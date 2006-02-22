@@ -4,7 +4,7 @@
 %             on the mean of the data epochs. Click on individual axes to examine them in detail.
 % Usage:
 %             >> envtopo(data,weights,'chanlocs',file_or_struct);
-%             >> [compvarorder,compvars,compframes,comptimes,compsplotted,pvaf] ...
+%             >> [compvarorder,compvars,compframes,comptimes,compsplotted,sortvar] ...
 %                                           = envtopo(data, weights, 'key1', val1, ...);
 % Inputs:
 %  data        = single data epoch (chans,frames), else it a 3-D epoched data matrix 
@@ -21,27 +21,26 @@
 %                 calculations and to chose plots from {default|[] -> all}, or
 %                [negative integer]  the number of largest contributing components to plot.
 %                 compnums in the latter case is restricted in size by the internal MAXTOPOS, 
-%                 currently MAXTOPOS = 20.                
-%                  {default|[] -> -7}
+%                 currently MAXTOPOS = 20 {default|[] -> -7}
 %  'limits'    = 0 or [minms maxms] or [minms maxms minuV maxuV]. Specify start/end plot
 %                  (x) limits (in ms) and min/max y-axis limits (in uV). If 0, or if both
 %                  minmx & maxms == 0 -> use latencies from 'timerange' (else 0:frames-1).
 %                  If both minuV and maxuV == 0 -> use data uV limits {default: 0}
 %  'timerange' = start and end input data latencies (in ms) {default: from 'limits' if any}
-%                  Note: Does not select a portion of the input data, just makes time labels.
+%                  Note: Does NOT select a portion of the input data, just makes time labels.
 %  'limcontrib' = [minms maxms]  time range (in ms) in which to rank component contribution
 %                  (boundaries shown with thin dotted lines) 
 %                  {default|[]|[0 0] -> plotting limits}
 %  'sortvar'    = ['mp'|'pv'|'pp'|'rp'] {default:'mp'} 
 %                  'mp', sort components by maximum mean back-projected power 
-%                  in the 'limcontrib' time range: mp(comp) = max(mean(back_proj.^2));
-%                    where back_proj = comp_map * comp_activation(t) over t in 'limcontrib'
+%                  in the 'limcontrib' time range: mp(comp) = max(Mean(back_proj.^2));
+%                    where back_proj = comp_map * comp_activation(t) for t in 'limcontrib'
 %                  'pv', sort components by percent variance accounted for (eeg_pvaf())
 %                    pvaf(comp) = 100-100*mean(var(data - back_proj))/mean(var(data));
 %                  'pp', sort components by percent power accounted for (ppaf) 
-%                    ppaf(comp) = 100-100*mean(mean((data - back_proj).^2))/mean(var(data));
+%                    ppaf(comp) = 100-100*Mean((data - back_proj).^2)/Mean(data.^2);
 %                  'rp', sort components by relative power 
-%                    rp(comp) = 100*mean(mean(back_proj.^2))/mean(mean(data.^2));
+%                    rp(comp) = 100*Mean(back_proj.^2)/Mean(data.^2);
 %  'title'      = [string] plot title {default|[] -> none}
 %  'plotchans'  = [integer array] data channels to use in computing contributions and 
 %                  envelopes, and also for making scalp topo plots
@@ -82,7 +81,7 @@
 %  compframes   = frames of comvars for each component plotted
 %  comptimes    = times of compvars for each component plotted
 %  compsplotted = indices of components plotted. unsorted_compvars=compvars(compsplotted)
-%  pvaf         = The computed data used to sort components with. See 'sortvar' option above.
+%  sortvar      = The computed data used to sort components with. See 'sortvar' option above.
 %
 % Notes:
 %  To label maps with other than component numbers, put four-char strings into 
@@ -110,6 +109,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.107  2006/02/22 03:01:47  toby
+% Updated 'sortvar' options. Numerous edits.
+%
 % Revision 1.106  2006/02/21 21:36:53  scott
 % clarifying sortvar args and computations and help msg -sm
 %
@@ -402,11 +404,11 @@
 % 03-15-02 added readlocs and the use of eloc input structure -ad 
 % 03-16-02 added all topoplot options -ad
 
-function [compvarorder,compvars,compframes,comptimes,compsplotted,pvaf] = envtopo(data,weights,varargin)
+function [compvarorder,compvars,compframes,comptimes,compsplotted,sortvar] = envtopo(data,weights,varargin)
 
 % icadefs;    % read toolbox defaults
 
-pvaf = []; 
+sortvar = []; 
 all_bold = 0;
 BOLD_COLORS = 1;    % 1 = use solid lines for first 5 components plotted
                     % 0 = use std lines according to component rank only
@@ -508,7 +510,7 @@ else % dprecated - old style input args
 end;
 
 if ~isempty(g.pvaf) 
-	g.sortvar = g.pvaf; % leave deprecated g.pvaf behind. pvaf is an output variable
+	g.sortvar = g.pvaf; % leave deprecated g.pvaf behind. 
 end
 
 if strcmpi(g.sortvar,'on') | strcmpi(g.sortvar,'pvaf') | strcmpi(g.sortvar,'mv')
@@ -828,11 +830,12 @@ end
 %%%%%%%%%%%%%% find max variances and their frame indices %%%%%%%%%%%
 %
 
-if strcmpi(g.sortvar,'mp') | strcmpi(g.sortvar,'pp')  | strcmpi(g.sortvar,'rp')  
-	powdat = mean(mean(data(g.plotchans,limframe1:limframe2).^2));
-else
-	% Variance of the data in the interval for the calculation of pvaf. 
+if strcmp(g.sortvar,'rv')
+	% Variance of the data in the interval, for calculating sortvar. 
 	vardat = mean(var(data(g.plotchans,limframe1:limframe2),1));
+else 
+	% Compute data rms for sortvar
+	powdat = mean(mean(data(g.plotchans,limframe1:limframe2).^2));
 end
 
 for c = 1:ncomps 
@@ -855,41 +858,41 @@ for c = 1:ncomps
       % save the comp envelope for plotting component waveforms
       envdata(:,c*frames+1:(c+1)*frames) = envelope(proj(g.plotchans,:), g.envmode); 
 
-      % Find the frame(timepoint) of greatest component value and the relative value to those 
-      % channels defined by plotchans. The data is squared in order to make it positive. 
-      % toby 2.19.2006
+      % Find the frame (timepoint) of largest rms component value 
+      % and the relative value to those channels defined by plotchans. 
       if length(g.plotchans) > 1
         [maxval,maxi] = max(mean((proj(g.plotchans,limframe1:limframe2)).^2));
-      else
-        [maxval,maxi] = max((proj(g.plotchans,limframe1:limframe2)).^2); 
+      else g.plotchans == 1 --> find absmax value
+        [maxval,maxi] = max((abs(proj(g.plotchans,limframe1:limframe2)))); 
       end
       maxi = maxi+limframe1-1;
-      % plotframes and compvars are needed for plotting the lines indicating the timepoint a
-      % topoplot refers to.
+
+      % plotframes and compvars are needed for plotting the lines indicating 
+      % the timepoint a topoplot refers to.
       plotframes(c) = maxi;
       compvars(c)   = maxval;       % find value of max variance for comp c
-      maxproj(:,c)  = proj(:,maxi); % maxproj now contains all channels, to handle the 
-                                    % 'plotchans'/topoplot'gridplot' conflict. Toby 2.17.2006
-
+      maxproj(:,c)  = proj(:,maxi); % maxproj now contains all channels, to handle 
+                                    % the 'plotchans'/topoplot'gridplot' conflict. 
+									% Toby 2.17.2006
       %
-      %%%%%% Calculate pvaf, used to sort the components %%%%%%%%%%%
+      %%%%%% Calculate sortvar, used to sort the components %%%%%%%%%%%
       %
       if strcmpi(g.sortvar,'mp')  % Maximum Power of backproj
-          pvaf(c) = maxval;
+          sortvar(c) = maxval;
           
       elseif strcmpi(g.sortvar, 'pv')   % Percent Variance
-          % toby 2.19.2006: Change to be consistent with pvaf calculation in eeg_pvaf().
-          pvaf(c) = 100-100*mean(var(data(g.plotchans,limframe1:limframe2)...
+          % toby 2.19.2006: Changed to be consistent with eeg_pvaf().
+          sortvar(c) = 100-100*mean(var(data(g.plotchans,limframe1:limframe2)...
                         - proj(g.plotchans,limframe1:limframe2),1))/vardat;
 
       elseif strcmpi(g.sortvar,'pp')    % Percent Power
-          pvaf(c) = 100-100*mean(mean((data(g.plotchans,limframe1:limframe2)...
+          sortvar(c) = 100-100*mean(mean((data(g.plotchans,limframe1:limframe2)...
                         - proj(g.plotchans,limframe1:limframe2)).^2))/powdat;
           
       elseif strcmpi(g.sortvar,'rp')    % Relative Power
-          pvaf(c) = 100*mean(mean((proj(g.plotchans,limframe1:limframe2)).^2))/powdat;
+          sortvar(c) = 100*mean(mean((proj(g.plotchans,limframe1:limframe2)).^2))/powdat;
       else
-          error('sortvar argument unknown');
+          error('''sortvar'' argument unknown');
       end;
 
 end % component c
@@ -899,20 +902,14 @@ fprintf('\n');
 %%%%%%%%%%%%%%% Compute component selection criterion %%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 
-% compute pvaf
+% compute sortvar
 if ~xunitframes
-  fprintf('  in the interval %3.0f ms to %3.0f ms.\n',1000*times(limframe1),1000*times(limframe2));
+  fprintf('  in the interval %3.0f ms to %3.0f ms.\n',...
+					1000*times(limframe1),1000*times(limframe2));
 end
 
-if strcmpi(g.sortvar, 'mp') | strcmpi(g.sortvar,'on') | strcmpi(g.sortvar,'mv') 
-    ot   = g.sortvar;
-    if strcmpi(ot,'on'), ot = 'pvaf'; end
-elseif strcmpi(g.sortvar, 'rv')| strcmpi(g.sortvar,'off')
-    ot   = 'rv';
-end;
-
-[sortpvaf spx] = sort(pvaf);
-sortpvaf = sortpvaf(end:-1:1);
+[sortsortvar spx] = sort(sortvar);
+sortsortvar = sortsortvar(end:-1:1);
 spx      = spx(end:-1:1);
 npercol = ceil(ncomps/3);
 
@@ -920,15 +917,15 @@ npercol = ceil(ncomps/3);
 %%%%%%%%%%%%%%%%%%%%%%%%% Sort the components %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 
-[tmp,compx]  = sort(pvaf');           % sort compnums on pvaf (with values defined by input 
-                                      % 'sortvar', default is 'mp'.
+[tmp,compx]  = sort(sortvar');           % sort compnums on sortvar (as defined by input 
+                                      % 'sortvar', default is 'mp').
 compx        = compx(ncomps:-1:1);    % reverse order of sort
 compvars     = compvars(ncomps:-1:1)';% reverse order of sort (output var)
 compvarorder = g.compnums(compx);     % actual component numbers (output var)
 plotframes   = plotframes(compx);     % plotted comps have these max frames 
 compframes   = plotframes';           % frame of max variance in each comp (output var)
-comptimes    = times(plotframes(compx));  % time of max variance in each comp (output var)
-compsplotted = compvarorder(1:ntopos);% (output var)
+comptimes    = times(plotframes(compx)); % time of max variance in each comp (output var)
+compsplotted = compvarorder(1:ntopos); % (output var)
 
 %
 %%%%%%%%%%%%%%%%%%%%%%%% Reduce to ntopos %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -987,10 +984,9 @@ for t=1:ntopos
 end
 fprintf('\n');
 
-if strcmpi(g.sortvar,'on') | strcmpi(g.sortvar,'pvaf')
-   fprintf('    Component pvaf in interval:  ');
+fprintf('    Component sortvar in interval:  ');
    for t=1:ntopos
-     fprintf('%4.2f ',pvaf(t));
+     fprintf('%4.2f ',sortvar(t));
    end
    fprintf('\n');
 end
@@ -999,26 +995,29 @@ end
 sumproj = zeros(size(data(g.plotchans,:)));
 for n = 1:ntopos
   if isempty(g.icaact)
-      sumproj = sumproj + g.icawinv(g.plotchans,maporder(n))*weights(maporder(n),:)*data; % updated -sm 11/04
+      sumproj = sumproj + ...
+		g.icawinv(g.plotchans,maporder(n))*weights(maporder(n),:)*data; 
   else 
-      sumproj = sumproj + g.icawinv(g.plotchans,maporder(n))*g.icaact(maporder(n),:);     % updated -sm 11/04
-  end;                                                              % Note: sumproj here has only g.plotchans
+      sumproj = sumproj + g.icawinv(g.plotchans,maporder(n))*g.icaact(maporder(n),:);     
+											% updated -sm 11/04
+  end;                                      % Note: sumproj here has only g.plotchans
 end
-varproj = mean(mean((data(g.plotchans,limframe1:limframe2).^2))); % find data variance in interval
-if strcmpi(g.sortvar, 'on')
-      sumpvaf = mean(mean((data(g.plotchans,limframe1:limframe2)-sumproj(:,limframe1:limframe2)).^2)); 
-  else
-      sumpvaf = mean(mean(sumproj(:,limframe1:limframe2).^2));      
+rmsproj = mean(mean((data(g.plotchans,limframe1:limframe2).^2))); % find data rms in interval
+
+if strcmpi(g.sortvar,'rp') 
+ 	sumppaf = mean(mean(sumproj(:,limframe1:limframe2).^2));      
+    sumppaf = 100*sumppaf/rmsproj;
+    ot   = 'rp';
+else 
+   sumppaf = mean(mean((data(g.plotchans,limframe1:limframe2) ...
+                                  - sumproj(:,limframe1:limframe2)).^2)); 
+    sumppaf = 100-100*sumppaf/rmsproj;
+    ot   = 'ppaf';
 end;
-if strcmpi(g.sortvar, 'on') | strcmpi(g.sortvar,'pv') | strcmpi(g.sortvar,'pvaf') | strcmpi(g.sortvar,'mv')
-    sumpvaf = 100-100*sumpvaf/varproj;
-    ot   = 'pvaf';
-else % if strcmpi(g.sortvar, 'off') | strcmpi(g.sortvar,'rv')
-    sumpvaf = 100*sumpvaf/varproj;
-    ot   = 'rv';
-end;
+
 if ~xunitframes
-   fprintf('    Summed component %s in interval [%4g %4g] ms: %4.2f%%\n',ot, 1000*times(limframe1),1000*times(limframe2), sumpvaf);
+   fprintf('    Summed component ''%s'' in interval [%4g %4g] ms: %4.2f%%\n',...
+					ot, 1000*times(limframe1),1000*times(limframe2), sumppaf);
 end
 %
 %%%%%%%%%%%%%%%%%%%%% Plot the data envelopes %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1098,17 +1097,17 @@ if strcmpi(g.sumenv,'on')  | strcmpi(g.sumenv,'fill')
     set(p,'color',FILLCOLOR);
  end
 end
-if strcmpi(g.sortvar,'pvaf')
-    t = text(double(xmin+0.1*(xmax-xmin)), ...
-             double(ymin+0.1*(ymax-ymin)), ...
-             ['pvaf ' num2str(sumpvaf,'%4.2f') '%']);
-   set(t,'fontsize',12,'fontweight','bold')
-elseif strcmpi(g.sortvar,'rv') | strcmpi(g.sortvar,'off')
-    t = text(double(xmin+0.1*(xmaxxpmin)), ...
-             double(ymin+0.1*(ymax-ymin)), ...
-             ['rv ' num2str(sumpvaf,'%4.2f') '%']);
-   set(t,'fontsize',12,'fontweight','bold')
+
+if strcmpi(g.sortvar,'rp')
+	t = text(double(xmin+0.1*(xmax-xmin)), ...
+         double(ymin+0.1*(ymax-ymin)), ...
+         ['rp ' num2str(sumppaf,'%4.2f') '%']);
+else
+	t = text(double(xmin+0.1*(xmax-xmin)), ...
+         double(ymin+0.1*(ymax-ymin)), ...
+         ['ppaf ' num2str(sumppaf,'%4.2f') '%']);
 end
+set(t,'fontsize',12,'fontweight','bold')
 
 %
 % %%%%%%%%%%%%%%%%%%%%%%%% Plot the computed component envelopes %%%%%%%%%%%%%%%%%%
@@ -1341,16 +1340,16 @@ if strcmpi(g.dispmaps, 'on')
             else  % if no varargin specified
                 figure(myfig);
 
-                % toby 2.16.2006: Changed to accomodate fact that maxproj contains all channel info now.
+           		% toby 2.16.2006: Changed to accomodate fact that 
+				% maxproj contains all channel info now.
                 topoplot(maxproj(g.plotchans,t),chanlocs,'style','both','emarkersize',3);
             end
             axis square
-            if strcmpi(g.sortvar, 'on')
-                set(gca, 'userdata', ['text(-0.6, -0.6, ''pvaf: ' sprintf('%6.2f', pvaf(tmpsort(t))) ''');'] );
-            else
-                set(gca, 'userdata', ['text(-0.6, -0.6, ''rv: ' sprintf('%6.2f', pvaf(tmpsort(t))) ''');'] );
+            set(gca, 'userdata', ...
+	['text(-0.6, -0.6, '''g.sortvar': ' sprintf('%6.2f', sortvar(tmpsort(t))) ''');'] );
             end;
-        else axis off;
+        else 
+			axis off;
         end;
 
         %
@@ -1367,7 +1366,8 @@ if strcmpi(g.dispmaps, 'on')
             if chid <3,
                 numlabels = 1;
             else
-                fprintf('Will label scalp maps with labels from file %s\n','envtopo.labels');
+                fprintf('Will label scalp maps with labels from file %s\n',...
+					'envtopo.labels');
                 compnames = fscanf(chid,'%s',[4 MAXPLOTDATACHANS]);
                 compnames = compnames';
                 [r c] = size(compnames);
@@ -1398,7 +1398,8 @@ if strcmpi(g.dispmaps, 'on')
     %%%%%%%%%%%%%%%%%%%%%%%%%%% Plot a colorbar %%%%%%%%%%%%%%%%%%%%%%%%%%
     %
     % axt = axes('Units','Normalized','Position',[.88 .58 .03 .10]);
-    axt = axes('Position',[pos(1)+pos(3)*1.015 pos(2)+0.6055*pos(4) pos(3)*.02 pos(4)*0.09]);
+    axt = axes('Position',[pos(1)+pos(3)*1.015 pos(2)+0.6055*pos(4) ...
+				pos(3)*.02 pos(4)*0.09]);
     if strcmpi(g.actscale, 'on')
         h=cbar(axt, [1:64],[-maxvolt maxvolt],3);
     else
@@ -1407,10 +1408,13 @@ if strcmpi(g.dispmaps, 'on')
         
         axes(axall)
         set(axall,'Color',axcolor);
-        tmp = text(0.50,1.05,g.title,'FontSize',16,'HorizontalAlignment','Center','FontWeight','Bold');
+        tmp = text(0.50,1.05,g.title,'FontSize',16,...
+						'HorizontalAlignment','Center',...
+						'FontWeight','Bold');
         set(tmp, 'interpreter', 'none');
         text(1,0.68,'+','FontSize',16,'HorizontalAlignment','Center');
-        % text(1,0.637,'0','FontSize',12,'HorizontalAlignment','Center','verticalalignment','middle');
+        % text(1,0.637,'0','FontSize',12,'HorizontalAlignment','Center',...
+		%	'verticalalignment','middle');
         text(1,0.61,'-','FontSize',16,'HorizontalAlignment','Center');
     end;
     axes(axall)
@@ -1420,7 +1424,8 @@ end;
 %
 %%%%%%%%%%%%%%%%%%%%%%%%% turn on axcopy %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-axcopy(gcf, 'if ~isempty(get(gca, ''''userdata'''')), eval(get(gca, ''''userdata'''')); end;');
+axcopy(gcf, ...
+  'if ~isempty(get(gca,''''userdata'''')), eval(get(gca,''''userdata''''));end;');
 
 return %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -1428,18 +1433,17 @@ function envdata = envelope(data, envmode)  % also in release as env()
   if nargin < 2
       envmode = 'avg';
   end;
-  if strcmpi(envmode, 'rms');
+  if strcmpi(envmode, 'rms'); % return rms of pos and neg vals at each time point 
       warning off;
-      negflag = (data < 0);
-      dataneg = negflag.* data;
-      % ERROR? dataneg appears to be taking the sqrt of a neg number. toby 2/20/2006
-      dataneg = -sqrt(sum(dataneg.*dataneg,1) ./ sum(negflag,1));
-      posflag = (data > 0);
-      datapos = posflag.* data;
-      datapos = sqrt(sum(datapos.*datapos,1) ./ sum(posflag,1)); 
+      datnaeg = (data < 0).*data; % zero out positive values
+      dataneg = -sqrt(sum(dataneg.^2,1) ./ sum(negflag,1));
+
+      datapos = (data > 0).*data; % zero out negative values
+      datapos = sqrt(sum(datapos.^2,1) ./ sum(posflag,1)); 
+
       envdata = [datapos;dataneg];
       warning on;
-  else    
+  else  % find max and min value at each time point
       if size(data,1)>1
           maxdata = max(data); % max at each time point
           mindata = min(data); % min at each time point
