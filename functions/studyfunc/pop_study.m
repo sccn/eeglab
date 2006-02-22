@@ -93,6 +93,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2006/02/09 22:44:17  arno
+% text edit
+%
 % Revision 1.19  2006/02/09 21:49:15  arno
 % adding rmclust options
 %
@@ -356,7 +359,7 @@ elseif strcmpi(mode, 'gui') % GUI mode
          end;
     else options = { options{:} 'updatedat' 'off' };
     end;
-    if outstruct(1).delstruct == 1
+    if outstruct(1).delclust == 1
         options = { options{:} 'rmclust' 'on' };
     end;
     
