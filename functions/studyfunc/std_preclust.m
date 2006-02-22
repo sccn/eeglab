@@ -127,6 +127,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2006/02/22 21:02:25  arno
+% Removing cluster information
+%
 % Revision 1.17  2006/02/22 20:03:20  arno
 % fixing dimension reduction
 %
@@ -261,9 +264,8 @@ function [ STUDY, ALLEEG ] = cls_preclust(STUDY, ALLEEG, cluster_ind, components
         
         % remove previous clusters
         % ------------------------
-        disp('Removing previous cluster information');
         STUDY.cluster = [];
-        STUDY = checkstudy(STUDY);
+        STUDY = checkstudy(STUDY, ALLEEG);
         
         % find dipoles of interest
         % ------------------------
