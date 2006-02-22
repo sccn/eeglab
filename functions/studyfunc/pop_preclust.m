@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2006/02/22 21:21:23  arno
+% update for hierarchic clustering
+%
 % Revision 1.26  2006/02/22 19:57:38  arno
 % second level pca
 %
@@ -115,32 +118,34 @@ if ~isstr(varargin{1}) %intial settings
     % cluster text
     % ------------
     % load leaf clusters
-    cls = [];
-    for k = 1:length(STUDY.cluster)
-        if isempty(STUDY.cluster(k).child) 
-            if isempty(cls)
-                parent = STUDY.cluster(k).parent;
-            elseif ~isempty(STUDY.cluster(k).parent)  | ~isempty(parent) % if not both empty                          
-                                                                         % Check if all parents are the same
-                if ~(sum(strcmp(STUDY.cluster(k).parent, parent)) == length(parent)) % different parent
-                    if ~strcmp(STUDY.cluster(k).parent,'manual') & ~strcmp(parent, 'manual') 
-                        sameparent = 0;
-                    end
-                end
-            end
-            cls = [ cls k];
-        end
-    end
-    N = length(cls); %number of clusters
-    show_options = {};
     num_cls = 0;
-    for k = 2:N
-        show_options{k-1} = [STUDY.cluster(cls(k)).name ' (' num2str(length(STUDY.cluster(cls(k)).comps))  ' ICs)'];
-        if (~strncmpi('Notclust',STUDY.cluster(cls(k)).name,8)) & (~strncmpi('Outliers',STUDY.cluster(cls(k)).name,8))  & ...
-                (~strncmpi('ParentCluster',STUDY.cluster(cls(k)).name,13))
-            num_cls = num_cls + 1;
-        end
-    end
+    cls = 1:length(STUDY.cluster);
+    N = length(cls); %number of clusters
+    
+    show_options{1} = [STUDY.cluster(1).name ' (' num2str(length(STUDY.cluster(1).comps))  ' ICs)'];
+    cls(1) = 1;
+    count = 2;
+    for index1 = 1:length(STUDY.cluster(1).child)
+        
+        indclust1 = strmatch( STUDY.cluster(1).child(index1), { STUDY.cluster.name });
+        show_options{count} = ['   ' STUDY.cluster(indclust1).name ' (' num2str(length(STUDY.cluster(indclust1).comps))  ' ICs)'];
+        cls(count) = indclust1;
+        count = count+1;
+        
+        for index2 = 1:length( STUDY.cluster(indclust1).child )
+            indclust2 = strmatch( STUDY.cluster(indclust1).child(index2), { STUDY.cluster.name });
+            show_options{count} = ['      ' STUDY.cluster(indclust2).name ' (' num2str(length(STUDY.cluster(indclust2).comps))  ' ICs)'];
+            cls(count) = indclust2;
+            count = count+1;
+            
+            for index3 = 1:length( STUDY.cluster(indclust2).child )
+                indclust3 = strmatch( STUDY.cluster(indclust2).child(index3), { STUDY.cluster.name });
+                show_options{count} = ['         ' STUDY.cluster(indclust3).name ' (' num2str(length(STUDY.cluster(indclust3).comps))  ' ICs)'];
+                cls(count) = indclust3;
+                count = count+1;
+            end;
+        end;
+    end;
 
     % callbacks
     % ---------
@@ -169,7 +174,7 @@ if ~isstr(varargin{1}) %intial settings
     
     gui_spec = { ...
     {'style' 'text'       'string' str_name 'FontSize' 12 'FontWeight' 'Bold' 'horizontalalignment' 'left'} ...
-	{'style' 'text'       'string' 'Select cluster leaves from which to refine clustering (remove cluster info (edit study) to restart from scratch)' } {} ...
+	{'style' 'text'       'string' 'Select cluster from which to refine clustering (sub-hierarchy will be overwritten)' } {} ...
     {'style' 'listbox'    'string' show_options 'value' 1 'tag' 'clus_list' 'Callback' show_clust 'max' 1 } {}  {} ...
     {'style' 'text'       'string' 'Pre-compute or load           Dim.       Norm.  Rel. weight' 'FontWeight' 'Bold'} ...
     {'style' 'checkbox'   'string' '' 'tag' 'spectra_on' 'value' 0 'Callback' set_spectra 'userdata' '1'}  ...
@@ -231,7 +236,7 @@ if ~isstr(varargin{1}) %intial settings
                  [3] geomline geomline geomline geomline geomline geomline [1] geomline [1] [0.32 2 5 0.8] };
     geomvert = [ 1 1 3 1 1 1 1 1 1 1 1 0.5 1 1 1 1];
 
-    if isempty(show_options)
+    if length(show_options) < 3
         gui_spec(2:6) = { {} ...
             { 'style' 'text'      'string' [ 'Among the pre-selected components (Edit study),' ...
                             'remove those which dipole res. var, exceed' ] 'tag' 'dipole_select_on' }  ...
@@ -252,8 +257,8 @@ if ~isstr(varargin{1}) %intial settings
     % precluster on what?
     % -------------------
     dipselect = 0;
-    if ~isempty(show_options)
-        options{3} = os.clus_list+2; % hierarchical clustering
+    if length(show_options) >= 2
+        options{3} = cls(os.clus_list); % hierarchical clustering
         options{4} = [];
     else
         options{3} = [];
