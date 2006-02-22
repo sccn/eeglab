@@ -58,6 +58,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2006/02/22 22:40:45  arno
+% smarter warning message
+%
 % Revision 1.12  2006/02/22 22:37:41  arno
 % allowing subclustering
 %
@@ -201,7 +204,7 @@ if isempty(varargin) %GUI call
            STUDY.history =  sprintf('%s\n%s',  STUDY.history, command);            
        end
            
-       [STUDY] = pop_clustedit(STUDY, ALLEEG, clusters);           
+       [STUDY] = pop_clustedit(STUDY, ALLEEG);           
 	end
     
 else %command line call
