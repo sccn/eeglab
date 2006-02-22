@@ -54,6 +54,8 @@
 %                                  'freqrange', 'padratio', 'timewindow', 'alpha').
 %                    * 'itc'     = cluster on components ITC.(requires: 'cycles', 
 %                                  'freqrange', 'padratio', 'timewindow', 'alpha').
+%                    * 'finaldim' = final number of dimensions. Enable second level PCA. 
+%                                  By default this command is not used (see example below).
 %
 %                  'key'   optional inputs used in computing  the specified measures:
 %                    * 'npca'    =  [integer] number of PCA components (PCA dimension) of the 
@@ -92,7 +94,8 @@
 %                        { 'ersp'  'npca' 10 'freqrange' [ 3 25 ] 'cycles' [ 3 0.5 ] 'alpha' 0.01 ....
 %                                  'padratio' 4 'timewindow' [ -1600 1495 ] 'norm' 1 'weight' 1 } ,...
 %                        { 'itc'   'npca' 10 'freqrange' [ 3 25 ] 'cycles' [ 3 0.5 ] 'alpha' 0.01 ...
-%                                  'padratio' 4 'timewindow' [ -1600 1495 ] 'norm' 1 'weight' 1 });
+%                                  'padratio' 4 'timewindow' [ -1600 1495 ] 'norm' 1 'weight' 1 }, ...
+%                        { 'finaldim' 'npca' 10 });
 %                          
 %                        % This prepares for first-stage clustering all components in the STUDY
 %                        % datasets except components with dipole model residual variance above 0.15.
@@ -100,6 +103,8 @@
 %                        % frequency range, the components' ERPs in the [350 500] ms % time window, 
 %                        % the (absolute-value) component scalp maps, their equivalent dipole locations,
 %                        % and their ERSP and ITC images. 
+%                        % At the last stage a second level PCA decomposition is performed. See web
+%                        % tutorial for more details.
 %
 % Authors: Arnaud Delorme, Hilit Serby & Scott Makeig, SCCN, INC, UCSD, May 13, 2004
 
@@ -122,6 +127,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2006/02/18 01:01:38  arno
+% eeg_preclust -> cls_preclust
+%
 % Revision 1.14  2006/02/18 00:56:34  arno
 % showing more warnings
 %
@@ -221,24 +229,25 @@ function [ STUDY, ALLEEG ] = cls_preclust(STUDY, ALLEEG, cluster_ind, components
         end
     end;
     
-    % Scan which component to remove (no dipole info)
-    % -----------------------------------------------
+    % Decode input arguments
+    % ----------------------
     update_flag = 0;
-    clear rv
+    rv           = 1;
+    secondlevpca = Inf;
     for index = 1:length(varargin) % scan commands
         strcom = varargin{index}{1};
         if strcmpi(strcom(1:3),'dip')
             update_flag = 1;
-            if strcmpi(strcom,'dipoles') & ~exist('rv')
-                rv = 1;
-            elseif strcmpi(strcom,'dipselect')
-                rv = varargin{index}{3};
-                varargin(index) = []; %remove this command
-                break
-            end
+            rv = varargin{index}{3};
+            varargin(index) = []; %remove this command
+        elseif strcmpi(strcom(1:3),'fin') % second level pca
+            secondlevpca = varargin{index}{3};
+            varargin(index) = []; %remove this command
         end        
     end
     
+    % Scan which component to remove (no dipole info)
+    % -----------------------------------------------
     nodip = 0;
     if update_flag % dipole information is used to select components
         for si = 1:size(STUDY.setind,2)% scan datasets that are part of STUDY
@@ -688,9 +697,10 @@ function [ STUDY, ALLEEG ] = cls_preclust(STUDY, ALLEEG, cluster_ind, components
     
     % Compute a second PCA of the already PCA'd data if there are too many PCA dimensions.
     % ------------------------------------------------------------------------------------
-    if size(clustdata,2) > 10
-        fprintf('Performing second-level PCA: reducing dimension from %d to 10 \n', size(clustdata,2));
-        clustdata = runpca( clustdata.', 10, 1);
+    if size(clustdata,2) > secondlevpca
+        fprintf('Performing second-level PCA: reducing dimension from %d to %d \n', ...
+                size(clustdata,2), secondlevpca);
+        clustdata = runpca( clustdata.', secondlevpca, 1);
         clustdata = clustdata.';
     end
     
