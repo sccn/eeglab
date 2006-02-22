@@ -32,16 +32,16 @@
 %  'limcontrib' = [minms maxms]  time range (in ms) in which to rank component contribution
 %                  (boundaries shown with thin dotted lines) 
 %                  {default|[]|[0 0] -> plotting limits}
-%  'sortvar'    = ['mp'|'pv'|'pp'|'rv'] {default:'mp'} 
+%  'sortvar'    = ['mp'|'pv'|'pp'|'rp'] {default:'mp'} 
 %                  'mp', sort components by maximum mean back-projected power 
-%                    in the 'limcontrib' time range: mp(comp) = max(mean(back_proj.^2));
+%                  in the 'limcontrib' time range: mp(comp) = max(mean(back_proj.^2));
 %                    where back_proj = comp_map * comp_activation(t) over t in 'limcontrib'
 %                  'pv', sort components by percent variance accounted for (eeg_pvaf())
 %                    pvaf(comp) = 100-100*mean(var(data - back_proj))/mean(var(data));
 %                  'pp', sort components by percent power accounted for (ppaf) 
 %                    ppaf(comp) = 100-100*mean(mean((data - back_proj).^2))/mean(var(data));
 %                  'rp', sort components by relative power 
-%                    rp(comp) = 100*mean(back_proj.^2)/mean(data.^2);
+%                    rp(comp) = 100*mean(mean(back_proj.^2))/mean(mean(data.^2));
 %  'title'      = [string] plot title {default|[] -> none}
 %  'plotchans'  = [integer array] data channels to use in computing contributions and 
 %                  envelopes, and also for making scalp topo plots
@@ -75,13 +75,15 @@
 %  'topoplotkey','val' = optional additional topoplot() arguments {default: none}
 %
 % Outputs:
+% 
 %  compvarorder = component numbers in decreasing order of max variance in data
-%  compvars     = ('sortvar') max power/variance for all components tested
-%  compframes   = frames of max variance for each component plotted
-%  comptimes    = times of max variance for each component plotted
-%  compsplotted = indices of components plotted
-%  mv|pvaf|rv   = max variance, percent variance accounted for, 
-%                 or relative variance (see 'sortvar')
+%  compvars     = ('sortvar') max power for all components tested, sorted from highest to
+%                   lowest. See 'sortvar' 'mp'
+%  compframes   = frames of comvars for each component plotted
+%  comptimes    = times of compvars for each component plotted
+%  compsplotted = indices of components plotted. unsorted_compvars=compvars(compsplotted)
+%  pvaf         = The computed data used to sort components with. See 'sortvar' option above.
+%
 % Notes:
 %  To label maps with other than component numbers, put four-char strings into 
 %  a local (pwd) file named 'envtopo.labels' (using . = space) in time-order 
@@ -108,6 +110,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.106  2006/02/21 21:36:53  scott
+% clarifying sortvar args and computations and help msg -sm
+%
 % Revision 1.105  2006/02/21 04:19:08  toby
 % Documentation updates.
 %
@@ -439,8 +444,8 @@ if nargin <= 2 | isstr(varargin{1})
 				  'subcomps'      'integer'  []                       []; 
 				  'envmode'       'string'   {'avg' 'rms'}            'avg'; 
 				  'dispmaps'      'string'   {'on' 'off'}             'on'; 
-				  'pvaf'          'string'   {'mp' 'mv' 'on'   'rp' 'rv'   'pv' 'pvaf'   'pp' 'off'} 'mp'; 
-				  'sortvar'       'string'   {'mp' 'mv' 'rv' 'pv' 'pvaf' 'on' 'off'} 'mp';  
+				  'pvaf'          'string'   {'mp' 'mv' 'on' 'rp' 'rv' 'pv' 'pvaf' 'pp' 'off' ''} ''; 
+				  'sortvar'       'string'   {'mp' 'mv' 'rp' 'rv' 'pv' 'pvaf' 'pp'} 'mp';  
 				  'actscale'      'string'   {'on' 'off'}             'off'; 
 				  'limcontrib'    'real'     []                       0;  
 				  'topoarg'    'real'     []                       0;  
@@ -824,7 +829,7 @@ end
 %
 
 if strcmpi(g.sortvar,'mp') | strcmpi(g.sortvar,'pp')  | strcmpi(g.sortvar,'rp')  
-	powdat = 1; % INCORRECT HERE !!!
+	powdat = mean(mean(data(g.plotchans,limframe1:limframe2).^2));
 else
 	% Variance of the data in the interval for the calculation of pvaf. 
 	vardat = mean(var(data(g.plotchans,limframe1:limframe2),1));
@@ -847,48 +852,46 @@ for c = 1:ncomps
           proj = g.icawinv(:,g.compnums(c))*g.icaact(g.compnums(c),:);
       end;    
 
-      % save the comp envelope
-      envdata(:,c*frames+1:(c+1)*frames) = envelope(proj(:,:), g.envmode); 
+      % save the comp envelope for plotting component waveforms
+      envdata(:,c*frames+1:(c+1)*frames) = envelope(proj(g.plotchans,:), g.envmode); 
 
       % Find the frame(timepoint) of greatest component value and the relative value to those 
-      % channels defined by plotchans. The data is squared in order to make it positive, maxval
-      % is not used and we are only interested in the location of the maxval, not it's value. 
+      % channels defined by plotchans. The data is squared in order to make it positive. 
       % toby 2.19.2006
       if length(g.plotchans) > 1
         [maxval,maxi] = max(mean((proj(g.plotchans,limframe1:limframe2)).^2));
       else
         [maxval,maxi] = max((proj(g.plotchans,limframe1:limframe2)).^2); 
       end
-
-      % find point of max variance for comp c
-      compvars(c)   = maxval;
+      maxi = maxi+limframe1-1;
+      % plotframes and compvars are needed for plotting the lines indicating the timepoint a
+      % topoplot refers to.
+      plotframes(c) = maxi;
+      compvars(c)   = maxval;       % find value of max variance for comp c
+      maxproj(:,c)  = proj(:,maxi); % maxproj now contains all channels, to handle the 
+                                    % 'plotchans'/topoplot'gridplot' conflict. Toby 2.17.2006
 
       %
-      %%%%%% find variance in interval after removing component %%%%%%%%%%%
+      %%%%%% Calculate pvaf, used to sort the components %%%%%%%%%%%
       %
-      if strcmpi(g.sortvar,'mp')  % INCORRECT BELOW !!!!
-          pvaf(c) = 100-100*mean(var(data(g.plotchans,limframe1:limframe2)...
-                        - proj(g.plotchans,limframe1:limframe2),1))/powdat;
+      if strcmpi(g.sortvar,'mp')  % Maximum Power of backproj
+          pvaf(c) = maxval;
           
-      elseif strcmpi(g.sortvar, 'pv') 
+      elseif strcmpi(g.sortvar, 'pv')   % Percent Variance
           % toby 2.19.2006: Change to be consistent with pvaf calculation in eeg_pvaf().
           pvaf(c) = 100-100*mean(var(data(g.plotchans,limframe1:limframe2)...
                         - proj(g.plotchans,limframe1:limframe2),1))/vardat;
 
-      elseif strcmpi(g.sortvar,'pp')  % INCORRECT BELOW !!!!
-          pvaf(c) = 100-100*mean(var(data(g.plotchans,limframe1:limframe2)...
-                        - proj(g.plotchans,limframe1:limframe2),1))/powdat;
+      elseif strcmpi(g.sortvar,'pp')    % Percent Power
+          pvaf(c) = 100-100*mean(mean((data(g.plotchans,limframe1:limframe2)...
+                        - proj(g.plotchans,limframe1:limframe2)).^2))/powdat;
           
-      elseif strcmpi(g.sortvar,'rp')  
-              pvaf(c) = 100*mean(mean(proj(g.plotchans,limframe1:limframe2)).^2)/powdat;
+      elseif strcmpi(g.sortvar,'rp')    % Relative Power
+          pvaf(c) = 100*mean(mean((proj(g.plotchans,limframe1:limframe2)).^2))/powdat;
       else
-			error('sortvar argument unknown');
+          error('sortvar argument unknown');
       end;
 
-      maxi = maxi+limframe1-1;
-      plotframes(c) = maxi;
-      maxproj(:,c)  = proj(:,maxi); % maxproj now contains all channels, to handle the 
-                                    % 'plotchans'/topoplot'gridplot' conflict. Toby 2.17.2006
 end % component c
 fprintf('\n');
 
@@ -901,7 +904,7 @@ if ~xunitframes
   fprintf('  in the interval %3.0f ms to %3.0f ms.\n',1000*times(limframe1),1000*times(limframe2));
 end
 
-if strcmpi(g.sortvar, 'mp') | strcmpi(g.sortvar,'on') | strcmpi(g.sortvar,'mv') | strcmpi(g.sortvar,'mp') 
+if strcmpi(g.sortvar, 'mp') | strcmpi(g.sortvar,'on') | strcmpi(g.sortvar,'mv') 
     ot   = g.sortvar;
     if strcmpi(ot,'on'), ot = 'pvaf'; end
 elseif strcmpi(g.sortvar, 'rv')| strcmpi(g.sortvar,'off')
@@ -913,22 +916,12 @@ sortpvaf = sortpvaf(end:-1:1);
 spx      = spx(end:-1:1);
 npercol = ceil(ncomps/3);
 
-% for index =1:npercol
-%     try, fprintf('   IC%d\t%s: %6.2f%%\t', spx(index)          , ot, sortpvaf(index)); catch, end;
-%     try, fprintf('   IC%d\t%s: %6.2f%%\t', spx(index+npercol)  , ot, sortpvaf(index+npercol)); catch, end;
-%     try, fprintf('   IC%d\t%s: %6.2f%%\t', spx(index+2*npercol), ot, sortpvaf(index+2*npercol)); catch, end;
-%     fprintf('\n');
-% end;
-
 %
-%%%%%%%%%%%%%%%%%%%%%%%%% Sort by max variance in data %%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%% Sort the components %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-if strcmpi(g.sortvar,'mv') | strcmpi(g.sortvar,'on') | strcmpi(g.sortvar,'mp')
-    [compvars,compx] = sort(compvars');  % sort compnums on max variance
-else % if 'pvaf' is 'pvaf' or 'rv'
-    [tmp,compx]  = sort(pvaf');   % sort compnums on pvaf or rv
-end
 
+[tmp,compx]  = sort(pvaf');           % sort compnums on pvaf (with values defined by input 
+                                      % 'sortvar', default is 'mp'.
 compx        = compx(ncomps:-1:1);    % reverse order of sort
 compvars     = compvars(ncomps:-1:1)';% reverse order of sort (output var)
 compvarorder = g.compnums(compx);     % actual component numbers (output var)
@@ -936,9 +929,11 @@ plotframes   = plotframes(compx);     % plotted comps have these max frames
 compframes   = plotframes';           % frame of max variance in each comp (output var)
 comptimes    = times(plotframes(compx));  % time of max variance in each comp (output var)
 compsplotted = compvarorder(1:ntopos);% (output var)
+
 %
 %%%%%%%%%%%%%%%%%%%%%%%% Reduce to ntopos %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
+
 [plotframes,ifx] = sort(plotframes(1:ntopos));% sort plotframes on their temporal order
 plottimes  = times(plotframes);       % convert to times in ms
 compx      = compx(ifx);              % indices into compnums, in plotting order
@@ -1000,6 +995,7 @@ if strcmpi(g.sortvar,'on') | strcmpi(g.sortvar,'pvaf')
    fprintf('\n');
 end
 
+% toby 2.21.2006 REDUNDANT CALCULATIONS!
 sumproj = zeros(size(data(g.plotchans,:)));
 for n = 1:ntopos
   if isempty(g.icaact)
@@ -1013,7 +1009,7 @@ if strcmpi(g.sortvar, 'on')
       sumpvaf = mean(mean((data(g.plotchans,limframe1:limframe2)-sumproj(:,limframe1:limframe2)).^2)); 
   else
       sumpvaf = mean(mean(sumproj(:,limframe1:limframe2).^2));      
-  end;
+end;
 if strcmpi(g.sortvar, 'on') | strcmpi(g.sortvar,'pv') | strcmpi(g.sortvar,'pvaf') | strcmpi(g.sortvar,'mv')
     sumpvaf = 100-100*sumpvaf/varproj;
     ot   = 'pvaf';
@@ -1436,6 +1432,7 @@ function envdata = envelope(data, envmode)  % also in release as env()
       warning off;
       negflag = (data < 0);
       dataneg = negflag.* data;
+      % ERROR? dataneg appears to be taking the sqrt of a neg number. toby 2/20/2006
       dataneg = -sqrt(sum(dataneg.*dataneg,1) ./ sum(negflag,1));
       posflag = (data > 0);
       datapos = posflag.* data;
