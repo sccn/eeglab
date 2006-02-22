@@ -127,6 +127,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2006/02/22 19:55:36  arno
+% second level pca
+%
 % Revision 1.15  2006/02/18 01:01:38  arno
 % eeg_preclust -> cls_preclust
 %
@@ -231,20 +234,22 @@ function [ STUDY, ALLEEG ] = cls_preclust(STUDY, ALLEEG, cluster_ind, components
     
     % Decode input arguments
     % ----------------------
-    update_flag = 0;
+    update_flag  = 0;
     rv           = 1;
     secondlevpca = Inf;
+    indrm        = [];
     for index = 1:length(varargin) % scan commands
         strcom = varargin{index}{1};
         if strcmpi(strcom(1:3),'dip')
             update_flag = 1;
             rv = varargin{index}{3};
-            varargin(index) = []; %remove this command
+            indrm = [indrm index]; %remove this command
         elseif strcmpi(strcom(1:3),'fin') % second level pca
             secondlevpca = varargin{index}{3};
-            varargin(index) = []; %remove this command
+            indrm = [indrm index]; %remove this command
         end        
     end
+    varargin(indrm) = []; %remove commands
     
     % Scan which component to remove (no dipole info)
     % -----------------------------------------------
