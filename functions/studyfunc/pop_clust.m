@@ -58,10 +58,21 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2006/02/14 00:13:32  arno
+% adding log
+%
 
 function [STUDY, ALLEEG, com] = pop_clust(STUDY, ALLEEG, varargin)
 
 com = '';
+
+if isempty(STUDY.etc)
+    error('No pre-clustering information');
+end;
+if isempty(STUDY.etc.preclust)
+    error('No pre-clustering information');
+end;
+
 if isempty(varargin) %GUI call
 	alg_options = {'Kmeans' 'Neural Network' }; %'Hierarchical tree' 
 	set_outliers = ['set(findobj(''parent'', gcbf, ''tag'', ''outliers_std''), ''enable'', fastif(get(gcbo, ''value''), ''on'', ''off''));'...
@@ -70,9 +81,15 @@ if isempty(varargin) %GUI call
 	saveSTUDY = [ 'set(findobj(''parent'', gcbf, ''userdata'', ''save''), ''enable'', fastif(get(gcbo, ''value'')==1, ''on'', ''off''));' ];
 	browsesave = [ '[filename, filepath] = uiputfile2(''*.study'', ''Save STUDY with .study extension -- pop_clust()''); ' ... 
                       'set(findobj(''parent'', gcbf, ''tag'', ''studyfile''), ''string'', [filepath filename]);' ];
-	
-	clust_param = inputgui( { [3 1] [3 1] [ 0.2 2.7 1 ] [1] [0.29 2 2.5 0.8] }, ...
-	{ {'style' 'text'       'string' 'Clustering algorithm:' } ...
+    if STUDY.etc.preclust.clustlevel == 1
+        strclust = [ 'Performing clustering on cluster ''' STUDY.cluster(STUDY.etc.preclust.clustlevel).name '''' ];
+    else
+        strclust = [ 'Performing sub-clustering on cluster ''' STUDY.cluster(STUDY.etc.preclust.clustlevel).name '''' ];
+    end;    
+    
+	clust_param = inputgui( { [1] [1] [3 1] [3 1] [ 0.2 2.7 1 ] [1] [0.29 2 2.5 0.8] }, ...
+	{ {'style' 'text'       'string' strclust 'fontweight' 'bold'  } {} ...
+      {'style' 'text'       'string' 'Clustering algorithm:' } ...
       {'style' 'popupmenu'  'string' alg_options  'value' 1 'tag' 'clust_algorithm'  'Callback' algoptions } ...
       {'style' 'text'       'string' 'Number of clusters to compute:' } ...
       {'style' 'edit'       'string' '2' 'tag' 'clust_num' }...
