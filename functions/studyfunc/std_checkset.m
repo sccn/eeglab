@@ -62,7 +62,7 @@ end;
 try, group = unique({ STUDY.datasetinfo.group });
 catch, 
      group = ''; 
-     disp('Important warning: not all dataset contain group info, some functions may crash');
+     % disp('Important warning: not all dataset contain group info, some functions may crash');
 end;
 try, condition = unique({ STUDY.datasetinfo.condition });
 catch, 
@@ -72,7 +72,7 @@ end;
 try, session = unique([STUDY.datasetinfo.session]);
 catch, 
      session = ''; 
-     disp('Important warning: not all dataset contain integer session info, some functions may crash');
+     % disp('Important warning: not all dataset contain integer session info, some functions may crash');
 end;
 if ~isequal(STUDY.subject,   subject  ), STUDY.subject   = subject;   modif = 1; end;  
 if ~isequal(STUDY.group,     group    ), STUDY.group     = group;     modif = 1; end;  
