@@ -7,7 +7,7 @@
 %   ALLEEG     - EEGLAB vector of EEG sets included in the STUDY structure 
 %
 % Optional input:
-%   'command'   - [cell array] change study (see command description and
+%   'command'  - [cell array] change study (see command description and
 %                 example below.
 %   'name'     - [string] a specified (mnemonic) name for the STUDY structure. 
 %                {default: ''}
@@ -31,6 +31,8 @@
 %   'group'     - [string] dataset group.
 %   'subject'   - [string] subject name or code.
 %   'load'      - [string] load dataset having filename contained in entry.
+%   'dipselect' - [float] select component with residual variance below
+%                 the value given as input for all loaded datasets.
 %
 % Output:
 %   STUDY      - a new STUDY set containing some or all of the datasets in ALLEEG, 
@@ -40,7 +42,7 @@
 %  See also:  pop_createstudy(), load_alleeg(), pop_clust(), pop_preclust(), 
 %             eeg_preclust(), eeg_createdata()
 %
-% Authors:  Hilit Serby, Arnaud Delorme, SCCN, INC, UCSD, October , 2004-
+% Authors: Arnaud Delorme, Hilit Serby, SCCN, INC, UCSD, October , 2004-
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -61,6 +63,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2006/02/09 21:48:13  arno
+% implement rmclust
+%
 % Revision 1.18  2006/02/09 21:46:14  arno
 % rmclust
 %
@@ -170,6 +175,35 @@ for k = 1:2:length(g.commands)
             STUDY.datasetinfo(currentind).session = g.commands{k+1};
         case 'remove'
             ALLEEG = eeg_store(ALLEEG, eeg_empty, g.commands{k+1});
+        case 'dipselect'
+            STUDY = checkstudy(STUDY); % update setind field
+            
+            for si = 1:size(STUDY.setind,2)% scan datasets that are part of STUDY
+                
+                % find a dataset with dipoles
+                % ---------------------------
+                idat = 0;
+                for sc = 1:size(STUDY.setind,1)
+                    if isfield(ALLEEG(STUDY.datasetinfo(STUDY.setind(sc,si)).index).dipfit, 'model')
+                        idat = STUDY.datasetinfo(STUDY.setind(sc,si)).index;
+                        break;
+                    end;
+                end;
+                    
+                if idat ~= 0
+                    fprintf('Selecting dipole with less than %2.1f residual variance in dataset ''%s''\n', 100*rv, ALLEEG(idat).setname)
+                    indleft = []; % components that are left in clustering
+                    for icomp = succompind{si} % scan components
+                        if (ALLEEG(idat).dipfit.model(icomp).rv < rv)
+                             indleft = [indleft icomp];
+                        end;
+                    end;
+                    STUDY.datasetinfo(STUDY.setind(sc,si)).comps = indleft;
+                else
+                    fprintf('No dipole information found in ''%s'' dataset, using all components\n', ALLEEG.setname)
+                end
+            end;
+            
         case 'load'
             TMPEEG = pop_loadset('filename', g.commands{k+1}, 'loadmode', 'info');
             ALLEEG = eeg_store(ALLEEG, eeg_checkset(TMPEEG), currentind);
