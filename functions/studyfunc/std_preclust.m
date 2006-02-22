@@ -127,6 +127,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2006/02/22 21:16:11  arno
+% better decoding of arguments
+%
 % Revision 1.19  2006/02/22 21:05:02  arno
 % update call to checkstudy
 %
@@ -241,7 +244,6 @@ function [ STUDY, ALLEEG ] = cls_preclust(STUDY, ALLEEG, cluster_ind, components
         end
     end;
     
-    fdsgfsgfs
     % Decode input arguments
     % ----------------------
     update_flag  = 0;
