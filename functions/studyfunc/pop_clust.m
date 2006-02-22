@@ -58,13 +58,16 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2006/02/22 21:34:13  arno
+% add cluster description to GUI
+%
 % Revision 1.10  2006/02/14 00:13:32  arno
 % adding log
 %
 
-function [STUDY, ALLEEG, com] = pop_clust(STUDY, ALLEEG, varargin)
+function [STUDY, ALLEEG, command] = pop_clust(STUDY, ALLEEG, varargin)
 
-com = '';
+command = '';
 
 if isempty(STUDY.etc)
     error('No pre-clustering information');
@@ -74,6 +77,11 @@ if isempty(STUDY.etc.preclust)
 end;
 
 if isempty(varargin) %GUI call
+    if length(STUDY.cluster) > 2
+        resp = questdlg2('Clustering again will delete the last clustering results', 'Warning', 'Cancel', 'Ok', 'Ok');
+        if strcmpi(resp, 'cancel'), return; end;
+    end;
+    
 	alg_options = {'Kmeans' 'Neural Network' }; %'Hierarchical tree' 
 	set_outliers = ['set(findobj(''parent'', gcbf, ''tag'', ''outliers_std''), ''enable'', fastif(get(gcbo, ''value''), ''on'', ''off''));'...
                             'set(findobj(''parent'', gcbf, ''tag'', ''std_txt''), ''enable'', fastif(get(gcbo, ''value''), ''on'', ''off''));']; 
@@ -81,11 +89,16 @@ if isempty(varargin) %GUI call
 	saveSTUDY = [ 'set(findobj(''parent'', gcbf, ''userdata'', ''save''), ''enable'', fastif(get(gcbo, ''value'')==1, ''on'', ''off''));' ];
 	browsesave = [ '[filename, filepath] = uiputfile2(''*.study'', ''Save STUDY with .study extension -- pop_clust()''); ' ... 
                       'set(findobj(''parent'', gcbf, ''tag'', ''studyfile''), ''string'', [filepath filename]);' ];
+    
+    strclust = '';
+    if STUDY.etc.preclust.clustlevel > length(STUDY.cluster)
+        STUDY.etc.preclust.clustlevel = 1;
+    end;
     if STUDY.etc.preclust.clustlevel == 1
         strclust = [ 'Performing clustering on cluster ''' STUDY.cluster(STUDY.etc.preclust.clustlevel).name '''' ];
     else
         strclust = [ 'Performing sub-clustering on cluster ''' STUDY.cluster(STUDY.etc.preclust.clustlevel).name '''' ];
-    end;    
+    end;
     
 	clust_param = inputgui( { [1] [1] [3 1] [3 1] [ 0.2 2.7 1 ] [1] [0.29 2 2.5 0.8] }, ...
 	{ {'style' 'text'       'string' strclust 'fontweight' 'bold'  } {} ...
@@ -103,13 +116,31 @@ if isempty(varargin) %GUI call
                             'pophelp(''eeg_clust'')', 'Set clustering algorithm -- pop_clust()' , [] , 'normal');
 	
 	if ~isempty(clust_param)
-        com = '% no history yet for clustering';
         
         clus_alg = alg_options{clust_param{1}};
         clus_num = str2num(clust_param{2});
         outliers_on = clust_param{3};
         stdval = clust_param{4};
         save_on = clust_param{5};
+        
+        % remove clusters below clustering level
+        % --------------------------------------
+        rmindex    = [];
+        clustlevel = STUDY.etc.preclust.clustlevel;
+        nameclustbase = STUDY.cluster(clustlevel).name;
+        for index = 2:length(STUDY.cluster)
+            if strcmpi(STUDY.cluster(index).parent{1}, nameclustbase) & ~strncmpi('Notclust',STUDY.cluster(index).name,8)
+                rmindex = [ rmindex index ];
+            end;
+        end;
+        if ~isempty(rmindex)
+            fprintf('Removing child clusters of ''%s''...\n', nameclustbase);
+            STUDY.cluster(rmindex)          = [];
+            STUDY.cluster(clustlevel).child = [];
+            if clustlevel == 1 & length(STUDY.cluster) > 1
+                STUDY.cluster(1).child = { STUDY.cluster(2).name }; % "Notclust" cluster
+            end;
+        end;
         
         outliers = [];
         try
@@ -124,9 +155,9 @@ if isempty(varargin) %GUI call
             case 'Kmeans'
                 command = sprintf('%s %s %d %s', command, '''algorithm'', ''kmeans'',''clus_num'', ', clus_num, ',');
                 if outliers_on
+                    command = sprintf('%s %s %s %s', command, '''outliers'', ', stdval, ',');
                     [IDX,C,sumd,D,outliers] = robust_kmeans(clustdata,clus_num,str2num(stdval),5);
                     [STUDY, clusters] = create_cluster(STUDY,IDX,C,  {'robust_kmeans', clus_num});
-                    command = sprintf('%s %s %s %s', command, '''outliers'', ', stdval, ',');
                 else
                     [IDX,C,sumd,D] = kmeans(clustdata,clus_num,'replicates',10,'emptyaction','drop');
                     [STUDY, clusters] = create_cluster(STUDY,IDX,C,  {'Kmeans', clus_num});
@@ -163,7 +194,7 @@ if isempty(varargin) %GUI call
            STUDY.history =  sprintf('%s\n%s',  STUDY.history, command);            
        end
            
-        [STUDY] = pop_clustedit(STUDY, ALLEEG, clusters);           
+       [STUDY] = pop_clustedit(STUDY, ALLEEG, clusters);           
 	end
     
 else %command line call
