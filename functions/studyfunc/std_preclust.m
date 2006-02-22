@@ -127,6 +127,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2006/02/22 21:05:02  arno
+% update call to checkstudy
+%
 % Revision 1.18  2006/02/22 21:02:25  arno
 % Removing cluster information
 %
@@ -238,6 +241,7 @@ function [ STUDY, ALLEEG ] = cls_preclust(STUDY, ALLEEG, cluster_ind, components
         end
     end;
     
+    fdsgfsgfs
     % Decode input arguments
     % ----------------------
     update_flag  = 0;
@@ -246,11 +250,11 @@ function [ STUDY, ALLEEG ] = cls_preclust(STUDY, ALLEEG, cluster_ind, components
     indrm        = [];
     for index = 1:length(varargin) % scan commands
         strcom = varargin{index}{1};
-        if strcmpi(strcom(1:3),'dip')
+        if strcmpi(strcom,'dipselect')
             update_flag = 1;
             rv = varargin{index}{3};
             indrm = [indrm index]; %remove this command
-        elseif strcmpi(strcom(1:3),'fin') % second level pca
+        elseif strcmpi(strcom,'finaldim') % second level pca
             secondlevpca = varargin{index}{3};
             indrm = [indrm index]; %remove this command
         end        
