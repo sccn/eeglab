@@ -51,6 +51,8 @@ if ~isfield(STUDY, 'session'),   STUDY.session   = {}; modif = 1; end;
 if ~isfield(STUDY, 'condition'), STUDY.condition = {}; modif = 1; end;
 if ~isfield(STUDY, 'setind'),    STUDY.setind    = []; modif = 1; end;
 if ~isfield(STUDY, 'etc'),       STUDY.etc       = []; modif = 1; end;
+if ~isfield(STUDY, 'datasetinfo'), STUDY.datasetinfo = []; modif = 1; end;
+if ~isfield(STUDY.datasetinfo, 'comps') & ~isempty(STUDY.datasetinfo), STUDY.datasetinfo(1).comps = []; modif = 1; end;
 
 % all summary fields
 % ------------------
@@ -136,10 +138,14 @@ if isempty(STUDY.cluster)
     [STUDY] = cls_createclust(STUDY, ALLEEG, 'ParentCluster');
     STUDY.cluster(1).parent = []; 
     for k = 1:size(STUDY.setind,2)
+        
         ind_nonnan = find(~isnan(STUDY.setind(:,k)));
-        ncomps = size(ALLEEG(STUDY.datasetinfo(ind_nonnan(1)).index).icaweights,1);
-        STUDY.cluster(1).sets =  [STUDY.cluster(1).sets k*ones(1,ncomps)];
-        STUDY.cluster(1).comps = [STUDY.cluster(1).comps      [1:ncomps]];
+        comps = STUDY.datasetinfo(ind_nonnan(1)).comps;
+        if isempty(comps)
+            comps = 1:size(ALLEEG(STUDY.datasetinfo(ind_nonnan(1)).index).icaweights,1);
+        end;
+        STUDY.cluster(1).sets =  [STUDY.cluster(1).sets       k*ones(1,length(comps))];
+        STUDY.cluster(1).comps = [STUDY.cluster(1).comps      comps];
     end
     if length(STUDY.condition) > 1
         tmp = ones(length(STUDY.condition), length(STUDY.cluster(1).sets));
