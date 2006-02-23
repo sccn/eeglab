@@ -26,6 +26,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2006/02/23 00:40:32  arno
+% multiple selection
+%
 % Revision 1.14  2006/02/23 00:35:02  arno
 % empty value case
 %
@@ -107,7 +110,6 @@ geomvert = [min(length(g.liststring), 10) 1];
 if ~strcmp(g.selectionmode, 'multiple') | ...
     (iscell(g.liststring) & length(g.liststring) == 1) | ...
     (isstr (g.liststring) & size  (g.liststring,1) == 1)
-	maxval = 2;
 	if isempty(g.initialvalue), g.initialvalue = 1; end;
 else
 	maxval = length(g.liststring)+1;
