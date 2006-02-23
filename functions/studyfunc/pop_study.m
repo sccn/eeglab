@@ -64,6 +64,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2006/02/23 00:06:20  arno
+% call to editstudy
+%
 % Revision 1.23  2006/02/23 00:04:54  arno
 % nothing
 %
@@ -426,13 +429,14 @@ else % internal command
             res = inputdlg2( { 'Enter threshold residual variance in % to pre-select components' }, ...
                              'Pre-select components', 1, { '15' } );
             
-            STUDY = editstudy(STUDY, ALLEEG, 'commands', { 'dipselect' num2str(res{1})/100 });
-            allcom = { allcom{:} { 'dipselect' num2str(res{1})/100 } };
+            STUDY = editstudy(STUDY, ALLEEG, 'commands', { 'dipselect' str2num(res{1})/100 'return' });
+            allcom = { allcom{:} { 'dipselect' str2num(res{1})/100 } };
             datasetinfo   = STUDY.datasetinfo;
             
             userdat{2} = datasetinfo;
             userdat{4} = allcom;
             set(hdl, 'userdata', userdat);            
+            pop_study('redraw', hdl);
 
         case 'component'
             guiindex  = varargin{1};
