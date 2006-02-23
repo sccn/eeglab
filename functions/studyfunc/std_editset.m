@@ -7,7 +7,7 @@
 %   ALLEEG     - EEGLAB vector of EEG sets included in the STUDY structure 
 %
 % Optional input:
-%   'command'  - [cell array] change study (see command description and
+%   'commands' - [cell array] change study (see command description and
 %                 example below.
 %   'name'     - [string] a specified (mnemonic) name for the STUDY structure. 
 %                {default: ''}
@@ -63,6 +63,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2006/02/22 23:44:09  arno
+% implementing dipselect command
+%
 % Revision 1.19  2006/02/09 21:48:13  arno
 % implement rmclust
 %
