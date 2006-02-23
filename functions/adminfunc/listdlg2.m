@@ -26,6 +26,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2006/02/23 22:32:32  arno
+% fixing initialvalues
+%
 % Revision 1.16  2006/02/23 00:42:57  arno
 % nothing
 %
@@ -93,7 +96,6 @@ try,  g.selectionmode; catch, g.selectionmode = 'multiple'; end;
 try,  g.listsize;      catch, g.listsize = []; end;
 try,  g.initialvalue;  catch, g.initialvalue = []; end;
 try,  g.name;          catch, g.name = ''; end;
-if isempty(g.value), g.value = 1; end;
 
 fig = figure('visible', 'off');
 set(gcf, 'name', g.name);
