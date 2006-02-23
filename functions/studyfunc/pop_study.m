@@ -65,6 +65,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2006/02/23 18:56:10  scott
+% help msg -sm
+%
 % Revision 1.27  2006/02/23 00:43:05  arno
 % trying to retain selection in listbox
 %
@@ -436,8 +439,8 @@ else % internal command
         case 'dipselect'
             STUDY.datasetinfo = datasetinfo;
             
-            res = inputdlg2( { strvcat('Enter threshold residual variance in % to pre-select components', ...
-                                       'Note that will delete all existing clusters') }, ...
+            res = inputdlg2( { strvcat('Enter threshold max residual variance in % to pre-select components', ...
+                                       'Note this will delete all existing clusters') }, ...
                              'Pre-select components', 1, { '15' } );
             
             STUDY = editstudy(STUDY, ALLEEG, 'commands', { 'dipselect' str2num(res{1})/100 'return' });
