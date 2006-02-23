@@ -109,6 +109,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.108  2006/02/22 17:05:42  scott
+% output variable pvaf --> sortvar; continued to change g.sortvar options to
+% new repetoire. -sm
+%
 % Revision 1.107  2006/02/22 03:01:47  toby
 % Updated 'sortvar' options. Numerous edits.
 %
@@ -862,7 +866,7 @@ for c = 1:ncomps
       % and the relative value to those channels defined by plotchans. 
       if length(g.plotchans) > 1
         [maxval,maxi] = max(mean((proj(g.plotchans,limframe1:limframe2)).^2));
-      else g.plotchans == 1 --> find absmax value
+      else % g.plotchans == 1 --> find absmax value
         [maxval,maxi] = max((abs(proj(g.plotchans,limframe1:limframe2)))); 
       end
       maxi = maxi+limframe1-1;
