@@ -24,24 +24,6 @@
 %  "STUDY set notes"     - [edit box] Notes about the experiment, the datasets, the STUDY, 
 %                          or anything else to keep with the rest of the STUDY information 
 %                          {default: ''}   
-%  "Include the datasets loaded in eeglab" - [check box] If checked and optional input ALLEEG 
-%                          is provided, its datasets are added to the STUDY. The datasets will 
-%                          be available in the "# datasets in STUDY" list box, where they can 
-%                          be edited. 
-%  "Include datasets and information from another STUDY" - [check box] If checked, an existing 
-%                          STUDY set (full path) filename must be provided in the associated 
-%                          edit box. The dataset information (file name/path, subject, 
-%                          condition, etc.) will be copied from the existing STUDY set. 
-%                          Those datasets will be added to datasets that were imported from 
-%                          an ALLEEG EEG structure (see option above) or to any manually 
-%                          added datasets (see option below).  
-%  "Include these datasets" - [check box] If checked, datasets and dataset information can be 
-%                          manually added to the STUDY set. The dataset full path and filename
-%                          must be provided or selected using he bowse button... You may then
-%                          provide subject, session, condition, and subject group information
-%                          for the dataset. If you leave those fields empty, default values
-%                          will be used. If you do provide this information for one dataset, 
-%                          you will need to enter it for all datasets you add to the STUDY.
 %  "subject"             - [edit box] The subject associated with the dataset. If no subject
 %                          information is provided, each dataset will assumed to be from a
 %                          different subject {defaults: 'S1', 'S2', ..., 'Sn'}
@@ -53,17 +35,6 @@
 %  "group"               - [edit box] the subject group the dataset belongs to. If no group
 %                          is provided all datasets and subjects are assumed to belong to
 %                          the same group. {default: []}
-%  "Add these and more"  - [pushbutton] Add the entered datasets to the STUDY and clear the
-%                          input fields so that additional datasets can be added. The added
-%                          datasets will appear in the "# datasets in STUDY" list box.
-%  "Add these"           - [pushbutton] add the datasets entered to the STUDY. The added
-%                          datasets will appear in the "# datasets in STUDY" list box and
-%                          no further dataset entry will be possible. 
-%  "# datasets in STUDY" - [list box] A list of the dataset file names to add to the
-%                          STUDY, both those entered manually and those in the ALLEEG 
-%                          structure. Any of these datasets may be deleted from the list 
-%                          using the 'Delete' button, or their information (subject, 
-%                          session, etc.) may be edited.
 %  "Save this STUDY set to disk file" - [check box] If checked, save the new STUDY set
 %                          structure to disk. If no filename is provided, a window will 
 %                          pop up to ask for the file name. 
@@ -93,6 +64,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2006/02/22 21:50:40  arno
+% fixing delclust option
+%
 % Revision 1.20  2006/02/09 22:44:17  arno
 % text edit
 %
@@ -235,6 +209,7 @@ elseif strcmpi(mode, 'gui') % GUI mode
     grpcom    = 'pop_study(''group''    , gcbf, get(gcbo, ''userdata''), get(gcbo, ''string''));';
     grpcom    = 'pop_study(''component'', gcbf, get(gcbo, ''userdata''), get(gcbo, ''string''));';
     cb_del    = 'pop_study(''delclust'' , gcbf, ''showwarning'');';
+    cb_dipole = 'pop_study(''dipselect'', gcbf, ''showwarning'');';
 
 	browsestudy = [ '[filename, filepath] = uiputfile2(''*.study'', ''Use exsiting STUDY set to import dataset information -- pop_study()''); ' ... 
                       'set(findobj(''parent'', gcbf, ''tag'', ''usestudy_file''), ''string'', [filepath filename]);' ];
@@ -257,7 +232,7 @@ elseif strcmpi(mode, 'gui') % GUI mode
         {'style' 'text' 'string' 'session'    'userdata' 'addt'} ...
         {'style' 'text' 'string' 'condition'  'userdata' 'addt'} ...
         {'style' 'text' 'string' 'group'      'userdata' 'addt'} ...
-        {'style' 'text' 'string' 'components' 'userdata' 'addt'} ...
+        {'style' 'pushbutton' 'string' 'components' 'userdata' 'addt' 'callback' cb_dipole } ...
         {} };
 	guigeom = { [1] [1 2] [1 2] [1 2] [1] [0.2 1.05 0.35 0.4 0.35 0.6 0.4 0.6 0.3]};
 	
@@ -319,6 +294,7 @@ elseif strcmpi(mode, 'gui') % GUI mode
     fig_arg{3} = 1;           % page
     fig_arg{4} = {};          % all commands
     fig_arg{5} = (length(STUDY.cluster) > 1); % are cluster present
+    fig_arg{6} = STUDY; % are cluster present
     
     % generate GUI
     % ------------
@@ -382,6 +358,7 @@ else % internal command
     page        = userdat{3};
     allcom      = userdat{4};
     clusterpresent = userdat{5};
+    STUDY       = userdat{6};
 
     switch  com
         case 'subject'
@@ -436,7 +413,21 @@ else % internal command
             userdat{2} = datasetinfo;
             userdat{4} = allcom;
             set(hdl, 'userdata', userdat);            
-     
+            
+        case 'dipselect'
+            STUDY.datasetinfo = datasetinfo;
+            
+            res = inputdlg2( { 'Enter threshold residual variance in % to pre-select components' }, ...
+                             'Pre-select components', 1, { '15' } );
+            
+            STUDY = editstudy(STUDY, ALLEEG, 'command', { 'dipselect' num2str(res)/100 });
+            allcom = { allcom{:} { 'dipselect' num2str(res)/100 } };
+            datasetinfo   = STUDY.datasetinfo;
+            
+            userdat{2} = datasetinfo;
+            userdat{4} = allcom;
+            set(hdl, 'userdata', userdat);            
+
         case 'component'
             guiindex  = varargin{1};
             realindex = guiindex+(page-1)*10;
@@ -465,6 +456,7 @@ else % internal command
             userdat{2} = datasetinfo;
             userdat{4} = allcom;
             set(hdl, 'userdata', userdat);            
+            pop_study('redraw', hdl);
 
         case 'clear'
             guiindex  = varargin{1};
