@@ -1,6 +1,7 @@
-% cls_preclust() - prepare STUDY components' location and activity measures for later clustering.
-%                  Selected measures (one or more from options: ERP, dipole locations, spectra,
-%                  scalp maps, ERSP, and ITC) are computed for each dataset in the STUDY 
+%
+% cls_preclust() - prepare STUDY component location and activity measures for later clustering.
+%                  Selected measures (one or more from options: ERPs, dipole locations, spectra,
+%                  scalp maps, ERSPs, and ITCs) are computed for each dataset in the STUDY 
 %                  set, unless they already present. After all requested measures are computed 
 %                  and saved in the STUDY datasets, each feature dimension is reduced by computing 
 %                  a PCA  decomposition. These PCA matrices (one per measure) are concatenated and 
@@ -40,50 +41,51 @@
 %                  'comnd' = component measures to compute:
 %                    * 'erp'     = cluster on the component ERPs,
 %                    * 'dipoles' = cluster on the component [X Y Z] dipole locations
-%                    * 'dipselect' = select components to cluster on that have residual 
+%                    * 'dipselect' = select components to cluster that have residual 
 %                                  dipole variance less than a specified threshold. 
-%                    * 'spec'    = cluster on the component activity spectra 
-%                                  (with the baseline removed).
-%                    * 'scalp'   = cluster on component topoplot() scalp maps 
-%                                  (or their absolute values),
-%                    * 'scalpLaplac' = cluster on component topoplot() laplacian scalp maps
-%                                  (or their absolute values),
-%                    * 'scalpGrad' = cluster on the topoplot() scalp map gradients 
-%                                  (or their absolute values),
+%                    * 'spec'    = cluster on the component log activity spectra (in dB)
+%                                  (with the baseline mean dB spectrum subtracted).
+%                    * 'scalp'   = cluster on component (topoplot()) scalp maps 
+%                                  (or on their absolute values),
+%                    * 'scalpLaplac' = cluster on component (topoplot()) laplacian scalp maps
+%                                  (or on their absolute values),
+%                    * 'scalpGrad' = cluster on the (topoplot()) scalp map gradients 
+%                                  (or on their absolute values),
 %                    * 'ersp'    = cluster on components ERSP. (requires: 'cycles', 
 %                                  'freqrange', 'padratio', 'timewindow', 'alpha').
 %                    * 'itc'     = cluster on components ITC.(requires: 'cycles', 
 %                                  'freqrange', 'padratio', 'timewindow', 'alpha').
-%                    * 'finaldim' = final number of dimensions. Enable second level PCA. 
-%                                  By default this command is not used (see example below).
+%                    * 'finaldim' = final number of dimensions. Enables second-level PCA. 
+%                                  By default this command is not used (see Example below).
 %
 %                  'key'   optional inputs used in computing  the specified measures:
-%                    * 'npca'    =  [integer] number of PCA components (PCA dimension) of the 
-%                                   selected data to retain for clustering. {default: 5}
-%                    * 'norm'    =  [0|1] 1 normalizes the PCA components so the variance of 
+%                    * 'npca'    =  [integer] number of principal components (PCA dimension) of 
+%                                   the selected measures to retain for clustering. {default: 5}
+%                    * 'norm'    =  [0|1] 1 -> normalize the PCA components so the variance of 
 %                                   first principal component is 1 (useful when using several 
-%                                   preprocessing measures - 'ersp','scalp',...). {default: 1}
-%                    * 'weight'  =  [integer] weight with respect to other preprocessing measures.
-%                    * 'freqrange'  = [min max] freq. range (in Hz) for spectrum, 'ersp', 
-%                                   and 'itc' options.  
-%                    * 'timewindow' = [min max] time window (in sec) for 'erp' 'ersp', 
-%                                   and 'itc' options.  
-%                    * 'abso'    =  [0|1] 1 = take absolute values of topoplot(), Gradient, or 
+%                                   clustering measures - 'ersp','scalp',...). {default: 1}
+%                    * 'weight'  =  [integer] weight with respect to other clustering measures.
+%                    * 'freqrange'  = [min max] frequency range (in Hz) to include in activity 
+%                                   spectrum, 'ersp', and 'itc' measures.  
+%                    * 'timewindow' = [min max] time window (in sec) to include in 'erp',
+%                                   'ersp', and 'itc' measures.  
+%                    * 'abso'    =  [0|1] 1 = use absolute values of topoplot(), gradient, or 
 %                                   Laplacian maps {default: 1}
-%                    * 'cycles'  =  [0| cycles_factor] for ERSP and ITC (see timef() for details) 
+%                    * 'cycles'  =  [0| cycles_factor] for ERSP and ITC (see >> timef details) 
 %                                   {default: 0 (=> FFT method)}
-%                    * 'padratio'=  [integer] for ERSP and ITC (see timef() for details) {default:1}
-%                    * 'alpha'   =  [integer] bootstrap probability significance trhshold 
-%                                   for ERSP and ITC (see timef() for details). {default: 0.01}
+%                    * 'padratio'=  [integer] for ERSP and ITC (see >> timef details) {default:1}
+%                    * 'alpha'   =  [integer] bootstrap probability significance threshold for 
+%                                   masking component mean ERSP and ITC measures 
+%                                   (>> timef details) {default: 0.01}
 %                    * 'funarg'  =  [cell array] optional function arguments for mean spectrum 
-%                                   calculation (see spectopo() for details) {default: none}
-%                    * 'rv'      =  [number < 1] for 'dipselect', a threshold on the component 
-%                                   residual variance. Only components with a lower residual variance 
-%                                   (rv) will be clustered {default: 0 (all components)}
+%                                   calculation (>> help spectopo) {default: none}
+%                    * 'rv'      =  [number < 1] for dipole locations ('dipselect'), max component 
+%                                   model residual variance. Only components with a lower residual 
+%                                   variance (rv) will be clustered {default: 0 (all components)}
 % Outputs:
-%   ALLEEG       - the input ALLEEG vector of EEG dataset structures modified by adding preprocessing 
-%                  data (pointers to float files that hold ERSP, spectrum, etc. information).
-%   STUDY        - the input STUDY set with added pre-clustering data, for use by pop_clust() 
+%   ALLEEG       - the input ALLEEG vector of EEG dataset structures, modified by adding preprocessing 
+%                  data as pointers to float files that hold ERSPs, spectra, and/or other measures.
+%   STUDY        - the input STUDY set with pre-clustering data added, for use by pop_clust() 
 %
 % Example:
 %   >> [ALLEEG  STUDY] = cls_preclust(ALLEEG, STUDY, [], [] , { 'dipselect'  'rv'  0.15  } ,...
@@ -97,14 +99,14 @@
 %                                  'padratio' 4 'timewindow' [ -1600 1495 ] 'norm' 1 'weight' 1 }, ...
 %                        { 'finaldim' 'npca' 10 });
 %                          
-%                        % This prepares for first-stage clustering all components in the STUDY
+%                        % This prepares, for initial clustering, all components in the STUDY
 %                        % datasets except components with dipole model residual variance above 0.15.
-%                        % Clustering will be based on the components' mean spectra in % the [3 25] Hz 
-%                        % frequency range, the components' ERPs in the [350 500] ms % time window, 
-%                        % the (absolute-value) component scalp maps, their equivalent dipole locations,
-%                        % and their ERSP and ITC images. 
-%                        % At the last stage a second level PCA decomposition is performed. See web
-%                        % tutorial for more details.
+%                        % Clustering will be based on the components' mean spectra in the [3 25] Hz 
+%                        % frequency range, on the components' ERPs in the [350 500] ms time window, on
+%                        % the (absolute-value) component scalp maps, on the equivalent dipole locations,
+%                        % and on the mean ERSP and ITC images. 
+%                        % The final keyword asks for a second level PCA dimension reduction (to 10
+%                        % principal dimensions) to be performed. See the web tutorial for details.
 %
 % Authors: Arnaud Delorme, Hilit Serby & Scott Makeig, SCCN, INC, UCSD, May 13, 2004
 
@@ -127,6 +129,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2006/02/22 21:17:01  arno
+% same
+%
 % Revision 1.20  2006/02/22 21:16:11  arno
 % better decoding of arguments
 %
@@ -299,7 +304,7 @@ function [ STUDY, ALLEEG ] = cls_preclust(STUDY, ALLEEG, cluster_ind, components
             end
         end;
         if nodip
-            error('Some dipole information is missing so dipole information may not be used for clustering\n');
+            error('Some dipole information is missing; thus, dipole information may not be used for clustering\n');
         end;
         
         % Create a cluster of removed components 
