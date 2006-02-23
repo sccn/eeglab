@@ -26,6 +26,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2006/02/08 23:15:23  arno
+% allowing non-cell array input
+%
 % Revision 1.11  2006/01/10 00:40:28  arno
 % fix multiline
 %
@@ -78,6 +81,7 @@ try,  g.selectionmode; catch, g.selectionmode = 'multiple'; end;
 try,  g.listsize;      catch, g.listsize = []; end;
 try,  g.initialvalue;  catch, g.initialvalue = []; end;
 try,  g.name;          catch, g.name = ''; end;
+try,  g.value;         catch, g.value = 1; end;
 
 fig = figure('visible', 'off');
 set(gcf, 'name', g.name);
@@ -101,7 +105,7 @@ if ~strcmp(g.selectionmode, 'multiple') | ...
 else
 	maxval = length(g.liststring)+1;
 end;
-listui = {{ 'Style', 'listbox', 'tag', 'listboxvals', 'string', allstr, 'min', 1, 'max', maxval } ...
+listui = {{ 'Style', 'listbox', 'tag', 'listboxvals', 'value' g.value 'string', allstr, 'min', 1, 'max', maxval } ...
 		  { 'Style', 'pushbutton', 'string', 'Cancel', 'callback', ['set(gcbf, ''userdata'', ''cancel'');'] }  ...
 		  { 'Style', 'pushbutton', 'string', 'Ok'    , 'callback', ['set(gcbf, ''userdata'', ''ok'');'] } };
 
