@@ -1,39 +1,40 @@
-% pop_study()  - create a new STUDY set structure defining a group of related EEG 
-%                      datasets. the STUDY set also contains information about each of the
-%                      datasets: the subject, group, condition and session. This can be 
+%
+% pop_study()  - create a new STUDY set structure defining a group of related EEG datasets. 
+%                      The STUDY set also contains information about each of the datasets: 
+%                      the subject code, subject group, exp. condition and session. This can be 
 %                      provided interactively in a pop-up window or be automatically filled 
-%                      in by the function. Default: assume a different subject for each 
-%                      dataset and only one condition, with dataset group and session fields 
+%                      in by the function. Defaults: Assume a different subject for each 
+%                      dataset and only one condition; leave subject group and session fields 
 %                      empty. Additional STUDY information about the STUDY name, task and 
 %                      miscellaneous notes can also be saved in the STUDY structure.
 % Usage:  
 %                        >> [ STUDY ALLEEG] = pop_study; % specify sets interactively
-%                        >> [ STUDY ALLEEG] = pop_study(ALLEEG); % included loaded
-%                                                                      % EEG datasets
+%                        >> [ STUDY ALLEEG] = pop_study(ALLEEG); % included the loaded
+%                                                                % EEG datasets
 % Optional Inputs:
 %   ALLEEG               - vector of EEG dataset structures to be included in the STUDY. 
 %
 % Outputs:
 %   STUDY                - a new STUDY set comprising some or all of the datasets in 
-%                          ALLEEG, plus other information on the experiments. 
+%                          ALLEEG, plus other information about the experiments. 
 %   ALLEEG               - an updated ALLEEG structure including the STUDY datasets. 
 %
 % Graphic interface buttons:
 %  "STUDY set name"      - [edit box] a name for the STUDY structure {default: ''}   
-%  "STUDY set task name" - [edit box] Name of the task performed by the subject {default: ''}   
-%  "STUDY set notes"     - [edit box] Notes about the experiment, the datasets, the STUDY, 
-%                          or anything else to keep with the rest of the STUDY information 
+%  "STUDY set task name" - [edit box] name for the task performed by the subject {default: ''}   
+%  "STUDY set notes"     - [edit box] notes about the experiment, the datasets, the STUDY, 
+%                          or anything else to store with the rest of the STUDY information 
 %                          {default: ''}   
-%  "subject"             - [edit box] The subject associated with the dataset. If no subject
-%                          information is provided, each dataset will assumed to be from a
-%                          different subject {defaults: 'S1', 'S2', ..., 'Sn'}
-%  "session"             - [edit box] The dataset session. If no session information is
-%                          provided, all datasets that belong to a subject are assumed to
-%                          have been recorded in one session {default: []}
-%  "condition"           - [edit box] The dataset condition. If no condition is provided,
-%                          all datasets are assumed to have the same condition {default:[]}
+%  "subject"             - [edit box] subject code associated with the dataset. If no 
+%                          subject code is provided, each dataset will assumed to be from 
+%                          a different subject {default: 'S1', 'S2', ..., 'Sn'}
+%  "session"             - [edit box] dataset session. If no session information is
+%                          provided, all datasets that belong to one subject are assumed to
+%                          have been recorded within one session {default: []}
+%  "condition"           - [edit box] dataset condition. If no condition code is provided,
+%                          all datasets are assumed to be from the same condition {default:[]}
 %  "group"               - [edit box] the subject group the dataset belongs to. If no group
-%                          is provided all datasets and subjects are assumed to belong to
+%                          is provided, all subjects and datasets are assumed to belong to
 %                          the same group. {default: []}
 %  "Save this STUDY set to disk file" - [check box] If checked, save the new STUDY set
 %                          structure to disk. If no filename is provided, a window will 
@@ -64,6 +65,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2006/02/23 00:43:05  arno
+% trying to retain selection in listbox
+%
 % Revision 1.26  2006/02/23 00:31:05  arno
 % better message
 %
