@@ -64,6 +64,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2006/02/23 00:31:05  arno
+% better message
+%
 % Revision 1.25  2006/02/23 00:16:52  arno
 % fix component selection
 %
@@ -450,7 +453,7 @@ else % internal command
                 complist{index} = [ 'IC ' int2str(index) ];
             end;
             [tmps,tmpv] = listdlg2('PromptString', 'Select components', 'SelectionMode', ...
-                                    'multiple', 'ListString', strvcat(complist));
+                                    'multiple', 'ListString', strvcat(complist), 'value', datasetinfo(realindex).comps);
             if tmpv ~= 0 % no cancel                
                 
                 % find other subjects with the same session
