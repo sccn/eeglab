@@ -64,6 +64,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2006/02/23 00:04:54  arno
+% nothing
+%
 % Revision 1.22  2006/02/23 00:01:45  arno
 % dipole selection
 %
@@ -423,7 +426,7 @@ else % internal command
             res = inputdlg2( { 'Enter threshold residual variance in % to pre-select components' }, ...
                              'Pre-select components', 1, { '15' } );
             
-            STUDY = editstudy(STUDY, ALLEEG, 'command', { 'dipselect' num2str(res{1})/100 });
+            STUDY = editstudy(STUDY, ALLEEG, 'commands', { 'dipselect' num2str(res{1})/100 });
             allcom = { allcom{:} { 'dipselect' num2str(res{1})/100 } };
             datasetinfo   = STUDY.datasetinfo;
             
