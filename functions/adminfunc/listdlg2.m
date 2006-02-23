@@ -26,6 +26,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2006/02/23 00:42:57  arno
+% nothing
+%
 % Revision 1.15  2006/02/23 00:40:32  arno
 % multiple selection
 %
@@ -90,7 +93,6 @@ try,  g.selectionmode; catch, g.selectionmode = 'multiple'; end;
 try,  g.listsize;      catch, g.listsize = []; end;
 try,  g.initialvalue;  catch, g.initialvalue = []; end;
 try,  g.name;          catch, g.name = ''; end;
-try,  g.value;         catch, g.value = 1; end;
 if isempty(g.value), g.value = 1; end;
 
 fig = figure('visible', 'off');
@@ -107,14 +109,17 @@ end;
 
 geometry = {[1] [1 1]};
 geomvert = [min(length(g.liststring), 10) 1];
-if ~strcmp(g.selectionmode, 'multiple') | ...
-    (iscell(g.liststring) & length(g.liststring) == 1) | ...
-    (isstr (g.liststring) & size  (g.liststring,1) == 1)
+if ~strcmpi(g.selectionmode, 'multiple') | ...
+        (iscell(g.liststring) & length(g.liststring) == 1) | ...
+        (isstr (g.liststring) & size  (g.liststring,1) == 1 & isempty(find(g.liststring == '|')))
 	if isempty(g.initialvalue), g.initialvalue = 1; end;
+    minval = 1;
+	maxval = 1;
 else
-	maxval = length(g.liststring)+1;
+    minval = 0;
+    maxval = 2;
 end;
-listui = {{ 'Style', 'listbox', 'tag', 'listboxvals', 'value' g.value 'string', allstr, 'max', maxval } ...
+listui = {{ 'Style', 'listbox', 'tag', 'listboxvals', 'string', allstr, 'max', maxval, 'min', minval } ...
 		  { 'Style', 'pushbutton', 'string', 'Cancel', 'callback', ['set(gcbf, ''userdata'', ''cancel'');'] }  ...
 		  { 'Style', 'pushbutton', 'string', 'Ok'    , 'callback', ['set(gcbf, ''userdata'', ''ok'');'] } };
 
