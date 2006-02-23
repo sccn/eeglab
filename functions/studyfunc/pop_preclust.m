@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2006/02/22 23:33:42  arno
+% implementing cluster hierarchy
+%
 % Revision 1.27  2006/02/22 21:21:23  arno
 % update for hierarchic clustering
 %
@@ -236,15 +239,15 @@ if ~isstr(varargin{1}) %intial settings
                  [3] geomline geomline geomline geomline geomline geomline [1] geomline [1] [0.32 2 5 0.8] };
     geomvert = [ 1 1 3 1 1 1 1 1 1 1 1 0.5 1 1 1 1];
 
-    if length(show_options) < 3
-        gui_spec(2:6) = { {} ...
-            { 'style' 'text'      'string' [ 'Among the pre-selected components (Edit study),' ...
-                            'remove those which dipole res. var, exceed' ] 'tag' 'dipole_select_on' }  ...
-            {'style' 'edit'       'string' '0.15' 'horizontalalignment' 'center' 'tag' 'dipole_rv'} ...
-            {'style' 'text'       'string'  '(empty=all)'} {} };
-        geometry{3} = [2.5 0.25 0.4];
-        geomvert(3) = 1;
-    end;
+    %if length(show_options) < 3
+    %    gui_spec(2:6) = { {} ...
+    %        { 'style' 'text'      'string' [ 'Among the pre-selected components (Edit study),' ...
+    %                        'remove those which dipole res. var, exceed' ] 'tag' 'dipole_select_on' }  ...
+    %        {'style' 'edit'       'string' '0.15' 'horizontalalignment' 'center' 'tag' 'dipole_rv'} ...
+    %        {'style' 'text'       'string'  '(empty=all)'} {} };
+    %    geometry{3} = [2.5 0.25 0.4];
+    %    geomvert(3) = 1;
+    %end;
     
 	[preclust_param, userdat2, strhalt, os] = inputgui( 'geometry', geometry, 'uilist', gui_spec, 'geomvert', geomvert, ...
                                                       'helpcom', ' pophelp(''cls_preclust'')', ...
@@ -257,17 +260,8 @@ if ~isstr(varargin{1}) %intial settings
     % precluster on what?
     % -------------------
     dipselect = 0;
-    if length(show_options) >= 2
-        options{3} = cls(os.clus_list); % hierarchical clustering
-        options{4} = [];
-    else
-        options{3} = [];
-        options{4} = [];
-        if ~isempty(str2num(os.dipole_rv)) %dipole information is used for component selection
-            dipselect = 1;
-            options{end+1} = { 'dipselect' 'rv' str2num(os.dipole_rv) };
-        end
-    end;
+    options{3} = cls(os.clus_list); % hierarchical clustering
+    options{4} = [];
 
     %if ~(os.preclust_PCA) %create PCA data for clustering
     %preclust_command = '[STUDY ALLEEG] = eeg_createdata(STUDY, ALLEEG, ';
@@ -340,7 +334,7 @@ if ~isstr(varargin{1}) %intial settings
     
     % evaluate command
     % ----------------
-    if length(options) == 4 | ( length(options) == 5 & dipselect )
+    if length(options) == 4
         warndlg2('No measure selected, abording operation.'); 
         return; 
     end;
