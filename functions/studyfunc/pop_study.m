@@ -1,4 +1,3 @@
-%
 % pop_study()  - create a new STUDY set structure defining a group of related EEG datasets. 
 %                      The STUDY set also contains information about each of the datasets: 
 %                      the subject code, subject group, exp. condition and session. This can be 
@@ -65,6 +64,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2006/02/23 18:58:15  scott
+% user msg -sm
+%
 % Revision 1.28  2006/02/23 18:56:10  scott
 % help msg -sm
 %
@@ -460,7 +462,7 @@ else % internal command
                 complist{index} = [ 'IC ' int2str(index) ];
             end;
             [tmps,tmpv] = listdlg2('PromptString', 'Select components', 'SelectionMode', ...
-                                    'multiple', 'ListString', strvcat(complist), 'value', datasetinfo(realindex).comps);
+                                    'multiple', 'ListString', strvcat(complist), 'initialvalue', datasetinfo(realindex).comps);
             if tmpv ~= 0 % no cancel                
                 
                 % find other subjects with the same session
