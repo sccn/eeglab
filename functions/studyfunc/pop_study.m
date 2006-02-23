@@ -1,15 +1,16 @@
+%
 % pop_study()  - create a new STUDY set structure defining a group of related EEG datasets. 
-%                      The STUDY set also contains information about each of the datasets: 
-%                      the subject code, subject group, exp. condition and session. This can be 
-%                      provided interactively in a pop-up window or be automatically filled 
-%                      in by the function. Defaults: Assume a different subject for each 
-%                      dataset and only one condition; leave subject group and session fields 
-%                      empty. Additional STUDY information about the STUDY name, task and 
-%                      miscellaneous notes can also be saved in the STUDY structure.
+%                The STUDY set also contains information about each of the datasets: 
+%                the subject code, subject group, exp. condition and session. This can be 
+%                provided interactively in a pop-up window or be automatically filled 
+%                in by the function. Defaults: Assume a different subject for each 
+%                dataset and only one condition; leave subject group and session fields 
+%                empty. Additional STUDY information about the STUDY name, task and 
+%                miscellaneous notes can also be saved in the STUDY structure.
 % Usage:  
-%                        >> [ STUDY ALLEEG] = pop_study; % specify sets interactively
-%                        >> [ STUDY ALLEEG] = pop_study(ALLEEG); % included the loaded
-%                                                                % EEG datasets
+%                >> [ STUDY ALLEEG] = pop_study; % specify sets interactively
+%                >> [ STUDY ALLEEG] = pop_study(ALLEEG); % included the loaded
+%                                                        % EEG datasets
 % Optional Inputs:
 %   ALLEEG               - vector of EEG dataset structures to be included in the STUDY. 
 %
@@ -64,6 +65,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2006/02/23 22:41:35  arno
+% cancel pre-select components
+%
 % Revision 1.30  2006/02/23 22:35:32  arno
 % use intial value for listbox instead of value
 %

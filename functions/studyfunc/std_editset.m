@@ -1,43 +1,42 @@
-% editstudy() - modify study dataset.
+%
+% editstudy() - modify an EEGLAB STUDY set structure.
 %
 % Usage: >> [STUDY, ALLEEG] = editstudy(STUDY, ALLEEG, key1, val1, ...);  
 %
 % Input:
 %   STUDY      - STUDY set
-%   ALLEEG     - EEGLAB vector of EEG sets included in the STUDY structure 
+%   ALLEEG     - EEGLAB vector of EEG datasets included in the STUDY structure 
 %
 % Optional input:
-%   'commands' - [cell array] change study (see command description and
+%   'commands' - {cell_array} change STUDY (see command description and
 %                 example below.
-%   'name'     - [string] a specified (mnemonic) name for the STUDY structure. 
+%   'name'     - [string] specify a (mnemonic) name for the STUDY structure. 
 %                {default: ''}
-%   'task'     - [string] a description of the experimental task(s) performed 
-%                by the STUDY subjects {default: ''}.  
+%   'task'     - [string] attach a description of the experimental task(s) 
+%                performed by the STUDY subjects {default: ''}.  
 %   'filename' - [string] filename for the STUDY set.
 %   'filepath' - [string] file path (directory/folder) in which the STUDY file
 %                will be saved.  
 %   'notes'    - [string] notes about the experiment, the datasets, the STUDY, 
-%                or anything to keep in the record {default: ''}. 
-%   'updatedat' - ['on'|'off'] update 'subject' 'session' 'condition' and 
-%                group field of datasets.
-%   'savedat'   - ['on'|'off'] resave datasets
+%                or anything else to store with the STUDY itself {default: ''}. 
+%   'updatedat' - ['on'|'off'] update 'subject' 'session' 'condition' and/or
+%                'group' fields of STUDY dataset(s).
+%   'savedat'   - ['on'|'off'] re-save datasets
 %
-% Each command is a cell array composed of the following: 
-%   'index'     - [integer] mmodify dataset index.
+% Each of the 'commands' (above) is a cell array composed of any of the following: 
+%   'index'     - [integer] modify dataset index.
 %   'remove'    - [integer] remove dataset index.
-%   'subject'   - [string] subject name or code.
-%   'condition' - [string] condition corresponding to dataset.
-%   'session '  - [integer] dataset session index.
+%   'subject'   - [string] subject code.
+%   'condition' - [string] dataset condition. 
+%   'session '  - [integer] dataset session number.
 %   'group'     - [string] dataset group.
-%   'subject'   - [string] subject name or code.
-%   'load'      - [string] load dataset having filename contained in entry.
-%   'dipselect' - [float] select component with residual variance below
-%                 the value given as input for all loaded datasets.
-%
+%   'load'      - [filename] load dataset from specified filename 
+%   'dipselect' - [float<1] select components for clustering from all STUDY 
+%                 datasets with dipole model residual var. below this value. 
 % Output:
 %   STUDY      - a new STUDY set containing some or all of the datasets in ALLEEG, 
 %                plus additional information from the optional inputs above. 
-%   ALLEEG     - an EEGLAB vector of EEG sets included in the STUDY structure 
+%   ALLEEG     - a vector of EEG datasets included in the STUDY structure 
 %
 %  See also:  pop_createstudy(), load_alleeg(), pop_clust(), pop_preclust(), 
 %             eeg_preclust(), eeg_createdata()
@@ -63,6 +62,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2006/02/23 22:38:08  arno
+% set to all components if rv = 1
+%
 % Revision 1.23  2006/02/23 00:29:28  arno
 % recreating parent dataset
 %
