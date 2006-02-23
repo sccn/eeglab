@@ -63,6 +63,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2006/02/23 00:05:28  arno
+% header
+%
 % Revision 1.20  2006/02/22 23:44:09  arno
 % implementing dipselect command
 %
@@ -178,8 +181,10 @@ for k = 1:2:length(g.commands)
             STUDY.datasetinfo(currentind).session = g.commands{k+1};
         case 'remove'
             ALLEEG = eeg_store(ALLEEG, eeg_empty, g.commands{k+1});
+        case 'return', return;
         case 'dipselect'
-            STUDY = checkstudy(STUDY); % update setind field
+            STUDY = checkstudy(STUDY, ALLEEG); % update setind field
+            rv = g.commands{k+1};
             
             for si = 1:size(STUDY.setind,2)% scan datasets that are part of STUDY
                 
@@ -196,12 +201,14 @@ for k = 1:2:length(g.commands)
                 if idat ~= 0
                     fprintf('Selecting dipole with less than %2.1f residual variance in dataset ''%s''\n', 100*rv, ALLEEG(idat).setname)
                     indleft = []; % components that are left in clustering
-                    for icomp = succompind{si} % scan components
+                    for icomp = 1:length(ALLEEG(idat).dipfit.model)
                         if (ALLEEG(idat).dipfit.model(icomp).rv < rv)
                              indleft = [indleft icomp];
                         end;
                     end;
-                    STUDY.datasetinfo(STUDY.setind(sc,si)).comps = indleft;
+                    for sc = 1:size(STUDY.setind,1)
+                        STUDY.datasetinfo(STUDY.setind(sc,si)).comps = indleft;
+                    end;
                 else
                     fprintf('No dipole information found in ''%s'' dataset, using all components\n', ALLEEG.setname)
                 end
