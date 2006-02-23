@@ -64,6 +64,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2006/02/23 22:35:32  arno
+% use intial value for listbox instead of value
+%
 % Revision 1.29  2006/02/23 18:58:15  scott
 % user msg -sm
 %
@@ -445,6 +448,7 @@ else % internal command
                                        'Note this will delete all existing clusters') }, ...
                              'Pre-select components', 1, { '15' } );
             
+            if isempty(res), return; end;
             STUDY = editstudy(STUDY, ALLEEG, 'commands', { 'dipselect' str2num(res{1})/100 'return' });
             allcom = { allcom{:} { 'dipselect' str2num(res{1})/100 } };
             datasetinfo   = STUDY.datasetinfo;
