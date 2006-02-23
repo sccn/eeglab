@@ -63,6 +63,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2006/02/23 00:29:28  arno
+% recreating parent dataset
+%
 % Revision 1.22  2006/02/23 00:11:58  arno
 % fixing dipselect
 %
@@ -201,20 +204,26 @@ for k = 1:2:length(g.commands)
                     end;
                 end;
                     
-                if idat ~= 0
-                    fprintf('Selecting dipole with less than %2.1f residual variance in dataset ''%s''\n', 100*rv, ALLEEG(idat).setname)
-                    indleft = []; % components that are left in clustering
-                    for icomp = 1:length(ALLEEG(idat).dipfit.model)
-                        if (ALLEEG(idat).dipfit.model(icomp).rv < rv)
-                             indleft = [indleft icomp];
+                if rv ~= 1
+                    if idat ~= 0
+                        fprintf('Selecting dipole with less than %2.1f residual variance in dataset ''%s''\n', ...
+                                100*rv, ALLEEG(idat).setname)
+                        indleft = []; % components that are left in clustering
+                        for icomp = 1:length(ALLEEG(idat).dipfit.model)
+                            if (ALLEEG(idat).dipfit.model(icomp).rv < rv)
+                                indleft = [indleft icomp];
+                            end;
                         end;
-                    end;
-                    for sc = 1:size(STUDY.setind,1)
-                        STUDY.datasetinfo(STUDY.setind(sc,si)).comps = indleft;
-                    end;
+                    else
+                        indleft = [];
+                        fprintf('No dipole information found in ''%s'' dataset, using all components\n', ALLEEG.setname)
+                    end
                 else
-                    fprintf('No dipole information found in ''%s'' dataset, using all components\n', ALLEEG.setname)
-                end
+                    indleft = [];
+                end;
+                for sc = 1:size(STUDY.setind,1)
+                    STUDY.datasetinfo(STUDY.setind(sc,si)).comps = indleft;
+                end;
             end;
             STUDY.cluster = [];
             STUDY = checkstudy(STUDY, ALLEEG); % recreate parent dataset
