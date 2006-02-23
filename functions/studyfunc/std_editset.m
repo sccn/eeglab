@@ -63,6 +63,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2006/02/23 00:11:58  arno
+% fixing dipselect
+%
 % Revision 1.21  2006/02/23 00:05:28  arno
 % header
 %
@@ -213,6 +216,8 @@ for k = 1:2:length(g.commands)
                     fprintf('No dipole information found in ''%s'' dataset, using all components\n', ALLEEG.setname)
                 end
             end;
+            STUDY.cluster = [];
+            STUDY = checkstudy(STUDY, ALLEEG); % recreate parent dataset
             
         case 'load'
             TMPEEG = pop_loadset('filename', g.commands{k+1}, 'loadmode', 'info');
