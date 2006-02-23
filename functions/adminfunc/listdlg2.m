@@ -26,6 +26,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2006/02/23 00:33:52  arno
+% adding value argument
+%
 % Revision 1.12  2006/02/08 23:15:23  arno
 % allowing non-cell array input
 %
@@ -82,6 +85,7 @@ try,  g.listsize;      catch, g.listsize = []; end;
 try,  g.initialvalue;  catch, g.initialvalue = []; end;
 try,  g.name;          catch, g.name = ''; end;
 try,  g.value;         catch, g.value = 1; end;
+if isempty(g.value), g.value = 1; end;
 
 fig = figure('visible', 'off');
 set(gcf, 'name', g.name);
