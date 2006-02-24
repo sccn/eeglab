@@ -1,10 +1,10 @@
-% checkstudy() - check study consistency
+% checkstudy() - check STUDY set consistency
 %
 % Usage: >> [STUDY, ALLEEG] = checkstudy(STUDY, ALLEEG);  
 %
 % Input:
-%   STUDY      - STUDY set
-%   ALLEEG     - EEGLAB vector of EEG sets included in the STUDY structure 
+%   STUDY      - EEGLAB STUDY set
+%   ALLEEG     - vector of EEG datasets included in the STUDY structure 
 %
 % Output:
 %   STUDY      - a new STUDY set containing some or all of the datasets in ALLEEG, 
@@ -59,22 +59,22 @@ if ~isfield(STUDY.datasetinfo, 'comps') & ~isempty(STUDY.datasetinfo), STUDY.dat
 try, subject = unique({ STUDY.datasetinfo.subject });
 catch, 
      subject = ''; 
-     disp('Important warning: not all dataset contain subject code, some functions may crash');
+     disp('Important warning: some datasets do not have subject codes; some functions may crash!');
 end;
 try, group = unique({ STUDY.datasetinfo.group });
 catch, 
      group = ''; 
-     % disp('Important warning: not all dataset contain group info, some functions may crash');
+     % disp('Important warning: some datasets do not have group codes; some functions may crash!');
 end;
 try, condition = unique({ STUDY.datasetinfo.condition });
 catch, 
      condition = ''; 
-     disp('Important warning: not all dataset contain condition info, some functions may crash');
+     disp('Important warning: some datasets do not have condition codes; some functions may crash!');
 end;
 try, session = unique([STUDY.datasetinfo.session]);
 catch, 
      session = ''; 
-     % disp('Important warning: not all dataset contain integer session info, some functions may crash');
+     % disp('Important warning: some datasets do not have session numbers; some functions may crash!');
 end;
 if ~isequal(STUDY.subject,   subject  ), STUDY.subject   = subject;   modif = 1; end;  
 if ~isequal(STUDY.group,     group    ), STUDY.group     = group;     modif = 1; end;  
