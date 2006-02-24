@@ -140,9 +140,10 @@ if isempty(STUDY.cluster)
     for k = 1:size(STUDY.setind,2)
         
         ind_nonnan = find(~isnan(STUDY.setind(:,k)));
-        comps = STUDY.datasetinfo(ind_nonnan(1)).comps;
+        ind_nonnan = STUDY.setind(ind_nonnan(1),k);
+        comps = STUDY.datasetinfo(ind_nonnan).comps;
         if isempty(comps)
-            comps = 1:size(ALLEEG(STUDY.datasetinfo(ind_nonnan(1)).index).icaweights,1);
+            comps = 1:size(ALLEEG(STUDY.datasetinfo(ind_nonnan).index).icaweights,1);
         end;
         STUDY.cluster(1).sets =  [STUDY.cluster(1).sets       k*ones(1,length(comps))];
         STUDY.cluster(1).comps = [STUDY.cluster(1).comps      comps];
