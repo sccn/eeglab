@@ -1,4 +1,3 @@
-%
 % pop_study()  - create a new STUDY set structure defining a group of related EEG datasets. 
 %                The STUDY set also contains information about each of the datasets: 
 %                the subject code, subject group, exp. condition and session. This can be 
@@ -65,6 +64,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2006/02/23 23:34:53  scott
+% help msg -sm
+%
 % Revision 1.31  2006/02/23 22:41:35  arno
 % cancel pre-select components
 %
@@ -314,7 +316,7 @@ elseif strcmpi(mode, 'gui') % GUI mode
 	guigeom = { guigeom{:} [1] [1 0.2 0.3 0.2 1] [1] [0.14 3] [0.14 3] [1 1.5 0.3] [1]};
 
     if ~isempty(STUDY.filename)
-        guispec{end-3} = {'style' 'checkbox' 'string' '' 'value' 1 'tag' 'studyfile' };
+        guispec{end-3} = {'style' 'checkbox' 'string' '' 'value' 0 'tag' 'studyfile' };
         guispec{end-2} = {'style' 'text'     'string' 'Resave study. Uncheck and use menu File > Save study as to save under a new filename'};
         guispec{end-1} = {};
         guigeom{end-1} = [0.08 1.5 0.1];
