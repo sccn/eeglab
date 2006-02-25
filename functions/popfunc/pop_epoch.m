@@ -9,7 +9,8 @@
 %
 % Graphic interface:
 %   "Time-locking event type(s)" - [edit box] Select 'Edit > Event values' 
-%                to see a list of event.type values; else use the push button. 
+%                to see a list of event.type values; else use the push button.
+%                To use event types containing spaces, enter in single-quotes.
 %                epoch() function command line equivalent: 'typerange' 
 %   "..."      - [push button] scroll event types.
 %   "Epoch limits" - [edit box] epoch latency range [start, end] in seconds relative
@@ -70,6 +71,14 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.46  2005/08/30 03:30:30  scott
+% edited help message and commandline text messages. Remaining questions, Arno -
+% How to use 'eventindices' with 'typerange' ??? Is 'eventindices' not available
+% from the GUI? When type [] is asked for - are epochs created around ALL events.
+% even in an already-epoched dataset?? Or just around time-locking events? What about
+% time locking only to already time-locking events (e.g. only to time-locking time=0
+% targets, not to all targets in each (long) epoch???  -Scott
+%
 % Revision 1.45  2005/05/24 17:30:24  arno
 % remove cell2mat
 %
@@ -287,7 +296,11 @@ if nargin < 3
    if length(result) == 0 return; end;
    
    if strcmpi(result{1}, '[]'), result{1} = ''; end;
-   events = parsetxt( result{1} );
+   if strcmpi(result{1}(1),'''')   % If event type appears to be in single-quotes, use comma
+                                   % and single-quote as delimiter between event types. toby 2.24.2006
+       events = parsetxt( result{1},[',',''''] );
+   else events = parsetxt( result{1});
+   end
    lim = eval( [ '[' result{2} ']' ] );
 
    args = {};
