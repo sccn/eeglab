@@ -109,6 +109,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.109  2006/02/23 20:48:56  scott
+% same -sm
+%
 % Revision 1.108  2006/02/22 17:05:42  scott
 % output variable pvaf --> sortvar; continued to change g.sortvar options to
 % new repetoire. -sm
@@ -995,8 +998,7 @@ fprintf('    Component sortvar in interval:  ');
    fprintf('\n');
 end
 
-% toby 2.21.2006 REDUNDANT CALCULATIONS!
-sumproj = zeros(size(data(g.plotchans,:)));
+sumproj = zeros(size(data(g.plotchans,:))); % toby 2.21.2006 REDUNDANT CALCULATIONS!
 for n = 1:ntopos
   if isempty(g.icaact)
       sumproj = sumproj + ...
