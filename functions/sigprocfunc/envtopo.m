@@ -109,6 +109,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.110  2006/03/01 01:51:25  scott
+% nothing. -sm
+%
 % Revision 1.109  2006/02/23 20:48:56  scott
 % same -sm
 %
@@ -1346,13 +1349,11 @@ if strcmpi(g.dispmaps, 'on')
             else  % if no varargin specified
                 figure(myfig);
 
-           		% toby 2.16.2006: Changed to accomodate fact that 
-				% maxproj contains all channel info now.
+           		% toby 2.16.2006: Changed; maxproj contains all channel info now.
                 topoplot(maxproj(g.plotchans,t),chanlocs,'style','both','emarkersize',3);
             end
             axis square
-            set(gca, 'userdata', ...
-	['text(-0.6, -0.6, '''g.sortvar': ' sprintf('%6.2f', sortvar(tmpsort(t))) ''');'] );
+            set(gca, 'userdata', ['text(-0.6, -0.6, '''g.sortvar': ' sprintf('%6.2f', sortvar(tmpsort(t))) ''');'] );
             end;
         else 
 			axis off;
