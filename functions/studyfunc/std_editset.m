@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2006/03/02 22:44:22  arno
+% checking session consistency
+%
 % Revision 1.25  2006/02/23 23:31:17  scott
 % help msg -sm
 %
@@ -261,7 +264,7 @@ if strcmpi(g.updatedat, 'on')
             ALLEEG(currentind).condition        = STUDY.datasetinfo(currentind).condition;
             ALLEEG(currentind).saved            = 'no';
         end;
-        if isequal(ALLEEG(currentind).session, STUDY.datasetinfo(currentind).session)
+        if ~isequal(ALLEEG(currentind).session, STUDY.datasetinfo(currentind).session)
             ALLEEG(currentind).session          = STUDY.datasetinfo(currentind).session;
             ALLEEG(currentind).saved            = 'no';
         end;
