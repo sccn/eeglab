@@ -109,6 +109,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.112  2006/03/01 17:41:35  arno
+% fix call to text
+%
 % Revision 1.111  2006/03/01 17:37:03  scott
 % nothing -sm
 %
@@ -1334,7 +1337,6 @@ if strcmpi(g.dispmaps, 'on')
     
     [tmp tmpsort] = sort(maporder);
     [tmp tmpsort] = sort(tmpsort);
-    chanlocs = g.chanlocs(g.plotchans); % topoplot based on g.plotchans only! -sm 11/04
 
     for t=1:ntopos % left to right order  (maporder)
                    % axt = axes('Units','Normalized','Position',...
@@ -1345,19 +1347,16 @@ if strcmpi(g.dispmaps, 'on')
         cla
         
         if ~isempty(chanlocs)  % plot the component scalp maps
+            figure(myfig);
             if ~isempty(varargin)
-                figure(myfig);
-                topoplot(maxproj(:,t),g.chanlocs, varargin{:});
-                
+                topoplot(maxproj(g.plotchans,t),g.chanlocs(g.plotchans), varargin{:});
             else  % if no varargin specified
-                figure(myfig);
-
-           		% toby 2.16.2006: Changed; maxproj contains all channel info now.
-                topoplot(maxproj(g.plotchans,t),chanlocs,'style','both','emarkersize',3);
+                topoplot(maxproj(g.plotchans,t),g.chanlocs(g.plotchans),...
+							'style','both','emarkersize',3);
             end
             axis square
-            set(gca, 'userdata', ['text(-0.6, -0.6, ''' g.sortvar ': ' sprintf('%6.2f', sortvar(tmpsort(t))) ''');']);
-            end;
+            set(gca, 'userdata', ...
+   ['text(-0.6, -0.6, ''' g.sortvar ': ' sprintf('%6.2f', sortvar(tmpsort(t))) ''');']);
         else 
 			axis off;
         end;
