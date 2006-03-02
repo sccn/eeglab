@@ -64,6 +64,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2006/02/24 00:12:19  arno
+% default is not to resave file
+%
 % Revision 1.32  2006/02/23 23:34:53  scott
 % help msg -sm
 %
@@ -231,18 +234,18 @@ elseif strcmpi(mode, 'gui') % GUI mode
         end;
     end;
 
-    nextpage = 'pop_study(''nextpage'', gcbf);';
-    prevpage = 'pop_study(''prevpage'', gcbf);';
-    delset   = 'pop_study(''clear'',    gcbf, get(gcbo, ''userdata''));';
-    loadset  = 'pop_study(''load'',     gcbf, get(guiind, ''userdata''), get(guiind, ''string'')); clear guiind;';
-    loadsetedit  = [ 'guiing = gcbo;' loadset ];
-    subcom    = 'pop_study(''subject''  , gcbf, get(gcbo, ''userdata''), get(gcbo, ''string''));';
-    sescom    = 'pop_study(''session''  , gcbf, get(gcbo, ''userdata''), get(gcbo, ''string''));';
-    condcom   = 'pop_study(''condition'', gcbf, get(gcbo, ''userdata''), get(gcbo, ''string''));';
-    grpcom    = 'pop_study(''group''    , gcbf, get(gcbo, ''userdata''), get(gcbo, ''string''));';
-    grpcom    = 'pop_study(''component'', gcbf, get(gcbo, ''userdata''), get(gcbo, ''string''));';
-    cb_del    = 'pop_study(''delclust'' , gcbf, ''showwarning'');';
-    cb_dipole = 'pop_study(''dipselect'', gcbf, ''showwarning'');';
+    nextpage    = 'pop_study(''nextpage'', gcbf);';
+    prevpage    = 'pop_study(''prevpage'', gcbf);';
+    delset      = 'pop_study(''clear'',    gcbf, get(gcbo, ''userdata''));';
+    loadset     = 'pop_study(''load'',     gcbf, get(guiind, ''userdata''), get(guiind, ''string'')); clear guiind;';
+    loadsetedit = [ 'guiing = gcbo;' loadset ];
+    subcom      = 'pop_study(''subject''  , gcbf, get(gcbo, ''userdata''), get(gcbo, ''string''));';
+    sescom      = 'pop_study(''session''  , gcbf, get(gcbo, ''userdata''), get(gcbo, ''string''));';
+    condcom     = 'pop_study(''condition'', gcbf, get(gcbo, ''userdata''), get(gcbo, ''string''));';
+    grpcom      = 'pop_study(''group''    , gcbf, get(gcbo, ''userdata''), get(gcbo, ''string''));';
+    compcom     = 'pop_study(''component'', gcbf, get(gcbo, ''userdata''), get(gcbo, ''string''));';
+    cb_del      = 'pop_study(''delclust'' , gcbf, ''showwarning'');';
+    cb_dipole   = 'pop_study(''dipselect'', gcbf, ''showwarning'');';
 
 	browsestudy = [ '[filename, filepath] = uiputfile2(''*.study'', ''Use exsiting STUDY set to import dataset information -- pop_study()''); ' ... 
                       'set(findobj(''parent'', gcbf, ''tag'', ''usestudy_file''), ''string'', [filepath filename]);' ];
@@ -288,7 +291,7 @@ elseif strcmpi(mode, 'gui') % GUI mode
         {'style' 'edit'       'string' ''      'tag' [ 'sess'  int2str(index) ] 'userdata' index 'Callback' sescom} ...
         {'style' 'edit'       'string' ''      'tag' [ 'cond'  int2str(index) ] 'userdata' index 'Callback' condcom} ...
         {'style' 'edit'       'string' ''      'tag' [ 'group' int2str(index) ] 'userdata' index 'Callback' grpcom} ...
-        {'style' 'pushbutton' 'string' 'All'   'tag' [ 'comps' int2str(index) ] 'userdata' index 'Callback' grpcom} ...
+        {'style' 'pushbutton' 'string' 'All'   'tag' [ 'comps' int2str(index) ] 'userdata' index 'Callback' compcom} ...
         {'style' 'pushbutton' 'string' 'CLear' 'tag' [ 'clear' int2str(index) ] 'userdata' index 'callback' delset} };
     end;
     
