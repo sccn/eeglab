@@ -29,6 +29,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:39:45  jorn
+% Initial revision
+%
 % 04-03-02 reprogrammed the function with findstr -ad
 
 function cellarray = parsetxt(txt, delims);
@@ -39,7 +42,7 @@ if nargin < 1
 end;	
 
 if nargin < 2
-    delims = [' ' ',' 9 '"' ''''];
+    delims = [' ' ',' 9 '"' '''' ];
 end;
     
 cellarray = {};
