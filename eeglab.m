@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.456  2006/03/02 22:53:01  scott
+% Nb. of clusters --> Clusters    -sm
+%
 % Revision 1.455  2006/02/17 23:22:28  arno
 % edit menu item
 %
@@ -2592,15 +2595,12 @@ if study_selected
     set( findobj('parent', file_m, 'type', 'uimenu'), 'enable', 'off');
     set( findobj('parent', tool_m, 'type', 'uimenu', 'label', 'Run ICA')        , 'enable', 'on');
     set( findobj('parent', tool_m, 'type', 'uimenu', 'label', 'Filter the data'), 'enable', 'on');
-    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Import data'             ), 'enable', 'on');
-    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Load existing dataset'   ), 'enable', 'on');
-    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Clear dataset(s)'        ), 'enable', 'on');
     set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Load existing study'     ), 'enable', 'on');
     set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Save current study'      ), 'enable', 'on');
     set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Save current study as'   ), 'enable', 'on');
+    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Clear study'             ), 'enable', 'on');
     set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Save history'            ), 'enable', 'on');
     set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Maximize memory'         ), 'enable', 'on');
-    set( findobj('parent', hist_m, 'type', 'uimenu', 'label', 'Dataset history'         ), 'enable', 'off');
     set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Quit'                    ), 'enable', 'on');
     
     % enable specific menus
