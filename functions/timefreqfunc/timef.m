@@ -148,6 +148,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.84  2005/09/01 03:41:53  scott
+% added flag 'hzdir' and made the default 'up'  -sm
+%
 % Revision 1.83  2005/09/01 01:55:40  scott
 % nothing
 %
@@ -1041,7 +1044,7 @@ end;
 Rsign = sign(imag(R));
 if nargout > 7
    for lp = 1:size(R,1)
-       Rphase(lp,:) = rem(phase(R(lp,:)),2*pi);
+       Rphase(lp,:) = rem(angle(R(lp,:)),2*pi); % replaced obsolete phase() -sm 2/1/6
    end
    Rphase(find(Rphase>pi))  = 2*pi-Rphase(find(Rphase>pi));
    Rphase(find(Rphase<-pi)) = -2*pi-Rphase(find(Rphase<-pi));
