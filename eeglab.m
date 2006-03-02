@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.455  2006/02/17 23:22:28  arno
+% edit menu item
+%
 % Revision 1.454  2006/02/07 23:18:32  arno
 % changing text
 %
@@ -2550,7 +2553,7 @@ if study_selected
     set( g.win7, 'String', 'Epoch consistency');
     set( g.win8, 'String', 'Channels per frame');
     set( g.win9, 'String', 'Channel locations');
-    set( g.win10, 'String', 'Nb of clusters');
+    set( g.win10, 'String', 'Clusters');
     set( g.win11, 'String', 'Status');
     set( g.win12, 'String', 'Total size (Mb)');
     
