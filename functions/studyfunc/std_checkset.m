@@ -99,7 +99,7 @@ end
 for k = 1:length(STUDY.datasetinfo)
     setcond = find(strcmp(STUDY.datasetinfo(k).condition, STUDY.condition));
     setsubj = find(strcmp(STUDY.datasetinfo(k).subject,   STUDY.subject));
-    setsess = find(strcmp(STUDY.datasetinfo(k).session,   STUDY.session));
+    setsess = find(STUDY.datasetinfo(k).session == STUDY.session);
     ncomps  = [];
     if ~isempty(setcond)
         if ~isempty(setsess)
