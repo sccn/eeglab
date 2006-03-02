@@ -64,6 +64,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2006/03/02 22:45:47  arno
+% fixing history
+%
 % Revision 1.34  2006/03/02 22:19:32  arno
 % fix group edit box callback
 %
@@ -185,7 +188,7 @@ elseif strcmpi(mode, 'gui') % GUI mode
     if isreal(ALLEEG)
         if ALLEEG == 0
             res = questdlg2( strvcat('Datasets currently loaded will be removed from EEGLAB memory.', ...
-                                     'Are you sure you want to pursue and ignore currenlty loaded datasets?'), ...
+                                     'Are you sure you want to continue?'), ...
                                      'Discard datasets loaded in EEGLAB?', 'Cancel', 'Yes', 'Yes');
             if strcmpi(res, 'cancel'), return; end;
         end;
@@ -455,9 +458,9 @@ else % internal command
         case 'dipselect'
             STUDY.datasetinfo = datasetinfo;
             
-            res = inputdlg2( { strvcat('Enter threshold max residual variance in % to pre-select components', ...
-                                       'Note this will delete all existing clusters') }, ...
-                             'Pre-select components', 1, { '15' } );
+            res = inputdlg2( { strvcat('Enter max residual variance (in %) for clustered components', ...
+                                       'NOTE: This will delete any existing component clusters!') }, ...
+                             'pop_study():  Pre-select components', 1, { '15' } );
             
             if isempty(res), return; end;
             STUDY = editstudy(STUDY, ALLEEG, 'commands', { 'dipselect' str2num(res{1})/100 'return' });
