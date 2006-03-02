@@ -64,6 +64,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2006/03/02 22:19:32  arno
+% fix group edit box callback
+%
 % Revision 1.33  2006/02/24 00:12:19  arno
 % default is not to resave file
 %
@@ -378,8 +381,7 @@ elseif strcmpi(mode, 'gui') % GUI mode
     % run command and create history
     % ------------------------------
     [STUDY ALLEEG] = editstudy(STUDY, ALLEEG, options{:});
-    com = sprintf( '[%s %s] = pop_study( %s, %s, %s );', inputname(1), inputname(2), ...
-                                                         inputname(1), inputname(2), vararg2str(options(3:end)) );
+    com = sprintf( '[STUDY ALLEEG] = editstudy( STUDY, ALLEEG, %s );', vararg2str(options) );
     
 else % internal command
     
