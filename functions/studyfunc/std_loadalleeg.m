@@ -97,8 +97,9 @@ function ALLEEG = load_alleeg(varargin)
         
         if ~option_storedisk
             EEG = eeg_checkset(EEG, 'loaddata');
-        else
-            EEG = eeg_checkset(EEG, 'savedata');
+        elseif ~isstr(EEG.data)
+            EEG.data   = 'in set file';
+            EEG.icaact = [];
         end;
         [ALLEEG EEG] = eeg_store(ALLEEG, EEG, 0);
     end
