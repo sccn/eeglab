@@ -129,8 +129,8 @@ end
 % -----------------------------------------------
 setind( find(setind(:) == 0) ) = NaN;
 rmind = [];
-for k = 1:size(STUDY.setind,2)
-    ind_nonnan = find(~isnan(STUDY.setind(:,k)));
+for k = 1:size(setind,2)
+    ind_nonnan = find(~isnan(setind(:,k)));
     if isempty(ind_nonnan), rmind = [ rmind k ]; end;
 end;
 setind(:,rmind) = [];
