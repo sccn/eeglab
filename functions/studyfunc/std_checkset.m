@@ -103,13 +103,14 @@ for k = 1:length(STUDY.datasetinfo)
     ncomps  = [];
     if ~isempty(setcond)
         if ~isempty(setsess)
-            setind(setcond, setsubj * setsess) = k; %A 2D matrix of size [conditions (subjects x sessions)]
+            setind(setcond, setsubj * length(STUDY.session)+setsess-1) = k; 
+            %A 2D matrix of size [conditions (subjects x sessions)]
         else
             setind(setcond, setsubj ) = k; 
         end
     else
         if ~isempty(setsess)
-            setind(1, setsubj * setsess) = k; %A 2D matrix of size [conditions (subjects x sessions)]
+            setind(1, setsubj * length(STUDY.session)+setsess-1) = k; 
         else
             setind(1, setsubj) = k; 
         end
@@ -123,11 +124,18 @@ for k = 1:length(STUDY.datasetinfo)
         STUDY.datasetinfo(k).index = k; modif = 1; %The dataset index in the current ALLEEG structure
     end;
 end
-% set to NaN empty indices
-% ------------------------    
+
+% set to NaN empty indices and remove nan columns
+% -----------------------------------------------
 setind( find(setind(:) == 0) ) = NaN;
+rmind = [];
+for k = 1:size(STUDY.setind,2)
+    ind_nonnan = find(~isnan(STUDY.setind(:,k)));
+    if isempty(ind_nonnan), rmind = [ rmind k ]; end;
+end;
+setind(:,rmind) = [];
 if ~isequal(setind, STUDY.setind)
-    STUDY.setind = setind; modif = 1; 
+    STUDY.setind = setind; modif = 1;
 end;
 
 % set cluster array if empty
