@@ -74,7 +74,11 @@ function ALLEEG = load_alleeg(varargin)
     else
         genpath = '';
         paths = varargin{1};
-        datasets = varargin{2};
+        if nargin > 1
+            datasets = varargin{2};
+        else
+            datasets = cell(size(paths));
+        end;
     end
     
     set = 1;
