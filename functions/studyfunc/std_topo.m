@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2006/03/03 00:41:38  arno
+% now correctly saving data
+%
 
 function [EEG_etc, X] = cls_scalp(EEG, comp)
 
@@ -93,7 +96,7 @@ end
 %save topos in file
 tmpfile = fullfile( EEG.filepath, [ EEG.filename(1:end-3) 'icascalp' ]); 
 floatwrite(all_topos, tmpfile);
-EEG.etc.icascalp       = tmpfile;
+EEG.etc.icascalp       = [ EEG.filename(1:end-3) 'icascalp' ];
 EEG.etc.icascalpparams = d;
 try
     EEG = pop_saveset( EEG, 'savemode', 'resave');
