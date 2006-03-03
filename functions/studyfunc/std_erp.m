@@ -50,6 +50,8 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+% $Log: not supported by cvs2svn $
+
 function [EEG_etc, X, t] = cls_erp(EEG, comp, timerange)
 
 EEG_etc = [];
@@ -58,11 +60,9 @@ if ~exist('timerange')
 end
 %erp information found in datasets
 if isfield(EEG,'etc')
-     if isfield(EEG.etc, 'icaerp')
+     if isfield(EEG.etc, 'icaerp') & exist(fullfile(EEG.filepath, EEG.etc.icaerp))
          d = EEG.etc.icaerpparams;
-         olddir = pwd;
-         eval ( ['cd '  EEG.filepath]);
-         t = floatread(EEG.etc.icaerp, [d 1]);
+         t = floatread(fullfile(EEG.filepath, EEG.etc.icaerp), [d 1]);
          blind = max(find(t <= 0)); %the baseline index
          if ~isempty(timerange)
              maxind = max(find(t <= timerange(end)));
@@ -80,38 +80,46 @@ if isfield(EEG,'etc')
          end
          X = zeros(length(comp),maxind-minind+1) ;
          for k = 1:length(comp)
-             tmp = floatread(EEG.etc.icaerp, [d 1],[],d*comp(k));
+             tmp = floatread(fullfile(EEG.filepath, EEG.etc.icaerp), [d 1],[],d*comp(k));
              X(k,:) =  tmp(minind:maxind)';
          end
-         eval ([ 'cd ' olddir]); 
          return
      end
  end
  
 %no erp information
-if isempty(EEG.icaact)
-    EEG = eeg_checkset( EEG, 'loaddata' ); %load EEG.data and EEG.icaact
+if isstr(EEG.data)
+    TMP = eeg_checkset( EEG, 'loaddata' ); %load EEG.data and EEG.icaact
+else
+    TMP = EEG;
 end
+if isempty(TMP.icaact)
+    TMP.icaact = (TMP.icaweights*TMP.icasphere)* ...
+                 reshape(TMP.data  , [ size(TMP.data,1)   size(TMP.data,2)*size(TMP.data,3) ]);
+    TMP.icaact = reshape(TMP.icaact, [ size(TMP.icaact,1) size(TMP.data,2)*size(TMP.data,3) ]);
+end;
+
 %remove base line
 if EEG.trials > 1 %epoched data
     time0 = find(EEG.times==0);
     if ~isempty(time0)
-        tmp = rmbase(EEG.icaact,EEG.pnts,1:time0);
+        tmp = rmbase(TMP.icaact,EEG.pnts,1:time0);
     else
-        tmp = rmbase(EEG.icaact);
+        tmp = rmbase(TMP.icaact);
     end
 else
-    tmp = rmbase(EEG.icaact);
+    tmp = rmbase(TMP.icaact);
 end
-tmp = reshape(tmp,EEG.nbchan,EEG.pnts,EEG.trials);
 X = mean(tmp,3); %calculate ERP
 t = EEG.times';
+
 %save erp in file
-olddir = pwd;
-eval ( ['cd '  EEG.filepath]);
-floatwrite([t X'], [ EEG.filename(1:end-3) 'icaerp']);
+% ---------------
+floatwrite([t X'], fullfile( EEG.filepath, [ EEG.filename(1:end-3) 'icaerp']));
+
 %update the info in the dataset
-EEG.etc.icaerp = [ EEG.filename(1:end-3) 'icaerp'];
+% -----------------------------
+EEG.etc.icaerp       = [ EEG.filename(1:end-3) 'icaerp'];
 EEG.etc.icaerpparams = length(t);
 try
     EEG = pop_saveset( EEG, 'filename', EEG.filename, 'filepath', EEG.filepath, 'savemode','twofiles');
@@ -119,7 +127,6 @@ catch,
     error([ 'problem saving information into path ' EEG.filepath])
 end
 EEG_etc = EEG.etc;
-eval ([ 'cd ' olddir]); 
 
 %Slect desired components
 X = X(comp,:); 
