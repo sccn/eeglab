@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2006/03/03 21:19:16  arno
+% change scalp map file name
+%
 % Revision 1.2  2006/03/03 00:41:38  arno
 % now correctly saving data
 %
@@ -59,15 +62,13 @@ EEG_etc = [];
 %figure; toporeplot(grid,'style', 'both','plotrad', 0.5, 'intrad', 0.5, 'xsurface' ,Xi, 'ysurface',Yi );
 %scalp information found in datasets
 if isfield(EEG,'etc')
-     if isfield(EEG.etc, 'icascalp')
+     if isfield(EEG.etc, 'icascalp') & exist(fullfile(EEG.filepath, EEG.etc.icascalp))
          d = EEG.etc.icascalpparams; %the grid dimension 
          if iscell(d)
              d = d{1};
          end
-         olddir = pwd;
-         eval ( ['cd '  EEG.filepath]);
          for k = 1:length(comp)
-             tmp = floatread(EEG.etc.icascalp, [d d],[],d*(d+2)*(comp(k)-1));
+             tmp = floatread(fullfile(EEG.filepath, EEG.etc.icascalp), [d d],[],d*(d+2)*(comp(k)-1));
              tmp = tmp(:)';
              tmp = tmp(find(~isnan(tmp)));
              if k == 1
@@ -75,7 +76,6 @@ if isfield(EEG,'etc')
              end
              X(k,:) =  tmp;
          end
-         eval ([ 'cd ' olddir]); 
          return
      end
  end
