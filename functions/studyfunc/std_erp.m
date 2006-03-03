@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2006/03/03 22:51:25  arno
+% fix same thing
+%
 % Revision 1.3  2006/03/03 22:44:54  arno
 % [6~[6~floatread/flotwrite folder fix; computation of ICA fix
 %
@@ -131,7 +134,7 @@ floatwrite([t X'], fullfile( EEG.filepath, [ EEG.filename(1:end-3) 'icaerp']));
 EEG.etc.icaerp       = [ EEG.filename(1:end-3) 'icaerp'];
 EEG.etc.icaerpparams = length(t);
 try
-    EEG = pop_saveset( EEG, 'filename', EEG.filename, 'filepath', EEG.filepath, 'savemode','twofiles');
+    EEG = pop_saveset( EEG, 'savemode','resave');
 catch,
     error([ 'problem saving information into path ' EEG.filepath])
 end
