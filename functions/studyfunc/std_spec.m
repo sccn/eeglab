@@ -68,14 +68,24 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2006/03/03 21:29:52  arno
+% update change dir, ICA computatation, read/write
+%
 
 function [EEG_etc, X, f, overwrite] = cls_spec(EEG, comp, freqrange, arg,overwrite)
+    
+if nargin < 1
+    help cls_spec;
+    return;
+end;
+    
 EEG_etc = [];
 if ~exist('overwrite')
     overwrite = 0;
 end
 if isfield(EEG,'etc')
-     if isfield(EEG.etc, 'icaspec') & exist(fullfile(EEG.filepath, [ EEG.etc.icaspec 'm']) %spectrum information found in datasets
+     if isfield(EEG.etc, 'icaspec') & exist(fullfile(EEG.filepath, [ EEG.etc.icaspec 'm'])) & ... 
+             exist(fullfile(EEG.filepath, [ EEG.etc.icaspec ]))%spectrum information found in datasets
          params = EEG.etc.icaspecparams;
          if iscell(params)
              d= params{1};
