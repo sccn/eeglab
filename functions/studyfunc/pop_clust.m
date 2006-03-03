@@ -1,7 +1,7 @@
 % pop_clust() - select and run a clustering algorithm on components from an EEGLAB STUDY 
-%               set of EEG datasets. Clustering data should be prepared beforehand using 
+%               structure of EEG datasets. Clustering data should be prepared beforehand using 
 %               pop_preclust() and/or eeg_preclust(). The number of clusters must be
-%               specified in advance. If called in GUI mode, the pop_clustedit() window
+%               specified in advance. If called in gui mode, the pop_clustedit() window
 %               appears when the clustering is complete to display clustering results
 %               and allow the user to review and edit them.
 % Usage: 
@@ -58,6 +58,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2006/02/22 22:44:39  arno
+% now edit all clusters by default
+%
 % Revision 1.13  2006/02/22 22:40:45  arno
 % smarter warning message
 %
@@ -125,7 +128,7 @@ if isempty(varargin) %GUI call
       {'style' 'text'       'string' 'Number of clusters to compute:' } ...
       {'style' 'edit'       'string' '2' 'tag' 'clust_num' }...
       {'style' 'checkbox'   'string' '' 'tag' 'outliers_on' 'value' 0 'Callback' set_outliers 'userdata' 'kmeans' 'enable' 'on' } ...
-      {'style' 'text'       'string' 'Identify outliers more than X std from cluster centers' 'userdata' 'kmeans' 'enable' 'on' } ...
+      {'style' 'text'       'string' 'Separate outliers %gt; [N] std.dev. from any cluster center' 'userdata' 'kmeans' 'enable' 'on' } ...
       {'style' 'edit'       'string' '3' 'tag' 'outliers_std' 'enable' 'off' } {}...
       {'style' 'checkbox'   'string' '' 'tag' 'saveSTUDY' 'Callback' saveSTUDY 'value' 0} ...
       {'style' 'text'       'string' 'Save STUDY set to disk'} ...
@@ -156,11 +159,11 @@ if isempty(varargin) %GUI call
         try
             clustdata = STUDY.etc.preclust.preclustdata;
         catch
-            error('Error accesing preclustering data. Study must go through pre-clustering first.');
+            error('Error accesing preclustering data. Perform pre-clustering.');
         end;
         command = '[STUDY] = pop_clust(STUDY, ALLEEG,';
         
-        disp('Performing clustering...');
+        disp('Clustering ...');
         switch clus_alg
             case 'Kmeans'
                 command = sprintf('%s %s %d %s', command, '''algorithm'', ''kmeans'',''clus_num'', ', clus_num, ',');
