@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2006/03/03 00:03:26  arno
+% use load_alleeg
+%
 % Revision 1.30  2006/03/03 00:02:56  arno
 % back to version 1.27
 %
@@ -134,14 +137,14 @@ end;
 
 % decode input parameters
 % -----------------------
-g = finputcheck(varargin, { 'updatedat' 'string'  { 'on' 'off' }  'on';
+g = finputcheck(varargin, { 'updatedat' 'string'  { 'on' 'off' }  'off';
                             'name'      'string'  { }             '';
                             'task'      'string'  { }             '';
                             'notes'     'string'  { }             '';
                             'filename'  'string'  { }             '';
                             'filepath'  'string'  { }             '';
                             'resave'    'string'  { 'on' 'off' 'info' }  'off';
-                            'savedat'   'string'  { 'on' 'off' }  'on';
+                            'savedat'   'string'  { 'on' 'off' }  'off';
                             'rmclust'   'string'  { 'on' 'off' }  'on';
                             'commands'  'cell'    {}              {} }, 'editstudy');
 if isstr(g), error(g); end;
