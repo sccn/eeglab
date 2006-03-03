@@ -68,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2006/03/03 21:37:17  arno
+% new message
+%
 % Revision 1.7  2006/03/03 21:32:07  arno
 % same
 %
@@ -120,52 +123,49 @@ if isfield(EEG,'etc')
                  f = fave;
                  return
              end
+% $$$              
+% $$$              if overwrite ~= 2
+% $$$                  set_yes =  [ 'set(findobj(''parent'', gcbf, ''tag'', ''spec_yesall''), ''value'', 0);' ...
+% $$$                     'set(findobj(''parent'', gcbf, ''tag'', ''spec_no''), ''value'', 0);'  ...
+% $$$                     'set(findobj(''parent'', gcbf, ''tag'', ''spec_noall''), ''value'', 0);'];
+% $$$                  set_yesall =  [ 'set(findobj(''parent'', gcbf, ''tag'', ''spec_yes''), ''value'', 0);' ...
+% $$$                     'set(findobj(''parent'', gcbf, ''tag'', ''spec_no''), ''value'', 0);'  ...
+% $$$                     'set(findobj(''parent'', gcbf, ''tag'', ''spec_noall''), ''value'', 0);'];
+% $$$                  set_no =  [ 'set(findobj(''parent'', gcbf, ''tag'', ''spec_yesall''), ''value'', 0);' ...
+% $$$                     'set(findobj(''parent'', gcbf, ''tag'', ''spec_yes''), ''value'', 0);' ...
+% $$$                     'set(findobj(''parent'', gcbf, ''tag'', ''spec_noall''), ''value'', 0);'];
+% $$$                  set_noall =  [ 'set(findobj(''parent'', gcbf, ''tag'', ''spec_yesall''), ''value'', 0);' ...
+% $$$                     'set(findobj(''parent'', gcbf, ''tag'', ''spec_yes''), ''value'', 0);' ...
+% $$$                     'set(findobj(''parent'', gcbf, ''tag'', ''spec_no''), ''value'', 0);'  ];
+% $$$                  spec_ans = inputgui({[1] [1] [1 1 ] [1 1] [1]}, ...
+% $$$                          { {'style' 'text' 'string' ['Spectrum infomation [' num2str(round(fave(1))) ' ' num2str(round(fave(end)))  '] Hz already exists for dataset: '  EEG.setname '. ' ] } ...
+% $$$                          {'style' 'text' 'string' 'Would you like to recalculate the spectrum and overwrite these information?' } ...
+% $$$                          {'style' 'checkbox' 'tag' 'spec_yes' 'string' 'Yes' 'value' 1 'Callback' set_yes }  ...
+% $$$                          {'style' 'checkbox' 'tag' 'spec_yesall' 'string' 'Yes to all datasets' 'value' 0 'Callback' set_yesall }  ...
+% $$$                          {'style' 'checkbox' 'tag' 'spec_no' 'string' 'Use existing spectrum info' 'value' 0 'Callback' set_no } ...
+% $$$                          {'style' 'checkbox' 'tag' 'spec_noall' 'string' 'Use existing info for all sets' 'value' 0 'Callback' set_noall } {} }, ...
+% $$$                      '', 'Recalculate spectrum information -- part of cls_spec()'); 
+% $$$                  switch (find(celltomat(spec_ans)))
+% $$$                      case 1
+% $$$                          [EEG_etc, X, f, overwrite] = cls_spec(EEG, comp, freqrange, arg, 1); % overwrite the info in this dataset
+% $$$                          overwrite = 0; %but ask before overwriting the rest of the datasets
+% $$$                          return;
+% $$$                      case 2
+% $$$                          [EEG_etc, X, f, overwrite] = cls_spec(EEG, comp, freqrange, arg, 1);
+% $$$                          return;
+% $$$                      case 3
+% $$$                          overwrite = 0; % don't overwrite the info in this datase but keep asking for the other datasets
+% $$$                      case 4
+% $$$                          overwrite = 2; % keep the info in all datasets
+% $$$                  end
+% $$$              end
+% $$$              
              
-             if overwrite ~= 2
-                 set_yes =  [ 'set(findobj(''parent'', gcbf, ''tag'', ''spec_yesall''), ''value'', 0);' ...
-                    'set(findobj(''parent'', gcbf, ''tag'', ''spec_no''), ''value'', 0);'  ...
-                    'set(findobj(''parent'', gcbf, ''tag'', ''spec_noall''), ''value'', 0);'];
-                 set_yesall =  [ 'set(findobj(''parent'', gcbf, ''tag'', ''spec_yes''), ''value'', 0);' ...
-                    'set(findobj(''parent'', gcbf, ''tag'', ''spec_no''), ''value'', 0);'  ...
-                    'set(findobj(''parent'', gcbf, ''tag'', ''spec_noall''), ''value'', 0);'];
-                 set_no =  [ 'set(findobj(''parent'', gcbf, ''tag'', ''spec_yesall''), ''value'', 0);' ...
-                    'set(findobj(''parent'', gcbf, ''tag'', ''spec_yes''), ''value'', 0);' ...
-                    'set(findobj(''parent'', gcbf, ''tag'', ''spec_noall''), ''value'', 0);'];
-                 set_noall =  [ 'set(findobj(''parent'', gcbf, ''tag'', ''spec_yesall''), ''value'', 0);' ...
-                    'set(findobj(''parent'', gcbf, ''tag'', ''spec_yes''), ''value'', 0);' ...
-                    'set(findobj(''parent'', gcbf, ''tag'', ''spec_no''), ''value'', 0);'  ];
-                 spec_ans = inputgui({[1] [1] [1 1 ] [1 1] [1]}, ...
-                         { {'style' 'text' 'string' ['Spectrum infomation [' num2str(round(fave(1))) ' ' num2str(round(fave(end)))  '] Hz already exists for dataset: '  EEG.setname '. ' ] } ...
-                         {'style' 'text' 'string' 'Would you like to recalculate the spectrum and overwrite these information?' } ...
-                         {'style' 'checkbox' 'tag' 'spec_yes' 'string' 'Yes' 'value' 1 'Callback' set_yes }  ...
-                         {'style' 'checkbox' 'tag' 'spec_yesall' 'string' 'Yes to all datasets' 'value' 0 'Callback' set_yesall }  ...
-                         {'style' 'checkbox' 'tag' 'spec_no' 'string' 'Use existing spectrum info' 'value' 0 'Callback' set_no } ...
-                         {'style' 'checkbox' 'tag' 'spec_noall' 'string' 'Use existing info for all sets' 'value' 0 'Callback' set_noall } {} }, ...
-                     '', 'Recalculate spectrum information -- part of cls_spec()'); 
-                 switch (find(celltomat(spec_ans)))
-                     case 1
-                         [EEG_etc, X, f, overwrite] = cls_spec(EEG, comp, freqrange, arg, 1); % overwrite the info in this dataset
-                         overwrite = 0; %but ask before overwriting the rest of the datasets
-                         return;
-                     case 2
-                         [EEG_etc, X, f, overwrite] = cls_spec(EEG, comp, freqrange, arg, 1);
-                         return;
-                     case 3
-                         overwrite = 0; % don't overwrite the info in this datase but keep asking for the other datasets
-                     case 4
-                         overwrite = 2; % keep the info in all datasets
-                 end
-             end
-             
-             X = zeros(length(comp),md) ;
-             for k = 1:length(comp)
-                 X(k,:) = floatread(fullfile(EEG.filepath, [ EEG.etc.icaspec 'm']), [md 1],[],md*comp(k))';
-             end
-             f = fave;
-             return
-         else % overwrite existing spectrum (use exisiting spectrum but take new frequency boundaries). 
              disp('Use exisiting spectrum but take new frequency boundaries');
              disp('(to recompute spectum delete files with extension .icaspec and .icaspecm)');
+             [EEG_etc, X, f, overwrite] = cls_spec(EEG, comp, freqrange, arg, 1);
+             return
+         else % overwrite existing spectrum (use exisiting spectrum but take new frequency boundaries). 
              f = floatread(fullfile(EEG.filepath, EEG.etc.icaspec), [d 1]);
              if ~isempty(freqrange)
                  maxind = max(find(f <= freqrange(end)));
