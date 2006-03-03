@@ -111,19 +111,27 @@ if isfield(EEG,'etc')
  end
 
 % No ERSP / ITC information available
-if isempty(EEG.icaact)
-    EEG = eeg_checkset( EEG, 'loaddata'); %load EEG.data and EEG.icaact
+if isstr(EEG.data)
+    TMP = eeg_checkset( EEG, 'loaddata' ); %load EEG.data and EEG.icaact
+else
+    TMP = EEG;
 end
+if isempty(TMP.icaact)
+    TMP.icaact = (TMP.icaweights*TMP.icasphere)* ...
+                 reshape(TMP.data  , [ size(TMP.data,1)   size(TMP.data,2)*size(TMP.data,3) ]);
+    TMP.icaact = reshape(TMP.icaact, [ size(TMP.icaact,1) size(TMP.data,2)*size(TMP.data,3) ]);
+end;
 
 %compute ERSP for all components
 [time_range, winsize] = compute_ersp_times(cycles,  EEG.srate, [EEG.xmin EEG.xmax]*1000 , freqrange(1), padratio); 
 if time_range(1) >= time_range(2)
     error(['cls_ersp: the parameters given for ' upper(type) ' calculation result in invalid time range. Aborting. Please change lower frequency bound or other parameters to resolve the problem.'] )
 end
-numc = size(EEG.icaact,1); %number of ICA comp
+
+numc = size(EEG.icaweights,1); %number of ICA comp
 for k = 1:numc
     % Compute ERSP & ITC
-    [ersp,itc,powbase,times,freqs,erspboot,itcboot] = timef( EEG.icaact(k, :) , EEG.pnts, [EEG.xmin EEG.xmax]*1000, EEG.srate, cycles ,'type', ...
+    [ersp,itc,powbase,times,freqs,erspboot,itcboot] = timef( TMP.icaact(k, :) , EEG.pnts, [EEG.xmin EEG.xmax]*1000, EEG.srate, cycles ,'type', ...
         'phasecoher',  'plotersp', 'off', 'plotitc', 'off', 'alpha',alpha,'padratio',padratio, 'plotphase','off','winsize',winsize);
    
     % Change frequency axis from linear scale to log scale (frequency values left in dB)
@@ -143,28 +151,25 @@ for k = 1:numc
 end
 
 %save ERSP in file
-olddir = pwd;
-eval ( ['cd '  EEG.filepath]);
-floatwrite(all_ersp, [ EEG.filename(1:end-3) 'icaersp']);
-floatwrite(all_itc, [ EEG.filename(1:end-3) 'icaitc']);
+floatwrite(all_ersp, fullfile(EEG.filepath, [ EEG.filename(1:end-3) 'icaersp']));
+floatwrite(all_itc,  fullfile(EEG.filepath, [ EEG.filename(1:end-3) 'icaitc']));
 %update the info in the dataset
 EEG.etc.icaersp = [ EEG.filename(1:end-3) 'icaersp'];
-EEG.etc.icaitc = [ EEG.filename(1:end-3) 'icaitc'];
+EEG.etc.icaitc  = [ EEG.filename(1:end-3) 'icaitc'];
 %save ersp parameters in the dataset
-EEG.etc.icaerspparams.times = times;
-EEG.etc.icaerspparams.freqs = freqs;
-EEG.etc.icaerspparams.logfreqs = logfreqs;
-EEG.etc.icaerspparams.cycles = cycles;
-EEG.etc.icaerspparams.alpha = alpha;
-EEG.etc.icaerspparams.padratio = padratio;
+EEG.etc.icaerspparams.times      = times;
+EEG.etc.icaerspparams.freqs      = freqs;
+EEG.etc.icaerspparams.logfreqs   = logfreqs;
+EEG.etc.icaerspparams.cycles     = cycles;
+EEG.etc.icaerspparams.alpha      = alpha;
+EEG.etc.icaerspparams.padratio   = padratio;
 EEG.etc.icaerspparams.timewindow = timewindow;
-EEG.etc.icaerspparams.freqrange = freqrange;
-EEG.etc.icaitcparams = EEG.etc.icaerspparams;
+EEG.etc.icaerspparams.freqrange  = freqrange;
+EEG.etc.icaitcparams             = EEG.etc.icaerspparams;
 
 try
-    EEG = pop_saveset( EEG, 'filename', EEG.filename, 'filepath', EEG.filepath, 'savemode','twofiles');
+    EEG = pop_saveset( EEG, 'savemode', 'resave');
 catch,
     error([ 'cls_ersp: problems saving into path ' EEG.filepath])
 end
-eval ([ 'cd ' olddir]); 
 EEG_etc = EEG.etc;
