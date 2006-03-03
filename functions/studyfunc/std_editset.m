@@ -61,9 +61,6 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
-% Revision 1.28  2006/03/03 00:00:04  arno
-% using load_alleeg to load datasets
-%
 % Revision 1.27  2006/03/02 23:01:09  arno
 % fix same problem
 %
@@ -242,7 +239,8 @@ for k = 1:2:length(g.commands)
             STUDY = checkstudy(STUDY, ALLEEG); % recreate parent dataset
             
         case 'load'
-            ALLEEG = load_alleeg({ g.commands{k+1} });
+            TMPEEG = pop_loadset('filename', g.commands{k+1}, 'loadmode', 'info');
+            ALLEEG = eeg_store(ALLEEG, eeg_checkset(TMPEEG), currentind);
             
             % update datasetinfo structure
             % ----------------------------
