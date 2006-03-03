@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2006/03/02 23:18:54  scott
+% editing window msgs  -sm
+%
 % Revision 1.29  2006/02/23 00:19:58  arno
 % remove dipole selection option (now mved to pop_study)
 %
@@ -443,19 +446,11 @@ else
             if ~isempty( ersp_params)
                 ersp_str = [ 'ersp_p = struct( ' ersp_params ');' ];
                 eval(ersp_str);
-                seti = STUDY.datasetinfo(1).index; %first dataset in ALLEEG that is part of STUDY
-                [time_range, winsize] = compute_ersp_times(ersp_p.cycles,  ALLEEG(seti).srate,...
-                    [ALLEEG(seti).xmin ALLEEG(seti).xmax]*1000, ersp_p.frange(1),ersp_p.padratio); 
-                if isfield(ersp_p, 'tlimits')
-                    if ersp_p.tlimits(1) < time_range(1)
-                        ersp_p.tlimits(1) = time_range(1);
-                    end
-                    if ersp_p.tlimits(2) > time_range(2)
-                        ersp_p.tlimits(2) = time_range(2);
-                    end
-                else
-                    ersp_p.tlimits = time_range;
-                end
+                if ~isfield(ersp_p, 'alpha'),    ersp_p.alpha    = ersp.a; end;
+                if ~isfield(ersp_p, 'cycle'),    ersp_p.cycle    = ersp.c; end;
+                if ~isfield(ersp_p, 'padratio'), ersp_p.padratio = ersp.p; end;
+                if ~isfield(ersp_p, 'frange'),   ersp_p.frange   = ersp.f; end;
+                if ~isfield(ersp_p, 'tlimits'),  ersp_p.tlimits  = ersp.t; end;
                 ersp.c = ersp_p.cycles;
                 ersp.a = ersp_p.alpha;
                 ersp.p = ersp_p.padratio;
