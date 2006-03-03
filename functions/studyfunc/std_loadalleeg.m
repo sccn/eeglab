@@ -77,7 +77,8 @@ function ALLEEG = load_alleeg(varargin)
         if nargin > 1
             datasets = varargin{2};
         else
-            datasets = cell(size(paths));
+            datasets = paths;
+            paths    = cell(size(datasets));
         end;
     end
     
