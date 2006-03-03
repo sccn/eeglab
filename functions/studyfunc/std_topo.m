@@ -1,9 +1,3 @@
-% Usage:
-%   >> [EEG_etc, X] = cls_scalp(EEG,components);  
-%   Returns the ICA scalp map grid for a dataset. 
-%   Updates the EEG structure in the Matlab environment and on the disk
-%   too!
-%
 % cls_scalp() - This function uses topoplot function to get the interpolated 
 % Cartesian grid of the component scalp maps. The scalp map grids are saved
 % into a float file and a pointer to the file is stored in the EEG structure.
@@ -13,6 +7,11 @@
 % It also returns the EEG sub-structure etc (i.e EEG.etc), which is modified 
 % with the pointer to the floating file and some information about the file. 
 %
+% Usage:
+%   >> [EEG_etc, X] = cls_scalp(EEG,components);  
+%   Returns the ICA scalp map grid for a dataset. 
+%   Updates the EEG structure in the Matlab environment and on the disk
+%   too!
 %
 % Inputs:
 %   EEG     - an EEG data structure. 
@@ -27,9 +26,9 @@
 %   X              - the scalp map grid of the requested ICA components, each grid is 
 %                     fitted into one row of X. 
 %
-%  See also  topoplot, cls_scalpL, cls_scalpG, cls_erp, cls_ersp, cls_spec, eeg_preclust, eeg_createdata            
+% Authors:  Hilit Serby, Arnaud Delorme, SCCN, INC, UCSD, January, 2005
 %
-% Authors:  Hilit Serby, SCCN, INC, UCSD, January, 2005
+%  See also  topoplot, cls_scalpL, cls_scalpG, cls_erp, cls_ersp, cls_spec, eeg_preclust, eeg_createdata           
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -48,6 +47,8 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+% $Log: not supported by cvs2svn $
 
 function [EEG_etc, X] = cls_scalp(EEG, comp)
 
@@ -76,12 +77,7 @@ if isfield(EEG,'etc')
      end
  end
  
-%no scalp information
-if isempty(EEG.icaact)
-    EEG = eeg_checkset( EEG, 'loaddata' ); %load EEG.data and EEG.icaact
-end
-
-numc = size(EEG.icaact,1); %number of ICA comp
+numc = size(EEG.icaweights,1); %number of ICA comp
 for k = 1:numc
     %compute scalp map grid (topoimage)
     [hfig grid plotrad Xi Yi] = topoplot( EEG.icawinv(:,k), EEG.chanlocs, 'verbose', 'off',...
@@ -95,19 +91,15 @@ for k = 1:numc
 end
 
 %save topos in file
-olddir = pwd;
-eval ( ['cd '  EEG.filepath]);
-floatwrite(all_topos, [ EEG.filename(1:end-3) 'icascalp']);
-%update the info in the dataset
-EEG.etc.icascalp = [ EEG.filename(1:end-3) 'icascalp'];
+tmpfile = fullfile( EEG.filepath, [ EEG.filename(1:end-3) 'icascalp' ]); 
+floatwrite(all_topos, tmpfile);
+EEG.etc.icascalp       = tmpfile;
 EEG.etc.icascalpparams = d;
 try
-    EEG = pop_saveset( EEG, 'filename', EEG.filename, 'filepath', EEG.filepath, 'savemode','twofiles');
+    EEG = pop_saveset( EEG, 'savemode', 'resave');
 catch,
     error([ 'cls_scalp: problems saving into path ' EEG.filepath])
 end
-    
-eval ([ 'cd ' olddir]); 
 EEG_etc = EEG.etc;
 
 for k = 1:length(comp)
