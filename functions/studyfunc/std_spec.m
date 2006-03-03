@@ -68,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2006/03/03 21:32:07  arno
+% same
+%
 % Revision 1.6  2006/03/03 21:29:52  arno
 % update change dir, ICA computatation, read/write
 %
@@ -161,6 +164,8 @@ if isfield(EEG,'etc')
              f = fave;
              return
          else % overwrite existing spectrum (use exisiting spectrum but take new frequency boundaries). 
+             disp('Use exisiting spectrum but take new frequency boundaries');
+             disp('(to recompute spectum delete files with extension .icaspec and .icaspecm)');
              f = floatread(fullfile(EEG.filepath, EEG.etc.icaspec), [d 1]);
              if ~isempty(freqrange)
                  maxind = max(find(f <= freqrange(end)));
