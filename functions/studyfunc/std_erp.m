@@ -51,9 +51,17 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2006/03/03 22:44:54  arno
+% [6~[6~floatread/flotwrite folder fix; computation of ICA fix
+%
 
 function [EEG_etc, X, t] = cls_erp(EEG, comp, timerange)
 
+if nargin < 1
+    help cls_erp;
+    return;
+end;
+    
 EEG_etc = [];
 if ~exist('timerange')
     timerange = [];
@@ -96,21 +104,22 @@ end
 if isempty(TMP.icaact)
     TMP.icaact = (TMP.icaweights*TMP.icasphere)* ...
                  reshape(TMP.data  , [ size(TMP.data,1)   size(TMP.data,2)*size(TMP.data,3) ]);
-    TMP.icaact = reshape(TMP.icaact, [ size(TMP.icaact,1) size(TMP.data,2)*size(TMP.data,3) ]);
+    TMP.icaact = reshape(TMP.icaact, [ size(TMP.icaact,1) size(TMP.data,2) size(TMP.data,3) ]);
 end;
 
 %remove base line
 if EEG.trials > 1 %epoched data
-    time0 = find(EEG.times==0);
+    time0 = find(EEG.times < 0);
     if ~isempty(time0)
-        tmp = rmbase(TMP.icaact,EEG.pnts,1:time0);
+        TMP.icaact = rmbase(TMP.icaact,EEG.pnts, time0);
     else
-        tmp = rmbase(TMP.icaact);
+        TMP.icaact = rmbase(TMP.icaact,EEG.pnts);
     end
 else
-    tmp = rmbase(TMP.icaact);
+    TMP.icaact = rmbase(TMP.icaact);
 end
-X = mean(tmp,3); %calculate ERP
+TMP.icaact = reshape(TMP.icaact, [ size(TMP.icaact,1) size(TMP.data,2) size(TMP.data,3) ]);
+X = mean(TMP.icaact,3); %calculate ERP
 t = EEG.times';
 
 %save erp in file
