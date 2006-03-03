@@ -72,7 +72,7 @@
 %
 %  See also  timef, cls_itc, cls_erp, cls_spec, cls_scalp, eeg_preclust, eeg_createdata         
 %
-% Authors:  Hilit Serby, SCCN, INC, UCSD, January, 2005
+% Authors:  Hilit Serby, Arnaud Delorme, SCCN, INC, UCSD, January, 2005
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -91,6 +91,8 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+% $Log: not supported by cvs2svn $
 
 function [EEG_etc] = cls_ersp(EEG, comp, freqrange, timewindow, cycles, padratio, alpha, type)
 EEG_etc = [];
