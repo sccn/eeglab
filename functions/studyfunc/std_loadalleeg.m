@@ -92,7 +92,7 @@ function ALLEEG = load_alleeg(varargin)
     % -------------
     for dset = 1:length(paths)
         if exist(fullfile(paths{dset}, datasets{dset}))    
-            EEG = pop_loadset(datasets{dset}, paths{dset}, 'info');
+            EEG = pop_loadset(datasets{dset}, char(paths{dset}), 'info');
         elseif exist( fullfile(genpath, paths{dset}, datasets{dset}))    
             [tmpp tmpf ext] = fileparts(fullfile(genpath, paths{dset}, datasets{dset}));
             EEG = pop_loadset([tmpf ext], tmpp, 'info');
