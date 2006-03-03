@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.73  2006/03/02 23:32:49  arno
+% nothing
+%
 % Revision 1.72  2006/02/03 23:56:38  arno
 % save set to yes
 %
@@ -335,6 +338,7 @@ end
 % default saving otion
 % --------------------
 save_as_dat_file = 0;
+data_on_disk     = 0;
 if strcmpi(g.savemode, 'resave')
     % process multiple datasets
     % -------------------------
@@ -357,6 +361,7 @@ if strcmpi(g.savemode, 'resave')
     if isstr(EEG.data) & ~save_as_dat_file % data in .set file
         TMP = pop_loadset(EEG.filename, EEG.filepath);
         EEG.data = TMP.data;
+        data_on_disk = 1;
     end;
 else
     if length(EEG) >1, error('For reasons of consistency, this function  does not save multiple datasets any more'); end;
@@ -430,6 +435,9 @@ end;
 % recovering variables
 % --------------------
 EEG.icaact = tmpica;
+if data_on_disk
+    EEG.data = 'in set file';
+end;
 if isnumeric(EEG.data) & v(1) < 7
     EEG.data   = double(reshape(tmpdata, EEG.nbchan,  EEG.pnts, EEG.trials));
 end;
