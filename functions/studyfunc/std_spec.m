@@ -67,13 +67,15 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+% $Log: not supported by cvs2svn $
+
 function [EEG_etc, X, f, overwrite] = cls_spec(EEG, comp, freqrange, arg,overwrite)
 EEG_etc = [];
 if ~exist('overwrite')
     overwrite = 0;
 end
 if isfield(EEG,'etc')
-     if isfield(EEG.etc, 'icaspec') %spectrum information found in datasets
+     if isfield(EEG.etc, 'icaspec') & exist(fullfile(EEG.filepath, [ EEG.etc.icaspec 'm']) %spectrum information found in datasets
          params = EEG.etc.icaspecparams;
          if iscell(params)
              d= params{1};
@@ -87,10 +89,8 @@ if isfield(EEG,'etc')
              else
                  md = mparams(1);
              end
-             olddir = pwd;
-             eval ( ['cd '  EEG.filepath]);
-             fave = floatread([ EEG.etc.icaspec 'm'], [md 1], [], 0);
-             f = floatread(EEG.etc.icaspec, [d 1], [], 0);
+             fave = floatread( fullfile(EEG.filepath, [ EEG.etc.icaspec 'm']), [md 1], [], 0);
+             f    = floatread( fullfile(EEG.filepath, EEG.etc.icaspec), [d 1], [], 0);
              %check if requested information already exists
              if ~isempty('freqrange')
                  maxind = max(find(f <= freqrange(end)));
@@ -102,10 +102,9 @@ if isfield(EEG,'etc')
              if (f(maxind) == fave(md)) & (f(minind) == fave(1))
                  X = zeros(length(comp),maxind-minind+1) ;
                  for k = 1:length(comp)
-                     X(k,:) = floatread([ EEG.etc.icaspec 'm'], [md 1],[],md*comp(k))';
+                     X(k,:) = floatread(fullfile(EEG.filepath, [ EEG.etc.icaspec 'm']), [md 1],[],md*comp(k))';
                  end
                  f = fave;
-                 eval ( ['cd '  olddir]);
                  return
              end
              
@@ -147,13 +146,12 @@ if isfield(EEG,'etc')
              
              X = zeros(length(comp),md) ;
              for k = 1:length(comp)
-                 X(k,:) = floatread([ EEG.etc.icaspec 'm'], [md 1],[],md*comp(k))';
+                 X(k,:) = floatread(fullfile(EEG.filepath, [ EEG.etc.icaspec 'm']), [md 1],[],md*comp(k))';
              end
              f = fave;
-             eval ( ['cd '  olddir]);
              return
          else % overwrite existing spectrum (use exisiting spectrum but take new frequency boundaries). 
-             f = floatread(EEG.etc.icaspec, [d 1]);
+             f = floatread(fullfile(EEG.filepath, EEG.etc.icaspec), [d 1]);
              if ~isempty(freqrange)
                  maxind = max(find(f <= freqrange(end)));
                  minind = min(find(f >= freqrange(1)));
@@ -170,7 +168,7 @@ if isfield(EEG,'etc')
              end
              X = zeros(length(comp),maxind-minind+1) ;
              for k = 1:length(comp)
-                 tmp = floatread(EEG.etc.icaspec, [d 1],[],d*comp(k));
+                 tmp = floatread(fullfile(EEG.filepath,EEG.etc.icaspec), [d 1],[],d*comp(k));
                  X(k,:) =  tmp(minind:maxind)';
              end
              X = X - mean(X,2)*ones(1,length(f)); %remove mean
@@ -183,14 +181,13 @@ if isfield(EEG,'etc')
 				end
                 %Save the updated dataset
 				try
-                    EEG = pop_saveset( EEG, 'filename', EEG.filename, 'filepath', EEG.filepath, 'savemode','twofiles');
+                    EEG = pop_saveset( EEG, 'savemode','resave');
 				catch,
                     error([ 'cls_spec: problems saving into path ' EEG.filepath])
 				end
                 EEG_etc = EEG.etc;
-                floatwrite([f X'], [ EEG.filename(1:end-3) 'icaspecm']);%save removed mean spectra info in float file
+                floatwrite([f X'], fullfile(EEG.filepath, [ EEG.filename(1:end-3) 'icaspecm']));%save removed mean spectra info in float file
              end
-             eval ([ 'cd ' olddir]); 
              return
          end
      end
@@ -214,9 +211,7 @@ else
 end
 
 %save spectrum in file
-olddir = pwd;
-eval ( ['cd '  EEG.filepath]);
-floatwrite([f X'], [ EEG.filename(1:end-3) 'icaspec']); %save spectra info in float file
+floatwrite([f X'], fullfile(EEG.filepath, [ EEG.filename(1:end-3) 'icaspec'])); %save spectra info in float file
 
 %update the info in the dataset
 EEG.etc.icaspec = [ EEG.filename(1:end-3) 'icaspec'];
@@ -247,7 +242,7 @@ if ~isempty(arg)
 else
     EEG.etc.icaspecmparams = {length(f)};
 end
-floatwrite([f X'], [ EEG.filename(1:end-3) 'icaspecm']);%save removed mean spectra info in float file
+floatwrite([f X'], fullfile(EEG.filepath, [ EEG.filename(1:end-3) 'icaspecm']));%save removed mean spectra info in float file
 
 %Save the updated dataset
 try
@@ -256,4 +251,3 @@ catch,
     error([ 'cls_spec: problems saving into path ' EEG.filepath])
 end
 EEG_etc = EEG.etc;
-eval ([ 'cd ' olddir]); 
