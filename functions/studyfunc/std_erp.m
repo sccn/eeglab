@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2006/03/03 22:58:55  arno
+% update call to pop_saveset
+%
 % Revision 1.4  2006/03/03 22:51:25  arno
 % fix same thing
 %
@@ -78,11 +81,11 @@ if isfield(EEG,'etc')
          if ~isempty(timerange)
              maxind = max(find(t <= timerange(end)));
              minind = min(find(t >= timerange(1)));
-             if t(end) < timerange(end)
-                 disp(['Warning! The requested max latency window limit, ' num2str(timerange(end)) 'ms, is out of bounds.']);
-             end
-             if t(1) > timerange(1)
-                 disp(['Warning! The requested min latency window limit, ' num2str(timerange(1)) 'ms, is out of bounds.']);
+             if t(end) < timerange(end) | t(1) > timerange(1)
+                 disp(['Warning! The requested max latency window limit is out of the current bounds, recomputing ERP...']);
+                 EEG.etc = rmfield(EEG.etc, 'icaerp');
+                 [EEG_etc, X, t] = cls_erp(EEG, comp, timerange);
+                 return;
              end
              t = t(minind:maxind);
          else
@@ -94,7 +97,23 @@ if isfield(EEG,'etc')
              tmp = floatread(fullfile(EEG.filepath, EEG.etc.icaerp), [d 1],[],d*comp(k));
              X(k,:) =  tmp(minind:maxind)';
          end
-         return
+
+         %save erp in file
+         % ---------------
+         floatwrite([t X'], fullfile( EEG.filepath, [ EEG.filename(1:end-3) 'icaerp']));
+         
+         %update the info in the dataset
+         % -----------------------------
+         EEG.etc.icaerp       = [ EEG.filename(1:end-3) 'icaerp'];
+         EEG.etc.icaerpparams = length(t);
+         try
+             EEG = pop_saveset( EEG, 'savemode','resave');
+         catch,
+             error([ 'problem saving information into path ' EEG.filepath])
+         end
+         EEG_etc = EEG.etc;
+         return;
+
      end
  end
  
@@ -121,9 +140,11 @@ if EEG.trials > 1 %epoched data
 else
     TMP.icaact = rmbase(TMP.icaact);
 end
+maxind = max(find(EEG.times <= timerange(end)));
+minind = min(find(EEG.times >= timerange(1)));
 TMP.icaact = reshape(TMP.icaact, [ size(TMP.icaact,1) size(TMP.data,2) size(TMP.data,3) ]);
-X = mean(TMP.icaact,3); %calculate ERP
-t = EEG.times';
+X = mean(TMP.icaact(:,minind:maxind,:),3); %calculate ERP
+t = EEG.times(minind:maxind)';
 
 %save erp in file
 % ---------------
