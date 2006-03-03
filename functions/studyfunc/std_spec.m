@@ -197,13 +197,20 @@ if isfield(EEG,'etc')
  end
  
 %no spectrum information
-if isempty(EEG.icaact)
-    EEG = eeg_checkset( EEG, 'loaddata' ); %load EEG.data and EEG.icaact
-end
-if ~isempty(arg)
-    [X, f] = spectopo(EEG.icaact, EEG.pnts, EEG.srate, 'plot', 'off', arg);  
+if isstr(EEG.data)
+    TMP = eeg_checkset( EEG, 'loaddata' ); %load EEG.data and EEG.icaact
 else
-    [X, f] = spectopo(EEG.icaact, EEG.pnts, EEG.srate, 'plot', 'off');
+    TMP = EEG;
+end
+if isempty(TMP.icaact)
+    TMP.icaact = (TMP.icaweights*TMP.icasphere)* ...
+                 reshape(TMP.data  , [ size(TMP.data,1)   size(TMP.data,2)*size(TMP.data,3) ]);
+    TMP.icaact = reshape(TMP.icaact, [ size(TMP.icaact,1) size(TMP.data,2)*size(TMP.data,3) ]);
+end;
+if ~isempty(arg)
+    [X, f] = spectopo(TMP.icaact, EEG.pnts, EEG.srate, 'plot', 'off', arg);  
+else
+    [X, f] = spectopo(TMP.icaact, EEG.pnts, EEG.srate, 'plot', 'off');
 end
 
 %save spectrum in file
