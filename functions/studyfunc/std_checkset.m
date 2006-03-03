@@ -53,6 +53,7 @@ if ~isfield(STUDY, 'setind'),    STUDY.setind    = []; modif = 1; end;
 if ~isfield(STUDY, 'etc'),       STUDY.etc       = []; modif = 1; end;
 if ~isfield(STUDY, 'datasetinfo'), STUDY.datasetinfo = []; modif = 1; end;
 if ~isfield(STUDY.datasetinfo, 'comps') & ~isempty(STUDY.datasetinfo), STUDY.datasetinfo(1).comps = []; modif = 1; end;
+if ~isfield(STUDY.datasetinfo, 'index') & ~isempty(STUDY.datasetinfo), STUDY.datasetinfo(1).index = []; modif = 1; end;
 
 % all summary fields
 % ------------------
@@ -116,11 +117,7 @@ for k = 1:length(STUDY.datasetinfo)
         end
     end
     
-    if isfield(STUDY.datasetinfo, 'index')
-        if STUDY.datasetinfo(k).index ~= k | isempty(STUDY.datasetinfo(k).index)
-            STUDY.datasetinfo(k).index = k; modif = 1; %The dataset index in the current ALLEEG structure
-        end;
-    else
+    if ~isequal(STUDY.datasetinfo(k).index, k)
         STUDY.datasetinfo(k).index = k; modif = 1; %The dataset index in the current ALLEEG structure
     end;
 end
