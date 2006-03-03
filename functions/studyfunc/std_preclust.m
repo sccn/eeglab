@@ -1,4 +1,3 @@
-%
 % cls_preclust() - prepare STUDY component location and activity measures for later clustering.
 %                  Selected measures (one or more from options: ERPs, dipole locations, spectra,
 %                  scalp maps, ERSPs, and ITCs) are computed for each dataset in the STUDY 
@@ -129,6 +128,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2006/02/23 19:14:21  scott
+% help msg
+%
 % Revision 1.21  2006/02/22 21:17:01  arno
 % same
 %
@@ -682,7 +684,7 @@ function [ STUDY, ALLEEG ] = cls_preclust(STUDY, ALLEEG, cluster_ind, components
                 dsflag = 1;
                 while dsflag
                     try,
-                        clustdatatmp = runpca( data.', npca, 1);
+                        clustdatatmp = runpca( double(data.'), npca, 1);
                         dsflag = 0;
                     catch,
                         % downsample frequency by 2 and times by 2
@@ -706,7 +708,7 @@ function [ STUDY, ALLEEG ] = cls_preclust(STUDY, ALLEEG, cluster_ind, components
                 clustdatatmp = data./normval;
                 norm = 0;
             otherwise
-                clustdatatmp = runpca( data.', npca, 1);
+                clustdatatmp = runpca( double(data.'), npca, 1);
                 clustdatatmp = clustdatatmp.';
         end
         
@@ -730,7 +732,7 @@ function [ STUDY, ALLEEG ] = cls_preclust(STUDY, ALLEEG, cluster_ind, components
     if size(clustdata,2) > secondlevpca
         fprintf('Performing second-level PCA: reducing dimension from %d to %d \n', ...
                 size(clustdata,2), secondlevpca);
-        clustdata = runpca( clustdata.', secondlevpca, 1);
+        clustdata = runpca( double(clustdata.'), secondlevpca, 1);
         clustdata = clustdata.';
     end
     
