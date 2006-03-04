@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2006/03/03 23:47:40  arno
+% decoding time-frequency parameters
+%
 % Revision 1.30  2006/03/02 23:18:54  scott
 % editing window msgs  -sm
 %
@@ -94,6 +97,7 @@
 function [STUDY, ALLEEG, com] = pop_preclust(varargin)
 
 com = '';
+
 if ~isstr(varargin{1}) %intial settings
     if length(varargin) < 2
         error('pop_preclust(): needs both ALLEEG and STUDY structures');
@@ -109,21 +113,12 @@ if ~isstr(varargin{1}) %intial settings
         cluster_ind = [];
     end
     
-    % Create default ERSP / ITC time/freq. paramters 
-    ersp.f = '3 25';
-    ersp.c = '3 0.5';
-    ersp.p = '4';
-    ersp.a = '0.01';
-    seti = STUDY.datasetinfo(1).index; %first dataset in ALLEEG that is part of STUDY
-    [time_range, winsize] = compute_ersp_times(str2num(ersp.c),  ALLEEG(seti).srate, ...
-        [ALLEEG(seti).xmin ALLEEG(seti).xmax]*1000, str2num(ersp.f(1)),str2num(ersp.p)); 
-    ersp.t = [num2str(round(time_range(1))) ' ' num2str(round(time_range(2))) ];
-    erspparams_str = ['''frange'', [' ...
-            ersp.f '], ''cycles'', [' ersp.c '], ''alpha'', ' ersp.a ', ''padratio'', ' ersp.p ', ''tlimits'', [' ersp.t ']'];
-
-    
     scalp_options = {'Use channel values' 'Use Laplacian values' 'Use Gradient values'} ;
     
+    % Create default ERSP / ITC time/freq. paramters 
+    % ----------------------------------------------
+    erspparams_str = '''freqrange'', [3 25], ''cycles'', [3 0.5], ''padratio'', 4';
+
     % cluster text
     % ------------
     % load leaf clusters
@@ -173,11 +168,14 @@ if ~isstr(varargin{1}) %intial settings
     preclust_PCA = ['pop_preclust(''preclustOK'',gcf);'];           
     ersp_params = ['pop_preclust(''erspparams'',gcf);']; 
     ersp_edit =  ['pop_preclust(''erspedit'',gcf);']; 
-    saveSTUDY = [ 'set(findobj(''parent'', gcbf, ''userdata'', ''save''), ''enable'', fastif(get(gcbo, ''value'')==1, ''on'', ''off''));' ];
+    itc_edit   = 'set(findobj(gcbf, ''tag'', ''ersp_params''), ''string'', get(gcbo, ''string''));';
+    ersp_edit  = 'set(findobj(gcbf, ''tag'', ''itc_params'' ), ''string'', get(gcbo, ''string''));';
+    
+    saveSTUDY  = [ 'set(findobj(''parent'', gcbf, ''userdata'', ''save''), ''enable'', fastif(get(gcbo, ''value'')==1, ''on'', ''off''));' ];
     browsesave = [ '[filename, filepath] = uiputfile2(''*.study'', ''Save STUDY with .study extension -- pop_preclust()''); ' ... 
                   'set(findobj(''parent'', gcbf, ''tag'', ''studyfile''), ''string'', [filepath filename]);' ];
     str_name   = ['Pre-compute measures on which to cluster components from study ''' STUDY.name '''' ];
-    str_time   = [ num2str(round(ALLEEG(seti).xmin*1000)) '  ' num2str(round(ALLEEG(seti).xmax*1000)) ];
+    str_time   = [ num2str(round(ALLEEG(1).xmin*1000)) '  ' num2str(round(ALLEEG(1).xmax*1000)) ];
     help_secpca = [ 'warndlg2(strvcat(''This is the final number of dimensions (otherwise use the sum'',' ...
                     '''of dimensions for all the selected options). See tutorial for more info''), ''Final number of dimension'');' ];
     
@@ -217,15 +215,15 @@ if ~isstr(varargin{1}) %intial settings
     {'style' 'edit'       'string' '10' 'tag' 'ersp_PCA' 'enable' 'off' 'userdata' 'erspP'} ...
     {'style' 'checkbox'   'string' '' 'tag' 'ersp_norm' 'value' 1 'enable' 'off' 'userdata' 'erspP'}   ...
 	{'style' 'edit'       'string' '1' 'tag' 'ersp_weight' 'enable' 'off' 'userdata' 'erspP'} ...
-    {'style' 'pushbutton' 'string' 'Time/freq. parameters' 'tag' 'ersp_push' 'value' 1 'enable' 'off' 'userdata' 'ersp' 'Callback' ersp_params} ...
+    {'style' 'text'       'string' 'Time/freq. parameters' 'tag' 'ersp_push' 'value' 1 'enable' 'off' 'userdata' 'ersp' 'Callback' ersp_params} ...
     {'style' 'edit'       'string' erspparams_str 'tag' 'ersp_params' 'enable' 'off' 'userdata' 'ersp' 'Callback' ersp_edit}...
     {'style' 'checkbox'   'string' '' 'tag' 'itc_on' 'value' 0 'Callback' set_itc 'userdata' '1'} ...
 	{'style' 'text'       'string' 'ITCs' 'horizontalalignment' 'center' } ...
     {'style' 'edit'       'string' '10' 'tag' 'itc_PCA' 'enable' 'off' 'userdata' 'itcP'} ...
     {'style' 'checkbox'   'string' '' 'tag' 'itc_norm' 'value' 1 'enable' 'off' 'userdata' 'itcP'}   ...
 	{'style' 'edit'       'string' '1' 'tag' 'itc_weight' 'enable' 'off' 'userdata' 'itcP'} ...
-    {'style' 'pushbutton' 'string' 'Time/freq. parameters' 'tag' 'itc_push' 'value' 1 'enable' 'off' 'userdata' 'itc' 'Callback' ersp_params} ...
-    {'style' 'edit'       'string' erspparams_str 'tag' 'itc_params' 'enable' 'off' 'userdata' 'itc' 'Callback' ersp_edit} {} ...
+    {'style' 'text'       'string' 'Time/freq. parameters' 'tag' 'itc_push' 'value' 1 'enable' 'off' 'userdata' 'itc' 'Callback' ersp_params} ...
+    {'style' 'edit'       'string' erspparams_str 'tag' 'itc_params' 'enable' 'off' 'userdata' 'itc' 'Callback' itc_edit} {} ...
     {'style' 'checkbox'   'string' '' 'tag' 'sec_on' 'Callback' set_secpca 'value' 0} ...
 	{'style' 'text'       'string' 'Final dimensions' } ...
     {'style' 'edit'       'string' '10' 'enable' 'off' 'tag' 'sec_PCA' 'userdata' 'sec' } ...
@@ -239,7 +237,6 @@ if ~isstr(varargin{1}) %intial settings
 	%{'style' 'text'       'string' 'Do not prepare data matrix for clustering at this time.' 'FontWeight' 'Bold'  } {} ...
 
     fig_arg{1} = { ALLEEG STUDY cls };
-    fig_arg{2} = ersp;
     geomline = [0.45 2 1 0.45 1 3 3 ];
     geometry = { [1] [1] [1 1 1] [1] ...
                  [3] geomline geomline geomline geomline geomline geomline [1] geomline [1] [0.32 2 5 0.8] };
@@ -315,20 +312,16 @@ if ~isstr(varargin{1}) %intial settings
     % ERSP option is on
     % -----------------
     if os.ersp_on  == 1 
-        ersp = userdat2{2};
-        options{end+1} = { 'ersp' 'npca' str2num(os.ersp_PCA) 'freqrange' str2num(ersp.f) ...
-                           'cycles' str2num(ersp.c) 'alpha' str2num(ersp.a) 'padratio' str2num(ersp.p) ...
-                           'timewindow' str2num(ersp.t) 'norm' os.ersp_norm ...
+        tmpparams = eval( [ '{' os.ersp_params '}' ] );
+        options{end+1} = { 'ersp' 'npca' str2num(os.ersp_PCA) tmpparams{:} 'norm' os.ersp_norm ...
                            'weight' str2num(os.ersp_weight) };
     end
     
     % ITC option is on 
     % ----------------
     if os.itc_on  == 1 
-        ersp = userdat2{2};
-        options{end+1} = { 'itc' 'npca' str2num(os.ersp_PCA) 'freqrange' str2num(ersp.f) ...
-                           'cycles' str2num(ersp.c) 'alpha' str2num(ersp.a) 'padratio' str2num(ersp.p) ...
-                           'timewindow' str2num(ersp.t) 'norm' os.ersp_norm ...
+        tmpparams = eval( [ '{' os.ersp_params '}' ] );
+        options{end+1} = { 'itc' 'npca' str2num(os.ersp_PCA) tmpparams{:} 'norm' os.ersp_norm ...
                            'weight' str2num(os.ersp_weight) };
     end       
     
@@ -446,10 +439,14 @@ else
             if ~isempty( ersp_params)
                 ersp_str = [ 'ersp_p = struct( ' ersp_params ');' ];
                 eval(ersp_str);
-                if ~isfield(ersp_p, 'alpha'),    ersp_p.alpha    = ersp.a; end;
-                if ~isfield(ersp_p, 'cycle'),    ersp_p.cycle    = ersp.c; end;
-                if ~isfield(ersp_p, 'padratio'), ersp_p.padratio = ersp.p; end;
-                if ~isfield(ersp_p, 'frange'),   ersp_p.frange   = ersp.f; end;
+                if ~isfield(ersp_p, 'alpha'),    ersp_p.alpha    = NaN; end;
+                if ~isfield(ersp_p, 'cycle'),    ersp_p.cycle    = [3 0.5]; end;
+                if ~isfield(ersp_p, 'padratio'), ersp_p.padratio = 4; end;
+                if ~isfield(ersp_p, 'frange'),   ersp_p.frange   = [3 25]; end;
+                seti = STUDY.datasetinfo(1).index; %first dataset in ALLEEG that is part of STUDY
+                [time_range, winsize] = compute_ersp_times(ersp_p.cycle,  ALLEEG(seti).srate, ...
+                                                           [ALLEEG(seti).xmin ALLEEG(seti).xmax]*1000, ersp_p.frange(1),ersp_p.padratio); 
+                ersp.t = [num2str(round(time_range(1))) ' ' num2str(round(time_range(2))) ];
                 if ~isfield(ersp_p, 'tlimits'),  ersp_p.tlimits  = ersp.t; end;
                 ersp.c = ersp_p.cycles;
                 ersp.a = ersp_p.alpha;
@@ -490,10 +487,10 @@ else
                 userdat{2} = ersp;
                 set(findobj('parent', hdl, 'tag', 'ersp_params'), 'string', ...
                     ['                                                             ''frange'', [' ersp.f '], ''cycles'', [' ...
-                     ersp.c '], ''alpha'', ' ersp.a ', ''padratio'', ' ersp.p ', '' tlimits'', [' ersp.t ']']);
+                     ersp.c '], ''alpha'', ' ersp.a ', ''padratio'', ' ersp.p ', ''tlimits'', [' ersp.t ']']);
                 set(findobj('parent', hdl, 'tag', 'itc_params'), 'string', ...
                     ['                                                             ''frange'', [' ersp.f '], ''cycles'', [' ...
-                     ersp.c '], ''alpha'', ' ersp.a ', ''padratio'', ' ersp.p ', '' tlimits'', [' ersp.t ']']);
+                     ersp.c '], ''alpha'', ' ersp.a ', ''padratio'', ' ersp.p ', ''tlimits'', [' ersp.t ']']);
                 set(hdl, 'userdat',userdat); 
             end
        case 'preclustOK'
