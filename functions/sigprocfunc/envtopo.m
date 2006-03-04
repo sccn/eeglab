@@ -109,6 +109,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.113  2006/03/02 18:55:06  scott
+% simplified topoplot code; removed ?? 'else'  -sm
+%
 % Revision 1.112  2006/03/01 17:41:35  arno
 % fix call to text
 %
@@ -981,10 +984,12 @@ if length(g.plotchans) ~= chans
   fprintf('Envelopes computed from %d specified data channels.\n',...
       length(g.plotchans));
 end
+
 fprintf('Topo maps will show components: ');
 for t=1:ntopos
   fprintf('%4d  ',maporder(t));
 end
+
 fprintf('\n');
 if ~xunitframes
   fprintf('    with max var at times (ms): ');
@@ -1001,11 +1006,10 @@ end
 fprintf('\n');
 
 fprintf('    Component sortvar in interval:  ');
-   for t=1:ntopos
+for t=1:ntopos
      fprintf('%4.2f ',sortvar(t));
-   end
-   fprintf('\n');
 end
+fprintf('\n');
 
 sumproj = zeros(size(data(g.plotchans,:))); % toby 2.21.2006 REDUNDANT CALCULATIONS!
 for n = 1:ntopos
