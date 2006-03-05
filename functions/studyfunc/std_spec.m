@@ -4,7 +4,7 @@
 % Usage:    
 %   >> [EEG_etc, X, f, overwrite] = cls_spec(EEG, components, freqrange, specargs, overwrite)
 %
-%              This function computes the mean spectra of the activites of specfied 
+%              This function computes the mean spectra of the activites of specified 
 %              components of the supplied dataset. The spectra are saved in a float file. 
 %              Also saves a pointer to this file in the EEG structure. If such a float file 
 %              already exists, the function loads the spectral information from this file.  
@@ -15,12 +15,10 @@
 %              cls_spec() returns the removed mean spectra of the selected ICA components 
 %              in the requested frequency range. If the spectra were computed previously
 %              but a different frequency range is selected, there is an overwrite variable 
-%              to do so. Depending on the variable setting, this can open a pop-up query 
-%              window to ask the user for permission to overwrite the previous spectra.
-%              Otherwise, the function will load the pre-computed spectra, and will remove 
-%              the mean from the requested frequency range. The frequency vector is returned
-%              as well, and the EEG sub-structure EEG.etc is modified with the pointer to 
-%              the spectra float file and with some information about it. 
+%              to do so. The function will load previously computed log spectra, if any, and 
+%              will remove the mean from the requested frequency range. The frequency vector 
+%              is returned and EEG.etc is modified with the pointer to the spectra float file 
+%              and with relevant information about it. 
 % Inputs:
 %   EEG        - an EEGLAB dataset structure. 
 %   components - [numeric vector] components of the EEG structure for which the mean 
@@ -70,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2006/03/04 04:11:45  scott
+% edited help and msgs  -sm
+%
 % Revision 1.9  2006/03/03 21:42:55  arno
 % new message; remove GUI
 %
@@ -106,7 +107,7 @@ if isfield(EEG,'etc')
              d = params(1);
          end
 
-         if overwrite ~= 1 % = 0 or 2: don't overwrite, read spectra info from file if exists
+         if overwrite ~= 1 % == 2: don't overwrite, read spectra info from file if exists
              mparams = EEG.etc.icaspecmparams;
              if iscell(mparams)
                  md= mparams{1};
@@ -172,11 +173,11 @@ if isfield(EEG,'etc')
 % $$$              end
 % $$$              
              
-             disp('Using existing spectra but with new frequency boundaries');
-             disp('To recompute spectra, first delete files in this dataset dir');
-             disp(' with extensions .icaspec and .icaspecm');
+             disp('Re-using existing spectrum but with new frequency boundaries');
+             disp('To recompute the spectra, first delete files in the directory');
+             disp('   of this dataset having extensions .icaspec and .icaspecm');
 
-             [EEG_etc, X, f, overwrite] = cls_spec(EEG, comp, freqrange, arg, 1);
+             [EEG_etc, X, f, overwrite] = cls_spec(EEG, comp, freqrange, arg, 1); % overwrite !?
              return
 
          else % overwrite == 1 --> overwrite existing spectra using existing spectra
@@ -204,6 +205,7 @@ if isfield(EEG,'etc')
                  tmp = floatread(fullfile(EEG.filepath,EEG.etc.icaspec), [d 1],[],d*comp(k));
                  X(k,:) =  tmp(minind:maxind)';
              end
+
              % remove the mean from each frequency across all components
              X = X - mean(X,2)*ones(1,length(f)); %remove mean
              X = X - ones(size(X,1),1)*mean(X); 
