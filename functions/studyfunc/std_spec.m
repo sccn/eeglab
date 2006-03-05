@@ -68,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2006/03/05 00:21:20  scott
+% checking on overwrite options - they look ~  -sm
+%
 % Revision 1.10  2006/03/04 04:11:45  scott
 % edited help and msgs  -sm
 %
@@ -125,7 +128,7 @@ if isfield(EEG,'etc')
                  minind = 1;
                  maxind = md;
              end
-             if (f(maxind) == fave(md)) & (f(minind) == fave(1))
+             if ((f(maxind) == fave(md)) & (f(minind) == fave(1))) | overwrite == 2
                  X = zeros(length(comp),maxind-minind+1) ;
                  for k = 1:length(comp)
                      X(k,:) = floatread(fullfile(EEG.filepath, ...
