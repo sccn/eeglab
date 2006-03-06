@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2006/03/03 21:22:07  arno
+% remve change folder
+%
 % Revision 1.3  2006/03/03 21:19:16  arno
 % change scalp map file name
 %
@@ -99,6 +102,7 @@ floatwrite(all_topos, tmpfile);
 EEG.etc.icascalp       = [ EEG.filename(1:end-3) 'icascalp' ];
 EEG.etc.icascalpparams = d;
 try
+    EEG.saved = 'no';
     EEG = pop_saveset( EEG, 'savemode', 'resave');
 catch,
     error([ 'cls_scalp: problems saving into path ' EEG.filepath])
