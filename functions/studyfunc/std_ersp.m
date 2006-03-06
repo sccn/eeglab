@@ -1,8 +1,3 @@
-% Usage:  
-%   >> [EEG_etc] = cls_ersp(EEG, components, freqrange, timewindow,  cycles, padratio, alpha, overwrite, type)
-%   If doesn't exist computes the ICA ERSPs / ITCs of a dataset. Updates the EEG structure in the 
-%   Matlab environment and on the disk too!
-%
 % cls_ersp() - This function computes the ERSP & ITC information 
 % of a dataset ICA components, saves that into a float files and 
 % and saves pointers to the files in the EEG structure.
@@ -30,6 +25,10 @@
 % as well as the EEG sub-structure etc (i.e. EEG.etc), which is modified 
 % with the pointers to the floating files and some information about them. 
 %
+% Usage:  
+%   >> [EEG_etc] = cls_ersp(EEG, components, freqrange, timewindow,  cycles, padratio, alpha, overwrite, type)
+%   If doesn't exist computes the ICA ERSPs / ITCs of a dataset. Updates the EEG structure in the 
+%   Matlab environment and on the disk too!
 %
 % Inputs:
 %   EEG            - an EEG data structure. 
@@ -93,6 +92,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2006/03/03 23:39:05  arno
+% put log
+%
 
 function [EEG_etc] = cls_ersp(EEG, comp, freqrange, timewindow, cycles, padratio, alpha, type)
 EEG_etc = [];
@@ -170,6 +172,7 @@ EEG.etc.icaerspparams.freqrange  = freqrange;
 EEG.etc.icaitcparams             = EEG.etc.icaerspparams;
 
 try
+    EEG.saved = 'no';
     EEG = pop_saveset( EEG, 'savemode', 'resave');
 catch,
     error([ 'cls_ersp: problems saving into path ' EEG.filepath])
