@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2006/03/03 23:34:18  arno
+% recomputing if our of bound
+%
 % Revision 1.5  2006/03/03 22:58:55  arno
 % update call to pop_saveset
 %
@@ -107,6 +110,7 @@ if isfield(EEG,'etc')
          EEG.etc.icaerp       = [ EEG.filename(1:end-3) 'icaerp'];
          EEG.etc.icaerpparams = length(t);
          try
+             EEg.saved = 'no';
              EEG = pop_saveset( EEG, 'savemode','resave');
          catch,
              error([ 'problem saving information into path ' EEG.filepath])
@@ -155,6 +159,7 @@ floatwrite([t X'], fullfile( EEG.filepath, [ EEG.filename(1:end-3) 'icaerp']));
 EEG.etc.icaerp       = [ EEG.filename(1:end-3) 'icaerp'];
 EEG.etc.icaerpparams = length(t);
 try
+    EEg.saved = 'no';
     EEG = pop_saveset( EEG, 'savemode','resave');
 catch,
     error([ 'problem saving information into path ' EEG.filepath])
