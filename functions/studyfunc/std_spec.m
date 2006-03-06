@@ -68,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2006/03/06 23:11:52  arno
+% remove comments
+%
 % Revision 1.12  2006/03/05 15:52:25  arno
 % allowing overwrite == 2
 %
@@ -186,6 +189,7 @@ if isfield(EEG,'etc')
 				end
                 %Save the updated dataset
 				try
+                    EEG.saved = 'no';
                     EEG = pop_saveset( EEG, 'savemode','resave');
 				catch,
                     error([ 'cls_spec(): problems saving into path ' EEG.filepath])
@@ -259,6 +263,7 @@ floatwrite([f X'], fullfile(EEG.filepath, [ EEG.filename(1:end-3) 'icaspecm']));
 
 % save the updated dataset
 try
+    EEG.saved = 'no';
     EEG = pop_saveset( EEG, 'savemode', 'resave');
 catch,
     error([ 'cls_spec: problems saving into path ' EEG.filepath])
