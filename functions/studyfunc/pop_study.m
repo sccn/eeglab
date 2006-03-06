@@ -64,6 +64,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.37  2006/03/06 22:32:04  arno
+% adding history to study
+%
 % Revision 1.36  2006/03/02 23:01:36  scott
 % edited pre-select window text -sm
 %
@@ -387,6 +390,7 @@ elseif strcmpi(mode, 'gui') % GUI mode
     % run command and create history
     % ------------------------------
     com = sprintf( '[STUDY ALLEEG] = editstudy( STUDY, ALLEEG, %s );', vararg2str(options) );
+    if ~isfield(STUDY, 'history'), STUDY.history = ''; end;
     STUDY.history = sprintf('%s\n%s', STUDY.history, com);
     [STUDY ALLEEG] = editstudy(STUDY, ALLEEG, options{:});
     
