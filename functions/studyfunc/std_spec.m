@@ -68,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2006/03/05 15:52:25  arno
+% allowing overwrite == 2
+%
 % Revision 1.11  2006/03/05 00:21:20  scott
 % checking on overwrite options - they look ~  -sm
 %
@@ -137,44 +140,6 @@ if isfield(EEG,'etc')
                  f = fave;
                  return
              end
-
-% $$$              
-% $$$              if overwrite ~= 2
-% $$$                  set_yes =  [ 'set(findobj(''parent'', gcbf, ''tag'', ''spec_yesall''), ''value'', 0);' ...
-% $$$                     'set(findobj(''parent'', gcbf, ''tag'', ''spec_no''), ''value'', 0);'  ...
-% $$$                     'set(findobj(''parent'', gcbf, ''tag'', ''spec_noall''), ''value'', 0);'];
-% $$$                  set_yesall =  [ 'set(findobj(''parent'', gcbf, ''tag'', ''spec_yes''), ''value'', 0);' ...
-% $$$                     'set(findobj(''parent'', gcbf, ''tag'', ''spec_no''), ''value'', 0);'  ...
-% $$$                     'set(findobj(''parent'', gcbf, ''tag'', ''spec_noall''), ''value'', 0);'];
-% $$$                  set_no =  [ 'set(findobj(''parent'', gcbf, ''tag'', ''spec_yesall''), ''value'', 0);' ...
-% $$$                     'set(findobj(''parent'', gcbf, ''tag'', ''spec_yes''), ''value'', 0);' ...
-% $$$                     'set(findobj(''parent'', gcbf, ''tag'', ''spec_noall''), ''value'', 0);'];
-% $$$                  set_noall =  [ 'set(findobj(''parent'', gcbf, ''tag'', ''spec_yesall''), ''value'', 0);' ...
-% $$$                     'set(findobj(''parent'', gcbf, ''tag'', ''spec_yes''), ''value'', 0);' ...
-% $$$                     'set(findobj(''parent'', gcbf, ''tag'', ''spec_no''), ''value'', 0);'  ];
-% $$$                  spec_ans = inputgui({[1] [1] [1 1 ] [1 1] [1]}, ...
-% $$$                          { {'style' 'text' 'string' ['Spectrum infomation [' num2str(round(fave(1))) ' ' num2str(round(fave(end)))  '] Hz already exists for dataset: '  EEG.setname '. ' ] } ...
-% $$$                          {'style' 'text' 'string' 'Would you like to recalculate the spectrum and overwrite these information?' } ...
-% $$$                          {'style' 'checkbox' 'tag' 'spec_yes' 'string' 'Yes' 'value' 1 'Callback' set_yes }  ...
-% $$$                          {'style' 'checkbox' 'tag' 'spec_yesall' 'string' 'Yes to all datasets' 'value' 0 'Callback' set_yesall }  ...
-% $$$                          {'style' 'checkbox' 'tag' 'spec_no' 'string' 'Use existing spectrum info' 'value' 0 'Callback' set_no } ...
-% $$$                          {'style' 'checkbox' 'tag' 'spec_noall' 'string' 'Use existing info for all sets' 'value' 0 'Callback' set_noall } {} }, ...
-% $$$                      '', 'Recalculate spectrum information -- part of cls_spec()'); 
-% $$$                  switch (find(celltomat(spec_ans)))
-% $$$                      case 1
-% $$$                          [EEG_etc, X, f, overwrite] = cls_spec(EEG, comp, freqrange, arg, 1); % overwrite the info in this dataset
-% $$$                          overwrite = 0; %but ask before overwriting the rest of the datasets
-% $$$                          return;
-% $$$                      case 2
-% $$$                          [EEG_etc, X, f, overwrite] = cls_spec(EEG, comp, freqrange, arg, 1);
-% $$$                          return;
-% $$$                      case 3
-% $$$                          overwrite = 0; % don't overwrite the info in this datase but keep asking for the other datasets
-% $$$                      case 4
-% $$$                          overwrite = 2; % keep the info in all datasets
-% $$$                  end
-% $$$              end
-% $$$              
              
              disp('Re-using existing spectrum but with new frequency boundaries');
              disp('To recompute the spectra, first delete files in the directory');
