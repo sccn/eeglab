@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.74  2006/03/03 00:17:14  arno
+% recovering EEG.data variable
+%
 % Revision 1.73  2006/03/02 23:32:49  arno
 % nothing
 %
