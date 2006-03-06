@@ -128,6 +128,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2006/03/03 23:02:37  arno
+% convert to doulbe before runing PCA
+%
 % Revision 1.22  2006/02/23 19:14:21  scott
 % help msg
 %
@@ -520,7 +523,7 @@ function [ STUDY, ALLEEG ] = cls_preclust(STUDY, ALLEEG, cluster_ind, components
              case 'scalpLaplac' , 
                  idat = STUDY.datasetinfo(STUDY.setind(1,si)).index; 
                  if ~isempty(succompind{si})
-                     [tmp, X] = cls_scalpl(ALLEEG(idat), succompind{si}); 
+                     [tmp, X] = cls_scalp(ALLEEG(idat), succompind{si}, 'laplacian'); 
                      if ~isempty(tmp)
                          ALLEEG(idat).etc = tmp;
                      end
@@ -536,7 +539,7 @@ function [ STUDY, ALLEEG ] = cls_preclust(STUDY, ALLEEG, cluster_ind, components
              case 'scalpGrad'   , 
                  idat = STUDY.datasetinfo(STUDY.setind(1,si)).index; 
                  if ~isempty(succompind{si})
-                     [tmp, X] = cls_scalpg(ALLEEG(idat), succompind{si}); 
+                     [tmp, X] = cls_scalp(ALLEEG(idat), succompind{si}, 'gradient'); 
                      if ~isempty(tmp)
                          ALLEEG(idat).etc = tmp;
                      end
