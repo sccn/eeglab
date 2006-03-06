@@ -8,15 +8,17 @@
 % with the pointer to the floating file and some information about the file. 
 %
 % Usage:
-%   >> [EEG_etc, X] = cls_scalp(EEG,components);  
+%   >> [EEG_etc, X] = cls_scalp(EEG, components, option);  
 %   Returns the ICA scalp map grid for a dataset. 
 %   Updates the EEG structure in the Matlab environment and on the disk
 %   too!
 %
 % Inputs:
-%   EEG     - an EEG data structure. 
+%   EEG        - an EEG data structure. 
 %   components - [numeric vector] of the EEG structure for which a grid of their 
 %                      scalp maps will be returned. 
+%   option     - ['gradient'|'laplacian'|'none'] compute gradient or laplacian of
+%                the scalpe topography. Default is 'none'.
 %
 % Outputs:
 %   EEG_etc    - the EEG dataset etc structure (i.e. EEG.etc), which is
@@ -49,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2006/03/06 23:17:34  arno
+% fix resave
+%
 % Revision 1.4  2006/03/03 21:22:07  arno
 % remve change folder
 %
@@ -59,7 +64,15 @@
 % now correctly saving data
 %
 
-function [EEG_etc, X] = cls_scalp(EEG, comp)
+function [EEG_etc, X] = cls_scalp(EEG, comp, option)
+
+if nargin < 2
+    help cls_scalp;
+    return;
+end;
+if nargin < 3
+    option = 'none';
+end;
 
 EEG_etc = [];
 %figure; toporeplot(grid,'style', 'both','plotrad', 0.5, 'intrad', 0.5, 'xsurface' ,Xi, 'ysurface',Yi );
@@ -72,7 +85,17 @@ if isfield(EEG,'etc')
          end
          for k = 1:length(comp)
              tmp = floatread(fullfile(EEG.filepath, EEG.etc.icascalp), [d d],[],d*(d+2)*(comp(k)-1));
-             tmp = tmp(:)';
+             
+             if strcmpi(option, 'gradient')
+                 [tmpx, tmpy]  = gradient(tmp); %Gradient
+                 tmp = [tmpx(:); tmpy(:)]';
+             elseif strcmpi(option, 'laplacian')
+                 tmp = del2(tmp); %Laplacian
+                 tmp = tmp(:)';
+             else
+                 tmp = tmp(:)';
+             end;
+
              tmp = tmp(find(~isnan(tmp)));
              if k == 1
                  X = zeros(length(comp),length(tmp)) ;
@@ -111,7 +134,17 @@ EEG_etc = EEG.etc;
 
 for k = 1:length(comp)
     tmp = all_topos(:,1+(k-1)*(d+2):k*(d+2)-2);
-    tmp = tmp(:)';
+    
+    if strcmpi(option, 'gradient')
+        [tmpx, tmpy]  = gradient(tmp); %Gradient
+        tmp = [tmpx(:); tmpy(:)]';
+    elseif strcmpi(option, 'laplacian')
+        tmp = del2(tmp); %Laplacian
+        tmp = tmp(:)';
+    else
+        tmp = tmp(:)';
+    end;
+
     tmp = tmp(find(~isnan(tmp)));
     if k == 1
         X = zeros(length(comp),length(tmp)) ;
