@@ -1,4 +1,3 @@
-%
 %   cls_erp() - Constructs and returns ICA activation ERPs for a dataset. 
 %               Updates the EEG structure both in the Matlab environment 
 %               and on disk Saves the ERPs into a float file, and then saves 
@@ -53,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2006/03/07 03:27:25  scott
+% accepting [] component list -sm
+%
 % Revision 1.8  2006/03/07 03:24:05  scott
 % reworked help msg; clarified filename output; made function accept default comps
 % -sm
@@ -119,7 +121,7 @@ if isfield(EEG,'etc')
 
          %save erp in file
          % ---------------
-         floatwrite([t X'], fullfile( EEG.filepath, [ EEG.filename(1:end-3) 'icaerp']));
+         floatwrite(double([t X']), fullfile( EEG.filepath, [ EEG.filename(1:end-3) 'icaerp']));
          
          %update the info in the dataset
          % -----------------------------
@@ -168,7 +170,7 @@ t = EEG.times(minind:maxind)';
 
 % Save ERPs in file
 % ---------------
-floatwrite([t X'], fullfile( EEG.filepath, [ EEG.filename(1:end-3) 'icaerp']));
+floatwrite(double([t X']), fullfile( EEG.filepath, [ EEG.filename(1:end-3) 'icaerp']));
 
 % Update the ERP info in the dataset .etc sub-structure
 % -----------------------------------------------------
