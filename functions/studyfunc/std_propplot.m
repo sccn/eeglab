@@ -48,6 +48,8 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+% $Log: not supported by cvs2svn $
+
 function STUDY = cls_plotclust(STUDY, ALLEEG,  varargin)
 icadefs;
 
@@ -83,6 +85,7 @@ for k = 1: len
     try,
         STUDY = cls_plotclustmap(STUDY,ALLEEG, 'clusters', cls(k), 'mode', 'centroid', 'figure', 'off');
     catch
+        axis off; text(0.5, 0.5, 'No scalp information', 'horizontalalignment', 'center');
     end
     waitbar(k/(len*6),h_wait)
     subplot(2,3,2),
