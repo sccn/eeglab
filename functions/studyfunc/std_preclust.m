@@ -128,6 +128,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2006/03/06 23:47:47  arno
+% computing gradient or laplacian
+%
 % Revision 1.23  2006/03/03 23:02:37  arno
 % convert to doulbe before runing PCA
 %
@@ -586,6 +589,7 @@ function [ STUDY, ALLEEG ] = cls_preclust(STUDY, ALLEEG, cluster_ind, components
                             % (no need to scan across conditions)
               idat = STUDY.datasetinfo(STUDY.setind(1,si)).index; 
               count = size(data,1)+1;
+              try,
               for icomp = succompind{si}
                   % select among 3 sub-options
                   % --------------------------
@@ -603,7 +607,11 @@ function [ STUDY, ALLEEG ] = cls_preclust(STUDY, ALLEEG, cluster_ind, components
                       data(count,:) = ALLEEG(idat).dipfit.model(icomp).posxyz(ldip,:);
                       count = count+1;
                   end
-              end                     
+              end 
+              catch,
+                  error('Some dipole information is missing');
+              end;
+              
              % cluster on ica ersp / itc values
              % --------------------------------
              case  {'ersp', 'itc'}
