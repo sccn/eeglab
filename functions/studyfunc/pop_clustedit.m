@@ -273,7 +273,7 @@ if ~isstr(varargin{1})
                 end;
             end;
         end;
-        show_options = { ['All ' num2str(length(STUDY.cluster)) ' cluster centroids'] show_options{:} }; 
+        show_options = { ['All cluster centroids'] show_options{:} }; 
     end
 
     
