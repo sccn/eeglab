@@ -39,7 +39,7 @@
 %
 %   EEG        - an EEG data structure. 
 %   components - [numeric vector] of the EEG structure for which an ERSP   
-%                 and ITC will be computed {default: compute for all components}
+%                 and ITC will be computed {default|[]: all components}
 %   freqrange  - [minHz maxHz] the frequency range to compute the ERSP/ITC.
 %   cycles     - If 0 -> Use FFTs (with constant window length) {default: 0}
 %                 If >0 -> Number of cycles in each analysis wavelet 
@@ -107,6 +107,11 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2006/03/07 02:30:54  scott
+% worked on help msg; formatted, made accurate (only 2 files are now output, not 4).
+% made the function accept the components argument (was always computing ersp/itc
+% for ALL components, not just those asked for.  -sm
+%
 % Revision 1.5  2006/03/06 23:18:08  arno
 % resave
 %
@@ -120,9 +125,16 @@ EEG_etc = [];
 if ~exist('type')
     type = 'ersp';
 end
-if isempty(comp)
-   numc = size(EEG.icaweights,1); % number of ICA comps
-   comp = 1:numc;
+
+if isfield(EEG,'icaweights')
+    numc = size(EEG.icaweights,1); % number of ICA comps
+else
+    error('EEG.icaweights not found');
+end
+if ~exist('comp') | isempty(comp)
+   comps = 1:numc;
+else
+   comps = comp;
 end
 
 % Check if ERSP information found in datasets and if fits requested parameters 
@@ -159,10 +171,10 @@ if time_range(1) >= time_range(2)
     error(['cls_ersp: parameters given for ' upper(type) ' calculation result in an invalid time range. Aborting. Please change the lower frequency bound or other parameters to resolve the problem.'] )
 end
 
-for k = comps  % for each (specified) component
+for k = 1:length(comps)  % for each (specified) component
 
     % Compute ERSP & ITC
-    [ersp,itc,powbase,times,freqs,erspboot,itcboot] = timef( TMP.icaact(k, :) , ...
+    [ersp,itc,powbase,times,freqs,erspboot,itcboot] = timef( TMP.icaact(comps(k), :) , ...
           EEG.pnts, [EEG.xmin EEG.xmax]*1000, EEG.srate, cycles ,'type', ...
              'phasecoher',  'plotersp', 'off', 'plotitc', 'off', ...
                 'alpha',alpha,'padratio',padratio, 'plotphase','off','winsize',winsize);
@@ -177,7 +189,7 @@ for k = comps  % for each (specified) component
     [logfreqs,logitc] = logimagesc(times,freqs,itc,'plot','off'); 
     logiboot = interp1(log(freqs),itcboot(1,:),logfreqs','linear');
 
-    if k == comps(1)
+    if k == 1
         all_ersp = zeros(length(freqs),(length(times)+3)*numc);
         all_itc = zeros(length(freqs),(length(times)+1)*numc); % Save ITC info as well.
     end
