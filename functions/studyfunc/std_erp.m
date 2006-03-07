@@ -1,24 +1,23 @@
-%   cls_erp() - Returns ICA activation ERP information for a dataset. 
+%
+%   cls_erp() - Constructs and returns ICA activation ERPs for a dataset. 
 %               Updates the EEG structure both in the Matlab environment 
-%               and on disk. Constructs the ERP of the ICA activation of a dataset,
-%               saves it into a float file, and then saves a pointer to it 
-%               in the EEG structure. If such a float file already exists, 
-%               the function loads its information. There is an option to 
-%               limit ERP coomputation to specified components, and to a 
+%               and on disk Saves the ERPs into a float file, and then saves 
+%               a pointer to the file in the EEG structure. If such a float file 
+%               already exists, loads its information. Options allow
+%               limiting ERP coomputation to specified components, and to a 
 %               specific latency range within the epoch limits. The function 
 %               returns the ERP of the selected ICA components in the requested 
-%               time window. A latencies vector is returned too, as well as 
-%               the EEG sub-structure .etc (i.e., EEG.etc), to which is added 
-%               a pointer to the ERP float file and some information about it. 
+%               time window. A latencies vector is returned, as well as the
+%               EEG sub-structure EEG.etc, to which is added a pointer to the 
+%               ERP float file and some information about it. 
 % Usage:    
-%        >> [EEG_etc, data, times] = cls_erp(EEG,components,timewindow);  
-%
+%            >> [EEG_etc, data, times] = cls_erp(EEG,components,timewindow);  
 % Inputs:
-%   EEG          - a loaded EEG data structure. 
+%   EEG          - a loaded epoched EEG dataset structure. 
 %   components   - [numeric vector] components of the EEG structure for which 
-%                      an activation ERP will be computed. 
-%   timewindow   - [minms maxms] the latency window limits within which to compute 
-%                      the ERP.
+%                      activation ERPs will be computed. {default|[] -> all}
+%   timewindow   - [minms maxms] latency window limits (in ms) within which to 
+%                      compute ERPs {default|[]: [EEG.minms EEGmaxms]}
 % Outputs:
 %   EEG_etc      - the EEG dataset .etc sub-structure (i.e., EEG.etc), to which 
 %                      is added an ERP file pointer plus some information about
@@ -28,7 +27,10 @@
 %                     latency window. 
 %   times        - a vector of epoch latencies at which the ERPs are computed. 
 %
-%  See also  cls_spec, cls_ersp, cls_scalp, eeg_preclust, eeg_createdata           
+% File output:     [dataset_file].icaerp
+%                  [dataset_file].set
+%
+%  See also  cls_spec(), cls_ersp(), cls_scalp(), eeg_preclust(), eeg_createdata()
 %
 % Authors:  Hilit Serby, SCCN, INC, UCSD, January, 2005
 
@@ -51,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2006/03/06 23:17:09  arno
+% change fields for resave
+%
 % Revision 1.6  2006/03/03 23:34:18  arno
 % recomputing if our of bound
 %
@@ -66,6 +71,12 @@
 
 function [EEG_etc, X, t] = cls_erp(EEG, comp, timerange)
 
+if isempty(comp)
+   comps = 1:size(EEG.icaweights,1);
+else
+   comps = comp;
+end
+
 if nargin < 1
     help cls_erp;
     return;
@@ -75,7 +86,8 @@ EEG_etc = [];
 if ~exist('timerange')
     timerange = [];
 end
-%erp information found in datasets
+
+% ERP information found in datasets
 if isfield(EEG,'etc')
      if isfield(EEG.etc, 'icaerp') & exist(fullfile(EEG.filepath, EEG.etc.icaerp))
          d = EEG.etc.icaerpparams;
@@ -85,7 +97,7 @@ if isfield(EEG,'etc')
              maxind = max(find(t <= timerange(end)));
              minind = min(find(t >= timerange(1)));
              if t(end) < timerange(end) | t(1) > timerange(1)
-                 disp(['Warning! The requested max latency window limit is out of the current bounds, recomputing ERP...']);
+                 disp(['Warning! The requested max latency window limit is outside the previous bounds; recomputing the ERPs...']);
                  EEG.etc = rmfield(EEG.etc, 'icaerp');
                  [EEG_etc, X, t] = cls_erp(EEG, comp, timerange);
                  return;
@@ -121,9 +133,9 @@ if isfield(EEG,'etc')
      end
  end
  
-%no erp information
+% No ERP information found
 if isstr(EEG.data)
-    TMP = eeg_checkset( EEG, 'loaddata' ); %load EEG.data and EEG.icaact
+    TMP = eeg_checkset( EEG, 'loaddata' ); % load EEG.data and EEG.icaact
 else
     TMP = EEG;
 end
@@ -133,7 +145,7 @@ if isempty(TMP.icaact)
     TMP.icaact = reshape(TMP.icaact, [ size(TMP.icaact,1) size(TMP.data,2) size(TMP.data,3) ]);
 end;
 
-%remove base line
+% Remove baseline mean
 if EEG.trials > 1 %epoched data
     time0 = find(EEG.times < 0);
     if ~isempty(time0)
@@ -147,15 +159,15 @@ end
 maxind = max(find(EEG.times <= timerange(end)));
 minind = min(find(EEG.times >= timerange(1)));
 TMP.icaact = reshape(TMP.icaact, [ size(TMP.icaact,1) size(TMP.data,2) size(TMP.data,3) ]);
-X = mean(TMP.icaact(:,minind:maxind,:),3); %calculate ERP
+X = mean(TMP.icaact(:,minind:maxind,:),3); % calculate ERP
 t = EEG.times(minind:maxind)';
 
-%save erp in file
+% Save ERPs in file
 % ---------------
 floatwrite([t X'], fullfile( EEG.filepath, [ EEG.filename(1:end-3) 'icaerp']));
 
-%update the info in the dataset
-% -----------------------------
+% Update the ERP info in the dataset .etc sub-structure
+% -----------------------------------------------------
 EEG.etc.icaerp       = [ EEG.filename(1:end-3) 'icaerp'];
 EEG.etc.icaerpparams = length(t);
 try
@@ -166,7 +178,7 @@ catch,
 end
 EEG_etc = EEG.etc;
 
-%Slect desired components
+% Select desired components
 X = X(comp,:); 
 if ~isempty('timerange')
     maxind = max(find(EEG.times <= timerange(end)));
