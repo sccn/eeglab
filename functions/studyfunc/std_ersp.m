@@ -107,6 +107,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2006/03/07 03:32:22  scott
+% fixing default|specified comps calculation -sm
+%
 % Revision 1.6  2006/03/07 02:30:54  scott
 % worked on help msg; formatted, made accurate (only 2 files are now output, not 4).
 % made the function accept the components argument (was always computing ersp/itc
@@ -190,8 +193,8 @@ for k = 1:length(comps)  % for each (specified) component
     logiboot = interp1(log(freqs),itcboot(1,:),logfreqs','linear');
 
     if k == 1
-        all_ersp = zeros(length(freqs),(length(times)+3)*numc);
-        all_itc = zeros(length(freqs),(length(times)+1)*numc); % Save ITC info as well.
+        all_ersp = zeros(length(freqs),(length(times)+3)*length(comps));
+        all_itc = zeros(length(freqs),(length(times)+1)*length(comps)); % Save ITC info as well.
     end
     all_ersp(:,1+(k-1)*(length(times)+3):k*(length(times)+3) ) = [logersp logeboot' logbase'];
     all_itc(:,1+(k-1)*(length(times)+1):k*(length(times)+1) )  = [logitc  logiboot'];
