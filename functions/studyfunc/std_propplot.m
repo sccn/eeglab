@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2006/03/07 19:35:31  arno
+% ploting
+%
 
 function STUDY = cls_plotclust(STUDY, ALLEEG,  varargin)
 icadefs;
@@ -77,7 +80,8 @@ for k = 1: len
         catch % for Matlab 5.3
             h_wait = waitbar(0,['Computing cluster measures ...'],'position', [300, 200, 300, 48]);
         end
-    end    
+    end  
+    warningon = 0;
     figure
     orient tall
     set(gcf,'Color', BACKCOLOR);
@@ -86,40 +90,61 @@ for k = 1: len
         STUDY = cls_plotclustmap(STUDY,ALLEEG, 'clusters', cls(k), 'mode', 'centroid', 'figure', 'off');
     catch
         axis off; text(0.5, 0.5, 'No scalp information', 'horizontalalignment', 'center');
+        warningon = 1;
     end
     waitbar(k/(len*6),h_wait)
     subplot(2,3,2),
     try,
         STUDY = cls_plotclusterp(STUDY,ALLEEG, 'clusters', cls(k), 'mode', 'centroid', 'figure', 'off');
     catch
+        axis off; text(0.5, 0.5, 'No ERP information', 'horizontalalignment', 'center');
+        warningon = 1;
     end
     waitbar((k*2)/(len*6),h_wait)
     subplot(2,3,3),
     try,
         [STUDY] = cls_plotclustersp(STUDY,ALLEEG, 'clusters', cls(k), 'mode', 'centroid', 'figure', 'off' );
-    catch, end
+    catch, 
+        axis off; text(0.5, 0.5, 'No ERSP information', 'horizontalalignment', 'center');
+        warningon = 1;
+    end
     waitbar((k*3)/(len*6),h_wait)
     axes('unit', 'normalized', 'position', [0.1 0.16 0.2 0.28]); %subplot(2,3,4),
     try,
         STUDY = cls_plotclustdip(STUDY,ALLEEG, 'clusters', cls(k), 'mode', 'apart', 'figure', 'off'); set(gcf,'Color', BACKCOLOR);
     catch
+        axis off; text(0.5, 0.5, 'No dipole information', 'horizontalalignment', 'center');
+        warningon = 1;
     end
     waitbar((k*4)/(len*6),h_wait)
     subplot(2,3,5),
     try,
         STUDY = cls_plotclustspec(STUDY,ALLEEG, 'clusters', cls(k), 'mode', 'centroid', 'figure', 'off');
     catch
+        axis off; text(0.5, 0.5, 'No spectrum information', 'horizontalalignment', 'center');
+        warningon = 1;
     end
     waitbar((k*5)/(len*6),h_wait)
     subplot(2,3,6),
     try,
         [STUDY] = cls_plotclustitc(STUDY,ALLEEG, 'clusters', cls(k), 'mode', 'centroid', 'figure', 'off' );
-    catch, end
+    catch, 
+        axis off; text(0.5, 0.5, 'No ITC information', 'horizontalalignment', 'center');
+        warningon = 1;
+    end
     waitbar((k*6)/(len*6),h_wait);
     %subplot('position', [0.77 0.16 0.15 0.28]),
     maintitle = ['Cluster '''  STUDY.cluster(cls(k)).name ''' average measures (' num2str(length(STUDY.cluster(cls(k)).comps)) ' comps).' ];
     a = textsc(maintitle, 'title'); 
     set(a, 'fontweight', 'bold');     
+
+    if warningon
+        disp('Some measures could not be plotted. To be able to plot these measures');
+        disp('include them in the pre-clustering (you may enter 0 as dimention if you just want');
+        disp('the measure (scalp map, ERSP, etc...) to be computed (and not having it included');
+        disp('in the clustering procedure - see tutorial for more information).');
+    end;
+
 end  % Finished all conditions
 delete(h_wait)
     
