@@ -51,6 +51,8 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+% $Log: not supported by cvs2svn $
+
 function [erp, t] = cls_readerp(ALLEEG, abset, comp)
 erp = [];
 d = ALLEEG(abset).etc.icaerpparams;
@@ -66,7 +68,7 @@ catch
             t = floatread([ ALLEEG(abset).filepath '\'  ALLEEG(abset).etc.icaerp], [d 1]);
             erp = floatread([ ALLEEG(abset).filepath '\' ALLEEG(abset).etc.icaerp], [d 1],[],d*(comp));
         catch 
-            warndlg2(['cls_readerp: file '  ALLEEG(abset).etc.icascalp ' was not found in path ' ALLEEG(abset).filepath], 'Abort - computing ERP centroid' ); 
+            warndlg2(['cls_readerp: file '  ALLEEG(abset).etc.icaerp ' was not found in path ' ALLEEG(abset).filepath], 'Abort - computing ERP centroid' ); 
             return;
         end
     end
