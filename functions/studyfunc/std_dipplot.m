@@ -61,7 +61,7 @@
 function STUDY = cls_plotclustdip(STUDY, ALLEEG, varargin)
 
 % Set default values
-cls = 2:length(STUDY.cluster); % plot all clusters in STUDY
+cls = []; % plot all clusters in STUDY
 mode = 'apart'; % plot clusters on separate figures  
 figureon = 1; % plot on a new figure
 opt_dipplot = {'normlen', 'on', 'pointout', 'on', 'verbose', 'off', 'dipolelength', 0};
@@ -101,15 +101,19 @@ for k = 3:2:nargin
     end
 end
 
-tmp =[];
-for k = 1: length(cls)
-    % don't include 'Notclust' clusters
-    if ~strncmpi('Notclust',STUDY.cluster(cls(k)).name,8) & ~strncmpi('ParentCluster',STUDY.cluster(cls(k)).name,13)
-        tmp = [tmp cls(k)];
+% select clusters to plot
+% -----------------------
+if isempty(cls)
+    tmp =[];
+    cls = 2:length(STUDY.cluster); % plot all clusters in STUDY
+    for k = 1: length(cls)
+        % don't include 'Notclust' clusters
+        if ~strncmpi('Notclust',STUDY.cluster(cls(k)).name,8) & ~strncmpi('ParentCluster',STUDY.cluster(cls(k)).name,13)
+            tmp = [tmp cls(k)];
+        end
     end
-end
-cls = tmp;
-clear tmp
+    cls = tmp;
+end;
 
 if strcmpi(mode, 'apart')  % case each cluster on a separate figure
     for clus = 1: length(cls) % For each cluster requested
