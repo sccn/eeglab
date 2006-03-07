@@ -197,6 +197,7 @@ if ~isstr(varargin{1})
         end
         
         % If not same parent check if all leaf clusters 
+        % ---------------------------------------------
         if ~sameparent
             for k = 1: N %check if all leaves
                  if ~isempty(STUDY.cluster(cls(k)).child) 
@@ -205,8 +206,21 @@ if ~isstr(varargin{1})
                  end
             end
         end
+
+        % ploting text etc ...
+        % --------------------
+        num_cls = 0;
+        for k = 1:N
+            show_options{k+1} = [STUDY.cluster(cls(k)).name ' (' num2str(length(STUDY.cluster(cls(k)).comps))  ' ICs)'];
+            if (~strncmpi('Notclust',STUDY.cluster(cls(k)).name,8)) & (~strncmpi('Outliers',STUDY.cluster(cls(k)).name,8))  & ...
+                    (~strncmpi('ParentCluster',STUDY.cluster(cls(k)).name,13))
+                num_cls = num_cls + 1;
+            end
+        end
+        show_options{1} = ['All ' num2str(num_cls) ' cluster centroids'];
         
     else   % load leaf clusters
+        
         sameparent = 1;
         cls = [];
         for k = 2:length(STUDY.cluster)
@@ -227,21 +241,45 @@ if ~isstr(varargin{1})
                  end
             end
         end
+        
+    
+        % Plot clusters hierarchically
+        % ----------------------------
+        num_cls = 0;
+        cls = 1:length(STUDY.cluster);
         N = length(cls); %number of clusters
+        
+        show_options{1} = [STUDY.cluster(1).name ' (' num2str(length(STUDY.cluster(1).comps))  ' ICs)'];
+        cls(1) = 1;
+        count = 2;
+        for index1 = 1:length(STUDY.cluster(1).child)
+            
+            indclust1 = strmatch( STUDY.cluster(1).child(index1), { STUDY.cluster.name });
+            show_options{count} = ['   ' STUDY.cluster(indclust1).name ' (' num2str(length(STUDY.cluster(indclust1).comps))  ' ICs)'];
+            cls(count) = indclust1;
+            count = count+1;
+            
+            for index2 = 1:length( STUDY.cluster(indclust1).child )
+                indclust2 = strmatch( STUDY.cluster(indclust1).child(index2), { STUDY.cluster.name });
+                show_options{count} = ['      ' STUDY.cluster(indclust2).name ' (' num2str(length(STUDY.cluster(indclust2).comps))  ' ICs)'];
+                cls(count) = indclust2;
+                count = count+1;
+                    
+                for index3 = 1:length( STUDY.cluster(indclust2).child )
+                    indclust3 = strmatch( STUDY.cluster(indclust2).child(index3), { STUDY.cluster.name });
+                    show_options{count} = ['         ' STUDY.cluster(indclust3).name ' (' num2str(length(STUDY.cluster(indclust3).comps))  ' ICs)'];
+                    cls(count) = indclust3;
+                    count = count+1;
+                end;
+            end;
+        end;
+        show_options = { ['All ' num2str(length(STUDY.cluster)) ' cluster centroids'] show_options{:} }; 
     end
+
+    
     
     all_comps = length(STUDY.cluster(1).comps);
-    % Hold a list of cluster names and the corresponding number of
-    % components in the format: Cluster_name (Y ICs).
-    num_cls = 0;
-    for k = 1:N
-        show_options{k+1} = [STUDY.cluster(cls(k)).name ' (' num2str(length(STUDY.cluster(cls(k)).comps))  ' ICs)'];
-        if (~strncmpi('Notclust',STUDY.cluster(cls(k)).name,8)) & (~strncmpi('Outliers',STUDY.cluster(cls(k)).name,8))  & ...
-                (~strncmpi('ParentCluster',STUDY.cluster(cls(k)).name,13))
-            num_cls = num_cls + 1;
-        end
-    end
-	show_options{1} = ['All ' num2str(num_cls) ' cluster centroids'];
+    
     
     show_clust      = [ 'pop_clustedit(''showclust'',gcf);'];
     show_comps      = [ 'pop_clustedit(''showcomplist'',gcf);'];
