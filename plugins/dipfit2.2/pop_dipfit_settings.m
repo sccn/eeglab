@@ -62,6 +62,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2006/03/07 00:41:10  arno
+% update help message
+%
 % Revision 1.14  2006/03/07 00:37:47  arno
 % disable edit boxes
 %
@@ -256,8 +259,8 @@ if nargin < 2
     % define each individual graphical user element
     comhelp1 = [ 'warndlg2(strvcat(''Other models can be found in the'',' ...
                  '''"model" folder of the DIPFIT2 plugin folder'',' ...
-                 'Any MRI normalized with the MNI brain may be used for plotting'',' ...
-                 '(set DIPFIT 2.0 tutorial for more information''), ''Model type'');' ];
+                 '''Any MRI normalized with the MNI brain may be used for plotting'',' ...
+                 '''(set DIPFIT 2.0 tutorial for more information''), ''Model type'');' ];
     comhelp2 = [ 'warndlg2(strvcat(''You need to enter the template location file associated'',' ...
                  '''with the model you are using for aligntment purpose (see tutorial).''), ''Template location file'');' ];
     commandload1 = [ '[filename, filepath] = uigetfile(''*'', ''Select a text file'');' ...
