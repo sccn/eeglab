@@ -16,20 +16,18 @@
 %              These contain the unprocessed ERSP|ITC image and its significant levels.
 %              (See filename info below).
 %
-%              If the ERSPs/ITCs were previously saved in these files and a new set of
-%              ERSP/ITC parameters are used, there is an overwrite flag to allow this.
-%              Depending on the flag, cls_ersp can open a pop-up window to ask the user
-%              what to do, use the existing information, or overwrite it. Vectors of
-%              frequencies and latencies for the ERSP/ITC images are returned separately, 
-%              as well as the EEG.etc sub-structure modified with pointers to the float 
-%              files and some information about them. 
+%              If the ERSPs/ITCs were previously saved in these files and the same set of
+%              ERSP/ITC parameters are used, the values are not recomputed.
+%              Vectors of frequencies and latencies for the ERSP/ITC images are returned 
+%              separately, as well as the EEG.etc sub-structure modified with pointers 
+%              to the output float files and some information about them. 
 % Usage:  
-%              >> [EEG_etc X times freqs overwrite] = cls_ersp(EEG, components,        ...
-%                                                              freqrange, timewindow,  ...
-%                                                              cycles, padratio, alpha,...
-%                                                              overwrite, type);
+%              >> [EEG_etc X times logfreqs ] = cls_ersp(EEG, components,  ...
+%                                                    freqrange, timewindow,  ...
+%                                                         cycles, padratio, alpha,...
+%                                                              type, powbase);
 %
-%              % If they do not exist, this computes the ICA component ERSPs/ITCs 
+%              % If they do not exist, computes the ICA component ERSPs/ITCs 
 %              % for a dataset. Saves the computed images in dataset name files 
 %              % with extensions .icaersp and .icaitc
 %              % Also updates the EEG structure in the Matlab environment 
@@ -50,37 +48,35 @@
 %                 When cycles==0, frequency spacing is (low_freq/padratio).
 %   alpha      - If in (0, 1), compute two-tailed permutation-based prob. thresholds
 %                 and use these to mask the ERSP/ITC image (in output X)
-%   overwrite  - [0|1|2] flag to indicate what to do with pre-existing ERSP/ITC info:
-%                 0 - there is no ERSP/ITC  information saved in the dataset 
-%                 1 - overwrite the saved ERSP/ITC of this dataset if exist
-%                 2 - use exsiting ERSP/ITC dataset info, requested time range 
-%                     and padratio (might be smaller then saved in dataset). 
-%                 {default: 0}
 %   type       - ['ersp'|'itc'] both ERSP and ITC images are computed and saved to disk, 
 %                 but only one is returned (output X) {default: 'ersp'}
+%   powbase    - [vector] baseline spectrum (power not dB, output from timef() run with 
+%                 same parameters as above) to use in the timef() computation 
+%                 {default|[] -> pre-time 0}
 % Outputs:
 %
 %   EEG_etc   - the EEG dataset .etc sub-structure (i.e. EEG.etc), which is
-%               modified with the pointers and some information about
-%               the floating files that hold the dataset ERSP, logERSP, ITC  
-%               and logITC information. If the ERSP/ITC file already exists 
-%               and wasn't overwritten this output will be empty. 
-%   X         - the masked log ERSP/ITC of the requested ICA components in the selected 
-%               frequency and time range. 
-%   times     - a time vector of the time points in which the ERSPs/ITCs were computed. 
-%   freqs     - a frequency vector (log scaled) of the points in which the 
-%               log ERSP/ITC was computed. 
-%   overwrite - same as input option, only modified with what the user
-%               asked for the rest of the datasets in STUDY (from the
-%               pop-up menu, or from command line).
+%               modified with the output filenames and some information about
+%               the float files that hold the dataset ERSP and/or ITC  
+%               information. If an ERSP/ITC file already exists and wasn't
+%               recomputed and this output will be empty. 
+%   X         - the masked log ERSP/ITC of the requested ICA components in the 
+%               selected frequency and time range. 
+%   times     - a vector of time points for which the ERSPs/ITCs were computed. 
+%   logfreqs  - a vector of (equally log spaced) frequencies (in Hz) at which the 
+%               log ERSP/ITC was evaluated. 
 %
 % Files written or modified:     [dataset_filename].icaersp   <-- saved component ERSPs
 %                                [dataset_filename].icaitc    <-- saved component ITCs
 %                                [dataset_filename].set       <-- re-saved dataset
 %  Example: 
-%            >> k = 1; 
-%            >> [EEG_etc, X, overwrite] = cls_ersp(ALLEEG(k), [1:size(ALLEEG(k).icawinv,2)],...
-%                                                     [2 50], [], [3 0.5], 4, 0.01, 0);
+%            % create ERSP and ITC images on disk for all comps from dataset EEG
+%            % use three-cycle wavelets (at 3 Hz) to >3-cycle wavelets at 50 Hz
+%            % use probability masking at p < 0.01, padratio 4. See >> timef details
+%            % returns log-freq spaced, probability-masked Xersp
+%            >> [EEG_etc, Xersp, times, logfreqs] = cls_ersp(EEG, ...
+%                                                    [1:size(EEG.icawinv,2)],...
+%                                                     [3 50], [3 0.5], 4, 0.01, 'ersp');
 %
 %  See also: timef(), cls_itc(), cls_erp(), cls_spec(), cls_scalp(), eeg_preclust(), 
 %            eeg_createdata()
@@ -106,6 +102,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2006/03/07 19:18:44  arno
+% header
+%
 % Revision 1.8  2006/03/07 03:58:32  scott
 % same -sm
 %
@@ -124,7 +123,7 @@
 % put log
 %
 
-function [EEG_etc] = cls_ersp(EEG, comp, freqrange, timewindow, cycles, padratio, alpha, type)
+function [EEG_etc X times freqs] = cls_ersp(EEG, comp, freqrange, timewindow, cycles, padratio, alpha, type, powbase)
 
 EEG_etc = [];
 if ~exist('type')
@@ -142,6 +141,10 @@ else
    comps = comp;
 end
 
+if ~exist('powbase') | isempty(powbase) | isnan(powbase)
+  powbase = NaN;  % default for timef()
+end
+
 % Check if ERSP information found in datasets and if fits requested parameters 
 if isfield(EEG,'etc')
      if isfield(EEG.etc, [ 'ica' type])
@@ -151,6 +154,7 @@ if isfield(EEG,'etc')
                            | (padratio ~= params.padratio) ...
                                   | (alpha~= params.alpha) ...
              % if not as requested parameters, recompute ERSP/ITC
+             % i.e., continue
          else
              return; % no need to compute ERSP
          end
@@ -163,17 +167,17 @@ if isstr(EEG.data)
 else
     TMP = EEG;
 end
-if isempty(TMP.icaact)
+if isempty(TMP.icaact)                      % make icaact if necessary
     TMP.icaact = (TMP.icaweights*TMP.icasphere)* ...
                  reshape(TMP.data  , [ size(TMP.data,1)   size(TMP.data,2)*size(TMP.data,3) ]);
     TMP.icaact = reshape(TMP.icaact, [ size(TMP.icaact,1) size(TMP.data,2)*size(TMP.data,3) ]);
 end;
 
-% Compute ERSP for all components
+% Compute ERSP parameters 
 [time_range, winsize] = compute_ersp_times(cycles,  EEG.srate, ...
                                  [EEG.xmin EEG.xmax]*1000 , freqrange(1), padratio); 
 if time_range(1) >= time_range(2)
-    error(['cls_ersp: parameters given for ' upper(type) ' calculation result in an invalid time range. Aborting. Please change the lower frequency bound or other parameters to resolve the problem.'] )
+    error(['cls_ersp: parameters given for ' upper(type) ' calculation result in an invalid time range. Aborting. Please increase the lower frequency bound or change other parameters to resolve the problem. See >> timef details'] )
 end
 
 for k = 1:length(comps)  % for each (specified) component
@@ -181,7 +185,7 @@ for k = 1:length(comps)  % for each (specified) component
     % Compute ERSP & ITC
     [ersp,itc,powbase,times,freqs,erspboot,itcboot] = timef( TMP.icaact(comps(k), :) , ...
           EEG.pnts, [EEG.xmin EEG.xmax]*1000, EEG.srate, cycles ,'type', ...
-             'phasecoher',  'plotersp', 'off', 'plotitc', 'off', ...
+             'phasecoher',  'plotersp', 'off', 'plotitc', 'off', 'powbase', powbase, ...
                 'alpha',alpha,'padratio',padratio, 'plotphase','off','winsize',winsize);
    
     % Change frequency axis from linear scale to log scale (frequency values left in dB)
@@ -194,10 +198,12 @@ for k = 1:length(comps)  % for each (specified) component
     [logfreqs,logitc] = logimagesc(times,freqs,itc,'plot','off'); 
     logiboot = interp1(log(freqs),itcboot(1,:),logfreqs','linear');
 
-    if k == 1
+    if k == 1 % create data matrices
         all_ersp = zeros(length(freqs),(length(times)+3)*length(comps));
         all_itc = zeros(length(freqs),(length(times)+1)*length(comps)); % Save ITC info as well.
     end
+
+    % store log-frequency spaced ersp and itc
     all_ersp(:,1+(k-1)*(length(times)+3):k*(length(times)+3) ) = [logersp logeboot' logbase'];
     all_itc(:,1+(k-1)*(length(times)+1):k*(length(times)+1) )  = [logitc  logiboot'];
 end
