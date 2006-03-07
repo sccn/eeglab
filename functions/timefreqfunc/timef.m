@@ -96,7 +96,9 @@
 %       'verbose'   = ['on'|'off'] print text                              {'on'}
 %    Outputs: 
 %            ersp   = Matrix (nfreqs,timesout) of log spectral diffs. from baseline (in dB) 
+%                       NB: Not masked for significance. Must do this using erspboot
 %            itc    = Matrix of inter-trial coherencies (nfreqs,timesout) (range: [0 1])
+%                       NB: Not masked for significance. Must do this using itcboot
 %          powbase  = Baseline power spectrum (NOT in dB, used to normalize the ERSP)
 %            times  = Vector of output times (sub-window centers) (in ms)
 %            freqs  = Vector of frequency bin centers (in Hz)
@@ -148,6 +150,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.85  2006/03/02 02:35:19  scott
+% replaced obsolete phase() with Matlab angle() -sm
+%
 % Revision 1.84  2005/09/01 03:41:53  scott
 % added flag 'hzdir' and made the default 'up'  -sm
 %
@@ -1109,7 +1114,7 @@ switch lower(g.plotersp)
     %
 	h(1) = subplot('Position',[.1 ordinate1 .9 height].*s+q);
 	
-	PP = P;
+	PP = P;            % PP will be ERSP power after
 	if ~isnan(g.alpha) % zero out nonsignif. power differences
 		PP(find((PP > repmat(Pboot(1,:)',[1 g.timesout])) ...
                     & (PP < repmat(Pboot(2,:)',[1 g.timesout])))) = 0;
@@ -1203,7 +1208,7 @@ switch lower(g.plotitc)
     %
 	h(6) = subplot('Position',[.1 ordinate2 .9 height].*s+q); % ITC image
 
-	RR = R;
+	RR = R; % RR is the masked ITC (R)
 	if ~isnan(g.alpha)
 		RR(find(RR < repmat(Rboot(1,:)',[1 g.timesout]))) = 0;
 	end
@@ -1299,6 +1304,7 @@ switch lower(g.plotitc)
         freqdir = 'normal';
     end
     set(gca,'xdir',freqdir);  % make frequency ascend or descend
+
     %
     %%%%%%%%%%%%%%% plot a topoplot() %%%%%%%%%%%%%%%%%%%%%%%
     %
@@ -1327,7 +1333,8 @@ if g.plot
     axcopy(gcf);
 end;
 
-% syemtric hanning function
+% symmetric Hanning tapering function
+% -----------------------------------
 function w = hanning(n)
 if ~rem(n,2)
    w = .5*(1 - cos(2*pi*(1:n/2)'/(n+1)));
