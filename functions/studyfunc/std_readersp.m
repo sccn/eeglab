@@ -1,10 +1,3 @@
-% Usage:    
-%   >> [logersp, logfreqs] = cls_readersp(ALLEEG, abset, component);  
-%   This functions returns the log scaled ERSP of an ICA component. 
-%   The information is loaded from a float file, which a pointer 
-%   to is saved in the EEG dataset. The float file was created
-%   by the pre - clustering function cls_ersp. 
-%
 % cls_readersp() - Given the ALLEEG structure, a specific EEG dataset index, 
 % and a specific component, the function returns the (frequency) log scaled 
 % ERSP of that ICA component. 
@@ -18,6 +11,12 @@
 % Along with the ERSP of the selected ICA component the function returns  
 % the log frequency vector of the ERSP samples. 
 %
+% Usage:    
+%   >> [logersp, logfreqs] = cls_readersp(ALLEEG, abset, component);  
+%   This functions returns the log scaled ERSP of an ICA component. 
+%   The information is loaded from a float file, which a pointer 
+%   to is saved in the EEG dataset. The float file was created
+%   by the pre - clustering function cls_ersp. 
 %
 % Inputs:
 %   ALLEEG     - an EEGLAB data structure, which holds EEG sets (can also be one EEG set). 
@@ -56,6 +55,8 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+% $Log: not supported by cvs2svn $
+
 function [logersp, logfreqs] = cls_readersp(ALLEEG, abset, comp);
 
 for k = 1: length(abset)    
@@ -63,22 +64,11 @@ for k = 1: length(abset)
 	tlen = length(params.times);
 	flen = length(params.freqs);
 	try
-        erspall{k} =  floatread([ ALLEEG(abset(k)).filepath ALLEEG(abset(k)).etc.icaersp], [flen (tlen+3)],[], flen*(tlen+3)*(comp-1));
-        %logersp =  floatread([ ALLEEG(abset).filepath ALLEEG(abset).etc.icalogersp], [flen tlen],[], flen*tlen*(comp-1));
-        %erspall =  floatread([ ALLEEG(abset).filepath ALLEEG(abset).etc.icaersp], [flen tlen+2],[], flen*(tlen+3)*(comp-1));
-        %ersp = erspall(:, 1:tlen);
-        %erspboot = erspall(:,tlen+1:tlen+2).';
+        erspall{k} =  floatread( fullfile( ALLEEG(abset(k)).filepath, ALLEEG(abset(k)).etc.icaersp), ...
+                                 [flen (tlen+3)],[], flen*(tlen+3)*(comp-1));
 	catch
-        try
-            erspall{k} =  floatread([ ALLEEG(abset(k)).filepath '/' ALLEEG(abset(k)).etc.icaersp], [flen (tlen+3)],[], flen*(tlen+3)*(comp-1));
-        catch
-            try
-                erspall{k} =  floatread([ ALLEEG(abset(k)).filepath '\' ALLEEG(abset(k)).etc.icaersp], [flen (tlen+3)],[], flen*(tlen+3)*(comp-1));
-            catch 
-                warndlg2(['cls_readersp: file '  ALLEEG(abset(k)).etc.icaersp ' was not found in path ' ALLEEG(abset(k)).filepath], 'Abort - cls_readersp' ); 
-                return;
-            end
-        end
+        warndlg2(['cls_readersp: file '  ALLEEG(abset(k)).etc.icaersp ' was not found in path ' ALLEEG(abset(k)).filepath], 'Abort - cls_readersp' ); 
+        return;
 	end
 end	
 % compute average baseline across conditions

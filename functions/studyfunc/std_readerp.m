@@ -1,10 +1,3 @@
-% Usage:    
-%   >> [erp, t] = cls_readerp(ALLEEG, setind, component);  
-%   This functions returns the ERP of an ICA component. 
-%   The information is loaded from a float file, which a pointer 
-%   to is saved in the EEG dataset. The float file was created
-%   by the pre - clustering function cls_erp. 
-%
 % cls_readerp() - Given the ALLEEG structure, a specific EEG dataset index, 
 % and a specific component, the function returns the ERP of that ICA component. 
 % The ERP of the dataset ICA components is assumed to be saved in a float 
@@ -14,6 +7,12 @@
 % Along with the ERP of the selected ICA component the function returns  
 % the time vector of the ERP samples. 
 %
+% Usage:    
+%   >> [erp, t] = cls_readerp(ALLEEG, setind, component);  
+%   This functions returns the ERP of an ICA component. 
+%   The information is loaded from a float file, which a pointer 
+%   to is saved in the EEG dataset. The float file was created
+%   by the pre - clustering function cls_erp. 
 %
 % Inputs:
 %   ALLEEG     - an EEGLAB data structure, which holds EEG sets (can also be one EEG set). 
@@ -52,24 +51,17 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2006/03/07 22:09:25  arno
+% fix error message
+%
 
 function [erp, t] = cls_readerp(ALLEEG, abset, comp)
 erp = [];
 d = ALLEEG(abset).etc.icaerpparams;
 try
-    t = floatread([ ALLEEG(abset).filepath ALLEEG(abset).etc.icaerp], [d 1]);
-    erp = floatread([ ALLEEG(abset).filepath ALLEEG(abset).etc.icaerp], [d 1],[],d*(comp));
+    t   = floatread( fullfile(ALLEEG(abset).filepath, ALLEEG(abset).etc.icaerp), [d 1]);
+    erp = floatread( fullfile(ALLEEG(abset).filepath, ALLEEG(abset).etc.icaerp), [d 1],[],d*(comp));
 catch
-    try
-        t = floatread([ ALLEEG(abset).filepath '/'  ALLEEG(abset).etc.icaerp], [d 1]);
-        erp = floatread([ ALLEEG(abset).filepath '/' ALLEEG(abset).etc.icaerp], [d 1],[],d*(comp));
-    catch
-        try
-            t = floatread([ ALLEEG(abset).filepath '\'  ALLEEG(abset).etc.icaerp], [d 1]);
-            erp = floatread([ ALLEEG(abset).filepath '\' ALLEEG(abset).etc.icaerp], [d 1],[],d*(comp));
-        catch 
-            warndlg2(['cls_readerp: file '  ALLEEG(abset).etc.icaerp ' was not found in path ' ALLEEG(abset).filepath], 'Abort - computing ERP centroid' ); 
-            return;
-        end
-    end
+    warndlg2(['cls_readerp: file '  ALLEEG(abset).etc.icaerp ' was not found in path ' ALLEEG(abset).filepath], 'Abort - computing ERP centroid' ); 
+    return;
 end

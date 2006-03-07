@@ -1,10 +1,3 @@
-% Usage:    
-%   >> [grid, y, x ] = cls_readscalp(ALLEEG, abset, component);  
-%   This functions returns the ICA component scalp map grid. 
-%   The information is loaded from a float file, which a pointer 
-%   to is saved in the EEG dataset. The float file was created
-%   by the pre - clustering function cls_scalp. 
-%
 % cls_readscalp() - Given the ALLEEG structure, a specific EEG dataset index, 
 % and a specific component, the function returns the scalp map of that ICA component. 
 % The scalp map grid of the dataset ICA components is assumed to be saved in a float 
@@ -14,6 +7,12 @@
 % Along with the scalp map grid of the selected ICA component the function returns  
 % the two axis grid points vectors (x and y). 
 %
+% Usage:    
+%   >> [grid, y, x ] = cls_readscalp(ALLEEG, abset, component);  
+%   This functions returns the ICA component scalp map grid. 
+%   The information is loaded from a float file, which a pointer 
+%   to is saved in the EEG dataset. The float file was created
+%   by the pre - clustering function cls_scalp. 
 %
 % Inputs:
 %   ALLEEG     - an EEGLAB data structure, which holds EEG sets (can also be one EEG set). 
@@ -52,6 +51,8 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+% $Log: not supported by cvs2svn $
+
 function [grid, yi, xi ] = cls_readscalp(ALLEEG, abset, comp)
 
 grid = [];
@@ -62,25 +63,11 @@ if iscell(d)
     d = d{1};
 end
 try
-    scalp = floatread([ ALLEEG(abset).filepath ALLEEG(abset).etc.icascalp], [d d+2],[],d*(d+2)*(comp-1));
+    scalp = floatread( fullfile( ALLEEG(abset).filepath, ALLEEG(abset).etc.icascalp), [d d+2],[],d*(d+2)*(comp-1));
     grid = scalp(:,1:d);
     yi = scalp(:,d+1);
     xi = scalp(:,d+2).';
 catch
-    try
-        scalp = floatread([ ALLEEG(abset).filepath '/' ALLEEG(abset).etc.icascalp], [d d+2],[],d*(d+2)*(comp-1));
-        grid = scalp(:,1:d);
-        yi = scalp(:,d+1);
-        xi = scalp(:,d+2).';
-    catch
-        try
-            scalp = floatread([ ALLEEG(abset).filepath '\' ALLEEG(abset).etc.icascalp], [d d+2],[],d*(d+2)*(comp-1));
-            grid = scalp(:,1:d);
-            yi = scalp(:,d+1);
-            xi = scalp(:,d+2).';
-        catch 
-            warndlg2(['cls_readscalp: file '  ALLEEG(abset).etc.icascalp ' was not found in path ' ALLEEG(abset).filepath], 'Abort - computing scalp map centroid' ); 
-            return;
-        end
-    end
+    warndlg2(['cls_readscalp: file '  ALLEEG(abset).etc.icascalp ' was not found in path ' ALLEEG(abset).filepath], 'Abort - computing scalp map centroid' ); 
+    return;
 end
