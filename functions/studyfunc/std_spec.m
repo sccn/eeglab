@@ -71,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2006/03/07 22:28:58  arno
+% fix header
+%
 % Revision 1.15  2006/03/07 03:56:49  scott
 % edited help msg; made accept specified components -sm
 %
@@ -109,7 +112,7 @@ if nargin < 1
     return;
 end;
 
-if isfield(EEG,'ciaweights')
+if isfield(EEG,'icaweights')
    numc = size(EEG.icaweights,1);
 else
    error('EEG.icaweights not found');
