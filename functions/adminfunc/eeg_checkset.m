@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.187  2006/03/03 22:55:50  arno
+% nothing
+%
 % Revision 1.186  2006/02/16 19:29:08  arno
 % nothing
 %
@@ -1417,9 +1420,10 @@ end;
                     end;
                 end;
             end;
-            if isempty(EEG.icawinv)
-                EEG.icawinv    = pinv(EEG.icaweights*EEG.icasphere); % a priori same result as inv
-                res = com;
+            tmpinv = pinv(EEG.icaweights*EEG.icasphere);
+            if ~isequal(EEG.icawinv, tmpinv)
+                EEG.icawinv = tmpinv; % a priori same result as inv
+                res         = com;
             end;     
         else
             disp( [ 'eeg_checkset warning: weights matrix cannot be empty if sphere matrix is not, correcting ...' ]); 
