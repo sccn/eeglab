@@ -53,6 +53,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2006/03/07 03:24:05  scott
+% reworked help msg; clarified filename output; made function accept default comps
+% -sm
+%
 % Revision 1.7  2006/03/06 23:17:09  arno
 % change fields for resave
 %
@@ -71,17 +75,17 @@
 
 function [EEG_etc, X, t] = cls_erp(EEG, comp, timerange)
 
-if isempty(comp)
-   comps = 1:size(EEG.icaweights,1);
-else
-   comps = comp;
-end
-
 if nargin < 1
     help cls_erp;
     return;
 end;
     
+if ~exist('comp') | isempty(comp)  
+   comps = 1:size(EEG.icaweights,1);
+else
+   comps = comp;
+end
+
 EEG_etc = [];
 if ~exist('timerange')
     timerange = [];
@@ -107,9 +111,9 @@ if isfield(EEG,'etc')
              minind = 1;
              maxind = d;
          end
-         X = zeros(length(comp),maxind-minind+1) ;
-         for k = 1:length(comp)
-             tmp = floatread(fullfile(EEG.filepath, EEG.etc.icaerp), [d 1],[],d*comp(k));
+         X = zeros(length(comps),maxind-minind+1) ;
+         for k = 1:length(comps)
+             tmp = floatread(fullfile(EEG.filepath, EEG.etc.icaerp), [d 1],[],d*comps(k));
              X(k,:) =  tmp(minind:maxind)';
          end
 
@@ -179,7 +183,7 @@ end
 EEG_etc = EEG.etc;
 
 % Select desired components
-X = X(comp,:); 
+X = X(comps,:); 
 if ~isempty('timerange')
     maxind = max(find(EEG.times <= timerange(end)));
     minind = min(find(EEG.times >= timerange(1)));
