@@ -62,6 +62,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2006/03/07 00:44:29  arno
+% same
+%
 % Revision 1.16  2006/03/07 00:42:14  arno
 % same
 %
@@ -260,10 +263,10 @@ if nargin < 2
         [1] };
     
     % define each individual graphical user element
-    comhelp1 = [ 'warndlg2(strvcat(''The two default models can be found in the'',' ...
-                 '''"model" folder of the DIPFIT2 plugin folder, and may be modified there.''), ''Model type'');' ];
+    comhelp1 = [ 'warndlg2(strvcat(''The two default models can be found in the standard_BEM and standard_BESA'',' ...
+                 ''' folder of the DIPFIT2 plugin folder, and may be modified there.''), ''Model type'');' ];
     comhelp3 = [ 'warndlg2(strvcat(''Any MRI normalized with the MNI brain may be used for plotting'',' ...
-                 '''(set DIPFIT 2.0 tutorial for more information''), ''Model type'');' ];
+                 '''(set DIPFIT 2.0 tutorial for more information)''), ''Model type'');' ];
     comhelp2 = [ 'warndlg2(strvcat(''You need to enter the template location file associated'',' ...
                  '''with the model you are using for aligntment purpose (see tutorial).''), ''Template location file'');' ];
     commandload1 = [ '[filename, filepath] = uigetfile(''*'', ''Select a text file'');' ...
