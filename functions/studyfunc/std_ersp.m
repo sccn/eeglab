@@ -1,4 +1,3 @@
-%
 % cls_ersp() - Computes ERSP and/or ITC information for ICA components of a dataset, 
 %              saves results into float files and and places pointers to the files 
 %              in the dataset EEG structures. When the ERSP/ITC float files already exist, 
@@ -107,6 +106,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2006/03/07 03:58:32  scott
+% same -sm
+%
 % Revision 1.7  2006/03/07 03:32:22  scott
 % fixing default|specified comps calculation -sm
 %
