@@ -1,10 +1,9 @@
-%
 % cls_spec() - Returns the ICA component spectra for a dataset. Updates the EEG structure 
 %              in the Matlab environment and in the .set file as well. Saves the spectra 
 %              in a float file.
 % Usage:    
 %           >> [EEG_etc, X, f, overwrite] = cls_spec(EEG, components, ...
-                                                    freqrange, specargs, overwrite);
+%                                                   freqrange, specargs, overwrite);
 %
 %              Computes the mean spectra of the activites of specified components of the 
 %              supplied dataset. The spectra are saved in a float file. Also saves a pointer 
@@ -28,7 +27,7 @@
 %   freqrange  - [minHz maxHz] the frequency range in which to compute the spectra.
 %                {default: }
 %   specargs   - {'key1', 'val1',...} cell array of optional spectopo inputs 
-$                {default empty}
+%                {default empty}
 %   overwrite  - [1|2] 1 -> overwrite the saved spectra for this dataset 
 %                      2 -> keep the spectra {default = 2}
 % Outputs:
@@ -48,7 +47,7 @@ $                {default empty}
 % 
 %  See also  spectopo(), cls_erp(), cls_ersp(), cls_scalp(), eeg_preclust(), eeg_createdata()
 %
-% Authors:  Hilit Serby, SCCN, INC, UCSD, January, 2005
+% Authors:  Hilit Serby & Arnaud Delorme, SCCN, INC, UCSD, January, 2005
 
 % Defunct:      0 -> if frequency range is different from saved spectra, ask via a 
 %                    pop-up window whether to keep existing spectra or to overwrite them. 
@@ -72,6 +71,9 @@ $                {default empty}
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2006/03/07 03:56:49  scott
+% edited help msg; made accept specified components -sm
+%
 % Revision 1.14  2006/03/06 23:16:31  arno
 % change field for resave
 %
