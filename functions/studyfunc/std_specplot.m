@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2006/02/16 19:51:45  arno
+% header
+%
 % Revision 1.5  2006/02/16 19:47:48  arno
 % set xlimits and move cls_plotcompspec.m inside
 %
@@ -80,7 +83,7 @@
 function STUDY = cls_plotclustspec(STUDY, ALLEEG,  varargin)
 icadefs;
 % Set default values
-cls = 2:length(STUDY.cluster); % plot all clusters in STUDY
+cls = []; % plot all clusters in STUDY
 mode = 'centroid'; % plot clusters centroid 
 figureon = 1; % plot on a new figure
 for k = 3:2:nargin
@@ -110,15 +113,19 @@ for k = 3:2:nargin
     end
 end
 
-tmp =[];
-for k = 1: length(cls)
-    % don't include 'Notclust' clusters
-    if ~strncmpi('Notclust',STUDY.cluster(cls(k)).name,8) & ~strncmpi('ParentCluster',STUDY.cluster(cls(k)).name,13)
-        tmp = [tmp cls(k)];
+% select clusters to plot
+% -----------------------
+if isempty(cls)
+    tmp =[];
+    cls = 2:length(STUDY.cluster); % plot all clusters in STUDY
+    for k = 1: length(cls)
+        % don't include 'Notclust' clusters
+        if ~strncmpi('Notclust',STUDY.cluster(cls(k)).name,8) & ~strncmpi('ParentCluster',STUDY.cluster(cls(k)).name,13)
+            tmp = [tmp cls(k)];
+        end
     end
-end
-cls = tmp;
-clear tmp
+    cls = tmp;
+end;
 
 Ncond = length(STUDY.condition);
 if Ncond == 0

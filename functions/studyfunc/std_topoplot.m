@@ -65,7 +65,7 @@ function STUDY = cls_plotclustmap(STUDY, ALLEEG,  varargin)
 icadefs;
 
 % Set default values
-cls = 2:length(STUDY.cluster); % plot all clusters in STUDY
+cls = [];
 mode = 'centroid'; % plot clusters centroid 
 figureon = 1; % plot on a new figure
 
@@ -96,15 +96,19 @@ for k = 3:2:nargin
     end
 end
         
-tmp =[];
-for k = 1: length(cls)
-    % don't include 'Notclust' clusters
-    if ~strncmpi('Notclust',STUDY.cluster(cls(k)).name,8) & ~strncmpi('ParentCluster',STUDY.cluster(cls(k)).name,13)
-        tmp = [tmp cls(k)];
+% select clusters to plot
+% -----------------------
+if isempty(cls)
+    tmp =[];
+    cls = 2:length(STUDY.cluster); % plot all clusters in STUDY
+    for k = 1: length(cls)
+        % don't include 'Notclust' clusters
+        if ~strncmpi('Notclust',STUDY.cluster(cls(k)).name,8) & ~strncmpi('ParentCluster',STUDY.cluster(cls(k)).name,13)
+            tmp = [tmp cls(k)];
+        end
     end
-end
-cls = tmp;
-clear tmp
+    cls = tmp;
+end;
 
 % Plot all the components in the cluster
 if strcmpi(mode, 'comps')         
