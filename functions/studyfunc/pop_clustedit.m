@@ -275,11 +275,7 @@ if ~isstr(varargin{1})
         end;
         show_options = { ['All cluster centroids'] show_options{:} }; 
     end
-
-    
-    
     all_comps = length(STUDY.cluster(1).comps);
-    
     
     show_clust      = [ 'pop_clustedit(''showclust'',gcf);'];
     show_comps      = [ 'pop_clustedit(''showcomplist'',gcf);'];
@@ -431,11 +427,17 @@ else
     STUDY = userdat{1}{2};
     cls = userdat{1}{3};
     
+    clus     = get(findobj('parent', hdl, 'tag', 'clus_list'), 'value');
+    comp_ind = get(findobj('parent', hdl, 'tag', 'clust_comp'), 'Value'); 
+    if clus == 1 & length(cls) == 1
+        warndlg2('No cluster', 'No cluster');
+        return;
+    end;
+    
     switch  varargin{1}
         
         case {'plotclustmap', 'plotclustersp','plotclustitc','plotclustspec', 'plotclusterp'}
             plotting_option = varargin{1};
-            clus = get(findobj('parent', hdl, 'tag', 'clus_list'), 'value');
             if (clus ~= 1 ) % specific cluster option
                 if ~isempty(STUDY.cluster(cls(clus-1)).comps)
                     eval(['STUDY = cls_' plotting_option '(STUDY,ALLEEG,''clusters'','  num2str(cls(clus-1)) ',''mode'',''centroid'');'  ]);
@@ -460,7 +462,6 @@ else
             userdat{1}{2} = STUDY;
             set(hdl, 'userdat',userdat); 
         case   'plotclustdip'  
-            clus = get(findobj('parent', hdl, 'tag', 'clus_list'), 'value');
             if (clus ~= 1 ) % specific cluster option
                 if ~isempty(STUDY.cluster(cls(clus-1)).comps)
                     [STUDY] = cls_plotclustdip(STUDY, ALLEEG, 'clusters', cls(clus-1), 'mode', 'apart');
@@ -487,8 +488,6 @@ else
         case {'plotcompmap', 'plotcompersp','plotcompitc','plotcompspec', 'plotcomperp','plotcompdip'}
             plotting_option = varargin{1};
             plotting_option = [ 'plotclust' plotting_option(9:end) ];
-            clus = get(findobj('parent', hdl, 'tag', 'clus_list'), 'value');
-            comp_ind = get(findobj('parent', hdl, 'tag', 'clust_comp'), 'Value'); 
             if (clus ~= 1 ) %specific cluster
                 if comp_ind(1) ~= 1  % check that not all comps in cluster are requested
                     eval(['STUDY = cls_' plotting_option '(STUDY,ALLEEG, ''clusters'','  num2str(cls(clus-1)) ', ''comps'',[' num2str(comp_ind-1) '] );'  ]);
@@ -582,7 +581,6 @@ else
             set(findobj('parent', hdl, 'tag', 'clust_comp'), 'String', compid, 'value', selected);
            
         case 'plotclustsum'
-            clus = get(findobj('parent', hdl, 'tag', 'clus_list'), 'value');
             if clus ~= 1 % specific cluster option
                 [STUDY] = cls_plotclust(STUDY, ALLEEG, 'cluster', cls(clus-1));
                 % update Study history
@@ -606,9 +604,6 @@ else
            set(hdl, 'userdat',userdat);    
            
         case 'plotcompsum'
-            comps_to_disp = get(findobj('parent', hdl, 'tag', 'clust_comp'), 'String');
-            clus = get(findobj('parent', hdl, 'tag', 'clus_list'), 'value');
-            comp_ind = get(findobj('parent', hdl, 'tag', 'clust_comp'), 'Value'); 
             for ci = 1 : length(comp_ind)
             end
             
