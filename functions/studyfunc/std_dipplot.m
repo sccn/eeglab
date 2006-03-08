@@ -1,11 +1,11 @@
-% cls_plotclustdip() - Commandline function, to visualizing cluster/s components dipoles. 
+% std_dipplot() - Commandline function, to visualizing cluster/s components dipoles. 
 %                   Each cluster is displayed in a separate figure. To view all the clustered in STUDY  
 %                   on the same figure (separate subplot), all STUDY clusters must be requested.
 %                   To visualize dipoles they first must be stored in the EEG dataset structures
 %                   using dipfit(). Only components that have a dipole locations will be displayed,
 %                   along with the cluster mean dipole in red. 
 % Usage:    
-%                   >> [STUDY] = cls_plotclustdip(STUDY, ALLEEG, clusters);  
+%                   >> [STUDY] = std_dipplot(STUDY, ALLEEG, clusters);  
 % Inputs:
 %   STUDY      - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
 %   ALLEEG     - global EEGLAB vector of EEG structures for the dataset(s) included in the STUDY. 
@@ -33,10 +33,10 @@
 %                     already exists in the STUDY).  
 %
 %   Example:
-%                         >> [STUDY] = cls_plotclustdip(STUDY,ALLEEG, 'clusters', 5, 'mode', 'apart', 'figure', 'off');
+%                         >> [STUDY] = std_dipplot(STUDY,ALLEEG, 'clusters', 5, 'mode', 'apart', 'figure', 'off');
 %                    Plots cluster 5 components dipoles in blue along with the mean dipole in red, on an exisiting figure (without gui). 
 %
-%  See also  pop_clustedit, dipfit, cls_plotcompdip         
+%  See also  pop_clustedit(), dipplot()        
 %
 % Authors:  Hilit Serby, Arnaud Delorme, Scott Makeig, SCCN, INC, UCSD, June, 2005
 
@@ -58,7 +58,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function STUDY = cls_plotclustdip(STUDY, ALLEEG, varargin)
+function STUDY = std_dipplot(STUDY, ALLEEG, varargin)
 
 % Set default values
 cls = []; % plot all clusters in STUDY
@@ -78,11 +78,11 @@ for k = 3:2:nargin
                 if isstr(varargin{k-1}) & strcmpi(varargin{k-1}, 'all')
                     cls = 2:length(STUDY.cluster);
                 else
-                    error('cls_plotclustdip: ''clusters'' input takes either specific clusters (numeric vector) or keyword ''all''.');
+                    error('std_dipplot: ''clusters'' input takes either specific clusters (numeric vector) or keyword ''all''.');
                 end
             end
         case 'comps'
-            STUDY = cls_plotcompdip(STUDY, ALLEEG,  cls, varargin{k-1});
+            STUDY = std_plotcompdip(STUDY, ALLEEG,  cls, varargin{k-1});
             return;
         case 'mode' % Plotting mode 'apart' / 'joined'
             mode = varargin{k-1};
@@ -124,7 +124,7 @@ if strcmpi(mode, 'apart')  % case each cluster on a separate figure
             ndip = 0;
             dip_ind = [];
             if ~isfield(STUDY.cluster(cls(clus)).centroid,'dipole')
-                STUDY = cls_centroid(STUDY,ALLEEG, cls(clus) , 'dipole');
+                STUDY = std_centroid(STUDY,ALLEEG, cls(clus) , 'dipole');
             end
             for k = 1:len
                 abset = STUDY.datasetinfo(STUDY.setind(1,STUDY.cluster(cls(clus)).sets(1,k))).index;
@@ -220,7 +220,7 @@ if strcmpi(mode, 'joined')  % case all clusters are plotted in the same figure (
         max_r = 0;
         clear cluster_dip_models;
         if ~isfield(STUDY.cluster(cls(l)).centroid,'dipole')
-            STUDY = cls_centroid(STUDY,ALLEEG, cls(l) , 'dipole');
+            STUDY = std_centroid(STUDY,ALLEEG, cls(l) , 'dipole');
         end
         for k = 1: len
             abset = STUDY.datasetinfo(STUDY.setind(1,STUDY.cluster(cls(l)).sets(1,k))).index;
@@ -283,14 +283,14 @@ if strcmpi(mode, 'joined')  % case all clusters are plotted in the same figure (
    end %finished going over all clusters
    set(fig_h, 'resize','on');
 end % finished case of 'all' clusters
-% cls_plotcompdip() - Commandline function, to visualizing cluster components dipoles. 
+% std_plotcompdip() - Commandline function, to visualizing cluster components dipoles. 
 %                   Displays the dipoles of specified cluster components with the cluster mean 
 %                   dipole on separate figures. 
 %                   To visualize dipoles they first must be stored in the EEG dataset structures
 %                   using dipfit(). Only components that have a dipole locations will be displayed,
 %                   along with the cluster mean dipole in red. 
 % Usage:    
-%                   >> [STUDY] = cls_plotcompdip(STUDY, ALLEEG, cluster, comps);  
+%                   >> [STUDY] = std_plotcompdip(STUDY, ALLEEG, cluster, comps);  
 % Inputs:
 %   STUDY      - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
 %   ALLEEG     - global EEGLAB vector of EEG structures for the dataset(s) included in the STUDY. 
@@ -308,10 +308,10 @@ end % finished case of 'all' clusters
 %
 %   Example:
 %                         >> cluster = 4; comps= 1;  
-%                         >> [STUDY] = cls_plotcompdip(STUDY,ALLEEG, cluster, comps);
+%                         >> [STUDY] = std_plotcompdip(STUDY,ALLEEG, cluster, comps);
 %                    Plots component 1 dipole in blue with the cluster 4 mean dipole in red. 
 %
-%  See also  pop_clustedit, dipfit, cls_plotclustdip         
+%  See also  pop_clustedit, dipfit, std_dipplot         
 %
 % Authors:  Hilit Serby, Arnaud Delorme, Scott Makeig, SCCN, INC, UCSD, June, 2005
 
@@ -333,16 +333,16 @@ end % finished case of 'all' clusters
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function STUDY = cls_plotcompdip(STUDY, ALLEEG, cls, varargin)
+function STUDY = std_plotcompdip(STUDY, ALLEEG, cls, varargin)
 if ~exist('cls')
-    error('cls_plotcompdip: you must provide a cluster number as an input.');
+    error('std_plotcompdip: you must provide a cluster number as an input.');
 end
 if isempty(cls)
-   error('cls_plotcompdip: you must provide a cluster number as an input.');
+   error('std_plotcompdip: you must provide a cluster number as an input.');
 end
 if nargin == 3 % no components indices were given
     % Default plot all components of the cluster
-    [STUDY] = cls_plotclustdip(STUDY, ALLEEG, 'clusters', cls);
+    [STUDY] = std_dipplot(STUDY, ALLEEG, 'clusters', cls);
     return
 else
     comp_ind = varargin{1}; 
@@ -357,7 +357,7 @@ for ci = 1:length(comp_ind)
         return;
     end
     if ~isfield(STUDY.cluster(cls).centroid,'dipole')
-        STUDY = cls_centroid(STUDY,ALLEEG, cls , 'dipole');
+        STUDY = std_centroid(STUDY,ALLEEG, cls , 'dipole');
     end
     comp_to_disp = ['IC' num2str(comp) ' / ' subject];
     cluster_dip_models = ALLEEG(abset).dipfit.model(comp);

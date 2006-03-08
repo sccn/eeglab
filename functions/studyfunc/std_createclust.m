@@ -1,8 +1,8 @@
-%  cls_createclust()  - Commandline function, to create a new empty cluster.
+%  std_createclust()  - Commandline function, to create a new empty cluster.
 %                            After the empty cluster is created, components can be
-%                            reassigned to it using the commandline cls_movecomp().
+%                            reassigned to it using the commandline std_movecomp().
 % Usage:
-%                   >> [STUDY] = cls_createclust(STUDY, ALLEEG, name);
+%                   >> [STUDY] = std_createclust(STUDY, ALLEEG, name);
 % Inputs:
 %   STUDY         - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
 %   ALLEEG        - global EEGLAB vector of EEG structures for the dataset(s) included in the STUDY.
@@ -15,10 +15,10 @@
 %
 %   Example:
 %                           >> name = 'eye_movements';
-%                         >> [STUDY] = cls_createclust(STUDY, ALLEEG, name);
+%                         >> [STUDY] = std_createclust(STUDY, ALLEEG, name);
 %                    A new cluster is created named 'Ceye_movements'.
 %
-%  See also  pop_clustedit, cls_movecomp
+%  See also  pop_clustedit, std_movecomp
 %
 % Authors:  Hilit Serby, Arnaud Delorme, Scott Makeig, SCCN, INC, UCSD, June, 2005
 
@@ -40,10 +40,10 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [STUDY, clusters] = cls_createclust(STUDY, ALLEEG, varargin)
+function [STUDY, clusters] = std_createclust(STUDY, ALLEEG, varargin)
 
     if length(varargin) > 1
-        [STUDY, clusters] = cls_createclust2(STUDY, ALLEEG, varargin{:});
+        [STUDY, clusters] = std_createclust2(STUDY, ALLEEG, varargin{:});
         return;
     end;
     

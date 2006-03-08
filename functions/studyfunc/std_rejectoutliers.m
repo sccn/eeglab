@@ -1,7 +1,7 @@
-%  cls_rejectoutliers()  - Commandline function, to reject outlier component(s) from clusters. 
+%  std_rejectoutliers()  - Commandline function, to reject outlier component(s) from clusters. 
 %                            Reassign the outlier component(s) to an outlier cluster specific to each cluster. 
 % Usage:    
-%                   >> [STUDY] = cls_rejectoutliers(STUDY, ALLEEG, clusters, th);   
+%                   >> [STUDY] = std_rejectoutliers(STUDY, ALLEEG, clusters, th);   
 % Inputs:
 %   STUDY         - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
 %   ALLEEG        - global EEGLAB vector of EEG structures for the dataset(s) included in the STUDY. 
@@ -20,7 +20,7 @@
 %
 %   Example:
 %                         >> clusters = [10 15]; th = 2;   
-%                         >> [STUDY] = cls_rejectoutliers(STUDY, ALLEEG, clusters, th);  
+%                         >> [STUDY] = std_rejectoutliers(STUDY, ALLEEG, clusters, th);  
 %                    Reject outlier components (that are more than 2 std from the cluster centroid) from cluster 10 and 15. 
 %
 %  See also  pop_clustedit         
@@ -45,7 +45,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function STUDY = cls_rejectoutliers(STUDY, ALLEEG, varargin)
+function STUDY = std_rejectoutliers(STUDY, ALLEEG, varargin)
 
 cls = 2:length(STUDY.cluster); % all clusters in STUDY
 th = 3; % The threshold factor - default: 3 
@@ -60,7 +60,7 @@ if length(varargin) > 1
         if isstr(varargin{1}) & strcmpi(varargin{1}, 'all')
             cls = 2:length(STUDY.cluster);
         else
-            error('cls_prejectoutliers: clusters input takes either specific clusters (numeric vector) or keyword ''all''.');
+            error('std_prejectoutliers: clusters input takes either specific clusters (numeric vector) or keyword ''all''.');
         end
     end
 end
@@ -78,7 +78,7 @@ if length(varargin) == 2
     if isnumeric(varargin{2})
         th = varargin{2};
     else
-        error('cls_prejectoutliers: std input must be a numeric value.');
+        error('std_prejectoutliers: std input must be a numeric value.');
     end
 end
 
@@ -110,16 +110,16 @@ for k = 1:length(cls)
     % The cluster centroid
     clsCentr = mean(clsPCA,1);
     % The std of the cluster (based on the distances between all cluster components to the cluster centroid). 
-    cls_std = std(sum((clsPCA-ones(size(clsPCA,1),1)*clsCentr).^2,2),1);
+    std_std = std(sum((clsPCA-ones(size(clsPCA,1),1)*clsCentr).^2,2),1);
     outliers = []; 
     for l = 1:length(STUDY.cluster(cls(k)).comps)
         compdist = sum((clsPCA(l,:) - clsCentr).^2); % Component distance from cluster centroid
-        if compdist > cls_std * th % check if an outlier
+        if compdist > std_std * th % check if an outlier
             outliers = [ outliers l];
         end
     end
     % Move outlier to the outlier cluster
     if ~isempty(outliers) % reject outliers if exist
-        STUDY = cls_moveoutlier(STUDY, ALLEEG,cls(k) , outliers); 
+        STUDY = std_moveoutlier(STUDY, ALLEEG,cls(k) , outliers); 
     end    
 end

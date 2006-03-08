@@ -1,4 +1,4 @@
-% std_plotclusterp() - Commandline function, to visualizing cluster/s components ERP. 
+% std_erpplot() - Commandline function, to visualizing cluster/s components ERP. 
 %                   Either displays mean ERP of all requested clusters in the same figure, 
 %                   with spectra for different conditions (if any) plotted in different colors. 
 %                   Or displays ERP for each specified cluster in separate figures (per condition),  
@@ -9,7 +9,7 @@
 %                   pop_preclust() or the equivalent commandline functions eeg_createdata() 
 %                   and eeg_preclust(). A pop-function that calls this function is pop_clustedit().
 % Usage:    
-%                   >> [STUDY] = std_plotclusterp(STUDY, ALLEEG, key1, val1, key2, val2);  
+%                   >> [STUDY] = std_erpplot(STUDY, ALLEEG, key1, val1, key2, val2);  
 % Inputs:
 %   STUDY      - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
 %   ALLEEG     - global EEGLAB vector of EEG structures for the dataset(s) included in the STUDY. 
@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2006/03/08 20:19:31  arno
+% rename func
+%
 % Revision 1.6  2006/03/07 18:43:13  arno
 % plot parent cluster
 %
@@ -77,7 +80,7 @@
 % fix rescaling\
 %
 
-function STUDY = std_plotclusterp(STUDY, ALLEEG,  varargin)
+function STUDY = std_erpplot(STUDY, ALLEEG,  varargin)
 icadefs;
 
 % Set default values
@@ -293,7 +296,7 @@ end % finished 'centroid' plot mode
 % Optional inputs:
 %   comps      - [numeric vector]  -> indices of the cluster components to plot.
 %                       'all'                       -> plot all the components in the cluster
-%                                                      (as in std_plotclusterp). {default: 'all'}.
+%                                                      (as in std_erpplot). {default: 'all'}.
 %
 % Outputs:
 %   STUDY    - the input STUDY set structure modified with plotted cluster
@@ -303,9 +306,9 @@ end % finished 'centroid' plot mode
 %   Example:
 %                         >> cluster = 4; comps= 'all';  
 %                         >> [STUDY] = std_plotcomperp(STUDY,ALLEEG, cluster, comps);
-%                    Plots all components of cluster 4, calls std_plotclusterp() . 
+%                    Plots all components of cluster 4, calls std_erpplot() . 
 %
-%  See also  pop_clustedit, pop_preclust, eeg_createdata, std_plotclusterp         
+%  See also  pop_clustedit(), pop_preclust()         
 %
 % Authors:  Hilit Serby, Arnaud Delorme, Scott Makeig, SCCN, INC, UCSD, June, 2005
 
@@ -338,7 +341,7 @@ if isempty(cls)
 end
 if nargin == 3 % no components indices were given
     % Default plot all components of the cluster
-    [STUDY] = std_plotclusterp(STUDY, ALLEEG, 'clusters', cls, 'mode', 'comps');
+    [STUDY] = std_erpplot(STUDY, ALLEEG, 'clusters', cls, 'mode', 'comps');
     return
 else
     comp_ind = varargin{1}; 

@@ -1,4 +1,4 @@
-% std_plotclustitc() - Commandline function, to visualizing cluster/s ITCs. 
+% std_itcplot() - Commandline function, to visualizing cluster/s ITCs. 
 %                   Displays either mean cluster/s ITC/s, or all cluster/s component
 %                   ITCs with the mean cluster/s ITC in one figure (per cluster & condition).
 %                   The ITCs can be visualized only if component ITCs     
@@ -7,7 +7,7 @@
 %                   pop_preclust() or the equivalent commandline functions eeg_createdata() 
 %                   and eeg_preclust(). A pop-function that calls this function is pop_clustedit().
 % Usage:    
-%                   >> [STUDY] = std_plotclustitc(STUDY, ALLEEG, key1, val1, key2, val2);  
+%                   >> [STUDY] = std_itcplot(STUDY, ALLEEG, key1, val1, key2, val2);  
 % Inputs:
 %   STUDY      - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
 %   ALLEEG     - global EEGLAB vector of EEG structures for the dataset(s) included in the STUDY. 
@@ -38,10 +38,10 @@
 %                     already exists in the STUDY).  
 %
 %   Example:
-%                         >> [STUDY] = std_plotclustitc(STUDY,ALLEEG, 'clusters', 'all', 'mode', 'centroid');
+%                         >> [STUDY] = std_itcplot(STUDY,ALLEEG, 'clusters', 'all', 'mode', 'centroid');
 %                    Plots the mean ITCs of all the clusters in STUDY on the same figure. 
 %
-%  See also  pop_clustedit, pop_preclust, eeg_createdata, std_plotcompitc         
+%  See also  pop_clustedit(), pop_preclust()
 %
 % Authors:  Hilit Serby, Arnaud Delorme, Scott Makeig, SCCN, INC, UCSD, June, 2005
 
@@ -63,7 +63,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function STUDY = std_plotclustitc(STUDY, ALLEEG,  varargin)
+function STUDY = std_itcplot(STUDY, ALLEEG,  varargin)
 icadefs;
 % Set default values
 cls = []; % plot all clusters in STUDY
@@ -82,7 +82,7 @@ for k = 3:2:nargin
                 if isstr(varargin{k-1}) & strcmpi(varargin{k-1}, 'all')
                     cls = 2:length(STUDY.cluster);
                 else
-                    error('std_plotclustitc: ''clusters'' input takes either specific clusters (numeric vector) or keyword ''all''.');
+                    error('std_itcplot: ''clusters'' input takes either specific clusters (numeric vector) or keyword ''all''.');
                 end
             end
         case 'comps'
@@ -342,7 +342,7 @@ end % Finished 'centroid' mode plot option
 %                         >> [STUDY] = std_plotcompmap(STUDY,ALLEEG, cluster, comps);
 %                    Plots components 1, 7 & 10  itcs of cluster 4 on separate figures. 
 %
-%  See also  pop_clustedit, pop_preclust, eeg_createdata, std_plotclustitc         
+%  See also  pop_clustedit, pop_preclust, eeg_createdata, std_itcplot         
 %
 % Authors:  Hilit Serby, Arnaud Delorme, Scott Makeig, SCCN, INC, UCSD, June, 2005
 
@@ -376,7 +376,7 @@ if isempty(cls)
 end
 if nargin == 3 % no components indices were given
     % Default plot all components of the cluster
-    [STUDY] = std_plotclustitc(STUDY, ALLEEG, 'clusters', cls, 'mode', 'comps');
+    [STUDY] = std_itcplot(STUDY, ALLEEG, 'clusters', cls, 'mode', 'comps');
     return
 else
     comp_ind = varargin{1}; 

@@ -1,4 +1,4 @@
-% std_plotclustersp() - Commandline function, to visualizing cluster/s ERSPs. 
+% std_erspplot() - Commandline function, to visualizing cluster/s ERSPs. 
 %                   Displays either mean cluster/s ERSP/s, or all cluster/s component 
 %                   ERSPs with the mean cluster/s ERSP in one figure (per condition).
 %                   The ERSPs can be visualized only if component ERSPs     
@@ -7,7 +7,7 @@
 %                   pop_preclust() or the equivalent commandline functions eeg_createdata() 
 %                   and eeg_preclust(). A pop-function that calls this function is pop_clustedit().
 % Usage:    
-%                   >> [STUDY] = std_plotclustersp(STUDY, ALLEEG, key1, val1, key2, val2);  
+%                   >> [STUDY] = std_erspplot(STUDY, ALLEEG, key1, val1, key2, val2);  
 % Inputs:
 %   STUDY      - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
 %   ALLEEG     - global EEGLAB vector of EEG structures for the dataset(s) included in the STUDY. 
@@ -38,10 +38,10 @@
 %                     already exists in the STUDY).  
 %
 %   Example:
-%                         >> [STUDY] = std_plotclustersp(STUDY,ALLEEG, 'clusters', 'all', 'mode', 'centroid');
+%                         >> [STUDY] = std_erspplot(STUDY,ALLEEG, 'clusters', 'all', 'mode', 'centroid');
 %                    Plots the mean ERSPs of all the clusters in STUDY on the same figure. 
 %
-%  See also  pop_clustedit, pop_preclust, eeg_createdata, std_plotcompersp         
+%  See also  pop_clustedit(), pop_preclust()
 %
 % Authors:  Hilit Serby, Arnaud Delorme, Scott Makeig, SCCN, INC, UCSD, June, 2005
 
@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2006/03/08 20:20:12  arno
+% rename func
+%
 % Revision 1.8  2006/03/07 18:43:43  arno
 % allow to plot parent cluster
 %
@@ -83,7 +86,7 @@
 % new format etc...
 %
 
-function STUDY = std_plotclustersp(STUDY, ALLEEG,  varargin)
+function STUDY = std_erspplot(STUDY, ALLEEG,  varargin)
 icadefs;
 
 % Set default values
@@ -103,7 +106,7 @@ for k = 3:2:nargin
                 if isstr(varargin{k-1}) & strcmpi(varargin{k-1}, 'all')
                     cls = 2:length(STUDY.cluster);
                 else
-                    error('std_plotclustersp: ''clusters'' input takes either specific clusters (numeric vector) or keyword ''all''.');
+                    error('std_erspplot: ''clusters'' input takes either specific clusters (numeric vector) or keyword ''all''.');
                 end
             end
         case 'comps'
@@ -347,7 +350,7 @@ end % Finished 'centroid' mode plot option
 % Optional inputs:
 %   comps      - [numeric vector]  -> indices of the cluster components to plot.
 %                       'all'                       -> plot all the components in the cluster
-%                                                      (as in std_plotclustersp). {default: 'all'}.
+%                                                      (as in std_erspplot). {default: 'all'}.
 %
 % Outputs:
 %   STUDY    - the input STUDY set structure modified with plotted cluster ersp
@@ -359,7 +362,7 @@ end % Finished 'centroid' mode plot option
 %                         >> [STUDY] = std_plotcompersp(STUDY,ALLEEG, cluster, comps);
 %                    Plots components 1, 7 & 10  ersps of cluster 4 on separate figures. 
 %
-%  See also  pop_clustedit, pop_preclust, eeg_createdata, std_plotclustersp         
+%  See also  pop_clustedit, pop_preclust, eeg_createdata, std_erspplot         
 %
 % Authors:  Hilit Serby, Arnaud Delorme, Scott Makeig, SCCN, INC, UCSD, June, 2005
 
@@ -393,7 +396,7 @@ if isempty(cls)
 end
 if nargin == 3 % no components indices were given
     % Default plot all components of the cluster
-    [STUDY] = std_plotclustersp(STUDY, ALLEEG, 'clusters', cls, 'mode', 'comps');
+    [STUDY] = std_erspplot(STUDY, ALLEEG, 'clusters', cls, 'mode', 'comps');
     return
 else
     comp_ind = varargin{1}; 

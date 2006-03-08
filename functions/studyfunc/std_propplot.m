@@ -1,4 +1,4 @@
-% cls_plotclust() - Commandline function, to visualizing cluster/s measures. 
+% std_plotclust() - Commandline function, to visualizing cluster/s measures. 
 %                   Displays either mean cluster/s ERSP/s, or all cluster/s component 
 %                   ERSPs with the mean cluster/s ERSP in one figure (per condition).
 %                   The ERSPs can be visualized only if component ERSPs     
@@ -7,7 +7,7 @@
 %                   pop_preclust() or the equivalent commandline functions eeg_createdata() 
 %                   and eeg_preclust(). A pop-function that calls this function is pop_clustedit().
 % Usage:    
-%                   >> [STUDY] = cls_plotclust(STUDY, ALLEEG, clusters);  
+%                   >> [STUDY] = std_plotclust(STUDY, ALLEEG, clusters);  
 % Inputs:
 %   STUDY      - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
 %   ALLEEG     - global EEGLAB vector of EEG structures for the dataset(s) included in the STUDY. 
@@ -23,10 +23,10 @@
 %                     already exists in the STUDY).  
 %
 %   Example:
-%                         >> [STUDY] = cls_plotclust(STUDY,ALLEEG, 5);
+%                         >> [STUDY] = std_plotclust(STUDY,ALLEEG, 5);
 %                    Plots the mean measures of cluster 5 on the same figure. 
 %
-%  See also  pop_clustedit, cls_plotcomp        
+%  See also  pop_clustedit() 
 %
 % Authors:  Hilit Serby, Arnaud Delorme, Scott Makeig, SCCN, INC, UCSD, July, 2005
 
@@ -49,11 +49,14 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2006/03/07 19:41:41  arno
+% warning text and message
+%
 % Revision 1.4  2006/03/07 19:35:31  arno
 % ploting
 %
 
-function STUDY = cls_plotclust(STUDY, ALLEEG,  varargin)
+function STUDY = std_plotclust(STUDY, ALLEEG,  varargin)
 icadefs;
 
 % Set default values
@@ -66,7 +69,7 @@ if length(varargin) > 0
     elseif isstr(varargin{2}) & strcmpi(varargin{2}, 'all')
         cls = 1:length(STUDY.cluster);
     else
-        error('cls_plotclust: clusters input is either specific clusters (numeric vector) or keyword ''all''.');
+        error('std_plotclust: clusters input is either specific clusters (numeric vector) or keyword ''all''.');
     end
 end
 
@@ -87,7 +90,7 @@ for k = 1: len
     set(gcf,'Color', BACKCOLOR);
     subplot(2,3,1),
     try,
-        STUDY = cls_plotclustmap(STUDY,ALLEEG, 'clusters', cls(k), 'mode', 'centroid', 'figure', 'off');
+        STUDY = std_topoplot(STUDY,ALLEEG, 'clusters', cls(k), 'mode', 'centroid', 'figure', 'off');
     catch
         axis off; text(0.5, 0.5, 'No scalp information', 'horizontalalignment', 'center');
         warningon = 1;
@@ -95,7 +98,7 @@ for k = 1: len
     waitbar(k/(len*6),h_wait)
     subplot(2,3,2),
     try,
-        STUDY = cls_plotclusterp(STUDY,ALLEEG, 'clusters', cls(k), 'mode', 'centroid', 'figure', 'off');
+        STUDY = std_erpplot(STUDY,ALLEEG, 'clusters', cls(k), 'mode', 'centroid', 'figure', 'off');
     catch
         axis off; text(0.5, 0.5, 'No ERP information', 'horizontalalignment', 'center');
         warningon = 1;
@@ -103,7 +106,7 @@ for k = 1: len
     waitbar((k*2)/(len*6),h_wait)
     subplot(2,3,3),
     try,
-        [STUDY] = cls_plotclustersp(STUDY,ALLEEG, 'clusters', cls(k), 'mode', 'centroid', 'figure', 'off' );
+        [STUDY] = std_erspplot(STUDY,ALLEEG, 'clusters', cls(k), 'mode', 'centroid', 'figure', 'off' );
     catch, 
         axis off; text(0.5, 0.5, 'No ERSP information', 'horizontalalignment', 'center');
         warningon = 1;
@@ -111,7 +114,7 @@ for k = 1: len
     waitbar((k*3)/(len*6),h_wait)
     axes('unit', 'normalized', 'position', [0.1 0.16 0.2 0.28]); %subplot(2,3,4),
     try,
-        STUDY = cls_plotclustdip(STUDY,ALLEEG, 'clusters', cls(k), 'mode', 'apart', 'figure', 'off'); set(gcf,'Color', BACKCOLOR);
+        STUDY = std_dipplot(STUDY,ALLEEG, 'clusters', cls(k), 'mode', 'apart', 'figure', 'off'); set(gcf,'Color', BACKCOLOR);
     catch
         axis off; text(0.5, 0.5, 'No dipole information', 'horizontalalignment', 'center');
         warningon = 1;
@@ -119,7 +122,7 @@ for k = 1: len
     waitbar((k*4)/(len*6),h_wait)
     subplot(2,3,5),
     try,
-        STUDY = cls_plotclustspec(STUDY,ALLEEG, 'clusters', cls(k), 'mode', 'centroid', 'figure', 'off');
+        STUDY = std_specplot(STUDY,ALLEEG, 'clusters', cls(k), 'mode', 'centroid', 'figure', 'off');
     catch
         axis off; text(0.5, 0.5, 'No spectrum information', 'horizontalalignment', 'center');
         warningon = 1;
@@ -127,7 +130,7 @@ for k = 1: len
     waitbar((k*5)/(len*6),h_wait)
     subplot(2,3,6),
     try,
-        [STUDY] = cls_plotclustitc(STUDY,ALLEEG, 'clusters', cls(k), 'mode', 'centroid', 'figure', 'off' );
+        [STUDY] = std_itcplot(STUDY,ALLEEG, 'clusters', cls(k), 'mode', 'centroid', 'figure', 'off' );
     catch, 
         axis off; text(0.5, 0.5, 'No ITC information', 'horizontalalignment', 'center');
         warningon = 1;
