@@ -101,6 +101,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2006/03/08 23:02:41  arno
+% renaming powbase properly
+%
 % Revision 1.19  2006/03/08 22:55:50  arno
 % fix itcboot now
 %
@@ -230,7 +233,6 @@ for k = 1:length(comps)  % for each (specified) component
     %          'phasecoher',  'plotersp', 'off', 'plotitc', 'off', 'powbase', powbase, ...
     %             'alpha',alpha,'padratio',padratio, 'plotphase','off','winsize',winsize);
 
-    dsfdsdsf
     [ersp,itc,tmppowbase,times,freqs,erspboot,itcboot] = timef( TMP.icaact(comps(k), :) , ...
           EEG.pnts, [EEG.xmin EEG.xmax]*1000, EEG.srate, cycles ,'type', ...
              'phasecoher',  'plotersp', 'off', 'plotitc', 'off', 'powbase', powbase(k,:), ...
