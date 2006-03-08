@@ -140,7 +140,7 @@ end;
 if ~isfield(STUDY, 'cluster'), STUDY.cluster = []; modif = 1; end;
 if isempty(STUDY.cluster)
     modif = 1; 
-    [STUDY] = cls_createclust(STUDY, ALLEEG, 'ParentCluster');
+    [STUDY] = std_createclust(STUDY, ALLEEG, 'ParentCluster');
     STUDY.cluster(1).parent = []; 
     for k = 1:size(STUDY.setind,2)
         

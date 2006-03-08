@@ -37,7 +37,7 @@
 %                plus additional information from the optional inputs above. 
 %   ALLEEG     - a vector of EEG datasets included in the STUDY structure 
 %
-%  See also:  pop_createstudy(), load_alleeg(), pop_clust(), pop_preclust(), 
+%  See also:  pop_createstudy(), std_loadalleeg(), pop_clust(), pop_preclust(), 
 %             eeg_preclust(), eeg_createdata()
 %
 % Authors: Arnaud Delorme, Hilit Serby, SCCN, INC, UCSD, October , 2004-
@@ -61,11 +61,14 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2006/03/08 21:08:10  arno
+% rename function
+%
 % Revision 1.32  2006/03/03 00:20:36  arno
 % changing defaults
 %
 % Revision 1.31  2006/03/03 00:03:26  arno
-% use load_alleeg
+% use std_loadalleeg
 %
 % Revision 1.30  2006/03/03 00:02:56  arno
 % back to version 1.27
@@ -248,7 +251,7 @@ for k = 1:2:length(g.commands)
             STUDY = std_checkset(STUDY, ALLEEG); % recreate parent dataset
             
         case 'load'
-            TMPEEG = load_alleeg( { g.commands{k+1} } );
+            TMPEEG = std_loadalleeg( { g.commands{k+1} } );
             ALLEEG = eeg_store(ALLEEG, eeg_checkset(TMPEEG), currentind);
             
             % update datasetinfo structure

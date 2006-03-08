@@ -1,4 +1,4 @@
-% load_alleeg() - This function constructs an ALLEEG structure.
+% std_loadalleeg() - This function constructs an ALLEEG structure.
 % The function takes the paths and file names of all the EEG datasets that
 % will be loaded into the ALLEEG structure. 
 % The EEG datasets are loaded without their data and icaact fields to save
@@ -9,8 +9,8 @@
 % pop_saveset for details).
 %
 % Usage:    
-%   >> ALLEEG = load_alleeg(paths,datasets) ;  
-%   >> ALLEEG = load_alleeg(STUDY) ;  
+%   >> ALLEEG = std_loadalleeg(paths,datasets) ;  
+%   >> ALLEEG = std_loadalleeg(STUDY) ;  
 %   The function loads several EEG datasets into an ALLEEG structure.
 %
 %
@@ -31,7 +31,7 @@
 %      paths = {'/home/eeglab/data/sub1/','/home/eeglab/data/sub2/', ...  
 %                     '/home/eeglab/data/sub3/', '/home/eeglab/data/sub6/'};
 %      datasets = { 'visattS1', 'visattS2', 'visattS3', 'visattS4'};
-%      ALLEEG = load_alleeg(paths,datasets) ; 
+%      ALLEEG = std_loadalleeg(paths,datasets) ; 
 %                
 % See also: pop_loadstudy(), pop_study()
 %
@@ -55,10 +55,10 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function ALLEEG = load_alleeg(varargin)
+function ALLEEG = std_loadalleeg(varargin)
 
     if nargin < 1
-        help load_alleeg;
+        help std_loadalleeg;
         return;
     end;
     

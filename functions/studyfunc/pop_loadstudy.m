@@ -1,5 +1,5 @@
 % pop_loadstudy() - load an existing EEGLAB STUDY set of EEG datasets plus 
-%                   its corresponding ALLEEG structure. Calls load_alleeg().
+%                   its corresponding ALLEEG structure. Calls std_loadalleeg().
 % Usage:
 %   >> [STUDY ALLEEG] = pop_loadstudy; % pop up a window to collect filename
 %   >> [STUDY ALLEEG] = pop_loadstudy( 'key', 'val', ...); % no pop-up
@@ -13,7 +13,7 @@
 %   ALLEEG     - the corresponding ALLEEG structure containing 
 %                the (loaded) STUDY EEG datasets.    
 %
-% See also: load_alleeg(), pop_savestudy(), pop_createstudy()
+% See also: std_loadalleeg(), pop_savestudy(), pop_createstudy()
 %
 % Authors: Hilit Serby SCCN, INC, UCSD, September 2005
 
@@ -78,7 +78,7 @@ else
     error(['pop_loadstudy(): No STUDY set file provided.']);
 end
   
-ALLEEG = load_alleeg(STUDY);
+ALLEEG = std_loadalleeg(STUDY);
 
 % Update the pointers from STUDY to the ALLEEG datasets
 for k = 1:length(STUDY.datasetinfo)
