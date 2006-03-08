@@ -1267,3 +1267,102 @@ function envdata = envelope(data, envmode)  % also in release as env()
   
 return %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% std_granderp() - compute the grand mean ERP of all the sets in a cluster
+%        or of all the sets in the STUDY (based on 'env_erp' input ['contrib'|'all']).
+%        This helper function is called by std_envtopo(). 
+   
+
+function [grandERP, len, STUDY, ALLEEG] = std_granderp(STUDY, ALLEEG, varargin)
+
+if nargin < 4
+    help std_granderp;
+    return
+end
+
+if mod(nargin,2)
+    error('std_granderp: Input argument list must be pairs of: ''keyx'', ''valx'' ');
+end
+
+clusters = [];
+subclus = []; 
+env_erp = 'contrib';% default grand ERP include only the sets that contribute to the dataset, otherwise 'all' datasets in STUDY.
+n = 1;
+only_clust = 'off'; % Include only components that were part of the pre-clustering data in the grand ERP
+
+for k = 1:2:(nargin-2)
+    switch varargin{k}
+        case 'clusters'
+            cls = varargin{k+1};
+        case 'env_erp'
+            env_erp = varargin{k+1};
+        case 'only_clust'
+            only_clust = varargin{k+1};
+        case 'subclus'
+            subclus = varargin{k+1};
+        case 'baseline'
+            baseline = varargin{k+1};
+        case 'condition'
+            n = varargin{k+1};
+    end
+end
+
+sets = [];
+if strcmpi(env_erp,'all') % all sets in STUDY
+    sets = STUDY.setind(n,:);
+else % Only sets that contribute to the clusters
+    for k = 1:length(cls)
+        sets = [sets STUDY.setind(n,unique(STUDY.cluster(cls(k)).sets(1,:)))];
+    end
+    sets = unique(sets);
+end
+
+% Remove clusters from the grand ERP
+if exist('subclus') 
+    if ~isempty(subclus)
+        for k = 1: length(sets)
+            rel_set = find(STUDY.setind(n,:) == sets(k)); %set index relative to STUDY instead of absolute in ALLEEG
+            tmp = [];
+            for l = 1:length(subclus)
+                compind = find(STUDY.cluster(subclus(l)).sets(1,:) == rel_set );
+                tmp = [tmp STUDY.cluster(subclus(l)).comps(compind)];
+            end
+            subcomps{k} = tmp;
+        end
+    end
+end
+
+fprintf('\n' ); 
+len = length(sets);
+for k = 1:len
+    EEG = ALLEEG(sets(k));
+    if strcmpi(only_clust, 'on')
+        comps = STUDY.cluster(cls(1)).preclust.preclustcomps{(mod(sets(k),size(STUDY.setind,2)))}; % Only components that were used in the pre-clustering
+    else
+        comps = 1:size(EEG.icawinv,2);
+    end
+    if exist('subcomps')
+        if ~isempty(subcomps{k})
+            comps = setdiff(comps,subcomps{k});
+        end
+	end
+    fprintf(' .' ); 
+    [EEG_etc, tmp_erp] = std_erp(EEG, comps);
+    if ~isempty(EEG_etc)
+         EEG.etc = EEG_etc;
+    end
+    [EEG_etc, tmp_scalp] = std_topo(EEG, comps);
+    if ~isempty(EEG_etc)
+         EEG.etc = EEG_etc;
+    end 
+    tmp = 0;
+    tmp = (tmp_scalp.'*tmp_erp)/len;
+    if exist('baseline')
+       tmp = rmbase(tmp,EEG.pnts,baseline);
+   end
+   if k == 1
+        grandERP = tmp;
+    else
+        grandERP = grandERP + tmp;
+    end
+    ALLEEG(sets(k)) = EEG;
+end 
