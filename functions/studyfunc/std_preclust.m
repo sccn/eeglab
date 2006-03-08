@@ -128,6 +128,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2006/03/08 20:30:41  arno
+% rename func
+%
 % Revision 1.25  2006/03/07 22:35:14  arno
 % catch error when scanning for dipoles
 %
@@ -287,7 +290,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, components
         % remove previous clusters
         % ------------------------
         STUDY.cluster = [];
-        STUDY = checkstudy(STUDY, ALLEEG);
+        STUDY = std_checkset(STUDY, ALLEEG);
         
         % find dipoles of interest
         % ------------------------
