@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2006/03/08 20:29:26  arno
+% rename func
+%
 % Revision 1.10  2006/03/07 22:40:10  arno
 % floatwrite in double
 %
@@ -141,7 +144,7 @@ if isfield(EEG,'etc')
 
      end
  end
- 
+  
 % No ERP information found
 if isstr(EEG.data)
     TMP = eeg_checkset( EEG, 'loaddata' ); % load EEG.data and EEG.icaact
@@ -180,7 +183,7 @@ floatwrite(double([t X']), fullfile( EEG.filepath, [ EEG.filename(1:end-3) 'icae
 EEG.etc.icaerp       = [ EEG.filename(1:end-3) 'icaerp'];
 EEG.etc.icaerpparams = length(t);
 try
-    EEg.saved = 'no';
+    EEG.saved = 'no';
     EEG = pop_saveset( EEG, 'savemode','resave');
 catch,
     error([ 'problem saving information into path ' EEG.filepath])
