@@ -1,12 +1,12 @@
 % std_editset() - modify an EEGLAB STUDY set structure.
 %
-% Usage: >> [STUDY, ALLEEG] = std_editset(STUDY, ALLEEG, key1, val1, ...);  
+% Usage: 
+%               >> [STUDY, ALLEEG] = std_editset(STUDY, ALLEEG, key1, val1, ...);  
+% Inputs:
+%   STUDY      - EEGLAB STUDY set
+%   ALLEEG     - vector of the EEG datasets included in the STUDY structure 
 %
-% Input:
-%   STUDY      - STUDY set
-%   ALLEEG     - EEGLAB vector of EEG datasets included in the STUDY structure 
-%
-% Optional input:
+% Optional inputs:
 %   'commands' - {cell_array} change STUDY (see command description and
 %                 example below.
 %   'name'     - [string] specify a (mnemonic) name for the STUDY structure. 
@@ -32,7 +32,7 @@
 %   'load'      - [filename] load dataset from specified filename 
 %   'dipselect' - [float<1] select components for clustering from all STUDY 
 %                 datasets with dipole model residual var. below this value. 
-% Output:
+% Outputs:
 %   STUDY      - a new STUDY set containing some or all of the datasets in ALLEEG, 
 %                plus additional information from the optional inputs above. 
 %   ALLEEG     - a vector of EEG datasets included in the STUDY structure 
@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2006/03/08 21:11:37  arno
+% rename func
+%
 % Revision 1.33  2006/03/08 21:08:10  arno
 % rename function
 %
