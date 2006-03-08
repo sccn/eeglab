@@ -33,9 +33,9 @@
 %      datasets = { 'visattS1', 'visattS2', 'visattS3', 'visattS4'};
 %      ALLEEG = load_alleeg(paths,datasets) ; 
 %                
-%  See also  pop_loadstudy, pop_createstudy, create_study          
+% See also: pop_loadstudy(), pop_study()
 %
-% Authors:  Hilit Serby, Arnaud Delorme, SCCN, INC, UCSD, October , 2004
+% Authors: Hilit Serby, Arnaud Delorme, SCCN, INC, UCSD, October , 2004
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
