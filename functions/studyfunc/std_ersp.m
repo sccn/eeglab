@@ -1,4 +1,4 @@
-% cls_ersp() - Computes ERSP and/or ITC information for ICA components of a dataset, 
+% std_ersp() - Computes ERSP and/or ITC information for ICA components of a dataset, 
 %              saves results into float files and and places pointers to the files 
 %              in the dataset EEG structures. When the ERSP/ITC float files already exist, 
 %              the function loads the ERSP/ITC information from it, unless the requested 
@@ -78,7 +78,7 @@
 %                                                    [1:size(EEG.icawinv,2)],...
 %                                                     [3 50], [3 0.5], 4, 0.01, 'ersp');
 %
-%  See also: timef(), cls_itc(), cls_erp(), cls_spec(), cls_scalp(), eeg_preclust(), 
+%  See also: timef(), std_itc(), std_erp(), std_spec(), std_scalp(), eeg_preclust(), 
 %            eeg_createdata()
 %
 % Authors:  Hilit Serby, Arnaud Delorme, SCCN, INC, UCSD, January, 2005
@@ -102,6 +102,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2006/03/08 03:02:27  scott
+% expand powbase to a matrix -sm
+%
 % Revision 1.13  2006/03/08 02:58:08  scott
 % debug3
 %
@@ -156,9 +159,14 @@ else
    comps = comp;
 end
 
-if ~exist('powbase') | isempty(powbase) | isnan(powbase)
-  powbase = NaN;  % default for timef()
+if exist('powbase') 
+ if isempty(powbase) | isnan(powbase)
+  powbase = NaN*ones(length(comps),1);  % default for timef()
+ end
+else
+  powbase = NaN*ones(length(comps),1);  % default for timef()
 end
+
 if size(powbase,1) ~= length(comps)
    error('powbase should be of size (ncomps,nfreqs)');
 end
@@ -199,11 +207,13 @@ if time_range(1) >= time_range(2)
 end
 
 for k = 1:length(comps)  % for each (specified) component
+
     % Compute ERSP & ITC
     % [ersp,itc,powbase,times,freqs,erspboot,itcboot] = timef( TMP.icaact(comps(k), :) , ...
     %       EEG.pnts, [EEG.xmin EEG.xmax]*1000, EEG.srate, cycles ,'type', ...
     %          'phasecoher',  'plotersp', 'off', 'plotitc', 'off', 'powbase', powbase, ...
     %             'alpha',alpha,'padratio',padratio, 'plotphase','off','winsize',winsize);
+
     [ersp,itc,powbase,times,freqs,erspboot,itcboot] = timef( TMP.icaact(comps(k), :) , ...
           EEG.pnts, [EEG.xmin EEG.xmax]*1000, EEG.srate, cycles ,'type', ...
              'phasecoher',  'plotersp', 'off', 'plotitc', 'off', 'powbase', powbase(k,:), ...
