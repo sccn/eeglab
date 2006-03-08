@@ -1,6 +1,6 @@
-% editstudy() - modify an EEGLAB STUDY set structure.
+% std_editset() - modify an EEGLAB STUDY set structure.
 %
-% Usage: >> [STUDY, ALLEEG] = editstudy(STUDY, ALLEEG, key1, val1, ...);  
+% Usage: >> [STUDY, ALLEEG] = std_editset(STUDY, ALLEEG, key1, val1, ...);  
 %
 % Input:
 %   STUDY      - STUDY set
@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2006/03/03 00:20:36  arno
+% changing defaults
+%
 % Revision 1.31  2006/03/03 00:03:26  arno
 % use load_alleeg
 %
@@ -128,10 +131,10 @@
 % do not modify dat fields if they have not changed
 %
 
-function [STUDY, ALLEEG] = editstudy(STUDY, ALLEEG, varargin) 
+function [STUDY, ALLEEG] = std_editset(STUDY, ALLEEG, varargin) 
 
 if (nargin < 3)
-    help editstudy;
+    help std_editset;
     return;
 end;
 
@@ -146,7 +149,7 @@ g = finputcheck(varargin, { 'updatedat' 'string'  { 'on' 'off' }  'off';
                             'resave'    'string'  { 'on' 'off' 'info' }  'off';
                             'savedat'   'string'  { 'on' 'off' }  'off';
                             'rmclust'   'string'  { 'on' 'off' }  'on';
-                            'commands'  'cell'    {}              {} }, 'editstudy');
+                            'commands'  'cell'    {}              {} }, 'std_editset');
 if isstr(g), error(g); end;
 
 if ~isempty(g.name),  STUDY.name  = g.name; end
@@ -205,7 +208,7 @@ for k = 1:2:length(g.commands)
             ALLEEG = eeg_store(ALLEEG, eeg_empty, g.commands{k+1});
         case 'return', return;
         case 'dipselect'
-            STUDY = checkstudy(STUDY, ALLEEG); % update setind field
+            STUDY = std_checkset(STUDY, ALLEEG); % update setind field
             rv = g.commands{k+1};
             
             for si = 1:size(STUDY.setind,2)% scan datasets that are part of STUDY
@@ -242,7 +245,7 @@ for k = 1:2:length(g.commands)
                 end;
             end;
             STUDY.cluster = [];
-            STUDY = checkstudy(STUDY, ALLEEG); % recreate parent dataset
+            STUDY = std_checkset(STUDY, ALLEEG); % recreate parent dataset
             
         case 'load'
             TMPEEG = load_alleeg( { g.commands{k+1} } );
@@ -310,7 +313,7 @@ end;
 
 % save study if necessary
 % -----------------------
-[STUDY ALLEEG] = checkstudy(STUDY, ALLEEG);
+[STUDY ALLEEG] = std_checkset(STUDY, ALLEEG);
 if ~isempty(g.filename),
     [STUDY.filepath STUDY.filename ext] = fileparts(fullfile( g.filepath, g.filename ));
     STUDY.filename = [ STUDY.filename ext ];
