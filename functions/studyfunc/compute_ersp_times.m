@@ -2,7 +2,7 @@
 %        which depends on requested ERSP/ITC parameters such as epoch limits, 
 %        frequency range, wavelet parameters, sampling rate and frequency 
 %        resolution that are used by timef(). 
-%        This helper function is called by pop_preclust() & cls_ersp(). 
+%        This helper function is called by pop_preclust() & std_ersp(). 
 
 function [time_range, winsize] = compute_ERSP_times(cycles, srate, epoch_lim, lowfreq, padratio) 
 
