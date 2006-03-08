@@ -1,8 +1,9 @@
-%  std_createclust()  - Commandline function, to create a new empty cluster.
-%                            After the empty cluster is created, components can be
-%                            reassigned to it using the commandline std_movecomp().
+%  std_createclust()  - Commandline function to create a new empty cluster.
+%                       After the empty cluster is created, components can be
+%                       reassigned to it using the commandline function
+%                       std_movecomp().
 % Usage:
-%                   >> [STUDY] = std_createclust(STUDY, ALLEEG, name);
+%                    >> [STUDY] = std_createclust(STUDY, ALLEEG, name);
 % Inputs:
 %   STUDY         - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
 %   ALLEEG        - global EEGLAB vector of EEG structures for the dataset(s) included in the STUDY.
@@ -11,14 +12,13 @@
 %   name          - a name string for the new cluster. {default: 'Cls #', where '#' is
 %                     the next available cluster number}.
 % Outputs:
-%   STUDY    - the input STUDY set structure modified with the new cluster.
+%   STUDY         - the input STUDY set structure modified with the new cluster.
 %
-%   Example:
-%                           >> name = 'eye_movements';
-%                         >> [STUDY] = std_createclust(STUDY, ALLEEG, name);
-%                    A new cluster is created named 'Ceye_movements'.
+%   Example:       % Create a new cluster named 'eye_movements'.
+%                    >> name = 'eye_movements';
+%                    >> [STUDY] = std_createclust(STUDY, ALLEEG, name);
 %
-%  See also  pop_clustedit, std_movecomp
+%  See also  pop_clustedit(), std_movecomp()
 %
 % Authors:  Hilit Serby, Arnaud Delorme, Scott Makeig, SCCN, INC, UCSD, June, 2005
 
