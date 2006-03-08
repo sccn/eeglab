@@ -591,11 +591,12 @@ else
             if ~isempty(rename_param) %if not canceled
                 new_name = rename_param{1};
                 STUDY = std_renameclust(STUDY, ALLEEG, cls(clus_num), new_name);
-                new_name = STUDY.cluster(cls(clus_num)).name;
+                new_name = [ STUDY.cluster(cls(clus_num)).name ' (' num2str(length(STUDY.cluster(cls(clus_num)).comps))  ' ICs)'];
                 % update Study history
                 a = ['STUDY = std_renameclust(STUDY, ALLEEG, ' num2str(cls(clus_num)) ', ' new_name ');'];
                 STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
-                clus_name_list{clus_num+1} = [new_name ' (' num2str(length(STUDY.cluster(cls(clus_num)).comps))  ' ICs)'];
+                
+                clus_name_list{clus_num+1} = renameclust( clus_name_list{clus_num+1}, newname);
                 set(findobj('parent', hdl, 'tag', 'clus_list'), 'String', clus_name_list);
                 set(findobj('parent', hdl, 'tag', 'clus_rename'), 'String', '');
                 userdat{1}{2} = STUDY;
@@ -639,10 +640,15 @@ else
                 % update Study history
                 a = ['STUDY = std_movecomp(STUDY, ALLEEG, ' num2str(cls(old_clus)) ', ' num2str(optionalcls(new_clus)) ', [' num2str(comp_ind - 1) ']);'];
                 STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);
-                clus_name_list = get(findobj('parent', hdl, 'tag', 'clus_list'), 'String');
                 newind = find(cls == optionalcls(new_clus));
-                clus_name_list{newind+1} = [STUDY.cluster(optionalcls(new_clus)).name ' (' num2str(length(STUDY.cluster(optionalcls(new_clus)).comps))  ' ICs)'];
-                clus_name_list{old_clus+1} = [STUDY.cluster(cls(old_clus)).name ' (' num2str(length(STUDY.cluster(cls(old_clus)).comps))  ' ICs)'];
+                
+                % update GUI
+                % ----------
+                clus_name_list = get(findobj('parent', hdl, 'tag', 'clus_list'), 'String');     
+                newname = [STUDY.cluster(optionalcls(new_clus)).name ' (' num2str(length(STUDY.cluster(optionalcls(new_clus)).comps))  ' ICs)'];
+                clus_name_list{newind+1} = renameclust( clus_name_list{newind+1}, newname);
+                newname = [STUDY.cluster(cls(old_clus)).name ' (' num2str(length(STUDY.cluster(cls(old_clus)).comps))  ' ICs)'];
+                clus_name_list{old_clus+1} = renameclust( clus_name_list{old_clus+1}, newname);
                 set(findobj('parent', hdl, 'tag', 'clus_list'), 'String', clus_name_list);
                 userdat{1}{2} = STUDY;
                 set(hdl, 'userdat',userdat); 
@@ -682,7 +688,8 @@ else
                 outlier_clust = std_findoutlierclust(STUDY,cls(old_clus)); %find the outlier cluster for this cluster
                 oind = find(cls == outlier_clust); % the outlier clust index (if already exist) in the cluster list GUI
                 if ~isempty(oind) % the outlier clust is already presented in the cluster list GUI
-                    clus_name_list{oind+1} = [STUDY.cluster(outlier_clust).name ' (' num2str(length(STUDY.cluster(outlier_clust).comps))  ' ICs)'];
+                    newname = [STUDY.cluster(outlier_clust).name ' (' num2str(length(STUDY.cluster(outlier_clust).comps))  ' ICs)'];
+                    clus_name_list{oind+1} = renameclust( clus_name_list{oind+1}, newname);
                 elseif outlier_clust == length(STUDY.cluster) % update the list with the Outlier cluster (if didn't exist before)
                     clus_name_list{end+1} = [STUDY.cluster(outlier_clust).name ' (' num2str(length(STUDY.cluster(outlier_clust).comps))  ' ICs)'];
                     userdat{2} = userdat{2} + 1; % update N, number of clusters in edit window 
@@ -738,7 +745,8 @@ else
                     outlier_clust = std_findoutlierclust(STUDY,clusters(k)); %find the outlier cluster for this cluster
                     oind = find(cls == outlier_clust); % the outlier clust index (if already exist) in the cluster list GUI
                     if ~isempty(oind) % the outlier clust is already presented in the cluster list GUI
-                        clus_name_list{oind+1} = [STUDY.cluster(outlier_clust).name ' (' num2str(length(STUDY.cluster(outlier_clust).comps))  ' ICs)'];
+                        newname = [STUDY.cluster(outlier_clust).name ' (' num2str(length(STUDY.cluster(outlier_clust).comps))  ' ICs)'];
+                        clus_name_list{oind+1} = renameclust( clus_name_list{oind+1}, newname);
                     else % update the list with the outlier cluster 
                         clus_name_list{end+1} = [STUDY.cluster(outlier_clust).name ' (' num2str(length(STUDY.cluster(outlier_clust).comps))  ' ICs)'];
                         userdat{2} = userdat{2} + 1; % update N, number of clusters in edit window 
@@ -746,7 +754,8 @@ else
                         userdat{1}{3} = cls;  % update cls, the cluster indices in edit window
                     end
                     clsind = find(cls == clusters(k));
-                    clus_name_list{clsind+1} = [STUDY.cluster(clusters(k)).name ' (' num2str(length(STUDY.cluster(clusters(k)).comps))  ' ICs)'];
+                    newname = [STUDY.cluster(clusters(k)).name ' (' num2str(length(STUDY.cluster(clusters(k)).comps))  ' ICs)'];
+                    clus_name_list{clsind+1} = renameclust( clus_name_list{clsind+1}, newname);
                     set(findobj('parent', hdl, 'tag', 'clus_list'), 'String', clus_name_list);
                 end
                 % If outlier cluster doesn't exist in the GUI window add it 
@@ -859,3 +868,12 @@ else
               end
     end
 end
+
+function newname = renameclust(oldname, newname);
+    
+    tmpname = deblank(oldname(end:-1:1));
+    strpos  = strfind(oldname, tmpname(end:-1:1));
+    
+    newname = [ oldname(1:strpos-1) newname ];
+
+    
