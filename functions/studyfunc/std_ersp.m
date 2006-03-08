@@ -102,6 +102,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2006/03/08 02:54:41  scott
+% debug 2
+%
 % Revision 1.11  2006/03/08 02:38:14  scott
 % debug
 %
@@ -203,7 +206,6 @@ for k = 1:length(comps)  % for each (specified) component
     % Change frequency axis from linear scale to log scale (frequency values left in dB)
 
     [logfreqs,logersp] = logimagesc(times,freqs,ersp,'plot','off');  
-keyboard
     logeboot(1,:) = interp1(log(freqs),erspboot(1,:),logfreqs','linear');
     logeboot(2,:) = interp1(log(freqs),erspboot(2,:),logfreqs','linear');
     logbase = interp1(log(freqs),powbase,logfreqs','linear');
