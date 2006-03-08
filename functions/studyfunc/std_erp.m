@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2006/03/08 22:01:10  arno
+% do not recompute for plotting
+%
 % Revision 1.13  2006/03/08 21:52:44  arno
 % typo
 %
@@ -111,8 +114,6 @@ if isfield(EEG,'etc')
          d = EEG.etc.icaerpparams;
          t = floatread(fullfile(EEG.filepath, EEG.etc.icaerp), [d 1]);
          blind = max(find(t <= 0)); %the baseline index
-         
-         dsfsd
          
          if ~isempty(timerange)
              maxind = max(find(t <= timerange(end)));
