@@ -696,7 +696,8 @@ else
                     cls(end +1) = length(STUDY.cluster); % update the GUI clusters list with the outlier cluster
                     userdat{1}{3} = cls;  % update cls, the cluster indices in edit window
                 end
-                clus_name_list{old_clus+1} = [STUDY.cluster(cls(old_clus)).name ' (' num2str(length(STUDY.cluster(cls(old_clus)).comps))  ' ICs)'];
+                newname = [STUDY.cluster(cls(old_clus)).name ' (' num2str(length(STUDY.cluster(cls(old_clus)).comps))  ' ICs)'];
+                clus_name_list{old_clus+1} = renameclust(clus_name_list{old_clus+1}, newname);
                 set(findobj('parent', hdl, 'tag', 'clus_list'), 'String', clus_name_list);
                 % update Study history
                 a = ['STUDY = std_moveoutlier(STUDY, ALLEEG, ' num2str(cls(old_clus)) ', [' num2str(comp_ind - 1) ']);'];
