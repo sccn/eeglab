@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2006/03/08 22:04:47  arno
+% move return to the right place
+%
 % Revision 1.15  2006/03/08 22:01:45  arno
 % remve debug message
 %
@@ -117,9 +120,7 @@ if isfield(EEG,'etc')
          d = EEG.etc.icaerpparams;
          t = floatread(fullfile(EEG.filepath, EEG.etc.icaerp), [d 1]);
          blind = max(find(t <= 0)); %the baseline index
-         
-         dsddds
-         
+                  
          if ~isempty(timerange)
              maxind = max(find(t <= timerange(end)));
              minind = min(find(t >= timerange(1)));
