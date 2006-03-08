@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2006/03/08 21:52:44  arno
+% typo
+%
 % Revision 1.12  2006/03/08 21:51:25  arno
 % fix typo
 %
@@ -108,6 +111,9 @@ if isfield(EEG,'etc')
          d = EEG.etc.icaerpparams;
          t = floatread(fullfile(EEG.filepath, EEG.etc.icaerp), [d 1]);
          blind = max(find(t <= 0)); %the baseline index
+         
+         dsfsd
+         
          if ~isempty(timerange)
              maxind = max(find(t <= timerange(end)));
              minind = min(find(t >= timerange(1)));
@@ -130,20 +136,22 @@ if isfield(EEG,'etc')
 
          %save erp in file
          % ---------------
-         floatwrite(double([t X']), fullfile( EEG.filepath, [ EEG.filename(1:end-3) 'icaerp']));
-         
-         %update the info in the dataset
-         % -----------------------------
-         EEG.etc.icaerp       = [ EEG.filename(1:end-3) 'icaerp'];
-         EEG.etc.icaerpparams = length(t);
-         try
-             EEG.saved = 'no';
-             EEG = pop_saveset( EEG, 'savemode','resave');
-         catch,
-             error([ 'problem saving information into path ' EEG.filepath])
-         end
-         EEG_etc = EEG.etc;
-         return;
+         if minind ~= 1 | maxind ~= length(t)
+             floatwrite(double([t X']), fullfile( EEG.filepath, [ EEG.filename(1:end-3) 'icaerp']));
+             
+             %update the info in the dataset
+             % -----------------------------
+             EEG.etc.icaerp       = [ EEG.filename(1:end-3) 'icaerp'];
+             EEG.etc.icaerpparams = length(t);
+             try
+                 EEG.saved = 'no';
+                 EEG = pop_saveset( EEG, 'savemode','resave');
+             catch,
+                 error([ 'problem saving information into path ' EEG.filepath])
+             end
+             EEG_etc = EEG.etc;
+             return;
+         end;
 
      end
  end
