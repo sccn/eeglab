@@ -102,6 +102,12 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2006/03/07 23:03:47  scott
+% added optional posbase argument for timef(). NOTE: probability masking now
+% allowed and computed
+% but the masked version is not output by timef (I think - must clarify timef help)
+% and therefore not used here... -sm
+%
 % Revision 1.9  2006/03/07 19:18:44  arno
 % header
 %
@@ -191,6 +197,7 @@ for k = 1:length(comps)  % for each (specified) component
     % Change frequency axis from linear scale to log scale (frequency values left in dB)
 
     [logfreqs,logersp] = logimagesc(times,freqs,ersp,'plot','off');  
+keyboard
     logeboot(1,:) = interp1(log(freqs),erspboot(1,:),logfreqs','linear');
     logeboot(2,:) = interp1(log(freqs),erspboot(2,:),logfreqs','linear');
     logbase = interp1(log(freqs),powbase,logfreqs','linear');
