@@ -101,6 +101,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2006/03/08 22:50:40  arno
+% fix last change
+%
 % Revision 1.17  2006/03/08 22:49:10  arno
 % detect the presence of file or not
 %
@@ -232,12 +235,21 @@ for k = 1:length(comps)  % for each (specified) component
     % Change frequency axis from linear scale to log scale (frequency values left in dB)
 
     [logfreqs,logersp] = logimagesc(times,freqs,ersp,'plot','off');  
-    logeboot(1,:) = interp1(log(freqs),erspboot(1,:),logfreqs','linear');
-    logeboot(2,:) = interp1(log(freqs),erspboot(2,:),logfreqs','linear');
+    try
+        logeboot(1,:) = interp1(log(freqs),erspboot(1,:),logfreqs','linear');
+        logeboot(2,:) = interp1(log(freqs),erspboot(2,:),logfreqs','linear');
+    catch
+        logeboot = zeros(2, length(logfreqs));
+    end;
     logbase = interp1(log(freqs),powbase,logfreqs','linear');
 
     [logfreqs,logitc] = logimagesc(times,freqs,itc,'plot','off'); 
-    logiboot = interp1(log(freqs),itcboot(1,:),logfreqs','linear');
+    
+    try
+        logiboot = interp1(log(freqs),itcboot(1,:),logfreqs','linear');
+    catch
+        logiboot = zeros(1, length(logfreqs));
+    end;
 
     if k == 1 % create data matrices
         all_ersp = zeros(length(freqs),(length(times)+3)*length(comps));
