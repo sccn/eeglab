@@ -102,6 +102,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2006/03/08 02:38:14  scott
+% debug
+%
 % Revision 1.10  2006/03/07 23:03:47  scott
 % added optional posbase argument for timef(). NOTE: probability masking now
 % allowed and computed
@@ -187,12 +190,15 @@ if time_range(1) >= time_range(2)
 end
 
 for k = 1:length(comps)  % for each (specified) component
-
     % Compute ERSP & ITC
+    % [ersp,itc,powbase,times,freqs,erspboot,itcboot] = timef( TMP.icaact(comps(k), :) , ...
+    %       EEG.pnts, [EEG.xmin EEG.xmax]*1000, EEG.srate, cycles ,'type', ...
+    %          'phasecoher',  'plotersp', 'off', 'plotitc', 'off', 'powbase', powbase, ...
+    %             'alpha',alpha,'padratio',padratio, 'plotphase','off','winsize',winsize);
     [ersp,itc,powbase,times,freqs,erspboot,itcboot] = timef( TMP.icaact(comps(k), :) , ...
           EEG.pnts, [EEG.xmin EEG.xmax]*1000, EEG.srate, cycles ,'type', ...
              'phasecoher',  'plotersp', 'off', 'plotitc', 'off', 'powbase', powbase, ...
-                'alpha',alpha,'padratio',padratio, 'plotphase','off','winsize',winsize);
+                'padratio',padratio, 'plotphase','off','winsize',winsize);
    
     % Change frequency axis from linear scale to log scale (frequency values left in dB)
 
