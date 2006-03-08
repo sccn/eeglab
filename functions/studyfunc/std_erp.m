@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2006/03/08 21:51:25  arno
+% fix typo
+%
 % Revision 1.11  2006/03/08 20:29:26  arno
 % rename func
 %
@@ -134,7 +137,7 @@ if isfield(EEG,'etc')
          EEG.etc.icaerp       = [ EEG.filename(1:end-3) 'icaerp'];
          EEG.etc.icaerpparams = length(t);
          try
-             EEg.saved = 'no';
+             EEG.saved = 'no';
              EEG = pop_saveset( EEG, 'savemode','resave');
          catch,
              error([ 'problem saving information into path ' EEG.filepath])
