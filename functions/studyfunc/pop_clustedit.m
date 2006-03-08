@@ -80,7 +80,7 @@
 %                a separate subplot. If applied to components, displays the ERSP images of the
 %                specified cluster. For specific components displays components dipole (in blue) 
 %                plus the average cluster dipole (in Red) in separate figures. 
-%                Uses the command line functions std_plotdip() and std_plotcompdip().
+%                Uses the command line functions std_dipplot() and std_plotcompdip().
 %  "Plot spectra" - [button] Displays the cluster component spectra.   
 %                If applied to a cluster, displays component spectra plus the average cluster 
 %                spectrum in bold. For a specific cluster, displays the cluster component 
@@ -464,9 +464,9 @@ else
         case   'dipplot'  
             if (clus ~= 1 ) % specific cluster option
                 if ~isempty(STUDY.cluster(cls(clus-1)).comps)
-                    [STUDY] = std_plotdip(STUDY, ALLEEG, 'clusters', cls(clus-1), 'mode', 'apart');
+                    [STUDY] = std_dipplot(STUDY, ALLEEG, 'clusters', cls(clus-1), 'mode', 'apart');
                     % update Study history
-                    a = ['STUDY = std_plotdip(STUDY, ALLEEG, ''clusters'','  num2str(cls(clus-1)) ',''mode'',''apart'' );'  ];
+                    a = ['STUDY = std_dipplot(STUDY, ALLEEG, ''clusters'','  num2str(cls(clus-1)) ',''mode'',''apart'' );'  ];
                     STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
                 end
             else % all clusters
@@ -478,9 +478,9 @@ else
                         tmpcls = [ tmpcls cls(k)];
                     end
                 end
-                [STUDY] = std_plotdip(STUDY, ALLEEG, 'clusters', tmpcls, 'mode', 'joined');
+                [STUDY] = std_dipplot(STUDY, ALLEEG, 'clusters', tmpcls, 'mode', 'joined');
                 % update Study history
-                a = ['STUDY = std_plotdip(STUDY, ALLEEG, ''clusters'',[' num2str(tmpcls)  '],''mode'',''joined'' );'  ];
+                a = ['STUDY = std_dipplot(STUDY, ALLEEG, ''clusters'',[' num2str(tmpcls)  '],''mode'',''joined'' );'  ];
                 STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
             end
            userdat{1}{2} = STUDY;
