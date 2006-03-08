@@ -41,7 +41,7 @@
 %                         >> [STUDY] = std_plotclustspec(STUDY,ALLEEG, 'clusters', 2, 'mode', 'comps');
 %                    Plots cluster 2 components spectra along with the mean spectra in bold. 
 %
-%  See also  pop_clustedit, pop_preclust, eeg_createdata, std_plotcompspec         
+%  See also  pop_clustedit(), pop_preclust()
 %
 % Authors:  Hilit Serby, Arnaud Delorme, Scott Makeig, SCCN, INC, UCSD, June, 2005
 
@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2006/03/08 20:59:04  arno
+% rename func
+%
 % Revision 1.7  2006/03/08 20:19:31  arno
 % rename func
 %
