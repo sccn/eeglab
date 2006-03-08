@@ -1,4 +1,4 @@
-% std_plotclustspec() - Commandline function, to visualizing cluster/s components spectra. 
+% std_specplot() - Commandline function, to visualizing cluster/s components spectra. 
 %                   Either displays mean spectra of all requested clusters in the same figure, 
 %                   with spectra for different conditions (if any) plotted in different colors. 
 %                   Or displays spectra for each specified cluster in separate figures (per condition),  
@@ -9,7 +9,7 @@
 %                   pop_preclust() or the equivalent commandline functions eeg_createdata() 
 %                   and eeg_preclust(). A pop-function that calls this function is pop_clustedit().
 % Usage:    
-%                   >> [STUDY] = std_plotclustspec(STUDY, ALLEEG, key1, val1, key2, val2);  
+%                   >> [STUDY] = std_specplot(STUDY, ALLEEG, key1, val1, key2, val2);  
 % Inputs:
 %   STUDY      - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
 %   ALLEEG     - global EEGLAB vector of EEG structures for the dataset(s) included in the STUDY. 
@@ -38,10 +38,10 @@
 %                     already exists in the STUDY).  
 %
 %   Example:
-%                         >> [STUDY] = std_plotclustspec(STUDY,ALLEEG, 'clusters', 2, 'mode', 'comps');
+%                         >> [STUDY] = std_specplot(STUDY,ALLEEG, 'clusters', 2, 'mode', 'comps');
 %                    Plots cluster 2 components spectra along with the mean spectra in bold. 
 %
-%  See also  pop_clustedit, pop_preclust, eeg_createdata, std_plotcompspec         
+%  See also  pop_clustedit(), pop_preclust()
 %
 % Authors:  Hilit Serby, Arnaud Delorme, Scott Makeig, SCCN, INC, UCSD, June, 2005
 
@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2006/03/08 20:21:26  arno
+% rename func
+%
 % Revision 1.7  2006/03/07 18:45:19  arno
 % allow plotting parent cluster
 %
@@ -83,7 +86,7 @@
 % adding scaling etc...
 %
 
-function STUDY = std_plotclustspec(STUDY, ALLEEG,  varargin)
+function STUDY = std_specplot(STUDY, ALLEEG,  varargin)
 icadefs;
 % Set default values
 cls = []; % plot all clusters in STUDY
@@ -278,7 +281,7 @@ end % finished 'centroid' plot mode
 % Optional inputs:
 %   comps      - [numeric vector]  -> indices of the cluster components to plot.
 %                       'all'                       -> plot all the components in the cluster
-%                                                      (as in std_plotclustspec). {default: 'all'}.
+%                                                      (as in std_specplot). {default: 'all'}.
 %
 % Outputs:
 %   STUDY    - the input STUDY set structure modified with plotted cluster
@@ -288,9 +291,9 @@ end % finished 'centroid' plot mode
 %   Example:
 %                         >> cluster = 4; comps= 'all';  
 %                         >> [STUDY] = std_plotcompspec(STUDY,ALLEEG, cluster, comps);
-%                    Plots all components of cluster 4, calls std_plotclustspec() . 
+%                    Plots all components of cluster 4, calls std_specplot() . 
 %
-%  See also  pop_clustedit, pop_preclust, eeg_createdata, std_plotclustspec         
+%  See also  pop_clustedit, pop_preclust, eeg_createdata, std_specplot         
 %
 % Authors:  Hilit Serby, Arnaud Delorme, Scott Makeig, SCCN, INC, UCSD, June, 2005
 
@@ -323,7 +326,7 @@ if isempty(cls)
 end
 if nargin == 3 % no components indices were given
     % Default plot all components of the cluster
-    [STUDY] = std_plotclustspec(STUDY, ALLEEG, 'clusters', cls, 'mode', 'comps');
+    [STUDY] = std_specplot(STUDY, ALLEEG, 'clusters', cls, 'mode', 'comps');
     return
 else
     comp_ind = varargin{1}; 

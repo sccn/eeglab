@@ -1,4 +1,4 @@
-% std_plotclust() - Commandline function, to visualizing cluster/s measures. 
+% std_propplot() - Commandline function, to visualizing cluster/s measures. 
 %                   Displays either mean cluster/s ERSP/s, or all cluster/s component 
 %                   ERSPs with the mean cluster/s ERSP in one figure (per condition).
 %                   The ERSPs can be visualized only if component ERSPs     
@@ -7,7 +7,7 @@
 %                   pop_preclust() or the equivalent commandline functions eeg_createdata() 
 %                   and eeg_preclust(). A pop-function that calls this function is pop_clustedit().
 % Usage:    
-%                   >> [STUDY] = std_plotclust(STUDY, ALLEEG, clusters);  
+%                   >> [STUDY] = std_propplot(STUDY, ALLEEG, clusters);  
 % Inputs:
 %   STUDY      - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
 %   ALLEEG     - global EEGLAB vector of EEG structures for the dataset(s) included in the STUDY. 
@@ -23,7 +23,7 @@
 %                     already exists in the STUDY).  
 %
 %   Example:
-%                         >> [STUDY] = std_plotclust(STUDY,ALLEEG, 5);
+%                         >> [STUDY] = std_propplot(STUDY,ALLEEG, 5);
 %                    Plots the mean measures of cluster 5 on the same figure. 
 %
 %  See also  pop_clustedit() 
@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2006/03/08 20:56:31  arno
+% rename func
+%
 % Revision 1.5  2006/03/07 19:41:41  arno
 % warning text and message
 %
@@ -56,7 +59,7 @@
 % ploting
 %
 
-function STUDY = std_plotclust(STUDY, ALLEEG,  varargin)
+function STUDY = std_propplot(STUDY, ALLEEG,  varargin)
 icadefs;
 
 % Set default values
@@ -69,7 +72,7 @@ if length(varargin) > 0
     elseif isstr(varargin{2}) & strcmpi(varargin{2}, 'all')
         cls = 1:length(STUDY.cluster);
     else
-        error('std_plotclust: clusters input is either specific clusters (numeric vector) or keyword ''all''.');
+        error('std_propplot: clusters input is either specific clusters (numeric vector) or keyword ''all''.');
     end
 end
 

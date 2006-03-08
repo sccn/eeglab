@@ -85,7 +85,7 @@ for k = 1:length(STUDY.datasetinfo)
     STUDY.datasetinfo(k).index = k;
 end
 
-[STUDY ALLEEG] = checkstudy(STUDY, ALLEEG);
+[STUDY ALLEEG] = std_checkset(STUDY, ALLEEG);
 STUDY.saved = 'yes';
 
 com = sprintf('[STUDY ALLEEG] = pop_loadstudy(''filename'', ''%s'', ''filepath'', ''%s'');', STUDY.filename, STUDY.filepath);

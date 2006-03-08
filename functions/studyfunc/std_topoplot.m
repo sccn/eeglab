@@ -1,4 +1,4 @@
-% std_plotclustmap() - Commandline function, to visualizing cluster/s scalp maps. 
+% std_topoplot() - Commandline function, to visualizing cluster/s scalp maps. 
 %                   Displays either mean cluster/s scalp map/s, or all cluster/s components
 %                   scalp maps with the mean cluster/s scsalp map in one figure.
 %                   The scalp maps can be visualized only if component scalp maps     
@@ -7,7 +7,7 @@
 %                   pop_preclust() or the equivalent commandline functions eeg_createdata() 
 %                   and eeg_preclust(). A pop-function that calls this function is pop_clustedit().
 % Usage:    
-%                   >> [STUDY] = std_plotclustmap(STUDY, ALLEEG, key1, val1, key2, val2);  
+%                   >> [STUDY] = std_topoplot(STUDY, ALLEEG, key1, val1, key2, val2);  
 % Inputs:
 %   STUDY      - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
 %   ALLEEG     - global EEGLAB vector of EEG structures for the dataset(s) included in the STUDY. 
@@ -36,10 +36,10 @@
 %                     already exists in th STUDY).  
 %
 %   Example:
-%                         >> [STUDY] = std_plotclustmap(STUDY,ALLEEG, 'clusters', [1:20], 'mode', 'centroid');
+%                         >> [STUDY] = std_topoplot(STUDY,ALLEEG, 'clusters', [1:20], 'mode', 'centroid');
 %                    Plots the mean scalp maps of cluster 1 to 20 on the same figure. 
 %
-%  See also  pop_clustedit, pop_preclust, eeg_createdata, std_plotcompmap         
+%  See also  pop_clustedit(), pop_preclust()
 %
 % Authors:  Hilit Serby, Arnaud Delorme, Scott Makeig, SCCN, INC, UCSD, June, 2005
 
@@ -61,7 +61,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function STUDY = std_plotclustmap(STUDY, ALLEEG,  varargin)
+function STUDY = std_topoplot(STUDY, ALLEEG,  varargin)
 icadefs;
 
 % Set default values
@@ -81,7 +81,7 @@ for k = 3:2:nargin
                 if isstr(varargin{k-1}) & strcmpi(varargin{k-1}, 'all')
                     cls = 2:length(STUDY.cluster);
                 else
-                    error('std_plotclustmap: ''clusters'' input takes either specific clusters (numeric vector) or keyword ''all''.');
+                    error('std_topoplot: ''clusters'' input takes either specific clusters (numeric vector) or keyword ''all''.');
                 end
             end
         case 'comps'
@@ -235,7 +235,7 @@ end
 % Optional inputs:
 %   comps      - [numeric vector]  -> indices of the cluster components to plot.
 %                       'all'                       -> plot all the components in the cluster
-%                                                      (as in std_plotclustmap). {default: 'all'}.
+%                                                      (as in std_topoplot). {default: 'all'}.
 %
 % Outputs:
 %   STUDY    - the input STUDY set structure modified with plotted cluster scalp
@@ -247,7 +247,7 @@ end
 %                         >> [STUDY] = std_plotcompmap(STUDY,ALLEEG, cluster, comps);
 %                    Plots components 1, 7 & 10  scalp maps of cluster 4 on separate figures. 
 %
-%  See also  pop_clustedit, pop_preclust, eeg_createdata, std_plotclustmap         
+%  See also  pop_clustedit, pop_preclust, eeg_createdata, std_topoplot         
 %
 % Authors:  Hilit Serby, Arnaud Delorme, Scott Makeig, SCCN, INC, UCSD, June, 2005
 
@@ -280,7 +280,7 @@ if isempty(cls)
 end
 if nargin == 3 % no components indices were given
     % Default plot all components of the cluster
-    [STUDY] = std_plotclustmap(STUDY, ALLEEG, 'clusters', cls, 'mode', 'comps');
+    [STUDY] = std_topoplot(STUDY, ALLEEG, 'clusters', cls, 'mode', 'comps');
     return
 else
     comp_ind = varargin{1}; 

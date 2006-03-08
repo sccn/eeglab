@@ -1,6 +1,6 @@
-% checkstudy() - check STUDY set consistency
+% std_checkset() - check STUDY set consistency
 %
-% Usage: >> [STUDY, ALLEEG] = checkstudy(STUDY, ALLEEG);  
+% Usage: >> [STUDY, ALLEEG] = std_checkset(STUDY, ALLEEG);  
 %
 % Input:
 %   STUDY      - EEGLAB STUDY set
@@ -31,10 +31,10 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [STUDY, ALLEEG] = checkstudy(STUDY, ALLEEG);
+function [STUDY, ALLEEG] = std_checkset(STUDY, ALLEEG);
 
 if nargin < 2
-    help checkstudy;
+    help std_checkset;
     return;
 end;
     
@@ -174,6 +174,6 @@ end;
 % --------------------------------------
 if modif;
     STUDY.saved = 'no';
-    eegh('[STUDY, ALLEEG] = checkstudy(STUDYIN, ALLEEG);');
-    STUDY.history =  sprintf('%s\n%s',  STUDY.history, '[STUDY, ALLEEG] = checkstudy(STUDYIN, ALLEEG);');
+    eegh('[STUDY, ALLEEG] = std_checkset(STUDYIN, ALLEEG);');
+    STUDY.history =  sprintf('%s\n%s',  STUDY.history, '[STUDY, ALLEEG] = std_checkset(STUDYIN, ALLEEG);');
 end;

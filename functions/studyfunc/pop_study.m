@@ -64,6 +64,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.38  2006/03/06 22:33:34  arno
+% same
+%
 % Revision 1.37  2006/03/06 22:32:04  arno
 % adding history to study
 %
@@ -104,7 +107,7 @@
 % fix component selection
 %
 % Revision 1.24  2006/02/23 00:06:20  arno
-% call to editstudy
+% call to std_editset
 %
 % Revision 1.23  2006/02/23 00:04:54  arno
 % nothing
@@ -186,7 +189,7 @@ else
 end;
 
 if strcmpi(mode, 'script') % script mode
-    [STUDY ALLEEG] = editstudy(STUDY, ALLEEG, varargin{:});
+    [STUDY ALLEEG] = std_editset(STUDY, ALLEEG, varargin{:});
     return;
 elseif strcmpi(mode, 'gui') % GUI mode
     % show warning if necessary
@@ -389,10 +392,10 @@ elseif strcmpi(mode, 'gui') % GUI mode
     
     % run command and create history
     % ------------------------------
-    com = sprintf( '[STUDY ALLEEG] = editstudy( STUDY, ALLEEG, %s );', vararg2str(options) );
+    com = sprintf( '[STUDY ALLEEG] = std_editset( STUDY, ALLEEG, %s );', vararg2str(options) );
     if ~isfield(STUDY, 'history'), STUDY.history = ''; end;
     STUDY.history = sprintf('%s\n%s', STUDY.history, com);
-    [STUDY ALLEEG] = editstudy(STUDY, ALLEEG, options{:});
+    [STUDY ALLEEG] = std_editset(STUDY, ALLEEG, options{:});
     
 else % internal command
     
@@ -471,7 +474,7 @@ else % internal command
                              'pop_study():  Pre-select components', 1, { '15' } );
             
             if isempty(res), return; end;
-            STUDY = editstudy(STUDY, ALLEEG, 'commands', { 'dipselect' str2num(res{1})/100 'return' });
+            STUDY = std_editset(STUDY, ALLEEG, 'commands', { 'dipselect' str2num(res{1})/100 'return' });
             allcom = { allcom{:} { 'dipselect' str2num(res{1})/100 } };
             datasetinfo   = STUDY.datasetinfo;
             

@@ -1,18 +1,18 @@
-% cls_readspec() - Given the ALLEEG structure, a specific EEG dataset index, 
+% std_readspec() - Given the ALLEEG structure, a specific EEG dataset index, 
 % and a specific component, the function returns the spectrum of that ICA component. 
 % The spectrum of the dataset ICA components is assumed to be saved in a float 
 % file, the EEG dataset include a pointer to this file. If such a float file doesn't exist,
-% you can use the cls_spec() function to create it, or use the pre - clustering functions
+% you can use the std_spec() function to create it, or use the pre - clustering functions
 % that call it: pop_preclust, eeg_preclust & eeg_createdata.  
 % Along with the spectrum of the selected ICA component the function returns  
 % the frequencies vector of the spectrum. 
 %
 % Usage:    
-%   >> [spec, f] = cls_readspec(ALLEEG, abset, comp);  
+%   >> [spec, f] = std_readspec(ALLEEG, abset, comp);  
 %   This functions returns the spectrum of an ICA component. 
 %   The information is loaded from a float file, which a pointer 
 %   to is saved in the EEG dataset. The float file was created by the 
-%   pre - clustering function cls_spec, in a specific frequency range. 
+%   pre - clustering function std_spec, in a specific frequency range. 
 %
 % Inputs:
 %   ALLEEG     - an EEGLAB data structure, which holds EEG sets (can also be one EEG set). 
@@ -27,7 +27,7 @@
 %                    selected dataset. 
 %   f             - a vector of the frequency points in which the spectra was computed. 
 %
-%  See also  cls_spec, pop_preclust, eeg_preclust, eeg_createdata           
+%  See also  std_spec, pop_preclust, eeg_preclust, eeg_createdata           
 %
 % Authors:  Hilit Serby, SCCN, INC, UCSD, February, 2005
 
@@ -50,8 +50,11 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2006/03/07 22:21:12  arno
+% use fullfile
+%
 
-function [spec, f] = cls_readspec(ALLEEG, abset, comp);
+function [spec, f] = std_readspec(ALLEEG, abset, comp);
 
 spec = [];
 if iscell(ALLEEG(abset).etc.icaspecmparams)
@@ -63,6 +66,6 @@ try
     f    = floatread( fullfile( ALLEEG(abset).filepath, [ ALLEEG(abset).etc.icaspec 'm']), [d 1],[],0);
     spec = floatread( fullfile( ALLEEG(abset).filepath, [ ALLEEG(abset).etc.icaspec 'm']), [d 1],[],d*(comp));
 catch
-    warndlg2(['cls_readspec: file '  ALLEEG(abset).etc.icaspec 'm was not found in path ' ALLEEG(abset).filepath], 'Abort - computing spectra centroid' ); 
+    warndlg2(['std_readspec: file '  ALLEEG(abset).etc.icaspec 'm was not found in path ' ALLEEG(abset).filepath], 'Abort - computing spectra centroid' ); 
     return;
 end

@@ -38,7 +38,7 @@
 %                     already exists in the STUDY).  
 %
 %   Example:
-%                         >> [STUDY] = std_plotclustspec(STUDY,ALLEEG, 'clusters', 2, 'mode', 'comps');
+%                         >> [STUDY] = std_erpplot(STUDY,ALLEEG, 'clusters', 2, 'mode', 'comps');
 %                    Plots cluster 2 components spectra along with the mean spectra in bold. 
 %
 %  See also  pop_clustedit(), pop_preclust()
@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2006/03/08 20:59:23  arno
+% rename func
+%
 % Revision 1.8  2006/03/08 20:59:04  arno
 % rename func
 %
@@ -102,7 +105,7 @@ for k = 3:2:nargin
                 if isstr(varargin{k-1}) & strcmpi(varargin{k-1}, 'all')
                     cls = 2:length(STUDY.cluster);
                 else
-                    error('std_plotclustersp: ''clusters'' input takes either specific clusters (numeric vector) or keyword ''all''.');
+                    error('std_erpplot: ''clusters'' input takes either specific clusters (numeric vector) or keyword ''all''.');
                 end
             end
         case 'comps'

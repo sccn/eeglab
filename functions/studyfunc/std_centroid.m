@@ -1,11 +1,11 @@
-% cls_centroid() - compute clusters centroid in EEGLAB dataset STUDY.
+% std_centroid() - compute clusters centroid in EEGLAB dataset STUDY.
 %                          Compute and store the averege (centroid) for
 %                          specific clusters or for all clusters in STUDY.
 %                          You can compute one or some of the 6 optional
 %                          avereges: Scalp map, ERP, Spectra, ERSP , ITC, dipole. 
 %
 % Usage:    
-%   >> [STUDY, centroid] = cls_centroid(STUDY, ALLEEG, clsind, ctr1, ctr2, ...);
+%   >> [STUDY, centroid] = std_centroid(STUDY, ALLEEG, clsind, ctr1, ctr2, ...);
 %
 % Inputs:
 %   STUDY        - an eeglab STUDY set (that contains some of these EEGs structures)
@@ -29,13 +29,13 @@
 %   centroid     - a cell array of centroid structures, each cell corraspond to a different cluster requested in clsind.
 %
 % Examples:
-%   >> [STUDY, centroid] = cls_centroid(STUDY, ALLEEG,[], 'scalp'); 
+%   >> [STUDY, centroid] = std_centroid(STUDY, ALLEEG,[], 'scalp'); 
 %   % For each of the clusters in STUDY an average scalp map is computed. 
 %   % The centroids are saved in the STUDY structure under
 %   % STUDY.cluster(k).centroid.scalp. The centroids are also returned in a
 %   % cell array the size of the clusters (stored in: centroid(k).scalp).
 %
-%   >> [STUDY, centroid] = cls_centroid(STUDY, ALLEEG,5,'spec','scalp'); 
+%   >> [STUDY, centroid] = std_centroid(STUDY, ALLEEG,5,'spec','scalp'); 
 %   % Same as before but now compute the centroid of cluster 5 only. The centroid has 2 fields one for 
 %   % spectrum the other for scalp map.
 %
@@ -62,14 +62,17 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2006/02/16 21:33:50  arno
+% do not jump line for scalp centroid
+%
 % Revision 1.4  2006/02/15 22:12:42  arno
 % revision
 %
 
-function [STUDY, centroid] = cls_centroid(STUDY,ALLEEG, clsind, varargin);
+function [STUDY, centroid] = std_centroid(STUDY,ALLEEG, clsind, varargin);
 
  if nargin < 3
-     help cls_centroid;
+     help std_centroid;
      return
  end
  
@@ -174,14 +177,14 @@ if itcC | erspC | specC | erpC | scalpC
                 for k = 1:length(compind) % go through all components
                     comp = STUDY.cluster(clsind(clust)).comps(compind(k));
                     if scalpC & cond == 1  %scalp centroid, does not depend on condition 
-                        grid = cls_readscalp(ALLEEG, abset, comp);
+                        grid = std_readtopo(ALLEEG, abset, comp);
                         if isempty(grid)
                             return;
                         end
                         centroid{clust}.scalp = centroid{clust}.scalp + grid;
                     end
                     if erpC %erp centroid
-                        [erp, t] = cls_readerp(ALLEEG, abset, comp);
+                        [erp, t] = std_readerp(ALLEEG, abset, comp);
                         fprintf('.');
                         if isempty(erp)
                             return;
@@ -197,7 +200,7 @@ if itcC | erspC | specC | erpC | scalpC
                         end
                     end
                     if specC %spec centroid
-                        [spec, f] = cls_readspec(ALLEEG, abset, comp);
+                        [spec, f] = std_readspec(ALLEEG, abset, comp);
                         fprintf('.');
                         if isempty(spec)
                             return;
@@ -209,7 +212,7 @@ if itcC | erspC | specC | erpC | scalpC
                         fprintf('.');
                         if cond == 1
                             abset = [STUDY.datasetinfo(STUDY.setind(:,ind)).index];
-                            [ersp, logfreqs] = cls_readersp(ALLEEG, abset, comp);
+                            [ersp, logfreqs] = std_readersp(ALLEEG, abset, comp);
                             if isempty(ersp)
                                 return;
                             end
@@ -223,7 +226,7 @@ if itcC | erspC | specC | erpC | scalpC
                     end
                     if itcC %itc centroid
                         fprintf('.');
-                        [itc, logfreqs] = cls_readitc(ALLEEG, abset, comp);
+                        [itc, logfreqs] = std_readitc(ALLEEG, abset, comp);
                         if isempty(itc)
                             return;
                         end

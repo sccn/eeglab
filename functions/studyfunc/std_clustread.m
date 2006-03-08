@@ -1,9 +1,8 @@
 % std_clustread() - load a requested measure (i.e. ['erp'|'spec'|'ersp'|'itc'|...
 %        'dipole'|'scalp']), for all the components of a specified cluster.  
 %        Used mostly by cluster plotting functions. 
-%        This helper function is called by std_envtopo(), std_plotclusterp(),
-%        std_plotclustersp(), std_plotclustitc(), std_plotclustmap(), 
-%        std_plotclustspec(), & std_ERPdiff(). 
+%        This helper function is called by std_envtopo(), std_erpplot(),
+%        std_erspplot(), ...
 
 function clusinfo = std_clustread(STUDY,ALLEEG, cluster, infotype, cond);
 
