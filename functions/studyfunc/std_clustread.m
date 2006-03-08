@@ -80,11 +80,11 @@ for k = 1:len
             end
             clusinfo(k) = ALLEEG(abset).dipfit.model(comp);            
             
-        case 'scalp'
+        case { 'scalp' 'topo' }
             if ~isfield(ALLEEG(abset).etc,'icascalpparams')
                 error([ 'Dataset ' num2str(abset) ' has no topoplot image information']);   
             end
-            [grid, yi, xi] = std_readscalp(ALLEEG, abset, comp); 
+            [grid, yi, xi] = std_readtopo(ALLEEG, abset, comp); 
             clusinfo.grid{k} = grid;
             clusinfo.yi{k} = yi;
             clusinfo.xi{k} = xi;
