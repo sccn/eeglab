@@ -1,7 +1,7 @@
-%  cls_movecomp()  - Commandline function, to move component(s) from one cluster to another. 
+%  std_movecomp()  - Commandline function, to move component(s) from one cluster to another. 
 %                            Reassign specified components of one cluster to another cluster. 
 % Usage:    
-%                   >> [STUDY] = cls_movecomp(STUDY, ALLEEG, from_cluster, to_cluster, comps);   
+%                   >> [STUDY] = std_movecomp(STUDY, ALLEEG, from_cluster, to_cluster, comps);   
 % Inputs:
 %   STUDY         - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
 %   ALLEEG        - global EEGLAB vector of EEG structures for the dataset(s) included in the STUDY. 
@@ -15,7 +15,7 @@
 %
 %   Example:
 %                         >> from_cluster = 10; to_cluster = 7; comps = [2 7];   
-%                         >> [STUDY] = cls_movecomp(STUDY,ALLEEG, from_cluster, to_cluster, comps);
+%                         >> [STUDY] = std_movecomp(STUDY,ALLEEG, from_cluster, to_cluster, comps);
 %                    Components 2 and 7 of cluster 10 are moved to cluster 7. 
 %
 %  See also  pop_clustedit         
@@ -40,7 +40,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function STUDY = cls_movecomp(STUDY, ALLEEG, old_clus, new_clus, comps)
+function STUDY = std_movecomp(STUDY, ALLEEG, old_clus, new_clus, comps)
 icadefs;
 
 % Cannot move components if clusters have children clusters
@@ -104,7 +104,7 @@ for  ci = 1:length(comps)
         STUDY.cluster(new_clus).preclust.preclustdata(sind,:) = STUDY.cluster(new_clus).preclust.preclustdata(:,:);
     end;
 end
-STUDY = cls_centroid(STUDY, ALLEEG, new_clus);%new centroid
+STUDY = std_centroid(STUDY, ALLEEG, new_clus);%new centroid
 % Remove data from old cluster
 % left_comps - are all the components of the cluster after the
 % components that were moved to the new cluster were removed. 
@@ -113,6 +113,6 @@ STUDY.cluster(old_clus).comps = STUDY.cluster(old_clus).comps(left_comps);
 STUDY.cluster(old_clus).sets = STUDY.cluster(old_clus).sets(:,left_comps);
 if ~isempty(STUDY.cluster(old_clus).preclust.preclustdata)
     STUDY.cluster(old_clus).preclust.preclustdata = STUDY.cluster(old_clus).preclust.preclustdata(left_comps,:);
-    STUDY = cls_centroid(STUDY, ALLEEG, old_clus);%new centroid
+    STUDY = std_centroid(STUDY, ALLEEG, old_clus);%new centroid
 end;
 disp('Done.');

@@ -1,7 +1,7 @@
-%  cls_moveoutlier()  - Commandline function, to reassign specified outlier component(s) 
+%  std_moveoutlier()  - Commandline function, to reassign specified outlier component(s) 
 %                            from a cluster to its outlier cluster. 
 % Usage:    
-%                   >> STUDY = cls_moveoutlier(STUDY, ALLEEG, from_cluster, comps);   
+%                   >> STUDY = std_moveoutlier(STUDY, ALLEEG, from_cluster, comps);   
 % Inputs:
 %   STUDY         - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
 %   ALLEEG        - global EEGLAB vector of EEG structures for the dataset(s) included in the STUDY. 
@@ -14,7 +14,7 @@
 %
 %   Example:
 %                         >> from_cluster = 10; comps = [2 7];   
-%                         >> STUDY = cls_movecomp(STUDY,ALLEEG, from_cluster, to_cluster, comps);
+%                         >> STUDY = std_movecomp(STUDY,ALLEEG, from_cluster, to_cluster, comps);
 %                    Components 2 and 7 of cluster 10 are moved to the its outlier cluster ('Outliers Cls 10'). 
 %
 %  See also  pop_clustedit         
@@ -39,12 +39,12 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function STUDY = cls_moveoutlier(STUDY, ALLEEG, old_clus, comps)
+function STUDY = std_moveoutlier(STUDY, ALLEEG, old_clus, comps)
 
 % Cannot move components if the cluster is either a 'Notclust' or
 % 'Outliers' cluster
 if strncmpi('Notclust',STUDY.cluster(old_clus).name,8) | strncmpi('Outliers',STUDY.cluster(old_clus).name,8)
-    warndlg2('cls_moveoutlier: cannot move components from Notclust or Outliers cluster');
+    warndlg2('std_moveoutlier: cannot move components from Notclust or Outliers cluster');
     return;
 end
 
@@ -54,11 +54,11 @@ if ~isempty(STUDY.cluster(old_clus).child)
     return;
 end
 
-outlier_clust = cls_findoutlierclust(STUDY,old_clus); %find the outlier cluster for this cluster
+outlier_clust = std_findoutlierclust(STUDY,old_clus); %find the outlier cluster for this cluster
 if outlier_clust == 0 %no such cluster exist
-    STUDY = cls_createclust(STUDY, ALLEEG, ['Outliers ' STUDY.cluster(old_clus).name]); %create an outlier cluster
+    STUDY = std_createclust(STUDY, ALLEEG, ['Outliers ' STUDY.cluster(old_clus).name]); %create an outlier cluster
     outlier_clust = length(STUDY.cluster);
 end
 
 %move the compnents to the outliers cluster
-STUDY = cls_movecomp(STUDY, ALLEEG, old_clus, outlier_clust, comps);   
+STUDY = std_movecomp(STUDY, ALLEEG, old_clus, outlier_clust, comps);   

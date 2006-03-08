@@ -1,6 +1,6 @@
-%  cls_mergeclust()  - Commandline function, to merge several clusters. 
+%  std_mergeclust()  - Commandline function, to merge several clusters. 
 % Usage:    
-%                   >> [STUDY] = cls_mergeclust(STUDY, ALLEEG, mrg_cls, name);   
+%                   >> [STUDY] = std_mergeclust(STUDY, ALLEEG, mrg_cls, name);   
 % Inputs:
 %   STUDY         - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
 %   ALLEEG        - global EEGLAB vector of EEG structures for the dataset(s) included in the STUDY. 
@@ -15,7 +15,7 @@
 %
 %   Example:
 %                         >> mrg_cls = [3 7 9]; name = 'eyes';  
-%                         >> [STUDY] = cls_mergecluster(STUDY,ALLEEG, mrg_cls, name);
+%                         >> [STUDY] = std_mergecluster(STUDY,ALLEEG, mrg_cls, name);
 %                    Merge clusters 3, 7 and 9 to a new cluster named 'eyes'. 
 %
 %  See also  pop_clustedit         
@@ -40,7 +40,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function STUDY = cls_mergeclust(STUDY, ALLEEG, mrg_cls, varargin)
+function STUDY = std_mergeclust(STUDY, ALLEEG, mrg_cls, varargin)
 
 if isempty(varargin) | strcmpi(varargin,'')
     name = 'Cls';
@@ -55,7 +55,7 @@ sets = [];
 for k = 1:length(mrg_cls)
     if strncmpi('Notclust',STUDY.cluster(mrg_cls(k)).name,8) | strncmpi('Outliers',STUDY.cluster(mrg_cls(k)).name,8) | ...
         ~isempty(STUDY.cluster(mrg_cls(k)).child)
-        warndlg2([ 'cls_mergeclust: cannot merge clusters if one of the clusters '...
+        warndlg2([ 'std_mergeclust: cannot merge clusters if one of the clusters '...
         'is a ''Notclust'' or ''Outliers'' cluster, or if it has children clusters.']);
     end
     parent{k} = STUDY.cluster(mrg_cls(k)).name;
@@ -76,7 +76,7 @@ for k = 1:length(diffsets)
 end
 
 % Create a new empty cluster
-[STUDY] = cls_createclust(STUDY, ALLEEG, name);  
+[STUDY] = std_createclust(STUDY, ALLEEG, name);  
 % Update merge cluster with parent clusters
 STUDY.cluster(end).parent = parent;
 STUDY.cluster(end).sets = sets; % Update merge cluster with merged component sets

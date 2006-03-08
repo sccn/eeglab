@@ -1,6 +1,6 @@
 % pop_preclust() - prepare STUDY components' location and activity measures for later clustering.
 %                  Collect information in an interactive pop-up query window. To pre-cluster
-%                  from the commandline, use cls_preclust(). After data entry into the pop window,
+%                  from the commandline, use std_preclust(). After data entry into the pop window,
 %                  Selected measures (one or more from options: ERP, dipole locations, spectra,
 %                  scalp maps, ERSP, and ITC) are computed for each dataset in the STUDY 
 %                  set, unless they already present. After all requested measures are computed 
@@ -12,7 +12,7 @@
 %                  variance lower than a defined threshold (see dipfit()), or components from 
 %                  an already existing cluster (for hierarchical clustering). The EEG datasets
 %                  in the ALLEEG structure are updated, and updated EEG sets are saved to disk.
-%                  Calls cls_preclust().
+%                  Calls std_preclust().
 % Usage:    
 %                >> [STUDY, ALLEEG] = pop_preclust(STUDY, ALLEEG); % pop up interactive window
 %                >> [STUDY, ALLEEG] = pop_preclust(STUDY, ALLEEG, clustind); % sub-cluster 
@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2006/03/04 00:40:06  arno
+% edit GUI
+%
 % Revision 1.32  2006/03/04 00:19:37  arno
 % fixing edit boxes
 %
@@ -73,7 +76,7 @@
 % second level pca
 %
 % Revision 1.25  2006/02/18 01:00:38  arno
-% eeg_preclust -> cls_preclust
+% eeg_preclust -> std_preclust
 %
 % Revision 1.24  2006/02/18 00:54:37  arno
 % changing default value for ERSP and spectrum so it matches the tutorial one
@@ -166,7 +169,7 @@ if ~isstr(varargin{1}) %intial settings
     set_ersp = ['pop_preclust(''setersp'',gcf);']; 
     set_itc = ['pop_preclust(''setitc'',gcf);']; 
     set_secpca = ['pop_preclust(''setsec'',gcf);']; 
-    help_clusteron = ['pophelp(''cls_helpselecton'');']; 
+    help_clusteron = ['pophelp(''std_helpselecton'');']; 
     help_ersp = ['pophelp(''pop_timef'')'];
     preclust_PCA = ['pop_preclust(''preclustOK'',gcf);'];           
     ersp_params = ['pop_preclust(''erspparams'',gcf);']; 
@@ -256,7 +259,7 @@ if ~isstr(varargin{1}) %intial settings
     %end;
     
 	[preclust_param, userdat2, strhalt, os] = inputgui( 'geometry', geometry, 'uilist', gui_spec, 'geomvert', geomvert, ...
-                                                      'helpcom', ' pophelp(''cls_preclust'')', ...
+                                                      'helpcom', ' pophelp(''std_preclust'')', ...
                                                       'title', 'Select and compute component measures for later clustering -- pop_preclust()', ...
                                                       'userdata', fig_arg);	
 	if isempty(preclust_param), return; end;
@@ -340,8 +343,8 @@ if ~isstr(varargin{1}) %intial settings
         warndlg2('No measure selected, abording operation.'); 
         return; 
     end;
-    [STUDY ALLEEG] = cls_preclust(options{:});
-    com = sprintf('%s\n[STUDY ALLEEG] = cls_preclust(STUDY, ALLEEG, %s);', ...
+    [STUDY ALLEEG] = std_preclust(options{:});
+    com = sprintf('%s\n[STUDY ALLEEG] = std_preclust(STUDY, ALLEEG, %s);', ...
                   STUDY.history, vararg2str(options(3:end)));
     
     % save updated STUDY to the disk
@@ -512,7 +515,7 @@ else
            set(findobj('parent', hdl,'userdata', 'dipoleP'), 'enable', fastif(~set_PCA & set_dipole,'on','off'));
            set(findobj('parent', hdl,'tag', 'chosen_component'), 'enable', fastif(~set_PCA,'on','off'));
            set(findobj('parent', hdl,'tag', 'dipole_rv'), 'enable', fastif(~set_PCA,'on','off'));
-           set(findobj('parent', hdl,'tag', 'compcls_str'), 'enable', fastif(~set_PCA,'on','off'));
+           set(findobj('parent', hdl,'tag', 'compstd_str'), 'enable', fastif(~set_PCA,'on','off'));
     end
 end
 STUDY.saved = 'no';

@@ -1,6 +1,6 @@
-%  cls_renameclust()  - Commandline function, to rename clusters using specified (mnemonic) names. 
+%  std_renameclust()  - Commandline function, to rename clusters using specified (mnemonic) names. 
 % Usage:    
-%                   >> [STUDY] = cls_renameclust(STUDY, ALLEEG, cluster, new_name);  
+%                   >> [STUDY] = std_renameclust(STUDY, ALLEEG, cluster, new_name);  
 % Inputs:
 %   STUDY      - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
 %   ALLEEG     - global EEGLAB vector of EEG structures for the dataset(s) included in the STUDY. 
@@ -13,7 +13,7 @@
 %
 %   Example:
 %                         >> cluster = 7; new_name = 'artifacts';  
-%                         >> [STUDY] = cls_renameclust(STUDY,ALLEEG, cluster, new_name);
+%                         >> [STUDY] = std_renameclust(STUDY,ALLEEG, cluster, new_name);
 %                    Cluster 7 name (i.e.: STUDY.cluster(7).name) will change to 'artifacts 7'. 
 %
 %  See also  pop_clustedit         
@@ -38,19 +38,19 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function STUDY = cls_renameclust(STUDY, ALLEEG, cls, new_name)
+function STUDY = std_renameclust(STUDY, ALLEEG, cls, new_name)
 
 if ~exist('cls')
-    error('cls_renameclust: you must provide a cluster number to rename.');
+    error('std_renameclust: you must provide a cluster number to rename.');
 end
 if isempty(cls)
-   error('cls_renameclust: you must provide a cluster number to rename.');
+   error('std_renameclust: you must provide a cluster number to rename.');
 end
 if ~exist('new_name')
-    error('cls_renameclust: you must provide a new cluster name.');
+    error('std_renameclust: you must provide a new cluster name.');
 end
 if strncmpi('Notclust',STUDY.cluster(cls).name,8)  % Don't rename Notclust 'clusters'
-    warndlg2('cls_renameclust: Notclust cannot be renamed');
+    warndlg2('std_renameclust: Notclust cannot be renamed');
     return;
 end
 
@@ -77,7 +77,7 @@ if ~isempty(STUDY.cluster(cls).parent)
     end
 end
 % If the cluster have an Outlier cluster, update the Outlier cluster name.  
-outlier_clust = cls_findoutlierclust(STUDY,cls); %find the outlier cluster for this cluster
+outlier_clust = std_findoutlierclust(STUDY,cls); %find the outlier cluster for this cluster
 if outlier_clust ~= 0
     ti = strfind(STUDY.cluster(outlier_clust).name, ' ');
     clus_id = STUDY.cluster(outlier_clust).name(ti(end) + 1:end);
