@@ -102,6 +102,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2006/03/08 02:58:08  scott
+% debug3
+%
 % Revision 1.12  2006/03/08 02:54:41  scott
 % debug 2
 %
@@ -156,6 +159,9 @@ end
 if ~exist('powbase') | isempty(powbase) | isnan(powbase)
   powbase = NaN;  % default for timef()
 end
+if size(powbase,1) ~= length(comps)
+   error('powbase should be of size (ncomps,nfreqs)');
+end
 
 % Check if ERSP information found in datasets and if fits requested parameters 
 if isfield(EEG,'etc')
@@ -200,7 +206,7 @@ for k = 1:length(comps)  % for each (specified) component
     %             'alpha',alpha,'padratio',padratio, 'plotphase','off','winsize',winsize);
     [ersp,itc,powbase,times,freqs,erspboot,itcboot] = timef( TMP.icaact(comps(k), :) , ...
           EEG.pnts, [EEG.xmin EEG.xmax]*1000, EEG.srate, cycles ,'type', ...
-             'phasecoher',  'plotersp', 'off', 'plotitc', 'off', 'powbase', powbase, ...
+             'phasecoher',  'plotersp', 'off', 'plotitc', 'off', 'powbase', powbase(k,:), ...
                 'padratio',padratio, 'plotphase','off','winsize',winsize);
    
     % Change frequency axis from linear scale to log scale (frequency values left in dB)
