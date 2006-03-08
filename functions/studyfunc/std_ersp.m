@@ -101,6 +101,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2006/03/08 20:29:08  arno
+% rename func
+%
 % Revision 1.15  2006/03/08 19:43:37  scott
 % fixed powbase definition -sm & ad
 %
@@ -175,17 +178,19 @@ end
 
 % Check if ERSP information found in datasets and if fits requested parameters 
 if isfield(EEG,'etc')
-     if isfield(EEG.etc, [ 'ica' type])
-         params = EEG.etc.icaerspparams;
-         if sum(params.cycles ~= cycles)                   ...
-                    | sum(params.freqrange ~= freqrange)   ...
-                           | (padratio ~= params.padratio) ...
-                                  | (alpha~= params.alpha) ...
-             % if not as requested parameters, recompute ERSP/ITC
-             % i.e., continue
-         else
-             return; % no need to compute ERSP
-         end
+     if isfield(EEG.etc, [ 'ica' type ])
+         if exist( fullfile(EEG.filepath, getfield(EEG.etc, [ 'ica' type ]))
+             params = EEG.etc.icaerspparams;
+             if sum(params.cycles ~= cycles)                   ...
+                     | sum(params.freqrange ~= freqrange)   ...
+                     | (padratio ~= params.padratio) ...
+                     | (alpha~= params.alpha) ...
+                 % if not as requested parameters, recompute ERSP/ITC
+                 % i.e., continue
+             else
+                 return; % no need to compute ERSP
+             end
+         end;
      end
  end
 
