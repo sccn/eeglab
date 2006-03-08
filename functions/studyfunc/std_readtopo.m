@@ -1,18 +1,18 @@
-% cls_readscalp() - Given the ALLEEG structure, a specific EEG dataset index, 
+% std_readtopo() - Given the ALLEEG structure, a specific EEG dataset index, 
 % and a specific component, the function returns the scalp map of that ICA component. 
 % The scalp map grid of the dataset ICA components is assumed to be saved in a float 
 % file, the EEG dataset include a pointer to this file. If such a float file doesn't exist,
-% you can use the cls_scalp() function to create it, or use the pre - clustering functions
+% you can use the std_scalp() function to create it, or use the pre - clustering functions
 % that call it: pop_preclust, eeg_preclust & eeg_createdata.  
 % Along with the scalp map grid of the selected ICA component the function returns  
 % the two axis grid points vectors (x and y). 
 %
 % Usage:    
-%   >> [grid, y, x ] = cls_readscalp(ALLEEG, abset, component);  
+%   >> [grid, y, x ] = std_readtopo(ALLEEG, abset, component);  
 %   This functions returns the ICA component scalp map grid. 
 %   The information is loaded from a float file, which a pointer 
 %   to is saved in the EEG dataset. The float file was created
-%   by the pre - clustering function cls_scalp. 
+%   by the pre - clustering function std_scalp. 
 %
 % Inputs:
 %   ALLEEG     - an EEGLAB data structure, which holds EEG sets (can also be one EEG set). 
@@ -29,7 +29,7 @@
 %   x              - the x axis points of the interpolated grid, for plotting purposes.  
 %   y              - the y axis points of the interpolated grid, for plotting purposes.  
 %
-%  See also  cls_scalp, pop_preclust, eeg_preclust, eeg_createdata           
+%  See also  std_scalp, pop_preclust, eeg_preclust, eeg_createdata           
 %
 % Authors:  Hilit Serby, SCCN, INC, UCSD, February, 2005
 
@@ -52,8 +52,11 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2006/03/07 22:14:40  arno
+% use fullfile
+%
 
-function [grid, yi, xi ] = cls_readscalp(ALLEEG, abset, comp)
+function [grid, yi, xi ] = std_readtopo(ALLEEG, abset, comp)
 
 grid = [];
 yi = [];
@@ -68,6 +71,6 @@ try
     yi = scalp(:,d+1);
     xi = scalp(:,d+2).';
 catch
-    warndlg2(['cls_readscalp: file '  ALLEEG(abset).etc.icascalp ' was not found in path ' ALLEEG(abset).filepath], 'Abort - computing scalp map centroid' ); 
+    warndlg2(['std_readtopo: file '  ALLEEG(abset).etc.icascalp ' was not found in path ' ALLEEG(abset).filepath], 'Abort - computing scalp map centroid' ); 
     return;
 end

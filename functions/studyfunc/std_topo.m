@@ -1,38 +1,36 @@
-%
-% cls_scalp() - uses topoplot() to get the interpolated Cartesian grid of the 
-%               specified component scalp maps. The scalp map grids are saved
-%               into a (.icascalp) float file and a pointer to the file is stored 
+% std_topo() - uses topoplot() to get the interpolated Cartesian grid of the 
+%               specified component topo maps. The topo map grids are saved
+%               into a (.icatopo) float file and a pointer to the file is stored 
 %               in the EEG structure. If such a float file already exists, 
 %               loads the information from it. 
 %
-%               Returns the scalp map grids of all the requested components. Also
+%               Returns the topo map grids of all the requested components. Also
 %               returns the EEG sub-structure etc (i.e EEG.etc), which is modified 
 %               with a pointer to the float file and some information about the file. 
 % Usage:
-%               >> [EEG_etc, X] = cls_scalp(EEG, components, option);  
+%               >> [EEG_etc, X] = std_topo(EEG, components, option);  
 %
-%                  % Returns the ICA scalp map grid for a dataset. 
+%                  % Returns the ICA topo map grid for a dataset. 
 %                  % Updates the EEG structure in the Matlab environment and re-saves
 % Inputs:
 %   EEG        - an EEG dataset structure. 
-%   components - [numeric vector] components in the EEG structure to compute scalp maps
+%   components - [numeric vector] components in the EEG structure to compute topo maps
 %                      {default|[] -> all}      
 %   option     - ['gradient'|'laplacian'|'none'] compute gradient or laplacian of
-%                the scale topography. {default is 'none' = the interpolated scalp map}
+%                the scale topography. {default is 'none' = the interpolated topo map}
 % Outputs:
 %   EEG_etc    - the EEG dataset EEG.etc structure modified with the file name 
 %                     and information about the float file that holds the dataset 
-%                     component scalp maps. If the scalp map file already exists 
+%                     component topo maps. If the topo map file already exists 
 %                     this output will be empty. 
-%   X          - the scalp map grid of the requested ICA components, each grid is 
+%   X          - the topo map grid of the requested ICA components, each grid is 
 %                     one ROW of X. 
 %
-% File output: [dataset_name].icascalp
+% File output: [dataset_name].icatopo
 %  
 % Authors:  Hilit Serby, Arnaud Delorme, SCCN, INC, UCSD, January, 2005
 %
-%  See also  topoplot(), cls_scalpL(), cls_scalpG(), cls_erp(), cls_ersp(), cls_spec()
-%            eeg_preclust(), eeg_createdata()
+% See also  topoplot(), std_erp(), std_ersp(), std_spec(), std_preclust()
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -53,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2006/03/07 03:46:43  scott
+% reworked help msg; made function accept specified component list or [] -sm
+%
 % Revision 1.6  2006/03/06 23:45:28  arno
 % adding gradient and laplacian
 %
@@ -63,16 +64,16 @@
 % remve change folder
 %
 % Revision 1.3  2006/03/03 21:19:16  arno
-% change scalp map file name
+% change topo map file name
 %
 % Revision 1.2  2006/03/03 00:41:38  arno
 % now correctly saving data
 %
 
-function [EEG_etc, X] = cls_scalp(EEG, comp, option)
+function [EEG_etc, X] = std_topo(EEG, comp, option)
 
 if nargin < 1
-    help cls_scalp;
+    help std_topo;
     return;
 end;
 if isfield(EEG,'icaweights')
@@ -92,15 +93,15 @@ end;
 EEG_etc = [];
 % figure; toporeplot(grid,'style', 'both','plotrad', 0.5, 'intrad', 0.5, 'xsurface' ,Xi, 'ysurface',Yi );
 
-% Scalp information found in dataset
+% Topo information found in dataset
 if isfield(EEG,'etc')
-     if isfield(EEG.etc, 'icascalp') & exist(fullfile(EEG.filepath, EEG.etc.icascalp))
-         d = EEG.etc.icascalpparams; %the grid dimension 
+     if isfield(EEG.etc, 'icatopo') & exist(fullfile(EEG.filepath, EEG.etc.icatopo))
+         d = EEG.etc.icatopoparams; %the grid dimension 
          if iscell(d)
              d = d{1};
          end
          for k = 1:length(comps)
-             tmp = floatread(fullfile(EEG.filepath, EEG.etc.icascalp), ...
+             tmp = floatread(fullfile(EEG.filepath, EEG.etc.icatopo), ...
                                                         [d d],[],d*(d+2)*(comps(k)-1));
              if strcmpi(option, 'gradient')
                  [tmpx, tmpy]  = gradient(tmp); %Gradient
@@ -124,7 +125,7 @@ if isfield(EEG,'etc')
  
 for k = 1:numc
 
-    % compute scalp map grid (topoimage)
+    % compute topo map grid (topoimage)
     [hfig grid plotrad Xi Yi] = topoplot( EEG.icawinv(:,k), EEG.chanlocs, ...
                                           'verbose', 'off',...
                                            'electrodes', 'on' ,'style','both',...
@@ -139,15 +140,15 @@ for k = 1:numc
 end
 
 % Save topos in file
-tmpfile = fullfile( EEG.filepath, [ EEG.filename(1:end-3) 'icascalp' ]); 
+tmpfile = fullfile( EEG.filepath, [ EEG.filename(1:end-3) 'icatopo' ]); 
 floatwrite(all_topos, tmpfile);
-EEG.etc.icascalp       = [ EEG.filename(1:end-3) 'icascalp' ];
-EEG.etc.icascalpparams = d;
+EEG.etc.icatopo       = [ EEG.filename(1:end-3) 'icatopo' ];
+EEG.etc.icatopoparams = d;
 try
     EEG.saved = 'no';
     EEG = pop_saveset( EEG, 'savemode', 'resave');
 catch,
-    error([ 'cls_scalp: problems saving into path ' EEG.filepath])
+    error([ 'std_topo: problems saving into path ' EEG.filepath])
 end
 EEG_etc = EEG.etc;
 

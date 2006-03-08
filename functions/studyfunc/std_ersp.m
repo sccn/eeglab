@@ -22,7 +22,7 @@
 %              separately, as well as the EEG.etc sub-structure modified with pointers 
 %              to the output float files and some information about them. 
 % Usage:  
-%              >> [EEG_etc X times logfreqs ] = cls_ersp(EEG, components,  ...
+%              >> [EEG_etc X times logfreqs ] = std_ersp(EEG, components,  ...
 %                                                    freqrange, timewindow,  ...
 %                                                         cycles, padratio, alpha,...
 %                                                              type, powbase);
@@ -69,17 +69,16 @@
 % Files written or modified:     [dataset_filename].icaersp   <-- saved component ERSPs
 %                                [dataset_filename].icaitc    <-- saved component ITCs
 %                                [dataset_filename].set       <-- re-saved dataset
-%  Example: 
+% Example: 
 %            % create ERSP and ITC images on disk for all comps from dataset EEG
 %            % use three-cycle wavelets (at 3 Hz) to >3-cycle wavelets at 50 Hz
 %            % use probability masking at p < 0.01, padratio 4. See >> timef details
 %            % returns log-freq spaced, probability-masked Xersp
-%            >> [EEG_etc, Xersp, times, logfreqs] = cls_ersp(EEG, ...
+%            >> [EEG_etc, Xersp, times, logfreqs] = std_ersp(EEG, ...
 %                                                    [1:size(EEG.icawinv,2)],...
 %                                                     [3 50], [3 0.5], 4, 0.01, 'ersp');
 %
-%  See also: timef(), std_itc(), std_erp(), std_spec(), std_scalp(), eeg_preclust(), 
-%            eeg_createdata()
+% See also: timef(), std_itc(), std_erp(), std_spec(), std_map(), std_preclust()
 %
 % Authors:  Hilit Serby, Arnaud Delorme, SCCN, INC, UCSD, January, 2005
 
@@ -102,6 +101,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2006/03/08 19:43:37  scott
+% fixed powbase definition -sm & ad
+%
 % Revision 1.14  2006/03/08 03:02:27  scott
 % expand powbase to a matrix -sm
 %
@@ -141,7 +143,7 @@
 % put log
 %
 
-function [EEG_etc X times freqs] = cls_ersp(EEG, comp, freqrange, timewindow, cycles, padratio, alpha, type, powbase)
+function [EEG_etc X times freqs] = std_ersp(EEG, comp, freqrange, timewindow, cycles, padratio, alpha, type, powbase)
 
 EEG_etc = [];
 if ~exist('type')
@@ -203,7 +205,7 @@ end;
 [time_range, winsize] = compute_ersp_times(cycles,  EEG.srate, ...
                                  [EEG.xmin EEG.xmax]*1000 , freqrange(1), padratio); 
 if time_range(1) >= time_range(2)
-    error(['cls_ersp: parameters given for ' upper(type) ' calculation result in an invalid time range. Aborting. Please increase the lower frequency bound or change other parameters to resolve the problem. See >> timef details'] )
+    error(['std_ersp: parameters given for ' upper(type) ' calculation result in an invalid time range. Aborting. Please increase the lower frequency bound or change other parameters to resolve the problem. See >> timef details'] )
 end
 
 for k = 1:length(comps)  % for each (specified) component
@@ -262,6 +264,6 @@ try
     EEG.saved = 'no';
     EEG = pop_saveset( EEG, 'savemode', 'resave');
 catch,
-    error([ 'cls_ersp: problem saving results into path ' EEG.filepath])
+    error([ 'std_ersp: problem saving results into path ' EEG.filepath])
 end
 EEG_etc = EEG.etc; % return updated EEG.etc sub-structure

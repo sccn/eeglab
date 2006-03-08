@@ -1,4 +1,4 @@
-% cls_plotclusterp() - Commandline function, to visualizing cluster/s components ERP. 
+% std_plotclusterp() - Commandline function, to visualizing cluster/s components ERP. 
 %                   Either displays mean ERP of all requested clusters in the same figure, 
 %                   with spectra for different conditions (if any) plotted in different colors. 
 %                   Or displays ERP for each specified cluster in separate figures (per condition),  
@@ -9,7 +9,7 @@
 %                   pop_preclust() or the equivalent commandline functions eeg_createdata() 
 %                   and eeg_preclust(). A pop-function that calls this function is pop_clustedit().
 % Usage:    
-%                   >> [STUDY] = cls_plotclusterp(STUDY, ALLEEG, key1, val1, key2, val2);  
+%                   >> [STUDY] = std_plotclusterp(STUDY, ALLEEG, key1, val1, key2, val2);  
 % Inputs:
 %   STUDY      - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
 %   ALLEEG     - global EEGLAB vector of EEG structures for the dataset(s) included in the STUDY. 
@@ -38,10 +38,10 @@
 %                     already exists in the STUDY).  
 %
 %   Example:
-%                         >> [STUDY] = cls_plotclustspec(STUDY,ALLEEG, 'clusters', 2, 'mode', 'comps');
+%                         >> [STUDY] = std_plotclustspec(STUDY,ALLEEG, 'clusters', 2, 'mode', 'comps');
 %                    Plots cluster 2 components spectra along with the mean spectra in bold. 
 %
-%  See also  pop_clustedit, pop_preclust, eeg_createdata, cls_plotcompspec         
+%  See also  pop_clustedit, pop_preclust, eeg_createdata, std_plotcompspec         
 %
 % Authors:  Hilit Serby, Arnaud Delorme, Scott Makeig, SCCN, INC, UCSD, June, 2005
 
@@ -64,17 +64,20 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2006/03/07 18:43:13  arno
+% plot parent cluster
+%
 % Revision 1.5  2006/02/16 21:46:29  arno
 % header
 %
 % Revision 1.4  2006/02/16 19:14:49  arno
-% now integrating cls_plotcompserp.m
+% now integrating std_plotcompserp.m
 %
 % Revision 1.3  2006/02/15 22:48:10  arno
 % fix rescaling\
 %
 
-function STUDY = cls_plotclusterp(STUDY, ALLEEG,  varargin)
+function STUDY = std_plotclusterp(STUDY, ALLEEG,  varargin)
 icadefs;
 
 % Set default values
@@ -93,11 +96,11 @@ for k = 3:2:nargin
                 if isstr(varargin{k-1}) & strcmpi(varargin{k-1}, 'all')
                     cls = 2:length(STUDY.cluster);
                 else
-                    error('cls_plotclustersp: ''clusters'' input takes either specific clusters (numeric vector) or keyword ''all''.');
+                    error('std_plotclustersp: ''clusters'' input takes either specific clusters (numeric vector) or keyword ''all''.');
                 end
             end
         case 'comps'
-            STUDY = cls_plotcomperp(STUDY, ALLEEG,  cls, varargin{k-1});
+            STUDY = std_plotcomperp(STUDY, ALLEEG,  cls, varargin{k-1});
             return;
         case 'mode' % Plotting mode 'centroid' / 'comps'
             mode = varargin{k-1};
@@ -131,7 +134,7 @@ if strcmpi(mode, 'comps')
     for clus = 1: length(cls) % For each cluster requested
         len = length(STUDY.cluster(cls(clus)).comps);
         if ~isfield(STUDY.cluster(cls(clus)).centroid, 'erp')
-            STUDY = cls_centroid(STUDY,ALLEEG, cls(clus) , 'erp');
+            STUDY = std_centroid(STUDY,ALLEEG, cls(clus) , 'erp');
         end
         % For ERP match polarity accross conditions
         for condi = 1: Ncond
@@ -155,7 +158,7 @@ if strcmpi(mode, 'comps')
         
         for n = 1:Ncond
             try
-                clusnval = cls_clusread(STUDY, ALLEEG, cls(clus),'erp',n);
+                clusnval = std_clustread(STUDY, ALLEEG, cls(clus),'erp',n);
             catch,
                 warndlg2([ 'Some ERP information is missing, aborting'] , ['Abort - Plot ERP'] );   
                 return;
@@ -206,7 +209,7 @@ if strcmpi(mode, 'centroid')
     orient tall
     for k = 1:len % Go through the clusters
         if ~isfield(STUDY.cluster(cls(k)).centroid, 'erp')
-            STUDY = cls_centroid(STUDY,ALLEEG, cls(k) , 'erp');
+            STUDY = std_centroid(STUDY,ALLEEG, cls(k) , 'erp');
         end
         if  (k == 1) 
             erp_min = min(STUDY.cluster(cls(k)).centroid.erp{1});
@@ -271,7 +274,7 @@ if strcmpi(mode, 'centroid')
     end % finished all clusters 
 end % finished 'centroid' plot mode
 
-% cls_plotcomperp() - Commandline function, to visualizing cluster component ERPs. 
+% std_plotcomperp() - Commandline function, to visualizing cluster component ERPs. 
 %                   Displays the ERPs of specified cluster components with the cluster mean 
 %                   ERP on separate figures, using one figure for all conditions. 
 %                   The ERPs can be visualized only if component ERPs     
@@ -280,7 +283,7 @@ end % finished 'centroid' plot mode
 %                   pop_preclust() or the equivalent commandline functions eeg_createdata() 
 %                   and eeg_preclust(). A pop-function that calls this function is pop_clustedit().
 % Usage:    
-%                   >> [STUDY] = cls_plotcomperp(STUDY, ALLEEG, cluster, comps);  
+%                   >> [STUDY] = std_plotcomperp(STUDY, ALLEEG, cluster, comps);  
 % Inputs:
 %   STUDY      - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
 %   ALLEEG     - global EEGLAB vector of EEG structures for the dataset(s) included in the STUDY. 
@@ -290,7 +293,7 @@ end % finished 'centroid' plot mode
 % Optional inputs:
 %   comps      - [numeric vector]  -> indices of the cluster components to plot.
 %                       'all'                       -> plot all the components in the cluster
-%                                                      (as in cls_plotclusterp). {default: 'all'}.
+%                                                      (as in std_plotclusterp). {default: 'all'}.
 %
 % Outputs:
 %   STUDY    - the input STUDY set structure modified with plotted cluster
@@ -299,10 +302,10 @@ end % finished 'centroid' plot mode
 %
 %   Example:
 %                         >> cluster = 4; comps= 'all';  
-%                         >> [STUDY] = cls_plotcomperp(STUDY,ALLEEG, cluster, comps);
-%                    Plots all components of cluster 4, calls cls_plotclusterp() . 
+%                         >> [STUDY] = std_plotcomperp(STUDY,ALLEEG, cluster, comps);
+%                    Plots all components of cluster 4, calls std_plotclusterp() . 
 %
-%  See also  pop_clustedit, pop_preclust, eeg_createdata, cls_plotclusterp         
+%  See also  pop_clustedit, pop_preclust, eeg_createdata, std_plotclusterp         
 %
 % Authors:  Hilit Serby, Arnaud Delorme, Scott Makeig, SCCN, INC, UCSD, June, 2005
 
@@ -324,18 +327,18 @@ end % finished 'centroid' plot mode
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function STUDY = cls_plotcomperp(STUDY, ALLEEG, cls, varargin)
+function STUDY = std_plotcomperp(STUDY, ALLEEG, cls, varargin)
 icadefs;
 
 if ~exist('cls')
-    error('cls_plotcomperp: you must provide a cluster number as an input.');
+    error('std_plotcomperp: you must provide a cluster number as an input.');
 end
 if isempty(cls)
-   error('cls_plotcomperp: you must provide a cluster number as an input.');
+   error('std_plotcomperp: you must provide a cluster number as an input.');
 end
 if nargin == 3 % no components indices were given
     % Default plot all components of the cluster
-    [STUDY] = cls_plotclusterp(STUDY, ALLEEG, 'clusters', cls, 'mode', 'comps');
+    [STUDY] = std_plotclusterp(STUDY, ALLEEG, 'clusters', cls, 'mode', 'comps');
     return
 else
     comp_ind = varargin{1}; 
@@ -361,13 +364,13 @@ for ci = 1 : length(comp_ind) %for each comp
              a = [ 'ERP, IC' num2str(comp) ' / ' subject ', ' STUDY.cluster(cls).name ];
         end
         if ~isfield(STUDY.cluster(cls).centroid, 'erp')
-            STUDY = cls_centroid(STUDY,ALLEEG, cls, 'erp');
+            STUDY = std_centroid(STUDY,ALLEEG, cls, 'erp');
         end
         if ~isfield(ALLEEG(abset).etc,'icaerpparams')
             warndlg2([ 'Dataset ' ALLEEG(abset).filename ' has no ERP info, aborting'] , 'Abort - Plot ERP' ); 
             return;
         end
-        [erp, t] = cls_readerp(ALLEEG, abset, comp);
+        [erp, t] = std_readerp(ALLEEG, abset, comp);
         if isempty(erp)
             warndlg2(['eeg_clustedit: file '  ALLEEG(abset).etc.icaerp ' was not found in path ' ALLEEG(abset).filepath], 'Abort - Plot ERP' ); 
             return

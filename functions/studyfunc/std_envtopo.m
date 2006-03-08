@@ -1,10 +1,10 @@
-% cls_envtopo() - Creates an envtopo() image for a STUDY set, uses cluster contributions 
+% std_envtopo() - Creates an envtopo() image for a STUDY set, uses cluster contributions 
 %                 instead of individual components.  Plots the envelope of a data epoch, 
 %                 plus envelopes and average scalp maps for specified or largest-contributing 
 %                 clusters for each condition. Click on individual axes to examine them 
 %                 in detail (using axcopy()). See envtopo() for further details.
 % Usage:
-%               >> cls_envtopo(STUDY, ALLEEG, 'key1', 'val1', ...);
+%               >> std_envtopo(STUDY, ALLEEG, 'key1', 'val1', ...);
 % Inputs:
 %   STUDY        = an EEGLAB STUDY structure containing EEG structures
 %   ALLEEG       = the ALLEEG data structure; can also be an EEG dataset structure.
@@ -50,10 +50,10 @@
 %  'vert'        = vector of times (in ms) at which to plot vertical dashed lines 
 %                   {default|[] -> none}
 %
-% See also: envtopo(), cls_granderp(), envtopo_plot()
+% See also: envtopo(), std_granderp(), envtopo_plot()
 %
 
-function cls_envtopo(STUDY, ALLEEG, varargin)
+function std_envtopo(STUDY, ALLEEG, varargin)
 icadefs;
 if nargin < 4
     help STUDY_envtopo;
@@ -151,7 +151,7 @@ for n = 1:Ncond
     % compute the grand mean ERP envelope of the cluster (for specific
    % condition).
    fprintf('\n Computing grand ERP for condition %d.', n); 
-   [grandERP, set_len, STUDY, ALLEEG] = cls_granderp(STUDY, ...
+   [grandERP, set_len, STUDY, ALLEEG] = std_granderp(STUDY, ...
 				, 'clusters', clusters, 'condition', n, e_options{:});
    grandERPtot{n} = grandERP;
    if ~exist('limits') | (length(limits)  == 2) % make limits same all conditions
@@ -187,13 +187,13 @@ for n = 1:Ncond
 	for cls = 1:length(clusters)
        len = length(STUDY.cluster(clusters(cls)).comps);
         try
-            clusscalp = cls_clusread(STUDY, ALLEEG, clusters(cls),'scalp');
+            clusscalp = std_clustread(STUDY, ALLEEG, clusters(cls),'scalp');
         catch,
             warndlg2([ 'Some topoplot information is missing, aborting'] , 'Abort - STUDY_envtopo' );   
             return;
        end
        try
-           cluserp = cls_clusread(STUDY, ALLEEG, clusters(cls),'erp', n);
+           cluserp = std_clustread(STUDY, ALLEEG, clusters(cls),'erp', n);
            if exist('baseline')
                cluserp.erp = rmbase(cluserp.erp,...
 			ALLEEG(STUDY.datasetinfo(STUDY.setind(1)).index).pnts,baseline);
@@ -325,9 +325,9 @@ end
 %                                           = envtopo(grandERP,projERP, 'key1', val1, ...);
 % Inputs:
 %  grandERP     = The grand average ERP (chans, frames),
-%                              (see cls_granderp() and STUDY_envtopo() for details).
+%                              (see std_granderp() and STUDY_envtopo() for details).
 %  projERP          = A cell array of the projected ERP of the desired components, each cell size is (chans,frames),
-%                              (see cls_granderp() and STUDY_envtopo() for details).
+%                              (see std_granderp() and STUDY_envtopo() for details).
 %
 % Optional inputs:
 %  'clustnums'  = [integer array] vector of clusters numbers to plot {default|0 -> all}

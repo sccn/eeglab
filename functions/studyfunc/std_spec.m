@@ -1,8 +1,8 @@
-% cls_spec() - Returns the ICA component spectra for a dataset. Updates the EEG structure 
+% std_spec() - Returns the ICA component spectra for a dataset. Updates the EEG structure 
 %              in the Matlab environment and in the .set file as well. Saves the spectra 
 %              in a float file.
 % Usage:    
-%           >> [EEG_etc, X, f, overwrite] = cls_spec(EEG, components, ...
+%           >> [EEG_etc, X, f, overwrite] = std_spec(EEG, components, ...
 %                                                   freqrange, specargs, overwrite);
 %
 %              Computes the mean spectra of the activites of specified components of the 
@@ -45,7 +45,7 @@
 % Files output or overwritten: [dataset_filename].icaspec, 
 %                              [dataset_filename].icaspecm
 % 
-%  See also  spectopo(), cls_erp(), cls_ersp(), cls_scalp(), eeg_preclust(), eeg_createdata()
+%  See also  spectopo(), std_erp(), std_ersp(), std_map(), std_preclust()
 %
 % Authors:  Hilit Serby & Arnaud Delorme, SCCN, INC, UCSD, January, 2005
 
@@ -71,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2006/03/07 22:31:01  arno
+% typo in test
+%
 % Revision 1.16  2006/03/07 22:28:58  arno
 % fix header
 %
@@ -105,10 +108,10 @@
 % update change dir, ICA computatation, read/write
 %
 
-function [EEG_etc, X, f, overwrite] = cls_spec(EEG, comp, freqrange, arg ,overwrite)
+function [EEG_etc, X, f, overwrite] = std_spec(EEG, comp, freqrange, arg ,overwrite)
     
 if nargin < 1
-    help cls_spec;
+    help std_spec;
     return;
 end;
 
@@ -171,7 +174,7 @@ if isfield(EEG,'etc')
              disp('To recompute the spectra, first delete files in the directory');
              disp('   of this dataset with extensions .icaspec and .icaspecm');
 
-             [EEG_etc, X, f, overwrite] = cls_spec(EEG, comp, freqrange, arg, 1); % overwrite !?
+             [EEG_etc, X, f, overwrite] = std_spec(EEG, comp, freqrange, arg, 1); % overwrite !?
              return
 
          else % overwrite == 1 --> overwrite existing spectra using existing spectra
@@ -215,7 +218,7 @@ if isfield(EEG,'etc')
                     EEG.saved = 'no';
                     EEG = pop_saveset( EEG, 'savemode','resave');
 				catch,
-                    error([ 'cls_spec(): problems saving into path ' EEG.filepath])
+                    error([ 'std_spec(): problems saving into path ' EEG.filepath])
 				end
                 EEG_etc = EEG.etc;
 
@@ -289,6 +292,6 @@ try
     EEG.saved = 'no';
     EEG = pop_saveset( EEG, 'savemode', 'resave');
 catch,
-    error([ 'cls_spec: problems saving into path ' EEG.filepath])
+    error([ 'std_spec: problems saving into path ' EEG.filepath])
 end
 EEG_etc = EEG.etc;

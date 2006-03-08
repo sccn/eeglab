@@ -1,9 +1,9 @@
-% cls_readitc() - Given the ALLEEG structure, a specific EEG dataset index, 
+% std_readitc() - Given the ALLEEG structure, a specific EEG dataset index, 
 % and a specific component, the function returns the (frequency) log scaled 
 % ITC of that ICA component. 
 % The ITC of the dataset ICA components is assumed to be saved in a float 
 % file, the EEG dataset include a pointer to this file. If such a float file doesn't exist,
-% you can use the cls_ersp() function to create it, or use the pre - clustering functions
+% you can use the std_ersp() function to create it, or use the pre - clustering functions
 % that call it: pop_preclust, eeg_preclust & eeg_createdata. The ITC information  
 % is specific to the input variables used to compute it, the frequency range, 
 % timewindow, resolution, confidence level and the wavelet type (FFT / wavelet
@@ -12,11 +12,11 @@
 % the log frequency vector of the ITC samples. 
 %
 % Usage:    
-%   >> [logersp, logfreqs] = cls_readitc(ALLEEG, abset, component);  
+%   >> [logersp, logfreqs] = std_readitc(ALLEEG, abset, component);  
 %   This functions returns the log scaled ITC of an ICA component. 
 %   The information is loaded from a float file, which a pointer 
 %   to is saved in the EEG dataset. The float file was created
-%   by the pre - clustering function cls_ersp. 
+%   by the pre - clustering function std_ersp. 
 %
 % Inputs:
 %   ALLEEG     - an EEGLAB data structure, which holds EEG sets (can also be one EEG set). 
@@ -33,7 +33,7 @@
 %                      of the ICA activations.
 %   logfreqs   - a vector of the frequencies points in log scale. 
 %
-%  See also  cls_ersp, cls_readersp, pop_preclust, eeg_preclust, eeg_createdata           
+%  See also  std_ersp, std_readersp, pop_preclust, eeg_preclust, eeg_createdata           
 %
 % Authors:  Hilit Serby, SCCN, INC, UCSD, February, 2005
 
@@ -56,8 +56,11 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2006/03/07 22:17:34  arno
+% use fullfile
+%
 
-function [logitc, logfreqs] = cls_readitc(ALLEEG, abset, comp);
+function [logitc, logfreqs] = std_readitc(ALLEEG, abset, comp);
 
 logitc = []; 
 params = ALLEEG(abset).etc.icaitcparams;
@@ -67,7 +70,7 @@ try
     itcall =  floatread( fullfile( ALLEEG(abset).filepath, ALLEEG(abset).etc.icaitc), ...
                          [flen tlen+1],[], flen*(tlen+1)*(comp-1));
 catch
-    warndlg2(['cls_readitc: file '  ALLEEG(abset).etc.icaitc ' was not found in path ' ALLEEG(abset).filepath], 'Abort - computing ITC centroid' ); 
+    warndlg2(['std_readitc: file '  ALLEEG(abset).etc.icaitc ' was not found in path ' ALLEEG(abset).filepath], 'Abort - computing ITC centroid' ); 
             return;
 end
 logitc = itcall(:, 1:tlen);

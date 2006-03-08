@@ -1,16 +1,16 @@
-% cls_clusread() - load a requested measure (i.e. ['erp'|'spec'|'ersp'|'itc'|...
+% std_clustread() - load a requested measure (i.e. ['erp'|'spec'|'ersp'|'itc'|...
 %        'dipole'|'scalp']), for all the components of a specified cluster.  
 %        Used mostly by cluster plotting functions. 
-%        This helper function is called by cls_envtopo(), cls_plotclusterp(),
-%        cls_plotclustersp(), cls_plotclustitc(), cls_plotclustmap(), 
-%        cls_plotclustspec(), & cls_ERPdiff(). 
+%        This helper function is called by std_envtopo(), std_plotclusterp(),
+%        std_plotclustersp(), std_plotclustitc(), std_plotclustmap(), 
+%        std_plotclustspec(), & std_ERPdiff(). 
 
-function clusinfo = cls_clusread(STUDY,ALLEEG, cluster, infotype, cond);
+function clusinfo = std_clustread(STUDY,ALLEEG, cluster, infotype, cond);
 
 % infotype - ['erp'|'spec'|'ersp'|'itc'|'dipole'|'scalp']
 
 if nargin < 4
-    help cls_clusread;
+    help std_clustread;
     return;
 end
 clusinfo = [];
@@ -32,7 +32,7 @@ for k = 1:len
             if ~isfield(ALLEEG(abset).etc, 'icaerpparams')
                 error([ 'No ERP information available in dataset ' num2str(abset) ]);   
             end
-            [erp, t] = cls_readerp(ALLEEG, abset, comp);
+            [erp, t] = std_readerp(ALLEEG, abset, comp);
             if  k == 1
                 clusinfo.erp = zeros(len,length(erp));
                 clusinfo.t = t;
@@ -46,7 +46,7 @@ for k = 1:len
             if ~isfield(ALLEEG(abset).etc, 'icaspecparams')
                 error([ 'No spectrum information available in dataset ' num2str(abset) ]);   
             end
-            [spec, f] = cls_readspec(ALLEEG, abset, comp);
+            [spec, f] = std_readspec(ALLEEG, abset, comp);
             if  k == 1
                 clusinfo.spec = zeros(len,length(spec));
                 clusinfo.f = f;
@@ -60,7 +60,7 @@ for k = 1:len
             if ~isfield(ALLEEG(abset(1)).etc, 'icaerspparams')
                 error([ 'No ERSP information available in dataset ' num2str(abset(1)) ]);   
             end
-            [ersp, logfreqs] = cls_readersp(ALLEEG, abset, comp);
+            [ersp, logfreqs] = std_readersp(ALLEEG, abset, comp);
             clusinfo.ersp{k} = ersp;
             clusinfo.logf{k} = logfreqs;
             
@@ -71,7 +71,7 @@ for k = 1:len
             if ~isfield(ALLEEG(abset).etc, 'icaitcparams')
                 error([ 'No ITC information available in dataset ' num2str(abset) ]);   
             end
-            [itc, logfreqs] = cls_readitc(ALLEEG, abset, comp);
+            [itc, logfreqs] = std_readitc(ALLEEG, abset, comp);
             clusinfo.itc{k} = itc;
             clusinfo.logf{k} = logfreqs;
             
@@ -85,7 +85,7 @@ for k = 1:len
             if ~isfield(ALLEEG(abset).etc,'icascalpparams')
                 error([ 'Dataset ' num2str(abset) ' has no topoplot image information']);   
             end
-            [grid, yi, xi] = cls_readscalp(ALLEEG, abset, comp); 
+            [grid, yi, xi] = std_readscalp(ALLEEG, abset, comp); 
             clusinfo.grid{k} = grid;
             clusinfo.yi{k} = yi;
             clusinfo.xi{k} = xi;

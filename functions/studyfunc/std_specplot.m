@@ -1,4 +1,4 @@
-% cls_plotclustspec() - Commandline function, to visualizing cluster/s components spectra. 
+% std_plotclustspec() - Commandline function, to visualizing cluster/s components spectra. 
 %                   Either displays mean spectra of all requested clusters in the same figure, 
 %                   with spectra for different conditions (if any) plotted in different colors. 
 %                   Or displays spectra for each specified cluster in separate figures (per condition),  
@@ -9,7 +9,7 @@
 %                   pop_preclust() or the equivalent commandline functions eeg_createdata() 
 %                   and eeg_preclust(). A pop-function that calls this function is pop_clustedit().
 % Usage:    
-%                   >> [STUDY] = cls_plotclustspec(STUDY, ALLEEG, key1, val1, key2, val2);  
+%                   >> [STUDY] = std_plotclustspec(STUDY, ALLEEG, key1, val1, key2, val2);  
 % Inputs:
 %   STUDY      - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
 %   ALLEEG     - global EEGLAB vector of EEG structures for the dataset(s) included in the STUDY. 
@@ -38,10 +38,10 @@
 %                     already exists in the STUDY).  
 %
 %   Example:
-%                         >> [STUDY] = cls_plotclustspec(STUDY,ALLEEG, 'clusters', 2, 'mode', 'comps');
+%                         >> [STUDY] = std_plotclustspec(STUDY,ALLEEG, 'clusters', 2, 'mode', 'comps');
 %                    Plots cluster 2 components spectra along with the mean spectra in bold. 
 %
-%  See also  pop_clustedit, pop_preclust, eeg_createdata, cls_plotcompspec         
+%  See also  pop_clustedit, pop_preclust, eeg_createdata, std_plotcompspec         
 %
 % Authors:  Hilit Serby, Arnaud Delorme, Scott Makeig, SCCN, INC, UCSD, June, 2005
 
@@ -64,11 +64,14 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2006/03/07 18:45:19  arno
+% allow plotting parent cluster
+%
 % Revision 1.6  2006/02/16 19:51:45  arno
 % header
 %
 % Revision 1.5  2006/02/16 19:47:48  arno
-% set xlimits and move cls_plotcompspec.m inside
+% set xlimits and move std_plotcompspec.m inside
 %
 % Revision 1.4  2006/02/16 19:01:33  arno
 % plotting both conditions on the same figure
@@ -80,7 +83,7 @@
 % adding scaling etc...
 %
 
-function STUDY = cls_plotclustspec(STUDY, ALLEEG,  varargin)
+function STUDY = std_plotclustspec(STUDY, ALLEEG,  varargin)
 icadefs;
 % Set default values
 cls = []; % plot all clusters in STUDY
@@ -98,11 +101,11 @@ for k = 3:2:nargin
                 if isstr(varargin{k-1}) & strcmpi(varargin{k-1}, 'all')
                     cls = 2:length(STUDY.cluster);
                 else
-                    error('cls_plotclustersp: ''clusters'' input takes either specific clusters (numeric vector) or keyword ''all''.');
+                    error('std_plotclustersp: ''clusters'' input takes either specific clusters (numeric vector) or keyword ''all''.');
                 end
             end
         case 'comps'
-            STUDY = cls_plotcompspec(STUDY, ALLEEG,  cls, varargin{k-1});
+            STUDY = std_plotcompspec(STUDY, ALLEEG,  cls, varargin{k-1});
             return;
         case 'mode' % Plotting mode 'centroid' / 'comps'
             mode = varargin{k-1};
@@ -136,7 +139,7 @@ if strcmpi(mode, 'comps')
     for clus = 1: length(cls) % For each cluster requested
         len = length(STUDY.cluster(cls(clus)).comps);
         if ~isfield(STUDY.cluster(cls(clus)).centroid,'spec')
-            STUDY = cls_centroid(STUDY,ALLEEG, cls(clus) , 'spec');
+            STUDY = std_centroid(STUDY,ALLEEG, cls(clus) , 'spec');
         end
         
         % figure properties
@@ -152,7 +155,7 @@ if strcmpi(mode, 'comps')
         
         for n = 1:Ncond
             try
-                clusnval = cls_clusread(STUDY, ALLEEG, cls(clus),'spec',n);
+                clusnval = std_clustread(STUDY, ALLEEG, cls(clus),'spec',n);
             catch,
                 warndlg2([ 'Some spectra information is missing, aborting'] , ['Abort - Plot spectra'] );   
                 return;
@@ -204,7 +207,7 @@ if strcmpi(mode, 'centroid')
     max_spec = -Inf;
     for k = 1:len % Go through the clusters
         if ~isfield(STUDY.cluster(cls(k)).centroid,'spec')
-            STUDY = cls_centroid(STUDY,ALLEEG, cls(k) , 'spec');
+            STUDY = std_centroid(STUDY,ALLEEG, cls(k) , 'spec');
         end
         if len ~= 1
             sbplot(rowcols(1),rowcols(2),k) ; 
@@ -256,7 +259,7 @@ if strcmpi(mode, 'centroid')
     end % finished all clusters 
 end % finished 'centroid' plot mode
 
-% cls_plotcompspec() - Commandline function, to visualizing cluster component spectra. 
+% std_plotcompspec() - Commandline function, to visualizing cluster component spectra. 
 %                   Displays the spectra of specified cluster components with the cluster mean 
 %                   spectra on separate figures, using one figure for all conditions. 
 %                   The spectra can be visualized only if component spectra     
@@ -265,7 +268,7 @@ end % finished 'centroid' plot mode
 %                   pop_preclust() or the equivalent commandline functions eeg_createdata() 
 %                   and eeg_preclust(). A pop-function that calls this function is pop_clustedit().
 % Usage:    
-%                   >> [STUDY] = cls_plotcompspec(STUDY, ALLEEG, cluster, comps);  
+%                   >> [STUDY] = std_plotcompspec(STUDY, ALLEEG, cluster, comps);  
 % Inputs:
 %   STUDY      - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
 %   ALLEEG     - global EEGLAB vector of EEG structures for the dataset(s) included in the STUDY. 
@@ -275,7 +278,7 @@ end % finished 'centroid' plot mode
 % Optional inputs:
 %   comps      - [numeric vector]  -> indices of the cluster components to plot.
 %                       'all'                       -> plot all the components in the cluster
-%                                                      (as in cls_plotclustspec). {default: 'all'}.
+%                                                      (as in std_plotclustspec). {default: 'all'}.
 %
 % Outputs:
 %   STUDY    - the input STUDY set structure modified with plotted cluster
@@ -284,10 +287,10 @@ end % finished 'centroid' plot mode
 %
 %   Example:
 %                         >> cluster = 4; comps= 'all';  
-%                         >> [STUDY] = cls_plotcompspec(STUDY,ALLEEG, cluster, comps);
-%                    Plots all components of cluster 4, calls cls_plotclustspec() . 
+%                         >> [STUDY] = std_plotcompspec(STUDY,ALLEEG, cluster, comps);
+%                    Plots all components of cluster 4, calls std_plotclustspec() . 
 %
-%  See also  pop_clustedit, pop_preclust, eeg_createdata, cls_plotclustspec         
+%  See also  pop_clustedit, pop_preclust, eeg_createdata, std_plotclustspec         
 %
 % Authors:  Hilit Serby, Arnaud Delorme, Scott Makeig, SCCN, INC, UCSD, June, 2005
 
@@ -309,18 +312,18 @@ end % finished 'centroid' plot mode
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function STUDY = cls_plotcompspec(STUDY, ALLEEG, cls, varargin)
+function STUDY = std_plotcompspec(STUDY, ALLEEG, cls, varargin)
 icadefs;
 
 if ~exist('cls')
-    error('cls_plotcompspec: you must provide a cluster number as an input.');
+    error('std_plotcompspec: you must provide a cluster number as an input.');
 end
 if isempty(cls)
-   error('cls_plotcompspec: you must provide a cluster number as an input.');
+   error('std_plotcompspec: you must provide a cluster number as an input.');
 end
 if nargin == 3 % no components indices were given
     % Default plot all components of the cluster
-    [STUDY] = cls_plotclustspec(STUDY, ALLEEG, 'clusters', cls, 'mode', 'comps');
+    [STUDY] = std_plotclustspec(STUDY, ALLEEG, 'clusters', cls, 'mode', 'comps');
     return
 else
     comp_ind = varargin{1}; 
@@ -350,13 +353,13 @@ for ci = 1 : length(comp_ind) %for each comp
             a = [ 'Spectra, IC' num2str(comp) ' / ' subject ', ' STUDY.cluster(cls).name ];
         end
         if ~isfield(STUDY.cluster(cls).centroid,'spec')
-            STUDY = cls_centroid(STUDY,ALLEEG, cls, 'spec');
+            STUDY = std_centroid(STUDY,ALLEEG, cls, 'spec');
         end
         if ~isfield(ALLEEG(abset).etc,'icaspecparams')
             warndlg2([ 'Dataset ' ALLEEG(abset).filename ' has no spectra info, aborting'] , 'Abort - Plot spectra' ); 
             return;
         end
-        [spec, f] = cls_readspec(ALLEEG, abset, comp);
+        [spec, f] = std_readspec(ALLEEG, abset, comp);
         if isempty(spec)
             warndlg2(['eeg_clustedit: file '  ALLEEG(abset).etc.icaspec ' was not found in path ' ALLEEG(abset).filepath], 'Abort - Plot spectra' ); 
             return

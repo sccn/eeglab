@@ -1,10 +1,10 @@
-% cls_preclust() - prepare STUDY component location and activity measures for later clustering.
+% std_preclust() - prepare STUDY component location and activity measures for later clustering.
 %                  Selected measures (one or more from options: ERPs, dipole locations, spectra,
 %                  scalp maps, ERSPs, and ITCs) are computed for each dataset in the STUDY 
 %                  set, unless they already present. After all requested measures are computed 
 %                  and saved in the STUDY datasets, each feature dimension is reduced by computing 
 %                  a PCA  decomposition. These PCA matrices (one per measure) are concatenated and 
-%                  used as input to the clustering  algorithm in pop_clust(). cls_preclust() allows 
+%                  used as input to the clustering  algorithm in pop_clust(). std_preclust() allows 
 %                  selection of a subset of components to use in the clustering. This subset 
 %                  may be a user-specified component subset, components with dipole model residual 
 %                  variance lower than a defined threshold (see dipfit()), or components from 
@@ -13,8 +13,8 @@
 %                  EEG sets are also saved to disk. Called by pop_preclust(). Follow with 
 %                  eeg_clust() or pop_clust().
 % Usage:    
-%                >> [ALLEEG,STUDY] = cls_preclust(ALLEEG,STUDY); % cluster all comps in all sets
-%                >> [ALLEEG,STUDY] = cls_preclust(ALLEEG,STUDY,clustind,compind, preproc1,...);
+%                >> [ALLEEG,STUDY] = std_preclust(ALLEEG,STUDY); % cluster all comps in all sets
+%                >> [ALLEEG,STUDY] = std_preclust(ALLEEG,STUDY,clustind,compind, preproc1,...);
 %
 % Required inputs:
 %   ALLEEG       - ALLEEG vector of one or more loaded EEG dataset structures
@@ -87,7 +87,7 @@
 %   STUDY        - the input STUDY set with pre-clustering data added, for use by pop_clust() 
 %
 % Example:
-%   >> [ALLEEG  STUDY] = cls_preclust(ALLEEG, STUDY, [], [] , { 'dipselect'  'rv'  0.15  } ,...
+%   >> [ALLEEG  STUDY] = std_preclust(ALLEEG, STUDY, [], [] , { 'dipselect'  'rv'  0.15  } ,...
 %                        { 'spec'  'npca' 10 'norm' 1 'weight' 1 'freqrange'  [ 3 25 ] } , ...
 %                        { 'erp'   'npca' 10 'norm' 1 'weight' 2 'timewindow' [ 350 500 ] } ,...
 %                        { 'scalp' 'npca' 10 'norm' 1 'weight' 2 'abso' 1 } , ...
@@ -128,6 +128,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2006/03/07 22:35:14  arno
+% catch error when scanning for dipoles
+%
 % Revision 1.24  2006/03/06 23:47:47  arno
 % computing gradient or laplacian
 %
@@ -156,7 +159,7 @@
 % second level pca
 %
 % Revision 1.15  2006/02/18 01:01:38  arno
-% eeg_preclust -> cls_preclust
+% eeg_preclust -> std_preclust
 %
 % Revision 1.14  2006/02/18 00:56:34  arno
 % showing more warnings
@@ -171,10 +174,10 @@
 % final fix
 %
 
-function [ STUDY, ALLEEG ] = cls_preclust(STUDY, ALLEEG, cluster_ind, components_ind, varargin)
+function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, components_ind, varargin)
     
     if nargin < 2
-        help cls_preclust;
+        help std_preclust;
         return;
     end;
     if nargin == 2
@@ -343,13 +346,13 @@ function [ STUDY, ALLEEG ] = cls_preclust(STUDY, ALLEEG, cluster_ind, components
             if isempty(cluster_ind)
                 a =  ['% A subset of components with dipole information were readied for clustering.'...
                         'Other components were placed in a separate cluster'];
-                [STUDY] = cls_createclust(STUDY, ALLEEG, 'Notclust');
+                [STUDY] = std_createclust(STUDY, ALLEEG, 'Notclust');
                 STUDY.cluster(end).parent{end} = STUDY.cluster(1).name; 
                 STUDY.cluster(1).child{end+1} = STUDY.cluster(end).name;
             else
                 a =  ['% A subset of components from ' STUDY.cluster(cluster_ind).name  'with dipole information, were readied for clustering.' ...
                     'Other components were placed in a separate cluster'];    
-                [STUDY] = cls_createclust(STUDY, ALLEEG, [ 'Notclust ' num2str(cluster_ind) ] );
+                [STUDY] = std_createclust(STUDY, ALLEEG, [ 'Notclust ' num2str(cluster_ind) ] );
                 STUDY.cluster(end).parent{end} = STUDY.cluster(cluster_ind).name;
                 STUDY.cluster(cluster_ind).child{end+1} = STUDY.cluster(end).name;
             end
@@ -443,7 +446,7 @@ function [ STUDY, ALLEEG ] = cls_preclust(STUDY, ALLEEG, cluster_ind, components
                                          {'style' 'text' 'string' ['Would you like to recalculate ' upper(strcom) ' and overwrite those values?' ]} ...
                                          {'style' 'checkbox' 'tag' 'ersp_yes' 'string' 'Yes' 'value' 1 'Callback' set_yes }  ...
                                          {'style' 'checkbox' 'tag' 'ersp_no' 'string' 'Use existing ERSP info' 'value' 0 'Callback' set_no } {} },...
-                                         'helpcom', '', 'title', ['Recalculate ' upper(strcom) ' parameters -- part of cls_ersp()']); 
+                                         'helpcom', '', 'title', ['Recalculate ' upper(strcom) ' parameters -- part of std_ersp()']); 
                                 if find(celltomat(ersp_ans))  == 2 % use existing ERSP info from this dataset
                                     overwrite = 2;
                                     cycles = params.cycles;
@@ -479,12 +482,12 @@ function [ STUDY, ALLEEG ] = cls_preclust(STUDY, ALLEEG, cluster_ind, components
                               error('No epochs in dataset: ERP information has no meaning');
                          end
                          if ~isempty('timewindow')
-                             [tmp, X, t] = cls_erp(ALLEEG(idat), succompind{si}, timewindow);
+                             [tmp, X, t] = std_erp(ALLEEG(idat), succompind{si}, timewindow);
                              if ~isempty(tmp)
                                  ALLEEG(idat).etc = tmp;
                              end
                          else
-                             [tmp, X, t] = cls_erp(ALLEEG(idat), succompind{si});
+                             [tmp, X, t] = std_erp(ALLEEG(idat), succompind{si});
                              if ~isempty(tmp)
                                  ALLEEG(idat).etc = tmp;
                              end
@@ -510,7 +513,7 @@ function [ STUDY, ALLEEG ] = cls_preclust(STUDY, ALLEEG, cluster_ind, components
              case 'scalp' , % NB: scalp maps are identical across conditions (within session)
                  idat = STUDY.datasetinfo(STUDY.setind(1,si)).index; 
                  if ~isempty(succompind{si})
-                     [tmp, X] = cls_scalp(ALLEEG(idat), succompind{si});
+                     [tmp, X] = std_topo(ALLEEG(idat), succompind{si});
                      if ~isempty(tmp)
                          ALLEEG(idat).etc = tmp;
                      end
@@ -526,7 +529,7 @@ function [ STUDY, ALLEEG ] = cls_preclust(STUDY, ALLEEG, cluster_ind, components
              case 'scalpLaplac' , 
                  idat = STUDY.datasetinfo(STUDY.setind(1,si)).index; 
                  if ~isempty(succompind{si})
-                     [tmp, X] = cls_scalp(ALLEEG(idat), succompind{si}, 'laplacian'); 
+                     [tmp, X] = std_topo(ALLEEG(idat), succompind{si}, 'laplacian'); 
                      if ~isempty(tmp)
                          ALLEEG(idat).etc = tmp;
                      end
@@ -542,7 +545,7 @@ function [ STUDY, ALLEEG ] = cls_preclust(STUDY, ALLEEG, cluster_ind, components
              case 'scalpGrad'   , 
                  idat = STUDY.datasetinfo(STUDY.setind(1,si)).index; 
                  if ~isempty(succompind{si})
-                     [tmp, X] = cls_scalp(ALLEEG(idat), succompind{si}, 'gradient'); 
+                     [tmp, X] = std_topo(ALLEEG(idat), succompind{si}, 'gradient'); 
                      if ~isempty(tmp)
                          ALLEEG(idat).etc = tmp;
                      end
@@ -562,7 +565,7 @@ function [ STUDY, ALLEEG ] = cls_preclust(STUDY, ALLEEG, cluster_ind, components
                 if ~isempty(succompind{si})
                     for cond = 1 : Ncond 
                          idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index;  
-                         [tmp, X, f,overwrite] = cls_spec(ALLEEG(idat),succompind{si}, ...
+                         [tmp, X, f,overwrite] = std_spec(ALLEEG(idat),succompind{si}, ...
                                                           freqrange, fun_arg,overwrite);
                          if ~isempty(tmp)
                              ALLEEG(idat).etc = tmp;
@@ -622,7 +625,7 @@ function [ STUDY, ALLEEG ] = cls_preclust(STUDY, ALLEEG, cluster_ind, components
                          idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index;  
                          idattot = [idattot idat];
                          % compute ERSP/ ITC, if doesn't exist.
-                         [tmp] = cls_ersp(ALLEEG(idat),succompind{si}, freqrange, timewindow, ...
+                         [tmp] = std_ersp(ALLEEG(idat),succompind{si}, freqrange, timewindow, ...
                                                                      cycles, padratio, alpha, type);
                          if ~isempty(tmp)
                              ALLEEG(idat).etc = tmp;
@@ -631,7 +634,7 @@ function [ STUDY, ALLEEG ] = cls_preclust(STUDY, ALLEEG, cluster_ind, components
                     % prepare ERSP / ITC data for clustering (select requested components, 
                     % mask and change to a common base if multiple conditions).
                     % --------------------------------------------------------------------
-                    X = cls_ersptocluster(ALLEEG(idattot),succompind{si}, timewindow, freqrange, type); 
+                    X = std_ersptocluster(ALLEEG(idattot),succompind{si}, timewindow, freqrange, type); 
                     data = [data; X];
                     clear tmp X 
                 end

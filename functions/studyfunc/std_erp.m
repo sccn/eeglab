@@ -1,4 +1,4 @@
-%   cls_erp() - Constructs and returns ICA activation ERPs for a dataset. 
+%   std_erp() - Constructs and returns ICA activation ERPs for a dataset. 
 %               Updates the EEG structure both in the Matlab environment 
 %               and on disk Saves the ERPs into a float file, and then saves 
 %               a pointer to the file in the EEG structure. If such a float file 
@@ -10,7 +10,7 @@
 %               EEG sub-structure EEG.etc, to which is added a pointer to the 
 %               ERP float file and some information about it. 
 % Usage:    
-%            >> [EEG_etc, data, times] = cls_erp(EEG,components,timewindow);  
+%            >> [EEG_etc, data, times] = std_erp(EEG,components,timewindow);  
 % Inputs:
 %   EEG          - a loaded epoched EEG dataset structure. 
 %   components   - [numeric vector] components of the EEG structure for which 
@@ -29,7 +29,7 @@
 % File output:     [dataset_file].icaerp
 %                  [dataset_file].set
 %
-%  See also  cls_spec(), cls_ersp(), cls_scalp(), eeg_preclust(), eeg_createdata()
+% See also  std_spec(), std_ersp(), std_topo(), std_preclust()
 %
 % Authors:  Hilit Serby, SCCN, INC, UCSD, January, 2005
 
@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2006/03/07 22:40:10  arno
+% floatwrite in double
+%
 % Revision 1.9  2006/03/07 03:27:25  scott
 % accepting [] component list -sm
 %
@@ -75,10 +78,10 @@
 % [6~[6~floatread/flotwrite folder fix; computation of ICA fix
 %
 
-function [EEG_etc, X, t] = cls_erp(EEG, comp, timerange)
+function [EEG_etc, X, t] = std_erp(EEG, comp, timerange)
 
 if nargin < 1
-    help cls_erp;
+    help std_erp;
     return;
 end;
     
@@ -105,7 +108,7 @@ if isfield(EEG,'etc')
              if t(end) < timerange(end) | t(1) > timerange(1)
                  disp(['Warning! The requested max latency window limit is outside the previous bounds; recomputing the ERPs...']);
                  EEG.etc = rmfield(EEG.etc, 'icaerp');
-                 [EEG_etc, X, t] = cls_erp(EEG, comp, timerange);
+                 [EEG_etc, X, t] = std_erp(EEG, comp, timerange);
                  return;
              end
              t = t(minind:maxind);
