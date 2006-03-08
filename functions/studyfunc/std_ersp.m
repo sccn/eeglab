@@ -101,6 +101,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2006/03/08 22:55:50  arno
+% fix itcboot now
+%
 % Revision 1.18  2006/03/08 22:50:40  arno
 % fix last change
 %
@@ -227,7 +230,8 @@ for k = 1:length(comps)  % for each (specified) component
     %          'phasecoher',  'plotersp', 'off', 'plotitc', 'off', 'powbase', powbase, ...
     %             'alpha',alpha,'padratio',padratio, 'plotphase','off','winsize',winsize);
 
-    [ersp,itc,powbase,times,freqs,erspboot,itcboot] = timef( TMP.icaact(comps(k), :) , ...
+    dsfdsdsf
+    [ersp,itc,tmppowbase,times,freqs,erspboot,itcboot] = timef( TMP.icaact(comps(k), :) , ...
           EEG.pnts, [EEG.xmin EEG.xmax]*1000, EEG.srate, cycles ,'type', ...
              'phasecoher',  'plotersp', 'off', 'plotitc', 'off', 'powbase', powbase(k,:), ...
                 'padratio',padratio, 'plotphase','off','winsize',winsize);
@@ -241,7 +245,7 @@ for k = 1:length(comps)  % for each (specified) component
     catch
         logeboot = zeros(2, length(logfreqs));
     end;
-    logbase = interp1(log(freqs),powbase,logfreqs','linear');
+    logbase = interp1(log(freqs),tmppowbase,logfreqs','linear');
 
     [logfreqs,logitc] = logimagesc(times,freqs,itc,'plot','off'); 
     
