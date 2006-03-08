@@ -293,7 +293,7 @@ for ci = 1:length(comp_ind)
         warndlg2([ 'Dataset ' num2str(abset) ' has no topoplot image information, aborting'] , 'Abort - Plot scalp maps' ); 
         return;
     end
-    [grid, yi, xi] = std_readscalp(ALLEEG, abset, comp);
+    [grid, yi, xi] = std_readtopo(ALLEEG, abset, comp);
     if isempty(grid)
         warndlg2(['pop_clustedit: file '  ALLEEG(abset).etc.icascalp ' was not found in path ' ALLEEG(abset).filepath], 'Abort - Plot scalp maps' ); 
         return

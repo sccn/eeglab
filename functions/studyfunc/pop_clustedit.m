@@ -280,7 +280,7 @@ if ~isstr(varargin{1})
     show_clust      = [ 'pop_clustedit(''showclust'',gcf);'];
     show_comps      = [ 'pop_clustedit(''showcomplist'',gcf);'];
 	plot_clus_maps  = [ 'pop_clustedit(''topoplot'',gcf); ']; 
-    plot_comp_maps  = [ 'pop_clustedit(''plotcompmap'',gcf); ']; 
+    plot_comp_maps  = [ 'pop_clustedit(''plotcomptopo'',gcf); ']; 
     plot_clus_ersps = ['pop_clustedit(''erspplot'',gcf); '];
     plot_comp_ersps = ['pop_clustedit(''plotcompersp'',gcf); '];
     plot_clus_itcs  = ['pop_clustedit(''itcplot'',gcf); '];
@@ -318,43 +318,7 @@ if ~isstr(varargin{1})
     fig_arg{1}{2} = STUDY;
     fig_arg{1}{3} = cls;
     fig_arg{2}    = N;
-    
-    cluster_on = '';
-    if sameparent 
-        k = 1;
-        lm = 1;
-        while (k ~= length(cls)) & (lm == 1) %  make sure to take clustered measures from clusters created by the clustering algorithm
-            if (~strncmpi('Notclust',STUDY.cluster(cls(k)).name,8))  & (~strncmpi('ParentCluster',STUDY.cluster(cls(k)).name,13))
-                lm = k;
-            end
-            k = k +1;
-        end
-        for k = 1: length(STUDY.cluster(cls(lm)).preclust.preclustparams)
-           std_measure = STUDY.cluster(cls(lm)).preclust.preclustparams{k}{1};
-           switch std_measure
-               case 'spec'
-                   std_measure = 'spectrum';
-               case 'erp'
-                   std_measure = 'ERP';
-               case 'dipoles'
-                   std_measure = 'dipole';
-               case 'ersp'
-                   std_measure = 'ERSP';
-               case 'itc'
-                   std_measure = 'ITC';
-               case 'scalp'
-                   std_measure = 'map';
-           end
-           if k == 1
-                cluster_on = strcat(cluster_on, std_measure);
-            elseif k ~= length(STUDY.cluster(cls(lm)).preclust.preclustparams)
-                cluster_on = strcat(cluster_on, ',  ' ,std_measure);
-            else
-                cluster_on = strcat(cluster_on, '& ' ,std_measure);
-           end
-        end
-    end
-    
+        
     if length(cls) > 1, vallist = 1; else vallist = 2; end;
     geometry = { [4] [1] [1 0.3 1] [1 0.3 1] [1 0.3 1] [1 0.3 1] [1 0.3 1] [1 0.3 1] [1 0.3 1] ...
                  [1 0.3 1] [1 0.3 1] [1] [1 0.3 1] [1 0.3 1] [1 0.3 1] [1] [0.2 1 1.5 0.3] [1] };
@@ -485,7 +449,7 @@ else
             end
            userdat{1}{2} = STUDY;
            set(hdl, 'userdat',userdat);    
-        case {'plotcompmap', 'plotcompersp','plotcompitc','plotcompspec', 'plotcomperp','plotcompdip'}
+        case {'plotcomptopo', 'plotcompersp','plotcompitc','plotcompspec', 'plotcomperp','plotcompdip'}
             plotting_option = varargin{1};
             plotting_option = [ plotting_option(9:end) 'plot' ];
             if (clus ~= 1 ) %specific cluster
