@@ -129,7 +129,7 @@ if strcmpi(mode, 'comps')
             tmp_ave = ave_grid;
             tmp_ave(find(isnan(tmp_ave))) = 0; % remove NaN values from grid for later correlation calculation.  
             try
-                clusscalp = std_clustread(STUDY, ALLEEG, cls(clus),'scalp');
+                clusscalp = std_clustread(STUDY, ALLEEG, cls(clus), 'topo');
             catch,
                 warndlg2([ 'Some topoplot image information is missing, aborting'] , 'Abort - Plot scalp maps' );   
                 delete(h_wait)
