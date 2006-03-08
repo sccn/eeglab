@@ -58,6 +58,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2006/03/03 00:43:32  scott
+% editing msgs -sm
+%
 % Revision 1.14  2006/02/22 22:44:39  arno
 % now edit all clusters by default
 %
@@ -170,17 +173,17 @@ if isempty(varargin) %GUI call
                 if outliers_on
                     command = sprintf('%s %s %s %s', command, '''outliers'', ', stdval, ',');
                     [IDX,C,sumd,D,outliers] = robust_kmeans(clustdata,clus_num,str2num(stdval),5);
-                    [STUDY, clusters] = create_cluster(STUDY,IDX,C,  {'robust_kmeans', clus_num});
+                    [STUDY, clusters] = std_createclust(STUDY,IDX,C,  {'robust_kmeans', clus_num});
                 else
                     [IDX,C,sumd,D] = kmeans(clustdata,clus_num,'replicates',10,'emptyaction','drop');
-                    [STUDY, clusters] = create_cluster(STUDY,IDX,C,  {'Kmeans', clus_num});
+                    [STUDY, clusters] = std_createclust(STUDY,IDX,C,  {'Kmeans', clus_num});
                 end    
          case 'Hierarchical tree'
              %[IDX,C] = hierarchical_tree(clustdata,clus_num);
-             %[STUDY, clusters] = create_cluster(STUDY,IDX,C,  {'Neural Network', clus_num});
+             %[STUDY, clusters] = std_createclust(STUDY,IDX,C,  {'Neural Network', clus_num});
          case 'Neural Network'
              [IDX,C] = neural_net(clustdata,clus_num);
-             [STUDY, clusters] = create_cluster(STUDY,IDX,C,  {'Neural Network', clus_num});
+             [STUDY, clusters] = std_createclust(STUDY,IDX,C,  {'Neural Network', clus_num});
              command = sprintf('%s %s %d %s', command, '''algorithm'', ''Neural Network'',''clus_num'', ', clus_num, ',');
         end
         disp('Done.');
@@ -248,14 +251,14 @@ else %command line call
         case 'kmeans'                
             if outliers == Inf
                 [IDX,C,sumd,D] = kmeans(clustdata,clus_num,'replicates',10,'emptyaction','drop');
-                [STUDY, clusters] = create_cluster(STUDY,IDX,C,  {'Kmeans', clus_num});
+                [STUDY, clusters] = std_createclust(STUDY,IDX,C,  {'Kmeans', clus_num});
             else
                 [IDX,C,sumd,D,outliers] = robust_kmeans(clustdata,clus_num,outliers,5);
-                [STUDY, clusters] = create_cluster(STUDY,IDX,C,  {'robust_kmeans', clus_num});
+                [STUDY, clusters] = std_createclust(STUDY,IDX,C,  {'robust_kmeans', clus_num});
             end
         case 'Neural Network'
             [IDX,C] = neural_net(clustdata,clus_num);
-            [STUDY, clusters] = create_cluster(STUDY,IDX,C,  {'Neural Network', clus_num});
+            [STUDY, clusters] = std_createclust(STUDY,IDX,C,  {'Neural Network', clus_num});
         otherwise
             disp('pop_clust: unknown algorithm return');
             return

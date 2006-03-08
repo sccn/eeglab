@@ -1,4 +1,4 @@
-function [STUDY, clusters] = create_cluster(STUDY,IDX,C, algorithm)
+function [STUDY, clusters] = std_createclust(STUDY,IDX,C, algorithm)
 
 clusters = [];
 sets = [];
