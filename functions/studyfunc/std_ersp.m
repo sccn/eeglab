@@ -101,6 +101,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2006/03/08 22:49:10  arno
+% detect the presence of file or not
+%
 % Revision 1.16  2006/03/08 20:29:08  arno
 % rename func
 %
@@ -179,7 +182,7 @@ end
 % Check if ERSP information found in datasets and if fits requested parameters 
 if isfield(EEG,'etc')
      if isfield(EEG.etc, [ 'ica' type ])
-         if exist( fullfile(EEG.filepath, getfield(EEG.etc, [ 'ica' type ]))
+         if exist( fullfile(EEG.filepath, getfield(EEG.etc, [ 'ica' type ])))
              params = EEG.etc.icaerspparams;
              if sum(params.cycles ~= cycles)                   ...
                      | sum(params.freqrange ~= freqrange)   ...
