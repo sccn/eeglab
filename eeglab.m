@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.458  2006/03/06 22:29:14  arno
+% debug clear study
+%
 % Revision 1.457  2006/03/02 23:36:54  arno
 % menus activated by default
 %
@@ -1596,11 +1599,13 @@ if (strcmpi(comp(1:3), 'GLN') & exist( [ eeglabpath 'functions/adminfunc' ] ) ==
     myaddpath( eeglabpath, 'readeetraklocs.m', 'functions/sigprocfunc');
     myaddpath( eeglabpath, 'eeg_checkset.m',   'functions/adminfunc');
     myaddpath( eeglabpath, 'pop_loadbci.m',    'functions/popfunc');
+    myaddpath( eeglabpath, 'pop_study.m',      'functions/studyfunc');
     myaddpath( eeglabpath, 'icademo.m',        'functions/miscfunc');
     myaddpath( eeglabpath, 'VolumeMNI.bin',    'functions/resources');
 elseif (strcmpi(computer, 'pcwin') & exist( [ eeglabpath 'functions\adminfunc' ] ) == 7)
     myaddpath( eeglabpath, 'readeetraklocs.m', 'functions\sigprocfunc');
     myaddpath( eeglabpath, 'eeg_checkset.m',   'functions\adminfunc');
+    myaddpath( eeglabpath, 'pop_study.m',      'functions\studyfunc');
     myaddpath( eeglabpath, 'pop_loadbci.m',    'functions\popfunc');
     myaddpath( eeglabpath, 'icademo.m',        'functions\miscfunc');
     myaddpath( eeglabpath, 'eeglab1020.ced',   'functions\resources');
