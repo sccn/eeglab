@@ -56,23 +56,23 @@
 %                and the spectrum will have different colors for each condition. The ERSP 
 %                and ITC plots will show only the first condition; clicking on the subplot 
 %                will open a new figure with the different conditions displayed together. 
-%                Uses the command line function cls_plotclust().
+%                Uses the command line function std_propplot().
 %  "Plot scalp maps"  - [button] Displays the scalp maps of cluster components.
 %                If applied to a cluster, scalp maps of the cluster components
 %                are plotted along with the cluster mean scalp map in one figure. 
 %                If "All # cluster centroids" option is selected, all cluster scalp map
 %                means are plotted in the same figure. If applied to components, displays
 %                the scalp maps of the specified cluster components in separate figures.
-%                Uses the command line functions cls_plotclustmap() and cls_plotcompmap().
+%                Uses the command line functions std_plotmap() and std_plotcompmap().
 %  "Plot ERSPs" - [button] Displays the cluster component ERSPs. 
 %                If applied to a cluster, component ERSPs are plotted in one figure  
 %                (per condition) with the cluster mean ERSP. If "All # cluster centroids" 
 %                option is selected, plots all average ERSPs of the clusters in one figure 
 %                per condition. If applied to components, display the ERSP images of specified 
 %                cluster components in separate figures, using one figure for all conditions.
-%                Uses the command line functions cls_plotclustersp() and cls_plotcompersp().
+%                Uses the command line functions std_plotersp() and std_plotcompersp().
 %  "Plot ITCs" - [button] Same as  "Plot ERSPs" but with ITC.
-%                Uses the command line functions cls_plotclustitc() and cls_plotcompitc().
+%                Uses the command line functions std_plotitc() and std_plotcompitc().
 %  "Plot dipoles" - [button] Displays the dipoles of the cluster components.
 %                If applied to a cluster, plots the cluster component dipoles (in blue) 
 %                plus the average cluster dipole (in red). If "All # cluster centroids" option 
@@ -80,7 +80,7 @@
 %                a separate subplot. If applied to components, displays the ERSP images of the
 %                specified cluster. For specific components displays components dipole (in blue) 
 %                plus the average cluster dipole (in Red) in separate figures. 
-%                Uses the command line functions cls_plotclustdip() and cls_plotcompdip().
+%                Uses the command line functions std_plotdip() and std_plotcompdip().
 %  "Plot spectra" - [button] Displays the cluster component spectra.   
 %                If applied to a cluster, displays component spectra plus the average cluster 
 %                spectrum in bold. For a specific cluster, displays the cluster component 
@@ -90,9 +90,9 @@
 %                conditions (if any) plotted in different colors.  
 %                If applied to components, displays the spectrum of specified cluster 
 %                components in separate figures using one figure for all conditions.  
-%                Uses the command line functions cls_plotclustspec() and cls_plotcompspec().
+%                Uses the command line functions std_plotspec() and std_plotcompspec().
 %  "Plot ERPs" - [button] Same as "Plot spectra" but for ERPs.
-%                Uses the command line functions cls_plotclusterp() and cls_plotcomperp().
+%                Uses the command line functions std_ploterp() and std_plotcomperp().
 %  "Create new cluster" - [button] Creates a new empty cluster.
 %                Opens a popup window in which a name for the new cluster can be entered.
 %                If no name is given the default name is 'Cls #', where '#' is the next
@@ -100,35 +100,35 @@
 %                window 'OK' button, else press the 'Cancel' button. After the empty 
 %                cluster is created, components can be moved into it using, 
 %                'Reassign selected component(s)' (see below). Uses the command line 
-%                function cls_createclust().
+%                function std_createclust().
 %  "Rename selected cluster" - [button] Renames a cluster using the selected (mnemonic) name. 
 %                Opens a popup window in which a new name for the selected cluster can be 
 %                entered. For changes to take place, press the popup window 'OK' button, 
-%                else press the 'Cancel' button. Uses the command line function cls_renameclust().
+%                else press the 'Cancel' button. Uses the command line function std_renameclust().
 %  "Reject outlier components" - [button] rejects outlier components to an outlier cluster.
 %                Opens a popup window to specify the outlier threshold. Move outlier 
 %                components that are more than x standard deviations devs from the 
 %                cluster centroid to an outlier cluster. For changes to take place, 
 %                press the popup window 'OK' button, else press the 'Cancel' button. 
-%                Uses the command line function cls_rejectoutliers().
+%                Uses the command line function std_rejectoutliers().
 %  "Merge clusters" - [button] Merges several clusters into one cluster.
 %                Opens a popup window in which the clusters to merge may be specified 
 %                An optional name can be given to the merged cluster. If no name is given, 
 %                the default name is 'Cls #', where '#' is the next available cluster number.   
 %                For changes to take place, press the popup window 'OK' button, else press
-%                the 'Cancel' button. Uses the command line function cls_mergeclust().
+%                the 'Cancel' button. Uses the command line function std_mergeclust().
 %  "Remove selected outlier component(s)" - [button] Moves selected component(s) to the 
 %                outlier cluster. The components that will be moved are the ones selected 
 %                in the "Select component(s) to plot" list box. Opens a popup window in which 
 %                a list of the selected component(s) is presented. For changes to take place,
 %                press the popup window 'OK' button, else press the 'Cancel' button. 
-%                Uses the command line function cls_moveoutlier().
+%                Uses the command line function std_moveoutlier().
 %  "Reassign selected component(s)"- [button] Moves selected component(s) from one cluster 
 %                to another. The components that will reassign are the ones selected in the
 %                "Select component(s) to plot" list box. Opens a popup window in which 
 %                a list of possible clusters to which to move the selected component(s) is 
 %                presented. For changes to take place, press the popup window 'OK' button, 
-%                else press the 'Cancel' button. Uses the command line function cls_movecomp().
+%                else press the 'Cancel' button. Uses the command line function std_movecomp().
 %  "Save STUDY set to disk" - [check box] Saves the STUDY set structure modified according 
 %                to specified user edits to the disk. If no file name is entered will
 %                overwrite the current STUDY set file. 
@@ -279,19 +279,19 @@ if ~isstr(varargin{1})
     
     show_clust      = [ 'pop_clustedit(''showclust'',gcf);'];
     show_comps      = [ 'pop_clustedit(''showcomplist'',gcf);'];
-	plot_clus_maps  = [ 'pop_clustedit(''plotclustmap'',gcf); ']; 
+	plot_clus_maps  = [ 'pop_clustedit(''topoplot'',gcf); ']; 
     plot_comp_maps  = [ 'pop_clustedit(''plotcompmap'',gcf); ']; 
-    plot_clus_ersps = ['pop_clustedit(''plotclustersp'',gcf); '];
+    plot_clus_ersps = ['pop_clustedit(''erspplot'',gcf); '];
     plot_comp_ersps = ['pop_clustedit(''plotcompersp'',gcf); '];
-    plot_clus_itcs  = ['pop_clustedit(''plotclustitc'',gcf); '];
+    plot_clus_itcs  = ['pop_clustedit(''itcplot'',gcf); '];
     plot_comp_itcs  = ['pop_clustedit(''plotcompitc'',gcf); '];
-    plot_clus_spectra = ['pop_clustedit(''plotclustspec'',gcf); '];
+    plot_clus_spectra = ['pop_clustedit(''specplot'',gcf); '];
     plot_comp_spectra = ['pop_clustedit(''plotcompspec'',gcf); '];
-    plot_clus_erp = ['pop_clustedit(''plotclusterp'',gcf); '];
+    plot_clus_erp = ['pop_clustedit(''erpplot'',gcf); '];
     plot_comp_erp = ['pop_clustedit(''plotcomperp'',gcf); '];
-    plot_clus_dip = ['pop_clustedit(''plotclustdip'',gcf); '];
+    plot_clus_dip = ['pop_clustedit(''dipplot'',gcf); '];
     plot_comp_dip = ['pop_clustedit(''plotcompdip'',gcf); '];
-    plot_clus_sum = ['pop_clustedit(''plotclustsum'',gcf); '];
+    plot_clus_sum = ['pop_clustedit(''plotsum'',gcf); '];
     plot_comp_sum = ['pop_clustedit(''plotcompsum'',gcf); '];
     rename_clust  = ['pop_clustedit(''renameclust'',gcf);']; 
     move_comp     = ['pop_clustedit(''movecomp'',gcf);'];
@@ -330,27 +330,27 @@ if ~isstr(varargin{1})
             k = k +1;
         end
         for k = 1: length(STUDY.cluster(cls(lm)).preclust.preclustparams)
-           cls_measure = STUDY.cluster(cls(lm)).preclust.preclustparams{k}{1};
-           switch cls_measure
+           std_measure = STUDY.cluster(cls(lm)).preclust.preclustparams{k}{1};
+           switch std_measure
                case 'spec'
-                   cls_measure = 'spectrum';
+                   std_measure = 'spectrum';
                case 'erp'
-                   cls_measure = 'ERP';
+                   std_measure = 'ERP';
                case 'dipoles'
-                   cls_measure = 'dipole';
+                   std_measure = 'dipole';
                case 'ersp'
-                   cls_measure = 'ERSP';
+                   std_measure = 'ERSP';
                case 'itc'
-                   cls_measure = 'ITC';
+                   std_measure = 'ITC';
                case 'scalp'
-                   cls_measure = 'map';
+                   std_measure = 'map';
            end
            if k == 1
-                cluster_on = strcat(cluster_on, cls_measure);
+                cluster_on = strcat(cluster_on, std_measure);
             elseif k ~= length(STUDY.cluster(cls(lm)).preclust.preclustparams)
-                cluster_on = strcat(cluster_on, ',  ' ,cls_measure);
+                cluster_on = strcat(cluster_on, ',  ' ,std_measure);
             else
-                cluster_on = strcat(cluster_on, '& ' ,cls_measure);
+                cluster_on = strcat(cluster_on, '& ' ,std_measure);
            end
         end
     end
@@ -436,13 +436,13 @@ else
     
     switch  varargin{1}
         
-        case {'plotclustmap', 'plotclustersp','plotclustitc','plotclustspec', 'plotclusterp'}
+        case {'topoplot', 'erspplot','itcplot','specplot', 'erpplot'}
             plotting_option = varargin{1};
             if (clus ~= 1 ) % specific cluster option
                 if ~isempty(STUDY.cluster(cls(clus-1)).comps)
-                    eval(['STUDY = cls_' plotting_option '(STUDY,ALLEEG,''clusters'','  num2str(cls(clus-1)) ',''mode'',''centroid'');'  ]);
+                    eval(['STUDY = std_' plotting_option '(STUDY,ALLEEG,''clusters'','  num2str(cls(clus-1)) ',''mode'',''centroid'');'  ]);
                      % update Study history
-                    a = ['STUDY = cls_' plotting_option '(STUDY,ALLEEG,''clusters'','  num2str(cls(clus-1)) ',''mode'',''centroid'');'  ];
+                    a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''clusters'','  num2str(cls(clus-1)) ',''mode'',''centroid'');'  ];
                     STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
                 end
             else % all clusters
@@ -454,19 +454,19 @@ else
                         tmpcls = [ tmpcls cls(k)];
                     end
                 end
-                eval(['STUDY = cls_' plotting_option '(STUDY,ALLEEG,''clusters'',[' num2str(tmpcls) '], ''mode'',''centroid'');'  ]);
+                eval(['STUDY = std_' plotting_option '(STUDY,ALLEEG,''clusters'',[' num2str(tmpcls) '], ''mode'',''centroid'');'  ]);
                 % update Study history
-                a = ['STUDY = cls_' plotting_option '(STUDY,ALLEEG,''clusters'',['  num2str(tmpcls) '],''mode'',''centroid'');'  ];
+                a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''clusters'',['  num2str(tmpcls) '],''mode'',''centroid'');'  ];
                 STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
             end
             userdat{1}{2} = STUDY;
             set(hdl, 'userdat',userdat); 
-        case   'plotclustdip'  
+        case   'dipplot'  
             if (clus ~= 1 ) % specific cluster option
                 if ~isempty(STUDY.cluster(cls(clus-1)).comps)
-                    [STUDY] = cls_plotclustdip(STUDY, ALLEEG, 'clusters', cls(clus-1), 'mode', 'apart');
+                    [STUDY] = std_plotdip(STUDY, ALLEEG, 'clusters', cls(clus-1), 'mode', 'apart');
                     % update Study history
-                    a = ['STUDY = cls_plotclustdip(STUDY, ALLEEG, ''clusters'','  num2str(cls(clus-1)) ',''mode'',''apart'' );'  ];
+                    a = ['STUDY = std_plotdip(STUDY, ALLEEG, ''clusters'','  num2str(cls(clus-1)) ',''mode'',''apart'' );'  ];
                     STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
                 end
             else % all clusters
@@ -478,31 +478,31 @@ else
                         tmpcls = [ tmpcls cls(k)];
                     end
                 end
-                [STUDY] = cls_plotclustdip(STUDY, ALLEEG, 'clusters', tmpcls, 'mode', 'joined');
+                [STUDY] = std_plotdip(STUDY, ALLEEG, 'clusters', tmpcls, 'mode', 'joined');
                 % update Study history
-                a = ['STUDY = cls_plotclustdip(STUDY, ALLEEG, ''clusters'',[' num2str(tmpcls)  '],''mode'',''joined'' );'  ];
+                a = ['STUDY = std_plotdip(STUDY, ALLEEG, ''clusters'',[' num2str(tmpcls)  '],''mode'',''joined'' );'  ];
                 STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
             end
            userdat{1}{2} = STUDY;
            set(hdl, 'userdat',userdat);    
         case {'plotcompmap', 'plotcompersp','plotcompitc','plotcompspec', 'plotcomperp','plotcompdip'}
             plotting_option = varargin{1};
-            plotting_option = [ 'plotclust' plotting_option(9:end) ];
+            plotting_option = [ plotting_option(9:end) 'plot' ];
             if (clus ~= 1 ) %specific cluster
                 if comp_ind(1) ~= 1  % check that not all comps in cluster are requested
-                    eval(['STUDY = cls_' plotting_option '(STUDY,ALLEEG, ''clusters'','  num2str(cls(clus-1)) ', ''comps'',[' num2str(comp_ind-1) '] );'  ]);
+                    eval(['STUDY = std_' plotting_option '(STUDY,ALLEEG, ''clusters'','  num2str(cls(clus-1)) ', ''comps'',[' num2str(comp_ind-1) '] );'  ]);
                     % update Study history
-                    a = ['STUDY = cls_' plotting_option '(STUDY,ALLEEG, ''clusters'','  num2str(cls(clus-1)) ',''comps'',[' num2str(comp_ind-1) '] );'  ];
+                    a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG, ''clusters'','  num2str(cls(clus-1)) ',''comps'',[' num2str(comp_ind-1) '] );'  ];
                     STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
                  else
-                    eval(['STUDY = cls_' plotting_option '(STUDY,ALLEEG, ''clusters'','  num2str(cls(clus-1)) ', ''mode'', ''comps'' );'  ]);
+                    eval(['STUDY = std_' plotting_option '(STUDY,ALLEEG, ''clusters'','  num2str(cls(clus-1)) ', ''mode'', ''comps'' );'  ]);
                     % update Study history
-                    a = ['STUDY = cls_' plotting_option '(STUDY,ALLEEG, ''clusters'','  num2str(cls(clus-1)) ', ''mode'', ''comps'' );'  ];
+                    a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG, ''clusters'','  num2str(cls(clus-1)) ', ''mode'', ''comps'' );'  ];
                     STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);
                     if length(comp_ind) > 1 % plot specific components too
-                        eval(['STUDY = cls_' plotting_option '(STUDY,ALLEEG, ''clusters'','  num2str(cls(clus-1)) ',''comps'',[' num2str(comp_ind(2:end)-1) '] );'  ]);
+                        eval(['STUDY = std_' plotting_option '(STUDY,ALLEEG, ''clusters'','  num2str(cls(clus-1)) ',''comps'',[' num2str(comp_ind(2:end)-1) '] );'  ]);
                         % update Study history
-                        a = ['STUDY = cls_' plotting_option '(STUDY,ALLEEG, ''clusters'','  num2str(cls(clus-1)) ',''comps'',[' num2str(comp_ind(2:end)-1) '] );' ];
+                        a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG, ''clusters'','  num2str(cls(clus-1)) ',''comps'',[' num2str(comp_ind(2:end)-1) '] );' ];
                         STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);
                     end
                 end
@@ -518,9 +518,9 @@ else
                             (~strncmpi('ParentCluster',STUDY.cluster(cls(k)).name,13)) 
                            if strcmpi(STUDY.cluster(cls(k)).name, clust_name)
                                cind = comp_ind(ci) - num_comps; % component index in the cluster
-                               eval(['STUDY = cls_' plotting_option '(STUDY,ALLEEG,''clusters'','  num2str(cls(k)) ',''comps'',[' num2str(cind) '] );'  ]);
+                               eval(['STUDY = std_' plotting_option '(STUDY,ALLEEG,''clusters'','  num2str(cls(k)) ',''comps'',[' num2str(cind) '] );'  ]);
                                % update Study history
-                               a = ['STUDY = cls_' plotting_option '(STUDY,ALLEEG,''clusters'','  num2str(cls(k)) ',''comps'',[' num2str(cind) '] );' ];
+                               a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''clusters'','  num2str(cls(k)) ',''comps'',[' num2str(cind) '] );' ];
                                STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);
                                break;
                            else
@@ -580,11 +580,11 @@ else
             end
             set(findobj('parent', hdl, 'tag', 'clust_comp'), 'String', compid, 'value', selected);
            
-        case 'plotclustsum'
+        case 'plotsum'
             if clus ~= 1 % specific cluster option
-                [STUDY] = cls_plotclust(STUDY, ALLEEG, 'cluster', cls(clus-1));
+                [STUDY] = std_propplot(STUDY, ALLEEG, 'cluster', cls(clus-1));
                 % update Study history
-                a = ['STUDY = cls_plotclust(STUDY, ALLEEG, ''cluster'', '  num2str(cls(clus-1)) ' );'  ];
+                a = ['STUDY = std_propplot(STUDY, ALLEEG, ''cluster'', '  num2str(cls(clus-1)) ' );'  ];
                 STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
             else % all clusters
                 % All clusters does not include 'Notclust' and 'Outliers' clusters. 
@@ -595,9 +595,9 @@ else
                         tmpcls = [tmpcls cls(k)];
                     end
                 end
-                [STUDY] = cls_plotclust(STUDY, ALLEEG, 'cluster', tmpcls);
+                [STUDY] = std_propplot(STUDY, ALLEEG, 'cluster', tmpcls);
                 % update Study history
-                a = ['STUDY = cls_plotclust(STUDY, ALLEEG, ''cluster'', ['  num2str(tmpcls) '] );'  ];
+                a = ['STUDY = std_propplot(STUDY, ALLEEG, ''cluster'', ['  num2str(tmpcls) '] );'  ];
                 STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
             end
            userdat{1}{2} = STUDY;
@@ -626,10 +626,10 @@ else
             '', 'Rename cluster - from pop_clustedit()' );
             if ~isempty(rename_param) %if not canceled
                 new_name = rename_param{1};
-                STUDY = cls_renameclust(STUDY, ALLEEG, cls(clus_num), new_name);
+                STUDY = std_renameclust(STUDY, ALLEEG, cls(clus_num), new_name);
                 new_name = STUDY.cluster(cls(clus_num)).name;
                 % update Study history
-                a = ['STUDY = cls_renameclust(STUDY, ALLEEG, ' num2str(cls(clus_num)) ', ' new_name ');'];
+                a = ['STUDY = std_renameclust(STUDY, ALLEEG, ' num2str(cls(clus_num)) ', ' new_name ');'];
                 STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
                 clus_name_list{clus_num+1} = [new_name ' (' num2str(length(STUDY.cluster(cls(clus_num)).comps))  ' ICs)'];
                 set(findobj('parent', hdl, 'tag', 'clus_list'), 'String', clus_name_list);
@@ -671,9 +671,9 @@ else
                     warndlg2('Cannot move all the components of the cluster - abort move components', 'Aborting move components');
                     return;
                 end
-                STUDY = cls_movecomp(STUDY, ALLEEG,  cls(old_clus), optionalcls(new_clus), comp_ind - 1);                
+                STUDY = std_movecomp(STUDY, ALLEEG,  cls(old_clus), optionalcls(new_clus), comp_ind - 1);                
                 % update Study history
-                a = ['STUDY = cls_movecomp(STUDY, ALLEEG, ' num2str(cls(old_clus)) ', ' num2str(optionalcls(new_clus)) ', [' num2str(comp_ind - 1) ']);'];
+                a = ['STUDY = std_movecomp(STUDY, ALLEEG, ' num2str(cls(old_clus)) ', ' num2str(optionalcls(new_clus)) ', [' num2str(comp_ind - 1) ']);'];
                 STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);
                 clus_name_list = get(findobj('parent', hdl, 'tag', 'clus_list'), 'String');
                 newind = find(cls == optionalcls(new_clus));
@@ -713,9 +713,9 @@ else
                   {'style' 'listbox' 'string' {comp_list{comp_ind}} 'tag' 'new_clus'} {} }, ...
                   '', 'Remove outliers - from pop_clustedit()' ,[] , 'normal', [1 3 1] );
             if ~isempty(reassign_param) %if not canceled
-                STUDY = cls_moveoutlier(STUDY, ALLEEG,  cls(old_clus), comp_ind - 1);
+                STUDY = std_moveoutlier(STUDY, ALLEEG,  cls(old_clus), comp_ind - 1);
                 clus_name_list = get(findobj('parent', hdl, 'tag', 'clus_list'), 'String');
-                outlier_clust = cls_findoutlierclust(STUDY,cls(old_clus)); %find the outlier cluster for this cluster
+                outlier_clust = std_findoutlierclust(STUDY,cls(old_clus)); %find the outlier cluster for this cluster
                 oind = find(cls == outlier_clust); % the outlier clust index (if already exist) in the cluster list GUI
                 if ~isempty(oind) % the outlier clust is already presented in the cluster list GUI
                     clus_name_list{oind+1} = [STUDY.cluster(outlier_clust).name ' (' num2str(length(STUDY.cluster(outlier_clust).comps))  ' ICs)'];
@@ -728,7 +728,7 @@ else
                 clus_name_list{old_clus+1} = [STUDY.cluster(cls(old_clus)).name ' (' num2str(length(STUDY.cluster(cls(old_clus)).comps))  ' ICs)'];
                 set(findobj('parent', hdl, 'tag', 'clus_list'), 'String', clus_name_list);
                 % update Study history
-                a = ['STUDY = cls_moveoutlier(STUDY, ALLEEG, ' num2str(cls(old_clus)) ', [' num2str(comp_ind - 1) ']);'];
+                a = ['STUDY = std_moveoutlier(STUDY, ALLEEG, ' num2str(cls(old_clus)) ', [' num2str(comp_ind - 1) ']);'];
                 STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);
                 userdat{1}{2} = STUDY;
                 set(hdl, 'userdat',userdat); 
@@ -739,16 +739,16 @@ else
             STUDY.saved = 'no';
             clus = get(findobj('parent', hdl, 'tag', 'clus_list'), 'Value') -1;
             if clus
-                cls_name = STUDY.cluster(cls(clus)).name;
+                std_name = STUDY.cluster(cls(clus)).name;
                 % Cannot reject outliers from 'Notclust', 'ParentCluster' and 'Outlier' clusters
-                if strncmpi('Notclust',cls_name,8) | strncmpi('ParentCluster', cls_name,13) | ...
-                        strncmpi('Outliers',cls_name,8)
+                if strncmpi('Notclust',std_name,8) | strncmpi('ParentCluster', std_name,13) | ...
+                        strncmpi('Outliers',std_name,8)
                     warndlg2('Cannot reject outliers of ''Notclust'' or ''Outliers'' or ''ParentCluster'' clusters.');
                     return;
 			    end
                 clusters = cls(clus);
             else
-                cls_name = 'All clusters';
+                std_name = 'All clusters';
                 clusters = [];
                 for k = 1:length(cls)
                      if ~strncmpi('Notclust',STUDY.cluster(cls(k)).name,8) & ~strncmpi('Outliers',STUDY.cluster(cls(k)).name,8) & ...
@@ -758,20 +758,20 @@ else
                 end
             end
             reject_param  = inputgui( { [1] [1] [4 1 2] [1]}, ...
-                { {'style' 'text' 'string' ['Reject "' cls_name  '" outliers ' ] 'FontWeight' 'Bold'} {} ...
+                { {'style' 'text' 'string' ['Reject "' std_name  '" outliers ' ] 'FontWeight' 'Bold'} {} ...
                    {'style' 'text' 'string' 'Move outlier components that are more than'} {'style' 'edit' 'string' '3' 'tag' 'outliers_std' } ...
                   {'style' 'text' 'string' 'standard deviations' } ...
-                  {'style' 'text' 'string' [ 'from the "' cls_name  '" centroid to an outlier cluster.']} }, ...
+                  {'style' 'text' 'string' [ 'from the "' std_name  '" centroid to an outlier cluster.']} }, ...
                   '', 'Reject outliers - from pop_clustedit()' );
             if ~isempty(reject_param) %if not canceled
                 ostd = reject_param{1}; % the requested outlier std
-                [STUDY] = cls_rejectoutliers(STUDY, ALLEEG, clusters, str2num(ostd));  
+                [STUDY] = std_rejectoutliers(STUDY, ALLEEG, clusters, str2num(ostd));  
                 % update Study history
-                a = ['STUDY = cls_rejectoutliers(STUDY, ALLEEG, [ ' num2str(clusters) ' ], ' ostd ');'];
+                a = ['STUDY = std_rejectoutliers(STUDY, ALLEEG, [ ' num2str(clusters) ' ], ' ostd ');'];
                 STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);
                 clus_name_list = get(findobj('parent', hdl, 'tag', 'clus_list'), 'String');
                 for k = 1:length(clusters)
-                    outlier_clust = cls_findoutlierclust(STUDY,clusters(k)); %find the outlier cluster for this cluster
+                    outlier_clust = std_findoutlierclust(STUDY,clusters(k)); %find the outlier cluster for this cluster
                     oind = find(cls == outlier_clust); % the outlier clust index (if already exist) in the cluster list GUI
                     if ~isempty(oind) % the outlier clust is already presented in the cluster list GUI
                         clus_name_list{oind+1} = [STUDY.cluster(outlier_clust).name ' (' num2str(length(STUDY.cluster(outlier_clust).comps))  ' ICs)'];
@@ -799,7 +799,7 @@ else
                   '', 'Create new empty cluster - from pop_clustedit()' );
             if ~isempty(create_param) %if not canceled
                 clus_name = create_param{1}; % the name of the new cluster
-                [STUDY] = cls_createclust(STUDY, ALLEEG, clus_name); 
+                [STUDY] = std_createclust(STUDY, ALLEEG, clus_name); 
                 % Update cluster list
                 clus_name_list = get(findobj('parent', hdl, 'tag', 'clus_list'), 'String');
                 clus_name_list{end+1} = [STUDY.cluster(end).name ' (0 ICs)']; %update the cluster list with the new cluster
@@ -811,9 +811,9 @@ else
                 set(findobj('parent', hdl, 'tag', 'clus_list'), 'String', clus_name_list);
                 % update Study history
                 if isempty(clus_name)
-                    a = ['STUDY = cls_createclust(STUDY, ALLEEG);'];
+                    a = ['STUDY = std_createclust(STUDY, ALLEEG);'];
                 else
-                    a = ['STUDY = cls_createclust(STUDY, ALLEEG, ' clus_name ');'];
+                    a = ['STUDY = std_createclust(STUDY, ALLEEG, ' clus_name ');'];
                 end                
                 STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
                 userdat{1}{2} = STUDY;
@@ -840,7 +840,7 @@ else
                   {'style' 'edit' 'string' ''} {} }, ...
                   '', 'Merge clusters - from pop_clustedit()' ,[] , 'normal', [1 3 1 1 1] );
               if ~isempty(reassign_param)
-                  cls_mrg = cls(optionalcls(reassign_param{1})-1);
+                  std_mrg = cls(optionalcls(reassign_param{1})-1);
                   name = reassign_param{2};
                   allleaves = 1;
                   N = userdat{2};
@@ -849,14 +849,14 @@ else
                           allleaves = 0;
                       end
                   end                     
-                  [STUDY] = cls_mergeclust(STUDY, ALLEEG, cls_mrg, name); 
+                  [STUDY] = std_mergeclust(STUDY, ALLEEG, std_mrg, name); 
                   % 
                   % update Study history
                   % 
                   if isempty(name)
-                      a = ['STUDY = cls_mergeclust(STUDY, ALLEEG, [' num2str(cls_mrg) ']);'];
+                      a = ['STUDY = std_mergeclust(STUDY, ALLEEG, [' num2str(std_mrg) ']);'];
                   else
-                      a = ['STUDY = cls_mergeclust(STUDY, ALLEEG, [' num2str(cls_mrg) '], ' name ');'];
+                      a = ['STUDY = std_mergeclust(STUDY, ALLEEG, [' num2str(std_mrg) '], ' name ');'];
                   end                  
                   STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);
                   userdat{1}{2} = STUDY;
@@ -873,7 +873,7 @@ else
                     % update the cluster list with the new cluster
                     %
                     clus_names([optionalcls(reassign_param{1})]) = [];
-                    cls = setdiff(cls, cls_mrg); % remove from the GUI clusters list the merged clusters
+                    cls = setdiff(cls, std_mrg); % remove from the GUI clusters list the merged clusters
                     cls(end+1) = length(STUDY.cluster); % update the GUI clusters list with the new cluster
                     N  = length(cls);
                     %
@@ -881,7 +881,7 @@ else
                     % with the new number of cluster centroids
                     %
                     ti = strfind(clus_names{1},'cluster'); %get the number of clusters centroid 
-                    cent = num2str(str2num(clus_names{1}(5:ti-2))+1- length(cls_mrg)); % new number of centroids
+                    cent = num2str(str2num(clus_names{1}(5:ti-2))+1- length(std_mrg)); % new number of centroids
                     clus_names{1} = [clus_names{1}(1:4) cent clus_names{1}(ti-1:end)]; %update list
                     set(findobj('parent', hdl, 'tag', 'clus_list'), 'String', clus_names);
                     %
