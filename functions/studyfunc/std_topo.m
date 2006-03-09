@@ -8,7 +8,7 @@
 %               returns the EEG sub-structure etc (i.e EEG.etc), which is modified 
 %               with a pointer to the float file and some information about the file. 
 % Usage:
-%               >> [EEG_etc, X] = std_topo(EEG, components, option);  
+%               >> X = std_topo(EEG, components, option);  
 %
 %                  % Returns the ICA topo map grid for a dataset. 
 %                  % Updates the EEG structure in the Matlab environment and re-saves
@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2006/03/09 19:21:08  arno
+% header
+%
 % Revision 1.10  2006/03/09 19:20:45  arno
 % saving topographies
 %
