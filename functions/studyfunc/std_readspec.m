@@ -29,7 +29,7 @@
 %
 %  See also  std_spec, pop_preclust, eeg_preclust, eeg_createdata           
 %
-% Authors:  Hilit Serby, SCCN, INC, UCSD, February, 2005
+% Authors:  Arnaud Delorme, Hilit Serby, SCCN, INC, UCSD, February, 2005
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2006/03/09 18:10:18  arno
+% do not use etc field any more
+%
 % Revision 1.6  2006/03/09 00:42:09  arno
 % fix reading file
 %
