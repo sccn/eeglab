@@ -1,7 +1,7 @@
 % std_readerp() - Given the ALLEEG structure, a specific EEG dataset index, 
 % and a specific component, the function returns the ERP of that ICA component. 
-% The ERP of the dataset ICA components is assumed to be saved in a float 
-% file, the EEG dataset include a pointer to this file. If such a float file doesn't exist,
+% The ERP of the dataset ICA components is assumed to be saved in a Matlab 
+% file. If such a file doesn't exist,
 % you can use the std_erp() function to create it, or use the pre - clustering functions
 % that call it: pop_preclust, eeg_preclust & eeg_createdata.  
 % Along with the ERP of the selected ICA component the function returns  
@@ -17,9 +17,9 @@
 % Inputs:
 %   ALLEEG     - an EEGLAB data structure, which holds EEG sets (can also be one EEG set). 
 %                      ALLEEG must contain the dataset of interest (the setind).
-%   setind         -  [integer] an index of an EEG dataset in the ALLEEG
+%   setind     -  [integer] an index of an EEG dataset in the ALLEEG
 %                      structure, for which to get the component ERP.
-%   component - [integer] a component index in the selected EEG dataset for which 
+%   component  - [integer] a component index in the selected EEG dataset for which 
 %                      an ERP will be returned. 
 %
 % Outputs:
@@ -30,7 +30,7 @@
 %
 %  See also  std_erp(), pop_preclust(), std_preclust()          
 %
-% Authors:  Hilit Serby, SCCN, INC, UCSD, February, 2005
+% Authors: Arnaud Delorme, Hilit Serby, SCCN, INC, UCSD, February, 2005
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2006/03/08 20:31:25  arno
+% rename func
+%
 % Revision 1.3  2006/03/07 22:21:26  arno
 % use fullfile
 %
@@ -59,12 +62,9 @@
 %
 
 function [erp, t] = std_readerp(ALLEEG, abset, comp)
+    
 erp = [];
-d = ALLEEG(abset).etc.icaerpparams;
-try
-    t   = floatread( fullfile(ALLEEG(abset).filepath, ALLEEG(abset).etc.icaerp), [d 1]);
-    erp = floatread( fullfile(ALLEEG(abset).filepath, ALLEEG(abset).etc.icaerp), [d 1],[],d*(comp));
-catch
-    warndlg2(['std_readerp: file '  ALLEEG(abset).etc.icaerp ' was not found in path ' ALLEEG(abset).filepath], 'Abort - computing ERP centroid' ); 
-    return;
-end
+filename  = fullfile( ALLEEG(abset).filepath,[ ALLEEG(abset).filename(1:end-3) 'icaerp']);
+erpstruct = load( '-mat', filename, [ 'comp' int2str(comp) ], 'times' );
+erp       = getfield(erpstruct, [ 'comp' int2str(comp) ]);
+t         = getfield(erpstruct, 'times');
