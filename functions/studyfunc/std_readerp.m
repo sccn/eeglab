@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2006/03/09 18:45:40  arno
+% reading all ERP
+%
 % Revision 1.5  2006/03/09 18:24:36  arno
 % load Matlab file now
 %
@@ -64,12 +67,12 @@
 % fix error message
 %
 
-function [erp, t] = std_readerp(ALLEEG, abset, comp, readall)
+function [erp, t] = std_readerp(ALLEEG, abset, comp)
     
 erp = [];
 filename  = fullfile( ALLEEG(abset).filepath,[ ALLEEG(abset).filename(1:end-3) 'icaerp']);
 
-if nargin < 4
+if ~isempty(comp)
     erpstruct = load( '-mat', filename, [ 'comp' int2str(comp) ], 'times' );
     erp       = getfield(erpstruct, [ 'comp' int2str(comp) ]);
     t         = getfield(erpstruct, 'times');
