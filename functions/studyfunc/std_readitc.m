@@ -35,7 +35,7 @@
 %
 %  See also  std_ersp, std_readersp, pop_preclust, eeg_preclust, eeg_createdata           
 %
-% Authors:  Hilit Serby, SCCN, INC, UCSD, February, 2005
+% Authors: Arnaud Delorme, Hilit Serby, SCCN, INC, UCSD, February, 2005
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -56,11 +56,90 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2006/03/08 20:35:03  arno
+% rename func
+%
 % Revision 1.2  2006/03/07 22:17:34  arno
 % use fullfile
 %
 
-function [logitc, logfreqs] = std_readitc(ALLEEG, abset, comp);
+function [logitc, logfreqs, timevals, params] = std_readitc(ALLEEG, abset, comp, timewindow, freqrange);
+
+for k = 1: length(abset)    
+    
+    filename = fullfile( ALLEEG(abset(k)).filepath,[ ALLEEG(abset(k)).filename(1:end-3) 'icaitc']);
+    if isempty(comp)
+        tmpitc   = load( '-mat', filename, 'parameters', 'times', 'freqs');
+        params    = struct(tmpitc.parameters{:});
+        params.times = tmpitc.times;
+        params.freqs = tmpitc.freqs;
+        logitc   = [];
+        logfreqs  = [];
+        timevals  = [];
+        return;
+    end;
+    tmpitc   = load( '-mat', filename, 'parameters', 'times', 'freqs', ...
+                     [ 'comp' int2str(comp) '_itc'], ...
+                     [ 'comp' int2str(comp) '_itcboot']);
+	params    = struct(tmpitc.parameters{:});
+    params.times = tmpitc.times;
+    params.freqs = tmpitc.freqs;
+    
+    tlen      = length(tmpitc.times);
+    flen      = length(tmpitc.freqs);
+    itcall{k}     = getfield(tmpitc, [ 'comp' int2str(comp) '_itc']);
+    itcallboot{k} = getfield(tmpitc, [ 'comp' int2str(comp) '_itcboot']);
+
+end
+
+% select plotting or clustering time/freq range
+% ---------------------------------------------
+if ~isempty(timewindow)
+    if timewindow(1) > tmpitc.times(1) | timewindow(end) < tmpitc.times(end)
+        maxind = max(find(tmpitc.times <= timewindow(end)));
+        minind = min(find(tmpitc.times >= timewindow(1)));
+    else
+        minind = 1;
+        maxind = tlen;
+    end
+else
+    minind = 1;
+    maxind = tlen;
+end
+if ~isempty(freqrange)
+    if freqrange(1) > exp(1)^tmpitc.freqs(1) | freqrange(end) < exp(1)^tmpitc.freqs(end)
+        fmaxind = max(find(tmpitc.freqs <= freqrange(end)));
+        fminind = min(find(tmpitc.freqs >= freqrange(1)));
+    else
+        fminind = 1;
+        fmaxind = flen;
+    end
+else
+    fminind = 1;
+    fmaxind = flen;
+end
+
+% Mask ITC
+% ---------
+if ~isempty(itcallboot{1})
+    for cond  = 1:length(abset)
+        maxitc= repmat(itcallboot{cond}',1,size(itcall{1},2));
+        itcall{cond}(find(itcall{cond}<maxitc)) = 0;
+    end
+end;
+
+% return parameters
+% ----------------
+for cond  = 1:length(abset)
+    itc = itcall{cond}(fminind:fmaxind,minind:maxind);
+    logitc(:,:,cond) = itc;
+end;
+logfreqs = tmpitc.freqs(fminind:fmaxind);
+timevals = tmpitc.times(minind:maxind);
+
+
+
+function [logitc, logfreqs] = std_readitcold(ALLEEG, abset, comp);
 
 logitc = []; 
 params = ALLEEG(abset).etc.icaitcparams;
