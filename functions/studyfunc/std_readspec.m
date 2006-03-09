@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2006/03/09 00:37:31  arno
+% now writing matlab file
+%
 % Revision 1.4  2006/03/09 00:03:57  arno
 % read spectrum form matlab file
 %
@@ -67,7 +70,7 @@ if nargin < 4
 end;
 
 spec = [];
-specstruct = load( '-mat', fullfile( ALLEEG(abset).filepath,[ ALLEEG(abset).etc.icaspec 'm']), ...
+specstruct = load( '-mat', fullfile( ALLEEG(abset).filepath,[ ALLEEG(abset).etc.icaspec ext]), ...
              [ 'comp' int2str(comp) ], 'freqs' );
 spec = getfield(specstruct, [ 'comp' int2str(comp) ]);
 f    = specstruct.freqs;
