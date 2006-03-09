@@ -1,14 +1,13 @@
 % std_spec() - Returns the ICA component spectra for a dataset. Updates the EEG structure 
 %              in the Matlab environment and in the .set file as well. Saves the spectra 
-%              in a float file.
+%              in a file.
 % Usage:    
 %           >> [EEG_etc, X, f, overwrite] = std_spec(EEG, components, ...
 %                                                   freqrange, specargs, overwrite);
 %
 %              Computes the mean spectra of the activites of specified components of the 
-%              supplied dataset. The spectra are saved in a float file. Also saves a pointer 
-%              to this file in the EEG structure. If such a float file already exists, 
-%              loads the spectral information from this file.  
+%              supplied dataset. The spectra are saved in a Matlab file. If such a file 
+%              already exists, loads the spectral information from this file.  
 %              Options (below) specify which components to use, and the desired frequency 
 %              range. There is also an option to specify other spectopo() input variables 
 %              (see >> help spectopo for details).
@@ -18,8 +17,7 @@
 %              different frequency range is selected, there is an overwrite option. 
 %              so. The function will load previously computed log spectra, if any, and 
 %              will remove the mean from the requested frequency range. The frequencies 
-%              vector is also returned and EEG.etc is modified with the pointer to the 
-%              spectra float file and with relevant information about it. 
+%              vector is also returned. 
 % Inputs:
 %   EEG        - an EEGLAB dataset structure. 
 %   components - [numeric vector] components of the EEG structure for which the mean 
@@ -31,23 +29,19 @@
 %   overwrite  - [1|2] 1 -> overwrite the saved spectra for this dataset 
 %                      2 -> keep the spectra {default = 2}
 % Outputs:
-%   EEG_etc   - the EEG dataset .etc structure (EEG.etc), modified with the filename and other
-%               information about the float file that holds the spectra. If the spectra file 
-%               already exists and wasn't modified, this output will be empty. Added/modified 
-%               fields:  EEG.etc.icaspec, EEG.etc.icaspecparams, EEG.etc.icaspecmparams
-%
 %   X         - the mean spectra (in dB) of the requested ICA components in the selected 
 %               frequency range (with the mean of each spectrum removed). 
 %   f         - a vector of frequencies at which the spectra have been computed. 
 %   overwrite - same as the input option, possibly modified by the user decision
 %               from the pop-up menu
 %
-% Files output or overwritten: [dataset_filename].icaspec, 
-%                              [dataset_filename].icaspecm
+% Files output or overwritten: 
+%               [dataset_filename].icaspec, 
+%               [dataset_filename].icaspecm
 % 
 %  See also  spectopo(), std_erp(), std_ersp(), std_map(), std_preclust()
 %
-% Authors:  Hilit Serby & Arnaud Delorme, SCCN, INC, UCSD, January, 2005
+% Authors:  Arnaud Delorme, Hilit Serby, SCCN, INC, UCSD, January, 2005
 
 % Defunct:      0 -> if frequency range is different from saved spectra, ask via a 
 %                    pop-up window whether to keep existing spectra or to overwrite them. 
@@ -71,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2006/03/09 00:48:39  arno
+% do not resave dataset if changing limits
+%
 % Revision 1.20  2006/03/09 00:39:31  arno
 % erase allspec first
 %
@@ -117,7 +114,7 @@
 % update change dir, ICA computatation, read/write
 %
 
-function [EEG_etc, X, f, overwrite] = std_spec(EEG, comp, freqrange, arg ,overwrite)
+function [EEG_etc, X, f, overwrite] = std_spec(EEG, comps, freqrange, arg ,overwrite)
     
 if nargin < 1
     help std_spec;
@@ -129,117 +126,80 @@ if isfield(EEG,'icaweights')
 else
    error('EEG.icaweights not found');
 end
-if ~exist('comp') | isempty(comp)
+if nargin < 2
    comps = 1:numc;
-else
-   comps = comp; % use specified components
+elseif isempty(comps)
+   comps = 1:numc;
 end
-    
-EEG_etc = [];
-if ~exist('overwrite')
+if nargin < 5
     overwrite = 0;   % default
 end
 
-if isfield(EEG,'etc')
-     % if spectrum information found in datasets
-     if isfield(EEG.etc, 'icaspec') & exist(fullfile(EEG.filepath, [ EEG.etc.icaspec 'm'])) & ... 
-             exist(fullfile(EEG.filepath, [ EEG.etc.icaspec ]))
-         params = EEG.etc.icaspecparams;
-         if iscell(params)
-             d= params{1};
-         else
-             d = params(1);
-         end
+% filename 
+% --------
+filenamespec = fullfile(EEG.filepath, [ EEG.filename(1:end-3) 'icaspec' ]);
 
-         if overwrite ~= 1 % == 2: don't overwrite, read spectra info from file if exists
-             mparams = EEG.etc.icaspecmparams;
-             if iscell(mparams)
-                 md= mparams{1};
-             else
-                 md = mparams(1);
-             end
-             load('-mat', fullfile(EEG.filepath, [ EEG.etc.icaspec 'm']), 'freqs'); fave = freqs;
-             load('-mat', fullfile(EEG.filepath, [ EEG.etc.icaspec    ]), 'freqs'); f    = freqs;
-            
-             %fave = floatread( fullfile(EEG.filepath, [ EEG.etc.icaspec 'm']), [md 1], [], 0);
-             %f    = floatread( fullfile(EEG.filepath, EEG.etc.icaspec), [d 1], [], 0);
-
-             % check whether requested information already exists
-             if ~isempty('freqrange')
-                 maxind = max(find(f <= freqrange(end)));
-                 minind = min(find(f >= freqrange(1)));
-             else
-                 minind = 1;
-                 maxind = md;
-             end
-             if ((f(maxind) == fave(md)) & (f(minind) == fave(1))) | overwrite == 2
-                 X = zeros(length(comps),maxind-minind+1) ;
-                 for k = 1:length(comps)
-                     X(k,:) = std_readspec( EEG, 1, comps(k), 'm');
-                     %X(k,:) = floatread(fullfile(EEG.filepath, ...
-                     %                   [ EEG.etc.icaspec 'm']), [md 1],[],md*comps(k))';
-                 end
-                 f = fave;
-                 return
-             end
-             
-             disp('Re-using existing spectrum but with new frequency boundaries');
-             disp('To recompute the spectra, first delete files in the directory');
-             disp('   of this dataset with extensions .icaspec and .icaspecm');
-
-             [EEG_etc, X, f, overwrite] = std_spec(EEG, comp, freqrange, arg, 1); % overwrite !?
-             return
-
-         else % overwrite == 1 --> overwrite existing spectra using existing spectra
-              %                    but with new frequency boundaries. 
-
-             load('-mat', fullfile(EEG.filepath, [ EEG.etc.icaspec ]), 'freqs'); f    = freqs;
-             if ~isempty(freqrange)
-                 maxind = max(find(f <= freqrange(end)));
-                 minind = min(find(f >= freqrange(1)));
-                 if f(end) < freqrange(end)
-                     disp(...
-['Warning! Requested high frequency limit, ' num2str(freqrange(end)) 'Hz, is out of bounds.']);
-                 end
-                 if f(1) > freqrange(1)
-                     disp(...
-['Warning! Requested low frequency limit, ' num2str(freqrange(1)) 'Hz, is out of bounds.']);
-                 end
-                 f = f(minind:maxind);
-             else
-                 minind = 1;
-                 maxind = d;
-             end
-             X = zeros(length(comps),maxind-minind+1) ;
-             for k = 1:length(comps)
-                 tmp = std_readspec( EEG, 1, comps(k));
-                 %tmp = floatread(fullfile(EEG.filepath,EEG.etc.icaspec), [d 1],[],d*comps(k));
-                 X(k,:) =  tmp(minind:maxind)';
-             end
-
-             % remove the mean from each frequency across all components
-             X = X - mean(X,2)*ones(1,length(f)); %remove mean
-             X = X - ones(size(X,1),1)*mean(X); 
-
-             if minind ~= 1 | maxind ~= d % new removed mean values
-                 allspec.specparams = arg;
-                 
-                 % save removed mean spectra info in float file
-                 allspec.freqs = f;
-                 for k = 1:size(X,1)
-                     allspec = setfield( allspec, [ 'comp' int2str(comps(k)) ], X(k,:));
-                 end;
-                 std_savedat(fullfile(EEG.filepath, [ EEG.filename(1:end-3) 'icaspecm']), allspec);
-                 %floatwrite([f X'], );
-             end
-             
-             EEG_etc = EEG.etc;
-             return
-         end
-     end
- end
+if exist([ filenamespec 'm']) & exist(filenamespec)
+    
+    load('-mat', filenamespec,        'parameters');  params = parameters;
+    load('-mat', [ filenamespec 'm'], 'parameters'); mparams = parameters;
+    load('-mat', [ filenamespec 'm'], 'freqs'); fave = freqs;
+    load('-mat', filenamespec,        'freqs'); f    = freqs;
+    
+    % find new frequency limits
+    % -------------------------
+    if ~isempty(freqrange)
+        maxind = max(find(f <= freqrange(end)));
+        minind = min(find(f >= freqrange(1)));
+        if f(end) < freqrange(end)
+            disp(['Warning! Requested high frequency limit, ' ...
+                  num2str(freqrange(end)) 'Hz, is out of bounds.']);
+        end
+        if f(1) > freqrange(1)
+            disp(['Warning! Requested low frequency limit, ' ...
+                  num2str(freqrange(1)) 'Hz, is out of bounds.']);
+        end
+        f = f(minind:maxind);
+    else
+        minind = 1;
+        maxind = length(f);
+    end
+    
+    % if same limits, just read spectrum and return
+    % ---------------------------------------------
+    if ((f(end) == fave(end)) & (f(1) == fave(1))) | overwrite == 2
+        X = zeros(length(comps),maxind-minind+1) ;
+        for k = 1:length(comps)
+            X(k,:) = std_readspec( EEG, 1, comps(k), 'm');
+        end
+        f = fave;
+        return
+    end
+    
+    % if different limits, recompute average file
+    % -------------------------------------------
+    disp('Re-using existing spectrum but with new frequency boundaries');
+    disp('To recompute the spectra, first delete files in the directory');
+    disp('   of this dataset with extensions .icaspec and .icaspecm');
+    
+    % reading unprocessed spectrum
+    % ----------------------------
+    X = zeros(length(comps),maxind-minind+1);
+    for k = 1:length(comps)
+        tmp = std_readspec( EEG, 1, comps(k));
+        X(k,:) =  tmp(minind:maxind)';
+    end
+    
+    % remove the mean from each frequency across all components
+    % ---------------------------------------------------------
+    X = X - mean(X,2)*ones(1,length(f)); %remove mean
+    X = X - ones(size(X,1),1)*mean(X); 
+    savetofile( [ filenamespec 'm'], f, X, comps, arg);
+    return
+end
  
 % no spectra available - recompute
+% --------------------------------
 if isstr(EEG.data)
     TMP = eeg_checkset( EEG, 'loaddata' ); % load EEG.data and EEG.icaact
 else
@@ -251,75 +211,48 @@ if isempty(TMP.icaact)
     TMP.icaact = reshape(TMP.icaact, [ size(TMP.icaact,1) size(TMP.data,2)*size(TMP.data,3) ]);
 end;
 if ~isempty(arg)
-    [X, f] = spectopo(TMP.icaact, EEG.pnts, EEG.srate, 'plot', 'off', arg);  
+    [X, f] = spectopo(TMP.icaact, EEG.pnts, EEG.srate, 'plot', 'off', arg{:});  
 else
     [X, f] = spectopo(TMP.icaact, EEG.pnts, EEG.srate, 'plot', 'off');
 end
 
-% save spectrum in float file
-allspec.freqs = f;
-allspec.specparams = arg;
-for k = 1:size(X,1)
-    allspec = setfield( allspec, [ 'comp' int2str(k) ], X(k,:));
-end;
-std_savedat(fullfile(EEG.filepath, [ EEG.filename(1:end-3) 'icaspec']), allspec);
-%floatwrite([f X'], fullfile(EEG.filepath, [ EEG.filename(1:end-3) 'icaspec'])); 
+% save spectrum in file
+% ---------------------
+savetofile( filenamespec, f, X, 1:size(X,1), arg);
 
-% update the info in the dataset
-
-% Select desired components
-X = X(comps,:); 
+% Select desired components and time frequency range
+% --------------------------------------------------
+X = X(comps,:);
 if ~isempty('freqrange')
     maxind = max(find(f <= freqrange(end)));
     minind = min(find(f >= freqrange(1)));
     if f(end) < freqrange(end)
-        disp(...
-['Warning! Requested high frequency limit, ' num2str(freqrange(end)) 'Hz, is out of bounds.']);
+        disp(['Warning! Requested high frequency limit, ' ...
+              num2str(freqrange(end)) 'Hz, is out of bounds.']);
     end
     if f(1) > freqrange(1)
-        disp(...
-['Warning! Requested low frequency limit, ' num2str(freqrange(1)) 'Hz, is out of bounds.']);
+        disp(['Warning! Requested low frequency limit, ' ...
+              num2str(freqrange(1)) 'Hz, is out of bounds.']);
     end
     f = f(minind:maxind);
     X = X(:,minind:maxind);
 end               
 
+% remove the mean from each frequency across all components
+% ---------------------------------------------------------
 X = X - mean(X,2)*ones(1,length(f)); 
-X = X - ones(size(X,1),1)*mean(X); % remove the mean from each frequency across all components
-if ~isempty(arg)
-    EEG.etc.icaspecmparams = {length(f), arg{:}};
-else
-    EEG.etc.icaspecmparams = {length(f)};
-end
+X = X - ones(size(X,1),1)*mean(X); 
+savetofile( [ filenamespec 'm'], f, X, comps, arg);
 
-% save removed mean spectra info in float file
-% --------------------------------------------
-clear allspec;
-allspec.freqs      = f;
-allspec.specparams = arg;
-for k = 1:size(X,1)
-    allspec = setfield( allspec, [ 'comp' int2str(comps(k)) ], X(k,:));
-end;
-std_savedat(fullfile(EEG.filepath, [ EEG.filename(1:end-3) 'icaspecm']), allspec);
-%floatwrite([f X'], fullfile(EEG.filepath, [ EEG.filename(1:end-3) 'icaspecm']));
-
-% save the updated dataset if necessary
-% -------------------------------------
-resave = 0;
-if ~isfield(EEG.etc, 'icaspec')
-    EEG.etc.icaspec = [ EEG.filename(1:end-3) 'icaspec'];
-    resave = 1;
-elseif ~strcmpi(EEG.etc.icaspec, [ EEG.filename(1:end-3) 'icaspec']);
-    EEG.etc.icaspec = [ EEG.filename(1:end-3) 'icaspec'];
-    resave = 1;
-end;
-if resave
-    try
-        EEG.saved = 'no';
-        EEG = pop_saveset( EEG, 'savemode', 'resave');
-    catch,
-        error([ 'std_spec: problems saving into path ' EEG.filepath])
-    end
-end;
-
-EEG_etc = EEG.etc;
+% ------------------------------------------
+% saving spectral information to Matlab file
+% ------------------------------------------
+function savetofile(filename, f, X, comps, params);
+    
+    allspec.freqs      = f;
+    allspec.parameters = params;
+    allspec.datatype   = 'SPECTRUM';
+    for k = 1:length(comps)
+        allspec = setfield( allspec, [ 'comp' int2str(comps(k)) ], X(k,:));
+    end;
+    std_savedat(filename, allspec);
