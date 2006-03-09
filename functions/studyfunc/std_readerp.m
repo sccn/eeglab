@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2006/03/09 18:24:36  arno
+% load Matlab file now
+%
 % Revision 1.4  2006/03/08 20:31:25  arno
 % rename func
 %
@@ -61,10 +64,29 @@
 % fix error message
 %
 
-function [erp, t] = std_readerp(ALLEEG, abset, comp)
+function [erp, t] = std_readerp(ALLEEG, abset, comp, readall)
     
 erp = [];
 filename  = fullfile( ALLEEG(abset).filepath,[ ALLEEG(abset).filename(1:end-3) 'icaerp']);
-erpstruct = load( '-mat', filename, [ 'comp' int2str(comp) ], 'times' );
-erp       = getfield(erpstruct, [ 'comp' int2str(comp) ]);
-t         = getfield(erpstruct, 'times');
+
+if nargin < 4
+    erpstruct = load( '-mat', filename, [ 'comp' int2str(comp) ], 'times' );
+    erp       = getfield(erpstruct, [ 'comp' int2str(comp) ]);
+    t         = getfield(erpstruct, 'times');
+else
+    erpstruct = load( '-mat', filename );
+    count = 1;
+    while count
+        if isfield(erpstruct, [ 'comp' int2str(count) ])
+            if count == 1
+                erp          = getfield(erpstruct, [ 'comp' int2str(count) ]);
+            else
+                erp(count,:) = getfield(erpstruct, [ 'comp' int2str(count) ]);
+            end;
+            count = count+1;
+        else
+            count = 0;
+        end;
+    end;
+    t = getfield(erpstruct, 'times');
+end;
