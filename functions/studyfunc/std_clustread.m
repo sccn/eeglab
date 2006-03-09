@@ -76,7 +76,7 @@ for k = 1:len
                                                                     STUDY.preclust.erspclustfreqs );
             clusinfo.itc{k}   = itc;
             clusinfo.logf{k}  = log(logfreqs);
-            clusinfo.times{k} = logfreqs;
+            clusinfo.times{k} = timevals;
             
         case 'dipole'
             if ~isfield(ALLEEG(abset).etc, 'dipfit')
