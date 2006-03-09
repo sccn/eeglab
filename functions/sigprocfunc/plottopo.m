@@ -65,6 +65,15 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.39  2005/11/16 22:01:41  toby
+% Edited vertical patch bars to be transparent for indicating regions of interest
+% so that the plots will be visible underneath. Another solution would have been to
+% plot the patches first.
+%
+% Revision 1.39  2005/11/24 10:32:0  stefan
+% added horizontal line input, modified defaults, added axis ticks, changed
+% plot order (data trace now on top)
+%
 % Revision 1.38  2005/03/21 16:13:09  arno
 % highlight regions of significance at the end
 %
@@ -204,6 +213,7 @@
 %                ( '.' = space) {0 -> default color order}
 %   ydir       = y-axis polarity (pos-up = 1; neg-up = -1) {def -> pos-up}
 %   vert       = [vector] of times (in ms or Hz) to plot vertical lines {def none}
+%   hori        = [vector] of amplitudes (in uV or dB) to plot horizontal lines {def none}
 %
 
 function plottopo(data, varargin);
@@ -211,13 +221,13 @@ function plottopo(data, varargin);
 %
 %%%%%%%%%%%%%%%%%%%%% Graphics Settings - can be customized %%%%%%%%%%%%%%%%%%
 %
-LINEWIDTH     = 1.0;     % data line widths (can be non-integer)
-FONTSIZE      = 14;      % font size to use for labels
-CHANFONTSIZE  = 12;      % font size to use for channel names
-TICKFONTSIZE  = 10;      % font size to use for axis labels
-TITLEFONTSIZE = 16;      % font size to use for the plot title
-PLOT_WIDTH    = 0.75;    % width and height of plot array on figure
-PLOT_HEIGHT   = 0.81;
+LINEWIDTH     = 0.7;     % data line widths (can be non-integer)
+FONTSIZE      = 10;      % font size to use for labels
+CHANFONTSIZE  = 7;       % font size to use for channel names
+TICKFONTSIZE  = 8;       % font size to use for axis labels
+TITLEFONTSIZE = 12;      % font size to use for the plot title
+PLOT_WIDTH    = 0.95;     % 0.75, width and height of plot array on figure
+PLOT_HEIGHT   = 0.88;    % 0.88
 gcapos = get(gca,'Position');
 PLOT_WIDTH    = gcapos(3)*PLOT_WIDTH; % width and height of gca plot array on gca
 PLOT_HEIGHT   = gcapos(4)*PLOT_HEIGHT;
@@ -226,9 +236,9 @@ curfig = gcf;            % learn the current graphic figure number
 %
 %%%%%%%%%%%%%%%%%%%% Default settings - use commandline to override %%%%%%%%%%%
 %
-DEFAULT_AXWIDTH  = 0.07;
-DEFAULT_AXHEIGHT = 0.07;
-DEFAULT_SIGN = 1;                         % Default - plot positive-up
+DEFAULT_AXWIDTH  = 0.05; %
+DEFAULT_AXHEIGHT = 0.08; % 
+DEFAULT_SIGN = -1;                        % Default - plot positive-up
 ISRECT = 0;                               % default
 ISSPEC = 0;                               % Default - not spectral data 
     
@@ -248,6 +258,7 @@ if length(varargin) > 0
         if nargin > 7, options = { options{:} 'colors' varargin{7} }; end;
         if nargin > 8, options = { options{:} 'ydir'   varargin{8} }; end;
         if nargin > 9, options = { options{:} 'vert'   varargin{9} }; end;
+        if nargin > 10,options = { options{:} 'hori'  varargin{10} }; end;
         if nargin > 4 & ~isequal(varargin{4}, 0), options = {options{:} 'title'  varargin{4} }; end;
         %    , chan_locs,frames,limits,plottitle,channels,axsize,colors,ydr,vert)
     else
@@ -269,7 +280,8 @@ g = finputcheck(options, { 'chanlocs'  ''    []          '';
                     'legend'    'cell'                  []          {};
                     'showleg'   'string'                {'on' 'off'} 'on';
                     'ydir'      'integer'               [-1 1]      DEFAULT_SIGN;
-                    'vert'      'float'                 []          []});
+                    'vert'      'float'                 []          [];
+                    'hori'      'float'                 []          []});
 if isstr(g), error(g); end;
 data = reshape(data, size(data,1), size(data,2), size(data,3));    
 if length(g.chans) == 1 & g.chans(1) ~= 0, error('can not plot a single ERP'); end;
@@ -375,7 +387,8 @@ end
   set(gca,'Color',BACKCOLOR);               % set the background color
   
   axcolor= get(0,'DefaultAxesXcolor'); % find what the default x-axis color is
-  vertcolor = 'b';
+  vertcolor = 'k';
+  horicolor = vertcolor;
   plotfile = 'plottopo.ps';
   ls_plotfile = 'ls -l plottopo.ps';
     
@@ -467,8 +480,12 @@ chans = length(channelnos);
   if g.limits==0,      % == 0 or [0 0 0 0]
     xmin=0;
     xmax=g.frames-1;
-    ymin=min(min(data));
-    ymax=max(max(data));
+    % for abs max scaling:
+    ymax=max(max(abs(data)));
+    ymin=ymax*-1;
+    % for data limits:
+    %ymin=min(min(data));
+    %ymax=max(max(data));
   else
     if length(g.limits)~=4,
       error('plottopo: limits should be 0 or an array [xmin xmax ymin ymax].\n');
@@ -493,8 +510,12 @@ chans = length(channelnos);
   end
 
   if ymax == 0 & ymin == 0,
-      ymax=max(max(data));
-      ymin=min(min(data));
+    % for abs max scaling:
+    ymax=max(max(abs(data)));
+    ymin=ymax*-1;
+    % for data limits:
+    %ymin=min(min(data));
+    %ymax=max(max(data));
   end
   if ymax<=ymin,
       fprintf('plottopo() - ymax must be > ymin.\n')
@@ -678,8 +699,8 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
             %
             %%%%%%%%%%%%%%%%%%%%%%% Print channel names %%%%%%%%%%%%%%%%%%%%%%%%%%
             %
-            NAME_OFFSET = -1;
-            NAME_OFFSETY = -0.5;
+            NAME_OFFSET = -.25;
+            NAME_OFFSETY = .2;
             if ISSPEC
                 figure(curfig);axis('off'),h=text(double(xmin-NAME_OFFSET*xdiff),double(ymax/2),[channames(c,:)]); 
                 set(h,'HorizontalAlignment','right');    % print before traces
@@ -707,6 +728,62 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
             
             
         end; % P=0 
+
+        
+        
+        %
+        %%%%%%%%%%%%%%%%%%%%%%% Plot lines %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %
+        if P == datasets-1
+            if ISSPEC
+                figure(curfig);plot([xmin xmin],[0 ymax],'color',axislcolor); 
+            else
+                figure(curfig);plot([0 0],[ymin ymax],'color',axislcolor); % draw vert axis at time 0  
+            end  
+            axis('off');
+            figure(curfig);plot([xmin xmax],[0 0],'color',axislcolor);  % draw horizontal axis 
+        end;
+        %
+        %%%%%%%%%%%%%%%%%%%% plot vertical lines (optional) %%%%%%%%%%%%%%%%%
+        %
+        
+        if isempty(g.vert)
+            g.vert = [xmin xmax];
+%            ymean = (ymin+ymax)/2; 
+%            vmin = ymean-0.1*(ymean-ymin);
+%            vmax = vmin*-1;  %ymean+0.2*(ymax-ymean);
+        elseif ~isnan(g.vert)
+           ymean = (ymin+ymax)/2; 
+           vmin = ymean-0.1*(ymean-ymin);
+           vmax = vmin*-1;  %ymean+0.2*(ymax-ymean);
+           if ~ISSPEC % -/+ plot, normal case (e.g., not spectra), plot data trace
+                for v = g.vert
+                    figure(curfig);plot([v v],[vmin vmax],'color',vertcolor); % draw vertical lines 
+                end
+            else
+                for v = g.vert
+                    figure(curfig);plot([v v],[0 ymax],'color',vertcolor); 
+                end
+            end
+        end
+        
+        %
+        %%%%%%%%%%%%%%%%%%%% plot horizontal lines (optional) %%%%%%%%%%%%%%%
+        %
+        if isempty(g.hori)
+           g.hori = [ymin ymax]; 
+        end
+        if ~isnan(g.hori)
+            if ~ISSPEC % -/+ plot, normal case (e.g., not spectra), plot data trace
+                xmean = 0; 
+                hmin = xmean-0.2*(xmean-xmin);
+                hmax = hmin*-1; %xmean+0.3*(xmax-xmean);
+                for v = g.hori
+                    figure(curfig);plot([hmin hmax],[v v], 'color',horicolor); % draw horizontal lines 
+                end
+            end
+        end
+        
         %
         %%%%%%%%%%%%%%%%%%%%%%% Plot data traces %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %
@@ -735,35 +812,6 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
             end;
             axis([xmin xmax ymin ymaxm]);      % set axis values
         end
-        %
-        %%%%%%%%%%%%%%%%%%%%%%% Plot lines %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        %
-        if P == datasets-1
-            if ISSPEC
-                figure(curfig);plot([xmin xmin],[0 ymax],'color',axislcolor); 
-            else
-                figure(curfig);plot([0 0],[ymin ymax],'color',axislcolor); % draw vert axis at time 0  
-            end  
-            axis('off');
-            figure(curfig);plot([xmin xmax],[0 0],'color',axislcolor);  % draw horizontal axis 
-        end;
-        %
-        %%%%%%%%%%%%%%%%%%%% plot vertical lines (optional) %%%%%%%%%%%%%%%%%
-        %
-        if ~isnan(g.vert)
-            if ~ISSPEC % -/+ plot, normal case (e.g., not spectra), plot data trace
-                ymean = (ymin+ymax)/2; 
-                vmin = ymean-0.5*(ymean-ymin);
-                vmax = ymean+0.5*(ymax-ymean);
-                for v = g.vert
-                    figure(curfig);plot([v v],[ymin ymax],'color',vertcolor); % draw vertical lines 
-                end
-            else
-                for v = g.vert
-                    figure(curfig);plot([v v],[0 ymax],'color',vertcolor); 
-                end
-            end
-        end
         
         if P == datasets-1 % last pass
             %
@@ -791,7 +839,7 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
   %%%%%%%%%%%%%%%%%%%%% Make time and amp cal bar %%%%%%%%%%%%%%%%%%%%%%%%%
   %
   ax = axes('Units','Normal','Position', ...
-                         [0.80 0.1 axwidth axheight]); % FIX!!!!
+                         [0.85 0.1 axwidth axheight]); % FIX!!!!
   axes(ax)
   axis('off');
   if ~ISSPEC,
@@ -821,6 +869,23 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
     for v = g.vert
       figure(curfig);plot([v v],[vmin vmax],'color',vertcolor); % draw vertical lines 
     end
+   else
+    for v = g.vert
+      figure(curfig);plot([v v],[0 ymax],'color',vertcolor); 
+    end
+   end
+  end
+  %
+  %%%%%%%%%%%%%%%%%%%% plot horizontal lines (optional) %%%%%%%%%%%%%%%%%
+  %
+  if ~isnan(g.hori)
+   if ~ISSPEC % -/+ plot, normal case (e.g., not spectra), plot data trace
+      xmean = 0; 
+      hmin = xmean-0.2*(xmean-xmin);
+      hmax = hmin*-1; %xmean+0.3*(xmax-xmean);
+     for v = g.hori
+         figure(curfig);plot([hmin hmax],[v v], 'color',horicolor); % draw horizontal lines 
+     end
    else
     for v = g.vert
       figure(curfig);plot([v v],[0 ymax],'color',vertcolor); 
