@@ -1,7 +1,7 @@
 % std_topo() - uses topoplot() to get the interpolated Cartesian grid of the 
 %               specified component topo maps. The topo map grids are saved
-%               into a (.icatopo) float file and a pointer to the file is stored 
-%               in the EEG structure. If such a float file already exists, 
+%               into a (.icatopo) file and a pointer to the file is stored 
+%               in the EEG structure. If such a file already exists, 
 %               loads the information from it. 
 %
 %               Returns the topo map grids of all the requested components. Also
@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2006/03/09 00:00:52  arno
+% now saving Matlab file
+%
 % Revision 1.8  2006/03/08 20:27:38  arno
 % rename func
 %
@@ -73,87 +76,78 @@
 % now correctly saving data
 %
 
-function [EEG_etc, X] = std_topo(EEG, comp, option)
+function [X] = std_topo(EEG, comps, option)
 
 if nargin < 1
     help std_topo;
     return;
 end;
 if isfield(EEG,'icaweights')
-     numc = size(EEG.icaweights,1); % number of ICA comps
+   numc = size(EEG.icaweights,1);
 else
-     error('EEG.icaweights not found')
+   error('EEG.icaweights not found');
 end
-if nargin < 2 | isempty(comp)
-    comps = 1:numc;
-else
-    comps = comp;
+if nargin < 2
+   comps = 1:numc;
+elseif isempty(comps)
+   comps = 1:numc;
 end
+
 if nargin < 3
     option = 'none';
 end;
 
-EEG_etc = [];
 % figure; toporeplot(grid,'style', 'both','plotrad', 0.5, 'intrad', 0.5, 'xsurface' ,Xi, 'ysurface',Yi );
 
 % Topo information found in dataset
-if isfield(EEG,'etc')
-     if isfield(EEG.etc, 'icatopo') & exist(fullfile(EEG.filepath, EEG.etc.icatopo))
-         d = EEG.etc.icatopoparams; %the grid dimension 
-         if iscell(d)
-             d = d{1};
-         end
-         for k = 1:length(comps)
-             tmp = std_readtopo( EEG, 1, comps(k));
-             if strcmpi(option, 'gradient')
-                 [tmpx, tmpy]  = gradient(tmp); %Gradient
-                 tmp = [tmpx(:); tmpy(:)]';
-             elseif strcmpi(option, 'laplacian')
-                 tmp = del2(tmp); %Laplacian
-                 tmp = tmp(:)';
-             else
-                 tmp = tmp(:)';
-             end;
-
-             tmp = tmp(find(~isnan(tmp)));
-             if k == 1
-                 X = zeros(length(comps),length(tmp)) ;
-             end
-             X(k,:) =  tmp;
-         end
-         return
-     end
- end
+% ---------------------------------
+if exist(fullfile(EEG.filepath, EEG.etc.icatopo))
+    d = EEG.etc.icatopoparams; %the grid dimension 
+    if iscell(d)
+        d = d{1};
+    end
+    for k = 1:length(comps)
+        tmp = std_readtopo( EEG, 1, comps(k));
+        if strcmpi(option, 'gradient')
+            [tmpx, tmpy]  = gradient(tmp); %Gradient
+            tmp = [tmpx(:); tmpy(:)]';
+        elseif strcmpi(option, 'laplacian')
+            tmp = del2(tmp); %Laplacian
+            tmp = tmp(:)';
+        else
+            tmp = tmp(:)';
+        end;
+        
+        tmp = tmp(find(~isnan(tmp)));
+        if k == 1
+            X = zeros(length(comps),length(tmp)) ;
+        end
+        X(k,:) =  tmp;
+    end
+    return
+end
  
 all_topos = [];
 for k = 1:numc
 
     % compute topo map grid (topoimage)
+    % ---------------------------------
     [hfig grid plotrad Xi Yi] = topoplot( EEG.icawinv(:,k), EEG.chanlocs, ...
                                           'verbose', 'off',...
                                            'electrodes', 'on' ,'style','both',...
                                            'plotrad',0.5,'intrad',0.5,...
                                            'noplot', 'on', 'chaninfo', EEG.chaninfo);
-    all_topos = setfield(all_topos, [ 'comp' int2str(k) '_grid' ], grid);
-    all_topos = setfield(all_topos, [ 'comp' int2str(k) '_x' ]   , Xi(:,1));
-    all_topos = setfield(all_topos, [ 'comp' int2str(k) '_y' ]   , Yi(:,1));
+    all_topos = setfield(all_topos, [ 'comp' int2str(comps(k)) '_grid' ], grid);
+    all_topos = setfield(all_topos, [ 'comp' int2str(comps(k)) '_x' ]   , Xi(:,1));
+    all_topos = setfield(all_topos, [ 'comp' int2str(comps(k)) '_y' ]   , Yi(:,1));
     
-    %all_topos = setfield(alltopo, [ 'comp' int2str(k) ] (:,1+(k-1)*(d+2):k*(d+2) ) = [grid Yi(:,1)  Xi(1,:)'];
-    % [Xi2,Yi2] = meshgrid(Yi(:,1),Xi(1,:));
 end
 
 % Save topos in file
+% ------------------
+all_topos.datatype = 'TOPO';
 tmpfile = fullfile( EEG.filepath, [ EEG.filename(1:end-3) 'icatopo' ]); 
 std_savedat(tmpfile, all_topos);
-EEG.etc.icatopo       = [ EEG.filename(1:end-3) 'icatopo' ];
-
-try
-    EEG.saved = 'no';
-    EEG = pop_saveset( EEG, 'savemode', 'resave');
-catch,
-    error([ 'std_topo: problems saving into path ' EEG.filepath])
-end
-EEG_etc = EEG.etc;
 
 for k = 1:length(comps)
     tmp =  getfield(all_topos, [ 'comp' int2str(k) '_grid' ]);
