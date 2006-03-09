@@ -1,4 +1,3 @@
-%
 %   std_erp() - Constructs and returns ICA activation ERPs for a dataset. 
 %               Updates the EEG structure both in the Matlab environment 
 %               and on disk Saves the ERPs into a float file, and then saves 
@@ -32,7 +31,7 @@
 %
 % See also  std_spec(), std_ersp(), std_topo(), std_preclust()
 %
-% Authors:  Hilit Serby, SCCN, INC, UCSD, January, 2005
+% Authors: Arnaud Delorme, Hilit Serby, SCCN, INC, UCSD, January, 2005
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -53,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2006/03/08 22:24:37  scott
+% help msg  -sm
+%
 % Revision 1.17  2006/03/08 22:05:19  arno
 % remove bebug msg
 %
@@ -100,17 +102,22 @@
 % [6~[6~floatread/flotwrite folder fix; computation of ICA fix
 %
 
-function [EEG_etc, X, t] = std_erp(EEG, comp, timerange)
+function [X, t] = std_erp(EEG, comps, timerange)
 
 if nargin < 1
     help std_erp;
     return;
 end;
     
-if ~exist('comp') | isempty(comp)  
-   comps = 1:size(EEG.icaweights,1);
+if isfield(EEG,'icaweights')
+   numc = size(EEG.icaweights,1);
 else
-   comps = comp;
+   error('EEG.icaweights not found');
+end
+if nargin < 2
+   comps = 1:numc;
+elseif isempty(comps)
+   comps = 1:numc;
 end
 
 EEG_etc = [];
@@ -118,56 +125,50 @@ if ~exist('timerange')
     timerange = [];
 end
 
+% filename 
+% --------
+filenameerp = fullfile(EEG.filepath, [ EEG.filename(1:end-3) 'icaerp' ]);
+
 % ERP information found in datasets
-if isfield(EEG,'etc')
-     if isfield(EEG.etc, 'icaerp') & exist(fullfile(EEG.filepath, EEG.etc.icaerp))
-         d = EEG.etc.icaerpparams;
-         t = floatread(fullfile(EEG.filepath, EEG.etc.icaerp), [d 1]);
-         blind = max(find(t <= 0)); %the baseline index
+% ---------------------------------
+if exist(filenameerp)
+
+    load('-mat', filenameerp, 'times'); t = times;
+    blind = max(find(t <= 0)); %the baseline index
                   
-         if ~isempty(timerange)
-             maxind = max(find(t <= timerange(end)));
-             minind = min(find(t >= timerange(1)));
-             if t(end) < timerange(end) | t(1) > timerange(1)
-                 disp(['Warning! The requested max latency window limit is outside the previous bounds; recomputing the ERPs...']);
-                 EEG.etc = rmfield(EEG.etc, 'icaerp');
-                 [EEG_etc, X, t] = std_erp(EEG, comp, timerange);
-                 return;
-             end
-             t = t(minind:maxind);
-         else
-             minind = 1;
-             maxind = d;
-         end
-         X = zeros(length(comps),maxind-minind+1) ;
-         for k = 1:length(comps)
-             tmp = floatread(fullfile(EEG.filepath, EEG.etc.icaerp), [d 1],[],d*comps(k));
-             X(k,:) =  tmp(minind:maxind)';
-         end
-
-         %save erp in file
-         % ---------------
-         if minind ~= 1 | maxind ~= length(t)
-             floatwrite(double([t X']), fullfile( EEG.filepath, [ EEG.filename(1:end-3) 'icaerp']));
-             
-             %update the info in the dataset
-             % -----------------------------
-             EEG.etc.icaerp       = [ EEG.filename(1:end-3) 'icaerp'];
-             EEG.etc.icaerpparams = length(t);
-             try
-                 EEG.saved = 'no';
-                 EEG = pop_saveset( EEG, 'savemode','resave');
-             catch,
-                 error([ 'problem saving information into path ' EEG.filepath])
-             end
-             EEG_etc = EEG.etc;
-         end;
-         return;
-
-     end
- end
-  
+    if ~isempty(timerange)
+        maxind = max(find(t <= timerange(end)));
+        minind = min(find(t >= timerange(1)));
+        if t(end) < timerange(end) | t(1) > timerange(1)
+            disp(['Warning! The requested max latency window limit is outside the ' ...
+                  'previous bounds; recomputing the ERPs...']);
+            delete(filenameerp);
+            [X, t] = std_erp(EEG, comps, timerange);
+            return;
+        end
+        t = t(minind:maxind);
+    else
+        minind = 1;
+        maxind = length(t);
+    end
+    
+    % reading ERP information
+    % -----------------------
+    X = std_readerp( EEG, 1, []);
+    X =  X(:,minind:maxind);
+    
+    % resave new ERP to file if necessary
+    % -----------------------------------
+    if minind ~= 1 | maxind ~= length(t)
+        savetofile( filenameerp, t, X, 1:size(X,1));
+    end;
+    X = X(comps,:);
+    return;
+    
+end 
+   
 % No ERP information found
+% ------------------------
 if isstr(EEG.data)
     TMP = eeg_checkset( EEG, 'loaddata' ); % load EEG.data and EEG.icaact
 else
@@ -175,13 +176,15 @@ else
 end
 if isempty(TMP.icaact)
     TMP.icaact = (TMP.icaweights*TMP.icasphere)* ...
-                 reshape(TMP.data  , [ size(TMP.data,1)   size(TMP.data,2)*size(TMP.data,3) ]);
+        reshape(TMP.data  , [ size(TMP.data,1)   size(TMP.data,2)*size(TMP.data,3) ]);
     TMP.icaact = reshape(TMP.icaact, [ size(TMP.icaact,1) size(TMP.data,2) size(TMP.data,3) ]);
 end;
 
 % Remove baseline mean
+% --------------------
 if EEG.trials > 1 %epoched data
     time0 = find(EEG.times < 0);
+    time0 = find(EEG.times(time0) > timerange(1));
     if ~isempty(time0)
         TMP.icaact = rmbase(TMP.icaact,EEG.pnts, time0);
     else
@@ -192,37 +195,34 @@ else
 end
 maxind = max(find(EEG.times <= timerange(end)));
 minind = min(find(EEG.times >= timerange(1)));
+if EEG.times(end) < timerange(end)
+    disp(['Warning! Requested max latency window limit, ' ...
+          num2str(timerange(end)) 'ms, is out of bounds.']);
+end
+if EEG.times(1) > timerange(1)
+    disp(['Warning! Requested min latency window limit, ' ...
+          num2str(timerange(1)) 'ms, is out of bounds.']);
+end
 TMP.icaact = reshape(TMP.icaact, [ size(TMP.icaact,1) size(TMP.data,2) size(TMP.data,3) ]);
 X = mean(TMP.icaact(:,minind:maxind,:),3); % calculate ERP
 t = EEG.times(minind:maxind)';
 
-% Save ERPs in file
-% ---------------
-floatwrite(double([t X']), fullfile( EEG.filepath, [ EEG.filename(1:end-3) 'icaerp']));
+% Save ERPs in file (all components)
+% ----------------------------------
+savetofile( filenameerp, t, X, 1:size(X,1));
 
-% Update the ERP info in the dataset .etc sub-structure
-% -----------------------------------------------------
-EEG.etc.icaerp       = [ EEG.filename(1:end-3) 'icaerp'];
-EEG.etc.icaerpparams = length(t);
-try
-    EEG.saved = 'no';
-    EEG = pop_saveset( EEG, 'savemode','resave');
-catch,
-    error([ 'problem saving information into path ' EEG.filepath])
-end
-EEG_etc = EEG.etc;
+% Select desired components and time range
+% ----------------------------------------
+X = X(comps,:);
 
-% Select desired components
-X = X(comps,:); 
-if ~isempty('timerange')
-    maxind = max(find(EEG.times <= timerange(end)));
-    minind = min(find(EEG.times >= timerange(1)));
-    if EEG.times(end) < timerange(end)
-         disp(['Warning! Requested max latency window limit, ' num2str(timerange(end)) 'ms, is out of bounds.']);
-     end
-     if EEG.times(1) > timerange(1)
-         disp(['Warning! Requested min latency window limit, ' num2str(timerange(1)) 'ms, is out of bounds.']);
-     end
-    t = EEG.times(minind:maxind);
-    X = X(:,minind:maxind);
-end  
+% -------------------------------------
+% saving ERP information to Matlab file
+% -------------------------------------
+function savetofile(filename, t, X, comps);
+    
+    allerp.times      = t;
+    allerp.datatype   = 'ERP';
+    for k = 1:length(comps)
+        allerp = setfield( allerp, [ 'comp' int2str(comps(k)) ], X(k,:));
+    end;
+    std_savedat(filename, allerp);
