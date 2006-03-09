@@ -62,6 +62,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2006/03/09 22:26:25  arno
+% reading ERSP to compute centroid
+%
 % Revision 1.7  2006/03/09 18:19:31  arno
 % spectrum read
 %
@@ -218,7 +221,7 @@ if itcC | erspC | specC | erpC | scalpC
                         fprintf('.');
                         if cond == 1
                             abset = [STUDY.datasetinfo(STUDY.setind(:,ind)).index];
-                            [ersp, logfreqs] = std_readersp(ALLEEG, abset, comp, STUDY.preclust.erspclusttimes,
+                            [ersp, logfreqs] = std_readersp(ALLEEG, abset, comp, STUDY.preclust.erspclusttimes, ...
                                                                     STUDY.preclust.erspclustfreqs );
                             if isempty(ersp)
                                 return;
