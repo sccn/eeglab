@@ -71,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2006/03/09 00:39:31  arno
+% erase allspec first
+%
 % Revision 1.19  2006/03/09 00:37:35  arno
 % now writing matlab file
 %
@@ -219,28 +222,18 @@ if isfield(EEG,'etc')
              X = X - ones(size(X,1),1)*mean(X); 
 
              if minind ~= 1 | maxind ~= d % new removed mean values
-                 if ~isempty(arg)
-                    EEG.etc.icaspecmparams = {length(f), arg{:}};
-				else
-                    EEG.etc.icaspecmparams = {length(f)};
-				end
-                %Save the updated dataset
-				try
-                    EEG.saved = 'no';
-                    EEG = pop_saveset( EEG, 'savemode','resave');
-				catch,
-                    error([ 'std_spec(): problems saving into path ' EEG.filepath])
-				end
-                EEG_etc = EEG.etc;
-
-                % save removed mean spectra info in float file
-                allspec.freqs = f;
-                for k = 1:size(X,1)
-                    allspec = setfield( allspec, [ 'comp' int2str(comps(k)) ], X(k,:));
-                end;
-                std_savedat(fullfile(EEG.filepath, [ EEG.filename(1:end-3) 'icaspecm']), allspec);
-                %floatwrite([f X'], );
+                 allspec.specparams = arg;
+                 
+                 % save removed mean spectra info in float file
+                 allspec.freqs = f;
+                 for k = 1:size(X,1)
+                     allspec = setfield( allspec, [ 'comp' int2str(comps(k)) ], X(k,:));
+                 end;
+                 std_savedat(fullfile(EEG.filepath, [ EEG.filename(1:end-3) 'icaspecm']), allspec);
+                 %floatwrite([f X'], );
              end
+             
+             EEG_etc = EEG.etc;
              return
          end
      end
@@ -265,6 +258,7 @@ end
 
 % save spectrum in float file
 allspec.freqs = f;
+allspec.specparams = arg;
 for k = 1:size(X,1)
     allspec = setfield( allspec, [ 'comp' int2str(k) ], X(k,:));
 end;
@@ -272,12 +266,6 @@ std_savedat(fullfile(EEG.filepath, [ EEG.filename(1:end-3) 'icaspec']), allspec)
 %floatwrite([f X'], fullfile(EEG.filepath, [ EEG.filename(1:end-3) 'icaspec'])); 
 
 % update the info in the dataset
-EEG.etc.icaspec = [ EEG.filename(1:end-3) 'icaspec'];
-if ~isempty(arg)
-    EEG.etc.icaspecparams = {length(f), arg{:}};
-else
-    EEG.etc.icaspecparams = {length(f)};
-end
 
 % Select desired components
 X = X(comps,:); 
@@ -307,18 +295,31 @@ end
 % save removed mean spectra info in float file
 % --------------------------------------------
 clear allspec;
-allspec.freqs = f;
+allspec.freqs      = f;
+allspec.specparams = arg;
 for k = 1:size(X,1)
     allspec = setfield( allspec, [ 'comp' int2str(comps(k)) ], X(k,:));
 end;
 std_savedat(fullfile(EEG.filepath, [ EEG.filename(1:end-3) 'icaspecm']), allspec);
 %floatwrite([f X'], fullfile(EEG.filepath, [ EEG.filename(1:end-3) 'icaspecm']));
 
-% save the updated dataset
-try
-    EEG.saved = 'no';
-    EEG = pop_saveset( EEG, 'savemode', 'resave');
-catch,
-    error([ 'std_spec: problems saving into path ' EEG.filepath])
-end
+% save the updated dataset if necessary
+% -------------------------------------
+resave = 0;
+if ~isfield(EEG.etc, 'icaspec')
+    EEG.etc.icaspec = [ EEG.filename(1:end-3) 'icaspec'];
+    resave = 1;
+elseif ~strcmpi(EEG.etc.icaspec, [ EEG.filename(1:end-3) 'icaspec']);
+    EEG.etc.icaspec = [ EEG.filename(1:end-3) 'icaspec'];
+    resave = 1;
+end;
+if resave
+    try
+        EEG.saved = 'no';
+        EEG = pop_saveset( EEG, 'savemode', 'resave');
+    catch,
+        error([ 'std_spec: problems saving into path ' EEG.filepath])
+    end
+end;
+
 EEG_etc = EEG.etc;
