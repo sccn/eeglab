@@ -65,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2006/03/09 18:05:45  arno
+% reprogramming function
+%
 % Revision 1.21  2006/03/09 00:48:39  arno
 % do not resave dataset if changing limits
 %
@@ -114,7 +117,7 @@
 % update change dir, ICA computatation, read/write
 %
 
-function [EEG_etc, X, f, overwrite] = std_spec(EEG, comps, freqrange, arg ,overwrite)
+function [X, f, overwrite] = std_spec(EEG, comps, freqrange, arg ,overwrite)
     
 if nargin < 1
     help std_spec;
