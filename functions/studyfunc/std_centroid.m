@@ -62,6 +62,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2006/03/09 23:11:00  arno
+% adding field ersp_times to centroid
+%
 % Revision 1.9  2006/03/09 23:05:19  arno
 % fixing call to std_readersp
 %
@@ -240,13 +243,14 @@ if itcC | erspC | specC | erpC | scalpC
                     end
                     if itcC %itc centroid
                         fprintf('.');
-                        [itc, logfreqs] = std_readitc(ALLEEG, abset, comp);
+                        [itc, logfreqs, timevals] = std_readitc(ALLEEG, abset, comp);
                         if isempty(itc)
                             return;
                         end
                         centroid{clust}.itc{cond} = centroid{clust}.itc{cond} + itc;
                         centroid{clust}.itc_limits{cond} = max(floor(max(max(abs(itc)))), centroid{clust}.itc_limits{cond}); %ersp image limits 
-                        centroid{clust}.itc_logf = logfreqs;
+                        centroid{clust}.itc_logf  = logfreqs;
+                        centroid{clust}.itc_times = timevals;
                     end
                 end
             end
@@ -321,12 +325,14 @@ for clust =  1:length(clsind) %go over all requested clusters
             STUDY.cluster(clsind(clust)).centroid.ersp_limits{cond} = floor(0.75*centroid{clust}.ersp_limits{cond}); 
             %[round(0.9*min(cell2mat({centroid{clust}.ersp_limits{cond,:}})))  round(0.9*max(cell2mat({centroid{clust}.ersp_limits{cond,:}})))];
             STUDY.cluster(clsind(clust)).centroid.ersp_logf = centroid{clust}.ersp_logf;
+            STUDY.cluster(clsind(clust)).centroid.ersp_times = centroid{clust}.ersp_times;
         end
         if itcC
             centroid{clust}.itc{cond} = centroid{clust}.itc{cond}/ncomp;
             STUDY.cluster(clsind(clust)).centroid.itc{cond} = centroid{clust}.itc{cond} ;
             STUDY.cluster(clsind(clust)).centroid.itc_limits{cond} = floor(0.75*centroid{clust}.itc_limits{cond});%round(0.9*max(cell2mat({centroid{clust}.itc_limits{cond,:}})));
-            STUDY.cluster(clsind(clust)).centroid.itc_logf = centroid{clust}.itc_logf;
+            STUDY.cluster(clsind(clust)).centroid.itc_logf  = centroid{clust}.itc_logf;
+            STUDY.cluster(clsind(clust)).centroid.itc_times = centroid{clust}.itc_times;
         end
         
     end
