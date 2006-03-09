@@ -1,32 +1,31 @@
-% std_propplot() - Commandline function, to visualizing cluster/s measures. 
-%                   Displays either mean cluster/s ERSP/s, or all cluster/s component 
-%                   ERSPs with the mean cluster/s ERSP in one figure (per condition).
-%                   The ERSPs can be visualized only if component ERSPs     
-%                   were calculated and saved in the EEG datasets in the STUDY.
-%                   These can be computed during pre-clustering using the GUI-based function
-%                   pop_preclust() or the equivalent commandline functions eeg_createdata() 
-%                   and eeg_preclust(). A pop-function that calls this function is pop_clustedit().
+%
+% std_propplot() - Commandline function to plot cluster properties. 
+%                  Displays either mean cluster ERSPs, or all cluster component ERSPs 
+%                  plut the mean cluster ERSP in one figure per condition.
+%                  The ERSPs can be plotted only when component ERSPs have been computed 
+%                  and saved in the EEG datasets of the STUDY.
+%                  These may be computed during pre-clustering using the gui-based function
+%                  pop_preclust() or via the equivalent commandline functions eeg_createdata() 
+%                  and eeg_preclust(). This function is called by pop_clustedit().
 % Usage:    
-%                   >> [STUDY] = std_propplot(STUDY, ALLEEG, clusters);  
+%              >> [STUDY] = std_propplot(STUDY, ALLEEG, clusters);  
 % Inputs:
 %   STUDY      - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
-%   ALLEEG     - global EEGLAB vector of EEG structures for the dataset(s) included in the STUDY. 
-%                     ALLEEG for a STUDY set is typically created using load_ALLEEG().  
+%   ALLEEG     - global EEGLAB vector of EEG structures for the datasets in the STUDY. 
+%                ALLEEG for a STUDY set is typically created using load_ALLEEG().  
 %
 % Optional inputs:
-%   clusters   - [numeric vector]  -> specific cluster numbers to plot.
-%                     'all'                         -> plot all clusters in STUDY.
-%                     {default: 'all'}.
+%   clusters   - [numeric vector]  -> cluster numbers to plot.
+%                            'all' -> plot all clusters in STUDY {default: 'all'}.
 % Outputs:
-%   STUDY    - the input STUDY set structure modified with plotted cluster 
-%                     mean measures, to allow quick replotting (unless cluster means 
-%                     already exists in the STUDY).  
+%   STUDY      - the input STUDY set structure modified with the plotted cluster 
+%                mean mproperties, to allow quick replotting (unless cluster means 
+%                already existed in the STUDY).  
+% Example:
+%              >> [STUDY] = std_propplot(STUDY,ALLEEG, 5);
+%                 % Plot mean properties for cluster 5 in one figure. 
 %
-%   Example:
-%                         >> [STUDY] = std_propplot(STUDY,ALLEEG, 5);
-%                    Plots the mean measures of cluster 5 on the same figure. 
-%
-%  See also  pop_clustedit() 
+% See also:  pop_clustedit() 
 %
 % Authors:  Hilit Serby, Arnaud Delorme, Scott Makeig, SCCN, INC, UCSD, July, 2005
 
@@ -49,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2006/03/08 21:03:37  arno
+% rename func
+%
 % Revision 1.6  2006/03/08 20:56:31  arno
 % rename func
 %
@@ -77,14 +79,14 @@ if length(varargin) > 0
 end
 
 len = length(cls);
-% Plot clusters mean measures
+% Plot clusters mean properties
 for k = 1: len
     if k == 1
         try 
             % optional 'CreateCancelBtn', 'delete(gcbf); error(''USER ABORT'');', 
-            h_wait = waitbar(0,['Computing cluster measures ...'], 'Color', BACKEEGLABCOLOR,'position', [300, 200, 300, 48]);
+            h_wait = waitbar(0,['Computing cluster properties ...'], 'Color', BACKEEGLABCOLOR,'position', [300, 200, 300, 48]);
         catch % for Matlab 5.3
-            h_wait = waitbar(0,['Computing cluster measures ...'],'position', [300, 200, 300, 48]);
+            h_wait = waitbar(0,['Computing cluster properties ...'],'position', [300, 200, 300, 48]);
         end
     end  
     warningon = 0;
@@ -140,15 +142,15 @@ for k = 1: len
     end
     waitbar((k*6)/(len*6),h_wait);
     %subplot('position', [0.77 0.16 0.15 0.28]),
-    maintitle = ['Cluster '''  STUDY.cluster(cls(k)).name ''' average measures (' num2str(length(STUDY.cluster(cls(k)).comps)) ' comps).' ];
+    maintitle = ['Cluster '''  STUDY.cluster(cls(k)).name ''' average properties (' num2str(length(STUDY.cluster(cls(k)).comps)) ' comps).' ];
     a = textsc(maintitle, 'title'); 
     set(a, 'fontweight', 'bold');     
 
     if warningon
-        disp('Some measures could not be plotted. To be able to plot these measures');
-        disp('include them in the pre-clustering (you may enter 0 as dimention if you just want');
-        disp('the measure (scalp map, ERSP, etc...) to be computed (and not having it included');
-        disp('in the clustering procedure - see tutorial for more information).');
+        disp('Some properties could not be plotted. To plot these properties, first');
+        disp('include them in pre-clustering. There, you may spcify 0 dimensions if you');
+        disp('want the property (scalp_map, ERSP, etc...) to be computed but not included');
+        disp('in the clustering procedure - see the clustering tutorial).');
     end;
 
 end  % Finished all conditions
