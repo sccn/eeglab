@@ -1,45 +1,42 @@
-% std_itcplot() - Commandline function, to visualizing cluster/s ITCs. 
-%                   Displays either mean cluster/s ITC/s, or all cluster/s component
-%                   ITCs with the mean cluster/s ITC in one figure (per cluster & condition).
-%                   The ITCs can be visualized only if component ITCs     
-%                   were calculated and saved in the EEG datasets in the STUDY.
-%                   These can be computed during pre-clustering using the GUI-based function
-%                   pop_preclust() or the equivalent commandline functions eeg_createdata() 
-%                   and eeg_preclust(). A pop-function that calls this function is pop_clustedit().
+% std_itcplot() - Commandline function to plot cluster ITCs. Either displays mean cluster 
+%                 ITCs, or else all cluster component ITCs, plus the mean cluster ITC, in 
+%                 one figure per cluster and condition. ITCs can be visualized only if 
+%                 component ITCs were calculated and saved in the STUDY EEG datasets.
+%                 These can be computed during pre-clustering using the gui-based function
+%                 pop_preclust(), or via the equivalent commandline functions 
+%                 eeg_createdata() and eeg_preclust(). Called by pop_clustedit().
 % Usage:    
-%                   >> [STUDY] = std_itcplot(STUDY, ALLEEG, key1, val1, key2, val2);  
+%              >> [STUDY] = std_itcplot(STUDY, ALLEEG, key1, val1, key2, val2);  
 % Inputs:
 %   STUDY      - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
-%   ALLEEG     - global EEGLAB vector of EEG structures for the dataset(s) included in the STUDY. 
-%                     ALLEEG for a STUDY set is typically created using load_ALLEEG().  
+%   ALLEEG     - global EEGLAB vector of EEG structures for the datasets in the STUDY. 
+%                Note: ALLEEG for a STUDY set is typically created using load_ALLEEG().  
 %
 % Optional inputs:
-%   'clusters'   - [numeric vector]  -> specific cluster numbers to plot.
-%                     'all'                         -> plot all clusters in STUDY.
-%                     {default: 'all'}.
-%   'comps'      - [numeric vector]  -> indices of the cluster components to plot.
-%                       'all'        -> plot all the components in the cluster {default: 'all'}.
-%   'mode'       - ['centroid'|'comps'] a plotting mode. In 'centroid' mode, the average ERSPs 
-%                     of the requested clusters are plotted in the same figure - one per condition. 
-%                     In 'comps' mode, component ERSPs for each cluster are plotted in a
-%                     separate figure (per condition) with the cluster mean ERSP.
-%                     {default: 'centroid'}. Note that this option is irrelevant if component
-%                     indices are provided as input.
-%   'figure'   - ['on'|'off'] plots on a new figure ('on')  or plots on current
-%                    figure ('off'). 'figure' 'off' is optional for one cluster in 'centroid' mode.
-%                    Useful for incomporating cluster ITC into a complex figure.
-%                    In case of multiple conditions only the first condition is displayed,
-%                    once plotted clicking on the figure will open a new figure with 
-%                    all the conditions plotted. {default: 'on'}. 
-%
+%   'clusters' - [numeric vector]  -> specific cluster numbers to plot.
+%                            'all' -> plot all clusters in STUDY  {default: 'all'}.
+%   'comps'    - [numeric vector]  -> indices of the cluster components to plot.
+%                            'all' -> plot all comps. in the cluster {default: 'all'}.
+%   'mode'     - ['centroid'|'comps'] plotting mode. 'centroid' -> average ERSPs 
+%                of the clusters are plotted in the same figure,  one per condition. 
+%                'comps' -> component ITCs for each cluster are plotted in a separate 
+%                figure (per condition) plus the cluster mean ITC. Note this option is 
+%                irrelevant if component indices are provided as input.
+%                {default: 'centroid'}. 
+%   'figure'   - ['on'|'off'] 'on' -> plot on a new figure; 'off' -> plot in current
+%                figure. 'figure','off' is optional for one cluster in 'centroid' mode.
+%                Useful for incorporating cluster ITCs into a complex figure.
+%                If multiple conditions, only the first condition is displayed, but
+%                clicking on the figure will open a new figure with all conditions 
+%                plotted. {default: 'on'}. 
 % Outputs:
-%   STUDY    - the input STUDY set structure modified with plotted cluster 
-%                     mean ITCs, to allow quick replotting (unless cluster means 
-%                     already exists in the STUDY).  
+%   STUDY      - the input STUDY set structure modified with plotted cluster 
+%                mean ITCs to allow quick replotting (unless cluster means 
+%                already exists in the STUDY).  
 %
 %   Example:
-%                         >> [STUDY] = std_itcplot(STUDY,ALLEEG, 'clusters', 'all', 'mode', 'centroid');
-%                    Plots the mean ITCs of all the clusters in STUDY on the same figure. 
+%           >> [STUDY] = std_itcplot(STUDY,ALLEEG, 'clusters', 'all', 'mode', 'centroid');
+%              % Plot the mean ITCs of all the clusters in STUDY on the same figure. 
 %
 %  See also  pop_clustedit(), pop_preclust()
 %
@@ -312,34 +309,34 @@ if strcmpi(mode, 'centroid')
 end % Finished 'centroid' mode plot option
 
 % std_plotcompitc() - Commandline function, to visualizing cluster component ITC images. 
-%                    Displays the ITC images of specified cluster components on separate figures,
-%                    using one figure for all conditions. 
-%                   The ITCs can be visualized only if component ITCs     
-%                   were calculated and saved in the EEG datasets in the STUDY.
-%                   These can be computed during pre-clustering using the GUI-based function
-%                   pop_preclust() or the equivalent commandline functions eeg_createdata() 
-%                   and eeg_preclust(). A pop-function that calls this function is pop_clustedit().
+%                     Displays the ITC images of specified cluster components on separate
+%                     figures using one figure for all conditions. ITCs can be visualized 
+%                     only if component ITCs have been calculated and saved in the EEG 
+%                     datasets in the STUDY. These can be computed during pre-clustering 
+%                     using the gui-based function pop_preclust() or the equivalent 
+%                     commandline functions eeg_createdata() and eeg_preclust(). 
+%                     Called by pop_clustedit().
 % Usage:    
-%                   >> [STUDY] = std_plotcompitc(STUDY, ALLEEG, cluster, comps);  
+%              >> [STUDY] = std_plotcompitc(STUDY, ALLEEG, cluster, comps);  
 % Inputs:
 %   STUDY      - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
-%   ALLEEG     - global EEGLAB vector of EEG structures for the dataset(s) included in the STUDY. 
-%                     ALLEEG for a STUDY set is typically created using load_ALLEEG().  
-%   cluster     - single cluster number.  
+%   ALLEEG     - global EEGLAB vector of EEG structures for the datasets included in 
+%                the STUDY. A STUDY set ALLEEG is typically created using load_ALLEEG().  
+%   cluster    - single cluster number.  
 %
 % Optional inputs:
 %   comps      - [numeric vector]  -> indices of the cluster components to plot.
-%                       'all'                       -> plot all the components in the cluster
+%                            'all' -> plot all the components in the cluster
 %
 % Outputs:
 %   STUDY    - the input STUDY set structure modified with plotted cluster itc
-%                     image mean, to allow quick replotting (unless cluster mean 
-%                     already existed in the STUDY).  
+%              image mean, to allow quick replotting (unless cluster mean 
+%              already existed in the STUDY).  
 %
 %   Example:
-%                         >> cluster = 4; comps= [1 7 10];  
-%                         >> [STUDY] = std_plotcompmap(STUDY,ALLEEG, cluster, comps);
-%                    Plots components 1, 7 & 10  itcs of cluster 4 on separate figures. 
+%              >> cluster = 4; comps= [1 7 10];  
+%              >> [STUDY] = std_plotcompmap(STUDY,ALLEEG, cluster, comps);
+%              % Plot components 1, 7 & 10  itcs of cluster 4 on separate figures. 
 %
 %  See also  pop_clustedit, pop_preclust, eeg_createdata, std_itcplot         
 %
