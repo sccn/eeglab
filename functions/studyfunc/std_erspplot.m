@@ -1,45 +1,45 @@
-% std_erspplot() - Commandline function, to visualizing cluster/s ERSPs. 
-%                   Displays either mean cluster/s ERSP/s, or all cluster/s component 
-%                   ERSPs with the mean cluster/s ERSP in one figure (per condition).
-%                   The ERSPs can be visualized only if component ERSPs     
-%                   were calculated and saved in the EEG datasets in the STUDY.
-%                   These can be computed during pre-clustering using the GUI-based function
-%                   pop_preclust() or the equivalent commandline functions eeg_createdata() 
-%                   and eeg_preclust(). A pop-function that calls this function is pop_clustedit().
+%
+% std_erspplot() - Commandline function to plot cluster ERSPs. Displays either mean cluster 
+%                  ERSPs, or else all cluster component ERSPs plus the mean cluster ERSP 
+%                  in one figure per condition.
+%                  The ERSPs can be plotted only if component ERSPs were computed and saved 
+%                  in the EEG datasets in the STUDY. These may either be computed during 
+%                  pre-clustering using the gui-based function pop_preclust(), or via
+%                  the equivalent commandline functions eeg_createdata() and eeg_preclust(). 
+%                  This function is called by pop_clustedit().
 % Usage:    
 %                   >> [STUDY] = std_erspplot(STUDY, ALLEEG, key1, val1, key2, val2);  
 % Inputs:
 %   STUDY      - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
-%   ALLEEG     - global EEGLAB vector of EEG structures for the dataset(s) included in the STUDY. 
-%                     ALLEEG for a STUDY set is typically created using load_ALLEEG().  
+%   ALLEEG     - global EEGLAB vector of EEG structures for the datasets included in the STUDY. 
+%                ALLEEG for a STUDY set is typically created using load_ALLEEG().  
 %
 % Optional inputs:
-%   'clusters'   - [numeric vector]  -> specific cluster numbers to plot.
-%                     'all'          -> plot all clusters in STUDY.
-%                     {default: 'all'}.
-%   'comps'      - [numeric vector]  -> indices of the cluster components to plot.
-%                       'all'        -> plot all the components in the cluster {default: 'all'}.
-%   'mode'       - ['centroid'|'comps'] a plotting mode. In 'centroid' mode, the average ERSPs 
-%                     of the requested clusters are plotted in the same figure - one per condition. 
-%                     In 'comps' mode, component ERSPs for each cluster are plotted in a
-%                     separate figure (per condition) with the cluster mean ERSP.
-%                     {default: 'centroid'}. Note that this option is irrelevant if component
-%                     indices are provided as input.
-%   'figure'   - ['on'|'off'] plots on a new figure ('on')  or plots on current
-%                    figure ('off'). 'figure' 'off' is optional for one cluster in 'centroid' mode.
-%                    Useful for incomporating cluster ERSP into a complex figure.
-%                    In case of multiple conditions only the first condition is displayed,
-%                    once plotted clicking on the figure will open a new figure with 
-%                    all the conditions plotted. {default: 'on'}. 
+%   'clusters' - [numeric vector]  -> specific cluster numbers to plot.
+%                            'all' -> plot all clusters in STUDY {default: 'all'}.
+%   'comps'    - [numeric vector]  -> indices of the cluster components to plot.
+%                            'all' -> plot all the components in the cluster {default: 'all'}.
+%   'mode'     - ['centroid'|'comps'] plotting mode. In 'centroid' mode, the average ERSPs 
+%                     of the requested clusters are plotted in the same figure - one per 
+%                     condition. In 'comps' mode, component ERSPs for each cluster are plotted 
+%                     in a separate figure (per condition) with the cluster mean ERSP.
+%                     Note: This option is irrelevant if component indices are provided as 
+%                     input {default: 'centroid'} 
+%   'figure'  - ['on'|'off'] 'on' -> plot on a new figure; 'off' -> plot on current figure 
+%                    'figure','off' is optional for one cluster in 'centroid' mode.
+%                    Useful for incomporating a cluster ERSP into a complex figure.
+%                    In case of multiple conditions, only the first condition is displayed,
+%                    but clicking on the figure will open a new figure with all conditions
+%                    plotted separately {default: 'on'} 
 %
-% Outputs:
-%   STUDY    - the input STUDY set structure modified with plotted cluster 
-%                     mean ERSPs, to allow quick replotting (unless cluster means 
-%                     already exists in the STUDY).  
+% Output:
+%   STUDY     - the input STUDY set structure modified with plotted cluster 
+%               mean ERSPs to allow quick replotting (unless cluster means 
+%               already exists in the STUDY).  
 %
-%   Example:
-%                         >> [STUDY] = std_erspplot(STUDY,ALLEEG, 'clusters', 'all', 'mode', 'centroid');
-%                    Plots the mean ERSPs of all the clusters in STUDY on the same figure. 
+% Example:
+%             >> [STUDY] = std_erspplot(STUDY,ALLEEG, 'clusters', 'all', 'mode', 'centroid');
+%                % Plot the mean ERSPs of all clusters in STUDY on the same figure. 
 %
 %  See also  pop_clustedit(), pop_preclust()
 %
@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2006/03/08 20:57:46  arno
+% rename func
+%
 % Revision 1.9  2006/03/08 20:20:12  arno
 % rename func
 %
