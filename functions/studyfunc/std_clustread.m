@@ -72,7 +72,8 @@ for k = 1:len
             if ~isfield(ALLEEG(abset).etc, 'icaitcparams')
                 error([ 'No ITC information available in dataset ' num2str(abset) ]);   
             end
-            [itc, logfreqs, timevals] = std_readitc(ALLEEG, abset, comp);
+            [itc, logfreqs, timevals] = std_readitc(ALLEEG, abset, comp, STUDY.preclust.erspclusttimes, ...
+                                                                    STUDY.preclust.erspclustfreqs );
             clusinfo.itc{k}   = itc;
             clusinfo.logf{k}  = log(logfreqs);
             clusinfo.times{k} = logfreqs;
