@@ -101,6 +101,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2006/03/08 23:03:25  arno
+% remove debug message
+%
 % Revision 1.20  2006/03/08 23:02:41  arno
 % renaming powbase properly
 %
@@ -268,6 +271,8 @@ for k = 1:length(comps)  % for each (specified) component
 end
 
 % Save ERSP into float file
+dsfsdds
+
 floatwrite(all_ersp, fullfile(EEG.filepath, [ EEG.filename(1:end-3) 'icaersp']));
 floatwrite(all_itc,  fullfile(EEG.filepath, [ EEG.filename(1:end-3) 'icaitc']));
 
