@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2006/03/08 21:04:03  arno
+% typo
+%
 % Revision 1.9  2006/03/08 21:00:40  arno
 % rename func
 %
@@ -365,7 +368,7 @@ for ci = 1 : length(comp_ind) %for each comp
             warndlg2([ 'Dataset ' ALLEEG(abset).filename ' has no spectra info, aborting'] , 'Abort - Plot spectra' ); 
             return;
         end
-        [spec, f] = std_readspec(ALLEEG, abset, comp);
+        [spec, f] = std_readspec(ALLEEG, abset, comp, 'm');
         if isempty(spec)
             warndlg2(['eeg_clustedit: file '  ALLEEG(abset).etc.icaspec ' was not found in path ' ALLEEG(abset).filepath], 'Abort - Plot spectra' ); 
             return
