@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2006/03/08 20:32:48  arno
+% rename func
+%
 % Revision 1.2  2006/03/07 22:14:40  arno
 % use fullfile
 %
@@ -61,6 +64,19 @@ function [grid, yi, xi ] = std_readtopo(ALLEEG, abset, comp)
 grid = [];
 yi = [];
 xi = [];
+topo = load( '-mat', fullfile( ALLEEG(abset).filepath, ALLEEG(abset).etc.icatopo), ...
+      [ 'comp' int2str(comp) '_grid'], ...
+      [ 'comp' int2str(comp) '_x'], ...
+      [ 'comp' int2str(comp) '_y'] );
+grid = getfield(topo, [ 'comp' int2str(comp) '_grid']);
+yi = getfield(topo, [ 'comp' int2str(comp) '_y']);
+xi = getfield(topo, [ 'comp' int2str(comp) '_x']);
+
+return;
+
+
+
+
 d = ALLEEG(abset).etc.icascalpparams; %the grid dimension 
 if iscell(d)
     d = d{1};
