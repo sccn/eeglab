@@ -71,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2006/03/09 00:37:35  arno
+% now writing matlab file
+%
 % Revision 1.18  2006/03/08 20:28:13  arno
 % rename func
 %
@@ -303,6 +306,7 @@ end
 
 % save removed mean spectra info in float file
 % --------------------------------------------
+clear allspec;
 allspec.freqs = f;
 for k = 1:size(X,1)
     allspec = setfield( allspec, [ 'comp' int2str(comps(k)) ], X(k,:));
