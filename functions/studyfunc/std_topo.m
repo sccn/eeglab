@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2006/03/09 19:21:29  arno
+% header
+%
 % Revision 1.11  2006/03/09 19:21:08  arno
 % header
 %
@@ -139,9 +142,9 @@ for k = 1:numc
                                            'electrodes', 'on' ,'style','both',...
                                            'plotrad',0.5,'intrad',0.5,...
                                            'noplot', 'on', 'chaninfo', EEG.chaninfo);
-    all_topos = setfield(all_topos, [ 'comp' int2str(comps(k)) '_grid' ], grid);
-    all_topos = setfield(all_topos, [ 'comp' int2str(comps(k)) '_x' ]   , Xi(:,1));
-    all_topos = setfield(all_topos, [ 'comp' int2str(comps(k)) '_y' ]   , Yi(:,1));
+    all_topos = setfield(all_topos, [ 'comp' int2str(k) '_grid' ], grid);
+    all_topos = setfield(all_topos, [ 'comp' int2str(k) '_x' ]   , Xi(:,1));
+    all_topos = setfield(all_topos, [ 'comp' int2str(k) '_y' ]   , Yi(:,1));
     
 end
 
@@ -152,7 +155,7 @@ tmpfile = fullfile( EEG.filepath, [ EEG.filename(1:end-3) 'icatopo' ]);
 std_savedat(tmpfile, all_topos);
 
 for k = 1:length(comps)
-    tmp =  getfield(all_topos, [ 'comp' int2str(k) '_grid' ]);
+    tmp =  getfield(all_topos, [ 'comp' int2str(comps(k)) '_grid' ]);
     
     if strcmpi(option, 'gradient')
         [tmpx, tmpy]  = gradient(tmp); % Gradient
