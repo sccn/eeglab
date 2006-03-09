@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2006/03/09 00:42:09  arno
+% fix reading file
+%
 % Revision 1.5  2006/03/09 00:37:31  arno
 % now writing matlab file
 %
@@ -70,23 +73,9 @@ if nargin < 4
 end;
 
 spec = [];
-specstruct = load( '-mat', fullfile( ALLEEG(abset).filepath,[ ALLEEG(abset).etc.icaspec ext]), ...
-             [ 'comp' int2str(comp) ], 'freqs' );
+filename = fullfile( ALLEEG(abset).filepath,[ ALLEEG(abset).filename(1:end-3) 'icaspec' ext]);
+specstruct = load( '-mat', filename, [ 'comp' int2str(comp) ], 'freqs' );
 spec = getfield(specstruct, [ 'comp' int2str(comp) ]);
 f    = specstruct.freqs;
 
 return;
-
-spec = [];
-if iscell(ALLEEG(abset).etc.icaspecmparams)
-    d = ALLEEG(abset).etc.icaspecmparams{1};
-else
-    d = ALLEEG(abset).etc.icaspecmparams(1);
-end
-try
-    f    = floatread( fullfile( ALLEEG(abset).filepath, [ ALLEEG(abset).etc.icaspec 'm']), [d 1],[],0);
-    spec = floatread( fullfile( ALLEEG(abset).filepath, [ ALLEEG(abset).etc.icaspec 'm']), [d 1],[],d*(comp));
-catch
-    warndlg2(['std_readspec: file '  ALLEEG(abset).etc.icaspec 'm was not found in path ' ALLEEG(abset).filepath], 'Abort - computing spectra centroid' ); 
-    return;
-end
