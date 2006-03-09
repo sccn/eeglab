@@ -62,6 +62,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2006/03/09 23:13:38  arno
+% debug adding times field
+%
 % Revision 1.10  2006/03/09 23:11:00  arno
 % adding field ersp_times to centroid
 %
@@ -236,20 +239,21 @@ if itcC | erspC | specC | erpC | scalpC
                                 centroid{clust}.ersp{m} = centroid{clust}.ersp{m} + ersp(:,:,m);
                                 centroid{clust}.ersp_limits{m} = max(floor(max(max(abs(ersp(:,:,m))))), centroid{clust}.ersp_limits{m});
                             end
-                            centroid{clust}.ersp_logf  = logfreqs;
+                            centroid{clust}.ersp_logf  = log(logfreqs);
                             centroid{clust}.ersp_times = timevals;
                             abset = STUDY.datasetinfo(STUDY.setind(cond,ind)).index; %return  default value
                         end
                     end
                     if itcC %itc centroid
                         fprintf('.');
-                        [itc, logfreqs, timevals] = std_readitc(ALLEEG, abset, comp);
+                        [itc, logfreqs, timevals] = std_readitc(ALLEEG, abset, comp, STUDY.preclust.erspclusttimes, ...
+                                                                    STUDY.preclust.erspclustfreqs ););
                         if isempty(itc)
                             return;
                         end
                         centroid{clust}.itc{cond} = centroid{clust}.itc{cond} + itc;
                         centroid{clust}.itc_limits{cond} = max(floor(max(max(abs(itc)))), centroid{clust}.itc_limits{cond}); %ersp image limits 
-                        centroid{clust}.itc_logf  = logfreqs;
+                        centroid{clust}.itc_logf  = log(logfreqs);
                         centroid{clust}.itc_times = timevals;
                     end
                 end
