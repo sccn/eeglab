@@ -45,7 +45,7 @@ for k = 1:len
             if ~isfield(ALLEEG(abset).etc, 'icaspecparams')
                 error([ 'No spectrum information available in dataset ' num2str(abset) ]);   
             end
-            [spec, f] = std_readspec(ALLEEG, abset, comp);
+            [spec, f] = std_readspec(ALLEEG, abset, comp, 'm');
             if  k == 1
                 clusinfo.spec = zeros(len,length(spec));
                 clusinfo.f = f;
