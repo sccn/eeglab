@@ -158,6 +158,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.268  2006/01/17 23:01:27  scott
+% clarified status of 'plotgrid' -sm
+%
 % Revision 1.267  2005/12/08 00:22:19  arno
 % fixing ploting one channel
 %
@@ -827,7 +830,7 @@ HEADCOLOR = [0 0 0];    % default head color (black)
 CCOLOR = [0.2 0.2 0.2]; % default contour color
 ELECTRODES = [];        % default 'electrodes': on|off|label - set below
 MAXDEFAULTSHOWLOCS = 64;% if more channels than this, don't show electrode locations by default
-EMARKER = '.';          % mark electrode locations with small disks
+EMARKER = 'o';          % mark electrode locations with small disks
 ECOLOR = [0 0 0];       % default electrode color = black
 EMARKERSIZE = [];       % default depends on number of electrodes, set in code
 EMARKERLINEWIDTH = 1;   % default edge linewidth for emarkers
@@ -839,7 +842,7 @@ EMARKER2COLOR = 'r';     % mark subset of electrode locations with small disks
 EMARKERSIZE2 = 10;      % default selected channel location marker size
 EMARKER2LINEWIDTH = 1;
 EFSIZE = get(0,'DefaultAxesFontSize'); % use current default fontsize for electrode labels
-HLINEWIDTH = 3;         % default linewidth for head, nose, ears
+HLINEWIDTH = 1.7;         % default linewidth for head, nose, ears
 BLANKINGRINGWIDTH = .035;% width of the blanking ring 
 HEADRINGWIDTH    = .007;% width of the cartoon head ring
 SHADING = 'flat';       % default 'shading': flat|interp
@@ -1966,9 +1969,9 @@ end
    elseif length(y)>=100
     EMARKERSIZE = 3;
    elseif length(y)>=128
-    EMARKERSIZE = 2;
+    EMARKERSIZE = 3;
    elseif length(y)>=160
-    EMARKERSIZE = 1;
+    EMARKERSIZE = 3;
    end
  end
 %
