@@ -128,6 +128,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2006/03/08 21:09:26  arno
+% checking study
+%
 % Revision 1.26  2006/03/08 20:30:41  arno
 % rename func
 %
@@ -427,41 +430,38 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, components
         % make sure they are the same as the requested parameters.
         % -----------------------------------------------------------
         if (strcmpi(strcom,'ersp')  | strcmpi(strcom,'itc') )  
-            overwrite = 0; 
             params = [];
             for si = 1:size(STUDY.setind,2) % scan datasets that are part of STUDY
                 for cond = 1:Ncond
-                    if overwrite == 0
-                        idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index;
-                        if isfield(ALLEEG(idat).etc, 'icaerspparams')
-                            params = ALLEEG(idat).etc.icaerspparams;
-                        end
-                        if ~isempty(params)
-                            overwrite = 2;
-                            if  sum(params.cycles ~= cycles) | sum(params.freqrange ~= freqrange)  | ...
-                                    (padratio ~= params.padratio) | (alpha~= params.alpha) 
-                                set_yes =  [ 'set(findobj(''parent'', gcbf, ''tag'', ''ersp_no''), ''value'', 0);'];
-                                set_no =  [ 'set(findobj(''parent'', gcbf, ''tag'', ''ersp_yes''), ''value'', 0);' ];
-                                ersp_ans = inputgui('geometry', {[1] [1] [1] [1] [1 1] [1]}, 'uilist', ...
-                                       { {'style' 'text' 'string' [upper(strcom) ' info exists for dataset: '  ALLEEG(idat).filename '. It does not fit requested values.' ] } ...
-                                         {'style' 'text' 'string' ['Existing values are: frequency range - [' num2str(params.freqrange) '], wavelet cycles - [' num2str(params.cycles) ...
-                                                 '], padratio - ' num2str(params.padratio) ', and bootstrap significance - ' num2str(params.alpha) ] } {} ...
-                                         {'style' 'text' 'string' ['Would you like to recalculate ' upper(strcom) ' and overwrite those values?' ]} ...
-                                         {'style' 'checkbox' 'tag' 'ersp_yes' 'string' 'Yes' 'value' 1 'Callback' set_yes }  ...
-                                         {'style' 'checkbox' 'tag' 'ersp_no' 'string' 'Use existing ERSP info' 'value' 0 'Callback' set_no } {} },...
-                                         'helpcom', '', 'title', ['Recalculate ' upper(strcom) ' parameters -- part of std_ersp()']); 
-                                if find(celltomat(ersp_ans))  == 2 % use existing ERSP info from this dataset
-                                    overwrite = 2;
-                                    cycles = params.cycles;
-                                    freqrange = params.freqrange;
-                                    alpha = params.alpha;
-                                    padratio = params.padratio;
-                               else % Over write data in dataset
-                                    overwrite = 1;
-                                end
-                            else
-                                disp('Using existing ERSP information...');
+                    idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index;
+                    
+                    % read spectrum paramters from file
+                    % ---------------------------------
+                    filename = fullfile( ALLEEG(idat).filepath,[ ALLEEG(idat).filename(1:end-3) 'icaersp']);
+                    if exist(filename)
+                        tmp = load('-mat', filename, 'parameters');
+                        params = struct( tmp.parameters{:} );
+                        if  sum(params.cycles ~= cycles) | (padratio ~= params.padratio) | (alpha~= params.alpha) 
+                            set_yes = [ 'set(findobj(''parent'', gcbf, ''tag'', ''ersp_no''), ''value'', 0);'];
+                            set_no  = [ 'set(findobj(''parent'', gcbf, ''tag'', ''ersp_yes''), ''value'', 0);' ];
+                            ersp_ans = inputgui('geometry', {[1] [1] [1] [1] [1 1] [1]}, 'uilist', ...
+                                                { {'style' 'text' 'string' [upper(strcom) ' info exists for dataset: ' ...
+                                                ALLEEG(idat).filename '. It does not fit requested values.' ] } ...
+                                                {'style' 'text' 'string' ['Existing values are: wavelet cycles - [' num2str(params.cycles) ...
+                                                '], padratio - ' num2str(params.padratio) ', and bootstrap significance - ' num2str(params.alpha) ] } {} ...
+                                                {'style' 'text' 'string' ['Would you like to recalculate ' upper(strcom) ' and overwrite those values?' ]} ...
+                                                {'style' 'checkbox' 'tag' 'ersp_yes' 'string' 'Yes' 'value' 1 'Callback' set_yes }  ...
+                                                {'style' 'checkbox' 'tag' 'ersp_no' 'string' 'Use existing ERSP info' 'value' 0 'Callback' set_no } {} },...
+                                                'helpcom', '', 'title', ['Recalculate ' upper(strcom) ' parameters -- part of std_ersp()']); 
+                            if find(celltomat(ersp_ans))  == 2 % use existing ERSP info from this dataset
+                                cycles   = params.cycles;
+                                alpha    = params.alpha;
+                                padratio = params.padratio;
+                                else % Over write data in dataset
+                                    delete(filename);
                             end
+                        else
+                            disp('Using existing ERSP information...');
                         end
                     end
                 end
@@ -485,15 +485,9 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, components
                               error('No epochs in dataset: ERP information has no meaning');
                          end
                          if ~isempty('timewindow')
-                             [tmp, X, t] = std_erp(ALLEEG(idat), succompind{si}, timewindow);
-                             if ~isempty(tmp)
-                                 ALLEEG(idat).etc = tmp;
-                             end
+                             [X, t] = std_erp(ALLEEG(idat), succompind{si}, timewindow);
                          else
-                             [tmp, X, t] = std_erp(ALLEEG(idat), succompind{si});
-                             if ~isempty(tmp)
-                                 ALLEEG(idat).etc = tmp;
-                             end
+                             [X, t] = std_erp(ALLEEG(idat), succompind{si});
                          end
                          if cond == 1
                              con_data = abs(X);
@@ -516,10 +510,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, components
              case 'scalp' , % NB: scalp maps are identical across conditions (within session)
                  idat = STUDY.datasetinfo(STUDY.setind(1,si)).index; 
                  if ~isempty(succompind{si})
-                     [tmp, X] = std_topo(ALLEEG(idat), succompind{si});
-                     if ~isempty(tmp)
-                         ALLEEG(idat).etc = tmp;
-                     end
+                     X = std_topo(ALLEEG(idat), succompind{si});
                      if abso % absolute values
                          data = [ data; abs(X) ];
                      else
@@ -532,10 +523,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, components
              case 'scalpLaplac' , 
                  idat = STUDY.datasetinfo(STUDY.setind(1,si)).index; 
                  if ~isempty(succompind{si})
-                     [tmp, X] = std_topo(ALLEEG(idat), succompind{si}, 'laplacian'); 
-                     if ~isempty(tmp)
-                         ALLEEG(idat).etc = tmp;
-                     end
+                     X = std_topo(ALLEEG(idat), succompind{si}, 'laplacian'); 
                      if abso
                          data = [ data; abs(X)];
                      else
@@ -548,10 +536,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, components
              case 'scalpGrad'   , 
                  idat = STUDY.datasetinfo(STUDY.setind(1,si)).index; 
                  if ~isempty(succompind{si})
-                     [tmp, X] = std_topo(ALLEEG(idat), succompind{si}, 'gradient'); 
-                     if ~isempty(tmp)
-                         ALLEEG(idat).etc = tmp;
-                     end
+                     X = std_topo(ALLEEG(idat), succompind{si}, 'gradient'); 
                      if abso
                          data = [ data; abs(X)];
                      else
@@ -563,16 +548,13 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, components
              % -----------------------
              case 'spec'   , 
                  if si == 1
-                    overwrite = 0;
-                end
-                if ~isempty(succompind{si})
-                    for cond = 1 : Ncond 
+                     overwrite = 0;
+                 end
+                 if ~isempty(succompind{si})
+                     for cond = 1 : Ncond 
                          idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index;  
-                         [tmp, X, f,overwrite] = std_spec(ALLEEG(idat),succompind{si}, ...
-                                                          freqrange, fun_arg,overwrite);
-                         if ~isempty(tmp)
-                             ALLEEG(idat).etc = tmp;
-                         end
+                         [X, f,overwrite] = std_spec(ALLEEG(idat),succompind{si}, ...
+                                                     freqrange, fun_arg,overwrite);
                          if cond == 1
                              con_data = X;
                              con_f = f;
@@ -583,12 +565,13 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, components
                      end
                      if isempty(data)
                           frequencies = con_f;
-                      else
-                          frequencies = [ frequencies; con_f];
-                      end
-                      data = [ data; con_data ];
-                      clear f X con_f con_data tmp;  
-                  end               
+                     else
+                         frequencies = [ frequencies; con_f];
+                     end
+                     data = [ data; con_data ];
+                     clear f X con_f con_data tmp;  
+                 end               
+                 
              % select dipole information
              % -------------------------
              case 'dipoles' % NB: dipoles are identical across conditions (within session)
@@ -625,20 +608,30 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, components
                 if ~isempty(succompind{si})
                     idattot = [];
                     for cond = 1 : Ncond 
-                         idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index;  
-                         idattot = [idattot idat];
-                         % compute ERSP/ ITC, if doesn't exist.
-                         [tmp] = std_ersp(ALLEEG(idat),succompind{si}, freqrange, timewindow, ...
-                                                                     cycles, padratio, alpha, type);
-                         if ~isempty(tmp)
-                             ALLEEG(idat).etc = tmp;
-                         end
+                        idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index;  
+                        idattot = [idattot idat];
+                        % compute ERSP/ ITC, if doesn't exist.
+                        std_ersp(ALLEEG(idat),succompind{si}, freqrange, timewindow, ...
+                                 cycles, padratio, alpha, type);
                     end
+                    STUDY.preclust.erspclustfreqs = freqrange;
+                    STUDY.preclust.erspclusttimes = timewindow;
+                    
                     % prepare ERSP / ITC data for clustering (select requested components, 
                     % mask and change to a common base if multiple conditions).
                     % --------------------------------------------------------------------
-                    X = std_ersptocluster(ALLEEG(idattot),succompind{si}, timewindow, freqrange, type); 
-                    data = [data; X];
+                    for k = 1:length(succompind{si})
+                        if strcmpi(type, 'ersp')
+                            tmp = std_readersp(ALLEEG, idattot, succompind{si}(k), timewindow, freqrange); 
+                        else
+                            tmp = std_readitc( ALLEEG, idattot, succompind{si}(k), timewindow, freqrange); 
+                        end;
+                        if k == 1
+                            X = zeros(length(succompind{si}), size(tmp,1), size(tmp,2), size(tmp,3)); 
+                        end;
+                        X(k,:,:,:) = tmp;
+                    end;
+                    data = [data; reshape(X, size(X,1), size(X,2)*size(X,3)*size(X,4)) ];
                     clear tmp X 
                 end
                 

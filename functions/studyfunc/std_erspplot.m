@@ -62,6 +62,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2006/03/09 22:24:30  arno
+% converting frequencies
+%
 % Revision 1.12  2006/03/09 20:00:24  scott
 % help msg
 %
@@ -161,13 +164,13 @@ if strcmpi(mode, 'comps')
         if ~isfield(STUDY.cluster(cls(clus)).centroid,'ersp')
             STUDY = std_centroid(STUDY,ALLEEG, cls(clus) , 'ersp');
         end
-        try
+        %try
             clusncomm = std_clustread(STUDY, ALLEEG, cls(clus),'ersp',[1:Ncond]);
-        catch,
-            warndlg2([ 'Some ERSP information is missing, aborting'] , ['Abort - Plot ERSP' ] );   
-            delete(h_wait)
-            return;
-       end
+        %catch,
+        %    warndlg2([ 'Some ERSP information is missing, aborting'] , ['Abort - Plot ERSP' ] );   
+        %    delete(h_wait)
+        %    return;
+        %end
        for n = 1:Ncond
            figure
            orient tall
@@ -178,8 +181,11 @@ if strcmpi(mode, 'comps')
             sbplot(rowcols(1),rowcols(2),[1 rowcols(2)+2 ]) ,
             ave_ersp = STUDY.cluster(cls(clus)).centroid.ersp{n};
             lim = STUDY.cluster(cls(clus)).centroid.ersp_limits{n}; %plotting limits
-            ersp_times = ALLEEG(STUDY.datasetinfo(STUDY.setind(1,STUDY.cluster(cls(clus)).sets(1,1))).index).etc.icaerspparams.times;
-            logfreqs = STUDY.cluster(cls(clus)).centroid.ersp_logf;
+            
+            idat = STUDY.datasetinfo(STUDY.setind(1,STUDY.cluster(cls(clus)).sets(1,1))).index;
+
+            logfreqs   = STUDY.cluster(cls(clus)).centroid.ersp_logf;
+            ersp_times = STUDY.cluster(cls(clus)).centroid.ersp_times;
             a = [ STUDY.cluster(cls(clus)).name ' average ERSP, ' num2str(length(unique(STUDY.cluster(cls(clus)).sets(1,:)))) 'Ss' ];
             tftopo(ave_ersp,ersp_times,logfreqs,'limits', [ersp_times(1) ersp_times(end) logfreqs(1) logfreqs(end)],...
                 'title', a, 'verbose', 'off', 'axcopy', 'off');
@@ -200,15 +206,15 @@ if strcmpi(mode, 'comps')
                 abset = STUDY.datasetinfo(STUDY.setind(n,STUDY.cluster(cls(clus)).sets(1,k))).index;
                 subject = STUDY.datasetinfo(STUDY.setind(n,STUDY.cluster(cls(clus)).sets(1,k))).subject;
                 comp = STUDY.cluster(cls(clus)).comps(k);
-                params = ALLEEG(abset).etc.icaerspparams;
+                                
                 a = [ 'ic' num2str(comp) '/' subject ];
                 if k <= rowcols(2) - 2 %first sbplot row
                     sbplot(rowcols(1),rowcols(2),k+2); 
                 else  %other sbplot rows
                     sbplot(rowcols(1),rowcols(2),k+4);  
                 end
-                tftopo(clusncomm.ersp{k}(:,:,n),params.times,clusncomm.logf{k},'limits', ...
-                    [params.times(1) params.times(end) clusncomm.logf{k}(1) clusncomm.logf{k}(end) -lim lim],...
+                tftopo(clusncomm.ersp{k}(:,:,n), clusncomm.times{k},clusncomm.logf{k},'limits', ...
+                    [clusncomm.times{k}(1) clusncomm.times{k}(end) clusncomm.logf{k}(1) clusncomm.logf{k}(end) -lim lim],...
                     'title', a, 'verbose', 'off', 'axcopy', 'off');
                 set(gca, 'xtick', [], 'ytick', []);
                 set(get(gca,'Title'),'FontSize',8)
@@ -256,7 +262,8 @@ if strcmpi(mode, 'centroid')
             return
         end
     end
-    params = ALLEEG(STUDY.datasetinfo(STUDY.setind(1,STUDY.cluster(cls(1)).sets(1,1))).index).etc.icaerspparams;       
+    abset = STUDY.datasetinfo(STUDY.setind(1,STUDY.cluster(cls(1)).sets(1,1))).index;
+    [tmp tmp2 tmp3] = std_readersp( ALLEEG, abset, []);
 
     if figureon
         figure
@@ -293,7 +300,7 @@ if strcmpi(mode, 'centroid')
                 end;
             end;
             logfreqs = STUDY.cluster(cls(k)).centroid.ersp_logf;
-            tftopo(ave_ersp,params.times,logfreqs,'limits', [params.times(1) params.times(end) logfreqs(1) logfreqs(end) -maxval maxval],...
+            tftopo(ave_ersp,timevals,logfreqs,'limits', [timevals(1) timevals(end) logfreqs(1) logfreqs(end) -maxval maxval],...
                    'title', 'Average ERSP', 'verbose', 'off');
             ft = str2num(get(gca,'yticklabel'));
             ft = exp(1).^ft;
@@ -312,7 +319,8 @@ if strcmpi(mode, 'centroid')
                 a = [ STUDY.cluster(cls(k)).name ' ERSP, ' num2str(length(unique(STUDY.cluster(cls(k)).sets(1,:)))) 'Ss, ' STUDY.condition{n}];
                 ave_ersp = STUDY.cluster(cls(k)).centroid.ersp{n};
                 logfreqs = STUDY.cluster(cls(k)).centroid.ersp_logf;
-                tftopo(ave_ersp,params.times,logfreqs,'limits', [params.times(1) params.times(end) logfreqs(1) logfreqs(end) -maxval maxval],...
+                timevals = STUDY.cluster(cls(k)).centroid.ersp_times;
+                tftopo(ave_ersp,timevals,logfreqs,'limits', [timevals(1) timevals(end) logfreqs(1) logfreqs(end) -maxval maxval],...
                        'title', a, 'verbose', 'off');
                 ft = str2num(get(gca,'yticklabel'));
                 ft = exp(1).^ft;
@@ -430,27 +438,19 @@ for ci = 1 : length(comp_ind) %for each comp
    
    for n = 1:Ncond  %for each cond
         abset = STUDY.datasetinfo(STUDY.setind(n,STUDY.cluster(cls).sets(1,comp_ind(ci)))).index;
-        if ~isfield(ALLEEG(abset).etc,'icaerspparams')
-            warndlg2([ 'Dataset ' num2str(abset) ' has no ERSP info, aborting'] , ['Abort - Plot ERSP']); 
-            return;
-        end
-        params = ALLEEG(abset).etc.icaerspparams;
         sbplot(rowcols(1),rowcols(2),n), 
         if n == 1
-            [ersp, logfreqs] = std_readersp(ALLEEG, [STUDY.datasetinfo(STUDY.setind(:,STUDY.cluster(cls).sets(1,comp_ind(ci)))).index], ...
-                                            comp, STUDY.preclust.erspclusttime,  STUDY.preclust.erspclustfreqs);
+            idat = [ STUDY.datasetinfo(STUDY.setind(:,STUDY.cluster(cls).sets(1,comp_ind(ci)))).index ];
+            [ersp, logfreqs, timeval] = std_readersp(ALLEEG, idat, comp, STUDY.preclust.erspclusttimes,  STUDY.preclust.erspclustfreqs);
             logfreqs = log(logfreqs);
-            if isempty(ersp)
-                warndlg2(['pop_clustedit: file '  ALLEEG(abset).etc.icalogersp ' was not found in path ' ALLEEG(abset).filepath], 'Abort - Plot ERSP' ); 
-                return
-            end
         end
         if Ncond >1
             a = [ 'ERSP, IC' num2str(comp) ' / ' subject ', ' STUDY.cluster(cls).name ', ' STUDY.condition{n} ];
         else
             a = ['ERSP, IC' num2str(comp) ' / ' subject  ', ' STUDY.cluster(cls(clus)).name];
         end
-        tftopo(ersp(:,:,n),params.times, logfreqs,'limits', [params.times(1) params.times(end) logfreqs(1) logfreqs(end) -4 4],'title', a, 'verbose', 'off', 'axcopy', 'off');
+        tftopo(ersp(:,:,n), timeval, logfreqs,'limits', [timeval(1) timeval(end) logfreqs(1) logfreqs(end) -4 4], ...
+               'title', a, 'verbose', 'off', 'axcopy', 'off');
         ft = str2num(get(gca,'yticklabel'));
         ft = exp(1).^ft;
         ft = unique(round(ft));

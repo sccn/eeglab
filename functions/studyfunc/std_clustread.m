@@ -59,9 +59,11 @@ for k = 1:len
             if ~isfield(ALLEEG(abset(1)).etc, 'icaerspparams')
                 error([ 'No ERSP information available in dataset ' num2str(abset(1)) ]);   
             end
-            [ersp, logfreqs] = std_readersp(ALLEEG, abset, comp);
-            clusinfo.ersp{k} = ersp;
-            clusinfo.logf{k} = logfreqs;
+            [ersp, logfreqs, timevals] = std_readersp(ALLEEG, abset, comp, ...
+                      STUDY.preclust.erspclusttimes,  STUDY.preclust.erspclustfreqs);
+            clusinfo.ersp{k}  = ersp;
+            clusinfo.logf{k}  = log(logfreqs);
+            clusinfo.times{k} = timevals;
             
         case 'itc'
             if nargin < 5
@@ -70,9 +72,10 @@ for k = 1:len
             if ~isfield(ALLEEG(abset).etc, 'icaitcparams')
                 error([ 'No ITC information available in dataset ' num2str(abset) ]);   
             end
-            [itc, logfreqs] = std_readitc(ALLEEG, abset, comp);
-            clusinfo.itc{k} = itc;
-            clusinfo.logf{k} = logfreqs;
+            [itc, logfreqs, timevals] = std_readitc(ALLEEG, abset, comp);
+            clusinfo.itc{k}   = itc;
+            clusinfo.logf{k}  = log(logfreqs);
+            clusinfo.times{k} = logfreqs;
             
         case 'dipole'
             if ~isfield(ALLEEG(abset).etc, 'dipfit')

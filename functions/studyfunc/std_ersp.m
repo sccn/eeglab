@@ -80,7 +80,7 @@
 %
 % See also: timef(), std_itc(), std_erp(), std_spec(), std_map(), std_preclust()
 %
-% Authors:  Hilit Serby, Arnaud Delorme, SCCN, INC, UCSD, January, 2005
+% Authors: Arnaud Delorme,  Hilit Serby, SCCN, INC, UCSD, January, 2005
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -101,6 +101,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2006/03/09 00:37:55  arno
+% nothing yet
+%
 % Revision 1.21  2006/03/08 23:03:25  arno
 % remove debug message
 %
@@ -161,55 +164,60 @@
 % put log
 %
 
-function [EEG_etc X times freqs] = std_ersp(EEG, comp, freqrange, timewindow, cycles, padratio, alpha, type, powbase)
+function [X times freqs] = std_ersp(EEG, comps, freqrange, timewindow, cycles, padratio, alpha, type, powbase)
 
-EEG_etc = [];
+% checking input parameters
+% -------------------------
 if ~exist('type')
     type = 'ersp';
 end
-
 if isfield(EEG,'icaweights')
-    numc = size(EEG.icaweights,1); % number of ICA comps
+   numc = size(EEG.icaweights,1);
 else
-    error('EEG.icaweights not found');
+   error('EEG.icaweights not found');
 end
-if ~exist('comp') | isempty(comp)
+if nargin < 2
    comps = 1:numc;
-else
-   comps = comp;
+elseif isempty(comps)
+   comps = 1:numc;
 end
-
+powbaseexist = 1; % used also later
 if exist('powbase') 
- if isempty(powbase) | isnan(powbase)
-  powbase = NaN*ones(length(comps),1);  % default for timef()
- end
+    if isempty(powbase) | isnan(powbase)
+        powbaseexist = 0;
+    end
 else
-  powbase = NaN*ones(length(comps),1);  % default for timef()
+    powbaseexist = 0;
+end;
+if ~powbaseexist
+    powbase = NaN*ones(length(comps),1);  % default for timef()
 end
-
 if size(powbase,1) ~= length(comps)
    error('powbase should be of size (ncomps,nfreqs)');
 end
 
+% filenames
+% ---------
+filenameersp = fullfile(EEG.filepath, [ EEG.filename(1:end-3) 'icaersp' ]);
+filenameitc  = fullfile(EEG.filepath, [ EEG.filename(1:end-3) 'icaitc' ]);
+
 % Check if ERSP information found in datasets and if fits requested parameters 
-if isfield(EEG,'etc')
-     if isfield(EEG.etc, [ 'ica' type ])
-         if exist( fullfile(EEG.filepath, getfield(EEG.etc, [ 'ica' type ])))
-             params = EEG.etc.icaerspparams;
-             if sum(params.cycles ~= cycles)                   ...
-                     | sum(params.freqrange ~= freqrange)   ...
-                     | (padratio ~= params.padratio) ...
-                     | (alpha~= params.alpha) ...
-                 % if not as requested parameters, recompute ERSP/ITC
-                 % i.e., continue
-             else
-                 return; % no need to compute ERSP
-             end
-         end;
-     end
- end
+% ----------------------------------------------------------------------------
+if exist( filenameersp )
+    tmpersp  = load( '-mat', filenameersp, 'parameters');
+	params   = struct(tmpersp.parameters{:});
+    if sum(params.cycles ~= cycles)                   ...
+            | (padratio ~= params.padratio) ...
+            | (alpha~= params.alpha) ...
+        % if not as requested parameters, recompute ERSP/ITC
+        % i.e., continue
+    else
+        return; % no need to compute ERSP
+    end
+end;
 
 % No ERSP/ITC information available
+% ---------------------------------
 if isstr(EEG.data)
     TMP = eeg_checkset( EEG, 'loaddata' );  % load EEG.data and EEG.icaact
 else
@@ -221,80 +229,67 @@ if isempty(TMP.icaact)                      % make icaact if necessary
     TMP.icaact = reshape(TMP.icaact, [ size(TMP.icaact,1) size(TMP.data,2)*size(TMP.data,3) ]);
 end;
 
-% Compute ERSP parameters 
+% Compute ERSP parameters
+% -----------------------
 [time_range, winsize] = compute_ersp_times(cycles,  EEG.srate, ...
                                  [EEG.xmin EEG.xmax]*1000 , freqrange(1), padratio); 
 if time_range(1) >= time_range(2)
-    error(['std_ersp: parameters given for ' upper(type) ' calculation result in an invalid time range. Aborting. Please increase the lower frequency bound or change other parameters to resolve the problem. See >> timef details'] )
+    error(['std_ersp: parameters given for ' upper(type) ...
+           ' calculation result in an invalid time range. Aborting.' ...
+           'Please increase the lower frequency bound or change other' ...
+           'parameters to resolve the problem. See >> timef details'] )
 end
+parameters = { 'cycles' cycles ,'type', 'phasecoher',  'plotersp', 'off', 'plotitc', 'off', ...
+               'padratio', padratio, 'plotphase', 'off', 'winsize', winsize, 'alpha', alpha };
 
+% Compute ERSP & ITC
+% ------------------
+all_ersp = [];
+all_itc  = [];
 for k = 1:length(comps)  % for each (specified) component
 
-    % Compute ERSP & ITC
-    % [ersp,itc,powbase,times,freqs,erspboot,itcboot] = timef( TMP.icaact(comps(k), :) , ...
-    %       EEG.pnts, [EEG.xmin EEG.xmax]*1000, EEG.srate, cycles ,'type', ...
-    %          'phasecoher',  'plotersp', 'off', 'plotitc', 'off', 'powbase', powbase, ...
-    %             'alpha',alpha,'padratio',padratio, 'plotphase','off','winsize',winsize);
-
     [ersp,itc,tmppowbase,times,freqs,erspboot,itcboot] = timef( TMP.icaact(comps(k), :) , ...
-          EEG.pnts, [EEG.xmin EEG.xmax]*1000, EEG.srate, cycles ,'type', ...
-             'phasecoher',  'plotersp', 'off', 'plotitc', 'off', 'powbase', powbase(k,:), ...
-                'padratio',padratio, 'plotphase','off','winsize',winsize);
+          EEG.pnts, [EEG.xmin EEG.xmax]*1000, EEG.srate, parameters{2:end}, 'powbase', powbase(k,:));
    
     % Change frequency axis from linear scale to log scale (frequency values left in dB)
-
+    % ----------------------------------------------------------------------------------
     [logfreqs,logersp] = logimagesc(times,freqs,ersp,'plot','off');  
     try
         logeboot(1,:) = interp1(log(freqs),erspboot(1,:),logfreqs','linear');
         logeboot(2,:) = interp1(log(freqs),erspboot(2,:),logfreqs','linear');
     catch
-        logeboot = zeros(2, length(logfreqs));
+        logeboot = [];
     end;
     logbase = interp1(log(freqs),tmppowbase,logfreqs','linear');
-
-    [logfreqs,logitc] = logimagesc(times,freqs,itc,'plot','off'); 
+    [logfreqs,logitc] = logimagesc(times,freqs,itc,'plot','off');
     
     try
         logiboot = interp1(log(freqs),itcboot(1,:),logfreqs','linear');
     catch
-        logiboot = zeros(1, length(logfreqs));
+        logiboot = [];
     end;
 
-    if k == 1 % create data matrices
-        all_ersp = zeros(length(freqs),(length(times)+3)*length(comps));
-        all_itc = zeros(length(freqs),(length(times)+1)*length(comps)); % Save ITC info as well.
-    end
-
-    % store log-frequency spaced ersp and itc
-    all_ersp(:,1+(k-1)*(length(times)+3):k*(length(times)+3) ) = [logersp logeboot' logbase'];
-    all_itc(:,1+(k-1)*(length(times)+1):k*(length(times)+1) )  = [logitc  logiboot'];
+    all_ersp = setfield( all_ersp, [ 'comp' int2str(comps(k)) '_ersp'     ], logersp );
+    all_ersp = setfield( all_ersp, [ 'comp' int2str(comps(k)) '_erspbase' ], logbase );
+    all_ersp = setfield( all_ersp, [ 'comp' int2str(comps(k)) '_erspboot' ], logeboot);
+    all_itc  = setfield( all_itc , [ 'comp' int2str(comps(k)) '_itc'      ], logitc  );
+    all_itc  = setfield( all_itc , [ 'comp' int2str(comps(k)) '_itcboot'  ], logiboot);
+    
 end
 
-% Save ERSP into float file
-dsfsdds
-
-floatwrite(all_ersp, fullfile(EEG.filepath, [ EEG.filename(1:end-3) 'icaersp']));
-floatwrite(all_itc,  fullfile(EEG.filepath, [ EEG.filename(1:end-3) 'icaitc']));
-
-% Update the info in the dataset
-EEG.etc.icaersp = [ EEG.filename(1:end-3) 'icaersp'];
-EEG.etc.icaitc  = [ EEG.filename(1:end-3) 'icaitc'];
-
-% Save ERSP parameters in the dataset
-EEG.etc.icaerspparams.times      = times;
-EEG.etc.icaerspparams.freqs      = freqs;
-EEG.etc.icaerspparams.logfreqs   = logfreqs;
-EEG.etc.icaerspparams.cycles     = cycles;
-EEG.etc.icaerspparams.alpha      = alpha;
-EEG.etc.icaerspparams.padratio   = padratio;
-EEG.etc.icaerspparams.timewindow = timewindow;
-EEG.etc.icaerspparams.freqrange  = freqrange;
-EEG.etc.icaitcparams             = EEG.etc.icaerspparams;
-
-try
-    EEG.saved = 'no';
-    EEG = pop_saveset( EEG, 'savemode', 'resave');
-catch,
-    error([ 'std_ersp: problem saving results into path ' EEG.filepath])
-end
-EEG_etc = EEG.etc; % return updated EEG.etc sub-structure
+% Save ERSP into file
+% -------------------
+all_ersp.freqs     = exp(1).^logfreqs;
+all_ersp.times     = times;
+all_ersp.datatype  = 'ERSP';
+all_itc.freqs      = exp(1).^logfreqs;
+all_itc.times      = times;
+all_itc.parameters = parameters;
+all_ersp.datatype  = 'ITC';
+if powbaseexist
+    all_ersp.parameters = { parameters{:} powbase };
+else
+    all_ersp.parameters = parameters;
+end;
+std_savedat( filenameersp, all_ersp);
+std_savedat( filenameitc , all_itc );
