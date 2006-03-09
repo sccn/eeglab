@@ -62,6 +62,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2006/03/09 18:19:31  arno
+% spectrum read
+%
 % Revision 1.6  2006/03/08 21:05:25  arno
 % rename func
 %
@@ -215,7 +218,8 @@ if itcC | erspC | specC | erpC | scalpC
                         fprintf('.');
                         if cond == 1
                             abset = [STUDY.datasetinfo(STUDY.setind(:,ind)).index];
-                            [ersp, logfreqs] = std_readersp(ALLEEG, abset, comp);
+                            [ersp, logfreqs] = std_readersp(ALLEEG, abset, comp, STUDY.preclust.erspclusttimes,
+                                                                    STUDY.preclust.erspclustfreqs );
                             if isempty(ersp)
                                 return;
                             end
