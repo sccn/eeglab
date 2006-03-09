@@ -56,6 +56,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2006/03/08 20:34:24  arno
+% rename func
+%
 % Revision 1.2  2006/03/07 22:16:23  arno
 % use fullfile
 %
@@ -74,6 +77,7 @@ for k = 1: length(abset)
         return;
 	end
 end	
+
 % compute average baseline across conditions
 if length(abset) > 1 
 	ave_baseline = 0; % mean baseline for requested component across conditions
