@@ -19,10 +19,6 @@
 %   option     - ['gradient'|'laplacian'|'none'] compute gradient or laplacian of
 %                the scale topography. {default is 'none' = the interpolated topo map}
 % Outputs:
-%   EEG_etc    - the EEG dataset EEG.etc structure modified with the file name 
-%                     and information about the matlab file that holds the dataset 
-%                     component topo maps. If the topo map file already exists 
-%                     this output will be empty. 
 %   X          - the topo map grid of the requested ICA components, each grid is 
 %                     one ROW of X. 
 %
@@ -51,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2006/03/09 19:20:45  arno
+% saving topographies
+%
 % Revision 1.9  2006/03/09 00:00:52  arno
 % now saving Matlab file
 %
