@@ -62,6 +62,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2006/03/09 23:05:19  arno
+% fixing call to std_readersp
+%
 % Revision 1.8  2006/03/09 22:26:25  arno
 % reading ERSP to compute centroid
 %
@@ -221,7 +224,7 @@ if itcC | erspC | specC | erpC | scalpC
                         fprintf('.');
                         if cond == 1
                             abset = [STUDY.datasetinfo(STUDY.setind(:,ind)).index];
-                            [ersp, logfreqs] = std_readersp(ALLEEG, abset, comp, STUDY.preclust.erspclusttimes, ...
+                            [ersp, logfreqs, timevals] = std_readersp(ALLEEG, abset, comp, STUDY.preclust.erspclusttimes, ...
                                                                     STUDY.preclust.erspclustfreqs );
                             if isempty(ersp)
                                 return;
@@ -230,7 +233,8 @@ if itcC | erspC | specC | erpC | scalpC
                                 centroid{clust}.ersp{m} = centroid{clust}.ersp{m} + ersp(:,:,m);
                                 centroid{clust}.ersp_limits{m} = max(floor(max(max(abs(ersp(:,:,m))))), centroid{clust}.ersp_limits{m});
                             end
-                            centroid{clust}.ersp_logf = logfreqs;
+                            centroid{clust}.ersp_logf  = logfreqs;
+                            centroid{clust}.ersp_times = timevals;
                             abset = STUDY.datasetinfo(STUDY.setind(cond,ind)).index; %return  default value
                         end
                     end
