@@ -1,4 +1,3 @@
-%
 % std_erspplot() - Commandline function to plot cluster ERSPs. Displays either mean cluster 
 %                  ERSPs, or else all cluster component ERSPs plus the mean cluster ERSP 
 %                  in one figure per condition. The ERSPs can be plotted only if component 
@@ -63,6 +62,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2006/03/09 20:00:24  scott
+% help msg
+%
 % Revision 1.11  2006/03/09 19:05:25  scott
 % help msg
 %
@@ -435,7 +437,9 @@ for ci = 1 : length(comp_ind) %for each comp
         params = ALLEEG(abset).etc.icaerspparams;
         sbplot(rowcols(1),rowcols(2),n), 
         if n == 1
-            [ersp, logfreqs] = std_readersp(ALLEEG, [STUDY.datasetinfo(STUDY.setind(:,STUDY.cluster(cls).sets(1,comp_ind(ci)))).index], comp);
+            [ersp, logfreqs] = std_readersp(ALLEEG, [STUDY.datasetinfo(STUDY.setind(:,STUDY.cluster(cls).sets(1,comp_ind(ci)))).index], ...
+                                            comp, STUDY.preclust.erspclusttime,  STUDY.preclust.erspclustfreqs);
+            logfreqs = log(logfreqs);
             if isempty(ersp)
                 warndlg2(['pop_clustedit: file '  ALLEEG(abset).etc.icalogersp ' was not found in path ' ALLEEG(abset).filepath], 'Abort - Plot ERSP' ); 
                 return
@@ -446,7 +450,7 @@ for ci = 1 : length(comp_ind) %for each comp
         else
             a = ['ERSP, IC' num2str(comp) ' / ' subject  ', ' STUDY.cluster(cls(clus)).name];
         end
-        tftopo(ersp(:,:,n),params.times,logfreqs,'limits', [params.times(1) params.times(end) logfreqs(1) logfreqs(end) -4 4],'title', a, 'verbose', 'off', 'axcopy', 'off');
+        tftopo(ersp(:,:,n),params.times, logfreqs,'limits', [params.times(1) params.times(end) logfreqs(1) logfreqs(end) -4 4],'title', a, 'verbose', 'off', 'axcopy', 'off');
         ft = str2num(get(gca,'yticklabel'));
         ft = exp(1).^ft;
         ft = unique(round(ft));
