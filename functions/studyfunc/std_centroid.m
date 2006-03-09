@@ -62,6 +62,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2006/03/09 23:31:29  arno
+% log of frequencies
+%
 % Revision 1.11  2006/03/09 23:13:38  arno
 % debug adding times field
 %
@@ -247,7 +250,7 @@ if itcC | erspC | specC | erpC | scalpC
                     if itcC %itc centroid
                         fprintf('.');
                         [itc, logfreqs, timevals] = std_readitc(ALLEEG, abset, comp, STUDY.preclust.erspclusttimes, ...
-                                                                    STUDY.preclust.erspclustfreqs ););
+                                                                    STUDY.preclust.erspclustfreqs );
                         if isempty(itc)
                             return;
                         end

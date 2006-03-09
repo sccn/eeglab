@@ -128,13 +128,13 @@ if strcmpi(mode, 'comps')
             STUDY = std_centroid(STUDY,ALLEEG, cls(clus) , 'itc');
         end
         for n = 1:Ncond
-            try
+            %try
                 clusncomm = std_clustread(STUDY, ALLEEG, cls(clus),'itc',n);
-            catch,
-                warndlg2([ 'Some ITC information is missing, aborting'] , ['Abort - Plot ITC' ] );   
-                delete(h_wait)
-                return;
-           end
+            %catch,
+            %    warndlg2([ 'Some ITC information is missing, aborting'] , ['Abort - Plot ITC' ] );   
+            %    delete(h_wait)
+            %    return;
+            %end
            figure
            orient tall
             maintitle = ['ITC, cond. ' num2str(n) ', ' STUDY.cluster(cls(clus)).name ];
@@ -145,7 +145,8 @@ if strcmpi(mode, 'comps')
             ave_itc = STUDY.cluster(cls(clus)).centroid.itc{n};
             %lim = STUDY.cluster(cls(clus)).centroid.itc_limits{n}; %plotting limits
             itc_times = ALLEEG(STUDY.datasetinfo(STUDY.setind(1,STUDY.cluster(cls(clus)).sets(1,1))).index).etc.icaerspparams.times;
-            logfreqs = STUDY.cluster(cls(clus)).centroid.itc_logf;
+            logfreqs  = STUDY.cluster(cls(clus)).centroid.itc_logf;
+            itc_times = STUDY.cluster(cls(clus)).centroid.itc_times;
             a = [ STUDY.cluster(cls(clus)).name ' average ITC, ' num2str(length(unique(STUDY.cluster(cls(clus)).sets(1,:)))) 'Ss' ];
             tftopo(abs(ave_itc),itc_times,logfreqs,'limits', [itc_times(1) itc_times(end) logfreqs(1) logfreqs(end) -.5 .5],...
                 'title', a, 'verbose', 'off', 'axcopy', 'off');
@@ -166,15 +167,14 @@ if strcmpi(mode, 'comps')
                 abset = STUDY.datasetinfo(STUDY.setind(n,STUDY.cluster(cls(clus)).sets(1,k))).index;
                 subject = STUDY.datasetinfo(STUDY.setind(n,STUDY.cluster(cls(clus)).sets(1,k))).subject;
                 comp = STUDY.cluster(cls(clus)).comps(k);
-                params = ALLEEG(abset).etc.icaitcparams;
                 a = [ 'ic' num2str(comp) '/' subject];
                 if k <= rowcols(2) - 2 %first sbplot row
                     sbplot(rowcols(1),rowcols(2),k+2); 
                 else  %other sbplot rows
                     sbplot(rowcols(1),rowcols(2),k+4);  
                 end
-                tftopo(abs(clusncomm.itc{k}),params.times,clusncomm.logf{k},'limits', ...
-                    [params.times(1) params.times(end) clusncomm.logf{k}(1) clusncomm.logf{k}(end) -.5 .5],...
+                tftopo(abs(clusncomm.itc{k}),clusncomm.times{k},clusncomm.logf{k},'limits', ...
+                    [clusncomm.times{k}(1) clusncomm.times{k}(end) clusncomm.logf{k}(1) clusncomm.logf{k}(end) -.5 .5],...
                     'title', a, 'verbose', 'off', 'axcopy', 'off');
                 set(gca, 'xtick', [], 'ytick', []);
                 set(get(gca,'Title'),'FontSize',8)
@@ -402,9 +402,9 @@ for ci = 1 : length(comp_ind) %for each comp
             warndlg2([ 'Dataset ' num2str(abset) ' has no ITC info, aborting'] , ['Abort - Plot ITC']); 
             return;
         end
-        params = ALLEEG(abset).etc.icaitcparams;
         sbplot(rowcols(1),rowcols(2),n), 
-        [itc, logfreqs] = std_readitc(ALLEEG, abset, comp);
+        [itc, logfreqs, timevals] = std_readitc(ALLEEG, abset, comp, STUDY.preclust.erspclusttimes, STUDY.preclust.erspclustfreqs );
+        logfreqs = log(logfreqs);
         if isempty(itc)
             warndlg2(['eeg_clustedit: file '  ALLEEG(abset).etc.icalogitc ' was not found in path ' ALLEEG(abset).filepath], 'Abort - Plot ITC' ); 
             return
@@ -414,7 +414,7 @@ for ci = 1 : length(comp_ind) %for each comp
         else
             a = ['ITC, IC' num2str(comp) ' / ' subject  ', ' STUDY.cluster(cls(clus)).name];
         end
-        tftopo(abs(itc),params.times,logfreqs,'limits', [params.times(1) params.times(end) logfreqs(1) logfreqs(end) -.5 .5],...
+        tftopo(abs(itc),timevals,logfreqs,'limits', [timevals(1) timevals(end) logfreqs(1) logfreqs(end) -.5 .5],...
             'title', a, 'verbose', 'off', 'axcopy', 'off');
                 ft = str2num(get(gca,'yticklabel'));
         ft = exp(1).^ft;
