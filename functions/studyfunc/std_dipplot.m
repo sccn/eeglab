@@ -1,40 +1,41 @@
-% std_dipplot() - Commandline function, to visualizing cluster/s components dipoles. 
-%                   Each cluster is displayed in a separate figure. To view all the clustered in STUDY  
-%                   on the same figure (separate subplot), all STUDY clusters must be requested.
-%                   To visualize dipoles they first must be stored in the EEG dataset structures
-%                   using dipfit(). Only components that have a dipole locations will be displayed,
-%                   along with the cluster mean dipole in red. 
+%
+% std_dipplot() - Commandline function to plot cluster component dipoles. Dipoles for each
+%                 named cluster is displayed in a separate figure. To view all the clustered 
+%                 components in the STUDY on the same figure (in a separate subplot), all 
+%                 STUDY clusters must be requested.
+%                 To visualize dipoles, they first must be stored in the EEG dataset structures
+%                 using dipfit(). Only components that have dipole locations will be displayed,
+%                 along with the cluster mean dipole (in red). 
 % Usage:    
-%                   >> [STUDY] = std_dipplot(STUDY, ALLEEG, clusters);  
+%                 >> [STUDY] = std_dipplot(STUDY, ALLEEG, clusters);  
 % Inputs:
 %   STUDY      - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
-%   ALLEEG     - global EEGLAB vector of EEG structures for the dataset(s) included in the STUDY. 
-%                     ALLEEG for a STUDY set is typically created using load_ALLEEG().  
+%   ALLEEG     - global EEGLAB vector of EEG structures for the dataset(s) included in 
+%                the STUDY. ALLEEG for a STUDY set is typically created using load_ALLEEG().  
 %
 % Optional inputs:
 %   'clusters' - [numeric vector]  -> specific cluster numbers to plot.
-%                    'all'         -> plot all clusters in STUDY.
-%                    {default: 'all'}.
+%                  'all'         -> plot all clusters in STUDY.
+%                  {default: 'all'}.
 %   'comps'    - [numeric vector]  -> indices of the cluster components to plot.
-%                     'all'        -> plot all the components in the cluster {default: 'all'}.
+%                  'all'  -> plot all the components in the cluster {default: 'all'}.
 %   'mode'     - ['joined'|'apart'] Display all requested cluster on one 
-%                    figure or separate figures. {default: 'joined'}
-%                    'joined' -> plot all 'clusters' in one figure (without the gui).
-%                    'apart'   -> plot each cluster in a separate figure. Note
-%                     that this parameter has no effect if the 'comps' option is used.
+%                  figure or separate figures. {default: 'joined'}
+%                  'joined' -> plot all 'clusters' in one figure (without the gui).
+%                  'apart'   -> plot each cluster in a separate figure. Note
+%                  that this parameter has no effect if the 'comps' option is used.
 %   'figure'   - ['on'|'off'] plots on a new figure ('on')  or plots on current
-%                    figure ('off'). If figure 'off' does not display gui controls,
-%                    Useful for incomporating one cluster dipplot into a 
-%                    complex figure. {default: 'on'}. 
-%
+%                  figure ('off'). If figure 'off' does not display gui controls,
+%                  Useful for incomporating one cluster dipplot into a 
+%                  complex figure. {default: 'on'}. 
 % Outputs:
 %   STUDY    - the input STUDY set structure modified with plotted cluster 
-%                     mean dipole, to allow quick replotting (unless cluster means 
-%                     already exists in the STUDY).  
-%
+%                  mean dipole, to allow quick replotting (unless cluster means 
+%                  already exists in the STUDY).  
 %   Example:
-%                         >> [STUDY] = std_dipplot(STUDY,ALLEEG, 'clusters', 5, 'mode', 'apart', 'figure', 'off');
-%                    Plots cluster 5 components dipoles in blue along with the mean dipole in red, on an exisiting figure (without gui). 
+%      >> [STUDY] = std_dipplot(STUDY,ALLEEG, 'clusters', 5, 'mode', 'apart', 'figure', 'off');
+%                   % Plot cluster-5 component dipoles (in blue), plus ther mean dipole (in red), 
+%                   % on an exisiting (gui-less) figure. 
 %
 %  See also  pop_clustedit(), dipplot()        
 %
