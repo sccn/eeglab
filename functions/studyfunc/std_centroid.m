@@ -62,6 +62,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2006/03/08 21:05:25  arno
+% rename func
+%
 % Revision 1.5  2006/02/16 21:33:50  arno
 % do not jump line for scalp centroid
 %
@@ -200,7 +203,7 @@ if itcC | erspC | specC | erpC | scalpC
                         end
                     end
                     if specC %spec centroid
-                        [spec, f] = std_readspec(ALLEEG, abset, comp);
+                        [spec, f] = std_readspec(ALLEEG, abset, comp, 'm');
                         fprintf('.');
                         if isempty(spec)
                             return;
