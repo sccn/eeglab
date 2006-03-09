@@ -1,12 +1,11 @@
 %
 % std_erspplot() - Commandline function to plot cluster ERSPs. Displays either mean cluster 
 %                  ERSPs, or else all cluster component ERSPs plus the mean cluster ERSP 
-%                  in one figure per condition.
-%                  The ERSPs can be plotted only if component ERSPs were computed and saved 
-%                  in the EEG datasets in the STUDY. These may either be computed during 
-%                  pre-clustering using the gui-based function pop_preclust(), or via
-%                  the equivalent commandline functions eeg_createdata() and eeg_preclust(). 
-%                  This function is called by pop_clustedit().
+%                  in one figure per condition. The ERSPs can be plotted only if component 
+%                  ERSPs were computed and saved in the EEG datasets in the STUDY. These 
+%                  may either be computed during pre-clustering using the gui-based 
+%                  function pop_preclust(), or via the equivalent commandline functions 
+%                  eeg_createdata() and eeg_preclust(). Called by pop_clustedit().
 % Usage:    
 %                   >> [STUDY] = std_erspplot(STUDY, ALLEEG, key1, val1, key2, val2);  
 % Inputs:
@@ -64,6 +63,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2006/03/09 19:05:25  scott
+% help msg
+%
 % Revision 1.10  2006/03/08 20:57:46  arno
 % rename func
 %
