@@ -1,5 +1,5 @@
-% std_topoplot() - Commandline function, to visualizing cluster/s scalp maps. 
-%                   Displays either mean cluster/s scalp map/s, or all cluster/s components
+% std_topoplot() - Commandline function to plot cluster component and mean scalp maps. 
+%                  Displays either mean cluster/s scalp map/s, or all cluster/s components
 %                   scalp maps with the mean cluster/s scsalp map in one figure.
 %                   The scalp maps can be visualized only if component scalp maps     
 %                   were calculated and saved in the EEG datasets in the STUDY.
