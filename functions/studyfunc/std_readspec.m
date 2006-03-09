@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2006/03/09 00:03:57  arno
+% read spectrum form matlab file
+%
 % Revision 1.3  2006/03/08 21:06:37  arno
 % rename func
 %
@@ -57,8 +60,12 @@
 % use fullfile
 %
 
-function [spec, f] = std_readspec(ALLEEG, abset, comp);
+function [spec, f] = std_readspec(ALLEEG, abset, comp, ext);
     
+if nargin < 4
+    ext = '';
+end;
+
 spec = [];
 specstruct = load( '-mat', fullfile( ALLEEG(abset).filepath,[ ALLEEG(abset).etc.icaspec 'm']), ...
              [ 'comp' int2str(comp) ], 'freqs' );

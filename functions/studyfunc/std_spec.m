@@ -71,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2006/03/08 20:28:13  arno
+% rename func
+%
 % Revision 1.17  2006/03/07 22:31:01  arno
 % typo in test
 %
@@ -149,8 +152,11 @@ if isfield(EEG,'etc')
              else
                  md = mparams(1);
              end
-             fave = floatread( fullfile(EEG.filepath, [ EEG.etc.icaspec 'm']), [md 1], [], 0);
-             f    = floatread( fullfile(EEG.filepath, EEG.etc.icaspec), [d 1], [], 0);
+             load('-mat', fullfile(EEG.filepath, [ EEG.etc.icaspec 'm']), 'freqs'); fave = freqs;
+             load('-mat', fullfile(EEG.filepath, [ EEG.etc.icaspec    ]), 'freqs'); f    = freqs;
+            
+             %fave = floatread( fullfile(EEG.filepath, [ EEG.etc.icaspec 'm']), [md 1], [], 0);
+             %f    = floatread( fullfile(EEG.filepath, EEG.etc.icaspec), [d 1], [], 0);
 
              % check whether requested information already exists
              if ~isempty('freqrange')
@@ -163,8 +169,9 @@ if isfield(EEG,'etc')
              if ((f(maxind) == fave(md)) & (f(minind) == fave(1))) | overwrite == 2
                  X = zeros(length(comps),maxind-minind+1) ;
                  for k = 1:length(comps)
-                     X(k,:) = floatread(fullfile(EEG.filepath, ...
-                                        [ EEG.etc.icaspec 'm']), [md 1],[],md*comps(k))';
+                     X(k,:) = std_readspec( EEG, 1, comps(k), 'm');
+                     %X(k,:) = floatread(fullfile(EEG.filepath, ...
+                     %                   [ EEG.etc.icaspec 'm']), [md 1],[],md*comps(k))';
                  end
                  f = fave;
                  return
@@ -180,7 +187,7 @@ if isfield(EEG,'etc')
          else % overwrite == 1 --> overwrite existing spectra using existing spectra
               %                    but with new frequency boundaries. 
 
-             f = floatread(fullfile(EEG.filepath, EEG.etc.icaspec), [d 1]);
+             load('-mat', fullfile(EEG.filepath, [ EEG.etc.icaspec ]), 'freqs'); f    = freqs;
              if ~isempty(freqrange)
                  maxind = max(find(f <= freqrange(end)));
                  minind = min(find(f >= freqrange(1)));
@@ -199,7 +206,8 @@ if isfield(EEG,'etc')
              end
              X = zeros(length(comps),maxind-minind+1) ;
              for k = 1:length(comps)
-                 tmp = floatread(fullfile(EEG.filepath,EEG.etc.icaspec), [d 1],[],d*comps(k));
+                 tmp = std_readspec( EEG, 1, comps(k));
+                 %tmp = floatread(fullfile(EEG.filepath,EEG.etc.icaspec), [d 1],[],d*comps(k));
                  X(k,:) =  tmp(minind:maxind)';
              end
 
@@ -223,8 +231,12 @@ if isfield(EEG,'etc')
                 EEG_etc = EEG.etc;
 
                 % save removed mean spectra info in float file
-                floatwrite([f X'], fullfile(EEG.filepath, ...
-                                   [ EEG.filename(1:end-3) 'icaspecm']));
+                allspec.freqs = f;
+                for k = 1:size(X,1)
+                    allspec = setfield( allspec, [ 'comp' int2str(comps(k)) ], X(k,:));
+                end;
+                std_savedat(fullfile(EEG.filepath, [ EEG.filename(1:end-3) 'icaspecm']), allspec);
+                %floatwrite([f X'], );
              end
              return
          end
@@ -249,7 +261,12 @@ else
 end
 
 % save spectrum in float file
-floatwrite([f X'], fullfile(EEG.filepath, [ EEG.filename(1:end-3) 'icaspec'])); 
+allspec.freqs = f;
+for k = 1:size(X,1)
+    allspec = setfield( allspec, [ 'comp' int2str(k) ], X(k,:));
+end;
+std_savedat(fullfile(EEG.filepath, [ EEG.filename(1:end-3) 'icaspec']), allspec);
+%floatwrite([f X'], fullfile(EEG.filepath, [ EEG.filename(1:end-3) 'icaspec'])); 
 
 % update the info in the dataset
 EEG.etc.icaspec = [ EEG.filename(1:end-3) 'icaspec'];
@@ -285,7 +302,13 @@ else
 end
 
 % save removed mean spectra info in float file
-floatwrite([f X'], fullfile(EEG.filepath, [ EEG.filename(1:end-3) 'icaspecm']));
+% --------------------------------------------
+allspec.freqs = f;
+for k = 1:size(X,1)
+    allspec = setfield( allspec, [ 'comp' int2str(comps(k)) ], X(k,:));
+end;
+std_savedat(fullfile(EEG.filepath, [ EEG.filename(1:end-3) 'icaspecm']), allspec);
+%floatwrite([f X'], fullfile(EEG.filepath, [ EEG.filename(1:end-3) 'icaspecm']));
 
 % save the updated dataset
 try
