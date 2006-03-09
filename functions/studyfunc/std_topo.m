@@ -20,7 +20,7 @@
 %                the scale topography. {default is 'none' = the interpolated topo map}
 % Outputs:
 %   EEG_etc    - the EEG dataset EEG.etc structure modified with the file name 
-%                     and information about the float file that holds the dataset 
+%                     and information about the matlab file that holds the dataset 
 %                     component topo maps. If the topo map file already exists 
 %                     this output will be empty. 
 %   X          - the topo map grid of the requested ICA components, each grid is 
@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2006/03/08 20:27:38  arno
+% rename func
+%
 % Revision 1.7  2006/03/07 03:46:43  scott
 % reworked help msg; made function accept specified component list or [] -sm
 %
@@ -101,8 +104,7 @@ if isfield(EEG,'etc')
              d = d{1};
          end
          for k = 1:length(comps)
-             tmp = floatread(fullfile(EEG.filepath, EEG.etc.icatopo), ...
-                                                        [d d],[],d*(d+2)*(comps(k)-1));
+             tmp = std_readtopo( EEG, 1, comps(k));
              if strcmpi(option, 'gradient')
                  [tmpx, tmpy]  = gradient(tmp); %Gradient
                  tmp = [tmpx(:); tmpy(:)]';
@@ -123,6 +125,7 @@ if isfield(EEG,'etc')
      end
  end
  
+all_topos = [];
 for k = 1:numc
 
     % compute topo map grid (topoimage)
@@ -131,19 +134,19 @@ for k = 1:numc
                                            'electrodes', 'on' ,'style','both',...
                                            'plotrad',0.5,'intrad',0.5,...
                                            'noplot', 'on', 'chaninfo', EEG.chaninfo);
-    if k == 1
-        d = length(grid);
-        all_topos = zeros(d,(d+2)*length(comps));
-    end
-    all_topos(:,1+(k-1)*(d+2):k*(d+2) ) = [grid Yi(:,1)  Xi(1,:)'];
+    all_topos = setfield(all_topos, [ 'comp' int2str(k) '_grid' ], grid);
+    all_topos = setfield(all_topos, [ 'comp' int2str(k) '_x' ]   , Xi(:,1));
+    all_topos = setfield(all_topos, [ 'comp' int2str(k) '_y' ]   , Yi(:,1));
+    
+    %all_topos = setfield(alltopo, [ 'comp' int2str(k) ] (:,1+(k-1)*(d+2):k*(d+2) ) = [grid Yi(:,1)  Xi(1,:)'];
     % [Xi2,Yi2] = meshgrid(Yi(:,1),Xi(1,:));
 end
 
 % Save topos in file
 tmpfile = fullfile( EEG.filepath, [ EEG.filename(1:end-3) 'icatopo' ]); 
-floatwrite(all_topos, tmpfile);
+std_savedat(tmpfile, all_topos);
 EEG.etc.icatopo       = [ EEG.filename(1:end-3) 'icatopo' ];
-EEG.etc.icatopoparams = d;
+
 try
     EEG.saved = 'no';
     EEG = pop_saveset( EEG, 'savemode', 'resave');
@@ -153,7 +156,7 @@ end
 EEG_etc = EEG.etc;
 
 for k = 1:length(comps)
-    tmp = all_topos(:,1+(k-1)*(d+2):k*(d+2)-2);
+    tmp =  getfield(all_topos, [ 'comp' int2str(k) '_grid' ]);
     
     if strcmpi(option, 'gradient')
         [tmpx, tmpy]  = gradient(tmp); % Gradient
