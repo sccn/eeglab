@@ -58,6 +58,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2006/03/10 18:39:13  arno
+% indices removal
+%
 % Revision 1.16  2006/03/08 20:07:36  arno
 % rename
 %
@@ -97,10 +100,10 @@ if isempty(varargin) %GUI call
     % --------------------------------------
     rmindex    = [];
     clustlevel = STUDY.etc.preclust.clustlevel;
+    nameclustbase = STUDY.cluster(clustlevel).name;
     if clustlevel == 1
         rmindex = [2:length(STUDY.cluster)]
     else
-        nameclustbase = STUDY.cluster(clustlevel).name;
         for index = 2:length(STUDY.cluster)
             if strcmpi(STUDY.cluster(index).parent{1}, nameclustbase) & ~strncmpi('Notclust',STUDY.cluster(index).name,8)
                 rmindex = [ rmindex index ];
