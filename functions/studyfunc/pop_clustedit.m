@@ -305,7 +305,7 @@ if ~isstr(varargin{1})
     
     % enable buttons
     % --------------
-    filename = fullfile( ALLEEG(1).filepath, ALLEEG(1).filename(1:end-3));
+    filename = fullfile( ALLEEG(STUDY.setind(1,1)).filepath, ALLEEG(STUDY.setind(1,1)).filename(1:end-3));
     if exist([filename 'icaspec']) , spec_enable = 'on'; else spec_enable  = 'off'; end;
     if exist([filename 'icaerp'] )  , erp_enable = 'on'; else erp_enable   = 'off'; end;
     if exist([filename 'icatopo']), scalp_enable = 'on'; else scalp_enable = 'off'; end;
