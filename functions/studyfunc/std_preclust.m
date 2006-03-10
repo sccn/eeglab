@@ -674,8 +674,6 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, components
             
         end; % end scan datasets
         
-        % remove mean from each 
-        
         % adjust number of PCA values
         % ---------------------------
         if isnan(npca), npca = 5; end; % default number of components
@@ -696,16 +694,6 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, components
                 fastif(norm, 'on', 'off'), weight);
         end
         
-        % normalize data array
-        % --------------------
-        if norm % normalize all dimensions of the data array
-            for icol = 1:size(data,2)
-                normval = std(data(:,icol));
-                meanval = mean(data(:,icol));
-                data(:,icol) = (data(:,icol)-meanval)/normval;
-            end;
-        end;
-        
         % run PCA to reduce data dimension
         % --------------------------------
         switch strcom
@@ -722,8 +710,6 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, components
                         [ tmp freqs times ] = std_readersp( ALLEEG, idat, succompind{1}, ...
                                                         timewindow, freqrange);
                         [data freqs times ] = erspdownsample(data,4, freqs,times,Ncond); 
-                        error('Have to downsample');
-                        
                         if strcmp(varargin{index}(end-1) , 'downsample')
                             varargin{index}(end) = {celltomat(varargin{index}(end)) + 4};
                         else
@@ -743,9 +729,13 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, components
                 clustdatatmp = clustdatatmp.';
         end
         
-        % weight data array
-        % -----------------
         clear data;
+        if norm %normalize the first pc std to 1
+            normval = std(clustdatatmp(:,1));
+            for icol = 1:size(clustdatatmp,2)
+                clustdatatmp(:,icol) = clustdatatmp(:,icol) /normval;
+            end;
+        end;
         if weight ~= 1
             clustdata(:,end+1:end+size(clustdatatmp,2)) = clustdatatmp * weight;
         else
