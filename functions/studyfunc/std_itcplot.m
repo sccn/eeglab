@@ -247,6 +247,7 @@ if strcmpi(mode, 'centroid')
         for n = 1:Ncond
             maxval = max(max(max(abs(STUDY.cluster(cls(k)).centroid.itc{n}))), maxval);
         end;
+        maxval = 0.5;
         
         % plot
         % ----
@@ -300,7 +301,6 @@ if strcmpi(mode, 'centroid')
                    xlabel('');
                end;
                cbar('pos');
-               dsffd
                waitbar((k*n)/(len*Ncond),h_wait);
            end;
         end % Finish plotting all centroids for one condition
