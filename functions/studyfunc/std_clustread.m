@@ -28,7 +28,7 @@ for k = 1:len
             if nargin < 5
                 error('Reading cluster ERP requires condition number');
             end
-            [erp, t] = std_readerp(ALLEEG, abset, comp);
+            [erp, t] = std_readerp(ALLEEG, abset, comp, STUDY.preclust.erpclusttimes);
             if  k == 1
                 clusinfo.erp = zeros(len,length(erp));
                 clusinfo.t = t;
@@ -53,7 +53,7 @@ for k = 1:len
             [ersp, logfreqs, timevals] = std_readersp(ALLEEG, abset, comp, ...
                       STUDY.preclust.erspclusttimes,  STUDY.preclust.erspclustfreqs);
             clusinfo.ersp{k}  = ersp;
-            clusinfo.logf{k}  = log(logfreqs);
+            clusinfo.logf{k}  = logfreqs;
             clusinfo.times{k} = timevals;
             
         case 'itc'
@@ -63,7 +63,7 @@ for k = 1:len
             [itc, logfreqs, timevals] = std_readitc(ALLEEG, abset, comp, STUDY.preclust.erspclusttimes, ...
                                                                     STUDY.preclust.erspclustfreqs );
             clusinfo.itc{k}   = itc;
-            clusinfo.logf{k}  = log(logfreqs);
+            clusinfo.logf{k}  = logfreqs;
             clusinfo.times{k} = timevals;
             
         case 'dipole'
