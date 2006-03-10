@@ -1,4 +1,3 @@
-%
 % std_centroid() - compute cluster centroid in EEGLAB dataset STUDY.
 %                  Compute and store the centroid(s) (i.e., mean(s)) 
 %                  for some combination of six measures on specified
@@ -63,6 +62,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2006/03/10 03:17:57  scott
+% help msg -sm
+%
 % Revision 1.13  2006/03/09 23:48:43  arno
 % fix new file format
 %
@@ -246,7 +248,7 @@ if itcC | erspC | specC | erpC | scalpC
                                 centroid{clust}.ersp{m} = centroid{clust}.ersp{m} + ersp(:,:,m);
                                 centroid{clust}.ersp_limits{m} = max(floor(max(max(abs(ersp(:,:,m))))), centroid{clust}.ersp_limits{m});
                             end
-                            centroid{clust}.ersp_logf  = log(logfreqs);
+                            centroid{clust}.ersp_freqs  = logfreqs;
                             centroid{clust}.ersp_times = timevals;
                             abset = STUDY.datasetinfo(STUDY.setind(cond,ind)).index; %return  default value
                         end
@@ -260,7 +262,7 @@ if itcC | erspC | specC | erpC | scalpC
                         end
                         centroid{clust}.itc{cond} = centroid{clust}.itc{cond} + itc;
                         centroid{clust}.itc_limits{cond} = max(floor(max(max(abs(itc)))), centroid{clust}.itc_limits{cond}); %ersp image limits 
-                        centroid{clust}.itc_logf  = log(logfreqs);
+                        centroid{clust}.itc_freqs  = logfreqs;
                         centroid{clust}.itc_times = timevals;
                     end
                 end
@@ -335,14 +337,14 @@ for clust =  1:length(clsind) %go over all requested clusters
             STUDY.cluster(clsind(clust)).centroid.ersp{cond} = centroid{clust}.ersp{cond};
             STUDY.cluster(clsind(clust)).centroid.ersp_limits{cond} = floor(0.75*centroid{clust}.ersp_limits{cond}); 
             %[round(0.9*min(cell2mat({centroid{clust}.ersp_limits{cond,:}})))  round(0.9*max(cell2mat({centroid{clust}.ersp_limits{cond,:}})))];
-            STUDY.cluster(clsind(clust)).centroid.ersp_logf = centroid{clust}.ersp_logf;
+            STUDY.cluster(clsind(clust)).centroid.ersp_freqs = centroid{clust}.ersp_freqs;
             STUDY.cluster(clsind(clust)).centroid.ersp_times = centroid{clust}.ersp_times;
         end
         if itcC
             centroid{clust}.itc{cond} = centroid{clust}.itc{cond}/ncomp;
             STUDY.cluster(clsind(clust)).centroid.itc{cond} = centroid{clust}.itc{cond} ;
             STUDY.cluster(clsind(clust)).centroid.itc_limits{cond} = floor(0.75*centroid{clust}.itc_limits{cond});%round(0.9*max(cell2mat({centroid{clust}.itc_limits{cond,:}})));
-            STUDY.cluster(clsind(clust)).centroid.itc_logf  = centroid{clust}.itc_logf;
+            STUDY.cluster(clsind(clust)).centroid.itc_freqs = centroid{clust}.itc_freqs;
             STUDY.cluster(clsind(clust)).centroid.itc_times = centroid{clust}.itc_times;
         end
         
