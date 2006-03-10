@@ -2,7 +2,7 @@
 
 function std_savedat( tmpfile, structure)
 
-    delims = find( tmpfile == '.')
+    delims = find( tmpfile == '.');
     structure.datafile = [ tmpfile(1:delims(end)-1) '.set' ];
     v = version;
     if v(1) < 7
