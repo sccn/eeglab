@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2006/03/09 18:13:21  arno
+% spectrum read
+%
 % Revision 1.10  2006/03/08 21:04:03  arno
 % typo
 %
@@ -364,15 +367,7 @@ for ci = 1 : length(comp_ind) %for each comp
         if ~isfield(STUDY.cluster(cls).centroid,'spec')
             STUDY = std_centroid(STUDY,ALLEEG, cls, 'spec');
         end
-        if ~isfield(ALLEEG(abset).etc,'icaspecparams')
-            warndlg2([ 'Dataset ' ALLEEG(abset).filename ' has no spectra info, aborting'] , 'Abort - Plot spectra' ); 
-            return;
-        end
         [spec, f] = std_readspec(ALLEEG, abset, comp, 'm');
-        if isempty(spec)
-            warndlg2(['eeg_clustedit: file '  ALLEEG(abset).etc.icaspec ' was not found in path ' ALLEEG(abset).filepath], 'Abort - Plot spectra' ); 
-            return
-        end
         plot(f,spec, 'c');
         ave_spec = STUDY.cluster(cls).centroid.spec{n};
         plot(f,ave_spec,'k','linewidth',2);

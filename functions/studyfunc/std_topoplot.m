@@ -189,10 +189,6 @@ if strcmpi(mode, 'centroid')
         if ~isfield(STUDY.cluster(cls(k)).centroid,'scalp')
             STUDY = std_centroid(STUDY,ALLEEG, cls(k) , 'scalp');
         end
-        if isempty(STUDY.cluster(cls(k)).centroid.scalp)
-            warndlg2(['pop_clustedit: file '  ALLEEG(abset).etc.icascalp ' was not found in path ' ALLEEG(abset).filepath], 'Abort - Plot scalp maps' ); 
-            return
-        end
        if len ~= 1
             sbplot(rowcols(1),rowcols(2),k)  
         end
@@ -289,15 +285,7 @@ for ci = 1:length(comp_ind)
     abset = STUDY.datasetinfo(STUDY.setind(1,STUDY.cluster(cls).sets(1,comp_ind(ci)))).index;
     comp = STUDY.cluster(cls).comps(comp_ind(ci));
     subject = STUDY.datasetinfo(STUDY.setind(1,STUDY.cluster(cls).sets(1,comp_ind(ci)))).subject;
-    if ~isfield(ALLEEG(abset).etc,'icascalpparams')
-        warndlg2([ 'Dataset ' num2str(abset) ' has no topoplot image information, aborting'] , 'Abort - Plot scalp maps' ); 
-        return;
-    end
     [grid, yi, xi] = std_readtopo(ALLEEG, abset, comp);
-    if isempty(grid)
-        warndlg2(['pop_clustedit: file '  ALLEEG(abset).etc.icascalp ' was not found in path ' ALLEEG(abset).filepath], 'Abort - Plot scalp maps' ); 
-        return
-    end
     [Xi,Yi] = meshgrid(yi,xi);
     figure;
     toporeplot(grid, 'style', 'both', 'plotrad',0.5,'intrad',0.5,'xsurface', Xi, 'ysurface', Yi, 'verbose', 'off');
