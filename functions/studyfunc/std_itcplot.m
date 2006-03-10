@@ -144,7 +144,6 @@ if strcmpi(mode, 'comps')
             sbplot(rowcols(1),rowcols(2),[1 rowcols(2)+2 ]) ,
             ave_itc = STUDY.cluster(cls(clus)).centroid.itc{n};
             %lim = STUDY.cluster(cls(clus)).centroid.itc_limits{n}; %plotting limits
-            itc_times = ALLEEG(STUDY.datasetinfo(STUDY.setind(1,STUDY.cluster(cls(clus)).sets(1,1))).index).etc.icaerspparams.times;
             logfreqs  = STUDY.cluster(cls(clus)).centroid.itc_logf;
             itc_times = STUDY.cluster(cls(clus)).centroid.itc_times;
             a = [ STUDY.cluster(cls(clus)).name ' average ITC, ' num2str(length(unique(STUDY.cluster(cls(clus)).sets(1,:)))) 'Ss' ];
@@ -225,7 +224,6 @@ if strcmpi(mode, 'centroid')
         %end
     end
 
-    params = ALLEEG(STUDY.datasetinfo(STUDY.setind(1,STUDY.cluster(cls(1)).sets(1,1))).index).etc.icaerspparams;
     if figureon
         figure
         pos = get(gcf, 'position');
@@ -263,7 +261,8 @@ if strcmpi(mode, 'centroid')
                 end;
             end;
             logfreqs = STUDY.cluster(cls(k)).centroid.itc_logf;
-            tftopo(abs(ave_itc),params.times,logfreqs,'limits', [params.times(1) params.times(end) logfreqs(1) logfreqs(end) -maxval maxval],...
+            timevals = STUDY.cluster(cls(k)).centroid.itc_times;
+            tftopo(abs(ave_itc), timevals, logfreqs,'limits', [timevals(1) timevals(end) logfreqs(1) logfreqs(end) -maxval maxval],...
                    'title', 'Average ITC', 'verbose', 'off');
             ft = str2num(get(gca,'yticklabel'));
             ft = exp(1).^ft;
@@ -401,17 +400,9 @@ for ci = 1 : length(comp_ind) %for each comp
    
    for n = 1:Ncond  %for each cond
         abset = STUDY.datasetinfo(STUDY.setind(n,STUDY.cluster(cls).sets(1,comp_ind(ci)))).index;
-        if ~isfield(ALLEEG(abset).etc,'icaitcparams')
-            warndlg2([ 'Dataset ' num2str(abset) ' has no ITC info, aborting'] , ['Abort - Plot ITC']); 
-            return;
-        end
         sbplot(rowcols(1),rowcols(2),n), 
         [itc, logfreqs, timevals] = std_readitc(ALLEEG, abset, comp, STUDY.preclust.erspclusttimes, STUDY.preclust.erspclustfreqs );
         logfreqs = log(logfreqs);
-        if isempty(itc)
-            warndlg2(['eeg_clustedit: file '  ALLEEG(abset).etc.icalogitc ' was not found in path ' ALLEEG(abset).filepath], 'Abort - Plot ITC' ); 
-            return
-        end
         if Ncond >1
             a = [ 'ITC, IC' num2str(comp) ' / ' subject ', ' STUDY.cluster(cls).name ', ' STUDY.condition{n} ];
         else
