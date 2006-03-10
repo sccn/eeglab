@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2006/03/10 16:23:32  arno
+% fix plotting erps
+%
 % Revision 1.13  2006/03/10 16:16:50  arno
 % reading ERPs
 %
@@ -186,7 +189,7 @@ if strcmpi(mode, 'comps')
            end
            handl(n) = sbplot(rowcols(1),rowcols(2),n);
            ave_erp = STUDY.cluster(cls(clus)).centroid.erp{n};
-           t = STUDY.cluster(cls(clus)).centroid.erp_t;
+           t = STUDY.cluster(cls(clus)).centroid.erp_times;
            [all_erp pol] = comppol(clusnval.erp');
            plot(t/1000,Avepol(n)*all_erp,'color', [0.5 0.5 0.5]);
            hold on
@@ -251,7 +254,7 @@ if strcmpi(mode, 'centroid')
             ave_erp(:,n) = STUDY.cluster(cls(k)).centroid.erp{n};
             if n == Ncond
                 [ave_erp pol] = comppol(ave_erp);
-                t = STUDY.cluster(cls(k)).centroid.erp_t;
+                t = STUDY.cluster(cls(k)).centroid.erp_times;
                 a = [ STUDY.cluster(cls(k)).name ', ' num2str(length(unique(STUDY.cluster(cls(k)).sets(1,:)))) 'Ss'];
                 for condi = 1: Ncond
                     plot(t/1000,ave_erp(:,condi),color_codes{condi},'linewidth',2);
