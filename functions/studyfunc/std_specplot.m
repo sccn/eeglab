@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2006/03/10 18:09:28  arno
+% remove wait bar
+%
 % Revision 1.13  2006/03/10 16:28:07  arno
 % reading spectrum
 %
@@ -180,7 +183,7 @@ if strcmpi(mode, 'comps')
             end
             handl(n) = sbplot(rowcols(1),rowcols(2),n);
             ave_spec = STUDY.cluster(cls(clus)).centroid.spec{n};
-            f = STUDY.cluster(cls(clus)).centroid.spec_f;
+            f = STUDY.cluster(cls(clus)).centroid.spec_freqs;
             plot(f,clusnval.spec,'color', [0.5 0.5 0.5]);
             hold on
             plot(f,ave_spec,'k','linewidth',2);
@@ -236,7 +239,7 @@ if strcmpi(mode, 'centroid')
                 leg_color{n} = [STUDY.condition{n}];
             end
             ave_spec = STUDY.cluster(cls(k)).centroid.spec{n};
-            f = STUDY.cluster(cls(k)).centroid.spec_f;
+            f = STUDY.cluster(cls(k)).centroid.spec_freqs;
             plot(f,ave_spec,color_codes{n},'linewidth',2);
             
             min_spec = min(min(ave_spec), min_spec);
