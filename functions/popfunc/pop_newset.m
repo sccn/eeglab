@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.60  2006/03/10 20:54:27  arno
+% nothing
+%
 % Revision 1.59  2006/03/10 19:18:54  arno
 % change text for edit box
 %
@@ -384,6 +387,7 @@ elseif length(varargin) == 0 & length(EEG) == 1 % if several arguments, assign v
     
     % remove new dataset if already saved
     % -----------------------------------
+    shift    = 0;
     if ~isfield(EEG, 'saved')
         EEG = eeg_checkset(EEG);
     end;
@@ -405,8 +409,6 @@ elseif length(varargin) == 0 & length(EEG) == 1 % if several arguments, assign v
             com = '[ALLEEG, EEG, CURRENTSET] = eeg_store( ALLEEG, EEG, 0 );';
             return;
         end;
-    else 
-        shift    = 0;
     end;
     
     % show GUI (do not return if old dataset has to be saved or overwritten)
