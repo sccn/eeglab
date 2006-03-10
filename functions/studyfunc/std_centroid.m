@@ -62,6 +62,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2006/03/10 15:56:04  arno
+% changing log and var name
+%
 % Revision 1.14  2006/03/10 03:17:57  scott
 % help msg -sm
 %
@@ -211,7 +214,7 @@ if itcC | erspC | specC | erpC | scalpC
                         centroid{clust}.scalp = centroid{clust}.scalp + grid;
                     end
                     if erpC %erp centroid
-                        [erp, t] = std_readerp(ALLEEG, abset, comp);
+                        [erp, t] = std_readerp(ALLEEG, abset, comp, STUDY.preclust.erpclusttimes);
                         fprintf('.');
                         if isempty(erp)
                             return;
