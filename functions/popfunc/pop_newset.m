@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.65  2006/03/10 21:40:35  arno
+% nothing
+%
 % Revision 1.64  2006/03/10 21:38:13  arno
 % use eeg_store
 %
@@ -254,12 +257,12 @@ eeglab_options;
 if length(EEG) > 1
     % cases when length(EEG) > 1: when retreiving a dataset and before several datasets were processed (NEWSET non empty)
     %                          2: when storing multiple datasets 
-    [ALLEEG EEG] = eeg_store(ALLEEG, EEG, OLDSET);
-    return;
     % canceling operation (not used)
     % -------------------
     if ~isempty(g.retrieve)
         [EEG, ALLEEG, CURRENTSET] = eeg_retrieve( ALLEEG, g.retrieve);
+    else
+        [ALLEEG EEG] = eeg_store(ALLEEG, EEG, OLDSET);
     end;
     return;
 elseif save_retrieve
