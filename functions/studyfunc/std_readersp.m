@@ -56,6 +56,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2006/03/09 23:29:34  arno
+% implement new ERSP from Matlab and different structure ec...
+%
 % Revision 1.4  2006/03/09 19:37:06  arno
 % header
 %
@@ -71,23 +74,24 @@ function [logersp, logfreqs, timevals, params] = std_readersp(ALLEEG, abset, com
 for k = 1: length(abset)    
     
     filename = fullfile( ALLEEG(abset(k)).filepath,[ ALLEEG(abset(k)).filename(1:end-3) 'icaersp']);
-    if isempty(comp)
+    try
         tmpersp   = load( '-mat', filename, 'parameters', 'times', 'freqs');
-        params    = struct(tmpersp.parameters{:});
-        params.times = tmpersp.times;
-        params.freqs = tmpersp.freqs;
+    catch
+        error( [ 'Cannot read file ''' filename '''' ]);
+    end;
+    params    = struct(tmpersp.parameters{:});
+    params.times = tmpersp.times;
+    params.freqs = tmpersp.freqs;
+    if isempty(comp)
         logersp   = [];
         logfreqs  = [];
         timevals  = [];
         return;
     end;
-    tmpersp   = load( '-mat', filename, 'parameters', 'times', 'freqs', ...
+    tmpersp   = load( '-mat', filename, ...
                      [ 'comp' int2str(comp) '_ersp'], ...
                      [ 'comp' int2str(comp) '_erspbase'], ...
                      [ 'comp' int2str(comp) '_erspboot']);
-	params    = struct(tmpersp.parameters{:});
-    params.times = tmpersp.times;
-    params.freqs = tmpersp.freqs;
     
     tlen      = length(tmpersp.times);
     flen      = length(tmpersp.freqs);

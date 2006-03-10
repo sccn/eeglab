@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2006/03/09 19:00:42  arno
+% reading Matlab file
+%
 % Revision 1.4  2006/03/09 00:00:54  arno
 %  now saving Matlab file
 %
@@ -68,10 +71,15 @@ grid = [];
 yi = [];
 xi = [];
 filename = fullfile( ALLEEG(abset).filepath,[ ALLEEG(abset).filename(1:end-3) 'icatopo']);
-topo = load( '-mat', filename, ...
-             [ 'comp' int2str(comp) '_grid'], ...
-             [ 'comp' int2str(comp) '_x'], ...
-             [ 'comp' int2str(comp) '_y'] );
+try
+    topo = load( '-mat', filename, ...
+                 [ 'comp' int2str(comp) '_grid'], ...
+                 [ 'comp' int2str(comp) '_x'], ...
+                 [ 'comp' int2str(comp) '_y'] );
+catch
+    error( [ 'Cannot read file ''' filename '''' ]);
+end;
+    
 grid = getfield(topo, [ 'comp' int2str(comp) '_grid']);
 yi   = getfield(topo, [ 'comp' int2str(comp) '_y']);
 xi   = getfield(topo, [ 'comp' int2str(comp) '_x']);

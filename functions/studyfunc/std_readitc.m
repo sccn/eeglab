@@ -56,6 +56,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2006/03/10 00:01:52  arno
+% remove old ITC code
+%
 % Revision 1.4  2006/03/09 23:40:10  arno
 % read new ITC format
 %
@@ -71,12 +74,16 @@ function [logitc, logfreqs, timevals, params] = std_readitc(ALLEEG, abset, comp,
 for k = 1: length(abset)    
     
     filename = fullfile( ALLEEG(abset(k)).filepath,[ ALLEEG(abset(k)).filename(1:end-3) 'icaitc']);
+    try
+        tmpersp   = load( '-mat', filename, 'parameters', 'times', 'freqs');
+    catch
+        error( [ 'Cannot read file ''' filename '''' ]);
+    end;
+    params    = struct(tmpersp.parameters{:});
+    params.times = tmpersp.times;
+    params.freqs = tmpersp.freqs;
     if isempty(comp)
-        tmpitc   = load( '-mat', filename, 'parameters', 'times', 'freqs');
-        params    = struct(tmpitc.parameters{:});
-        params.times = tmpitc.times;
-        params.freqs = tmpitc.freqs;
-        logitc   = [];
+        logitc    = [];
         logfreqs  = [];
         timevals  = [];
         return;
@@ -84,9 +91,6 @@ for k = 1: length(abset)
     tmpitc   = load( '-mat', filename, 'parameters', 'times', 'freqs', ...
                      [ 'comp' int2str(comp) '_itc'], ...
                      [ 'comp' int2str(comp) '_itcboot']);
-	params    = struct(tmpitc.parameters{:});
-    params.times = tmpitc.times;
-    params.freqs = tmpitc.freqs;
     
     tlen      = length(tmpitc.times);
     flen      = length(tmpitc.freqs);

@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2006/03/09 18:53:15  arno
+% reading all ERPs if necessary
+%
 % Revision 1.6  2006/03/09 18:45:40  arno
 % reading all ERP
 %
@@ -73,11 +76,20 @@ erp = [];
 filename  = fullfile( ALLEEG(abset).filepath,[ ALLEEG(abset).filename(1:end-3) 'icaerp']);
 
 if ~isempty(comp)
-    erpstruct = load( '-mat', filename, [ 'comp' int2str(comp) ], 'times' );
+    try,
+        erpstruct = load( '-mat', filename, [ 'comp' int2str(comp) ], 'times' );
+    catch
+        error( [ 'Cannot read file ''' filename '''' ]);
+    end;
+        
     erp       = getfield(erpstruct, [ 'comp' int2str(comp) ]);
     t         = getfield(erpstruct, 'times');
 else
-    erpstruct = load( '-mat', filename );
+    try,
+        erpstruct = load( '-mat', filename );
+    catch
+        error( [ 'Cannot read file ''' filename '''' ]);
+    end;
     count = 1;
     while count
         if isfield(erpstruct, [ 'comp' int2str(count) ])

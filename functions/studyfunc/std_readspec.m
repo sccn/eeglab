@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2006/03/09 18:10:38  arno
+% *** empty log message ***
+%
 % Revision 1.7  2006/03/09 18:10:18  arno
 % do not use etc field any more
 %
@@ -76,7 +79,12 @@ if nargin < 4
 end;
 
 spec = [];
-filename = fullfile( ALLEEG(abset).filepath,[ ALLEEG(abset).filename(1:end-3) 'icaspec' ext]);
+try,
+    filename = fullfile( ALLEEG(abset).filepath,[ ALLEEG(abset).filename(1:end-3) 'icaspec' ext]);
+catch
+    error( [ 'Cannot read file ''' filename '''' ]);
+end;
+   
 specstruct = load( '-mat', filename, [ 'comp' int2str(comp) ], 'freqs' );
 spec = getfield(specstruct, [ 'comp' int2str(comp) ]);
 f    = specstruct.freqs;
