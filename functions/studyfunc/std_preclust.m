@@ -128,6 +128,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2006/03/10 17:43:45  arno
+% do not remove grand mean for spectrum
+%
 % Revision 1.33  2006/03/10 17:04:20  arno
 % remove mean for spectrum
 %
@@ -492,7 +495,13 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, components
              
              % select ica ERP
              % --------------
-             case 'erp'    , 
+             case 'erp', 
+                  for kk = 1:length(STUDY.cluster)
+                      if isfield(STUDY.cluster(kk).centroid, 'erp')
+                          STUDY.cluster(kk).centroid = rmfield(STUDY.cluster(kk).centroid, 'erp');
+                          STUDY.cluster(kk).centroid = rmfield(STUDY.cluster(kk).centroid, 'erp_times');
+                      end;
+                  end;
                   if ~isempty(succompind{si})
                       for cond = 1 : Ncond
                           idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index;  
@@ -558,7 +567,13 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, components
                  end 
              % select ica comp spectra
              % -----------------------
-             case 'spec'   , 
+             case 'spec', 
+                 for kk = 1:length(STUDY.cluster)
+                     if isfield(STUDY.cluster(kk).centroid, 'spec')
+                         STUDY.cluster(kk).centroid = rmfield(STUDY.cluster(kk).centroid, 'spec');
+                         STUDY.cluster(kk).centroid = rmfield(STUDY.cluster(kk).centroid, 'spec_freqs');
+                     end;
+                 end;
                  if si == 1
                      overwrite = 0;
                  end
@@ -619,6 +634,17 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, components
              % cluster on ica ersp / itc values
              % --------------------------------
              case  {'ersp', 'itc'}
+                for kk = 1:length(STUDY.cluster)
+                    if isfield(STUDY.cluster(kk).centroid, 'ersp')
+                        STUDY.cluster(kk).centroid = rmfield(STUDY.cluster(kk).centroid, 'ersp');
+                        STUDY.cluster(kk).centroid = rmfield(STUDY.cluster(kk).centroid, 'ersp_freqs');
+                        STUDY.cluster(kk).centroid = rmfield(STUDY.cluster(kk).centroid, 'ersp_times');
+                    end;
+                    if isfield(STUDY.cluster(kk).centroid, 'itc')
+                        STUDY.cluster(kk).centroid = rmfield(STUDY.cluster(kk).centroid, 'itc');
+                        STUDY.cluster(kk).centroid = rmfield(STUDY.cluster(kk).centroid, 'itc_times');
+                    end;
+                end;
                 type =  strcom;            
                 if ~isempty(succompind{si})
                     idattot = [];
