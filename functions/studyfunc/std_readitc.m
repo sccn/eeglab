@@ -56,6 +56,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2006/03/09 23:40:10  arno
+% read new ITC format
+%
 % Revision 1.3  2006/03/08 20:35:03  arno
 % rename func
 %
@@ -123,8 +126,8 @@ end
 % ---------
 if ~isempty(itcallboot{1})
     for cond  = 1:length(abset)
-        maxitc= repmat(itcallboot{cond}',1,size(itcall{1},2));
-        itcall{cond}(find(itcall{cond}<maxitc)) = 0;
+        %maxitc= repmat(itcallboot{cond}',1,size(itcall{1},2));
+        %itcall{cond}(find(itcall{cond}<maxitc)) = 0;
     end
 end;
 
@@ -136,50 +139,3 @@ for cond  = 1:length(abset)
 end;
 logfreqs = tmpitc.freqs(fminind:fmaxind);
 timevals = tmpitc.times(minind:maxind);
-
-
-
-function [logitc, logfreqs] = std_readitcold(ALLEEG, abset, comp);
-
-logitc = []; 
-params = ALLEEG(abset).etc.icaitcparams;
-tlen = length(params.times);
-flen = length(params.freqs);
-try
-    itcall =  floatread( fullfile( ALLEEG(abset).filepath, ALLEEG(abset).etc.icaitc), ...
-                         [flen tlen+1],[], flen*(tlen+1)*(comp-1));
-catch
-    warndlg2(['std_readitc: file '  ALLEEG(abset).etc.icaitc ' was not found in path ' ALLEEG(abset).filepath], 'Abort - computing ITC centroid' ); 
-            return;
-end
-logitc = itcall(:, 1:tlen);
-itcboot = itcall(:,tlen+1);
-minitc= repmat(itcboot,1,size(logitc,2));
-logitc(find(abs(logitc)<minitc))  = 0;
-if ~isempty(params.timewindow)
-    if params.timewindow(1) > params.times(1) | params.timewindow(end) < params.times(end)
-        maxind = max(find(params.times <= params.timewindow(end)));
-        minind = min(find(params.times >= params.timewindow(1)));
-    else
-        minind = 1;
-        maxind = tlen;
-    end
-else
-    minind = 1;
-    maxind = tlen;
-end
-if ~isempty(params.freqrange)
-    if params.freqrange(1) > exp(1)^params.logfreqs(1) | params.freqrange(end) < exp(1)^params.logfreqs(end)
-        fmaxind = max(find(exp(1).^(params.logfreqs) <= params.freqrange(end)));
-        fminind = min(find(exp(1).^(params.logfreqs) >= params.freqrange(1)));
-    else
-        fminind = 1;
-        fmaxind = flen;
-    end
-else
-    fminind = 1;
-    fmaxind = flen;
-end
-
-logitc = logitc(fminind:fmaxind,minind:maxind);
-logfreqs = params.logfreqs(fminind:fmaxind);
