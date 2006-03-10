@@ -65,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2006/03/10 17:04:56  arno
+% only one spectrum version
+%
 % Revision 1.23  2006/03/09 18:07:45  arno
 % remove output argument
 %
@@ -184,4 +187,5 @@ function savetofile(filename, f, X, comps, params);
     for k = 1:length(comps)
         allspec = setfield( allspec, [ 'comp' int2str(comps(k)) ], X(k,:));
     end;
+    allspec.average_spec = mean(X,1);
     std_savedat(filename, allspec);
