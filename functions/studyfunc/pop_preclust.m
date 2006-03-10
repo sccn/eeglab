@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2006/03/10 22:56:24  arno
+% timewindow
+%
 % Revision 1.34  2006/03/08 20:45:26  arno
 % rename func
 %
@@ -126,9 +129,16 @@ if ~isstr(varargin{1}) %intial settings
     
     % Create default ERSP / ITC time/freq. paramters 
     % ----------------------------------------------
-    [time_range, winsize] = compute_ersp_times([3 0.5],  ALLEEG(STUDY.setind(1,1)).srate, ...
-                                 [ALLEEG(STUDY.setind(1,1)).xmin ALLEEG(STUDY.setind(1,1)).xmax]*1000 , 3, 4); 
-    erspparams_str = [ '''freqrange'', [3 25], ''timewindow'', ' vararg2str(time_range) '''cycles'', [3 0.5], ''padratio'', 4' ];
+    maxrange = [ALLEEG(STUDY.setind(1,1)).xmin ALLEEG(STUDY.setind(1,1)).xmax]*1000;
+    time_range = [0 0];
+    minfreq    = 2;
+    while (time_range(2)-time_range(1)) < (maxrange(2)-maxrange(1))/2
+        minfreq = minfreq+1;
+        [time_range, winsize] = compute_ersp_times([3 0.5],  ALLEEG(STUDY.setind(1,1)).srate, ...
+                                                   [ALLEEG(STUDY.setind(1,1)).xmin ALLEEG(STUDY.setind(1,1)).xmax]*1000 , minfreq, 4); 
+    end;
+    erspparams_str = [ '''freqrange'', [' int2str(minfreq) ' 50], ''timewindow'', ' ...
+                       vararg2str(time_range) '''cycles'', [3 0.5], ''padratio'', 4' ];
 
     % cluster text
     % ------------
