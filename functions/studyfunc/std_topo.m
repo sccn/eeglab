@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2006/03/10 00:19:49  arno
+% removing reference to etc field
+%
 % Revision 1.13  2006/03/09 19:27:39  arno
 % fix function crash
 %
@@ -110,10 +113,6 @@ end;
 % Topo information found in dataset
 % ---------------------------------
 if exist(fullfile(EEG.filepath, [ EEG.filename(1:end-3) 'icatopo' ]))
-    d = EEG.etc.icatopoparams; %the grid dimension 
-    if iscell(d)
-        d = d{1};
-    end
     for k = 1:length(comps)
         tmp = std_readtopo( EEG, 1, comps(k));
         if strcmpi(option, 'gradient')
