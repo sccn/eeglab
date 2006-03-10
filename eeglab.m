@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.460  2006/03/10 19:52:18  arno
+% just select data for studies
+%
 % Revision 1.459  2006/03/08 21:28:22  arno
 % adding study path
 %
@@ -2421,6 +2424,30 @@ end;
 % ----------------------------
 exist_study = 0;
 if exist('STUDY') & exist('CURRENTSTUDY')
+
+    % if study present, check study consistency with loaded datasets
+    % --------------------------------------------------------------
+    if ~isempty(STUDY)
+        if length(ALLEEG) > length(STUDY.datasetinfo) | any(cellfun('isempty', {ALLEEG.data}))
+            if strcmpi(STUDY.saved, 'no')
+                res = questdlg2( strvcat('The study is not consistent with the datasets loaded in memory', ...
+                                         'Do you wish to save the study as it is (EEGLAB will prompt you to enter', ...
+                                         'file name) or do you wish to remove it'), 'Study inconsistency', 'Save and remove', 'Remove', 'Remove' );
+                if strcmpi(res, 'Remove')
+                    STUDY = [];
+                else
+                    pop_savestudy(STUDY, ALLEEG);
+                    STUDY = [];
+                end;
+            else
+                warndlg2( strvcat('The study is not consistent with the datasets loaded in memory.', ...
+                                  'Since it had not changed since last saved, it was simply removed', ...
+                                  'from memory') );
+                STUDY = [];
+            end;
+        end;
+    end;
+    
     if ~isempty(STUDY)
         exist_study = 1;
     end;
