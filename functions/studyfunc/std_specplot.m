@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2006/03/10 00:21:18  arno
+% removing reference to etc field
+%
 % Revision 1.11  2006/03/09 18:13:21  arno
 % spectrum read
 %
@@ -367,7 +370,7 @@ for ci = 1 : length(comp_ind) %for each comp
         if ~isfield(STUDY.cluster(cls).centroid,'spec')
             STUDY = std_centroid(STUDY,ALLEEG, cls, 'spec');
         end
-        [spec, f] = std_readspec(ALLEEG, abset, comp, 'm');
+        [spec, f] = std_readspec(ALLEEG, abset, comp, STUDY.preclust.specclustfreqs);
         plot(f,spec, 'c');
         ave_spec = STUDY.cluster(cls).centroid.spec{n};
         plot(f,ave_spec,'k','linewidth',2);
