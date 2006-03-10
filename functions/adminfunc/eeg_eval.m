@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2006/03/10 20:49:30  arno
+% set saved to 'no'
+%
 % Revision 1.9  2006/03/10 19:10:16  arno
 % fixing eeg_eval
 %
@@ -122,8 +125,9 @@ function [EEG, com] = eeg_eval( funcname, EEG, varargin);
         TMPEEG.saved = 'no';
         if option_storedisk
             TMPEEG = pop_saveset(TMPEEG, 'savemode', 'resave');
+            TMPEEG = update_datafield(TMPEEG);
         end;
-        NEWEEG = pop_newset(NEWEEG, TMPEEG, i, 'retrieve', [], 'study', 1);
+        NEWEEG = eeg_store(NEWEEG, TMPEEG, i);
     end;
     EEG = NEWEEG;
 
@@ -132,3 +136,16 @@ function [EEG, com] = eeg_eval( funcname, EEG, varargin);
     if nargout > 1
         com = sprintf('%s = %s( %s,%s);', funcname, inputname(2), funcname, inputname(2), vararg2str(g.params));
     end;
+
+
+function EEG = update_datafield(EEG);
+    if isfield(EEG, 'datfile')
+        if ~isempty(EEG.datfile)
+            EEG.data = EEG.datfile;
+        else
+            EEG = rmfield(EEG, 'datfile');
+        end;
+    else 
+        EEG.data = 'in set file';
+    end;
+    EEG.icaact = [];
