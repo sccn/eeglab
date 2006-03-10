@@ -94,6 +94,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.57  2006/02/02 22:22:51  arno
+% removing trials from the ICA matrix too
+%
 % Revision 1.56  2006/01/31 20:56:47  arno
 % nothing
 %
