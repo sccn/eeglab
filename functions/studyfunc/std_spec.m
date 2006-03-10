@@ -65,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2006/03/09 18:07:45  arno
+% remove output argument
+%
 % Revision 1.22  2006/03/09 18:05:45  arno
 % reprogramming function
 %
@@ -142,63 +145,9 @@ end
 % --------
 filenamespec = fullfile(EEG.filepath, [ EEG.filename(1:end-3) 'icaspec' ]);
 
-if exist([ filenamespec 'm']) & exist(filenamespec)
-    
-    load('-mat', filenamespec,        'parameters');  params = parameters;
-    load('-mat', [ filenamespec 'm'], 'parameters'); mparams = parameters;
-    load('-mat', [ filenamespec 'm'], 'freqs'); fave = freqs;
-    load('-mat', filenamespec,        'freqs'); f    = freqs;
-    
-    % find new frequency limits
-    % -------------------------
-    if ~isempty(freqrange)
-        maxind = max(find(f <= freqrange(end)));
-        minind = min(find(f >= freqrange(1)));
-        if f(end) < freqrange(end)
-            disp(['Warning! Requested high frequency limit, ' ...
-                  num2str(freqrange(end)) 'Hz, is out of bounds.']);
-        end
-        if f(1) > freqrange(1)
-            disp(['Warning! Requested low frequency limit, ' ...
-                  num2str(freqrange(1)) 'Hz, is out of bounds.']);
-        end
-        f = f(minind:maxind);
-    else
-        minind = 1;
-        maxind = length(f);
-    end
-    
-    % if same limits, just read spectrum and return
-    % ---------------------------------------------
-    if ((f(end) == fave(end)) & (f(1) == fave(1))) | overwrite == 2
-        X = zeros(length(comps),maxind-minind+1) ;
-        for k = 1:length(comps)
-            X(k,:) = std_readspec( EEG, 1, comps(k), 'm');
-        end
-        f = fave;
-        return
-    end
-    
-    % if different limits, recompute average file
-    % -------------------------------------------
-    disp('Re-using existing spectrum but with new frequency boundaries');
-    disp('To recompute the spectra, first delete files in the directory');
-    disp('   of this dataset with extensions .icaspec and .icaspecm');
-    
-    % reading unprocessed spectrum
-    % ----------------------------
-    X = zeros(length(comps),maxind-minind+1);
-    for k = 1:length(comps)
-        tmp = std_readspec( EEG, 1, comps(k));
-        X(k,:) =  tmp(minind:maxind)';
-    end
-    
-    % remove the mean from each frequency across all components
-    % ---------------------------------------------------------
-    X = X - mean(X,2)*ones(1,length(f)); %remove mean
-    X = X - ones(size(X,1),1)*mean(X); 
-    savetofile( [ filenamespec 'm'], f, X, comps, arg);
-    return
+if exist(filenamespec)
+    [X f] = std_readspec(EEG, 1, comps, freqrange);
+    return;
 end
  
 % no spectra available - recompute
@@ -222,30 +171,7 @@ end
 % save spectrum in file
 % ---------------------
 savetofile( filenamespec, f, X, 1:size(X,1), arg);
-
-% Select desired components and time frequency range
-% --------------------------------------------------
-X = X(comps,:);
-if ~isempty('freqrange')
-    maxind = max(find(f <= freqrange(end)));
-    minind = min(find(f >= freqrange(1)));
-    if f(end) < freqrange(end)
-        disp(['Warning! Requested high frequency limit, ' ...
-              num2str(freqrange(end)) 'Hz, is out of bounds.']);
-    end
-    if f(1) > freqrange(1)
-        disp(['Warning! Requested low frequency limit, ' ...
-              num2str(freqrange(1)) 'Hz, is out of bounds.']);
-    end
-    f = f(minind:maxind);
-    X = X(:,minind:maxind);
-end               
-
-% remove the mean from each frequency across all components
-% ---------------------------------------------------------
-X = X - mean(X,2)*ones(1,length(f)); 
-X = X - ones(size(X,1),1)*mean(X); 
-savetofile( [ filenamespec 'm'], f, X, comps, arg);
+[X f] = std_readspec(EEG, 1, comps, freqrange);
 
 % ------------------------------------------
 % saving spectral information to Matlab file
