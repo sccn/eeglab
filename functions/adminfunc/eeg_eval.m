@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2006/03/10 19:10:16  arno
+% fixing eeg_eval
+%
 % Revision 1.8  2006/03/10 18:52:32  arno
 % only store on disk if necessary
 %
@@ -116,6 +119,7 @@ function [EEG, com] = eeg_eval( funcname, EEG, varargin);
         else            TMPEEG = feval(func, TMPEEG, g.params{:}); % Matlab 6 and higher
         end;
         TMPEEG = eeg_checkset(TMPEEG);
+        TMPEEG.saved = 'no';
         if option_storedisk
             TMPEEG = pop_saveset(TMPEEG, 'savemode', 'resave');
         end;
