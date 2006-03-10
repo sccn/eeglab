@@ -62,6 +62,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2006/03/09 23:28:07  arno
+% implement new ERSP from Matlab and different structure ec...
+%
 % Revision 1.13  2006/03/09 22:24:30  arno
 % converting frequencies
 %
@@ -184,7 +187,7 @@ if strcmpi(mode, 'comps')
             
             idat = STUDY.datasetinfo(STUDY.setind(1,STUDY.cluster(cls(clus)).sets(1,1))).index;
 
-            logfreqs   = STUDY.cluster(cls(clus)).centroid.ersp_logf;
+            logfreqs   = log(STUDY.cluster(cls(clus)).centroid.ersp_logf);
             ersp_times = STUDY.cluster(cls(clus)).centroid.ersp_times;
             a = [ STUDY.cluster(cls(clus)).name ' average ERSP, ' num2str(length(unique(STUDY.cluster(cls(clus)).sets(1,:)))) 'Ss' ];
             tftopo(ave_ersp,ersp_times,logfreqs,'limits', [ersp_times(1) ersp_times(end) logfreqs(1) logfreqs(end)],...
@@ -213,15 +216,13 @@ if strcmpi(mode, 'comps')
                 else  %other sbplot rows
                     sbplot(rowcols(1),rowcols(2),k+4);  
                 end
-                tftopo(clusncomm.ersp{k}(:,:,n), clusncomm.times{k},clusncomm.logf{k},'limits', ...
-                    [clusncomm.times{k}(1) clusncomm.times{k}(end) clusncomm.logf{k}(1) clusncomm.logf{k}(end) -lim lim],...
+                tftopo(clusncomm.ersp{k}(:,:,n), clusncomm.times{k},log(clusncomm.logf{k}),'limits', ...
+                    [clusncomm.times{k}(1) clusncomm.times{k}(end) log(clusncomm.logf{k}(1)) log(clusncomm.logf{k}(end)) -lim lim],...
                     'title', a, 'verbose', 'off', 'axcopy', 'off');
                 set(gca, 'xtick', [], 'ytick', []);
                 set(get(gca,'Title'),'FontSize',8)
                 xlabel('');
                 ylabel('');
-                axcopy(gcf, [' ft = str2num(get(gca,''''yticklabel'''')); ft = exp(1).^ft; ft = unique(round(ft)); fti = get(gca,''''ytick''''); fti = exp(1).^fti; fti = unique(round(fti));'...
-                     'fti = log(fti); set(gca, ''''ytick'''',fti); set(gca, ''''yticklabel'''',num2str(ft)); xlabel(''''Time [ms]''''); ylabel(''''Frequency [Hz]''''); cbar; clear ft fti;' ]);
                 waitbar((k*n)/(Ncond*len),h_wait);
                 if k == len
                     cbar;
@@ -299,7 +300,7 @@ if strcmpi(mode, 'centroid')
                     ave_ersp = ave_ersp + STUDY.cluster(cls(k)).centroid.ersp{n}/Ncond;
                 end;
             end;
-            logfreqs = STUDY.cluster(cls(k)).centroid.ersp_logf;
+            logfreqs = log(STUDY.cluster(cls(k)).centroid.ersp_logf);
             tftopo(ave_ersp,timevals,logfreqs,'limits', [timevals(1) timevals(end) logfreqs(1) logfreqs(end) -maxval maxval],...
                    'title', 'Average ERSP', 'verbose', 'off');
             ft = str2num(get(gca,'yticklabel'));
@@ -318,7 +319,7 @@ if strcmpi(mode, 'centroid')
                 sbplot(rowcols(1),rowcols(2),(k-1)*Ncond+n), 
                 a = [ STUDY.cluster(cls(k)).name ' ERSP, ' num2str(length(unique(STUDY.cluster(cls(k)).sets(1,:)))) 'Ss, ' STUDY.condition{n}];
                 ave_ersp = STUDY.cluster(cls(k)).centroid.ersp{n};
-                logfreqs = STUDY.cluster(cls(k)).centroid.ersp_logf;
+                logfreqs = log(STUDY.cluster(cls(k)).centroid.ersp_logf);
                 timevals = STUDY.cluster(cls(k)).centroid.ersp_times;
                 tftopo(ave_ersp,timevals,logfreqs,'limits', [timevals(1) timevals(end) logfreqs(1) logfreqs(end) -maxval maxval],...
                        'title', a, 'verbose', 'off');
