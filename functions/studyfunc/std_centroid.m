@@ -62,6 +62,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2006/03/10 16:27:08  arno
+% new call for spectrum
+%
 % Revision 1.16  2006/03/10 16:00:00  arno
 % reading ERP
 % ./
@@ -230,7 +233,7 @@ if itcC | erspC | specC | erpC | scalpC
                         if (k == length(compind) ) &  (ind == STUDY.cluster(clsind(clust)).sets(1,end)) 
                             [all_erp pol] = comppol(all_erp);
                             centroid{clust}.erp{cond} = mean(all_erp,2);
-                            centroid{clust}.erp_t = t;
+                            centroid{clust}.erp_times = t;
                         end
                     end
                     if specC %spec centroid
@@ -240,7 +243,7 @@ if itcC | erspC | specC | erpC | scalpC
                             return;
                         end
                         centroid{clust}.spec{cond} = centroid{clust}.spec{cond} + spec;
-                        centroid{clust}.spec_f = f;
+                        centroid{clust}.spec_freqs = f;
                     end
                     if erspC %ersp centroid
                         fprintf('.');
@@ -332,12 +335,12 @@ for clust =  1:length(clsind) %go over all requested clusters
         end
         if erpC
             STUDY.cluster(clsind(clust)).centroid.erp{cond} = centroid{clust}.erp{cond};
-		    STUDY.cluster(clsind(clust)).centroid.erp_t = centroid{clust}.erp_t;
+		    STUDY.cluster(clsind(clust)).centroid.erp_times = centroid{clust}.erp_times;
         end
 		if specC
             centroid{clust}.spec{cond} = centroid{clust}.spec{cond}/ncomp;
             STUDY.cluster(clsind(clust)).centroid.spec{cond} = centroid{clust}.spec{cond};
-		    STUDY.cluster(clsind(clust)).centroid.spec_f = centroid{clust}.spec_f;
+		    STUDY.cluster(clsind(clust)).centroid.spec_freqs = centroid{clust}.spec_freqs;
         end
         if erspC %ersp centroid
             centroid{clust}.ersp{cond} = centroid{clust}.ersp{cond}/ncomp;
