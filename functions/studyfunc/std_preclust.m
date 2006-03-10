@@ -128,6 +128,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2006/03/09 23:28:54  arno
+% implement new ERSP from Matlab and different structure ec...
+%
 % Revision 1.27  2006/03/08 21:09:26  arno
 % checking study
 %
@@ -700,9 +703,9 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, components
                         % downsample frequency by 2 and times by 2
                         % ----------------------------------------
                         idat = STUDY.datasetinfo(STUDY.setind(1)).index; 
-                        times = ALLEEG(idat).etc.icaerspparams.times;
-                        freqs = ALLEEG(idat).etc.icaerspparams.logfreqs;
-                        [data, freqs, times] = erspdownsample(data,4, freqs,times,Ncond); 
+                        [ tmp freqs times ] = std_readersp( ALLEEG, idat, succompind{1}, ...
+                                                        timewindow, freqrange);
+                        [data freqs times ] = erspdownsample(data,4, freqs,times,Ncond); 
                         if strcmp(varargin{index}(end-1) , 'downsample')
                             varargin{index}(end) = {celltomat(varargin{index}(end)) + 4};
                         else
