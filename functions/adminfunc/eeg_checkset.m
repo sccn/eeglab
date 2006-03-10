@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.189  2006/03/10 19:02:22  arno
+% using pop_loadset to load data
+%
 % Revision 1.188  2006/03/07 17:47:39  arno
 % automatically recomputing EEG.icawinv
 %
@@ -1423,9 +1426,8 @@ end;
                     end;
                 end;
             end;
-            tmpinv = pinv(EEG.icaweights*EEG.icasphere);
-            if ~isequal(EEG.icawinv, tmpinv)
-                EEG.icawinv = tmpinv; % a priori same result as inv
+            if isempty(EEG.icawinv)
+                EEG.icawinv = pinv(EEG.icaweights*EEG.icasphere); % a priori same result as inv
                 res         = com;
             end;     
         else
