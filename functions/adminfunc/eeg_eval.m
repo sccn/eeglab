@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2006/03/10 18:52:32  arno
+% only store on disk if necessary
+%
 % Revision 1.7  2006/01/31 20:57:12  arno
 % fixing history
 %
@@ -112,10 +115,11 @@ function [EEG, com] = eeg_eval( funcname, EEG, varargin);
         if v(1) == '5', eval(command);                      % Matlab 5
         else            TMPEEG = feval(func, TMPEEG, g.params{:}); % Matlab 6 and higher
         end;
-        [NEWEEG, TMPEEG] = eeg_store(NEWEEG, TMPEEG, i);
+        TMPEEG = eeg_checkset(TMPEEG);
         if option_storedisk
             TMPEEG = pop_saveset(TMPEEG, 'savemode', 'resave');
         end;
+        NEWEEG = pop_newset(NEWEEG, TMPEEG, i, 'retrieve', [], 'study', 1);
     end;
     EEG = NEWEEG;
 
