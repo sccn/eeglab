@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.461  2006/03/10 20:07:44  arno
+% check consistency with loaded datasets
+%
 % Revision 1.460  2006/03/10 19:52:18  arno
 % just select data for studies
 %
@@ -2754,14 +2757,14 @@ elseif (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG(1).data)
 
         % enable specific menus
         % ---------------------
-        if strcmpi(chanconsist, 'yes')
-            set( edit_m, 'enable', 'on');
-            set( findobj('parent', edit_m, 'type', 'uimenu'), 'enable', 'off');
-            set( findobj('parent', edit_m, 'type', 'uimenu', 'label', 'Channel locations'), 'enable', 'on');
-            set( findobj('parent', edit_m, 'type', 'uimenu', 'label', 'Select data'      ), 'enable', 'on');
-            set( findobj('parent', edit_m, 'type', 'uimenu', 'label', 'Append datasets'  ), 'enable', 'on');
-            set( findobj('parent', edit_m, 'type', 'uimenu', 'label', 'Delete dataset(s)'), 'enable', 'on');
-        end;
+        %if strcmpi(chanconsist, 'yes')
+        %    set( edit_m, 'enable', 'on');
+        %    set( findobj('parent', edit_m, 'type', 'uimenu'), 'enable', 'off');
+        %    set( findobj('parent', edit_m, 'type', 'uimenu', 'label', 'Channel locations'), 'enable', 'on');
+        %    set( findobj('parent', edit_m, 'type', 'uimenu', 'label', 'Select data'      ), 'enable', 'on');
+        %    set( findobj('parent', edit_m, 'type', 'uimenu', 'label', 'Append datasets'  ), 'enable', 'on');
+        %    set( findobj('parent', edit_m, 'type', 'uimenu', 'label', 'Delete dataset(s)'), 'enable', 'on');
+        %end;
         
     else % one dataset selected
         
