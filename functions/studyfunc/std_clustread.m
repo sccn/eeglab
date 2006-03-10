@@ -28,9 +28,6 @@ for k = 1:len
             if nargin < 5
                 error('Reading cluster ERP requires condition number');
             end
-            if ~isfield(ALLEEG(abset).etc, 'icaerpparams')
-                error([ 'No ERP information available in dataset ' num2str(abset) ]);   
-            end
             [erp, t] = std_readerp(ALLEEG, abset, comp);
             if  k == 1
                 clusinfo.erp = zeros(len,length(erp));
@@ -41,9 +38,6 @@ for k = 1:len
         case 'spec'
             if nargin < 5
                 error('Reading cluster spectrum requires condition number');
-            end
-            if ~isfield(ALLEEG(abset).etc, 'icaspecparams')
-                error([ 'No spectrum information available in dataset ' num2str(abset) ]);   
             end
             [spec, f] = std_readspec(ALLEEG, abset, comp, 'm');
             if  k == 1
@@ -56,9 +50,6 @@ for k = 1:len
             if nargin < 5
                 error('Reading cluster ERSP requires condition number');
             end
-            if ~isfield(ALLEEG(abset(1)).etc, 'icaerspparams')
-                error([ 'No ERSP information available in dataset ' num2str(abset(1)) ]);   
-            end
             [ersp, logfreqs, timevals] = std_readersp(ALLEEG, abset, comp, ...
                       STUDY.preclust.erspclusttimes,  STUDY.preclust.erspclustfreqs);
             clusinfo.ersp{k}  = ersp;
@@ -69,9 +60,6 @@ for k = 1:len
             if nargin < 5
                 error('Reading cluster ITC requires condition number');
             end
-            if ~isfield(ALLEEG(abset).etc, 'icaitcparams')
-                error([ 'No ITC information available in dataset ' num2str(abset) ]);   
-            end
             [itc, logfreqs, timevals] = std_readitc(ALLEEG, abset, comp, STUDY.preclust.erspclusttimes, ...
                                                                     STUDY.preclust.erspclustfreqs );
             clusinfo.itc{k}   = itc;
@@ -79,15 +67,9 @@ for k = 1:len
             clusinfo.times{k} = timevals;
             
         case 'dipole'
-            if ~isfield(ALLEEG(abset).etc, 'dipfit')
-                error([ 'No dipole information available in dataset ' num2str(abset) ]);   
-            end
             clusinfo(k) = ALLEEG(abset).dipfit.model(comp);            
             
         case { 'scalp' 'topo' }
-            if ~isfield(ALLEEG(abset).etc,'icascalpparams')
-                error([ 'Dataset ' num2str(abset) ' has no topoplot image information']);   
-            end
             [grid, yi, xi] = std_readtopo(ALLEEG, abset, comp); 
             clusinfo.grid{k} = grid;
             clusinfo.yi{k} = yi;
