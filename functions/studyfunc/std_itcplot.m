@@ -282,7 +282,9 @@ if strcmpi(mode, 'centroid')
                a = [ STUDY.cluster(cls(k)).name ' ITC, ' num2str(length(unique(STUDY.cluster(cls(k)).sets(1,:)))) 'Ss, ' STUDY.condition{n}];
                ave_itc  = STUDY.cluster(cls(k)).centroid.itc{n};
                logfreqs = STUDY.cluster(cls(k)).centroid.itc_logf;
-               tftopo(abs(ave_itc),params.times,logfreqs,'limits', [params.times(1) params.times(end) logfreqs(1) logfreqs(end) -maxval maxval],...
+               timevals = STUDY.cluster(cls(k)).centroid.itc_times;
+               tftopo(abs(ave_itc),timevals,logfreqs,'limits', ...
+                      [timevals(1) timevals(end) logfreqs(1) logfreqs(end) -maxval maxval],...
                       'title', a, 'verbose', 'off');
                ft = str2num(get(gca,'yticklabel'));
                ft = exp(1).^ft;
@@ -299,6 +301,7 @@ if strcmpi(mode, 'centroid')
                    xlabel('');
                end;
                cbar('pos');
+               dsffd
                waitbar((k*n)/(len*Ncond),h_wait);
            end;
         end % Finish plotting all centroids for one condition
