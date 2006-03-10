@@ -1,33 +1,28 @@
-% std_readersp() - Given the ALLEEG structure, a specific EEG dataset index, 
-% and a specific component, the function returns the (frequency) log scaled 
-% ERSP of that ICA component. 
-% The ERSP of the dataset ICA components is assumed to be saved in a float 
-% file, the EEG dataset include a pointer to this file. If such a float file doesn't exist,
-% you can use the std_ersp() function to create it, or use the pre - clustering functions
-% that call it: pop_preclust, eeg_preclust & eeg_createdata. The ERSP information  
-% is specific to the input variables used to compute it, the frequency range, 
-% timewindow, resolution, confidence level and the wavelet type (FFT / wavelet
-%  cycles), see timef for details. 
-% Along with the ERSP of the selected ICA component the function returns  
-% the log frequency vector of the ERSP samples. 
 %
+% std_readersp() - Given the ALLEEG structure, a specific EEG dataset index, 
+%                  and a specific component, return the mean log-frequency scaled 
+%                  ERSP for a specified ICA component. The ERSP of the dataset ICA 
+%                  component is assumed to be saved in a float file. The EEG dataset 
+%                  includes a pointer to this file. If such a float file doesn't 
+%                  exist, you can use the std_ersp() function to create it, or use 
+%                  pop_preclust(), eeg_preclust(), and eeg_createdata(). The ERSP 
+%                  information is specific to the input variables used to compute it: 
+%                  frequency range, timewindow, resolution, probability threshold, 
+%                  and wavelet type (FFT|wavelet_cycles), see >> timef details 
+%                  Along with the ERSP of the selected ICA component the function 
+%                  returns the log frequency vector of the ERSP samples. 
 % Usage:    
-%   >> [logersp, logfreqs] = std_readersp(ALLEEG, abset, component);  
-%   This functions returns the log scaled ERSP of an ICA component. 
-%   The information is loaded from a float file, which a pointer 
-%   to is saved in the EEG dataset. The float file was created
-%   by the pre - clustering function std_ersp. 
+%       >> [logersp, logfreqs] = std_readersp(ALLEEG, setindex, component);  
 %
 % Inputs:
-%   ALLEEG     - an EEGLAB data structure, which holds EEG sets (can also be one EEG set). 
-%                      ALLEEG must contain the dataset of interest (the setind).
-%   setind         -  [integer] an index of an EEG dataset in the ALLEEG
-%                      structure, for which to get the component log scaled ERSP.
-%   component - [integer] a component index in the selected EEG dataset for which 
-%                      an ERSP will be returned. 
-%
+%   ALLEEG     - an EEGLAB data structure, which holds EEG sets (can also be one EEG
+%                dataset). ALLEEG must contain the dataset of interest (the setind).
+%   setindex   - [integer] an index of an EEG dataset in the ALLEEG structure, for 
+%                which to get the component log scaled ERSP.
+%   component  - [integer] a component index in the selected EEG dataset for which 
+%                an ERSP will be returned. 
 % Outputs:
-%   logesrp    - the log scaled ERSP of the requested ICA component in the
+%   logersp    - the log scaled ERSP of the requested ICA component in the
 %                      selected dataset. This is frequencies (log scaled)
 %                      by time, time - frequency decomposition of the ICA
 %                      activations.
@@ -56,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2006/03/10 00:39:39  arno
+% error msg
+%
 % Revision 1.5  2006/03/09 23:29:34  arno
 % implement new ERSP from Matlab and different structure ec...
 %
