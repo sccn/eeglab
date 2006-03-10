@@ -56,6 +56,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2006/03/10 00:39:37  arno
+% error msg
+%
 % Revision 1.5  2006/03/10 00:01:52  arno
 % remove old ITC code
 %
@@ -94,8 +97,8 @@ for k = 1: length(abset)
     
     tlen      = length(tmpitc.times);
     flen      = length(tmpitc.freqs);
-    itcall{k}     = getfield(tmpitc, [ 'comp' int2str(comp) '_itc']);
-    itcallboot{k} = getfield(tmpitc, [ 'comp' int2str(comp) '_itcboot']);
+    itcall{k}     = double(getfield(tmpitc, [ 'comp' int2str(comp) '_itc']));
+    itcallboot{k} = double(getfield(tmpitc, [ 'comp' int2str(comp) '_itcboot']));
 
 end
 
