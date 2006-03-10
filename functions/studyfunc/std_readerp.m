@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2006/03/10 00:36:34  arno
+% error msg
+%
 % Revision 1.7  2006/03/09 18:53:15  arno
 % reading all ERPs if necessary
 %
@@ -70,38 +73,31 @@
 % fix error message
 %
 
-function [erp, t] = std_readerp(ALLEEG, abset, comp)
+function [X, t] = std_readerp(ALLEEG, abset, comp, timerange)
     
-erp = [];
+X = [];
 filename  = fullfile( ALLEEG(abset).filepath,[ ALLEEG(abset).filename(1:end-3) 'icaerp']);
 
-if ~isempty(comp)
+for k=1:length(comp)
     try,
-        erpstruct = load( '-mat', filename, [ 'comp' int2str(comp) ], 'times' );
+        erpstruct = load( '-mat', filename, [ 'comp' int2str(comp(k)) ], 'times' );
     catch
         error( [ 'Cannot read file ''' filename '''' ]);
     end;
-        
-    erp       = getfield(erpstruct, [ 'comp' int2str(comp) ]);
+
+    tmpdat    = getfield(erpstruct, [ 'comp' int2str(comp(k)) ]);
+    if k == 1
+        X = zeros(length(comp), length(tmpdat));
+    end;
+    X(k,:)  = tmpdat;
     t         = getfield(erpstruct, 'times');
-else
-    try,
-        erpstruct = load( '-mat', filename );
-    catch
-        error( [ 'Cannot read file ''' filename '''' ]);
-    end;
-    count = 1;
-    while count
-        if isfield(erpstruct, [ 'comp' int2str(count) ])
-            if count == 1
-                erp          = getfield(erpstruct, [ 'comp' int2str(count) ]);
-            else
-                erp(count,:) = getfield(erpstruct, [ 'comp' int2str(count) ]);
-            end;
-            count = count+1;
-        else
-            count = 0;
-        end;
-    end;
-    t = getfield(erpstruct, 'times');
+end;
+
+% select time range of interest
+% -----------------------------
+if nargin > 3
+    maxind = max(find(t <= timerange(end)));
+    minind = min(find(t >= timerange(1)));
+    X = X(:,minind:maxind);
+    t = t(minind:maxind)';
 end;
