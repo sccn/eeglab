@@ -128,6 +128,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2006/03/10 00:25:53  arno
+% remove reference to .etc fields
+%
 % Revision 1.28  2006/03/09 23:28:54  arno
 % implement new ERSP from Matlab and different structure ec...
 %
@@ -487,11 +490,8 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, components
                           if ALLEEG(idat).trials == 1
                               error('No epochs in dataset: ERP information has no meaning');
                          end
-                         if ~isempty('timewindow')
-                             [X, t] = std_erp(ALLEEG(idat), succompind{si}, timewindow);
-                         else
-                             [X, t] = std_erp(ALLEEG(idat), succompind{si});
-                         end
+                         [X, t] = std_erp(ALLEEG(idat), succompind{si}, timewindow);
+                         STUDY.preclust.erpclusttimes = timewindow;
                          if cond == 1
                              con_data = abs(X);
                              con_t = t;
@@ -558,6 +558,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, components
                          idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index;  
                          [X, f,overwrite] = std_spec(ALLEEG(idat),succompind{si}, ...
                                                      freqrange, fun_arg,overwrite);
+                         STUDY.preclust.specclustfreqs = freqrange;
                          if cond == 1
                              con_data = X;
                              con_f = f;
