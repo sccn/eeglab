@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2006/03/10 20:59:41  arno
+% fixing save mode
+%
 % Revision 1.11  2006/03/10 20:56:37  arno
 % fixing new eeg
 %
@@ -136,7 +139,7 @@ function [EEG, com] = eeg_eval( funcname, EEG, varargin);
         end;
     end;
     EEG = NEWEEG;
-
+    
     % history
     % -------
     if nargout > 1
