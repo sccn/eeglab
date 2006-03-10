@@ -53,6 +53,9 @@
 % uses the global variable EEG ALLEEG CURRENTSET 
 
 % $Log: not supported by cvs2svn $
+% Revision 1.40  2006/02/03 00:27:02  arno
+% remove dat file reference in dataset when creating new dataset
+%
 % Revision 1.39  2006/02/01 06:54:37  arno
 % remove all the savedata stuff
 %
@@ -193,17 +196,15 @@ if length(EEG) > 1
     if nargin >= 3
         for index=1:length(TMPEEG)
             EEG = TMPEEG(index);
-            [ALLEEG, EEG] = eeg_store(ALLEEG, EEG, storeSetIndex(index), varargin{:});
             tmpsaved      = EEG.saved;
-            TMPEEG        = eeg_store(TMPEEG, EEG, index);
+            [ALLEEG, EEG] = eeg_store(ALLEEG, EEG, storeSetIndex(index), varargin{:});
             TMPEEG(index).saved = tmpsaved;
         end;        
     else
         for index=1:length(TMPEEG)
             EEG = TMPEEG(index);
-            [ALLEEG, EEG, storeSetIndex(index)] = eeg_store(ALLEEG, EEG);
             tmpsaved      = EEG.saved;
-            TMPEEG        = eeg_store(TMPEEG, EEG, index);
+            [ALLEEG, EEG, storeSetIndex(index)] = eeg_store(ALLEEG, EEG);
             TMPEEG(index).saved = tmpsaved;
         end;
     end;
