@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.61  2006/03/10 20:58:24  arno
+% fix shift
+%
 % Revision 1.60  2006/03/10 20:54:27  arno
 % nothing
 %
@@ -239,9 +242,13 @@ else                 save_retrieve = 1;
 end;
 
 eeglab_options;
-if save_retrieve & length(EEG) > 1
+if length(EEG) > 1
     % cases when length(EEG) > 1: when retreiving a dataset and before several datasets were processed (NEWSET non empty)
     %                          2: when storing multiple datasets 
+    ALLEEG = EEG;
+    return;
+    % canceling operation (not used)
+    % -------------------
     if ~isempty(g.retrieve)
         [EEG, ALLEEG, CURRENTSET] = eeg_retrieve( ALLEEG, g.retrieve);
     end;
