@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2006/03/10 00:28:02  arno
+% remove ref to etc field
+%
 % Revision 1.11  2006/03/09 20:19:26  scott
 % help msg
 %
@@ -381,7 +384,7 @@ for ci = 1 : length(comp_ind) %for each comp
         if ~isfield(STUDY.cluster(cls).centroid, 'erp')
             STUDY = std_centroid(STUDY,ALLEEG, cls, 'erp');
         end
-        [erp, t] = std_readerp(ALLEEG, abset, comp);
+        [erp, t] = std_readerp(ALLEEG, abset, comp, STUDY.preclust.erpclusttimes);
         % Change polarity to be similar across conditions
         % (using the ERP centroid).
         if (n == 1) & (Ncond > 1)
