@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.190  2006/03/10 20:30:41  arno
+% do not recompute icawinv automatically
+%
 % Revision 1.189  2006/03/10 19:02:22  arno
 % using pop_loadset to load data
 %
@@ -776,7 +779,9 @@ if length(EEG) > 1
             else
                 [TMP, res] = eeg_checkset(EEG(index));
             end;
+            tmpsaved = TMP.saved;
             [EEG TMP] = eeg_store(EEG, TMP, index);
+            EEG(index).saved = tmpsaved;
         end;
     end;
     return;
