@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2006/01/31 20:57:12  arno
+% fixing history
+%
 % Revision 1.6  2006/01/31 20:51:45  arno
 % eeglab options
 %
@@ -74,8 +77,8 @@ function [EEG, com] = eeg_eval( funcname, EEG, varargin);
     
     % warning pop up
     % --------------
+    eeglab_options;
     if strcmpi(g.warning, 'on')
-        eeglab_options;
         if ~option_storedisk
             res = questdlg2(strvcat( 'When processing multiple datasets, it is not', ...
                                  'possible to enter new names for the newly created', ...
@@ -109,8 +112,10 @@ function [EEG, com] = eeg_eval( funcname, EEG, varargin);
         if v(1) == '5', eval(command);                      % Matlab 5
         else            TMPEEG = feval(func, TMPEEG, g.params{:}); % Matlab 6 and higher
         end;
-        TMPEEG = eeg_checkset(TMPEEG, 'savedata');
-        NEWEEG = eeg_store(NEWEEG, TMPEEG, i);
+        [NEWEEG, TMPEEG] = eeg_store(NEWEEG, TMPEEG, i);
+        if option_storedisk
+            TMPEEG = pop_saveset(TMPEEG, 'savemode', 'resave');
+        end;
     end;
     EEG = NEWEEG;
 
