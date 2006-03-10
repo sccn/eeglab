@@ -62,6 +62,10 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2006/03/10 16:00:00  arno
+% reading ERP
+% ./
+%
 % Revision 1.15  2006/03/10 15:56:04  arno
 % changing log and var name
 %
@@ -230,7 +234,7 @@ if itcC | erspC | specC | erpC | scalpC
                         end
                     end
                     if specC %spec centroid
-                        [spec, f] = std_readspec(ALLEEG, abset, comp, 'm');
+                        [spec, f] = std_readspec(ALLEEG, abset, comp, STUDY.preclust.specclustfreqs);
                         fprintf('.');
                         if isempty(spec)
                             return;
