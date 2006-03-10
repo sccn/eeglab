@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.78  2006/03/10 21:32:27  arno
+% change saved statust
+%
 % Revision 1.77  2006/03/10 21:30:09  arno
 % same
 %
@@ -362,7 +365,7 @@ if strcmpi(g.savemode, 'resave')
         return;
     end;
     
-    if strcmpi( EEG.saved, 'yes'), return; end;
+    if strcmpi( EEG.saved, 'yes'), disp('Dataset has not been modified; No need to resave it.'); return; end;
     g.filename = EEG.filename;
     g.filepath = EEG.filepath;
     if isfield(EEG, 'datfile')
