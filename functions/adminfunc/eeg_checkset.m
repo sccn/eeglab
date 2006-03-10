@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.188  2006/03/07 17:47:39  arno
+% automatically recomputing EEG.icawinv
+%
 % Revision 1.187  2006/03/03 22:55:50  arno
 % nothing
 %
@@ -1128,7 +1131,7 @@ if isstr(EEG.data) & nargin > 1
 
         if strcmpi(EEG.data, 'in set file')
             filename = fullfile(EEG.filepath, EEG.filename);
-            EEG = load('-mat', filename); EEG = EEG.EEG;
+            EEG = pop_loadset(filename);
         else
             % opening data file
             % -----------------
