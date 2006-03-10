@@ -144,7 +144,7 @@ if strcmpi(mode, 'comps')
             sbplot(rowcols(1),rowcols(2),[1 rowcols(2)+2 ]) ,
             ave_itc = STUDY.cluster(cls(clus)).centroid.itc{n};
             %lim = STUDY.cluster(cls(clus)).centroid.itc_limits{n}; %plotting limits
-            logfreqs  = log(STUDY.cluster(cls(clus)).centroid.itc_logf);
+            logfreqs  = log(STUDY.cluster(cls(clus)).centroid.itc_freqs);
             itc_times = STUDY.cluster(cls(clus)).centroid.itc_times;
             a = [ STUDY.cluster(cls(clus)).name ' average ITC, ' num2str(length(unique(STUDY.cluster(cls(clus)).sets(1,:)))) 'Ss' ];
             tftopo(abs(ave_itc),itc_times,logfreqs,'limits', [itc_times(1) itc_times(end) logfreqs(1) logfreqs(end) -.5 .5],...
@@ -260,7 +260,7 @@ if strcmpi(mode, 'centroid')
                     ave_itc = ave_itc + STUDY.cluster(cls(k)).centroid.itc{n}/Ncond;
                 end;
             end;
-            logfreqs = log(STUDY.cluster(cls(k)).centroid.itc_logf);
+            logfreqs = log(STUDY.cluster(cls(k)).centroid.itc_freqs);
             timevals = STUDY.cluster(cls(k)).centroid.itc_times;
             tftopo(abs(ave_itc), timevals, logfreqs,'limits', [timevals(1) timevals(end) logfreqs(1) logfreqs(end) -maxval maxval],...
                    'title', 'Average ITC', 'verbose', 'off');
@@ -280,7 +280,7 @@ if strcmpi(mode, 'centroid')
                sbplot(rowcols(1),rowcols(2),(k-1)*Ncond+n), 
                a = [ STUDY.cluster(cls(k)).name ' ITC, ' num2str(length(unique(STUDY.cluster(cls(k)).sets(1,:)))) 'Ss, ' STUDY.condition{n}];
                ave_itc  = STUDY.cluster(cls(k)).centroid.itc{n};
-               logfreqs = log(STUDY.cluster(cls(k)).centroid.itc_logf);
+               logfreqs = log(STUDY.cluster(cls(k)).centroid.itc_freqs);
                timevals = STUDY.cluster(cls(k)).centroid.itc_times;
                tftopo(abs(ave_itc),timevals,logfreqs,'limits', ...
                       [timevals(1) timevals(end) logfreqs(1) logfreqs(end) -maxval maxval],...

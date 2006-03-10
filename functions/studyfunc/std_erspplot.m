@@ -62,6 +62,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2006/03/10 15:53:11  arno
+% using log frequencies
+%
 % Revision 1.14  2006/03/09 23:28:07  arno
 % implement new ERSP from Matlab and different structure ec...
 %
@@ -187,7 +190,7 @@ if strcmpi(mode, 'comps')
             
             idat = STUDY.datasetinfo(STUDY.setind(1,STUDY.cluster(cls(clus)).sets(1,1))).index;
 
-            logfreqs   = log(STUDY.cluster(cls(clus)).centroid.ersp_logf);
+            logfreqs   = log(STUDY.cluster(cls(clus)).centroid.ersp_freqs);
             ersp_times = STUDY.cluster(cls(clus)).centroid.ersp_times;
             a = [ STUDY.cluster(cls(clus)).name ' average ERSP, ' num2str(length(unique(STUDY.cluster(cls(clus)).sets(1,:)))) 'Ss' ];
             tftopo(ave_ersp,ersp_times,logfreqs,'limits', [ersp_times(1) ersp_times(end) logfreqs(1) logfreqs(end)],...
@@ -300,7 +303,7 @@ if strcmpi(mode, 'centroid')
                     ave_ersp = ave_ersp + STUDY.cluster(cls(k)).centroid.ersp{n}/Ncond;
                 end;
             end;
-            logfreqs = log(STUDY.cluster(cls(k)).centroid.ersp_logf);
+            logfreqs = log(STUDY.cluster(cls(k)).centroid.ersp_freqs);
             tftopo(ave_ersp,timevals,logfreqs,'limits', [timevals(1) timevals(end) logfreqs(1) logfreqs(end) -maxval maxval],...
                    'title', 'Average ERSP', 'verbose', 'off');
             ft = str2num(get(gca,'yticklabel'));
@@ -319,7 +322,7 @@ if strcmpi(mode, 'centroid')
                 sbplot(rowcols(1),rowcols(2),(k-1)*Ncond+n), 
                 a = [ STUDY.cluster(cls(k)).name ' ERSP, ' num2str(length(unique(STUDY.cluster(cls(k)).sets(1,:)))) 'Ss, ' STUDY.condition{n}];
                 ave_ersp = STUDY.cluster(cls(k)).centroid.ersp{n};
-                logfreqs = log(STUDY.cluster(cls(k)).centroid.ersp_logf);
+                logfreqs = log(STUDY.cluster(cls(k)).centroid.ersp_freqs);
                 timevals = STUDY.cluster(cls(k)).centroid.ersp_times;
                 tftopo(ave_ersp,timevals,logfreqs,'limits', [timevals(1) timevals(end) logfreqs(1) logfreqs(end) -maxval maxval],...
                        'title', a, 'verbose', 'off');
