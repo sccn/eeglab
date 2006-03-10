@@ -128,6 +128,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2006/03/10 17:04:20  arno
+% remove mean for spectrum
+%
 % Revision 1.32  2006/03/10 16:55:16  arno
 % revision 1.30
 %
@@ -579,6 +582,8 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, components
                          frequencies = [ frequencies; con_f];
                      end
                      data = [ data; con_data ];
+                     data = data - repmat(mean(data,2), [1 size(data,2)]);
+                     data = data - repmat(mean(data,1), [size(data,1) 1]);
                      clear f X con_f con_data tmp;  
                  end               
                  
@@ -677,13 +682,6 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, components
             
         end; % end scan datasets
 
-        % remove grand mean for spectrum
-        % ------------------------------
-        if strcmpi(strcom, 'spec')
-            data = data - repmat(mean(data,2), [1 size(data,2)]);
-            data = data - repmat(mean(data,1), [size(data,1) 1]);
-        end;
-        
         % adjust number of PCA values
         % ---------------------------
         if isnan(npca), npca = 5; end; % default number of components
