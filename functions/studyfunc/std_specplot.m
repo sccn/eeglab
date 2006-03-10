@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2006/03/10 16:28:07  arno
+% reading spectrum
+%
 % Revision 1.12  2006/03/10 00:21:18  arno
 % removing reference to etc field
 %
@@ -245,13 +248,13 @@ if strcmpi(mode, 'centroid')
                 set(gcf,'Color', BACKCOLOR);
                 set(gca,'UserData', leg_color);
                 set(gcf,'UserData', leg_color);
-                axis([f(1) f(end) -10 20]);
+                xlim([f(1) f(end)]);
                 axcopy(gcf, 'leg_color = get(gca,''''UserData'''') ; legend(leg_color); xlabel(''''Frequency [Hz]'''');ylabel(''''Power [dB]'''') ;');
                 if figureon
                     waitbar(k/len,h_wait);
                 end
             end
-            if (k == len) & (n == Ncond)
+            if mod(k, rowcols(2)) == 1 & (floor(k/rowcols(2)) == rowcols(1)-1) & (n == Ncond)
                 xlabel('Frequency [Hz]');
                 ylabel('Power [dB]');
                 if len ~= 1
@@ -266,12 +269,12 @@ if strcmpi(mode, 'centroid')
                 ylim( [ min_spec - 0.1*diff_spec max_spec + 0.1*diff_spec]);
                 set(gcf,'Color', BACKCOLOR);
                 legend(leg_color);
-                if figureon
-                    delete(h_wait);
-                end
             end
         end % finished the different conditions
     end % finished all clusters 
+    if figureon
+        delete(h_wait);
+    end
 end % finished 'centroid' plot mode
 
 % std_plotcompspec() - Commandline function, to visualizing cluster component spectra. 
