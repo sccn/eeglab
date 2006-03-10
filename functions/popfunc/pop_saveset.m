@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.77  2006/03/10 21:30:09  arno
+% same
+%
 % Revision 1.76  2006/03/10 21:29:17  arno
 % resave of multiple datasets
 %
@@ -353,6 +356,9 @@ if strcmpi(g.savemode, 'resave')
     % -------------------------
     if length(EEG) > 1
         [ EEG com ] = eeg_eval( 'pop_saveset', EEG, 'warning', 'off', 'params', { 'savemode', 'resave' } );
+        for index = 1:length(EEG)
+            EEG(index).saved = 'yes';
+        end;
         return;
     end;
     
