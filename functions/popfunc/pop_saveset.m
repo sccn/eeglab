@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.75  2006/03/06 23:16:06  arno
+% nothing
+%
 % Revision 1.74  2006/03/03 00:17:14  arno
 % recovering EEG.data variable
 %
@@ -346,8 +349,7 @@ if strcmpi(g.savemode, 'resave')
     % process multiple datasets
     % -------------------------
     if length(EEG) > 1
-        [ EEG com ] = eeg_eval( 'pop_saveset', EEG, 'warning', 'off', 'params', ...
-                                options );
+        [ EEG com ] = eeg_eval( 'pop_saveset', EEG, 'savemode', 'resave' );
         return;
     end;
     
@@ -444,6 +446,7 @@ end;
 if isnumeric(EEG.data) & v(1) < 7
     EEG.data   = double(reshape(tmpdata, EEG.nbchan,  EEG.pnts, EEG.trials));
 end;
+EEG.saved = 'yes';
 
 com = sprintf('%s = pop_saveset( %s, %s);', inputname(1), inputname(1), vararg2str(options));
 return;
