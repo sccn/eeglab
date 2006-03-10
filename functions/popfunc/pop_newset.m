@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.66  2006/03/10 21:51:28  arno
+% fixing retreive
+%
 % Revision 1.65  2006/03/10 21:40:35  arno
 % nothing
 %
@@ -418,8 +421,8 @@ elseif length(varargin) == 0 & length(EEG) == 1 % if several arguments, assign v
             shift    = 3;
         elseif ~save_retrieve % just loaded from disk
             
-            % remove data from file
-            % ---------------------
+            % remove data from file for old dataset
+            % -------------------------------------
             if option_storedisk & ~isempty(ALLEEG) & OLDSET ~= 0
                 ALLEEG(OLDSET) = update_datafield(ALLEEG(OLDSET));
             end;
@@ -462,11 +465,13 @@ elseif length(varargin) == 0 & length(EEG) == 1 % if several arguments, assign v
             if ~strcmp(EEG.setname, result{1} )       
                 args = { 'setname', result{1} };
             end;
-            if result{2} 
-                if ~isempty(result{3}) 
-                    args = { args{:} 'savenew', result{3} };
-                else
-                    disp('Warning: no file name given for new dataset (the dataset will not be saved on disk)');
+            if length(result) > 1
+                if result{2} 
+                    if ~isempty(result{3}) 
+                        args = { args{:} 'savenew', result{3} };
+                    else
+                        disp('Warning: no file name given for new dataset (the dataset will not be saved on disk)');
+                    end;
                 end;
             end;
             if ~strcmp(EEG.comments, userdat)
