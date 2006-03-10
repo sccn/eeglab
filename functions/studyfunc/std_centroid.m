@@ -1,43 +1,44 @@
-% std_centroid() - compute clusters centroid in EEGLAB dataset STUDY.
-%                          Compute and store the averege (centroid) for
-%                          specific clusters or for all clusters in STUDY.
-%                          You can compute one or some of the 6 optional
-%                          avereges: Scalp map, ERP, Spectra, ERSP , ITC, dipole. 
 %
+% std_centroid() - compute cluster centroid in EEGLAB dataset STUDY.
+%                  Compute and store the centroid(s) (i.e., mean(s)) 
+%                  for some combination of six measures on specified
+%                  clusters in a STUDY. Possible measures include:
+%                  scalp_maps, ERPs, spectra, ERSPs, ITCs, dipole_locations
 % Usage:    
-%   >> [STUDY, centroid] = std_centroid(STUDY, ALLEEG, clsind, ctr1, ctr2, ...);
+%        >> [STUDY, centroid] = std_centroid(STUDY, ALLEEG, clsind, ctr1, ctr2, ...);
 %
 % Inputs:
 %   STUDY        - an eeglab STUDY set (that contains some of these EEGs structures)
 %   ALLEEG       - ALLEEG data structure, can also be one EEG dataset structure.
-%   clsind         - [vector], cluster indices. Compute centroids only for
-%                        indicated clusters. 
-%                        If left empty compute centroids for all clusters in STUDY.
-%   ctrX            - ['erp'|'spec'|'scalp'|'dipole'|'itc'|'ersp'].   
-%                      * The field/s to calculate the mean of each cluster.
-%                      * 'erp'   -  the mean ERP of each cluster.
-%                      * 'dipole'  - the mean dipole of each cluster.
-%                      * 'spec' - the mean spectra of each cluster (with the baseline removed).
-%                      * 'scalp' - the mean topoplot scalp map of each cluster.
-%                      * 'ersp'  - the mean ERSP of each cluster. 
-%                      * 'itc'  - the mean ITC of each cluster. 
-%                      If left empty re-compute the centroid for whatever mean centroid was already in the cluster.  
-%
+%   clusters     - [vector], cluster indices. Compute centroids only for specified 
+%                  clusters. If [], compute centroids for all STUDY clusters. 
+%   measures     - ['erp'|'spec'|'scalp'|'dipole'|'itc'|'ersp'].   
+%                  The measures(s) for which to calculate the cluster centroid(s):
+%                     'erp'   -  mean ERP of each cluster.
+%                     'dipole' - mean dipole of each cluster.
+%                     'spec'  -  mean spectrum of each cluster (baseline removed).
+%                     'scalp' -  mean topoplot scalp map of each cluster.
+%                     'ersp'  -  mean ERSP of each cluster. 
+%                     'itc'   -  mean ITC of each cluster. 
+%                  If [], re-compute the centroid for whichever centroids 
+%                  had previously been computed.
 % Outputs:
-%   STUDY        - the STUDY structure updated with centroids. If centroids
-%                        already exist, will overwite them. 
-%   centroid     - a cell array of centroid structures, each cell corraspond to a different cluster requested in clsind.
-%
+%   STUDY        - input STUDY structure with computed centroids added. 
+%                  If the requested centroids already exist, overwites them. 
+%   centroid     - cell array of centroid structures, each cell corrasponding 
+%                  to a different cluster requested in 'clusters' (above).
+%                  fields of 'centroid' may include centroid.erp, centroid.dipole,
+%                  etc (as above).
 % Examples:
 %   >> [STUDY, centroid] = std_centroid(STUDY, ALLEEG,[], 'scalp'); 
-%   % For each of the clusters in STUDY an average scalp map is computed. 
-%   % The centroids are saved in the STUDY structure under
-%   % STUDY.cluster(k).centroid.scalp. The centroids are also returned in a
-%   % cell array the size of the clusters (stored in: centroid(k).scalp).
+%   % For each of the clusters in STUDY, compute a mean scalp map.
+%   % The centroids are saved in the STUDY structure as entries in array
+%   % STUDY.cluster(k).centroid.scalp. The centroids are also returned in 
+%   % a cell array the size of the clusters (i.e., in: centroid(k).scalp).
 %
 %   >> [STUDY, centroid] = std_centroid(STUDY, ALLEEG,5,'spec','scalp'); 
-%   % Same as before but now compute the centroid of cluster 5 only. The centroid has 2 fields one for 
-%   % spectrum the other for scalp map.
+%   % Same as above, but now compute only two centroids for cluster 5. 
+%   % The returned 'centroid' has 2 fields: centroid.scalp and centroid.spec
 %
 % Authors: Hilit Serby & Arnaud Delorme, SCCN, INC, UCSD, Feb 03, 2005
 
@@ -62,6 +63,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2006/03/09 23:48:43  arno
+% fix new file format
+%
 % Revision 1.12  2006/03/09 23:31:29  arno
 % log of frequencies
 %
