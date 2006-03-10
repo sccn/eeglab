@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2006/03/10 20:56:37  arno
+% fixing new eeg
+%
 % Revision 1.10  2006/03/10 20:49:30  arno
 % set saved to 'no'
 %
@@ -128,6 +131,9 @@ function [EEG, com] = eeg_eval( funcname, EEG, varargin);
             TMPEEG = update_datafield(TMPEEG);
         end;
         NEWEEG = eeg_store(NEWEEG, TMPEEG, i);
+        if option_storedisk
+            NEWEEG(i).saved = 'yes'; % eeg_store by default set it to no
+        end;
     end;
     EEG = NEWEEG;
 
