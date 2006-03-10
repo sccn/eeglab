@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.63  2006/03/10 21:21:18  arno
+% same
+%
 % Revision 1.62  2006/03/10 21:20:01  arno
 % saving new datasets
 %
@@ -248,7 +251,7 @@ eeglab_options;
 if length(EEG) > 1
     % cases when length(EEG) > 1: when retreiving a dataset and before several datasets were processed (NEWSET non empty)
     %                          2: when storing multiple datasets 
-    ALLEEG(OLDSET) = EEG;
+    [ALLEEG EEG] = eeg_store(ALLEEG, EEG, OLDSET);
     return;
     % canceling operation (not used)
     % -------------------
