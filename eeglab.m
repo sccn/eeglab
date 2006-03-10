@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.459  2006/03/08 21:28:22  arno
+% adding study path
+%
 % Revision 1.458  2006/03/06 22:29:14  arno
 % debug clear study
 %
@@ -2616,10 +2619,7 @@ if study_selected
     if strcmpi(chanconsist, 'yes')
         set( edit_m, 'enable', 'on');
         set( findobj('parent', edit_m, 'type', 'uimenu'), 'enable', 'off');
-        set( findobj('parent', edit_m, 'type', 'uimenu', 'label', 'Channel locations'), 'enable', 'on');
         set( findobj('parent', edit_m, 'type', 'uimenu', 'label', 'Select data'      ), 'enable', 'on');
-        set( findobj('parent', edit_m, 'type', 'uimenu', 'label', 'Append datasets'  ), 'enable', 'on');
-        set( findobj('parent', edit_m, 'type', 'uimenu', 'label', 'Delete dataset(s)'), 'enable', 'on');
     end;
     
 elseif (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG(1).data)        
