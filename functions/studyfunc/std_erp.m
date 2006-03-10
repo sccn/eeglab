@@ -10,7 +10,7 @@
 %               EEG sub-structure EEG.etc, to which is added a pointer to the 
 %               ERP float file and some information about it. 
 % Usage:    
-%            >> [EEG_etc, data, times] = std_erp(EEG,components,timewindow);  
+%            >> [data, times] = std_erp(EEG,components,timewindow);  
 % Inputs:
 %   EEG          - a loaded epoched EEG dataset structure. 
 %   components   - [numeric vector] components of the EEG structure for which 
@@ -18,10 +18,6 @@
 %   timewindow   - [minms maxms] latency window limits (in ms) within which to 
 %                      compute ERPs {default|[]: [EEG.minms EEGmaxms]}
 % Outputs:
-%   EEG_etc      - the EEG dataset .etc sub-structure (i.e., EEG.etc), to which 
-%                      is added an ERP file pointer plus some information about
-%                      the float file that holds the component ERP information.
-%                      If the ERP file already exists, this output will be empty. 
 %   data         - ERP for the requested ICA components in the selected 
 %                     latency window. 
 %   times        - a vector of epoch latencies at which the ERPs are computed. 
@@ -52,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2006/03/09 18:52:58  arno
+% saving ERP to float file
+%
 % Revision 1.18  2006/03/08 22:24:37  scott
 % help msg  -sm
 %

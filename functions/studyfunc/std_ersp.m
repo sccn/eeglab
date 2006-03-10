@@ -22,7 +22,7 @@
 %              separately, as well as the EEG.etc sub-structure modified with pointers 
 %              to the output float files and some information about them. 
 % Usage:  
-%              >> [EEG_etc X times logfreqs ] = std_ersp(EEG, components,  ...
+%              >> [X times logfreqs ] = std_ersp(EEG, components,  ...
 %                                                    freqrange, timewindow,  ...
 %                                                         cycles, padratio, alpha,...
 %                                                              type, powbase);
@@ -54,12 +54,6 @@
 %                 same parameters as above) to use in the timef() computation 
 %                 {default|[] -> pre-time 0}
 % Outputs:
-%
-%   EEG_etc   - the EEG dataset .etc sub-structure (i.e. EEG.etc), which is
-%               modified with the output filenames and some information about
-%               the float files that hold the dataset ERSP and/or ITC  
-%               information. If an ERSP/ITC file already exists and wasn't
-%               recomputed and this output will be empty. 
 %   X         - the masked log ERSP/ITC of the requested ICA components in the 
 %               selected frequency and time range. 
 %   times     - a vector of time points for which the ERSPs/ITCs were computed. 
@@ -74,7 +68,7 @@
 %            % use three-cycle wavelets (at 3 Hz) to >3-cycle wavelets at 50 Hz
 %            % use probability masking at p < 0.01, padratio 4. See >> timef details
 %            % returns log-freq spaced, probability-masked Xersp
-%            >> [EEG_etc, Xersp, times, logfreqs] = std_ersp(EEG, ...
+%            >> [Xersp, times, logfreqs] = std_ersp(EEG, ...
 %                                                    [1:size(EEG.icawinv,2)],...
 %                                                     [3 50], [3 0.5], 4, 0.01, 'ersp');
 %
@@ -101,6 +95,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2006/03/09 23:29:21  arno
+% implement new ERSP from Matlab and different structure ec...
+%
 % Revision 1.22  2006/03/09 00:37:55  arno
 % nothing yet
 %
