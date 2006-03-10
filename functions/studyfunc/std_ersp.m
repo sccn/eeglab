@@ -95,6 +95,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2006/03/10 00:30:55  arno
+% update header
+%
 % Revision 1.23  2006/03/09 23:29:21  arno
 % implement new ERSP from Matlab and different structure ec...
 %
@@ -266,11 +269,11 @@ for k = 1:length(comps)  % for each (specified) component
         logiboot = [];
     end;
 
-    all_ersp = setfield( all_ersp, [ 'comp' int2str(comps(k)) '_ersp'     ], logersp );
-    all_ersp = setfield( all_ersp, [ 'comp' int2str(comps(k)) '_erspbase' ], logbase );
-    all_ersp = setfield( all_ersp, [ 'comp' int2str(comps(k)) '_erspboot' ], logeboot);
-    all_itc  = setfield( all_itc , [ 'comp' int2str(comps(k)) '_itc'      ], logitc  );
-    all_itc  = setfield( all_itc , [ 'comp' int2str(comps(k)) '_itcboot'  ], logiboot);
+    all_ersp = setfield( all_ersp, [ 'comp' int2str(comps(k)) '_ersp'     ], single(logersp ));
+    all_ersp = setfield( all_ersp, [ 'comp' int2str(comps(k)) '_erspbase' ], single(logbase ));
+    all_ersp = setfield( all_ersp, [ 'comp' int2str(comps(k)) '_erspboot' ], single(logeboot));
+    all_itc  = setfield( all_itc , [ 'comp' int2str(comps(k)) '_itc'      ], single(logitc  ));
+    all_itc  = setfield( all_itc , [ 'comp' int2str(comps(k)) '_itcboot'  ], single(logiboot));
     
 end
 
