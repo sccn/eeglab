@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2006/03/10 23:33:48  arno
+% GUI wording
+%
 % Revision 1.8  2005/04/08 23:09:05  arno
 % fix defaultconstraint
 %
@@ -369,21 +372,20 @@ elseif nargin>=3
       end
       dipfitdefs;
       if get(findobj(parent, 'tag', 'dip2sym'), 'value') & get(findobj(parent, 'tag', 'dip2sel'), 'value')
-          cfg.symmetry = 'y';
-          if ~isempty(EEG.chaninfo)
-              if isfield(EEG.chaninfo, 'nosedir')
-                  if lower(EEG.chaninfo.nosedir(2)) == 'y'
-                      cfg.symmetry = 'x';
-                  end;
-              end;
+          if strcmpi(EEG.dipfit.coordformat,'MNI')
+              cfg.symmetry = 'x';
+          else
+              cfg.symmetry = 'y';
           end;
       else
           cfg.symmetry = [];
       end
+      
       cfg.component  = current;
       % convert structure into list of input arguments
       arg = [fieldnames(cfg)' ; struct2cell(cfg)']; 
       arg = arg(:)';
+      
       % make a dialog to interrupt the fitting procedure
       fig = figure('visible', 'off');
       supergui( fig, {1 1}, [], ...

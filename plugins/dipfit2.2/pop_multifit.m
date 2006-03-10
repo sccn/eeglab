@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2006/01/19 22:11:39  arno
+% same
+%
 % Revision 1.16  2006/01/19 22:10:37  arno
 % dipfit settings
 %
@@ -259,13 +262,10 @@ function [EEG, com] = pop_multifit(EEG, comps, varargin);
    
     % set symetry constraint
     % ----------------------
-    defaultconstraint = 'y';
-    if ~isempty(EEG.chaninfo)
-        if isfield(EEG.chaninfo, 'nosedir')
-            if lower(EEG.chaninfo.nosedir(2)) == 'y'
-                defaultconstraint = 'x';
-            end;
-        end;
+    if strcmpi(EEG.dipfit.coordformat,'MNI')
+        defaultconstraint = 'x';
+    else
+        defaultconstraint = 'y';
     end;
     
     % Searching dipole localization
