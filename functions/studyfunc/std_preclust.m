@@ -128,6 +128,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2006/03/10 18:21:27  arno
+% erase centroid
+%
 % Revision 1.34  2006/03/10 17:43:45  arno
 % do not remove grand mean for spectrum
 %
@@ -417,7 +420,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, components
         abso = 1;
         cycles = 0;
         padratio  = 1;
-        alpha = 0.01;
+        alpha = NaN;
         fun_arg = [];
         for subind = 2:2:length(varargin{index})
             switch varargin{index}{subind}
