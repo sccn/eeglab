@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.463  2006/03/10 20:10:39  arno
+% smae
+%
 % Revision 1.462  2006/03/10 20:10:06  arno
 % disable edit menu when study loaded
 %
@@ -2639,6 +2642,7 @@ if study_selected
     set( findobj('parent', file_m, 'type', 'uimenu'), 'enable', 'off');
     set( findobj('parent', tool_m, 'type', 'uimenu', 'label', 'Run ICA')        , 'enable', 'on');
     set( findobj('parent', tool_m, 'type', 'uimenu', 'label', 'Filter the data'), 'enable', 'on');
+    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Save current dataset(s)' ), 'enable', 'on');
     set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Load existing study'     ), 'enable', 'on');
     set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Save current study'      ), 'enable', 'on');
     set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Save current study as'   ), 'enable', 'on');
