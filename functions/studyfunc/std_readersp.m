@@ -1,4 +1,3 @@
-%
 % std_readersp() - Given the ALLEEG structure, a specific EEG dataset index, 
 %                  and a specific component, return the mean log-frequency scaled 
 %                  ERSP for a specified ICA component. The ERSP of the dataset ICA 
@@ -51,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2006/03/10 03:25:32  scott
+% help msg -- ARNO, please check  -sm
+%
 % Revision 1.6  2006/03/10 00:39:39  arno
 % error msg
 %
@@ -80,22 +82,22 @@ for k = 1: length(abset)
     params    = struct(tmpersp.parameters{:});
     params.times = tmpersp.times;
     params.freqs = tmpersp.freqs;
+    tlen         = length(tmpersp.times);
+    flen         = length(tmpersp.freqs);
     if isempty(comp)
         logersp   = [];
         logfreqs  = [];
         timevals  = [];
         return;
     end;
-    tmpersp   = load( '-mat', filename, ...
+    tmp2ersp   = load( '-mat', filename, ...
                      [ 'comp' int2str(comp) '_ersp'], ...
                      [ 'comp' int2str(comp) '_erspbase'], ...
                      [ 'comp' int2str(comp) '_erspboot']);
     
-    tlen      = length(tmpersp.times);
-    flen      = length(tmpersp.freqs);
-    erspall{k}     = getfield(tmpersp, [ 'comp' int2str(comp) '_ersp']);
-    erspallboot{k} = getfield(tmpersp, [ 'comp' int2str(comp) '_erspboot']);
-    erspallbase{k} = getfield(tmpersp, [ 'comp' int2str(comp) '_erspbase']);
+    erspall{k}     = double(getfield(tmpersp2, [ 'comp' int2str(comp) '_ersp']));
+    erspallboot{k} = double(getfield(tmpersp2, [ 'comp' int2str(comp) '_erspboot']));
+    erspallbase{k} = double(getfield(tmpersp2, [ 'comp' int2str(comp) '_erspbase']));
 
 end
 
