@@ -128,6 +128,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2006/03/10 16:55:16  arno
+% revision 1.30
+%
 % Revision 1.30  2006/03/10 16:25:30  arno
 % new call for ERP and SPEC
 %
@@ -673,6 +676,13 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, components
 
             
         end; % end scan datasets
+
+        % remove grand mean for spectrum
+        % ------------------------------
+        if strcmpi(strcom, 'spec')
+            data = data - repmat(mean(data,2), [1 size(data,2)]);
+            data = data - repmat(mean(data,1), [size(data,1) 1]);
+        end;
         
         % adjust number of PCA values
         % ---------------------------
