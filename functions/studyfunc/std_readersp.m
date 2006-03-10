@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2006/03/10 15:49:19  arno
+% fix reading ERSP
+%
 % Revision 1.7  2006/03/10 03:25:32  scott
 % help msg -- ARNO, please check  -sm
 %
@@ -90,7 +93,7 @@ for k = 1: length(abset)
         timevals  = [];
         return;
     end;
-    tmp2ersp   = load( '-mat', filename, ...
+    tmpersp2   = load( '-mat', filename, ...
                      [ 'comp' int2str(comp) '_ersp'], ...
                      [ 'comp' int2str(comp) '_erspbase'], ...
                      [ 'comp' int2str(comp) '_erspboot']);
