@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2006/03/10 16:16:50  arno
+% reading ERPs
+%
 % Revision 1.12  2006/03/10 00:28:02  arno
 % remove ref to etc field
 %
@@ -399,7 +402,7 @@ for ci = 1 : length(comp_ind) %for each comp
             Avepol = 1;
         end
         ave_erp = STUDY.cluster(cls).centroid.erp{n};
-        [erp tmp] = comppol([erp Avepol(n)*ave_erp]);
+        [erp tmp] = comppol([erp' Avepol(n)*ave_erp]);
         plot(t,erp,'c');
         plot(t,Avepol(n)*ave_erp,'k','linewidth',2);
         xlabel('t [ms]');
