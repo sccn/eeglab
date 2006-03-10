@@ -109,6 +109,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.114  2006/03/04 03:29:08  scott
+% rm'd extra 'end' < 1013   -Scott
+%
 % Revision 1.113  2006/03/02 18:55:06  scott
 % simplified topoplot code; removed ?? 'else'  -sm
 %
@@ -1350,7 +1353,7 @@ if strcmpi(g.dispmaps, 'on')
         axes(axt)                             % topoplot axes
         cla
         
-        if ~isempty(chanlocs)  % plot the component scalp maps
+        if ~isempty(g.chanlocs)  % plot the component scalp maps
             figure(myfig);
             if ~isempty(varargin)
                 topoplot(maxproj(g.plotchans,t),g.chanlocs(g.plotchans), varargin{:});
