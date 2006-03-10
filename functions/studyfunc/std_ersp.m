@@ -95,6 +95,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2006/03/10 15:50:07  arno
+% converting values to single
+%
 % Revision 1.24  2006/03/10 00:30:55  arno
 % update header
 %
@@ -241,6 +244,7 @@ if time_range(1) >= time_range(2)
 end
 parameters = { 'cycles' cycles ,'type', 'phasecoher',  'plotersp', 'off', 'plotitc', 'off', ...
                'padratio', padratio, 'plotphase', 'off', 'winsize', winsize, 'alpha', alpha };
+adfdsds
 
 % Compute ERSP & ITC
 % ------------------
