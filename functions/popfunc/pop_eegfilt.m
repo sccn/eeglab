@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2005/10/11 16:20:45  arno
+% warning for bandpass
+%
 % Revision 1.29  2005/09/10 00:44:35  arno
 % adding multiple dataset capabilities
 %
@@ -201,7 +204,7 @@ if length(EEG) > 1
     return;
 end;
 
-options = { EEG.srate, locutoff, hicutoff, EEG.pnts };
+options = { EEG.srate, locutoff, hicutoff };
 if ~isempty( filtorder )
 	options = { options{:} filtorder };
 else 
