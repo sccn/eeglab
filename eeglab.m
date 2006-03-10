@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.462  2006/03/10 20:10:06  arno
+% disable edit menu when study loaded
+%
 % Revision 1.461  2006/03/10 20:07:44  arno
 % check consistency with loaded datasets
 %
@@ -2646,11 +2649,11 @@ if study_selected
     
     % enable specific menus
     % ---------------------
-    if strcmpi(chanconsist, 'yes')
-        set( edit_m, 'enable', 'on');
-        set( findobj('parent', edit_m, 'type', 'uimenu'), 'enable', 'off');
-        set( findobj('parent', edit_m, 'type', 'uimenu', 'label', 'Select data'      ), 'enable', 'on');
-    end;
+    %if strcmpi(chanconsist, 'yes')
+    %    set( edit_m, 'enable', 'on');
+    %    set( findobj('parent', edit_m, 'type', 'uimenu'), 'enable', 'off');
+    %    set( findobj('parent', edit_m, 'type', 'uimenu', 'label', 'Select data'      ), 'enable', 'on');
+    %end;
     
 elseif (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG(1).data)        
     hh = findobj('parent', gcf, 'userdata', 'fullline'); set(hh, 'visible', 'off');
