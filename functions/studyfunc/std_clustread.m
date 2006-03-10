@@ -39,7 +39,7 @@ for k = 1:len
             if nargin < 5
                 error('Reading cluster spectrum requires condition number');
             end
-            [spec, f] = std_readspec(ALLEEG, abset, comp, 'm');
+            [spec, f] = std_readspec(ALLEEG, abset, comp, STUDY.preclust.specclustfreqs);
             if  k == 1
                 clusinfo.spec = zeros(len,length(spec));
                 clusinfo.f = f;
