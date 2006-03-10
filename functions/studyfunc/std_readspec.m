@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2006/03/10 00:37:45  arno
+% error msg
+%
 % Revision 1.8  2006/03/09 18:10:38  arno
 % *** empty log message ***
 %
@@ -72,21 +75,39 @@
 % use fullfile
 %
 
-function [spec, f] = std_readspec(ALLEEG, abset, comp, ext);
+function [X, f] = std_readspec(ALLEEG, abset, comp, freqrange);
     
-if nargin < 4
-    ext = '';
+X = [];
+filename = fullfile( ALLEEG(abset).filepath,[ ALLEEG(abset).filename(1:end-3) 'icaspec' ]);
+
+for k=1:length(comp)
+    try,
+        specstruct = load( '-mat', filename, [ 'comp' int2str(comp(k)) ], 'freqs' );
+    catch
+        error( [ 'Cannot read file ''' filename '''' ]);
+    end;
+
+    tmpdat    = getfield(specstruct, [ 'comp' int2str(comp(k)) ]);
+    if k == 1
+        X = zeros(length(comp), length(tmpdat));
+    end;
+    X(k,:)  = tmpdat;
+    f       = specstruct.freqs;
 end;
 
-spec = [];
-try,
-    filename = fullfile( ALLEEG(abset).filepath,[ ALLEEG(abset).filename(1:end-3) 'icaspec' ext]);
-catch
-    error( [ 'Cannot read file ''' filename '''' ]);
-end;
-   
-specstruct = load( '-mat', filename, [ 'comp' int2str(comp) ], 'freqs' );
-spec = getfield(specstruct, [ 'comp' int2str(comp) ]);
-f    = specstruct.freqs;
+% select frequency range of interest
+% ----------------------------------
+maxind = max(find(f <= freqrange(end)));
+minind = min(find(f >= freqrange(1)));
+f = f(minind:maxind);
+X = X(:,minind:maxind);
+%if f(end) < freqrange(end)
+%    disp(['Warning! Requested high frequency limit, ' ...
+%          num2str(freqrange(end)) 'Hz, is out of bounds.']);
+%end
+%if f(1) > freqrange(1)
+%    disp(['Warning! Requested low frequency limit, ' ...
+%          num2str(freqrange(1)) 'Hz, is out of bounds.']);
+%end
 
 return;
