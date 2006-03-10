@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2006/03/09 20:19:26  scott
+% help msg
+%
 % Revision 1.10  2006/03/08 21:02:18  arno
 % rename func
 %
@@ -378,15 +381,7 @@ for ci = 1 : length(comp_ind) %for each comp
         if ~isfield(STUDY.cluster(cls).centroid, 'erp')
             STUDY = std_centroid(STUDY,ALLEEG, cls, 'erp');
         end
-        if ~isfield(ALLEEG(abset).etc,'icaerpparams')
-            warndlg2([ 'Dataset ' ALLEEG(abset).filename ' has no ERP info, aborting'] , 'Abort - Plot ERP' ); 
-            return;
-        end
         [erp, t] = std_readerp(ALLEEG, abset, comp);
-        if isempty(erp)
-            warndlg2(['eeg_clustedit: file '  ALLEEG(abset).etc.icaerp ' was not found in path ' ALLEEG(abset).filepath], 'Abort - Plot ERP' ); 
-            return
-        end
         % Change polarity to be similar across conditions
         % (using the ERP centroid).
         if (n == 1) & (Ncond > 1)
