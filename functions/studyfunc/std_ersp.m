@@ -244,7 +244,6 @@ if time_range(1) >= time_range(2)
 end
 parameters = { 'cycles' cycles ,'type', 'phasecoher',  'plotersp', 'off', 'plotitc', 'off', ...
                'padratio', padratio, 'plotphase', 'off', 'winsize', winsize, 'alpha', alpha };
-adfdsds
 
 % Compute ERSP & ITC
 % ------------------
