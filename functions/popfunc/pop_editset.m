@@ -134,6 +134,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.51  2005/11/08 23:23:29  scott
+% help msg edits -sm
+%
 % Revision 1.50  2005/11/08 22:16:27  arno
 % editing GUI
 %
@@ -365,7 +368,7 @@ if nargin < 2                 % if several arguments, assign values
          { 'Style', 'pushbutton', 'string', 'Browse', 'callback', [ 'tagtest = ''chanfile'';' commandload ] }, ...
          ...
          { 'Style', 'text', 'string', ...
-           '      (note: autodetect file format using file extension; use menu "Edit > Channel locations" for more importing options)', ...
+           ' Note: The file format may be auto-detected from its file extension. See menu "Edit > Channel locations" for other options.', ...
            'horizontalalignment', 'right' }, ...
          ...
          { 'Style', 'text', 'string', 'ICA weights array or text/binary file (if any):', 'horizontalalignment', 'right' }, ...
@@ -455,8 +458,8 @@ for curfield = tmpfields'
                          if oldxmin ~= EEGOUT.xmin
                              if ~isempty(EEG.event)
                                  if nargin < 2
-                                     if ~popask( ['Warning: changing the starting point of epochs will' 10 'lead to recomputing epoch event latencies ?'] )
-                                         com = ''; warndlg2('Pop_editset: transformation cancelled by user'); return; 
+                                     if ~popask( ['Warning: changing the starting point of epochs will' 10 'lead to recomputing epoch event latencies, Continue?'] )
+                                         com = ''; warndlg2('pop_editset(): transformation cancelled by user'); return; 
                                      end;
                                  end;
                                  if isfield(EEG.event, 'latency')
@@ -471,10 +474,10 @@ for curfield = tmpfields'
                          if isempty(varname)
                              EEGOUT.chanlocs = [];
                          elseif isstr(varname) & exist( varname ) == 2
-                            fprintf('Pop_editset: channel locations file ''%s'' found\n', varname); 
+                            fprintf('pop_editset(): channel locations file ''%s'' found\n', varname); 
                             [ EEGOUT.chanlocs lab theta rad ind EEGOUT.chaninfo ] = readlocs(varname);
                          elseif isstr(varname)
-                            EEGOUT.chanlocs = evalin('base', varname, 'fprintf(''Pop_editset warning: variable ''''%s'''' not found, ignoring\n'', varname)' );
+                            EEGOUT.chanlocs = evalin('base', varname, 'fprintf(''pop_editset() warning: variable ''''%s'''' not found, ignoring\n'', varname)' );
                             if iscell(EEGOUT.chanlocs)
                                 if length(EEGOUT.chanlocs) > 1, EEGOUT.chaninfo   = EEGOUT.chanlocs{2}; end;
                                 if length(EEGOUT.chanlocs) > 2, EEGOUT.urchanlocs = EEGOUT.chanlocs{3}; end;
@@ -485,7 +488,7 @@ for curfield = tmpfields'
                          end;
         case 'icaweights', varname = getfield(g, {1}, curfield{1});
                          if isstr(varname) & exist( varname ) == 2
-                            fprintf('Pop_editset: ICA weight matrix file ''%s'' found\n', varname); 
+                            fprintf('pop_editset(): ICA weight matrix file ''%s'' found\n', varname); 
 							try, EEGOUT.icaweights = load(varname, '-ascii');
 								EEGOUT.icawinv = [];
                             catch, 
@@ -493,14 +496,14 @@ for curfield = tmpfields'
                                     EEGOUT.icaweights = floatread(varname, [1 Inf]);
                                     EEGOUT.icaweights = reshape( EEGOUT.icaweights, [length(EEGOUT.icaweights)/EEG.nbchan EEG.nbchan]);
                                 catch
-                                    fprintf('Pop_editset warning: error while reading filename ''%s'' for ICA weight matrix\n', varname); 
+                                    fprintf('pop_editset() warning: error while reading filename ''%s'' for ICA weight matrix\n', varname); 
                                 end;
                             end;
                          else
 							 if isempty(varname) 
 								 EEGOUT.icaweights = [];
 							 elseif isstr(varname)
-								 EEGOUT.icaweights = evalin('base', varname, 'fprintf(''Pop_editset warning: variable ''''%s'''' not found, ignoring\n'', varname)' );
+								 EEGOUT.icaweights = evalin('base', varname, 'fprintf(''pop_editset() warning: variable ''''%s'''' not found, ignoring\n'', varname)' );
 								 EEGOUT.icawinv = [];
                              else
 								 EEGOUT.icaweights = varname;
@@ -512,7 +515,7 @@ for curfield = tmpfields'
                          end;
         case 'icasphere', varname = getfield(g, {1}, curfield{1});
                          if isstr(varname) & exist( varname ) == 2
-                            fprintf('Pop_editset: ICA sphere matrix file ''%s'' found\n', varname); 
+                            fprintf('pop_editset(): ICA sphere matrix file ''%s'' found\n', varname); 
                             try, EEGOUT.icasphere = load(varname, '-ascii');
 								EEGOUT.icawinv = [];
                             catch,
@@ -520,14 +523,14 @@ for curfield = tmpfields'
                                     EEGOUT.icasphere = floatread(varname, [1 Inf]);
                                     EEGOUT.icasphere = reshape( EEGOUT.icasphere, [length(EEGOUT.icasphere)/EEG.nbchan EEG.nbchan]);
                                 catch
-                                    fprintf('Pop_editset warning: erro while reading filename ''%s'' for ICA weight matrix\n', varname); 
+                                    fprintf('pop_editset() warning: erro while reading filename ''%s'' for ICA weight matrix\n', varname); 
                                 end;
                             end;
                          else
 							 if isempty(varname) 
 								 EEGOUT.icasphere = [];
 							 elseif isstr(varname)
-								 EEGOUT.icasphere = evalin('base', varname, 'fprintf(''Pop_editset warning: variable ''''%s'''' not found, ignoring\n'', varname)' );
+								 EEGOUT.icasphere = evalin('base', varname, 'fprintf(''pop_editset() warning: variable ''''%s'''' not found, ignoring\n'', varname)' );
 								 EEGOUT.icawinv = [];
                              else
   								 EEGOUT.icaweights = varname;
@@ -541,34 +544,34 @@ for curfield = tmpfields'
                          if isnumeric(varname)
                              EEGOUT.data = varname;
                          elseif exist( varname ) == 2 & ~strcmp(lower(g.dataformat), 'array');
-                            fprintf('Pop_editset: raw data file ''%s'' found\n', varname); 
+                            fprintf('pop_editset(): raw data file ''%s'' found\n', varname); 
                             switch lower(g.dataformat)
 							 case 'ascii' , 
 							  try, EEGOUT.data = load(varname, '-ascii');
-							  catch, error(['Pop_editset error: cannot read ascii file ''' varname ''' ']); 
+							  catch, error(['pop_editset() error: cannot read ascii file ''' varname ''' ']); 
 							  end;
 							  if ndims(EEGOUT.data)<3 & size(EEGOUT.data,1) > size(EEGOUT.data,2), EEGOUT.data = transpose(EEGOUT.data); end;
 							 case 'matlab', 
 							  try,
 								  x = whos('-file', varname);
 								  if length(x) > 1, 
-									  error('Pop_editset error: .mat file must contain a single variable'); 
+									  error('pop_editset() error: .mat file must contain a single variable'); 
 								  end;
 								  tmpdata = load(varname, '-mat');									  
 								  EEGOUT.data = getfield(tmpdata,{1},x(1).name);
 								  clear tmpdata;
-							  catch, error(['Pop_editset error: cannot read .mat file ''' varname ''' ']); 
+							  catch, error(['pop_editset() error: cannot read .mat file ''' varname ''' ']); 
 							  end;
 							  if ndims(EEGOUT.data)<3 & size(EEGOUT.data,1) > size(EEGOUT.data,2), EEGOUT.data = transpose(EEGOUT.data); end;
 							 case {'float32le' 'float32be'}, 
 							  if EEGOUT.nbchan == 0,
-								  error(['Pop_editset error: to read float32 data you must first specify the number of channels']);
+								  error(['pop_editset() error: to read float32 data you must first specify the number of channels']);
 							  end;     
 							  try, EEGOUT.data = floatread(varname, [EEGOUT.nbchan Inf], ...
 														   fastif(strcmpi(g.dataformat, 'float32le'), 'ieee-le', 'ieee-be'));
-							  catch, error(['Pop_editset error: cannot read float32 data file ''' varname ''' ']); 
+							  catch, error(['pop_editset() error: cannot read float32 data file ''' varname ''' ']); 
 							  end;
-							 otherwise, error('Pop_editset error: unrecognized file format');
+							 otherwise, error('pop_editset() error: unrecognized file format');
                             end;
                          elseif isstr(varname)
                              % restoration command
@@ -576,10 +579,10 @@ for curfield = tmpfields'
                              try 
                                  res = evalin('base', ['exist(''' varname ''') == 1']);
                              catch
-                                 disp('Pop_editset warning: cannot find specified variable in global workspace!');
+                                 disp('pop_editset() warning: cannot find specified variable in global workspace!');
                              end;
                              if ~res, 
-                                 error('Pop_editset: cannot find specified variable.'); 
+                                 error('pop_editset(): cannot find specified variable.'); 
                              end;
                              warning off;
                              try,
@@ -603,7 +606,7 @@ for curfield = tmpfields'
                              EEGOUT.data = varname;
                              if ndims(EEGOUT.data)<3 & size(EEGOUT.data,1) > size(EEGOUT.data,2), EEGOUT.data = transpose(EEGOUT.data); end;
                          end;
-         otherwise, error(['Pop_editset error: unrecognized field ''' curfield{1} '''']); 
+         otherwise, error(['pop_editset() error: unrecognized field ''' curfield{1} '''']); 
     end;
 end;
 
