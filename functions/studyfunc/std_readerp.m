@@ -8,7 +8,7 @@
 % the time vector of the ERP samples. 
 %
 % Usage:    
-%   >> [erp, t] = std_readerp(ALLEEG, setind, component);  
+%   >> [erp, t] = std_readerp(ALLEEG, setind, component, timewindow);  
 %   % This functions returns the ERP of an ICA component. 
 %   % The information is loaded from a Matlab file, created
 %   % by the pre-clustering function std_erp(). 
@@ -20,6 +20,7 @@
 %                      structure, for which to get the component ERP.
 %   component  - [integer] a component index in the selected EEG dataset for which 
 %                      an ERP will be returned. 
+%   timewindow - [min max] time window in ms
 %
 % Outputs:
 %   erp            - the ERP of the requested ICA component in the
@@ -50,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2006/03/11 07:22:22  arno
+% header
+%
 % Revision 1.10  2006/03/11 07:18:43  arno
 % header information
 %
