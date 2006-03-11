@@ -31,7 +31,7 @@
 %                the STUDY structure after they are first plotted to allow quick replotting.  
 %
 % Graphic interface buttons:
-%  "Select cluster to plot" - [list box] Displays available clusters to plot (format: 
+%  "Select cluster to plot" - [list box] Displays available clusters to plot (format is
 %                'cluster name (number of components)'). The presented clusters depend 
 %                on the optional input variable 'clusters'. Selecting (clicking on) a 
 %                cluster from the list will display the selected cluster components in the 

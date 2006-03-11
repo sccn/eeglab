@@ -13,7 +13,7 @@
 %   ALLEEG     - the corresponding ALLEEG structure containing 
 %                the (loaded) STUDY EEG datasets.    
 %
-% See also: std_loadalleeg(), pop_savestudy(), pop_createstudy()
+% See also: std_loadalleeg(), pop_savestudy()
 %
 % Authors: Hilit Serby & Arnaud Delorme, SCCN, INC, UCSD, September 2005
 

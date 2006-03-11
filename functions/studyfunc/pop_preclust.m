@@ -17,7 +17,6 @@
 %                >> [STUDY, ALLEEG] = pop_preclust(STUDY, ALLEEG); % pop up interactive window
 %                >> [STUDY, ALLEEG] = pop_preclust(STUDY, ALLEEG, clustind); % sub-cluster 
 %
-% Graphic interface:
 % Inputs:
 %   STUDY        - an EEGLAB STUDY set (containing loaded EEG structures)
 %   ALLEEG       - ALLEEG data structure, can also be an EEG dataset structure.
@@ -31,6 +30,8 @@
 %                  data (pointers to float files that hold ERSP, spectrum, etc. information).
 %
 % Authors: Arnaud Delorme, Hilit Serby & Scott Makeig, SCCN, INC, UCSD, May 13, 2004-
+%
+% See also: std_preclust()
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -51,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.37  2006/03/11 00:18:16  arno
+% add function get_ersptime at the end
+%
 % Revision 1.36  2006/03/10 23:13:00  arno
 % min time and max time for ERSP depend on low freq
 %
