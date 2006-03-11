@@ -17,11 +17,13 @@
 %                For more information, see >> topoplot example 
 %
 % Optional inputs:
-%  'compnums'  = [integer array] vector of indices of component numbers to use in the 
-%                 calculations and to chose plots from {default|[] -> all}, or
-%                [negative integer]  the number of largest contributing components to plot.
-%                 compnums in the latter case is restricted in size by the internal MAXTOPOS, 
-%                 currently MAXTOPOS = 20 {default|[] -> -7}
+%  'compnums'  = [integer array] vector of component indices to use in the calculations
+%                  and to select plotted components from. {default|[]: all}
+%  'compsplot' = [integer] the number of largest contributing components to plot.
+%                  compnums in the latter case is restricted in size by the internal 
+%                  MAXTOPOS (20) {default|[] -> 7}
+%  'subcomps'  = [integer vector] indices of components to remove from the whole data before 
+%                  plotting. 0 -> none {default: if 'compnums' listed, remove all others}
 %  'limits'    = 0 or [minms maxms] or [minms maxms minuV maxuV]. Specify start/end plot
 %                  (x) limits (in ms) and min/max y-axis limits (in uV). If 0, or if both
 %                  minmx & maxms == 0 -> use latencies from 'timerange' (else 0:frames-1).
@@ -31,7 +33,7 @@
 %  'limcontrib' = [minms maxms]  time range (in ms) in which to rank component contribution
 %                  (boundaries shown with thin dotted lines) 
 %                  {default|[]|[0 0] -> plotting limits}
-%  'sortvar'    = ['mp'|'pv'|'pp'|'rp'] {default:'mp'} 
+%  'sortvar'   = ['mp'|'pv'|'pp'|'rp'] {default:'mp'} 
 %                  'mp', sort components by maximum mean back-projected power 
 %                  in the 'limcontrib' time range: mp(comp) = max(Mean(back_proj.^2));
 %                    where back_proj = comp_map * comp_activation(t) for t in 'limcontrib'
@@ -41,36 +43,34 @@
 %                    ppaf(comp) = 100-100*Mean((data - back_proj).^2)/Mean(data.^2);
 %                  'rp', sort components by relative power 
 %                    rp(comp) = 100*Mean(back_proj.^2)/Mean(data.^2);
-%  'title'      = [string] plot title {default|[] -> none}
-%  'plotchans'  = [integer array] data channels to use in computing contributions and 
+%  'title'     = [string] plot title {default|[] -> none}
+%  'plotchans' = [integer array] data channels to use in computing contributions and 
 %                  envelopes, and also for making scalp topo plots
 %                  {default|[] -> all}, by calling topoplot().
-%  'voffsets'   = [float array] vertical line extentions above the data max to disentangle
+%  'voffsets'  = [float array] vertical line extentions above the data max to disentangle
 %                  plot lines (left->right heads, values in y-axis units) {def|[] -> none}
-%  'colors'     = [string] filename of file containing colors for envelopes, 3 chars
+%  'colors'    = [string] filename of file containing colors for envelopes, 3 chars
 %                  per line, (. = blank). First color should be "w.." (white)
 %                  Else, 'bold' -> plot default colors in thick lines.
 %                  {default|[] -> standard Matlab color order}
-%  'fillcomp'   = int_vector>0 -> fill the numbered component envelope(s) with 
+%  'fillcomp'  = int_vector>0 -> fill the numbered component envelope(s) with 
 %                  solid color. Ex: [1] or [1 5] {default|[]|0 -> no fill}
-%  'vert'       = vector of times (in ms) at which to plot vertical dashed lines 
+%  'vert'      = vector of times (in ms) at which to plot vertical dashed lines 
 %                  {default|[] -> none}
-%  'icawinv'    = [float array] inverse weight matrix. Normally computed by inverting
+%  'icawinv'   = [float array] inverse weight matrix. Normally computed by inverting
 %                  the weights*sphere matrix (Note: If some components have been removed, 
 %                  the pseudo-inverse does not represent component maps accurately).
-%  'icaact'     = [float array] component activations. {default: computed from the 
+%  'icaact'    = [float array] component activations. {default: computed from the 
 %                  input weight matrix}
-%  'envmode'    = ['avg'|'rms'] compute the average envelope or the root mean square
+%  'envmode'   = ['avg'|'rms'] compute the average envelope or the root mean square
 %                  envelope {default: 'avg'}
-%  'subcomps'   = [integer vector] indices of components to remove from data before 
-%                  plotting {default: none}
-%  'sumenv'     = ['on'|'off'|'fill'] 'fill' -> show the filled envelope of the summed 
+%  'sumenv'    = ['on'|'off'|'fill'] 'fill' -> show the filled envelope of the summed 
 %                  projections of the selected components; 'on' -> show the envelope only 
 %                  {default: 'fill'}
-%  'actscale'   = ['on'|'off'] scale component scalp maps by maximum component activity 
+%  'actscale'  = ['on'|'off'] scale component scalp maps by maximum component activity 
 %                  in the designated (limcontrib) interval. 'off' -> scale scalp maps 
 %                  individually using +/- max(abs(map value)) {default: 'off'}
-%  'dispmaps'   = ['on'|'off'] display component numbers and scalp maps {default: 'on'}
+%  'dispmaps'  = ['on'|'off'] display component numbers and scalp maps {default: 'on'}
 %  'topoplotkey','val' = optional additional topoplot() arguments {default: none}
 %
 % Outputs:
@@ -90,7 +90,7 @@
 %
 % Authors: Scott Makeig & Arnaud Delorme, SCCN/INC/UCSD, La Jolla, 3/1998 
 %
-% See also: timtopo()
+% See also: timtopo() axcopy()
 
 % Copyright (C) 3-10-98 from timtopo.m Scott Makeig, SCCN/INC/UCSD, scott@sccn.ucsd.edu
 %
@@ -109,6 +109,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.115  2006/03/10 20:05:03  scott
+% chanlocs -> g.chanlocs in 1356 -sm
+%
 % Revision 1.114  2006/03/04 03:29:08  scott
 % rm'd extra 'end' < 1013   -Scott
 %
@@ -464,7 +467,8 @@ if nargin <= 2 | isstr(varargin{1})
 				  'fillcomp'      'integer'  []                       0 ; 
 				  'colorfile'     'string'   []                       '' ; 
 				  'colors'        'string'   []                       '' ;
-				  'compnums'      'integer'  []                       -7; 
+				  'compnums'      'integer'  []                       []; 
+				  'compsplot'     'integer'  []                       7; 
 				  'subcomps'      'integer'  []                       []; 
 				  'envmode'       'string'   {'avg' 'rms'}            'avg'; 
 				  'dispmaps'      'string'   {'on' 'off'}             'on'; 
@@ -719,24 +723,32 @@ end
 if max(g.plotchans) > chans | min(g.plotchans) < 1
     error('invalid ''plotchan'' index');
 end
-if isempty(g.compnums) | g.compnums(1) == 0
-    g.compnums = 1:wtcomps; % by default, all components
+
+if g.compsplot < 0
+   g.compsplot = abs(g.compsplot);
 end
-if min(g.compnums) < 0
-    if length(g.compnums) > 1
-	     error('Negative compnums must be a single integer.');
-    end
-    if -g.compnums > MAXTOPOS
-	    fprintf('Can only plot a maximum of %d components.\n',MAXTOPOS);
-	    return
-    else
-	    MAXTOPOS = -g.compnums;
-	    g.compnums = 1:wtcomps;
-    end
+
+if g.compnums < 0 % legacy syntax
+   g.compsplot = abs(g.compnums);
+   g.compnums = [];
+end
+if isempty(g.compnums) | g.compnums(1) == 0
+    g.compnums = 1:wtcomps; % by default, select from all components
+end
+
+if g.compsplot > MAXTOPOS
+    fprintf('Can only plot a maximum of %d components.\n',MAXTOPOS);
+    return
+else
+    MAXTOPOS = g.compsplot;
+end
+
+if max(g.compnums) > wtcomps | min(g.compnums)< 1
+    error('Keyword ''compnums'' out of range (1 to %d)', wtcomps);
 end
 
 g.subcomps = abs(g.subcomps); % don't pass negative channel numbers
-if min(g.subcomps)<1 | max(g.subcomps) > chans
+if max(g.subcomps) > wtchans
     error('Keyword ''subcomps'' argument out of bounds');
 end
 
@@ -745,25 +757,34 @@ end
 %
 
 ncomps = length(g.compnums);
+
+if isempty(g.subcomps) % remove all but compnums
+     g.subcomps = 1:wtcomps;
+     g.subcomps(g.compnums) = [];
+else
+  % g.subcomps 0    -> subtract no comps
+  %            list -> subtract subcomps list
+  if min(g.subcomps) < 1
+      if length(g.subcomps) > 1
+         error('Keyword ''subcomps'' argument incorrect.');
+      end
+      g.subcomps = [];   % if subcomps contains a 0, don't remove components
+  elseif max(g.subcomps) > wtchans
+      error('Keyword ''subcomps'' argument out of bounds.');
+  end
+end
+
+g.icaact = weights*data;
 if ~isempty(g.subcomps)
-	    fprintf('Subtracting requested components from plotting data: ');
-            for c=g.subcomps
-              fprintf('%d ',c);
-            end
-            fprintf('\n');
-            
-        g.icaact = weights*data;
-        for i = 1:ncomps
-            for subcompind = g.subcomps
-                if g.compnums(i) == subcompind
-                    g.icaact(i,:) = zeros(1,length(g.icaact(i,:)));
-                end
-            end
-        end
-        
-	    %tmpproj = icaproj(data,weights,g.subcomps) ; % updated arg list 12/00 -sm
-        %data = data - tmpproj;
-        %clear tmpproj;
+  fprintf('Subtracting requested components from plotting data: ');
+  for k = 1:length(g.subcomps)
+      fprintf('%d ',g.subcomps(k));
+      if ~rem(k,32)
+         fprintf('\n');
+      end
+  end
+  fprintf('\n');
+  g.icaact(g.subcomps,:) = zeros(length(g.subcomps),size(data,2));
 end;
 
 %
@@ -772,7 +793,7 @@ end;
 
 for i=1:ncomps-1
     if g.compnums(i) == 0
-	       fprintf('Removing component number 0 in compnums.\n');
+	       fprintf('Removing component number 0 from compnums.\n');
 	       g.compnums(i)=[];
     elseif g.compnums(i)>wtcomps
 	       fprintf('compnums(%d) > number of comps (%d)?\n',i,wtcomps);
@@ -811,8 +832,8 @@ end
 plotframes = ones(ncomps);
 
 % toby 2.16.2006: maxproj will now contain all channel info, in case
-% plotgrid is called in topoplot.
-% maxproj = zeros(length(g.plotchans),ncomps);
+%                 plotgrid is called in topoplot.
+%                 NOT maxproj = zeros(length(g.plotchans),ncomps);
 maxproj = zeros(chans,ncomps);
 
 %
@@ -1021,8 +1042,8 @@ for n = 1:ntopos
 		g.icawinv(g.plotchans,maporder(n))*weights(maporder(n),:)*data; 
   else 
       sumproj = sumproj + g.icawinv(g.plotchans,maporder(n))*g.icaact(maporder(n),:);     
-											% updated -sm 11/04
-  end;                                      % Note: sumproj here has only g.plotchans
+       % updated -sm 11/04
+  end; % Note: sumproj here has only g.plotchans
 end
 rmsproj = mean(mean((data(g.plotchans,limframe1:limframe2).^2))); % find data rms in interval
 
