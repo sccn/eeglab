@@ -1,33 +1,32 @@
 % pop_preclust() - prepare STUDY components' location and activity measures for later clustering.
 %                  Collect information in an interactive pop-up query window. To pre-cluster
 %                  from the commandline, use std_preclust(). After data entry into the pop window,
-%                  Selected measures (one or more from options: ERP, dipole locations, spectra,
+%                  selected measures (one or more from options: ERP, dipole locations, spectra,
 %                  scalp maps, ERSP, and ITC) are computed for each dataset in the STUDY 
 %                  set, unless they already present. After all requested measures are computed 
 %                  and saved in the STUDY datasets, a PCA  matrix (by runica() with 'pca' option) 
 %                  is constructed (this is the feature reduction step). This matrix will be used 
 %                  as input to the clustering  algorithm in pop_clust(). pop_preclust() allows 
-%                  selection of a subset of components to use in the clustering. This subset 
-%                  may be a user-specified component subset, components with dipole model residual 
-%                  variance lower than a defined threshold (see dipfit()), or components from 
-%                  an already existing cluster (for hierarchical clustering). The EEG datasets
-%                  in the ALLEEG structure are updated, and updated EEG sets are saved to disk.
-%                  Calls std_preclust().
+%                  selection of a subset of components to cluster. This subset may either be 
+%                  user-specified, all components with dipole model residual variance lower than 
+%                  a defined threshold (see dipfit()), or components from an already existing cluster 
+%                  (for hierarchical clustering). The EEG datasets in the ALLEEG structure are 
+%                  updated; then the updated EEG sets are saved to disk.  Calls std_preclust().
 % Usage:    
 %                >> [STUDY, ALLEEG] = pop_preclust(STUDY, ALLEEG); % pop up interactive window
 %                >> [STUDY, ALLEEG] = pop_preclust(STUDY, ALLEEG, clustind); % sub-cluster 
 %
 % Inputs:
-%   STUDY        - an EEGLAB STUDY set (containing loaded EEG structures)
-%   ALLEEG       - ALLEEG data structure, can also be an EEG dataset structure.
-%   clustind     - a (single) cluster index for sub-clustering (hierarchical clustering) --
-%                  for example to cluster a mu component cluster into left mu and right mu 
-%                  sub-clusters. Should be empty for top level (whole STUDY) clustering 
+%   STUDY        - STUDY set structure containing (loaded) EEG dataset structures
+%   ALLEEG       - ALLEEG vector of EEG structures, else a single EEG dataset.
+%   clustind     - (single) cluster index to sub-cluster, Hhierarchical clustering may be
+%                  useful, for example, to separate a bilteral cluster into left and right 
+%                  hemisphere sub-clusters. Should be empty for whole STUDY (top level) clustering 
 %                  {default: []}
 % Outputs:
-%   STUDY        - the input STUDY set with added pre-clustering data, for use by pop_clust() 
-%   ALLEEG       - the input ALLEEG vector of EEG dataset structures modified by adding preprocessing 
-%                  data (pointers to float files that hold ERSP, spectrum, etc. information).
+%   STUDY        - the input STUDY set with added pre-clustering data for use by pop_clust() 
+%   ALLEEG       - the input ALLEEG vector of EEG dataset structures modified by adding 
+%                  pre-clustering data (pointers to .mat files that hold cluster measure information).
 %
 % Authors: Arnaud Delorme, Hilit Serby & Scott Makeig, SCCN, INC, UCSD, May 13, 2004-
 %
@@ -52,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.38  2006/03/11 06:57:04  arno
+% header
+%
 % Revision 1.37  2006/03/11 00:18:16  arno
 % add function get_ersptime at the end
 %
@@ -202,7 +204,7 @@ if ~isstr(varargin{1}) %intial settings
     saveSTUDY  = [ 'set(findobj(''parent'', gcbf, ''userdata'', ''save''), ''enable'', fastif(get(gcbo, ''value'')==1, ''on'', ''off''));' ];
     browsesave = [ '[filename, filepath] = uiputfile2(''*.study'', ''Save STUDY with .study extension -- pop_preclust()''); ' ... 
                   'set(findobj(''parent'', gcbf, ''tag'', ''studyfile''), ''string'', [filepath filename]);' ];
-    str_name   = ['Pre-compute measures on which to cluster components from study ''' STUDY.name '''' ];
+    str_name   = ['Pre-compute clustering measures for STUDY ''' STUDY.name '''' ];
     str_time   = [ num2str(round(ALLEEG(1).xmin*1000)) '  ' num2str(round(ALLEEG(1).xmax*1000)) ];
     help_secpca = [ 'warndlg2(strvcat(''This is the final number of dimensions (otherwise use the sum'',' ...
                     '''of dimensions for all the selected options). See tutorial for more info''), ''Final number of dimension'');' ];
