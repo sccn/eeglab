@@ -1,5 +1,6 @@
 % timefdetails() - details of the timef() function for time/frequency analysis 
 %                  of multiple epochs of single-channel event-related data.
+%
 % Global Description:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % timef() performs normalized time/frequency averaging using either 
@@ -255,6 +256,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2004/02/17 17:53:52  arno
+% *** empty log message ***
+%
 % Revision 1.5  2002/11/15 03:23:57  arno
 % formating for web
 %
