@@ -8,13 +8,11 @@
 %        >> pop_editoptions( 'key1', value1, 'key2', value2, ...);
 %
 % Graphic interface inputs:
-%   "If set, keep at most one dataset in memory (this allow processing dozens of 
-%   "datasets at a time)" - [checkbox] If set, EEGLAB will only retain the current
+%   "If set, keep at most one dataset in memory ..." - [checkbox] If set, EEGLAB will only retain the current
 %                   dataset in memory. All other datasets will be automatically
 %                   read and writen to disk. All EEGLAB functionalities are preserved
 %                   even for dataset stored on disk. 
-%   "If set, write data in same file as dataset (unset allow reading one channel at
-%   "a time from disk)" - [checkbox] Set -> dataset data (EEG.data) are 
+%   "If set, write data in same file as dataset ..." - [checkbox] Set -> dataset data (EEG.data) are 
 %                   saved in the EEG structure in the standard Matlab dataset (.set) file. 
 %                   Unset -> The EEG.data are saved as a transposed stream of 32-bit 
 %                   floats in a separate binary file. As of Matlab 4.51, the order 
@@ -74,6 +72,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.40  2006/03/06 21:50:28  arno
+% remove file after testing
+%
 % Revision 1.39  2006/02/03 18:53:47  arno
 % default option file
 %

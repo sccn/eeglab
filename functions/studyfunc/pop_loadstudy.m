@@ -15,7 +15,7 @@
 %
 % See also: std_loadalleeg(), pop_savestudy(), pop_createstudy()
 %
-% Authors: Hilit Serby SCCN, INC, UCSD, September 2005
+% Authors: Hilit Serby & Arnaud Delorme, SCCN, INC, UCSD, September 2005
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 

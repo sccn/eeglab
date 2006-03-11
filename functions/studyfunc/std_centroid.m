@@ -13,12 +13,12 @@
 %                  clusters. If [], compute centroids for all STUDY clusters. 
 %   measures     - ['erp'|'spec'|'scalp'|'dipole'|'itc'|'ersp'].   
 %                  The measures(s) for which to calculate the cluster centroid(s):
-%                     'erp'   -  mean ERP of each cluster.
-%                     'dipole' - mean dipole of each cluster.
-%                     'spec'  -  mean spectrum of each cluster (baseline removed).
-%                     'scalp' -  mean topoplot scalp map of each cluster.
-%                     'ersp'  -  mean ERSP of each cluster. 
-%                     'itc'   -  mean ITC of each cluster. 
+%                     'erp'    ->  mean ERP of each cluster.
+%                     'dipole' -> mean dipole of each cluster.
+%                     'spec'   ->  mean spectrum of each cluster (baseline removed).
+%                     'scalp'  ->  mean topoplot scalp map of each cluster.
+%                     'ersp'   ->  mean ERSP of each cluster. 
+%                     'itc'    ->  mean ITC of each cluster. 
 %                  If [], re-compute the centroid for whichever centroids 
 %                  had previously been computed.
 % Outputs:
@@ -62,6 +62,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2006/03/10 18:22:17  arno
+% renaming variables
+%
 % Revision 1.17  2006/03/10 16:27:08  arno
 % new call for spectrum
 %

@@ -5,8 +5,8 @@
 %               appears when the clustering is complete to display clustering results
 %               and allow the user to review and edit them.
 % Usage: 
-%               >> [ STUDY] = pop_clust( STUDY, ALLEEG); % pop up a graphic interface
-%               >> [ STUDY] = pop_clust( STUDY, ALLEEG, 'key1', 'val1', ...); % no pop-up
+%               >> STUDY = pop_clust( STUDY, ALLEEG); % pop up a graphic interface
+%               >> STUDY = pop_clust( STUDY, ALLEEG, 'key1', 'val1', ...); % no pop-up
 % Inputs:
 %   STUDY       - an EEGLAB STUDY set containing some or all of the EEG sets in ALLEEG. 
 %   ALLEEG      - a vector of loaded EEG dataset structures of all sets in the STUDY set.
@@ -58,6 +58,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2006/03/10 22:53:17  arno
+% typo
+%
 % Revision 1.18  2006/03/10 18:40:04  arno
 % same
 %
