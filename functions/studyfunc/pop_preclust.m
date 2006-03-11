@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2006/03/10 23:13:00  arno
+% min time and max time for ERSP depend on low freq
+%
 % Revision 1.35  2006/03/10 22:56:24  arno
 % timewindow
 %
@@ -534,3 +537,15 @@ else
     end
 end
 STUDY.saved = 'no';
+
+function get_ersptime(ALLEEG, STUDY, ersphdl)
+cycles = str2num(get(findobj('parent', ersphdl, 'tag', 'ersp_c'), 'string'));
+freq = str2num(get(findobj('parent', ersphdl, 'tag', 'ersp_f'), 'string'));
+padratio = str2num(get(findobj('parent', ersphdl, 'tag', 'ersp_p'), 'string'));
+seti = STUDY.datasetinfo(1).index; %first dataset in ALLEEG that is part of STUDY
+[time_range, winsize] = compute_ersp_times(cycles,  ALLEEG(seti).srate, [ALLEEG(seti).xmin ALLEEG(seti).xmax]*1000, freq(1),padratio);
+if time_range(1) >= time_range(2)
+    warndlg2('ERSP time range is not valid, please change lower frequency bound or other parameters', 'Warning!');
+else
+    set(findobj('parent', ersphdl, 'tag', 'ersp_timewindow'), 'string', [ num2str(round(time_range(1)))  '  ' num2str(round(time_range(2))) ] );
+end
