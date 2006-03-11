@@ -1,7 +1,7 @@
 % pop_study()  - create a new STUDY set structure defining a group of related EEG datasets. 
 %                The STUDY set also contains information about each of the datasets: the 
-%                subject code, subject group, exp. condition and session. This can be 
-%                provided interactively in a pop-up window or be automatically filled 
+%                subject code, subject group, experimental condition, and session. This can 
+%                be provided interactively in a pop-up window or be automatically filled 
 %                in by the function. Defaults: Assume a different subject for each 
 %                dataset and only one condition; leave subject group and session fields 
 %                empty. Additional STUDY information about the STUDY name, task and 
@@ -19,12 +19,12 @@
 %   All "'key', 'val'" inputs of std_editset() may be used.
 %
 % Outputs:
-%   STUDY                - a new STUDY set comprising some or all of the datasets in 
+%   STUDY                - new STUDY set comprising some or all of the datasets in 
 %                          ALLEEG, plus other information about the experiments. 
 %   ALLEEG               - an updated ALLEEG structure including the STUDY datasets. 
 %
 % Graphic interface buttons:
-%  "STUDY set name"      - [edit box] a name for the STUDY structure {default: ''}   
+%  "STUDY set name"      - [edit box] name for the STUDY structure {default: ''}   
 %  "STUDY set task name" - [edit box] name for the task performed by the subject {default: ''}   
 %  "STUDY set notes"     - [edit box] notes about the experiment, the datasets, the STUDY, 
 %                          or anything else to store with the rest of the STUDY information 
@@ -42,7 +42,7 @@
 %                          the same group. {default: []}
 %  "Save this STUDY set to disk file" - [check box] If checked, save the new STUDY set
 %                          structure to disk. If no filename is provided, a window will 
-%                          pop up to ask for the file name. 
+%                          pop up to ask for it. 
 %
 %  See also  pop_loadstudy(), pop_preclust(), pop_clust()
 %
@@ -69,6 +69,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.40  2006/03/11 07:02:24  arno
+% header
+%
 % Revision 1.39  2006/03/08 21:10:29  arno
 % rename func
 %
@@ -319,14 +322,14 @@ elseif strcmpi(mode, 'gui') % GUI mode
     end;
     
     if strcmpi(info, 'from_STUDY_different_from_ALLEEG')
-        text1    = 'The dataset info (condition, group, ...) is different from info stored in study. [set] Overwrite dataset info.';
+        text1    = 'Dataset info (condition, group, ...) differs from info in STUDY. [set] = Overwrite dataset info.';
         value_cb = 0;
     else
-        text1    = 'Update dataset info (unset=local to study). If datasets are stored on disk, they will be overwritten.';
+        text1    = 'Update dataset info - datasets stored on disk will be overwritten (unset = Keep STUDY info separate).';
         value_cb = 1;
     end;
     guispec = { guispec{:} ...
-                {'style' 'text'       'string'  'Important note: Removed datasets will not be saved prior to being delete from EEGLAB memory' } ...
+                {'style' 'text'       'string'  'Important note: Removed datasets will not be saved before being deleted from EEGLAB memory' } ...
                 {} ...
                 {'style' 'pushbutton' 'string'  '<'      'Callback' prevpage 'userdata' 'addt'} ...
                 {'style' 'text'       'string'  'Page 1' 'tag' 'page' 'horizontalalignment' 'center' } ... 
@@ -335,7 +338,7 @@ elseif strcmpi(mode, 'gui') % GUI mode
                 {'style' 'checkbox'   'value'   value_cb 'tag' 'copy_to_dataset' } ...
                 {'style' 'text'       'string'  text1 } ...
                 {'style' 'checkbox'   'value'   0        'tag' 'delclust' 'callback' cb_del } ...
-                {'style' 'text'       'string'  'Delete cluster information (allow loading new datasets, set new starting components for clustering, ...)' } ...
+                {'style' 'text'       'string'  'Delete cluster information (to allow loading new datasets, set new components for clustering, etc.)' } ...
                 {'style' 'text'       'string'  'Save this STUDY set to disk file'} ...
                 {'style' 'edit'       'string'  ''       'tag' 'studyfile'                        'userdata' 'save'} ...
                 {'style' 'pushbutton' 'string'  '...'    'tag' 'browsesave' 'Callback' browsesave 'userdata' 'save'} {} };
@@ -343,7 +346,7 @@ elseif strcmpi(mode, 'gui') % GUI mode
 
     if ~isempty(STUDY.filename)
         guispec{end-3} = {'style' 'checkbox' 'string' '' 'value' 0 'tag' 'studyfile' };
-        guispec{end-2} = {'style' 'text'     'string' 'Resave study. Uncheck and use menu File > Save study as to save under a new filename'};
+        guispec{end-2} = {'style' 'text'     'string' 'Re-save STUDY. Uncheck and use menu File > Save study as to save under a new filename'};
         guispec{end-1} = {};
         guigeom{end-1} = [0.08 1.5 0.1];
     end;
@@ -653,7 +656,7 @@ function bool = test_wrong_parameters(hdl)
     for index = 1:length(datasetinfo)
         if ~isempty(datasetinfo(index).filename)
             if isempty(datasetinfo(index).subject) & bool == 0
-                bool = 1; warndlg2('All dataset must have a subject name or code', 'Error');
+                bool = 1; warndlg2('All datasets must have a subject name or code', 'Error');
             end;
         end;
     end;
@@ -666,10 +669,10 @@ function bool = test_wrong_parameters(hdl)
     allgroup     = all(~cellfun('isempty', { datasetinfo.group }));
 
     if anygroup & ~allgroup
-         bool = 1; warndlg2('If one dataset has a group, they must all have one', 'Error');
+         bool = 1; warndlg2('If one dataset has a group label, they must all have one', 'Error');
     end;
     if anycondition & ~allcondition
-         bool = 1; warndlg2('If one dataset has a condition, they must all have one', 'Error');
+         bool = 1; warndlg2('If one dataset has a condition label, they must all have one', 'Error');
     end;
     if anysession & ~allsession
          bool = 1; warndlg2('If one dataset has a session index, they must all have one', 'Error');
