@@ -21,7 +21,7 @@
 %                   reading of single channels from the data, e.g. when comparing 
 %                   channels across datasets. The stored files have the extension 
 %                   .dat instead of the pre-4.51, non-transposed .fdt. Both file types 
-%                   are read by the dataset load function. Command line equivalent: 
+%                   are read by the dataset load function. Command line equivalent is
 %                   option_savematlab.
 %   "Precompute ICA activations" - [checkbox] If set, all the ICA activation
 %                   time courses are precomputed (this requires more RAM). 
@@ -72,6 +72,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.41  2006/03/11 00:32:08  arno
+% header
+%
 % Revision 1.40  2006/03/06 21:50:28  arno
 % remove file after testing
 %

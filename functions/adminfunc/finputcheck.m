@@ -10,7 +10,7 @@
 %               column contains the key string, the second its type, 
 %               the third the accepted value range, and the fourth the 
 %               default value.  Allowed types are 'boolean', 'integer', 
-%               'real', 'string', 'cell' or 'struct'.  For example:
+%               'real', 'string', 'cell' or 'struct'.  For example,
 %                       {'key1' 'string' { 'string1' 'string2' } 'defaultval_key1'}
 %                       {'key2' 'int' { minint maxint } 'defaultval_key2'} 
 %  callingfunc - Calling function name for error messages. {default: none}.
@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2004/11/06 02:54:06  scott
+% a few further small edits to the help msg -sm
+%
 % Revision 1.22  2004/11/05 15:23:37  arno
 % ,sg
 %
