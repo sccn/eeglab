@@ -128,6 +128,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.37  2006/03/11 00:07:12  arno
+% showing message
+%
 % Revision 1.36  2006/03/10 23:16:29  arno
 % default alpha is NaN
 %
@@ -806,3 +809,22 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, components
     end
 
 return
+
+% erspdownsample() - down samples component ERSP/ITC images if the
+%        PCA operation in the clustering feature reduction step fails.
+%        This is a helper function called by eeg_preclust().
+
+function [dsdata, freqs, times] = erspdownsample(data, n, freqs,times,cond)
+
+len = length(freqs)*length(times); %size of ERSP
+nlen = ceil(length(freqs)/2)*ceil(length(times)/2); %new size of ERSP
+dsdata = zeros(size(data,1),cond*nlen);
+for k = 1:cond
+    tmpdata = data(:,1+(k-1)*len:k*len);
+    for l = 1:size(data,1) % go over components
+        tmpersp = reshape(tmpdata(l,:)',length(freqs),length(times));
+        tmpersp = downsample(tmpersp.', n/2).'; %downsample times
+        tmpersp = downsample(tmpersp, n/2); %downsample freqs
+        dsdata(l,1+(k-1)*nlen:k*nlen)  = tmpersp(:)';
+    end
+end
