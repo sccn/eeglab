@@ -128,6 +128,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.40  2006/03/11 06:20:38  arno
+% remove debug message, fix ERSP
+%
 % Revision 1.39  2006/03/11 00:44:58  arno
 % GUI text
 %
@@ -475,7 +478,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, components
                         tmp = load('-mat', filename, 'parameters');
                         params = struct( tmp.parameters{:} );
                         if  sum(params.cycles ~= cycles) | (padratio ~= params.padratio) | ...
-                                ( (alpha~= params.alpha) & ~isnan(alpha) & ~isnan(params.alpha) )
+                                ( (alpha~= params.alpha) & ~( isnan(alpha) & isnan(params.alpha)) )
                             set_yes = [ 'set(findobj(''parent'', gcbf, ''tag'', ''ersp_no''), ''value'', 0);'];
                             set_no  = [ 'set(findobj(''parent'', gcbf, ''tag'', ''ersp_yes''), ''value'', 0);' ];
                             ersp_ans = inputgui('geometry', {[1] [1] [1] [1] [0.5 1] [1]}, 'uilist', ...
