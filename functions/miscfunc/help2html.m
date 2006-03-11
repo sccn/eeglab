@@ -92,6 +92,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2003/03/06 01:32:51  arno
+% header typo
+%
 % Revision 1.20  2003/02/17 02:51:36  arno
 % max image size set to 600 instead of 400
 %
@@ -349,6 +352,7 @@ while (str(1) == '%')
 			   if isempty(g.outputtext),  g.outputtext	=  filename(1:indexdot(end)-1); end;
 			   linktext = sprintf( g.outputlink, g.outputtext,  filename(1:indexdot(end)-1), maintext ); 
 			   if strcmp(g.outputonly, 'on')
+                   fclose(fid);
 				   return;
 			   end;
 			   
