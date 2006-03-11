@@ -128,6 +128,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2006/03/10 23:16:29  arno
+% default alpha is NaN
+%
 % Revision 1.35  2006/03/10 18:21:27  arno
 % erase centroid
 %
@@ -533,6 +536,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, components
               % --------------------------
              case 'scalp' , % NB: scalp maps are identical across conditions (within session)
                  idat = STUDY.datasetinfo(STUDY.setind(1,si)).index; 
+                 fprintf('Computing interpolated scalp maps for dataset %s...\n', idat);
                  if ~isempty(succompind{si})
                      X = std_topo(ALLEEG(idat), succompind{si});
                      if abso % absolute values
