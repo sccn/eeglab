@@ -9,10 +9,9 @@
 %
 % Usage:    
 %   >> [erp, t] = std_readerp(ALLEEG, setind, component);  
-%   This functions returns the ERP of an ICA component. 
-%   The information is loaded from a float file, which a pointer 
-%   to is saved in the EEG dataset. The float file was created
-%   by the pre - clustering function std_erp. 
+%   % This functions returns the ERP of an ICA component. 
+%   % The information is loaded from a Matlab file, created
+%   % by the pre-clustering function std_erp(). 
 %
 % Inputs:
 %   ALLEEG     - an EEGLAB data structure, which holds EEG sets (can also be one EEG set). 
@@ -51,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2006/03/10 16:08:19  arno
+% select time range
+%
 % Revision 1.8  2006/03/10 00:36:34  arno
 % error msg
 %
