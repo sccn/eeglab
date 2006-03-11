@@ -34,8 +34,8 @@
 %                      do, a duration field (or 0) must be entered for each 
 %                      latency field you define. For instance if the latency fields
 %                      are "'rt1' 'rt2'", then you must have duration fields
-%                      "'dr1' 'dr2'". If duration is not defined for event latency
-%                      'tr1', you may enter "0 'rt2'". Command line 
+%                      such as "'dr1' 'dr2'". If duration is not defined for event 
+%                      latency 'tr1', you may enter "0 'rt2'". Command line 
 %                      equivalent: 'durationfields'.
 %  "Field name containing time locking event type(s)" - [edit box] if one column
 %                      contain the epoch type, its name must be defined in the 
@@ -116,6 +116,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2004/06/15 17:17:32  arno
+% debug one epoch info
+%
 % Revision 1.32  2004/06/15 16:50:42  arno
 % array transposition
 %
