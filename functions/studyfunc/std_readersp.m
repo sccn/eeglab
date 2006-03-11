@@ -10,7 +10,7 @@
 %                  Along with the ERSP of the selected ICA component the function 
 %                  returns the frequency vector (in log space) of the ERSP samples. 
 % Usage:    
-%       >> [logersp, logfreqs] = std_readersp(ALLEEG, setindex, component);  
+%       >> [logersp, logfreqs] = std_readersp(ALLEEG, setindex, component, timewindow, freqrange);  
 %
 % Inputs:
 %   ALLEEG     - an EEGLAB data structure, which holds EEG sets (can also be one EEG
@@ -19,6 +19,9 @@
 %                which to get the component log scaled ERSP.
 %   component  - [integer] a component index in the selected EEG dataset for which 
 %                an ERSP will be returned. 
+%   timewindow - [min max] time window in ms
+%   freqrange  - [min max] frequency range in Hz
+%
 % Outputs:
 %   logersp    - the log scaled ERSP of the requested ICA component in the
 %                      selected dataset. This is frequencies (log scaled)
@@ -49,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2006/03/11 07:21:08  arno
+% header
+%
 % Revision 1.9  2006/03/10 17:44:25  arno
 % typo
 %

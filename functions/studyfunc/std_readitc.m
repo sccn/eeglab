@@ -1,30 +1,31 @@
 % std_readitc() - Given the ALLEEG structure, a specific EEG dataset index, 
 % and a specific component, the function returns the (frequency) log scaled 
 % ITC of that ICA component. 
-% The ITC of the dataset ICA components is assumed to be saved in a float 
-% file, the EEG dataset include a pointer to this file. If such a float file doesn't exist,
+% The ITC of the dataset ICA components is assumed to be saved in a Matlab 
+% file. If such a float file doesn't exist,
 % you can use the std_ersp() function to create it, or use the pre - clustering functions
-% that call it: pop_preclust, eeg_preclust & eeg_createdata. The ITC information  
+% that call it: pop_preclust, std_preclust(). The ITC information  
 % is specific to the input variables used to compute it, the frequency range, 
 % timewindow, resolution, confidence level and the wavelet type (FFT / wavelet
 %  cycles), see timef for details. 
 % Along with the ITC of the selected ICA component the function returns  
-% the log frequency vector of the ITC samples. 
+% the frequency vector (in log space) of the ITC samples. 
 %
 % Usage:    
-%   >> [logersp, logfreqs] = std_readitc(ALLEEG, abset, component);  
-%   This functions returns the log scaled ITC of an ICA component. 
-%   The information is loaded from a float file, which a pointer 
-%   to is saved in the EEG dataset. The float file was created
-%   by the pre - clustering function std_ersp. 
+%   >> [logersp, logfreqs] = std_readitc(ALLEEG, abset, component, timewindow, freqrange);  
+%   % This functions returns the log scaled ITC of an ICA component. 
+%   % The information is loaded from a float file, was created
+%   % by the pre-clustering function std_ersp(). 
 %
 % Inputs:
 %   ALLEEG     - an EEGLAB data structure, which holds EEG sets (can also be one EEG set). 
 %                      ALLEEG must contain the dataset of interest (the setind).
-%   setind         -  [integer] an index of an EEG dataset in the ALLEEG
+%   setind     -  [integer] an index of an EEG dataset in the ALLEEG
 %                      structure, for which to get the component log scaled ITC.
-%   component - [integer] a component index in the selected EEG dataset for which 
+%   component  - [integer] a component index in the selected EEG dataset for which 
 %                      an ITC will be returned. 
+%   timewindow - [min max] time window in ms
+%   freqrange  - [min max] frequency range in Hz
 %
 % Outputs:
 %   logitc       - the log scaled ITC of the requested ICA component in the
@@ -56,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2006/03/10 15:49:07  arno
+% fix reading ITC
+%
 % Revision 1.6  2006/03/10 00:39:37  arno
 % error msg
 %
