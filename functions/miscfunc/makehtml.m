@@ -73,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2003/05/23 17:45:20  arno
+% update header
+%
 % Revision 1.15  2003/01/28 19:51:11  arno
 % deleting destination filename
 %
@@ -163,7 +166,10 @@ if ~isempty(g.mainheader)
 end;
 
 options = { 'footer', g.footer, 'background', g.background, ...
-		  'refcall', g.refcall, 'font', g.font, 'header', g.header, 'outputlink', g.outputlink, 'outputonly', g.mainonly };
+		  'refcall', g.refcall, 'font', g.font, 'header', g.header, 'outputlink', g.outputlink};
+if strcmpi( g.mainonly, 'on')
+    options = { options{:}, 'outputonly', g.mainonly };
+end;
 
 % ------------------------------------------- 
 % scrips which generate a web page for eeglab
@@ -267,27 +273,29 @@ function makehelphtml( files, fo, title, STYLEHEADER, DEST, mode, options, maino
 				filename = files{index};
 			    filelink = '';
 			end;
-			fprintf('Processing %s:%s\n', filename, filelink );
-			if ~isempty(filename)				
-				cd(DEST); 
-                try, delete([ DEST filename ]);
-                catch, end;
-                help2html( filename, [],  'outputtext', filelink, options{:}); cd(tmpdir);
-				
-				if strcmp(mainonly,'off')
-					inputfile = which( filename);
-					try, copyfile( inputfile, [ DEST filename ]); % asuming the file is in the path 
-					catch, fprintf('Cannot copy file %s\n', inputfile); end;
-				end;
-				
-				indexdot = find(filename == '.');
-				if ~isempty(filelink)
-					com = [ space2html(filelink)  ' -- ' space2html([ filename(1:indexdot(end)-1) '()'], ...
-								 [ '<A HREF="' filename(1:indexdot(end)-1) '.html">' ], '</A><BR>')];
-				else
-					com = [ space2html([ filename(1:indexdot(end)-1) '()'], ...
-								 [ '<A HREF="' filename(1:indexdot(end)-1) '.html">' ], '</A><BR>')];
-				end;
+			fprintf('Processing (mode file) %s:%s\n', filename, filelink );
+			if ~isempty(filename)
+                if ~exist(fullfile(DEST, [ filename(1:end-1) 'html' ]))
+                    cd(DEST); 
+                    try, delete([ DEST filename ]);
+                    catch, end;
+                    help2html( filename, [],  'outputtext', filelink, options{:}); cd(tmpdir);
+                    
+                    if strcmp(mainonly,'off')
+                        inputfile = which( filename);
+                        try, copyfile( inputfile, [ DEST filename ]); % asuming the file is in the path 
+                        catch, fprintf('Cannot copy file %s\n', inputfile); end;
+                    end;
+                    
+                    indexdot = find(filename == '.');
+                end;
+                if ~isempty(filelink)
+                    com = [ space2html(filelink)  ' -- ' space2html([ filename(1:indexdot(end)-1) '()'], ...
+                                                                    [ '<A HREF="' filename(1:indexdot(end)-1) '.html">' ], '</A><BR>')];
+                else
+                    com = [ space2html([ filename(1:indexdot(end)-1) '()'], ...
+                                       [ '<A HREF="' filename(1:indexdot(end)-1) '.html">' ], '</A><BR>')];
+                end;
 			else 
 				com = space2html(filelink, '<B>', '</B><BR>');
 			end;
@@ -299,14 +307,20 @@ function makehelphtml( files, fo, title, STYLEHEADER, DEST, mode, options, maino
 		fprintf(fo, '<table WIDTH="100%%" NOSAVE>' );
 		for index = 1:length(files)
 	        % Processing file only
- 			fprintf('Processing %s\n', files{index});
-			cd(DEST); com = help2html( files{index}, [], options{:}); cd(tmpdir);
-			fprintf( fo, '%s', com);
-			if strcmp(mainonly,'off')
-				inputfile = which( files{index});
-				try, copyfile( inputfile, [ DEST files{index} ]); % asuming the file is in the path 
-				catch, fprintf('Cannot copy file %s\n', inputfile); end;
-			end;
+            if ~exist(fullfile(DEST, [ files{index}(1:end-1) 'html' ]))
+                fprintf('Processing %s\n', files{index});
+                cd(DEST); com = help2html( files{index}, [], options{:}); cd(tmpdir);
+                fprintf( fo, '%s', com);
+                if strcmp(mainonly,'off')
+                    inputfile = which( files{index});
+                    try, copyfile( inputfile, [ DEST files{index} ]); % asuming the file is in the path 
+                    catch, fprintf('Cannot copy file %s\n', inputfile); end;
+                end;
+            else
+                cd(DEST); com = help2html( files{index}, [], options{:}, 'outputonly', 'on'); cd(tmpdir);
+                fprintf( fo, '%s', com);
+                fprintf('Skipping %s\n', files{index});                
+            end;
 		end;
 		fprintf(fo, '</table>' );
 	end;	
