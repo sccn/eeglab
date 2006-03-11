@@ -8,7 +8,7 @@
 % the frequencies vector of the spectrum. 
 %
 % Usage:    
-%   >> [spec, f] = std_readspec(ALLEEG, abset, comp);  
+%   >> [spec, f] = std_readspec(ALLEEG, abset, comp, freqrange);  
 %   % This functions returns the spectrum of an ICA component. 
 %   % The information is loaded from a float file, created by the 
 %   % pre-clustering function std_spec(), in a specific frequency range. 
@@ -20,6 +20,7 @@
 %                      structure, for which to get the component spectrum.
 %   component  - [integer] a component index in the selected EEG dataset for which 
 %                      a spectrum will be returned. 
+%   freqrange  - [min max] frequency range in Hz
 %
 % Outputs:
 %   spec          - the spectrum of the requested ICA component in the
@@ -49,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2006/03/11 07:25:37  arno
+% header
+%
 % Revision 1.10  2006/03/10 16:33:37  arno
 % selecting frequency range for reading
 %
