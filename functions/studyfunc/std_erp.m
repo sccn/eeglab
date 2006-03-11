@@ -1,14 +1,11 @@
 % std_erp() -   Constructs and returns ICA activation ERPs for a dataset. 
 %               Updates the EEG structure both in the Matlab environment 
-%               and on disk Saves the ERPs into a float file, and then saves 
-%               a pointer to the file in the EEG structure. If such a float file 
+%               and on disk Saves the ERPs into a file. If such a file 
 %               already exists, loads its information. Options allow
 %               limiting ERP coomputation to specified components, and to a 
 %               specific latency range within the epoch limits. The function 
 %               returns the ERP of the selected ICA components in the requested 
-%               time window. A latencies vector is returned, as well as the
-%               EEG sub-structure EEG.etc, to which is added a pointer to the 
-%               ERP float file and some information about it. 
+%               time window.
 % Usage:    
 %            >> [data, times] = std_erp(EEG,components,timewindow);  
 % Inputs:
@@ -48,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2006/03/10 16:23:43  arno
+% reprogram timerange
+%
 % Revision 1.20  2006/03/10 00:30:21  arno
 % update header
 %

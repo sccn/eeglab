@@ -1,15 +1,14 @@
 % std_readersp() - Given the ALLEEG structure, a specific EEG dataset index, 
 %                  and a specific component, return the mean log-frequency scaled 
 %                  ERSP for a specified ICA component. The ERSP of the dataset ICA 
-%                  component is assumed to be saved in a float file. The EEG dataset 
-%                  includes a pointer to this file. If such a float file doesn't 
+%                  component is assumed to be saved in a Matlab file. If such a file doesn't 
 %                  exist, you can use the std_ersp() function to create it, or use 
-%                  pop_preclust(), eeg_preclust(), and eeg_createdata(). The ERSP 
-%                  information is specific to the input variables used to compute it: 
-%                  frequency range, timewindow, resolution, probability threshold, 
-%                  and wavelet type (FFT|wavelet_cycles), see >> timef details 
+%                  pop_preclust(), std_preclust(). The ERSP  information is specific 
+%                  to the input variables used to compute it: frequency range, timewindow,
+%                  resolution, probability threshold, 
+%                  and wavelet type (FFT|wavelet_cycles), see the timef() function.
 %                  Along with the ERSP of the selected ICA component the function 
-%                  returns the log frequency vector of the ERSP samples. 
+%                  returns the frequency vector (in log space) of the ERSP samples. 
 % Usage:    
 %       >> [logersp, logfreqs] = std_readersp(ALLEEG, setindex, component);  
 %
@@ -27,7 +26,7 @@
 %                      activations.
 %   logfreqs   - a vector of the frequencies points in log scale. 
 %
-%  See also  std_ersp, pop_preclust, eeg_preclust, eeg_createdata           
+% See also:  std_ersp(), pop_preclust(), std_preclust()
 %
 % Authors: Arnaud Delorme, Hilit Serby, SCCN, INC, UCSD, February, 2005
 
@@ -50,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2006/03/10 17:44:25  arno
+% typo
+%
 % Revision 1.8  2006/03/10 15:49:19  arno
 % fix reading ERSP
 %

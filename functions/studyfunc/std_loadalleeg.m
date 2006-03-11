@@ -1,12 +1,9 @@
 % std_loadalleeg() - constructs an ALLEEG structure, given the paths and file names 
 %                    of all the EEG datasets that will be loaded into the ALLEEG 
-%                    structure. The EEG datasets are loaded without their EEG.data 
-%                    and EEG.icaact fields to save memory, so many datasets can be 
+%                    structure. The EEG datasets may be loaded without their EEG.data 
+%                    (see the pop_editoptions() function), so many datasets can be 
 %                    loaded simultaneously. The loaded EEG datasets have dataset 
-%                    information and a (filename) pointer to the data. The datasets 
-%                    must have been saved in this format using pop_saveset() with 
-%                    input argument 'savemode' set to 'twofiles'. For details, 
-%                    see >> help pop_saveset
+%                    information and a (filename) pointer to the data. 
 % Usage:    
 %                  % Load sseveral EEG datasets into an ALLEEG structure.
 %                  >> ALLEEG = std_loadalleeg(paths,datasets) ;  
@@ -17,13 +14,7 @@
 %
 % Output:
 %   ALLEEG     - an EEGLAB data structure, which holds the loaded EEG sets  
-%                 (can also be one EEG set). The loaded EEG datasets do not
-%                 contain the data or ICA activations (EEG.data, EEG.icaact), 
-%                 Instead, EEG.data holds a pointer (name) to the float file 
-%                 that holds the dataset EEG data. The datasets must be saved 
-%                 beforehand in this format using pop_saveset() with the input 
-%                 argument 'savemode' set to 'twofiles'. For details, see 
-%                 >> help pop_saveset 
+%                 (can also be one EEG set).
 %  Example: 
 %          >> paths = {'/home/eeglab/data/sub1/','/home/eeglab/data/sub2/', ...  
 %          >>          '/home/eeglab/data/sub3/', '/home/eeglab/data/sub6/'};

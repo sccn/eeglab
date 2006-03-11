@@ -1,8 +1,8 @@
 % std_centroid() - compute cluster centroid in EEGLAB dataset STUDY.
 %                  Compute and store the centroid(s) (i.e., mean(s)) 
 %                  for some combination of six measures on specified
-%                  clusters in a STUDY. Possible measures include:
-%                  scalp_maps, ERPs, spectra, ERSPs, ITCs, dipole_locations
+%                  clusters in a STUDY. Possible measures include: scalp
+%                  maps, ERPs, spectra, ERSPs, ITCs, dipole_locations
 % Usage:    
 %        >> [STUDY, centroid] = std_centroid(STUDY, ALLEEG, clsind, ctr1, ctr2, ...);
 %
@@ -12,7 +12,7 @@
 %   clusters     - [vector], cluster indices. Compute centroids only for specified 
 %                  clusters. If [], compute centroids for all STUDY clusters. 
 %   measures     - ['erp'|'spec'|'scalp'|'dipole'|'itc'|'ersp'].   
-%                  The measures(s) for which to calculate the cluster centroid(s):
+%                  The measures(s) for which to calculate the cluster centroid(s) are, 
 %                     'erp'    ->  mean ERP of each cluster.
 %                     'dipole' -> mean dipole of each cluster.
 %                     'spec'   ->  mean spectrum of each cluster (baseline removed).
@@ -62,6 +62,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2006/03/11 00:29:15  arno
+% header
+%
 % Revision 1.18  2006/03/10 18:22:17  arno
 % renaming variables
 %

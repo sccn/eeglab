@@ -23,12 +23,12 @@
 %                   only the datasets that are part of that cluster.
 %                  'all' -> Grand ERP envelope includes all datasets in STUDY. 
 %                   If multiple clusters, this is the only option possible. 
-%  'only_clust'  = [ 'on' | 'off'] dataset components to include in the grand ERP: 
-%                  'on' - include only the components that were part of the clustering 
+%  'only_clust'  = [ 'on' | 'off'] dataset components to include in the grand ERP. 
+%                  'on' will include only the components that were part of the clustering 
 %                   For example, if components were rejected from clustering because 
 %                   of high dipole model residual variance, don't include their 
 %                   data in the grand ERP.
-%                  'off' - include all components in the datasets except those 
+%                  'off' will include all components in the datasets except those 
 %                   in the subtructed ('subclus') clusters {default 'off'}. 
 %  'baseline'    = [minms maxms] - a new baseline to remove from the grand
 %                   ERP and cluster ERP contributions.
@@ -51,7 +51,6 @@
 %                   {default|[] -> none}
 %
 % See also: envtopo(), std_granderp(), envtopo_plot()
-%
 
 function std_envtopo(STUDY, ALLEEG, varargin)
 icadefs;

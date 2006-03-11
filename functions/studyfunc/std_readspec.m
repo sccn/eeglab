@@ -1,25 +1,24 @@
 % std_readspec() - Given the ALLEEG structure, a specific EEG dataset index, 
 % and a specific component, the function returns the spectrum of that ICA component. 
-% The spectrum of the dataset ICA components is assumed to be saved in a float 
-% file, the EEG dataset include a pointer to this file. If such a float file doesn't exist,
+% The spectrum of the dataset ICA components is assumed to be saved in a Matlab 
+% file. If such a file doesn't exist,
 % you can use the std_spec() function to create it, or use the pre - clustering functions
-% that call it: pop_preclust, eeg_preclust & eeg_createdata.  
+% that call it: pop_preclust(), std_preclust().  
 % Along with the spectrum of the selected ICA component the function returns  
 % the frequencies vector of the spectrum. 
 %
 % Usage:    
 %   >> [spec, f] = std_readspec(ALLEEG, abset, comp);  
-%   This functions returns the spectrum of an ICA component. 
-%   The information is loaded from a float file, which a pointer 
-%   to is saved in the EEG dataset. The float file was created by the 
-%   pre - clustering function std_spec, in a specific frequency range. 
+%   % This functions returns the spectrum of an ICA component. 
+%   % The information is loaded from a float file, created by the 
+%   % pre-clustering function std_spec(), in a specific frequency range. 
 %
 % Inputs:
 %   ALLEEG     - an EEGLAB data structure, which holds EEG sets (can also be one EEG set). 
 %                      ALLEEG must contain the dataset of interest (the setind).
-%   setind         -  [integer] an index of an EEG dataset in the ALLEEG
+%   setind     -  [integer] an index of an EEG dataset in the ALLEEG
 %                      structure, for which to get the component spectrum.
-%   component - [integer] a component index in the selected EEG dataset for which 
+%   component  - [integer] a component index in the selected EEG dataset for which 
 %                      a spectrum will be returned. 
 %
 % Outputs:
@@ -27,7 +26,7 @@
 %                    selected dataset. 
 %   f             - a vector of the frequency points in which the spectra was computed. 
 %
-%  See also  std_spec, pop_preclust, eeg_preclust, eeg_createdata           
+%  See also  std_spec(), pop_preclust(), std_preclust()
 %
 % Authors:  Arnaud Delorme, Hilit Serby, SCCN, INC, UCSD, February, 2005
 
@@ -50,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2006/03/10 16:33:37  arno
+% selecting frequency range for reading
+%
 % Revision 1.9  2006/03/10 00:37:45  arno
 % error msg
 %

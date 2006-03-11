@@ -1,17 +1,22 @@
 % pop_study()  - create a new STUDY set structure defining a group of related EEG datasets. 
-%                The STUDY set also contains information about each of the datasets: 
-%                the subject code, subject group, exp. condition and session. This can be 
+%                The STUDY set also contains information about each of the datasets: the 
+%                subject code, subject group, exp. condition and session. This can be 
 %                provided interactively in a pop-up window or be automatically filled 
 %                in by the function. Defaults: Assume a different subject for each 
 %                dataset and only one condition; leave subject group and session fields 
 %                empty. Additional STUDY information about the STUDY name, task and 
 %                miscellaneous notes can also be saved in the STUDY structure.
 % Usage:  
-%                >> [ STUDY ALLEEG] = pop_study; % specify sets interactively
-%                >> [ STUDY ALLEEG] = pop_study(ALLEEG); % included the loaded
-%                                                        % EEG datasets
+%  >> [ STUDY ALLEEG ] = pop_study([],[], 'gui', 'on'); % create new study interactively
+%  >> [ STUDY ALLEEG ] = pop_study(STUDY, ALLEEG, 'gui', 'on'); % edit study interactively
+%  >> [ STUDY ALLEEG ] = pop_study(STUDY, ALLEEG, 'key', 'val', ...); % edit study
+%
 % Optional Inputs:
+%   STUDY                - existing study structure. 
 %   ALLEEG               - vector of EEG dataset structures to be included in the STUDY. 
+%
+% Optional Inputs:
+%   All "'key', 'val'" inputs of std_editset() may be used.
 %
 % Outputs:
 %   STUDY                - a new STUDY set comprising some or all of the datasets in 
@@ -39,7 +44,7 @@
 %                          structure to disk. If no filename is provided, a window will 
 %                          pop up to ask for the file name. 
 %
-%  See also  create_study(), pop_loadstudy(), pop_preclust(), eeg_preclust(), pop_clust()
+%  See also  pop_loadstudy(), pop_preclust(), pop_clust()
 %
 % Authors: Arnaud Delorme, Hilit Serby, Scott Makeig, SCCN, INC, UCSD, July 22, 2005
 
@@ -64,6 +69,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.39  2006/03/08 21:10:29  arno
+% rename func
+%
 % Revision 1.38  2006/03/06 22:33:34  arno
 % same
 %

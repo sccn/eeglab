@@ -3,7 +3,7 @@
 % The ERP of the dataset ICA components is assumed to be saved in a Matlab 
 % file. If such a file doesn't exist,
 % you can use the std_erp() function to create it, or use the pre - clustering functions
-% that call it: pop_preclust, eeg_preclust & eeg_createdata.  
+% that call it: pop_preclust(), std_preclust().  
 % Along with the ERP of the selected ICA component the function returns  
 % the time vector of the ERP samples. 
 %
@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2006/03/11 07:18:43  arno
+% header information
+%
 % Revision 1.9  2006/03/10 16:08:19  arno
 % select time range
 %

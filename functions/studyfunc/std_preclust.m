@@ -38,47 +38,47 @@
 %   preprocX     - {'comnd' 'key1' val1 'key2' val2 ...} component clustering measures to prepare
 %
 %                  'comnd' = component measures to compute:
-%                    * 'erp'     = cluster on the component ERPs,
-%                    * 'dipoles' = cluster on the component [X Y Z] dipole locations
-%                    * 'dipselect' = select components to cluster that have residual 
+%                    'erp'     = cluster on the component ERPs,
+%                    'dipoles' = cluster on the component [X Y Z] dipole locations
+%                    'dipselect' = select components to cluster that have residual 
 %                                  dipole variance less than a specified threshold. 
-%                    * 'spec'    = cluster on the component log activity spectra (in dB)
+%                    'spec'    = cluster on the component log activity spectra (in dB)
 %                                  (with the baseline mean dB spectrum subtracted).
-%                    * 'scalp'   = cluster on component (topoplot()) scalp maps 
+%                    'scalp'   = cluster on component (topoplot()) scalp maps 
 %                                  (or on their absolute values),
-%                    * 'scalpLaplac' = cluster on component (topoplot()) laplacian scalp maps
+%                    'scalpLaplac' = cluster on component (topoplot()) laplacian scalp maps
 %                                  (or on their absolute values),
-%                    * 'scalpGrad' = cluster on the (topoplot()) scalp map gradients 
+%                    'scalpGrad' = cluster on the (topoplot()) scalp map gradients 
 %                                  (or on their absolute values),
-%                    * 'ersp'    = cluster on components ERSP. (requires: 'cycles', 
+%                    'ersp'    = cluster on components ERSP. (requires: 'cycles', 
 %                                  'freqrange', 'padratio', 'timewindow', 'alpha').
-%                    * 'itc'     = cluster on components ITC.(requires: 'cycles', 
+%                    'itc'     = cluster on components ITC.(requires: 'cycles', 
 %                                  'freqrange', 'padratio', 'timewindow', 'alpha').
-%                    * 'finaldim' = final number of dimensions. Enables second-level PCA. 
+%                    'finaldim' = final number of dimensions. Enables second-level PCA. 
 %                                  By default this command is not used (see Example below).
 %
 %                  'key'   optional inputs used in computing  the specified measures:
-%                    * 'npca'    =  [integer] number of principal components (PCA dimension) of 
+%                    'npca'    =  [integer] number of principal components (PCA dimension) of 
 %                                   the selected measures to retain for clustering. {default: 5}
-%                    * 'norm'    =  [0|1] 1 -> normalize the PCA components so the variance of 
+%                    'norm'    =  [0|1] 1 -> normalize the PCA components so the variance of 
 %                                   first principal component is 1 (useful when using several 
 %                                   clustering measures - 'ersp','scalp',...). {default: 1}
-%                    * 'weight'  =  [integer] weight with respect to other clustering measures.
-%                    * 'freqrange'  = [min max] frequency range (in Hz) to include in activity 
+%                    'weight'  =  [integer] weight with respect to other clustering measures.
+%                    'freqrange'  = [min max] frequency range (in Hz) to include in activity 
 %                                   spectrum, 'ersp', and 'itc' measures.  
-%                    * 'timewindow' = [min max] time window (in sec) to include in 'erp',
+%                    'timewindow' = [min max] time window (in sec) to include in 'erp',
 %                                   'ersp', and 'itc' measures.  
-%                    * 'abso'    =  [0|1] 1 = use absolute values of topoplot(), gradient, or 
+%                    'abso'    =  [0|1] 1 = use absolute values of topoplot(), gradient, or 
 %                                   Laplacian maps {default: 1}
-%                    * 'cycles'  =  [0| cycles_factor] for ERSP and ITC (see >> timef details) 
+%                    'cycles'  =  [0| cycles_factor] for ERSP and ITC (see >> timef details) 
 %                                   {default: 0 (=> FFT method)}
-%                    * 'padratio'=  [integer] for ERSP and ITC (see >> timef details) {default:1}
-%                    * 'alpha'   =  [integer] bootstrap probability significance threshold for 
+%                    'padratio'=  [integer] for ERSP and ITC (see >> timef details) {default:1}
+%                    'alpha'   =  [integer] bootstrap probability significance threshold for 
 %                                   masking component mean ERSP and ITC measures 
 %                                   (>> timef details) {default: 0.01}
-%                    * 'funarg'  =  [cell array] optional function arguments for mean spectrum 
+%                    'funarg'  =  [cell array] optional function arguments for mean spectrum 
 %                                   calculation (>> help spectopo) {default: none}
-%                    * 'rv'      =  [number < 1] for dipole locations ('dipselect'), max component 
+%                    'rv'      =  [number < 1] for dipole locations ('dipselect'), max component 
 %                                   model residual variance. Only components with a lower residual 
 %                                   variance (rv) will be clustered {default: 0 (all components)}
 % Outputs:
@@ -128,6 +128,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.41  2006/03/11 06:23:06  arno
+% same
+%
 % Revision 1.40  2006/03/11 06:20:38  arno
 % remove debug message, fix ERSP
 %

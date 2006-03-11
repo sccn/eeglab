@@ -1,18 +1,17 @@
 % std_readtopo() - Given the ALLEEG structure, a specific EEG dataset index, 
 % and a specific component, the function returns the scalp map of that ICA component. 
 % The scalp map grid of the dataset ICA components is assumed to be saved in a  
-% file. If such a file doesn't exist,
-% you can use the std_topo() function to create it, or use the pre - clustering functions
-% that call it: pop_preclust, eeg_preclust & eeg_createdata.  
+% Matlab file. If such a file doesn't exist,
+% you can use the std_topo() function to create it, or use the pre-clustering functions
+% that call it: pop_preclust(), eeg_preclust().  
 % Along with the scalp map grid of the selected ICA component the function returns  
 % the two axis grid points vectors (x and y). 
 %
 % Usage:    
 %   >> [grid, y, x ] = std_readtopo(ALLEEG, abset, component);  
-%   This functions returns the ICA component scalp map grid. 
-%   The information is loaded from a float file, which a pointer 
-%   to is saved in the EEG dataset. The float file was created
-%   by the pre - clustering function std_scalp. 
+%   % This functions returns the ICA component scalp map grid. 
+%   % The information is loaded from a file, created
+%   % by the pre-clustering function std_topo(). 
 %
 % Inputs:
 %   ALLEEG     - an EEGLAB data structure, which holds EEG sets (can also be one EEG set). 
@@ -29,7 +28,7 @@
 %   x             - the x axis points of the interpolated grid, for plotting purposes.  
 %   y             - the y axis points of the interpolated grid, for plotting purposes.  
 %
-%  See also  std_topo(), pop_preclust()
+%  See also  std_topo(), std_preclust()
 %
 % Authors: Arnaud Delorme, Hilit Serby, SCCN, INC, UCSD, February, 2005
 
@@ -52,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2006/03/10 00:37:17  arno
+% error msg
+%
 % Revision 1.5  2006/03/09 19:00:42  arno
 % reading Matlab file
 %

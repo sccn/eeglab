@@ -1,18 +1,18 @@
 % std_ersp() - Computes ERSP and/or ITC information for ICA components of a dataset, 
-%              saves results into float files and and places pointers to the files 
-%              in the dataset EEG structures. When the ERSP/ITC float files already exist, 
+%              saves results into Matlab files. When the ERSP/ITC float files already exist, 
 %              the function loads the ERSP/ITC information from it, unless the requested 
 %              flag specifies differently: If so, a query window pops up. 
+%
+% Function description:
+%              The function returns the masked (as per the requested alpha) ERSP or ITC
+%              for the selected ICA components in the requested frequency range and 
+%              time window (the two are dependent). Frequencies are equally log spaced.
 %
 %              Re options to specify component numbers, the desired frequency range, 
 %              timewindow, resolution, confidence level and the wavelet parameters 
 %              (number of cycles): see >> help timef and >> timef details 
 %
-%              The function returns the masked (as per the requested alpha) ERSP or ITC
-%              for the selected ICA components in the requested frequency range and 
-%              time window (the two are dependent). Frequencies are equally log spaced.
-%
-%              Two float files are saved, one for ERSP and one for ITC information:
+%              Two Matlab files are saved, one for ERSP and one for ITC information.
 %              These contain the unprocessed ERSP|ITC image and its significant levels.
 %              (See filename info below).
 %
@@ -21,6 +21,7 @@
 %              Vectors of frequencies and latencies for the ERSP/ITC images are returned 
 %              separately, as well as the EEG.etc sub-structure modified with pointers 
 %              to the output float files and some information about them. 
+%
 % Usage:  
 %              >> [X times logfreqs ] = std_ersp(EEG, components,  ...
 %                                                    freqrange, timewindow,  ...
@@ -60,9 +61,10 @@
 %   logfreqs  - a vector of (equally log spaced) frequencies (in Hz) at which the 
 %               log ERSP/ITC was evaluated. 
 %
-% Files written or modified:     [dataset_filename].icaersp   <-- saved component ERSPs
-%                                [dataset_filename].icaitc    <-- saved component ITCs
-%                                [dataset_filename].set       <-- re-saved dataset
+% Files written or modified:     
+%              [dataset_filename].icaersp   <-- saved component ERSPs
+%              [dataset_filename].icaitc    <-- saved component ITCs
+%
 % Example: 
 %            % create ERSP and ITC images on disk for all comps from dataset EEG
 %            % use three-cycle wavelets (at 3 Hz) to >3-cycle wavelets at 50 Hz
@@ -72,7 +74,7 @@
 %                                                    [1:size(EEG.icawinv,2)],...
 %                                                     [3 50], [3 0.5], 4, 0.01, 'ersp');
 %
-% See also: timef(), std_itc(), std_erp(), std_spec(), std_map(), std_preclust()
+% See also: timef(), std_itc(), std_erp(), std_spec(), std_topo(), std_preclust()
 %
 % Authors: Arnaud Delorme,  Hilit Serby, SCCN, INC, UCSD, January, 2005
 
@@ -95,6 +97,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2006/03/11 00:35:50  arno
+% retreive previous version
+%
 % Revision 1.25  2006/03/10 15:50:07  arno
 % converting values to single
 %
