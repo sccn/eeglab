@@ -12,11 +12,10 @@
 %   ALLEEG      - a vector of loaded EEG dataset structures of all sets in the STUDY set.
 %
 % Optional Inputs:
-%   'algorithm' - ['kmeans' | 'Neural Network'] algorithm to be used for clustering.
+%   'algorithm' - ['kmeans'|'Neural Network'] algorithm to be used for clustering.
 %                 the 'Neural Network' option requires the Matlab Neural Net toolbox 
 %                    {default: 'kmeans'} 
-%   'clust_num' - [num] the number of desired clusters (must be > 1)
-%                    {default: 20}
+%   'clust_num' - [num] the number of desired clusters (must be > 1) {default: 20}
 %   'save'      - ['on' | 'off'] save the updated STUDY to disk {default: 'off'} 
 %   'filename'  - [string] if save option is 'on', save the STUDY under this file name
 %                    {default: current STUDY filename}
@@ -29,7 +28,7 @@
 %  "Clustering algorithm" - [list box] display/choose among the available clustering 
 %                           algorithms. 
 %  "Number of clusters to compute" - [edit box] the number of desired clusters (>2)
-%  "Identify outliers'' - [check box] check to detect outliers. 
+%  "Identify outliers"  - [check box] check to detect outliers. 
 %  "Save STUDY"         - [check box] check to save the updated STUDY after clustering 
 %                         is performed. If no file entered, overwrites the current STUDY. 
 %
@@ -58,6 +57,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2006/03/11 00:27:40  arno
+% header
+%
 % Revision 1.19  2006/03/10 22:53:17  arno
 % typo
 %

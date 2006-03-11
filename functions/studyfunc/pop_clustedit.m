@@ -123,7 +123,7 @@
 %                a list of the selected component(s) is presented. For changes to take place,
 %                press the popup window 'OK' button, else press the 'Cancel' button. 
 %                Uses the command line function std_moveoutlier().
-%  "Reassign selected component(s)"- [button] Moves selected component(s) from one cluster 
+%  "Reassign selected component(s)" - [button] Moves selected component(s) from one cluster 
 %                to another. The components that will reassign are the ones selected in the
 %                "Select component(s) to plot" list box. Opens a popup window in which 
 %                a list of possible clusters to which to move the selected component(s) is 
@@ -133,9 +133,9 @@
 %                to specified user edits to the disk. If no file name is entered will
 %                overwrite the current STUDY set file. 
 %
-%  See also  pop_preclust(), pop_clust().         
+% See also:  pop_preclust(), pop_clust().         
 %
-% Authors:  Hilit Serby, Arnaud Delorme, Scott Makeig, SCCN/INC/UCSD, October 11, 2004
+% Authors: Arnaud Delorme, Hilit Serby, Scott Makeig, SCCN/INC/UCSD, October 11, 2004
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 

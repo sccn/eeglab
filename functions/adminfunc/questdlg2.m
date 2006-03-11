@@ -5,7 +5,6 @@
 %
 % Warning: 
 % Case of button text and result might be changed by the function
-%         
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, La Jolla, 11 August 2002
 %
@@ -30,6 +29,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2005/08/04 22:13:07  arno
+% adapting box size
+%
 % Revision 1.11  2002/10/15 17:23:50  arno
 % drawnow
 %
