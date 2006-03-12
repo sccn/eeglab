@@ -97,6 +97,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2006/03/11 07:11:28  arno
+% header
+%
 % Revision 1.27  2006/03/11 00:35:50  arno
 % retreive previous version
 %
@@ -172,7 +175,7 @@
 % put log
 %
 
-function [X times freqs] = std_ersp(EEG, comps, freqrange, timewindow, cycles, padratio, alpha, type, powbase)
+function [X, times, freqs] = std_ersp(EEG, comps, freqrange, timewindow, cycles, padratio, alpha, type, powbase)
 
 % checking input parameters
 % -------------------------
