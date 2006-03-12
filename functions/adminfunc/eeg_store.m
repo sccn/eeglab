@@ -53,6 +53,9 @@
 % uses the global variable EEG ALLEEG CURRENTSET 
 
 % $Log: not supported by cvs2svn $
+% Revision 1.42  2006/03/10 21:39:40  arno
+% debug last change
+%
 % Revision 1.41  2006/03/10 21:36:58  arno
 % storing datasets
 %
@@ -236,6 +239,8 @@ if nargin < 4
         else 
             EEG.saved = 'no';
         end;
+    else
+        EEG.saved = 'no';        
     end;
 else
     error('does not support more than 3 arguments anymore');
