@@ -62,6 +62,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2006/03/11 07:04:18  arno
+% header
+%
 % Revision 1.19  2006/03/11 00:29:15  arno
 % header
 %
@@ -237,7 +240,7 @@ if itcC | erspC | specC | erpC | scalpC
                         end
                         all_erp(:,compind(k)) = erp;
                         if (k == length(compind) ) &  (ind == STUDY.cluster(clsind(clust)).sets(1,end)) 
-                            [all_erp pol] = comppol(all_erp);
+                            [all_erp pol] = std_comppol(all_erp);
                             centroid{clust}.erp{cond} = mean(all_erp,2);
                             centroid{clust}.erp_times = t;
                         end

@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2006/03/10 18:22:56  arno
+% rename variable
+%
 % Revision 1.14  2006/03/10 16:23:32  arno
 % fix plotting erps
 %
@@ -164,7 +167,7 @@ if strcmpi(mode, 'comps')
         for condi = 1: Ncond
             ave_erp(:,condi) = STUDY.cluster(cls(clus)).centroid.erp{condi};
             if  condi == Ncond
-                [tmp Avepol] = comppol(ave_erp);
+                [tmp Avepol] = std_comppol(ave_erp);
                 clear tmp ave_erp
             end
         end
@@ -190,7 +193,7 @@ if strcmpi(mode, 'comps')
            handl(n) = sbplot(rowcols(1),rowcols(2),n);
            ave_erp = STUDY.cluster(cls(clus)).centroid.erp{n};
            t = STUDY.cluster(cls(clus)).centroid.erp_times;
-           [all_erp pol] = comppol(clusnval.erp');
+           [all_erp pol] = std_comppol(clusnval.erp');
            plot(t/1000,Avepol(n)*all_erp,'color', [0.5 0.5 0.5]);
            hold on
            plot(t/1000,Avepol(n)*ave_erp,'k','linewidth',2);
@@ -253,7 +256,7 @@ if strcmpi(mode, 'centroid')
             erp_max = max(erp_max, max(STUDY.cluster(cls(k)).centroid.erp{n}));
             ave_erp(:,n) = STUDY.cluster(cls(k)).centroid.erp{n};
             if n == Ncond
-                [ave_erp pol] = comppol(ave_erp);
+                [ave_erp pol] = std_comppol(ave_erp);
                 t = STUDY.cluster(cls(k)).centroid.erp_times;
                 a = [ STUDY.cluster(cls(k)).name ', ' num2str(length(unique(STUDY.cluster(cls(k)).sets(1,:)))) 'Ss'];
                 for condi = 1: Ncond
@@ -397,7 +400,7 @@ for ci = 1 : length(comp_ind) %for each comp
             for condi = 1: Ncond
                 ave_erp(:,condi) = STUDY.cluster(cls).centroid.erp{condi};
                 if  condi == Ncond
-                    [tmp Avepol] = comppol(ave_erp);
+                    [tmp Avepol] = std_comppol(ave_erp);
                     clear tmp ave_erp
                 end
             end
@@ -405,7 +408,7 @@ for ci = 1 : length(comp_ind) %for each comp
             Avepol = 1;
         end
         ave_erp = STUDY.cluster(cls).centroid.erp{n};
-        [erp tmp] = comppol([erp' Avepol(n)*ave_erp]);
+        [erp tmp] = std_comppol([erp' Avepol(n)*ave_erp]);
         plot(t,erp,'c');
         plot(t,Avepol(n)*ave_erp,'k','linewidth',2);
         xlabel('t [ms]');
