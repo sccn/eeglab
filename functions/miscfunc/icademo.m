@@ -29,6 +29,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2005/02/06 01:32:33  arno
+% updating eegplot call
+%
 % Revision 1.13  2004/12/14 15:32:33  arno
 % fixing envtopo
 %
@@ -107,7 +110,7 @@ fprintf('\n *************************************************************\n');
 fprintf(' *************************************************************\n\n');
 
 v=version;
-if v(1) < 5
+if v(1) < '5'
   fprintf('Not all segments may work for Matlab version 4.\n')
 end
 
