@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.464  2006/03/10 21:25:51  arno
+% activate save current datasets
+%
 % Revision 1.463  2006/03/10 20:10:39  arno
 % smae
 %
@@ -1821,8 +1824,8 @@ catchstrs.new_non_empty          = e_newset;
 	cb_study1      = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_study([], ALLEEG         , ''gui'', ''on'');'          e_load_study]; 
 	cb_study2      = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_study([], isempty(ALLEEG), ''gui'', ''on'');'          e_load_study]; 
 	cb_loadstudy   = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_loadstudy;'                                            e_load_study]; 
-	cb_savestudy1  = [ check   '[STUDYTMP ALLEEGTMP LASTCOM] = pop_savestudy(STUDY, EEG, ''savemode'', ''resave'');'      e_load_study ];
-	cb_savestudy2  = [ check   '[STUDYTMP ALLEEGTMP LASTCOM] = pop_savestudy(STUDY, EEG);' e_hist_nh ];
+	cb_savestudy1  = [ check   '[STUDYTMP ALLEEGTMP LASTCOM] = pop_savestudy(STUDY, EEG, ''savemode'', ''resave'');'      e_load_study];
+	cb_savestudy2  = [ check   '[STUDYTMP ALLEEGTMP LASTCOM] = pop_savestudy(STUDY, EEG);'                                e_load_study];
 	cb_clearstudy  =           'LASTCOM = ''STUDY = []; CURRENTSTUDY = 0; ALLEEG = []; EEG=[]; CURRENTSET=[];''; eval(LASTCOM); eegh( LASTCOM ); eeglab redraw;';
 	cb_editoptions = [ nocheck 'if isfield(ALLEEG, ''nbchan''), LASTCOM = pop_editoptions(length([ ALLEEG.nbchan ]) >1);' ...
                                     'else                            LASTCOM = pop_editoptions(0); end;'                  e_storeall_nh];
