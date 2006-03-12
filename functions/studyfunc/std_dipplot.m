@@ -1,4 +1,3 @@
-%
 % std_dipplot() - Commandline function to plot cluster component dipoles. Dipoles for each
 %                 named cluster is displayed in a separate figure. To view all the clustered 
 %                 components in the STUDY on the same figure (in a separate subplot), all 
