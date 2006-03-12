@@ -57,6 +57,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2006/03/11 06:05:50  arno
+% header
+%
 % Revision 1.20  2006/03/11 00:27:40  arno
 % header
 %
@@ -142,7 +145,7 @@ if isempty(varargin) %GUI call
         strclust = [ 'Performing sub-clustering on cluster ''' STUDY.cluster(STUDY.etc.preclust.clustlevel).name '''' ];
     end;
     
-	clust_param = inputgui( { [1] [1] [3 1] [3 1] [ 0.2 2.7 1 ] [1] [0.29 2 2.5 0.8] }, ...
+	clust_param = inputgui( { [1] [1] [3 1] [3 1] [ 0.2 2.73 1 ] [1] [0.29 2 2.5 0.8] }, ...
 	{ {'style' 'text'       'string' strclust 'fontweight' 'bold'  } {} ...
       {'style' 'text'       'string' 'Clustering algorithm:' } ...
       {'style' 'popupmenu'  'string' alg_options  'value' 1 'tag' 'clust_algorithm'  'Callback' algoptions } ...
