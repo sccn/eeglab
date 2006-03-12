@@ -62,6 +62,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2006/03/12 04:27:45  arno
+% message
+%
 % Revision 1.21  2006/03/12 04:21:06  arno
 % component polarity
 %
@@ -241,7 +244,7 @@ if itcC | erspC | specC | erpC | scalpC
                         if (k==1) & (ind == STUDY.cluster(clsind(clust)).sets(1,1))
                             all_erp = zeros(length(erp),length(STUDY.cluster(clsind(clust)).comps));
                         end
-                        all_erp(:,compind(k)) = erp;
+                        all_erp(:,compind(k)) = erp';
                         if (k == length(compind) ) &  (ind == STUDY.cluster(clsind(clust)).sets(1,end)) 
                             [all_erp pol] = std_comppol(all_erp);
                             centroid{clust}.erp{cond} = mean(all_erp,2);
