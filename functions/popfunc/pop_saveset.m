@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.80  2006/03/10 21:49:29  arno
+% nothing
+%
 % Revision 1.79  2006/03/10 21:43:34  arno
 % message
 %
@@ -361,10 +364,11 @@ if strcmpi(g.savemode, 'resave')
     % process multiple datasets
     % -------------------------
     if length(EEG) > 1
-        [ EEG com ] = eeg_eval( 'pop_saveset', EEG, 'warning', 'off', 'params', { 'savemode', 'resave' } );
         for index = 1:length(EEG)
+            pop_saveset(EEG, 'savemode', 'resave');
             EEG(index).saved = 'yes';
         end;
+        com = sprintf('%s = pop_saveset( %s, %s);', inputname(1), inputname(1), vararg2str(options));
         return;
     end;
     
