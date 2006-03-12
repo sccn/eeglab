@@ -110,9 +110,9 @@ STUDY.filename = g.filename;
 STUDYfile = fullfile(STUDY.filepath,STUDY.filename);
 v = version;
 if v(1) > '6'
-    save('-mat', STUDYfile, 'STUDY');
-else
     save('-v6' , STUDYfile, 'STUDY');
+else
+    save('-mat', STUDYfile, 'STUDY');
 end;
 
 % history
