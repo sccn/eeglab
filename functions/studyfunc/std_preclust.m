@@ -128,6 +128,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.42  2006/03/11 07:17:06  arno
+% header
+%
 % Revision 1.41  2006/03/11 06:23:06  arno
 % same
 %
@@ -554,7 +557,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, components
               % --------------------------
              case 'scalp' , % NB: scalp maps are identical across conditions (within session)
                  idat = STUDY.datasetinfo(STUDY.setind(1,si)).index; 
-                 fprintf('Computing interpolated scalp maps for dataset %s...\n', idat);
+                 fprintf('Computing interpolated scalp maps for dataset %d...\n', idat);
                  if ~isempty(succompind{si})
                      X = std_topo(ALLEEG(idat), succompind{si});
                      if abso % absolute values
