@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.192  2006/03/12 03:10:43  arno
+% testing dipfit standard files
+%
 % Revision 1.191  2006/03/10 21:48:52  arno
 % preserve saving status
 %
@@ -1556,8 +1559,8 @@ else
         if strcmpi(EEG.dipfit.hdmfile(end-8), template_models{2}{1}(end-8)), EEG.dipfit.hdmfile = template_models{2}{1}; end;
         if strcmpi(EEG.dipfit.mrifile(end-8), template_models{1}{3}(end-8)), EEG.dipfit.mrifile = template_models{1}{3}; end;
         if strcmpi(EEG.dipfit.mrifile(end-8), template_models{2}{3}(end-8)), EEG.dipfit.mrifile = template_models{2}{3}; end;
-        if strcmpi(EEG.dipfit.chanfile(end-8), template_models{1}{3}(end-8)), EEG.dipfit.chanfile = template_models{1}{4}; end;
-        if strcmpi(EEG.dipfit.chanfile(end-8), template_models{2}{3}(end-8)), EEG.dipfit.chanfile = template_models{2}{4}; end;
+        if strcmpi(EEG.dipfit.chanfile(end-8), template_models{1}{4}(end-8)), EEG.dipfit.chanfile = template_models{1}{4}; end;
+        if strcmpi(EEG.dipfit.chanfile(end-8), template_models{2}{4}(end-8)), EEG.dipfit.chanfile = template_models{2}{4}; end;
     end;
 end;
 
