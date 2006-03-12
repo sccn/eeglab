@@ -1,4 +1,3 @@
-%
 % std_propplot() - Commandline function to plot cluster properties. 
 %                  Displays either mean cluster ERSPs, or all cluster component ERSPs 
 %                  plut the mean cluster ERSP in one figure per condition.
@@ -48,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2006/03/09 18:58:25  scott
+% help msg -sm
+%
 % Revision 1.7  2006/03/08 21:03:37  arno
 % rename func
 %
