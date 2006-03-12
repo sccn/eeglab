@@ -62,6 +62,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2006/03/10 15:57:06  arno
+% renaming variable
+%
 % Revision 1.15  2006/03/10 15:53:11  arno
 % using log frequencies
 %
@@ -304,6 +307,7 @@ if strcmpi(mode, 'centroid')
                 end;
             end;
             logfreqs = log(STUDY.cluster(cls(k)).centroid.ersp_freqs);
+            timevals = STUDY.cluster(cls(k)).centroid.ersp_times;
             tftopo(ave_ersp,timevals,logfreqs,'limits', [timevals(1) timevals(end) logfreqs(1) logfreqs(end) -maxval maxval],...
                    'title', 'Average ERSP', 'verbose', 'off');
             ft = str2num(get(gca,'yticklabel'));
