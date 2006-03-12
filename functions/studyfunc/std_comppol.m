@@ -1,6 +1,6 @@
-% comppol() - inverse component polarity in a component cluster
+% std_comppol() - inverse component polarity in a component cluster
 %
-% Usage: [compout pol] = comppol(compin);
+% Usage: [compout pol] = std_comppol(compin);
 %
 % Inputs:
 %    compin  - component scalp maps, one per column.
@@ -33,11 +33,14 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2004/08/26 23:06:27  arno
+% Initial revision
+%
 
-function [compin, pol] = comppol(compin);
+function [compin, pol] = std_comppol(compin);
 
 if nargin < 1
-    help comppol;
+    help std_comppol;
     return;
 end;
 
