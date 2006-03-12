@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.191  2006/03/10 21:48:52  arno
+% preserve saving status
+%
 % Revision 1.190  2006/03/10 20:30:41  arno
 % do not recompute icawinv automatically
 %
@@ -1536,10 +1539,10 @@ end;
 if ~isfield(EEG, 'dipfit')   
     EEG.dipfit = []; res = com; 
 else
+    dipfitdefs;
     if isfield(EEG.dipfit, 'vol') & ~isfield(EEG.dipfit, 'hdmfile')
         if exist('pop_dipfit_settings')
             disp('Old DIPFIT structure detected: converting to DIPFIT 2 format');
-            dipfitdefs;
             EEG.dipfit.hdmfile     = template_models{1}{1};
             EEG.dipfit.coordformat = template_models{1}{2};
             EEG.dipfit.mrifile     = template_models{1}{3};
@@ -1547,6 +1550,14 @@ else
             EEG.dipfit.coord_transform = [];
             res = com;
         end;
+    end;
+    if isfield(EEG.dipfit, 'hdmfile')
+        if strcmpi(EEG.dipfit.hdmfile(end-8), template_models{1}{1}(end-8)), EEG.dipfit.hdmfile = template_models{1}{1}; end;
+        if strcmpi(EEG.dipfit.hdmfile(end-8), template_models{2}{1}(end-8)), EEG.dipfit.hdmfile = template_models{2}{1}; end;
+        if strcmpi(EEG.dipfit.mrifile(end-8), template_models{1}{3}(end-8)), EEG.dipfit.mrifile = template_models{1}{3}; end;
+        if strcmpi(EEG.dipfit.mrifile(end-8), template_models{2}{3}(end-8)), EEG.dipfit.mrifile = template_models{2}{3}; end;
+        if strcmpi(EEG.dipfit.chanfile(end-8), template_models{1}{3}(end-8)), EEG.dipfit.chanfile = template_models{1}{4}; end;
+        if strcmpi(EEG.dipfit.chanfile(end-8), template_models{2}{3}(end-8)), EEG.dipfit.chanfile = template_models{2}{4}; end;
     end;
 end;
 
