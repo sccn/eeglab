@@ -108,22 +108,12 @@ end
 STUDY.filepath = g.filepath;
 STUDY.filename = g.filename;
 STUDYfile = fullfile(STUDY.filepath,STUDY.filename);
-try 
-    STUDYfile = fullfile(STUDY.filepath,STUDY.filename);
-    eval(['save ' STUDYfile ' STUDY -mat']);
-catch
-    try
-        eval(['save ' STUDY.filepath '/' STUDY.filename ' STUDY -mat']);
-        STUDY.filepath = [ STUDY.filepath '/' ];
-    catch
-        try 
-            eval(['save ' STUDY.filepath '\' STUDY.filename ' STUDY -mat']);
-            STUDY.filepath = [ STUDY.filepath '\' ];
-        catch
-            warning('pop_preclust(): STUDY was not saved: check file path and filename')
-        end
-    end
-end
+v = version;
+if v(1) < 7
+    save('-mat', STUDYfile, 'STUDY');
+else
+    save('-v6' , STUDYfile, 'STUDY');
+end;
 
 % history
 % -------
