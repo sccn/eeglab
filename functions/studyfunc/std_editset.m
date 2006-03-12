@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2006/03/12 03:18:05  arno
+% file format save
+%
 % Revision 1.35  2006/03/08 22:26:16  scott
 % help msg
 %
@@ -329,13 +332,7 @@ if ~isempty(g.filename),
     g.resave = 'on';
 end
 if strcmpi(g.resave, 'on')
-    ver = version;
-    disp('Saving study...');
-    STUDY.saved = 'yes';
-    if ver(1) > '6'
-         save('-mat','-V6',fullfile( STUDY.filepath, STUDY.filename), 'STUDY');
-    else save('-mat',      fullfile( STUDY.filepath, STUDY.filename), 'STUDY');
-    end;
+    STUDY = pop_savestudy(STUDY, ALLEEG, 'resave', 'on');
 end;    
 
 % ---------------------
