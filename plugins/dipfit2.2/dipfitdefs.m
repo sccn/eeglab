@@ -26,6 +26,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2006/01/10 22:57:17  arno
+% new default for sphere
+%
 % Revision 1.5  2005/04/08 23:05:37  arno
 % remove defaultsymetry
 %
@@ -90,8 +93,8 @@ if ~isfield(EEG, 'icawinv')
   error('No ICA components present');
 end
 
-nchan = length(EEG.chanlocs);
-ncomp = size(EEG.icawinv, 2);
+nchan = length(EEG(1).chanlocs);
+ncomp = size(EEG(1).icawinv, 2);
 
 % create one-sphere model
 % defaultvolume.r = meanradius;
