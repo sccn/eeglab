@@ -57,6 +57,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2006/03/12 02:56:42  arno
+% gui aspect ratio
+%
 % Revision 1.21  2006/03/11 06:05:50  arno
 % header
 %
@@ -216,14 +219,14 @@ if isempty(varargin) %GUI call
                 [filepath filename ext] = fileparts(clust_param{6});
                 command = sprintf('%s%s%s%s%s%s', command, '''filename'', ''', [filename ext], ', ''filepath'', ''', filepath, ''');' );
                 STUDY.history =  sprintf('%s\n%s',  STUDY.history, command);
-                STUDY = pop_savestudy(STUDY, 'filename', [filename ext], 'filepath', filepath);
+                STUDY = pop_savestudy(STUDY, ALLEEG, 'filename', [filename ext], 'filepath', filepath);
               else
                 command(end:end+1) = ');';
                 STUDY.history =  sprintf('%s\n%s',  STUDY.history, command); 
                 if (~isempty(STUDY.filename)) & (~isempty(STUDY.filepath))
-                    STUDY = pop_savestudy(STUDY, 'filename', STUDY.filename, 'filepath', STUDY.filepath);
+                    STUDY = pop_savestudy(STUDY, ALLEEG, 'filename', STUDY.filename, 'filepath', STUDY.filepath);
                 else
-                    STUDY = pop_savestudy(STUDY);
+                    STUDY = pop_savestudy(STUDY, ALLEEG);
                 end
            end
        else
