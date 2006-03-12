@@ -367,18 +367,18 @@ if ~isstr(varargin{1})
         if out_param{3}
             if ~isempty(out_param{4})
                 [filepath filename ext] = fileparts(out_param{4});
-                a = sprintf('%s%s%s%s%s%s', 'STUDY = pop_savestudy(STUDY,' , '''filename'', ''', [filename ext], ''', ''filepath'', ''', filepath, ''');' );
+                a = sprintf('%s%s%s%s%s%s', 'STUDY = pop_savestudy(STUDY, ALLEEG' , '''filename'', ''', [filename ext], ''', ''filepath'', ''', filepath, ''');' );
                 STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);              
-                STUDY = pop_savestudy(STUDY, 'filename', [filename ext], 'filepath', filepath);
+                STUDY = pop_savestudy(STUDY, ALLEEG, 'filename', [filename ext], 'filepath', filepath);
             else
                 if (~isempty(STUDY.filename)) & (~isempty(STUDY.filepath))
-                    a = sprintf('%s%s%s%s%s%s', 'STUDY = pop_savestudy(STUDY,' , '''filename'', ''', STUDY.filename, ''', ''filepath'', ''', STUDY.filepath, ''');' );
+                    a = sprintf('%s%s%s%s%s%s', 'STUDY = pop_savestudy(STUDY, ALLEEG, ' , '''filename'', ''', STUDY.filename, ''', ''filepath'', ''', STUDY.filepath, ''');' );
                     STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);              
-                    STUDY = pop_savestudy(STUDY, 'filename', STUDY.filename, 'filepath', STUDY.filepath);
+                    STUDY = pop_savestudy(STUDY, ALLEEG, 'filename', STUDY.filename, 'filepath', STUDY.filepath);
                 else
-                    a = sprintf('%s%s%s%s%s%s', 'STUDY = pop_savestudy(STUDY);' );
+                    a = sprintf('%s%s%s%s%s%s', 'STUDY = pop_savestudy(STUDY, ALLEEG);' );
                     STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);              
-                    STUDY = pop_savestudy(STUDY);
+                    STUDY = pop_savestudy(STUDY, ALLEEG);
                 end
            end
        end
