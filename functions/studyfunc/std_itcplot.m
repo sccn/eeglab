@@ -127,10 +127,17 @@ if strcmpi(mode, 'comps')
         if ~isfield(STUDY.cluster(cls(clus)).centroid,'itc')
             STUDY = std_centroid(STUDY,ALLEEG, cls(clus) , 'itc');
         end
+        % limits
+        % ------
+        maxitc = 0;
+        for n = 1:Ncond
+            maxitc = max(maxitc, max(max(STUDY.cluster(cls(clus)).centroid.itc{n})));
+        end;
+        maxitc = maxitc*2;
         for n = 1:Ncond
             %try
-                clusncomm = std_clustread(STUDY, ALLEEG, cls(clus),'itc',n);
-            %catch,
+            clusncomm = std_clustread(STUDY, ALLEEG, cls(clus),'itc',n);
+            
             %    warndlg2([ 'Some ITC information is missing, aborting'] , ['Abort - Plot ITC' ] );   
             %    delete(h_wait)
             %    return;
@@ -147,7 +154,7 @@ if strcmpi(mode, 'comps')
             logfreqs  = log(STUDY.cluster(cls(clus)).centroid.itc_freqs);
             itc_times = STUDY.cluster(cls(clus)).centroid.itc_times;
             a = [ STUDY.cluster(cls(clus)).name ' average ITC, ' num2str(length(unique(STUDY.cluster(cls(clus)).sets(1,:)))) 'Ss' ];
-            tftopo(abs(ave_itc),itc_times,logfreqs,'limits', [itc_times(1) itc_times(end) logfreqs(1) logfreqs(end) -.5 .5],...
+            tftopo(abs(ave_itc),itc_times,logfreqs,'limits', [itc_times(1) itc_times(end) logfreqs(1) logfreqs(end) -maxitc maxitc],...
                 'title', a, 'verbose', 'off', 'axcopy', 'off');
             ft = str2num(get(gca,'yticklabel'));
             ft = exp(1).^ft;
@@ -173,7 +180,7 @@ if strcmpi(mode, 'comps')
                     sbplot(rowcols(1),rowcols(2),k+4);  
                 end
                 tftopo(abs(clusncomm.itc{k}),clusncomm.times{k},log(clusncomm.logf{k}),'limits', ...
-                    [clusncomm.times{k}(1) clusncomm.times{k}(end) log(clusncomm.logf{k}(1)) log(clusncomm.logf{k}(end)) -.5 .5],...
+                    [clusncomm.times{k}(1) clusncomm.times{k}(end) log(clusncomm.logf{k}(1)) log(clusncomm.logf{k}(end)) -maxitc maxitc],...
                     'title', a, 'verbose', 'off', 'axcopy', 'off');
                 set(gca, 'xtick', [], 'ytick', []);
                 set(get(gca,'Title'),'FontSize',8)
@@ -247,7 +254,7 @@ if strcmpi(mode, 'centroid')
         for n = 1:Ncond
             maxval = max(max(max(abs(STUDY.cluster(cls(k)).centroid.itc{n}))), maxval);
         end;
-        maxval = 0.5;
+        maxval = maxval*2;
         
         % plot
         % ----
@@ -398,17 +405,21 @@ for ci = 1 : length(comp_ind) %for each comp
    orient tall
    set(gcf,'Color', BACKCOLOR);
    
+   maxval = 0;
    for n = 1:Ncond  %for each cond
         abset = STUDY.datasetinfo(STUDY.setind(n,STUDY.cluster(cls).sets(1,comp_ind(ci)))).index;
+        [itc{n}, logfreqs, timevals] = std_readitc(ALLEEG, abset, comp, STUDY.preclust.erspclusttimes, STUDY.preclust.erspclustfreqs );
+        maxval = max(maxval, max(max(itc{n})));
+   end;
+   for n = 1:Ncond  %for each cond
         sbplot(rowcols(1),rowcols(2),n), 
-        [itc, logfreqs, timevals] = std_readitc(ALLEEG, abset, comp, STUDY.preclust.erspclusttimes, STUDY.preclust.erspclustfreqs );
         logfreqs = log(logfreqs);
         if Ncond >1
             a = [ 'ITC, IC' num2str(comp) ' / ' subject ', ' STUDY.cluster(cls).name ', ' STUDY.condition{n} ];
         else
             a = ['ITC, IC' num2str(comp) ' / ' subject  ', ' STUDY.cluster(cls(clus)).name];
         end
-        tftopo(abs(itc),timevals,logfreqs,'limits', [timevals(1) timevals(end) logfreqs(1) logfreqs(end) -.5 .5],...
+        tftopo(abs(itc{n}),timevals,logfreqs,'limits', [timevals(1) timevals(end) logfreqs(1) logfreqs(end) -maxval maxval],...
             'title', a, 'verbose', 'off', 'axcopy', 'off');
                 ft = str2num(get(gca,'yticklabel'));
         ft = exp(1).^ft;
