@@ -28,7 +28,7 @@ function std_savedat( tmpfile, structure)
     structure.datafile = [ tmpfile(1:delims(end)-1) '.set' ];
     v = version;
     if v(1) > '6'
-        save('-mat', tmpfile, '-struct', 'structure');
-    else
         save('-v6' , tmpfile, '-struct', 'structure');
+    else
+        save('-mat', tmpfile, '-struct', 'structure');
     end;
