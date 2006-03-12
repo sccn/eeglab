@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2006/03/08 22:26:16  scott
+% help msg
+%
 % Revision 1.34  2006/03/08 21:11:37  arno
 % rename func
 %
@@ -323,13 +326,7 @@ end;
 if ~isempty(g.filename),
     [STUDY.filepath STUDY.filename ext] = fileparts(fullfile( g.filepath, g.filename ));
     STUDY.filename = [ STUDY.filename ext ];
-    ver = version;
-    STUDY.saved = 'yes';
-    disp('Saving study...');
-    if ver(1) > '6'
-         save('-mat','-V6',fullfile( STUDY.filepath, STUDY.filename), 'STUDY');
-    else save('-mat',      fullfile( STUDY.filepath, STUDY.filename), 'STUDY');
-    end;
+    g.resave = 'on';
 end
 if strcmpi(g.resave, 'on')
     ver = version;
