@@ -62,6 +62,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2006/03/12 04:21:06  arno
+% component polarity
+%
 % Revision 1.20  2006/03/11 07:04:18  arno
 % header
 %
@@ -213,7 +216,7 @@ for k = 1:length(clsind)
         end
     end
 end   
-fprintf('centroid \n');
+fprintf('centroid (only done once)\n');
 if itcC | erspC | specC | erpC | scalpC
     for cond = 1:Ncond %compute for all conditions
         for clust = 1:length(clsind) %go over all requested clusters
