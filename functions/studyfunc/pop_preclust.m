@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.40  2006/03/12 02:17:26  arno
+% remove fontsize
+%
 % Revision 1.39  2006/03/11 17:12:41  scott
 % help and text msgs -sm
 %
@@ -382,8 +385,8 @@ if ~isstr(varargin{1}) %intial settings
             STUDY.filename = [ filename ext ];
             STUDY.filepath = filepath;
         end;
-        STUDY = pop_savestudy(STUDY, 'filename', STUDY.filename, 'filepath', STUDY.filepath);
-        com = sprintf('%s\nSTUDY = pop_savestudy(STUDY, %s);',  com, ...
+        STUDY = pop_savestudy(STUDY, ALLEEG, 'filename', STUDY.filename, 'filepath', STUDY.filepath);
+        com = sprintf('%s\nSTUDY = pop_savestudy(STUDY, ALLEEG, %s);',  com, ...
                       vararg2str( { 'filename', STUDY.filename, 'filepath', STUDY.filepath }));
     end
 else
