@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.37  2006/03/12 03:24:24  arno
+% just resave study
+%
 % Revision 1.36  2006/03/12 03:18:05  arno
 % file format save
 %
@@ -332,7 +335,7 @@ if ~isempty(g.filename),
     g.resave = 'on';
 end
 if strcmpi(g.resave, 'on')
-    STUDY = pop_savestudy(STUDY, ALLEEG, 'resave', 'on');
+    STUDY = pop_savestudy(STUDY, ALLEEG, 'savemode', 'resave');
 end;    
 
 % ---------------------
