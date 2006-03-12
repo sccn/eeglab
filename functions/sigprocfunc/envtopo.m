@@ -109,6 +109,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.116  2006/03/11 18:34:52  scott
+% separated 'compnums' from new 'compsplot'. Make 'subcomps' include all but specified 'compnums' by default.
+%
 % Revision 1.115  2006/03/10 20:05:03  scott
 % chanlocs -> g.chanlocs in 1356 -sm
 %
@@ -748,7 +751,7 @@ if max(g.compnums) > wtcomps | min(g.compnums)< 1
 end
 
 g.subcomps = abs(g.subcomps); % don't pass negative channel numbers
-if max(g.subcomps) > wtchans
+if max(g.subcomps) > wtcomps
     error('Keyword ''subcomps'' argument out of bounds');
 end
 
@@ -769,7 +772,7 @@ else
          error('Keyword ''subcomps'' argument incorrect.');
       end
       g.subcomps = [];   % if subcomps contains a 0, don't remove components
-  elseif max(g.subcomps) > wtchans
+  elseif max(g.subcomps) > wtcomps
       error('Keyword ''subcomps'' argument out of bounds.');
   end
 end
