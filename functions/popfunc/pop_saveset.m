@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.81  2006/03/12 04:14:06  arno
+% cannot use eeg_eval because dataset are suposed to be modeified by the calling function
+%
 % Revision 1.80  2006/03/10 21:49:29  arno
 % nothing
 %
@@ -365,7 +368,7 @@ if strcmpi(g.savemode, 'resave')
     % -------------------------
     if length(EEG) > 1
         for index = 1:length(EEG)
-            pop_saveset(EEG, 'savemode', 'resave');
+            pop_saveset(EEG(index), 'savemode', 'resave');
             EEG(index).saved = 'yes';
         end;
         com = sprintf('%s = pop_saveset( %s, %s);', inputname(1), inputname(1), vararg2str(options));
