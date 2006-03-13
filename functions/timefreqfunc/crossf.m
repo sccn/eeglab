@@ -169,6 +169,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.71  2005/08/19 18:31:45  scott
+% fixed
+% bug  ( = Tfx2;)  (thanks to Pierre Herremans); edited commandline printouts -sm
+%
 % Revision 1.70  2005/05/16 20:40:50  hilit
 % changing command order to enable right operation
 %
@@ -1131,9 +1135,6 @@ R = abs(R);
 
 Rraw = R; % raw coherence (e.g., coherency) magnitude values output
 
-Rangle(find(Rraw==0)) = 0; % when plotting, mask for significance 
-                           % = set angle at non-signif coher points to 0
-
 if g.plot
    fprintf('\nNow plotting...\n');
    set(gcf,'DefaultAxesFontSize',g.AXES_FONT)
@@ -1248,6 +1249,8 @@ case 'on'
    % Plot coherence phase lags in bottom panel
    %
    h(13) = axes('Units','Normalized','Position',[.1 ordinate2 .8 height].*s+q);
+   Rangle(find(Rraw==0)) = 0; % when plotting, mask for significance 
+                              % = set angle at non-signif coher points to 0
    
    imagesc(times,freqs(dispf),Rangle(dispf,:),[-maxangle maxangle]); % plot the 
    hold on                                             % coherence phase angles
