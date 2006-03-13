@@ -55,6 +55,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2006/03/13 22:46:17  scott
+% help msg
+%
 % Revision 1.25  2006/01/24 19:40:12  arno
 % change GUI color
 %
@@ -592,7 +595,9 @@ function [elec1, transf] = warp_chans(elec1, elec2, chanlist)
     cfg.elec     = elec1;
     cfg.template = elec2;
     cfg.method   = 'warp';
+    warning off;
     elec3 = electrodenormalize(cfg);
+    warning on;
     
     transf = elec3.m;
     transfmat = traditional(elec3.m);
