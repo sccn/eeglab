@@ -128,6 +128,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.43  2006/03/12 02:46:13  arno
+% typo
+%
 % Revision 1.42  2006/03/11 07:17:06  arno
 % header
 %
@@ -769,8 +772,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, components
                         % downsample frequency by 2 and times by 2
                         % ----------------------------------------
                         idat = STUDY.datasetinfo(STUDY.setind(1)).index; 
-                        [ tmp freqs times ] = std_readersp( ALLEEG, idat, succompind{1}, ...
-                                                        timewindow, freqrange);
+                        [ tmp freqs times ] = std_readersp( ALLEEG, idat, succompind{1}(1));
                         [data freqs times ] = erspdownsample(data,4, freqs,times,Ncond); 
                         if strcmp(varargin{index}(end-1) , 'downsample')
                             varargin{index}(end) = {celltomat(varargin{index}(end)) + 4};
