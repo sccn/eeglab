@@ -1,7 +1,7 @@
-% coregister() -  Coregister electrode location file with head template or mesh.
+% coregister() -  Co-register electrode location file with head template or mesh.
 %
 % Usage:
-%        >> coregister( chan1, chan2, 'key', 'val' )
+%        >> [chan1_out transform] = coregister( chan1, chan2, 'key', 'val' )
 %
 % Inputs:
 %    chan1    - EEG.chanlocs channel location structure to align.
@@ -10,28 +10,30 @@
 %
 % Optional input:
 %    'alignfid'  - [cell array of strings] names of fiducials for alignment.
-%    'warp'      - [cell array of string] names of electrode for warping.
+%    'warp'      - [cell array of string] names of electrodes for warping.
 %    'transform' - [real array] homogenous transformation matrix or a 
 %                  1x9 matrix containing traditional 9-parameter "Talairach 
 %                  model" transformation (see traditional()).
 %    'mesh'      - [cell array|string] head mesh. Can contain {points triangles} 
-%                  or {points triangle normals}. See the function plotmesh() 
+%                  or {points triangles normals}. See the function plotmesh() 
 %                  for details. May also contain the name of a file containing 
 %                  head mesh information (several formats recognized).
 %    'chaninfo1' - [struct] EEG.chanlocs.chaninfo channel information structure 
 %                  for first EEG.chanlocs structure (may contain fiducials).
 %    'chaninfo2' - [struct] EEG.chanlocs.chaninfo channel information structure 
-%                  for second EEG.chanlocs structure (might contain fiducials).
+%                  for second EEG.chanlocs structure (may contain fiducials).
 %    'autoscale' - ['on'|'off'] autoscale electrode radius when aligning 
 %                  fiducials. {default: 'on'}
 %    'helpmsg'   - ['on'|'off'] pop-up help message when calling function.
 %                  {default: 'off'}
 % Output:
-%    chan1       - transformed EEG.chanlocs channel location structure
+%    chan1_out   - transformed EEG.chanlocs channel location structure
 %    transform   - transformation matrix. Use function traditional() to 
 %                  convert to homogenous transformation matrix and input
 %                  it into functions like headplot().
-% 
+%
+% See also: traditional(), headplot(), plotmesh()
+%
 % Author: Arnaud Delorme, SCCN, INC, UCSD, 2005
         
 %123456789012345678901234567890123456789012345678901234567890123456789012
@@ -53,6 +55,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2006/01/24 19:40:12  arno
+% change GUI color
+%
 % Revision 1.24  2006/01/24 19:31:24  arno
 % window title
 %
