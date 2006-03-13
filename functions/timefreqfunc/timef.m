@@ -1,66 +1,69 @@
+%
 % timef() - Returns estimates and plots of mean event-related spectral
 %           perturbation (ERSP) and inter-trial coherence (ITC) changes 
 %           across event-related trials (epochs) of a single input time series. 
-%
-%         * Uses either fixed-window, zero-padded FFTs (fastest), wavelet
+%        * Uses either fixed-window, zero-padded FFTs (fastest), wavelet
 %           0-padded DFTs (both Hanning-tapered), OR multitaper spectra ('mtaper').
-%         * For the wavelet and FFT methods, output frequency spacing 
+%        * For the wavelet and FFT methods, output frequency spacing 
 %           is the lowest frequency ('srate'/'winsize') divided by 'padratio'.
 %           NaN input values (such as returned by eventlock()) are ignored.
-%         * If 'alpha' is given, then bootstrap statistics are computed 
+%        * If 'alpha' is given, then bootstrap statistics are computed 
 %           (from a distribution of 'naccu' surrogate data trials) and 
 %           non-significant features of the output plots are zeroed out 
 %           (i.e., plotted in green). 
-%         * Given a 'topovec' topo vector and 'elocs' electrode location file,
+%        * Given a 'topovec' topo vector and 'elocs' electrode location file,
 %           the figure also shows a topoplot() of the specified scalp map.
-%         * Note: Left-click on subplots to view and zoom in separate windows.
+%        * Note: Left-click on subplots to view and zoom in separate windows.
 % Usage: 
 %        >> [ersp,itc,powbase,times,freqs,erspboot,itcboot,itcphase] = ...
 %                timef(data,frames,tlimits,srate,cycles,...
 %                                 'key1',value1,'key2',value2, ... );        
 % NOTE:                                        
-%        * To see more detailed information about timef(), >> timef details  
-%        * Some default values are different when called from pop_timef()
+%        * For more detailed information about timef(), >> timef details  
+%        * Default values may differ when called from pop_timef()
 %
 % Required inputs:     
 %       data        = Single-channel data vector (1,frames*ntrials) (required)
-%       frames      = Frames per trial                         {def|[]: datalength}
-%       tlimits     = [mintime maxtime] (ms) Epoch time limits {def|[]: from frames,srate}
+%       frames      = Frames per trial                     {def|[]: datalength}
+%       tlimits     = [mintime maxtime] (ms) Epoch time limits 
+%                      {def|[]: from frames,srate}
 %       srate       = data sampling rate (Hz)                  {def:250}
 %       cycles      = If 0 -> Use FFTs (with constant window length) {0 = FFT}
 %                     If >0 -> Number of cycles in each analysis wavelet 
-%                     If [wavecycles factor] -> wavelet cycles increase with frequency 
-%                     beginning at wavecyles (0<factor<1; factor=1 -> no increase,
-%                     standard wavelets; factor=0 -> fixed epoch length, as in FFT.
-%                     Else, 'mtaper' -> multitaper decomposition 
+%                     If [wavecycles factor] -> wavelet cycles increase with 
+%                     frequency  beginning at wavecyles (0<factor<1; factor=1 
+%                     -> no increase, standard wavelets; factor=0 -> fixed epoch 
+%                     length, as in FFT.  Else, 'mtaper' -> multitaper decomp. 
 %
 %    Optional Inter-Irial Coherence (ITC) type:
 %       'type'      = ['coher'|'phasecoher'] Compute either linear coherence 
 %                      ('coher') or phase coherence ('phasecoher') also known
 %                      as the phase coupling factor           {'phasecoher'}.
 %    Optional detrending:
-%       'detret'    = ['on'|'off'], Detrend data in time.       {'off'}
-%       'detrep'    = ['on'|'off'], Detrend data across trials  {'off'}
+%       'detret'    = ['on'|'off'], Detrend data in time.               {'off'}
+%       'detrep'    = ['on'|'off'], Detrend data across trials          {'off'}
 %
 %    Optional FFT/DFT parameters:
 %       'winsize'   = If cycles==0: data subwindow length (fastest, 2^n<frames);
 %                     If cycles >0: *longest* window length to use. This
 %                      determines the lowest output frequency       {~frames/8}
 %       'timesout'  = Number of output times (int<frames-winframes)       {200}
-%       'padratio'  = FFT-length/winframes (2^k)                          {2}
+%       'padratio'  = FFT-length/winframes (2^k)                            {2}
 %                      Multiplies the number of output frequencies by
 %                      dividing their spacing. When cycles==0, frequency
 %                      spacing is (low_freq/padratio).
-%       'maxfreq'   = Maximum frequency (Hz) to plot (& to output, if cycles>0) 
+%       'maxfreq'   = Maximum frequency (Hz) to plot (& to output if cycles>0) 
 %                      If cycles==0, all FFT frequencies are output.      {50}
-%       'baseline'  = Spectral baseline end-time (in ms).                 {0}
-%       'powbase'   = Baseline spectrum (power, not dB) to normalize the data. {def|NaN->from data}
+%       'baseline'  = Spectral baseline window center end-time (in ms).    {0}
+%       'powbase'   = Baseline spectrum (power, not dB) to normalize the data. 
+%                      {def|NaN->from data}
 %
 %    Optional multitaper parameters:
 %       'mtaper'    = If [N W], performs multitaper decomposition. 
 %                      (N is the time resolution and W the frequency resolution; 
-%                      maximum taper number is 2NW-1). Overwrites 'winsize' and 'padratio'. 
-%                     If [N W K], forces the use of K Slepian tapers (if possible).
+%                      maximum taper number is 2NW-1). Overwrites 'winsize' and 
+%                      'padratio'. 
+%                     If [N W K], uses K Slepian tapers (if possible).
 %                      Phase is calculated using standard methods.
 %                      The use of mutitaper with wavelets (cycles>0) is not 
 %                      recommended (as multiwavelets are not implemented). 
@@ -70,17 +73,18 @@
 %       'alpha'     = If non-0, compute two-tailed bootstrap significance prob. 
 %                     level. Show non-signif. output values in green       {0}
 %       'naccu'     = Number of bootstrap replications to accumulate       {200}
-%       'baseboot'  = Bootstrap baseline to subtract (1 -> use 'baseline'(see above)
+%       'baseboot'  = Bootstrap baseline to subtract (1 -> use 'baseline'(above)
 %                                                     0 -> use whole trial) {1}
 %    Optional scalp map:
-%       'topovec'   = Scalp topography (map) to plot                       {none}
+%       'topovec'   = Scalp topography (map) to plot                     {none}
 %       'elocs'     = Electrode location file for scalp map   
 %                     File should be ascii in format of  >> topoplot example   
-%                     May also be an EEG.chanlocs struct. {file named in icadefs.m}
+%                     May also be an EEG.chanlocs struct. 
+%                     {default: file named in icadefs.m}
 %    Optional plotting parameters:
-%       'hzdir'     = ['up'|'down'] Direction of the frequency axes        {'up'}
-%       'plotersp'  = ['on'|'off'] Plot power spectral perturbations       {'on'} 
-%       'plotitc'   = ['on'|'off'] Plot inter trial coherence              {'on'}
+%       'hzdir'     = ['up'|'down'] Direction of the frequency axes      {'up'}
+%       'plotersp'  = ['on'|'off'] Plot power spectral perturbations     {'on'} 
+%       'plotitc'   = ['on'|'off'] Plot inter trial coherence            {'on'}
 %       'plotphase' = ['on'|'off'] Plot sign of the phase in the ITC panel, i.e.
 %                     green->red, pos.-phase ITC, green->blue, neg.-phase ITC {'on'}
 %       'erspmax'   = [real dB] set the ERSP max. for the scale (min= -max){auto}
@@ -92,14 +96,17 @@
 %       'rboot'     = Bootstrap ITC limits (e.g., from timef())      {from data}
 %       'axesfont'  = Axes text font size                                  {10}
 %       'titlefont' = Title text font size                                 {8}
-%       'vert'      = [times_vector] -> plot vertical dashed lines at given times in ms.
+%       'vert'      = [times_vector] -> plot vertical dashed lines at given ms.
 %       'verbose'   = ['on'|'off'] print text                              {'on'}
+%
 %    Outputs: 
-%            ersp   = Matrix (nfreqs,timesout) of log spectral diffs. from baseline (in dB) 
-%                       NB: Not masked for significance. Must do this using erspboot
-%            itc    = Matrix of inter-trial coherencies (nfreqs,timesout) (range: [0 1])
-%                       NB: Not masked for significance. Must do this using itcboot
-%          powbase  = Baseline power spectrum (NOT in dB, used to normalize the ERSP)
+%            ersp   = Matrix (nfreqs,timesout) of log spectral diffs. from 
+%                     baseline (in dB).  NB: Not masked for significance. 
+%                     Must do this using erspboot
+%            itc    = Matrix of inter-trial coherencies (nfreqs,timesout) 
+%                     (range: [0 1]) NB: Not masked for significance. 
+%                     Must do this using itcboot
+%          powbase  = Baseline power spectrum (NOT in dB, used to norm. the ERSP)
 %            times  = Vector of output times (sub-window centers) (in ms)
 %            freqs  = Vector of frequency bin centers (in Hz)
 %         erspboot  = Matrix (2,nfreqs) of [lower;upper] ERSP significance diffs
@@ -107,20 +114,22 @@
 %          itcphase = Matrix (nfreqs,timesout) of ITC phase (in radians)
 %
 % Plot description:
-%   Assuming both 'plotersp' and 'plotitc' options are 'on' (= default). The upper panel
-%   presents the data ERSP (Event-Related Spectral Perturbation) in dB, with mean baseline 
-%   spectral activity (in dB) subtracted. Use "'baseline', NaN" to prevent timef() from 
-%   removing the baseline. The lower panel presents the data ITC (Inter-Trial Coherence). 
+%   Assuming both 'plotersp' and 'plotitc' options are 'on' (= default). 
+%   The upper panel presents the data ERSP (Event-Related Spectral Perturbation) 
+%   in dB, with mean baseline spectral activity (in dB) subtracted. Use 
+%   "'baseline', NaN" to prevent timef() from removing the baseline. 
+%   The lower panel presents the data ITC (Inter-Trial Coherence). 
 %   Click on any plot axes to pop up a new window (using 'axcopy()')
-%   -- Upper left marginal panel presents the mean spectrum during the baseline period
-%      (blue), and when significance is set, the significance threshold at each frequency
-%      (dotted green-black trace).
-%   -- The marginal panel under the ERSP image shows the maximum (green) and minimum 
-%      (blue) ERSP values relative to baseline power at each frequency.
-%   -- The lower left marginal panel shows mean ITC across the imaged time range (blue),
-%      and when significance is set, the significance threshold (dotted green-black).
-%   -- The marginal panel under the ITC image shows the ERP (which is produced by ITC 
-%      across the data spectral pass band).
+%   -- Upper left marginal panel presents the mean spectrum during the baseline 
+%      period (blue), and when significance is set, the significance threshold 
+%      at each frequency (dotted green-black trace).
+%   -- The marginal panel under the ERSP image shows the maximum (green) and 
+%      minimum (blue) ERSP values relative to baseline power at each frequency.
+%   -- The lower left marginal panel shows mean ITC across the imaged time range 
+%      (blue), and when significance is set, the significance threshold (dotted 
+%      green-black).  
+%   -- The marginal panel under the ITC image shows the ERP (which is produced by 
+%      ITC across the data spectral pass band).
 %
 % Author: Sigurd Enghoff, Arnaud Delorme & Scott Makeig
 %          CNL / Salk Institute 1998- | SCCN/INC, UCSD 2002-
@@ -150,6 +159,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.86  2006/03/07 23:12:17  scott
+% clarified h - clearified help msg that output ersp and itc are NOT prob. masked -sm
+%
 % Revision 1.85  2006/03/02 02:35:19  scott
 % replaced obsolete phase() with Matlab angle() -sm
 %
@@ -854,7 +866,7 @@ if ~isnan(g.alpha) & length(baseln)==0
   myprintf(g.verbose,'timef(): no window centers in baseline (times<%g) - shorten (max) window length.\n', g.baseline)
   return
 elseif ~isnan(g.alpha) & g.baseboot
-  myprintf(g.verbose,'   %d bootstrap windows in baseline (times<%g).\n',...
+  myprintf(g.verbose,'   %d bootstrap windows in baseline (center times < %g).\n',...
           length(baseln), g.baseline)
 end
 dispf = find(freqs <= g.maxfreq);
