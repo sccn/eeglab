@@ -55,6 +55,7 @@ if nargin<4
     return
 end
 
+data = double(data);
 
 if exist('ellipord') ~= 2 | exist('ellip') ~= 2
    error('*** ellip() requires the Matlab Signal Processing toolbox. ***');
