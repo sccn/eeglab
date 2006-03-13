@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2006/01/24 19:30:50  arno
+% name of dataset
+%
 % Revision 1.35  2006/01/21 00:44:04  arno
 % gui error
 %
@@ -530,9 +533,10 @@ function bool = test_wrong_parameters(hdl)
         coreg1   = get( findobj( hdl, 'userdata', 'coregtext')    , 'string' );
         coreg3   = get( findobj( hdl, 'userdata', 'coregfile')    , 'string' );
         if isempty(coreg1)
-            textlines = strvcat('You must coregister your channel locations', ...
-                                'with the head model. To bypass coregistration,', ...
-                                'check the checkbox "no coreg".');
+            textlines = strvcat('You must coregister your channel locations with the head model.', ...
+                                'It is an easy process (just press the "Manual coreg. button and', ...
+                                'follow instructions). To bypass coregistration (not recommended), enter', ...
+                                '"0 0 0 0 0 0 1 1 1" in the coregistration edit box.');
             bool = 1;
         end;
         if isempty(coreg3)
