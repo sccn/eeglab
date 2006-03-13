@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2006/03/13 00:13:32  scott
+% debugged new envtopo() feature -sm
+%
 % Revision 1.32  2005/10/11 16:45:46  arno
 % fix upper limit bug when timerange is out of range
 %
@@ -199,10 +202,9 @@ if nargin < 3
     end;
 
     timerange    = eval( [ '[' result{1} ']' ] );
-	if ~isempty( result{2} ), options = [ options '''limcontrib'',[' result{2} '],' ]; end;
-	if ~isempty( result{4} ), options = [ options '''compnums'',[' result{4} '],' ]; 
-    else                      options = [ options '''compnums'',-' result{3} ',' ];
-    end;
+    if ~isempty( result{2} ), options = [ options '''limcontrib'',[' result{2} '],' ]; end;
+    if ~isempty( result{3} ), options = [ options '''compsplot'',[' result{3} '],' ]; end;
+    if ~isempty( result{4} ), options = [ options '''compnums'',[' result{4} '],' ]; end;
     if ~isempty(result{5}),   options = [ options '''subcomps'',[' result{5} '],' ]; end;
     if ~isempty(result{6}),   options = [ options '''title'', ''' result{6} ''',' ]; end;
 	options      =  [ options result{7} ];
