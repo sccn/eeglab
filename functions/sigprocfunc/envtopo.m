@@ -109,6 +109,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.117  2006/03/12 23:52:26  scott
+% wtchans -> wtcomps
+%
 % Revision 1.116  2006/03/11 18:34:52  scott
 % separated 'compnums' from new 'compsplot'. Make 'subcomps' include all but specified 'compnums' by default.
 %
@@ -843,7 +846,7 @@ maxproj = zeros(chans,ncomps);
 % first, plot the data envelope
 %
 envdata = zeros(2,frames*(ncomps+1));
-envdata(:,1:frames) = envelope(data(g.plotchans,:), g.envmode); 
+envdata(:,1:frames) = envelope(g.icawinv*g.icaact(g.plotchans,:), g.envmode); 
 
 fprintf('Data epoch is from %.0f ms to %.0f ms.\n',1000*xmin,1000*xmax);
 fprintf('Plotting data from %.0f ms to %.0f ms.\n',1000*xmin,1000*xmax);
@@ -1092,8 +1095,8 @@ set(axe,'Color',axcolor);
 %%%%%%%%%%%% Collect y-axis range information %%%%%%%%%%%%%%%%%%%%%%%%
 %
 ylimset = 0; % flag whether hard limits have been set by the user
-ymin = min(min(data(g.plotchans,pframes))); % begin by setting limits from plotted data
-ymax = max(max(data(g.plotchans,pframes)));
+ymin = min(min(g.icawinv*g.icaact(g.plotchans,pframes))); % begin by setting limits from plotted data
+ymax = max(max(g.icawinv*g.icaact(g.plotchans,pframes)));
 if length(g.limits) == 4 
      if g.limits(3)~=0 | g.limits(4)~=0 % collect plotting limits from 'limits'
 	 ymin = g.limits(3);
