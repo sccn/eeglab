@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.465  2006/03/12 04:47:47  arno
+% problem saving study
+%
 % Revision 1.464  2006/03/10 21:25:51  arno
 % activate save current datasets
 %
@@ -1741,7 +1744,7 @@ e_histdone      = [e_catch 'EEG = eegh(LASTCOM, EEG); if ~isempty(LASTCOM), disp
 
 % study checking
 % --------------
-e_load_study    = [e_catch 'eegh(LASTCOM); if ~isempty(LASTCOM), ALLEEG = ALLEEGTMP; EEG = ALLEEG; CURRENTSET = [1:length(EEG)]; eegh(''CURRENTSTUDY = 1; EEG = ALLEEG; CURRENTSET = [1:' int2str(length(EEG)) '];''); STUDY = STUDYTMP; CURRENTSTUDY = 1; disp(''Done.''); end; clear ALLEEGTMP STUDYTMP; eeglab(''redraw'');'];
+e_load_study    = [e_catch 'eegh(LASTCOM); if ~isempty(LASTCOM), ALLEEG = ALLEEGTMP; EEG = ALLEEG; CURRENTSET = [1:length(EEG)]; eegh(''CURRENTSTUDY = 1; EEG = ALLEEG; CURRENTSET = [1:length(EEG)];''); STUDY = STUDYTMP; CURRENTSTUDY = 1; disp(''Done.''); end; clear ALLEEGTMP STUDYTMP; eeglab(''redraw'');'];
 
 % build structures for plugins
 % ----------------------------
@@ -2466,7 +2469,7 @@ if exist('STUDY') & exist('CURRENTSTUDY')
 end;
 if exist_study
     cb_select = [  '[ALLEEG EEG CURRENTSET LASTCOM] = pop_newset(ALLEEG, EEG, CURRENTSET, ''retrieve'', [], ''study'', 1);' ...
-                  'LASTCOM = ''CURRENTSTUDY = 1; [EEG ALLEEG CURRENTSET] = eeg_retrieve(ALLEEG, [1:' int2str(length(ALLEEG)) ']);'';' ...
+                  'LASTCOM = ''CURRENTSTUDY = 1; [EEG ALLEEG CURRENTSET] = eeg_retrieve(ALLEEG, [1:length(ALLEEG)]);'';' ...
                   'eval(LASTCOM); eegh(LASTCOM);' ...
                   'eeglab(''redraw'');' ];
     tmp_m = findobj('label', 'Select the study set');
