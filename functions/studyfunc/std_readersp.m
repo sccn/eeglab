@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2006/03/11 07:28:49  arno
+% header info
+%
 % Revision 1.10  2006/03/11 07:21:08  arno
 % header
 %
@@ -82,6 +85,13 @@
 
 function [logersp, logfreqs, timevals, params] = std_readersp(ALLEEG, abset, comp, timewindow, freqrange);
 
+if nargin < 4
+    timewindow = [];
+end;
+if nargin < 5
+    freqrange = [];
+end;
+    
 for k = 1: length(abset)    
     
     filename = fullfile( ALLEEG(abset(k)).filepath,[ ALLEEG(abset(k)).filename(1:end-3) 'icaersp']);
