@@ -1,85 +1,98 @@
+%
 % headplot() - plot a spherically-splined EEG field map on a semi-realistic 
-%              3-D head model. Rotate head using left mouse button.
+%              3-D head model. Can 3-D rotate the head image using the left 
+%              mouse button.
 % Example:
-%   >> headplot example   - show an example spherical 'eloc_angles' file
-%   >> headplot cartesian - show an example cartesian 'eloc_angles' file
+%   >> headplot example   % show an example spherical 'eloc_angles' file
+%   >> headplot cartesian % show an example cartesian 'eloc_angles' file
 %
-% Setup usage (do once):
+% Setup usage (do only once for each scalp montage):
+%
 %   >> headplot('setup', elocs, splinefile, 'Param','Value',...);
-%   (previous call format headplot('setup', elocs, splinefile, cooment, type)
-%    is still supported)
+%      %
+%      % NOTE: previous call format below is still supported
+%      %       >> headplot('setup', elocs, splinefile, comment, type);
 %
-% Inputs: 
-%   elocs         - file of electrode locations (compatible with readlocs())
-%                   or channel location structure. If the channel file extension
-%                   is not standard, use readlocs() to load the data file, e.g.
-%                   >> headplot('setup', readlocs('myfile', 'filetype', 'besa'), ...
-%                      'splinefile');
-%   splinefile    - name of spline file to save splining info into
+% Required Setup-mode Inputs: 
 %
-% Optional Parameters:
-%   'comment'     - ['string'] optional string vector containing info for spline 
-%                   file.
-%   'meshfile'    - ['string'] Matlab files containing at least 2 variables
-%                   POS    - vertices 3-D positions, x=left-right; y=back-front, 
-%                            z=up-down
-%                   TRI1   - faces on which the scalp map should be computed
-%                   center (optional) - 3-D center of head mesh
-%                   TRI2   (optional) - faces in skin color
-%                   NORM   (optional) - normal for each vertex (better shades)
-%   'orilocs'     - ['off'|'on'] use original electrode location on the head
-%                   default: 'off' (extrapolated to spherical). Note that 
+%   elocs         - file of electrode locations (compatible with readlocs()),
+%                   or EEG.chanlocs channel location structure. If the channel 
+%                   file extension is not standard, use readlocs() to load the 
+%                   data file, e.g.
+%                      >> headplot('setup', ...
+%                            readlocs('myfile.xxx', 'filetype', 'besa'),...
+%                               'splinefile');
+%   splinefile    - name of spline file to save spline info into
+%
+% Optional Setup-mode Inputs:
+%
+%   'meshfile'    - ['string'] Matlab files containing at least two variables:
+%                      POS    - 3-D positions of vertices: 
+%                               x=left-right; y=back-front; z=up-down
+%                      TRI1   - faces on which the scalp map should be computed
+%                     plus possible optional variables:
+%                     center (optional) - 3-D center of head mesh
+%                     TRI2   (optional) - faces in skin color
+%                     NORM   (optional) - normal for each vertex (better shading)
+%   'orilocs'     - ['off'|'on'] use original electrode locations on the head
+%                   {default: 'off'} (extrapolated to spherical). Note that these
 %                   electrode locations must be coregisted with the head mesh.
-%   'transform'   - [real array] tailarach transformation matrix. 
-%                   [ shiftX shiftY shiftZ pitch roll yaw scaleX scaleY scaleZ ]
-%                   to coregister electrode locations with the head mesh. This
-%                   array is returned by the coregister() function.
-%  'plotmeshonly' - [string] plot only mesh and electrode position. Options are
-%                   'head' to plot the standard head mesh, 'sphere' to plot the
-%                   texture of the head on a sphere, and 'off' (default) not to
-%                   plot anything.
+%   'transform'   - [real array] tailarach transformation matrix to co-register 
+%                   the electrode locations with the head mesh:
+%                    [shiftX shiftY shiftZ pitch roll yaw scaleX scaleY scaleZ]
+%                   This array is returned by coregister().
+%  'plotmeshonly' - [string] plot only mesh and electrode positions. Options are
+%                   'head' to plot the standard head mesh; 'sphere' to plot the
+%                   texture of the head on a sphere; 'off' not to plot anything.
+%                   {default: 'off'}
+%   'comment'     - ['string'] optional string containing comments for spline file
+%                   {default: []}
 %
-% General usage:
-%   >> headplot(values,'spline_file','Param','Value',...)
+% Standard-mode Usage thereafter:
 %
-% Inputs:
-%   values        - vector containing value at each electrode position
-%   'spline_file' - spline filename computed and saved by running 'setup'
+%       >> headplot(values,'spline_file','Param','Value',...)
 %
-% Optional Parameters:
-%   'meshfile'   - [string] mesh file name. See file content in the setup
-%                  description. By default uses the template EEGLAB file.
+% Required Standard-mode Inputs:
+%
+%   values        - vector containing a data value at each electrode position
+%   'spline_file' - spline filename, computed and saved in 'setup' mode (above)
+%
+% Optional Standard-mode Inputs:
+%
+%   'meshfile'   - [string] mesh file name. See file content in the setup-mode
+%                  description above. {default: the EEGLAB head template file}.
 %   'electrodes' - ['on'|'off'] -> show electrode positions {default 'on'}
-%   'title'      -  Plot title {default none}
+%   'title'      -  Plot title {default: none}
 %   'labels'     -  2 -> plot stored electrode labels;
-%                   1 -> plot channel numbers; 0 -> no labels {default}
-%   'cbar'       -  0 -> Plot colorbar {default: no colorbar}
-%                   H -> Colorbar axis handle (e.g., choose location)
+%                   1 -> plot channel numbers; 0 -> no labels {default 0}
+%   'cbar'       -  0 -> Plot colorbar {default: no colorbar} 
+%                        Note: standard jet colormap) red = +;blue = -;green=0
+%                   h -> Colorbar axis handle (to specify headplot location)
 %   'view'       - Camera viewpoint in deg. [azimuth elevation]
 %                  'back'|'b'=[  0 30]; 'front'|'f'=[180 30] 
 %                  'left'|'l'=[-90 30]; 'right'|'r'=[ 90 30];
 %                  'frontleft'|'bl','backright'|'br', etc.,
-%                  'top'=[0 90]   {default [143 18]}
+%                  'top'=[0 90],  Can rotate with mouse {default [143 18]}
 %   'maplimits'  - 'absmax' -> make limits +/- the absolute-max
 %                  'maxmin' -> scale to data range
 %                   [min,max] -> user-definined values
-%                   {default = 'absmax'; red +, blue -, green 0}
-%   'lights'     - (3,N) matrix whose rows give x,y,z pos. of 
-%                   N lights {default: 4 lights at corners}
-%   'lighting'   - 'off' = show wire frame {default 'on'} 
-%   'colormap'   -  3-column colormap matrix {default jet(64)}
-%   'verbose'    - 'off' -> no msgs, no rotate3d {default 'on'}
+%                      {default = 'absmax'}
+%   'lights'     - (3,N) matrix whose rows give [x y z] pos. of each of
+%                   N lights {default: four lights at corners}
+%   'lighting'   - 'off' = show wire frame head {default 'on'} 
+%   'colormap'   -  3-column colormap matrix {default: jet(64)}
+%   'verbose'    - 'off' -> no msgs, no rotate3d {default: 'on'}
 %   'orilocs'    - [channel structure or channel file name] Use original 
 %                  channel locations instead of the one extrapolated from 
 %                  spherical locations. Note that if you use 'orilocs'
-%                  during setup, this is not necessary here as the 
+%                  during setup, this is not necessary here since the 
 %                  original channel location have already been saved.
-%                  This option might be usefull to show more channel than
-%                  the one actually used for interpolating (such as fiducials).
-%   'transform'  - [real array] homogenous transformation matrix to apply
-%                  to original location ('orilocs') before plotting them.
+%                  This option might be useful to show more channels than
+%                  the ones actually used for interpolating (e.g., fiducials).
+%   'transform'  - [real array] homogeneous transformation matrix to apply
+%                  to the original locations ('orilocs') before plotting them.
 %
-% Note: if an error is generated, headplot may close the current figure
+% Note: if an error is generated, headplot() may close the current figure
 %
 % Authors: Arnaud Delorme, Colin Humphries, Scott Makeig, SCCN/INC/UCSD, 
 %          La Jolla, 1998-
@@ -105,6 +118,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.62  2006/01/24 19:25:13  arno
+% corect coregistration etc...
+%
 % Revision 1.61  2005/11/30 23:29:14  arno
 % taking into account icachansind and channel location file orientation
 %
