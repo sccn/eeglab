@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2006/03/11 07:30:41  arno
+% time input
+%
 % Revision 1.11  2006/03/11 07:22:22  arno
 % header
 %
@@ -83,6 +86,10 @@
 %
 
 function [X, t] = std_readerp(ALLEEG, abset, comp, timerange)
+
+if nargin < 4
+    timerange = [];
+end;
     
 X = [];
 filename  = fullfile( ALLEEG(abset).filepath,[ ALLEEG(abset).filename(1:end-3) 'icaerp']);
@@ -104,9 +111,12 @@ end;
 
 % select time range of interest
 % -----------------------------
-if nargin > 3
+if ~isempty(timerange)
     maxind = max(find(t <= timerange(end)));
     minind = min(find(t >= timerange(1)));
-    X = X(:,minind:maxind);
-    t = t(minind:maxind)';
+else
+    maxind = length(t);
+    minind = 1;
 end;
+X = X(:,minind:maxind);
+t = t(minind:maxind)';
