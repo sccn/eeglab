@@ -1,4 +1,8 @@
-% coregister() -  Co-register electrode location file with head template or mesh.
+% coregister() -  Co-register electrode location file with head template or mesh
+%                 using the channel electrode file associated with this model
+%                 (for example if you have a subject MRI and extract a head mesh
+%                 from this MRI, the template file would be the electrodes scanned
+%                 on the subject head and already aligned with this head mesh).
 %
 % Usage:
 %        >> [chan1_out transform] = coregister( chan1, chan2, 'key', 'val' )
@@ -6,7 +10,8 @@
 % Inputs:
 %    chan1    - EEG.chanlocs channel location structure to align.
 %    chan2    - reference channel location file or EEG channel locations
-%               structure
+%               structure associated with the head model (given or not in
+%               'mesh' optional input below).
 %
 % Optional input:
 %    'alignfid'  - [cell array of strings] names of fiducials for alignment.
@@ -55,6 +60,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2006/03/13 22:53:20  arno
+% warp warnings
+%
 % Revision 1.26  2006/03/13 22:46:17  scott
 % help msg
 %
