@@ -158,6 +158,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.269  2006/03/09 17:15:37  arno
+% change default marker size
+% /
+%
 % Revision 1.268  2006/01/17 23:01:27  scott
 % clarified status of 'plotgrid' -sm
 %
@@ -830,7 +834,7 @@ HEADCOLOR = [0 0 0];    % default head color (black)
 CCOLOR = [0.2 0.2 0.2]; % default contour color
 ELECTRODES = [];        % default 'electrodes': on|off|label - set below
 MAXDEFAULTSHOWLOCS = 64;% if more channels than this, don't show electrode locations by default
-EMARKER = 'o';          % mark electrode locations with small disks
+EMARKER = '.';          % mark electrode locations with small disks
 ECOLOR = [0 0 0];       % default electrode color = black
 EMARKERSIZE = [];       % default depends on number of electrodes, set in code
 EMARKERLINEWIDTH = 1;   % default edge linewidth for emarkers
