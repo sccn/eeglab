@@ -50,7 +50,7 @@
 %  'vert'        = vector of times (in ms) at which to plot vertical dashed lines 
 %                   {default|[] -> none}
 %
-% See also: envtopo(), std_granderp(), envtopo_plot()
+% See also: envtopo()
 
 function std_envtopo(STUDY, ALLEEG, varargin)
 icadefs;
@@ -150,8 +150,7 @@ for n = 1:Ncond
     % compute the grand mean ERP envelope of the cluster (for specific
    % condition).
    fprintf('\n Computing grand ERP for condition %d.', n); 
-   [grandERP, set_len, STUDY, ALLEEG] = std_granderp(STUDY, ...
-				, 'clusters', clusters, 'condition', n, e_options{:});
+   [grandERP, set_len, STUDY, ALLEEG] = std_granderp(STUDY, ALLEEG, 'clusters', clusters, 'condition', n, e_options{:});
    grandERPtot{n} = grandERP;
    if ~exist('limits') | (length(limits)  == 2) % make limits same all conditions
        tmpmin = min(min(grandERP)); 
@@ -1345,20 +1344,14 @@ for k = 1:len
         end
 	end
     fprintf(' .' ); 
-    [EEG_etc, tmp_erp] = std_erp(EEG, comps);
-    if ~isempty(EEG_etc)
-         EEG.etc = EEG_etc;
-    end
-    [EEG_etc, tmp_scalp] = std_topo(EEG, comps);
-    if ~isempty(EEG_etc)
-         EEG.etc = EEG_etc;
-    end 
+    [tmp_erp] = std_erp(EEG, comps);
+    [tmp_scalp] = std_topo(EEG, comps);
     tmp = 0;
     tmp = (tmp_scalp.'*tmp_erp)/len;
     if exist('baseline')
-       tmp = rmbase(tmp,EEG.pnts,baseline);
-   end
-   if k == 1
+        tmp = rmbase(tmp,EEG.pnts,baseline);
+    end
+    if k == 1
         grandERP = tmp;
     else
         grandERP = grandERP + tmp;
