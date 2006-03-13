@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2005/10/11 16:45:46  arno
+% fix upper limit bug when timerange is out of range
+%
 % Revision 1.31  2005/03/31 17:58:21  arno
 % remove dbug message
 %
@@ -168,8 +171,8 @@ if nargin < 3
 	% -----------------
 	promptstr    = { 'Enter time range (in ms) to plot:', ...
 			 'Enter time range (in ms) to rank component contributions:', ...
-			 'Number of largest contributing components to plot (1-20):', ...
-			 'Else plot these component numbers only (<21) (Ex: 2:4,7):', ...
+			 'Number of largest contributing components to plot (7):', ...
+			 'Else plot these component numbers only (Ex: 2:4,7):', ...
                          'Component numbers to remove from data before plotting:' ...
 			 'Plot title:' ...
 			 'Optional topoplot() and spectopo() arguments:' };
@@ -278,7 +281,10 @@ else
                         '''timerange'', [timerange(1) timerange(2)] %s);' ] , outstr, options);
     end;    
 end;
-eval(com);
+
+% fprintf(['\npop_envtopo(): Issuing command: ' com '\n\n']); % type the evntopo() call
+
+eval(com); % make the plot using envtopo()
 
 return;
 
