@@ -1,31 +1,24 @@
-% std_readspec() - Given the ALLEEG structure, a specific EEG dataset index, 
-% and a specific component, the function returns the spectrum of that ICA component. 
-% The spectrum of the dataset ICA components is assumed to be saved in a Matlab 
-% file. If such a file doesn't exist,
-% you can use the std_spec() function to create it, or use the pre - clustering functions
-% that call it: pop_preclust(), std_preclust().  
-% Along with the spectrum of the selected ICA component the function returns  
-% the frequencies vector of the spectrum. 
-%
+% std_readspec() - returns the stored mean power spectrum for an ICA component 
+%                  in a specified dataset.  The spectrum is assumed to have been 
+%                  saved in a Matlab %file, [dataset_name].icaspec, in the same
+%                  directory as the dataset file. If this file doesn't exist,
+%                  use std_spec() to create it else a pre-clustering functions
+%                  that calls it: pop_preclust() or std_preclust().  
 % Usage:    
-%   >> [spec, f] = std_readspec(ALLEEG, abset, comp, freqrange);  
-%   % This functions returns the spectrum of an ICA component. 
-%   % The information is loaded from a float file, created by the 
-%   % pre-clustering function std_spec(), in a specific frequency range. 
-%
+%         >> [spec, freqs] = std_readspec(ALLEEG, setindx, component, freqrange);  
 % Inputs:
-%   ALLEEG     - an EEGLAB data structure, which holds EEG sets (can also be one EEG set). 
-%                      ALLEEG must contain the dataset of interest (the setind).
-%   setind     -  [integer] an index of an EEG dataset in the ALLEEG
-%                      structure, for which to get the component spectrum.
-%   component  - [integer] a component index in the selected EEG dataset for which 
-%                      a spectrum will be returned. 
-%   freqrange  - [min max] frequency range in Hz
+%   ALLEEG     - a EEG dataset vector (can also be one EEG set). 
+%                Must contain the dataset of interest (the 'setindx' below).
+%   setindx    - [integer] an index of an EEG dataset in the ALLEEG
+%                structure for which to read a component spectrum.
+%   component  - [integer] index of the component in the selected EEG dataset 
+%                for which to return the spectrum
+%   freqrange  - [min max in Hz] frequency range to return
 %
 % Outputs:
-%   spec          - the spectrum of the requested ICA component in the
-%                    selected dataset. 
-%   f             - a vector of the frequency points in which the spectra was computed. 
+%   spec      - the log-power spectrum of the requested ICA component in the
+%               specified dataset (in dB)
+%   freqs     - vector of spectral frequencies (in Hz)
 %
 %  See also  std_spec(), pop_preclust(), std_preclust()
 %
@@ -50,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2006/03/11 07:30:01  arno
+% freqrange input
+%
 % Revision 1.11  2006/03/11 07:25:37  arno
 % header
 %
