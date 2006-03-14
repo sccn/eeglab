@@ -1,24 +1,23 @@
-%  std_movecomp()  - Commandline function, to move component(s) from one cluster to another. 
-%                            Reassign specified components of one cluster to another cluster. 
+%  std_movecomp()  - Move ICA component(s) from one cluster to another. 
+%
 % Usage:    
-%                   >> [STUDY] = std_movecomp(STUDY, ALLEEG, from_cluster, to_cluster, comps);   
+%       >> [STUDY] = std_movecomp(STUDY, ALLEEG, from_cluster, to_cluster, comps);   
 % Inputs:
-%   STUDY         - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
-%   ALLEEG        - global EEGLAB vector of EEG structures for the dataset(s) included in the STUDY. 
-%                       ALLEEG for a STUDY set is typically created using load_ALLEEG().  
-%   from_cluster - cluster number, the cluster components are moved from.  
-%   to_cluster     - cluster number, the cluster components are moved to.  
-%   comps          - [numeric vector] component indices in the from_cluster to move.  
+%   STUDY        - STUDY structure comprising all or some of the EEG datasets in ALLEEG.
+%   ALLEEG       - vector of EEG structures in the STUDY, typically created using
+%                  load_ALLEEG().  
+%   from_cluster - index of the cluster components are to be moved from.  
+%   to_cluster   - index of the cluster components are to be moved to.  
+%   comps        - [int vector] indices of from_cluster components to move.  
 %
 % Outputs:
-%   STUDY    - the input STUDY set structure modified with the components reassignment. 
+%   STUDY        - input STUDY structure with modified component reassignments.
 %
 %   Example:
-%                         >> from_cluster = 10; to_cluster = 7; comps = [2 7];   
-%                         >> [STUDY] = std_movecomp(STUDY,ALLEEG, from_cluster, to_cluster, comps);
-%                    Components 2 and 7 of cluster 10 are moved to cluster 7. 
+%           >> [STUDY] = std_movecomp(STUDY, ALLEEG, 10, 7, [2 7]);
+%           % Move components 2 and 7 of Cluster 10 to Cluster 7. 
 %
-%  See also  pop_clustedit         
+%  See also:  pop_clustedit         
 %
 % Authors:  Hilit Serby, Arnaud Delorme, Scott Makeig, SCCN, INC, UCSD, June, 2005
 
