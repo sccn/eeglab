@@ -1,42 +1,44 @@
-% coregister() -  Co-register electrode location file with head template or mesh
-%                 using the channel electrode file associated with this model
-%                 (for example if you have a subject MRI and extract a head mesh
-%                 from this MRI, the template file would be the electrodes scanned
+% coregister() -  Co-register electrode locations with a head template or mesh
+% HEAD TEMPLATE = ??
+%                 using the channel locations file associated with this model
+%                 For example: After extracting a head mesh from a subject MRI, 
+%                 the template file would be the electrodes scanned
+% THE ELECTRODES THEMSELVES??? OR THEIR LOCATIONS??
 %                 on the subject head and already aligned with this head mesh).
-%
+% ALIGNED HOW??
 % Usage:
-%        >> [chan1_out transform] = coregister( chan1, chan2, 'key', 'val' )
-%
+%        >> [locs1_out transform] = coregister( chanlocs1, chanlocs2, 'key', 'val' )
 % Inputs:
-%    chan1    - EEG.chanlocs channel location structure to align.
-%    chan2    - reference channel location file or EEG channel locations
-%               structure associated with the head model (given or not in
-%               'mesh' optional input below).
-%
+%    chanlocs1   - (EEG.chanlocs) channel locations structure to align.
+%    chanlocs2   - reference channel locations structure or file associated 
+%                  with the head model (given or not in the optional 
+%                 'mesh' input below). GIVEN OR NOT = ?? WHAT KIND OF FILE?
 % Optional input:
-%    'alignfid'  - [cell array of strings] names of fiducials for alignment.
-%    'warp'      - [cell array of string] names of electrodes for warping.
+%    'alignfid'  - [cell array of strings] names of fiducial channels to use
+%                  in the  alignment. NAMES MUST BE COMMON TO BOTH??
+%    'warp'      - [cell array of strings] names of electrodes for warping.
+%                  WHAT ABOUT THE REST???
 %    'transform' - [real array] homogenous transformation matrix or a 
 %                  1x9 matrix containing traditional 9-parameter "Talairach 
-%                  model" transformation (see traditional()).
+%                  model" transformation (>> help traditional).
 %    'mesh'      - [cell array|string] head mesh. Can contain {points triangles} 
-%                  or {points triangles normals}. See the function plotmesh() 
-%                  for details. May also contain the name of a file containing 
-%                  head mesh information (several formats recognized).
-%    'chaninfo1' - [struct] EEG.chanlocs.chaninfo channel information structure 
-%                  for first EEG.chanlocs structure (may contain fiducials).
-%    'chaninfo2' - [struct] EEG.chanlocs.chaninfo channel information structure 
-%                  for second EEG.chanlocs structure (may contain fiducials).
+%                  or {points triangles normals}. See >> help plotmesh 
+%                  for details. May also be the name of a file containing 
+%                  head mesh information (several formats are recognized).
+%    'chaninfo1' - [EEG.chanlocs.chaninfo struct] channel information structure 
+%                  from chanlocs1 (may contain fiducials). WHY SEPARATE FROM chanlocs1??
+%    'chaninfo2' - [EEG.chanlocs.chaninfo struct] channel information structure 
+%                  for chanlocs2 (may contain fiducials). WHY SEPARATE FROM chanlocs2??
 %    'autoscale' - ['on'|'off'] autoscale electrode radius when aligning 
 %                  fiducials. {default: 'on'}
 %    'helpmsg'   - ['on'|'off'] pop-up help message when calling function.
 %                  {default: 'off'}
 % Output:
-%    chan1_out   - transformed EEG.chanlocs channel location structure
-%    transform   - transformation matrix. Use function traditional() to 
-%                  convert to homogenous transformation matrix and input
-%                  it into functions like headplot().
-%
+%    c1_locsout  - transformed chanlocs1 channel locations structure
+%    transform   - transformation matrix. Use traditional() to convert
+%                  this to a homogenous transformation matrix for
+%                  3-D plotting functions including headplot().
+%                  IS THIS FOR APPLICATION TO THE HEAD MESH OR TO ELECTRODE LOCS??
 % See also: traditional(), headplot(), plotmesh()
 %
 % Author: Arnaud Delorme, SCCN, INC, UCSD, 2005
@@ -60,6 +62,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2006/03/13 23:29:27  arno
+% clarifying message
+%
 % Revision 1.27  2006/03/13 22:53:20  arno
 % warp warnings
 %
