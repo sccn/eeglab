@@ -62,6 +62,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2006/03/12 03:53:36  arno
+% fix timevals
+%
 % Revision 1.16  2006/03/10 15:57:06  arno
 % renaming variable
 %
@@ -322,6 +325,7 @@ if strcmpi(mode, 'centroid')
             xlabel('Time [ms]');
             cbar;
         else
+            
             for n = 1:Ncond
                 sbplot(rowcols(1),rowcols(2),(k-1)*Ncond+n), 
                 a = [ STUDY.cluster(cls(k)).name ' ERSP, ' num2str(length(unique(STUDY.cluster(cls(k)).sets(1,:)))) 'Ss, ' STUDY.condition{n}];
@@ -343,6 +347,11 @@ if strcmpi(mode, 'centroid')
                     xlabel('Time [ms]');
                 else
                     xlabel('');
+                end;
+                if n == 1
+                    ylabel('Frequency (Hz)');
+                else
+                    ylabel('');
                 end;
                 cbar;
                 waitbar((k*n)/(len*Ncond),h_wait);
