@@ -4,7 +4,7 @@
 %                  in the same folder as the dataset file.
 %                  If this file does not exist, use std_ersp() to create it, else 
 %                  use a pre-clustering function: pop_preclust() or std_preclust(), 
-%                  that calls it. Intpretation of the ERSP requires some input 
+%                  that calls it. Interpretation of the ERSP requires some input 
 %                  variables used to compute it: frequency range, window width, 
 %                  resolution, probability threshold, and wavelet type (FFT or 
 %                  wavelet_cycles). See timef() for details.
@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2006/03/14 02:23:18  scott
+% help msg
+%
 % Revision 1.13  2006/03/14 01:59:38  scott
 % help msg
 %

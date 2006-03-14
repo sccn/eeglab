@@ -1,28 +1,27 @@
 % std_propplot() - Commandline function to plot cluster properties. 
-%                  Displays either mean cluster ERSPs, or all cluster component ERSPs 
-%                  plut the mean cluster ERSP in one figure per condition.
+%                  Displays either mean cluster ERSPs, else all cluster component ERSPs 
+%                  Plots the mean cluster ERSP in one figure per condition.
 %                  The ERSPs can be plotted only when component ERSPs have been computed 
-%                  and saved in the EEG datasets of the STUDY.
-%                  These may be computed during pre-clustering using the gui-based function
-%                  pop_preclust() or via the equivalent commandline functions eeg_createdata() 
-%                  and eeg_preclust(). This function is called by pop_clustedit().
+%                  and saved with the EEG datasets of the STUDY.
+%                  These may be computed during pre-clustering using pop_preclust() 
+%                  or std_preclust(). Called by pop_clustedit().
 % Usage:    
 %              >> [STUDY] = std_propplot(STUDY, ALLEEG, clusters);  
 % Inputs:
-%   STUDY      - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
-%   ALLEEG     - global EEGLAB vector of EEG structures for the datasets in the STUDY. 
-%                ALLEEG for a STUDY set is typically created using load_ALLEEG().  
+%   STUDY      - STUDY set comprising some or all of the EEG datasets in ALLEEG.
+%   ALLEEG     - vector of EEG dataset structures including the datasets in the STUDY, 
+%                typically created using load_ALLEEG().  
 %
 % Optional inputs:
-%   clusters   - [numeric vector]  -> cluster numbers to plot.
-%                            'all' -> plot all clusters in STUDY {default: 'all'}.
+%   clusters   - [numeric vector] -> cluster numbers to plot.
+%                           'all' -> plot all clusters in STUDY {default: 'all'}.
 % Outputs:
 %   STUDY      - the input STUDY set structure modified with the plotted cluster 
-%                mean mproperties, to allow quick replotting (unless cluster means 
+%                mean properties to allow quick replotting (unless cluster means 
 %                already existed in the STUDY).  
 % Example:
 %              >> [STUDY] = std_propplot(STUDY,ALLEEG, 5);
-%                 % Plot mean properties for cluster 5 in one figure. 
+%                 % Plot mean properties of Cluster 5 in one figure. 
 %
 % See also:  pop_clustedit() 
 %
@@ -47,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2006/03/12 03:38:34  arno
+% header
+%
 % Revision 1.8  2006/03/09 18:58:25  scott
 % help msg -sm
 %
