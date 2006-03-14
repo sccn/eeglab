@@ -1,45 +1,46 @@
-% std_specplot() - Commandline function, to visualizing cluster/s components spectra. 
-%                   Either displays mean spectra of all requested clusters in the same figure, 
-%                   with spectra for different conditions (if any) plotted in different colors. 
-%                   Or displays spectra for each specified cluster in separate figures (per condition),  
-%                   each containing the cluster components plus the average cluster spectrum in bold.
-%                   The spectra can be visualized only if component spectra     
-%                   were calculated and saved in the EEG datasets in the STUDY.
-%                   These can be computed during pre-clustering using the GUI-based function
-%                   pop_preclust() or the equivalent commandline functions eeg_createdata() 
-%                   and eeg_preclust(). A pop-function that calls this function is pop_clustedit().
+% std_specplot() - visualizes cluster component spectra, either mean spectra of 
+%                  all requested clusters in the same figure, with spectra for 
+%                  different conditions (if any) plotted in different colors, 
+%                  or spectra for each specified cluster in a separate figure 
+%                  per condition,  each showing the cluster components plus 
+%                  the average cluster spectrum in bold. The spectra can be 
+%                  plotted only if component spectra have been calculated and 
+%                  saved with the EEG datasets  using pop_preclust() or 
+%                  std_preclust(). Called by pop_clustedit(). Calls std_readspec()
 % Usage:    
-%                   >> [STUDY] = std_specplot(STUDY, ALLEEG, key1, val1, key2, val2);  
+%              >> [STUDY] = std_specplot(STUDY, ALLEEG, key1, val1, key2, val2, ...);  
 % Inputs:
-%   STUDY      - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
-%   ALLEEG     - global EEGLAB vector of EEG structures for the dataset(s) included in the STUDY. 
-%                     ALLEEG for a STUDY set is typically created using load_ALLEEG().  
+%   STUDY      - STUDY structure comprising some or all of the EEG datasets in ALLEEG.
+%   ALLEEG     - vector of EEG dataset structures for the dataset(s) in the STUDY, 
+%                typically created using load_ALLEEG().  
 %
 % Optional inputs:
-%   'clusters'   - [numeric vector]  -> specific cluster numbers to plot.
-%                     'all'          -> plot all clusters in STUDY.
-%                     {default: 'all'}.
-%   'comps'      - [numeric vector]  -> indices of the cluster components to plot.
-%                       'all'        -> plot all the components in the cluster {default: 'all'}.
-%   'mode'       - ['centroid'|'comps'] a plotting mode. In 'centroid' mode, the average spectra 
-%                     of the requested clusters are plotted in the same figure, with spectra for  
-%                     different conditions (if any) plotted in different colors. In 'comps' mode, spectra
-%                     for each specified cluster are plotted in separate figures (per condition), each 
-%                     containing  cluster components spectra plus the average cluster spectrum in bold.
-%                     {default: 'centroid'}. Note that this option is irrelevant if component
-%                     indices are provided as input.
-%   'figure'       - ['on'|'off'] for the 'centroid' mode option, plots on
-%                     a new figure ('on')  or plots on current figure ('off').
-%                     {default: 'on'}.
+%   'clusters' - [int vector] -> cluster numbers to plot.
+%                       'all' -> plot all clusters in STUDY.
+%                {default: 'all'}.
+%   'comps'    - [int vector] -> indices of cluster components to plot.
+%                       'all' -> plot all the components in the cluster 
+%                {default: 'all'}.
+%   'mode'     - ['centroid'|'comps'] plotting mode. In 'centroid' mode, the average 
+%                spectra of the requested clusters are plotted in the same figure, 
+%                with spectra for  different conditions (if any) plotted in different 
+%                colors. In 'comps' mode, spectra for each specified cluster are 
+%                plotted in separate figures (per condition), each containing the
+%                cluster component spectra plus the mean cluster spectrum in bold.
+%                {default: 'centroid'}. Note that this option is irrelevant when 
+%                component indices are provided as input.
+%   'figure'   - ['on'|'off'] for the 'centroid' mode option, 'on' plots in a new 
+%                figure, while 'off'  plots in the current figure. {default: 'on'}
 %
 % Outputs:
-%   STUDY    - the input STUDY set structure modified with plotted cluster 
-%                     mean spectra, to allow quick replotting (unless cluster means 
-%                     already exists in the STUDY).  
+%   STUDY      - the input STUDY set structure modified with the plotted cluster 
+%                mean spectra, to allow quick replotting (unless the cluster means 
+%                already exists in the STUDY).  
 %
 %   Example:
-%                         >> [STUDY] = std_specplot(STUDY,ALLEEG, 'clusters', 2, 'mode', 'comps');
-%                    Plots cluster 2 components spectra along with the mean spectra in bold. 
+%            >> [STUDY] = std_specplot(STUDY,ALLEEG, 'clusters', 2, 'mode', 'comps');
+%               % Plot component spectra for Cluster 2 plus the mean cluster spectrum 
+%               % (in bold). 
 %
 %  See also  pop_clustedit(), pop_preclust()
 %
@@ -64,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2006/03/10 18:23:37  arno
+% rename variables
+%
 % Revision 1.14  2006/03/10 18:09:28  arno
 % remove wait bar
 %
