@@ -1,7 +1,8 @@
 %
 % std_readitc() - returns the log-frequency inter-trial coherence (ITC) for a 
 %                 specified ICA component. The component ITCs for the dataset 
-%                 are assumed to have been saved in a Matlab file ([datafile].itc). 
+%                 are assumed to have been saved in a Matlab file, 
+%                 [dataset_)name].icaitc, in the same directory as the dataset.
 %                 If no such file exists, use std_ersp() to create it, else 
 %                 the pre-clustering functions that call it: pop_preclust, 
 %                 std_preclust().  The input variables used to compute the
@@ -12,7 +13,7 @@
 %   >> [logersp, logfreqs, times] = std_readitc(ALLEEG, setindx, component, ...
 %                                                       time_range, freq_range);  
 % Inputs:
-%   ALLEEG     - EEG dataset vector (can also be one EEG set). 
+%   ALLEEG     - EEG dataset vector (can also be an EEG set). 
 %                Must contain the dataset of interest (see 'setindx' below).
 %   setindx    -  [integer] index of the EEG dataset in ALLEEG for which 
 %                 to return the log-frequency ITC.
@@ -53,6 +54,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2006/03/14 02:11:46  scott
+% help msg
+%
 % Revision 1.8  2006/03/11 07:28:50  arno
 % header info
 %

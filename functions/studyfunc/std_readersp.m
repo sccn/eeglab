@@ -1,17 +1,16 @@
-%
-% std_readersp() - Given the ALLEEG structure, a specific EEG dataset index, and a 
-%                  specific component, return the mean log-frequency ERSP for a
-%                  specified ICA component. The ERSP of the dataset ICA component 
-%                  is assumed to be saved in a Matlab file. If such a file does not 
-%                  exist, use std_ersp() to create it, or use a pre-clustering
-%                  function: pop_preclust() or std_preclust(). The ERSP  information 
-%                  is connected to input variables used to compute it: frequency 
-%                  range, window width, resolution, probability threshold, and 
-%                  wavelet type (FFT or wavelet_cycles), see timef() for details.
+% std_readersp() - Returns the equal-log-frequency spaced mean event-related spectral 
+%                  perturbation (ERSP) for a requested ICA component. The ERSP is 
+%                  assumed to have been saved in a Matlab file, [dataset_name].icaersp 
+%                  in the same folder as the dataset file.
+%                  If this file does not exist, use std_ersp() to create it, else 
+%                  use a pre-clustering function: pop_preclust() or std_preclust(), 
+%                  that calls it. Intpretation of the ERSP requires some input 
+%                  variables used to compute it: frequency range, window width, 
+%                  resolution, probability threshold, and wavelet type (FFT or 
+%                  wavelet_cycles). See timef() for details.
 % Usage:    
-%          >> [logersp, logfreqs] = std_readersp(ALLEEG, setindex, component, ...
-%                                                             time_range, freq_range);  
-%
+%     >> [logersp, logfreqs, times ] = std_readersp(ALLEEG, setindex, component, ...
+%                                                            time_range, freq_range);  
 % Inputs:
 %   ALLEEG     - vector of EEG datasets (can also be one EEG dataset). Must contain 
 %                the dataset of interest (see 'setind' below).
@@ -19,17 +18,18 @@
 %                which to read a component log-frequency ERSP.
 %   component  - [integer] component index in the selected EEG dataset for which 
 %                to read the ERSP 
-%   time_range - [min max ms] ERSP time (latency) range 
-%   freq_range - [min max Hz] ERSP frequency range
+%   time_range - [min max ms] ERSP time (latency) range of interest
+%   freq_range - [min max Hz] ERSP frequency range of interest
 %
 % Outputs:
 %   logersp    - the log-frequency ERSP for the requested ICA component 
-%                in the specified dataset. Dimensions: (log-spaced) frequencies 
-%                      by time, time - frequency decomposition of the ICA
-%                      activations.
-%   logfreqs   - a vector of the frequencies points in log scale. 
+%                in the specified dataset. Dimensions: (equal log-spaced) 
+%                frequencies by times. Units, dB re baseline
+%   logfreqs   - vector of equal-log-spaced ERSP frequencies, in Hz
+%   times      - vector of ERSP times (latencies), in ms.
+%   params     - structure of timef() parameters saved with the ERSP
 %
-% See also:  std_ersp(), pop_preclust(), std_preclust()
+% See also:  std_ersp(), pop_preclust(), std_preclust(), timef()
 %
 % Authors: Arnaud Delorme, Hilit Serby, SCCN, INC, UCSD, February, 2005
 
@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2006/03/14 01:59:38  scott
+% help msg
+%
 % Revision 1.12  2006/03/13 19:09:03  arno
 % no time range and freq range
 %
