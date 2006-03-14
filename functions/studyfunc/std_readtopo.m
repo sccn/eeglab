@@ -1,32 +1,24 @@
-% std_readtopo() - Given the ALLEEG structure, a specific EEG dataset index, 
-% and a specific component, the function returns the scalp map of that ICA component. 
-% The scalp map grid of the dataset ICA components is assumed to be saved in a  
-% Matlab file. If such a file doesn't exist,
-% you can use the std_topo() function to create it, or use the pre-clustering functions
-% that call it: pop_preclust(), eeg_preclust().  
-% Along with the scalp map grid of the selected ICA component the function returns  
-% the two axis grid points vectors (x and y). 
-%
+% std_readtopo() - returns the scalp map of a specified ICA component, assumed
+%                  to have been saved in a Matlab file, [dataset_name].icatopo, 
+%                  in the same directory as the dataset file. If this file does 
+%                  not exist, use std_topo() to create it, else a pre-clustering 
+%                  function that calls it: pop_preclust() or eeg_preclust().  
 % Usage:    
-%   >> [grid, y, x ] = std_readtopo(ALLEEG, abset, component);  
-%   % This functions returns the ICA component scalp map grid. 
-%   % The information is loaded from a file, created
-%   % by the pre-clustering function std_topo(). 
+%   >> [grid, y, x ] = std_readtopo(ALLEEG, setindx, component);  
 %
 % Inputs:
-%   ALLEEG     - an EEGLAB data structure, which holds EEG sets (can also be one EEG set). 
-%                      ALLEEG must contain the dataset of interest (the setind).
-%   setind     -  [integer] an index of an EEG dataset in the ALLEEG
-%                      structure, for which to get the component ERP.
-%   component  - [integer] a component index in the selected EEG dataset for which 
-%                      an ERP will be returned. 
-%
+%   ALLEEG     - vector of EEG datasets (can also be one EEG set). 
+%                must contain the dataset of interest (see 'setindx' below).
+%   setind     - [integer] an index of an EEG dataset in the ALLEEG
+%                structure, for which to get the component ERP.
+%   component  - [integer] index of the component for which the scalp map 
+%                grid should be returned. 
 % Outputs:
-%   grid          - the scalp map grid of the requested ICA component in the
-%                      selected dataset. This grid is an interpolated Cartesian grid 
-%                      of the component scalp map (the output of the topoplot function). 
-%   x             - the x axis points of the interpolated grid, for plotting purposes.  
-%   y             - the y axis points of the interpolated grid, for plotting purposes.  
+%   grid      - square scalp-map color-value grid for the requested ICA component 
+%               in the specified dataset, an interpolated Cartesian grid as output 
+%               by topoplot(). 
+%   y         - y-axis values for the interpolated grid
+%   x         - x-axis values of the interpolated grid
 %
 %  See also  std_topo(), std_preclust()
 %
@@ -51,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2006/03/11 07:23:51  arno
+% header
+%
 % Revision 1.6  2006/03/10 00:37:17  arno
 % error msg
 %
