@@ -1,40 +1,36 @@
-% std_readitc() - Given the ALLEEG structure, a specific EEG dataset index, 
-% and a specific component, the function returns the (frequency) log scaled 
-% ITC of that ICA component. 
-% The ITC of the dataset ICA components is assumed to be saved in a Matlab 
-% file. If such a float file doesn't exist,
-% you can use the std_ersp() function to create it, or use the pre - clustering functions
-% that call it: pop_preclust, std_preclust(). The ITC information  
-% is specific to the input variables used to compute it, the frequency range, 
-% timewindow, resolution, confidence level and the wavelet type (FFT / wavelet
-%  cycles), see timef for details. 
-% Along with the ITC of the selected ICA component the function returns  
-% the frequency vector (in log space) of the ITC samples. 
 %
+% std_readitc() - returns the log-frequency inter-trial coherence (ITC) for a 
+%                 specified ICA component. The component ITCs for the dataset 
+%                 are assumed to have been saved in a Matlab file ([datafile].itc). 
+%                 If no such file exists, use std_ersp() to create it, else 
+%                 the pre-clustering functions that call it: pop_preclust, 
+%                 std_preclust().  The input variables used to compute the
+%                 ITC are returnsd: frequency_range, time_range, resolution, 
+%                 probability_threshold, and wavelet type (FFT | wavelet 
+%                 cycles). See timef() for details. 
 % Usage:    
-%   >> [logersp, logfreqs] = std_readitc(ALLEEG, abset, component, timewindow, freqrange);  
-%   % This functions returns the log scaled ITC of an ICA component. 
-%   % The information is loaded from a float file, was created
-%   % by the pre-clustering function std_ersp(). 
-%
+%   >> [logersp, logfreqs, times] = std_readitc(ALLEEG, setindx, component, ...
+%                                                       time_range, freq_range);  
 % Inputs:
-%   ALLEEG     - an EEGLAB data structure, which holds EEG sets (can also be one EEG set). 
-%                      ALLEEG must contain the dataset of interest (the setind).
-%   setind     -  [integer] an index of an EEG dataset in the ALLEEG
-%                      structure, for which to get the component log scaled ITC.
-%   component  - [integer] a component index in the selected EEG dataset for which 
-%                      an ITC will be returned. 
-%   timewindow - [min max] time window in ms
-%   freqrange  - [min max] frequency range in Hz
+%   ALLEEG     - EEG dataset vector (can also be one EEG set). 
+%                Must contain the dataset of interest (see 'setindx' below).
+%   setindx    -  [integer] index of the EEG dataset in ALLEEG for which 
+%                 to return the log-frequency ITC.
+%   component  - [integer] component index in the selected EEG dataset for 
+%                which to return the ITC. 
+%   time_range - [min max in ms] ITC time window 
+%   freq_range - [min max in Hz] ITC frequency range 
 %
 % Outputs:
-%   logitc       - the log scaled ITC of the requested ICA component in the
-%                      selected dataset. This is frequencies (log scaled)
-%                      by time, time - frequency decomposition inter-trial coherence 
-%                      of the ICA activations.
-%   logfreqs   - a vector of the frequencies points in log scale. 
+%   logitc     - the equal log-spaced frequency ITC for the requested ICA 
+%                component in the specified dataset. Its dimensions are 
+%                (equal log-spaced) frequencies by times. 
+%   logfreqs   - vector of ITC (log-spaced) frequencies, in Hz
+%   times      - vector of ITC times (latencies), in ms.
+%   params     - full structure of ITC parameters saved
 %
-%  See also  std_ersp, std_readersp, pop_preclust, eeg_preclust, eeg_createdata           
+%  See also  std_ersp(), std_readersp(), pop_preclust(), eeg_preclust(), 
+%               eeg_createdata()
 %
 % Authors: Arnaud Delorme, Hilit Serby, SCCN, INC, UCSD, February, 2005
 
@@ -57,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2006/03/11 07:28:50  arno
+% header info
+%
 % Revision 1.7  2006/03/10 15:49:07  arno
 % fix reading ITC
 %
