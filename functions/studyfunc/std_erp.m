@@ -1,28 +1,29 @@
 % std_erp() -   Constructs and returns ICA activation ERPs for a dataset. 
 %               Updates the EEG structure both in the Matlab environment 
-%               and on disk Saves the ERPs into a file. If such a file 
-%               already exists, loads its information. Options allow
-%               limiting ERP coomputation to specified components, and to a 
-%               specific latency range within the epoch limits. The function 
-%               returns the ERP of the selected ICA components in the requested 
-%               time window.
+%               and on disk. Saves the ERPs into a Matlab file, 
+%               [dataset_name].icaerp, in the same directory as the dataset
+%               file.  If such a file already exists, loads its information. 
+%               Options allow limiting ERP coomputation to specified components
+%               and to a specific latency range (within epoch limits). Returns
+%               the ERP of the selected ICA components in the requested 
+%               time range.
 % Usage:    
-%            >> [data, times] = std_erp(EEG,components,timewindow);  
+%            >> [erp, times] = std_erp(EEG,components,time_range);  
 % Inputs:
 %   EEG          - a loaded epoched EEG dataset structure. 
 %   components   - [numeric vector] components of the EEG structure for which 
-%                      activation ERPs will be computed. {default|[] -> all}
-%   timewindow   - [minms maxms] latency window limits (in ms) within which to 
-%                      compute ERPs {default|[]: [EEG.minms EEGmaxms]}
+%                  activation ERPs will be computed. {default|[] -> all}
+%   time_range   - [minms maxms] latency window limits (in ms) within which to 
+%                  compute ERPs {default|[]: [EEG.minms EEGmaxms]}
 % Outputs:
-%   data         - ERP for the requested ICA components in the selected 
+%   erp         - ERP for the requested ICA components in the selected 
 %                     latency window. 
-%   times        - a vector of epoch latencies at which the ERPs are computed. 
+%   times       - vector of times (epoch latencies in ms) for the ERP
 %
-% File output:     [dataset_file].icaerp
-%                  [dataset_file].set
+% File output:     [dataset_file].icaerp     % component erp file
+%                  [dataset_file].set        % dataset file
 %
-% See also  std_spec(), std_ersp(), std_topo(), std_preclust()
+% See also:    std_spec(), std_ersp(), std_topo(), std_preclust()
 %
 % Authors: Arnaud Delorme, Hilit Serby, SCCN, INC, UCSD, January, 2005
 
@@ -45,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2006/03/11 07:08:03  arno
+% header
+%
 % Revision 1.21  2006/03/10 16:23:43  arno
 % reprogram timerange
 %
