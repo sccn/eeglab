@@ -128,6 +128,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.44  2006/03/13 19:14:21  arno
+% fix downsampling etc...
+%
 % Revision 1.43  2006/03/12 02:46:13  arno
 % typo
 %
@@ -771,9 +774,10 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, components
                     catch,
                         % downsample frequency by 2 and times by 2
                         % ----------------------------------------
-                        idat = STUDY.datasetinfo(STUDY.setind(1)).index; 
-                        [ tmp freqs times ] = std_readersp( ALLEEG, idat, succompind{1}(1));
-                        [data freqs times ] = erspdownsample(data,4, freqs,times,Ncond); 
+                        data = data(:,1:2:end);
+                        %idat = STUDY.datasetinfo(STUDY.setind(1)).index; 
+                        %[ tmp freqs times ] = std_readersp( ALLEEG, idat, succompind{1}(1));
+                        %[data freqs times ] = erspdownsample(data,4, freqs,times,Ncond); 
                         if strcmp(varargin{index}(end-1) , 'downsample')
                             varargin{index}(end) = {celltomat(varargin{index}(end)) + 4};
                         else
@@ -835,7 +839,7 @@ return
 %        This is a helper function called by eeg_preclust().
 
 function [dsdata, freqs, times] = erspdownsample(data, n, freqs,times,cond)
-
+    
 len = length(freqs)*length(times); %size of ERSP
 nlen = ceil(length(freqs)/2)*ceil(length(times)/2); %new size of ERSP
 dsdata = zeros(size(data,1),cond*nlen);
