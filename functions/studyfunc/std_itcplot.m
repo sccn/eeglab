@@ -293,21 +293,30 @@ if strcmpi(mode, 'centroid')
                tftopo(abs(ave_itc),timevals,logfreqs,'limits', ...
                       [timevals(1) timevals(end) logfreqs(1) logfreqs(end) -maxval maxval],...
                       'title', a, 'verbose', 'off');
-               ft = str2num(get(gca,'yticklabel'));
-               ft = exp(1).^ft;
-               ft = unique(round(ft));
-               ftick = get(gca,'ytick');
-               ftick = exp(1).^ftick;
-               ftick = unique(round(ftick));
-               ftick = log(ftick);
-               set(gca,'ytick',ftick);
-               set(gca,'yticklabel', num2str(ft));
+               if n == 1
+                   ft = str2num(get(gca,'yticklabel'));
+                   ft = exp(1).^ft;
+                   ft = unique(round(ft));
+                   ftick = get(gca,'ytick');
+                   ftick = exp(1).^ftick;
+                   ftick = unique(round(ftick));
+                    ftick = log(ftick);
+                    set(gca,'ytick',ftick);
+                    set(gca,'yticklabel', num2str(ft));
+                    ylabel('Frequency (Hz)');
+               else
+                   set(gca,'ytick',[]);
+                    set(gca,'yticklabel', []);
+                    ylabel('');
+               end;
+               if n == Ncond
+                   cbar;
+               end;
                if (k-1)*Ncond+n > (rowcols(1)-1)*rowcols(2)
                    xlabel('Time [ms]');
                else
                    xlabel('');
                end;
-               cbar('pos');
                waitbar((k*n)/(len*Ncond),h_wait);
            end;
         end % Finish plotting all centroids for one condition
