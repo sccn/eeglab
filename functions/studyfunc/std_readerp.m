@@ -1,23 +1,24 @@
 %
 % std_readerp() - returns the ERP for an ICA component in an epoched dataset.
 %                 The ERPs of the dataset ICA components are assumed to have 
-%                 been saved in a Matlab file. If such a file doesn't exist, 
-%                 use std_erp() to create it, or use a pre-clustering function 
-%                 that call it: pop_preclust() or std_preclust()  
+%                 been saved in a Matlab file, [dataset_name].icaerp, in the
+%                 same directory as the dataset file. If this file doesn't exist, 
+%                 use std_erp() to create it, else use a pre-clustering function 
+%                 that calls it: pop_preclust() or std_preclust()  
 % Usage:    
-%   >> [erp, times] = std_readerp(ALLEEG, setind, component, timewindow);  
+%   >> [erp, times] = std_readerp(ALLEEG, setindx, component, timewindow);  
 %
 % Inputs:
 %   ALLEEG     - an EEGLAB dataset vector (else one EEG dataset). 
-%                ALLEEG must contain the dataset of interest (see setind).
-%   setind     - [integer] index of an EEG dataset in the ALLEEG structure 
-%                from which to read the component ERP.
-%   component  - [integer] component index in the selected EEG dataset 
+%                ALLEEG must contain the dataset of interest (see 'setindx').
+%   setindx    - [integer] index of the EEG dataset in the ALLEEG structure 
+%                for which to read the component ERP.
+%   component  - [integer] index of the component in the selected EEG dataset 
 %                for which to return the ERP. 
 %   timewindow - [min max] ERP time (latency) window, in ms. Must be in
-%                the dataset latency range.
+%                the dataset epoch latency range.
 % Outputs:
-%   erp        - ERP of the requested ICA component in the selected dataset; 
+%   erp        - ERP for the requested ICA component in the selected dataset; 
 %                the average of the ICA activations in all the dataset epochs.
 %   times      - vector of ERP time points (latencies) in ms.
 %
@@ -44,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2006/03/14 01:51:02  scott
+% help msg
+%
 % Revision 1.13  2006/03/13 23:21:27  arno
 % timerange
 %
