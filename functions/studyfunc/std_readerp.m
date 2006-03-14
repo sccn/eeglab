@@ -1,32 +1,25 @@
-% std_readerp() - Given the ALLEEG structure, a specific EEG dataset index, 
-% and a specific component, the function returns the ERP of that ICA component. 
-% The ERP of the dataset ICA components is assumed to be saved in a Matlab 
-% file. If such a file doesn't exist,
-% you can use the std_erp() function to create it, or use the pre - clustering functions
-% that call it: pop_preclust(), std_preclust().  
-% Along with the ERP of the selected ICA component the function returns  
-% the time vector of the ERP samples. 
 %
+% std_readerp() - returns the ERP for an ICA component in an epoched dataset.
+%                 The ERPs of the dataset ICA components are assumed to have 
+%                 been saved in a Matlab file. If such a file doesn't exist, 
+%                 use std_erp() to create it, or use a pre-clustering function 
+%                 that call it: pop_preclust() or std_preclust()  
 % Usage:    
-%   >> [erp, t] = std_readerp(ALLEEG, setind, component, timewindow);  
-%   % This functions returns the ERP of an ICA component. 
-%   % The information is loaded from a Matlab file, created
-%   % by the pre-clustering function std_erp(). 
+%   >> [erp, times] = std_readerp(ALLEEG, setind, component, timewindow);  
 %
 % Inputs:
-%   ALLEEG     - an EEGLAB data structure, which holds EEG sets (can also be one EEG set). 
-%                      ALLEEG must contain the dataset of interest (the setind).
-%   setind     -  [integer] an index of an EEG dataset in the ALLEEG
-%                      structure, for which to get the component ERP.
-%   component  - [integer] a component index in the selected EEG dataset for which 
-%                      an ERP will be returned. 
-%   timewindow - [min max] time window in ms
-%
+%   ALLEEG     - an EEGLAB dataset vector (else one EEG dataset). 
+%                ALLEEG must contain the dataset of interest (see setind).
+%   setind     - [integer] index of an EEG dataset in the ALLEEG structure 
+%                from which to read the component ERP.
+%   component  - [integer] component index in the selected EEG dataset 
+%                for which to return the ERP. 
+%   timewindow - [min max] ERP time (latency) window, in ms. Must be in
+%                the dataset latency range.
 % Outputs:
-%   erp            - the ERP of the requested ICA component in the
-%                      selected dataset. This is the average of the ICA
-%                      activation across all the epochs.
-%   t              - a vector of the time points in which the ERP was computed. 
+%   erp        - ERP of the requested ICA component in the selected dataset; 
+%                the average of the ICA activations in all the dataset epochs.
+%   times      - vector of ERP time points (latencies) in ms.
 %
 %  See also  std_erp(), pop_preclust(), std_preclust()          
 %
@@ -51,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2006/03/13 23:21:27  arno
+% timerange
+%
 % Revision 1.12  2006/03/11 07:30:41  arno
 % time input
 %
