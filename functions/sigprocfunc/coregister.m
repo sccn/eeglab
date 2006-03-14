@@ -1,34 +1,39 @@
-% coregister() -  Co-register electrode locations with a head template or mesh
-% HEAD TEMPLATE = ??
-%                 using the channel locations file associated with this model
+% coregister() -  Co-register electrode locations with a head mesh
+%                 using the channel locations file associated with this mesh.
 %                 For example: After extracting a head mesh from a subject MRI, 
 %                 the template file would be the electrodes scanned
-% THE ELECTRODES THEMSELVES??? OR THEIR LOCATIONS??
-%                 on the subject head and already aligned with this head mesh).
-% ALIGNED HOW??
+%                 on the subject head and already aligned with this head mesh
+%                 (using another function or using the graphic interface of
+%                 this function). This function can then be used to (graphically) align
+%                 new electrode locations to this mesh (and the associated
+%                 template electrodes which labels may be used as landmark location
+%                 to align the new electrodes having the same labels with the head mesh).
 % Usage:
 %        >> [locs1_out transform] = coregister( chanlocs1, chanlocs2, 'key', 'val' )
 % Inputs:
 %    chanlocs1   - (EEG.chanlocs) channel locations structure to align.
 %    chanlocs2   - reference channel locations structure or file associated 
-%                  with the head model (given or not in the optional 
-%                 'mesh' input below). GIVEN OR NOT = ?? WHAT KIND OF FILE?
+%                  with the head mesh (given in the optional 
+%                 'mesh' input below). 
 % Optional input:
 %    'alignfid'  - [cell array of strings] names of fiducial channels to use
-%                  in the  alignment. NAMES MUST BE COMMON TO BOTH??
+%                  in the  alignment. Names must be common to both channel
+%                  location stuctures.
 %    'warp'      - [cell array of strings] names of electrodes for warping.
-%                  WHAT ABOUT THE REST???
+%                  Other electrodes are "warped" too but are not used to 
+%                  optimize warping.
 %    'transform' - [real array] homogenous transformation matrix or a 
 %                  1x9 matrix containing traditional 9-parameter "Talairach 
 %                  model" transformation (>> help traditional).
 %    'mesh'      - [cell array|string] head mesh. Can contain {points triangles} 
 %                  or {points triangles normals}. See >> help plotmesh 
 %                  for details. May also be the name of a file containing 
-%                  head mesh information (several formats are recognized).
-%    'chaninfo1' - [EEG.chanlocs.chaninfo struct] channel information structure 
-%                  from chanlocs1 (may contain fiducials). WHY SEPARATE FROM chanlocs1??
-%    'chaninfo2' - [EEG.chanlocs.chaninfo struct] channel information structure 
-%                  for chanlocs2 (may contain fiducials). WHY SEPARATE FROM chanlocs2??
+%                  head mesh information (several formats are recognized, and
+%                  you load the file "mheadnew.mat" for example).
+%    'chaninfo1' - [EEG.chaninfo struct] channel information structure 
+%                  from chanlocs1 (may contain fiducials). 
+%    'chaninfo2' - [EEG.chaninfo struct] channel information structure 
+%                  for chanlocs2 (may contain fiducials).
 %    'autoscale' - ['on'|'off'] autoscale electrode radius when aligning 
 %                  fiducials. {default: 'on'}
 %    'helpmsg'   - ['on'|'off'] pop-up help message when calling function.
@@ -36,9 +41,9 @@
 % Output:
 %    c1_locsout  - transformed chanlocs1 channel locations structure
 %    transform   - transformation matrix. Use traditional() to convert
-%                  this to a homogenous transformation matrix for
-%                  3-D plotting functions including headplot().
-%                  IS THIS FOR APPLICATION TO THE HEAD MESH OR TO ELECTRODE LOCS??
+%                  this to a homogenous transformation matrix that may
+%                  be used in 3-D plotting functions such as headplot().
+%
 % See also: traditional(), headplot(), plotmesh()
 %
 % Author: Arnaud Delorme, SCCN, INC, UCSD, 2005
@@ -62,6 +67,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2006/03/14 20:05:29  scott
+% trying to complete the help msg ... see QUESTIONS??  -sm
+%
 % Revision 1.28  2006/03/13 23:29:27  arno
 % clarifying message
 %
