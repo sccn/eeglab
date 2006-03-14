@@ -79,6 +79,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.77  2006/02/16 00:26:11  arno
+% do not use sbplot if gca exist
+%
 % Revision 1.76  2005/12/06 20:51:48  arno
 % allowing separate color axis
 %
@@ -329,6 +332,8 @@ tfdataori = mean(tfdata,4); % for topoplot
 % test inputs
 % -----------
 % 'key' 'val' sequence
+
+dsdsafdsaa
 fieldlist = { 'chanlocs'      { 'string' 'struct' }       []       '' ;
               'limits'        'real'     []                        [nan nan nan nan nan nan];
               'logfreq'       'string'   {'on' 'off' }             'off';
@@ -345,7 +350,7 @@ fieldlist = { 'chanlocs'      { 'string' 'struct' }       []       '' ;
               'sigthresh'     'integer'  [1 Inf]                   [1 1];
               'smooth'        'real'     [0 Inf]                   1;
               'timefreqs'     'real'     []                        [];
-              'vert'          'real'     [times(1) times(end)]     [0] };
+              'vert'          'real'     [times(1) times(end)]     [max(0, times(1))] };
 
 [g varargin] = finputcheck( varargin, fieldlist, 'tftopo', 'ignore');
 if isstr(g), error(g); end;
