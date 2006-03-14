@@ -62,6 +62,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2006/03/14 19:56:06  arno
+% temporary
+% /
+%
 % Revision 1.18  2006/03/14 19:54:55  arno
 % temporary
 %
@@ -354,9 +358,13 @@ if strcmpi(mode, 'centroid')
                     set(gca,'yticklabel', num2str(ft));
                     ylabel('Frequency (Hz)');
                 else
+                    set(gca,'ytick',[]);
+                    set(gca,'yticklabel', []);
                     ylabel('');
                 end;
-                cbar;
+                if n == Ncond
+                    cbar;
+                end;
                 waitbar((k*n)/(len*Ncond),h_wait);
             end;
         end % Finish plotting all centroids for one condition
