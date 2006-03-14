@@ -79,6 +79,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.78  2006/03/14 19:49:20  arno
+% in case the tf-decomp does not include time 0
+%
 % Revision 1.77  2006/02/16 00:26:11  arno
 % do not use sbplot if gca exist
 %
@@ -332,8 +335,6 @@ tfdataori = mean(tfdata,4); % for topoplot
 % test inputs
 % -----------
 % 'key' 'val' sequence
-
-dsdsafdsaa
 fieldlist = { 'chanlocs'      { 'string' 'struct' }       []       '' ;
               'limits'        'real'     []                        [nan nan nan nan nan nan];
               'logfreq'       'string'   {'on' 'off' }             'off';
