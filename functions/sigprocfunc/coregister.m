@@ -99,6 +99,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2006/03/15 00:32:29  arno
+% text
+%
 % Revision 1.31  2006/03/15 00:25:21  scott
 % revising help msg; added a default 'manual' mode keyword -sm
 %
@@ -436,7 +439,7 @@ if 1
     h = uicontrol( opt{:}, [0.4  .05 .1  .05], 'tag', 'resizey', 'callback', cbresizey, 'style', 'edit', 'string', '' );
     h = uicontrol( opt{:}, [0.4  0   .1  .05], 'tag', 'resizez', 'callback', cbresizez, 'style', 'edit', 'string', '');
     h = uicontrol( opt{:}, [0.5  .1  .2  .05], 'style', 'text', 'string', 'Move right {mm}');
-    h = uicontrol( opt{:}, [0.5  .05 .2  .05], 'style', 'text', 'string', 'Move forward {mm}' );
+    h = uicontrol( opt{:}, [0.5  .05 .2  .05], 'style', 'text', 'string', 'Move front {mm}' );
     h = uicontrol( opt{:}, [0.5  0   .2  .05], 'style', 'text', 'string', 'Move up {mm}');
     h = uicontrol( opt{:}, [0.7  .1  .1  .05], 'tag', 'right'  , 'callback', cbright  , 'style', 'edit', 'string', '');
     h = uicontrol( opt{:}, [0.7  .05 .1  .05], 'tag', 'forward', 'callback', cbforward, 'style', 'edit', 'string', '' );
