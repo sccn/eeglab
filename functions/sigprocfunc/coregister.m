@@ -99,6 +99,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2006/03/15 00:25:21  scott
+% revising help msg; added a default 'manual' mode keyword -sm
+%
 % Revision 1.30  2006/03/14 20:28:12  arno
 % header
 %
@@ -204,12 +207,14 @@ if nargin < 1
 end
 
 if nargin < 2
+    help coregister;
+    return;
    % chan1 = readlocs('/home/arno/P3FigArno/juliedata/jop3_raw.elp');
    % chan1 = readlocs('D:\data\arnodata\ad-256.elp');
    % manually for Arno:  transf = [4 0 -50 -0.3 0 -1.53 1.05 1.1 1.1]
    % manually for Julie: transf = [-4 -6 -50 -0.37 0 -1.35 1.1 1.15 1.1]
    chan2 = readlocs('D:\matlab\eeglab\plugins\dipfit2.0\standard_BEM\elec\standard_1005.elc');
-    normalize = 1;
+   normalize = 1;
 end;
 
 
@@ -430,9 +435,9 @@ if 1
     h = uicontrol( opt{:}, [0.4  .1  .1  .05], 'tag', 'resizex', 'callback', cbresizex, 'style', 'edit', 'string', '');
     h = uicontrol( opt{:}, [0.4  .05 .1  .05], 'tag', 'resizey', 'callback', cbresizey, 'style', 'edit', 'string', '' );
     h = uicontrol( opt{:}, [0.4  0   .1  .05], 'tag', 'resizez', 'callback', cbresizez, 'style', 'edit', 'string', '');
-    h = uicontrol( opt{:}, [0.5  .1  .2  .05], 'style', 'text', 'string', 'Move right {x in mm}');
-    h = uicontrol( opt{:}, [0.5  .05 .2  .05], 'style', 'text', 'string', 'Move forward {y in mm}' );
-    h = uicontrol( opt{:}, [0.5  0   .2  .05], 'style', 'text', 'string', 'Move up {z in mm}');
+    h = uicontrol( opt{:}, [0.5  .1  .2  .05], 'style', 'text', 'string', 'Move right {mm}');
+    h = uicontrol( opt{:}, [0.5  .05 .2  .05], 'style', 'text', 'string', 'Move forward {mm}' );
+    h = uicontrol( opt{:}, [0.5  0   .2  .05], 'style', 'text', 'string', 'Move up {mm}');
     h = uicontrol( opt{:}, [0.7  .1  .1  .05], 'tag', 'right'  , 'callback', cbright  , 'style', 'edit', 'string', '');
     h = uicontrol( opt{:}, [0.7  .05 .1  .05], 'tag', 'forward', 'callback', cbforward, 'style', 'edit', 'string', '' );
     h = uicontrol( opt{:}, [0.7  0   .1  .05], 'tag', 'up'     , 'callback', cbup     , 'style', 'edit', 'string', '');
