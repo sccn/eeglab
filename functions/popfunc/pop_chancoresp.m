@@ -1,21 +1,23 @@
-% pop_chancoresp() - build correspondance between channel location files
-%
+% pop_chancoresp() - define correspondances between two channel locations structures
+%                    (EEG.chanlocs) automatically (by matching channel labels) 
+%                    else using a user input gui.
 % Usage:
 %   >> [chanlist] = pop_chancoresp(chanstruct1, chanstruc2, 'key', 'val', ...); 
 %
 % Inputs:
-%   chanstruct1     - first channel structure. See readlocs()
-%   chanstruct2     - second channel structure.
+%   chanstruct1     - first (new) channel locations structure (EEG.chanlocs). 
+%                      For details, >> help readlocs
+%   chanstruct2     - second (reference) chanlocs structure.
 %
 % Optional parameters:
+%   'gui'           - ['on'|'off'] display gui or not ('on' -> yes)
 %   'autoselect'    - ['none'|'fiducials'|'all'] automatically pair channels
-%   'gui'           - ['on'|'off'] display gui or not
-%   'chaninfo1'     - channel info structure for first channel structure
-%   'chaninfo2'     - channel info structure for second channel structure
+%   'chaninfo1'     - EEG.chaninfo structure for first (new) EEG.chanlocs
+%   'chaninfo2'     - EEG.chaninfo structure for second (reference) EEG.chanlocs
 %
 % Output:
-%   chanlist1  - indices of selected channels
-%   chanlist2  - indices of selected channels
+%   chanlist1       - [int vector] indices of selected channels from first (new) EEG.chanlocs
+%   chanlist2       - [int vector] selected channels from second (reference) EEG.chanlocs
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2005
 
@@ -38,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2006/01/20 23:57:00  arno
+% header
+%
 % Revision 1.4  2006/01/14 00:35:22  arno
 % debugging output
 %
@@ -154,7 +159,7 @@ function [chanlistout1, chanlistout2, thirdout, outfourth] = pop_chancoresp(chan
 	g.chanstr2 = chanstr2;
 
     fig = figure('visible', 'off');
-    set(fig, 'name', 'Select channels to pair');
+    set(fig, 'name', 'Select corresponding channels to pair');
     
     % make text for list
     % ------------------
@@ -230,8 +235,8 @@ function [chanlistout1, chanlistout2, thirdout, outfourth] = pop_chancoresp(chan
     geometry = {[1 1] [1 1] [1 1] [1 1] [1 1]};
     geomvert = [ 1 min(max(length(chanstr1),length(chanstr2)), 10) 1 1 1];
     listui = { ...
-              { 'Style', 'pushbutton', 'string', 'Plot topo. 1', 'callback', cb_plot1 }  ...
-              { 'Style', 'pushbutton', 'string', 'Plot topo. 2', 'callback', cb_plot2 }  ...
+              { 'Style', 'pushbutton', 'string', 'Plot new montage', 'callback', cb_plot1 }  ...
+              { 'Style', 'pushbutton', 'string', 'Plot ref montage', 'callback', cb_plot2 }  ...
               { 'Style', 'listbox', 'tag', 'list1', 'string', g.newchanstr1, 'value', 1, 'min', 1, 'max', 2, 'callback', cb_list1 } ...
               { 'Style', 'listbox', 'tag', 'list2', 'string', g.newchanstr2, 'value', 1, 'min', 1, 'max', 2, 'callback', cb_list2 } ...
               { 'Style', 'pushbutton', 'string', 'Pair channels'  , 'callback', cb_pair } ...     
