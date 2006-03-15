@@ -50,7 +50,7 @@
 %
 % Standard-mode Usage thereafter:
 %
-%       >> headplot(values,'spline_file','Param','Value',...)
+%       >> [hdaxis cbaraxis] = headplot(values,'spline_file','Param','Value',...)
 %
 % Required Standard-mode Inputs:
 %
@@ -92,6 +92,10 @@
 %   'transform'  - [real array] homogeneous transformation matrix to apply
 %                  to the original locations ('orilocs') before plotting them.
 %
+% Outputs:
+%      hdaxis    - handle of the head axes (the existing gca when headplot() was called)
+%      cbaraxis  - handle of the color bar axes
+%
 % Note: if an error is generated, headplot() may close the current figure
 %
 % Authors: Arnaud Delorme, Colin Humphries, Scott Makeig, SCCN/INC/UCSD, 
@@ -118,6 +122,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.65  2006/03/15 20:02:35  scott
+% made entered cbar axes not re-positioned. 
+%
 % Revision 1.64  2006/03/14 22:37:53  scott
 % example msg edits
 %
@@ -322,7 +329,7 @@
 % 01-25-02 reformated help & license, added links -ad 
 % 03-21-02 added readlocs and the use of eloc input structure -ad 
 
-function [] = headplot(values, arg1, varargin)
+function [HeadAxes ColorbarHandle] = headplot(values, arg1, varargin)
 
 if nargin < 1
     help headplot
