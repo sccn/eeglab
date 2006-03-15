@@ -78,6 +78,11 @@
 %
 % Authors: Arnaud Delorme,  Hilit Serby, SCCN, INC, UCSD, January, 2005
 
+% Unimplemented:
+%   baseline   - spectral baseline window center end-time (in ms). {default: 0}
+%   baseboot   - [0|1] bootstrap baseline mode: 1 -> pre-0 latencies; 0 -> whole epoch
+%                 {default: 1}
+
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
 % Copyright (C) Hilit Serby, SCCN, INC, UCSD, October 11, 2004, hilit@sccn.ucsd.edu
@@ -97,6 +102,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2006/03/12 02:51:02  arno
+% function
+% call
+%
 % Revision 1.28  2006/03/11 07:11:28  arno
 % header
 %
