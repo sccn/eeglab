@@ -1,92 +1,101 @@
-% coregister() -  Co-register measured or assumed electrode locations with a 
-%                 head mesh that has a reference channel locations file or
-%                 EEG.chanlocs structure. For example: (1) Extract a head mesh 
-%                 from a subject's MRI (possibly in SPM). (2) Record electrode 
-%                 locations on the subject's head. (3) Align these locations to 
-%                 the subject head mesh, e.g., using the interactive coregister() 
-%                 interface. The aligned locations will then be reference 
-%                 locations for this mesh. (4) Use coregister() to align some 
-%                 new set of recorded channel locations to the reference 
-%                 locations and (optionally) head mesh. Channel labels in 
-%                 common to both the new and existing reference locations 
-%                 and (optional) chaninfo structures (e.g., recorded fiducial 
-%                 head locations, usually stored in the chaninfo structure, 
-%                 else measured commond electrode locations (e.g., Cz) may be 
-%                 used by coregister() as landmarks to align the new locations. 
-%                 coregister() may also be used to align newly recorded or 
-%                 nominally equivalent electrode locations to a standard head 
-%                 template. In its (default) manual mode, coregister() produces 
-%                 an interactive graphics window showing the channel locations 
-%                 and template reference locations (on the head mesh, if any), 
-%                 allowing the user to make additional manual adjustments using 
-%                 gui text entry boxes and to rotate the diplay using the mouse.
+% coregister() -  Co-register measured or nominal electrode locations with a 
+%                 a reference channel locations file or EEG.chanlocs structure. 
+%                 To use coregister(), one may either use the default MNI head 
+%                 and 10-5 System locations from Robert Oostenveld, used in the 
+%                 dipfit2() dipole modeling function as a reference, or else: 
+%                 (1) Extract a head mesh from a subject MRI (possibly in SPM). 
+%                 (2) Measure reference locations on the subject's head. 
+%                 (3) Align these locations to the extracted subject head mesh 
+%                 (using the coregister() graphic interface). The aligned locations 
+%                 then become reference locations for this mesh. In either case, 
+%                 then use coregister() to linearly align or nonlinearly warp 
+%                 subsequently recorded or nominally identified ('Cz') sets of 
+%                 channel and/or fiducial head locations to the reference locations. 
+%                 Both channel locations, read from the EEG.chanlocs structure 
+%                 (or equivalent file), and/or purely fiducial (non-electrode) 
+%                 locations, read from the EEG.chaninfo structure, can then be used 
+%                 by coregister() to linearly align or nonlinearly warp a given or 
+%                 measured montage to the reference locations. In its (default) 
+%                 manual mode, coregister() produces an interactive gui showing 
+%                 the imported and reference channel locations on the imported 
+%                 head mesh (if any), allowing the user to make additional manual 
+%                 adjustments using gui text entry boxes, and to rotate the display 
+%                 using the mouse.
 % Usage:
+%        >>  coregister(EEG.chanlocs); % Show channel locations in the coregister() 
+%                 % gui, for align, warp, or manual mode co-registration with the 
+%                 % dipfit2() model head mesh and 10-5 System reference locations.
+%                 % Note: May need to scale channel x,y,z positions by 100 to see 
+%                 % the imported locations in the default dipfit2() head mesh.
+%
 %        >> [locs_out transform] = coregister( chanlocs, reflocs, 'key', 'val' )
-% Else:
-%        >>  coregister(EEG.chanlocs); % show channel locations in coregister() gui
-%                                      % May need to upscale x,y,z by ~100 to see
-%                                      % locations with the default Dipfit2 head mesh.
-%        >>  coregister(EEG.chanlocs,[],'mesh',[]); % show channel locations 
-%                                                   % with no mesh file
+%                 % Perform custom co-registration to a reference locations and
+%                 % (optional) head mesh. If a ('warp' or 'alignfid') mode is
+%                 % specified, no gui window is produced.
 % Inputs:
 %    chanlocs   - (EEG.chanlocs) channel locations structure (or file) to align
 %                 For file structure, see >> headplot example 
 %                                      or >> headplot cartesian
-% Optional 'keywords; and [] arguments:
 %    reflocs    - reference channel locations structure (or file) associated 
-%                 with the head mesh (see 'mesh' below) {default: = chanlocs}
+%                 with the head mesh ('mesh' below) {default|[] -> 10-5 System locs}
+%
+% Optional 'keywords' and arguments ([ ]):
 %    'mesh'     - [cell array|string] head mesh. May contain {points triangles} 
 %                 or {points triangles normals} (see >> help plotmesh 
-%                 for details). May also be the name of a Matlab head mesh
-%                 file (several formats are recognized). Loads the Dipfit2
-%                 mesh file by default; cf. 'mheadnew.mat' (used by headplot).
-%                 Use 'mesh',[] to load no head mesh.
+%                 for details). May also be the name of a head mesh .mat
+%                 file (several formats recognized). By default, loads the 
+%                 dipfit2() MNI head mesh file. Compare 'mheadnew.mat', the 
+%                 mesh used by headplot(); 'mesh',[] shows no head mesh.
 %   'transform' - [real array] homogenous transformation matrix or a 
 %                 1x9 matrix containing traditional 9-parameter "Talairach 
 %                 model" transformation (>> help traditional) to apply to
 %                 the new chanlocs. May be a previous output of coregister(). 
 %
-%   ----------------------------------- MANUAL MODE (default) -------------
-%   'manual'    - [] Default MANUAL MODE: pop up the coregister() graphic window
-%                 to allow viewing the current alignment and performing 
-%                 manual adjustments using the gui. {this is the default mode}
+%   ------------------------------- MANUAL MODE (default) -----------------
+%   'manual'    - [takes [] as argument] Pops up the coregister() gui window to 
+%                 allow viewing the current alignment, performing 'alignfid' or 
+%                 'warp' mode co-registration,  and making manual adjustments.  
 %
-%   --------------------------------------- ALIGN MODE --------------------
-%    'alignfid' - {[cell array of strings} labels of (fiducial) channels to use 
+%   ----------------------------------- ALIGN MODE ------------------------
+%    'alignfid' - {cell array of strings} = labels of (fiducial) channels to use 
 %                 as common landmarks for aligning the new channel locations to 
 %                 the reference locations. These labels must be in both channel 
-%                 locations or (more often) chaninfo structures (see 'chaninfo1'
-%                 and 'chaninfo2' below). coregister() will then apply a linear 
+%                 locations (EEG.chanlocs) and/or EEG.chaninfo structures (see 
+%                 'chaninfo1' and 'chaninfo2' below). Will then apply a linear 
 %                 transform including translation, rotation, and/or uniform 
-%                 scaling so as to best match the two sets of fiducial landmarks. 
-%                 (Don't use with 'warp'). See 'autoscale' below.
-%   'chaninfo1' - [EEG.chaninfo struct] channel information structure for input 
-%                 chanlocs (may contain fiducial locations not in chanlocs). 
-%   'chaninfo2'   - [EEG.chaninfo struct] channel information structure for input
-%                 reflocs (may contain fiducial locations not in chanlocs).
+%                 scaling so as to best match the two sets of landmarks. 
+%                 See 'autoscale' below.
+%   'chaninfo1' - [EEG.chaninfo struct] channel information structure for the 
+%                 montage to be coregistered. May contain (no-electrode) fiducial
+%                 locations.
+%   'chaninfo2'   - [EEG.chaninfo struct] channel information structure for 
+%                 the reference montage.
 %   'autoscale' - ['on'|'off'] autoscale electrode radius when aligning 
 %                 fiducials. {default: 'on'}
 %
-%   --------------------------------------- WARP MODE ---------------------
+%   ------------------------------------ WARP MODE ------------------------
 %    'warp'     - {cell array of strings} channel labels used for non-linear 
-%                 warping of the new channel locations to the reference locations.
+%                 warping of the new channel locations to reference locations.
 %                 For example: Specifying all 10-20 channel labels will
 %                 nonlinearly warp the 10-20 channel locations in the new
 %                 chanlocs to the 10-20 locations in the reference chanlocs.
-%                 Other channels in the new chanlocs will be moved so as
-%                 to produce a smooth warp. (Don't use with 'align').
+%                 Locations of other channels in the new chanlocs will be 
+%                 adjusted so as to produce a smooth warp.
 %
 %   'helpmsg'   - ['on'|'off'] pop-up help message when calling function.
 %                 {default: 'off'}
+%
 % Outputs:
-%    chanlocs_out - transformed input channel locations (chanlocs) structure
-%    transform    - transformation matrix. Use traditional() to convert
-%                   this to a homogenous transformation matrix used in
-%                   3-D plotting functions such as headplot().
+%  chanlocs_out - transformed input channel locations (chanlocs) structure
+%  transform    - transformation matrix. Use traditional() to convert
+%                 this to a homogenous transformation matrix used in
+%                 3-D plotting functions such as headplot().
 %
-% See also: traditional(), headplot(), plotmesh()
+% See also: traditional(), headplot(), plotmesh(). 
 %
-% Author: Arnaud Delorme, SCCN, INC, UCSD, 2005
+% Note: Calls Robert Oostenveld's FieldTrip coregistration functions.
+%
+% Author: Arnaud Delorme, SCCN/INC/UCSD, 2005-06
         
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -107,6 +116,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2006/03/15 01:31:12  scott
+% help msg; defined default mode - coregister(EEG.chanlocs) -sm
+% NOTE: stray debug outputs are present...
+%
 % Revision 1.33  2006/03/15 00:33:11  arno
 % wording
 %
@@ -213,34 +226,28 @@
 %                  channel location info for both channel location struct.
 %
 
-function [ chan1, transformmat ] = coregister(chan1, chan2, varargin)
+function [ chanlocs1, transformmat ] = coregister(chanlocs1, chanlocs2, varargin)
 
 if nargin < 1
   help coregister
-  error('not enough inputs');
+  error('Not enough inputs');
 end
 
 if nargin < 2
-   chan2 = [];
+    chanlocs2 = [];
+end
+    % manually for s1:  transf = [4 0 -50 -0.3 0 -1.53 1.05 1.1 1.1]
+    % manually for s2:  transf = [-4 -6 -50 -0.37 0 -1.35 1.1 1.15 1.1]
 
-% chan1 = readlocs('/home/arno/P3FigArno/juliedata/jop3_raw.elp');
-% chan1 = readlocs('D:\data\arnodata\ad-256.elp');
-% manually for Arno:  transf = [4 0 -50 -0.3 0 -1.53 1.05 1.1 1.1]
-% manually for Julie: transf = [-4 -6 -50 -0.37 0 -1.35 1.1 1.15 1.1]
-% chan2 = readlocs('D:\matlab\eeglab\plugins\dipfit2.0\standard_BEM\elec\standard_1005.elc');
-% normalize = 1;
-
-end;
-
-if isempty(chan2)
-   chan2 = chan1; % default
+if isempty(chanlocs2)
+    chanlocs2 = readlocs('standard_1005.elc'); % NEEDS TO FIND THIS FILE!
 end
 
-% internal command
-% ----------------
-if isstr(chan1) 
-    com = chan1;
-    fid = chan2;
+% undocumented commands ?
+% ---------------------
+if isstr(chanlocs1) 
+    com = chanlocs1;
+    fid = chanlocs2;
 
     % update GUI
     % ----------
@@ -259,6 +266,7 @@ if isstr(chan1)
         end;
     elseif strcmpi(com, 'warp')
         [clist1 clist2] = pop_chancoresp( dat.elec1, dat.elec2, 'autoselect', 'all');
+
         % copy electrode names
         if ~isempty(clist1)
             tmpelec2 = dat.elec2;
@@ -280,10 +288,10 @@ end;
 defaultmesh = 'standard_vol.mat';
 g = finputcheck(varargin, { 'alignfid'   'cell'  {}      {};
                             'warp'       'cell'  {}      {};
-                            'chaninfo1'  'struct' {}    struct('no', {}); % empty structure
-                            'chaninfo2'  'struct' {}     struct('no', {}); % empty structure
+                            'chaninfo1'  'struct' {}    struct('no', {}); % default empty structure
+                            'chaninfo2'  'struct' {}     struct('no', {}); 
                             'transform'  'real'  []      [];
-                            'manual'  ''  []      []; % do-nothing input -> pop up window
+                            'manual'  ''  []      []; % -> pop up window
                             'autoscale'  'string' { 'on' 'off' } 'on';
                             'helpmsg'    'string' { 'on' 'off' } 'off';
                             'mesh'       ''      []   defaultmesh });
@@ -296,11 +304,11 @@ if strcmpi(g.helpmsg, 'on')
             'Press ''Warp'' to automatically warp channels to corresponding template channel locations.', ...
             'If desired, then edit the transformation manually.', ...
             ' ', ...
-            'To use the locations of the corresponding template channels (and discard your current locations),', ...
+            'To use the locations of the corresponding template channels (and discard current locations),', ...
             'select menu item "Edit > Channel locations" and press, "Look up loc." Select a ', ...
             'head model. Then re-open DIPFIT "Head model and settings" and select the "No coreg" option.');
-    if ~isempty(findstr(lower(chan2), 'standard-10-5-cap385')) | ...
-        ~isempty(findstr(lower(chan2), 'standard_1005')),
+    if ~isempty(findstr(lower(chanlocs2), 'standard-10-5-cap385')) | ...
+        ~isempty(findstr(lower(chanlocs2), 'standard_1005')),
         mytext = strvcat( mytext, 'Then re-open DIPFIT "Head model and settings" and select the "No coreg" option.');
     else
         mytext = strvcat( mytext, 'Then re-open the graphic interface you were using.');
@@ -357,20 +365,20 @@ else
     dat.meshtri = [];
 end;
 
-% transform to arrays chan1
+% transform to arrays chanlocs1
 % -------------------------
 TMP                           = eeg_emptyset;
-[TMP.chanlocs tmp2 tmp3 ind1] = readlocs(chan1);
+[TMP.chanlocs tmp2 tmp3 ind1] = readlocs(chanlocs1);
 TMP.chaninfo                  = g.chaninfo1;
 TMP.nbchan = length(TMP.chanlocs);
 cfg   = eeglab2fieldtrip(TMP, 'chanloc_withfid');
 elec1 = cfg.elec;
 
-% transform to arrays chan2
+% transform to arrays chanlocs2
 % -------------------------
-if ~isempty(chan2)
+if ~isempty(chanlocs2)
     TMP   = eeg_emptyset;
-    [TMP.chanlocs tmp2 tmp3 ind1] = readlocs(chan2);
+    [TMP.chanlocs tmp2 tmp3 ind1] = readlocs(chanlocs2);
     TMP.chaninfo                  = g.chaninfo2;
     TMP.nbchan = length(TMP.chanlocs);
     cfg   = eeglab2fieldtrip(TMP, 'chanloc_withfid');
@@ -540,10 +548,10 @@ try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end
 % -----------------------------------------
 waitfor( findobj('parent', fid, 'tag', 'ok'), 'userdata');
 try, findobj(fid); % figure still exist ?
-catch, transformmat = []; chan1 = []; return; end;
+catch, transformmat = []; chanlocs1 = []; return; end;
 dat = get(fid, 'userdata');
 transformmat = dat.transform;
-chan1        = dat.electransf;
+chanlocs1        = dat.electransf;
 close(fid);
 
 % plot electrodes
@@ -778,7 +786,7 @@ function redrawgui(fid)
     rotate3d on    
     
   
-% function to plot the noze
+% function to plot the nose
 % -------------------------
 function s = plotnose(transf, col)
 
@@ -893,9 +901,3 @@ function s = plotnose(transf, col)
     s=surf(x,y,z,facecolor);
     set(s, 'edgecolor', [0.5 0.5 0.5]);
 
-    
-    
-    
-    
-    
-  
