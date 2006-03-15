@@ -159,6 +159,15 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.87  2006/03/13 18:45:51  scott
+% help timef
+%
+%
+%
+%
+%
+% clarified baseline meaning -sm
+%
 % Revision 1.86  2006/03/07 23:12:17  scott
 % clarified h - clearified help msg that output ersp and itc are NOT prob. masked -sm
 %
@@ -685,7 +694,7 @@ if g.alpha>0.5 | g.alpha<=0
 end
 if ~isnan(g.alpha)
    if g.baseboot > 0
-     myprintf(g.verbose,'Bootstrap analysis will use data in baseline (pre-0) subwindows only.\n')
+     myprintf(g.verbose,'Bootstrap analysis will use data in baseline (pre-0 centered) subwindows only.\n')
    else
      myprintf(g.verbose,'Bootstrap analysis will use data in all subwindows.\n')
    end
