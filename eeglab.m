@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.466  2006/03/13 23:36:30  arno
+% fix study history
+%
 % Revision 1.465  2006/03/12 04:47:47  arno
 % problem saving study
 %
@@ -2003,7 +2006,10 @@ catchstrs.new_non_empty          = e_newset;
 	uimenu( edit_m, 'Label', 'Delete dataset(s)'                      , 'CallBack', cb_delset);
 		
 	uimenu( tools_m, 'Label', 'Change sampling rate'                  , 'CallBack', cb_resample);
-	uimenu( tools_m, 'Label', 'Filter the data'                       , 'CallBack', cb_eegfilt);
+
+	filter = uimenu( tools_m, 'Label', 'Filter the data'              , 'tag', 'filter');
+	uimenu( filter_m, 'Label', 'Original EEGLAB method'               , 'CallBack', cb_eegfilt);
+    
 	uimenu( tools_m, 'Label', 'Re-reference'                          , 'CallBack', cb_reref);
 	uimenu( tools_m, 'Label', 'Reject continuous data by eye'         , 'CallBack', cb_eegplot);
 	uimenu( tools_m, 'Label', 'Extract epochs'                        , 'CallBack', cb_epoch, 'Separator', 'on');

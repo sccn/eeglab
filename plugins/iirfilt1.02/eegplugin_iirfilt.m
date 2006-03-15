@@ -50,7 +50,7 @@ function vers = eegplugin_iirfilt(fig, trystrs, catchstrs)
   
   % find import data menu
   % ---------------------
-  menu = findobj(fig, 'tag', 'tools');
+  menu = findobj(fig, 'tag', 'filter');
   
   % menu callbacks
   % --------------
