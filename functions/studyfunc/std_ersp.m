@@ -51,9 +51,9 @@
 %                 and use these to mask the ERSP/ITC image (in output X)
 %   type       - ['ersp'|'itc'] both ERSP and ITC images are computed and saved to disk, 
 %                 but only one is returned (output X) {default: 'ersp'}
-%   powbase    - [vector] baseline spectrum (power not dB, output from timef() run with 
-%                 same parameters as above) to use in the timef() computation 
-%                 {default|[] -> pre-time 0}
+%   powbase    - [ncomps,nfreqs] optional matrix of baseline spectra (power, not dB, 
+%                 as output from timef() run with same parameters as above) to use 
+%                 in timef() {default|[] -> time windows centered before time 0}
 % Outputs:
 %   X         - the masked log ERSP/ITC of the requested ICA components in the 
 %               selected frequency and time range. 
@@ -102,6 +102,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2006/03/15 19:49:07  scott
+% nothing
+%
 % Revision 1.29  2006/03/12 02:51:02  arno
 % function
 % call
@@ -254,13 +257,18 @@ end;
 [time_range, winsize] = compute_ersp_times(cycles,  EEG.srate, ...
                                  [EEG.xmin EEG.xmax]*1000 , freqrange(1), padratio); 
 if time_range(1) >= time_range(2)
-    error(['std_ersp: parameters given for ' upper(type) ...
-           ' calculation result in an invalid time range. Aborting.' ...
+    error(['std_ersp(): parameters given for ' upper(type) ...
+           'calculation result in an invalid time range. Aborting.' ...
            'Please increase the lower frequency bound or change other' ...
            'parameters to resolve the problem. See >> timef details'] )
 end
 parameters = { 'cycles' cycles ,'type', 'phasecoher',  'plotersp', 'off', 'plotitc', 'off', ...
                'padratio', padratio, 'plotphase', 'off', 'winsize', winsize, 'alpha', alpha };
+
+if powbaseexist & time_range(1) >= 0 
+    parameters = { parameters, 'baseboot',0};
+    fprintf('No pre-0 baseline spectral estimates: Using whole epoch for timef() "baseboot"\n');
+end
 
 % Compute ERSP & ITC
 % ------------------
@@ -268,8 +276,12 @@ all_ersp = [];
 all_itc  = [];
 for k = 1:length(comps)  % for each (specified) component
 
-    [ersp,itc,tmppowbase,times,freqs,erspboot,itcboot] = timef( TMP.icaact(comps(k), :) , ...
-          EEG.pnts, [EEG.xmin EEG.xmax]*1000, EEG.srate, parameters{2:end}, 'powbase', powbase(k,:));
+    % Run timef() to get ERSP
+    % ------------------------
+    [ersp,itc,tmppowbase,times,freqs,erspboot,itcboot] ...
+             = timef( TMP.icaact(comps(k), :) , ...
+                       EEG.pnts, [EEG.xmin EEG.xmax]*1000, EEG.srate, ...
+                       parameters{2:end}, 'powbase', powbase(k,:));
    
     % Change frequency axis from linear scale to log scale (frequency values left in dB)
     % ----------------------------------------------------------------------------------
