@@ -118,6 +118,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.64  2006/03/14 22:37:53  scott
+% example msg edits
+%
 % Revision 1.63  2006/03/13 23:45:32  scott
 % help msg
 %
@@ -791,11 +794,11 @@ else
       BACKCOLOR = get(gcf,'Color');
       if g.cbar == 0       
           ColorbarHandle = cbar(0,3,[amin amax]); 
+          pos = get(ColorbarHandle,'position');  % move left & shrink to match head size
+          set(ColorbarHandle,'position',[pos(1)-.05 pos(2)+0.13 pos(3)*0.7 pos(4)-0.26]);
       else
           ColorbarHandle = cbar(g.cbar,3,[amin amax]); 
       end
-      pos = get(ColorbarHandle,'position');  % move left & shrink to match head size
-      set(ColorbarHandle,'position',[pos(1)-.05 pos(2)+0.13 pos(3)*0.7 pos(4)-0.26]);
   end
   axes(HeadAxes);
 
