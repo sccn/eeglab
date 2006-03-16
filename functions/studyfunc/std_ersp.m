@@ -101,6 +101,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2006/03/16 01:12:49  scott
+% added back? comma
+%
 % Revision 1.31  2006/03/15 22:52:44  scott
 % if powbase specified and no pre-0 spectral estimates, use whole epoch for baseboot (with warning)
 %
@@ -268,7 +271,8 @@ parameters = { 'cycles', cycles ,'type', 'phasecoher',  'plotersp', 'off', 'plot
                'padratio', padratio, 'plotphase', 'off', 'winsize', winsize, 'alpha', alpha };
 
 if powbaseexist & time_range(1) >= 0 
-    parameters = { parameters, 'baseboot',0};
+    parameters{end+1} = 'baseboot';
+    parameters{end+1} = 0;
     fprintf('No pre-0 baseline spectral estimates: Using whole epoch for timef() "baseboot"\n');
 end
 
