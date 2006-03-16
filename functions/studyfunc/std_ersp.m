@@ -21,7 +21,6 @@
 %              Vectors of frequencies and latencies for the ERSP/ITC images are returned 
 %              separately, as well as the EEG.etc sub-structure modified with pointers 
 %              to the output float files and some information about them. 
-%
 % Usage:  
 %              >> [X times logfreqs ] = std_ersp(EEG, components,  ...
 %                                                    freqrange, timewindow,  ...
@@ -102,6 +101,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2006/03/15 22:52:44  scott
+% if powbase specified and no pre-0 spectral estimates, use whole epoch for baseboot (with warning)
+%
 % Revision 1.30  2006/03/15 19:49:07  scott
 % nothing
 %
@@ -262,7 +264,7 @@ if time_range(1) >= time_range(2)
            'Please increase the lower frequency bound or change other' ...
            'parameters to resolve the problem. See >> timef details'] )
 end
-parameters = { 'cycles' cycles ,'type', 'phasecoher',  'plotersp', 'off', 'plotitc', 'off', ...
+parameters = { 'cycles', cycles ,'type', 'phasecoher',  'plotersp', 'off', 'plotitc', 'off', ...
                'padratio', padratio, 'plotphase', 'off', 'winsize', winsize, 'alpha', alpha };
 
 if powbaseexist & time_range(1) >= 0 
