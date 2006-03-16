@@ -116,6 +116,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2006/03/15 22:35:03  scott
+% pop-up help msg
+%
 % Revision 1.35  2006/03/15 16:21:58  scott
 % finished editing help message - NEED to read 1005 locs file by default! -sm
 %
@@ -309,7 +312,7 @@ if strcmpi(g.helpmsg, 'on')
             ' ', ...
             'To use locations of corresponding reference channels (and discard current locations),', ...
             'select "Edit > Channel locations" in the EEGLAB mensu and press, "Look up loc." Select a ', ...
-            'head model. Then re-open "Tools > Locate dipoles using DIPFIT2 > Head model and settings";,...
+            'head model. Then re-open "Tools > Locate dipoles using DIPFIT2 > Head model and settings';,...
             'in the EEGLAB menu and select the "No coreg" option.');
     if ~isempty(findstr(lower(chanlocs2), 'standard-10-5-cap385')) | ...
         ~isempty(findstr(lower(chanlocs2), 'standard_1005')),
@@ -414,10 +417,11 @@ else
 
         [ electransf transform ] = align_fiducials(electmp, elec2, g.alignfid);
         if ~isempty(transform), dat.transform = transform; end;
-        %dat.transform = invtrad(dat.transform, 1)
+
+        % dat.transform = invtrad(dat.transform, 1)
         
         if strcmpi(g.autoscale, 'on')
-            dat.transform =dat.transform*transmat;
+            dat.transform = dat.transform * transmat;
         end;        
         
     elseif ~isempty(g.warp)
