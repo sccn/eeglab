@@ -101,6 +101,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2006/03/16 01:46:12  scott
+% fix appending to cell array parameters
+%
 % Revision 1.32  2006/03/16 01:12:49  scott
 % added back? comma
 %
@@ -325,7 +328,7 @@ all_itc.times      = times;
 all_itc.parameters = parameters;
 all_ersp.datatype  = 'ITC';
 if powbaseexist
-    all_ersp.parameters = { parameters{:} powbase };
+    all_ersp.parameters = { parameters{:}, 'baseline', powbase };
 else
     all_ersp.parameters = parameters;
 end;
