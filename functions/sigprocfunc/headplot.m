@@ -122,6 +122,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.66  2006/03/15 20:12:16  scott
+% return HeadAxes and ColorbarAxes for use in movies, etc.
+%
 % Revision 1.65  2006/03/15 20:02:35  scott
 % made entered cbar axes not re-positioned. 
 %
@@ -329,7 +332,7 @@
 % 01-25-02 reformated help & license, added links -ad 
 % 03-21-02 added readlocs and the use of eloc input structure -ad 
 
-function [HeadAxes ColorbarHandle] = headplot(values, arg1, varargin)
+function [HeadAxes, ColorbarHandle] = headplot(values, arg1, varargin)
 
 if nargin < 1
     help headplot
