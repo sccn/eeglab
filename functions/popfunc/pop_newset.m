@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.67  2006/03/10 22:58:33  arno
+% testing length of result
+%
 % Revision 1.66  2006/03/10 21:51:28  arno
 % fixing retreive
 %
@@ -322,7 +325,7 @@ elseif length(varargin) == 0 & length(EEG) == 1 % if several arguments, assign v
     % status of parent dataset etc...
     saved = 1;
     filename = '';
-    if ~isempty(ALLEEG)
+    if ~isempty(ALLEEG) & OLDSET ~= 0
         if strcmpi(ALLEEG(OLDSET).saved, 'no')
             saved = 0;
             if ~isempty(ALLEEG(OLDSET).filename)
@@ -349,19 +352,17 @@ elseif length(varargin) == 0 & length(EEG) == 1 % if several arguments, assign v
         cb_save2     = [ 'if ~get(findobj(gcbf, ''tag'', ''cb_owrt''), ''value''),' ...
                        '   set(gcbo, ''value'', 1);' ...
                        '    warndlg2(strvcat(''Cannot unset the save checkbox!'','' '',' ...
-                           '''The old dataset has to be saved because,'',' ...
-                           '''according to your memory option, only one full '',' ...
+                           '''According to your memory option, only one full '',' ...
                            '''dataset can be retained in memory. Thus, you either'',' ...
-                           ''' have to save or delete/overwrite the old dataset''));' ... 
+                           '''have to save or delete/overwrite the old dataset''));' ... 
                        'else, ' cb_save2 ...
                        'end;' ];
         cb_owrt      = [ 'if ~get(findobj(gcbf, ''tag'', ''cb_save2''), ''value''),' ...
                        '   set(gcbo, ''value'', 1);' ...
                        '    warndlg2(strvcat(''Cannot unset the overwrite checkbox!'','' '',' ...
-                           '''The old dataset has to be overwriten because,'',' ...
-                           '''according to your memory option, only one full '',' ...
+                           '''According to your memory option, only one full '',' ...
                            '''dataset can be retained in memory. Thus, you either'',' ...
-                           ''' have to save or delete/overwrite the old dataset''));' ... 
+                           '''have to save or delete/overwrite the old dataset''));' ... 
                        'end;' ];
         enable_save2 = 'on';
         value_save2  = 1;
@@ -505,12 +506,6 @@ else
     args = varargin;
 end;
 
-% remove data from file if necessary
-% ----------------------------------
-if option_storedisk & ~isempty(ALLEEG) & OLDSET ~= 0
-    ALLEEG(OLDSET) = update_datafield(ALLEEG(OLDSET));
-end;
-
 % assigning values
 % ----------------
 overWflag    = 0;
@@ -542,6 +537,12 @@ for ind = 1:2:length(args)
                         end;
 	 otherwise, error(['pop_newset error: unrecognized key ''' args{ind} '''']); 
     end;
+end;
+
+% remove data from file if necessary
+% ----------------------------------
+if option_storedisk & ~isempty(ALLEEG) & OLDSET ~= 0
+    ALLEEG(OLDSET) = update_datafield(ALLEEG(OLDSET));
 end;
 
 % moving/erasing/creating datasets
