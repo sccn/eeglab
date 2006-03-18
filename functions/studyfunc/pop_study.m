@@ -69,6 +69,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.42  2006/03/12 02:17:07  arno
+% remove fontsize
+%
 % Revision 1.41  2006/03/11 16:58:08  scott
 % help and text msgs -sm
 %
@@ -297,7 +300,7 @@ elseif strcmpi(mode, 'gui') % GUI mode
         {'style' 'text' 'string' 'session'    'userdata' 'addt'} ...
         {'style' 'text' 'string' 'condition'  'userdata' 'addt'} ...
         {'style' 'text' 'string' 'group'      'userdata' 'addt'} ...
-        {'style' 'pushbutton' 'string' 'components' 'userdata' 'addt' 'callback' cb_dipole } ...
+        {'style' 'pushbutton' 'string' 'Select by r.v.' 'userdata' 'addt' 'callback' cb_dipole } ...
         {} };
 	guigeom = { [1] [1 2] [1 2] [1 2] [1] [0.2 1.05 0.35 0.4 0.35 0.6 0.4 0.6 0.3]};
 	
@@ -320,7 +323,7 @@ elseif strcmpi(mode, 'gui') % GUI mode
         {'style' 'edit'       'string' ''      'tag' [ 'sess'  int2str(index) ] 'userdata' index 'Callback' sescom} ...
         {'style' 'edit'       'string' ''      'tag' [ 'cond'  int2str(index) ] 'userdata' index 'Callback' condcom} ...
         {'style' 'edit'       'string' ''      'tag' [ 'group' int2str(index) ] 'userdata' index 'Callback' grpcom} ...
-        {'style' 'pushbutton' 'string' 'All'   'tag' [ 'comps' int2str(index) ] 'userdata' index 'Callback' compcom} ...
+        {'style' 'pushbutton' 'string' 'All comp.'   'tag' [ 'comps' int2str(index) ] 'userdata' index 'Callback' compcom} ...
         {'style' 'pushbutton' 'string' 'CLear' 'tag' [ 'clear' int2str(index) ] 'userdata' index 'callback' delset} };
     end;
     
@@ -620,7 +623,7 @@ else % internal command
                     set(findobj('parent', hdl, 'tag',['group' num2str(k)]), 'string','');
                 else
                     set(findobj('parent', hdl, 'tag',['num' num2str(k)]), 'string', int2str(kk));
-                    set(findobj('parent', hdl, 'tag',['set' num2str(k)]), 'string', fullfile(datasetinfo(kk).filepath, datasetinfo(kk).filename));
+                    set(findobj('parent', hdl, 'tag',['set' num2str(k)]), 'string', fullfile(char(datasetinfo(kk).filepath), char(datasetinfo(kk).filename)));
                     set(findobj('parent', hdl, 'tag',['sub' num2str(k)]), 'string', datasetinfo(kk).subject);
                     set(findobj('parent', hdl, 'tag',['sess' num2str(k)]), 'string', int2str(datasetinfo(kk).session));
                     set(findobj('parent', hdl, 'tag',['cond' num2str(k)]), 'string', datasetinfo(kk).condition);
@@ -683,9 +686,9 @@ function bool = test_wrong_parameters(hdl)
     
 function strbut = formatbut(complist)
     if isempty(complist)
-        strbut = 'All';
+        strbut = 'All comp.';
     else
-        if length(complist) > 5, strbut = [ ' ' int2str(complist(1:4)) ' ...' ];
-        else                     strbut = [ ' ' int2str(complist) ];
+        if length(complist) > 3, strbut = [ 'Comp.: ' int2str(complist(1:2)) ' ...' ];
+        else                     strbut = [ 'Comp.: ' int2str(complist) ];
         end;
     end;
