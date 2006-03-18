@@ -58,5 +58,4 @@ function vers = eegplugin_iirfilt(fig, trystrs, catchstrs)
   
   % create menus if necessary
   % -------------------------
-  submenu = uimenu( menu, 'Label', 'Filter the data (IIR)');
-  uimenu( submenu, 'Label', 'Filter the data using non-linear IIR filter',  'CallBack', combio, 'Separator', 'on'); 
+  uimenu( menu, 'Label', 'Filter the data using non-linear IIR filter',  'CallBack', combio, 'Separator', 'on'); 
