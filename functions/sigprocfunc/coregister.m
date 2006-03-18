@@ -1,26 +1,23 @@
-% coregister() -  Co-register measured or nominal electrode locations with a 
-%                 a reference channel locations file or EEG.chanlocs structure. 
-%                 To use coregister(), one may either use the default MNI head 
-%                 and 10-5 System locations from Robert Oostenveld, used in the 
-%                 dipfit2() dipole modeling function as a reference, or else: 
-%                 (1) Extract a head mesh from a subject MRI (possibly in SPM). 
-%                 (2) Measure reference locations on the subject's head. 
-%                 (3) Align these locations to the extracted subject head mesh 
-%                 (using the coregister() graphic interface). The aligned locations 
-%                 then become reference locations for this mesh. In either case, 
-%                 then use coregister() to linearly align or nonlinearly warp 
-%                 subsequently recorded or nominally identified ('Cz') sets of 
-%                 channel and/or fiducial head locations to the reference locations. 
-%                 Both channel locations, read from the EEG.chanlocs structure 
-%                 (or equivalent file), and/or purely fiducial (non-electrode) 
-%                 locations, read from the EEG.chaninfo structure, can then be used 
-%                 by coregister() to linearly align or nonlinearly warp a given or 
-%                 measured montage to the reference locations. In its (default) 
-%                 manual mode, coregister() produces an interactive gui showing 
-%                 the imported and reference channel locations on the imported 
-%                 head mesh (if any), allowing the user to make additional manual 
-%                 adjustments using gui text entry boxes, and to rotate the display 
-%                 using the mouse.
+% coregister() -  Co-register measured or template electrode locations with a 
+%                 a reference channel locations file. For instance if you
+%                 want to perform dipole modeling you have to coregister
+%                 (align) your channel electrodes with the model (and the
+%                 easiest way to do that is to coregister your channel
+%                 electrodes with the electrodes file associated with the
+%                 model. To use coregister(), one may for instance use the default 
+%                 MNI head and 10-5 System locations from Robert Oostenveld, used in  
+%                 the dipfit2() dipole modeling function as a reference. 
+%                 Use coregister() to linearly align or nonlinearly warp 
+%                 subsequently recorded or nominally identified (e.g., 'Cz') sets of 
+%                 channel head locations to the reference locations. 
+%                 Both channel locations and/or fiducial (non-electrode) 
+%                 locations can then be used by coregister() to linearly align 
+%                 or nonlinearly warp a given or measured montage to the reference 
+%                 locations. In its (default) manual mode, coregister() produces 
+%                 an interactive gui showing the imported and reference channel 
+%                 locations on the imported head mesh (if any), allowing the user 
+%                 to make additional manual adjustments using gui text entry boxes, 
+%                 and to rotate the display using the mouse.
 % Usage:
 %        >>  coregister(EEG.chanlocs); % Show channel locations in the coregister() 
 %                 % gui, for align, warp, or manual mode co-registration with the 
@@ -50,13 +47,21 @@
 %                 1x9 matrix containing traditional 9-parameter "Talairach 
 %                 model" transformation (>> help traditional) to apply to
 %                 the new chanlocs. May be a previous output of coregister(). 
+%   'chaninfo1' - [EEG.chaninfo struct] channel information structure for the 
+%                 montage to be coregistered. May contain (no-electrode) fiducial
+%                 locations.
+%   'chaninfo2' - [EEG.chaninfo struct] channel information structure for 
+%                 the reference montage.
+%   'helpmsg'   - ['on'|'off'] pop-up help message when calling function.
+%                 {default: 'off'}
 %
-%   ------------------------------- MANUAL MODE (default) -----------------
-%   'manual'    - [takes [] as argument] Pops up the coregister() gui window to 
+% Optional 'keywords' for MANUAL MODE (default):
+%   'manual'    - ['on'|'off'] Pops up the coregister() gui window to 
 %                 allow viewing the current alignment, performing 'alignfid' or 
-%                 'warp' mode co-registration,  and making manual adjustments.  
+%                 'warp' mode co-registration,  and making manual
+%                 adjustments. Default if 'on'.
 %
-%   ----------------------------------- ALIGN MODE ------------------------
+% Optional 'keywords' for ALIGN MODE:
 %    'alignfid' - {cell array of strings} = labels of (fiducial) channels to use 
 %                 as common landmarks for aligning the new channel locations to 
 %                 the reference locations. These labels must be in both channel 
@@ -65,15 +70,10 @@
 %                 transform including translation, rotation, and/or uniform 
 %                 scaling so as to best match the two sets of landmarks. 
 %                 See 'autoscale' below.
-%   'chaninfo1' - [EEG.chaninfo struct] channel information structure for the 
-%                 montage to be coregistered. May contain (no-electrode) fiducial
-%                 locations.
-%   'chaninfo2'   - [EEG.chaninfo struct] channel information structure for 
-%                 the reference montage.
 %   'autoscale' - ['on'|'off'] autoscale electrode radius when aligning 
 %                 fiducials. {default: 'on'}
 %
-%   ------------------------------------ WARP MODE ------------------------
+% Optional 'keywords' for WARP MODE:
 %    'warp'     - {cell array of strings} channel labels used for non-linear 
 %                 warping of the new channel locations to reference locations.
 %                 For example: Specifying all 10-20 channel labels will
@@ -82,14 +82,19 @@
 %                 Locations of other channels in the new chanlocs will be 
 %                 adjusted so as to produce a smooth warp.
 %
-%   'helpmsg'   - ['on'|'off'] pop-up help message when calling function.
-%                 {default: 'off'}
-%
 % Outputs:
 %  chanlocs_out - transformed input channel locations (chanlocs) structure
 %  transform    - transformation matrix. Use traditional() to convert
 %                 this to a homogenous transformation matrix used in
 %                 3-D plotting functions such as headplot().
+%
+% Note on how to create a template:
+%                 (1) Extract a head mesh from a subject MRI (possibly in 
+%                 Matlab using the function isosurface). 
+%                 (2) Measure reference locations on the subject's head. 
+%                 (3) Align these locations to the extracted subject head mesh 
+%                 (using the coregister() graphic interface). The aligned locations 
+%                 then become reference locations for this mesh.
 %
 % See also: traditional(), headplot(), plotmesh(). 
 %
@@ -116,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.38  2006/03/16 01:47:19  scott
+% text typo
+%
 % Revision 1.37  2006/03/16 01:35:24  scott
 % help msg typo
 %
@@ -299,8 +307,8 @@ g = finputcheck(varargin, { 'alignfid'   'cell'  {}      {};
                             'warp'       'cell'  {}      {};
                             'chaninfo1'  'struct' {}    struct('no', {}); % default empty structure
                             'chaninfo2'  'struct' {}     struct('no', {}); 
-                            'transform'  'real'  []      [];
-                            'manual'  ''  []      []; % -> pop up window
+                            'transform'  'real'   []      [];
+                            'manual'     'string' []      ''; % -> pop up window
                             'autoscale'  'string' { 'on' 'off' } 'on';
                             'helpmsg'    'string' { 'on' 'off' } 'off';
                             'mesh'       ''      []   defaultmesh });
@@ -531,6 +539,7 @@ if 1
                       'clear tmp tmpres;' ...
                       'coregister(''redraw'', gcbf);' ];
     h = uicontrol( opt{:}, [0 0.75  .13 .05], 'style', 'pushbutton', 'string', 'Mesh off', 'callback', cb_mesh );
+    h = uicontrol( opt{:}, [0.87 0.95 .13 .05], 'style', 'pushbutton', 'string', 'Help', 'callback', 'pophelp(''coregister'');' );
 
     % change colors
     % -------------
