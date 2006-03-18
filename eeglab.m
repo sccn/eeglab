@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.468  2006/03/15 00:40:53  scott
+% commented out undefined filter_m at #2014   -sm
+%
 % Revision 1.467  2006/03/15 00:26:26  arno
 % filter menu
 %
@@ -2010,8 +2013,8 @@ catchstrs.new_non_empty          = e_newset;
 		
 	uimenu( tools_m, 'Label', 'Change sampling rate'                  , 'CallBack', cb_resample);
 
-	filter = uimenu( tools_m, 'Label', 'Filter the data'              , 'tag', 'filter');
-%	uimenu( filter_m, 'Label', 'Original EEGLAB method'               , 'CallBack', cb_eegfilt);
+	filter_m = uimenu( tools_m, 'Label', 'Filter the data'              , 'tag', 'filter');
+	uimenu( filter_m, 'Label', 'Original EEGLAB FIR filtering method'   , 'CallBack', cb_eegfilt);
     
 	uimenu( tools_m, 'Label', 'Re-reference'                          , 'CallBack', cb_reref);
 	uimenu( tools_m, 'Label', 'Reject continuous data by eye'         , 'CallBack', cb_eegplot);
@@ -2196,6 +2199,7 @@ catchstrs.new_non_empty          = e_newset;
     epochsub_m  = findobj('parent', epoch_m);
     eventsub_m  = findobj('parent', event_m);
     exportsub_m = findobj('parent', exportm);
+    filter_m    = findobj('parent', filter_m);
     icadefs; % containing PLUGINMENUCOLOR
     if length(fourthsub_m) > 10, set(fourthsub_m(1:end-10), 'foregroundcolor', PLUGINMENUCOLOR); end;
     if length(plotsub_m)   > 17, set(plotsub_m  (1:end-17), 'foregroundcolor', PLUGINMENUCOLOR); end;
@@ -2203,6 +2207,7 @@ catchstrs.new_non_empty          = e_newset;
     if length(epochsub_m ) > 2 , set(epochsub_m (1:end-2 ), 'foregroundcolor', PLUGINMENUCOLOR); end;
     if length(eventsub_m ) > 3 , set(eventsub_m (1:end-3 ), 'foregroundcolor', PLUGINMENUCOLOR); end;
     if length(exportsub_m) > 3 , set(exportsub_m(1:end-3 ), 'foregroundcolor', PLUGINMENUCOLOR); end;
+    if length(filter_m)    > 3 , set(filter_m   (1:end-1 ), 'foregroundcolor', PLUGINMENUCOLOR); end;
 
 EEGMENU = uimenu( set_m, 'Label', '------', 'Enable', 'off');
 set(W_MAIN, 'userdat', { EEGUSERDAT{1} EEGMENU OPT_FOLDER });
