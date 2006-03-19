@@ -72,6 +72,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.42  2006/03/11 05:39:03  arno
+% header
+%
 % Revision 1.41  2006/03/11 00:32:08  arno
 % header
 %
@@ -221,7 +224,7 @@ if	fid == -1
 			return;
 		else 
             warndlg2(strvcat('Warning: you must store the file in a FOLDER always accessible', ...
-                             'from Matlab (i.e. a folder in the Matlab path) and not necessarilly in', ...
+                             'from Matlab (i.e. a folder in the Matlab path) and not necessarily in', ...
                              'the local folder. Otherwise, every time you restart EEGLAB, the default', ...
                              'EEGLAB options will apply (the path you choose will be added temporarily', ...
                              'for this session). Select a folder in the next pop-up file window.'), 'Warning');
