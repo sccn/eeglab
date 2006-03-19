@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.470  2006/03/19 05:34:18  toby
+% Menu name change: Maximize memory -> Memory options
+%
 % Revision 1.469  2006/03/18 14:42:17  arno
 % filter menu
 %
@@ -1995,7 +1998,7 @@ catchstrs.new_non_empty          = e_newset;
 	uimenu( file_m, 'Label', 'Save current study'                     , 'CallBack', cb_savestudy1);
 	uimenu( file_m, 'Label', 'Save current study as'                  , 'CallBack', cb_savestudy2);
 	uimenu( file_m, 'Label', 'Clear study'                            , 'CallBack', cb_clearstudy);
-	uimenu( file_m, 'Label', 'Memory options'                         , 'CallBack', cb_editoptions, 'Separator', 'on');
+	uimenu( file_m, 'Label', 'Maximize memory'                         , 'CallBack', cb_editoptions, 'Separator', 'on');
     
 	hist_m = uimenu( file_m, 'Label', 'Save history'                  , 'Separator', 'on');
 	uimenu( hist_m, 'Label', 'Dataset history'                        , 'CallBack', cb_saveh1);
@@ -2671,7 +2674,7 @@ if study_selected
     set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Save current study as'   ), 'enable', 'on');
     set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Clear study'             ), 'enable', 'on');
     set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Save history'            ), 'enable', 'on');
-    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Maximize memory'         ), 'enable', 'on');
+    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Maximize memory'          ), 'enable', 'on');
     set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Quit'                    ), 'enable', 'on');
     
     % enable specific menus
@@ -2781,7 +2784,7 @@ elseif (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG(1).data)
         set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Clear dataset(s)'        ), 'enable', 'on');
         set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Load existing study'     ), 'enable', 'on');
         set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Save history'            ), 'enable', 'on');
-        set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Maximize memory'         ), 'enable', 'on');
+        set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Maximize memory'          ), 'enable', 'on');
         set( findobj('parent', hist_m, 'type', 'uimenu', 'label', 'Dataset history'         ), 'enable', 'off');
         set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Quit'                    ), 'enable', 'on');
 
@@ -2945,7 +2948,7 @@ else
     set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Import data')             , 'enable', 'on');
     set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Load existing dataset'   ), 'enable', 'on');
     set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Load existing study'     ), 'enable', 'on');
-    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Maximize memory')         , 'enable', 'on');
+    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Maximize memory' )         , 'enable', 'on');
     set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Quit')                    , 'enable', 'on');
     set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Create study'    )        , 'enable', 'on');
     set( findobj('type', 'uimenu', 'label', 'Using all loaded datasets'), 'enable', 'off');
