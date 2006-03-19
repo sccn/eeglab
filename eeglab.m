@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.469  2006/03/18 14:42:17  arno
+% filter menu
+%
 % Revision 1.468  2006/03/15 00:40:53  scott
 % commented out undefined filter_m at #2014   -sm
 %
@@ -1992,7 +1995,7 @@ catchstrs.new_non_empty          = e_newset;
 	uimenu( file_m, 'Label', 'Save current study'                     , 'CallBack', cb_savestudy1);
 	uimenu( file_m, 'Label', 'Save current study as'                  , 'CallBack', cb_savestudy2);
 	uimenu( file_m, 'Label', 'Clear study'                            , 'CallBack', cb_clearstudy);
-	uimenu( file_m, 'Label', 'Maximize memory'                        , 'CallBack', cb_editoptions, 'Separator', 'on');
+	uimenu( file_m, 'Label', 'Memory options'                         , 'CallBack', cb_editoptions, 'Separator', 'on');
     
 	hist_m = uimenu( file_m, 'Label', 'Save history'                  , 'Separator', 'on');
 	uimenu( hist_m, 'Label', 'Dataset history'                        , 'CallBack', cb_saveh1);
