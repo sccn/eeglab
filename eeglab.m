@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.473  2006/03/20 19:09:40  scott
+% Original EEGLAB FIR filtering method -> Simple FIR filter
+%
 % Revision 1.472  2006/03/19 06:09:07  toby
 % *** empty log message ***
 %
@@ -2026,7 +2029,7 @@ catchstrs.new_non_empty          = e_newset;
 	uimenu( tools_m, 'Label', 'Change sampling rate'                  , 'CallBack', cb_resample);
 
 	filter_m = uimenu( tools_m, 'Label', 'Filter the data'              , 'tag', 'filter');
-	uimenu( filter_m, 'Label', 'Simple FIR filter'   , 'CallBack', cb_eegfilt);
+	uimenu( filter_m, 'Label', 'Basic FIR filter'   , 'CallBack', cb_eegfilt);
     
 	uimenu( tools_m, 'Label', 'Re-reference'                          , 'CallBack', cb_reref);
 	uimenu( tools_m, 'Label', 'Reject continuous data by eye'         , 'CallBack', cb_eegplot);
