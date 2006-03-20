@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2006/03/12 04:21:45  arno
+% component polarity
+%
 % Revision 1.15  2006/03/10 18:22:56  arno
 % rename variable
 %
@@ -192,7 +195,7 @@ if strcmpi(mode, 'comps')
            end
            handl(n) = sbplot(rowcols(1),rowcols(2),n);
            ave_erp = STUDY.cluster(cls(clus)).centroid.erp{n};
-           t = STUDY.cluster(cls(clus)).centroid.erp_times;
+           t = clusnval.erp_times;
            [all_erp pol] = std_comppol(clusnval.erp');
            plot(t/1000,Avepol(n)*all_erp,'color', [0.5 0.5 0.5]);
            hold on
