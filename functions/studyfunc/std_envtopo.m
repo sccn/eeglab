@@ -203,9 +203,9 @@ for n = 1:Ncond
        % compute grand mean back projection ERP for the cluster
        projERP = 0;
        fprintf('\n Computing projected component ERP of cluster %d: ', (clusters(cls)) ); 
-       val_ind = find(~isnan(clusscalp.grid{1}(:))); % find non-NAN values
+       val_ind = find(~isnan(clusscalp.scalp{1}(:))); % find non-NAN values
        for k = 1:len
-           tmp = clusscalp.grid{k}(val_ind);
+           tmp = clusscalp.scalp{k}(val_ind);
            projERP = projERP + tmp*cluserp.erp(k,:);
            fprintf('.'); 
        end
