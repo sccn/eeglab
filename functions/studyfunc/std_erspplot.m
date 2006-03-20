@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2006/03/17 17:54:08  scott
+% help msg format
+%
 % Revision 1.20  2006/03/14 19:57:56  arno
 % plottting different conditions
 %
@@ -242,8 +245,8 @@ if strcmpi(mode, 'comps')
                 else  %other sbplot rows
                     sbplot(rowcols(1),rowcols(2),k+4);  
                 end
-                tftopo(clusncomm.ersp{k}(:,:,n), clusncomm.times{k},log(clusncomm.logf{k}),'limits', ...
-                    [clusncomm.times{k}(1) clusncomm.times{k}(end) log(clusncomm.logf{k}(1)) log(clusncomm.logf{k}(end)) -lim lim],...
+                tftopo(clusncomm.ersp{k}(:,:,n), clusncomm.ersp_times{k},log(clusncomm.ersp_freqs{k}),'limits', ...
+                    [clusncomm.ersp_times{k}(1) clusncomm.ersp_times{k}(end) log(clusncomm.ersp_freqs{k}(1)) log(clusncomm.ersp_freqs{k}(end)) -lim lim],...
                     'title', a, 'verbose', 'off', 'axcopy', 'off');
                 set(gca, 'xtick', [], 'ytick', []);
                 set(get(gca,'Title'),'FontSize',8)
