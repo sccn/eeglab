@@ -111,14 +111,15 @@ if isempty(cls)
 end;
 
 % Plot all the components in the cluster
+disp('Drawing components of cluster (all at once)...');
 if strcmpi(mode, 'comps')         
     for clus = 1: length(cls) % For each cluster requested
         len = length(STUDY.cluster(cls(clus)).comps);
         if len > 0 % A non-empty cluster 
             try 
-                h_wait = waitbar(0,'Computing topoplot ...', 'Color', BACKEEGLABCOLOR,'position', [300, 200, 300, 48]);
+                %h_wait = waitbar(0,'Computing topoplot ...', 'Color', BACKEEGLABCOLOR,'position', [300, 200, 300, 48]);
             catch % for Matlab 5.3
-                h_wait = waitbar(0,'Computing topoplot ...','position', [300, 200, 300, 48]);
+                %h_wait = waitbar(0,'Computing topoplot ...','position', [300, 200, 300, 48]);
             end
             h_topo = figure;
             rowcols(2) = ceil(sqrt(len + 4)); rowcols(1) = ceil((len+4)/rowcols(2));
@@ -132,7 +133,7 @@ if strcmpi(mode, 'comps')
                 clusscalp = std_clustread(STUDY, ALLEEG, cls(clus), 'topo');
             catch,
                 warndlg2([ 'Some topoplot image information is missing, aborting'] , 'Abort - Plot scalp maps' );   
-                delete(h_wait)
+                %delete(h_wait)
                 return;
            end
             for k = 1:len
@@ -141,22 +142,22 @@ if strcmpi(mode, 'comps')
                 comp = STUDY.cluster(cls(clus)).comps(k);
                 [Xi,Yi] = meshgrid(clusscalp.yi{k},clusscalp.xi{k});                     
                 % Compute correlation between a component and the average scalp map to determine polarity. 
-                tmp_grid = clusscalp.grid{k};
+                tmp_grid = clusscalp.scalp{k};
                 tmp_grid(find(isnan(tmp_grid))) = 0;% remove NaN values from grid for later correlation calculation.  
                 grid_pol = corrcoef(tmp_grid(:), tmp_ave(:)); % compute correlation.  
                 grid_pol = sign(grid_pol(1,2));
                 if k <= rowcols(2) - 2 %first sbplot row
                     figure(h_topo);
                     sbplot(rowcols(1),rowcols(2),k+2) , 
-                    toporeplot(grid_pol*clusscalp.grid{k}, 'style', 'both', 'plotrad',0.5,'intrad',0.5, 'verbose', 'off','xsurface', Xi, 'ysurface', Yi );
+                    toporeplot(grid_pol*clusscalp.scalp{k}, 'style', 'both', 'plotrad',0.5,'intrad',0.5, 'verbose', 'off','xsurface', Xi, 'ysurface', Yi );
                     title([ 'ic' num2str(comp) '/' subject ]);
-                    waitbar(k/(len+1),h_wait)
+                    %waitbar(k/(len+1),h_wait)
                 else %other sbplot rows
                     figure(h_topo)
                     sbplot(rowcols(1),rowcols(2),k+4) , 
-                    toporeplot(grid_pol*clusscalp.grid{k}, 'style', 'both', 'plotrad',0.5,'intrad',0.5, 'verbose', 'off','xsurface', Xi, 'ysurface', Yi );
+                    toporeplot(grid_pol*clusscalp.scalp{k}, 'style', 'both', 'plotrad',0.5,'intrad',0.5, 'verbose', 'off','xsurface', Xi, 'ysurface', Yi );
                     title([ 'ic' num2str(comp) '/' subject ]);
-                    waitbar(k/(len+1),h_wait)
+                    %waitbar(k/(len+1),h_wait)
                 end
             end
             figure(h_topo)
@@ -164,8 +165,8 @@ if strcmpi(mode, 'comps')
             toporeplot(ave_grid, 'style', 'both', 'plotrad',0.5,'intrad',0.5, 'verbose', 'off');
             title([ STUDY.cluster(cls(clus)).name ' average scalp map, ' num2str(length(unique(STUDY.cluster(cls(clus)).sets(1,:)))) 'Ss']);
             set(gcf,'Color', BACKCOLOR);
-            waitbar(1,h_wait)
-            delete(h_wait)
+            %waitbar(1,h_wait)
+            %delete(h_wait)
             orient tall  % fill the figure page for printing
             axcopy
         end % Finished one cluster plot 

@@ -30,7 +30,9 @@
 %   centroid     - cell array of centroid structures, each cell corrasponding 
 %                  to a different cluster requested in 'clusters' (above).
 %                  fields of 'centroid' may include centroid.erp, centroid.dipole,
-%                  etc. (as above).
+%                  etc. (as above). The structure is similar as the output
+%                  of the std_clustread() function (with some fields
+%                  about the cluster name and index missing).
 % Examples:
 %
 %   >> [STUDY, centroid] = std_centroid(STUDY, ALLEEG,[], 'scalp'); 
@@ -66,6 +68,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2006/03/14 02:55:44  scott
+% help msg
+%
 % Revision 1.23  2006/03/12 04:29:24  arno
 % G247
 % transpose ERP
