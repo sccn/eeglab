@@ -6,27 +6,27 @@
 %                   std_erpplot(), std_erspplot(), etc.
 % Usage:
 %         >> clustinfo = std_clustread(STUDY,ALLEEG, cluster, ...
-%                                             infotypes, conditions);
+%                                             infotype(s), condition(s));
 % Inputs:
 %         STUDY - studyset structure containing some or all files in ALLEEG
 %        ALLEEG - vector of loaded EEG datasets including STUDY datasets
 %       cluster - cluster number in STUDY
-%      infotypes - ['erp'|'spec'|'ersp'|'itc'|'dipole'|'map'] type(s) of 
-%                 cluster information to read. May also be a cell array of
-%                 these types. For example: { 'erp' 'map' 'dipole' }
+%      infotype(s) - ['erp'|'spec'|'ersp'|'itc'|'dipole'|'map'] type(s) of 
+%                    cluster information to read. May also be a cell array of
+%                    these types. For example: { 'erp' 'map' 'dipole' }
 % Optional input:
-%     conditions - ['string'] or {cell array of 'strings'} STUDY condition 
-%                  name(s) to return info for {default|[]: all conditions}
+%     condition(s) - ['string'] or {cell array of 'strings'} STUDY condition 
+%                    name(s) to return info for {default|[]: all conditions}
 % Output:
-%      clustinfo - structure of specified cluster information 
+%      clustinfo   - structure of specified cluster information 
 %
 % With fields:
 %         .clustname     % cluster name
-%         .clustnum      % cluster index
-%         .condition     % names of the condition(s) returned
-%         .clustcomp     % [integer array] of comp. indices in their datasets
-%         .clustsubj     % {cell array} of component subject codes 
-%         .clustgroup    % {cell array} of component group codes  UNIMPLMENTED!
+%         .clustnum      % cluster index 
+%         .condition     % {dell array of 'strings'} condition(s) returned
+%         .subject       % {cell array} of component subject codes 
+%         .group         % {cell array} of component group codes  UNIMPLMENTED!
+%         .comp          % [integer array] of comp. dataset indices 
 %
 % And optional fields (defined for the requested measures):
 %         .erp           % [(ncomps, ntimes) array] component ERPs
@@ -53,8 +53,8 @@
 % Example:
 %         % To overplot the ERPs for all Cluster 3 components in a STUDY
 %         %
-%         clstinfo = std_clustread(STUDY, ALLEEG, 3, 'erp');
-%         figure; plot(clstinfo.erp_times, clstinfo.erp);
+%         info = std_clustread(STUDY, ALLEEG, 3, 'erp');
+%         figure; plot(info.erp_times, info.erp);
 % 
 % Author: Hilit Serby, Scott Makeig & Arnaud Delorme, SCCN/INC/UCSD, 2005-
 
@@ -86,6 +86,8 @@ if nargin < 5
   condition = []; % default
 end
 
+clustinfo = [];      % initialize
+
 if isempty(condition)
   clustinfo.condition   = STUDY.condition; % all conditions
 else % condition(s) specified
@@ -103,20 +105,19 @@ if ~iscell(infotype),
     infotype = { infotype }; 
 end;
 
-clustinfo = [];      % initialize
 clustinfo.clustname  = STUDY.cluster(cluster).name;
 clustinfo.clustnum   = cluster;
-clustinfo.clustcomp  = STUDY.cluster(cluster).comps;
-clustinfo.clustsubj  = [];  % UNIMPLEMENTED! ???
-clustinfo.clustgrp   = [];  % UNIMPLEMENTED! ???
+clustinfo.subject    = [];  % UNIMPLEMENTED! ???
+clustinfo.group      = [];  % UNIMPLEMENTED! ???
+clustinfo.comp       = STUDY.cluster(cluster).comps;
 
 ncomps = length(STUDY.cluster(cluster).comps);
 nconditions = length(condition);
 condnums = zeros(1,nconditions);
 
-for c=1:nconditions % find condition indices
-   condnums(c) = ismember(condition(c),STUDY.condition); % ??? WRONG ??? should return the condition numbers
-end
+% for c=1:nconditions % find condition indices
+%    condnums(c) = ismember(condition(c),STUDY.condition); % ??? WRONG ??? should return the condition numbers
+% end
 
 for k = 1:ncomps %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for each cluster component %%%%%%%%%%%%%%
     
