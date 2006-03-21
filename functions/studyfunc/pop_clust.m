@@ -1,9 +1,9 @@
-% pop_clust() - select and run a clustering algorithm on components from an EEGLAB STUDY 
-%               structure of EEG datasets. Clustering data should be prepared beforehand using 
-%               pop_preclust() and/or eeg_preclust(). The number of clusters must be
-%               specified in advance. If called in gui mode, the pop_clustedit() window
-%               appears when the clustering is complete to display clustering results
-%               and allow the user to review and edit them.
+% pop_clust() - select and run a clustering algorithm on components from a STUDY 
+%               structure of EEG datasets. Clustering data should be prepared beforehand 
+%               using pop_preclust() and/or eeg_preclust(). The number of clusters must 
+%               be specified in advance. If called in gui mode, the pop_clustedit() 
+%               window appears when the clustering is complete to display clustering 
+%               results and allow the user to review and edit them.
 % Usage: 
 %               >> STUDY = pop_clust( STUDY, ALLEEG); % pop up a graphic interface
 %               >> STUDY = pop_clust( STUDY, ALLEEG, 'key1', 'val1', ...); % no pop-up
@@ -38,7 +38,7 @@
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
-% Copyright (C) Hilit Serby, SCCN, INC, UCSD, October 11, 2004, hilit@sccn.ucsd.edu
+% Copyright (C) Arnaud Delorme & Scott Makeig, SCCN/INC/UCSD, 2005, smakeig@ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -57,6 +57,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2006/03/12 03:20:35  arno
+% study saving
+%
 % Revision 1.22  2006/03/12 02:56:42  arno
 % gui aspect ratio
 %
