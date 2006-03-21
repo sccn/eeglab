@@ -153,14 +153,6 @@ if isempty(STUDY.cluster)
         STUDY.cluster(1).sets =  [STUDY.cluster(1).sets       STUDY.setind(:,k)*ones(1,length(comps))];
         STUDY.cluster(1).comps = [STUDY.cluster(1).comps      comps];
     end
-    if length(STUDY.condition) > 1
-        tmp = ones(length(STUDY.condition), length(STUDY.cluster(1).sets));
-        for l = 1:length(STUDY.condition)
-            tmp(l,:) = STUDY.cluster(1).sets + (l-1)*size(STUDY.setind,2);
-        end
-        STUDY.cluster(1).sets = tmp;
-        clear tmp
-    end
 else
     for index = 1:length(STUDY.cluster)
         if ~isempty(STUDY.cluster(index).centroid) & ~isstruct(STUDY.cluster(index).centroid)
