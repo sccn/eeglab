@@ -1,20 +1,20 @@
-%  std_createclust()  - dreate a new empty cluster.  After creation, components 
-%                       may be (re)assigned to it using std_movecomp().
+%  std_createclust()  - create a new empty cluster.  After creation, components 
+%                       may be (re)assigned to this cluster using std_movecomp().
 % Usage:
-%                    >> [STUDY] = std_createclust(STUDY, ALLEEG, name);
+%            >> [STUDY] = std_createclust(STUDY, ALLEEG, name);
 % Inputs:
-%   STUDY    - STUDY set comprising some or all of the EEG datasets in ALLEEG.
-%   ALLEEG   - vector of EEG datasets included in the STUDY, typically created 
-%              using load_ALLEEG().
+%   STUDY    - STUDY structure comprising some or all of the EEG datasets in ALLEEG.
+%   ALLEEG   - vector of EEG dataset structures included in the STUDY, typically 
+%              created using load_ALLEEG().
 % Optional inputs:
 %   name     - ['string'] name of the new cluster {default: 'Cls #', where 
 %              '#' is the next available cluster number}
 % Outputs:
-%   STUDY    - the input STUDY set structure modified with the new cluster.
+%   STUDY    - the input STUDY structure modified with the new cluster.
 %
 % Example: 
+%               % Create a new cluster named 'eye_movements'.
 %            >> [STUDY] = std_createclust(STUDY, ALLEEG, 'eye_movements');
-%            % Create a new cluster named 'eye_movements'.
 %
 %  See also  pop_clustedit(), std_movecomp()
 %
@@ -22,7 +22,7 @@
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
-% Copyright (C) Hilit Serby, SCCN, INC, UCSD, June 07, 2005, hilit@sccn.ucsd.edu
+% Copyright (C) Arnaud Delorme & Scott Makeig, SCCN/INC/UCSD, 06/07/2005, smakeig@ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -50,7 +50,8 @@ function [STUDY, clusters] = std_createclust(STUDY, ALLEEG, varargin)
 else
     name = varargin{1};
 end
-% Find out the highst cluster id number (in cluster name), to find
+
+% Find the highst cluster id number (in cluster name), to find
 % next available cluster index
 max_id = 0;
 for k = 1:length(STUDY.cluster)
@@ -61,6 +62,7 @@ end
 max_id = max_id + 1;
 name = sprintf('%s %d', name, max_id);
 STUDY.cluster(end+1).name = name;
+
 % Initialize the new cluster fields.
 STUDY.cluster(end).parent{1} = 'manual'; % update parent cluster if exists.
 STUDY.cluster(end).child = [];
@@ -96,6 +98,7 @@ if Ncond > 1
 end
 
 cls = size(C,1);
+
 % Find the next available cluster index
 nc = 0; 
 for k =  1:length(STUDY.cluster)
