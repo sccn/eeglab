@@ -150,7 +150,7 @@ if isempty(STUDY.cluster)
         if isempty(comps)
             comps = 1:size(ALLEEG(STUDY.datasetinfo(ind_nonnan).index).icaweights,1);
         end;
-        STUDY.cluster(1).sets =  [STUDY.cluster(1).sets       k*ones(1,length(comps))];
+        STUDY.cluster(1).sets =  [STUDY.cluster(1).sets       STUDY.cluster(1).sets(:,k)*ones(1,length(comps))];
         STUDY.cluster(1).comps = [STUDY.cluster(1).comps      comps];
     end
     if length(STUDY.condition) > 1
