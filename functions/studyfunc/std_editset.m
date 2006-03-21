@@ -1,7 +1,7 @@
-% std_editset() - modify an EEGLAB STUDY set structure.
+% std_editset() - modify a STUDY set structure.
 %
 % Usage: 
-%               >> [STUDY, ALLEEG] = std_editset(STUDY, ALLEEG, key1, val1, ...);  
+%             >> [STUDY, ALLEEG] = std_editset(STUDY, ALLEEG, key1, val1, ...);  
 % Inputs:
 %   STUDY      - EEGLAB STUDY set
 %   ALLEEG     - vector of the EEG datasets included in the STUDY structure 
@@ -40,11 +40,11 @@
 %  See also:  pop_createstudy(), std_loadalleeg(), pop_clust(), pop_preclust(), 
 %             eeg_preclust(), eeg_createdata()
 %
-% Authors: Arnaud Delorme, Hilit Serby, SCCN, INC, UCSD, October , 2004-
+% Authors: Arnaud Delorme, Hilit Serby, SCCN/INC/UCSD, October , 2004-
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
-% Copyright (C) Hilit Serby, SCCN, INC, UCSD, October 11, 2004, hilit@sccn.ucsd.edu
+% Copyright (C) Arnaud Delorme & Scott Makeig, SCCN/INC/UCSD, October 11, 2004, smakeig@ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.38  2006/03/12 03:27:27  arno
+% saving file
+%
 % Revision 1.37  2006/03/12 03:24:24  arno
 % just resave study
 %

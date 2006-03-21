@@ -13,9 +13,9 @@
 %                  EEG sets are also saved to disk. Called by pop_preclust(). Follow with 
 %                  eeg_clust() or pop_clust().
 % Usage:    
-%                >> [ALLEEG,STUDY] = std_preclust(ALLEEG,STUDY); % cluster all comps in all sets
-%                >> [ALLEEG,STUDY] = std_preclust(ALLEEG,STUDY,clustind,compind, preproc1,...);
-%
+%              >> [ALLEEG,STUDY] = std_preclust(ALLEEG,STUDY); % cluster all comps in all sets
+%              >> [ALLEEG,STUDY] = std_preclust(ALLEEG,STUDY,clustind,compind, ...
+%                                                                 {preproc1}, {preproc2},...);
 % Required inputs:
 %   ALLEEG       - ALLEEG vector of one or more loaded EEG dataset structures
 %   STUDY        - an EEGLAB STUDY set of loaded EEG structures
@@ -35,11 +35,14 @@
 %                  array variable named 'clustcomp' {default: [] => include all components 
 %                  from all datasets}.
 %
-%   preprocX     - {'comnd' 'key1' val1 'key2' val2 ...} component clustering measures to prepare
+%   preproc(s)   - cell array(s) {'measure' 'key1' val1 'key2' val2 ...} of component clustering 
+%                  measures to prepare and store for clustering. Each such cell array gives
+%                  all ncessary parameters for the named preprocessing 'measure'. See Example
+%                  below.
 %
-%                  'comnd' = component measures to compute:
+%               'measure' = component measures to compute:
 %                    'erp'     = cluster on the component ERPs,
-%                    'dipoles' = cluster on the component [X Y Z] dipole locations
+%                    'dipoles' = cluster on the component [x y z] dipole locations
 %                    'dipselect' = select components to cluster that have residual 
 %                                  dipole variance less than a specified threshold. 
 %                    'spec'    = cluster on the component log activity spectra (in dB)
@@ -57,7 +60,7 @@
 %                    'finaldim' = final number of dimensions. Enables second-level PCA. 
 %                                  By default this command is not used (see Example below).
 %
-%                  'key'   optional inputs used in computing  the specified measures:
+%               'key' = optional inputs used in computing the specified measures (require [values]):
 %                    'npca'    =  [integer] number of principal components (PCA dimension) of 
 %                                   the selected measures to retain for clustering. {default: 5}
 %                    'norm'    =  [0|1] 1 -> normalize the PCA components so the variance of 
@@ -87,7 +90,8 @@
 %   STUDY        - the input STUDY set with pre-clustering data added, for use by pop_clust() 
 %
 % Example:
-%   >> [ALLEEG  STUDY] = std_preclust(ALLEEG, STUDY, [], [] , { 'dipselect'  'rv'  0.15  } ,...
+%   >> [ALLEEG  STUDY] = std_preclust(ALLEEG, STUDY, [], [] , ...
+%                        { 'dipselect'  'rv'  0.15  } ,...
 %                        { 'spec'  'npca' 10 'norm' 1 'weight' 1 'freqrange'  [ 3 25 ] } , ...
 %                        { 'erp'   'npca' 10 'norm' 1 'weight' 2 'timewindow' [ 350 500 ] } ,...
 %                        { 'scalp' 'npca' 10 'norm' 1 'weight' 2 'abso' 1 } , ...
@@ -111,7 +115,7 @@
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
-% Copyright (C) Hilit Serby, SCCN, INC, UCSD, May 13,2004, hilit@sccn.ucsd.edu
+% Copyright (C) Arnaud Delorme & Scott Makeig, SCCN/INC/UCSD, May 13,2004, smakeig@ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -128,6 +132,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.45  2006/03/14 22:36:43  arno
+% fix downsampling
+%
 % Revision 1.44  2006/03/13 19:14:21  arno
 % fix downsampling etc...
 %
