@@ -15,19 +15,20 @@
 %                 cluster information to read. May also be a cell array of
 %                 these types. For example: { 'erp' 'map' 'dipole' }
 % Optional input:
-%     conditions - {cell array} STUDY condition name(s) to return info for 
-%                  {default: all}
-%
+%     conditions - ['string'] or {cell array of 'strings'} STUDY condition 
+%                  name(s) to return info for {default|[]: all conditions}
 % Output:
-%      clustinfo - structure of specified cluster information:
+%      clustinfo - structure of specified cluster information 
 %
+% With fields:
 %         .clustname     % cluster name
 %         .clustnum      % cluster index
 %         .condition     % names of the condition(s) returned
 %         .clustcomp     % [integer array] of comp. indices in their datasets
-%         .clustsubj     % {cell array} of component subject codes UNIMPLMENTED
+%         .clustsubj     % {cell array} of component subject codes 
 %         .clustgroup    % {cell array} of component group codes  UNIMPLMENTED!
 %
+% And optional fields (defined for the requested measures):
 %         .erp           % [(ncomps, ntimes) array] component ERPs
 %           .erp_times   % [(1,ntimes) array] ERP epoch latencies (ms)
 %
@@ -85,6 +86,19 @@ if nargin < 5
   condition = []; % default
 end
 
+if isempty(condition)
+  clustinfo.condition   = STUDY.condition; % all conditions
+else % condition(s) specified
+  if ~iscell(condition), 
+    condition = { condition }; 
+  end;
+  if ~ismember(condition,STUDY.condition) % ???? WRONG ???
+    error('Named condition not found in STUDY')
+  else
+    clustinfo.condition  = condition;
+  end
+end
+
 if ~iscell(infotype), 
     infotype = { infotype }; 
 end;
@@ -93,20 +107,27 @@ clustinfo = [];      % initialize
 clustinfo.clustname  = STUDY.cluster(cluster).name;
 clustinfo.clustnum   = cluster;
 clustinfo.clustcomp  = STUDY.cluster(cluster).comps;
-
-if isempty(condition)
-  clustinfo.conditions  = STUDY.condition; % all conditions
-else
-  clustinfo.conditions = condition;
-end
+clustinfo.clustsubj  = [];  % UNIMPLEMENTED! ???
+clustinfo.clustgrp   = [];  % UNIMPLEMENTED! ???
 
 ncomps = length(STUDY.cluster(cluster).comps);
+nconditions = length(condition);
+condnums = zeros(1,nconditions);
+
+for c=1:nconditions % find condition indices
+   condnums(c) = ismember(condition(c),STUDY.condition); % ??? WRONG ??? should return the condition numbers
+end
+
 for k = 1:ncomps %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for each cluster component %%%%%%%%%%%%%%
     
-    abset = [STUDY.datasetinfo(STUDY.cluster(cluster).sets(condition,k)).index]; % ??? condition ???
+ for c = 1:nconditions
+   
+    % NB: BELOW, CONDITION NEEDS TO BE THE INDICES OF THE REQUESTED CONDITIONS, NO???
+
+    abset = [STUDY.datasetinfo(STUDY.cluster(cluster).sets(condnums(c),k)).index]; % ??? condition ???
     comp  = STUDY.cluster(cluster).comps(k);
-    % clustinfo.subject{k} = ??? UNIMPLEMENTED 
-    % clustinfo.group{k} = ??? UNIMPLEMENTED BECAUSE OF CLUSTER.SETS PROBLEM
+    % clustinfo(c).clustsubj{k} = ??? UNIMPLEMENTED 
+    % clustinfo(c).clustgrp{k}  = ??? UNIMPLEMENTED - NOTE CLUSTER.SETS PROBLEM
     
     for index = 1:length(infotype) %%%%%%%%%%%%%%%% for each information type %%%%%%%%%%%%%%%%
         switch infotype{index}        
@@ -117,7 +138,7 @@ for k = 1:ncomps %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for each cluster component 
                     clustinfo.erp_times = t;
                 end
                 clustinfo.erp(k,:) = erp;
-
+                if k==ncomps & c==conditions, fprintf('Cluster component ERPs read.\n'); end;
             case 'spec'
                 [spec, f] = std_readspec(ALLEEG, abset, comp, STUDY.preclust.specclustfreqs);
                 if  k == 1
@@ -125,6 +146,7 @@ for k = 1:ncomps %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for each cluster component 
                     clustinfo.spec_freqs = f;
                 end
                 clustinfo.spec(k,:) = spec;
+                if k==ncomps & c==conditions, fprintf('Cluster component spectra read.\n'); end;
 
             case 'ersp'
                 [ersp, logfreqs, timevals] = std_readersp(ALLEEG, abset, comp, ...
@@ -132,6 +154,7 @@ for k = 1:ncomps %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for each cluster component 
                 clustinfo.ersp_freqs{k} = logfreqs;
                 clustinfo.ersp_times{k} = timevals;
                 clustinfo.ersp{k}       = ersp;
+                if k==ncomps & c==conditions, fprintf('Cluster component ERSPs read.\n'); end;
 
             case 'itc'
                 [itc, logfreqs, timevals] = std_readitc(ALLEEG, abset, comp, ...
@@ -139,9 +162,11 @@ for k = 1:ncomps %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for each cluster component 
                 clustinfo.itc_freqs{k} = logfreqs;
                 clustinfo.itc_times{k} = timevals;
                 clustinfo.itc{k}       = itc;
+                if k==ncomps & c==conditions, fprintf('Cluster component ITCs read.\n'); end;
 
             case 'dipole'
                 clustinfo.dipole(k) = ALLEEG(abset).dipfit.model(comp);            
+                if k==ncomps & c==conditions, fprintf('Cluster component dipole models read.\n'); end;
 
             case { 'map' 'scalp' 'topo' }
                 [grid, yi, xi] = std_readtopo(ALLEEG, abset, comp); 
@@ -151,6 +176,7 @@ for k = 1:ncomps %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for each cluster component 
                  clustinfo.yi = yi;
                 end
                 clustinfo.scalp(k,:,:) = grid;
+                if k==ncomps & c==conditions, fprintf('Cluster component scalp maps grids read.\n'); end;
 
             otherwise, error('Unrecognized ''infotype'' entry');
         end; % switch
