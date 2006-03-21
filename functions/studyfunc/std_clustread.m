@@ -1,57 +1,79 @@
-% std_clustread() - load one or more requested measures 
-%                   ['erp'|'spec'|'ersp'|'itc'|'dipole'|'map']
+% std_clustread() - load one or more requested component data measures 
+%                     ['erp'|'spec'|'ersp'|'itc'|'dipole'|'map']
 %                   for all components of a specified cluster.  
+%                   Useful for accessing cluster compoent data in scripts.
 %                   Called by cluster plotting functions: std_envtopo(), 
-%                   std_erpplot(), std_erspplot(), ...
+%                   std_erpplot(), std_erspplot(), etc.
 % Usage:
-%         >> clustinfo = std_clustread(STUDY,ALLEEG, cluster, infotype, condition);
+%         >> clustinfo = std_clustread(STUDY,ALLEEG, cluster, ...
+%                                             infotypes, conditions);
 % Inputs:
 %         STUDY - studyset structure containing some or all files in ALLEEG
-%        ALLEEG - vector of loaded EEG datasets
+%        ALLEEG - vector of loaded EEG datasets including STUDY datasets
 %       cluster - cluster number in STUDY
-%      infotype - ['erp'|'spec'|'ersp'|'itc'|'dipole'|'map'] type of stored
+%      infotypes - ['erp'|'spec'|'ersp'|'itc'|'dipole'|'map'] type(s) of 
 %                 cluster information to read. May also be a cell array of
-%                 these types, for example: { 'erp' 'map' 'dipole' }
-%     condition - STUDY condition number to read {default: 1}
+%                 these types. For example: { 'erp' 'map' 'dipole' }
+% Optional input:
+%     conditions - {cell array} STUDY condition name(s) to return info for 
+%                  {default: all}
 %
 % Output:
 %      clustinfo - structure of specified cluster information:
 %
-%         clustinfo.name          % cluster name
-%         clustinfo.clusternum    % cluster index
-%         clustinfo.condition     % index of the condition asked for
+%         .clustname     % cluster name
+%         .clustnum      % cluster index
+%         .condition     % names of the condition(s) returned
+%         .clustcomp     % [integer array] of comp. indices in their datasets
+%         .clustsubj     % {cell array} of component subject codes UNIMPLMENTED
+%         .clustgroup    % {cell array} of component group codes  UNIMPLMENTED!
 %
-%         clustinfo.comp[]        % array of component indices 
-%         clustinfo.subject{}     % cell array of component subject codes UNIMPLMENETED
-%         clustinfo.group{}       % cell array of component group codes  UNIMPLMENETED!
+%         .erp           % [(ncomps, ntimes) array] component ERPs
+%           .erp_times   % [(1,ntimes) array] ERP epoch latencies (ms)
 %
-%         clustinfo.erp[]         % (ncomps, ntimes) array of component ERPs
-%           clustinfo.erp_times[] % vector of ERP epoch latencies
+%         .spec          % [(ncomps, nfreqs) array] component spectra
+%           .spec_freqs  % [(1,nfreqs) array] spectral frequencies (Hz)
 %
-%         clustinfo.spec[]        % (ncomps, nfreqs) array of component spectra
-%           clustinfo.spec_freqs[]% vector of spectral frequencies 
+%         .ersp          % [(ncomps, ntimes, nfreqs) array] component ERSPs
+%           .ersp_times  % [(1,ntimes) array] ERSP latencies (ms)
+%           .ersp_freqs  % [(1,nfreqs) array] ERSP frequencies (Hz)
 %
-%         clustinfo.ersp[]        % (ncomps,ntimes,nfreqs) array of component ERSPs
-%           clustinfo.ersp_times[]% vector of ERSP latencies
-%           clustinfo.ersp_freqs[]% vector of ERSP frequencies
+%         .itc           % [(ncomps, ntimes, nfreqs) array] component ITCs
+%           .itc_times   % [(1,ntimes) array] ERSP latencies (ms)
+%           .itc_freqs   % [(1,nfreqs) array] ERSP frequencies (Hz)
 %
-%         clustinfo.itc[]         % (ncomps,ntimes,nfreqs) array of component ITCs
-%           clustinfo.itc_times[] % vector of ITC latencies
-%           clustinfo.itc_freqs[] % vector of ITC frequencies
+%         .scalp         % [(ncomps, ngrid, ngrid) array] comp. map grids
+%           .xi          % [(1, ngrid) array] abscissa values 
+%           .yi          % [(1, ngrid) array] oridnate values 
+%                        % {default ngrid: 65}
 %
-%         clustinfo.scalp[]       % (ncomps,65,65) array of component scalp map grids
-%           clustinfo.xi[]        % abscissa values for columns of the scalp maps
-%           clustinfo.yi[]        % ordinate values for rows of the scalp maps
-%
-%         clustinfo.dipole        % array of component dipole information structs
-%                                 % with same format as EEG.dipfit.model
+%         .dipole        % [(1,ncomps) struct array] comp. dipole information 
+%                        % Same format as EEG.dipfit.model ( see >> help dipfit)
 % Example:
-%         % To plot the ERPs for all Cluster-3 components from a STUDY
+%         % To overplot the ERPs for all Cluster 3 components in a STUDY
 %         %
-%         clustinfo = std_clustread(STUDY, ALLEEG, 3, 'erp');
-%         figure; plot(clustinfo.erp_times, clustinfo.erp);
+%         clstinfo = std_clustread(STUDY, ALLEEG, 3, 'erp');
+%         figure; plot(clstinfo.erp_times, clstinfo.erp);
 % 
 % Author: Hilit Serby, Scott Makeig & Arnaud Delorme, SCCN/INC/UCSD, 2005-
+
+%123456789012345678901234567890123456789012345678901234567890123456789012
+
+% Copyright (C) Arnaud Delorme & Scott Makeig, SCCN/INC/UCSD, July 22, 2005, smakeig@ucsd.edu
+%
+% This program is free software; you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation; either version 2 of the License, or
+% (at your option) any later version.
+%
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+% You should have received a copy of the GNU General Public License
+% along with this program; if not, write to the Free Software
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 function clustinfo = std_clustread(STUDY,ALLEEG, cluster, infotype, condition);
 
@@ -60,23 +82,28 @@ if nargin < 4
     return;
 end
 if nargin < 5
-  condition = 1; % default
+  condition = []; % default
 end
 
 if ~iscell(infotype), 
     infotype = { infotype }; 
 end;
 
-clustinfo = [];
-clustinfo.name       = STUDY.cluster(cluster).name;
-clustinfo.clusternum = cluster;
-clustinfo.comps      = STUDY.cluster(cluster).comps;
-clustinfo.condition  = condition;
+clustinfo = [];      % initialize
+clustinfo.clustname  = STUDY.cluster(cluster).name;
+clustinfo.clustnum   = cluster;
+clustinfo.clustcomp  = STUDY.cluster(cluster).comps;
+
+if isempty(condition)
+  clustinfo.conditions  = STUDY.condition; % all conditions
+else
+  clustinfo.conditions = condition;
+end
 
 ncomps = length(STUDY.cluster(cluster).comps);
 for k = 1:ncomps %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for each cluster component %%%%%%%%%%%%%%
     
-    abset = [STUDY.datasetinfo(STUDY.cluster(cluster).sets(condition,k)).index];
+    abset = [STUDY.datasetinfo(STUDY.cluster(cluster).sets(condition,k)).index]; % ??? condition ???
     comp  = STUDY.cluster(cluster).comps(k);
     % clustinfo.subject{k} = ??? UNIMPLEMENTED 
     % clustinfo.group{k} = ??? UNIMPLEMENTED BECAUSE OF CLUSTER.SETS PROBLEM
