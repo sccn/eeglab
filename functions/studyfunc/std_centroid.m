@@ -68,6 +68,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2006/03/20 17:34:50  arno
+% new std_clustread
+%
 % Revision 1.24  2006/03/14 02:55:44  scott
 % help msg
 %
@@ -235,81 +238,77 @@ for k = 1:length(clsind)
 end   
 fprintf('centroid (only done once)\n');
 if itcC | erspC | specC | erpC | scalpC
-    for cond = 1:Ncond %compute for all conditions
-        for clust = 1:length(clsind) %go over all requested clusters
-            for ind = 1:size(STUDY.setind,2) %go through all datasets in STUDY
-                abset = STUDY.datasetinfo(STUDY.setind(cond,ind)).index;
-                compind = find(STUDY.cluster(clsind(clust)).sets(1,:) == ind);
-                for k = 1:length(compind) % go through all components
-                    comp = STUDY.cluster(clsind(clust)).comps(compind(k));
-                    if scalpC & cond == 1  %scalp centroid, does not depend on condition 
-                        grid = std_readtopo(ALLEEG, abset, comp);
-                        if isempty(grid)
-                            return;
-                        end
-                        centroid{clust}.scalp = centroid{clust}.scalp + grid;
+    for clust = 1:length(clsind) %go over all requested clusters
+        for cond = 1:Ncond %compute for all conditions
+            for k = 1:length(STUDY.cluster(clsind(clust)).comps) % go through all components
+                comp  = STUDY.cluster(clsind(clust)).comps(k);
+                abset = STUDY.cluster(clsind(clust)).sets(cond,k);
+                if scalpC & cond == 1  %scalp centroid, does not depend on condition 
+                    grid = std_readtopo(ALLEEG, abset, comp);
+                    if isempty(grid)
+                        return;
                     end
-                    if erpC %erp centroid
-                        [erp, t] = std_readerp(ALLEEG, abset, comp, STUDY.preclust.erpclusttimes);
-                        fprintf('.');
-                        if isempty(erp)
-                            return;
-                        end
-                        if (k==1) & (ind == STUDY.cluster(clsind(clust)).sets(1,1))
-                            all_erp = zeros(length(erp),length(STUDY.cluster(clsind(clust)).comps));
-                        end
-                        all_erp(:,compind(k)) = erp';
-                        if (k == length(compind) ) &  (ind == STUDY.cluster(clsind(clust)).sets(1,end)) 
-                            [all_erp pol] = std_comppol(all_erp);
-                            centroid{clust}.erp{cond} = mean(all_erp,2);
-                            centroid{clust}.erp_times = t;
-                        end
+                    centroid{clust}.scalp = centroid{clust}.scalp + grid;
+                end
+                if erpC %erp centroid
+                    [erp, t] = std_readerp(ALLEEG, abset, comp, STUDY.preclust.erpclusttimes);
+                    fprintf('.');
+                    if isempty(erp)
+                        return;
                     end
-                    if specC %spec centroid
-                        [spec, f] = std_readspec(ALLEEG, abset, comp, STUDY.preclust.specclustfreqs);
-                        fprintf('.');
-                        if isempty(spec)
-                            return;
-                        end
-                        centroid{clust}.spec{cond} = centroid{clust}.spec{cond} + spec;
-                        centroid{clust}.spec_freqs = f;
+                    if (cond==1) & (k==1)
+                        all_erp = zeros(length(erp),length(STUDY.cluster(clsind(clust)).comps));
                     end
-                    if erspC %ersp centroid
-                        fprintf('.');
-                        if cond == 1
-                            abset = [STUDY.datasetinfo(STUDY.setind(:,ind)).index];
-                            [ersp, logfreqs, timevals] = std_readersp(ALLEEG, abset, comp, STUDY.preclust.erspclusttimes, ...
-                                                                    STUDY.preclust.erspclustfreqs );
-                            if isempty(ersp)
-                                return;
-                            end
-                            for m = 1:Ncond
-                                centroid{clust}.ersp{m} = centroid{clust}.ersp{m} + ersp(:,:,m);
-                                centroid{clust}.ersp_limits{m} = max(floor(max(max(abs(ersp(:,:,m))))), centroid{clust}.ersp_limits{m});
-                            end
-                            centroid{clust}.ersp_freqs  = logfreqs;
-                            centroid{clust}.ersp_times = timevals;
-                            abset = STUDY.datasetinfo(STUDY.setind(cond,ind)).index; %return  default value
-                        end
-                    end
-                    if itcC %itc centroid
-                        fprintf('.');
-                        [itc, logfreqs, timevals] = std_readitc(ALLEEG, abset, comp, STUDY.preclust.erspclusttimes, ...
-                                                                    STUDY.preclust.erspclustfreqs );
-                        if isempty(itc)
-                            return;
-                        end
-                        centroid{clust}.itc{cond} = centroid{clust}.itc{cond} + itc;
-                        centroid{clust}.itc_limits{cond} = max(floor(max(max(abs(itc)))), centroid{clust}.itc_limits{cond}); %ersp image limits 
-                        centroid{clust}.itc_freqs  = logfreqs;
-                        centroid{clust}.itc_times = timevals;
+                    all_erp(:,k) = erp';
+                    if k == length(STUDY.cluster(clsind(clust)).comps)
+                        [all_erp pol] = std_comppol(all_erp);
+                        centroid{clust}.erp{cond} = mean(all_erp,2);
+                        centroid{clust}.erp_times = t;
                     end
                 end
+                if specC %spec centroid
+                    [spec, f] = std_readspec(ALLEEG, abset, comp, STUDY.preclust.specclustfreqs);
+                    fprintf('.');
+                    if isempty(spec)
+                        return;
+                    end
+                    centroid{clust}.spec{cond} = centroid{clust}.spec{cond} + spec;
+                    centroid{clust}.spec_freqs = f;
+                end
+                if erspC %ersp centroid
+                    fprintf('.');
+                    if cond == 1
+                        tmpabset = STUDY.cluster(clsind(clust)).sets(:,k);
+                        [ersp, logfreqs, timevals] = std_readersp(ALLEEG, tmpabset, comp, STUDY.preclust.erspclusttimes, ...
+                                                                STUDY.preclust.erspclustfreqs );
+                        if isempty(ersp)
+                            return;
+                        end
+                        for m = 1:Ncond
+                            centroid{clust}.ersp{m} = centroid{clust}.ersp{m} + ersp(:,:,m);
+                            centroid{clust}.ersp_limits{m} = max(floor(max(max(abs(ersp(:,:,m))))), centroid{clust}.ersp_limits{m});
+                        end
+                        centroid{clust}.ersp_freqs  = logfreqs;
+                        centroid{clust}.ersp_times = timevals;
+                    end
+                end
+                if itcC %itc centroid
+                    fprintf('.');
+                    [itc, logfreqs, timevals] = std_readitc(ALLEEG, abset, comp, STUDY.preclust.erspclusttimes, ...
+                                                                STUDY.preclust.erspclustfreqs );
+                    if isempty(itc)
+                        return;
+                    end
+                    centroid{clust}.itc{cond} = centroid{clust}.itc{cond} + itc;
+                    centroid{clust}.itc_limits{cond} = max(floor(max(max(abs(itc)))), centroid{clust}.itc_limits{cond}); %ersp image limits 
+                    centroid{clust}.itc_freqs  = logfreqs;
+                    centroid{clust}.itc_times = timevals;
+                end
             end
-            if ~scalpC
-                fprintf('\n');
-            end;
         end
+        if ~scalpC
+            fprintf('\n');
+        end;
 	end
 end
 
@@ -323,8 +322,8 @@ if dipoleC %dipole centroid
         ndip = 0;
         for k = 1:len 
             fprintf('.');
-            abset = STUDY.datasetinfo(STUDY.setind(1,STUDY.cluster(clsind(clust)).sets(1,k))).index;
-            comp = STUDY.cluster(clsind(clust)).comps(k);
+            comp  = STUDY.cluster(clsind(clust)).comps(k);
+            abset = STUDY.cluster(clsind(clust)).sets(1,k);
             if ~isfield(ALLEEG(abset), 'dipfit')
                warndlg2(['No dipole information available in dataset ' num2str(abset) ], 'Aborting compute centroid dipole');
                return;
@@ -336,7 +335,7 @@ if dipoleC %dipole centroid
                 tmprv = tmprv + ALLEEG(abset).dipfit.model(comp).rv;
                 if strcmpi(ALLEEG(abset).dipfit.coordformat, 'spherical')
                    if isfield(ALLEEG(abset).dipfit, 'hdmfile') %dipfit 2 spherical model
-                       eval(['load ' ALLEEG(abset).dipfit.hdmfile]);
+                       load('-mat', ALLEEG(abset).dipfit.hdmfile);
                        max_r = max(max_r, max(vol.r));
                    else % old version of dipfit
                        max_r = max(max_r,max(ALLEEG(abset).dipfit.vol.r));

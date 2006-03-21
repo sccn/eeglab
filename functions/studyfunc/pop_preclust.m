@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.41  2006/03/12 03:23:03  arno
+% save study
+%
 % Revision 1.40  2006/03/12 02:17:26  arno
 % remove fontsize
 %
@@ -300,7 +303,6 @@ if ~isstr(varargin{1}) %intial settings
     % -------------------
     dipselect = 0;
     options{3} = cls(os.clus_list); % hierarchical clustering
-    options{4} = [];
 
     %if ~(os.preclust_PCA) %create PCA data for clustering
     %preclust_command = '[STUDY ALLEEG] = eeg_createdata(STUDY, ALLEEG, ';
@@ -369,7 +371,7 @@ if ~isstr(varargin{1}) %intial settings
     
     % evaluate command
     % ----------------
-    if length(options) == 4
+    if length(options) == 3
         warndlg2('No measure selected, abording operation.'); 
         return; 
     end;

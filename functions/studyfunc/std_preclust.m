@@ -13,9 +13,9 @@
 %                  EEG sets are also saved to disk. Called by pop_preclust(). Follow with 
 %                  eeg_clust() or pop_clust().
 % Usage:    
-%              >> [ALLEEG,STUDY] = std_preclust(ALLEEG,STUDY); % cluster all comps in all sets
-%              >> [ALLEEG,STUDY] = std_preclust(ALLEEG,STUDY,clustind,compind, ...
-%                                                                 {preproc1}, {preproc2},...);
+%                >> [ALLEEG,STUDY] = std_preclust(ALLEEG,STUDY); % cluster all comps in all sets
+%                >> [ALLEEG,STUDY] = std_preclust(ALLEEG,STUDY,clustind,preproc1,...);
+%
 % Required inputs:
 %   ALLEEG       - ALLEEG vector of one or more loaded EEG dataset structures
 %   STUDY        - an EEGLAB STUDY set of loaded EEG structures
@@ -25,24 +25,11 @@
 %                  to cluster a mu component cluster into left mu and right mu sub-clusters. 
 %                  Should be empty for first stage (whole STUDY) clustering {default: []}
 %
-%   compind      - [ cell array | filename | [] ] Indices of dataset components to cluster. 
-%                  A cell array of vectors of component indices for each dataset: Empty brackets 
-%                  ([]) means all components in a dataset; 0 means none of them.
-%                  For example: {[2:5] [10:15] [] [0]} includes components 2 to 5 from the first 
-%                  dataset, components 10 to 15 from the second dataset, excludes dataset three, 
-%                  but includes all components of the fourth dataset.
-%                  Else, a quoted string containing the name of a .mat file containing such a cell 
-%                  array variable named 'clustcomp' {default: [] => include all components 
-%                  from all datasets}.
+%   preprocX     - {'comnd' 'key1' val1 'key2' val2 ...} component clustering measures to prepare
 %
-%   preproc(s)   - cell array(s) {'measure' 'key1' val1 'key2' val2 ...} of component clustering 
-%                  measures to prepare and store for clustering. Each such cell array gives
-%                  all ncessary parameters for the named preprocessing 'measure'. See Example
-%                  below.
-%
-%               'measure' = component measures to compute:
+%                  'comnd' = component measures to compute:
 %                    'erp'     = cluster on the component ERPs,
-%                    'dipoles' = cluster on the component [x y z] dipole locations
+%                    'dipoles' = cluster on the component [X Y Z] dipole locations
 %                    'dipselect' = select components to cluster that have residual 
 %                                  dipole variance less than a specified threshold. 
 %                    'spec'    = cluster on the component log activity spectra (in dB)
@@ -60,7 +47,7 @@
 %                    'finaldim' = final number of dimensions. Enables second-level PCA. 
 %                                  By default this command is not used (see Example below).
 %
-%               'key' = optional inputs used in computing the specified measures (require [values]):
+%                  'key'   optional inputs used in computing  the specified measures:
 %                    'npca'    =  [integer] number of principal components (PCA dimension) of 
 %                                   the selected measures to retain for clustering. {default: 5}
 %                    'norm'    =  [0|1] 1 -> normalize the PCA components so the variance of 
@@ -90,8 +77,7 @@
 %   STUDY        - the input STUDY set with pre-clustering data added, for use by pop_clust() 
 %
 % Example:
-%   >> [ALLEEG  STUDY] = std_preclust(ALLEEG, STUDY, [], [] , ...
-%                        { 'dipselect'  'rv'  0.15  } ,...
+%   >> [ALLEEG  STUDY] = std_preclust(ALLEEG, STUDY, [], [] , { 'dipselect'  'rv'  0.15  } ,...
 %                        { 'spec'  'npca' 10 'norm' 1 'weight' 1 'freqrange'  [ 3 25 ] } , ...
 %                        { 'erp'   'npca' 10 'norm' 1 'weight' 2 'timewindow' [ 350 500 ] } ,...
 %                        { 'scalp' 'npca' 10 'norm' 1 'weight' 2 'abso' 1 } , ...
@@ -115,7 +101,7 @@
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
-% Copyright (C) Arnaud Delorme & Scott Makeig, SCCN/INC/UCSD, May 13,2004, smakeig@ucsd.edu
+% Copyright (C) Hilit Serby, SCCN, INC, UCSD, May 13,2004, hilit@sccn.ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -235,19 +221,15 @@
 % final fix
 %
 
-function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, components_ind, varargin)
+function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
     
     if nargin < 2
         help std_preclust;
         return;
     end;
     if nargin == 2
-        cluster_ind = []; % default to clustering the whole STUDY 
+        cluster_ind = 1; % default to clustering the whole STUDY 
     end    
-    if nargin == 3
-        components_ind = []; % default to clustering all components 
-    end    
-
     Ncond = length(STUDY.condition);
     if Ncond == 0
         Ncond = 1;
@@ -255,70 +237,22 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, components
     
     % Get component indices that are part of the cluster 
     % --------------------------------------------------
-    if ~isempty(cluster_ind)
-        if length(cluster_ind) ~= 1
-            error('Only one cluster can be sub-clustered. To sub-cluster multiple clusters, first merge them.');
-        end
-        for k = 1 : size(STUDY.setind,2)   % go over the sets from the first condition (if there are some)
-            sind = find(STUDY.cluster(cluster_ind).sets(1,:) == k); % the component indices that belong to 
-                                                                    % the dataset in the cluster 
-            if isempty(sind)
-                succompind{k} = 0;
-            else
-                succompind{k} = STUDY.cluster(cluster_ind).comps(sind);
-            end
-        end
+    if isempty(cluster_ind)
+        cluster_ind = 1;
+    end;
+    if length(cluster_ind) ~= 1
+        error('Only one cluster can be sub-clustered. To sub-cluster multiple clusters, first merge them.');
     end
-
-    if ~isempty(components_ind) % if there is a component selection
-        if isstr(components_ind) % if input is a .mat file, load component indices
-            try, 
-                eval( [ 'load ' components_ind ]);
-            catch
-                error('The compind argument is not a valid filename')
-            end
-            if isempty('clustcomp')
-                error('The compind .mat file must have a cell array variable ''clustcomp''');
-            end
-            components_ind = clustcomp;
+    for k = 1:size(STUDY.cluster(cluster_ind).sets,2)   % go over the sets from the first condition (if there are some)
+        for cond = 1:Ncond
+            sind = find(STUDY.cluster(cluster_ind).sets(cond,:) == k); % indices of dataset k
+                                                                       % in the cluster 
+            succompind{k} = STUDY.cluster(cluster_ind).comps(sind);
         end
-        if length(components_ind) ~= size(STUDY.setind,2)
-            error('Size of cell array of component indices (''compsind'') ~= (subjects * sessions) in STUDY.');
-        end;
-        if ~isempty(cluster_ind) % components to cluster on must be both part of the specified cluster 
-                                 % and selected components
-            for ind = 1:size(STUDY.setind,2)
-                if isempty(components_ind{ind})
-                    seti = STUDY.datasetinfo(STUDY.setind(1,ind)).index;
-                    components_ind{ind} = 1:size(ALLEEG(seti).icawinv,2);
-                end
-                succompind{ind} = intersect(components_ind{ind}, succompind{ind});
-                if isempty(succompind{ind})
-                    succompind{ind} = 0;
-                end
-            end
-        else
-            succompind = components_ind;
-        end
-    else % no component selection (use pre-selected components)
-        if ~isfield(STUDY.datasetinfo, 'comps')
-            STUDY.datasetinfo(1).comps = [];
-        end;
-        if ~exist('succompind')
-            for ind = 1:size(STUDY.setind,2)
-                succompind{ind} = STUDY.datasetinfo(STUDY.setind(1,ind)).comps; 
-            end;
-        end
-    end
-    
+    end;
     for ind = 1:size(STUDY.setind,2)
-        if isempty(succompind{ind})
-            seti = STUDY.datasetinfo(STUDY.setind(1,ind)).index;
-            succompind{ind} = 1:size(ALLEEG(seti).icawinv,2);
-        else
-            succompind{ind} = succompind{ind}(find(succompind{ind}));% remove zeros
-            succompind{ind} = sort(succompind{ind}); % sort the components
-        end
+        succompind{ind} = succompind{ind}(find(succompind{ind}));% remove zeros (there should not be any but? -Arno)
+        succompind{ind} = sort(succompind{ind}); % sort the components
     end;
     
     % Decode input arguments
@@ -344,96 +278,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, components
     % -----------------------------------------------
     nodip = 0;
     if update_flag % dipole information is used to select components
-        
-        % remove previous clusters
-        % ------------------------
-        STUDY.cluster = [];
-        STUDY = std_checkset(STUDY, ALLEEG);
-        
-        % find dipoles of interest
-        % ------------------------
-        for si = 1:size(STUDY.setind,2)% scan datasets that are part of STUDY
-            idat = STUDY.datasetinfo(STUDY.setind(1,si)).index;
-            if isfield(ALLEEG(idat).dipfit, 'model')
-                fprintf('Selecting dipole with less than %2.1f residual variance in dataset ''%s''\n', 100*rv, ALLEEG(idat).setname)
-                indrm = []; % components that will be removed from the clustering
-                indleft = []; % components that are left in clustering
-                for icomp = succompind{si} % scan components
-                    if (ALLEEG(idat).dipfit.model(icomp).rv >= rv) | isnan(ALLEEG(idat).dipfit.model(icomp).rv) 
-                        % Components have rv bigger than asked for 
-                        % fprintf('Component %d of dataset %d has no dipole info and was removed\n', icomp, idat)
-                        indrm = [indrm icomp];
-                    else
-                        indleft = [indleft icomp];
-                    end;
-                end;
-                if ~isempty(indrm)
-                    succompind{si} = indleft;
-                end
-            else
-                fprintf('No dipole information found in ''%s'' dataset, using all components\n', ALLEEG.setname)
-                nodip = 1;
-            end
-        end;
-        if nodip
-            error('Some dipole information is missing; thus, dipole information may not be used for clustering\n');
-        end;
-        
-        % Create a cluster of removed components 
-        % --------------------------------------
-        update_flag = 0;
-        if isempty(cluster_ind) % first step clustering
-            for si = 1:size(STUDY.setind,2)
-                idat = STUDY.datasetinfo(STUDY.setind(1,si)).index;
-                % Check if not all components in this dataset are part of the clustering
-                rmind = setdiff([1:size(ALLEEG(idat).icawinv,2)], succompind{si});
-                if ~isempty(rmind) 
-                    rmcomp{si} = rmind;
-                    update_flag = 1;
-                end
-            end
-        else % cluster on a specific cluster components
-            for si = 1:size(STUDY.setind,2)
-                % Check if not all components in the cluster are part of the clustering
-                compind = find(STUDY.cluster(cluster_ind).sets(1,:) == si);
-                rmind = setdiff(STUDY.cluster(cluster_ind).comps(compind), succompind{si});  
-                if ~isempty(rmind) 
-                    rmcomp{si} = rmind;
-                    update_flag = 1;
-                end
-            end
-        end
-        if update_flag % Update STUDY with new components
-            if isempty(cluster_ind)
-                a =  ['% A subset of components with dipole information were readied for clustering.'...
-                        'Other components were placed in a separate cluster'];
-                [STUDY] = std_createclust(STUDY, ALLEEG, 'Notclust');
-                STUDY.cluster(end).parent{end} = STUDY.cluster(1).name; 
-                STUDY.cluster(1).child{end+1} = STUDY.cluster(end).name;
-            else
-                a =  ['% A subset of components from ' STUDY.cluster(cluster_ind).name  'with dipole information, were readied for clustering.' ...
-                    'Other components were placed in a separate cluster'];    
-                [STUDY] = std_createclust(STUDY, ALLEEG, [ 'Notclust ' num2str(cluster_ind) ] );
-                STUDY.cluster(end).parent{end} = STUDY.cluster(cluster_ind).name;
-                STUDY.cluster(cluster_ind).child{end+1} = STUDY.cluster(end).name;
-            end
-            for k = 1: length(rmcomp)
-                if ~isempty(rmcomp{k})
-                    STUDY.cluster(end).sets = [STUDY.cluster(end).sets k*ones(1,length(rmcomp{k}))];
-                    STUDY.cluster(end).comps = [STUDY.cluster(end).comps rmcomp{k}];
-                end
-            end
-            if Ncond > 1
-                tmp = ones(Ncond, length(STUDY.cluster(end).sets));
-                for l = 1:Ncond
-                    tmp(l,:) = STUDY.cluster(end).sets + (l-1)*size(STUDY.setind,2);
-                end
-                STUDY.cluster(end).sets = tmp;
-                clear tmp
-			end
-
-            STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);
-        end;
+        error('Update flag is obsolete');
     end;
     
     % scan all commands

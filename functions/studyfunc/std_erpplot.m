@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2006/03/20 17:36:37  arno
+% new std_clustread call
+%
 % Revision 1.16  2006/03/12 04:21:45  arno
 % component polarity
 %
@@ -384,8 +387,8 @@ for ci = 1 : length(comp_ind) %for each comp
     orient tall
     set(gcf,'Color', BACKCOLOR);
     for n = 1:Ncond  %for each cond
-        abset = STUDY.datasetinfo(STUDY.setind(n,STUDY.cluster(cls).sets(1,comp_ind(ci)))).index;
-        subject = STUDY.datasetinfo(STUDY.setind(n,STUDY.cluster(cls).sets(1,comp_ind(ci)))).subject;
+        abset    = STUDY.datasetinfo(STUDY.cluster(cls).sets(n,comp_ind(ci))).index;
+        subject  = STUDY.datasetinfo(STUDY.cluster(cls).sets(n,comp_ind(ci))).subject;
         handl(n) = sbplot(rowcols(1),rowcols(2),n);
         hold on
         if Ncond  > 1

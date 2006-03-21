@@ -1309,7 +1309,7 @@ if strcmpi(env_erp,'all') % all sets in STUDY
     sets = STUDY.setind(n,:);
 else % Only sets that contribute to the clusters
     for k = 1:length(cls)
-        sets = [sets STUDY.setind(n,unique(STUDY.cluster(cls(k)).sets(1,:)))];
+        sets = [sets unique(STUDY.cluster(cls(k)).sets(n,:)) ];
     end
     sets = unique(sets);
 end
@@ -1318,11 +1318,12 @@ end
 if exist('subclus') 
     if ~isempty(subclus)
         for k = 1: length(sets)
-            rel_set = find(STUDY.setind(n,:) == sets(k)); %set index relative to STUDY instead of absolute in ALLEEG
             tmp = [];
             for l = 1:length(subclus)
-                compind = find(STUDY.cluster(subclus(l)).sets(1,:) == rel_set );
-                tmp = [tmp STUDY.cluster(subclus(l)).comps(compind)];
+                for cond = 1:size(STUDY.setind,2)
+                    compind = find(STUDY.cluster(subclus(l)).sets(cond,:) == sets(k) );
+                    tmp     = [tmp STUDY.cluster(subclus(l)).comps(compind)];
+                end;
             end
             subcomps{k} = tmp;
         end

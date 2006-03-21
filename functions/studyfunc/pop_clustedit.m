@@ -520,7 +520,7 @@ else
                 compid{1} = 'All components';
                 % Convert from components numbering to the indexing form 'setXcomY'
                 for l = 1:len % go over the components of the cluster
-                    subject = STUDY.datasetinfo(STUDY.setind(1,STUDY.cluster(cls(cind-1)).sets(1,l))).subject;
+                    subject = STUDY.datasetinfo(STUDY.cluster(cls(cind-1)).sets(1,l)).subject;
                     compid{l+1} = [  subject ' IC' num2str(STUDY.cluster(cls(cind-1)).comps(1,l)) ];
                 end
                 if isfield(STUDY.cluster, 'selected')
@@ -535,7 +535,7 @@ else
                     if ~strncmpi('Notclust',STUDY.cluster(cls(k)).name,8) & ~strncmpi('Outliers',STUDY.cluster(cls(k)).name,8) & ...
                             (~strncmpi('ParentCluster',STUDY.cluster(cls(k)).name,13)) 
                         for l = 1: length(STUDY.cluster(cls(k)).comps)
-                            subject = STUDY.datasetinfo(STUDY.setind(1,STUDY.cluster(cls(k)).sets(1,l))).subject;
+                            subject = STUDY.datasetinfo(STUDY.cluster(cls(k)).sets(1,l)).subject;
                             compid{count} = [ '''' STUDY.cluster(cls(k)).name ''' comp. ' ...
                                               num2str(l) ' (' subject  ' IC' num2str(STUDY.cluster(cls(k)).comps(l)) ')'];
                             count = count +1;

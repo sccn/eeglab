@@ -127,8 +127,8 @@ if strcmpi(mode, 'apart')  % case each cluster on a separate figure
                 STUDY = std_centroid(STUDY,ALLEEG, cls(clus) , 'dipole');
             end
             for k = 1:len
-                abset = STUDY.datasetinfo(STUDY.setind(1,STUDY.cluster(cls(clus)).sets(1,k))).index;
-                subject = STUDY.datasetinfo(STUDY.setind(1,STUDY.cluster(cls(clus)).sets(1,k))).subject;
+                abset   = STUDY.datasetinfo(STUDY.cluster(cls(clus)).sets(1,k)).index;
+                subject = STUDY.datasetinfo(STUDY.cluster(cls(clus)).sets(1,k)).subject;
                if ~isfield(ALLEEG(abset), 'dipfit')
                    warndlg2(['No dipole information available in dataset ' ALLEEG(abset).filename ' , abort plotting'], 'Aborting plot dipoles');
                    return;
@@ -137,7 +137,7 @@ if strcmpi(mode, 'apart')  % case each cluster on a separate figure
                cluster_dip_models(k) = ALLEEG(abset).dipfit.model(comp);
                if strcmpi(ALLEEG(abset).dipfit.coordformat, 'spherical')
                    if isfield(ALLEEG(abset).dipfit, 'hdmfile') %dipfit 2 spherical model
-                       eval(['load ' ALLEEG(abset).dipfit.hdmfile]);
+                       load('-mat', ALLEEG(abset).dipfit.hdmfile);
                        max_r = max(max_r, max(vol.r));
                    else % old version of dipfit
                        max_r = max(max_r,max(ALLEEG(abset).dipfit.vol.r));
@@ -174,7 +174,7 @@ if strcmpi(mode, 'apart')  % case each cluster on a separate figure
            end
            if ndip < 6 % less than 6 dipoles, plot projected lines 
                options{end+1} = 'projlines';
-               options{end+1} = 'on'
+               options{end+1} = 'on';
            end
            
            if figureon
@@ -223,7 +223,7 @@ if strcmpi(mode, 'joined')  % case all clusters are plotted in the same figure (
             STUDY = std_centroid(STUDY,ALLEEG, cls(l) , 'dipole');
         end
         for k = 1: len
-            abset = STUDY.datasetinfo(STUDY.setind(1,STUDY.cluster(cls(l)).sets(1,k))).index;
+            abset = STUDY.datasetinfo(STUDY.cluster(cls(l)).sets(1,k)).index;
            if ~isfield(ALLEEG(abset), 'dipfit')
                warndlg2(['No dipole information available in dataset ' num2str(abset) ' , abort plotting'], 'Aborting plot dipoles');
                return;
@@ -232,7 +232,7 @@ if strcmpi(mode, 'joined')  % case all clusters are plotted in the same figure (
            cluster_dip_models(k) = ALLEEG(abset).dipfit.model(comp);
            if strcmpi(ALLEEG(abset).dipfit.coordformat, 'spherical')
                 if isfield(ALLEEG(abset).dipfit, 'hdmfile') %dipfit 2 spherical model
-                   eval(['load ' ALLEEG(abset).dipfit.hdmfile]);
+                   load('-mat', ALLEEG(abset).dipfit.hdmfile);
                    max_r = max(max_r, max(vol.r));
                else % old version of dipfit
                    max_r = max(max_r,max(ALLEEG(abset).dipfit.vol.r));
@@ -349,9 +349,9 @@ else
 end
 
 for ci = 1:length(comp_ind)
-    abset = STUDY.datasetinfo(STUDY.setind(1,STUDY.cluster(cls).sets(1,comp_ind(ci)))).index;
+    abset = STUDY.datasetinfo(STUDY.cluster(cls).sets(1,comp_ind(ci))).index;
     comp = STUDY.cluster(cls).comps(comp_ind(ci));
-    subject = STUDY.datasetinfo(STUDY.setind(1,STUDY.cluster(cls).sets(1,comp_ind(ci)))).subject;
+    subject = STUDY.datasetinfo(STUDY.cluster(cls).sets(1,comp_ind(ci))).subject;
     if ~isfield(ALLEEG(abset), 'dipfit')
         warndlg2(['No dipole information available in dataset ' num2str(abset) ' , abort plotting'], 'Aborting plot dipoles');
         return;
@@ -364,7 +364,7 @@ for ci = 1:length(comp_ind)
     cluster_dip_models(2) = STUDY.cluster(cls).centroid.dipole;
     if strcmpi(ALLEEG(abset).dipfit.coordformat, 'spherical')
         if isfield(ALLEEG(abset).dipfit, 'hdmfile') %dipfit 2 spherical model
-            eval(['load ' ALLEEG(abset).dipfit.hdmfile]);
+            load('-mat', ALLEEG(abset).dipfit.hdmfile);
             max_r = max(vol.r);
         else
             max_r = max(ALLEEG(abset).dipfit.vol.r);

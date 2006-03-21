@@ -170,8 +170,8 @@ if strcmpi(mode, 'comps')
                 'fti = log(fti); set(gca, ''''ytick'''',fti); set(gca, ''''yticklabel'''',num2str(ft)); xlabel(''''Time [ms]''''); cbar(''pos''); clear ft fti;' ]);
             cbar('pos');
             for k = 1:len % Plot the individual component itc  
-                abset = STUDY.datasetinfo(STUDY.setind(n,STUDY.cluster(cls(clus)).sets(1,k))).index;
-                subject = STUDY.datasetinfo(STUDY.setind(n,STUDY.cluster(cls(clus)).sets(1,k))).subject;
+                abset   = STUDY.datasetinfo(STUDY.cluster(cls(clus)).sets(n,k)).index;
+                subject = STUDY.datasetinfo(STUDY.cluster(cls(clus)).sets(n,k)).subject;
                 comp = STUDY.cluster(cls(clus)).comps(k);
                 a = [ 'ic' num2str(comp) '/' subject];
                 if k <= rowcols(2) - 2 %first sbplot row
@@ -403,7 +403,7 @@ end
 for ci = 1 : length(comp_ind) %for each comp
    rowcols(2) = ceil(sqrt(Ncond)); rowcols(1) = ceil((Ncond)/rowcols(2));
    comp = STUDY.cluster(cls).comps(comp_ind(ci));     
-   subject = STUDY.datasetinfo(STUDY.setind(1,STUDY.cluster(cls).sets(1,comp_ind(ci)))).subject;
+   subject = STUDY.datasetinfo(STUDY.cluster(cls).sets(1,comp_ind(ci))).subject;
    
    % figure properties
    % -----------------
@@ -416,7 +416,7 @@ for ci = 1 : length(comp_ind) %for each comp
    
    maxval = 0;
    for n = 1:Ncond  %for each cond
-        abset = STUDY.datasetinfo(STUDY.setind(n,STUDY.cluster(cls).sets(1,comp_ind(ci)))).index;
+        abset = STUDY.datasetinfo(STUDY.cluster(cls).sets(n,comp_ind(ci))).index;
         [itc{n}, logfreqs, timevals] = std_readitc(ALLEEG, abset, comp, STUDY.preclust.erspclusttimes, STUDY.preclust.erspclustfreqs );
         maxval = max(maxval, max(max(itc{n})));
    end;

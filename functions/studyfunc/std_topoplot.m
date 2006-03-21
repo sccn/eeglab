@@ -137,25 +137,25 @@ if strcmpi(mode, 'comps')
                 return;
            end
             for k = 1:len
-                abset = STUDY.datasetinfo(STUDY.setind(1,STUDY.cluster(cls(clus)).sets(1,k))).index;
-                subject = STUDY.datasetinfo(STUDY.setind(1,STUDY.cluster(cls(clus)).sets(1,k))).subject;
+                abset   = STUDY.datasetinfo(STUDY.cluster(cls(clus)).sets(1,k)).index;
+                subject = STUDY.datasetinfo(STUDY.cluster(cls(clus)).sets(1,k)).subject;
                 comp = STUDY.cluster(cls(clus)).comps(k);
-                [Xi,Yi] = meshgrid(clusscalp.yi{k},clusscalp.xi{k});                     
+                [Xi,Yi] = meshgrid(clusscalp.yi,clusscalp.xi);                     
                 % Compute correlation between a component and the average scalp map to determine polarity. 
-                tmp_grid = clusscalp.scalp{k};
+                tmp_grid = squeeze(clusscalp.scalp(k,:,:));
                 tmp_grid(find(isnan(tmp_grid))) = 0;% remove NaN values from grid for later correlation calculation.  
                 grid_pol = corrcoef(tmp_grid(:), tmp_ave(:)); % compute correlation.  
                 grid_pol = sign(grid_pol(1,2));
                 if k <= rowcols(2) - 2 %first sbplot row
                     figure(h_topo);
                     sbplot(rowcols(1),rowcols(2),k+2) , 
-                    toporeplot(grid_pol*clusscalp.scalp{k}, 'style', 'both', 'plotrad',0.5,'intrad',0.5, 'verbose', 'off','xsurface', Xi, 'ysurface', Yi );
+                    toporeplot(grid_pol*squeeze(clusscalp.scalp(k,:,:)), 'style', 'both', 'plotrad',0.5,'intrad',0.5, 'verbose', 'off','xsurface', Xi, 'ysurface', Yi );
                     title([ 'ic' num2str(comp) '/' subject ]);
                     %waitbar(k/(len+1),h_wait)
                 else %other sbplot rows
                     figure(h_topo)
                     sbplot(rowcols(1),rowcols(2),k+4) , 
-                    toporeplot(grid_pol*clusscalp.scalp{k}, 'style', 'both', 'plotrad',0.5,'intrad',0.5, 'verbose', 'off','xsurface', Xi, 'ysurface', Yi );
+                    toporeplot(grid_pol*squeeze(clusscalp.scalp(k,:,:)), 'style', 'both', 'plotrad',0.5,'intrad',0.5, 'verbose', 'off','xsurface', Xi, 'ysurface', Yi );
                     title([ 'ic' num2str(comp) '/' subject ]);
                     %waitbar(k/(len+1),h_wait)
                 end
@@ -283,9 +283,9 @@ else
     comp_ind = varargin{1}; 
 end
 for ci = 1:length(comp_ind)
-    abset = STUDY.datasetinfo(STUDY.setind(1,STUDY.cluster(cls).sets(1,comp_ind(ci)))).index;
-    comp = STUDY.cluster(cls).comps(comp_ind(ci));
-    subject = STUDY.datasetinfo(STUDY.setind(1,STUDY.cluster(cls).sets(1,comp_ind(ci)))).subject;
+    abset = STUDY.datasetinfo(STUDY.cluster(cls).sets(1,comp_ind(ci))).index;
+    comp  = STUDY.cluster(cls).comps(comp_ind(ci));
+    subject = STUDY.datasetinfo(STUDY.cluster(cls).sets(1,comp_ind(ci))).subject;
     [grid, yi, xi] = std_readtopo(ALLEEG, abset, comp);
     [Xi,Yi] = meshgrid(yi,xi);
     figure;

@@ -65,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2006/03/14 03:10:48  scott
+% help msg
+%
 % Revision 1.15  2006/03/10 18:23:37  arno
 % rename variables
 %
@@ -261,7 +264,7 @@ if strcmpi(mode, 'centroid')
                     waitbar(k/len,h_wait);
                 end
             end
-            if mod(k, rowcols(2)) == 1 & (floor(k/rowcols(2)) == rowcols(1)-1) & (n == Ncond)
+            if (all(rowcols == 1) | (mod(k, rowcols(2)) == 1 & (floor(k/rowcols(2)) == rowcols(1)-1))) & n == Ncond
                 xlabel('Frequency [Hz]');
                 ylabel('Power [dB]');
                 if len ~= 1
@@ -364,12 +367,12 @@ for ci = 1 : length(comp_ind) %for each comp
     figure
     orient tall
     set(gcf,'Color', BACKCOLOR);
-    subject  = STUDY.datasetinfo(STUDY.setind(1,STUDY.cluster(cls).sets(1,comp_ind(ci)))).subject;
+    subject  = STUDY.datasetinfo(STUDY.cluster(cls).sets(1,comp_ind(ci))).subject;
     if Ncond >1
         textsc(['Spectra, ' subject ' / IC' num2str(comp) ', ' STUDY.cluster(cls).name ],'title');
     end
     for n = 1:Ncond  %for each cond
-        abset = STUDY.datasetinfo(STUDY.setind(n,STUDY.cluster(cls).sets(1,comp_ind(ci)))).index;
+        abset = STUDY.datasetinfo(STUDY.cluster(cls).sets(n,comp_ind(ci))).index;
         sbplot(rowcols(1),rowcols(2),n),
         hold on
         if Ncond  > 1

@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2006/03/20 17:22:45  arno
+% new std_clustread
+%
 % Revision 1.21  2006/03/17 17:54:08  scott
 % help msg format
 %
@@ -214,7 +217,7 @@ if strcmpi(mode, 'comps')
             ave_ersp = STUDY.cluster(cls(clus)).centroid.ersp{n};
             lim = STUDY.cluster(cls(clus)).centroid.ersp_limits{n}; %plotting limits
             
-            idat = STUDY.datasetinfo(STUDY.setind(1,STUDY.cluster(cls(clus)).sets(1,1))).index;
+            idat = STUDY.datasetinfo(STUDY.cluster(cls(clus)).sets(1,1)).index;
 
             logfreqs   = log(STUDY.cluster(cls(clus)).centroid.ersp_freqs);
             ersp_times = STUDY.cluster(cls(clus)).centroid.ersp_times;
@@ -235,8 +238,8 @@ if strcmpi(mode, 'comps')
                 'fti = log(fti); set(gca, ''''ytick'''',fti); set(gca, ''''yticklabel'''',num2str(ft)); xlabel(''''Time [ms]''''); ylabel(''''Frequency [Hz]''''); cbar; clear ft fti;' ]);
             cbar;
             for k = 1:len % Plot the individual component ersp  
-                abset = STUDY.datasetinfo(STUDY.setind(n,STUDY.cluster(cls(clus)).sets(1,k))).index;
-                subject = STUDY.datasetinfo(STUDY.setind(n,STUDY.cluster(cls(clus)).sets(1,k))).subject;
+                abset   = STUDY.datasetinfo(STUDY.cluster(cls(clus)).sets(n,k)).index;
+                subject = STUDY.datasetinfo(STUDY.cluster(cls(clus)).sets(n,k)).subject;
                 comp = STUDY.cluster(cls(clus)).comps(k);
                                 
                 a = [ 'ic' num2str(comp) '/' subject ];
@@ -292,7 +295,7 @@ if strcmpi(mode, 'centroid')
             return
         end
     end
-    abset = STUDY.datasetinfo(STUDY.setind(1,STUDY.cluster(cls(1)).sets(1,1))).index;
+    abset = STUDY.datasetinfo(STUDY.cluster(cls(1)).sets(1,1)).index;
     [tmp tmp2 tmp3] = std_readersp( ALLEEG, abset, []);
 
     if figureon
@@ -466,7 +469,7 @@ for ci = 1 : length(comp_ind) %for each comp
    rowcols(1) = ceil((Ncond)/rowcols(2));
    
    comp = STUDY.cluster(cls).comps(comp_ind(ci));     
-   subject = STUDY.datasetinfo(STUDY.setind(1,STUDY.cluster(cls).sets(1,comp_ind(ci)))).subject;
+   subject = STUDY.datasetinfo(STUDY.cluster(cls).sets(1,comp_ind(ci))).subject;
    
    % figure properties
    % -----------------
@@ -478,10 +481,10 @@ for ci = 1 : length(comp_ind) %for each comp
    set(gcf,'Color', BACKCOLOR);
    
    for n = 1:Ncond  %for each cond
-        abset = STUDY.datasetinfo(STUDY.setind(n,STUDY.cluster(cls).sets(1,comp_ind(ci)))).index;
+        abset = STUDY.datasetinfo(STUDY.cluster(cls).sets(n,comp_ind(ci))).index;
         sbplot(rowcols(1),rowcols(2),n), 
         if n == 1
-            idat = [ STUDY.datasetinfo(STUDY.setind(:,STUDY.cluster(cls).sets(1,comp_ind(ci)))).index ];
+            idat = [ STUDY.datasetinfo(STUDY.cluster(cls).sets(:,comp_ind(ci))).index ];
             [ersp, logfreqs, timeval] = std_readersp(ALLEEG, idat, comp, STUDY.preclust.erspclusttimes,  STUDY.preclust.erspclustfreqs);
             logfreqs = log(logfreqs);
         end

@@ -1,21 +1,21 @@
-% std_checkset() - check STUDY set consistency. Make changes to STUDY and issue
-%                  commandline warnings as needed.
+% std_checkset() - check STUDY set consistency
 %
 % Usage: >> [STUDY, ALLEEG] = std_checkset(STUDY, ALLEEG);  
 %
-% Inputs:
-%   STUDY   - EEGLAB STUDY set
-%   ALLEEG  - vector of EEG datasets included in the STUDY structure 
+% Input:
+%   STUDY      - EEGLAB STUDY set
+%   ALLEEG     - vector of EEG datasets included in the STUDY structure 
 %
-% Outputs:
-%   STUDY   - a possibly modified STUDY set 
-%   ALLEEG  - the unmodified ALLEEG input
+% Output:
+%   STUDY      - a new STUDY set containing some or all of the datasets in ALLEEG, 
+%                plus additional information from the optional inputs above. 
+%   ALLEEG     - an EEGLAB vector of EEG sets included in the STUDY structure 
 %
 % Authors:  Arnaud Delorme & Hilit Serby, SCCN, INC, UCSD, November 2005
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
-% Copyright (C) Arnaud Delorme & Scott Makeig, SCCN/INC/UCSD, smakeig@ucsd.edu
+% Copyright (C) Arnaud Delorme, SCCN, INC, UCSD, arno@sccn.ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -37,52 +37,50 @@ if nargin < 2
     help std_checkset;
     return;
 end;
-modified = 0; % 0 = NO modifications made; 1 = modified
     
-% check existence of all STUDY fields
-% ------------------------------------
-if ~isfield(STUDY, 'name'),  STUDY.name  = ''; modified = 1; end;
-if ~isfield(STUDY, 'task'),  STUDY.task  = ''; modified = 1; end;
-if ~isfield(STUDY, 'notes'), STUDY.notes = ''; modified = 1; end;
-if ~isfield(STUDY, 'filename'),  STUDY.filename  = ''; modified = 1; end;
-if ~isfield(STUDY, 'filepath'),  STUDY.filepath  = ''; modified = 1; end;
-if ~isfield(STUDY, 'history'),   STUDY.history   = ''; modified = 1; end;
-if ~isfield(STUDY, 'subject'),   STUDY.subject   = {}; modified = 1; end;
-if ~isfield(STUDY, 'group'),     STUDY.group     = {}; modified = 1; end;
-if ~isfield(STUDY, 'session'),   STUDY.session   = {}; modified = 1; end;
-if ~isfield(STUDY, 'condition'), STUDY.condition = {}; modified = 1; end;
-if ~isfield(STUDY, 'setind'),    STUDY.setind    = []; modified = 1; end;
-if ~isfield(STUDY, 'etc'),       STUDY.etc       = []; modified = 1; end;
-if ~isfield(STUDY, 'datasetinfo'), STUDY.datasetinfo = []; modified = 1; end;
-if ~isfield(STUDY.datasetinfo, 'comps') & ~isempty(STUDY.datasetinfo), STUDY.datasetinfo(1).comps = []; modified = 1; end;
-if ~isfield(STUDY.datasetinfo, 'index') & ~isempty(STUDY.datasetinfo), STUDY.datasetinfo(1).index = []; modified = 1; end;
+modif = 0;
+if ~isfield(STUDY, 'name'),  STUDY.name  = ''; modif = 1; end;
+if ~isfield(STUDY, 'task'),  STUDY.task  = ''; modif = 1; end;
+if ~isfield(STUDY, 'notes'), STUDY.notes = ''; modif = 1; end;
+if ~isfield(STUDY, 'filename'),  STUDY.filename  = ''; modif = 1; end;
+if ~isfield(STUDY, 'filepath'),  STUDY.filepath  = ''; modif = 1; end;
+if ~isfield(STUDY, 'history'),   STUDY.history   = ''; modif = 1; end;
+if ~isfield(STUDY, 'subject'),   STUDY.subject   = {}; modif = 1; end;
+if ~isfield(STUDY, 'group'),     STUDY.group     = {}; modif = 1; end;
+if ~isfield(STUDY, 'session'),   STUDY.session   = {}; modif = 1; end;
+if ~isfield(STUDY, 'condition'), STUDY.condition = {}; modif = 1; end;
+if ~isfield(STUDY, 'setind'),    STUDY.setind    = []; modif = 1; end;
+if ~isfield(STUDY, 'etc'),       STUDY.etc       = []; modif = 1; end;
+if ~isfield(STUDY, 'datasetinfo'), STUDY.datasetinfo = []; modif = 1; end;
+if ~isfield(STUDY.datasetinfo, 'comps') & ~isempty(STUDY.datasetinfo), STUDY.datasetinfo(1).comps = []; modif = 1; end;
+if ~isfield(STUDY.datasetinfo, 'index') & ~isempty(STUDY.datasetinfo), STUDY.datasetinfo(1).index = []; modif = 1; end;
 
-% check all summary fields
-% -------------------------
+% all summary fields
+% ------------------
 try, subject = unique({ STUDY.datasetinfo.subject });
 catch, 
      subject = ''; 
-     disp('Important warning: Some datasets do not have subject codes; some functions may crash!');
+     disp('Important warning: some datasets do not have subject codes; some functions may crash!');
 end;
 try, group = unique({ STUDY.datasetinfo.group });
 catch, 
      group = ''; 
-     % disp('Important warning: Some datasets do not have group codes; some functions may crash!');
+     % disp('Important warning: some datasets do not have group codes; some functions may crash!');
 end;
 try, condition = unique({ STUDY.datasetinfo.condition });
 catch, 
      condition = ''; 
-     disp('Important warning: Some datasets do not have condition codes; some functions may crash!');
+     disp('Important warning: some datasets do not have condition codes; some functions may crash!');
 end;
 try, session = unique([STUDY.datasetinfo.session]);
 catch, 
      session = ''; 
-     % disp('Important warning: Some datasets do not have session numbers; some functions may crash!');
+     % disp('Important warning: some datasets do not have session numbers; some functions may crash!');
 end;
-if ~isequal(STUDY.subject,   subject  ), STUDY.subject   = subject;   modified = 1; end;  
-if ~isequal(STUDY.group,     group    ), STUDY.group     = group;     modified = 1; end;  
-if ~isequal(STUDY.condition, condition), STUDY.condition = condition; modified = 1; end;  
-if ~isequal(STUDY.session,   session  ), STUDY.session   = session;   modified = 1; end;  
+if ~isequal(STUDY.subject,   subject  ), STUDY.subject   = subject;   modif = 1; end;  
+if ~isequal(STUDY.group,     group    ), STUDY.group     = group;     modif = 1; end;  
+if ~isequal(STUDY.condition, condition), STUDY.condition = condition; modif = 1; end;  
+if ~isequal(STUDY.session,   session  ), STUDY.session   = session;   modif = 1; end;  
 
 % recompute setind matrix
 % -----------------------
@@ -120,11 +118,11 @@ for k = 1:length(STUDY.datasetinfo)
     end
     
     if ~isequal(STUDY.datasetinfo(k).index, k)
-        STUDY.datasetinfo(k).index = k; modified = 1; %The dataset index in the current ALLEEG structure
+        STUDY.datasetinfo(k).index = k; modif = 1; %The dataset index in the current ALLEEG structure
     end;
 end
 
-% set to NaN empty indices and remove NaN columns
+% set to NaN empty indices and remove nan columns
 % -----------------------------------------------
 setind( find(setind(:) == 0) ) = NaN;
 rmind = [];
@@ -134,14 +132,14 @@ for k = 1:size(setind,2)
 end;
 setind(:,rmind) = [];
 if ~isequal(setind, STUDY.setind)
-    STUDY.setind = setind; modified = 1;
+    STUDY.setind = setind; modif = 1;
 end;
 
 % set cluster array if empty
 % --------------------------
-if ~isfield(STUDY, 'cluster'), STUDY.cluster = []; modified = 1; end;
+if ~isfield(STUDY, 'cluster'), STUDY.cluster = []; modif = 1; end;
 if isempty(STUDY.cluster)
-    modified = 1; 
+    modif = 1; 
     [STUDY] = std_createclust(STUDY, ALLEEG, 'ParentCluster');
     STUDY.cluster(1).parent = []; 
     for k = 1:size(STUDY.setind,2)
@@ -159,15 +157,15 @@ else
     for index = 1:length(STUDY.cluster)
         if ~isempty(STUDY.cluster(index).centroid) & ~isstruct(STUDY.cluster(index).centroid)
             STUDY.cluster(index).centroid = [];
-            modified = 1; 
+            modif = 1; 
         end;
     end;    
 end;
 
 % determine if there has been any change
 % --------------------------------------
-if modified;
-    STUDY.saved = 'no'; % mark as "changed without saving to disk"
-    eegh('[STUDY, ALLEEG] = std_checkset(STUDYIN, ALLEEG);'); % add to EEGLAB session history
+if modif;
+    STUDY.saved = 'no';
+    eegh('[STUDY, ALLEEG] = std_checkset(STUDYIN, ALLEEG);');
     STUDY.history =  sprintf('%s\n%s',  STUDY.history, '[STUDY, ALLEEG] = std_checkset(STUDYIN, ALLEEG);');
 end;
