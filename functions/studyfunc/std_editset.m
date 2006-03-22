@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.39  2006/03/21 14:58:10  scott
+% help msg & copyright
+%
 % Revision 1.38  2006/03/12 03:27:27  arno
 % saving file
 %
@@ -235,7 +238,7 @@ for k = 1:2:length(g.commands)
                 % ---------------------------
                 idat = 0;
                 for sc = 1:size(STUDY.setind,1)
-                    if isfield(ALLEEG(STUDY.datasetinfo(STUDY.setind(sc,si)).index).dipfit, 'model')
+                    if ~isnan(STUDY.setind(sc,si)) && isfield(ALLEEG(STUDY.datasetinfo(STUDY.setind(sc,si)).index).dipfit, 'model')
                         idat = STUDY.datasetinfo(STUDY.setind(sc,si)).index;
                         break;
                     end;
@@ -248,7 +251,17 @@ for k = 1:2:length(g.commands)
                         indleft = []; % components that are left in clustering
                         for icomp = 1:length(ALLEEG(idat).dipfit.model)
                             if (ALLEEG(idat).dipfit.model(icomp).rv < rv)
-                                indleft = [indleft icomp];
+                                % Restrict search to chosen components, if components have already been chosen.
+                                % Toby 03.21.2006
+                                if isempty(STUDY.datasetinfo(idat).comps)
+                                   indleft = [indleft icomp];
+                                else
+                                    for isdc = 1:length(STUDY.datasetinfo(idat).comps)
+                                        if icomp == STUDY.datasetinfo(idat).comps(isdc)
+                                            indleft = [indleft STUDY.datasetinfo(idat).comps(isdc)];
+                                        end
+                                    end
+                                end
                             end;
                         end;
                     else
@@ -259,7 +272,9 @@ for k = 1:2:length(g.commands)
                     indleft = [];
                 end;
                 for sc = 1:size(STUDY.setind,1)
-                    STUDY.datasetinfo(STUDY.setind(sc,si)).comps = indleft;
+                    if ~isnan(STUDY.setind(sc,si))
+                       STUDY.datasetinfo(STUDY.setind(sc,si)).comps = indleft;
+                    end
                 end;
             end;
             STUDY.cluster = [];
