@@ -1,6 +1,7 @@
 % std_readersp() - Returns the equal-log-frequency spaced mean event-related spectral 
-%                  perturbation (ERSP) for a requested ICA component. The ERSP is 
-%                  assumed to have been saved in a Matlab file, [dataset_name].icaersp 
+%                  perturbation(s) (ERSP(s)) for a requested ICA component. The ERSP 
+%                  is assumed to have been saved in a Matlab file, 
+%                          [dataset_name].icaersp 
 %                  in the same folder as the dataset file.
 %                  If this file does not exist, use std_ersp() to create it, else 
 %                  use a pre-clustering function: pop_preclust() or std_preclust(), 
@@ -52,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2006/03/14 03:02:51  scott
+% help msg
+%
 % Revision 1.14  2006/03/14 02:23:18  scott
 % help msg
 %
