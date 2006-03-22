@@ -1,5 +1,5 @@
 % std_clustread() - load one or more requested component data measures 
-%                     ['erp'|'spec'|'ersp'|'itc'|'dipole'|'map']
+%                      ['erp'|'spec'|'ersp'|'itc'|'dipole'|'map']
 %                   for all components of a specified cluster.  
 %                   Useful for accessing cluster compoent data in scripts.
 %                   Called by cluster plotting functions: std_envtopo(), 
@@ -8,9 +8,9 @@
 %         >> clustinfo = std_clustread(STUDY,ALLEEG, cluster, ...
 %                                             infotype(s), condition(s));
 % Inputs:
-%         STUDY - studyset structure containing some or all files in ALLEEG
-%        ALLEEG - vector of loaded EEG datasets including STUDY datasets
-%       cluster - cluster number in STUDY
+%         STUDY    - studyset structure comprising some or all datasets in ALLEEG
+%        ALLEEG    - array of loaded EEG datasets including the STUDY datasets
+%       cluster    - index of the cluster in the STUDY
 %      infotype(s) - ['erp'|'spec'|'ersp'|'itc'|'dipole'|'map'] type(s) of 
 %                    cluster information to read. May also be a cell array of
 %                    these types. For example: { 'erp' 'map' 'dipole' }
@@ -21,12 +21,13 @@
 %      clustinfo   - structure of specified cluster information 
 %
 % With fields:
-%         .clustname     % cluster name
+%         .name          % cluster name
 %         .clustnum      % cluster index 
-%         .condition     % {dell array of 'strings'} condition(s) returned
-%         .subject       % {cell array} of component subject codes 
-%         .group         % {cell array} of component group codes  UNIMPLMENTED!
-%         .comp          % [integer array] of comp. dataset indices 
+%         .condition     % {cell array of 'strings'} condition name(s) 
+%                           for which information is returned
+%         .subject       % {cell array} component subject codes 
+%         .group         % {cell array} component group codes  UNIMPLMENTED!
+%         .comp          % [integer array] comp. dataset indices 
 %
 % And optional fields (defined for the requested measures):
 %         .erp           % [(ncomps, ntimes) array] component ERPs
@@ -120,7 +121,6 @@ condnums = zeros(1,nconditions);
 % end
 
 for k = 1:ncomps %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for each cluster component %%%%%%%%%%%%%%
-    
  for c = 1:nconditions
    
     % NB: BELOW, CONDITION NEEDS TO BE THE INDICES OF THE REQUESTED CONDITIONS, NO???
@@ -152,8 +152,10 @@ for k = 1:ncomps %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for each cluster component 
             case 'ersp'
                 [ersp, logfreqs, timevals] = std_readersp(ALLEEG, abset, comp, ...
                           STUDY.preclust.erspclusttimes,  STUDY.preclust.erspclustfreqs);
-                clustinfo.ersp_freqs{k} = logfreqs;
-                clustinfo.ersp_times{k} = timevals;
+                if k == 1
+                    clustinfo.ersp_freqs = logfreqs;
+                    clustinfo.ersp_times = timevals;
+                end
                 clustinfo.ersp{k}       = ersp;
                 if k==ncomps & c==conditions, fprintf('Cluster component ERSPs read.\n'); end;
 
