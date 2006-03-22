@@ -496,9 +496,9 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                      else
                          frequencies = [ frequencies; con_f];
                      end
+                     con_data = con_data - repmat(mean(con_data,2), [1 size(con_data,2)]);
+                     con_data = con_data - repmat(mean(con_data,1), [size(con_data,1) 1]);
                      data = [ data; con_data ];
-                     data = data - repmat(mean(data,2), [1 size(data,2)]);
-                     data = data - repmat(mean(data,1), [size(data,1) 1]);
                      clear f X con_f con_data tmp;  
                  end               
                  
@@ -508,8 +508,8 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                             % (no need to scan across conditions)
               idat = STUDY.datasetinfo(STUDY.setind(1,si)).index;  
               count = size(data,1)+1;
-              %try,
-              for icomp = succompind{si}
+              try,
+                for icomp = succompind{si}
                   % select among 3 sub-options
                   % --------------------------
                   if ~isempty(succompind{si})
@@ -527,9 +527,9 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                       count = count+1;
                   end
               end 
-              %catch,
-              %    error('Some dipole information is missing');
-              %end;
+              catch,
+                  error('Some dipole information is missing');
+              end;
               
              % cluster on ica ersp / itc values
              % --------------------------------
