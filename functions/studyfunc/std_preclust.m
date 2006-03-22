@@ -122,6 +122,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.49  2006/03/22 14:35:32  arno
+% fix .sets format
+%
 % Revision 1.48  2006/03/22 01:05:36  scott
 % format help msg only
 %
@@ -253,10 +256,11 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
     if length(cluster_ind) ~= 1
         error('Only one cluster can be sub-clustered. To sub-cluster multiple clusters, first merge them.');
     end
-    for k = 1:size(STUDY.setind,2)   % go over the sets from the first condition 
-                                                        % (if there are some)
-        sind = find(STUDY.cluster(cluster_ind).sets(1,:) == k); % indices of dataset k
-                                                                % in the cluster 
+    
+    % the goal of this code below is to find the components in the cluster
+    % of interest for each set of condition 
+    for k = 1:size(STUDY.setind,2)
+        sind = find(STUDY.cluster(cluster_ind).sets(1,:) == STUDY.setind(1,k));
         succompind{k} = STUDY.cluster(cluster_ind).comps(sind);
     end;
     for ind = 1:size(STUDY.setind,2)
@@ -264,7 +268,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                                                                   % (though there should not be any? -Arno)
         succompind{ind} = sort(succompind{ind}); % sort the components
     end;
-dsafdads    
+    
     % Decode input arguments
     % ----------------------
     update_flag  = 0;
@@ -399,7 +403,7 @@ dsafdads
                   end;
                   if ~isempty(succompind{si})
                       for cond = 1 : Ncond
-                         idat = STUDY.datasetinfo(STUDY.cluster(clust_ind).sets(cond,si)).index;  
+                         idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index;  
                          if ALLEEG(idat).trials == 1
                               error('No epochs in dataset: ERP information has no meaning');
                          end
@@ -424,7 +428,7 @@ dsafdads
               % select ica scalp maps
               % --------------------------
              case 'scalp' , % NB: scalp maps are identical across conditions (within session)
-                 idat = STUDY.datasetinfo(STUDY.cluster(clust_ind).sets(1,si)).index;  
+                 idat = STUDY.datasetinfo(STUDY.setind(1,si)).index;  
                  fprintf('Computing interpolated scalp maps for dataset %d...\n', idat);
                  if ~isempty(succompind{si})
                      X = std_topo(ALLEEG(idat), succompind{si});
@@ -438,7 +442,7 @@ dsafdads
              % select Laplacian ica comp scalp maps
              % ------------------------------------
              case 'scalpLaplac' , 
-                 idat = STUDY.datasetinfo(STUDY.cluster(clust_ind).sets(1,si)).index;  
+                 idat = STUDY.datasetinfo(STUDY.setind(1,si)).index;  
                  if ~isempty(succompind{si})
                      X = std_topo(ALLEEG(idat), succompind{si}, 'laplacian'); 
                      if abso
@@ -451,7 +455,7 @@ dsafdads
              % select Gradient ica comp scalp maps
              % -----------------------------------
              case 'scalpGrad'   , 
-                 idat = STUDY.datasetinfo(STUDY.cluster(clust_ind).sets(1,si)).index;  
+                 idat = STUDY.datasetinfo(STUDY.setind(1,si)).index;  
                  if ~isempty(succompind{si})
                      X = std_topo(ALLEEG(idat), succompind{si}, 'gradient'); 
                      if abso
@@ -475,7 +479,7 @@ dsafdads
                  end
                  if ~isempty(succompind{si})
                      for cond = 1 : Ncond 
-                         idat = STUDY.datasetinfo(STUDY.cluster(clust_ind).sets(cond,si)).index;  
+                         idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index;  
                          [X, f,overwrite] = std_spec(ALLEEG(idat),succompind{si}, ...
                                                      freqrange, fun_arg,overwrite);
                          STUDY.preclust.specclustfreqs = freqrange;
@@ -502,9 +506,9 @@ dsafdads
              % -------------------------
              case 'dipoles' % NB: dipoles are identical across conditions (within session)
                             % (no need to scan across conditions)
-              idat = STUDY.datasetinfo(STUDY.cluster(clust_ind).sets(1,si)).index;  
+              idat = STUDY.datasetinfo(STUDY.setind(1,si)).index;  
               count = size(data,1)+1;
-              try,
+              %try,
               for icomp = succompind{si}
                   % select among 3 sub-options
                   % --------------------------
@@ -523,9 +527,9 @@ dsafdads
                       count = count+1;
                   end
               end 
-              catch,
-                  error('Some dipole information is missing');
-              end;
+              %catch,
+              %    error('Some dipole information is missing');
+              %end;
               
              % cluster on ica ersp / itc values
              % --------------------------------
@@ -545,7 +549,6 @@ dsafdads
                 if ~isempty(succompind{si})
                     idattot = [];
                     for cond = 1 : Ncond 
-                        idat = STUDY.datasetinfo(STUDY.cluster(clust_ind).sets(cond,si)).index;  
                         idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index;  
                         idattot = [idattot idat];
                         % compute ERSP/ ITC, if doesn't exist.
@@ -660,7 +663,6 @@ dsafdads
                 clustdatatmp = clustdatatmp.';
         end
         
-        clear data;
         if norm %normalize the first pc std to 1
             normval = std(clustdatatmp(:,1));
             for icol = 1:size(clustdatatmp,2)
