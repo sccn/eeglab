@@ -11,23 +11,27 @@
 %                  an already existing cluster (for hierarchical clustering). The EEG datasets
 %                  in the ALLEEG structure are updated. If new measures are added, the updated 
 %                  EEG sets are also saved to disk. Called by pop_preclust(). Follow with 
-%                  eeg_clust() or pop_clust().
+%                  eeg_clust() or pop_clust(). See Example below.
 % Usage:    
-%                >> [ALLEEG,STUDY] = std_preclust(ALLEEG,STUDY); % cluster all comps in all sets
-%                >> [ALLEEG,STUDY] = std_preclust(ALLEEG,STUDY,clustind,preproc1,...);
+%                >> [ALLEEG,STUDY] = std_preclust(ALLEEG,STUDY); % prepare to cluster all comps 
+%                                                                % in all sets on all measures
 %
+%                >> [ALLEEG,STUDY] = std_preclust(ALLEEG, STUDY, clustind, preproc1, preproc2...);
+%                                                                % prepare to cluster specifed 
+%                                                                % cluster on specified measures
 % Required inputs:
 %   ALLEEG       - ALLEEG vector of one or more loaded EEG dataset structures
 %   STUDY        - an EEGLAB STUDY set of loaded EEG structures
 %
 % Optional inputs:
-%   clustind     - a cluster index for further clustering (hierarchical clustering), for example 
-%                  to cluster a mu component cluster into left mu and right mu sub-clusters. 
-%                  Should be empty for first stage (whole STUDY) clustering {default: []}
+%   clustind     - a cluster index for further (hierarchical) clustering -
+%                  for example to cluster a spectrum-based mu-rhythm cluster into 
+%                  dipole location-based left mu and right mu sub-clusters. 
+%                  Should be empty for first stage (whole-STUDY) clustering {default: []}
 %
-%   preprocX     - {'comnd' 'key1' val1 'key2' val2 ...} component clustering measures to prepare
+%   preproc      - {'command' 'key1' val1 'key2' val2 ...} component clustering measures to prepare
 %
-%                  'comnd' = component measures to compute:
+%            * 'command' = component measure to compute:
 %                    'erp'     = cluster on the component ERPs,
 %                    'dipoles' = cluster on the component [X Y Z] dipole locations
 %                    'dipselect' = select components to cluster that have residual 
@@ -47,7 +51,7 @@
 %                    'finaldim' = final number of dimensions. Enables second-level PCA. 
 %                                  By default this command is not used (see Example below).
 %
-%                  'key'   optional inputs used in computing  the specified measures:
+%            * 'key'   optional keywords and [valuess] used to compute the above 'commands':
 %                    'npca'    =  [integer] number of principal components (PCA dimension) of 
 %                                   the selected measures to retain for clustering. {default: 5}
 %                    'norm'    =  [0|1] 1 -> normalize the PCA components so the variance of 
@@ -73,11 +77,11 @@
 %                                   variance (rv) will be clustered {default: 0 (all components)}
 % Outputs:
 %   ALLEEG       - the input ALLEEG vector of EEG dataset structures, modified by adding preprocessing 
-%                  data as pointers to float files that hold ERSPs, spectra, and/or other measures.
+%                  data as pointers to Matlab files that hold the pre-clustering component measures.
 %   STUDY        - the input STUDY set with pre-clustering data added, for use by pop_clust() 
 %
 % Example:
-%   >> [ALLEEG  STUDY] = std_preclust(ALLEEG, STUDY, [], [] , { 'dipselect'  'rv'  0.15  } ,...
+%   >> [ALLEEG STUDY] = std_preclust(ALLEEG, STUDY, [], [] , { 'dipselect'  'rv'  0.15  } ,...
 %                        { 'spec'  'npca' 10 'norm' 1 'weight' 1 'freqrange'  [ 3 25 ] } , ...
 %                        { 'erp'   'npca' 10 'norm' 1 'weight' 2 'timewindow' [ 350 500 ] } ,...
 %                        { 'scalp' 'npca' 10 'norm' 1 'weight' 2 'abso' 1 } , ...
@@ -88,14 +92,14 @@
 %                                  'padratio' 4 'timewindow' [ -1600 1495 ] 'norm' 1 'weight' 1 }, ...
 %                        { 'finaldim' 'npca' 10 });
 %                          
-%                        % This prepares, for initial clustering, all components in the STUDY
-%                        % datasets except components with dipole model residual variance above 0.15.
-%                        % Clustering will be based on the components' mean spectra in the [3 25] Hz 
-%                        % frequency range, on the components' ERPs in the [350 500] ms time window, on
-%                        % the (absolute-value) component scalp maps, on the equivalent dipole locations,
-%                        % and on the mean ERSP and ITC images. 
-%                        % The final keyword asks for a second level PCA dimension reduction (to 10
-%                        % principal dimensions) to be performed. See the web tutorial for details.
+%                   % This prepares, for initial clustering, all components in the STUDY datasets
+%                   % except components with dipole model residual variance above 0.15.
+%                   % Clustering will be based on the components' mean spectra in the [3 25] Hz 
+%                   % frequency range, on the components' ERPs in the [350 500] ms time window, 
+%                   % on the (absolute-value) component scalp maps, on the equivalent dipole 
+%                   % locations, and on the component mean ERSP and ITC images. 
+%                   % The final keyword specifies final PCA dimension reduction to 10
+%                   % principal dimensions. See the clustering tutorial for more details.
 %
 % Authors: Arnaud Delorme, Hilit Serby & Scott Makeig, SCCN, INC, UCSD, May 13, 2004
 
@@ -118,6 +122,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.47  2006/03/21 15:41:45  arno
+% new .sets format
+%
 % Revision 1.45  2006/03/14 22:36:43  arno
 % fix downsampling
 %
@@ -243,7 +250,8 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
     if length(cluster_ind) ~= 1
         error('Only one cluster can be sub-clustered. To sub-cluster multiple clusters, first merge them.');
     end
-    for k = 1:size(STUDY.cluster(cluster_ind).sets,2)   % go over the sets from the first condition (if there are some)
+    for k = 1:size(STUDY.cluster(cluster_ind).sets,2)   % go over the sets from the first condition 
+                                                        % (if there are some)
         for cond = 1:Ncond
             sind = find(STUDY.cluster(cluster_ind).sets(cond,:) == k); % indices of dataset k
                                                                        % in the cluster 
@@ -251,7 +259,8 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
         end
     end;
     for ind = 1:size(STUDY.setind,2)
-        succompind{ind} = succompind{ind}(find(succompind{ind}));% remove zeros (there should not be any but? -Arno)
+        succompind{ind} = succompind{ind}(find(succompind{ind})); % remove zeros 
+                                                                  % (though there should not be any? -Arno)
         succompind{ind} = sort(succompind{ind}); % sort the components
     end;
     
