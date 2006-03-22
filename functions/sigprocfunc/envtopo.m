@@ -109,6 +109,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.118  2006/03/13 00:12:20  scott
+% debugged default subtraction of other comps if 'compnums' specified -sm
+%
 % Revision 1.117  2006/03/12 23:52:26  scott
 % wtchans -> wtcomps
 %
@@ -879,7 +882,7 @@ end
 %%%%%%%%%%%%%% find max variances and their frame indices %%%%%%%%%%%
 %
 
-if strcmp(g.sortvar,'rv')
+if strcmp(g.sortvar,'pv') %Changed -Jean
 	% Variance of the data in the interval, for calculating sortvar. 
 	vardat = mean(var(data(g.plotchans,limframe1:limframe2),1));
 else 
@@ -1068,19 +1071,41 @@ if ~xunitframes
    fprintf('    Summed component ''%s'' in interval [%4g %4g] ms: %4.2f%%\n',...
 					ot, 1000*times(limframe1),1000*times(limframe2), sumppaf);
 end
+
+%
+% Collect user-supplied Y-axis information
+% Edited and moved here from 'Collect Y-axis information' section below -Jean
+%
+if length(g.limits) == 4 
+     if g.limits(3)~=0 | g.limits(4)~=0 % collect plotting limits from 'limits'
+	 ymin = g.limits(3);
+	 ymax = g.limits(4);
+         ylimset = 1;
+     end
+else
+  ylimset = 0; % flag whether hard limits have been set by the user
+  ymin = min(min(g.icawinv*g.icaact(g.plotchans,pframes))); % begin by setting limits from plotted data
+  ymax = max(max(g.icawinv*g.icaact(g.plotchans,pframes)));
+end
+
+fprintf('    Plot limits (sec, sec, uV, uV) [%g,%g,%g,%g]\n\n',xmin,xmax, ymin,ymax);
+
 %
 %%%%%%%%%%%%%%%%%%%%% Plot the data envelopes %%%%%%%%%%%%%%%%%%%%%%%%%
 %
 BACKCOLOR = [0.7 0.7 0.7];
+FONTSIZE=12;
+FONTSIZEMED=10;
+FONTSIZESMALL=8;
 newaxes=axes('position',pos);
 axis off
-set(newaxes,'FontSize',16,'FontWeight','Bold','Visible','off');
+set(newaxes,'FontSize',FONTSIZE,'FontWeight','Bold','Visible','off');
 set(newaxes,'Color',BACKCOLOR); % set the background color
 delete(newaxes) %XXX
 
 % site the plot at bottom of the current axes
 axe = axes('Position',[pos(1) pos(2) pos(3) 0.6*pos(4)],...
-           'FontSize',16,'FontWeight','Bold');
+           'FontSize',FONTSIZE,'FontWeight','Bold');
 
 g.limits = get(axe,'Ylim');
 set(axe,'GridLineStyle',':')
@@ -1089,21 +1114,8 @@ set(axe,'Ygrid','on')
 axes(axe)
 set(axe,'Color',axcolor);
 
-% fprintf('    Plot limits (sec, sec, uV, uV) [%g,%g,%g,%g]\n\n',xmin,xmax,ymin,ymax);
 
-%
-%%%%%%%%%%%% Collect y-axis range information %%%%%%%%%%%%%%%%%%%%%%%%
-%
-ylimset = 0; % flag whether hard limits have been set by the user
-ymin = min(min(g.icawinv*g.icaact(g.plotchans,pframes))); % begin by setting limits from plotted data
-ymax = max(max(g.icawinv*g.icaact(g.plotchans,pframes)));
-if length(g.limits) == 4 
-     if g.limits(3)~=0 | g.limits(4)~=0 % collect plotting limits from 'limits'
-	 ymin = g.limits(3);
-	 ymax = g.limits(4);
-         ylimset = 1;
-     end
-end
+
 
 %
 %%%%%%%%%%%%%%%%% Plot the envelope of the summed selected components %%%%%%%%%%%%%%%%%
@@ -1156,7 +1168,7 @@ else
          double(ymin+0.1*(ymax-ymin)), ...
          ['ppaf ' num2str(sumppaf,'%4.2f') '%']);
 end
-set(t,'fontsize',12,'fontweight','bold')
+set(t,'fontsize',FONTSIZESMALL,'fontweight','bold')
 
 %
 % %%%%%%%%%%%%%%%%%%%%%%%% Plot the computed component envelopes %%%%%%%%%%%%%%%%%%
@@ -1166,7 +1178,7 @@ set(t,'fontsize',12,'fontweight','bold')
         curenv = matsel(envdata,frames,0,1,envx(c));
         if ~ylimset & max(curenv) > ymax, ymax = max(curenv); end
         p=plot(times,curenv,colors(mapcolors(c),1));% plot the max
-        set(gca,'FontSize',12,'FontWeight','Bold')
+        set(gca,'FontSize',FONTSIZESMALL,'FontWeight','Bold')
         if c==1                                % Note: use colors in original
             set(p,'LineWidth',2);              %       component order (if BOLD_COLORS==0)
         else
@@ -1265,19 +1277,19 @@ if ~xunitframes
 else % xunitframes == 1
    l= xlabel('Data (time points)');
 end
-set(l,'FontSize',14,'FontWeight','Bold');
+set(l,'FontSize',FONTSIZEMED,'FontWeight','Bold');
 if strcmpi(g.envmode, 'avg')
     l=ylabel('Potential (uV)');
 else 
     l=ylabel('RMS of uV');
 end;    
-set(l,'FontSize',14,'FontWeight','Bold');
+set(l,'FontSize',FONTSIZEMED,'FontWeight','Bold');
 %
 %%%%%%%%%%%%%% Draw maps and oblique/vertical lines %%%%%%%%%%%%%%%%%%%%%
 %
 % axall = axes('Units','Normalized','Position',pos,...
 axall = axes('Position',pos,...
-    'Visible','Off','Fontsize',16); % whole-figure invisible axes
+    'Visible','Off','Fontsize',FONTSIZE); % whole-figure invisible axes
 axes(axall)
 set(axall,'Color',axcolor);
 axis([0 1 0 1])
@@ -1429,11 +1441,11 @@ if strcmpi(g.dispmaps, 'on')
         else
             complabel = compnames(t,:);              % use labels in file
         end
-        text(0.00,0.80,complabel,'FontSize',14,...
+        text(0.00,0.80,complabel,'FontSize',FONTSIZEMED,...
              'FontWeight','Bold','HorizontalAlignment','Center');
         % axt = axes('Units','Normalized','Position',[0 0 1 1],...
         axt = axes('Position',[0 0 1 1],...
-                   'Visible','Off','Fontsize',16);
+                   'Visible','Off','Fontsize',FONTSIZE);
         set(axt,'Color',axcolor);           % topoplot axes
         drawnow
     end
@@ -1451,14 +1463,14 @@ if strcmpi(g.dispmaps, 'on')
         
         axes(axall)
         set(axall,'Color',axcolor);
-        tmp = text(0.50,1.05,g.title,'FontSize',16,...
+        tmp = text(0.50,1.05,g.title,'FontSize',FONTSIZE,...
 						'HorizontalAlignment','Center',...
 						'FontWeight','Bold');
         set(tmp, 'interpreter', 'none');
-        text(1,0.68,'+','FontSize',16,'HorizontalAlignment','Center');
+        text(1,0.68,'+','FontSize',FONTSIZE,'HorizontalAlignment','Center');
         % text(1,0.637,'0','FontSize',12,'HorizontalAlignment','Center',...
 		%	'verticalalignment','middle');
-        text(1,0.61,'-','FontSize',16,'HorizontalAlignment','Center');
+        text(1,0.61,'-','FontSize',FONTSIZE,'HorizontalAlignment','Center');
     end;
     axes(axall)
     set(axall,'layer','top'); % bring component lines to top
