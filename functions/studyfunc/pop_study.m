@@ -21,7 +21,7 @@
 % Outputs:
 %   STUDY                - new STUDY set comprising some or all of the datasets in 
 %                          ALLEEG, plus other information about the experiments. 
-%   ALLEEG               - an updated ALLEEG structure including the STUDY datasets. 
+%   ALLEEG               - an updated ALLEEG structure including the STUDY datasets.   
 %
 % Graphic interface buttons:
 %  "STUDY set name"      - [edit box] name for the STUDY structure {default: ''}   
@@ -69,6 +69,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.46  2006/03/23 17:01:54  scott
+% same
+%
 % Revision 1.45  2006/03/23 17:00:43  scott
 % msg text
 % .,
