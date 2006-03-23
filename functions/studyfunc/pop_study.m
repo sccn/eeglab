@@ -69,6 +69,10 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.45  2006/03/23 17:00:43  scott
+% msg text
+% .,
+%
 % Revision 1.44  2006/03/23 16:58:34  scott
 % msg text
 %
@@ -351,7 +355,7 @@ elseif strcmpi(mode, 'gui') % GUI mode
                 {'style' 'text'       'string'  text1 } ...
                 {'style' 'checkbox'   'value'   0        'tag' 'delclust' 'callback' cb_del } ...
                 {'style' 'text'       'string'  'Delete cluster information (to allow loading new datasets, set new components for clustering, etc.)' } ...
-                {'style' 'text'       'string'  '      Save this STUDY set to a disk file named:'} ...
+                {'style' 'text'       'string'  '           Save this STUDY set to a disk file named:'} ...
                 {'style' 'edit'       'string'  ''       'tag' 'studyfile'                        'userdata' 'save'} ...
                 {'style' 'pushbutton' 'string'  '...'    'tag' 'browsesave' 'Callback' browsesave 'userdata' 'save'} {} };
 	guigeom = { guigeom{:} [1] [1 0.2 0.3 0.2 1] [1] [0.14 3] [0.14 3] [1 1.5 0.3] [1]};
