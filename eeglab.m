@@ -144,6 +144,7 @@
 % Non-GUI functions use for handling the EEG structure:
 % ----------------------------------------------------
 % eeg_checkset()       - check dataset parameter consistency
+% eeg_context()        - return info about events surrounding given events
 % pop_delset()         - delete dataset
 % pop_editoptions()    - edit the option file
 % eeg_emptyset()       - empty dataset
@@ -187,6 +188,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.476  2006/03/23 16:48:52  scott
+% msg text
+%
 % Revision 1.475  2006/03/23 16:46:22  scott
 % help menu text
 %
@@ -2566,7 +2570,7 @@ if length(EEG) == 1
     end;
 end;
 
-% print some informations on the main figure
+% print some information on the main figure
 % ------------------------------------------
 g = myguihandles(gcf);
 if ~isfield(g, 'win0') % no display
