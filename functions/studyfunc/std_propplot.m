@@ -1,31 +1,33 @@
 % std_propplot() - Commandline function to plot cluster properties. 
-%                  Displays either mean cluster ERSPs, else all cluster component ERSPs 
-%                  Plots the mean cluster ERSP in one figure per condition.
-%                  The ERSPs can be plotted only when component ERSPs have been computed 
-%                  and saved with the EEG datasets of the STUDY.
-%                  These may be computed during pre-clustering using pop_preclust() 
-%                  or std_preclust(). Called by pop_clustedit().
+%                  Displays mean cluster scalp map, ERP, ERSP; 
+%                  dipole model, spectrum, and ITC in one figure 
+%                  per cluster. Only meaasures computed during 
+%                  pre-clustering (by pop_preclust() or std_preclust()) 
+%                  are plotted. Called by pop_clustedit().
+%                  Leaves the plotted grand mean cluster measures 
+%                  in STUDY.cluster for quick replotting.
 % Usage:    
 %              >> [STUDY] = std_propplot(STUDY, ALLEEG, clusters);  
 % Inputs:
-%   STUDY      - STUDY set comprising some or all of the EEG datasets in ALLEEG.
-%   ALLEEG     - vector of EEG dataset structures including the datasets in the STUDY, 
-%                typically created using load_ALLEEG().  
+%   STUDY      - STUDY set including some or all EEG datasets in ALLEEG.
+%   ALLEEG     - vector of EEG dataset structures including the datasets 
+%                in the STUDY. Yypically created using load_ALLEEG().  
 %
 % Optional inputs:
 %   clusters   - [numeric vector] -> cluster numbers to plot.
-%                           'all' -> plot all clusters in STUDY {default: 'all'}.
+%                           'all' -> plot all clusters in STUDY 
+%                {default: 'all'}.
 % Outputs:
-%   STUDY      - the input STUDY set structure modified with the plotted cluster 
-%                mean properties to allow quick replotting (unless cluster means 
-%                already existed in the STUDY).  
+%   STUDY      - the input STUDY set structure modified with the plotted 
+%                cluster mean properties to allow quick replotting (unless 
+%                cluster means already existed in the STUDY).  
 % Example:
+%              % Plot mean properties of Cluster 5 in one figure. 
 %              >> [STUDY] = std_propplot(STUDY,ALLEEG, 5);
-%                 % Plot mean properties of Cluster 5 in one figure. 
 %
 % See also:  pop_clustedit() 
 %
-% Authors:  Hilit Serby, Arnaud Delorme, Scott Makeig, SCCN, INC, UCSD, July, 2005
+% Authors:  Hilit Serby, Arnaud Delorme, Scott Makeig, SCCN/INC/UCSD, 2005
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -46,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2006/03/14 02:59:35  scott
+% help msg
+%
 % Revision 1.9  2006/03/12 03:38:34  arno
 % header
 %
@@ -66,7 +71,7 @@
 %
 
 function STUDY = std_propplot(STUDY, ALLEEG,  varargin)
-icadefs;
+icadefs; % read EEGLAB defaults
 
 % Set default values
 cls = 1:length(STUDY.cluster); % plot all clusters in STUDY
@@ -78,7 +83,7 @@ if length(varargin) > 0
     elseif isstr(varargin{2}) & strcmpi(varargin{2}, 'all')
         cls = 1:length(STUDY.cluster);
     else
-        error('std_propplot: clusters input is either specific clusters (numeric vector) or keyword ''all''.');
+        error('cluster input should be either a vector of cluster numbers or the keyword ''all''.');
     end
 end
 
@@ -101,7 +106,7 @@ for k = 1: len
     try,
         STUDY = std_topoplot(STUDY,ALLEEG, 'clusters', cls(k), 'mode', 'centroid', 'figure', 'off');
     catch
-        axis off; text(0.5, 0.5, 'No scalp information', 'horizontalalignment', 'center');
+        axis off; text(0.5, 0.5, 'No scalp map information', 'horizontalalignment', 'center');
         warningon = 1;
     end
     waitbar(k/(len*6),h_wait)
@@ -133,7 +138,7 @@ for k = 1: len
     try,
         STUDY = std_specplot(STUDY,ALLEEG, 'clusters', cls(k), 'mode', 'centroid', 'figure', 'off');
     catch
-        axis off; text(0.5, 0.5, 'No spectrum information', 'horizontalalignment', 'center');
+        axis off; text(0.5, 0.5, 'No spectral information', 'horizontalalignment', 'center');
         warningon = 1;
     end
     waitbar((k*5)/(len*6),h_wait)
@@ -152,9 +157,9 @@ for k = 1: len
 
     if warningon
         disp('Some properties could not be plotted. To plot these properties, first');
-        disp('include them in pre-clustering. There, you may spcify 0 dimensions if you');
-        disp('want the property (scalp_map, ERSP, etc...) to be computed but not included');
-        disp('in the clustering procedure - see the clustering tutorial).');
+        disp('include them in pre-clustering. There, specify 0 dimensions if you do');
+        disp('now want a property (scalp map, ERSP, etc...) to be included');
+        disp('in the clustering procedure. See the clustering tutorial.');
     end;
 
 end  % Finished all conditions
