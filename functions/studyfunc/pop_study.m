@@ -21,7 +21,7 @@
 % Outputs:
 %   STUDY                - new STUDY set comprising some or all of the datasets in 
 %                          ALLEEG, plus other information about the experiments. 
-%   ALLEEG               - an updated ALLEEG structure including the STUDY datasets.   
+%   ALLEEG               - an updated ALLEEG structure including the STUDY datasets. 
 %
 % Graphic interface buttons:
 %  "STUDY set name"      - [edit box] name for the STUDY structure {default: ''}   
@@ -69,16 +69,6 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
-% Revision 1.46  2006/03/23 17:01:54  scott
-% same
-%
-% Revision 1.45  2006/03/23 17:00:43  scott
-% msg text
-% .,
-%
-% Revision 1.44  2006/03/23 16:58:34  scott
-% msg text
-%
 % Revision 1.43  2006/03/18 14:46:15  arno
 % component button
 %
@@ -228,7 +218,7 @@ elseif strcmpi(mode, 'gui') % GUI mode
         if ALLEEG == 0
             res = questdlg2( strvcat('Datasets currently loaded will be removed from EEGLAB memory.', ...
                                      'Are you sure you want to continue?'), ...
-                                     'Discard datasets now loaded in EEGLAB?', 'Cancel', 'Yes', 'Yes');
+                                     'Discard datasets loaded in EEGLAB?', 'Cancel', 'Yes', 'Yes');
             if strcmpi(res, 'cancel'), return; end;
         end;
         ALLEEG = [];
@@ -341,14 +331,14 @@ elseif strcmpi(mode, 'gui') % GUI mode
     end;
     
     if strcmpi(info, 'from_STUDY_different_from_ALLEEG')
-        text1    = 'Dataset info (condition, group, ...) differs from info in study. [set] = Overwrite dataset info.';
+        text1    = 'Dataset info (condition, group, ...) differs from info in STUDY. [set] = Overwrite dataset info.';
         value_cb = 0;
     else
-        text1    = 'Update dataset info: Datasets stored on disk will be overwritten (unset = keep study info separate).';
+        text1    = 'Update dataset info - datasets stored on disk will be overwritten (unset = Keep STUDY info separate).';
         value_cb = 1;
     end;
     guispec = { guispec{:} ...
-                {'style' 'text'       'string'  'Important note: Removed datasets will not be saved before being deleted from EEGLAB memory.' } ...
+                {'style' 'text'       'string'  'Important note: Removed datasets will not be saved before being deleted from EEGLAB memory' } ...
                 {} ...
                 {'style' 'pushbutton' 'string'  '<'      'Callback' prevpage 'userdata' 'addt'} ...
                 {'style' 'text'       'string'  'Page 1' 'tag' 'page' 'horizontalalignment' 'center' } ... 
@@ -358,7 +348,7 @@ elseif strcmpi(mode, 'gui') % GUI mode
                 {'style' 'text'       'string'  text1 } ...
                 {'style' 'checkbox'   'value'   0        'tag' 'delclust' 'callback' cb_del } ...
                 {'style' 'text'       'string'  'Delete cluster information (to allow loading new datasets, set new components for clustering, etc.)' } ...
-                {'style' 'text'       'string'  '           Save this STUDY set to a disk file named:'} ...
+                {'style' 'text'       'string'  'Save this STUDY set to disk file'} ...
                 {'style' 'edit'       'string'  ''       'tag' 'studyfile'                        'userdata' 'save'} ...
                 {'style' 'pushbutton' 'string'  '...'    'tag' 'browsesave' 'Callback' browsesave 'userdata' 'save'} {} };
 	guigeom = { guigeom{:} [1] [1 0.2 0.3 0.2 1] [1] [0.14 3] [0.14 3] [1 1.5 0.3] [1]};
@@ -499,8 +489,7 @@ else % internal command
         case 'dipselect'
             STUDY.datasetinfo = datasetinfo;
             
-            res = inputdlg2( { strvcat('Enter max. residual scalp map variance (in %) for',...
-                                       'the current dipole models of clustered components.', ...
+            res = inputdlg2( { strvcat('Enter max residual variance (in %) for clustered components', ...
                                        'NOTE: This will delete any existing component clusters!') }, ...
                              'pop_study():  Pre-select components', 1, { '15' } );
             
