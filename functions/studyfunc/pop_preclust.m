@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.42  2006/03/21 15:42:22  arno
+% new .sets format
+%
 % Revision 1.41  2006/03/12 03:23:03  arno
 % save study
 %
@@ -216,7 +219,7 @@ if ~isstr(varargin{1}) %intial settings
     str_name   = ['Pre-compute clustering measures for STUDY ''' STUDY.name '''' ];
     str_time   = [ num2str(round(ALLEEG(1).xmin*1000)) '  ' num2str(round(ALLEEG(1).xmax*1000)) ];
     help_secpca = [ 'warndlg2(strvcat(''This is the final number of dimensions (otherwise use the sum'',' ...
-                    '''of dimensions for all the selected options). See tutorial for more info''), ''Final number of dimension'');' ];
+                    '''of dimensions for all the selected options). See tutorial for more info''), ''Final number of dimensions'');' ];
     
     gui_spec = { ...
     {'style' 'text'       'string' str_name 'FontWeight' 'Bold' 'horizontalalignment' 'left'} ...
@@ -273,7 +276,7 @@ if ~isstr(varargin{1}) %intial settings
 	{'style' 'pushbutton' 'string' '...' 'tag' 'browsesave' 'Callback' browsesave 'enable' 'off' 'userdata' 'save'} };
   
 	%{'style' 'checkbox'   'string' '' 'tag' 'preclust_PCA'  'Callback' preclust_PCA 'value' 0} ...
-	%{'style' 'text'       'string' 'Do not prepare data matrix for clustering at this time.' 'FontWeight' 'Bold'  } {} ...
+	%{'style' 'text'       'string' 'Do not prepare dataset for clustering at this time.' 'FontWeight' 'Bold'  } {} ...
 
     fig_arg{1} = { ALLEEG STUDY cls };
     geomline = [0.45 2 1 0.45 1 3 3 ];
@@ -372,7 +375,7 @@ if ~isstr(varargin{1}) %intial settings
     % evaluate command
     % ----------------
     if length(options) == 3
-        warndlg2('No measure selected, abording operation.'); 
+        warndlg2('No measure selected: aborting.'); 
         return; 
     end;
     [STUDY ALLEEG] = std_preclust(options{:});
@@ -507,7 +510,7 @@ else
                     { {'style' 'text' 'string' 'ERSP and ITC time/freq. parameters' 'FontWeight' 'Bold'} ...
                     {'style' 'text' 'string' 'Frequency range [Hz]' 'tag' 'ersp_freq' } ...
                     {'style' 'edit' 'string' ersp.f 'tag' 'ersp_f' 'Callback' ERSP_timewindow } ...
-                    {'style' 'text' 'string' 'Wavelet cycles (see help timef())' 'tag' 'ersp_cycle' } ...
+                    {'style' 'text' 'string' 'Wavelet cycles (see >> help timef())' 'tag' 'ersp_cycle' } ...
                     {'style' 'edit' 'string' ersp.c 'tag' 'ersp_c' 'Callback' ERSP_timewindow} ...    
                     {'style' 'text' 'string' 'Significance level (< 0.1)' 'tag' 'ersp_alpha' } ...
                     {'style' 'edit' 'string' ersp.a 'tag' 'ersp_a'} ...
@@ -552,14 +555,15 @@ else
 end
 STUDY.saved = 'no';
 
-function get_ersptime(ALLEEG, STUDY, ersphdl)
+function get_ersptime(ALLEEG, STUDY, ersphdl) %%%%%%%%%%%%%% get_ersptime() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 cycles = str2num(get(findobj('parent', ersphdl, 'tag', 'ersp_c'), 'string'));
 freq = str2num(get(findobj('parent', ersphdl, 'tag', 'ersp_f'), 'string'));
 padratio = str2num(get(findobj('parent', ersphdl, 'tag', 'ersp_p'), 'string'));
 seti = STUDY.datasetinfo(1).index; %first dataset in ALLEEG that is part of STUDY
 [time_range, winsize] = compute_ersp_times(cycles,  ALLEEG(seti).srate, [ALLEEG(seti).xmin ALLEEG(seti).xmax]*1000, freq(1),padratio);
 if time_range(1) >= time_range(2)
-    warndlg2('ERSP time range is not valid, please change lower frequency bound or other parameters', 'Warning!');
+    warndlg2('ERSP time range is invalid; please change lower frequency bound or other parameters', 'Warning!');
 else
     set(findobj('parent', ersphdl, 'tag', 'ersp_timewindow'), 'string', [ num2str(round(time_range(1)))  '  ' num2str(round(time_range(2))) ] );
 end
