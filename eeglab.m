@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.475  2006/03/23 16:46:22  scott
+% help menu text
+%
 % Revision 1.474  2006/03/20 19:10:36  scott
 % Simple FIR filter -> Basic FIR filter
 %
@@ -1718,10 +1721,10 @@ colordef white
 % default option folder
 % ---------------------
 if ~isempty(OPT_FOLDER)
-    fprintf('EEGLAB current options file is %s%seeg_options.m\n', OPT_FOLDER, filesep);
+    fprintf('eeglab: options file is %s%seeg_options.m\n', OPT_FOLDER, filesep);
     addpath( OPT_FOLDER );
 else
-    disp('EEGLAB will be using the default options');
+    disp('eeglab: using default options');
 end;
 
 % checking strings
@@ -1871,7 +1874,7 @@ catchstrs.new_non_empty          = e_newset;
 	cb_comments    = [ check      '[EEG.comments LASTCOM] =pop_comments(EEG.comments, ''About this dataset'');' e_store];
 	cb_chanedit    = [ 'disp(''IMPORTANT: After importing/modifying data channels, you must close'');' ...
                        'disp(''the channel editing window for the changes to take effect in EEGLAB.'');' ...
-                       'disp(''TIP: call this function directy from the prompt, ">> pop_chanedit([]);"'');' ...
+                       'disp(''TIP: Call this function directy from the prompt, ">> pop_chanedit([]);"'');' ...
                        'disp(''     to convert between channel location file formats'');' ...
                        '[EEG TMPINFO TMP LASTCOM] = pop_chanedit(EEG); if ~isempty(LASTCOM), EEG = eeg_checkset(EEG, ''chanlocsize'');' ...
                        'clear TMPINFO TMP; EEG = eegh(LASTCOM, EEG);' storecall 'end; eeglab(''redraw'');'];
