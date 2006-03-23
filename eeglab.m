@@ -187,6 +187,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.474  2006/03/20 19:10:36  scott
+% Simple FIR filter -> Basic FIR filter
+%
 % Revision 1.473  2006/03/20 19:09:40  scott
 % Original EEGLAB FIR filtering method -> Simple FIR filter
 %
@@ -2122,8 +2125,8 @@ catchstrs.new_non_empty          = e_newset;
     uimenu( help_2, 'Label', 'Dataset structure'                      , 'CallBack', 'pophelp(''eeg_checkset'');');
 	uimenu( help_2, 'Label', 'Admin functions'                        , 'Callback', 'eeg_helpadmin;');	
     
-    uimenu( help_m, 'Label', 'Tutorial (web)'                         , 'CallBack', 'tutorial;');
-    uimenu( help_m, 'Label', 'Contact us (email)'                     , 'CallBack', 'web(''mailto:eeglab@sccn.ucsd.edu'');');
+    uimenu( help_m, 'Label', 'Web tutorial'                         , 'CallBack', 'tutorial;');
+    uimenu( help_m, 'Label', 'Email EEGLAB'                     , 'CallBack', 'web(''mailto:eeglab@sccn.ucsd.edu'');');
 
     % looking for eeglab plugins
     % --------------------------
