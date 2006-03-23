@@ -6,15 +6,15 @@
 % Inputs and outputs:
 %   ALLEEG     - array of EEG dataset structures
 %   EEG        - current dataset structure or structure array
-%   CURRENTSET - index/indices of the current EEG dataset(s) in ALLEEG
+%   CURRENTSET - index(s) of the current EEG dataset(s) in ALLEEG
 %
 % Optional inputs:
-%   'setname'     - Name of the new dataset
+%   'setname'     - ['string'] name for the new dataset
 %   'comments'    - ['string'] comments on the new dataset
 %   'overwrite'   - ['on'|'off'] overwrite the old dataset
-%   'savenew'     - ['filename'] filename to use to save the new dataset
-%   'saveold'     - ['filename'] filename to use to save the old dataset
-%   'retrieve'    - [index] retrieve the old dataset (ignore changes)
+%   'saveold'     - ['filename'] filename in which to save the old dataset
+%   'savenew'     - ['filename'] filename in which to save the new dataset
+%   'retrieve'    - [index] retrieve the old dataset (ignore recent changes)
 %
 % Note: Calls eeg_store() which may modify the variable ALLEEG 
 %       containing the current dataset(s).
@@ -42,6 +42,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.68  2006/03/18 14:45:01  arno
+% y
+% cancel button
+%
 % Revision 1.67  2006/03/10 22:58:33  arno
 % testing length of result
 %
@@ -277,7 +281,7 @@ elseif save_retrieve
     % --------------------
     if ~(option_storedisk & strcmpi(EEG.saved, 'no'))
         if strcmpi(EEG.saved, 'yes') & option_storedisk
-            fprintf('eeg_store(): Dataset %d has not been modified since last save; did not resave it\n', OLDSET);
+            fprintf('pop_newset(): Dataset %d has not been modified since last save, so did not resave it.\n', OLDSET);
             %[ EEG com] = pop_saveset(EEG, 'savemode', 'resave');
             EEG = update_datafield(EEG);
             if ~isempty(com), EEG.saved = 'no'; end;
@@ -336,41 +340,41 @@ elseif length(varargin) == 0 & length(EEG) == 1 % if several arguments, assign v
     overwrite_or_save = 0;
     if g.study ==  1 % have to overwrite
         if saved
-            text_old       = 'What do you want to do with the old dataset (NOT modified since last saved)?';
+            text_old       = 'The old dataset has not been modified since last saved. What do you want to do with it?';
             cb_save2       = '';
         else
-            text_old = 'What do you want to do with the old dataset (some changes have not been saved)?';
+            text_old = 'Some changes have not been saved. What do you want to do with the old dataset?';
         end;
         cb_owrt      = [ ...
                        '   set(gcbo, ''value'', 1);' ...
                        '    warndlg2(strvcat(''Cannot unset the overwrite checkbox!'','' '',' ...
-                           '''The old dataset has to be overwriten because'',' ...
-                           '''all datasets must be in the study.''), ''warning'');' ];
+                           '''The old dataset must be overwriten: All datasets.'',' ...
+                           '''must be in the STUDY.''), ''warning'');' ];
         value_owrt   = 1;
     elseif ~saved & option_storedisk
-        text_old = 'What do you want to do with the old dataset (some changes have not been saved)?';
+        text_old = 'Some changes have not been saved. What do you want to do with the old dataset?'
         cb_save2     = [ 'if ~get(findobj(gcbf, ''tag'', ''cb_owrt''), ''value''),' ...
                        '   set(gcbo, ''value'', 1);' ...
                        '    warndlg2(strvcat(''Cannot unset the save checkbox!'','' '',' ...
-                           '''According to your memory option, only one full '',' ...
-                           '''dataset can be retained in memory. Thus, you either'',' ...
-                           '''have to save or delete/overwrite the old dataset''));' ... 
+                           '''By your selected memory option, only one full dataset'',' ...
+                           '''can be kept in memory. Thus, you must either'',' ...
+                           '''save or delete/overwrite the old dataset.''));' ... 
                        'else, ' cb_save2 ...
                        'end;' ];
         cb_owrt      = [ 'if ~get(findobj(gcbf, ''tag'', ''cb_save2''), ''value''),' ...
                        '   set(gcbo, ''value'', 1);' ...
                        '    warndlg2(strvcat(''Cannot unset the overwrite checkbox!'','' '',' ...
-                           '''According to your memory option, only one full '',' ...
-                           '''dataset can be retained in memory. Thus, you either'',' ...
-                           '''have to save or delete/overwrite the old dataset''));' ... 
+                           '''By your memory option, only one full dataset'',' ...
+                           '''can be kept in memory. Thus, you must either'',' ...
+                           '''save or delete/overwrite the old dataset.''));' ... 
                        'end;' ];
         enable_save2 = 'on';
         value_save2  = 1;
         overwrite_or_save = 1;
     elseif ~saved
-        text_old = 'What do you want to do with the old dataset (some changes have not been saved)?';
+        text_old = 'Some changes have not been saved. What do you want to do with the old dataset?';
     else
-        text_old       = 'What do you want to do with the old dataset (NOT modified since last saved)?';
+        text_old       = 'What do you want to do with the old dataset (not modified since last saved)?';
         cb_save2       = '';
         cb_overwrite   = 'Overwrite current dataset|New dataset';
     end;
@@ -418,7 +422,7 @@ elseif length(varargin) == 0 & length(EEG) == 1 % if several arguments, assign v
         if overwrite_or_save % only pop-up a window if some action has to be taken
             uilist = uilist(11:end);
             geometry = geometry(5:end);
-            uilist(3) = {{ 'Style', 'text'      , 'string', 'Delete it in memory (set=yes)' }};
+            uilist(3) = {{ 'Style', 'text'      , 'string', 'Delete it from memory (set=yes)' }};
             shift    = 3;
         elseif ~save_retrieve % just loaded from disk
             
@@ -445,11 +449,11 @@ elseif length(varargin) == 0 & length(EEG) == 1 % if several arguments, assign v
         if length(result) > 4-shift & overwrite_or_save
             if result{5-shift} & ~result{4-shift} % save but not overwrite
                 if isempty(result{6-shift})
-                    warndlg2(strvcat('Error: You must enter a name for the old dataset!',' ', ...
-                           'The old dataset has to be saved because,', ...
-                           'according to your memory option, only one full ', ...
-                           'dataset can be retained in memory. Thus, you either', ...
-                           'have to save or overwrite the old dataset')); ... 
+                    warndlg2(strvcat('Error: You must enter a filename for the old dataset!',' ', ...
+                           'The old dataset must be saved because, by your', ...
+                           'current memory option, only one full dataset', ...
+                           'can be kept in memory. Thus, you must either', ...
+                           'save or overwrite the old dataset.')); ... 
                     cont = 1;
                 end;
             end;
@@ -471,7 +475,7 @@ elseif length(varargin) == 0 & length(EEG) == 1 % if several arguments, assign v
                     if ~isempty(result{3}) 
                         args = { args{:} 'savenew', result{3} };
                     else
-                        disp('Warning: no file name given for new dataset (the dataset will not be saved on disk)');
+                        disp('Warning: no filename given for new dataset, so it will not be saved to disk.');
                     end;
                 end;
             end;
@@ -490,7 +494,7 @@ elseif length(varargin) == 0 & length(EEG) == 1 % if several arguments, assign v
                 if ~isempty(result{6-shift}) 
                     args = { args{:} 'saveold', result{6-shift} };
                 else
-                    disp('Warning: no file name given for old dataset (the dataset will not be saved on disk)');
+                    disp('Warning: no file name given for the old dataset, so it will not be saved to disk.');
                 end;
             end;
 		end;
