@@ -8,6 +8,7 @@
 %                 These can be computed during pre-clustering using the gui-based 
 %                 function pop_preclust() or the equivalent commandline functions 
 %                 eeg_createdata() and eeg_preclust(). Called by pop_clustedit().
+%                 and std_propplot().
 % Usage:    
 %              >> [STUDY] = std_erpplot(STUDY, ALLEEG, key1, val1, key2, val2);  
 % Inputs:
@@ -64,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2006/03/21 15:43:48  arno
+% new .sets format
+%
 % Revision 1.17  2006/03/20 17:36:37  arno
 % new std_clustread call
 %
@@ -204,8 +208,9 @@ if strcmpi(mode, 'comps')
            hold on
            plot(t/1000,Avepol(n)*ave_erp,'k','linewidth',2);
            xlabel('time [s]');
-           ylabel('activations');
-           title(['ERP, '  STUDY.cluster(cls(clus)).name ', ' STUDY.condition{n} ', ' num2str(length(unique(STUDY.cluster(cls(clus)).sets(1,:)))) 'Ss']);
+           ylabel('activation');
+           title(['ERP, '  STUDY.cluster(cls(clus)).name ', ' STUDY.condition{n} ', ' ...
+                               num2str(length(unique(STUDY.cluster(cls(clus)).sets(1,:)))) ' Ss']);
            % Make common axis to all conditions
            if n == 1
                ylimits = get(gca,'YLim');
@@ -256,27 +261,26 @@ if strcmpi(mode, 'centroid')
             if k == 1
                 leg_color{n} = [STUDY.condition{n}];
             end
-            % Compute ERP limits accross conditions and
-            % across clusters (all on same scale)  
+            % Compute ERP limits accross conditions and across clusters (all on same scale)  
+            %
             erp_min = min(erp_min, min(STUDY.cluster(cls(k)).centroid.erp{n}));
             erp_max = max(erp_max, max(STUDY.cluster(cls(k)).centroid.erp{n}));
             ave_erp(:,n) = STUDY.cluster(cls(k)).centroid.erp{n};
             if n == Ncond
                 [ave_erp pol] = std_comppol(ave_erp);
                 t = STUDY.cluster(cls(k)).centroid.erp_times;
-                a = [ STUDY.cluster(cls(k)).name ', ' num2str(length(unique(STUDY.cluster(cls(k)).sets(1,:)))) 'Ss'];
+                a = [ STUDY.cluster(cls(k)).name ', ' num2str(length(unique(STUDY.cluster(cls(k)).sets(1,:)))) ' Ss'];
                 for condi = 1: Ncond
                     plot(t/1000,ave_erp(:,condi),color_codes{condi},'linewidth',2);
                 end
-            end
-            if n == Ncond
-                a = [ STUDY.cluster(cls(k)).name ', '  num2str(length(unique(STUDY.cluster(cls(k)).sets(1,:)))) 'Ss' ];
-                title(a);
                 set(gcf,'Color', BACKCOLOR);
                 set(gca,'UserData', leg_color);
                 set(gcf,'UserData', leg_color);
                 if figureon
+                    title(a); % don't plot title when fitting into a larger figure
                     waitbar(k/len,h_wait);
+                else
+                    title('ERP');
                 end
             end
             if (k == len) & (n == Ncond)
@@ -285,16 +289,18 @@ if strcmpi(mode, 'centroid')
                         axes(handl(clsi)); 
                     end
                     axis([t(1)/1000 t(end)/1000 erp_min erp_max]);
-                    axcopy(gcf, 'leg_color = get(gca,''''UserData'''') ; legend(leg_color); xlabel(''''Time [sec]'''');ylabel(''''Activations'''') ;');
+                    axcopy(gcf, 'leg_color = get(gca,''''UserData'''') ; 
+                    legend(leg_color); xlabel(''''Time [sec]'''');ylabel(''''Activations'''') ;');
                 end
                 xlabel('Time [sec]');
                 ylabel('Activations');
                 if len ~= 1
-                    maintitle = ['Average ICA ERP for several clusters across all conditions'];
+                    maintitle = ['Grand average ERPs for several clusters across all conditions'];
                     a = textsc(maintitle, 'title'); 
                     set(a, 'fontweight', 'bold'); 
                 else
-                    a = [ STUDY.cluster(cls(k)).name ' ERP, '  num2str(length(unique(STUDY.cluster(cls(k)).sets(1,:)))) 'Ss' ];
+                    a = [ STUDY.cluster(cls(k)).name ' ERP, '  ...
+                              num2str(length(unique(STUDY.cluster(cls(k)).sets(1,:)))) ' Ss' ];
                     title(a);
                 end
                 set(gcf,'Color', BACKCOLOR);
