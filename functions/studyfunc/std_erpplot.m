@@ -65,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2006/03/23 18:23:36  scott
+% help, text msg, and title
+%
 % Revision 1.18  2006/03/21 15:43:48  arno
 % new .sets format
 %
@@ -289,8 +292,7 @@ if strcmpi(mode, 'centroid')
                         axes(handl(clsi)); 
                     end
                     axis([t(1)/1000 t(end)/1000 erp_min erp_max]);
-                    axcopy(gcf, 'leg_color = get(gca,''''UserData'''') ; 
-                    legend(leg_color); xlabel(''''Time [sec]'''');ylabel(''''Activations'''') ;');
+                    axcopy(gcf, 'leg_color = get(gca,''''UserData'''') ; legend(leg_color); xlabel(''''Time [sec]'''');ylabel(''''Activations'''') ;');
                 end
                 xlabel('Time [sec]');
                 ylabel('Activations');
