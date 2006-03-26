@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.39  2006/03/15 22:37:43  scott
+% edit printed msgs - questons remain...
+%
 % Revision 1.38  2006/03/15 19:27:21  scott
 % Made Error message on co-registration more precise. -sm
 %
@@ -345,8 +348,8 @@ if nargin < 3
     options = {};
     if result{1},               options = { options{:} 'load'    result{2} };
     else
-        if result{7}            options = { options{:} 'setup' { result{4} 'meshfile' result{5} } }; % no coreg
-        else                    options = { options{:} 'setup' { result{4} 'meshfile' result{5} 'transform' result{6} } };
+        if isempty(result{7})   options = { options{:} 'setup' { result{4} 'meshfile' result{5} } }; % no coreg
+        else                    options = { options{:} 'setup' { result{4} 'meshfile' result{5} 'transform' str2num(result{7}) 'orilocs' 'on' } };
         end;
     end;
     
