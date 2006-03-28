@@ -1,13 +1,13 @@
 % std_readspec() - returns the stored mean power spectrum for an ICA component 
 %                  in a specified dataset.  The spectrum is assumed to have been 
-%                  saved in a Matlab %file, [dataset_name].icaspec, in the same
+%                  saved in a Matlab file, "[dataset_name].icaspec", in the same
 %                  directory as the dataset file. If this file doesn't exist,
-%                  use std_spec() to create it else a pre-clustering functions
-%                  that calls it: pop_preclust() or std_preclust().  
+%                  use std_spec() to create it or a pre-clustering function
+%                  (pop_preclust() or std_preclust()) that calls it. 
 % Usage:    
 %         >> [spec, freqs] = std_readspec(ALLEEG, setindx, component, freqrange);  
 % Inputs:
-%   ALLEEG     - a EEG dataset vector (can also be one EEG set). 
+%   ALLEEG     - a vector of dataset EEG structures (may also be one dataset). 
 %                Must contain the dataset of interest (the 'setindx' below).
 %   setindx    - [integer] an index of an EEG dataset in the ALLEEG
 %                structure for which to read a component spectrum.
@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2006/03/14 02:32:32  scott
+% help msg
+%
 % Revision 1.12  2006/03/11 07:30:01  arno
 % freqrange input
 %

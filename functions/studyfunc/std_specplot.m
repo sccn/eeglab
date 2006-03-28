@@ -1,12 +1,13 @@
-% std_specplot() - visualizes cluster component spectra, either mean spectra of 
+% std_specplot() - visualizes component cluster spectra, either mean spectra for 
 %                  all requested clusters in the same figure, with spectra for 
 %                  different conditions (if any) plotted in different colors, 
 %                  or spectra for each specified cluster in a separate figure 
-%                  per condition,  each showing the cluster components plus 
-%                  the average cluster spectrum in bold. The spectra can be 
-%                  plotted only if component spectra have been calculated and 
-%                  saved with the EEG datasets  using pop_preclust() or 
-%                  std_preclust(). Called by pop_clustedit(). Calls std_readspec()
+%                  for each condition,  showing the cluster component spectra plus 
+%                  the mean cluster spectrum (in bold). The spectra can be 
+%                  plotted only if component spectra have been computed and 
+%                  saved with the EEG datasets in Matlab files "[datasetname].icaspec" 
+%                  using pop_preclust() or std_preclust(). Called by pop_clustedit(). 
+%                  Calls std_readspec() and internal function std_plotcompspec()
 % Usage:    
 %              >> [STUDY] = std_specplot(STUDY, ALLEEG, key1, val1, key2, val2, ...);  
 % Inputs:
@@ -65,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2006/03/28 14:54:26  arno
+% cell array format
+%
 % Revision 1.17  2006/03/21 15:36:33  arno
 % new .sets format
 %
@@ -115,7 +119,9 @@
 %
 
 function STUDY = std_specplot(STUDY, ALLEEG,  varargin)
-icadefs;
+
+icadefs; % read EEGLAB defaults
+
 % Set default values
 cls = []; % plot all clusters in STUDY
 mode = 'centroid'; % plot clusters centroid 
@@ -132,7 +138,7 @@ for k = 3:2:nargin
                 if isstr(varargin{k-1}) & strcmpi(varargin{k-1}, 'all')
                     cls = 2:length(STUDY.cluster);
                 else
-                    error('std_specplot: ''clusters'' input takes either specific clusters (numeric vector) or keyword ''all''.');
+                    error('std_specplot(): ''clusters'' input takes either specific clusters (numeric vector) or keyword ''all''.');
                 end
             end
         case 'comps'
@@ -186,7 +192,7 @@ if strcmpi(mode, 'comps')
         try
             clusnval = std_clustread(STUDY, ALLEEG, cls(clus),'spec',1:Ncond);
         catch,
-            warndlg2([ 'Some spectra information is missing, aborting'] , ['Abort - Plot spectra'] );   
+            warndlg2([ 'Not all component spectra found: aborting'] , ['Abort - Plot spectra'] );   
             return;
         end
         
@@ -227,9 +233,9 @@ if strcmpi(mode, 'centroid')
     if figureon
         try 
             % optional 'CreateCancelBtn', 'delete(gcbf); error(''USER ABORT'');', 
-            h_wait = waitbar(0,['Computing Spectra ...'], 'Color', BACKEEGLABCOLOR,'position', [300, 200, 300, 48]);
+            h_wait = waitbar(0,['Computing spectra ...'], 'Color', BACKEEGLABCOLOR,'position', [300, 200, 300, 48]);
         catch % for Matlab 5.3
-            h_wait = waitbar(0,['Computing Spectra ...'],'position', [300, 200, 300, 48]);
+            h_wait = waitbar(0,['Computing spectra ...'],'position', [300, 200, 300, 48]);
         end
         figure
 	end
@@ -273,7 +279,7 @@ if strcmpi(mode, 'centroid')
                 xlabel('Frequency [Hz]');
                 ylabel('Power [dB]');
                 if len ~= 1
-                    maintitle = ['Average spectra for several clusters across all conditions'];
+                    maintitle = ['Mean cluster spectra across all conditions'];
                     a = textsc(maintitle, 'title'); 
                     set(a, 'fontweight', 'bold'); 
                 else
@@ -349,10 +355,10 @@ function STUDY = std_plotcompspec(STUDY, ALLEEG, cls, varargin)
 icadefs;
 
 if ~exist('cls')
-    error('std_plotcompspec: you must provide a cluster number as an input.');
+    error('std_plotcompspec(): you must provide a cluster number as an input.');
 end
 if isempty(cls)
-   error('std_plotcompspec: you must provide a cluster number as an input.');
+   error('std_plotcompspec(): you must provide a cluster number as an input.');
 end
 if nargin == 3 % no components indices were given
     % Default plot all components of the cluster
