@@ -142,20 +142,20 @@ if strcmpi(mode, 'comps')
                 comp = STUDY.cluster(cls(clus)).comps(k);
                 [Xi,Yi] = meshgrid(clusscalp.yi,clusscalp.xi);                     
                 % Compute correlation between a component and the average scalp map to determine polarity. 
-                tmp_grid = squeeze(clusscalp.scalp(k,:,:));
+                tmp_grid = squeeze(clusscalp.scalp{k});
                 tmp_grid(find(isnan(tmp_grid))) = 0;% remove NaN values from grid for later correlation calculation.  
                 grid_pol = corrcoef(tmp_grid(:), tmp_ave(:)); % compute correlation.  
                 grid_pol = sign(grid_pol(1,2));
                 if k <= rowcols(2) - 2 %first sbplot row
                     figure(h_topo);
                     sbplot(rowcols(1),rowcols(2),k+2) , 
-                    toporeplot(grid_pol*squeeze(clusscalp.scalp(k,:,:)), 'style', 'both', 'plotrad',0.5,'intrad',0.5, 'verbose', 'off','xsurface', Xi, 'ysurface', Yi );
+                    toporeplot(grid_pol*squeeze(clusscalp.scalp{k}), 'style', 'both', 'plotrad',0.5,'intrad',0.5, 'verbose', 'off','xsurface', Xi, 'ysurface', Yi );
                     title([ 'ic' num2str(comp) '/' subject ]);
                     %waitbar(k/(len+1),h_wait)
                 else %other sbplot rows
                     figure(h_topo)
                     sbplot(rowcols(1),rowcols(2),k+4) , 
-                    toporeplot(grid_pol*squeeze(clusscalp.scalp(k,:,:)), 'style', 'both', 'plotrad',0.5,'intrad',0.5, 'verbose', 'off','xsurface', Xi, 'ysurface', Yi );
+                    toporeplot(grid_pol*squeeze(clusscalp.scalp{k}), 'style', 'both', 'plotrad',0.5,'intrad',0.5, 'verbose', 'off','xsurface', Xi, 'ysurface', Yi );
                     title([ 'ic' num2str(comp) '/' subject ]);
                     %waitbar(k/(len+1),h_wait)
                 end
