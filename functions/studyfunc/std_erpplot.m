@@ -65,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2006/03/25 02:23:40  toby
+% missing parentheses reinserted, works again
+%
 % Revision 1.19  2006/03/23 18:23:36  scott
 % help, text msg, and title
 %
@@ -206,6 +209,10 @@ if strcmpi(mode, 'comps')
            handl(n) = sbplot(rowcols(1),rowcols(2),n);
            ave_erp = STUDY.cluster(cls(clus)).centroid.erp{n};
            t = clusnval.erp_times;
+           for index = 1:size(clusnval.erp,2)
+               tmperp(index,:) = clusnval.erp{index};
+           end;
+           clusnval.erp = tmperp;
            [all_erp pol] = std_comppol(clusnval.erp');
            plot(t/1000,Avepol(n)*all_erp,'color', [0.5 0.5 0.5]);
            hold on

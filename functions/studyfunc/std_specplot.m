@@ -65,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2006/03/21 15:36:33  arno
+% new .sets format
+%
 % Revision 1.16  2006/03/14 03:10:48  scott
 % help msg
 %
@@ -180,19 +183,21 @@ if strcmpi(mode, 'comps')
         set(gcf, 'position', [ pos(1)+15 pos(2)+15 pos(3)*magnif pos(4)/rowcols(2)*rowcols(1)*magnif ]);
         orient tall
         set(gcf,'Color', BACKCOLOR);        
+        try
+            clusnval = std_clustread(STUDY, ALLEEG, cls(clus),'spec',1:Ncond);
+        catch,
+            warndlg2([ 'Some spectra information is missing, aborting'] , ['Abort - Plot spectra'] );   
+            return;
+        end
         
         for n = 1:Ncond
-            try
-                clusnval = std_clustread(STUDY, ALLEEG, cls(clus),'spec',n);
-            catch,
-                warndlg2([ 'Some spectra information is missing, aborting'] , ['Abort - Plot spectra'] );   
-                return;
-            end
             handl(n) = sbplot(rowcols(1),rowcols(2),n);
             ave_spec = STUDY.cluster(cls(clus)).centroid.spec{n};
             f = STUDY.cluster(cls(clus)).centroid.spec_freqs;
-            plot(f,clusnval.spec,'color', [0.5 0.5 0.5]);
-            hold on
+            for index = 1:size(clusnval.spec,2)
+                plot(f,clusnval.spec{n, index},'color', [0.5 0.5 0.5]);
+                hold on
+            end;
             plot(f,ave_spec,'k','linewidth',2);
             xlabel('Frequency [Hz]');
             ylabel('Power [dB]');
