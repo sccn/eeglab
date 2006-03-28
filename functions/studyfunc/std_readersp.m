@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2006/03/22 00:46:32  scott
+% help msg format only
+%
 % Revision 1.15  2006/03/14 03:02:51  scott
 % help msg
 %
@@ -104,10 +107,27 @@ end;
 if nargin < 5
     freqrange = [];
 end;
-    
+
+% multiple entry
+% --------------
+if length(comp) > 1
+    for index = 1:length(comp)
+        [tmpersp, logfreqs, timevals, params] = std_readersp(ALLEEG, abset, comp(index), timewindow, freqrange);
+        logersp(index,:,:,:) = tmpersp;
+    end;
+    return;
+end;
+
 for k = 1: length(abset)    
     
-    filename = fullfile( ALLEEG(abset(k)).filepath,[ ALLEEG(abset(k)).filename(1:end-3) 'icaersp']);
+    if comp < 0
+        filename = fullfile( ALLEEG(abset(k)).filepath,[ ALLEEG(abset(k)).filename(1:end-3) 'datersp']);
+        comp   = -comp;
+        prefix = 'chan';
+    else    
+        filename = fullfile( ALLEEG(abset(k)).filepath,[ ALLEEG(abset(k)).filename(1:end-3) 'icaersp']);
+        prefix = 'comp';
+    end;
     try
         tmpersp   = load( '-mat', filename, 'parameters', 'times', 'freqs');
     catch
@@ -125,13 +145,13 @@ for k = 1: length(abset)
         return;
     end;
     tmpersp2   = load( '-mat', filename, ...
-                     [ 'comp' int2str(comp) '_ersp'], ...
-                     [ 'comp' int2str(comp) '_erspbase'], ...
-                     [ 'comp' int2str(comp) '_erspboot']);
+                     [ prefix int2str(comp) '_ersp'], ...
+                     [ prefix int2str(comp) '_erspbase'], ...
+                     [ prefix int2str(comp) '_erspboot']);
     
-    erspall{k}     = double(getfield(tmpersp2, [ 'comp' int2str(comp) '_ersp']));
-    erspallboot{k} = double(getfield(tmpersp2, [ 'comp' int2str(comp) '_erspboot']));
-    erspallbase{k} = double(getfield(tmpersp2, [ 'comp' int2str(comp) '_erspbase']));
+    erspall{k}     = double(getfield(tmpersp2, [ prefix int2str(comp) '_ersp']));
+    erspallboot{k} = double(getfield(tmpersp2, [ prefix int2str(comp) '_erspboot']));
+    erspallbase{k} = double(getfield(tmpersp2, [ prefix int2str(comp) '_erspbase']));
 
 end
 
