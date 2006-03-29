@@ -1,81 +1,57 @@
-% std_clustread() - load one or more requested component data measures 
-%                      ['erp'|'spec'|'ersp'|'itc'|'dipole'|'map']
+% std_clustread() - load one or more requested measures 
+%                   ['erp'|'spec'|'ersp'|'itc'|'dipole'|'map']
 %                   for all components of a specified cluster.  
-%                   Useful for accessing cluster compoent data in scripts.
 %                   Called by cluster plotting functions: std_envtopo(), 
-%                   std_erpplot(), std_erspplot(), etc.
+%                   std_erpplot(), std_erspplot(), ...
 % Usage:
-%         >> clustinfo = std_clustread(STUDY,ALLEEG, cluster, ...
-%                                             infotype(s), condition(s));
+%         >> clustinfo = std_clustread(STUDY,ALLEEG, cluster, infotype, condition);
 % Inputs:
-%         STUDY    - studyset structure comprising some or all datasets in ALLEEG
-%        ALLEEG    - array of loaded EEG datasets including the STUDY datasets
-%       cluster    - index of the cluster in the STUDY
-%      infotype(s) - ['erp'|'spec'|'ersp'|'itc'|'dipole'|'map'] type(s) of 
-%                    cluster information to read. May also be a cell array of
-%                    these types. For example: { 'erp' 'map' 'dipole' }
-% Optional input:
-%     condition(s) - ['string'] or {cell array of 'strings'} STUDY condition 
-%                    name(s) to return info for {default|[]: all conditions}
+%         STUDY - studyset structure containing some or all files in ALLEEG
+%        ALLEEG - vector of loaded EEG datasets
+%       cluster - cluster number in STUDY
+%      infotype - ['erp'|'spec'|'ersp'|'itc'|'dipole'|'map'] type of stored
+%                 cluster information to read. May also be a cell array of
+%                 these types, for example: { 'erp' 'map' 'dipole' }
+%     condition - STUDY condition number to read {default: 1}
+%
 % Output:
-%      clustinfo   - structure of specified cluster information 
+%      clustinfo - structure of specified cluster information:
 %
-% With fields:
-%         .name          % cluster name
-%         .clustnum      % cluster index 
-%         .condition     % {cell array of 'strings'} condition name(s) 
-%                           for which information is returned
-%         .subject       % {cell array} component subject codes 
-%         .group         % {cell array} component group codes  UNIMPLMENTED!
-%         .comp          % [integer array] comp. dataset indices 
+%         clustinfo.name          % cluster name
+%         clustinfo.clusternum    % cluster index
+%         clustinfo.condition     % index of the condition asked for
 %
-% And optional fields (defined for the requested measures):
-%         .erp           % [(ncomps, ntimes) array] component ERPs
-%           .erp_times   % [(1,ntimes) array] ERP epoch latencies (ms)
+%         clustinfo.comp[]        % array of component indices 
+%         clustinfo.subject{}     % cell array of component subject codes UNIMPLMENETED
+%         clustinfo.group{}       % cell array of component group codes  UNIMPLMENETED!
 %
-%         .spec          % [(ncomps, nfreqs) array] component spectra
-%           .spec_freqs  % [(1,nfreqs) array] spectral frequencies (Hz)
+%         clustinfo.erp[]         % (ncomps, ntimes) array of component ERPs
+%           clustinfo.erp_times[] % vector of ERP epoch latencies
 %
-%         .ersp          % [(ncomps, ntimes, nfreqs) array] component ERSPs
-%           .ersp_times  % [(1,ntimes) array] ERSP latencies (ms)
-%           .ersp_freqs  % [(1,nfreqs) array] ERSP frequencies (Hz)
+%         clustinfo.spec[]        % (ncomps, nfreqs) array of component spectra
+%           clustinfo.spec_freqs[]% vector of spectral frequencies 
 %
-%         .itc           % [(ncomps, ntimes, nfreqs) array] component ITCs
-%           .itc_times   % [(1,ntimes) array] ERSP latencies (ms)
-%           .itc_freqs   % [(1,nfreqs) array] ERSP frequencies (Hz)
+%         clustinfo.ersp[]        % (ncomps,ntimes,nfreqs) array of component ERSPs
+%           clustinfo.ersp_times[]% vector of ERSP latencies
+%           clustinfo.ersp_freqs[]% vector of ERSP frequencies
 %
-%         .scalp         % [(ncomps, ngrid, ngrid) array] comp. map grids
-%           .xi          % [(1, ngrid) array] abscissa values 
-%           .yi          % [(1, ngrid) array] oridnate values 
-%                        % {default ngrid: 65}
+%         clustinfo.itc[]         % (ncomps,ntimes,nfreqs) array of component ITCs
+%           clustinfo.itc_times[] % vector of ITC latencies
+%           clustinfo.itc_freqs[] % vector of ITC frequencies
 %
-%         .dipole        % [(1,ncomps) struct array] comp. dipole information 
-%                        % Same format as EEG.dipfit.model ( see >> help dipfit)
+%         clustinfo.scalp[]       % (ncomps,65,65) array of component scalp map grids
+%           clustinfo.xi[]        % abscissa values for columns of the scalp maps
+%           clustinfo.yi[]        % ordinate values for rows of the scalp maps
+%
+%         clustinfo.dipole        % array of component dipole information structs
+%                                 % with same format as EEG.dipfit.model
 % Example:
-%         % To overplot the ERPs for all Cluster 3 components in a STUDY
+%         % To plot the ERPs for all Cluster-3 components from a STUDY
 %         %
-%         info = std_clustread(STUDY, ALLEEG, 3, 'erp');
-%         figure; plot(info.erp_times, info.erp);
+%         clustinfo = std_clustread(STUDY, ALLEEG, 3, 'erp');
+%         figure; plot(clustinfo.erp_times, clustinfo.erp);
 % 
 % Author: Hilit Serby, Scott Makeig & Arnaud Delorme, SCCN/INC/UCSD, 2005-
-
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
-% Copyright (C) Arnaud Delorme & Scott Makeig, SCCN/INC/UCSD, July 22, 2005, smakeig@ucsd.edu
-%
-% This program is free software; you can redistribute it and/or modify
-% it under the terms of the GNU General Public License as published by
-% the Free Software Foundation; either version 2 of the License, or
-% (at your option) any later version.
-%
-% This program is distributed in the hope that it will be useful,
-% but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-% GNU General Public License for more details.
-%
-% You should have received a copy of the GNU General Public License
-% along with this program; if not, write to the Free Software
-% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 function clustinfo = std_clustread(STUDY,ALLEEG, cluster, infotype, condition);
 
@@ -84,104 +60,73 @@ if nargin < 4
     return;
 end
 if nargin < 5
-  condition = []; % default
-end
-
-clustinfo = [];      % initialize
-
-if isempty(condition)
-  clustinfo.condition   = STUDY.condition; % all conditions
-else % condition(s) specified
-  if ~iscell(condition), 
-    condition = { condition }; 
-  end;
-  if ~ismember(condition,STUDY.condition) % ???? WRONG ???
-    error('Named condition not found in STUDY')
-  else
-    clustinfo.condition  = condition;
-  end
+  condition = [1:length(STUDY.condition)]; % default
 end
 
 if ~iscell(infotype), 
     infotype = { infotype }; 
 end;
 
-clustinfo.clustname  = STUDY.cluster(cluster).name;
-clustinfo.clustnum   = cluster;
-clustinfo.subject    = [];  % UNIMPLEMENTED! ???
-clustinfo.group      = [];  % UNIMPLEMENTED! ???
-clustinfo.comp       = STUDY.cluster(cluster).comps;
+clustinfo = [];
+clustinfo.name       = STUDY.cluster(cluster).name;
+clustinfo.clusternum = cluster;
+clustinfo.comps      = STUDY.cluster(cluster).comps;
+clustinfo.condition  = condition;
 
 ncomps = length(STUDY.cluster(cluster).comps);
-nconditions = length(condition);
-condnums = zeros(1,nconditions);
-
-% for c=1:nconditions % find condition indices
-%    condnums(c) = ismember(condition(c),STUDY.condition); % ??? WRONG ??? should return the condition numbers
-% end
-
-for k = 1:ncomps %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for each cluster component %%%%%%%%%%%%%%
- for c = 1:nconditions
-   
-    % NB: BELOW, CONDITION NEEDS TO BE THE INDICES OF THE REQUESTED CONDITIONS, NO???
-
-    abset = [STUDY.datasetinfo(STUDY.cluster(cluster).sets(condnums(c),k)).index]; % ??? condition ???
-    comp  = STUDY.cluster(cluster).comps(k);
-    % clustinfo(c).clustsubj{k} = ??? UNIMPLEMENTED 
-    % clustinfo(c).clustgrp{k}  = ??? UNIMPLEMENTED - NOTE CLUSTER.SETS PROBLEM
+for k = 1:ncomps %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for each channel component %%%%%%%%%%%%%%
     
-    for index = 1:length(infotype) %%%%%%%%%%%%%%%% for each information type %%%%%%%%%%%%%%%%
-        switch infotype{index}        
-            case 'erp'
-                [erp, t] = std_readerp(ALLEEG, abset, comp, STUDY.preclust.erpclusttimes);
-                if  k == 1
-                    clustinfo.erp       = zeros(ncomps,length(erp));
+    for n = 1:length(condition)
+
+        abset = [STUDY.datasetinfo(STUDY.cluster(cluster).sets(condition(n),k)).index];
+        comp  = STUDY.cluster(cluster).comps(k);
+        % clustinfo.subject{k} = ??? UNIMPLEMENTED 
+        % clustinfo.group{k} = ??? UNIMPLEMENTED BECAUSE OF CLUSTER.SETS PROBLEM
+
+        for index = 1:length(infotype) %%%%%%%%%%%%%%%% for each information type %%%%%%%%%%%%%%%%
+            switch infotype{index}        
+                case 'erp'
+                    [erp, t] = std_readerp(ALLEEG, abset, comp, STUDY.preclust.erpclusttimes);
                     clustinfo.erp_times = t;
-                end
-                clustinfo.erp(k,:) = erp;
-                if k==ncomps & c==conditions, fprintf('Cluster component ERPs read.\n'); end;
-            case 'spec'
-                [spec, f] = std_readspec(ALLEEG, abset, comp, STUDY.preclust.specclustfreqs);
-                if  k == 1
-                    clustinfo.spec       = zeros(ncomps,length(spec));
+                    clustinfo.erp{n,k} = erp;
+
+                case 'spec'
+                    [spec, f] = std_readspec(ALLEEG, abset, comp, STUDY.preclust.specclustfreqs);
                     clustinfo.spec_freqs = f;
-                end
-                clustinfo.spec(k,:) = spec;
-                if k==ncomps & c==conditions, fprintf('Cluster component spectra read.\n'); end;
+                    clustinfo.spec{n,k} = spec;
 
-            case 'ersp'
-                [ersp, logfreqs, timevals] = std_readersp(ALLEEG, abset, comp, ...
-                          STUDY.preclust.erspclusttimes,  STUDY.preclust.erspclustfreqs);
-                if k == 1
-                    clustinfo.ersp_freqs = logfreqs;
-                    clustinfo.ersp_times = timevals;
-                end
-                clustinfo.ersp{k}       = ersp;
-                if k==ncomps & c==conditions, fprintf('Cluster component ERSPs read.\n'); end;
+                case 'ersp'
+                    if n == 1
+                        abset = [STUDY.datasetinfo(STUDY.cluster(cluster).sets(condition,k)).index];
+                        [ersp, logfreqs, timevals] = std_readersp(ALLEEG, abset, comp, ...
+                                  STUDY.preclust.erspclusttimes,  STUDY.preclust.erspclustfreqs);
+                        for cc = 1:length(condition)
+                            clustinfo.ersp{condition(cc), k} = ersp(:,:,cc);
+                        end;
+                        clustinfo.ersp_freqs = logfreqs;
+                        clustinfo.ersp_times = timevals;
+                    end;
+                case 'itc'
+                    [itc, logfreqs, timevals] = std_readitc(ALLEEG, abset, comp, ...
+                             STUDY.preclust.erspclusttimes, STUDY.preclust.erspclustfreqs );
+                    clustinfo.itc_freqs = logfreqs;
+                    clustinfo.itc_times = timevals;
+                    clustinfo.itc{n,k}       = itc;
 
-            case 'itc'
-                [itc, logfreqs, timevals] = std_readitc(ALLEEG, abset, comp, ...
-                         STUDY.preclust.erspclusttimes, STUDY.preclust.erspclustfreqs );
-                clustinfo.itc_freqs{k} = logfreqs;
-                clustinfo.itc_times{k} = timevals;
-                clustinfo.itc{k}       = itc;
-                if k==ncomps & c==conditions, fprintf('Cluster component ITCs read.\n'); end;
+                case 'dipole'
+                    if n == 1, clustinfo.dipole(k) = ALLEEG(abset).dipfit.model(comp); end;
 
-            case 'dipole'
-                clustinfo.dipole(k) = ALLEEG(abset).dipfit.model(comp);            
-                if k==ncomps & c==conditions, fprintf('Cluster component dipole models read.\n'); end;
-
-            case { 'map' 'scalp' 'topo' }
-                [grid, yi, xi] = std_readtopo(ALLEEG, abset, comp); 
-                if  k == 1
-                 clustinfo.scalp = zeros(ncomps,length(xi),length(yi));
-                 clustinfo.xi = xi;
-                 clustinfo.yi = yi;
-                end
-                clustinfo.scalp(k,:,:) = grid;
-                if k==ncomps & c==conditions, fprintf('Cluster component scalp maps grids read.\n'); end;
-
-            otherwise, error('Unrecognized ''infotype'' entry');
-        end; % switch
+                case { 'map' 'scalp' 'topo' }
+                    if n == 1
+                        [grid, yi, xi] = std_readtopo(ALLEEG, abset, comp); 
+                        if  k == 1
+                         clustinfo.xi = xi;
+                         clustinfo.yi = yi;
+                        end
+                        clustinfo.scalp{k} = grid;
+                    end;
+                otherwise, error('Unrecognized ''infotype'' entry');
+            end; % switch
+        end;
     end; % infotype
 end % comp
