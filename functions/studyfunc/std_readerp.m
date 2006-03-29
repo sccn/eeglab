@@ -1,4 +1,3 @@
-%
 % std_readerp() - returns the ERP for an ICA component in an epoched dataset.
 %                 The ERPs of the dataset ICA components are assumed to have 
 %                 been saved in a Matlab file, [dataset_name].icaerp, in the
@@ -45,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2006/03/14 02:27:04  scott
+% help msg - filename
+%
 % Revision 1.14  2006/03/14 01:51:02  scott
 % help msg
 %
