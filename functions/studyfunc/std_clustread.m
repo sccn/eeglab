@@ -80,8 +80,8 @@ for k = 1:ncomps %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for each channel component 
 
         abset = [STUDY.datasetinfo(STUDY.cluster(cluster).sets(condition(n),k)).index];
         comp  = STUDY.cluster(cluster).comps(k);
-        % clustinfo.subject{k} = ??? UNIMPLEMENTED 
-        % clustinfo.group{k} = ??? UNIMPLEMENTED BECAUSE OF CLUSTER.SETS PROBLEM
+        clustinfo.subject{k} = STUDY.datasetinfo(STUDY.cluster(cluster).sets(condition(n),k)).subject;
+        clustinfo.group{k} = STUDY.datasetinfo(STUDY.cluster(cluster).sets(condition(n),k)).group;
 
         for index = 1:length(infotype) %%%%%%%%%%%%%%%% for each information type %%%%%%%%%%%%%%%%
             switch infotype{index}        
