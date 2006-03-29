@@ -1,4 +1,4 @@
-% pop_chansel() - select channel graphical interface
+% pop_chansel() - pop up a graphic interface to select channels
 %
 % Usage:
 %   >> [chanlist] = pop_chansel(chanstruct); % a window pops up
@@ -41,6 +41,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2006/01/10 00:42:58  arno
+% fixing scrolling more than 60 channels
+%
 % Revision 1.17  2005/09/27 22:03:07  arno
 % fix argument 'withindex' must be numeric
 %
@@ -153,7 +156,7 @@ function [chanlist,chanliststr, allchanstr] = pop_chansel(chans, varargin);
             end;
         end;
     end;
-    [chanlist,tmp,chanliststr] = listdlg2('PromptString',strvcat('(use shift/Ctrl to', 'select several)'), ...
+    [chanlist,tmp,chanliststr] = listdlg2('PromptString',strvcat('(use shift|Ctrl to', 'select several)'), ...
                 'ListString', tmpfieldnames, 'initialvalue', g.select, 'selectionmode', g.selectionmode);       
     allchanstr = chans(chanlist);
     
