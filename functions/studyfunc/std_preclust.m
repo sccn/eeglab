@@ -122,6 +122,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.52  2006/03/29 00:47:54  toby
+% dealing with NaNs in STUDY.setind
+%
 % Revision 1.51  2006/03/22 15:24:09  arno
 % fixing dipole plotting
 %
@@ -263,7 +266,12 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
     % the goal of this code below is to find the components in the cluster
     % of interest for each set of condition 
     for k = 1:size(STUDY.setind,2)
-        sind = find(STUDY.cluster(cluster_ind).sets(1,:) == STUDY.setind(1,k));
+        % Find the first entry in STUDY.setind(:,k) that is non-NaN. We only need one since
+        % components are the same across conditions.
+        for ri = 1:size(STUDY.setind,1)
+            if ~isnan(STUDY.setind(ri,k)), break; end
+        end
+        sind = find(STUDY.cluster(cluster_ind).sets(ri,:) == STUDY.setind(ri,k));
         succompind{k} = STUDY.cluster(cluster_ind).comps(sind);
     end;
     for ind = 1:size(STUDY.setind,2)
