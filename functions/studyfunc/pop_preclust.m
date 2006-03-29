@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.43  2006/03/23 17:29:40  scott
+% msg text
+%
 % Revision 1.42  2006/03/21 15:42:22  arno
 % new .sets format
 %
@@ -150,13 +153,30 @@ if ~isstr(varargin{1}) %intial settings
     
     % Create default ERSP / ITC time/freq. paramters 
     % ----------------------------------------------
-    maxrange = [ALLEEG(STUDY.setind(1,1)).xmin ALLEEG(STUDY.setind(1,1)).xmax]*1000;
+    % Find the first entry in STUDY.setind that is not NaN
+    ref_ind = 0;
+    found_ind1 = 0;
+    for ri = 1:size(STUDY.setind,1)
+        for ci = 1:size(STUDY.setind,2)
+            if ~isnan(STUDY.setind(ri,ci))
+                ref_ind = STUDY.setind(ri,ci);
+                found_ind1 = 1;
+                break
+            end
+        end
+        if found_ind1 == 1, break; end
+    end
+    if ref_ind == 0     % If STUDY.setind contains only NaNs, or is empty.
+        error('STUDY contains no datasets');
+    end
+         
+    maxrange = [ALLEEG(ref_ind).xmin ALLEEG(ref_ind).xmax]*1000;
     time_range = [0 0];
     minfreq    = 2;
     while (time_range(2)-time_range(1)) < (maxrange(2)-maxrange(1))/2
         minfreq = minfreq+1;
-        [time_range, winsize] = compute_ersp_times([3 0.5],  ALLEEG(STUDY.setind(1,1)).srate, ...
-                                                   [ALLEEG(STUDY.setind(1,1)).xmin ALLEEG(STUDY.setind(1,1)).xmax]*1000 , minfreq, 4); 
+        [time_range, winsize] = compute_ersp_times([3 0.5],  ALLEEG(ref_ind).srate, ...
+                                                   [ALLEEG(ref_ind).xmin ALLEEG(ref_ind).xmax]*1000 , minfreq, 4); 
     end;
     erspparams_str = [ '''freqrange'', [' int2str(minfreq) ' 50], ''timewindow'', ' ...
                        vararg2str(time_range) '''cycles'', [3 0.5], ''padratio'', 4' ];
