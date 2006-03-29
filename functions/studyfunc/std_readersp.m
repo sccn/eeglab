@@ -8,7 +8,7 @@
 %                  that calls it. Interpretation of the ERSP requires some input 
 %                  variables used to compute it: frequency range, window width, 
 %                  resolution, probability threshold, and wavelet type (FFT or 
-%                  wavelet_cycles). See timef() for details.
+%                  wavelet_cycles). See >> timef help and >> timef details
 % Usage:    
 %     >> [logersp, logfreqs, times ] = std_readersp(ALLEEG, setindex, component, ...
 %                                                            time_range, freq_range);  
@@ -25,9 +25,9 @@
 % Outputs:
 %   logersp    - the log-frequency ERSP for the requested ICA component 
 %                in the specified dataset. Dimensions: (equal log-spaced) 
-%                frequencies by times. Units, dB re baseline
-%   logfreqs   - vector of equal-log-spaced ERSP frequencies, in Hz
-%   times      - vector of ERSP times (latencies), in ms.
+%                frequencies by epoch latencies (unit: dB diff from baseline)
+%   logfreqs   - vector of equal-log-spaced ERSP frequencies (Hz)
+%   times      - vector of ERSP times (latencies) (s)
 %   params     - structure of timef() parameters saved with the ERSP
 %
 % See also:  std_ersp(), pop_preclust(), std_preclust(), timef()
@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2006/03/28 14:58:10  arno
+% reading ersp channel
+%
 % Revision 1.16  2006/03/22 00:46:32  scott
 % help msg format only
 %
