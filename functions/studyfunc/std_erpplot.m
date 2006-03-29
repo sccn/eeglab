@@ -65,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2006/03/28 14:53:42  arno
+% cell array format
+%
 % Revision 1.20  2006/03/25 02:23:40  toby
 % missing parentheses reinserted, works again
 %
@@ -139,7 +142,7 @@ for k = 3:2:nargin
                 if isstr(varargin{k-1}) & strcmpi(varargin{k-1}, 'all')
                     cls = 2:length(STUDY.cluster);
                 else
-                    error('std_erpplot: ''clusters'' input takes either specific clusters (numeric vector) or keyword ''all''.');
+                    error('''clusters'' input takes either specific clusters (numeric vector) or keyword ''all''.');
                 end
             end
         case 'comps'
