@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2005/11/02 19:56:07  arno
+% history
+%
 % Revision 1.26  2005/03/05 02:33:21  arno
 % chaninfo
 %
@@ -207,7 +210,7 @@ for ri = compnum
 	if exist('fig')
 		button = findobj('parent', fig, 'tag', ['comp' num2str(ri)]);
 		if isempty(button) 
-			error( 'pop_selectcomps, figure does not contain the component button');
+			error( 'pop_selectcomps(): figure does not contain the component button');
 		end;	
 	else
 		button = [];
