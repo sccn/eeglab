@@ -122,6 +122,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.53  2006/03/29 03:44:32  toby
+% *** empty log message ***
+%
 % Revision 1.52  2006/03/29 00:47:54  toby
 % dealing with NaNs in STUDY.setind
 %
@@ -421,6 +424,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                             if ALLEEG(idat).trials == 1
                                error('No epochs in dataset: ERP information has no meaning');
                             end
+                            con_t = []; con_data = [];
                             [X, t] = std_erp(ALLEEG(idat), succompind{si}, timewindow);
                             STUDY.preclust.erpclusttimes = timewindow;
                             if cond == 1
@@ -507,7 +511,8 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                  if ~isempty(succompind{si})
                      for cond = 1 : Ncond 
                          if ~isnan(STUDY.setind(cond,si))
-                            idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index;  
+                            idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index; 
+                            con_f = []; con_data = [];
                             [X, f,overwrite] = std_spec(ALLEEG(idat),succompind{si}, ...
                                                      freqrange, fun_arg,overwrite);
                             STUDY.preclust.specclustfreqs = freqrange;
@@ -710,7 +715,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
             clustdata(:,end+1:end+size(clustdatatmp,2)) = clustdatatmp;
         end
         
-    end;
+    end
     
     % Compute a second PCA of the already PCA'd data if there are too many PCA dimensions.
     % ------------------------------------------------------------------------------------
