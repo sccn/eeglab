@@ -90,7 +90,7 @@
 % File formats:
 %   If 'filetype' is unspecified, the file extension determines its type.
 %
-%   '.loc' or '.locs': 
+%   '.loc' or '.locs' or '.eloc': 
 %               polar coordinates. Notes: angles in degrees: 
 %               right ear is 90; left ear -90; head disk radius is 0.5. 
 %               Fields:   N    angle  radius    label
@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.83  2006/02/14 00:01:18  arno
+% change xyz format
+%
 % Revision 1.82  2006/01/20 22:37:08  arno
 % default for BESA and polhemus
 %
@@ -465,7 +468,7 @@ listcolformat = { 'labels' 'channum' 'theta' 'radius' 'sph_theta' 'sph_phi' ...
 % ----------------------------------
 % special mode for getting the info
 % ----------------------------------
-	if isstr(filename) & strcmp(filename, 'getinfos')
+if isstr(filename) & strcmp(filename, 'getinfos')
    eloc = chanformat;
    labels = listcolformat;
    return;
@@ -507,7 +510,8 @@ if isstr(filename)
        end;
        fprintf('readlocs(): ''%s'' format assumed from file extension\n', g.filetype); 
    else 
-       if strcmpi(g.filetype, 'locs'),  g.filetype = 'loc'; end;
+       if strcmpi(g.filetype, 'locs'),  g.filetype = 'loc'; end
+       if strcmpi(g.filetype, 'eloc'),  g.filetype = 'loc'; end
    end;
    
    % assign format from filetype
