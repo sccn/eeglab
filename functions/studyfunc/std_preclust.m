@@ -122,6 +122,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.54  2006/03/30 03:49:47  toby
+% *** empty log message ***
+%
 % Revision 1.53  2006/03/29 03:44:32  toby
 % *** empty log message ***
 %
@@ -447,55 +450,54 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
               % select ica scalp maps
               % --------------------------
              case 'scalp' , % NB: scalp maps are identical across conditions (within session)
-                 for cond = 1 : Ncond
-                    if ~isnan(STUDY.setind(cond,si))
-                        idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index;
-                        fprintf('Computing interpolated scalp maps for dataset %d...\n', idat);
-                        if ~isempty(succompind{si})
-                            X = std_topo(ALLEEG(idat), succompind{si});
-                            if abso % absolute values
-                                data = [ data; abs(X) ];
-                            else
-                                data = [ data; X ];
-                            end
-                            clear X tmp;
-                        end
-                    end
+                 for cond = 1 : Ncond   % Find first nonNaN index
+                    if ~isnan(STUDY.setind(cond,si)), break; end
                  end       
+                 idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index;
+                 fprintf('Computing interpolated scalp maps for dataset %d...\n', idat);
+                 if ~isempty(succompind{si})
+                    X = std_topo(ALLEEG(idat), succompind{si});
+                    if abso % absolute values
+                       data = [ data; abs(X) ];
+                    else
+                       data = [ data; X ];
+                    end
+                    clear X tmp;
+                 end
              % select Laplacian ica comp scalp maps
              % ------------------------------------si
              case 'scalpLaplac'
-                 for cond = 1 : Ncond
-                    if ~isnan(STUDY.setind(cond,si))
-                        idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index;  
-                        if ~isempty(succompind{si})
-                            X = std_topo(ALLEEG(idat), succompind{si}, 'laplacian'); 
-                            if abso
-                                data = [ data; abs(X)];
-                            else
-                                data = [ data; X];
-                            end
-                                clear X tmp;
-                        end
+                 for cond = 1 : Ncond   % Find first nonNaN index
+                    if ~isnan(STUDY.setind(cond,si)), break; end
+                 end       
+                 idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index;  
+                 if ~isempty(succompind{si})
+                    X = std_topo(ALLEEG(idat), succompind{si}, 'laplacian'); 
+                    if abso
+                       data = [ data; abs(X)];
+                    else
+                       data = [ data; X];
                     end
+                       clear X tmp;
                  end
+
              % select Gradient ica comp scalp maps
              % -----------------------------------
              case 'scalpGrad'
-                 for cond = 1 : Ncond
-                    if ~isnan(STUDY.setind(cond,si))
-                        idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index;  
-                        if ~isempty(succompind{si})
-                            X = std_topo(ALLEEG(idat), succompind{si}, 'gradient'); 
-                            if abso
-                                data = [ data; abs(X)];
-                            else
-                                data = [ data; X];
-                            end
-                            clear X tmp;
-                        end 
-                    end
+                 for cond = 1 : Ncond   % Find first nonNaN index
+                    if ~isnan(STUDY.setind(cond,si)), break; end
                  end
+                 idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index;  
+                 if ~isempty(succompind{si})
+                    X = std_topo(ALLEEG(idat), succompind{si}, 'gradient'); 
+                    if abso
+                       data = [ data; abs(X)];
+                    else
+                       data = [ data; X];
+                    end
+                    clear X tmp;
+                 end 
+                    
              % select ica comp spectra
              % -----------------------
              case 'spec', 
@@ -540,33 +542,32 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
              % -------------------------
              case 'dipoles' % NB: dipoles are identical across conditions (within session)
                             % (no need to scan across conditions)
-              for cond = 1 : Ncond 
-                 if ~isnan(STUDY.setind(cond,si))
-                    idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index;  
-                    count = size(data,1)+1;
-                    try
-                        for icomp = succompind{si}
-                        % select among 3 sub-options
-                        % --------------------------
-                        if ~isempty(succompind{si})
-                            ldip = 1;
-                            if size(ALLEEG(idat).dipfit.model(icomp).posxyz,1) == 2 % two dipoles model
-                                if any(ALLEEG(idat).dipfit.model(icomp).posxyz(1,:)) ...
-                                    & any(ALLEEG(idat).dipfit.model(icomp).posxyz(2,:)) %both dipoles exist
-                                    % find the leftmost dipole
-                                    [garb ldip] = max(ALLEEG(idat).dipfit.model(icomp).posxyz(:,2)); 
-                                elseif any(ALLEEG(idat).dipfit.model(icomp).posxyz(2,:)) 
-                                    ldip = 2; % the leftmost dipole is the only one that exists
-                                end
-                            end
-                            data(count,:) = ALLEEG(idat).dipfit.model(icomp).posxyz(ldip,:);
-                            count = count+1;
+              for cond = 1 : Ncond  % Scan for first nonNaN index.
+                 if ~isnan(STUDY.setind(cond,si)), break; end
+              end
+              idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index;  
+              count = size(data,1)+1;
+              try
+                 for icomp = succompind{si}
+                 % select among 3 sub-options
+                 % --------------------------
+                 if ~isempty(succompind{si})
+                    ldip = 1;
+                    if size(ALLEEG(idat).dipfit.model(icomp).posxyz,1) == 2 % two dipoles model
+                        if any(ALLEEG(idat).dipfit.model(icomp).posxyz(1,:)) ...
+                            & any(ALLEEG(idat).dipfit.model(icomp).posxyz(2,:)) %both dipoles exist
+                           % find the leftmost dipole
+                           [garb ldip] = max(ALLEEG(idat).dipfit.model(icomp).posxyz(:,2)); 
+                        elseif any(ALLEEG(idat).dipfit.model(icomp).posxyz(2,:)) 
+                           ldip = 2; % the leftmost dipole is the only one that exists
                         end
-                        end 
-                    catch
-                        error('Some dipole information is missing');
-                    end;
+                     end
+                     data(count,:) = ALLEEG(idat).dipfit.model(icomp).posxyz(ldip,:);
+                     count = count+1;
                  end
+                 end 
+              catch
+                error('Some dipole information is missing');
               end
               
              % cluster on ica ersp / itc values
