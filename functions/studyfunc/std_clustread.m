@@ -21,14 +21,20 @@
 %                     Else 'all', meaning all measures available.
 %                     Else 'cls', meaning all measures clustered on.
 %                     Else [], for none {default: 'cls'}                                            
-%     'condition'   - STUDY condition 'name', {'names'}, or [number(s)] to read,
+%     'condition'   - STUDY condition 'name' or {'names'} to read,
 %                     Else 'all' {default: 'all'}
-%     'subject'     - STUDY subjects 'name', {'names'}, or [number(s)] to read, 
+%     'condnum''    - STUDY condition [number(s)] to read,
+%                     Else 0 -> all {default: 0}
+%     'subject'     - STUDY subjects 'name' or {'names'} to read, 
 %                     Else 'all' {default: 'all'}
-%     'group'       - STUDY subject group 'name', {'names'}, or [number(s)] to read, 
+%     'subjnum'     - STUDY subjects [number(s)] to read, 
+%                     Else 0 -> all {default: 0}
+%     'group'       - STUDY subject group 'name' or {'names'} to read, 
 %                     Else 'all' {default: 'all'}
+%     'groupnum'    - STUDY subject group [number(s)] to read, 
+%                     Else 0 -> all {default: 0}
 %     'session'     - STUDY session [number(s)] to read, 
-%                     Else 'all' {default: 'all'}
+%                     Else 0 -> all {default: 0}
 %
 % Output:
 %      clsinfo - structure containing information about cluster components in fields:
