@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.39  2005/11/29 22:57:26  toby
+% *** empty log message ***
+%
 % Revision 1.37  2005/11/10 23:42:03  toby
 % edit to be compatible with Matlab 5
 %
@@ -386,11 +389,8 @@ else % INEEG is an EEG struct
         INEEG1.pnts = size(INEEG1.data,2);
         disp('Reconstituting epoch information...');
         INEEG1 = eeg_checkset(INEEG1, 'eventconsistency');
-    end;
-     global toby
-        toby.orilen = orilen;
-        toby.event = INEEG1.event;
-end;
+    end
+end
 
 % build the command
 % -----------------
@@ -398,6 +398,6 @@ if exist('indices') == 1
 	com = sprintf('EEG = pop_mergeset( %s, [%s], %d);', inputname(1), int2str(indices), keepall);
 else
 	com = sprintf('EEG = pop_mergeset( %s, %s, %d);', inputname(1), inputname(2), keepall);		
-end;
+end
 
-return;
+return
