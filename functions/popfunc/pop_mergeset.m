@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.40  2006/04/08 01:58:55  toby
+% removed some extraneous code used for bug checking
+%
 % Revision 1.39  2005/11/29 22:57:26  toby
 % *** empty log message ***
 %
@@ -161,7 +164,7 @@
 
 function [INEEG1, com] = pop_mergeset( INEEG1, INEEG2, keepall);
 
-com = '';
+com = ''; 
 if nargin < 1
 	help pop_mergeset;
 	return;
@@ -324,8 +327,8 @@ else % INEEG is an EEG struct
                 for e=1:length(INEEG2.urevent)
                     tmpval = getfield(INEEG2.urevent, { e }, allfields{i});
                     INEEG1.urevent = setfield(INEEG1.urevent, {orilen + e}, allfields{i}, tmpval);
-                end;
-            end;
+                end
+            end
 		  else
             fprintf('Warning: second dataset has empty urevent structure.\n');
           end 
@@ -335,34 +338,21 @@ else % INEEG is an EEG struct
         % ------------------
         disp('Concatenating events...');
         orilen = length(INEEG1.event);
-        allfields = fieldnames(INEEG2.event);
-        % Toby 11/10/2005
-        orilen = length(INEEG1.event);
-        allfields = fieldnames(INEEG2.event);
-		for i=1:length( allfields )
-            for e=1:length(INEEG2.event)
-                tmpval = getfield(INEEG2.event, { e }, allfields{i});
-                INEEG1.event = setfield(INEEG1.event, {orilen + e}, allfields{i}, tmpval);
-            end;
-		end;
-        INEEG1.epoch = []; % epoch info regenerated at the end by 'eventconsistency'
+        %allfields = fieldnames(INEEG2.event);
 
-		%for i=1:length( allfields )
-%{
-            for e=1:length(INEEG2.event)
-                % Will break if 'event' doesn't have the same subfields, need to fix this. 
-                INEEG1.event(orilen + e) = INEEG2.event(e);
-                if isfield(INEEG1.event,'latency') & isfield(INEEG2.event,'latency')
-                    INEEG1.event(orilen + e).latency = INEEG2.event(e).latency + INEEG1.pnts * INEEG1trials;
-                end
-                if isfield(INEEG1.event,'epoch') & isfield(INEEG2.event,'epoch')
-                    INEEG1.event(orilen + e).epoch = INEEG2.event(e).epoch + INEEG1trials;
-                end
-            end;
-     
-		%end;
+        for e=1:length(INEEG2.event)
+            % Will break if 'event' doesn't have the same subfields, need to fix this. 
+            INEEG1.event(orilen + e) = INEEG2.event(e);
+            if isfield(INEEG1.event,'latency') & isfield(INEEG2.event,'latency')
+               INEEG1.event(orilen + e).latency = INEEG2.event(e).latency + INEEG1.pnts * INEEG1trials;
+            end
+            if isfield(INEEG1.event,'epoch') & isfield(INEEG2.event,'epoch')
+               INEEG1.event(orilen + e).epoch = INEEG2.event(e).epoch + INEEG1trials;
+            end
+         end
+
         INEEG1.epoch = []; % epoch info regenerated below by 'eventconsistency' in eeg_checkset()
-  %}
+  
         % add discontinuity event if continuous
         % -------------------------------------
         if INEEG1trials  == 1 & INEEG2trials == 1
@@ -372,16 +362,15 @@ else % INEEG is an EEG struct
 
 	end;
         
-	%if isfield(INEEG1, 'epoch') & isfield(INEEG2, 'epoch') ...
-	%		& ~isempty(INEEG1.epoch) & ~isempty(INEEG2.epoch)
-	%	try 
-	%		INEEG1.epoch(end+1:end+INEEG2.trials) = INEEG2.epoch(:);
-	%	catch
-	%		disp('pop_mergetset: epoch info removed (information not consistent across datasets)');
-	%	end;
-	%else
-	%	INEEG1.epoch =[];
-	%end;
+	if isfield(INEEG1, 'epoch') && isfield(INEEG2, 'epoch') && ~isempty(INEEG1.epoch) && ~isempty(INEEG2.epoch)
+		try 
+			INEEG1.epoch(end+1:end+INEEG2.trials) = INEEG2.epoch(:);
+		catch
+			disp('pop_mergetset: epoch info removed (information not consistent across datasets)');
+		end;
+	else
+		INEEG1.epoch =[];
+	end;
 
   	% check consistency of merged dataset, regenerate epoch structure
   	% ---------------------------------------------------------------
