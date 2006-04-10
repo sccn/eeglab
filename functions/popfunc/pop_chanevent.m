@@ -92,6 +92,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.47  2006/01/05 20:45:56  arno
+% revert edgelen
+%
 % Revision 1.46  2006/01/05 20:39:14  arno
 % change default edge length
 %
@@ -343,7 +346,7 @@ for ci = chan
     
     % extract edges
     % -------------
-    tmpdiff =  diff(abs(X));
+    tmpdiff =  diff(abs([ X X(end) ]));
     switch g.edge
      case 'both'    , tmpevent1 = find( tmpdiff > 0)-1; tmpevent2 = find( tmpdiff < 0);
      case 'trailing', tmpevent2 = find( tmpdiff < 0);
