@@ -94,6 +94,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.58  2006/03/10 20:09:22  arno
+% nothing
+%
 % Revision 1.57  2006/02/02 22:22:51  arno
 % removing trials from the ICA matrix too
 %
@@ -542,7 +545,7 @@ if ~isempty(g.time) | ~isempty(g.notime)
     else
         if isempty(g.notime)
             g.time = g.time';
-            if g.time(1) ~= 0, g.notime = [0 g.time(1:end)'];
+            if g.time(1) ~= 0, g.notime = [0; g.time(1:end)'];
             else               g.notime = [g.time(2:end)'];
             end;
             if g.time(end) == EEG.xmax, g.notime(end) = [];
