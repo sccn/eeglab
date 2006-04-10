@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.69  2006/03/23 16:44:00  scott
+% text and help
+%
 % Revision 1.68  2006/03/18 14:45:01  arno
 % y
 % cancel button
@@ -352,7 +355,7 @@ elseif length(varargin) == 0 & length(EEG) == 1 % if several arguments, assign v
                            '''must be in the STUDY.''), ''warning'');' ];
         value_owrt   = 1;
     elseif ~saved & option_storedisk
-        text_old = 'Some changes have not been saved. What do you want to do with the old dataset?'
+        text_old = 'Some changes have not been saved. What do you want to do with the old dataset?';
         cb_save2     = [ 'if ~get(findobj(gcbf, ''tag'', ''cb_owrt''), ''value''),' ...
                        '   set(gcbo, ''value'', 1);' ...
                        '    warndlg2(strvcat(''Cannot unset the save checkbox!'','' '',' ...
