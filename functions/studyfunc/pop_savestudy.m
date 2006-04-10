@@ -63,7 +63,7 @@ if nargin < 3
     % ----------------------------------
     [filename, filepath] = uiputfile2('*.study', ...
                     'Save STUDY with .study extension -- pop_savestudy()'); 
-    if isempty(filename), return; end;
+    if isequal(filename,0), return; end;
     if ~strncmp(filename(end-5:end), '.study',6)
         if isempty(strfind(filename,'.'))
             filename = [filename '.study'];
