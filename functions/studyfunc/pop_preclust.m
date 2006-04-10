@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.44  2006/03/29 00:47:59  toby
+% dealing with NaNs in STUDY.setind
+%
 % Revision 1.43  2006/03/23 17:29:40  scott
 % msg text
 %
@@ -383,7 +386,7 @@ if ~isstr(varargin{1}) %intial settings
     if os.itc_on  == 1 
         tmpparams = eval( [ '{' os.ersp_params '}' ] );
         options{end+1} = { 'itc' 'npca' str2num(os.ersp_PCA) tmpparams{:} 'norm' os.ersp_norm ...
-                           'weight' str2num(os.ersp_weight) };
+                           'weight' str2num(os.itc_weight) };
     end       
     
     % ERSP option is on
