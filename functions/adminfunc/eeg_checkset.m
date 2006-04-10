@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.193  2006/03/12 03:12:06  arno
+% typo
+%
 % Revision 1.192  2006/03/12 03:10:43  arno
 % testing dipfit standard files
 %
