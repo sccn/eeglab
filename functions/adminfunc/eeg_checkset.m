@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.194  2006/04/10 21:07:14  arno
+% nothing
+%
 % Revision 1.193  2006/03/12 03:12:06  arno
 % typo
 %
@@ -1158,7 +1161,7 @@ if isstr(EEG.data) & nargin > 1
                 error( ['file ' filename ' not found. If you have renamed/moved' 10 ...
                         'the .set file, you must also rename/move the associated data file.' ]);
             else 
-                fprintf('Reading float file ''%s''...\n', [EEG.filepath filename]);
+                fprintf('Reading float file ''%s''...\n', filename);
             end;
             
             % old format = .fdt; new format = .dat (transposed)
