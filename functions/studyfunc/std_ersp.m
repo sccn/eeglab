@@ -38,6 +38,7 @@
 %   components - [numeric vector] of the EEG structure for which an ERSP   
 %                 and ITC will be computed {default|[]: all components}
 %   freqrange  - [minHz maxHz] the frequency range to compute the ERSP/ITC.
+%   timewindow - [min max] time window in ms.
 %   cycles     - If 0 -> Use FFTs (with constant window length) {default: 0}
 %                 If >0 -> Number of cycles in each analysis wavelet 
 %                 If [wavecycles factor] -> wavelet cycles increase with frequency 
@@ -101,6 +102,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2006/03/16 02:52:27  scott
+% adding 'baseline',powbase to saved params -sm
+%
 % Revision 1.33  2006/03/16 01:46:12  scott
 % fix appending to cell array parameters
 %
@@ -239,7 +243,7 @@ if exist( filenameersp )
 	params   = struct(tmpersp.parameters{:});
     if sum(params.cycles ~= cycles)                   ...
             | (padratio ~= params.padratio) ...
-            | (alpha~= params.alpha) ...
+            | ( (alpha~= params.alpha) & ~( isnan(alpha) & isnan(params.alpha)) ) ...
         % if not as requested parameters, recompute ERSP/ITC
         % i.e., continue
     else
