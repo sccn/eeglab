@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.41  2006/04/11 20:43:41  arno
+% nothing to plot
+%
 % Revision 1.40  2006/03/26 15:13:20  arno
 % fixing coregistration
 %
@@ -352,7 +355,7 @@ if nargin < 3
     if result{1},               options = { options{:} 'load'    result{2} };
     else
         if isempty(result{7})   options = { options{:} 'setup' { result{4} 'meshfile' result{5} } }; % no coreg
-        else                    options = { options{:} 'setup' { result{4} 'meshfile' result{5} 'transform' str2num(result{7}) 'orilocs' 'on' } };
+        else                    options = { options{:} 'setup' { result{4} 'meshfile' result{5} 'transform' str2num(result{7}) } };
         end;
     end;
     
@@ -389,6 +392,7 @@ if ~isempty(loc)
 end;
 loc = strmatch('setup', options(1:2:end)); loc = loc*2-1;
 if ~isempty(loc)
+        dsfdsfds
     if typeplot
         headplot('setup', EEG.chanlocs, options{loc+1}{1}, 'chaninfo', EEG.chaninfo, options{ loc+1 }{2:end});
         EEG.splinefile    = options{loc+1}{1};
@@ -465,6 +469,8 @@ end;
 % plot the graphs
 % ---------------
 counter = 1;
+disp('IMPORTANT NOTICE: electrodes are plotted outside the head surface so their location');
+disp('                  might slightly differ from the one they had during coregistration ');
 for index = 1:size(arg2(:),1)
 	if nbgraph > 1
         if mod(index, rowcols(1)*rowcols(2)) == 1
