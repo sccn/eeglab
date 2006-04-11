@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.40  2006/03/26 15:13:20  arno
+% fixing coregistration
+%
 % Revision 1.39  2006/03/15 22:37:43  scott
 % edit printed msgs - questons remain...
 %
@@ -360,6 +363,7 @@ if nargin < 3
 		tmpbut = questdlg2(['This will draw ' int2str(length(arg2)) ' plots. Continue ?'], '', 'Cancel', 'Yes', 'Yes');
 		if strcmp(tmpbut, 'Cancel'), return; end;
 	end;
+    if length(arg2) == 0, error('Nothing to plot'); end;
 	topotitle  = result{9};
 	rowcols    = eval( [ '[ ' result{10} ' ]' ] );
     tmpopts    = eval( [ '{ ' result{11} ' }' ] );
