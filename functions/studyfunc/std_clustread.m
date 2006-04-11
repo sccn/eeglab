@@ -22,8 +22,8 @@
 %         clustinfo.condition     % index of the condition asked for
 %
 %         clustinfo.comp[]        % array of component indices 
-%         clustinfo.subject{}     % cell array of component subject codes UNIMPLMENETED
-%         clustinfo.group{}       % cell array of component group codes  UNIMPLMENETED!
+%         clustinfo.subject{}     % cell array of component subject codes
+%         clustinfo.group{}       % cell array of component group codes
 %
 %         clustinfo.erp[]         % (ncomps, ntimes) array of component ERPs
 %           clustinfo.erp_times[] % vector of ERP epoch latencies
@@ -130,3 +130,104 @@ for k = 1:ncomps %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for each channel component 
         end;
     end; % infotype
 end % comp
+
+% FUTURE HEADER
+% std_clustread() - return detailed information and (any) requested component 
+%                   measures for all components of a specified cluster. Restrict 
+%                   component info to components from specified subjects, groups,
+%                   sessions, and/or conditions. Use in scripts handling results 
+%                   of component clustering. Called by cluster plotting 
+%                   functions: std_envtopo(), std_erpplot(), std_erspplot(), ...
+% Usage:
+%         >> clsinfo = std_clustread(STUDY, ALLEEG, cluster);  % use defaults
+%         >> clsinfo = std_clustread(STUDY, ALLEEG, cluster, ...
+%                                             'keyword1', keyval1, ...
+%                                                   'keyword2', keyval2, ...);
+% Inputs:
+%         STUDY     - studyset structure containing some or all files in ALLEEG
+%         ALLEEG    - vector of loaded EEG datasets including those in STUDY
+%         cluster   - cluster number in STUDY to return information for 
+%
+% Optional keywords - and values:                                               IMPLEMENT !!
+%      'measure'    - ['erp'|'spec'|'ersp'|'itc'|'dipole'|'topo'] stored
+%                     cluster measure(s) to read. May also be a cell array of
+%                     these, for example: { 'erp' 'map' 'dipole' }. 
+%                     Else 'all', meaning all measures available.
+%                     Else 'cls', meaning all measures clustered on.
+%                     Else [], for none {default: 'cls'}                                            
+%     'condition'   - STUDY condition 'name' or {'names'} to read,
+%                     Else 'all' {default: 'all'}
+%     'condnum''    - STUDY condition [number(s)] to read,
+%                     Else 0 -> all {default: 0}
+%     'subject'     - STUDY subjects 'name' or {'names'} to read, 
+%                     Else 'all' {default: 'all'}
+%     'subjnum'     - STUDY subjects [number(s)] to read, 
+%                     Else 0 -> all {default: 0}
+%     'group'       - STUDY subject group 'name' or {'names'} to read, 
+%                     Else 'all' {default: 'all'}
+%     'groupnum'    - STUDY subject group [number(s)] to read, 
+%                     Else 0 -> all {default: 0}
+%     'session'     - STUDY session [number(s)] to read, 
+%                     Else 0 -> all {default: 0}
+%
+% Output:
+%      clsinfo - structure containing information about cluster components in fields:
+%
+%         .clustername   % cluster name
+%           .clusternum  % cluster index
+%
+%         .dataset       % {(conditions,components) cell array} component dataset indices 
+%                                                           in the input ALLEEG array
+%         .component     % [(1,components) int array]  component decomposition indices 
+%         .subject       % {(1,components) cell array} component subject codes 
+%           .subjectnum  % [(1,components) int array] component subject indices
+%         .group         % {(1,components) cell array} component group codes  
+%           .groupnum    % [(1,components) int array] component group indices
+%
+%         .condition     % {(1,components) cell array} component condition codes
+%           .conditionnum % [(1,components) int array] component condition indices
+%         .session       % [(1,components) int array] component session indices
+%
+%         .erp           % {(conditions, components) cell array} 
+%                                       (1, latencies) component ERPs             CHECK DIM
+%           .erp_times   % [num vector] ERP epoch latencies (s)
+%
+%         .spec          % {(conditions, components) cell array} 
+%                                       (1,frequencies) component spectra         CHECK DIM
+%           .spec_freqs  % [num vector] spectral frequencies (Hz)
+%
+%         .ersp          % {(conditions, components) cell array} 
+%                                       (freqs,latencies) component ERSPs         CHECK DIM
+%           .ersp_times  % [num vector] ERSP epoch latencies (s)
+%           .ersp_freqs  % [num vector] ERSP frequencies (Hz)
+%
+%         .itc           % {(conditions, components) cell array} 
+%                                       (freqs,latencies) component ITCs           CHECK DIM
+%           .itc_times   % [num vector] ITC epoch latencies (s)
+%           .itc_freqs   % [num vector] ITC frequencies (Hz)
+%
+%         .topo          % {(1,components) cell array} 
+%                                              (65,65) component topo map grids    CHECK DIM
+%           .xi          % [vector] topo grid abscissa values 
+%           .yi          % [vector] topo grid ordinate values
+%
+%         .dipole        % [struct array] component dipole information 
+%                        % structures with same format as "EEG.dipfit.model"
+%                        % See >> help dipfit                                      CHECK HELP
+% Example:
+%         % To plot the ERPs for all Cluster-3 components in a one-condition STUDY
+%         %
+%         clsinfo3 = std_clustread(STUDY, ALLEEG, 3, 'measure', 'erp'); % assume 1 condition
+%         times = clsinfo3.erp_times; figure; plot(times, clsinfo3.erp');
+%         %
+%         % To plot ERPs for only those Cluster-3 components from subjects in group 'female'
+%         %
+%         feminfo3 = std_clustread(STUDY, ALLEEG, 3, 'measure', 'erp', 'group', 'female');
+%         figure; plot(times, feminfo3.erp');
+%         %
+%         % Alternatively, to extract 'female' subject components from clsinfo3 above
+%         %
+%         femidx = find(strcmp({clsinfo3.group},'female'));
+%         figure; plot(times, clustinfo.erp(femidx,:)');                            CHECK EXAMPLE
+% 
+% Authors: Hilit Serby, Scott Makeig, Toby Fernsler & Arnaud Delorme, SCCN/INC/UCSD, 2005-
