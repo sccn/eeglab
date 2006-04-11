@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.68  2006/04/11 20:44:59  arno
+% do not know
+%
 % Revision 1.67  2006/03/17 18:35:20  scott
 % added comma between outputs in function statement
 %
@@ -451,14 +454,6 @@ if isstr(values)
         Xeori     = imag(allcoords);
         Yeori     = real(allcoords);
     end;
-    
-    if strcmpi(g.orilocs, 'off')
-        % normalize electrode locations if spherical
-        dists = sqrt(Xeori.^2+Yeori.^2+Zeori.^2);
-        Xeori = Xeori./dists*0.1; % 0.1 is the radius of the sphere for 
-        Yeori = Yeori./dists*0.1; % the standard BESA file that was 
-        Zeori = Zeori./dists*0.1; % used to perform the coregistration
-    end;
     newcoords = [ Xeori Yeori Zeori ];
     
     %newcoords = transformcoords( [ Xe Ye Ze ], [0 -pi/16 -1.57], 100, -[6 0 46]);
@@ -538,9 +533,9 @@ if isstr(values)
     y = spherePOS(:,2);
     z = spherePOS(:,3);
     
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    % Calculate new electrode positions
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % Calculate new electrode positions on head
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     if strcmpi(g.orilocs, 'off')
         fprintf('Computing electrode locations on head...\n');
         for i=1:length(Xe)
@@ -591,11 +586,12 @@ if isstr(values)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     comment          = g.comment;
     headplot_version = 2;
+    transform        = g.transform
     try, save(spline_file, '-V6', '-mat', 'Xe', 'Ye', 'Ze', 'G', 'gx', 'newElect', ...
-              'ElectrodeNames', 'indices', 'comment', 'headplot_version');   
+              'ElectrodeNames', 'indices', 'comment', 'headplot_version', 'transform');   
     catch,
         try,  save(spline_file, '-mat', 'Xe', 'Ye', 'Ze', 'G', 'gx', 'newElect', ...
-                   'ElectrodeNames', 'indices', 'comment', 'headplot_version');
+                   'ElectrodeNames', 'indices', 'comment', 'headplot_version', 'transform');
         catch, error('headplot: save spline file error, out of space or file permission problem');
         end;
     end;
