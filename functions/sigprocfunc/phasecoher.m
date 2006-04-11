@@ -6,7 +6,8 @@
 %     >> [amps,cohers       ] = phasecoher(data,frames,srate,freq,cycles); 
 %     >> [amps,cohers,cohsig,ampsig,allamps,allphs] = phasecoher(data,frames,...
 %                                                    srate,freq,cycles,...
-%                                                       alpha,times,titl);
+%                                                       alpha,times,titl,...
+%                                               timeStretchRef, timeStretchMarks);
 % Inputs:
 %   data   = input data, (1,frames*trials) or NB: (frames,trials) 
 %   frames = frames per trial
@@ -17,6 +18,10 @@
 %            >=3 output arguments. alpha=0 -> no signif {default: 0}.
 %   times  = vector of times for plotting {default: no plot}
 %   titl   = plot title {default none}
+%   timeStretchRef = common reference frames for timeStretching (1,number
+%                    of references)
+%   timeStretchMarks = mark frames for timeStretching (number of
+%                      references, trials)
 %
 % Outputs:
 %   amps    = mean amplitude at each time point
@@ -47,6 +52,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2006/01/12 00:36:42  toby
+% Phase coher no longer removes epoch means.
+% Needed so that dB conversion could be done correctly.
+%
 % Revision 1.9  2003/11/30 18:29:18  scott
 % phase() (obsolete) -> angle()
 %
@@ -83,7 +92,8 @@
 % 08-18-01 debugged cohsig plotting line (302) -sm
 % 01-25-02 reformated help & license, added links -ad 
 
-function [amps,cohers,cohsig,ampsig,allamps,allphs] = phasecoher(data,frames,srate,freq,cycles,alpha,times,titl)
+function [amps,cohers,cohsig,ampsig,allamps,allphs] = ...
+      myphasecoher(data, frames, srate, freq, cycles, alpha, times, titl, timeStretchRef, timeStretchMarks)
 
 MIN_AMP = 10^-6;
 DEFAULT_ALPHA = nan;% no bootstrap computed
@@ -97,18 +107,18 @@ ampsig = []; % initialize for null output
 cohsig = [];
 
 if nargin<4
-  help phasecoher
+  help myphasecoher
   return
 end
 if nargin<5
   cycles = DEFAULT_CYCLES;
 end
 
-if nargin < 8
+if nargin < 8 | isempty(titl)
    titl = '';
 end
 
-if nargin < 7
+if nargin < 7 | isempty(titl) | isempty(times)
   PLOT_IT = 0;
 elseif length(times) ~= frames
   fprintf('phasecoher(): times vector length must be same as frames.\n')
@@ -218,6 +228,9 @@ end
 cohers  = zeros(1,frames);
 ix = 0:winlength-1;
 nsums = zeros(1,frames);
+
+C = [];
+
 for f = 1:frames %%%%%%%%%%%%%%% frames %%%%%%%%%%%%%%%%%%%%
   epoch = data(ix+f,:);
   %epoch = epoch - ones(winlength,1)*mean(epoch); % remove epoch means
@@ -227,79 +240,106 @@ for f = 1:frames %%%%%%%%%%%%%%% frames %%%%%%%%%%%%%%%%%%%%
   for t = 1:trials  %%%%%%%%%%%%%%% trials %%%%%%%%%%%%%%%%%%%
     realpart = coswin*epoch(:,t);
     imagpart = sinwin*epoch(:,t);
-    amp = sqrt(realpart.*realpart+imagpart.*imagpart);
-    if amp >= MIN_AMP
-      amps(f) = amps(f) + amp; % sum of amps
-      realcoh(f) = realcoh(f)+ realpart/amp;
-      imagcoh(f) = imagcoh(f)+ imagpart/amp;
-      nsums(f) = nsums(f)+1;
-    end
-    if nargout > 3 
-      if amp < MIN_AMP
-        amp = MIN_AMP;
-      end
-      allamps(f,t) = amp;
-    end
-    if nargout > 5
-      allphs(f,t) = 180/pi*angle(realpart+i*imagpart);
-    end
+    C(f,t) = complex(realpart, imagpart);
   end
-  if nsums(f)>0
-    amps(f) = amps(f)/nsums(f);
-    realcoh(f) = realcoh(f)/nsums(f);
-    imagcoh(f) = imagcoh(f)/nsums(f);
-  else
-    amps(f) = 0;
-    realcoh(f) = 0;
-    imagcoh(f) = 0;
+end
+
+allamps = sqrt(C.*conj(C)); %compute all amplitudes for all frames, all trials
+allphs = angle(C); %get the phase
+                   
+%for debugging
+allphampsori = allamps; 
+allphsori = allphs;
+%end debug
+
+if exist('timeStretchRef') & exist('timeStretchMarks') & ...
+    length(timeStretchRef) > 0 & length(timeStretchMarks) > 0 %Added -Jean
+  for t=1:trials
+% $$$     disp(t);
+    M = timeWarp(timeStretchMarks(:,t)', timeStretchRef');
+    allamps(:,t) = M*allamps(:,t);
+    allphs(:,t) = angTimeWarp(timeStretchMarks(:,t)', timeStretchRef', ...
+                              allphs(:,t));
   end
-end %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+end
+
+
+% keyboard;
+
+[amps, cohers, nsums]=getAmpCoh(allamps, allphs, MIN_AMP);
+
+% $$$ keyboard;
+
+% Old routine, for archeological purposes
+% $$$ for f = 1:frames %%%%%%%%%%%%%%% frames %%%%%%%%%%%%%%%%%%%%
+% $$$   epoch = data(ix+f,:);
+% $$$   %epoch = epoch - ones(winlength,1)*mean(epoch); % remove epoch means
+% $$$   if rem(f,50)== 0
+% $$$     fprintf(' %d',f)
+% $$$   end
+% $$$   for t = 1:trials  %%%%%%%%%%%%%%% trials %%%%%%%%%%%%%%%%%%%
+% $$$     realpart = coswin*epoch(:,t);
+% $$$     imagpart = sinwin*epoch(:,t);
+% $$$     amp = sqrt(realpart.*realpart+imagpart.*imagpart);
+% $$$     if amp >= MIN_AMP
+% $$$       amps(f) = amps(f) + amp; % sum of amps
+% $$$       realcoh(f) = realcoh(f) + realpart/amp;
+% $$$       imagcoh(f) = imagcoh(f) + imagpart/amp;
+% $$$       nsums(f) = nsums(f)+1;
+% $$$     end
+% $$$     if nargout > 3 
+% $$$       if amp < MIN_AMP
+% $$$         amp = MIN_AMP;
+% $$$       end
+% $$$       allamps(f,t) = amp;
+% $$$     end
+% $$$     if nargout > 5
+% $$$       allphs(f,t) = 180/pi*angle(realpart+i*imagpart);
+% $$$     end
+% $$$   end
+% $$$   if nsums(f)>0
+% $$$     amps(f) = amps(f)/nsums(f);
+% $$$     realcoh(f) = realcoh(f)/nsums(f);
+% $$$     imagcoh(f) = imagcoh(f)/nsums(f);
+% $$$   else
+% $$$     amps(f) = 0;
+% $$$     realcoh(f) = 0;
+% $$$     imagcoh(f) = 0;
+% $$$   end
+% $$$ end %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% $$$ cohers = sqrt(realcoh.^2+imagcoh.^2);
+
 fprintf('\n');
 
-cohers = sqrt(realcoh.^2+imagcoh.^2);
+
+
+
 cohsig = [];
 
 if ~isnan(alpha)  %%%%%%%%%%%%%% Compute cohsig/ampsig %%%%%%%%%%%%%%
  ix = 0:winlength-1;
  bootcoher = zeros(1,COHSIG_REPS);
  bootamp   = zeros(1,COHSIG_REPS);
-
+ 
+ bootallamps = zeros(COHSIG_REPS, trials); %Added -Jean
+ bootallphs = zeros(COHSIG_REPS, trials); %Added -Jean
+ 
  fprintf('Computing %d bootstrap coherence values... ',COHSIG_REPS); 
  for f = 1:COHSIG_REPS %%%%%%%%%%%%%%% Bootstrap replications %%%%%%%%%%%
   if rem(f,50) == 0
     fprintf('%d ',f);
   end
   randoff = floor(rand(1,trials)*(frames-winlength))+1; % random offsets
-  realcoh = 0;
-  imagcoh = 0;
-  tmpamps = 0;
-  nsums   = 0;
-  for t = 1:trials %%%%%%%%%%%% trials %%%%%%%%%%%%%%%
-    epoch = data(ix+randoff(t),t); % random time-window 
-    %epoch = epoch - ones(winlength,1)*mean(epoch); 
-    realpart = coswin*epoch;
-    imagpart = sinwin*epoch;
-    amp = sqrt(realpart.^2+imagpart.^2);
-    if amp >= MIN_AMP
-      tmpamps = tmpamps + amp;
-      realcoh = realcoh+ realpart/amp;
-      imagcoh = imagcoh+ imagpart/amp;
-      nsums = nsums+1;
-    end
-  end %%%%%%%%%%%%%% trials %%%%%%%%%%%%%%%%%%%%%%%%%%
-  if nsums>0
-    realcoh = realcoh/nsums;
-    imagcoh = imagcoh/nsums;
-    tmpamps = tmpamps/nsums;
-  else
-    realcoh = 0;
-    imagcoh = 0;
-    tmpamps = 0;
+  
+  %Create randomized time-stretched allamps and allphs arrays (see above)
+  for t = 1:trials
+    bootallamps(f, t) = allamps(randoff(t), t);
+    bootallphs(f, t) = allphs(randoff(t), t);
   end
-  bootamp(f)   = tmpamps;
-  bootcoher(f) = sqrt(realcoh.^2+imagcoh.^2);
+ end
 
- end  %%%%%%%%%%%%%%%%%%%%%%%%%% COHSIG_REPS %%%%%%%%%%%%%%%%%%%%%%%%%
+ [bootamp, bootcoher]=getAmpCoh(bootallamps, bootallphs, MIN_AMP);
+ 
  fprintf('\n');
 
  bootcoher = sort(bootcoher); % sort low to high
@@ -356,3 +396,27 @@ if PLOT_IT %%%%%%%%%%%%%% make two-panel plot of results %%%%%%%%
   end                                  
 end
 
+
+
+function [amps, cohers, nsums]=getAmpCoh(allamps, allphs, MIN_AMP);
+  minampfilter = allamps >= MIN_AMP;
+  nsums = sum(minampfilter,2);
+
+  amps(find(nsums == 0)) = 0; %zero the amplitude if no trial shows
+                              %significant power at that frame
+  cohers(find(nsums == 0)) = 0; %zero the coherence too if no trial shows
+                                %significant power at that frame
+                                %Now average out amplitudes over trials
+  allminamps = allamps;
+  if nargout > 3
+    allminamps(~minampfilter) = MIN_AMP;
+  end
+  allzeramps = allamps .* minampfilter;
+  allzeramps = allzeramps(find(nsums ~= 0),:);
+  amps(find(nsums ~= 0)) = sum(allzeramps,2) ./ nsums(find(nsums ~= 0));
+
+  %Convert angles to complex for summing
+  allzerphs = complex(cos(allphs), sin(allphs)) .* minampfilter;
+  allzerphs = allzerphs(find(nsums ~= 0), :);
+  cohers(find(nsums ~= 0)) = sum(allzerphs,2) ./ nsums(find(nsums ~= 0));
+  cohers = sqrt(cohers .* conj(cohers));
