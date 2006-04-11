@@ -122,6 +122,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.58  2006/04/11 18:35:07  arno
+% better message
+%
 % Revision 1.57  2006/04/11 18:33:30  arno
 % text message
 %
@@ -405,7 +408,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                                     delete(filename);
                                 end
                             else
-                                fprintf('Using existing %s information for dataset %d...\n', upper(strcom), idat);
+                                fprintf('Using %s information available on disk for dataset %d...\n', upper(strcom), idat);
                             end
                         end
                     end
