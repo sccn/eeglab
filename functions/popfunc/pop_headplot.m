@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.43  2006/04/11 21:15:37  arno
+% remove debug message
+%
 % Revision 1.42  2006/04/11 21:14:29  arno
 % warning message
 %
@@ -471,7 +474,7 @@ end;
 % plot the graphs
 % ---------------
 counter = 1;
-disp('IMPORTANT NOTICE: electrodes are plotted outside the head surface so their location');
+disp('IMPORTANT NOTICE: electrodes are projected to the head surface so their location');
 disp('                  might slightly differ from the one they had during coregistration ');
 for index = 1:size(arg2(:),1)
 	if nbgraph > 1
