@@ -21,21 +21,23 @@
 %   'comps'    - [numeric vector]  -> cluster components to plot.
 %                            'all' -> plot all cluster components 
 %                            {default: 'all'}.
-%   'mode'     - ['centroid'|'comps'] plotting mode. In 'centroid' mode, 
-%                     the average ERSPs of the requested clusters are plotted 
-%                     in the same figure - one per condition. In 'comps' mode, 
-%                     icomponent ERSPs for each cluster are plotted n a separate 
-%                     figure (per condition) with the cluster mean ERSP. 
-%                     Note: This option is irrelevant if component indices 
-%                     are provided as input {default: 'centroid'} 
+%   'channels' - [numeric vector]  -> channels to plot.
+%   'mode'     - ['centroid'|'individual'] plotting mode. In 'centroid' 
+%                mode, the average ERSPs of the requested clusters or channels  
+%                are plotted in the same figure - one per condition. In 
+%                'individual' mode, component ERSPs for each
+%                cluster (or channel) are plotted in a separate 
+%                figure (per condition) with the mean ERSP. 
+%                Note that for clusters, this option is irrelevant if component  
+%                indices are provided as input {default: 'centroid'} 
 %   'figure'  - ['on'|'off'] 'on' -> plot on a new figure; 
-%                    'off' -> plot on current figure 'figure'.
-%                    Note: 'off' is optional for one cluster in 'centroid' mode.
-%                    Useful for incomporating a cluster ERSP into 
-%                    a complex figure. In case of multiple conditions, 
-%                    only the first condition is displayed, but clicking on 
-%                    the figure will open a new figure with all conditions 
-%                    plotted separately {default: 'on'} 
+%                'off' -> plot on current figure 'figure'.
+%                Note: 'off' is optional for one cluster in 'centroid' mode.
+%                Useful for incomporating a cluster ERSP into 
+%                a complex figure. In case of multiple conditions, 
+%                only the first condition is displayed, but clicking on 
+%                the figure will open a new figure with all conditions 
+%                plotted separately {default: 'on'} 
 % Output:
 %   STUDY     - the input STUDY set structure modified with plotted cluster 
 %               mean ERSPs to allow quick replotting (unless cluster means 
@@ -69,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2006/03/21 15:43:14  arno
+% new .sets format
+%
 % Revision 1.22  2006/03/20 17:22:45  arno
 % new std_clustread
 %
@@ -135,180 +140,231 @@ function STUDY = std_erspplot(STUDY, ALLEEG,  varargin)
 icadefs;
 
 % Set default values
-cls = []; % plot all clusters in STUDY
-mode = 'centroid'; % plot clusters centroid 
-figureon = 1;
+% ------------------
+g = finputcheck( varargin, { 'clusters'    { 'integer' 'string' }  { [] [] }           'all';
+                             'mode'        'string'     { 'centroid' 'comps' 'individual' } 'centroid';
+                             'figure'      'string'     { 'on' 'off' }                 'on';
+                             'channels'    'integer'    []                             [];
+                             'subject'     'string'     []                             '';
+                             'dataset'     'integer'    []                             [];
+                             'comps'       'integer'    []                             [] }, 'std_plotersp');
+if isstr(g), error(g); end;
 
-for k = 3:2:nargin
-    switch varargin{k-2}
-        case 'clusters'
-            if isnumeric(varargin{k-1})
-                cls = varargin{k-1};
-                if isempty(cls)
-                    cls = 2:length(STUDY.cluster);
-                end
-            else
-                if isstr(varargin{k-1}) & strcmpi(varargin{k-1}, 'all')
-                    cls = 2:length(STUDY.cluster);
-                else
-                    error('std_erspplot: ''clusters'' input takes either specific clusters (numeric vector) or keyword ''all''.');
-                end
-            end
-        case 'comps'
-            STUDY = std_plotcompersp(STUDY, ALLEEG,  cls, varargin{k-1});
-            return;
-        case 'mode' % Plotting mode 'centroid' / 'comps'
-            mode = varargin{k-1};
-        case 'figure' % plot on exisiting figure or a new figure
-            if strcmpi(varargin{k-1},'off')
-                if length(cls) == 1 % only in case of one cluster
-                    figureon = 0;
-                end
-            end
-    end
+% check input parameters
+% ----------------------
+if isempty(g.clusters)
+    g.clusters = 2:length(STUDY.cluster);
 end
+if strcmpi(g.clusters, 'all')
+    g.clusters = 2:length(STUDY.cluster);
+end
+if ~isfield(STUDY, 'chanmean')
+    STUDY.chanmean = [];
+end;
+Ncond = length(STUDY.condition);
 
-% select clusters to plot
+% plot component measures
 % -----------------------
-if isempty(cls)
-    tmp =[];
-    cls = 2:length(STUDY.cluster); % plot all clusters in STUDY
-    for k = 1: length(cls)
-        % don't include 'Notclust' clusters
-        if ~strncmpi('Notclust',STUDY.cluster(cls(k)).name,8) & ~strncmpi('ParentCluster',STUDY.cluster(cls(k)).name,13)
-            tmp = [tmp cls(k)];
-        end
+if ~isempty(g.comps)
+    for ci = 1 : length(g.comps) %for each comp
+        if ~isempty(g.clusters)
+            abset   = [ STUDY.datasetinfo(STUDY.cluster(g.clusters).sets(:,g.comps(ci))).index ];
+            subject =   STUDY.datasetinfo(STUDY.cluster(g.clusters).sets(1,g.comps(ci))).subject;
+            comp    =   STUDY.cluster(g.clusters).comps(g.comps(ci));
+            fig_title = [ 'ERSP, IC' num2str(comp) ' / ' subject ', ' STUDY.cluster(g.clusters).name ];
+            plotcondersp( STUDY, ALLEEG, 'dataset', abset, 'component', comp, 'title', fig_title );
+        else
+            plotcondersp( STUDY, ALLEEG, 'dataset', g.datasets, 'component', g.comps(ci), 'subject', g.subject);
+        end;
     end
-    cls = tmp;
+    return;
 end;
 
-Ncond = length(STUDY.condition);
-if Ncond == 0
-    Ncond = 1;
-end
+% plot channel measures for one dataset or one subject
+% ----------------------------------------------------
+if ~isempty(g.channels) & (~isempty(g.dataset) | ~isempty(g.subject))
+    for ci = 1 : length(g.channels) %for each comp
+        if ~isempty(g.subject), fig_title = [' Subject ' g.subject          ', channel ' int2str(g.channels(ci)) ]; end;
+        if ~isempty(g.dataset), fig_title = [' Dataset ' int2str(g.dataset) ', channel ' int2str(g.channels(ci)) ]; end;
+        plotcondersp( STUDY, ALLEEG, 'dataset', g.dataset, 'component', g.channels(ci), ...
+            'subject', g.subject, 'title', fig_title);
+    end
+    return;
+end;
+
+% -----------------
+% compute centroids
+% -----------------
+if ~isempty(g.clusters) % cluster
+    for k = 1:length(g.clusters)
+        if ~isfield(STUDY.cluster(g.clusters(k)).centroid,'ersp')
+            STUDY = std_centroid(STUDY,ALLEEG, g.clusters(k) , 'ersp');
+        end
+        if isempty(STUDY.cluster(g.clusters(k)).centroid.ersp)
+            warndlg2(['eeg_clustedit: some .icaersp files could not be found for cluster ' STUDY.cluster(g.clusters(k)).name ], 'Abort - Plot ERSP' ); 
+            return
+        end
+    end
+else % channel centroid
+    for k = 1:length(g.channels)
+        STUDY = std_chanmean(STUDY,ALLEEG, g.channels(k), 'ersp');
+    end
+end;    
+
+% -----------------------------------------------------
 % Plot all the components in the cluster ('comps' mode)
-if strcmpi(mode, 'comps')         
-    for clus = 1: length(cls) % For each cluster requested
-        len = length(STUDY.cluster(cls(clus)).comps);
-        try 
-            h_wait = waitbar(0,['Plotting ERSP ...'], 'Color', BACKEEGLABCOLOR,'position', [300, 200, 300, 48]);
-        catch % for Matlab 5.3
-            h_wait = waitbar(0,['Plotting ERSP ...'],'position', [300, 200, 300, 48]);
+% -----------------------------------------------------
+if ~isempty(g.clusters) & (strcmpi(g.mode, 'comps') | strcmpi(g.mode, 'individual'))
+    for clus = 1: length(g.clusters) % For each cluster requested
+
+        len = length(STUDY.cluster(g.clusters(clus)).comps);
+        rowcols(2) = ceil(sqrt(len + 4)); 
+        rowcols(1) = ceil((len+4)/rowcols(2));
+
+        % get cluster information
+        % -----------------------
+        try
+            clusncomm = std_clustread(STUDY, ALLEEG, g.clusters(clus),'ersp',[1:Ncond]);
+        catch,
+            warndlg2([ 'Some ERSP information is missing, aborting'] , ['Abort - Plot ERSP' ] );   
+            return;
         end
-        rowcols(2) = ceil(sqrt(len + 4)); rowcols(1) = ceil((len+4)/rowcols(2));
-        if ~isfield(STUDY.cluster(cls(clus)).centroid,'ersp')
-            STUDY = std_centroid(STUDY,ALLEEG, cls(clus) , 'ersp');
-        end
-        %try
-            clusncomm = std_clustread(STUDY, ALLEEG, cls(clus),'ersp',[1:Ncond]);
-        %catch,
-        %    warndlg2([ 'Some ERSP information is missing, aborting'] , ['Abort - Plot ERSP' ] );   
-        %    delete(h_wait)
-        %    return;
-        %end
-       for n = 1:Ncond
-           figure
-           orient tall
-            maintitle = ['ERSP, cond. ' num2str(n) ', ' STUDY.cluster(cls(clus)).name ];
+        
+        % plot: one figure per condition
+        % ------------------------------
+        for n = 1:Ncond
+            
+            % create new figure
+            % -----------------
+            figure
+            orient tall
+            maintitle = ['ERSP, cond. ' num2str(n) ', ' STUDY.cluster(g.clusters(clus)).name ];
             a = textsc(maintitle,'title'); 
             set(a, 'fontweight', 'bold'); 
             set(gcf,'Color', BACKCOLOR);
-            sbplot(rowcols(1),rowcols(2),[1 rowcols(2)+2 ]) ,
-            ave_ersp = STUDY.cluster(cls(clus)).centroid.ersp{n};
-            lim = STUDY.cluster(cls(clus)).centroid.ersp_limits{n}; %plotting limits
+            sbplot(rowcols(1),rowcols(2),[1 rowcols(2)+2 ]);
             
-            idat = STUDY.datasetinfo(STUDY.cluster(cls(clus)).sets(1,1)).index;
+            % plot centroid
+            % -------------
+            ave_ersp = STUDY.cluster(g.clusters(clus)).centroid.ersp{n};
+            idat     = STUDY.datasetinfo(STUDY.cluster(g.clusters(clus)).sets(1,1)).index;
+            ersp_times = STUDY.cluster(g.clusters(clus)).centroid.ersp_times;
+            ersp_freqs = STUDY.cluster(g.clusters(clus)).centroid.ersp_freqs;
+            fig_title  = [ STUDY.cluster(g.clusters(clus)).name ' average ERSP, ' ...
+                num2str(length(unique(STUDY.cluster(g.clusters(clus)).sets(1,:)))) 'Ss' ];
+            %lim = STUDY.cluster(g.clusters(clus)).centroid.ersp_limits{n}; %plotting limits
+            plotersp( ave_ersp, ersp_times, ersp_freqs, 'title', fig_title);
 
-            logfreqs   = log(STUDY.cluster(cls(clus)).centroid.ersp_freqs);
-            ersp_times = STUDY.cluster(cls(clus)).centroid.ersp_times;
-            a = [ STUDY.cluster(cls(clus)).name ' average ERSP, ' num2str(length(unique(STUDY.cluster(cls(clus)).sets(1,:)))) 'Ss' ];
-            tftopo(ave_ersp,ersp_times,logfreqs,'limits', [ersp_times(1) ersp_times(end) logfreqs(1) logfreqs(end)],...
-                'title', a, 'verbose', 'off', 'axcopy', 'off');
-            ft = str2num(get(gca,'yticklabel'));
-            ft = exp(1).^ft;
-            ft = unique(round(ft));
-            ftick = get(gca,'ytick');
-            ftick = exp(1).^ftick;
-            ftick = unique(round(ftick));
-            ftick = log(ftick);
-            set(gca,'ytick',ftick);
-            set(gca,'yticklabel', num2str(ft));
-            xlabel('Time [ms]');
-            axcopy(gcf, [' ft = str2num(get(gca,''''yticklabel'''')); ft = exp(1).^ft; ft = unique(round(ft)); fti = get(gca,''''ytick''''); fti = exp(1).^fti; fti = unique(round(fti));'...
-                'fti = log(fti); set(gca, ''''ytick'''',fti); set(gca, ''''yticklabel'''',num2str(ft)); xlabel(''''Time [ms]''''); ylabel(''''Frequency [Hz]''''); cbar; clear ft fti;' ]);
-            cbar;
-            for k = 1:len % Plot the individual component ersp  
-                abset   = STUDY.datasetinfo(STUDY.cluster(cls(clus)).sets(n,k)).index;
-                subject = STUDY.datasetinfo(STUDY.cluster(cls(clus)).sets(n,k)).subject;
-                comp = STUDY.cluster(cls(clus)).comps(k);
+            % Plot the individual component ersp 
+            % ----------------------------------
+            for k = 1:len %  
+                abset   = STUDY.datasetinfo(STUDY.cluster(g.clusters(clus)).sets(n,k)).index;
+                subject = STUDY.datasetinfo(STUDY.cluster(g.clusters(clus)).sets(n,k)).subject;
+                comp    = STUDY.cluster(g.clusters(clus)).comps(k);
                                 
-                a = [ 'ic' num2str(comp) '/' subject ];
+                fig_title = [ 'ic' num2str(comp) '/' subject ];
                 if k <= rowcols(2) - 2 %first sbplot row
                     sbplot(rowcols(1),rowcols(2),k+2); 
                 else  %other sbplot rows
                     sbplot(rowcols(1),rowcols(2),k+4);  
                 end
-                tftopo(clusncomm.ersp{k}(:,:,n), clusncomm.ersp_times{k},log(clusncomm.ersp_freqs{k}),'limits', ...
-                    [clusncomm.ersp_times{k}(1) clusncomm.ersp_times{k}(end) log(clusncomm.ersp_freqs{k}(1)) log(clusncomm.ersp_freqs{k}(end)) -lim lim],...
-                    'title', a, 'verbose', 'off', 'axcopy', 'off');
-                set(gca, 'xtick', [], 'ytick', []);
-                set(get(gca,'Title'),'FontSize',8)
-                xlabel('');
-                ylabel('');
-                waitbar((k*n)/(Ncond*len),h_wait);
-                if k == len
-                    cbar;
-                end
+                
+                plotersp( clusncomm.ersp{n,k}(:,:), clusncomm.ersp_times, clusncomm.ersp_freqs, ...
+                    'title', fig_title, 'xlabel', 'off', 'ylabel', 'off', 'cbar', 'off');
+                set(get(gca,'Title'),'FontSize',8);
+                drawnow;
             end % finished all components in cluster 
        end % finished all conditions
-       delete(h_wait);
     end % finished all requested clusters 
 end % Finished 'comps' mode plot option
 
-% Plot clusters mean ersp
-if strcmpi(mode, 'centroid') 
-    len = length(cls);
+% -----------------------------------------
+% Plot all the channels in the mean channel
+% -----------------------------------------
+if ~isempty(g.channels) & strcmpi(g.mode, 'individual')
+    for chan = 1: length(g.channels) % For each cluster requested
+
+        len = size(STUDY.setind,2);
+        rowcols(2) = ceil(sqrt(len + 4)); 
+        rowcols(1) = ceil((len+4)/rowcols(2));
+
+        % get cluster information
+        % -----------------------
+        try
+            channcomn = std_chanread(STUDY, ALLEEG, g.channels(chan),'ersp',[1:Ncond]);
+        catch,
+            warndlg2([ 'Some ERSP information is missing, aborting'] , ['Abort - Plot ERSP' ] );   
+            return;
+        end
+        
+        % plot: one figure per condition
+        % ------------------------------
+        for n = 1:Ncond
+            
+            % create new figure
+            % -----------------
+            figure
+            orient tall
+            maintitle = ['ERSP, cond. ' num2str(n) ', Channel ' int2str(g.channels) ];
+            a = textsc(maintitle,'title'); 
+            set(a, 'fontweight', 'bold'); 
+            set(gcf,'Color', BACKCOLOR);
+            sbplot(rowcols(1),rowcols(2),[1 rowcols(2)+2 ]);
+            
+            % plot centroid
+            % -------------
+            ave_ersp   = STUDY.chanmean.ersp{n, g.channels(chan)};
+            ersp_times = STUDY.chanmean.ersp_times;
+            ersp_freqs = STUDY.chanmean.ersp_freqs;
+            fig_title  = [ 'Channel ' int2str(g.channels(chan)) ' average ERSP, ' num2str(length(STUDY.datasetinfo)) 'Ss' ];
+            %lim = STUDY.cluster(g.clusters(clus)).centroid.ersp_limits{n}; %plotting limits
+            plotersp( ave_ersp, ersp_times, ersp_freqs, 'title', fig_title);
+
+            % Plot the individual component ersp 
+            % ----------------------------------
+            for k = 1:len %  
+                abset   = STUDY.datasetinfo(STUDY.setind(n,k)).index;
+                subject = STUDY.datasetinfo(STUDY.setind(n,k)).subject;
+                                
+                fig_title = [ 'chan ' num2str(g.channels(chan)) '/' subject ];
+                if k <= rowcols(2) - 2 %first sbplot row
+                    sbplot(rowcols(1),rowcols(2),k+2); 
+                else  %other sbplot rows
+                    sbplot(rowcols(1),rowcols(2),k+4);  
+                end
+                
+                plotersp( channcomn.ersp{n,k}, channcomn.ersp_times, channcomn.ersp_freqs, ...
+                    'title', fig_title, 'xlabel', 'off', 'ylabel', 'off', 'cbar', 'off');
+                set(get(gca,'Title'),'FontSize',8);
+                drawnow;
+            end % finished all components in cluster 
+       end % finished all conditions
+    end % finished all requested clusters 
+end % Finished 'comps' mode plot option
+
+% ------------------------------
+% Plot only the cluster centroid
+% ------------------------------
+if strcmpi(g.mode, 'centroid') & ~isempty(g.clusters) 
+    
+    % create figure
+    % -------------
+    len = length(g.clusters);
     if len ~= 1
         rowcols(2) = ceil(sqrt(len)/Ncond); rowcols(1) = ceil((len)/rowcols(2)); rowcols(2) = rowcols(2)*Ncond;
     else
         rowcols(2) = Ncond;  rowcols(1) = 1;
     end
-
-    if figureon 
-        try 
-            % optional 'CreateCancelBtn', 'delete(gcbf); error(''USER ABORT'');', 
-            h_wait = waitbar(0,['Computing ERSP ...'], 'Color', BACKEEGLABCOLOR,'position', [300, 200, 300, 48]);
-        catch % for Matlab 5.3
-            h_wait = waitbar(0,['Computing ERSP ...'],'position', [300, 200, 300, 48]);
-        end
-    end
-    % ERSP plotting limitis is the average limits across all clusters
-
-    % Compute cluster centroid
-    % ------------------------
-    for k = 1:len 
-        if ~isfield(STUDY.cluster(cls(k)).centroid,'ersp')
-            STUDY = std_centroid(STUDY,ALLEEG, cls(k) , 'ersp');
-        end
-        if isempty(STUDY.cluster(cls(k)).centroid.ersp)
-            warndlg2(['eeg_clustedit: some .icaersp files could not be found for cluster ' STUDY.cluster(cls(k)).name ], 'Abort - Plot ERSP' ); 
-            return
-        end
-    end
-    abset = STUDY.datasetinfo(STUDY.cluster(cls(1)).sets(1,1)).index;
-    [tmp tmp2 tmp3] = std_readersp( ALLEEG, abset, []);
-
-    if figureon
+    if strcmpi(g.figure, 'on')
         figure
         pos = get(gcf, 'position');
         magnif = 2.5/sqrt(Ncond);
         set(gcf, 'position', [ pos(1)+15 pos(2)+15 pos(3)*magnif pos(4)/rowcols(2)*rowcols(1)*magnif ]);
         orient tall
         set(gcf,'Color', BACKCOLOR);
-    end;
-    
-    if len > 1
-        maintitle = ['Average ERSP for clusters ' int2str(cls(1:len)) ];
+    end;    
+    if length(g.clusters) > 1
+        maintitle = ['Average ERSP for clusters ' int2str(g.clusters(:)') ];
         a = textsc(maintitle, 'title'); 
         set(a, 'fontweight', 'bold'); 
     end;
@@ -319,61 +375,37 @@ if strcmpi(mode, 'centroid')
         % ------------------
         maxval = 0;
         for n = 1:Ncond
-            maxval = max(max(max(abs(STUDY.cluster(cls(k)).centroid.ersp{n}))), maxval);
+            maxval = max(max(max(abs(STUDY.cluster(g.clusters(k)).centroid.ersp{n}))), maxval);
         end;
  
-        if ~figureon % only for summary mode: average all conditions
+        if strcmpi(g.figure, 'off') % only for summary mode: average all conditions
             % average all conditions
             % ----------------------
             for n = 1:Ncond          
                 if n == 1
-                    ave_ersp = STUDY.cluster(cls(k)).centroid.ersp{n}/Ncond;
+                    ave_ersp = STUDY.cluster(g.clusters(k)).centroid.ersp{n}/Ncond;
                 else
-                    ave_ersp = ave_ersp + STUDY.cluster(cls(k)).centroid.ersp{n}/Ncond;
+                    ave_ersp = ave_ersp + STUDY.cluster(g.clusters(k)).centroid.ersp{n}/Ncond;
                 end;
             end;
-            logfreqs = log(STUDY.cluster(cls(k)).centroid.ersp_freqs);
-            timevals = STUDY.cluster(cls(k)).centroid.ersp_times;
-            tftopo(ave_ersp,timevals,logfreqs,'limits', [timevals(1) timevals(end) logfreqs(1) logfreqs(end) -maxval maxval],...
-                   'title', 'Average ERSP', 'verbose', 'off');
-            ft = str2num(get(gca,'yticklabel'));
-            ft = exp(1).^ft;
-            ft = unique(round(ft));
-            ftick = get(gca,'ytick');
-            ftick = exp(1).^ftick;
-            ftick = unique(round(ftick));
-            ftick = log(ftick);
-            set(gca,'ytick',ftick);
-            set(gca,'yticklabel', num2str(ft));
-            xlabel('Time [ms]');
-            cbar;
+            logfreqs = STUDY.cluster(g.clusters(k)).centroid.ersp_freqs;
+            timevals = STUDY.cluster(g.clusters(k)).centroid.ersp_times;
+            plotersp( ave_ersp,timevals,logfreqs, 'clim', [-maxval maxval], 'title', 'Average ERSP');
         else
             
             for n = 1:Ncond
                 sbplot(rowcols(1),rowcols(2),(k-1)*Ncond+n), 
-                a = [ STUDY.cluster(cls(k)).name ' ERSP, ' num2str(length(unique(STUDY.cluster(cls(k)).sets(1,:)))) 'Ss, ' STUDY.condition{n}];
-                ave_ersp = STUDY.cluster(cls(k)).centroid.ersp{n};
-                logfreqs = log(STUDY.cluster(cls(k)).centroid.ersp_freqs);
-                timevals = STUDY.cluster(cls(k)).centroid.ersp_times;
-                tftopo(ave_ersp,timevals,logfreqs,'limits', [timevals(1) timevals(end) logfreqs(1) logfreqs(end) -maxval maxval],...
-                       'title', a, 'verbose', 'off');
+                a = [ STUDY.cluster(g.clusters(k)).name ' ERSP, ' num2str(length(unique(STUDY.cluster(g.clusters(k)).sets(1,:)))) 'Ss, ' STUDY.condition{n}];
+                ave_ersp = STUDY.cluster(g.clusters(k)).centroid.ersp{n};
+                logfreqs = STUDY.cluster(g.clusters(k)).centroid.ersp_freqs;
+                timevals = STUDY.cluster(g.clusters(k)).centroid.ersp_times;
+                plotersp( ave_ersp,timevals,logfreqs, 'clim', [-maxval maxval], 'title', a, 'cbar', 'off');                
                 if (k-1)*Ncond+n > (rowcols(1)-1)*rowcols(2)
                     xlabel('Time [ms]');
                 else
                     xlabel('');
                 end;
-                if n == 1
-                    ft = str2num(get(gca,'yticklabel'));
-                    ft = exp(1).^ft;
-                    ft = unique(round(ft));
-                    ftick = get(gca,'ytick');
-                    ftick = exp(1).^ftick;
-                    ftick = unique(round(ftick));
-                    ftick = log(ftick);
-                    set(gca,'ytick',ftick);
-                    set(gca,'yticklabel', num2str(ft));
-                    ylabel('Frequency (Hz)');
-                else
+                if n ~= 1
                     set(gca,'ytick',[]);
                     set(gca,'yticklabel', []);
                     ylabel('');
@@ -381,131 +413,199 @@ if strcmpi(mode, 'centroid')
                 if n == Ncond
                     cbar;
                 end;
-                waitbar((k*n)/(len*Ncond),h_wait);
             end;
         end % Finish plotting all centroids for one condition
     end  % Finished all conditions
-    if figureon
-        delete(h_wait)
-    end
 end % Finished 'centroid' mode plot option
 
-% std_plotcompersp() - Commandline function, to visualizing cluster component ERSP images. 
-%                    Displays the ERSP images of specified cluster components on separate figures,
-%                    using one figure for all conditions. 
-%                   The ERSPs can be visualized only if component ERSPs     
-%                   were calculated and saved in the EEG datasets in the STUDY.
-%                   These can be computed during pre-clustering using the GUI-based function
-%                   pop_preclust() or the equivalent commandline functions eeg_createdata() 
-%                   and eeg_preclust(). A pop-function that calls this function is pop_clustedit().
-% Usage:    
-%                   >> [STUDY] = std_plotcompersp(STUDY, ALLEEG, cluster, comps);  
-% Inputs:
-%   STUDY      - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
-%   ALLEEG     - global EEGLAB vector of EEG structures for the dataset(s) included in the STUDY. 
-%                     ALLEEG for a STUDY set is typically created using load_ALLEEG().  
-%   cluster     - single cluster number.  
-%
-% Optional inputs:
-%   comps      - [numeric vector]  -> indices of the cluster components to plot.
-%                       'all'                       -> plot all the components in the cluster
-%                                                      (as in std_erspplot). {default: 'all'}.
-%
-% Outputs:
-%   STUDY    - the input STUDY set structure modified with plotted cluster ersp
-%                     image mean, to allow quick replotting (unless cluster mean 
-%                     already existed in the STUDY).  
-%
-%   Example:
-%                         >> cluster = 4; comps= [1 7 10];  
-%                         >> [STUDY] = std_plotcompersp(STUDY,ALLEEG, cluster, comps);
-%                    Plots components 1, 7 & 10  ersps of cluster 4 on separate figures. 
-%
-%  See also  pop_clustedit, pop_preclust, eeg_createdata, std_erspplot         
-%
-% Authors:  Hilit Serby, Arnaud Delorme, Scott Makeig, SCCN, INC, UCSD, June, 2005
-
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
-% Copyright (C) Hilit Serby, SCCN, INC, UCSD, June 07, 2005, hilit@sccn.ucsd.edu
-%
-% This program is free software; you can redistribute it and/or modify
-% it under the terms of the GNU General Public License as published by
-% the Free Software Foundation; either version 2 of the License, or
-% (at your option) any later version.
-%
-% This program is distributed in the hope that it will be useful,
-% but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-% GNU General Public License for more details.
-%
-% You should have received a copy of the GNU General Public License
-% along with this program; if not, write to the Free Software
-% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $ Log: std_plotcompersp.m,v $
-
-function STUDY = std_plotcompersp(STUDY, ALLEEG, cls, varargin)
-icadefs;
-if ~exist('cls')
-    error('std_plotcompersp: you must provide a cluster number as an input.');
-end
-if isempty(cls)
-   error('std_plotcompersp: you must provide a cluster number as an input.');
-end
-if nargin == 3 % no components indices were given
-    % Default plot all components of the cluster
-    [STUDY] = std_erspplot(STUDY, ALLEEG, 'clusters', cls, 'mode', 'comps');
-    return
-else
-    comp_ind = varargin{1}; 
-end
-Ncond = length(STUDY.condition);
-if Ncond == 0
-    Ncond = 1;
-end
-for ci = 1 : length(comp_ind) %for each comp
-   rowcols(2) = ceil(sqrt(Ncond)); 
-   rowcols(1) = ceil((Ncond)/rowcols(2));
-   
-   comp = STUDY.cluster(cls).comps(comp_ind(ci));     
-   subject = STUDY.datasetinfo(STUDY.cluster(cls).sets(1,comp_ind(ci))).subject;
-   
-   % figure properties
-   % -----------------
-   figure
-   pos = get(gcf, 'position');
-   magnif = 2.5/sqrt(Ncond);
-   set(gcf, 'position', [ pos(1)+15 pos(2)+15 pos(3)*magnif pos(4)/rowcols(2)*rowcols(1)*magnif ]);
-   orient tall
-   set(gcf,'Color', BACKCOLOR);
-   
-   for n = 1:Ncond  %for each cond
-        abset = STUDY.datasetinfo(STUDY.cluster(cls).sets(n,comp_ind(ci))).index;
-        sbplot(rowcols(1),rowcols(2),n), 
-        if n == 1
-            idat = [ STUDY.datasetinfo(STUDY.cluster(cls).sets(:,comp_ind(ci))).index ];
-            [ersp, logfreqs, timeval] = std_readersp(ALLEEG, idat, comp, STUDY.preclust.erspclusttimes,  STUDY.preclust.erspclustfreqs);
-            logfreqs = log(logfreqs);
-        end
-        if Ncond >1
-            a = [ 'ERSP, IC' num2str(comp) ' / ' subject ', ' STUDY.cluster(cls).name ', ' STUDY.condition{n} ];
+% ------------------------------
+% Plot only the cluster centroid
+% ------------------------------
+if strcmpi(g.mode, 'centroid') & ~isempty(g.channels) 
+    
+    % create figure
+    % -------------
+    len = length(g.channels);
+    if len ~= 1
+        rowcols(2) = ceil(sqrt(len)/Ncond); rowcols(1) = ceil((len)/rowcols(2)); rowcols(2) = rowcols(2)*Ncond;
+    else
+        rowcols(2) = Ncond;  rowcols(1) = 1;
+    end
+    if strcmpi(g.figure, 'on')
+        figure
+        pos = get(gcf, 'position');
+        magnif = 2.5/sqrt(Ncond);
+        set(gcf, 'position', [ pos(1)+15 pos(2)+15 pos(3)*magnif pos(4)/rowcols(2)*rowcols(1)*magnif ]);
+        orient tall
+        set(gcf,'Color', BACKCOLOR);
+    end;    
+    if length(g.channels) > 1
+        maintitle = ['Average ERSP for channels ' int2str(g.channels(:)') ];
+        a = textsc(maintitle, 'title'); 
+        set(a, 'fontweight', 'bold'); 
+    end;
+    
+    for k = 1:len 
+        
+        % find maximum value
+        % ------------------
+        maxval = 0;
+        for n = 1:Ncond
+            maxval = max(max(max(abs(STUDY.chanmean.ersp{n, g.channels(k)}))), maxval);
+        end;
+ 
+        if strcmpi(g.figure, 'off') % only for summary mode: average all conditions
+            % average all conditions
+            % ----------------------
+            for n = 1:Ncond          
+                if n == 1
+                    ave_ersp = STUDY.chanmean.ersp{n, g.channels(k)}/Ncond;
+                else
+                    ave_ersp = ave_ersp + STUDY.chanmean.ersp{n, g.channels(k)}/Ncond;
+                end;
+            end;
+            logfreqs = STUDY.chanmean.ersp_freqs;
+            timevals = STUDY.chanmean.ersp_times;
+            plotersp( ave_ersp,timevals,logfreqs, 'clim', [-maxval maxval], 'title', 'Average ERSP');
         else
-            a = ['ERSP, IC' num2str(comp) ' / ' subject  ', ' STUDY.cluster(cls(clus)).name];
-        end
-        tftopo(ersp(:,:,n), timeval, logfreqs,'limits', [timeval(1) timeval(end) logfreqs(1) logfreqs(end) -4 4], ...
-               'title', a, 'verbose', 'off', 'axcopy', 'off');
-        ft = str2num(get(gca,'yticklabel'));
-        ft = exp(1).^ft;
-        ft = unique(round(ft));
-        ftick = get(gca,'ytick');
-        ftick = exp(1).^ftick;
-        ftick = unique(round(ftick));
-        ftick = log(ftick);
-        set(gca,'ytick',ftick);
-        set(gca,'yticklabel', num2str(ft));
+            
+            for n = 1:Ncond
+                sbplot(rowcols(1),rowcols(2),(k-1)*Ncond+n), 
+                a = [ 'Channel ' int2str(g.channels(k)) ' ERSP, ' num2str(length(STUDY.subject)) 'Ss, ' STUDY.condition{n}];
+                ave_ersp = STUDY.chanmean.ersp{n, g.channels(k)};
+                logfreqs = STUDY.chanmean.ersp_freqs;
+                timevals = STUDY.chanmean.ersp_times;
+                plotersp( ave_ersp,timevals,logfreqs, 'clim', [-maxval maxval], 'title', a, 'cbar', 'off');                
+                if (k-1)*Ncond+n > (rowcols(1)-1)*rowcols(2)
+                    xlabel('Time [ms]');
+                else
+                    xlabel('');
+                end;
+                if n ~= 1
+                    set(gca,'ytick',[]);
+                    set(gca,'yticklabel', []);
+                    ylabel('');
+                end;
+                if n == Ncond
+                    cbar;
+                end;
+            end;
+        end % Finish plotting all centroids for one condition
+    end  % Finished all conditions
+end % Finished 'centroid' mode plot option
+
+% ------------------------------------------------------------
+% std_plotcompersp() - plot ERSP for one or several conditions
+% ------------------------------------------------------------
+function STUDY = plotcondersp(STUDY, ALLEEG, varargin)
+
+    g = finputcheck( varargin, { 'dataset'     'integer'     []                  [];
+                                 'component'   'integer'     []                  [];
+                                 'condition'   'string'      []                  '';
+                                 'subject'     'string'      []                  '';
+                                 'channel'     'integer'     []                  [];
+                                 'figure'      'string'      { 'on' 'off' }      'on';
+                                 'title'       'string'      []                  '';
+                                 'rowcols'     'integer'     []                  [1 1];
+                                 'rowcolpos'   'integer'     []                  1;
+                                 'plotargs'    'cell'        []                  {}}, 'plotcondersp');
+    if isstr(g), error(g); end;
+
+    % conditions
+    % ----------
+    Ncond = length(STUDY.condition);
+    if isempty(g.dataset)
+        if isempty(g.condition), g.condition = [1:Ncond];
+        else                     g.condition = strmatch(g.condition, lower(STUDY.condition));
+        end;
+    else
+        g.condition = 1;
+    end;
+    if isempty(g.condition), error('Unknown condition'); end;
+    Ncond = length(g.condition);
+        
+    % figure properties
+    % -----------------
+    if strcmpi(g.figure, 'on')
+        icadefs;
+        figure
+        pos = get(gcf, 'position');
+        magnif = 2.5/sqrt(Ncond); if Ncond == 1, magnif = 1; end;
+        g.rowcols(2) = ceil(sqrt(Ncond)); 
+        g.rowcols(1) = ceil((Ncond)/g.rowcols(2));
+        set(gcf, 'position', [ pos(1)+15 pos(2)+15 pos(3)*magnif pos(4)/g.rowcols(2)*g.rowcols(1)*magnif ]);
+        orient tall
+        set(gcf,'Color', BACKCOLOR);
+        g.rowcolpos = 1;
+    end;
+   
+    % dataset indices
+    % ---------------
+    if ~isempty(g.subject)
+       g.dataset = STUDY.setind(:,strmatch(lower(g.subject), lower(STUDY.subject)));
+       if isempty(g.dataset), error('Could not find subject'); end;
+    end;
+    subject = STUDY.datasetinfo(g.dataset(1)).subject;
+
+    % retrieve data
+    % -------------
+    if ~isempty(g.component)
+        [ersp, logfreqs, timeval] = std_readersp(ALLEEG, g.dataset, g.component, STUDY.preclust.erspclusttimes,  STUDY.preclust.erspclustfreqs);
+    else
+        [ersp, logfreqs, timeval] = std_readersp(ALLEEG, g.dataset, -g.channel, STUDY.preclust.erspclusttimes,  STUDY.preclust.erspclustfreqs);
+    end;    
+
+    % find index in setind
+    % --------------------
+    for n = g.condition  %for each cond
+        
+        sbplot(g.rowcols(1),g.rowcols(2),g.rowcolpos);
+        g.rowcolpos = g.rowcolpos + 1;
+        idat = g.dataset(n);
+        if Ncond >1, fig_title = [ g.title ', ' STUDY.condition{n} ]; 
+        else         fig_title =   g.title; end;
+        
+        plotersp( ersp(:,:,n), timeval, logfreqs, 'clim', [-4 4], 'title', fig_title, g.plotargs{:});
+    end
+
+% sub function to plot ERSPs
+% --------------------------
+function plotersp( data, times, freqs, varargin);
+
+    g = finputcheck(varargin, { 'title'    'string'    []               '';
+                                'xlabel'   'string'    { 'on' 'off' }   'on';
+                                'ylabel'   'string'    { 'on' 'off' }   'on';
+                                'cbar'     'string'    { 'on' 'off' }   'on';
+                                'clim'     'real'      []               [] });
+    if isstr(g), error(g); end;
+    logfreqs = log(freqs);
+
+    tftopo( data, times,logfreqs,'limits', [times(1) times(end) logfreqs(1) logfreqs(end) g.clim ],...
+        'title', g.title, 'verbose', 'off', 'axcopy', 'off');
+    ft = str2num(get(gca,'yticklabel'));
+    ft = exp(1).^ft;
+    ft = unique(round(ft));
+    ftick = get(gca,'ytick');
+    ftick = exp(1).^ftick;
+    ftick = unique(round(ftick));
+    ftick = log(ftick);
+    set(gca,'ytick',ftick);
+    set(gca,'yticklabel', num2str(ft));
+    if strcmpi(g.xlabel, 'on')
+        xlabel('Time [ms]');
+    else    
+        xlabel('');
+        set(gca, 'xtick', []);
+    end;
+    if strcmpi(g.ylabel, 'on')
+        ylabel('Power (dB)');
+    else    
+        ylabel('');
+        set(gca, 'ytick', []);
+    end;
+    
+    axcopy(gcf, [' ft = str2num(get(gca,''''yticklabel'''')); ft = exp(1).^ft; ft = unique(round(ft)); fti = get(gca,''''ytick''''); fti = exp(1).^fti; fti = unique(round(fti));'...
+        'fti = log(fti); set(gca, ''''ytick'''',fti); set(gca, ''''yticklabel'''',num2str(ft)); xlabel(''''Time [ms]''''); ylabel(''''Frequency [Hz]''''); cbar; clear ft fti;' ]);
+    if strcmpi(g.cbar, 'on')
         cbar;
-        axcopy(gcf, [' ft = str2num(get(gca,''''yticklabel'''')); ft = exp(1).^ft; ft = unique(round(ft)); fti = get(gca,''''ytick''''); fti = exp(1).^fti; fti = unique(round(fti));'...
-            'fti = log(fti); set(gca, ''''ytick'''',fti); set(gca, ''''yticklabel'''',num2str(ft)); xlabel(''''Time [ms]''''); cbar; clear ft fti;' ]);
-   end
-end
+    end;
