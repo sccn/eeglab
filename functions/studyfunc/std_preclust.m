@@ -122,6 +122,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.56  2006/04/04 22:37:40  toby
+% *** empty log message ***
+%
 % Revision 1.55  2006/04/01 03:48:00  toby
 % NaNs
 %
@@ -457,7 +460,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                     if ~isnan(STUDY.setind(cond,si)), break; end
                  end       
                  idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index;
-                 fprintf('Computing interpolated scalp maps for dataset %d...\n', idat);
+                 fprintf('Computing/loading interpolated scalp maps for dataset %d...\n', idat);
                  if ~isempty(succompind{si})
                     X = std_topo(ALLEEG(idat), succompind{si});
                     if abso % absolute values
