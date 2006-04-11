@@ -71,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2006/04/11 19:04:52  arno
+% individual input
+%
 % Revision 1.23  2006/03/21 15:43:14  arno
 % new .sets format
 %
@@ -419,7 +422,7 @@ if strcmpi(g.mode, 'centroid') & ~isempty(g.clusters)
 end % Finished 'centroid' mode plot option
 
 % ------------------------------
-% Plot only the cluster centroid
+% Plot only the channel centroid
 % ------------------------------
 if strcmpi(g.mode, 'centroid') & ~isempty(g.channels) 
     
@@ -501,7 +504,7 @@ function STUDY = plotcondersp(STUDY, ALLEEG, varargin)
 
     g = finputcheck( varargin, { 'dataset'     'integer'     []                  [];
                                  'component'   'integer'     []                  [];
-                                 'condition'   'string'      []                  '';
+                                 'condition'   { 'string' 'cell' }   { [] [] }   '';
                                  'subject'     'string'      []                  '';
                                  'channel'     'integer'     []                  [];
                                  'figure'      'string'      { 'on' 'off' }      'on';
@@ -515,15 +518,21 @@ function STUDY = plotcondersp(STUDY, ALLEEG, varargin)
     % ----------
     Ncond = length(STUDY.condition);
     if isempty(g.dataset)
-        if isempty(g.condition), g.condition = [1:Ncond];
-        else                     g.condition = strmatch(g.condition, lower(STUDY.condition));
-        end;
+        if isstr(g.condition), g.condition = { g.condition }; end;
     else
-        g.condition = 1;
+        g.condition = { STUDY.datasetinfo(g.dataset).condition };
     end;
     if isempty(g.condition), error('Unknown condition'); end;
     Ncond = length(g.condition);
         
+    % dataset indices
+    % ---------------
+    if ~isempty(g.subject)
+       g.dataset = STUDY.setind(:,strmatch(lower(g.subject), lower(STUDY.subject)));
+       if isempty(g.dataset), error('Could not find subject'); end;
+    end;
+    subject = STUDY.datasetinfo(g.dataset(1)).subject;
+
     % figure properties
     % -----------------
     if strcmpi(g.figure, 'on')
@@ -538,14 +547,6 @@ function STUDY = plotcondersp(STUDY, ALLEEG, varargin)
         set(gcf,'Color', BACKCOLOR);
         g.rowcolpos = 1;
     end;
-   
-    % dataset indices
-    % ---------------
-    if ~isempty(g.subject)
-       g.dataset = STUDY.setind(:,strmatch(lower(g.subject), lower(STUDY.subject)));
-       if isempty(g.dataset), error('Could not find subject'); end;
-    end;
-    subject = STUDY.datasetinfo(g.dataset(1)).subject;
 
     % retrieve data
     % -------------
@@ -557,7 +558,7 @@ function STUDY = plotcondersp(STUDY, ALLEEG, varargin)
 
     % find index in setind
     % --------------------
-    for n = g.condition  %for each cond
+    for n = 1:length(g.condition)  %for each cond
         
         sbplot(g.rowcols(1),g.rowcols(2),g.rowcolpos);
         g.rowcolpos = g.rowcolpos + 1;
