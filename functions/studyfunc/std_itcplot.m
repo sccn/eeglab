@@ -134,9 +134,9 @@ if strcmpi(mode, 'comps')
             maxitc = max(maxitc, max(max(STUDY.cluster(cls(clus)).centroid.itc{n})));
         end;
         maxitc = maxitc*2;
+        clusncomm = std_clustread(STUDY, ALLEEG, cls(clus),'itc', 1:Ncond);
         for n = 1:Ncond
             %try
-            clusncomm = std_clustread(STUDY, ALLEEG, cls(clus),'itc',n);
             
             %    warndlg2([ 'Some ITC information is missing, aborting'] , ['Abort - Plot ITC' ] );   
             %    delete(h_wait)
@@ -179,8 +179,8 @@ if strcmpi(mode, 'comps')
                 else  %other sbplot rows
                     sbplot(rowcols(1),rowcols(2),k+4);  
                 end
-                tftopo(abs(clusncomm.itc{k}),clusncomm.itc_times{k},log(clusncomm.itc_freqs{k}),'limits', ...
-                    [clusncomm.itc_times{k}(1) clusncomm.itc_times{k}(end) log(clusncomm.itc_freqs{k}(1)) log(clusncomm.itc_freqs{k}(end)) -maxitc maxitc],...
+                tftopo(abs(clusncomm.itc{n,k}),clusncomm.itc_times,log(clusncomm.itc_freqs),'limits', ...
+                    [clusncomm.itc_times(1) clusncomm.itc_times(end) log(clusncomm.itc_freqs(1)) log(clusncomm.itc_freqs(end)) -maxitc maxitc],...
                     'title', a, 'verbose', 'off', 'axcopy', 'off');
                 set(gca, 'xtick', [], 'ytick', []);
                 set(get(gca,'Title'),'FontSize',8)
