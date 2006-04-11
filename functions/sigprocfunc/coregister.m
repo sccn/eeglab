@@ -320,9 +320,8 @@ if isstr(g), error(g); end;
 % help message
 % ------------
 if strcmpi(g.helpmsg, 'on')
-    mytext = strvcat( ...
-            'coregister() help: User channels (sometimes hidden in the 3-D mesh) are in green, reference channels', ...
-            'in red. Press ''Warp'' to automatically warp user channels to corresponding reference channels.', ...
+    mytext = strvcat( 'User channels (sometimes hidden in the 3-D mesh) are in green, reference channels in red.', ...
+            'Press ''Warp'' to automatically warp user channels to corresponding reference channels.', ...
             'Then, if desired, further edit the transformation manually using the coregister gui buttons.', ...
             ' ', ...
             'To use locations of corresponding reference channels (and discard current locations),', ...
@@ -418,31 +417,24 @@ else
 
     % perfrom alignment
     % -----------------
+    if strcmpi(g.autoscale, 'on')
+        avgrad1 = sqrt(sum(elec1.pnt.^2,2));
+        avgrad2 = sqrt(sum(elec2.pnt.^2,2));
+        ratio   = mean(avgrad2)/mean(avgrad1);
+    else
+        ratio = 1;
+    end;
     if ~isempty(g.alignfid)
+        
         % autoscale
         % ---------
-        electmp = elec1;
-        if strcmpi(g.autoscale, 'on')
-            avgrad1 = sqrt(sum(elec1.pnt.^2,2));
-            avgrad2 = sqrt(sum(elec2.pnt.^2,2));
-            ratio   = mean(avgrad2)/mean(avgrad1)*1.05;
-            transmat = [ratio 0 0 0; 0 ratio 0 0; 0 0 ratio 0; 0 0 0 1];
-            electmp.pnt = elec1.pnt*ratio;
-        end;
-
         [ electransf transform ] = align_fiducials(electmp, elec2, g.alignfid);
-        if ~isempty(transform), dat.transform = transform; end;
-
-        % dat.transform = invtrad(dat.transform, 1)
-        
-        if strcmpi(g.autoscale, 'on')
-            dat.transform = dat.transform * transmat;
-        end;        
+        if ~isempty(transform), dat.transform = [ transform(1:6)' ratio ratio ratio ]; end;
         
     elseif ~isempty(g.warp)
         [ electransf dat.transform ] = warp_chans(elec1, elec2, g.warp);
     else
-        dat.transform = [0 0 0 0 0 0 1 1 1];
+        dat.transform = [0 0 0 0 0 0 ratio ratio ratio];
     end;
     
 end;
