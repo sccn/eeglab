@@ -60,6 +60,15 @@
 %                    closest correspondant frequencies in the 'linear' space 
 %                    are returned.
 %
+%    Optional time stretching:
+%      'timestretch' - {[Refmarks marks x trials], [Refframes marks x 1]}
+%                  Stretch amplitude and phase time-course right before
+%                  smoothing. Refmarks is a matrix where rows are marks you
+%                  want to time-lock to and columns are trials. Each trial
+%                  will be stretched so that its marks occures at time
+%                  refframes. If Refframes is [], the median accross trials
+%                  of the latencies in Refmarks will be used.
+%
 % Outputs: 
 %       tf      - time frequency array for all trials (freqs, times, trials)
 %       freqs   - vector of computed frequencies (Hz)
@@ -98,6 +107,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.45  2005/05/23 18:24:08  arno
+% error
+%
 % Revision 1.44  2004/02/27 19:11:09  arno
 % reintroducing non-FFT min
 %
@@ -259,7 +271,8 @@ g = finputcheck(varargin, ...
 				  'wavelet'       'real'     [0 Inf]                   0; ...
 				  'padratio'      'integer'  [1 Inf]                   2; ...
 				  'itctype'       'string'   {'phasecoher' 'phasecoher2' 'coher'}  'phasecoher'; ...
-				  'subitc'        'string'   {'on' 'off'}              'off'	});
+				  'subitc'        'string'   {'on' 'off'}  'off'; ...
+                  'timestretch'   'cell'     []                        {} });
 if isstr(g), error(g); end;
 
 % checkin parameters
@@ -422,6 +435,62 @@ else % wavelet
     end;
 end;    
 fprintf('\n');
+
+
+%time-warp code begins -Jean
+%DEBUG
+urtmpall = tmpall;
+if ~isempty(g.timestretch) & length(g.timestretch{1}) > 0 ...
+
+  timemarks = g.timestretch{1};
+  if isempty(g.timestretch{2}) | length(g.timestretch{2}) == 0
+    timerefs = median(g.timestretch{1},2);
+  else
+    timerefs = g.timestretch{2};
+  end    
+  trials = size(tmpall,3);
+  
+  %convert timerefs to subsampled ERSP space
+  [dummy refsPos] = min(transpose(abs(...
+      repmat(timerefs, [1 length(g.indexout)]) ...
+      - repmat(g.indexout, [length(timerefs) 1]) ...
+      )));
+  refsPos(end+1) = 1;
+  refsPos(end+1) = length(g.indexout);
+  refsPos = sort(refsPos);
+  
+  for t=1:trials
+    %convert timemarks to subsampled ERSP space
+    %[dummy pos]=min(abs(repmat(timemarks(2:7,1), [1 length(g.indexout)])-repmat(g.indexout,[6 1])));
+    [dummy marksPos] = min(transpose(abs(...
+        repmat(timemarks(:,t), [1 length(g.indexout)]) ...
+        - repmat(g.indexout, [size(timemarks,1) 1]) ...
+        )));
+    marksPos(end+1) = 1;
+    marksPos(end+1) = length(g.indexout);
+    marksPos = sort(marksPos);
+
+    %now warp tmpall
+    mytmpall = tmpall(:,:,t);
+    r = sqrt(mytmpall.*conj(mytmpall));
+    theta = angle(mytmpall);
+    
+    %So mytmpall is almost equal to r.*exp(i*theta)
+    M = timeWarp(marksPos, refsPos);
+    TSr = transpose(M*r');
+    TStheta = zeros(size(theta,1), size(theta,2));
+    for freqInd=1:size(TStheta,1)
+      TStheta(freqInd, :) = angTimeWarp(marksPos, refsPos, theta(freqInd, :));
+    end
+    TStmpall = TSr.*exp(i*TStheta);
+    
+% $$$     keyboard;
+
+    tmpall(:,:,t) =  TStmpall;
+  end
+end
+%time-warp ends
+
 
 % compute and subtract ITC
 % ------------------------
