@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.69  2006/04/11 21:10:55  arno
+% fixing original electrode location on head
+%
 % Revision 1.68  2006/04/11 20:44:59  arno
 % do not know
 %
@@ -586,7 +589,7 @@ if isstr(values)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     comment          = g.comment;
     headplot_version = 2;
-    transform        = g.transform
+    transform        = g.transform;
     try, save(spline_file, '-V6', '-mat', 'Xe', 'Ye', 'Ze', 'G', 'gx', 'newElect', ...
               'ElectrodeNames', 'indices', 'comment', 'headplot_version', 'transform');   
     catch,
