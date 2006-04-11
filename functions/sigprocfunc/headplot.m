@@ -1,4 +1,3 @@
-%
 % headplot() - plot a spherically-splined EEG field map on a semi-realistic 
 %              3-D head model. Can 3-D rotate the head image using the left 
 %              mouse button.
@@ -122,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.67  2006/03/17 18:35:20  scott
+% added comma between outputs in function statement
+%
 % Revision 1.66  2006/03/15 20:12:16  scott
 % return HeadAxes and ColorbarAxes for use in movies, etc.
 %
@@ -931,7 +933,7 @@ EI = onemat - sqrt((repmat(x,1,length(Xe)) - repmat(Xe',length(x),1)).^2 +...
 gx = zeros(length(x),length(Xe));
 m = 4;
 icadefs;
-hwb = waitbar(0,'Computing spline file (percent done)...', 'color', BACKEEGLABCOLOR);
+hwb = waitbar(0,'Computing spline file (only done once)...', 'color', BACKEEGLABCOLOR);
 hwbend = 7;
 for n = 1:7
     L = legendre(n,EI);
