@@ -90,6 +90,17 @@
 %                     x and y not arising from common synchronization to
 %                     experimental events. See notes. {default: 'off'}
 %
+%    Optional Time Warping Parameters:
+%       'timeStretchMarks' = [marks x trials matrix] Each trial will be
+%                     stretched so that marks time-lock to reference
+%                     frames (see timeStretchRefs). Marks have to be
+%                     specified in frames
+%       'timeStretchRefs' = [1 x marks] Common reference frames to all
+%                     trials. If empty or undefined, median latency for
+%                     each mark will be used.
+%       'timeStretchPlot' = [vector] Indicates which reference frames
+%                     should be overplotted on the ERSP and ITC.
+%
 %    Optional Bootstrap Parameters:
 %       'alpha'     = If non-0, compute two-tailed bootstrap significance prob. 
 %                      level. Show non-signif. output values as green.   {0}
@@ -194,6 +205,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.78  2005/12/06 19:15:17  arno
+% nothing
+%
 % Revision 1.77  2005/07/27 18:30:37  arno
 % typo for bootstrap
 %
@@ -697,6 +711,7 @@ if ~isempty(varargin)
     try, g = struct(varargin{:}); 
     catch, error('Argument error in the {''param'', value} sequence'); end; 
 end;
+% $$$ keyboard;
 g.tlimits = tlimits;
 g.frame   = frame;
 g.srate   = Fs;
@@ -753,6 +768,10 @@ try, g.erspmarglim;     catch, g.erspmarglim = []; end;
 try, g.itcavglim;       catch, g.itcavglim   = []; end;
 try, g.erplim;          catch, g.erplim      = []; end;
 try, g.speclim;         catch, g.speclim     = []; end;
+%Added -Jean
+try, g.timeStretchMarks;     catch, g.timeStretchMarks = []; end;
+try, g.timeStretchRefs;     catch, g.timeStretchRefs = []; end;
+try, g.timeStretchPlot;     catch, g.timeStretchPlot = []; end;
 g.AXES_FONT       = AXES_FONT;           % axes text FontSize
 g.TITLE_FONT      = TITLE_FONT;
 g.ERSP_CAXIS_LIMIT = ERSP_CAXIS_LIMIT;         
@@ -846,6 +865,19 @@ if ~isnan(g.alpha)
      myprintf(g.verbose, 'Bootstrap analysis will use data in all subwindows.\n')
    end
 end
+if ~isempty(g.timeStretchMarks) %Added -Jean
+  if isempty(g.timeStretchRefs)
+    myprintf(g.verbose, ['Using median mark latencies as references for ' ...
+                        'time-stretching']);
+    g.timeStretchRefs = median(g.timeStretchMarks,2);
+  end
+  if isempty(g.timeStretchPlot)
+    myprintf(g.verbose, 'Will not overplot references on the ERSP');
+  elseif length(g.timeStretchPlot) > 0
+    g.vert = ((g.timeStretchRefs(g.timeStretchPlot)-1) ...
+              /g.srate+g.tlimits(1)/1000)*1000;
+  end
+end %End -Jean
 if ~isnumeric(g.vert)
     error('vertical line(s) option must be a vector');
 else
@@ -853,6 +885,7 @@ else
         error('vertical line(s) time out-of-bound');
 	end;
 end;
+
 
 % Multitape not used any more
 % ---------------------------
@@ -942,7 +975,13 @@ end;
 % checking keywords
 % -----------------
 allfields = { 'tlimits' 'frame' 'srate' 'cycles' 'cyclesfact' 'boottype' 'condboot' 'title' 'winsize' 'pad' 'timesout' 'padratio' 'topovec' 'elocs' 'alpha' 'marktimes' 'powbase' 'pboot' 'rboot' 'plotersp' 'plotitc' 'detrend' 'rmerp' 'baseline' 'baseboot' 'linewidth' 'naccu' 'mtaper' 'maxfreq' 'freqs' ...
-              'plotamp' 'subitc' 'nfreqs' 'freqscale' 'vert' 'newfig' 'type' 'phsamp' 'plotphase' 'plotphasesign' 'outputformat' 'itcmax' 'erspmax' 'lowmem' 'verbose' 'plottype' 'plotmean' 'highlightmode' 'chaninfo' 'erspmarglim' 'itcavglim' 'erplim' 'speclim' 'AXES_FONT' 'TITLE_FONT' 'ERSP_CAXIS_LIMIT' 'ITC_CAXIS_LIMIT' };
+              'plotamp' 'subitc' 'nfreqs' 'freqscale' 'vert' 'newfig' ...
+              'type' 'phsamp' 'plotphase' 'plotphasesign' 'outputformat' ...
+              'itcmax' 'erspmax' 'lowmem' 'verbose' 'plottype' 'plotmean' ...
+              'highlightmode' 'chaninfo' 'erspmarglim' 'itcavglim' 'erplim' ...
+              'speclim' 'AXES_FONT' 'TITLE_FONT' 'ERSP_CAXIS_LIMIT' ...
+              'ITC_CAXIS_LIMIT' 'timeStretchMarks' 'timeStretchRefs' ...
+              'timeStretchPlot' }; %Added 3 keywords -Jean
 tmpfields = fieldnames(g);
 for index = 1:length(tmpfields)
     if isempty(strmatch(tmpfields{index}, allfields))
@@ -992,34 +1031,48 @@ if iscell(X)
     % deal with titles
     % ----------------
     for index = 1:2:length(vararginori)
-		if index<=length(vararginori) % needed: if elemenets are deleted
-			if strcmp(vararginori{index}, 'title'), vararginori(index:index+1) = []; 
-			end;
-		end;
-	end;
-	if iscell(g.title) 
-		if length(g.title) <= 2,
-			g.title{3} = 'Condition 1 - condition 2';
-		end;
-	else
-		g.title = { 'Condition 1', 'Condition 2', 'Condition 1 - condition 2' };
-	end;
-	
-	myprintf(g.verbose, 'Running newtimef on condition 1 *********************\n');
-	myprintf(g.verbose, 'Note: if an out-of-memory error occurs, try reducing the\n');
-	myprintf(g.verbose, '      number of time points or number of frequencies\n');
-	myprintf(g.verbose, '      (the ''coher'' options takes 3 times more memory than other options)\n');
-    [P1,R1,mbase1,timesout,freqs,Pboot1,Rboot1,alltfX1] = newtimef( X{1}, frame, tlimits, Fs, varwin, ...
-                                                      'plotitc', 'off', 'plotersp', 'off', vararginori{:}, 'lowmem', 'off');
+      if index<=length(vararginori) % needed: if elemenets are deleted
+        if strcmp(vararginori{index}, 'title') | ... %Added -Jean
+              strcmp(vararginori{index}, 'timeStretchMarks') | ...
+              strcmp(vararginori{index}, 'timeStretchRefs') | ...
+              strcmp(vararginori{index}, 'timeStretchPlots')
+          vararginori(index:index+1) = [];
+        end;
+      end;
+    end;
+    if size(g.title,1) >= 2 %Changed that part because providing titles
+                            %as cells caused the function to crash at
+                            %line at line 704 (g.tlimits = tlimits) -Jean
+      if size(g.title,1) == 2,
+        g.title(3,1:length('Condition 1 - condition 2')) = ...
+            'Condition 1 - Condition 2';
+      end;
+    else
+      g.title(1,:) = 'Condition 1';
+      g.title(2,:) = 'Condition 2';
+      g.title(3,1:24) = 'Condition 1 - Condition 2';
+    end;
     
-	myprintf(g.verbose, '\nRunning newtimef on condition 2 *********************\n');
-    [P2,R2,mbase2,timesout,freqs,Pboot2,Rboot2,alltfX2] = newtimef( X{2}, frame, tlimits, Fs, varwin,  ...
-                                                      'plotitc', 'off', 'plotersp', 'off', vararginori{:}, 'lowmem', 'off');
+    myprintf(g.verbose, 'Running newtimef on condition 1 *********************\n');
+    myprintf(g.verbose, 'Note: if an out-of-memory error occurs, try reducing the\n');
+    myprintf(g.verbose, '      number of time points or number of frequencies\n');
+    myprintf(g.verbose, '      (the ''coher'' options takes 3 times more memory than other options)\n');
+    [P1,R1,mbase1,timesout,freqs,Pboot1,Rboot1,alltfX1] = ...
+        newtimef( X{1}, frame, tlimits, Fs, varwin, 'plotitc', 'off', ...
+                  'plotersp', 'off', vararginori{:}, 'lowmem', 'off', ...
+                  'timeStretchMarks', g.timeStretchMarks(:,1:(end/2)), ... %Added -Jean
+                  'timeStretchRefs', g.timeStretchRefs);
     
+    myprintf(g.verbose, '\nRunning newtimef on condition 2 *********************\n');
+    [P2,R2,mbase2,timesout,freqs,Pboot2,Rboot2,alltfX2] = ...
+        newtimef( X{2}, frame, tlimits, Fs, varwin, 'plotitc', 'off', ...
+                  'plotersp', 'off', vararginori{:}, 'lowmem', 'off', ...
+                  'timeStretchMarks', g.timeStretchMarks(:,(1+end/2):end), ... %Added -Jean
+                  'timeStretchRefs', g.timeStretchRefs);
     % recompute baselines for power
     % -----------------------------
     if ~isnan( g.baseline(1) ) & ~isnan( mbase1 ) & isnan(g.powbase)
-        disp('Recomputing baseline power by using the mean from both conditions');
+      disp('Recomputing baseline power by using the mean from both conditions');
         mbase = (mbase1 + mbase2)/2;
         P1 = P1 + repmat(mbase1(1:size(P1,1))',[1 size(P1,2)]); 
         P2 = P2 + repmat(mbase2(1:size(P1,1))',[1 size(P1,2)]); 
@@ -1051,12 +1104,12 @@ if iscell(X)
             g.itcmax  = max( max(max(abs(Rboot1))), max(max(abs(Rboot2))) );
         end;
             
-        subplot(1,3,1); g.title = g.titleall{1}; 
+        subplot(1,3,1); g.title = g.titleall(1,:); 
         g = plottimef(P1, R1, Pboot1, Rboot1, mean(X{1},2), freqs, timesout, mbase, g);
         g.itcavglim = [];
-        subplot(1,3,2); g.title = g.titleall{2}; 
+        subplot(1,3,2); g.title = g.titleall(2,:); 
         plottimef(P2, R2, Pboot2, Rboot2, mean(X{2},2), freqs, timesout, mbase, g);
-        subplot(1,3,3); g.title = g.titleall{3};
+        subplot(1,3,3); g.title = g.titleall(3,:);
     end;
     
     if isnan(g.alpha)
@@ -1187,11 +1240,13 @@ end;
 if length(g.timesout) > 1, tmioutopt = { 'timesout' , g.timesout };
 else                       tmioutopt = { 'ntimesout', g.timesout };
 end;
+
 [alltfX freqs timesout R] = timefreq(X, g.srate, tmioutopt{:}, 'winsize', g.winsize, ...
                                      'tlimits', g.tlimits, 'detrend', g.detrend, 'itctype', ...
                                      g.type, 'subitc', g.subitc, 'wavelet', [g.cycles g.cyclesfact], ...
                                      'padratio', g.padratio, 'freqs', g.freqs, 'freqscale', g.freqscale, ...
-                                     'nfreqs', g.nfreqs); 
+                                     'nfreqs', g.nfreqs, ...
+                                     'timestretch', {g.timeStretchMarks, g.timeStretchRefs}); 
 P  = mean(alltfX.*conj(alltfX), 3); % power
 
 % ----------------
