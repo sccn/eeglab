@@ -192,6 +192,9 @@
 %                 and trial. {default: no}
 
 % $Log: not supported by cvs2svn $
+% Revision 1.254  2006/04/12 03:26:37  scott
+% help msg
+%
 % Revision 1.253  2006/04/12 03:05:34  scott
 % replaced 'timestretch' with 'timewarp', arguments in ms
 %
@@ -1875,7 +1878,7 @@ function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,al
     fprintf('Sorting trials on phase at %.2g Hz.\n',freq);
     
     [amps, cohers, cohsig, ampsig, allamps, allphs] = ...
-        myphasecoher(data,length(times),srate,freq,DEFAULT_CYCLES,0, ...
+        phasecoher(data,length(times),srate,freq,DEFAULT_CYCLES,0, ...
                      [], [], timeStretchRef, timeStretchMarks);
     
 
@@ -2037,7 +2040,7 @@ function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,al
     for f = 1:length(freq)  % use one or range of frequencies
       frq = freq(f);
       [amps, cohers, cohsig, ampsig, allamps, allphs] = ...
-          myphasecoher(data,length(times),srate,frq,DEFAULT_CYCLES,0, ...
+          phasecoher(data,length(times),srate,frq,DEFAULT_CYCLES,0, ...
                        [], [], timeStretchRef, timeStretchMarks);
       
       for ampwin = ampwins
@@ -2412,7 +2415,7 @@ function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,al
       fprintf(['Computing and plotting received ERSP and ITC signif. ' ...
                'levels...\n']);
       [amps,cohers,cohsig,ampsig,allamps] = ...
-          myphasecoher(urdata,length(times),srate,coherfreq,DEFAULT_CYCLES,0, ...
+          phasecoher(urdata,length(times),srate,coherfreq,DEFAULT_CYCLES,0, ...
                        [], [], timeStretchRef, timeStretchMarks);
       % need to receive cohsig and ampsig to get allamps
       ampsig = signifs([1 2]); % assume these already in dB
@@ -2421,14 +2424,14 @@ function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,al
     elseif alpha>0 % compute significance levels
       fprintf('Computing and plotting %g ERSP and ITC signif. level...\n',alpha);
       [amps,cohers,cohsig,ampsig,allamps] = ...
-          myphasecoher(urdata,length(times),srate,coherfreq, ...
+          phasecoher(urdata,length(times),srate,coherfreq, ...
                        DEFAULT_CYCLES, alpha, [], [], ...
                        timeStretchRef, timeStretchMarks');
       % need to receive cohsig and ampsig to get allamps
       fprintf('Coherence significance level: %g\n',cohsig);
     else % no plotting of significance
       [amps,cohers,cohsig,ampsig,allamps] = ...
-          myphasecoher(urdata,length(times),srate,coherfreq, ...
+          phasecoher(urdata,length(times),srate,coherfreq, ...
                        DEFAULT_CYCLES,0,[], [], timeStretchRef, timeStretchMarks);
       % need to receive cohsig and ampsig to get allamps
     end
@@ -3168,7 +3171,7 @@ function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,al
       fprintf('Computing and plotting amplitude at %g Hz.\n',coherfreq);
       
       if ~isnan(signifs) | Cohsigflag==NO % don't compute or plot signif. levels
-        [amps,cohers] = myphasecoher(urdata,size(times,2),srate,coherfreq,DEFAULT_CYCLES);
+        [amps,cohers] = phasecoher(urdata,size(times,2),srate,coherfreq,DEFAULT_CYCLES);
         if ~isnan(signifs) 
           ampsig = signifs([1 2]);
           fprintf('Using supplied amplitude significance levels: [%g,%g]\n',...
@@ -3181,7 +3184,7 @@ function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,al
             'Computing and plotting %g coherence significance level at %g Hz...\n',...
             alpha,                          coherfreq);
         [amps,cohers,cohsig,ampsig] = ...
-            myphasecoher(urdata,size(times,2),srate,coherfreq,DEFAULT_CYCLES,alpha);
+            phasecoher(urdata,size(times,2),srate,coherfreq,DEFAULT_CYCLES,alpha);
         fprintf('Coherence significance level: %g\n',cohsig);
         
         ampsig = 20*(log10(ampsig) - log10(mean(amps))); % convert to dB
