@@ -117,6 +117,11 @@
 % Chan_locs format:
 %    See >> topoplot 'example'
 %
+% Examples:
+%
+%    To plot channel locations only:
+%    >> figure; topoplot([],EEG.chanlocs,'style','blank','electrodes','labelpoint','chaninfo',EEG.chaninfo);
+%    
 % Notes: - To change the plot map masking ring to a new figure background color,
 %            >> set(findobj(gca,'type','patch'),'facecolor',get(gcf,'color'))
 %        - Topoplots may be rotated. From the commandline >> view([deg 90]) {default: [0 90])
@@ -158,6 +163,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.270  2006/03/13 22:44:32  arno
+% change default marker
+%
 % Revision 1.269  2006/03/09 17:15:37  arno
 % change default marker size
 % /
