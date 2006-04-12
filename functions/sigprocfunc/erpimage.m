@@ -192,6 +192,9 @@
 %                 and trial. {default: no}
 
 % $Log: not supported by cvs2svn $
+% Revision 1.255  2006/04/12 03:31:32  scott
+% myphasecoher() -> phasecoher()
+%
 % Revision 1.254  2006/04/12 03:26:37  scott
 % help msg
 %
@@ -2220,11 +2223,8 @@ function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,al
     %
     % Perform time-stretching here -JH %%%%%%%%%%%%%%%%
     %
-% size(timeStretchMarks)
-% size(timeStretchRef)
-% timestretchColors
       for t=1:size(data,2)
-        M = timeWarp(timeStretchMarks(t,:)', timeStretchRef');
+        M = timewarp(timeStretchMarks(t,:)', timeStretchRef');
         data(:,t) = M*data(:,t);
       end
     end

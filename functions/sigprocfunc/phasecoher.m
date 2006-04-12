@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2006/04/12 03:30:00  scott
+% help msg
+%
 % Revision 1.11  2006/04/11 19:33:33  toby
 % Jean's update. Needed for new timewarping feature in erpimage()
 %
@@ -257,8 +260,7 @@ allphsori = allphs;
 if exist('timeStretchRef') & exist('timeStretchMarks') & ...
     length(timeStretchRef) > 0 & length(timeStretchMarks) > 0 %Added -Jean
   for t=1:trials
-% $$$     disp(t);
-    M = timeWarp(timeStretchMarks(:,t)', timeStretchRef');
+    M = timewarp(timeStretchMarks(:,t)', timeStretchRef');
     allamps(:,t) = M*allamps(:,t);
     allphs(:,t) = angTimeWarp(timeStretchMarks(:,t)', timeStretchRef', ...
                               allphs(:,t));
@@ -269,8 +271,6 @@ end
 % keyboard;
 
 [amps, cohers, nsums]=getAmpCoh(allamps, allphs, MIN_AMP);
-
-% $$$ keyboard;
 
 % Old routine, for archeological purposes
 % $$$ for f = 1:frames %%%%%%%%%%%%%%% frames %%%%%%%%%%%%%%%%%%%%
