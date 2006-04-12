@@ -19,42 +19,38 @@
 %   sortvar  - [vector | []] Variable to sort epochs on (length(sortvar) = nepochs)
 %              Example: sortvar may by subject response time in each epoch (in ms)
 %              {default|[]: plot in input order}
-%   times    - [vector | []] of latencies (ms) (length(times) = frames) 
-%               Else [startms ntimes srate] Give start latency (ms), time points 
-%               (i.e. frames) per epoch, sampling rate (Hz), {default|[]: 0:nframes-1}
-%  'title'   - ['string'] Plot titla {default: none}
-%   avewidth - Number of trials to smooth with a moving-average (may be non-integer) 
+%   times    - [vector | []] vector of latencies (in ms) for each epoch time point.
+%               Else [startms ntimes srate] = [start latency (ms), time points 
+%               (=frames) per epoch, sampling rate (Hz)]. Else [] -> 0:nframes-1
+%               {default: []}
+%  'title'   - ['string'] Plot title {default: none}
+%   avewidth - Number of trials to smooth (vertically) with a moving-average 
+%               Note: May be non-integer.  {default|0 -> 1}
+%   decimate - Factor to decimate|interpolate ntrials by (may be non-integer)  
+%               Else, if this is large (> sqrt(ntrials)), output this many epochs.
 %               {default|0->1}
-%   decimate - Factor to decimate ntrials out by (may be non-integer)  {default|0->1}
-%               If this is large ( > sqrt(num. trials)), output this many trials.
 %
 % Unordered options ('keyword',argument pairs):
 %
 % Optionally realign data epochs: 
-%   'align'  - [latency] Time-lock data to sortvar. Plot sortvar as at latency (ms)
-%               If latency == Inf, plot at sortvar median {default: no
-%               align}
-% 'timestretch' - {[Refmarks marks x trials], [Refframes marks x 1], {colors}}
-%               When 'plotamps' is turned on, stretch amplitude and phase
-%               time-course right before smoothing. Refmarks is a matrix
-%               where rows are frames you want to time-lock to and columns
-%               are trials. Each trial j will be stretched so that mark
-%               time-locks to Refframes(i). Frame 1 (beginning of epochs)
-%               and last frame in the epoch don't need to be declared as
-%               reference marks nor reference frames : they'll be added
-%               to refmarks by erpimage() before timeWarp is called.
-%               If Refframes is [], the median accross trials of the
-%               latencies in Refmarks will be used.  {colors} contains a
-%               list of linestyles you want to use to visualize the stretch
-%               variable on the ERP image. The length of {colors} should
-%               equal the number of lines in Refmarks. Setting an item of
-%               colors to '' will result in the variable not to be shown on
-%               the ERP image. Furthermore, 'vert' will be overwritten
-%               according to Refframes and {colors}.
-%   'renorm' - ['yes'|'no'|'formula(x)'] Normalize sorting variable to epoch 
-%               latency range and plot. 'yes'= autoscale. Example of formula(x):
+%   'align'  - [latency] Time-lock data to sortvar. Plot sortvar at given latency 
+%               (in ms). Else Inf -> plot sortvar at median sortvar latency 
+%               {default: do not align}
+%   'timewarp' - {[events], [plotms], {colors}} Time warp ERP, amplitude and phase 
+%               time-courses before smoothing. 'events' is a matrix whose columns 
+%               specify the times (in ms) at which a series of successive events occur 
+%               in each trial. 'plotms' is an optional vector of times (in ms) to which 
+%               the series of events should be time locked. (Note: Epoch start and end 
+%               shouldnot be declared as events or plotms. If 'plotms' is absent or [], 
+%               the median of each 'events' column will be used. {colors} contains a 
+%               list of Matlab linestyles to use for vertical lines marking the occurence 
+%               of the time warped events. If '', no line will be drawn for this event 
+%               column. If fewer colors than event columns, cycles through the given color 
+%               labels.  Note: If 'vert' (below) specified, will be overwritten. 
+%   'renorm' - ['yes'|'no'| formula] Normalize sorting variable to epoch 
+%               latency range and plot. 'yes'= autoscale. Example of formula:
 %               '3*x+2'. {default: 'no'}
-%   'noplot' - Do not plot sortvar {default: Do plot sortvar if in times range}
+%   'noplot' - Do not plot sortvar {default: Plot sortvar if in times range}
 %   'noshow' - ['yes'|'no'] Do not plot erpimage, simply return outputs {default: 'no'}
 %
 % Optionally sort input epochs: 
@@ -108,7 +104,7 @@
 %   'rmerp'  - Subtract the average ERP from each trial before processing {default: no}
 %
 % Add time/frequency information:
-%  'coher'   - [freq] Plot ERP average plus mean amplitude & coherence at freq (Hz)
+%   'coher'  - [freq] Plot ERP average plus mean amplitude & coherence at freq (Hz)
 %               Else [minfrq maxfrq] = same, but select frequency with max power in 
 %               given range. (Note: the 'phasesort' freq (above) overwrites these 
 %               parameters). Else [minfrq maxfrq alpha] = plot coher. signif. level line 
@@ -117,7 +113,7 @@
 %               implicit in third arg, times) {default: as defined in icadefs.m}
 %   'cycles' - Number of cycles in the wavelet time/frequency decomposition {default: 3}
 %
-% Add other features:
+% Add other features to the plot:
 %   'cbar'   - Plot color bar to right of ERP-image {default no}
 %   'topo'   - {map,chan_locs,eloc_info} Plot a 2-D scalp map at upper left of image. 
 %               map may be a single integer, representing the plotted data channel, 
@@ -126,18 +122,18 @@
 %               eloc_info (EEG.chaninfo), if empty ([]) or absent, implies the 'X' direction
 %               points towards the nose and all channels are plotted {default: no scalp map}
 %   'spec'   - [loHz,hiHz] Plot the mean data spectrum at upper right of image. 
-%   'horz'   - [epochs_vector] Plot horizontal lines at specified epochs
+%   'horz'   - [epochs_vector] Plot horizontal lines at specified epoch numbers.
 %   'vert'   - [times_vector] Plot vertical dashed lines at specified latencies
-%   'auxvar' - [(nvars,ntrials) matrix] Plot auxiliary variable(s) for each trial 
-%               as separate traces. Else, 'auxvar',{[that_matrix],{colorstrings}} 
+%   'auxvar' - [size(nvars,ntrials) matrix] Plot auxiliary variable(s) for each trial 
+%               as separate traces. Else, 'auxvar',{[matrix],{colorstrings}} 
 %               to specify N trace colors.  Ex: colorstrings = {'r','bo-','k:'} 
-%               (See also: 'vert' above). {default: none}
-%   'sortvarpercent' - [float vector] plot percentiles for the sorting variable
+%               (See also: 'vert' and 'timewarp' above). {default: none}
+%   'sortvarpercent' - [float vector] Plot percentiles for the sorting variable
 %               for instance, [0.1 0.5 0.9] plots the 10th percentile, the median
 %               and the 90th percentile.
-% Miscellaneous options:
+% Plot options:
 % 'noxlabel' - Do not plot "Time (ms)" on the bottom x-axis
-% 'yerplabel' - ['string'] ERP ordinate axis label (default is ERP). Get uV with '\muV'
+% 'yerplabel' - ['string'] ERP ordinate axis label (default is ERP). Print uV with '\muV'
 %
 % Optional outputs:
 %    outdata  = (times,epochsout) data matrix (after smoothing)
@@ -1023,8 +1019,8 @@ function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,al
   Noshow    = NO;     % show sortvar by default
   Nosort    = NO;     % sort on sortvar by default
   Caxflag   = NO;     % use default caxis by default
-                      % Added -Jean
-  timestretchflag = NO;
+                      
+  timestretchflag = NO; % Added -JH
 
   Caxis     = [];
   caxfraction = [];
@@ -1091,10 +1087,8 @@ function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,al
   
   timeStretchRef = [];
   timeStretchMarks = [];
-  tsurdata = []; %time-stretched data before smoothing (for
-                 %timestretched-erp computation)
-                 %If time-stretching is off, this variable remains empty
-  
+  tsurdata = []; % time-stretched data before smoothing (for timestretched-erp computation)
+                 % If time-stretching is off, this variable remains empty
   %
   %%%%%%%%%%%%%%%%%%% Test, fill in commandline args %%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %
@@ -1205,26 +1199,27 @@ function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,al
           caxfraction = Arg;
         end
         Caxflag = NO;
-      elseif timestretchflag == YES %Added -Jean
-% $$$         keyboard;
+
+      elseif timestretchflag == YES % Added -JH
         timeStretchMarks = Arg{1};
+        timeStretchMarks = round(1+(timeStretchMarks-times(1))*srate/1000); % convert from ms to frames -sm
         timeStretchMarks = [ ...
-            repmat(1, [size(timeStretchMarks,1), 1]), ...%Epoch begins
+            repmat(1, [size(timeStretchMarks,1), 1]), ...% Epoch begins
             timeStretchMarks, ...
-            repmat(length(times), [size(timeStretchMarks,1), 1])]; %Epoch ends
+            repmat(length(times), [size(timeStretchMarks,1), 1])]; % Epoch ends
         if length(Arg) < 2 | isempty(Arg{2})
-% $$$               timeStretchRef = [];
           timeStretchRef = median(timeStretchMarks',2);
         else
           timeStretchRef = Arg{2};
+          timeStretchRef = round(1+(timeStretchRef-times(1))*srate/1000); % convert from ms to frames -sm
         end
         if length(Arg) < 3 | isempty(Arg{3})
           timestretchColors = {};
         else
           timestretchColors = Arg{3};
         end
-        fprintf('References for timeStretching are frames:');
-        fprintf(' %.2f', timeStretchRef);
+        fprintf('The %d events specified in each trial will be time warped to ms:',length(timeStretchRef));
+        fprintf(' %.0f', times(1)+1000*(timeStretchRef-1)/srate); % converted from frames to ms -sm
         fprintf('\n');
         timestretchflag = NO;
       elseif Coherflag == YES
@@ -1506,7 +1501,7 @@ function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,al
         Caxflag = YES;
       elseif strcmp(Arg,'coher')
         Coherflag = YES;
-      elseif strcmp(Arg,'timestretch') % Added -Jean
+      elseif strcmp(Arg,'timestretch') | strcmp(Arg,'timewarp') % Added -JH
         timestretchflag = YES;
       elseif (strcmp(Arg,'allamps') | strcmp(Arg,'plotamps'))
         Allampsflag = YES;
@@ -1610,26 +1605,38 @@ function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,al
     end
   elseif exist('timeStretchRef') & ~isempty(timeStretchRef)
     if ~isnan(aligntime)
-      fprintf(['erpimage(): incompatiable options "align" and ' ...
-               '"timestretch\n']);
+      fprintf(['erpimage(): options "align" and ' ...
+               '"timewarp" are not compatiable.\n']);
       return;
     end
     if ~isempty(timestretchColors)
+      if length(timestretchColors) < length(timeStretchRef)
+        ltsC = length(timestretchColors);
+        for k=ltsC+1:length(timeStretchRef)
+          timestretchColors = { timestretchColors{:} timestretchColors{1+rem(k-1,ltsC)}};
+        end
+      end
       timestretchColors = {'' timestretchColors{:} ''};
-      auxvarInd = 1-strcmp('',timestretchColors);
-      newauxvars = ((timeStretchRef(find(auxvarInd))-1)/srate+times(1)/1000)* ...
-          1000;
+    else
+      timestretchColors = { 'k--'};
+      for k=2:length(timeStretchRef)
+        timestretchColors = { timestretchColors{:} 'k--'};
+      end
+    end
+      auxvarInd = 1-strcmp('',timestretchColors); % indicate which lines to draw
+      timeStretchRef = [1 timeStretchRef length(times)];  % 
+      newauxvars = ((timeStretchRef(find(auxvarInd))-1)/srate+times(1)/1000) * 1000;
       fprintf('Overwriting vert with auxvar\n');
       verttimes = [newauxvars'];
-% $$$       keyboard;
       verttimesColors = {timestretchColors{find(auxvarInd)}};
       newauxvars = repmat(newauxvars, [1 ntrials]);
-      if isempty(auxvar) %Initialize auxvar & auxcolors
-        auxvar = newauxvars;
+
+      if isempty(auxvar) % Initialize auxvar & auxcolors
+      %  auxvar = newauxvars;
         auxcolors = {timestretchColors{find(auxvarInd)}};
-      else %Append auxvar & auxcolors
+      else % Append auxvar & auxcolors
       if ~exist('auxcolors')
-        %Fill with default color (k-- for now)
+        % Fill with default color (k-- for now)
         auxcolors = {};
         for j=1:size(auxvar,1)
           auxcolors{end+1} = 'k--';
@@ -1640,17 +1647,10 @@ function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,al
       end
       auxvar = [auxvar; newauxvars];
       end
-    end
   end
   
-  % No need to turn off ERP anymore, we now time-stretch potentials
-  % seperately (see tsurdata below) so the ERP is actually meaningful
-  % again.
-% $$$   if exist('timeStretchMarks') & ~isempty(timeStretchMarks)
-% $$$     %ERP doesn't really mean anything when
-% $$$     %we time-strecht power or phase
-% $$$     Erpflag = NO;
-% $$$   end
+  % No need to turn off ERP anymore; we now time-stretch potentials
+  % separately (see tsurdata below) so the (warped) ERP is actually meaningful
 
   if exist('phargs')
     if phargs(3) > srate/2
@@ -1658,6 +1658,7 @@ function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,al
           'erpimage(): Phase-sorting frequency (%g Hz) must be less than Nyquist rate (%g Hz).',...
           phargs(3),srate/2);
     end
+
     % DEFAULT_CYCLES = 9*phargs(3)/(phargs(3)+10); % 3 cycles at 5 Hz
     if frames < DEFAULT_CYCLES*srate/phargs(3)
       fprintf('\nerpimage(): phase-sorting freq. (%g) too low: epoch length < %d cycles.\n',...
@@ -1857,7 +1858,7 @@ function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,al
         fprintf('Computing data spectrum using spec().\n');
         [pxx,freqs] = spec(data(:),max(1024, pow2(ceil(log2(frames)))),srate,frames,0);
       end;
-      %gf = gcf; % figure;plot(freqs,pxx); %xx=axis; %axis([phargs(3) phargs(4) xx(3) xx(4)]); %figure(gf);
+      % gf = gcf; % figure;plot(freqs,pxx); %xx=axis; %axis([phargs(3) phargs(4) xx(3) xx(4)]); %figure(gf);
       pxx = 10*log10(pxx);
       n = find(freqs >= phargs(3) & freqs <= phargs(4));
       if ~length(n)
@@ -2033,7 +2034,7 @@ function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,al
     for f = 1:length(freq)  % use one or range of frequencies
       frq = freq(f);
       [amps, cohers, cohsig, ampsig, allamps, allphs] = ...
-          phasecoher(data,length(times),srate,frq,DEFAULT_CYCLES,0, ...
+          myphasecoher(data,length(times),srate,frq,DEFAULT_CYCLES,0, ...
                        [], [], timeStretchRef, timeStretchMarks);
       
       for ampwin = ampwins
@@ -2087,7 +2088,6 @@ function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,al
     %
     % Remove low|high-amplitude trials %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %
-% $$$     keyboard;
     
     data = data(:,n); % amp-sort the data, removing rejected-amp trials
     phsamps = phsamps(n);           % amp-sort the amps
@@ -2210,12 +2210,15 @@ function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,al
   urdata = data; % save data to compute amp, coher on unsmoothed data
 
   if ~Allampsflag & ~exist('data2') % if imaging potential,
-% $$$     keyboard;
     if length(timeStretchRef) > 0 & length(timeStretchMarks) > 0
-      % Time-stretching -Jean %%%%%%%%%%%%%%%%
+    %
+    % Perform time-stretching here -JH %%%%%%%%%%%%%%%%
+    %
+% size(timeStretchMarks)
+% size(timeStretchRef)
+% timestretchColors
       for t=1:size(data,2)
-% $$$     disp(t);
-        M = timeWarp(timeStretchMarks(:,t)', timeStretchRef');
+        M = timeWarp(timeStretchMarks(t,:)', timeStretchRef');
         data(:,t) = M*data(:,t);
       end
     end
@@ -2231,10 +2234,12 @@ function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,al
       end
       fprintf('\n');
       fprintf('  and a decimation factor of %g\n',decfactor);
+
       if ~exist('phargs') % if not phase-sorted trials
         [data,outtrials] = movav(data,1:ntrials,avewidth,decfactor); 
         % Note: movav() here sorts using square window
         [outsort,outtrials] = movav(sortvar,1:ntrials,avewidth,decfactor);
+
       else % if phase-sorted trials, use circular / wrap-around smoothing
         backhalf  = floor(avewidth/2);
         fronthalf = floor((avewidth-1)/2);
@@ -2248,10 +2253,11 @@ function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,al
                               sortvar(1:fronthalf)],...
                                       1:(ntrials+backhalf+fronthalf),avewidth,decfactor); 
           % outtrials = 1:ntrials;
+
         else % avewidth==2
           [data,outtrials] = movav([data(:,end),data],...
                                    [1:(ntrials+1)],avewidth,decfactor); 
-          % Note: movav here sorts using square window
+          % Note: movav() here sorts using square window
           [outsort,outtrials] = movav([sortvar(end) sortvar],...
                                       1:(ntrials+1),avewidth,decfactor); 
           % outtrials = 1:ntrials;
@@ -2400,27 +2406,26 @@ function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,al
     end
     
     if ~isnan(signifs) % plot received significance levels
-      fprintf(['Computing and plotting received amp and ITC signif. ' ...
+      fprintf(['Computing and plotting received ERSP and ITC signif. ' ...
                'levels...\n']);
       [amps,cohers,cohsig,ampsig,allamps] = ...
-          phasecoher(urdata,length(times),srate,coherfreq,DEFAULT_CYCLES,0, ...
+          myphasecoher(urdata,length(times),srate,coherfreq,DEFAULT_CYCLES,0, ...
                        [], [], timeStretchRef, timeStretchMarks);
       % need to receive cohsig and ampsig to get allamps
       ampsig = signifs([1 2]); % assume these already in dB
       cohsig = signifs(3);
       
     elseif alpha>0 % compute significance levels
-      fprintf('Computing and plotting %g amp and ITC signif. level...\n',alpha);
-% $$$         keyboard;
+      fprintf('Computing and plotting %g ERSP and ITC signif. level...\n',alpha);
       [amps,cohers,cohsig,ampsig,allamps] = ...
-          phasecoher(urdata,length(times),srate,coherfreq, ...
+          myphasecoher(urdata,length(times),srate,coherfreq, ...
                        DEFAULT_CYCLES, alpha, [], [], ...
                        timeStretchRef, timeStretchMarks');
       % need to receive cohsig and ampsig to get allamps
       fprintf('Coherence significance level: %g\n',cohsig);
     else % no plotting of significance
       [amps,cohers,cohsig,ampsig,allamps] = ...
-          phasecoher(urdata,length(times),srate,coherfreq, ...
+          myphasecoher(urdata,length(times),srate,coherfreq, ...
                        DEFAULT_CYCLES,0,[], [], timeStretchRef, timeStretchMarks);
       % need to receive cohsig and ampsig to get allamps
     end
@@ -2543,10 +2548,11 @@ function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,al
         fprintf('Using the specified caxis range of [%g,%g].\n',...
                 mindat,maxdat);
     else
-      %Changed -Jean
-      %.8 is Scott's suggestion to make the erp image show small
-      %variations better
-      maxdat = .8 * max(max(abs(allamps)));
+
+      % Changed -JH
+      % 0.8 is Scott's suggestion to make the erp image show small
+      % variations better
+      maxdat = 0.8 * max(max(abs(allamps)));
       mindat = -maxdat;
 % $$$         mindat = min(min(allamps));
 % $$$         maxdat = max(max(allamps));
@@ -2706,15 +2712,14 @@ function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,al
       end
       for vt = verttimes % for each column
         fprintf('%g ',vt(1));
-        if isnan(aligntime) % if nor re-aligned data
+        if isnan(aligntime) % if NOT re-aligned data
           if TIMEX          % overplot vt on image
             if length(vt)==1
-% $$$               keyboard;
               mydotstyle = DOTSTYLE;
-% $$$               if exist('auxcolors') & ...
-% $$$                     length(verttimes) == length(auxcolors)
-% $$$                 mydotstyle = auxcolors{find(verttimes == vt)};
-% $$$               end
+                    if exist('auxcolors') & ...
+                          length(verttimes) == length(auxcolors)
+                      mydotstyle = auxcolors{find(verttimes == vt)};
+                    end
               figure(curfig);plot([vt vt],[0 max(outtrials)],mydotstyle,'Linewidth',VERTWIDTH);
             elseif length(vt)==ntrials
               [outvt,ix] = movav(vt,1:ntrials,avewidth,decfactor); 
@@ -2728,7 +2733,7 @@ function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,al
               figure(curfig);plot(outtrials,outvt,DOTSTYLE,'Linewidth',VERTWIDTH);
             end
           end
-        else                % re-aligned data
+        else % re-aligned data
           if TIMEX          % overplot vt on image
             if length(vt)==ntrials
               [outvt,ix] = movav(vt,1:ntrials,avewidth,decfactor); 
@@ -2868,7 +2873,7 @@ function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,al
         figure(curfig);plot(outtrials,outsort,'k','LineWidth',SORTWIDTH);
       end                                                 
       drawnow
-    else % plot re-aligned zeros on sortvar-aligned data
+      else % plot re-aligned zeros on sortvar-aligned data
       if Nosort == NO;
         fprintf('Overplotting sorted sortvar on data.\n');
       end
@@ -2937,7 +2942,6 @@ function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,al
       end;
     end;
   end;
-
   %
   %%%%%%%%%%%%%%%%%%%%%%%% Plot colorbar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %
@@ -2965,12 +2969,13 @@ function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,al
       fprintf('   Mean ERP (p<%g) significance threshold: +/-%g\n', ...
               erpalpha,mean(erpsig));
     else
-      [erp] = nan_mean(fastif(length(tsurdata) > 0, tsurdata', urdata'));   % compute erp average, ignoring nan's
-    end
+      [erp] = nan_mean(fastif(length(tsurdata) > 0, tsurdata', urdata'));   
+    end % compute average ERP, ignoring nan's
   end;          
+
   if Erpflag == YES & strcmpi(noshow, 'no')
     axes(ax1); % reset current axes to the erpimage
-    xtick = get(ax1,'Xtick');     % remember x-axis tick locations
+    xtick = get(ax1,'Xtick');               % remember x-axis tick locations
     xticklabel = get(ax1,'Xticklabel');     % remember x-axis tick locations
     set(ax1, 'xticklabel', []);
     widthxticklabel = size(xticklabel,2);
@@ -3081,6 +3086,9 @@ function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,al
 % $$$         set(l,'FontSize',LABELFONT);
       end
     end
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% plot vert lines %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
     if ~isempty(verttimes) 
       if size(verttimes,1) == ntrials
         vts=sort(verttimes); 
@@ -3157,7 +3165,7 @@ function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,al
       fprintf('Computing and plotting amplitude at %g Hz.\n',coherfreq);
       
       if ~isnan(signifs) | Cohsigflag==NO % don't compute or plot signif. levels
-        [amps,cohers] = phasecoher(urdata,size(times,2),srate,coherfreq,DEFAULT_CYCLES);
+        [amps,cohers] = myphasecoher(urdata,size(times,2),srate,coherfreq,DEFAULT_CYCLES);
         if ~isnan(signifs) 
           ampsig = signifs([1 2]);
           fprintf('Using supplied amplitude significance levels: [%g,%g]\n',...
@@ -3170,7 +3178,7 @@ function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,al
             'Computing and plotting %g coherence significance level at %g Hz...\n',...
             alpha,                          coherfreq);
         [amps,cohers,cohsig,ampsig] = ...
-            phasecoher(urdata,size(times,2),srate,coherfreq,DEFAULT_CYCLES,alpha);
+            myphasecoher(urdata,size(times,2),srate,coherfreq,DEFAULT_CYCLES,alpha);
         fprintf('Coherence significance level: %g\n',cohsig);
         
         ampsig = 20*(log10(ampsig) - log10(mean(amps))); % convert to dB
@@ -3267,7 +3275,7 @@ function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,al
         line([aligntime aligntime],[minamp(1) maxamp(1)]*1.1,'Color','k'); 
         % x=median sort value
       end
-      if exist('xtick') % Added -Jean
+      if exist('xtick') % Added -JH
         set(ax3,'Xtick',xtick);
       end
       set(ax3,'Xticklabel',[]);   % remove tick labels from bottom of image
@@ -3276,6 +3284,8 @@ function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,al
       axis('off');
       set(ax3,'Box','off','color',BACKCOLOR);
       
+      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% plot vert marks %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
       if ~isempty(verttimes)
         if size(verttimes,1) == ntrials
           vts=sort(verttimes); 
@@ -3318,7 +3328,6 @@ function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,al
                             'linewidth',SIGNIFWIDTH);
       end
       
-% $$$       keyboard;
       if ~exist('ynumoffset')
         limit = [timelimits(1:2) -max(abs([minamp maxamp])) max(abs([minamp maxamp]))];
         limit = double(limit);
