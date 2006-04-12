@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2006/04/12 04:11:00  scott
+% timeWarp -> timewarp()
+%
 % Revision 1.12  2006/04/12 03:30:00  scott
 % help msg
 %
@@ -262,13 +265,10 @@ if exist('timeStretchRef') & exist('timeStretchMarks') & ...
   for t=1:trials
     M = timewarp(timeStretchMarks(:,t)', timeStretchRef');
     allamps(:,t) = M*allamps(:,t);
-    allphs(:,t) = angTimeWarp(timeStretchMarks(:,t)', timeStretchRef', ...
+    allphs(:,t) = angtimewarp(timeStretchMarks(:,t)', timeStretchRef', ...
                               allphs(:,t));
   end
 end
-
-
-% keyboard;
 
 [amps, cohers, nsums]=getAmpCoh(allamps, allphs, MIN_AMP);
 
