@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.41  2006/04/11 20:42:03  arno
+% debug
+%
 % Revision 1.39  2006/03/18 18:51:47  arno
 % header and help button
 %
@@ -285,6 +288,10 @@ if isstr(chanlocs1)
             warndlg2('Transformation failed, try warping fiducials + 1 vertex electrode');
         end;
     elseif strcmpi(com, 'warp')
+        if ~exist('fminunc')
+            warndlg2('This function requires the Matlab Optimization toolbox');
+            return;
+        end;
         [clist1 clist2] = pop_chancoresp( dat.elec1, dat.elec2, 'autoselect', 'all');
 
         % copy electrode names
