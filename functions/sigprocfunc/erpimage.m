@@ -36,17 +36,17 @@
 %   'align'  - [latency] Time-lock data to sortvar. Plot sortvar at given latency 
 %               (in ms). Else Inf -> plot sortvar at median sortvar latency 
 %               {default: do not align}
-%   'timewarp' - {[events], [plotms], {colors}} Time warp ERP, amplitude and phase 
+%   'timewarp' - {[events], [warpms], {colors}} Time warp ERP, amplitude and phase 
 %               time-courses before smoothing. 'events' is a matrix whose columns 
-%               specify the times (in ms) at which a series of successive events occur 
-%               in each trial. 'plotms' is an optional vector of times (in ms) to which 
+%               specify the latencies (in ms) at which a series of successive events occur 
+%               in each trial. 'warpms' is an optional vector of latencies (in ms) to which 
 %               the series of events should be time locked. (Note: Epoch start and end 
-%               shouldnot be declared as events or plotms. If 'plotms' is absent or [], 
+%               should not be declared as events or warpms}. If 'warpms' is absent or [], 
 %               the median of each 'events' column will be used. {colors} contains a 
 %               list of Matlab linestyles to use for vertical lines marking the occurence 
 %               of the time warped events. If '', no line will be drawn for this event 
 %               column. If fewer colors than event columns, cycles through the given color 
-%               labels.  Note: If 'vert' (below) specified, will be overwritten. 
+%               labels.  Note: Not compatible with 'vert' (below).
 %   'renorm' - ['yes'|'no'| formula] Normalize sorting variable to epoch 
 %               latency range and plot. 'yes'= autoscale. Example of formula:
 %               '3*x+2'. {default: 'no'}
@@ -192,6 +192,9 @@
 %                 and trial. {default: no}
 
 % $Log: not supported by cvs2svn $
+% Revision 1.253  2006/04/12 03:05:34  scott
+% replaced 'timestretch' with 'timewarp', arguments in ms
+%
 % Revision 1.248  2006/01/12 01:33:04  toby
 % Comment edit
 %

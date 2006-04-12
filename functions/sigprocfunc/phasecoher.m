@@ -3,11 +3,12 @@
 %                Plots results when nargin>6. Outputs have flat ends 
 %                at data indices [1:halfwin] and [frames-halfwin:frames].
 % Usage:
-%     >> [amps,cohers       ] = phasecoher(data,frames,srate,freq,cycles); 
-%     >> [amps,cohers,cohsig,ampsig,allamps,allphs] = phasecoher(data,frames,...
-%                                                    srate,freq,cycles,...
-%                                                       alpha,times,titl,...
-%                                               timeStretchRef, timeStretchMarks);
+%     >> [amps,cohers ] = phasecoher(data,frames,srate,freq,cycles); 
+%     >> [amps,cohers,cohsig,ampsig,allamps,allphs] ...
+%                 = phasecoher(data,frames,...
+%                                srate,freq,cycles,...
+%                                  alpha,times,titl,...
+%                                    warpframes, events);
 % Inputs:
 %   data   = input data, (1,frames*trials) or NB: (frames,trials) 
 %   frames = frames per trial
@@ -16,13 +17,11 @@
 %   cycles = cycles in Gaussian wavelet window (float) {3}
 %   alpha  = (0 0.1] significance probability threshold. Requires 
 %            >=3 output arguments. alpha=0 -> no signif {default: 0}.
-%   times  = vector of times for plotting {default: no plot}
-%   titl   = plot title {default none}
-%   timeStretchRef = common reference frames for timeStretching (1,number
-%                    of references)
-%   timeStretchMarks = mark frames for timeStretching (number of
-%                      references, trials)
-%
+%   times  = vector of latencies (in ms) for plotting {default: no plot}
+%   titl   = [string] plot title {default none}
+%   warpframes = frame numbers of warped events (below)
+%   events = matrix of events in each trial, size (nevents, trials)
+%            as frame numbers.
 % Outputs:
 %   amps    = mean amplitude at each time point
 %   cohers  = phase coherence at each time point [0,1]
@@ -52,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2006/04/11 19:33:33  toby
+% Jean's update. Needed for new timewarping feature in erpimage()
+%
 % Revision 1.10  2006/01/12 00:36:42  toby
 % Phase coher no longer removes epoch means.
 % Needed so that dB conversion could be done correctly.
