@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.42  2006/04/12 02:39:54  arno
+% warning if optimization toolbox absent
+%
 % Revision 1.41  2006/04/11 20:42:03  arno
 % debug
 %
@@ -289,7 +292,7 @@ if isstr(chanlocs1)
         end;
     elseif strcmpi(com, 'warp')
         if ~exist('fminunc')
-            warndlg2('This function requires the Matlab Optimization toolbox');
+            warndlg2(strvcat('This function requires the Matlab Optimization toolbox.', 'Turn on labels, enter scaling, shifts and rotation values to perform alignment manually,'));
             return;
         end;
         [clist1 clist2] = pop_chancoresp( dat.elec1, dat.elec2, 'autoselect', 'all');
