@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.70  2006/04/10 21:04:35  arno
+% remove dbug mssage
+%
 % Revision 1.69  2006/03/23 16:44:00  scott
 % text and help
 %
@@ -467,6 +470,7 @@ elseif length(varargin) == 0 & length(EEG) == 1 % if several arguments, assign v
     % -----------------
     args = {};
     if length(result) == 0,
+        if isempty(OLDSET), error('Cancel operation'); end;
 		args = { 'retrieve', OLDSET }; % cancel
 	else 
         if shift == 0
