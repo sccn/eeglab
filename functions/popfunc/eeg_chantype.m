@@ -36,6 +36,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2005/11/30 19:38:18  arno
+% same
+%
 % Revision 1.3  2005/11/30 19:36:52  arno
 % handling empty channel types
 %
@@ -66,6 +69,7 @@ function indices = eeg_chantype(data,chantype)
     % seach for types
     % ---------------
     k = 1;
+    plotchans = [];
     for i = 1:length(chantype)
         for j = 1:length(datatype)
             if strcmpi(chantype{i},char(datatype{j}))
