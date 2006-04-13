@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1.07  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2006/01/13 00:26:40  arno
+% changing menu order
+%
 % Revision 1.15  2006/01/10 23:34:55  arno
 % same
 %
@@ -178,7 +181,6 @@ function vers = eegplugin_dipfit2_0(fig, trystrs, catchstrs)
         ind = strmatch('fieldtrip', lower(dircontent));
         if ~isempty(ind)
             addpath([ p '..' p(end) '..' p(end) '..' p(end) dircontent{ind} ] );
-            addpath([ p '..' p(end) '..' p(end) '..' p(end) 'warping' ] );
         else
             disp('Warning: Add Fieldtrip folder path manualy or dipfit2 will not be functional');
         end;
