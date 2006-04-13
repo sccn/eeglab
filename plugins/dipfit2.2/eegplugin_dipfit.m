@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1.07  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2006/04/13 17:15:23  arno
+% warning message
+%
 % Revision 1.19  2006/04/13 17:13:07  arno
 % same
 %
@@ -236,7 +239,7 @@ function vers = eegplugin_dipfit2_0(fig, trystrs, catchstrs)
     % create menus
     % ------------
     submenu = uimenu( menu, 'Label', 'Locate dipoles using DIPFIT 2.x');
-    uimenu( submenu, 'Label', 'Head model and settings'  , 'CallBack', comsetting, 'separator', 'on');
+    uimenu( submenu, 'Label', 'Head model and settings'  , 'CallBack', comsetting);
     uimenu( submenu, 'Label', 'Coarse fit (grid scan)'   , 'CallBack', combatch);
     uimenu( submenu, 'Label', 'Fine fit (iterative)'     , 'CallBack', comfit);
     uimenu( submenu, 'Label', 'Autofit (coarse fit, fine fit & plot)', 'CallBack', comauto);
