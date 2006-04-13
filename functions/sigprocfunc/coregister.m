@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.44  2006/04/12 02:45:59  arno
+% text
+%
 % Revision 1.43  2006/04/12 02:41:40  arno
 % better warning
 %
@@ -343,7 +346,8 @@ if strcmpi(g.helpmsg, 'on')
             'in the EEGLAB menu and select the "No coreg" option.');
     if ~isempty(findstr(lower(chanlocs2), 'standard-10-5-cap385')) | ...
         ~isempty(findstr(lower(chanlocs2), 'standard_1005')),
-        mytext = strvcat( mytext, 'Then re-open "Tools > Locate dipoles using DIPFIT2 > Head model and settings" in the EEGLAB menu and select the "No coreg" option.');
+        mytext = strvcat( mytext, 'Then re-open "Tools > Locate dipoles using DIPFIT2 > Head model and settings"', ...
+                          'in the EEGLAB menu and select the "No coreg" option.');
     else
         mytext = strvcat( mytext, 'Then re-open the graphic interface function you were using.');
     end;        
