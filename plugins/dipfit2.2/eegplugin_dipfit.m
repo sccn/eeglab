@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1.07  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2006/04/13 16:27:33  arno
+% do not add warping toolbox
+%
 % Revision 1.16  2006/01/13 00:26:40  arno
 % changing menu order
 %
@@ -180,7 +183,13 @@ function vers = eegplugin_dipfit2_0(fig, trystrs, catchstrs)
         dircontent  = { dircontent.name };
         ind = strmatch('fieldtrip', lower(dircontent));
         if ~isempty(ind)
+            tmp  = which('topoplot');
             addpath([ p '..' p(end) '..' p(end) '..' p(end) dircontent{ind} ] );
+            tmp2 = which('topoplot');
+            if ~strcmpi(tmp, tmp2),
+                disp('Warning: you should delete the topoplot functions in fieldtrip which might confuse EEGLAB');
+                addpath(fileparts(tmp);
+            end;
         else
             disp('Warning: Add Fieldtrip folder path manualy or dipfit2 will not be functional');
         end;
