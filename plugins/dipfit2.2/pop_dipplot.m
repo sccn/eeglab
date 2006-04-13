@@ -67,6 +67,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2006/03/10 23:31:45  arno
+% use MRI file
+%
 % Revision 1.35  2006/03/10 23:30:15  arno
 % remove dbug message
 %
@@ -284,7 +287,7 @@ else
     
     % plotting
     % --------
-    tmpoptions = { options{:} 'coordformat', EEG.dipfit.coordformat 'mri' EEG.dipfit.mrifile };
+    tmpoptions = { options{:} 'coordformat', EEG.dipfit.coordformat };
     if strcmpi(EEG.dipfit.coordformat, 'spherical')
         dipplot(EEG.dipfit.model(comps), tmpoptions{:});
     else
