@@ -62,6 +62,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2006/04/13 17:28:43  arno
+% default values for model
+%
 % Revision 1.18  2006/03/07 00:46:05  arno
 % final edits
 %
@@ -250,8 +253,8 @@ if nargin < 2
     valmodel     = 1;
     nocoregvalue = 0;
     if isfield(EEG.chaninfo, 'filename')
-        if ~isempty(findstr(lower(EEG.chaninfo.filename), 'standard-10-5-cap385')), transform = autocoregsph; nocoregvalue = 1; end;
-        if ~isempty(findstr(lower(EEG.chaninfo.filename), 'standard_1005')),        transform = autocoregbem; nocoregvalue = 1; valmodel = 2; end;
+        if ~isempty(findstr(lower(EEG.chaninfo.filename), 'standard-10-5-cap385')), nocoregvalue = 1; end;
+        if ~isempty(findstr(lower(EEG.chaninfo.filename), 'standard_1005')),        nocoregvalue = 1; valmodel = 2; end;
     end;
         
     userdata    = [];
