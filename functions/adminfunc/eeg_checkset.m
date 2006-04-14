@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.195  2006/04/11 18:14:37  arno
+% text message
+%
 % Revision 1.194  2006/04/10 21:07:14  arno
 % nothing
 %
@@ -807,6 +810,17 @@ if ~isempty( varargin)
     if isempty(EEG.data)
         errordlg2('Empty dataset -> File / Import data or File / Load existing dataset', 'Error');
         error('eeg_checkset error: empty dataset'); return;
+    end;    
+end;
+
+% checking data length
+% --------------------
+if isnumeric(EEG.data)
+    if size(EEG.data,2) ~= EEG.pnts 
+       disp( [ 'eeg_checkset warning: number of columns in data (' int2str(size(EEG.data,2)) ...
+           ') does not match the number of points (' int2str(EEG.pnts) '): corrected' ]); 
+       res = com;
+       EEG.pnts = size(EEG.data,2);
     end;    
 end;
 
