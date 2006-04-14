@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.197  2006/04/14 17:49:34  arno
+% move com
+%
 % Revision 1.196  2006/04/14 17:46:10  arno
 % checking data length
 %
@@ -824,7 +827,8 @@ if isnumeric(EEG.data)
        disp( [ 'eeg_checkset warning: number of columns in data (' int2str(size(EEG.data,2)) ...
            ') does not match the number of points (' int2str(EEG.pnts) '): corrected' ]); 
        res = com;
-       EEG.pnts = size(EEG.data,2);
+       EEG.pnts   = size(EEG.data,2);
+       EEG.trials = size(EEG.data,3);
     end;    
 end;
 
