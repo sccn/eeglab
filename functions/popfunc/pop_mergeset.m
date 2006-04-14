@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.41  2006/04/08 04:02:54  toby
+% corrected problems with events and epochs
+%
 % Revision 1.40  2006/04/08 01:58:55  toby
 % removed some extraneous code used for bug checking
 %
@@ -344,7 +347,7 @@ else % INEEG is an EEG struct
             % Will break if 'event' doesn't have the same subfields, need to fix this. 
             INEEG1.event(orilen + e) = INEEG2.event(e);
             if isfield(INEEG1.event,'latency') & isfield(INEEG2.event,'latency')
-               INEEG1.event(orilen + e).latency = INEEG2.event(e).latency + INEEG1.pnts * INEEG1trials;
+               INEEG1.event(orilen + e).latency = INEEG2.event(e).latency + INEEG1pnts * INEEG1trials;
             end
             if isfield(INEEG1.event,'epoch') & isfield(INEEG2.event,'epoch')
                INEEG1.event(orilen + e).epoch = INEEG2.event(e).epoch + INEEG1trials;
