@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.198  2006/04/14 17:54:25  arno
+% fixing number of trials too
+%
 % Revision 1.197  2006/04/14 17:49:34  arno
 % move com
 %
@@ -820,18 +823,6 @@ if ~isempty( varargin)
     end;    
 end;
 
-% checking data length
-% --------------------
-if isnumeric(EEG.data)
-    if size(EEG.data,2) ~= EEG.pnts 
-       disp( [ 'eeg_checkset warning: number of columns in data (' int2str(size(EEG.data,2)) ...
-           ') does not match the number of points (' int2str(EEG.pnts) '): corrected' ]); 
-       res = com;
-       EEG.pnts   = size(EEG.data,2);
-       EEG.trials = size(EEG.data,3);
-    end;    
-end;
-
 % additional checks
 % -----------------
 res = -1; % error code
@@ -925,6 +916,7 @@ if ~isempty( varargin)
               end;
           end;
          case 'eventconsistency',          
+          [EEG res] = eeg_checkset(EEG);
           if isempty(EEG.event), return; end;
           
           % remove the events which latency are out of boundary
