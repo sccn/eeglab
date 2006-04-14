@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.196  2006/04/14 17:46:10  arno
+% checking data length
+%
 % Revision 1.195  2006/04/11 18:14:37  arno
 % text message
 %
@@ -724,6 +727,7 @@
 function [EEG, res] = eeg_checkset( EEG, varargin );
 msg = '';
 res = 0; % 0 = OK, 1 = error, -1=warning
+com = sprintf('%s = eeg_checkset( %s );', inputname(1), inputname(1));
 
 if nargin < 1
     help eeg_checkset;
@@ -1130,7 +1134,6 @@ if ~isempty( varargin)
     end;
 end;            
 
-com = sprintf('%s = eeg_checkset( %s );', inputname(1), inputname(1));
 res = [];
 
 % check name consistency
