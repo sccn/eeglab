@@ -38,7 +38,7 @@
 % 
 % Functions added to EEGLAB: 
 % --------------------------------------------------------------------
-% cell2mat()      - cell to matrix, overwrites neural network toolbox function
+% celltomat()     - cell to matrix, overwrites neural network toolbox function
 % compvar()       - compute component variance
 % convolve()      - smart conv2 (fewer boundary problems)
 % del2map()       - compute a surface Laplacian transform of the data
@@ -65,7 +65,7 @@
 % loadeeg()       - load neuroscan .EEG file
 % loadtxt()       - load text file
 % makehtml()      - generate html pages for directories (uses help2html)
-% mat2cell()      - matrix to cell (local)
+% mattocell()     - matrix to cell (local)
 % pophelp()       - format the help header  !!!
 % readedf()       - read binary EEG EDF file
 % readegi()       - read binary EEG EGI file 
@@ -188,6 +188,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.479  2006/04/12 05:40:33  arno
+% canceling loading STUDY
+%
 % Revision 1.478  2006/04/10 21:03:21  arno
 % debug cancel for select study
 %
