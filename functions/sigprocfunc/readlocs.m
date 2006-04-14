@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.84  2006/03/31 03:11:13  toby
+% made '.eloc' equivalent to '.loc' as a filetype
+%
 % Revision 1.83  2006/02/14 00:01:18  arno
 % change xyz format
 %
@@ -398,7 +401,7 @@ chanformat(2).type         = 'besa';
 chanformat(2).typestring   = 'BESA spherical .elp file';
 chanformat(2).description  = [ 'BESA spherical coordinate file. Note that BESA spherical coordinates ' ...
                                'are different from Matlab spherical coordinates' ];
-chanformat(2).skipline     = 1;
+chanformat(2).skipline     = -1;
 chanformat(2).importformat = { 'type' 'labels' 'sph_theta_besa' 'sph_phi_besa' 'sph_radius' };
 % ---------------------------------------------------------------------------------------------------
 chanformat(3).type         = 'xyz';
