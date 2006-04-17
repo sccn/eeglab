@@ -1,6 +1,6 @@
 % pop_chanedit() - Edit channel locations structure of an EEGLAB dataset,
 %                  EEG.chanlocs. For EEG channel location structure and file 
-%                  formats, see >> help readlocs  % help message of readlocs() 
+%                  formats, see >> help readlocs  
 %
 % Usage: >> newchans = pop_chanedit( EEG, 'key1', value1, ...
 %                        'key2', value2, ... ); % edit dataset containing chanlocs
@@ -10,30 +10,30 @@
 %   "Channel information ('field name')" - [edit boxes] display channel field 
 %                   contents for the current channel. Use 'transform' on the command
 %                   line to modify these fields.
-%   "Opt. 3D center" - [button] recenter 3-D channel coordinates. Uses the chancenter()
-%                 function. Command line equivalent is 'convert', { 'chancenter' [xc
-%                 yc zc] }, [xc yc zc] being the center of the sphere (use empty to
-%                 find the center so that electrodes best match a sphere).
-%   "rotate axis" - [button] force one electrode to one position and rotate other
+%   "Opt. 3D center" - [button] optimally re-center 3-D channel coordinates. Uses 
+%                 chancenter(). Command line equivalent is 'convert', { 'chancenter' 
+%                 [xc yc zc] }, [xc yc zc] being the center of the sphere. Use [] 
+%                 to find the center such that electrode locations best match a sphere.
+%   "Rotate axis" - [button] force one electrode to one position and rotate other
 %                 electrodes accordingly. Command line equivalent is 'forcelocs'.
 %   "Transform axis" - [button] perform any operation on channel fields. Command
 %                 line equivalent is 'transform'.
-%   "xyz->polar & sph." - [button] convert 3-D cartesian coordinates to polar and
+%   "Xyz->polar & sph." - [button] convert 3-D cartesian coordinates to polar and
 %                 3-D spherical coordinates. This is useful when you edit the 
 %                 coordinates manually. Command line equivalent is 'convert', 
 %                 'cart2all'.
-%   "sph.->polar & xyz" - [button] convert 3-D spherical coordinates to polar and
+%   "Sph.->polar & xyz" - [button] convert 3-D spherical coordinates to polar and
 %                 3-D cartesian coordinates. Command line equivalent is 'convert', 
 %                 'sph2all'.
-%   "polar->sph & xyz" - [button] convert 2-D polar coordinates to 3-D spherical and
+%   "Polar->sph & xyz" - [button] convert 2-D polar coordinates to 3-D spherical and
 %                 3-D cartesian coordinates. Command line equivalent is 'convert', 
 %                 'topo2all'. Note that if spherical radii are absent, they are forced
 %                 to 1.
 %   "Set head radius" - [button] change head size radius. This is usefull
 %                 to make channel location compatible with a specified
 %                 spherical model. Command line option: 'headrad'.
-%   'Set channel types' - [button] set type names for a range of data channels.
-%   'Shift data channels' - [button] shift data channel indices. Command
+%   "Set channel types" - [button] set channel type names for a range of data channels.
+%   "Shift data channels" - [button] shift data channel indices. Command
 %                 line equivalent: 'shiftdatachans'.
 %   "Delete chan" - [button] delete channel. Command line equivalent: 'delete'.
 %   "Insert chan" - [button] insert channel before current channel. Command line 
@@ -65,7 +65,7 @@
 %   "Help" - [button] this help message.
 %   "OK" - [button] save editing and propagate to parent.
 % 
-% Input:
+% Inputs:
 %   EEG      - EEG dataset 
 %   chanlocs - EEG.chanlocs structure
 %
@@ -147,6 +147,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.149  2006/04/10 08:30:33  scott
+% dos2unix
+%
 % Revision 1.148  2006/04/09 02:37:06  scott
 % window text detail
 %
