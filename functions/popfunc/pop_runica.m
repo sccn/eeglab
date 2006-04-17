@@ -1,13 +1,12 @@
 % pop_runica() - Run an ICA decomposition of an EEG dataset using runica(), 
-%                binica(), or some ICA or other method of linear decomposition. 
+%                binica(), or another ICA or other linear decomposition. 
 % Usage:
 %   >> OUT_EEG = pop_runica( EEG ); % pops-up a data entry window
 %   >> OUT_EEG = pop_runica( EEG, 'key', 'val' ); % no pop_up
 %
 % Graphic interface:
-%   "ICA algorithm to use" - [edit box] The type of ICA algorithm 
-%                 to use for the ICA decomposition. Command line
-%                 equivalent: 'icatype'
+%   "ICA algorithm to use" - [edit box] The ICA algorithm to use for 
+%                 ICA decomposition. Command line equivalent: 'icatype'
 %   "Commandline options" - [edit box] Command line options to forward
 %                 to the ICA algorithm. Command line equivalent: 'options' 
 % Inputs:
@@ -17,9 +16,9 @@
 %   'icatype'   - ['runica'|'binica'|'jader'|'fastica'] ICA algorithm 
 %                 to use for the ICA decomposition. The nature of any 
 %                 differences in the results of these algorithms have 
-%                 not been well characterized. Default is binica(), if
-%                 found, else runica().
-%   'dataset'   - [integer array] dataset indices.
+%                 not been well characterized. {default: binica(), if
+%                 found, else runica()}
+%   'dataset'   - [integer array] dataset index or indices.
 %   'chanind'   - [integer array] subset of channel indices for running
 %                 the ICA decomposition.
 %   'concatenate' - ['on'|'off'] 'on' concatenate all input datasets 
@@ -34,7 +33,7 @@
 %    also extract sub-Gaussian sources using the (recommended) 'extended' option 
 %    of Lee and Girolami. Function runica() is the all-Matlab version; function 
 %    binica() calls the (1.5x faster) binary version (a separate download) 
-%    which was translated into C from runica() by Sigurd Enghoff.
+%    translated into C from runica() by Sigurd Enghoff.
 % 2) jader() calls the JADE algorithm of Jean-Francois Cardoso. This is 
 %    included in the EEGLAB toolbox by his permission. See >> help jader
 % 3) To run fastica(), download the fastICA toolbox from its website,
@@ -44,7 +43,8 @@
 %    in parallel.
 %
 % Outputs:
-%   OUT_EEG = Input EEGLAB dataset with new icaweights and icasphere fields. 
+%   OUT_EEG = The input EEGLAB dataset with new fields icaweights, icasphere 
+%             and icachansind (channel indices). 
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.63  2006/03/10 20:15:40  arno
+% extended 1 as default
+%
 % Revision 1.62  2005/11/22 00:25:38  arno
 % fixing channel browsing
 %
@@ -310,7 +313,7 @@ if nargin < 2
                
     promptstr    = { { 'style' 'text'       'string' 'ICA algorithm to use (click to select)' } ...
                      { 'style' 'listbox'    'string' strvcat(allalgs{:}) 'callback', cb_ica } ...
-                     { 'style' 'text'       'string' 'Commandline options (See algorithm help messages)' } ...
+                     { 'style' 'text'       'string' 'Commandline options (See help messages)' } ...
                      { 'style' 'edit'       'string' '''extended'', 1' 'tag' 'params' } ...
                      { 'style' 'text'       'string' 'Channel type(s) or channel indices' } ...
                      { 'style' 'edit'       'string' '' 'tag' 'chantype' }  ...
@@ -412,7 +415,7 @@ end;
 % ---------------------------------------------------
 fprintf('\n');
 if ~isempty(EEG.icaweights)
-    fprintf('Saving current ICA weights in "EEG.etc" sub-structure.\n');
+    fprintf('Saving current ICA decomposition in "EEG.etc.oldicaweights" (etc.).\n');
     if ~isfield(EEG,'etc'), EEG.etc = []; end;
     if ~isfield(EEG.etc,'oldicaweights')
         EEG.etc.oldicaweights = {};
@@ -421,7 +424,8 @@ if ~isempty(EEG.icaweights)
     end;
     EEG.etc.oldicaweights = { EEG.icaweights  EEG.etc.oldicaweights{:} };
     EEG.etc.oldicasphere  = { EEG.icasphere   EEG.etc.oldicasphere{:}  };
-    EEG.etc.oldicasphere  = { EEG.icachansind EEG.etc.oldicachansind{:}  };
+    EEG.etc.oldicachansind  = { EEG.icachansind EEG.etc.oldicachansind{:}  };
+    fprintf('               Decomposition saved as entry %d.\n',length(EEG.etc.oldicaweights));
 end
 EEG.icaweights = [];
 EEG.icasphere  = [];
@@ -455,7 +459,7 @@ switch lower(g.icatype)
     case 'runica' 
         if nargin < 2
             fig = figure('visible', 'off');
-            supergui( fig, {1 1}, [], {'style' 'text' 'string' 'Press Button to interupt runica' }, ...
+            supergui( fig, {1 1}, [], {'style' 'text' 'string' 'Press button to interrupt runica()' }, ...
                       {'style' 'pushbutton' 'string' 'Interupt' 'callback' 'figure(gcbf); set(gcbf, ''tag'', ''stop'');' } );
             drawnow;
         end;
@@ -468,16 +472,16 @@ switch lower(g.icatype)
         end;
      case 'binica'
         icadefs;
-        fprintf(['Warning: IF the binary ICA function does not work, check that you have added the\n' ...
+        fprintf(['Warning: If the binary ICA function does not work, check that you have added the\n' ...
                  'binary file location (in the EEGLAB directory) to your Unix /bin directory (.cshrc file)\n']);
         if exist(ICABINARY) ~= 2
-            error('Pop_runica: binary ICA program cannot be found. Edit icadefs.m file to specify ICABINARY variable');
+            error('Pop_runica(): binary ICA executable not found. Edit icadefs.m file to specify the ICABINARY location');
         end;
         tmprank = rank(tmpdata(:,1:min(3000, size(tmpdata,2))));
         if tmprank == size(tmpdata,1) | pca_opt
             [EEG.icaweights,EEG.icasphere] = binica( tmpdata, 'lrate', 0.001, g.options{:} );
         else 
-            disp(['Data rank (' int2str(tmprank) ') less than the number of channels (' int2str(size(tmpdata,1)) ').']);
+            disp(['Data rank (' int2str(tmprank) ') is less than the number of channels (' int2str(size(tmpdata,1)) ').']);
             [EEG.icaweights,EEG.icasphere] = binica( tmpdata, 'lrate', 0.001, 'pca', tmprank, g.options{:} );
         end;
      case 'pearson_ica' 
