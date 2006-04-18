@@ -1,35 +1,33 @@
 % timefreq() - compute time/frequency decomposition of data trials.
 %
 % Usage:
-%     >> [tf, freqs, times] = timefreq(data, srate);
-%     >> [tf, freqs, times, itcvals] = timefreq(data, srate, 'key1', 'val1', ...
-%                                      'key2', 'val2' ...)
-%
+%     >> [tf, freqs, times]          = timefreq(data, srate);
+%     >> [tf, freqs, times, itcvals] = timefreq(data, srate, ...
+%                                        'key1', 'val1', 'key2', 'val2' ...)
 % Inputs:
-%       data    = [float array] 2-D data array of size (times,trials)
-%       srate   = sampling rate
+%         data    = [float array] 2-D data array of size (times,trials)
+%         srate   = sampling rate
 %
 % Optional inputs:
-%      'wavelet' = 0  -> Use FFTs (with constant window length) { Default } 
-%               = >0 -> Number of cycles in each analysis wavelet 
-%               = [cycles expfactor] -> if 0 < expfactor < 1,  the number 
-%                 of wavelet cycles expands with frequency from cycles
-%                 If expfactor = 1, no expansion; if = 0, constant
-%                 window length (as in FFT)            {default wavelet: 0}
+%       'wavelet' = (>0) -> Number of cycles in each analysis wavelet 
+%                 = [cycles expfactor] -> if = 0, constant window length 
+%                   (FFT). If (0 < expfactor < 1), the number of wavelet
+%                   cycles expands with frequency from cycles. 
+%                   If expfactor = 1, no expansion (scaled wavelets);
+%                   {default: 0 = FFT}
+% Optional ITC type:
+%        'type'   = ['coher'|'phasecoher'] Compute either linear coherence
+%                   ('coher') or phase coherence ('phasecoher') also known
+%                   as phase coupling factor' {default: 'phasecoher'}.
+%        'subitc' = ['on'|'off'] subtract stimulus locked Inter-Trial Coherence 
+%                   (ITC) from x and y. This computes the  'intrinsic' coherence
+%                   x and y not arising from common synchronization to 
+%                   experimental events. See notes. {default: 'off'}
 %
-%    Optional Coherence Type for ITC:
-%      'type'   = ['coher'|'phasecoher'] Compute either linear coherence
-%                 ('coher') or phase coherence ('phasecoher') also known
-%                 as phase coupling factor' {default: 'phasecoher'}.
-%      'subitc' = ['on'|'off'] subtract stimulus locked Inter-Trial Coherence 
-%                 (ITC) from x and y. This computes the  'intrinsic' coherence
-%                 x and y not arising from common synchronization to 
-%                 experimental events. See notes. {default: 'off'}
+% Optional detrending:
+%       'detrend' = ['on'|'off'], Linearly detrend each data epoch  {'off'}
 %
-%    Optional Detrend:
-%      'detrend' = ['on'|'off'], Linearly detrend each data epoch  {'off'}
-%
-%    Optional FFT/DFT:
+% Optional FFT/DFT parameters:
 %      'tlimits'  = [min max] time limits in ms.
 %      'winsize'  = If cycles==0 (FFT, see 'wavelet' input): data subwindow 
 %                   length (fastest, 2^n<frames);
@@ -55,41 +53,42 @@
 %      'nfreqs'   = number of output frequencies. For FFT, closest computed
 %                   frequency will be returned. Overwrite 'padratio' effects
 %                   for wavelets. Default: use 'padratio'.
-%      'freqscale' = ['log'|'linear'] frequency scale. Default is 'linear'.
-%                    Note that for obtaining 'log' spaced freqs using FFT, 
-%                    closest correspondant frequencies in the 'linear' space 
-%                    are returned.
+%     'freqscale' = ['log'|'linear'] frequency scale. Default is 'linear'.
+%                   Note that for obtaining 'log' spaced freqs using FFT, 
+%                   closest correspondant frequencies in the 'linear' space 
+%                   are returned.
 %
-%    Optional time stretching:
-%      'timestretch' - {[Refmarks marks x trials], [Refframes marks x 1]}
-%                  Stretch amplitude and phase time-course right before
-%                  smoothing. Refmarks is a matrix where rows are marks you
-%                  want to time-lock to and columns are trials. Each trial
-%                  will be stretched so that its marks occures at time
-%                  refframes. If Refframes is [], the median accross trials
-%                  of the latencies in Refmarks will be used.
-%
+% Optional time warping:
+%   'timestretch' = {[Refmarks], [Refframes]}
+%                   Stretch amplitude and phase time-course before smoothing.
+%                   Refmarks is a (frames,trials) matrix in which rows are 
+%                   event marks to time-lock to for a given trial. Each trial
+%                   will be stretched so that its marked events occur at times
+%                   Refframes. If Refframes is [], the median frame, across trials,
+%                   of the Refmarks latencies will be used. Both Refmarks and
+%                   Refframes are given in frames in this version - will be 
+%                   changed to ms in future.
 % Outputs: 
-%       tf      - time frequency array for all trials (freqs, times, trials)
-%       freqs   - vector of computed frequencies (Hz)
-%       times   - vector of computed time points (ms)
-%       itcvals - time frequency "average" for all trials (freqs, times).
-%                 In the coherence case, it is the real mean of the time
-%                 frequency decomposition, but in the phase coherence case
-%                 (see 'type' input'), this is the mean of the normalized
-%                 spectral estimate.
+%         tf      = time frequency array for all trials (freqs, times, trials)
+%         freqs   = vector of computed frequencies (Hz)
+%         times   = vector of computed time points (ms)
+%         itcvals = time frequency "average" for all trials (freqs, times).
+%                   In the coherence case, it is the real mean of the time
+%                   frequency decomposition, but in the phase coherence case
+%                   (see 'type' input'), this is the mean of the normalized
+%                   spectral estimate.
 %
-% Authors: Arnaud Delorme, Lars & Scott Makeig
+% Authors: Arnaud Delorme, Jean Hausser & Scott Makeig
 %          CNL/Salk Institute 1998-2001; SCCN/INC/UCSD, La Jolla, 2002-
 %
+% See also: timef(), newtimef(), crossf(), newcrossf()
+
 % Note: it is not advised to use a FFT decomposition in a log scale. Output
 %       value are accurate but plotting might not be because of the non-uniform
 %       frequency output values in log-space. If you have to do it, use a 
 %       padratio as large as possible, or interpolate time-freq image at
 %       exact log scale values before plotting.
-%
-% See also: timef()
-
+ 
 % Copyright (C) 8/1/98  Arnaud Delorme, Sigurd Enghoff & Scott Makeig, SCCN/INC/UCSD
 %
 % This program is free software; you can redistribute it and/or modify
@@ -107,6 +106,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.46  2006/04/11 20:11:48  toby
+% Jean's update for timewarp and erpimage()
+%
 % Revision 1.45  2005/05/23 18:24:08  arno
 % error
 %
@@ -464,8 +466,8 @@ if ~isempty(g.timestretch) & length(g.timestretch{1}) > 0 ...
     %[dummy pos]=min(abs(repmat(timemarks(2:7,1), [1 length(g.indexout)])-repmat(g.indexout,[6 1])));
     [dummy marksPos] = min(transpose(abs(...
         repmat(timemarks(:,t), [1 length(g.indexout)]) ...
-        - repmat(g.indexout, [size(timemarks,1) 1]) ...
-        )));
+           - repmat(g.indexout, [size(timemarks,1) 1]) ...
+              )));
     marksPos(end+1) = 1;
     marksPos(end+1) = length(g.indexout);
     marksPos = sort(marksPos);
@@ -627,6 +629,7 @@ function [ timevals, timeindices ] = gettimes(frames, tlimits, timevar, winsize,
     else 
         %disp('Debug msg: Time value updated by finding closest points in data');
     end;    
+
 
 % DEPRECATED, FOR C INTERFACE
 function nofunction()
