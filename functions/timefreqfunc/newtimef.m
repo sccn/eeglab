@@ -1,27 +1,32 @@
-% WARNING: this function is not part of the EEGLAB toolbox and should not be distributed
-%          you must contact Arnaud Delorme (arno@salk.edu) for terms of use
-%
 % newtimef() - Returns estimates and plots of event-related (log) spectral
 %           perturbation (ERSP) and inter-trial coherence (ITC) changes 
 %           across event-related trials (epochs) of a single input time series. 
+%
+%         * Also can compute and statistically compare transforms for two time 
+%           series. Use to compare ERSP and ITC means in two conditions.
+%
 %         * Uses either fixed-window, zero-padded FFTs (fastest), wavelet
 %           0-padded DFTs (both Hanning-tapered), OR multitaper spectra ('mtaper').
+%
 %         * For the wavelet and FFT methods, output frequency spacing 
 %           is the lowest frequency ('srate'/'winsize') divided by 'padratio'.
 %           NaN input values (such as returned by eventlock()) are ignored.
+%
 %         * If 'alpha' is given, then bootstrap statistics are computed 
 %           (from a distribution of 'naccu' surrogate data trials) and 
 %           non-significant features of the output plots are zeroed out 
 %           (i.e., plotted in green). 
+%
 %         * Given a 'topovec' topo vector and 'elocs' electrode location file,
 %           the figure also shows a topoplot() of the specified scalp map.
 %         * Note: Left-click on subplots to view and zoom in separate windows.
 % Usage: 
 %        >> [ersp,itc,powbase,times,freqs,erspboot,itcboot] = ...
-%                timef(data,frames,tlimits,srate,cycles,...
-%                        'key1',value1,'key2',value2, ... );        
+%                      timef(data,frames,tlimits,srate,cycles,...
+%                                'key1',value1,'key2',value2, ... );        
 % NOTE:                                        
-%        >> timef details  % scrolls more detailed information about timef
+%        >> timef details  % scrolls more detailed argument information 
+%           % timef() also computes multitaper transforms
 %
 % Required inputs:     Value                                 {default}
 %       data        = Single-channel data vector (1,frames*ntrials) (required)
@@ -41,7 +46,7 @@
 %    Optional Inter-Irial Coherence Type:
 %       'type'      = ['coher'|'phasecoher'] Compute either linear coherence 
 %                      ('coher') or phase coherence ('phasecoher') also known
-%                      as the phase coupling factor           {'phasecoher'}.
+%                      as phase-locking factor                  {'phasecoher'}
 %
 %    Optional Detrending:
 %       'detrend'   = ['on'|'off'], Linearly detrend each data epoch   {'off'}
@@ -159,7 +164,6 @@
 %       'outputformat' = ['old'|'new'] for compatibility with script that used the old
 %                        output format, set to 'old' (mbase in absolute amplitude (not
 %                        dB) and real itc instead of complex itc). Default is 'new'.
-%                     
 % Outputs: 
 %            ersp   = Matrix (nfreqs,timesout) of log spectral diffs. from baseline (dB) 
 %            itc    = Matrix of inter-trial coherencies (nfreqs,timesout) (range: [0 1])
@@ -170,10 +174,10 @@
 %          itcboot  = Matrix (2,nfreqs) of [lower;upper] ITC thresholds (not diffs).
 %           tfdata  = time frequency decomposition of the data (nfreqs,timesout,trials)
 %
-% Author: Arnaud Delorme, Sigurd Enghoff & Scott Makeig
+% Authors: Arnaud Delorme, Sigurd Enghoff, Jean Hausser, & Scott Makeig
 %          CNL / Salk Institute 1998- | SCCN/INC, UCSD 2002-
 %
-% See also: crossf()
+% See also: timefreq(), condstat(), newcrossf()
  
 %123456789012345678901234567890123456789012345678901234567890123456789012
 %    Optional Multitaper Parameters:
@@ -185,10 +189,11 @@
 %                      The use of mutitaper with wavelets (cycles>0) is not 
 %                      recommended (as multiwavelets are not implemented). 
 %                      Uses Matlab functions DPSS, PMTM.      {no multitaper}
-%
 
-% Copyright (C) 1998 Arnaud Delorme, Sigurd Enghoff, Scott Makeig, Arnaud Delorme 
-% CNL / Salk Institute 8/1/98-8/28/01
+% Copyright (C) 1998 Sigurd Enghoff, Scott Makeig
+% first built as timef.m at CNL / Salk Institute 8/1/98-8/28/01
+% SCCN/INC/UCSD/ recast as newtimef -Arno Delorme
+% SCCN/INC/UCSD/ added time warping -Jean Hausser
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -205,6 +210,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.79  2006/04/11 20:19:29  toby
+% Jean's update for timewarp() feature
+%
 % Revision 1.78  2005/12/06 19:15:17  arno
 % nothing
 %
@@ -823,7 +831,7 @@ if (~isnumeric(g.maxfreq) | length(g.maxfreq)~=1)
 elseif (g.maxfreq <= 0)
 	error('Value of maxfreq must be positive.');
 elseif (g.maxfreq > Fs/2)
-	myprintf(g.verbose, ['Warning: value of maxfreq reduced to Nyquist rate' ...
+	verboseprintf(g.verbose, ['Warning: value of maxfreq reduced to Nyquist rate' ...
 		 ' (%3.2f)\n\n'], Fs/2);
 	g.maxfreq = Fs/2;
 end
@@ -849,30 +857,30 @@ end;
 if (~isnumeric(g.alpha) | length(g.alpha)~=1)
 	error('timef(): Value of g.alpha must be a number.\n');
 elseif (round(g.naccu*g.alpha) < 2)
-	myprintf(g.verbose, 'Value of g.alpha is out of the normal range [%g,0.5]\n',2/g.naccu);
+	verboseprintf(g.verbose, 'Value of g.alpha is out of the normal range [%g,0.5]\n',2/g.naccu);
     g.naccu = round(2/g.alpha);
-	myprintf(g.verbose, '  Increasing the number of bootstrap iterations to %d\n',g.naccu);
+	verboseprintf(g.verbose, '  Increasing the number of bootstrap iterations to %d\n',g.naccu);
 end
 if g.alpha>0.5 | g.alpha<=0
     error('Value of g.alpha is out of the allowed range (0.00,0.5).');
 end
 if ~isnan(g.alpha)
     if length(g.baseboot) == 2
-     myprintf(g.verbose, 'Bootstrap analysis will use data in range %3.2g-%3.2g ms.\n', g.baseboot(1),  g.baseboot(2))
+     verboseprintf(g.verbose, 'Bootstrap analysis will use data in range %3.2g-%3.2g ms.\n', g.baseboot(1),  g.baseboot(2))
     elseif g.baseboot > 0
-     myprintf(g.verbose, 'Bootstrap analysis will use data in baseline (pre-0) subwindows only.\n')
+     verboseprintf(g.verbose, 'Bootstrap analysis will use data in baseline (pre-0) subwindows only.\n')
    else
-     myprintf(g.verbose, 'Bootstrap analysis will use data in all subwindows.\n')
+     verboseprintf(g.verbose, 'Bootstrap analysis will use data in all subwindows.\n')
    end
 end
 if ~isempty(g.timeStretchMarks) %Added -Jean
   if isempty(g.timeStretchRefs)
-    myprintf(g.verbose, ['Using median mark latencies as references for ' ...
+    verboseprintf(g.verbose, ['Using median mark latencies as references for ' ...
                         'time-stretching']);
     g.timeStretchRefs = median(g.timeStretchMarks,2);
   end
   if isempty(g.timeStretchPlot)
-    myprintf(g.verbose, 'Will not overplot references on the ERSP');
+    verboseprintf(g.verbose, 'Will not overplot references on the ERSP');
   elseif length(g.timeStretchPlot) > 0
     g.vert = ((g.timeStretchRefs(g.timeStretchPlot)-1) ...
               /g.srate+g.tlimits(1)/1000)*1000;
@@ -1053,17 +1061,17 @@ if iscell(X)
       g.title(3,1:24) = 'Condition 1 - Condition 2';
     end;
     
-    myprintf(g.verbose, 'Running newtimef on condition 1 *********************\n');
-    myprintf(g.verbose, 'Note: if an out-of-memory error occurs, try reducing the\n');
-    myprintf(g.verbose, '      number of time points or number of frequencies\n');
-    myprintf(g.verbose, '      (the ''coher'' options takes 3 times more memory than other options)\n');
+    verboseprintf(g.verbose, 'Running newtimef on condition 1 *********************\n');
+    verboseprintf(g.verbose, 'Note: if an out-of-memory error occurs, try reducing the\n');
+    verboseprintf(g.verbose, '      the number of time points or number of frequencies\n');
+    verboseprintf(g.verbose, '      (''coher'' options take 3 times more memory than other options)\n');
     [P1,R1,mbase1,timesout,freqs,Pboot1,Rboot1,alltfX1] = ...
         newtimef( X{1}, frame, tlimits, Fs, varwin, 'plotitc', 'off', ...
                   'plotersp', 'off', vararginori{:}, 'lowmem', 'off', ...
                   'timeStretchMarks', g.timeStretchMarks(:,1:(end/2)), ... %Added -Jean
                   'timeStretchRefs', g.timeStretchRefs);
     
-    myprintf(g.verbose, '\nRunning newtimef on condition 2 *********************\n');
+    verboseprintf(g.verbose, '\nRunning newtimef on condition 2 *********************\n');
     [P2,R2,mbase2,timesout,freqs,Pboot2,Rboot2,alltfX2] = ...
         newtimef( X{2}, frame, tlimits, Fs, varwin, 'plotitc', 'off', ...
                   'plotersp', 'off', vararginori{:}, 'lowmem', 'off', ...
@@ -1084,7 +1092,7 @@ if iscell(X)
 			Pboot1 = Pboot1 - repmat(mbase (1:size(Pboot1,1))',[1 size(Pboot1,2) size(Pboot1,3)]); 
 			Pboot2 = Pboot2 - repmat(mbase (1:size(Pboot1,1))',[1 size(Pboot1,2) size(Pboot1,3)]);        
         end;
-        myprintf(g.verbose, '\nSubtracting common baseline\n');
+        verboseprintf(g.verbose, '\nSubtracting common baseline\n');
     else
         mbase = NaN;
     end;
@@ -1212,18 +1220,18 @@ end;
 %%%%%%%%%%%%%%%%%%%%%%
 % display text to user (computation perfomed only for display)
 %%%%%%%%%%%%%%%%%%%%%%
-myprintf(g.verbose, 'Computing Event-Related Spectral Perturbation (ERSP) and\n');
+verboseprintf(g.verbose, 'Computing Event-Related Spectral Perturbation (ERSP) and\n');
 switch g.type
-    case 'phasecoher',  myprintf(g.verbose, '  Inter-Trial Phase Coherence (ITC) images based on %d trials\n',trials);
-    case 'phasecoher2', myprintf(g.verbose, '  Inter-Trial Phase Coherence 2 (ITC) images based on %d trials\n',trials);
-    case 'coher',       myprintf(g.verbose, '  Linear Inter-Trial Coherence (ITC) images based on %d trials\n',trials);
+    case 'phasecoher',  verboseprintf(g.verbose, '  Inter-Trial Phase Coherence (ITC) images based on %d trials\n',trials);
+    case 'phasecoher2', verboseprintf(g.verbose, '  Inter-Trial Phase Coherence 2 (ITC) images based on %d trials\n',trials);
+    case 'coher',       verboseprintf(g.verbose, '  Linear Inter-Trial Coherence (ITC) images based on %d trials\n',trials);
 end;
-myprintf(g.verbose, '  of %d frames sampled at %g Hz.\n',g.frame,g.srate);
-myprintf(g.verbose, 'Each trial contains samples from %1.0f ms before to\n',g.tlimits(1));
-myprintf(g.verbose, '  %1.0 ms after the timelocking event.\n',g.tlimits(2));
+verboseprintf(g.verbose, '  of %d frames sampled at %g Hz.\n',g.frame,g.srate);
+verboseprintf(g.verbose, 'Each trial contains samples from %1.0f ms before to\n',g.tlimits(1));
+verboseprintf(g.verbose, '  %1.0 ms after the timelocking event.\n',g.tlimits(2));
 if ~isnan(g.alpha)
-  myprintf(g.verbose, 'Only significant values (bootstrap p<%g) will be colored;\n',g.alpha) 
-  myprintf(g.verbose, '  non-significant values will be plotted in green\n');
+  verboseprintf(g.verbose, 'Only significant values (bootstrap p<%g) will be colored;\n',g.alpha) 
+  verboseprintf(g.verbose, '  non-significant values will be plotted in green\n');
 end
 
 % -----------------------------------------
@@ -1289,14 +1297,14 @@ else
 end;
 
 if ~isnan(g.alpha) & length(baseln)==0
-    myprintf(g.verbose, 'timef(): no window centers in baseline (times<%g) - shorten (max) window length.\n', g.baseline)
+    verboseprintf(g.verbose, 'timef(): no window centers in baseline (times<%g) - shorten (max) window length.\n', g.baseline)
     return
 end
 if isnan(g.powbase)
-  myprintf(g.verbose, 'Computing the mean baseline spectrum\n');
+  verboseprintf(g.verbose, 'Computing the mean baseline spectrum\n');
   mbase = mean(P(:,baseln),2)';
 else
-  myprintf(g.verbose, 'Using the input baseline spectrum\n');
+  verboseprintf(g.verbose, 'Using the input baseline spectrum\n');
   mbase = 10.^(g.powbase/10);
 end
 baselength = length(baseln);
@@ -1425,7 +1433,7 @@ function g = plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
     end;    
 
     if g.plot
-        myprintf(g.verbose, '\nNow plotting...\n');
+        verboseprintf(g.verbose, '\nNow plotting...\n');
         set(gcf,'DefaultAxesFontSize',g.AXES_FONT)
         colormap(jet(256));
         pos = get(gca,'position');
@@ -1786,7 +1794,7 @@ function plotallcurves(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
 	end;
 
     if strcmpi(g.plotitc, 'on') | strcmpi(g.plotersp, 'on')
-        myprintf(g.verbose, '\nNow plotting...\n');
+        verboseprintf(g.verbose, '\nNow plotting...\n');
         pos = get(gca,'position');
         q = [pos(1) pos(2) 0 0];
         s = [pos(3) pos(4) pos(3) pos(4)];
@@ -1930,7 +1938,7 @@ function [X, frame] = reshapeX(X, frame)
         frame = size(X,1);
     end 
 
-function myprintf(verbose, varargin)
+function verboseprintf(verbose, varargin)
     if strcmpi(verbose, 'on')
         fprintf(varargin{:});
     end;
