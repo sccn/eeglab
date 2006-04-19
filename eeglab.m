@@ -38,7 +38,7 @@
 % 
 % Functions added to EEGLAB: 
 % --------------------------------------------------------------------
-% celltomat()     - cell to matrix, overwrites neural network toolbox function
+% cell2mat()      - cell to matrix, overwrites neural network toolbox function
 % compvar()       - compute component variance
 % convolve()      - smart conv2 (fewer boundary problems)
 % del2map()       - compute a surface Laplacian transform of the data
@@ -65,7 +65,7 @@
 % loadeeg()       - load neuroscan .EEG file
 % loadtxt()       - load text file
 % makehtml()      - generate html pages for directories (uses help2html)
-% mattocell()     - matrix to cell (local)
+% mat2cell()      - matrix to cell (local)
 % pophelp()       - format the help header  !!!
 % readedf()       - read binary EEG EDF file
 % readegi()       - read binary EEG EGI file 
@@ -2686,12 +2686,11 @@ if study_selected
     file_m  = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'File');  set(file_m, 'enable', 'on');
     edit_m  = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Edit');  set(edit_m, 'enable', 'on');
     tool_m  = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Tools'); set(tool_m, 'enable', 'on');
-    tools_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Plot');  set(tools_m, 'enable', 'on');
+    plot_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Plot');   set(plot_m, 'enable', 'off');
     hist_m  = findobj('parent', file_m, 'type', 'uimenu', 'label', 'Save history');
     data_m  = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Datasets');  set(data_m, 'enable', 'on');
     std_m   = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Study'); set(std_m , 'enable', 'on');
     set( edit_m, 'enable', 'off');
-    set( tools_m, 'enable', 'off');
     set( findobj('parent', tool_m, 'type', 'uimenu'), 'enable', 'off');
     set( findobj('parent', file_m, 'type', 'uimenu'), 'enable', 'off');
     set( findobj('parent', tool_m, 'type', 'uimenu', 'label', 'Run ICA')        , 'enable', 'on');
@@ -2797,11 +2796,11 @@ elseif (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG(1).data)
         file_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'File');  set(file_m, 'enable', 'on');
         edit_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Edit');  set(edit_m, 'enable', 'on');
         tool_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Tools'); set(tool_m, 'enable', 'on');
-        tools_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Plot');  set(tools_m, 'enable', 'on');
+        plot_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Plot');  set(plot_m, 'enable', 'off');
         std_m  = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Study'); set(std_m , 'enable', 'off');
+        dat_m  = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Datasets'); set(dat_m, 'enable', 'on');
         hist_m = findobj('parent', file_m, 'type', 'uimenu', 'label', 'Save history');
         set( edit_m, 'enable', 'off');
-        set( tools_m, 'enable', 'off');
         set( findobj('parent', tool_m, 'type', 'uimenu'), 'enable', 'off');
         set( findobj('parent', file_m, 'type', 'uimenu'), 'enable', 'off');
         set( findobj('parent', tool_m, 'type', 'uimenu', 'label', 'Run ICA')        , 'enable', 'on');
