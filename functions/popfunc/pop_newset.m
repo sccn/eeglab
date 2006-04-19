@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.71  2006/04/12 05:42:03  arno
+% cancel button
+%
 % Revision 1.70  2006/04/10 21:04:35  arno
 % remove dbug mssage
 %
@@ -265,7 +268,7 @@ CURRENTSET = OLDSET;
 [g varargin] = finputcheck(varargin, { ...
                     'retrieve'      'integer'    []               -1;
                     'study'         'integer'    [0 1]            0  }, 'pop_newset', 'ignore');
-if g.retrieve == -1, save_retrieve = 0; 
+if g.retrieve == -1, save_retrieve = 0; g.retrieve = 0;
 else                 save_retrieve = 1;
 end;
 
@@ -275,10 +278,12 @@ if length(EEG) > 1
     %                          2: when storing multiple datasets 
     % canceling operation (not used)
     % -------------------
-    if ~isempty(g.retrieve)
+    if ~isempty(g.retrieve) && ~isequal(g.retrieve, 0)
         [EEG, ALLEEG, CURRENTSET] = eeg_retrieve( ALLEEG, g.retrieve);
+    elseif length(OLDSET) == length(EEG)
+        [ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, OLDSET);
     else
-        [ALLEEG EEG] = eeg_store(ALLEEG, EEG, OLDSET);
+        [ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG); % storing new datasets
     end;
     return;
 elseif save_retrieve
@@ -335,7 +340,7 @@ elseif length(varargin) == 0 & length(EEG) == 1 % if several arguments, assign v
     % status of parent dataset etc...
     saved = 1;
     filename = '';
-    if ~isempty(ALLEEG) & OLDSET ~= 0
+    if ~isempty(ALLEEG) && any(OLDSET ~= 0) && length(OLDSET) == 1
         if strcmpi(ALLEEG(OLDSET).saved, 'no')
             saved = 0;
             if ~isempty(ALLEEG(OLDSET).filename)
