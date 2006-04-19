@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2006/01/25 21:11:29  arno
+% fixing 2 typos
+%
 % Revision 1.11  2006/01/25 00:38:08  arno
 % fixing sclose
 %
@@ -195,7 +198,7 @@ EEG.data            = DAT;
 EEG.setname 		= sprintf('%s file', dat.TYPE);
 EEG.comments        = [ 'Original file: ' filename ];
 EEG.xmin            = 0; 
-if strcmpi(dat.TYPE, 'BDF')
+if strcmpi(dat.TYPE, 'BDF') || strcmpi(dat.TYPE, 'EDF')
     EEG.trials   = 1;
     EEG.pnts     = size(EEG.data,2);
 else
