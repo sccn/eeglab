@@ -292,6 +292,12 @@ else
         
     elseif isfield(TMPVAR, 'ALLEEG')
         
+        eeg_optionsbackup;
+        eeg_options;
+        if option_storedisk
+            error('Cannot load multiple dataset file. Change memory option to allow multiple datasets in memory, then try again. Remember that this file type is OBSOLETE.');
+        end;
+                  
         % this part is deprecated as of EEGLAB 5.00
         % since all dataset data have to be saved in separate files
         % -----------------------------------------------------
