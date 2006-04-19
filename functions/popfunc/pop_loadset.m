@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.51  2006/02/16 19:29:41  arno
+% checking dataset consitency
+%
 % Revision 1.50  2006/02/16 19:23:52  arno
 % checking dataset
 %
@@ -295,8 +298,8 @@ else
         disp('pop_loadset(): appending datasets');
         EEG = TMPVAR.ALLEEG;
         for index=1:length(EEG)
-            EEG.filename = '';
-            EEG.filepath = '';        
+            EEG(index).filename = '';
+            EEG(index).filepath = '';        
             if isstr(EEG(index).data), 
                 EEG(index).filepath = g.filepath; 
                 if length(g.filename) > 4 & ~strcmp(g.filename(1:end-4), EEG(index).data(1:end-4)) & strcmpi(g.filename(end-3:end), 'sets')
