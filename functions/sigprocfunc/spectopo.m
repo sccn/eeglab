@@ -72,7 +72,7 @@
 %                matrix should be supplied here {default: from component 'weights'}
 %   'memory'   = ['low'|'high'] a 'low' setting will use less memory for computing 
 %                component activities, will take longer {default: 'high'}
-
+%
 % Topoplot options:
 %    other 'key','val' options are propagated to topoplot() for map display
 %                (See >> help topoplot)
@@ -114,6 +114,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.100  2006/02/16 21:37:09  scott
+% same
+%
 % Revision 1.99  2006/02/16 21:34:30  scott
 % same
 %
