@@ -134,7 +134,9 @@ if strcmpi(mode, 'apart')  % case each cluster on a separate figure
                    return;
                end
                comp = STUDY.cluster(cls(clus)).comps(k); 
-               cluster_dip_models(k) = ALLEEG(abset).dipfit.model(comp);
+               cluster_dip_models(k).posxyz = ALLEEG(abset).dipfit.model(comp).posxyz;
+               cluster_dip_models(k).momxyz = ALLEEG(abset).dipfit.model(comp).momxyz;
+               cluster_dip_models(k).rv = ALLEEG(abset).dipfit.model(comp).rv;
                if strcmpi(ALLEEG(abset).dipfit.coordformat, 'spherical')
                    if isfield(ALLEEG(abset).dipfit, 'hdmfile') %dipfit 2 spherical model
                        load('-mat', ALLEEG(abset).dipfit.hdmfile);
@@ -148,8 +150,8 @@ if strcmpi(mode, 'apart')  % case each cluster on a separate figure
                    ndip = ndip +1;
                    dip_ind = [dip_ind k];
                end
-           end % finished going over cluster comps
-           cluster_dip_models(end + 1) = STUDY.cluster(cls(clus)).centroid.dipole;
+            end % finished going over cluster comps
+            cluster_dip_models(end + 1) = STUDY.cluster(cls(clus)).centroid.dipole;
            
            % additional options
            % ------------------
@@ -228,8 +230,10 @@ if strcmpi(mode, 'joined')  % case all clusters are plotted in the same figure (
                warndlg2(['No dipole information available in dataset ' num2str(abset) ' , abort plotting'], 'Aborting plot dipoles');
                return;
            end
-           comp = STUDY.cluster(cls(l)).comps(k); 
-           cluster_dip_models(k) = ALLEEG(abset).dipfit.model(comp);
+           comp = STUDY.cluster(cls(l)).comps(k);
+           cluster_dip_models(k).posxyz = ALLEEG(abset).dipfit.model(comp).posxyz;
+           cluster_dip_models(k).momxyz = ALLEEG(abset).dipfit.model(comp).momxyz;
+           cluster_dip_models(k).rv = ALLEEG(abset).dipfit.model(comp).rv;
            if strcmpi(ALLEEG(abset).dipfit.coordformat, 'spherical')
                 if isfield(ALLEEG(abset).dipfit, 'hdmfile') %dipfit 2 spherical model
                    load('-mat', ALLEEG(abset).dipfit.hdmfile);
@@ -360,7 +364,9 @@ for ci = 1:length(comp_ind)
         STUDY = std_centroid(STUDY,ALLEEG, cls , 'dipole');
     end
     comp_to_disp = ['IC' num2str(comp) ' / ' subject];
-    cluster_dip_models = ALLEEG(abset).dipfit.model(comp);
+    cluster_dip_models.posxyz = ALLEEG(abset).dipfit.model(comp).posxyz;
+    cluster_dip_models.momxyz = ALLEEG(abset).dipfit.model(comp).momxyz;
+    cluster_dip_models.rv = ALLEEG(abset).dipfit.model(comp).rv;
     cluster_dip_models(2) = STUDY.cluster(cls).centroid.dipole;
     if strcmpi(ALLEEG(abset).dipfit.coordformat, 'spherical')
         if isfield(ALLEEG(abset).dipfit, 'hdmfile') %dipfit 2 spherical model
