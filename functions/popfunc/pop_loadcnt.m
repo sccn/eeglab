@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2005/10/24 23:33:15  arno
+% fix filename
+%
 % Revision 1.29  2005/05/24 17:28:06  arno
 % remove cell2mat
 %
@@ -229,13 +232,15 @@ if ~isempty(I)
 end;
 
 % modified by Andreas Widmann  2005/05/12  14:15:00
-temp = find([r.event.accept_ev1] == 14 | [r.event.accept_ev1] == 11); % 14: Discontinuity, 11: DC reset
-if ~isempty(temp)
-    disp('pop_loadcnt note: event field ''type'' set to ''boundary'' for data discontinuities');
-    for index = 1:length(temp)
-        EEG.event(temp(index)).type = 'boundary';
-    end;
-end
+try, % this piece of code makes the function crash sometimes - Arnaud Delorme 2006/04/27
+    temp = find([r.event.accept_ev1] == 14 | [r.event.accept_ev1] == 11); % 14: Discontinuity, 11: DC reset
+    if ~isempty(temp)
+        disp('pop_loadcnt note: event field ''type'' set to ''boundary'' for data discontinuities');
+        for index = 1:length(temp)
+            EEG.event(temp(index)).type = 'boundary';
+        end;
+    end
+catch, end;
 % end modification
 
 % process keyboard entries
