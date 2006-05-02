@@ -188,6 +188,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.482  2006/05/02 00:17:06  toby
+% gave File menu a graphical tag
+%
 % Revision 1.481  2006/04/19 15:30:08  arno
 % loading multiple datasets
 %
@@ -1978,7 +1981,7 @@ catchstrs.new_non_empty          = e_newset;
     W_MAIN = findobj('tag', 'EEGLAB');
     EEGUSERDAT = get(W_MAIN, 'userdata');
     set(W_MAIN, 'MenuBar', 'none');
-    file_m  = uimenu( W_MAIN, 'Label', 'File','tag','file');
+    file_m  = uimenu( W_MAIN, 'Label', 'File');
 	neuro_m = uimenu( file_m, 'Label', 'Import data', 'tag', 'import data'); 
     epoch_m = uimenu( file_m, 'Label', 'Import epoch info', 'tag', 'import epoch'); 
 	event_m = uimenu( file_m, 'Label', 'Import event info', 'tag', 'import event'); 
