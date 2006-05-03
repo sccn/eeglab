@@ -33,7 +33,8 @@
 %  'smooth'    = [pow2] magnification and smoothing factor. power of 2 (default: 1}.
 %  'mode'      = ['rms'|'ave'] ('rms') return root-mean-square, else ('ave') average power
 %                {default: 'rms' }
-%  'logfreq'   = ['on'|'off'] plot log frequencies {default: 'off'}
+%  'logfreq'   = ['on'|'off'|'native'] plot log frequencies {default: 'off'}
+%                'native' means that the input is already in log frequencies 
 %  'vert'      = [times vector] (in msec) plot vertical dashed lines at specified times 
 %                {default: 0}
 %  'shiftimgs' = [resposne_times_vector] - shift time/frequency images from several subjects 
@@ -79,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.79  2006/03/14 19:50:32  arno
+% remove debug message
+%
 % Revision 1.78  2006/03/14 19:49:20  arno
 % in case the tf-decomp does not include time 0
 %
@@ -337,7 +341,7 @@ tfdataori = mean(tfdata,4); % for topoplot
 % 'key' 'val' sequence
 fieldlist = { 'chanlocs'      { 'string' 'struct' }       []       '' ;
               'limits'        'real'     []                        [nan nan nan nan nan nan];
-              'logfreq'       'string'   {'on' 'off' }             'off';
+              'logfreq'       'string'   {'on' 'off' 'native'}     'off';
               'cbar'          'string'   {'on' 'off' }             'on';
               'mode'          'string'   { 'ave' 'rms' }           'rms';
               'title'         'string'   []                        '';
@@ -605,7 +609,19 @@ end
 if strcmpi(g.logfreq, 'on'), 
     logimagesc(times(tftimes),freqs(tffreqs),tfave);
     axis([g.limits(1) g.limits(2) log(g.limits(3)), log(g.limits(4))]);
-else                            
+elseif strcmpi(g.logfreq, 'native'), 
+    imagesc(times(tftimes),log(freqs(tffreqs)),tfave);
+    axis([g.limits(1:2) log(g.limits(3:4))]);
+    ft = str2num(get(gca,'yticklabel'));
+    ft = exp(1).^ft;
+    ft = unique(round(ft));
+    ftick = get(gca,'ytick');
+    ftick = exp(1).^ftick;
+    ftick = unique(round(ftick));
+    ftick = log(ftick);
+    set(gca,'ytick',ftick);
+    set(gca,'yticklabel', num2str(ft));
+else
     imagesc(times(tftimes),freqs(tffreqs),tfave);
     axis([g.limits(1:4)]);
 end;
@@ -642,11 +658,8 @@ set(gca,'fontsize',12)
 set(gca,'ydir','normal');
 
 for indtime = g.vert
-    if strcmpi(g.logfreq, 'on'), 
-        plot([indtime indtime],log([freqs(1) freqs(end)]),[LINECOLOR ':'],'linewidth',ZEROLINEWIDTH);
-    else
-        plot([indtime indtime],[freqs(1) freqs(end)],[LINECOLOR ':'],'linewidth',ZEROLINEWIDTH);
-    end;
+    tmpy = ylim;
+    plot([indtime indtime],tmpy,[LINECOLOR ':'],'linewidth',ZEROLINEWIDTH);
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
