@@ -55,6 +55,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2005/12/07 17:25:58  arno
+% Initial revision
+%
 
 function [F, df] = anova1_cell(data)
     
@@ -82,7 +85,7 @@ function [F, df] = anova1_cell(data)
         end;
         nt = sum(n(1,:));
     
-    else        
+    elseif nd == 3        
         
         for i = 1:length(data)
             n( :,:,i) = ones(size(data{i},1),size(data{i},2)) * size(data{i},3);
@@ -90,6 +93,15 @@ function [F, df] = anova1_cell(data)
             sd(:,:,i) = std(   data{i},[],3);
         end;
         nt = sum(n(1,1,:));
+        
+    else
+
+        for i = 1:length(data)
+            n( :,:,:,i) = ones(size(data{i},1),size(data{i},2), size(data{i},3)) * size(data{i},4);
+            m( :,:,:,i) = mean(  data{i},4);
+            sd(:,:,:,i) = std(   data{i},[],4);
+        end;
+        nt = sum(n(1,1,1,:));
         
     end;
     
