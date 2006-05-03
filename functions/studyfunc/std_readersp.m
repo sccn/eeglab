@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2006/03/29 17:47:10  scott
+% help msg
+%
 % Revision 1.17  2006/03/28 14:58:10  arno
 % reading ersp channel
 %
@@ -102,7 +105,7 @@
 % use fullfile
 %
 
-function [logersp, logfreqs, timevals, params] = std_readersp(ALLEEG, abset, comp, timewindow, freqrange);
+function [logersp, logfreqs, timevals, params, baseersp] = std_readersp(ALLEEG, abset, comp, timewindow, freqrange);
 
 if nargin < 4
     timewindow = [];
@@ -115,8 +118,9 @@ end;
 % --------------
 if length(comp) > 1
     for index = 1:length(comp)
-        [tmpersp, logfreqs, timevals, params] = std_readersp(ALLEEG, abset, comp(index), timewindow, freqrange);
+        [tmpersp, logfreqs, timevals, params, tmpbase] = std_readersp(ALLEEG, abset, comp(index), timewindow, freqrange);
         logersp(index,:,:,:) = tmpersp;
+        baseersp(index,:,:)  = tmpbase;
     end;
     return;
 end;
@@ -225,6 +229,7 @@ end;
 for cond  = 1:length(abset)
     ersp = erspall{cond}(fminind:fmaxind,minind:maxind);
     logersp(:,:,cond) = ersp;
+    baseersp(:,cond)  = erspallbase{cond}(fminind:fmaxind);
 end;
 logfreqs = tmpersp.freqs(fminind:fmaxind);
 timevals = tmpersp.times(minind:maxind);
