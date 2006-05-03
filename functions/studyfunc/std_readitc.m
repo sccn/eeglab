@@ -54,6 +54,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2006/03/14 02:24:41  scott
+% help msg
+%
 % Revision 1.9  2006/03/14 02:11:46  scott
 % help msg
 %
@@ -81,9 +84,33 @@
 
 function [logitc, logfreqs, timevals, params] = std_readitc(ALLEEG, abset, comp, timewindow, freqrange);
 
+if nargin < 4
+    timewindow = [];
+end;
+if nargin < 5
+    freqrange = [];
+end;
+
+% multiple entry
+% --------------
+if length(comp) > 1
+    for index = 1:length(comp)
+        [tmpitc, logfreqs, timevals, params] = std_readitc(ALLEEG, abset, comp(index), timewindow, freqrange);
+        logitc(index,:,:,:) = tmpitc;
+    end;
+    return;
+end;
+
 for k = 1: length(abset)    
     
-    filename = fullfile( ALLEEG(abset(k)).filepath,[ ALLEEG(abset(k)).filename(1:end-3) 'icaitc']);
+    if comp < 0
+        filename = fullfile( ALLEEG(abset(k)).filepath,[ ALLEEG(abset(k)).filename(1:end-3) 'datitc']);
+        comp   = -comp;
+        prefix = 'chan';
+    else    
+        filename = fullfile( ALLEEG(abset(k)).filepath,[ ALLEEG(abset(k)).filename(1:end-3) 'icaitc']);
+        prefix = 'comp';
+    end;
     try
         tmpersp   = load( '-mat', filename, 'parameters', 'times', 'freqs');
     catch
@@ -99,13 +126,13 @@ for k = 1: length(abset)
         return;
     end;
     tmpitc   = load( '-mat', filename, 'parameters', 'times', 'freqs', ...
-                     [ 'comp' int2str(comp) '_itc'], ...
-                     [ 'comp' int2str(comp) '_itcboot']);
+                     [ prefix int2str(comp) '_itc'], ...
+                     [ prefix int2str(comp) '_itcboot']);
     
     tlen      = length(tmpitc.times);
     flen      = length(tmpitc.freqs);
-    itcall{k}     = double(getfield(tmpitc, [ 'comp' int2str(comp) '_itc']));
-    itcallboot{k} = double(getfield(tmpitc, [ 'comp' int2str(comp) '_itcboot']));
+    itcall{k}     = double(getfield(tmpitc, [ prefix int2str(comp) '_itc']));
+    itcallboot{k} = double(getfield(tmpitc, [ prefix int2str(comp) '_itcboot']));
 
 end
 
