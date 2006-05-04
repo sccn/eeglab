@@ -360,13 +360,8 @@ end;
 % include ICA or not
 % ------------------
 if ~isempty(EEG.icaweights)
-    optionscall = { optionscall{:} 'icaweight' EEG.icaweights*EEG.icasphere }; 
-    [EEG.data EEG.chanlocs EEG.icaweights EEG.icasphere] = reref(EEG.data, ref, optionscall{:});
-    ref = sort(ref);
-    for i=length(ref)
-        EEG.icachansind(ref+1:end) = EEG.icachansind(ref+1:end)-1;
-        EEG.icachansind(ref) = [];
-    end;
+    optionscall = { optionscall{:} 'icaweight' EEG.icaweights*EEG.icasphere 'icachansind' EEG.icachansind }; 
+    [EEG.data EEG.chanlocs EEG.icaweights EEG.icasphere EEG.icachansind] = reref(EEG.data, ref, optionscall{:});
 else 
     [EEG.data EEG.chanlocs ] = reref(EEG.data, ref, optionscall{:});
 end;
