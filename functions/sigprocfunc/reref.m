@@ -16,7 +16,10 @@
 % 
 % Optional inputs:
 %   'elocs'      - Electrode location structure (e.g., EEG.chanlocs).
-%   'icaweight'  - ICA weight matrix (Note: this should be weights*sphere)
+%   'icaweights' - ICA weight matrix (Note: this could be weights*sphere and
+%                  the 'icasphere' input below is unnecessary)
+%   'icasphere'  - ICA sphere matrix if any
+%   'icachansind' - Indices of channels used for ICA
 %   'method'     - ['standard'|'withref'] Include ('withref') reference channel 
 %                  in output. Default is 'standard'. 
 %   'refstate  ' - ['common'|'averef'|integer] Current average reference.
@@ -37,7 +40,8 @@
 %   dataout     - Input data converted to average reference
 %   Chanlocs    - Updated location structure
 %   Wout        - ICA weight matrix converted to average reference
-%   Sout        - ICA sphere matrix converted to eye()
+%   Sout        - ICA sphere matrix converted to average reference
+%   ICAinds     - indices of channels used for ICA
 %   meandata    - (1,dataframes) mean removed from each data frame (point)
 %
 % Notes: 1) The average reference calculation implements two methods 
@@ -70,6 +74,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2004/11/05 18:29:16  arno
+% fixing channel label problem
+%
 % Revision 1.27  2003/12/11 17:55:22  arno
 % remove debug msg
 %
@@ -176,7 +183,7 @@
 % 12/16/99 Corrected denomiator on the suggestion of Ian Nimmo-Smith, Cambridge UK
 % 01-25-02 reformated help & license -ad 
 
-function [data, Elocs, W, S, meandata] = reref(data, ref, varargin)
+function [data, Elocs, W, S, icachansind, meandata] = reref(data, ref, varargin)
 
 if nargin<1
   help reref
@@ -188,7 +195,10 @@ end;
 
 % check inputs
 % ------------
-g = finputcheck(varargin, { 'icaweight'  'real'    []          [];
+g = finputcheck(varargin, { 'icaweight'   'real'    []          [];
+                            'icaweights'  'real'    []          [];
+                            'icasphere'   'real'    []          [];
+                            'icachansind' 'integer'    []       [];
                             'method'     'string'  { 'standard' 'withref' }  'standard';
                             'refstate'   { 'string' 'integer' } { { 'common' 'averef' } [1 size(data,1)] }     'common';
                             'exclude'    'integer' [1 size(data,1)]          [];
@@ -196,6 +206,20 @@ g = finputcheck(varargin, { 'icaweight'  'real'    []          [];
                             'keepref'    'string'  {'on' 'off' }             'off';
                             'elocs'      {'integer' 'struct'}  []            [] });
 if isstr(g), error(g); end;
+if ~isempty(g.icaweight)
+    g.icaweights = g.icaweight;
+end;
+if ~isempty(g.icaweights) & ~isempty(g.icasphere)
+    g.icaweights = g.icaweights*g.icasphere;
+end;
+if ~isempty(g.icaweights)
+    if isempty(g.icachansind), 
+        g.icachansind = [1:size(g.icaweights,2)]; 
+        disp('Warning: reref() output has sligtly changed since EEGLAB 5.02');
+        disp('         the 4th output argument is the indices of channels used for ICA instead');
+        disp('         of the mean reference value (which is now output argument 5)');
+    end;
+end;
 
 chans = size(data,1);
 if chans < 2 
@@ -326,16 +350,26 @@ data = reshape(data, size(data,1), dim2, dim3);
 
 % treat optional ica parameters
 % -----------------------------
-if ~isempty(g.icaweight) 
-	winv = pinv(g.icaweight);
+if ~isempty(g.icaweights) 
+	winv = pinv(g.icaweights);
     try, 
-        W = pinv(refmatrix*avematrix*winv);
+        W = pinv(refmatrix*avematrix(:,g.icachansind)*winv);
 	catch,
         error([ 'Weight matrix size is different from the data size, re-referencing impossible' 10 ...
                       '(you have to use the same number of channel in rereferenging (minus excluded ones)' 10 ...
                       'as in the ICA decomposition; best solution is to suppress ICA weights, rereference, then rerun ICA)']);
     end;
-    S = eye(size(W,2));
+    icachansind = g.icachansind;
+    rmchans     = sort(rmchans);
+    for i=length(icachansind):-1:1
+        indchan = find( icachansind(i) == rmchans );
+        if ~isempty( indchan )
+            icachansind(i) = indchan;
+        else
+            icachansind(i) = [];
+        end;
+    end;
+    S = eye(length(icachansind));
 else
     W = []; S = [];
 end;
