@@ -66,6 +66,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2005/01/24 19:30:37  arno
+% remove field for Keun re-refencing
+% ,.
+%
 % Revision 1.28  2004/05/14 23:58:23  arno
 % operator precedence
 %
@@ -358,6 +362,11 @@ end;
 if ~isempty(EEG.icaweights)
     optionscall = { optionscall{:} 'icaweight' EEG.icaweights*EEG.icasphere }; 
     [EEG.data EEG.chanlocs EEG.icaweights EEG.icasphere] = reref(EEG.data, ref, optionscall{:});
+    ref = sort(ref);
+    for i=length(ref)
+        EEG.icachansind(ref+1:end) = EEG.icachansind(ref+1:end)-1;
+        EEG.icachansind(ref) = [];
+    end;
 else 
     [EEG.data EEG.chanlocs ] = reref(EEG.data, ref, optionscall{:});
 end;
