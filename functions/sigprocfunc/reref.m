@@ -351,14 +351,9 @@ data = reshape(data, size(data,1), dim2, dim3);
 % treat optional ica parameters
 % -----------------------------
 if ~isempty(g.icaweights) 
-	winv = pinv(g.icaweights);
-    try, 
-        W = pinv(refmatrix*avematrix(:,g.icachansind)*winv);
-	catch,
-        error([ 'Weight matrix size is different from the data size, re-referencing impossible' 10 ...
-                      '(you have to use the same number of channel in rereferenging (minus excluded ones)' 10 ...
-                      'as in the ICA decomposition; best solution is to suppress ICA weights, rereference, then rerun ICA)']);
-    end;
+
+    % compute new channel indices
+    % ---------------------------
     icachansind = g.icachansind;
     rmchans     = sort(rmchans);
     for i=length(icachansind):-1:1
@@ -368,6 +363,17 @@ if ~isempty(g.icaweights)
         else
             icachansind(i) = [];
         end;
+    end;
+
+    % compute new weight matrix
+    % -------------------------
+    winv = pinv(g.icaweights);
+    try, 
+        W = pinv(refmatrix(icachansind,:)*avematrix(:,g.icachansind)*winv);
+	catch,
+        error([ 'Weight matrix size is different from the data size, re-referencing impossible' 10 ...
+                      '(you have to use the same number of channel in rereferenging (minus excluded ones)' 10 ...
+                      'as in the ICA decomposition; best solution is to suppress ICA weights, rereference, then rerun ICA)']);
     end;
     S = eye(length(icachansind));
 else
