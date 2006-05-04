@@ -38,7 +38,7 @@ if cycles == 0 %FFT option
     %winsize =2^round(log2(winsize)); 
 else %wavelet
     t = cycles(1)/lowfreq; %time window in sec
-    winsize  = t*srate; %time window in points
+    winsize  = round(t*srate); %time window in points
 end
 
 time_range(1) = epoch_lim(1) + .5*t*1000;
