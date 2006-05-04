@@ -210,6 +210,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.80  2006/04/18 15:43:47  scott
+% text edits
+%
 % Revision 1.79  2006/04/11 20:19:29  toby
 % Jean's update for timewarp() feature
 %
@@ -1056,9 +1059,9 @@ if iscell(X)
             'Condition 1 - Condition 2';
       end;
     else
-      g.title(1,:) = 'Condition 1';
-      g.title(2,:) = 'Condition 2';
-      g.title(3,1:24) = 'Condition 1 - Condition 2';
+      g.title(1,:) = 'Condition 1    ';
+      g.title(2,:) = 'Condition 2    ';
+      g.title(3,1:24) = 'Cond 1 - Cond 2';
     end;
     
     verboseprintf(g.verbose, 'Running newtimef on condition 1 *********************\n');
