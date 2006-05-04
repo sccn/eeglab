@@ -102,6 +102,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2006/05/04 03:09:52  toby
+% *** empty log message ***
+%
 % Revision 1.35  2006/04/11 18:24:07  arno
 % fixing alpha NaN problem
 %
@@ -277,13 +280,10 @@ if time_range(1) >= time_range(2)
            'Please increase the lower frequency bound or change other' ...
            'parameters to resolve the problem. See >> timef details'] )
 end
-%parameters = { 'cycles', cycles ,'type', 'phasecoher',  'plotersp', 'off', 'plotitc', 'off', ...
-%               'padratio', padratio, 'plotphase', 'off', 'winsize', winsize, 'alpha', alpha };
 
-% toby 4/3/2006
 parameters = { 'cycles', cycles ,'type', 'phasecoher',  'plotersp', 'off', 'plotitc', 'off', ...
-              'padratio', padratio, 'plotphase', 'off', 'alpha', alpha };
-%/toby
+               'padratio', padratio, 'plotphase', 'off', 'winsize', winsize, 'alpha', alpha };
+
 if powbaseexist & time_range(1) >= 0 
     parameters{end+1} = 'baseboot';
     parameters{end+1} = 0;
