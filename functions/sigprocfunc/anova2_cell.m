@@ -17,7 +17,8 @@
 % Note: the advantage over the ANOVA2 function of Matlab statistical
 %       toolbox is that this function works on arrays (see examples). Note
 %       also that you still need the statistical toolbox to assess
-%       significance using the fcdf() function.
+%       significance using the fcdf() function. The other advantage is that
+%       this function will work with complex numbers.
 %
 % Example:
 %   a = { rand(1,10) rand(1,10) rand(1,10); rand(1,10) rand(1,10) rand(1,10) }
@@ -65,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2005/12/07 17:25:54  arno
+% Initial revision
+%
 
 function [FC, FR, FI, freeC, freeR, freeI] = anova2_cell(data)
     
@@ -75,14 +79,25 @@ function [FC, FR, FI, freeC, freeR, freeI] = anova2_cell(data)
     nd = myndims( data{1} );
     c  = size(data{1}, nd);
     
+    % dataabs if for complex data only
+    % --------------------------------
+    dataabs = data;
+    if ~isreal(data{1})
+        for i = 1:a
+            for ii = 1:b
+                dataabs{i,ii} = abs(data{i,ii});
+            end;
+        end;
+    end;
+    
     if nd == 1
         
         VE = 0;
         m  = zeros( size(data) );
         for i = 1:a
             for ii = 1:b
-                m(i,ii) = mean(data{i,ii});
-                VE      = VE+sum( (data{i,ii}-m(i,ii)).^2 );
+                m(i,ii) = mymean(data{i,ii});
+                VE      = VE+sum( (dataabs{i,ii}-m(i,ii)).^2 );
             end;
         end;
         X  = mean(mean(m));
@@ -101,9 +116,9 @@ function [FC, FR, FI, freeC, freeR, freeI] = anova2_cell(data)
         m  = zeros( [ size(data{1},1) size(data) ] );
         for i = 1:a
             for ii = 1:b
-                tmpm = mean(data{i,ii}, 2);
+                tmpm = mymean(data{i,ii}, 2);
                 m(:,i,ii) = tmpm;
-                VE        = VE+sum( (data{i,ii}-repmat(tmpm, [1 size(data{i,ii},2)])).^2, 2);
+                VE        = VE+sum( (dataabs{i,ii}-repmat(tmpm, [1 size(data{i,ii},2)])).^2, 2);
             end;
         end;
         X  = mean(mean(m,3),2);
@@ -122,9 +137,9 @@ function [FC, FR, FI, freeC, freeR, freeI] = anova2_cell(data)
         m  = zeros( [ size(data{1},1) size(data{1},2) size(data) ] );
         for i = 1:a
             for ii = 1:b
-                tmpm = mean(data{i,ii}, 3);
+                tmpm = mymean(data{i,ii}, 3);
                 m(:,:,i,ii) = tmpm;
-                VE          = VE+sum( (data{i,ii}-repmat(tmpm, [1 1 size(data{i,ii},3)])).^2, 3);
+                VE          = VE+sum( (dataabs{i,ii}-repmat(tmpm, [1 1 size(data{i,ii},3)])).^2, 3);
             end;
         end;
         X  = mean(mean(m,4),3);
@@ -143,9 +158,9 @@ function [FC, FR, FI, freeC, freeR, freeI] = anova2_cell(data)
         m  = zeros( [ size(data{1},1) size(data{1},2) size(data{1},3) size(data) ] );
         for i = 1:a
             for ii = 1:b
-                tmpm = mean(data{i,ii}, 4);
+                tmpm = mymean(data{i,ii}, 4);
                 m(:,:,:,i,ii) = tmpm;
-                VE            = VE+sum( (data{i,ii}-repmat(tmpm, [1 1 1 size(data{i,ii},4)])).^2, 4);
+                VE            = VE+sum( (dataabs{i,ii}-repmat(tmpm, [1 1 1 size(data{i,ii},4)])).^2, 4);
             end;
         end;
         X  = mean(mean(m,5),4);
@@ -186,3 +201,8 @@ function val = myndims(a)
         end;
     end; 
   
+function res = mymean( data, varargin) % deal with complex numbers
+    res = mean( data, varargin{:});
+    if ~isreal(data)
+        res = abs( res );
+    end;

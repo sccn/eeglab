@@ -1,4 +1,4 @@
-%  anova1_cell() - compute F-values in cell array using ANOVA.
+% anova1_cell() - compute F-values in cell array using ANOVA.
 %
 % Usage:
 %    >> [F df] = anova1_cell( data );
@@ -13,7 +13,8 @@
 % Note: the advantage over the ANOVA1 function of Matlab statistical
 %       toolbox is that this function works on arrays (see examples). Note
 %       also that you still need the statistical toolbox to assess
-%       significance using the fcdf() function.
+%       significance using the fcdf() function. The other advantage is that
+%       this function will work with complex numbers.
 %
 % Example:
 %   a = { rand(1,10) rand(1,10) rand(1,10) }
@@ -68,8 +69,8 @@ function [F, df] = anova1_cell(data)
         
         for i = 1:length(data)
             n( i) = length(data{i});
-            m( i) = mean(  data{i});
-            sd(i) = std(   data{i});
+            m( i) = mymean(  data{i});
+            sd(i) = mystd(   data{i});
         end;
         nt = sum(n);
         n   = n';
@@ -80,8 +81,8 @@ function [F, df] = anova1_cell(data)
 
         for i = 1:length(data)
             n( :,i) = ones(size(data{i},1),1) * size(data{i},2);
-            m( :,i) = mean(  data{i},2);
-            sd(:,i) = std(   data{i},[],2);
+            m( :,i) = mymean(  data{i},2);
+            sd(:,i) = mystd(   data{i},[],2);
         end;
         nt = sum(n(1,:));
     
@@ -89,8 +90,8 @@ function [F, df] = anova1_cell(data)
         
         for i = 1:length(data)
             n( :,:,i) = ones(size(data{i},1),size(data{i},2)) * size(data{i},3);
-            m( :,:,i) = mean(  data{i},3);
-            sd(:,:,i) = std(   data{i},[],3);
+            m( :,:,i) = mymean(  data{i},3);
+            sd(:,:,i) = mystd(   data{i},[],3);
         end;
         nt = sum(n(1,1,:));
         
@@ -98,8 +99,8 @@ function [F, df] = anova1_cell(data)
 
         for i = 1:length(data)
             n( :,:,:,i) = ones(size(data{i},1),size(data{i},2), size(data{i},3)) * size(data{i},4);
-            m( :,:,:,i) = mean(  data{i},4);
-            sd(:,:,:,i) = std(   data{i},[],4);
+            m( :,:,:,i) = mymean(  data{i},4);
+            sd(:,:,:,i) = mystd(   data{i},[],4);
         end;
         nt = sum(n(1,1,1,:));
         
@@ -125,3 +126,12 @@ function val = myndims(a)
             val = 2;
         end;
     end;
+
+function res = mymean( data, varargin) % deal with complex numbers
+    res = mean( data, varargin{:});
+    if ~isreal(data)
+        res = abs( res );
+    end;
+
+function res = mystd( data, varargin) % deal with complex numbers
+    res = mean( abs(data), varargin{:});

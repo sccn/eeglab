@@ -116,6 +116,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2005/12/11 03:06:40  scott
+% help msg editing -sm
+%
 % Revision 1.4  2005/12/09 19:05:13  arno
 % editing header
 %
@@ -405,8 +408,8 @@ function [a b] = shuffle_paired(a, b); % for increased speed only shuffle half t
 function [tval, df] = paired_ttest(a,b)
     
     tmpdiff = a-b;
-    diff = mean(tmpdiff,    myndims(a));
-    sd   = std( tmpdiff,[], myndims(a));
+    diff = mymean(tmpdiff,    myndims(a));
+    sd   = mystd( tmpdiff,[], myndims(a));
     tval = diff./sd*sqrt(size(a, myndims(a)));
     df   = size(a, myndims(a))-1;
             
@@ -423,3 +426,11 @@ function val = myndims(a)
         end;
     end; 
   
+function res = mymean( data, varargin) % deal with complex numbers
+    res = mean( data, varargin{:});
+    if ~isreal(data)
+        res = abs( res );
+    end;
+
+function res = mystd( data, varargin) % deal with complex numbers
+    res = mean( abs(data), varargin{:});
