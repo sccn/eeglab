@@ -134,4 +134,4 @@ function res = mymean( data, varargin) % deal with complex numbers
     end;
 
 function res = mystd( data, varargin) % deal with complex numbers
-    res = mean( abs(data), varargin{:});
+    res = std( abs(data), varargin{:});
