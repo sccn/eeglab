@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2004/03/04 19:31:03  arno
+% email
+%
 % Revision 1.7  2004/02/25 01:45:55  arno
 % sinus test
 %
@@ -73,7 +76,7 @@ function wavelet = dftfilt2( freqs, cycles, srate, cycleinc, type);
     if nargin < 5
         type = 'morlet';
     end;
-    
+
     % compute number of cycles at each frequency
     % ------------------------------------------
     if length(cycles) == 1

@@ -106,6 +106,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.47  2006/04/18 16:00:45  scott
+% text edits
+%
 % Revision 1.46  2006/04/11 20:11:48  toby
 % Jean's update for timewarp and erpimage()
 %
@@ -279,11 +282,12 @@ if isstr(g), error(g); end;
 
 % checkin parameters
 % ------------------
-g.cycles = g.wavelet(1);
-if length(g.wavelet) >= 2
+if length(g.wavelet) == 2
+    g.cycles     = g.wavelet(1);
 	g.cyclesfact = g.wavelet(2);
 else 
 	g.cyclesfact = 1; % default is 1 (no decrease)
+    g.cycles = g.wavelet;
 end;
 if g.cyclesfact < 0 | g.cyclesfact > 1
     error('Wavelet cycle factor must be comprised between 0 and 1');

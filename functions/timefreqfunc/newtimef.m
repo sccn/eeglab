@@ -708,7 +708,7 @@ end
 
 if (nargin < 5)
 	varwin = DEFAULT_VARWIN;
-elseif (~isnumeric(varwin) | length(varwin)>2)
+elseif ~isnumeric(varwin)
 	error('Value of cycles must be a number.');
 elseif (varwin < 0)
 	error('Value of cycles must be zero or positive.');
@@ -726,12 +726,7 @@ end;
 g.tlimits = tlimits;
 g.frame   = frame;
 g.srate   = Fs;
-g.cycles  = varwin(1);
-if length(varwin)>1
-	g.cyclesfact = varwin(2);
-else 
-	g.cyclesfact = 1;
-end;
+g.cycles  = varwin;
 try, g.boottype;   catch, g.boottype = 'shuffle'; end;
 try, g.condboot;   catch, g.condboot = 'abs'; end;
 try, g.title;      catch, g.title = DEFAULT_TITLE; end;
@@ -805,7 +800,7 @@ if (~isnumeric(g.winsize) | length(g.winsize)~=1 | g.winsize~=round(g.winsize))
 	error('Value of winsize must be an integer number.');
 elseif (g.winsize <= 0)
 	error('Value of winsize must be positive.');
-elseif (g.cycles == 0 & pow2(nextpow2(g.winsize)) ~= g.winsize)
+elseif (g.cycles(1) == 0 & pow2(nextpow2(g.winsize)) ~= g.winsize)
 	error('Value of winsize must be an integer power of two [1,2,4,8,16,...]');
 elseif (g.winsize > g.frame)
 	error('Value of winsize must be less than frame length.');
@@ -1059,9 +1054,9 @@ if iscell(X)
             'Condition 1 - Condition 2';
       end;
     else
-      g.title(1,:) = 'Condition 1    ';
-      g.title(2,:) = 'Condition 2    ';
-      g.title(3,1:24) = 'Cond 1 - Cond 2';
+      g.title(1,:) = 'Condition 1';
+      g.title(2,:) = 'Condition 2';
+      g.title(3,1:24) = 'Condition 1 - Condition 2';
     end;
     
     verboseprintf(g.verbose, 'Running newtimef on condition 1 *********************\n');
@@ -1254,7 +1249,7 @@ end;
 
 [alltfX freqs timesout R] = timefreq(X, g.srate, tmioutopt{:}, 'winsize', g.winsize, ...
                                      'tlimits', g.tlimits, 'detrend', g.detrend, 'itctype', ...
-                                     g.type, 'subitc', g.subitc, 'wavelet', [g.cycles g.cyclesfact], ...
+                                     g.type, 'subitc', g.subitc, 'wavelet', g.cycles, ...
                                      'padratio', g.padratio, 'freqs', g.freqs, 'freqscale', g.freqscale, ...
                                      'nfreqs', g.nfreqs, ...
                                      'timestretch', {g.timeStretchMarks, g.timeStretchRefs}); 
