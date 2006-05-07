@@ -188,6 +188,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.483  2006/05/02 00:25:59  toby
+% Removed File menu graphical tag
+%
 % Revision 1.482  2006/05/02 00:17:06  toby
 % gave File menu a graphical tag
 %
@@ -1774,7 +1777,7 @@ backup =     [ 'if CURRENTSET ~= 0,' ...
 storecall    = '[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET); eegh(''[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET);'');';
 storenewcall = '[ALLEEG EEG CURRENTSET LASTCOM] = pop_newset(ALLEEG, EEG, CURRENTSET, ''study'', CURRENTSTUDY); eegh(LASTCOM);';
 storeallcall = [ 'if ~isempty(ALLEEG) & ~isempty(ALLEEG(1).data), ALLEEG = eeg_checkset(ALLEEG);' ...
-                 'EEG = eeg_checkset(EEG); eegh(''ALLEEG = eeg_checkset(ALLEEG); EEG = eeg_checkset(EEG);''); end;' ];
+                 'EEG = eeg_retrieve(ALLEEG, CURRENTSET); eegh(''ALLEEG = eeg_checkset(ALLEEG); EEG = eeg_retrieve(ALLEEG, CURRENTSET);''); end;' ];
 
 ifeeg        =  'if ~isempty(LASTCOM) & ~isempty(EEG),';
 ifeegnh      =  'if ~isempty(LASTCOM) & ~isempty(EEG) & ~isempty(findstr(''='',LASTCOM)),';
@@ -1870,7 +1873,7 @@ catchstrs.new_non_empty          = e_newset;
 	cb_expica2     = [ check        'LASTCOM = pop_expica(EEG, ''inv'');'     e_histdone ]; 
     
     cb_loadset     = [ nocheck '[EEG LASTCOM] = pop_loadset;'                                e_newset];
-    cb_saveset     = [ check   '[EEG LASTCOM] = pop_saveset(EEG, ''savemode'', ''resave'');' e_store];
+    cb_saveset     = [ check   '[EEG LASTCOM] = pop_saveset(EEG, ''savemode'', ''resave'');' e_hist_nh ];
     cb_savesetas   = [ check   '[EEG LASTCOM] = pop_saveset(EEG);'                           e_hist_nh ];
 	cb_delset      = [ nocheck '[ALLEEG LASTCOM] = pop_delset(ALLEEG, -CURRENTSET);'         e_hist_nh 'eeglab redraw;' ];
 	cb_study1      = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_study([], ALLEEG         , ''gui'', ''on'');'          e_load_study]; 
@@ -2499,20 +2502,24 @@ if exist('STUDY') & exist('CURRENTSTUDY')
     if ~isempty(STUDY)
         if length(ALLEEG) > length(STUDY.datasetinfo) | any(cellfun('isempty', {ALLEEG.data}))
             if strcmpi(STUDY.saved, 'no')
-                res = questdlg2( strvcat('The study is not consistent with the datasets loaded in memory', ...
-                                         'Do you wish to save the study as it is (EEGLAB will prompt you to enter', ...
-                                         'file name) or do you wish to remove it'), 'Study inconsistency', 'Save and remove', 'Remove', 'Remove' );
+                res = questdlg2( strvcat('The study is not compatible with the datasets present in memory', ...
+                                         'It is self consistent but EEGLAB is not be able to process it.', ...
+                                         'Do you wish to save the study as it is (EEGLAB will prompt you to', ...
+                                         'enter a file name) or do you wish to remove it'), 'Study inconsistency', 'Save and remove', 'Remove', 'Remove' );
                 if strcmpi(res, 'Remove')
                     STUDY = [];
+                    CURRENTSTUDY = 0;
                 else
                     pop_savestudy(STUDY, ALLEEG);
                     STUDY = [];
+                    CURRENTSTUDY = 0;
                 end;
             else
-                warndlg2( strvcat('The study is not consistent with the datasets loaded in memory.', ...
-                                  'Since it had not changed since last saved, it was simply removed', ...
-                                  'from memory') );
+                warndlg2( strvcat('The study was not compatible any more with the datasets present in memory.', ...
+                                  'Since it had not changed since last saved, it was simply removed from', ...
+                                  'memory.') );
                 STUDY = [];
+                CURRENTSTUDY = 0;
             end;
         end;
     end;
@@ -2522,9 +2529,9 @@ if exist('STUDY') & exist('CURRENTSTUDY')
     end;
 end;
 if exist_study
-    cb_select = [  '[ALLEEG EEG CURRENTSET LASTCOM] = pop_newset(ALLEEG, EEG, CURRENTSET, ''retrieve'', [], ''study'', 1);' ...
-                  'LASTCOM = ''CURRENTSTUDY = 1; [EEG ALLEEG CURRENTSET] = eeg_retrieve(ALLEEG, [1:length(ALLEEG)]);'';' ...
-                  'eval(LASTCOM); eegh(LASTCOM);' ...
+    cb_select = [ '[ALLEEG EEG CURRENTSET LASTCOM] = pop_newset(ALLEEG, EEG, CURRENTSET, ''retrieve'', [], ''study'', 1);' ...
+                  'if ~isempty(LASTCOM), LASTCOM = ''CURRENTSTUDY = 1; [EEG ALLEEG CURRENTSET] = eeg_retrieve(ALLEEG, [1:length(ALLEEG)]);'';' ...
+                  'eval(LASTCOM); eegh(LASTCOM); end;' ...
                   'eeglab(''redraw'');' ];
     tmp_m = findobj('label', 'Select the study set');
     delete(tmp_m); % in case it is not at the end
