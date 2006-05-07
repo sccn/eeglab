@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.82  2006/03/12 04:15:19  arno
+% resave dataset
+%
 % Revision 1.81  2006/03/12 04:14:06  arno
 % cannot use eeg_eval because dataset are suposed to be modeified by the calling function
 %
@@ -357,6 +360,9 @@ g.filename = [ filenamenoext ext ];
 if strcmpi(g.check, 'on')
     fprintf('Pop_saveset: Performing extended dataset syntax check...\n');
     EEG = eeg_checkset(EEG, 'eventconsistency');
+    EEG = eeg_checkset(EEG);
+else
+    EEG = eeg_checkset(EEG);
 end
 
 % default saving otion
@@ -417,7 +423,7 @@ else
     no_resave_dat = 'yes';
 end;
 v = version;
-%try, 
+try, 
     fprintf('Saving dataset...\n');
     EEG.saved = 'yes';
     if save_as_dat_file
@@ -432,9 +438,9 @@ v = version;
     if save_as_dat_file & strcmpi( no_resave_dat, 'no' )
         EEG.data = tmpdata;
     end;
-%catch,
-%    error('Pop_saveset: save error, out of space or file permission problem');
-%end;
+catch,
+    error('Pop_saveset: save error, out of space or file permission problem');
+end;
 
 % try to delete old .fdt or .dat files
 % ------------------------------------
