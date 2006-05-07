@@ -84,8 +84,8 @@
 %   'hcolor'          - color of the cartoon head. Use 'hcolor','none' to plot no head. {default: 'k' = black}
 %   'shading'         - 'flat','interp'  {default: 'flat'}
 %   'numcontour'      - number of contour lines {default: 6}
-%   'ccolor'          - color of the contours {default: dark grey}
-%   'whitebk'        -  ('on'|'off') make the background color white (e.g., to print empty plotgrid channels) 
+%   'color'           - color of the contours {default: dark grey}
+%   'whitebk '        -  ('on'|'off') make the background color white (e.g., to print empty plotgrid channels) 
 %                       {default: 'off'}
 %   'gridscale'       - [int > 32] size (nrows) of interpolated scalp map data matrix {default: 67}
 %   'colormap'        -  (n,3) any size colormap {default: existing colormap}
@@ -163,6 +163,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.271  2006/04/12 02:54:13  toby
+% help text edit
+%
 % Revision 1.270  2006/03/13 22:44:32  arno
 % change default marker
 %
@@ -1216,6 +1219,7 @@ if ~strcmpi(STYLE,'grid')                     % if not plot grid only
        error('loc_file must be a EEG.locs struct or locs filename');
   end
   Th = pi/180*Th;                              % convert degrees to radians
+  allchansind = 1:length(Th);
 
 %
 %%%%%%%%%% if channels-to-mark-only are given in Values vector %%%%%%%%%%%%%%%%%
@@ -1313,6 +1317,7 @@ end
 
 [x,y]     = pol2cart(Th,Rd);  % transform electrode locations from polar to cartesian coordinates
 plotchans = abs(plotchans);   % reverse indicated channel polarities
+allchansind = allchansind(plotchans);
 Th        = Th(plotchans);
 Rd        = Rd(plotchans);
 x         = x(plotchans);
@@ -1479,11 +1484,11 @@ if ~isempty(Values)
 	end;	
 end;   % now channel parameters and values all refer to plotting channels only
 
+allchansind = allchansind(pltchans);
 intTh = Th(intchans);           % eliminate channels outside the interpolation area
 intRd = Rd(intchans);
 intx  = x(intchans);
 inty  = y(intchans);
-
 Th    = Th(pltchans);              % eliminate channels outside the plotting area
 Rd    = Rd(pltchans);
 x     = x(pltchans);
@@ -2027,7 +2032,7 @@ elseif strcmp(ELECTRODES,'labelpoint')
   for i = 1:size(labels,1)
     hh(i) = text(double(y(i)+0.01),double(x(i)),...
         ELECTRODE_HEIGHT,labels(i,:),'HorizontalAlignment','left',...
-	'VerticalAlignment','middle','Color', ECOLOR,'userdata', num2str(pltchans(i)), ...
+	'VerticalAlignment','middle','Color', ECOLOR,'userdata', num2str(allchansind(i)), ...
 	'FontSize',EFSIZE, 'buttondownfcn', ...
 	    ['tmpstr = get(gco, ''userdata'');'...
 	     'set(gco, ''userdata'', get(gco, ''string''));' ...
@@ -2048,7 +2053,7 @@ elseif strcmp(ELECTRODES,'numpoint')
   end
   for i = 1:size(labels,1)
     hh(i) = text(double(y(i)+0.01),double(x(i)),...
-        ELECTRODE_HEIGHT,num2str(pltchans(i)),'HorizontalAlignment','left',...
+        ELECTRODE_HEIGHT,num2str(allchansind(i)),'HorizontalAlignment','left',...
 	'VerticalAlignment','middle','Color', ECOLOR,'userdata', labels(i,:) , ...
 	'FontSize',EFSIZE, 'buttondownfcn', ...
 	    ['tmpstr = get(gco, ''userdata'');'...
@@ -2061,7 +2066,7 @@ elseif strcmp(ELECTRODES,'numpoint')
 elseif strcmp(ELECTRODES,'numbers')
   for i = 1:size(labels,1)
     text(double(y(i)),double(x(i)),...
-        ELECTRODE_HEIGHT,int2str(pltchans(i)),'HorizontalAlignment','center',...
+        ELECTRODE_HEIGHT,int2str(allchansind(i)),'HorizontalAlignment','center',...
 	'VerticalAlignment','middle','Color',ECOLOR,...
 	'FontSize',EFSIZE)
   end
