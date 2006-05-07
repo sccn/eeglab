@@ -53,6 +53,9 @@
 % uses the global variable EEG ALLEEG CURRENTSET 
 
 % $Log: not supported by cvs2svn $
+% Revision 1.44  2006/04/19 14:18:59  arno
+% multiple dataset file
+%
 % Revision 1.43  2006/03/12 16:58:55  arno
 % store new dataset
 %
@@ -235,19 +238,15 @@ if nargin < 3
     end;
 end;
 
-if nargin < 4 
-    [ EEG com ]  = eeg_checkset(EEG);
-    if nargin > 2, 
-        if storeSetIndex == 0
-            EEG.saved = 'yes'; % just loaded
-        else 
-            EEG.saved = 'no';
-        end;
-    else
-        EEG.saved = 'no';        
+[ EEG com ]  = eeg_checkset(EEG);
+if nargin > 2, 
+    if storeSetIndex == 0
+        EEG.saved = 'yes'; % just loaded
+    else 
+        EEG.saved = 'no';
     end;
 else
-    error('does not support more than 3 arguments anymore');
+    EEG.saved = 'no';        
 end;
 EEG = eeg_hist(EEG, com);
 
@@ -270,7 +269,9 @@ if findindex
 			storeSetIndex = i; i = 200;
 		end;
    end;
-   fprintf('Creating a new ALLEEG dataset %d\n', storeSetIndex);
+   if isempty(varargin)
+       fprintf('Creating a new ALLEEG dataset %d\n', storeSetIndex);
+   end;
 else
 	if isempty(storeSetIndex) | storeSetIndex == 0
 		storeSetIndex = 1;
