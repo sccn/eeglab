@@ -79,13 +79,13 @@ function ALLEEG = std_loadalleeg(varargin)
     % read datasets
     % -------------
     for dset = 1:length(paths)
-        if exist(fullfile(paths{dset}, datasets{dset}))    
+        if exist(fullfile(char(paths{dset}), datasets{dset}))    
             EEG = pop_loadset(datasets{dset}, char(paths{dset}), 'info');
-        elseif exist( fullfile(genpath, paths{dset}, datasets{dset}))    
-            [tmpp tmpf ext] = fileparts(fullfile(genpath, paths{dset}, datasets{dset}));
+        elseif exist( fullfile(genpath, char(paths{dset}), datasets{dset}))    
+            [tmpp tmpf ext] = fileparts(fullfile(genpath, char(paths{dset}), datasets{dset}));
             EEG = pop_loadset([tmpf ext], tmpp, 'info');
         else
-            error(sprintf('Dataset ''%s'' not found', fullfile(paths{dset}, datasets{dset})));
+            error(sprintf('Dataset ''%s'' not found', fullfile(char(paths{dset}), datasets{dset})));
         end;
         
         if ~option_storedisk
@@ -94,5 +94,5 @@ function ALLEEG = std_loadalleeg(varargin)
             EEG.data   = 'in set file';
             EEG.icaact = [];
         end;
-        [ALLEEG EEG] = eeg_store(ALLEEG, EEG, 0);
+        [ALLEEG EEG] = eeg_store(ALLEEG, EEG, 0, 'notext');
     end

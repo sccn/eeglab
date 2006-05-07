@@ -61,6 +61,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.40  2006/03/22 06:03:30  toby
+% Select by r.v. now chooses from previously specified components.
+% Solved glitch when element of STUDY.setind is NaN
+%
 % Revision 1.39  2006/03/21 14:58:10  scott
 % help msg & copyright
 %
@@ -283,6 +287,7 @@ for k = 1:2:length(g.commands)
         case 'load'
             TMPEEG = std_loadalleeg( { g.commands{k+1} } );
             ALLEEG = eeg_store(ALLEEG, eeg_checkset(TMPEEG), currentind);
+            ALLEEG(currentind).saved = 'yes';
             
             % update datasetinfo structure
             % ----------------------------
