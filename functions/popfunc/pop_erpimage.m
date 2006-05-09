@@ -99,7 +99,7 @@
 %                 plot the ERP standard deviation; 'auxvar' to plot auxilary 
 %                 variables; 'ampsort' to sort trials based on amplitude at 
 %                 the selected frequency, etc.  For further information see  
-%                 >> help erpimage() 
+%                 >> help erpimage 
 % Inputs:
 %   EEG        - dataset structure
 %   typeplot   - 1=channel, 0=component {default: 1}
@@ -171,6 +171,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.128  2006/01/31 20:19:55  arno
+% options
+%
 % Revision 1.127  2005/10/11 17:57:09  arno
 % allowing to plot several channels and several components
 %
