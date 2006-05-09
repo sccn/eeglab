@@ -114,6 +114,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.101  2006/04/20 16:57:16  arno
+% header typo
+%
 % Revision 1.100  2006/02/16 21:37:09  scott
 % same
 %
@@ -1015,7 +1018,7 @@ if ~isempty(g.freq) &  strcmpi(g.plot, 'on')
 			axes(headax(realpos(index+1)));						
 			compnum = g.icamaps(index);
 
-			topoplot(icawinv(g.mapchans,compnum).^2,g.chanlocs,varargin{:}); 
+			topoplot(g.icawinv(g.mapchans,compnum).^2,g.chanlocs,varargin{:}); 
 			tl=title(int2str(g.icacomps(compnum)));
 			set(tl,'fontsize',16);
 			axis square;
