@@ -69,6 +69,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.49  2006/03/29 00:24:07  scott
+% text
+%
 % Revision 1.48  2006/03/23 19:58:51  toby
 % revert to 1.43
 %
@@ -649,11 +652,11 @@ end;
 % -------------------------------
 function allcom = simplifycom(allcom);
 
-    for index = length(allcom):-1:2
-        if strcmpi(allcom{index}{1}, 'index') & strcmpi(allcom{index-1}{1}, 'index')
-            if allcom{index}{2} == allcom{index-1}{2}
-                allcom{index-1}(end+1:end+2) = allcom{index}(3:4);
-                allcom(index) = [];
+    for index = length(allcom)-1:-1:1
+        if strcmpi(allcom{index}{1}, 'index') & strcmpi(allcom{index+1}{1}, 'index')
+            if allcom{index}{2} == allcom{index+1}{2} % same dataset index
+                allcom{index}(end+1:end+length(allcom{index+1})-2) = allcom{index+1}(3:end);
+                allcom(index+1) = [];
             end;
         end;
     end;
