@@ -122,6 +122,16 @@ for k = 1:length(STUDY.datasetinfo)
     end;
 end
 
+% check dataset info consistency 
+% ------------------------------
+for k = 1:length(STUDY.datasetinfo)
+    if ~strcmpi(STUDY.datasetinfo(k).filename, ALLEEG(k).filename)
+        STUDY.datasetinfo(k).filename = ALLEEG(k).filename; modif = 1;
+        fprintf('Warning: file name has changed for dataset %d and the study has been updated\n', k);
+        fprintf('         to discard this change in the study, reload it from disk\n');
+    end;
+end;
+
 % set to NaN empty indices and remove nan columns
 % -----------------------------------------------
 setind( find(setind(:) == 0) ) = NaN;
