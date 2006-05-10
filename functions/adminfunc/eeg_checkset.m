@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.199  2006/04/14 18:04:42  arno
+% checking eeg
+%
 % Revision 1.198  2006/04/14 17:54:25  arno
 % fixing number of trials too
 %
