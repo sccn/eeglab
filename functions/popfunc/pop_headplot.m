@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.44  2006/04/11 21:18:03  arno
+% text message
+%
 % Revision 1.43  2006/04/11 21:15:37  arno
 % remove debug message
 %
@@ -360,8 +363,8 @@ if nargin < 3
     options = {};
     if result{1},               options = { options{:} 'load'    result{2} };
     else
-        if isempty(result{7})   options = { options{:} 'setup' { result{4} 'meshfile' result{5} } }; % no coreg
-        else                    options = { options{:} 'setup' { result{4} 'meshfile' result{5} 'transform' str2num(result{7}) } };
+        if isempty(result{7})   options = { options{:} 'setup' { result{4} 'meshfile' result{5} } 'meshfile' result{5} }; % no coreg
+        else                    options = { options{:} 'setup' { result{4} 'meshfile' result{5} 'transform' str2num(result{7}) } 'meshfile' result{5} };
         end;
     end;
     
