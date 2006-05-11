@@ -151,7 +151,7 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
                '            Running nonparametric permutation tests\n.']);
       g.mode = 'perm';
     end
-    if size(data,2) == 1, data  = transpose(data); end;
+    if size(data,2) == 1, data  = transpose(data); end; % cell array transpose
     
     tmpsize   = size(data{1});
     if ~strcmpi(g.mode, 'param')
@@ -161,7 +161,7 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
         
     % test if data can be paired
     % --------------------------
-    if length(unique(cellfun('length', data ))) > 1
+    if length(unique(cellfun('size', data, ndims(data{1}) ))) > 1
         g.paired = 'off'; 
     end;
     if strcmpi(g.paired, 'on')
