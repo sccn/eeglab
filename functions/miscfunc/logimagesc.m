@@ -31,6 +31,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2005/06/30 17:48:06  scott
+% same
+%
 % Revision 1.5  2005/06/30 17:46:23  scott
 % fixed bug in yticklabel (sometimes was non-monotonic) -sm
 %
@@ -72,7 +75,7 @@ function [lgfreqs,datout] = logimagesc(times,freqs,data,varargin)
   lgfreqs = lgfreqs(:);
   lfreqs = lfreqs(:);
   [mesht meshf] = meshgrid(times,lfreqs);
-  datout = griddata(mesht,meshf,data,times,lgfreqs);
+  datout = griddata(mesht,meshf,data,times,lgfreqs,'v4');
   datout(find(isnan(datout(:)))) = 0;
   
   if ~isempty(varargin)
