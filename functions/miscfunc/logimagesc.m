@@ -31,6 +31,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2006/05/12 03:41:53  toby
+% qhull related bug, this fix works but slows things down
+%
 % Revision 1.6  2005/06/30 17:48:06  scott
 % same
 %
@@ -75,7 +78,12 @@ function [lgfreqs,datout] = logimagesc(times,freqs,data,varargin)
   lgfreqs = lgfreqs(:);
   lfreqs = lfreqs(:);
   [mesht meshf] = meshgrid(times,lfreqs);
-  datout = griddata(mesht,meshf,data,times,lgfreqs,'v4');
+  try
+      datout = griddata(mesht,meshf,data,times,lgfreqs);
+  catch
+      fprintf('error in logimagesc.m calling griddata.m, trying v4 method.');
+      datout = griddata(mesht,meshf,data,times,lgfreqs,'v4');
+  end
   datout(find(isnan(datout(:)))) = 0;
   
   if ~isempty(varargin)
