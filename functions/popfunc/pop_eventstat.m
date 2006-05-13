@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2004/06/03 18:39:38  arno
+% debug to process all events
+%
 % Revision 1.10  2004/06/03 18:29:47  arno
 % debug label
 %
@@ -112,7 +115,10 @@ if nargin < 2
 	result       = inputdlg2( promptstr, 'Plot event statistics -- pop_eventstat()', 1,  inistr, 'signalstat');
 	if length( result ) == 0 return; end;
 	eventfield   = deblank(result{1}); % the brackets allow to process matlab arrays
-	type   	     = parsetxt( result{2} ); % the brackets allow to process matlab arrays
+    if strcmpi(result{2}(1),'''')
+         type = eval( [ '{' result{2} '}' ] );
+    else type = parsetxt( result{2});
+    end;
 	latrange     = eval( [ '[' result{3} ']' ] );
 	percent      = eval( [ '[' result{4} ']' ] );
 else
