@@ -73,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.55  2005/05/24 17:25:46  arno
+% remove cell2ma
+%
 % Revision 1.54  2004/11/17 00:03:29  arno
 % do not rename boundary events
 %
@@ -322,7 +325,13 @@ if nargin<2
         tmpres = results{2*index+1};
         if isempty(findstr(tmpres, '<=')), 
             try, tmpres = eval( [ '[' tmpres ']' ] );
-                 if ~isnumeric(tmpres), tmpres = parsetxt( results{2*index+1} ); end;
+                if ~isnumeric(tmpres),
+                    if results{2*index+1}(1) == ''''
+                        tmpres = eval( [ '{' results{2*index+1} '}' ] );
+                    else
+                        tmpres = parsetxt( results{2*index+1} ); 
+                    end;
+                end;
             catch, tmpres = parsetxt( tmpres ); end;
         end;
         if ~results{2*index+2}, args = { args{:}, allfields{index}, tmpres };
