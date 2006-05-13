@@ -41,6 +41,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2006/03/29 00:49:38  scott
+% txt
+%
 % Revision 1.18  2006/01/10 00:42:58  arno
 % fixing scrolling more than 60 channels
 %
@@ -103,7 +106,12 @@ function [chanlist,chanliststr, allchanstr] = pop_chansel(chans, varargin);
         return;
     end;
     if isempty(chans), disp('Empty input'); return; end;
-    if ~iscell(chans), error('Can only process cell array'); end;
+    if isnumeric(chans),
+        for c = 1:length(chans)
+            newchans{c} = num2str(chans(c));
+        end;
+        chans = newchans;
+    end;
     chanlist    = [];
     chanliststr = {};
     allchanstr  = '';
@@ -160,15 +168,29 @@ function [chanlist,chanliststr, allchanstr] = pop_chansel(chans, varargin);
                 'ListString', tmpfieldnames, 'initialvalue', g.select, 'selectionmode', g.selectionmode);       
     allchanstr = chans(chanlist);
     
+    % test for spaces
+    % ---------------
+    spacepresent = 0;
+    if ~isnumeric(chans{1})
+        tmpstrs = [ allchanstr{:} ];
+        if ~isempty( find(tmpstrs == ' ')) | ~isempty( find(tmpstrs == 9))
+            spacepresent = 1;
+        end;
+    end;
+    
     % get concatenated string (if index)
     % -----------------------
-    if strcmpi(g.withindex, 'on')
+    if strcmpi(g.withindex, 'on') | spacepresent
         if isnumeric(chans{1})
             chanliststr = num2str(allchanstr);
         else
             chanliststr = '';
             for index = 1:length(allchanstr)
-                chanliststr = [ chanliststr allchanstr{index} ' ' ];
+                if spacepresent
+                    chanliststr = [ chanliststr '''' allchanstr{index} ''' ' ];
+                else
+                    chanliststr = [ chanliststr allchanstr{index} ' ' ];
+                end;
             end;
             chanliststr = chanliststr(1:end-1);
         end;
