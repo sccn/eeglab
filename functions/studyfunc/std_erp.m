@@ -17,11 +17,11 @@
 %                  compute ERPs {default|[]: [EEG.minms EEGmaxms]}
 % Outputs:
 %   erp         - ERP for the requested ICA components in the selected 
-%                     latency window. 
+%                 latency window. ERPs are scaled by the RMS over of the
+%                 component scalp map projection over all data channels.
 %   times       - vector of times (epoch latencies in ms) for the ERP
 %
 % File output:     [dataset_file].icaerp     % component erp file
-%                  [dataset_file].set        % dataset file
 %
 % See also:    std_spec(), std_ersp(), std_topo(), std_preclust()
 %
@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2006/03/14 03:28:10  scott
+% help msg
+%
 % Revision 1.22  2006/03/11 07:08:03  arno
 % header
 %
@@ -171,7 +174,7 @@ else
     TMP.icaact = rmbase(TMP.icaact);
 end
 TMP.icaact = reshape(TMP.icaact, [ size(TMP.icaact,1) size(TMP.data,2) size(TMP.data,3) ]);
-X = mean(TMP.icaact,3); % calculate ERP
+X = repmat(sqrt(mean(TMP.icawinv.^2))', [1 TMP.pnts]) .* mean(TMP.icaact,3); % calculate ERP
 
 % Save ERPs in file (all components)
 % ----------------------------------
