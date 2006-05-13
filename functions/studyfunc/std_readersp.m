@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2006/05/03 18:20:40  arno
+% allowing to read data channels
+%
 % Revision 1.18  2006/03/29 17:47:10  scott
 % help msg
 %
@@ -229,7 +232,7 @@ end;
 for cond  = 1:length(abset)
     ersp = erspall{cond}(fminind:fmaxind,minind:maxind);
     logersp(:,:,cond) = ersp;
-    baseersp(:,cond)  = erspallbase{cond}(fminind:fmaxind);
+    baseersp(:,cond)  = erspallbase{cond}(fminind:fmaxind)';
 end;
 logfreqs = tmpersp.freqs(fminind:fmaxind);
 timevals = tmpersp.times(minind:maxind);
