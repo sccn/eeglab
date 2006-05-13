@@ -51,7 +51,12 @@ if ~isfield(STUDY, 'session'),   STUDY.session   = {}; modif = 1; end;
 if ~isfield(STUDY, 'condition'), STUDY.condition = {}; modif = 1; end;
 if ~isfield(STUDY, 'setind'),    STUDY.setind    = []; modif = 1; end;
 if ~isfield(STUDY, 'etc'),       STUDY.etc       = []; modif = 1; end;
+if ~isfield(STUDY, 'preclust'),  STUDY.preclust  = []; modif = 1; end;
 if ~isfield(STUDY, 'datasetinfo'), STUDY.datasetinfo = []; modif = 1; end;
+if ~isfield(STUDY.preclust, 'erpclusttimes' ),  STUDY.preclust.erpclusttimes = []; modif = 1; end;
+if ~isfield(STUDY.preclust, 'specclustfreqs' ), STUDY.preclust.specclustfreqs = []; modif = 1; end;
+if ~isfield(STUDY.preclust, 'erspclustfreqs' ), STUDY.preclust.erspclustfreqs = []; modif = 1; end;
+if ~isfield(STUDY.preclust, 'erspclusttimes' ), STUDY.preclust.erspclusttimes = []; modif = 1; end;
 if ~isfield(STUDY.datasetinfo, 'comps') & ~isempty(STUDY.datasetinfo), STUDY.datasetinfo(1).comps = []; modif = 1; end;
 if ~isfield(STUDY.datasetinfo, 'index') & ~isempty(STUDY.datasetinfo), STUDY.datasetinfo(1).index = []; modif = 1; end;
 
