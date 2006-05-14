@@ -192,6 +192,9 @@
 %                 and trial. {default: no}
 
 % $Log: not supported by cvs2svn $
+% Revision 1.256  2006/04/12 04:12:02  scott
+% timeWarp -> timewarp()
+%
 % Revision 1.255  2006/04/12 03:31:32  scott
 % myphasecoher() -> phasecoher()
 %
@@ -3538,7 +3541,7 @@ function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,al
                     max(1024,pow2(ceil(log2(frames)))),srate,frames,0,0.05);
       % [Pxx,F] = psd(reshape(urdata,1,size(urdata,1)*size(urdata,2)),512,srate,winlength,0,0.05);
     else
-      [Pxx,tmpfreq] = spec(reshape(urdata,1,size(urdata,1)*size(urdata,2)),...
+      [Pxx,F] = spec(reshape(urdata,1,size(urdata,1)*size(urdata,2)),...
                            max(1024,pow2(ceil(log2(frames)))),srate,frames,0);
       % [Pxx,F] = spec(reshape(urdata,1,size(urdata,1)*size(urdata,2)),512,srate,winlength,0);
     end;
