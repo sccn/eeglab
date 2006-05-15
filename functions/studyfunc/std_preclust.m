@@ -122,6 +122,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.59  2006/04/11 18:36:44  arno
+% message
+%
 % Revision 1.58  2006/04/11 18:35:07  arno
 % better message
 %
@@ -443,11 +446,11 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                             [X, t] = std_erp(ALLEEG(idat), succompind{si}, timewindow);
                             STUDY.preclust.erpclusttimes = timewindow;
                             if cond == 1
-                                con_data = abs(X);
+                                con_data = X;
                                 con_t = t;
                             else % concatenate across conditions
                                 con_t = [con_t; t];
-                                con_data = [con_data abs(X)];
+                                con_data = [con_data X];
                             end
                          end
                      end
@@ -711,6 +714,9 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                 normval = std(sqrt(data(:,1).^2 + data(:,2).^2 + data(:,3).^2));
                 clustdatatmp = data./normval;
                 norm = 0;
+            case 'erp'
+                clustdatatmp = runpca( double(data.'), npca, 1);
+                clustdatatmp = abs(clustdatatmp.');
             otherwise
                 clustdatatmp = runpca( double(data.'), npca, 1);
                 clustdatatmp = clustdatatmp.';
