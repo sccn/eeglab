@@ -532,7 +532,7 @@ else
             cind = get(findobj('parent', hdl, 'tag', 'clus_list'), 'value');
             N = userdat{2};
             count = 1;
-            selected = 1;
+            selected = get(findobj('parent', hdl, 'tag', 'clust_comp'), 'value');
             if cind ~= 1 %specific cluster
                 len = length(STUDY.cluster(cls(cind-1)).comps);
                 compid = cell(len+1,1);
@@ -544,7 +544,8 @@ else
                 end
                 if isfield(STUDY.cluster, 'selected')
                     if ~isempty(STUDY.cluster(cls(cind-1)).selected)
-                        selected = STUDY.cluster(cls(cind-1)).selected;
+                        selected = min(STUDY.cluster(cls(cind-1)).selected, 1+length(STUDY.cluster(cls(cind-1)).comps(1,:)));
+                        STUDY.cluster(cls(cind-1)).selected = selected;
                     end;
                 end;
 
@@ -562,7 +563,7 @@ else
                     end
                 end
             end
-            set(findobj('parent', hdl, 'tag', 'clust_comp'), 'String', compid, 'value', selected);
+            set(findobj('parent', hdl, 'tag', 'clust_comp'), 'value', selected, 'String', compid);
            
         case 'plotsum'
             if clus ~= 1 % specific cluster option
@@ -669,7 +670,7 @@ else
                 clus_name_list{newind+1} = renameclust( clus_name_list{newind+1}, newname);
                 newname = [STUDY.cluster(cls(old_clus)).name ' (' num2str(length(STUDY.cluster(cls(old_clus)).comps))  ' ICs)'];
                 clus_name_list{old_clus+1} = renameclust( clus_name_list{old_clus+1}, newname);
-                set(findobj('parent', hdl, 'tag', 'clus_list'), 'String', clus_name_list);
+                set( findobj('parent', hdl, 'tag', 'clus_list'), 'String', clus_name_list);
                 userdat{1}{2} = STUDY;
                 set(hdl, 'userdat',userdat); 
                 pop_clustedit('showclust',hdl);
