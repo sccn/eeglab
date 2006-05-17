@@ -62,6 +62,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2006/04/13 17:33:02  arno
+% coreg checkbox disable
+%
 % Revision 1.21  2006/04/13 17:30:48  arno
 % same
 %
@@ -386,23 +389,23 @@ else
     options = varargin;
 end
 
-options = finputcheck(options, { 'hdmfile'  'string'    []         '';
+g = finputcheck(options, { 'hdmfile'  'string'    []         '';
                                  'mrifile'  'string'    []         '';
                                  'chanfile' 'string'    []         '';
                                  'chansel'  'integer'   []         [1:EEG.nbchan];
                                  'electrodes' 'integer'   []         [];
                                  'coord_transform' 'real' []         [];
                                  'coordformat' 'string'    { 'MNI' 'spherical' } 'MNI' });
-if isstr(options), error(options); end;
+if isstr(g), error(g); end;
 
 OUTEEG = rmfield(OUTEEG, 'dipfit');
-OUTEEG.dipfit.hdmfile     = options.hdmfile;
-OUTEEG.dipfit.mrifile     = options.mrifile;
-OUTEEG.dipfit.chanfile    = options.chanfile;
-OUTEEG.dipfit.chansel     = options.chansel;
-OUTEEG.dipfit.coordformat     = options.coordformat;
-OUTEEG.dipfit.coord_transform = options.coord_transform;
-if ~isempty(options.electrodes), OUTEEG.dipfit.chansel = options.electrodes; end;
+OUTEEG.dipfit.hdmfile     = g.hdmfile;
+OUTEEG.dipfit.mrifile     = g.mrifile;
+OUTEEG.dipfit.chanfile    = g.chanfile;
+OUTEEG.dipfit.chansel     = g.chansel;
+OUTEEG.dipfit.coordformat     = g.coordformat;
+OUTEEG.dipfit.coord_transform = g.coord_transform;
+if ~isempty(g.electrodes), OUTEEG.dipfit.chansel = g.electrodes; end;
 
 % removing channels with no coordinates
 % -------------------------------------
