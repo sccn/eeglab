@@ -511,7 +511,7 @@ switch lower(g.icatype)
      case 'icams',         [tmp EEG.icawinv] = icaMS( tmpdata, g.options{:} );
      case 'fastica',       [ ICAcomp, EEG.icawinv, EEG.icaweights] = fastica( tmpdata, 'displayMode', 'off', g.options{:} );
      case { 'tica' 'erica' 'simbec' 'unica' 'amuse' 'fobi' 'evd' 'sons' ...
-            'jadeop' 'jade_td_p' 'evd24' 'sobi' 'ng_ol' 'acrsobiro' 'acrsobibpf' } 
+            'jadeop' 'jade_td_p' 'evd24' 'sobi' 'ng_ol' 'acsobiro' 'acrsobibpf' } 
         fig = figure('tag', 'alg_is_run', 'visible', 'off');
         
         if isempty(g.options), g.options = { size(tmpdata,1) }; end;
