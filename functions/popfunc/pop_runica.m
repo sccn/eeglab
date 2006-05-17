@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.64  2006/04/17 16:20:05  scott
+% help msg and print text; fixed bug in saving icachansind to .etc
+%
 % Revision 1.63  2006/03/10 20:15:40  arno
 % extended 1 as default
 %
@@ -362,21 +365,23 @@ if nargin < 2
     end;
 else 
     if ~strcmpi(varargin{1}, 'icatype')
-        options = { 'icatype' varargin(1:end) };
+        options = { 'icatype' varargin{1:end} };
     else
         options = varargin;
     end;
 end;
+options
 
 % decode input arguments
 % ----------------------
-g = finputcheck( options, { 'icatype'        'string'  allalgs   'runica'; ...
+[ g options ] = finputcheck( options, { 'icatype'        'string'  allalgs   'runica'; ...
                             'dataset'        'integer' []        1;
                             'options'        'cell'    []        {};
                             'concatenate'    'string'  { 'on' 'off' }   'on';
                             'chanind'        'integer' []        [];}, ...
                                  'pop_runica', 'ignore');
 if isstr(g), error(g); end;
+if isempty(g.options), g.options = options; end;
 
 % select datasets, create new big dataset if necessary
 % ----------------------------------------------------
@@ -535,11 +540,11 @@ end;
 % update weight and inverse matrices etc...
 % -----------------------------------------
 if ~isempty(fig), try, close(fig); catch, end; end;
-if isempty(EEG.icasphere)
-    EEG.icasphere  = eye(size(EEG.icaweights,2));
-end;
 if isempty(EEG.icaweights)
     EEG.icaweights = pinv(EEG.icawinv);
+end;
+if isempty(EEG.icasphere)
+    EEG.icasphere  = eye(size(EEG.icaweights,2));
 end;
 if isempty(EEG.icawinv)
     EEG.icawinv    = pinv(EEG.icaweights*EEG.icasphere); % a priori same result as inv
