@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.41  2006/05/07 18:05:33  arno
+% remove unwanted warnings
+%
 % Revision 1.40  2006/03/22 06:03:30  toby
 % Select by r.v. now chooses from previously specified components.
 % Solved glitch when element of STUDY.setind is NaN
@@ -230,7 +233,12 @@ for k = 1:2:length(g.commands)
         case 'session' 
             STUDY.datasetinfo(currentind).session = g.commands{k+1};
         case 'remove'
-            ALLEEG = eeg_store(ALLEEG, eeg_empty, g.commands{k+1});
+            ALLEEG(end+2)            = ALLEEG(end);
+            ALLEEG(g.commands{k+1})  = ALLEEG(end-1); % empty dataset
+            ALLEEG(end-1:end)        = [];
+            STUDY.datasetinfo(end+2)           = STUDY.datasetinfo(end);
+            STUDY.datasetinfo(g.commands{k+1}) = STUDY.datasetinfo(end-1);
+            STUDY.datasetinfo(end-1:end)       = [];
         case 'return', return;
         case 'dipselect'
             STUDY = std_checkset(STUDY, ALLEEG); % update setind field
