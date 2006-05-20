@@ -69,6 +69,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.50  2006/05/10 14:05:15  arno
+% fix problem when remodyfying the GUI
+%
 % Revision 1.49  2006/03/29 00:24:07  scott
 % text
 %
@@ -676,12 +679,13 @@ function bool = test_wrong_parameters(hdl)
         end;
     end;
     
-    anysession   = any(~cellfun('isempty', { datasetinfo.session }));
-    allsession   = all(~cellfun('isempty', { datasetinfo.session }));
-    anycondition = any(~cellfun('isempty', { datasetinfo.condition }));
-    allcondition = all(~cellfun('isempty', { datasetinfo.condition }));
-    anygroup     = any(~cellfun('isempty', { datasetinfo.group }));
-    allgroup     = all(~cellfun('isempty', { datasetinfo.group }));
+    nonempty     = cellfun('isempty', { datasetinfo.filename });
+    anysession   = any(~cellfun('isempty', { datasetinfo(nonempty).session }));
+    allsession   = all(~cellfun('isempty', { datasetinfo(nonempty).session }));
+    anycondition = any(~cellfun('isempty', { datasetinfo(nonempty).condition }));
+    allcondition = all(~cellfun('isempty', { datasetinfo(nonempty).condition }));
+    anygroup     = any(~cellfun('isempty', { datasetinfo(nonempty).group }));
+    allgroup     = all(~cellfun('isempty', { datasetinfo(nonempty).group }));
 
     if anygroup & ~allgroup
          bool = 1; warndlg2('If one dataset has a group label, they must all have one', 'Error');
