@@ -134,6 +134,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.52  2006/03/11 16:46:14  scott
+% msg text -sm
+%
 % Revision 1.51  2005/11/08 23:23:29  scott
 % help msg edits -sm
 %
@@ -406,7 +409,6 @@ if nargin < 2                 % if several arguments, assign values
 	if ~isempty( results{i+10} ) , args = { args{:}, 'chanlocs' ,  results{i+10} }; end;
 	if ~isempty( results{i+11} ),  args = { args{:}, 'icaweights', results{i+11} }; end;
 	if ~isempty( results{i+12} ) , args = { args{:}, 'icasphere',  results{i+12} }; end;
-    args
     
 else % no interactive inputs
     args = varargin;
@@ -475,7 +477,7 @@ for curfield = tmpfields'
                              EEGOUT.chanlocs = [];
                          elseif isstr(varname) & exist( varname ) == 2
                             fprintf('pop_editset(): channel locations file ''%s'' found\n', varname); 
-                            [ EEGOUT.chanlocs lab theta rad ind EEGOUT.chaninfo ] = readlocs(varname);
+                            [ EEGOUT.chanlocs lab theta rad ind ] = readlocs(varname);
                          elseif isstr(varname)
                             EEGOUT.chanlocs = evalin('base', varname, 'fprintf(''pop_editset() warning: variable ''''%s'''' not found, ignoring\n'', varname)' );
                             if iscell(EEGOUT.chanlocs)
