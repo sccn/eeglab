@@ -11,7 +11,7 @@
 %                  browse for a data file, the graphical interface might be
 %                  able to detect the file format from the file extension and
 %                  his list box accordingly. Note that you have to click on
-%                  the option to make it active. Command line equivalent:
+%                  the option to make it active. Command line equivalent is 
 %                  'dataformat'
 %   "Dataset name" - [Edit box] Name for the new dataset. 
 %                  In the last column of the graphic interface, the "EEG.setname"
@@ -130,6 +130,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2005/11/08 22:16:20  arno
+% editing header
+%
 % Revision 1.27  2005/11/05 03:10:27  toby
 % Revised edition helpmenu outline
 %
