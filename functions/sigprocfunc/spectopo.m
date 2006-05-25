@@ -73,7 +73,7 @@
 %   'memory'   = ['low'|'high'] a 'low' setting will use less memory for computing 
 %                component activities, will take longer {default: 'high'}
 %
-% Reploting options:
+% Replotting options:
 %   'specdata' = [freq x chan array ] spectral data
 %   'freqdata' = [freq] array of frequencies
 % 
@@ -118,6 +118,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.104  2006/05/25 04:12:47  toby
+% bug fix: no chanlocs with a zero power channel
+%
 % Revision 1.103  2006/05/22 15:44:42  arno
 % add option to replot data
 %
@@ -545,10 +548,6 @@ if frames == 0
   frames = size(data,2); % assume one epoch
 end
 
-if isempty(g.mapchans) | g.mapchans == 0
-	g.mapchans = 1:size(data,1); % default to plotting all chans
-end
-
 %if ~isempty(g.plotchan) & g.plotchan == 0 & strcmpi(g.icamode, 'sub')
 %    if ~isempty(get(0,'currentfigure')) & strcmp(get(gcf, 'tag'), 'spectopo'), close(gcf); end;
 %    error('Cannot plot data component at all channels (option not implemented)');
@@ -564,7 +563,6 @@ g.chanlocs2 = g.chanlocs;
 if ~isempty(g.specdata)
     eegspecdB  = g.specdata;
     freqs      = g.freqdata;
-    g.mapchans = 1:size(g.specdata,1);
 else
     epochs = round(size(data,2)/frames);
     if frames*epochs ~= size(data,2)
@@ -1013,6 +1011,9 @@ if ~isempty(g.freq) &  strcmpi(g.plot, 'on')
             
 		else % plot all channels in g.plotchans 
 
+            if isempty(g.mapchans) | g.mapchans == 0
+                g.mapchans = 1:size(eegspecdB,1); % default to plotting all chans
+            end
 			if ~isempty(varargin)
 				topoplot(topodata(g.mapchans),g.chanlocs2,'maplimits',maplimits, varargin{:}); 
 			else
