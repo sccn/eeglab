@@ -118,6 +118,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.103  2006/05/22 15:44:42  arno
+% add option to replot data
+%
 % Revision 1.102  2006/05/09 04:21:09  toby
 % icawinv bug fix
 %
@@ -620,8 +623,10 @@ else
             fprintf('\nWarning: channels [%s] have 0 values, so will be omitted from the display', ...
                        zchans);
             eegspecdB = eegspecdB(tmpc,:);
-            if ~isempty(specstd),  specstd = specstd(tmpc,:); end;
-            g.chanlocs2 = g.chanlocs(tmpc);
+            if ~isempty(specstd),  specstd = specstd(tmpc,:); end
+            if ~isempty(g.chanlocs)
+                g.chanlocs2 = g.chanlocs(tmpc);
+            end
         end;
         eegspecdB = 10*log10(eegspecdB);
         specstd   = 10*log10(specstd);
