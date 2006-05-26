@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.85  2006/04/14 21:19:08  arno
+% fixing skipping lines
+%
 % Revision 1.84  2006/03/31 03:11:13  toby
 % made '.eloc' equivalent to '.loc' as a filetype
 %
@@ -381,14 +384,19 @@ if nargin < 1
 	return;
 end;
 
-% to add a new channel format
-% ---------------------------
-% 1) Add a new element to the structure chanformat
-% 2) enter type name for file format, type string (short) and description
-% 3) enter the column types in the importformat field
-% 4) enter the number of lines to skip in the skipline field
-% Note: these infos are also used by writelocs() and pop_readlocs() but
-% you do not have to edit these functions.
+% NOTE: To add a new channel format:
+% ----------------------------------
+% 1) Add a new element to the structure 'chanformat' (see 'ADD NEW FORMATS HERE' below):
+% 2)  Enter a format 'type' for the new file format, 
+% 3)  Enter a (short) 'typestring' description of the format
+% 4)  Enter a longer format 'description' (possibly multiline, see ex. (1) below)
+% 5)  Enter format file column labels in the 'importformat' field (see ex. (2) below)
+% 6)  Enter the number of header lines to skip (if any) in the 'skipline' field
+% 7)  Document the new channel format in the help message above.
+% 8)  After testing, please send the new version of readloca.m to us
+%       at eeglab@sccn.ucsd.edu with a sample locs file.
+% The 'chanformat' structure is also used (automatically) by the writelocs() 
+% and pop_readlocs() functions. You do not need to edit these functions.
 
 chanformat(1).type         = 'polhemus';
 chanformat(1).typestring   = 'Polhemus native .elp file';
