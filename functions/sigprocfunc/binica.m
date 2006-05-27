@@ -74,6 +74,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2006/01/29 18:20:02  scott
+% help msg -sm
+%
 % Revision 1.16  2006/01/14 18:04:35  scott
 % added 'stem' output -sm
 %
@@ -340,12 +343,12 @@ if ~exist('ncomps')
   ncomps = nchans;
 end
 
-wts = floatread(weightsfile,[ncomps Inf]);
+wts = floatread(weightsfile,[ncomps Inf],[],0);
 if isempty(wts)
    fprintf('\nbinica(): weight matrix not read.\n')
    return
 end
-sph = floatread(spherefile,[nchans Inf]);
+sph = floatread(spherefile,[nchans Inf],[],0);
 if isempty(sph)
    fprintf('\nbinica():  sphere matrix not read.\n')
    return
