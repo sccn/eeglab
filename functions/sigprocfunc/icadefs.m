@@ -22,6 +22,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.38  2006/05/26 01:30:52  toby
+% JR says ica_linux is more recent than ica_linux2.4
+%
 % Revision 1.37  2006/05/12 17:53:05  arno
 % changing version number
 %
@@ -153,7 +156,7 @@ TUTORIAL_URL = 'http://sccn.ucsd.edu/eeglab/eeglabdocs.html'; % online version
 % TUTORIAL_URL = 'file:///home/user/eeglabtutorial/eeglabdocs.html'; % Unix
 % TUTORIAL_URL = 'file://::disk:folder:eeglabtutorial:eeglabdocs.html'; % Mac
 
-ICABINARY = 'ica_linux'; % <=INSERT name of ica executable for binica.m
+ICABINARY = '/data/common/matlab/fmrlab/ica_linux'; % <=INSERT name of ica executable for binica.m
                             % If none, use []
 SHRINKWARNING = 1;          % warn user about the shrink factor
 YDIR = 1;                   % positive up = 1; negative up = -1
