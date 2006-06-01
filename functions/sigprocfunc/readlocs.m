@@ -5,7 +5,7 @@
 % Usage:
 %   >>  eloc = readlocs( filename );
 %   >>  EEG.chanlocs = readlocs( filename, 'key', 'val', ... ); 
-%   >>  [eloc, labels, theta, radius, indices, chaninfo] = ...
+%   >>  [eloc, labels, theta, radius, indices] = ...
 %                                               readlocs( filename, 'key', 'val', ... );
 % Inputs:
 %   filename   - Name of the file containing the electrode locations
@@ -85,7 +85,6 @@
 %   theta       - vector (in degrees) of polar angles of the electrode locations.
 %   radius      - vector of polar-coordinate radii (arc_lengths) of the electrode locations 
 %   indices     - indices, k, of channels with non-empty 'locs(k).theta' coordinate
-%   chaninfo    - structure containing global channel information
 %
 % File formats:
 %   If 'filetype' is unspecified, the file extension determines its type.
@@ -189,6 +188,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.86  2006/05/26 15:59:35  scott
+% worked on text of instructions for adding a channel type -- NOTE: chaninfo is
+% discussed in help message, but NOT implemented!?
+%
 % Revision 1.85  2006/04/14 21:19:08  arno
 % fixing skipping lines
 %
