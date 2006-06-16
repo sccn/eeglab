@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.73  2006/05/10 14:06:09  arno
+% better handling of condition when study is present
+%
 % Revision 1.72  2006/04/19 14:18:29  arno
 % multiple dataset file
 %
@@ -405,7 +408,7 @@ elseif length(varargin) == 0 & length(EEG) == 1 % if several arguments, assign v
     saved = 1;
     filenameold = '';
     filenamenew = '';
-    if ~isempty(ALLEEG) && any(OLDSET ~= 0) && length(OLDSET) == 1
+    if ~isempty(ALLEEG) & any(OLDSET ~= 0) & length(OLDSET) == 1
         if strcmpi(ALLEEG(OLDSET).saved, 'no')
             saved = 0;
             if ~isempty(ALLEEG(OLDSET).filename)
@@ -419,14 +422,14 @@ elseif length(varargin) == 0 & length(EEG) == 1 % if several arguments, assign v
     % ***************************************************
     % case 5 -> single dataset, has to be saved, several dataset to retrieve
     % ***************************************************
-    if length(g.retrieve) > 1 | ( g.study && ~isempty(g.retrieve)) % selecting several datasets or a study is present
+    if length(g.retrieve) > 1 | ( g.study & ~isempty(g.retrieve)) % selecting several datasets or a study is present
         text_new = 'Current dataset has not been saved. Saved it or reload it from disk.';
         text_old = '';
         have_to_save_new = 1;
         value_savenew    = 1;
         enable_savenew = 'on';
         filenamenew    = fullfile(EEG.filepath, EEG.filename);
-        cb_savenew     = [ 'if ~get(gcbo, ''value'') && ~get(findobj(gcbf, ''tag'', ''cb_loadold''), ''value''),' ...
+        cb_savenew     = [ 'if ~get(gcbo, ''value'') & ~get(findobj(gcbf, ''tag'', ''cb_loadold''), ''value''),' ...
                        '   set(gcbo, ''value'', 1);' ...
                        '   warndlg2(strvcat(''You must enter a filename for the dataset or use the copy on disk!'','' '',' ...
                        '   ''It must be saved or you must use the old dataset on disk because, by your current memory'',' ...
@@ -438,7 +441,7 @@ elseif length(varargin) == 0 & length(EEG) == 1 % if several arguments, assign v
     % case 6 -> single dataset modified or not, study is present (the old
     %           dataset has to be replaced to preserve study consistency)
     % ***************************************************
-    elseif g.study == 1 && isempty(g.retrieve)
+    elseif g.study == 1 & isempty(g.retrieve)
         if saved
             text_old       = 'The old dataset has not been modified since last saved. What do you want to do with it?';
             cb_saveold     = '';
@@ -523,11 +526,11 @@ elseif length(varargin) == 0 & length(EEG) == 1 % if several arguments, assign v
     end;        
     % update GUI for selecting multiple datasets
     % ------------------------------------------
-    if length(g.retrieve) > 1 | ( g.study && ~isempty(g.retrieve)) % selecting several datasets or a study is present
+    if length(g.retrieve) > 1 | ( g.study & ~isempty(g.retrieve)) % selecting several datasets or a study is present
         uilist = uilist(1:9);
         geometry = geometry(1:3);
         if ~isempty(EEG.filename)
-            cb_loadold = [ 'if ~get(gcbo, ''value'') && ~get(findobj(gcbf, ''tag'', ''cb_savenew''), ''value''),' ...
+            cb_loadold = [ 'if ~get(gcbo, ''value'') & ~get(findobj(gcbf, ''tag'', ''cb_savenew''), ''value''),' ...
                            '   set(gcbo, ''value'', 1);' ...
                            '   warndlg2(strvcat(''You must enter a filename for the dataset or use the copy on disk!'','' '',' ...
                            '   ''It must be saved or you must use the old dataset on disk because, by your current memory option, only one full'',' ...
