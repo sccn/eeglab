@@ -101,6 +101,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2006/01/17 16:55:21  scott
+% re-coded 'posact' processing to be efficient -sm
+%
 % Revision 1.26  2006/01/17 16:29:05  scott
 % re-wrote 'posact' processing for efficiency -sm
 %
@@ -819,257 +822,664 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%% Initialize ICA training %%%%%%%%%%%%%%%%%%%%%%%%%
 %
-  lastt=fix((datalength/block-1)*block+1);
-  BI=block*eye(ncomps,ncomps);
-  delta=zeros(1,chans*ncomps);
-  changes = [];
-  degconst = 180./pi;
-  startweights = weights;
-  prevweights = startweights;
-  oldweights = startweights;
-  prevwtchange = zeros(chans,ncomps);
-  oldwtchange = zeros(chans,ncomps);
-  lrates = zeros(1,maxsteps); 
-  onesrow = ones(1,block); 
-  bias = zeros(ncomps,1);
-  signs = ones(1,ncomps);    % initialize signs to nsub -1, rest +1
-  for k=1:nsub
-      signs(k) = -1;
-  end
-  if extended & extblocks < 0 & verbose,
+lastt=fix((datalength/block-1)*block+1);
+BI=block*eye(ncomps,ncomps);
+delta=zeros(1,chans*ncomps);
+changes = [];
+degconst = 180./pi;
+startweights = weights;
+prevweights = startweights;
+oldweights = startweights;
+prevwtchange = zeros(chans,ncomps);
+oldwtchange = zeros(chans,ncomps);
+lrates = zeros(1,maxsteps);
+onesrow = ones(1,block);
+bias = zeros(ncomps,1);
+signs = ones(1,ncomps);    % initialize signs to nsub -1, rest +1
+for k=1:nsub
+    signs(k) = -1;
+end
+if extended & extblocks < 0 & verbose,
     fprintf('Fixed extended-ICA sign assignments:  ');
     for k=1:ncomps
-       fprintf('%d ',signs(k));	
+        fprintf('%d ',signs(k));
     end; fprintf('\n');
-  end
-  signs = diag(signs); % make a diagonal matrix
-  oldsigns = zeros(size(signs));;
-  signcount = 0;              % counter for same-signs
-  signcounts = [];
-  urextblocks = extblocks;    % original value, for resets
-  old_kk = zeros(1,ncomps);   % for kurtosis momemtum
+end
+signs = diag(signs); % make a diagonal matrix
+oldsigns = zeros(size(signs));;
+signcount = 0;              % counter for same-signs
+signcounts = [];
+urextblocks = extblocks;    % original value, for resets
+old_kk = zeros(1,ncomps);   % for kurtosis momemtum
 %
 %%%%%%%% ICA training loop using the logistic sigmoid %%%%%%%%%%%%%%%%%%%
 %
-  if verbose,
+if verbose,
     fprintf('Beginning ICA training ...');
     if extended,
         fprintf(' first training step may be slow ...\n');
     else
         fprintf('\n');
     end
-  end
-  step=0;
-  laststep=0; 
-  blockno = 1;  % running block counter for kurtosis interrupts
+end
+step=0;
+laststep=0;
+blockno = 1;  % running block counter for kurtosis interrupts
 
-  rand('state',sum(100*clock));  % set the random number generator state to
-                                 % a position dependent on the system clock
-  while step < maxsteps, %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-      permute=randperm(datalength); % shuffle data order at each step
+rand('state',sum(100*clock));  % set the random number generator state to
+                               % a position dependent on the system clock
 
-      for t=1:block:lastt, %%%%%%%%% ICA Training Block %%%%%%%%%%%%%%%%%%%
-          pause(0);
-          if ~isempty(get(0, 'currentfigure')) & strcmp(get(gcf, 'tag'), 'stop')
-              close; error('USER ABORT');
-          end;
-          if biasflag                                                   
-              u=weights*data(:,permute(t:t+block-1)) + bias*onesrow;      
-          else                                                             
-              u=weights*data(:,permute(t:t+block-1));                      
-          end                                                              
-          if ~extended
-              %%%%%%%%%%%%%%%%%%% Logistic ICA weight update %%%%%%%%%%%%%%%%%%%
-              y=1./(1+exp(-u));                                                %
-              weights = weights + lrate*(BI+(1-2*y)*u')*weights;               %
-              %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-          else % Tanh extended-ICA weight update
-               %%%%%%%%%%%%%%%%%%% Extended-ICA weight update %%%%%%%%%%%%%%%%%%%
-               y=tanh(u);                                                       %
-               weights = weights + lrate*(BI-signs*y*u'-u*u')*weights;          %
-               %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-          end
-          if biasflag 
-              if ~extended
-                  %%%%%%%%%%%%%%%%%%%%%%%% Logistic ICA bias %%%%%%%%%%%%%%%%%%%%%%%
-                  bias = bias + lrate*sum((1-2*y)')'; % for logistic nonlin. %
-                  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-              else % extended
-                   %%%%%%%%%%%%%%%%%%% Extended-ICA bias %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                   bias = bias + lrate*sum((-2*y)')';  % for tanh() nonlin.   %
-                   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-              end                                    
-          end
+%% Compute ICA Weights
+if biasflag & extended
+    while step < maxsteps, %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        timeperm=randperm(datalength); % shuffle data order at each step
 
-      if momentum > 0 %%%%%%%%% Add momentum %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        weights = weights + momentum*prevwtchange;                
-        prevwtchange = weights-prevweights;                      
-        prevweights = weights;                                  
-      end %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        for t=1:block:lastt, %%%%%%%%% ICA Training Block %%%%%%%%%%%%%%%%%%%
+            pause(0);
+            if ~isempty(get(0, 'currentfigure')) & strcmp(get(gcf, 'tag'), 'stop')
+                close; error('USER ABORT');
+            end
 
-      if max(max(abs(weights))) > MAX_WEIGHT
-          wts_blowup = 1;
-          change = nochange;
-      end
-      if extended & ~wts_blowup
-       %
-       %%%%%%%%%%% Extended-ICA kurtosis estimation %%%%%%%%%%%%%%%%%%%%%
-       %
-       if extblocks > 0 & rem(blockno,extblocks) == 0, 
-                                  % recompute signs vector using kurtosis
-        if kurtsize < frames % 12-22-99 rand() size suggestion by M. Spratling
-           rp = fix(rand(1,kurtsize)*datalength);  % pick random subset
-           % Accout for the possibility of a 0 generation by rand
-           ou = find(rp == 0);
-           while ~isempty(ou) % 1-11-00 suggestion by J. Foucher
-              rp(ou) = fix(rand(1,length(ou))*datalength);
-              ou = find(rp == 0);
-           end
-           partact=weights*data(:,rp(1:kurtsize));
-        else                                        % for small data sets,
-            partact=weights*data;                   % use whole data
-        end
-        m2=mean(partact'.^2).^2; 
-        m4= mean(partact'.^4);
-        kk= (m4./m2)-3.0;                           % kurtosis estimates
-        if extmomentum
-            kk = extmomentum*old_kk + (1.0-extmomentum)*kk; % use momentum
-            old_kk = kk;
-        end
-        signs=diag(sign(kk+signsbias));             % pick component signs
-        if signs == oldsigns,
-           signcount = signcount+1;
-        else
-           signcount = 0;
-        end
-        oldsigns = signs;
-        signcounts = [signcounts signcount];
-        if signcount >= SIGNCOUNT_THRESHOLD,
-         extblocks = fix(extblocks * SIGNCOUNT_STEP);% make kurt() estimation
-         signcount = 0;                             % less frequent if sign
-        end                                         % is not changing
-       end % extblocks > 0 & . . .
-      end % if extended %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-      blockno = blockno + 1;
-      if wts_blowup
-         break
-      end
-    end % training block %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            u=weights*data(:,timeperm(t:t+block-1)) + bias*onesrow;
+            y=tanh(u);                                                       
+            weights = weights + lrate*(BI-signs*y*u'-u*u')*weights;
+            bias = bias + lrate*sum((-2*y)')';  % for tanh() nonlin.
+            
+            if momentum > 0 %%%%%%%%% Add momentum %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                weights = weights + momentum*prevwtchange;
+                prevwtchange = weights-prevweights;
+                prevweights = weights;
+            end %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    if ~wts_blowup
-      oldwtchange = weights-oldweights;
-      step=step+1; 
-      %
-      %%%%%%% Compute and print weight and update angle changes %%%%%%%%%
-      %
-      lrates(1,step) = lrate;
-      angledelta=0.;
-      delta=reshape(oldwtchange,1,chans*ncomps);
-      change=delta*delta'; 
-    end
-    %
-    %%%%%%%%%%%%%%%%%%%%%% Restart if weights blow up %%%%%%%%%%%%%%%%%%%%
-    %
-    if wts_blowup | isnan(change)|isinf(change),  % if weights blow up,
-        fprintf('');
-        step = 0;                          % start again
-        change = nochange;
-        wts_blowup = 0;                    % re-initialize variables
-        blockno = 1;
-        lrate = lrate*DEFAULT_RESTART_FAC; % with lower learning rate
-        weights = startweights;            % and original weight matrix
-        oldweights = startweights;            
-        change = nochange;
-        oldwtchange = zeros(chans,ncomps);
-        delta=zeros(1,chans*ncomps);
-        olddelta = delta;
-        extblocks = urextblocks;
-        prevweights = startweights;
-        prevwtchange = zeros(chans,ncomps);
-        lrates = zeros(1,maxsteps);
-        bias = zeros(ncomps,1);
-        if extended
-           signs = ones(1,ncomps);    % initialize signs to nsub -1, rest +1
-           for k=1:nsub
-               signs(k) = -1;
-           end
-           signs = diag(signs); % make a diagonal matrix
-           oldsigns = zeros(size(signs));;
+            if max(max(abs(weights))) > MAX_WEIGHT
+                wts_blowup = 1;
+                change = nochange;
+            end
+            if ~wts_blowup
+                %
+                %%%%%%%%%%% Extended-ICA kurtosis estimation %%%%%%%%%%%%%%%%%%%%%
+                %while step < maxsteps
+                if extblocks > 0 & rem(blockno,extblocks) == 0,
+                    % recompute signs vector using kurtosis
+                    if kurtsize < frames % 12-22-99 rand() size suggestion by M. Spratling
+                        rp = fix(rand(1,kurtsize)*datalength);  % pick random subset
+                        % Accout for the possibility of a 0 generation by rand
+                        ou = find(rp == 0);
+                        while ~isempty(ou) % 1-11-00 suggestion by J. Foucher
+                            rp(ou) = fix(rand(1,length(ou))*datalength);
+                            ou = find(rp == 0);
+                        end
+                        partact=weights*data(:,rp(1:kurtsize));
+                    else                                        % for small data sets,
+                        partact=weights*data;                   % use whole data
+                    end
+                    m2=mean(partact'.^2).^2;
+                    m4= mean(partact'.^4);
+                    kk= (m4./m2)-3.0;                           % kurtosis estimates
+                    if extmomentum
+                        kk = extmomentum*old_kk + (1.0-extmomentum)*kk; % use momentum
+                        old_kk = kk;
+                    end
+                    signs=diag(sign(kk+signsbias));             % pick component signs
+                    if signs == oldsigns,
+                        signcount = signcount+1;
+                    else
+                        signcount = 0;
+                    end
+                    oldsigns = signs;
+                    signcounts = [signcounts signcount];
+                    if signcount >= SIGNCOUNT_THRESHOLD,
+                        extblocks = fix(extblocks * SIGNCOUNT_STEP);% make kurt() estimation
+                        signcount = 0;                             % less frequent if sign
+                    end                                         % is not changing
+                end % extblocks > 0 & . . .
+            end % if extended & ~wts_blowup %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            blockno = blockno + 1;
+            if wts_blowup
+                break
+            end
+        end % for t=1:block:lastt %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+        if ~wts_blowup
+            oldwtchange = weights-oldweights;
+            step=step+1;
+            %
+            %%%%%%% Compute and print weight and update angle changes %%%%%%%%%
+            %
+            lrates(1,step) = lrate;
+            angledelta=0.;
+            delta=reshape(oldwtchange,1,chans*ncomps);
+            change=delta*delta';
         end
-        if lrate> MIN_LRATE
-          r = rank(data);
-          if r<ncomps
-           fprintf('Data has rank %d. Cannot compute %d components.\n',...
-                                  r,ncomps);
-           return
-          else
-           fprintf(...
-            'Lowering learning rate to %g and starting again.\n',lrate);
-          end
-        else
-          fprintf( ...
-          'runica(): QUITTING - weight matrix may not be invertible!\n');
-          return;
+        %
+        %%%%%%%%%%%%%%%%%%%%%% Restart if weights blow up %%%%%%%%%%%%%%%%%%%%
+        %
+        if wts_blowup | isnan(change)|isinf(change),  % if weights blow up,
+            fprintf('');
+            step = 0;                          % start again
+            change = nochange;
+            wts_blowup = 0;                    % re-initialize variables
+            blockno = 1;
+            lrate = lrate*DEFAULT_RESTART_FAC; % with lower learning rate
+            weights = startweights;            % and original weight matrix
+            oldweights = startweights;
+            change = nochange;
+            oldwtchange = zeros(chans,ncomps);
+            delta=zeros(1,chans*ncomps);
+            olddelta = delta;
+            extblocks = urextblocks;
+            prevweights = startweights;
+            prevwtchange = zeros(chans,ncomps);
+            lrates = zeros(1,maxsteps);
+            bias = zeros(ncomps,1);
+
+            signs = ones(1,ncomps);    % initialize signs to nsub -1, rest +1
+            for k=1:nsub
+                signs(k) = -1;
+            end
+            signs = diag(signs); % make a diagonal matrix
+            oldsigns = zeros(size(signs));;
+
+            if lrate> MIN_LRATE
+                r = rank(data);
+                if r<ncomps
+                    fprintf('Data has rank %d. Cannot compute %d components.\n',...
+                        r,ncomps);
+                    return
+                else
+                    fprintf(...
+                        'Lowering learning rate to %g and starting again.\n',lrate);
+                end
+            else
+                fprintf( ...
+                    'runica(): QUITTING - weight matrix may not be invertible!\n');
+                return;
+            end
+        else % if weights in bounds
+            %
+            %%%%%%%%%%%%% Print weight update information %%%%%%%%%%%%%%%%%%%%%%
+            %
+            if step> 2
+                angledelta=acos((delta*olddelta')/sqrt(change*oldchange));
+            end
+            if verbose,
+                places = -floor(log10(nochange));
+                if step > 2
+                   ps = sprintf('step %d - lrate %5f, wchange %%%d.%df, angledelta %4.1f deg, %d subgauss\n',...
+                        step,      lrate,        degconst*angledelta,...
+                        places+1,places,           (ncomps-sum(diag(signs)))/2);
+                else
+                    ps = sprintf('step %d - lrate %5f, wchange %%%d.%df, %d subgauss\n',...
+                        step,      lrate,        places+1,places, (ncomps-sum(diag(signs)))/2);
+                end % step > 2
+                fprintf('step %d - lrate %5f, wchange %8.8f, angledelta %4.1f deg\n', ...
+                    step,      lrate,     change, degconst*angledelta);
+                % fprintf(ps,change);  % <---- BUG !!!!
+            end; % if verbose
+            %
+            %%%%%%%%%%%%%%%%%%%% Save current values %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            %
+            changes = [changes change];
+            oldweights = weights;
+            %
+            %%%%%%%%%%%%%%%%%%%% Anneal learning rate %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            %
+            if degconst*angledelta > annealdeg,
+                lrate = lrate*annealstep;          % anneal learning rate
+                olddelta   = delta;                % accumulate angledelta until
+                oldchange  = change;               %  annealdeg is reached
+            elseif step == 1                     % on first step only
+                olddelta   = delta;                % initialize
+                oldchange  = change;
+            end
+            %
+            %%%%%%%%%%%%%%%%%%%% Apply stopping rule %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            %
+            if step >2 & change < nochange,      % apply stopping rule
+                laststep=step;
+                step=maxsteps;                  % stop when weights stabilize
+            elseif change > DEFAULT_BLOWUP,      % if weights blow up,
+                lrate=lrate*DEFAULT_BLOWUP_FAC;    % keep trying
+            end;                                 % with a smaller learning rate
+        end; % end if weights in bounds
+
+    end; % end while step < maxsteps (ICA Training) %%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+end
+%% Compute ICA Weights
+if biasflag & ~extended
+    while step < maxsteps, %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        timeperm=randperm(datalength); % shuffle data order at each step
+
+        for t=1:block:lastt, %%%%%%%%% ICA Training Block %%%%%%%%%%%%%%%%%%%
+            pause(0);
+            if ~isempty(get(0, 'currentfigure')) & strcmp(get(gcf, 'tag'), 'stop')
+                close; error('USER ABORT');
+            end;
+            
+            u=weights*data(:,timeperm(t:t+block-1)) + bias*onesrow;
+            y=1./(1+exp(-u));                                                
+            weights = weights + lrate*(BI+(1-2*y)*u')*weights;               
+            bias = bias + lrate*sum((1-2*y)')'; % for logistic nonlin. %
+               
+            if momentum > 0 %%%%%%%%% Add momentum %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                weights = weights + momentum*prevwtchange;
+                prevwtchange = weights-prevweights;
+                prevweights = weights;
+            end %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+            if max(max(abs(weights))) > MAX_WEIGHT
+                wts_blowup = 1;
+                change = nochange;
+            end
+            blockno = blockno + 1;
+            if wts_blowup
+                break
+            end
+        end % for t=1:block:lastt %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+        if ~wts_blowup
+            oldwtchange = weights-oldweights;
+            step=step+1;
+            %
+            %%%%%%% Compute and print weight and update angle changes %%%%%%%%%
+            %
+            lrates(1,step) = lrate;
+            angledelta=0.;
+            delta=reshape(oldwtchange,1,chans*ncomps);
+            change=delta*delta';
         end
-    else % if weights in bounds 
-     %
-     %%%%%%%%%%%%% Print weight update information %%%%%%%%%%%%%%%%%%%%%%
-     %
-     if step> 2 
-         angledelta=acos((delta*olddelta')/sqrt(change*oldchange));
-     end
-     if verbose,
-      places = -floor(log10(nochange));
-      if step > 2, 
-          if ~extended,
-           ps = sprintf('step %d - lrate %5f, wchange %%%d.%df, angledelta %4.1f deg\n', ...
+        %
+        %%%%%%%%%%%%%%%%%%%%%% Restart if weights blow up %%%%%%%%%%%%%%%%%%%%
+        %
+        if wts_blowup | isnan(change)|isinf(change),  % if weights blow up,
+            fprintf('');
+            step = 0;                          % start again
+            change = nochange;
+            wts_blowup = 0;                    % re-initialize variables
+            blockno = 1;
+            lrate = lrate*DEFAULT_RESTART_FAC; % with lower learning rate
+            weights = startweights;            % and original weight matrix
+            oldweights = startweights;
+            change = nochange;
+            oldwtchange = zeros(chans,ncomps);
+            delta=zeros(1,chans*ncomps);
+            olddelta = delta;
+            extblocks = urextblocks;
+            prevweights = startweights;
+            prevwtchange = zeros(chans,ncomps);
+            lrates = zeros(1,maxsteps);
+            bias = zeros(ncomps,1);
+            if lrate> MIN_LRATE
+                r = rank(data);
+                if r<ncomps
+                    fprintf('Data has rank %d. Cannot compute %d components.\n',...
+                        r,ncomps);
+                    return
+                else
+                    fprintf(...
+                        'Lowering learning rate to %g and starting again.\n',lrate);
+                end
+            else
+                fprintf( ...
+                    'runica(): QUITTING - weight matrix may not be invertible!\n');
+                return;
+            end
+        else % if weights in bounds
+            %
+            %%%%%%%%%%%%% Print weight update information %%%%%%%%%%%%%%%%%%%%%%
+            %
+            if step> 2
+                angledelta=acos((delta*olddelta')/sqrt(change*oldchange));
+            end
+            if verbose,
+                places = -floor(log10(nochange));
+                if step > 2
+                   ps = sprintf('step %d - lrate %5f, wchange %%%d.%df, angledelta %4.1f deg\n', ...
                        step,      lrate,        places+1,places,   degconst*angledelta);
-          else
-           ps = sprintf('step %d - lrate %5f, wchange %%%d.%df, angledelta %4.1f deg, %d subgauss\n',...
-                       step,      lrate,        degconst*angledelta,...
-                                                     places+1,places,           (ncomps-sum(diag(signs)))/2);
-          end
-      elseif ~extended
-         ps = sprintf('step %d - lrate %5f, wchange %%%d.%df\n',...
-                     step,      lrate,       places+1,places  );
-      else
-         ps = sprintf('step %d - lrate %5f, wchange %%%d.%df, %d subgauss\n',...
-                     step,      lrate,        places+1,places, (ncomps-sum(diag(signs)))/2);
-      end % step > 2
-      fprintf('step %d - lrate %5f, wchange %8.8f, angledelta %4.1f deg\n', ...
-                       step,      lrate,     change, degconst*angledelta);
-      % fprintf(ps,change);  % <---- BUG !!!!
-     end; % if verbose
-  %
-  %%%%%%%%%%%%%%%%%%%% Save current values %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  %
-      changes = [changes change];
-      oldweights = weights;
-  %
-  %%%%%%%%%%%%%%%%%%%% Anneal learning rate %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  %
-      if degconst*angledelta > annealdeg,  
-        lrate = lrate*annealstep;          % anneal learning rate
-        olddelta   = delta;                % accumulate angledelta until
-        oldchange  = change;               %  annealdeg is reached
-      elseif step == 1                     % on first step only
-        olddelta   = delta;                % initialize 
-        oldchange  = change;               
-      end
-  %
-  %%%%%%%%%%%%%%%%%%%% Apply stopping rule %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  %
-      if step >2 & change < nochange,      % apply stopping rule
-        laststep=step;            
-           step=maxsteps;                  % stop when weights stabilize
-      elseif change > DEFAULT_BLOWUP,      % if weights blow up,
-        lrate=lrate*DEFAULT_BLOWUP_FAC;    % keep trying 
-      end;                                 % with a smaller learning rate
-    end; % end if weights in bounds
+                else
+                    ps = sprintf('step %d - lrate %5f, wchange %%%d.%df\n',...
+                        step,      lrate,       places+1,places  );
+                end % step > 2
+                fprintf('step %d - lrate %5f, wchange %8.8f, angledelta %4.1f deg\n', ...
+                    step,      lrate,     change, degconst*angledelta);
+                % fprintf(ps,change);  % <---- BUG !!!!
+            end; % if verbose
+            %
+            %%%%%%%%%%%%%%%%%%%% Save current values %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            %
+            changes = [changes change];
+            oldweights = weights;
+            %
+            %%%%%%%%%%%%%%%%%%%% Anneal learning rate %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            %
+            if degconst*angledelta > annealdeg,
+                lrate = lrate*annealstep;          % anneal learning rate
+                olddelta   = delta;                % accumulate angledelta until
+                oldchange  = change;               %  annealdeg is reached
+            elseif step == 1                     % on first step only
+                olddelta   = delta;                % initialize
+                oldchange  = change;
+            end
+            %
+            %%%%%%%%%%%%%%%%%%%% Apply stopping rule %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            %
+            if step >2 & change < nochange,      % apply stopping rule
+                laststep=step;
+                step=maxsteps;                  % stop when weights stabilize
+            elseif change > DEFAULT_BLOWUP,      % if weights blow up,
+                lrate=lrate*DEFAULT_BLOWUP_FAC;    % keep trying
+            end;                                 % with a smaller learning rate
+        end; % end if weights in bounds
 
-  end; % end ICA training %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    end; % end while step < maxsteps (ICA Training) %%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+end
+%% Compute ICA Weights
+if ~biasflag & extended
+    while step < maxsteps, %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        timeperm=randperm(datalength); % shuffle data order at each step
 
+        for t=1:block:lastt, %%%%%%%%% ICA Training Block %%%%%%%%%%%%%%%%%%%
+            pause(0);
+            if ~isempty(get(0, 'currentfigure')) & strcmp(get(gcf, 'tag'), 'stop')
+                close; error('USER ABORT');
+            end
+            
+            u=weights*data(:,timeperm(t:t+block-1));
+            y=tanh(u);                                                       %
+            weights = weights + lrate*(BI-signs*y*u'-u*u')*weights;
+
+            if momentum > 0 %%%%%%%%% Add momentum %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                weights = weights + momentum*prevwtchange;
+                prevwtchange = weights-prevweights;
+                prevweights = weights;
+            end %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+            if max(max(abs(weights))) > MAX_WEIGHT
+                wts_blowup = 1;
+                change = nochange;
+            end
+            if ~wts_blowup
+                %
+                %%%%%%%%%%% Extended-ICA kurtosis estimation %%%%%%%%%%%%%%%%%%%%%
+                %while step < maxsteps
+                if extblocks > 0 & rem(blockno,extblocks) == 0,
+                    % recompute signs vector using kurtosis
+                    if kurtsize < frames % 12-22-99 rand() size suggestion by M. Spratling
+                        rp = fix(rand(1,kurtsize)*datalength);  % pick random subset
+                        % Accout for the possibility of a 0 generation by rand
+                        ou = find(rp == 0);
+                        while ~isempty(ou) % 1-11-00 suggestion by J. Foucher
+                            rp(ou) = fix(rand(1,length(ou))*datalength);
+                            ou = find(rp == 0);
+                        end
+                        partact=weights*data(:,rp(1:kurtsize));
+                    else                                        % for small data sets,
+                        partact=weights*data;                   % use whole data
+                    end
+                    m2=mean(partact'.^2).^2;
+                    m4= mean(partact'.^4);
+                    kk= (m4./m2)-3.0;                           % kurtosis estimates
+                    if extmomentum
+                        kk = extmomentum*old_kk + (1.0-extmomentum)*kk; % use momentum
+                        old_kk = kk;
+                    end
+                    signs=diag(sign(kk+signsbias));             % pick component signs
+                    if signs == oldsigns,
+                        signcount = signcount+1;
+                    else
+                        signcount = 0;
+                    end
+                    oldsigns = signs;
+                    signcounts = [signcounts signcount];
+                    if signcount >= SIGNCOUNT_THRESHOLD,
+                        extblocks = fix(extblocks * SIGNCOUNT_STEP);% make kurt() estimation
+                        signcount = 0;                             % less frequent if sign
+                    end                                         % is not changing
+                end % extblocks > 0 & . . .
+            end % if ~wts_blowup %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            blockno = blockno + 1;
+            if wts_blowup
+                break
+            end
+        end % for t=1:block:lastt %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+        if ~wts_blowup
+            oldwtchange = weights-oldweights;
+            step=step+1;
+            %
+            %%%%%%% Compute and print weight and update angle changes %%%%%%%%%
+            %
+            lrates(1,step) = lrate;
+            angledelta=0.;
+            delta=reshape(oldwtchange,1,chans*ncomps);
+            change=delta*delta';
+        end
+        %
+        %%%%%%%%%%%%%%%%%%%%%% Restart if weights blow up %%%%%%%%%%%%%%%%%%%%
+        %
+        if wts_blowup | isnan(change)|isinf(change),  % if weights blow up,
+            fprintf('');
+            step = 0;                          % start again
+            change = nochange;
+            wts_blowup = 0;                    % re-initialize variables
+            blockno = 1;
+            lrate = lrate*DEFAULT_RESTART_FAC; % with lower learning rate
+            weights = startweights;            % and original weight matrix
+            oldweights = startweights;
+            change = nochange;
+            oldwtchange = zeros(chans,ncomps);
+            delta=zeros(1,chans*ncomps);
+            olddelta = delta;
+            extblocks = urextblocks;
+            prevweights = startweights;
+            prevwtchange = zeros(chans,ncomps);
+            lrates = zeros(1,maxsteps);
+            bias = zeros(ncomps,1);
+            signs = ones(1,ncomps);    % initialize signs to nsub -1, rest +1
+            for k=1:nsub
+                signs(k) = -1;
+            end
+            signs = diag(signs); % make a diagonal matrix
+            oldsigns = zeros(size(signs));
+            if lrate> MIN_LRATE
+                r = rank(data);
+                if r<ncomps
+                    fprintf('Data has rank %d. Cannot compute %d components.\n',...
+                        r,ncomps);
+                    return
+                else
+                    fprintf(...
+                        'Lowering learning rate to %g and starting again.\n',lrate);
+                end
+            else
+                fprintf( ...
+                    'runica(): QUITTING - weight matrix may not be invertible!\n');
+                return;
+            end
+        else % if weights in bounds
+            %
+            %%%%%%%%%%%%% Print weight update information %%%%%%%%%%%%%%%%%%%%%%
+            %
+            if step> 2
+                angledelta=acos((delta*olddelta')/sqrt(change*oldchange));
+            end
+            if verbose,
+                places = -floor(log10(nochange));
+                if step > 2
+                    ps = sprintf('step %d - lrate %5f, wchange %%%d.%df, angledelta %4.1f deg, %d subgauss\n',...
+                        step,      lrate,        degconst*angledelta,...
+                        places+1,places,           (ncomps-sum(diag(signs)))/2);
+                else
+                    ps = sprintf('step %d - lrate %5f, wchange %%%d.%df, %d subgauss\n',...
+                        step,      lrate,        places+1,places, (ncomps-sum(diag(signs)))/2);
+                end % step > 2
+                fprintf('step %d - lrate %5f, wchange %8.8f, angledelta %4.1f deg\n', ...
+                    step,      lrate,     change, degconst*angledelta);
+                % fprintf(ps,change);  % <---- BUG !!!!
+            end; % if verbose
+            %
+            %%%%%%%%%%%%%%%%%%%% Save current values %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            %
+            changes = [changes change];
+            oldweights = weights;
+            %
+            %%%%%%%%%%%%%%%%%%%% Anneal learning rate %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            %
+            if degconst*angledelta > annealdeg,
+                lrate = lrate*annealstep;          % anneal learning rate
+                olddelta   = delta;                % accumulate angledelta until
+                oldchange  = change;               %  annealdeg is reached
+            elseif step == 1                     % on first step only
+                olddelta   = delta;                % initialize
+                oldchange  = change;
+            end
+            %
+            %%%%%%%%%%%%%%%%%%%% Apply stopping rule %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            %
+            if step >2 & change < nochange,      % apply stopping rule
+                laststep=step;
+                step=maxsteps;                  % stop when weights stabilize
+            elseif change > DEFAULT_BLOWUP,      % if weights blow up,
+                lrate=lrate*DEFAULT_BLOWUP_FAC;    % keep trying
+            end;                                 % with a smaller learning rate
+        end; % end if weights in bounds
+
+    end; % end while step < maxsteps (ICA Training) %%%%%%%%%%%%%%%%%%%%%%%%%
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Compute ICA Weights
+if ~biasflag & ~extended
+    while step < maxsteps, %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        timeperm=randperm(datalength); % shuffle data order at each step
+
+        for t=1:block:lastt, %%%%%%%%% ICA Training Block %%%%%%%%%%%%%%%%%%%
+            pause(0);
+            if ~isempty(get(0, 'currentfigure')) & strcmp(get(gcf, 'tag'), 'stop')
+                close; error('USER ABORT');
+            end;
+            u=weights*data(:,timeperm(t:t+block-1));
+            y=1./(1+exp(-u));                                                %
+            weights = weights + lrate*(BI+(1-2*y)*u')*weights;
+
+            if momentum > 0 %%%%%%%%% Add momentum %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                weights = weights + momentum*prevwtchange;
+                prevwtchange = weights-prevweights;
+                prevweights = weights;
+            end %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+            if max(max(abs(weights))) > MAX_WEIGHT
+                wts_blowup = 1;
+                change = nochange;
+            end
+            
+            blockno = blockno + 1;
+            if wts_blowup
+                break
+            end
+        end % for t=1:block:lastt %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+        if ~wts_blowup
+            oldwtchange = weights-oldweights;
+            step=step+1;
+            %
+            %%%%%%% Compute and print weight and update angle changes %%%%%%%%%
+            %
+            lrates(1,step) = lrate;
+            angledelta=0.;
+            delta=reshape(oldwtchange,1,chans*ncomps);
+            change=delta*delta';
+        end
+        %
+        %%%%%%%%%%%%%%%%%%%%%% Restart if weights blow up %%%%%%%%%%%%%%%%%%%%
+        %
+        if wts_blowup | isnan(change)|isinf(change),  % if weights blow up,
+            fprintf('');
+            step = 0;                          % start again
+            change = nochange;
+            wts_blowup = 0;                    % re-initialize variables
+            blockno = 1;
+            lrate = lrate*DEFAULT_RESTART_FAC; % with lower learning rate
+            weights = startweights;            % and original weight matrix
+            oldweights = startweights;
+            change = nochange;
+            oldwtchange = zeros(chans,ncomps);
+            delta=zeros(1,chans*ncomps);
+            olddelta = delta;
+            extblocks = urextblocks;
+            prevweights = startweights;
+            prevwtchange = zeros(chans,ncomps);
+            lrates = zeros(1,maxsteps);
+            bias = zeros(ncomps,1);
+            
+            if lrate> MIN_LRATE
+                r = rank(data);
+                if r<ncomps
+                    fprintf('Data has rank %d. Cannot compute %d components.\n',...
+                        r,ncomps);
+                    return
+                else
+                    fprintf(...
+                        'Lowering learning rate to %g and starting again.\n',lrate);
+                end
+            else
+                fprintf( ...
+                    'runica(): QUITTING - weight matrix may not be invertible!\n');
+                return;
+            end
+        else % if weights in bounds
+            %
+            %%%%%%%%%%%%% Print weight update information %%%%%%%%%%%%%%%%%%%%%%
+            %
+            if step> 2
+                angledelta=acos((delta*olddelta')/sqrt(change*oldchange));
+            end
+            if verbose,
+                places = -floor(log10(nochange));
+                if step > 2
+                    ps = sprintf('step %d - lrate %5f, wchange %%%d.%df, angledelta %4.1f deg\n', ...
+                            step,      lrate,        places+1,places,   degconst*angledelta);
+                else
+                    ps = sprintf('step %d - lrate %5f, wchange %%%d.%df\n',...
+                        step,      lrate,       places+1,places  );
+                end % step > 2
+                fprintf('step %d - lrate %5f, wchange %8.8f, angledelta %4.1f deg\n', ...
+                    step,      lrate,     change, degconst*angledelta);
+                % fprintf(ps,change);  % <---- BUG !!!!
+            end; % if verbose
+            %
+            %%%%%%%%%%%%%%%%%%%% Save current values %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            %
+            changes = [changes change];
+            oldweights = weights;
+            %
+            %%%%%%%%%%%%%%%%%%%% Anneal learning rate %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            %
+            if degconst*angledelta > annealdeg,
+                lrate = lrate*annealstep;          % anneal learning rate
+                olddelta   = delta;                % accumulate angledelta until
+                oldchange  = change;               %  annealdeg is reached
+            elseif step == 1                     % on first step only
+                olddelta   = delta;                % initialize
+                oldchange  = change;
+            end
+            %
+            %%%%%%%%%%%%%%%%%%%% Apply stopping rule %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            %
+            if step >2 & change < nochange,      % apply stopping rule
+                laststep=step;
+                step=maxsteps;                  % stop when weights stabilize
+            elseif change > DEFAULT_BLOWUP,      % if weights blow up,
+                lrate=lrate*DEFAULT_BLOWUP_FAC;    % keep trying
+            end;                                 % with a smaller learning rate
+        end; % end if weights in bounds
+
+    end; % end while step < maxsteps (ICA Training) %%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+end
+%% Finalize Computed Data for Output
+  
   if ~laststep
     laststep = step;
   end;
