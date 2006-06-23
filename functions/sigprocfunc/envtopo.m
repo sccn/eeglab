@@ -109,6 +109,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.120  2006/06/23 01:55:34  toby
+% bug fix for data with rejected components
+%
 % Revision 1.119  2006/03/22 20:56:57  toby
 % Jean Hausser's bug fixes
 %
@@ -1087,8 +1090,8 @@ if length(g.limits) == 4
      end
 else
   ylimset = 0; % flag whether hard limits have been set by the user
-  ymin = min(min(g.icawinv*g.icaact(g.plotchans,pframes))); % begin by setting limits from plotted data
-  ymax = max(max(g.icawinv*g.icaact(g.plotchans,pframes)));
+  ymin = min(min(g.icawinv(g.plotchans,:)*g.icaact(:,pframes))); % begin by setting limits from plotted data
+  ymax = max(max(g.icawinv(g.plotchans,:)*g.icaact(:,pframes)));
 end
 
 fprintf('    Plot limits (sec, sec, uV, uV) [%g,%g,%g,%g]\n\n',xmin,xmax, ymin,ymax);
