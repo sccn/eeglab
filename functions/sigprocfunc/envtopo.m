@@ -109,6 +109,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.119  2006/03/22 20:56:57  toby
+% Jean Hausser's bug fixes
+%
 % Revision 1.118  2006/03/13 00:12:20  scott
 % debugged default subtraction of other comps if 'compnums' specified -sm
 %
@@ -849,7 +852,7 @@ maxproj = zeros(chans,ncomps);
 % first, plot the data envelope
 %
 envdata = zeros(2,frames*(ncomps+1));
-envdata(:,1:frames) = envelope(g.icawinv*g.icaact(g.plotchans,:), g.envmode); 
+envdata(:,1:frames) = envelope(g.icawinv(g.plotchans,:)*g.icaact, g.envmode); 
 
 fprintf('Data epoch is from %.0f ms to %.0f ms.\n',1000*xmin,1000*xmax);
 fprintf('Plotting data from %.0f ms to %.0f ms.\n',1000*xmin,1000*xmax);
