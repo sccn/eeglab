@@ -92,6 +92,8 @@ function ALLEEG = std_loadalleeg(varargin)
         elseif exist( fullfile(genpath, sub2, datasets{dset}))    
             [tmpp tmpf ext] = fileparts(fullfile(genpath, sub2, datasets{dset}));
             EEG = pop_loadset([tmpf ext], tmpp, 'info');
+        elseif exist(lower(fullfile(char(paths{dset}), datasets{dset})))    
+            EEG = pop_loadset(lower(datasets{dset}), lower(char(paths{dset})), 'info');
         else
             error(sprintf('Dataset ''%s'' not found', fullfile(char(paths{dset}), datasets{dset})));
         end;
