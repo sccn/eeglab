@@ -23,7 +23,11 @@
 % Usage: 
 %        >> [ersp,itc,powbase,times,freqs,erspboot,itcboot] = ...
 %                      timef(data,frames,tlimits,srate,cycles,...
-%                                'key1',value1,'key2',value2, ... );        
+%                                'key1',value1,'key2',value2, ... ); 
+% Usage with ALLEEG structure:
+%        >> [ersp,itc,powbase,times,freqs,erspboot,itcboot] = ...
+%           newtimef({ALLEEG(1).data ALLEEG(2).data},ALLEEG(1).pnts, ...
+%           [ALLEEG(1).xmin ALLEEG(1).xmax]*1000,ALLEEG(1).srate,4);
 % NOTE:                                        
 %        >> timef details  % scrolls more detailed argument information 
 %           % timef() also computes multitaper transforms
@@ -210,6 +214,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.82  2006/05/05 16:15:01  arno
+% implementing cycle array
+%
 % Revision 1.80  2006/04/18 15:43:47  scott
 % text edits
 %
@@ -1046,17 +1053,17 @@ if iscell(X)
         end;
       end;
     end;
-    if size(g.title,1) >= 2 %Changed that part because providing titles
+    if iscell(g.title) & lenth(g.title) >= 2 %Changed that part because providing titles
                             %as cells caused the function to crash at
                             %line at line 704 (g.tlimits = tlimits) -Jean
-      if size(g.title,1) == 2,
-        g.title(3,1:length('Condition 1 - condition 2')) = ...
+      if length(g.title) == 2,
+        g.title{3,1:length('Condition 1 - condition 2')} = ...
             'Condition 1 - Condition 2';
       end;
     else
-      g.title(1,:) = 'Condition 1';
-      g.title(2,:) = 'Condition 2';
-      g.title(3,1:24) = 'Condition 1 - Condition 2';
+      g.title{1} = 'Condition 1';
+      g.title{2} = 'Condition 2';
+      g.title{3} = 'Condition 1 - Condition 2';
     end;
     
     verboseprintf(g.verbose, 'Running newtimef on condition 1 *********************\n');
@@ -1110,12 +1117,12 @@ if iscell(X)
             g.itcmax  = max( max(max(abs(Rboot1))), max(max(abs(Rboot2))) );
         end;
             
-        subplot(1,3,1); g.title = g.titleall(1,:); 
+        subplot(1,3,1); g.title = g.titleall{1}; 
         g = plottimef(P1, R1, Pboot1, Rboot1, mean(X{1},2), freqs, timesout, mbase, g);
         g.itcavglim = [];
-        subplot(1,3,2); g.title = g.titleall(2,:); 
+        subplot(1,3,2); g.title = g.titleall{2}; 
         plottimef(P2, R2, Pboot2, Rboot2, mean(X{2},2), freqs, timesout, mbase, g);
-        subplot(1,3,3); g.title = g.titleall(3,:);
+        subplot(1,3,3); g.title = g.titleall{3};
     end;
     
     if isnan(g.alpha)
