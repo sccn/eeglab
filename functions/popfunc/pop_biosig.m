@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2006/04/19 14:54:21  arno
+% EDF continous files
+%
 % Revision 1.12  2006/01/25 21:11:29  arno
 % fixing 2 typos
 %
@@ -215,7 +218,7 @@ EEG = eeg_checkset(EEG);
 disp('Extracting events...');
 if ~isempty(dat.EVENT)
     EEG.event = biosig2eeglabevent(dat.EVENT);
-    if strcmpi(g.rmeventchan, 'on') & strcmpi(dat.TYPE, 'BDF')
+    if strcmpi(g.rmeventchan, 'on') & strcmpi(dat.TYPE, 'BDF') & isfield(dat, 'BDF')
         disp('Removing event channel...');
         EEG.data(dat.BDF.Status,:) = [];
         EEG.nbchan = size(EEG.data,1);
