@@ -88,6 +88,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2005/09/27 22:10:29  arno
+% Dataset name if only 2 datasets
+%
 % Revision 1.32  2005/03/31 17:51:42  arno
 % debugging scott error message
 %
@@ -452,6 +455,7 @@ if ~isempty(g.lowpass)
     end;
 end;
 if strcmpi(g.geom, 'array') | flag == 0, chanlocs = []; end;
+if ~isfield(chanlocs, 'theta'), chanlocs = []; end;
 
 % select time range
 % -----------------

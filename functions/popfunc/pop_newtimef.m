@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.38  2006/01/31 20:52:59  arno
+% eeglab otpiosn
+%
 % Revision 1.37  2005/09/27 22:06:07  arno
 % better history
 %
@@ -242,7 +245,7 @@ if popup
 	
     % add topoplot
     % ------------
-    if ~isempty(EEG.chanlocs)
+    if isfield(EEG.chanlocs, 'theta')
         if ~isfield(EEG, 'chaninfo'), EEG.chaninfo = []; end;
         if typeproc == 1
             options = [options ', ''topovec'', ' int2str(num) ...
