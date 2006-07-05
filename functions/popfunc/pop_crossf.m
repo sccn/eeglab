@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2006/01/31 20:17:27  arno
+% options
+%
 % Revision 1.34  2005/11/10 23:36:24  arno
 % remove comment
 %
@@ -220,7 +223,7 @@ if popup
 	
     % add topoplot
     % ------------
-	if ~isempty(EEG.chanlocs)
+	if isfield(EEG.chanlocs, 'theta')
         if ~isfield(EEG, 'chaninfo'), EEG.chaninfo = []; end;
 		if typeproc == 1
 			options = [options ', ''topovec'', [' int2str([num1 num2]) ...
