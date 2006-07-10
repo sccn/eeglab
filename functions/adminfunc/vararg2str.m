@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2005/09/27 22:02:35  arno
+% concatenating lines
+%
 % Revision 1.15  2005/08/05 17:08:13  arno
 % fixing structure to string for Matlab
 % 7
