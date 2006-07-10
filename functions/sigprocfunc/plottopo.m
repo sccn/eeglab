@@ -65,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.40  2006/03/09 17:20:39  arno
+% stefan's changes
+%
 % Revision 1.39  2005/11/16 22:01:41  toby
 % Edited vertical patch bars to be transparent for indicating regions of interest
 % so that the plots will be visible underneath. Another solution would have been to
@@ -655,10 +658,11 @@ end
 % xvals = 0.5+PLOT_WIDTH*xvals;   % controls width of  plot array on page!
 % yvals = 0.5+PLOT_HEIGHT*yvals;  % controls height of plot array on page!
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-xvals = (xvals-mean([max(xvals) min(xvals)]))/(max(xvals)-min(xvals)); % recenter
-xvals = gcapos(1)+gcapos(3)/2+PLOT_WIDTH*xvals;   % controls width of plot 
-                                                  % array on current axes
+if length(xvals) > 1
+    xvals = (xvals-mean([max(xvals) min(xvals)]))/(max(xvals)-min(xvals)); % recenter
+    xvals = gcapos(1)+gcapos(3)/2+PLOT_WIDTH*xvals;   % controls width of plot 
+                                                      % array on current axes
+end;
 yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot 
                                                   % array on current axes
 %
@@ -749,9 +753,9 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
         
         if isempty(g.vert)
             g.vert = [xmin xmax];
-%            ymean = (ymin+ymax)/2; 
-%            vmin = ymean-0.1*(ymean-ymin);
-%            vmax = vmin*-1;  %ymean+0.2*(ymax-ymean);
+            ymean = (ymin+ymax)/2; 
+            vmin = ymean-0.1*(ymean-ymin);
+            vmax = vmin*-1;  %ymean+0.2*(ymax-ymean);
         elseif ~isnan(g.vert)
            ymean = (ymin+ymax)/2; 
            vmin = ymean-0.1*(ymean-ymin);
