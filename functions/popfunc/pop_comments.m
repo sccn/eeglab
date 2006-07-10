@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2006/07/10 20:15:39  arno
+% fixing empty comment problem
+%
 % Revision 1.15  2005/11/04 17:56:02  arno
 % fixing closing several windows
 %
@@ -202,7 +205,7 @@ if nargout > 1
         else
             allsame = 0;
         end;
-        if allsame & ~isempty(EEG.comments)
+        if allsame & ~isempty(comments)
              com =sprintf('EEG.comments = pop_comments(EEG.comments, '''', %s, 1);', vararg2str(newcomments(index+1:end,:)));
         else 
             com =sprintf('EEG.comments = pop_comments('''', '''', %s);', vararg2str(newcomments));     
