@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2005/11/04 17:56:02  arno
+% fixing closing several windows
+%
 % Revision 1.14  2005/09/27 22:01:28  arno
 % fix multiline text for windows
 %
@@ -199,7 +202,7 @@ if nargout > 1
         else
             allsame = 0;
         end;
-        if allsame
+        if allsame & ~isempty(EEG.comments)
              com =sprintf('EEG.comments = pop_comments(EEG.comments, '''', %s, 1);', vararg2str(newcomments(index+1:end,:)));
         else 
             com =sprintf('EEG.comments = pop_comments('''', '''', %s);', vararg2str(newcomments));     
