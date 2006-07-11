@@ -34,6 +34,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2004/07/29 19:00:17  arno
+% saving as double
+% .,
+%
 % Revision 1.3  2003/05/22 15:04:30  arno
 % header typo
 %
@@ -78,6 +82,6 @@ else
 end;
 save(filename, '-ascii', 'tmpmat');
 
-com = sprintf('EEG = pop_expica(%s, ''%s'', ''%s'');', inputname(1), whichica, filename); 
+com = sprintf('pop_expica(%s, ''%s'', ''%s'');', inputname(1), whichica, filename); 
 
 return;
