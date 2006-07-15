@@ -191,7 +191,11 @@
 %                 Shows projection on grand mean coherence vector at each latency
 %                 and trial. {default: no}
 
+%% LOG COMMENTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % $Log: not supported by cvs2svn $
+% Revision 1.258  2006/07/15 01:05:26  toby
+% Smart indent, created programming cells
+%
 % Revision 1.257  2006/05/14 20:10:29  toby
 % bug fix
 %
@@ -1146,7 +1150,7 @@ if nargin < 6
     decfactor = 0;
 end
 if nargin < 5
-    avewidth = 0;
+    avewidth = DEFAULT_AVEWIDTH;
 end
 if nargin<4
     titl = ''; % default no title
