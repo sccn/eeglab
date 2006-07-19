@@ -26,7 +26,7 @@
 %                                'key1',value1,'key2',value2, ... ); 
 % Usage with ALLEEG structure:
 %        >> [ersp,itc,powbase,times,freqs,erspboot,itcboot] = ...
-%           newtimef({ALLEEG(1).data ALLEEG(2).data},ALLEEG(1).pnts, ...
+%           newtimef({ALLEEG(1).data(37,:,:) ALLEEG(2).data(37,:,:)},ALLEEG(1).pnts, ...
 %           [ALLEEG(1).xmin ALLEEG(1).xmax]*1000,ALLEEG(1).srate,4);
 % NOTE:                                        
 %        >> timef details  % scrolls more detailed argument information 
@@ -214,6 +214,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.83  2006/06/28 01:54:32  toby
+% Bug fix, help section edit
+%
 % Revision 1.82  2006/05/05 16:15:01  arno
 % implementing cycle array
 %
