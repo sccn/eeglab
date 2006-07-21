@@ -163,6 +163,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.273  2006/07/21 02:44:48  toby
+% commented out faulty error message
+%
 % Revision 1.272  2006/05/07 18:10:15  arno
 % channels indices were not accurate -> fixing them
 %
@@ -1168,10 +1171,6 @@ end
 %
 if strcmp(plotgrid,'on')
    STYLE = 'grid';
-   % bad logic, fix later toby
-   %if abs(max(max(gridchans))) > length(Values)
-   %     error('''plotgrid'' channel index > the number of input channel values');
-   %end
    gchans = sort(find(abs(gridchans(:))>0));
 
    % if setdiff(gchans,unique(gchans))
