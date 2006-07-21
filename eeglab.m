@@ -188,6 +188,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.486  2006/05/13 16:56:39  arno
+% fixing history for transfer of datasets
+%
 % Revision 1.485  2006/05/10 14:07:42  arno
 % call to pop_newset fixes
 %
@@ -2375,7 +2378,7 @@ alltexth = setdiff(alltexth, titleh);
 
 set(gcf, 'Position',[200 100 (WINMINX+WINMAXX+2*BORDERINT+2*BORDEREXT) (WINY+2*BORDERINT+2*BORDEREXT) ]);
 set(titleh, 'fontsize', 14, 'fontweight', 'bold');
-set(alltexth, 'fontname', FONTNAME, 'fontsize', FONTSIZE);
+set(alltexth, 'fontsize', FONTSIZE); % CHANGE FONTNAME HERE IF DESIRED
 set(W_MAIN, 'userdata', {[] []}, 'visible', 'on');
 return;
 
