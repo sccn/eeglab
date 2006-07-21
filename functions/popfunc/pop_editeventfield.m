@@ -87,6 +87,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.39  2005/09/27 22:12:02  arno
+% nothing
+%
 % Revision 1.38  2005/05/24 17:00:07  arno
 % cell2mat
 %
@@ -370,7 +373,9 @@ try, g.delold; 	      catch, g.delold = 'no'; end;
 try, g.timeunit; 	  catch, g.timeunit = 1; end;
 try, g.align; 	      catch, g.align = NaN; end;
 try, g.delim; 	      catch, g.delim = char([9 32]); end;
-g.align.val = g.align;
+tmpval  = g.align;
+g.align = [];
+g.align.val = tmpval;
 if isstr(g.indices), g.indices = eval([ '[' g.indices ']' ]); end;
 
 tmpfields = fieldnames(g);
