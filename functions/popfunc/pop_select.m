@@ -29,7 +29,7 @@
 %                   Command line equivalent: [if checked] 'notrial' 
 %   "Channel range" - [edit box] RETAIN the indicdated vector of data channels 
 %                  Command line equivalent: 'channel' (or 'nochannel' - see below)
-%   "Channel range" - [checkbox] EXCLUDE the indicated channel range [min max].
+%   "Channel range" - [checkbox] EXCLUDE the indicated channels.
 %                  Command line equivalent: [if checked] 'nochannel' 
 %   "..." - [button] select channels by name.
 %   "Scroll dataset" - [button] call the eegplot() function to scroll the
@@ -94,6 +94,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.60  2006/04/18 01:42:16  toby
+% bug fix for selecting time range
+%
 % Revision 1.59  2006/04/10 21:38:06  arno
 % fix problem for notime
 %
