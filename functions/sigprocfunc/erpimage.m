@@ -193,6 +193,9 @@
 
 %% LOG COMMENTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % $Log: not supported by cvs2svn $
+% Revision 1.259  2006/07/15 02:00:46  toby
+% help edit, minor code streamlining.
+%
 % Revision 1.258  2006/07/15 01:05:26  toby
 % Smart indent, created programming cells
 %
@@ -2268,15 +2271,16 @@ if ~Allampsflag & ~exist('data2') % if imaging potential,
                     sortvar,...
                     sortvar(1:fronthalf)],...
                     1:(ntrials+backhalf+fronthalf),avewidth,decfactor);
-                % outtrials = 1:ntrials;
-
+                % Shift elements of outtrials so the first element is 1
+                outtrials = outtrials - outtrials(1) + 1;
             else % avewidth==2
                 [data,outtrials] = movav([data(:,end),data],...
                     [1:(ntrials+1)],avewidth,decfactor);
                 % Note: movav() here sorts using square window
                 [outsort,outtrials] = movav([sortvar(end) sortvar],...
                     1:(ntrials+1),avewidth,decfactor);
-                % outtrials = 1:ntrials;
+                % Shift elements of outtrials so the first element is 1
+                outtrials = outtrials - outtrials(1) + 1;
             end
         end
         for index=1:length(percentiles)
@@ -2291,8 +2295,12 @@ if ~Allampsflag & ~exist('data2') % if imaging potential,
                         auxvar,...
                         auxvar(:,[1:fronthalf])],...
                         [1:(ntrials+backhalf+fronthalf)],avewidth,decfactor);
+                    % Shift elements of tmp so the first element is 1
+                    tmp = tmp - tmp(1) + 1;
                 else % avewidth==2
                     [auxvar,tmp] = movav([auxvar(:,end),auxvar],[1:(ntrials+1)],avewidth,decfactor);
+                    % Shift elements of tmp so the first element is 1
+                    tmp = tmp - tmp(1) + 1;
                 end
             end
         end
@@ -2493,12 +2501,15 @@ elseif Allampsflag %%%%%%%%%%%%%%%% Plot allamps instead of data %%%%%%%%%%%%%%
                     sortvar,...
                     sortvar(1:fronthalf)],...
                     1:(ntrials+backhalf+fronthalf),avewidth,decfactor);
-                % outtrials = 1:ntrials;
+                % Shift elements of outtrials so the first element is 1
+                outtrials = outtrials - outtrials(1) + 1;
                 if ~isempty(auxvar)
                     [auxvar,tmp] = movav([auxvar(:,[(end-backhalf+1):end]),...
                         auxvar,...
                         auxvar(:,[1:fronthalf])],...
                         [1:(ntrials+backhalf+fronthalf)],avewidth,decfactor);
+                    % Shift elements of outtrials so the first element is 1
+                    outtrials = outtrials - outtrials(1) + 1;
                 end
             else % avewidth==2
                 [allamps,outtrials] = movav([allamps(:,end),allamps],...
@@ -2506,8 +2517,11 @@ elseif Allampsflag %%%%%%%%%%%%%%%% Plot allamps instead of data %%%%%%%%%%%%%%
                 % Note: sort using square window
                 [outsort,outtrials] = movav([sortvar(end) sortvar],...
                     1:(ntrials+1),avewidth,decfactor);
-                % outtrials = 1:ntrials;
+                % Shift elements of outtrials so the first element is 1
+                outtrials = outtrials - outtrials(1) + 1;
                 [auxvar,tmp] = movav([auxvar(:,end),auxvar],[1:(ntrials+1)],avewidth,decfactor);
+                % Shift elements of tmp so the first element is 1
+                tmp = tmp - tmp(1) + 1;
             end
         else % if trials not phase sorted, no wrap-around
             [allamps,outtrials] = movav(allamps,1:ntrials,avewidth,decfactor);
