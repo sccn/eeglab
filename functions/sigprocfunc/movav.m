@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2005/11/07 19:25:40  scott
+% turned off debug and verbose flags -sm
+%
 % Revision 1.17  2005/11/07 19:25:14  scott
 % debugged nonorm -sm
 %
@@ -192,10 +195,7 @@ if isempty(xadv) | xadv == 0,
   xadv = 1.0; % DEFAULT XADV
 end
 
-if nargin<3 | isempty(xwidth)
-  xwidth = 0;
-end
-if xwidth==0,
+if nargin<3 | isempty(xwidth) | xwidth==0
   xwidth = (lastx-firstx)/4;
 end
 wlen = 1;  % default;
@@ -219,7 +219,8 @@ if fastave==0
   end
 end
 
-outframes = floor(0.99999+((lastx-firstx+xadv)-xwidth)/xadv);
+%outframes = floor(0.99999+((lastx-firstx+xadv)-xwidth)/xadv);
+outframes = floor(((lastx-firstx+xadv+1)-xwidth)/xadv);
 if verbose
   fprintf('movav() will output %d frames.\n',outframes);
 end
