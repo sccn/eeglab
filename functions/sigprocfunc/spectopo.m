@@ -118,6 +118,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.105  2006/05/25 05:10:29  toby
+% bug fix: all channels and zero power channel
+%
 % Revision 1.104  2006/05/25 04:12:47  toby
 % bug fix: no chanlocs with a zero power channel
 %
@@ -1011,13 +1014,13 @@ if ~isempty(g.freq) &  strcmpi(g.plot, 'on')
             
 		else % plot all channels in g.plotchans 
 
-            if isempty(g.mapchans) | g.mapchans == 0
-                g.mapchans = 1:size(eegspecdB,1); % default to plotting all chans
+            if isempty(g.mapframes) | g.mapframes == 0
+                g.mapframes = 1:size(eegspecdB,1); % default to plotting all chans
             end
 			if ~isempty(varargin)
-				topoplot(topodata(g.mapchans),g.chanlocs2,'maplimits',maplimits, varargin{:}); 
+				topoplot(topodata(g.mapframes),g.chanlocs2,'maplimits',maplimits, varargin{:}); 
 			else
-				topoplot(topodata(g.mapchans),g.chanlocs2,'maplimits',maplimits); 
+				topoplot(topodata(g.mapframes),g.chanlocs2,'maplimits',maplimits); 
 			end
 			if f<length(g.freq)
 				tl=title([num2str(freqs(freqidx(f)), '%3.1f')]);
@@ -1041,7 +1044,9 @@ if ~isempty(g.freq) &  strcmpi(g.plot, 'on')
 
 		% make the line with the scalp topoplot thicker than others
 		set(li(realpos(1)), 'linewidth', 2.5); 
-
+        if isempty(g.mapchans) | g.mapchans == 0
+            g.mapchans = 1:size(g.icawinv,1); % default to plotting all chans
+        end
 		for index = 1:length(g.icamaps)
 			axes(headax(realpos(index+1)));						
 			compnum = g.icamaps(index);
