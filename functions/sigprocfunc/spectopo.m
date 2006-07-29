@@ -58,6 +58,7 @@
 %                power at all channels. {defatul|[] -> channel with highest power 
 %                at specified 'freq' (above)). 
 %   'mapchans' = [int vector] channels to plot in topoplots {default: all}
+%   'mapframes'= [int vector] frames to plot {default: all}
 %   'nicamaps' = [integer] number of ICA component maps to plot {default: 4}.
 %   'icacomps' = [integer array] indices of ICA component spectra to plot ([] -> all).
 %   'icamode'  = ['normal'|'sub'] in 'sub' mode, instead of computing the spectra of
@@ -67,7 +68,7 @@
 %                {default: [] = the 'nicamaps' largest contributing components}.
 %   'icawinv'  = [float array] inverse component weight or mixing matrix. Normally,
 %                this is computed by inverting the ICA unmixing matrix 'weights' (above).
-%                However, if any components were removed from the supplied 'weights'
+%                However, if any components were removed from the supplied 'weights'mapchans
 %                then the component maps will not be correctly drawn and the 'icawinv'
 %                matrix should be supplied here {default: from component 'weights'}
 %   'memory'   = ['low'|'high'] a 'low' setting will use less memory for computing 
@@ -118,6 +119,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.106  2006/07/28 02:35:24  toby
+% Bugzilla bug 38 fix, program cleanup
+%
 % Revision 1.105  2006/05/25 05:10:29  toby
 % bug fix: all channels and zero power channel
 %
@@ -489,7 +493,8 @@ if nargin <= 3 | isstr(varargin{1})
 				  'icacomps'      'integer'  []                       [] ;
 				  'icamaps'       'integer'  []                       [] ;
                   'rmdc'           'string'   {'on' 'off'}          'off';
-				  'mapchans'      'integer'  [1:size(data,1)]         [] };
+				  'mapchans'      'integer'  [1:size(data,1)]         [] 
+                  'mapframes'     'integer'  [1:size(data,2)]         []};
 	
 	[g varargin] = finputcheck( varargin, fieldlist, 'spectopo', 'ignore');
 	if isstr(g), error(g); end;
