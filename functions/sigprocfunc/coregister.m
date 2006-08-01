@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.50  2006/08/01 21:00:30  arno
+% implementing manual mode off
+%
 % Revision 1.49  2006/08/01 20:57:19  arno
 % transformation
 %
@@ -472,8 +475,17 @@ else
     
 end;
 
+% manual mode off
+% ---------------
 if strcmpi(g.manual, 'off'), 
     transformmat = dat.transform;
+    if size(dat.transform,1) > 1
+        dat.electransf.pnt = dat.transform*[ dat.elec1.pnt ones(size(dat.elec1.pnt,1),1) ]';
+    else
+        dat.electransf.pnt = traditional(dat.transform)*[ dat.elec1.pnt ones(size(dat.elec1.pnt,1),1) ]';
+    end;
+    dat.electransf.pnt   = dat.electransf.pnt(1:3,:)';
+    dat.electransf.label = dat.elec1.label;
     chanlocs1    = dat.electransf;
     return; 
 end;
@@ -606,7 +618,7 @@ try, findobj(fid); % figure still exist ?
 catch, transformmat = []; chanlocs1 = []; return; end;
 dat = get(fid, 'userdata');
 transformmat = dat.transform;
-chanlocs1        = dat.electransf;
+chanlocs1    = dat.electransf;
 close(fid);
 
 % plot electrodes
