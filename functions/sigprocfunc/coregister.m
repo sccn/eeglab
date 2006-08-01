@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.48  2006/08/01 20:50:12  arno
+% same
+%
 % Revision 1.47  2006/08/01 20:44:55  arno
 % same
 %
@@ -744,7 +747,8 @@ function [elec1, transf] = warp_chans(elec1, elec2, chanlist, warpmethod)
     warning on;
     
     transf = elec3.m;
-    transfmat = traditional(elec3.m);
+    if length(transf) == 6, transf(7:9) = 1; end;
+    transfmat = traditional(transf);
     elec1.pnt = transfmat*[ elec1.pnt ones(size(elec1.pnt,1),1) ]';
     elec1.pnt = elec1.pnt(1:3,:)';
 
