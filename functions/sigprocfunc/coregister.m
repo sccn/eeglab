@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.45  2006/04/13 16:25:15  arno
+% text
+%
 % Revision 1.44  2006/04/12 02:45:59  arno
 % text
 %
@@ -309,7 +312,7 @@ if isstr(chanlocs1)
             for index = 1:length(clist2)
                 tmpelec2.label{clist2(index)} = dat.elec1.label{clist1(index)};
             end;
-            [ tmp dat.transform ] = warp_chans(dat.elec1, dat.elec2, tmpelec2.label(clist2));
+            [ tmp dat.transform ] = warp_chans(dat.elec1, dat.elec2, tmpelec2.label(clist2), 'traditional');
         end;
     end;
     set(fid, 'userdata', dat);
@@ -324,6 +327,7 @@ end;
 defaultmesh = 'standard_vol.mat';
 g = finputcheck(varargin, { 'alignfid'   'cell'  {}      {};
                             'warp'       'cell'  {}      {};
+                            'warpmethod' 'string'  {'rigidbody', 'globalrescale', 'traditional', 'nonlin1', 'nonlin2', 'nonlin3', 'nonlin4', 'nonlin5'} 'traditional';
                             'chaninfo1'  'struct' {}    struct('no', {}); % default empty structure
                             'chaninfo2'  'struct' {}     struct('no', {}); 
                             'transform'  'real'   []      [];
@@ -449,7 +453,7 @@ else
         if ~isempty(transform), dat.transform = [ transform(1:6)' ratio ratio ratio ]; end;
         
     elseif ~isempty(g.warp)
-        [ electransf dat.transform ] = warp_chans(elec1, elec2, g.warp);
+        [ electransf dat.transform ] = warp_chans(elec1, elec2, g.warp, g);
     else
         dat.transform = [0 0 0 0 0 0 ratio ratio ratio];
     end;
@@ -724,11 +728,11 @@ function [elec1, transf] = align_fiducials(elec1, elec2, fidnames)
     
 % warp channels
 % -------------
-function [elec1, transf] = warp_chans(elec1, elec2, chanlist)
+function [elec1, transf] = warp_chans(elec1, elec2, chanlist, g)
     cfg          = [];
     cfg.elec     = elec1;
     cfg.template = elec2;
-    cfg.method   = 'warp';
+    cfg.method   = g.warpmethod;
     warning off;
     elec3 = electrodenormalize(cfg);
     warning on;
