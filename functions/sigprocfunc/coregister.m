@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.49  2006/08/01 20:57:19  arno
+% transformation
+%
 % Revision 1.48  2006/08/01 20:50:12  arno
 % same
 %
@@ -340,7 +343,7 @@ g = finputcheck(varargin, { 'alignfid'   'cell'  {}      {};
                             'chaninfo1'  'struct' {}    struct('no', {}); % default empty structure
                             'chaninfo2'  'struct' {}     struct('no', {}); 
                             'transform'  'real'   []      [];
-                            'manual'     'string' []      ''; % -> pop up window
+                            'manual'     'string' { 'on' 'off' } 'on'; % -> pop up window
                             'autoscale'  'string' { 'on' 'off' } 'on';
                             'helpmsg'    'string' { 'on' 'off' } 'off';
                             'mesh'       ''      []   defaultmesh });
@@ -467,6 +470,12 @@ else
         dat.transform = [0 0 0 0 0 0 ratio ratio ratio];
     end;
     
+end;
+
+if strcmpi(g.manual, 'off'), 
+    transformmat = dat.transform;
+    chanlocs1    = dat.electransf;
+    return; 
 end;
 
 % find common electrode names
