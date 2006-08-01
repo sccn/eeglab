@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.51  2006/08/01 21:03:01  arno
+% manual mode off
+%
 % Revision 1.50  2006/08/01 21:00:30  arno
 % implementing manual mode off
 %
@@ -479,6 +482,7 @@ end;
 % ---------------
 if strcmpi(g.manual, 'off'), 
     transformmat = dat.transform;
+    dat.elec1    = elec1;
     if size(dat.transform,1) > 1
         dat.electransf.pnt = dat.transform*[ dat.elec1.pnt ones(size(dat.elec1.pnt,1),1) ]';
     else
