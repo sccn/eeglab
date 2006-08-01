@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.46  2006/08/01 20:43:35  arno
+% warping method
+%
 % Revision 1.45  2006/04/13 16:25:15  arno
 % text
 %
@@ -728,11 +731,11 @@ function [elec1, transf] = align_fiducials(elec1, elec2, fidnames)
     
 % warp channels
 % -------------
-function [elec1, transf] = warp_chans(elec1, elec2, chanlist, g)
+function [elec1, transf] = warp_chans(elec1, elec2, chanlist, warpmethod)
     cfg          = [];
     cfg.elec     = elec1;
     cfg.template = elec2;
-    cfg.method   = g.warpmethod;
+    cfg.method   = warpmethod;
     warning off;
     elec3 = electrodenormalize(cfg);
     warning on;
