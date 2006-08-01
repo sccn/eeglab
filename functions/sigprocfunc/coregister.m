@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.47  2006/08/01 20:44:55  arno
+% same
+%
 % Revision 1.46  2006/08/01 20:43:35  arno
 % warping method
 %
@@ -456,7 +459,7 @@ else
         if ~isempty(transform), dat.transform = [ transform(1:6)' ratio ratio ratio ]; end;
         
     elseif ~isempty(g.warp)
-        [ electransf dat.transform ] = warp_chans(elec1, elec2, g.warp, g);
+        [ electransf dat.transform ] = warp_chans(elec1, elec2, g.warp, g.warpmethod);
     else
         dat.transform = [0 0 0 0 0 0 ratio ratio ratio];
     end;
