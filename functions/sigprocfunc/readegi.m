@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2006/08/03 23:34:36  arno
+% nothing
+%
 % Revision 1.17  2006/02/09 02:10:38  toby
 % corrected line 220 to use desiredFrames instead of desiredSegments.
 % bug and solution from T. O'Keefe
@@ -125,7 +128,6 @@ end
 % get our header structure
 fprintf('Importing binary EGI data file ...\n');
 head = readegihdr(fid);
-dasfd
 
 % do we have segmented data?
 segmented = 0;
