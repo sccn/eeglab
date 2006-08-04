@@ -1,6 +1,5 @@
 % readegi() - read EGI Simple Binary datafile (versions 2,3,4,5,6,7).
 %	      Return header info, EEG data, and any event data.
-%
 % Usage:
 %   >> [head, TrialData, EventData, CatIndex] = readegi(filename, dataChunks)
 %
@@ -12,7 +11,6 @@
 %                datafiles) or segments (for segmented files). If this
 %                input is empty or is not provided then all data will be
 %                returned.
-% 
 % Outputs:
 %   head = struct containing header info (see readegihdr() )
 %   TrialData = EEG channel data
@@ -45,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2006/08/03 23:34:57  arno
+% undo changes
+%
 % Revision 1.18  2006/08/03 23:34:36  arno
 % nothing
 %
