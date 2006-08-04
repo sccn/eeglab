@@ -35,6 +35,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2006/08/04 19:01:17  zhenkun
+% added forceversion argument
+%
 % Revision 1.18  2006/08/04 18:39:40  zhenkun
 % edit comments
 %
@@ -106,8 +109,12 @@ if nargin < 1
 	filename = [filepath filename];
 
     fid = fopen(filename, 'rb', 'b');
-    if fid == -1, error('Cannot open file'); end;
-    head = readegihdr(fid,forceversion); % read EGI file header
+    if fid == -1, error('Cannot open file'); end
+    if exist('forceversion')
+        head = readegihdr(fid,forceversion); % read EGI file header
+    else
+        head = readegihdr(fid); % read EGI file header
+    end
     fclose(fid);
     if head.segments ~= 0
         promptstr    = { sprintf('Segment/frame number (default: 1:%d)', head.segments) };
@@ -124,11 +131,15 @@ end;
 % load data
 % ----------
 EEG = eeg_emptyset;
-if exist('datachunks')
+if exist('datachunks') && exist('forceversion')
     [Head EEG.data Eventdata SegCatIndex] = readegi( filename, datachunks,forceversion);
-else
+elseif exist('forceversion')
     [Head EEG.data Eventdata SegCatIndex] = readegi( filename,[],forceversion);
-end;
+elseif exist('datachunks')
+    [Head EEG.data Eventdata SegCatIndex] = readegi( filename, datachunks);
+else
+    [Head EEG.data Eventdata SegCatIndex] = readegi( filename);    
+end
 if ~isempty(Eventdata) & size(Eventdata,2) == size(EEG.data,2)
     EEG.data(end+1:end+size(Eventdata,1),:) = Eventdata;
 end;
