@@ -1,7 +1,7 @@
 % readegihdr() - read header information from EGI (versions 2,3,4,5,6,7) data file.
 %
 % Usage:
-%   >> [head] = readegihdr(fid)
+%   >> [head] = readegihdr(fid,forceversion)
 %
 % Input:
 %   fid - file identifier of EGI datafile
@@ -29,14 +29,18 @@
 %
 % See also: readegi()
 
-function head = readegihdr(fid)
+function head = readegihdr(fid,forceversion)
 
 if nargin < 1
     help readegihdr;
     return;
 end;
     
-head.version = fread(fid,1,'integer*4');
+if exist('forceversion')
+    head.version = forceversion;
+else
+    head.version = fread(fid,1,'integer*4');
+end
 
 if ~( head.version >= 2 & head.version <= 7 ),
         error('EGI Simple Binary Versions 2-7 supported only.');
