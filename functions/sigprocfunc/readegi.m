@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2006/08/04 18:35:54  zhenkun
+% comment edit
+%
 % Revision 1.19  2006/08/03 23:34:57  arno
 % undo changes
 %
@@ -102,7 +105,7 @@
 % header ...
 %
 
-function  [head, TrialData, EventData, SegmentCatIndex] = readegi(filename, dataChunks)
+function  [head, TrialData, EventData, SegmentCatIndex] = readegi(filename, dataChunks,forceversion)
 
 if nargin <1 | nargin >2,
     help readegi;
@@ -128,7 +131,11 @@ end
 
 % get our header structure
 fprintf('Importing binary EGI data file ...\n');
-head = readegihdr(fid);
+if exist('forceversion')
+   head = readegihdr(fid,forceversion);
+else
+   head = readegihdr(fid);
+end
 
 % do we have segmented data?
 segmented = 0;
