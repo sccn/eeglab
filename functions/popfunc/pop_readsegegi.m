@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2005/10/26 01:27:54  arno
+% filename
+%
 % Revision 1.6  2003/07/20 19:38:17  scott
 % typo
 %
@@ -75,7 +78,7 @@ Eventdata = [];
 
 disp('Removing trailing character of selected file to find base file name');
 fprintf('Base file name is: %s\n', basename);
-orifilename = [ basename sprintf('%3.3d', index) tailname ];
+orifilename = [ basename '/' sprintf('%3.3d', index) tailname ];
 if ~exist(orifilename)
     disp ([ 'First file of series ''' orifilename ''' not found' ] );
     error([ 'First file of series ''' orifilename ''' not found' ] );
