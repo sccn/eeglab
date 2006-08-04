@@ -34,6 +34,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2006/08/04 18:35:12  zhenkun
+% edited comments
+%
 % Revision 1.16  2005/10/27 05:20:16  arno
 % fix reading file name
 %
@@ -103,7 +106,7 @@ if nargin < 1
     head = readegihdr(fid); % read EGI file header
     fclose(fid);
     if head.segments ~= 0
-        promptstr    = { sprintf('Segment/frame number (default: 1 to %d)', head.segments) };
+        promptstr    = { sprintf('Segment/frame number (default: 1:%d)', head.segments) };
         inistr       = { '' };
         result       = inputdlg2( promptstr, 'Import EGI file -- pop_readegi()', 1,  inistr, 'pop_readegi');
         if length(result) == 0 return; end;
