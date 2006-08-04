@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2006/08/04 19:06:19  zhenkun
+% added forceversion
+%
 % Revision 1.20  2006/08/04 18:35:54  zhenkun
 % comment edit
 %
@@ -107,7 +110,7 @@
 
 function  [head, TrialData, EventData, SegmentCatIndex] = readegi(filename, dataChunks,forceversion)
 
-if nargin <1 | nargin >2,
+if nargin <1 | nargin > 3,
     help readegi;
     return;
 end
