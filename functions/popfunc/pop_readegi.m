@@ -8,7 +8,6 @@
 %   filename       - EGI file name
 %   datachunks     - desired frame numbers (see readegi() help)
 %                    option available from the command line only
-% 
 % Outputs:
 %   EEG            - EEGLAB data structure
 %
@@ -35,6 +34,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2005/10/27 05:20:16  arno
+% fix reading file name
+%
 % Revision 1.15  2005/10/24 23:36:56  arno
 % fix file name
 %
@@ -85,22 +87,23 @@ function [EEG, command] = pop_readegi(filename, datachunks);
     
 EEG = [];
 command = '';
-disp('Warning: this function can only import continuous files or');
+disp('Warning: This function can only import continuous files or');
 disp('         epoch files with only one length for data epochs');
+
 if nargin < 1 
 	% ask user
-	[filename, filepath] = uigetfile('*.RAW;*.raw', 'Choose an EGI RAW file -- pop_readegi()'); 
+	[filename, filepath] = uigetfile('*.RAW;*.raw', ...
+							'Choose an EGI RAW file -- pop_readegi()'); 
     drawnow;
 	if filename == 0 return; end;
 	filename = [filepath filename];
 
     fid = fopen(filename, 'rb', 'b');
     if fid == -1, error('Cannot open file'); end;
-    head = readegihdr(fid);
+    head = readegihdr(fid); % read EGI file header
     fclose(fid);
-    
     if head.segments ~= 0
-        promptstr    = { sprintf('Segment/frame number (default: 1:%d)', head.segments) };
+        promptstr    = { sprintf('Segment/frame number (default: 1 to %d)', head.segments) };
         inistr       = { '' };
         result       = inputdlg2( promptstr, 'Import EGI file -- pop_readegi()', 1,  inistr, 'pop_readegi');
         if length(result) == 0 return; end;
@@ -111,7 +114,7 @@ if nargin < 1
     end;
 end;
 
-% load datas
+% load data
 % ----------
 EEG = eeg_emptyset;
 if exist('datachunks')
