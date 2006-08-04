@@ -3,6 +3,7 @@
 % Usage:
 %   >> EEG = pop_readegi;             % a window pops up
 %   >> EEG = pop_readegi( filename );
+%   >> EEG = pop_readegi( filename, datachunks,forceversion ); 
 %
 % Inputs:
 %   filename       - EGI file name
@@ -34,6 +35,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2006/08/04 18:39:40  zhenkun
+% edit comments
+%
 % Revision 1.17  2006/08/04 18:35:12  zhenkun
 % edited comments
 %
@@ -86,7 +90,7 @@
 % Initial revision
 %
 
-function [EEG, command] = pop_readegi(filename, datachunks); 
+function [EEG, command] = pop_readegi(filename, datachunks, forceversion); 
     
 EEG = [];
 command = '';
@@ -96,14 +100,14 @@ disp('         epoch files with only one length for data epochs');
 if nargin < 1 
 	% ask user
 	[filename, filepath] = uigetfile('*.RAW;*.raw', ...
-							'Choose an EGI RAW file -- pop_readegi()'); 
+						'Choose an EGI RAW file -- pop_readegi()'); 
     drawnow;
 	if filename == 0 return; end;
 	filename = [filepath filename];
 
     fid = fopen(filename, 'rb', 'b');
     if fid == -1, error('Cannot open file'); end;
-    head = readegihdr(fid); % read EGI file header
+    head = readegihdr(fid,forceversion); % read EGI file header
     fclose(fid);
     if head.segments ~= 0
         promptstr    = { sprintf('Segment/frame number (default: 1:%d)', head.segments) };
@@ -121,9 +125,9 @@ end;
 % ----------
 EEG = eeg_emptyset;
 if exist('datachunks')
-    [Head EEG.data Eventdata SegCatIndex] = readegi( filename, datachunks);
+    [Head EEG.data Eventdata SegCatIndex] = readegi( filename, datachunks,forceversion);
 else
-    [Head EEG.data Eventdata SegCatIndex] = readegi( filename);
+    [Head EEG.data Eventdata SegCatIndex] = readegi( filename,[],forceversion);
 end;
 if ~isempty(Eventdata) & size(Eventdata,2) == size(EEG.data,2)
     EEG.data(end+1:end+size(Eventdata,1),:) = Eventdata;
