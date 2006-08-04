@@ -5,6 +5,7 @@
 %
 % Input:
 %   fid - file identifier of EGI datafile
+%   forceversion - optional integer input to override automatic reading of version number.
 %
 % Output:
 %   head - structure containing header information.
