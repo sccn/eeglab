@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.67  2006/08/08 22:59:30  arno
+% remove debug message
+%
 % Revision 1.66  2006/05/17 18:32:10  arno
 % typo
 %
@@ -451,7 +454,7 @@ EEG.icachansind = g.chanind;
 pca_opt = 0;
 for i = 1:length(g.options)
     if isstr(g.options{i})
-        if strcmpi(g.options{1}, 'pca')
+        if strcmpi(g.options{i}, 'pca')
             pca_opt = 1;
         end;
     end;
