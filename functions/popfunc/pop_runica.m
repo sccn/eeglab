@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.66  2006/05/17 18:32:10  arno
+% typo
+%
 % Revision 1.64  2006/04/17 16:20:05  scott
 % help msg and print text; fixed bug in saving icachansind to .etc
 %
@@ -370,7 +373,6 @@ else
         options = varargin;
     end;
 end;
-options
 
 % decode input arguments
 % ----------------------
