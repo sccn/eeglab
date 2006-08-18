@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.68  2006/08/08 23:03:09  arno
+% fix bug for detecting PCA options
+%
 % Revision 1.67  2006/08/08 22:59:30  arno
 % remove debug message
 %
@@ -445,7 +448,7 @@ EEG.icaact     = [];
 % select sub_channels
 % -------------------
 if isempty(g.chanind)
-    g.chanind = 1:ALLEEG(1).nbchan;
+    g.chanind = 1:EEG.nbchan;
 end;
 EEG.icachansind = g.chanind;
 
