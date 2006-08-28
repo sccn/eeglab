@@ -1788,6 +1788,7 @@ storenewcall = '[ALLEEG EEG CURRENTSET LASTCOM] = pop_newset(ALLEEG, EEG, CURREN
 storeallcall = [ 'if ~isempty(ALLEEG) & ~isempty(ALLEEG(1).data), ALLEEG = eeg_checkset(ALLEEG);' ...
                  'EEG = eeg_retrieve(ALLEEG, CURRENTSET); eegh(''ALLEEG = eeg_checkset(ALLEEG); EEG = eeg_retrieve(ALLEEG, CURRENTSET);''); end;' ];
 
+testeegtmp   =  'if exist(''EEGTMP'') == 1, EEG = EEGTMP; clear EEGTMP; end;'; % for backward compatibility
 ifeeg        =  'if ~isempty(LASTCOM) & ~isempty(EEG),';
 ifeegnh      =  'if ~isempty(LASTCOM) & ~isempty(EEG) & ~isempty(findstr(''='',LASTCOM)),';
 
@@ -1798,7 +1799,7 @@ e_hist_nh       = [e_catch 'eegh(LASTCOM);'];
 
 % same as above but also save history in dataset
 % ----------------------------------------------
-e_newset        = [e_catch 'EEG = eegh(LASTCOM, EEG);' ifeeg   storenewcall 'disp(''Done.''); end; eeglab(''redraw'');'];
+e_newset        = [e_catch 'EEG = eegh(LASTCOM, EEG);' testeegtmp ifeeg   storenewcall 'disp(''Done.''); end; eeglab(''redraw'');'];
 e_store         = [e_catch 'EEG = eegh(LASTCOM, EEG);' ifeegnh storecall    'disp(''Done.''); end; eeglab(''redraw'');'];
 e_hist          = [e_catch 'EEG = eegh(LASTCOM, EEG);'];
 e_histdone      = [e_catch 'EEG = eegh(LASTCOM, EEG); if ~isempty(LASTCOM), disp(''Done.''); end;' ];
@@ -2378,7 +2379,7 @@ alltexth = setdiff(alltexth, titleh);
 
 set(gcf, 'Position',[200 100 (WINMINX+WINMAXX+2*BORDERINT+2*BORDEREXT) (WINY+2*BORDERINT+2*BORDEREXT) ]);
 set(titleh, 'fontsize', 14, 'fontweight', 'bold');
-set(alltexth, 'fontsize', FONTSIZE); % CHANGE FONTNAME HERE IF DESIRED
+set(alltexth, 'fontname', FONTNAME, 'fontsize', FONTSIZE);
 set(W_MAIN, 'userdata', {[] []}, 'visible', 'on');
 return;
 
