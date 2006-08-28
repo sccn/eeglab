@@ -122,6 +122,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.60  2006/05/15 00:25:57  toby
+% cluster ica erp using abs(pca(comps)), not pca(abs(comps))
+%
 % Revision 1.59  2006/04/11 18:36:44  arno
 % message
 %
@@ -274,6 +277,18 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
     if Ncond == 0
         Ncond = 1;
     end
+
+    % check dataset length consistency before computing
+    % -------------------------------------------------
+    pnts  = ALLEEG(STUDY.datasetinfo(1).index).pnts;
+    srate = ALLEEG(STUDY.datasetinfo(1).index).srate;
+    xmin  = ALLEEG(STUDY.datasetinfo(1).index).xmin;
+    for index = 1:length(STUDY.datasetinfo)
+        ind = STUDY.datasetinfo(index).index;
+        if pnts  ~= ALLEEG(ind).pnts, error(sprintf('Dataset %d does not have the same number of point as dataset 1', ind)); end;
+        if srate ~= ALLEEG(ind).srate, error(sprintf('Dataset %d does not have the same sampling rate as dataset 1', ind)); end;
+        if xmin  ~= ALLEEG(ind).xmin, warning(sprintf('Dataset %d does not have the same time limit as dataset 1', ind)); end;
+    end;
     
     % Get component indices that are part of the cluster 
     % --------------------------------------------------
