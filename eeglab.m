@@ -188,6 +188,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.488  2006/08/28 11:25:53  arno
+% Backward compatibility for old plugin for importing data
+%
 % Revision 1.486  2006/05/13 16:56:39  arno
 % fixing history for transfer of datasets
 %
@@ -2191,7 +2194,7 @@ catchstrs.new_non_empty          = e_newset;
                         tmpind = length(tmpdir);
                     end;
                     
-                    % spetial case of eeglab subfolder (for BIOSIG)
+                    % special case of eeglab subfolder (for BIOSIG)
                     % --------------------------------
                     if strcmpi(tmpdir(tmpind).name, 'eeglab')
                         addpath([ p 'plugins' delimiter dircontent{index} delimiter 'eeglab' ],'-end');
