@@ -16,8 +16,8 @@
 %             cosine (real part) and sine (imaginary part) tapered by
 %             a hanning function. 'morlet' is the typical morlet wavelet
 %             (p=2pi and sigma=0.7 so that the wavelet best matches 
-%             sinusoidal wavelets). Default is 'morlet'.
-%
+%             sinusoidal wavelets). 'sinus' gives a Hanning window.
+%             Default is 'morlet'.
 % Output:
 %   wavelet - cell array of wavelet filters
 %
@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2006/05/05 16:17:36  arno
+% implementing cycle array
+%
 % Revision 1.8  2004/03/04 19:31:03  arno
 % email
 %
