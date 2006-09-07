@@ -4,25 +4,27 @@
 %   >> wavelet = dftfilt2( freqs, cycles, srate, cyclefact)
 %
 % Inputs:
-%   freqs   - frequency array
-%   cycles  - cycles array. If one vale is given, all wavelets have
-%             the same number of cycles. If 2 numbers are given, these
-%             2 numbers are used for the number of cycles at the lowest
-%             frequency and at the higher frequency. 
-%   srate   - sampling rate
+%   freqs    - frequency array
+%   cycles   - cycles array. If one value is given, all wavelets have
+%              the same number of cycles. If two values are given, the
+%              two values are used for the number of cycles at the lowest
+%              frequency and at the highest frequency, with linear 
+%              interpolation between these values for intermediate
+%              frequencies
+%   srate    - sampling rate (in Hz)
+%
 %   cycleinc - ['linear'|'log'] increase mode if [min max] cycles is
-%              provided in 'cycle' parameter. Default is 'linear'.
-%   type     - ['sinus'|'morlet'] wavelet type is sinusoidal
-%             cosine (real part) and sine (imaginary part) tapered by
-%             a hanning function. 'morlet' is the typical morlet wavelet
-%             (p=2pi and sigma=0.7 so that the wavelet best matches 
-%             sinusoidal wavelets). 'sinus' gives a Hanning window.
-%             Default is 'morlet'.
+%              provided in 'cycle' parameter. {default: 'linear'}
+%   type     - ['sinus'|'morlet'] wavelet type is a sinusoid with
+%              cosine (real) and sine (imaginary) parts tapered by
+%              a Hanning or Morlet function. 'morlet' is a typical Morlet 
+%              wavelet (with p=2*pi and sigma=0.7) best matching the 
+%              'sinus' Hanning taper) {default: 'morlet'}
 % Output:
 %   wavelet - cell array of wavelet filters
 %
-% Note: The size of the window is automatically computed from the 
-%       number of cycles ans is always odd.
+% Note: The length of the window is automatically computed from the 
+%       number of cycles and is always made odd.
 %
 % Authors: Arnaud Delorme, SCCN/INC/UCSD, La Jolla, 3/28/2003
 
@@ -43,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2006/09/07 18:55:15  scott
+% clarified window types in help msg -sm
+%
 % Revision 1.9  2006/05/05 16:17:36  arno
 % implementing cycle array
 %
@@ -106,10 +111,11 @@ function wavelet = dftfilt2( freqs, cycles, srate, cycleinc, type);
         if mod(winlenint,2) == 1, winlenint = winlenint+1; end; 
         winval = linspace(winlenint/2, -winlenint/2, winlenint+1);        
         
-        if strcmpi(type, 'sinus')
+        if strcmpi(type, 'sinus') % Hanning
             win = exp(2i*pi*freqs(index)*winval/srate);
             wavelet{index} = win .* hanning(length(winval))';
-        else % morlet
+
+        else % Morlet
             t = freqs(index)*winval/srate;
             p = 2*pi;
             s = cycles(index)/5;
