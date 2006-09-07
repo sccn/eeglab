@@ -12,9 +12,10 @@
 %       'wavelet' = (>0) -> Number of cycles in each analysis wavelet 
 %                 = [cycles expfactor] -> if = 0, constant window length 
 %                   (FFT). If (0 < expfactor < 1), the number of wavelet
-%                   cycles expands with frequency from cycles. 
+%                   cycles expands with frequency from a min of cycles. 
 %                   If expfactor = 1, no expansion (scaled wavelets);
-%                   {default: 0 = FFT}
+%                   If 0 (FFT), a Hanning taper is used; else a Morlet
+%                   taper. {default: 0 = FFT}
 % Optional ITC type:
 %        'type'   = ['coher'|'phasecoher'] Compute either linear coherence
 %                   ('coher') or phase coherence ('phasecoher') also known
@@ -106,6 +107,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.48  2006/05/05 16:17:02  arno
+% implementing cycle array
+%
 % Revision 1.47  2006/04/18 16:00:45  scott
 % text edits
 %
@@ -363,6 +367,7 @@ if (g.cycles == 0) %%%%%%%%%%%%%% constant window-length FFTs %%%%%%%%%%%%%%%%
     freqs = freqs(2:end); % remove DC (match the output of PSD)
                           %srate/g.winsize*[1:2/g.padratio:g.winsize]/2
     g.win   = hanning(g.winsize);
+
 else % %%%%%%%%%%%%%%%%%% Constant-Q (wavelet) DFTs %%%%%%%%%%%%%%%%%%%%%%%%%%%%
      %freqs = srate*g.cycles/g.winsize*[2:2/g.padratio:g.winsize]/2;
      %g.win = dftfilt(g.winsize,g.freqs(2)/srate,g.cycles,g.padratio,g.cyclesfact);
@@ -371,7 +376,7 @@ else % %%%%%%%%%%%%%%%%%% Constant-Q (wavelet) DFTs %%%%%%%%%%%%%%%%%%%%%%%%%%%%
     if g.cyclesfact ~= 1, 
         g.cycles = [ g.cycles g.cycles*g.freqs(end)/g.freqs(1)*(1-g.cyclesfact)]; 
     end;
-    g.win    = dftfilt2(g.freqs,g.cycles,srate, g.freqscale);
+    g.win    = dftfilt2(g.freqs,g.cycles,srate, g.freqscale); % uses Marlet taper by default
     
     g.winsize = 0;
     for index = 1:length(g.win)
