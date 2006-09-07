@@ -1,12 +1,13 @@
-% newtimef() - Returns estimates and plots of event-related (log) spectral
-%           perturbation (ERSP) and inter-trial coherence (ITC) changes 
+% newtimef() - Returns estimates and plots of mean event-related (log) spectral
+%           perturbation (ERSP) and inter-trial coherence (ITC) events
 %           across event-related trials (epochs) of a single input time series. 
 %
 %         * Also can compute and statistically compare transforms for two time 
 %           series. Use to compare ERSP and ITC means in two conditions.
 %
 %         * Uses either fixed-window, zero-padded FFTs (fastest), wavelet
-%           0-padded DFTs (both Hanning-tapered), OR multitaper spectra ('mtaper').
+%           0-padded DFTs (FFT uses Hanning tapers; wavelets use smilar Morlet 
+%           tapers), 
 %
 %         * For the wavelet and FFT methods, output frequency spacing 
 %           is the lowest frequency ('srate'/'winsize') divided by 'padratio'.
@@ -30,7 +31,7 @@
 %           [ALLEEG(1).xmin ALLEEG(1).xmax]*1000,ALLEEG(1).srate,4);
 % NOTE:                                        
 %        >> timef details  % scrolls more detailed argument information 
-%           % timef() also computes multitaper transforms
+%                          % version timef() also computes multitaper transforms
 %
 % Required inputs:     Value                                 {default}
 %       data        = Single-channel data vector (1,frames*ntrials) (required)
@@ -47,41 +48,41 @@
 %                     same as running FFT).
 %                     OR multitaper decomposition (with 'mtaper').
 %
-%    Optional Inter-Irial Coherence Type:
+%    Optional inter-trial coherence (ITC) Type:
 %       'type'      = ['coher'|'phasecoher'] Compute either linear coherence 
 %                      ('coher') or phase coherence ('phasecoher') also known
-%                      as phase-locking factor                  {'phasecoher'}
+%                      as phase-locking factor         {default: 'phasecoher'}
 %
-%    Optional Detrending:
+%    Optional detrending:
 %       'detrend'   = ['on'|'off'], Linearly detrend each data epoch   {'off'}
 %       'rmerp'     = ['on'|'off'], Remove epoch mean from data epochs {'off'}
 %
-%    Optional FFT/DFT Parameters:
+%    Optional FFT/DFT parameters:
 %       'winsize'   = If cycles==0: data subwindow length (fastest, 2^n<frames);
 %                     If cycles >0: *longest* window length to use. This
 %                      determines the lowest output frequency. Note that this
 %                     parameter is overwritten if the minimum frequency requires
-%                     a longer time window {~frames/8}
+%                     a longer time window {default: ~frames/8}
 %       'timesout'  = Number of output times (int<frames-winframes). Enter a 
-%                     negative value [-S] to subsample original time by S.
+%                     negative value [-S] to subsample original times by S.
 %                     Enter an array to obtain spectral decomposition at 
-%                     specific time values (note: algorithm find closest time 
-%                     point in data and this might result in an unevenly spaced
-%                     time array. {def: 200}
-%       'padratio'  = FFT-length/winframes (2^k)                    {2}
+%                     specific times (Note: algorithm finds the closest time 
+%                     point in data; this could give a slightly unevenly spaced 
+%                     time array                                    {default: 200}
+%       'padratio'  = FFT-length/winframes (2^k)                    {default: 2}
 %                     Multiplies the number of output frequencies by dividing
 %                     their spacing (standard FFT padding). When cycles~=0, 
 %                     frequency spacing is divided by padratio.
 %       'maxfreq'   = Maximum frequency (Hz) to plot (& to output, if cycles>0) 
-%                     If cycles==0, all FFT frequencies are output. {50}
+%                     If cycles==0, all FFT frequencies are output. {default: 50}
 %                     DEPRECATED, use 'freqs' instead,
-%       'freqs'     = [min max] frequency limits. Default [minfreq 50], 
+%       'freqs'     = [min max] frequency limits. {default [minfreq 50],
 %                     minfreq being determined by the number of data points, 
 %                     cycles and sampling frequency.
 %       'nfreqs'    = number of output frequencies. For FFT, closest computed
 %                     frequency will be returned. Overwrite 'padratio' effects
-%                     for wavelets. Default: use 'padratio'.
-%       'freqscale' = ['log'|'linear'] frequency scale. Default is 'linear'.
+%                     for wavelets. {default: use 'padratio'}
+%       'freqscale' = ['log'|'linear'] frequency scale. {default: 'linear'}
 %                     Note that for obtaining 'log' spaced freqs using FFT, 
 %                     closest correspondant frequencies in the 'linear' space 
 %                     are returned.
@@ -89,28 +90,31 @@
 %                      baseline is used. A range [min max] may also be entered
 %                     You may also enter one row per region for baseline
 %                     e.g. [0 100; 300 400] considers the window 0 to 100 ms and
-%                     300 to 400 ms. { default 0 }
-%       'powbase'   = Baseline spectrum to log-subtract. {def|NaN->from data}
+%                     300 to 400 ms {default: 0}
+%       'powbase'   = Baseline spectrum to log-subtract {default|NaN -> from data}
 %       'lowmem'    = ['on'|'off'] compute frequency, by frequency to save
-%                     memory. Default 'off'.
+%                     memory. {default: 'off'}
 %       'verbose'   = ['on'|'off'] print text {'on'}
 %       'subitc'    = ['on'|'off'] subtract stimulus locked Inter-Trial Coherence
 %                     (ITC) from x and y. This computes the  'intrinsic' coherence
 %                     x and y not arising from common synchronization to
 %                     experimental events. See notes. {default: 'off'}
 %
-%    Optional Time Warping Parameters:
-%       'timeStretchMarks' = [marks x trials matrix] Each trial will be
-%                     stretched so that marks time-lock to reference
-%                     frames (see timeStretchRefs). Marks have to be
-%                     specified in frames
-%       'timeStretchRefs' = [1 x marks] Common reference frames to all
-%                     trials. If empty or undefined, median latency for
-%                     each mark will be used.
-%       'timeStretchPlot' = [vector] Indicates which reference frames
-%                     should be overplotted on the ERSP and ITC.
+%    Optional time warping parameters:
+%      'timewarpfr' = {[events], [warpfr], [plotidx]} Time warp amplitude and phase
+%                     time-courses (after time/freq transform but before smoothing 
+%                     across trials). 'events' is a matrix whose columns specify the 
+%                     epoch frames [1 ... end] at which a series of successive events 
+%                     occur in each trial. 'warpfr' is an optional vector of event 
+%                     frames to which the series of events should be time locked. 
+%                     (Note: Epoch start and end should not be declared as events or 
+%                     warpfr}. If 'warpfr' is absent or [], the median of each 'events' 
+%                     column will be used. [plotidx] is an optional vector of indices 
+%                     telling which [warpfr] to plot with vertical lines. [Note: In 
+%                     future releases, 'timewarpfr' will be deprecated in favor of 
+%                     'timewarp' using ms instead of frames].
 %
-%    Optional Bootstrap Parameters:
+%    Optional bootstrap parameters:
 %       'alpha'     = If non-0, compute two-tailed bootstrap significance prob. 
 %                      level. Show non-signif. output values as green.   {0}
 %       'naccu'     = Number of bootstrap replications to accumulate     {200}
@@ -138,36 +142,36 @@
 %       'topovec'   = Scalp topography (map) to plot                     {none}
 %       'elocs'     = Electrode location file for scalp map   {no default}
 %                     File should be ascii in format of  >> topoplot example   
-%
-%    Optional Plotting Parameters:
+%     Optional Plotting Parameters:
+%       'hzdir'     = ['up'|'down'] Direction of the frequency axes      {'up'}
 %       'plottype'  = ['image'|'curve'] plot time frequency images or
-%                     curves (one curve per frequency). Default is 'image'.
+%                     curves (one curve per frequency). {default: 'image'}
 %       'plotmean'  = ['on'|'off'] For 'curve' plots only. Average all
-%                     frequencies given as input. Default: 'on'.
+%                     frequencies given as input. {default: 'on'}
 %       'highlightmode'  = ['background'|'bottom'] For 'curve' plots only,
 %                     display significant time regions either in the plot background
 %                     or underneatht the curve.
-%       'plotersp'  = ['on'|'off'] Plot power spectral perturbations              {'on'} 
-%       'plotitc'   = ['on'|'off'] Plot inter trial coherence                     {'on'}
+%       'plotersp'  = ['on'|'off'] Plot power spectral perturbations    {'on'} 
+%       'plotitc'   = ['on'|'off'] Plot inter trial coherence           {'on'}
 %       'plotphasesign' = ['on'|'off'] Plot phase sign in the inter trial coherence {'on'}
-%       'plotphase' = ['on'|'off'] Plot ITC phase instead ofITC amplitude         {'off'}
-%       'erspmax'   = [real dB] set the ERSP max. for the color scale (min= -max) { auto }
-%       'itcmax'    = [real] set the ITC image maximum for the color scale        { auto }
-%       'erplim'    = [min max] ERP limits for ITC (below ITC image)              { auto }
-%       'itcavglim' = [min max] average ITC limits for all freq. (left of ITC)    { auto }
-%       'speclim'   = [min max] average spectrum limits (left of ERSP image)      { auto }
-%       'erspmarglim' = [min max] average marginal ERSP limits (below ERSP image) { auto }
-%       'title'     = Optional figure title                                       { none }
-%       'marktimes' = Non-0 times to mark with a dotted vertical line (ms)        { none }
-%       'linewidth' = Line width for 'marktimes' traces (thick=2, thin=1)         {2}
-%       'axesfont'  = Axes text font size                                         {10}
-%       'titlefont' = Title text font size                                        {8}
+%       'plotphase' = ['on'|'off'] Plot ITC phase instead ofITC amplitude {'off'}
+%       'erspmax'   = [real dB] set the ERSP max. for the color scale (min= -max) {auto}
+%       'itcmax'    = [real] set the ITC image maximum for the color scale {auto}
+%       'erplim'    = [min max] ERP limits for ITC (below ITC image)       {auto}
+%       'itcavglim' = [min max] average ITC limits for all freq. (left of ITC) {auto}
+%       'speclim'   = [min max] average spectrum limits (left of ERSP image)   {auto}
+%       'erspmarglim' = [min max] average marginal ERSP limits (below ERSP image) {auto}
+%       'title'     = Optional figure title                                    {none}
+%       'marktimes' = Non-0 times to mark with a dotted vertical line (ms)     {none}
+%       'linewidth' = Line width for 'marktimes' traces (thick=2, thin=1)      {2}
+%       'axesfont'  = Axes text font size                                      {10}
+%       'titlefont' = Title text font size                                     {8}
 %       'vert'      = [times_vector] -> plot vertical dashed lines at specified times
-%                     in ms.
+%                     in ms. {default: none}
 %       'newfig'    = ['on'|'off'] Create new figure for difference plots {'on'}
 %       'outputformat' = ['old'|'new'] for compatibility with script that used the old
 %                        output format, set to 'old' (mbase in absolute amplitude (not
-%                        dB) and real itc instead of complex itc). Default is 'new'.
+%                        dB) and real itc instead of complex itc). {default: 'new'}
 % Outputs: 
 %            ersp   = Matrix (nfreqs,timesout) of log spectral diffs. from baseline (dB) 
 %            itc    = Matrix of inter-trial coherencies (nfreqs,timesout) (range: [0 1])
@@ -214,6 +218,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.84  2006/07/19 03:24:34  toby
+% Corrected example
+%
 % Revision 1.83  2006/06/28 01:54:32  toby
 % Bug fix, help section edit
 %
@@ -637,6 +644,24 @@ function [P,R,mbase,timesout,freqs,Pboot,Rboot,alltfX,PA] = timef( X, frame, tli
 
 % Note: PA is output of 'phsamp','on' 
 
+% For future 'timewarp' keyword help: 'timewarp' 3rd element {colors} contains a
+%               list of Matlab linestyles to use for vertical lines marking the occurence
+%               of the time warped events. If '', no line will be drawn for this event
+%               column. If fewer colors than event columns, cycles through the given color
+%               labels.  Note: Not compatible with 'vert' (below).
+
+% Deprecated time warp keywords (still viable)
+%       'timeStretchMarks' = [(marks,trials) matrix] Each trial data will be
+%                     linearly warped (after time/freq. transform) so that the
+%                     event marks are time locked to the reference
+%                     frames (see timeStretchRefs). Marks have to be
+%                     specified in frames
+%       'timeStretchRefs' = [1 x marks] Common reference frames to all
+%                     trials. If empty or undefined, median latency for
+%                     each mark will be used.
+%       'timeStretchPlot' = [vector] Indicates the indices of the reference frames
+%                     (in StretchRefs) should be overplotted on the ERSP and ITC.
+
 %varwin,winsize,g.timesout,g.padratio,g.maxfreq,g.topovec,g.elocs,g.alpha,g.marktimes,g.powbase,g.pboot,g.rboot)
 
 % ITC:   Normally, R = |Sum(Pxy)| / (Sum(|Pxx|)*Sum(|Pyy|)) is coherence.
@@ -652,20 +677,20 @@ ITC_CAXIS_LIMIT  = 0;           % 0 -> use data limits; else positive value
 MIN_ABS          = 1e-8;        % avoid division by ~zero
 
 % Commandline arg defaults:
-DEFAULT_EPOCH	= 750;			% Frames per trial
+DEFAULT_EPOCH	= 750;		% Frames per trial
 DEFAULT_TIMLIM = [-1000 2000];	% Time range of g.frames (ms)
-DEFAULT_FS	= 250;			% Sampling frequency (Hz)
-DEFAULT_NWIN	= 200;			% Number of windows = horizontal resolution
-DEFAULT_VARWIN	= 0;			% Fixed window length or fixed number of cycles.
-								% =0: fix window length to that determined by nwin
-								% >0: set window length equal to varwin cycles
-								%     Bounded above by winsize, which determines
-								%     the min. freq. to be computed.
-DEFAULT_OVERSMP	= 2;			% Number of times to oversample frequencies 
-DEFAULT_MAXFREQ = 50;			% Maximum frequency to display (Hz)
-DEFAULT_TITLE	= '';			% Figure title
+DEFAULT_FS	= 250;		% Sampling frequency (Hz)
+DEFAULT_NWIN	= 200;		% Number of windows = horizontal resolution
+DEFAULT_VARWIN	= 0;		% Fixed window length or fixed number of cycles.
+				  % =0: fix window length to that determined by nwin
+				  % >0: set window length equal to varwin cycles
+				  %     Bounded above by winsize, which determines
+				  %     the min. freq. to be computed.
+DEFAULT_OVERSMP	= 2;		% Number of times to oversample frequencies 
+DEFAULT_MAXFREQ = 50;		% Maximum frequency to display (Hz)
+DEFAULT_TITLE	= '';		% Figure title
 DEFAULT_ELOC    = 'chan.locs';	% Channel location file
-DEFAULT_ALPHA   = NaN;			% Percentile of bins to keep
+DEFAULT_ALPHA   = NaN;		% Percentile of bins to keep
 DEFAULT_MARKTIME= NaN;
 
 % Font sizes:
@@ -784,6 +809,7 @@ try, g.erspmarglim;     catch, g.erspmarglim = []; end;
 try, g.itcavglim;       catch, g.itcavglim   = []; end;
 try, g.erplim;          catch, g.erplim      = []; end;
 try, g.speclim;         catch, g.speclim     = []; end;
+try, g.timewarp;        catch, g.timewarp    = []; end;
 %Added -Jean
 try, g.timeStretchMarks;     catch, g.timeStretchMarks = []; end;
 try, g.timeStretchRefs;     catch, g.timeStretchRefs = []; end;
@@ -795,6 +821,27 @@ g.ITC_CAXIS_LIMIT  = ITC_CAXIS_LIMIT;
 
 if isfield(g, 'detret'), g.detrend = g.detret; end;
 if isfield(g, 'detrep'), g.rmerp   = g.detrep; end;
+
+% unpack 'timewarpfr' argument (transitional to future 'timewarp' in ms) -sm
+%-----------------------------
+if ~isempty(g.timewarp)
+    g.timeStretchMarks = g.timewarp{1};
+    if length(g.timewarp) > 1
+        g.timeStretchRefs = g.timewarp{2};
+    end
+    if length(g.timewarp) > 2
+        g.timeStretchPlot = g.timewarp{3};
+    end
+    if max(max(g.timeStretchMarks)) > frame | min(min(g.timeStretchMarks)) < 1
+       error('Time warping event marks must be inside the epochs.');
+    end
+    if ~isempty(g.timeStretchRefs)
+       if max(g.timeStretchRefs) > frame | min(g.timeStretchRefs) < 1
+          error('Time warping reference marks must be inside the epochs.');
+       end
+    end
+end
+
 
 % testing arguments consistency
 % -----------------------------
@@ -903,9 +950,9 @@ else
 end;
 
 
-% Multitape not used any more
+% Multitaper not used any more
 % ---------------------------
-if ~isempty(g.mtaper) % mutitaper, inspired from Bijan Pesaran matlab function
+if ~isempty(g.mtaper) % multitaper, inspired from Bijan Pesaran matlab function
   if length(g.mtaper) < 3
         %error('mtaper arguement must be [N W] or [N W K]');
     
