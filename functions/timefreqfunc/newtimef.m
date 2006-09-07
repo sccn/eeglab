@@ -143,7 +143,6 @@
 %       'elocs'     = Electrode location file for scalp map   {no default}
 %                     File should be ascii in format of  >> topoplot example   
 %     Optional Plotting Parameters:
-%       'hzdir'     = ['up'|'down'] Direction of the frequency axes      {'up'}
 %       'plottype'  = ['image'|'curve'] plot time frequency images or
 %                     curves (one curve per frequency). {default: 'image'}
 %       'plotmean'  = ['on'|'off'] For 'curve' plots only. Average all
@@ -218,6 +217,14 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.85  2006/09/07 19:06:35  scott
+% clarified the use of Hanning (fot FFT) or Morlet (for wavelet) tapering
+% in the help message!!!
+% Deprecated timeStretch... keywords in favor of 'timewarpfr'
+% In future, this will also be deprecated in favor of 'timewarp' which will use
+% event latencies in ms instead of frames.
+% Note: 'hzdir' not introduced now - too complicated to implement at the moment
+%
 % Revision 1.84  2006/07/19 03:24:34  toby
 % Corrected example
 %
@@ -642,7 +649,10 @@
 
 function [P,R,mbase,timesout,freqs,Pboot,Rboot,alltfX,PA] = timef( X, frame, tlimits, Fs, varwin, varargin);
 
-% Note: PA is output of 'phsamp','on' 
+% Not yet implemented:
+%       'hzdir'     = ['up'|'down'] Direction of the frequency axes      {'up'}
+
+% Note: Above, PA is output of 'phsamp','on' 
 
 % For future 'timewarp' keyword help: 'timewarp' 3rd element {colors} contains a
 %               list of Matlab linestyles to use for vertical lines marking the occurence
