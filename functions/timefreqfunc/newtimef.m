@@ -110,9 +110,9 @@
 %                     (Note: Epoch start and end should not be declared as events or 
 %                     warpfr}. If 'warpfr' is absent or [], the median of each 'events' 
 %                     column will be used. [plotidx] is an optional vector of indices 
-%                     telling which [warpfr] to plot with vertical lines. [Note: In 
-%                     future releases, 'timewarpfr' will be deprecated in favor of 
-%                     'timewarp' using ms instead of frames].
+%                     telling which [warpfr] to plot with vertical lines. If not defined,
+%                     all marks are plotted. [Note: In future releases, 'timewarpfr' will 
+%                     be deprecated in favor of 'timewarp' using ms instead of frames].
 %
 %    Optional bootstrap parameters:
 %       'alpha'     = If non-0, compute two-tailed bootstrap significance prob. 
@@ -217,6 +217,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.86  2006/09/07 19:09:55  scott
+% rm 'hzdir'
+%
 % Revision 1.85  2006/09/07 19:06:35  scott
 % clarified the use of Hanning (fot FFT) or Morlet (for wavelet) tapering
 % in the help message!!!
@@ -841,6 +844,10 @@ if ~isempty(g.timewarp)
     end
     if length(g.timewarp) > 2
         g.timeStretchPlot = g.timewarp{3};
+    else
+        stretchevents = size(g.timeStretchMarks);
+        stretchevents = stretchevents(2);
+        g.timeStretchPlot = [1:stretchevents]; % default to plotting all lines
     end
     if max(max(g.timeStretchMarks)) > frame | min(min(g.timeStretchMarks)) < 1
        error('Time warping event marks must be inside the epochs.');
