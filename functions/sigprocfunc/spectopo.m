@@ -119,6 +119,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.107  2006/07/29 00:52:18  toby
+% bug repair bug repaired
+%
 % Revision 1.106  2006/07/28 02:35:24  toby
 % Bugzilla bug 38 fix, program cleanup
 %
@@ -474,7 +477,7 @@ if nargin <= 3 | isstr(varargin{1})
 				  'freqrange'     'real'     [0 srate/2]               [] ;
 				  'memory'        'string'   {'low' 'high'}           'high' ;
 				  'plot'          'string'   {'on' 'off'}             'on' ;
-				  'plotmean'      'string'   {'on' 'off'}             'on' ;
+				  'plotmean'      'string'   {'on' 'off'}             'off' ;
 				  'title'         'string'   []                       '';
 				  'limits'        'real'     []                       [nan nan nan nan nan nan];
 				  'freqfac'       'integer'  []                        FREQFAC;
