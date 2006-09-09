@@ -7,25 +7,25 @@
 % Usage:
 %              >> spectopo(data, frames, srate);
 %              >> [spectra,freqs,speccomp,contrib,specstd] = ...
-%                   spectopo(data, frames, srate, 'key1','val1', 'key2','val2' ...);
+%                    spectopo(data, frames, srate, 'key1','val1', 'key2','val2' ...);
 % Inputs:
-%       data   = If 2-D (nchans,time_points); % may be continuous = a single epoch,
-%                else a set of concatenated data epochs. Else, a 3-D set of data 
+%       data   = If 2-D (nchans,time_points); % may be a continuous single epoch,
+%                else a set of concatenated data epochs, else a 3-D set of data 
 %                epochs (nchans,frames,epochs)
 %       frames = frames per epoch {default|0 -> data length}
 %       srate  = sampling rate per channel (Hz)
 %
-% Optional inputs:
+% Optional 'keyword',[argument] input pairs:
 %   'freq'     = [float vector (Hz)] vector of frequencies at which to plot power 
 %                scalp maps, or else a single frequency at which to plot component 
 %                contributions at a single channel (see also 'plotchan').
-%   'chanlocs' = electrode locations file or EEG.chanlocs structure. For format, see
-%                    >> topoplot example
-%   'limits'   = axis limits [xmin xmax ymin ymax cmin cmax] set x y and color axis
-%                limits. May omit final values or use NaN's
+%   'chanlocs' = [electrode locations filename or EEG.chanlocs structure]. 
+%                    For format, see >> topoplot example
+%   'limits'   = [xmin xmax ymin ymax cmin cmax] axis limits. Sets x, y, and color 
+%                axis limits. May omit final values or use NaNs.
 %                   Ex: [0 60 NaN NaN -10 10], [0 60], ...
 %                Default color limits are symmetric around 0 and are different 
-%                for each scalp map {default|all NaN's: from data}
+%                for each scalp map {default|all NaN's: from the data limits}
 %   'title'    = [quoted string] plot title {default: none}
 %   'freqfac'  = [integer] ntimes to oversample -> frequency resolution {default: 2}
 %   'nfft'     = [integer] length to zero-pad data to. Overwrites 'freqfac' above.
@@ -37,8 +37,7 @@
 %                1 Hz for the min and Nyquist (srate/2) for the max. If specified 
 %                power distribution maps are plotted, the highest mapped frequency 
 %                determines the max freq}.
-%   'reref'    = ['averef'|'off'] convert input data to average reference 
-%                {default: 'off'}
+%   'reref'    = ['averef'|'off'] convert data to average reference {default: 'off'}
 %   'mapnorm'  = [float vector] If 'data' contain the activity of an independant 
 %                component, this parameter should contain its scalp map. In this case
 %                the spectrum amplitude will be scaled to component RMS scalp power.
@@ -46,6 +45,7 @@
 %   'boundaries' = data point indices of discontinuities in the signal {default: none}
 %   'plot'     = ['on'|'off'] 'off' -> disable plotting {default: 'on'}
 %   'rmdc'     = ['on'|'off'] 'on' -> remove DC {default: 'off'}  
+%   'plotmean' = ['on'|'off'] 'on' -> plot the mean channel spectrum {default: 'off'}  
 %
 % Optionally plot component contributions:
 %   'weights'  = ICA unmixing matrix. Here, 'freq' (above) must be a single frequency.
@@ -119,6 +119,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.108  2006/09/08 11:10:14  arno
+% default plotmean option off
+%
 % Revision 1.107  2006/07/29 00:52:18  toby
 % bug repair bug repaired
 %
