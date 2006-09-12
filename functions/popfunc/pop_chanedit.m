@@ -147,6 +147,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.150  2006/04/17 15:47:54  scott
+% help message formatting
+%
 % Revision 1.149  2006/04/10 08:30:33  scott
 % dos2unix
 %
@@ -596,7 +599,7 @@
 % hidden parameter
 %   'gui' - [figure value], allow to process the same dialog box several times
 
-function [chansout, params, urchans, com] = pop_chanedit(chans, params, varargin);
+function [chansout, params, urchans, com] = pop_chanedit(chans, oriparams, varargin);
 
 urchans  = [];
 chansout = chans;
@@ -606,12 +609,13 @@ if nargin < 1
    return;
 end;
 if nargin < 2
-   params = [];
+   oriparams = [];
 end;
 
 % in case an EEG structure was given as input
 % -------------------------------------------
 dataset_input = 0;
+params = oriparams;
 if isstruct(chans) & isfield(chans, 'chanlocs')
     dataset_input = 1;
     EEG           = chans;
@@ -663,7 +667,7 @@ end;
 
 % dealing with additional parameters
 % ----------------------------------
-if nargin > 1 & ~isstr(params), % nothing
+if nargin > 1 & ~isstr(oriparams), % nothing
     if nargin > 2
         if ~isstr(varargin{1})
             urchans  = varargin{1};
@@ -671,7 +675,7 @@ if nargin > 1 & ~isstr(params), % nothing
         end;
     end;
 elseif nargin > 1
-    varargin = { params varargin{:} };
+    varargin = { oriparams varargin{:} };
     clear params;
     params.shrink        = shrinkorskirt;
     params.plotrad       = plotrad;
@@ -1264,7 +1268,14 @@ else
            
 		  case 'lookup'
            params.filename = args{ curfield+1 };
-           tmplocs = readlocs( args{ curfield+1 }, 'defaultelp', 'BESA' );
+           if strcmpi(params.filename, 'standard-10-5-cap385.elp')
+                dipfitdefs;
+                params.filename = template_models{1}{4};
+           elseif strcmpi(params.filename, 'standard_1005.elc') 
+                dipfitdefs;
+                params.filename = template_models{2}{4};
+           end;
+           tmplocs = readlocs( params.filename, 'defaultelp', 'BESA' );
            [tmp ind1 ind2] = intersect(lower({ tmplocs.labels }), lower({ chans.labels }));
            if ~isempty(tmp)
                chans = struct('labels', { chans.labels });
