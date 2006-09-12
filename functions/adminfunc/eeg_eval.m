@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2006/03/12 04:12:59  arno
+% nothing
+%
 % Revision 1.13  2006/03/10 21:24:22  arno
 % fixing saveing datasets etc...
 %
@@ -149,14 +152,10 @@ function [EEG, com] = eeg_eval( funcname, EEG, varargin);
         com = sprintf('%s = %s( %s,%s);', funcname, inputname(2), funcname, inputname(2), vararg2str(g.params));
     end;
 
-
 function EEG = update_datafield(EEG);
-    if isfield(EEG, 'datfile')
-        if ~isempty(EEG.datfile)
-            EEG.data = EEG.datfile;
-        else
-            EEG = rmfield(EEG, 'datfile');
-        end;
+    if ~isfield(EEG, 'datfile'), EEG.datfile = ''; end;
+    if ~isempty(EEG.datfile)
+        EEG.data = EEG.datfile;
     else 
         EEG.data = 'in set file';
     end;
