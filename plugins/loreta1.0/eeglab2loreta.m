@@ -58,6 +58,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2005/04/25 21:46:09  arno
+% fix
+%
 % Revision 1.1  2005/04/21 23:31:14  arno
 % Initial revision
 %
@@ -80,6 +83,8 @@ function eeglab2loreta( chanlocs, winv, varargin );
     
     % remove channels
     % ---------------
+    inds = find(cellfun('isempty', { chanlocs.X }));
+    g.excludechan = union(g.excludechan, inds);
     if ~isempty(g.excludechan)
         chanlocs(g.excludechan) = [];
         winv(g.excludechan,:)  = [];
@@ -97,6 +102,7 @@ function eeglab2loreta( chanlocs, winv, varargin );
 
         % remove all channels below limit
         % -------------------------------
+        
         if ~isnan(g.lowchanlim)
             rmelec = find(XYZ(:,3) < g.lowchanlim);
             chanlocs(rmelec) = [];
