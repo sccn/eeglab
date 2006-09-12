@@ -72,6 +72,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.51  2006/02/23 22:32:43  arno
+% nothing
+%
 % Revision 1.50  2006/02/10 22:33:13  arno
 % nothing
 %
@@ -324,12 +327,26 @@ for row = 1:length(g.geomhoriz)
 			return;
 		end;		
 		if ~isempty(currentelem)
+            if strcmpi(currentelem{1}, 'link2lines'), 
+                currentelem(1) = []; 
+                rowhandle(column) = uicontrol(g.fig, 'unit', 'normalized', 'position', ...
+						                      [posx-width posy+3.6*height/2 width 0.005].*s+q, 'style', 'pushbutton', 'string', '');
+                rowhandle(column) = uicontrol(g.fig, 'unit', 'normalized', 'position', ...
+						                      [posx-width posy+0.7*height/2 width 0.005].*s+q, 'style', 'pushbutton', 'string', '');
+                rowhandle(column) = uicontrol(g.fig, 'unit', 'normalized', 'position', ...
+						                      [posx posy+0.7*height/2 0.005 3/2*height].*s+q, 'style', 'pushbutton', 'string', '');
+                rowhandle(column) = uicontrol(g.fig, 'unit', 'normalized', 'position', ...
+						                      [posx posy+2.1*height/2 width 0.005].*s+q, 'style', 'pushbutton', 'string', '');
+            end;
+            if strcmpi(currentelem{1}, 'vertshift'), currentelem(1) = []; addvert = -height/2; 
+            else                                                         addvert = 0;   
+            end;
             if ~strcmp(currentelem{2}, 'popupmenu') & ~strcmp(currentelem{2}, 'pushbutton')
                 rowhandle(column) = uicontrol(g.fig, 'unit', 'normalized', 'position', ...
-						                      [posx posy width height].*s+q, currentelem{:});
+						                      [posx posy+addvert width height].*s+q, currentelem{:});
             else % force height to be unitary
                 rowhandle(column) = uicontrol(g.fig, 'unit', 'normalized', 'position', ...
-						[posx posy+height-(height+g.geomvert(ind1))/2 width g.geomvert(ind1)].*s+q, currentelem{:});
+						[posx posy+height-(height+g.geomvert(ind1))/2+addvert width g.geomvert(ind1)].*s+q, currentelem{:});
             end;
             
 			% this simply compute a factor so that all uicontrol will be visible
