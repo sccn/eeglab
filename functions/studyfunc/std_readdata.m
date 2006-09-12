@@ -1,10 +1,10 @@
-% std_chanread() - load one or more requested measures 
+% std_readdata() - load one or more requested measures 
 %                   ['erp'|'spec'|'ersp'|'itc'|'dipole'|'map']
 %                   for all components of a specified chaner.  
 %                   Called by chaner plotting functions: std_envtopo(), 
 %                   std_erpplot(), std_erspplot(), ...
 % Usage:
-%         >> chaninfo = std_chanread(STUDY,ALLEEG, channel, infotype, condition);
+%         >> chaninfo = std_readdata(STUDY,ALLEEG, channel, infotype, condition);
 % Inputs:
 %         STUDY - studyset structure containing some or all files in ALLEEG
 %        ALLEEG - vector of loaded EEG datasets
@@ -48,15 +48,17 @@
 % Example:
 %         % To plot the ERPs for all chaner-3 components from a STUDY
 %         %
-%         chaninfo = std_chanread(STUDY, ALLEEG, 3, 'erp');
+%         chaninfo = std_readdata(STUDY, ALLEEG, 3, 'erp');
 %         figure; plot(chaninfo.erp_times, chaninfo.erp);
 % 
 % Author: Hilit Serby, Scott Makeig & Arnaud Delorme, SCCN/INC/UCSD, 2005-
 
-function [STUDY allinds ] = std_chanread(STUDY, ALLEEG, varargin);
+% $Log: not supported by cvs2svn $
+
+function [STUDY allinds ] = std_readdata(STUDY, ALLEEG, varargin);
 
 if nargin < 2
-    help std_chanread;
+    help std_readdata;
     return;
 end
 if nargin < 3
@@ -72,7 +74,7 @@ opt = finputcheck( varargin, { 'condition'  'cell'    []       {};
                              'group'      'cell'    []       {};
                              'statmode'   'string'  { 'individual' 'common' 'trials' }       'individual';
                              'subbaseline' 'string'  { 'on' 'off' }       'on';
-                             'infotype'   'string'  { 'erp' 'spec' 'ersp' 'itc' } 'erp' }, 'std_chanread');
+                             'infotype'   'string'  { 'erp' 'spec' 'ersp' 'itc' } 'erp' }, 'std_readdata');
 if isstr(opt), error(opt); end;
 if strcmpi(opt.infotype, 'erp'),
     STUDY = pop_erpparams(STUDY, 'default');
