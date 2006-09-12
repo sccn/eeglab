@@ -69,12 +69,12 @@ catch,
 end;
 try, group = unique({ STUDY.datasetinfo.group });
 catch, 
-     group = ''; 
+     group = {}; 
      % disp('Important warning: some datasets do not have group codes; some functions may crash!');
 end;
 try, condition = unique({ STUDY.datasetinfo.condition });
 catch, 
-     condition = ''; 
+     condition = {}; 
      disp('Important warning: some datasets do not have condition codes; some functions may crash!');
 end;
 try, session = unique([STUDY.datasetinfo.session]);
