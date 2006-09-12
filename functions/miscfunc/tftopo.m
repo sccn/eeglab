@@ -14,6 +14,8 @@
 % Optional inputs:
 %  'timefreqs' = Array of time/frequency points at which to plot topoplot() maps.
 %                Size: (nrows,2), each row given the [ms Hz] location of one point.
+%  ' plotscalponly' = Plot only one scalp map (same format as above) and no
+%                time-frequency image.
 %  'showchan'  = [integer] Channel number of the tfdata to image. Else 0 to image
 %                the (median-signed) RMS values across channels. {default: 0}
 %  'chanlocs'  = ['string'|structure] Electrode locations file (for format see 
@@ -80,6 +82,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.80  2006/05/03 12:14:24  arno
+% implementing native input
+%
 % Revision 1.79  2006/03/14 19:50:32  arno
 % remove debug message
 %
@@ -350,6 +355,7 @@ fieldlist = { 'chanlocs'      { 'string' 'struct' }       []       '' ;
               'cmode'         'string'   {'common' 'separate' }    'common';
               'selchans'      'integer'  [1 nchans]                [1:nchans];
               'shiftimgs'     'real'     []                        [] ;
+              'plotscalponly' 'real'     []                        [] ;
               'showchan'      'integer'  [0 nchans]                0 ;
               'signifs'       'real'     []                        [];
               'sigthresh'     'integer'  [1 Inf]                   [1 1];
@@ -463,6 +469,26 @@ if ~isempty(g.timefreqs)
     tfpidx = [timeidx' freqidx'];
 else 
     tfpoints = 0;
+end;
+
+% only plot one scalp map
+% -----------------------
+if ~isempty(g.plotscalponly)
+    [tmp fi] = min(abs(freqs-g.plotscalponly(2)));
+    [tmp ti] = min(abs(times-g.plotscalponly(1)));
+    scalpmap = squeeze(tfdataori(fi, ti, g.selchans));   
+
+    if ~isempty(varargin)
+        topoplot(scalpmap,g.chanlocs,'electrodes','on', varargin{:}); 
+    else
+        topoplot(scalpmap,g.chanlocs,'electrodes','on'); 
+    end;
+    % 'interlimits','electrodes')
+    axis square;
+    hold on
+    tl=title([int2str(g.plotscalponly(2)),' ms, ',int2str(g.plotscalponly(1)),' Hz']);
+    set(tl,'fontsize',13);
+    return;
 end;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
