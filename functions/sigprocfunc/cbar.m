@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2006/02/16 21:21:06  arno
+% same
+%
 % Revision 1.4  2006/02/16 21:20:35  arno
 % new option pos
 %
@@ -197,9 +200,14 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%
 
 if nargin > 2 
-  Cax = get(ax,'Ylim');
+  if strcmp(arg,'vert')
+      Cax = get(ax,'Ylim');
+  else
+      Cax = get(ax,'Xlim');
+  end;
   CBTicks = [Cax(1):(Cax(2)-Cax(1))/(grad-1):Cax(2)]; % caxis tick positions
   CBLabels = [minmax(1):(minmax(2)-minmax(1))/(grad-1):minmax(2)]; % tick labels
+  
   dec = floor(log10(max(abs(minmax)))); % decade of largest abs value
   CBLabels = ([minmax]* [ linspace(1,0, grad);linspace(0, 1, grad)]);
   %[1.0 .75 .50 .25 0.0; 0.0 .25 .50 .75 1.0]);
