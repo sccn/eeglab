@@ -1,61 +1,73 @@
 % std_readdata() - load one or more requested measures 
 %                   ['erp'|'spec'|'ersp'|'itc'|'dipole'|'map']
-%                   for all components of a specified chaner.  
-%                   Called by chaner plotting functions: std_envtopo(), 
+%                   for all components of a specified cluster.  
+%                   Called by cluster plotting functions: std_envtopo(), 
 %                   std_erpplot(), std_erspplot(), ...
 % Usage:
-%         >> chaninfo = std_readdata(STUDY,ALLEEG, channel, infotype, condition);
+%         >> [STUDY clustinfo] = std_clustread(STUDY, ALLEEG, cluster, infotype);
 % Inputs:
 %         STUDY - studyset structure containing some or all files in ALLEEG
 %        ALLEEG - vector of loaded EEG datasets
-%       channel - [cell array] channel name(s)
+%       cluster - cluster number in STUDY
 %      infotype - ['erp'|'spec'|'ersp'|'itc'|'dipole'|'map'] type of stored
-%                 chaner information to read. May also be a cell array of
-%                 these types, for example: { 'erp' 'map' 'dipole' }
-%     condition - STUDY condition number to read {default: 1}
+%                 cluster information to read. May also be a cell array of
+%                 these types, for example: { 'erp' 'map' 'dipole' }.
+%                 ************* 'map' and 'dipole' not implemented yet
 %
 % Output:
-%      chaninfo - structure of specified chaner information:
+%    STUDY     - updated STUDY structure
+%    clustinfo - structure of specified cluster information. This is 
+%                equal to STUDY.cluster(cluster)     
 %
-%         chaninfo.name          % chaner name
-%         chaninfo.chanernum    % chaner index
-%         chaninfo.condition     % index of the condition asked for
+%         clustinfo.erpdata   % (ncomps, ntimes) array of component ERPs
+%         clustinfo.erptimes  % vector of ERP epoch latencies
 %
-%         chaninfo.comp[]        % array of component indices 
-%         chaninfo.subject{}     % cell array of component subject codes
-%         chaninfo.group{}       % cell array of component group codes
+%         clustinfo.specdata  % (ncomps, nfreqs) array of component spectra
+%         clustinfo.specfreqs % vector of spectral frequencies 
 %
-%         chaninfo.erp[]         % (ncomps, ntimes) array of component ERPs
-%           chaninfo.erp_times[] % vector of ERP epoch latencies
+%         clustinfo.erspdata    % (ncomps,ntimes,nfreqs) array of component ERSPs
+%           clustinfo.ersptimes % vector of ERSP latencies
+%           clustinfo.erspfreqs % vector of ERSP frequencies
 %
-%         chaninfo.spec[]        % (ncomps, nfreqs) array of component spectra
-%           chaninfo.spec_freqs[]% vector of spectral frequencies 
+%         clustinfo.itcdata     % (ncomps,ntimes,nfreqs) array of component ITCs
+%           clustinfo.itctimes  % vector of ITC latencies
+%           clustinfo.itc_freqs % vector of ITC frequencies
 %
-%         chaninfo.ersp[]        % (ncomps,ntimes,nfreqs) array of component ERSPs
-%           chaninfo.ersp_times[]% vector of ERSP latencies
-%           chaninfo.ersp_freqs[]% vector of ERSP frequencies
+%  ********** SOON **********
 %
-%         chaninfo.itc[]         % (ncomps,ntimes,nfreqs) array of component ITCs
-%           chaninfo.itc_times[] % vector of ITC latencies
-%           chaninfo.itc_freqs[] % vector of ITC frequencies
+%         clustinfo.topo        % (ncomps,65,65) array of component scalp map grids
+%           clustinfo.topox     % abscissa values for columns of the scalp maps
+%           clustinfo.topoy     % ordinate values for rows of the scalp maps
 %
-%         chaninfo.scalp[]       % (ncomps,65,65) array of component scalp map grids
-%           chaninfo.xi[]        % abscissa values for columns of the scalp maps
-%           chaninfo.yi[]        % ordinate values for rows of the scalp maps
-%
-%         chaninfo.dipole        % array of component dipole information structs
-%                                 % with same format as EEopt.dipfit.model
+%         clustinfo.dipole      % array of component dipole information structs
+%                               % with same format as EEG.dipfit.model
 % Example:
-%         % To plot the ERPs for all chaner-3 components from a STUDY
+%         % To obtain the ERPs for all Cluster-3 components from a STUDY
 %         %
-%         chaninfo = std_readdata(STUDY, ALLEEG, 3, 'erp');
-%         figure; plot(chaninfo.erp_times, chaninfo.erp);
+%         [STUDY clustinfo] = std_clustread(STUDY, ALLEEG, 3, 'erp');
+%         figure; plot(clustinfo.erptimes, mean(clustinfo.erpdata,2));
 % 
-% Author: Hilit Serby, Scott Makeig & Arnaud Delorme, SCCN/INC/UCSD, 2005-
+% Author: Arnaud Delorme, CERCO, 2006-
+
+% Copyright (C) Arnaud Delorme, arno@salk.edu
+%
+% This program is free software; you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation; either version 2 of the License, or
+% (at your option) any later version.
+%
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+% You should have received a copy of the GNU General Public License
+% along with this program; if not, write to the Free Software
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
 
-function [STUDY allinds ] = std_readdata(STUDY, ALLEEG, varargin);
+function [STUDY, clustinfo, allinds] = std_readdata(STUDY, ALLEEG, varargin);
 
 if nargin < 2
     help std_readdata;
@@ -401,4 +413,11 @@ for ind = 1:length(allinds)
             end;
         end;
     end;
+end;
+
+% return structure
+% ----------------
+if ~isempty(opt.channels)
+     clustinfo = STUDY.changrp(allinds);
+else clustinfo = STUDY.cluster(allinds);
 end;
