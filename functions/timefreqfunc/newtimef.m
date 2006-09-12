@@ -217,6 +217,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.87  2006/09/08 01:45:22  scott
+% default to plot all timeStretchRefs -sm
+%
 % Revision 1.86  2006/09/07 19:09:55  scott
 % rm 'hzdir'
 %
@@ -822,7 +825,7 @@ try, g.erspmarglim;     catch, g.erspmarglim = []; end;
 try, g.itcavglim;       catch, g.itcavglim   = []; end;
 try, g.erplim;          catch, g.erplim      = []; end;
 try, g.speclim;         catch, g.speclim     = []; end;
-try, g.timewarp;        catch, g.timewarp    = []; end;
+try, g.timewarpfr;        catch, g.timewarpfr    = []; end;
 %Added -Jean
 try, g.timeStretchMarks;     catch, g.timeStretchMarks = []; end;
 try, g.timeStretchRefs;     catch, g.timeStretchRefs = []; end;
@@ -831,6 +834,7 @@ g.AXES_FONT       = AXES_FONT;           % axes text FontSize
 g.TITLE_FONT      = TITLE_FONT;
 g.ERSP_CAXIS_LIMIT = ERSP_CAXIS_LIMIT;         
 g.ITC_CAXIS_LIMIT  = ITC_CAXIS_LIMIT;        
+g.timewarp = g.timewarpfr; % for now, g.timewarp means g.timewarpfr  -sm
 
 if isfield(g, 'detret'), g.detrend = g.detret; end;
 if isfield(g, 'detrep'), g.rmerp   = g.detrep; end;
