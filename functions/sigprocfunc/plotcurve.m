@@ -69,18 +69,22 @@ function plotcurve( times, R, varargin);
    % regions of significance
    % -----------------------
    if ~isempty(g.maskarray)
-      Rregions = ones(size(g.val2mask));
-      switch dims(g.maskarray)
-           case 3, Rregions  (find(g.val2mask > g.maskarray(:,:,1) & (g.val2mask < g.maskarray(:,:,2)))) = 0;
-           case 2, if size(g.val2mask,2) == size(g.maskarray,2)
-                       Rregions  (find(g.val2mask < g.maskarray)) = 0;
-                   else
-                       Rregions(find((g.val2mask > repmat(g.maskarray(:,1),[1 length(times)])) ...
-                         & (g.val2mask < repmat(g.maskarray(:,2),[1 length(times)])))) = 0;
-                   end;
-           case 1, Rregions  (find(g.val2mask < repmat(g.maskarray(:),[1 size(g.val2mask,2)]))) = 0;
-       end; 
-       Rregions = sum(Rregions,1);
+       if length(unique(g.maskarray)) < 3
+          Rregions = g.maskarray;
+       else
+          Rregions = ones(size(g.val2mask));
+          switch dims(g.maskarray)
+               case 3, Rregions  (find(g.val2mask > g.maskarray(:,:,1) & (g.val2mask < g.maskarray(:,:,2)))) = 0;
+               case 2, if size(g.val2mask,2) == size(g.maskarray,2)
+                           Rregions  (find(g.val2mask < g.maskarray)) = 0;
+                       else
+                           Rregions(find((g.val2mask > repmat(g.maskarray(:,1),[1 length(times)])) ...
+                             & (g.val2mask < repmat(g.maskarray(:,2),[1 length(times)])))) = 0;
+                       end;
+               case 1, Rregions  (find(g.val2mask < repmat(g.maskarray(:),[1 size(g.val2mask,2)]))) = 0;
+           end; 
+           Rregions = sum(Rregions,1);
+       end;
    else 
        Rregions = [];
    end
@@ -110,9 +114,9 @@ function plotcurve( times, R, varargin);
   % --------------
   hold on
   yl = ylim;
-  if times(1) < 0
-      plot([0 0],[yl(1) yl(2)],'--m','LineWidth',g.linewidth);
-  end;
+  %if times(1) < 0
+  %    plot([0 0],[yl(1) yl(2)],'--m','LineWidth',g.linewidth);
+  %end;
   if ~isnan(g.marktimes) % plot marked time
       for mt = g.marktimes(:)'
           plot([mt mt],[yl(1) yl(2)],'--k','LineWidth',g.linewidth);
@@ -137,7 +141,9 @@ function plotcurve( times, R, varargin);
 function highlight(ax, times, regions, highlightmode, myxlabel);
 color1 = [0.75 0.75 0.75];
 color2 = [0 0 0];
-yl  = ylim;
+yl  = ylim; 
+yl(1) = yl(1)-max(abs(yl));
+yl(2) = yl(2)+max(abs(yl));
 
 if ~strcmpi(highlightmode, 'background')
     pos = get(gca, 'position');
@@ -146,6 +152,8 @@ if ~strcmpi(highlightmode, 'background')
     plot(times, times, 'w');
     set(axsignif, 'ytick', []);
     yl2 = ylim;
+    yl2(1) = yl2(1)-max(abs(yl2));
+    yl2(2) = yl2(2)+max(abs(yl2));
     xlim([times(1) times(end)]);
     xlabel(myxlabel);
 else
