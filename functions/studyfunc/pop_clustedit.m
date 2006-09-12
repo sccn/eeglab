@@ -299,6 +299,9 @@ if ~isstr(varargin{1})
     create_clus   = ['pop_clustedit(''createclust'',gcf);'];
     reject_outliers = ['pop_clustedit(''rejectoutliers'',gcf);'];
     merge_clusters = ['pop_clustedit(''mergeclusters'',gcf);'];
+    erp_opt        = ['pop_clustedit(''erp_opt'',gcf);'];
+    spec_opt       = ['pop_clustedit(''spec_opt'',gcf);'];
+    ersp_opt       = ['pop_clustedit(''ersp_opt'',gcf);'];
     saveSTUDY     = [ 'set(findobj(''parent'', gcbf, ''userdata'', ''save''), ''enable'', fastif(get(gcbo, ''value'')==1, ''on'', ''off''));' ];
     browsesave    = [ '[filename, filepath] = uiputfile2(''*.study'', ''Save STUDY with .study extension -- pop_clust()''); ' ... 
                       'set(findobj(''parent'', gcbf, ''tag'', ''studyfile''), ''string'', [filepath filename]);' ];
@@ -353,18 +356,20 @@ if ~isstr(varargin{1})
         {'style' 'pushbutton' 'enable' scalp_enable 'string' 'Plot scalp map(s)' 'Callback' plot_comp_maps}...
         {'style' 'pushbutton' 'enable'   dip_enable 'string' 'Plot dipoles' 'Callback' plot_clus_dip} {}  ...
         {'style' 'pushbutton' 'enable'   dip_enable 'string' 'Plot dipole(s)' 'Callback' plot_comp_dip}...
-        {'style' 'pushbutton' 'enable'   erp_enable 'string' 'Plot ERPs' 'Callback' plot_clus_erp} {} ...
+        {'style' 'pushbutton' 'enable'   erp_enable 'string' 'Plot ERPs' 'Callback' plot_clus_erp} ...
+        {'style' 'pushbutton' 'enable'   erp_enable 'string' 'Params' 'Callback' erp_opt }  ...
         {'style' 'pushbutton' 'enable'   erp_enable 'string' 'Plot ERP(s)' 'Callback' plot_comp_erp} ...
-        {'style' 'pushbutton' 'enable'  spec_enable 'string' 'Plot spectra' 'Callback' plot_clus_spectra} {} ...
+        {'style' 'pushbutton' 'enable'  spec_enable 'string' 'Plot spectra' 'Callback' plot_clus_spectra} ...
+        {'style' 'pushbutton' 'enable'  spec_enable 'string' 'Params' 'Callback' spec_opt } ...
         {'style' 'pushbutton' 'enable'  spec_enable 'string' 'Plot spectra' 'Callback' plot_comp_spectra} ...
         {'style' 'pushbutton' 'enable'  ersp_enable 'string' 'Plot ERSPs' 'Callback' plot_clus_ersps} ...
-        {'style' 'pushbutton' 'enable'  ersp_enable 'string' 'Params' 'Callback' 'warndlg2(''Not implemented yet'');' }  ...
+        {'vertshift' 'style' 'pushbutton' 'enable'  ersp_enable 'string' 'Params' 'Callback' ersp_opt }  ...
         {'style' 'pushbutton' 'enable'  ersp_enable 'string' 'Plot ERSP(s)' 'Callback' plot_comp_ersps}...
-        {'style' 'pushbutton' 'enable'  ersp_enable 'string' 'Plot ITCs' 'Callback' plot_clus_itcs} ...
-        {'style' 'pushbutton' 'enable'  ersp_enable 'string' 'Params' 'Callback' 'warndlg2(''Not implemented yet'');' }  ...
+        {'style' 'pushbutton' 'enable'  ersp_enable 'string' 'Plot ITCs' 'Callback' plot_clus_itcs} { }  ...
         {'style' 'pushbutton' 'enable'  ersp_enable 'string' 'Plot ITC(s)' 'Callback' plot_comp_itcs}...
         {'style' 'pushbutton' 'string' 'Plot cluster properties' 'Callback' plot_clus_sum} {} ... 
-        {'style' 'pushbutton' 'string' 'Plot component properties' 'Callback' plot_comp_sum 'enable' 'off'} {} ...
+        {'style' 'pushbutton' 'string' 'Plot component properties' 'Callback' plot_comp_sum 'enable' 'off'} ...
+        {} ...
         {'style' 'pushbutton' 'string' 'Create new cluster' 'Callback'  create_clus} {} ...
         {'style' 'pushbutton' 'string' 'Reassign selected component(s)' 'Callback' move_comp} ...
         {'style' 'pushbutton' 'string' 'Rename selected cluster' 'Callback' rename_clust } {} ...
@@ -422,75 +427,17 @@ else
     
     switch  varargin{1}
         
-        case {'topoplot', 'erspplot','itcplot','specplot', 'erpplot'}
-            plotting_option = varargin{1};
-            if (clus ~= 1 ) % specific cluster option
-                if ~isempty(STUDY.cluster(cls(clus-1)).comps)
-                    eval(['STUDY = std_' plotting_option '(STUDY,ALLEEG,''clusters'','  num2str(cls(clus-1)) ',''mode'',''centroid'');'  ]);
-                     % update Study history
-                    a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''clusters'','  num2str(cls(clus-1)) ',''mode'',''centroid'');'  ];
-                    STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
-                end
-            else % all clusters
-                % All clusters does not include 'Notclust' 'ParentCluster' and 'Outliers' clusters. 
-                tmpcls = [];
-                for k = 1:length(cls) 
-                    if ~strncmpi(STUDY.cluster(cls(k)).name,'Notclust',8) & ~strncmpi(STUDY.cluster(cls(k)).name,'Outliers',8) & ...
-                            (~strncmpi('ParentCluster',STUDY.cluster(cls(k)).name,13)) & ~isempty(STUDY.cluster(cls(k)).comps)
-                        tmpcls = [ tmpcls cls(k)];
-                    end
-                end
-                eval(['STUDY = std_' plotting_option '(STUDY,ALLEEG,''clusters'',[' num2str(tmpcls) '], ''mode'',''centroid'');'  ]);
-                % update Study history
-                a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''clusters'',['  num2str(tmpcls) '],''mode'',''centroid'');'  ];
-                STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
-            end
-            userdat{1}{2} = STUDY;
-            set(hdl, 'userdat',userdat); 
-        case   'dipplot'  
-            if (clus ~= 1 ) % specific cluster option
-                if ~isempty(STUDY.cluster(cls(clus-1)).comps)
-                    [STUDY] = std_dipplot(STUDY, ALLEEG, 'clusters', cls(clus-1), 'mode', 'apart');
-                    % update Study history
-                    a = ['STUDY = std_dipplot(STUDY, ALLEEG, ''clusters'','  num2str(cls(clus-1)) ',''mode'',''apart'' );'  ];
-                    STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
-                end
-            else % all clusters
-                % All clusters does not include 'Notclust' and 'Outliers' clusters. 
-                tmpcls = [];
-                for k = 1:length(cls) 
-                    if ~strncmpi(STUDY.cluster(cls(k)).name,'Notclust',8) & ~strncmpi(STUDY.cluster(cls(k)).name,'Outliers',8) & ...
-                            (~strncmpi('ParentCluster',STUDY.cluster(cls(k)).name,13))  & ~isempty(STUDY.cluster(cls(k)).comps)                           
-                        tmpcls = [ tmpcls cls(k)];
-                    end
-                end
-                [STUDY] = std_dipplot(STUDY, ALLEEG, 'clusters', tmpcls, 'mode', 'joined');
-                % update Study history
-                a = ['STUDY = std_dipplot(STUDY, ALLEEG, ''clusters'',[' num2str(tmpcls)  '],''mode'',''joined'' );'  ];
-                STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
-            end
-           userdat{1}{2} = STUDY;
-           set(hdl, 'userdat',userdat);    
-        case {'plotcomptopo', 'plotcompersp','plotcompitc','plotcompspec', 'plotcomperp','plotcompdip'}
+        case {'plotcomptopo', 'plotcompersp','plotcompitc','plotcompspec', 'plotcomperp'}
             plotting_option = varargin{1};
             plotting_option = [ plotting_option(9:end) 'plot' ];
             if (clus ~= 1 ) %specific cluster
                 if comp_ind(1) ~= 1  % check that not all comps in cluster are requested
-                    eval(['STUDY = std_' plotting_option '(STUDY,ALLEEG, ''clusters'','  num2str(cls(clus-1)) ', ''comps'',[' num2str(comp_ind-1) '] );'  ]);
-                    % update Study history
-                    a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG, ''clusters'','  num2str(cls(clus-1)) ',''comps'',[' num2str(comp_ind-1) '] );'  ];
-                    STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
+                    subject = STUDY.datasetinfo( STUDY.cluster(cls(clus-1)).sets(1,comp_ind-1)).subject;
+                    a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''clusters'','  num2str(cls(clus-1)) ', ''comps'', ' num2str(comp_ind-1) ' );' ];
+                    eval(a); STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
                  else
-                    eval(['STUDY = std_' plotting_option '(STUDY,ALLEEG, ''clusters'','  num2str(cls(clus-1)) ', ''mode'', ''comps'' );'  ]);
-                    % update Study history
-                    a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG, ''clusters'','  num2str(cls(clus-1)) ', ''mode'', ''comps'' );'  ];
-                    STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);
-                    if length(comp_ind) > 1 % plot specific components too
-                        eval(['STUDY = std_' plotting_option '(STUDY,ALLEEG, ''clusters'','  num2str(cls(clus-1)) ',''comps'',[' num2str(comp_ind(2:end)-1) '] );'  ]);
-                        % update Study history
-                        a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG, ''clusters'','  num2str(cls(clus-1)) ',''comps'',[' num2str(comp_ind(2:end)-1) '] );' ];
-                        STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);
-                    end
+                    a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''clusters'','  num2str(cls(clus-1)) ', ''plotsubjects'', ''on'' );' ];
+                    eval(a); STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
                 end
             else % all clusters - plot average scalp map
                comp_list = get(findobj('parent', hdl, 'tag', 'clust_comp'), 'String');
@@ -504,10 +451,9 @@ else
                             (~strncmpi('ParentCluster',STUDY.cluster(cls(k)).name,13)) 
                            if strcmpi(STUDY.cluster(cls(k)).name, clust_name)
                                cind = comp_ind(ci) - num_comps; % component index in the cluster
-                               eval(['STUDY = std_' plotting_option '(STUDY,ALLEEG,''clusters'','  num2str(cls(k)) ',''comps'',[' num2str(cind) '] );'  ]);
-                               % update Study history
-                               a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''clusters'','  num2str(cls(k)) ',''comps'',[' num2str(cind) '] );' ];
-                               STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);
+                               subject = STUDY.datasetinfo( STUDY.cluster(cls(k)).sets(1,cind)).subject;
+                               a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''clusters'','  num2str(cls(k)) ', ''comps'',' num2str(cind) ' );' ];
+                               eval(a); STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
                                break;
                            else
                                num_comps = num_comps + length(STUDY.cluster(cls(k)).comps);
@@ -518,6 +464,73 @@ else
             end
             userdat{1}{2} = STUDY;
             set(hdl, 'userdat',userdat); 
+            
+        case {'topoplot', 'erspplot', 'itcplot', 'specplot', 'erpplot'}
+            plotting_option = varargin{1};
+            plotting_option = [ plotting_option(1:end-4) 'plot' ];
+            if (clus ~= 1 ) % specific cluster option
+                if ~isempty(STUDY.cluster(cls(clus-1)).comps)
+                    a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''clusters'','  num2str(cls(clus-1)) ');' ];
+                    eval(a); STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
+                end
+            else % all clusters
+                % All clusters does not include 'Notclust' 'ParentCluster' and 'Outliers' clusters. 
+                tmpcls = [];
+                for k = 1:length(cls) 
+                    if ~strncmpi(STUDY.cluster(cls(k)).name,'Notclust',8) & ~strncmpi(STUDY.cluster(cls(k)).name,'Outliers',8) & ...
+                            (~strncmpi('ParentCluster',STUDY.cluster(cls(k)).name,13)) & ~isempty(STUDY.cluster(cls(k)).comps)
+                        tmpcls = [ tmpcls cls(k)];
+                    end
+                end
+                a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''clusters'',['  num2str(tmpcls) ']);' ];
+                eval(a); STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
+            end
+            userdat{1}{2} = STUDY;
+            set(hdl, 'userdat',userdat); 
+            
+        case  { 'dipplot', 'plotcompdip' } 
+            if strcmpi(varargin{1}, 'plotcompdip') & comp_ind ~= 1
+                [STUDY] = std_dipplot(STUDY, ALLEEG, 'clusters', cls(clus-1), 'comps', comp_ind-1);
+            else    
+                if (clus ~= 1) % specific cluster option
+                    if ~isempty(STUDY.cluster(cls(clus-1)).comps)
+                        [STUDY] = std_dipplot(STUDY, ALLEEG, 'clusters', cls(clus-1), 'mode', 'apart');
+                        % update Study history
+                        a = ['STUDY = std_dipplot(STUDY, ALLEEG, ''clusters'','  num2str(cls(clus-1)) ',''mode'',''apart'' );'  ];
+                        STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
+                    end
+                else % all clusters
+                    % All clusters does not include 'Notclust' and 'Outliers' clusters. 
+                    tmpcls = [];
+                    for k = 1:length(cls) 
+                        if ~strncmpi(STUDY.cluster(cls(k)).name,'Notclust',8) & ~strncmpi(STUDY.cluster(cls(k)).name,'Outliers',8) & ...
+                                (~strncmpi('ParentCluster',STUDY.cluster(cls(k)).name,13))  & ~isempty(STUDY.cluster(cls(k)).comps)                           
+                            tmpcls = [ tmpcls cls(k)];
+                        end
+                    end
+                    [STUDY] = std_dipplot(STUDY, ALLEEG, 'clusters', tmpcls, 'mode', 'joined');
+                    % update Study history
+                    a = ['STUDY = std_dipplot(STUDY, ALLEEG, ''clusters'',[' num2str(tmpcls)  '],''mode'',''joined'' );'  ];
+                    STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
+                end
+            end;
+            userdat{1}{2} = STUDY;
+            set(hdl, 'userdat',userdat);    
+            
+        case 'erp_opt' % save the list of selected chaners
+            STUDY = pop_erpparams(STUDY);
+            userdat{1}{2} = STUDY;
+            set(hdl, 'userdat',userdat); %update information (STUDY)     
+
+        case 'spec_opt' % save the list of selected chaners
+            STUDY = pop_specparams(STUDY);
+            userdat{1}{2} = STUDY;
+            set(hdl, 'userdat',userdat); %update information (STUDY)     
+         
+        case 'ersp_opt' % save the list of selected chaners
+            STUDY = pop_erspparams(STUDY);
+            userdat{1}{2} = STUDY;
+            set(hdl, 'userdat',userdat); %update information (STUDY)     
             
        case 'showcomplist' % save the list of selected clusters
             clust = get(findobj('parent', hdl, 'tag', 'clus_list') , 'value');
@@ -565,6 +578,7 @@ else
                     end
                 end
             end
+            if selected > length(compid), selected = 1; end;
             set(findobj('parent', hdl, 'tag', 'clust_comp'), 'value', selected, 'String', compid);
            
         case 'plotsum'
