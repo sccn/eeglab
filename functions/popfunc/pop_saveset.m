@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.83  2006/05/07 18:08:07  arno
+% resaving dataset fix
+%
 % Revision 1.82  2006/03/12 04:15:19  arno
 % resave dataset
 %
@@ -318,7 +321,7 @@ if isempty(EEG)  , error('Cannot save empty datasets'); end;
 % empty filename (resave file)
 emptyfilename = 0;
 if nargin > 1
-    if isempty(varargin{1}), emptyfilename = 1; end;
+    if isempty(varargin{1}) | isempty(EEG.filename), emptyfilename = 1; end;
 end;
 
 if nargin < 2 | emptyfilename
@@ -352,6 +355,7 @@ if isstr(g), error(g); end;
 
 % current filename without the .set
 % ---------------------------------
+if emptyfilename == 1, g.savemode = ''; end;
 [g.filepath filenamenoext ext] = fileparts( fullfile(g.filepath, g.filename) ); ext = '.set';
 g.filename = [ filenamenoext ext ];
 
@@ -364,6 +368,42 @@ if strcmpi(g.check, 'on')
 else
     EEG = eeg_checkset(EEG);
 end
+
+% check for change in saving mode
+% -------------------------------
+eeglab_options;
+if length(EEG) == 1
+    if isfield(EEG, 'datfile')
+        if isempty(EEG.datfile), EEG = rmfield(EEG, 'datfile'); end;
+    end;
+    if strcmpi(g.savemode, 'resave') & isfield(EEG, 'datfile') & option_savematlab
+        but = questdlg2(strvcat('This dataset has an associated ''.dat'' file, but since you have', ...
+                          'changed of saving mode, all the data will now be saved within the', ...
+                          'Matlab file and the ''.dat'' file will be deleted.', ...
+                          '(Note: Just press ''No'' if you do not know what you are doing)'), ...
+                          'Warning: saving mode changed', 'Cancel', 'No, save as before', 'Yes, do it', 'Yes, do it');
+        switch but
+            case 'Cancel', return;
+            case 'No, save as before', % nothing
+            case 'Yes, do it', g.savemode = 'onefile';
+        end;
+        g.filename = EEG.filename;
+        g.filepath = EEG.filepath;
+    elseif strcmpi(g.savemode, 'resave') & ~isfield(EEG, 'datfile') & ~option_savematlab
+        but = questdlg2(strvcat('This dataset does not have yet an associated ''.dat'' file, but since you have', ...
+                          'changed of saving mode, all the data will now be saved within the ''.dat''', ...
+                          'file and not in the Matlab file (as it is currently the case).', ...
+                          '(Note: Just press ''No'' if you do not know what you are doing)'), ...
+                          'Warning: saving mode changed', 'Cancel', 'No, save as before', 'Yes, do it', 'Yes, do it');
+        switch but
+            case 'Cancel', return;
+            case 'No, save as before', % nothing
+            case 'Yes, do it', g.savemode = 'twofiles';
+        end;
+        g.filename = EEG.filename;
+        g.filepath = EEG.filepath;
+    end;
+end;
 
 % default saving otion
 % --------------------
@@ -400,7 +440,6 @@ else
     if length(EEG) >1, error('For reasons of consistency, this function  does not save multiple datasets any more'); end;
     EEG.filename    = g.filename;
     EEG.filepath    = g.filepath;
-    eeglab_options;
     if isempty(g.savemode)
         if option_savematlab, g.savemode = 'onefile';
         else                  g.savemode = 'twofiles';
@@ -430,6 +469,18 @@ try,
         if ~isstr(EEG.data)
             EEG.data = EEG.datfile;
             floatwrite( tmpdata', fullfile(EEG.filepath, EEG.data), 'ieee-le');
+        end;
+    else
+        if isfield(EEG, 'datfile')
+            if ~isempty(EEG.datfile)
+                if exist(fullfile(EEG.filepath, EEG.datfile))
+                    try, 
+                        delete(fullfile(EEG.filepath, EEG.datfile));
+                        disp('Deleting .dat file on disk (all data is within the Matlab file)');
+                    catch, end;
+                end;
+            end;
+            EEG = rmfield(EEG, 'datfile');
         end;
     end;
     if str2num(v(1)) > 6, save(fullfile(EEG.filepath, EEG.filename), '-v6', '-mat', 'EEG');
