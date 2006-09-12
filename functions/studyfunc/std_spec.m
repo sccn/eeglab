@@ -3,7 +3,7 @@
 %              in a file.
 % Usage:    
 %           >> [EEG_etc, X, f, overwrite] = std_spec(EEG, components, ...
-%                                                   freqrange, specargs, overwrite);
+%                                                   freqrange, specargs);
 %
 %              Computes the mean spectra of the activites of specified components of the 
 %              supplied dataset. The spectra are saved in a Matlab file. If such a file 
@@ -26,14 +26,10 @@
 %                {default: }
 %   specargs   - {'key1', 'val1',...} cell array of optional spectopo inputs 
 %                {default empty}
-%   overwrite  - [1|2] 1 -> overwrite the saved spectra for this dataset 
-%                      2 -> keep the spectra {default = 2}
 % Outputs:
 %   X         - the mean spectra (in dB) of the requested ICA components in the selected 
 %               frequency range (with the mean of each spectrum removed). 
 %   f         - a vector of frequencies at which the spectra have been computed. 
-%   overwrite - same as the input option, possibly modified by the user decision
-%               from the pop-up menu
 %
 % Files output or overwritten: 
 %               [dataset_filename].icaspec, 
@@ -41,14 +37,14 @@
 % 
 %  See also  spectopo(), std_erp(), std_ersp(), std_map(), std_preclust()
 %
-% Authors:  Arnaud Delorme, Hilit Serby, SCCN, INC, UCSD, January, 2005
+% Authors: Arnaud Delorme, SCCN, INC, UCSD, January, 2005
 
 % Defunct:      0 -> if frequency range is different from saved spectra, ask via a 
 %                    pop-up window whether to keep existing spectra or to overwrite them. 
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
-% Copyright (C) Hilit Serby, SCCN, INC, UCSD, October 11, 2004, hilit@sccn.ucsd.edu
+% Copyright (C) Arnaud Delorme, SCCN, INC, UCSD, October 11, 2004, arno@sccn.ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -65,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2006/03/10 22:40:21  arno
+% saving average spectrum
+%
 % Revision 1.24  2006/03/10 17:04:56  arno
 % only one spectrum version
 %
@@ -123,69 +122,115 @@
 % update change dir, ICA computatation, read/write
 %
 
-function [X, f, overwrite] = std_spec(EEG, comps, freqrange, arg ,overwrite)
-    
+function [X, f, overwrt] = std_spec(EEG, varargin)
+
+overwrt = 1; % deprecated
 if nargin < 1
     help std_spec;
     return;
 end;
 
+% decode inputs
+% -------------
+if ~isempty(varargin) 
+    if ~isstr(varargin{1})
+        varargin = { varargin{:} [] [] };
+        if all(varargin{1} > 0) 
+            options = { 'components' varargin{1} 'freqrange' varargin{2} };
+        else
+            options = { 'channels' -varargin{1} 'freqrange' varargin{2} };
+        end;
+    else
+        options = varargin;
+    end;
+else
+    options = varargin;
+end;
+
+[g spec_opt] = finputcheck(options, { 'components' 'integer' []         [];
+                                      'channels'   'cell'    {}         {};
+                                      'freqrange'  'real'    []         [] }, 'std_spec', 'ignore');
+if isstr(g), error(g); end;
 if isfield(EEG,'icaweights')
    numc = size(EEG.icaweights,1);
 else
    error('EEG.icaweights not found');
 end
-if nargin < 2
-   comps = 1:numc;
-elseif isempty(comps)
-   comps = 1:numc;
+if isempty(g.components)
+    g.components = 1:numc;
 end
-if nargin < 5
-    overwrite = 0;   % default
-end
+
+EEG_etc = [];
 
 % filename 
 % --------
-filenamespec = fullfile(EEG.filepath, [ EEG.filename(1:end-3) 'icaspec' ]);
+if ~isempty(g.channels)
+    filename = fullfile( EEG.filepath,[ EEG.filename(1:end-3) 'datspec']);
+    prefix = 'chan';
+else    
+    filename = fullfile( EEG.filepath,[ EEG.filename(1:end-3) 'icaspec']);
+    prefix = 'comp';
+end;
 
-if exist(filenamespec)
-    [X f] = std_readspec(EEG, 1, comps, freqrange);
+% SPEC information found in datasets
+% ---------------------------------
+if exist(filename)
+
+    if strcmpi(prefix, 'comp')
+        [X, f] = std_readspec(EEG, 1, g.components, g.freqrange);
+    else
+        [X, f] = std_readspec(EEG, 1, g.channels, g.freqrange);
+    end;
     return;
-end
+    
+end 
  
-% no spectra available - recompute
-% --------------------------------
+% No SPEC information found
+% ------------------------
 if isstr(EEG.data)
     TMP = eeg_checkset( EEG, 'loaddata' ); % load EEG.data and EEG.icaact
 else
     TMP = EEG;
 end
-if isempty(TMP.icaact)
+if strcmpi(prefix, 'comp') & isempty(TMP.icaact)
     TMP.icaact = (TMP.icaweights*TMP.icasphere)* ...
-                 reshape(TMP.data  , [ size(TMP.data,1)   size(TMP.data,2)*size(TMP.data,3) ]);
-    TMP.icaact = reshape(TMP.icaact, [ size(TMP.icaact,1) size(TMP.data,2)*size(TMP.data,3) ]);
+        reshape(TMP.data  , [ size(TMP.data,1)   size(TMP.data,2)*size(TMP.data,3) ]);
+    TMP.icaact = reshape(TMP.icaact, [ size(TMP.icaact,1) size(TMP.data,2) size(TMP.data,3) ]);
 end;
-if ~isempty(arg)
-    [X, f] = spectopo(TMP.icaact, EEG.pnts, EEG.srate, 'plot', 'off', arg{:});  
+if strcmpi(prefix, 'comp'), X = TMP.icaact;
+else                        X = TMP.data;
+end;
+
+% Remove baseline mean
+% --------------------
+if strcmpi(prefix, 'comp')
+     [X, f] = spectopo(TMP.icaact, EEG.pnts, EEG.srate, 'plot', 'off', spec_opt{:});  
+else [X, f] = spectopo(TMP.data  , EEG.pnts, EEG.srate, 'plot', 'off', spec_opt{:});  
+end;
+
+% Save SPECs in file (all components or channels)
+% ----------------------------------
+if strcmpi(prefix, 'comp')
+    savetofile( filename, f, X, 'comp', 1:size(X,1), spec_opt);
+    [X f] = std_readspec(EEG, 1, g.components, g.freqrange);
 else
-    [X, f] = spectopo(TMP.icaact, EEG.pnts, EEG.srate, 'plot', 'off');
-end
+    savetofile( filename, f, X, 'chan', 1:size(X,1), spec_opt, { TMP.chanlocs.labels });
+    [X f] = std_readspec(EEG, 1, g.channels, g.freqrange);
+end;
+return;
 
-% save spectrum in file
-% ---------------------
-savetofile( filenamespec, f, X, 1:size(X,1), arg);
-[X f] = std_readspec(EEG, 1, comps, freqrange);
-
-% ------------------------------------------
-% saving spectral information to Matlab file
-% ------------------------------------------
-function savetofile(filename, f, X, comps, params);
+% -------------------------------------
+% saving SPEC information to Matlab file
+% -------------------------------------
+function savetofile(filename, f, X, prefix, comps, params, labels);
     
+    disp([ 'Saving SPECTRAL file ''' filename '''' ]);
     allspec.freqs      = f;
     allspec.parameters = params;
     allspec.datatype   = 'SPECTRUM';
     for k = 1:length(comps)
-        allspec = setfield( allspec, [ 'comp' int2str(comps(k)) ], X(k,:));
+        allspec = setfield( allspec, [ prefix int2str(comps(k)) ], X(k,:));
     end;
     allspec.average_spec = mean(X,1);
     std_savedat(filename, allspec);
+
