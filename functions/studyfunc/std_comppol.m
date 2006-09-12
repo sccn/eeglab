@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2006/03/12 04:22:29  arno
+% comppol -> std_comppol
+%
 % Revision 1.1  2004/08/26 23:06:27  arno
 % Initial revision
 %
@@ -76,4 +79,9 @@ for index = 1:size(compin,2)
     end;
 end;
 
-    
+% try to swap minimum
+% -------------------
+if length(pol)/2 < length(find(pol == -1))
+    compin = -compin;
+    pol = -pol;
+end;
