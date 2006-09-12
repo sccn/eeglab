@@ -53,6 +53,9 @@
 % uses the global variable EEG ALLEEG CURRENTSET 
 
 % $Log: not supported by cvs2svn $
+% Revision 1.45  2006/05/07 18:06:27  arno
+% cosmetic changes
+%
 % Revision 1.44  2006/04/19 14:18:59  arno
 % multiple dataset file
 %
@@ -286,6 +289,9 @@ if ~isempty( ALLEEG )
 		for i=1:length( allfields )
 			eval( ['ALLEEG(' int2str(storeSetIndex) ').' allfields{i} ' = EEG.' allfields{i} ';' ]);
 		end;	
+        if ~isfield(EEG, 'datfile') & isfield(ALLEEG, 'datfile')
+            ALLEEG(storeSetIndex).datfile = '';
+        end;
 	end;
 else	
 	ALLEEG = EEG;
@@ -297,14 +303,3 @@ else
  	end;	
 end;	
 return;
-
-function EEG = update_datafield(EEG);
-    if isfield(EEG, 'datfile')
-        if ~isempty(EEG.datfile)
-            EEG.data = EEG.datfile;
-        else
-            EEG = rmfield(EEG, 'datfile');
-        end;
-    else 
-        EEG.data = 'in set file';
-    end;
