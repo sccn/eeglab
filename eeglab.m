@@ -188,9 +188,6 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
-% Revision 1.488  2006/08/28 11:25:53  arno
-% Backward compatibility for old plugin for importing data
-%
 % Revision 1.486  2006/05/13 16:56:39  arno
 % fixing history for transfer of datasets
 %
@@ -1886,8 +1883,8 @@ catchstrs.new_non_empty          = e_newset;
 	cb_expica2     = [ check        'LASTCOM = pop_expica(EEG, ''inv'');'     e_histdone ]; 
     
     cb_loadset     = [ nocheck '[EEG LASTCOM] = pop_loadset;'                                e_newset];
-    cb_saveset     = [ check   '[EEG LASTCOM] = pop_saveset(EEG, ''savemode'', ''resave'');' e_hist_nh ];
-    cb_savesetas   = [ check   '[EEG LASTCOM] = pop_saveset(EEG);'                           e_hist_nh ];
+    cb_saveset     = [ check   '[EEG LASTCOM] = pop_saveset(EEG, ''savemode'', ''resave'');' e_store ];
+    cb_savesetas   = [ check   '[EEG LASTCOM] = pop_saveset(EEG);'                           e_store ];
 	cb_delset      = [ nocheck '[ALLEEG LASTCOM] = pop_delset(ALLEEG, -CURRENTSET);'         e_hist_nh 'eeglab redraw;' ];
 	cb_study1      = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_study([], ALLEEG         , ''gui'', ''on'');'          e_load_study]; 
 	cb_study2      = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_study([], isempty(ALLEEG), ''gui'', ''on'');'          e_load_study]; 
@@ -1987,6 +1984,8 @@ catchstrs.new_non_empty          = e_newset;
 	cb_crossf2     = [ checkepochica 'LASTCOM = pop_crossf(EEG, 0,eegh(''find'',''pop_crossf(EEG,0''));' e_hist];
 		
     cb_study3      = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_study(STUDY, ALLEEG, ''gui'', ''on'');' e_load_study];
+    cb_precomp     = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_precomp(STUDY, ALLEEG);'                e_load_study];
+    cb_chanplot    = [ nocheck '[STUDYTMP LASTCOM] = pop_chanplot(STUDY, ALLEEG); ALLEEGTMP=ALLEEG;'       e_load_study];
     cb_preclust    = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_preclust(STUDY, ALLEEG);'               e_load_study];
     cb_clust       = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_clust(STUDY, ALLEEG);'                  e_load_study];
     cb_clustedit   = [ nocheck 'ALLEEGTMP = ALLEEG; LASTCOM = ''[STUDY]  = pop_clustedit(STUDY, ALLEEG);'';' ...
@@ -2145,6 +2144,8 @@ catchstrs.new_non_empty          = e_newset;
     uimenu( spec_m, 'Label', 'Component cross-coherence'              , 'CallBack', cb_crossf2);
 		
     uimenu( std_m,  'Label', 'Edit study info'                        , 'CallBack', cb_study3);
+    uimenu( std_m,  'Label', 'Precompute channel measures'            , 'CallBack', cb_precomp, 'separator', 'on');
+    uimenu( std_m,  'Label', 'Plot channel measures'                  , 'CallBack', cb_chanplot);
     uimenu( std_m,  'Label', 'Build preclustering array'              , 'CallBack', cb_preclust, 'separator', 'on');
     uimenu( std_m,  'Label', 'Cluster components'                     , 'CallBack', cb_clust);
     uimenu( std_m,  'Label', 'Edit/plot clusters'                     , 'CallBack', cb_clustedit);
@@ -2194,7 +2195,7 @@ catchstrs.new_non_empty          = e_newset;
                         tmpind = length(tmpdir);
                     end;
                     
-                    % special case of eeglab subfolder (for BIOSIG)
+                    % spetial case of eeglab subfolder (for BIOSIG)
                     % --------------------------------
                     if strcmpi(tmpdir(tmpind).name, 'eeglab')
                         addpath([ p 'plugins' delimiter dircontent{index} delimiter 'eeglab' ],'-end');
