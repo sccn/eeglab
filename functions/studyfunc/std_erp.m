@@ -1,20 +1,30 @@
-% std_erp() -   Constructs and returns ICA activation ERPs for a dataset. 
-%               Updates the EEG structure both in the Matlab environment 
-%               and on disk. Saves the ERPs into a Matlab file, 
-%               [dataset_name].icaerp, in the same directory as the dataset
-%               file.  If such a file already exists, loads its information. 
-%               Options allow limiting ERP coomputation to specified components
-%               and to a specific latency range (within epoch limits). Returns
-%               the ERP of the selected ICA components in the requested 
-%               time range.
+% std_erp() -   Constructs and returns channel or ICA activation ERPs for a dataset. 
+%               Saves the ERPs into a Matlab file, [dataset_name].icaerp, for
+%               data channels or [dataset_name].icaerp for ICA components, 
+%               in the same directory as the dataset file.  If such a file 
+%               already exists, loads its information. 
 % Usage:    
-%            >> [erp, times] = std_erp(EEG,components,time_range);  
+%            >> [erp, times] = std_erp(EEG, 'key', 'val', ...);
 % Inputs:
 %   EEG          - a loaded epoched EEG dataset structure. 
-%   components   - [numeric vector] components of the EEG structure for which 
-%                  activation ERPs will be computed. {default|[] -> all}
-%   time_range   - [minms maxms] latency window limits (in ms) within which to 
-%                  compute ERPs {default|[]: [EEG.minms EEGmaxms]}
+%
+% Optional inputs:
+%   'components' - [numeric vector] components of the EEG structure for which 
+%                  activation ERPs will be computed. Note that because 
+%                  computation of ERP is so fast, all components ERP are
+%                  computed and saved. Only selected component 
+%                  are returned by the function to Matlab
+%                  {default|[] -> all}
+%   'channels'   - [cell array] channels of the EEG structure for which 
+%                  activation ERPs will be computed. Note that because 
+%                  computation of ERP is so fast, all channels ERP are
+%                  computed and saved. Only selected channels 
+%                  are returned by the function to Matlab
+%                  {default|[] -> all}
+%   'time_range' - [minms maxms] latency window limits (in ms) within which to 
+%                  compute ERPs {default|[]: [EEG.min EEG.max]}. It is not
+%                  advised to change this range unless you require a
+%                  specific baseline. The plotting 
 % Outputs:
 %   erp         - ERP for the requested ICA components in the selected 
 %                 latency window. ERPs are scaled by the RMS over of the
@@ -25,11 +35,11 @@
 %
 % See also:    std_spec(), std_ersp(), std_topo(), std_preclust()
 %
-% Authors: Arnaud Delorme, Hilit Serby, SCCN, INC, UCSD, January, 2005
+% Authors: Arnaud Delorme, SCCN, INC, UCSD, January, 2005
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
-% Copyright (C) Hilit Serby, SCCN, INC, UCSD, October 11, 2004, hilit@sccn.ucsd.edu
+% Copyright (C) Arnaud Delorme, SCCN, INC, UCSD, October 11, 2004, arno@sccn.ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -46,6 +56,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2006/05/13 11:59:58  arno
+% now clustering using RMS
+%
 % Revision 1.23  2006/03/14 03:28:10  scott
 % help msg
 %
@@ -111,38 +124,64 @@
 % [6~[6~floatread/flotwrite folder fix; computation of ICA fix
 %
 
-function [X, t] = std_erp(EEG, comps, timerange)
+function [X, t] = std_erp(EEG, varargin); %comps, timerange)
 
 if nargin < 1
     help std_erp;
     return;
 end;
-    
+
+% decode inputs
+% -------------
+if ~isempty(varargin) 
+    if ~isstr(varargin{1})
+        varargin = { varargin{:} [] [] };
+        if all(varargin{1} > 0) 
+            options = { 'components' varargin{1} 'timerange' varargin{2} };
+        else
+            options = { 'channels' -varargin{1} 'timerange' varargin{2} };
+        end;
+    else
+        options = varargin;
+    end;
+else
+    options = varargin;
+end;
+
+g = finputcheck(options, { 'components' 'integer' []         [];
+                           'channels'   'cell'    {}         {};
+                           'timerange'  'real'    []         [EEG.xmin EEG.xmax]*1000 }, 'std_erp');
+if isstr(g), error(g); end;
 if isfield(EEG,'icaweights')
    numc = size(EEG.icaweights,1);
 else
    error('EEG.icaweights not found');
 end
-if nargin < 2
-   comps = 1:numc;
-elseif isempty(comps)
-   comps = 1:numc;
+if isempty(g.components)
+    g.components = 1:numc;
 end
 
 EEG_etc = [];
-if ~exist('timerange')
-    timerange = [];
-end
 
 % filename 
 % --------
-filenameerp = fullfile(EEG.filepath, [ EEG.filename(1:end-3) 'icaerp' ]);
+if ~isempty(g.channels)
+    filename = fullfile( EEG.filepath,[ EEG.filename(1:end-3) 'daterp']);
+    prefix = 'chan';
+else    
+    filename = fullfile( EEG.filepath,[ EEG.filename(1:end-3) 'icaerp']);
+    prefix = 'comp';
+end;
 
 % ERP information found in datasets
 % ---------------------------------
-if exist(filenameerp)
+if exist(filename)
 
-    [X, t] = std_readerp(EEG, 1, comps, timerange);
+    if strcmpi(prefix, 'comp')
+        [X, t] = std_readerp(EEG, 1, g.components, g.timerange);
+    else
+        [X, t] = std_readerp(EEG, 1, g.channels, g.timerange);
+    end;
     return;
     
 end 
@@ -154,41 +193,57 @@ if isstr(EEG.data)
 else
     TMP = EEG;
 end
-if isempty(TMP.icaact)
+if strcmpi(prefix, 'comp') & isempty(TMP.icaact)
     TMP.icaact = (TMP.icaweights*TMP.icasphere)* ...
         reshape(TMP.data  , [ size(TMP.data,1)   size(TMP.data,2)*size(TMP.data,3) ]);
     TMP.icaact = reshape(TMP.icaact, [ size(TMP.icaact,1) size(TMP.data,2) size(TMP.data,3) ]);
+end;
+if strcmpi(prefix, 'comp'), X = TMP.icaact;
+else                        X = TMP.data;
 end;
 
 % Remove baseline mean
 % --------------------
 if EEG.trials > 1 %epoched data
     time0 = find(EEG.times < 0);
-    time0 = find(EEG.times(time0) > timerange(1));
+    time0 = find(EEG.times(time0) > g.timerange(1));
     if ~isempty(time0)
-        TMP.icaact = rmbase(TMP.icaact,EEG.pnts, time0);
+        X = rmbase(X,EEG.pnts, time0);
     else
-        TMP.icaact = rmbase(TMP.icaact,EEG.pnts);
+        X = rmbase(X,EEG.pnts);
     end
 else
-    TMP.icaact = rmbase(TMP.icaact);
+    X = rmbase(X);
 end
-TMP.icaact = reshape(TMP.icaact, [ size(TMP.icaact,1) size(TMP.data,2) size(TMP.data,3) ]);
-X = repmat(sqrt(mean(TMP.icawinv.^2))', [1 TMP.pnts]) .* mean(TMP.icaact,3); % calculate ERP
+X = reshape(X, [ size(X,1) size(TMP.data,2) size(TMP.data,3) ]);
+if strcmpi(prefix, 'comp')
+    X = repmat(sqrt(mean(TMP.icawinv.^2))', [1 TMP.pnts]) .* mean(X,3); % calculate ERP
+else    
+    X = mean(X, 3);
+end;
 
-% Save ERPs in file (all components)
+% Save ERPs in file (all components or channels)
 % ----------------------------------
-savetofile( filenameerp, EEG.times, X, 1:size(X,1));
-[X,t] = std_readerp( EEG, 1, comps, timerange);
+if strcmpi(prefix, 'comp')
+    savetofile( filename, EEG.times, X, 'comp', 1:size(X,1));
+    [X,t] = std_readerp( EEG, 1, g.components, g.timerange);
+else
+    savetofile( filename, EEG.times, X, 'chan', 1:size(X,1), { TMP.chanlocs.labels });
+    [X,t] = std_readerp( EEG, 1, g.channels, g.timerange);
+end;
 
 % -------------------------------------
 % saving ERP information to Matlab file
 % -------------------------------------
-function savetofile(filename, t, X, comps);
+function savetofile(filename, t, X, prefix, comps, labels);
     
+    disp([ 'Saving ERP file ''' filename '''' ]);
     allerp.times      = t;
     allerp.datatype   = 'ERP';
     for k = 1:length(comps)
-        allerp = setfield( allerp, [ 'comp' int2str(comps(k)) ], X(k,:));
+        allerp = setfield( allerp, [ prefix int2str(comps(k)) ], X(k,:));
+    end;
+    if nargin > 5
+        allerp.labels = labels;
     end;
     std_savedat(filename, allerp);

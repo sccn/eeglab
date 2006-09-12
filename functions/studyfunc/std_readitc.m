@@ -33,11 +33,11 @@
 %  See also  std_ersp(), std_readersp(), pop_preclust(), eeg_preclust(), 
 %               eeg_createdata()
 %
-% Authors: Arnaud Delorme, Hilit Serby, SCCN, INC, UCSD, February, 2005
+% Authors: Arnaud Delorme, SCCN, INC, UCSD, February, 2005
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
-% Copyright (C) Hilit Serby, SCCN, INC, UCSD, October 11, 2004, hilit@sccn.ucsd.edu
+% Copyright (C) Arnaud Delorme, SCCN, INC, UCSD, October 11, 2004, arno@sccn.ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -54,6 +54,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2006/05/03 17:55:54  arno
+% allow to read data channels
+%
 % Revision 1.10  2006/03/14 02:24:41  scott
 % help msg
 %
@@ -116,6 +119,8 @@ for k = 1: length(abset)
     catch
         error( [ 'Cannot read file ''' filename '''' ]);
     end;
+    
+    tmpersp.parameters = removedup(tmpersp.parameters);
     params    = struct(tmpersp.parameters{:});
     params.times = tmpersp.times;
     params.freqs = tmpersp.freqs;
@@ -180,3 +185,12 @@ for cond  = 1:length(abset)
 end;
 logfreqs = tmpitc.freqs(fminind:fmaxind);
 timevals = tmpitc.times(minind:maxind);
+
+% remove duplicates in the list of parameters
+% -------------------------------------------
+function cella = removedup(cella)
+    [tmp indices] = unique(cella(1:2:end));
+    if length(tmp) ~= length(cella)/2
+        fprintf('Warning: duplicate ''key'', ''val'' parameter(s), keeping the last one(s)\n');
+    end;
+    cella = cella(sort(union(indices*2-1, indices*2)));

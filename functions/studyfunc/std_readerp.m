@@ -23,11 +23,11 @@
 %
 %  See also  std_erp(), pop_preclust(), std_preclust()          
 %
-% Authors: Arnaud Delorme, Hilit Serby, SCCN, INC, UCSD, February, 2005
+% Authors: Arnaud Delorme, SCCN, INC, UCSD, February, 2005
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
-% Copyright (C) Hilit Serby, SCCN, INC, UCSD, October 11, 2004, hilit@sccn.ucsd.edu
+% Copyright (C) Arnaud Delorme, SCCN, INC, UCSD, October 11, 2004, arno@sccn.ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2006/03/29 18:23:36  scott
+% help msg
+%
 % Revision 1.15  2006/03/14 02:27:04  scott
 % help msg - filename
 %
@@ -94,21 +97,46 @@ if nargin < 4
 end;
     
 X = [];
-filename  = fullfile( ALLEEG(abset).filepath,[ ALLEEG(abset).filename(1:end-3) 'icaerp']);
 
-for k=1:length(comp)
+if iscell(comp)
+    % find channel indices list
+    % -------------------------
+    chanind  = [];
+    chanlabs = lower({ ALLEEG(abset).chanlocs.labels });
+    for index = 1:length(comp)
+        tmp = strmatch(lower(comp{index}), chanlabs, 'exact');
+        if isempty(tmp)
+            error([ 'Channel ''' comp{index} ''' not found in dataset ' int2str(abset)]);
+        else    
+            chanind = [ chanind tmp ];
+        end;
+    end;
+    filename = fullfile( ALLEEG(abset).filepath,[ ALLEEG(abset).filename(1:end-3) 'daterp']);
+    prefix = 'chan';
+    inds   = chanind;
+elseif comp(1) < 0
+    filename = fullfile( ALLEEG(abset).filepath,[ ALLEEG(abset).filename(1:end-3) 'daterp']);
+    prefix = 'chan';
+    inds   = -comp;
+else
+    filename = fullfile( ALLEEG(abset).filepath,[ ALLEEG(abset).filename(1:end-3) 'icaerp']);
+    prefix = 'comp';
+    inds   = comp;
+end;
+
+for k=1:length(inds)
     try,
-        erpstruct = load( '-mat', filename, [ 'comp' int2str(comp(k)) ], 'times' );
+        erpstruct = load( '-mat', filename, [ prefix int2str(inds(k)) ], 'times' );
     catch
         error( [ 'Cannot read file ''' filename '''' ]);
     end;
 
-    tmpdat    = getfield(erpstruct, [ 'comp' int2str(comp(k)) ]);
+    tmpdat    = getfield(erpstruct, [ prefix int2str(inds(k)) ]);
     if k == 1
         X = zeros(length(comp), length(tmpdat));
     end;
     X(k,:)  = tmpdat;
-    t         = getfield(erpstruct, 'times');
+    t       = getfield(erpstruct, 'times');
 end;
 
 % select time range of interest
