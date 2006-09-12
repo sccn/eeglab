@@ -32,11 +32,11 @@
 %
 % See also:  std_ersp(), pop_preclust(), std_preclust(), timef()
 %
-% Authors: Arnaud Delorme, Hilit Serby, SCCN, INC, UCSD, February, 2005
+% Authors: Arnaud Delorme, SCCN, INC, UCSD, February, 2005
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
-% Copyright (C) Hilit Serby, SCCN, INC, UCSD, October 11, 2004, hilit@sccn.ucsd.edu
+% Copyright (C) Arnaud Delorme, SCCN, INC, UCSD, October 11, 2004, arno@sccn.ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2006/05/13 17:46:22  arno
+% transposing baseline to prevent crash
+%
 % Revision 1.19  2006/05/03 18:20:40  arno
 % allowing to read data channels
 %
@@ -119,7 +122,7 @@ end;
 
 % multiple entry
 % --------------
-if length(comp) > 1
+if (length(comp) > 1 & comp(1) > 0) | length(comp) > length(abset)
     for index = 1:length(comp)
         [tmpersp, logfreqs, timevals, params, tmpbase] = std_readersp(ALLEEG, abset, comp(index), timewindow, freqrange);
         logersp(index,:,:,:) = tmpersp;
@@ -132,17 +135,20 @@ for k = 1: length(abset)
     
     if comp < 0
         filename = fullfile( ALLEEG(abset(k)).filepath,[ ALLEEG(abset(k)).filename(1:end-3) 'datersp']);
-        comp   = -comp;
-        prefix = 'chan';
+        comptmp  = -comp(k);
+        prefix   = 'chan';
     else    
         filename = fullfile( ALLEEG(abset(k)).filepath,[ ALLEEG(abset(k)).filename(1:end-3) 'icaersp']);
-        prefix = 'comp';
+        prefix   = 'comp';
+        comptmp  = comp;
     end;
     try
         tmpersp   = load( '-mat', filename, 'parameters', 'times', 'freqs');
     catch
         error( [ 'Cannot read file ''' filename '''' ]);
     end;
+    
+    tmpersp.parameters = removedup(tmpersp.parameters);
     params    = struct(tmpersp.parameters{:});
     params.times = tmpersp.times;
     params.freqs = tmpersp.freqs;
@@ -154,15 +160,20 @@ for k = 1: length(abset)
         timevals  = [];
         return;
     end;
-    tmpersp2   = load( '-mat', filename, ...
-                     [ prefix int2str(comp) '_ersp'], ...
-                     [ prefix int2str(comp) '_erspbase'], ...
-                     [ prefix int2str(comp) '_erspboot']);
-    
-    erspall{k}     = double(getfield(tmpersp2, [ prefix int2str(comp) '_ersp']));
-    erspallboot{k} = double(getfield(tmpersp2, [ prefix int2str(comp) '_erspboot']));
-    erspallbase{k} = double(getfield(tmpersp2, [ prefix int2str(comp) '_erspbase']));
+    if isinf(comp) % only read time and freqs
+        abset = [];
+        erspallboot{1} = [];
+        logersp = [];
+    else
+        tmpersp2   = load( '-mat', filename, ...
+                         [ prefix int2str(comptmp) '_ersp'], ...
+                         [ prefix int2str(comptmp) '_erspbase'], ...
+                         [ prefix int2str(comptmp) '_erspboot']);
 
+        erspall{k}     = double(getfield(tmpersp2, [ prefix int2str(comptmp) '_ersp']));
+        erspallboot{k} = double(getfield(tmpersp2, [ prefix int2str(comptmp) '_erspboot']));
+        erspallbase{k} = double(getfield(tmpersp2, [ prefix int2str(comptmp) '_erspbase']));
+    end;
 end
 
 % compute average baseline across conditions
@@ -170,7 +181,7 @@ end
 if length(abset) > 1 
     % mean baseline for requested component across conditions
     % -------------------------------------------------------
-	ave_baseline = 0; 
+	ave_baseline = zeros(size(erspallbase{1})); 
 	for cond = 1:length(abset)
         ave_baseline = ave_baseline + erspallbase{cond}/length(abset);
 	end    
@@ -237,3 +248,11 @@ end;
 logfreqs = tmpersp.freqs(fminind:fmaxind);
 timevals = tmpersp.times(minind:maxind);
 
+% remove duplicates in the list of parameters
+% -------------------------------------------
+function cella = removedup(cella)
+    [tmp indices] = unique(cella(1:2:end));
+    if length(tmp) ~= length(cella)/2
+        fprintf('Warning: duplicate ''key'', ''val'' parameter(s), keeping the last one(s)\n');
+    end;
+    cella = cella(sort(union(indices*2-1, indices*2)));
