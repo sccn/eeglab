@@ -36,6 +36,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2006/04/12 02:37:19  toby
+% Dealing with no chantype match.
+%
 % Revision 1.4  2005/11/30 19:38:18  arno
 % same
 %
@@ -61,7 +64,7 @@ function indices = eeg_chantype(data,chantype)
     % ------------------------------------------------------------
     if isfield(data,'type')
         datatype = {data.type};
-    elseif isfield(data,'chanlocs') && isfield(data.chanlocs,'type')
+    elseif isfield(data,'chanlocs') & isfield(data.chanlocs,'type')
         datatype = {data.chanlocs.type};
     else error('Incorrect ''data'' input. Should be ''EEG'' or ''loc_file'' structure variable in the format associated with EEGLAB.');
     end
