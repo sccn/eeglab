@@ -217,6 +217,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.88  2006/09/12 18:30:31  scott
+% cleared confusion of timewarpfr and timewarp -sm
+%
 % Revision 1.87  2006/09/08 01:45:22  scott
 % default to plot all timeStretchRefs -sm
 %
@@ -765,11 +768,11 @@ elseif (varwin < 0)
 	error('Value of cycles must be zero or positive.');
 end
 
-% consider structure for these arguments
+% build a structure for keyword arguments
 % --------------------------------------
 if ~isempty(varargin)
     [tmp indices] = unique(varargin(1:2:end));
-    varargin = varargin(sort(union(indices*2-1, indices*2))); % these 2 line remove duplicate arguments
+    varargin = varargin(sort(union(indices*2-1, indices*2))); % these 2 lines remove duplicate arguments
     try, g = struct(varargin{:}); 
     catch, error('Argument error in the {''param'', value} sequence'); end; 
 end;
@@ -825,43 +828,47 @@ try, g.erspmarglim;     catch, g.erspmarglim = []; end;
 try, g.itcavglim;       catch, g.itcavglim   = []; end;
 try, g.erplim;          catch, g.erplim      = []; end;
 try, g.speclim;         catch, g.speclim     = []; end;
-try, g.timewarpfr;        catch, g.timewarpfr    = []; end;
-%Added -Jean
+
+% try, g.timewarp;        catch, g.timewarp    = []; end; % unused for now -sm
+% try, g.timewarpfr;      catch, g.timewarpfr  = []; end;
+
 try, g.timeStretchMarks;     catch, g.timeStretchMarks = []; end;
 try, g.timeStretchRefs;     catch, g.timeStretchRefs = []; end;
 try, g.timeStretchPlot;     catch, g.timeStretchPlot = []; end;
+
+
 g.AXES_FONT       = AXES_FONT;           % axes text FontSize
 g.TITLE_FONT      = TITLE_FONT;
 g.ERSP_CAXIS_LIMIT = ERSP_CAXIS_LIMIT;         
 g.ITC_CAXIS_LIMIT  = ITC_CAXIS_LIMIT;        
-g.timewarp = g.timewarpfr; % for now, g.timewarp means g.timewarpfr  -sm
+% if isfield(g,'timewarpfr'), g.timewarp = g.timewarpfr; end; % for now, g.timewarp means g.timewarpfr  -sm
 
-if isfield(g, 'detret'), g.detrend = g.detret; end;
-if isfield(g, 'detrep'), g.rmerp   = g.detrep; end;
+if isfield(g, 'detret'),    g.detrend = g.detret;      end;
+if isfield(g, 'detrep'),    g.rmerp   = g.detrep;      end;
 
 % unpack 'timewarpfr' argument (transitional to future 'timewarp' in ms) -sm
 %-----------------------------
-if ~isempty(g.timewarp)
-    g.timeStretchMarks = g.timewarp{1};
-    if length(g.timewarp) > 1
-        g.timeStretchRefs = g.timewarp{2};
-    end
-    if length(g.timewarp) > 2
-        g.timeStretchPlot = g.timewarp{3};
-    else
-        stretchevents = size(g.timeStretchMarks);
-        stretchevents = stretchevents(2);
-        g.timeStretchPlot = [1:stretchevents]; % default to plotting all lines
-    end
-    if max(max(g.timeStretchMarks)) > frame | min(min(g.timeStretchMarks)) < 1
-       error('Time warping event marks must be inside the epochs.');
-    end
-    if ~isempty(g.timeStretchRefs)
-       if max(g.timeStretchRefs) > frame | min(g.timeStretchRefs) < 1
-          error('Time warping reference marks must be inside the epochs.');
-       end
-    end
-end
+% if ~isempty(g.timewarp)
+%   g.timeStretchMarks = g.timewarp{1};
+%   if length(g.timewarp) > 1
+%      g.timeStretchRefs = g.timewarp{2};
+%   end
+%   if length(g.timewarp) > 2
+%        g.timeStretchPlot = g.timewarp{3};
+%   else
+%      stretchevents = size(g.timeStretchMarks);
+%      stretchevents = stretchevents(2);
+%      g.timeStretchPlot = [1:stretchevents]; % default to plotting all lines
+%   end
+%   if max(max(g.timeStretchMarks)) > frame | min(min(g.timeStretchMarks)) < 1
+%       error('Time warping event marks must be inside the epochs.');
+%   end
+%   if ~isempty(g.timeStretchRefs)
+%       if max(g.timeStretchRefs) > frame | min(g.timeStretchRefs) < 1
+%          error('Time warping reference marks must be inside the epochs.');
+%       end
+%   end
+% end
 
 
 % testing arguments consistency
