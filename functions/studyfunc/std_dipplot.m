@@ -123,7 +123,9 @@ if strcmpi(mode, 'apart')  % case each cluster on a separate figure
             len = length(STUDY.cluster(cls(clus)).comps);
             ndip = 0;
             dip_ind = [];
-            if ~isfield(STUDY.cluster(cls(clus)).centroid,'dipole')
+            if ~isfield(STUDY.cluster(cls(clus)),'dipole')
+                STUDY = std_centroid(STUDY,ALLEEG, cls(clus) , 'dipole');
+            elseif isempty(STUDY.cluster(cls(clus)).dipole)
                 STUDY = std_centroid(STUDY,ALLEEG, cls(clus) , 'dipole');
             end
             for k = 1:len
@@ -151,7 +153,7 @@ if strcmpi(mode, 'apart')  % case each cluster on a separate figure
                    dip_ind = [dip_ind k];
                end
             end % finished going over cluster comps
-            cluster_dip_models(end + 1) = STUDY.cluster(cls(clus)).centroid.dipole;
+            cluster_dip_models(end + 1) = STUDY.cluster(cls(clus)).dipole;
            
            % additional options
            % ------------------
@@ -221,8 +223,10 @@ if strcmpi(mode, 'joined')  % case all clusters are plotted in the same figure (
         len = length(STUDY.cluster(cls(l)).comps);
         max_r = 0;
         clear cluster_dip_models;
-        if ~isfield(STUDY.cluster(cls(l)).centroid,'dipole')
-            STUDY = std_centroid(STUDY,ALLEEG, cls(l) , 'dipole');
+        if ~isfield(STUDY.cluster(cls(l)),'dipole')
+            STUDY = std_centroid(STUDY,ALLEEG, cls(l), 'dipole');
+        elseif isempty(STUDY.cluster(cls(l)).dipole)
+            STUDY = std_centroid(STUDY,ALLEEG, cls(l), 'dipole');
         end
         for k = 1: len
             abset = STUDY.datasetinfo(STUDY.cluster(cls(l)).sets(1,k)).index;
@@ -243,7 +247,7 @@ if strcmpi(mode, 'joined')  % case all clusters are plotted in the same figure (
                end
            end
         end % finished going over cluster comps
-        cluster_dip_models(end + 1) = STUDY.cluster(cls(l)).centroid.dipole;
+        cluster_dip_models(end + 1) = STUDY.cluster(cls(l)).dipole;
         dip_color = cell(1,length(cluster_dip_models));
         dip_color(1:end-1) = {'b'};
         dip_color(end) = {'r'};
@@ -360,14 +364,16 @@ for ci = 1:length(comp_ind)
         warndlg2(['No dipole information available in dataset ' num2str(abset) ' , abort plotting'], 'Aborting plot dipoles');
         return;
     end
-    if ~isfield(STUDY.cluster(cls).centroid,'dipole')
+    if ~isfield(STUDY.cluster(cls),'dipole')
+        STUDY = std_centroid(STUDY,ALLEEG, cls , 'dipole');
+    elseif isempty(STUDY.cluster(cls).dipole)
         STUDY = std_centroid(STUDY,ALLEEG, cls , 'dipole');
     end
     comp_to_disp = ['IC' num2str(comp) ' / ' subject];
     cluster_dip_models.posxyz = ALLEEG(abset).dipfit.model(comp).posxyz;
     cluster_dip_models.momxyz = ALLEEG(abset).dipfit.model(comp).momxyz;
     cluster_dip_models.rv = ALLEEG(abset).dipfit.model(comp).rv;
-    cluster_dip_models(2) = STUDY.cluster(cls).centroid.dipole;
+    cluster_dip_models(2) = STUDY.cluster(cls).dipole;
     if strcmpi(ALLEEG(abset).dipfit.coordformat, 'spherical')
         if isfield(ALLEEG(abset).dipfit, 'hdmfile') %dipfit 2 spherical model
             load('-mat', ALLEEG(abset).dipfit.hdmfile);
@@ -387,3 +393,46 @@ for ci = 1:length(comp_ind)
     set(fig_h,'Name', [ 'IC' num2str(comp) ' / ' subject ', ' STUDY.cluster(cls).name],'NumberTitle','off');
 end
         
+% compute dipole centroid
+% -----------------------
+function STUDY = std_centroid(STUDY,ALLEEG, clsind, tmp);
+
+    for clust = 1:length(clsind)
+        max_r = 0;
+        len = length(STUDY.cluster(clsind(clust)).comps);
+        tmppos = 0;
+        tmpmom = 0;
+        tmprv = 0;
+        ndip = 0;
+        for k = 1:len 
+            fprintf('.');
+            comp  = STUDY.cluster(clsind(clust)).comps(k);
+            abset = STUDY.cluster(clsind(clust)).sets(1,k);
+            if ~isfield(ALLEEG(abset), 'dipfit')
+               warndlg2(['No dipole information available in dataset ' num2str(abset) ], 'Aborting compute centroid dipole');
+               return;
+            end
+            if ~isempty(ALLEEG(abset).dipfit.model(comp).posxyz)
+                ndip = ndip +1;
+                tmppos = tmppos + ALLEEG(abset).dipfit.model(comp).posxyz;
+                tmpmom = tmpmom + ALLEEG(abset).dipfit.model(comp).momxyz;
+                tmprv = tmprv + ALLEEG(abset).dipfit.model(comp).rv;
+                if strcmpi(ALLEEG(abset).dipfit.coordformat, 'spherical')
+                   if isfield(ALLEEG(abset).dipfit, 'hdmfile') %dipfit 2 spherical model
+                       load('-mat', ALLEEG(abset).dipfit.hdmfile);
+                       max_r = max(max_r, max(vol.r));
+                   else % old version of dipfit
+                       max_r = max(max_r,max(ALLEEG(abset).dipfit.vol.r));
+                   end
+               end
+            end
+        end
+        centroid{clust}.dipole.posxyz =  tmppos/ndip;
+        centroid{clust}.dipole.momxyz =  tmpmom/ndip;
+        centroid{clust}.dipole.rv =  tmprv/ndip;
+        if strcmpi(ALLEEG(abset).dipfit.coordformat, 'spherical') & (~isfield(ALLEEG(abset).dipfit, 'hdmfile')) %old dipfit
+            centroid{clust}.dipole.maxr = max_r;
+        end
+        STUDY.cluster(clsind(clust)).dipole = centroid{clust}.dipole;
+    end
+    fprintf('\n');

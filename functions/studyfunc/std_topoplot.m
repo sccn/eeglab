@@ -84,6 +84,8 @@ for k = 3:2:nargin
                     error('std_topoplot: ''clusters'' input takes either specific clusters (numeric vector) or keyword ''all''.');
                 end
             end
+        case 'plotsubjects'
+            mode = 'comps';
         case 'comps'
             STUDY = std_plotcompmap(STUDY, ALLEEG,  cls, varargin{k-1});
             return;
@@ -112,50 +114,42 @@ end;
 
 % Plot all the components in the cluster
 disp('Drawing components of cluster (all at once)...');
+if ~isfield(STUDY.cluster,'topo'), STUDY.cluster(1).topo = []; end;
+for clus = 1: length(cls) % For each cluster requested
+    if isempty(STUDY.cluster(cls(clus)).topo)
+        STUDY = std_scalpcentroid(STUDY,ALLEEG, cls(clus));
+    end;
+end
 if strcmpi(mode, 'comps')         
     for clus = 1: length(cls) % For each cluster requested
         len = length(STUDY.cluster(cls(clus)).comps);
         if len > 0 % A non-empty cluster 
-            try 
-                %h_wait = waitbar(0,'Computing topoplot ...', 'Color', BACKEEGLABCOLOR,'position', [300, 200, 300, 48]);
-            catch % for Matlab 5.3
-                %h_wait = waitbar(0,'Computing topoplot ...','position', [300, 200, 300, 48]);
-            end
             h_topo = figure;
             rowcols(2) = ceil(sqrt(len + 4)); rowcols(1) = ceil((len+4)/rowcols(2));
-            if ~isfield(STUDY.cluster(cls(clus)).centroid,'scalp')
-                STUDY = std_centroid(STUDY,ALLEEG, cls(clus), 'scalp');
-            end
-            ave_grid = STUDY.cluster(cls(clus)).centroid.scalp;
+            clusscalp = STUDY.cluster(cls(clus));
+            ave_grid = clusscalp.topo;
             tmp_ave = ave_grid;
             tmp_ave(find(isnan(tmp_ave))) = 0; % remove NaN values from grid for later correlation calculation.  
-            try
-                clusscalp = std_clustread(STUDY, ALLEEG, cls(clus), 'topo');
-            catch,
-                warndlg2([ 'Some topoplot image information is missing, aborting'] , 'Abort - Plot scalp maps' );   
-                %delete(h_wait)
-                return;
-           end
             for k = 1:len
                 abset   = STUDY.datasetinfo(STUDY.cluster(cls(clus)).sets(1,k)).index;
                 subject = STUDY.datasetinfo(STUDY.cluster(cls(clus)).sets(1,k)).subject;
                 comp = STUDY.cluster(cls(clus)).comps(k);
-                [Xi,Yi] = meshgrid(clusscalp.yi,clusscalp.xi);                     
+                [Xi,Yi] = meshgrid(clusscalp.topoy,clusscalp.topox);                     
                 % Compute correlation between a component and the average scalp map to determine polarity. 
-                tmp_grid = squeeze(clusscalp.scalp{k});
+                tmp_grid = squeeze(clusscalp.topoall{k});
                 tmp_grid(find(isnan(tmp_grid))) = 0;% remove NaN values from grid for later correlation calculation.  
                 grid_pol = corrcoef(tmp_grid(:), tmp_ave(:)); % compute correlation.  
                 grid_pol = sign(grid_pol(1,2));
                 if k <= rowcols(2) - 2 %first sbplot row
                     figure(h_topo);
                     sbplot(rowcols(1),rowcols(2),k+2) , 
-                    toporeplot(grid_pol*squeeze(clusscalp.scalp{k}), 'style', 'both', 'plotrad',0.5,'intrad',0.5, 'verbose', 'off','xsurface', Xi, 'ysurface', Yi );
+                    toporeplot(grid_pol*squeeze(clusscalp.topoall{k}), 'style', 'both', 'plotrad',0.5,'intrad',0.5, 'verbose', 'off','xsurface', Xi, 'ysurface', Yi );
                     title([ 'ic' num2str(comp) '/' subject ]);
                     %waitbar(k/(len+1),h_wait)
                 else %other sbplot rows
                     figure(h_topo)
                     sbplot(rowcols(1),rowcols(2),k+4) , 
-                    toporeplot(grid_pol*squeeze(clusscalp.scalp{k}), 'style', 'both', 'plotrad',0.5,'intrad',0.5, 'verbose', 'off','xsurface', Xi, 'ysurface', Yi );
+                    toporeplot(grid_pol*squeeze(clusscalp.topoall{k}), 'style', 'both', 'plotrad',0.5,'intrad',0.5, 'verbose', 'off','xsurface', Xi, 'ysurface', Yi );
                     title([ 'ic' num2str(comp) '/' subject ]);
                     %waitbar(k/(len+1),h_wait)
                 end
@@ -187,13 +181,10 @@ if strcmpi(mode, 'centroid')
         figure   
     end
     for k = 1:len 
-        if ~isfield(STUDY.cluster(cls(k)).centroid,'scalp')
-            STUDY = std_centroid(STUDY,ALLEEG, cls(k) , 'scalp');
-        end
        if len ~= 1
             sbplot(rowcols(1),rowcols(2),k)  
         end
-        toporeplot(STUDY.cluster(cls(k)).centroid.scalp, 'style', 'both', 'plotrad',0.5,'intrad',0.5, 'verbose', 'off');
+        toporeplot(STUDY.cluster(cls(k)).topo, 'style', 'both', 'plotrad',0.5,'intrad',0.5, 'verbose', 'off');
         title([ STUDY.cluster(cls(k)).name ', ' num2str(length(unique(STUDY.cluster(cls(k)).sets(1,:)))) 'Ss' ]);
         if figureon
             waitbar(k/len,h_wait)
@@ -294,4 +285,74 @@ for ci = 1:length(comp_ind)
     set(gcf,'Color', BACKCOLOR);
     axcopy
 end
+
+% ---------------------------------------------------------------
+% ---------------------------------------------------------------
+% ---------------------------------------------------------------
+% ---------------------------------------------------------------
+function [STUDY, centroid] = std_scalpcentroid(STUDY,ALLEEG, clsind, tmp);
+
+if isempty(clsind)
+    for k = 2: length(STUDY.cluster) %don't include the ParentCluster
+         if ~strncmpi('Notclust',STUDY.cluster(k).name,8) 
+             % don't include 'Notclust' clusters
+             clsind = [clsind k];
+         end
+    end
+end
+
+ Ncond = length(STUDY.condition);
+if Ncond == 0
+    Ncond = 1;
+end 
+centroid = cell(length(clsind),1);
+fprintf('centroid (only done once)\n');
+
+for clust = 1:length(clsind) %go over all requested clusters
+    for cond = 1 %compute for all conditions
+        if clsind(clust) > 0
+             numitems = length(STUDY.cluster(clsind(clust)).comps);
+        else numitems = length(STUDY.changrp(-clsind(clust)).chaninds);
+        end;
+
+        for k = 1:numitems % go through all components
+            comp  = STUDY.cluster(clsind(clust)).comps(k);
+            abset = STUDY.cluster(clsind(clust)).sets(cond,k);
+            [grid yi xi] = std_readtopo(ALLEEG, abset, comp);
+            if ~isfield(centroid{clust}, 'topotmp')
+                centroid{clust}.topotmp = zeros([ size(grid(1:4:end),2) numitems ]);
+            elseif isempty(centroid{clust}.topotmp)
+                centroid{clust}.topotmp = zeros([ size(grid(1:4:end),2) numitems ]);
+            end;
+            centroid{clust}.topotmp(:,k) = grid(1:4:end); % for inversion
+            centroid{clust}.topo{k} = grid;
+            centroid{clust}.topox = xi;
+            centroid{clust}.topoy = yi;
+        end;
+        fprintf('\n');
+    end;
+end
+
+%update STUDY
+for clust =  1:length(clsind) %go over all requested clusters
+    for cond  = 1
+        if clsind(1) > 0
+            ncomp = length(STUDY.cluster(clsind(clust)).comps);
+        end;
+        [ tmp pol ] = std_comppol(centroid{clust}.topotmp);
+        fprintf('%d/%d polarities inverted while reading ICA component scalp maps\n', length(find(pol == -1)), length(pol));
+        nitems = length(centroid{clust}.topo);
+        for k = 1:nitems
+            if k == 1, allscalp = pol(k)*centroid{clust}.topo{k}/nitems;
+            else       allscalp = pol(k)*centroid{clust}.topo{k}/nitems + allscalp;
+            end;
+        end;
+        STUDY.cluster(clsind(clust)).topox   = centroid{clust}.topox;
+        STUDY.cluster(clsind(clust)).topoy   = centroid{clust}.topoy;
+        STUDY.cluster(clsind(clust)).topoall = centroid{clust}.topo;
+        STUDY.cluster(clsind(clust)).topo    = allscalp;
+        STUDY.cluster(clsind(clust)).topopol = pol;
+    end
+end
+fprintf('\n');
 
