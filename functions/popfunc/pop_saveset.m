@@ -321,7 +321,7 @@ if isempty(EEG)  , error('Cannot save empty datasets'); end;
 % empty filename (resave file)
 emptyfilename = 0;
 if nargin > 1
-    if isempty(varargin{1}) | isempty(EEG.filename), emptyfilename = 1; end;
+    if isempty(varargin{1}) & isempty(EEG.filename), emptyfilename = 1; end;
 end;
 
 if nargin < 2 | emptyfilename
