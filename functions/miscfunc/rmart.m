@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % 2-22-97  Tzyy-Ping Jung  CNL/Salk Institute, La Jolla, CA
 % 2-24-97  Formatted for ICA package release -Scott Makeig
@@ -84,7 +87,7 @@ end
 data=(fread(fid,'float'))';
 status=fclose('all');
 if ~isint(length(data)/nchans) % check length
-   fprintf(''rmart() - data length not divisible by %d chans.\n',nchans);
+   fprintf('rmart() - data length not divisible by %d chans.\n',nchans);
     return
 end
 
@@ -184,7 +187,21 @@ if count == procchans*frames,
   fprintf('Output file "%s" written, size = [%d,%d] \n\n',...
              outfile,procchans,frames);
 else
-  fprintf('rmart(): Output file "%s" written, SIZE ONLY [%d,%g]\n',..
+  fprintf('rmart(): Output file "%s" written, SIZE ONLY [%d,%g]\n',...
              outfile,procchans,count/procchans);
 end
 fclose('all');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
