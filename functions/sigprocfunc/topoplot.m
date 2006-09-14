@@ -163,6 +163,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.274  2006/07/21 03:05:34  toby
+% *** empty log message ***
+%
 % Revision 1.273  2006/07/21 02:44:48  toby
 % commented out faulty error message
 %
@@ -1165,6 +1168,9 @@ if nargs > 2
     end
   end
 end
+if strcmpi(whitebk, 'on')
+    BACKCOLOR = [ 1 1 1 ];
+end;
 
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%% test args for plotting an electrode grid %%%%%%%%%%%%%%%%%%%%%%
