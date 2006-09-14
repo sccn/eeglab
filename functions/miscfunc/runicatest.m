@@ -147,7 +147,6 @@ elseif ndims(data)  < 2
     return
 end
 
-end
 [chans frames] = size(data); % determine the data size
 urchans = chans;  % remember original data channels 
 datalength = frames;
