@@ -159,6 +159,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.88  2006/03/15 20:02:10  scott
+% nothing
+%
 % Revision 1.87  2006/03/13 18:45:51  scott
 % help timef
 %
@@ -472,7 +475,6 @@ ERSP_CAXIS_LIMIT = 0;           % 0 -> use data limits; else positive value
                                 % giving symmetric +/- caxis limits.
 ITC_CAXIS_LIMIT  = 0;           % 0 -> use data limits; else positive value
                                 % giving symmetric +/- caxis limits.
-MIN_ABS          = 1e-8;        % avoid division by ~zero
 
 % Commandline arg defaults:
 DEFAULT_EPOCH	= NaN;		% Frames per trial
@@ -961,7 +963,8 @@ for i=1:trials
             end    
           end
 		
-          if abs(tmpX) < MIN_ABS
+          if abs(tmpX) < eps    % If less than smallest possible machine value 
+                                % (i.e. if it's zero) then call it 0.
 		        RR(:,j) = zeros(size(RR(:,j)));
           else
 		      switch g.type
