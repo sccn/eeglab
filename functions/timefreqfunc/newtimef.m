@@ -92,7 +92,7 @@
 %                     e.g. [0 100; 300 400] considers the window 0 to 100 ms and
 %                     300 to 400 ms {default: 0}
 %       'powbase'   = Baseline spectrum to log-subtract {default|NaN -> from data}
-%       'lowmem'    = ['on'|'off'] compute frequency, by frequency to save
+%       'lowmem'    = ['on'|'off'] compute frequency by frequency to save
 %                     memory. {default: 'off'}
 %       'verbose'   = ['on'|'off'] print text {'on'}
 %       'subitc'    = ['on'|'off'] subtract stimulus locked Inter-Trial Coherence
@@ -100,7 +100,20 @@
 %                     x and y not arising from common synchronization to
 %                     experimental events. See notes. {default: 'off'}
 %
-%    Optional time warping parameters:
+%    Optional time warping parameter: [not  working! see below]
+%       'timewarp'  = {[events], [warpms], [plotidx]} Time warp amplitude and phase
+%                     time-courses (after time/freq transform but before smoothing 
+%                     across trials). 'events' is a matrix whose columns specify the 
+%                     epoch latencies (in ms) at which the same series of successive 
+%                     events occur in each trial. 'warpms' is an optional vector of 
+%                     event times (in ms) to which the series of events should be 
+%                     time locked. (Note: Epoch start and end should not be declared as 
+%                     events or warpms}. If 'warpms' is absent or [], the median of each 
+%                     'events' column will be used. [plotidx] is an optional vector 
+%                     of indices telling which of the warpfr to plot with vertical lines. 
+%                     If undefined, all marks are plotted. Overwrites 'vert' argument, 
+%                     if any. 
+%    Deprecated time warp keywords (still working)
 %      'timewarpfr' = {[events], [warpfr], [plotidx]} Time warp amplitude and phase
 %                     time-courses (after time/freq transform but before smoothing 
 %                     across trials). 'events' is a matrix whose columns specify the 
@@ -110,9 +123,18 @@
 %                     (Note: Epoch start and end should not be declared as events or 
 %                     warpfr}. If 'warpfr' is absent or [], the median of each 'events' 
 %                     column will be used. [plotidx] is an optional vector of indices 
-%                     telling which [warpfr] to plot with vertical lines. If not defined,
-%                     all marks are plotted. [Note: In future releases, 'timewarpfr' will 
-%                     be deprecated in favor of 'timewarp' using ms instead of frames].
+%                     telling which of the warpfr to plot with vertical lines. If 
+%                     undefined, all marks are plotted. Overwrites 'vert' argument, 
+%                     if any. [Note: In future releases, 'timewarpfr' will be deprecated 
+%                     in favor of 'timewarp' using latencies in ms instead of frames].
+%       'timeStretchMarks' = [(marks,trials) matrix] Each trial data will be
+%                     linearly warped (after time/freq. transform) so that the
+%                     event marks are time locked to the reference frames 
+%                     (see timeStretchRefs). Marks must be specified in frames
+%       'timeStretchRefs' = [1 x marks] Common reference frames to all trials. 
+%                     If empty or undefined, median latency for each mark will be used.
+%       'timeStretchPlot' = [vector] Indicates the indices of the reference frames
+%                     (in StretchRefs) should be overplotted on the ERSP and ITC.
 %
 %    Optional bootstrap parameters:
 %       'alpha'     = If non-0, compute two-tailed bootstrap significance prob. 
@@ -187,6 +209,7 @@
 % See also: timefreq(), condstat(), newcrossf()
  
 %123456789012345678901234567890123456789012345678901234567890123456789012
+
 %    Optional Multitaper Parameters:
 %       'mtaper'    = If [N W], performs multitaper decomposition. 
 %                      (N is the time resolution and W the frequency resolution; 
@@ -217,6 +240,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.89  2006/09/12 19:10:16  scott
+% commented out timewarp and timewarpfr for unknown ??? -sm
+%
 % Revision 1.88  2006/09/12 18:30:31  scott
 % cleared confusion of timewarpfr and timewarp -sm
 %
@@ -669,18 +695,6 @@ function [P,R,mbase,timesout,freqs,Pboot,Rboot,alltfX,PA] = timef( X, frame, tli
 %               column. If fewer colors than event columns, cycles through the given color
 %               labels.  Note: Not compatible with 'vert' (below).
 
-% Deprecated time warp keywords (still viable)
-%       'timeStretchMarks' = [(marks,trials) matrix] Each trial data will be
-%                     linearly warped (after time/freq. transform) so that the
-%                     event marks are time locked to the reference
-%                     frames (see timeStretchRefs). Marks have to be
-%                     specified in frames
-%       'timeStretchRefs' = [1 x marks] Common reference frames to all
-%                     trials. If empty or undefined, median latency for
-%                     each mark will be used.
-%       'timeStretchPlot' = [vector] Indicates the indices of the reference frames
-%                     (in StretchRefs) should be overplotted on the ERSP and ITC.
-
 %varwin,winsize,g.timesout,g.padratio,g.maxfreq,g.topovec,g.elocs,g.alpha,g.marktimes,g.powbase,g.pboot,g.rboot)
 
 % ITC:   Normally, R = |Sum(Pxy)| / (Sum(|Pxx|)*Sum(|Pyy|)) is coherence.
@@ -781,6 +795,7 @@ g.tlimits = tlimits;
 g.frame   = frame;
 g.srate   = Fs;
 g.cycles  = varwin;
+
 try, g.boottype;   catch, g.boottype = 'shuffle'; end;
 try, g.condboot;   catch, g.condboot = 'abs'; end;
 try, g.title;      catch, g.title = DEFAULT_TITLE; end;
@@ -829,47 +844,65 @@ try, g.itcavglim;       catch, g.itcavglim   = []; end;
 try, g.erplim;          catch, g.erplim      = []; end;
 try, g.speclim;         catch, g.speclim     = []; end;
 
-% try, g.timewarp;        catch, g.timewarp    = []; end; % unused for now -sm
-% try, g.timewarpfr;      catch, g.timewarpfr  = []; end;
+try, g.timewarpfr;      catch, g.timewarpfr  = []; end;
+try, g.timewarp;        catch, g.timewarp    = []; end; 
 
-try, g.timeStretchMarks;     catch, g.timeStretchMarks = []; end;
-try, g.timeStretchRefs;     catch, g.timeStretchRefs = []; end;
-try, g.timeStretchPlot;     catch, g.timeStretchPlot = []; end;
+try, g.timeStretchMarks; catch, g.timeStretchMarks = []; end;
+try, g.timeStretchRefs;  catch, g.timeStretchRefs = []; end;
+try, g.timeStretchPlot;  catch, g.timeStretchPlot = []; end;
 
-
-g.AXES_FONT       = AXES_FONT;           % axes text FontSize
-g.TITLE_FONT      = TITLE_FONT;
+g.AXES_FONT        = AXES_FONT;      % axes text FontSize
+g.TITLE_FONT       = TITLE_FONT;
 g.ERSP_CAXIS_LIMIT = ERSP_CAXIS_LIMIT;         
 g.ITC_CAXIS_LIMIT  = ITC_CAXIS_LIMIT;        
-% if isfield(g,'timewarpfr'), g.timewarp = g.timewarpfr; end; % for now, g.timewarp means g.timewarpfr  -sm
 
-if isfield(g, 'detret'),    g.detrend = g.detret;      end;
-if isfield(g, 'detrep'),    g.rmerp   = g.detrep;      end;
+if isfield(g, 'detret'), g.detrend = g.detret; end;
+if isfield(g, 'detrep'), g.rmerp   = g.detrep; end;
 
-% unpack 'timewarpfr' argument (transitional to future 'timewarp' in ms) -sm
-%-----------------------------
-% if ~isempty(g.timewarp)
-%   g.timeStretchMarks = g.timewarp{1};
-%   if length(g.timewarp) > 1
-%      g.timeStretchRefs = g.timewarp{2};
-%   end
-%   if length(g.timewarp) > 2
-%        g.timeStretchPlot = g.timewarp{3};
-%   else
-%      stretchevents = size(g.timeStretchMarks);
-%      stretchevents = stretchevents(2);
-%      g.timeStretchPlot = [1:stretchevents]; % default to plotting all lines
-%   end
-%   if max(max(g.timeStretchMarks)) > frame | min(min(g.timeStretchMarks)) < 1
-%       error('Time warping event marks must be inside the epochs.');
-%   end
-%   if ~isempty(g.timeStretchRefs)
-%       if max(g.timeStretchRefs) > frame | min(g.timeStretchRefs) < 1
-%          error('Time warping reference marks must be inside the epochs.');
-%       end
-%   end
-% end
+% unpack 'timewarp' and 'timewarpfr' arguments 
+%---------------------------------------------
 
+if ~isempty(g.timewarpfr) & length(g.timewarpfr) > 3
+       error('''timewarpfr'' argument may have at most 3 elements');
+end
+if ~isempty(g.timewarp) % convert wimewarp ms to timewarpfr frames -sm
+       if length(g.timewarp) > 3
+         error('''timewarp'' argument may have at most 3 elements');
+       end
+       evntms = g.timewarp{1};
+       warpfr = round((evntms - g.tlimits(1))/1000*g.srate)+1;
+       timewarpfr{1} = warpfr;
+       if length(g.timewarp) > 1
+         refms = g.timewarp{2};
+         reffr = round((refms - g.tlimits(1))/1000*g.srate)+1;
+         timewarpfr{2} = reffr;
+       end
+       if length(g.timewarp) > 2
+         timewarpfr{3} = timewarp{3};
+       end
+end
+
+if ~isempty(g.timewarpfr)
+  g.timeStretchMarks = g.timewarpfr{1};
+  if length(g.timewarpfr) > 1
+     g.timeStretchRefs = g.timewarpfr{2};
+  end
+  if length(g.timewarpfr) > 2
+       g.timeStretchPlot = g.timewarpfr{3};
+  else
+     stretchevents = size(g.timeStretchMarks);
+     stretchevents = stretchevents(2);
+     g.timeStretchPlot = [1:stretchevents]; % default to plotting all lines
+  end
+  if max(max(g.timeStretchMarks)) > frame-1 | min(min(g.timeStretchMarks)) < 2
+      error('Time warping events must be inside the epochs.');
+  end
+  if ~isempty(g.timeStretchRefs)
+      if max(g.timeStretchRefs) > frame-1 | min(g.timeStretchRefs) < 2
+         error('Time warping references must be inside the epochs.');
+      end
+  end
+end
 
 % testing arguments consistency
 % -----------------------------
@@ -938,48 +971,50 @@ if ~strcmpi(g.condboot, 'abs') & ~strcmpi(g.condboot, 'angle') ...
 	error('Condboot must be either ''abs'', ''angle'' or ''complex''.');
 end;
 if (~isnumeric(g.alpha) | length(g.alpha)~=1)
-	error('timef(): Value of g.alpha must be a number.\n');
+	error('timef(): Value of alpha must be a number.\n');
 elseif (round(g.naccu*g.alpha) < 2)
-	verboseprintf(g.verbose, 'Value of g.alpha is out of the normal range [%g,0.5]\n',2/g.naccu);
+	verboseprintf(g.verbose, 'Value of alpha is outside its normal range [%g,0.5]\n',2/g.naccu);
     g.naccu = round(2/g.alpha);
 	verboseprintf(g.verbose, '  Increasing the number of bootstrap iterations to %d\n',g.naccu);
 end
 if g.alpha>0.5 | g.alpha<=0
-    error('Value of g.alpha is out of the allowed range (0.00,0.5).');
+    error('Value of alpha is outside the allowed range (0.00,0.5).');
 end
 if ~isnan(g.alpha)
     if length(g.baseboot) == 2
-     verboseprintf(g.verbose, 'Bootstrap analysis will use data in range %3.2g-%3.2g ms.\n', g.baseboot(1),  g.baseboot(2))
+     verboseprintf(g.verbose, 'Bootstrap analysis will use data from %3.2g to %3.2g ms.\n', ...
+         g.baseboot(1),  g.baseboot(2))
     elseif g.baseboot > 0
-     verboseprintf(g.verbose, 'Bootstrap analysis will use data in baseline (pre-0) subwindows only.\n')
+     verboseprintf(g.verbose, 'Bootstrap analysis will use data in (pre-0) baseline subwindows only.\n')
    else
      verboseprintf(g.verbose, 'Bootstrap analysis will use data in all subwindows.\n')
    end
 end
+
 if ~isempty(g.timeStretchMarks) %Added -Jean
   if isempty(g.timeStretchRefs)
-    verboseprintf(g.verbose, ['Using median mark latencies as references for ' ...
-                        'time-stretching']);
+    verboseprintf(g.verbose, ['Using median event latencies as reference event times for time-warping']);
     g.timeStretchRefs = median(g.timeStretchMarks,2);
   end
   if isempty(g.timeStretchPlot)
-    verboseprintf(g.verbose, 'Will not overplot references on the ERSP');
+    verboseprintf(g.verbose, 'Will not overplot reference event times on the ERSP');
   elseif length(g.timeStretchPlot) > 0
     g.vert = ((g.timeStretchRefs(g.timeStretchPlot)-1) ...
               /g.srate+g.tlimits(1)/1000)*1000;
   end
 end %End -Jean
+
 if ~isnumeric(g.vert)
-    error('vertical line(s) option must be a vector');
+    error('the argument of vertical line drawing keyword ''vert'' must be a numeric vector');
 else
 	if min(g.vert) < g.tlimits(1) | max(g.vert) > g.tlimits(2)
-        error('vertical line(s) time out-of-bound');
+        error('vertical line (''vert'') latency out of bounds');
 	end;
 end;
 
 
-% Multitaper not used any more
-% ---------------------------
+% Multitaper - not used any more
+% ------------------------------
 if ~isempty(g.mtaper) % multitaper, inspired from Bijan Pesaran matlab function
   if length(g.mtaper) < 3
         %error('mtaper arguement must be [N W] or [N W K]');
@@ -1065,14 +1100,19 @@ end;
 
 % checking keywords
 % -----------------
-allfields = { 'tlimits' 'frame' 'srate' 'cycles' 'cyclesfact' 'boottype' 'condboot' 'title' 'winsize' 'pad' 'timesout' 'padratio' 'topovec' 'elocs' 'alpha' 'marktimes' 'powbase' 'pboot' 'rboot' 'plotersp' 'plotitc' 'detrend' 'rmerp' 'baseline' 'baseboot' 'linewidth' 'naccu' 'mtaper' 'maxfreq' 'freqs' ...
+allfields = { 'tlimits' 'frame' 'srate' 'cycles' 'cyclesfact' 'boottype' 'condboot' ...
+              'title' 'winsize' 'pad' 'timesout' 'padratio' 'topovec' 'elocs' 'alpha' ...
+              'marktimes' 'powbase' 'pboot' 'rboot' 'plotersp' 'plotitc' 'detrend' 'rmerp' ...
+              'baseline' 'baseboot' 'linewidth' 'naccu' 'mtaper' 'maxfreq' 'freqs' ...
               'plotamp' 'subitc' 'nfreqs' 'freqscale' 'vert' 'newfig' ...
               'type' 'phsamp' 'plotphase' 'plotphasesign' 'outputformat' ...
               'itcmax' 'erspmax' 'lowmem' 'verbose' 'plottype' 'plotmean' ...
               'highlightmode' 'chaninfo' 'erspmarglim' 'itcavglim' 'erplim' ...
               'speclim' 'AXES_FONT' 'TITLE_FONT' 'ERSP_CAXIS_LIMIT' ...
-              'ITC_CAXIS_LIMIT' 'timeStretchMarks' 'timeStretchRefs' ...
-              'timeStretchPlot' }; %Added 3 keywords -Jean
+              'ITC_CAXIS_LIMIT' ...
+              'timeStretchMarks' 'timeStretchRefs' 'timeStretchPlot' ...
+              'timewarpfr' 'timewarp' ...
+            }; 
 tmpfields = fieldnames(g);
 for index = 1:length(tmpfields)
     if isempty(strmatch(tmpfields{index}, allfields))
@@ -1116,7 +1156,7 @@ end;
 if iscell(X)
     vararginori = varargin;
 	if length(X) ~= 2
-		error('timef: to compare conditions, data must be 2-elements cell arrays');
+		error('timef: to compare conditions, data must be 2-element cell arrays');
 	end;
 	
     % deal with titles
@@ -1144,17 +1184,17 @@ if iscell(X)
       g.title{3} = 'Condition 1 - Condition 2';
     end;
     
-    verboseprintf(g.verbose, 'Running newtimef on condition 1 *********************\n');
-    verboseprintf(g.verbose, 'Note: if an out-of-memory error occurs, try reducing the\n');
+    verboseprintf(g.verbose, 'Running newtimef on first condition *********************\n');
+    verboseprintf(g.verbose, 'Note: If an out-of-memory error occurs, try reducing the\n');
     verboseprintf(g.verbose, '      the number of time points or number of frequencies\n');
-    verboseprintf(g.verbose, '      (''coher'' options take 3 times more memory than other options)\n');
+    verboseprintf(g.verbose, '      (''coher'' options take 3 times as much memory as other options)\n');
     [P1,R1,mbase1,timesout,freqs,Pboot1,Rboot1,alltfX1] = ...
         newtimef( X{1}, frame, tlimits, Fs, varwin, 'plotitc', 'off', ...
                   'plotersp', 'off', vararginori{:}, 'lowmem', 'off', ...
                   'timeStretchMarks', g.timeStretchMarks(:,1:(end/2)), ... %Added -Jean
                   'timeStretchRefs', g.timeStretchRefs);
     
-    verboseprintf(g.verbose, '\nRunning newtimef on condition 2 *********************\n');
+    verboseprintf(g.verbose, '\nRunning newtimef on second condition *********************\n');
     [P2,R2,mbase2,timesout,freqs,Pboot2,Rboot2,alltfX2] = ...
         newtimef( X{2}, frame, tlimits, Fs, varwin, 'plotitc', 'off', ...
                   'plotersp', 'off', vararginori{:}, 'lowmem', 'off', ...
@@ -1163,7 +1203,7 @@ if iscell(X)
     % recompute baselines for power
     % -----------------------------
     if ~isnan( g.baseline(1) ) & ~isnan( mbase1 ) & isnan(g.powbase)
-      disp('Recomputing baseline power by using the mean from both conditions');
+      disp('Recomputing baseline power: using the grand mean of both conditions');
         mbase = (mbase1 + mbase2)/2;
         P1 = P1 + repmat(mbase1(1:size(P1,1))',[1 size(P1,2)]); 
         P2 = P2 + repmat(mbase2(1:size(P1,1))',[1 size(P1,2)]); 
