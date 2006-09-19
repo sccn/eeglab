@@ -1,4 +1,4 @@
-% pop_dipfit_settings() - interactively change the global settings for dipole fitting
+% pop_dipfit_settings() - select global settings for dipole fitting through a pop up window
 %
 % Usage:
 %   >> OUTEEG = pop_dipfit_settings ( INEEG ); % pop up window
@@ -8,35 +8,34 @@
 %   INEEG	input dataset
 %
 % Optional inputs:
-%   'hdmfile'  - [string] file containing model compatible with
-%                Fieldtrip dipolefitting() function ("vol" entry)
-%   'mrifile'  - [string] file containing anatomical MRI. MRI must
-%                normalized to the MNI brain. See Matlab files
-%                used by the spherical and boundary element model
-%                (select BESA model for instance and look at
-%                EEG.dipfit). If SPM2 is installed, dipfit will be
-%                able to read most MRI file formats for ploting (.mnc files
-%                etc...). To plot dipole in a subject MRI, normalized
-%                firt the MRI to the MNI brain in SPM2.
-%   'coordformat' - ['MNI'|'Spherical'] coordinate returned by the selected
-%                model. Can be MNI coordinates or spherical coordinates
-%                (head radius is assumed to be 85 mm for spherical
-%                coordinates).
-%   'chanfile' - [string] template channel location file. The function will
-%                check if your channel location file is compatible with the
-%                model.
-%   'chansel'  - [integer] channel index selection. Default: all.
-%   'coord_transform' - [float array] talairach transformation matrix to
-%                       align input dataset channel structure to the selected 
+%   'hdmfile'  - [string] file containing a head model compatible with
+%                the Fieldtrip dipolefitting() function ("vol" entry)
+%   'mrifile'  - [string] file containing an anatomical MR head image. 
+%                The MRI must be normalized to the MNI brain. See the .mat 
+%                files used by the sphere and boundary element models
+%                (For instance, select the sphere model and study 'EEG.dipfit'). 
+%                If SPM2 software is installed, dipfit will be able to read 
+%                most MRI file formats for plotting purposes (.mnc files, etc...). 
+%                To plot dipoles in a subject MRI, first normalize the MRI 
+%                to the MNI brain using SPM2.
+%   'coordformat' - ['MNI'|'Spherical'] Coordinates returned by the selected
+%                head model. May be MNI coordinates or spherical coordinates
+%                (For spherical coordinates, the head radius is assumed to be 85 mm.
+%   'chanfile' - [string] template channel locations file. (This function will
+%                check whether your channel locations file is compatible with 
+%                your selected head model).
+%   'chansel'  - [int. vector] indices of channels to use for dipole fitting. 
+%                {default: all} ????????????????
+%   'coord_transform' - [float array] Talairach transformation matrix for
+%                       aligning the dataset channel locations to the selected 
 %                       head model.
-%   'electrodes'      - [integer array] indices of electrode to include
-%                       in model. Default: all.
+%   'electrodes'      - [integer array] indices of channels to include
+%                       in the dipole model. {default: all}
 % Outputs:
 %   OUTEEG	output dataset
 %
 % Author: Arnaud Delorme, SCCN, La Jolla 2003-
 %         Robert Oostenveld, SMI/FCDC, Nijmegen 2003
-%         
 
 % MEG flag:
 %   'gradfile' - [string] file containing gradiometer locations
@@ -62,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2006/09/19 19:41:05  toby
+% further text edits
+%
 % Revision 1.24  2006/09/19 19:32:45  toby
 % edited gui text -sm & tf
 %
@@ -290,9 +292,9 @@ if nargin < 2
         [1] };
     
     % define each individual graphical user element
-    comhelp1 = [ 'warndlg2(strvcat(''The two default head models are in standard_BEM and standard_BESA'',' ...
+    comhelp1 = [ 'warndlg2(strvcat(''The two default head models are in ''standard_BEM'' and ''standard_BESA'''',' ...
                  ''' sub-folders in the DIPFIT2 plugin folder, and may be modified there.''), ''Model type'');' ];
-    comhelp3 = [ 'warndlg2(strvcat(''Any MRI normalized to the MNI brain model may be used for plotting'',' ...
+    comhelp3 = [ 'warndlg2(strvcat(''Any MR image normalized to the MNI brain model may be used for plotting'',' ...
                  '''(see the DIPFIT 2.0 tutorial for more information)''), ''Model type'');' ];
     comhelp2 = [ 'warndlg2(strvcat(''The template location file associated with the head model'',' ...
                  '''you are using must be entered (see tutorial).''), ''Template location file'');' ];
