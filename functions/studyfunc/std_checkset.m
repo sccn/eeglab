@@ -31,7 +31,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [STUDY, ALLEEG] = std_checkset(STUDY, ALLEEG);
+function [STUDY, ALLEEG] = std_checkset(STUDY, ALLEEG, option);
 
 if nargin < 2
     help std_checkset;
@@ -176,6 +176,24 @@ else
         end;
     end;    
 end;
+
+% check for options
+% -----------------
+if nargin > 2
+    notsameica = 1;
+    if strcmpi(option, 'checkica')
+        for ic = 1:length(STUDY.setind)
+            alldats = STUDY.setind(:,ic)';
+            nc = size(ALLEEG(STUDY.datasetinfo(alldats(1))).icaweights,1);
+            for ir = 2:length(alldats)
+                if nc ~= size(ALLEEG(STUDY.datasetinfo(alldats(ir))).icaweights,1)
+                    notsameica = [ 1 alldats(1) alldats(ir) ];
+                end;
+            end;
+        end;
+    end;
+end;
+                
 
 % determine if there has been any change
 % --------------------------------------
