@@ -110,9 +110,44 @@ plotcurveopt = { ...
    'plotcond',   STUDY.etc.specparams.plotcond, ...
    'statistics', STUDY.etc.specparams.statistics };
 
+if ~isempty(opt.plotfreq) & ~isempty(opt.channels)
+    alllocs      = eeg_mergelocs(ALLEEG(:).chanlocs);
+    opt.channels = { alllocs.labels };
+end;
 if ~isempty(opt.channels)
      [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'channels', opt.channels, 'infotype', 'spec', 'freqrange', opt.freqrange);
 else [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'clusters', opt.clusters, 'infotype', 'spec', 'freqrange', opt.freqrange);
+end;
+
+if ~isempty(opt.plotfreq)
+    erspbase = cell(size(STUDY.changrp(1).specdata));
+    for ind = 1:length(STUDY.changrp(1).specdata(:))
+        erspbase{ind} = zeros([ size(STUDY.changrp(1).specdata{1}) length(opt.channels)]);
+        for index = 1:length(allinds)
+            if ~isempty(opt.channels)
+                erspbase{ind}(:,:,index) = STUDY.changrp(allinds(index)).specdata{ind};
+                allfreqs                 = STUDY.changrp(allinds(index)).specfreqs;
+            else
+                erspbase{ind}(:,:,index) = STUDY.cluster(allinds(index)).specdata{ind};
+                allfreqs                 = STUDY.cluster(allinds(index)).specfreqs;
+            end;
+        end;
+        erspbase{ind} = permute(erspbase{ind}, [1 3 2]);
+    end;
+
+    if ~isempty(opt.subject)
+        subjind = strmatch(opt.subject, STUDY.subject);
+        for c = 1:size(erspbase,1)
+            for g = 1:size(erspbase,2)
+                erspbase{c,g} = erspbase{c,g}(:,:,subjind);
+            end;
+        end;
+    end;
+
+    [pgroup pcond pinter] = std_plot(allfreqs, erspbase, 'condname', STUDY.condition, ...
+                                      'plotmode', opt.plotmode, 'groupname', STUDY.group, 'plotx', opt.plotfreq, 'unitx', 'Hz', ...
+                                      'chanlocs', ALLEEG(1).chanlocs, 'plotsubjects', opt.plotsubjects, plotcurveopt{:});
+    return;
 end;
 
 opt.legend = 'off';
@@ -130,7 +165,7 @@ for index = 1:length(allinds)
         erspbase = STUDY.cluster(allinds(index)).specdata;
         allfreqs = STUDY.cluster(allinds(index)).specfreqs;
     end;
-
+    
     if ~isempty(opt.subject)
         subjind = strmatch(opt.subject, STUDY.subject);
         for c = 1:size(erspbase,1)
