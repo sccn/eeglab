@@ -124,6 +124,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.64  2006/09/20 13:37:21  scott
+% text edits
+%
 % Revision 1.63  2006/09/20 12:21:00  arno
 % savetrial option fix
 %
@@ -594,13 +597,13 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                  % --------------------------
                  if ~isempty(succompind{si})
                     ldip = 1;
-                    if size(ALLEEG(idat).dipfit.model(icomp).posxyz,1) == 2 % two dipoles model
+                    if size(ALLEEG(idat).dipfit.model(icomp).posxyz,1) == 2     % if two-dipole model
                         if any(ALLEEG(idat).dipfit.model(icomp).posxyz(1,:)) ...
-                            & any(ALLEEG(idat).dipfit.model(icomp).posxyz(2,:)) %both dipoles exist
-                           % find the leftmost dipole
+                            & any(ALLEEG(idat).dipfit.model(icomp).posxyz(2,:)) % if both dipoles exist
+                                                                                % find the leftmost dipole
                            [garb ldip] = max(ALLEEG(idat).dipfit.model(icomp).posxyz(:,2)); 
                         elseif any(ALLEEG(idat).dipfit.model(icomp).posxyz(2,:)) 
-                           ldip = 2; % the leftmost dipole is the only one that exists
+                           ldip = 2;                    % the leftmost dipole is the only one that exists
                         end
                      end
                      data(count,:) = ALLEEG(idat).dipfit.model(icomp).posxyz(ldip,:);
@@ -609,9 +612,10 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                  end 
               catch
                 error([ sprintf('Dipole model information is missing for component %d of dataset %d.', icomp, idat) 10 ...
-                              'Components are not given a dipole model when residual variance of the best-fiting' 10 ...
-                              'dipole model is too high. In the STUDY info editor, std_preclust(), select' 10 ...
-                              'components by residual variance ("Select by R.V.") before preclustering.' ]);
+                              'Components are not given a dipole model when residual variance of the' 10 ...
+                              'best-fitting dipole model is too high. Either remove this component,' 10 ...
+                              'from clustering, or in the STUDY information editor, pop_study(), ' 10 ...
+                              'raise the residual variance threshold ("Select by R.V.").' ]);
               end
               
              % cluster on ica ersp / itc values
