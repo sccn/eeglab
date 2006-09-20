@@ -362,6 +362,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
         padratio  = 1;
         alpha = NaN;
         fun_arg = [];
+        savetrials = 'on';
         for subind = 2:2:length(varargin{index})
             switch varargin{index}{subind}
                 case 'npca'
@@ -376,6 +377,8 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                     timewindow = varargin{index}{subind+1};
                 case 'abso'
                     abso = varargin{index}{subind+1};
+                case 'savetrials'
+                    savetrials = varargin{index}{subind+1};
                 case 'cycles'
                     cycles = varargin{index}{subind+1};
                 case 'alpha'
@@ -597,7 +600,10 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                  end
                  end 
               catch
-                error('Some dipole information is missing');
+                error([ sprintf('Some dipole information is missing (e.g. component %d of dataset %d)', icomp, idat) 10 ...
+                              'Components are not assigned a dipole if residual variance is too high so' 10 ...
+                              'in the STUDY info editor, remember to select component by residual' 10 ...
+                              'variance (column "select by r.v.") prior to preclustering them.' ]);
               end
               
              % cluster on ica ersp / itc values
@@ -622,8 +628,9 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                             idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index;  
                             idattot = [idattot idat];
                             % compute ERSP/ ITC, if doesn't exist.
-                            std_ersp(ALLEEG(idat),succompind{si}, freqrange, timewindow, ...
-                                 cycles, padratio, alpha, type);
+                            std_ersp(ALLEEG(idat), 'components', succompind{si}, 'freqs', freqrange, ...
+                                'timewindow', timewindow, 'cycles', cycles, 'padratio', padratio, 'alpha', alpha, ...
+                                'type', type, 'savetrials', savetrials);
                         end
                     end
                     STUDY.preclust.erspclustfreqs = freqrange;
