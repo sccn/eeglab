@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2006/03/13 19:29:08  scott
+% split out envtopo() 'compsplot' argument (new)   -sm
+%
 % Revision 1.33  2006/03/13 00:13:32  scott
 % debugged new envtopo() feature -sm
 %
@@ -221,8 +224,8 @@ if length(EEG) > 2
     error('Cannot process more than two datasets');
 end;
 
-if timerange(1) < EEG.xmin*1000, timerange(1) =  EEG.xmin*1000; end;
-if timerange(2) > EEG.xmax*1000, timerange(2) =  EEG.xmax*1000; end;
+if timerange(1) < max([EEG.xmin])*1000, timerange(1) =  max([EEG.xmin])*1000; end;
+if timerange(2) > min([EEG.xmax])*1000, timerange(2) =  min([EEG.xmax])*1000; end;
 
 sigtmp = reshape(EEG(1).data, EEG(1).nbchan, EEG(1).pnts, EEG(1).trials);
 if length(EEG) == 2
