@@ -61,12 +61,7 @@ end;
 
 % union of all channel structures
 % -------------------------------
-alllocs = ALLEEG(STUDY.datasetinfo(1).index).chanlocs;
-alllabs = { alllocs.labels };
-for index = 2:length(STUDY.datasetinfo)
-   tmplocs = ALLEEG(STUDY.datasetinfo(index).index).chanlocs;
-   alllocs = eeg_mergechan(alllocs, tmplocs);
-end;
+alllocs = eeg_mergelocs(ALLEEG(:).chanlocs);
 
 % check if all the channels have the same coordinates
 % only check the theta field
