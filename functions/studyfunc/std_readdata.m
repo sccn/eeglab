@@ -195,7 +195,7 @@ for ind = 1:length(allinds)
                 % --------------
                 allspec = cell( length(STUDY.condition), length(STUDY.group) );
                 %[ tmpersp allfreqs alltimes tmpparams tmpspec] = std_readersp( ALLEEG, 1, -1, [], opt.freqrange);
-                [ tmp allfreqs ] = std_readspec( ALLEEG, 1, -sign(allchanorcomp(1)), opt.freqrange);
+                [ tmp allfreqs ] = std_readspec( ALLEEG, 1, sign(allchanorcomp(1)), opt.freqrange);
                 for cond = 1:nc
                     for group = 1:ng
                         allspec{cond, group} = single(zeros(length(allfreqs), length(STUDY.subject)));
