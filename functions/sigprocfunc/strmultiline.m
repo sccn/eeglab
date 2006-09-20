@@ -34,6 +34,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2005/09/27 22:02:04  arno
+% allow processing multiple lines
+%
 % Revision 1.2  2005/03/20 18:39:14  scott
 % help msg
 %
@@ -50,6 +53,19 @@ end;
 if nargin < 3
     delimiter = [];
 end;
+
+% first format input string
+% -------------------------
+if ~isempty(find(strinori == 10))
+    tmpinds = [1 find(strinori == 10)+1 length(strinori)];
+    strinori = [ ' ' strinori ' ' ];
+    for ind = 2:length(tmpinds)
+        allstrs{ind} = strinori(tmpinds(ind-1)+1:tmpinds(ind)-1);
+        if isempty(allstrs{ind}), allstrs{ind} = ' '; end;
+    end;
+    strinori = strvcat(allstrs{:});
+end;
+if size(strinori,2) < maxlen, strout = strinori; return; end;
 
 strout = [];
 for index = 1:size(strinori,1) % scan lines
