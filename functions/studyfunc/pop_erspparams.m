@@ -31,7 +31,7 @@
 
 % $Log: not supported by cvs2svn $
 
-function [ STUDY com ] = pop_erspparams(STUDY, varargin);
+function [ STUDY, com ] = pop_erspparams(STUDY, varargin);
 
 STUDY = default_params(STUDY);
 TMPSTUDY = STUDY;
