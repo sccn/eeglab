@@ -22,7 +22,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [pgroup pcond pinter] = std_plot(allx, data, varargin)
+function [pgroup, pcond, pinter] = std_plot(allx, data, varargin)
 
 pgroup = [];
 pcond  = [];
@@ -122,6 +122,16 @@ if isempty(opt.plotx) % only for curves
         disp('         threshold, unless you only compute statistics for ether groups or conditions');
         opt.plotgroup = 'appart';
         opt.plotcond  = 'appart';
+    end;
+end;
+
+if ~isempty(opt.plotx)
+    % ----------------------------
+    % plot scalp maps for baseline    
+    % ----------------------------
+    [tmp ti] = min(abs(allx-opt.plotx));
+    for index = 1:length(data(:))
+        data{index} = data{index}(ti,:,:);
     end;
 end;
 
@@ -392,42 +402,21 @@ elseif isempty(opt.plotx)
     
     % color bars
     % ----------
-    axes(hdl(nc,ng));
-    pos = get(gca, 'position');
-    tmpc = caxis;
-    fact = fastif(ng == 1, 40, 20);
-    tmp = axes('position', [ pos(1)+pos(3)+pos(3)/fact pos(2) pos(3)/fact pos(4) ]);  
-    set(gca, 'unit', 'normalized');
-    if strcmpi(opt.datatype, 'itc')
-         cbar(tmp, 0, tmpc, 10); ylim([0.5 1]);
-    else cbar(tmp, 0, tmpc, 5);
-    end;
+    axes(hdl(nc,ng)); 
+    cbar_standard(opt.datatype, ng);
     if nc ~= size(hdl,1) | ng ~= size(hdl,2)
         axes(hdl(end,end));
-        pos = get(gca, 'position');
-        tmpc = caxis;
-        tmp = axes('position', [ pos(1)+pos(3)+pos(3)/fact pos(2) pos(3)/fact pos(4) ]);  
-        map = colormap;
-        n = size(map,1);
-        image([0 1],[0 2],[ceil(n/2):n-33]');
-        %cbar(tmp, 0, tmpc, 5);
-        set(gca, 'ytickmode', 'manual', 'YAxisLocation', 'right', 'xtick', [], 'ytick', [0 1 2], 'yticklabel', round(10.^-[0 1 2]*1000)/1000);
-        xlabel('');
+        cbar_signif(ng);
     end;
 else    
     
-     % ----------------------------
-     % plot scalp maps for baseline    
-     % ----------------------------
-    [tmp ti] = min(abs(allx-opt.plotx));
-
     figure('color', 'w');
     tmpc = [inf -inf];
     for c = 1:nc
         for g = 1:ng
             hdl(c,g) = mysubplot(nc+addr, ng+addc, g + (c-1)*(ng+addc), opt.transpose);
             fig_title = [ opt.condname{c} ', ' opt.groupname{g} ', ' num2str(opt.plotx) opt.unitx];
-            tmpplot = double(mean(data{c,g}(ti,:,:),3));
+            tmpplot = double(mean(data{c,g},3));
             topoplot( tmpplot, opt.chanlocs);
             title(fig_title); 
             if isempty(opt.caxis)
@@ -439,9 +428,11 @@ else
             % statistics accross groups
             % -------------------------
             if g == ng & ng > 1 & strcmpi(opt.statgroup, 'on')
-                mysubplot(nc+addr, ng+addc, g + 1 + (c-1)*(ng+addc), opt.transpose);
-                topoplot( pgroupplot{c}(ti,:), opt.chanlocs);
-                title('significance');
+                hdl(c,g+1) = mysubplot(nc+addr, ng+addc, g + 1 + (c-1)*(ng+addc), opt.transpose);
+                topoplot( pgroupplot{c}, opt.chanlocs);
+                if isnan(opt.threshold), title(sprintf('%s (p-value)', opt.condname{c}));
+                else                     title(sprintf('%s (p<%.4f)',  opt.condname{c}, opt.threshold));
+                end;
                 caxis([-maxplot maxplot]);
             end;
         end;
@@ -462,9 +453,11 @@ else
         % statistics accross conditions
         % -----------------------------
         if strcmpi(opt.statcond, 'on') & nc > 1
-            mysubplot(nc+addr, ng+addc, g + c*(ng+addc), opt.transpose);
-            topoplot( pcondplot{c}(ti,:), opt.chanlocs);
-            title('significance');
+            hdl(nc+1,g) = mysubplot(nc+addr, ng+addc, g + c*(ng+addc), opt.transpose);
+            topoplot( pcondplot{c}, opt.chanlocs);
+            if isnan(opt.threshold), title(sprintf('%s (p-value)', opt.groupname{g}));
+            else                     title(sprintf('%s (p<%.4f)',  opt.groupname{g}, opt.threshold));
+            end;
             caxis([-maxplot maxplot]);
         end;
     end;
@@ -472,11 +465,23 @@ else
     % statistics accross group and conditions
     % ---------------------------------------
     if strcmpi(opt.statgroup, 'on') & strcmpi(opt.statcond, 'on') & ng > 1 & nc > 1
-        mysubplot(nc+addr, ng+addc, g + 1 + c*(ng+addr), opt.transpose);
-        topoplot( pinterplot(ti,:), opt.chanlocs);
-        title('significance');
+        hdl(nc+1,ng+1) = mysubplot(nc+addr, ng+addc, g + 1 + c*(ng+addr), opt.transpose);
+        topoplot( pinterplot, opt.chanlocs);
+        if isnan(opt.threshold), title('Interaction (p-value)');
+        else                     title(sprintf('Interaction (p<%.4f)', opt.threshold));
+        end;
         caxis([-maxplot maxplot]);
     end;    
+    
+    % color bars
+    % ----------
+    axes(hdl(nc,ng)); 
+    cbar_standard(opt.datatype, ng);
+    if nc ~= size(hdl,1) | ng ~= size(hdl,2)
+        axes(hdl(end,end));
+        cbar_signif(ng);
+    end;
+
 end;
 
 % remove axis labels
@@ -497,4 +502,32 @@ function hdl = mysubplot(nr,nc,ind,transp);
     if strcmpi(transp, 'on'), hdl = subplot(nc,nr,(c-1)*nr+r);
     else                      hdl = subplot(nr,nc,(r-1)*nc+c);
     end;
-    
+
+% colorbar for ERSP and scalp plot
+% --------------------------------
+function cbar_standard(datatype, ng);
+    pos = get(gca, 'position');
+    tmpc = caxis;
+    fact = fastif(ng == 1, 40, 20);
+    tmp = axes('position', [ pos(1)+pos(3)+pos(3)/fact pos(2) pos(3)/fact pos(4) ]);  
+    set(gca, 'unit', 'normalized');
+    if strcmpi(datatype, 'itc')
+         cbar(tmp, 0, tmpc, 10); ylim([0.5 1]);
+    else cbar(tmp, 0, tmpc, 5);
+    end;
+
+% colorbar for significance
+% -------------------------
+function cbar_signif(ng);
+    pos = get(gca, 'position');
+    tmpc = caxis;
+    fact = fastif(ng == 1, 40, 20);
+    tmp = axes('position', [ pos(1)+pos(3)+pos(3)/fact pos(2) pos(3)/fact pos(4) ]);  
+    map = colormap;
+    n = size(map,1);
+    cols = [ceil(n/2):n]';
+    image([0 1],linspace(0,2,length(cols)),[cols cols]);
+    %cbar(tmp, 0, tmpc, 5);
+    set(gca, 'ytickmode', 'manual', 'YAxisLocation', 'right', 'xtick', [], ...
+        'ytick', [0 1 2], 'yticklabel', round(10.^-[0 1 2]*1000)/1000);
+    xlabel('');
