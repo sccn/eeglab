@@ -74,6 +74,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2006/05/04 10:33:54  arno
+% fixing last changes when not all channels are used for ICA
+%
 % Revision 1.28  2004/11/05 18:29:16  arno
 % fixing channel label problem
 %
@@ -341,9 +344,6 @@ Elocs = g.elocs;
 if strcmpi(g.keepref, 'off')
     rmchans = setdiff(1:size(data,1), ref);
     data  = data(rmchans,:);
-    if ~isempty(Elocs)
-        Elocs = Elocs(rmchans);
-    end;
 end;
 
 data = reshape(data, size(data,1), dim2, dim3);
