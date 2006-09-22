@@ -43,7 +43,7 @@
 %               the series of events should be time locked. (Note: Epoch start and end
 %               should not be declared as events or warpms}. If 'warpms' is absent or [],
 %               the median of each 'events' column will be used. {colors} contains a
-%               list of Matlab linestyles to use for vertical lines marking the occurence
+%               list of Matlab linestyles to use for vertical lines marking the occurrence
 %               of the time warped events. If '', no line will be drawn for this event
 %               column. If fewer colors than event columns, cycles through the given color
 %               labels.  Note: Not compatible with 'vert' (below).
@@ -156,10 +156,10 @@
 %
 % Example:  >> figure; erpimage(data,RTs,[-400 256 256],'Test',1,1,'erp','cbar','vert',-350);
 %
-% Plots an ERP-image of 1-s data epochs sampled at 256 Hz, sorted by RTs, title 'Test',
-% sorted epochs not smoothed or decimated. Also plots the epoch-mean ERP, a color bar,
-% and a dashed vertical line at -350 ms.
-
+% Plots an ERP-image of 1-s data epochs sampled at 256 Hz, sorted by RTs, title ('Test'),
+% sorted epochs not smoothed or decimated (1,1). Overplots the RT latencies. Also plots 
+% the epoch-mean ERP, a color bar, and a dashed vertical line at -350 ms.
+%
 % Authors: Scott Makeig, Tzyy-Ping Jung & Arnaud Delorme,
 %          CNL/Salk Institute, La Jolla, 3-2-1998 -
 %
@@ -193,6 +193,9 @@
 
 %% LOG COMMENTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % $Log: not supported by cvs2svn $
+% Revision 1.264  2006/09/22 16:18:52  scott
+% added test that timewarp latencies are in ascending order in each trial
+%
 % Revision 1.263  2006/09/22 15:36:12  scott
 % made auxvar more flexible
 %
