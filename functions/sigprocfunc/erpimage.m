@@ -126,7 +126,7 @@
 %   'vert'   - [times_vector] Plot vertical dashed lines at specified latencies
 %   'auxvar' - [size(nvars,ntrials) matrix] Plot auxiliary variable(s) for each trial
 %               as separate traces. Else, 'auxvar',{[matrix],{colorstrings}}
-%               to specify N trace colors.  Ex: colorstrings = {'r','bo-','k:'}
+%               to specify N trace colors.  Ex: colorstrings = {'r','bo-','','k:'}
 %               (See also: 'vert' and 'timewarp' above). {default: none}
 %   'sortvarpercent' - [float vector] Plot percentiles for the sorting variable
 %               for instance, [0.1 0.5 0.9] plots the 10th percentile, the median
@@ -193,6 +193,9 @@
 
 %% LOG COMMENTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % $Log: not supported by cvs2svn $
+% Revision 1.262  2006/09/22 02:10:19  scott
+% debugged 'timewarp' feature using test script /home/scott/matlab/testerpimagewarp.m
+%
 % Revision 1.261  2006/09/22 00:07:56  scott
 % fixed 'timewarp' call as per Diane's suggestion. -sm
 %
@@ -1381,6 +1384,13 @@ if nargin > 6
                 return
             else
                 auxvar = Arg; % no auxcolors specified
+            end
+            [xr,xc] = size(auxvar);
+            lns = length(sortvar);
+            if xr ~= lns & xc ~= lns
+               error('auxvar columns different from the number of epochs in data');
+            elseif xr == lns & xc ~= lns
+               auxvar = auxvar';   % exchange rows/cols
             end
             Auxvarflag = NO;
         elseif Vertflag == YES
@@ -2951,23 +2961,36 @@ if strcmpi(noshow, 'no')
                 auxcolors(c) = {'k'};       % plot auxvars as black trace(s)
             end
         end
+size(auxvar)
+        if length(auxcolors) < size(auxvar,1)
+            nauxColors = length(auxcolors);
+            for k=nauxColors+1:size(auxvar,1)
+                auxcolors = { auxcolors{:} auxcolors{1+rem(k-1,nauxColors)}};
+            end
+        end
+size(auxcolors)
         for c=1:size(auxvar,1)
             if isnan(aligntime) % plot auxvar on un-aligned data
+c
                 auxcolor = auxcolors{c};
-                if TIMEX      % overplot auxvar
+                if ~isempty(auxcolor)
+                  if TIMEX      % overplot auxvar
                     figure(curfig);plot(auxvar(c,:)',auxtrials',auxcolor,'LineWidth',SORTWIDTH);
-                else
+                  else
                     figure(curfig);plot(auxtrials',auxvar(c,:)',auxcolor,'LineWidth',SORTWIDTH);
+                  end
+                  drawnow
                 end
-                drawnow
             else % plot re-aligned zeros on sortvar-aligned data
-                auxcolor = auxcolors{c};
-                if TIMEX      % overplot realigned 0-time on image
+                if ~isempty(auxcolor)
+                  auxcolor = auxcolors{c};
+                  if TIMEX      % overplot realigned 0-time on image
                     figure(curfig);plot(auxvar(c,:)',auxtrials',auxcolor,'LineWidth',ZEROWIDTH);
-                else
+                  else
                     figure(curfig);plot(0+auxtrials',aligntime-auxvar(c,:)',auxcolor,'LineWidth',ZEROWIDTH);
+                  end
+                  drawnow
                 end
-                drawnow
             end % aligntime
         end % c
     end % auxvar
