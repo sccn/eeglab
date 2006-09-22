@@ -193,6 +193,9 @@
 
 %% LOG COMMENTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % $Log: not supported by cvs2svn $
+% Revision 1.263  2006/09/22 15:36:12  scott
+% made auxvar more flexible
+%
 % Revision 1.262  2006/09/22 02:10:19  scott
 % debugged 'timewarp' feature using test script /home/scott/matlab/testerpimagewarp.m
 %
@@ -1234,6 +1237,12 @@ if nargin > 6
         elseif timestretchflag == YES % Added -JH
             timeStretchMarks = Arg{1};
             timeStretchMarks = round(1+(timeStretchMarks-times(1))*srate/1000); % convert from ms to frames -sm
+            [smc smr] = find(diff(timeStretchMarks')<0);
+            if ~isempty(smr)
+                 fprintf('erpimage(): Timewarp event latencies not in ascending order in trial %d.\n',smr)
+                 return
+            end
+
             timeStretchMarks = [ ...
                 repmat(1, [size(timeStretchMarks,1), 1]), ...% Epoch begins
                 timeStretchMarks, ...
