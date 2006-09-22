@@ -193,6 +193,9 @@
 
 %% LOG COMMENTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % $Log: not supported by cvs2svn $
+% Revision 1.260  2006/07/26 03:35:13  toby
+% Changed so that smoothing does not bias the trial numbers
+%
 % Revision 1.259  2006/07/15 02:00:46  toby
 % help edit, minor code streamlining.
 %
@@ -1230,7 +1233,7 @@ if nargin > 6
                 timeStretchMarks, ...
                 repmat(length(times), [size(timeStretchMarks,1), 1])]; % Epoch ends
             if length(Arg) < 2 | isempty(Arg{2})
-                timeStretchRef = median(timeStretchMarks',2);
+                timeStretchRef = median(timeStretchMarks);
             else
                 timeStretchRef = Arg{2};
                 timeStretchRef = round(1+(timeStretchRef-times(1))*srate/1000); % convert from ms to frames -sm
@@ -1240,9 +1243,9 @@ if nargin > 6
             else
                 timestretchColors = Arg{3};
             end
-            fprintf('The %d events specified in each trial will be time warped to ms:',length(timeStretchRef));
+            fprintf('The %d events specified in each trial will be time warped to latencies:',length(timeStretchRef));
             fprintf(' %.0f', times(1)+1000*(timeStretchRef-1)/srate); % converted from frames to ms -sm
-            fprintf('\n');
+            fprintf(' ms\n');
             timestretchflag = NO;
         elseif Coherflag == YES
             if length(Arg) > 3 | length(Arg) < 1
@@ -1645,9 +1648,11 @@ elseif exist('timeStretchRef') & ~isempty(timeStretchRef)
             timestretchColors = { timestretchColors{:} 'k--'};
         end
     end
-    auxvarInd = 1-strcmp('',timestretchColors); % indicate which lines to draw
+
     timeStretchRef = [1 timeStretchRef length(times)];  %
-    newauxvars = ((timeStretchRef(find(auxvarInd))-1)/srate+times(1)/1000) * 1000;
+
+    auxvarInd = 1-strcmp('',timestretchColors); % indicate which lines to draw
+    newauxvars = ((timeStretchRef(find(auxvarInd))-1)/srate+times(1)/1000) * 1000; % convert back to ms
     fprintf('Overwriting vert with auxvar\n');
     verttimes = [newauxvars'];
     verttimesColors = {timestretchColors{find(auxvarInd)}};
