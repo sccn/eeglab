@@ -193,6 +193,9 @@
 
 %% LOG COMMENTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % $Log: not supported by cvs2svn $
+% Revision 1.261  2006/09/22 00:07:56  scott
+% fixed 'timewarp' call as per Diane's suggestion. -sm
+%
 % Revision 1.260  2006/07/26 03:35:13  toby
 % Changed so that smoothing does not bias the trial numbers
 %
@@ -999,7 +1002,7 @@ function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,al
 erp = []; amps = []; cohers = []; cohsig = []; ampsig = [];
 allamps = []; phaseangles = []; phsamp = []; sortidx = [];
 auxvar = []; erpsig = []; winloc = [];winlocs = [];
-timestretchColors = {};
+timeStretchColors = {};
 curfig = gcf;   % note current figure - to avoid v7.0.0 bug that draws
 % some elements on the EEGLAB window -sm 8-30-04
 
@@ -1237,14 +1240,15 @@ if nargin > 6
             else
                 timeStretchRef = Arg{2};
                 timeStretchRef = round(1+(timeStretchRef-times(1))*srate/1000); % convert from ms to frames -sm
+                timeStretchRef = [1 timeStretchRef length(times)];  % add epoch beginning, end
             end
             if length(Arg) < 3 | isempty(Arg{3})
-                timestretchColors = {};
+                timeStretchColors = {};
             else
-                timestretchColors = Arg{3};
+                timeStretchColors = Arg{3};
             end
-            fprintf('The %d events specified in each trial will be time warped to latencies:',length(timeStretchRef));
-            fprintf(' %.0f', times(1)+1000*(timeStretchRef-1)/srate); % converted from frames to ms -sm
+            fprintf('The %d events specified in each trial will be time warped to latencies:',length(timeStretchRef)-2);
+            fprintf(' %.0f', times(1)+1000*(timeStretchRef(2:end-1)-1)/srate); % converted from frames to ms -sm
             fprintf(' ms\n');
             timestretchflag = NO;
         elseif Coherflag == YES
@@ -1634,33 +1638,33 @@ elseif exist('timeStretchRef') & ~isempty(timeStretchRef)
             '"timewarp" are not compatiable.\n']);
         return;
     end
-    if ~isempty(timestretchColors)
-        if length(timestretchColors) < length(timeStretchRef)
-            ltsC = length(timestretchColors);
-            for k=ltsC+1:length(timeStretchRef)
-                timestretchColors = { timestretchColors{:} timestretchColors{1+rem(k-1,ltsC)}};
+
+    if ~isempty(timeStretchColors)
+        if length(timeStretchColors) < length(timeStretchRef)
+            nColors = length(timeStretchColors);
+            for k=nColors+1:length(timeStretchRef)-2
+                timeStretchColors = { timeStretchColors{:} timeStretchColors{1+rem(k-1,nColors)}};
             end
         end
-        timestretchColors = {'' timestretchColors{:} ''};
+        timeStretchColors = {'' timeStretchColors{:} ''};
     else
-        timestretchColors = { 'k--'};
+        timeStretchColors = { 'k--'};
         for k=2:length(timeStretchRef)
-            timestretchColors = { timestretchColors{:} 'k--'};
+            timeStretchColors = { timeStretchColors{:} 'k--'};
         end
     end
 
-    timeStretchRef = [1 timeStretchRef length(times)];  %
 
-    auxvarInd = 1-strcmp('',timestretchColors); % indicate which lines to draw
+    auxvarInd = 1-strcmp('',timeStretchColors); % indicate which lines to draw
     newauxvars = ((timeStretchRef(find(auxvarInd))-1)/srate+times(1)/1000) * 1000; % convert back to ms
     fprintf('Overwriting vert with auxvar\n');
     verttimes = [newauxvars'];
-    verttimesColors = {timestretchColors{find(auxvarInd)}};
+    verttimesColors = {timeStretchColors{find(auxvarInd)}};
     newauxvars = repmat(newauxvars, [1 ntrials]);
 
     if isempty(auxvar) % Initialize auxvar & auxcolors
         %  auxvar = newauxvars;
-        auxcolors = {timestretchColors{find(auxvarInd)}};
+        auxcolors = {timeStretchColors{find(auxvarInd)}};
     else % Append auxvar & auxcolors
         if ~exist('auxcolors')
             % Fill with default color (k-- for now)
@@ -1670,7 +1674,7 @@ elseif exist('timeStretchRef') & ~isempty(timeStretchRef)
             end
         end
         for j=find(auxvarInd)
-            auxcolors{end+1} = timestretchColors{j};
+            auxcolors{end+1} = timeStretchColors{j};
         end
         auxvar = [auxvar; newauxvars];
     end
@@ -1763,7 +1767,7 @@ if size(data,2) ~= ntrials
     end
     data=reshape(data,frames,ntrials);
 end
-fprintf('\nPlotting input data as %d epochs of %d frames sampled at %3.1f Hz.\n',...
+fprintf('Plotting input data as %d epochs of %d frames sampled at %3.1f Hz.\n',...
     ntrials,frames,srate);
 %
 %% %%%%%%%%%%%% Reshape data2 to (frames,ntrials) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -3609,7 +3613,7 @@ if exist('outpercent')
     outsort = { outsort outpercent };
 end;
 
-fprintf('Done.\n');
+fprintf('Done.\n\n');
 
 %
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%  End erpimage() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
