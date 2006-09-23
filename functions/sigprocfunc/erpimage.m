@@ -1,42 +1,48 @@
-% erpimage() - Image a collection of single-trial data epochs, optionally sorted on
-%              and/or aligned to an input sorting variable and smoothed across trials
-%              with a moving-average.  (To return event-aligned data without plotting,
-%              use eventlock()).  Optionally sort trials on value, amplitude or phase
-%              within a specified latency window. Optionally plot the ERP mean and
-%              std. dev.and moving-window spectral amplitude and inter-trial coherence
-%              at aselected or peak frequency. Click on individual figures parts to
-%              examine them separately and zoom (using axcopy()).
+% erpimage() - Plot a colored image of a collection of single-trial data epochs, optionally 
+%              sorted on and/or aligned to an input sorting variable and smoothed across 
+%              trials with a moving-average.  (To return event-aligned data without 
+%              plotting, use eventlock()).  Optionally sort trials on value, amplitude 
+%              or phase within a specified latency window. Optionally plot the ERP mean 
+%              and std. dev.and moving-window spectral amplitude and inter-trial coherence
+%              at aselected or peak frequency. Optionally 'time warp' the single trial 
+%              time-domain (potential) or power data to align the plotted data to a series
+%              of events with varying latencies that occur in each trial . Click on 
+%              individual figures parts to examine them separately and zoom (using axcopy()).
 % Usage:
-%   >> [outdata,outvar,outtrials,limits,axhndls,erp, ...
-%         amps,cohers,cohsig,ampsig,outamps,phsangls,phsamp,sortidx,erpsig] ...
-%                  = erpimage(data,sortvar,times,'title',avewidth,decimate,...
-%                             flag1,arg1,flag2,arg2,...);
-% Necessary inputs:
-%   data     - [vector or matrix] Single-channel input data to image.
+%            >> figure; erpimage(data,[],times); % image trials in input order
+%
+%            >> figure; [outdata,outvar,outtrials,limits,axhndls, ...
+%                        erp,amps,cohers,cohsig,ampsig,outamps,...
+%                        phsangls,phsamp,sortidx,erpsig] ...
+%                            = erpimage(data,sortvar,times,'title',avewidth,decimate,...
+%                                  flag1,arg1, flag2,arg2, ...); % use options
+% Required input:
+%   data     = [vector or matrix] Single-channel input data to image.
 %               Formats (1,frames*trials) or (frames,trials)
 %
 % Optional ordered inputs {with defaults}:
-%   sortvar  - [vector | []] Variable to sort epochs on (length(sortvar) = nepochs)
+%
+%   sortvar  = [vector | []] Variable to sort epochs on (length(sortvar) = nepochs)
 %              Example: sortvar may by subject response time in each epoch (in ms)
 %              {default|[]: plot in input order}
-%   times    - [vector | []] vector of latencies (in ms) for each epoch time point.
+%   times    = [vector | []] vector of latencies (in ms) for each epoch time point.
 %               Else [startms ntimes srate] = [start latency (ms), time points
 %               (=frames) per epoch, sampling rate (Hz)]. Else [] -> 0:nframes-1
 %               {default: []}
-%  'title'   - ['string'] Plot title {default: none}
-%   avewidth - Number of trials to smooth (vertically) with a moving-average
+%  'title'   = ['string'] Plot title {default: none}
+%   avewidth = Number of trials to smooth (vertically) with a moving-average
 %               Note: May be non-integer.  {default|0 -> 1}
-%   decimate - Factor to decimate|interpolate ntrials by (may be non-integer)
+%   decimate = Factor to decimate|interpolate ntrials by (may be non-integer)
 %               Else, if this is large (> sqrt(ntrials)), output this many epochs.
 %               {default|0->1}
 %
-% Unordered options ('keyword',argument pairs):
+% Optional unordered 'keyword',argument pairs: 
 %
-% Optionally realign data epochs:
-%   'align'  - [latency] Time-lock data to sortvar. Plot sortvar at given latency
+% Re-align data epochs:
+%   'align'  = [latency] Time-lock data to sortvar. Plot sortvar at given latency
 %               (in ms). Else Inf -> plot sortvar at median sortvar latency
 %               {default: do not align}
-%   'timewarp' - {[events], [warpms], {colors}} Time warp ERP, amplitude and phase
+%   'timewarp' = {[events], [warpms], {colors}} Time warp ERP, amplitude and phase
 %               time-courses before smoothing. 'events' is a matrix whose columns
 %               specify the latencies (in ms) at which a series of successive events occur
 %               in each trial. 'warpms' is an optional vector of latencies (in ms) to which
@@ -47,19 +53,19 @@
 %               of the time warped events. If '', no line will be drawn for this event
 %               column. If fewer colors than event columns, cycles through the given color
 %               labels.  Note: Not compatible with 'vert' (below).
-%   'renorm' - ['yes'|'no'| formula] Normalize sorting variable to epoch
+%   'renorm' = ['yes'|'no'| formula] Normalize sorting variable to epoch
 %               latency range and plot. 'yes'= autoscale. Example of formula:
 %               '3*x+2'. {default: 'no'}
-%   'noplot' - Do not plot sortvar {default: Plot sortvar if in times range}
-%   'noshow' - ['yes'|'no'] Do not plot erpimage, simply return outputs {default: 'no'}
+%   'noplot' = Do not plot sortvar {default: Plot sortvar if in times range}
+%   'noshow' = ['yes'|'no'] Do not plot erpimage, simply return outputs {default: 'no'}
 %
-% Optionally sort input epochs:
-%   'nosort' - Do not sort data epochs.
-%  {default} - Sort data epochs by sortvar (see Necessary inputs above).
-%  'valsort' - [startms endms direction] Sort data on (mean) value
+% Sort data epochs:
+%   'nosort' = Do not sort data epochs.
+%  {default} = Sort data epochs by sortvar (see sortvar input above).
+%  'valsort' = [startms endms direction] Sort data on (mean) value
 %               between startms and (optional) endms. Direction is 1 or -1.
 %              If -1, plot max-value epoch at bottom {Default: sort on sortvar}
-% 'phasesort' - [ms_center prct freq maxfreq topphase] Sort epochs by phase in
+% 'phasesort' = [ms_center prct freq maxfreq topphase] Sort epochs by phase in
 %                an 3-cycle window centered at latency ms_center (ms).
 %                Percentile (prct) in range [0,100] gives percent of trials
 %                to reject for low amplitude. Else, if in range [-100,0],
@@ -72,59 +78,59 @@
 %                at the top of the image. Note: 'phasesort' now uses circular
 %                smoothing. Use 'cycles' (below) for wavelet length.
 %                {Default: [0 25 8 13 180]}
-%  'ampsort' - [center_ms prcnt freq maxfreq] Sort epochs by amplitude.
+%  'ampsort' = [center_ms prcnt freq maxfreq] Sort epochs by amplitude.
 %                (See 'phasesort' above). If ms_center is 'Inf', then sorting
 %                is by mean power across the time window specified by 'winsort' below.
 %                If third arg freq is < 0, sort by mean power in the range
 %                [abs(freq) maxfreq].
-%  'sortwin' - [start_ms end_ms] With center_ms == Inf in 'ampsort' ars (above), sorts
+%  'sortwin' = [start_ms end_ms] With center_ms == Inf in 'ampsort' ars (above), sorts
 %                by mean amplitude across window centers shifted from start_ms
 %                to end_ms by 10 ms.
-%  'showwin' - Show sorting window behind ERP trace. {default: don't show sorting window}
+%  'showwin' = Show sorting window behind ERP trace. {default: don't show sorting window}
 %
 % Plot time-varying spectral amplitude instead of potential:
-% 'plotamps' - Image amplitudes at each trial and latency instead of potential values.
-%               Note: Currently requires 'coher' (below) with alpha signif. {default: no}
+% 'plotamps' = Image amplitudes at each trial and latency instead of potential values.
+%              Note: Currently requires 'coher' (below) with alpha signif. {default: no}
 %
 % Specify plot parameters:
-%   'limits' - [lotime hitime minerp maxerp loamp hiamp locoher hicoher bamp]
+%   'limits' = [lotime hitime minerp maxerp loamp hiamp locoher hicoher bamp]
 %               Plot axes limits. Can use NaN (or nan, but not Nan) for missing items
 %               and omit late items. Use last input, bamp, to fix the baseline amplitude.
 %               {default: from data}
-%   'signif' - [lo_amp, hi_amp, coher_signif_level] Use precomputed significance
+%   'signif' = [lo_amp, hi_amp, coher_signif_level] Use precomputed significance
 %               thresholds (as from outputs ampsig, cohsig) to save time. {default: none}
-%   'caxis'  - [lo hi] Set color axis limits. Else [fraction] Set caxis limits at
+%   'caxis'  = [lo hi] Set color axis limits. Else [fraction] Set caxis limits at
 %               (+/-)fraction*max(abs(data)) {default: symmetrical, based on data limits}
 %
 % Add epoch-mean ERP to plot:
-%   'erp'    - Plot ERP time average of the trials below the image {default no ERP plotted}
-%   'erpalpha' - [alpha] One-sided significance threshold (range: [.001 0.1]).
+%   'erp'    = Plot ERP time average of the trials below the image {default no ERP plotted}
+%   'erpalpha' = [alpha] One-sided significance threshold (range: [.001 0.1]).
 %              Requires 'erp' {default: no alpha significance thresholds plotted}
-%   'erpstd' - Plot ERP +/- stdev. Requires 'erp' {default: no std. dev. plotted}
-%   'rmerp'  - Subtract the average ERP from each trial before processing {default: no}
+%   'erpstd' = Plot ERP +/- stdev. Requires 'erp' {default: no std. dev. plotted}
+%   'rmerp'  = Subtract the average ERP from each trial before processing {default: no}
 %
 % Add time/frequency information:
-%   'coher'  - [freq] Plot ERP average plus mean amplitude & coherence at freq (Hz)
+%   'coher'  = [freq] Plot ERP average plus mean amplitude & coherence at freq (Hz)
 %               Else [minfrq maxfrq] = same, but select frequency with max power in
 %               given range. (Note: the 'phasesort' freq (above) overwrites these
 %               parameters). Else [minfrq maxfrq alpha] = plot coher. signif. level line
 %               at probability alpha (range: [0,0.1]) {default: no coher, no alpha level}
-%   'srate'  - [freq] Specify the data sampling rate in Hz for amp/coher (if not
+%   'srate'  = [freq] Specify the data sampling rate in Hz for amp/coher (if not
 %               implicit in third arg, times) {default: as defined in icadefs.m}
-%   'cycles' - Number of cycles in the wavelet time/frequency decomposition {default: 3}
+%   'cycles' = Number of cycles in the wavelet time/frequency decomposition {default: 3}
 %
-% Add other features to the plot:
-%   'cbar'   - Plot color bar to right of ERP-image {default no}
-%   'topo'   - {map,chan_locs,eloc_info} Plot a 2-D scalp map at upper left of image.
+% Add plot features:
+%   'cbar'   = Plot color bar to right of ERP-image {default no}
+%   'topo'   = {map,chan_locs,eloc_info} Plot a 2-D scalp map at upper left of image.
 %               map may be a single integer, representing the plotted data channel,
 %               or a vector of scalp map channel values. chan_locs may be a channel locations
 %               file or a chanlocs structure (EEG.chanlocs). See '>> topoplot example'
 %               eloc_info (EEG.chaninfo), if empty ([]) or absent, implies the 'X' direction
 %               points towards the nose and all channels are plotted {default: no scalp map}
-%   'spec'   - [loHz,hiHz] Plot the mean data spectrum at upper right of image.
-%   'horz'   - [epochs_vector] Plot horizontal lines at specified epoch numbers.
-%   'vert'   - [times_vector] Plot vertical dashed lines at specified latencies
-%   'auxvar' - [size(nvars,ntrials) matrix] Plot auxiliary variable(s) for each trial
+%   'spec'   = [loHz,hiHz] Plot the mean data spectrum at upper right of image.
+%   'horz'   = [epochs_vector] Plot horizontal lines at specified epoch numbers.
+%   'vert'   = [times_vector] Plot vertical dashed lines at specified latencies
+%   'auxvar' = [size(nvars,ntrials) matrix] Plot auxiliary variable(s) for each trial
 %               as separate traces. Else, 'auxvar',{[matrix],{colorstrings}}
 %               to specify N trace colors.  Ex: colorstrings = {'r','bo-','','k:'}
 %               (See also: 'vert' and 'timewarp' above). {default: none}
@@ -132,8 +138,8 @@
 %               for instance, [0.1 0.5 0.9] plots the 10th percentile, the median
 %               and the 90th percentile.
 % Plot options:
-% 'noxlabel' - Do not plot "Time (ms)" on the bottom x-axis
-% 'yerplabel' - ['string'] ERP ordinate axis label (default is ERP). Print uV with '\muV'
+% 'noxlabel'  = Do not plot "Time (ms)" on the bottom x-axis
+% 'yerplabel' = ['string'] ERP ordinate axis label (default is ERP). Print uV with '\muV'
 %
 % Optional outputs:
 %    outdata  = (times,epochsout) data matrix (after smoothing)
@@ -193,6 +199,9 @@
 
 %% LOG COMMENTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % $Log: not supported by cvs2svn $
+% Revision 1.265  2006/09/22 16:25:42  scott
+% text edit
+%
 % Revision 1.264  2006/09/22 16:18:52  scott
 % added test that timewarp latencies are in ascending order in each trial
 %
@@ -1240,7 +1249,7 @@ if nargin > 6
         elseif timestretchflag == YES % Added -JH
             timeStretchMarks = Arg{1};
             timeStretchMarks = round(1+(timeStretchMarks-times(1))*srate/1000); % convert from ms to frames -sm
-            [smc smr] = find(diff(timeStretchMarks')<0);
+            [smc smr] = find(diff(timeStretchMarks') < 0);
             if ~isempty(smr)
                  fprintf('erpimage(): Timewarp event latencies not in ascending order in trial %d.\n',smr)
                  return
@@ -1713,6 +1722,7 @@ if exist('phargs')
     end
 
     % DEFAULT_CYCLES = 9*phargs(3)/(phargs(3)+10); % 3 cycles at 5 Hz
+
     if frames < DEFAULT_CYCLES*srate/phargs(3)
         fprintf('\nerpimage(): phase-sorting freq. (%g) too low: epoch length < %d cycles.\n',...
             phargs(3),DEFAULT_CYCLES);
@@ -1733,6 +1743,7 @@ if exist('ampargs')
             abs(ampargs(3)),srate/2);
     end
     % DEFAULT_CYCLES = 9*abs(ampargs(3))/(abs(ampargs(3))+10); % 3 cycles at 5 Hz
+
     if frames < DEFAULT_CYCLES*srate/abs(ampargs(3))
         fprintf('\nerpimage(): amplitude-sorting freq. (%g) too low: epoch length < %d cycles.\n',...
             abs(ampargs(3)),DEFAULT_CYCLES);
@@ -1927,8 +1938,6 @@ if exist('phargs') == 1 % if phase-sort the data trials
     [amps, cohers, cohsig, ampsig, allamps, allphs] = ...
         phasecoher(data,length(times),srate,freq,DEFAULT_CYCLES,0, ...
         [], [], timeStretchRef, timeStretchMarks);
-
-
 
     phwin = phargs(1);
     [dummy minx] = min(abs(times-phwin)); % closest time to requested
@@ -2973,37 +2982,31 @@ if strcmpi(noshow, 'no')
                 auxcolors(c) = {'k'};       % plot auxvars as black trace(s)
             end
         end
-size(auxvar)
         if length(auxcolors) < size(auxvar,1)
             nauxColors = length(auxcolors);
             for k=nauxColors+1:size(auxvar,1)
                 auxcolors = { auxcolors{:} auxcolors{1+rem(k-1,nauxColors)}};
             end
         end
-size(auxcolors)
         for c=1:size(auxvar,1)
-            if isnan(aligntime) % plot auxvar on un-aligned data
-c
-                auxcolor = auxcolors{c};
-                if ~isempty(auxcolor)
+            auxcolor = auxcolors{c};
+            if ~isempty(auxcolor)
+              if isnan(aligntime) % plot auxvar on un-aligned data
                   if TIMEX      % overplot auxvar
                     figure(curfig);plot(auxvar(c,:)',auxtrials',auxcolor,'LineWidth',SORTWIDTH);
                   else
                     figure(curfig);plot(auxtrials',auxvar(c,:)',auxcolor,'LineWidth',SORTWIDTH);
                   end
                   drawnow
-                end
-            else % plot re-aligned zeros on sortvar-aligned data
-                if ~isempty(auxcolor)
-                  auxcolor = auxcolors{c};
+              else % plot re-aligned zeros on sortvar-aligned data
                   if TIMEX      % overplot realigned 0-time on image
                     figure(curfig);plot(auxvar(c,:)',auxtrials',auxcolor,'LineWidth',ZEROWIDTH);
                   else
                     figure(curfig);plot(0+auxtrials',aligntime-auxvar(c,:)',auxcolor,'LineWidth',ZEROWIDTH);
                   end
                   drawnow
-                end
-            end % aligntime
+              end % aligntime
+           end % if auxcolor
         end % c
     end % auxvar
     if exist('outpercent')
@@ -3379,15 +3382,18 @@ if ~isnan(coherfreq)
                         figure(curfig);plot([vt vt],[minamp(1) maxamp(1)],mydotstyle,...
                             'Linewidth',VERTWIDTH);
                     else
-                        figure(curfig);plot([min(outtrials) max(outtrials)],[minamp(1) maxamp(1)],DOTSTYLE,...
+                        figure(curfig);plot([min(outtrials) max(outtrials)],[minamp(1) maxamp(1)], ...
+                            DOTSTYLE,...
                             'Linewidth',VERTWIDTH);
                     end
                 else
                     if TIMEX      % overplot realigned vt on amp
-                        figure(curfig);plot(repmat(median(aligntime+vt-outsort),1,2),[minamp(1),maxamp(1)],DOTSTYLE,...
+                        figure(curfig);plot(repmat(median(aligntime+vt-outsort),1,2), ...
+                            [minamp(1),maxamp(1)],DOTSTYLE,...
                             'LineWidth',VERTWIDTH);
                     else
-                        figure(curfig);plot([minamp,maxamp],repmat(median(aligntime+vt-outsort),1,2),DOTSTYLE,...
+                        figure(curfig);plot([minamp,maxamp],repmat(median(aligntime+vt-outsort),1,2), ...
+                            DOTSTYLE,...
                             'LineWidth',VERTWIDTH);
                     end
                 end
@@ -3475,34 +3481,36 @@ if ~isnan(coherfreq)
         set(ax4,'YColor',BACKCOLOR);
 
         if ~isempty(verttimes)
-            if size(verttimes,1) == ntrials
+          if size(verttimes,1) == ntrials
                 vts=sort(verttimes);
                 vts = vts(ceil(ntrials/2),:); % plot median values if a matrix
-            else
+          else
                 vts = verttimes(:)';  % make verttimes a row vector
-            end
-            for vt = vts
-                if isnan(aligntime)
-                    if TIMEX      % overplot vt on coher
-                        mydotstyle = DOTSTYLE;
-                        if exist('auxcolors') & ...
-                                length(verttimes) == length(verttimesColors)
-                            mydotstyle = verttimesColors{find(verttimes == vt)};
-                        end
+          end
+          for vt = vts
+              if isnan(aligntime)
+               if TIMEX      % overplot vt on coher
+                   mydotstyle = DOTSTYLE;
+                   if exist('auxcolors') & ...
+                      length(verttimes) == length(verttimesColors)
+                      mydotstyle = verttimesColors{find(verttimes == vt)};
+                   end
 
-
-                        figure(curfig);plot([vt vt],[mincoh maxcoh],mydotstyle,'Linewidth',VERTWIDTH);
-                    else
-                        figure(curfig);plot([min(outtrials) max(outtrials)],[mincoh maxcoh],DOTSTYLE,'Linewidth',VERTWIDTH);
-                    end
-                else
-                    if TIMEX      % overplot realigned vt on coher
-                        figure(curfig);plot(repmat(median(aligntime+vt-outsort),1,2),[mincoh,maxcoh],DOTSTYLE,'LineWidth',VERTWIDTH);
-                    else
-                        figure(curfig);plot([mincoh,maxcoh],repmat(median(aligntime+vt-outsort),1,2),DOTSTYLE,'LineWidth',VERTWIDTH);
-                    end
-                end
-            end
+                   figure(curfig);plot([vt vt],[mincoh maxcoh],mydotstyle,'Linewidth',VERTWIDTH);
+               else
+                   figure(curfig);plot([min(outtrials) max(outtrials)],...
+                                                   [mincoh maxcoh],DOTSTYLE,'Linewidth',VERTWIDTH);
+               end
+             else
+               if TIMEX      % overplot realigned vt on coher
+                figure(curfig);plot(repmat(median(aligntime+vt-outsort),1,2),...
+                                                   [mincoh,maxcoh],DOTSTYLE,'LineWidth',VERTWIDTH);
+               else
+                figure(curfig);plot([mincoh,maxcoh],repmat(median(aligntime+vt-outsort),1,2),...
+                                                   DOTSTYLE,'LineWidth',VERTWIDTH);
+               end
+             end
+          end
         end
 
         t=text(ynumoffset,0, num2str(0));
