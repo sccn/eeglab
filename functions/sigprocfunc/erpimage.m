@@ -89,8 +89,10 @@
 %  'showwin' = Show sorting window behind ERP trace. {default: don't show sorting window}
 %
 % Plot time-varying spectral amplitude instead of potential:
-% 'plotamps' = Image amplitudes at each trial and latency instead of potential values.
-%              Note: Currently requires 'coher' (below) with alpha signif. {default: no}
+% 'plotamps' = Image amplitudes at each trial and latency instead of potential 
+%              values. Note: Currently requires 'coher' (below) with alpha signif. 
+%              Use 'cycles' (below) > (default) 3 for better frequency specificity,
+%              {default: plot potential, not amplitudes}
 %
 % Specify plot parameters:
 %   'limits' = [lotime hitime minerp maxerp loamp hiamp locoher hicoher bamp]
@@ -199,6 +201,9 @@
 
 %% LOG COMMENTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % $Log: not supported by cvs2svn $
+% Revision 1.266  2006/09/23 22:04:43  scott
+% fixed auxcolor bug, edited help message
+%
 % Revision 1.265  2006/09/22 16:25:42  scott
 % text edit
 %
@@ -1053,7 +1058,8 @@ YEXPAND = 1.3;      % expansion factor for y-axis about erp, amp data limits
 
 DEFAULT_AVEWIDTH  = 1; % smooth trials with this window size by default
 DEFAULT_DECFACTOR = 1; % decimate by this factor by default
-DEFAULT_CYCLES    = 3; % use this many cycles in amp,coher computation window
+DEFAULT_CYCLES    = 5; % use this many cycles in amp,coher computation window
+cycles = DEFAULT_CYCLES;
 DEFAULT_CBAR      = NO;% do not plot color bar by default
 DEFAULT_PHARGS = [0 25 8 13]; % Default arguments for phase sorting
 DEFAULT_ALPHA     = 0.01;
@@ -1394,7 +1400,7 @@ if nargin > 6
             srate = Arg(1);
             Srateflag = NO;
         elseif Cycleflag == YES
-            DEFAULT_CYCLES = Arg;
+            cycles = Arg;
             Cycleflag = NO;
         elseif Auxvarflag == YES;
             if isa(Arg,'cell')==YES & length(Arg)==2
@@ -1721,11 +1727,9 @@ if exist('phargs')
             phargs(3),srate/2);
     end
 
-    % DEFAULT_CYCLES = 9*phargs(3)/(phargs(3)+10); % 3 cycles at 5 Hz
-
-    if frames < DEFAULT_CYCLES*srate/phargs(3)
+    if frames < cycles*srate/phargs(3)
         fprintf('\nerpimage(): phase-sorting freq. (%g) too low: epoch length < %d cycles.\n',...
-            phargs(3),DEFAULT_CYCLES);
+            phargs(3),cycles);
         return
     end
     if length(phargs)==4 & phargs(4) > srate/2
@@ -1742,11 +1746,10 @@ if exist('ampargs')
             'erpimage(): amplitude-sorting frequency (%g Hz) must be less than Nyquist rate (%g Hz).',...
             abs(ampargs(3)),srate/2);
     end
-    % DEFAULT_CYCLES = 9*abs(ampargs(3))/(abs(ampargs(3))+10); % 3 cycles at 5 Hz
 
-    if frames < DEFAULT_CYCLES*srate/abs(ampargs(3))
+    if frames < cycles*srate/abs(ampargs(3))
         fprintf('\nerpimage(): amplitude-sorting freq. (%g) too low: epoch length < %d cycles.\n',...
-            abs(ampargs(3)),DEFAULT_CYCLES);
+            abs(ampargs(3)),cycles);
         return
     end
     if length(ampargs)==4 & abs(ampargs(4)) > srate/2
@@ -1763,10 +1766,9 @@ if ~any(isnan(coherfreq))
         fprintf('\nerpimage(): coher frequency (%g) out of range.\n',coherfreq(end));
         return
     end
-    %DEFAULT_CYCLES = 9*coherfreq(1)/(coherfreq(1)+10); % 3 cycles at 5 Hz
-    if frames < DEFAULT_CYCLES*srate/coherfreq(1)
+    if frames < cycles*srate/coherfreq(1)
         fprintf('\nerpimage(): coher freq. (%g) too low:  epoch length < %d cycles.\n',...
-            coherfreq(1),DEFAULT_CYCLES);
+            coherfreq(1),cycles);
         return
     end
 end
@@ -1936,12 +1938,12 @@ if exist('phargs') == 1 % if phase-sort the data trials
     fprintf('Sorting trials on phase at %.2g Hz.\n',freq);
 
     [amps, cohers, cohsig, ampsig, allamps, allphs] = ...
-        phasecoher(data,length(times),srate,freq,DEFAULT_CYCLES,0, ...
+        phasecoher(data,length(times),srate,freq,cycles,0, ...
         [], [], timeStretchRef, timeStretchMarks);
 
     phwin = phargs(1);
     [dummy minx] = min(abs(times-phwin)); % closest time to requested
-    winlen = floor(DEFAULT_CYCLES*srate/freq);
+    winlen = floor(cycles*srate/freq);
     winloc = minx-linspace(floor(winlen/2), floor(-winlen/2), winlen+1);
     tmprange = find(winloc>0 & winloc<=frames);
     winloc = winloc(tmprange); % sorting window times
@@ -1959,7 +1961,7 @@ if exist('phargs') == 1 % if phase-sort the data trials
     % $$$     % Print facts on commandline %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % $$$     %
     % $$$     if length(tmprange) ~=  winlen+1
-    % $$$       filtersize = DEFAULT_CYCLES * length(tmprange) / (winlen+1);
+    % $$$       filtersize = cycles * length(tmprange) / (winlen+1);
     % $$$       timecenter = median(winloc)/srate*1000+times(1); % center of window in ms
     % $$$       phaseangles = phaseangles + 2*pi*(timecenter-phargs(1))*freq;
     % $$$       fprintf('Sorting data epochs by phase at frequency %2.1f Hz: \n', freq);
@@ -1972,7 +1974,7 @@ if exist('phargs') == 1 % if phase-sort the data trials
     % $$$     else
     % $$$       fprintf(...
     % $$$           'Sorting data epochs by phase at %2.1f Hz in a %1.1f-cycle (%1.0f ms) window centered at %1.0f ms.\n',...
-    % $$$           freq,DEFAULT_CYCLES,1000/freq*DEFAULT_CYCLES,times(minx));
+    % $$$           freq,cycles,1000/freq*cycles,times(minx));
     % $$$       fprintf('Phase is computed using a wavelet of %d frames.\n',length(winloc));
     % $$$     end;
     %
@@ -2074,20 +2076,20 @@ elseif exist('ampargs') == 1 % if amplitude-sort
     if ~isinf(ampargs(1)) % single time given
         if length(freq) == 1
             fprintf('   in a %1.1f-cycle (%1.0f ms) time window centered at %1.0f ms.\n',...
-                DEFAULT_CYCLES,1000/freq(1)*DEFAULT_CYCLES,ampargs(1));
+                cycles,1000/freq(1)*cycles,ampargs(1));
         else
             fprintf('   in %1.1f-cycle (%1.0f-%1.0f ms) time windows centered at %1.0f ms.\n',...
-                DEFAULT_CYCLES,1000/freq(1)*DEFAULT_CYCLES,1000/freq(end)*DEFAULT_CYCLES,ampargs(1));
+                cycles,1000/freq(1)*cycles,1000/freq(end)*cycles,ampargs(1));
         end
     else % range of times
         [dummy sortwin_st ] = min(abs(times-ampwins(1)));
         [dummy sortwin_end] = min(abs(times-ampwins(end)));
         if length(freq) == 1
             fprintf('   in %d %1.1f-cycle (%1.0f ms) time windows centered from %1.0f to  %1.0f ms.\n',...
-                length(ampwins),DEFAULT_CYCLES,1000/freq(1)*DEFAULT_CYCLES,times(sortwin_st),times(sortwin_end));
+                length(ampwins),cycles,1000/freq(1)*cycles,times(sortwin_st),times(sortwin_end));
         else
             fprintf('   in %d %1.1f-cycle (%1.0f-%1.0f ms) time windows centered from %1.0f to %1.0f ms.\n',...
-                length(ampwins),DEFAULT_CYCLES,1000/freq(1)*DEFAULT_CYCLES,1000/freq(end)*DEFAULT_CYCLES,times(sortwin_st),times(sortwin_end));
+                length(ampwins),cycles,1000/freq(1)*cycles,1000/freq(end)*cycles,times(sortwin_st),times(sortwin_end));
         end
     end
 
@@ -2096,13 +2098,13 @@ elseif exist('ampargs') == 1 % if amplitude-sort
     for f = 1:length(freq)  % use one or range of frequencies
         frq = freq(f);
         [amps, cohers, cohsig, ampsig, allamps, allphs] = ...
-            phasecoher(data,length(times),srate,frq,DEFAULT_CYCLES,0, ...
+            phasecoher(data,length(times),srate,frq,cycles,0, ...
             [], [], timeStretchRef, timeStretchMarks);
 
         for ampwin = ampwins
             [dummy minx] = min(abs(times-ampwin)); % find nearest time point to requested
             minxs = [minxs minx];
-            winlen = floor(DEFAULT_CYCLES*srate/frq);
+            winlen = floor(cycles*srate/frq);
             % winloc = minx-[winlen:-1:0]; % ending time version
             winloc = minx-linspace(floor(winlen/2), floor(-winlen/2), winlen+1);
             tmprange = find(winloc>0 & winloc<=frames);
@@ -2117,7 +2119,7 @@ elseif exist('ampargs') == 1 % if amplitude-sort
         end
     end %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     if length(tmprange) ~=  winlen+1 % ?????????
-        filtersize = DEFAULT_CYCLES * length(tmprange) / (winlen+1);
+        filtersize = cycles * length(tmprange) / (winlen+1);
         timecenter = median(winloc)/srate*1000+times(1); % center of window in ms
         phaseangles = phaseangles + 2*pi*(timecenter-ampargs(1))*freq(end);
         fprintf(...
@@ -2473,7 +2475,7 @@ elseif Allampsflag %%%%%%%%%%%%%%%% Plot allamps instead of data %%%%%%%%%%%%%%
         fprintf(['Computing and plotting received ERSP and ITC signif. ' ...
             'levels...\n']);
         [amps,cohers,cohsig,ampsig,allamps] = ...
-            phasecoher(urdata,length(times),srate,coherfreq,DEFAULT_CYCLES,0, ...
+            phasecoher(urdata,length(times),srate,coherfreq,cycles,0, ...
             [], [], timeStretchRef, timeStretchMarks);
         % need to receive cohsig and ampsig to get allamps
         ampsig = signifs([1 2]); % assume these already in dB
@@ -2483,14 +2485,14 @@ elseif Allampsflag %%%%%%%%%%%%%%%% Plot allamps instead of data %%%%%%%%%%%%%%
         fprintf('Computing and plotting %g ERSP and ITC signif. level...\n',alpha);
         [amps,cohers,cohsig,ampsig,allamps] = ...
             phasecoher(urdata,length(times),srate,coherfreq, ...
-            DEFAULT_CYCLES, alpha, [], [], ...
+            cycles, alpha, [], [], ...
             timeStretchRef, timeStretchMarks');
         % need to receive cohsig and ampsig to get allamps
         fprintf('Coherence significance level: %g\n',cohsig);
     else % no plotting of significance
         [amps,cohers,cohsig,ampsig,allamps] = ...
             phasecoher(urdata,length(times),srate,coherfreq, ...
-            DEFAULT_CYCLES,0,[], [], timeStretchRef, timeStretchMarks);
+            cycles,0,[], [], timeStretchRef, timeStretchMarks);
         % need to receive cohsig and ampsig to get allamps
     end
 
@@ -2672,13 +2674,13 @@ elseif exist('data2') %%%%%% Plot allcohers instead of data %%%%%%%%%%%%%%%%%%%
         fprintf('Computing and plotting %g coherence significance level...\n',alpha);
 
         % [amps,cohers,cohsig,ampsig,allcohers] = ...
-        %   crosscoher(urdata,data2,length(times),srate,coherfreq,DEFAULT_CYCLES,alpha);
+        %   crosscoher(urdata,data2,length(times),srate,coherfreq,cycles,alpha);
 
         fprintf('Inter-Trial Coherence significance level: %g\n',cohsig);
         fprintf('Amplitude significance levels: [%g %g]\n',ampsig(1),ampsig(2));
     else
         % [amps,cohers,cohsig,ampsig,allcohers] = ...
-        %    crosscoher(urdata,data2,length(times),srate,coherfreq,DEFAULT_CYCLES,0);
+        %    crosscoher(urdata,data2,length(times),srate,coherfreq,cycles,0);
     end
     if ~exist('allcohers')
         fprintf('erpimage(): allcohers not returned....\n')
@@ -3242,7 +3244,7 @@ if ~isnan(coherfreq)
         fprintf('Computing and plotting amplitude at %g Hz.\n',coherfreq);
 
         if ~isnan(signifs) | Cohsigflag==NO % don't compute or plot signif. levels
-            [amps,cohers] = phasecoher(urdata,size(times,2),srate,coherfreq,DEFAULT_CYCLES);
+            [amps,cohers] = phasecoher(urdata,size(times,2),srate,coherfreq,cycles);
             if ~isnan(signifs)
                 ampsig = signifs([1 2]);
                 fprintf('Using supplied amplitude significance levels: [%g,%g]\n',...
@@ -3255,7 +3257,7 @@ if ~isnan(coherfreq)
                 'Computing and plotting %g coherence significance level at %g Hz...\n',...
                 alpha,                          coherfreq);
             [amps,cohers,cohsig,ampsig] = ...
-                phasecoher(urdata,size(times,2),srate,coherfreq,DEFAULT_CYCLES,alpha);
+                phasecoher(urdata,size(times,2),srate,coherfreq,cycles,alpha);
             fprintf('Coherence significance level: %g\n',cohsig);
 
             ampsig = 20*(log10(ampsig) - log10(mean(amps))); % convert to dB
