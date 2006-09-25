@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2006/01/31 20:19:18  arno
+% options
+%
 % Revision 1.16  2006/01/25 21:27:30  arno
 % nothing
 %
@@ -156,7 +159,7 @@ else
                  *reshape(EEG.data(EEG.icachansind,:,:), length(EEG.icachansind), EEG.pnts*EEG.trials);
     %[ compproj, varegg ] = compvar( EEG.data, { EEG.icasphere EEG.icaweights }, EEG.icawinv, setdiff(1:size(EEG.icaweights,1), components));
 end;    
-compproj = reshape(compproj, EEG.nbchan, EEG.pnts, EEG.trials);
+compproj = reshape(compproj, size(compproj,1), EEG.pnts, EEG.trials);
 
 %fprintf( 'The ICA projection accounts for %2.2f percent of the data\n', 100*varegg);
 	
