@@ -1,7 +1,11 @@
-% icadefs() - file of default filenames and constants to source in the ICA /ERP
-%             package functions.  Insert local dir reference below. 
-%
-% Note: Edit this file to change local directories under Unix and Windows 
+% icadefs() - function to read in a set of EEGLAB system-wide (i.e. lab-wide)
+%             or working directory-wide constants and preferences. Change the 
+%             way these are defined in the master icadefs.m file (usually
+%             in dir eeglab/functions/sigprocfunc) or make a custom copy of 
+%             the icadefs.m file in a project directory. Then, calling functions 
+%             that call icadefs from an EEGLAB session in that working directory 
+%             will read the local copy, which may set preferences different from 
+%             the system-wide copy.
 %
 % Author: Scott Makeig, SCCN/INC/UCSD, La Jolla, 05-20-97 
 
@@ -22,6 +26,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.41  2006/09/26 20:10:37  scott
+% added HZDIR to set frequency axis direction (up/down) in timef/newtimef
+%
 % Revision 1.40  2006/09/07 17:31:30  arno
 % change revision number
 %
