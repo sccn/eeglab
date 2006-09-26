@@ -246,6 +246,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.92  2006/09/26 02:33:16  scott
+% fixed 'timewarp' call - at least with a data martix argument
+%
 % Revision 1.91  2006/09/26 02:11:28  scott
 % edit help msg
 %
@@ -802,8 +805,9 @@ if ~isempty(varargin)
     varargin = varargin(sort(union(indices*2-1, indices*2))); % these 2 lines remove duplicate arguments
     try, g = struct(varargin{:}); 
     catch, error('Argument error in the {''param'', value} sequence'); end; 
+g
 end;
-% $$$ keyboard;
+
 g.tlimits = tlimits;
 g.frame   = frame;
 g.srate   = Fs;
