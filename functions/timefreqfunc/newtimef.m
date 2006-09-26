@@ -103,18 +103,20 @@
 %                     experimental events. See notes. {default: 'off'}
 %
 %    Optional time warping parameter: [not yet working! see below]
-%       'timewarp'  = {[events], [warpms], [plotidx]} Time warp amplitude and phase
-%                     time-courses (after time/freq transform but before smoothing 
-%                     across trials). 'events' is a matrix whose columns specify the 
-%                     epoch latencies (in ms) at which the same series of successive 
-%                     events occur in each trial. 'warpms' is an optional vector of 
+%       'timewarp'  = [events] Time warp amplitude and phase time-courses 
+%                     (after time/freq transform but before smoothing across
+%                     trials). 'events' is a matrix whose columns specify the 
+%                     epoch latencies (in ms) at which the same series of 
+%                     successive events occur in each trial. 
+%                     ELSE {[events], [warpms]} 'warpms' is an optional vector of 
 %                     event times (in ms) to which the series of events should be 
-%                     time locked. (Note: Epoch start and end should not be declared as 
-%                     events or warpms}. If 'warpms' is absent or [], the median of each 
-%                     'events' column will be used. [plotidx] is an optional vector 
-%                     of indices telling which of the warpfr to plot with vertical lines. 
-%                     If undefined, all marks are plotted. Overwrites 'vert' argument, 
-%                     if any. 
+%                     time locked. (Note: Epoch start and end should not be declared 
+%                     as events or warpms}. If 'warpms' is absent or [], the median 
+%                     of each 'events' column will be used. 
+%                     ELSE {[events], [warpms], [plotidx]} [plotidx] is an vector 
+%                     of indices telling which of the warpfr to plot with vertical 
+%                     lines. If undefined, all marks are plotted. Overwrites 'vert' 
+%                     argument, if any. 
 %    Deprecated time warp keywords (working??)
 %      'timewarpfr' = {[events], [warpfr], [plotidx]} Time warp amplitude and phase
 %                     time-courses (after time/freq transform but before smoothing 
@@ -244,6 +246,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.91  2006/09/26 02:11:28  scott
+% edit help msg
+%
 % Revision 1.90  2006/09/17 02:27:37  scott
 % added timewarpfr and timewarp arguments - ran simple test -sm
 %
@@ -870,23 +875,27 @@ if isfield(g, 'detrep'), g.rmerp   = g.detrep; end;
 % unpack 'timewarp' and 'timewarpfr' arguments 
 %---------------------------------------------
 
-if ~isempty(g.timewarpfr) & length(g.timewarpfr) > 3
-       error('''timewarpfr'' argument may have at most 3 elements');
+if iscell(g.timewarpfr) & length(g.timewarpfr) > 3
+       error('''timewarpfr'' cell array may have at most 3 elements');
 end
+
 if ~isempty(g.timewarp) % convert wimewarp ms to timewarpfr frames -sm
-       if length(g.timewarp) > 3
-         error('''timewarp'' argument may have at most 3 elements');
+       if iscell(g.timewarp) 
+          evntms = g.timewarp{1};
+       else
+          evntms = g.timewarp;
        end
-       evntms = g.timewarp{1};
        warpfr = round((evntms - g.tlimits(1))/1000*g.srate)+1;
        timewarpfr{1} = warpfr;
-       if length(g.timewarp) > 1
-         refms = g.timewarp{2};
-         reffr = round((refms - g.tlimits(1))/1000*g.srate)+1;
-         timewarpfr{2} = reffr;
-       end
-       if length(g.timewarp) > 2
-         timewarpfr{3} = timewarp{3};
+       if iscell(g.timewarp) 
+         if length(g.timewarp) > 1
+             refms = g.timewarp{2};
+             reffr = round((refms - g.tlimits(1))/1000*g.srate)+1;
+             timewarpfr{2} = reffr;
+         end
+         if length(g.timewarp) > 2
+             timewarpfr{3} = timewarp{3};
+         end
        end
 end
 
