@@ -107,6 +107,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.50  2006/09/26 17:58:59  scott
+% no changes
+%
 % Revision 1.49  2006/09/07 18:57:57  scott
 % clarified use of Hanning (FFT) or Morlet (wavelet) tapering -sm
 %
@@ -468,10 +471,9 @@ if ~isempty(g.timestretch) & length(g.timestretch{1}) > 0
   % convert timerefs to subsampled ERSP space
   % -----------------------------------------
 
-  [dummy refsPos] = min(transpose(abs(...
-      repmat(timerefs, [1 length(g.indexout)]) ...
-      - repmat(g.indexout, [length(timerefs) 1]) ...
-      )));
+  [dummy refsPos] = min(transpose(abs( ...
+      repmat(timerefs, [1 length(g.indexout)]) - repmat(g.indexout, [length(timerefs) 1]) ...
+                                   )));
   refsPos(end+1) = 1;
   refsPos(end+1) = length(g.indexout);
   refsPos = sort(refsPos);
@@ -499,7 +501,8 @@ if ~isempty(g.timestretch) & length(g.timestretch{1}) > 0
     theta = angle(mytmpall);
     
     % So mytmpall is almost equal to r.*exp(i*theta)
-whos marksPos refsPos
+    % whos marksPos refsPos
+
     M = timeWarp(marksPos, refsPos);
     TSr = transpose(M*r');
     TStheta = zeros(size(theta,1), size(theta,2));
