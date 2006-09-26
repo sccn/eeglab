@@ -22,6 +22,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.40  2006/09/07 17:31:30  arno
+% change revision number
+%
 % Revision 1.39  2006/05/27 03:23:26  toby
 % temp bug fix in search of a better solution
 %
@@ -163,6 +166,7 @@ ICABINARY = '/data/common/matlab/fmrlab/ica_linux'; % <=INSERT name of ica execu
                             % If none, use []
 SHRINKWARNING = 1;          % warn user about the shrink factor
 YDIR = 1;                   % positive up = 1; negative up = -1
+HZDIR = 'up';               % ascending = 'up'; descending = 'down' (timef/newtimef frequency direction)
 
 % COLORS
 % ------
