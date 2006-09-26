@@ -6,7 +6,7 @@
 %           series. Use to compare ERSP and ITC means in two conditions.
 %
 %         * Uses either fixed-window, zero-padded FFTs (fastest), wavelet
-%           0-padded DFTs (FFT uses Hanning tapers; wavelets use smilar Morlet 
+%           0-padded DFTs (FFT uses Hanning tapers; wavelets use similar Morlet 
 %           tapers), 
 %
 %         * For the wavelet and FFT methods, output frequency spacing 
@@ -21,37 +21,39 @@
 %         * Given a 'topovec' topo vector and 'elocs' electrode location file,
 %           the figure also shows a topoplot() of the specified scalp map.
 %         * Note: Left-click on subplots to view and zoom in separate windows.
-% Usage: 
+%
+% Usage with single dataset: 
 %        >> [ersp,itc,powbase,times,freqs,erspboot,itcboot] = ...
-%                      timef(data,frames,tlimits,srate,cycles,...
-%                                'key1',value1,'key2',value2, ... ); 
-% Usage with ALLEEG structure:
+%                  newtimef(data, frames, tlimits, srate, cycles,...
+%                       'key1',value1, 'key2',value2, ... ); 
+%
+% Usage with two datasets (compare current EEG dataset against ALLEEG(2)):
 %        >> [ersp,itc,powbase,times,freqs,erspboot,itcboot] = ...
-%           newtimef({ALLEEG(1).data(37,:,:) ALLEEG(2).data(37,:,:)},ALLEEG(1).pnts, ...
-%           [ALLEEG(1).xmin ALLEEG(1).xmax]*1000,ALLEEG(1).srate,4);
+%                  newtimef({EEG.data(37,:,:) ALLEEG(2).data(37,:,:)}, ,,,
+%                       EEG.pnts, [EEG.xmin EEG.xmax]*1000, EEG.srate, 4);
 % NOTE:                                        
 %        >> timef details  % scrolls more detailed argument information 
 %                          % version timef() also computes multitaper transforms
 %
-% Required inputs:     Value                                 {default}
+% Required inputs:    Value                                 {default}
 %       data        = Single-channel data vector (1,frames*ntrials) (required)
 %                     2-D array (frames,trials) or 3-D array (1,frames,trials)
-%                     To compare conditions 1 (data1) and condition 2 (data2)
-%                     in place of data enter { data1 data2 }
+%                     To compare two conditions (data1 and data2)
+%                     in place of single data matrix, enter { data1 data2 }
 %       frames      = Frames per trial. Ignored if data is 2-D or 3-D.  {750}
 %       tlimits     = [mintime maxtime] (ms) Epoch time limits {[-1000 2000]}
-%       srate       = data sampling rate (Hz)                 {250}
-%       cycles      = is 0 -> Use FFTs (with constant window length) {0}
-%                     is >0 -> Number of cycles in each analysis wavelet 
-%                     is [wavcycles fact] -> wavelet cycles increase with frequency 
-%                     starting at wavcyle (0<fact<1, fact=1 no increase, fact=0
-%                     same as running FFT).
-%                     OR multitaper decomposition (with 'mtaper').
+%       srate       = data sampling rate (Hz)                           {250}
+%       cycles      = value = 0 -> Use FFTs (with constant window length) 
+%                     and Hanning window tapering                        {0}
+%                     value > 0 -> Number of cycles in each Morlet wavelet 
+%                     [wavcycles fact] -> wavelet cycles increase with frequency 
+%                     starting at wavcyles (fact range, [[0,1]: fact=1 -> constant;
+%                     fact=0, as in FFTs). For multitaper options, see timef().
 %
 %    Optional inter-trial coherence (ITC) Type:
 %       'type'      = ['coher'|'phasecoher'] Compute either linear coherence 
-%                      ('coher') or phase coherence ('phasecoher') also known
-%                      as phase-locking factor         {default: 'phasecoher'}
+%                     ('coher') or phase coherence ('phasecoher') also known
+%                     as phase-locking factor         {default: 'phasecoher'}
 %
 %    Optional detrending:
 %       'detrend'   = ['on'|'off'], Linearly detrend each data epoch   {'off'}
@@ -100,7 +102,7 @@
 %                     x and y not arising from common synchronization to
 %                     experimental events. See notes. {default: 'off'}
 %
-%    Optional time warping parameter: [not  working! see below]
+%    Optional time warping parameter: [not yet working! see below]
 %       'timewarp'  = {[events], [warpms], [plotidx]} Time warp amplitude and phase
 %                     time-courses (after time/freq transform but before smoothing 
 %                     across trials). 'events' is a matrix whose columns specify the 
@@ -113,7 +115,7 @@
 %                     of indices telling which of the warpfr to plot with vertical lines. 
 %                     If undefined, all marks are plotted. Overwrites 'vert' argument, 
 %                     if any. 
-%    Deprecated time warp keywords (still working)
+%    Deprecated time warp keywords (working??)
 %      'timewarpfr' = {[events], [warpfr], [plotidx]} Time warp amplitude and phase
 %                     time-courses (after time/freq transform but before smoothing 
 %                     across trials). 'events' is a matrix whose columns specify the 
@@ -127,6 +129,8 @@
 %                     undefined, all marks are plotted. Overwrites 'vert' argument, 
 %                     if any. [Note: In future releases, 'timewarpfr' will be deprecated 
 %                     in favor of 'timewarp' using latencies in ms instead of frames].
+%
+%    Deprecated original time warp keywords (working)
 %       'timeStretchMarks' = [(marks,trials) matrix] Each trial data will be
 %                     linearly warped (after time/freq. transform) so that the
 %                     event marks are time locked to the reference frames 
@@ -240,6 +244,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.90  2006/09/17 02:27:37  scott
+% added timewarpfr and timewarp arguments - ran simple test -sm
+%
 % Revision 1.89  2006/09/12 19:10:16  scott
 % commented out timewarp and timewarpfr for unknown ??? -sm
 %
@@ -703,6 +710,7 @@ function [P,R,mbase,timesout,freqs,Pboot,Rboot,alltfX,PA] = timef( X, frame, tli
 %        Also called 'phase-locking factor' by Tallon-Baudry et al. (1996)
 
 % Constants set here:
+%
 ERSP_CAXIS_LIMIT = 0;           % 0 -> use data limits; else positive value
                                 % giving symmetric +/- caxis limits.
 ITC_CAXIS_LIMIT  = 0;           % 0 -> use data limits; else positive value
