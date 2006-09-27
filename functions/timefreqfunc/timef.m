@@ -82,7 +82,8 @@
 %                     May also be an EEG.chanlocs struct. 
 %                     {default: file named in icadefs.m}
 %    Optional plotting parameters:
-%       'hzdir'     = ['up'|'down'] Direction of the frequency axes      {'up'}
+%       'hzdir'     = ['up'|'down'] Direction of the frequency axes; reads default
+%                     from icadefs.m                                     {'up'}
 %       'plotersp'  = ['on'|'off'] Plot power spectral perturbations     {'on'} 
 %       'plotitc'   = ['on'|'off'] Plot inter trial coherence            {'on'}
 %       'plotphase' = ['on'|'off'] Plot sign of the phase in the ITC panel, i.e.
@@ -159,6 +160,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.89  2006/09/16 02:34:29  toby
+% Bug fix, replaced MIN_ABS variable with machine-specific eps
+%
 % Revision 1.88  2006/03/15 20:02:10  scott
 % nothing
 %
@@ -470,6 +474,9 @@ function [P,R,mbase,times,freqs,Pboot,Rboot,Rphase,PA] = timef(X,frames,tlimits,
 %        the ITC is the phase coherence between the data time series and the
 %        time-locking event time series.
 
+% Read system-wide / dir-wide constants: 
+icadefs
+
 % Constants set here:
 ERSP_CAXIS_LIMIT = 0;           % 0 -> use data limits; else positive value
                                 % giving symmetric +/- caxis limits.
@@ -614,7 +621,7 @@ try, g.itcmax;     catch, g.itcmax = []; end;
 try, g.erspmax;    catch, g.erspmax = []; end;
 try, g.verbose;    catch, g.verbose = 'on'; end;
 try, g.chaninfo;   catch, g.chaninfo = []; end;
-try, g.hzdir;      catch, g.hzdir = 'up'; end;
+try, g.hzdir;      catch, g.hzdir = HZDIR; end; % default from icadefs
 
 % testing arguments consistency
 % -----------------------------
