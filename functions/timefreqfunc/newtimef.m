@@ -108,39 +108,15 @@
 %                     trials). 'events' is a matrix whose columns specify the 
 %                     epoch latencies (in ms) at which the same series of 
 %                     successive events occur in each trial. 
-%                     ELSE {[events], [warpms]} 'warpms' is an optional vector of 
+%                     ELSE {{[events], [warpms]}} 'warpms' is an optional vector of 
 %                     event times (in ms) to which the series of events should be 
 %                     time locked. (Note: Epoch start and end should not be declared 
 %                     as events or warpms}. If 'warpms' is absent or [], the median 
-%                     of each 'events' column will be used. 
-%                     ELSE {[events], [warpms], [plotidx]} [plotidx] is an vector 
+%                     of each 'events' column will be used. NB: double {{}} required!
+%                     ELSE {{[events], [warpms], [plotidx]}} [plotidx] is an vector 
 %                     of indices telling which of the warpfr to plot with vertical 
 %                     lines. If undefined, all marks are plotted. Overwrites 'vert' 
 %                     argument, if any. 
-%    Deprecated time warp keywords (working??)
-%      'timewarpfr' = {[events], [warpfr], [plotidx]} Time warp amplitude and phase
-%                     time-courses (after time/freq transform but before smoothing 
-%                     across trials). 'events' is a matrix whose columns specify the 
-%                     epoch frames [1 ... end] at which a series of successive events 
-%                     occur in each trial. 'warpfr' is an optional vector of event 
-%                     frames to which the series of events should be time locked. 
-%                     (Note: Epoch start and end should not be declared as events or 
-%                     warpfr}. If 'warpfr' is absent or [], the median of each 'events' 
-%                     column will be used. [plotidx] is an optional vector of indices 
-%                     telling which of the warpfr to plot with vertical lines. If 
-%                     undefined, all marks are plotted. Overwrites 'vert' argument, 
-%                     if any. [Note: In future releases, 'timewarpfr' will be deprecated 
-%                     in favor of 'timewarp' using latencies in ms instead of frames].
-%
-%    Deprecated original time warp keywords (working)
-%       'timeStretchMarks' = [(marks,trials) matrix] Each trial data will be
-%                     linearly warped (after time/freq. transform) so that the
-%                     event marks are time locked to the reference frames 
-%                     (see timeStretchRefs). Marks must be specified in frames
-%       'timeStretchRefs' = [1 x marks] Common reference frames to all trials. 
-%                     If empty or undefined, median latency for each mark will be used.
-%       'timeStretchPlot' = [vector] Indicates the indices of the reference frames
-%                     (in StretchRefs) should be overplotted on the ERSP and ITC.
 %
 %    Optional bootstrap parameters:
 %       'alpha'     = If non-0, compute two-tailed bootstrap significance prob. 
@@ -184,6 +160,7 @@
 %       'plotphase' = ['on'|'off'] Plot ITC phase instead ofITC amplitude {'off'}
 %       'erspmax'   = [real dB] set the ERSP max. for the color scale (min= -max) {auto}
 %       'itcmax'    = [real] set the ITC image maximum for the color scale {auto}
+%       'hzdir'     = ['up'|'down'] Direction of the frequency axes      {'up'}
 %       'erplim'    = [min max] ERP limits for ITC (below ITC image)       {auto}
 %       'itcavglim' = [min max] average ITC limits for all freq. (left of ITC) {auto}
 %       'speclim'   = [min max] average spectrum limits (left of ERSP image)   {auto}
@@ -216,7 +193,7 @@
  
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
-%    Optional Multitaper Parameters:
+%    Optional Multitaper Parameters: [not included here]
 %       'mtaper'    = If [N W], performs multitaper decomposition. 
 %                      (N is the time resolution and W the frequency resolution; 
 %                      maximum taper number is 2NW-1). Overwrites 'winsize' and 'padratio'. 
@@ -226,6 +203,32 @@
 %                      recommended (as multiwavelets are not implemented). 
 %                      Uses Matlab functions DPSS, PMTM.      {no multitaper}
 
+%    Deprecated time warp keywords (working??)
+%      'timewarpfr' = {{[events], [warpfr], [plotidx]}} Time warp amplitude and phase
+%                     time-courses (after time/freq transform but before smoothing 
+%                     across trials). 'events' is a matrix whose columns specify the 
+%                     epoch frames [1 ... end] at which a series of successive events 
+%                     occur in each trial. 'warpfr' is an optional vector of event 
+%                     frames to which the series of events should be time locked. 
+%                     (Note: Epoch start and end should not be declared as events or 
+%                     warpfr}. If 'warpfr' is absent or [], the median of each 'events' 
+%                     column will be used. [plotidx] is an optional vector of indices 
+%                     telling which of the warpfr to plot with vertical lines. If 
+%                     undefined, all marks are plotted. Overwrites 'vert' argument, 
+%                     if any. [Note: In future releases, 'timewarpfr' will be deprecated 
+%                     in favor of 'timewarp' using latencies in ms instead of frames].
+
+%    Deprecated original time warp keywords (working)
+%       'timeStretchMarks' = [(marks,trials) matrix] Each trial data will be
+%                     linearly warped (after time/freq. transform) so that the
+%                     event marks are time locked to the reference frames 
+%                     (see timeStretchRefs). Marks must be specified in frames
+%       'timeStretchRefs' = [1 x marks] Common reference frames to all trials. 
+%                     If empty or undefined, median latency for each mark will be used.
+%       'timeStretchPlot' = [vector] Indicates the indices of the reference frames
+%                     (in StretchRefs) should be overplotted on the ERSP and ITC.
+%
+%
 % Copyright (C) 1998 Sigurd Enghoff, Scott Makeig
 % first built as timef.m at CNL / Salk Institute 8/1/98-8/28/01
 % SCCN/INC/UCSD/ recast as newtimef -Arno Delorme
@@ -246,6 +249,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.93  2006/09/26 02:53:17  scott
+% debugging 'timewarp'
+%
 % Revision 1.92  2006/09/26 02:33:16  scott
 % fixed 'timewarp' call - at least with a data martix argument
 %
@@ -699,8 +705,6 @@
 
 function [P,R,mbase,timesout,freqs,Pboot,Rboot,alltfX,PA] = timef( X, frame, tlimits, Fs, varwin, varargin);
 
-% Not yet implemented:
-%       'hzdir'     = ['up'|'down'] Direction of the frequency axes      {'up'}
 
 % Note: Above, PA is output of 'phsamp','on' 
 
@@ -716,6 +720,10 @@ function [P,R,mbase,timesout,freqs,Pboot,Rboot,alltfX,PA] = timef( X, frame, tli
 %        But here, we consider    Phase(Pyy) = 0 and |Pyy| = 1 -> Pxy = Pxx
 %        Giving, R = |Sum(Pxx)|/Sum(|Pxx|), the inter-trial coherence (ITC)
 %        Also called 'phase-locking factor' by Tallon-Baudry et al. (1996)
+
+% Read system (or directory) constants and preferences:
+% ------------------------------------------------------
+icadefs
 
 % Constants set here:
 %
@@ -805,7 +813,6 @@ if ~isempty(varargin)
     varargin = varargin(sort(union(indices*2-1, indices*2))); % these 2 lines remove duplicate arguments
     try, g = struct(varargin{:}); 
     catch, error('Argument error in the {''param'', value} sequence'); end; 
-g
 end;
 
 g.tlimits = tlimits;
@@ -865,8 +872,20 @@ try, g.timewarpfr;      catch, g.timewarpfr  = []; end;
 try, g.timewarp;        catch, g.timewarp    = []; end; 
 
 try, g.timeStretchMarks; catch, g.timeStretchMarks = []; end;
-try, g.timeStretchRefs;  catch, g.timeStretchRefs = []; end;
-try, g.timeStretchPlot;  catch, g.timeStretchPlot = []; end;
+try, g.timeStretchRefs;  catch, g.timeStretchRefs  = []; end;
+try, g.timeStretchPlot;  catch, g.timeStretchPlot  = []; end;
+try, g.hzdir;            catch, g.hzdir            = HZDIR; end;
+
+% testing arguments consistency
+% -----------------------------
+if strcmp(g.hzdir,'up')| strcmp(g.hzdir,'normal')
+    g.hzdir = 'normal'; % convert to Matlab graphics constants
+elseif strcmp(g.hzdir,'down') | strcmp(g.hzdir,'reverse')
+    g.hzdir = 'reverse';
+else
+    error('unknown ''hzdir'' string argument'); 
+end
+
 
 g.AXES_FONT        = AXES_FONT;      % axes text FontSize
 g.TITLE_FONT       = TITLE_FONT;
@@ -884,21 +903,22 @@ if iscell(g.timewarpfr) & length(g.timewarpfr) > 3
 end
 
 if ~isempty(g.timewarp) % convert wimewarp ms to timewarpfr frames -sm
+fprintf('\n')
        if iscell(g.timewarp) 
           evntms = g.timewarp{1};
        else
           evntms = g.timewarp;
        end
        warpfr = round((evntms - g.tlimits(1))/1000*g.srate)+1;
-       timewarpfr{1} = warpfr;
+       g.timewarpfr{1} = warpfr';
        if iscell(g.timewarp) 
          if length(g.timewarp) > 1
              refms = g.timewarp{2};
              reffr = round((refms - g.tlimits(1))/1000*g.srate)+1;
-             timewarpfr{2} = reffr;
+             g.timewarpfr{2} = reffr';
          end
          if length(g.timewarp) > 2
-             timewarpfr{3} = timewarp{3};
+             g.timewarpfr{3} = timewarp{3};
          end
        end
 end
@@ -911,8 +931,7 @@ if ~isempty(g.timewarpfr)
   if length(g.timewarpfr) > 2
        g.timeStretchPlot = g.timewarpfr{3};
   else
-     stretchevents = size(g.timeStretchMarks);
-     stretchevents = stretchevents(2);
+     stretchevents = size(g.timeStretchMarks,1);
      g.timeStretchPlot = [1:stretchevents]; % default to plotting all lines
   end
   if max(max(g.timeStretchMarks)) > frame-1 | min(min(g.timeStretchMarks)) < 2
@@ -925,8 +944,8 @@ if ~isempty(g.timewarpfr)
   end
 end
 
-% testing arguments consistency
-% -----------------------------
+% test argument consistency
+% --------------------------
 switch lower(g.verbose)
     case { 'on', 'off' }, ;
     otherwise error('verbose must be either on or off');
@@ -1014,8 +1033,10 @@ end
 
 if ~isempty(g.timeStretchMarks) %Added -Jean
   if isempty(g.timeStretchRefs)
-    verboseprintf(g.verbose, ['Using median event latencies as reference event times for time-warping']);
+    verboseprintf(g.verbose, ['Using median event latencies as reference event times for time warping.\n']);
     g.timeStretchRefs = median(g.timeStretchMarks,2);
+  else
+    verboseprintf(g.verbose, ['Using supplied latencies as reference event times for time warping.\n']);
   end
   if isempty(g.timeStretchPlot)
     verboseprintf(g.verbose, 'Will not overplot reference event times on the ERSP');
@@ -1130,7 +1151,7 @@ allfields = { 'tlimits' 'frame' 'srate' 'cycles' 'cyclesfact' 'boottype' 'condbo
               'itcmax' 'erspmax' 'lowmem' 'verbose' 'plottype' 'plotmean' ...
               'highlightmode' 'chaninfo' 'erspmarglim' 'itcavglim' 'erplim' ...
               'speclim' 'AXES_FONT' 'TITLE_FONT' 'ERSP_CAXIS_LIMIT' ...
-              'ITC_CAXIS_LIMIT' ...
+              'ITC_CAXIS_LIMIT' 'hzdir' ...
               'timeStretchMarks' 'timeStretchRefs' 'timeStretchPlot' ...
               'timewarpfr' 'timewarp' ...
             }; 
@@ -1256,7 +1277,8 @@ if iscell(X)
             g.itcmax  = max( max(max(abs(Rboot1))), max(max(abs(Rboot2))) );
         end;
             
-        subplot(1,3,1); g.title = g.titleall{1}; 
+        subplot(1,3,1); 
+        g.title = g.titleall{1}; 
         g = plottimef(P1, R1, Pboot1, Rboot1, mean(X{1},2), freqs, timesout, mbase, g);
         g.itcavglim = [];
         subplot(1,3,2); g.title = g.titleall{2}; 
@@ -1377,6 +1399,7 @@ if ~isnan(g.alpha)
   verboseprintf(g.verbose, 'Only significant values (bootstrap p<%g) will be colored;\n',g.alpha) 
   verboseprintf(g.verbose, '  non-significant values will be plotted in green\n');
 end
+verboseprintf(g.verbose,'  Image frequency direction: %s\n',g.hzdir);
 
 % -----------------------------------------
 % detrend over epochs (trials) if requested
@@ -1398,7 +1421,7 @@ end;
                                      g.type, 'subitc', g.subitc, 'wavelet', g.cycles, ...
                                      'padratio', g.padratio, 'freqs', g.freqs, 'freqscale', g.freqscale, ...
                                      'nfreqs', g.nfreqs, ...
-                                     'timestretch', {g.timeStretchMarks, g.timeStretchRefs}); 
+                                     'timestretch', {g.timeStretchMarks', g.timeStretchRefs}); 
 P  = mean(alltfX.*conj(alltfX), 3); % power
 
 % ----------------
@@ -1628,6 +1651,8 @@ function g = plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
               imagesclogy(times,freqs,PP(:,:));
           end;
       end;
+      set(gca,'ydir',g.hzdir);  % make frequency ascend or descend
+ 
           
       hold on
       plot([0 0],[0 freqs(end)],'--m','LineWidth',g.linewidth); % plot time 0
@@ -1685,7 +1710,7 @@ function g = plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
 
       if ~isnan(E)
           
-          % ploting limits
+          % plotting limits
           if isempty(g.speclim)
               g.speclim = [min(E)-max(abs(E))/3 max(E)+max(abs(E))/3];
           end;
@@ -1699,7 +1724,8 @@ function g = plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
               end
               if freqs(1) ~= freqs(end), xlim([freqs(1) freqs(end)]); end;
               ylim(g.speclim)
-          else
+
+          else % 'log'
               semilogx(freqs,E,'LineWidth',g.linewidth); hold on;
               if ~isnan(g.alpha)
                   semilogx(freqs,Pboot(:,:)'+[E;E],'g', 'LineWidth',g.linewidth)
@@ -1712,16 +1738,31 @@ function g = plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
               set(gca, 'xtickmode', 'manual');
               divs = ceil(exp(divs)); divs = unique(divs); % ceil is critical here, round might misalign
                                                            % out-of border label with within border ticks
-              set(gca, 'xtick', divs);
+              if strcmp(g.hzdir,'reverse')
+                   set(gca, 'xtick', divs);
+divs
+              else
+                   dd = zeros(size(divs));
+                   for d = 1:length(dd)
+                      dd(d) = divs(length(divs)+1-d);
+                   end
+                   set(gca, 'xtick', dd);
+dd
+              end
           end;
           set(h(5),'TickLength',[0.020 0.025]);          
           set(h(5),'View',[90 90])
+          xlabel('Frequency (Hz)')
+          if strcmp(g.hzdir,'normal')
+             set(gca,'xdir','reverse');
+          else
+             set(gca,'xdir','normal');
+          end
+          ylabel('dB')
           tick = get(h(5),'YTick');
           if (length(tick)>2)
               set(h(5),'YTick',[tick(1) ; tick(end-1)])
           end
-          xlabel('Frequency (Hz)')
-          ylabel('dB')
       end;
     end;
 
@@ -1780,6 +1821,7 @@ function g = plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
           end
         end;
       end;
+      set(gca,'ydir',g.hzdir);  % make frequency ascend or descend
 
       if isempty(g.itcmax)
           g.itcmax = caxis;
@@ -1842,16 +1884,14 @@ function g = plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
       set(h(10),'YAxisLocation','right')
       xlabel('Time (ms)')
       ylabel('uV')
-
-      E = mean(R(:,:)');
+      E = nan_mean(R(:,:)'); % don't let a few NaN's crash this 
       
       %
-      %%%%% plot the marginal mean ERP below the ITC image %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+      %%%%% plot the marginal mean left of the ITC image %%%%%%%%%%%%%%%%%%%%%
       %
 
       h(11) = subplot('Position',[0 ordinate2 .1 height].*s+q); % plot the marginal mean
                                                                 % ITC left of the ITC image
-      
       % set plotting limits
       if isempty(g.itcavglim)
           if ~isnan(g.alpha)
@@ -1882,10 +1922,18 @@ function g = plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
           set(gca, 'xtickmode', 'manual');
           divs = ceil(exp(divs)); divs = unique(divs); % ceil is critical here, round might misalign
                                                        % out-of border label with within border ticks
-          set(gca, 'xtick', divs);
+              if strcmp(g.hzdir,'reverse')
+                   set(gca, 'xtick', divs);
+              else
+                   dd = zeros(size(divs));
+                   for d = 1:length(dd)
+                      dd(d) = divs(length(divs)+1-d);
+                   end
+                   set(gca, 'xtick', dd);
+              end
       end;
 
-      % plot details
+      % ITC plot details
       tick = get(h(11),'YTick');
       if length(tick) > 1
           set(h(11),'YTick',[tick(1) ; tick(length(tick))])
@@ -1893,6 +1941,11 @@ function g = plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
       set(h(11),'View',[90 90])
       %set(h(11),'TickLength',[0.020 0.025]);
       xlabel('Frequency (Hz)')
+      if strcmp(g.hzdir,'normal')
+         set(gca,'xdir','reverse');
+      else
+         set(gca,'xdir','normal');
+      end
       ylabel('ERP')
       
       %
