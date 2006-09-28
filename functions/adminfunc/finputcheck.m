@@ -12,7 +12,7 @@
 %               default value.  Allowed types are 'boolean', 'integer', 
 %               'real', 'string', 'cell' or 'struct'.  For example,
 %                       {'key1' 'string' { 'string1' 'string2' } 'defaultval_key1'}
-%                       {'key2' 'int' { minint maxint } 'defaultval_key2'} 
+%                       {'key2' 'integer' { minint maxint } 'defaultval_key2'} 
 %  callingfunc - Calling function name for error messages. {default: none}.
 %  mode        - ['ignore'|'error'] ignore keywords that are either not specified 
 %                in the fieldlist cell array or generate an error. 
@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2006/03/11 05:37:07  arno
+% header
+%
 % Revision 1.23  2004/11/06 02:54:06  scott
 % a few further small edits to the help msg -sm
 %
