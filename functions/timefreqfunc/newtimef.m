@@ -249,6 +249,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.94  2006/09/27 01:47:22  scott
+% added 'hzdir', debugged 'timewarp', clarified help msg and commandline text -sm
+%
 % Revision 1.93  2006/09/26 02:53:17  scott
 % debugging 'timewarp'
 %
@@ -703,7 +706,7 @@
 % 03-16-02 timeout automatically adjusted if too high -ad 
 % 04-02-02 added 'coher' option -ad 
 
-function [P,R,mbase,timesout,freqs,Pboot,Rboot,alltfX,PA] = timef( X, frame, tlimits, Fs, varwin, varargin);
+function [P,R,mbase,timesout,freqs,Pboot,Rboot,alltfX,PA] = timef( data, frame, tlimits, Fs, varwin, varargin);
 
 
 % Note: Above, PA is output of 'phsamp','on' 
@@ -759,19 +762,19 @@ if (nargin < 1)
 	return
 end
 
-if isstr(X) & strcmp(X,'details')
+if isstr(data) & strcmp(data,'details')
    more on
    help timefdetails
    more off
    return
 end
-if ~iscell(X)
-    [X, frame] = reshapeX(X, frame);
-    trials = size(X,2);
+if ~iscell(data)
+    [data, frame] = reshapeX(data, frame);
+    trials = size(data,2);
 else 
-    [X{1}, frame] = reshapeX(X{1}, frame);
-    [X{2}, frame] = reshapeX(X{2}, frame);
-    trials = size(X{1},2);
+    [data{1}, frame] = reshapeX(data{1}, frame);
+    [data{2}, frame] = reshapeX(data{2}, frame);
+    trials = size(data{1},2);
 end;
 
 if (nargin < 2)
@@ -819,6 +822,33 @@ g.tlimits = tlimits;
 g.frame   = frame;
 g.srate   = Fs;
 g.cycles  = varwin;
+
+%{ 
+% toby
+if nargin < 2
+	help timefreq;
+	return;
+end;
+
+[frame trials]= size(data);
+g = finputcheck(varargin, ...
+                { 'ntimesout'     'integer'  []                       200; ...
+				  'timesout'      'real'     []                       []; ...
+				  'winsize'       'integer'  [0 Inf]                  max(pow2(nextpow2(frame)-3),4); ...
+                  'tlimits'       'real'     []                       [0 frame/srate*1000]; ...
+                  'detrend'       'string'   {'on' 'off'}              'off'; ...
+				  'freqs'         'real'     [0 Inf]                  [0 srate/2]; ...
+				  'nfreqs'        'integer'  [0 Inf]                  []; ...
+				  'freqscale'     'string'   { 'linear' 'log' }       'linear'; ...
+				  'wavelet'       'real'     [0 Inf]                   0; ...
+				  'padratio'      'integer'  [1 Inf]                   2; ...
+				  'itctype'       'string'   {'phasecoher' 'phasecoher2' 'coher'}  'phasecoher'; ...
+				  'subitc'        'string'   {'on' 'off'}  'off'; ...
+                  'timestretch'   'cell'     []                        {}
+                  'wletmethod'    'string'   {'dftfilt2' 'dftfilt2_rey'}    'dftfilt2_rey'});
+if isstr(g), error(g); end;
+%} 
+% /toby
 
 try, g.boottype;   catch, g.boottype = 'shuffle'; end;
 try, g.condboot;   catch, g.condboot = 'abs'; end;
@@ -1165,28 +1195,28 @@ end;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % compute frequency by frequency if low memory
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-if strcmpi(g.lowmem, 'on') & length(X) ~= g.frame & isempty(g.nfreqs) & ~iscell(X)
+if strcmpi(g.lowmem, 'on') & length(data) ~= g.frame & isempty(g.nfreqs) & ~iscell(data)
     
     % compute for first 2 trials to get freqsout
-    XX = reshape(X, 1, frame, prod(size(X))/g.frame);    
+    XX = reshape(data, 1, frame, prod(size(data))/g.frame);    
     [P,R,mbase,timesout,freqsout] = newtimef(XX(1,:,1), frame, tlimits, Fs, varwin, 'plotitc', 'off', 'plotamp', 'off',varargin{:}, 'lowmem', 'off');
     
     % scan all frequencies
     for index = 1:length(freqsout)
         if nargout < 8
             [P(index,:),R(index,:),mbase(index),timesout,tmpfreqs(index),Pboot(index,:),Rboot(index,:)] = ...
-                newtimef(X, frame, tlimits, Fs, varwin, 'freqs', [freqsout(index) freqsout(index)], 'nfreqs', 1, ...
+                newtimef(data, frame, tlimits, Fs, varwin, 'freqs', [freqsout(index) freqsout(index)], 'nfreqs', 1, ...
                           'plotamp', 'off', 'plotphasesign', 'off',varargin{:}, 'lowmem', 'off', 'timesout', timesout);
         else
             [P(index,:),R(index,:),mbase(index),timesout,tmpfreqs(index),Pboot(index,:),Rboot(index,:), ...
             alltfX(index,:,:)] = ...
-                newtimef(X, frame, tlimits, Fs, varwin, 'freqs', [freqsout(index) freqsout(index)], 'nfreqs', 1, ...
+                newtimef(data, frame, tlimits, Fs, varwin, 'freqs', [freqsout(index) freqsout(index)], 'nfreqs', 1, ...
                           'plotamp', 'off', 'plotphasesign', 'off',varargin{:}, 'lowmem', 'off', 'timesout', timesout);
         end;
     end;
     
     % plot and return
-    ERP = mean(X,2);
+    ERP = mean(data,2);
     plottimef(P, R, Pboot, Rboot, ERP, freqsout, timesout, mbase, g);
     return;
 end;    
@@ -1195,9 +1225,9 @@ end;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 % compare 2 conditions part
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
-if iscell(X)
+if iscell(data)
     vararginori = varargin;
-	if length(X) ~= 2
+	if length(data) ~= 2
 		error('timef: to compare conditions, data must be 2-element cell arrays');
 	end;
 	
@@ -1231,14 +1261,14 @@ if iscell(X)
     verboseprintf(g.verbose, '      the number of time points or number of frequencies\n');
     verboseprintf(g.verbose, '      (''coher'' options take 3 times as much memory as other options)\n');
     [P1,R1,mbase1,timesout,freqs,Pboot1,Rboot1,alltfX1] = ...
-        newtimef( X{1}, frame, tlimits, Fs, varwin, 'plotitc', 'off', ...
+        newtimef( data{1}, frame, tlimits, Fs, varwin, 'plotitc', 'off', ...
                   'plotersp', 'off', vararginori{:}, 'lowmem', 'off', ...
                   'timeStretchMarks', g.timeStretchMarks(:,1:(end/2)), ... %Added -Jean
                   'timeStretchRefs', g.timeStretchRefs);
     
     verboseprintf(g.verbose, '\nRunning newtimef on second condition *********************\n');
     [P2,R2,mbase2,timesout,freqs,Pboot2,Rboot2,alltfX2] = ...
-        newtimef( X{2}, frame, tlimits, Fs, varwin, 'plotitc', 'off', ...
+        newtimef( data{2}, frame, tlimits, Fs, varwin, 'plotitc', 'off', ...
                   'plotersp', 'off', vararginori{:}, 'lowmem', 'off', ...
                   'timeStretchMarks', g.timeStretchMarks(:,(1+end/2):end), ... %Added -Jean
                   'timeStretchRefs', g.timeStretchRefs);
@@ -1279,10 +1309,10 @@ if iscell(X)
             
         subplot(1,3,1); 
         g.title = g.titleall{1}; 
-        g = plottimef(P1, R1, Pboot1, Rboot1, mean(X{1},2), freqs, timesout, mbase, g);
+        g = plottimef(P1, R1, Pboot1, Rboot1, mean(data{1},2), freqs, timesout, mbase, g);
         g.itcavglim = [];
         subplot(1,3,2); g.title = g.titleall{2}; 
-        plottimef(P2, R2, Pboot2, Rboot2, mean(X{2},2), freqs, timesout, mbase, g);
+        plottimef(P2, R2, Pboot2, Rboot2, mean(data{2},2), freqs, timesout, mbase, g);
         subplot(1,3,3); g.title = g.titleall{3};
     end;
     
@@ -1293,17 +1323,17 @@ if iscell(X)
             case 'complex',  Rdiff = R1-R2;
         end;
         if strcmpi(g.plotersp, 'on') | strcmpi(g.plotitc, 'on')
-            plottimef(P1-P2, Rdiff, [], [], mean(X{1},2)-mean(X{2},2), freqs, timesout, mbase, g);
+            plottimef(P1-P2, Rdiff, [], [], mean(data{1},2)-mean(data{2},2), freqs, timesout, mbase, g);
         end;
 	else 		
 		% preprocess data and run compstat
 		% --------------------------------
 		alltfX1power = alltfX1.*conj(alltfX1);
 		alltfX2power = alltfX2.*conj(alltfX2);
-		formula = {'log10(mean(arg1(:,:,X),3))'};
+		formula = {'log10(mean(arg1(:,:,data),3))'};
 		switch g.type
 		 case 'coher', % take the square of alltfx and alltfy first to speed up
-		  formula = { formula{1} ['sum(arg2(:,:,X),3)./sqrt(sum(arg1(:,:,X),3)*length(X) )'] };
+		  formula = { formula{1} ['sum(arg2(:,:,data),3)./sqrt(sum(arg1(:,:,data),3)*length(data) )'] };
           if strcmpi(g.lowmem, 'on')
               for ind = 1:2:size(alltfX1power,1)
                   if ind == size(alltfX1,1), indarr = ind; else indarr = [ind:ind+1]; end;
@@ -1320,9 +1350,9 @@ if iscell(X)
                                                        { alltfX1power alltfX2power }, {alltfX1 alltfX2});
           end; 
 		 case 'phasecoher2', % normalize first to speed up
-		  formula = { formula{1} ['sum(arg2(:,:,X),3)./sum(arg3(:,:,X),3)'] }; 
+		  formula = { formula{1} ['sum(arg2(:,:,data),3)./sum(arg3(:,:,data),3)'] }; 
 		  alltfX1abs = sqrt(alltfX1power); % these 2 lines can be suppressed 
-		  alltfX2abs = sqrt(alltfX2power); % by inserting sqrt(arg1(:,:,X)) instead of arg3(:,:,X))
+		  alltfX2abs = sqrt(alltfX2power); % by inserting sqrt(arg1(:,:,data)) instead of arg3(:,:,data))
           if strcmpi(g.lowmem, 'on')
               for ind = 1:2:size(alltfX1abs,1)
                   if ind == size(alltfX1,1), indarr = ind; else indarr = [ind:ind+1]; end;
@@ -1340,7 +1370,7 @@ if iscell(X)
                                                        { alltfX1power alltfX2power }, {alltfX1 alltfX2}, { alltfX1abs alltfX2abs });
           end; 
 		 case 'phasecoher',
-		  formula = { formula{1} ['mean(arg2(:,:,X),3)'] }; 
+		  formula = { formula{1} ['mean(arg2(:,:,data),3)'] }; 
           if strcmpi(g.lowmem, 'on')
               for ind = 1:2:size(alltfX1,1)
                   if ind == size(alltfX1,1), indarr = ind; else indarr = [ind:ind+1]; end;
@@ -1362,12 +1392,12 @@ if iscell(X)
           end; 
 		end;
         
-		% same as below: plottimef(P1-P2, R2-R1, 10*resimages{1}, resimages{2}, mean(X{1},2)-mean(X{2},2), freqs, times, mbase, g);
+		% same as below: plottimef(P1-P2, R2-R1, 10*resimages{1}, resimages{2}, mean(data{1},2)-mean(data{2},2), freqs, times, mbase, g);
         if strcmpi(g.plotersp, 'on') | strcmpi(g.plotitc, 'on')
             g.erspmax = []; % auto scale
             g.itcmax  = []; % auto scale
             plottimef(10*resdiff{1}, resdiff{2}, 10*resimages{1}, resimages{2}, ...
-                      mean(X{1},2)-mean(X{2},2), freqs, timesout, mbase, g);
+                      mean(data{1},2)-mean(data{2},2), freqs, timesout, mbase, g);
 		end;
         R1 = res1{2};
 		R2 = res2{2};
@@ -1404,9 +1434,9 @@ verboseprintf(g.verbose,'  Image frequency direction: %s\n',g.hzdir);
 % -----------------------------------------
 % detrend over epochs (trials) if requested
 % -----------------------------------------
-X = reshape(X, g.frame, prod(size(X))/g.frame);
+data = reshape(data, g.frame, prod(size(data))/g.frame);
 if strcmpi(g.rmerp, 'on')
-    X = X - mean(X,2)*ones(1, length(X(:))/g.frame);
+    data = data - mean(data,2)*ones(1, length(data(:))/g.frame);
 end;        
 
 % ----------------------------------------------------
@@ -1416,7 +1446,7 @@ if length(g.timesout) > 1, tmioutopt = { 'timesout' , g.timesout };
 else                       tmioutopt = { 'ntimesout', g.timesout };
 end;
 
-[alltfX freqs timesout R] = timefreq(X, g.srate, tmioutopt{:}, 'winsize', g.winsize, ...
+[alltfX freqs timesout R] = timefreq(data, g.srate, tmioutopt{:}, 'winsize', g.winsize, ...
                                      'tlimits', g.tlimits, 'detrend', g.detrend, 'itctype', ...
                                      g.type, 'subitc', g.subitc, 'wavelet', g.cycles, ...
                                      'padratio', g.padratio, 'freqs', g.freqs, 'freqscale', g.freqscale, ...
@@ -1547,7 +1577,7 @@ end
 % --------
 % plotting
 % --------
-ERP = mean(X,2);
+ERP = mean(data,2);
 mbase = log10(mbase)*10;
 if strcmpi(g.plotersp, 'on') | strcmpi(g.plotitc, 'on')
     if strcmpi(g.plottype, 'image')
@@ -2122,17 +2152,17 @@ if ~isempty(regions)
     end;
 end;
             
-% reshaping X
+% reshaping data
 % -----------
-function [X, frame] = reshapeX(X, frame)
-    X = squeeze(X);
-    if min(size(X)) == 1
-        if (rem(length(X),frame) ~= 0)
+function [data, frame] = reshapeX(data, frame)
+    data = squeeze(data);
+    if min(size(data)) == 1
+        if (rem(length(data),frame) ~= 0)
             error('Length of data vector must be divisible by frames.');
         end
-        X = reshape(X, frame, length(X)/frame);
+        data = reshape(data, frame, length(data)/frame);
     else
-        frame = size(X,1);
+        frame = size(data,1);
     end 
 
 function verboseprintf(verbose, varargin)
