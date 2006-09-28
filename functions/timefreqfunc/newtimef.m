@@ -140,11 +140,13 @@
 %       'pboot'     = Bootstrap power limits (e.g., from timef())   {from data}
 %       'rboot'     = Bootstrap ITC limits (e.g., from timef()). Note that both
 %                     pboot and rboot must be provided to avoid recomputing
-%                     surogate data.                                {from data}
+%                     surogate data.                                {from data}boottype
 %
 %    Optional Scalp Map:
 %       'topovec'   = Scalp topography (map) to plot                     {none}
 %       'elocs'     = Electrode location file for scalp map   {no default}
+%                     Value should be a string array containing the path
+%                     and name of the file.
 %                     File should be ascii in format of  >> topoplot example   
 %     Optional Plotting Parameters:
 %       'plottype'  = ['image'|'curve'] plot time frequency images or
@@ -170,7 +172,7 @@
 %       'linewidth' = Line width for 'marktimes' traces (thick=2, thin=1)      {2}
 %       'axesfont'  = Axes text font size                                      {10}
 %       'titlefont' = Title text font size                                     {8}
-%       'vert'      = [times_vector] -> plot vertical dashed lines at specified times
+%       'vert'      = [times_vector] -> plot vertical dashed lines at specified timesboottype
 %                     in ms. {default: none}
 %       'newfig'    = ['on'|'off'] Create new figure for difference plots {'on'}
 %       'outputformat' = ['old'|'new'] for compatibility with script that used the old
@@ -182,7 +184,7 @@
 %          powbase  = Baseline power spectrum (in dB removed for each window to compute the ersp)
 %            times  = Vector of output times (subwindow centers) (in ms).
 %            freqs  = Vector of frequency bin centers (in Hz).
-%         erspboot  = Matrix (2,nfreqs) of [lower;upper] ERSP significance diffs.
+%         erspboot  = Matrix (2,nfreqs) of [lower;upper] ERSP significance diffs.boottype
 %          itcboot  = Matrix (2,nfreqs) of [lower;upper] ITC thresholds (not diffs).
 %           tfdata  = time frequency decomposition of the data (nfreqs,timesout,trials)
 %
@@ -224,7 +226,7 @@
 %                     event marks are time locked to the reference frames 
 %                     (see timeStretchRefs). Marks must be specified in frames
 %       'timeStretchRefs' = [1 x marks] Common reference frames to all trials. 
-%                     If empty or undefined, median latency for each mark will be used.
+%                     If empty or undefined, median latency for each mark will be used.boottype
 %       'timeStretchPlot' = [vector] Indicates the indices of the reference frames
 %                     (in StretchRefs) should be overplotted on the ERSP and ITC.
 %
@@ -249,6 +251,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.95  2006/09/28 01:38:03  toby
+% variable 'X' -> 'data'. Single-letter variables are just bad news.
+%
 % Revision 1.94  2006/09/27 01:47:22  scott
 % added 'hzdir', debugged 'timewarp', clarified help msg and commandline text -sm
 %
@@ -823,16 +828,68 @@ g.frame   = frame;
 g.srate   = Fs;
 g.cycles  = varwin;
 
-%{ 
-% toby
-if nargin < 2
-	help timefreq;
-	return;
-end;
 
-[frame trials]= size(data);
 g = finputcheck(varargin, ...
-                { 'ntimesout'     'integer'  []                       200; ...
+       {'boottype'      'string'    {'shuffle','rand','randall'}    'shuffle'; ...
+        'condboot'      'string'    {'abs','angle','complex'}       'abs'; ...
+        'title'         'string'    []                              DEFAULT_TITLE; ...
+        'winsize'       'real'      [0 Inf]     max(pow2(nextpow2(g.frame)-3),4); ...
+        'pad'           'real'      []          max(pow2(nextpow2(g.winsize)),4); ...
+        'timesout'      'integer'   []          DEFAULT_NWIN; ...
+        'padratio'      'integer'   []          DEFAULT_OVERSMP; ...
+        'topovec'       'real'      []          []; ...
+        'elocs'         'string'    []          []; ...
+        'alpha'         'real'      [0 1]       DEFAULT_ALPHA; ...
+        'marktimes'     'real'      []          DEFAULT_MARKTIME; ...
+        'powbase'       'real'      []          NaN; ...
+        'pboot'         'real'      []          NaN; ...
+        'rboot'         'real'      []          NaN; ...
+        'plotersp'      'string'    {'on','off'}    'on'; ...
+        'subitc'        'string'    {'on','off'}    'off'; ...
+        'plotitc'       'string'    {'on','off'}    'on'; ...
+        'detrend'       'string'    {'on','off'}    'off'; ...
+        'rmerp'         'string'    {'on','off'}    'off'; ...
+        'baseline'      'real'      []              0; ...
+        'baseboot'      'real'      []              1; ...
+        'linewidth'     'integer'   [1 2]           2; ...
+        'naccu'         'integer'   [1 Inf]      	200; ...
+    try, g.mtaper;     catch, g.mtaper = []; end;
+    try, g.maxfreq;    catch, g.maxfreq = DEFAULT_MAXFREQ; end;
+    try, g.freqs;      catch, g.freqs = [0 g.maxfreq]; end;
+    try, g.nfreqs;     catch, g.nfreqs = []; end;
+    try, g.freqscale;  catch, g.freqscale = 'linear'; end;
+    try, g.vert;       catch, g.vert = []; end;
+    try, g.newfig;     catch, g.newfig = 'on'; end;
+    try, g.type;       catch, g.type = 'phasecoher'; end;
+    try, g.phsamp;     catch, g.phsamp = 'off'; end;
+    try, g.plotphase;  catch, g.plotphase = 'off'; end;
+    try, g.plotphasesign;  catch, g.plotphasesign = 'on'; end;
+    try, g.outputformat;  catch, g.outputformat = 'new'; end;
+    try, g.itcmax;     catch, g.itcmax = []; end;
+    try, g.erspmax;    catch, g.erspmax = []; end;
+    try, g.lowmem;     catch, g.lowmem = 'off'; end;
+    try, g.verbose;    catch, g.verbose = 'on'; end;
+    try, g.plottype;   catch, g.plottype = 'image'; end;
+    try, g.plotmean;   catch, g.plotmean = 'on'; end;
+    try, g.highlightmode;   catch, g.highlightmode = 'background'; end;
+    try, g.chaninfo;        catch, g.chaninfo    = []; end;
+    try, g.erspmarglim;     catch, g.erspmarglim = []; end;
+    try, g.itcavglim;       catch, g.itcavglim   = []; end;
+    try, g.erplim;          catch, g.erplim      = []; end;
+    try, g.speclim;         catch, g.speclim     = []; end;
+
+    try, g.timewarpfr;      catch, g.timewarpfr  = []; end;
+    try, g.timewarp;        catch, g.timewarp    = []; end;
+
+    try, g.timeStretchMarks; catch, g.timeStretchMarks = []; end;
+    try, g.timeStretchRefs;  catch, g.timeStretchRefs  = []; end;
+    try, g.timeStretchPlot;  catch, g.timeStretchPlot  = []; end;
+    try, g.hzdir;            catch, g.hzdir            = HZDIR; end;
+
+
+
+
+                'ntimesout'     'integer'  []                       200; ...
 				  'timesout'      'real'     []                       []; ...
 				  'winsize'       'integer'  [0 Inf]                  max(pow2(nextpow2(frame)-3),4); ...
                   'tlimits'       'real'     []                       [0 frame/srate*1000]; ...
@@ -1088,42 +1145,42 @@ end;
 % Multitaper - not used any more
 % ------------------------------
 if ~isempty(g.mtaper) % multitaper, inspired from Bijan Pesaran matlab function
-  if length(g.mtaper) < 3
+    if length(g.mtaper) < 3
         %error('mtaper arguement must be [N W] or [N W K]');
-    
-    if g.mtaper(1) * g.mtaper(2) < 1
-        error('mtaper 2 first arguments'' product must be higher than 1');
-    end;
-    if length(g.mtaper) == 2
-        g.mtaper(3) = floor( 2*g.mtaper(2)*g.mtaper(1) - 1);
-    end
-    if length(g.mtaper) == 3
-        if g.mtaper(3) > 2 * g.mtaper(1) * g.mtaper(2) -1
-            error('mtaper number too high (maximum (2*N*W-1))');
+
+        if g.mtaper(1) * g.mtaper(2) < 1
+            error('mtaper 2 first arguments'' product must be higher than 1');
         end;
-    end
-    disp(['Using ' num2str(g.mtaper(3)) ' tapers.']);
-    NW = g.mtaper(1)*g.mtaper(2);   % product NW
-    N  = g.mtaper(1)*g.srate;     
-    [e,v] = dpss(N, NW, 'calc');
-    e=e(:,1:g.mtaper(3));
-    g.alltapers = e;
-  else    
-    g.alltapers = g.mtaper;
-    disp('mtaper argument not [N W] or [N W K]; considering raw taper matrix');
-  end;
-  g.winsize = size(g.alltapers, 1);
-  g.pad = max(pow2(nextpow2(g.winsize)),256); % pad*nextpow
-  nfk = floor([0 g.maxfreq]./g.srate.*g.pad);
-  g.padratio = 2*nfk(2)/g.winsize;
- 
-  %compute number of frequencies
-  %nf = max(256, g.pad*2^nextpow2(g.winsize+1)); 
-  %nfk = floor([0 g.maxfreq]./g.srate.*nf);
-  
-  %freqs = linspace( 0, g.maxfreq, diff(nfk)); % this also work in the case of a FFT
-  
-end;           
+        if length(g.mtaper) == 2
+            g.mtaper(3) = floor( 2*g.mtaper(2)*g.mtaper(1) - 1);
+        end
+        if length(g.mtaper) == 3
+            if g.mtaper(3) > 2 * g.mtaper(1) * g.mtaper(2) -1
+                error('mtaper number too high (maximum (2*N*W-1))');
+            end;
+        end
+        disp(['Using ' num2str(g.mtaper(3)) ' tapers.']);
+        NW = g.mtaper(1)*g.mtaper(2);   % product NW
+        N  = g.mtaper(1)*g.srate;
+        [e,v] = dpss(N, NW, 'calc');
+        e=e(:,1:g.mtaper(3));
+        g.alltapers = e;
+    else
+        g.alltapers = g.mtaper;
+        disp('mtaper argument not [N W] or [N W K]; considering raw taper matrix');
+    end;
+    g.winsize = size(g.alltapers, 1);
+    g.pad = max(pow2(nextpow2(g.winsize)),256); % pad*nextpow
+    nfk = floor([0 g.maxfreq]./g.srate.*g.pad);
+    g.padratio = 2*nfk(2)/g.winsize;
+
+    %compute number of frequencies
+    %nf = max(256, g.pad*2^nextpow2(g.winsize+1));
+    %nfk = floor([0 g.maxfreq]./g.srate.*nf);
+
+    %freqs = linspace( 0, g.maxfreq, diff(nfk)); % this also work in the case of a FFT
+
+end;
 
 switch lower(g.plotphasesign)
     case { 'on', 'off' }, ;
@@ -1460,7 +1517,7 @@ P  = mean(alltfX.*conj(alltfX), 3); % power
 if strcmpi(g.phsamp, 'on')
 %  switch g.phsamp
 %  case 'on'
-% $$$     PA = zeros(size(P,1),size(P,1),g.timesout); % NB: (freqs,freqs,times)
+    PA = zeros(size(P,1),size(P,1),g.timesout); % NB: (freqs,freqs,times)
 % $$$ end                                             %       phs   amp
     %PA (freq x freq x time)
     PA(:,:,j) = PA(:,:,j)  + (tmpX ./ abs(tmpX)) * ((PP(:,j)))';
