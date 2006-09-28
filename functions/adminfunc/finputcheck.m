@@ -6,7 +6,7 @@
 % Input:
 %   varargin  - 'varargin' argument from a function call using 'key', 'value'
 %               argument pairs.
-%   fieldlist - A 3- to 5-column cell array, one row per 'key'. The first
+%   fieldlist - A 4-column cell array, one row per 'key'. The first
 %               column contains the key string, the second its type, 
 %               the third the accepted value range, and the fourth the 
 %               default value.  Allowed types are 'boolean', 'integer', 
@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2006/09/28 02:59:59  toby
+% documentation correction
+%
 % Revision 1.24  2006/03/11 05:37:07  arno
 % header
 %
