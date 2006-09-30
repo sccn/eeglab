@@ -7,12 +7,12 @@
 %   varargin  - 'varargin' argument from a function call using 'key', 'value'
 %               argument pairs.
 %   fieldlist - A 4-column cell array, one row per 'key'. The first
-%               column contains the key string, the second its type, 
+%               column contains the key string, the second its type(s), 
 %               the third the accepted value range, and the fourth the 
 %               default value.  Allowed types are 'boolean', 'integer', 
 %               'real', 'string', 'cell' or 'struct'.  For example,
 %                       {'key1' 'string' { 'string1' 'string2' } 'defaultval_key1'}
-%                       {'key2' 'integer' { minint maxint } 'defaultval_key2'} 
+%                       {'key2' {'real' 'integer'} { minint maxint } 'defaultval_key2'} 
 %  callingfunc - Calling function name for error messages. {default: none}.
 %  mode        - ['ignore'|'error'] ignore keywords that are either not specified 
 %                in the fieldlist cell array or generate an error. 
@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2006/09/28 03:20:21  toby
+% more doc edits
+%
 % Revision 1.25  2006/09/28 02:59:59  toby
 % documentation correction
 %
