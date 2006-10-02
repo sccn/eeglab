@@ -119,6 +119,8 @@ if ~isempty(opt.channels)
 else [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'clusters', opt.clusters, 'infotype', 'spec', 'freqrange', opt.freqrange);
 end;
 
+% plot single scalp map
+% ---------------------
 if ~isempty(opt.plotfreq)
     erspbase = cell(size(STUDY.changrp(1).specdata));
     for ind = 1:length(STUDY.changrp(1).specdata(:))
@@ -134,7 +136,11 @@ if ~isempty(opt.plotfreq)
         end;
         erspbase{ind} = permute(erspbase{ind}, [1 3 2]);
     end;
-
+    %erspbase(:,2) = [];
+    %erspbase(:,1) = [];
+    
+    % select individual subject
+    % -------------------------
     if ~isempty(opt.subject)
         subjind = strmatch(opt.subject, STUDY.subject);
         for c = 1:size(erspbase,1)
