@@ -30,10 +30,10 @@
 %   'plotgroups' - ['together'|'apart'] 'together' -> plot subject groups 
 %                  on the same axis in different colors, else ('apart') 
 %                  on different axes.
-%   'plotcond'   - ['together'|'apart'] 'together' -> plot conditions on 
-%                  the same axis in different colors, else ('apart') on 
-%                  different axes. Keywords 'plotgroups' and 'plotcond' 
-%                  may not both be set to 'together'. 
+%   'plotconditions' - ['together'|'apart'] 'together' -> plot conditions 
+%                  on the same axis in different colors, else ('apart') 
+%                  on different axes. Note: Keywords 'plotgroups' and 
+%                  'plotconditions' may not both be set to 'together'. 
 %
 % See also: std_erpplot()
 %
@@ -56,6 +56,13 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2006/10/02 17:09:09  scott
+% edited help message for clarity and grammar. NOTE: changed argument
+% 'appart'  to English 'apart'. ALSO changed keyword 'plotgroup' to
+% more grammatical 'plotgroups' throughout. (Note: did not change
+% 'plotcond' to 'plotconds' since this abbreviation feels awkward).
+% Similar changes may be needed in other functions. -sm
+%
 % Revision 1.3  2006/10/02 11:38:06  arno
 % header documentation
 %
@@ -70,7 +77,7 @@ if isempty(varargin)
     enablegroup = fastif(length(STUDY.group)>1, 'on', 'off');
     enablecond  = fastif(length(STUDY.condition)>1, 'on', 'off');
     threshstr   = fastif(isnan(STUDY.etc.erpparams.threshold),'', num2str(STUDY.etc.erpparams.threshold));
-    plotcond    = fastif(strcmpi(STUDY.etc.erpparams.plotcond, 'together'), 1, 0);
+    plotconditions    = fastif(strcmpi(STUDY.etc.erpparams.plotconditions, 'together'), 1, 0);
     plotgroups  = fastif(strcmpi(STUDY.etc.erpparams.plotgroups,'together'), 1, 0);
     statval     = fastif(strcmpi(STUDY.etc.erpparams.statistics,'param'), 1, 2);
     statcond    = fastif(strcmpi(STUDY.etc.erpparams.statcond, 'on'), 1, 0);
@@ -81,7 +88,7 @@ if isempty(varargin)
         {'style' 'edit'       'string' num2str(STUDY.etc.erpparams.timerange) 'tag' 'timerange' } ...
         {'style' 'text'       'string' 'Plot limit (uV)'} ...
         {'style' 'edit'       'string' num2str(STUDY.etc.erpparams.ylim) 'tag' 'ylim' } ...
-        {} {'style' 'checkbox'   'string' '' 'value' plotcond 'enable' enablecond  'tag' 'plotcond' } ...
+        {} {'style' 'checkbox'   'string' '' 'value' plotconditions 'enable' enablecond  'tag' 'plotconditions' } ...
         {'style' 'text'       'string' 'Plot conditions on the same panel' 'enable' enablecond } ...
         {} {'style' 'checkbox'   'string' '' 'value' plotgroups 'enable' enablegroup 'tag' 'plotgroups' } ...
         {'style' 'text'       'string' 'Plot groups on the same panel' 'enable' enablegroup } ...
@@ -105,11 +112,11 @@ if isempty(varargin)
     
     % decode inputs
     % -------------
-    if res.plotgroups & res.plotcond, warndlg2('Both conditions and group cannot be plotted on the same panel'); return; end;
+    if res.plotgroups & res.plotconditions, warndlg2('Both conditions and group cannot be plotted on the same panel'); return; end;
     if res.statgroup, res.statgroup = 'on'; else res.statgroup = 'off'; end;
     if res.statcond , res.statcond  = 'on'; else res.statcond  = 'off'; end;
     if res.plotgroups, res.plotgroups = 'together'; else res.plotgroups = 'apart'; end;
-    if res.plotcond , res.plotcond  = 'together'; else res.plotcond  = 'apart'; end;
+    if res.plotconditions , res.plotconditions  = 'together'; else res.plotconditions  = 'apart'; end;
     res.timerange = str2num( res.timerange );
     res.ylim      = str2num( res.ylim );
     res.threshold = str2num( res.threshold );
@@ -122,7 +129,7 @@ if isempty(varargin)
     % ------------------
     options = {};
     if ~strcmpi( res.plotgroups, STUDY.etc.erpparams.plotgroups), options = { options{:} 'plotgroups' res.plotgroups }; end;
-    if ~strcmpi( res.plotcond , STUDY.etc.erpparams.plotcond ), options = { options{:} 'plotcond'  res.plotcond  }; end;
+    if ~strcmpi( res.plotconditions , STUDY.etc.erpparams.plotconditions ), options = { options{:} 'plotconditions'  res.plotconditions  }; end;
     if ~strcmpi( res.statgroup, STUDY.etc.erpparams.statgroup), options = { options{:} 'statgroup' res.statgroup }; end;
     if ~strcmpi( res.statcond , STUDY.etc.erpparams.statcond ), options = { options{:} 'statcond'  res.statcond  }; end;
     if ~strcmpi( res.statistics, STUDY.etc.erpparams.statistics ), options = { options{:} 'statistics' res.statistics }; end;
@@ -174,5 +181,5 @@ function STUDY = default_params(STUDY)
     if ~isfield(STUDY.etc.erpparams, 'threshold' ), STUDY.etc.erpparams.threshold = NaN; end;
     if ~isfield(STUDY.etc.erpparams, 'plotgroups') , STUDY.etc.erpparams.plotgroups = 'apart'; end;
     if ~isfield(STUDY.etc.erpparams, 'naccu') ,     STUDY.etc.erpparams.naccu     = []; end;
-    if ~isfield(STUDY.etc.erpparams, 'plotcond') ,  STUDY.etc.erpparams.plotcond  = 'apart'; end;
+    if ~isfield(STUDY.etc.erpparams, 'plotconditions') ,  STUDY.etc.erpparams.plotconditions  = 'apart'; end;
 
