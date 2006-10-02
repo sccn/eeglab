@@ -298,35 +298,30 @@ end;
 if strcmpi(g.method, 'withref')
     chans = chans+1;
 end;
+
+% generating rereferencing matrix
+% -------------------------------
 refmatrix = eye(chans);
-if ~isempty(ref)
-    
+if ~isempty(ref)    
     fprintf('Re-referencing data\n');
     for index = 1:length(ref)
         refmatrix(:,ref(index)) = refmatrix(:,ref(index))-1/length(ref);
     end;
+end;
+
+% dealing with channel locations
+% ------------------------------
+if ~isempty(ref)    
     if length(ref) > 1 
         if strcmpi(g.keepref, 'off')
+            % remove reference from channel locstion
+            % --------------------------------------
             fprintf('Warning: reference channels have been removed\n');
-            refmatrix([ref g.exclude],:) = []; % supress references and non EEG channels
-            refmatrix(:,g.exclude      ) = [];              % supress non EEG channels
-            rerefchansout = setdiff(rerefchansout, ref);
-
             if ~isempty(g.elocs)
                 g.elocs(ref) = [];
             end;
-        else
-            refmatrix(g.exclude,:) = []; % supress non EEG channels
-            refmatrix(:,g.exclude) = []; % supress non EEG channels
         end;
     else
-        if strcmpi(g.keepref, 'on')
-            fprintf('Warning: ''keepref'' can only be used with multiple references (ignored)\n');
-        end;
-        refmatrix([ref g.exclude],:) = []; % supress references and non EEG channels
-        refmatrix(:,g.exclude      ) = [];              % supress non EEG channels
-        rerefchansout = setdiff(rerefchansout, ref);
-
         % copy channel location for single ref
         % ------------------------------------
         if ~isempty(g.elocs) & length(g.elocs) > chans & length(ref) == 1
@@ -337,8 +332,20 @@ if ~isempty(ref)
     end;
 end;
 
-% there are faster methods but this one is the simpliest
+% exclude electrodes
+% ------------------
+rerefchansout = setdiff(rerefchansout, ref);
+if strcmpi(g.keepref, 'on') & length(ref) > 1
+    refmatrix(g.exclude,:) = []; % supress non EEG channels
+    refmatrix(:,g.exclude) = []; % supress non EEG channels
+else
+    refmatrix([ref g.exclude],:) = []; % supress references and non EEG channels
+    refmatrix(:,g.exclude      ) = [];              % supress non EEG channels
+end;
 
+% rereferencing, there are faster methods
+% but this one is the simpliest (for ICA referecing too)
+% ------------------------------------------------------
 data(rerefchansout,:) = (refmatrix*avematrix)*data(rerefchans,:); % implement as a matrix multiply
 Elocs = g.elocs;
 if strcmpi(g.keepref, 'off')
