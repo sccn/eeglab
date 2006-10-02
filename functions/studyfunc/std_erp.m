@@ -195,7 +195,7 @@ else
 end
 if strcmpi(prefix, 'comp') & isempty(TMP.icaact)
     TMP.icaact = (TMP.icaweights*TMP.icasphere)* ...
-        reshape(TMP.data  , [ size(TMP.data,1)   size(TMP.data,2)*size(TMP.data,3) ]);
+        reshape(TMP.data(TMP.icachansind,:,:), [ length(TMP.icachansind) size(TMP.data,2)*size(TMP.data,3) ]);
     TMP.icaact = reshape(TMP.icaact, [ size(TMP.icaact,1) size(TMP.data,2) size(TMP.data,3) ]);
 end;
 if strcmpi(prefix, 'comp'), X = TMP.icaact;
