@@ -1,4 +1,4 @@
-% pop_erpparams() - Set plotting and statistics parameters for ERP
+% pop_erpparams() - Set plotting and statistics parameters for ERP plotting
 %
 % Usage:    
 %   >> STUDY = pop_erpparams(STUDY, 'key', 'val');   
@@ -8,32 +8,32 @@
 %
 % Statistics options:
 %   'statgroup'  - ['on'|'off'] Compute (or not) statistics across groups.
-%                  Default is 'off'.
+%                  {default: 'off'}
 %   'statcond'   - ['on'|'off'] Compute (or not) statistics across groups.
-%                  Default is 'off'.
+%                  {default: 'off'}
 %   'statistics' - ['param'|'perm'] Type of statistics to use 'param' for
-%                  parametric and 'perm' for permutations. Default is
-%                  'param'.
-%   'naccu'      - [integer] Number of accumulation when computing 
-%                  permutation statistics. For instance if you want to see
-%                  if p<0.01 use 200. For p<0.001, use 2000. If a threshold
-%                  is set below (non NaN) and 'naccu' is too low, it will
-%                  be automatically updated. (option available only from 
-%                  command line and not in GUI yet).
+%                  parametric and 'perm' for permutation-based statistics. 
+%                  {default: 'param'}
+%   'naccu'      - [integer] Number of surrogate averages to accumulate for
+%                  permutation statistics. For example, to test whether 
+%                  p<0.01, use >=200. For p<0.001, use 'naccu' >=2000. 
+%                  If a threshold (not NaN) is set below, and 'naccu' is 
+%                  too low, it will be automatically reset. (This option 
+%                  is now available only from the command line).
 %   'threshold'  - [NaN|0.0x] Significance threshold. NaN will plot the 
-%                  p-value itself on a different panel. When possible, the
-%                  significance time regions are indicated below the data
-%                  on the same plot.
+%                  p-value itself on a different axis. When possible, the
+%                  significant time regions are indicated below the data.
 % Plot options:
-%   'timerange'  - [min max] ERP plotting time range in ms. Default is 
-%                  the whole time range.
-%   'ylim'       - [min max] ERP limits in microvolt (default is automatic)
-%   'plotgroup'  - ['together'|'appart'] plot groups on the same panel
-%                  in different colors 'together' or on different panels.
-%   'plotcond'   - ['together'|'appart'] plot conditions on the same panel
-%                  in different colors 'together' or on different panels.
-%                  Note that 'plotgroup' and 'plotcond' cannot be set to 
-%                  'together' both at the same time.
+%   'timerange'  - [min max] ERP plotting latency range in ms. 
+%                  {default: the whole epoch}.
+%   'ylim'       - [min max] ERP limits in microvolts {default: from data}
+%   'plotgroups' - ['together'|'apart'] 'together' -> plot subject groups 
+%                  on the same axis in different colors, else ('apart') 
+%                  on different axes.
+%   'plotcond'   - ['together'|'apart'] 'together' -> plot conditions on 
+%                  the same axis in different colors, else ('apart') on 
+%                  different axes. Keywords 'plotgroups' and 'plotcond' 
+%                  may not both be set to 'together'. 
 %
 % See also: std_erpplot()
 %
@@ -56,6 +56,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2006/10/02 11:38:06  arno
+% header documentation
+%
 
 function [ STUDY, com ] = pop_erpparams(STUDY, varargin);
 
@@ -68,7 +71,7 @@ if isempty(varargin)
     enablecond  = fastif(length(STUDY.condition)>1, 'on', 'off');
     threshstr   = fastif(isnan(STUDY.etc.erpparams.threshold),'', num2str(STUDY.etc.erpparams.threshold));
     plotcond    = fastif(strcmpi(STUDY.etc.erpparams.plotcond, 'together'), 1, 0);
-    plotgroup   = fastif(strcmpi(STUDY.etc.erpparams.plotgroup,'together'), 1, 0);
+    plotgroups  = fastif(strcmpi(STUDY.etc.erpparams.plotgroups,'together'), 1, 0);
     statval     = fastif(strcmpi(STUDY.etc.erpparams.statistics,'param'), 1, 2);
     statcond    = fastif(strcmpi(STUDY.etc.erpparams.statcond, 'on'), 1, 0);
     statgroup   = fastif(strcmpi(STUDY.etc.erpparams.statgroup,'on'), 1, 0);
@@ -80,7 +83,7 @@ if isempty(varargin)
         {'style' 'edit'       'string' num2str(STUDY.etc.erpparams.ylim) 'tag' 'ylim' } ...
         {} {'style' 'checkbox'   'string' '' 'value' plotcond 'enable' enablecond  'tag' 'plotcond' } ...
         {'style' 'text'       'string' 'Plot conditions on the same panel' 'enable' enablecond } ...
-        {} {'style' 'checkbox'   'string' '' 'value' plotgroup 'enable' enablegroup 'tag' 'plotgroup' } ...
+        {} {'style' 'checkbox'   'string' '' 'value' plotgroups 'enable' enablegroup 'tag' 'plotgroups' } ...
         {'style' 'text'       'string' 'Plot groups on the same panel' 'enable' enablegroup } ...
         {} ...
         {'style' 'text'       'string' 'Statistics'} ...
@@ -102,11 +105,11 @@ if isempty(varargin)
     
     % decode inputs
     % -------------
-    if res.plotgroup & res.plotcond, warndlg2('Both conditions and group cannot be plotted on the same panel'); return; end;
+    if res.plotgroups & res.plotcond, warndlg2('Both conditions and group cannot be plotted on the same panel'); return; end;
     if res.statgroup, res.statgroup = 'on'; else res.statgroup = 'off'; end;
     if res.statcond , res.statcond  = 'on'; else res.statcond  = 'off'; end;
-    if res.plotgroup, res.plotgroup = 'together'; else res.plotgroup = 'appart'; end;
-    if res.plotcond , res.plotcond  = 'together'; else res.plotcond  = 'appart'; end;
+    if res.plotgroups, res.plotgroups = 'together'; else res.plotgroups = 'apart'; end;
+    if res.plotcond , res.plotcond  = 'together'; else res.plotcond  = 'apart'; end;
     res.timerange = str2num( res.timerange );
     res.ylim      = str2num( res.ylim );
     res.threshold = str2num( res.threshold );
@@ -118,7 +121,7 @@ if isempty(varargin)
     % build command call
     % ------------------
     options = {};
-    if ~strcmpi( res.plotgroup, STUDY.etc.erpparams.plotgroup), options = { options{:} 'plotgroup' res.plotgroup }; end;
+    if ~strcmpi( res.plotgroups, STUDY.etc.erpparams.plotgroups), options = { options{:} 'plotgroups' res.plotgroups }; end;
     if ~strcmpi( res.plotcond , STUDY.etc.erpparams.plotcond ), options = { options{:} 'plotcond'  res.plotcond  }; end;
     if ~strcmpi( res.statgroup, STUDY.etc.erpparams.statgroup), options = { options{:} 'statgroup' res.statgroup }; end;
     if ~strcmpi( res.statcond , STUDY.etc.erpparams.statcond ), options = { options{:} 'statcond'  res.statcond  }; end;
@@ -169,7 +172,7 @@ function STUDY = default_params(STUDY)
     if ~isfield(STUDY.etc.erpparams, 'statgroup'),  STUDY.etc.erpparams.statgroup = 'off'; end;
     if ~isfield(STUDY.etc.erpparams, 'statcond' ),  STUDY.etc.erpparams.statcond  = 'off'; end;
     if ~isfield(STUDY.etc.erpparams, 'threshold' ), STUDY.etc.erpparams.threshold = NaN; end;
-    if ~isfield(STUDY.etc.erpparams, 'plotgroup') , STUDY.etc.erpparams.plotgroup = 'appart'; end;
+    if ~isfield(STUDY.etc.erpparams, 'plotgroups') , STUDY.etc.erpparams.plotgroups = 'apart'; end;
     if ~isfield(STUDY.etc.erpparams, 'naccu') ,     STUDY.etc.erpparams.naccu     = []; end;
-    if ~isfield(STUDY.etc.erpparams, 'plotcond') ,  STUDY.etc.erpparams.plotcond  = 'appart'; end;
+    if ~isfield(STUDY.etc.erpparams, 'plotcond') ,  STUDY.etc.erpparams.plotcond  = 'apart'; end;
 
