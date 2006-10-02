@@ -149,6 +149,8 @@ end;
 
 [g spec_opt] = finputcheck(options, { 'components' 'integer' []         [];
                                       'channels'   'cell'    {}         {};
+                                      'specmode'   'string'  {'fft' 'psd'} 'fft';
+                                      'nfft'       'integer' []         [];
                                       'freqrange'  'real'    []         [] }, 'std_spec', 'ignore');
 if isstr(g), error(g); end;
 if isfield(EEG,'icaweights')
@@ -195,17 +197,22 @@ end
 if strcmpi(prefix, 'comp') & isempty(TMP.icaact)
     TMP.icaact = (TMP.icaweights*TMP.icasphere)* ...
         reshape(TMP.data  , [ size(TMP.data,1)   size(TMP.data,2)*size(TMP.data,3) ]);
-    TMP.icaact = reshape(TMP.icaact, [ size(TMP.icaact,1) size(TMP.data,2) size(TMP.data,3) ]);
+    reshape(TMP.data(TMP.icachansind,:,:), [ length(TMP.icachansind) size(TMP.data,2)*size(TMP.data,3) ]);
 end;
 if strcmpi(prefix, 'comp'), X = TMP.icaact;
 else                        X = TMP.data;
 end;
 
-% Remove baseline mean
-% --------------------
-if strcmpi(prefix, 'comp')
-     [X, f] = spectopo(TMP.icaact, EEG.pnts, EEG.srate, 'plot', 'off', spec_opt{:});  
-else [X, f] = spectopo(TMP.data  , EEG.pnts, EEG.srate, 'plot', 'off', spec_opt{:});  
+if strcmpi(g.specmode, 'psd')
+     [X, f] = spectopo(X, EEG.pnts, EEG.srate, 'plot', 'off', 'nfft', g.nfft, spec_opt{:});  
+else
+    % Remove baseline mean
+    % --------------------
+    tmp   = fft(X, g.nfft, 2);
+    f     = linspace(0, EEG.srate/2, size(tmp,2)/2);
+    f     = f(2:end); % remove DC (match the output of PSD)
+    tmp   = tmp(:,2:size(tmp,2)/2,:);
+    X     = 10*log10(mean(abs(tmp).^2,3));     
 end;
 
 % Save SPECs in file (all components or channels)
