@@ -570,6 +570,7 @@ elseif length(varargin) == 0 & length(EEG) == 1 % if several arguments, assign v
             % remove data from file for old dataset
             % -------------------------------------
             if option_storedisk & ~isempty(ALLEEG) & OLDSET ~= 0
+                if ~isfield(ALLEEG(OLDSET), 'datfile'), ALLEEG(OLDSET).datfile = ''; end;
                 ALLEEG(OLDSET) = update_datafield(ALLEEG(OLDSET));
             end;
             
