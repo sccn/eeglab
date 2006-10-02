@@ -270,6 +270,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.98  2006/10/02 20:43:29  toby
+% newtimefr call debugging
+%
 % Revision 1.97  2006/09/30 07:39:29  toby
 % Extensive edits:
 % now uses finputcheck
@@ -922,7 +925,7 @@ g.ITC_CAXIS_LIMIT  = ITC_CAXIS_LIMIT;
 % unpack 'timewarp' and 'timewarpfr' arguments
 %---------------------------------------------
 
-if iscell(g.timewarpfr) && length(g.timewarpfr) > 3
+if isfield(g.timewarpfr) && iscell(g.timewarpfr) && length(g.timewarpfr) > 3
     error('''timewarpfr'' cell array may have at most 3 elements');
 end
 
