@@ -89,43 +89,70 @@ if ~isequal(STUDY.session,   session  ), STUDY.session   = session;   modif = 1;
 
 % recompute setind matrix
 % -----------------------
-if ~isempty(STUDY.condition)
-    if ~isempty(STUDY.session)
-        setind = zeros(length(STUDY.condition), length(STUDY.subject) *length(STUDY.session));
-    else
-        setind = zeros(length(STUDY.condition), length(STUDY.subject) );
-    end
-else
-    if ~isempty(STUDY.session)        
-        setind = zeros(1, length(STUDY.subject) *length(STUDY.session));
-    else
-        setind = zeros(1, length(STUDY.subject) );
-    end
-end
-for k = 1:length(STUDY.datasetinfo)
-    setcond = find(strcmp(STUDY.datasetinfo(k).condition, STUDY.condition));
-    setsubj = find(strcmp(STUDY.datasetinfo(k).subject,   STUDY.subject));
-    setsess = find(STUDY.datasetinfo(k).session == STUDY.session);
-    ncomps  = [];
-    if ~isempty(setcond)
-        if ~isempty(setsess)
-            setind(setcond, setsubj * length(STUDY.session)+setsess-1) = k; 
-            %A 2D matrix of size [conditions (subjects x sessions)]
-        else
-            setind(setcond, setsubj ) = k; 
-        end
-    else
-        if ~isempty(setsess)
-            setind(1, setsubj * length(STUDY.session)+setsess-1) = k; 
-        else
-            setind(1, setsubj) = k; 
-        end
-    end
-    
-    if ~isequal(STUDY.datasetinfo(k).index, k)
-        STUDY.datasetinfo(k).index = k; modif = 1; %The dataset index in the current ALLEEG structure
+notsameica = [];
+for is = 1:length(STUDY.subject)
+    alldats = strmatch(STUDY.subject{is}, { STUDY.datasetinfo.subject });
+
+    for ig = 1:length(STUDY.group)
+        tmpind  = strmatch(STUDY.group{ig}, { STUDY.datasetinfo(alldats).group });
+        tmpdats = alldats(tmpind);
+
+        nc = size(ALLEEG(STUDY.datasetinfo(tmpdats(1)).index).icaweights,1);
+        for ir = 2:length(tmpdats)
+            if nc ~= size(ALLEEG(STUDY.datasetinfo(tmpdats(ir)).index).icaweights,1)
+                notsameica = [ 1 tmpdats(1) tmpdats(ir) ];
+            end;
+        end;
     end;
-end
+end;
+if ~isempty(notsameica)
+    %disp('Different ICA decompositions have been found for the same')
+    %disp('subject in two conditions (if the data was recorded at the')
+    %disp('time, it is best to have the run ICA on both datasets
+    %simultanously.')
+    setind = [1:length(STUDY.datasetinfo)];
+    if ~isequal(STUDY.setind, setind)
+        STUDY.setind = setind; modif = 1;
+    end;
+else
+    if ~isempty(STUDY.condition)
+        if ~isempty(STUDY.session)
+            setind = zeros(length(STUDY.condition), length(STUDY.subject) *length(STUDY.session));
+        else
+            setind = zeros(length(STUDY.condition), length(STUDY.subject) );
+        end
+    else
+        if ~isempty(STUDY.session)        
+            setind = zeros(1, length(STUDY.subject) *length(STUDY.session));
+        else
+            setind = zeros(1, length(STUDY.subject) );
+        end
+    end
+    for k = 1:length(STUDY.datasetinfo)
+        setcond = find(strcmp(STUDY.datasetinfo(k).condition, STUDY.condition));
+        setsubj = find(strcmp(STUDY.datasetinfo(k).subject,   STUDY.subject));
+        setsess = find(STUDY.datasetinfo(k).session == STUDY.session);
+        ncomps  = [];
+        if ~isempty(setcond)
+            if ~isempty(setsess)
+                setind(setcond, setsubj * length(STUDY.session)+setsess-1) = k; 
+                %A 2D matrix of size [conditions (subjects x sessions)]
+            else
+                setind(setcond, setsubj ) = k; 
+            end
+        else
+            if ~isempty(setsess)
+                setind(1, setsubj * length(STUDY.session)+setsess-1) = k; 
+            else
+                setind(1, setsubj) = k; 
+            end
+        end
+
+        if ~isequal(STUDY.datasetinfo(k).index, k)
+            STUDY.datasetinfo(k).index = k; modif = 1; %The dataset index in the current ALLEEG structure
+        end;
+    end
+end;
 
 % check dataset info consistency 
 % ------------------------------
@@ -176,24 +203,6 @@ else
         end;
     end;    
 end;
-
-% check for options
-% -----------------
-if nargin > 2
-    notsameica = 1;
-    if strcmpi(option, 'checkica')
-        for ic = 1:length(STUDY.setind)
-            alldats = STUDY.setind(:,ic)';
-            nc = size(ALLEEG(STUDY.datasetinfo(alldats(1))).icaweights,1);
-            for ir = 2:length(alldats)
-                if nc ~= size(ALLEEG(STUDY.datasetinfo(alldats(ir))).icaweights,1)
-                    notsameica = [ 1 alldats(1) alldats(ir) ];
-                end;
-            end;
-        end;
-    end;
-end;
-                
 
 % determine if there has been any change
 % --------------------------------------
