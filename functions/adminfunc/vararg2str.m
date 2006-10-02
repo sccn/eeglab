@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2006/07/10 20:09:08  arno
+% nothing
+%
 % Revision 1.16  2005/09/27 22:02:35  arno
 % concatenating lines
 %
@@ -206,7 +209,7 @@ return;
 % double the quotes in strings
 % ----------------------------
 function str = doublequotes( str )
-	quoteloc = findstr( str, '''');
+	quoteloc = union(findstr( str, ''''), union(findstr(str, '%'), findstr(str, '\')));
 	if ~isempty(quoteloc)
 		for index = length(quoteloc):-1:1
 			str = [ str(1:quoteloc(index)) str(quoteloc(index):end) ];
