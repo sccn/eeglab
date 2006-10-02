@@ -16,8 +16,8 @@
 %                  {default: 'param'}
 %   'naccu'      - [integer] Number of surroage averages to accumulate for
 %                  permutation-based statistics. For instance for p < 0.01,
-%                  use 'naccu' >= 200; for p < 0.001, use >=2000. When 
-%                  threshold (below) is not NaN, and 'naccu' is too low, 
+%                  use 'naccu' >= 200; for p < 0.001, use >= 2000. When 
+%                  threshold (below) is not NaN and 'naccu' is too low, 
 %                  'naccu' will be automatically updated (for now, from
 %                  the command line only).
 %   'threshold'  - [NaN|0.0x] Significance threshold. NaN will plot the 
@@ -30,10 +30,10 @@
 %   'plotgroups'  - ['together'|'apart'] 'together' -> plot subject groups 
 %                  on the same axis in different colors, else ('apart') on 
 %                  different panels.
-%   'plotcond'   - ['together'|'apart'] 'together' -> plot conditions on 
-%                  the same axis in different colors, else ('apart') on 
-%                  different panels. Keywords 'plotgroups' and 'plotcond' 
-%                  cannot both be set to 'together.' 
+%   'plotconditions' - ['together'|'apart'] 'together' -> plot conditions 
+%                  on the same axis in different colors, else ('apart') 
+%                  on different panels. Note: Keywords 'plotgroups' and 
+%                  'plotconditions' cannot both be set to 'together'. 
 %
 % See also: std_specplot()
 %
@@ -56,6 +56,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2006/10/02 17:19:49  scott
+% edited help msg for clarity and grammar. changed 'appart'  to English 'apart'
+% changed 'plotgroup' to 'plotgroups'; in help, changed 'panel' to 'axis'
+%
 % Revision 1.3  2006/10/02 11:39:15  arno
 % header documentation
 %
@@ -70,7 +74,7 @@ if isempty(varargin)
     enablegroup = fastif(length(STUDY.group)>1, 'on', 'off');
     enablecond  = fastif(length(STUDY.condition)>1, 'on', 'off');
     threshstr   = fastif(isnan(STUDY.etc.specparams.threshold),'', num2str(STUDY.etc.specparams.threshold));
-    plotcond    = fastif(strcmpi(STUDY.etc.specparams.plotcond, 'together'), 1, 0);
+    plotconditions    = fastif(strcmpi(STUDY.etc.specparams.plotconditions, 'together'), 1, 0);
     plotgroups   = fastif(strcmpi(STUDY.etc.specparams.plotgroups,'together'), 1, 0);
     statval     = fastif(strcmpi(STUDY.etc.specparams.statistics,'param'), 1, 2);
     statcond    = fastif(strcmpi(STUDY.etc.specparams.statcond, 'on'), 1, 0);
@@ -81,7 +85,7 @@ if isempty(varargin)
         {'style' 'edit'       'string' num2str(STUDY.etc.specparams.freqrange) 'tag' 'freqrange' } ...
         {'style' 'text'       'string' 'Plot limit (uV)'} ...
         {'style' 'edit'       'string' num2str(STUDY.etc.specparams.ylim) 'tag' 'ylim' } ...
-        {} {'style' 'checkbox'   'string' '' 'value' plotcond 'enable' enablecond  'tag' 'plotcond' } ...
+        {} {'style' 'checkbox'   'string' '' 'value' plotconditions 'enable' enablecond  'tag' 'plotconditions' } ...
         {'style' 'text'       'string' 'Plot conditions on the same panel' 'enable' enablecond } ...
         {} {'style' 'checkbox'   'string' '' 'value' plotgroups 'enable' enablegroup 'tag' 'plotgroups' } ...
         {'style' 'text'       'string' 'Plot groups on the same panel' 'enable' enablegroup } ...
@@ -105,11 +109,11 @@ if isempty(varargin)
     
     % decode inputs
     % -------------
-    if res.plotgroups & res.plotcond, warndlg2('Both conditions and group cannot be plotted on the same panel'); return; end;
+    if res.plotgroups & res.plotconditions, warndlg2('Both conditions and group cannot be plotted on the same panel'); return; end;
     if res.statgroup, res.statgroup = 'on'; else res.statgroup = 'off'; end;
     if res.statcond , res.statcond  = 'on'; else res.statcond  = 'off'; end;
     if res.plotgroups, res.plotgroups = 'together'; else res.plotgroups = 'apart'; end;
-    if res.plotcond , res.plotcond  = 'together'; else res.plotcond  = 'apart'; end;
+    if res.plotconditions , res.plotconditions  = 'together'; else res.plotconditions  = 'apart'; end;
     res.freqrange = str2num( res.freqrange );
     res.ylim      = str2num( res.ylim );
     res.threshold = str2num( res.threshold );
@@ -122,7 +126,7 @@ if isempty(varargin)
     % ------------------
     options = {};
     if ~strcmpi( res.plotgroups, STUDY.etc.specparams.plotgroups), options = { options{:} 'plotgroups' res.plotgroups }; end;
-    if ~strcmpi( res.plotcond , STUDY.etc.specparams.plotcond ), options = { options{:} 'plotcond'  res.plotcond  }; end;
+    if ~strcmpi( res.plotconditions , STUDY.etc.specparams.plotconditions ), options = { options{:} 'plotconditions'  res.plotconditions  }; end;
     if ~strcmpi( res.statgroup, STUDY.etc.specparams.statgroup), options = { options{:} 'statgroup' res.statgroup }; end;
     if ~strcmpi( res.statcond , STUDY.etc.specparams.statcond ), options = { options{:} 'statcond'  res.statcond  }; end;
     if ~strcmpi( res.statistics, STUDY.etc.specparams.statistics ), options = { options{:} 'statistics' res.statistics }; end;
@@ -174,5 +178,5 @@ function STUDY = default_params(STUDY)
     if ~isfield(STUDY.etc.specparams, 'statcond' ),  STUDY.etc.specparams.statcond  = 'off'; end;
     if ~isfield(STUDY.etc.specparams, 'threshold' ), STUDY.etc.specparams.threshold = NaN; end;
     if ~isfield(STUDY.etc.specparams, 'plotgroups') , STUDY.etc.specparams.plotgroups = 'apart'; end;
-    if ~isfield(STUDY.etc.specparams, 'plotcond') ,  STUDY.etc.specparams.plotcond  = 'apart'; end;
+    if ~isfield(STUDY.etc.specparams, 'plotconditions') ,  STUDY.etc.specparams.plotconditions  = 'apart'; end;
     if ~isfield(STUDY.etc.specparams, 'naccu')    ,  STUDY.etc.specparams.naccu     = []; end;
