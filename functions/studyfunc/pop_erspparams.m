@@ -1,19 +1,61 @@
-% std_erspplot() - plotting and statistics option for ERSP and ITC.
+% pop_erspparams() - Set plotting and statistics parameters for ERSP and
+%                    ITC.
 %
 % Usage:    
-%   >> STUDY = std_erspplot(STUDY, 'key', 'val');   
+%   >> STUDY = pop_erspparams(STUDY, 'key', 'val');   
 %
 % Inputs:
-%   STUDY      - EEGLAB STUDY set comprising some or all of the EEG
+%   STUDY        - EEGLAB STUDY set
 %
-% Optional inputs:
-% To be documented...
+% Statistics options:
+%  'statgroup'   - ['on'|'off'] Compute (or not) statistics across groups.
+%                  Default is 'off'.
+%  'statcond'    - ['on'|'off'] Compute (or not) statistics across groups.
+%                  Default is 'off'.
+%  'statistics'  - ['param'|'perm'] Type of statistics to use 'param' for
+%                  parametric and 'perm' for permutations. Default is
+%                  'param'.
+%  'statmode'    - ['individual'|'trials'] standard statistics are 
+%                  'individual' where the statistics is performed accross
+%                  the mean ERSP (or ITC) of single subjects. For trials
+%                  statistics, the single trial 'ERSP' of all subjects
+%                  are pooled together. This requires that they were
+%                  saved on disk (options 'savetrials', 'on' at the time
+%                  of computation). Note that these single trial ERSP
+%                  use several Gb of disk space and that computation of
+%                  statistics requires a lot of RAM.
+%  'naccu'       - [integer] Number of accumulation when computing 
+%                  permutation statistics. For instance if you want to see
+%                  if p<0.01 use 200. For p<0.001, use 2000. If a threshold
+%                  is set below (non NaN) and 'naccu' is too low, it will
+%                  be automatically updated. (option available only from 
+%                  command line and not in GUI yet).
+%  'threshold'   - [NaN|0.0x] Significance threshold. NaN will plot the 
+%                  p-value itself on a different panel. When possible, the
+%                  significance time regions are indicated below the data
+%                  on the same plot.
+%  'subbaseline' - ['on'|'off'] subtract baseline across conditions for 
+%                  ERSP (not ITC). Since datasets with different conditions
+%                  are usually recorded simultaneously, the common baseline
+%                  must be removed. Note that this also affect the results
+%                  of statistics. Default is 'on'.
+%  'maskdata'    - ['on'|'off'] when threshold is non-nan and not both 
+%                  condition and group statistics are computed, the user 
+%                  has the option to mask the data for significance.
 %
-% See also: std_erspplot()
+% Plot options:
+%   'timerange'  - [min max] ERSP/ITC plotting time range in ms. Default is 
+%                  the whole time range.
+%   'freqrange'  - [min max] ERSP/ITC plotting frequency range in ms. Default 
+%                  is the whole frequency range.
+%   'ersplim'    - [min max] ERSP plotting limits in dB (default is automatic)
+%   'itclim'     - [min max] ITC plotting limits (default is automatic)
+%
+% See also: std_erspplot(), std_itcplot()
 %
 % Authors: Arnaud Delorme, CERCO, CNRS, 2006-
 
-% Copyright (C) Arnaud Delorme, arno@salk.edu
+% Copyright (C) Arnaud Delorme, 2006
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -184,5 +226,6 @@ function STUDY = default_params(STUDY)
     if ~isfield(STUDY.etc.erspparams, 'subbaseline' ), STUDY.etc.erspparams.subbaseline = 'on'; end;
     if ~isfield(STUDY.etc.erspparams, 'threshold' ),   STUDY.etc.erspparams.threshold = NaN; end;
     if ~isfield(STUDY.etc.erspparams, 'maskdata') ,    STUDY.etc.erspparams.maskdata  = 'on'; end;
+    if ~isfield(STUDY.etc.erspparams, 'naccu')    ,    STUDY.etc.erspparams.naccu     = []; end;
     if ~isfield(STUDY.etc.erspparams, 'statmode') ,    STUDY.etc.erspparams.statmode  = 'individual'; end;
 

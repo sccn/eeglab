@@ -1,19 +1,45 @@
-% std_specplot() - plotting and statistics option for spectrum.
+% pop_specparams() - Set plotting and statistics parameters for spectrum
 %
 % Usage:    
-%   >> STUDY = std_specplot(STUDY, 'key', 'val');   
+%   >> STUDY = pop_specparams(STUDY, 'key', 'val');   
 %
 % Inputs:
-%   STUDY      - EEGLAB STUDY set comprising some or all of the EEG
+%   STUDY        - EEGLAB STUDY set
 %
-% Optional inputs:
-% To be documented...
+% Statistics options:
+%   'statgroup'  - ['on'|'off'] Compute (or not) statistics across groups.
+%                  Default is 'off'.
+%   'statcond'   - ['on'|'off'] Compute (or not) statistics across groups.
+%                  Default is 'off'.
+%   'statistics' - ['param'|'perm'] Type of statistics to use 'param' for
+%                  parametric and 'perm' for permutations. Default is
+%                  'param'.
+%   'naccu'      - [integer] Number of accumulation when computing 
+%                  permutation statistics. For instance if you want to see
+%                  if p<0.01 use 200. For p<0.001, use 2000. If a threshold
+%                  is set below (non NaN) and 'naccu' is too low, it will
+%                  be automatically updated. (option available only from 
+%                  command line and not in GUI yet).
+%   'threshold'  - [NaN|0.0x] Significance threshold. NaN will plot the 
+%                  p-value itself on a different panel. When possible, the
+%                  significance time regions are indicated below the data
+%                  on the same plot.
+% Plot options:
+%   'freqrange'  - [min max] spectrum plotting frequency range in ms. Default 
+%                  is the whole frequency range.
+%   'ylim'       - [min max] spectrum plotting limits (default is automatic)
+%   'plotgroup'  - ['together'|'appart'] plot groups on the same panel
+%                  in different colors 'together' or on different panels.
+%   'plotcond'   - ['together'|'appart'] plot conditions on the same panel
+%                  in different colors 'together' or on different panels.
+%                  Note that 'plotgroup' and 'plotcond' cannot be set to 
+%                  'together' both at the same time.
 %
 % See also: std_specplot()
 %
 % Authors: Arnaud Delorme, CERCO, CNRS, 2006-
 
-% Copyright (C) Arnaud Delorme, arno@salk.edu
+% Copyright (C) Arnaud Delorme, CERCO
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -146,4 +172,4 @@ function STUDY = default_params(STUDY)
     if ~isfield(STUDY.etc.specparams, 'threshold' ), STUDY.etc.specparams.threshold = NaN; end;
     if ~isfield(STUDY.etc.specparams, 'plotgroup') , STUDY.etc.specparams.plotgroup = 'appart'; end;
     if ~isfield(STUDY.etc.specparams, 'plotcond') ,  STUDY.etc.specparams.plotcond  = 'appart'; end;
-
+    if ~isfield(STUDY.etc.specparams, 'naccu')    ,  STUDY.etc.specparams.naccu     = []; end;
