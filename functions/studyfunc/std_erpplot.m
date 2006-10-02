@@ -1,6 +1,6 @@
-% std_erpplot() - Commandline function to plot cluster component ERPs. Either displays 
-%                 mean ERP of all requested clusters in the same figure, with ERPs 
-%                 for different conditions (if any) plotted in different colors. 
+% std_erpplot() - Commandline function to plot STUDY cluster component ERPs. Either 
+%                 displays mean ERP of all requested clusters in the same figure, with 
+%                 ERPs for different conditions (if any) plotted in different colors. 
 %                 Else, displays ERP for each specified cluster in separate figures 
 %                 (per condition), each containing the cluster component ERPs plus 
 %                 the grand mean cluster ERP (in bold). ERPs can be plotted only if 
@@ -45,7 +45,6 @@
 %   STUDY      - the input STUDY set structure modified with plotted cluster 
 %                 mean ERP to allow quick replotting (unless cluster means 
 %                 already exists in the STUDY).  
-%
 %   Example:
 %              >> [STUDY] = std_erpplot(STUDY,ALLEEG, 'clusters', 2, 'comps', 'all');
 %                 % Plot cluster-2 components ERPs plus the mean ERP in bold. 
@@ -71,6 +70,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2006/09/12 18:50:03  arno
+% reprogram from scratch (statistics...), backward compatible
+%
                             
 function [STUDY allerp alltimes ] = std_erpplot(STUDY, ALLEEG, varargin)
 
@@ -112,7 +114,7 @@ plotcurveopt = { ...
    'threshold',  STUDY.etc.erpparams.threshold, ...
    'statgroup',  statgroup, ...
    'statcond',   statcond, ...
-   'plotgroup',  STUDY.etc.erpparams.plotgroup, ...
+   'plotgroups',  STUDY.etc.erpparams.plotgroups, ...
    'plotcond',   STUDY.etc.erpparams.plotcond, ...
    'statistics', STUDY.etc.erpparams.statistics };
 
