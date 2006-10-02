@@ -1,6 +1,6 @@
-% std_specplot() - visualizes component cluster spectra, either mean spectra for 
-%                  all requested clusters in the same figure, with spectra for 
-%                  different conditions (if any) plotted in different colors, 
+% std_specplot() - visualizes component STUDY cluster spectra, either mean spectra 
+%                  for all requested clusters in the same figure, with spectra 
+%                  for different conditions (if any) plotted in different colors, 
 %                  or spectra for each specified cluster in a separate figure 
 %                  for each condition,  showing the cluster component spectra plus 
 %                  the mean cluster spectrum (in bold). The spectra can be 
@@ -32,16 +32,14 @@
 %                component indices are provided as input.
 %   'figure'   - ['on'|'off'] for the 'centroid' mode option, 'on' plots in a new 
 %                figure, while 'off'  plots in the current figure. {default: 'on'}
-%
 % Outputs:
 %   STUDY      - the input STUDY set structure modified with the plotted cluster 
 %                mean spectra, to allow quick replotting (unless the cluster means 
 %                already exists in the STUDY).  
-%
 %   Example:
 %            >> [STUDY] = std_specplot(STUDY,ALLEEG, 'clusters', 2, 'mode', 'comps');
-%               % Plot component spectra for Cluster 2 plus the mean cluster spectrum 
-%               % (in bold). 
+%               % Plot component spectra for STUDY cluster 2, plus the mean cluster 
+%               % spectrum (in bold). 
 %
 %  See also  pop_clustedit(), pop_preclust()
 %
@@ -64,6 +62,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2006/10/02 11:43:00  arno
+% allow plotting scalp maps
+%
                             
 function [STUDY, erspbase] = std_specplot(STUDY, ALLEEG, varargin)
 
@@ -106,7 +107,7 @@ plotcurveopt = { ...
    'threshold',  STUDY.etc.specparams.threshold, ...
    'statgroup',  statgroup, ...
    'statcond',   statcond, ...
-   'plotgroup',  STUDY.etc.specparams.plotgroup, ...
+   'plotgroups',  STUDY.etc.specparams.plotgroups, ...
    'plotcond',   STUDY.etc.specparams.plotcond, ...
    'statistics', STUDY.etc.specparams.statistics };
 
