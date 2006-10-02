@@ -1,12 +1,95 @@
-% std_plot() - plot curve for study
+% std_plot() - plot ERP/spectrum curve or ERSP/ITC image for component
+%              or channel clusters in a study. Also allow plotting scalp
+%              maps at specific latencies.
+% Usage:
+% >> std_plot( x, data, 'key', 'val', ...)
 %
-% Documentation to be written
+% Inputs:
+%  x     - abscicia vector for the data. If data is ERSP or ITC, then this 
+%          input may contain a cell array { times freqs }.
+%  data  - [cell array] cell array of data containing containing groups and
+%          conditions. For instance for ERP of 2 conditions and 3 groups. 
+%             data = { [800x12] [800x12] [800x12];
+%                      [800x12] [800x12] [800x12] };
+%          when there is 800 points for the ERP and 12 subjects. Statistics
+%          is run accross subejcts and only the average is plotted. See 
+%          below and statcond() for more information about statistics.
+%
+% Optional input for display:
+%  'datatype'    - ['ersp'|'itc'|'erp'|'spec'] data type. Default is 'erp'.
+%  'channels'    - [cell array] channel names (for titles)
+%  'condname'    - [cell array] names of conditions (for titles)
+%  'groupname'   - [cell array] names of groups (for titles)
+%  'subject'     - [string] subject name (for titles)
+%
+% Statistics options:
+%  'statgroup'     'string' { 'on' 'off' }   'off';
+%  'statgroup'   - ['on'|'off'] Compute (or not) statistics across groups.
+%                  Default is 'off'.
+%  'statcond'    - ['on'|'off'] Compute (or not) statistics across groups.
+%                  Default is 'off'.
+%  'statistics'  - ['param'|'perm'] Type of statistics to use 'param' for
+%                  parametric and 'perm' for permutations. Default is
+%                  'param'.
+%  'naccu'       - [integer] Number of accumulation when computing 
+%                  permutation statistics. For instance if you want to see
+%                  if p<0.01 use 200. For p<0.001, use 2000. If a threshold
+%                  is set below (non NaN) and 'naccu' is too low, it will
+%                  be automatically updated. (option available only from 
+%                  command line and not in GUI yet).
+%  'statmode'    - ['individual'|'trials'] standard statistics are 
+%                  'individual' where the statistics is performed accross
+%                  the mean ERSP (or ITC) of single subjects. For trials
+%                  statistics, the single trial 'ERSP' of all subjects
+%                  are pooled together. This requires that they were
+%                  saved on disk (options 'savetrials', 'on' at the time
+%                  of computation). Note that these single trial ERSP
+%                  use several Gb of disk space and that computation of
+%                  statistics requires a lot of RAM.
+%  'threshold'   - [NaN|0.0x] Significance threshold. NaN will plot the 
+%                  p-value itself on a different panel. When possible, the
+%                  significance time regions are indicated below the data
+%                  on the same plot.
+%  'maskdata'    - ['on'|'off'] when threshold is non-nan and not both 
+%                  condition and group statistics are computed, the user 
+%                  has the option to mask the data for significance.
+%
+% Curve plotting options (ERP and spectrum):
+%  'plotgroup'   - ['together'|'appart'] plot groups on the same panel
+%                  in different colors 'together' or on different panels.
+%  'plotcond'    - ['together'|'appart'] plot conditions on the same panel
+%                  in different colors 'together' or on different panels.
+%                  Note that 'plotgroup' and 'plotcond' cannot be set to 
+%                  'together' both at the same time.
+%  'freqrange'   - [min max] spectrum plotting frequency range in ms. Default 
+%                  is the whole frequency range.
+%  'timerange'   - [min max] ERP plotting time range in ms. Default is 
+%                  the whole time range.
+%  'legend'      - ['on'|'off'] plot legend
+%  'plotmode'    - ['normal'|'condensed'] plotting for statistics.
+%                  Condensed plot statistics under the curves (when possible)
+%                  and 'normal' plot them in separate panels.
+%  'plotx'       - [real] plot scalp map at specific latency. For ERSP
+%                  this arguement must contain [time freq].
+%  'ylim'        - [min max] ordinate limits (ERP, spectrum)
+%  'plotsubjects' - ['on'|'off'] plot single subjects curves
+%
+% ITC/ERSP image plotting options:
+%  'plotx'       - [time freq] plot scalp map at specific latency in ms and 
+%                  frequency.
+%  'tftopoopt'   - [cell array] tftopo() plotting options (ERSP and ITC)
+%  'caxis'       - [min max] color axis (ERSP, ITC, scalp maps)
+%
+% Scalp map plotting options:
+%  'chanlocs'    - [struct] channel location structure
 %
 % Author: Arnaud Delorme, CERCO, CNRS, 2006-
+%
+% See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
 
-% Copyright (C) Arnaud Delorme, arno@salk.edu
+% Copyright (C) 2006 Arnaud Delorme
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -35,12 +118,12 @@ end;
 opt = finputcheck( varargin, { 'channels'    'cell'   []              {};
                                'caxis'       'real'   []              [];
                                'ylim'        'real'   []              [];
-                               'ersplim'     'real'   []              [];
                                'condname'    'cell'   []              {};
                                'groupname'   'cell'   []              {};
                                'tftopoopt'   'cell'   []              {};
                                'threshold'   'real'   []              NaN;
                                'plotx'       'real'   []              [];
+                               'naccu'       'integer' []             500;
                                'unitx'       'string' []              'ms'; % just for titles
                                'subject'     'string' []              '';   % just for titles
                                'chanlocs'    'struct' []              struct('labels', {});
@@ -58,6 +141,7 @@ opt = finputcheck( varargin, { 'channels'    'cell'   []              {};
                                'statmode'    'string' { 'individual' 'common' 'trials' } 'individual'}, 'std_erpmaskdata');
                            
 if isstr(opt), error(opt); end;
+if strcmpi(datatype, 'spec'), g.unit = 'Hz'; end;
 if strcmpi(opt.plotsubjects, 'on')
     opt.plotgroup = 'appart';
     opt.plotcond  = 'appart';
@@ -129,9 +213,11 @@ if ~isempty(opt.plotx)
     % ----------------------------
     % plot scalp maps for baseline    
     % ----------------------------
-    [tmp ti] = min(abs(allx-opt.plotx));
+    if length(opt.plotx) < 1, opt.plotx(2) = opt.plotx(1); end;
+    [tmp ti1] = min(abs(allx-opt.plotx(1)));
+    [tmp ti2] = min(abs(allx-opt.plotx(2)));
     for index = 1:length(data(:))
-        data{index} = data{index}(ti,:,:);
+        data{index} = mean(data{index}(ti1:ti2,:,:),1);
     end;
 end;
 
@@ -139,7 +225,7 @@ end;
 % --------------------------
 if strcmpi(opt.statcond, 'on') & nc > 1
     for g = 1:ng
-        [F df pval] = statcond(data(:,g), 'mode', opt.statistics); 
+        [F df pval] = statcond(data(:,g), 'mode', opt.statistics, 'naccu', opt.naccu); 
         pcond{g} = squeeze(pval);
     end;
 else
@@ -147,14 +233,14 @@ else
 end;
 if strcmpi(opt.statgroup, 'on') & ng > 1
     for c = 1:nc
-        [F df pval] = statcond(data(c,:), 'mode', opt.statistics); 
+        [F df pval] = statcond(data(c,:), 'mode', opt.statistics, 'naccu', opt.naccu); 
         pgroup{c} = squeeze(pval);
     end;
 else
     pgroup = {};
 end;
 if ( strcmpi(opt.statgroup, 'on') | strcmpi(opt.statcond, 'on') ) & ng > 1 & nc > 1
-    [F df pval] = statcond(data, 'mode', opt.statistics);
+    [F df pval] = statcond(data, 'mode', opt.statistics, 'naccu', opt.naccu);
     pinter      = squeeze(pval{3});
 else
     pinter = [];
@@ -406,16 +492,20 @@ elseif isempty(opt.plotx)
     cbar_standard(opt.datatype, ng);
     if nc ~= size(hdl,1) | ng ~= size(hdl,2)
         axes(hdl(end,end));
-        cbar_signif(ng);
+        cbar_signif(ng, maxplot);
     end;
 else    
     
+    % topoplot
+    % --------
     figure('color', 'w');
     tmpc = [inf -inf];
     for c = 1:nc
         for g = 1:ng
             hdl(c,g) = mysubplot(nc+addr, ng+addc, g + (c-1)*(ng+addc), opt.transpose);
-            fig_title = [ opt.condname{c} ', ' opt.groupname{g} ', ' num2str(opt.plotx) opt.unitx];
+            if opt.plotx(1) == opt.plotx(2), fig_title = [ opt.condname{c} ', ' opt.groupname{g} ', ' num2str(opt.plotx(1)) opt.unitx];
+            else                             fig_title = [ opt.condname{c} ', ' opt.groupname{g} ', ' num2str(opt.plotx(1)) '-' num2str(opt.plotx(2)) opt.unitx];
+            end;
             tmpplot = double(mean(data{c,g},3));
             topoplot( tmpplot, opt.chanlocs);
             title(fig_title); 
@@ -454,7 +544,7 @@ else
         % -----------------------------
         if strcmpi(opt.statcond, 'on') & nc > 1
             hdl(nc+1,g) = mysubplot(nc+addr, ng+addc, g + c*(ng+addc), opt.transpose);
-            topoplot( pcondplot{c}, opt.chanlocs);
+            topoplot( pcondplot{g}, opt.chanlocs);
             if isnan(opt.threshold), title(sprintf('%s (p-value)', opt.groupname{g}));
             else                     title(sprintf('%s (p<%.4f)',  opt.groupname{g}, opt.threshold));
             end;
@@ -479,7 +569,7 @@ else
     cbar_standard(opt.datatype, ng);
     if nc ~= size(hdl,1) | ng ~= size(hdl,2)
         axes(hdl(end,end));
-        cbar_signif(ng);
+        cbar_signif(ng, maxplot);
     end;
 
 end;
@@ -518,7 +608,7 @@ function cbar_standard(datatype, ng);
 
 % colorbar for significance
 % -------------------------
-function cbar_signif(ng);
+function cbar_signif(ng, maxplot);
     pos = get(gca, 'position');
     tmpc = caxis;
     fact = fastif(ng == 1, 40, 20);
@@ -526,8 +616,9 @@ function cbar_signif(ng);
     map = colormap;
     n = size(map,1);
     cols = [ceil(n/2):n]';
-    image([0 1],linspace(0,2,length(cols)),[cols cols]);
+    image([0 1],linspace(0,maxplot,length(cols)),[cols cols]);
     %cbar(tmp, 0, tmpc, 5);
+    tick = linspace(0, maxplot, maxplot+1);
     set(gca, 'ytickmode', 'manual', 'YAxisLocation', 'right', 'xtick', [], ...
-        'ytick', [0 1 2], 'yticklabel', round(10.^-[0 1 2]*1000)/1000);
+        'ytick', tick, 'yticklabel', round(10.^-tick*1000)/1000);
     xlabel('');
