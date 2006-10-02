@@ -1,19 +1,17 @@
-% std_preclust() - prepare STUDY component-location and/or activity measures for later clustering.
-%                  Selected measures (one or more from these options: dipole locations, scalp 
-%                  maps, activiy spectra, condition ERPs, ERSPs, and/or ITCs) are first computed for 
-%                  and saved in each STUDY dataset, unless they already present. After all the
-%                  requested measures are computed and saved, dimensions of each feature (except
-%                  dipole locations) are reduced to a principal component subspace by PCA. These 
-%                  PC matrices (one per measure) are then stacked (and optionally jointly compressed
-%                  again by PCA) to form component 'coordinates' in an absract component space.
-%                  Distances between these component coordinates are used to cluster components in 
-%                  pop_clust(). The components clustered may be a user-specified list, all 
-%                  components with dipole-model residual variance lower than a given threshold 
-%                  (see >> help dipfit), or components from an already existing cluster 
-%                  (hierarchical clustering). The EEG datasets in the ALLEEG structure vector are 
-%                  updated. If new measures are computed, the updated EEG datasets are also saved 
-%                  to disk. Called by pop_preclust(). Follow with eeg_clust() or pop_clust(). 
-%                  See Example below.
+% std_preclust() - prepare STUDY component location and activity measures for later clustering.
+%                  Selected measures (one or more from options: ERPs, dipole locations, spectra,
+%                  scalp maps, ERSPs, and ITCs) are computed for each dataset in the STUDY 
+%                  set, unless they already present. After all requested measures are computed 
+%                  and saved in the STUDY datasets, each feature dimension is reduced by computing 
+%                  a PCA  decomposition. These PCA matrices (one per measure) are concatenated and 
+%                  used as input to the clustering  algorithm in pop_clust(). std_preclust() allows 
+%                  selection of a subset of components to use in the clustering. This subset 
+%                  may be a user-specified component subset, components with dipole model residual 
+%                  variance lower than a defined threshold (see dipfit()), or components from 
+%                  an already existing cluster (for hierarchical clustering). The EEG datasets
+%                  in the ALLEEG structure are updated. If new measures are added, the updated 
+%                  EEG sets are also saved to disk. Called by pop_preclust(). Follow with 
+%                  eeg_clust() or pop_clust(). See Example below.
 % Usage:    
 %                >> [ALLEEG,STUDY] = std_preclust(ALLEEG,STUDY); % prepare to cluster all comps 
 %                                                                % in all sets on all measures
@@ -29,7 +27,7 @@
 %   clustind     - a cluster index for further (hierarchical) clustering -
 %                  for example to cluster a spectrum-based mu-rhythm cluster into 
 %                  dipole location-based left mu and right mu sub-clusters. 
-%                  Should remain empty during first stage (whole-STUDY) clustering {default: []}
+%                  Should be empty for first stage (whole-STUDY) clustering {default: []}
 %
 %   preproc      - {'command' 'key1' val1 'key2' val2 ...} component clustering measures to prepare
 %
@@ -124,12 +122,6 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
-% Revision 1.64  2006/09/20 13:37:21  scott
-% text edits
-%
-% Revision 1.63  2006/09/20 12:21:00  arno
-% savetrial option fix
-%
 % Revision 1.60  2006/05/15 00:25:57  toby
 % cluster ica erp using abs(pca(comps)), not pca(abs(comps))
 %
@@ -281,10 +273,6 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
     if nargin == 2
         cluster_ind = 1; % default to clustering the whole STUDY 
     end    
-    Ncond = length(STUDY.condition);
-    if Ncond == 0
-        Ncond = 1;
-    end
 
     % check dataset length consistency before computing
     % -------------------------------------------------
@@ -293,9 +281,9 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
     xmin  = ALLEEG(STUDY.datasetinfo(1).index).xmin;
     for index = 1:length(STUDY.datasetinfo)
         ind = STUDY.datasetinfo(index).index;
-        if pnts  ~= ALLEEG(ind).pnts, error(sprintf(  'Datasets 1 and %d have different numbers of epoch timepoints.', ind)); end;
-        if xmin  ~= ALLEEG(ind).xmin, warning(sprintf('Datasets 1 and %d have different epoch time limits.', ind)); end;
-        if srate ~= ALLEEG(ind).srate, error(sprintf( 'Datasets 1 and %d have different sampling rates.', ind)); end;
+        if pnts  ~= ALLEEG(ind).pnts, error(sprintf('Dataset %d does not have the same number of point as dataset 1', ind)); end;
+        if srate ~= ALLEEG(ind).srate, error(sprintf('Dataset %d does not have the same sampling rate as dataset 1', ind)); end;
+        if xmin  ~= ALLEEG(ind).xmin, warning(sprintf('Dataset %d does not have the same time limit as dataset 1', ind)); end;
     end;
     
     % Get component indices that are part of the cluster 
@@ -404,7 +392,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
         if (strcmpi(strcom,'ersp')  | strcmpi(strcom,'itc') )  
             params = [];
             for si = 1:size(STUDY.setind,2) % scan datasets that are part of STUDY
-                for cond = 1:Ncond
+                for cond = 1:size(STUDY.setind,1)
                     if ~isnan(STUDY.setind(cond,si))
                         idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index;
                     
@@ -462,7 +450,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                       end;
                   end;
                   if ~isempty(succompind{si})
-                      for cond = 1 : Ncond
+                      for cond = 1 : size(STUDY.setind,1)
                          if ~isnan(STUDY.setind(cond,si))
                             idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index;  
                             if ALLEEG(idat).trials == 1
@@ -491,7 +479,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
               % select ica scalp maps
               % --------------------------
              case 'scalp' , % NB: scalp maps are identical across conditions (within session)
-                 for cond = 1 : Ncond   % Find first nonNaN index
+                 for cond = 1:size(STUDY.setind,1)   % Find first nonNaN index
                     if ~isnan(STUDY.setind(cond,si)), break; end
                  end       
                  idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index;
@@ -508,7 +496,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
              % select Laplacian ica comp scalp maps
              % ------------------------------------si
              case 'scalpLaplac'
-                 for cond = 1 : Ncond   % Find first nonNaN index
+                 for cond = 1:size(STUDY.setind,1)   % Find first nonNaN index
                     if ~isnan(STUDY.setind(cond,si)), break; end
                  end       
                  idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index;  
@@ -525,7 +513,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
              % select Gradient ica comp scalp maps
              % -----------------------------------
              case 'scalpGrad'
-                 for cond = 1 : Ncond   % Find first nonNaN index
+                 for cond = 1:size(STUDY.setind,1)   % Find first nonNaN index
                     if ~isnan(STUDY.setind(cond,si)), break; end
                  end
                  idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index;  
@@ -552,12 +540,9 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                      overwrite = 0;
                  end
                  if ~isempty(succompind{si})
-                     for cond = 1 : Ncond 
+                     for cond = 1 : size(STUDY.setind,1)
                          if ~isnan(STUDY.setind(cond,si))
                             idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index; 
-                            if ALLEEG(idat).trials == 1
-                               error('No epochs in dataset: spectral information has no meaning');
-                            end
                             con_f = []; con_data = [];
                             [X, f,overwrite] = std_spec(ALLEEG(idat),succompind{si}, ...
                                                      freqrange, fun_arg,overwrite);
@@ -586,7 +571,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
              % -------------------------
              case 'dipoles' % NB: dipoles are identical across conditions (within session)
                             % (no need to scan across conditions)
-              for cond = 1 : Ncond  % Scan for first nonNaN index.
+              for cond = 1:size(STUDY.setind,1)  % Scan for first nonNaN index.
                  if ~isnan(STUDY.setind(cond,si)), break; end
               end
               idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index;  
@@ -597,13 +582,13 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                  % --------------------------
                  if ~isempty(succompind{si})
                     ldip = 1;
-                    if size(ALLEEG(idat).dipfit.model(icomp).posxyz,1) == 2     % if two-dipole model
+                    if size(ALLEEG(idat).dipfit.model(icomp).posxyz,1) == 2 % two dipoles model
                         if any(ALLEEG(idat).dipfit.model(icomp).posxyz(1,:)) ...
-                            & any(ALLEEG(idat).dipfit.model(icomp).posxyz(2,:)) % if both dipoles exist
-                                                                                % find the leftmost dipole
+                            & any(ALLEEG(idat).dipfit.model(icomp).posxyz(2,:)) %both dipoles exist
+                           % find the leftmost dipole
                            [garb ldip] = max(ALLEEG(idat).dipfit.model(icomp).posxyz(:,2)); 
                         elseif any(ALLEEG(idat).dipfit.model(icomp).posxyz(2,:)) 
-                           ldip = 2;                    % the leftmost dipole is the only one that exists
+                           ldip = 2; % the leftmost dipole is the only one that exists
                         end
                      end
                      data(count,:) = ALLEEG(idat).dipfit.model(icomp).posxyz(ldip,:);
@@ -611,11 +596,10 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                  end
                  end 
               catch
-                error([ sprintf('Dipole model information is missing for component %d of dataset %d.', icomp, idat) 10 ...
-                              'Components are not given a dipole model when residual variance of the' 10 ...
-                              'best-fitting dipole model is too high. Either remove this component,' 10 ...
-                              'from clustering, or in the STUDY information editor, pop_study(), ' 10 ...
-                              'raise the residual variance threshold ("Select by R.V.").' ]);
+                error([ sprintf('Some dipole information is missing (e.g. component %d of dataset %d)', icomp, idat) 10 ...
+                              'Components are not assigned a dipole if residual variance is too high so' 10 ...
+                              'in the STUDY info editor, remember to select component by residual' 10 ...
+                              'variance (column "select by r.v.") prior to preclustering them.' ]);
               end
               
              % cluster on ica ersp / itc values
@@ -635,12 +619,9 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                 type =  strcom;            
                 if ~isempty(succompind{si})
                     idattot = [];
-                    for cond = 1 : Ncond 
+                    for cond = 1:size(STUDY.setind,1)
                         if ~isnan(STUDY.setind(cond,si))
                             idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index;  
-                            if ALLEEG(idat).trials == 1
-                               error('No epochs in dataset: time/frequency information has no meaning');
-                            end
                             idattot = [idattot idat];
                             % compute ERSP/ ITC, if doesn't exist.
                             std_ersp(ALLEEG(idat), 'components', succompind{si}, 'freqs', freqrange, ...
