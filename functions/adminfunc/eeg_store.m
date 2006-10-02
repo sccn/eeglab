@@ -199,7 +199,7 @@ function [ALLEEG, EEG, storeSetIndex] = eeg_store(ALLEEG, EEG, storeSetIndex, va
 % check parameter consistency
 % ------------------------------
 if nargin == 3
-    if length(EEG) ~= length(storeSetIndex) && storeSetIndex(1) ~= 0
+    if length(EEG) ~= length(storeSetIndex) & storeSetIndex(1) ~= 0
         error('Length of input dataset structure must equal the length of the index array');
     end;
 end;
@@ -208,7 +208,7 @@ end;
 % -----------------------------
 if length(EEG) > 1
 	TMPEEG = EEG;
-    if nargin >= 3 && storeSetIndex(1) ~= 0
+    if nargin >= 3 & storeSetIndex(1) ~= 0
         for index=1:length(TMPEEG)
             EEG = TMPEEG(index);
             tmpsaved      = EEG.saved;
