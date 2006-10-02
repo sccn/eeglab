@@ -29,6 +29,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2005/02/03 18:51:34  arno
+% fixing missing character
+%
 % Revision 1.10  2003/03/12 03:12:34  arno
 % special help for pop_functions
 %
@@ -139,3 +142,4 @@ else
 		str = fgets( fid );
 	end;
 end;
+fclose(fid);
