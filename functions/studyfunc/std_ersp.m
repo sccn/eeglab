@@ -329,9 +329,9 @@ for index = 1:length(EEG)
     if ~isempty(g.components)
         if isempty(TMP.icaact)                      % make icaact if necessary
             TMP.icaact = (TMP.icaweights*TMP.icasphere)* ...
-                          reshape(TMP.data  , [ size(TMP.data,1)   size(TMP.data,2)*size(TMP.data,3) ]);
-            tmpdata    = reshape(TMP.icaact, [ size(TMP.icaact,1) size(TMP.data,2)*size(TMP.data,3) ]);
+                          reshape(TMP.data(TMP.icachansind,:,:), [ length(TMP.icachansind) size(TMP.data,2)*size(TMP.data,3) ]);
         end;
+        tmpdata    = reshape(TMP.icaact, [ size(TMP.icaact,1) size(TMP.data,2)*size(TMP.data,3) ]);
     else
         if isempty(tmpdata)
             tmpdata = TMP.data(g.indices,:,:);
