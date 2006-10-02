@@ -62,6 +62,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2006/10/02 17:24:38  scott
+% edited help msg for clarity, changed 'plotgroup' to 'plotgroups'
+% ala change in std_specparams
+%
 % Revision 1.22  2006/10/02 11:43:00  arno
 % allow plotting scalp maps
 %
@@ -108,7 +112,7 @@ plotcurveopt = { ...
    'statgroup',  statgroup, ...
    'statcond',   statcond, ...
    'plotgroups',  STUDY.etc.specparams.plotgroups, ...
-   'plotcond',   STUDY.etc.specparams.plotcond, ...
+   'plotconditions', STUDY.etc.specparams.plotconditions, ...
    'statistics', STUDY.etc.specparams.statistics };
 
 if ~isempty(opt.plotfreq) & ~isempty(opt.channels)
