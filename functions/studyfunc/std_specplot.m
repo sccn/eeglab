@@ -15,20 +15,20 @@
 %   ALLEEG     - vector of EEG dataset structures for the dataset(s) in the STUDY, 
 %                typically created using load_ALLEEG().  
 % Optional inputs:
-%   'clusters' - [int vector|'all'??] -> cluster numbers to plot.
+%   'clusters' - [int vector|'all'] -> cluster numbers to plot.
 %                'all' -> plot all clusters in STUDY {default: 'all'}.
-%   'comps'    - [int vector|'all'??] -> indices of cluster components to plot.
+%   'comps'    - [int vector|'all'] -> indices of cluster components to plot.
 %                'all' -> plot all the components in the cluster {default: 'all'}.
-%   'mode'     - ['together'|'apart'] plotting mode. In 'centroid' mode, the average 
+%   'mode'     - ['together'|'apart'] plotting mode. In 'together' mode, the average 
 %                spectra of the requested clusters are plotted in the same figure, 
 %                with spectra for  different conditions ??and groups?? (if any) 
-%                plotted in different colors. In 'comps' mode, spectra for each 
+%                plotted in different colors. In 'apart' mode, spectra for each 
 %                specified cluster are plotted in separate figures (per condition 
-% ??and group??), 
+%                ??and group??), 
 %                each containing the overplotted individual cluster component spectra 
 %                plus the mean cluster spectrum in bold.
 %                Note that this option is irrelevant when component indices are provided 
-%                as input (via 'comps' above) {default: 'together'}. 
+%                as input (via 'apart' above) {default: 'together'}. 
 %   'figure'   - ['on'|'off'] in 'together' mode, 'on' plots in a new figure, 
 %                while 'off' plots in the current figure {default: 'on'}
 % Outputs:
@@ -60,6 +60,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2006/10/03 21:57:50  scott
+% edit help msg  -- some ?? remain   -sm
+%
 % Revision 1.26  2006/10/03 18:39:25  scott
 % help msg   ARNO - SEE ??    -sm
 %
@@ -102,7 +105,7 @@ if isstr(opt), error(opt); end;
 
 % for backward compatibility
 % --------------------------
-if strcmpi(opt.mode, 'comps'), opt.plotsubjects = 'on'; end;
+if strcmpi(opt.mode, 'apart'), opt.plotsubjects = 'on'; end;
 if ~isempty(opt.comps), 
     opt.subject = STUDY.datasetinfo( STUDY.cluster(opt.clusters).sets(1,opt.comps)).subject;
 end;
