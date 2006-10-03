@@ -1,6 +1,7 @@
-% pop_erspparams() - Set plotting and statistics parameters for ERSP and
-%                    ITC.
-%
+% pop_erspparams() - Set plotting and statistics parameters for computing 
+%                    and later?? plotting?? STUDY mean (and optionally 
+%                    single-trial) ERSP and ITC measures and mean measure 
+%                    statistics.
 % Usage:    
 %   >> STUDY = pop_erspparams(STUDY, 'key', 'val');   
 %
@@ -8,48 +9,50 @@
 %   STUDY        - EEGLAB STUDY set
 %
 % Statistics options:
-%  'statgroup'   - ['on'|'off'] Compute (or not) statistics across groups.
-%                  Default is 'off'.
-%  'statcond'    - ['on'|'off'] Compute (or not) statistics across groups.
-%                  Default is 'off'.
-%  'statistics'  - ['param'|'perm'] Type of statistics to use 'param' for
-%                  parametric and 'perm' for permutations. Default is
-%                  'param'.
-%  'statmode'    - ['individual'|'trials'] standard statistics are 
-%                  'individual' where the statistics is performed accross
-%                  the mean ERSP (or ITC) of single subjects. For trials
-%                  statistics, the single trial 'ERSP' of all subjects
-%                  are pooled together. This requires that they were
-%                  saved on disk (options 'savetrials', 'on' at the time
-%                  of computation). Note that these single trial ERSP
-%                  use several Gb of disk space and that computation of
-%                  statistics requires a lot of RAM.
-%  'naccu'       - [integer] Number of accumulation when computing 
-%                  permutation statistics. For instance if you want to see
-%                  if p<0.01 use 200. For p<0.001, use 2000. If a threshold
-%                  is set below (non NaN) and 'naccu' is too low, it will
-%                  be automatically updated. (option available only from 
-%                  command line and not in GUI yet).
-%  'threshold'   - [NaN|0.0x] Significance threshold. NaN will plot the 
-%                  p-value itself on a different panel. When possible, the
-%                  significance time regions are indicated below the data
-%                  on the same plot.
-%  'subbaseline' - ['on'|'off'] subtract baseline across conditions for 
-%                  ERSP (not ITC). Since datasets with different conditions
-%                  are usually recorded simultaneously, the common baseline
-%                  must be removed. Note that this also affect the results
-%                  of statistics. Default is 'on'.
-%  'maskdata'    - ['on'|'off'] when threshold is non-nan and not both 
-%                  condition and group statistics are computed, the user 
-%                  has the option to mask the data for significance.
-%
-% Plot options:
-%   'timerange'  - [min max] ERSP/ITC plotting time range in ms. Default is 
-%                  the whole time range.
-%   'freqrange'  - [min max] ERSP/ITC plotting frequency range in ms. Default 
-%                  is the whole frequency range.
-%   'ersplim'    - [min max] ERSP plotting limits in dB (default is automatic)
-%   'itclim'     - [min max] ITC plotting limits (default is automatic)
+%  'statgroup'   - ['on'|'off'] Compute statistics across groups?
+%                  {default: 'off'}
+%  'statcond'    - ['on'|'off'] Compute statistics across conditions?
+%                  {default: 'off'}
+%  'statistics'  - ['param'|'perm'] Type of statistics to compute: 
+%                  'param' for parametric (t-test), 'perm' for 
+%                  permutation-based {default: 'param'}
+%  'statmode'    - ['individual'|'trials'] (default) 'individual' 
+%                  statistics -> statistics are computed across
+%                  mean ERSPs (ITCs) of the single subjects. 'trials'
+%                  statistics -> single-trial 'ERSP' transforms for all 
+%                  subjects are pooled together. This requires that they 
+%                  were saved to disk (std_ersp() option 'savetrials', 
+%                  'on'). Note that the single-trial ERSPs may occupy 
+%                  several GB of disk space, and that computation 
+%                  of their?? statistics may require large RAM.
+%                  {default: 'individual'}
+%  'naccu'       - [integer] Number of surrogate data averages to use in
+%                  permutation-based statistics. For instance, if p<0.01, 
+%                  use naccu>200. For p<0.001, naccu>2000. If a 'threshold'
+%                  (not NaN) is set below and 'naccu' is too low, it will
+%                  be automatically increased. (This keyword?? is available 
+%                  only from the command line). 
+%  'threshold'   - [NaN|alpha] Significance threshold (0<alpha<<1). Value 
+%                  NaN will plot the p-value itself?? on a different axis??. 
+%                  When possible, the significant time regions?? are indicated 
+%                  below the data on the same plot.?? {default: ??}
+%  'subbaseline' - ['on'|'off'] subtract the same baseline across conditions 
+%                  for ERSP (not ITC). When datasets with different conditions
+%                  are recorded simultaneously, a common baseline spectrum 
+%                  should be used. Note that this also affects the 
+%                  results of statistics. {default: 'on'}
+%  'maskdata'    - ['on'|'off'] when threshold is not NaN, and 'statgroup'
+%                  or 'statcond' (above) are 'off', masks the output?? data 
+%                  for significance.
+% Plotting options??:
+%   'timerange'  - [min max] ERSP/ITC plotting latency range in ms. {default:
+%                  the whole output latency range}.
+%   'freqrange'  - [min max] ERSP/ITC plotting frequency range in ms. {default:
+%                  the whole output frequency range}
+%   'ersplim'    - [mindB maxdB] ERSP color?? plotting limits in dB 
+%                  {default: from data limits}
+%   'itclim'     - [minitc maxitc] ITC color?? plotting limits (range: [0,1]) 
+%                  {default: [0, ITC data max]}
 %
 % See also: std_erspplot(), std_itcplot()
 %
@@ -72,6 +75,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2006/10/02 11:38:30  arno
+% header documentation
+%
 
 function [ STUDY, com ] = pop_erspparams(STUDY, varargin);
 
