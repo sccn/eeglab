@@ -11,7 +11,7 @@
 %                  {default: 'off'}
 %   'statcond'   - ['on'|'off'] Compute (or not) statistics across groups.
 %                  {default: 'off'}
-%   'statistics' - ['param'|'perm'] Type of statistics to use 'param' for
+%   'statistics' - ['param'|'perm'] Type of statistics to use: 'param' for
 %                  parametric and 'perm' for permutation-based statistics. 
 %                  {default: 'param'}
 %   'naccu'      - [integer] Number of surrogate averages to accumulate for
@@ -56,6 +56,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2006/10/02 21:57:51  scott
+% plotcond -> plotconditions
+%
 % Revision 1.4  2006/10/02 17:09:09  scott
 % edited help message for clarity and grammar. NOTE: changed argument
 % 'appart'  to English 'apart'. ALSO changed keyword 'plotgroup' to

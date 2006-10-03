@@ -1,5 +1,5 @@
-% pop_specparams() - Set plotting and statistics parameters for STUDY spectra.
-%
+% pop_specparams() - Set plotting and statistics parameters for computing
+%                    STUDY spectra.
 % Usage:    
 %       >> STUDY = pop_specparams(STUDY, 'key', 'val');   
 %
@@ -56,6 +56,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2006/10/02 20:58:43  scott
+% plotcond -> plotconditions
+%
 % Revision 1.4  2006/10/02 17:19:49  scott
 % edited help msg for clarity and grammar. changed 'appart'  to English 'apart'
 % changed 'plotgroup' to 'plotgroups'; in help, changed 'panel' to 'axis'
