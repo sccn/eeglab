@@ -13,16 +13,16 @@
 %                Note: ALLEEG for a STUDY set is typically created using load_ALLEEG().  
 %
 % Optional inputs:
-%   'clusters' - [numeric vector]  -> specific cluster numbers to plot.
-%                            'all' -> plot all clusters in STUDY  {default: 'all'}.
-%   'comps'    - [numeric vector]  -> indices of the cluster components to plot.
-%                            'all' -> plot all comps. in the cluster {default: 'all'}.
-%   'mode'     - ['centroid'|'comps'] plotting mode. 'centroid' -> average ERSPs 
+%   'clusters' - [numeric vector|'all'] -> indices of clusters to plot.
+%                'all' -> plot all clusters in STUDY  {default: 'all'}.
+%   'comps'    - [numeric vector|'all']  -> indices of the cluster components to plot.
+%                'all' -> plot all components in the cluster {default: 'all'}.
+%   'mode'     - ['together'|'apart'] plotting mode. 'together' -> mean ITCs 
 %                of the clusters are plotted in the same figure,  one per condition. 
-%                'comps' -> component ITCs for each cluster are plotted in a separate 
+%                'apart' -> component ITCs for each cluster are plotted in a separate 
 %                figure (per condition) plus the cluster mean ITC. Note this option is 
 %                irrelevant if component indices are provided as input.
-%                {default: 'centroid'}. 
+%                {default: ' together'}. 
 %   'figure'   - ['on'|'off'] 'on' -> plot on a new figure; 'off' -> plot in current
 %                figure. 'figure','off' is optional for one cluster in 'centroid' mode.
 %                Useful for incorporating cluster ITCs into a complex figure.
@@ -33,9 +33,8 @@
 %   STUDY      - the input STUDY set structure modified with plotted cluster 
 %                mean ITCs to allow quick replotting (unless cluster means 
 %                already exists in the STUDY).  
-%
 %   Example:
-%           >> [STUDY] = std_itcplot(STUDY,ALLEEG, 'clusters', 'all', 'mode', 'centroid');
+%           >> [STUDY] = std_itcplot(STUDY,ALLEEG, 'clusters', 'all', 'mode', 'together');
 %              % Plot the mean ITCs of all the clusters in STUDY on the same figure. 
 %
 %  See also  pop_clustedit(), pop_preclust()
@@ -59,6 +58,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2006/09/12 18:51:28  arno
+% reprogram from scratch (statistics...), backward compatible
+%
                             
 function [STUDY allitc alltimes ] = std_itcplot(STUDY, ALLEEG, varargin)
 
