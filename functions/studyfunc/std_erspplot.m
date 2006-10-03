@@ -7,31 +7,31 @@
 %                  pop_preclust(), or via the equivalent commandline functions 
 %                  eeg_createdata() and eeg_preclust(). Called by pop_clustedit().
 % Usage:    
-%        >> [STUDY] = std_erspplot(STUDY, ALLEEG, key1, val1, key2, val2);  
+%           >> [STUDY] = std_erspplot(STUDY, ALLEEG, key1, val1, key2, val2);  
 % Inputs:
 %   STUDY    - STUDY set comprising some or all of the EEG datasets in ALLEEG.
 %   ALLEEG   - global vector of EEG structures for the datasets included 
 %              in the STUDY. ALLEEG for a STUDY set is typically created 
 %              using load_ALLEEG().  
 % Optional inputs:
-%   'clusters' - [numeric vector]  -> cluster numbers to plot.
-%                            'all' -> plot all clusters in STUDY 
-%                            {default: 'all'}.
-%   'comps'    - [numeric vector]  -> cluster components to plot.
-%                            'all' -> plot all cluster components 
-%                            {default: 'all'}.
-%   'channels' - [numeric vector]  -> channels to plot. {default: all}
+%   'clusters' - [numeric vector|'all'??]  cluster numbers to plot.
+%                Else?? 'all' -> plot all clusters in STUDY 
+%                {default: 'all'}.
+%   'comps'    - [numeric vector|'all'??]  cluster components to plot.
+%                Else?? 'all' -> plot all cluster components 
+%                {default: 'all'}.
+%   'channels' - [numeric vector]  channels to plot. {default: all??}
 %   'mode'     - ['centroid'|'individual'] plotting mode. In 'centroid' 
 %                mode, the average ERSPs of the requested clusters|channels  
-%                are plotted in the same figure - one per condition. In 
-%                'individual' mode, component ERSPs for each
+%                are plotted in the same figure - one per condition ??and 
+%                group??. In 'individual' mode, component ERSPs for each
 %                cluster (or channel) are plotted in a separate 
-%                figure (per condition) with the mean ERSP. 
-%                Note that for clusters, this option is irrelevant if 
-%                comp. indices are provided as input 
+%                figure (per condition ""and group??) along with their mean 
+%                ERSP. Note that for clusters, this option is irrelevant if 
+%                component indices are provided as input (via 'comps' above) 
 %                {default: 'centroid'} 
 %   'figure'  - ['on'|'off'] 'on' -> plot on a new figure; 
-%                'off' -> plot on current figure 'figure'.
+%                'off' -> plot on current figure. 
 %                Note: 'off' is optional for one cluster in 'centroid' 
 %                mode. This is useful for incomporating a cluster ERSP 
 %                into a complex figure. In case of multiple conditions, 
@@ -39,15 +39,14 @@
 %                the figure will open a new figure with all conditions 
 %                plotted separately {default: 'on'} 
 % Output:
-%   STUDY     - the input STUDY set structure modified with plotted cluster 
-%               mean ERSPs to allow quick replotting (unless cluster means 
-%               already exist in the STUDY).  
+%   STUDY     - the input STUDY set structure with the plotted cluster 
+%               mean ERSPs added to allow quick replotting 
 % Example:
 %        >> [STUDY] = std_erspplot(STUDY,ALLEEG, 'clusters', 'all', ...
 %                                       'mode', 'centroid');
 %           % Plot the mean ERSPs of all clusters in STUDY on the same figure. 
 %
-% See also: pop_clustedit(), pop_preclust()
+% See also: pop_clustedit(), pop_preclust(), eeg_createdata(), eeg_preclust(), pop_clustedit()
 %
 % Authors: Arnaud Delorme, CERCO, August, 2006
 
@@ -68,6 +67,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2006/10/02 22:29:21  scott
+% minor help edits
+%
 % Revision 1.26  2006/09/12 18:52:01  arno
 % reprogram from scratch (statistics...), backward compatible
 %
@@ -151,8 +153,8 @@ for index = 1:length(allinds)
     end;
 
     if index == length(allinds), opt.legend = 'on'; end;
-    [pgroup pcond pinter] = std_plot({ allfreqs alltimes }, allersp, 'condname', STUDY.condition, 'subject', opt.subject, 'legend', opt.legend, ...
-                                      'datatype', opt.datatype,'plotmode', opt.plotmode, 'groupname', STUDY.group, 'plotx', opt.plottf, 'unitx', 'Hz', ...
+    [pgroup pcond pinter] = std_plot({ allfreqs alltimes }, allersp, 'condnames', STUDY.condition, 'subject', opt.subject, 'legend', opt.legend, ...
+                                      'datatype', opt.datatype,'plotmode', opt.plotmode, 'groupnames', STUDY.group, 'topovals', opt.plottf, 'unitx', 'Hz', ...
                                       'chanlocs', ALLEEG(1).chanlocs, 'plotsubjects', opt.plotsubjects, plotcurveopt{:});
     if length(allinds) > 1, 
         if isempty(opt.channels), title(sprintf('Cluster %d', allinds(index))); 
