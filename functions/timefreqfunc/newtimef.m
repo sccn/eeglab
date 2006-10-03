@@ -270,6 +270,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.99  2006/10/02 20:52:31  toby
+% *** empty log message ***
+%
 % Revision 1.98  2006/10/02 20:43:29  toby
 % newtimefr call debugging
 %
@@ -742,7 +745,7 @@
 % 03-16-02 timeout automatically adjusted if too high -ad
 % 04-02-02 added 'coher' option -ad
 
-function [P,R,mbase,timesout,freqs,Pboot,Rboot,alltfX,PA] = timef( data, frame, tlimits, Fs, varwin, varargin);
+function [P,R,mbase,timesout,freqs,Pboot,Rboot,alltfX,PA] = newtimef( data, frame, tlimits, Fs, varwin, varargin);
 
 
 % Note: Above, PA is output of 'phsamp','on'
@@ -846,6 +849,7 @@ elseif (varwin < 0)
     error('Value of cycles must be zero or positive.');
 end
 
+%{
 % build a structure for keyword arguments
 % --------------------------------------
 if ~isempty(varargin)
@@ -854,7 +858,7 @@ if ~isempty(varargin)
     try, g = struct(varargin{:});
     catch, error('Argument error in the {''param'', value} sequence'); end;
 end
-
+%}
 g = finputcheck(varargin, ...
     {'boottype'      'string'    {'shuffle','rand','randall'}    'shuffle'; ...
     'condboot'      'string'    {'abs','angle','complex'}       'abs'; ...
@@ -898,7 +902,7 @@ g = finputcheck(varargin, ...
     'plottype'      'string'    {'image','curve'}   'image'; ...
     'plotmean'      'string'    {'on','off'}    'on'; ...
     'highlightmode' 'string'    {'background','bottom'}     'background'; ...
-    'chaninfo'      'struct'    []              []; ...
+    'chaninfo'      'struct'    []              struct([]); ...
     'erspmarglim'   'real'      []              []; ...
     'itcavglim'     'real'      []              []; ...
     'erplim'        'real'      []              []; ...
@@ -909,8 +913,8 @@ g = finputcheck(varargin, ...
     'timeStretchRefs'   'real'  []              []; ...
     'timeStretchPlot'   'real'  []              []; ...
     'hzdir'         'string'    {'up','down','normal','reverse'}   HZDIR; ...
-    'wletmethod'    'string'   {'dftfilt2' 'dftfilt2_rey'}    'dftfilt2_rey'; ...
-    'cycleinc'      'string'   {'linear' 'log'}         'linear'
+    'wletmethod'    'string'   {'dftfilt2' 'dftfilt2_rey'}  'dftfilt2_rey'; ...
+    'cycleinc'      'string'   {'linear' 'log'}             'linear'
     });
 
 g.tlimits = tlimits;
@@ -925,50 +929,54 @@ g.ITC_CAXIS_LIMIT  = ITC_CAXIS_LIMIT;
 % unpack 'timewarp' and 'timewarpfr' arguments
 %---------------------------------------------
 
-if isfield(g.timewarpfr) && iscell(g.timewarpfr) && length(g.timewarpfr) > 3
-    error('''timewarpfr'' cell array may have at most 3 elements');
-end
+if isfield(g,'timewarpfr')
 
-if ~isempty(g.timewarp) % convert timewarp ms to timewarpfr frames -sm
-    fprintf('\n')
-    if iscell(g.timewarp)
-        evntms = g.timewarp{1};
-    else
-        evntms = g.timewarp;
+    if iscell(g.timewarpfr) & length(g.timewarpfr) > 3
+        error('''timewarpfr'' cell array may have at most 3 elements');
     end
-    warpfr = round((evntms - g.tlimits(1))/1000*g.srate)+1;
-    g.timewarpfr{1} = warpfr';
-    if iscell(g.timewarp)
-        if length(g.timewarp) > 1
-            refms = g.timewarp{2};
-            reffr = round((refms - g.tlimits(1))/1000*g.srate)+1;
-            g.timewarpfr{2} = reffr';
-        end
-        if length(g.timewarp) > 2
-            g.timewarpfr{3} = timewarp{3};
-        end
-    end
-end
 
-if ~isempty(g.timewarpfr)
-    g.timeStretchMarks = g.timewarpfr{1};
-    if length(g.timewarpfr) > 1
-        g.timeStretchRefs = g.timewarpfr{2};
-    end
-    if length(g.timewarpfr) > 2
-        g.timeStretchPlot = g.timewarpfr{3};
-    else
-        stretchevents = size(g.timeStretchMarks,1);
-        g.timeStretchPlot = [1:stretchevents]; % default to plotting all lines
-    end
-    if max(max(g.timeStretchMarks)) > frame-1 | min(min(g.timeStretchMarks)) < 2
-        error('Time warping events must be inside the epochs.');
-    end
-    if ~isempty(g.timeStretchRefs)
-        if max(g.timeStretchRefs) > frame-1 | min(g.timeStretchRefs) < 2
-            error('Time warping references must be inside the epochs.');
+    if ~isempty(g.timewarp) % convert timewarp ms to timewarpfr frames -sm
+        fprintf('\n')
+        if iscell(g.timewarp)
+            evntms = g.timewarp{1};
+        else
+            evntms = g.timewarp;
+        end
+        warpfr = round((evntms - g.tlimits(1))/1000*g.srate)+1;
+        g.timewarpfr{1} = warpfr';
+        if iscell(g.timewarp)
+            if length(g.timewarp) > 1
+                refms = g.timewarp{2};
+                reffr = round((refms - g.tlimits(1))/1000*g.srate)+1;
+                g.timewarpfr{2} = reffr';
+            end
+            if length(g.timewarp) > 2
+                g.timewarpfr{3} = timewarp{3};
+            end
         end
     end
+
+    if ~isempty(g.timewarpfr)
+        g.timeStretchMarks = g.timewarpfr{1};
+        if length(g.timewarpfr) > 1
+            g.timeStretchRefs = g.timewarpfr{2};
+        end
+        if length(g.timewarpfr) > 2
+            g.timeStretchPlot = g.timewarpfr{3};
+        else
+            stretchevents = size(g.timeStretchMarks,1);
+            g.timeStretchPlot = [1:stretchevents]; % default to plotting all lines
+        end
+        if max(max(g.timeStretchMarks)) > frame-1 | min(min(g.timeStretchMarks)) < 2
+            error('Time warping events must be inside the epochs.');
+        end
+        if ~isempty(g.timeStretchRefs)
+            if max(g.timeStretchRefs) > frame-1 | min(g.timeStretchRefs) < 2
+                error('Time warping references must be inside the epochs.');
+            end
+        end
+    end
+
 end
 
 % test argument consistency
@@ -1230,7 +1238,8 @@ if iscell(data)
         % --------------------------------
         alltfX1power = alltfX1.*conj(alltfX1);
         alltfX2power = alltfX2.*conj(alltfX2);
-        formula = {'log10(mean(arg1(:,:,data),3))'};
+        formula = {'log10(mean(arg1,3))'};              % toby 10.02.2006
+        %formula = {'log10(mean(arg1(:,:,data),3))'};
         switch g.type
             case 'coher', % take the square of alltfx and alltfy first to speed up
                 formula = { formula{1} ['sum(arg2(:,:,data),3)./sqrt(sum(arg1(:,:,data),3)*length(data) )'] };
@@ -1270,7 +1279,8 @@ if iscell(data)
                         { alltfX1power alltfX2power }, {alltfX1 alltfX2}, { alltfX1abs alltfX2abs });
                 end;
             case 'phasecoher',
-                formula = { formula{1} ['mean(arg2(:,:,data),3)'] };
+                formula = { formula{1} ['mean(arg2,3)'] };              % toby 10.02.2006
+                %formula = { formula{1} ['mean(arg2(:,:,data),3)'] };
                 if strcmpi(g.lowmem, 'on')
                     for ind = 1:2:size(alltfX1,1)
                         if ind == size(alltfX1,1), indarr = ind; else indarr = [ind:ind+1]; end;
@@ -1555,7 +1565,7 @@ switch lower(g.plotersp)
             else
                 PP(find((PP > repmat(Pboot(:,1),[1 length(times)])) ...
                     & (PP < repmat(Pboot(:,2),[1 length(times)])))) = 0;
-            end;
+            end
         end
 
         if isempty(g.erspmax)
@@ -1566,14 +1576,17 @@ switch lower(g.plotersp)
             end
         elseif length(g.erspmax) == 1
             g.erspmax = [ -g.erspmax g.erspmax];
-        end;
+        end
+        if max(g.erspmax) == 0,     % toby 10.02.2006
+            g.erspmax = [-1 1]; 
+        end
 
         if ~strcmpi(g.freqscale, 'log')
             if ~isnan( g.baseline )
                 imagesc(times,freqs,PP(:,:),g.erspmax);
             else
                 imagesc(times,freqs,PP(:,:));
-            end;
+            end
         else
             if ~isnan( g.baseline )
                 imagesclogy(times,freqs,PP(:,:),g.erspmax);
@@ -1737,6 +1750,9 @@ switch lower(g.plotitc)
             g.itcmax = [-180 180];
             setylim = 0;
         else
+            if max(coh_caxis) == 0,              % toby 10.02.2006
+                coh_caxis = [-1 1];
+            end
             if ~strcmpi(g.freqscale, 'log')
                 if exist('Rsign') & strcmp(g.plotphasesign, 'on')
                     imagesc(times,freqs,Rsign(:,:).*RR(:,:),coh_caxis); % <---
@@ -1830,7 +1846,10 @@ switch lower(g.plotitc)
                 g.itcavglim = [ min(E)-max(E)/3 max(E)+max(E)/3];
             end;
         end;
-
+        if max(g.itcavglim) == 0        % toby 10.02.2006
+            g.itcavglim = [-1 1];
+        end
+        
         % plot marginal ITC
         if ~strcmpi(g.freqscale, 'log')
             plot(freqs,E,'LineWidth',g.linewidth); hold on;
@@ -1838,7 +1857,7 @@ switch lower(g.plotitc)
                 plot(freqs,Rboot,'g', 'LineWidth',g.linewidth)
                 plot(freqs,Rboot,'k:','LineWidth',g.linewidth)
             end
-            if freqs(1) ~= freqs(end), xlim([freqs(1) freqs(end)]); end;
+            if freqs(1) ~= freqs(end), xlim([freqs(1) freqs(end)]); end
             ylim(g.itcavglim)
         else
             semilogx(freqs,E,'LineWidth',g.linewidth); hold on;
