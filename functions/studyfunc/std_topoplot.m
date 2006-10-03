@@ -1,43 +1,42 @@
-% std_topoplot() - Commandline function to plot cluster component and mean scalp maps. 
+% std_topoplot() - Command line function to plot cluster component and mean scalp maps. 
 %                  Displays either mean cluster/s scalp map/s, or all cluster/s components
-%                   scalp maps with the mean cluster/s scsalp map in one figure.
-%                   The scalp maps can be visualized only if component scalp maps     
-%                   were calculated and saved in the EEG datasets in the STUDY.
-%                   These can be computed during pre-clustering using the GUI-based function
-%                   pop_preclust() or the equivalent commandline functions eeg_createdata() 
-%                   and eeg_preclust(). A pop-function that calls this function is pop_clustedit().
+%                  scalp maps with the mean cluster/s scsalp map in one figure.
+%                  The scalp maps can be visualized only if component scalp maps     
+%                  were calculated and saved in the EEG datasets in the STUDY.
+%                  These can be computed during pre-clustering using the GUI-based function
+%                  pop_preclust() or the equivalent commandline functions eeg_createdata() 
+%                  and eeg_preclust(). A pop-function that calls this function is 
+%                  pop_clustedit().
 % Usage:    
-%                   >> [STUDY] = std_topoplot(STUDY, ALLEEG, key1, val1, key2, val2);  
+%              >> [STUDY] = std_topoplot(STUDY, ALLEEG, key1, val1, key2, val2);  
 % Inputs:
 %   STUDY      - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
-%   ALLEEG     - global EEGLAB vector of EEG structures for the dataset(s) included in the STUDY. 
-%                     ALLEEG for a STUDY set is typically created using load_ALLEEG().  
-%
+%   ALLEEG     - global EEGLAB vector of EEG structures for the dataset(s) included in 
+%                the STUDY. ALLEEG for a STUDY set is typically created using load_ALLEEG().
 % Optional inputs:
-%   'clusters'   - [numeric vector]  -> specific cluster numbers to plot.
-%                       'all'        -> plot all clusters in STUDY.
-%                       {default: 'all'}.
-%   'comps'      - [numeric vector]  -> indices of the cluster components to plot.
-%                       'all'        -> plot all the components in the cluster {default: 'all'}.
-%   'mode'       - ['centroid'|'comps'] a plotting mode. In 'centroid' mode, the average ERSPs 
-%                     of the requested clusters are plotted in the same figure - one per condition. 
-%                     In 'comps' mode, component scalp map for each cluster are plotted in a
-%                     separate figure (per condition) with the cluster mean map.
-%                     {default: 'centroid'}. Note that this option is irrelevant if component
-%                     indices are provided as input.
-%   'figure'       - ['on'|'off'] for the 'centroid' mode option, plots on
-%                     a new figure ('on')  or plots on current figure ('off').
-%                     {default: 'on'}.
-%
-%
+%   'clusters'   - [numeric vector| 'all']  -> specific cluster numbers to plot.
+%                  'all' -> plot all clusters in STUDY.
+%                  {default: 'all'}.
+%   'comps'      - [numeric vector | 'all']  -> indices of the cluster components to plot.
+%                  'all' -> plot all the components in the cluster 
+%                  {default: 'all'}.
+%   'mode'       - ['together'|'apart'] a plotting mode. In 'together' mode, the average 
+%                  scalp maps of the requested clusters are plotted in the same figure,
+%                  one per condition.  In 'apart' mode, component scalp maps for each 
+%                  cluster are plotted in a separate figure for each condition, plus the 
+%                  cluster mean map. Note that this option is irrelevant if component 
+%                  indices ('comps' above) are provided.{default: 'apart'}. 
+%   'figure'     - ['on'|'off'] for the 'together' mode option, plots on
+%                  a new figure ('on'),  or on the current figure ('off').
+%                  {default: 'on'}.
 % Outputs:
-%   STUDY    - the input STUDY set structure modified with plotted cluster scalp
-%                     map means, to allow quick replotting (unless clusters meands 
-%                     already exists in th STUDY).  
+%   STUDY        - the input STUDY set structure modified with plotted cluster scalp
+%                  map means, to allow quick replotting (unless clusters meands 
+%                  already exists in th STUDY).  
 %
 %   Example:
-%                         >> [STUDY] = std_topoplot(STUDY,ALLEEG, 'clusters', [1:20], 'mode', 'centroid');
-%                    Plots the mean scalp maps of cluster 1 to 20 on the same figure. 
+%              % Plot the mean scalp maps for clusters 1 through 20 on the same figure. 
+%           >> [STUDY] = std_topoplot(STUDY,ALLEEG, 'clusters', [1:20], 'mode', 'together');
 %
 %  See also  pop_clustedit(), pop_preclust()
 %
@@ -89,9 +88,9 @@ for k = 3:2:nargin
         case 'comps'
             STUDY = std_plotcompmap(STUDY, ALLEEG,  cls, varargin{k-1});
             return;
-        case 'mode' % Plotting mode 'centroid' / 'comps'
+        case 'mode' % Plotting mode 'together' / 'apart'
             mode = varargin{k-1};
-         case 'figure'
+        case 'figure'
             if strcmpi(varargin{k-1},'off')
                 figureon = 0;
             end
@@ -266,9 +265,9 @@ end
 if isempty(cls)
    error('std_plotcompmap: you must provide a cluster numberas an input.');
 end
-if nargin == 3 % no components indices were given
-    % Default plot all components of the cluster
-    [STUDY] = std_topoplot(STUDY, ALLEEG, 'clusters', cls, 'mode', 'comps');
+if nargin == 3 % no component indices were given
+    % Default: plot all components of the cluster
+    [STUDY] = std_topoplot(STUDY, ALLEEG, 'clusters', cls, 'mode', 'apart');
     return
 else
     comp_ind = varargin{1}; 
