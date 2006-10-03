@@ -9,13 +9,15 @@
 %          array giving { latencies_in_ms frequencies_in_hz }
 %  data  - [cell array] mean data for each subject group and/or data
 %          condition. For example, to plot mean ERPs from a STUDY 
-%          comprising two data conditions and three subject groups: 
-%             data = { [800x12] [800x12] [800x12];
-%                      [800x12] [800x12] [800x12] };
-%          for 800 timepoints and 12 subjects. Statistics
-%          are run across subjects; only the averages are plotted. 
-%          See below and statcond() for more information about the 
-%          statistical computations.
+%          for epochs of 800 frames in two conditions from three groups 
+%          of 12 subjects:
+%          >> data = { [800x12] [800x12] [800x12];... % 3 groups, cond 1
+%                      [800x12] [800x12] [800x12] };  % 3 groups, cond 2
+%          >> std_plot(erp_ms,data);
+%          By default, parametric statistics are computed across subjects 
+%          in the three groups. (group,condition) ERP averages are plotted. 
+%          See below and >> help statcond 
+%          for more information about the statistical computations.
 %
 % Optional display parameters:
 %  'datatype'    - ['ersp'|'itc'|'erp'|'spec'] data type {default: 'erp'}
@@ -27,36 +29,36 @@
 %  'subject'     - [string] plot subject name (for title)
 %
 % Statistics options:
-%  'statgroup'     'string' { 'on' 'off' }   'off';
-%  'statgroup'   - ['on'|'off'] Compute (or not) statistics across groups.
-%                  Default is 'off'.
-%  'statcond'    - ['on'|'off'] Compute (or not) statistics across groups.
-%                  Default is 'off'.
+%  'groupstats'  - ['on'|'off'] Compute (or not) statistics across groups.
+%                  {default: 'off'}
+%  'condstats'   - ['on'|'off'] Compute (or not) statistics across groups.
+%                  {default: 'off'}
 %  'statistics'  - ['param'|'perm'] Type of statistics to use 'param' for
-%                  parametric and 'perm' for permutations. Default is
-%                  'param'.
-%  'naccu'       - [integer] Number of accumulation when computing 
-%                  permutation statistics. For instance if you want to see
-%                  if p<0.01 use 200. For p<0.001, use 2000. If a threshold
-%                  is set below (non NaN) and 'naccu' is too low, it will
-%                  be automatically updated. This keyword?? is available 
-%                  only from the command line.
-%  'statmode'    - ['individual'|'trials'] standard statistics are 
-%                  'individual' where the statistics is performed accross
-%                  the mean ERSP (or ITC) of single subjects. For trials
-%                  statistics, the single trial 'ERSP' of all subjects
+%                  parametric and 'perm' for permutations. 
+%                  {default: 'param'}
+%  'naccu'       - [integer] Number of surrogate averges fo accumulate when 
+%                  computing permutation-based statistics. For example, to
+%                  test p<0.01 use naccu>=200; for p<0.001, use naccu>=2000. 
+%                  If a non-NaN 'threshold' is set (see below) and 'naccu' 
+%                  is too low, it will be automatically increased. This keyword 
+%                  is available only from the command line. {default: ??}
+%  'statmode'    - ['subjects'|'trials'] standard statistics are 
+%                  'subjects' where the statistics is performed accross
+%                  the mean ERSP (or ITC) of single subjects. For 'trials'
+%                  statistics, the single-trial data epochs of all subjects
 %                  are pooled together. This requires that they were
-%                  saved on disk (options 'savetrials', 'on' at the time
-%                  of computation). Note that these single trial ERSP
-%                  use several Gb of disk space and that computation of
-%                  statistics requires a lot of RAM.
-%  'threshold'   - [NaN|0.0x] Significance threshold. NaN will plot the 
-%                  p-value itself on a different panel. When possible, the
-%                  significance time regions are indicated below the data
-%                  on the same plot.
-%  'maskdata'    - ['on'|'off'] when threshold is non-nan and not both 
+%                  saved on disk using option 'savetrials', 'on' at the time
+%                  of computation. Note that these single-trial data
+%                  may use several GB of disk space and that computation 
+%                  of 'trials' statistics requires a lot of RAM.
+%  'threshold'   - [NaN|0.0x] Significance threshold. NaN -> plot the 
+%                  p-values themselves on a different figure. When possible, 
+%                  significance regions are indicated below the data.
+%                  {default: ??}
+%  'maskdata'    - ['on'|'off'] when threshold is non-NaN and not both 
 %                  condition and group statistics are computed, the user 
 %                  has the option to mask the data for significance.
+%                  {defualt: ??}
 %
 % Curve plotting options (ERP and spectrum):
 %  'plotgroups'  - ['together'|'apart'] 'together' -> plot mean results 
@@ -98,6 +100,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2006/10/03 16:29:27  scott
+% edit
+%
 % Revision 1.4  2006/10/03 16:24:12  scott
 % help message eidts.  ARNO - SEE ??s   -sm
 %
@@ -144,8 +149,8 @@ opt = finputcheck( varargin, { 'channels'    'cell'   []              {};
                                'subject'     'string' []              '';   % just for titles
                                'chanlocs'    'struct' []              struct('labels', {});
                                'plotsubjects' 'string' { 'on' 'off' }  'off';
-                               'statgroup'   'string' { 'on' 'off' }   'off';
-                               'statcond'    'string' { 'on' 'off' }   'off';
+                               'groupstats'   'string' { 'on' 'off' }   'off';
+                               'condstats'    'string' { 'on' 'off' }   'off';
                                'maskdata'    'string' { 'on' 'off' }   'off';
                                'legend'      'string' { 'on' 'off' }   'off';
                                'timerange'   'real'   []               [];
@@ -154,7 +159,7 @@ opt = finputcheck( varargin, { 'channels'    'cell'   []              {};
                                'plotconditions'    'string' { 'together' 'apart' }  'apart';
                                'plotmode'    'string' { 'normal' 'condensed' }  'normal';
                                'statistics'  'string' { 'param' 'perm' }       'param';
-                               'statmode'    'string' { 'individual' 'common' 'trials' } 'individual'}, 'std_erpmaskdata');
+                               'statmode'    'string' { 'subjects' 'common' 'trials' } 'subjects'}, 'std_erpmaskdata');
                            
 if isstr(opt), error(opt); end;
 if strcmpi(datatype, 'spec'), g.unit = 'Hz'; end;
@@ -211,12 +216,12 @@ end;
 
 % plotting paramters
 % ------------------
-if ng > 1 & strcmpi(opt.statgroup, 'on'), addc = 1; else addc = 0; end;
-if nc > 1 & strcmpi(opt.statcond , 'on'), addr = 1; else addr = 0; end;
+if ng > 1 & strcmpi(opt.groupstats, 'on'), addc = 1; else addc = 0; end;
+if nc > 1 & strcmpi(opt.condstats , 'on'), addr = 1; else addr = 0; end;
 if isempty(opt.plottopo) % only for curves
     plottag = 0;
-    if strcmpi(opt.plotgroups, 'together') & strcmpi(opt.statcond, 'off') & strcmpi(opt.statgroup, 'on' ) & ~isnan(opt.threshold), addc = 0; plottag = 1; end;
-    if strcmpi(opt.plotconditions , 'together') & strcmpi(opt.statcond, 'on' ) & strcmpi(opt.statgroup, 'off') & ~isnan(opt.threshold), addr = 0; plottag = 1; end;
+    if strcmpi(opt.plotgroups, 'together') & strcmpi(opt.condstats, 'off') & strcmpi(opt.groupstats, 'on' ) & ~isnan(opt.threshold), addc = 0; plottag = 1; end;
+    if strcmpi(opt.plotconditions , 'together') & strcmpi(opt.condstats, 'on' ) & strcmpi(opt.groupstats, 'off') & ~isnan(opt.threshold), addr = 0; plottag = 1; end;
     if ~isnan(opt.threshold) & plottag == 0
         disp('Warning: cannot plot condition/group on the same panel while using a fixed');
         disp('         threshold, unless you only compute statistics for ether groups or conditions');
@@ -239,24 +244,24 @@ end;
 
 % compute significance mask
 % --------------------------
-if strcmpi(opt.statcond, 'on') & nc > 1
+if strcmpi(opt.condstats, 'on') & nc > 1
     for g = 1:ng
-        [F df pval] = statcond(data(:,g), 'mode', opt.statistics, 'naccu', opt.naccu); 
+        [F df pval] = condstats(data(:,g), 'mode', opt.statistics, 'naccu', opt.naccu); 
         pcond{g} = squeeze(pval);
     end;
 else
     pcond = {};
 end;
-if strcmpi(opt.statgroup, 'on') & ng > 1
+if strcmpi(opt.groupstats, 'on') & ng > 1
     for c = 1:nc
-        [F df pval] = statcond(data(c,:), 'mode', opt.statistics, 'naccu', opt.naccu); 
+        [F df pval] = condstats(data(c,:), 'mode', opt.statistics, 'naccu', opt.naccu); 
         pgroup{c} = squeeze(pval);
     end;
 else
     pgroup = {};
 end;
-if ( strcmpi(opt.statgroup, 'on') | strcmpi(opt.statcond, 'on') ) & ng > 1 & nc > 1
-    [F df pval] = statcond(data, 'mode', opt.statistics, 'naccu', opt.naccu);
+if ( strcmpi(opt.groupstats, 'on') | strcmpi(opt.condstats, 'on') ) & ng > 1 & nc > 1
+    [F df pval] = condstats(data, 'mode', opt.statistics, 'naccu', opt.naccu);
     pinter      = squeeze(pval{3});
 else
     pinter = [];
@@ -332,8 +337,8 @@ if isempty(opt.plottopo) & ( strcmpi(opt.datatype, 'erp') | strcmpi(opt.datatype
 
             % statistics accross groups
             % -------------------------
-            if g == ng & ng > 1 & strcmpi(opt.statgroup, 'on')
-                if strcmpi(opt.plotgroups, 'together') & strcmpi(opt.statcond, 'off') & ~isnan(opt.threshold)
+            if g == ng & ng > 1 & strcmpi(opt.groupstats, 'on')
+                if strcmpi(opt.plotgroups, 'together') & strcmpi(opt.condstats, 'off') & ~isnan(opt.threshold)
                      plotcurve(allx, zeros(size(allx)), 'maskarray', mean(pgroupplot{c},2), 'highlightmode', 'bottom');
                 else
                     if strcmpi(opt.plotgroups, 'together'),    mysubplot(ncplot+addr, ngplot+addc, 2 + (c-1)*(ngplot+addc), opt.transpose); ci = g;
@@ -357,8 +362,8 @@ if isempty(opt.plottopo) & ( strcmpi(opt.datatype, 'erp') | strcmpi(opt.datatype
     for g = 1:ng
         % statistics accross conditions
         % -----------------------------
-        if strcmpi(opt.statcond, 'on') & nc > 1
-            if strcmpi(opt.plotconditions, 'together') & strcmpi(opt.statgroup, 'off') & ~isnan(opt.threshold)
+        if strcmpi(opt.condstats, 'on') & nc > 1
+            if strcmpi(opt.plotconditions, 'together') & strcmpi(opt.groupstats, 'off') & ~isnan(opt.threshold)
                  axes(hdl(c,g));
                  plotcurve(allx, zeros(size(allx)), 'maskarray', mean(pcondplot{g},2), 'highlightmode', 'bottom');
                  title(opt.groupnames{g}); 
@@ -405,7 +410,7 @@ if isempty(opt.plottopo) & ( strcmpi(opt.datatype, 'erp') | strcmpi(opt.datatype
 
     % statistics accross group and conditions
     % ---------------------------------------
-    if strcmpi(opt.statgroup, 'on') & strcmpi(opt.statcond, 'on') & ng > 1 & nc > 1
+    if strcmpi(opt.groupstats, 'on') & strcmpi(opt.condstats, 'on') & ng > 1 & nc > 1
         mysubplot(ncplot+addr, ngplot+addc, ngplot + 1 + ncplot*(ngplot+addr), opt.transpose);
         if ~isnan(opt.threshold)
              plotcurve(allx, zeros(size(allx)), 'maskarray', mean(pinterplot,2));
@@ -423,7 +428,7 @@ elseif isempty(opt.plottopo)
     % -------------------------------
     statmask = 0;
     if strcmpi(opt.maskdata, 'on') & ~isnan(opt.threshold) & ...
-            (strcmpi(opt.statcond, 'off') | strcmpi(opt.statcond, 'on'))
+            (strcmpi(opt.condstats, 'off') | strcmpi(opt.condstats, 'on'))
         addc = 0; addr = 0; statmask = 1;
     end;
         
@@ -440,7 +445,7 @@ elseif isempty(opt.plottopo)
             fig_title = [ opt.condnames{c} ', ' opt.groupnames{g} ];
             tmpplot = mean(data{c,g},3);
             if statmask, 
-                if strcmpi(opt.statcond, 'on'), tmpplot(find(pcondplot{g}(:) == 0)) = 0;
+                if strcmpi(opt.condstats, 'on'), tmpplot(find(pcondplot{g}(:) == 0)) = 0;
                 else                            tmpplot(find(pgroupplot{c}(:) == 0)) = 0;
                 end;
             end;
@@ -453,7 +458,7 @@ elseif isempty(opt.plottopo)
 
             % statistics accross groups
             % -------------------------
-            if g == ng && ng > 1 & strcmpi(opt.statgroup, 'on') & ~statmask
+            if g == ng && ng > 1 & strcmpi(opt.groupstats, 'on') & ~statmask
                 hdl(c,g+1) = mysubplot(nc+addr, ng+addc, g + 1 + (c-1)*(ng+addc), opt.transpose);
                 if isnan(opt.threshold), tmp_title = sprintf('%s (p-value)', opt.condnames{c});
                 else                     tmp_title = sprintf('%s (p<%.4f)',  opt.condnames{c}, opt.threshold);
@@ -468,7 +473,7 @@ elseif isempty(opt.plottopo)
     for g = 1:ng
         % statistics accross conditions
         % -----------------------------
-        if strcmpi(opt.statcond, 'on') & ~statmask && nc > 1
+        if strcmpi(opt.condstats, 'on') & ~statmask && nc > 1
             hdl(nc+1,g) = mysubplot(nc+addr, ng+addc, g + c*(ng+addc), opt.transpose);
             if isnan(opt.threshold), tmp_title = sprintf('%s (p-value)', opt.groupnames{g});
             else                     tmp_title = sprintf('%s (p<%.4f)',  opt.groupnames{g}, opt.threshold);
@@ -492,7 +497,7 @@ elseif isempty(opt.plottopo)
     
     % statistics accross group and conditions
     % ---------------------------------------
-    if strcmpi(opt.statgroup, 'on') & strcmpi(opt.statcond, 'on') && ng > 1 && nc > 1
+    if strcmpi(opt.groupstats, 'on') & strcmpi(opt.condstats, 'on') && ng > 1 && nc > 1
         hdl(nc+1,ng+1) = mysubplot(nc+addr, ng+addc, g + 1 + c*(ng+addr), opt.transpose);
         if isnan(opt.threshold), tmp_title = 'Interaction (p-value)';
         else                     tmp_title = sprintf('Interaction (p<%.4f)', opt.threshold);
@@ -533,7 +538,7 @@ else
 
             % statistics accross groups
             % -------------------------
-            if g == ng & ng > 1 & strcmpi(opt.statgroup, 'on')
+            if g == ng & ng > 1 & strcmpi(opt.groupstats, 'on')
                 hdl(c,g+1) = mysubplot(nc+addr, ng+addc, g + 1 + (c-1)*(ng+addc), opt.transpose);
                 topoplot( pgroupplot{c}, opt.chanlocs);
                 if isnan(opt.threshold), title(sprintf('%s (p-value)', opt.condnames{c}));
@@ -558,7 +563,7 @@ else
     for g = 1:ng
         % statistics accross conditions
         % -----------------------------
-        if strcmpi(opt.statcond, 'on') & nc > 1
+        if strcmpi(opt.condstats, 'on') & nc > 1
             hdl(nc+1,g) = mysubplot(nc+addr, ng+addc, g + c*(ng+addc), opt.transpose);
             topoplot( pcondplot{g}, opt.chanlocs);
             if isnan(opt.threshold), title(sprintf('%s (p-value)', opt.groupnames{g}));
@@ -570,7 +575,7 @@ else
 
     % statistics accross group and conditions
     % ---------------------------------------
-    if strcmpi(opt.statgroup, 'on') & strcmpi(opt.statcond, 'on') & ng > 1 & nc > 1
+    if strcmpi(opt.groupstats, 'on') & strcmpi(opt.condstats, 'on') & ng > 1 & nc > 1
         hdl(nc+1,ng+1) = mysubplot(nc+addr, ng+addc, g + 1 + c*(ng+addr), opt.transpose);
         topoplot( pinterplot, opt.chanlocs);
         if isnan(opt.threshold), title('Interaction (p-value)');
