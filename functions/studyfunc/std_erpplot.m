@@ -1,6 +1,6 @@
-% std_erpplot() - Commandline function to plot STUDY cluster component ERPs. Either 
-%                 displays mean ERP of all requested clusters in the same figure, with 
-%                 ERPs for different conditions (if any) plotted in different colors. 
+% std_erpplot() - Command line function to plot STUDY cluster component ERPs. Either 
+%                 displays grand mean ERPs for all requested clusters in the same figure, 
+%                 with ERPs for different conditions (if any) plotted in different colors. 
 %                 Else, displays ERP for each specified cluster in separate figures 
 %                 (per condition), each containing the cluster component ERPs plus 
 %                 the grand mean cluster ERP (in bold). ERPs can be plotted only if 
@@ -71,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2006/10/03 18:25:34  scott
+% help msg edits ARNO - SEE ??  -sm
+%
 % Revision 1.25  2006/10/02 20:26:18  scott
 % plotcond -> plotconditions
 %
@@ -100,7 +103,7 @@ opt = finputcheck( varargin, { 'channels'    'cell'    []              {};
                                'plotmode'    'string' { 'normal' 'condensed' }  'normal';
                                'plotsubjects' 'string' { 'on' 'off' }  'off';
                                'subject'     'string'  []              '';
-                               'statmode'    'string'  { 'individual' 'common' 'trials' } 'individual'}, 'std_erpplot');
+                               'statmode'    'string'  { 'subjects' 'common' 'trials' } 'subjects'}, 'std_erpplot');
 if isstr(opt), error(opt); end;
 
 % for backward compatibility
@@ -110,17 +113,17 @@ if ~isempty(opt.comps),
     opt.subject = STUDY.datasetinfo( STUDY.cluster(opt.clusters).sets(1,opt.comps)).subject;
 end;
 
-if ~isempty(opt.subject), statgroup = 'off'; disp('No group statistics for single subject');
-else                      statgroup = STUDY.etc.erpparams.statgroup;
+if ~isempty(opt.subject), groupstats = 'off'; disp('No group statistics for single subject');
+else                      groupstats = STUDY.etc.erpparams.groupstats;
 end;
-if ~isempty(opt.subject), statcond = 'off'; disp('No condition statistics for single subject');
-else                      statcond = STUDY.etc.erpparams.statcond;
+if ~isempty(opt.subject), condstats = 'off'; disp('No condition statistics for single subject');
+else                      condstats = STUDY.etc.erpparams.condstats;
 end;
 plotcurveopt = { ...
    'ylim',       STUDY.etc.erpparams.ylim, ...
    'threshold',  STUDY.etc.erpparams.threshold, ...
-   'statgroup',  statgroup, ...
-   'statcond',   statcond, ...
+   'groupstats',  groupstats, ...
+   'condstats',   condstats, ...
    'plotgroups',  STUDY.etc.erpparams.plotgroups, ...
    'plotconditions',   STUDY.etc.erpparams.plotconditions, ...
    'statistics', STUDY.etc.erpparams.statistics };
