@@ -1,86 +1,97 @@
-% std_ersp() - Computes ERSP and/or ITC information for data channels or ICA components
-%              of a dataset, saves results into Matlab files. When the ERSP/ITC float 
-%               files already exist, the function loads the ERSP/ITC information from it,  
-%              unless the requested flag specifies differently: If so, a query window 
-%              pops up. 
+% std_ersp() - Compute ERSP and/or ITC transforms for ICA components 
+%              or data channels of a dataset. Save results into Matlab 
+%              float files. When these output files already exist, loads 
+%              the ERSP/ITC information from them unless the requested 
+%              flag '??' specifies differently. If so, a query window 
+%              pops up??.
+%              Also updates the EEG structure in the calling % Matlab 
+%              environment?? and saves the modified dataset to disk??
 %
 % Function description:
-%              The function returns the masked (as per the requested alpha) ERSP or ITC
-%              for the selected data channels or ICA components in the
-%              requested frequency range and time window (the two are dependent). 
-%              Frequencies are equally log spaced.
+%              The function returns the masked (as per the requested alpha) 
+%              mean ERSP or ITC for the selected dataset ICA components or 
+%              data channels in the requested frequency range and time window 
+%              (the two are dependent). Frequencies are equally log spaced.
+%              Options specify component numbers, desired frequency range, 
+%              time window length, frequency resolution, significance level, 
+%              and wavelet cycles. See >> help newtimef?? and >> timef details 
 %
-%              Re options to specify component numbers, the desired frequency range, 
-%              timewindow, resolution, confidence level and the wavelet parameters 
-%              (number of cycles): see >> help timef and >> timef details 
-%
-%              Two Matlab files are saved, one for ERSP and one for ITC information.
-%              These contain the unprocessed ERSP|ITC image and its significant levels.
-%              (See filename info below).
-%
-%              If the ERSPs/ITCs were previously saved in these files and the same set of
-%              ERSP/ITC parameters are used, the values are not recomputed.
-%              Vectors of frequencies and latencies for the ERSP/ITC images are returned 
-%              separately, as well as the EEG.etc sub-structure modified with pointers 
-%              to the output float files and some information about them. 
+%              Two Matlab files are saved, one for ERSP and one for ITC 
+%              information. These contain the unmasked?? ERSP|ITC image 
+%              and its significant mask??, plus the transform parameters 
+%              used to compute them. Saves the computed dataset mean images 
+%              in dataset-name files with extensions '.icaersp' and '.icaitc'
+%              If the ERSPs/ITCs were previously saved into these files, 
+%              and the same set of ERSP/ITC parameters are used, the values 
+%              are not recomputed, but the information is read from these
+%              files. Vectors of frequencies and latencies for the ERSP/ITC 
+%              images are returned separately. Returned 'EEG.etc' fields
+%              are modified with pointers to the output float files and some 
+%              information about them. 
 % Usage:  
 %              >> [X times logfreqs ] = std_ersp(EEG, 'key', 'val', ...);
-%
-%              % If they do not exist, computes the ICA component ERSPs/ITCs 
-%              % for a dataset. Saves the computed images in dataset name files 
-%              % with extensions .icaersp and .icaitc
-%              % Also updates the EEG structure in the Matlab environment 
-%              % and saves the modified dataset to disk.
 % Inputs:
-%   EEG        - an EEG data structure. 
+%   EEG          - an EEG dataset structure. 
 %
 % Optional inputs:
-%   'components' - [numeric vector] of the EEG structure for which an ERSP   
-%                  and ITC will be computed {default|[]: all components if
-%                  no channel index is given as input}
-%   'channels'   - [numeric vector] of the EEG structure for which an ERSP   
-%                  and ITC will be computed {default|[]: no channels}
-%   'freqs'      - [minHz maxHz] the frequency range to compute the ERSP/ITC.
-%   'timewindow' - [min max] time window in ms for plotting.
-%   'timelimits' - [min max] time window in ms for computing. Default is
-%                  whole time range.
-%   'cycle'      - If 0 -> Use FFTs (with constant window length) {default: 0}
-%                  If >0 -> Number of cycles in each analysis wavelet 
-%                  If [wavecycles factor] -> wavelet cycles increase with frequency 
-%                  beginning at wavecyles (0 < factor < 1; factor = 1 -> no increase,
-%                  standard wavelets; factor=0 -> fixed epoch length, as in FFT.
-%   'padratio'   - FFT-length/winframes (2^k)                          
-%                  Multiplies the number of output frequencies by dividing their spacing. 
-%                  When cycles==0, frequency spacing is (low_freq/padratio).
-%   'alpha'      - If in (0, 1), compute two-tailed permutation-based prob. thresholds
-%                  and use these to mask the ERSP/ITC image (in output X)
-%   'type'       - ['ersp'|'itc'] both ERSP and ITC images are computed and saved to disk, 
-%                  but only one is returned (output X) {default: 'ersp'}
-%   'savetrials' - ['on'|'off'] save single trial decomposition in a
-%                  separate file with extension '.dattimef' or '.icatimef' 
-%   'powbase'    - [ncomps,nfreqs] optional matrix of baseline spectra (power, not dB, 
-%                  as output from timef() run with same parameters as above) to use 
-%                  in timef() {default|[] -> time windows centered before time 0}
+%   'components' - [numeric vector] components in the EEG structure for which 
+%                  ERSP and ITC data will be computed {default|[]: all 
+%                  components if no 'channels' are specified (see below)}
+%   'channels'   - [numeric vector] channels in the EEG structure for which 
+%                  ERSP and ITC will be computed {default|[]: no channels}
+%   'freqs'      - [minHz maxHz] the ERSP/ITC frequency range to compute 
+%                  and return. {default: ??}
+%   'timelimits' - [minms maxms] time window (in ms) to compute.
+%                  {default: whole input epoch}.
+%   'timewindow' - [minms maxms] time window (in ms) to plot.
+%                  {default: all output latencies}
+%   'cycles'     - [wavecycles (factor)]. If 0 -> DFT (constant window length 
+%                  across frequencies). [THEN LOG SPACED??].
+%                  If >0 -> the number of cycles in each analysis wavelet. 
+%                  If [wavecycles factor], wavelet cycles increase with 
+%                  frequency, beginning at wavecyles. (0 < factor < 1) 
+%                  factor = 0 -> fixed epoch length (DFT, as in FFT). 
+%                  factor = 1 -> no increase (standard wavelets)
+%                  {default: [0]?? [TO GIVE LOG SPACING??]}
+%   'padratio'   - (power of 2). Multiply the number of output frequencies 
+%                  by dividing their frequency spacing through 0-padding.
+%                  Output frequency spacing is (low_freq/padratio).
+%   'alpha'      - If in (0, 1), compute two-tailed permutation-based 
+%                  probability thresholds and use these to mask the output 
+%                  ERSP/ITC images. The stored ERSP/ITC data are ?? masked 
+%                  {default: ??}
+%   'type'       - ['ersp'|'itc'] though both ERSP and ITC images are computed 
+%                  and saved to disk, only this transform is returned to the 
+%                  command line (see first output, X, below) {default: 'ersp'}
+%   'savetrials' - ['on'|'off'] Also?? save single-trial decompositions in a
+%                  file with extension '.dattimef' (channels) or '.icatimef' 
+%                  (components).  {default: ??}
+%   'powbase'    - [ncomps,nfreqs] optional input matrix giving baseline power 
+%                  spectra (not dB power, see >> help timef). 
+%                  For use in repeated calls to timef() using the same baseine
+%                  {default|[] -> none; data windows centered before 0 latency}
 % Outputs:
-%   X         - the masked log ERSP/ITC of the requested ICA components in the 
-%               selected frequency and time range. 
-%   times     - a vector of time points for which the ERSPs/ITCs were computed. 
-%   logfreqs  - a vector of (equally log spaced) frequencies (in Hz) at which the 
+%   X         - the masked log ERSP/ITC of the requested ICA components/channels 
+%               in the selected frequency and time range. 
+%   times     - vector of time points for which the ERSPs/ITCs were computed. 
+%   logfreqs  - vector of (equally log spaced) frequencies (in Hz) at which the 
 %               log ERSP/ITC was evaluated. 
 %
 % Files written or modified:     
 %              [dataset_filename].icaersp   <-- saved component ERSPs
 %              [dataset_filename].icaitc    <-- saved component ITCs
-%    OR for channels
+%  OR for channels
 %              [dataset_filename].datersp   <-- saved channel ERSPs
 %              [dataset_filename].datitc    <-- saved channel ITCs
 % Example: 
-%            % create ERSP and ITC images on disk for all comps from dataset EEG
-%            % use three-cycle wavelets (at 3 Hz) to >3-cycle wavelets at 50 Hz
-%            % use probability masking at p < 0.01, padratio 4. See >> timef details
-%            % returns log-freq spaced, probability-masked Xersp
-%            >> [Xersp, times, logfreqs] = std_ersp(EEG, 'type', 'ersp', 'freqs', [3 50], ...
-%                                              'cycles', [3 0.5], 'alpha', 0.01);
+%            % Create mean ERSP and ITC images on disk for all comps from 
+%            % dataset EEG use three-cycle wavelets (at 3 Hz) to more than 
+%            % three-cycle wavelets at 50 Hz. Use probability masking at 
+%            % p < 0.01 with padratio 4. See >> timef details. 
+%            % Return the (equally log-freq spaced, probability-masked) ERSP.
+%            >> [Xersp, times, logfreqs] = std_ersp(EEG, ...
+%                       'type', 'ersp', 'freqs', [3 50], ...
+%                                 'cycles', [3 0.5], 'alpha', 0.01);
 %
 % See also: timef(), std_itc(), std_erp(), std_spec(), std_topo(), std_preclust()
 %
@@ -105,6 +116,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.39  2006/10/02 11:40:51  arno
+% minor changes
+%
 % Revision 1.35  2006/04/11 18:24:07  arno
 % fixing alpha NaN problem
 %
@@ -267,8 +281,8 @@ if ~isempty(g.channels)
     g.channels = chaninds;
 end;
 
-% choose ICA or DATA
-% ------------------
+% select ICA components or data channels
+% --------------------------------------
 if ~isempty(g.outputfile)
     filenameersp   = fullfile('', [ g.outputfile '.datersp' ]);
     filenameitc    = fullfile('', [ g.outputfile '.datitc' ]);    
@@ -301,7 +315,7 @@ if size(g.powbase,1) ~= length(g.indices)
     error('powbase should be of size (ncomps,nfreqs)');
 end
 
-% Check if ERSP information found in datasets and if fits requested parameters 
+% Check if ERSP/ITC information found in datasets and if fits requested parameters 
 % ----------------------------------------------------------------------------
 if exist( filenameersp ) & strcmpi(g.recompute, 'off')
     tmpersp  = load( '-mat', filenameersp, 'parameters');
@@ -309,15 +323,15 @@ if exist( filenameersp ) & strcmpi(g.recompute, 'off')
     if ~isequal(params.cycles, g.cycles)                   ...
             | (g.padratio ~= params.padratio) ...
             | ( (g.alpha~= params.alpha) & ~( isnan(g.alpha) & isnan(params.alpha)) )
-        disp('File already present and computed with the same parameters: no need to recompute...');
-        % if not as requested parameters, recompute ERSP/ITC
+        disp('File ERSP/ITC data already present, computed with the same parameters: no need to recompute...');
+        % if not computed with the requested parameters, recompute ERSP/ITC
         % i.e., continue
     else
-        return; % no need to compute ERSP
+        return; % no need to compute ERSP/ITC
     end
 end;
 
-% No ERSP/ITC information available
+% No usable ERSP/ITC information available
 % ---------------------------------
 tmpdata = [];
 for index = 1:length(EEG)
@@ -382,8 +396,8 @@ for k = 1:length(g.indices)  % for each (specified) component
     timefdata  = reshape(tmpdata(k,pointrange,:), 1, length(pointrange)*size(tmpdata,3));
     if strcmpi(g.plot, 'on'), figure; end;
     [logersp,logitc,logbase,times,logfreqs,logeboot,logiboot,alltfX] ...
-             = newtimef( timefdata, length(pointrange), g.timelimits, EEG(1).srate, parameters{2:end});
-             %figure; newtimef( TMP.data(32,:), EEG.pnts, [EEG.xmin EEG.xmax]*1000, EEG.srate, cycles, 'freqs', freqs);
+      = newtimef( timefdata, length(pointrange), g.timelimits, EEG(1).srate, parameters{2:end});
+    %figure; newtimef( TMP.data(32,:), EEG.pnts, [EEG.xmin EEG.xmax]*1000, EEG.srate, cycles, 'freqs', freqs);
     %figure; newtimef( timefdata, length(pointrange), g.timelimits, EEG.srate, cycles, 'freqs', freqs);
     if strcmpi(g.plot, 'on'), return; end;
     
