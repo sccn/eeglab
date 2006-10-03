@@ -1,4 +1,4 @@
-% std_specplot() - plot component STUDY cluster spectra, either mean spectra 
+% std_specplot() - plot STUDY component cluster spectra, either mean spectra 
 %                  for all requested clusters in the same figure, with spectra 
 %                  for different conditions (if any) plotted in different colors, 
 %                  or spectra for each specified cluster in a separate figure 
@@ -19,22 +19,23 @@
 %                'all' -> plot all clusters in STUDY {default: 'all'}.
 %   'comps'    - [int vector|'all'??] -> indices of cluster components to plot.
 %                'all' -> plot all the components in the cluster {default: 'all'}.
-%   'mode'     - ['centroid'|'comps'] plotting mode. In 'centroid' mode, the average 
+%   'mode'     - ['together'|'apart'] plotting mode. In 'centroid' mode, the average 
 %                spectra of the requested clusters are plotted in the same figure, 
 %                with spectra for  different conditions ??and groups?? (if any) 
 %                plotted in different colors. In 'comps' mode, spectra for each 
-%                specified cluster are plotted in separate figures (per condition ??and group??), 
+%                specified cluster are plotted in separate figures (per condition 
+% ??and group??), 
 %                each containing the overplotted individual cluster component spectra 
-%                plus the mean cluster spectrum in bold {default: 'centroid'}. 
+%                plus the mean cluster spectrum in bold.
 %                Note that this option is irrelevant when component indices are provided 
-%                as input (via 'comps' above) {default: ??}
-%   'figure'   - ['on'|'off'] in 'centroid' mode, 'on' plots in a new figure, 
-%                while 'off' plots in the current figure. {default: 'on'}
+%                as input (via 'comps' above) {default: 'together'}. 
+%   'figure'   - ['on'|'off'] in 'together' mode, 'on' plots in a new figure, 
+%                while 'off' plots in the current figure {default: 'on'}
 % Outputs:
 %   STUDY      - the input STUDY set structure with the plotted cluster mean spectra
 %                added?? to allow quick replotting.
 %   Example:
-%            >> [STUDY] = std_specplot(STUDY,ALLEEG, 'clusters', 2, 'mode', 'comps');
+%            >> [STUDY] = std_specplot(STUDY,ALLEEG, 'clusters', 2, 'mode', 'apart');
 %               % Plot component spectra for STUDY cluster 2, plus the mean cluster 
 %               % spectrum (in bold). 
 %
@@ -59,6 +60,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2006/10/03 18:39:25  scott
+% help msg   ARNO - SEE ??    -sm
+%
 % Revision 1.25  2006/10/03 18:37:49  scott
 % help msg edits.  ARNO - SEE ??   -sm
 %
@@ -103,17 +107,17 @@ if ~isempty(opt.comps),
     opt.subject = STUDY.datasetinfo( STUDY.cluster(opt.clusters).sets(1,opt.comps)).subject;
 end;
 
-if ~isempty(opt.subject), statgroup = 'off'; disp('No group statistics for single subject');
-else                      statgroup = STUDY.etc.specparams.statgroup;
+if ~isempty(opt.subject), groupstats = 'off'; disp('No group statistics for single subject');
+else                      groupstats = STUDY.etc.specparams.groupstats;
 end;
-if ~isempty(opt.subject), statcond = 'off'; disp('No condition statistics for single subject');
-else                      statcond = STUDY.etc.specparams.statcond;
+if ~isempty(opt.subject), condstats = 'off'; disp('No condition statistics for single subject');
+else                      condstats = STUDY.etc.specparams.condstats;
 end;
 plotcurveopt = { ...
    'ylim',       STUDY.etc.specparams.ylim, ...
    'threshold',  STUDY.etc.specparams.threshold, ...
-   'statgroup',  statgroup, ...
-   'statcond',   statcond, ...
+   'groupstats',  groupstats, ...
+   'condstats',   condstats, ...
    'plotgroups',  STUDY.etc.specparams.plotgroups, ...
    'plotconditions', STUDY.etc.specparams.plotconditions, ...
    'statistics', STUDY.etc.specparams.statistics };
