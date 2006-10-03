@@ -21,18 +21,18 @@
 %                Else?? 'all' -> plot all cluster components 
 %                {default: 'all'}.
 %   'channels' - [numeric vector]  channels to plot. {default: all??}
-%   'mode'     - ['centroid'|'individual'] plotting mode. In 'centroid' 
+%   'mode'     - ['together'|'apart'] plotting mode. In 'together' 
 %                mode, the average ERSPs of the requested clusters|channels  
 %                are plotted in the same figure - one per condition ??and 
-%                group??. In 'individual' mode, component ERSPs for each
+%                group??. In 'apart' mode, component ERSPs for each
 %                cluster (or channel) are plotted in a separate 
 %                figure (per condition ""and group??) along with their mean 
 %                ERSP. Note that for clusters, this option is irrelevant if 
 %                component indices are provided as input (via 'comps' above) 
-%                {default: 'centroid'} 
+%                {default: 'together'??} 
 %   'figure'  - ['on'|'off'] 'on' -> plot on a new figure; 
 %                'off' -> plot on current figure. 
-%                Note: 'off' is optional for one cluster in 'centroid' 
+%                Note: 'off' is optional for one cluster in 'together' 
 %                mode. This is useful for incomporating a cluster ERSP 
 %                into a complex figure. In case of multiple conditions, 
 %                only the first condition is displayed, but clicking on 
@@ -43,8 +43,9 @@
 %               mean ERSPs added to allow quick replotting 
 % Example:
 %        >> [STUDY] = std_erspplot(STUDY,ALLEEG, 'clusters', 'all', ...
-%                                       'mode', 'centroid');
-%           % Plot the mean ERSPs of all clusters in STUDY on the same figure. 
+%                                       'mode', 'together');
+%           % Plot the mean ERSPs of all clusters in STUDY together 
+%           % on the same figure. 
 %
 % See also: pop_clustedit(), pop_preclust(), eeg_createdata(), eeg_preclust(), pop_clustedit()
 %
@@ -67,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2006/10/03 18:31:49  scott
+% help msg edits. ARNO - SEE ??  -sm
+%
 % Revision 1.27  2006/10/02 22:29:21  scott
 % minor help edits
 %
@@ -96,7 +100,7 @@ opt = finputcheck( varargin, { 'channels'    'cell'    []              {};
                                'plotsubjects' 'string' { 'on' 'off' }  'off';
                                'plotmode'    'string' { 'normal' 'condensed' }  'normal';
                                'subject'     'string'  []              '';
-                               'statmode'    'string'  { 'individual' 'common' 'trials' } STUDY.etc.erspparams.statmode}, 'std_erspstatplot');
+                               'statmode'    'string'  { 'subjects' 'common' 'trials' } STUDY.etc.erspparams.statmode}, 'std_erspstatplot');
 if isstr(opt), error(opt); end;
 
 % for backward compatibility
@@ -106,18 +110,18 @@ if ~isempty(opt.comps),
     opt.subject = STUDY.datasetinfo( STUDY.cluster(opt.clusters).sets(1,opt.comps)).subject;
 end;
 
-if ~isempty(opt.subject), statgroup = 'off'; disp('No group statistics for single subject');
-else                      statgroup = STUDY.etc.erspparams.statgroup;
+if ~isempty(opt.subject), groupstats = 'off'; disp('No group statistics for single subject');
+else                      groupstats = STUDY.etc.erspparams.groupstats;
 end;
-if ~isempty(opt.subject), statcond = 'off'; disp('No condition statistics for single subject');
-else                      statcond = STUDY.etc.erspparams.statcond;
+if ~isempty(opt.subject), condstats = 'off'; disp('No condition statistics for single subject');
+else                      condstats = STUDY.etc.erspparams.condstats;
 end;
 plotcurveopt = { ...
    'ersplim',    eval( [ 'STUDY.etc.erspparams.' opt.datatype 'lim' ]), ...
    'threshold',  STUDY.etc.erspparams.threshold, ...
    'maskdata',   STUDY.etc.erspparams.maskdata, ...
-   'statgroup',  statgroup, ...
-   'statcond',   statcond, ...
+   'groupstats',  groupstats, ...
+   'condstats',   condstats, ...
    'statistics', STUDY.etc.erspparams.statistics };
 
 if ~isempty(opt.channels)
