@@ -1,40 +1,40 @@
-% pop_erspparams() - Set plotting and statistics parameters for computing 
-%                    and plotting STUDY mean (and optionally 
-%                    single-trial) ERSP and ITC measures and mean measure 
+% pop_erspparams() - Set plotting and statistics parameters for 
+%                    computing and plotting STUDY mean (and optionally 
+%                    single-trial) ERSP and ITC measures and measure 
 %                    statistics. Settings are stored within the STUDY 
-%                    structure (STUDY.etc.erspparams) and are used
-%                    whenever Plotting is performed by the function
+%                    structure (STUDY.etc.erspparams) which is used
+%                    whenever plotting is performed by the function
 %                    std_specplot().
 % Usage:    
-%   >> STUDY = pop_erspparams(STUDY, 'key', 'val');   
+%   >> STUDY = pop_erspparams(STUDY, 'key', 'val', ...);   
 %
 % Inputs:
 %   STUDY        - EEGLAB STUDY set
 %
 % Statistics options:
-%  'statgroup'   - ['on'|'off'] Compute statistics across groups?
-%                  {default: 'off'}
-%  'statcond'    - ['on'|'off'] Compute statistics across conditions?
-%                  {default: 'off'}
+%  'groupstats'   - ['on'|'off'] Compute statistics across subject 
+%                  groups {default: 'off'}
+%  'condstats'    - ['on'|'off'] Compute statistics across data 
+%                  conditions {default: 'off'}
 %  'statistics'  - ['param'|'perm'] Type of statistics to compute: 
-%                  'param' for parametric (t-test/anova), 'perm' for 
+%                  'param' for parametric (t-test/anova); 'perm' for 
 %                  permutation-based {default: 'param'}
-%  'statmode'    - ['individual'|'trials'] (default) 'individual' 
-%                  statistics -> statistics are computed across
-%                  mean ERSPs (ITCs) of the single subjects. 'trials'
-%                  statistics -> single-trial 'ERSP' transforms for all 
-%                  subjects are pooled together. This requires that they 
-%                  were saved to disk (std_ersp() option 'savetrials', 
-%                  'on'). Note that the single-trial ERSPs may occupy 
-%                  several GB of disk space, and that computation 
-%                  of statistics may require large RAM.
-%                  {default: 'individual'}
+%  'statmode'    - ['subjects'|'trials'] 'subjects' {default}
+%                  -> statistics are computed across condition mean 
+%                  ERSPs|ITCs of the single subjects. 
+%                  'trials' -> single-trial 'ERSP' transforms 
+%                  for all subjects are pooled.  This requires that 
+%                  they were saved to disk using std_ersp() option 
+%                  'savetrials', 'on'. Note, however, that the 
+%                  single-trial ERSPs may occupy several GB of disk 
+%                  space, and that computation of statistics may 
+%                  require a large amount of RAM.
 %  'naccu'       - [integer] Number of surrogate data averages to use in
 %                  permutation-based statistics. For instance, if p<0.01, 
 %                  use naccu>200. For p<0.001, naccu>2000. If a 'threshold'
 %                  (not NaN) is set below and 'naccu' is too low, it will
 %                  be automatically increased. (This keyword is currently
-%                  only modifyable from the command line and not from the GUI). 
+%                  only modifiable from the command line, not from the gui). 
 %  'threshold'   - [NaN|alpha] Significance threshold (0<alpha<<1). Value 
 %                  NaN will plot p-values for each time and/or frequency
 %                  on a different axis. If alpha is used, significant time
@@ -45,20 +45,20 @@
 %                  for ERSP (not ITC). When datasets with different conditions
 %                  are recorded simultaneously, a common baseline spectrum 
 %                  should be used. Note that this also affects the 
-%                  results of statistics. {default: 'on'}
-%  'maskdata'    - ['on'|'off'] when threshold is not NaN, and 'statgroup'
-%                  or 'statcond' (above) are 'off', masks the data 
+%                  results of statistics {default: 'on'}
+%  'maskdata'    - ['on'|'off'] when threshold is not NaN, and 'groupstats'
+%                  or 'condstats' (above) are 'off', masks the data 
 %                  for significance.
 %
 % ERSP/ITC image plotting options:
-%   'timerange'  - [min max] ERSP/ITC plotting latency range in ms. {default:
-%                  the whole output latency range}.
-%   'freqrange'  - [min max] ERSP/ITC plotting frequency range in ms. {default:
-%                  the whole output frequency range}
+%   'timerange'  - [min max] ERSP/ITC plotting latency range in ms. 
+%                  {default: the whole output latency range}.
+%   'freqrange'  - [min max] ERSP/ITC plotting frequency range in ms. 
+%                  {default: the whole output frequency range}
 %   'ersplim'    - [mindB maxdB] ERSP plotting limits in dB 
-%                  {default: from data limits}
+%                  {default: from [ERSPmin,ERSPmax]}
 %   'itclim'     - [minitc maxitc] ITC plotting limits (range: [0,1]) 
-%                  {default: [0, ITC data max]}
+%                  {default: from [0,ITC data max]}
 %
 % See also: std_erspplot(), std_itcplot()
 %
@@ -81,6 +81,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2006/10/03 20:14:21  arno
+% removing ??
+%
 % Revision 1.5  2006/10/03 20:07:02  arno
 % more comments
 %
@@ -102,13 +105,13 @@ if isempty(varargin)
     enablecond  = fastif(length(STUDY.condition)>1, 'on', 'off');
     threshstr   = fastif(isnan(STUDY.etc.erspparams.threshold),'', num2str(STUDY.etc.erspparams.threshold));
     statval     = fastif(strcmpi(STUDY.etc.erspparams.statistics,'param'), 1, 2);
-    statmode    = fastif(strcmpi(STUDY.etc.erspparams.statmode,'individual'), 1, 2);
+    statmode    = fastif(strcmpi(STUDY.etc.erspparams.statmode,'subjects'), 1, 2);
     subbaseline = fastif(strcmpi(STUDY.etc.erspparams.subbaseline,'on'), 1, 0);
-    statcond    = fastif(strcmpi(STUDY.etc.erspparams.statcond, 'on'), 1, 0);
-    statgroup   = fastif(strcmpi(STUDY.etc.erspparams.statgroup,'on'), 1, 0);
+    condstats    = fastif(strcmpi(STUDY.etc.erspparams.condstats, 'on'), 1, 0);
+    groupstats   = fastif(strcmpi(STUDY.etc.erspparams.groupstats,'on'), 1, 0);
     maskdata    = fastif(strcmpi(STUDY.etc.erspparams.maskdata,'on'), 1, 0);
-    cb_maskdata = [ 'tmpcond  = get(findobj(gcbf, ''tag'', ''statcond'') , ''value'');' ...
-                    'tmpgroup = get(findobj(gcbf, ''tag'', ''statgroup''), ''value'');' ...
+    cb_maskdata = [ 'tmpcond  = get(findobj(gcbf, ''tag'', ''condstats'') , ''value'');' ...
+                    'tmpgroup = get(findobj(gcbf, ''tag'', ''groupstats''), ''value'');' ...
                     'tmpplot  = get(findobj(gcbf, ''tag'', ''maskdata'') , ''value'');' ...
                     'if tmpcond & tmpgroup & tmpplot,' ...
                     '    warndlg2(strvcat(''Cannot mask time/freq. image if both statistics for conditions'',' ...
@@ -120,41 +123,41 @@ if isempty(varargin)
     uilist = { ...
         {'style' 'text'       'string' 'Time range (ms)'} ...
         {'style' 'edit'       'string' num2str(STUDY.etc.erspparams.timerange) 'tag' 'timerange' } ...
-        {'style' 'text'       'string' 'Power limit (dB)'} ...
+        {'style' 'text'       'string' 'Power limits (dB)'} ...
         {'style' 'edit'       'string' num2str(STUDY.etc.erspparams.ersplim) 'tag' 'ersplim' } ...
-        {'style' 'text'       'string' 'Freq range (Hz)'} ...
+        {'style' 'text'       'string' 'Freq. range (Hz)'} ...
         {'style' 'edit'       'string' num2str(STUDY.etc.erspparams.freqrange) 'tag' 'freqrange' } ...
         {'style' 'text'       'string' 'ITC limit (0-1)'} ...
         {'style' 'edit'       'string' num2str(STUDY.etc.erspparams.itclim) 'tag' 'itclim' } ...
         {} {'style' 'checkbox'   'string' '' 'value' subbaseline 'tag' 'subbaseline' } ...
-        {'style' 'text'       'string' 'Compute baseline accross conditions for ERSP' } ...
+        {'style' 'text'       'string' 'Compute ERSP baseline accross conditions' } ...
         {} ...
         {'style' 'text'       'string' 'Statistics'} ...
-        {'style' 'popupmenu'  'string' 'Parametric|Permutations' 'tag' 'statistics' 'value' statval 'listboxtop' statval } ...
+        {'style' 'popupmenu'  'string' 'Parametric|Permutation-based' 'tag' 'statistics' 'value' statval 'listboxtop' statval } ...
         {'style' 'text'       'string' 'Threshold'} ...
         {'style' 'edit'       'string' threshstr 'tag' 'threshold' } ...
         {'style' 'text'       'string' 'Data for statistics'} ...
-        {'style' 'popupmenu'  'string' 'Use mean|Use trials' 'tag' 'statmode' 'value' statmode 'listboxtop' statmode } ...
+        {'style' 'popupmenu'  'string' 'Use means|Use trials' 'tag' 'statmode' 'value' statmode 'listboxtop' statmode } ...
         { } { } ...
-        {} {'style' 'checkbox'   'string' '' 'value' statcond  'enable' enablecond  'tag' 'statcond' 'callback' cb_maskdata } ...
+        {} {'style' 'checkbox'   'string' '' 'value' condstats  'enable' enablecond  'tag' 'condstats' 'callback' cb_maskdata } ...
         {'style' 'text'       'string' 'Compute condition statistics' 'enable' enablecond} ...
-        {} {'style' 'checkbox'   'string' '' 'value' statgroup 'enable' enablegroup 'tag' 'statgroup' 'callback' cb_maskdata } ...
+        {} {'style' 'checkbox'   'string' '' 'value' groupstats 'enable' enablegroup 'tag' 'groupstats' 'callback' cb_maskdata } ...
         {'style' 'text'       'string' 'Compute group statistics' 'enable' enablegroup } ...
         {} {'style' 'checkbox'   'string' '' 'value' maskdata 'tag' 'maskdata' 'callback' cb_maskdata } ...
-        {'style' 'text'       'string' 'Use statistics to mask data' } };
+        {'style' 'text'       'string' 'Mask non-significant data' } };
     
     geometry = { [ 1 1 1 1] [ 1 1 1 1] [0.1 0.1 1] [1] [1 1 1 1] [1 1 1 1] [0.1 0.1 1] [0.1 0.1 1] [0.1 0.1 1] };
     
     [out_param userdat tmp res] = inputgui( 'geometry' , geometry, 'uilist', uilist, ...
                                    'helpcom', 'pophelp(''std_erspparams'')', ...
-                                   'title', 'Set parameters for plotting ERPs -- pop_erspparams()');
+                                   'title', 'Set ERSP|ITC plotting parameters -- pop_erspparams()');
 
     if isempty(res), return; end;
     
-    % decode inputs
-    % -------------
-    if res.statgroup, res.statgroup = 'on'; else res.statgroup = 'off'; end;
-    if res.statcond , res.statcond  = 'on'; else res.statcond  = 'off'; end;
+    % decode input
+    % ------------
+    if res.groupstats, res.groupstats = 'on'; else res.groupstats = 'off'; end;
+    if res.condstats , res.condstats  = 'on'; else res.condstats  = 'off'; end;
     if res.maskdata , res.maskdata  = 'on'; else res.maskdata  = 'off'; end;
     if res.subbaseline, res.subbaseline = 'on'; else res.subbaseline = 'off'; end;
     res.timerange = str2num( res.timerange );
@@ -166,15 +169,15 @@ if isempty(varargin)
     if res.statistics == 1, res.statistics  = 'param'; 
     else                    res.statistics  = 'perm'; 
     end;
-    if res.statmode   == 1, res.statmode    = 'individual'; 
+    if res.statmode   == 1, res.statmode    = 'subjects'; 
     else                    res.statmode    = 'trials'; 
     end;
     
     % build command call
     % ------------------
     options = {};
-    if ~strcmpi( res.statgroup, STUDY.etc.erspparams.statgroup), options = { options{:} 'statgroup' res.statgroup }; end;
-    if ~strcmpi( res.statcond , STUDY.etc.erspparams.statcond ), options = { options{:} 'statcond'  res.statcond  }; end;
+    if ~strcmpi( res.groupstats, STUDY.etc.erspparams.groupstats), options = { options{:} 'groupstats' res.groupstats }; end;
+    if ~strcmpi( res.condstats , STUDY.etc.erspparams.condstats ), options = { options{:} 'condstats'  res.condstats  }; end;
     if ~strcmpi( res.maskdata,  STUDY.etc.erspparams.maskdata ), options = { options{:} 'maskdata'  res.maskdata  }; end;
     if ~strcmpi( res.statmode,  STUDY.etc.erspparams.statmode ), options = { options{:} 'statmode'  res.statmode }; end;
     if ~strcmpi( res.statistics, STUDY.etc.erspparams.statistics ), options = { options{:} 'statistics' res.statistics }; end;
@@ -202,8 +205,8 @@ else
     end;
 end;
 
-% scan clusters and channels to remove erpdata info if timerange has changed
-% ----------------------------------------------------------
+% scan clusters and channels to remove erspdata info if timerange etc. have changed
+% ---------------------------------------------------------------------------------
 if ~isequal(STUDY.etc.erspparams.timerange, TMPSTUDY.etc.erspparams.timerange) | ... 
     ~isequal(STUDY.etc.erspparams.freqrange, TMPSTUDY.etc.erspparams.freqrange) | ... 
     ~isequal(STUDY.etc.erspparams.statmode, TMPSTUDY.etc.erspparams.statmode) | ...
@@ -239,11 +242,11 @@ function STUDY = default_params(STUDY)
     if ~isfield(STUDY.etc.erspparams, 'ersplim' ),     STUDY.etc.erspparams.ersplim   = []; end;
     if ~isfield(STUDY.etc.erspparams, 'itclim' ),      STUDY.etc.erspparams.itclim    = []; end;
     if ~isfield(STUDY.etc.erspparams, 'statistics'),   STUDY.etc.erspparams.statistics = 'param'; end;
-    if ~isfield(STUDY.etc.erspparams, 'statgroup'),    STUDY.etc.erspparams.statgroup = 'off'; end;
-    if ~isfield(STUDY.etc.erspparams, 'statcond' ),    STUDY.etc.erspparams.statcond  = 'off'; end;
+    if ~isfield(STUDY.etc.erspparams, 'groupstats'),    STUDY.etc.erspparams.groupstats = 'off'; end;
+    if ~isfield(STUDY.etc.erspparams, 'condstats' ),    STUDY.etc.erspparams.condstats  = 'off'; end;
     if ~isfield(STUDY.etc.erspparams, 'subbaseline' ), STUDY.etc.erspparams.subbaseline = 'on'; end;
     if ~isfield(STUDY.etc.erspparams, 'threshold' ),   STUDY.etc.erspparams.threshold = NaN; end;
     if ~isfield(STUDY.etc.erspparams, 'maskdata') ,    STUDY.etc.erspparams.maskdata  = 'on'; end;
     if ~isfield(STUDY.etc.erspparams, 'naccu')    ,    STUDY.etc.erspparams.naccu     = []; end;
-    if ~isfield(STUDY.etc.erspparams, 'statmode') ,    STUDY.etc.erspparams.statmode  = 'individual'; end;
+    if ~isfield(STUDY.etc.erspparams, 'statmode') ,    STUDY.etc.erspparams.statmode  = 'subjects'; end;
 
