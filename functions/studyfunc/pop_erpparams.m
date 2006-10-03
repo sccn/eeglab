@@ -1,5 +1,5 @@
-% pop_erpparams() - Set plotting and statistics parameters for ERP plotting
-%
+% pop_erpparams() - Set plotting and statistics parameters for cluster ERP 
+%                   plotting
 % Usage:    
 %   >> STUDY = pop_erpparams(STUDY, 'key', 'val');   
 %
@@ -7,9 +7,9 @@
 %   STUDY        - EEGLAB STUDY set
 %
 % Statistics options:
-%   'statgroup'  - ['on'|'off'] Compute (or not) statistics across groups.
+%   'groupstats'  - ['on'|'off'] Compute (or not) statistics across groups.
 %                  {default: 'off'}
-%   'statcond'   - ['on'|'off'] Compute (or not) statistics across groups.
+%   'condstats'   - ['on'|'off'] Compute (or not) statistics across groups.
 %                  {default: 'off'}
 %   'statistics' - ['param'|'perm'] Type of statistics to use: 'param' for
 %                  parametric and 'perm' for permutation-based statistics. 
@@ -20,21 +20,22 @@
 %                  If a threshold (not NaN) is set below, and 'naccu' is 
 %                  too low, it will be automatically reset. (This option 
 %                  is now available only from the command line).
-%   'threshold'  - [NaN|0.0x] Significance threshold. NaN will plot the 
-%                  p-value itself on a different axis. When possible, the
-%                  significant time regions are indicated below the data.
+%   'threshold'  - [NaN|float<<1] Significance probability threshold. 
+%                  NaN -> plot the p-values themselves on a different axis. 
+%                  When possible, the significant time regions are indicated 
+%                  below the data.
 % Plot options:
 %   'timerange'  - [min max] ERP plotting latency range in ms. 
-%                  {default: the whole epoch}.
+%                  {default: the whole epoch}
 %   'ylim'       - [min max] ERP limits in microvolts {default: from data}
 %   'plotgroups' - ['together'|'apart'] 'together' -> plot subject groups 
 %                  on the same axis in different colors, else ('apart') 
-%                  on different axes.
+%                  on different axes. {default: 'apart'??}
 %   'plotconditions' - ['together'|'apart'] 'together' -> plot conditions 
 %                  on the same axis in different colors, else ('apart') 
 %                  on different axes. Note: Keywords 'plotgroups' and 
 %                  'plotconditions' may not both be set to 'together'. 
-%
+%                  {default: 'together'??}
 % See also: std_erpplot()
 %
 % Authors: Arnaud Delorme, CERCO, CNRS, 2006-
@@ -56,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2006/10/03 18:09:34  scott
+% minor help edit
+%
 % Revision 1.5  2006/10/02 21:57:51  scott
 % plotcond -> plotconditions
 %
@@ -83,8 +87,8 @@ if isempty(varargin)
     plotconditions    = fastif(strcmpi(STUDY.etc.erpparams.plotconditions, 'together'), 1, 0);
     plotgroups  = fastif(strcmpi(STUDY.etc.erpparams.plotgroups,'together'), 1, 0);
     statval     = fastif(strcmpi(STUDY.etc.erpparams.statistics,'param'), 1, 2);
-    statcond    = fastif(strcmpi(STUDY.etc.erpparams.statcond, 'on'), 1, 0);
-    statgroup   = fastif(strcmpi(STUDY.etc.erpparams.statgroup,'on'), 1, 0);
+    condstats    = fastif(strcmpi(STUDY.etc.erpparams.condstats, 'on'), 1, 0);
+    groupstats   = fastif(strcmpi(STUDY.etc.erpparams.groupstats,'on'), 1, 0);
     
     uilist = { ...
         {'style' 'text'       'string' 'Time range (ms)'} ...
@@ -100,9 +104,9 @@ if isempty(varargin)
         {'style' 'popupmenu'  'string' 'Parametric|Permutations' 'tag' 'statistics' 'value' statval 'listboxtop' statval } ...
         {'style' 'text'       'string' 'Threshold'} ...
         {'style' 'edit'       'string' threshstr 'tag' 'threshold' } ...
-        {} {'style' 'checkbox'   'string' '' 'value' statcond  'enable' enablecond  'tag' 'statcond' } ...
+        {} {'style' 'checkbox'   'string' '' 'value' condstats  'enable' enablecond  'tag' 'condstats' } ...
         {'style' 'text'       'string' 'Compute condition statistics' 'enable' enablecond} ...
-        {} {'style' 'checkbox'   'string' '' 'value' statgroup 'enable' enablegroup 'tag' 'statgroup' } ...
+        {} {'style' 'checkbox'   'string' '' 'value' groupstats 'enable' enablegroup 'tag' 'groupstats' } ...
         {'style' 'text'       'string' 'Compute group statistics' 'enable' enablegroup } };
     
     geometry = { [ 1 1 1 1] [0.1 0.1 1] [0.1 0.1 1] [1] [1 1 1 1] [0.1 0.1 1] [0.1 0.1 1] };
@@ -116,8 +120,8 @@ if isempty(varargin)
     % decode inputs
     % -------------
     if res.plotgroups & res.plotconditions, warndlg2('Both conditions and group cannot be plotted on the same panel'); return; end;
-    if res.statgroup, res.statgroup = 'on'; else res.statgroup = 'off'; end;
-    if res.statcond , res.statcond  = 'on'; else res.statcond  = 'off'; end;
+    if res.groupstats, res.groupstats = 'on'; else res.groupstats = 'off'; end;
+    if res.condstats , res.condstats  = 'on'; else res.condstats  = 'off'; end;
     if res.plotgroups, res.plotgroups = 'together'; else res.plotgroups = 'apart'; end;
     if res.plotconditions , res.plotconditions  = 'together'; else res.plotconditions  = 'apart'; end;
     res.timerange = str2num( res.timerange );
@@ -133,8 +137,8 @@ if isempty(varargin)
     options = {};
     if ~strcmpi( res.plotgroups, STUDY.etc.erpparams.plotgroups), options = { options{:} 'plotgroups' res.plotgroups }; end;
     if ~strcmpi( res.plotconditions , STUDY.etc.erpparams.plotconditions ), options = { options{:} 'plotconditions'  res.plotconditions  }; end;
-    if ~strcmpi( res.statgroup, STUDY.etc.erpparams.statgroup), options = { options{:} 'statgroup' res.statgroup }; end;
-    if ~strcmpi( res.statcond , STUDY.etc.erpparams.statcond ), options = { options{:} 'statcond'  res.statcond  }; end;
+    if ~strcmpi( res.groupstats, STUDY.etc.erpparams.groupstats), options = { options{:} 'groupstats' res.groupstats }; end;
+    if ~strcmpi( res.condstats , STUDY.etc.erpparams.condstats ), options = { options{:} 'condstats'  res.condstats  }; end;
     if ~strcmpi( res.statistics, STUDY.etc.erpparams.statistics ), options = { options{:} 'statistics' res.statistics }; end;
     if ~isequal(res.ylim     , STUDY.etc.erpparams.ylim),      options = { options{:} 'ylim' res.ylim      }; end;
     if ~isequal(res.timerange, STUDY.etc.erpparams.timerange), options = { options{:} 'timerange' res.timerange }; end;
@@ -179,8 +183,8 @@ function STUDY = default_params(STUDY)
     if ~isfield(STUDY.etc.erpparams, 'timerange'),  STUDY.etc.erpparams.timerange = []; end;
     if ~isfield(STUDY.etc.erpparams, 'ylim'     ),  STUDY.etc.erpparams.ylim      = []; end;
     if ~isfield(STUDY.etc.erpparams, 'statistics'), STUDY.etc.erpparams.statistics = 'param'; end;
-    if ~isfield(STUDY.etc.erpparams, 'statgroup'),  STUDY.etc.erpparams.statgroup = 'off'; end;
-    if ~isfield(STUDY.etc.erpparams, 'statcond' ),  STUDY.etc.erpparams.statcond  = 'off'; end;
+    if ~isfield(STUDY.etc.erpparams, 'groupstats'),  STUDY.etc.erpparams.groupstats = 'off'; end;
+    if ~isfield(STUDY.etc.erpparams, 'condstats' ),  STUDY.etc.erpparams.condstats  = 'off'; end;
     if ~isfield(STUDY.etc.erpparams, 'threshold' ), STUDY.etc.erpparams.threshold = NaN; end;
     if ~isfield(STUDY.etc.erpparams, 'plotgroups') , STUDY.etc.erpparams.plotgroups = 'apart'; end;
     if ~isfield(STUDY.etc.erpparams, 'naccu') ,     STUDY.etc.erpparams.naccu     = []; end;
