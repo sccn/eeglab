@@ -13,28 +13,30 @@
 %                the STUDY. ALLEEG for a STUDY set is typically created using load_ALLEEG().  
 %
 % Optional inputs:
-%   'clusters' - [numeric vector]  -> specific cluster numbers to plot.
-%                  'all'         -> plot all clusters in STUDY.
-%                  {default: 'all'}.
+%   'clusters' - [numeric vector | 'all']  -> specific cluster numbers to plot.
+%                'all'  -> plot all clusters in STUDY.
+%                {default: 'all'}.
 %   'comps'    - [numeric vector]  -> indices of the cluster components to plot.
-%                  'all'  -> plot all the components in the cluster {default: 'all'}.
-%   'mode'     - ['joined'|'apart'] Display all requested cluster on one 
-%                  figure or separate figures. {default: 'joined'}
-%                  'joined' -> plot all 'clusters' in one figure (without the gui).
-%                  'apart'   -> plot each cluster in a separate figure. Note
-%                  that this parameter has no effect if the 'comps' option is used.
+%                'all'  -> plot all the components in the cluster 
+%                {default: 'all'}.
+%   'mode'     - ['together'|'apart'] Display all requested cluster on one 
+%                figure ('together') or separate figures ('apart'). 
+%                'together'-> plot all 'clusters' in one figure (without the gui).
+%                'apart'   -> plot each cluster in a separate figure. Note that
+%                this parameter has no effect if the 'comps' option (above) is used.
+%                {default: 'together'}
 %   'figure'   - ['on'|'off'] plots on a new figure ('on')  or plots on current
-%                  figure ('off'). If figure 'off' does not display gui controls,
-%                  Useful for incomporating one cluster dipplot into a 
-%                  complex figure. {default: 'on'}. 
+%                figure ('off'). If 'figure','off' does not display gui controls,
+%                Useful for incomporating a cluster dipplot into a complex figure. 
+%                {default: 'on'}. 
 % Outputs:
-%   STUDY    - the input STUDY set structure modified with plotted cluster 
-%                  mean dipole, to allow quick replotting (unless cluster means 
-%                  already exists in the STUDY).  
+%   STUDY      - the input STUDY set structure modified with plotted cluster 
+%                mean dipole, to allow quick replotting (unless cluster means 
+%                already exists in the STUDY).  
 %   Example:
-%      >> [STUDY] = std_dipplot(STUDY,ALLEEG, 'clusters', 5, 'mode', 'apart', 'figure', 'off');
-%                   % Plot cluster-5 component dipoles (in blue), plus ther mean dipole (in red), 
-%                   % on an exisiting (gui-less) figure. 
+%   >> [STUDY] = std_dipplot(STUDY,ALLEEG, 'clusters', 5, 'mode', 'apart', 'figure', 'off');
+%                % Plot cluster-5 component dipoles (in blue), plus ther mean dipole (in red), 
+%                % on an exisiting (gui-less) figure. 
 %
 %  See also  pop_clustedit(), dipplot()        
 %
@@ -84,10 +86,10 @@ for k = 3:2:nargin
         case 'comps'
             STUDY = std_plotcompdip(STUDY, ALLEEG,  cls, varargin{k-1});
             return;
-        case 'mode' % Plotting mode 'apart' / 'joined'
+        case 'mode' % Plotting mode 'apart' / 'together'
             mode = varargin{k-1};
-            if strcmpi(mode, 'centroid') | strcmpi(mode, 'comps')
-                if length(cls) == 1, mode = 'apart'; else mode = 'joined'; end;
+            if strcmpi(mode, 'centroid') | strcmpi(mode, 'comps') | strcmpi(mode,'together') | strcmpi(mode,'apart')
+                if length(cls) == 1, mode = 'apart'; else mode = 'together'; end;
             end;
          case 'figure'
             if strcmpi(varargin{k-1},'off') 
@@ -210,7 +212,7 @@ if strcmpi(mode, 'apart')  % case each cluster on a separate figure
     end % finished going over requested clusters
 end
 
-if strcmpi(mode, 'joined')  % case all clusters are plotted in the same figure (must be a new figure)
+if strcmpi(mode, 'together')  % case all clusters are plotted in the same figure (must be a new figure)
     N = length(cls);
     rowcols(2) = ceil(sqrt(N)); % Number of rows in the subplot figure.
     rowcols(1) = ceil(N/rowcols(2));
