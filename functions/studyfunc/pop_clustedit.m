@@ -508,9 +508,9 @@ else
                             tmpcls = [ tmpcls cls(k)];
                         end
                     end
-                    [STUDY] = std_dipplot(STUDY, ALLEEG, 'clusters', tmpcls, 'mode', 'joined');
+                    [STUDY] = std_dipplot(STUDY, ALLEEG, 'clusters', tmpcls, 'mode', 'together');
                     % update Study history
-                    a = ['STUDY = std_dipplot(STUDY, ALLEEG, ''clusters'',[' num2str(tmpcls)  '],''mode'',''joined'' );'  ];
+                    a = ['STUDY = std_dipplot(STUDY, ALLEEG, ''clusters'',[' num2str(tmpcls)  '],''mode'',''together'' );'  ];
                     STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
                 end
             end;
