@@ -6,7 +6,7 @@
 %                 the grand mean cluster ERP (in bold). ERPs can be plotted only if 
 %                 component ERPs were computed and saved in the STUDY EEG datasets. 
 %                 These can be computed during pre-clustering using the gui-based 
-%                 function pop_preclust() or the equivalent commandline functions 
+%                 function pop_preclust() or the equivalent command line functions 
 %                 eeg_createdata() and eeg_preclust(). Called by pop_clustedit().
 %                 and std_propplot().
 % Usage:    
@@ -17,39 +17,40 @@
 %                in the STUDY. A STUDY set ALLEEG is typically created by load_ALLEEG().  
 %
 % Optional inputs for component plotting:
-%   'clusters' - [numeric vector]  -> specific cluster indices to plot.
-%                            'all' -> plot all clusters in STUDY {default: 'all'}.
-%                If no component index (next option) is given, the average ERPs of 
-%                the requested clusters are plotted in the same figure, with ERPs for
-%                different conditions (if any) plotted in different colors. In 'comps' 
-%                mode, ERPS for each specified cluster are plotted in separate figures 
-%                (per condition), each containing cluster component ERPs plus the
+%   'clusters' - [numeric vector | 'all'??]  indices of clusters to plot.
+%                Else?? 'all' -> plot all clusters in STUDY {default: 'all'}.
+%                If no component indices ('comps' below) are given, the average 
+%                ERPs of the requested clusters are plotted in the same figure, 
+%                with ERPs for different conditions ??and groups?? (if any) plotted 
+%                in different colors. In 'comps' (below) mode, ERPS for each 
+%                specified cluster are plotted in separate figures (one per 
+%                condition), each overplotting cluster component ERPs plus the
 %                average cluster ERP in bold. Note this parameter has no effect 
-%                if the 'comps' option is used. {default: 'centroid'}.
-%   'comps'    - [numeric vector]  -> indices of the cluster components to plot.
-%                            'all' -> plot all the components in the cluster 
-%                {default: 'all'}.
+%                if the 'comps' option (below) is used. {default: ??}
+%   'comps'    - [numeric vector|'all'??]  indices of the cluster components to plot.
+%                Else??, 'all' -> plot all the components in the specified 
+%                cluster(s)?? {default: 'all'}.
 %
 % Optional inputs for channel plotting:
-%   'changrp'  - [numeric vector]  -> specific channel group to plot. By
-%                default, the channel grand ERP is plotted (using the same
-%                format as the cluster component centroid described above)
-%   'subject'  - [numeric vector]  -> index of the subject to plot for changrp.
-%                            'all' -> plot all the components in the cluster 
+%   'changrp'  - [numeric vector]  specific channel group to plot. By
+%                default, the grand mean channel ERP is plotted (using the 
+%                same format as for the cluster component means described above)
+%                {default: ??}
+%   'subject'  - [numeric vector|'all'??]  In 'changrp' mode (above), index of 
+%                the subject(s) to plot. Else??, 'all' -> plot all components 
+%                in the cluster {default: 'all'}
 %
 % Other optional inputs:
-%   'figure'   - ['on'|'off'] for the 'centroid' mode option. 
-%                 'on'  -> plot in a new figure; 
-%                 'off' -> plot in the current figure {default: 'on'}
+%   'figure'   - ['on'|'off'] 'on'  -> plot in a new figure; 
+%                'off' -> plot in the current figure {default: 'on'}
 % Outputs:
-%   STUDY      - the input STUDY set structure modified with plotted cluster 
-%                 mean ERP to allow quick replotting (unless cluster means 
-%                 already exists in the STUDY).  
+%   STUDY      - the input STUDY set structure with plotted cluster mean
+%                ERPs added?? to allow quick replotting 
 %   Example:
-%              >> [STUDY] = std_erpplot(STUDY,ALLEEG, 'clusters', 2, 'comps', 'all');
-%                 % Plot cluster-2 components ERPs plus the mean ERP in bold. 
+%            >> [STUDY] = std_erpplot(STUDY,ALLEEG, 'clusters', 2, 'comps', 'all');
+%               % Plot cluster-2 component ERPs plus the mean ERP in bold. 
 %
-%  See also  pop_clustedit(), pop_preclust()
+%  See also  pop_clustedit(), pop_preclust(), eeg_createdata(), eeg_preclust(). std_propplot()
 %
 % Authors: Arnaud Delorme, CERCO, August, 2006
 
@@ -70,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2006/10/02 20:26:18  scott
+% plotcond -> plotconditions
+%
 % Revision 1.24  2006/10/02 17:22:47  scott
 % changed 'plotgroup' to 'plotgroups' ala change in std_erpparams.m
 %
@@ -152,8 +156,8 @@ for index = 1:length(allinds)
     end;
 
     if index == length(allinds), opt.legend = 'on'; end;
-    [pgroup pcond pinter] = std_plot(alltimes, erpdata, 'condname', STUDY.condition, 'legend', opt.legend, ...
-                                      'plotmode', opt.plotmode, 'groupname', STUDY.group, 'plotx', opt.plottime, 'unitx', 'Hz', ...
+    [pgroup pcond pinter] = std_plot(alltimes, erpdata, 'condnames', STUDY.condition, 'legend', opt.legend, ...
+                                      'plotmode', opt.plotmode, 'groupnames', STUDY.group, 'topovals', opt.plottime, 'unitx', 'Hz', ...
                                       'chanlocs', ALLEEG(1).chanlocs, 'plotsubjects', opt.plotsubjects, plotcurveopt{:});
     if length(allinds) > 1, 
         if isempty(opt.channels), title(sprintf('Cluster %d', allinds(index))); 
