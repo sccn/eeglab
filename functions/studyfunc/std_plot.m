@@ -1,26 +1,30 @@
-% std_plot() - plot ERP/spectrum curve or ERSP/ITC image for component
-%              or channel clusters in a study. Also allow plotting scalp
-%              maps at specific latencies.
+% std_plot() - plot ERP/spectral traces or ERSP/ITC images a component
+%              or channel cluster in a STUDY. Also allows plotting scalp
+%              maps at specific data latency or frequency??.
 % Usage:
-% >> std_plot( x, data, 'key', 'val', ...)
-%
+%        >> std_plot( axvals, data, 'key', 'val', ...)
 % Inputs:
-%  x     - abscicia vector for the data. If data is ERSP or ITC, then this 
-%          input may contain a cell array { times freqs }.
-%  data  - [cell array] cell array of data containing containing groups and
-%          conditions. For instance for ERP of 2 conditions and 3 groups. 
+%  axvals - [vector or cell array] axis values for the data. 
+%          If data are ERSP or ITC images, then this should be a cell 
+%          array giving { latencies_in_ms frequencies_in_hz }
+%  data  - [cell array] mean data for each subject group and/or data
+%          condition. For example, to plot mean ERPs from a STUDY 
+%          comprising two data conditions and three subject groups: 
 %             data = { [800x12] [800x12] [800x12];
 %                      [800x12] [800x12] [800x12] };
-%          when there is 800 points for the ERP and 12 subjects. Statistics
-%          is run accross subejcts and only the average is plotted. See 
-%          below and statcond() for more information about statistics.
+%          for 800 timepoints and 12 subjects. Statistics
+%          are run across subjects; only the averages are plotted. 
+%          See below and statcond() for more information about the 
+%          statistical computations.
 %
-% Optional input for display:
-%  'datatype'    - ['ersp'|'itc'|'erp'|'spec'] data type. Default is 'erp'.
-%  'channels'    - [cell array] channel names (for titles)
-%  'condname'    - [cell array] names of conditions (for titles)
-%  'groupname'   - [cell array] names of groups (for titles)
-%  'subject'     - [string] subject name (for titles)
+% Optional display parameters:
+%  'datatype'    - ['ersp'|'itc'|'erp'|'spec'] data type {default: 'erp'}
+%  'channels'    - [cell array] channel names (for titles) {default: all}
+%  'condnames'   - [cell array] names of conditions (for titles} 
+%                  {default: none}
+%  'groupnames'  - [cell array] names of subject groups (for titles)
+%                  {default: none}
+%  'subject'     - [string] plot subject name (for title)
 %
 % Statistics options:
 %  'statgroup'     'string' { 'on' 'off' }   'off';
@@ -55,28 +59,34 @@
 %                  has the option to mask the data for significance.
 %
 % Curve plotting options (ERP and spectrum):
-%  'plotgroup'   - ['together'|'appart'] plot groups on the same panel
-%                  in different colors 'together' or on different panels.
-%  'plotcond'    - ['together'|'appart'] plot conditions on the same panel
-%                  in different colors 'together' or on different panels.
-%                  Note that 'plotgroup' and 'plotcond' cannot be set to 
-%                  'together' both at the same time.
-%  'freqrange'   - [min max] spectrum plotting frequency range in ms. Default 
-%                  is the whole frequency range.
-%  'timerange'   - [min max] ERP plotting time range in ms. Default is 
-%                  the whole time range.
-%  'legend'      - ['on'|'off'] plot legend
-%  'plotmode'    - ['normal'|'condensed'] plotting for statistics.
-%                  Condensed plot statistics under the curves (when possible)
-%                  and 'normal' plot them in separate panels.
-%  'plotx'       - [real] plot scalp map at specific latency. For ERSP
-%                  this arguement must contain [time freq].
-%  'ylim'        - [min max] ordinate limits (ERP, spectrum)
-%  'plotsubjects' - ['on'|'off'] plot single subjects curves
+%  'plotgroups'  - ['together'|'apart'] 'together' -> plot mean results 
+%                  for subject groups on the same axis in different colors 
+%                  'apart' -> plot group results on different axes.
+%                  {default: ??}
+%  'plotconditions' - ['together'|'apart'] 'together' -> plot mean results 
+%                  for data conditions on the same axis in different colors 
+%                  'apart' -> plot conditions on different axes. Note: 
+%                  'plotgroups' and 'plotconditions' cannot both be 
+%                  set to 'together' {default: ??}
+%  'freqrange'   - [min max] spectrum plotting frequency range in Hz. 
+%                  {default: all available frequencies}
+%  'timerange'   - [min max] ERP plotting latency range in ms. 
+%                  {default: all available latencies}
+%  'legend'      - ['on'|'off'] plot ?? legend {default: ??}
+%  'plotmode'    - ['normal'|'condensed'] statistics plotting mode:
+%                  'condensed' -> plot statistics under the curves 
+%                  (when possible); 'normal' -> plot them in separate 
+%                  axes {default: ??}
+% 'plotsubjects' - ['on'|'off'] overplot traces for individual components
+%                  or channels {default: ??}
+%  'plottopo'    - [real] plot a scalp map for the specified latency (ms)
+%                  or frequency (Hz) {default: no topoplot}
+%  'ylim'        - [min max] ordinate limits for ERP and spectrum plots
+%                  {default: all available data}
 %
 % ITC/ERSP image plotting options:
-%  'plotx'       - [time freq] plot scalp map at specific latency in ms and 
-%                  frequency.
+%  'plottopo'    - [latency frequency] plot a scalp map at specific 
+%                  latency (in ms) and frequency (in Hz).
 %  'tftopoopt'   - [cell array] tftopo() plotting options (ERSP and ITC)
 %  'caxis'       - [min max] color axis (ERSP, ITC, scalp maps)
 %
@@ -88,6 +98,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2006/10/02 11:41:13  arno
+% wrote documentation
+%
 
 % Copyright (C) 2006 Arnaud Delorme
 %
@@ -118,11 +131,11 @@ end;
 opt = finputcheck( varargin, { 'channels'    'cell'   []              {};
                                'caxis'       'real'   []              [];
                                'ylim'        'real'   []              [];
-                               'condname'    'cell'   []              {};
-                               'groupname'   'cell'   []              {};
+                               'condnames'    'cell'   []              {};
+                               'groupnames'   'cell'   []              {};
                                'tftopoopt'   'cell'   []              {};
                                'threshold'   'real'   []              NaN;
-                               'plotx'       'real'   []              [];
+                               'plottopo'       'real'   []              [];
                                'naccu'       'integer' []             500;
                                'unitx'       'string' []              'ms'; % just for titles
                                'subject'     'string' []              '';   % just for titles
@@ -134,8 +147,8 @@ opt = finputcheck( varargin, { 'channels'    'cell'   []              {};
                                'legend'      'string' { 'on' 'off' }   'off';
                                'timerange'   'real'   []               [];
                                'datatype'    'string' { 'ersp' 'itc' 'erp' 'spec' }    'erp';
-                               'plotgroup'   'string' { 'together' 'appart' }  'appart';
-                               'plotcond'    'string' { 'together' 'appart' }  'appart';
+                               'plotgroups'   'string' { 'together' 'apart' }  'apart';
+                               'plotconditions'    'string' { 'together' 'apart' }  'apart';
                                'plotmode'    'string' { 'normal' 'condensed' }  'normal';
                                'statistics'  'string' { 'param' 'perm' }       'param';
                                'statmode'    'string' { 'individual' 'common' 'trials' } 'individual'}, 'std_erpmaskdata');
@@ -143,8 +156,8 @@ opt = finputcheck( varargin, { 'channels'    'cell'   []              {};
 if isstr(opt), error(opt); end;
 if strcmpi(datatype, 'spec'), g.unit = 'Hz'; end;
 if strcmpi(opt.plotsubjects, 'on')
-    opt.plotgroup = 'appart';
-    opt.plotcond  = 'appart';
+    opt.plotgroups = 'apart';
+    opt.plotconditions  = 'apart';
 end;
 onecol  = { 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b' };
 manycol = { 'b' 'r' 'g' 'k' 'c' 'y' };
@@ -154,13 +167,13 @@ ng = size(data,2);
 if nc >= ng, opt.transpose = 'on';
 else         opt.transpose = 'off';
 end;
-if isempty(opt.condname)
-    for c=1:nc, opt.condname{c} = sprintf('Cond. %d', c); end;
-    if nc == 1, opt.condname = { '' }; end;
+if isempty(opt.condnames)
+    for c=1:nc, opt.condnames{c} = sprintf('Cond. %d', c); end;
+    if nc == 1, opt.condnames = { '' }; end;
 end;
-if isempty(opt.groupname)
-    for g=1:ng, opt.groupname{g} = sprintf('Group. %d', g); end;
-    if ng == 1, opt.groupname = { '' }; end;
+if isempty(opt.groupnames)
+    for g=1:ng, opt.groupnames{g} = sprintf('Group. %d', g); end;
+    if ng == 1, opt.groupnames = { '' }; end;
 end;
 
 % condensed plot
@@ -173,8 +186,8 @@ if strcmpi(opt.plotmode, 'condensed')
                 plot( allx, real(mean(mean(data{c,g},2),3)), manycol{(c-1)*ng+g});
                 xlim([allx(1) allx(end)]); hold on;
                 if ~isempty(opt.ylim), ylim(opt.ylim); end;
-                if isempty(opt.condname{c}) | isempty(opt.groupname{g}), leg{(c-1)*ng+g} = [ opt.condname{c} opt.groupname{g} ];
-                else                                                     leg{(c-1)*ng+g} = [ opt.condname{c} ', ' opt.groupname{g} ];
+                if isempty(opt.condnames{c}) | isempty(opt.groupnames{g}), leg{(c-1)*ng+g} = [ opt.condnames{c} opt.groupnames{g} ];
+                else                                                     leg{(c-1)*ng+g} = [ opt.condnames{c} ', ' opt.groupnames{g} ];
                 end;
             end;
         end;
@@ -197,25 +210,25 @@ end;
 % ------------------
 if ng > 1 & strcmpi(opt.statgroup, 'on'), addc = 1; else addc = 0; end;
 if nc > 1 & strcmpi(opt.statcond , 'on'), addr = 1; else addr = 0; end;
-if isempty(opt.plotx) % only for curves
+if isempty(opt.plottopo) % only for curves
     plottag = 0;
-    if strcmpi(opt.plotgroup, 'together') & strcmpi(opt.statcond, 'off') & strcmpi(opt.statgroup, 'on' ) & ~isnan(opt.threshold), addc = 0; plottag = 1; end;
-    if strcmpi(opt.plotcond , 'together') & strcmpi(opt.statcond, 'on' ) & strcmpi(opt.statgroup, 'off') & ~isnan(opt.threshold), addr = 0; plottag = 1; end;
+    if strcmpi(opt.plotgroups, 'together') & strcmpi(opt.statcond, 'off') & strcmpi(opt.statgroup, 'on' ) & ~isnan(opt.threshold), addc = 0; plottag = 1; end;
+    if strcmpi(opt.plotconditions , 'together') & strcmpi(opt.statcond, 'on' ) & strcmpi(opt.statgroup, 'off') & ~isnan(opt.threshold), addr = 0; plottag = 1; end;
     if ~isnan(opt.threshold) & plottag == 0
         disp('Warning: cannot plot condition/group on the same panel while using a fixed');
         disp('         threshold, unless you only compute statistics for ether groups or conditions');
-        opt.plotgroup = 'appart';
-        opt.plotcond  = 'appart';
+        opt.plotgroups = 'apart';
+        opt.plotconditions  = 'apart';
     end;
 end;
 
-if ~isempty(opt.plotx)
+if ~isempty(opt.plottopo)
     % ----------------------------
     % plot scalp maps for baseline    
     % ----------------------------
-    if length(opt.plotx) < 1, opt.plotx(2) = opt.plotx(1); end;
-    [tmp ti1] = min(abs(allx-opt.plotx(1)));
-    [tmp ti2] = min(abs(allx-opt.plotx(2)));
+    if length(opt.plottopo) < 1, opt.plottopo(2) = opt.plottopo(1); end;
+    [tmp ti1] = min(abs(allx-opt.plottopo(1)));
+    [tmp ti2] = min(abs(allx-opt.plottopo(2)));
     for index = 1:length(data(:))
         data{index} = mean(data{index}(ti1:ti2,:,:),1);
     end;
@@ -263,14 +276,14 @@ end;
 
 % plotting all conditions
 % -----------------------
-if isempty(opt.plotx) & ( strcmpi(opt.datatype, 'erp') | strcmpi(opt.datatype, 'spec') )
+if isempty(opt.plottopo) & ( strcmpi(opt.datatype, 'erp') | strcmpi(opt.datatype, 'spec') )
 
-    if strcmpi(opt.plotgroup, 'together') & strcmpi(opt.plotcond,  'together')
+    if strcmpi(opt.plotgroups, 'together') & strcmpi(opt.plotconditions,  'together')
         error('Cannot plot both conditions and groups on the same plot');
     end;
-    if strcmpi(opt.plotgroup, 'together'), ngplot = 1; else ngplot = ng; end; 
-    if strcmpi(opt.plotcond,  'together'), ncplot = 1; else ncplot = nc; end;     
-    if strcmpi(opt.plotgroup, 'together') | strcmpi(opt.plotcond, 'together')
+    if strcmpi(opt.plotgroups, 'together'), ngplot = 1; else ngplot = ng; end; 
+    if strcmpi(opt.plotconditions,  'together'), ncplot = 1; else ncplot = nc; end;     
+    if strcmpi(opt.plotgroups, 'together') | strcmpi(opt.plotconditions, 'together')
          col = manycol;
          leg = 'on';
     else
@@ -283,10 +296,10 @@ if isempty(opt.plotx) & ( strcmpi(opt.datatype, 'erp') | strcmpi(opt.datatype, '
     figure('color', 'w');
     pos = get(gcf, 'position');
     basewinsize = 200/max(nc,ng)*3;
-    if strcmpi(opt.plotgroup, 'together') pos(3) = 200*(1+addc);
+    if strcmpi(opt.plotgroups, 'together') pos(3) = 200*(1+addc);
     else                                  pos(3) = 200*(ng+addc);
     end;
-    if strcmpi(opt.plotcond , 'together') pos(4) = 200*(1+addr);
+    if strcmpi(opt.plotconditions , 'together') pos(4) = 200*(1+addr);
     else                                  pos(4) = 200*(nc+addr);
     end;
     if strcmpi(opt.transpose, 'on'), set(gcf, 'position', [ pos(1) pos(2) pos(4) pos(3)]);
@@ -296,8 +309,8 @@ if isempty(opt.plotx) & ( strcmpi(opt.datatype, 'erp') | strcmpi(opt.datatype, '
     tmplim = [Inf -Inf];
     for c = 1:nc
         for g = 1:ng
-            if strcmpi(opt.plotgroup, 'together'),    hdl(c,g)=mysubplot(ncplot+addr, ngplot+addc, 1 + (c-1)*(ngplot+addc), opt.transpose); ci = g;
-            elseif strcmpi(opt.plotcond, 'together'), hdl(c,g)=mysubplot(ncplot+addr, ngplot+addc, g, opt.transpose); ci = c;
+            if strcmpi(opt.plotgroups, 'together'),    hdl(c,g)=mysubplot(ncplot+addr, ngplot+addc, 1 + (c-1)*(ngplot+addc), opt.transpose); ci = g;
+            elseif strcmpi(opt.plotconditions, 'together'), hdl(c,g)=mysubplot(ncplot+addr, ngplot+addc, g, opt.transpose); ci = c;
             else                                      hdl(c,g)=mysubplot(ncplot+addr, ngplot+addc, g + (c-1)*(ngplot+addc), opt.transpose); ci = 1;
             end;
             if strcmpi(opt.plotsubjects, 'on')
@@ -317,19 +330,19 @@ if isempty(opt.plotx) & ( strcmpi(opt.datatype, 'erp') | strcmpi(opt.datatype, '
             % statistics accross groups
             % -------------------------
             if g == ng & ng > 1 & strcmpi(opt.statgroup, 'on')
-                if strcmpi(opt.plotgroup, 'together') & strcmpi(opt.statcond, 'off') & ~isnan(opt.threshold)
+                if strcmpi(opt.plotgroups, 'together') & strcmpi(opt.statcond, 'off') & ~isnan(opt.threshold)
                      plotcurve(allx, zeros(size(allx)), 'maskarray', mean(pgroupplot{c},2), 'highlightmode', 'bottom');
                 else
-                    if strcmpi(opt.plotgroup, 'together'),    mysubplot(ncplot+addr, ngplot+addc, 2 + (c-1)*(ngplot+addc), opt.transpose); ci = g;
-                    elseif strcmpi(opt.plotcond, 'together'), mysubplot(ncplot+addr, ngplot+addc, ngplot + 1, opt.transpose); ci = c;
+                    if strcmpi(opt.plotgroups, 'together'),    mysubplot(ncplot+addr, ngplot+addc, 2 + (c-1)*(ngplot+addc), opt.transpose); ci = g;
+                    elseif strcmpi(opt.plotconditions, 'together'), mysubplot(ncplot+addr, ngplot+addc, ngplot + 1, opt.transpose); ci = c;
                     else                                      mysubplot(ncplot+addr, ngplot+addc, ngplot + 1 + (c-1)*(ngplot+addc), opt.transpose); ci = 1;
                     end;
-                    if strcmpi(opt.plotcond, 'together'), condname = 'Conditions'; else condname = opt.condname{c}; end;
+                    if strcmpi(opt.plotconditions, 'together'), condnames = 'Conditions'; else condnames = opt.condnames{c}; end;
                     if ~isnan(opt.threshold)
                          plotcurve(allx, zeros(size(allx)), 'maskarray', mean(pgroupplot{c},2));
-                         xlim([allx(1) allx(end)]); ylim([0 maxplot]); set(gca, 'ytick', []); title(sprintf('%s (p<%.4f)', condname, opt.threshold));
+                         xlim([allx(1) allx(end)]); ylim([0 maxplot]); set(gca, 'ytick', []); title(sprintf('%s (p<%.4f)', condnames, opt.threshold));
                     else plot( allx, mean(pgroupplot{c},2), col{ci});  hold on;
-                         xlim([allx(1) allx(end)]); ylim([0 maxplot]); title([ condname ' (p-value)' ]);
+                         xlim([allx(1) allx(end)]); ylim([0 maxplot]); title([ condnames ' (p-value)' ]);
                          set(gca, 'yticklabel', round(10.^-get(gca, 'ytick')*1000)/1000, 'ydir', 'reverse', 'ytickmode', 'manual');
                     end;
                 end;
@@ -342,21 +355,21 @@ if isempty(opt.plotx) & ( strcmpi(opt.datatype, 'erp') | strcmpi(opt.datatype, '
         % statistics accross conditions
         % -----------------------------
         if strcmpi(opt.statcond, 'on') & nc > 1
-            if strcmpi(opt.plotcond, 'together') & strcmpi(opt.statgroup, 'off') & ~isnan(opt.threshold)
+            if strcmpi(opt.plotconditions, 'together') & strcmpi(opt.statgroup, 'off') & ~isnan(opt.threshold)
                  axes(hdl(c,g));
                  plotcurve(allx, zeros(size(allx)), 'maskarray', mean(pcondplot{g},2), 'highlightmode', 'bottom');
-                 title(opt.groupname{g}); 
+                 title(opt.groupnames{g}); 
             else
-                if strcmpi(opt.plotgroup, 'together'),    mysubplot(ncplot+addr, ngplot+addc, 1 + c*(ngplot+addc), opt.transpose); ci = g;
-                elseif strcmpi(opt.plotcond, 'together'), mysubplot(ncplot+addr, ngplot+addc, g + ngplot+addc, opt.transpose); ci = c;
+                if strcmpi(opt.plotgroups, 'together'),    mysubplot(ncplot+addr, ngplot+addc, 1 + c*(ngplot+addc), opt.transpose); ci = g;
+                elseif strcmpi(opt.plotconditions, 'together'), mysubplot(ncplot+addr, ngplot+addc, g + ngplot+addc, opt.transpose); ci = c;
                 else                                      mysubplot(ncplot+addr, ngplot+addc, g + c*(ngplot+addc), opt.transpose); ci = 1;
                 end;
-                if strcmpi(opt.plotgroup, 'together'), groupname = 'Groups'; else groupname = opt.groupname{g}; end;
+                if strcmpi(opt.plotgroups, 'together'), groupnames = 'Groups'; else groupnames = opt.groupnames{g}; end;
                 if ~isnan(opt.threshold)
                      plotcurve(allx, zeros(size(allx)), 'maskarray', mean(pcondplot{g},2));
-                     xlim([allx(1) allx(end)]); set(gca, 'ytick', []); ylim([0 maxplot]); title(sprintf('%s (p<%.4f)', groupname, opt.threshold));
+                     xlim([allx(1) allx(end)]); set(gca, 'ytick', []); ylim([0 maxplot]); title(sprintf('%s (p<%.4f)', groupnames, opt.threshold));
                 else plot( allx, mean(pcondplot{g},2), col{ci}); hold on;
-                     xlim([allx(1) allx(end)]); ylim([0 maxplot]); title([ groupname ' (p-value)' ]);
+                     xlim([allx(1) allx(end)]); ylim([0 maxplot]); title([ groupnames ' (p-value)' ]);
                      set(gca, 'yticklabel', round(10.^-get(gca, 'ytick')*1000)/1000, 'ydir', 'reverse');
                 end;
             end;
@@ -371,17 +384,17 @@ if isempty(opt.plotx) & ( strcmpi(opt.datatype, 'erp') | strcmpi(opt.datatype, '
             if isempty(opt.ylim)
                 ylim(tmplim);
             end;
-            if strcmpi(opt.plotgroup, 'together'),                       fig_title = opt.condname{c};
-            elseif strcmpi(opt.plotcond, 'together'),                    fig_title = opt.groupname{g};
-            elseif isempty(opt.condname{c}) | isempty(opt.groupname{g}), fig_title = [ opt.condname{c} opt.groupname{g} ];
-            else                                                         fig_title = [ opt.condname{c} ', ' opt.groupname{g} ];
+            if strcmpi(opt.plotgroups, 'together'),                       fig_title = opt.condnames{c};
+            elseif strcmpi(opt.plotconditions, 'together'),                    fig_title = opt.groupnames{g};
+            elseif isempty(opt.condnames{c}) | isempty(opt.groupnames{g}), fig_title = [ opt.condnames{c} opt.groupnames{g} ];
+            else                                                         fig_title = [ opt.condnames{c} ', ' opt.groupnames{g} ];
             end;
             if ~isempty(opt.subject), fig_title = [ opt.subject ', ' fig_title ];
             end;
             title(fig_title); 
             if strcmpi(leg, 'on') & c == nc & g == ng 
-                if strcmpi(opt.plotgroup, 'together'), legend( opt.groupname );
-                else                                   legend( opt.condname );
+                if strcmpi(opt.plotgroups, 'together'), legend( opt.groupnames );
+                else                                   legend( opt.condnames );
                 end;
             end;
         end;
@@ -400,7 +413,7 @@ if isempty(opt.plotx) & ( strcmpi(opt.datatype, 'erp') | strcmpi(opt.datatype, '
         end;
     end;  
     axcopy;
-elseif isempty(opt.plotx)
+elseif isempty(opt.plottopo)
     
     % -------------------------------
     % masking for significance of not
@@ -421,7 +434,7 @@ elseif isempty(opt.plotx)
     for c = 1:nc
         for g = 1:ng
             hdl(c,g) = mysubplot(nc+addr, ng+addc, g + (c-1)*(ng+addc), opt.transpose);
-            fig_title = [ opt.condname{c} ', ' opt.groupname{g} ];
+            fig_title = [ opt.condnames{c} ', ' opt.groupnames{g} ];
             tmpplot = mean(data{c,g},3);
             if statmask, 
                 if strcmpi(opt.statcond, 'on'), tmpplot(find(pcondplot{g}(:) == 0)) = 0;
@@ -439,8 +452,8 @@ elseif isempty(opt.plotx)
             % -------------------------
             if g == ng && ng > 1 & strcmpi(opt.statgroup, 'on') & ~statmask
                 hdl(c,g+1) = mysubplot(nc+addr, ng+addc, g + 1 + (c-1)*(ng+addc), opt.transpose);
-                if isnan(opt.threshold), tmp_title = sprintf('%s (p-value)', opt.condname{c});
-                else                     tmp_title = sprintf('%s (p<%.4f)',  opt.condname{c}, opt.threshold);
+                if isnan(opt.threshold), tmp_title = sprintf('%s (p-value)', opt.condnames{c});
+                else                     tmp_title = sprintf('%s (p<%.4f)',  opt.condnames{c}, opt.threshold);
                 end;
                 tftopo( pgroupplot{c}', allx{2}, allx{1}, 'title', tmp_title, options{:});
                 caxis([-maxplot maxplot]);
@@ -454,8 +467,8 @@ elseif isempty(opt.plotx)
         % -----------------------------
         if strcmpi(opt.statcond, 'on') & ~statmask && nc > 1
             hdl(nc+1,g) = mysubplot(nc+addr, ng+addc, g + c*(ng+addc), opt.transpose);
-            if isnan(opt.threshold), tmp_title = sprintf('%s (p-value)', opt.groupname{g});
-            else                     tmp_title = sprintf('%s (p<%.4f)',  opt.groupname{g}, opt.threshold);
+            if isnan(opt.threshold), tmp_title = sprintf('%s (p-value)', opt.groupnames{g});
+            else                     tmp_title = sprintf('%s (p<%.4f)',  opt.groupnames{g}, opt.threshold);
             end;
             tftopo( pcondplot{g}', allx{2}, allx{1}, 'title', tmp_title, options{:});
             caxis([-maxplot maxplot]);
@@ -503,8 +516,8 @@ else
     for c = 1:nc
         for g = 1:ng
             hdl(c,g) = mysubplot(nc+addr, ng+addc, g + (c-1)*(ng+addc), opt.transpose);
-            if opt.plotx(1) == opt.plotx(2), fig_title = [ opt.condname{c} ', ' opt.groupname{g} ', ' num2str(opt.plotx(1)) opt.unitx];
-            else                             fig_title = [ opt.condname{c} ', ' opt.groupname{g} ', ' num2str(opt.plotx(1)) '-' num2str(opt.plotx(2)) opt.unitx];
+            if opt.plottopo(1) == opt.plottopo(2), fig_title = [ opt.condnames{c} ', ' opt.groupnames{g} ', ' num2str(opt.plottopo(1)) opt.unitx];
+            else                             fig_title = [ opt.condnames{c} ', ' opt.groupnames{g} ', ' num2str(opt.plottopo(1)) '-' num2str(opt.plottopo(2)) opt.unitx];
             end;
             tmpplot = double(mean(data{c,g},3));
             topoplot( tmpplot, opt.chanlocs);
@@ -520,8 +533,8 @@ else
             if g == ng & ng > 1 & strcmpi(opt.statgroup, 'on')
                 hdl(c,g+1) = mysubplot(nc+addr, ng+addc, g + 1 + (c-1)*(ng+addc), opt.transpose);
                 topoplot( pgroupplot{c}, opt.chanlocs);
-                if isnan(opt.threshold), title(sprintf('%s (p-value)', opt.condname{c}));
-                else                     title(sprintf('%s (p<%.4f)',  opt.condname{c}, opt.threshold));
+                if isnan(opt.threshold), title(sprintf('%s (p-value)', opt.condnames{c}));
+                else                     title(sprintf('%s (p<%.4f)',  opt.condnames{c}, opt.threshold));
                 end;
                 caxis([-maxplot maxplot]);
             end;
@@ -545,8 +558,8 @@ else
         if strcmpi(opt.statcond, 'on') & nc > 1
             hdl(nc+1,g) = mysubplot(nc+addr, ng+addc, g + c*(ng+addc), opt.transpose);
             topoplot( pcondplot{g}, opt.chanlocs);
-            if isnan(opt.threshold), title(sprintf('%s (p-value)', opt.groupname{g}));
-            else                     title(sprintf('%s (p<%.4f)',  opt.groupname{g}, opt.threshold));
+            if isnan(opt.threshold), title(sprintf('%s (p-value)', opt.groupnames{g}));
+            else                     title(sprintf('%s (p<%.4f)',  opt.groupnames{g}, opt.threshold));
             end;
             caxis([-maxplot maxplot]);
         end;
