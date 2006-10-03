@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2006/10/03 18:37:49  scott
+% help msg edits.  ARNO - SEE ??   -sm
+%
 % Revision 1.24  2006/10/02 20:25:30  scott
 % plotcond -> plotconditions
 %
@@ -155,8 +158,8 @@ if ~isempty(opt.plotfreq)
         end;
     end;
 
-    [pgroup pcond pinter] = std_plot(allfreqs, erspbase, 'condname', STUDY.condition, ...
-                                      'plotmode', opt.plotmode, 'groupname', STUDY.group, 'plotx', opt.plotfreq, 'unitx', 'Hz', ...
+    [pgroup pcond pinter] = std_plot(allfreqs, erspbase, 'condnames', STUDY.condition, ...
+                                      'plotmode', opt.plotmode, 'groupnames', STUDY.group, 'topovals', opt.plotfreq, 'unitx', 'Hz', ...
                                       'chanlocs', ALLEEG(1).chanlocs, 'plotsubjects', opt.plotsubjects, plotcurveopt{:});
     return;
 end;
@@ -187,8 +190,8 @@ for index = 1:length(allinds)
     end;
 
     if index == length(allinds), opt.legend = 'on'; end;
-    [pgroup pcond pinter] = std_plot(allfreqs, erspbase, 'condname', STUDY.condition, 'legend', opt.legend, ...
-                                      'plotmode', opt.plotmode, 'groupname', STUDY.group, 'plotx', opt.plotfreq, 'unitx', 'Hz', ...
+    [pgroup pcond pinter] = std_plot(allfreqs, erspbase, 'condnames', STUDY.condition, 'legend', opt.legend, ...
+                                      'plotmode', opt.plotmode, 'groupnames', STUDY.group, 'topovals', opt.plotfreq, 'unitx', 'Hz', ...
                                       'chanlocs', ALLEEG(1).chanlocs, 'plotsubjects', opt.plotsubjects, plotcurveopt{:});
     if length(allinds) > 1, 
         if isempty(opt.channels), title(sprintf('Cluster %d', allinds(index))); 
