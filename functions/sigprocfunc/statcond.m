@@ -1,4 +1,4 @@
-%  statcond()  - compare 2 or more conditions statistically using standard 
+%  statcond()  - compare two or more data conditions statistically using standard 
 %                parametric or nonparametric permutation-based ANOVA 
 %                (1-way or 2-way) or t-test methods. Parametric testing uses 
 %                fcdf() from the Matlab Statistical Toolbox. Use of up to 
@@ -6,8 +6,8 @@
 % Usage:
 %             >> [stats, df, pvals, surrog] = statcond( data, 'key', 'val', ... );
 % Inputs:
-%   data       = 1-dim or 2-dim cell array of data matrices. 
-%                For nonparametric permutation-based testing, the last 
+%   data       = one-dim or two-dim cell array of data matrices. 
+%                For nonparametric, permutation-based testing, the last 
 %                dimension of the data arrays (which may be of up to 4
 %                dimensions) is permuted across conditions, either in
 %                a 'paired' fashion (not changing the, e.g., subject or
@@ -41,7 +41,6 @@
 %                  made by permuting the input data {default: 'perm'}
 %   'naccu'    = [integer] Number of surrogate data copies to use in 'perm' 
 %                 mode estimation (see above) {default: 200}.
-%
 % Outputs:
 %   stats      = F- or t-value array of the same size as input data without 
 %                the last dimension. A t value is returned only if the data 
@@ -53,15 +52,15 @@
 %                 dim. filled with a number ('naccu') of surrogate data sets.
 %
 % Important note: When a two-way ANOVA is performed, outputs are cell arrays
-%                 with three elements: output(1) = effects of column; 
-%                 output(2) = effectss of row; output(3) = interactions
+%                 with three elements: output(1) = column effects; 
+%                 output(2) = row effects; output(3) = interactions
 %                 between rows and columns.
 % Examples:
 %      >> a = { rand(1,10) rand(1,10)+0.5 }; % pseudo 'paired' data vectors
 %         [t df pvals] = statcond(a);        % perform paired t-test
 %         pvals =                  
 %            5.2807e-04          % standard t-test probability value
-%            % Note: for different rand() data results will differ.
+%            % Note: for different rand() outputs, results will differ.
 %         [t df pvals surog] = statcond(a, 'mode', 'perm', 'naccu', 2000); 
 %         pvals =
 %            0.0065 % nonparametric t-test using 2000 permuted data sets
@@ -116,6 +115,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2006/05/11 15:48:07  arno
+% now better detect unpaired data
+%
 % Revision 1.5  2005/12/11 03:06:40  scott
 % help msg editing -sm
 %
