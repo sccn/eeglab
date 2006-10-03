@@ -1,7 +1,10 @@
 % pop_erspparams() - Set plotting and statistics parameters for computing 
-%                    and later?? plotting?? STUDY mean (and optionally 
+%                    and plotting STUDY mean (and optionally 
 %                    single-trial) ERSP and ITC measures and mean measure 
-%                    statistics.
+%                    statistics. Settings are stored within the STUDY 
+%                    structure (STUDY.etc.erspparams) and are used
+%                    whenever Plotting is performed by the function
+%                    std_specplot().
 % Usage:    
 %   >> STUDY = pop_erspparams(STUDY, 'key', 'val');   
 %
@@ -14,7 +17,7 @@
 %  'statcond'    - ['on'|'off'] Compute statistics across conditions?
 %                  {default: 'off'}
 %  'statistics'  - ['param'|'perm'] Type of statistics to compute: 
-%                  'param' for parametric (t-test), 'perm' for 
+%                  'param' for parametric (t-test/anova), 'perm' for 
 %                  permutation-based {default: 'param'}
 %  'statmode'    - ['individual'|'trials'] (default) 'individual' 
 %                  statistics -> statistics are computed across
@@ -24,14 +27,14 @@
 %                  were saved to disk (std_ersp() option 'savetrials', 
 %                  'on'). Note that the single-trial ERSPs may occupy 
 %                  several GB of disk space, and that computation 
-%                  of their?? statistics may require large RAM.
+%                  of statistics may require large RAM.
 %                  {default: 'individual'}
 %  'naccu'       - [integer] Number of surrogate data averages to use in
 %                  permutation-based statistics. For instance, if p<0.01, 
 %                  use naccu>200. For p<0.001, naccu>2000. If a 'threshold'
 %                  (not NaN) is set below and 'naccu' is too low, it will
-%                  be automatically increased. (This keyword?? is available 
-%                  only from the command line). 
+%                  be automatically increased. (This keyword is currently
+%                  only modifyable from the command line and not from the GUI). 
 %  'threshold'   - [NaN|alpha] Significance threshold (0<alpha<<1). Value 
 %                  NaN will plot p-values for each time and/or frequency
 %                  on a different axis. If alpha is used, significant time
@@ -44,9 +47,10 @@
 %                  should be used. Note that this also affects the 
 %                  results of statistics. {default: 'on'}
 %  'maskdata'    - ['on'|'off'] when threshold is not NaN, and 'statgroup'
-%                  or 'statcond' (above) are 'off', masks the output?? data 
+%                  or 'statcond' (above) are 'off', masks the data 
 %                  for significance.
-% Plotting options??:
+%
+% ERSP/ITC image plotting options:
 %   'timerange'  - [min max] ERSP/ITC plotting latency range in ms. {default:
 %                  the whole output latency range}.
 %   'freqrange'  - [min max] ERSP/ITC plotting frequency range in ms. {default:
@@ -77,6 +81,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2006/10/03 20:07:02  arno
+% more comments
+%
 % Revision 1.4  2006/10/03 13:57:06  scott
 % worked on help msg. ARNO, SEE MANY ?? -sm
 %
