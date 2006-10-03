@@ -1,4 +1,5 @@
-% std_propplot() - Commandline function to plot cluster properties. 
+% std_propplot() - Command line function to plot component cluster 
+%                  properties for a STUDY set. 
 %                  Displays mean cluster scalp map, ERP, ERSP; 
 %                  dipole model, spectrum, and ITC in one figure 
 %                  per cluster. Only meaasures computed during 
@@ -7,15 +8,15 @@
 %                  Leaves the plotted grand mean cluster measures 
 %                  in STUDY.cluster for quick replotting.
 % Usage:    
-%              >> [STUDY] = std_propplot(STUDY, ALLEEG, clusters);  
+%             >> [STUDY] = std_propplot(STUDY, ALLEEG, clusters);  
 % Inputs:
 %   STUDY      - STUDY set including some or all EEG datasets in ALLEEG.
 %   ALLEEG     - vector of EEG dataset structures including the datasets 
 %                in the STUDY. Yypically created using load_ALLEEG().  
 %
 % Optional inputs:
-%   clusters   - [numeric vector] -> cluster numbers to plot.
-%                           'all' -> plot all clusters in STUDY 
+%   clusters   - [numeric vector | 'all'] -> cluster numbers to plot.
+%                Else 'all' -> make plots for all clusters in the STUDY 
 %                {default: 'all'}.
 % Outputs:
 %   STUDY      - the input STUDY set structure modified with the plotted 
@@ -48,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2006/09/12 18:52:37  arno
+% Allow plotting channel properties
+%
 % Revision 1.11  2006/03/23 18:08:43  scott
 % help and msg text
 %
@@ -74,9 +78,10 @@
 %
 
 function STUDY = std_propplot(STUDY, ALLEEG,  varargin)
-icadefs; % read EEGLAB defaults
 
+icadefs; % read EEGLAB defaults
 warningon = 0;
+
 if iscell(varargin{1}) % channel plotting
     chans = varargin{1};
     for k = 1: length(chans);
@@ -85,32 +90,33 @@ if iscell(varargin{1}) % channel plotting
         set(gcf,'Color', BACKCOLOR);
         subplot(2,2,1),
         try,
-            STUDY = std_erpplot(STUDY,ALLEEG, 'channels', chans(k), 'mode', 'centroid', 'plotmode', 'condensed' );
+            STUDY = std_erpplot(STUDY,ALLEEG, 'channels', chans(k), 'mode', 'together', 'plotmode', 'condensed' );
         catch
             axis off; text(0.5, 0.5, 'No ERP information', 'horizontalalignment', 'center');
             warningon = 1;
         end
         subplot(2,2,2),
         try,
-            [STUDY] = std_erspplot(STUDY,ALLEEG, 'channels', chans(k), 'mode', 'centroid', 'plotmode', 'condensed' );
+            [STUDY] = std_erspplot(STUDY,ALLEEG, 'channels', chans(k), 'mode', 'together', 'plotmode', 'condensed' );
         catch, 
             axis off; text(0.5, 0.5, 'No ERSP information', 'horizontalalignment', 'center');
             warningon = 1;
         end
         subplot(2,2,3),
         try,
-            STUDY = std_specplot(STUDY,ALLEEG, 'channels', chans(k), 'mode', 'centroid', 'plotmode', 'condensed');
+            STUDY = std_specplot(STUDY,ALLEEG, 'channels', chans(k), 'mode', 'together', 'plotmode', 'condensed');
         catch
             axis off; text(0.5, 0.5, 'No spectral information', 'horizontalalignment', 'center');
             warningon = 1;
         end
         subplot(2,2,4),
         try,
-            [STUDY] = std_itcplot(STUDY,ALLEEG, 'channels', chans(k), 'mode', 'centroid', 'plotmode', 'condensed' );
+            [STUDY] = std_itcplot(STUDY,ALLEEG, 'channels', chans(k), 'mode', 'together', 'plotmode', 'condensed' );
         catch, 
             axis off; text(0.5, 0.5, 'No ITC information', 'horizontalalignment', 'center');
             warningon = 1;
         end
+
         %subplot('position', [0.77 0.16 0.15 0.28]),
         maintitle = ['Channel ''' chans{k} ''' average properties' ];
         a = textsc(maintitle, 'title'); 
@@ -137,7 +143,7 @@ if length(varargin) > 0
     elseif isstr(varargin{2}) & strcmpi(varargin{2}, 'all')
         cls = 1:length(STUDY.cluster);
     else
-        error('cluster input should be either a vector of cluster numbers or the keyword ''all''.');
+        error('cluster input should be either a vector of cluster indices or the keyword ''all''.');
     end
 end
 
@@ -158,7 +164,7 @@ for k = 1: len
     set(gcf,'Color', BACKCOLOR);
     subplot(2,3,1),
     try,
-        STUDY = std_topoplot(STUDY,ALLEEG, 'clusters', cls(k), 'mode', 'centroid', 'figure', 'off');
+        STUDY = std_topoplot(STUDY,ALLEEG, 'clusters', cls(k), 'mode', 'together', 'figure', 'off');
     catch
         axis off; text(0.5, 0.5, 'No scalp map information', 'horizontalalignment', 'center');
         warningon = 1;
@@ -166,7 +172,7 @@ for k = 1: len
     waitbar(k/(len*6),h_wait)
     subplot(2,3,2),
     try,
-        STUDY = std_erpplot(STUDY,ALLEEG, 'clusters', cls(k), 'mode', 'centroid', 'plotmode', 'condensed' );
+        STUDY = std_erpplot(STUDY,ALLEEG, 'clusters', cls(k), 'mode', 'together', 'plotmode', 'condensed' );
     catch
         axis off; text(0.5, 0.5, 'No ERP information', 'horizontalalignment', 'center');
         warningon = 1;
@@ -174,7 +180,7 @@ for k = 1: len
     waitbar((k*2)/(len*6),h_wait)
     subplot(2,3,3),
     try,
-        [STUDY] = std_erspplot(STUDY,ALLEEG, 'clusters', cls(k), 'mode', 'centroid', 'plotmode', 'condensed' );
+        [STUDY] = std_erspplot(STUDY,ALLEEG, 'clusters', cls(k), 'mode', 'together', 'plotmode', 'condensed' );
     catch, 
         axis off; text(0.5, 0.5, 'No ERSP information', 'horizontalalignment', 'center');
         warningon = 1;
@@ -190,7 +196,7 @@ for k = 1: len
     waitbar((k*4)/(len*6),h_wait)
     subplot(2,3,5),
     try,
-        STUDY = std_specplot(STUDY,ALLEEG, 'clusters', cls(k), 'mode', 'centroid', 'plotmode', 'condensed');
+        STUDY = std_specplot(STUDY,ALLEEG, 'clusters', cls(k), 'mode', 'together', 'plotmode', 'condensed');
     catch
         axis off; text(0.5, 0.5, 'No spectral information', 'horizontalalignment', 'center');
         warningon = 1;
@@ -198,21 +204,21 @@ for k = 1: len
     waitbar((k*5)/(len*6),h_wait)
     subplot(2,3,6),
     try,
-        [STUDY] = std_itcplot(STUDY,ALLEEG, 'clusters', cls(k), 'mode', 'centroid', 'plotmode', 'condensed' );
+        [STUDY] = std_itcplot(STUDY,ALLEEG, 'clusters', cls(k), 'mode', 'together', 'plotmode', 'condensed' );
     catch, 
         axis off; text(0.5, 0.5, 'No ITC information', 'horizontalalignment', 'center');
         warningon = 1;
     end
     waitbar((k*6)/(len*6),h_wait);
     %subplot('position', [0.77 0.16 0.15 0.28]),
-    maintitle = ['Cluster '''  STUDY.cluster(cls(k)).name ''' average properties (' num2str(length(STUDY.cluster(cls(k)).comps)) ' comps).' ];
+    maintitle = ['Cluster '''  STUDY.cluster(cls(k)).name ''' mean properties (' num2str(length(STUDY.cluster(cls(k)).comps)) ' comps).' ];
     a = textsc(maintitle, 'title'); 
     set(a, 'fontweight', 'bold');     
 
     if warningon
         disp('Some properties could not be plotted. To plot these properties, first');
         disp('include them in pre-clustering. There, specify 0 dimensions if you do');
-        disp('now want a property (scalp map, ERSP, etc...) to be included');
+        disp('not want a property (scalp map, ERSP, etc...) to be included');
         disp('in the clustering procedure. See the clustering tutorial.');
     end;
 
