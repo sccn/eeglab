@@ -1,5 +1,5 @@
 % pop_specparams() - Set plotting and statistics parameters for computing
-%                    STUDY spectra.
+%                    STUDY component spectra.
 % Usage:    
 %       >> STUDY = pop_specparams(STUDY, 'key', 'val');   
 %
@@ -7,33 +7,36 @@
 %   STUDY        - EEGLAB STUDY set
 %
 % Statistics options:
-%   'statgroup'  - ['on'|'off'] Compute (or not) statistics across groups.
-%                  {default: 'off'}
-%   'statcond'   - ['on'|'off'] Compute (or not) statistics across groups.
-%                  {default: 'off'}
-%   'statistics' - ['param'|'perm'] Type of statistics to use 'param' for
-%                  parametric and 'perm' for permutation-based statistics. 
-%                  {default: 'param'}
+%   'groupstats'  - ['on'|'off'] Compute (or not) statistics across subject 
+%                  groups {default: 'off'}
+%   'condstats'   - ['on'|'off'] Compute (or not) statistics across data.
+%                  conditions {default: 'off'}
+%   'statistics' - ['param'|'perm'] Type of statistics to use: 'param' for
+%                  parametric (t-test/anova) and 'perm' for permutation
+%                  -based statistics {default: 'param'} {default: 'param'}
 %   'naccu'      - [integer] Number of surroage averages to accumulate for
 %                  permutation-based statistics. For instance for p < 0.01,
 %                  use 'naccu' >= 200; for p < 0.001, use >= 2000. When 
 %                  threshold (below) is not NaN and 'naccu' is too low, 
 %                  'naccu' will be automatically updated (for now, from
-%                  the command line only).
+%                  the command line only). {default: ??}
 %   'threshold'  - [NaN|0.0x] Significance threshold. NaN will plot the 
-%                  p-value itself on a different axis. When possible, the
+%                  p-value themselves on a different figure. When possible, 
 %                  significant latency regions are shown below the data.
+%                  {default: ??}
 % Plot options:
 %   'freqrange'  - [min max] spectral frequency range (in Hz) to plot. 
 %                  {default: whole frequency range} .
-%   'ylim'       - [min max] spectral plotting limits {default: from data}
-%   'plotgroups'  - ['together'|'apart'] 'together' -> plot subject groups 
-%                  on the same axis in different colors, else ('apart') on 
-%                  different panels.
+%   'ylim'       - [mindB maxdB] spectral plotting limits in dB 
+%                  {default: from data}
+%   'plotgroups' - ['together'|'apart'] 'together' -> plot subject groups 
+%                  on the same figure in different colors, else ('apart') on 
+%                  different figures {default: ??}
 %   'plotconditions' - ['together'|'apart'] 'together' -> plot conditions 
-%                  on the same axis in different colors, else ('apart') 
-%                  on different panels. Note: Keywords 'plotgroups' and 
+%                  on the same figure in different colors, else ('apart') 
+%                  on different figures. Note: keywords 'plotgroups' and 
 %                  'plotconditions' cannot both be set to 'together'. 
+%                  {default: ??}
 %
 % See also: std_specplot()
 %
@@ -56,11 +59,14 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2006/10/03 18:10:30  scott
+% minor help edit
+%
 % Revision 1.5  2006/10/02 20:58:43  scott
 % plotcond -> plotconditions
 %
 % Revision 1.4  2006/10/02 17:19:49  scott
-% edited help msg for clarity and grammar. changed 'appart'  to English 'apart'
+% edited help msg for clarity and grammar. changed to English 'apart'
 % changed 'plotgroup' to 'plotgroups'; in help, changed 'panel' to 'axis'
 %
 % Revision 1.3  2006/10/02 11:39:15  arno
@@ -80,8 +86,8 @@ if isempty(varargin)
     plotconditions    = fastif(strcmpi(STUDY.etc.specparams.plotconditions, 'together'), 1, 0);
     plotgroups   = fastif(strcmpi(STUDY.etc.specparams.plotgroups,'together'), 1, 0);
     statval     = fastif(strcmpi(STUDY.etc.specparams.statistics,'param'), 1, 2);
-    statcond    = fastif(strcmpi(STUDY.etc.specparams.statcond, 'on'), 1, 0);
-    statgroup   = fastif(strcmpi(STUDY.etc.specparams.statgroup,'on'), 1, 0);
+    condstats    = fastif(strcmpi(STUDY.etc.specparams.condstats, 'on'), 1, 0);
+    groupstats   = fastif(strcmpi(STUDY.etc.specparams.groupstats,'on'), 1, 0);
     
     uilist = { ...
         {'style' 'text'       'string' 'Frequency range (Hz)'} ...
@@ -97,9 +103,9 @@ if isempty(varargin)
         {'style' 'popupmenu'  'string' 'Parametric|Permutations' 'tag' 'statistics' 'value' statval 'listboxtop' statval } ...
         {'style' 'text'       'string' 'Threshold'} ...
         {'style' 'edit'       'string' threshstr 'tag' 'threshold' } ...
-        {} {'style' 'checkbox'   'string' '' 'value' statcond  'enable' enablecond  'tag' 'statcond' } ...
+        {} {'style' 'checkbox'   'string' '' 'value' condstats  'enable' enablecond  'tag' 'condstats' } ...
         {'style' 'text'       'string' 'Compute condition statistics' 'enable' enablecond} ...
-        {} {'style' 'checkbox'   'string' '' 'value' statgroup 'enable' enablegroup 'tag' 'statgroup' } ...
+        {} {'style' 'checkbox'   'string' '' 'value' groupstats 'enable' enablegroup 'tag' 'groupstats' } ...
         {'style' 'text'       'string' 'Compute group statistics' 'enable' enablegroup } };
     
     geometry = { [ 1 1 1 1] [0.1 0.1 1] [0.1 0.1 1] [1] [1 1 1 1] [0.1 0.1 1] [0.1 0.1 1] };
@@ -113,8 +119,8 @@ if isempty(varargin)
     % decode inputs
     % -------------
     if res.plotgroups & res.plotconditions, warndlg2('Both conditions and group cannot be plotted on the same panel'); return; end;
-    if res.statgroup, res.statgroup = 'on'; else res.statgroup = 'off'; end;
-    if res.statcond , res.statcond  = 'on'; else res.statcond  = 'off'; end;
+    if res.groupstats, res.groupstats = 'on'; else res.groupstats = 'off'; end;
+    if res.condstats , res.condstats  = 'on'; else res.condstats  = 'off'; end;
     if res.plotgroups, res.plotgroups = 'together'; else res.plotgroups = 'apart'; end;
     if res.plotconditions , res.plotconditions  = 'together'; else res.plotconditions  = 'apart'; end;
     res.freqrange = str2num( res.freqrange );
@@ -130,8 +136,8 @@ if isempty(varargin)
     options = {};
     if ~strcmpi( res.plotgroups, STUDY.etc.specparams.plotgroups), options = { options{:} 'plotgroups' res.plotgroups }; end;
     if ~strcmpi( res.plotconditions , STUDY.etc.specparams.plotconditions ), options = { options{:} 'plotconditions'  res.plotconditions  }; end;
-    if ~strcmpi( res.statgroup, STUDY.etc.specparams.statgroup), options = { options{:} 'statgroup' res.statgroup }; end;
-    if ~strcmpi( res.statcond , STUDY.etc.specparams.statcond ), options = { options{:} 'statcond'  res.statcond  }; end;
+    if ~strcmpi( res.groupstats, STUDY.etc.specparams.groupstats), options = { options{:} 'groupstats' res.groupstats }; end;
+    if ~strcmpi( res.condstats , STUDY.etc.specparams.condstats ), options = { options{:} 'condstats'  res.condstats  }; end;
     if ~strcmpi( res.statistics, STUDY.etc.specparams.statistics ), options = { options{:} 'statistics' res.statistics }; end;
     if ~isequal(res.ylim, STUDY.etc.specparams.ylim),           options = { options{:} 'ylim' res.ylim      }; end;
     if ~isequal(res.freqrange, STUDY.etc.specparams.freqrange), options = { options{:} 'freqrange' res.freqrange }; end;
@@ -177,8 +183,8 @@ function STUDY = default_params(STUDY)
     if ~isfield(STUDY.etc.specparams, 'freqrange'),  STUDY.etc.specparams.freqrange = []; end;
     if ~isfield(STUDY.etc.specparams, 'ylim'     ),  STUDY.etc.specparams.ylim      = []; end;
     if ~isfield(STUDY.etc.specparams, 'statistics'), STUDY.etc.specparams.statistics = 'param'; end;
-    if ~isfield(STUDY.etc.specparams, 'statgroup'),  STUDY.etc.specparams.statgroup = 'off'; end;
-    if ~isfield(STUDY.etc.specparams, 'statcond' ),  STUDY.etc.specparams.statcond  = 'off'; end;
+    if ~isfield(STUDY.etc.specparams, 'groupstats'),  STUDY.etc.specparams.groupstats = 'off'; end;
+    if ~isfield(STUDY.etc.specparams, 'condstats' ),  STUDY.etc.specparams.condstats  = 'off'; end;
     if ~isfield(STUDY.etc.specparams, 'threshold' ), STUDY.etc.specparams.threshold = NaN; end;
     if ~isfield(STUDY.etc.specparams, 'plotgroups') , STUDY.etc.specparams.plotgroups = 'apart'; end;
     if ~isfield(STUDY.etc.specparams, 'plotconditions') ,  STUDY.etc.specparams.plotconditions  = 'apart'; end;
