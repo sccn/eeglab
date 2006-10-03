@@ -33,9 +33,11 @@
 %                  be automatically increased. (This keyword?? is available 
 %                  only from the command line). 
 %  'threshold'   - [NaN|alpha] Significance threshold (0<alpha<<1). Value 
-%                  NaN will plot the p-value itself?? on a different axis??. 
-%                  When possible, the significant time regions?? are indicated 
-%                  below the data on the same plot.?? {default: ??}
+%                  NaN will plot p-values for each time and/or frequency
+%                  on a different axis. If alpha is used, significant time
+%                  and/or frequency regions will be indicated either on
+%                  a separate axis or (whenever possible) along with the
+%                  data {default: NaN}
 %  'subbaseline' - ['on'|'off'] subtract the same baseline across conditions 
 %                  for ERSP (not ITC). When datasets with different conditions
 %                  are recorded simultaneously, a common baseline spectrum 
@@ -49,9 +51,9 @@
 %                  the whole output latency range}.
 %   'freqrange'  - [min max] ERSP/ITC plotting frequency range in ms. {default:
 %                  the whole output frequency range}
-%   'ersplim'    - [mindB maxdB] ERSP color?? plotting limits in dB 
+%   'ersplim'    - [mindB maxdB] ERSP plotting limits in dB 
 %                  {default: from data limits}
-%   'itclim'     - [minitc maxitc] ITC color?? plotting limits (range: [0,1]) 
+%   'itclim'     - [minitc maxitc] ITC plotting limits (range: [0,1]) 
 %                  {default: [0, ITC data max]}
 %
 % See also: std_erspplot(), std_itcplot()
@@ -75,6 +77,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2006/10/03 13:57:06  scott
+% worked on help msg. ARNO, SEE MANY ?? -sm
+%
 % Revision 1.3  2006/10/02 11:38:30  arno
 % header documentation
 %
