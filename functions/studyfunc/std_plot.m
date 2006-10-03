@@ -39,8 +39,8 @@
 %                  permutation statistics. For instance if you want to see
 %                  if p<0.01 use 200. For p<0.001, use 2000. If a threshold
 %                  is set below (non NaN) and 'naccu' is too low, it will
-%                  be automatically updated. (option available only from 
-%                  command line and not in GUI yet).
+%                  be automatically updated. This keyword?? is available 
+%                  only from the command line.
 %  'statmode'    - ['individual'|'trials'] standard statistics are 
 %                  'individual' where the statistics is performed accross
 %                  the mean ERSP (or ITC) of single subjects. For trials
@@ -98,6 +98,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2006/10/03 16:24:12  scott
+% help message eidts.  ARNO - SEE ??s   -sm
+%
 % Revision 1.3  2006/10/02 11:41:13  arno
 % wrote documentation
 %
