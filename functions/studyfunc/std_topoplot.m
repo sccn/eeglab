@@ -65,7 +65,7 @@ icadefs;
 
 % Set default values
 cls = [];
-mode = 'centroid'; % plot clusters centroid 
+mode = 'together'; % plot all cluster mean scalp maps on one figure
 figureon = 1; % plot on a new figure
 
 for k = 3:2:nargin
@@ -83,8 +83,8 @@ for k = 3:2:nargin
                     error('std_topoplot: ''clusters'' input takes either specific clusters (numeric vector) or keyword ''all''.');
                 end
             end
-        case 'plotsubjects'
-            mode = 'comps';
+        case 'plotsubjects' % legacy
+            mode = 'apart';
         case 'comps'
             STUDY = std_plotcompmap(STUDY, ALLEEG,  cls, varargin{k-1});
             return;
@@ -119,7 +119,7 @@ for clus = 1: length(cls) % For each cluster requested
         STUDY = std_scalpcentroid(STUDY,ALLEEG, cls(clus));
     end;
 end
-if strcmpi(mode, 'comps')         
+if strcmpi(mode, 'apart')         
     for clus = 1: length(cls) % For each cluster requested
         len = length(STUDY.cluster(cls(clus)).comps);
         if len > 0 % A non-empty cluster 
@@ -164,10 +164,10 @@ if strcmpi(mode, 'comps')
             axcopy
         end % Finished one cluster plot 
     end   % Finished plotting all clusters
-end % Finished 'comps' plotting mode
+end % Finished 'apart' plotting mode
 
 % Plot clusters centroid maps
-if strcmpi(mode, 'centroid') 
+if strcmpi(mode, 'together') 
     len = length(cls);
     rowcols(2) = ceil(sqrt(len)); rowcols(1) = ceil((len)/rowcols(2));
     if figureon
