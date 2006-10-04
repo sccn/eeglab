@@ -1024,9 +1024,15 @@ if nargin < 3
         if isfield(chans, 'type')
             alltypes          = { chans.type };
             indnoempty        = find(~cellfun('isempty', alltypes));
-            inds              = strmatch( 'fid', lower(alltypes(indnoempty)) );
-            params.nodatchans = chans(indnoempty(inds));
-            chans(indnoempty(inds)) = [];
+            if ~isempty(indnoempty)
+                if isnumeric(alltypes{indnoempty(1)})
+                    inds = [ find([alltypes{indnoempty}] > 98) ];
+                else
+                    inds = strmatch( 'fid', lower(alltypes(indnoempty)) );
+                end;
+                params.nodatchans = chans(indnoempty(inds));
+                chans(indnoempty(inds)) = [];
+            end;
         end;
         
         % multiple datasets
@@ -1439,6 +1445,10 @@ function [chans, shrinkorskirt, plotrad]= checkchans(chans, fields);
         if ~isfield(chans, fields{index})
             if ~strcmpi(fields{index}, 'datachan')
                 chans = setfield(chans, {1}, fields{index}, []);
+            elseif ~strcmpi(fields{index}, 'type')
+                for indchan = 1:length(chans)
+                    chans = setfield(chans, {indchan}, num2str(fields{index}), indchan);
+                end;
             else
                 for indchan = 1:length(chans)
                     chans = setfield(chans, {indchan}, fields{index}, indchan);
