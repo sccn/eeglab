@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2006/03/28 15:38:13  scott
+% help msg
+%
 % Revision 1.13  2006/03/14 02:32:32  scott
 % help msg
 %
@@ -68,7 +71,7 @@
 % fix reading file
 %
 % Revision 1.5  2006/03/09 00:37:31  arno
-% now writing matlab file
+% now writing matlab fileend
 %
 % Revision 1.4  2006/03/09 00:03:57  arno
 % read spectrum form matlab file
@@ -81,7 +84,7 @@
 %
 
 function [X, f] = std_readspec(ALLEEG, abset, comp, freqrange);
-    
+
 X = [];
 filename = fullfile( ALLEEG(abset).filepath,[ ALLEEG(abset).filename(1:end-3) 'icaspec' ]);
 
@@ -102,8 +105,17 @@ end;
 
 % select frequency range of interest
 % ----------------------------------
-maxind = max(find(f <= freqrange(end)));
-minind = min(find(f >= freqrange(1)));
+
+%check if freqrange is specified
+if(~isempty(freqrange))
+    maxind = max(find(f <= freqrange(end)));
+    minind = min(find(f >= freqrange(1)));
+else
+    %if not, use whole spectrum
+    maxind = length(f);
+    minind = 1;
+end
+
 f = f(minind:maxind);
 X = X(:,minind:maxind);
 %if f(end) < freqrange(end)
