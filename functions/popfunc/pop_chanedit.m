@@ -147,6 +147,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.152  2006/10/04 14:40:44  arno
+% fixed integer channel type
+%
 % Revision 1.150  2006/04/17 15:47:54  scott
 % help message formatting
 %
@@ -1006,7 +1009,7 @@ if nargin < 3
         % ----------------
         params.nosedir = nosevals{tmpval2};
         if ~strcmpi(params.nosedir, oldparams.nosedir)
-            totaluserdat = { totaluserdat 'nosedir' tmpval2 };
+            totaluserdat = { totaluserdat 'nosedir' params.nosedir };
         end;
         close(gcf);
 
