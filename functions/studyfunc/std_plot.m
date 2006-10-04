@@ -100,6 +100,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2006/10/03 21:46:11  scott
+% edit help msg -- ?? remain... -sm
+%
 % Revision 1.5  2006/10/03 16:29:27  scott
 % edit
 %
@@ -162,7 +165,7 @@ opt = finputcheck( varargin, { 'channels'    'cell'   []              {};
                                'statmode'    'string' { 'subjects' 'common' 'trials' } 'subjects'}, 'std_erpmaskdata');
                            
 if isstr(opt), error(opt); end;
-if strcmpi(datatype, 'spec'), g.unit = 'Hz'; end;
+if strcmpi(opt.datatype, 'spec'), g.unit = 'Hz'; end;
 if strcmpi(opt.plotsubjects, 'on')
     opt.plotgroups = 'apart';
     opt.plotconditions  = 'apart';
