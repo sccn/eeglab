@@ -116,6 +116,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.40  2006/10/03 13:38:22  scott
+% worked on help msg. ARNO - See many ?? in the help text! -sm
+%
 % Revision 1.39  2006/10/02 11:40:51  arno
 % minor changes
 %
@@ -345,7 +348,7 @@ for index = 1:length(EEG)
             TMP.icaact = (TMP.icaweights*TMP.icasphere)* ...
                           reshape(TMP.data(TMP.icachansind,:,:), [ length(TMP.icachansind) size(TMP.data,2)*size(TMP.data,3) ]);
         end;
-        tmpdata    = reshape(TMP.icaact, [ size(TMP.icaact,1) size(TMP.data,2)*size(TMP.data,3) ]);
+        tmpdata    = reshape(TMP.icaact, [ size(TMP.icaact,1) size(TMP.data,2) size(TMP.data,3) ]);
     else
         if isempty(tmpdata)
             tmpdata = TMP.data(g.indices,:,:);
