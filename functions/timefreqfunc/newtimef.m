@@ -270,6 +270,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.100  2006/10/03 03:41:28  toby
+% Debugging condition comparisons
+%
 % Revision 1.99  2006/10/02 20:52:31  toby
 % *** empty log message ***
 %
@@ -1238,8 +1241,9 @@ if iscell(data)
         % --------------------------------
         alltfX1power = alltfX1.*conj(alltfX1);
         alltfX2power = alltfX2.*conj(alltfX2);
-        formula = {'log10(mean(arg1,3))'};              % toby 10.02.2006
+        %formula = {'log10(mean(arg1,3))'};              % toby 10.02.2006
         %formula = {'log10(mean(arg1(:,:,data),3))'};
+        formula = {'log10(mean(arg1(:,:,X),3))'};
         switch g.type
             case 'coher', % take the square of alltfx and alltfy first to speed up
                 formula = { formula{1} ['sum(arg2(:,:,data),3)./sqrt(sum(arg1(:,:,data),3)*length(data) )'] };
@@ -1259,7 +1263,9 @@ if iscell(data)
                         { alltfX1power alltfX2power }, {alltfX1 alltfX2});
                 end;
             case 'phasecoher2', % normalize first to speed up
-                formula = { formula{1} ['sum(arg2(:,:,data),3)./sum(arg3(:,:,data),3)'] };
+                %formula = { formula{1} ['sum(arg2(:,:,data),3)./sum(arg3(:,:,data),3)'] }; 
+                % toby 10/3/2006
+                formula = { formula{1} ['sum(arg2(:,:,X),3)./sum(arg3(:,:,X),3)'] };
                 alltfX1abs = sqrt(alltfX1power); % these 2 lines can be suppressed
                 alltfX2abs = sqrt(alltfX2power); % by inserting sqrt(arg1(:,:,data)) instead of arg3(:,:,data))
                 if strcmpi(g.lowmem, 'on')
@@ -1279,8 +1285,9 @@ if iscell(data)
                         { alltfX1power alltfX2power }, {alltfX1 alltfX2}, { alltfX1abs alltfX2abs });
                 end;
             case 'phasecoher',
-                formula = { formula{1} ['mean(arg2,3)'] };              % toby 10.02.2006
+                %formula = { formula{1} ['mean(arg2,3)'] };              % toby 10.02.2006
                 %formula = { formula{1} ['mean(arg2(:,:,data),3)'] };
+                formula = { formula{1} ['mean(arg2(:,:,X),3)'] };
                 if strcmpi(g.lowmem, 'on')
                     for ind = 1:2:size(alltfX1,1)
                         if ind == size(alltfX1,1), indarr = ind; else indarr = [ind:ind+1]; end;
