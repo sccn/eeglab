@@ -107,8 +107,8 @@ for is = 1:length(STUDY.subject)
 end;
 if ~isempty(notsameica)
     %disp('Different ICA decompositions have been found for the same')
-    %disp('subject in two conditions (if the data was recorded at the')
-    %disp('time, it is best to have the run ICA on both datasets
+    %disp('subject in two conditions. if the data were recorded at the')
+    %disp('same time, it is best to have run ICA on both datasets
     %simultanously.')
     setind = [1:length(STUDY.datasetinfo)];
     if ~isequal(STUDY.setind, setind)
