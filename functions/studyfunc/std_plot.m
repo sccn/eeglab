@@ -2,22 +2,24 @@
 %              or channel cluster in a STUDY. Also allows plotting scalp
 %              maps at specific data latency or frequency??.
 % Usage:
-%        >> std_plot( axvals, data, 'key', 'val', ...)
+%          >> std_plot( axvals, data, 'key', 'val', ...)
 % Inputs:
 %  axvals - [vector or cell array] axis values for the data. 
-%          If data are ERSP or ITC images, then this should be a cell 
-%          array giving { latencies_in_ms frequencies_in_hz }
-%  data  - [cell array] mean data for each subject group and/or data
-%          condition. For example, to plot mean ERPs from a STUDY 
-%          for epochs of 800 frames in two conditions from three groups 
-%          of 12 subjects:
-%          >> data = { [800x12] [800x12] [800x12];... % 3 groups, cond 1
-%                      [800x12] [800x12] [800x12] };  % 3 groups, cond 2
-%          >> std_plot(erp_ms,data);
-%          By default, parametric statistics are computed across subjects 
-%          in the three groups. (group,condition) ERP averages are plotted. 
-%          See below and >> help statcond 
-%          for more information about the statistical computations.
+%           If data are ERSP or ITC images, then this should be a cell 
+%           array giving { latencies_in_ms frequencies_in_hz }
+%  data  -  [cell array] mean data for each subject group and/or data
+%           condition. For example, to plot mean ERPs from a STUDY 
+%           for epochs of 800 frames in two conditions from three groups 
+%           of 12 subjects:
+%
+%           >> data = { [800x12] [800x12] [800x12];... % 3 groups, cond 1
+%                       [800x12] [800x12] [800x12] };  % 3 groups, cond 2
+%           >> std_plot(erp_ms,data);
+%
+%           By default, parametric statistics are computed across subjects 
+%           in the three groups. (group,condition) ERP averages are plotted. 
+%           See below and >> help statcond 
+%           for more information about the statistical computations.
 %
 % Optional display parameters:
 %  'datatype'    - ['ersp'|'itc'|'erp'|'spec'] data type {default: 'erp'}
@@ -33,9 +35,8 @@
 %                  {default: 'off'}
 %  'condstats'   - ['on'|'off'] Compute (or not) statistics across groups.
 %                  {default: 'off'}
-%  'statistics'  - ['param'|'perm'] Type of statistics to use 'param' for
-%                  parametric and 'perm' for permutations. 
-%                  {default: 'param'}
+%  'statistics'  - ['param'|'perm'] Type of statistics to use: 'param' for
+%                  parametric; 'perm' for permutations {default: 'param'}
 %  'naccu'       - [integer] Number of surrogate averges fo accumulate when 
 %                  computing permutation-based statistics. For example, to
 %                  test p<0.01 use naccu>=200; for p<0.001, use naccu>=2000. 
@@ -62,14 +63,14 @@
 %
 % Curve plotting options (ERP and spectrum):
 %  'plotgroups'  - ['together'|'apart'] 'together' -> plot mean results 
-%                  for subject groups on the same axis in different colors 
-%                  'apart' -> plot group results on different axes.
+%                  for subject groups on the same figure in different colors 
+%                  'apart' -> plot group results on different figures.
 %                  {default: ??}
 %  'plotconditions' - ['together'|'apart'] 'together' -> plot mean results 
-%                  for data conditions on the same axis in different colors 
-%                  'apart' -> plot conditions on different axes. Note: 
-%                  'plotgroups' and 'plotconditions' cannot both be 
-%                  set to 'together' {default: ??}
+%                  for data conditions on the same figure in different colors 
+%                  'apart' -> plot conditions on different figure. Note: 
+%                  'plotgroups' and 'plotconditions' arguments cannot both 
+%                  be 'together' {default: ??}
 %  'freqrange'   - [min max] spectrum plotting frequency range in Hz. 
 %                  {default: all available frequencies}
 %  'timerange'   - [min max] ERP plotting latency range in ms. 
@@ -100,6 +101,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2006/10/04 23:55:34  toby
+% Bug fix courtesy Bas de Kruif
+%
 % Revision 1.6  2006/10/03 21:46:11  scott
 % edit help msg -- ?? remain... -sm
 %
