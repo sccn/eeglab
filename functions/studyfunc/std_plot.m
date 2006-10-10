@@ -41,8 +41,8 @@
 %                  computing permutation-based statistics. For example, to
 %                  test p<0.01 use naccu>=200; for p<0.001, use naccu>=2000. 
 %                  If a non-NaN 'threshold' is set (see below) and 'naccu' 
-%                  is too low, it will be automatically increased. This keyword 
-%                  is available only from the command line. {default: ??}
+%                  is too low, it will be automatically increased. This 
+%                  keyword available only from the command line {default:500}
 %  'statmode'    - ['subjects'|'trials'] standard statistics are 
 %                  'subjects' where the statistics is performed accross
 %                  the mean ERSP (or ITC) of single subjects. For 'trials'
@@ -52,36 +52,36 @@
 %                  of computation. Note that these single-trial data
 %                  may use several GB of disk space and that computation 
 %                  of 'trials' statistics requires a lot of RAM.
-%  'threshold'   - [NaN|0.0x] Significance threshold. NaN -> plot the 
+%  'threshold'   - [NaN|real<<1] Significance threshold. NaN -> plot the 
 %                  p-values themselves on a different figure. When possible, 
 %                  significance regions are indicated below the data.
-%                  {default: ??}
+%                  {default: NaN}
 %  'maskdata'    - ['on'|'off'] when threshold is non-NaN and not both 
 %                  condition and group statistics are computed, the user 
 %                  has the option to mask the data for significance.
-%                  {defualt: ??}
+%                  {defualt: 'off'}
 %
 % Curve plotting options (ERP and spectrum):
 %  'plotgroups'  - ['together'|'apart'] 'together' -> plot mean results 
-%                  for subject groups on the same figure in different colors 
-%                  'apart' -> plot group results on different figures.
-%                  {default: ??}
+%                  for subject groups in the same figure panel in different 
+%                  colors. 'apart' -> plot group results on different figure
+%                  panels {default: 'apart'}
 %  'plotconditions' - ['together'|'apart'] 'together' -> plot mean results 
-%                  for data conditions on the same figure in different colors 
-%                  'apart' -> plot conditions on different figure. Note: 
-%                  'plotgroups' and 'plotconditions' arguments cannot both 
-%                  be 'together' {default: ??}
+%                  for data conditions on the same figure panel in different 
+%                  colors. 'apart' -> plot conditions on different figure
+%                  panel. Note: 'plotgroups' and 'plotconditions' arguments 
+%                  cannot both be 'together' {default: 'apart'}
 %  'freqrange'   - [min max] spectrum plotting frequency range in Hz. 
 %                  {default: all available frequencies}
 %  'timerange'   - [min max] ERP plotting latency range in ms. 
 %                  {default: all available latencies}
-%  'legend'      - ['on'|'off'] plot ?? legend {default: ??}
+%  'legend'      - ['on'|'off'] turn plot legend on/off {default: 'off'}
 %  'plotmode'    - ['normal'|'condensed'] statistics plotting mode:
 %                  'condensed' -> plot statistics under the curves 
 %                  (when possible); 'normal' -> plot them in separate 
-%                  axes {default: ??}
+%                  axes {default: 'normal'}
 % 'plotsubjects' - ['on'|'off'] overplot traces for individual components
-%                  or channels {default: ??}
+%                  or channels {default: 'off'}
 %  'plottopo'    - [real] plot a scalp map for the specified latency (ms)
 %                  or frequency (Hz) {default: no topoplot}
 %  'ylim'        - [min max] ordinate limits for ERP and spectrum plots
@@ -101,6 +101,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2006/10/09 23:51:45  scott
+% some more help edits
+%
 % Revision 1.7  2006/10/04 23:55:34  toby
 % Bug fix courtesy Bas de Kruif
 %
