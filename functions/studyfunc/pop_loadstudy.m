@@ -37,6 +37,8 @@
 
 % Coding notes: Useful information on functions and global variables used.
 
+% $Log: not supported by cvs2svn $
+
 
 function [STUDY, ALLEEG, com] = pop_loadstudy(varargin)
 
