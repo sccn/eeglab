@@ -31,6 +31,8 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+% $Log: not supported by cvs2svn $
+
 function [STUDY, ALLEEG] = std_checkset(STUDY, ALLEEG, option);
 
 if nargin < 2
@@ -96,8 +98,9 @@ for is = 1:length(STUDY.subject)
     for ig = 1:length(STUDY.group)
         tmpind  = strmatch(STUDY.group{ig}, { STUDY.datasetinfo(alldats).group });
         tmpdats = alldats(tmpind);
-
-        nc = size(ALLEEG(STUDY.datasetinfo(tmpdats(1)).index).icaweights,1);
+        try nc = size(ALLEEG(STUDY.datasetinfo(tmpdats(1)).index).icaweights,1);
+        catch nc = [];
+        end
         for ir = 2:length(tmpdats)
             if nc ~= size(ALLEEG(STUDY.datasetinfo(tmpdats(ir)).index).icaweights,1)
                 notsameica = [ 1 tmpdats(1) tmpdats(ir) ];
