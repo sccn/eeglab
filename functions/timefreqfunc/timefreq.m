@@ -127,6 +127,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.52  2006/10/04 19:58:51  toby
+% updated to use Rey's Morlet wavelet, documentation updates, code cleanup
+% 'wletmethod' option to choose the freq analysis program you want to use.
+%
 % Revision 1.51  2006/09/26 18:33:38  scott
 % testing
 %
@@ -493,7 +497,7 @@ if ~isempty(g.timestretch) & length(g.timestretch{1}) > 0
 
     timemarks = g.timestretch{1}';
     if isempty(g.timestretch{2}) | length(g.timestretch{2}) == 0
-        timerefs = median(g.timestretch{1},2);
+        timerefs = median(g.timestretch{1}',2);
     else
         timerefs = g.timestretch{2};
     end
