@@ -30,6 +30,8 @@
 % Authors: Jean Hausser, SCCN/INC/UCSD, 2006
 %
 % See also: angTimeWarp(), phasecoher(), erpimage(), newtimef()
+
+% $Log: not supported by cvs2svn $
 %
 function M=timeWarp(evLatency, newLatency)
   M = [0];
