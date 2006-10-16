@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2005/05/24 17:51:16  arno
+% remove cell2mat
+%
 % Revision 1.9  2005/02/14 00:20:57  arno
 % fix delim
 %
@@ -152,7 +155,7 @@ while isempty(inputline) | inputline~=-1
 			         array{linenb, colnb} = str2double( tmp );
 			         colnb = colnb+1;
 			     end;
-	        otherwise, error('Unrecognised converting option');
+	        otherwise, error('Unrecognised conversion option');
 	     end;   
 	     linenb = linenb +1;
      end;
