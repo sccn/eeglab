@@ -88,6 +88,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2006/07/05 22:18:30  arno
+% fixed problem if only channel labels
+%
 % Revision 1.33  2005/09/27 22:10:29  arno
 % Dataset name if only 2 datasets
 %
@@ -302,7 +305,7 @@ g = finputcheck( options, ...
                    'multcmp'  'integer'  [0 Inf]         [] });
 if isstr(g), error(g); end;
 
-figure;
+figure; axcopy
 
 try, icadefs; set(gcf, 'color', BACKCOLOR); axis off; catch, end;
 
