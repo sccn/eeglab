@@ -6,7 +6,7 @@
 %        >> EEG = pop_importevent( EEG, 'key1', 'value1', ...);
 %
 % Graphic interface:
-%   "Event indices" - [edit box] Enter indices of event to modify. 
+%   "Event indices" - [edit box] Enter indices of events to modify. 
 %               Leave this field blank to import new events. 
 %               Command line equivalent: 'indices'.
 %   "Append events?" - [checkbox] Check this checkbox to clear prior
@@ -22,10 +22,10 @@
 %               in the text file, they cannnot be used and you must copy 
 %               the names into this edit box (and skip the name row). Must
 %               provide a name for each column. The keywords "type",
-%               "latency", and "duration" are recognized EEGLAB keyword and 
-%               should be used to define the columns containing event types, 
-%               event latencies, and event durations. Columns names can be
-%               separated by comas, quoted or not. 
+%               "latency", and "duration" are recognized EEGLAB keywords and 
+%               should be used to define the event log file columns containing 
+%               event types, latencies, and durations. Column names can be
+%               separated by commas, quoted or not. 
 %               Command line equivalent: fields.
 %  "Latency time unit (sec)" - [edit box] Specify the time unit for the 
 %               latency column defined above relative to seconds. 
