@@ -38,7 +38,7 @@
 %    use 'print -mfile filemane' to save a matlab file of the figure.
 %
 % Output:
-%    handlers  - all the handler of the elements (in the same ordre as the
+%    handlers  - all the handler of the elements (in the same order as the
 %                uilist input).
 %    height    - adviced widht for the figure (so the text look nice).   
 %    height    - adviced height for the figure (so the text look nice).   
@@ -72,6 +72,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.52  2006/09/12 16:43:24  arno
+% allow vertshift
+%
 % Revision 1.51  2006/02/23 22:32:43  arno
 % nothing
 %
