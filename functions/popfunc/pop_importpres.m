@@ -1,35 +1,37 @@
-% pop_importpres() - append Presentation event file information into eeglab()
-%
+% pop_importpres() - append Presentation event file information into an EEGLAB dataset
+%                    The Presentation stimulus presentation program outputs an ascii
+%                    log file. This function merges existing EEG dataset events with
+%                    additional field information (fields) about those events contained 
+%                    in the logfile. 
 % Usage:
 %   >> EEGOUT = pop_importpres( EEGIN, filename );
 %   >> EEGOUT = pop_importpres( EEGIN, filename, typefield, ...
 %                                  latfield, durfield, align, 'key', 'val', ... );
-%
 % Inputs:
 %   EEGIN          - input dataset
-%   filename       - file name
-%   typefield      - [string] type field name. Default is 'code'.
-%   latfield       - [string] latency field name. Default is 'time'.
-%   durfield       - [string] duration field name. Default is 'none'.
-%   align          - [integer] alignment with preexisting events
-%                    see pop_importevent().
+%   logfilename    - Presentation logfile name
+%
+%   typefield      - [string] type fieldname {default: 'code'}
+%   latfield       - [string] latency fieldname {default: 'time'}
+%   durfield       - [string] duration fieldname {default: 'none'}
+%   align          - [integer] alignment with pre-existing events
+%                    See    >> help pop_importevent
 %   'key','val'    - This function calls pop_importevent(). These are
 %                    optional arguments for this function (for event 
 %                    alignment for instance).
-% 
 % Outputs:
-%   EEGOUT         - data structure
+%   EEGOUT         - data structure with added Presentation logfile information
 %
-% Note: 1) If they are pre-existing events in the input dataset,
-%          this function will recalculate the latency of the events
-%          in the Presentation file, so that they match the one
-%          of the pre-existing events.
+% Note: If there are pre-existing events in the input dataset,
+%       this function will recalculate the latencies of the events
+%       in the Presentation file, so that they match those
+%       of the pre-existing events.
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 15 March 2002
 %
-% Note: this function is backward compatible (before the input
-%       'durfield' was introduced) and can take 'align' as the 
-%       5th paramter (instead of 6th parameter).
+% Note: This function is backward compatible with its early versions
+%       (before the input argument 'durfield' was introduced). 
+%       It can read the 'align' value as its 5th (not 6th) paramater. 
 %
 % See also: eeglab(), pop_importevent()
 
@@ -52,6 +54,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2004/05/24 22:06:56  arno
+% importing duration field
+%
 % Revision 1.15  2004/03/19 00:48:16  arno
 % propagate varargin
 %
@@ -99,6 +104,7 @@
 %
 
 function [EEG, command] = pop_importpres(EEG, filename, typefield, latfield, durfield, align, varargin); 
+
 command = '';
 
 if nargin < 1 
