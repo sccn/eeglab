@@ -220,7 +220,7 @@ if nargin < 1
 end;	
 
 if isempty(EEG.data)
-    disp('Setevent error: cannot process empty dataset'); return;
+   disp('pop_importevent(): error: cannot process empty dataset'); return;
 end;    
 
 I = [];
@@ -228,9 +228,9 @@ I = [];
 % warning if data epochs
 % ----------------------
 if nargin<2 & EEG.trials > 1
-		questdlg2(strvcat('Though epoch information is defined in terms of event,', ...
+		questdlg2(strvcat('Though epoch information is defined in terms of the event structure,', ...
 				  'this function is usually used to import events into continuous data.', ...
-				  'For data epochs you may better use menu /File/Import epoch info/'), ...
+				  'For epoched data, use menu item ''File > Import epoch info'''), ...
 				'pop_importevent warning', 'OK', 'OK');
 end;
 	
