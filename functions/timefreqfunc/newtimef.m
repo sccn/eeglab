@@ -270,6 +270,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.101  2006/10/05 03:34:33  toby
+% condition comparison bug fixed
+%
 % Revision 1.100  2006/10/03 03:41:28  toby
 % Debugging condition comparisons
 %
@@ -748,7 +751,7 @@
 % 03-16-02 timeout automatically adjusted if too high -ad
 % 04-02-02 added 'coher' option -ad
 
-function [P,R,mbase,timesout,freqs,Pboot,Rboot,alltfX,PA] = newtimef( data, frame, tlimits, Fs, varwin, varargin);
+function [P,R,mbase,timesout,freqs,Pboot,Rboot,alltfX,PA] = newtimef( data, frames, tlimits, Fs, varwin, varargin);
 
 
 % Note: Above, PA is output of 'phsamp','on'
@@ -794,7 +797,7 @@ DEFAULT_TITLE	= '';		% Figure title
 DEFAULT_ELOC    = 'chan.locs';	% Channel location file
 DEFAULT_ALPHA   = NaN;		% Percentile of bins to keep
 DEFAULT_MARKTIME= NaN;
-DEFAULT_WINSIZE = max(pow2(nextpow2(frame)-3),4);
+DEFAULT_WINSIZE = max(pow2(nextpow2(frames)-3),4);
 DEFAULT_PAD = max(pow2(nextpow2(DEFAULT_WINSIZE)),4);
 % Font sizes:
 AXES_FONT       = 10;           % axes text FontSize
@@ -812,19 +815,19 @@ if isstr(data) & strcmp(data,'details')
     return
 end
 if ~iscell(data)
-    [data, frame] = reshapeX(data, frame);
+    [data, frames] = reshapeX(data, frames);
     trials = size(data,2);
 else
-    [data{1}, frame] = reshapeX(data{1}, frame);
-    [data{2}, frame] = reshapeX(data{2}, frame);
+    [data{1}, frames] = reshapeX(data{1}, frames);
+    [data{2}, frames] = reshapeX(data{2}, frames);
     trials = size(data{1},2);
 end;
 
 if (nargin < 2)
-    frame = DEFAULT_EPOCH;
-elseif (~isnumeric(frame) | length(frame)~=1 | frame~=round(frame))
+    frames = DEFAULT_EPOCH;
+elseif (~isnumeric(frames) | length(frames)~=1 | frames~=round(frames))
     error('Value of frames must be an integer.');
-elseif (frame <= 0)
+elseif (frames <= 0)
     error('Value of frames must be positive.');
 end;
 
@@ -921,7 +924,7 @@ g = finputcheck(varargin, ...
     });
 
 g.tlimits = tlimits;
-g.frame   = frame;
+g.frames   = frames;
 g.srate   = Fs;
 g.cycles  = varwin;
 g.AXES_FONT        = AXES_FONT;      % axes text FontSize
@@ -970,11 +973,11 @@ if isfield(g,'timewarpfr')
             stretchevents = size(g.timeStretchMarks,1);
             g.timeStretchPlot = [1:stretchevents]; % default to plotting all lines
         end
-        if max(max(g.timeStretchMarks)) > frame-1 | min(min(g.timeStretchMarks)) < 2
+        if max(max(g.timeStretchMarks)) > frames-1 | min(min(g.timeStretchMarks)) < 2
             error('Time warping events must be inside the epochs.');
         end
         if ~isempty(g.timeStretchRefs)
-            if max(g.timeStretchRefs) > frame-1 | min(g.timeStretchRefs) < 2
+            if max(g.timeStretchRefs) > frames-1 | min(g.timeStretchRefs) < 2
                 error('Time warping references must be inside the epochs.');
             end
         end
@@ -991,14 +994,14 @@ end
 
 if (g.cycles(1) == 0 & pow2(nextpow2(g.winsize)) ~= g.winsize)
     error('Value of winsize must be an integer power of two [1,2,4,8,16,...]');
-elseif (g.winsize > g.frame)
-    error('Value of winsize must be less than frame length.');
+elseif (g.winsize > g.frames)
+    error('Value of winsize must be less than epoch frames.');
 end
 
 if length(g.timesout) == 1 & g.timesout > 0
-    if g.timesout > g.frame-g.winsize
-        g.timesout = g.frame-g.winsize;
-        disp(['Value of timesout must be <= frame-winsize, timeout adjusted to ' int2str(g.timesout) ]);
+    if g.timesout > g.frames-g.winsize
+        g.timesout = g.frames-g.winsize;
+        disp(['Value of timesout must be <= frames-winsize, timeout adjusted to ' int2str(g.timesout) ]);
     end
 end;
 
@@ -1106,22 +1109,22 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % compute frequency by frequency if low memory
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-if strcmpi(g.lowmem, 'on') & length(data) ~= g.frame & isempty(g.nfreqs) & ~iscell(data)
+if strcmpi(g.lowmem, 'on') & length(data) ~= g.frames & isempty(g.nfreqs) & ~iscell(data)
 
     % compute for first 2 trials to get freqsout
-    XX = reshape(data, 1, frame, prod(size(data))/g.frame);
-    [P,R,mbase,timesout,freqsout] = newtimef(XX(1,:,1), frame, tlimits, Fs, varwin, 'plotitc', 'off', 'plotamp', 'off',varargin{:}, 'lowmem', 'off');
+    XX = reshape(data, 1, frames, prod(size(data))/g.frames);
+    [P,R,mbase,timesout,freqsout] = newtimef(XX(1,:,1), frames, tlimits, Fs, varwin, 'plotitc', 'off', 'plotamp', 'off',varargin{:}, 'lowmem', 'off');
 
     % scan all frequencies
     for index = 1:length(freqsout)
         if nargout < 8
             [P(index,:),R(index,:),mbase(index),timesout,tmpfreqs(index),Pboot(index,:),Rboot(index,:)] = ...
-                newtimef(data, frame, tlimits, Fs, varwin, 'freqs', [freqsout(index) freqsout(index)], 'nfreqs', 1, ...
+                newtimef(data, frames, tlimits, Fs, varwin, 'freqs', [freqsout(index) freqsout(index)], 'nfreqs', 1, ...
                 'plotamp', 'off', 'plotphasesign', 'off',varargin{:}, 'lowmem', 'off', 'timesout', timesout);
         else
             [P(index,:),R(index,:),mbase(index),timesout,tmpfreqs(index),Pboot(index,:),Rboot(index,:), ...
                 alltfX(index,:,:)] = ...
-                newtimef(data, frame, tlimits, Fs, varwin, 'freqs', [freqsout(index) freqsout(index)], 'nfreqs', 1, ...
+                newtimef(data, frames, tlimits, Fs, varwin, 'freqs', [freqsout(index) freqsout(index)], 'nfreqs', 1, ...
                 'plotamp', 'off', 'plotphasesign', 'off',varargin{:}, 'lowmem', 'off', 'timesout', timesout);
         end;
     end;
@@ -1172,14 +1175,14 @@ if iscell(data)
     verboseprintf(g.verbose, '      the number of time points or number of frequencies\n');
     verboseprintf(g.verbose, '      (''coher'' options take 3 times as much memory as other options)\n');
     [P1,R1,mbase1,timesout,freqs,Pboot1,Rboot1,alltfX1] = ...
-        newtimef( data{1}, frame, tlimits, Fs, varwin, 'plotitc', 'off', ...
+        newtimef( data{1}, frames, tlimits, Fs, varwin, 'plotitc', 'off', ...
         'plotersp', 'off', vararginori{:}, 'lowmem', 'off', ...
         'timeStretchMarks', g.timeStretchMarks(:,1:(end/2)), ... %Added -Jean
         'timeStretchRefs', g.timeStretchRefs);
 
     verboseprintf(g.verbose, '\nRunning newtimef on second condition *********************\n');
     [P2,R2,mbase2,timesout,freqs,Pboot2,Rboot2,alltfX2] = ...
-        newtimef( data{2}, frame, tlimits, Fs, varwin, 'plotitc', 'off', ...
+        newtimef( data{2}, frames, tlimits, Fs, varwin, 'plotitc', 'off', ...
         'plotersp', 'off', vararginori{:}, 'lowmem', 'off', ...
         'timeStretchMarks', g.timeStretchMarks(:,(1+end/2):end), ... %Added -Jean
         'timeStretchRefs', g.timeStretchRefs);
@@ -1339,7 +1342,7 @@ switch g.type
     case 'phasecoher2', verboseprintf(g.verbose, '  Inter-Trial Phase Coherence 2 (ITC) images based on %d trials\n',trials);
     case 'coher',       verboseprintf(g.verbose, '  Linear Inter-Trial Coherence (ITC) images based on %d trials\n',trials);
 end;
-verboseprintf(g.verbose, '  of %d frames sampled at %g Hz.\n',g.frame,g.srate);
+verboseprintf(g.verbose, '  of %d frames sampled at %g Hz.\n',g.frames,g.srate);
 verboseprintf(g.verbose, 'Each trial contains samples from %1.0f ms before to\n',g.tlimits(1));
 verboseprintf(g.verbose, '  %1.0 ms after the timelocking event.\n',g.tlimits(2));
 if ~isnan(g.alpha)
@@ -1351,9 +1354,9 @@ verboseprintf(g.verbose,'  Image frequency direction: %s\n',g.hzdir);
 % -----------------------------------------
 % detrend over epochs (trials) if requested
 % -----------------------------------------
-data = reshape(data, g.frame, prod(size(data))/g.frame);
+data = reshape(data, g.frames, prod(size(data))/g.frames);
 if strcmpi(g.rmerp, 'on')
-    data = data - mean(data,2)*ones(1, length(data(:))/g.frame);
+    data = data - mean(data,2)*ones(1, length(data(:))/g.frames);
 end;
 
 % ----------------------------------------------------
@@ -1516,7 +1519,7 @@ function g = plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
 %
 % compute ERP
 %
-ERPtimes = [g.tlimits(1):(g.tlimits(2)-g.tlimits(1))/(g.frame-1):g.tlimits(2)+0.000001];
+ERPtimes = [g.tlimits(1):(g.tlimits(2)-g.tlimits(1))/(g.frames-1):g.tlimits(2)+0.000001];
 ERPindices = zeros(1, length(times));
 for ti=1:length(times)
     [tmp ERPindices(ti)] = min(abs(ERPtimes-times(ti)));
@@ -2080,15 +2083,15 @@ end;
 
 % reshaping data
 % -----------
-function [data, frame] = reshapeX(data, frame)
+function [data, frames] = reshapeX(data, frames)
 data = squeeze(data);
 if min(size(data)) == 1
-    if (rem(length(data),frame) ~= 0)
+    if (rem(length(data),frames) ~= 0)
         error('Length of data vector must be divisible by frames.');
     end
-    data = reshape(data, frame, length(data)/frame);
+    data = reshape(data, frames, length(data)/frames);
 else
-    frame = size(data,1);
+    frames = size(data,1);
 end
 
 function verboseprintf(verbose, varargin)
