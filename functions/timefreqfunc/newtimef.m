@@ -122,15 +122,14 @@
 %                     trials). 'events' is a matrix whose columns specify the
 %                     epoch latencies (in ms) at which the same series of
 %                     successive events occur in each trial.
-%                     ELSE {{[events], [warpms]}} 'warpms' is an optional vector of
-%                     event times (in ms) to which the series of events should be
-%                     time locked. (Note: Epoch start and end should not be declared
+%      'timewarpms' = [warpms] optional vector of event latencies (in ms) 
+%                     to which the series of events should be time locked. 
+%                     (Note: Epoch start and end should not be declared
 %                     as events or warpms}. If 'warpms' is absent or [], the median
 %                     of each 'events' column will be used. NB: double {{}} required!
-%                     ELSE {{[events], [warpms], [plotidx]}} [plotidx] is an vector
-%                     of indices telling which of the warpfr to plot with vertical
-%                     lines. If undefined, all marks are plotted. Overwrites 'vert'
-%                     argument, if any.
+%     'timewarpidx' = [plotidx] is an vector of indices telling which of the events 
+%                     columns to plot with vertical lines. If undefined, all events 
+%                     are plotted. Overwrites 'vert' argument, if any.
 %
 %    Optional bootstrap parameters:
 %       'alpha'     = If non-0, compute two-tailed bootstrap significance prob.
@@ -270,6 +269,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.102  2006/10/18 15:42:09  scott
+% frame -> frames -sm
+%
 % Revision 1.101  2006/10/05 03:34:33  toby
 % condition comparison bug fixed
 %
@@ -783,7 +785,7 @@ MIN_ABS          = 1e-8;        % avoid division by ~zero
 
 % Commandline arg defaults:
 DEFAULT_EPOCH	= 750;		% Frames per trial
-DEFAULT_TIMLIM = [-1000 2000];	% Time range of g.frames (ms)
+DEFAULT_TIMLIM = [-1000 2000];	% Epoch rime range (ms)
 DEFAULT_FS	= 250;		% Sampling frequency (Hz)
 DEFAULT_NWIN	= 200;		% Number of windows = horizontal resolution
 DEFAULT_VARWIN	= 0;		% Fixed window length or fixed number of cycles.
@@ -797,11 +799,21 @@ DEFAULT_TITLE	= '';		% Figure title
 DEFAULT_ELOC    = 'chan.locs';	% Channel location file
 DEFAULT_ALPHA   = NaN;		% Percentile of bins to keep
 DEFAULT_MARKTIME= NaN;
-DEFAULT_WINSIZE = max(pow2(nextpow2(frames)-3),4);
-DEFAULT_PAD = max(pow2(nextpow2(DEFAULT_WINSIZE)),4);
+
 % Font sizes:
 AXES_FONT       = 10;           % axes text FontSize
 TITLE_FONT      = 8;
+
+if (nargin < 2)
+    frames = DEFAULT_EPOCH;
+elseif (~isnumeric(frames) | length(frames)~=1 | frames~=round(frames))
+    error('Value of frames must be an integer.');
+elseif (frames <= 0)
+    error('Value of frames must be positive.');
+end;
+
+DEFAULT_WINSIZE = max(pow2(nextpow2(frames)-3),4);
+DEFAULT_PAD = max(pow2(nextpow2(DEFAULT_WINSIZE)),4);
 
 if (nargin < 1)
     help newtimef
@@ -821,14 +833,6 @@ else
     [data{1}, frames] = reshapeX(data{1}, frames);
     [data{2}, frames] = reshapeX(data{2}, frames);
     trials = size(data{1},2);
-end;
-
-if (nargin < 2)
-    frames = DEFAULT_EPOCH;
-elseif (~isnumeric(frames) | length(frames)~=1 | frames~=round(frames))
-    error('Value of frames must be an integer.');
-elseif (frames <= 0)
-    error('Value of frames must be positive.');
 end;
 
 if (nargin < 3)
@@ -913,6 +917,8 @@ g = finputcheck(varargin, ...
     'itcavglim'     'real'      []              []; ...
     'erplim'        'real'      []              []; ...
     'speclim'       'real'      []              []; ...
+    'timewarpidx'   'real'      []              []; ...
+    'timewarpms'    'real'      []              []; ...
     'timewarpfr'    'real'      []              []; ...
     'timewarp'      'real'      []              []; ...
     'timeStretchMarks'  'real'  []              []; ...
@@ -932,47 +938,53 @@ g.TITLE_FONT       = TITLE_FONT;
 g.ERSP_CAXIS_LIMIT = ERSP_CAXIS_LIMIT;
 g.ITC_CAXIS_LIMIT  = ITC_CAXIS_LIMIT;
 
-% unpack 'timewarp' and 'timewarpfr' arguments
-%---------------------------------------------
+% unpack 'timewarp' (and undocumented 'timewarpfr') arguments
+%------------------------------------------------------------
 
 if isfield(g,'timewarpfr')
-
     if iscell(g.timewarpfr) & length(g.timewarpfr) > 3
-        error('''timewarpfr'' cell array may have at most 3 elements');
+        error('undocumented ''timewarpfr'' cell array may have at most 3 elements');
     end
+end
 
+if isfield(g,'timewarp')
     if ~isempty(g.timewarp) % convert timewarp ms to timewarpfr frames -sm
         fprintf('\n')
         if iscell(g.timewarp)
-            evntms = g.timewarp{1};
+            error('timewarp argument cannot be a cell array');
         else
             evntms = g.timewarp;
         end
         warpfr = round((evntms - g.tlimits(1))/1000*g.srate)+1;
         g.timewarpfr{1} = warpfr';
-        if iscell(g.timewarp)
-            if length(g.timewarp) > 1
-                refms = g.timewarp{2};
-                reffr = round((refms - g.tlimits(1))/1000*g.srate)+1;
-                g.timewarpfr{2} = reffr';
-            end
-            if length(g.timewarp) > 2
-                g.timewarpfr{3} = timewarp{3};
-            end
+
+        if isfield(g,'timewarpms')
+           refms = g.timewarpms;
+           reffr = round((refms - g.tlimits(1))/1000*g.srate)+1;
+           g.timewarpfr{2} = reffr';
+        end
+        if isfield(g,'timewarpidx')
+                g.timewarpfr{3} = g.timewarpidx;
         end
     end
 
+    % convert again to timeStretch parameters
+    % ---------------------------------------
     if ~isempty(g.timewarpfr)
         g.timeStretchMarks = g.timewarpfr{1};
         if length(g.timewarpfr) > 1
             g.timeStretchRefs = g.timewarpfr{2};
         end
+
         if length(g.timewarpfr) > 2
-            g.timeStretchPlot = g.timewarpfr{3};
-        else
+          if isempty(g.timewarpfr{3})
             stretchevents = size(g.timeStretchMarks,1);
             g.timeStretchPlot = [1:stretchevents]; % default to plotting all lines
+          else
+            g.timeStretchPlot = g.timewarpfr{3};
+          end
         end
+
         if max(max(g.timeStretchMarks)) > frames-1 | min(min(g.timeStretchMarks)) < 2
             error('Time warping events must be inside the epochs.');
         end
@@ -991,6 +1003,7 @@ end
 if g.tlimits(2)-g.tlimits(1) < 30
     disp('Crossf WARNING: time range is very small (<30 ms). Times limits are in millisenconds not seconds.');
 end
+
 
 if (g.cycles(1) == 0 & pow2(nextpow2(g.winsize)) ~= g.winsize)
     error('Value of winsize must be an integer power of two [1,2,4,8,16,...]');
@@ -1047,10 +1060,15 @@ if ~isempty(g.timeStretchMarks) %Added -Jean
         verboseprintf(g.verbose, ['Using supplied latencies as reference event times for time warping.\n']);
     end
     if isempty(g.timeStretchPlot)
-        verboseprintf(g.verbose, 'Will not overplot reference event times on the ERSP');
+        verboseprintf(g.verbose, 'Will not overplot the reference event times on the ERSP.\n');
     elseif length(g.timeStretchPlot) > 0
         g.vert = ((g.timeStretchRefs(g.timeStretchPlot)-1) ...
             /g.srate+g.tlimits(1)/1000)*1000;
+        fprintf('Plotting timewarp markers at ')
+        for li = 1:length(g.vert)
+           fprintf('%d ',g.vert(li));
+        end
+        fprintf(' ms.\n')
     end
 end %End -Jean
 
@@ -1372,6 +1390,7 @@ end;
     'padratio', g.padratio, 'freqs', g.freqs, 'freqscale', g.freqscale, ...
     'nfreqs', g.nfreqs, ...
     'timestretch', {g.timeStretchMarks', g.timeStretchRefs});
+
 P  = mean(alltfX.*conj(alltfX), 3); % power
 
 % ----------------
