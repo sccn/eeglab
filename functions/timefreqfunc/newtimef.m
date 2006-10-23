@@ -116,54 +116,57 @@
 %                     provided in 'cycle' parameter. {default: 'linear'}
 %                     Applies only to dftfilt2_rey.
 %
-%    Optional time warping parameter: [not yet working! see below]
+%    Optional time warping parameter: 
 %       'timewarp'  = [events] Time warp amplitude and phase time-courses
 %                     (after time/freq transform but before smoothing across
-%                     trials). 'events' is a matrix whose columns specify the
-%                     epoch latencies (in ms) at which the same series of
-%                     successive events occur in each trial.
+%                     trials). 'events' is a matrix whose columns specify 
+%                     the epoch latencies (in ms) at which the same series 
+%                     of successive events occur in each trial.      {none}
 %      'timewarpms' = [warpms] optional vector of event latencies (in ms) 
 %                     to which the series of events should be time locked. 
 %                     (Note: Epoch start and end should not be declared
-%                     as events or warpms}. If 'warpms' is absent or [], the median
-%                     of each 'events' column will be used. NB: double {{}} required!
-%     'timewarpidx' = [plotidx] is an vector of indices telling which of the events 
-%                     columns to plot with vertical lines. If undefined, all events 
-%                     are plotted. Overwrites 'vert' argument, if any.
+%                     as events or warpms}. If 'warpms' is absent or [], 
+%                     the median of each 'events' column will be used. 
+%     'timewarpidx' = [plotidx] is an vector of indices telling which of 
+%                     the 'timewarp' events columns (above) to plot with 
+%                     vertical lines. If undefined, all events are plotted. 
+%                     Overwrites the 'vert' argument (see below), if any.
 %
 %    Optional bootstrap parameters:
-%       'alpha'     = If non-0, compute two-tailed bootstrap significance prob.
-%                      level. Show non-signif. output values as green.   {0}
-%       'naccu'     = Number of bootstrap replications to accumulate     {200}
+%       'alpha'     = If non-0, compute two-tailed bootstrap significance 
+%                      probability level. Show non-signif. output values 
+%                      as green.                                     {0}
+%       'naccu'     = Number of bootstrap replications to accumulate {200}
 %       'baseboot'  = Bootstrap baseline subtract (1 -> use 'baseline';
 %                                                  0 -> use whole trial
-%                                                  [min max] -> use time range) {1}
+%                                          [min max] -> use time range) {1}
 %                     You may also enter one row per region for baseline
-%                     e.g. [0 100; 300 400] considers the window 0 to 100 ms and
-%                     300 to 400 ms.
-%       'boottype'  = ['shuffle'|'rand'|'randall'] shuffle time and trials or
-%                     invert polarity of spectral data points in ERSP (or
-%                     randomize phase in ITC) ('rand'). 'randall' compute
-%                     significance by accumulating radom polarity invertions
-%                     for each times/frequencies points (time consuming).
+%                     e.g. [0 100; 300 400] considers the window 0 to 100 ms 
+%                     and 300 to 400 ms.
+%       'boottype'  = ['shuffle'|'rand'|'randall'] 'shuffle' times and trials;
+%                     'rand' -> invert polarity of spectral data points (ERSP)
+%                     or randomize phase (ITC). 'randall' -> compute
+%                     significances by accumulating random-polarity inversions
+%                     for each time/frequency point (this is time consuming).
 %                     return identical results {'times'}.
 %       'condboot'  = ['abs'|'angle'|'complex'] for comparing 2 conditions,
 %                     either subtract ITC absolute vales ('abs'), angles
-%                     ('angles') or complex values ('complex').     {'abs'}
-%       'pboot'     = Bootstrap power limits (e.g., from timef())   {from data}
-%       'rboot'     = Bootstrap ITC limits (e.g., from timef()). Note that both
-%                     pboot and rboot must be provided to avoid recomputing
-%                     surogate data.                                {from data}boottype
+%                     ('angles') or complex values ('complex').   {'abs'}
+%       'pboot'     = Bootstrap power limits (e.g., from timef()) {from data}
+%       'rboot'     = Bootstrap ITC limits (e.g., from timef()). 
+%                     Note: Both pboot and rboot must be provided to avoid 
+%                     recomputing the surrogate data!           {from data}
 %
 %    Optional Scalp Map:
-%       'topovec'   = Scalp topography (map) to plot                     {none}
-%       'elocs'     = Electrode location file for scalp map   {no default}
+%       'topovec'   = Scalp topography (map) to plot              {none}
+%       'elocs'     = Electrode location file for scalp map       {none}
 %                     Value should be a string array containing the path
-%                     and name of the file.
-%                     File should be ascii in format of  >> topoplot example
+%                     and name of the file.  For file format, see
+%                         >> topoplot example
 %       'chaninfo'    Passed to topoplot, if called.
-%                     [struct] optional structure containing fields 'nosedir', 'plotrad'
-%                     and/or 'chantype'. See these (separate) field definitions above, below.
+%                     [struct] optional structure containing fields 
+%                     'nosedir', 'plotrad', and/or 'chantype'. See these 
+%                     field definitions above, below.
 %                     {default: nosedir +X, plotrad 0.5, all channels}
 %     Optional Plotting Parameters:
 %       'plottype'  = ['image'|'curve'] plot time frequency images or
@@ -269,6 +272,12 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.103  2006/10/18 16:23:10  scott
+% changed 'timewarp' argument to three keyword arguments:
+% 'timewarp' [eventms];  'timewarpms' [event_reference_ms]; 'timewarpidx' [indices of
+% reference event ms to plot]
+% NOTE: still a divide-by-zero problem in plotting the ITC.. -sm
+%
 % Revision 1.102  2006/10/18 15:42:09  scott
 % frame -> frames -sm
 %
