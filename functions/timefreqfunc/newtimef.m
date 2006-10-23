@@ -117,20 +117,20 @@
 %                     Applies only to dftfilt2_rey.
 %
 %    Optional time warping parameter: 
-%       'timewarp'  = [events] Time warp amplitude and phase time-courses
-%                     (after time/freq transform but before smoothing across
-%                     trials). 'events' is a matrix whose columns specify 
-%                     the epoch latencies (in ms) at which the same series 
-%                     of successive events occur in each trial.      {none}
+%       'timewarp'  = [eventms] Time-warp amplitude and phase time-courses
+%                     (following time/freq transform but before smoothing 
+%                     across trials). 'eventms' is a matrix whose columns 
+%                     specify the epoch latencies (in ms) at which the same 
+%                     series of successive events occur in each trial.
 %      'timewarpms' = [warpms] optional vector of event latencies (in ms) 
-%                     to which the series of events should be time locked. 
+%                     to which the series of events should be warped.
 %                     (Note: Epoch start and end should not be declared
-%                     as events or warpms}. If 'warpms' is absent or [], 
-%                     the median of each 'events' column will be used. 
+%                     as eventms or warpms}. If 'warpms' is absent or [], 
+%                     the median of each 'eventms' column will be used. 
 %     'timewarpidx' = [plotidx] is an vector of indices telling which of 
-%                     the 'timewarp' events columns (above) to plot with 
-%                     vertical lines. If undefined, all events are plotted. 
-%                     Overwrites the 'vert' argument (see below), if any.
+%                     the time-warped 'eventms' columns (above) to plot with 
+%                     vertical lines. If undefined, all columns are plotted. 
+%                     Overwrites the 'vert' argument (below) if any.
 %
 %    Optional bootstrap parameters:
 %       'alpha'     = If non-0, compute two-tailed bootstrap significance 
@@ -216,7 +216,7 @@
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
-%    Optional Multitaper Parameters: [not included here]
+%    Deprecated Multitaper Parameters: [not included here]
 %       'mtaper'    = If [N W], performs multitaper decomposition.
 %                      (N is the time resolution and W the frequency resolution;
 %                      maximum taper number is 2NW-1). Overwrites 'winsize' and 'padratio'.
@@ -226,7 +226,7 @@
 %                      recommended (as multiwavelets are not implemented).
 %                      Uses Matlab functions DPSS, PMTM.      {no multitaper}
 
-%    Deprecated time warp keywords (working??)
+%    Deprecated time warp keywords (working?)
 %      'timewarpfr' = {{[events], [warpfr], [plotidx]}} Time warp amplitude and phase
 %                     time-courses (after time/freq transform but before smoothing
 %                     across trials). 'events' is a matrix whose columns specify the
@@ -241,7 +241,7 @@
 %                     if any. [Note: In future releases, 'timewarpfr' will be deprecated
 %                     in favor of 'timewarp' using latencies in ms instead of frames].
 
-%    Deprecated original time warp keywords (working)
+%    Deprecated original time warp keywords (working?)
 %       'timeStretchMarks' = [(marks,trials) matrix] Each trial data will be
 %                     linearly warped (after time/freq. transform) so that the
 %                     event marks are time locked to the reference frames
@@ -272,6 +272,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.104  2006/10/23 18:56:11  scott
+% help msg -sm
+%
 % Revision 1.103  2006/10/18 16:23:10  scott
 % changed 'timewarp' argument to three keyword arguments:
 % 'timewarp' [eventms];  'timewarpms' [event_reference_ms]; 'timewarpidx' [indices of
@@ -926,10 +929,10 @@ g = finputcheck(varargin, ...
     'itcavglim'     'real'      []              []; ...
     'erplim'        'real'      []              []; ...
     'speclim'       'real'      []              []; ...
-    'timewarpidx'   'real'      []              []; ...
+    'timewarp'      'real'      []              []; ...
     'timewarpms'    'real'      []              []; ...
     'timewarpfr'    'real'      []              []; ...
-    'timewarp'      'real'      []              []; ...
+    'timewarpidx'   'real'      []              []; ...
     'timeStretchMarks'  'real'  []              []; ...
     'timeStretchRefs'   'real'  []              []; ...
     'timeStretchPlot'   'real'  []              []; ...
@@ -960,10 +963,9 @@ if isfield(g,'timewarp')
     if ~isempty(g.timewarp) % convert timewarp ms to timewarpfr frames -sm
         fprintf('\n')
         if iscell(g.timewarp)
-            error('timewarp argument cannot be a cell array');
-        else
-            evntms = g.timewarp;
+           error('timewarp argument cannot be a cell array');
         end
+        evntms = g.timewarp;
         warpfr = round((evntms - g.tlimits(1))/1000*g.srate)+1;
         g.timewarpfr{1} = warpfr';
 
@@ -973,7 +975,7 @@ if isfield(g,'timewarp')
            g.timewarpfr{2} = reffr';
         end
         if isfield(g,'timewarpidx')
-                g.timewarpfr{3} = g.timewarpidx;
+           g.timewarpfr{3} = g.timewarpidx;
         end
     end
 
@@ -1169,13 +1171,14 @@ end;
 if iscell(data)
     vararginori = varargin;
     if length(data) ~= 2
-        error('timef: to compare conditions, data must be 2-element cell arrays');
+        error('newtimef: to compare two conditions, data must be a length-2 cell array');
     end;
 
     % deal with titles
     % ----------------
     for index = 1:2:length(vararginori)
-        if index<=length(vararginori) % needed: if elemenets are deleted
+        if index<=length(vararginori) % needed if elements are deleted
+
             if strcmp(vararginori{index}, 'title') | ... %Added -Jean
                     strcmp(vararginori{index}, 'timeStretchMarks') | ...
                     strcmp(vararginori{index}, 'timeStretchRefs') | ...
@@ -1184,11 +1187,11 @@ if iscell(data)
             end;
         end;
     end;
-    if iscell(g.title) & lenth(g.title) >= 2 %Changed that part because providing titles
-        %as cells caused the function to crash at
-        %line at line 704 (g.tlimits = tlimits) -Jean
+    if iscell(g.title) & length(g.title) >= 2 % Changed that part because providing titles
+                                              % as cells caused the function to crash at
+                                              % line at line 704 (g.tlimits = tlimits) -Jean
         if length(g.title) == 2,
-            g.title{3,1:length('Condition 1 - condition 2')} = ...
+            g.title{3,1:length('Condition 1 - Condition 2')} = ...
                 'Condition 1 - Condition 2';
         end;
     else
@@ -1197,26 +1200,29 @@ if iscell(data)
         g.title{3} = 'Condition 1 - Condition 2';
     end;
 
-    verboseprintf(g.verbose, 'Running newtimef on first condition *********************\n');
+    verboseprintf(g.verbose, 'Running newtimef() on Condition 1 **********************\n');
     verboseprintf(g.verbose, 'Note: If an out-of-memory error occurs, try reducing the\n');
     verboseprintf(g.verbose, '      the number of time points or number of frequencies\n');
-    verboseprintf(g.verbose, '      (''coher'' options take 3 times as much memory as other options)\n');
+    verboseprintf(g.verbose, '(''coher'' options take 3 times the memory of other options)\n');
+
     [P1,R1,mbase1,timesout,freqs,Pboot1,Rboot1,alltfX1] = ...
         newtimef( data{1}, frames, tlimits, Fs, varwin, 'plotitc', 'off', ...
         'plotersp', 'off', vararginori{:}, 'lowmem', 'off', ...
         'timeStretchMarks', g.timeStretchMarks(:,1:(end/2)), ... %Added -Jean
         'timeStretchRefs', g.timeStretchRefs);
 
-    verboseprintf(g.verbose, '\nRunning newtimef on second condition *********************\n');
+    verboseprintf(g.verbose,'\nRunning newtimef() on Condition 2 **********************\n');
+
     [P2,R2,mbase2,timesout,freqs,Pboot2,Rboot2,alltfX2] = ...
         newtimef( data{2}, frames, tlimits, Fs, varwin, 'plotitc', 'off', ...
         'plotersp', 'off', vararginori{:}, 'lowmem', 'off', ...
         'timeStretchMarks', g.timeStretchMarks(:,(1+end/2):end), ... %Added -Jean
         'timeStretchRefs', g.timeStretchRefs);
-    % recompute baselines for power
-    % -----------------------------
+
+    % recompute power baselines 
+    % -------------------------
     if ~isnan( g.baseline(1) ) & ~isnan( mbase1 ) & isnan(g.powbase)
-        disp('Recomputing baseline power: using the grand mean of both conditions');
+        disp('Recomputing baseline power: using the grand mean of both conditions ...');
         mbase = (mbase1 + mbase2)/2;
         P1 = P1 + repmat(mbase1(1:size(P1,1))',[1 size(P1,2)]);
         P2 = P2 + repmat(mbase2(1:size(P1,1))',[1 size(P1,2)]);
@@ -1228,7 +1234,7 @@ if iscell(data)
             Pboot1 = Pboot1 - repmat(mbase (1:size(Pboot1,1))',[1 size(Pboot1,2) size(Pboot1,3)]);
             Pboot2 = Pboot2 - repmat(mbase (1:size(Pboot1,1))',[1 size(Pboot1,2) size(Pboot1,3)]);
         end;
-        verboseprintf(g.verbose, '\nSubtracting common baseline\n');
+        verboseprintf(g.verbose, '\nSubtracting the common power baseline ...\n');
     else
         mbase = NaN;
     end;
@@ -1248,12 +1254,14 @@ if iscell(data)
             g.itcmax  = max( max(max(abs(Rboot1))), max(max(abs(Rboot2))) );
         end;
 
-        subplot(1,3,1);
+        subplot(1,3,1); % plot Condition 1
         g.title = g.titleall{1};
         g = plottimef(P1, R1, Pboot1, Rboot1, mean(data{1},2), freqs, timesout, mbase, g);
         g.itcavglim = [];
-        subplot(1,3,2); g.title = g.titleall{2};
+
+        subplot(1,3,2); g.title = g.titleall{2}; % plot Condition 2
         plottimef(P2, R2, Pboot2, Rboot2, mean(data{2},2), freqs, timesout, mbase, g);
+
         subplot(1,3,3); g.title = g.titleall{3};
     end;
 
@@ -1267,12 +1275,14 @@ if iscell(data)
             plottimef(P1-P2, Rdiff, [], [], mean(data{1},2)-mean(data{2},2), freqs, timesout, mbase, g);
         end;
     else
-        % preprocess data and run compstat
-        % --------------------------------
+        % preprocess data and run compstat() function
+        % -------------------------------------------
         alltfX1power = alltfX1.*conj(alltfX1);
         alltfX2power = alltfX2.*conj(alltfX2);
+
         %formula = {'log10(mean(arg1,3))'};              % toby 10.02.2006
         %formula = {'log10(mean(arg1(:,:,data),3))'};
+
         formula = {'log10(mean(arg1(:,:,X),3))'};
         switch g.type
             case 'coher', % take the square of alltfx and alltfy first to speed up
@@ -1293,8 +1303,10 @@ if iscell(data)
                         { alltfX1power alltfX2power }, {alltfX1 alltfX2});
                 end;
             case 'phasecoher2', % normalize first to speed up
+
                 %formula = { formula{1} ['sum(arg2(:,:,data),3)./sum(arg3(:,:,data),3)'] }; 
                 % toby 10/3/2006
+
                 formula = { formula{1} ['sum(arg2(:,:,X),3)./sum(arg3(:,:,X),3)'] };
                 alltfX1abs = sqrt(alltfX1power); % these 2 lines can be suppressed
                 alltfX2abs = sqrt(alltfX2power); % by inserting sqrt(arg1(:,:,data)) instead of arg3(:,:,data))
@@ -1315,8 +1327,10 @@ if iscell(data)
                         { alltfX1power alltfX2power }, {alltfX1 alltfX2}, { alltfX1abs alltfX2abs });
                 end;
             case 'phasecoher',
+
                 %formula = { formula{1} ['mean(arg2,3)'] };              % toby 10.02.2006
                 %formula = { formula{1} ['mean(arg2(:,:,data),3)'] };
+
                 formula = { formula{1} ['mean(arg2(:,:,X),3)'] };
                 if strcmpi(g.lowmem, 'on')
                     for ind = 1:2:size(alltfX1,1)
@@ -1357,7 +1371,7 @@ if iscell(data)
 
     if nargout >= 8, alltfX = { alltfX1 alltfX2 }; end;
 
-    return; % ********************************** END FOR SEVERAL CONDITIONS
+    return; % ********************************** END FOR MULTIPLE CONDITIONS
 end;
 
 %%%%%%%%%%%%%%%%%%%%%%
