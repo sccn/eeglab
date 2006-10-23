@@ -27,7 +27,7 @@
 %                  newtimef(data, frames, tlimits, srate, cycles,...
 %                       'key1',value1, 'key2',value2, ... );
 %
-% Usage with two datasets (compare current EEG dataset against ALLEEG(2)):
+% Usage with two condition datasets (here, comparing EEG against ALLEEG(2)):
 %        >> [ersp,itc,powbase,times,freqs,erspboot,itcboot] = ...
 %                  newtimef({EEG.data(37,:,:) ALLEEG(2).data(37,:,:)}, ,,,
 %                       EEG.pnts, [EEG.xmin EEG.xmax]*1000, EEG.srate, 4);
@@ -122,6 +122,8 @@
 %                     across trials). 'eventms' is a matrix whose columns 
 %                     specify the epoch latencies (in ms) at which the same 
 %                     series of successive events occur in each trial.
+%                     If two data conditions, eventms should be 
+%                                  [eventms1;eventms2]
 %      'timewarpms' = [warpms] optional vector of event latencies (in ms) 
 %                     to which the series of events should be warped.
 %                     (Note: Epoch start and end should not be declared
@@ -272,6 +274,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.105  2006/10/23 21:28:05  scott
+% timewarp help msg upgrade. Found a problem with two-condition timeStretchFrames etc
+% If two condition, Jean assumed they have the same number of trials!?
+%
 % Revision 1.104  2006/10/23 18:56:11  scott
 % help msg -sm
 %
@@ -839,11 +845,11 @@ if isstr(data) & strcmp(data,'details')
     return
 end
 if ~iscell(data)
-    [data, frames] = reshapeX(data, frames);
+    [data, frames] = reshape_data(data, frames);
     trials = size(data,2);
 else
-    [data{1}, frames] = reshapeX(data{1}, frames);
-    [data{2}, frames] = reshapeX(data{2}, frames);
+    [data{1}, frames] = reshape_data(data{1}, frames);
+    [data{2}, frames] = reshape_data(data{2}, frames);
     trials = size(data{1},2);
 end;
 
@@ -1165,9 +1171,9 @@ if strcmpi(g.lowmem, 'on') & length(data) ~= g.frames & isempty(g.nfreqs) & ~isc
 end;
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% compare 2 conditions part
-%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%
+% compare 2 conditions 
+%%%%%%%%%%%%%%%%%%%%%%%
 if iscell(data)
     vararginori = varargin;
     if length(data) ~= 2
@@ -1205,19 +1211,20 @@ if iscell(data)
     verboseprintf(g.verbose, '      the number of time points or number of frequencies\n');
     verboseprintf(g.verbose, '(''coher'' options take 3 times the memory of other options)\n');
 
+    cond_1_epochs = size(data{1},2);
     [P1,R1,mbase1,timesout,freqs,Pboot1,Rboot1,alltfX1] = ...
         newtimef( data{1}, frames, tlimits, Fs, varwin, 'plotitc', 'off', ...
-        'plotersp', 'off', vararginori{:}, 'lowmem', 'off', ...
-        'timeStretchMarks', g.timeStretchMarks(:,1:(end/2)), ... %Added -Jean
-        'timeStretchRefs', g.timeStretchRefs);
+          'plotersp', 'off', vararginori{:}, 'lowmem', 'off', ...
+            'timeStretchMarks', g.timeStretchMarks(:,1:cond_1_epochs), ... 
+              'timeStretchRefs', g.timeStretchRefs);
 
     verboseprintf(g.verbose,'\nRunning newtimef() on Condition 2 **********************\n');
 
     [P2,R2,mbase2,timesout,freqs,Pboot2,Rboot2,alltfX2] = ...
         newtimef( data{2}, frames, tlimits, Fs, varwin, 'plotitc', 'off', ...
-        'plotersp', 'off', vararginori{:}, 'lowmem', 'off', ...
-        'timeStretchMarks', g.timeStretchMarks(:,(1+end/2):end), ... %Added -Jean
-        'timeStretchRefs', g.timeStretchRefs);
+          'plotersp', 'off', vararginori{:}, 'lowmem', 'off', ...
+            'timeStretchMarks', g.timeStretchMarks(:,cond_1_epochs+1:end), ... 
+              'timeStretchRefs', g.timeStretchRefs);
 
     % recompute power baselines 
     % -------------------------
@@ -2125,7 +2132,7 @@ end;
 
 % reshaping data
 % -----------
-function [data, frames] = reshapeX(data, frames)
+function [data, frames] = reshape_data(data, frames)
 data = squeeze(data);
 if min(size(data)) == 1
     if (rem(length(data),frames) ~= 0)
