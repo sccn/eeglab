@@ -274,6 +274,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.106  2006/10/23 21:38:52  scott
+% added help and support for two-condition time warping. Corrected Jean's assumption
+% that the two conditions contain the same number of epochs.
+%
 % Revision 1.105  2006/10/23 21:28:05  scott
 % timewarp help msg upgrade. Found a problem with two-condition timeStretchFrames etc
 % If two condition, Jean assumed they have the same number of trials!?
@@ -995,7 +999,7 @@ if isfield(g,'timewarp')
 
         if length(g.timewarpfr) > 2
           if isempty(g.timewarpfr{3})
-            stretchevents = size(g.timeStretchMarks,1);
+            stretchevents = size(g.timeStretchMarks,2);
             g.timeStretchPlot = [1:stretchevents]; % default to plotting all lines
           else
             g.timeStretchPlot = g.timewarpfr{3};
@@ -1018,7 +1022,7 @@ end
 % --------------------------
 
 if g.tlimits(2)-g.tlimits(1) < 30
-    disp('Crossf WARNING: time range is very small (<30 ms). Times limits are in millisenconds not seconds.');
+    disp('Crossf WARNING: time range is very small (< 30 ms). Epoch latency limits are in msec, not seconds!');
 end
 
 
