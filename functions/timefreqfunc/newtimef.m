@@ -128,7 +128,8 @@
 %                     to which the series of events should be warped.
 %                     (Note: Epoch start and end should not be declared
 %                     as eventms or warpms}. If 'warpms' is absent or [], 
-%                     the median of each 'eventms' column will be used. 
+%                     the median of each 'eventms' column will be used;
+%                     If two datasets, the grand medians of the two.
 %     'timewarpidx' = [plotidx] is an vector of indices telling which of 
 %                     the time-warped 'eventms' columns (above) to plot with 
 %                     vertical lines. If undefined, all columns are plotted. 
@@ -274,6 +275,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.108  2006/10/24 21:19:46  scott
+% changed back
+%
 % Revision 1.107  2006/10/24 21:14:17  scott
 % minor change
 %
