@@ -188,6 +188,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.490  2006/09/12 16:44:18  arno
+% new menus
+%
 % Revision 1.486  2006/05/13 16:56:39  arno
 % fixing history for transfer of datasets
 %
@@ -2292,7 +2295,7 @@ WINY		    = WINYDEC*NBLINES;
 
 BORDERINT       = 4;
 BORDEREXT       = 10;
-FONTNAME        = ''; %courier';
+FONTNAME        = 'courier';
 FONTSIZE        = 11;
 
 hh = findobj('tag', 'EEGLAB');
