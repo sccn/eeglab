@@ -160,6 +160,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.90  2006/09/27 01:48:09  scott
+% hzdir
+%
 % Revision 1.89  2006/09/16 02:34:29  toby
 % Bug fix, replaced MIN_ABS variable with machine-specific eps
 %
@@ -622,6 +625,7 @@ try, g.erspmax;    catch, g.erspmax = []; end;
 try, g.verbose;    catch, g.verbose = 'on'; end;
 try, g.chaninfo;   catch, g.chaninfo = []; end;
 try, g.hzdir;      catch, g.hzdir = HZDIR; end; % default from icadefs
+lasterr('');
 
 % testing arguments consistency
 % -----------------------------
