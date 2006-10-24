@@ -31,6 +31,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2006/05/12 04:03:00  toby
+% use stable interpolation 'v4' if fast int. from qhull crashes
+%
 % Revision 1.7  2006/05/12 03:41:53  toby
 % qhull related bug, this fix works but slows things down
 %
@@ -95,17 +98,40 @@ function [lgfreqs,datout] = logimagesc(times,freqs,data,varargin)
   if strcmp(plot, 'on')
       imagesc(times,freqs,data);
       nt = ceil(min(freqs)); % new tick - round up min y to int
+      ht = floor(max(freqs)); % high freq - round down
+
       yt=get(gca,'ytick');
       yl=get(gca,'yticklabel');
       
       imagesc(times,lgfreqs,datout); % plot the image
       set(gca,'ydir','normal')
 
-      if nt > min(yt),
-         set(gca,'ytick',log([nt yt]));
-         set(gca,'yticklabel',{int2str(nt) yl});
-      else
-         set(gca,'ytick',log([yt]));
-         set(gca,'yticklabel',{yl});
+      i = 0; yt = [];
+      yl = cell(1,100);
+
+      tickscale = 1.618; % log scaling power for frequency ticks
+      while (nt*tickscale^i < ht )
+        yt = [yt log(round(nt*tickscale^i))];
+        yl{i+1}=int2str(round(nt*tickscale^i));
+        i=i+1;
       end
+
+      if ht/(nt*tickscale^(i-1)) > 1.35
+         yt = [yt log(ht)];
+         yl{i+1} = ht;
+      else
+         i=i-1;
+      end
+     yl = {yl{1:i+1}};
+     set(gca,'ytick',yt);
+     set(gca,'yticklabel',yl);
+
+%     if nt > min(yt),
+%         set(gca,'ytick',log([nt yt]));
+%         set(gca,'yticklabel',{int2str(nt) yl});
+%      else
+%         set(gca,'ytick',log([yt]));
+%         set(gca,'yticklabel',{yl});
+%      end
+
   end 
