@@ -27,13 +27,13 @@
 %                  newtimef(data, frames, tlimits, srate, cycles,...
 %                       'key1',value1, 'key2',value2, ... );
 %
-% Usage with two condition datasets (here, comparing EEG against ALLEEG(2)):
+% Example using data from two conditions (EEG versus ALLEEG(2)):
 %        >> [ersp,itc,powbase,times,freqs,erspboot,itcboot] = ...
-%                  newtimef({EEG.data(37,:,:) ALLEEG(2).data(37,:,:)}, ,,,
-%                       EEG.pnts, [EEG.xmin EEG.xmax]*1000, EEG.srate, 4);
+%                  newtimef({EEG.data(chan,:,:) ALLEEG(2).data(chan,:,:)}, ,,,
+%                       EEG.pnts, [EEG.xmin EEG.xmax]*1000, EEG.srate, cycles);
 % NOTE:
-%        >> timef details  % scrolls more detailed argument information
-%                          % version timef() also computes multitaper transforms
+%        >> timef details  % presents more detailed argument information
+%                          % Note: timef() also computes multitaper transforms
 %
 % Required inputs:    Value                                 {default}
 %       data        = Single-channel data vector (1,frames*ntrials) (required)
@@ -43,22 +43,20 @@
 %       frames      = Frames per trial. Ignored if data is 2-D or 3-D.  {750}
 %       tlimits     = [mintime maxtime] (ms) Epoch time limits {[-1000 2000]}
 %       srate       = data sampling rate (Hz)   {default: 250}
-%       'cycles'    = [0] Use FFTs and Hanning window tapering. {default: 0}
+%       cycles      = [0] Use FFTs with Hanning window tapering. {default}
 %                   = [real positive scalar] Number of cycles in each Morlet
-%                     wavelet, constant across frequencies.
-%                   = [cycles(1) cycles(2)] wavelet cycles increase with frequency
-%                     starting at cycles(1) and, 
-%                     if cycles(2) > 1, increasing to cycles(2) at
-%                     the upper frequency,
-%                     if cycles(2) < 1, increasing by a factor of cycles(2),
-%                     or if cycles(2) = 1, not increasing (same as giving
-%                     only one value for 'cycles').
-%                     For multitaper options, see timef().
+%                     (gaussian-tapered) wavelet, constant across frequencies.
+%                   = [cycles(1) cycles(2)] wavelet cycles increase with 
+%                     frequency, beginning at cycles(1) and, if cycles(2) > 1,
+%                     increasing to cycles(2) at the highest frequency. Else:
+%                     If cycles(2) < 1, increasing by a factor of cycles(2),
+%                     If cycles(2) = 1, not increasing (same as giving only 
+%                     one value for 'cycles'). For multitaper, use timef().
 %
 %    Optional inter-trial coherence (ITC) Type:
-%       'type'      = ['coher'|'phasecoher'|'phasecoher2'] Compute either
-%                     linear coherence ('coher') or phase coherence ('phasecoher')
-%                     also known as phase-locking factor  {default: 'phasecoher'}
+%       'type'      = ['coher'|'phasecoher'|'phasecoher2'] Compute either linear
+%                     coherence ('coher') or phase coherence ('phasecoher'),
+%                     first called 'phase-locking factor' {default: 'phasecoher'}
 %
 %    Optional detrending:
 %       'detrend'   = ['on'|'off'], Linearly detrend each data epoch   {'off'}
@@ -103,27 +101,27 @@
 %                     memory. {default: 'off'}
 %       'verbose'   = ['on'|'off'] print text {'on'}
 %       'subitc'    = ['on'|'off'] subtract stimulus locked Inter-Trial Coherence
-%                     (ITC) from x and y. This computes the  'intrinsic' coherence
-%                     x and y not arising from common synchronization to
-%                     experimental events. See notes. {default: 'off'}
-%       'wletmethod' = ['dftfilt2'|'dftfilt2_rey'] Wavelet method/program to use.
-%                     {default: 'dftfilt2_rey'}
-%                     'dftfilt2_rey' Morlet wavelet or Hanning DFT
-%                     'dftfilt2' Morlet-variant or Hanning DFT.
-%                     Note that there are differences betweeen the Hanning
-%                     DFTs in the two programs.
+%                     (ITC) from x and y. This computes an 'intrinsic' coherence
+%                     of x and y not arising directly from common phase locking 
+%                     to experimental events. See notes.    {default: 'off'}
+%       'wletmethod' = ['dftfilt'|'dftfilt2'] Wavelet type to use.
+%                     'dftfilt' -> Morlet wavelets, or Hanning DFT
+%                     'dftfilt2' -> Morlet-variant wavelets, or Hanning DFT.
+%                     There are ??? differences betweeen the Hanning DFTs in the 
+%                     two methods.                      {default: 'dftfilt'}
 %       'cycleinc'    ['linear'|'log'] increase mode if [min max] cycles is
-%                     provided in 'cycle' parameter. {default: 'linear'}
-%                     Applies only to dftfilt2_rey.
+%                     provided in 'cycle' parameter. Applies only to 
+%                     'wletmethod','dftfilt'  {default: 'linear'}
 %
 %    Optional time warping parameter: 
-%       'timewarp'  = [eventms] Time-warp amplitude and phase time-courses
-%                     (following time/freq transform but before smoothing 
-%                     across trials). 'eventms' is a matrix whose columns 
-%                     specify the epoch latencies (in ms) at which the same 
-%                     series of successive events occur in each trial.
-%                     If two data conditions, eventms should be 
-%                                  [eventms1;eventms2]
+%       'timewarp'  = [eventms matrix] Time-warp amplitude and phase time-
+%                     courses(following time/freq transform but before 
+%                     smoothing across trials). 'eventms' is a matrix 
+%                     of size (all_trials,epoch_events) whose columns
+%                     specify the epoch latencies (in ms) at which the
+%                     same series of successive events occur in each 
+%                     trial. If two data conditions, eventms should be 
+%                     [eventms1;eventms2] = all trials stacked vertically.
 %      'timewarpms' = [warpms] optional vector of event latencies (in ms) 
 %                     to which the series of events should be warped.
 %                     (Note: Epoch start and end should not be declared
@@ -191,7 +189,8 @@
 %       'itcavglim' = [min max] average ITC limits for all freq. (left of ITC) {auto}
 %       'speclim'   = [min max] average spectrum limits (left of ERSP image)   {auto}
 %       'erspmarglim' = [min max] average marginal ERSP limits (below ERSP image) {auto}
-%       'title'     = Optional figure title                                    {none}
+%       'title'     = Optional figure or (brief) first-condition title         {none}
+%       'title2'    = Optional second-condition (brief) title                  {none}
 %       'marktimes' = Non-0 times to mark with a dotted vertical line (ms)     {none}
 %       'linewidth' = Line width for 'marktimes' traces (thick=2, thin=1)      {2}
 %       'axesfont'  = Axes text font size                                      {10}
@@ -275,6 +274,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.109  2006/10/24 21:24:10  scott
+% help msg
+%
 % Revision 1.108  2006/10/24 21:19:46  scott
 % changed back
 %
@@ -901,61 +903,62 @@ end
 g = finputcheck(varargin, ...
     {'boottype'      'string'    {'shuffle','rand','randall'}    'shuffle'; ...
     'condboot'      'string'    {'abs','angle','complex'}       'abs'; ...
-    'title'         'string'    []                              DEFAULT_TITLE; ...
-    'winsize'       'integer'      [0 Inf]     DEFAULT_WINSIZE; ...
+    'title'         'string'    []          DEFAULT_TITLE; ...
+    'title2'        'string'    []          DEFAULT_TITLE; ...
+    'winsize'       'integer'      [0 Inf]  DEFAULT_WINSIZE; ...
     'pad'           'real'      []          DEFAULT_PAD; ...
     'timesout'      'integer'   []          DEFAULT_NWIN; ...
     'padratio'      'integer'   [0 Inf]     DEFAULT_OVERSMP; ...
     'topovec'       'real'      []          []; ...
-    'elocs'         {'string','struct'} []          DEFAULT_ELOC; ...
-    'alpha'         'real'      [0 0.5]       DEFAULT_ALPHA; ...
+    'elocs'         {'string','struct'} []  DEFAULT_ELOC; ...
+    'alpha'         'real'      [0 0.5]     DEFAULT_ALPHA; ...
     'marktimes'     'real'      []          DEFAULT_MARKTIME; ...
     'powbase'       'real'      []          NaN; ...
     'pboot'         'real'      []          NaN; ...
     'rboot'         'real'      []          NaN; ...
-    'plotersp'      'string'    {'on','off'}    'on'; ...
-    'subitc'        'string'    {'on','off'}    'off'; ...
-    'plotitc'       'string'    {'on','off'}    'on'; ...
-    'detrend'       'string'    {'on','off'}    'off'; ...
-    'rmerp'         'string'    {'on','off'}    'off'; ...
-    'baseline'      'real'      []              0; ...
-    'baseboot'      'real'      []              1; ...
-    'linewidth'     'integer'   [1 2]           2; ...
-    'naccu'         'integer'   [1 Inf]      	200; ...
-    'mtaper'        'real'      []              []; ...
-    'maxfreq'       'real'      [0 Inf]         DEFAULT_MAXFREQ; ...
-    'freqs'         'real'      [0 Inf]         [0 DEFAULT_MAXFREQ]; ...
-    'nfreqs'        'integer'   []              []; ...
-    'freqscale'     'string'    []              'linear'; ...
-    'vert'          'real'      []              [];  ...
-    'newfig'        'string'    {'on','off'}    'on'; ...
+    'plotersp'      'string'    {'on','off'} 'on'; ...
+    'subitc'        'string'    {'on','off'} 'off'; ...
+    'plotitc'       'string'    {'on','off'} 'on'; ...
+    'detrend'       'string'    {'on','off'} 'off'; ...
+    'rmerp'         'string'    {'on','off'} 'off'; ...
+    'baseline'      'real'      []           0; ...
+    'baseboot'      'real'      []           1; ...
+    'linewidth'     'integer'   [1 2]        2; ...
+    'naccu'         'integer'   [1 Inf]      200; ...
+    'mtaper'        'real'      []           []; ...
+    'maxfreq'       'real'      [0 Inf]      DEFAULT_MAXFREQ; ...
+    'freqs'         'real'      [0 Inf]      [0 DEFAULT_MAXFREQ]; ...
+    'nfreqs'        'integer'   []           []; ...
+    'freqscale'     'string'    []           'linear'; ...
+    'vert'          'real'      []           [];  ...
+    'newfig'        'string'    {'on','off'} 'on'; ...
     'type'          'string'    {'coher','phasecoher','phasecoher2'}  'phasecoher'; ...
-    'phsamp'        'string'    {'on','off'}    'off'; ...  % phsamp not completed Toby 9.28.2006
-    'plotphase'     'string'    {'on','off'}    'off'; ...
-    'plotphasesign' 'string'    {'on','off'}    'on'; ...
-    'outputformat'  'string'    {'old','new'}   'new'; ...
-    'itcmax'        'real'      []              []; ...
-    'erspmax'       'real'      []              []; ...
-    'lowmem'        'string'    {'on','off'}    'off'; ...
-    'verbose'       'string'    {'on','off'}    'on'; ...
+    'phsamp'        'string'    {'on','off'} 'off'; ...  % phsamp not completed - Toby 9.28.2006
+    'plotphase'     'string'    {'on','off'} 'off'; ...
+    'plotphasesign' 'string'    {'on','off'} 'on'; ...
+    'outputformat'  'string'    {'old','new'} 'new'; ...
+    'itcmax'        'real'      []           []; ...
+    'erspmax'       'real'      []           []; ...
+    'lowmem'        'string'    {'on','off'} 'off'; ...
+    'verbose'       'string'    {'on','off'} 'on'; ...
     'plottype'      'string'    {'image','curve'}   'image'; ...
-    'plotmean'      'string'    {'on','off'}    'on'; ...
+    'plotmean'      'string'    {'on','off'} 'on'; ...
     'highlightmode' 'string'    {'background','bottom'}     'background'; ...
-    'chaninfo'      'struct'    []              struct([]); ...
-    'erspmarglim'   'real'      []              []; ...
-    'itcavglim'     'real'      []              []; ...
-    'erplim'        'real'      []              []; ...
-    'speclim'       'real'      []              []; ...
-    'timewarp'      'real'      []              []; ...
-    'timewarpms'    'real'      []              []; ...
-    'timewarpfr'    'real'      []              []; ...
-    'timewarpidx'   'real'      []              []; ...
-    'timeStretchMarks'  'real'  []              []; ...
-    'timeStretchRefs'   'real'  []              []; ...
-    'timeStretchPlot'   'real'  []              []; ...
+    'chaninfo'      'struct'    []           struct([]); ...
+    'erspmarglim'   'real'      []           []; ...
+    'itcavglim'     'real'      []           []; ...
+    'erplim'        'real'      []           []; ...
+    'speclim'       'real'      []           []; ...
+    'timewarp'      'real'      []           []; ...
+    'timewarpms'    'real'      []           []; ...
+    'timewarpfr'    'real'      []           []; ...
+    'timewarpidx'   'real'      []           []; ...
+    'timeStretchMarks'  'real'  []           []; ...
+    'timeStretchRefs'   'real'  []           []; ...
+    'timeStretchPlot'   'real'  []           []; ...
     'hzdir'         'string'    {'up','down','normal','reverse'}   HZDIR; ...
-    'wletmethod'    'string'   {'dftfilt2' 'dftfilt2_rey'}  'dftfilt2_rey'; ...
-    'cycleinc'      'string'   {'linear' 'log'}             'linear'
+    'wletmethod'    'string'   {'dftfilt2' 'dftfilt'}  'dftfilt'; ...
+    'cycleinc'      'string'   {'linear' 'log'}        'linear'
     });
 
 g.tlimits = tlimits;
@@ -980,7 +983,7 @@ if isfield(g,'timewarp')
     if ~isempty(g.timewarp) % convert timewarp ms to timewarpfr frames -sm
         fprintf('\n')
         if iscell(g.timewarp)
-           error('timewarp argument cannot be a cell array');
+           error('timewarp argument must be a (total_trials,epoch_events) matrix');
         end
         evntms = g.timewarp;
         warpfr = round((evntms - g.tlimits(1))/1000*g.srate)+1;
@@ -1018,7 +1021,7 @@ if isfield(g,'timewarp')
         end
         if ~isempty(g.timeStretchRefs)
             if max(g.timeStretchRefs) > frames-1 | min(g.timeStretchRefs) < 2
-                error('Time warping references must be inside the epochs.');
+                error('Time warping reference latencies must be within the epochs.');
             end
         end
     end
@@ -1029,14 +1032,15 @@ end
 % --------------------------
 
 if g.tlimits(2)-g.tlimits(1) < 30
-    disp('Crossf WARNING: time range is very small (< 30 ms). Epoch latency limits are in msec, not seconds!');
+    disp('newtimef(): WARNING: Specified time range is very small (< 30 ms)???');
+    disp('                     Epoch time limits should be in msec, not seconds!');
 end
 
 
 if (g.cycles(1) == 0 & pow2(nextpow2(g.winsize)) ~= g.winsize)
     error('Value of winsize must be an integer power of two [1,2,4,8,16,...]');
 elseif (g.winsize > g.frames)
-    error('Value of winsize must be less than epoch frames.');
+    error('Value of winsize must be smaller than epoch frames.');
 end
 
 if length(g.timesout) == 1 & g.timesout > 0
@@ -1080,10 +1084,11 @@ if ~isnan(g.alpha)
     end
 end
 
-if ~isempty(g.timeStretchMarks) %Added -Jean
+if ~isempty(g.timeStretchMarks) % timeStretch code by Jean Hauser
     if isempty(g.timeStretchRefs)
         verboseprintf(g.verbose, ['Using median event latencies as reference event times for time warping.\n']);
-        g.timeStretchRefs = median(g.timeStretchMarks,2);
+        g.timeStretchRefs = median(g.timeStretchMarks,2); 
+                                          % Note: Uses (grand) median latencies for two conditions
     else
         verboseprintf(g.verbose, ['Using supplied latencies as reference event times for time warping.\n']);
     end
@@ -1093,15 +1098,13 @@ if ~isempty(g.timeStretchMarks) %Added -Jean
         g.vert = ((g.timeStretchRefs(g.timeStretchPlot)-1) ...
             /g.srate+g.tlimits(1)/1000)*1000;
         fprintf('Plotting timewarp markers at ')
-        for li = 1:length(g.vert)
-           fprintf('%d ',g.vert(li));
-        end
+           for li = 1:length(g.vert), fprintf('%d ',g.vert(li)); end
         fprintf(' ms.\n')
     end
-end %End -Jean
+end 
 
 if min(g.vert) < g.tlimits(1) | max(g.vert) > g.tlimits(2)
-    error('vertical line (''vert'') latency out of bounds');
+    error('vertical line (''vert'') latency outside of epoch boundaries');
 end
 
 if strcmp(g.hzdir,'up')| strcmp(g.hzdir,'normal')
@@ -1112,14 +1115,14 @@ else
     error('unknown ''hzdir'' string argument'); 
 end
 
-% Multitaper - not used any more
-% ------------------------------
-if ~isempty(g.mtaper) % multitaper, inspired from Bijan Pesaran matlab function
+% Multitaper - used in timef
+% --------------------------
+if ~isempty(g.mtaper) % multitaper, inspired from a Bijan Pesaran matlab function
     if length(g.mtaper) < 3
         %error('mtaper arguement must be [N W] or [N W K]');
 
         if g.mtaper(1) * g.mtaper(2) < 1
-            error('mtaper 2 first arguments'' product must be higher than 1');
+            error('mtaper 2 first arguments'' product must be larger than 1');
         end;
         if length(g.mtaper) == 2
             g.mtaper(3) = floor( 2*g.mtaper(2)*g.mtaper(1) - 1);
@@ -1148,7 +1151,7 @@ if ~isempty(g.mtaper) % multitaper, inspired from Bijan Pesaran matlab function
     %nf = max(256, g.pad*2^nextpow2(g.winsize+1));
     %nfk = floor([0 g.maxfreq]./g.srate.*nf);
 
-    %freqs = linspace( 0, g.maxfreq, diff(nfk)); % this also work in the case of a FFT
+    %freqs = linspace( 0, g.maxfreq, diff(nfk)); % this also works in the case of a FFT
 
 end
 
@@ -1165,20 +1168,29 @@ if strcmpi(g.lowmem, 'on') & length(data) ~= g.frames & isempty(g.nfreqs) & ~isc
     for index = 1:length(freqsout)
         if nargout < 8
             [P(index,:),R(index,:),mbase(index),timesout,tmpfreqs(index),Pboot(index,:),Rboot(index,:)] = ...
-                newtimef(data, frames, tlimits, Fs, varwin, 'freqs', [freqsout(index) freqsout(index)], 'nfreqs', 1, ...
-                'plotamp', 'off', 'plotphasesign', 'off',varargin{:}, 'lowmem', 'off', 'timesout', timesout);
+                newtimef(data, frames, tlimits, Fs, varwin, ...
+                          'freqs', [freqsout(index) freqsout(index)], 'nfreqs', 1, ...
+                             'plotamp', 'off', 'plotphasesign', 'off',varargin{:}, ...
+                                  'lowmem', 'off', 'timesout', timesout);
         else
             [P(index,:),R(index,:),mbase(index),timesout,tmpfreqs(index),Pboot(index,:),Rboot(index,:), ...
                 alltfX(index,:,:)] = ...
-                newtimef(data, frames, tlimits, Fs, varwin, 'freqs', [freqsout(index) freqsout(index)], 'nfreqs', 1, ...
-                'plotamp', 'off', 'plotphasesign', 'off',varargin{:}, 'lowmem', 'off', 'timesout', timesout);
+                newtimef(data, frames, tlimits, Fs, varwin, ...
+                            'freqs', [freqsout(index) freqsout(index)], 'nfreqs', 1, ...
+                                  'plotamp', 'off', 'plotphasesign', 'off',varargin{:}, ...
+                                          'lowmem', 'off', 'timesout', timesout);
         end;
     end;
 
-    % plot and return
+    % compute trial-average ERP 
+    % -------------------------
     ERP = mean(data,2);
+
+    % plot results 
+    %-------------
     plottimef(P, R, Pboot, Rboot, ERP, freqsout, timesout, mbase, g);
-    return;
+
+    return; % finished
 end;
 
 
@@ -1196,7 +1208,8 @@ if iscell(data)
     for index = 1:2:length(vararginori)
         if index<=length(vararginori) % needed if elements are deleted
 
-            if strcmp(vararginori{index}, 'title') | ... %Added -Jean
+            if      strcmp(vararginori{index}, 'title') | ... % Added by Jean Hauser
+                    strcmp(vararginori{index}, 'title2') | ...
                     strcmp(vararginori{index}, 'timeStretchMarks') | ...
                     strcmp(vararginori{index}, 'timeStretchRefs') | ...
                     strcmp(vararginori{index}, 'timeStretchPlots')
@@ -1205,16 +1218,12 @@ if iscell(data)
         end;
     end;
     if iscell(g.title) & length(g.title) >= 2 % Changed that part because providing titles
-                                              % as cells caused the function to crash at
-                                              % line at line 704 (g.tlimits = tlimits) -Jean
+                                              % as cells caused the function to crash (why?) 
+                                              % at line 704 (g.tlimits = tlimits) -Jean
         if length(g.title) == 2,
-            g.title{3,1:length('Condition 1 - Condition 2')} = ...
-                'Condition 1 - Condition 2';
+             g.title{3,1:length('Condition 1 - Condition 2')} = ...
+                 'Condition 1 - Condition 2';
         end;
-    else
-        g.title{1} = 'Condition 1';
-        g.title{2} = 'Condition 2';
-        g.title{3} = 'Condition 1 - Condition 2';
     end;
 
     verboseprintf(g.verbose, 'Running newtimef() on Condition 1 **********************\n');
@@ -1261,7 +1270,7 @@ if iscell(data)
     % --------
     if strcmpi(g.plotersp, 'on') | strcmpi(g.plotitc, 'on')
         g.titleall = g.title;
-        if strcmpi(g.newfig, 'on'), figure; end;
+        if strcmpi(g.newfig, 'on'), figure; end; % declare a new figure
 
         % using same color scale
         % ----------------------
@@ -1273,14 +1282,16 @@ if iscell(data)
         end;
 
         subplot(1,3,1); % plot Condition 1
-        g.title = g.titleall{1};
+        % g.title = g.titleall{1};
         g = plottimef(P1, R1, Pboot1, Rboot1, mean(data{1},2), freqs, timesout, mbase, g);
         g.itcavglim = [];
 
-        subplot(1,3,2); g.title = g.titleall{2}; % plot Condition 2
+        subplot(1,3,2); % plot Condition 2
+        g.title = g.title2; 
         plottimef(P2, R2, Pboot2, Rboot2, mean(data{2},2), freqs, timesout, mbase, g);
 
-        subplot(1,3,3); g.title = g.titleall{3};
+        subplot(1,3,3); % plot Condition 1 - Condition 2
+        g.title = [ g.title ' - ' g.title2];
     end;
 
     if isnan(g.alpha)
@@ -1425,12 +1436,11 @@ if length(g.timesout) > 1, tmioutopt = { 'timesout' , g.timesout };
 else                       tmioutopt = { 'ntimesout', g.timesout };
 end;
 
-[alltfX freqs timesout R] = timefreq(data, g.srate, tmioutopt{:}, 'winsize', g.winsize, ...
-    'tlimits', g.tlimits, 'detrend', g.detrend, 'itctype', ...
-    g.type, 'subitc', g.subitc, 'wavelet', g.cycles, ...
+[alltfX freqs timesout R] = timefreq(data, g.srate, tmioutopt{:}, ...
+    'winsize', g.winsize, 'tlimits', g.tlimits, 'detrend', g.detrend, ...
+    'itctype', g.type, 'subitc', g.subitc, 'wavelet', g.cycles, ...
     'padratio', g.padratio, 'freqs', g.freqs, 'freqscale', g.freqscale, ...
-    'nfreqs', g.nfreqs, ...
-    'timestretch', {g.timeStretchMarks', g.timeStretchRefs});
+    'nfreqs', g.nfreqs, 'timestretch', {g.timeStretchMarks', g.timeStretchRefs});
 
 P  = mean(alltfX.*conj(alltfX), 3); % power
 
