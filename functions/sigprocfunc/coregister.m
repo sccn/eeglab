@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.52  2006/08/01 21:03:58  arno
+% same
+%
 % Revision 1.51  2006/08/01 21:03:01  arno
 % manual mode off
 %
@@ -331,6 +334,7 @@ if isstr(chanlocs1)
                 tmpelec2.label{clist2(index)} = dat.elec1.label{clist1(index)};
             end;
             [ tmp dat.transform ] = warp_chans(dat.elec1, dat.elec2, tmpelec2.label(clist2), 'traditional');
+            dat.transform(6) = - dat.transform(6);
         end;
     end;
     set(fid, 'userdata', dat);
