@@ -274,6 +274,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.110  2006/10/25 14:50:13  scott
+% no changes, I hope! -sm
+%
 % Revision 1.109  2006/10/24 21:24:10  scott
 % help msg
 %
@@ -826,7 +829,7 @@ DEFAULT_VARWIN	= 0;		% Fixed window length or fixed number of cycles.
 %     the min. freq. to be computed.
 DEFAULT_OVERSMP	= 2;		% Number of times to oversample frequencies
 DEFAULT_MAXFREQ = 50;		% Maximum frequency to display (Hz)
-DEFAULT_TITLE	= '';		% Figure title
+DEFAULT_TITLE	= '';		% Figure title (no default)
 DEFAULT_ELOC    = 'chan.locs';	% Channel location file
 DEFAULT_ALPHA   = NaN;		% Percentile of bins to keep
 DEFAULT_MARKTIME= NaN;
@@ -1208,9 +1211,9 @@ if iscell(data)
     for index = 1:2:length(vararginori)
         if index<=length(vararginori) % needed if elements are deleted
 
-            if      strcmp(vararginori{index}, 'title') | ... % Added by Jean Hauser
-                    strcmp(vararginori{index}, 'title2') | ...
-                    strcmp(vararginori{index}, 'timeStretchMarks') | ...
+          %  if      strcmp(vararginori{index}, 'title') | ... % Added by Jean Hauser
+          %          strcmp(vararginori{index}, 'title2') | ...
+                 if strcmp(vararginori{index}, 'timeStretchMarks') | ...
                     strcmp(vararginori{index}, 'timeStretchRefs') | ...
                     strcmp(vararginori{index}, 'timeStretchPlots')
                 vararginori(index:index+1) = [];
@@ -1226,25 +1229,35 @@ if iscell(data)
         end;
     end;
 
-    verboseprintf(g.verbose, 'Running newtimef() on Condition 1 **********************\n');
+    verboseprintf(g.verbose, '\nRunning newtimef() on Condition 1 **********************\n\n');
+
     verboseprintf(g.verbose, 'Note: If an out-of-memory error occurs, try reducing the\n');
     verboseprintf(g.verbose, '      the number of time points or number of frequencies\n');
-    verboseprintf(g.verbose, '(''coher'' options take 3 times the memory of other options)\n');
+    verboseprintf(g.verbose, '(''coher'' options take 3 times the memory of other options)\n\n');
 
     cond_1_epochs = size(data{1},2);
+
+  if ~isempty(g.timeStretchMarks)
     [P1,R1,mbase1,timesout,freqs,Pboot1,Rboot1,alltfX1] = ...
         newtimef( data{1}, frames, tlimits, Fs, varwin, 'plotitc', 'off', ...
           'plotersp', 'off', vararginori{:}, 'lowmem', 'off', ...
             'timeStretchMarks', g.timeStretchMarks(:,1:cond_1_epochs), ... 
               'timeStretchRefs', g.timeStretchRefs);
+  else
+    [P1,R1,mbase1,timesout,freqs,Pboot1,Rboot1,alltfX1] = ...
+        newtimef( data{1}, frames, tlimits, Fs, varwin, 'plotitc', 'off', ...
+          'plotersp', 'off', vararginori{:}, 'lowmem', 'off');
+  end
 
-    verboseprintf(g.verbose,'\nRunning newtimef() on Condition 2 **********************\n');
+    verboseprintf(g.verbose,'\nRunning newtimef() on Condition 2 **********************\n\n');
 
     [P2,R2,mbase2,timesout,freqs,Pboot2,Rboot2,alltfX2] = ...
         newtimef( data{2}, frames, tlimits, Fs, varwin, 'plotitc', 'off', ...
           'plotersp', 'off', vararginori{:}, 'lowmem', 'off', ...
             'timeStretchMarks', g.timeStretchMarks(:,cond_1_epochs+1:end), ... 
               'timeStretchRefs', g.timeStretchRefs);
+
+    verboseprintf(g.verbose,'\nComputing difference **********************\n\n');
 
     % recompute power baselines 
     % -------------------------
@@ -1620,7 +1633,7 @@ switch lower(g.plotitc)
 end;
 
 if g.plot
-    verboseprintf(g.verbose, '\nNow plotting...\n');
+    % verboseprintf(g.verbose, '\nNow plotting...\n');
     set(gcf,'DefaultAxesFontSize',g.AXES_FONT)
     colormap(jet(256));
     pos = get(gca,'position');
