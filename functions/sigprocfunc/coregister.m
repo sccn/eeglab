@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.53  2006/10/25 22:00:31  arno
+% invert yaw direction for warp
+%
 % Revision 1.52  2006/08/01 21:03:58  arno
 % same
 %
@@ -315,7 +318,7 @@ if isstr(chanlocs1)
     if strcmpi(com, 'fiducials')
         [clist1 clist2] = pop_chancoresp( dat.elec1, dat.elec2, 'autoselect', 'fiducials');
         try,
-            [ tmp transform ] = align_fiducials(dat.elec1, dat.elec2, dat.elec2.label(clist2));
+            [ tmp transform ] = align_fiducials(dat.elec1, dat.elec2, dat.elec1.label(clist1), dat.elec2.label(clist2));
             if ~isempty(transform), dat.transform = transform; end;
         catch,
             warndlg2('Transformation failed, try warping fiducials + 1 vertex electrode');
@@ -707,32 +710,18 @@ function plotlabels(elec, elecshow, color, tag);
     
 % align fiducials
 % ---------------
-function [elec1, transf] = align_fiducials(elec1, elec2, fidnames)
+function [elec1, transf] = align_fiducials(elec1, elec2, fidnames1, fidnames2)
 
-    % rename fiducials in template
-    % ----------------------------
-    fidtemplate = { 'Nz' 'LPA' 'RPA' };
-    ind21 = strmatch(fidtemplate{1}, elec2.label, 'exact');
-    ind22 = strmatch(fidtemplate{2}, elec2.label, 'exact');
-    ind23 = strmatch(fidtemplate{3}, elec2.label, 'exact');
-    ind11 = strmatch(fidtemplate{1}, elec1.label, 'exact');
-    ind12 = strmatch(fidtemplate{2}, elec1.label, 'exact');
-    ind13 = strmatch(fidtemplate{3}, elec1.label, 'exact');
-    if isempty(ind11) | isempty(ind12) | isempty(ind13)
-        transf = []; return;
-    end;
-    if isempty(ind21) | isempty(ind22) | isempty(ind23)
-        transf = []; return;
-    else
-         elec2.label{ind21} = fidnames{1};
-         elec2.label{ind22} = fidnames{2};
-         elec2.label{ind23} = fidnames{3};
-    end;
+    % rename fiducials
+    % ----------------
+    ind1 = strmatch(fidnames1{1}, elec1.label, 'exact'); elec1.label{ind1} = fidnames2{1};
+    ind2 = strmatch(fidnames1{2}, elec1.label, 'exact'); elec1.label{ind2} = fidnames2{2};
+    ind3 = strmatch(fidnames1{3}, elec1.label, 'exact'); elec1.label{ind3} = fidnames2{3};
     cfg          = [];
     cfg.elec     = elec1;
     cfg.template = elec2;
     cfg.method   = 'realignfiducial'; 
-    cfg.fiducial = fidnames;
+    cfg.fiducial = fidnames2;
     elec3 = electrodenormalize(cfg);
     transf = homogenous2traditional(elec3.m);
     
