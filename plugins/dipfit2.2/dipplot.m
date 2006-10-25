@@ -149,6 +149,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.138  2006/01/23 22:24:24  arno
+%set multfactor to 1
+%
 %Revision 1.137  2006/01/23 22:23:18  arno
 %factor -> multfactor
 %
@@ -570,7 +573,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                                  'drawedges' 'string'   { 'on' 'off' }     'off';
                                  'mesh'      'string'   { 'on' 'off' }     'off';
                                  'gui'       'string'   { 'on' 'off' }     'on';
-                                 'summary'   'string'   { 'on' 'off' }     'off';
+                                 'summary'   'string'   { 'on2' 'on' 'off' }     'off';
                                  'verbose'   'string'   { 'on' 'off' }     'on';
                                  'view'      'real'     []                 [0 0 1];
                                  'rvrange'   'real'     [0 Inf]             [];
@@ -785,14 +788,17 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     
     % build summarized figure
     % -----------------------
-    if strcmp(g.summary, 'on')
+    if ~strcmp(g.summary, 'off')
         figure;
         options = { 'gui', 'off', 'dipolesize', g.dipolesize/1.5,'dipolelength', g.dipolelength, 'sphere', g.sphere ...
                     'color', g.color, 'mesh', g.mesh, 'num', g.num, 'image', g.image 'normlen' g.normlen ...
                     'coordformat' g.coordformat 'mri' g.mri 'meshdata' g.meshdata };
-        axes('position', [0 0 0.5 0.5]);  newsources = dipplot(sourcesori, 'view', [1 0 0] , options{:}); axis off; 
-        axes('position', [0 0.5 0.5 .5]); newsources = dipplot(sourcesori, 'view', [0 0 1] , options{:}); axis off; 
-        axes('position', [.5 .5 0.5 .5]); newsources = dipplot(sourcesori, 'view', [0 -1 0], options{:}); axis off; 
+        pos1 = [0 0 0.5 0.5];
+        pos2 = [0 0.5 0.5 .5];
+        pos3 = [.5 .5 0.5 .5]; if strcmp(g.summary, 'on2'), tmp = pos1; pos1 =pos3; pos3 = tmp; end;
+        axes('position', pos1);  newsources = dipplot(sourcesori, 'view', [1 0 0] , options{:}); axis off; 
+        axes('position', pos2); newsources = dipplot(sourcesori, 'view', [0 0 1] , options{:}); axis off; 
+        axes('position', pos3); newsources = dipplot(sourcesori, 'view', [0 -1 0], options{:}); axis off; 
         axes('position', [0.5 0 0.5 0.5]); 
         colorcount = 1;
         if isfield(newsources, 'component')
