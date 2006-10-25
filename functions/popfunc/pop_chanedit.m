@@ -147,6 +147,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.153  2006/10/04 16:29:52  arno
+% fix nosedir  history
+%
 % Revision 1.152  2006/10/04 14:40:44  arno
 % fixed integer channel type
 %
@@ -1029,10 +1032,14 @@ if nargin < 3
             indnoempty        = find(~cellfun('isempty', alltypes));
             if ~isempty(indnoempty)
                 if isnumeric(alltypes{indnoempty(1)})
-                    inds = [ find([alltypes{indnoempty}] > 98) ];
-                else
-                    inds = strmatch( 'fid', lower(alltypes(indnoempty)) );
+                    %inds = [ find([alltypes{indnoempty}] > 98) ];
+                    for index = 1:length(chans)
+                        if chans(index).type > 98, chans(index).type = 'fid'; end;
+                        chans(index).type = num2str(chans(index).type);
+                    end;
                 end;
+                alltypes          = { chans.type };
+                inds = strmatch( 'fid', lower(alltypes(indnoempty)) );
                 params.nodatchans = chans(indnoempty(inds));
                 chans(indnoempty(inds)) = [];
             end;
