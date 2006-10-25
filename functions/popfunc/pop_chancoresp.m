@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2006/03/15 23:07:58  scott
+% edited help msg and gui text
+%
 % Revision 1.5  2006/01/20 23:57:00  arno
 % header
 %
@@ -170,7 +173,7 @@ function [chanlistout1, chanlistout2, thirdout, outfourth] = pop_chancoresp(chan
     for index = 1:length(chanstr1)
         if ismember(index, g.chanlist1)
             pos = find(g.chanlist1 == index);
-            g.newchanstr1{index} = pair( g.chanlist1(pos), g.chanlist2(pos), chanstr1, chanstr2 );
+            g.newchanstr1{index} = pair( g.chanlist1(pos(1)), g.chanlist2(pos(1)), chanstr1, chanstr2 );
         else
             g.newchanstr1{index} = sprintf('%2d - %3s', index, g.chanstr1{index});
         end;
@@ -178,7 +181,7 @@ function [chanlistout1, chanlistout2, thirdout, outfourth] = pop_chancoresp(chan
     for index = 1:length(chanstr2)
         if ismember(index, g.chanlist2)
             pos = find(g.chanlist2 == index);
-            [tmp g.newchanstr2{index}] = pair( g.chanlist1(pos), g.chanlist2(pos), chanstr1, chanstr2 );
+            [tmp g.newchanstr2{index}] = pair( g.chanlist1(pos(1)), g.chanlist2(pos(1)), chanstr1, chanstr2 );
         else
             g.newchanstr2{index} = sprintf('%2d - %3s', index, g.chanstr2{index});
         end;
