@@ -67,6 +67,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.37  2006/04/13 20:16:10  arno
+% no need for additional MRI input
+%
 % Revision 1.36  2006/03/10 23:31:45  arno
 % use MRI file
 %
@@ -270,7 +273,7 @@ else
     % ------------------
     if ~isempty(comps)
         if ~isfield(EEG.dipfit.model, 'component')
-            for index = comps(:)'
+            for index = double(comps(:)')
                 EEG.dipfit.model(index).component = index;
             end;
         end;
