@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.45  2006/05/10 16:42:37  arno
+% using custom head mesh
+%
 % Revision 1.44  2006/04/11 21:18:03  arno
 % text message
 %
@@ -363,9 +366,10 @@ if nargin < 3
     options = {};
     if result{1},               options = { options{:} 'load'    result{2} };
     else
-        if isempty(result{7})   options = { options{:} 'setup' { result{4} 'meshfile' result{5} } 'meshfile' result{5} }; % no coreg
-        else                    options = { options{:} 'setup' { result{4} 'meshfile' result{5} 'transform' str2num(result{7}) } 'meshfile' result{5} };
+        if isempty(result{7})   options = { options{:} 'setup' { result{4} 'meshfile' result{5} } }; % no coreg
+        else                    options = { options{:} 'setup' { result{4} 'meshfile' result{5} 'transform' str2num(result{7}) } };
         end;
+        if ~strcmpi(result{5}, 'mheadnew.mat'), EEG.headplotmeshfile = result{5}; end;
     end;
     
     % decode other parameters
@@ -429,6 +433,14 @@ else % ************* Component plot
         if length(EEG.icachansind) == EEG.nbchan & ~isempty(EEG.splinefile)
             EEG.icasplinefile = EEG.splinefile;
         end;
+    end;
+end;
+
+% headplot mesh file
+% ------------------
+if isfield(EEG, 'headplotmeshfile')
+    if ~isempty(EEG.headplotmeshfile)
+        options = { options{:} 'meshfile' EEG.headplotmeshfile };
     end;
 end;
 
