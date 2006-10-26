@@ -149,6 +149,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.139  2006/10/25 23:29:47  arno
+%custom summary mode
+%
 %Revision 1.138  2006/01/23 22:24:24  arno
 %set multfactor to 1
 %
@@ -792,7 +795,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
         figure;
         options = { 'gui', 'off', 'dipolesize', g.dipolesize/1.5,'dipolelength', g.dipolelength, 'sphere', g.sphere ...
                     'color', g.color, 'mesh', g.mesh, 'num', g.num, 'image', g.image 'normlen' g.normlen ...
-                    'coordformat' g.coordformat 'mri' g.mri 'meshdata' g.meshdata };
+                    'coordformat' g.coordformat 'mri' g.mri 'meshdata' g.meshdata 'axistight' g.axistight };
         pos1 = [0 0 0.5 0.5];
         pos2 = [0 0.5 0.5 .5];
         pos3 = [.5 .5 0.5 .5]; if strcmp(g.summary, 'on2'), tmp = pos1; pos1 =pos3; pos3 = tmp; end;
