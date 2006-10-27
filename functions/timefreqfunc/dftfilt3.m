@@ -1,7 +1,7 @@
 % dftfilt2_rey() - discrete complex wavelet filters
 %
 % Usage:
-%   >> wavelet = dftfilt2_rey( freqs, cycles, srate, varargin)
+%   >> [wavelet,cycles,freqresol,timeresol] = dftfilt2_rey( freqs, cycles, srate, varargin)
 %
 % Inputs:
 %   freqs    - vector of frequencies of interest. 
@@ -52,6 +52,9 @@
 
 %
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2006/09/28 01:05:51  toby
+% Initial revision
+%
 
 % Revision 1.12 2006/09/25  rey r
 % Almost complete rewriting of dftfilt2.m, changing both Morlet and Hanning
