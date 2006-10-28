@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.72  2005/05/16 20:27:46  scott
+% adjusted several plotting details, oblique line height, cbar, text, etc.
+%
 % Revision 1.71  2005/03/05 02:28:36  arno
 % debug argument passing to topoplot
 %
@@ -638,4 +641,32 @@ end
 %
 % Turn on axcopy()
 %
-axcopy(gcf);
+
+% clicking on ERP pop_up topoplot
+% -------------------------------
+disp('Click on ERP waveform to show scalp map at specific latency');
+
+dat.times = x;
+dat.erp   = data;
+dat.chanlocs = chan_locs;
+dat.options  = topoargs;
+dat.srate    = (size(data,2)-1)/(x(end)-x(1))*1000;
+dat.axes     = axtp;
+dat.line     = l1;
+
+cb_code = [ 'tmppos = get(gca, ''currentpoint'');' ...
+            'dattmp = get(gcf, ''userdata'');' ...
+            'set(dattmp.line, ''visible'', ''off'');' ...
+            'axes(dattmp.axes); cla;' ...
+            'latpoint = round((tmppos(1)-dattmp.times(1))/1000*dattmp.srate);' ...
+            'topoplot(dattmp.erp(:,latpoint), dattmp.chanlocs, dattmp.options{:});' ...
+            'title(sprintf(''%.0f ms'', tmppos(1)));' ...
+            'clear latpoint dattmp;' ...
+          ];
+axcopy;
+
+set(gcf, 'userdata', dat);
+set(axdata, 'ButtonDownFcn', cb_code); %windowbuttondownfcn', cb_code);
+set(pl, 'ButtonDownFcn', cb_code);
+
+%axcopy(gcf, cb_code);
