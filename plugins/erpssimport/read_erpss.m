@@ -23,6 +23,9 @@
 %          with help from Andrey Vankov
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2005/05/20 18:39:53  hilit
+% if header is empty not rescaling to uV.
+%
 % Revision 1.24  2005/04/08 23:23:41  arno
 % rescale to microvolt
 %
@@ -70,7 +73,7 @@ function [eeg,ev,header] = read_erpss(filename)
          case {'MAC2','SUN4','SOL2','SGI','SGI64'}, complendian = 1;
          case {'PCWIN','LNX86','GLNX86'}, complendian = 0;
          otherwise 
-          disp('Disp: endian of computer not known, set to PC (windows/linux) by default');
+          disp('Byte order ('''endian'''') of this computer is unknown, set to PC (windows/linux) by default');
         end;
     end;
     fseek(fp,6,-1);
