@@ -101,6 +101,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2006/11/02 21:59:18  arno
+% input option
+%
 % Revision 1.11  2006/11/02 21:54:51  arno
 % same
 %
@@ -157,6 +160,8 @@ end;
 
 opt = finputcheck( varargin, { 'channels'    'cell'   []              {};
                                'caxis'       'real'   []              [];
+                               'ersplim'     'real'   []              []; % same as above
+                               'itclim'      'real'   []              []; % same as above
                                'ylim'        'real'   []              [];
                                'condnames'    'cell'   []              {};
                                'groupnames'   'cell'   []              {};
@@ -183,6 +188,8 @@ opt = finputcheck( varargin, { 'channels'    'cell'   []              {};
                            
 if isstr(opt), error(opt); end;
 if ~isempty(g.topovals), g.plottopo = g.topovals; end;
+if ~isempty(g.ersplim), g.caxis = g.ersplim; end;
+if ~isempty(g.itclim), g.caxis = g.itclim; end;
 if strcmpi(opt.datatype, 'spec'), g.unit = 'Hz'; end;
 if strcmpi(opt.plotsubjects, 'on')
     opt.plotgroups = 'apart';
