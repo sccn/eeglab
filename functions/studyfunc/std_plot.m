@@ -1,6 +1,6 @@
 % std_plot() - plot ERP/spectral traces or ERSP/ITC images a component
 %              or channel cluster in a STUDY. Also allows plotting scalp
-%              maps at specific data latency or frequency??.
+%              maps.
 % Usage:
 %          >> std_plot( axvals, data, 'key', 'val', ...)
 % Inputs:
@@ -101,6 +101,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2006/10/10 23:50:54  scott
+% replaced ?? defaults with defaults from finputcheck()
+%
 % Revision 1.8  2006/10/09 23:51:45  scott
 % some more help edits
 %
@@ -256,7 +259,7 @@ end;
 % --------------------------
 if strcmpi(opt.condstats, 'on') & nc > 1
     for g = 1:ng
-        [F df pval] = condstats(data(:,g), 'mode', opt.statistics, 'naccu', opt.naccu); 
+        [F df pval] = condstat(data(:,g), 'mode', opt.statistics, 'naccu', opt.naccu); 
         pcond{g} = squeeze(pval);
     end;
 else
@@ -264,14 +267,14 @@ else
 end;
 if strcmpi(opt.groupstats, 'on') & ng > 1
     for c = 1:nc
-        [F df pval] = condstats(data(c,:), 'mode', opt.statistics, 'naccu', opt.naccu); 
+        [F df pval] = condstat(data(c,:), 'mode', opt.statistics, 'naccu', opt.naccu); 
         pgroup{c} = squeeze(pval);
     end;
 else
     pgroup = {};
 end;
 if ( strcmpi(opt.groupstats, 'on') | strcmpi(opt.condstats, 'on') ) & ng > 1 & nc > 1
-    [F df pval] = condstats(data, 'mode', opt.statistics, 'naccu', opt.naccu);
+    [F df pval] = condstat(data, 'mode', opt.statistics, 'naccu', opt.naccu);
     pinter      = squeeze(pval{3});
 else
     pinter = [];
