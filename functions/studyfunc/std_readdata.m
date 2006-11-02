@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2006/09/20 12:27:14  arno
+% fix reading of spectral data
+%
 
 function [STUDY, clustinfo, allinds] = std_readdata(STUDY, ALLEEG, varargin);
 
@@ -84,7 +87,7 @@ opt = finputcheck( varargin, { 'condition'  'cell'    []       {};
                              'freqrange'  'real'    []       [];
                              'timerange'  'real'    []       [];
                              'group'      'cell'    []       {};
-                             'statmode'   'string'  { 'individual' 'common' 'trials' }       'individual';
+                             'statmode'   'string'  { 'subject' 'individual' 'common' 'trials' }       'individual';
                              'subbaseline' 'string'  { 'on' 'off' }       'on';
                              'infotype'   'string'  { 'erp' 'spec' 'ersp' 'itc' } 'erp' }, 'std_readdata');
 if isstr(opt), error(opt); end;
@@ -98,7 +101,7 @@ elseif strcmpi(opt.infotype, 'ersp') | strcmpi(opt.infotype, 'itc')
     STUDY = pop_erspparams(STUDY, 'default');
     if isempty(opt.freqrange), opt.freqrange   = STUDY.etc.erspparams.freqrange; end;
     if isempty(opt.timerange), opt.timerange   = STUDY.etc.erspparams.timerange; end;
-    if strcmpi(opt.statmode, 'individual'), opt.statmode    = STUDY.etc.erspparams.statmode;end;
+    if strcmpi(opt.statmode, 'individual') |  strcmpi(opt.statmode, 'subject'), opt.statmode    = STUDY.etc.erspparams.statmode;end;
     if strcmpi(opt.subbaseline, 'on'),      opt.subbaseline = STUDY.etc.erspparams.subbaseline; end;
 end;
 
