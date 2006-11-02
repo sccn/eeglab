@@ -101,6 +101,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2006/11/02 21:53:06  arno
+% condstats -> condstat
+%
 % Revision 1.9  2006/10/10 23:50:54  scott
 % replaced ?? defaults with defaults from finputcheck()
 %
@@ -259,7 +262,7 @@ end;
 % --------------------------
 if strcmpi(opt.condstats, 'on') & nc > 1
     for g = 1:ng
-        [F df pval] = condstat(data(:,g), 'mode', opt.statistics, 'naccu', opt.naccu); 
+        [F df pval] = statcond(data(:,g), 'mode', opt.statistics, 'naccu', opt.naccu); 
         pcond{g} = squeeze(pval);
     end;
 else
@@ -267,14 +270,14 @@ else
 end;
 if strcmpi(opt.groupstats, 'on') & ng > 1
     for c = 1:nc
-        [F df pval] = condstat(data(c,:), 'mode', opt.statistics, 'naccu', opt.naccu); 
+        [F df pval] = statcond(data(c,:), 'mode', opt.statistics, 'naccu', opt.naccu); 
         pgroup{c} = squeeze(pval);
     end;
 else
     pgroup = {};
 end;
 if ( strcmpi(opt.groupstats, 'on') | strcmpi(opt.condstats, 'on') ) & ng > 1 & nc > 1
-    [F df pval] = condstat(data, 'mode', opt.statistics, 'naccu', opt.naccu);
+    [F df pval] = statcond(data, 'mode', opt.statistics, 'naccu', opt.naccu);
     pinter      = squeeze(pval{3});
 else
     pinter = [];
