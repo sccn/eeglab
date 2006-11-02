@@ -101,6 +101,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2006/11/02 21:54:51  arno
+% same
+%
 % Revision 1.10  2006/11/02 21:53:06  arno
 % condstats -> condstat
 %
@@ -160,6 +163,7 @@ opt = finputcheck( varargin, { 'channels'    'cell'   []              {};
                                'tftopoopt'   'cell'   []              {};
                                'threshold'   'real'   []              NaN;
                                'plottopo'       'real'   []              [];
+                               'topovals'       'real'   []              []; % same as above
                                'naccu'       'integer' []             500;
                                'unitx'       'string' []              'ms'; % just for titles
                                'subject'     'string' []              '';   % just for titles
@@ -178,6 +182,7 @@ opt = finputcheck( varargin, { 'channels'    'cell'   []              {};
                                'statmode'    'string' { 'subjects' 'common' 'trials' } 'subjects'}, 'std_erpmaskdata');
                            
 if isstr(opt), error(opt); end;
+if ~isempty(g.topovals), g.plottopo = g.topovals; end;
 if strcmpi(opt.datatype, 'spec'), g.unit = 'Hz'; end;
 if strcmpi(opt.plotsubjects, 'on')
     opt.plotgroups = 'apart';
