@@ -101,6 +101,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2006/11/02 22:13:04  arno
+% Limit to ERSP
+%
 % Revision 1.12  2006/11/02 21:59:18  arno
 % input option
 %
@@ -187,10 +190,10 @@ opt = finputcheck( varargin, { 'channels'    'cell'   []              {};
                                'statmode'    'string' { 'subjects' 'common' 'trials' } 'subjects'}, 'std_erpmaskdata');
                            
 if isstr(opt), error(opt); end;
-if ~isempty(g.topovals), g.plottopo = g.topovals; end;
-if ~isempty(g.ersplim), g.caxis = g.ersplim; end;
-if ~isempty(g.itclim), g.caxis = g.itclim; end;
-if strcmpi(opt.datatype, 'spec'), g.unit = 'Hz'; end;
+if ~isempty(opt.topovals), opt.plottopo = opt.topovals; end;
+if ~isempty(opt.ersplim), opt.caxis = opt.ersplim; end;
+if ~isempty(opt.itclim), opt.caxis = opt.itclim; end;
+if strcmpi(opt.datatype, 'spec'), opt.unit = 'Hz'; end;
 if strcmpi(opt.plotsubjects, 'on')
     opt.plotgroups = 'apart';
     opt.plotconditions  = 'apart';
