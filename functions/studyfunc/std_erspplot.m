@@ -68,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2006/10/03 21:54:31  scott
+% help msg edits -- ?? remain    -sm
+%
 % Revision 1.28  2006/10/03 18:31:49  scott
 % help msg edits. ARNO - SEE ??  -sm
 %
@@ -127,6 +130,45 @@ plotcurveopt = { ...
 if ~isempty(opt.channels)
      [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'channels', opt.channels, 'infotype', opt.datatype, 'timerange', opt.timerange, 'statmode', opt.statmode);
 else [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'clusters', opt.clusters, 'infotype', opt.datatype, 'timerange', opt.timerange, 'statmode', opt.statmode);
+end;
+
+% plot single scalp map
+% ---------------------
+if ~isempty(opt.plotfreq)
+    allersp = cell(size(STUDY.changrp(1).erspdata));
+    for ind = 1:length(STUDY.changrp(1).erspdata(:))
+        allersp{ind} = zeros([ size(STUDY.changrp(1).erspdata{1}) length(opt.channels)]);
+        for index = 1:length(allinds)
+            if ~isempty(opt.channels)
+                allersp{ind}(:,:,index)  = STUDY.changrp(allinds(index)).erspdata{ind};
+                allfreqs                 = STUDY.changrp(allinds(index)).erspfreqs;
+                alltimes                 = STUDY.changrp(allinds(index)).ersptimes;
+            else
+                allersp{ind}(:,:,index)  = STUDY.cluster(allinds(index)).erspdata{ind};
+                allfreqs                 = STUDY.cluster(allinds(index)).erspfreqs;
+                alltimes                 = STUDY.changrp(allinds(index)).ersptimes;
+            end;
+        end;
+        allersp{ind} = permute(allersp{ind}, [1 3 2]);
+    end;
+    %erspbase(:,2) = [];
+    %erspbase(:,1) = [];
+    
+    % select individual subject
+    % -------------------------
+    if ~isempty(opt.subject)
+        subjind = strmatch(opt.subject, STUDY.subject);
+        for c = 1:size(allersp,1)
+            for g = 1:size(allersp,2)
+                allersp{c,g} = allersp{c,g}(:,:,subjind);
+            end;
+        end;
+    end;
+
+    [pgroup pcond pinter] = std_plot({ allfreqs alltimes }, allersp, 'condnames', STUDY.condition, 'subject', opt.subject, 'legend', opt.legend, ...
+                                      'datatype', opt.datatype,'plotmode', opt.plotmode, 'groupnames', STUDY.group, 'topovals', opt.plottf, 'unitx', 'Hz', ...
+                                      'chanlocs', ALLEEG(1).chanlocs, 'plotsubjects', opt.plotsubjects, 'topovals', opt.plottf, plotcurveopt{:});
+    return;
 end;
 
 opt.legend = 'off';
