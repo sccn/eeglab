@@ -147,6 +147,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.154  2006/10/25 21:25:07  arno
+% fixing integer channel type
+%
 % Revision 1.153  2006/10/04 16:29:52  arno
 % fix nosedir  history
 %
@@ -1371,7 +1374,8 @@ else
             if message == 1
                 textcomment = strvcat('Only channel labels are currenlty present but some of these labels have known', ...
                                       'positions. Do you want to look up coordinates for these channels using the electrode', ...
-                                      'file below? If you do not know, press OK.'); 
+                                      'file below? If you have a channel location file for this dataset, press cancel, then', ...
+                                      'use button "Read location" in the next gui. If you do not know, just press OK.'); 
             else
                 textcomment = strvcat('Some channel labels may have known locations.', ...
                                       'Do you want to look up coordinates for these channels using the electrode', ...
@@ -1386,7 +1390,7 @@ else
                        { 'style' 'pushbutton' 'string' '...' 'callback' commandload } };
             
             res = inputgui( { 1 [1 0.3] [1 0.3] }, uilist, 'pophelp(''pop_chanedit'')', 'Look up channel locations?', ...
-                           userdata, 'normal', [3 1 1] );
+                           userdata, 'normal', [4 1 1] );
             if ~isempty(res)
                 %[chans params]  = pop_chanedit(chans, params, 'lookup', res{2});	
                 com = { 'lookup' res{2} };
