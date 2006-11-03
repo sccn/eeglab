@@ -1,5 +1,5 @@
 % pop_chanplot() - graphic user interface (GUI)-based function with plotting 
-%                options for visualizing. Only component measures (e.g., spectra, 
+%                options for visualizing. Only channel measures (e.g., spectra, 
 %                ERPs, ERSPs, ITCs) that have been computed and saved in the study EEG 
 %                datasets can be visualized. These can be computed using the GUI-based 
 %                pop_precomp().
@@ -19,23 +19,23 @@
 %
 % Graphic interface buttons:
 %  "Select channel to plot" - [list box] Displays available channels to plot (format is
-%                'channel name (number of components)'). The presented channels depend s
+%                'channel name (number of channels)'). The presented channels depend s
 %                on the optional input variable 'channels'. Selecting (clicking on) a 
-%                channel from the list will display the selected channel components in the 
-%                "Select component(s) to plot" list box. Use the plotting buttons below 
+%                channel from the list will display the selected channel channels in the 
+%                "Select channel(s) to plot" list box. Use the plotting buttons below 
 %                to plot selected measures of the selected channel. Additional editing 
-%                options (renaming the channel, rejecting outliers, moving components to 
+%                options (renaming the channel, rejecting outliers, moving channels to 
 %                another channel) are also available. The option 'All N channel centroids' 
 %                at the top of the list displays all the channels in the list except the 
 %                'Notchannel', 'Outlier' and 'Parentchannel' channels. Selecting this option 
 %                will plot the channel centroids (i.e. ERP, ERSP, ...) in a single figure.
-%  "Select component(s) to plot" - [list box] Displays the ICA components of the currently 
-%                selected channel (in the "Select channel to plot" list box). Each component 
-%                has the format: 'subject name, component index'. Multiple components can be 
+%  "Select channel(s) to plot" - [list box] Displays the ICA channels of the currently 
+%                selected channel (in the "Select channel to plot" list box). Each channel 
+%                has the format: 'subject name, channel index'. Multiple channels can be 
 %                selected from the list. Use the plotting buttons below to plot different 
-%                measures of the selected components on different figures. Selecting the 
-%                "All components" option is  equivalent to using the channel plotting buttons. 
-%                Additional editing options are reassigning the selected components to 
+%                measures of the selected channels on different figures. Selecting the 
+%                "All channels" option is  equivalent to using the channel plotting buttons. 
+%                Additional editing options are reassigning the selected channels to 
 %                another channel or moving them to the outlier channel.
 %  "Plot channel properties" - [button] Displays in one figure all the mean channel measures
 %                (e.g., dipole locations, scalp maps, spectra, etc.) that were calculated
@@ -44,39 +44,39 @@
 %                and ITC plots will show only the first condition; clicking on the subplot 
 %                will open a new figure with the different conditions displayed together. 
 %                Uses the command line function std_propplot().
-%  "Plot scalp maps"  - [button] Displays the scalp maps of channel components.
-%                If applied to a channel, scalp maps of the channel components
+%  "Plot scalp maps"  - [button] Displays the scalp maps of channel channels.
+%                If applied to a channel, scalp maps of the channel channels
 %                are plotted along with the channel mean scalp map in one figure. 
 %                If "All # channel centroids" option is selected, all channel scalp map
-%                means are plotted in the same figure. If applied to components, displays
-%                the scalp maps of the specified channel components in separate figures.
+%                means are plotted in the same figure. If applied to channels, displays
+%                the scalp maps of the specified channel channels in separate figures.
 %                Uses the command line functions std_plotmap() and std_plotchanmap().
-%  "Plot ERSPs" - [button] Displays the channel component ERSPs. 
-%                If applied to a channel, component ERSPs are plotted in one figure  
+%  "Plot ERSPs" - [button] Displays the channel channel ERSPs. 
+%                If applied to a channel, channel ERSPs are plotted in one figure  
 %                (per condition) with the channel mean ERSP. If "All # channel centroids" 
 %                option is selected, plots all average ERSPs of the channels in one figure 
-%                per condition. If applied to components, display the ERSP images of specified 
-%                channel components in separate figures, using one figure for all conditions.
+%                per condition. If applied to channels, display the ERSP images of specified 
+%                channel channels in separate figures, using one figure for all conditions.
 %                Uses the command line functions std_plotersp() and std_plotchannelsp().
 %  "Plot ITCs" - [button] Same as  "Plot ERSPs" but with ITC.
 %                Uses the command line functions std_plotitc() and std_plotchanitc().
-%  "Plot dipoles" - [button] Displays the dipoles of the channel components.
-%                If applied to a channel, plots the channel component dipoles (in blue) 
+%  "Plot dipoles" - [button] Displays the dipoles of the channel channels.
+%                If applied to a channel, plots the channel channel dipoles (in blue) 
 %                plus the average channel dipole (in red). If "All # channel centroids" option 
 %                is selected, all channel plots are displayed in one figure each channel in 
-%                a separate subplot. If applied to components, displays the ERSP images of the
-%                specified channel. For specific components displays components dipole (in blue) 
+%                a separate subplot. If applied to channels, displays the ERSP images of the
+%                specified channel. For specific channels displays channels dipole (in blue) 
 %                plus the average channel dipole (in Red) in separate figures. 
 %                Uses the command line functions std_dipplot() and std_plotchandip().
-%  "Plot spectra" - [button] Displays the channel component spectra.   
-%                If applied to a channel, displays component spectra plus the average channel 
-%                spectrum in bold. For a specific channel, displays the channel component 
+%  "Plot spectra" - [button] Displays the channel channel spectra.   
+%                If applied to a channel, displays channel spectra plus the average channel 
+%                spectrum in bold. For a specific channel, displays the channel channel 
 %                spectra plus the average channel spectrum (in bold) in one figure per condition.
 %                If the "All # channel centroids" option is selected, displays the average 
 %                spectrum of all channels in the same figure, with spectrum for different 
 %                conditions (if any) plotted in different colors.  
-%                If applied to components, displays the spectrum of specified channel 
-%                components in separate figures using one figure for all conditions.  
+%                If applied to channels, displays the spectrum of specified channel 
+%                channels in separate figures using one figure for all conditions.  
 %                Uses the command line functions std_plotspec() and std_plotonechanpec().
 %  "Plot ERPs" - [button] Same as "Plot spectra" but for ERPs.
 %                Uses the command line functions std_ploterp() and std_plotchannelp().
@@ -85,16 +85,16 @@
 %                If no name is given the default name is 'Cls #', where '#' is the next
 %                available channel number. For changes to take place, press the popup 
 %                window 'OK' button, else press the 'Cancel' button. After the empty 
-%                channel is created, components can be moved into it using, 
-%                'Reassign selected component(s)' (see below). Uses the command line 
+%                channel is created, channels can be moved into it using, 
+%                'Reassign selected channel(s)' (see below). Uses the command line 
 %                function std_createchant().
 %  "Rename selected channel" - [button] Renames a channel using the selected (mnemonic) name. 
 %                Opens a popup window in which a new name for the selected channel can be 
 %                entered. For changes to take place, press the popup window 'OK' button, 
 %                else press the 'Cancel' button. Uses the command line function std_renamechant().
-%  "Reject outlier components" - [button] rejects outlier components to an outlier channel.
+%  "Reject outlier channels" - [button] rejects outlier channels to an outlier channel.
 %                Opens a popup window to specify the outlier threshold. Move outlier 
-%                components that are more than x standard deviations devs from the 
+%                channels that are more than x standard deviations devs from the 
 %                channel centroid to an outlier channel. For changes to take place, 
 %                press the popup window 'OK' button, else press the 'Cancel' button. 
 %                Uses the command line function std_rejectoutliers().
@@ -104,16 +104,16 @@
 %                the default name is 'Cls #', where '#' is the next available channel number.   
 %                For changes to take place, press the popup window 'OK' button, else press
 %                the 'Cancel' button. Uses the command line function std_mergechant().
-%  "Remove selected outlier component(s)" - [button] Moves selected component(s) to the 
-%                outlier channel. The components that will be moved are the ones selected 
-%                in the "Select component(s) to plot" list box. Opens a popup window in which 
-%                a list of the selected component(s) is presented. For changes to take place,
+%  "Remove selected outlier channel(s)" - [button] Moves selected channel(s) to the 
+%                outlier channel. The channels that will be moved are the ones selected 
+%                in the "Select channel(s) to plot" list box. Opens a popup window in which 
+%                a list of the selected channel(s) is presented. For changes to take place,
 %                press the popup window 'OK' button, else press the 'Cancel' button. 
 %                Uses the command line function std_moveoutlier().
-%  "Reassign selected component(s)" - [button] Moves selected component(s) from one channel 
-%                to another. The components that will reassign are the ones selected in the
-%                "Select component(s) to plot" list box. Opens a popup window in which 
-%                a list of possible channels to which to move the selected component(s) is 
+%  "Reassign selected channel(s)" - [button] Moves selected channel(s) from one channel 
+%                to another. The channels that will reassign are the ones selected in the
+%                "Select channel(s) to plot" list box. Opens a popup window in which 
+%                a list of possible channels to which to move the selected channel(s) is 
 %                presented. For changes to take place, press the popup window 'OK' button, 
 %                else press the 'Cancel' button. Uses the command line function std_movecomp().
 %  "Save STUDY set to disk" - [check box] Saves the STUDY set structure modified according 
@@ -240,7 +240,7 @@ if ~isstr(varargin{1})
         {'style' 'text' 'string' ['Study ''' STUDY.name '''' ] ...
             'FontWeight' 'Bold' 'HorizontalAlignment' 'center'} {} ...
         {'style' 'text'       'string' 'Select channel to plot' 'FontWeight' 'Bold' } {} ...
-        {'style' 'text'       'string' 'Select component(s) to plot' 'FontWeight' 'Bold'} ...
+        {'style' 'text'       'string' 'Select channel(s) to plot' 'FontWeight' 'Bold'} ...
         {'style' 'listbox'    'string' show_options 'value' 1 'tag' 'chan_list' 'Callback' show_chan } {} ...
         {'style' 'listbox'    'string' '' 'tag' 'chan_onechan' 'max' 2 'min' 1 'callback'    show_onechan } ... 
         {'style' 'pushbutton' 'enable'   erp_enable 'string' 'Plot ERPs' 'Callback' plot_chan_erp} ...
@@ -255,7 +255,7 @@ if ~isstr(varargin{1})
         {'style' 'pushbutton' 'enable'  ersp_enable 'string' 'Plot ITCs' 'Callback' plot_chan_itcs} { }  ...
         {'style' 'pushbutton' 'enable'  ersp_enable 'string' 'Plot ITC(s)' 'Callback' plot_onechan_itcs}...
         {'style' 'pushbutton' 'string' 'Plot channel properties' 'Callback' plot_chan_sum} {} ... 
-        {'style' 'pushbutton' 'string' 'Plot component properties' 'Callback' plot_onechan_sum 'enable' 'off'} {} ...
+        {'style' 'pushbutton' 'string' 'Plot channel properties' 'Callback' plot_onechan_sum 'enable' 'off'} {} ...
         {'style' 'checkbox'   'string' '' 'tag' 'saveSTUDY' 'Callback' saveSTUDY 'value' 0} ...
         {'style' 'text'       'string' 'Save STUDY set to disk'} ...
         {'style' 'edit'       'string' fullfile(STUDY.filepath, STUDY.filename) 'enable' 'off' 'tag' 'studyfile' 'userdata' 'save'} ...
@@ -263,7 +263,7 @@ if ~isstr(varargin{1})
     
    [out_param userdat] = inputgui( 'geometry' , geometry, 'uilist', uilist, ...
                                    'helpcom', 'pophelp(''pop_chanoutput'')', ...
-                                   'title', 'View and edit current component channels -- pop_chanplot()' , 'userdata', fig_arg, ...
+                                   'title', 'View and edit current channels -- pop_chanplot()' , 'userdata', fig_arg, ...
                                    'geomvert', [ 1 1 1 3 1 1 1 1 1 1 1 1], 'eval', show_chan );
 	
    if ~isempty(userdat)
@@ -431,13 +431,13 @@ else
             if old_chan == 0 % 'all channels' option 
                 return;
             end
-            % Don't reassign components of 'Notchan' or the 'Parentchannel'.
+            % Don't reassign channels of 'Notchan' or the 'Parentchannel'.
             if strncmpi('Parentchannel',STUDY.channel(cls(old_chan)).name,13)  
-                warndlg2('Cannot reassign components of ''Parentchannel''.');
+                warndlg2('Cannot reassign channels of ''Parentchannel''.');
                 return;
 			end
             old_name = STUDY.channel(cls(old_chan)).name;
-            ncomp = length(comp_ind); % number of selected components
+            ncomp = length(comp_ind); % number of selected channels
             optionalcls =[];
             for k = 1:length(cls)
                 if (~strncmpi('Parentchannel',STUDY.channel(cls(k)).name,13))  & (k~= old_chan)
@@ -445,16 +445,16 @@ else
                 end
             end                    
             reassign_param  = inputgui( { [1] [1] [1]}, ...
-                { {'style' 'text' 'string' strvcat(['Reassign ' fastif(ncomp >1, [num2str(length(comp_ind)) ' currently selected components'], ...
-                                                              'currently selected component') ], ...
+                { {'style' 'text' 'string' strvcat(['Reassign ' fastif(ncomp >1, [num2str(length(comp_ind)) ' currently selected channels'], ...
+                                                              'currently selected channel') ], ...
                             [' from ' old_name ' to the channel selected below']) 'FontWeight' 'Bold'} ...
                   {'style' 'listbox' 'string' {STUDY.channel(optionalcls).name} 'tag' 'new_chan'} {} }, ...
                   '', 'Reassign channel - from pop_chanplot()' ,[] , 'normal', [2 3 1] );
             if ~isempty(reassign_param) %if not canceled
                 new_chan = reassign_param{1};
                 comp_to_disp = get(findobj('parent', hdl, 'tag', 'chan_onechan'), 'String');      
-                if strcmp(comp_to_disp{comp_ind(1)},'All components')
-                    warndlg2('Cannot move all the components of the channel - abort move components', 'Aborting move components');
+                if strcmp(comp_to_disp{comp_ind(1)},'All channels')
+                    warndlg2('Cannot move all the channels of the channel - abort move channels', 'Aborting move channels');
                     return;
                 end
                 STUDY = std_movecomp(STUDY, ALLEEG,  cls(old_chan), optionalcls(new_chan), comp_ind - 1);                
@@ -481,14 +481,14 @@ else
             old_chan = get(findobj('parent', hdl, 'tag', 'chan_list'), 'value') -1;
             comp_ind = get(findobj('parent', hdl, 'tag', 'chan_onechan'), 'Value'); 
             if ~isempty(find(comp_ind ==1))
-                warndlg2('Cannot remove all the channel components');
+                warndlg2('Cannot remove all the channel channels');
                 return;
             end
             if old_chan == 0 % 'all channels' option 
                 return;
             end
             if strncmpi('Notchan',STUDY.channel(cls(old_chan)).name,8) | strncmpi('Parentchannel',STUDY.channel(cls(old_chan)).name,13)    % There are no outliers to 'Notchan'
-                warndlg2('Cannot reassign components of ''Notchan'' or ''Parentchannel''.');
+                warndlg2('Cannot reassign channels of ''Notchan'' or ''Parentchannel''.');
                 return;
             end
             comp_list = get(findobj('parent', hdl, 'tag', 'chan_onechan'), 'String'); 
@@ -499,7 +499,7 @@ else
                 return;
 			end
             reassign_param  = inputgui( { [1] [1] [1]}, ...
-                { {'style' 'text' 'string' ['Remove ' fastif(ncomp >1, [num2str(length(comp_ind)) ' currently selected components below '], 'currently selected component below ') ...
+                { {'style' 'text' 'string' ['Remove ' fastif(ncomp >1, [num2str(length(comp_ind)) ' currently selected channels below '], 'currently selected channel below ') ...
                             'from ' old_name ' to its outlier channel?'] 'FontWeight' 'Bold'} ...
                   {'style' 'listbox' 'string' {comp_list{comp_ind}} 'tag' 'new_chan'} {} }, ...
                   '', 'Remove outliers - from pop_chanplot()' ,[] , 'normal', [1 3 1] );
@@ -552,7 +552,7 @@ else
             end
             reject_param  = inputgui( { [1] [1] [4 1 2] [1]}, ...
                 { {'style' 'text' 'string' ['Reject "' std_name  '" outliers ' ] 'FontWeight' 'Bold'} {} ...
-                   {'style' 'text' 'string' 'Move outlier components that are more than'} {'style' 'edit' 'string' '3' 'tag' 'outliers_std' } ...
+                   {'style' 'text' 'string' 'Move outlier channels that are more than'} {'style' 'edit' 'string' '3' 'tag' 'outliers_std' } ...
                   {'style' 'text' 'string' 'standard deviations' } ...
                   {'style' 'text' 'string' [ 'from the "' std_name  '" centroid to an outlier channel.']} }, ...
                   '', 'Reject outliers - from pop_chanplot()' );
