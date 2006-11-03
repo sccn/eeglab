@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2006/09/12 18:56:48  arno
+% channel compatibility and many more features
+%
 % Revision 1.20  2006/05/13 17:46:22  arno
 % transposing baseline to prevent crash
 %
@@ -230,13 +233,13 @@ end
 
 % Mask ERSP
 % ---------
-if ~isempty(erspallboot{1})
-    for cond  = 1:length(abset)
-        minersp= repmat(erspallboot{cond}(1,:)',1,size(erspall{1},2));
-        maxersp= repmat(erspallboot{cond}(2,:)',1,size(erspall{1},2));
-        erspall{cond}(find(erspall{cond}<maxersp & erspall{cond}>minersp)) = 0;
-    end
-end;
+%if ~isempty(erspallboot{1})
+%    for cond  = 1:length(abset)
+%        minersp= repmat(erspallboot{cond}(1,:)',1,size(erspall{1},2));
+%        maxersp= repmat(erspallboot{cond}(2,:)',1,size(erspall{1},2));
+%        erspall{cond}(find(erspall{cond}<maxersp & erspall{cond}>minersp)) = 0;
+%    end
+%end;
 
 % return parameters
 % ----------------
