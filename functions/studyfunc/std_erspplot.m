@@ -68,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2006/11/03 02:08:47  arno
+% allowing ploting single time-freq point
+%
 % Revision 1.29  2006/10/03 21:54:31  scott
 % help msg edits -- ?? remain    -sm
 %
@@ -134,7 +137,7 @@ end;
 
 % plot single scalp map
 % ---------------------
-if ~isempty(opt.plotfreq)
+if ~isempty(opt.plottf)
     allersp = cell(size(STUDY.changrp(1).erspdata));
     for ind = 1:length(STUDY.changrp(1).erspdata(:))
         allersp{ind} = zeros([ size(STUDY.changrp(1).erspdata{1}) length(opt.channels)]);
