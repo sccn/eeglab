@@ -147,6 +147,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.157  2006/11/03 23:22:17  arno
+% same
+%
 % Revision 1.156  2006/11/03 23:20:50  arno
 % changing message fro wrong number of channels
 %
@@ -648,8 +651,8 @@ end;
 % ----------------------------------------------
 if isfield(params, 'nodatchans')
     chanlen = length(chans);
-    fields = fieldnames( params.nodatchans );
     for index = 1:length(params.nodatchans)
+        fields = fieldnames( params.nodatchans );
         ind = chanlen+index;
         for f = 1:length( fields )
             chans = setfield(chans, { ind }, fields{f}, getfield( params.nodatchans, { index },  fields{f}));
@@ -717,10 +720,10 @@ if nargin < 3
     % lookup channel locations if necessary
     % -------------------------------------
     if ~all(cellfun('isempty', {chans.labels})) & all(cellfun('isempty', {chans.theta}))
-        [chans params com] = pop_chanedit(chans, params, 'lookupgui', []);
+        [chans params urchans com] = pop_chanedit(chans, params, 'lookupgui', []);
         if ~isempty(com)
             totaluserdat = com;
-            [chans params com] = pop_chanedit(chans, params, com{:});
+            [chans params urchans com] = pop_chanedit(chans, params, com{:});
         end;
     end;
     
@@ -990,8 +993,8 @@ if nargin < 3
             [tmpchans tmpfid] = getfid(chans);            
 			if nbchan ~= 0 & nbchan ~= length(tmpchans)
 				if ~popask(strvcat(['The number of data channel (' int2str(length(tmpchans)) ') not including fiducials does not'], ...
-								  ['correspond to the initial number of channel (' int2str(nbchan) '), so the channel information'], ...
-								  'will be removed if this function was called from EEGLAB'))
+								  ['correspond to the initial number of channel (' int2str(nbchan) '), so for consistency purposes'], ...
+								  'new channel information will be ignored if this function was called from EEGLAB'))
 					ingui = 1;
 				end;
 			end;	
@@ -1468,6 +1471,7 @@ function [chans, shrinkorskirt, plotrad]= checkchans(chans, fields);
     end;
     
 function [chans, fids] = getfid(chans)
+    fids = [];
     if isfield(chans, 'type')
         alltypes          = { chans.type };
         indnoempty        = find(~cellfun('isempty', alltypes));
