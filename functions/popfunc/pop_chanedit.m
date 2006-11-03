@@ -147,6 +147,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.155  2006/11/03 22:05:16  arno
+% update message
+%
 % Revision 1.154  2006/10/25 21:25:07  arno
 % fixing integer channel type
 %
@@ -981,10 +984,11 @@ if nargin < 3
 		% ----------------
 		if strcmp(returnmode, 'retuninginputui')
 			ingui = 0;
-			if nbchan ~= 0 & nbchan ~= length(chans)
-				if ~popask(strvcat(['The number of channel (' int2str(length(chans)) ') does not correspond to the'], ...
-								  ['initial number of channel (' int2str(nbchan) '), so the channel information'], ...
-								  'may be removed if this function was called from EEGLAB'))
+            [tmpchans tmpfid] = getfid(chans);            
+			if nbchan ~= 0 & nbchan ~= length(tmpchans)
+				if ~popask(strvcat(['The number of data channel (' int2str(length(tmpchans)) ') not including fiducials does not'], ...
+								  ['correspond to the initial number of channel (' int2str(nbchan) '), so the channel information'], ...
+								  'will be removed if this function was called from EEGLAB'))
 					ingui = 1;
 				end;
 			end;	
@@ -1030,23 +1034,7 @@ if nargin < 3
         
         % move no data channels to info structure
         % ---------------------------------------
-        if isfield(chans, 'type')
-            alltypes          = { chans.type };
-            indnoempty        = find(~cellfun('isempty', alltypes));
-            if ~isempty(indnoempty)
-                if isnumeric(alltypes{indnoempty(1)})
-                    %inds = [ find([alltypes{indnoempty}] > 98) ];
-                    for index = 1:length(chans)
-                        if chans(index).type > 98, chans(index).type = 'fid'; end;
-                        chans(index).type = num2str(chans(index).type);
-                    end;
-                end;
-                alltypes          = { chans.type };
-                inds = strmatch( 'fid', lower(alltypes(indnoempty)) );
-                params.nodatchans = chans(indnoempty(inds));
-                chans(indnoempty(inds)) = [];
-            end;
-        end;
+        [chans params.nodatchans] = getfid(chans);
         
         % multiple datasets
         % -----------------
@@ -1476,3 +1464,22 @@ function [chans, shrinkorskirt, plotrad]= checkchans(chans, fields);
         catch, end;
     end;
     
+function [chans, ifds] = getfid(chans)
+    if isfield(chans, 'type')
+        alltypes          = { chans.type };
+        indnoempty        = find(~cellfun('isempty', alltypes));
+        if ~isempty(indnoempty)
+            if isnumeric(alltypes{indnoempty(1)})
+                %inds = [ find([alltypes{indnoempty}] > 98) ];
+                for index = 1:length(chans)
+                    if chans(index).type > 98, chans(index).type = 'fid'; end;
+                    chans(index).type = num2str(chans(index).type);
+                end;
+            end;
+            alltypes          = { chans.type };
+            inds = strmatch( 'fid', lower(alltypes(indnoempty)) );
+            params.nodatchans = chans(indnoempty(inds));
+            chans(indnoempty(inds)) = [];
+        end;
+    end;
+        
