@@ -147,6 +147,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.156  2006/11/03 23:20:50  arno
+% changing message fro wrong number of channels
+%
 % Revision 1.155  2006/11/03 22:05:16  arno
 % update message
 %
@@ -1464,7 +1467,7 @@ function [chans, shrinkorskirt, plotrad]= checkchans(chans, fields);
         catch, end;
     end;
     
-function [chans, ifds] = getfid(chans)
+function [chans, fids] = getfid(chans)
     if isfield(chans, 'type')
         alltypes          = { chans.type };
         indnoempty        = find(~cellfun('isempty', alltypes));
@@ -1478,7 +1481,7 @@ function [chans, ifds] = getfid(chans)
             end;
             alltypes          = { chans.type };
             inds = strmatch( 'fid', lower(alltypes(indnoempty)) );
-            params.nodatchans = chans(indnoempty(inds));
+            fids = chans(indnoempty(inds));
             chans(indnoempty(inds)) = [];
         end;
     end;
