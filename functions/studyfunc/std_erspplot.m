@@ -68,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2006/11/03 02:11:22  arno
+% same
+%
 % Revision 1.31  2006/11/03 02:09:47  arno
 % same
 %
@@ -137,6 +140,7 @@ if ~isempty(opt.channels)
      [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'channels', opt.channels, 'infotype', opt.datatype, 'timerange', opt.timerange, 'statmode', opt.statmode);
 else [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'clusters', opt.clusters, 'infotype', opt.datatype, 'timerange', opt.timerange, 'statmode', opt.statmode);
 end;
+opt.legend = 'off';
 
 % plot single scalp map
 % ---------------------
@@ -146,16 +150,16 @@ if ~isempty(opt.plottf)
         allersp{ind} = zeros([ size(STUDY.changrp(1).erspdata{1}) length(opt.channels)]);
         for index = 1:length(allinds)
             if ~isempty(opt.channels)
-                allersp{ind}(:,:,index)  = STUDY.changrp(allinds(index)).erspdata{ind};
-                allfreqs                 = STUDY.changrp(allinds(index)).erspfreqs;
-                alltimes                 = STUDY.changrp(allinds(index)).ersptimes;
+                allersp{ind}(:,:,:,index)  = STUDY.changrp(allinds(index)).erspdata{ind};
+                allfreqs                   = STUDY.changrp(allinds(index)).erspfreqs;
+                alltimes                   = STUDY.changrp(allinds(index)).ersptimes;
             else
-                allersp{ind}(:,:,index)  = STUDY.cluster(allinds(index)).erspdata{ind};
-                allfreqs                 = STUDY.cluster(allinds(index)).erspfreqs;
-                alltimes                 = STUDY.changrp(allinds(index)).ersptimes;
+                allersp{ind}(:,:,:,index)  = STUDY.cluster(allinds(index)).erspdata{ind};
+                allfreqs                   = STUDY.cluster(allinds(index)).erspfreqs;
+                alltimes                   = STUDY.changrp(allinds(index)).ersptimes;
             end;
         end;
-        %allersp{ind} = permute(allersp{ind}, [1 3 2]);
+        allersp{ind} = permute(allersp{ind}, [1 2 4 3]);
     end;
     %erspbase(:,2) = [];
     %erspbase(:,1) = [];
@@ -177,7 +181,6 @@ if ~isempty(opt.plottf)
     return;
 end;
 
-opt.legend = 'off';
 if length(allinds) > 1, figure; opt.plotmode = 'condensed'; end;
 nc = ceil(sqrt(length(allinds)));
 nr = ceil(length(allinds)/nc);

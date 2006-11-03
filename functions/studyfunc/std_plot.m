@@ -101,6 +101,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2006/11/02 22:14:15  arno
+% g. -> opt.
+%
 % Revision 1.13  2006/11/02 22:13:04  arno
 % Limit to ERSP
 %
@@ -262,14 +265,29 @@ if isempty(opt.plottopo) % only for curves
 end;
 
 if ~isempty(opt.plottopo)
-    % ----------------------------
-    % plot scalp maps for baseline    
-    % ----------------------------
-    if length(opt.plottopo) < 1, opt.plottopo(2) = opt.plottopo(1); end;
-    [tmp ti1] = min(abs(allx-opt.plottopo(1)));
-    [tmp ti2] = min(abs(allx-opt.plottopo(2)));
-    for index = 1:length(data(:))
-        data{index} = mean(data{index}(ti1:ti2,:,:),1);
+    if strcmpi(opt.datatype, 'ersp') | strcmpi(opt.datatype, 'ersp')
+        if length(opt.plottopo) < 3, 
+            opt.plottopo(3:4) = opt.plottopo(2);
+            opt.plottopo(2) = opt.plottopo(1);
+        end;
+        [tmp fi1] = min(abs(allx{1}-opt.plottopo(1)));
+        [tmp fi2] = min(abs(allx{1}-opt.plottopo(2)));
+        [tmp ti1] = min(abs(allx{2}-opt.plottopo(3)));
+        [tmp ti2] = min(abs(allx{2}-opt.plottopo(4)));
+        for index = 1:length(data(:))
+            data{index} = mean(mean(data{index}(ti1:ti2,fi1:fi2,:,:),1),2);
+            data{index} = reshape(data{index}, [1 size(data{index},3) size(data{index},4) ]);
+        end;
+    else
+        % ----------------------------
+        % plot scalp maps for baseline    
+        % ----------------------------
+        if length(opt.plottopo) < 2, opt.plottopo(2) = opt.plottopo(1); end;
+        [tmp ti1] = min(abs(allx-opt.plottopo(1)));
+        [tmp ti2] = min(abs(allx-opt.plottopo(2)));
+        for index = 1:length(data(:))
+            data{index} = mean(data{index}(ti1:ti2,:,:),1);
+        end;
     end;
 end;
 
