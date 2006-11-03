@@ -68,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2006/11/03 02:09:47  arno
+% same
+%
 % Revision 1.30  2006/11/03 02:08:47  arno
 % allowing ploting single time-freq point
 %
@@ -152,7 +155,7 @@ if ~isempty(opt.plottf)
                 alltimes                 = STUDY.changrp(allinds(index)).ersptimes;
             end;
         end;
-        allersp{ind} = permute(allersp{ind}, [1 3 2]);
+        %allersp{ind} = permute(allersp{ind}, [1 3 2]);
     end;
     %erspbase(:,2) = [];
     %erspbase(:,1) = [];
