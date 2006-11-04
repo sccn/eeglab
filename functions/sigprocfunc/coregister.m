@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.54  2006/10/25 22:17:20  arno
+% alignment of electrodes
+%
 % Revision 1.53  2006/10/25 22:00:31  arno
 % invert yaw direction for warp
 %
@@ -321,7 +324,7 @@ if isstr(chanlocs1)
             [ tmp transform ] = align_fiducials(dat.elec1, dat.elec2, dat.elec1.label(clist1), dat.elec2.label(clist2));
             if ~isempty(transform), dat.transform = transform; end;
         catch,
-            warndlg2('Transformation failed, try warping fiducials + 1 vertex electrode');
+            warndlg2('Transformation failed: Try warping the fiducials plus one electrode near the vertex');
         end;
     elseif strcmpi(com, 'warp')
         if ~exist('fminunc')
