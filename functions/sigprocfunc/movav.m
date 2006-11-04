@@ -10,9 +10,9 @@
 %   data   = input data (chans,frames)
 %   xvals  = x-value for each data frame (column) The default is fastest, 
 %            and assumes equal x-spacing {def|[]|0 -> 1:frames}
-%   xwidth = smoothing-window width in xvals {def|0 -> (lastx-firstx)/4}
-%   xadv   = xvals step size. NOTE: To reduce yyy frames to about xxx, 
-%            xadv needs to be near yyy/xxx {default|0 -> 1}
+%   xwidth = smoothing-window width in xvals units {def|0 -> (lastx-firstx)/4}
+%   xadv   = window step size in xvals units. NOTE: To reduce yyy frames 
+%            to about xxx, xadv needs to be near yyy/xxx {default|0 -> 1}
 %   firstx = low xval of first averaging window {def|[] -> low xvals}
 %   lastx  = high xval of last averaging window {def|[] -> high xvals}
 %   xwin   = vector of window values {def|0 -> ones() = square window}
@@ -20,10 +20,10 @@
 %            Example: gauss(1001,2) ->  [0.018 ... 1.0 ... 0.018]
 %   nonorm = [1|0] If non-zero, do not normalize the moving sum, thereby
 %            creating a moving histogram (e.g., if all y values are 1).
-%            Ex: >> [oy,ox] = movav(ones(size(y)),x,xwd,xadv,[],[],0,1);
-%            returns a moving histogram of y  {default: 0}
+%            Ex: >> [oy,ox] = movav(ones(size(x)),x,xwd,xadv,[],[],0,1);
+%            returns a moving histogram of x  {default: 0}
 % Outputs:
-%   outdata = smoothed data (chans,
+%   outdata = smoothed data (chans,outframes)
 %   outx    = xval midpoints of successive output data windows
 %
 % Author: Scott Makeig, SCCN/INC/UCSD, La Jolla, 10-25-97 
@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2006/07/26 03:37:25  toby
+% change to outframes to choose an optimal number, was sometimes losing the last possible.
+%
 % Revision 1.18  2005/11/07 19:25:40  scott
 % turned off debug and verbose flags -sm
 %
