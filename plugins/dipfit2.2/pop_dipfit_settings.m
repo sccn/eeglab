@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2006/11/06 21:26:14  arno
+% different coregistration for BEM
+%
 % Revision 1.26  2006/09/19 19:52:33  toby
 % further text and help edits
 %
@@ -275,9 +278,9 @@ if nargin < 2
     coregvals    = '';
     if isfield(EEG.chaninfo, 'filename')
         if ~isempty(findstr(lower(EEG.chaninfo.filename), 'standard-10-5-cap385')), nocoregvalue = 1; end;
-        if ~isempty(findstr(lower(EEG.chaninfo.filename), 'standard_1005')),        coregvals = num2str(template_models{valmodel}{5}); valmodel = 2; end;
+        if ~isempty(findstr(lower(EEG.chaninfo.filename), 'standard_1005')),        valmodel = 2; coregvals = num2str(template_models{valmodel}{5}); end;
     end;
-        
+            
     userdata    = [];
     
     geomvert = [2 1 1 1 1 1 1 1 1 1 1];
@@ -349,7 +352,7 @@ if nargin < 2
         { 'style' 'pushbutton'  'string' 'Browse'    'callback' commandload1       'userdata' 'editable' 'enable' 'off' } ...
         { 'style' 'pushbutton'  'string' 'Help'      'callback' comhelp1 } ...
         { 'style' 'text'        'string' 'Ourput coordinates' } ...
-        { 'style' 'listbox'     'string' 'spherical (head radius 85 mm)|MNI' 'tag' 'coord' ...
+        { 'style' 'popupmenu'   'string' 'spherical (head radius 85 mm)|MNI' 'tag' 'coord' ...
           'value' fastif(strcmpi(template_models{valmodel}{2},'MNI'),2,1)  'userdata' 'editable' 'enable' 'off'} ...
         { 'style' 'text'        'string' 'Click to select' } { } ...
         { 'style' 'text'        'string' 'MRI' } ...
