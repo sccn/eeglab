@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.200  2006/05/10 14:37:10  arno
+% nothing
+%
 % Revision 1.199  2006/04/14 18:04:42  arno
 % checking eeg
 %
@@ -1491,7 +1494,11 @@ end;
     
 % check chanlocs
 % -------------
+if ~isfield(EEG, 'chaninfo')
+    EEG.chaninfo = [];
+end;
 if ~isempty( EEG.chanlocs )
+        
     if ~isstruct( EEG.chanlocs)
         if exist( EEG.chanlocs ) ~= 2
             disp( [ 'eeg_checkset warning: channel file does not exist or is not in Matlab path: filename removed from EEG struct' ]); 
@@ -1533,9 +1540,45 @@ if ~isempty( EEG.chanlocs )
         EEG.chaninfo.shrink = EEG.chanlocs(1).shrink;
         EEG.chanlocs = rmfield( EEG.chanlocs, 'shrink');
     end;
-end;
-if ~isfield(EEG, 'chaninfo')
-    EEG.chaninfo = [];
+
+    % force Nosedir to +X
+    % -------------------
+    if isfield(EEG.chaninfo, 'nosedir')
+        if strcmpi(EEG.chaninfo.nosedir, '+x')
+            rotate = 0;
+        else
+            disp('EEG checkset note for expert users: Noze direction now set to default +X in EEG.chanlocs and EEG.dipfit.');
+            if strcmpi(EEG.chaninfo.nosedir, '+y')
+                 rotate = 270;
+            elseif strcmpi(EEG.chaninfo.nosedir, '-x')
+                 rotate = 180;
+            else rotate = 90;
+            end;
+            for index = 1:length(EEG.chanlocs)
+                if ~isempty(EEG.chanlocs(index).theta)
+                    rotategrad = rotate/180*pi;
+                    coord = (EEG.chanlocs(index).Y + EEG.chanlocs(index).X*sqrt(-1))*exp(sqrt(-1)*-rotategrad);
+                    EEG.chanlocs(index).Y = real(coord);
+                    EEG.chanlocs(index).X = imag(coord);
+                    
+                    EEG.chanlocs(index).theta     = EEG.chanlocs(index).theta    -rotate;
+                    EEG.chanlocs(index).sph_theta = EEG.chanlocs(index).sph_theta+rotate;
+                    if EEG.chanlocs(index).theta    <-180, EEG.chanlocs(index).theta    =EEG.chanlocs(index).theta    +360; end;
+                    if EEG.chanlocs(index).sph_theta>180 , EEG.chanlocs(index).sph_theta=EEG.chanlocs(index).sph_theta-360; end;
+                end;
+            end;
+            
+            if isfield(EEG, 'dipfit')
+                if isfield(EEG.dipfit, 'coord_transform')
+                    if isempty(EEG.dipfit.coord_transform)
+                        EEG.dipfit.coord_transform = [0 0 0 0 0 0 1 1 1];
+                    end;
+                    EEG.dipfit.coord_transform(6) = EEG.dipfit.coord_transform(6)+rotategrad;
+                end;
+            end;
+        end;
+        EEG.chaninfo.nosedir = '+X';
+    end;
 end;
 EEG.chaninfo.icachansind = EEG.icachansind; % just a copy for programming convinience
 
