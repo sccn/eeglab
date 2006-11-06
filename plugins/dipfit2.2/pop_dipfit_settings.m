@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2006/09/19 19:52:33  toby
+% further text and help edits
+%
 % Revision 1.25  2006/09/19 19:41:05  toby
 % further text edits
 %
@@ -269,9 +272,10 @@ if nargin < 2
     %                'end;' ];
     valmodel     = 1;
     nocoregvalue = 0;
+    coregvals    = '';
     if isfield(EEG.chaninfo, 'filename')
         if ~isempty(findstr(lower(EEG.chaninfo.filename), 'standard-10-5-cap385')), nocoregvalue = 1; end;
-        if ~isempty(findstr(lower(EEG.chaninfo.filename), 'standard_1005')),        nocoregvalue = 1; valmodel = 2; end;
+        if ~isempty(findstr(lower(EEG.chaninfo.filename), 'standard_1005')),        coregvals = num2str(template_models{valmodel}{5}); valmodel = 2; end;
     end;
         
     userdata    = [];
@@ -357,7 +361,7 @@ if nargin < 2
         { 'style' 'pushbutton'  'string' 'Browse'       'callback' commandload2  'userdata' 'editable' 'enable' 'off'} ...
         { 'style' 'pushbutton'  'string' 'Help'         'callback' comhelp2 } ...
         { 'style' 'text'        'string' 'Co-register chan. locs. with head model' } ...
-        { 'style' 'edit'        'string' ''             'tag' 'coregtext' } ...
+        { 'style' 'edit'        'string' coregvals 'tag' 'coregtext' } ...
         { 'style' 'pushbutton'  'string' 'Manual Co-Reg.' 'callback' cb_selectcoreg 'userdata' { EEG.chanlocs EEG.chaninfo } } ... 
         { 'style' 'checkbox'    'string' 'No Co-Reg.'    'tag' 'coregcheckbox' 'value' nocoregvalue } ... 
         { 'style' 'text'        'string' 'Channels to omit from dipole fitting' } ...
