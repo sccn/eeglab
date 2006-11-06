@@ -26,6 +26,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2006/03/12 03:05:10  arno
+% avoid crash with studies
+%
 % Revision 1.6  2006/01/10 22:57:17  arno
 % new default for sphere
 %
@@ -120,13 +123,15 @@ template_models = { ...
     { [ folder 'standard_BESA' delim 'standard_BESA.mat' ] ... % model hdmfile for BESA
       'spherical' ...                                          % coordinate 'spherical' or 'MNI'
       [ folder 'standard_BESA' delim 'avg152t1.mat' ] ...      % MRI MNI normalized file
-      [ folder 'standard_BESA' delim 'standard-10-5-cap385.elp' ] } ... % channel location file
-                                                                        % associated with model
+      [ folder 'standard_BESA' delim 'standard-10-5-cap385.elp' ] ... % channel location file
+      [] } ...                                                        % coregistration transform matrix
+                                                                      % associated with model
     { [ folder 'standard_BEM' delim 'standard_vol.mat' ] ...   % same as above for BEM model
       'MNI' ...
       [ folder 'standard_BEM' delim 'standard_mri.mat' ] ...
-      [ folder 'standard_BEM' delim 'elec' delim 'standard_1005.elc' ] } 
-    { '' 'MNI' '' '' } }; % custom model
+      [ folder 'standard_BEM' delim 'elec' delim 'standard_1005.elc' ] ...
+      [ 0 0 0 0 0 pi/2  1 1 1] } ...
+    { '' 'MNI' '' '' [] } }; % custom model
 
 % constrain electrode to sphere
 % -----------------------------
