@@ -26,6 +26,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2006/11/06 21:21:38  arno
+% adding coregistration matrix
+%
 % Revision 1.7  2006/03/12 03:05:10  arno
 % avoid crash with studies
 %
@@ -125,7 +128,7 @@ template_models = { ...
       [ folder 'standard_BESA' delim 'avg152t1.mat' ] ...      % MRI MNI normalized file
       [ folder 'standard_BESA' delim 'standard-10-5-cap385.elp' ] ... % channel location file
       [] } ...                                                        % coregistration transform matrix
-                                                                      % associated with model
+    ...                                                                  % associated with model
     { [ folder 'standard_BEM' delim 'standard_vol.mat' ] ...   % same as above for BEM model
       'MNI' ...
       [ folder 'standard_BEM' delim 'standard_mri.mat' ] ...
