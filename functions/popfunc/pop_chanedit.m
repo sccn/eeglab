@@ -147,6 +147,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.158  2006/11/03 23:32:01  arno
+% fix lookup gui, text etc...
+%
 % Revision 1.157  2006/11/03 23:22:17  arno
 % same
 %
@@ -1041,6 +1044,7 @@ if nargin < 3
         % move no data channels to info structure
         % ---------------------------------------
         [chans params.nodatchans] = getfid(chans);
+        if isempty(params.nodatchans), params = rmfield(params, 'nodatchans'); end;
         
         % multiple datasets
         % -----------------
