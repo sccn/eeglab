@@ -188,6 +188,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.87  2006/06/01 17:40:50  arno
+% updating header
+%
 % Revision 1.86  2006/05/26 15:59:35  scott
 % worked on text of instructions for adding a channel type -- NOTE: chaninfo is
 % discussed in help message, but NOT implemented!?
@@ -577,7 +580,7 @@ if isstr(filename)
        % importing file
        % --------------
        if isempty(g.skiplines), g.skiplines = 0; end;
-       array = load_file_or_array( filename, max(g.skiplines,0));
+       array = load_file_or_array( filename, g.skiplines);
        if size(array,2) < length(g.format)
            fprintf(['readlocs() warning: Fewer columns in the input than expected.\n' ...
                     '                    See >> help readlocs\n']);
