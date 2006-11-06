@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.55  2006/11/04 01:06:35  toby
+% edit text msg
+%
 % Revision 1.54  2006/10/25 22:17:20  arno
 % alignment of electrodes
 %
@@ -324,7 +327,7 @@ if isstr(chanlocs1)
             [ tmp transform ] = align_fiducials(dat.elec1, dat.elec2, dat.elec1.label(clist1), dat.elec2.label(clist2));
             if ~isempty(transform), dat.transform = transform; end;
         catch,
-            warndlg2('Transformation failed: Try warping the fiducials plus one electrode near the vertex');
+            warndlg2('Transformation failed');
         end;
     elseif strcmpi(com, 'warp')
         if ~exist('fminunc')
@@ -339,8 +342,12 @@ if isstr(chanlocs1)
             for index = 1:length(clist2)
                 tmpelec2.label{clist2(index)} = dat.elec1.label{clist1(index)};
             end;
-            [ tmp dat.transform ] = warp_chans(dat.elec1, dat.elec2, tmpelec2.label(clist2), 'traditional');
-            dat.transform(6) = - dat.transform(6);
+            try,
+                [ tmp dat.transform ] = warp_chans(dat.elec1, dat.elec2, tmpelec2.label(clist2), 'traditional');
+                dat.transform(6) = - dat.transform(6);
+            catch,
+                warndlg2('Transformation failed');
+            end;
         end;
     end;
     set(fid, 'userdata', dat);
@@ -747,8 +754,11 @@ function [elec1, transf] = align_fiducials(elec1, elec2, fidnames1, fidnames2)
 
     % rescale if necessary
     % --------------------
-    coords2 = elec2.pnt([ind21 ind22 ind23],:); dist_coords2 = sqrt(sum(coords2.^2,2));
-    coords1 = elec1.pnt([ind11 ind12 ind13],:); dist_coords1 = sqrt(sum(coords1.^2,2));
+    coords1 = elec1.pnt([ind1 ind2 ind3],:); dist_coords1 = sqrt(sum(coords1.^2,2));
+    ind1 = strmatch(fidnames2{1}, elec2.label, 'exact');
+    ind2 = strmatch(fidnames2{2}, elec2.label, 'exact');
+    ind3 = strmatch(fidnames2{3}, elec2.label, 'exact');
+    coords2 = elec2.pnt([ind1 ind2 ind3],:); dist_coords2 = sqrt(sum(coords2.^2,2));
     ratio = mean(dist_coords2./dist_coords1);
     transf(7:9) = ratio;
     
