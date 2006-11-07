@@ -37,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2006/11/07 18:39:24  toby
+% added skip if data too small for erpimage -sm
+%
 % Revision 1.28  2006/11/07 18:35:18  toby
 % added Continuous data title to erpimage if continuous data
 %
@@ -308,7 +311,7 @@ else
             if option_computeica  
                     offset = nan_mean(EEG.icaact(numcompo,:));
                     erpimage( ...
-           reshape(EEG.icaact(numcompo,1:erpimageframestot),erpimageframes,ERPIMAGELINES)-offset, ...
+              reshape(EEG.icaact(numcompo,1:erpimageframestot),erpimageframes,ERPIMAGELINES)-offset, ...
                    ones(1,ERPIMAGELINES)*10000, eegtimes , ...
                          EI_TITLE, ei_smooth, 1, 'caxis', 2/3, 'cbar','yerplabel', '');   
             else
@@ -318,10 +321,10 @@ else
                     erpimage( icaacttmp-offset, ones(1,ERPIMAGELINES)*10000, eegtimes, ...
                          EI_TITLE, ei_smooth, 1, 'caxis', 2/3, 'cbar', 'yerplabel', '');   
             end;
-     else
+      end
+    else
             axis off;
             text(0.1, 0.3, [ 'No erpimage plotted' 10 'for small continuous data']);
-     end
     end;
     axes(hhh);
 end;	
