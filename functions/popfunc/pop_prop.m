@@ -37,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2006/11/07 18:30:16  toby
+% added erpimage if continuous data
+%
 % Revision 1.25  2006/02/13 23:26:31  arno
 % changing default label
 %
@@ -302,7 +305,7 @@ else
                   erpimage( reshape(EEG.icaact(numcompo,1:erpimageframestot),erpimageframes,ERPIMAGELINES)-offset, ones(1,ERPIMAGELINES)*10000, eegtimes , ...
                        '', ei_smooth, 1, 'caxis', 2/3, 'cbar','yerplabel', '');   
           else
-                  icaacttmp = (reshape(EEG.icaweights(numcompo,:) * EEG.icasphere) ...
+                  icaacttmp = reshape(EEG.icaweights(numcompo,:) * EEG.icasphere) ...
                                    * reshape(EEG.data, erpimageframes, ERPIMAGELINES);
                   offset = nan_mean(icaacttmp);
                   erpimage( icaacttmp-offset, ones(1,ERPIMAGELINES)*10000, eegtimes, ...
