@@ -171,6 +171,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.131  2006/11/07 02:50:57  arno
+% fix gethelpvar call
+%
 % Revision 1.130  2006/05/13 13:27:55  arno
 % allow to process event types with space
 %
@@ -549,6 +552,7 @@ end;
 if popup
 	% get contextual help
 	% -------------------
+    clear functions;
     erpimagefile = which('erpimage.m');
 	[txt2 vars2] = gethelpvar(erpimagefile);
 	txt  = { txt2{:}};
