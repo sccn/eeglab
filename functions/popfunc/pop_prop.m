@@ -37,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2006/11/07 18:40:42  toby
+% debug same -sm
+%
 % Revision 1.29  2006/11/07 18:39:24  toby
 % added skip if data too small for erpimage -sm
 %
@@ -241,15 +244,19 @@ axis off;
 % plotting topoplot
 % -----------------
 h = axes('Units','Normalized', 'Position',[-10 60 40 42].*s+q);
+
 %topoplot( EEG.icawinv(:,numcompo), EEG.chanlocs); axis square; 
+
 if typecomp == 1 % plot single channel locations
 	topoplot( numcompo, EEG.chanlocs, 'chaninfo', EEG.chaninfo, ...
-             'electrodes','off', 'style', 'blank', 'emarkersize1chan', 10); axis square;
+             'electrodes','off', 'style', 'blank', 'emarkersize1chan', 12); axis square;
 else             % plot component map
 	topoplot( EEG.icawinv(:,numcompo), EEG.chanlocs, 'chaninfo', EEG.chaninfo, ...
              'shading', 'interp', 'numcontour', 3); axis square;
 end;
-title([ basename fastif(typecomp, ' location', ' map')], 'fontsize', 14); 
+basename = [fastif(typecomp,'Channel ', 'IC') int2str(numcompo) ];
+% title([ basename fastif(typecomp, ' location', ' map')], 'fontsize', 14); 
+title(basename, 'fontsize', 14); 
 
 % plotting erpimage
 % -----------------
