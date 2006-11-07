@@ -37,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2006/02/13 23:26:31  arno
+% changing default label
+%
 % Revision 1.24  2006/01/31 20:20:52  arno
 % options
 %
@@ -240,34 +243,73 @@ title([ basename fastif(typecomp, ' location', ' map')], 'fontsize', 14);
 % -----------------
 hhh = axes('Units','Normalized', 'Position',[45 62 48 38].*s+q);
 if EEG.trials > 1
-	eeglab_options; 
-	 % put title at top of erpimage
-	axis off
-	hh = axes('Units','Normalized', 'Position',[45 62 48 38].*s+q);
-	EEG.times = linspace(EEG.xmin, EEG.xmax, EEG.pnts);
+    eeglab_options; 
+    % put title at top of erpimage
+    axis off
+    hh = axes('Units','Normalized', 'Position',[45 62 48 38].*s+q);
+    EEG.times = linspace(EEG.xmin, EEG.xmax, EEG.pnts);
     if EEG.trials < 6
       ei_smooth = 1;
     else
       ei_smooth = 3;
     end
-	if typecomp == 1
-        offset = nan_mean(EEG.data(numcompo,:));
-		erpimage( EEG.data(numcompo,:)-offset, ones(1,EEG.trials)*10000, EEG.times , '', ei_smooth, 1, 'caxis', 2/3, 'cbar','erp');   
-	else
-		if option_computeica  
-            offset = nan_mean(EEG.icaact(numcompo,:));
-			erpimage( EEG.icaact(numcompo,:)-offset, ones(1,EEG.trials)*10000, EEG.times , '', ei_smooth, 1, 'caxis', 2/3, 'cbar','erp', 'yerplabel', '');   
-		else
-			icaacttmp = (EEG.icaweights(numcompo,:)*EEG.icasphere)*reshape(EEG.data, EEG.nbchan, EEG.trials*EEG.pnts);
-            offset = nan_mean(icaacttmp);
-			erpimage( icaacttmp-offset, ones(1,EEG.trials)*10000, EEG.times, '', ei_smooth, 1, 'caxis', 2/3, 'cbar','erp', 'yerplabel', '');   
-		end;
-	end;
+    if typecomp == 1 % plot component
+         offset = nan_mean(EEG.data(numcompo,:));
+         erpimage( EEG.data(numcompo,:)-offset, ones(1,EEG.trials)*10000, EEG.times , ...
+                       '', ei_smooth, 1, 'caxis', 2/3, 'cbar','erp');   
+    else % plot channel
+          if option_computeica  
+                  offset = nan_mean(EEG.icaact(numcompo,:));
+                  erpimage( EEG.icaact(numcompo,:)-offset, ones(1,EEG.trials)*10000, EEG.times , ...
+                       '', ei_smooth, 1, 'caxis', 2/3, 'cbar','erp', 'yerplabel', '');   
+          else
+                  icaacttmp = (EEG.icaweights(numcompo,:) * EEG.icasphere) ...
+                                   * reshape(EEG.data, EEG.nbchan, EEG.trials*EEG.pnts);
+                  offset = nan_mean(icaacttmp);
+                  erpimage( icaacttmp-offset, ones(1,EEG.trials)*10000, EEG.times, ...
+                       '', ei_smooth, 1, 'caxis', 2/3, 'cbar','erp', 'yerplabel', '');   
+          end;
+    end;
     axes(hhh);
     title(sprintf('%s activity \\fontsize{10}(global offset %3.3f)', basename, offset), 'fontsize', 14);
 else
-	axis off;
-	text(0.1, 0.3, [ 'No erpimage plotted' 10 'for continuous data']);
+    % axis off;
+    % text(0.1, 0.3, [ 'No erpimage plotted' 10 'for continuous data']);
+
+    eeglab_options; 
+    % put title at top of erpimage
+    axis off
+    hh = axes('Units','Normalized', 'Position',[45 62 48 38].*s+q);
+    ERPIMAGELINES = 200; % show 200-line erpimage
+    while size(EEG.data,2) < ERPIMAGELINES*EEG.srate
+       ERPIMAGELINES = round(0.9 * ERPIMAGESLINES);
+    end
+    if ERPIMAGELINES < 10
+       ei_smooth == 1;
+    else
+      ei_smooth = 3;
+    end
+    erpimageframes = floor(size(EEG.data,2)/ERPIMAGELINES);
+    erpimageframestot = erpimageframes*ERPIMAGELINES;
+    eegtimes = linspace(0, erpimageframes-1, EEG.srate/1000);
+    if typecomp == 1 % plot component
+         offset = nan_mean(EEG.data(numcompo,:));
+         erpimage( reshape(EEG.data(numcompo,1:erpimageframestot),erpimageframes,ERPIMAGELINES)-offset, ones(1,ERPIMAGELINES)*10000, eegtimes , ...
+                       '', ei_smooth, 1, 'caxis', 2/3, 'cbar');   
+    else % plot channel
+          if option_computeica  
+                  offset = nan_mean(EEG.icaact(numcompo,:));
+                  erpimage( reshape(EEG.icaact(numcompo,1:erpimageframestot),erpimageframes,ERPIMAGELINES)-offset, ones(1,ERPIMAGELINES)*10000, eegtimes , ...
+                       '', ei_smooth, 1, 'caxis', 2/3, 'cbar','yerplabel', '');   
+          else
+                  icaacttmp = (reshape(EEG.icaweights(numcompo,:) * EEG.icasphere) ...
+                                   * reshape(EEG.data, erpimageframes, ERPIMAGELINES);
+                  offset = nan_mean(icaacttmp);
+                  erpimage( icaacttmp-offset, ones(1,ERPIMAGELINES)*10000, eegtimes, ...
+                       '', ei_smooth, 1, 'caxis', 2/3, 'cbar', 'yerplabel', '');   
+          end;
+    end;
+    axes(hhh);
 end;	
 
 % plotting spectrum
