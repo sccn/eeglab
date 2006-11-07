@@ -133,7 +133,9 @@
 %                           ...
 %   '.xyz': 
 %               Matlab/EEGLAB Cartesian coordinates. Here. x is towards the nose, 
-%               y is towards the left ear, and z towards the vertex.
+%               y is towards the left ear, and z towards the vertex. Note that the first
+%               column (x) is -Y in a Matlab 3-D plot, the second column (y) is X in a 
+%               matlab 3-D plot, and the third column (z) is Z.
 %               Fields:   channum   x           y         z     label
 %               Sample:   1       .950        .308     -.035     Fp1
 %                         2       .950       -.308     -.035     Fp2
@@ -188,6 +190,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.88  2006/11/06 22:15:46  arno
+% loading besa format
+%
 % Revision 1.87  2006/06/01 17:40:50  arno
 % updating header
 %
