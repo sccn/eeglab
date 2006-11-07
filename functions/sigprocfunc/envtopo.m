@@ -4,7 +4,8 @@
 %             on the mean of the data epochs. Click on individual axes to examine them in detail.
 %             The black lines represent the max and min values across all channels at each time point. 
 %             The blue shading represents the max and min contributions of the selected components to
-%             those channels.
+%             those channels. The paired colored lines represent the max and min contributions of the 
+%             indicated component across all channels.
 % Usage:
 %             >> envtopo(data,weights,'chanlocs',file_or_struct);
 %             >> [compvarorder,compvars,compframes,comptimes,compsplotted,sortvar] ...
@@ -112,6 +113,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.122  2006/11/07 20:34:08  toby
+% documentation edit
+%
 % Revision 1.121  2006/06/23 01:59:20  toby
 % *** empty log message ***
 %
