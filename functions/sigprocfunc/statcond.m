@@ -24,13 +24,11 @@
 %                   The test used depends on the size of the data array input: 
 %                When the data cell array has 2 columns and the data are 
 %                paired, a paired t-test is performed; when the data are 
-%                unpaired, an unpaired t-test is performed. Note that an F-value 
-%                is returned since the function uses a one-way ANOVA that 
-%                returns p-values identical to an unpaired t-test. If 'data' 
-%                has only one row (paired or unpaired), a one-way ANOVA is 
-%                performed. If the data cell array contains several rows 
-%                and columns (of paired or unpaired data), a two-way ANOVA 
-%                is performed.
+%                unpaired, an unpaired t-test is performed. If 'data' 
+%                has only one row (paired or unpaired) and more than 2 
+%                columns, a one-way ANOVA is performed. If the data cell 
+%                array contains several rows and columns (of paired or 
+%                unpaired data), a two-way ANOVA is performed.
 %
 % Optional inputs:
 %   'paired'   = ['on'|'off'] pair the data array {default: 'on' unless 
@@ -42,14 +40,14 @@
 %   'naccu'    = [integer] Number of surrogate data copies to use in 'perm' 
 %                 mode estimation (see above) {default: 200}.
 % Outputs:
-%   stats      = F- or t-value array of the same size as input data without 
-%                the last dimension. A t value is returned only if the data 
-%                consist of two paired conditions.
+%   stats      = F- or T-value array of the same size as input data without 
+%                the last dimension. A T value is returned only if the data 
+%                consist of two conditions.
 %   df         = degrees of freedom, a (2,1) vector if F-values are returned
 %   pvals      = array of p-values. Same size as input data without the last
-%                data dimension.
+%                data dimension. All returned p-values are two tailed.
 %   surrog     = surrogate data array (same size as input data with the last 
-%                 dim. filled with a number ('naccu') of surrogate data sets.
+%                dim. filled with a number ('naccu') of surrogate data sets.
 %
 % Important note: When a two-way ANOVA is performed, outputs are cell arrays
 %                 with three elements: output(1) = column effects; 
@@ -81,7 +79,9 @@
 %         pvals{3} % a (3,4) matrix of p-values; interaction effects
 %                                             % across rows and columns
 %
-% Author: Arnaud Delorme, SCCN/INC/UCSD, La Jolla, 2005
+% Author: Arnaud Delorme, SCCN/INC/UCSD, La Jolla, 2005-
+%         Thanks to Robert Oostenveld for fruitful discussions and advices
+%         about this function.
 %
 % See also: anova1_cell(), anova2_cell(), fcdf()
 
@@ -115,6 +115,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2006/10/03 22:00:58  scott
+% minor help msg edits -sm
+%
 % Revision 1.8  2006/05/11 15:48:07  arno
 % now better detect unpaired data
 %
@@ -145,7 +148,6 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
                                  'mode'    'string'    { 'param' 'perm' }  'param';
                                  'paired'  'string'    { 'on' 'off' }      'on' }, 'statcond');
     if isstr(g), error(g); end;
-    if strcmpi(g.paired, 'off'), error('Paired ANOVA not implemented yet'); end;
     
     if strcmp(g.mode, 'param' ) & exist('fcdf') ~= 2
       fprintf(['statcond(): parametric testing requires fcdf() \n' ...
@@ -166,9 +168,14 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
     if length(unique(cellfun('size', data, ndims(data{1}) ))) > 1
         g.paired = 'off'; 
     end;
+    fprintf('%d x %d, ', size(data,1), size(data,2));
     if strcmpi(g.paired, 'on')
-         disp('Paired data');
-    else disp('Unpaired data');
+         fprintf('paired data, ');
+    else fprintf('unpaired data, ');
+    end;
+    if size(data,1) == 1 & size(data,2) == 2
+         fprintf('computing T values\n');
+    else fprintf('computing F values\n');
     end;
     
     % output text
@@ -203,8 +210,32 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
                     
                 end;
             end;
-        else        
-        
+        elseif size(data,2) == 2 & strcmpi(g.paired, 'off')
+            
+            % unpaired t-test (very fast)
+            % -------------
+            tail = 'both';
+            cond1 = data{1,1};
+            cond2 = data{1,2};
+            [ori_vals df] = unpaired_ttest(cond1, cond2);
+            if strcmpi(g.mode, 'param')
+                pvals = tcdf(ori_vals, df)*2; return;
+            else
+                for index = 1:g.naccu
+                    
+                    [cond1 cond2]    = shuffle_unpaired(cond1, cond2);
+                    if mod(index, 10) == 0 , fprintf('%d ', index); end;
+                    if mod(index, 100) == 0, fprintf('\n'); end;
+                    switch myndims(cond1)
+                     case 1   , surrogval(index)     = unpaired_ttest( cond1, cond2);
+                     case 2   , surrogval(:,index)   = unpaired_ttest( cond1, cond2);
+                     otherwise, surrogval(:,:,index) = unpaired_ttest( cond1, cond2);
+                    end;
+                    
+                end;
+            end;
+            
+        else
             % one-way ANOVA (paired) this is equivalent to unpaired t-test
             % -------------
             tail = 'one';
@@ -381,7 +412,8 @@ function [a b] = shuffle_paired(a, b); % for increased speed only shuffle half t
         indswap1(tmpind1) = indswap1(tmpind1)-alllen(index);
         indswap2(tmpind2) = indswap2(tmpind2)-alllen(index);
         indtarg1(tmpind1) = indtarg1(tmpind1)+1;
-        indtarg2(tmpind2) = indtarg2(tmpind2)+1;
+        indtarg2(tmpind2) = indtarg2(tmpind2)
++1;
     end;
     
     % perform swaping
@@ -414,6 +446,18 @@ function [tval, df] = paired_ttest(a,b)
     sd   = mystd( tmpdiff,[], myndims(a));
     tval = diff./sd*sqrt(size(a, myndims(a)));
     df   = size(a, myndims(a))-1;
+            
+function [tval, df] = unpaired_ttest(a,b) % assumes equal variances
+    
+    meana = mymean(a, myndims(a));
+    meanb = mymean(b, myndims(b));
+    sda   = mystd(a, [], myndims(a));
+    sdb   = mystd(b, [], myndims(b));
+    na    = size(a, myndims(a));
+    nb    = size(b, myndims(b));
+    sp    = sqrt(((na-1)*sda.^2+(nb-1)*sdb.^2)/(na+nb-2));
+    tval  = (meana-meanb)./sp/sqrt(1/na+1/nb);
+    df    = na+nb-2;
             
 function val = myndims(a)
     if ndims(a) > 2
