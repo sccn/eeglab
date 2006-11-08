@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2006/09/12 18:43:23  arno
+% Initial revision
+%
 
 function [STUDY, ALLEEG, com] = pop_precomp(varargin)
 
@@ -259,7 +262,7 @@ else
                 EEG = eeg_checkset(ALLEEG(1), 'loaddata');
                 data = EEG.data(1,:,1:min(EEG.trials,10));
                 figure; pos = get(gcf, 'position'); pos(3)=pos(3)*2; set(gcf, 'position', pos);
-                subplot(1,2,1); newtimef( data, EEG.pnts, [ EEG.xmin EEG.xmax ], EEG.srate, tmpstruct.cycles, opt{:}, 'maxfreq', EEG.srate/2, ersp_params{:});
+                subplot(1,2,1); timef( data, EEG.pnts, [ EEG.xmin EEG.xmax ], EEG.srate, tmpstruct.cycles, opt{:}, 'maxfreq', EEG.srate/2, ersp_params{:});
                 subplot(1,2,2); 
                 text( 0.2, 0.8, strvcat('This is a test plot performed on', ...
                                                          'the first 10 trials of the first', ....
