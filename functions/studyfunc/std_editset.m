@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.42  2006/05/20 18:42:44  arno
+% fix remove study
+%
 % Revision 1.41  2006/05/07 18:05:33  arno
 % remove unwanted warnings
 %
@@ -307,6 +310,7 @@ for k = 1:2:length(g.commands)
             STUDY.datasetinfo(currentind).session   = ALLEEG(currentind).session;
             STUDY.datasetinfo(currentind).condition = ALLEEG(currentind).condition;
             STUDY.datasetinfo(currentind).group     = ALLEEG(currentind).group;                    
+            STUDY.datasetinfo(currentind).index     = currentind;                    
     end
 end
 
