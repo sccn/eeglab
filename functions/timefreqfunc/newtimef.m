@@ -274,6 +274,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.111  2006/10/25 15:24:56  scott
+% changed 'title', {t1 t2} usage to 'title',ti,'title2',t2
+% improved help msg and commandline printout
+%
 % Revision 1.110  2006/10/25 14:50:13  scott
 % no changes, I hope! -sm
 %
@@ -1019,11 +1023,11 @@ if isfield(g,'timewarp')
           end
         end
 
-        if max(max(g.timeStretchMarks)) > frames-1 | min(min(g.timeStretchMarks)) < 2
+        if max(max(g.timeStretchMarks)) > frames-2 | min(min(g.timeStretchMarks)) < 3
             error('Time warping events must be inside the epochs.');
         end
         if ~isempty(g.timeStretchRefs)
-            if max(g.timeStretchRefs) > frames-1 | min(g.timeStretchRefs) < 2
+            if max(g.timeStretchRefs) > frames-2 | min(g.timeStretchRefs) < 3
                 error('Time warping reference latencies must be within the epochs.');
             end
         end
