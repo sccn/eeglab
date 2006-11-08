@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2006/10/10 04:12:36  toby
+% load bug fixed, save revision info added
+%
 
 function [STUDY, ALLEEG] = std_checkset(STUDY, ALLEEG, option);
 
@@ -40,6 +43,9 @@ if nargin < 2
     return;
 end;
     
+studywasempty = 0;
+if isempty(STUDY), studywasempty = 1; end;
+
 modif = 0;
 if ~isfield(STUDY, 'name'),  STUDY.name  = ''; modif = 1; end;
 if ~isfield(STUDY, 'task'),  STUDY.task  = ''; modif = 1; end;
@@ -211,6 +217,11 @@ end;
 % --------------------------------------
 if modif;
     STUDY.saved = 'no';
-    eegh('[STUDY, ALLEEG] = std_checkset(STUDYIN, ALLEEG);');
-    STUDY.history =  sprintf('%s\n%s',  STUDY.history, '[STUDY, ALLEEG] = std_checkset(STUDYIN, ALLEEG);');
+    if studywasempty
+        command = '[STUDY, ALLEEG] = std_checkset([], ALLEEG);';
+    else
+        command = '[STUDY, ALLEEG] = std_checkset(STUDY, ALLEEG);';
+    end;
+    eegh(command);
+    STUDY.history =  sprintf('%s\n%s',  STUDY.history, command);
 end;
