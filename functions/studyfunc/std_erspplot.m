@@ -68,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2006/11/03 03:01:16  arno
+% allow plotting specific time-freq point
+%
 % Revision 1.32  2006/11/03 02:11:22  arno
 % same
 %
@@ -202,7 +205,7 @@ for index = 1:length(allinds)
         subjind = strmatch(opt.subject, STUDY.subject);
         for c = 1:size(allersp,1)
             for g = 1:size(allersp,2)
-                allersp{c,g} = allersp{c,g}(:,subjind);
+                allersp{c,g} = allersp{c,g}(:,:,subjind);
             end;
         end;
     end;
