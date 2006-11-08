@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2006/11/02 22:05:16  arno
+% same
+%
 % Revision 1.5  2006/11/02 22:03:35  arno
 % add subject statmode
 %
@@ -153,7 +156,8 @@ for ind = 1:length(allinds)
             if ~dataread
                 % reserve arrays
                 % --------------
-                allerp = cell( length(STUDY.condition), length(STUDY.group) );
+                allerp  = cell( length(STUDY.condition), length(STUDY.group) );
+                condgrp = cell( length(STUDY.condition), length(STUDY.group) );
                 [ tmp alltimes ] = std_readerp( ALLEEG, 1, sign(allchanorcomp(1)), opt.timerange);
                 for cond = 1:nc
                     for group = 1:ng
@@ -174,6 +178,7 @@ for ind = 1:length(allinds)
                     % load data
                     % ---------
                     tmpind = allchanorcomp(indtmp);
+                    condgrp{condind, grpind} = tmpind;                    
                     if ~isnan(tmpind)
                         [ tmperp alltimes ] = std_readerp( ALLEEG, index, tmpind, opt.timerange);
                         allerp{condind, grpind}(:,subject) = tmperp(:);
@@ -185,6 +190,7 @@ for ind = 1:length(allinds)
                 fprintf('\n');
                 tmpstruct.erptimes = alltimes;
                 tmpstruct.erpdata  = allerp;
+                if ~isempty(opt.channels), tmpstruct.condgrp = condgrp; end;
             end;
 
         case 'spec', 
@@ -200,6 +206,7 @@ for ind = 1:length(allinds)
                 % reserve arrays
                 % --------------
                 allspec = cell( length(STUDY.condition), length(STUDY.group) );
+                condgrp = cell( length(STUDY.condition), length(STUDY.group) );
                 %[ tmpersp allfreqs alltimes tmpparams tmpspec] = std_readersp( ALLEEG, 1, -1, [], opt.freqrange);
                 [ tmp allfreqs ] = std_readspec( ALLEEG, 1, sign(allchanorcomp(1)), opt.freqrange);
                 for cond = 1:nc
@@ -217,10 +224,11 @@ for ind = 1:length(allinds)
                     condind = strmatch( STUDY.datasetinfo(index).condition, STUDY.condition ); if isempty(condind), condind = 1; end;
                     grpind  = strmatch( STUDY.datasetinfo(index).group    , STUDY.group     ); if isempty(grpind) , grpind  = 1; end;
                     subject = strmatch( STUDY.datasetinfo(index).subject  , STUDY.subject   ); 
-
+                    
                     % load data
                     % ---------
                     tmpind = allchanorcomp(indtmp);
+                    condgrp{condind, grpind} = tmpind;                    
                     if ~isnan(tmpind)
                         %[ tmpersp allfreqs alltimes tmpparams tmpspec] = std_readersp( ALLEEG, index, tmpind, [], opt.freqrange);
                         %allspec{condind, grpind}(:,subject) = 10*log(tmpspec(:));
@@ -234,6 +242,7 @@ for ind = 1:length(allinds)
                 fprintf('\n');
                 tmpstruct.specfreqs = allfreqs;
                 tmpstruct.specdata  = allspec;
+                if ~isempty(opt.channels), tmpstruct.condgrp = condgrp; end;
             end;
             
         case { 'ersp' 'itc' }, 
@@ -274,6 +283,7 @@ for ind = 1:length(allinds)
                 ersp     = cell( length(STUDY.condition), length(STUDY.group) );
                 erspbase = cell( length(STUDY.condition), length(STUDY.group) );
                 erspinds = cell( length(STUDY.condition), length(STUDY.group) );
+                condgrp = cell( length(STUDY.condition), length(STUDY.group) );
                 [ tmp allfreqs alltimes ] = std_readersp( ALLEEG, 1, Inf*sign(allchanorcomp(1)), opt.timerange, opt.freqrange);
                 for c = 1:nc
                     for g = 1:ng
@@ -299,6 +309,7 @@ for ind = 1:length(allinds)
                     % load data
                     % ---------
                     tmpind = allchanorcomp(indtmp);
+                    condgrp{condind, grpind} = tmpind;                    
                     if strcmpi(opt.statmode, 'trials')
                         [ tmpersp allfreqs alltimes tmpparams] = std_readtimef( ALLEEG, index, tmpind, opt.timerange, opt.freqrange);
                         indices = [count{condind, grpind}:count{condind, grpind}+size(tmpersp,3)-1];
@@ -403,6 +414,7 @@ for ind = 1:length(allinds)
                         tmpstruct.itcsubjinds  = erspinds;
                     end;
                 end;
+                if ~isempty(opt.channels), tmpstruct.condgrp = condgrp; end;
             end;
     end; % end switch
     
