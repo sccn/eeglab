@@ -101,6 +101,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2006/11/09 22:04:39  arno
+% ERSP plotting
+%
 % Revision 1.15  2006/11/03 03:01:17  arno
 % allow plotting specific time-freq point
 %
@@ -233,7 +236,7 @@ if strcmpi(opt.plotmode, 'condensed')
                 xlim([allx(1) allx(end)]); hold on;
                 if ~isempty(opt.ylim), ylim(opt.ylim); end;
                 if isempty(opt.condnames{c}) | isempty(opt.groupnames{g}), leg{(c-1)*ng+g} = [ opt.condnames{c} opt.groupnames{g} ];
-                else                                                     leg{(c-1)*ng+g} = [ opt.condnames{c} ', ' opt.groupnames{g} ];
+                else                                                       leg{(c-1)*ng+g} = [ opt.condnames{c} ', ' opt.groupnames{g} ];
                 end;
             end;
         end;
@@ -445,11 +448,12 @@ if isempty(opt.plottopo) & ( strcmpi(opt.datatype, 'erp') | strcmpi(opt.datatype
             if isempty(opt.ylim)
                 ylim(tmplim);
             end;
-            if strcmpi(opt.plotgroups, 'together'),                       fig_title = opt.condnames{c};
-            elseif strcmpi(opt.plotconditions, 'together'),                    fig_title = opt.groupnames{g};
+            if strcmpi(opt.plotgroups, 'together'),                        fig_title = opt.condnames{c};
+            elseif strcmpi(opt.plotconditions, 'together'),                fig_title = opt.groupnames{g};
             elseif isempty(opt.condnames{c}) | isempty(opt.groupnames{g}), fig_title = [ opt.condnames{c} opt.groupnames{g} ];
-            else                                                         fig_title = [ opt.condnames{c} ', ' opt.groupnames{g} ];
+            else                                                           fig_title = [ opt.condnames{c} ', ' opt.groupnames{g} ];
             end;
+            if length(opt.compinds) == 1, fig_title = [ 'Comp.' int2str(opt.compinds) ', ' fig_title ]; end;
             if ~isempty(opt.subject), fig_title = [ opt.subject ', ' fig_title ];
             end;
             title(fig_title); 
