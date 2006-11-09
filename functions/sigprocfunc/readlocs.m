@@ -190,6 +190,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.89  2006/11/07 02:31:21  arno
+% better documentation for .xyz
+%
 % Revision 1.88  2006/11/06 22:15:46  arno
 % loading besa format
 %
@@ -420,7 +423,7 @@ chanformat(2).type         = 'besa';
 chanformat(2).typestring   = 'BESA spherical .elp file';
 chanformat(2).description  = [ 'BESA spherical coordinate file. Note that BESA spherical coordinates ' ...
                                'are different from Matlab spherical coordinates' ];
-chanformat(2).skipline     = -1;
+chanformat(2).skipline     = 0; % some BESA files do not have headers
 chanformat(2).importformat = { 'type' 'labels' 'sph_theta_besa' 'sph_phi_besa' 'sph_radius' };
 % ---------------------------------------------------------------------------------------------------
 chanformat(3).type         = 'xyz';
@@ -596,10 +599,11 @@ if isstr(filename)
        
        % removing lines BESA
        % -------------------
-       if g.skiplines == -1
+       if isempty(array{1,2})
+           disp('BESA header detected, skipping three lines...');
+           array = load_file_or_array( filename, g.skiplines-1);
            if isempty(array{1,2})
-               disp('BESA header detected, skipping three lines...');
-               array = load_file_or_array( filename, -2);
+               array = load_file_or_array( filename, g.skiplines-1);
            end;
        end;
        
