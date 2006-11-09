@@ -101,6 +101,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2006/11/09 23:21:21  arno
+% add component name
+%
 % Revision 1.16  2006/11/09 22:04:39  arno
 % ERSP plotting
 %
@@ -200,6 +203,7 @@ opt = finputcheck( varargin, { 'channels'    'cell'   []              {};
                                'statmode'    'string' { 'subjects' 'common' 'trials' } 'subjects'}, 'std_erpmaskdata');
                            
 if isstr(opt), error(opt); end;
+if length(opt.compinds{1}) > 1, opt.compinds = {}; end;
 if ~isempty(opt.topovals), opt.plottopo = opt.topovals; end;
 if ~isempty(opt.ersplim), opt.caxis = opt.ersplim; end;
 if ~isempty(opt.itclim), opt.caxis = opt.itclim; end;
@@ -453,8 +457,8 @@ if isempty(opt.plottopo) & ( strcmpi(opt.datatype, 'erp') | strcmpi(opt.datatype
             elseif isempty(opt.condnames{c}) | isempty(opt.groupnames{g}), fig_title = [ opt.condnames{c} opt.groupnames{g} ];
             else                                                           fig_title = [ opt.condnames{c} ', ' opt.groupnames{g} ];
             end;
-            if length(opt.compinds) == 1, fig_title = [ 'Comp.' int2str(opt.compinds) ', ' fig_title ]; end;
-            if ~isempty(opt.subject), fig_title = [ opt.subject ', ' fig_title ];
+            if ~isempty(opt.compinds), fig_title = [ 'Comp.' int2str(opt.compinds{c,g}) ', ' fig_title ]; end;
+            if ~isempty(opt.subject),  fig_title = [ opt.subject ', ' fig_title ];
             end;
             title(fig_title); 
             if strcmpi(leg, 'on') & c == nc & g == ng 
@@ -503,7 +507,7 @@ elseif isempty(opt.plottopo)
                  fig_title = [ opt.condnames{c} opt.groupnames{g} ];
             else fig_title = [ opt.condnames{c} ', ' opt.groupnames{g} ];
             end;
-            if ~isempty(opt.compinds), fig_title = [ fig_title ', Comp. ' int2str(opt.compinds{c,g}) ]; end;            
+            if ~isempty(opt.compinds), fig_title = [ 'Comp. ' int2str(opt.compinds{c,g}) ', ' fig_title ]; end;            
             if ~isempty(opt.subject) , fig_title = [ fig_title ', ' opt.subject ]; end;
             tmpplot = mean(data{c,g},3);
             if statmask, 
