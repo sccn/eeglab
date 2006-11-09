@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2006/11/09 00:27:01  arno
+% same
+%
 % Revision 1.9  2006/11/09 00:20:38  arno
 % same
 %
@@ -423,7 +426,7 @@ for ind = 1:length(allinds)
                 end;
             end;
     end; % end switch
-    if isempty(opt.channels), tmpstruct.compinds = condgrp; end;
+    if isempty(opt.channels) & exist('condgrp'), tmpstruct.compinds = condgrp; end;
     
     % copy results to structure
     % -------------------------
