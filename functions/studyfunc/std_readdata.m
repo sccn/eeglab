@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2006/11/09 20:50:34  arno
+% final indices now returned
+%
 % Revision 1.12  2006/11/09 01:32:28  arno
 % new implementation
 %
@@ -234,8 +237,6 @@ for ind = 1:length(finalinds)
                 % reserve arrays
                 % --------------
                 allspec  = cell( max(length(STUDY.condition),1), max(length(STUDY.group),1) ); 
-                allinds  = cell( max(length(STUDY.condition),1), max(length(STUDY.group),1) );
-                setinds  = cell( max(length(STUDY.condition),1), max(length(STUDY.group),1) );
                 %[ tmpersp allfreqs alltimes tmpparams tmpspec] = std_readersp( ALLEEG, 1, -1, [], opt.freqrange);
                 [ tmp allfreqs ] = std_readspec( ALLEEG, 1, sign(allchanorcomp(1)), opt.freqrange);
                 for c = 1:nc
