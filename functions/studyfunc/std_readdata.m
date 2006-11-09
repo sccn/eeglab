@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2006/11/09 01:32:28  arno
+% new implementation
+%
 % Revision 1.11  2006/11/09 00:35:59  arno
 % text if condgrp exist
 %
@@ -91,7 +94,7 @@
 % fix reading of spectral data
 %
 
-function [STUDY, clustinfo, allinds] = std_readdata(STUDY, ALLEEG, varargin);
+function [STUDY, clustinfo, finalinds] = std_readdata(STUDY, ALLEEG, varargin);
 
 if nargin < 2
     help std_readdata;
