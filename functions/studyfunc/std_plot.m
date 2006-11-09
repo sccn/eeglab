@@ -101,6 +101,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2006/11/09 23:27:11  arno
+% figure titles
+%
 % Revision 1.17  2006/11/09 23:21:21  arno
 % add component name
 %
@@ -203,7 +206,7 @@ opt = finputcheck( varargin, { 'channels'    'cell'   []              {};
                                'statmode'    'string' { 'subjects' 'common' 'trials' } 'subjects'}, 'std_erpmaskdata');
                            
 if isstr(opt), error(opt); end;
-if length(opt.compinds{1}) > 1, opt.compinds = {}; end;
+if ~isempty(opt.compinds), if length(opt.compinds{1}) > 1, opt.compinds = {}; end; end;
 if ~isempty(opt.topovals), opt.plottopo = opt.topovals; end;
 if ~isempty(opt.ersplim), opt.caxis = opt.ersplim; end;
 if ~isempty(opt.itclim), opt.caxis = opt.itclim; end;
