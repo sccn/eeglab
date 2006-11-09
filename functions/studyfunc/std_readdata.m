@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2006/11/09 00:16:44  arno
+% field compsind
+%
 % Revision 1.7  2006/11/08 23:46:48  arno
 % save condgrp structure
 %
@@ -417,7 +420,7 @@ for ind = 1:length(allinds)
                 end;
             end;
     end; % end switch
-    if ~isempty(opt.channels), tmpstruct.compsind = condgrp; end;
+    if isempty(opt.channels), tmpstruct.compsind = condgrp; end;
     
     % copy results to structure
     % -------------------------
