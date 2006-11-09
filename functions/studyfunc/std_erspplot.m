@@ -68,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2006/11/08 23:21:41  arno
+% fixed plotting single subject
+%
 % Revision 1.33  2006/11/03 03:01:16  arno
 % allow plotting specific time-freq point
 %
@@ -110,7 +113,6 @@ opt = finputcheck( varargin, { 'channels'    'cell'    []              {};
                                'plottf'      'real'    []              [];
                                'timerange'   'real'    []              STUDY.etc.erspparams.timerange;
                                'freqrange'   'real'    []              STUDY.etc.erspparams.freqrange;
-                               'mode'        'string'  []              ''; % for backward compatibility
                                'comps'       'integer' []              []; % for backward compatibility
                                'plotsubjects' 'string' { 'on' 'off' }  'off';
                                'plotmode'    'string' { 'normal' 'condensed' }  'normal';
@@ -121,9 +123,6 @@ if isstr(opt), error(opt); end;
 % for backward compatibility
 % --------------------------
 if strcmpi(opt.mode, 'comps'), opt.plotsubjects = 'on'; end;
-if ~isempty(opt.comps), 
-    opt.subject = STUDY.datasetinfo( STUDY.cluster(opt.clusters).sets(1,opt.comps)).subject;
-end;
 
 if ~isempty(opt.subject), groupstats = 'off'; disp('No group statistics for single subject');
 else                      groupstats = STUDY.etc.erspparams.groupstats;
@@ -187,6 +186,7 @@ end;
 if length(allinds) > 1, figure; opt.plotmode = 'condensed'; end;
 nc = ceil(sqrt(length(allinds)));
 nr = ceil(length(allinds)/nc);
+comp_names = {};
 
 for index = 1:length(allinds)
 
@@ -199,20 +199,55 @@ for index = 1:length(allinds)
         eval( [ 'allersp  = STUDY.cluster(allinds(index)).' opt.datatype 'data;' ]);
         eval( [ 'alltimes = STUDY.cluster(allinds(index)).' opt.datatype 'times;' ]);
         eval( [ 'allfreqs = STUDY.cluster(allinds(index)).' opt.datatype 'freqs;' ]);
+        compinds = STUDY.cluster(allinds(index)).allinds;
     end;
+    setinds = STUDY.cluster(allinds(index)).setinds;
 
+    % plot specific subject
+    % ---------------------
     if ~isempty(opt.subject)
-        subjind = strmatch(opt.subject, STUDY.subject);
         for c = 1:size(allersp,1)
             for g = 1:size(allersp,2)
-                allersp{c,g} = allersp{c,g}(:,:,subjind);
+                for l=length(setinds{c,g}):-1:1
+                    if ~strcmpi(opt.subject, STUDY.datatasetinfo(setinds{c,g}(l)).subject)
+                        allersp{c,g}(:,:,l) = [];
+                    end;
+                end;
             end;
         end;
     end;
-
+    
+    % plot specific component
+    % -----------------------
+    if ~isempty(opt.comps)
+        
+        % find and select group
+        % ---------------------
+        sets   = STUDY.cluster(allinds(index)).sets(:,opt.comps);
+        comps  = STUDY.cluster(allinds(index)).comps(opt.comps);
+        grp    = STUDY.datasetinfo(sets(1)).group;
+        grpind = strmatch( grp, STUDY.group );
+        if isempty(grpind), grpind = 1; end;
+        allersp = allersp(:,grpind);
+            
+        % find component
+        % --------------
+        for c = 1:size(allersp,1)
+            for ind = 1:length(compinds{1,grpind})
+                if compinds{1,grpind}(ind) == comps & any(setinds{1,grpind}(ind) == sets)
+                    allersp{c} = allersp{c}(:,:,ind);
+                    comp_names{c,1} = comps;
+                end;
+            end;
+        end;
+    end;
+    
+    % plot specific component
+    % -----------------------
+    
     if index == length(allinds), opt.legend = 'on'; end;
     [pgroup pcond pinter] = std_plot({ allfreqs alltimes }, allersp, 'condnames', STUDY.condition, 'subject', opt.subject, 'legend', opt.legend, ...
-                                      'datatype', opt.datatype,'plotmode', opt.plotmode, 'groupnames', STUDY.group, 'topovals', opt.plottf, 'unitx', 'Hz', ...
+                                      'compinds', comp_names, 'datatype', opt.datatype,'plotmode', opt.plotmode, 'groupnames', STUDY.group, 'topovals', opt.plottf, 'unitx', 'Hz', ...
                                       'chanlocs', ALLEEG(1).chanlocs, 'plotsubjects', opt.plotsubjects, plotcurveopt{:});
     if length(allinds) > 1, 
         if isempty(opt.channels), title(sprintf('Cluster %d', allinds(index))); 
