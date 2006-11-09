@@ -67,6 +67,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2006/11/02 21:48:44  arno
+% header
+%
 % Revision 1.27  2006/10/03 21:48:48  scott
 % edit help msg -- some ?? remain   -sm
 % ,
@@ -109,9 +112,6 @@ if isstr(opt), error(opt); end;
 % for backward compatibility
 % --------------------------
 if strcmpi(opt.mode, 'comps'), opt.plotsubjects = 'on'; end;
-if ~isempty(opt.comps), 
-    opt.subject = STUDY.datasetinfo( STUDY.cluster(opt.clusters).sets(1,opt.comps)).subject;
-end;
 
 if ~isempty(opt.subject), groupstats = 'off'; disp('No group statistics for single subject');
 else                      groupstats = STUDY.etc.erpparams.groupstats;
@@ -137,6 +137,7 @@ opt.legend = 'off';
 if length(allinds) > 1, figure; opt.plotmode = 'condensed'; end;
 nc = ceil(sqrt(length(allinds)));
 nr = ceil(length(allinds)/nc);
+comp_names = {};
 
 for index = 1:length(allinds)
 
@@ -144,23 +145,56 @@ for index = 1:length(allinds)
     if ~isempty(opt.channels)
         erpdata  = STUDY.changrp(allinds(index)).erpdata;
         alltimes = STUDY.changrp(allinds(index)).erptimes;
+        setinds  = STUDY.changrp(allinds(index)).setinds;
     else
         erpdata  = STUDY.cluster(allinds(index)).erpdata;
         alltimes = STUDY.cluster(allinds(index)).erptimes;
+        compinds = STUDY.cluster(allinds(index)).allinds;
+        setinds = STUDY.cluster(allinds(index)).setinds;
     end;
 
+    % plot specific subject
+    % ---------------------
     if ~isempty(opt.subject)
-        subjind = strmatch(opt.subject, STUDY.subject);
         for c = 1:size(erpdata,1)
             for g = 1:size(erpdata,2)
-                erpdata{c,g} = erpdata{c,g}(:,subjind);
+                for l=length(setinds{c,g}):-1:1
+                    if ~strcmpi(opt.subject, STUDY.datasetinfo(setinds{c,g}(l)).subject)
+                        erpdata{c,g}(:,l) = [];
+                    end;
+                end;
+            end;
+        end;
+    end;
+    
+    % plot specific component
+    % -----------------------
+    if ~isempty(opt.comps)
+        
+        % find and select group
+        % ---------------------
+        sets   = STUDY.cluster(allinds(index)).sets(:,opt.comps);
+        comps  = STUDY.cluster(allinds(index)).comps(opt.comps);
+        grp    = STUDY.datasetinfo(sets(1)).group;
+        grpind = strmatch( grp, STUDY.group );
+        if isempty(grpind), grpind = 1; end;
+        erpdata = erpdata(:,grpind);
+            
+        % find component
+        % --------------
+        for c = 1:size(erpdata,1)
+            for ind = 1:length(compinds{1,grpind})
+                if compinds{1,grpind}(ind) == comps & any(setinds{1,grpind}(ind) == sets)
+                    erpdata{c} = erpdata{c}(:,ind);
+                    comp_names{c,1} = comps;
+                end;
             end;
         end;
     end;
 
     if index == length(allinds), opt.legend = 'on'; end;
     [pgroup pcond pinter] = std_plot(alltimes, erpdata, 'condnames', STUDY.condition, 'legend', opt.legend, ...
-                                      'plotmode', opt.plotmode, 'groupnames', STUDY.group, 'plottopo', opt.plottime, 'unitx', 'Hz', ...
+                                      'compinds', comp_names, 'plotmode', opt.plotmode, 'groupnames', STUDY.group, 'plottopo', opt.plottime, 'unitx', 'Hz', ...
                                       'chanlocs', ALLEEG(1).chanlocs, 'plotsubjects', opt.plotsubjects, plotcurveopt{:});
     if length(allinds) > 1, 
         if isempty(opt.channels), title(sprintf('Cluster %d', allinds(index))); 
