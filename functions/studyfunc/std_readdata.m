@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2006/11/09 00:20:38  arno
+% same
+%
 % Revision 1.8  2006/11/09 00:16:44  arno
 % field compsind
 %
@@ -183,8 +186,8 @@ for ind = 1:length(allinds)
 
                     % load data
                     % ---------
-                    tmpind = allchanorcomp(indtmp);
-                    condgrp{condind, grpind}(indtmp) = tmpind;                    
+                    tmpind = allchanorcomp(indtmp); 
+                    condgrp{condind, grpind}(subject) = tmpind;                    
                     if ~isnan(tmpind)
                         [ tmperp alltimes ] = std_readerp( ALLEEG, index, tmpind, opt.timerange);
                         allerp{condind, grpind}(:,subject) = tmperp(:);
@@ -233,7 +236,7 @@ for ind = 1:length(allinds)
                     % load data
                     % ---------
                     tmpind = allchanorcomp(indtmp);
-                    condgrp{condind, grpind}(indtmp) = tmpind;                    
+                    condgrp{condind, grpind}(subject) = tmpind;                    
                     if ~isnan(tmpind)
                         %[ tmpersp allfreqs alltimes tmpparams tmpspec] = std_readersp( ALLEEG, index, tmpind, [], opt.freqrange);
                         %allspec{condind, grpind}(:,subject) = 10*log(tmpspec(:));
@@ -313,7 +316,7 @@ for ind = 1:length(allinds)
                     % load data
                     % ---------
                     tmpind = allchanorcomp(indtmp);
-                    condgrp{condind, grpind}(indtmp) = tmpind;                    
+                    condgrp{condind, grpind}(subject) = tmpind;                    
                     if strcmpi(opt.statmode, 'trials')
                         [ tmpersp allfreqs alltimes tmpparams] = std_readtimef( ALLEEG, index, tmpind, opt.timerange, opt.freqrange);
                         indices = [count{condind, grpind}:count{condind, grpind}+size(tmpersp,3)-1];
@@ -420,12 +423,12 @@ for ind = 1:length(allinds)
                 end;
             end;
     end; % end switch
-    if isempty(opt.channels), tmpstruct.compsind = condgrp; end;
+    if isempty(opt.channels), tmpstruct.compinds = condgrp; end;
     
     % copy results to structure
     % -------------------------
     fieldnames = { 'erpdata' 'erptimes' 'specdata' 'specfreqs' 'erspdata' 'erspbase' 'erspfreqs' 'ersptimes' ...
-                   'itcfreqs' 'itctimes' 'itcdata' 'erspsubjinds' 'itcsubjinds' };
+                   'itcfreqs' 'itctimes' 'itcdata' 'erspsubjinds' 'itcsubjinds' 'compinds' };
     for f = 1:length(fieldnames)
         if isfield(tmpstruct, fieldnames{f}), 
             tmpdata = getfield(tmpstruct, fieldnames{f});
