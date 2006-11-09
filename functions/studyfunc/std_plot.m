@@ -101,6 +101,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2006/11/03 03:01:17  arno
+% allow plotting specific time-freq point
+%
 % Revision 1.14  2006/11/02 22:14:15  arno
 % g. -> opt.
 %
@@ -169,8 +172,9 @@ opt = finputcheck( varargin, { 'channels'    'cell'   []              {};
                                'ersplim'     'real'   []              []; % same as above
                                'itclim'      'real'   []              []; % same as above
                                'ylim'        'real'   []              [];
-                               'condnames'    'cell'   []              {};
-                               'groupnames'   'cell'   []              {};
+                               'condnames'   'cell'   []              {};
+                               'groupnames'  'cell'   []              {};
+                               'compinds'    'cell'   []              {};
                                'tftopoopt'   'cell'   []              {};
                                'threshold'   'real'   []              NaN;
                                'plottopo'       'real'   []              [];
@@ -491,7 +495,12 @@ elseif isempty(opt.plottopo)
     for c = 1:nc
         for g = 1:ng
             hdl(c,g) = mysubplot(nc+addr, ng+addc, g + (c-1)*(ng+addc), opt.transpose);
-            fig_title = [ opt.condnames{c} ', ' opt.groupnames{g} ];
+            if isempty( opt.condnames{c} ) | isempty( opt.groupnames{g} )
+                 fig_title = [ opt.condnames{c} opt.groupnames{g} ];
+            else fig_title = [ opt.condnames{c} ', ' opt.groupnames{g} ];
+            end;
+            if ~isempty(opt.compinds), fig_title = [ fig_title ', Comp. ' int2str(opt.compinds{c,g}) ]; end;            
+            if ~isempty(opt.subject) , fig_title = [ fig_title ', ' opt.subject ]; end;
             tmpplot = mean(data{c,g},3);
             if statmask, 
                 if strcmpi(opt.condstats, 'on'), tmpplot(find(pcondplot{g}(:) == 0)) = 0;
