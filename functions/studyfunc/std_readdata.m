@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2006/11/09 00:35:59  arno
+% text if condgrp exist
+%
 % Revision 1.10  2006/11/09 00:27:01  arno
 % same
 %
@@ -128,32 +131,54 @@ ng = length(STUDY.group);
 
 % find channel indices
 % --------------------
-allinds = [];
+finalinds = [];
 if ~isempty(opt.channels)
     for c = 1:length(opt.channels)
         chanind = strmatch( lower(opt.channels{c}), lower({ STUDY.changrp.name }), 'exact');
         if isempty(chanind), error('Channel group not found'); end;
-        allinds   = [ allinds chanind ];
+        finalinds   = [ finalinds chanind ];
     end;
 else
-    allinds = opt.clusters;
+    finalinds = opt.clusters;
 end;
     
 % check if data is present
 % ------------------------
-for ind = 1:length(allinds)
+for ind = 1:length(finalinds)
     
     if ~isempty(opt.channels)
-         tmpstruct = STUDY.changrp(allinds(ind));
+         tmpstruct = STUDY.changrp(finalinds(ind));
          alldatasets = 1:length(STUDY.datasetinfo);
          allchanorcomp = -tmpstruct.chaninds;
-    else tmpstruct = STUDY.cluster(allinds(ind));
+    else tmpstruct = STUDY.cluster(finalinds(ind));
          alldatasets = tmpstruct.sets; 
          allchanorcomp = repmat(tmpstruct.comps, [length(STUDY.condition) 1]);
     end;
     alldatasets   = alldatasets(:)';
     allchanorcomp = allchanorcomp(:)';
-    
+
+    % get indices for all groups and conditions
+    % -----------------------------------------
+    nc = max(length(STUDY.condition),1);
+    ng = max(length(STUDY.group),1);
+    allinds = cell( nc, ng );
+    setinds = cell( nc, ng );
+    for indtmp = 1:length(alldatasets)
+
+        index = alldatasets(indtmp);
+        condind = strmatch( STUDY.datasetinfo(index).condition, STUDY.condition ); if isempty(condind), condind = 1; end;
+        grpind  = strmatch( STUDY.datasetinfo(index).group    , STUDY.group     ); if isempty(grpind) , grpind  = 1; end;
+        indcellarray = length(allinds{condind, grpind})+1;
+
+        % load data
+        % ---------
+        tmpind = allchanorcomp(indtmp); 
+        if ~isnan(tmpind)
+            allinds{ condind, grpind}(indcellarray) = tmpind;                    
+            setinds{ condind, grpind}(indcellarray) = index;                    
+        end;
+    end;
+                    
     dataread = 0;
     switch opt.infotype
         case 'erp', 
@@ -168,35 +193,24 @@ for ind = 1:length(allinds)
             if ~dataread
                 % reserve arrays
                 % --------------
-                allerp  = cell( length(STUDY.condition), length(STUDY.group) );
-                condgrp = cell( length(STUDY.condition), length(STUDY.group) );
+                allerp   = cell( max(length(STUDY.condition),1), max(length(STUDY.group),1) );
                 [ tmp alltimes ] = std_readerp( ALLEEG, 1, sign(allchanorcomp(1)), opt.timerange);
-                for cond = 1:nc
-                    for group = 1:ng
-                        allerp{cond, group} = single(zeros(length(alltimes), length(STUDY.subject)));
+                for c = 1:nc
+                    for g = 1:ng
+                        allerp{c, g} = single(zeros(length(alltimes), length(allinds{c,g})));
                     end;
                 end;
 
                 % read the data and select channels
                 % ---------------------------------
                 fprintf('Reading ERP data:');
-                for indtmp = 1:length(alldatasets)
-
-                    index = alldatasets(indtmp);
-                    condind = strmatch( STUDY.datasetinfo(index).condition, STUDY.condition ); if isempty(condind), condind = 1; end;
-                    grpind  = strmatch( STUDY.datasetinfo(index).group    , STUDY.group     ); if isempty(grpind) , grpind  = 1; end;
-                    subject = strmatch( STUDY.datasetinfo(index).subject  , STUDY.subject   ); 
-
-                    % load data
-                    % ---------
-                    tmpind = allchanorcomp(indtmp); 
-                    condgrp{condind, grpind}(subject) = tmpind;                    
-                    if ~isnan(tmpind)
-                        [ tmperp alltimes ] = std_readerp( ALLEEG, index, tmpind, opt.timerange);
-                        allerp{condind, grpind}(:,subject) = tmperp(:);
-                        fprintf('.');
-                    else
-                        allerp{condind, grpind}(:,subject) = NaN;
+                for c = 1:nc
+                    for g = 1:ng
+                        for indtmp = 1:length(allinds{c,g})
+                            [ tmperp alltimes ] = std_readerp( ALLEEG, setinds{c,g}(indtmp), allinds{c,g}(indtmp), opt.timerange);
+                            allerp{c, g}(:,indtmp) = tmperp(:);
+                            fprintf('.');
+                        end;
                     end;
                 end;
                 fprintf('\n');
@@ -216,38 +230,29 @@ for ind = 1:length(allinds)
             if ~dataread
                 % reserve arrays
                 % --------------
-                allspec = cell( length(STUDY.condition), length(STUDY.group) );
-                condgrp = cell( length(STUDY.condition), length(STUDY.group) );
+                allspec  = cell( max(length(STUDY.condition),1), max(length(STUDY.group),1) ); 
+                allinds  = cell( max(length(STUDY.condition),1), max(length(STUDY.group),1) );
+                setinds  = cell( max(length(STUDY.condition),1), max(length(STUDY.group),1) );
                 %[ tmpersp allfreqs alltimes tmpparams tmpspec] = std_readersp( ALLEEG, 1, -1, [], opt.freqrange);
                 [ tmp allfreqs ] = std_readspec( ALLEEG, 1, sign(allchanorcomp(1)), opt.freqrange);
-                for cond = 1:nc
-                    for group = 1:ng
-                        allspec{cond, group} = single(zeros(length(allfreqs), length(STUDY.subject)));
+                for c = 1:nc
+                    for g = 1:ng
+                        allspec{c, g} = single(zeros(length(allfreqs), length(allinds{c,g})));
                     end;
                 end;
 
                 % read the data and select channels
                 % ---------------------------------
                 fprintf('Reading Spectrum data:');
-                for indtmp = 1:length(alldatasets)
-
-                    index = alldatasets(indtmp);
-                    condind = strmatch( STUDY.datasetinfo(index).condition, STUDY.condition ); if isempty(condind), condind = 1; end;
-                    grpind  = strmatch( STUDY.datasetinfo(index).group    , STUDY.group     ); if isempty(grpind) , grpind  = 1; end;
-                    subject = strmatch( STUDY.datasetinfo(index).subject  , STUDY.subject   ); 
-                    
-                    % load data
-                    % ---------
-                    tmpind = allchanorcomp(indtmp);
-                    condgrp{condind, grpind}(subject) = tmpind;                    
-                    if ~isnan(tmpind)
-                        %[ tmpersp allfreqs alltimes tmpparams tmpspec] = std_readersp( ALLEEG, index, tmpind, [], opt.freqrange);
-                        %allspec{condind, grpind}(:,subject) = 10*log(tmpspec(:));
-                        [ tmpspec allfreqs ] = std_readspec( ALLEEG, index, tmpind, opt.freqrange);
-                        allspec{condind, grpind}(:,subject) = tmpspec(:);
-                        fprintf('.');
-                    else
-                        allspec{condind, grpind}(:,subject) = NaN;
+                for c = 1:nc
+                    for g = 1:ng
+                        for indtmp = 1:length(allinds{c,g})
+                            %[ tmpersp allfreqs alltimes tmpparams tmpspec] = std_readersp( ALLEEG, index, tmpind, [], opt.freqrange);
+                            %allspec{condind, grpind}(:,subject) = 10*log(tmpspec(:));
+                            [ tmpspec allfreqs ] = std_readspec( ALLEEG, setinds{c,g}(indtmp), allinds{c,g}(indtmp), opt.freqrange);
+                            allspec{c, g}(:,indtmp) = tmpspec(:);
+                            fprintf('.');
+                        end;
                     end;
                 end;
                 fprintf('\n');
@@ -290,17 +295,16 @@ for ind = 1:length(allinds)
                 
                 % reserve arrays
                 % --------------
-                ersp     = cell( length(STUDY.condition), length(STUDY.group) );
-                erspbase = cell( length(STUDY.condition), length(STUDY.group) );
-                erspinds = cell( length(STUDY.condition), length(STUDY.group) );
-                condgrp = cell( length(STUDY.condition), length(STUDY.group) );
+                ersp     = cell( max(length(STUDY.condition),1), max(length(STUDY.group),1) );
+                erspbase = cell( max(length(STUDY.condition),1), max(length(STUDY.group),1) );
+                erspinds = cell( max(length(STUDY.condition),1), max(length(STUDY.group),1) );
                 [ tmp allfreqs alltimes ] = std_readersp( ALLEEG, 1, Inf*sign(allchanorcomp(1)), opt.timerange, opt.freqrange);
                 for c = 1:nc
                     for g = 1:ng
-                        ersp{c, g}     = single(zeros(length(alltimes), length(allfreqs), length(STUDY.subject)));
-                        erspbase{c, g} = single(zeros(               1, length(allfreqs), length(STUDY.subject)));
+                        ersp{c, g}     = single(zeros(length(alltimes), length(allfreqs), length(allinds{c,g})));
+                        erspbase{c, g} = single(zeros(               1, length(allfreqs), length(allinds{c,g})));
                         if strcmpi(opt.statmode, 'trials')
-                            ersp{c, g}  = single(zeros(length(alltimes), length(allfreqs), tottrials{c, g}));
+                            ersp{ c, g} = single(zeros(length(alltimes), length(allfreqs), tottrials{c, g}));
                             count{c, g} = 1;
                         end;
                     end;
@@ -309,39 +313,32 @@ for ind = 1:length(allinds)
                 % read the data and select channels
                 % ---------------------------------
                 fprintf('Reading all %s data:', upper(opt.infotype));
-                for indtmp = 1:length(alldatasets)
-
-                    index = alldatasets(indtmp);
-                    condind = strmatch( STUDY.datasetinfo(index).condition, STUDY.condition ); if isempty(condind), condind = 1; end;
-                    grpind  = strmatch( STUDY.datasetinfo(index).group    , STUDY.group     ); if isempty(grpind) , grpind  = 1; end;
-                    subject = strmatch( STUDY.datasetinfo(index).subject  , STUDY.subject   ); 
-
-                    % load data
-                    % ---------
-                    tmpind = allchanorcomp(indtmp);
-                    condgrp{condind, grpind}(subject) = tmpind;                    
-                    if strcmpi(opt.statmode, 'trials')
-                        [ tmpersp allfreqs alltimes tmpparams] = std_readtimef( ALLEEG, index, tmpind, opt.timerange, opt.freqrange);
-                        indices = [count{condind, grpind}:count{condind, grpind}+size(tmpersp,3)-1];
-                        ersp {condind, grpind}(:,:,indices) = single(permute(tmpersp, [2 1 3]));
-                        erspinds{condind, grpind}(1:2,subject) = [ count{condind, grpind} count{condind, grpind}+size(tmpersp,3)-1 ];
-                        count{condind, grpind} = count{condind, grpind}+size(tmpersp,3);
-                        if size(tmpersp,3) ~= ALLEEG(STUDY.datasetinfo(index).index).trials
-                            error( sprintf('Wrong number of trials in datafile for dataset %d\n', STUDY.datasetinfo(index).index));
+                for c = 1:nc
+                    for g = 1:ng
+                        for indtmp = 1:length(allinds{c,g})
+                            if strcmpi(opt.statmode, 'trials')
+                                [ tmpersp allfreqs alltimes tmpparams] = std_readtimef( ALLEEG, setinds{c,g}(indtmp), allinds{c,g}(indtmp), ...
+                                                                                  opt.timerange, opt.freqrange);
+                                indices = [count{c, g}:count{c, g}+size(tmpersp,3)-1];
+                                ersp{    c, g}(:,:,indices) = single(permute(tmpersp, [2 1 3]));
+                                erspinds{c, g}(1:2,indtmp) = [ count{c, g} count{c, g}+size(tmpersp,3)-1 ];
+                                count{c, g} = count{c, g}+size(tmpersp,3);
+                                if size(tmpersp,3) ~= ALLEEG(STUDY.datasetinfo(index).index).trials
+                                    error( sprintf('Wrong number of trials in datafile for dataset %d\n', STUDY.datasetinfo(index).index));
+                                end;
+                            elseif strcmpi(opt.infotype, 'itc')
+                                [ tmpersp allfreqs alltimes tmpparams] = std_readitc( ALLEEG, setinds{c,g}(indtmp), allinds{c,g}(indtmp), ...
+                                                                                  opt.timerange, opt.freqrange);
+                                ersp{c, g}(:,:,indtmp)     = single(abs(permute(tmpersp    , [2 1])));
+                            else
+                                [ tmpersp allfreqs alltimes tmpparams tmperspbase] = std_readersp( ALLEEG, setinds{c,g}(indtmp), allinds{c,g}(indtmp), ...
+                                                                                  opt.timerange, opt.freqrange);
+                                ersp{c, g}(    :,:,indtmp) = single(permute(tmpersp    , [2 1]));
+                                erspbase{c, g}(:,:,indtmp) = single(10*log(permute(tmperspbase, [2 1])));
+                            end;
+                            fprintf('.');
                         end;
-                    elseif strcmpi(opt.infotype, 'itc')
-                        [ tmpersp allfreqs alltimes tmpparams] = std_readitc( ALLEEG, index, tmpind, opt.timerange, opt.freqrange);
-                        ersp{condind, grpind}(:,:,subject)     = single(abs(permute(tmpersp    , [2 1])));
-                    else
-                        [ tmpersp allfreqs alltimes tmpparams tmperspbase] = std_readersp( ALLEEG, index, tmpind, opt.timerange, opt.freqrange);
-                        ersp{condind, grpind}(:,:,subject)     = single(permute(tmpersp    , [2 1]));
-                        erspbase{condind, grpind}(:,:,subject) = single(10*log(permute(tmperspbase, [2 1])));
                     end;
-                    %catch,
-                    %    error(sprintf('Error loading time-freq file for dataset ''%s'': has it been computed?\n', ALLEEG.filename));
-                    %end;
-                    fprintf('.');
-
                 end;
                 fprintf('\n');
 
@@ -426,18 +423,19 @@ for ind = 1:length(allinds)
                 end;
             end;
     end; % end switch
-    if isempty(opt.channels) & exist('condgrp'), tmpstruct.compinds = condgrp; end;
+    if exist('allinds'),  tmpstruct.allinds = allinds; end;
+    if exist('setinds' ), tmpstruct.setinds = setinds; end;
     
     % copy results to structure
     % -------------------------
     fieldnames = { 'erpdata' 'erptimes' 'specdata' 'specfreqs' 'erspdata' 'erspbase' 'erspfreqs' 'ersptimes' ...
-                   'itcfreqs' 'itctimes' 'itcdata' 'erspsubjinds' 'itcsubjinds' 'compinds' };
+                   'itcfreqs' 'itctimes' 'itcdata' 'erspsubjinds' 'itcsubjinds' 'allinds' 'setinds' };
     for f = 1:length(fieldnames)
         if isfield(tmpstruct, fieldnames{f}), 
             tmpdata = getfield(tmpstruct, fieldnames{f});
             if ~isempty(opt.channels)
-                 STUDY.changrp = setfield(STUDY.changrp, { allinds(ind) }, fieldnames{f}, tmpdata);
-            else STUDY.cluster = setfield(STUDY.cluster, { allinds(ind) }, fieldnames{f}, tmpdata);
+                 STUDY.changrp = setfield(STUDY.changrp, { finalinds(ind) }, fieldnames{f}, tmpdata);
+            else STUDY.cluster = setfield(STUDY.cluster, { finalinds(ind) }, fieldnames{f}, tmpdata);
             end;
         end;
     end;
@@ -446,6 +444,6 @@ end;
 % return structure
 % ----------------
 if ~isempty(opt.channels)
-     clustinfo = STUDY.changrp(allinds);
-else clustinfo = STUDY.cluster(allinds);
+     clustinfo = STUDY.changrp(finalinds);
+else clustinfo = STUDY.cluster(finalinds);
 end;
