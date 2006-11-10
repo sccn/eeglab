@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2006/11/08 22:37:02  arno
+% history, test if studywasempty
+%
 % Revision 1.34  2006/10/10 04:12:36  toby
 % load bug fixed, save revision info added
 %
@@ -189,6 +192,7 @@ end;
 % set cluster array if empty
 % --------------------------
 if ~isfield(STUDY, 'cluster'), STUDY.cluster = []; modif = 1; end;
+if ~isfield(STUDY, 'changrp'), STUDY.changrp = []; modif = 1; end;
 if isempty(STUDY.cluster)
     modif = 1; 
     [STUDY] = std_createclust(STUDY, ALLEEG, 'ParentCluster');
