@@ -122,6 +122,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.66  2006/10/02 11:41:41  arno
+% allow conditions to have different ICA
+%
 % Revision 1.60  2006/05/15 00:25:57  toby
 % cluster ica erp using abs(pca(comps)), not pca(abs(comps))
 %
@@ -458,6 +461,9 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                             end
                             con_t = []; con_data = [];
                             [X, t] = std_erp(ALLEEG(idat), succompind{si}, timewindow);
+                            
+                            X = abs(X); % taking the absolute of the ERP
+                            
                             STUDY.preclust.erpclusttimes = timewindow;
                             if cond == 1
                                 con_data = X;
