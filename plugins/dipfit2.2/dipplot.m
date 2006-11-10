@@ -153,6 +153,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.141  2006/11/10 02:13:03  arno
+%transform to MNI model
+%
 %Revision 1.140  2006/10/26 17:33:24  arno
 %propagate axis tight option to summary mode
 %
@@ -690,8 +693,9 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     
     if strcmpi(g.coordformat, 'spherical')
          dat.sph2spm    = sph2spm;
-    else dat.sph2spm    = traditional([0 0 0 0 0 -pi/2 1 1 1]);
+    else dat.sph2spm    = traditional([0 0 0 0 0 pi 1 1 1]);
     end;
+    
     if ~isempty(g.transform), dat.sph2spm = traditional(g.transform);
     end;
     if isfield(g.mri, 'anatomycol')
