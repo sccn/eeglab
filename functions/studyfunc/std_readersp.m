@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2006/11/03 19:45:06  arno
+% do not mask ERSP by default
+%
 % Revision 1.21  2006/09/12 18:56:48  arno
 % channel compatibility and many more features
 %
@@ -198,8 +201,8 @@ if length(abset) > 1
         
         % same for bootstrap array
         if ~isempty(erspallboot{cond})
-            erspallboot{cond} = erspallboot{cond} + 10*log10(repmat(erspallbase{cond}',[1 2]))';
-            erspallboot{cond} = erspallboot{cond} - 10*log10(repmat(ave_baseline'     ,[1 2]))';  
+            erspallboot{cond} = erspallboot{cond} + 10*log10(repmat(erspallbase{cond}',[1 2]));
+            erspallboot{cond} = erspallboot{cond} - 10*log10(repmat(ave_baseline'     ,[1 2]));  
         end;
     end
 end
