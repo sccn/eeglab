@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2006/10/02 11:42:11  arno
+% plotting scalp maps
+%
 % Revision 1.25  2006/03/10 22:40:21  arno
 % saving average spectrum
 %
@@ -149,7 +152,7 @@ end;
 
 [g spec_opt] = finputcheck(options, { 'components' 'integer' []         [];
                                       'channels'   'cell'    {}         {};
-                                      'specmode'   'string'  {'fft' 'psd'} 'fft';
+                                      'specmode'   'string'  {'fft' 'psd'} 'psd';
                                       'nfft'       'integer' []         [];
                                       'freqrange'  'real'    []         [] }, 'std_spec', 'ignore');
 if isstr(g), error(g); end;
