@@ -147,6 +147,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.159  2006/11/06 21:45:34  arno
+% fix .nodatchans for fieldtrip compatibility
+%
 % Revision 1.158  2006/11/03 23:32:01  arno
 % fix lookup gui, text etc...
 %
@@ -653,22 +656,24 @@ end;
 % insert "no data channels" in channel structure
 % ----------------------------------------------
 if isfield(params, 'nodatchans')
-    chanlen = length(chans);
-    for index = 1:length(params.nodatchans)
-        fields = fieldnames( params.nodatchans );
-        ind = chanlen+index;
-        for f = 1:length( fields )
-            chans = setfield(chans, { ind }, fields{f}, getfield( params.nodatchans, { index },  fields{f}));
+    if ~isempty(params.nodatchans)
+        chanlen = length(chans);
+        for index = 1:length(params.nodatchans)
+            fields = fieldnames( params.nodatchans );
+            ind = chanlen+index;
+            for f = 1:length( fields )
+                chans = setfield(chans, { ind }, fields{f}, getfield( params.nodatchans, { index },  fields{f}));
+            end;
         end;
+        disp('Fiducial have been added at the end of the channel structure');
+        params = rmfield(params, 'nodatchans');
+        
+        % put these channels first
+        % ------------------------
+        % tmp = chans(chanlen+1:end);
+        % chans(length(tmp)+1:end) = chans(1:end-length(tmp));
+        % chans(1:length(tmp)) = tmp;
     end;
-    disp('Fiducial have been added at the end of the channel structure');
-    params = rmfield(params, 'nodatchans');
-    
-    % put these channels first
-    % ------------------------
-    % tmp = chans(chanlen+1:end);
-    % chans(length(tmp)+1:end) = chans(1:end-length(tmp));
-    % chans(1:length(tmp)) = tmp;
 end;
 
 nbchan = length(chans);
