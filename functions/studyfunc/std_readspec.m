@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2006/10/04 23:39:49  toby
+% Bug fix courtesy Bas de Kruif
+%
 % Revision 1.14  2006/03/28 15:38:13  scott
 % help msg
 %
@@ -85,29 +88,58 @@
 
 function [X, f] = std_readspec(ALLEEG, abset, comp, freqrange);
 
+if nargin < 4
+    freqrange = [];
+end;
+    
 X = [];
-filename = fullfile( ALLEEG(abset).filepath,[ ALLEEG(abset).filename(1:end-3) 'icaspec' ]);
 
-for k=1:length(comp)
+if iscell(comp)
+    % find channel indices list
+    % -------------------------
+    chanind  = [];
+    chanlabs = lower({ ALLEEG(abset).chanlocs.labels });
+    for index = 1:length(comp)
+        tmp = strmatch(lower(comp{index}), chanlabs, 'exact');
+        if isempty(tmp)
+            error([ 'Channel ''' comp{index} ''' not found in dataset ' int2str(abset)]);
+        else    
+            chanind = [ chanind tmp ];
+        end;
+    end;
+    filename = fullfile( ALLEEG(abset).filepath,[ ALLEEG(abset).filename(1:end-3) 'datspec']);
+    prefix = 'chan';
+    inds   = chanind;
+elseif comp(1) < 0
+    filename = fullfile( ALLEEG(abset).filepath,[ ALLEEG(abset).filename(1:end-3) 'datspec']);
+    prefix = 'chan';
+    inds   = -comp;
+else
+    filename = fullfile( ALLEEG(abset).filepath,[ ALLEEG(abset).filename(1:end-3) 'icaspec']);
+    prefix = 'comp';
+    inds   = comp;
+end;
+
+for k=1:length(inds)
     try,
-        specstruct = load( '-mat', filename, [ 'comp' int2str(comp(k)) ], 'freqs' );
+        erpstruct = load( '-mat', filename, [ prefix int2str(inds(k)) ], 'freqs' );
     catch
         error( [ 'Cannot read file ''' filename '''' ]);
     end;
 
-    tmpdat    = getfield(specstruct, [ 'comp' int2str(comp(k)) ]);
+    tmpdat    = getfield(erpstruct, [ prefix int2str(inds(k)) ]);
     if k == 1
         X = zeros(length(comp), length(tmpdat));
     end;
     X(k,:)  = tmpdat;
-    f       = specstruct.freqs;
+    f       = getfield(erpstruct, 'freqs');
 end;
 
 % select frequency range of interest
 % ----------------------------------
 
 %check if freqrange is specified
-if(~isempty(freqrange))
+if ~isempty(freqrange)
     maxind = max(find(f <= freqrange(end)));
     minind = min(find(f >= freqrange(1)));
 else
