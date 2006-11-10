@@ -27,6 +27,10 @@
 %  'coordformat' - ['MNI'|'spherical'] Consider that dipole coordinates are in
 %               MNI or spherical coordinates (for spherical, the radius of the 
 %               head is assumed to be 85 (mm)). See also function sph2spm().
+%  'transform' - [real array] traditional transformation matrix to convert
+%               dipole coordinates to MNI space. Default is assumed from 
+%               'coordformat' input above. Type help traditional for more 
+%               information.
 %  'image'    - ['besa'|'mri'] Background image. 
 %               'mri' (or 'fullmri') uses mean-MRI brain images from the Montreal 
 %               Neurological Institute. This option can also contain a 3-D MRI
@@ -149,6 +153,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.140  2006/10/26 17:33:24  arno
+%propagate axis tight option to summary mode
+%
 %Revision 1.139  2006/10/25 23:29:47  arno
 %custom summary mode
 %
@@ -580,6 +587,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                                  'verbose'   'string'   { 'on' 'off' }     'on';
                                  'view'      'real'     []                 [0 0 1];
                                  'rvrange'   'real'     [0 Inf]             [];
+                                 'transform' 'real'     [0 Inf]             [];
                                  'normlen'   'string'   { 'on' 'off' }     'off';
                                  'num'       'string'   { 'on' 'off' }     'off';
                                  'cornermri' 'string'   { 'on' 'off' }     'off';
@@ -681,8 +689,10 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     end;
     
     if strcmpi(g.coordformat, 'spherical')
-        dat.sph2spm    = sph2spm;
-    else dat.sph2spm    = [];
+         dat.sph2spm    = sph2spm;
+    else dat.sph2spm    = traditional([0 0 0 0 0 -pi/2 1 1 1]);
+    end;
+    if ~isempty(g.transform), dat.sph2spm = traditional(g.transform);
     end;
     if isfield(g.mri, 'anatomycol')
         dat.imgs       = g.mri.anatomycol;
