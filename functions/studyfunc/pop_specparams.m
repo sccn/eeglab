@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2006/11/04 00:19:43  arno
+% text
+%
 % Revision 1.7  2006/10/03 21:29:15  scott
 % help msg edits.  Some ?? remain.  -sm
 %
@@ -111,7 +114,7 @@ if isempty(varargin)
         {} {'style' 'checkbox'   'string' '' 'value' groupstats 'enable' enablegroup 'tag' 'groupstats' } ...
         {'style' 'text'       'string' 'Compute group statistics' 'enable' enablegroup } };
     
-    geometry = { [ 1 1 1 1] [0.1 0.1 1] [0.1 0.1 1] [1] [1 1 1 1] [0.1 0.1 1] [0.1 0.1 1] };
+    geometry = { [ 1 .5 1 .5] [0.1 0.1 1] [0.1 0.1 1] [1] [.7 .8 1 .5] [0.1 0.1 1] [0.1 0.1 1] };
     
     [out_param userdat tmp res] = inputgui( 'geometry' , geometry, 'uilist', uilist, ...
                                    'helpcom', 'pophelp(''std_specparams'')', ...
