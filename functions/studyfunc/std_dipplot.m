@@ -402,8 +402,8 @@ function STUDY = std_centroid(STUDY,ALLEEG, clsind, tmp);
     for clust = 1:length(clsind)
         max_r = 0;
         len = length(STUDY.cluster(clsind(clust)).comps);
-        tmppos = 0;
-        tmpmom = 0;
+        tmppos = [ 0 0 0 ];
+        tmpmom = [ 0 0 0 ];
         tmprv = 0;
         ndip = 0;
         for k = 1:len 
@@ -416,8 +416,8 @@ function STUDY = std_centroid(STUDY,ALLEEG, clsind, tmp);
             end
             if ~isempty(ALLEEG(abset).dipfit.model(comp).posxyz)
                 ndip = ndip +1;
-                tmppos = tmppos + ALLEEG(abset).dipfit.model(comp).posxyz;
-                tmpmom = tmpmom + ALLEEG(abset).dipfit.model(comp).momxyz;
+                tmppos = tmppos + mean(ALLEEG(abset).dipfit.model(comp).posxyz,1);
+                tmpmom = tmpmom + mean(ALLEEG(abset).dipfit.model(comp).momxyz,1);
                 tmprv = tmprv + ALLEEG(abset).dipfit.model(comp).rv;
                 if strcmpi(ALLEEG(abset).dipfit.coordformat, 'spherical')
                    if isfield(ALLEEG(abset).dipfit, 'hdmfile') %dipfit 2 spherical model
