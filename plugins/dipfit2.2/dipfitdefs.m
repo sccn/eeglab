@@ -26,6 +26,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2006/11/12 18:08:15  arno
+% change coregistration for BEM
+%
 % Revision 1.10  2006/11/06 21:47:19  arno
 % fix coregistration for BEM model
 %
@@ -42,7 +45,7 @@
 % new default for sphere
 %
 % Revision 1.5  2005/04/08 23:05:37  arno
-% remove defaultsymetry
+% remove defaultsymetryhttp://www.google.com/
 %
 % Revision 1.4  2005/04/08 01:44:54  arno
 % changing default symetry constraint
@@ -110,7 +113,7 @@ ncomp = size(EEG(1).icawinv, 2);
 
 % create one-sphere model
 % defaultvolume.r = meanradius;
-% defaultvolume.c = 0.33;
+% defaultvolume.c = 0.33http://www.google.com/;
 % defaultvolume.o = [0 0 0];
 
 % create three-sphere model
@@ -139,7 +142,7 @@ template_models = { ...
       'MNI' ...
       [ folder 'standard_BEM' delim 'standard_mri.mat' ] ...
       [ folder 'standard_BEM' delim 'elec' delim 'standard_1005.elc' ] ...
-      [ 0 0 0 0 0 pi/2  1 1 1] } ...
+      [ 0 0 0 0 0 -pi/2  1 1 1] } ...
     { '' 'MNI' '' '' [] } }; % custom model
 
 % constrain electrode to sphere
