@@ -68,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2006/11/09 22:04:35  arno
+% fix cluster plotting
+%
 % Revision 1.34  2006/11/08 23:21:41  arno
 % fixed plotting single subject
 %
@@ -195,13 +198,14 @@ for index = 1:length(allinds)
         eval( [ 'allersp  = STUDY.changrp(allinds(index)).' opt.datatype 'data;' ]);
         eval( [ 'alltimes = STUDY.changrp(allinds(index)).' opt.datatype 'times;' ]);
         eval( [ 'allfreqs = STUDY.changrp(allinds(index)).' opt.datatype 'freqs;' ]);
+        setinds  = STUDY.changrp(allinds(index)).setinds;
     else
         eval( [ 'allersp  = STUDY.cluster(allinds(index)).' opt.datatype 'data;' ]);
         eval( [ 'alltimes = STUDY.cluster(allinds(index)).' opt.datatype 'times;' ]);
         eval( [ 'allfreqs = STUDY.cluster(allinds(index)).' opt.datatype 'freqs;' ]);
         compinds = STUDY.cluster(allinds(index)).allinds;
+        setinds  = STUDY.cluster(allinds(index)).setinds;
     end;
-    setinds = STUDY.cluster(allinds(index)).setinds;
 
     % plot specific subject
     % ---------------------
