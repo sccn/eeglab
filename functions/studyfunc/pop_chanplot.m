@@ -221,8 +221,7 @@ if ~isstr(varargin{1})
     filename = fullfile( ALLEEG(ref_ind).filepath, ALLEEG(ref_ind).filename(1:end-3));
     if exist([filename 'datspec']) , spec_enable = 'on'; else spec_enable  = 'off'; end;
     if exist([filename 'daterp'] )  , erp_enable = 'on'; else erp_enable   = 'off'; end;
-    if exist([filename 'icatopo']), scalp_enable = 'on'; else scalp_enable = 'off'; end;
-    if exist([filename 'icaersp']) , ersp_enable = 'on'; else ersp_enable  = 'off'; end;
+    if exist([filename 'datersp']) , ersp_enable = 'on'; else ersp_enable  = 'off'; end;
     
     if isfield(ALLEEG(1).dipfit, 'model'), dip_enable   = 'on'; else dip_enable   = 'off'; end;
     
