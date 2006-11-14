@@ -68,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2006/11/14 03:53:18  arno
+% Now checking file on disk
+%
 % Revision 1.1  2006/09/12 18:43:54  arno
 % Initial revision
 %
@@ -152,8 +155,9 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
         
         % check for existing files
         % ------------------------
+        tmpparams = struct2cell(g.erspparams);
         for index = 1:length(STUDY.datasetinfo)
-            std_ersp(ALLEEG(STUDY.datasetinfo(index).index), 'channels', chanlist, 'type', type, g.erspparams{:});
+            std_ersp(ALLEEG(STUDY.datasetinfo(index).index), 'channels', chanlist, 'type', type, tmpparams{:});
         end;
     end;
     return;
