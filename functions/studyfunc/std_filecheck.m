@@ -57,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2006/11/14 03:56:38  arno
+% fixed inorefields
+%
 % Revision 1.1  2006/11/14 03:53:31  arno
 % Initial revision
 %
@@ -138,6 +141,7 @@ function [ res, params2 ] = std_filecheck(filename, params2, guiflag, ignorefiel
         if isempty(txt)
             params2 = params1;
             res     = 'usedisk';
+            disp(['Using file on disk: ' filename ]);
             return; 
         else
             error(strvcat([ 'Two ' strcom ' files had different parameters and the ' strcom ' function' ], ...
@@ -146,6 +150,9 @@ function [ res, params2 ] = std_filecheck(filename, params2, guiflag, ignorefiel
     elseif strcmpi(guiflag, 'recompute'), 
         res     = 'recompute';
         disp(['Deleting and recomputing file: ' filename ]);
+        return;
+    elseif strcmpi(res, 'same') & strcmpi(guiflag, 'guion'), 
+        disp(['Using file on disk: ' filename ]);
         return;
     end;
     
@@ -171,6 +178,7 @@ function [ res, params2 ] = std_filecheck(filename, params2, guiflag, ignorefiel
                         
     if isempty(ersp_ans), res = 'cancel'; return; end;
     if find(celltomat(ersp_ans))  == 2 % use existing ERSP info from this dataset
+        disp(['Using file on disk: ' filename ]);
         params2 = params1;
         res              = 'usedisk';
     else % Over write data in dataset
