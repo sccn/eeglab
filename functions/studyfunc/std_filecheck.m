@@ -57,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2006/11/14 03:53:31  arno
+% Initial revision
+%
 
 function [ res, params2 ] = std_filecheck(filename, params2, guiflag, ignorefields);
     
@@ -81,8 +84,8 @@ function [ res, params2 ] = std_filecheck(filename, params2, guiflag, ignorefiel
     % --------------------------------
     params1 = orderfields(params1);
     params2 = orderfields(params2);
-    fields1 = fieldnames( params1 ); fields1 = setdiff( params1, ignorefields);
-    fields2 = fieldnames( params2 ); fields2 = setdiff( params1, ignorefields);
+    fields1 = fieldnames( params1 ); fields1 = setdiff( fields1, ignorefields);
+    fields2 = fieldnames( params2 ); fields2 = setdiff( fields2, ignorefields);
     allfields = union(fields1, fields2);
     
     % make fields the same
