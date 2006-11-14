@@ -116,6 +116,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.41  2006/10/05 15:13:28  arno
+% fixing processing ICA data for 'savetrials'
+%
 % Revision 1.40  2006/10/03 13:38:22  scott
 % worked on help msg. ARNO - See many ?? in the help text! -sm
 %
@@ -149,7 +152,7 @@
 %
 % Revision 1.27  2006/03/11 00:35:50  arno
 % retreive previous version
-%
+%std_filecheck
 % Revision 1.25  2006/03/10 15:50:07  arno
 % converting values to single
 %
@@ -452,3 +455,4 @@ end;
 if strcmpi(g.savetrials, 'on')
     std_savedat( filenametrials , all_trials );
 end;
+
