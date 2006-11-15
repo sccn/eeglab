@@ -65,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.41  2006/07/10 21:00:21  arno
+% fix one channel plotting
+%
 % Revision 1.40  2006/03/09 17:20:39  arno
 % stefan's changes
 %
@@ -974,7 +977,7 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
     com = [ 'axis on;' ...
             'clear xlabel ylabel;' tmpleg ...
             'xlabel(''''Time (ms)'''');' ...
-            'ylabel(''''Voltage (\muV)'''');' ];
+            'ylabel(''''Potential (\muV)'''');' ];
     axcopy(gcf, com); % turn on popup feature
 %
 %%%%%%%%%%%%%%%%%% Make printed figure fill page %%%%%%%%%%%%%%%%%%%%%%%%%%%
