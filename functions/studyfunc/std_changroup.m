@@ -34,6 +34,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2006/09/12 18:45:16  arno
+% Initial revision
+%
 
 function STUDY = std_changroup(STUDY, ALLEEG);
 
@@ -55,10 +58,10 @@ for indc = 1:length(alllocs)
     STUDY.changrp(indc).chaninds = tmp.chaninds;
     STUDY.changrp(indc).centroid = [];
 end;
-STUDY.changrp(indc).name = [ 'full montage' ];
-STUDY.changrp(indc).channels = { alllocs.labels };
-tmp = std_chanlookup( STUDY, ALLEEG, STUDY.changrp(indc));
-STUDY.changrp(indc).chaninds = tmp.chaninds;
+%STUDY.changrp(indc).name = [ 'full montage' ];
+%STUDY.changrp(indc).channels = { alllocs.labels };
+%tmp = std_chanlookup( STUDY, ALLEEG, STUDY.changrp(indc));
+%STUDY.changrp(indc).chaninds = tmp.chaninds;
 
 % ---------------
 % channel look-up
