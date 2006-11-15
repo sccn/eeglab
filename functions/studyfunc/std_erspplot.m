@@ -68,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2006/11/14 04:16:43  arno
+% setinds for channels
+%
 % Revision 1.35  2006/11/09 22:04:35  arno
 % fix cluster plotting
 %
@@ -213,7 +216,7 @@ for index = 1:length(allinds)
         for c = 1:size(allersp,1)
             for g = 1:size(allersp,2)
                 for l=length(setinds{c,g}):-1:1
-                    if ~strcmpi(opt.subject, STUDY.datatasetinfo(setinds{c,g}(l)).subject)
+                    if ~strcmpi(opt.subject, STUDY.datasetinfo(setinds{c,g}(l)).subject)
                         allersp{c,g}(:,:,l) = [];
                     end;
                 end;
