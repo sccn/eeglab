@@ -7,7 +7,7 @@
 %
 % Usage:
 %   >> [ outparam ] = inputgui( 'key1', 'val1', 'key2', 'val2', ... );
-%   >> [ outparam userdat strhalt] = ...
+%   >> [ outparam userdat strhalt outstruct] = ...
 %             inputgui( 'key1', 'val1', 'key2', 'val2', ... );
 % 
 % Inputs:
@@ -73,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2006/02/10 23:36:56  arno
+% assign popupmenu too
+%
 % Revision 1.31  2006/01/13 00:18:33  arno
 % nothing
 %
