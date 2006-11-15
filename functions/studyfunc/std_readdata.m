@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2006/11/09 22:38:08  arno
+% fix spectrum loading
+%
 % Revision 1.13  2006/11/09 20:50:34  arno
 % final indices now returned
 %
@@ -237,8 +240,14 @@ for ind = 1:length(finalinds)
                 % reserve arrays
                 % --------------
                 allspec  = cell( max(length(STUDY.condition),1), max(length(STUDY.group),1) ); 
-                %[ tmpersp allfreqs alltimes tmpparams tmpspec] = std_readersp( ALLEEG, 1, -1, [], opt.freqrange);
-                [ tmp allfreqs ] = std_readspec( ALLEEG, 1, sign(allchanorcomp(1)), opt.freqrange);
+                filetype = 'spec';
+                try,
+                    [ tmp allfreqs ] = std_readspec( ALLEEG, 1, sign(allchanorcomp(1)), opt.freqrange);
+                catch 
+                    filetype = 'ersp';
+                    disp('Cannot find spectral file, trying ERSP baseline file instead');
+                    [ tmpersp allfreqs alltimes tmpparams tmpspec] = std_readersp( ALLEEG, 1, sign(allchanorcomp(1)), [], opt.freqrange);
+                end;
                 for c = 1:nc
                     for g = 1:ng
                         allspec{c, g} = single(zeros(length(allfreqs), length(allinds{c,g})));
@@ -251,10 +260,13 @@ for ind = 1:length(finalinds)
                 for c = 1:nc
                     for g = 1:ng
                         for indtmp = 1:length(allinds{c,g})
-                            %[ tmpersp allfreqs alltimes tmpparams tmpspec] = std_readersp( ALLEEG, index, tmpind, [], opt.freqrange);
-                            %allspec{condind, grpind}(:,subject) = 10*log(tmpspec(:));
-                            [ tmpspec allfreqs ] = std_readspec( ALLEEG, setinds{c,g}(indtmp), allinds{c,g}(indtmp), opt.freqrange);
-                            allspec{c, g}(:,indtmp) = tmpspec(:);
+                            if strcmpi(filetype, 'spec')
+                                [ tmpspec allfreqs ] = std_readspec( ALLEEG, setinds{c,g}(indtmp), allinds{c,g}(indtmp), opt.freqrange);
+                                allspec{c, g}(:,indtmp) = tmpspec(:);
+                            else
+                                [ tmpersp allfreqs alltimes tmpparams tmpspec] = std_readersp( ALLEEG, setinds{c,g}(indtmp), allinds{c,g}(indtmp), [], opt.freqrange);
+                                allspec{c, g}(:,indtmp) = 10*log(tmpspec(:));
+                            end;
                             fprintf('.');
                         end;
                     end;
