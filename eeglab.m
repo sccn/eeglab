@@ -188,6 +188,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.491  2006/10/24 18:30:18  toby
+% Bugzilla bug 80: crashes on some Linux systems, courtesy  Florian Ph.S Fischmeister
+%
 % Revision 1.490  2006/09/12 16:44:18  arno
 % new menus
 %
@@ -2008,7 +2011,7 @@ catchstrs.new_non_empty          = e_newset;
     tools_m = uimenu( W_MAIN, 'Label', 'Tools', 'tag', 'tools');
     plot_m  = uimenu( W_MAIN, 'Label', 'Plot', 'tag', 'plot');
 	loc_m   = uimenu( plot_m, 'Label', 'Channel locations'   );
-    std_m   = uimenu( W_MAIN, 'Label', 'Study');
+    std_m   = uimenu( W_MAIN, 'Label', 'Study', 'tag', 'study');
     set_m   = uimenu( W_MAIN, 'Label', 'Datasets');
     help_m  = uimenu( W_MAIN, 'Label', 'Help');
     
