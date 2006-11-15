@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.56  2006/11/06 22:32:29  arno
+% debug fiducial alignmenent
+%
 % Revision 1.55  2006/11/04 01:06:35  toby
 % edit text msg
 %
@@ -330,10 +333,6 @@ if isstr(chanlocs1)
             warndlg2('Transformation failed');
         end;
     elseif strcmpi(com, 'warp')
-        if ~exist('fminunc')
-            warndlg2(strvcat('This function requires the Matlab Optimization toolbox.', 'To align manually, turn on labels, then enter scaling, shift, and rotation values.'));
-            return;
-        end;
         [clist1 clist2] = pop_chancoresp( dat.elec1, dat.elec2, 'autoselect', 'all');
 
         % copy electrode names
