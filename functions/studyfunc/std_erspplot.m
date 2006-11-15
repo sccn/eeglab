@@ -68,6 +68,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.37  2006/11/15 01:59:23  arno
+% dataset typo
+% /
+%
 % Revision 1.36  2006/11/14 04:16:43  arno
 % setinds for channels
 %
@@ -178,7 +182,7 @@ if ~isempty(opt.plottf)
         subjind = strmatch(opt.subject, STUDY.subject);
         for c = 1:size(allersp,1)
             for g = 1:size(allersp,2)
-                allersp{c,g} = allersp{c,g}(:,:,subjind);
+                allersp{c,g} = allersp{c,g}(:,:,:,subjind);
             end;
         end;
     end;
