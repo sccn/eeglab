@@ -159,6 +159,9 @@ if ~isstr(varargin{1})
     if ~isfield(STUDY, 'changrp')
         STUDY = std_changroup(STUDY, ALLEEG);
         disp('Warning: history not saved for group creation');
+    elseif isempty(STUDY.changrp)
+        STUDY = std_changroup(STUDY, ALLEEG);
+        disp('Warning: history not saved for group creation');
     end;
     
     show_chan          = [ 'pop_chanplot(''showchan'',gcf);'];
