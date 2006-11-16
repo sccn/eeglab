@@ -101,6 +101,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2006/11/15 21:58:49  arno
+% plotting titles
+%
 % Revision 1.19  2006/11/09 23:55:18  arno
 % fix last change
 %
@@ -300,7 +303,6 @@ if ~isempty(opt.plottopo)
         % plot scalp maps for baseline    
         % ----------------------------
         if length(opt.plottopo) < 2, opt.plottopo(2) = opt.plottopo(1); end;
-        opt.plottopo(3:4) = opt.plottopo(2);       
         [tmp ti1] = min(abs(allx-opt.plottopo(1)));
         [tmp ti2] = min(abs(allx-opt.plottopo(2)));
         for index = 1:length(data(:))
@@ -597,9 +599,15 @@ else
     for c = 1:nc
         for g = 1:ng
             hdl(c,g) = mysubplot(nc+addr, ng+addc, g + (c-1)*(ng+addc), opt.transpose);
-            if opt.plottopo(1) == opt.plottopo(3), fig_title = [ opt.condnames{c} ', ' opt.groupnames{g} ', ' num2str(opt.plottopo(1)) opt.unitx];
-            else                                   fig_title = [ opt.condnames{c} ', ' opt.groupnames{g} ', ' num2str(opt.plottopo(1)) '-' num2str(opt.plottopo(3)) opt.unitx];
+            if opt.plottopo(1) == opt.plottopo(2), fig_title = [ opt.condnames{c} ', ' opt.groupnames{g} ', ' num2str(opt.plottopo(1)) opt.unitx];
+            else                                   fig_title = [ opt.condnames{c} ', ' opt.groupnames{g} ', ' num2str(opt.plottopo(1)) '-' num2str(opt.plottopo(2)) opt.unitx];
             end;
+            if length(opt.plottopo) > 2
+                if opt.plottopo(3) == opt.plottopo(4), fig_title = [ fig_title ', ' num2str(opt.plottopo(3)) ' ms'];
+                else                                   fig_title = [ fig_title ', ' num2str(opt.plottopo(3)) '-' num2str(opt.plottopo(4)) ' ms' ];
+                end;
+            end;
+                
             tmpplot = double(mean(data{c,g},3));
             topoplot( tmpplot, opt.chanlocs);
             title(fig_title); 
