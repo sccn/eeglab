@@ -57,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2006/11/16 01:00:54  arno
+% more detailed message
+%
 % Revision 1.3  2006/11/14 04:10:34  arno
 % better messages
 %
@@ -147,7 +150,7 @@ function [ res, params2 ] = std_filecheck(filename, params2, guiflag, ignorefiel
             disp(['Using file on disk: ' filename ]);
             return; 
         else
-            strvcat(txt{:});
+            strvcat(txt{:})
             error([ 'Two ' strcom ' files had different parameters and the ' strcom ' function' 10 ...
                           'cannot handle that. We suggest that you delete all files. See command line details' ]);
         end;
