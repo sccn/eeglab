@@ -23,6 +23,8 @@
 %   filtorder - length of the filter in points {default 3*fix(srate/locutoff)}
 %   revfilt   - [0|1] Reverse filter polarity (from bandpass to notch filter). 
 %                     Default is 0 (bandpass).
+%   usefft    - [0|1] 1 use FFT filtering instead of FIR. Default is 0.
+%
 % Outputs:
 %   EEGOUT   - output dataset
 %
@@ -49,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2006/11/16 21:54:33  arno
+% same
+%
 % Revision 1.32  2006/11/16 21:53:43  arno
 % fix options
 %
@@ -148,7 +153,7 @@
 
 % 01-25-02 reformated help & license -ad 
 
-function [EEG, com] = pop_eegfilt( EEG, locutoff, hicutoff, filtorder, revfilt);
+function [EEG, com] = pop_eegfilt( EEG, locutoff, hicutoff, filtorder, revfilt, usefft);
 
 com = '';
 if nargin < 1
@@ -158,32 +163,52 @@ end;
 if isempty(EEG(1).data)
     disp('Pop_eegfilt() error: cannot filter an empty dataset'); return;
 end;    
+
+% warning
+% -------
+if nargin < 6, usefft = 0; end;
+if exist('filtfilt') ~= 2
+    disp('Warning: cannot find the signal processing toolbox');
+    disp('         a simple fft/inverse fft filter will be used');
+    usefft = 1;
+end;
+
 if nargin < 2
 	% which set to save
 	% -----------------
-   	promptstr = { 'Highpass: lower edge of the frequency pass band (Hz) (0 -> lowpass)', ...
-   				  'Lowpass: higher edge of the frequency pass band (Hz) (0 -> highpass)', ...
-   				  strvcat('Notch filter the data. Give the notch range, i.e. [45 55] for 50 Hz)', ...
-                  '(this option overwrites the low and high edge limits given above)'), ...
-                  'Filter length in points (default: see >> help pop_eegfilt)' };
-	inistr       = { '0', '0', '', '' };
-   	result       = inputdlg2( promptstr, 'Filter the data -- pop_eegfilt()', 1,  inistr, 'pop_eegfilt');
-	if size(result, 1) == 0 return; end;
-	locutoff   	 = eval( result{1} );
+   	uilist = { ...
+        { 'style' 'text' 'string' 'Lower edge of the frequency pass band (Hz)' } ...
+        { 'style' 'edit' 'string' '' } ...
+        { 'style' 'text' 'string' 'Higher edge of the frequency pass band (Hz)' } ...
+        { 'style' 'edit' 'string' '' } ...
+        { 'style' 'text' 'string' 'FIR Filter order (default is automatic)' } ...
+        { 'style' 'edit' 'string' '' } ...
+        { 'style' 'checkbox' 'string' 'Notch filter the data instead of pass band' } ...
+        { 'style' 'checkbox' 'string' 'Use (sharper) FFT linear filter instead of FIR filtering' 'value' usefft } };
+    geometry = { [3 1] [3 1] [3 1] 1 1 };
+    
+    result = inputgui( 'geometry', geometry, 'uilist', uilist, 'title', 'Filter the data -- pop_eegfilt()', ...
+                    'helpcom', 'pophelp(''pop_eegfilt'')');
+    
+    if isempty(result), return; end;
+    if isempty(result{1}), result{1} = '0'; end;
+    if isempty(result{2}), result{2} = '0'; end;
+
+    locutoff   	 = eval( result{1} );
 	hicutoff 	 = eval( result{2} );
 	if isempty( result{3} )
-		 revfilt = 0;
-	else 
-        revfilt    = eval( [ '[' result{3} ']' ] );
-        locutoff = revfilt(1);
-        hicutoff = revfilt(2);
-        revfilt = 1;
-	end;
-	if locutoff == 0 & hicutoff == 0 return; end;
-	if isempty( result{4} )
 		 filtorder = [];
-	else filtorder    = eval( result{4} );
+	else filtorder    = eval( result{3} );
 	end;
+    revfilt = 0; 
+	if result{4}, 
+        revfilt = 1; 
+        if locutoff == 0 | hicutoff == 0,
+            error('Need both lower and higher edge for notch filter');
+        end;
+    end;
+    if result{5}, usefft = 1; end;
+	if locutoff == 0 & hicutoff == 0 return; end;
 else
     if nargin < 3
         hicutoff = 0;
@@ -197,7 +222,7 @@ else
 end;
 
 if locutoff & hicutoff
-    disp('WARNING: BANDPASS FILTERS SOMETIMES DO NOT WORK')
+    disp('WARNING: BANDPASS FILTERS SOMETIMES DO NOT WORK (MATLAB BUG)')
     disp('WARNING: PLOT SPECTRUM AFTER FILTERING TO ASSESS FILTER EFFICIENCY')
     disp('WARNING: IF FILTER FAILS, LOWPASS DATA THEN HIGHPASS DATA')
 end;
@@ -220,18 +245,12 @@ if revfilt ~= 0
 	options = { options{:} revfilt };
 end;
 
-% warning
-% -------
-if exist('filtfilt') ~= 2
-    disp('Warning: cannot find the signal processing toolbox');
-    disp('         a simple fft/inverse fft filter will be used');
-end;
 
 if EEG.trials == 1 
 	if ~isempty(EEG.event) & isfield(EEG.event, 'type') & isstr(EEG.event(1).type)
 		boundaries = strmatch('boundary', {EEG.event.type});
 		if isempty(boundaries)
-            if exist('filtfilt') == 2
+            if ~usefft
                 EEG.data = eegfilt( EEG.data, options{:}); 
             else
                 EEG.data = eegfiltfft( EEG.data, options{:}); 
@@ -247,7 +266,7 @@ if EEG.trials == 1
 			for n=1:length(boundaries)-1
 				try
                     fprintf('Processing continuous data (%d:%d)\n',boundaries(n),boundaries(n+1)); 
-                    if exist('filtfilt') == 2
+                    if ~usefft
                         EEG.data(:,boundaries(n)+1:boundaries(n+1)) = ...
                             eegfilt(EEG.data(:,boundaries(n)+1:boundaries(n+1)), options{:});
                     else
@@ -267,7 +286,7 @@ if EEG.trials == 1
             catch, end;
 		end
 	else
-        if exist('filtfilt') == 2
+        if ~usefft
             EEG.data = eegfilt( EEG.data, options{:});
         else
             EEG.data = eegfiltfft( EEG.data, options{:});
@@ -276,7 +295,7 @@ if EEG.trials == 1
 else
     EEG.data = reshape(EEG.data, EEG.nbchan, EEG.pnts*EEG.trials);
     options{4} = EEG.pnts;
-    if exist('filtfilt') == 2
+    if ~usefft
         EEG.data = eegfilt( EEG.data, options{:});
     else
         EEG.data = eegfiltfft( EEG.data, options{:});
