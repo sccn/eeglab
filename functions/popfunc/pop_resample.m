@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2006/11/17 21:12:52  arno
+% *** empty log message ***
+%
 % Revision 1.18  2005/10/01 23:09:51  arno
 % remove doublet boundaries if any
 %
@@ -140,9 +143,7 @@ oldpnts   = EEG.pnts;
 if isfield(EEG, 'event') & isfield(EEG.event, 'type') & isstr(EEG.event(1).type)
     bounds = strmatch('boundary', { EEG.event.type });
     if ~isempty(bounds),
-        if exist('resample') == 2
-            disp('Data break detected and taken into account for resampling');
-        end;
+        disp('Data break detected and taken into account for resampling');
         bounds = [ EEG.event(bounds).latency ];
         if bounds(1) < 0, bounds(1) = []; end; % remove initial boundary if any
     end;
@@ -152,40 +153,36 @@ else
     bounds = [1 size(EEG.data,2)+1]; % [1:size(EEG.data,2):size(EEG.data,2)*size(EEG.data,3)+1];
 end;
 if exist('resample') == 2
-    fprintf('resampling data %3.4f Hz\n', EEG.srate*p/q);
-    for index1 = 1:size(EEG.data,1)
-        fprintf('%d ', index1);	
-        sigtmp = reshape(EEG.data(index1,:, :), oldpnts, EEG.trials);
-        
-        if index1 == 1
-            tmpres = [];
-            indices = [1];
-            for ind = 1:length(bounds)-1
-                tmpres  = [ tmpres; resample( double( sigtmp(bounds(ind):bounds(ind+1)-1,:)), p, q ) ];
-                indices = [ indices size(tmpres,1)+1 ];
-            end;
-            if size(tmpres,1) == 1, EEG.pnts  = size(tmpres,2);
-            else                    EEG.pnts  = size(tmpres,1);
-            end;
-            tmpeeglab = zeros(EEG.nbchan, EEG.pnts, EEG.trials);
-        else
-            for ind = 1:length(bounds)-1
-                tmpres(indices(ind):indices(ind+1)-1,:) = resample( double( sigtmp(bounds(ind):bounds(ind+1)-1,:) ), p, q );
-            end;
-        end; 
-        tmpeeglab(index1,:, :) = tmpres;
-    end;
-    fprintf('\n');	
-    EEG.srate   = EEG.srate*p/q;
-else
-    disp('This method of resampling uses the griddata function and is extremelly slow');
-    disp('To speed it up, use the signal processing toolbox (automatically detected)');
-    disp('or reprogram this function using spline interpolation (see >> help spline)');
-    disp('This method also ignores data breaks if any');
-    EEG.srate   = (round(EEG.pnts*p/q)-1)/(EEG.xmax-EEG.xmin);
-    fprintf('resampling data %3.4f Hz\n', EEG.srate);
-    tmpeeglab = myresample(EEG.data, EEG.pnts, round(EEG.pnts*p/q));
+     usesigproc = 1;
+else usesigproc = 0;
+    disp('This method of resampling uses spline interpolation after anti-aliasing (see >> help spline)');    
 end;
+
+fprintf('resampling data %3.4f Hz\n', EEG.srate*p/q);
+for index1 = 1:size(EEG.data,1)
+    fprintf('%d ', index1);	
+    sigtmp = reshape(EEG.data(index1,:, :), oldpnts, EEG.trials);
+    
+    if index1 == 1
+        tmpres = [];
+        indices = [1];
+        for ind = 1:length(bounds)-1
+            tmpres  = [ tmpres; myresample( double( sigtmp(bounds(ind):bounds(ind+1)-1,:)), p, q, usesigproc ) ];
+            indices = [ indices size(tmpres,1)+1 ];
+        end;
+        if size(tmpres,1) == 1, EEG.pnts  = size(tmpres,2);
+        else                    EEG.pnts  = size(tmpres,1);
+        end;
+        tmpeeglab = zeros(EEG.nbchan, EEG.pnts, EEG.trials);
+    else
+        for ind = 1:length(bounds)-1
+            tmpres(indices(ind):indices(ind+1)-1,:) = myresample( double( sigtmp(bounds(ind):bounds(ind+1)-1,:) ), p, q, usesigproc );
+        end;
+    end; 
+    tmpeeglab(index1,:, :) = tmpres;
+end;
+fprintf('\n');	
+EEG.srate   = EEG.srate*p/q;
 EEG.data = tmpeeglab;
 
 % recompute all event latencies
@@ -221,14 +218,24 @@ return;
 
 % resample if resample is not present
 % -----------------------------------
-function tmpeeglab = myresample(data, pnts, new_pnts);
-    Y  = [1 2];
-	for index1 = 1:size(data,1)
-		for index3 = 1:size(data,3)
-			X = [1:pnts];
-			XX = linspace( 1, pnts, new_pnts);
-            cs = spline( X, squeeze(data(index1, :, index3))');
-            tmpeeglab(index1,:, index3) = ppval(cs, XX);
-			fprintf('.');
-		end;
-	end;
+function tmpeeglab = myresample(data, pnts, new_pnts, usesigproc);
+    
+    if usesigproc
+        tmpeeglab = resample(data, pnts, new_pnts);
+        return;
+    end;
+    
+    % anti-alias filter
+    % -----------------
+    data         = eegfiltfft(data', 256, 0, 128*pnts/new_pnts);
+    
+    % spline interpolation
+    % --------------------
+    X            = [1:length(data)];
+    nbnewpoints  = length(data)*pnts/new_pnts;
+    nbnewpoints2 = floor(nbnewpoints);
+    lastpointval = length(data)/nbnewpoints*nbnewpoints2;        
+    XX = linspace( 1, lastpointval, nbnewpoints2);
+    
+    cs = spline( X, data);
+    tmpeeglab = ppval(cs, XX);
