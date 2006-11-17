@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2006/11/17 21:51:18  arno
+% *** empty log message ***
+%
 % Revision 1.20  2006/11/17 21:48:47  arno
 % fixed resampling if sigproc absent
 %
@@ -236,9 +239,9 @@ function tmpeeglab = myresample(data, pnts, new_pnts, usesigproc);
     % --------------------
     X            = [1:length(data)];
     nbnewpoints  = length(data)*pnts/new_pnts;
-    nbnewpoints2 = floor(nbnewpoints);
+    nbnewpoints2 = ceil(nbnewpoints);
     lastpointval = length(data)/nbnewpoints*nbnewpoints2;        
     XX = linspace( 1, lastpointval, nbnewpoints2);
     
     cs = spline( X, data);
-    tmpeeglab = ppval(cs, XX);
+    tmpeeglab = ppval(cs, XX)';
