@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2006/11/17 21:48:47  arno
+% fixed resampling if sigproc absent
+%
 % Revision 1.19  2006/11/17 21:12:52  arno
 % *** empty log message ***
 %
