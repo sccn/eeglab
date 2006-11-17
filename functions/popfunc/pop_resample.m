@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2006/11/17 21:58:07  arno
+% fixed spline interpolation
+%
 % Revision 1.21  2006/11/17 21:51:18  arno
 % *** empty log message ***
 %
@@ -161,7 +164,8 @@ end;
 if exist('resample') == 2
      usesigproc = 1;
 else usesigproc = 0;
-    disp('This method of resampling uses spline interpolation after anti-aliasing (see >> help spline)');    
+    disp('Signal Processing Toolbox absent: using custom interpolation instead of resample() function.');
+    disp('This method uses cubic spline interpolation after anti-aliasing (see >> help spline)');    
 end;
 
 fprintf('resampling data %3.4f Hz\n', EEG.srate*p/q);
