@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2005/10/01 23:09:51  arno
+% remove doublet boundaries if any
+%
 % Revision 1.17  2005/09/27 22:09:30  arno
 % now uses spline interpolation if the signal processing toolbox is absent (should be as efficient as the signal processing toolbox)
 %
