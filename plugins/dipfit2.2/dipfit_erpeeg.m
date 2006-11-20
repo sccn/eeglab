@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2006/01/19 22:15:19  arno
+% extra ouput
+%
 % Revision 1.3  2004/05/20 00:32:03  arno
 % header
 %
@@ -74,14 +77,17 @@ function [dipoles, model, EEG] = dipfit_erpeeg(DATA, chanlocs, varargin);
     % faking an EEG dataset
     % ---------------------
     EEG          = eeg_emptyset;
-    EEG.data     = zeros(size(DATA,1), 1000);
+    EEG.data     = rand(size(DATA,1), 1000);
     EEG.nbchan   = size(DATA,1);
     EEG.pnts     = 1000;
     EEG.trials   = 1;
     EEG.chanlocs = chanlocs;
-    EEG.icawinv    = DATA;
-    EEG.icaweights = zeros(size(DATA))';
+    EEG.icawinv    = [ DATA DATA ];
+    EEG.icaweights = zeros(size([ DATA DATA ]))';
     EEG.icasphere  = zeros(size(DATA,1), size(DATA,1));
+    %EEG            = eeg_checkset(EEG);
+    EEG.icaact     = EEG.icaweights*EEG.icasphere*EEG.data(:,:);
+    EEG.icaact     = reshape( EEG.icaact, size(EEG.icaact,1), size(EEG.data,2), size(EEG.data,3));
     
     % uses mutlifit to fit dipoles
     % ----------------------------
