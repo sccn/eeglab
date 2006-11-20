@@ -1,18 +1,21 @@
-% pop_prop() - plot the properties of a channel or of an independent
+% pop_prop() - plot properties of a channel or of an independent
 %              component. 
 % Usage:
-%   >> pop_prop( EEG, typecomp); % pops up a query window 
-%   >> pop_prop( EEG, typecomp, chan, winhandle);
+%   >> pop_prop( EEG, chancomp);                   % pop up a query window 
+%   >> pop_prop( EEG, chancomp, index);            % no query pop window
+%   >> pop_prop( EEG, chancomp, index, winhandle); % add rejection buttons
 %
 % Inputs:
 %   EEG        - dataset structure (see EEGGLOBAL)
-%   typecomp   - [0|1] compute electrode property (1) or component 
-%                property (0). Default is 1.
-%   chan       - channel or component number
-%   winhandle  - if this parameter is present, buttons for the
-%                rejection of the component are drawn. If 
-%                non-zero, this parameter is used to backpropagate
-%                the color of the rejection button.
+%   chancomp   - [0|1] 1 --> plot channel properties;
+%                0 --> plot component properties(default: 1)
+%
+% Optional inputs:
+%   index      - channel or component index to plot properties for
+%   winhandle  - if this parameter is present, buttons to allow
+%                component rejection are added to the plot.
+%                (If non-zero, this parameter is used to back-
+%                propagate the button color to the EEGLAB gui).
 % 
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
@@ -37,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2006/11/07 19:17:09  toby
+% changed topoplot title -sm
+%
 % Revision 1.30  2006/11/07 18:40:42  toby
 % debug same -sm
 %
@@ -187,7 +193,7 @@
 % 03-18-02 text settings -ad & sm
 % 03-18-02 added title -ad & sm
 
-function com = pop_prop(EEG, typecomp, numcompo, winhandle)
+function com = pop_prop(EEG, chancomp, chancompidx, winhandle)
 
 com = '';
 if nargin < 1
@@ -195,42 +201,42 @@ if nargin < 1
 	return;   
 end;
 if nargin == 1
-	typecomp = 1;
+	chancomp = 1; % Default to plotting CHANNEL properties
 end;
-if typecomp == 0 & isempty(EEG.icaweights)
-   error('No ICA weights recorded for this set, first run ICA');
+if chancomp == 0 & isempty(EEG.icaweights)
+   error('No ICA weights recorded for this set; first run ICA');
 end;   
 if nargin == 2
-	promptstr    = { fastif(typecomp,'Channel number to plot:','Component number to plot:') };
+	promptstr    = { fastif(chancomp,'Channel number to plot:','Component number to plot:') };
 	inistr       = { '1' };
 	result       = inputdlg2( promptstr, 'Component properties - pop_prop()', 1,  inistr, 'pop_prop');
 	if size( result, 1 ) == 0 return; end;
    
-	numcompo   = eval( [ '[' result{1} ']' ] );
+	chancompidx   = eval( [ '[' result{1} ']' ] );  channel or component to plot properties for
 end;
 
-% plotting several component properties
-% -------------------------------------
-if length(numcompo) > 1
-    for index = numcompo
-        pop_prop(EEG, typecomp, index);
+% plot several component properties
+% ---------------------------------
+if length(chancompidx) > 1
+    for index = chancompidx
+        pop_prop(EEG, chancomp, index);
     end;
-	com = sprintf('pop_prop( %s, %d, [%s]);', inputname(1), typecomp, int2str(numcompo));
+	com = sprintf('pop_prop( %s, %d, [%s]);', inputname(1), chancomp, int2str(chancompidx));
     return;
 end;
 
-if numcompo < 1 | numcompo > EEG.nbchan
-   error('Component index out of range');
+if chancompidx < 1 | chancompidx > EEG.nbchan
+   error('Channel or component index out of range');
 end;   
 
-% assumed input is numcompo
+% assume input is chancompidx
 % -------------------------
 try, icadefs; 
 catch, 
 	BACKCOLOR = [0.8 0.8 0.8];
 	GUIBUTTONCOLOR   = [0.8 0.8 0.8]; 
 end;
-basename = [fastif(typecomp,'Channel ', 'Component ') int2str(numcompo) ];
+basename = [fastif(chancomp,'Channel ', 'Component ') int2str(chancompidx) ];
 
 fh = figure('name', ['pop_prop() - ' basename ' properties'], 'color', BACKCOLOR, 'numbertitle', 'off', 'visible', 'off');
 pos = get(gcf,'Position');
@@ -241,28 +247,30 @@ q = [pos(1) pos(2) 0 0];
 s = [pos(3) pos(4) pos(3) pos(4)]./100;
 axis off;
 
-% plotting topoplot
-% -----------------
+% plot topoplot
+% -------------
 h = axes('Units','Normalized', 'Position',[-10 60 40 42].*s+q);
 
-%topoplot( EEG.icawinv(:,numcompo), EEG.chanlocs); axis square; 
+%topoplot( EEG.icawinv(:,chancompidx), EEG.chanlocs); axis square; 
 
-if typecomp == 1 % plot single channel locations
-	topoplot( numcompo, EEG.chanlocs, 'chaninfo', EEG.chaninfo, ...
+if chancomp == 1 % plot single channel locations
+	topoplot( chancompidx, EEG.chanlocs, 'chaninfo', EEG.chaninfo, ...
              'electrodes','off', 'style', 'blank', 'emarkersize1chan', 12); axis square;
 else             % plot component map
-	topoplot( EEG.icawinv(:,numcompo), EEG.chanlocs, 'chaninfo', EEG.chaninfo, ...
+	topoplot( EEG.icawinv(:,chancompidx), EEG.chanlocs, 'chaninfo', EEG.chaninfo, ...
              'shading', 'interp', 'numcontour', 3); axis square;
 end;
-basename = [fastif(typecomp,'Channel ', 'IC') int2str(numcompo) ];
-% title([ basename fastif(typecomp, ' location', ' map')], 'fontsize', 14); 
+basename = [fastif(chancomp,'Channel ', 'IC') int2str(chancompidx) ];
+% title([ basename fastif(chancomp, ' location', ' map')], 'fontsize', 14); 
 title(basename, 'fontsize', 14); 
 
 % plotting erpimage
 % -----------------
 hhh = axes('Units','Normalized', 'Position',[45 62 48 38].*s+q);
-eeglab_options; 
-if EEG.trials > 1
+eeglab_options;  % read current memory option settings
+
+if EEG.trials > 1 % if epoched data 
+% ---------------------------------
     % put title at top of erpimage
     axis off
     hh = axes('Units','Normalized', 'Position',[45 62 48 38].*s+q);
@@ -272,17 +280,17 @@ if EEG.trials > 1
     else
       ei_smooth = 3;
     end
-    if typecomp == 1 % plot component
-         offset = nan_mean(EEG.data(numcompo,:));
-         erpimage( EEG.data(numcompo,:)-offset, ones(1,EEG.trials)*10000, EEG.times , ...
+    if chancomp == 1 % plot component properties
+         offset = nan_mean(EEG.data(chancompidx,:));
+         erpimage( EEG.data(chancompidx,:)-offset, ones(1,EEG.trials)*10000, EEG.times , ...
                        '', ei_smooth, 1, 'caxis', 2/3, 'cbar','erp');   
-    else % plot channel
-          if option_computeica  
-                  offset = nan_mean(EEG.icaact(numcompo,:));
-                  erpimage( EEG.icaact(numcompo,:)-offset, ones(1,EEG.trials)*10000, EEG.times , ...
+    else % 0 == plot channel properties
+          if option_computeica  % if EEG.icaact is present
+                  offset = nan_mean(EEG.icaact(chancompidx,:));
+                  erpimage( EEG.icaact(chancompidx,:)-offset, ones(1,EEG.trials)*10000, EEG.times , ...
                        '', ei_smooth, 1, 'caxis', 2/3, 'cbar','erp', 'yerplabel', '');   
-          else
-                  icaacttmp = (EEG.icaweights(numcompo,:) * EEG.icasphere) ...
+          else % if EEG.icaact is no present
+                  icaacttmp = (EEG.icaweights(chancompidx,:) * EEG.icasphere) ...
                                    * reshape(EEG.data, EEG.nbchan, EEG.trials*EEG.pnts);
                   offset = nan_mean(icaacttmp);
                   erpimage( icaacttmp-offset, ones(1,EEG.trials)*10000, EEG.times, ...
@@ -291,8 +299,9 @@ if EEG.trials > 1
     end;
     axes(hhh);
     title(sprintf('%s activity \\fontsize{10}(global offset %3.3f)', basename, offset), 'fontsize', 14);
-else
 
+else % EEG.epochs > 1 % continuous data 
+% -------------------------------------
     % put title at top of erpimage
     EI_TITLE = 'Continous data';
     axis off
@@ -309,23 +318,27 @@ else
       end
       erpimageframes = floor(size(EEG.data,2)/ERPIMAGELINES);
       erpimageframestot = erpimageframes*ERPIMAGELINES;
-      eegtimes = linspace(0, erpimageframes-1, EEG.srate/1000);
-      if typecomp == 1 % plot component
-           offset = nan_mean(EEG.data(numcompo,:));
-           erpimage( reshape(EEG.data(numcompo,1:erpimageframestot),erpimageframes,ERPIMAGELINES)-offset, ones(1,ERPIMAGELINES)*10000, eegtimes , ...
+      eegtimes = ([0:erpimageframes-1]+0.01) * 1000/EEG.srate;
+      
+      if chancomp == 1 % plot channel properties
+           offset = nan_mean(EEG.data(chancompidx,:));
+           erpimage( reshape(EEG.data(chancompidx,1:erpimageframestot),erpimageframes,ERPIMAGELINES)-offset, ...
+                  ones(1,ERPIMAGELINES)*1000, eegtimes , ...
                          EI_TITLE, ei_smooth, 1, 'caxis', 2/3, 'cbar');   
-      else % plot channel
-            if option_computeica  
-                    offset = nan_mean(EEG.icaact(numcompo,:));
+      else % 0 == plot component properties
+            if option_computeica  % if EEG.icaact exists ...
+                    offset = nan_mean(EEG.icaact(chancompidx,:));
                     erpimage( ...
-              reshape(EEG.icaact(numcompo,1:erpimageframestot),erpimageframes,ERPIMAGELINES)-offset, ...
-                   ones(1,ERPIMAGELINES)*10000, eegtimes , ...
+                        reshape(EEG.icaact(chancompidx,1:erpimageframestot),erpimageframes,ERPIMAGELINES)-offset, ...
+                   ones(1,ERPIMAGELINES)*1000, eegtimes , ...
                          EI_TITLE, ei_smooth, 1, 'caxis', 2/3, 'cbar','yerplabel', '');   
-            else
-                    icaacttmp = reshape(EEG.icaweights(numcompo,:) * EEG.icasphere) ...
-                                     * reshape(EEG.data, erpimageframes, ERPIMAGELINES);
-                    offset = nan_mean(icaacttmp);
-                    erpimage( icaacttmp-offset, ones(1,ERPIMAGELINES)*10000, eegtimes, ...
+            else % if EEG.icaact doesnt exist
+                    icawts = EEG.icaweights * EEG.icasphere;
+                    icaact = icawts(chancompidx,:) * EEG.data(:,1:erpimageframestot);
+                    offset = nan_mean(icaact(:));
+                    icaact = reshape(icaact,erpimageframes,ERPIMAGELINES);
+       size(icaact), size(offset)
+                    erpimage(icaact - offset, ones(1,ERPIMAGELINES)*10000, eegtimes, ...
                          EI_TITLE, ei_smooth, 1, 'caxis', 2/3, 'cbar', 'yerplabel', '');   
             end;
       end
@@ -336,8 +349,8 @@ else
     axes(hhh);
 end;	
 
-% plotting spectrum
-% -----------------
+% plot spectrum
+% -------------
 if exist('winhandle')
 	h = axes('units','normalized', 'position',[5 10 95 35].*s+q);
 else
@@ -346,16 +359,16 @@ end;
 %h = axes('units','normalized', 'position',[45 5 60 40].*s+q);
 try
 	eeglab_options; 
-	if typecomp == 1
-		[spectra freqs] = spectopo( EEG.data(numcompo,:), EEG.pnts, EEG.srate );
-	else 
+	if chancomp == 1 % channel properties
+		[spectra freqs] = spectopo( EEG.data(chancompidx,:), EEG.pnts, EEG.srate );
+	else % 0 == component properties
 		if option_computeica  
-			[spectra freqs] = spectopo( EEG.icaact(numcompo,:), EEG.pnts, EEG.srate, 'mapnorm', EEG.icawinv(:,numcompo) );
-		else
+			[spectra freqs] = spectopo( EEG.icaact(chancompidx,:), EEG.pnts, EEG.srate, 'mapnorm', EEG.icawinv(:,chancompidx) );
+        else % if EEG.icaact doesnt exist
 			if exist('icaacttmp')~=1, 
-				icaacttmp = (EEG.icaweights(numcompo,:)*EEG.icasphere)*reshape(EEG.data, EEG.nbchan, EEG.trials*EEG.pnts); 
+				icaacttmp = (EEG.icaweights(chancompidx,:)*EEG.icasphere)*reshape(EEG.data, EEG.nbchan, EEG.trials*EEG.pnts); 
 			end;
-			[spectra freqs] = spectopo( icaacttmp, EEG.pnts, EEG.srate, 'mapnorm', EEG.icawinv(:,numcompo) );
+			[spectra freqs] = spectopo( icaacttmp, EEG.pnts, EEG.srate, 'mapnorm', EEG.icawinv(:,chancompidx) );
 		end;
 	end;
     % set up new limits
@@ -372,13 +385,12 @@ try
 	title('Activity power spectrum', 'fontsize', 14); 
 catch
 	axis off;
-	text(0.1, 0.3, [ 'Error: no spectrum plotted' 10 ' make sure you have the ' 10 'signal processing toolbox']);
+	text(0.1, 0.3, [ 'Error: no spectrum plotted' 10 ' Make sure you have the ' 10 'Matlab Signal Processing Toolbox']);
 end;	
 	
 % display buttons
 % ---------------
-
-if exist('winhandle')
+if exist('winhandle') % if rejection buttons are to be plotted
 	COLREJ = '[1 0.6 0.6]';
 	COLACC = '[0.75 1 0.75]';
 	% CANCEL button
@@ -391,7 +403,7 @@ if exist('winhandle')
 
 	% REJECT button
 	% -------------
-	status = EEG.reject.gcompreject(numcompo);
+	status = EEG.reject.gcompreject(chancompidx);
 	hr = uicontrol(gcf, 'Style', 'pushbutton', 'backgroundcolor', eval(fastif(status,COLREJ,COLACC)), ...
 				'string', fastif(status, 'REJECT', 'ACCEPT'), 'Units','Normalized', 'Position', [40 -10 15 6].*s+q, 'userdata', status, 'tag', 'rejstatus');
 	command = [ 'set(gcbo, ''userdata'', ~get(gcbo, ''userdata''));' ...
@@ -410,7 +422,7 @@ if exist('winhandle')
 	% ---------
  	command = [ 'global EEG;' ...
  				'tmpstatus = get( findobj(''parent'', gcbf, ''tag'', ''rejstatus''), ''userdata'');' ...
- 				'EEG.reject.gcompreject(' num2str(numcompo) ') = tmpstatus;' ]; 
+ 				'EEG.reject.gcompreject(' num2str(chancompidx) ') = tmpstatus;' ]; 
 	if winhandle ~= 0
 	 	command = [ command ...
 	 				sprintf('if tmpstatus set(%3.15f, ''backgroundcolor'', %s); else set(%3.15f, ''backgroundcolor'', %s); end;', ...
@@ -421,7 +433,7 @@ if exist('winhandle')
 
 	% draw the figure for statistical values
 	% --------------------------------------
-	index = num2str( numcompo );
+	index = num2str( chancompidx );
 	command = [ ...
 		'figure(''MenuBar'', ''none'', ''name'', ''Statistics of the component'', ''numbertitle'', ''off'');' ...
 		'' ...
@@ -456,9 +468,9 @@ if exist('winhandle')
 		set(hval, 'enable', 'off');
 	end;
 	
-	com = sprintf('pop_prop( %s, %d, %d, 0);', inputname(1), typecomp, numcompo );
+	com = sprintf('pop_prop( %s, %d, %d, 0);', inputname(1), chancomp, chancompidx );
 else
-	com = sprintf('pop_prop( %s, %d, %d);', inputname(1), typecomp, numcompo );
+	com = sprintf('pop_prop( %s, %d, %d);', inputname(1), chancomp, chancompidx );
 end;
 
 return;
