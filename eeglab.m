@@ -188,6 +188,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.492  2006/11/15 21:01:37  arno
+% tag for study menu
+%
 % Revision 1.491  2006/10/24 18:30:18  toby
 % Bugzilla bug 80: crashes on some Linux systems, courtesy  Florian Ph.S Fischmeister
 %
@@ -1845,7 +1848,7 @@ catchstrs.new_non_empty          = e_newset;
     % ------------------------------------
     p = which('eeglab.m');
     p = p(1:findstr(p,'eeglab.m')-1);
-    delimiter = p(end); if strcmpi(delimiter, ':'), delmiter = '::'; end;
+    delimiter = p(end); if strcmpi(delimiter, ':'), delimiter = '::'; end;
     path_biosig = [ p '..' delimiter 'biosig' delimiter 't200' ];
     biosigflag = 0;
     if exist(path_biosig) == 7
