@@ -153,6 +153,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.143  2006/11/10 02:47:00  arno
+%remove transformation
+%
 %Revision 1.142  2006/11/10 02:22:28  arno
 %problem with BEM
 %
@@ -1009,8 +1012,8 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             dipstruct.posxyz    = sources(index).posxyz; % Coordinates in spherical space
             outsources(index).eleccoord(dip,:) = [xx yy zz];
             outsources(index).mnicoord(dip,:) = [xxmri yymri zzmri];
-            outsources(index).talcoord(dip,:) = mni2tal([xx yy zz]);
-            dipstruct.talcoord                = mni2tal([xx yy zz]);
+            outsources(index).talcoord(dip,:) = mni2tal([xx yy zz]')';
+            dipstruct.talcoord                = mni2tal([xx yy zz]')';
             
             % copy for output
             % ---------------
