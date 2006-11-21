@@ -122,6 +122,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.67  2006/11/10 01:38:16  arno
+% taking the absolute value of the ERP
+%
 % Revision 1.66  2006/10/02 11:41:41  arno
 % allow conditions to have different ICA
 %
@@ -394,48 +397,24 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
         % -----------------------------------------------------------
         if (strcmpi(strcom,'ersp')  | strcmpi(strcom,'itc') )  
             params = [];
-            for si = 1:size(STUDY.setind,2) % scan datasets that are part of STUDY
-                for cond = 1:size(STUDY.setind,1)
-                    if ~isnan(STUDY.setind(cond,si))
-                        idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index;
-                    
-                        % read spectrum paramters from file
-                        % ---------------------------------
-                        filename = fullfile( ALLEEG(idat).filepath,[ ALLEEG(idat).filename(1:end-3) 'icaersp']);
-                        if exist(filename)
-                            tmp = load('-mat', filename, 'parameters');
-                            params = struct( tmp.parameters{:} );
-                            if  sum(params.cycles ~= cycles) | (padratio ~= params.padratio) | ...
-                                ( (alpha~= params.alpha) & ~( isnan(alpha) & isnan(params.alpha)) )
-                                set_yes = [ 'set(findobj(''parent'', gcbf, ''tag'', ''ersp_no''), ''value'', 0);'];
-                                set_no  = [ 'set(findobj(''parent'', gcbf, ''tag'', ''ersp_yes''), ''value'', 0);' ];
-                                ersp_ans = inputgui('geometry', {[1] [1] [1] [1] [0.5 1] [1]}, 'uilist', ...
-                                                { {'style' 'text' 'string' [upper(strcom) ' info exists for dataset: ' ...
-                                                ALLEEG(idat).filename '. It does not fit requested values. Existing values used these parameters: ' ] } ...
-                                                {'style' 'text' 'string' ['wavelet cycles - [' num2str(params.cycles(1)) ' ' num2str(params.cycles(2)) ...
-                                                '] instead of [' num2str(cycles(1)) ' ' num2str(cycles(2)) '], padratio - ' num2str(params.padratio) ' instead of ' num2str(padratio) ...
-                                                ', and bootstrap significance - ' num2str(params.alpha) ' instead of ' num2str(alpha) ] } {} ...
-                                                {'style' 'text' 'string' ['Would you like to recompute ' upper(strcom) ' and overwrite those values?' ]} ...
-                                                {'style' 'checkbox' 'tag' 'ersp_yes' 'string' 'Yes, recompute' 'value' 1 'Callback' set_yes }  ...
-                                                {'style' 'checkbox' 'tag' 'ersp_no' 'string' 'No, use data file parameters (and existing ERSP info)' 'value' 0 'Callback' set_no } {} },...
-                                                'helpcom', '', 'title', ['Recalculate ' upper(strcom) ' parameters -- part of std_ersp()']); 
-                                if isempty(ersp_ans), return; end;
-                                if find(celltomat(ersp_ans))  == 2 % use existing ERSP info from this dataset
-                                    cycles   = params.cycles;
-                                    alpha    = params.alpha;
-                                    padratio = params.padratio;
-                                else % Over write data in dataset
-                                    delete(filename);
-                                end
-                            else
-                                fprintf('Using %s information available on disk for dataset %d...\n', upper(strcom), idat);
-                            end
-                        end
-                    end
-                end
-            end
+            
+            % check for existing files
+            % ------------------------
+            guimode = 'guion';
+            g.erspparams.alpha    = alpha;
+            g.erspparams.cycles   = cycles;
+            g.erspparams.padratio = padratio;
+            for index = 1:length(STUDY.datasetinfo)
+                
+                filename = fullfile( ALLEEG(index).filepath,[ ALLEEG(index).filename(1:end-3) 'icaersp']);
+                [guimode, g.erspparams] = std_filecheck(filename, g.erspparams, guimode, { 'plotitc' 'plotersp' 'plotphase' });
+                if strcmpi(guimode, 'cancel'), return; end;
+                
+            end;
+            alpha    = g.erspparams.alpha;
+            cycles   = g.erspparams.cycles;
+            padratio = g.erspparams.padratio;
         end
-
         
         % scan datasets
         % -------------
