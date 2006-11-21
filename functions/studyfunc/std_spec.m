@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2006/11/10 00:11:12  arno
+% default specmode is using spectopo
+%
 % Revision 1.27  2006/10/02 11:42:11  arno
 % plotting scalp maps
 %
@@ -199,8 +202,7 @@ else
 end
 if strcmpi(prefix, 'comp') & isempty(TMP.icaact)
     TMP.icaact = (TMP.icaweights*TMP.icasphere)* ...
-        reshape(TMP.data  , [ size(TMP.data,1)   size(TMP.data,2)*size(TMP.data,3) ]);
-    reshape(TMP.data(TMP.icachansind,:,:), [ length(TMP.icachansind) size(TMP.data,2)*size(TMP.data,3) ]);
+        reshape(TMP.data(TMP.icachansind,:,:), [ length(TMP.icachansind) size(TMP.data,2)*size(TMP.data,3) ]);
 end;
 if strcmpi(prefix, 'comp'), X = TMP.icaact;
 else                        X = TMP.data;
