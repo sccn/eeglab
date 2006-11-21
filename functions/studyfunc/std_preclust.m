@@ -122,6 +122,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.68  2006/11/21 21:54:12  arno
+% replacing ERSP file checking
+%
 % Revision 1.67  2006/11/10 01:38:16  arno
 % taking the absolute value of the ERP
 %
@@ -407,7 +410,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
             for index = 1:length(STUDY.datasetinfo)
                 
                 filename = fullfile( ALLEEG(index).filepath,[ ALLEEG(index).filename(1:end-3) 'icaersp']);
-                [guimode, g.erspparams] = std_filecheck(filename, g.erspparams, guimode, { 'plotitc' 'plotersp' 'plotphase' });
+                [guimode, g.erspparams] = std_filecheck(filename, g.erspparams, guimode, { 'plotitc' 'plotersp' 'plotphase' 'freqscale' });
                 if strcmpi(guimode, 'cancel'), return; end;
                 
             end;
