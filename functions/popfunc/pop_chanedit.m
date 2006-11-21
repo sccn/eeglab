@@ -147,6 +147,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.160  2006/11/10 01:58:52  arno
+% text
+%
 % Revision 1.159  2006/11/06 21:45:34  arno
 % fix .nodatchans for fieldtrip compatibility
 %
@@ -1033,7 +1036,7 @@ if nargin < 3
         % ----------------
         params.nosedir = nosevals{tmpval2};
         if ~strcmpi(params.nosedir, oldparams.nosedir)
-            totaluserdat = { totaluserdat 'nosedir' params.nosedir };
+            totaluserdat = { totaluserdat{:} 'nosedir' params.nosedir };
         end;
         close(gcf);
 
