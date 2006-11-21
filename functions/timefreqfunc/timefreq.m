@@ -107,6 +107,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.54  2006/11/16 23:42:47  arno
+% version 1.49
+%
 % Revision 1.49  2006/09/07 18:57:57  scott
 % clarified use of Hanning (FFT) or Morlet (wavelet) tapering -sm
 %
@@ -310,7 +313,7 @@ end
 
 % finding frequency limits
 % ------------------------
-if g.cycles ~= 0 & g.freqs(1) == 0, g.freqs(1) = srate*g.cycles/g.winsize; end;
+if g.cycles(1) ~= 0 & g.freqs(1) == 0, g.freqs(1) = srate*g.cycles/g.winsize; end;
 
 % finding frequencies
 % -------------------
