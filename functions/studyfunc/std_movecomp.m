@@ -129,6 +129,6 @@ function STUDY = rm_centroid(STUDY, clsindex)
     allfields  = fieldnames(STUDY.cluster);
     for index = 1:length(allfields)
         if isempty(strmatch(allfields{index}, keepfields))
-            STUDY.cluster = setfield( STUDY.cluster, { new_clus }, allfields{index});
+            STUDY.cluster = setfield( STUDY.cluster, { clsindex }, allfields{index}, []);
         end;
     end;
