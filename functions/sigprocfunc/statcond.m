@@ -115,6 +115,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2006/11/07 23:11:16  arno
+% implement umpaired t-test, add documentation
+%
 % Revision 1.9  2006/10/03 22:00:58  scott
 % minor help msg edits -sm
 %
@@ -412,8 +415,7 @@ function [a b] = shuffle_paired(a, b); % for increased speed only shuffle half t
         indswap1(tmpind1) = indswap1(tmpind1)-alllen(index);
         indswap2(tmpind2) = indswap2(tmpind2)-alllen(index);
         indtarg1(tmpind1) = indtarg1(tmpind1)+1;
-        indtarg2(tmpind2) = indtarg2(tmpind2)
-+1;
+        indtarg2(tmpind2) = indtarg2(tmpind2)+1;
     end;
     
     % perform swaping
