@@ -60,6 +60,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2006/11/09 22:38:03  arno
+% fix component and subject selection
+%
 % Revision 1.29  2006/10/04 23:46:58  toby
 % Bug fix courtesy Bas de Kruif
 %
@@ -199,7 +202,7 @@ for index = 1:length(allinds)
     
     % plot specific subject
     % ---------------------
-    if ~isempty(opt.subject)
+    if ~isempty(opt.subject) & isempty(opt.comps)
         for c = 1:size(erspbase,1)
             for g = 1:size(erspbase,2)
                 for l=length(setinds{c,g}):-1:1

@@ -67,6 +67,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2006/11/09 22:44:06  arno
+% copying changes to std_specplot
+%
 % Revision 1.28  2006/11/02 21:48:44  arno
 % header
 %
@@ -155,7 +158,7 @@ for index = 1:length(allinds)
 
     % plot specific subject
     % ---------------------
-    if ~isempty(opt.subject)
+    if ~isempty(opt.subject) & isempty(opt.comps)
         for c = 1:size(erpdata,1)
             for g = 1:size(erpdata,2)
                 for l=length(setinds{c,g}):-1:1

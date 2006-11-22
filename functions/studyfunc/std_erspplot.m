@@ -68,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.38  2006/11/15 21:29:39  arno
+% subject index
+%
 % Revision 1.37  2006/11/15 01:59:23  arno
 % dataset typo
 % /
@@ -216,7 +219,7 @@ for index = 1:length(allinds)
 
     % plot specific subject
     % ---------------------
-    if ~isempty(opt.subject)
+    if ~isempty(opt.subject) & isempty(opt.comps)
         for c = 1:size(allersp,1)
             for g = 1:size(allersp,2)
                 for l=length(setinds{c,g}):-1:1
