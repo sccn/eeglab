@@ -101,6 +101,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2006/11/16 00:07:31  arno
+% fix title for topoplot
+%
 % Revision 1.20  2006/11/15 21:58:49  arno
 % plotting titles
 %
@@ -245,7 +248,9 @@ if strcmpi(opt.plotmode, 'condensed')
         leg = {};
         for c = 1:nc
             for g = 1:ng
-                plot( allx, real(mean(mean(data{c,g},2),3)), manycol{(c-1)*ng+g});
+                if ~isempty(data{c,g})
+                    plot( allx, real(mean(mean(data{c,g},2),3)), manycol{(c-1)*ng+g});
+                end;
                 xlim([allx(1) allx(end)]); hold on;
                 if ~isempty(opt.ylim), ylim(opt.ylim); end;
                 if isempty(opt.condnames{c}) | isempty(opt.groupnames{g}), leg{(c-1)*ng+g} = [ opt.condnames{c} opt.groupnames{g} ];
