@@ -254,19 +254,19 @@ if ~isstr(varargin{1})
         count = 2;
         for index1 = 1:length(STUDY.cluster(1).child)
             
-            indclust1 = strmatch( STUDY.cluster(1).child(index1), { STUDY.cluster.name });
+            indclust1 = strmatch( STUDY.cluster(1).child(index1), { STUDY.cluster.name }, 'exact');
             show_options{count} = ['   ' STUDY.cluster(indclust1).name ' (' num2str(length(STUDY.cluster(indclust1).comps))  ' ICs)'];
             cls(count) = indclust1;
             count = count+1;
             
             for index2 = 1:length( STUDY.cluster(indclust1).child )
-                indclust2 = strmatch( STUDY.cluster(indclust1).child(index2), { STUDY.cluster.name });
+                indclust2 = strmatch( STUDY.cluster(indclust1).child(index2), { STUDY.cluster.name }, 'exact');
                 show_options{count} = ['      ' STUDY.cluster(indclust2).name ' (' num2str(length(STUDY.cluster(indclust2).comps))  ' ICs)'];
                 cls(count) = indclust2;
                 count = count+1;
                     
                 for index3 = 1:length( STUDY.cluster(indclust2).child )
-                    indclust3 = strmatch( STUDY.cluster(indclust2).child(index3), { STUDY.cluster.name });
+                    indclust3 = strmatch( STUDY.cluster(indclust2).child(index3), { STUDY.cluster.name }, 'exact');
                     show_options{count} = ['         ' STUDY.cluster(indclust3).name ' (' num2str(length(STUDY.cluster(indclust3).comps))  ' ICs)'];
                     cls(count) = indclust3;
                     count = count+1;
