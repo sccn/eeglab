@@ -101,6 +101,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2006/11/22 19:34:22  arno
+% empty plot
+%
 % Revision 1.21  2006/11/16 00:07:31  arno
 % fix title for topoplot
 %
@@ -190,6 +193,7 @@ opt = finputcheck( varargin, { 'channels'    'cell'   []              {};
                                'ersplim'     'real'   []              []; % same as above
                                'itclim'      'real'   []              []; % same as above
                                'ylim'        'real'   []              [];
+                               'filter'      'real'   []              [];
                                'condnames'   'cell'   []              {};
                                'groupnames'  'cell'   []              {};
                                'compinds'    'cell'   []              {};
@@ -249,7 +253,9 @@ if strcmpi(opt.plotmode, 'condensed')
         for c = 1:nc
             for g = 1:ng
                 if ~isempty(data{c,g})
-                    plot( allx, real(mean(mean(data{c,g},2),3)), manycol{(c-1)*ng+g});
+                    tmpdata = real(mean(mean(data{c,g},2),3));
+                    if ~isempty(opt.filter), tmpdata = eegfiltfft(tmpdata', 1000/(allx(2)-allx(1)), 0, opt.filter); end;
+                    plot( allx, tmpdata, manycol{(c-1)*ng+g});
                 end;
                 xlim([allx(1) allx(end)]); hold on;
                 if ~isempty(opt.ylim), ylim(opt.ylim); end;
@@ -395,11 +401,19 @@ if isempty(opt.plottopo) & ( strcmpi(opt.datatype, 'erp') | strcmpi(opt.datatype
             elseif strcmpi(opt.plotconditions, 'together'), hdl(c,g)=mysubplot(ncplot+addr, ngplot+addc, g, opt.transpose); ci = c;
             else                                      hdl(c,g)=mysubplot(ncplot+addr, ngplot+addc, g + (c-1)*(ngplot+addc), opt.transpose); ci = 1;
             end;
-            if strcmpi(opt.plotsubjects, 'on')
-                tmp = plot( allx, real(data{c,g}), 'k'); set(tmp, 'color', [0.5 0.5 0.5]); hold on;
-                plot( allx, real(mean(mean(data{c,g},2),3)), 'k', 'linewidth', 2);
-            else
-                plot( allx, real(mean(mean(data{c,g},2),3)), col{ci});
+            if ~isempty(data{c,g})
+                if strcmpi(opt.plotsubjects, 'on')
+                    tmpdata = real(data{c,g});
+                    if ~isempty(opt.filter), tmpdata = eegfiltfft(tmpdata', 1000/(allx(2)-allx(1)), 0, opt.filter)'; end;
+                    tmp = plot( allx, tmpdata, 'k'); set(tmp, 'color', [0.5 0.5 0.5]); hold on;
+                    tmpdata = real(mean(mean(data{c,g},2),3));
+                    if ~isempty(opt.filter), tmpdata = eegfiltfft(tmpdata', 1000/(allx(2)-allx(1)), 0, opt.filter); end;
+                    plot( allx, tmpdata, 'k', 'linewidth', 2);
+                else
+                    tmpdata = real(mean(mean(data{c,g},2),3));
+                    if ~isempty(opt.filter), tmpdata = eegfiltfft(tmpdata', 1000/(allx(2)-allx(1)), 0, opt.filter); end;
+                    plot( allx, tmpdata, col{ci});
+                end;
             end;
             xlim([allx(1) allx(end)]); hold on;
             if isempty(opt.ylim)
