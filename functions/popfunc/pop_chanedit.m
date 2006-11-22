@@ -147,6 +147,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.161  2006/11/21 22:43:20  arno
+% debug lookup for BEM file
+%
 % Revision 1.160  2006/11/10 01:58:52  arno
 % text
 %
@@ -1411,11 +1414,12 @@ end;
 if isfield(chans, 'sph_phi_besa'  ), chans = rmfield(chans, 'sph_phi_besa'); end;
 if isfield(chans, 'sph_theta_besa'), chans = rmfield(chans, 'sph_theta_besa'); end;
 if dataset_input, 
-    for index = 1:length(EEG)
+     for index = 1:length(EEG)
         EEG(index).chanlocs = chans; 
-    end; 
-    chansout = EEG;
-else              chansout = chans;
+        EEG(index).chaninfo = params; 
+     end; 
+     chansout = EEG;
+else chansout = chans;
 end;
 return;
 
