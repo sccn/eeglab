@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.65  2005/09/05 21:11:43  scott
+% made 'electrodes' 'off' the default for > 64 channels -sm
+%
 % Revision 1.64  2005/03/31 02:52:39  arno
 % dipole plot
 %
@@ -410,16 +413,16 @@ for index = 1:size(arg2(:),1)
                       select = EEG.dipfit.model(arg2(index)).select;
                 catch select = 0;
                 end;
-                if strcmpi(EEG.dipfit.coordformat, 'MNI') % from MNI to sperical coordinates
-                    transform = pinv( sph2spm );                    
-                    tmpres = transform * [ curpos(1,:) 1 ]'; curpos(1,:) = tmpres(1:3);
-                    tmpres = transform * [ curmom(1,:) 1 ]'; curmom(1,:) = tmpres(1:3);
-                    try, tmpres = transform * [ curpos(2,:) 1 ]'; curpos(2,:) = tmpres(1:3); catch, end;
-                    try, tmpres = transform * [ curmom(2,:) 1 ]'; curmom(2,:) = tmpres(1:3); catch, end;
-                end;
-                curpos = curpos / 85;
                 if ~isempty(curpos)
-                    if size(curpos,1) > 1 & length(select) == 2
+                    if strcmpi(EEG.dipfit.coordformat, 'MNI') % from MNI to sperical coordinates
+                        transform = pinv( sph2spm );                    
+                        tmpres = transform * [ curpos(1,:) 1 ]'; curpos(1,:) = tmpres(1:3);
+                        tmpres = transform * [ curmom(1,:) 1 ]'; curmom(1,:) = tmpres(1:3);
+                        try, tmpres = transform * [ curpos(2,:) 1 ]'; curpos(2,:) = tmpres(1:3); catch, end;
+                        try, tmpres = transform * [ curmom(2,:) 1 ]'; curmom(2,:) = tmpres(1:3); catch, end;
+                    end;
+                    curpos = curpos / 85;
+                   if size(curpos,1) > 1 & length(select) == 2
                         options = { options{:} 'dipole' [ curpos(:,1:2) curmom(:,1:3) ] };
                         dipoleplotted = 1;
                     else
