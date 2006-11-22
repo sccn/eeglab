@@ -68,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.39  2006/11/22 19:43:33  arno
+% cannot select subject and component at the same time
+%
 % Revision 1.38  2006/11/15 21:29:39  arno
 % subject index
 %
@@ -162,7 +165,10 @@ opt.legend = 'off';
 if ~isempty(opt.plottf)
     allersp = cell(size(STUDY.changrp(1).erspdata));
     for ind = 1:length(STUDY.changrp(1).erspdata(:))
-        allersp{ind} = zeros([ size(STUDY.changrp(1).erspdata{1}) length(opt.channels)]);
+        if size(STUDY.changrp(1).erspdata{1},3) == 1
+             allersp{ind} = zeros([ size(STUDY.changrp(1).erspdata{1}) 1 length(opt.channels)]);
+        else allersp{ind} = zeros([ size(STUDY.changrp(1).erspdata{1}) length(opt.channels)]);
+        end;
         for index = 1:length(allinds)
             if ~isempty(opt.channels)
                 allersp{ind}(:,:,:,index)  = STUDY.changrp(allinds(index)).erspdata{ind};
