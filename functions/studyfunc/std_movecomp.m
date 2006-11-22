@@ -128,7 +128,7 @@ function STUDY = rm_centroid(STUDY, clsindex)
     keepfields = { 'name' 'parent' 'child' 'comps' 'sets' 'algorithm' 'preclust' };
     allfields  = fieldnames(STUDY.cluster);
     for index = 1:length(allfields)
-        if isempty(strmatch(allfields{index}, keepfields)
+        if isempty(strmatch(allfields{index}, keepfields))
             STUDY.cluster = setfield( STUDY.cluster, { new_clus }, allfields{index});
         end;
     end;
