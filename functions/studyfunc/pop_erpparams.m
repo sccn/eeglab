@@ -57,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2006/11/10 01:30:21  arno
+% gui size
+%
 % Revision 1.9  2006/11/10 01:28:28  arno
 % GUI size
 %
@@ -104,6 +107,8 @@ if isempty(varargin)
         {'style' 'edit'       'string' num2str(STUDY.etc.erpparams.timerange) 'tag' 'timerange' } ...
         {'style' 'text'       'string' 'Plot limits in uV [low high]'} ...
         {'style' 'edit'       'string' num2str(STUDY.etc.erpparams.ylim) 'tag' 'ylim' } ...
+        {} {} {'style' 'text'       'string' 'Display filter in Hz [high]'} ...
+        {'style' 'edit'       'string' '' 'tag' 'filter' } ...
         {} {'style' 'checkbox'   'string' '' 'value' plotconditions 'enable' enablecond  'tag' 'plotconditions' } ...
         {'style' 'text'       'string' 'Plot conditions on the same panel' 'enable' enablecond } ...
         {} {'style' 'checkbox'   'string' '' 'value' plotgroups 'enable' enablegroup 'tag' 'plotgroups' } ...
@@ -118,7 +123,7 @@ if isempty(varargin)
         {} {'style' 'checkbox'   'string' '' 'value' groupstats 'enable' enablegroup 'tag' 'groupstats' } ...
         {'style' 'text'       'string' 'Compute group statistics' 'enable' enablegroup } };
     
-    geometry = { [ 1 .5 1 .5] [0.1 0.1 1] [0.1 0.1 1] [1] [.7 .8 1 .5] [0.1 0.1 1] [0.1 0.1 1] };
+    geometry = { [ 1 .5 1 .5] [1 0.5  1 0.5] [0.1 0.1 1] [0.1 0.1 1] [1] [.7 .8 1 .5] [0.1 0.1 1] [0.1 0.1 1] };
     
     [out_param userdat tmp res] = inputgui( 'geometry' , geometry, 'uilist', uilist, ...
                                    'helpcom', 'pophelp(''std_erpparams'')', ...
@@ -136,6 +141,7 @@ if isempty(varargin)
     res.timerange = str2num( res.timerange );
     res.ylim      = str2num( res.ylim );
     res.threshold = str2num( res.threshold );
+    res.filter    = str2num( res.filter );
     if isempty(res.threshold),res.threshold = NaN; end;
     if res.statistics == 1, res.statistics  = 'param'; 
     else                    res.statistics  = 'perm'; 
@@ -144,6 +150,7 @@ if isempty(varargin)
     % build command call
     % ------------------
     options = {};
+    if ~strcmpi( res.filter, STUDY.etc.erpparams.filter), options = { options{:} 'filter' res.filter }; end;
     if ~strcmpi( res.plotgroups, STUDY.etc.erpparams.plotgroups), options = { options{:} 'plotgroups' res.plotgroups }; end;
     if ~strcmpi( res.plotconditions , STUDY.etc.erpparams.plotconditions ), options = { options{:} 'plotconditions'  res.plotconditions  }; end;
     if ~strcmpi( res.groupstats, STUDY.etc.erpparams.groupstats), options = { options{:} 'groupstats' res.groupstats }; end;
@@ -189,6 +196,7 @@ end;
 
 function STUDY = default_params(STUDY)
     if ~isfield(STUDY.etc, 'erpparams'), STUDY.etc.erpparams = []; end;
+    if ~isfield(STUDY.etc.erpparams, 'filter'),     STUDY.etc.erpparams.filter = []; end;
     if ~isfield(STUDY.etc.erpparams, 'timerange'),  STUDY.etc.erpparams.timerange = []; end;
     if ~isfield(STUDY.etc.erpparams, 'ylim'     ),  STUDY.etc.erpparams.ylim      = []; end;
     if ~isfield(STUDY.etc.erpparams, 'statistics'), STUDY.etc.erpparams.statistics = 'param'; end;
