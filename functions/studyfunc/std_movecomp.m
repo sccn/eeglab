@@ -103,8 +103,13 @@ for  ci = 1:length(comps)
         STUDY.cluster(new_clus).preclust.preclustdata(sind,:) = STUDY.cluster(new_clus).preclust.preclustdata(:,:);
     end;
 end
-STUDY.cluster(new_clus).centroid = []; %new centroid
+%STUDY.cluster(new_clus).centroid = []; % remove centroid
+STUDY = rm_centroid(STUDY, new_clus);
+STUDY = rm_centroid(STUDY, old_clus);
+
 fprintf('Removing centroid (will have to be recomputed) for cluster %d\n', new_clus);
+fprintf('Removing centroid (will have to be recomputed) for cluster %d\n', old_clus);
+
 % Remove data from old cluster
 % left_comps - are all the components of the cluster after the
 % components that were moved to the new cluster were removed. 
@@ -113,7 +118,17 @@ STUDY.cluster(old_clus).comps = STUDY.cluster(old_clus).comps(left_comps);
 STUDY.cluster(old_clus).sets = STUDY.cluster(old_clus).sets(:,left_comps);
 if ~isempty(STUDY.cluster(old_clus).preclust.preclustdata)
     STUDY.cluster(old_clus).preclust.preclustdata = STUDY.cluster(old_clus).preclust.preclustdata(left_comps,:);
-    STUDY.cluster(old_clus).centroid = []; %new centroid
-    fprintf('Removing centroid (will have to be recomputed) for cluster %d\n', old_clus);
 end;
 disp('Done.');
+
+% remove cluster information
+% --------------------------
+function STUDY = rm_centroid(STUDY, clsindex)
+    
+    keepfields = { 'name' 'parent' 'child' 'comps' 'sets' 'algorithm' 'preclust' };
+    allfields  = fieldnames(STUDY.cluster);
+    for index = 1:length(allfields)
+        if isempty(strmatch(allfields{index}, keepfields)
+            STUDY.cluster = setfield( STUDY.cluster, { new_clus }, allfields{index});
+        end;
+    end;
