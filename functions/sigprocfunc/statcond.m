@@ -115,6 +115,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2006/11/22 18:46:15  arno
+% fix typo
+%
 % Revision 1.10  2006/11/07 23:11:16  arno
 % implement umpaired t-test, add documentation
 %
@@ -400,7 +403,7 @@ function [a b] = shuffle_paired(a, b); % for increased speed only shuffle half t
     % --------
     dims      = size(a);
     a         = a(:)';                
-    alllen    = cellfun('length', a ); % by chance, pick up the last dimension
+    alllen    = cellfun('size', a, myndims(a{1}) ); % by chance, pick up the last dimension
     
     indswap1 = ceil(rand( 1, ceil(sum(alllen)/2) )*sum(alllen)); % origin index (cumulated indices)
     indswap2 = ceil(rand( 1, ceil(sum(alllen)/2) )*sum(alllen)); % origin target
