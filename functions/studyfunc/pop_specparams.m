@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2006/11/23 00:48:13  arno
+% typo
+%
 % Revision 1.10  2006/11/23 00:47:41  arno
 % subject mean buttont
 %
@@ -180,7 +183,8 @@ end;
 
 % scan clusters and channels to remove specdata info if freqrange has changed
 % ----------------------------------------------------------
-if ~isequal(STUDY.etc.specparams.freqrange, TMPSTUDY.etc.specparams.freqrange)
+if ~isequal(STUDY.etc.specparams.freqrange, TMPSTUDY.etc.specparams.freqrange) | ...
+    ~isequal(STUDY.etc.specparams.subtractsubjectmean, TMPSTUDY.etc.specparams.subtractsubjectmean)
     if isfield(STUDY.cluster, 'specdata')
         for index = 1:length(STUDY.cluster)
             STUDY.cluster(index).specdata  = [];
