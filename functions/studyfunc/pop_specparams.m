@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2006/11/10 01:29:49  arno
+% GUI size
+%
 % Revision 1.8  2006/11/04 00:19:43  arno
 % text
 %
@@ -91,7 +94,8 @@ if isempty(varargin)
     threshstr   = fastif(isnan(STUDY.etc.specparams.threshold),'', num2str(STUDY.etc.specparams.threshold));
     plotconditions    = fastif(strcmpi(STUDY.etc.specparams.plotconditions, 'together'), 1, 0);
     plotgroups   = fastif(strcmpi(STUDY.etc.specparams.plotgroups,'together'), 1, 0);
-    statval     = fastif(strcmpi(STUDY.etc.specparams.statistics,'param'), 1, 2);
+    submean      = fastif(strcmpi(STUDY.etc.specparams.subtractsubjectmean,'on'), 1, 0);
+    statval      = fastif(strcmpi(STUDY.etc.specparams.statistics,'param'), 1, 2);
     condstats    = fastif(strcmpi(STUDY.etc.specparams.condstats, 'on'), 1, 0);
     groupstats   = fastif(strcmpi(STUDY.etc.specparams.groupstats,'on'), 1, 0);
     
@@ -100,6 +104,8 @@ if isempty(varargin)
         {'style' 'edit'       'string' num2str(STUDY.etc.specparams.freqrange) 'tag' 'freqrange' } ...
         {'style' 'text'       'string' 'Plot limits [low high]'} ...
         {'style' 'edit'       'string' num2str(STUDY.etc.specparams.ylim) 'tag' 'ylim' } ...
+        {} {'style' 'checkbox'   'string' '' 'value' submean 'tag' 'submean' } ...
+        {'style' 'text'       'string' 'Subtract individual subject mean ERSP' } ...
         {} {'style' 'checkbox'   'string' '' 'value' plotconditions 'enable' enablecond  'tag' 'plotconditions' } ...
         {'style' 'text'       'string' 'Plot conditions on the same panel' 'enable' enablecond } ...
         {} {'style' 'checkbox'   'string' '' 'value' plotgroups 'enable' enablegroup 'tag' 'plotgroups' } ...
@@ -114,7 +120,7 @@ if isempty(varargin)
         {} {'style' 'checkbox'   'string' '' 'value' groupstats 'enable' enablegroup 'tag' 'groupstats' } ...
         {'style' 'text'       'string' 'Compute group statistics' 'enable' enablegroup } };
     
-    geometry = { [ 1 .5 1 .5] [0.1 0.1 1] [0.1 0.1 1] [1] [.7 .8 1 .5] [0.1 0.1 1] [0.1 0.1 1] };
+    geometry = { [ 1 .5 1 .5] [0.1 0.1 1] [0.1 0.1 1] [0.1 0.1 1] [1] [.7 .8 1 .5] [0.1 0.1 1] [0.1 0.1 1] };
     
     [out_param userdat tmp res] = inputgui( 'geometry' , geometry, 'uilist', uilist, ...
                                    'helpcom', 'pophelp(''std_specparams'')', ...
@@ -127,6 +133,7 @@ if isempty(varargin)
     if res.plotgroups & res.plotconditions, warndlg2('Both conditions and group cannot be plotted on the same panel'); return; end;
     if res.groupstats, res.groupstats = 'on'; else res.groupstats = 'off'; end;
     if res.condstats , res.condstats  = 'on'; else res.condstats  = 'off'; end;
+    if res.submean   , res.submean    = 'on'; else res.submean    = 'off'; end;
     if res.plotgroups, res.plotgroups = 'together'; else res.plotgroups = 'apart'; end;
     if res.plotconditions , res.plotconditions  = 'together'; else res.plotconditions  = 'apart'; end;
     res.freqrange = str2num( res.freqrange );
@@ -144,6 +151,7 @@ if isempty(varargin)
     if ~strcmpi( res.plotconditions , STUDY.etc.specparams.plotconditions ), options = { options{:} 'plotconditions'  res.plotconditions  }; end;
     if ~strcmpi( res.groupstats, STUDY.etc.specparams.groupstats), options = { options{:} 'groupstats' res.groupstats }; end;
     if ~strcmpi( res.condstats , STUDY.etc.specparams.condstats ), options = { options{:} 'condstats'  res.condstats  }; end;
+    if ~strcmpi( res.submean   , STUDY.etc.specparams.subtractsubjectmean ), options = { options{:} 'subtractsubjectmean'  res.submean  }; end;
     if ~strcmpi( res.statistics, STUDY.etc.specparams.statistics ), options = { options{:} 'statistics' res.statistics }; end;
     if ~isequal(res.ylim, STUDY.etc.specparams.ylim),           options = { options{:} 'ylim' res.ylim      }; end;
     if ~isequal(res.freqrange, STUDY.etc.specparams.freqrange), options = { options{:} 'freqrange' res.freqrange }; end;
@@ -191,6 +199,7 @@ function STUDY = default_params(STUDY)
     if ~isfield(STUDY.etc.specparams, 'statistics'), STUDY.etc.specparams.statistics = 'param'; end;
     if ~isfield(STUDY.etc.specparams, 'groupstats'),  STUDY.etc.specparams.groupstats = 'off'; end;
     if ~isfield(STUDY.etc.specparams, 'condstats' ),  STUDY.etc.specparams.condstats  = 'off'; end;
+    if ~isfield(STUDY.etc.specparams, 'subtractsubjectmean' ), STUDY.etc.specparams.subtractsubjectmean  = 'off'; end;
     if ~isfield(STUDY.etc.specparams, 'threshold' ), STUDY.etc.specparams.threshold = NaN; end;
     if ~isfield(STUDY.etc.specparams, 'plotgroups') , STUDY.etc.specparams.plotgroups = 'apart'; end;
     if ~isfield(STUDY.etc.specparams, 'plotconditions') ,  STUDY.etc.specparams.plotconditions  = 'apart'; end;
