@@ -101,6 +101,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2006/11/22 20:22:38  arno
+% filter if necessary
+%
 % Revision 1.22  2006/11/22 19:34:22  arno
 % empty plot
 %
@@ -486,8 +489,7 @@ if isempty(opt.plottopo) & ( strcmpi(opt.datatype, 'erp') | strcmpi(opt.datatype
             else                                                           fig_title = [ opt.condnames{c} ', ' opt.groupnames{g} ];
             end;
             if ~isempty(opt.compinds), fig_title = [ 'Comp.' int2str(opt.compinds{c,g}) ', ' fig_title ]; end;
-            if ~isempty(opt.subject),  fig_title = [ opt.subject ', ' fig_title ];
-            end;
+            if ~isempty(opt.subject),  fig_title = [ opt.subject ', ' fig_title ]; end;
             title(fig_title); 
             if strcmpi(leg, 'on') & c == nc & g == ng 
                 if strcmpi(opt.plotgroups, 'together'), legend( opt.groupnames );
