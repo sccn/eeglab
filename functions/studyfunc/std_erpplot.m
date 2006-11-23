@@ -67,6 +67,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2006/11/22 20:06:18  arno
+% filter option
+%
 % Revision 1.30  2006/11/22 19:43:01  arno
 % cannot select subject and component at the same time
 %
@@ -197,10 +200,11 @@ for index = 1:length(allinds)
                 end;
             end;
         end;
+        opt.subject = STUDY.datasetinfo(sets(1)).subject;
     end;
-
+    
     if index == length(allinds), opt.legend = 'on'; end;
-    [pgroup pcond pinter] = std_plot(alltimes, erpdata, 'condnames', STUDY.condition, 'legend', opt.legend, ...
+    [pgroup pcond pinter] = std_plot(alltimes, erpdata, 'condnames', STUDY.condition, 'legend', opt.legend, 'subject', opt.subject, ...
                                       'compinds', comp_names, 'plotmode', opt.plotmode, 'groupnames', STUDY.group, 'plottopo', opt.plottime, 'unitx', 'Hz', ...
                                       'chanlocs', ALLEEG(1).chanlocs, 'plotsubjects', opt.plotsubjects, plotcurveopt{:});
     if length(allinds) > 1, 
