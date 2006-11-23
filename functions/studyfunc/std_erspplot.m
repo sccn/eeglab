@@ -68,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.40  2006/11/22 23:01:07  arno
+% array size for one subject
+%
 % Revision 1.39  2006/11/22 19:43:33  arno
 % cannot select subject and component at the same time
 %
@@ -260,6 +263,7 @@ for index = 1:length(allinds)
                 end;
             end;
         end;
+        opt.subject = STUDY.datasetinfo(sets(1)).subject;
     end;
     
     % plot specific component
