@@ -60,6 +60,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2006/11/23 00:27:40  arno
+% add subject info for components
+%
 % Revision 1.31  2006/11/22 19:41:17  arno
 % cannot select subject and component at the same time
 %
@@ -142,8 +145,8 @@ if ~isempty(opt.plotfreq) & ~isempty(opt.channels)
     opt.channels = { alllocs.labels };
 end;
 if ~isempty(opt.channels)
-     [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'channels', opt.channels, 'infotype', 'spec', 'freqrange', opt.freqrange);
-else [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'clusters', opt.clusters, 'infotype', 'spec', 'freqrange', opt.freqrange);
+     [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'channels', opt.channels, 'infotype', 'spec', 'freqrange', opt.freqrange, 'rmsubjmean', STUDY.etc.specparams.subtractsubjectmean);
+else [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'clusters', opt.clusters, 'infotype', 'spec', 'freqrange', opt.freqrange, 'rmsubjmean', STUDY.etc.specparams.subtractsubjectmean);
 end;
 
 % plot single scalp map
