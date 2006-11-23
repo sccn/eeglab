@@ -5,7 +5,8 @@
 %                  use std_spec() to create it or a pre-clustering function
 %                  (pop_preclust() or std_preclust()) that calls it. 
 % Usage:    
-%         >> [spec, freqs] = std_readspec(ALLEEG, setindx, component, freqrange);  
+%  >> [spec, freqs] = std_readspec(ALLEEG, setindx, component, freqrange, rmsubjmean);  
+%
 % Inputs:
 %   ALLEEG     - a vector of dataset EEG structures (may also be one dataset). 
 %                Must contain the dataset of interest (the 'setindx' below).
@@ -14,6 +15,7 @@
 %   component  - [integer] index of the component in the selected EEG dataset 
 %                for which to return the spectrum
 %   freqrange  - [min max in Hz] frequency range to return
+%   rmsubjmean - [0|1] remove subject mean spectrum (0 is no and is the default)
 %
 % Outputs:
 %   spec      - the log-power spectrum of the requested ICA component in the
@@ -43,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2006/11/10 00:08:43  arno
+% reprogram for channel
+%
 % Revision 1.15  2006/10/04 23:39:49  toby
 % Bug fix courtesy Bas de Kruif
 %
@@ -86,10 +91,13 @@
 % use fullfile
 %
 
-function [X, f] = std_readspec(ALLEEG, abset, comp, freqrange);
+function [X, f] = std_readspec(ALLEEG, abset, comp, freqrange, rmsubjmean);
 
 if nargin < 4
     freqrange = [];
+end;
+if nargin < 5
+    rmsubjmean = 0;
 end;
     
 X = [];
@@ -122,12 +130,16 @@ end;
 
 for k=1:length(inds)
     try,
-        erpstruct = load( '-mat', filename, [ prefix int2str(inds(k)) ], 'freqs' );
+        if rmsubjmean == 0
+             erpstruct = load( '-mat', filename, [ prefix int2str(inds(k)) ], 'freqs' );
+        else erpstruct = load( '-mat', filename, [ prefix int2str(inds(k)) ], 'freqs', 'average_spec' );
+        end;
     catch
         error( [ 'Cannot read file ''' filename '''' ]);
     end;
 
     tmpdat    = getfield(erpstruct, [ prefix int2str(inds(k)) ]);
+    if rmsubjmean, tmpdat = tmpdat - erpstruct.average_spec; end;
     if k == 1
         X = zeros(length(comp), length(tmpdat));
     end;

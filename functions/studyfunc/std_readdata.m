@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2006/11/15 21:52:14  arno
+% reading baseline ERSP if spectrum absent
+%
 % Revision 1.14  2006/11/09 22:38:08  arno
 % fix spectrum loading
 %
@@ -119,6 +122,7 @@ opt = finputcheck( varargin, { 'condition'  'cell'    []       {};
                              'group'      'cell'    []       {};
                              'statmode'   'string'  { 'subjects' 'individual' 'common' 'trials' }       'individual';
                              'subbaseline' 'string'  { 'on' 'off' }       'on';
+                             'rmsubjmean'  'string'  { 'on' 'off' }       'on';
                              'infotype'   'string'  { 'erp' 'spec' 'ersp' 'itc' } 'erp' }, 'std_readdata');
 if isstr(opt), error(opt); end;
 if strcmpi(opt.infotype, 'erp'),
@@ -261,7 +265,7 @@ for ind = 1:length(finalinds)
                     for g = 1:ng
                         for indtmp = 1:length(allinds{c,g})
                             if strcmpi(filetype, 'spec')
-                                [ tmpspec allfreqs ] = std_readspec( ALLEEG, setinds{c,g}(indtmp), allinds{c,g}(indtmp), opt.freqrange);
+                                [ tmpspec allfreqs ] = std_readspec( ALLEEG, setinds{c,g}(indtmp), allinds{c,g}(indtmp), opt.freqrange, strcmpi(opt.rmsubjmean, 'on'));
                                 allspec{c, g}(:,indtmp) = tmpspec(:);
                             else
                                 [ tmpersp allfreqs alltimes tmpparams tmpspec] = std_readersp( ALLEEG, setinds{c,g}(indtmp), allinds{c,g}(indtmp), [], opt.freqrange);
