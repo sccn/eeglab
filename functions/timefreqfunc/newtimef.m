@@ -254,10 +254,11 @@
 %                     (in StretchRefs) should be overplotted on the ERSP and ITC.
 %
 %
-% Copyright (C) 1998 Sigurd Enghoff, Scott Makeig
-% first built as timef.m at CNL / Salk Institute 8/1/98-8/28/01
-% SCCN/INC/UCSD/ recast as newtimef -Arno Delorme
-% SCCN/INC/UCSD/ added time warping -Jean Hausser
+% Copyright (C) 1998- Arnaud Delorme, Scott Makeig
+% first built as timef.m at CNL / Salk Institute 8/1/98-8/28/01 by
+% Sigurd Enghoff and Scott Makeig, edited by Arnaud Delorme
+% SCCN/INC/UCSD/ reprogrammed as newtimef -Arnaud Delorme 2002-
+% SCCN/INC/UCSD/ added time warping capabilities -Jean Hausser 2005
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -274,6 +275,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.114  2006/11/16 23:41:39  arno
+% version 1.112
+%
 % Revision 1.112  2006/11/08 23:14:20  scott
 % narrowed allowable window for timewarping (epoch ends - 2 frames)
 %
