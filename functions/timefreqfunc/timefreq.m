@@ -10,26 +10,31 @@
 %
 % Optional inputs:
 %       'cycles'  = [0] Use FFTs and Hanning window tapering.  {default: 0}
-%                 = [real positive scalar] Number of cycles in each Morlet
+%                   or [real positive scalar] Number of cycles in each Morlet
 %                   wavelet, constant across frequencies.
-%                 = [cycles(1) cycles(2)] wavelet cycles increase with frequency
+%                   or [cycles(1) cycles(2)] wavelet cycles increase with frequency
 %                   starting at cycles(1) and, 
 %                   if cycles(2) > 1, increasing to cycles(2) at
 %                   the upper frequency,
 %                   if cycles(2) < 1, increasing by a factor of cycles(2),
 %                   or if cycles(2) = 1, not increasing (same as giving
 %                   only one value for 'cycles').
-%       'wavelet'   DEPRECATED, please use 'cycles'
-%                   For multitaper options, see timef().
-%       'wletmethod' = ['dftfilt2'|'dftfilt2_rey'] Wavelet method/program to use.
-%                   {default: 'dftfilt2_rey'}
-%                   'dftfilt2_rey' Morlet wavelet or Hanning DFT
-%                   'dftfilt2' Morlet-variant or Hanning DFT.
+%       'wavelet' = DEPRECATED, please use 'cycles'. This function does not 
+%                   support multitaper. For multitaper, use timef().
+%       'wletmethod' = ['dftfilt2'|'dftfilt3'] Wavelet method/program to use.
+%                   {default: 'dftfilt2'}
+%                   'dftfilt'  DEPRECATED. Method used in regular timef()
+%                              program. Not available any more.
+%                   'dftfilt2' Morlet-variant or Hanning DFT (calls dftfilt2()
+%                              to generate wavelets).
+%                   'dftfilt3' Morlet wavelet or Hanning DFT (exact Tallon 
+%                              Baudry although not thoroughly tested). Calls
+%                              dftfilt3().
 %                   Note that there are differences betweeen the Hanning
 %                   DFTs in the two programs.
-%       'cycleinc'  ['linear'|'log'] increase mode if [min max] cycles is
+%       'cycleinc' = ['linear'|'log'] increase mode if [min max] cycles is
 %                   provided in 'cycle' parameter. {default: 'linear'}
-%                   Applies only to dftfilt2_rey.
+%                   Applies only to dftfilt3.
 % Optional ITC type:
 %        'type'   = ['coher'|'phasecoher'] Compute either linear coherence
 %                   ('coher') or phase coherence ('phasecoher') also known
@@ -72,9 +77,9 @@
 %                   Note that for obtaining 'log' spaced freqs using FFT,
 %                   closest correspondant frequencies in the 'linear' space
 %                   are returned.
-%     'wletmethod'= ['dftfilt2'|'dftfilt2_rey'] Wavelet method/program to use.
-%                   Default is 'dftfilt2_rey'
-%                   'dftfilt2_rey' Morlet wavelet or Hanning DFT
+%     'wletmethod'= ['dftfilt2'|'dftfilt3'] Wavelet method/program to use.
+%                   Default is 'dftfilt3'
+%                   'dftfilt3' Morlet wavelet or Hanning DFT
 %                   'dftfilt2' Morlet-variant or Hanning DFT.
 %                   Note that there are differences betweeen the Hanning
 %                   DFTs in the two programs.
@@ -127,6 +132,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.56  2006/11/27 23:23:44  arno
+% revert version 1.53
+%
 % Revision 1.53  2006/10/11 02:54:52  toby
 % timewarp bug fix
 %
@@ -319,7 +327,7 @@ g = finputcheck(varargin, ...
     'itctype'       'string'   {'phasecoher' 'phasecoher2' 'coher'}  'phasecoher'; ...
     'subitc'        'string'   {'on' 'off'}  'off'; ...
     'timestretch'   'cell'     []                        {}; ...
-    'wletmethod'    'string'   {'dftfilt2' 'dftfilt2_rey'}    'dftfilt2_rey'; ...
+    'wletmethod'    'string'   {'dftfilt2' 'dftfilt3'}    'dftfilt2'; ...
     'cycleinc'      'string'   {'linear' 'log'}         'linear'
     });
 if isstr(g), error(g); end;
@@ -414,12 +422,15 @@ else % %%%%%%%%%%%%%%%%%% Constant-Q (wavelet) DFTs %%%%%%%%%%%%%%%%%%%%%%%%%%%%
             g.cycles = [ g.cycles(1) g.cycles(1)*g.freqs(end)/g.freqs(1)*(1-g.cycles(2))];
         end
         fprintf('Using %g cycles at lowest frequency to %g at highest.\n', g.cycles(1), g.cycles(2));
-    else fprintf('Using %d cycles at all frequencies.\n',g.cycles);
+    elseif length(g.cycles) == 1
+        fprintf('Using %d cycles at all frequencies.\n',g.cycles);
+    else
+        fprintf('Using user-defined cycle for each frequency\n',g.cycles);
     end
     if strcmp(g.wletmethod, 'dftfilt2')
         g.win    = dftfilt2(g.freqs,g.cycles,srate, g.freqscale); % uses Morlet taper by default
-    elseif strcmp(g.wletmethod, 'dftfilt2_rey')     % Default
-        g.win    = dftfilt2_rey(g.freqs,g.cycles,srate); % uses Morlet taper by default
+    elseif strcmp(g.wletmethod, 'dftfilt3')     % Default
+        g.win    = dftfilt3(g.freqs,g.cycles,srate); % uses Morlet taper by default
     else return
     end
     g.winsize = 0;
