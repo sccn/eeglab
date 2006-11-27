@@ -1,7 +1,7 @@
-% dftfilt2_rey() - discrete complex wavelet filters
+% dftfilt3() - discrete complex wavelet filters
 %
 % Usage:
-%   >> [wavelet,cycles,freqresol,timeresol] = dftfilt2_rey( freqs, cycles, srate, varargin)
+%   >> [wavelet,cycles,freqresol,timeresol] = dftfilt3( freqs, cycles, srate, varargin)
 %
 % Inputs:
 %   freqs    - vector of frequencies of interest. 
@@ -52,6 +52,9 @@
 
 %
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2006/10/27 23:23:23  toby
+% Doc edit, courtesy Diane
+%
 % Revision 1.1  2006/09/28 01:05:51  toby
 % Initial revision
 %
@@ -94,7 +97,7 @@
 % Initial revision
 %
 
-function [wavelet,cycles,freqresol,timeresol] = dftfilt2_rey( freqs, cycles, srate, varargin);
+function [wavelet,cycles,freqresol,timeresol] = dftfilt3( freqs, cycles, srate, varargin);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Rey fixed all input parameter sorting. 
