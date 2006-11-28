@@ -180,7 +180,7 @@
 %       'plotersp'  = ['on'|'off'] Plot power spectral perturbations    {'on'}
 %       'plotitc'   = ['on'|'off'] Plot inter trial coherence           {'on'}
 %       'plotphasesign' = ['on'|'off'] Plot phase sign in the inter trial coherence {'on'}
-%       'plotphase' = ['on'|'off'] Plot ITC phase instead of ITC amplitude {'off'}
+%       'plotphaseonly' = ['on'|'off'] Plot ITC phase instead of ITC amplitude {'off'}
 %       'erspmax'   = [real dB] set the ERSP max. for the color scale (min= -max) {auto}
 %       'itcmax'    = [real] set the ITC image maximum for the color scale {auto}
 %       'hzdir'     = ['up' or 'normal'|'down' or 'reverse'] Direction of
@@ -275,6 +275,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.118  2006/11/28 21:01:30  arno
+% header typo
+%
 % Revision 1.117  2006/11/27 23:22:45  arno
 % revert version 1.115
 %
@@ -954,8 +957,9 @@ g = finputcheck(varargin, ...
     'newfig'        'string'    {'on','off'} 'on'; ...
     'type'          'string'    {'coher','phasecoher','phasecoher2'}  'phasecoher'; ...
     'phsamp'        'string'    {'on','off'} 'off'; ...  % phsamp not completed - Toby 9.28.2006
-    'plotphase'     'string'    {'on','off'} 'off'; ...
+    'plotphaseonly' 'string'    {'on','off'} 'off'; ...
     'plotphasesign' 'string'    {'on','off'} 'on'; ...
+    'plotphase'     'string'    {'on','off'} 'on'; ... % same as above for backward compatibility
     'outputformat'  'string'    {'old','new'} 'new'; ...
     'itcmax'        'real'      []           []; ...
     'erspmax'       'real'      []           []; ...
@@ -989,10 +993,10 @@ g.AXES_FONT        = AXES_FONT;      % axes text FontSize
 g.TITLE_FONT       = TITLE_FONT;
 g.ERSP_CAXIS_LIMIT = ERSP_CAXIS_LIMIT;
 g.ITC_CAXIS_LIMIT  = ITC_CAXIS_LIMIT;
+if ~strcmpi(g.plotphase, 'on'), g.plotphasesign = g.plotphase; end;
 
 % unpack 'timewarp' (and undocumented 'timewarpfr') arguments
 %------------------------------------------------------------
-
 if isfield(g,'timewarpfr')
     if iscell(g.timewarpfr) & length(g.timewarpfr) > 3
         error('undocumented ''timewarpfr'' cell array may have at most 3 elements');
@@ -1827,8 +1831,8 @@ switch lower(g.plotitc)
         h(6) = subplot('Position',[.1 ordinate2 .9 height].*s+q); % ITC image
         set(h(1), 'tag', 'itc');
 
-        if abs(R(1,1)-1) < 0.0001, g.plotphase = 'on'; end;
-        if strcmpi(g.plotphase, 'on')
+        if abs(R(1,1)-1) < 0.0001, g.plotphaseonly = 'on'; end;
+        if strcmpi(g.plotphaseonly, 'on')
             RR = Rangle/pi*180;
         else
             RR = R;
@@ -1851,7 +1855,7 @@ switch lower(g.plotitc)
             coh_caxis = g.ITC_CAXIS_LIMIT*[-1 1];
         end
 
-        if strcmpi(g.plotphase, 'on')
+        if strcmpi(g.plotphaseonly, 'on')
             if ~strcmpi(g.freqscale, 'log')
                 imagesc(times,freqs,RR(:,:)); % <---
             else
@@ -1910,7 +1914,7 @@ switch lower(g.plotitc)
         if setylim
             set(h(8),'YLim',[0 g.itcmax(2)]);
         end;
-        if strcmpi(g.plotphase, 'on')
+        if strcmpi(g.plotphaseonly, 'on')
             title('ITC phase')
         else
             title('ITC')
@@ -2092,8 +2096,8 @@ if strcmpi(g.plotitc, 'on')
     %
     if strcmpi(g.plotersp, 'on'), subplot(2,1,2); end;
     set(gca, 'tag', 'itc');
-    if abs(R(1,1)-1) < 0.0001, g.plotphase = 'on'; end;
-    if strcmpi(g.plotphase, 'on') % plot ITC phase instead of amplitude (e.g. for continuous data)
+    if abs(R(1,1)-1) < 0.0001, g.plotphaseonly = 'on'; end;
+    if strcmpi(g.plotphaseonly, 'on') % plot ITC phase instead of amplitude (e.g. for continuous data)
         RR = Rangle/pi*180;
     else RR = R;
     end;
