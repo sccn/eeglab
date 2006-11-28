@@ -180,7 +180,7 @@
 %       'plotersp'  = ['on'|'off'] Plot power spectral perturbations    {'on'}
 %       'plotitc'   = ['on'|'off'] Plot inter trial coherence           {'on'}
 %       'plotphasesign' = ['on'|'off'] Plot phase sign in the inter trial coherence {'on'}
-%       'plotphase' = ['on'|'off'] Plot ITC phase instead ofITC amplitude {'off'}
+%       'plotphase' = ['on'|'off'] Plot ITC phase instead of ITC amplitude {'off'}
 %       'erspmax'   = [real dB] set the ERSP max. for the color scale (min= -max) {auto}
 %       'itcmax'    = [real] set the ITC image maximum for the color scale {auto}
 %       'hzdir'     = ['up' or 'normal'|'down' or 'reverse'] Direction of
@@ -275,6 +275,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.117  2006/11/27 23:22:45  arno
+% revert version 1.115
+%
 % Revision 1.115  2006/11/24 23:42:43  arno
 % *** empty log message ***
 %
