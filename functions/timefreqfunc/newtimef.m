@@ -275,6 +275,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.119  2006/11/28 21:05:27  arno
+% backward compatibility
+%
 % Revision 1.118  2006/11/28 21:01:30  arno
 % header typo
 %
@@ -1794,18 +1797,7 @@ switch lower(g.plotersp)
                 divs = linspace(log(freqs(1)), log(freqs(end)), 10);
                 set(gca, 'xtickmode', 'manual');
                 divs = ceil(exp(divs)); divs = unique(divs); % ceil is critical here, round might misalign
-                % out-of border label with within border ticks
-                if strcmp(g.hzdir,'reverse')
-                    set(gca, 'xtick', divs);
-                    divs
-                else
-                    dd = zeros(size(divs));
-                    for d = 1:length(dd)
-                        dd(d) = divs(length(divs)+1-d);
-                    end
-                    set(gca, 'xtick', dd);
-                    dd
-                end
+                set(gca, 'xtick', divs);
             end;
             set(h(5),'TickLength',[0.020 0.025]);
             set(h(5),'View',[90 90])
@@ -1984,17 +1976,8 @@ switch lower(g.plotitc)
             divs = linspace(log(freqs(1)), log(freqs(end)), 10);
             set(gca, 'xtickmode', 'manual');
             divs = ceil(exp(divs)); divs = unique(divs); % ceil is critical here, round might misalign
-            % out-of border label with within border ticks
-            if strcmp(g.hzdir,'reverse')
-                set(gca, 'xtick', divs);
-            else
-                dd = zeros(size(divs));
-                for d = 1:length(dd)
-                    dd(d) = divs(length(divs)+1-d);
-                end
-                set(gca, 'xtick', dd);
-            end
-        end;
+            set(gca, 'xtick', divs);
+         end;
 
         % ITC plot details
         tick = get(h(11),'YTick');
