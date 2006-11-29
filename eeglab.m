@@ -26,6 +26,7 @@
 %        2) To redaw and update the EEGLAB interface, type
 %            >> eeglab redraw    % Scans for non-empty datasets
 %            >> eeglab rebuild   % Closes and rebuilds the EEGLAB window
+%            >> eeglab versions  % State EEGLAB version number
 %
 %   >> type "license.txt" % the GNU public license
 %   >> web http://sccn.ucsd.edu/eeglab/tutorial/ % the EEGLAB tutorial
@@ -188,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.493  2006/11/20 18:48:39  arno
+% fix typo in delimiter
+%
 % Revision 1.492  2006/11/15 21:01:37  arno
 % tag for study menu
 %
@@ -1732,7 +1736,7 @@ if nargin < 1 | exist('EEG') ~= 1
 end;
 
 if nargin == 1
-	if strcmp(onearg, 'verions')
+	if strcmp(onearg, 'versions')
         disp( [ 'EEGLAB v' EEGLAB_VERSION ] );
 	elseif strcmp(onearg, 'nogui')
         if nargout < 1, clear ALLEEG; end; % do not return output var
