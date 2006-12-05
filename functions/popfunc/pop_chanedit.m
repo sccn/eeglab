@@ -147,6 +147,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.162  2006/11/22 18:50:02  arno
+% fix chaninfo update from command line
+%
 % Revision 1.161  2006/11/21 22:43:20  arno
 % debug lookup for BEM file
 %
@@ -661,6 +664,7 @@ end;
 
 % insert "no data channels" in channel structure
 % ----------------------------------------------
+nbchan = length(chans);
 if isfield(params, 'nodatchans')
     if ~isempty(params.nodatchans)
         chanlen = length(chans);
@@ -682,7 +686,6 @@ if isfield(params, 'nodatchans')
     end;
 end;
 
-nbchan = length(chans);
 allfields = { 'labels' 'theta' 'radius' 'X' 'Y' 'Z' 'sph_theta' 'sph_phi' 'sph_radius' 'type' 'urchan' };
 
 if isfield(chans, 'shrink')
@@ -1004,7 +1007,7 @@ if nargin < 3
 		% ----------------
 		if strcmp(returnmode, 'retuninginputui')
 			ingui = 0;
-            [tmpchans tmpfid] = getfid(chans);            
+            [tmpchans tmpfid] = getfid(chans);
 			if nbchan ~= 0 & nbchan ~= length(tmpchans)
 				if ~popask(strvcat(['The number of data channel (' int2str(length(tmpchans)) ') not including fiducials does not'], ...
 								  ['correspond to the initial number of channel (' int2str(nbchan) '), so for consistency purposes'], ...
