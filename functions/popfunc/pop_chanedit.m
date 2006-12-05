@@ -147,6 +147,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.163  2006/12/05 21:40:53  arno
+% fixing warning message nbchan difference...
+%
 % Revision 1.162  2006/11/22 18:50:02  arno
 % fix chaninfo update from command line
 %
@@ -1416,6 +1419,8 @@ end;
 
 if isfield(chans, 'sph_phi_besa'  ), chans = rmfield(chans, 'sph_phi_besa'); end;
 if isfield(chans, 'sph_theta_besa'), chans = rmfield(chans, 'sph_theta_besa'); end;
+[chans params.nodatchans] = getfid(chans);
+if isempty(params.nodatchans), params = rmfield(params, 'nodatchans'); end;
 if dataset_input, 
      for index = 1:length(EEG)
         EEG(index).chanlocs = chans; 
