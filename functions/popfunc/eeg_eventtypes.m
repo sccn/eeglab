@@ -28,8 +28,10 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
+%
+%
+% event types can be numbers, Stefan Debener, 05/12/2006, 
+%
 
 function [types,numbers] = eeg_eventtypes(EEG)
 
@@ -48,7 +50,11 @@ end
 nevents = length(EEG.event);
 alltypes = cell(nevents,1);
 for k=1:nevents
+    if isnumeric(EEG.event(k).type)
+           alltypes{k} = num2str(EEG.event(k).type);
+    else
    alltypes{k} = EEG.event(k).type;
+    end
 end
 [types i j] = unique(alltypes);
 
