@@ -4,7 +4,7 @@
 % >> [ laplac ] = del2map( map, filename, draw );
 %
 % Inputs:
-%    map        - level of activity (size: nbelectrodes * nbChannel)
+%    map        - level of activity (size: nbChannel)
 %    filename	- filename (.loc file) countaining the coordinates
 %                 of the electrodes, or array countaining complex positions 		 
 %    draw       - integer, if not nul draw the gradient (default:0)
@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2006/01/22 00:09:58  arno
+% header message
+%
 % Revision 1.4  2004/05/18 18:58:56  arno
 % allowing to process different maps
 %
@@ -124,8 +127,6 @@ for i=1:size(map,2)
 		title( int2str(i) );
 	end;
 end;                                                             %
-plot(y, x, 'x', 'Color', 'black', 'markersize', 5); hold on
-contour(Xi, Yi, sumLaplac2D); hold off;
 
 return;
 
