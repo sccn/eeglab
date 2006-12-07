@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2006/11/10 01:42:32  arno
+% set changrp to empty
+%
 % Revision 1.35  2006/11/08 22:37:02  arno
 % history, test if studywasempty
 %
@@ -192,7 +195,6 @@ end;
 % set cluster array if empty
 % --------------------------
 if ~isfield(STUDY, 'cluster'), STUDY.cluster = []; modif = 1; end;
-if ~isfield(STUDY, 'changrp'), STUDY.changrp = []; modif = 1; end;
 if isempty(STUDY.cluster)
     modif = 1; 
     [STUDY] = std_createclust(STUDY, ALLEEG, 'ParentCluster');
@@ -215,6 +217,14 @@ else
             modif = 1; 
         end;
     end;    
+end;
+
+% make channel groups
+% -------------------
+if ~isfield(STUDY, 'changrp'), STUDY.changrp = []; modif = 1; end;
+if isempty(STUDY, 'changrp')
+  STUDY = std_changroup(STUDY, ALLEEG);
+  modif = 1; 
 end;
 
 % determine if there has been any change
