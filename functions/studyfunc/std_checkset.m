@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.38  2006/12/07 22:07:23  arno
+% changrp check
+%
 % Revision 1.37  2006/12/07 20:22:02  arno
 % make changrp by default
 %
@@ -225,10 +228,10 @@ end;
 % make channel groups
 % -------------------
 if ~isfield(STUDY, 'changrp'), STUDY.changrp = []; modif = 1; end;
-if isempty(STUDY.changrp)
-  STUDY = std_changroup(STUDY, ALLEEG);
-  modif = 1; 
-end;
+%if isempty(STUDY.changrp)
+%  STUDY = std_changroup(STUDY, ALLEEG);
+%  modif = 1; 
+%end;
 
 % determine if there has been any change
 % --------------------------------------
