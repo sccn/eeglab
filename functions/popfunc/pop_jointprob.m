@@ -76,6 +76,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2006/01/31 20:20:26  arno
+% options
+%
 % Revision 1.22  2004/05/07 22:09:37  arno
 % debug rejecttrials
 %
@@ -233,13 +236,7 @@ if icacomp == 1
 	tmpdata = reshape(tmpdata, size(tmpdata,1), size(tmpdata,2)*size(tmpdata,3));
 	[ EEG.stats.jp rej ] = jointprob( tmpdata, globthresh, EEG.stats.jp, 1); 
 else
-	eeglab_options; % changed from eeglaboptions 3/30/02 -sm
-	if option_computeica  
-	    tmpdata = EEG.icaact;
-	else
-        tmpdata = (EEG.icaweights*EEG.icasphere)*reshape(EEG.data, EEG.nbchan, EEG.trials*EEG.pnts);
-        tmpdata = reshape( tmpdata, size(tmpdata,1), EEG.pnts, EEG.trials);
-    end;
+  tmpdata = eeg_getica(EEG);
 	fprintf('Computing joint probability for components...\n');
     if isempty(EEG.stats.icajpE)
 		[ EEG.stats.icajpE rejE ] = jointprob( tmpdata, locthresh, EEG.stats.icajpE, 1); 
