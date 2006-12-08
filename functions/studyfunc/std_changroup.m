@@ -34,6 +34,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2006/12/08 19:40:49  arno
+% error for duplicate channel label
+%
 % Revision 1.2  2006/11/15 22:55:46  arno
 % last channel problem
 %
@@ -80,7 +83,7 @@ function changrp = std_chanlookup( STUDY, ALLEEG, changrp);
 
             for indc = 1:length(changrp.channels)
                 ind = strmatch( changrp.channels(indc), tmplocs, 'exact');
-                if length(ind) > 1, error([ 'Duplicate channel label ''' tmplocs(ind(1)) ''' for dataset ' int2str(datind) ]); end;
+                if length(ind) > 1, error([ 'Duplicate channel label ''' tmplocs{ind(1)} ''' for dataset ' int2str(datind) ]); end;
                 if ~isempty(ind)
                     changrp.chaninds(ir,ic) = ind;
                 end;
