@@ -29,6 +29,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2006/09/12 16:49:34  arno
+% Initial revision
+%
 
 % union of two channel location structure
 % without loosing the order information
@@ -50,7 +53,7 @@ function alllocs = myunion(locs1, locs2)
            count3 = count3 + 1;
        elseif count2 > length(locs2)
            alllocs(count3) = locs1(count1);
-           count2 = count1 + 1;
+           count1 = count1 + 1;
            count3 = count3 + 1;
        elseif strcmpi(labs1(count1), labs2(count2))
            alllocs(count3) = locs1(count1);
