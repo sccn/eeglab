@@ -76,6 +76,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2006/01/31 20:15:23  arno
+% option
+%
 % Revision 1.19  2004/05/07 22:08:11  arno
 % debug GUI call
 %
@@ -226,13 +229,7 @@ else
 	fprintf('Computing joint probability for components...\n');
     % test if ICA was computed
     % ------------------------
-    eeglab_options; % changed from eeglaboptions 3/30/02 -sm
- 	if option_computeica  
-    	icaacttmp = EEG.icaact;
-	else
-        icaacttmp = (EEG.icaweights*EEG.icasphere)*reshape(EEG.data, EEG.nbchan, EEG.trials*EEG.pnts);
-        icaacttmp = reshape( icaacttmp, size(icaacttmp,1), EEG.pnts, EEG.trials);
-    end;
+    icaacttmp = eeg_getica(EEG);
     if isempty(EEG.stats.icakurtE )
 		[ EEG.stats.icakurtE rejE ] = rejkurt( icaacttmp, locthresh, EEG.stats.icakurtE, 1); 
 	end;
