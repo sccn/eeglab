@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.201  2006/11/06 21:18:47  arno
+% remove the +Y noze direction
+%
 % Revision 1.200  2006/05/10 14:37:10  arno
 % nothing
 %
@@ -1541,6 +1544,14 @@ if ~isempty( EEG.chanlocs )
         EEG.chanlocs = rmfield( EEG.chanlocs, 'shrink');
     end;
 
+    % check if duplicate channel label
+    % --------------------------------
+    if isfield(EEG.chanlocs, 'labels')
+      if length( { EEG.chanlocs.labels } ) > length( unique({ EEG.chanlocs.labels } ) )
+        disp('Warning: some channels have the same label');
+      end;
+    end;
+    
     % force Nosedir to +X
     % -------------------
     if isfield(EEG.chaninfo, 'nosedir')
