@@ -1,13 +1,26 @@
-% eeg_eventtypes()  - find closest channels in a larger EEGLAB chanlocs structure
-%                     to channels in a smaller chanlocs structure
+% eeg_eventtypes()  - return a list of event or urevent types in a dataset and 
+%                     the respective number of events of each type. Ouput event 
+%                     or urevent types are sorted in reverse order of their number.
+%                     If no outputs, print this list on the commandline instead.
 % Usage:
 %        >> [types,numbers] = eeg_eventtypes(EEG);
+%        >> [types,numbers] = eeg_eventtypes(EEG,types);
+%        >> [types,numbers] = eeg_eventtypes(EEG,'urevents',types);
 % Inputs:
 %        EEG        - EEGLAB dataset structure
-%                     produce illustrative plots of the BIG and small locations}
+%        'urevents' - return event information for the EEG.urevent structure
+%        types      - {cell array} of event types to return or print.
 % Outputs:
 %        types      - cell array of event type strings
 %        numbers    - vector giving the numbers of each event type in the data
+%
+% Examples:
+%           >> eeg_eventtypes(EEG);       % print histogram of event types
+%           >> eeg_eventtypes(EEG,'urevent');  % print hist. of urevent types
+%           >> eeg_eventtypes(EEG,{'rt'});% print number of 'rt' events 
+%           >> eeg_eventtypes(EEG,'urevent',{'rt','break'}); 
+%                                         % print numbers of 'rt' and 'break' 
+%                                         % type urevents 
 %
 % Author: Scott Makeig, SCCN/INC/UCSD, April 28, 2004
 
@@ -31,9 +44,9 @@
 %
 %
 % event types can be numbers, Stefan Debener, 05/12/2006, 
-%
+% added 2nd and 3rd args, sorted outputs by number, Scott Makeig, 09/12/06
 
-function [types,numbers] = eeg_eventtypes(EEG)
+function [types,numbers] = eeg_eventtypes(EEG,arg2,arg3)
 
 if nargin< 1
    help eeg_eventtypes
@@ -47,30 +60,86 @@ if ~isfield(EEG,'event')
    error('EEG.event field not found');
 end
 
-nevents = length(EEG.event);
-alltypes = cell(nevents,1);
-for k=1:nevents
-    if isnumeric(EEG.event(k).type)
-           alltypes{k} = num2str(EEG.event(k).type);
-    else
-   alltypes{k} = EEG.event(k).type;
-    end
+UREVENTS = 0; % flag returning infor for urevents instead of events
+typelist = [];
+if nargin>1
+   if ischar(arg2)
+       if strcmp(arg2,'urevent') | strcmp(arg2,'urevents')
+            UREVENTS = 1; % change flag
+       else
+            error('second argument string not understood')
+       end
+       if nargin>2
+            if iscell(arg3)
+                  typelist = arg3;
+            end
+       end
+   elseif iscell(arg2)
+       typelist = arg2;
+   end
 end
+       
+if ~UREVENTS
+   nevents = length(EEG.event);
+   alltypes = cell(nevents,1);
+   for k=1:nevents
+       if isnumeric(EEG.event(k).type)
+          alltypes{k} = num2str(EEG.event(k).type);
+       else
+          alltypes{k} = EEG.event(k).type;
+       end
+   end
+else
+   nevents = length(EEG.urevent);
+   alltypes = cell(nevents,1);
+   for k=1:nevents
+       if isnumeric(EEG.urevent(k).type)
+          alltypes{k} = num2str(EEG.urevent(k).type);
+       else
+          alltypes{k} = EEG.urevent(k).type;
+       end
+   end
+end
+
 [types i j] = unique(alltypes);
 
-ntypes = length(types);
-numbers = zeros(ntypes,1);
-for k=1:ntypes
- numbers(k) = length(find(j==k));
+istypes = 1:length(types);
+notistypes = [];
+if ~isempty(typelist)
+  notistypes = ismember(typelist,types);
+  istypes = ismember(types,typelist(find(notistypes==1))); % types in typelist?
+  notistypes = typelist(find(notistypes==0));
 end
+
+types(~istypes) = []; % restrict types to typelist
+ntypes = length(types);
+numbers = zeros(ntypes + length(notistypes),1);
+for k=1:ntypes
+  numbers(k) = length(find(j==k));
+end
+types = [types(:); notistypes(:)]; % concatenate the types not found
+ntypes = length(types);
+for j = 1:length(notistypes)
+   numbers(k+j) = 0;
+end
+
+[numbers nsort] = sort(numbers);
+numbers = numbers(end:-1:1);
+types = types(nsort(end:-1:1)); % sort in reverse order of event numbers
   
 if nargout < 1
   fprintf('\n');
+  if UREVENTS
+    fprintf('EEG urevent types:\n\n')
+  else
+    fprintf('EEG event types:\n\n')
+  end
+
   maxx = 0;
   for k=1:ntypes
     x = length(types{k});
     if x > maxx
-        maxx = x;
+        maxx = x; % find max type name length
     end
   end
   for k=1:ntypes
