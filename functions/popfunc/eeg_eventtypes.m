@@ -14,6 +14,9 @@
 %        types      - cell array of event type strings
 %        numbers    - vector giving the numbers of each event type in the data
 %
+% Note:  Numeric (ur)event types are converted to strings, so, for example, 
+%        types {13} and {'13'} are not distinguished.
+%
 % Examples:
 %           >> eeg_eventtypes(EEG);       % print histogram of event types
 %           >> eeg_eventtypes(EEG,'urevent');  % print hist. of urevent types
@@ -78,6 +81,13 @@ if nargin>1
        typelist = arg2;
    end
 end
+if ~isempty(typelist)     % cast to cell array of strings
+   for k=1:length(typelist)
+       if isnumeric(typelist{k})
+          typelist{k} = num2str(typelist{k});
+       end
+   end
+end
        
 if ~UREVENTS
    nevents = length(EEG.event);
@@ -112,6 +122,7 @@ if ~isempty(typelist)
 end
 
 types(~istypes) = []; % restrict types to typelist
+
 ntypes = length(types);
 numbers = zeros(ntypes + length(notistypes),1);
 for k=1:ntypes
@@ -123,11 +134,15 @@ for j = 1:length(notistypes)
    numbers(k+j) = 0;
 end
 
+% sort types in reverse order of event numbers
 [numbers nsort] = sort(numbers);
 numbers = numbers(end:-1:1);
-types = types(nsort(end:-1:1)); % sort in reverse order of event numbers
-  
-if nargout < 1
+types = types(nsort(end:-1:1)); 
+
+%
+% print output on commandline %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+if nargout < 1 
   fprintf('\n');
   if UREVENTS
     fprintf('EEG urevent types:\n\n')
@@ -150,5 +165,5 @@ if nargout < 1
     fprintf('%d\n',numbers(k));
  end
  fprintf('\n');
- clear types
+ clear types % no return variables
 end
