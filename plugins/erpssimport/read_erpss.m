@@ -73,7 +73,7 @@ function [eeg,ev,header] = read_erpss(filename)
          case {'MAC2','SUN4','SOL2','SGI','SGI64'}, complendian = 1;
          case {'PCWIN','LNX86','GLNX86'}, complendian = 0;
          otherwise 
-          disp('Byte order ('''endian'''') of this computer is unknown, set to PC (windows/linux) by default');
+          disp('Disp: endian of computer not known, set to PC (windows/linux) by default');
         end;
     end;
     fseek(fp,6,-1);
