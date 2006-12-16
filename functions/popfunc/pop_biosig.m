@@ -9,10 +9,8 @@
 %
 % Optional inputs:
 %   'channels'   - [integer array] list of channel indices
-%   'blockrange' - [min max] integer range of data blocks to import.
-%                  One block is one second. If a time longer than 
-%                  the blockrange is entered, it will automatically be
-%                  shortened to the maximum time. 
+%   'blockrange' - [min max] integer range of data blocks to import, in seconds.
+%                  Entering [0 3] will import the first three blocks of data.
 %                  Default is empty -> import all data blocks. 
 %   'ref'        - [integer] channel index or index(s) for the reference.
 %                  Reference channels are not removed from the data,
@@ -54,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2006/12/16 04:16:37  toby
+% Help edit.
+%
 % Revision 1.14  2006/07/05 23:03:47  arno
 % checking for field BDF
 %
@@ -61,7 +62,7 @@
 % EDF continous files
 %
 % Revision 1.12  2006/01/25 21:11:29  arno
-% fixing 2 typos
+% fixing 2 typos3
 %
 % Revision 1.11  2006/01/25 00:38:08  arno
 % fixing sclose
@@ -70,7 +71,7 @@
 % closing data file after reading
 %
 % Revision 1.9  2006/01/17 00:54:13  arno
-% disable overflow detection
+% disable overflow detection3
 %
 % Revision 1.8  2006/01/17 00:47:08  arno
 % 0verflow detection off
@@ -88,7 +89,7 @@
 % now uses biosig2eeglabevent
 %
 % Revision 1.3  2005/10/27 05:24:55  arno
-% filename
+% filename3
 %
 % Revision 1.2  2005/03/23 16:01:17  arno
 % implmenting DUR and CHN
@@ -139,7 +140,7 @@ if nargin < 1
     dat = sopen(filename);
     uilist   = { { 'style' 'text' 'String' 'Channel list (defaut all):' } ...
                  { 'style' 'edit' 'string' '' } ...
-                 { 'style' 'text' 'String' [ 'Data block range (seconds) to read (default all [1 ' int2str(dat.NRec) '])' ] } ...
+                 { 'style' 'text' 'String' [ 'Data range (in seconds) to read (default all [0 ' int2str(dat.NRec) '])' ] } ...
                  { 'style' 'edit' 'string' '' }  };
     geom = { [3 1] [3 1] };
     
@@ -186,17 +187,18 @@ EEG = eeg_emptyset;
 if ~isempty(g.channels)
      dat = sopen(filename, 'r', g.channels,'OVERFLOWDETECTION:OFF');
 else dat = sopen(filename, 'r', 0,'OVERFLOWDETECTION:OFF');
-end;
+end
 fprintf('Reading data in %s format...\n', dat.TYPE);
 
 if ~isempty(g.blockrange)
     newblockrange    = g.blockrange;
     newblockrange(2) = min(newblockrange(2), dat.NRec);
-    newblockrange    = (newblockrange-1)*dat.Dur;    
+    newblockrange    = newblockrange*dat.Dur;    
     DAT=sread(dat, newblockrange(2)-newblockrange(1), newblockrange(1))';
 else 
     DAT=sread(dat, Inf)';
-end;
+    newblockrange    = [];
+end
 dat = sclose(dat);
 
 % convert to seconds for sread
@@ -213,17 +215,22 @@ if strcmpi(dat.TYPE, 'BDF') || strcmpi(dat.TYPE, 'EDF')
 else
     EEG.trials   = dat.NRec;
     EEG.pnts     = size(EEG.data,2)/dat.NRec;
-end;
+end
 if isfield(dat, 'Label') & ~isempty(dat.Label)
     EEG.chanlocs = struct('labels', cellstr(char(dat.Label)));
-end;
+end
 EEG = eeg_checkset(EEG);
 
 % extract events
 % --------------
 disp('Extracting events...');
 if ~isempty(dat.EVENT)
-    EEG.event = biosig2eeglabevent(dat.EVENT);
+    if ~isempty(newblockrange)
+        interval(1) = newblockrange(1) * dat.SampleRate(1) + 1;
+        interval(2) = newblockrange(2) * dat.SampleRate(1);
+    else interval = [];
+    end
+    EEG.event = biosig2eeglabevent(dat.EVENT, interval);
     if strcmpi(g.rmeventchan, 'on') & strcmpi(dat.TYPE, 'BDF') & isfield(dat, 'BDF')
         disp('Removing event channel...');
         EEG.data(dat.BDF.Status,:) = [];

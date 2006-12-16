@@ -1,10 +1,12 @@
 % biosig2eeglabevent() - convert biosig events to EEGLAB event structure
 %
 % Usage:
-%   >> eeglabevent = biosig2eeglabevent( biosigevent )
+%   >> eeglabevent = biosig2eeglabevent( biosigevent, interval )
 %
 % Inputs:
 %   biosigevent    - BioSig event structure
+%   interval       - Period to extract events for, in frames.
+%                    Default [] is all.
 %
 % Outputs:
 %   eeglabevent    - EEGLAB event structure
@@ -30,38 +32,61 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2006/01/13 23:09:53  arno
+% default events
+%
 % Revision 1.1  2006/01/13 21:59:19  arno
 % Initial revision
 %
 
-function event = biosig2eeglabevent(EVENT)
+function event = biosig2eeglabevent(EVENT, interval)
 
-    event = [];
-    disp('Importing data events...');
+event = [];
+disp('Importing data events...');
+
+% If the interval variable is empty, import all events.
+if isempty(interval)
     if isfield(EVENT, 'Teeg')
         event = EVENT.Teeg;
     end
     if isfield(EVENT, 'TYP')
         for index = 1:length( EVENT.TYP )
             event(index).type = EVENT.TYP(index);
-        end;
-    end;
+        end
+    end
     if isfield(EVENT, 'POS')
         for index = 1:length( EVENT.POS )
             event(index).latency = EVENT.POS(index);
-        end;
-    end;
+        end
+    end
     if isfield(EVENT, 'DUR')
         if any( [ EVENT.DUR ] )
             for index = 1:length( EVENT.DUR )
                 event(index).duration = EVENT.DUR(index);
-            end;
-        end;
-    end;
+            end
+        end
+    end
     if isfield(EVENT, 'CHN')
         if any( [ EVENT.CHN ] )
             for index = 1:length( EVENT.CHN )
                 event(index).chanindex = EVENT.CHN(index);
-            end;
-        end;
-    end;            
+            end
+        end
+    end
+% If a subinterval was specified, select only events that fall in that range, and
+% edit duration field if it exceeds that range.
+elseif isfield(EVENT,'POS')
+    count = 1;
+    for index = 1:length(EVENT.POS)
+        pos_tmp = EVENT.POS(index) - interval(1) + 1;
+        if pos_tmp > 0 & EVENT.POS(index) <= interval(2)
+            event(count).latency = pos_tmp;
+            if isfield(EVENT, 'TYP'), event(count).type = EVENT.TYP(index); end
+            if isfield(EVENT, 'CHN'), event(count).chanindex = EVENT.CHN(index); end
+            if isfield(EVENT, 'DUR')
+                event(count).duration = min(EVENT.DUR(index), interval(2) - EVENT.POS(index));
+            end
+            count = count + 1;
+        end
+    end
+end
