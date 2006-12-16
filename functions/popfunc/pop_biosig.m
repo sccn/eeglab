@@ -10,6 +10,9 @@
 % Optional inputs:
 %   'channels'   - [integer array] list of channel indices
 %   'blockrange' - [min max] integer range of data blocks to import.
+%                  One block is one second. If a time longer than 
+%                  the blockrange is entered, it will automatically be
+%                  shortened to the maximum time. 
 %                  Default is empty -> import all data blocks. 
 %   'ref'        - [integer] channel index or index(s) for the reference.
 %                  Reference channels are not removed from the data,
@@ -51,6 +54,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2006/07/05 23:03:47  arno
+% checking for field BDF
+%
 % Revision 1.13  2006/04/19 14:54:21  arno
 % EDF continous files
 %
@@ -133,7 +139,7 @@ if nargin < 1
     dat = sopen(filename);
     uilist   = { { 'style' 'text' 'String' 'Channel list (defaut all):' } ...
                  { 'style' 'edit' 'string' '' } ...
-                 { 'style' 'text' 'String' [ 'Data block range to read (default all [1 ' int2str(dat.NRec) '])' ] } ...
+                 { 'style' 'text' 'String' [ 'Data block range (seconds) to read (default all [1 ' int2str(dat.NRec) '])' ] } ...
                  { 'style' 'edit' 'string' '' }  };
     geom = { [3 1] [3 1] };
     
