@@ -1,46 +1,52 @@
 %
-% envtopo() - Plot the envelope of a multichannel data epoch, plus envelopes and scalp maps 
-%             of specified or largest-contributing components. If a 3-D input matrix, operates 
-%             on the mean of the data epochs. Click on individual axes to examine them in detail.
-%             The black lines represent the max and min values across all channels at each time point. 
-%             The blue shading represents the max and min contributions of the selected components to
-%             those channels. The paired colored lines represent the max and min contributions of the 
-%             indicated component across all channels.
+% envtopo() - Plot the envelope of a multichannel data epoch, plus envelopes and 
+%             scalp maps of specified or largest-contributing components. If a 3-D 
+%             input matrix, operates on the mean of the data epochs. Click on 
+%             individual axes to examine them in detail. The black lines represent 
+%             the max and min values across all channels at each time point. 
+%             The blue shading represents the max and min contributions of 
+%             the selected components tothose channels. The paired colored lines 
+%             represent the max and min contributions of the indicated component 
+%             across all channels.
 % Usage:
 %             >> envtopo(data,weights,'chanlocs',file_or_struct);
-%             >> [compvarorder,compvars,compframes,comptimes,compsplotted,sortvar] ...
-%                                           = envtopo(data, weights, 'key1', val1, ...);
+%             >> [cmpvarorder,cmpvars,cmpframes,cmptimes,cmpsplotted,sortvar] ...
+%                                     = envtopo(data, weights, 'key1', val1, ...);
 % Inputs:
 %  data        = single data epoch (chans,frames), else it a 3-D epoched data matrix 
 %                (chans,frames,epochs) ->  processes the mean data epoch. 
-%  weights     = linear decomposition (unmixing) weight matrix. The whole matrix should
-%                be passed to the function here.  Ex: (EEG.icaweights*EEG.icasphere)
-%
+%  weights     = linear decomposition (unmixing) weight matrix. The whole matrix 
+%                should be passed to the function here.  
+%                    Ex: (EEG.icaweights*EEG.icasphere)
 % Required keyword:
 %  'chanlocs'  = [string] channel location filename or EEG.chanlocs structure. 
 %                For more information, see >> topoplot example 
 %
 % Optional inputs:
-%  'compnums'  = [integer array] vector of component indices to use in the calculations
-%                  and to select plotted components from. {default|[]: all}
+%  'compnums'  = [integer array] vector of component indices to use in the 
+%                  calculations and to select plotted components from 
+%                  {default|[]: all}
 %  'compsplot' = [integer] the number of largest contributing components to plot.
-%                  compnums in the latter case is restricted in size by the internal 
-%                  MAXTOPOS (20) {default|[] -> 7}
-%  'subcomps'  = [integer vector] indices of components to remove from the whole data before 
-%                  plotting. 0 -> none {default: if 'compnums' listed, remove all others}
-%  'limits'    = 0 or [minms maxms] or [minms maxms minuV maxuV]. Specify start/end plot
-%                  (x) limits (in ms) and min/max y-axis limits (in uV). If 0, or if both
-%                  minmx & maxms == 0 -> use latencies from 'timerange' (else 0:frames-1).
-%                  If both minuV and maxuV == 0 -> use data uV limits {default: 0}
-%  'timerange' = start and end input data latencies (in ms) {default: from 'limits' if any}
-%                  Note: Does NOT select a portion of the input data, just makes time labels.
-%  'limcontrib' = [minms maxms]  time range (in ms) in which to rank component contribution
-%                  (boundaries shown with thin dotted lines) 
+%                  compnums in the latter case is restricted in size by the 
+%                  internal variable MAXTOPOS (20) {default|[] -> 7}
+%  'subcomps'  = [integer vector] indices of comps. to remove from the whole data 
+%                  before plotting. 0 -> none {default: if 'compnums' listed, 
+%                  remove all others}
+%  'limits'    = 0 or [minms maxms] or [minms maxms minuV maxuV]. Specify 
+%                  start/end plot (x) limits (in ms) and min/max y-axis limits 
+%                  (in uV). If 0, or if both minmx & maxms == 0 -> use latencies 
+%                  from 'timerange' (else 0:frames-1). If both minuV and 
+%                  maxuV == 0 -> use data uV limits {default: 0}
+%  'timerange' = start and end input data latencies (in ms) {default: from 'limits' 
+%                  if any}. Note: Does NOT select a portion of the input data, 
+%                  just makes time labels.
+%  'limcontrib' = [minms maxms]  time range (in ms) in which to rank component 
+%                  contribution (boundaries shown with thin dotted lines) 
 %                  {default|[]|[0 0] -> plotting limits}
 %  'sortvar'   = ['mp'|'pv'|'pp'|'rp'] {default:'mp'} 
 %                  'mp', sort components by maximum mean back-projected power 
 %                  in the 'limcontrib' time range: mp(comp) = max(Mean(back_proj.^2));
-%                    where back_proj = comp_map * comp_activation(t) for t in 'limcontrib'
+%                  where back_proj = comp_map * comp_activation(t) for t in 'limcontrib'
 %                  'pv', sort components by percent variance accounted for (eeg_pvaf())
 %                    pvaf(comp) = 100-100*mean(var(data - back_proj))/mean(var(data));
 %                  'pp', sort components by percent power accounted for (ppaf) 
@@ -51,8 +57,9 @@
 %  'plotchans' = [integer array] data channels to use in computing contributions and 
 %                  envelopes, and also for making scalp topo plots
 %                  {default|[] -> all}, by calling topoplot().
-%  'voffsets'  = [float array] vertical line extentions above the data max to disentangle
-%                  plot lines (left->right heads, values in y-axis units) {def|[] -> none}
+%  'voffsets'  = [float array] vertical line extentions above the data max to 
+%                  disentangle plot lines (left->right heads, values in y-axis units) 
+%                  {default|[] -> none}
 %  'colors'    = [string] filename of file containing colors for envelopes, 3 chars
 %                  per line, (. = blank). First color should be "w.." (white)
 %                  Else, 'bold' -> plot default colors in thick lines.
@@ -62,15 +69,16 @@
 %  'vert'      = vector of times (in ms) at which to plot vertical dashed lines 
 %                  {default|[] -> none}
 %  'icawinv'   = [float array] inverse weight matrix. Normally computed by inverting
-%                  the weights*sphere matrix (Note: If some components have been removed, 
-%                  the pseudo-inverse does not represent component maps accurately).
+%                  the weights*sphere matrix (Note: If some components have been 
+%                  removed, the pseudo-inverse does not represent component maps 
+%                  accurately).
 %  'icaact'    = [float array] component activations. {default: computed from the 
 %                  input weight matrix}
 %  'envmode'   = ['avg'|'rms'] compute the average envelope or the root mean square
 %                  envelope {default: 'avg'}
 %  'sumenv'    = ['on'|'off'|'fill'] 'fill' -> show the filled envelope of the summed 
-%                  projections of the selected components; 'on' -> show the envelope only 
-%                  {default: 'fill'}
+%                  projections of the selected components; 'on' -> show the envelope 
+%                  only {default: 'fill'}
 %  'actscale'  = ['on'|'off'] scale component scalp maps by maximum component activity 
 %                  in the designated (limcontrib) interval. 'off' -> scale scalp maps 
 %                  individually using +/- max(abs(map value)) {default: 'off'}
@@ -79,13 +87,15 @@
 %
 % Outputs:
 % 
-%  compvarorder = component numbers in decreasing order of max variance in data
-%  compvars     = ('sortvar') max power for all components tested, sorted from highest to
-%                   lowest. See 'sortvar' 'mp'
-%  compframes   = frames of comvars for each component plotted
-%  comptimes    = times of compvars for each component plotted
-%  compsplotted = indices of components plotted. unsorted_compvars=compvars(compsplotted)
-%  sortvar      = The computed data used to sort components with. See 'sortvar' option above.
+%  cmpvarorder = component numbers in decreasing order of max variance in data
+%  cmpvars     = ('sortvar') max power for all components tested, sorted 
+%                   from highest to lowest. See 'sortvar' 'mp'
+%  cmpframes   = frames of comvars for each component plotted
+%  cmptimes    = times of compvars for each component plotted
+%  cmpsplotted = indices of components plotted. 
+%                       unsorted_compvars = compvars(compsplotted);
+%  sortvar      = The computed data used to sort components with. 
+%                 See 'sortvar' option above.
 %
 % Notes:
 %  To label maps with other than component numbers, put four-char strings into 
@@ -113,6 +123,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.123  2006/11/07 20:48:33  toby
+% documentation edit
+%
 % Revision 1.122  2006/11/07 20:34:08  toby
 % documentation edit
 %
@@ -1130,9 +1143,6 @@ set(axe,'Ygrid','on')
 axes(axe)
 set(axe,'Color',axcolor);
 
-
-
-
 %
 %%%%%%%%%%%%%%%%% Plot the envelope of the summed selected components %%%%%%%%%%%%%%%%%
 %
@@ -1142,10 +1152,10 @@ else
   mapcolors = [1 maporder+1];
 end
 
-if strcmpi(g.sumenv,'on')  | strcmpi(g.sumenv,'fill')
+if strcmpi(g.sumenv,'on')  | strcmpi(g.sumenv,'fill') %%%%%%%% if 'sunvenv' %%%%%%%%%
  sumenv = envelope(sumproj(:,:), g.envmode);
- if ~ylimset & max(sumenv) > ymax, ymax = max(curenv); end
- if ~ylimset & min(sumenv) < ymin, ymin = min(curenv); end
+ if ~ylimset & max(sumenv) > ymax, ymax = max(sumenv(1,:)); end
+ if ~ylimset & min(sumenv) < ymin, ymin = min(sumenv(2,:)); end
  if strcmpi(g.sumenv,'fill')  
     %
     % Plot the summed projection filled 
