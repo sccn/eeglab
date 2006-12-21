@@ -88,6 +88,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2006/10/16 14:16:38  scott
+% added axcopy after figure;
+%
 % Revision 1.34  2006/07/05 22:18:30  arno
 % fixed problem if only channel labels
 %
@@ -399,6 +402,9 @@ if length(datsub) > 0 % dataset to subtract
         TMPEEG = eeg_checkset(ALLEEG(datsub(index)));
         if flag == 1, erp2ind(:,:,index)  = mean(TMPEEG.data,3);
         elseif isempty(TMPEEG.icaact)
+            tmpica              =  reshape((TMPEEG.icaweights*TMPEEG.icasphere)*TMPEEG.data(:,:), ...
+                                       size(TMPEEG.icaweights,1), size(TMPEEG.data,2), size(TMPEEG.data,3));
+            erp2ind(:,:,index)  = mean(tmpica,3);
         else          tmpica              =  reshape((TMPEEG.icaweights*TMPEEG.icasphere)*TMPEEG.data(:,:), ...
                                                      size(TMPEEG.icaweights,1), size(TMPEEG.data,2), size(TMPEEG.data,3));
                       erp2ind(:,:,index)  = mean(tmpica,3);
