@@ -1,15 +1,15 @@
-%  statcond()  - compare two or more data conditions statistically using standard 
-%                parametric or nonparametric permutation-based ANOVA 
+%  statcond()  - compare two or more data conditions statistically using 
+%                standard parametric or nonparametric permutation-based ANOVA 
 %                (1-way or 2-way) or t-test methods. Parametric testing uses 
 %                fcdf() from the Matlab Statistical Toolbox. Use of up to 
 %                4-D data matrices speeds processing.
 % Usage:
-%             >> [stats, df, pvals, surrog] = statcond( data, 'key', 'val', ... );
+%          >> [stats, df, pvals, surrog] = statcond( data, 'key','val'... );
 % Inputs:
-%   data       = one-dim or two-dim cell array of data matrices. 
-%                For nonparametric, permutation-based testing, the last 
-%                dimension of the data arrays (which may be of up to 4
-%                dimensions) is permuted across conditions, either in
+%   data       = one-or two-dimensional cell array of data matrices. 
+%                   For nonparametric, permutation-based testing, the 
+%                last dimension of the data arrays (which may be of up to 
+%                4 dimensions) is permuted across conditions, either in
 %                a 'paired' fashion (not changing the, e.g., subject or
 %                trial order in the last dimension) or in an umpaired 
 %                fashion (not respecting this order). If the number of 
@@ -41,13 +41,13 @@
 %                 mode estimation (see above) {default: 200}.
 % Outputs:
 %   stats      = F- or T-value array of the same size as input data without 
-%                the last dimension. A T value is returned only if the data 
-%                consist of two conditions.
-%   df         = degrees of freedom, a (2,1) vector if F-values are returned
+%                the last dimension. A T value is returned only when the data 
+%                includes exactly two conditions.
+%   df         = degrees of freedom, a (2,1) vector, when F-values are returned
 %   pvals      = array of p-values. Same size as input data without the last
-%                data dimension. All returned p-values are two tailed.
+%                data dimension. All returned p-values are two-tailed.
 %   surrog     = surrogate data array (same size as input data with the last 
-%                dim. filled with a number ('naccu') of surrogate data sets.
+%                dimension filled with a number ('naccu') of surrogate data sets.
 %
 % Important note: When a two-way ANOVA is performed, outputs are cell arrays
 %                 with three elements: output(1) = column effects; 
@@ -56,44 +56,48 @@
 % Examples:
 %      >> a = { rand(1,10) rand(1,10)+0.5 }; % pseudo 'paired' data vectors
 %         [t df pvals] = statcond(a);        % perform paired t-test
-%         pvals =                  
-%            5.2807e-04          % standard t-test probability value
-%            % Note: for different rand() outputs, results will differ.
+%           pvals =                  
+%              5.2807e-04 % standard t-test probability value
+%         % Note: for different rand() outputs, results will differ.
+%
 %         [t df pvals surog] = statcond(a, 'mode', 'perm', 'naccu', 2000); 
-%         pvals =
-%            0.0065 % nonparametric t-test using 2000 permuted data sets
+%           pvals =
+%              0.0065 % nonparametric t-test using 2000 permuted data sets
 %
 %         a = { rand(2,11) rand(2,10) rand(2,12)+0.5 }; % pseudo 'unpaired' 
 %         [F df pvals] = statcond(a); % perform an unpaired ANOVA 
-%         pvals =
-%            0.00025 % p-values for difference between columns 
-%            0.00002 % for each data row
+%           pvals =
+%              0.00025 % p-values for difference between columns 
+%              0.00002 % for each data row
 %
 %         a = { rand(3,4,10) rand(3,4,10) rand(3,4,10); ...
 %               rand(3,4,10) rand(3,4,10) rand(3,4,10)+0.5 }; 
 %         % pseudo (2,3)-condition data array, each entry containing 
 %         %                                    ten (3,4) data matrices
 %         [F df pvals] = statcond(a);  % perform a paired 2-way ANOVA 
-%         pvals{1} % a (3,4) matrix of p-values; effects across columns
-%         pvals{2} % a (3,4) matrix of p-values; effects across rows 
-%         pvals{3} % a (3,4) matrix of p-values; interaction effects
-%                                             % across rows and columns
+%         % Output:
+%           pvals{1} % a (3,4) matrix of p-values; effects across columns
+%           pvals{2} % a (3,4) matrix of p-values; effects across rows 
+%           pvals{3} % a (3,4) matrix of p-values; interaction effects
+%                                      % across rows and columns
 %
 % Author: Arnaud Delorme, SCCN/INC/UCSD, La Jolla, 2005-
-%         Thanks to Robert Oostenveld for fruitful discussions and advices
-%         about this function.
+%         With rhanks to Robert Oostenveld for fruitful discussions 
+%         and advice on this function.
 %
 % See also: anova1_cell(), anova2_cell(), fcdf()
 
-% testing paired t-test
+% perform a paired t-test
+% -----------------------
 % a = { rand(2,10) rand(2,10) };
 % [t df pval] = statcond(a); pval
 % [h p t stat] = ttest( a{1}(1,:), a{2}(1,:)); p
 % [h p t stat] = ttest( a{1}(2,:), a{2}(2,:)); p
 %
-% compare significance level
+% compare significance levels
 % --------------------------
-% a = { rand(1,10) rand(1,10) }; [F df pval] = statcond(a, 'mode', 'perm', 'naccu', 200); pval
+% a = { rand(1,10) rand(1,10) }; 
+% [F df pval] = statcond(a, 'mode', 'perm', 'naccu', 200); pval
 % [h p t stat] = ttest( a{1}(1,:), a{2}(1,:)); p
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
@@ -115,6 +119,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2006/11/22 19:03:28  arno
+% number of dimensions fix
+%
 % Revision 1.11  2006/11/22 18:46:15  arno
 % fix typo
 %
