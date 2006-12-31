@@ -12,11 +12,10 @@
 %      infotype - ['erp'|'spec'|'ersp'|'itc'|'dipole'|'map'] type of stored
 %                 cluster information to read. May also be a cell array of
 %                 these types, for example: { 'erp' 'map' 'dipole' }
-%     condition - STUDY condition number to read {default: 1}
+%     condition - STUDY condition number to read {default: all}
 %
 % Output:
 %      clustinfo - structure of specified cluster information:
-%
 %         clustinfo.name          % cluster name
 %         clustinfo.clusternum    % cluster index
 %         clustinfo.condition     % index of the condition asked for
@@ -46,10 +45,9 @@
 %         clustinfo.dipole        % array of component dipole information structs
 %                                 % with same format as EEG.dipfit.model
 % Example:
-%         % To plot the ERPs for all Cluster-3 components from a STUDY
-%         %
-%         clustinfo = std_clustread(STUDY, ALLEEG, 3, 'erp');
-%         figure; plot(clustinfo.erp_times, clustinfo.erp);
+%         % To plot the ERPs for all components in cluster 3 of a loaded STUDY
+%         >> clustinfo = std_clustread(STUDY, ALLEEG, 3, 'erp');
+%            figure; plot(clustinfo.erp_times, clustinfo.erp);
 % 
 % Author: Hilit Serby, Scott Makeig & Arnaud Delorme, SCCN/INC/UCSD, 2005-
 
@@ -74,16 +72,16 @@ clustinfo.comps      = STUDY.cluster(cluster).comps;
 clustinfo.condition  = condition;
 
 ncomps = length(STUDY.cluster(cluster).comps);
-for k = 1:ncomps %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for each channel component %%%%%%%%%%%%%%
+for k = 1:ncomps %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for each channel | component %%%%%%%%%%%%%%
     
-    for n = 1:length(condition)
+    for n = 1:length(condition) %%%%%%%%%%%%%%%%%%%%%%%% for each STUDY condition %%%%%%%%%%%%%%
 
         abset = [STUDY.datasetinfo(STUDY.cluster(cluster).sets(condition(n),k)).index];
         comp  = STUDY.cluster(cluster).comps(k);
         clustinfo.subject{k} = STUDY.datasetinfo(STUDY.cluster(cluster).sets(condition(n),k)).subject;
         clustinfo.group{k} = STUDY.datasetinfo(STUDY.cluster(cluster).sets(condition(n),k)).group;
 
-        for index = 1:length(infotype) %%%%%%%%%%%%%%%% for each information type %%%%%%%%%%%%%%%%
+        for index = 1:length(infotype) %%%%%%%%%%%%%% for each information type %%%%%%%%%%%%%%%%
             switch infotype{index}        
                 case 'erp'
                     [erp, t] = std_readerp(ALLEEG, abset, comp, STUDY.preclust.erpclusttimes);
