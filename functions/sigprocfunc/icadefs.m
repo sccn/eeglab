@@ -26,6 +26,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.43  2006/11/12 19:15:38  arno
+% version number
+%
 % Revision 1.42  2006/09/26 20:20:37  scott
 % changed help message (1st change since '97 !)
 %
@@ -167,20 +170,24 @@
 EEGLAB_VERSION = '5.1b'; % EEGLAB version s=stable, b=beta, a=alpha (SCCN only)
 TUTORIAL_URL = 'http://sccn.ucsd.edu/eeglab/eeglabdocs.html'; % online version
 
-% for local copies of the web site, uncomment and edit one of the following lines
+% If there is a local copy of the web site, uncomment and edit one of the following lines
+%
 % TUTORIAL_URL = 'file://C:\folder\eeglabtutorial\eeglabdocs.html'; % Windows
 % TUTORIAL_URL = 'file:///home/user/eeglabtutorial/eeglabdocs.html'; % Unix
 % TUTORIAL_URL = 'file://::disk:folder:eeglabtutorial:eeglabdocs.html'; % Mac
 
-ICABINARY = '/data/common/matlab/fmrlab/ica_linux'; % <=INSERT name of ica executable for binica.m
+ICABINARY = '/data/common/matlab/fmrlab/ica_linux'; 
+%                           % <=INSERT name of ica executable for binica.m above
                             % If none, use []
-SHRINKWARNING = 1;          % warn user about the shrink factor
-YDIR = 1;                   % positive up = 1; negative up = -1
-HZDIR = 'up';               % ascending = 'up'; descending = 'down' (timef/newtimef frequency direction)
 
-% COLORS
-% ------
+SHRINKWARNING = 1;          % Warn user about the shrink factor in topoplot() (1/0)
+YDIR  = 1;                  % positive up = 1; negative up = -1
+HZDIR = 'up';               % ascending = 'up'; descending = 'down' 
+                            % (timef/newtimef frequency direction)
+% Set EEGLAB figure and GUI colors
+% --------------------------------
 if get(0, 'screendepth') <=8 % if mono or 8-bit color
+    fprintf('icadefs(): Setting display parameters for mono or 8-bit color\n');
     BACKCOLOR           = [1 1 1];    % Background figure color 
     BACKEEGLABCOLOR     = [1 1 1];    % EEGLAB main window background
     GUIBUTTONCOLOR      = [1 1 1];    % Buttons colors in figures
@@ -188,14 +195,15 @@ if get(0, 'screendepth') <=8 % if mono or 8-bit color
     GUIBACKCOLOR        = [1 1 1];    % GUI background color
     GUITEXTCOLOR        = [0 0 0];      % GUI foreground color for text    
     PLUGINMENUCOLOR     = [.5 0 .5];  % plugin menu color
+
 else % if full color screen
     BACKCOLOR           = [.93 .96 1];    % Background figure color 
     BACKEEGLABCOLOR     = [.66 .76 1];    % EEGLAB main window background
-    GUIBUTTONCOLOR      = [.66 .76 1];    % Buttons colors in figures
-    GUIPOPBUTTONCOLOR   = [.93 .96 1];    % Buttons colors in GUI windows
-    GUIBACKCOLOR        = [.66 .76 1];    % EEGLAB GUI background color <---------
+    GUIBUTTONCOLOR      = BACKEEGLABCOLOR;% Buttons colors in figures
+    GUIPOPBUTTONCOLOR   = BACKCOLOR;      % Buttons colors in GUI windows
+    GUIBACKCOLOR        = BACKEEGLABCOLOR;% EEGLAB GUI background color <---------
     GUITEXTCOLOR        = [0 0 0.4];      % GUI foreground color for text
-    PLUGINMENUCOLOR     = [.5 0 .5];  % plugin menu color
+    PLUGINMENUCOLOR     = [.5 0 .5];      % plugin menu color
 end;
 
 % THE FOLLOWING PARAMETERS WILL BE DEPRECATED IN LATER VERSIONS
