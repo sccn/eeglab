@@ -1,8 +1,7 @@
 % std_clustread() - load one or more requested measures 
 %                   ['erp'|'spec'|'ersp'|'itc'|'dipole'|'map']
 %                   for all components of a specified cluster.  
-%                   Called by cluster plotting functions: std_envtopo(), 
-%                   std_erpplot(), std_erspplot(), ...
+%                   Calls std_readerp(), std_readersp(), etc.
 % Usage:
 %         >> clustinfo = std_clustread(STUDY,ALLEEG, cluster, infotype, condition);
 % Inputs:
@@ -49,7 +48,10 @@
 %         >> clustinfo = std_clustread(STUDY, ALLEEG, 3, 'erp');
 %            figure; plot(clustinfo.erp_times, clustinfo.erp);
 % 
-% Author: Hilit Serby, Scott Makeig & Arnaud Delorme, SCCN/INC/UCSD, 2005-
+% See also: std_readerp(), std_readspec(), std_readersp(), std_readitc(), std_readtopo()
+%
+% Authors: Hilit Serby, Scott Makeig & Arnaud Delorme, SCCN/INC/UCSD, 2005-
+
 
 function clustinfo = std_clustread(STUDY,ALLEEG, cluster, infotype, condition);
 
