@@ -73,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2007/01/06 06:11:11  toby
+% Help text update
+%
 % Revision 1.33  2006/11/15 21:16:30  arno
 % typo in header
 %
@@ -196,20 +199,28 @@ end;
 
 % checking inputs
 % ---------------
-g = finputcheck(options, { 'geometry' 'cell'   []      [];
-                           'uilist'   'cell'   []      {};
-                           'helpcom'  'string' []      '';
-                           'title'    'string' []      '';
-                           'eval'     'string' []      '';
-                           'userdata' ''       []      [];
-                           'mode'     ''       []      'normal';
-                           'geomvert' 'real'   []       [] }, 'inputgui');
+g = finputcheck(options, { 'geometry' {'cell','integer'}    []      []; ...
+                           'uilist'   'cell'                []      {}; ...
+                           'helpcom'  'string'              []      ''; ...
+                           'title'    'string'              []      ''; ...
+                           'eval'     'string'              []      ''; ...
+                           'userdata' ''                    []      []; ...
+                           'mode'     ''                    []      'normal'; ...
+                           'geomvert' 'real'                []       [] ...
+                          }, 'inputgui');
 if isstr(g), error(g); end;
 
 if isstr(g.mode)
 	fig = figure('visible', 'off');
 	set(fig, 'name', g.title);
 	set(fig, 'userdata', g.userdata);
+    if ~iscell( g.geometry )
+        oldgeom = g.geometry;
+        g.geometry = {};
+        for row = 1:length(oldgeom)
+            g.geometry = { g.geometry{:} ones(1, oldgeom(row)) };
+        end;
+    end
 	g.geometry = { g.geometry{:} [1] [1 1 1] }; % add button to geometry
 	
 	% add the three buttons (CANCEL HELP OK) at the bottom of the GUI
