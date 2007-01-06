@@ -1,12 +1,12 @@
 % erpimage() - Plot a colored image of a collection of single-trial data epochs, optionally 
 %              sorted on and/or aligned to an input sorting variable and smoothed across 
-%              trials with a moving-average.  (To return event-aligned data without 
+%              trials with a moving-average. (To return event-aligned data without 
 %              plotting, use eventlock()).  Optionally sort trials on value, amplitude 
 %              or phase within a specified latency window. Optionally plot the ERP mean 
 %              and std. dev.and moving-window spectral amplitude and inter-trial coherence
 %              at aselected or peak frequency. Optionally 'time warp' the single trial 
 %              time-domain (potential) or power data to align the plotted data to a series
-%              of events with varying latencies that occur in each trial . Click on 
+%              of events with varying latencies that occur in each trial. Click on 
 %              individual figures parts to examine them separately and zoom (using axcopy()).
 % Usage:
 %            >> figure; erpimage(data,[],times); % image trials in input order
@@ -64,25 +64,25 @@
 %  {default} = Sort data epochs by sortvar (see sortvar input above).
 %  'valsort' = [startms endms direction] Sort data on (mean) value
 %               between startms and (optional) endms. Direction is 1 or -1.
-%              If -1, plot max-value epoch at bottom {Default: sort on sortvar}
+%              If -1, plot max-value epoch at bottom {default: sort on sortvar}
 % 'phasesort' = [ms_center prct freq maxfreq topphase] Sort epochs by phase in
-%                an 3-cycle window centered at latency ms_center (ms).
+%                a 3-cycle window centered at latency ms_center (ms).
 %                Percentile (prct) in range [0,100] gives percent of trials
-%                to reject for low amplitude. Else, if in range [-100,0],
-%                percent of trials to reject for high amplitude; freq (Hz)
-%                is the phase-sorting frequency. With optional maxfreq,
-%                sort by phase at freq of max power in the data in range
-%                [freq,maxfreq] (Note: 'phasesort' arg freq overrides the
-%                frequency specified in 'coher'). With optional topphase,
+%                to reject for (too) low amplitude. Else, if in range [-100,0],
+%                percent of trials to reject for (too) high amplitude; 
+%                freq (Hz) is the phase-sorting frequency. With optional 
+%                maxfreq, sort by phase at freq of max power in the data in 
+%                the range [freq,maxfreq] (Note: 'phasesort' arg freq overrides 
+%                the frequency specified in 'coher'). With optional topphase,
 %                sort by phase, putting topphase (degrees, in range [-180,180])
 %                at the top of the image. Note: 'phasesort' now uses circular
 %                smoothing. Use 'cycles' (below) for wavelet length.
-%                {Default: [0 25 8 13 180]}
-%  'ampsort' = [center_ms prcnt freq maxfreq] Sort epochs by amplitude.
+%                {default: [0 25 8 13 180]}
+%  'ampsort' = [center_ms prcnt freq maxfreq]  Sort epochs by amplitude.
 %                (See 'phasesort' above). If ms_center is 'Inf', then sorting
-%                is by mean power across the time window specified by 'winsort' below.
-%                If third arg freq is < 0, sort by mean power in the range
-%                [abs(freq) maxfreq].
+%                is by mean power across the time window specified by 'sortwin' 
+%                below. If third arg, freq, is < 0, sort by mean power in the range
+%                                [ abs(freq)   maxfreq ].
 %  'sortwin' = [start_ms end_ms] With center_ms == Inf in 'ampsort' ars (above), sorts
 %                by mean amplitude across window centers shifted from start_ms
 %                to end_ms by 10 ms.
@@ -162,11 +162,13 @@
 %    sortidx  = indices of input data epochs in the sorting order
 %     erpsig  = trial average significance levels [2,frames]
 %
-% Example:  >> figure; erpimage(data,RTs,[-400 256 256],'Test',1,1,'erp','cbar','vert',-350);
-%
-% Plots an ERP-image of 1-s data epochs sampled at 256 Hz, sorted by RTs, title ('Test'),
-% sorted epochs not smoothed or decimated (1,1). Overplots the RT latencies. Also plots 
-% the epoch-mean ERP, a color bar, and a dashed vertical line at -350 ms.
+% Example:  >> figure; 
+%              erpimage(data,RTs,[-400 256 256],'Test',1,1,...
+%                            'erp','cbar','vert',-350);
+%    Plots an ERP-image of 1-s data epochs sampled at 256 Hz, sorted by RTs, with 
+%    title ('Test'), and sorted epochs not smoothed or decimated (1,1). Overplots 
+%    the (unsmoothed) RT latencies on the colored ERP-image. Also plots the 
+%    epoch-mean (ERP), a color bar, and a dashed vertical line at -350 ms.
 %
 % Authors: Scott Makeig, Tzyy-Ping Jung & Arnaud Delorme,
 %          CNL/Salk Institute, La Jolla, 3-2-1998 -
@@ -201,6 +203,9 @@
 
 %% LOG COMMENTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % $Log: not supported by cvs2svn $
+% Revision 1.267  2006/09/23 23:03:15  scott
+% nothing
+%
 % Revision 1.266  2006/09/23 22:04:43  scott
 % fixed auxcolor bug, edited help message
 %
