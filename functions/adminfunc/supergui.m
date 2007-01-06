@@ -11,15 +11,19 @@
 % 
 % Inputs:
 %   'fig'       - figure handler, if not given, create a new figure.
-%   'geomhoriz' - cell array describing the geometry of the elements
-%               in the figure. For instance, [2 3 2] means that the
+%   'geomhoriz' - integer vector or cell array of numerical vectors describing the 
+%               geometry of the elements in the figure. 
+%               - if integer vector, vector length is the number of rows and vector 
+%               values are the number of 'uilist' elements in each row.
+%               For example, [2 3 2] means that the
 %               figures will have 3 rows, with 2 elements in the first
 %               and last row and 3 elements in the second row.
-%               An other syntax is { [2 8] [1 2 3] } which means
+%               - if cell array, each vector describes the relative widths
+%               of items in each row. For example, { [2 8] [1 2 3] } which means
 %               that figures will have 2 rows, the first one with 2
 %               elements of relative width 2 and 8 (20% and 80%). The
 %               second row will have 3 elements of relative size 1, 2 
-%               and 3.
+%               and 3 (1/6 2/6 and 3/6).
 %   'geomvert' - describting geometry for the rows. For instance
 %               [1 2 1] means that the second row will be twice the height
 %               of the other ones. If [], all the lines have the same height.
@@ -72,6 +76,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.53  2006/10/18 02:34:21  toby
+% spelling
+%
 % Revision 1.52  2006/09/12 16:43:24  arno
 % allow vertshift
 %
@@ -246,7 +253,7 @@ if isstr(varargin{1})
 else
     options = { 'fig'      varargin{1} 'geomhoriz' varargin{2} ...
                 'geomvert' varargin{3} 'uilist'    varargin(4:end) }; 
-end;
+end
 g = finputcheck(options, { 'geomhoriz' 'cell'   []      [];
                            'fig'       'real'   []      0;
                            'uilist'    'cell'   []      {};
@@ -255,14 +262,14 @@ g = finputcheck(options, { 'geomhoriz' 'cell'   []      [];
                            'geomvert'  'real'   []      [];
                            'inseth'    'real'   []      0.02; % x border absolute (5% of width)
                            'insetv'    'real'   []      0.02 }, 'supergui');
-if isstr(g), error(g); end;
+if isstr(g), error(g); end
 g.insetv = g.insetv/length(g.geomhoriz);
 
 % create new figure
 % -----------------
 if g.fig == 0
 	g.fig = figure('visible','off');
-end;
+end
 
 % converting the geometry formats
 % -------------------------------
@@ -272,10 +279,10 @@ if ~iscell( g.geomhoriz )
 	for row = 1:length(oldgeom)
 		g.geomhoriz = { g.geomhoriz{:} ones(1, oldgeom(row)) };
 	end;
-end;
+end
 if isempty(g.geomvert)
 	g.geomvert = ones(1, length(g.geomhoriz));
-end;
+end
 
 % setting relative width in percent
 % ---------------------------------
@@ -284,7 +291,7 @@ for row = 1:length(g.geomhoriz)
 	sumrow = sum(g.geomhoriz{row});
 	g.geomhoriz{row} = 1.05*g.geomhoriz{row}/sumrow;
 	g.geomhoriz{row} = g.geomhoriz{row} - g.inseth*(length(tmprow)-1)/length(tmprow);
-end;
+end
 
 % setting relative height in percent
 % ---------------------------------
