@@ -11,7 +11,7 @@
 %             inputgui( 'key1', 'val1', 'key2', 'val2', ... );
 % 
 % Inputs:
-%   'geometry'   - see supergui()
+%   'geometry'   - this corresponds to supergui() key-val input 'geomhoriz'
 %   'uilist'     - list of uicontrol lists describing elements properties
 %                  { { ui1 }, { ui2 }... }, { 'uiX' } being GUI matlab 
 %                  uicontrol arguments such as { 'style', 'radiobutton', 
@@ -73,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2006/11/15 21:16:30  arno
+% typo in header
+%
 % Revision 1.32  2006/02/10 23:36:56  arno
 % assign popupmenu too
 %
