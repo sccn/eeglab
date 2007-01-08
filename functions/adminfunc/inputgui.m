@@ -15,7 +15,7 @@
 %   'uilist'     - list of uicontrol lists describing elements properties
 %                  { { ui1 }, { ui2 }... }, { 'uiX' } being GUI matlab 
 %                  uicontrol arguments such as { 'style', 'radiobutton', 
-%                  'String', 'hello' }. See supergui() for details.
+%                  'String', 'hello' }. See Matlab function uicontrol() for details.
 %   'helpcom'    - optional help command 
 %   'title'      - optional figure title
 %   'userdata'   - optional userdata input for the figure
@@ -73,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2007/01/06 08:45:37  toby
+% Geometry input altered for consistency with supergui.m help
+%
 % Revision 1.34  2007/01/06 06:11:11  toby
 % Help text update
 %

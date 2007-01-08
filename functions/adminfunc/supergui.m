@@ -30,7 +30,7 @@
 %   'uilist'   - list of uicontrol lists describing elements properties
 %               { { ui1 }, { ui2 }... }, { 'uiX' } being GUI matlab 
 %               uicontrol arguments such as { 'style', 'radiobutton', 
-%               'String', 'hello' }. See supergui() for details.
+%               'String', 'hello' }. See Matlab function uicontrol() for details.
 %   'title'    - optional figure title
 %   'userdata' - optional userdata input for the figure
 %   'inseth'   - horizontal space between elements. Default is 2% 
@@ -76,6 +76,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.54  2007/01/06 08:48:27  toby
+% Help clarified concerning 'geomhoriz'
+%
 % Revision 1.53  2006/10/18 02:34:21  toby
 % spelling
 %
