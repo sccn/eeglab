@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.202  2006/12/08 19:36:11  arno
+% chekcing labels
+%
 % Revision 1.201  2006/11/06 21:18:47  arno
 % remove the +Y noze direction
 %
@@ -1254,9 +1257,17 @@ end;
 if isnumeric(EEG.data)
     v = version;
     if ~isempty(findstr(v, 'R11')) | ~isempty(findstr(v, 'R12')) | ~isempty(findstr(v, 'R13'))
-        EEG.data = double(EEG.data);
+        EEG.data       = double(EEG.data);
+        EEG.icawinv    = double(EEG.icawinv);
+        EEG.icaweights = double(EEG.icaweights);
+        EEG.icasphere  = double(EEG.icasphere);
+        EEG.icaact     = double(EEG.icaact);
     else
-        EEG.data = single(EEG.data);
+        EEG.data       = single(EEG.data);
+        EEG.icawinv    = single(EEG.icawinv);
+        EEG.icaweights = single(EEG.icaweights);
+        EEG.icasphere  = single(EEG.icasphere);
+        EEG.icaact     = single(EEG.icaact);
     end;
 end;
 
