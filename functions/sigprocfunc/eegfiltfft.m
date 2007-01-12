@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2004/03/04 19:30:41  arno
+% email
+%
 % Revision 1.6  2003/12/03 19:32:25  arno
 % removing debug messages
 %
@@ -98,7 +101,7 @@ function smoothdata = eegfiltfft(data, fs, lowcut, highcut, epochframes, filtord
     if highcut ~= 0        
         [tmp idxh]=min(abs(fv-highcut));  % Find the entry in fv closest to 5 kHz    
     else 
-        idxh = length(fv)/2;
+        idxh = ceil(length(fv)/2);
     end;
     
     % filter the data
