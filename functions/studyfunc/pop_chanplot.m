@@ -34,7 +34,7 @@
 %                has the format: 'subject name, channel index'. Multiple channels can be 
 %                selected from the list. Use the plotting buttons below to plot different 
 %                measures of the selected channels on different figures. Selecting the 
-%                "All channels" option is  equivalent to using the channel plotting buttons. 
+%                "all subjects" option is  equivalent to using the channel plotting buttons. 
 %                Additional editing options are reassigning the selected channels to 
 %                another channel or moving them to the outlier channel.
 %  "Plot channel properties" - [button] Displays in one figure all the mean channel measures
@@ -359,7 +359,7 @@ else
             changrp  = STUDY.changrp(cind);
             
             len = length(STUDY.changrp(cind).chaninds);
-            chanid{1} = 'All channels';
+            chanid{1} = 'All subjects';
 
             % Find datasets availaible
             % ------------------------
@@ -398,7 +398,7 @@ else
             STUDY.saved = 'no';
             chan_name_list = get(findobj('parent', hdl, 'tag', 'chan_list'), 'String');
             chan_num = get(findobj('parent', hdl, 'tag', 'chan_list'), 'Value') -1;
-            if chan_num == 0  % 'all channels' option 
+            if chan_num == 0  % 'all subjects' option 
                 return;
             end
             % Don't rename 'Notchan' and 'Outliers'  channels.
@@ -430,7 +430,7 @@ else
             STUDY.saved = 'no';
             old_chan = get(findobj('parent', hdl, 'tag', 'chan_list'), 'value') -1;
             comp_ind = get(findobj('parent', hdl, 'tag', 'chan_onechan'), 'Value'); 
-            if old_chan == 0 % 'all channels' option 
+            if old_chan == 0 % 'all subjects' option 
                 return;
             end
             % Don't reassign channels of 'Notchan' or the 'Parentchannel'.
@@ -455,7 +455,7 @@ else
             if ~isempty(reassign_param) %if not canceled
                 new_chan = reassign_param{1};
                 comp_to_disp = get(findobj('parent', hdl, 'tag', 'chan_onechan'), 'String');      
-                if strcmp(comp_to_disp{comp_ind(1)},'All channels')
+                if strcmp(comp_to_disp{comp_ind(1)},'All subjects')
                     warndlg2('Cannot move all the channels of the channel - abort move channels', 'Aborting move channels');
                     return;
                 end
@@ -486,7 +486,7 @@ else
                 warndlg2('Cannot remove all the channel channels');
                 return;
             end
-            if old_chan == 0 % 'all channels' option 
+            if old_chan == 0 % 'all subjects' option 
                 return;
             end
             if strncmpi('Notchan',STUDY.channel(cls(old_chan)).name,8) | strncmpi('Parentchannel',STUDY.channel(cls(old_chan)).name,13)    % There are no outliers to 'Notchan'
@@ -543,7 +543,7 @@ else
 			    end
                 channels = cls(chan);
             else
-                std_name = 'All channels';
+                std_name = 'All subjects';
                 channels = [];
                 for k = 1:length(cls)
                      if ~strncmpi('Notchan',STUDY.channel(cls(k)).name,8) & ~strncmpi('Outliers',STUDY.channel(cls(k)).name,8) & ...
