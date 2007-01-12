@@ -9,10 +9,12 @@
 %   typecomp   - [0|1] compute electrode property (1) or component 
 %                property (0). Default is 1.
 %   chan       - channel or component number
-%   winhandle  - if this parameter is present, buttons for the
+%   winhandle  - if this parameter is present or non-NaN, buttons for the
 %                rejection of the component are drawn. If 
 %                non-zero, this parameter is used to backpropagate
 %                the color of the rejection button.
+%   spectral_options - [cell array] cell arry of options for the spectopo()
+%                      function.
 % 
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
@@ -37,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2006/11/22 21:28:11  arno
+% scott fix crashed, reverting to previous version
+%
 % Revision 1.31  2006/11/07 19:17:09  toby
 % changed topoplot title -sm
 %
@@ -61,7 +66,7 @@
 % Revision 1.24  2006/01/31 20:20:52  arno
 % options
 %
-% Revision 1.23  2006/01/31 20:16:47  arno
+% Revision 1.23  2006/01/31 20:16:47  arno\
 % options
 %
 % Revision 1.22  2005/09/05 21:25:14  scott
@@ -190,12 +195,15 @@
 % 03-18-02 text settings -ad & sm
 % 03-18-02 added title -ad & sm
 
-function com = pop_prop(EEG, typecomp, numcompo, winhandle)
+function com = pop_prop(EEG, typecomp, numcompo, winhandle, spec_opt)
 
 com = '';
 if nargin < 1
 	help pop_prop;
 	return;   
+end;
+if nargin < 5
+	spec_opt = {};
 end;
 if nargin == 1
 	typecomp = 1;
@@ -204,12 +212,14 @@ if typecomp == 0 & isempty(EEG.icaweights)
    error('No ICA weights recorded for this set, first run ICA');
 end;   
 if nargin == 2
-	promptstr    = { fastif(typecomp,'Channel number to plot:','Component number to plot:') };
-	inistr       = { '1' };
+	promptstr    = { fastif(typecomp,'Channel number to plot:','Component number to plot:') ...
+                     'Spectral options (see spectopo help):' };
+	inistr       = { '1' '''freqrange'', [2 50]' };
 	result       = inputdlg2( promptstr, 'Component properties - pop_prop()', 1,  inistr, 'pop_prop');
 	if size( result, 1 ) == 0 return; end;
    
 	numcompo   = eval( [ '[' result{1} ']' ] );
+    spec_opt   = eval( [ '{' result{2} '}' ] );
 end;
 
 % plotting several component properties
@@ -341,7 +351,10 @@ end;
 
 % plotting spectrum
 % -----------------
-if exist('winhandle')
+if ~exist('winhandle')
+    winhandle = NaN;
+end;
+if ~isnan(winhandle)
 	h = axes('units','normalized', 'position',[5 10 95 35].*s+q);
 else
 	h = axes('units','normalized', 'position',[5 0 95 40].*s+q);
@@ -350,23 +363,23 @@ end;
 try
 	eeglab_options; 
 	if typecomp == 1
-		[spectra freqs] = spectopo( EEG.data(numcompo,:), EEG.pnts, EEG.srate );
+		[spectra freqs] = spectopo( EEG.data(numcompo,:), EEG.pnts, EEG.srate, spec_opt{:} );
 	else 
 		if option_computeica  
-			[spectra freqs] = spectopo( EEG.icaact(numcompo,:), EEG.pnts, EEG.srate, 'mapnorm', EEG.icawinv(:,numcompo) );
+			[spectra freqs] = spectopo( EEG.icaact(numcompo,:), EEG.pnts, EEG.srate, 'mapnorm', EEG.icawinv(:,numcompo), spec_opt{:} );
 		else
 			if exist('icaacttmp')~=1, 
 				icaacttmp = (EEG.icaweights(numcompo,:)*EEG.icasphere)*reshape(EEG.data, EEG.nbchan, EEG.trials*EEG.pnts); 
 			end;
-			[spectra freqs] = spectopo( icaacttmp, EEG.pnts, EEG.srate, 'mapnorm', EEG.icawinv(:,numcompo) );
+			[spectra freqs] = spectopo( icaacttmp, EEG.pnts, EEG.srate, 'mapnorm', EEG.icawinv(:,numcompo), spec_opt{:} );
 		end;
 	end;
     % set up new limits
     % -----------------
-    freqslim = 50;
-	set(gca, 'xlim', [0 min(freqslim, EEG.srate/2)]);
-    spectra = spectra(find(freqs <= freqslim));
-	set(gca, 'ylim', [min(spectra) max(spectra)]);
+    %freqslim = 50;
+	%set(gca, 'xlim', [0 min(freqslim, EEG.srate/2)]);
+    %spectra = spectra(find(freqs <= freqslim));
+	%set(gca, 'ylim', [min(spectra) max(spectra)]);
     
 	%tmpy = get(gca, 'ylim');
     %set(gca, 'ylim', [max(tmpy(1),-1) tmpy(2)]);
@@ -381,7 +394,7 @@ end;
 % display buttons
 % ---------------
 
-if exist('winhandle')
+if ~isnan(winhandle)
 	COLREJ = '[1 0.6 0.6]';
 	COLACC = '[0.75 1 0.75]';
 	% CANCEL button
@@ -459,9 +472,9 @@ if exist('winhandle')
 		set(hval, 'enable', 'off');
 	end;
 	
-	com = sprintf('pop_prop( %s, %d, %d, 0);', inputname(1), typecomp, numcompo );
+	com = sprintf('pop_prop( %s, %d, %d, 0, %s);', inputname(1), typecomp, numcompo, vararg2str( { spec_opt } ) );
 else
-	com = sprintf('pop_prop( %s, %d, %d);', inputname(1), typecomp, numcompo );
+	com = sprintf('pop_prop( %s, %d, %d, NaN, %s);', inputname(1), typecomp, numcompo, vararg2str( { spec_opt } ) );
 end;
 
 return;
