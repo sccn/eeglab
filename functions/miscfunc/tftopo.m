@@ -1,50 +1,58 @@
-% tftopo()  - Generate a figure showing a selected image (e.g., an ERSP, ITC or ERP image) 
-%             from a supplied set of images, one for each scalp channel. Plots topoplot() 
-%             scalp maps of value distributions at specified (x,y) (e.g., time, frequency) 
-%             image points.  Else, images the signed (selected) between-channel std(). 
-%             Inputs may be outputs of timef(), crossf(), or erpimage().
+% tftopo()  - Generate a figure showing a selected or representative image (e.g., 
+%             an ERSP, ITC or ERP-image) from a supplied set of images, one for each 
+%             scalp channel. Then, plot topoplot() scalp maps of value distributions 
+%             at specified (time, frequency) image points. Else, image the signed 
+%             (selected) between-channel std(). Inputs may be outputs of 
+%             timef(), crossf(), or erpimage().
 % Usage:
 %             >> tftopo(tfdata,times,freqs, 'key1', 'val1', 'key2', val2' ...)
 % Inputs:
-%   tfdata    = Set of time/freq images, one for each channel. Matrix size: (time,freq,chans). 
-%               Else, (time,freq,chans,subjects) for grand mean RMS plotting.
-%   times     = Vector of image x-values (e.g., times in msec from timef()).
-%   freqs     = Vector of image y-values (e.g., frequencies in Hz from timef()).
+%   tfdata    = Set of time/freq images, one for each channel. Matrix dims: 
+%               (time,freq,chans). Else, (time,freq,chans,subjects) for grand mean 
+%               RMS plotting.
+%   times     = Vector of image (x-value) times in msec, from timef()).
+%   freqs     = Vector of image (y-value) frequencies in Hz, from timef()).
 %
 % Optional inputs:
 %  'timefreqs' = Array of time/frequency points at which to plot topoplot() maps.
-%                Size: (nrows,2), each row given the [ms Hz] location of one point.
-%  ' plotscalponly' = Plot only one scalp map (same format as above) and no
-%                time-frequency image.
+%                Size: (nrows,2), each row given the [ms Hz] location 
+%                of one point.
 %  'showchan'  = [integer] Channel number of the tfdata to image. Else 0 to image
 %                the (median-signed) RMS values across channels. {default: 0}
-%  'chanlocs'  = ['string'|structure] Electrode locations file (for format see 
-%                >> topoplot example) or EEG.chanlocs structure   {default: none}
+%  'chanlocs'  = ['string'|structure] Electrode locations file (for format, see 
+%                >> topoplot example) or EEG.chanlocs structure  {default: none}
 %  'limits'    = Vector of plotting limits [minms maxms minhz maxhz mincaxis maxcaxis]
-%                Omit, or use NaN's to use the input data limits. Ex: [nan nan -100 400];
-%  'signifs'   = Matrix of significance level(s) (e.g., from timef()) to zero out non-signif. 
-%                tfdata points. Matrix size must be ([1|2], freqs, chans, subjects) if
-%                the same threshold for all time points at each frequency, else
-%                ([1|2], freqs, times, chans, subjects). If first dimension is of size 1, 
-%                data is assumed to contain positive values only {default: none}
-%  'sigthresh' = [K L] After masking time-frequency decomposition using the 'signifs' array
-%                (above), concatenate time/freq values for which no more than K electrodes
-%                have non-0 (significant) values. If several subjects, the second value L
-%                is used to concatenate subjects in the same way. {default: [1 1]}
-%  'selchans'  = Channels to include in the topoplot() scalp maps (and image values) {default: all}
+%                May omit final vales, or use NaN's to use the input data limits. 
+%                Ex: [nan nan -100 400];
+%  'signifs'   = (times,freqs) Matrix of significance level(s) (e.g., from timef()) 
+%                to zero out non-signif. tfdata points. Matrix size must be 
+%                         ([1|2], freqs, chans, subjects) 
+%                if using the same threshold for all time points at each frequency, or
+%                         ([1|2], freqs, times, chans, subjects). 
+%                If first dimension is of size 1, data are assumed to contain 
+%                positive values only {default: none}
+%  'sigthresh' = [K L] After masking time-frequency decomposition using the 'signifs' 
+%                array (above), concatenate (time,freq) values for which no more than 
+%                K electrodes have non-0 (significant) values. If several subjects, 
+%                the second value L is used to concatenate subjects in the same way. 
+%                {default: [1 1]}
+%  'selchans'  = Channels to include in the topoplot() scalp maps (and image values) 
+%                {default: all}
 %  'smooth'    = [pow2] magnification and smoothing factor. power of 2 (default: 1}.
-%  'mode'      = ['rms'|'ave'] ('rms') return root-mean-square, else ('ave') average power
-%                {default: 'rms' }
+%  'mode'      = ['rms'|'ave'] ('rms') return root-mean-square, else ('ave') average 
+%                power {default: 'rms' }
 %  'logfreq'   = ['on'|'off'|'native'] plot log frequencies {default: 'off'}
 %                'native' means that the input is already in log frequencies 
 %  'vert'      = [times vector] (in msec) plot vertical dashed lines at specified times 
 %                {default: 0}
-%  'shiftimgs' = [resposne_times_vector] - shift time/frequency images from several subjects 
-%                each subject's response time {default: no shift} 
+%  'shiftimgs' = [response_times_vector] - shift time/frequency images from several 
+%                subjects by each subject's response time {default: no shift} 
 %  'title'     = [quoted_string] plot title (default: provided_string). 
 %  'cbar'      = ['on'|'off'] plot color bar {default: 'on'}
 %  'cmode'     = ['common'|'separate'] 'common' or 'separate' color axis for each
 %                topoplot {default: 'common'}
+%  'plotscalponly' = [x,y] location (e.g. msec,hz). Plot one scalp map only; no
+%                time-frequency image.
 %  'verbose'   = ['on'|'off'] comment on operations on command line {default: 'on'}.
 %  'axcopy'  = ['on'|'off'] creates a copy of the figure axis and its graphic objects in a new pop-up window 
 %                    using the left mouse button {default: 'on'}.. 
@@ -82,6 +90,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.81  2006/09/12 16:45:19  arno
+% debugging
+%
 % Revision 1.80  2006/05/03 12:14:24  arno
 % implementing native input
 %
@@ -406,10 +417,10 @@ if length(g.sigthresh) == 1
     g.sigthresh(2) = 1;
 end;
 if g.sigthresh(1) > nchans
-    error('tftopo(): ''sigthresh'' first number must be lower or equal to the number of channels');
+    error('tftopo(): ''sigthresh'' first number must be less than or equal to the number of channels');
 end;
 if g.sigthresh(2) > size(tfdata,4)
-    error('tftopo(): ''sigthresh'' second number must be lower or equal to the number of subjects');
+    error('tftopo(): ''sigthresh'' second number must be less than or equal to the number of subjects');
 end;
 if ~isempty(g.signifs)
     if size(g.signifs,1) > 2 | size(g.signifs,2) ~= size(tfdata,1)| ...
@@ -764,9 +775,10 @@ if g.showchan>0 & ~isempty(g.chanlocs)
      axis('square');
 end
 if strcmpi(g.axcopy, 'on')
-    axcopy
+    axcopy % turn on axis copying on mouse click 
 end
 
+%%%%%%%%%%%%%%%%%%%%%%%% embedded functions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function tfdat = avedata(tfdat, dim, thresh, mode)
     tfsign  = sign(mean(tfdat,dim));
@@ -777,6 +789,7 @@ function tfdat = avedata(tfdat, dim, thresh, mode)
         tfdat   = tfmask.*mean(tfdat,dim); % std of all channels
     end;
     
+
 function [tfdatnew, times, freqs] = magnifytwice(tfdat, times, freqs);
     indicetimes = [floor(1:0.5:size(tfdat,1)) size(tfdat,1)];
     indicefreqs = [floor(1:0.5:size(tfdat,2)) size(tfdat,2)];
@@ -791,6 +804,5 @@ function [tfdatnew, times, freqs] = magnifytwice(tfdat, times, freqs);
             tfdatnew(:,:,elec,S) = conv2(tfdatnew(:,:,elec,S), gauss2, 'same');
         end;
     end;
-
     %tfdatnew = convn(tfdatnew, gauss2, 'same'); % is equivalent to the loop for slowlier
 
