@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.47  2006/11/03 20:30:50  arno
+% add channel info for coregistration
+%
 % Revision 1.46  2006/10/25 20:38:14  arno
 % fix saving head mesh in EEG strcuture
 %
@@ -382,7 +385,7 @@ if nargin < 3
 		tmpbut = questdlg2(['This will draw ' int2str(length(arg2)) ' plots. Continue ?'], '', 'Cancel', 'Yes', 'Yes');
 		if strcmp(tmpbut, 'Cancel'), return; end;
 	end;
-    if length(arg2) == 0, error('Nothing to plot'); end;
+    if length(arg2) == 0, error('please choose a latency(s) to plot'); end
 	topotitle  = result{9};
 	rowcols    = eval( [ '[ ' result{10} ' ]' ] );
     tmpopts    = eval( [ '{ ' result{11} ' }' ] );
