@@ -34,6 +34,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2006/12/08 19:41:51  arno
+% same
+%
 % Revision 1.3  2006/12/08 19:40:49  arno
 % error for duplicate channel label
 %
@@ -68,7 +71,8 @@ end;
 %STUDY.changrp(indc).channels = { alllocs.labels };
 %tmp = std_chanlookup( STUDY, ALLEEG, STUDY.changrp(indc));
 %STUDY.changrp(indc).chaninds = tmp.chaninds;
-
+return; 
+    
 % ---------------
 % channel look-up
 % ---------------
@@ -90,3 +94,75 @@ function changrp = std_chanlookup( STUDY, ALLEEG, changrp);
             end;
         end;    
     end;
+    
+    return; 
+    
+    % ----BELOW IS AN OLDER VERSION -----
+    % --------------------------
+    % --------------------------
+    % --------------------------
+    % --------------------------
+    % --------------------------
+    % --------------------------
+    % --------------------------
+    % --------------------------
+    % --------------------------
+    % --------------------------
+    % --------------------------
+    % --------------------------
+    % --------------------------
+    % --------------------------
+    % --------------------------
+    % --------------------------
+    % --------------------------
+    % --------------------------
+    % --------------------------
+% create groups for channels
+% --------------------------
+function STUDY = std_changroupold(STUDY, ALLEEG);
+
+% union of all channel structures
+% -------------------------------
+alllocs = ALLEEG(STUDY.datasetinfo(1).index).chanlocs;
+alllabs = { alllocs.labels };
+for index = 2:length(STUDY.datasetinfo)
+   tmplocs = ALLEEG(STUDY.datasetinfo(index).index).chanlocs;
+   alllocs = eeg_mergechan(alllocs, tmplocs);
+end;
+
+% create group for each electrode
+% -------------------------------
+for indc = 1:length(alllocs)
+    STUDY.changrp(indc).name = [ alllocs(indc).labels ];
+    STUDY.changrp(indc).channels = { alllocs(indc).labels };
+    tmp = std_chanlookup( STUDY, ALLEEG, STUDY.changrp(indc));
+    STUDY.changrp(indc).chaninds = tmp.chaninds;
+    STUDY.changrp(indc).centroid = [];
+end;
+%STUDY.changrp(indc).name = [ 'full montage' ];
+%STUDY.changrp(indc).channels = { alllocs.labels };
+%tmp = std_chanlookup( STUDY, ALLEEG, STUDY.changrp(indc));
+%STUDY.changrp(indc).chaninds = tmp.chaninds;
+
+% ---------------
+% channel look-up
+% ---------------
+function changrp = std_chanlookupold( STUDY, ALLEEG, changrp);
+
+    changrp.chaninds = [];
+    changrp.chaninds = zeros(size(STUDY.setind));
+    for ir = 1:size(STUDY.setind,1)
+        for ic = 1:size(STUDY.setind,2)
+            datind  = STUDY.setind(ir,ic);
+            tmplocs = { ALLEEG(STUDY.datasetinfo(datind).index).chanlocs.labels };
+
+            for indc = 1:length(changrp.channels)
+                ind = strmatch( changrp.channels(indc), tmplocs, 'exact');
+                if length(ind) > 1, error([ 'Duplicate channel label ''' tmplocs{ind(1)} ''' for dataset ' int2str(datind) ]); end;
+                if ~isempty(ind)
+                    changrp.chaninds(ir,ic) = ind;
+                end;
+            end;
+        end;    
+    end;
+
