@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.70  2006/04/11 21:16:57  arno
+% typo
+%
 % Revision 1.69  2006/04/11 21:10:55  arno
 % fixing original electrode location on head
 %
@@ -487,16 +490,7 @@ if isstr(values)
         fprintf('Setting up splining matrix.\n');    
         enum = length(Xe);
         onemat = ones(enum,1);
-        G = zeros(enum,enum);
-        for i = 1:enum
-            ei = onemat-sqrt((Xe(i)*onemat-Xe).^2 + (Ye(i)*onemat-Ye).^2 + ...
-                             (Ze(i)*onemat-Ze).^2); % default was /2 and no sqrt
-            gx = zeros(1,enum);
-            for j = 1:enum
-                gx(j) = calcgx(ei(j));
-            end
-            G(i,:) = gx;
-        end
+        G = fastcalcgx(Xe,Ye,Ze,Xe,Ye,Ze);
     end;
     fprintf('Calculating splining matrix...\n')
 
@@ -925,10 +919,15 @@ out = out/(4*pi);
 function gx = fastcalcgx(x,y,z,Xe,Ye,Ze)
 
 onemat = ones(length(x),length(Xe));
-EI = onemat - sqrt((repmat(x,1,length(Xe)) - repmat(Xe',length(x),1)).^2 +... 
-                    (repmat(y,1,length(Xe)) - repmat(Ye',length(x),1)).^2 +...
-                    (repmat(z,1,length(Xe)) - repmat(Ze',length(x),1)).^2);
-%
+EI = onemat - ((repmat(x,1,length(Xe)) - repmat(Xe',length(x),1)).^2 +... 
+               (repmat(y,1,length(Xe)) - repmat(Ye',length(x),1)).^2 +...
+               (repmat(z,1,length(Xe)) - repmat(Ze',length(x),1)).^2)/2;
+%EI = onemat - sqrt((repmat(x,1,length(Xe)) - repmat(Xe',length(x),1)).^2 +... 
+%               (repmat(y,1,length(Xe)) - repmat(Ye',length(x),1)).^2 +...
+%               (repmat(z,1,length(Xe)) - repmat(Ze',length(x),1)).^2);
+EI(find(EI < 0)) = 0;
+EI = EI*2-1;
+
 gx = zeros(length(x),length(Xe));
 m = 4;
 icadefs;
