@@ -67,6 +67,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.38  2006/10/25 23:07:46  arno
+% convert comps to double
+%
 % Revision 1.37  2006/04/13 20:16:10  arno
 % no need for additional MRI input
 %
@@ -292,6 +295,8 @@ else
     % --------
     tmpoptions = { options{:} 'coordformat', EEG.dipfit.coordformat };
     if strcmpi(EEG.dipfit.coordformat, 'spherical')
+        dipplot(EEG.dipfit.model(comps), tmpoptions{:});
+    elseif strcmpi(EEG.dipfit.coordformat, 'CTF')
         dipplot(EEG.dipfit.model(comps), tmpoptions{:});
     else
         dipplot(EEG.dipfit.model(comps), 'meshdata', EEG.dipfit.hdmfile, tmpoptions{:});

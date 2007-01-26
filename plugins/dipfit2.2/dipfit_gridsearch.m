@@ -19,6 +19,8 @@
 %
 % Author: Robert Oostenveld, SMI/FCDC, Nijmegen 2003, load/save by
 %         Arnaud Delorme
+%         Thanks to Nicolas Robitaille for his help on the CTF MEG
+%         implementation
 
 % SMI, University Aalborg, Denmark http://www.smi.auc.dk/
 % FC Donders Centre, University Nijmegen, the Netherlands http://www.fcdonders.kun.nl
@@ -40,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2006/01/10 03:26:03  arno
+% donnot know
+%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [EEGOUT] = dipfit_gridsearch(EEG, varargin)
@@ -78,6 +83,23 @@ end
 % was computed using FIELDTRIPs componentanalysis function
 comp = eeglab2fieldtrip(EEG, 'componentanalysis', 'dipfit');
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  Added code to handle CTF data with multipleSphere head model           %
+%  This code is copy-pasted in dipfit_gridSearch, dipfit_nonlinear        %
+%  The flag .isMultiSphere is used by dipplot                             %
+%  Nicolas Robitaille, January 2007.                                      %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Do some trick to force fieldtrip to use the multiple sphere model
+if strcmpi(EEG.dipfit.coordformat, 'CTF')
+   cfg = rmfield(cfg, 'channel');
+   comp = rmfield(comp, 'elec');
+   cfg.gradfile = EEG.dipfit.chanfile;
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% END                                                                     %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if ~isfield(cfg, 'component')
   % default is to scan all components
   cfg.component = 1:size(comp.topo,2);

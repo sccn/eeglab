@@ -11,6 +11,8 @@
 %
 % Author: Robert Oostenveld, SMI/FCDC, Nijmegen 2003
 %         Arnaud Delorme, SCCN, La Jolla 2003
+%         Thanks to Nicolas Robitaille for his help on the CTF MEG
+%         implementation
 
 % SMI, University Aalborg, Denmark http://www.smi.auc.dk/
 % FC Donders Centre, University Nijmegen, the Netherlands http://www.fcdonders.kun.nl/
@@ -32,6 +34,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2006/03/10 23:52:46  arno
+% multiple dipole fit
+%
 % Revision 1.9  2006/03/10 23:33:48  arno
 % GUI wording
 %
@@ -89,7 +94,7 @@ elseif nargin==1
   
   EEGOUT = EEG;
   com = '';
-  
+
   if ~isfield(EEG, 'chanlocs')
     error('No electrodes present');
   end
@@ -276,7 +281,7 @@ elseif nargin>=3
       current = get(findobj(parent, 'tag', 'component'), 'string');
       EEG.dipfit.current = str2num(current);
       if ~isempty( EEG.dipfit.current )
-        pop_dipplot(EEG, 'DIPFIT',  EEG.dipfit.current, 'normlen', 'on');
+        pop_dipplot(EEG, 'DIPFIT',  EEG.dipfit.current, 'normlen', 'on', 'mri', EEG.dipfit.mrifile);
       end;
       
     case 'dialog_checkinput'
@@ -318,11 +323,17 @@ elseif nargin>=3
       set(findobj(parent, 'tag', 'dip1sel'), 'value', ismember(1, EEG.dipfit.model(EEG.dipfit.current).select));
       set(findobj(parent, 'tag', 'dip2sel'), 'value', ismember(2, EEG.dipfit.model(EEG.dipfit.current).select));
       set(findobj(parent, 'tag', 'dip1pos'), 'string', sprintf('%0.3f %0.3f %0.3f', EEG.dipfit.model(EEG.dipfit.current).posxyz(1,:)));
-      set(findobj(parent, 'tag', 'dip1mom'), 'string', sprintf('%0.3f %0.3f %0.3f', EEG.dipfit.model(EEG.dipfit.current).momxyz(1,:)));
+      if strcmpi(EEG.dipfit.coordformat, 'CTF')
+           set(findobj(parent, 'tag', 'dip1mom'), 'string', sprintf('%f %f %f', EEG.dipfit.model(EEG.dipfit.current).momxyz(1,:)));
+      else set(findobj(parent, 'tag', 'dip1mom'), 'string', sprintf('%0.3f %0.3f %0.3f', EEG.dipfit.model(EEG.dipfit.current).momxyz(1,:)));
+      end;
       Ndipoles = size(EEG.dipfit.model(EEG.dipfit.current).posxyz, 1);
       if Ndipoles>=2
           set(findobj(parent, 'tag', 'dip2pos'), 'string', sprintf('%0.3f %0.3f %0.3f', EEG.dipfit.model(EEG.dipfit.current).posxyz(2,:)));
-          set(findobj(parent, 'tag', 'dip2mom'), 'string', sprintf('%0.3f %0.3f %0.3f', EEG.dipfit.model(EEG.dipfit.current).momxyz(2,:)));
+          if strcmpi(EEG.dipfit.coordformat, 'CTF')
+               set(findobj(parent, 'tag', 'dip2mom'), 'string', sprintf('%f %f %f', EEG.dipfit.model(EEG.dipfit.current).momxyz(2,:)));
+          else set(findobj(parent, 'tag', 'dip2mom'), 'string', sprintf('%0.3f %0.3f %0.3f', EEG.dipfit.model(EEG.dipfit.current).momxyz(2,:)));
+          end;
       end
       
     case 'dialog_getvalue'

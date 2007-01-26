@@ -15,6 +15,8 @@
 %    ...
 %
 % Author: Robert Oostenveld, SMI/FCDC, Nijmegen 2003
+%         Thanks to Nicolas Robitaille for his help on the CTF MEG
+%         implementation
 
 % SMI, University Aalborg, Denmark http://www.smi.auc.dk/
 % FC Donders Centre, University Nijmegen, the Netherlands http://www.fcdonders.kun.nl
@@ -36,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2006/01/10 00:46:07  arno
+% nothing
+%
 % Revision 1.1  2005/03/11 00:18:39  arno
 % Initial revision
 %
@@ -69,6 +74,7 @@ elseif isfield(EEG.dipfit, 'hdmfile')
 else
     error('no head model in EEG.dipfit')
 end
+
 if isfield(EEG.dipfit, 'elecfile') & ~isempty(EEG.dipfit.elecfile)
     cfg.elecfile = EEG.dipfit.elecfile;
 end
@@ -84,6 +90,23 @@ cfg.dip.mom = cfg.dip.mom(:);
 % convert the EEGLAB data structure into a structure that looks as if it
 % was computed using FIELDTRIPs componentanalysis function
 comp = eeglab2fieldtrip(EEG, 'componentanalysis', 'dipfit');
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  Added code to handle CTF data with multipleSphere head model           %
+%  This code is copy-pasted in dipfit_gridSearch, dipfit_nonlinear        %
+%  The flag .isMultiSphere is used by dipplot                             %
+%  Nicolas Robitaille, January 2007.                                      %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Do some trick to force fieldtrip to use the multiple sphere model
+if strcmpi(EEG.dipfit.coordformat, 'CTF')
+   cfg = rmfield(cfg, 'channel');
+   comp = rmfield(comp, 'elec');
+   cfg.gradfile = EEG.dipfit.chanfile;
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% END                                                                     %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % fit the dipoles to the ICA component(s) of interest using FIELDTRIPs
 % dipolefitting function
@@ -93,6 +116,8 @@ source = dipolefitting(cfg, comp);
 EEG.dipfit.model(cfg.component).posxyz  = source.dip.pos;
 EEG.dipfit.model(cfg.component).momxyz  = reshape(source.dip.mom, 3, length(source.dip.mom)/3)';
 EEG.dipfit.model(cfg.component).diffmap = source.dip.pot - source.Vdata;
+EEG.dipfit.model(cfg.component).sourcepot = source.dip.pot;
+EEG.dipfit.model(cfg.component).datapot   = source.Vdata;
 EEG.dipfit.model(cfg.component).rv      = source.dip.rv;
 
 EEGOUT = EEG;

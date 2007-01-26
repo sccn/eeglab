@@ -153,6 +153,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.144  2006/11/20 21:22:12  arno
+%call 2 mni2tal compatible with mni2tal in bioelectromagnetism
+%
 %Revision 1.143  2006/11/10 02:47:00  arno
 %remove transformation
 %
@@ -588,7 +591,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     %                             key        type       range             default
     g = finputcheck( varargin, { 'color'     ''         []                  [];
                                  'axistight' 'string'   { 'on' 'off' }     'off';
-                                 'coordformat' 'string' { 'MNI' 'spherical' 'auto' } 'auto';
+                                 'coordformat' 'string' { 'MNI' 'spherical' 'CTF' 'auto' } 'auto';
                                  'drawedges' 'string'   { 'on' 'off' }     'off';
                                  'mesh'      'string'   { 'on' 'off' }     'off';
                                  'gui'       'string'   { 'on' 'off' }     'on';
@@ -699,7 +702,10 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     
     if strcmpi(g.coordformat, 'spherical')
          dat.sph2spm    = sph2spm;
-    else dat.sph2spm    = []; %traditional([0 0 0 0 0 pi 1 1 1]);
+    elseif strcmpi(g.coordformat, 'CTF')
+        dat.sph2spm    = traditional([0 0 0 0 0 0 10 10 10]);
+    else
+        dat.sph2spm    = []; %traditional([0 0 0 0 0 pi 1 1 1]);
     end;
     
     if ~isempty(g.transform), dat.sph2spm = traditional(g.transform);
@@ -718,6 +724,10 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
         g.mri.ygrid = [1:size(dat.imgs,2)];
         g.mri.zgrid = [1:size(dat.imgs,3)];
     end;
+    if strcmpi(g.coordformat, 'CTF')
+        g.mri.zgrid = g.mri.zgrid(end:-1:1);
+    end;
+
     dat.imgcoords = { g.mri.xgrid g.mri.ygrid g.mri.zgrid };            
     dat.maxcoord  = [max(dat.imgcoords{1}) max(dat.imgcoords{2}) max(dat.imgcoords{3})];
     COLORMESH = 'w';
@@ -830,7 +840,9 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                 else                    tmpname = char(g.dipnames{index});
                 end;
                 talpos = newsources(index).talcoord;
-                if size(talpos,1) == 1
+                if strcmpi(g.coordformat, 'CTF')
+                    textforgui(colorcount) = { sprintf( [ tmpname ' (RV:%3.2f%%)' ], 100*newsources(index).rv) };
+                elseif size(talpos,1) == 1
                     textforgui(colorcount) = { sprintf( [ tmpname ' (RV:%3.2f%%; Tal:%d,%d,%d)' ], ...
                                                         100*newsources(index).rv, ...
                                                         round(talpos(1,1)), round(talpos(1,2)), round(talpos(1,3))) };
@@ -876,6 +888,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     axis equal;
     set(gca, 'cameraviewanglemode', 'manual'); % disable change size
     camzoom(1.2^2);
+    if strcmpi(g.coordformat, 'CTF'), g.view(2:3) = -g.view(2:3); end;
     view(g.view);
     %set(gca, 'cameratarget',   dat.zeroloc); % disable change size
     %set(gca, 'cameraposition', dat.zeroloc+g.view*g.zoom); % disable change size
@@ -951,6 +964,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             z = sources(index).posxyz(dip,3);
             if strcmpi(g.normlen, 'on')
                 len    = sqrt(sum(sources(index).momxyz(dip,:).^2));
+                if strcmpi(g.coordformat, 'CTF'), len = len*10; end;
                 if len ~= 0, multfactor = 15/len; end;
             else
                 if strcmpi(g.coordformat, 'spherical')
@@ -1206,30 +1220,36 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
              'dipplot(gcbf);' ];
     viewstring = fastif(dat.axistight, 'Loose view', 'Tight view');
     enmesh     = fastif(isempty(g.meshdata) & strcmpi(g.coordformat, 'MNI'), 'off', 'on');
+    if strcmpi(g.coordformat, 'CTF'), viewcor = 'view([0 1 0]);';  viewtop = 'view([0 0 -1]);'; vis = 'off';
+    else                              viewcor = 'view([0 -1 0]);'; viewtop = 'view([0 0 1]);';  vis = 'on';
+    end;
     
+    h = uicontrol( 'unit', 'normalized', 'position', [0 0  .15 1], 'tag', 'tmp', ...
+                  'style', 'text', 'string',' ');
     h = uicontrol( 'unit', 'normalized', 'position', [0 0 .15 .05], 'tag', 'tmp', ...
                   'style', 'pushbutton', 'fontweight', 'bold', 'string', 'No controls', 'callback', ...
                    'set(findobj(''parent'', gcbf, ''tag'', ''tmp''), ''visible'', ''off'');');
     h = uicontrol( 'unit', 'normalized', 'position', [0 0.05 .15 .05], 'tag', 'tmp', ...
-                  'style', 'pushbutton', 'string', 'Top view', 'callback', 'view([0 0 1]);');
+                  'style', 'pushbutton', 'string', 'Top view', 'callback', viewtop);
     h = uicontrol( 'unit', 'normalized', 'position', [0 0.1 .15 .05], 'tag', 'tmp', ...
-                  'style', 'pushbutton', 'string', 'Coronal view', 'callback', 'view([0 -1 0]);');
+                  'style', 'pushbutton', 'string', 'Coronal view', 'callback', viewcor);
     h = uicontrol( 'unit', 'normalized', 'position', [0 0.15 .15 .05], 'tag', 'tmp', ...
                   'style', 'pushbutton', 'string', 'Sagittal view', 'callback', 'view([1 0 0]);');
     h = uicontrol( 'unit', 'normalized', 'position', [0 0.2  .15 .05], 'tag', 'tmp', ...
                   'style', 'pushbutton', 'string', viewstring, 'callback', cbview);
     h = uicontrol( 'unit', 'normalized', 'position', [0 0.25 .15 .05], 'tag', 'tmp', ...
-                  'style', 'pushbutton', 'string', 'Mesh on', 'userdata', 0, 'callback', cbmesh, 'enable', enmesh);
+                  'style', 'pushbutton', 'string', 'Mesh on', 'userdata', 0, 'callback', ...
+                  cbmesh, 'enable', enmesh, 'visible', vis );
     h = uicontrol( 'unit', 'normalized', 'position', [0 0.3 .15 .05], 'tag', 'tmp', ...
                   'style', 'text', 'string', 'Display:','fontweight', 'bold' );
     h = uicontrol( 'unit', 'normalized', 'position', [0 0.35 .15 .02], 'tag', 'tmp',...
                   'style', 'text', 'string', '');
     h = uicontrol( 'unit', 'normalized', 'position', [0 0.37 .15 .05], 'tag', 'tmp','userdata', 'z',...
-                  'style', 'text', 'string', 'Z:');
+                  'style', 'text', 'string', 'Z:', 'visible', vis );
     h = uicontrol( 'unit', 'normalized', 'position', [0 0.42 .15 .05], 'tag', 'tmp','userdata', 'y', ...
-                  'style', 'text', 'string', 'Y:');
+                  'style', 'text', 'string', 'Y:', 'visible', vis );
     h = uicontrol( 'unit', 'normalized', 'position', [0 0.47 .15 .05], 'tag', 'tmp', 'userdata', 'x',...
-                   'style', 'text', 'string', 'X:' );
+                   'style', 'text', 'string', 'X:', 'visible', vis );
     h = uicontrol( 'unit', 'normalized', 'position', [0 0.52 .15 .05], 'tag', 'tmp', 'userdata', 'rv',...
                    'style', 'text', 'string', 'RV:' );
     h = uicontrol( 'unit', 'normalized', 'position', [0 0.57 .15 .05], 'tag', 'tmp', 'userdata', 'comp', ...
