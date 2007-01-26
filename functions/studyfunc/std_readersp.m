@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2006/11/10 02:28:46  arno
+% bootstrap concatenation
+%
 % Revision 1.22  2006/11/03 19:45:06  arno
 % do not mask ERSP by default
 %
@@ -259,6 +262,6 @@ timevals = tmpersp.times(minind:maxind);
 function cella = removedup(cella)
     [tmp indices] = unique(cella(1:2:end));
     if length(tmp) ~= length(cella)/2
-        fprintf('Warning: duplicate ''key'', ''val'' parameter(s), keeping the last one(s)\n');
+        %fprintf('Warning: duplicate ''key'', ''val'' parameter(s), keeping the last one(s)\n');
     end;
     cella = cella(sort(union(indices*2-1, indices*2)));
