@@ -26,6 +26,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2006/11/13 20:02:13  arno
+% change automatic BEM rotation again
+%
 % Revision 1.11  2006/11/12 18:08:15  arno
 % change coregistration for BEM
 %
@@ -100,16 +103,17 @@
 % this file is not a function but a script and is included in the dipfit_XXX functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-if ~isfield(EEG, 'chanlocs')
-  error('No electrode locations defined');
-end
+try,
+    if ~isfield(EEG, 'chanlocs')
+    error('No electrode locations defined');
+    end
 
-if ~isfield(EEG, 'icawinv')
-  error('No ICA components present');
-end
-
-nchan = length(EEG(1).chanlocs);
-ncomp = size(EEG(1).icawinv, 2);
+    if ~isfield(EEG, 'icawinv')
+    error('No ICA components present');
+    end
+    nchan = length(EEG(1).chanlocs);
+    ncomp = size(EEG(1).icawinv, 2);
+catch, nchan = 0; end;
 
 % create one-sphere model
 % defaultvolume.r = meanradius;
@@ -143,7 +147,8 @@ template_models = { ...
       [ folder 'standard_BEM' delim 'standard_mri.mat' ] ...
       [ folder 'standard_BEM' delim 'elec' delim 'standard_1005.elc' ] ...
       [ 0 0 0 0 0 -pi/2  1 1 1] } ...
-    { '' 'MNI' '' '' [] } }; % custom model
+    ...                                                                  % associated with model
+    { '' 'CTF' '' '' [] } { '' 'MNI' '' '' [] } }; % custom model
 
 % constrain electrode to sphere
 % -----------------------------
