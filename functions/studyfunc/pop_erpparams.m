@@ -7,10 +7,13 @@
 %   STUDY        - EEGLAB STUDY set
 %
 % Statistics options:
-%   'groupstats'  - ['on'|'off'] Compute (or not) statistics across groups.
+%   'groupstats  - ['on'|'off'] Compute (or not) statistics across groups.
 %                  {default: 'off'}
-%   'condstats'   - ['on'|'off'] Compute (or not) statistics across groups.
+%   'condstats'  - ['on'|'off'] Compute (or not) statistics across groups.
 %                  {default: 'off'}
+%   'topotime'   - [real] Plot ERP scalp maps at one specific latency (ms).
+%                   A latency range [min max] may also be defined (the 
+%                   ERP is then averaged over the interval) {default: []}
 %   'statistics' - ['param'|'perm'] Type of statistics to use: 'param' for
 %                  parametric and 'perm' for permutation-based statistics. 
 %                  {default: 'param'}
@@ -57,6 +60,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2006/11/22 20:04:40  arno
+% same
+%
 % Revision 1.11  2006/11/22 20:03:35  arno
 % filter filed
 % field
@@ -105,13 +111,16 @@ if isempty(varargin)
     statval     = fastif(strcmpi(STUDY.etc.erpparams.statistics,'param'), 1, 2);
     condstats    = fastif(strcmpi(STUDY.etc.erpparams.condstats, 'on'), 1, 0);
     groupstats   = fastif(strcmpi(STUDY.etc.erpparams.groupstats,'on'), 1, 0);
+    vis = fastif(isnan(STUDY.etc.erpparams.topotime), 'off', 'on');
     
     uilist = { ...
         {'style' 'text'       'string' 'Time range in ms [low high]'} ...
         {'style' 'edit'       'string' num2str(STUDY.etc.erpparams.timerange) 'tag' 'timerange' } ...
         {'style' 'text'       'string' 'Plot limits in uV [low high]'} ...
         {'style' 'edit'       'string' num2str(STUDY.etc.erpparams.ylim) 'tag' 'ylim' } ...
-        {} {} {'style' 'text'       'string' 'Display filter in Hz [high]'} ...
+        {'style' 'text'       'string' 'Plot scalp map at latency [ms]' 'enable' vis } ...
+        {'style' 'edit'       'string' num2str(STUDY.etc.erpparams.topotime) 'tag' 'topotime' 'enable' vis } ...
+        {'style' 'text'       'string' 'Display filter in Hz [high]' } ...
         {'style' 'edit'       'string' num2str(STUDY.etc.erpparams.filter) 'tag' 'filter' } ...
         {} {'style' 'checkbox'   'string' '' 'value' plotconditions 'enable' enablecond  'tag' 'plotconditions' } ...
         {'style' 'text'       'string' 'Plot conditions on the same panel' 'enable' enablecond } ...
@@ -142,6 +151,7 @@ if isempty(varargin)
     if res.condstats , res.condstats  = 'on'; else res.condstats  = 'off'; end;
     if res.plotgroups, res.plotgroups = 'together'; else res.plotgroups = 'apart'; end;
     if res.plotconditions , res.plotconditions  = 'together'; else res.plotconditions  = 'apart'; end;
+    res.topotime   = str2num( res.topotime );
     res.timerange = str2num( res.timerange );
     res.ylim      = str2num( res.ylim );
     res.threshold = str2num( res.threshold );
@@ -160,7 +170,8 @@ if isempty(varargin)
     if ~strcmpi( res.groupstats, STUDY.etc.erpparams.groupstats), options = { options{:} 'groupstats' res.groupstats }; end;
     if ~strcmpi( res.condstats , STUDY.etc.erpparams.condstats ), options = { options{:} 'condstats'  res.condstats  }; end;
     if ~strcmpi( res.statistics, STUDY.etc.erpparams.statistics ), options = { options{:} 'statistics' res.statistics }; end;
-    if ~isequal(res.ylim     , STUDY.etc.erpparams.ylim),      options = { options{:} 'ylim' res.ylim      }; end;
+    if ~isequal(res.ylim     , STUDY.etc.erpparams.ylim),      options = { options{:} 'ylim' res.ylim       }; end;
+    if ~isequal(res.topotime  , STUDY.etc.erpparams.topotime),   options = { options{:} 'topotime' res.topotime }; end;
     if ~isequal(res.timerange, STUDY.etc.erpparams.timerange), options = { options{:} 'timerange' res.timerange }; end;
     if isnan(res.threshold) & ~isnan(STUDY.etc.erpparams.threshold) | ...
             ~isnan(res.threshold) & isnan(STUDY.etc.erpparams.threshold) | ...
@@ -200,6 +211,7 @@ end;
 
 function STUDY = default_params(STUDY)
     if ~isfield(STUDY.etc, 'erpparams'), STUDY.etc.erpparams = []; end;
+    if ~isfield(STUDY.etc.erpparams, 'topotime'),    STUDY.etc.erpparams.topotime = []; end;
     if ~isfield(STUDY.etc.erpparams, 'filter'),     STUDY.etc.erpparams.filter = []; end;
     if ~isfield(STUDY.etc.erpparams, 'timerange'),  STUDY.etc.erpparams.timerange = []; end;
     if ~isfield(STUDY.etc.erpparams, 'ylim'     ),  STUDY.etc.erpparams.ylim      = []; end;
