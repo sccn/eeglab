@@ -1,9 +1,9 @@
-% eegplugin_dipfit2_0() - DIPFIT plugin version 2.0 for EEGLAB menu. 
+% eegplugin_dipfit2_1() - DIPFIT plugin version 2.0 for EEGLAB menu. 
 %                      DIPFIT is the dipole fitting Matlab Toolbox of 
 %                      Robert Oostenveld (in collaboration with A. Delorme).
 %
 % Usage:
-%   >> eegplugin_dipfit2_0(fig, trystrs, catchstrs);
+%   >> eegplugin_dipfit2_1(fig, trystrs, catchstrs);
 %
 % Inputs:
 %   fig        - [integer] eeglab figure.
@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1.07  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2006/11/20 18:46:06  arno
+% add menu separator
+%
 % Revision 1.21  2006/04/13 17:31:16  arno
 % separator
 %
@@ -179,19 +182,19 @@
 % Initial revision
 %
 
-function vers = eegplugin_dipfit2_0(fig, trystrs, catchstrs)
+function vers = eegplugin_dipfit2_1(fig, trystrs, catchstrs)
     
-    vers = 'dipfit2.0';
+    vers = 'dipfit2.1';
     if nargin < 3
-        error('eegplugin_dipfit2_0 requires 3 arguments');
+        error('eegplugin_dipfit2_1 requires 3 arguments');
     end;
     
     % add dipfit folder to path
     % -----------------------
     tmp  = which('topoplot');
     if ~exist('dipolefitting')
-        p = which('eegplugin_dipfit2_0');
-        p = p(1:findstr(p,'eegplugin_dipfit2_0.m')-1);
+        p = which('eegplugin_dipfit2_1');
+        p = p(1:findstr(p,'eegplugin_dipfit2_1.m')-1);
         dircontent  = dir([ p '..' p(end) '..' p(end) '..'  ]);
         dircontent  = { dircontent.name };
         ind = strmatch('fieldtrip', lower(dircontent));
