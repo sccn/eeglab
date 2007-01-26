@@ -1,4 +1,3 @@
-%
 % std_readitc() - returns the log-frequency inter-trial coherence (ITC) for a 
 %                 specified ICA component. The component ITCs for the dataset 
 %                 are assumed to have been saved in a Matlab file, 
@@ -54,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2006/09/12 18:56:15  arno
+% channel compatibility
+%
 % Revision 1.11  2006/05/03 17:55:54  arno
 % allow to read data channels
 %
@@ -191,6 +193,6 @@ timevals = tmpitc.times(minind:maxind);
 function cella = removedup(cella)
     [tmp indices] = unique(cella(1:2:end));
     if length(tmp) ~= length(cella)/2
-        fprintf('Warning: duplicate ''key'', ''val'' parameter(s), keeping the last one(s)\n');
+        %fprintf('Warning: duplicate ''key'', ''val'' parameter(s), keeping the last one(s)\n');
     end;
     cella = cella(sort(union(indices*2-1, indices*2)));
