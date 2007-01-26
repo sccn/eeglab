@@ -81,6 +81,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2006/11/10 01:34:55  arno
+% GUI units
+%
 % Revision 1.7  2006/10/03 21:21:43  scott
 % nothing
 %
@@ -110,8 +113,8 @@ if isempty(varargin)
     statval     = fastif(strcmpi(STUDY.etc.erspparams.statistics,'param'), 1, 2);
     statmode    = fastif(strcmpi(STUDY.etc.erspparams.statmode,'subjects'), 1, 2);
     subbaseline = fastif(strcmpi(STUDY.etc.erspparams.subbaseline,'on'), 1, 0);
-    condstats    = fastif(strcmpi(STUDY.etc.erspparams.condstats, 'on'), 1, 0);
-    groupstats   = fastif(strcmpi(STUDY.etc.erspparams.groupstats,'on'), 1, 0);
+    condstats   = fastif(strcmpi(STUDY.etc.erspparams.condstats, 'on'), 1, 0);
+    groupstats  = fastif(strcmpi(STUDY.etc.erspparams.groupstats,'on'), 1, 0);
     maskdata    = fastif(strcmpi(STUDY.etc.erspparams.maskdata,'on'), 1, 0);
     cb_maskdata = [ 'tmpcond  = get(findobj(gcbf, ''tag'', ''condstats'') , ''value'');' ...
                     'tmpgroup = get(findobj(gcbf, ''tag'', ''groupstats''), ''value'');' ...
@@ -122,14 +125,19 @@ if isempty(varargin)
                     '    set(gcbo, ''value'', 0);' ...
                     'end;' ...
                     'clear tmpcond tmpgroup tmpplot;' ];
+    vis = fastif(isnan(STUDY.etc.erspparams.topotime), 'off', 'on');
     
     uilist = { ...
         {'style' 'text'       'string' 'Time range in ms [Low High]'} ...
         {'style' 'edit'       'string' num2str(STUDY.etc.erspparams.timerange) 'tag' 'timerange' } ...
-        {'style' 'text'       'string' 'Power limits in dB [Low High]'} ...
-        {'style' 'edit'       'string' num2str(STUDY.etc.erspparams.ersplim) 'tag' 'ersplim' } ...
+        {'style' 'text'       'string' 'Plot scalp map at time [ms]' 'visible' vis} ...
+        {'style' 'edit'       'string' num2str(STUDY.etc.erspparams.topotime) 'tag' 'topotime' 'visible' vis } ...
         {'style' 'text'       'string' 'Freq. range in Hz [Low High]'} ...
         {'style' 'edit'       'string' num2str(STUDY.etc.erspparams.freqrange) 'tag' 'freqrange' } ...
+        {'style' 'text'       'string' 'Plot scalp map at freq. [Hz]' 'visible' vis} ...
+        {'style' 'edit'       'string' num2str(STUDY.etc.erspparams.topofreq) 'tag' 'topofreq' 'visible' vis } ...
+        {'style' 'text'       'string' 'Power limits in dB [Low High]'} ...
+        {'style' 'edit'       'string' num2str(STUDY.etc.erspparams.ersplim) 'tag' 'ersplim' } ...
         {'style' 'text'       'string' 'ITC limit (0-1) [High]'} ...
         {'style' 'edit'       'string' num2str(STUDY.etc.erspparams.itclim) 'tag' 'itclim' } ...
         {} {'style' 'checkbox'   'string' '' 'value' subbaseline 'tag' 'subbaseline' } ...
@@ -149,7 +157,7 @@ if isempty(varargin)
         {} {'style' 'checkbox'   'string' '' 'value' maskdata 'tag' 'maskdata' 'callback' cb_maskdata } ...
         {'style' 'text'       'string' 'Mask non-significant data' } };
     
-    geometry = { [ 1 .5 1 .5]  [ 1 .5 1 .5] [0.1 0.1 1] [1] [ 0.7 .8 1 .5] [ 0.7 .8 1 .5] [0.1 0.1 1] [0.1 0.1 1] [0.1 0.1 1] };
+    geometry = { [ 1 .5 1 .5]  [ 1 .5 1 .5] [ 1 .5 1 .5] [0.1 0.1 1] [1] [ 0.7 .8 1 .5] [ 0.7 .8 1 .5] [0.1 0.1 1] [0.1 0.1 1] [0.1 0.1 1] };
     
     [out_param userdat tmp res] = inputgui( 'geometry' , geometry, 'uilist', uilist, ...
                                    'helpcom', 'pophelp(''std_erspparams'')', ...
@@ -163,6 +171,8 @@ if isempty(varargin)
     if res.condstats , res.condstats  = 'on'; else res.condstats  = 'off'; end;
     if res.maskdata , res.maskdata  = 'on'; else res.maskdata  = 'off'; end;
     if res.subbaseline, res.subbaseline = 'on'; else res.subbaseline = 'off'; end;
+    res.topotime  = str2num( res.topotime );
+    res.topofreq  = str2num( res.topofreq );
     res.timerange = str2num( res.timerange );
     res.freqrange = str2num( res.freqrange );
     res.ersplim   = str2num( res.ersplim );
@@ -185,6 +195,8 @@ if isempty(varargin)
     if ~strcmpi( res.statmode,  STUDY.etc.erspparams.statmode ), options = { options{:} 'statmode'  res.statmode }; end;
     if ~strcmpi( res.statistics, STUDY.etc.erspparams.statistics ), options = { options{:} 'statistics' res.statistics }; end;
     if ~strcmpi( res.subbaseline , STUDY.etc.erspparams.subbaseline ), options = { options{:} 'subbaseline' res.subbaseline }; end;
+    if ~isequal(res.topotime , STUDY.etc.erspparams.topotime),  options = { options{:} 'topotime'   res.topotime  }; end;
+    if ~isequal(res.topofreq , STUDY.etc.erspparams.topofreq),  options = { options{:} 'topofreq'   res.topofreq  }; end;
     if ~isequal(res.ersplim  , STUDY.etc.erspparams.ersplim),   options = { options{:} 'ersplim'   res.ersplim   }; end;
     if ~isequal(res.itclim   , STUDY.etc.erspparams.itclim),    options = { options{:} 'itclim'    res.itclim    }; end;
     if ~isequal(res.timerange, STUDY.etc.erspparams.timerange), options = { options{:} 'timerange' res.timerange }; end;
@@ -216,6 +228,8 @@ if ~isequal(STUDY.etc.erspparams.timerange, TMPSTUDY.etc.erspparams.timerange) |
     ~isequal(STUDY.etc.erspparams.subbaseline, TMPSTUDY.etc.erspparams.subbaseline)
     if isfield(STUDY.cluster, 'erspdata')
         for index = 1:length(STUDY.cluster)
+            STUDY.cluster(index).topotime  = [];
+            STUDY.cluster(index).topofreq  = [];
             STUDY.cluster(index).erspdata  = [];
             STUDY.cluster(index).erspbase  = [];
             STUDY.cluster(index).ersptimes = [];
@@ -227,6 +241,8 @@ if ~isequal(STUDY.etc.erspparams.timerange, TMPSTUDY.etc.erspparams.timerange) |
     end;
     if isfield(STUDY.changrp, 'erspdata')
         for index = 1:length(STUDY.changrp)
+            STUDY.changrp(index).topotime  = [];
+            STUDY.changrp(index).topofreq  = [];
             STUDY.changrp(index).erspdata  = [];
             STUDY.changrp(index).erspbase  = [];
             STUDY.changrp(index).ersptimes = [];
@@ -240,6 +256,8 @@ end;
 
 function STUDY = default_params(STUDY)
     if ~isfield(STUDY.etc, 'erspparams'), STUDY.etc.erspparams = []; end;
+    if ~isfield(STUDY.etc.erspparams, 'topotime'),     STUDY.etc.erspparams.topotime = []; end;
+    if ~isfield(STUDY.etc.erspparams, 'topofreq'),     STUDY.etc.erspparams.topofreq = []; end;
     if ~isfield(STUDY.etc.erspparams, 'timerange'),    STUDY.etc.erspparams.timerange = []; end;
     if ~isfield(STUDY.etc.erspparams, 'freqrange'),    STUDY.etc.erspparams.freqrange = []; end;
     if ~isfield(STUDY.etc.erspparams, 'ersplim' ),     STUDY.etc.erspparams.ersplim   = []; end;
