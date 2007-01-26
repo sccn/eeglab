@@ -67,6 +67,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2006/11/23 00:26:16  arno
+% add subject name
+%
 % Revision 1.31  2006/11/22 20:06:18  arno
 % filter option
 %
@@ -96,7 +99,7 @@
 % reprogram from scratch (statistics...), backward compatible
 %
                             
-function [STUDY allerp alltimes ] = std_erpplot(STUDY, ALLEEG, varargin)
+function [STUDY allerp alltimes pgroup pcond pinter] = std_erpplot(STUDY, ALLEEG, varargin)
 
 if nargin < 2
     help std_erpplot;
@@ -122,6 +125,8 @@ if isstr(opt), error(opt); end;
 % --------------------------
 if strcmpi(opt.mode, 'comps'), opt.plotsubjects = 'on'; end;
 
+if isempty(opt.plottime), opt.plottime = STUDY.etc.erpparams.topotime; end;
+if isnan(  opt.plottime), opt.plottime = []; end;
 if ~isempty(opt.subject), groupstats = 'off'; disp('No group statistics for single subject');
 else                      groupstats = STUDY.etc.erpparams.groupstats;
 end;
@@ -132,84 +137,101 @@ plotcurveopt = { ...
    'ylim',       STUDY.etc.erpparams.ylim, ...
    'filter',     STUDY.etc.erpparams.filter, ...
    'threshold',  STUDY.etc.erpparams.threshold, ...
-   'groupstats',  groupstats, ...
-   'condstats',   condstats, ...
    'plotgroups',  STUDY.etc.erpparams.plotgroups, ...
    'plotconditions',   STUDY.etc.erpparams.plotconditions, ...
    'statistics', STUDY.etc.erpparams.statistics };
 
+if ~isempty(opt.plottime) & length(opt.channels) < 5
+    warndlg2(strvcat('ERP parameters indicate that you wish to plot scalp maps', 'Select at least 5 channels to plot topography'));
+    return;
+end;
+
+% read data from disk
+% -------------------
 if ~isempty(opt.channels)
      [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'channels', opt.channels, 'infotype', 'erp', 'timerange', opt.timerange);
 else [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'clusters', opt.clusters, 'infotype', 'erp', 'timerange', opt.timerange);
 end;
 
-opt.legend = 'off';
-if length(allinds) > 1, figure; opt.plotmode = 'condensed'; end;
-nc = ceil(sqrt(length(allinds)));
-nr = ceil(length(allinds)/nc);
-comp_names = {};
+% channel plotting
+% ----------------
+if ~isempty(opt.channels)
+    structdat = STUDY.changrp;
+    erpdata = cell(size(structdat(allinds(1)).erpdata));
+    for ind =  1:length(structdat(allinds(1)).erpdata(:))
+        erpdata{ind} = zeros([ size(structdat(allinds(1)).erpdata{1}) length(allinds)]);
+        for index = 1:length(allinds)
+            erpdata{ind}(:,:,index)  = structdat(allinds(index)).erpdata{ind};
+            alltimes                 = structdat(allinds(index)).erptimes;
+            compinds                 = structdat(allinds(index)).allinds;
+            setinds                  = structdat(allinds(index)).setinds;
+        end;
+        erpdata{ind} = squeeze(permute(erpdata{ind}, [1 3 2])); % time elec subjects
+    end;
 
-for index = 1:length(allinds)
-
-    if length(allinds) > 1, subplot(nr,nc,index); end;
-    if ~isempty(opt.channels)
-        erpdata  = STUDY.changrp(allinds(index)).erpdata;
-        alltimes = STUDY.changrp(allinds(index)).erptimes;
-        setinds  = STUDY.changrp(allinds(index)).setinds;
+    % select specific subject or component then plot
+    % ----------------------------------------------
+    if ~isempty(opt.subject), erpdata = std_selsubject(erpdata, opt.subject, setinds, { STUDY.datasetinfo(:).subject }, length(STUDY.subject)); end;
+    
+    % select specific time    
+    % --------------------
+    if ~isempty(opt.plottime)
+        [tmp ti1] = min(abs(alltimes-opt.plottime(1)));
+        [tmp ti2] = min(abs(alltimes-opt.plottime(end)));
+        for index = 1:length(erpdata(:))
+            erpdata{index} = mean(erpdata{index}(ti1:ti2,:,:),1);
+        end;
+        if opt.plottime(1) == opt.plottime(end), titlestr = [ num2str(opt.plottime(1)) ' ms'];
+        else                                     titlestr = [ num2str(opt.plottime(1)) '-' num2str(opt.plottime(2)) ' ms'];
+        end;
+    end;
+    
+    % compute statistics and plot
+    % ---------------------------
+    [pcond pgroup pinter] = std_stat(erpdata, STUDY.etc.erpparams, 'groupstats', groupstats, 'condstats', condstats);
+    locs = eeg_mergelocs(ALLEEG.chanlocs);
+    locs = locs(std_chaninds(STUDY, opt.channels));
+    if ~isempty(opt.plottime)
+        std_chantopo(erpdata, 'condnames', STUDY.condition, 'plottopo', fastif(length(allinds)==1, 'off', 'on'), ...
+                                      'datatype', 'spec', 'plotmode', opt.plotmode, 'groupnames', STUDY.group, 'unitx', '\muV', ...
+                                      'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, ...
+                                      'chanlocs', locs, 'plotsubjects', opt.plotsubjects, 'topovals', titlestr, plotcurveopt{:});
     else
+        std_plotcurve(alltimes, erpdata, 'condnames', STUDY.condition, 'plottopo', fastif(length(allinds)==1, 'off', 'on'), ...
+                                      'datatype', 'spec', 'plotmode', opt.plotmode, 'groupnames', STUDY.group, 'unitx', '\muV', ...
+                                      'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, ...
+                                      'chanlocs', locs, 'plotsubjects', opt.plotsubjects, plotcurveopt{:});
+    end;
+else 
+    % plot component
+    % --------------
+    opt.legend = 'off';
+    if length(allinds) > 1, figure('color', 'w'); opt.plotmode = 'condensed'; end;
+    nc = ceil(sqrt(length(allinds)));
+    nr = ceil(length(allinds)/nc);
+    comp_names = {};
+
+    for index = 1:length(allinds)
+
+        if length(allinds) > 1, subplot(nr,nc,index); end;
         erpdata  = STUDY.cluster(allinds(index)).erpdata;
         alltimes = STUDY.cluster(allinds(index)).erptimes;
         compinds = STUDY.cluster(allinds(index)).allinds;
-        setinds = STUDY.cluster(allinds(index)).setinds;
-    end;
+        setinds  = STUDY.cluster(allinds(index)).setinds;
 
-    % plot specific subject
-    % ---------------------
-    if ~isempty(opt.subject) & isempty(opt.comps)
-        for c = 1:size(erpdata,1)
-            for g = 1:size(erpdata,2)
-                for l=length(setinds{c,g}):-1:1
-                    if ~strcmpi(opt.subject, STUDY.datasetinfo(setinds{c,g}(l)).subject)
-                        erpdata{c,g}(:,l) = [];
-                    end;
-                end;
-            end;
-        end;
-    end;
-    
-    % plot specific component
-    % -----------------------
-    if ~isempty(opt.comps)
-        
-        % find and select group
-        % ---------------------
-        sets   = STUDY.cluster(allinds(index)).sets(:,opt.comps);
-        comps  = STUDY.cluster(allinds(index)).comps(opt.comps);
-        grp    = STUDY.datasetinfo(sets(1)).group;
-        grpind = strmatch( grp, STUDY.group );
-        if isempty(grpind), grpind = 1; end;
-        erpdata = erpdata(:,grpind);
+        % plot specific component
+        % -----------------------
+        [erpdata opt.subject comp_names] = std_selcomp(STUDY, erpdata, allinds(index), setinds, compinds, opt.comps);
+        [pcond pgroup pinter] = std_stat(erpdata, STUDY.etc.erpparams);
             
-        % find component
-        % --------------
-        for c = 1:size(erpdata,1)
-            for ind = 1:length(compinds{1,grpind})
-                if compinds{1,grpind}(ind) == comps & any(setinds{1,grpind}(ind) == sets)
-                    erpdata{c} = erpdata{c}(:,ind);
-                    comp_names{c,1} = comps;
-                end;
+        if index == length(allinds), opt.legend = 'on'; end;
+        [pgroup pcond pinter] = std_plotcurve(alltimes, erpdata, 'condnames', STUDY.condition, 'legend', opt.legend, 'subject', opt.subject, ...
+                                          'compinds', comp_names, 'plotmode', opt.plotmode, 'groupnames', STUDY.group, 'topovals', opt.plottime, 'unitx', 'ms',  'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, ...
+                                          'chanlocs', ALLEEG(1).chanlocs, 'plotsubjects', opt.plotsubjects, plotcurveopt{:});
+        if length(allinds) > 1, 
+            if isempty(opt.channels), title(sprintf('Cluster %d', allinds(index))); 
+            else                      title(sprintf('%s', opt.channels{index}));  
             end;
-        end;
-        opt.subject = STUDY.datasetinfo(sets(1)).subject;
-    end;
-    
-    if index == length(allinds), opt.legend = 'on'; end;
-    [pgroup pcond pinter] = std_plot(alltimes, erpdata, 'condnames', STUDY.condition, 'legend', opt.legend, 'subject', opt.subject, ...
-                                      'compinds', comp_names, 'plotmode', opt.plotmode, 'groupnames', STUDY.group, 'plottopo', opt.plottime, 'unitx', 'Hz', ...
-                                      'chanlocs', ALLEEG(1).chanlocs, 'plotsubjects', opt.plotsubjects, plotcurveopt{:});
-    if length(allinds) > 1, 
-        if isempty(opt.channels), title(sprintf('Cluster %d', allinds(index))); 
-        else                      title(sprintf('%s', opt.channels{index}));  
         end;
     end;
 end;
