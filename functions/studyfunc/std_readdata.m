@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2006/11/23 01:12:46  arno
+% implement mean spectrum subtraction
+%
 % Revision 1.15  2006/11/15 21:52:14  arno
 % reading baseline ERSP if spectrum absent
 %
@@ -144,13 +147,8 @@ ng = length(STUDY.group);
 
 % find channel indices
 % --------------------
-finalinds = [];
 if ~isempty(opt.channels)
-    for c = 1:length(opt.channels)
-        chanind = strmatch( lower(opt.channels{c}), lower({ STUDY.changrp.name }), 'exact');
-        if isempty(chanind), error('Channel group not found'); end;
-        finalinds   = [ finalinds chanind ];
-    end;
+    finalinds = std_chaninds(STUDY, opt.channels);
 else
     finalinds = opt.clusters;
 end;
