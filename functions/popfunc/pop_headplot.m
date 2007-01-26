@@ -5,19 +5,24 @@
 %                  done again for this channel locations montage. A wait 
 %                  bar will pop up to indicate how much time remains.
 % Usage:
+%   To open input GUI:
+%   >> EEGOUT = pop_headplot( EEG, typeplot)
+%   To run as a script without further GUI input:
 %   >> EEGOUT = pop_headplot( EEG, typeplot, ...
 %                    latencies/components, title, rowscols, 'key', 'val' ...);
-% Inputs:
+% Required Inputs:
 %   EEG        - EEG dataset structure
 %   typeplot   - 1=channel, 0=component {Default: 1}
+%
+% Required Inputs to bypass input GUI
 %   latencies/components  - If channels, array of epoch mean latencies (in ms),
 %                Else, for components, array of component indices to plot.
+%
+% Optional inputs:
 %   title      - Plot title
 %   rowscols   - Vector of the form [m,n] where m is total vertical tiles and n 
 %                horizontal tiles per page. If the number of maps exceeds m*n,
 %                multiple figures will be produced {def|0 -> 1 near-square page}
-%
-% Optional inputs:
 %   'setup'    - ['setupfile.spl'] Make the headplot spline file
 %   'load'     - ['setupfile.spl'] Load the headplot spline file
 %   others...  - Other headplot options. See >> help headplot
@@ -53,6 +58,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.48  2007/01/25 04:45:10  toby
+% Error message edit
+%
 % Revision 1.47  2006/11/03 20:30:50  arno
 % add channel info for coregistration
 %
@@ -530,20 +538,22 @@ for index = 1:size(arg2(:),1)
 		drawnow;
 		axis equal; 
 		rotate3d off;
-		if index == size(arg2(:),1)
-	        pos = get(gca,'position');
-	        q = [pos(1) pos(2) 0 0];
-	        s = [pos(3) pos(4) pos(3) pos(4)];
-	        col = colormap;
-            if nbgraph > 1
-                ax = subplot('position', [1.1 0 .05 1].*s+q);
-	        else 
-                ax = subplot('position', [1 0 .05 1].*s+q);          
-            end;
-            col = col(1:end-3,:);
-            imagesc([], [maplimits(1) 0 maplimits(2)], reshape(col,size(col,1),1,3));
-            set(gca, 'xtick', [], 'yaxislocation', 'right', 'ydir', 'normal');
-	    end;	   
+        % DEPRECATED: use headplot option 'cbar' to draw a colorbar.
+        % Draw colorbar
+		%if index == size(arg2(:),1)
+	    %    pos = get(gca,'position');
+	    %    q = [pos(1) pos(2) 0 0];
+	    %    s = [pos(3) pos(4) pos(3) pos(4)];
+	    %    col = colormap;
+        %    if nbgraph > 1
+        %        ax = subplot('position', [1.1 0 .05 1].*s+q);
+	    %    else 
+        %        ax = subplot('position', [1 0 .05 1].*s+q);          
+        %    end;
+        %    col = col(1:end-3,:);
+        %    imagesc([], [maplimits(1) 0 maplimits(2)], reshape(col,size(col,1),1,3));
+        %    set(gca, 'xtick', [], 'yaxislocation', 'right', 'ydir', 'normal');
+	    %end;	   
     else
         axis off
     end;
