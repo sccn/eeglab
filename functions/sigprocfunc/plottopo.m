@@ -65,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.42  2006/11/15 20:41:40  arno
+% Voltage -> Potential
+%
 % Revision 1.41  2006/07/10 21:00:21  arno
 % fix one channel plotting
 %
@@ -280,6 +283,7 @@ g = finputcheck(options, { 'chanlocs'  ''    []          '';
                     'limits'    'float'                 []          0;
                     'ylim'      'float'                 []          [];
                     'title'     'string'                []          '';
+                    'plotfunc'  'cell'                  []          {};
                     'axsize'    'float'                 [0 1]       [nan nan];
                     'regions'   'cell'                  []          {};
                     'colors'    { 'cell' 'string' }     []          {};
@@ -799,17 +803,22 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
         else                          tmpcolor = g.colors{Pind};
         end;
         if ~ISSPEC % -/+ plot, normal case (e.g., not spectra), plot data trace           
-            figure(curfig);plot(x,data(c,1+P*g.frames:1+P*g.frames+g.frames-1), ...
-                      'color', tmpcolor{:});   
+            figure(curfig);
             ymn = min([ymax ymin]);
             ymx = max([ymax ymin]);
-            if g.ydir == -1
-                set(gca, 'ydir', 'reverse');
+            if isempty(g.plotfunc)
+                plot(x,data(c,1+P*g.frames:1+P*g.frames+g.frames-1), 'color', tmpcolor{:});   
+                if g.ydir == -1
+                    set(gca, 'ydir', 'reverse');
+                end;
+                axis([xmin xmax ymn ymx]);          % set axis bounds
+            elseif P == 1
+                func = eval( [ '@' g.plotfunc{1} ] );
+                feval(func, data(c,:), g.plotfunc{2:end});
             end;
-            axis([xmin xmax ymn ymx]);          % set axis bounds
         else % ISSPEC
-            figure(curfig); plot(x,data(c,1+P*g.frames:1+P*g.frames+g.frames-1), ...
-                      'color',  tmpcolor{:});   
+            figure(curfig); 
+            plot(x,data(c,:), 'color',  tmpcolor{:});   
             ymaxm = ymax;
             if ymaxm/2. > ymax,
                 ymaxm = ymaxm/2.;
