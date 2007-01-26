@@ -52,19 +52,32 @@ function plotcurve( times, R, varargin);
         help plotcurve;
         return;
 	end;
-	g = finputcheck( varargin, { 'maskarray'     'real'    []       [];
+	g = finputcheck( varargin, { 'maskarray' ''        []       [];
                              'val2mask'      'real'    []           R;
                              'highlightmode' 'string'  { 'background' 'bottom' } 'background';
-                             'plotmean'      'string'  { 'on' 'off' }            'on';
+                             'plotmean'      'string'  { 'on' 'off' }            'off';
+                             'plotindiv'     'string'  { 'on' 'off' }            'on';
+                             'logpval'       'string'  { 'on' 'off' }            'off';
                              'title'         'string'  []                        '';
                              'xlabel'        'string'  []                        '';
+                             'plotmode'      'string'  {'single' 'topo'}         'single';
                              'ylabel'        'string'  []                        '';
                              'legend'        'cell'    []                        {};
+                             'colors'        'cell'    []                        {};
                              'ylim'          'real'    []                        [];
                              'vert'          'real'    []                        [];
                              'linewidth'     'real'    []                        2;
                              'marktimes'     'real'    []                        [] });
    if isstr(g), error(g); end;
+   if isempty(g.colors), g.colors = { 'b' 'r' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' ...
+                   'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' }; end;
+   if strcmpi(g.plotindiv, 'off'), g.plotmean = 'on'; end;
+   if ~any(length(times) == size(R))
+       try,
+           R = reshape(R, length(times), length(R)/length(times))';
+       catch, error('Size of time input and array input does not match');
+       end;
+   end;
 
    % regions of significance
    % -----------------------
@@ -91,32 +104,72 @@ function plotcurve( times, R, varargin);
 
   % plotting
   % --------
-  if strcmpi(g.plotmean, 'on')
-      R       = mean(R,1);
+  if size(R,1) == length(times), R = R'; end;
+  if strcmpi(g.plotmean, 'on') | strcmpi(g.plotindiv, 'off')
+      if strcmpi(g.plotindiv, 'on')
+          R = [ R; mean(R,1) ];
+      else
+          R = mean(R,1);
+      end;
   end;
-  plot(times,R);
-  if ~isempty(g.ylim) && length(g.ylim) == 2
+  ax = gca;
+  axes(ax);
+  if ~isempty(g.maskarray) & strcmpi(g.highlightmode, 'bottom')
+      pos = get(gca, 'position');
+      set(gca, 'position', [ pos(1)+pos(3)*0.1 pos(2)+pos(4)*0.1 pos(3)*0.9 pos(4)*0.85 ]);
+  end;
+  for ind = 1:size(R,1)
+      if ind == size(R,1) & strcmpi(g.plotmean, 'on') & size(R,1) > 1
+           plot(times,R(ind,:), 'k', 'linewidth', 2);
+      elseif ~isempty(g.colors),
+           tmp = plot(times,R(ind,:), 'k'); set(tmp, 'color', g.colors{mod(ind, length(g.colors))+1}); hold on;
+      else plot(times,R(ind,:));
+      end;
+  end;
+  
+  % ordinate limits
+  % ---------------
+  if isempty(g.ylim), 
+    yl = max(abs(reshape(R, [1 prod(size(R))])))*1.2;
+    g.ylim = [-yl yl];
+  end;
+  if ~isempty(g.ylim) & length(g.ylim) == 2
       ylim(g.ylim);
   elseif ~isempty(g.ylim)
       yl = ylim;
       ylim([g.ylim yl(2)]);
   end
-  if ~isempty(g.maskarray)
-      highlight(gca, times, Rregions, g.highlightmode, g.xlabel);
-  else
-      xlabel(g.xlabel);
-  end;
-  if strcmpi(g.highlightmode, 'background')
-      plot(times,R(:,:)); % replot
-  end;
+  yl = ylim;
 
+  % highlight regions
+  % -----------------
+  if ~isempty(g.maskarray)
+      highlight(ax, times, Rregions, g.highlightmode, g.xlabel);
+
+      % replot data (above highlighted regions)
+      % ---------
+      axes(ax);
+      for ind = 1:size(R,1)
+          if ind == size(R,1) & strcmpi(g.plotmean, 'on') & size(R,1) > 1
+               plot(times,R(ind,:), 'k', 'linewidth', 2);
+          elseif ~isempty(g.colors),
+               tmp = plot(times,R(ind,:), 'k'); set(tmp, 'color', g.colors{mod(ind, length(g.colors))+1}); hold on;
+          else plot(times,R(ind,:));
+          end;
+      end;
+      if strcmpi(g.highlightmode, 'bottom'), xlabel(''); set(ax, 'xtick', []); end;
+  end;
+  box on;
+  
+  ylim(yl);
+  if strcmpi(g.logpval, 'on')
+      set(gca, 'ytickmode', 'manual', 'yticklabel', round(10.^-get(gca, 'ytick')*1000)/1000, 'ydir', 'reverse');
+  end;
+  
   % vertical lines
   % --------------
   hold on
-  yl = ylim;
-  %if times(1) < 0
-  %    plot([0 0],[yl(1) yl(2)],'--m','LineWidth',g.linewidth);
-  %end;
+  xl = xlim;
   if ~isnan(g.marktimes) % plot marked time
       for mt = g.marktimes(:)'
           plot([mt mt],[yl(1) yl(2)],'--k','LineWidth',g.linewidth);
@@ -132,13 +185,29 @@ function plotcurve( times, R, varargin);
 
   % title and legend
   % ----------------
-  title(g.title)
-  ylabel(g.ylabel)
-  if ~isempty(g.legend)
-      legend(g.legend);
+  if strcmpi(g.plotmode, 'topo') % plot in scalp array
+    NAME_OFFSETX = 0.1;
+    NAME_OFFSETY = 0.2;
+    xx = xlim; xmin = xx(1); xdiff = xx(2)-xx(1); xpos = double(xmin+NAME_OFFSETX*xdiff);
+    yy = ylim; ymax = yy(2); ydiff = yy(2)-yy(1); ypos = double(ymax-NAME_OFFSETY*ydiff);
+    t=text(xpos, ypos,g.title); 
+    axis off;
+    line([0 0], [yl(1) yl(2)], 'linewidth', 1, 'color', 'k');
+    line([xl(1) xl(2)], [0 0], 'linewidth', 1, 'color', 'k');
+    set(ax, 'userdata', { g.xlabel g.ylabel g.legend });
+  else
+    title(g.title)
+    if ~isempty(g.legend)
+        hh = legend(g.legend);
+        set(hh, 'unit', 'pixels')      
+    end;
+    ylabel(g.ylabel)
   end;
   
-function highlight(ax, times, regions, highlightmode, myxlabel);
+% -----------------
+% highlight regions
+% -----------------
+function axsignif = highlight(ax, times, regions, highlightmode, myxlabel);
 color1 = [0.75 0.75 0.75];
 color2 = [0 0 0];
 yl  = ylim; 
@@ -146,7 +215,8 @@ yl(1) = yl(1)-max(abs(yl));
 yl(2) = yl(2)+max(abs(yl));
 
 if ~strcmpi(highlightmode, 'background')
-    pos = get(gca, 'position');
+    xlabel(myxlabel);
+    pos = get(ax, 'position');
     set(gca, 'xtick', []);
     axsignif = axes('position', [pos(1) pos(2)-pos(4)*0.05 pos(3) pos(4)*0.05 ]);
     plot(times, times, 'w');
@@ -155,7 +225,6 @@ if ~strcmpi(highlightmode, 'background')
     yl2(1) = yl2(1)-max(abs(yl2));
     yl2(2) = yl2(2)+max(abs(yl2));
     xlim([times(1) times(end)]);
-    xlabel(myxlabel);
 else
     xlabel(myxlabel);
 end;
@@ -176,7 +245,7 @@ if ~isempty(regions)
                     [yl(1) yl(1) yl(2) yl(2)], color1); hold on;
                 set(tmph, 'edgecolor', color1);
             else
-                oldax = gca;
+                oldax = ax;
                 axes(axsignif);
                 tmph = patch([tmpreg(1) tmpreg(2) tmpreg(2) tmpreg(1)], ...
                     [yl2(1) yl2(1) yl2(2) yl2(2)], color2); hold on;
@@ -185,6 +254,7 @@ if ~isempty(regions)
             end;
         end;
     end;
+    ylim(yl);
 end;
   
   function res = dims(array)
