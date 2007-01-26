@@ -14,11 +14,11 @@
 %              in the STUDY. ALLEEG for a STUDY set is typically created 
 %              using load_ALLEEG().  
 % Optional inputs:
-%   'clusters' - [numeric vector|'all'??]  cluster numbers to plot.
-%                Else?? 'all' -> plot all clusters in STUDY 
+%   'clusters' - [numeric vector|string 'all']  cluster numbers to plot.
+%                Else 'all' -> plot all clusters in STUDY 
 %                {default: 'all'}.
-%   'comps'    - [numeric vector|'all'??]  cluster components to plot.
-%                Else?? 'all' -> plot all cluster components 
+%   'comps'    - [numeric vector|string 'all']  cluster components to plot.
+%                Else 'all' -> plot all cluster components 
 %                {default: 'all'}.
 %   'channels' - [numeric vector]  channels to plot. {default: all??}
 %   'mode'     - ['together'|'apart'] plotting mode. In 'together' 
@@ -29,7 +29,7 @@
 %                figure (per condition ""and group??) along with their mean 
 %                ERSP. Note that for clusters, this option is irrelevant if 
 %                component indices are provided as input (via 'comps' above) 
-%                {default: 'together'??} 
+%                {default: 'together'} 
 %   'figure'  - ['on'|'off'] 'on' -> plot on a new figure; 
 %                'off' -> plot on current figure. 
 %                Note: 'off' is optional for one cluster in 'together' 
@@ -68,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.41  2006/11/23 00:28:32  arno
+% add subject info to subject plot
+%
 % Revision 1.40  2006/11/22 23:01:07  arno
 % array size for one subject
 %
@@ -115,7 +118,7 @@
 % reprogram from scratch (statistics...), backward compatible
 %
                             
-function [STUDY allersp alltimes ] = std_erspstatplot(STUDY, ALLEEG, varargin)
+function [STUDY allersp alltimes ] = std_erspplot(STUDY, ALLEEG, varargin)
 
 if nargin < 2
     help std_erspstatplot;
@@ -141,6 +144,9 @@ if isstr(opt), error(opt); end;
 
 % for backward compatibility
 % --------------------------
+if isempty(opt.plottf) & ~isnan(STUDY.etc.erspparams.topotime),
+    opt.plottf = [ STUDY.etc.erspparams.topofreq STUDY.etc.erspparams.topotime ];
+end;
 if strcmpi(opt.mode, 'comps'), opt.plotsubjects = 'on'; end;
 
 if ~isempty(opt.subject), groupstats = 'off'; disp('No group statistics for single subject');
@@ -156,10 +162,14 @@ plotcurveopt = { ...
    'groupstats',  groupstats, ...
    'condstats',   condstats, ...
    'statistics', STUDY.etc.erspparams.statistics };
+if ~isempty(opt.plottf) & length(opt.channels) < 5
+    warndlg2(strvcat('ERSP/ITC parameters indicate that you wish to plot scalp maps', 'Select at least 5 channels to plot topography'));
+    return;
+end;    
 
 if ~isempty(opt.channels)
-     [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'channels', opt.channels, 'infotype', opt.datatype, 'timerange', opt.timerange, 'statmode', opt.statmode);
-else [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'clusters', opt.clusters, 'infotype', opt.datatype, 'timerange', opt.timerange, 'statmode', opt.statmode);
+     [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'channels', opt.channels, 'infotype', opt.datatype, 'statmode', opt.statmode);
+else [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'clusters', opt.clusters, 'infotype', opt.datatype, 'statmode', opt.statmode);
 end;
 opt.legend = 'off';
 
@@ -198,10 +208,12 @@ if ~isempty(opt.plottf)
             end;
         end;
     end;
-
-    [pgroup pcond pinter] = std_plot({ allfreqs alltimes }, allersp, 'condnames', STUDY.condition, 'subject', opt.subject, 'legend', opt.legend, ...
+    
+    locs = eeg_mergelocs(ALLEEG.chanlocs);
+    locs = locs(std_chaninds(STUDY, opt.channels));
+    [pgroup pcond pinter] = std_plottf(alltimes, allfreqs, allersp, 'condnames', STUDY.condition, 'subject', opt.subject, 'legend', opt.legend, ...
                                       'datatype', opt.datatype,'plotmode', opt.plotmode, 'groupnames', STUDY.group, 'topovals', opt.plottf, 'unitx', 'Hz', ...
-                                      'chanlocs', ALLEEG(1).chanlocs, 'plotsubjects', opt.plotsubjects, 'topovals', opt.plottf, plotcurveopt{:});
+                                      'chanlocs', locs, 'plotsubjects', opt.plotsubjects, 'topovals', opt.plottf, plotcurveopt{:});
     return;
 end;
 
@@ -270,7 +282,7 @@ for index = 1:length(allinds)
     % -----------------------
     
     if index == length(allinds), opt.legend = 'on'; end;
-    [pgroup pcond pinter] = std_plot({ allfreqs alltimes }, allersp, 'condnames', STUDY.condition, 'subject', opt.subject, 'legend', opt.legend, ...
+    [pgroup pcond pinter] = std_plottf(alltimes, allfreqs, allersp, 'condnames', STUDY.condition, 'subject', opt.subject, 'legend', opt.legend, ...
                                       'compinds', comp_names, 'datatype', opt.datatype,'plotmode', opt.plotmode, 'groupnames', STUDY.group, 'topovals', opt.plottf, 'unitx', 'Hz', ...
                                       'chanlocs', ALLEEG(1).chanlocs, 'plotsubjects', opt.plotsubjects, plotcurveopt{:});
     if length(allinds) > 1, 
