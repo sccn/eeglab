@@ -26,6 +26,9 @@
 % LDM031695jlg
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 function H = textsc(x,y,txt);
 
@@ -55,7 +58,7 @@ if nargin == 2 & isstr(x) & strcmp(lower(y),'title')  % Subplot title
   y = 1 - .60*H;
 end
 h = text(x,y,txt,'VerticalAlignment','Middle', ...
-         'HorizontalAlignment','Center');
+         'HorizontalAlignment','Center','interpreter', 'none' );
 
 % Make the original AXES current
 if ~isempty(ch)
