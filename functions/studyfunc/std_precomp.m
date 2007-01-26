@@ -68,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2006/11/14 04:12:53  arno
+% [Asame
+%
 % Revision 1.3  2006/11/14 03:59:25  arno
 % debug ERSP check
 %
@@ -158,10 +161,16 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
         
         % check for existing files
         % ------------------------
-        tmpparams      = fieldnames(g.erspparams); tmpparams = tmpparams';
-        tmpparams(2,:) = struct2cell(g.erspparams);
+        if isempty(g.erspparams), 
+            tmpparams = {}; 
+        else
+            tmpparams      = fieldnames(g.erspparams); tmpparams = tmpparams';
+            tmpparams(2,:) = struct2cell(g.erspparams);
+        end;
         for index = 1:length(STUDY.datasetinfo)
             std_ersp(ALLEEG(STUDY.datasetinfo(index).index), 'channels', chanlist, 'type', type, tmpparams{:});
         end;
     end;
+    
+    STUDY = std_changroup(STUDY, ALLEEG);
     return;
