@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.494  2006/11/29 21:32:45  toby
+% spelling and doc update
+%
 % Revision 1.493  2006/11/20 18:48:39  arno
 % fix typo in delimiter
 %
@@ -2692,11 +2695,11 @@ if study_selected
     
     % text
     % ----
-    set( g.win2, 'String', 'Study task name:');
-    set( g.win3, 'String', 'Number of subjects:');
-    set( g.win4, 'String', 'Number of conditions:');
-    set( g.win5, 'String', 'Number of sessions:');
-    set( g.win6, 'String', 'Number of groups:');
+    set( g.win2, 'String', 'Study task name');
+    set( g.win3, 'String', 'Nb of subjects');
+    set( g.win4, 'String', 'Nb of conditions');
+    set( g.win5, 'String', 'Nb of sessions');
+    set( g.win6, 'String', 'Nb of groups');
     set( g.win7, 'String', 'Epoch consistency');
     set( g.win8, 'String', 'Channels per frame');
     set( g.win9, 'String', 'Channel locations');
@@ -2746,6 +2749,12 @@ if study_selected
     set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Save history'            ), 'enable', 'on');
     set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Memory options'          ), 'enable', 'on');
     set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Quit'                    ), 'enable', 'on');
+    set( findobj('parent', std_m , 'type', 'uimenu', 'label', 'Plot channel measures'), 'enable', 'off');
+    if isfield(STUDY, 'changrp')
+        if ~isempty(STUDY.changrp)
+            set( findobj('parent', std_m, 'type', 'uimenu', 'label', 'Plot channel measures'), 'enable', 'on');
+        end;
+    end;
     
     % enable specific menus
     % ---------------------
