@@ -11,6 +11,9 @@
 %                  groups {default: 'off'}
 %   'condstats'   - ['on'|'off'] Compute (or not) statistics across data.
 %                  conditions {default: 'off'}
+%   'topofreq'    - [real] Plot Spectrum scalp maps at one specific freq. (Hz).
+%                   A frequency range [min max] may also be defined (the 
+%                   spectrum is then averaged over the interval) {default: []}
 %   'statistics' - ['param'|'perm'] Type of statistics to use: 'param' for
 %                  parametric (t-test/anova) and 'perm' for permutation
 %                  -based statistics {default: 'param'} {default: 'param'}
@@ -59,6 +62,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2006/11/23 00:59:36  arno
+% removing psectral data if subject mean subtract
+%
 % Revision 1.11  2006/11/23 00:48:13  arno
 % typo
 %
@@ -104,12 +110,16 @@ if isempty(varargin)
     statval      = fastif(strcmpi(STUDY.etc.specparams.statistics,'param'), 1, 2);
     condstats    = fastif(strcmpi(STUDY.etc.specparams.condstats, 'on'), 1, 0);
     groupstats   = fastif(strcmpi(STUDY.etc.specparams.groupstats,'on'), 1, 0);
+    vis = fastif(isnan(STUDY.etc.specparams.topofreq), 'off', 'on');
     
     uilist = { ...
         {'style' 'text'       'string' 'Frequency [low_Hz high_Hz]'} ...
         {'style' 'edit'       'string' num2str(STUDY.etc.specparams.freqrange) 'tag' 'freqrange' } ...
         {'style' 'text'       'string' 'Plot limits [low high]'} ...
         {'style' 'edit'       'string' num2str(STUDY.etc.specparams.ylim) 'tag' 'ylim' } ...
+        {'style' 'text'       'string' 'Plot scalp map at freq. [Hz]' 'enable' vis } ...
+        {'style' 'edit'       'string' num2str(STUDY.etc.specparams.topofreq) 'tag' 'topofreq' 'enable' vis } ...
+        {} {} ...
         {} {'style' 'checkbox'   'string' '' 'value' submean 'tag' 'submean' } ...
         {'style' 'text'       'string' 'Subtract individual subject mean spectrum' } ...
         {} {'style' 'checkbox'   'string' '' 'value' plotconditions 'enable' enablecond  'tag' 'plotconditions' } ...
@@ -126,7 +136,7 @@ if isempty(varargin)
         {} {'style' 'checkbox'   'string' '' 'value' groupstats 'enable' enablegroup 'tag' 'groupstats' } ...
         {'style' 'text'       'string' 'Compute group statistics' 'enable' enablegroup } };
     
-    geometry = { [ 1 .5 1 .5] [0.1 0.1 1] [0.1 0.1 1] [0.1 0.1 1] [1] [.7 .8 1 .5] [0.1 0.1 1] [0.1 0.1 1] };
+    geometry = { [ 1 .5 1 .5] [ 1 .5 1 .5] [0.1 0.1 1] [0.1 0.1 1] [0.1 0.1 1] [1] [.7 .8 1 .5] [0.1 0.1 1] [0.1 0.1 1] };
     
     [out_param userdat tmp res] = inputgui( 'geometry' , geometry, 'uilist', uilist, ...
                                    'helpcom', 'pophelp(''std_specparams'')', ...
@@ -142,6 +152,7 @@ if isempty(varargin)
     if res.submean   , res.submean    = 'on'; else res.submean    = 'off'; end;
     if res.plotgroups, res.plotgroups = 'together'; else res.plotgroups = 'apart'; end;
     if res.plotconditions , res.plotconditions  = 'together'; else res.plotconditions  = 'apart'; end;
+    res.topofreq  = str2num( res.topofreq );
     res.freqrange = str2num( res.freqrange );
     res.ylim      = str2num( res.ylim );
     res.threshold = str2num( res.threshold );
@@ -159,6 +170,7 @@ if isempty(varargin)
     if ~strcmpi( res.condstats , STUDY.etc.specparams.condstats ), options = { options{:} 'condstats'  res.condstats  }; end;
     if ~strcmpi( res.submean   , STUDY.etc.specparams.subtractsubjectmean ), options = { options{:} 'subtractsubjectmean'  res.submean  }; end;
     if ~strcmpi( res.statistics, STUDY.etc.specparams.statistics ), options = { options{:} 'statistics' res.statistics }; end;
+    if ~isequal(res.topofreq, STUDY.etc.specparams.topofreq),   options = { options{:} 'topofreq' res.topofreq }; end;
     if ~isequal(res.ylim, STUDY.etc.specparams.ylim),           options = { options{:} 'ylim' res.ylim      }; end;
     if ~isequal(res.freqrange, STUDY.etc.specparams.freqrange), options = { options{:} 'freqrange' res.freqrange }; end;
     if isnan(res.threshold) & ~isnan(STUDY.etc.specparams.threshold) | ...
@@ -201,13 +213,14 @@ end;
 
 function STUDY = default_params(STUDY)
     if ~isfield(STUDY.etc, 'specparams'), STUDY.etc.specparams = []; end;
+    if ~isfield(STUDY.etc.specparams, 'topofreq'),   STUDY.etc.specparams.topofreq = []; end;
     if ~isfield(STUDY.etc.specparams, 'freqrange'),  STUDY.etc.specparams.freqrange = []; end;
     if ~isfield(STUDY.etc.specparams, 'ylim'     ),  STUDY.etc.specparams.ylim      = []; end;
     if ~isfield(STUDY.etc.specparams, 'statistics'), STUDY.etc.specparams.statistics = 'param'; end;
-    if ~isfield(STUDY.etc.specparams, 'groupstats'),  STUDY.etc.specparams.groupstats = 'off'; end;
-    if ~isfield(STUDY.etc.specparams, 'condstats' ),  STUDY.etc.specparams.condstats  = 'off'; end;
+    if ~isfield(STUDY.etc.specparams, 'groupstats'), STUDY.etc.specparams.groupstats = 'off'; end;
+    if ~isfield(STUDY.etc.specparams, 'condstats' ), STUDY.etc.specparams.condstats  = 'off'; end;
     if ~isfield(STUDY.etc.specparams, 'subtractsubjectmean' ), STUDY.etc.specparams.subtractsubjectmean  = 'off'; end;
     if ~isfield(STUDY.etc.specparams, 'threshold' ), STUDY.etc.specparams.threshold = NaN; end;
-    if ~isfield(STUDY.etc.specparams, 'plotgroups') , STUDY.etc.specparams.plotgroups = 'apart'; end;
-    if ~isfield(STUDY.etc.specparams, 'plotconditions') ,  STUDY.etc.specparams.plotconditions  = 'apart'; end;
-    if ~isfield(STUDY.etc.specparams, 'naccu')    ,  STUDY.etc.specparams.naccu     = []; end;
+    if ~isfield(STUDY.etc.specparams, 'plotgroups'), STUDY.etc.specparams.plotgroups = 'apart'; end;
+    if ~isfield(STUDY.etc.specparams, 'plotconditions'),  STUDY.etc.specparams.plotconditions  = 'apart'; end;
+    if ~isfield(STUDY.etc.specparams, 'naccu'),      STUDY.etc.specparams.naccu     = []; end;
