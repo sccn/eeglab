@@ -164,6 +164,10 @@ if ~isstr(varargin{1})
         error('pop_clustedit(): You must provide ALLEEG and STUDY structures');
     end
     STUDY  = varargin{1};
+    STUDY.etc.erpparams.topotime  = NaN; % [] for channels and NaN for components
+    STUDY.etc.specparams.topofreq = NaN; % NaN -> GUI disabled
+    STUDY.etc.erspparams.topotime = NaN;
+    STUDY.etc.erspparams.topofreq = NaN;
     ALLEEG = varargin{2};
     clus_comps = 0; % the number of clustered components
     if nargin > 2 % load specific clusters
