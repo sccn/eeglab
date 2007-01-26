@@ -23,6 +23,8 @@
 %
 % Authors: Robert Oostenveld, SMI/FCDC, Nijmegen 2003
 %          Arnaud Delorme, SCCN, La Jolla 2003
+%          Thanks to Nicolas Robitaille for his help on the CTF MEG
+%          implementation
 
 % SMI, University Aalborg, Denmark http://www.smi.auc.dk/
 % FC Donders Centre, University Nijmegen, the Netherlands http://www.fcdonders.kun.nl/
@@ -44,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2005/03/17 17:43:40  arno
+% nothing
+%
 % Revision 1.5  2005/03/17 02:18:45  arno
 % reject
 %
@@ -89,6 +94,12 @@ if ~isfield(EEG.dipfit, 'vol') & ~isfield(EEG.dipfit, 'hdmfile')
 end
 
 dipfitdefs
+if strcmpi(EEG.dipfit.coordformat, 'CTF')
+    maxrad = 8.5;
+    xgridstr     = sprintf('linspace(-%2.1f,%2.1f,11)', maxrad, maxrad);
+    ygridstr     = sprintf('linspace(-%2.1f,%2.1f,11)', maxrad, maxrad);
+    zgridstr     = sprintf('linspace(0,%2.1f,6)', maxrad);
+end;
 if nargin < 2
   % get the default values and filenames
   promptstr = { 'Component(s) (not faster if few comp.)', ...
