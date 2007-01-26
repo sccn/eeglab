@@ -203,6 +203,9 @@
 
 %% LOG COMMENTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % $Log: not supported by cvs2svn $
+% Revision 1.268  2007/01/06 13:48:54  scott
+% help msg corrections
+%
 % Revision 1.267  2006/09/23 23:03:15  scott
 % nothing
 %
@@ -1100,6 +1103,7 @@ Valflag   = NO;     % don't sort by value
 Srateflag = NO;     % srate not given
 Vertflag  = NO;
 Horzflag  = NO;
+titleflag = NO;
 Noshowflag  = NO;
 Renormflag = NO;
 Showwin = NO;
@@ -1111,6 +1115,8 @@ horzepochs = [];
 NoTimeflag= NO;     % by default DO print "Time (ms)" below bottom axis
 Signifflag= NO;     % compute significance instead of receiving it
 Auxvarflag= NO;
+plotmodeflag= NO;
+plotmode = 'normal';
 Cycleflag = NO;
 signifs   = NaN;
 coherfreq = nan;    % amp/coher-calculating frequency
@@ -1548,6 +1554,10 @@ if nargin > 6
                 error('erpimage(): Value sorting direction must be +1 or -1.');
             end
             Valflag = NO;
+        elseif plotmodeflag == YES
+            plotmode = Arg; plotmodeflag = NO;
+        elseif titleflag == YES
+            titl = Arg; titleflag = NO;
         elseif Erpalphaflag == YES
             erpalpha = Arg(1);
             if erpalpha < MIN_ERPALPHA | erpalpha > MAX_ERPALPHA
@@ -1556,6 +1566,8 @@ if nargin > 6
                 return
             end
             Erpalphaflag = NO;
+        elseif strcmp(Arg,'plotmode')
+            plotmodeflag = YES;
         elseif strcmp(Arg,'nosort')
             Nosort = YES;
         elseif strcmp(Arg,'sortvarpercent')
@@ -1570,6 +1582,8 @@ if nargin > 6
             Noshow = YES;
         elseif strcmp(Arg,'caxis')
             Caxflag = YES;
+        elseif strcmp(Arg,'title')
+            titleflag = YES;
         elseif strcmp(Arg,'coher')
             Coherflag = YES;
         elseif strcmp(Arg,'timestretch') | strcmp(Arg,'timewarp') % Added -JH
@@ -2914,9 +2928,18 @@ if strcmpi(noshow, 'no')
     end
     set(l,'FontSize',LABELFONT);
 
-    t=title(titl);
-    set(t,'FontSize',LABELFONT);
-
+    if ~strcmpi(plotmode, 'topo')
+        t=title(titl);
+        set(t,'FontSize',LABELFONT);
+    else
+        NAME_OFFSETX = 0.1;
+        NAME_OFFSETY = 0.2;
+        xx = xlim; xmin = xx(1); xdiff = xx(2)-xx(1); xpos = double(xmin+NAME_OFFSETX*xdiff);
+        yy = ylim; ymax = yy(2); ydiff = yy(2)-yy(1); ypos = double(ymax-NAME_OFFSETY*ydiff);
+        t=text(xpos, ypos,titl); 
+        axis off;
+    end;
+    
     set(gca,'Box','off');
     set(gca,'Fontsize',TICKFONT);
     set(gca,'color',BACKCOLOR);
