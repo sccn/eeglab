@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.66  2006/11/22 00:36:59  arno
+% curpos
+%
 % Revision 1.65  2005/09/05 21:11:43  scott
 % made 'electrodes' 'off' the default for > 64 channels -sm
 %
@@ -378,6 +381,10 @@ if typeplot
 	maplimits = [ -max(maxlim, -minlim) max(maxlim, -minlim)];
 end;
 	
+if plotdip & strcmpi(EEG.dipfit.coordformat, 'CTF')
+    disp('Cannot plot dipole on scalp map for CTF MEG data');
+end;
+    
 % plot the graphs
 % ---------------
 counter = 1;
@@ -403,9 +410,9 @@ for index = 1:size(arg2(:),1)
     % ------------------------------
     options = outoptions;
     dipoleplotted = 0;
-    if plotdip & typeplot == 0
+    if plotdip & typeplot == 0     
         if isfield(EEG, 'dipfit') & isfield(EEG.dipfit, 'model')
-            if length(EEG.dipfit.model) >= index
+            if length(EEG.dipfit.model) >= index & ~strcmpi(EEG.dipfit.coordformat, 'CTF')
                 %curpos = EEG.dipfit.model(arg2(index)).posxyz/EEG.dipfit.vol.r(end);
                 curpos = EEG.dipfit.model(arg2(index)).posxyz;
                 curmom = EEG.dipfit.model(arg2(index)).momxyz;
@@ -455,10 +462,10 @@ for index = 1:size(arg2(:),1)
             tmpobj = topoplot( SIGTMPAVG(:,index), EEG.chanlocs, 'maplimits', maplimits, addopt{:}, options{:});
 			if nbgraph == 1, 
                  figure(curfig); if nbgraph > 1, axes(curax); end;
-                 title( [ 'Latency ' int2str(arg2(index)) ' ms from ' topotitle] );
+                 title( [ 'Latency ' int2str(arg2(index)) ' ms from ' topotitle]);
 			else 
                  figure(curfig); if nbgraph > 1, axes(curax); end; 
-                 title([int2str(arg2(index)) ' ms']);
+                 title([int2str(arg2(index)) ' ms'] );
 			end;
 		else
             if arg2(index) < 0
