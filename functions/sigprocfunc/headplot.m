@@ -54,7 +54,8 @@
 % Required Standard-mode Inputs:
 %
 %   values        - vector containing a data value at each electrode position
-%   'spline_file' - spline filename, computed and saved in 'setup' mode (above)
+%   'spline_file' - spline filename, computed and saved in 'setup' mode (above). This
+%                   will be a matlab .mat file and should be given the extension .spl .
 %
 % Optional Standard-mode Inputs:
 %
@@ -121,6 +122,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.71  2007/01/26 17:59:44  arno
+% Simplify code, everybody calls fastcalcgx
+%
 % Revision 1.70  2006/04/11 21:16:57  arno
 % typo
 %
