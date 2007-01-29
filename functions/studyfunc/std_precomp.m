@@ -163,6 +163,8 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
         % ------------------------
         if isempty(g.erspparams), 
             tmpparams = {}; 
+        elseif iscell(g.erspparams), 
+            tmpparams = g.erspparams; 
         else
             tmpparams      = fieldnames(g.erspparams); tmpparams = tmpparams';
             tmpparams(2,:) = struct2cell(g.erspparams);
