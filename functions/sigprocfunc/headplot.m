@@ -21,7 +21,8 @@
 %                      >> headplot('setup', ...
 %                            readlocs('myfile.xxx', 'filetype', 'besa'),...
 %                               'splinefile');
-%   splinefile    - name of spline file to save spline info into
+%   splinefile    - name of spline file to save spline info into. It is saved as a
+%                   *.mat file and should be given the extension .spl .
 %
 % Optional Setup-mode Inputs:
 %
@@ -121,6 +122,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.73  2007/01/30 01:53:35  toby
+% revert to 1.70
+%
 % Revision 1.70  2006/04/11 21:16:57  arno
 % typo
 %
