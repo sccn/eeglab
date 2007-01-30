@@ -54,8 +54,7 @@
 % Required Standard-mode Inputs:
 %
 %   values        - vector containing a data value at each electrode position
-%   'spline_file' - spline filename, computed and saved in 'setup' mode (above). This
-%                   will be a matlab .mat file and should be given the extension .spl .
+%   'spline_file' - spline filename, computed and saved in 'setup' mode (above)
 %
 % Optional Standard-mode Inputs:
 %
@@ -122,9 +121,6 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
-% Revision 1.71  2007/01/26 17:59:44  arno
-% Simplify code, everybody calls fastcalcgx
-%
 % Revision 1.70  2006/04/11 21:16:57  arno
 % typo
 %
@@ -494,7 +490,16 @@ if isstr(values)
         fprintf('Setting up splining matrix.\n');    
         enum = length(Xe);
         onemat = ones(enum,1);
-        G = fastcalcgx(Xe,Ye,Ze,Xe,Ye,Ze);
+        G = zeros(enum,enum);
+        for i = 1:enum
+            ei = onemat-sqrt((Xe(i)*onemat-Xe).^2 + (Ye(i)*onemat-Ye).^2 + ...
+                             (Ze(i)*onemat-Ze).^2); % default was /2 and no sqrt
+            gx = zeros(1,enum);
+            for j = 1:enum
+                gx(j) = calcgx(ei(j));
+            end
+            G(i,:) = gx;
+        end
     end;
     fprintf('Calculating splining matrix...\n')
 
@@ -923,15 +928,10 @@ out = out/(4*pi);
 function gx = fastcalcgx(x,y,z,Xe,Ye,Ze)
 
 onemat = ones(length(x),length(Xe));
-EI = onemat - ((repmat(x,1,length(Xe)) - repmat(Xe',length(x),1)).^2 +... 
-               (repmat(y,1,length(Xe)) - repmat(Ye',length(x),1)).^2 +...
-               (repmat(z,1,length(Xe)) - repmat(Ze',length(x),1)).^2)/2;
-%EI = onemat - sqrt((repmat(x,1,length(Xe)) - repmat(Xe',length(x),1)).^2 +... 
-%               (repmat(y,1,length(Xe)) - repmat(Ye',length(x),1)).^2 +...
-%               (repmat(z,1,length(Xe)) - repmat(Ze',length(x),1)).^2);
-EI(find(EI < 0)) = 0;
-EI = EI*2-1;
-
+EI = onemat - sqrt((repmat(x,1,length(Xe)) - repmat(Xe',length(x),1)).^2 +... 
+                    (repmat(y,1,length(Xe)) - repmat(Ye',length(x),1)).^2 +...
+                    (repmat(z,1,length(Xe)) - repmat(Ze',length(x),1)).^2);
+%
 gx = zeros(length(x),length(Xe));
 m = 4;
 icadefs;
