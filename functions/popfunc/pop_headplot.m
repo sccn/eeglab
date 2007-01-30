@@ -60,6 +60,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.51  2007/01/30 03:18:43  toby
+% show full path of spline file
+%
 % Revision 1.50  2007/01/29 21:05:25  toby
 % testing
 %
@@ -370,7 +373,7 @@ if nargin < 3
         
     % plot GUI and protect parameters
     % -------------------------------
-    geom = { [1] [1.3 1 0.5 0.5 ] [1.3 1 0.5 0.5 ] [1.3 1 0.5 0.5 ] [1.3 1 0.5 0.5 ] [1.3 1 0.5 0.5 ] [1] [1] [2 1] [2 1] [2 1] [2 1] };
+    geom = { [1] [1.3 1.6 0.5 0.5 ] [1.3 1.6 0.5 0.5 ] [1.3 1.6 0.5 0.5 ] [1.3 1.6 0.5 0.5 ] [1.3 1.6 0.5 0.5 ] [1] [1] [2 1] [2 1] [2 1] [2 1] };
     optiongui = { 'uilist', txt, 'title', fastif( typeplot, 'ERP head plot(s) -- pop_headplot()', ...
                        'Component head plot(s) -- pop_headplot()'), 'geometry', geom };
 	[result, userdat2, strhalt, outstruct] = inputgui( 'mode', 'noclose', optiongui{:});
