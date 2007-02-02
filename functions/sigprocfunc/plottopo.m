@@ -711,7 +711,7 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
             NAME_OFFSET = -.25;
             NAME_OFFSETY = .2;
             if ISSPEC
-                figure(curfig);axis('off'),h=text(double(xmin-NAME_OFFSET*xdiff),double(ymax/2),[channames(c,:)]); 
+                h=text(double(xmin-NAME_OFFSET*xdiff),double(ymax/2),[channames(c,:)]); 
                 set(h,'HorizontalAlignment','right');    % print before traces
                 %set(h,'FontSize',CHANFONTSIZE);              % choose font size
             else % ~ISSPEC
@@ -724,12 +724,12 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
                     xt = double(xmin-NAME_OFFSET*xdiff);
                     yt = double(yht-NAME_OFFSETY*ydiff); 
                     str = [channames(c,:)];
-                    figure(curfig);axis('off'); h=text(xt,yt,str);
+                    h=text(xt,yt,str);
                     set(h,'HorizontalAlignment','right');      
                     %set(h,'FontSize',CHANFONTSIZE);           % choose font size
                 else % ISRECT
                     xmn = xdiff/2+xmin;
-                    figure(curfig);axis('off'),h=text(double(xmn),double(ymax+0.05*ymax),[channames(c,:)]); 
+                    h=text(double(xmn),double(ymax+0.05*ymax),[channames(c,:)]); 
                     set(h,'HorizontalAlignment','right');      
                     %set(h,'FontSize',CHANFONTSIZE);            % choose font size
                 end % ISRECT
@@ -745,12 +745,12 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
         %
         if P == datasets-1
             if ISSPEC
-                figure(curfig);plot([xmin xmin],[0 ymax],'color',axislcolor); 
+                plot([xmin xmin],[0 ymax],'color',axislcolor); 
             else
-                figure(curfig);plot([0 0],[ymin ymax],'color',axislcolor); % draw vert axis at time 0  
+                plot([0 0],[ymin ymax],'color',axislcolor); % draw vert axis at time 0  
             end  
             axis('off');
-            figure(curfig);plot([xmin xmax],[0 0],'color',axislcolor);  % draw horizontal axis 
+            plot([xmin xmax],[0 0],'color',axislcolor);  % draw horizontal axis 
         end;
         %
         %%%%%%%%%%%%%%%%%%%% plot vertical lines (optional) %%%%%%%%%%%%%%%%%
@@ -767,11 +767,11 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
            vmax = vmin*-1;  %ymean+0.2*(ymax-ymean);
            if ~ISSPEC % -/+ plot, normal case (e.g., not spectra), plot data trace
                 for v = g.vert
-                    figure(curfig);plot([v v],[vmin vmax],'color',vertcolor); % draw vertical lines 
+                    plot([v v],[vmin vmax],'color',vertcolor); % draw vertical lines 
                 end
             else
                 for v = g.vert
-                    figure(curfig);plot([v v],[0 ymax],'color',vertcolor); 
+                    plot([v v],[0 ymax],'color',vertcolor); 
                 end
             end
         end
@@ -788,7 +788,7 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
                 hmin = xmean-0.2*(xmean-xmin);
                 hmax = hmin*-1; %xmean+0.3*(xmax-xmean);
                 for v = g.hori
-                    figure(curfig);plot([hmin hmax],[v v], 'color',horicolor); % draw horizontal lines 
+                    plot([hmin hmax],[v v], 'color',horicolor); % draw horizontal lines 
                 end
             end
         end
@@ -801,7 +801,6 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
         else                          tmpcolor = g.colors{Pind};
         end;
         if ~ISSPEC % -/+ plot, normal case (e.g., not spectra), plot data trace           
-            figure(curfig);
             ymn = min([ymax ymin]);
             ymx = max([ymax ymin]);
             if isempty(g.plotfunc)
@@ -815,7 +814,6 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
                 feval(func, data(c,:), g.plotfunc{2:end});
             end;
         else % ISSPEC
-            figure(curfig); 
             plot(x,data(c,:), 'color',  tmpcolor{:});   
             ymaxm = ymax;
             if ymaxm/2. > ymax,
@@ -834,7 +832,7 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
             if ~isempty(g.regions)
                 for index=1:size(g.regions{c},2)
                     tmpreg = g.regions{c}(:,index);
-                    figure(curfig); tmph = patch([tmpreg(1) tmpreg(2) tmpreg(2) tmpreg(1)], ...
+                    tmph = patch([tmpreg(1) tmpreg(2) tmpreg(2) tmpreg(1)], ...
                                                  [-100 -100 100 100], [0.9 0.9 0.9]); hold on;
                     set(tmph, 'edgecolor', [0.9 0.9 0.9],'facealpha',0.5,'edgealpha',0.5);
                 end;
