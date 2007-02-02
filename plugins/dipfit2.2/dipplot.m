@@ -703,7 +703,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     if strcmpi(g.coordformat, 'spherical')
          dat.sph2spm    = sph2spm;
     elseif strcmpi(g.coordformat, 'CTF')
-        dat.sph2spm    = traditional([0 0 0 0 0 0 10 10 10]);
+        dat.sph2spm    = traditional([0 0 0 0 0 0 10 -10 10]);
     else
         dat.sph2spm    = []; %traditional([0 0 0 0 0 pi 1 1 1]);
     end;
