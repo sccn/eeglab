@@ -294,7 +294,7 @@ g = finputcheck(options, { 'chanlocs'  ''    []          '';
                     'hori'      'float'                 []          []});
 if isstr(g), error(g); end;
 data = reshape(data, size(data,1), size(data,2), size(data,3));    
-if length(g.chans) == 1 & g.chans(1) ~= 0, error('can not plot a single ERP'); end;
+%if length(g.chans) == 1 & g.chans(1) ~= 0, error('can not plot a single ERP'); end;
 
 [chans,framestotal]=size(data);           % data size
 
@@ -324,10 +324,15 @@ limitset = 0;
 if length(g.limits)>1
     limitset = 1;
 end
-
-if isempty(g.chanlocs) & isempty(g.geom)
+plotgrid = 0;
+if isempty(g.chanlocs) % plot in a rectangular grid
+    plotgrid = 1;
+elseif ~isfield(g.chanlocs, 'theta')
+    plotgrid = 1;
+end;
+if plotgrid & isempty(g.geom)
   n = ceil(sqrt(length(channelnos)));
-  g.geom = [n n];
+  g.geom = [n ceil(length(channelnos)/n)];
 end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%% Test parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -583,7 +588,7 @@ chans = length(channelnos);
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%% Read chan_locs %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-if isempty(g.chanlocs) % plot in a rectangular grid
+if plotgrid
     ISRECT = 1;
     ht = g.geom(1);
     wd = g.geom(2);
@@ -592,35 +597,15 @@ if isempty(g.chanlocs) % plot in a rectangular grid
                 chans,ht,wd);
         return
     end
-    halfht = (ht-1)/2;
-    halfwd = (wd-1)/2;
-    xvals = zeros(ht*wd,1);
-    yvals = zeros(ht*wd,1);
-    dist  = zeros(ht*wd,1);
-    for j=1:ht  
-        for i=1:wd
-            xvals(i+(j-1)*wd) = -halfwd+(i-1);
-            yvals(i+(j-1)*wd) =  halfht-(j-1);
-            % dist(i+(j-1)*wd) =  sqrt(xvals(j+(i-1)*ht).^2+yvals(j+(i-1)*ht).^2);
-        end
-    end
-    % maxdist = max(dist);
-    maxxvals = max(xvals);
-    maxyvals = max(yvals);
-    for j=1:ht
-        for i=1:wd
-            % xvals(i+(j-1)*wd) = 0.499*xvals(i+(j-1)*wd)/maxdist; 
-            % yvals(i+(j-1)*wd) = 0.499*yvals(i+(j-1)*wd)/maxdist; 
-            xvals(i+(j-1)*wd) = 0.499*xvals(i+(j-1)*wd)/maxxvals; 
-            yvals(i+(j-1)*wd) = 0.499*yvals(i+(j-1)*wd)/maxyvals; 
-        end
-    end
-    if ~exist('channames')
+    xvals = 0; yvals = 0;
+    if ~exist('channames') & isempty(g.chanlocs)
         channames = repmat(' ',ht*wd,4);
         for i=1:ht*wd
             channum = num2str(i);
             channames(i,1:length(channum)) = channum;
         end
+    else
+        channames = strvcat(g.chanlocs.labels);
     end
     
 else % read chan_locs file
@@ -666,9 +651,11 @@ end
 % yvals = 0.5+PLOT_HEIGHT*yvals;  % controls height of plot array on page!
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if length(xvals) > 1
-    xvals = (xvals-mean([max(xvals) min(xvals)]))/(max(xvals)-min(xvals)); % recenter
-    xvals = gcapos(1)+gcapos(3)/2+PLOT_WIDTH*xvals;   % controls width of plot 
-                                                      % array on current axes
+    if length(unique(xvals)) > 1
+        xvals = (xvals-mean([max(xvals) min(xvals)]))/(max(xvals)-min(xvals)); % recenter
+        xvals = gcapos(1)+gcapos(3)/2+PLOT_WIDTH*xvals;   % controls width of plot 
+                                                          % array on current axes
+    end;
 end;
 yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot 
                                                   % array on current axes
@@ -690,11 +677,15 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
             hold on;                      % plot down left side of page first
             axis('off')
         else   % first page, specify axes
-            xcenter = xvals(c);
-            ycenter = yvals(c);
-            Axes = [Axes axes('Units','Normal','Position', ...
-                              [xcenter-axwidth/2 ycenter-axheight/2 axwidth axheight])];
-            axes(Axes(c))
+            if plotgrid
+                Axes = [ Axes sbplot(g.geom(1), g.geom(2), c)];
+            else
+                xcenter = xvals(c);
+                ycenter = yvals(c);
+                Axes = [Axes axes('Units','Normal','Position', ...
+                                  [xcenter-axwidth/2 ycenter-axheight/2 axwidth axheight])];
+            end;
+            %axes(Axes(c))
             axis('off')
             
             hold on;                      % plot down left side of page first
@@ -715,7 +706,7 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
             if ISSPEC
                 figure(curfig);axis('off'),h=text(double(xmin-NAME_OFFSET*xdiff),double(ymax/2),[channames(c,:)]); 
                 set(h,'HorizontalAlignment','right');    % print before traces
-                set(h,'FontSize',CHANFONTSIZE);              % choose font size
+                %set(h,'FontSize',CHANFONTSIZE);              % choose font size
             else % ~ISSPEC
                 if ymin <= 0 & ymax >= 0,
                     yht = 0;
@@ -728,12 +719,12 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
                     str = [channames(c,:)];
                     figure(curfig);axis('off'); h=text(xt,yt,str);
                     set(h,'HorizontalAlignment','right');      
-                    set(h,'FontSize',CHANFONTSIZE);           % choose font size
+                    %set(h,'FontSize',CHANFONTSIZE);           % choose font size
                 else % ISRECT
                     xmn = xdiff/2+xmin;
                     figure(curfig);axis('off'),h=text(double(xmn),double(ymax+0.05*ymax),[channames(c,:)]); 
                     set(h,'HorizontalAlignment','right');      
-                    set(h,'FontSize',CHANFONTSIZE);            % choose font size
+                    %set(h,'FontSize',CHANFONTSIZE);            % choose font size
                 end % ISRECT
             end % ~ISSPEC
             
