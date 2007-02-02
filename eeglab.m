@@ -2125,7 +2125,7 @@ catchstrs.new_non_empty          = e_newset;
     
 	ERP_m = uimenu( plot_m, 'Label', 'Channel ERPs');
     uimenu( ERP_m,  'Label', 'With scalp maps'                        , 'CallBack', cb_timtopo);
-    uimenu( ERP_m,  'Label', 'In scalp array'                         , 'CallBack', cb_plottopo);
+    uimenu( ERP_m,  'Label', 'In scalp/rect. array'                   , 'CallBack', cb_plottopo);
     uimenu( ERP_m,  'Label', 'In rect. array'                         , 'CallBack', cb_plotdata1);
     
 	topo_m = uimenu( plot_m, 'Label', 'ERP map series');
