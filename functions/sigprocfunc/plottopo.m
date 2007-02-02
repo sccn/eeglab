@@ -323,17 +323,24 @@ end;
 limitset = 0;
 if length(g.limits)>1
     limitset = 1;
-end
+end    
 plotgrid = 0;
 if isempty(g.chanlocs) % plot in a rectangular grid
     plotgrid = 1;
 elseif ~isfield(g.chanlocs, 'theta')
     plotgrid = 1;
 end;
+if length(g.chans) < 4 & ~plotgrid
+    disp('Not enough channels, does not use channel coordinate to plot axis');
+    plotgrid = 1;
+end;
 if plotgrid & isempty(g.geom)
   n = ceil(sqrt(length(channelnos)));
   g.geom = [n ceil(length(channelnos)/n)];
 end
+if ~isempty(g.geom)
+    plotgrid = 1;
+end;
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%% Test parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
