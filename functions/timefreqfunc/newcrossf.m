@@ -216,6 +216,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.78  2005/08/04 20:40:28  arno
+% fixing savecoher for 'coher' condition
+%
 % Revision 1.77  2005/04/08 22:56:46  arno
 % help msg for chaninfo
 %
@@ -1487,8 +1490,8 @@ case 'on'
    if ~strcmpi(g.freqscale, 'log')
        plot(freqs,E,'b','LineWidth',g.linewidth); % plot mbase
    else
-       semilogy(freqs,E,'b','LineWidth',g.linewidth); % plot mbase
-       set(h(5),'View',[90 90])
+       semilogx(freqs,E,'b','LineWidth',g.linewidth); % plot mbase
+       set(h(11),'View',[90 90])
        divs = linspace(log(freqs(1)), log(freqs(end)), 10);
        set(gca, 'xtickmode', 'manual');
        divs = ceil(exp(divs)); divs = unique(divs); % ceil is critical here, round might misalign
@@ -1530,7 +1533,7 @@ case 'on'
    end
    
    tick = get(h(11),'YTick');
-   set(h(11),'YTick',[tick(1) ; tick(length(tick))])
+   set(h(11),'YTick',[tick(1) ; tick(length(tick))]); % crashes for log
    set(h(11),'View',[90 90])
    xlabel('Freq. (Hz)')
    ylabel('coh.')
