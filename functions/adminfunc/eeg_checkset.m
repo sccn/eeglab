@@ -1642,12 +1642,18 @@ else
         end;
     end;
     if isfield(EEG.dipfit, 'hdmfile')
-        if strcmpi(EEG.dipfit.hdmfile(end-8), template_models{1}{1}(end-8)), EEG.dipfit.hdmfile = template_models{1}{1}; end;
-        if strcmpi(EEG.dipfit.hdmfile(end-8), template_models{2}{1}(end-8)), EEG.dipfit.hdmfile = template_models{2}{1}; end;
-        if strcmpi(EEG.dipfit.mrifile(end-8), template_models{1}{3}(end-8)), EEG.dipfit.mrifile = template_models{1}{3}; end;
-        if strcmpi(EEG.dipfit.mrifile(end-8), template_models{2}{3}(end-8)), EEG.dipfit.mrifile = template_models{2}{3}; end;
-        if strcmpi(EEG.dipfit.chanfile(end-8), template_models{1}{4}(end-8)), EEG.dipfit.chanfile = template_models{1}{4}; end;
-        if strcmpi(EEG.dipfit.chanfile(end-8), template_models{2}{4}(end-8)), EEG.dipfit.chanfile = template_models{2}{4}; end;
+        if length(EEG.dipfit.hdmfile) > 8
+            if strcmpi(EEG.dipfit.hdmfile(end-8), template_models{1}{1}(end-8)), EEG.dipfit.hdmfile = template_models{1}{1}; end;
+            if strcmpi(EEG.dipfit.hdmfile(end-8), template_models{2}{1}(end-8)), EEG.dipfit.hdmfile = template_models{2}{1}; end;
+        end;
+        if length(EEG.dipfit.mrifile) > 8
+            if strcmpi(EEG.dipfit.mrifile(end-8), template_models{1}{3}(end-8)), EEG.dipfit.mrifile = template_models{1}{3}; end;
+            if strcmpi(EEG.dipfit.mrifile(end-8), template_models{2}{3}(end-8)), EEG.dipfit.mrifile = template_models{2}{3}; end;
+        end;
+        if length(EEG.dipfit.chanfile) > 8
+            if strcmpi(EEG.dipfit.chanfile(end-8), template_models{1}{4}(end-8)), EEG.dipfit.chanfile = template_models{1}{4}; end;
+            if strcmpi(EEG.dipfit.chanfile(end-8), template_models{2}{4}(end-8)), EEG.dipfit.chanfile = template_models{2}{4}; end;
+        end;
     end;
 end;
 
