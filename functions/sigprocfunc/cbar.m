@@ -12,10 +12,11 @@
 % Inputs:
 %  type      - ['vert'|'horiz'] direction of the cbar {default: 'vert')
 %              ELSE axhandle = handle of axes to draw the cbar
-%  colors    - vector of colormap indices to display, 
-%              (else int n -> display colors [1:end-n]) {default: all}
+%  colors    - vector of colormap indices to display, or integer to truncate upper 
+%              limit by.
+%              (int n -> display colors [1:end-n]) {default: 0}
 %  minmax    - [min, max] range of values to label on colorbar 
-%  grad      - [integer] number of color graduations. {default: 5}.
+%  grad      - [integer] number of tick labels. {default: 5}.
 %
 % Example:
 %         >> colormap('default') % default colormap is 64-color 'jet'
@@ -46,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2006/09/12 16:52:04  arno
+% Minor fix and debugging (this function should be reprogrammed)
+%
 % Revision 1.5  2006/02/16 21:21:06  arno
 % same
 %
