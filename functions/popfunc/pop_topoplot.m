@@ -21,6 +21,9 @@
 %              are produced {default|0 -> one near-square page}.
 %   plotdip  - [0|1] plot associated dipole(s) for scalp map if present
 %              in dataset.
+%
+% Optional Key-Value Pair Inputs
+%   'colorbar' - ['on' or 'off'] Switch to turn colorbar on or off. {Default: 'on'}
 %   options  - optional topoplot() arguments. Separate using commas. 
 %              Example 'style', 'straight'. See >> help topoplot
 %              for further details. {default: none}
@@ -53,6 +56,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.67  2007/01/26 18:03:45  arno
+% handle MEG data
+%
 % Revision 1.66  2006/11/22 00:36:59  arno
 % curpos
 %
@@ -366,6 +372,16 @@ if isempty(EEG.chanlocs)
 	return;
 end;
 
+% Check if pop_topoplot input 'colorbar' was called, and don't send it to topoplot
+loc = strmatch('colorbar', options(1:2:end), 'exact');
+loc = loc*2-1;
+if ~isempty(loc)
+    colorbar_switch = strcmp('on',options{ loc+1 });
+    options(loc:loc+1) = [];
+else
+    colorbar_switch = 1;
+end 
+
 % determine the scale for plot of different times (same scales)
 % -------------------------------------------------------------
 if typeplot
@@ -379,6 +395,8 @@ if typeplot
 	maxlim = max(SIGTMPAVG(:));
 	minlim = min(SIGTMPAVG(:));
 	maplimits = [ -max(maxlim, -minlim) max(maxlim, -minlim)];
+else
+    maplimits = [-1 1];
 end;
 	
 if plotdip & strcmpi(EEG.dipfit.coordformat, 'CTF')
@@ -408,7 +426,6 @@ for index = 1:size(arg2(:),1)
 
 	% add dipole location if present
     % ------------------------------
-    options = outoptions;
     dipoleplotted = 0;
     if plotdip & typeplot == 0     
         if isfield(EEG, 'dipfit') & isfield(EEG.dipfit, 'model')
@@ -484,7 +501,10 @@ for index = 1:size(arg2(:),1)
         allobj(countobj:countobj+length(tmpobj)-1) = tmpobj;
         countobj = countobj+length(tmpobj);
 		drawnow;
-		axis square; 
+		axis square;
+        
+        %{
+        % Draw a colorbar
 		if index == size(arg2(:),1)
 	        if nbgraph == 1
                 clim = get(gca, 'clim');
@@ -497,11 +517,28 @@ for index = 1:size(arg2(:),1)
 	        else 
                 cbar('vert');
             end;
-	    end;	   
+	    end;
+	   %}
     else
     axis off
     end;
-end;
+end
+
+% Draw colorbar
+if colorbar_switch
+    if nbgraph == 1
+        ColorbarHandle = cbar(0,0,[maplimits(1) maplimits(2)]); 
+        pos = get(ColorbarHandle,'position');  % move left & shrink to match head size
+        set(ColorbarHandle,'position',[pos(1)-.05 pos(2)+0.13 pos(3)*0.7 pos(4)-0.26]);
+    else
+        cbar('vert',0,[maplimits(1) maplimits(2)]);
+    end
+    if ~typeplot    % Draw '+' and '-' instead of numbers for colorbar tick labels
+        tmp = get(gca, 'ytick');
+        set(gca, 'ytickmode', 'manual', 'yticklabelmode', 'manual', 'ytick', [tmp(1) tmp(end)], 'yticklabel', { '-' '+' });
+    end
+end
+
 if nbgraph> 1, 
    figure(curfig); a = textsc(0.5, 0.05, topotitle); 
    set(a, 'fontweight', 'bold'); 

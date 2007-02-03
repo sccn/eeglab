@@ -23,9 +23,13 @@
 %   rowscols   - Vector of the form [m,n] where m is total vertical tiles and n 
 %                horizontal tiles per page. If the number of maps exceeds m*n,
 %                multiple figures will be produced {def|0 -> 1 near-square page}
-%   'setup'    - ['setupfile.spl'] Make the headplot spline file
-%   'load'     - ['setupfile.spl'] Load the headplot spline file
-%   others...  - Other headplot options. See >> help headplot
+%   
+% Optional 'Key' 'Value' Paired Inputs
+%   'setup'    - ['name_of_file_to_save.spl'] Make the headplot spline file
+%   'load'     - ['name_of_file_to_load.spl'] Load the headplot spline file
+%   'colorbar' - ['on' or 'off'] Switch to turn colorbar on or off. {Default: 'on'}
+%   others...  - All other key-val calls are passed directly to headplot. 
+%                See >> help headplot
 %
 % Output:
 %   EEGOUT - EEG dataset, possibly with a new or modified splinefile. 
@@ -60,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.52  2007/01/30 03:23:39  toby
+% edit geometry
+%
 % Revision 1.51  2007/01/30 03:18:43  toby
 % show full path of spline file
 %
@@ -226,7 +233,7 @@ if isempty(EEG.chanlocs)
     error('Pop_headplot: this dataset does not contain channel locations. Use menu item: Edit > Dataset info');
 end;
 
-if nargin < 3
+if nargin < 3 % Open GUI input window
     % remove old spline file
     % ----------------------
     if isfield(EEG, 'splinefile') 
@@ -235,7 +242,7 @@ if nargin < 3
             byteperelec = splfile.bytes/EEG.nbchan;
             if byteperelec/EEG.nbchan < 625, % old head plot file
                 EEG.splinefile = [];
-                disp('Warning: Wrong montage or old-versin spline file version detected and removed; new spline file required');
+                disp('Warning: Wrong montage or old-version spline file version detected and removed; new spline file required');
             end;
         end;
     end;
@@ -412,9 +419,19 @@ if nargin < 3
         options    = { options{:} tmpopts{:} };
     end;
 	if size(arg2(:),1) == 1, figure; end;
-else
+else % Pass along parameters and bypass GUI input
     options = varargin;
 end;
+
+% Check if pop_headplot input 'colorbar' was called, and don't send it to headplot
+loc = strmatch('colorbar', options(1:2:end), 'exact');
+loc = loc*2-1;
+if ~isempty(loc)
+    colorbar_switch = strcmp('on',options{ loc+1 });
+    options(loc:loc+1) = [];
+else
+    colorbar_switch = 1;
+end 
 
 % read or generate file if necessary
 % ----------------------------------
@@ -549,27 +566,28 @@ for index = 1:size(arg2(:),1)
 		drawnow;
 		axis equal; 
 		rotate3d off;
-        % DEPRECATED: use headplot option 'cbar' to draw a colorbar.
-        % Draw colorbar
-		%if index == size(arg2(:),1)
-	    %    pos = get(gca,'position');
-	    %    q = [pos(1) pos(2) 0 0];
-	    %    s = [pos(3) pos(4) pos(3) pos(4)];
-	    %    col = colormap;
-        %    if nbgraph > 1
-        %        ax = subplot('position', [1.1 0 .05 1].*s+q);
-	    %    else 
-        %        ax = subplot('position', [1 0 .05 1].*s+q);          
-        %    end;
-        %    col = col(1:end-3,:);
-        %    imagesc([], [maplimits(1) 0 maplimits(2)], reshape(col,size(col,1),1,3));
-        %    set(gca, 'xtick', [], 'yaxislocation', 'right', 'ydir', 'normal');
-	    %end;	   
     else
         axis off
-    end;
-end;
+    end
+end
+
+% Draw colorbar
+if colorbar_switch
+    if nbgraph == 1
+        ColorbarHandle = cbar(0,0,[maplimits(1) maplimits(2)]); 
+        pos = get(ColorbarHandle,'position');  % move left & shrink to match head size
+        set(ColorbarHandle,'position',[pos(1)-.05 pos(2)+0.13 pos(3)*0.7 pos(4)-0.26]);
+    else
+        cbar('vert',0,[maplimits(1) maplimits(2)]);
+    end
+    if ~typeplot    % Draw '+' and '-' instead of numbers for colorbar tick labels
+        tmp = get(gca, 'ytick');
+        set(gca, 'ytickmode', 'manual', 'yticklabelmode', 'manual', 'ytick', [tmp(1) tmp(end)], 'yticklabel', { '-' '+' });
+    end
+end
+        
 try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
+
 
 if nbgraph> 1, 
     a = textsc(0.5, 0.05, topotitle); 
