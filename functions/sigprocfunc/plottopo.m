@@ -65,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.46  2007/02/02 16:36:04  arno
+% speed plot
+%
 % Revision 1.42  2006/11/15 20:41:40  arno
 % Voltage -> Potential
 %
@@ -738,61 +741,6 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
             
         end; % P=0 
 
-        
-        
-        %
-        %%%%%%%%%%%%%%%%%%%%%%% Plot lines %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        %
-        if P == datasets-1
-            if ISSPEC
-                plot([xmin xmin],[0 ymax],'color',axislcolor); 
-            else
-                plot([0 0],[ymin ymax],'color',axislcolor); % draw vert axis at time 0  
-            end  
-            axis('off');
-            plot([xmin xmax],[0 0],'color',axislcolor);  % draw horizontal axis 
-        end;
-        %
-        %%%%%%%%%%%%%%%%%%%% plot vertical lines (optional) %%%%%%%%%%%%%%%%%
-        %
-        
-        if isempty(g.vert)
-            g.vert = [xmin xmax];
-            ymean = (ymin+ymax)/2; 
-            vmin = ymean-0.1*(ymean-ymin);
-            vmax = vmin*-1;  %ymean+0.2*(ymax-ymean);
-        elseif ~isnan(g.vert)
-           ymean = (ymin+ymax)/2; 
-           vmin = ymean-0.1*(ymean-ymin);
-           vmax = vmin*-1;  %ymean+0.2*(ymax-ymean);
-           if ~ISSPEC % -/+ plot, normal case (e.g., not spectra), plot data trace
-                for v = g.vert
-                    plot([v v],[vmin vmax],'color',vertcolor); % draw vertical lines 
-                end
-            else
-                for v = g.vert
-                    plot([v v],[0 ymax],'color',vertcolor); 
-                end
-            end
-        end
-        
-        %
-        %%%%%%%%%%%%%%%%%%%% plot horizontal lines (optional) %%%%%%%%%%%%%%%
-        %
-        if isempty(g.hori)
-           g.hori = [ymin ymax]; 
-        end
-        if ~isnan(g.hori)
-            if ~ISSPEC % -/+ plot, normal case (e.g., not spectra), plot data trace
-                xmean = 0; 
-                hmin = xmean-0.2*(xmean-xmin);
-                hmax = hmin*-1; %xmean+0.3*(xmax-xmean);
-                for v = g.hori
-                    plot([hmin hmax],[v v], 'color',horicolor); % draw horizontal lines 
-                end
-            end
-        end
-        
         %
         %%%%%%%%%%%%%%%%%%%%%%% Plot data traces %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %
@@ -826,6 +774,58 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
         end
         
         if P == datasets-1 % last pass
+            %
+            %%%%%%%%%%%%%%%%%%%%%%% Plot lines %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            %
+            if ISSPEC
+                plot([xmin xmin],[0 ymax],'color',axislcolor); 
+            else
+                plot([0 0],[ymin ymax],'color',axislcolor); % draw vert axis at time 0  
+            end  
+            axis('off');
+            plot([xmin xmax],[0 0],'color',axislcolor);  % draw horizontal axis 
+
+            %
+            %%%%%%%%%%%%%%%%%%%% plot vertical lines (optional) %%%%%%%%%%%%%%%%%
+            %
+        
+            if isempty(g.vert)
+                g.vert = [xmin xmax];
+                ymean = (ymin+ymax)/2; 
+                vmin = ymean-0.1*(ymean-ymin);
+                vmax = vmin*-1;  %ymean+0.2*(ymax-ymean);
+            elseif ~isnan(g.vert)
+               ymean = (ymin+ymax)/2; 
+               vmin = ymean-0.1*(ymean-ymin);
+               vmax = vmin*-1;  %ymean+0.2*(ymax-ymean);
+               if ~ISSPEC % -/+ plot, normal case (e.g., not spectra), plot data trace
+                    for v = g.vert
+                        plot([v v],[vmin vmax],'color',vertcolor); % draw vertical lines 
+                    end
+                else
+                    for v = g.vert
+                        plot([v v],[0 ymax],'color',vertcolor); 
+                    end
+                end
+            end
+        
+            %
+            %%%%%%%%%%%%%%%%%%%% plot horizontal lines (optional) %%%%%%%%%%%%%%%
+            %
+            if isempty(g.hori)
+               g.hori = [ymin ymax]; 
+            end
+            if ~isnan(g.hori)
+                if ~ISSPEC % -/+ plot, normal case (e.g., not spectra), plot data trace
+                    xmean = 0; 
+                    hmin = xmean-0.2*(xmean-xmin);
+                    hmax = hmin*-1; %xmean+0.3*(xmax-xmean);
+                    for v = g.hori
+                        plot([hmin hmax],[v v], 'color',horicolor); % draw horizontal lines 
+                    end
+                end
+            end
+
             %
             %%%%%%%%%%%%%%%%%%%%%%% Highlight regions %%%%%%%%%%%%%%%%%%%%%%%%%%
             %
