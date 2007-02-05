@@ -43,6 +43,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2006/01/31 20:22:07  arno
+% eeglab options
+% ..
+%
 % Revision 1.22  2005/11/04 02:41:48  toby
 % Fixed a minor bug in default number of channels
 %
@@ -152,7 +156,7 @@ if nargin <3
                                       'Plot single trials instead of average (yes|no)' ...
                                    }, ...
                                    'Component ERPs in rect. array -- pop_plotdata()', 1, ...
-                                   {   ['1:' int2str(EEG.nbchan)] [fastif(isempty(EEG.setname), '',[EEG.setname ' ERP'])] ['0 0'] ['no'] }, ...
+                                   {   ['1:' int2str(size(EEG.icawinv,2))] [fastif(isempty(EEG.setname), '',[EEG.setname ' ERP'])] ['0 0'] ['no'] }, ...
                                    'pop_plotdata' );
 	end;		
 	if length(result) == 0 return; end;
