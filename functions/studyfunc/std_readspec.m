@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2006/11/23 01:12:50  arno
+% implement mean spectrum subtraction
+%
 % Revision 1.16  2006/11/10 00:08:43  arno
 % reprogram for channel
 %
@@ -130,16 +133,22 @@ end;
 
 for k=1:length(inds)
     try,
+        warning backtrace off;
         if rmsubjmean == 0
              erpstruct = load( '-mat', filename, [ prefix int2str(inds(k)) ], 'freqs' );
         else erpstruct = load( '-mat', filename, [ prefix int2str(inds(k)) ], 'freqs', 'average_spec' );
         end;
+        warning backtrace on;
     catch
         error( [ 'Cannot read file ''' filename '''' ]);
     end;
 
     tmpdat    = getfield(erpstruct, [ prefix int2str(inds(k)) ]);
-    if rmsubjmean, tmpdat = tmpdat - erpstruct.average_spec; end;
+    if rmsubjmean, 
+        if isfield(erpstruct, 'average_spec')
+            tmpdat = tmpdat - erpstruct.average_spec; 
+        end;
+    end;
     if k == 1
         X = zeros(length(comp), length(tmpdat));
     end;
