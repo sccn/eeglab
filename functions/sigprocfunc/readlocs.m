@@ -190,6 +190,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.90  2006/11/09 20:46:51  arno
+% fixing readling .elp files
+%
 % Revision 1.89  2006/11/07 02:31:21  arno
 % better documentation for .xyz
 %
@@ -475,7 +478,7 @@ chanformat(10).typestring   = 'EEGLAB complete 3-D file';
 chanformat(10).description  = [ 'EEGLAB file containing polar, cartesian 3-D, and spherical 3-D ' ...
                                'electrode locations.' ];
 chanformat(10).importformat = { 'channum' 'labels'  'theta' 'radius' 'X' 'Y' 'Z' 'sph_theta' 'sph_phi' ...
-                               'sph_radius' };
+                               'sph_radius' 'type' };
 chanformat(10).skipline     = 1;
 % ---------------------------------------------------------------------------------------------------
 chanformat(11).type         = 'custom';
