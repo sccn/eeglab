@@ -160,6 +160,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.91  2006/10/24 21:29:08  arno
+% last error
+%
 % Revision 1.90  2006/09/27 01:48:09  scott
 % hzdir
 %
@@ -1312,7 +1315,10 @@ switch lower(g.plotitc)
     set(h(10),'TickLength',[0.02 0.025]);
 	set(h(10),'YAxisLocation','right')
 	xlabel('Time (ms)')
-	ylabel('uV')
+    ylabel('\muV')
+    if (~isempty(g.topovec))
+      if length(g.topovec) ~= 1, ylabel(''); end; % ICA component
+    end;
 
 	E = mean(R(dispf,:)');
 	h(11) = subplot('Position',[0 ordinate2 .1 height].*s+q); % plot the marginal mean
