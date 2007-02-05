@@ -53,6 +53,9 @@
 % uses the global variable EEG ALLEEG CURRENTSET 
 
 % $Log: not supported by cvs2svn $
+% Revision 1.47  2006/10/02 11:31:32  arno
+% Matlab 6.1 compatibility
+%
 % Revision 1.45  2006/05/07 18:06:27  arno
 % cosmetic changes
 %
@@ -262,14 +265,14 @@ end;
 
 if findindex
 	i = 1;
-	while (i<200)
+	while (i<2000)
 		try
 			if isempty(ALLEEG(i).data);
-				storeSetIndex = i; i = 200;
+				storeSetIndex = i; i = 2000;
 			end;
 			i = i+1;	
 		catch
-			storeSetIndex = i; i = 200;
+			storeSetIndex = i; i = 2000;
 		end;
    end;
    if isempty(varargin)
