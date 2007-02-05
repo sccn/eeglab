@@ -171,6 +171,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.132  2006/11/07 02:52:15  arno
+% same
+%
 % Revision 1.131  2006/11/07 02:50:57  arno
 % fix gethelpvar call
 %
@@ -849,12 +852,14 @@ else
 	if nargin < 10
 		sortingeventfield = [];
 	end;
+    %options = vararg2str(varargin); % NO BECAUSE OF THE CHANNEL LOCATION
+    %                                  PROBLEM BELOW
 	for i=1:length( varargin )
 		if isstr( varargin{ i } )
 			options = [ options ', ''' varargin{i} '''' ];
 		else  
 		  if ~iscell( varargin{ i } )
-		      options = [ options ', [' num2str(varargin{i}) ']' ];
+		      options = [ options ',' vararg2str({varargin{i}}) ];
 		  else
 		      options = [ options ', { [' num2str(varargin{ i }{1}') ']'' EEG.chanlocs EEG.chaninfo }' ];
 		  end;    
