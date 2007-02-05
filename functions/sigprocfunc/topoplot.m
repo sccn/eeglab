@@ -163,6 +163,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.275  2006/09/14 09:31:43  arno
+% fix the white background command
+%
 % Revision 1.274  2006/07/21 03:05:34  toby
 % *** empty log message ***
 %
@@ -1333,7 +1336,7 @@ x         = x(plotchans);
 y         = y(plotchans);
 labels    = labels(plotchans); % remove labels for electrodes without locations
 labels    = strvcat(labels); % make a label string matrix
-if ~isempty(Values) & length(Values) > 1
+if ~isempty(Values) & length(Values) > 1 & ~strcmpi( STYLE, 'blank')
     Values    = Values(plotchans);
 end;
 
