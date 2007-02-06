@@ -1,6 +1,11 @@
 % eeg_helpmenu() - Call the help file for EEGLAB menus       
 %       
-% Usage: >> eeg_helpmenu( ); 
+% Usage:
+%   To call a menu of eeglab functions
+%       >> eeg_helpmenu;
+%   To open a help window with the specific called file.
+%   Equivalent to calling >> pophelp( 'filename' );
+%        >> eeg_helpmenu( 'filename' );
 %       
 % Author: Arnaud Delorme CNL / Salk Institute 2001     
 %       
@@ -25,6 +30,9 @@
 % Foundation Inc. 59 Temple Place Suite 330 Boston MA  02111-1307  USA  
        
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2007/02/06 20:04:34  toby
+% nothing
+%
 % Revision 1.15  2003/07/28 15:14:45  arno
 % averef -> reref
 %
@@ -194,15 +202,17 @@ catch, end;
 
 if nargin > 0
 	close(gcf);
-	command = allmenus( 2:2:length(allmenus));
-	for index = 1:length(text)
-		if isempty(allmenus{index*2})
-			tmpparam{index} = {  '' allmenus{(index-1)*2+1} };
-		else
-			tmpparam{index} = {  [ allmenus{index*2} '.m' ] allmenus{(index-1)*2+1} };
-		end;
-	end;
- 	makehtml( tmpparam, '/home/www/eeglab/allfunctions', 'outputfile', 'tempmenu.html', 'mainonly', 'on');
+    pophelp(filename);
+	%command = allmenus( 2:2:length(allmenus));
+	%for index = 1:length(text)
+	%	if isempty(allmenus{index*2})
+	%		tmpparam{index} = {  '' allmenus{(index-1)*2+1} };
+	%	else
+	%		tmpparam{index} = {  [ allmenus{index*2} '.m' ] allmenus{(index-1)*2+1} };
+	%	end;
+	%end;
+ 	%makehtml( tmpparam, '/home/www/eeglab/allfunctions', 'outputfile', 'tempmenu.html', 'mainonly', 'on');
+    %}
 end;
 
 return;
