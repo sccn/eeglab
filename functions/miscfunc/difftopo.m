@@ -34,10 +34,23 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+% $Log: not supported by cvs2svn $
 
 function difftopo(ALLEEG,eeg1,eeg2,interval,limits,subcomps);
 
 if nargin < 3
+   help difftopo
+   return
+end
+if eeg1 < 1 | eeg1 > length(ALLEEG)
+   help difftopo
+   return
+end
+if eeg2 < 1 | eeg2 > length(ALLEEG)
+   help difftopo
+   return
+end
+if eeg1 == eeg2
    help difftopo
    return
 end
@@ -62,18 +75,7 @@ if length(interval) ~= 2
    help difftopo
    return
 end
-if eeg1 < 1 | eeg1 > length(ALLEEG)
-   help difftopo
-   return
-end
-if eeg2 < 1 | eeg2 > length(ALLEEG)
-   help difftopo
-   return
-end
-if eeg1 == eeg2
-   help difftopo
-   return
-end
+
 if ALLEEG(eeg1).pnts ~= ALLEEG(eeg1).pnts
   error('EEG datasets must have the same number of frames per epoch');
 end
