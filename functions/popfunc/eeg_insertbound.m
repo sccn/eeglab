@@ -3,12 +3,13 @@
 % Usage:
 %       >> [eventout indnew] = eeg_insertbound( eventin, pnts, ...
 %                                                abslatency, duration);
-% Inputs:
+% Required Inputs:
 %   eventin    - EEGLAB event structure (EEG.event)
 %   pnts       - data points in EEG dataset (EEG.pnts * EEG.trials)
 %   abslatency - absolute latency of regions in original dataset. Can
 %                also be an array of [beg end] latencies with one row
 %                per region removed. Then 'lengths' argument is ignored.
+% Optional Inputs:
 %   lengths    - lengths of removed regions
 %
 % Outputs:
@@ -47,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2005/11/02 07:16:05  scott
+% fprintf messages corrected -sm
+%
 % Revision 1.33  2005/08/10 01:47:32  scott
 % clarifying latencies in help msg (Arno, please check the example -sm)
 %
@@ -153,7 +157,7 @@
 
 function [eventout,indnew] = eeg_insertbound( eventin, pnts, regions, lengths);
     
-    if nargin < 2
+    if nargin < 3
         help eeg_insertbound;
         return;
     end;
