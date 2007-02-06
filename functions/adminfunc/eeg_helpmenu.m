@@ -1,6 +1,6 @@
 % eeg_helpmenu() - Call the help file for EEGLAB menus       
 %       
-% Usage: >> eeg_helpmenu( );       
+% Usage: >> eeg_helpmenu( ); 
 %       
 % Author: Arnaud Delorme CNL / Salk Institute 2001     
 %       
@@ -25,6 +25,9 @@
 % Foundation Inc. 59 Temple Place Suite 330 Boston MA  02111-1307  USA  
        
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2003/07/28 15:14:45  arno
+% averef -> reref
+%
 % Revision 1.14  2002/11/15 00:40:08  arno
 % adding readegi menu
 %
