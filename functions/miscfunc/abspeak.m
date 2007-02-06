@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2006/10/18 21:14:20  toby
+% documentation edit
+%
 % Revision 1.1  2002/04/05 17:36:45  jorn
 % Initial revision
 %
@@ -55,7 +58,7 @@ if fepoch == 0
 end
 epochs = floor(ftot/fepoch);
 if fepoch*epochs ~= ftot
-   fprintf('asbpeak(): frames arg does not divide data length.\n')
+   fprintf('abspeak(): frames arg does not divide data length.\n')
    return
 end
 
