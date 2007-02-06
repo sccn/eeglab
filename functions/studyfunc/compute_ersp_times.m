@@ -3,6 +3,9 @@
 %        frequency range, wavelet parameters, sampling rate and frequency 
 %        resolution that are used by timef(). 
 %        This helper function is called by pop_preclust() & std_ersp(). 
+% Example:
+%    [time_range, winsize] = compute_ersp_times(cycles,  ALLEEG(seti).srate, ...
+%                              [ALLEEG(seti).xmin ALLEEG(seti).xmax]*1000, freq(1),padratio);
 %
 % Authors: Hilit Serby & Arnaud Delorme, SCCN, INC, UCSD, Feb 03, 2005
 
