@@ -76,6 +76,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2006/01/31 20:16:02  arno
+% options
+%
 % Revision 1.24  2005/08/04 15:37:52  arno
 % remove memory saving option
 %
@@ -262,10 +265,10 @@ if calldisp
 	eeg_rejmacro; % script macro for generating command and old rejection arrays
 	if icacomp == 1
 		eegplot(EEG.data(elecrange,:,:), 'winlength', 5, 'position', [100 550 800 500], ...
-				'limits', [EEG.xmin EEG.xmax]*1000, 'xgrid', 'off', 'tag', 'childEEG' );
+			'limits', [EEG.xmin EEG.xmax]*1000, 'xgrid', 'off', 'movebutton', 'off', 'tag', 'childEEG' );
 	else
 		eegplot(icaacttmp(elecrange,:,:), 'winlength', 5, 'position', [100 550 800 500], 'limits', ...
-				[EEG.xmin EEG.xmax]*1000 , 'xgrid', 'off', 'tag', 'childEEG' );
+				[EEG.xmin EEG.xmax]*1000 , 'xgrid', 'off', 'movebutton', 'off', 'tag', 'tag', 'childEEG' );
 	end;	
 	eegplot( allspec(elecrange,:,:), 'srate', EEG.srate, 'freqlimits', [1 EEG.srate/2], 'command', ...
 			 command, 'children', gcf, 'position', [100 50 800 500], eegplotoptions{:}); 
