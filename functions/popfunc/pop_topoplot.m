@@ -56,6 +56,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.68  2007/02/03 04:06:20  toby
+% 'colorbar' switch added, minor related changes
+%
 % Revision 1.67  2007/01/26 18:03:45  arno
 % handle MEG data
 %
@@ -409,6 +412,7 @@ counter = 1;
 countobj = 1;
 allobj = zeros(1,1000);
 curfig = gcf;
+if isfield(EEG, 'chaninfo'), options = { options{:} 'chaninfo' EEG.chaninfo }; end;
 for index = 1:size(arg2(:),1)
 	if nbgraph > 1
         if mod(index, rowcols(1)*rowcols(2)) == 1
@@ -472,7 +476,6 @@ for index = 1:size(arg2(:),1)
         addopt = { 'verbose', 'off' };
     end;
     %fprintf('Printing to figure %d.\n',curfig);
-    if isfield(EEG, 'chaninfo'), options = { options{:} 'chaninfo' EEG.chaninfo }; end;
     if ~isnan(arg2(index))
 		if typeplot
             if nbgraph > 1, axes(curax); end;
@@ -502,23 +505,6 @@ for index = 1:size(arg2(:),1)
         countobj = countobj+length(tmpobj);
 		drawnow;
 		axis square;
-        
-        %{
-        % Draw a colorbar
-		if index == size(arg2(:),1)
-	        if nbgraph == 1
-                clim = get(gca, 'clim');
-                pos = get(gca,'position');
-                q = [pos(1) pos(2) 0 0];
-                s = [pos(3) pos(4) pos(3) pos(4)];
-                col = colormap;
-                ax = axes('position', [0.95 0 .05 1].*s+q);
-                cbar(ax,[1:64],clim);
-	        else 
-                cbar('vert');
-            end;
-	    end;
-	   %}
     else
     axis off
     end;
