@@ -30,6 +30,9 @@
 % Foundation Inc. 59 Temple Place Suite 330 Boston MA  02111-1307  USA  
        
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2007/02/06 20:27:30  toby
+% completed undocumented feature of calling help for a specific file.
+%
 % Revision 1.16  2007/02/06 20:04:34  toby
 % nothing
 %
@@ -88,12 +91,15 @@ allmenus = { ...
 'File' ''      ...
 '   Import data' ''  ...    
 '      From ASCII/float file or Matlab array' 'pop_editset'        ... %       Import Matlab data array      
-'      From EGI .RAW file' 'pop_readegi'        ... %       Read .BCI datafile (Snapmaster)      
+'      From continuous or seg. EGI .RAW file' 'pop_readegi'        ... %             
+'      From Multiple seg. EGI .RAW files'     'cb_readsegegi'      ... %       
 '      From BCI2000 ASCII file' 'pop_loadbci'        ... %       Read .BCI datafile (Snapmaster)      
 '      From Snapmaster .SMA file' 'pop_snapread'       ... %       Read .SMA datafile (Snapmaster)      
-'      From .BDF and Biosemi .EDF file' 'pop_readedf'        ... %       Read .ELP datafile (Neuroscan continuous)      
 '      From Neuroscan .CNT file' 'pop_loadcnt'        ... %       Read .CNT datafile (Neuroscan continuous)      
 '      From Neuroscan .EEG file' 'pop_loadeeg'        ... %       Read .EEG datafile (Neuroscan epochs)      
+'      From ERPSS .RAW or .RDF file'           'cb_read_erpss' ...
+'      From .BDF and Biosemi .EDF file'        'pop_readedf' ... % Read .ELP datafile (Neuroscan continuous)      
+'      From other formats using BIOSIG'        'cb_biosig' ...
 '   Import epoch info' ''      ...
 '      From Matlab array or ASCII file' 'pop_importepoch'    ... %       Import Matlab array or ASCII file      
 '      From Neuroscan .DAT file' 'pop_loaddat'        ... %       Import .DAT info file (Neuroscan epochs)      
@@ -101,6 +107,8 @@ allmenus = { ...
 '      From  Matlab array or ASCII file' 'pop_importevent'    ... %       Import Matlab array or ASCII file      
 '      From data channel' 'pop_chanevent'      ... %       Import events from channels      
 '      From Presentation .LOG file' 'pop_importpres'     ... %       Import .LOG event file (Presentation)      
+'   Export '...
+'       '...
 '   Load existing dataset' 'pop_loadset'        ... %    Load dataset      
 '   Save current dataset' 'pop_saveset'        ... %    Save dataset      
 '   Save datasets' 'pop_saveset'        ... %    Save dataset      
