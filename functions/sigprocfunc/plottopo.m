@@ -65,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.47  2007/02/05 16:19:12  arno
+% Bug due to Stefan's changes, legend color now fixed
+%
 % Revision 1.46  2007/02/02 16:36:04  arno
 % speed plot
 %
@@ -608,7 +611,7 @@ if plotgrid
         return
     end
     xvals = 0; yvals = 0;
-    if ~exist('channames') & isempty(g.chanlocs)
+    if ~exist('channames') & (~isfield(g.chanlocs,'labels') | ~isempty(g.chanlocs.labels))
         channames = repmat(' ',ht*wd,4);
         for i=1:ht*wd
             channum = num2str(i);
