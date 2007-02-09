@@ -65,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.48  2007/02/08 23:42:35  toby
+% correcting bug discovered by nightly script ICADEMO
+%
 % Revision 1.47  2007/02/05 16:19:12  arno
 % Bug due to Stefan's changes, legend color now fixed
 %
@@ -611,14 +614,16 @@ if plotgrid
         return
     end
     xvals = 0; yvals = 0;
-    if ~exist('channames') & (~isfield(g.chanlocs,'labels') | ~isempty(g.chanlocs.labels))
-        channames = repmat(' ',ht*wd,4);
-        for i=1:ht*wd
-            channum = num2str(i);
-            channames(i,1:length(channum)) = channum;
+    if ~exist('channames') 
+        if (isfield(g.chanlocs,'labels') && isempty(g.chanlocs.labels))
+            channames = strvcat(g.chanlocs.labels);
+        else
+            channames = repmat(' ',ht*wd,4);
+            for i=1:ht*wd
+                channum = num2str(i);
+                channames(i,1:length(channum)) = channum;
+            end
         end
-    else
-        channames = strvcat(g.chanlocs.labels);
     end
     
 else % read chan_locs file
