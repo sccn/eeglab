@@ -65,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.49  2007/02/09 00:31:39  toby
+% 2nd attempt to fix bug, tested well
+%
 % Revision 1.48  2007/02/08 23:42:35  toby
 % correcting bug discovered by nightly script ICADEMO
 %
@@ -615,7 +618,7 @@ if plotgrid
     end
     xvals = 0; yvals = 0;
     if ~exist('channames') 
-        if (isfield(g.chanlocs,'labels') && isempty(g.chanlocs.labels))
+        if isfield(g.chanlocs,'labels') && ~iscellstr({g.chanlocs.labels})
             channames = strvcat(g.chanlocs.labels);
         else
             channames = repmat(' ',ht*wd,4);
