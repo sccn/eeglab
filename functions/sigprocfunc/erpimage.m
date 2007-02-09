@@ -203,6 +203,9 @@
 
 %% LOG COMMENTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % $Log: not supported by cvs2svn $
+% Revision 1.269  2007/01/26 17:58:49  arno
+% Add option for compatibility with metaplottopo
+%
 % Revision 1.268  2007/01/06 13:48:54  scott
 % help msg corrections
 %
@@ -3346,6 +3349,8 @@ if ~isnan(coherfreq)
                 end
             end
         end
+        if isnan(maxamp), maxamp = 0; end   % In case the above iteration went on 
+                                            % until fac = Inf and maxamp = NaN again.
 
         if isnan(minamp) % if not specified
             fac = 1;
@@ -3366,6 +3371,8 @@ if ~isnan(coherfreq)
                 end
             end
         end
+        if isnan(minamp), minamp = 0; end   % In case the above iteration went on 
+                                            % until fac = Inf and minamp = NaN again.
 
         fprintf('Plotting the ERSP amplitude trace below the ERP\n');
         fprintf('Min, max plotting amplitudes: [%g, %g] dB\n',minamp,maxamp);
