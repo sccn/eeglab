@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % 01-25-02 reformated help & license, added links -ad 
 
@@ -155,7 +158,7 @@ clf            % clear figure
 %%%%%%%%%%%%%%%%%%%%% eegplot() of data %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 axeegplot = axes('Units','Normalized','Position',[.75 .05 .2 .9]);
-eegplots(-data,srate,eloc_file,' ',0,frames/srate,'r',startsec); %CJH
+eegplotsold(-data,srate,eloc_file,' ',0,frames/srate,'r',startsec); %CJH
 set(axeegplot,'XTick',[])                %%CJH
                                          % plot negative up
 limits = get(axeegplot,'Ylim');          % list channel numbers only
@@ -181,7 +184,7 @@ axcolorbar = axes('Units','Normalized','Position',[.05 .05 .055 .18]);
      h=colorbar(axcolorbar);  % Note: there is a minor problem with this call.
    end                 % Write authors for further information.
    hkids=get(h,'children');
-   for k=1:3
+   for k=1:1
       delete(hkids(k));
    end
    set(axcolorbar,'Ytick',[0 0.5 1.0],'Yticklabel',[' - ';' 0 ';' + '],'FontSize',16);
