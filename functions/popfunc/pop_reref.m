@@ -1,47 +1,48 @@
 % pop_reref() - Convert an EEG dataset to average reference or to a
-%               new common reference.
-%
+%               new common reference channel (or channels). Calls reref().
 % Usage:
 %       >> EEGOUT = pop_reref( EEG ); % pop up interactive window
 %       >> EEGOUT = pop_reref( EEG, ref, 'key', 'val' ...);
 %
-% Graphical interface:
-%   "Compute average reference" - [edit box] Checking this box is the same 
-%                 as giving an empty value to the 'ref' command line parameter.
-%   "Re-reference data to channel number" - [checkbox] Checking this option
-%                 automatically uncheck the first checkbox and allow to enter a
-%                 value in the edit box on the right of the checkbox. It does not
-%                 correspond to any command line input.
-%   "Re-reference data to channel number" - [edit box] Enter the index of the 
-%                 electrode for re-referencing in this box. Same as using the 
-%                 'ref' command line input.
-%   "Include old reference channel" - [checkbox] When re-referencing the data,
-%                 checking this checkbox allow to generate data for the old 
-%                 reference channel. The location for this channel might not
-%                 have been defined and can be specified using the following 
-%                 textbox. Using this option is the same as setting the 'method'
-%                 option to 'withref'.
-%   "Include old reference channel" - [edit boxes] use these edit boxes to specify 
-%                 the old reference channel location. Same as using the 'refloc' 
-%                 optional input.  (note that if the channel location structure 
-%                 contains one more channel that the data, the last channel is 
-%                 considered to be the reference and the location for this channel
-%                 does not have to be specified here). 
-%
+% Graphic interface:
+%   "Compute average reference" - [edit box] Checking this box (for 'yes') is 
+%                 the same as giving an empty value for the commandline 'ref' 
+%                 argument. Unchecked, the data are transformed to common reference.
+%   "Re-reference data to channel number(s)" - [checkbox] Checking this option
+%                 automatically unchecks the checkbox above, allowing reference 
+%                 channel indices to be entered in the text edit box to its right
+%                 (No commandline equivalent).
+%   "Re-reference data to channel number(s)" - [edit box] Enter the index of 
+%                 the electrode(s) for re-referencing here. Commandline
+%                equivalent: 'ref'. 
+%   "Include old reference channel" - [checkbox] When re-referencing the 
+%                 data, checking this checkbox reconstitutes the data for the 
+%                 previous reference channel. If the location for this channel 
+%                 was not defined, it can be specified using the text box below.
+%                 Commandline equivalent: 'method', 'withref'
+%   "Include old reference channel" - [edit boxes] Use these edit boxes to specify 
+%                 the previous reference channel location. Same as the 'refloc' 
+%                 commandline option. Note: When the chanloc structure 
+%                 contains one more channel than the data do, its last channel 
+%                 is taken to be the (previous) reference, and its location 
+%                 does not have to be specified again here. 
 % Inputs:
 %   EEG         - input dataset
-%   ref         - reference: [] = average reference
-%                            X  = new reference electrode number
-%
+%   ref         - reference: []            = convert to average reference
+%                            [int vector]  = new reference electrode number(s)
 % Optional inputs:
-%   'method'    - ['standard'|'withref'] can be either 'standard' or 'withref' 
-%                 to recompute the old reference potential. See also reref().
-%   'refloc'    - [cell array] old common reference name polar location 
-%                 (can also be included as the last channel of the EEG.chanlocs 
-%                 struture). i.e. { 'cz' 0 0 }
+%   'method'    - ['standard'|'withref'] can either be 'withref' = recompute 
+%                 the previous reference channel data, or 'standard' = do not
+%                 recompute the previous reference channel. See >> help reref()
+%   'refloc'    - [cell array] Previous common-reference channel label and polar 
+%                 coordinates location. Ex: { 'Cz' 0 0 }. This information may 
+%                 also be passed as the last channel in the 'EEG.chanlocs' data 
+%                 struture). 
+% Outputs:
+%   EEGOUT      - re-referenced output dataset
 %
-% Inputs:
-%   EEGOUT      - output dataset
+% Notes:
+%                 For other options, call reref() directly. See >> help reref
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 12 Nov 2002
 %
@@ -66,6 +67,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2006/05/04 10:07:07  arno
+% same
+%
 % Revision 1.29  2005/01/24 19:30:37  arno
 % remove field for Keun re-refencing
 % ,.
@@ -179,7 +183,7 @@ if nargin < 2
     includeref = 0; % this is for the second gui
     if strcmpi(EEG.ref, 'common')
         if length(EEG.chanlocs) == EEG.nbchan+1
-            disp('Extra channel detected: using cahnnel as reference');
+            disp('Extra channel detected: using channel as reference');
             includeref = 1;
             options = { 'refstate',  EEG.nbchan+1 };
         else
@@ -220,7 +224,7 @@ if nargin < 2
                        { 'style' 'edit' 'tag' 'oldref' 'enable' 'off' 'string' '' } ...
                        { 'style' 'text' 'string' strvcat('Note: by including a reference channel in your data (above), its potential may be computed when', ...
                                                          'you re-reference the data. If you have polar coordinates of the reference channel, enter them above;', ...
-                                                         'If the dataset has no channel locations yet, you may leave the label and location fields empty;', ...
+                                                         'If the dataset has no channel locations, you may leave the label and location fields empty;', ...
                                                          [ 'If you have 3-D location coordinates only, then Cancel and create a new channel ' int2str(EEG.nbchan+1) ], ...
                                                          'in Edit > Channel locations. Then return to Tools > Re-reference.') } ...
                      };
