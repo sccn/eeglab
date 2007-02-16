@@ -1,57 +1,66 @@
 % reref() - convert common reference EEG data to some other common reference
 %           or to average reference
-%
 % Usage:
-%   >> dataout = reref(data);
-%   >> [dataout Chanlocs Wout Sout meandata] = reref(data, refchan, 'key', 'val');
-%
+%   >> Dataout = reref(data);  % convert all channels to average reference
+%   >> [Dataout Chanlocs Wout Sout meandata] = reref(data, refchan, 'key', 'val');
+%                              % convert data to new reference with options
 % Inputs:
 %   data - 2-D data matrix (chans,frames*epochs) 
-%   refchan  - reference channel number(s) -- two possibilities here
-%          1) [] - if data state (see 'refstate' below) is 'common' compute 
-%             average reference, otherwise undo average reference.
-%          2) 1 <= num <= size(data,1): re-reference to channel num. If the 
-%             'withref' method is set, the function computes the previous 
-%             common reference channel.
+%   refchan  - reference channel number(s). There are two possibilities:
+%          1) [] - if data state (see 'refstate' below) is 'common', compute 
+%             average reference, otherwise convert from average reference.
+%          2) [1 <= num(s) <= size(data,1)]: re-reference to channel num(s). 
+%             If the 'withref' method (below) is used, compute the previous 
+%             common reference channel as well.
 % 
 % Optional inputs:
-%   'elocs'      - Electrode location structure (e.g., EEG.chanlocs).
-%   'icaweights' - ICA weight matrix (Note: this could be weights*sphere and
-%                  the 'icasphere' input below is unnecessary)
-%   'icasphere'  - ICA sphere matrix if any
-%   'icachansind' - Indices of channels used for ICA
-%   'method'     - ['standard'|'withref'] Include ('withref') reference channel 
-%                  in output. Default is 'standard'. 
-%   'refstate  ' - ['common'|'averef'|integer] Current average reference.
-%                  Use this parameter to re-reference data to a given channel if data
-%                  is already average referenced (by setting it to 'averef').
-%                  Integer designates channel reference indices.
-%                  Default is 'common' or 0 (0 is the same as common).
-%   'refloc'     - Reference channel location -- a cell array with name and 
-%                  polar coordinates of the channel, { 'label' theta radius }. 
-%                  For 3-D location, include the reference as the last channel 
-%                  in the 'chanlocs' structure.
-%   'exclude'    - [integer array] channel indices to exclude from rereferencing
-%                  i.e. EMG
-%   'keepref'    - ['on'|'off'] keep reference channel in output (only for several
-%                  references).
+%   'elocs'      - Current data electrode location structure (e.g., EEG.chanlocs).
+%   'icaweights' - ICA weight matrix. Note: If this is ICA weights*sphere, 
+%                  then the 'icasphere' input below should be [] or identity.
+%   'icasphere'  - ICA sphere matrix (if any)
+%   'icachansind' - Indices of the channels used in ICA decomposition
+%
+%   'method'     - ['standard'|'withref'] Do not ('standard') or do ('withref') 
+%                  include reference channel data in output {def: 'standard'}. 
+%                  Note: Option 'withref' not possible when multiple ref channel 
+%                  indices are given as argument to 'refstate' (below).
+%   'refstate  ' - ['common'|'averef'|[indices]] Current reference condition,
+%                  ('averef') = average reference; ('common' or 0) = common
+%                  reference. [indices] designate the current reference channel 
+%                  or channels if present in the data {default: 'common'}
+%   'refloc'     - Reference channel location {'label' theta radius} cell array
+%                  containing the name and polar coordinates of the channel.
+%                  If only 3-D coordinates are available, include the reference 
+%                  channel location as the last channel in the 'elocs' structure.
+%   'exclude'    - [integer array] channel indices to exclude from re-referencing
+%                  (e.g., event marker channels, etc.)
+%   'keepref'    - ['on'|'off'] keep reference channel in output (only usable 
+%                  when there are several references).
 %
 % Outputs:
-%   dataout     - Input data converted to average reference
-%   Chanlocs    - Updated location structure
-%   Wout        - ICA weight matrix converted to average reference
-%   Sout        - ICA sphere matrix converted to average reference
-%   ICAinds     - indices of channels used for ICA
-%   meandata    - (1,dataframes) mean removed from each data frame (point)
+%   Dataout     - Input data converted to the new reference
+%   Chanlocs    - Updated channel locations structure
+%   Wout        - ICA weight matrix (former icaweights*icasphere)
+%                 converted to new data reference
+%   Sout        - ICA sphere matrix converted to an identity matrix
+%   ICAinds     - New indices of channels used in ICA decomposition
+%   meandata    - (1,dataframes) means removed from each data point
 %
 % Notes: 1) The average reference calculation implements two methods 
-%           (from www.egi.com/Technotes/AverageReference.pdf)
-%            V'i= (Vi-Vref) - sum(Vi-Vref)/number_of_electrodes
-%        2) 'icaweight' conversion of the weight matrix W to average reference:
-%        If ica_act = W*data, then data = inv(W)*ica_act; 
-%        If R*data is the average-referenced data, 
-%        R*data= (R*inv(W))*ica_act and Wout = inv(R*inv(W));
-%        The average-reference ICA maps are the columns of inv(Wout).
+%           (see www.egi.com/Technotes/AverageReference.pdf)
+%            V'i = (Vi-Vref) - sum(Vi-Vref)/number_of_electrodes
+%
+%        2) In conversion of the weight matrix to a new reference
+%           where WS = Wts*Sph  and  ica_act = WS*data, then
+%              data = inv(WS)*ica_act;
+%           If R*data are the re-referenced data,
+%              R*data= R*inv(WS)*ica_act;   
+%           And Wout = inv(R*inv(WS));
+%           Now, Sout = eye(length(ICAinds));
+%           The re-referenced ICA component maps are now the 
+%           columns of inv(Wout), and the icasphere matrix, Sout, 
+%           is an identity matrix. Note: inv() -> pinv() when 
+%           PCA dimension reduction is used during ICA decomposition.
 %
 % Authors: Arnaud Delorme & Scott Makeig, SCCN/INC/UCSD, La Jolla, 1999-2002 
 
@@ -74,6 +83,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2006/10/02 11:36:56  arno
+% fix excluding channels
+%
 % Revision 1.30  2006/05/04 10:33:54  arno
 % fixing last changes when not all channels are used for ICA
 %
@@ -214,11 +226,12 @@ if ~isempty(g.icaweight)
 end;
 if ~isempty(g.icaweights) & ~isempty(g.icasphere)
     g.icaweights = g.icaweights*g.icasphere;
+    % g.icasphere = eye(size(g.icasphere,1)); % make icasphere an identity matrix - see below
 end;
 if ~isempty(g.icaweights)
     if isempty(g.icachansind), 
         g.icachansind = [1:size(g.icaweights,2)]; 
-        disp('Warning: reref() output has sligtly changed since EEGLAB 5.02');
+        disp('Warning: reref() output has changed slightly since EEGLAB 5.02');
         disp('         the 4th output argument is the indices of channels used for ICA instead');
         disp('         of the mean reference value (which is now output argument 5)');
     end;
@@ -257,11 +270,11 @@ if ~isstr(g.refstate) | ~strcmp(g.refstate, 'averef')
     
     if strcmpi(g.method, 'withref')
         if ~isstr(g.refstate) & length(g.refstate) > 1
-            error('Cannot include old reference if multiple references had been used');
+            error('Cannot include old reference as a channel when multiple reference channels are use');
         end;
         disp('Note: old reference electrode included in average reference computation');
-        avematrix          = eye(nbchans)-ones(nbchans)*1/(nbchans+1); % reference is a relrevant channel i.e. Cz
-        avematrix(end+1,:) = -1/(nbchans+1);                           % potential for the new electrode (previously ref)
+        avematrix          = eye(nbchans)-ones(nbchans)*1/(nbchans+1); % reference is a relevant channel i.e. Cz
+        avematrix(end+1,:) = -1/(nbchans+1);                           % potential for the new (previously ref) channel added to end of data
         if ~( length(g.elocs) > chans )
             if ~isempty(g.refloc) & ~isempty(g.refloc{1})
                 if ~isempty(g.elocs)
@@ -279,7 +292,7 @@ if ~isstr(g.refstate) | ~strcmp(g.refstate, 'averef')
         end;
         rerefchansout(end+1) = chans+1;
     else
-        disp('Note: old reference electrode (unless present as data channel) not included in average reference computation');
+        disp('Note: Unless present as a data channel, data for the old reference electrode are not included in the average reference computation');
         if length(g.refstate) > 1
             avematrix = eye(nbchans)-ones(nbchans)*1/nbchans;
         else
@@ -299,9 +312,9 @@ if strcmpi(g.method, 'withref')
     chans = chans+1;
 end;
 
-% generating rereferencing matrix
+% generate rereferencing matrix
 % -------------------------------
-refmatrix = eye(chans);
+refmatrix = eye(chans); % begin with identiy matrix
 if ~isempty(ref)    
     fprintf('Re-referencing data\n');
     for index = 1:length(ref)
@@ -309,13 +322,13 @@ if ~isempty(ref)
     end;
 end;
 
-% dealing with channel locations
+% deal with channel locations
 % ------------------------------
 if ~isempty(ref)    
     if length(ref) > 1 
         if strcmpi(g.keepref, 'off')
-            % remove reference from channel locstion
-            % --------------------------------------
+            % remove reference from channel location structure
+            % -------------------------------------------------
             fprintf('Warning: reference channels have been removed\n');
             if ~isempty(g.elocs)
                 g.elocs(ref) = [];
@@ -336,17 +349,17 @@ end;
 % ------------------
 rerefchansout = setdiff(rerefchansout, ref);
 if strcmpi(g.keepref, 'on') & length(ref) > 1
-    refmatrix(g.exclude,:) = []; % supress non EEG channels
-    refmatrix(:,g.exclude) = []; % supress non EEG channels
+    refmatrix(g.exclude,:) = []; % suppress excluded non-EEG channels
+    refmatrix(:,g.exclude) = []; % suppress excluded non-EEG channels
 else
-    refmatrix([ref g.exclude],:) = []; % supress references and non EEG channels
-    refmatrix(:,g.exclude      ) = [];              % supress non EEG channels
+    refmatrix([ref g.exclude],:) = []; % suppress references and non-EEG channels
+    refmatrix(:,g.exclude      ) = []; % suppress non-EEG channels
 end;
 
 % rereferencing, there are faster methods
-% but this one is the simpliest (for ICA referecing too)
+% but this one is the simpliest (for ICA re-referencing too)
 % ------------------------------------------------------
-data(rerefchansout,:) = (refmatrix*avematrix)*data(rerefchans,:); % implement as a matrix multiply
+data(rerefchansout,:) = (refmatrix*avematrix)*data(rerefchans,:); % perform matrix multiply
 Elocs = g.elocs;
 if strcmpi(g.keepref, 'off')
     rmchans = setdiff(1:size(data,1), ref);
@@ -379,10 +392,10 @@ if ~isempty(g.icaweights)
         W = pinv(refmatrix(icachansind,:)*avematrix(:,g.icachansind)*winv);
 	catch,
         error([ 'Weight matrix size is different from the data size, re-referencing impossible' 10 ...
-                      '(you have to use the same number of channel in rereferenging (minus excluded ones)' 10 ...
-                      'as in the ICA decomposition; best solution is to suppress ICA weights, rereference, then rerun ICA)']);
+                      '(referencing must use the same number of channels (less excluded ones)' 10 ...
+                      'as in the ICA decomposition. Best solution is to empty ICA weights, rereference, then run ICA decomposition again)']);
     end;
-    S = eye(length(icachansind));
+    S = eye(length(icachansind)); % output an identity sphere matrix
 else
     W = []; S = [];
 end;
