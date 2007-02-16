@@ -83,6 +83,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2007/02/16 17:22:06  scott
+% clarified help msg -- with major ??? remaining ! -sm
+%
 % Revision 1.32  2006/10/02 11:36:56  arno
 % fix excluding channels
 %
@@ -292,7 +295,9 @@ if ~isstr(g.refstate) | ~strcmp(g.refstate, 'averef')
         end;
         rerefchansout(end+1) = chans+1;
     else
-        disp('Note: Unless present as a data channel, data for the old reference electrode are not included in the average reference computation');
+        disp(['Note: Unless present as a data channel, data for the old ' ...
+              'reference']);
+        disp(' electrode are not included in the average reference computation');
         if length(g.refstate) > 1
             avematrix = eye(nbchans)-ones(nbchans)*1/nbchans;
         else
