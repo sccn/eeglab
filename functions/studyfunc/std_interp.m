@@ -1,24 +1,21 @@
-% std_interp() - interpolate data channels for all dataset contained 
-%                within a study
+% std_interp() - interpolate, if needed, a list of named data channels 
+%                for all datasets included in a STUDY. Currently assumes
+%                that all channels have uniform locations across datasets.
 %
-% Usage: [STUDY ALLEEG] = std_interp(STUDY, ALLEEG, chans, method);
+% Usage:      >> [STUDY ALLEEG] = std_interp(STUDY, ALLEEG, chans, method);
 %
 % Inputs: 
-%     STUDY    - EEGLAB study structure
-%     ALLEEG   - EEGLAB dataset structure containing all datasets in the
-%                study.
-%     chans    - [Cell array] cell array of channels to interpolate if 
-%                they are missing from one of the dataset.
-%              - [chanlocs structure] channel location structure containing
-%                a full channel structure (missing channels in the current 
-%                dataset are interpolated).
-%     method   - [string] griddata method use for interpolation 
-%                (default is 'invdist')
+%     STUDY    - EEGLAB STUDY structure
+%     ALLEEG   - EEGLAB vector containing all EEG dataset structures in the STUDY.
+%     chans    - [Cell array] cell array of channel names (labels) to interpolate 
+%                into the data if they are missing from one of the datasets.
+%     method   - [string] griddata() method to use for interpolation.
+%                See  >> help griddata()  {default:'invdist'}
 %
-% Important note:
-% This function currently presuposes that all the dataset have the same channel 
-% location. If this is not the case, the interpolation will not be
-% performed.
+% Important limitation:
+%     This function currently presuposes that all datasets have the same channel 
+%     locations (with various channels from a standard set possibly missing). 
+%     If this is not the case, the interpolation will not be performed.
 %
 % Output: 
 %     STUDY    - study structure.
@@ -45,6 +42,14 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2006/09/20 12:26:01  arno
+% use function eeg_mergelocs
+%
+
+% Deprecated:
+%              - [chanlocs structure] channel location structure containing
+%                a full channel structure (missing channels in the current 
+%                dataset are interpolated).
 
 function [STUDY ALLEEG] = std_interp(STUDY, ALLEEG, chans, method);
 
@@ -63,9 +68,9 @@ end;
 % -------------------------------
 alllocs = eeg_mergelocs(ALLEEG(:).chanlocs);
 
-% check if all the channels have the same coordinates
-% only check the theta field
-% ---------------------------------------------------
+% Check to see if all the channels have the same coordinates
+% (check only the theta field)
+% ----------------------------------------------------------
 for index = 1:length(STUDY.datasetinfo)
    tmpind  = STUDY.datasetinfo(index).index;
    tmplocs = ALLEEG(tmpind).chanlocs;
@@ -73,8 +78,8 @@ for index = 1:length(STUDY.datasetinfo)
    for ind = 1:length(id1)
        if tmplocs(id1(ind)).theta ~= alllocs(id2(ind)).theta
            
-           % find dataset with different coordinate
-           % --------------------------------------
+           % find datasets with different coordinates
+           % ----------------------------------------
            for ind2 = 1:length(STUDY.datasetinfo)
                tmplocs2 = ALLEEG(ind2).chanlocs;
                tmpmatch = strmatch(alllocs(id2(ind)).labels, { tmplocs2.labels });
@@ -104,14 +109,14 @@ if iscell(chans)
     end;
 end;
 
-% read all datasets of the study and interpolate electrodes
-% ---------------------------------------------------------
+% read all STUDY datasets and interpolate electrodes
+% ---------------------------------------------------
 for index = 1:length(STUDY.datasetinfo)
    tmpind  = STUDY.datasetinfo(index).index;
    tmplocs = ALLEEG(tmpind).chanlocs;
 
-   % build electrode structure for interpolation
-   % -------------------------------------------
+   % build electrode location structure for interpolation
+   % ----------------------------------------------------
    [tmp tmp2 id1] = intersect({tmplocs.labels}, {alllocs.labels});
    if isempty(chans)
        interplocs = alllocs;
