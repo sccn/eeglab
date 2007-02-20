@@ -29,7 +29,7 @@
 %   'comps'    - [numeric vector|'all']  indices of the cluster components to plot.
 %
 % Optional inputs for channel plotting:
-%   'changrp'  - [numeric vector]  specific channel group to plot. By
+%   'channels' - [numeric vector]  specific channel group to plot. By
 %                default, the grand mean channel ERP is plotted (using the 
 %                same format as for the cluster component means described above)
 %   'subject'  - [numeric vector]  In 'changrp' mode (above), index of 
@@ -67,6 +67,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2007/01/26 18:04:33  arno
+% reprogrammed from scractch (again)
+%
 % Revision 1.32  2006/11/23 00:26:16  arno
 % add subject name
 %

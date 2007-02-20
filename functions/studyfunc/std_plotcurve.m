@@ -64,6 +64,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2007/01/26 18:08:28  arno
+% Initial revision
+%
 % Revision 1.24  2006/11/23 00:26:22  arno
 % cosmetic change
 %
@@ -493,8 +496,8 @@ function hdl = mysubplot(nr,nc,ind,transp);
 
 % rapid filtering for ERP
 % -----------------------
-function tmpdata2 = myfilt(tmpdata, lowpass, highpass, factor, filtertype)
+function tmpdata2 = myfilt(tmpdata, srate, lowpass, highpass)
 
     tmpdata2 = reshape(tmpdata, size(tmpdata,1), size(tmpdata,2)*size(tmpdata,3)*size(tmpdata,4));
-    tmpdata2 = eegfiltfft(tmpdata2',lowpass, highpass, factor, filtertype)';
+    tmpdata2 = eegfiltfft(tmpdata2',srate, lowpass, highpass)';
     tmpdata2 = reshape(tmpdata2, size(tmpdata,1), size(tmpdata,2), size(tmpdata,3), size(tmpdata,4));

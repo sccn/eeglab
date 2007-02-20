@@ -101,6 +101,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2006/06/20 02:00:57  toby
+% Modified for speed, about 15% faster
+%
 % Revision 1.27  2006/01/17 16:55:21  scott
 % re-coded 'posact' processing to be efficient -sm
 %
@@ -876,8 +879,10 @@ if biasflag & extended
 
         for t=1:block:lastt, %%%%%%%%% ICA Training Block %%%%%%%%%%%%%%%%%%%
             pause(0);
-            if ~isempty(get(0, 'currentfigure')) & strcmp(get(gcf, 'tag'), 'stop')
-                close; error('USER ABORT');
+            if ~isempty(get(0, 'currentfigure')) 
+                if strcmp(get(gcf, 'tag'), 'stop')
+                    close; error('USER ABORT');
+                end;
             end
 
             u=weights*data(:,timeperm(t:t+block-1)) + bias*onesrow;
