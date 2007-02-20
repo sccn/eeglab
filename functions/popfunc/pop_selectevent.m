@@ -28,6 +28,7 @@
 %                   the specified events. {Default = 'on'}.
 %                   This option is relevant only for epoched datasets derived
 %                   from continuous datasets.
+%   'invertepochs' - ['on'|'off'] 'on' = Invert epoch selection. {Default = 'off'}.
 %   'deleteevents' - ['on'|'off'] 'on' = Delete ALL events except
 %                   the selected events. {Default = 'off'}.
 %   'renametype'   - [string] rename the type of selected events with the
@@ -73,6 +74,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.56  2006/05/13 13:29:05  arno
+% allow to process event types with sapce
+%
 % Revision 1.55  2005/05/24 17:25:46  arno
 % remove cell2ma
 %
@@ -306,10 +310,12 @@ if nargin<2
                 'value', fastif(EEG.trials>1, 0, 1) } { } };
 
     if EEG.trials > 1
-        geometry = { geometry{:} [2 1] };
+        geometry = { geometry{:} [2 1] [2 1]};
         uilist   = { uilist{:} ...
                      { 'Style', 'checkbox', 'string','Remove epochs not referenced by any selected event', ...
-                       'fontweight', 'bold', 'value', 1  } { } };
+                       'fontweight', 'bold', 'value', 1  } { } ...
+                       { 'Style', 'checkbox', 'string','Invert epoch selection', ...
+                       'value', 0 } { }};
     end;
     
 	results = inputgui( geometry, uilist, 'pophelp(''pop_selectevent'')', 'Select events -- pop_selectevent()');
@@ -339,11 +345,12 @@ if nargin<2
         end;
     end;
     if EEG.trials > 1
-        if results{end-4},  args = { args{:}, 'select', 'inverse' }; end;
-        if ~isempty(results{end-3}),  args = { args{:}, 'renametype', results{end-3} }; end;
-        if ~isempty(results{end-2}),  args = { args{:}, 'oldtypefield', results{end-2} }; end;
-        args = { args{:}, 'deleteevents', fastif(results{end-1}, 'on', 'off') };
-        args = { args{:}, 'deleteepochs', fastif(results{end}, 'on', 'off') };
+        if results{end-5},  args = { args{:}, 'select', 'inverse' }; end;
+        if ~isempty(results{end-4}),  args = { args{:}, 'renametype', results{end-4} }; end;
+        if ~isempty(results{end-3}),  args = { args{:}, 'oldtypefield', results{end-3} }; end;
+        args = { args{:}, 'deleteevents', fastif(results{end-2}, 'on', 'off') };
+        args = { args{:}, 'deleteepochs', fastif(results{end-1}, 'on', 'off') };        
+        args = { args{:}, 'invertepochs', fastif(results{end}, 'on', 'off') };
     else
         if results{end-3},  args = { args{:}, 'select', 'inverse' }; end;
         if ~isempty(results{end-2}),  args = { args{:}, 'renametype', results{end-2} }; end;
@@ -359,7 +366,8 @@ end;
 fieldlist = { 'event'         'integer'     []                                       [1:length(EEG.event)] ;
 			  'omitevent'     'integer'     []                                       [] ;
 			  'deleteepochs'  'string'      { 'yes' 'no' 'on' 'off' }                'on' ;
-			  'deleteevents'  'string'      { 'yes' 'no' 'on' 'off' }               'off';
+			  'invertepochs'  'string'      { 'on' 'off' }                           'off' ;
+			  'deleteevents'  'string'      { 'yes' 'no' 'on' 'off' }                'off';
 			  'renametype'    'string'      []                                       '';
 			  'oldtypefield'  'string'      []                                       '';
 			  'select'        'string'      { 'normal' 'inverse' 'remove' 'keep' }   'normal' };
@@ -564,6 +572,9 @@ if strcmp( lower(g.deleteepochs), 'on') & EEG.trials > 1
 	for index = 1:length(Ievent)
 		Iepoch(EEG.event(Ievent(index)).epoch) = 0;
 	end;
+    if strcmpi(g.invertepochs, 'on')
+        Iepoch = ~Iepoch;
+    end;
 	Iepoch = find(Iepoch == 0);
 	if length(Iepoch) == 0,
 		error('Empty dataset: all epochs have been removed');
