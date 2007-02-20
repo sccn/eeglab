@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2005/05/24 17:27:22  arno
+% remove cell2mat
+%
 % Revision 1.10  2003/07/24 18:50:59  arno
 % typo
 %
@@ -133,6 +136,6 @@ tmp = [ EEG.event.latency ];
 EEG.event = EEG.event(indexsort);
 EEG = eeg_checkset(EEG, 'eventconsistency');
 
-command = sprintf('%s = pop_loaddat(''%s'', %s, %d);', inputname(1), inputname(1), fullFileName, no_rt); 
+command = sprintf('%s = pop_loaddat(%s, %s, %d);', inputname(1), inputname(1), fullFileName, no_rt); 
 
 return;
