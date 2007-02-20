@@ -1,93 +1,122 @@
-% eeg_checkset() - check the consistency of fields of an EEG dataset 
+% eeg_checkset()   - check the consistency of the fields of an EEG dataset 
+%                    Also: See EEG dataset structure field descriptions below.
 %
-% Usage: EEG = eeg_checkset(EEG);
-%        EEG = eeg_checkset(EEG, 'keyword');
+% Usage: >> EEG = eeg_checkset(EEG);              % perform all checks
+%        >> EEG = eeg_checkset(EEG, 'keyword');   % perform the indicated check
 %
-% Optional keyword:
-%   'icaconsist'   - if EEG contains several dataset, check if they have the
-%                    same ICA decomposition
-%   'epochconsist' - if EEG contains several dataset, check if they have
+% Optional keywords:
+%   'icaconsist'   - if EEG contains several datasets, check whether they have 
+%                    the same ICA decomposition
+%   'epochconsist' - if EEG contains several datasets, check whether they have
 %                    identical epoch lengths and time limits.
-%   'chanconsist'  - if EEG contains several dataset, check if they have the
-%                    same number of channela and channel labels.
-%   'data'         - check if EEG contains data
-%   'loaddata'     - load data array if necessary
-%   'savedata'     - save data array if necessary
-%   'contdata'     - check if EEG contains continuous data
-%   'epoch'        - check if EEG contains epoched data
-%   'ica'          - check if EEG contains ICA decomposition
-%   'besa'         - check if EEG contains dipole locations
-%   'event'        - check if EEG contains event array
-%   'makeur'       - remake urevent structure
-%   'checkur'      - check if 'urevent' structure is consistent with event 
-%                    structure
-%   'chanlocsize'  - check chanlocs structure length and show warning if
+%   'chanconsist'  - if EEG contains several datasets, check whether they have 
+%                    the same number of channela and channel labels.
+%   'data'         - check whether EEG contains data (EEG.data)
+%   'loaddata'     - load data array (if necessary)
+%   'savedata'     - save data array (if necessary - see EEG.saved below)
+%   'contdata'     - check whether EEG contains continuous data
+%   'epoch'        - check whether EEG contains epoched or continuous data
+%   'ica'          - check whether EEG contains an ICA decomposition
+%   'besa'         - check whether EEG contains component dipole locations
+%   'event'        - check whether EEG contains an event array
+%   'makeur'       - remake the EEG.urevent structure
+%   'checkur'      - check whether the EEG.urevent structure is consistent 
+%                    with the EEG.event structure
+%   'chanlocsize'  - check the EEG.chanlocs structure length; show warning if
 %                    necessary.
-%   'chanlocs_homogenous' - check if EEG contains consistent channel
-%                           information and if not, correct it.
-%   'eventconsistency'    - check if event information is consistent. 
-%                           Remake 'epoch' field (time consuming).
+%   'chanlocs_homogenous' - check whether EEG contains consistent channel
+%                           information; if not, correct it.
+%   'eventconsistency'    - check whether EEG.event information are consistent; 
+%                           remake 'epoch' field (can be time consuming).
 %
-% Structure of an EEG dataset under EEGLAB:
-%    EEG.data         - two-dimensional continuous data array (chans, frames)
-%                       OR three-dim. epoched data array (chans, frames, epochs)
-%    EEG.setname      - name of the dataset
-%    EEG.filename     - filename of the dataset
-%    EEG.filepath     - filepath of the dataset
-%    EEG.chanlocs     - structure array containing names and positions 
-%                       of the channels on the scalp
-%    EEG.urchanlocs   - original chanlocs structure
-%    EEG.pnts         - number of time points (data frames) per epoch (trial).
-%                       OR if data is continuous, total number of time points
-%    EEG.nbchan       - number of channels
-%    EEG.trials       - number of epochs (trials) in the dataset. If data
-%                       is continuous, automatically set to 1.
-%    EEG.srate        - channel sampling rate (in Hz)
-%    EEG.xmin         - epoch start time (in seconds)
-%    EEG.xmax         - epoch end time (in seconds)
-%    EEG.times        - time vector (one value per time point)
-%    EEG.ref          - ['common'|'averef'|integer] reference index or type
-%    EEG.comments     - comments about the dataset
+% The structure of an EEG dataset under EEGLAB (as of v5.03):
 %
-% ICA variables:
-%    EEG.icaact       - ICA activations (components, frames, epochs)
-%                       [] means compute_ica option is set to 0 under
-%                       EEGLAB options -> activations are computed on the fly.
-%    EEG.icasphere    - sphere array returned by linear (ICA) decomposition
-%    EEG.icaweights   - weight array returned by linear (ICA) decomposition
-%    EEG.icawinv      - inverse (ICA) weight matrix giving the projected
-%                       activity of the components to the electrodes.
-%                       NOTE: Any linear unmixing matrix may be used. 
+% Basic dataset information:
+%   EEG.setname      - descriptive name|title for the dataset
+%   EEG.filename     - filename of the dataset file on disk
+%   EEG.filepath     - filepath (directory/folder) of the dataset file(s)
+%   EEG.trials       - number of epochs (or trials) in the dataset. 
+%                      If data are continuous, this number is 1.
+%   EEG.pnts         - number of time points (or data frames) per trial (epoch).
+%                      If data are continuous (trials=1), the total number 
+%                      of time points (frames) in the dataset
+%   EEG.nbchan       - number of channels
+%   EEG.srate        - data sampling rate (in Hz)
+%   EEG.xmin         - epoch start latency|time (in sec. relative to the
+%                      time-locking event at time 0)
+%   EEG.xmax         - epoch end latency|time (in seconds)
+%   EEG.times        - vector of latencies|times in seconds (one per time point)
+%   EEG.ref          - ['common'|'averef'|integer] reference channel type or number
+%   EEG.history      - cell array of ascii pop-window commands that created
+%                      or modified the dataset
+%   EEG.comments     - comments about the nature of the dataset (edit this via 
+%                      menu selection Edit > About this dataset)
+%   EEG.etc          - miscellaneous (technical or temporary) dataset information
+%   EEG.saved        - ['yes'|'no'] 'no' flags need to save dataset changes before exit
 %
-% Event and epoch structures:    
-%       EEG.event     - event structure (any number of events per epoch)
-%       EEG.epoch     - epoch structure (one structure per epoch)
-%       EEG.eventdescription - cell array of strings describing event fields.
-%       EEG.epochdescription - cell array of strings describing epoch fields.
-%       --> See the http://sccn.ucsd.edu/eeglab/maintut/eeglabscript.html 
-%           for details
+% The data:
+%   EEG.data         - two-dimensional continuous data array (chans, frames)
+%                      ELSE, three-dim. epoched data array (chans, frames, epochs)
+%
+% The channel locations sub-structures:
+%   EEG.chanlocs     - structure array containing names and locations 
+%                      of the channels on the scalp
+%   EEG.urchanlocs   - original (ur) dataset chanlocs structure containing
+%                      all channels originally collected with these data
+%                      (before channel rejection)
+%   EEG.chaninfo     - structure containing additional channel info
+%   EEG.ref          - type of channel reference ('common'|'averef'|+/-int]
+%   EEG.splinefile   - location of the spline file used by headplot() to plot 
+%                      data scalp maps in 3-D
+%
+% The event and epoch sub-structures:    
+%   EEG.event        - event structure containing times and nature of experimental 
+%                      events recorded as occurring at data time points
+%   EEG.urevent      - original (ur) event structure containing all experimental
+%                      events recorded as occurring at the original data time points
+%                      (before data rejection)
+%   EEG.epoch        - epoch event information structure array (one per epoch)
+%   EEG.eventdescription - cell array of strings describing event fields.
+%   EEG.epochdescription - cell array of strings describing epoch fields.
+%   --> See the http://sccn.ucsd.edu/eeglab/maintut/eeglabscript.html for details
+%
+% ICA (or other linear) data components:
+%   EEG.icasphere   - sphering array returned by linear (ICA) decomposition
+%   EEG.icaweights  - unmixing weights array returned by linear (ICA) decomposition
+%   EEG.icawinv     - inverse (ICA) weight matrix. Columns gives the projected
+%                     topographies of the components to the electrodes.
+%   EEG.icaact      - ICA activations matrix (components, frames, epochs)
+%                     Note: [] here means that 'compute_ica' option has bee set 
+%                     to 0 under 'File > Memory options' In this case, 
+%                     component activations are computed only as needed.
+%   EEG.icasplinefile - location of the spline file used by headplot() to plot 
+%                     component scalp maps in 3-D
+%   EEG.chaninfo.icachansind  - indices of channels used in the ICA decomposition
+%   EEG.dipfit      - array of structures containing component map dipole models 
+%
+% Variables indicating membership of the dataset in a studyset:
+%   EEG.subject     - studyset subject code 
+%   EEG.group       - studyset group code 
+%   EEG.condition   - studyset experimental condition code 
+%   EEG.session     - studyset session number
 %
 % Variables used for manual and semi-automatic data rejection:
-%      EEG.specdata          - data spectrum for every single trial
-%      EEG.specica           - data spectrum for every single trial
-%      EEG.stats.kurtc       - component kurtosis values
-%      EEG.stats.kurtg       - global kurtosis of components      
-%      EEG.stats.kurta       - kurtosis of accepted epochs      
-%      EEG.stats.kurtr       - kurtosis of rejected epochs      
-%      EEG.stats.kurtd       - kurtosis of spatial distribution      
-%      EEG.reject.entropy    - entropy of epochs  
-%      EEG.reject.entropyc   - entropy of components
-%      EEG.reject.threshold  - rejection thresholds 
-%      EEG.reject.icareject  - epochs rejected by ICA criteria
-%      EEG.reject.gcompreject - rejected ICA components
-%      EEG.reject.sigreject  - epochs rejected by single-channel criteria
-%      EEG.reject.elecreject - epochs rejected by raw data criteria
-%
-%      EEG.reject.compreject - deprecated
-%      EEG.reject.comptrial  - deprecated
-%      EEG.reject.eegentropy - deprecated
-%      EEG.reject.eegkurt    - deprecated
-%      EEG.reject.eegkurtg   - deprecated
+%   EEG.specdata           - data spectrum for every single trial
+%   EEG.specica            - data spectrum for every single trial
+%   EEG.stats              - statistics used for data rejection
+%       EEG.stats.kurtc    - component kurtosis values
+%       EEG.stats.kurtg    - global kurtosis of components      
+%       EEG.stats.kurta    - kurtosis of accepted epochs      
+%       EEG.stats.kurtr    - kurtosis of rejected epochs      
+%       EEG.stats.kurtd    - kurtosis of spatial distribution      
+%   EEG.reject            - statistics used for data rejection
+%       EEG.reject.entropy - entropy of epochs  
+%       EEG.reject.entropyc  - entropy of components
+%       EEG.reject.threshold - rejection thresholds 
+%       EEG.reject.icareject - epochs rejected by ICA criteria
+%       EEG.reject.gcompreject - rejected ICA components
+%       EEG.reject.sigreject  - epochs rejected by single-channel criteria
+%       EEG.reject.elecreject - epochs rejected by raw data criteria
 %
 % Usage:
 %       >> [EEGOUT, res] = eeg_checkset( EEG ); % check consistency of EEG
@@ -101,6 +130,7 @@
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
 % See also: eeglab()
+
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -121,6 +151,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.206  2007/02/20 14:16:50  arno
+% Added memory warning
+%
 % Revision 1.205  2007/02/02 11:51:43  arno
 % fix MEG file problem
 %
@@ -1269,8 +1302,9 @@ if isnumeric(EEG.data)
         try,
             EEG.data       = single(EEG.data);
         catch,
-            disp('WARNING: EEGLAB out of memory converting dataset to single precision (double memory usage)');
-            disp('         save dataset (preferably write data in a separate file in Memory options) and reload it');
+            disp('WARNING: EEGLAB ran out of memory while converting dataset to single precision.');
+            disp('         Save dataset (preferably saving data to a separate file; see File > Memory options).'); 
+            disp('         Then reload it.');
         end;
         EEG.icawinv    = single(EEG.icawinv);
         EEG.icaweights = single(EEG.icaweights);
