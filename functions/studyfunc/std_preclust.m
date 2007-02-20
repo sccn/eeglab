@@ -122,6 +122,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.69  2006/11/21 22:15:49  arno
+% freqscale
+%
 % Revision 1.68  2006/11/21 21:54:12  arno
 % replacing ERSP file checking
 %
@@ -425,8 +428,8 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
         for si = 1:size(STUDY.setind,2)
             switch strcom
              
-             % select ica ERP
-             % --------------
+             % select ica component ERPs
+             % -------------------------
              case 'erp', 
                   for kk = 1:length(STUDY.cluster)
                       if isfield(STUDY.cluster(kk).centroid, 'erp')
@@ -444,7 +447,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                             con_t = []; con_data = [];
                             [X, t] = std_erp(ALLEEG(idat), succompind{si}, timewindow);
                             
-                            X = abs(X); % taking the absolute of the ERP
+                            X = abs(X); % take the absolute value of the ERP
                             
                             STUDY.preclust.erpclusttimes = timewindow;
                             if cond == 1
@@ -464,9 +467,11 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                      data = [ data; con_data ];
                      clear X t con_data con_t tmp;
                  end
+
               % select ica scalp maps
               % --------------------------
-             case 'scalp' , % NB: scalp maps are identical across conditions (within session)
+             case 'scalp' , % NB: scalp maps must be identical across conditions (within session)
+
                  for cond = 1:size(STUDY.setind,1)   % Find first nonNaN index
                     if ~isnan(STUDY.setind(cond,si)), break; end
                  end       
@@ -474,6 +479,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                  fprintf('Computing/loading interpolated scalp maps for dataset %d...\n', idat);
                  if ~isempty(succompind{si})
                     X = std_topo(ALLEEG(idat), succompind{si});
+
                     if abso % absolute values
                        data = [ data; abs(X) ];
                     else
