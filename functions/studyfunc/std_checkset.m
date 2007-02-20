@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.39  2006/12/07 22:19:17  arno
+% removing changrp for now
+%
 % Revision 1.38  2006/12/07 22:07:23  arno
 % changrp check
 %
@@ -71,6 +74,7 @@ if ~isfield(STUDY, 'session'),   STUDY.session   = {}; modif = 1; end;
 if ~isfield(STUDY, 'condition'), STUDY.condition = {}; modif = 1; end;
 if ~isfield(STUDY, 'setind'),    STUDY.setind    = []; modif = 1; end;
 if ~isfield(STUDY, 'etc'),       STUDY.etc       = []; modif = 1; end;
+if ~isfield(STUDY, 'etc.warnmemory'), STUDY.etc.warnmemory = 1; modif = 1; end;
 if ~isfield(STUDY, 'preclust'),  STUDY.preclust  = []; modif = 1; end;
 if ~isfield(STUDY, 'datasetinfo'), STUDY.datasetinfo = []; modif = 1; end;
 if ~isfield(STUDY.preclust, 'erpclusttimes' ),  STUDY.preclust.erpclusttimes = []; modif = 1; end;
@@ -110,18 +114,20 @@ if ~isequal(STUDY.session,   session  ), STUDY.session   = session;   modif = 1;
 % recompute setind matrix
 % -----------------------
 notsameica = [];
-for is = 1:length(STUDY.subject)
-    alldats = strmatch(STUDY.subject{is}, { STUDY.datasetinfo.subject });
+if ~isempty(STUDY.datasetinfo(1).index)
+    for is = 1:length(STUDY.subject)
+        alldats = strmatch(STUDY.subject{is}, { STUDY.datasetinfo.subject });
 
-    for ig = 1:length(STUDY.group)
-        tmpind  = strmatch(STUDY.group{ig}, { STUDY.datasetinfo(alldats).group });
-        tmpdats = alldats(tmpind);
-        try nc = size(ALLEEG(STUDY.datasetinfo(tmpdats(1)).index).icaweights,1);
-        catch nc = [];
-        end
-        for ir = 2:length(tmpdats)
-            if nc ~= size(ALLEEG(STUDY.datasetinfo(tmpdats(ir)).index).icaweights,1)
-                notsameica = [ 1 tmpdats(1) tmpdats(ir) ];
+        for ig = 1:length(STUDY.group)
+            tmpind  = strmatch(STUDY.group{ig}, { STUDY.datasetinfo(alldats).group });
+            tmpdats = alldats(tmpind);
+            try nc = size(ALLEEG(STUDY.datasetinfo(tmpdats(1)).index).icaweights,1);
+            catch nc = [];
+            end
+            for ir = 2:length(tmpdats)
+                if nc ~= size(ALLEEG(STUDY.datasetinfo(tmpdats(ir)).index).icaweights,1)
+                    notsameica = [ 1 tmpdats(1) tmpdats(ir) ];
+                end;
             end;
         end;
     end;
