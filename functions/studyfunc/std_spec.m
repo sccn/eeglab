@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2006/11/21 21:59:45  arno
+% computing ICA activity bug
+%
 % Revision 1.28  2006/11/10 00:11:12  arno
 % default specmode is using spectopo
 %
@@ -156,6 +159,7 @@ end;
 [g spec_opt] = finputcheck(options, { 'components' 'integer' []         [];
                                       'channels'   'cell'    {}         {};
                                       'specmode'   'string'  {'fft' 'psd'} 'psd';
+                                      'recompute'  'string'  { 'on' 'off' } 'off';
                                       'nfft'       'integer' []         [];
                                       'freqrange'  'real'    []         [] }, 'std_spec', 'ignore');
 if isstr(g), error(g); end;
@@ -182,7 +186,7 @@ end;
 
 % SPEC information found in datasets
 % ---------------------------------
-if exist(filename)
+if exist(filename) & strcmpi(g.recompute, 'off')
 
     if strcmpi(prefix, 'comp')
         [X, f] = std_readspec(EEG, 1, g.components, g.freqrange);

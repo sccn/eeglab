@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2007/01/26 18:02:55  arno
+% warning message
+%
 % Revision 1.3  2006/11/22 21:05:56  arno
 % fixing time limits
 %
@@ -117,7 +120,8 @@ if ~isstr(varargin{1}) %intial settings
     {'vertshift' 'style'  'pushbutton' 'string' 'Test' 'tag' 'ersp_test' 'enable' 'off' 'callback' test_ersp }...
     {'style' 'checkbox'   'string' '' 'tag' 'itc_on' 'value' 0 'Callback' set_itc } ...
 	{'style' 'text'       'string' 'ITCs' 'horizontalalignment' 'center' } {'link2lines' 'style'  'text'   'string' '' } {} {} {} ...
-     ...
+    {} {'style' 'checkbox'   'string' '' 'tag' 'recomp_on' 'value' 0 } ...
+	{'style' 'text'       'string' 'Recompute even if present on disk' }
     };
   
 	%{'style' 'checkbox'   'string' '' 'tag' 'precomp_PCA'  'Callback' precomp_PCA 'value' 0} ...
@@ -138,8 +142,8 @@ if ~isstr(varargin{1}) %intial settings
     firsttimeersp = 1;
     fig_arg = { ALLEEG STUDY allchans chanlist firsttimeersp };
     geomline = [0.45 1 0.3 2 3 0.7 ];
-    geometry = { [1] [1] [2 3 0.5] [0.33 6]  [1] [1] [0.33 6] [0.45 1.5 0.3 1.5 3 0.7 ] geomline geomline  };
-    geomvert = [ 1 0.5 1 1 0.5 1 1 1 1 1 1 ];
+    geometry = { [1] [1] [2 3 0.5] [0.33 6]  [1] [1] [0.33 6] [0.45 1.5 0.3 1.5 3 0.7 ] geomline geomline 1 [0.05 1] };
+    geomvert = [ 1 0.5 1 1 0.5 1 1 1 1 1 1 1 1];
 	[precomp_param, userdat2, strhalt, os] = inputgui( 'geometry', geometry, 'uilist', gui_spec, 'geomvert', geomvert, ...
                                                       'helpcom', ' pophelp(''std_precomp'')', ...
                                                       'title', 'Select and compute component measures for later clustering -- pop_precomp()', ...
@@ -152,6 +156,12 @@ if ~isstr(varargin{1}) %intial settings
     % ------------------------
     if os.interpolate_on == 1 
         options = { options{:} 'interpolate' 'on' };
+    end
+    
+    % recompute option is on
+    % ----------------------
+    if os.recomp_on == 1 
+        options = { options{:} 'recompute' 'on' };
     end
     
     % ERP option is on
