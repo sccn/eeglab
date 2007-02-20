@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.69  2006/08/18 01:09:13  toby
+% bug fix, was collecting data from ALLEEG(1) instead of EEG in a particular situation
+%
 % Revision 1.68  2006/08/08 23:03:09  arno
 % fix bug for detecting PCA options
 %
@@ -333,10 +336,14 @@ if nargin < 2
                      { 'style' 'pushbutton' 'string' '... channels' 'callback' commandchans } };
     geometry = { [2 1] [2 1] [2 1 1 1] };
     if length(ALLEEG) > 1
+        cb1 = 'set(findobj(''parent'', gcbf, ''tag'', ''concat2''), ''value'', 0);';
+        cb2 = 'set(findobj(''parent'', gcbf, ''tag'', ''concat1''), ''value'', 0);';
         promptstr = { promptstr{:} ...
                      { 'style' 'text'       'string' 'Concatenate all datasets (check=yes; uncheck=run ICA on each dataset)?' } ...
-                     { 'style' 'checkbox'   'string' '' 'value' 1 } };
-        geometry = { geometry{:} [ 2 0.2 ] };
+                     { 'style' 'checkbox'   'string' '' 'value' 0 'tag' 'concat1' 'callback' cb1 } ...
+                     { 'style' 'text'       'string' 'Concatenate datasets for the same subject and session (check=yes)?' } ...
+                     { 'style' 'checkbox'   'string' '' 'value' 1 'tag' 'concat2' 'callback' cb2 } };
+        geometry = { geometry{:} [ 2 0.2 ] [ 2 0.2 ]};
     end;                 
     % channel types
     % -------------
@@ -371,6 +378,7 @@ if nargin < 2
     end;
     if length(result) > 3
         options = { options{:} 'concatenate' fastif(result{4}, 'on', 'off') };
+        options = { options{:} 'concatcond'  fastif(result{5}, 'on', 'off') };
     end;
 else 
     if ~strcmpi(varargin{1}, 'icatype')
@@ -383,11 +391,12 @@ end;
 % decode input arguments
 % ----------------------
 [ g options ] = finputcheck( options, { 'icatype'        'string'  allalgs   'runica'; ...
-                            'dataset'        'integer' []        1;
+                            'dataset'        'integer' []        [1:length(ALLEEG)];
                             'options'        'cell'    []        {};
-                            'concatenate'    'string'  { 'on' 'off' }   'on';
+                            'concatenate'    'string'  { 'on' 'off' }   'off';
+                            'concatcond'     'string'  { 'on' 'off' }   'off';
                             'chanind'        'integer' []        [];}, ...
-                                 'pop_runica', 'ignore');
+                            'pop_runica', 'ignore');
 if isstr(g), error(g); end;
 if isempty(g.options), g.options = options; end;
 
@@ -395,9 +404,42 @@ if isempty(g.options), g.options = options; end;
 % ----------------------------------------------------
 if length(g.dataset) == 1
     EEG = ALLEEG(g.dataset);
-elseif length(ALLEEG) > 1 & ~strcmpi(g.concatenate, 'on')
+elseif length(ALLEEG) > 1 & ~strcmpi(g.concatenate, 'on') & ~strcmpi(g.concatcond, 'on')
     [ ALLEEG com ] = eeg_eval( 'pop_runica', ALLEEG, 'warning', 'off', 'params', ...
            { 'icatype' g.icatype 'options' g.options 'chanind' g.chanind } );
+    return;
+elseif length(ALLEEG) > 1 & strcmpi(g.concatcond, 'on')
+    allsubjects = { ALLEEG.subject };
+    allsessions = { ALLEEG.session };
+    allgroups   = { ALLEEG.group };
+    alltags     = zeros(1,length(allsubjects));
+    if any(cellfun('isempty', allsubjects))
+        disp('Abording, some datasets do not have subject names');
+        return;
+    end;
+    dats = {};
+    for index = 1:length(allsubjects)
+        if ~alltags(index)
+            allinds = strmatch(allsubjects{index}, allsubjects);
+            rmind = [];
+            for tmpi = 2:length(allinds)
+                if ~isequal(allsessions(allinds(1)), allsessions(allinds(tmpi))), rmind = [rmind tmpi];
+                elseif ~isequal(allgroups(allinds(1)), allgroups(allinds(tmpi))), rmind = [rmind tmpi]; 
+                end;
+            end;
+            allinds(rmind) = [];
+            fprintf('Found %d datasets for subject ''%s''\n', length(allinds), allsubjects{index});
+            dats = { dats{:} allinds };
+            alltags(allinds) = 1;
+        end;
+    end;
+    fprintf('**************************\nNOW RUNNING ALL DECOMPOSITIONS\n****************************\n');
+    for index = 1:length(dats)
+        ALLEEG(dats{index}) = pop_runica(ALLEEG(dats{index}), 'icatype', g.icatype, ...
+            'options', g.options, 'chanind', g.chanind, 'concatenate', 'on');
+    end;
+    com = sprintf('%s = pop_runica(%s, %s);', inputname(1),inputname(1), ...
+              vararg2str({ 'icatype' g.icatype 'concatcond' 'on' 'options' g.options }) );
     return;
 else
     disp('Concatenating datasets...');
@@ -416,7 +458,8 @@ else
     cpnts = 1;
     for i = g.dataset
         tmplen = ALLEEG(g.dataset(i)).pnts*ALLEEG(g.dataset(i)).trials;
-        EEG.data(:,cpnts:cpnts+tmplen-1) = ALLEEG(g.dataset(i)).data(:,:);
+        TMP = eeg_checkset(ALLEEG(g.dataset(i)), 'loaddata');
+        EEG.data(:,cpnts:cpnts+tmplen-1) = reshape(TMP.data, size(TMP.data,1), size(TMP.data,2)*size(TMP.data,3));
         cpnts = cpnts+1;
     end;
     EEG.icaweights = [];
