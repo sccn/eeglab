@@ -199,8 +199,7 @@ if ~isstr(varargin{1})
     saveSTUDY          = [ 'set(findobj(''parent'', gcbf, ''userdata'', ''save''), ''enable'', fastif(get(gcbo, ''value'')==1, ''on'', ''off''));' ];
     browsesave         = [ '[filename, filepath] = uiputfile2(''*.study'', ''Save STUDY with .study extension -- pop_chan()''); ' ... 
                            'set(faindobj(''parent'', gcbf, ''tag'', ''studyfile''), ''string'', [filepath filename]);' ];
-    sel_all_chans      = [ 'set(findobj(''parent'', gcbf, ''tag'', ''chan_list''), ''value'', [1:' num2str(length(STUDY.changrp)) ']);' ];
-        
+    sel_all_chans      = ['pop_chanplot(''sel_all_chans'',gcf);'];
                        
     % list of channel groups
     % ----------------------
@@ -397,7 +396,19 @@ else
             end;
 
             set(findobj('parent', hdl, 'tag', 'chan_onechan'), 'value', selected, 'String', chanid);
-           
+        
+        case 'sel_all_chans'
+            set(findobj('parent', hdl, 'tag', 'chan_list'), 'value', [1:length(STUDY.changrp)]);
+            
+            % Generate channel list
+            % ---------------------
+            chanid{1} = 'All subjects';
+            for l = 1:length(STUDY.subject)
+                chanid{end+1} = [ STUDY.subject{l} ' All' ];
+            end;
+            selected = 1;
+            set(findobj('parent', hdl, 'tag', 'chan_onechan'), 'value', selected, 'String', chanid);
+
         case 'plotsum'
             changrpstr = allchans(changrp);
             [STUDY] = std_propplot(STUDY, ALLEEG, allchans(changrp));
