@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.43  2006/11/08 22:50:20  arno
+% now seting indexes
+%
 % Revision 1.42  2006/05/20 18:42:44  arno
 % fix remove study
 %
@@ -242,6 +245,9 @@ for k = 1:2:length(g.commands)
             STUDY.datasetinfo(end+2)           = STUDY.datasetinfo(end);
             STUDY.datasetinfo(g.commands{k+1}) = STUDY.datasetinfo(end-1);
             STUDY.datasetinfo(end-1:end)       = [];
+            STUDY.datasetinfo = rmfield(STUDY.datasetinfo, 'index');
+            STUDY.datasetinfo(1).index = [];
+            STUDY.changrp = [];
         case 'return', return;
         case 'dipselect'
             STUDY = std_checkset(STUDY, ALLEEG); % update setind field
