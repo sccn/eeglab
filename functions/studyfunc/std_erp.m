@@ -1,39 +1,53 @@
-% std_erp() -   Constructs and returns channel or ICA activation ERPs for a dataset. 
-%               Saves the ERPs into a Matlab file, [dataset_name].icaerp, for
-%               data channels or [dataset_name].icaerp for ICA components, 
-%               in the same directory as the dataset file.  If such a file 
-%               already exists, loads its information. 
+% std_erp() -   Constructs and returns ICA component activation or channel activity 
+%               average ERP for dataset epochs. Saves the ERPs into a Matlab file, 
+%                          '[dataset_name].icaerp'
+%               for ICA components or 
+%                          '[dataset_name].daterp' 
+%               for scalp channels, in the same directory as the dataset file.  
+%               If such a file already exists, std_erp() loads its information. 
 % Usage:    
-%            >> [erp, times] = std_erp(EEG, 'key', 'val', ...);
+%               >> [ERP, ERPtimes] = std_erp(EEG, 'key', 'val', ...);
 % Inputs:
-%   EEG          - a loaded epoched EEG dataset structure. 
+%   EEG          - a loaded, epoched EEG dataset structure. 
 %
 % Optional inputs:
 %   'components' - [numeric vector] components of the EEG structure for which 
 %                  activation ERPs will be computed. Note that because 
-%                  computation of ERP is so fast, all components ERP are
-%                  computed and saved. Only selected component 
-%                  are returned by the function to Matlab
+%                  computation of ERPs is so fast, all components ERP are
+%                  computed and saved, though only the selected components
+%                  are returned by the function to the Matlab work space
 %                  {default|[] -> all}
 %   'channels'   - [cell array] channels of the EEG structure for which 
-%                  activation ERPs will be computed. Note that because 
-%                  computation of ERP is so fast, all channels ERP are
-%                  computed and saved. Only selected channels 
-%                  are returned by the function to Matlab
-%                  {default|[] -> all}
+%                  ERPs will be computed. Note that be epochscause computation of ERPs 
+%                  is so fast, all channel ERPs are computed and saved. Only 
+%                  the selected channels are returned by the function to 
+%                  the Matlab work space {default|[] -> all}
 %   'time_range' - [minms maxms] latency window limits (in ms) within which to 
-%                  compute ERPs {default|[]: [EEG.min EEG.max]}. It is not
-%                  advised to change this range unless you require a
-%                  specific baseline. The plotting 
+%                  compute ERPs It is not advisable to change this range unless 
+%                  you require a specific baseline. The plotting functions
+%                  can restrict the window plotted later.
+%                  {default|[]: [EEG.min EEG.max]}. 
 % Outputs:
-%   erp         - ERP for the requested ICA components in the selected 
-%                 latency window. ERPs are scaled by the RMS over of the
-%                 component scalp map projection over all data channels.
-%   times       - vector of times (epoch latencies in ms) for the ERP
+%   ERP         - (comps/chans,times) ERP matrix for the requested ICA components 
+%                 or scalp channels in the selected latency window. Component ERPs 
+%                 are scaled by the RMS component scalp map projection to all the 
+%                 scalp channels; they are thus in RMS microvolts. Channel ERPs are 
+%                 in microvolts.
+%   ERPtimes    - vector of ERP epoch latencies (in ms) 
 %
-% File output:     [dataset_file].icaerp     % component erp file
+% File output:     [dataset_file].icaerp     % component ERP Matlab file
+%      or          [dataset_file].daterp     % channel ERP Matlab file
+%                  
+% Matlab variables in the file output:
+%                               compN        % (or  chanN) for N = all comp or chan indices
+%                               times        % epoch latencies
+%                               datafile     % full datafile pathname
+%                               datatype     % 'ERP'
 %
-% See also:    std_spec(), std_ersp(), std_topo(), std_preclust()
+% To load the component file output:   
+%                               >> load -mat [dataset_file].icaerp % or std_readerp()
+%
+% See also:    std_erpplot(), std_readerp(), std_spec(), std_ersp(), std_topo(), std_preclust()
 %
 % Authors: Arnaud Delorme, SCCN, INC, UCSD, January, 2005
 
@@ -56,6 +70,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2006/10/02 11:40:26  arno
+% minor things
+%
 % Revision 1.24  2006/05/13 11:59:58  arno
 % now clustering using RMS
 %
