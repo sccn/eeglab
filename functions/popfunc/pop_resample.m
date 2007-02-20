@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2006/11/17 22:07:40  arno
+% help message
+%
 % Revision 1.22  2006/11/17 21:58:07  arno
 % fixed spline interpolation
 %
@@ -123,7 +126,7 @@ if nargin < 1
     help pop_resample;
     return;
 end;     
-if isempty(EEG.data)
+if isempty(EEG(1).data)
     disp('Pop_resample error: cannot resample empty dataset'); return;
 end;    
 
@@ -132,11 +135,18 @@ if nargin < 2
 	% popup window parameters
 	% -----------------------
 	promptstr    = {['New sampling rate']};
-	inistr       = { num2str(EEG.srate) };
+	inistr       = { num2str(EEG(1).srate) };
 	result       = inputdlg2( promptstr, 'Resample current dataset -- pop_resample()', 1,  inistr, 'pop_resample');
 	if length(result) == 0 return; end;
 	freq         = eval( result{1} );
 
+end;
+
+% process multiple datasets
+% -------------------------
+if length(EEG) > 1
+    [ EEG command ] = eeg_eval( 'pop_resample', EEG, 'warning', 'on', 'params', { freq } );
+    return;
 end;
 
 % finding the best ratio
