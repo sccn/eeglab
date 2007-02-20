@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.205  2007/02/02 11:51:43  arno
+% fix MEG file problem
+%
 % Revision 1.202  2006/12/08 19:36:11  arno
 % chekcing labels
 %
@@ -1263,7 +1266,12 @@ if isnumeric(EEG.data)
         EEG.icasphere  = double(EEG.icasphere);
         EEG.icaact     = double(EEG.icaact);
     else
-        EEG.data       = single(EEG.data);
+        try,
+            EEG.data       = single(EEG.data);
+        catch,
+            disp('WARNING: EEGLAB out of memory converting dataset to single precision (double memory usage)');
+            disp('         save dataset (preferably write data in a separate file in Memory options) and reload it');
+        end;
         EEG.icawinv    = single(EEG.icawinv);
         EEG.icaweights = single(EEG.icaweights);
         EEG.icasphere  = single(EEG.icasphere);
