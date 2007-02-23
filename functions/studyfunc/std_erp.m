@@ -1,7 +1,8 @@
 % std_erp() -   Constructs and returns ICA component activation or channel activity 
-%               average ERP for dataset epochs. Saves the ERPs into a Matlab file, 
+%               event-related potential (ERP) average of dataset epochs. Saves the ERP 
+%               into a Matlab file, 
 %                          '[dataset_name].icaerp'
-%               for ICA components or 
+%               for ICA components or
 %                          '[dataset_name].daterp' 
 %               for scalp channels, in the same directory as the dataset file.  
 %               If such a file already exists, std_erp() loads its information. 
@@ -12,21 +13,23 @@
 %
 % Optional inputs:
 %   'components' - [numeric vector] components of the EEG structure for which 
-%                  activation ERPs will be computed. Note that because 
-%                  computation of ERPs is so fast, all components ERP are
-%                  computed and saved, though only the selected components
+%                  activation ERPs should be computed. Note that because 
+%                  ERP computation is so fast, all components ERP are
+%                  computed and saved. Then only the selected components
 %                  are returned by the function to the Matlab work space
 %                  {default|[] -> all}
 %   'channels'   - [cell array] channels of the EEG structure for which 
-%                  ERPs will be computed. Note that be epochscause computation of ERPs 
-%                  is so fast, all channel ERPs are computed and saved. Only 
+%                  ERPs will be computed. Because ERP computation is so fast,
+%                  all channel ERPs are computed and saved. Then only 
 %                  the selected channels are returned by the function to 
 %                  the Matlab work space {default|[] -> all}
-%   'time_range' - [minms maxms] latency window limits (in ms) within which to 
+%   'time_range' - [startms endms] latency window limits (in ms) within which to 
 %                  compute ERPs It is not advisable to change this range unless 
 %                  you require a specific baseline. The plotting functions
 %                  can restrict the window plotted later.
 %                  {default|[]: [EEG.min EEG.max]}. 
+%   'baseline'   - [minms maxms] removes the mean of this period from the ERP
+%                  {default|[]: 'time_range' startms to 0 ms).
 % Outputs:
 %   ERP         - (comps/chans,times) ERP matrix for the requested ICA components 
 %                 or scalp channels in the selected latency window. Component ERPs 
@@ -70,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2007/02/23 04:44:07  toby
+% consolidate versions 1.27 and 1.28
+%
 % Revision 1.28  2007/02/20 14:21:40  arno
 % option to force recomputing
 %
@@ -173,6 +179,7 @@ end;
 
 g = finputcheck(options, { 'components' 'integer' []         [];
                            'channels'   'cell'    {}         {};
+                           'baseline'   'real'    []         [];
                            'recompute'  'string'  { 'on' 'off' } 'off';
                            'timerange'  'real'    []         [EEG.xmin EEG.xmax]*1000 }, 'std_erp');
 if isstr(g), error(g); end;
@@ -187,6 +194,19 @@ end
 
 EEG_etc = [];
 
+% get baseline
+% ------------
+if isempty(g.baseline) & ~strcmp(g.timerange,'std_erp')
+         g.baseline = [g.timerange(1) 0];
+end
+
+if length(g.baseline)>1 & g.baseline(1) > g.baseline(2)
+           fprintf('Reversing baseline ms limits - now [%g %g]\n',g.baseline(1),g.baseline(2));
+           tmpb = g.baseline(1);
+           g.baseline(1) = g.baseline(2); 
+           g.baseline(2) = tmpb;
+end
+   
 % filename 
 % --------
 if ~isempty(g.channels)
@@ -228,13 +248,18 @@ end;
 
 % Remove baseline mean
 % --------------------
-if EEG.trials > 1 %epoched data
-    time0 = find(EEG.times < 0);
-    time0 = find(EEG.times(time0) > g.timerange(1));
+if EEG.trials > 1 % epoched data
+    time0 = find(EEG.times <= g.baseline(2) & EEG.times>= g.baseline(1));
+
+    % time0 = find(EEG.times < 0);
+    % time0 = find(EEG.times(time0) > g.timerange(1));
+
     if ~isempty(time0)
         X = rmbase(X,EEG.pnts, time0);
+        fprintf('Removing mean of specified baseline [%g %g] ms.\n',g.baseline(1),g.baseline(2));
     else
         X = rmbase(X,EEG.pnts);
+        fprintf('Removing whole epoch mean baseline.\n');
     end
 else
     X = rmbase(X);
