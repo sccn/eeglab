@@ -70,8 +70,14 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2007/02/23 04:06:00  toby
+% Version 1.7 and 1.8 consolidation
+%
 % Revision 1.8  2007/02/20 14:24:03  arno
 % option to force recomputation
+%
+% Revision 1.7  2007/02/18 19:47:13  scott
+% worked on help msg
 %
 % Revision 1.6  2007/01/29 10:50:27  arno
 % fix ERSP options
