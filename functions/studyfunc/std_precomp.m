@@ -1,53 +1,53 @@
-% std_precomp() - Precompute measures (ERP, spectrum, ERSP, ITC) for channels in a study. 
-%                 If channels are interpolated before computing the measures, the updated 
-%                 EEG datasets are also saved to disk. Called by pop_precomp(). Follow with 
-%                 pop_plotstudy(). See Example below.
+% std_precomp() - Precompute clustering measures (ERP, spectrum, ERSP, ITC) on channel 
+%                 data for datasets in an EEGLAB STUDY. When channel data are interpolated 
+%                 before computing the measures, the updated EEG datasets are also saved 
+%                 to disk. Called by pop_precomp(). Used to plot STUDY data by 
+%                 component clustering software. Follow with pop_plotstudy(). 
+%                 See Example below.
 % Usage:    
-% >> [ALLEEG,STUDY] = std_precomp(ALLEEG, STUDY, chanlist, 'key', 'val', ...);
+%       >> [ALLEEG,STUDY] = std_precomp(ALLEEG, STUDY, chanlist, 'key', 'val', ...);
 %
 % Required inputs:
 %   ALLEEG       - ALLEEG vector of one or more loaded EEG dataset structures
-%   STUDY        - an EEGLAB STUDY set of loaded EEG structures
+%   STUDY        - an EEGLAB STUDY set containing the ALLEEG EEG structures
 %   chanlist     - [cell array] Channel names for which to precompute the
-%                  selected measures. Note that the name of the channel is
-%                  not case-sensitive.
+%                  selected measures. Note that the channel names are not case-sensitive.
 % Optional inputs:
-%  'erp'     - ['on'|'off'] pre-compute ERPs for each dataset.
+%  'erp'     - ['on'|'off'] pre-compute ERP for each dataset.
 %  'spec'    - ['on'|'off'] pre-compute spectrum for each dataset.
 %              Use 'specparams' to set spectrum parameters.
 %  'ersp'    - ['on'|'off'] pre-compute ERSP for each dataset.
 %              Use 'erspparams' to set time/frequency parameters.
 %  'itc'     - ['on'|'off'] pre-compute ITC for each dataset.
 %              Use 'erspparams' to set time/frequency parameters.
-%  'specparams' - [cell array] Parameters for the spectopo function are given as 
-%              optional arguments. Note that it is advised to compute spectrum 
-%              over all frequencies since plotting function can always reduce
+%  'specparams' - [cell array] Parameters for the spectopo() function are given as 
+%              optional arguments. Note that it is advisable to compute the spectrum 
+%              over all frequencies since the plotting function can always reduce
 %              the range of plotted frequencies.
 %  'erspparams' - [cell array] Optional arguments are 'cycles', 'freqrange',
 %              'padratio', 'winsize', 'alpha' (see newtimef()). Note that it 
-%              is adivised to select the largest frequency range and time window
-%              as plotting function are capable of plotting subranges of
-%              these. An important optional parameter that is
+%              is advisable to select the largest frequency range and time window
+%              as plotting function are capable of plotting subranges of these. 
+%              An important optional parameter is:
 %                    'savetrials' = ['on'|'off'] save single-trials ERSP.
-%                                   Requires a lot of disk space (dataset
-%                                   space on disk times 10) but allow for
+%                                   Requires a lot of disk space (= dataset
+%                                   space on disk times 10) but allows for
 %                                   refined single-trial statistics.
-%  'recompute' - ['on'|'off'] force recomputing ERP file even if it is 
-%                already on disk.
-%
 % Outputs:
-%   ALLEEG       - the input ALLEEG vector of EEG dataset structures, modified by adding preprocessing 
-%                  data as pointers to Matlab files that hold the pre-clustering component measures.
-%   STUDY        - the input STUDY set with pre-clustering data added, for use by pop_clust() 
-%
+%   ALLEEG  - the input ALLEEG vector of EEG dataset structures, modified by 
+%             adding preprocessing data as pointers to Matlab files that hold 
+%             the pre-clustering component measures.
+%   STUDY   - the input STUDY set with pre-clustering data added, 
+%             for use by pop_clust() 
 % Example:
-%   >> [ALLEEG STUDY] = std_precomp(ALLEEG, STUDY, { 'cz' 'oz' }, 'interpolate', 'on', 'erp', 'on', ...
-%          'spec', 'on', 'ersp', 'on', 'erspparams', { 'cycles' [ 3 0.5 ], 'alpha', 0.01, 'padratio' 1 });
+%   >> [ALLEEG STUDY] = std_precomp(ALLEEG, STUDY, { 'cz' 'oz' }, ...
+%          'interpolate', 'on', 'erp', 'on', 'spec', 'on', 'ersp', 'on', ...
+%          'erspparams', { 'cycles' [ 3 0.5 ], 'alpha', 0.01, 'padratio' 1 });
 %                          
-%           % This prepares, channels 'cz' and 'oz' in the STUDY datasets.
-%           % If a data channel is missing in one dataset, it will be
-%           % interpolated (see eeg_interp()). The ERP, spectrum, ERSP, and 
-%           % ITC for each dataset is then computed. 
+%           % This prepares preclustering measures for channels 'cz' and 'oz' 
+%           % in each of the STUDY datasets. If a data channel is missing in 
+%           % one dataset, it will be interpolated (see eeg_interp()). 
+%           % The ERP, spectrum, ERSP, and ITC for each dataset is then computed. 
 %
 % Authors: Arnaud Delorme, SCCN, INC, UCSD, 2006-
 
@@ -70,6 +70,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2007/02/20 14:24:03  arno
+% option to force recomputation
+%
 % Revision 1.6  2007/01/29 10:50:27  arno
 % fix ERSP options
 %
