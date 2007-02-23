@@ -51,7 +51,9 @@
 % See also: std_readerp(), std_readspec(), std_readersp(), std_readitc(), std_readtopo()
 %
 % Authors: Hilit Serby, Scott Makeig & Arnaud Delorme, SCCN/INC/UCSD, 2005-
-
+%
+% RCS-recorded version number, date, editor and comments
+% $Log: not supported by cvs2svn $
 
 function clustinfo = std_clustread(STUDY,ALLEEG, cluster, infotype, condition);
 
