@@ -1,8 +1,11 @@
 % eeg_checkset()   - check the consistency of the fields of an EEG dataset 
 %                    Also: See EEG dataset structure field descriptions below.
 %
-% Usage: >> EEG = eeg_checkset(EEG);              % perform all checks
-%        >> EEG = eeg_checkset(EEG, 'keyword');   % perform the indicated check
+% Usage: >> [EEGOUT,result] = eeg_checkset(EEG);            % perform all checks
+%        >> [EEGOUT,result] = eeg_checkset(EEG, 'keyword'); % perform 'keyword' check(s)
+%
+% Inputs:
+%       EEG        - EEGLAB dataset structure or (ALLEEG) array of EEG structures
 %
 % Optional keywords:
 %   'icaconsist'   - if EEG contains several datasets, check whether they have 
@@ -29,6 +32,11 @@
 %   'eventconsistency'    - check whether EEG.event information are consistent; 
 %                           remake 'epoch' field (can be time consuming).
 %
+% Outputs:
+%       EEGOUT     - output EEGLAB dataset or dataset array
+%       result     - result code:  0 = OK; 1 = error; -1 = warning
+%
+% ===========================================================
 % The structure of an EEG dataset under EEGLAB (as of v5.03):
 %
 % Basic dataset information:
@@ -118,19 +126,9 @@
 %       EEG.reject.sigreject  - epochs rejected by single-channel criteria
 %       EEG.reject.elecreject - epochs rejected by raw data criteria
 %
-% Usage:
-%       >> [EEGOUT, res] = eeg_checkset( EEG ); % check consistency of EEG
-%
-% Inputs:
-%       EEG        - EEGLAB dataset structure
-%
-% Outputs:
-%       EEGOUT     - output EEGLAB dataset
-%
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
 % See also: eeglab()
-
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -151,6 +149,13 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.207  2007/02/20 17:02:18  scott
+% reworked help message - brought description of the EEG structure fields
+% up to date -- Arno, please check.
+% Toby -- please check this help message against the tutorial description
+%  in the data structure appendix.
+% -sm
+%
 % Revision 1.206  2007/02/20 14:16:50  arno
 % Added memory warning
 %
