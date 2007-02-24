@@ -14,7 +14,6 @@
 %
 % Note: this version of eegplotgold() reguires that your data matrix 
 %       be defined as a global variable before running this routine. 
-%       With long data sets, it may run much faster than eegplotgold()
 %
 % Example:  >> global dataname
 %           >> eegplotgold('dataname')
