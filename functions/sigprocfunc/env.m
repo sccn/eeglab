@@ -12,7 +12,7 @@
 %   timearray  - Optional times array to interpolate the data (default: none)
 %
 % Outputs:
-%   envdata    - A (2,nchannels) array containing the "envelope" of 
+%   envdata    - A (2,timepoints) array containing the "envelope" of 
 %                a multichannel data set = the maximum and minimum values,
 %                across all the channels, at each time point. That is,
 %                   >> envdata = [max(data');min(data')];
@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2004/10/14 15:39:11  scott
+% same
+%
 % Revision 1.3  2004/10/14 15:34:34  scott
 % improved help msg and testing for optional varible integrity -sm
 %
