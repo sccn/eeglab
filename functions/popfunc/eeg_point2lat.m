@@ -28,7 +28,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2 Mai 2002
 %
-% See also: eeg_point2lat(), eeglab(), pop_editieventvals(), pop_loaddat()
+% See also: eeg_lat2point(), eeglab(), pop_editieventvals(), pop_loaddat()
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2005/05/24 17:41:11  arno
+% remove cell2mat
+%
 % Revision 1.7  2004/05/26 23:16:14  arno
 % same
 %
