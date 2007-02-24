@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2005/05/24 17:43:55  arno
+% remove cell2mat
+%
 % Revision 1.3  2003/01/01 18:28:11  scott
 % header edit
 %
@@ -61,7 +64,7 @@ end;
 
 if length(lat_array) ~= length(epoch_array)
 	if length(epoch_array)~= 1
-		disp('eeg_point2lat: latency and epochs must have the same length'); return;
+		disp('eeg_lat2point: latency and epochs must have the same length'); return;
 	else
 		epoch_array = ones(1,length(lat_array))*epoch_array;
 	end;

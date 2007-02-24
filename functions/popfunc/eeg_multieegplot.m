@@ -4,7 +4,7 @@
 %   >> eeg_multieegplot( data,trialrej, elecrej, ...
 %                                'key1', value, 'key2', value ... );
 % Inputs:
-%   data        - input data (channnels x points or channels x points x trials).
+%   data        - input data (channels x points or channels x points x trials).
 %   trialrej    - array of 0s and 1s (depicting rejected trials) (size sweeps)
 %   elecrej     - array of 0s and 1s (depicting electrodes rejected in 
 %                 all trials) (size nbelectrodes x sweeps )
@@ -13,7 +13,7 @@
 %                 all trials) (size nbelectrodes x sweeps )
 %
 % Note: 1) {'Key', value } Arguments are passed on to eegplot() 
-%       2) Oo ignore previous rejections simply set 'oldtrialrej' and
+%       2) To ignore previous rejections simply set 'oldtrialrej' and
 %          'oldelecrej' arguments to empty ([]).
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2003/07/20 19:36:03  scott
+% typo
+%
 % Revision 1.3  2002/07/30 17:15:33  arno
 % header
 %
