@@ -17,7 +17,7 @@
 %
 % Author: Colin Humphries, CNL, Salk Institute, La Jolla, 5/98
 %
-% See also: eegplot(), eegplotold(), eegplotsold()
+% See also: eegplot(), eegplotgold(), eegplotsold()
 
 % Copyright (C) Colin Humphries, CNL, Salk Institute 3/97 from eegplotold()
 %
