@@ -51,7 +51,7 @@
 %
 % Author: Arnaud Delorme, SCCN / INC / UCSD, March 2002
 %
-% See also: eeg_options()
+% See also: eeg_options(), eeg_readoptions()
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -72,6 +72,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.43  2006/03/19 05:29:16  toby
+% spelling edit
+%
 % Revision 1.42  2006/03/11 05:39:03  arno
 % header
 %
