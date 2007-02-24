@@ -1,5 +1,5 @@
-% eeg_readoptions() - handle EEGLAB options. This script (not function)
-%                    set the various options in the eeg_options() file.
+% eeg_readoptions() - Read EEGLAB memory options file (eeg_options) into a
+%                     structure variable (opt).
 %
 % Usage:
 %   [ header, opt ] = eeg_readoptions( filename, opt );
@@ -16,6 +16,8 @@
 %                 description -> all description associated with each variable
 %
 % Author: Arnaud Delorme, SCCN, INC, UCSD, 2006-
+%
+% See also: eeg_options(), eeg_editoptions()
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -36,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2006/01/31 19:04:23  arno
+% allow default structure
+%
 % Revision 1.2  2006/01/31 18:54:56  arno
 % returns structure
 %
