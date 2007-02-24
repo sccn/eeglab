@@ -36,6 +36,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % Runs under Matlab 5.0+ (not supported for Matlab 4)
+% 
+% RCS-recorded version number, date, editor and comments
+% $Log: not supported by cvs2svn $  
+%
 % Edit History:
 % 5-14-98 v2.1 fixed bug for small-variance data -ch
 % 1-31-00 v2.2 exchanged meaning of > and >>, < and << -sm
