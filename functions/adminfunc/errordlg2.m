@@ -1,4 +1,15 @@
-% errordlg2() - same as errordlg for eeglab()
+% errordlg2() - Makes a popup dialog box with the specified message and (optional)
+%               title.
+%
+% Usage:
+%   errordlg2(Prompt, Title);
+%
+% Example:
+%   errordlg2('Explanation of error','title of error');
+%
+% Input:
+%   Prompt  -   A text string explaning why the user is seeing this error message.
+%   Title   _   A text string that appears in the title bar of the error message.
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 12 August 2002
 %
@@ -23,6 +34,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2002/11/15 02:15:07  arno
+% header typos
+%
 % Revision 1.3  2002/08/28 01:04:34  arno
 % debugging beep
 %
