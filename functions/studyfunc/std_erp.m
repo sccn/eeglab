@@ -1,56 +1,41 @@
-% std_erp() -   Constructs and returns ICA component activation or channel activity 
-%               event-related potential (ERP) average of dataset epochs. Saves the ERP 
-%               into a Matlab file, 
-%                          '[dataset_name].icaerp'
-%               for ICA components or
-%                          '[dataset_name].daterp' 
-%               for scalp channels, in the same directory as the dataset file.  
-%               If such a file already exists, std_erp() loads its information. 
+% std_erp() -   Constructs and returns channel or ICA activation ERPs for a dataset. 
+%               Saves the ERPs into a Matlab file, [dataset_name].icaerp, for
+%               data channels or [dataset_name].icaerp for ICA components, 
+%               in the same directory as the dataset file.  If such a file 
+%               already exists, loads its information. 
 % Usage:    
-%               >> [ERP, ERPtimes] = std_erp(EEG, 'key', 'val', ...);
+%            >> [erp, times] = std_erp(EEG, 'key', 'val', ...);
 % Inputs:
-%   EEG          - a loaded, epoched EEG dataset structure. 
+%   EEG          - a loaded epoched EEG dataset structure. 
 %
 % Optional inputs:
 %   'components' - [numeric vector] components of the EEG structure for which 
-%                  activation ERPs should be computed. Note that because 
-%                  ERP computation is so fast, all components ERP are
-%                  computed and saved. Then only the selected components
-%                  are returned by the function to the Matlab work space
+%                  activation ERPs will be computed. Note that because 
+%                  computation of ERP is so fast, all components ERP are
+%                  computed and saved. Only selected component 
+%                  are returned by the function to Matlab
 %                  {default|[] -> all}
 %   'channels'   - [cell array] channels of the EEG structure for which 
-%                  ERPs will be computed. Because ERP computation is so fast,
-%                  all channel ERPs are computed and saved. Then only 
-%                  the selected channels are returned by the function to 
-%                  the Matlab work space {default|[] -> all}
-%   'time_range' - [startms endms] latency window limits (in ms) within which to 
-%                  compute ERPs It is not advisable to change this range unless 
-%                  you require a specific baseline. The plotting functions
-%                  can restrict the window plotted later.
-%                  {default|[]: [EEG.min EEG.max]}. 
-%   'baseline'   - [minms maxms] removes the mean of this period from the ERP
-%                  {default|[]: 'time_range' startms to 0 ms).
+%                  activation ERPs will be computed. Note that because 
+%                  computation of ERP is so fast, all channels ERP are
+%                  computed and saved. Only selected channels 
+%                  are returned by the function to Matlab
+%                  {default|[] -> all}
+%   'time_range' - [minms maxms] latency window limits (in ms) within which to 
+%                  compute ERPs {default|[]: [EEG.min EEG.max]}. It is not
+%                  advised to change this range unless you require a
+%                  specific baseline. The plotting 
+%   'recompute'  - ['on'|'off'] force recomputing ERP file even if it is 
+%                  already on disk.
 % Outputs:
-%   ERP         - (comps/chans,times) ERP matrix for the requested ICA components 
-%                 or scalp channels in the selected latency window. Component ERPs 
-%                 are scaled by the RMS component scalp map projection to all the 
-%                 scalp channels; they are thus in RMS microvolts. Channel ERPs are 
-%                 in microvolts.
-%   ERPtimes    - vector of ERP epoch latencies (in ms) 
+%   erp         - ERP for the requested ICA components in the selected 
+%                 latency window. ERPs are scaled by the RMS over of the
+%                 component scalp map projection over all data channels.
+%   times       - vector of times (epoch latencies in ms) for the ERP
 %
-% File output:     [dataset_file].icaerp     % component ERP Matlab file
-%      or          [dataset_file].daterp     % channel ERP Matlab file
-%                  
-% Matlab variables in the file output:
-%                               compN        % (or  chanN) for N = all comp or chan indices
-%                               times        % epoch latencies
-%                               datafile     % full datafile pathname
-%                               datatype     % 'ERP'
+% File output:     [dataset_file].icaerp     % component erp file
 %
-% To load the component file output:   
-%                               >> load -mat [dataset_file].icaerp % or std_readerp()
-%
-% See also:    std_erpplot(), std_readerp(), std_spec(), std_ersp(), std_topo(), std_preclust()
+% See also:    std_spec(), std_ersp(), std_topo(), std_preclust()
 %
 % Authors: Arnaud Delorme, SCCN, INC, UCSD, January, 2005
 
@@ -73,15 +58,6 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
-% Revision 1.29  2007/02/23 04:44:07  toby
-% consolidate versions 1.27 and 1.28
-%
-% Revision 1.28  2007/02/20 14:21:40  arno
-% option to force recomputing
-%
-% Revision 1.27  2007/02/20 01:46:30  scott
-% completed and clarified the help msg
-%
 % Revision 1.26  2006/10/02 11:40:26  arno
 % minor things
 %
@@ -179,7 +155,6 @@ end;
 
 g = finputcheck(options, { 'components' 'integer' []         [];
                            'channels'   'cell'    {}         {};
-                           'baseline'   'real'    []         [];
                            'recompute'  'string'  { 'on' 'off' } 'off';
                            'timerange'  'real'    []         [EEG.xmin EEG.xmax]*1000 }, 'std_erp');
 if isstr(g), error(g); end;
@@ -194,19 +169,6 @@ end
 
 EEG_etc = [];
 
-% get baseline
-% ------------
-if isempty(g.baseline) & ~strcmp(g.timerange,'std_erp')
-         g.baseline = [g.timerange(1) 0];
-end
-
-if length(g.baseline)>1 & g.baseline(1) > g.baseline(2)
-           fprintf('Reversing baseline ms limits - now [%g %g]\n',g.baseline(1),g.baseline(2));
-           tmpb = g.baseline(1);
-           g.baseline(1) = g.baseline(2); 
-           g.baseline(2) = tmpb;
-end
-   
 % filename 
 % --------
 if ~isempty(g.channels)
@@ -248,18 +210,13 @@ end;
 
 % Remove baseline mean
 % --------------------
-if EEG.trials > 1 % epoched data
-    time0 = find(EEG.times <= g.baseline(2) & EEG.times>= g.baseline(1));
-
-    % time0 = find(EEG.times < 0);
-    % time0 = find(EEG.times(time0) > g.timerange(1));
-
+if EEG.trials > 1 %epoched data
+    time0 = find(EEG.times < 0);
+    time0 = find(EEG.times(time0) > g.timerange(1));
     if ~isempty(time0)
         X = rmbase(X,EEG.pnts, time0);
-        fprintf('Removing mean of specified baseline [%g %g] ms.\n',g.baseline(1),g.baseline(2));
     else
         X = rmbase(X,EEG.pnts);
-        fprintf('Removing whole epoch mean baseline.\n');
     end
 else
     X = rmbase(X);
