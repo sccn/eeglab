@@ -42,7 +42,8 @@
 %                  colors. 'apart' -> plot group results on different figure
 %                  panels {default: 'apart'}
 %  'plotconditions' - ['together'|'apart'] 'together' -> plot mean results 
-%                  for data conditions on the same figure panel in different 
+%                  for data conditions on the same figure panel in
+%                  different 
 %                  colors. 'apart' -> plot conditions on different figure
 %                  panel. Note: 'plotgroups' and 'plotconditions' arguments 
 %                  cannot both be 'together' {default: 'apart'}
@@ -149,7 +150,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [pgroup, pcond, pinter] = std_plotcurve(allx, data, varargin)
+function std_plotcurve(allx, data, varargin)
 
 pgroup = [];
 pcond  = [];
