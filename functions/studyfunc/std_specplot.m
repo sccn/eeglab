@@ -9,7 +9,9 @@
 %                  using pop_preclust() or std_preclust(). Called by pop_clustedit(). 
 %                  Calls std_readspec() and internal function std_plotcompspec()
 % Usage:    
-%              >> [STUDY] = std_specplot(STUDY, ALLEEG, key1, val1, key2, val2, ...);  
+%  >> [STUDY] = std_specplot(STUDY, ALLEEG, key1, val1, key2, val2, ...);  
+%  >> [STUDY specdata specfreqs pgroup pcond pinter] = std_specplot(STUDY, ALLEEG, ...);
+%
 % Inputs:
 %   STUDY      - STUDY structure comprising some or all of the EEG datasets in ALLEEG.
 %   ALLEEG     - vector of EEG dataset structures for the dataset(s) in the STUDY, 
@@ -34,6 +36,19 @@
 % Outputs:
 %   STUDY      - the input STUDY set structure with the plotted cluster mean spectra
 %                added?? to allow quick replotting.
+%   specdata   - [cell] spectral data for each condition, group and subjects.
+%                size of cell array is [nconds x ngroups]. Size of each element
+%                is [freqs x subjects] for data channels or [freqs x components]
+%                for component clusters. This array may be gicen as input 
+%                directly to the statcond() function or std_stats() function
+%                to compute statistics.
+%   specfreqs  - [array] Sprectum point frequency values.
+%   pgroup     - [array or cell] p-values group statistics. Output of the 
+%                statcond() function.
+%   pcond      - [array or cell] condition statistics. Output of the statcond() 
+%                function.
+%   pinter     - [array or cell] groups x conditions statistics. Output of
+%                statcond() function.
 %   Example:
 %            >> [STUDY] = std_specplot(STUDY,ALLEEG, 'clusters', 2, 'mode', 'apart');
 %               % Plot component spectra for STUDY cluster 2, plus the mean cluster 
@@ -60,6 +75,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2007/01/26 18:04:55  arno
+% reprogrammed from scratch again
+%
 % Revision 1.33  2006/11/23 00:50:01  arno
 % rmsubjmean flag
 %
@@ -98,7 +116,7 @@
 % allow plotting scalp maps
 %
                             
-function [STUDY, erspbase] = std_specplot(STUDY, ALLEEG, varargin)
+function [STUDY, specdata, allfreqs, pgroup, pcond, pinter] = std_specplot(STUDY, ALLEEG, varargin)
 
 if nargin < 2
     help std_specplot;
@@ -223,7 +241,7 @@ else
         [pcond pgroup pinter] = std_stat(specdata, STUDY.etc.specparams);
             
         if index == length(allinds), opt.legend = 'on'; end;
-        [pgroup pcond pinter] = std_plotcurve(allfreqs, specdata, 'condnames', STUDY.condition, 'legend', opt.legend, 'subject', opt.subject, ...
+        std_plotcurve(allfreqs, specdata, 'condnames', STUDY.condition, 'legend', opt.legend, 'subject', opt.subject, ...
                                           'compinds', comp_names, 'plotmode', opt.plotmode, 'groupnames', STUDY.group, 'topovals', opt.plotfreq, 'unitx', 'Hz',  'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, ...
                                           'chanlocs', ALLEEG(1).chanlocs, 'plotsubjects', opt.plotsubjects, plotcurveopt{:});
         if length(allinds) > 1, 

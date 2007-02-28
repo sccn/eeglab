@@ -7,7 +7,10 @@
 %                  pop_preclust(), or via the equivalent commandline functions 
 %                  eeg_createdata() and eeg_preclust(). Called by pop_clustedit().
 % Usage:    
-%           >> [STUDY] = std_erspplot(STUDY, ALLEEG, key1, val1, key2, val2);  
+%   >> [STUDY] = std_erspplot(STUDY, ALLEEG, key1, val1, key2, val2);  
+%   >> [STUDY erspdata ersptimes erspfreqs pgroup pcond pinter] = ...
+%                std_erspplot(STUDY, ALLEEG ...);
+%
 % Inputs:
 %   STUDY    - STUDY set comprising some or all of the EEG datasets in ALLEEG.
 %   ALLEEG   - global vector of EEG structures for the datasets included 
@@ -39,8 +42,23 @@
 %                the figure will open a new figure with all conditions 
 %                plotted separately {default: 'on'} 
 % Output:
-%   STUDY     - the input STUDY set structure with the plotted cluster 
-%               mean ERSPs added to allow quick replotting 
+%   STUDY      - the input STUDY set structure with the plotted cluster 
+%                mean ERSPs added to allow quick replotting 
+%   erspdata   - [cell] ERSP data for each condition, group and subjects.
+%                size of cell array is [nconds x ngroups]. Size of each element
+%                is [freqs x times x subjects] for data channels or 
+%                [freqs x times x components] for component clusters. This 
+%                array may be gicen as input  directly to the statcond() f
+%                unction or std_stats() function to compute statistics.
+%   ersptimes  - [array] ERSP time point latencies.
+%   erspfreqs  - [array] ERSP point frequency values.
+%   pgroup     - [array or cell] p-values group statistics. Output of the 
+%                statcond() function.
+%   pcond      - [array or cell] condition statistics. Output of the statcond() 
+%                function.
+%   pinter     - [array or cell] groups x conditions statistics. Output of
+%                statcond() function.
+%
 % Example:
 %        >> [STUDY] = std_erspplot(STUDY,ALLEEG, 'clusters', 'all', ...
 %                                       'mode', 'together');
@@ -68,6 +86,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.42  2007/01/26 18:05:24  arno
+% new handling of scalp plotting
+%
 % Revision 1.41  2006/11/23 00:28:32  arno
 % add subject info to subject plot
 %
@@ -118,7 +139,7 @@
 % reprogram from scratch (statistics...), backward compatible
 %
                             
-function [STUDY allersp alltimes ] = std_erspplot(STUDY, ALLEEG, varargin)
+function [STUDY, allersp, alltimes, allfreqs, pgroup, pcond, pinter] = std_erspplot(STUDY, ALLEEG, varargin)
 
 if nargin < 2
     help std_erspstatplot;
@@ -184,13 +205,13 @@ if ~isempty(opt.plottf)
         end;
         for index = 1:length(allinds)
             if ~isempty(opt.channels)
-                allersp{ind}(:,:,:,index)  = STUDY.changrp(allinds(index)).erspdata{ind};
-                allfreqs                   = STUDY.changrp(allinds(index)).erspfreqs;
-                alltimes                   = STUDY.changrp(allinds(index)).ersptimes;
-            else
-                allersp{ind}(:,:,:,index)  = STUDY.cluster(allinds(index)).erspdata{ind};
-                allfreqs                   = STUDY.cluster(allinds(index)).erspfreqs;
-                alltimes                   = STUDY.changrp(allinds(index)).ersptimes;
+                eval( [ 'allersp{ind}(:,:,:,index)  = STUDY.changrp(allinds(index)).' opt.datatype 'data{ind};' ]);
+                eval( [ 'alltimes                   = STUDY.changrp(allinds(index)).' opt.datatype 'times;' ]);
+                eval( [ 'allfreqs                   = STUDY.changrp(allinds(index)).' opt.datatype 'freqs;' ]);
+            else % not sure clusters are actually of any use here
+                eval( [ 'allersp{ind}(:,:,:,index)  = STUDY.cluster(allinds(index)).' opt.datatype 'data{ind};' ]);
+                eval( [ 'alltimes                   = STUDY.cluster(allinds(index)).' opt.datatype 'times;' ]);
+                eval( [ 'allfreqs                   = STUDY.cluster(allinds(index)).' opt.datatype 'freqs;' ]);
             end;
         end;
         allersp{ind} = permute(allersp{ind}, [1 2 4 3]);

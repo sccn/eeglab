@@ -10,7 +10,9 @@
 %                 eeg_createdata() and eeg_preclust(). Called by pop_clustedit().
 %                 and std_propplot().
 % Usage:    
-%              >> [STUDY] = std_erpplot(STUDY, ALLEEG, key1, val1, key2, val2);  
+%   >> [STUDY] = std_erpplot(STUDY, ALLEEG, key1, val1, key2, val2);  
+%   >> [STUDY erpdata erptimes pgroup pcond pinter] = std_erpplot(STUDY, ALLEEG, ...);  
+%
 % Inputs:
 %   STUDY      - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
 %   ALLEEG     - global EEGLAB vector of EEG structures for the datasets included 
@@ -42,13 +44,27 @@
 % Outputs:
 %   STUDY      - the input STUDY set structure with plotted cluster mean
 %                ERPs data to allow quick replotting 
+%   erpdata    - [cell] ERP data for each condition, group and subjects.
+%                size of cell array is [nconds x ngroups]. Size of each element
+%                is [times x subjects] for data channels or [times x components]
+%                for component clusters. This array may be gicen as input 
+%                directly to the statcond() function or std_stats function
+%                to compute statistics.
+%   erptimes   - [array] ERP time point latencies.
+%   pgroup     - [array or cell] p-values group statistics. Output of the 
+%                statcond() function.
+%   pcond      - [array or cell] condition statistics. Output of the statcond() 
+%                function.
+%   pinter     - [array or cell] groups x conditions statistics. Output of
+%                statcond() function.
+%
 %   Example:
 %            >> [STUDY] = std_erpplot(STUDY,ALLEEG, 'clusters', 2, 'comps', 'all');
 %               % Plot cluster-2 component ERPs plus the mean ERP in bold. 
 %
 %  See also  pop_clustedit(), pop_preclust(), eeg_createdata(), eeg_preclust(). std_propplot()
 %
-% Authors: Arnaud Delorme, CERCO, August, 2006
+% Authors: Arnaud Delorme, CERCO, August, 2006-
 
 % Copyright (C) Arnaud Delorme, arno@salk.edu
 %
@@ -102,7 +118,7 @@
 % reprogram from scratch (statistics...), backward compatible
 %
                             
-function [STUDY allerp alltimes pgroup pcond pinter] = std_erpplot(STUDY, ALLEEG, varargin)
+function [STUDY erpdata alltimes pgroup pcond pinter] = std_erpplot(STUDY, ALLEEG, varargin)
 
 if nargin < 2
     help std_erpplot;
@@ -228,7 +244,7 @@ else
         [pcond pgroup pinter] = std_stat(erpdata, STUDY.etc.erpparams);
             
         if index == length(allinds), opt.legend = 'on'; end;
-        [pgroup pcond pinter] = std_plotcurve(alltimes, erpdata, 'condnames', STUDY.condition, 'legend', opt.legend, 'subject', opt.subject, ...
+            std_plotcurve(alltimes, erpdata, 'condnames', STUDY.condition, 'legend', opt.legend, 'subject', opt.subject, ...
                                           'compinds', comp_names, 'plotmode', opt.plotmode, 'groupnames', STUDY.group, 'topovals', opt.plottime, 'unitx', 'ms',  'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, ...
                                           'chanlocs', ALLEEG(1).chanlocs, 'plotsubjects', opt.plotsubjects, plotcurveopt{:});
         if length(allinds) > 1, 
