@@ -35,25 +35,29 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:39:45  jorn
+% Initial revision
+%
 
-function [ probaMap, sortbox ] = realproba( data, BOXES );
+function [ probaMap, sortbox ] = realproba( data, bins );
 
 if nargin < 1
 	help realproba;
 	return;
 end;
 if nargin < 2
-	BOXES = round(size(data,1)*size(data,2)/5);
+	bins = round(size(data,1)*size(data,2)/5);
 end;	
 
-if BOXES > 0
+if bins > 0
 	% COMPUTE THE DENSITY FUNCTION
 	% ----------------------------
 	SIZE = size(data,1)*size(data,2);
-	sortbox = zeros(1,BOXES);
+	sortbox = zeros(1,bins);
 	minimum =  min(data(:));
 	maximum =  max(data(:));
-	data = floor((data - minimum )/(maximum - minimum)*(BOXES-1))+1;
+	data = floor((data - minimum )/(maximum - minimum)*(bins-1))+1;
+    if any(any(isnan(data))), error('Binning failed because probability is 100%'); end;
 	for index=1:SIZE
 		sortbox(data(index)) = sortbox(data(index))+1;
 	end;
