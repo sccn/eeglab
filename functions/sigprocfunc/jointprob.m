@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/18 18:26:40  arno
+% typo can not
+%
 % Revision 1.1  2002/04/05 17:39:45  jorn
 % Initial revision
 %
@@ -104,11 +107,13 @@ else
 	% normalize the last dimension
 	% ----------------------------	
 	if normalize
-	    switch ndims( signal )
-	    	case 2,	jp = (jp-mean(jp)) / std(jp);
-	    	case 3,	jp = (jp-mean(jp,2)*ones(1,size(jp,2)))./ ...
-				        (std(jp,0,2)*ones(1,size(jp,2)));
-		end;
+        try, 
+            switch ndims( signal )
+             case 2,	jp = (jp-mean(jp)) / std(jp);
+             case 3,	jp = (jp-mean(jp,2)*ones(1,size(jp,2)))./ ...
+                  (std(jp,0,2)*ones(1,size(jp,2)));
+            end;
+        catch, error('Error while normalizing'); end;
 	end;
 end	
 
