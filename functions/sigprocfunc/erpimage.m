@@ -1,7 +1,7 @@
 % erpimage() - Plot a colored image of a collection of single-trial data epochs, optionally 
 %              sorted on and/or aligned to an input sorting variable and smoothed across 
 %              trials with a moving-average. (To return event-aligned data without 
-%              plotting, use eventlock()).  Optionally sort trials on value, amplitude 
+%              plotting, use eegalign()).  Optionally sort trials on value, amplitude 
 %              or phase within a specified latency window. Optionally plot the ERP mean 
 %              and std. dev.and moving-window spectral amplitude and inter-trial coherence
 %              at aselected or peak frequency. Optionally 'time warp' the single trial 
@@ -203,6 +203,9 @@
 
 %% LOG COMMENTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % $Log: not supported by cvs2svn $
+% Revision 1.270  2007/02/09 02:58:35  toby
+% bug fix: auto-calculation of yaxis limits occasionally fails
+%
 % Revision 1.269  2007/01/26 17:58:49  arno
 % Add option for compatibility with metaplottopo
 %
