@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2007/03/05 15:15:51  scott
+% nothing
+%
 % Revision 1.20  2006/11/04 03:04:20  scott
 % help msg calrification
 %
@@ -140,7 +143,7 @@ if frames < 4
 end
 
 fastave = 0;
-if nargin<2 | isempty(xvals) | (nelem(xvals)==1 & xvals == 0)
+if nargin<2 | isempty(xvals) | (numel(xvals)==1 & xvals == 0)
   xvals = 1:frames; % flag default xvals
 end
 if size(xvals,1)>1 & size(xvals,2)>1
