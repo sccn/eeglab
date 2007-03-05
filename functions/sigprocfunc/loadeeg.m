@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2004/11/21 01:48:48  arno
+% add "char" for printing
+%
 % Revision 1.6  2003/11/26 18:17:07  scott
 % help msg
 %
@@ -111,7 +114,7 @@ if ~strcmpi(format, 'short') & ~strcmpi(format, 'int32'), error('loadeeg: format
 % ---------------------
 fid=fopen(FILENAME,'r','ieee-le');
 if fid<0
-	fprintf(2,['Error LOADEEG: File ' FILENAME ' not found\n']);  
+	fprintf('Error LOADEEG: File %s not found\n', FILENAME);  
 	return;
 end;
 
