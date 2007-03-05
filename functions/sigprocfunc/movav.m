@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2007/03/05 15:17:56  scott
+% nelem() -> numel()
+%
 % Revision 1.21  2007/03/05 15:15:51  scott
 % nothing
 %
@@ -211,7 +214,7 @@ if fastave==0
 
   if xwin~=0
     if abs(sum(xwin)) < NEARZERO
-      fprintf('movav(): abs(sum(xwin)) too small. Cannot normalize.\n');
+      fprintf('\nmovav(): abs(sum(xwin)) too small. Cannot normalize.\n');
     else
       xwin = xwin/abs(sum(xwin)); % make xwin values sum to 1;
     end
@@ -300,23 +303,16 @@ for f=1:outframes
           sumx=1;
        end
        if abs(sumx) < NEARZERO  % cannot normalize
-         if f>1,
-          outdata(:,f) = outdata(:,f-1); % if no data, replicate
-          if debugit,
-            fprintf('R');
-          end
-         else
-          outdata(:,f) = zeros(chans,1); % or output zeros
-          if debugit,
-            fprintf('0');
-          end
-         end
+
+         outdata(:,f) = nan_sum((((ones(chans,1)*xwin(ix)).*data(:,i)))')';
+          % AG fix 3/5/07
+
        else % normalize
-           outdata(:,f) = nan_sum((((ones(chans,1)*xwin(ix)).*data(:,i))/sumx)')'; 
+         outdata(:,f) = nan_sum((((ones(chans,1)*xwin(ix)).*data(:,i))/sumx)')'; 
        end 
        if nonorm & length(ix) % undo division by number of elements summed
-          outdata(:,f) = outdata(:,f)*sumx;
-          if debugit, fprintf('n'); end;
+         outdata(:,f) = outdata(:,f)*sumx;
+         if debugit, fprintf('n'); end;
        end
    end
    lox = lox+xadv;
