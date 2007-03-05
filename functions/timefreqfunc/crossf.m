@@ -169,6 +169,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.72  2006/03/13 23:10:50  arno
+% significance masking
+%
 % Revision 1.71  2005/08/19 18:31:45  scott
 % fixed
 % bug  ( = Tfx2;)  (thanks to Pierre Herremans); edited commandline printouts -sm
@@ -388,6 +391,7 @@
 % 08-13-99 added cohangle plotting -sm
 % 08-20-99 made bootstrap more efficient -sm
 % 08-24-99 allow nan values introduced by possible eventlock() preproc. -sm
+% 03-05-2007 eventlock.m deprecated to eegalign.m. -tf
 % 03-16-00 added lead/lag interpretation to help msg - sm & eric visser
 % 03-16-00 added axcopy() feature -sm & tpj
 % 04-20-00 fixed Rangle sign for wavelets, added verts array -sm
