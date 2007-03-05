@@ -1,3 +1,4 @@
+% eventlock() - DEPRECATED: Please use eegalign() instead.
 % eventlock() - Time lock data epochs to specified event frames or event x-values.
 %               Use to timelock existing data epochs to reaction times or other events
 %
@@ -51,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2005/05/20 22:09:02  arno
+% same
+%
 % Revision 1.3  2005/05/20 22:08:02  arno
 % type
 %
