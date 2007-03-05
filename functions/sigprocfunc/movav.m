@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2006/11/04 03:04:20  scott
+% help msg calrification
+%
 % Revision 1.19  2006/07/26 03:37:25  toby
 % change to outframes to choose an optimal number, was sometimes losing the last possible.
 %
@@ -137,25 +140,16 @@ if frames < 4
 end
 
 fastave = 0;
-if nargin<2 
-  xvals = 0;
-end
-if isempty(xvals) | (numel(xvals) == 1 & size(data,2)>1)
-  xvals = 1:size(data,2);
+if nargin<2 | isempty(xvals) | (nelem(xvals)==1 & xvals == 0)
+  xvals = 1:frames; % flag default xvals
 end
 if size(xvals,1)>1 & size(xvals,2)>1
-  error('does not work on multi-channel data');
+  error('xvals must be a vector');
 end
-xvals = xvals(:)'; % make row vector
-if length(xvals)==1 
-  if xvals(1)==0,
-    fastave =1;
-  else
-    error('data are too small');
-  end
-end
-if fastave == 0 & frames ~= length(xvals)
-    error('sizes of xvals and data not equal');
+xvals = xvals(:)'; % make xvals a row vector
+
+if frames ~= length(xvals) 
+    error('lengths of xvals and data not equal');
 end
 
 if nargin < 8 | isempty(nonorm)
