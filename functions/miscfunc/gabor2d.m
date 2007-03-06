@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2003/12/01 15:10:33  scott
+% header msg
+%
 % Revision 1.2  2003/01/10 03:10:40  arno
 % debuging rotation (recentering)
 %
@@ -97,7 +100,16 @@ mat = sin(real(rotatedmat)*freq + dephase/180*pi).*exp(-0.5*(  ((X-meanX)/sigmaX
 				+((Y-meanY)/sigmaY).*((Y-meanY)/sigmaY)))... 
             			/((sigmaX*sigmaY)^(0.5)*pi); 
 
+if cut > 0
+	maximun = max(max(mat))*cut;
+	I = find(mat < maximun);
+	mat(I) = 0;
+end;
+
 return;
+
+% other solution
+% --------------
 
 for X = 1:sizeX
     for Y = 1:sizeY
@@ -106,13 +118,6 @@ for X = 1:sizeX
                           +((Y-meanY)/sigmaY).*((Y-meanY)/sigmaY)))... 
             			/((sigmaX*sigmaY)^(0.5)*pi); 
     end;
-end;
-
-
-if cut > 0
-	maximun = max(max(mat))*cut;
-	I = find(mat < maximun);
-	mat(I) = 0;
 end;
 
 return;
