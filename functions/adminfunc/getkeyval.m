@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2003/03/12 20:13:34  scott
+% header edits -sm
+%
 % Revision 1.5  2003/03/12 19:21:05  arno
 % handle setial case
 %
@@ -68,7 +71,7 @@ function txt = getkeyval(lastcom, var, mode, default)
 		txt = default; return;
 	end;
 	if nargin < 3
-		mode = [];
+		mode = '';
 	end;
 	if isstr(mode) & strcmp(mode, 'present')
 		if ~isempty(findstr(var, lastcom))

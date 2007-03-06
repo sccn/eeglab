@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2007/03/06 23:18:35  toby
+% bug 144
+%
 % Revision 1.3  2002/05/21 19:23:09  arno
 % matlab PC compatibility
 %
@@ -236,6 +239,7 @@ end;
 
 if exist('varlist') == 1
 	if ~iscell(varlist), varlist = { varlist }; end;
+        newtxt = mat2cell(zeros(length(varlist), 1), length(varlist), 1); % preallocation
 	for index = 1:length(varlist)
 		loc = strmatch( varlist{index}, allvars);
 		if ~isempty(loc)
