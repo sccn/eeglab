@@ -1,30 +1,32 @@
 % movav() - Perform a moving average of data indexed by xvals.
 %           Supports use of a moving non-rectangular window.
 %           Can be used to resample a data matrix to any size 
-%           (see NOTE below) and to regularize sampling of 
+%           (see xadv NOTE below) and to regularize sampling of 
 %           irregularly sampled data.
 % Usage:
 %  >> [outdata,outx] = movav(data,xvals,xwidth,xadv,firstx,lastx,xwin,nonorm);
 %
-% Inputs:
+% Input:
 %   data   = input data (chans,frames)
-%   xvals  = x-value for each data frame (column) The default is fastest, 
-%            and assumes equal x-spacing {def|[]|0 -> 1:frames}
-%   xwidth = smoothing-window width in xvals units {def|0 -> (lastx-firstx)/4}
+%
+% Optional inputs:
+%   xvals  = increasing x-values for data frames (columnsa). The default 
+%            [1:frames] is fastest {def|[]|0 -> 1:frames}
+%   xwidth = smoothing-window width in xvals units {def|0->(hix-lox)/4}
 %   xadv   = window step size in xvals units. NOTE: To reduce yyy frames 
 %            to about xxx, xadv needs to be near yyy/xxx {default|0 -> 1}
-%   firstx = low xval of first averaging window {def|[] -> low xvals}
-%   lastx  = high xval of last averaging window {def|[] -> high xvals}
+%   firstx = low xval of first averaging window {def|[] -> min xvals}
+%   lastx  = high xval of last averaging window {def|[] -> max xvals}
 %   xwin   = vector of window values {def|0 -> ones() = square window}
-%            May be long: note linear interp. is NOT used between values.
+%            May be long. NOTE: linear interp. is NOT used between values.
 %            Example: gauss(1001,2) ->  [0.018 ... 1.0 ... 0.018]
-%   nonorm = [1|0] If non-zero, do not normalize the moving sum, thereby
-%            creating a moving histogram (e.g., if all y values are 1).
+%   nonorm = [1|0] If non-zero, do not normalize the moving sum. If
+%            all y values are 1s. this creates a moving histogram. 
 %            Ex: >> [oy,ox] = movav(ones(size(x)),x,xwd,xadv,[],[],0,1);
-%            returns a moving histogram of x  {default: 0}
+%            returns a moving histogram of xvals {default: 0}
 % Outputs:
-%   outdata = smoothed data (chans,outframes)
-%   outx    = xval midpoints of successive output data windows
+%   outdata = smoothed output data (chans,outframes)
+%   outx    = xval midpoints of successive output windows
 %
 % Author: Scott Makeig, SCCN/INC/UCSD, La Jolla, 10-25-97 
 
@@ -47,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2007/03/05 15:33:46  scott
+% implemented AG fix is sum(xwin) is near zero -sm
+%
 % Revision 1.22  2007/03/05 15:17:56  scott
 % nelem() -> numel()
 %
@@ -124,6 +129,7 @@ function [outdata,outx] = movav(data,xvals,xwidth,xadv,firstx,lastx,xwin,nonorm)
 
 MAXPRINT = 1; % max outframe numbers to print on tty
 NEARZERO = 1e-22;
+DEFAULT_XADV = 1; % default x window advance
 verbose = 0;  % If 1, output process info
 debugit = 0;  % If 1, output more process info
 
@@ -145,9 +151,10 @@ if frames < 4
   return
 end
 
-fastave = 0;
+flag_fastave = 0;
 if nargin<2 | isempty(xvals) | (numel(xvals)==1 & xvals == 0)
   xvals = 1:frames; % flag default xvals
+  flag_fastave = 0;
 end
 if size(xvals,1)>1 & size(xvals,2)>1
   error('xvals must be a vector');
@@ -173,7 +180,7 @@ if nargin < 6 | isempty(lastx)
   lastx = [];
 end
 if isempty(lastx),
-  if fastave
+  if flag_fastave
     lastx = frames;
   else
     lastx = max(xvals);
@@ -184,7 +191,7 @@ if nargin<5 | isempty(firstx)
   firstx = [];
 end
 if isempty(firstx),
-  if fastave
+  if flag_fastave
     firstx = 1;
   else
     firstx = min(xvals);
@@ -195,14 +202,15 @@ if nargin<4 | isempty(xadv)
   xadv = 0;
 end
 if isempty(xadv) | xadv == 0,
-  xadv = 1.0; % DEFAULT XADV
+  xadv = DEFAULT_XADV;
 end
 
 if nargin<3 | isempty(xwidth) | xwidth==0
-  xwidth = (lastx-firstx)/4;
+  xwidth = (lastx-firstx)/4;  % DEFAULT XWIDTH
 end
+
 wlen = 1;  % default;
-if fastave==0
+if flag_fastave==0
   if length(xwin)==1 & xwin ~=0,  % should be a vector or 0
     error('xwin not vector or 0');
   elseif size(xwin,1)>1 & size(xwin,2)>1 % not a matrix
@@ -253,13 +261,13 @@ end
 %%%%%%%%%%%%%%%%%%% Perform averaging %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 lox = firstx;
-i = 0; % fastave default
+i = 0; % flag_fastave default
 for f=1:outframes
    hix = lox+xwidth;
    outx(1,f)=outxval;
    outxval = outxval + xadv;
-   if fastave == 0 
-      i = find(xvals>=lox & xvals <= hix);
+   if flag_fastave == 0 
+      i = find(xvals>=lox & xvals < hix);
    end
    if length(i)==0,
       if f>1,
@@ -274,7 +282,7 @@ for f=1:outframes
        end
       end
    elseif length(xwin)==1,
-      if fastave
+      if flag_fastave > 0
           outdata(:,f) = nan_mean(data(:,round(lox):round(hix))')'; 
           nix = length([round(lox):round(hix)]);
       else
@@ -337,10 +345,10 @@ function out = nan_mean(in)
    sums = sum(in);
    nonnans = ones(size(in));
    nonnans(nans) = 0;
-   nonnans = sum(nonnans);
+   nonnans = sum(nonnans,1);
    nononnans = find(nonnans==0);
    nonnans(nononnans) = 1;
-   out = sum(in)./nonnans;
+   out = sum(in,1)./nonnans;
    out(nononnans) = NaN;
 
 %
@@ -353,10 +361,10 @@ function out = nan_sum(in)
 
    nans = find(isnan(in));
    in(nans) = 0;
-   out = sum(in);
+   out = sum(in,1);
 
    nonnans = ones(size(in));
    nonnans(nans) = 0;
-   nonnans = sum(nonnans);
+   nonnans = sum(nonnans,1);
    nononnans = find(nonnans==0);
    out(nononnans) = NaN;
