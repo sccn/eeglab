@@ -3,7 +3,7 @@
 %               CAUTION: Only for use on electrodes in
 %               and remaining in the upper spherical hemisphere,
 %               otherwise it will work improperly. Written primarily for
-%               adjusting Cz.
+%               adjusting all electrodes homogenously with Cz.
 %
 % Usage:
 %   >> chanlocs = forcelocs( chanlocs ); % pop-up window mode
@@ -19,12 +19,14 @@
 %   loc1      - cell array: { location, axis, channame1, channame2, .. } 
 %               'location' is new cartesian coordinate of channame1 along 'axis'
 %               'axis' is either
-%                 'X'   New x-coordinate of channame1, used to calculate the 
-%                       X-Z plane angle by which to rotate channame1, channame2, etc.
+%                 'X'   New x-coordinate of mean of channame1, channame2,
+%                       etc. Used to calculate the X-Z plane angle by
+%                       which to rotate all channels.
 %                       Note that all rotations are to the corresponding positive 
 %                       Z-value, since theta=atan(z/x).
-%                 'Y'   New y-coordinate of channame1, used to calculate the angle  
-%                       Y-Z plane angle by which to rotate channame1, channame2, etc.
+%                 'Y'   New x-coordinate of mean of channame1, channame2,
+%                       etc.
+%                 
 %               'channame#'  Name of channel(s) to be rotated, as they appear in 
 %                       chanlocs.label
 %   loc2      - same as loc1
@@ -56,6 +58,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2007/03/06 02:39:05  toby
+% Caution statement added
+%
 % Revision 1.12  2007/03/06 02:31:28  toby
 % Corrected, updated help message, see Bug 140 reported by Ronny Lindner
 %
