@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2007/03/06 17:48:25  scott
+% fixed ?????????? computation as suggested by AG  -sm
+%
 % Revision 1.24  2007/03/06 17:17:50  scott
 % fixed AG bugs, disabled 'flag_fastave' (formerly 'fastave') mode
 % (or kept it disabled) -sm
@@ -157,8 +160,8 @@ end
 flag_fastave = 0;
 if nargin<2 | isempty(xvals) | (numel(xvals)==1 & xvals == 0)
   xvals = 1:frames; % flag default xvals
-  flag_fastave = 0;
-end
+  flag_fastave = 0; % TURNED OFF THIS FEATURE - LEADS TO ?? BUG AT ABOUT 287
+end                 % -sm 3/6/07
 if size(xvals,1)>1 & size(xvals,2)>1
   error('xvals must be a vector');
 end
