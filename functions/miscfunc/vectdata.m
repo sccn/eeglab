@@ -1,7 +1,3 @@
-% WARNING: this function is not part of the EEGLAB toolbox and should not be 
-%          distributed you must contact Arnaud Delorme (arno@salk.edu) for 
-%          terms of use
-%
 % vectdata() - vector data interpolation with optional moving 
 %              average.
 %
@@ -57,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2004/02/06 23:31:22  arno
+% implementing new option 'avgtype'
+%
 % Revision 1.11  2004/02/06 22:36:23  arno
 % new option 'border'
 %
