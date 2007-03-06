@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2007/03/05 18:52:23  arno
+% fixed error message
+%
 % Revision 1.7  2004/11/21 01:48:48  arno
 % add "char" for printing
 %
@@ -121,14 +124,14 @@ end;
 % read general part of the erp header and set variables
 % -----------------------------------------------------
 rev = char(fread(fid, 20, 'uchar'))'; % revision number
-erp = fread(fid, 342, 'uchar');	% skip the firsts 368 bytes
+erp = fread(fid, 342, 'uchar');	% skip the firsts 362 from BOF (368 bytes in orginal comment?)
 nsweeps = fread(fid, 1, 'ushort');	% number of sweeps
 erp = fread(fid, 4, 'uchar'); 	% skip 4 bytes 
 pnts= fread(fid, 1, 'ushort');	% number of point per waveform
 chan= fread(fid, 1, 'ushort');  % number of channels
 erp = fread(fid, 4, 'uchar'); 	% skip 4 bytes 
 rate= fread(fid, 1, 'ushort');  % sample rate (Hz)
-erp = fread(fid, 127, 'uchar');	% skip 125 bytes 
+erp = fread(fid, 127, 'uchar');	% skip 127 bytes 
 xmin= fread(fid, 1, 'float32'); % in s
 xmax= fread(fid, 1, 'float32'); % in s
 erp = fread(fid, 387, 'uchar');	% skip 387 bytes 
