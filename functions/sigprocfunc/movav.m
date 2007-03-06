@@ -49,6 +49,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2007/03/06 17:17:50  scott
+% fixed AG bugs, disabled 'flag_fastave' (formerly 'fastave') mode
+% (or kept it disabled) -sm
+%
 % Revision 1.23  2007/03/05 15:33:46  scott
 % implemented AG fix is sum(xwin) is near zero -sm
 %
@@ -117,7 +121,6 @@
 %
 % Revision 1.1  2002/04/05 17:36:45  jorn
 % Initial revision
-%
 
 % 3-20-98 fixed bug in multi-channel windowed averaging -sm
 % 6-10-98 changed mean() and sum() to nanmean() and nansum() -sm
@@ -221,11 +224,6 @@ if flag_fastave==0
   end
 
   if xwin~=0
-    if abs(sum(xwin)) < NEARZERO
-      fprintf('\nmovav(): abs(sum(xwin)) too small. Cannot normalize.\n');
-    else
-      xwin = xwin/abs(sum(xwin)); % make xwin values sum to 1;
-    end
     wlen = length(xwin);
   end
 end
@@ -248,10 +246,11 @@ if verbose,
   fprintf('Performing moving averaging:\n')
   fprintf('Output will be %d chans by %d frames',chans,outframes);
   if wlen>1,
-    fprintf(' using the specified width-%d window.\n',wlen);
+    fprintf(' using the specified width-%d window\n',wlen);
   else
-    fprintf(' using a width-%d square window.\n',xwidth);
+    fprintf(' using a width-%d square window\n',xwidth);
   end
+  fprintf(' and a window advance of %g\n',xadv);
 end
 if debugit
    fprintf('   firstx = %g, lastx= %g, xwidth = %g xadv = %g\n',...
@@ -302,25 +301,17 @@ for f=1:outframes
          fprintf('i %g, f %g\n',i,f);
        end
        wadv=(hix-lox)/wlen;
-       ix = ceil((xvals(i)-lox)/wadv);
-       zs = find(ix==0);
-       ix(zs) = ones(1,zs); % ????????????????
+       ix = floor((xvals(i)-lox)/wadv)+1; % AG fix 3/6/07
        if length(xwin)>1
           sumx = sum(xwin(ix));
        else
           sumx=1;
        end
-       if abs(sumx) < NEARZERO  % cannot normalize
 
-         outdata(:,f) = nan_sum((((ones(chans,1)*xwin(ix)).*data(:,i)))')';
-          % AG fix 3/5/07
-
-       else % normalize
-         outdata(:,f) = nan_sum((((ones(chans,1)*xwin(ix)).*data(:,i))/sumx)')'; 
-       end 
-       if nonorm & length(ix) % undo division by number of elements summed
-         outdata(:,f) = outdata(:,f)*sumx;
-         if debugit, fprintf('n'); end;
+       % AG fix 3/6/7
+       outdata(:,f) = nan_sum((((ones(chans,1)*xwin(ix)).*data(:,i)))')';
+       if abs(sumx) > NEARZERO && nonorm == 0 
+          outdata(:,f) = outdata(:,f)/sumx;
        end
    end
    lox = lox+xadv;
