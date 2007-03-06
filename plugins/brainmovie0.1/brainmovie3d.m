@@ -133,6 +133,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2007/03/02 22:42:56  arno
+% trying to fix the function
+%
 % Revision 1.17  2005/07/26 21:24:47  arno
 % add option 'project3d' to function header
 %
@@ -734,14 +737,15 @@ for indeximage = alltimepoints
 		end;
 	end;
 	
-	% clean images and update view
-	% ----------------------------
-	for i=1:nbconditions
-          axes(hh(i));
-
+	for tmpcond=1:nbconditions
+          axes(hh(tmpcond)); set (gcf, 'visible', g.visible);
+          
+          
+          % clean images and update view
+          % ----------------------------
           if ~isempty(g.path3d)
-            angle = (indeximage-1)/length(alltimepoints)*360;
-            camorbit( cos(angle/180*pi)*g.path3d(1), sin(angle/180*pi)*g.path3d(2) );
+              angle = (indeximage-1)/length(alltimepoints)*360;
+              camorbit( cos(angle/180*pi)*g.path3d(1), sin(angle/180*pi)*g.path3d(2) );
           end;
           delete( findobj( hh(i), 'tag', 'tmpmov') );
           set (gcf, 'visible', g.visible); 
@@ -749,64 +753,55 @@ for indeximage = alltimepoints
             t = textsc(g.title,'title');
             set(t,'VerticalAlignment','top', 'fontsize', 15);
           end;  
-	end;
 	
-	% draw correlations
-	% -----------------  
-	switch lower(g.crossf), case 'on', 
-          for tmpcond = 1:nbconditions
-            axes(hh(tmpcond)); set (gcf, 'visible', g.visible);
-            for index1 = selected
-              for index2 = selected
-                if index2 > index1
-                  
-                  tmpcrossfpow = ALLCROSSF     	 { index1, index2, tmpcond };
-                  tmpcrossfang = ALLCROSSFANGLE    { index1, index2, tmpcond };
-                  tmppower  = mean(tmpcrossfpow( FREQS, indeximage));
-                  tmpangle  = mean(tmpcrossfang( FREQS, indeximage));
-                  
-                  if strcmp(lower(g.crossfphaseunit), 'radian'), tmpangle = tmpangle/pi*180; end;
-                  %fprintf('%d-%d -> power %1.1f\n', index1, index2, tmppower);
-                  drawconnections( g.coordinates{tmpcond}( index1,: ), g.coordinates{tmpcond}( index2,: ), ...
-                                   tmppower, tmpangle, g.circfactor(index1, index2), g);
-                end;	
-              end;	
-            end;
-          end;	
-	end;
-	
-	% draw circles
-	% ------------     
-	for index1 = g.plotorder(:)'
-          for tmpcond = 1:nbconditions
-            axes(hh(tmpcond)); set (gcf, 'visible', g.visible);
-
-            tmptimef = ALLERSP{ index1, tmpcond};
-            tmppow   = mean(tmptimef( FREQS, indeximage)); % size is power
-            tmptimef = ALLITC{ index1, tmpcond};
-            tmpitc = mean(tmptimef( FREQS, indeximage)); % color is ITC
-                                                         %index1, tmpitc, tmppow,
-            drawcircle( g.coordinates{tmpcond}( index1,: ), tmppow, tmpitc, g);
+          % draw correlations
+          % -----------------  
+          switch lower(g.crossf), case 'on', 
+              for index1 = selected
+                  for index2 = selected
+                      if index2 > index1
+                          
+                          tmpcrossfpow = ALLCROSSF     	 { index1, index2, tmpcond };
+                          tmpcrossfang = ALLCROSSFANGLE    { index1, index2, tmpcond };
+                          tmppower  = mean(tmpcrossfpow( FREQS, indeximage));
+                          tmpangle  = mean(tmpcrossfang( FREQS, indeximage));
+                          
+                          if strcmp(lower(g.crossfphaseunit), 'radian'), tmpangle = tmpangle/pi*180; end;
+                          %fprintf('%d-%d -> power %1.1f\n', index1, index2, tmppower);
+                          drawconnections( g.coordinates{tmpcond}( index1,: ), g.coordinates{tmpcond}( index2,: ), ...
+                                           tmppower, tmpangle, g.circfactor(index1, index2), g);
+                      end;	
+                  end;	
+              end;
           end;
-	end;
+	
+          % draw circles
+          % ------------     
+          for index1 = g.plotorder(:)'
+              tmptimef = ALLERSP{ index1, tmpcond};
+              tmppow   = mean(tmptimef( FREQS, indeximage)); % size is power
+              tmptimef = ALLITC{ index1, tmpcond};
+              tmpitc = mean(tmptimef( FREQS, indeximage)); % color is ITC
+                                                           %index1, tmpitc, tmppow,
+              drawcircle( g.coordinates{tmpcond}( index1,: ), tmppow, tmpitc, g);
+          end;
 
-	% draw a bar for time probability
-	% -------------------------------
-	for tmpcond = 1:nbconditions
+
+          % draw a bar for time probability
+          % -------------------------------
           if ~isempty(g.rt)
-            if ~isempty(g.rt{tmpcond}) 
-              axes(hh(tmpcond)); set (gcf, 'visible', g.visible);      
-              ll = line([g.rthistloc(1)-g.rthistloc(3)/2 g.rthistloc(1)+g.rthistloc(3)/2], [g.rthistloc(2) g.rthistloc(2)]);
-              set(ll, 'linewidth', 2*g.resmult, 'color', 'k'); 
-              barheight = RTdist(tmpcond, indeximage)*g.rthistloc(4);
-              x1 = g.rthistloc(1)-0.65*g.rthistloc(3)/2;
-              x2 = g.rthistloc(1)+0.65*g.rthistloc(3)/2;
-              y1 = g.rthistloc(2);
-              y2 = g.rthistloc(2)-barheight;
-              ll = patch([x1 x1 x2 x2], [y1 y2 y2 y1], g.rthistcolor, 'linewidth', 2*g.resmult);
-            end;
+              if ~isempty(g.rt{tmpcond}) 
+                  ll = line([g.rthistloc(1)-g.rthistloc(3)/2 g.rthistloc(1)+g.rthistloc(3)/2], [g.rthistloc(2) g.rthistloc(2)]);
+                  set(ll, 'linewidth', 2*g.resmult, 'color', 'k'); 
+                  barheight = RTdist(tmpcond, indeximage)*g.rthistloc(4);
+                  x1 = g.rthistloc(1)-0.65*g.rthistloc(3)/2;
+                  x2 = g.rthistloc(1)+0.65*g.rthistloc(3)/2;
+                  y1 = g.rthistloc(2);
+                  y2 = g.rthistloc(2)-barheight;
+                  ll = patch([x1 x1 x2 x2], [y1 y2 y2 y1], g.rthistcolor, 'linewidth', 2*g.resmult);
+              end;
           end;
-	end;	
+    end;
 
 	% draw the enveloppe of the signal if necessary
 	% ---------------------------------------------
@@ -840,29 +835,30 @@ for indeximage = alltimepoints
           set(tt, 'fontsize', 12*g.resmult, 'horizontalalignment', 'right', 'tag', 'tmpmov', 'color', 'w');
 	end;		   
 
-        % last 3-D settings
-        % -----------------
-        lighting phong;
-        material shiny;
-        setfont(gcf, 'color', [0.99 0.99 0.99]); % warning, for some reasons white does not print
-        for index = 1:length(c)
-          axes(c(index)); % bring back legend to front
-        end;
+
+    % last 3-D settings
+    % -----------------
+    lighting phong;
+    material shiny;
+    setfont(gcf, 'color', [0.99 0.99 0.99]); % warning, for some reasons white does not print
+    for index = 1:length(c)
+        axes(c(index)); % bring back legend to front
+    end;
         
 	% save the file for a movie
 	% -------------------------
-        if strcmpi(g.framesout, 'eps')
-          command2 = sprintf('print -depsc -loose %s/image%4.4d.eps', g.framefolder, indeximage);
-          eval(command2);
-        elseif 	strcmpi(g.framesout, 'ppm')
-          command2 = sprintf('print -dppm -loose %s/image%4.4d.ppm', g.framefolder, indeximage);
-          eval(command2);
-        else % fig format
-          hgsave(sprintf('%s/image%4.4d.fig', g.framefolder, indeximage));
-          if strcmp(g.visible, 'on')
+    if strcmpi(g.framesout, 'eps')
+        command2 = sprintf('print -depsc -loose %s/image%4.4d.eps', g.framefolder, indeximage);
+        eval(command2);
+    elseif 	strcmpi(g.framesout, 'ppm')
+        command2 = sprintf('print -dppm -loose %s/image%4.4d.ppm', g.framefolder, indeximage);
+        eval(command2);
+    else % fig format
+        hgsave(sprintf('%s/image%4.4d.fig', g.framefolder, indeximage));
+        if strcmp(g.visible, 'on')
             drawnow;
-          end;
         end;
+    end;
 end;		 
 return;
 
