@@ -149,6 +149,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.208  2007/02/23 19:03:38  scott
+% completed help msg -- added 'result' output and the fact that EEG can also be ALLEEG
+%
 % Revision 1.207  2007/02/20 17:02:18  scott
 % reworked help message - brought description of the EEG structure fields
 % up to date -- Arno, please check.
@@ -1673,9 +1676,9 @@ end;
 
 % DIPFIT structure
 % ----------------
-if ~isfield(EEG, 'dipfit')   
+if ~isfield(EEG, 'dipfit') 
     EEG.dipfit = []; res = com; 
-else
+elseif exist('dipfitdefs')
     dipfitdefs;
     if isfield(EEG.dipfit, 'vol') & ~isfield(EEG.dipfit, 'hdmfile')
         if exist('pop_dipfit_settings')
