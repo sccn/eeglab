@@ -1,5 +1,9 @@
 % forcelocs() - rotate location in 3-D so specified electrodes
-%               match specified locations.
+%               match specified locations. 
+%               CAUTION: Only for use on electrodes in
+%               and remaining in the upper spherical hemisphere,
+%               otherwise it will work improperly. Written primarily for
+%               adjusting Cz.
 %
 % Usage:
 %   >> chanlocs = forcelocs( chanlocs ); % pop-up window mode
@@ -28,6 +32,7 @@
 % Outputs:
 %   chanlocs  - updated EEGLAB channel structure.
 %
+%
 % Author: Arnaud Delorme, CNL / Salk Institute, 15 April 2003
 %
 % See also: readlocs()
@@ -51,6 +56,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2007/03/06 02:31:28  toby
+% Corrected, updated help message, see Bug 140 reported by Ronny Lindner
+%
 % Revision 1.11  2005/05/24 17:13:02  arno
 % cell2mat -> celltomat
 %
