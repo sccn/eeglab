@@ -103,11 +103,11 @@
 % pop_resample()  - change data sampling rate (resample())
 % pop_rmbase()    - remove epoch baseline (rmbase())
 % pop_runica()    - run infomax ICA decomposition (runica())
-% pop_timef()     - event-related time-frequency (timef())
+% pop_newtimef()  - event-related time-frequency (newtimef())
 % pop_timtopo()   - plot ERP and scalp maps  (timtopo())
 % pop_topoplot()  - plot scalp maps (topoplot())
 % pop_snapread()  - read Snapmaster .SMA files (snapread())
-% pop_crossf()    - event-realted cross-coherence (crossf())
+% pop_newcrossf() - event-realted cross-coherence (newcrossf())
 % pop_spectopo()  - plot all channel spectra and scalp maps (spectopo())
 % pop_plottopo()  - plot a data epoch in a topographic array (plottopo())
 % pop_readedf()   - read .EDF EEG data format (readedf())
@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.497  2007/02/20 14:17:43  arno
+% enable more menus for study (resample, baseline)
+%
 % Revision 1.494  2006/11/29 21:32:45  toby
 % spelling and doc update
 %
@@ -1994,10 +1997,10 @@ catchstrs.new_non_empty          = e_newset;
 	cb_signalstat1 = [ check         'LASTCOM = pop_signalstat(EEG, 1);' e_hist];
 	cb_signalstat2 = [ checkica      'LASTCOM = pop_signalstat(EEG, 0);' e_hist];
 	cb_eventstat   = [ checkevent    'LASTCOM = pop_eventstat(EEG);'     e_hist];
-	cb_timef1      = [ checkepoch    'LASTCOM = pop_timef(EEG, 1, eegh(''find'',''pop_timef(EEG,1''));'  e_hist];
-	cb_crossf1     = [ checkepoch    'LASTCOM = pop_crossf(EEG, 1,eegh(''find'',''pop_crossf(EEG,1''));' e_hist];
-	cb_timef2      = [ checkepochica 'LASTCOM = pop_timef(EEG, 0, eegh(''find'',''pop_timef(EEG,0''));'  e_hist];
-	cb_crossf2     = [ checkepochica 'LASTCOM = pop_crossf(EEG, 0,eegh(''find'',''pop_crossf(EEG,0''));' e_hist];
+	cb_timef1      = [ checkepoch    'LASTCOM = pop_newtimef(EEG, 1, eegh(''find'',''pop_newtimef(EEG,1''));'  e_hist];
+	cb_crossf1     = [ checkepoch    'LASTCOM = pop_newcrossf(EEG, 1,eegh(''find'',''pop_newcrossf(EEG,1''));' e_hist];
+	cb_timef2      = [ checkepochica 'LASTCOM = pop_newtimef(EEG, 0, eegh(''find'',''pop_newtimef(EEG,0''));'  e_hist];
+	cb_crossf2     = [ checkepochica 'LASTCOM = pop_newcrossf(EEG, 0,eegh(''find'',''pop_newcrossf(EEG,0''));' e_hist];
 		
     cb_study3      = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_study(STUDY, ALLEEG, ''gui'', ''on'');' e_load_study];
     cb_precomp     = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_precomp(STUDY, ALLEEG);'                e_load_study];
