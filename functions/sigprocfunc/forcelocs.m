@@ -3,18 +3,26 @@
 %
 % Usage:
 %   >> chanlocs = forcelocs( chanlocs ); % pop-up window mode
-%   >> chanlocs = forcelocs( filename, loc1, loc2, ... );
+%   >> chanlocs = forcelocs( chanlocs, loc1, loc2, ... );
+% Example:
+%   >> chanlocs = forcelocs( chanlocs, { 0.78, 'x', 'A1' }, { 0.023, 'x', ...
+%   'B1','B2','Cz' } );
 %
 % Inputs:
 %   chanlocs  - EEGLAB channel structure. See help readlocs()
 %
 % Optional inputs:
-%   loc1      - cell array. First element is spherical horizontal angle;
-%               second element is spherical elevation angle 
-%               (90 = vertical); other elements are channel indices or
-%               name. If several channel names are given, the function
-%               set the average of channel horizontal angle and elevation
-%               to the new values given as input.
+%   loc1      - cell array: { location, axis, channame1, channame2, .. } 
+%               'location' is new cartesian coordinate of channame1 along 'axis'
+%               'axis' is either
+%                 'X'   New x-coordinate of channame1, used to calculate the 
+%                       X-Z plane angle by which to rotate channame1, channame2, etc.
+%                       Note that all rotations are to the corresponding positive 
+%                       Z-value, since theta=atan(z/x).
+%                 'Y'   New y-coordinate of channame1, used to calculate the angle  
+%                       Y-Z plane angle by which to rotate channame1, channame2, etc.
+%               'channame#'  Name of channel(s) to be rotated, as they appear in 
+%                       chanlocs.label
 %   loc2      - same as loc1
 %
 % Outputs:
@@ -43,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2005/05/24 17:13:02  arno
+% cell2mat -> celltomat
+%
 % Revision 1.10  2005/01/28 00:36:45  arno
 % same
 %
@@ -173,21 +184,25 @@ function chanlist = getchans(chanliststr, channelnames);
 
 % function rotate coordinates
 % ---------------------------
-function [X,Y] = rotation(x,y,rotangle);
+function [X,Y] = rotation(x,y,rotangle)
     X = real((x+j*y)*exp(j*rotangle));
     Y = imag((x+j*y)*exp(j*rotangle));
     
 % function solvesyst
 % ------------------
-function theta = solvesystem(x,y,nx);
-    eq(1,:) = [x -y]; res(1) = nx;
-    eq(2,:) = [y x];  res(2) = sqrt(x^2+y^2-nx^2);
-    sol = eq\res';
-    theta = atan2(sol(2), sol(1));
+function theta = solvesystem(x,y,nx)
+    % Original Solution
+    %eq(1,:) = [x -y]; res(1) = nx;
+    %eq(2,:) = [y x];  res(2) = sqrt(x^2+y^2-nx^2);
+    %sol = eq\res';
+    %theta = atan2(sol(2), sol(1));
     
-    % simplier solution
+    % simplified solution
     ny = sqrt(x^2+y^2-nx^2);
     ang1 = angle(x+j*y);
     ang2 = angle(nx+j*ny);
     theta = ang2-ang1;
+    
+    % Even simpler solution     Toby 03/05/2007
+    % theta = atan(y/x);
     
