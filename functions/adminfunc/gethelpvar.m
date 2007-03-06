@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2002/05/21 19:23:09  arno
+% matlab PC compatibility
+%
 % Revision 1.2  2002/04/23 00:22:13  arno
 % adding carraige return in text
 %
@@ -120,7 +123,7 @@ while (str(1) == '%')
          [tok1 strrm] = strtok( str );
          [tok2 strrm] = strtok( strrm );
 
-         if ~isempty(tok2) & ( tok2 == '-' | tok2 == '=') % new variable 
+         if ~isempty(tok2) & ( isequal(tok2,'-') | isequal(tok2,'=')) % new variable 
             newvar = 1;
             oldvarname = varname;
             oldvartext = vartext;
