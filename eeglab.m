@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.499  2007/03/07 17:28:59  scott
+% typo
+%
 % Revision 1.498  2007/03/06 22:57:53  arno
 % upgrading to newtimef and newcrossf
 %
@@ -1700,6 +1703,7 @@ if (strcmpi(comp(1:3), 'GLN') & exist( [ eeglabpath 'functions/adminfunc' ] ) ==
     myaddpath( eeglabpath, 'readeetraklocs.m', 'functions/sigprocfunc');
     myaddpath( eeglabpath, 'eeg_checkset.m',   'functions/adminfunc');
     myaddpath( eeglabpath, 'pop_loadbci.m',    'functions/popfunc');
+    myaddpath( eeglabpath, 'timefreq.m',       'functions/timefreqfunc');
     myaddpath( eeglabpath, 'pop_study.m',      'functions/studyfunc');
     myaddpath( eeglabpath, 'icademo.m',        'functions/miscfunc');
     myaddpath( eeglabpath, 'VolumeMNI.bin',    'functions/resources');
@@ -1708,6 +1712,7 @@ elseif (strcmpi(computer, 'pcwin') & exist( [ eeglabpath 'functions\adminfunc' ]
     myaddpath( eeglabpath, 'eeg_checkset.m',   'functions\adminfunc');
     myaddpath( eeglabpath, 'pop_study.m',      'functions\studyfunc');
     myaddpath( eeglabpath, 'pop_loadbci.m',    'functions\popfunc');
+    myaddpath( eeglabpath, 'timefreq.m',       'functions\timefreqfunc');
     myaddpath( eeglabpath, 'icademo.m',        'functions\miscfunc');
     myaddpath( eeglabpath, 'eeglab1020.ced',   'functions\resources');
 else
