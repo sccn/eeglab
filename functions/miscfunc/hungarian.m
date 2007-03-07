@@ -22,6 +22,9 @@
 % me by email. /Niclas
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 function [C,T]=hungarian(A)
 
@@ -363,7 +366,7 @@ while (1)
     
     % If this was the first zero of the path..
     if (LR(r)<0)
-        ...remove row from unassigned row list and return.
+        % remove row from unassigned row list and return.
         U(n+1)=U(r);
         U(r)=0;
         return;
