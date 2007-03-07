@@ -214,6 +214,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.122  2007/03/07 20:50:14  arno
+% replace subplot with axes
+%
 % Revision 1.121  2007/02/05 16:17:55  arno
 % unit for compoent (ERP unit)
 %
@@ -1885,7 +1888,7 @@ function plotallcurves(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
       %%%%%%%%%%%%%%% plot a topoplot() %%%%%%%%%%%%%%%%%%%%%%%
       %
       if (~isempty(g.topovec))
-          h(12) = subplot('Position',[-.1 .43 .2 .14].*s+q);
+          h(12) = axes('Position',[-.1 .43 .2 .14].*s+q);
           if length(g.topovec) == 1
               topoplot(g.topovec,g.elocs,'electrodes','off', ...
                        'style', 'blank', 'emarkersize1chan', 10);
