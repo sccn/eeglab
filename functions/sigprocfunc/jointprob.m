@@ -3,8 +3,8 @@
 %              using the probability distribution of all columns).
 %
 % Usage:
-%   >>  [rej jp] = jointprob( signal );
-%   >>  [rej jp] = jointprob( signal, threshold, jp, normalize, discret);
+%   >>  [jp rej] = jointprob( signal );
+%   >>  [jp rej] = jointprob( signal, threshold, jp, normalize, discret);
 %  
 %
 % Inputs:
@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2007/03/05 19:00:54  arno
+% error message
+%
 % Revision 1.2  2002/04/18 18:26:40  arno
 % typo can not
 %
