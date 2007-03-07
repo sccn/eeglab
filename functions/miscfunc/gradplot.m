@@ -37,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2007/03/07 01:25:37  toby
+% bug 149, courtesy Ronny Lindner
+%
 % Revision 1.9  2004/03/22 03:32:15  scott
 % shrink commandline message edit
 %
@@ -111,7 +114,9 @@ end;
 xi = linspace(-0.5,0.5,GRID_SCALE);   % x-axis description (row vector)
 yi = linspace(-0.5,0.5,GRID_SCALE);   % y-axis description (row vector)
 delta = xi(2)-xi(1); % length of grid entry
-
+horizidx=zeros(1, NCHANS); %preallocation
+vertidx=zeros(1, NCHANS); % preallocation
+    
 for c=1:NCHANS
    [useless_var horizidx(c)] = min(abs(y(c) - xi)); % find pointers to electrode
    [useless_var  vertidx(c)] = min(abs(x(c) - yi));  % positions in Zi
