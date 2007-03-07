@@ -4,8 +4,8 @@
 %        >> [result varargin] = finputcheck( varargin, fieldlist, ... 
 %                                                         callingfunc, mode );
 % Input:
-%   varargin  - 'varargin' argument from a function call using 'key', 'value'
-%               argument pairs.
+%   varargin  - Cell array 'varargin' argument from a function call using 'key', 
+%               'value' argument pairs. See Matlab function 'varargin'
 %   fieldlist - A 4-column cell array, one row per 'key'. The first
 %               column contains the key string, the second its type(s), 
 %               the third the accepted value range, and the fourth the 
@@ -26,11 +26,15 @@
 % Note: In case of error, a string is returned containing the error message
 %       instead of a structure.
 %
-% Example:
-%	g = finputcheck(varargin, ...
+% Example (insert the following at the beginning of your function):
+%	result = finputcheck(varargin, ...
 %               { 'title'         'string'   []       ''; ...
 %                 'percent'       'real'     [0 1]    1 ; ...
 %                 'elecamp'       'integer'  [1:10]   [] });
+%   if isstr(result)
+%       error(result);
+%   end
+%
 % Note: 
 %   The 'title' argument should be a string. {no default value}
 %   The 'percent' argument should be a real number between 0 and 1. {default: 1}
@@ -59,6 +63,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2007/01/26 17:59:20  arno
+% msg wording
+%
 % Revision 1.27  2006/09/30 07:38:52  toby
 % help message edit
 %
