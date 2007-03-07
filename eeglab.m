@@ -6,12 +6,12 @@
 %   University of California San Diego (http://sccn.ucsd.edu/). 
 %   User feedback welcome: email eeglab@sccn.ucsd.edu
 %
-% Authors: Arnaud Delorme, Scott Makeig, with substantial contributions
+% Authors: Arnaud Delorme and Scott Makeig, with substantial contributions
 %   from Colin Humphries, Sigurd Enghoff, Tzyy-Ping Jung, plus contributions 
-%   from Tony Bell, Te-Won Lee, Luca Finelli and other contributors. 
+%   from Tony Bell, Te-Won Lee, Luca Finelli and many other contributors. 
 %
 % Description:
-%   EEGLAB is Matlab software for processing continuous or event-related 
+%   EEGLAB is Matlab-based software for processing continuous or event-related 
 %   EEG or other physiological data. It is designed for use by both novice and 
 %   expert Matlab users. In normal use, the EEGLAB graphic interface calls 
 %   graphic functions via pop-up function windows. The EEGLAB history mechanism 
@@ -107,7 +107,7 @@
 % pop_timtopo()   - plot ERP and scalp maps  (timtopo())
 % pop_topoplot()  - plot scalp maps (topoplot())
 % pop_snapread()  - read Snapmaster .SMA files (snapread())
-% pop_newcrossf() - event-realted cross-coherence (newcrossf())
+% pop_newcrossf() - event-related cross-coherence (newcrossf())
 % pop_spectopo()  - plot all channel spectra and scalp maps (spectopo())
 % pop_plottopo()  - plot a data epoch in a topographic array (plottopo())
 % pop_readedf()   - read .EDF EEG data format (readedf())
@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.498  2007/03/06 22:57:53  arno
+% upgrading to newtimef and newcrossf
+%
 % Revision 1.497  2007/02/20 14:17:43  arno
 % enable more menus for study (resample, baseline)
 %
