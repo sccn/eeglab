@@ -122,6 +122,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.75  2007/03/07 03:25:35  toby
+% bug151, courtesy Ronny Lindner
+%
 % Revision 1.74  2007/01/30 03:00:41  toby
 % help edit
 %
@@ -406,11 +409,11 @@ if isstr(values)
                                        'transform'    'real'    []                         DEFAULT_TRANSFORM;
                                        'comment'      'string'  []                         '' });
     if isstr(g), 
+        fprintf(g);
         clear g; 
         g.comment   = varargin{2}; 
         g.orilocs   = 'off';
         g.meshfile  = DEFAULT_MESH;
-        error(g);
     end;
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
