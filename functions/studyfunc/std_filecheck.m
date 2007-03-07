@@ -57,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2006/11/16 01:01:57  arno
+% same
+%
 % Revision 1.4  2006/11/16 01:00:54  arno
 % more detailed message
 %
@@ -86,7 +89,8 @@ function [ res, params2 ] = std_filecheck(filename, params2, guiflag, ignorefiel
     if ~exist( filename ), res = guiflag; return; end;
         
     params1 = load('-mat', filename, 'parameters');
-    params1 = struct(params1.parameters{:});
+    params1 = finputcheck( params1.parameters, { 'tmp' 'real' [] NaN}, '', 'ignore'); % allow to tackle duplicate fields
+    params1 = rmfield(params1, 'tmp');
     if iscell(params2), params2 = struct(params2{:}); end;
     
     % test if the fields are different
