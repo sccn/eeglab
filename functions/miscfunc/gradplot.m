@@ -37,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2004/03/22 03:32:15  scott
+% shrink commandline message edit
+%
 % Revision 1.8  2004/01/29 21:16:54  scott
 % more
 %
@@ -79,8 +82,10 @@ MAX_RADIUS = 0.5;
 % Read the electrode location file
 % --------------------------------
 if isstr(locs_file) % a locs file
-        [tmpeloc labels Th Rd ind] = readlocs(locs_file,'filetype','loc');
-	[x,y] = pol2cart(Th,Rd);
+        [tmpeloc labels Th Rd ind] = readlocs(locs_file,'filetype', ...
+                                              'loc');
+        [x,y] = pol2cart(Th/180*pi,Rd); % See Bug 149
+	% [x,y] = pol2cart(Th,Rd);
 elseif isstruct(locs_file)  % a locs struct
         [tmpeloc labels Th Rd ind] = readlocs(locs_file);
         if max(abs(Rd))>0.5
