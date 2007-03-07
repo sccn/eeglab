@@ -39,6 +39,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2005/05/24 17:47:36  arno
+% remove cell2map
+% ./
+%
 % Revision 1.3  2004/07/26 18:10:28  arno
 % debug for eeglab
 %
@@ -71,13 +75,15 @@ else
     fe = find(cellfun('isempty', { tmploc.theta }));
     tmploc(fe) = [];
     map(fe,:) = [];
-	[x,y] = pol2cart( [ tmploc.theta ] , [ tmploc.radius ] );
+    [x,y] = pol2cart( [ tmploc.theta ]/180*pi , [ tmploc.radius ] );
 end;	
 
 % locates nearest position of electrod in the grid 
 % ------------------------------------------------
 xi = linspace(-0.5,0.5,GRID_SCALE);   % x-axis description (row vector)
 yi = linspace(-0.5,0.5,GRID_SCALE);   % y-axis description (row vector)
+horizidx=zeros(1, MAXCHANS); %preallocation
+vertidx=zeros(1, MAXCHANS); % preallocation
 for i=1:MAXCHANS
    [useless_var horizidx(i)] = min(abs(y(i) - xi));    % find pointers to electrode
    [useless_var vertidx(i)] = min(abs(x(i) - yi));     % positions in Zi
