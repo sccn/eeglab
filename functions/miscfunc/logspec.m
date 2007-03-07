@@ -6,14 +6,15 @@
 %        >> [spectra,freqs] = logspec(data,frames,srate,'title',...
 %                                    [loHz-hiHz],'chan_locs',rm_mean);
 % Inputs:
-%          data   = input data (chans,frames*epochs)
-%          frames = data samples per epoch   {default length(data)}
-%          srate  = data sampling rate in Hz {default 256 Hz};
-%         'title' = plot title {default: none}
-%     [loHz-hiHz] = [loHz hiHz] plotting limits {default: [0:srate/2]}
-%     'chan_locs' = channel location file (ala topoplot()) 
+%    data   = input data (chans,frames*epochs)
+%    frames = data samples per epoch   {default length(data)}
+%    srate  = data sampling rate in Hz {default 256 Hz};
+%    'title' = plot title {default: none}
+%    [loHz-hiHz] = [loHz hiHz] plotting limits 
+%       {default: [srate/fftlength srate/2]}
+%    'chan_locs' = channel location file (ala topoplot()) 
 %                   Else [rows cols] to plot data in a grid array
-%         rm_mean = [0/1] 1 -> remove log mean spectrum from all
+%    rm_mean = [0/1] 1 -> remove log mean spectrum from all
 %
 % Author: Scott Makeig, SCCN/INC/UCSD, La Jolla, 11-07-97 
 %
@@ -36,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % Changed plotdata() below to plottopo() 11/12/99 -sm
 % Mentioned new grid array option 12/22/99 -sm
