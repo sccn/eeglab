@@ -92,6 +92,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2006/03/11 06:40:45  arno
+% close input file
+%
 % Revision 1.21  2003/03/06 01:32:51  arno
 % header typo
 %
@@ -259,7 +262,7 @@ while (str(1) == '%')
 	  	 i2d = i2d(1);
 	  	 switch lower(str(1:i2d))
 	  		case { 'usage:' 'authors:' 'author:' 'notes:' 'note:' 'input:' ...
-	  		'inputs:' 'outputs:' 'output' 'example:' 'examples:' 'see also:' }, newtitle = 1;
+	  		'inputs:' 'outputs:' 'output:' 'example:' 'examples:' 'see also:' }, newtitle = 1;
 		 end;
 		 if (i2d == length(str)) & (str(1) ~= '%'), newtitle = 1; end;	
    	  end;
