@@ -214,6 +214,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.121  2007/02/05 16:17:55  arno
+% unit for compoent (ERP unit)
+%
 % Revision 1.83  2006/06/28 01:54:32  toby
 % Bug fix, help section edit
 %
@@ -1455,7 +1458,7 @@ function g = plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
       %%%%%%% image the ERSP %%%%%%%%%%%%%%%%%%%%%%%%%%
       %
       
-      h(1) = subplot('Position',[.1 ordinate1 .9 height].*s+q);
+      h(1) = axes('Position',[.1 ordinate1 .9 height].*s+q);
       set(h(1), 'tag', 'ersp');
       
       PP = P;
@@ -1519,7 +1522,7 @@ function g = plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
       %%%%% plot marginal ERSP mean below ERSP image %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
       %
 
-      h(4) = subplot('Position',[.1 ordinate1-0.1 .8 .1].*s+q);
+      h(4) = axes('Position',[.1 ordinate1-0.1 .8 .1].*s+q);
       
       E = [min(P(:,:),[],1);max(P(:,:),[],1)];
 
@@ -1547,7 +1550,7 @@ function g = plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
 
       if ~isnan(E)
           
-          h(5) = subplot('Position',[0 ordinate1 .1 height].*s+q);
+          h(5) = axes('Position',[0 ordinate1 .1 height].*s+q);
       
           % ploting limits
           if isempty(g.speclim)
@@ -1602,7 +1605,7 @@ function g = plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
       %
       %%%%%%%%%%%% Image the ITC %%%%%%%%%%%%%%%%%%
       %
-      h(6) = subplot('Position',[.1 ordinate2 .9 height].*s+q); % ITC image
+      h(6) = axes('Position',[.1 ordinate2 .9 height].*s+q); % ITC image
       set(h(1), 'tag', 'itc');
 
       if abs(R(1,1)-1) < 0.0001, g.plotphase = 'on'; end;
@@ -1694,7 +1697,7 @@ function g = plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
       %%%%% plot the ERP below the ITC image %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
       %
 
-      h(10) = subplot('Position',[.1 ordinate2-0.1 .8 .1].*s+q); % ERP
+      h(10) = axes('Position',[.1 ordinate2-0.1 .8 .1].*s+q); % ERP
 
       if isempty(g.erplim)
           ERPmax = max(ERP);
@@ -1724,7 +1727,7 @@ function g = plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
       %%%%% plot the marginal mean ERP below the ITC image %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
       %
 
-      h(11) = subplot('Position',[0 ordinate2 .1 height].*s+q); % plot the marginal mean
+      h(11) = axes('Position',[0 ordinate2 .1 height].*s+q); % plot the marginal mean
                                                                 % ITC left of the ITC image
       
       % set plotting limits
@@ -1774,7 +1777,7 @@ function g = plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
       %%%%%%%%%%%%%%% plot a topoplot() %%%%%%%%%%%%%%%%%%%%%%%
       %
       if (~isempty(g.topovec))
-          h(12) = subplot('Position',[-.1 .43 .2 .14].*s+q);
+          h(12) = axes('Position',[-.1 .43 .2 .14].*s+q);
           if length(g.topovec) == 1
               topoplot(g.topovec,g.elocs,'electrodes','off', ...
                        'style', 'blank', 'emarkersize1chan', 10, 'chaninfo', g.chaninfo);
