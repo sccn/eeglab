@@ -230,7 +230,7 @@
 
 %    Deprecated time warp keywords (working?)
 %      'timewarpfr' = {{[events], [warpfr], [plotidx]}} Time warp amplitude and phase
-%                     time-courses (after time/freq transform but before smoothing
+%                     time-courses (after time/freq transform but before smoothingtimefreqfunc
 %                     across trials). 'events' is a matrix whose columns specify the
 %                     epoch frames [1 ... end] at which a series of successive events
 %                     occur in each trial. 'warpfr' is an optional vector of event
@@ -275,6 +275,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.125  2007/03/08 03:34:55  arno
+% axis off  Courtesy Makoto Miyakoshi
+%
 % Revision 1.124  2007/03/07 20:59:32  arno
 % Undo fork of function; The 3 last revisions are missing bu it is OK
 % Here fixed again the label for the ERPs and the axes problem for Matlab 7.3
