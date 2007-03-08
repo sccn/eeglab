@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2006/12/16 07:36:21  toby
+% Fixed partial data event problem, documentation update.
+%
 % Revision 1.15  2006/12/16 04:16:37  toby
 % Help edit.
 %
@@ -260,6 +263,7 @@ end;
 
 % convert data to single if necessary
 % -----------------------------------
+EEG = eeg_checkset(EEG,'makeur');   % Make EEG.urevent field
 EEG = eeg_checkset(EEG);
 
 % history
