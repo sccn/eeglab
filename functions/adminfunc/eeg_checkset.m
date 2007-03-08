@@ -1,7 +1,8 @@
 % eeg_checkset()   - check the consistency of the fields of an EEG dataset 
 %                    Also: See EEG dataset structure field descriptions below.
 %
-% Usage: >> [EEGOUT,result] = eeg_checkset(EEG);            % perform all checks
+% Usage: >> [EEGOUT,result] = eeg_checkset(EEG); % perform all checks
+%                                                  except 'makeur'
 %        >> [EEGOUT,result] = eeg_checkset(EEG, 'keyword'); % perform 'keyword' check(s)
 %
 % Inputs:
@@ -149,6 +150,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.209  2007/03/06 03:13:16  arno
+% dipfitdefs check
+%
 % Revision 1.208  2007/02/23 19:03:38  scott
 % completed help msg -- added 'result' output and the fact that EEG can also be ALLEEG
 %
@@ -1515,8 +1519,8 @@ end;
                         EEG.icaweights = double(EEG.icaweights);
                         EEG.icawinv = double(EEG.icawinv);
                         if any(isnan(EEG.data(:)))
-                            fprintf('eeg_checkset: recomputing using NaN indices in first channel ...\n'); 
-                            tmpindices = find(~isnan(EEG.data(1,:)));
+                            fprintf('eeg_checkset: recomputing using NaN indices [in first channel] ...\n');
+                            tmpindices = find(~sum(isnan(EEG.data))); % was: tmpindices = find(~isnan(EEG.data(1,:)));
                             EEG.icaact = zeros(size(EEG.icaweights,1), size(EEG.data,2)); EEG.icaact(:) = NaN;
                             EEG.icaact(:,tmpindices) = (EEG.icaweights*EEG.icasphere)*EEG.data(:,tmpindices);
                         else
