@@ -30,6 +30,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2003/05/09 20:54:38  arno
+% adding hanning function
+%
 % Revision 1.3  2002/08/09 22:21:52  arno
 % implementing 0 zero phase
 %
@@ -82,3 +85,4 @@ else
    w = .5*(1 - cos(2*pi*(1:(n+1)/2)'/(n+1)));
    w = [w; w(end-1:-1:1)];
 end
+ 
