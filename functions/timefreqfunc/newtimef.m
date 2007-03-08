@@ -275,6 +275,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.124  2007/03/07 20:59:32  arno
+% Undo fork of function; The 3 last revisions are missing bu it is OK
+% Here fixed again the label for the ERPs and the axes problem for Matlab 7.3
+%
 % Revision 1.120  2006/11/28 21:13:52  arno
 % debugging ydir
 %
@@ -1666,6 +1670,7 @@ if g.plot
     pos = get(gca,'position');
     q = [pos(1) pos(2) 0 0];
     s = [pos(3) pos(4) pos(3) pos(4)];
+    axis off;
 end;
 
 switch lower(g.plotersp)
