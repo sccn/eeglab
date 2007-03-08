@@ -74,6 +74,10 @@
 % 5/06/04 completed the function -sm
 %
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2005/11/01 15:58:33  scott
+% fixed apparent bug in assigning trglt (was evlt); allowed target and neighbor strings
+% improved help message; turned off debug_print  -sm
+%
 % Revision 1.13  2005/10/26 21:15:20  scott
 % ignore 'boundary' type events
 %
@@ -116,13 +120,13 @@ if ~isstruct(EEG)
    error('first argument must be an EEG dataset structure');
 end
 if ~isfield(EEG,'event')
-   error('no EEG.event structure found');
+   error('No EEG.event structure found');
 end
 if ~isfield(EEG,'urevent')
-   error('no EEG.urevent structure found');
+   error('No EEG.urevent structure found');
 end
 if ~isfield(EEG.event,'urevent')
-   error('no EEG.event().urevent field found');
+   error('No EEG.event().urevent field found');
 end
       
 if EEG.trials == 1 | ~isfield(EEG.event(1),'epoch')
@@ -133,20 +137,20 @@ else
   epochinfo = 1;
 end
 if epochinfo & ~isfield(EEG,'epoch')
-  error('EEG.epoch information missing from this epoched dataset');
-end
-if epochinfo & ~isfield(EEG.epoch,'event')
-  error('EEG.epoch.event information missing from this epoched dataset');
+  error('No EEG.epoch information in this epoched dataset - run eeg_checkset()');
 end
 if epochinfo & ~isfield(EEG.epoch,'eventlatency')
-  error('EEG.epoch.eventlatency information missing from this epoched dataset');
+  error('No EEG.epoch.eventlatency information in this epoched dataset');
+end
+if epochinfo & ~isfield(EEG.epoch,'event')
+  error('No EEG.epoch.event information in this epoched dataset');
 end
 
 nevents   = length(EEG.event);
 nurevents = length(EEG.urevent);
-%if length(EEG.urevent) < nevents
-%  error('WARNING: In this dataset, number of urevents < number of events!?');
-%end
+if length(EEG.urevent) < nevents
+  fprintf('In this dataset there are more events than urevents. Check consistency.\n');
+end
 %
 %%%%%%%%%%%%%%%%%% Substitute input defaults %%%%%%%%%%%%%%%%%%%%
 %
