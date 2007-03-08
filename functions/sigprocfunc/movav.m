@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2007/03/06 17:50:17  scott
+% documented turning off the fastave feature -sm
+%
 % Revision 1.25  2007/03/06 17:48:25  scott
 % fixed ?????????? computation as suggested by AG  -sm
 %
@@ -133,11 +136,10 @@
 
 function [outdata,outx] = movav(data,xvals,xwidth,xadv,firstx,lastx,xwin,nonorm)
 
-MAXPRINT = 1; % max outframe numbers to print on tty
-NEARZERO = 1e-22;
-DEFAULT_XADV = 1; % default x window advance
-verbose = 0;  % If 1, output process info
-debugit = 0;  % If 1, output more process info
+MAXPRINT = 1;     % max outframe numbers to print on tty
+NEARZERO = 1e-22; %
+DEFAULT_XADV = 1; % default xvals window step advance
+verbose = 0;      % If 1, output process info
 
 nanexist = 0;  
 if nargin<1
@@ -255,10 +257,6 @@ if verbose,
   end
   fprintf(' and a window advance of %g\n',xadv);
 end
-if debugit
-   fprintf('   firstx = %g, lastx= %g, xwidth = %g xadv = %g\n',...
-                   firstx,lastx,xwidth,xadv);
-end
 %
 %%%%%%%%%%%%%%%%%%% Perform averaging %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -274,14 +272,8 @@ for f=1:outframes
    if length(i)==0,
       if f>1,
        outdata(:,f) = outdata(:,f-1); % If no data, replicate
-       if debugit,
-          fprintf('r');
-       end
       else
        outdata(:,f) = zeros(chans,1); %  or else output zeros
-       if debugit
-         fprintf('0');
-       end
       end
    elseif length(xwin)==1,
       if flag_fastave > 0
@@ -293,16 +285,11 @@ for f=1:outframes
       end
       if nonorm & nix % undo division by number of elements summed
           outdata(:,f) = outdata(:,f)*nix;
-      if debugit, fprintf('n'); end;
       end
-      if debugit, fprintf('.'); end;
 %
 %%%%%%%%%%%%%%%%% Windowed averaging %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
    else % length(xwin) > 1
-       if debugit
-         fprintf('i %g, f %g\n',i,f);
-       end
        wadv=(hix-lox)/wlen;
        ix = floor((xvals(i)-lox)/wadv)+1; % AG fix 3/6/07
        if length(xwin)>1
