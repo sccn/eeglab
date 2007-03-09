@@ -35,6 +35,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % 5-25-96 added chanlist, epochlist -sm
 % 10-05-97 added out of bounds tests for chanlist and framelist -sm
@@ -48,13 +51,9 @@ if nargin<1
   return
 end
 
+[chans framestot] = size(data);
 if isempty(data)
   fprintf('matsel(): empty data matrix!?\n')
-  return
-end
-
-[chans framestot] = size(data);
-if chans<1 
   help matsel
   return
 end
