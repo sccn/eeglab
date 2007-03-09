@@ -133,6 +133,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2007/03/06 18:56:01  arno
+% *** empty log message ***
+%
 % Revision 1.18  2007/03/02 22:42:56  arno
 % trying to fix the function
 %
@@ -562,9 +565,9 @@ coords = g.coordinates;
 g.coordinates = {};
 for i=1:nbconditions
     
-    % plot 3d head
+    % plot 3d head (*0.9 added for Nick - Arno).
     % ------------
-	hh(i) = axes('position', [0+maxcoordx/nbconditions*(i-1), ordinate, maxcoordx/nbconditions, max_ordinate].*s+q );
+	hh(i) = axes('position', [0+maxcoordx/nbconditions*(i-1), ordinate, maxcoordx/nbconditions*0.9, max_ordinate].*s+q );
     gr = [ 0.3 0.3 0.3 ];
     g.dipplotopt = { 'gui', 'off', 'image', 'fullmri', 'cornermri', 'on', 'color', { gr gr gr gr gr gr gr gr gr } };
     if iscell(coords)
@@ -954,7 +957,8 @@ function handles = drawconnections( pos1, pos2, crossfpower, crossfangle, circfa
 		case 'on',  tmpcolor  = g.colmapcrossf( sizec/2+ ceil(tmpthick*(sizec/2-1)+1)*sign(crossfpower), : );    % determine color = coherence phase
 		case 'off', tmpcolor  = g.colmapcrossf( sizec/2, : );
 	end;
-	tmpthick = 30 * (tmpthick-0.1); % does not vary with the axis zoom
+	%tmpthick = 30 * (tmpthick-0.1); % does not vary with the axis zoom
+	tmpthick = 30 * (tmpthick); % adjusted for Nick
 	
 	% absolute value to 90 degree determine speed
 	switch lower(g.crossfphasespeed)
