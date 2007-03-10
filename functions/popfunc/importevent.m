@@ -31,8 +31,13 @@
 %  'indices'  - {integer vector] Vector indicating the indices of the events to
 %               modify. 
 %  'align'    - [num] Align the first event latency to the latency of existing 
-%               event number (num), and check latency consistency. See also the 
-%               GUI help above.
+%               event number (num), and check latency consistency. 
+%               A value of 0 indicates that the first events of the pre-defined 
+%               events and imported events will be aligned. A positive value (num)
+%               aligns the first event to the num-th pre-existing event. 
+%               A negative value can also be used; then event number (-num) 
+%               is aligned to the first pre-existing event.  Default is 0. 
+%               (NaN-> no alignment).
 %  'optimalign' - ['on'|'off'] Optimize the sampling rate of the new events so 
 %               they best align with old events. Default is 'on'.
 %
@@ -73,7 +78,7 @@
 
 % $Log: importevent.m,v 
 
-function event = importevent(event, oldevent, srate, varargin);
+function event = importevent(event, oldevent, srate, varargin)
 
 if nargin < 1
    help importevent;
@@ -172,12 +177,12 @@ for curfield = tmpfields'
                       % add new values
                       % ---------------------
                       for eventfield = 1:size(tmparray,2)
-                          if isstr(tmparray{1,eventfield})
+                          %if isstr(tmparray{1,eventfield})
                               for indtmp = 1:length(g.indices)
                                   event = setstruct( event, g.fields{eventfield}, g.indices(indtmp), tmparray{indtmp,eventfield});
                               end;
-                          else event = setstruct( event, g.fields{eventfield}, g.indices, [ tmparray{:,eventfield} ]);
-                          end;
+                          %else event = setstruct( event, g.fields{eventfield}, g.indices, [ tmparray{:,eventfield} ]);
+                          %end;
                       end;      
 					  % generate ori fields
 					  % -------------------
@@ -210,7 +215,7 @@ if isfield(event, 'latency')
     end;
 end;
 
-% interpret the variable name
+%% interpret the variable name
 % ---------------------------
 function array = load_file_or_array( varname, skipline, delim );
     if isstr(varname) & exist(varname) == 2  % mean that it is a filename
@@ -230,7 +235,7 @@ function array = load_file_or_array( varname, skipline, delim );
     end;     
 return;
 
-% update latency values
+%% update latency values
 % ---------------------
 function event = recomputelatency( event, indices, srate, timeunit, align, oldevents, optimalign);
 
@@ -319,7 +324,7 @@ function event = recomputelatency( event, indices, srate, timeunit, align, oldev
     end;        
 
          
-% create new field names
+%% create new field names
 % ----------------------
 function epochfield = getnewfields( epochfield, nbfields )
    count = 1;
@@ -331,10 +336,18 @@ function epochfield = getnewfields( epochfield, nbfields )
        end;                    
    end;     
 return;
-    
+
+%%
+% ----------------------
 function var = setstruct( var, fieldname, indices, values )
     if exist('indices') ~= 1, indices = 1:length(var); end;
-    for index = 1:length(indices)
-        var = setfield(var, {indices(index)}, fieldname, values(index));
-    end;
+    if ~isempty(values)
+        for index = 1:length(indices)
+            var = setfield(var, {indices(index)}, fieldname, values(index));
+        end
+    else
+        for index = 1:length(indices)
+            var = setfield(var, {indices(index)}, fieldname, values);
+        end
+    end
 return;
