@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.45  2007/02/28 12:03:11  arno
+% removing datasets
+%
 % Revision 1.43  2006/11/08 22:50:20  arno
 % now seting indexes
 %
@@ -274,15 +277,18 @@ for k = 1:2:length(g.commands)
                             if (ALLEEG(idat).dipfit.model(icomp).rv < rv)
                                 % Restrict search to chosen components, if components have already been chosen.
                                 % Toby 03.21.2006
-                                if isempty(STUDY.datasetinfo(idat).comps)
-                                   indleft = [indleft icomp];
-                                else
-                                    for isdc = 1:length(STUDY.datasetinfo(idat).comps)
-                                        if icomp == STUDY.datasetinfo(idat).comps(isdc)
-                                            indleft = [indleft STUDY.datasetinfo(idat).comps(isdc)];
-                                        end
-                                    end
-                                end
+                                % Undoing that because after selecting components < 15%, it is not possible to
+                                % select component below 20% of RV - Arno 
+                                indleft = [indleft icomp];
+                                %if isempty(STUDY.datasetinfo(idat).comps)
+                                %   indleft = [indleft icomp];
+                                %else
+                                    %for isdc = 1:length(STUDY.datasetinfo(idat).comps)
+                                    %    if icomp == STUDY.datasetinfo(idat).comps(isdc)
+                                    %       indleft = [indleft STUDY.datasetinfo(idat).comps(isdc)];
+                                    %    end
+                                    %end
+                                %end
                             end;
                         end;
                     else
