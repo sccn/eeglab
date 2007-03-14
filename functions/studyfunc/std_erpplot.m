@@ -83,6 +83,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2007/02/28 12:03:41  arno
+% output statistics and documentation
+%
 % Revision 1.33  2007/01/26 18:04:33  arno
 % reprogrammed from scractch (again)
 %
@@ -225,7 +228,7 @@ else
     % plot component
     % --------------
     opt.legend = 'off';
-    if length(allinds) > 1, figure('color', 'w'); opt.plotmode = 'condensed'; end;
+    if length(allinds) > 1, figure('color', 'w'); opt.plotmode = 'condensed'; plotcurveopt = { plotcurveopt{:} 'figure' 'off' }; end;
     nc = ceil(sqrt(length(allinds)));
     nr = ceil(length(allinds)/nc);
     comp_names = {};

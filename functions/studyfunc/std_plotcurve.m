@@ -65,6 +65,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2007/02/28 12:04:38  arno
+% do not output statistics
+%
 % Revision 1.1  2007/01/26 18:08:28  arno
 % Initial revision
 %
@@ -177,6 +180,7 @@ opt = finputcheck( varargin, { 'channels'    'cell'   []              {};
                                'condstats'    'cell'   []              {};
                                'interstats'   'cell'   []              {};
                                'plottopo'     'string' { 'on' 'off' }   'off';
+                               'figure'       'string' { 'on' 'off' }   'on';
                                'legend'      'string' { 'on' 'off' }   'off';
                                'datatype'    'string' { 'ersp' 'itc' 'erp' 'spec' }    'erp';
                                'plotgroups'   'string' { 'together' 'apart' }  'apart';
@@ -200,8 +204,8 @@ manycol = { 'b' 'r' 'g' 'k' 'c' 'y' };
 
 nc = size(data,1);
 ng = size(data,2);
-if nc >= ng, opt.transpose = 'on';
-else         opt.transpose = 'off';
+if nc >= ng, opt.subplot = 'transpose';
+else         opt.subplot = 'normal';
 end;
 if isempty(opt.condnames)
     for c=1:nc, opt.condnames{c} = sprintf('Cond. %d', c); end;
@@ -272,25 +276,29 @@ end;
 
 % adjust figure size
 % ------------------
-figure('color', 'w');
-pos = get(gcf, 'position');
-basewinsize = 200/max(nc,ng)*3;
-if strcmpi(opt.plotgroups, 'together') pos(3) = 200*(1+addc);
-else                                   pos(3) = 200*(ng+addc);
-end;
-if strcmpi(opt.plotconditions , 'together') pos(4) = 200*(1+addr);
-else                                        pos(4) = 200*(nc+addr);
-end;
-if strcmpi(opt.transpose, 'on'), set(gcf, 'position', [ pos(1) pos(2) pos(4) pos(3)]);
-else                             set(gcf, 'position', pos);
+if strcmpi(opt.figure, 'on')
+    figure('color', 'w');
+    pos = get(gcf, 'position');
+    basewinsize = 200/max(nc,ng)*3;
+    if strcmpi(opt.plotgroups, 'together') pos(3) = 200*(1+addc);
+    else                                   pos(3) = 200*(ng+addc);
+    end;
+    if strcmpi(opt.plotconditions , 'together') pos(4) = 200*(1+addr);
+    else                                        pos(4) = 200*(nc+addr);
+    end;
+    if strcmpi(opt.subplot, 'transpose'), set(gcf, 'position', [ pos(1) pos(2) pos(4) pos(3)]);
+    else                                  set(gcf, 'position', pos);
+    end;
+else
+    opt.subplot = 'noplot';
 end;
 
 tmplim = [Inf -Inf];
 for c = 1:ncplot
     for g = 1:ngplot
-        if strcmpi(opt.plotgroups, 'together'),         hdl(c,g)=mysubplot(ncplot+addr, ngplot+addc, 1 + (c-1)*(ngplot+addc), opt.transpose); ci = g;
-        elseif strcmpi(opt.plotconditions, 'together'), hdl(c,g)=mysubplot(ncplot+addr, ngplot+addc, g, opt.transpose); ci = c;
-        else                                            hdl(c,g)=mysubplot(ncplot+addr, ngplot+addc, g + (c-1)*(ngplot+addc), opt.transpose); ci = 1;
+        if strcmpi(opt.plotgroups, 'together'),         hdl(c,g)=mysubplot(ncplot+addr, ngplot+addc, 1 + (c-1)*(ngplot+addc), opt.subplot); ci = g;
+        elseif strcmpi(opt.plotconditions, 'together'), hdl(c,g)=mysubplot(ncplot+addr, ngplot+addc, g, opt.subplot); ci = c;
+        else                                            hdl(c,g)=mysubplot(ncplot+addr, ngplot+addc, g + (c-1)*(ngplot+addc), opt.subplot); ci = 1;
         end;
         
         if ~isempty(data{c,g})
@@ -383,9 +391,9 @@ for c = 1:ncplot
         % -------------------------
         if g == ngplot & ng > 1 & ~isempty(opt.groupstats)            
             if ~strcmpi(opt.plotgroups, 'together') | ~isempty(opt.condstats) | isnan(opt.threshold)
-                if strcmpi(opt.plotgroups, 'together'),         mysubplot(ncplot+addr, ngplot+addc, 2 + (c-1)*(ngplot+addc), opt.transpose); ci = g;
-                elseif strcmpi(opt.plotconditions, 'together'), mysubplot(ncplot+addr, ngplot+addc, ngplot + 1, opt.transpose); ci = c;
-                else                                            mysubplot(ncplot+addr, ngplot+addc, ngplot + 1 + (c-1)*(ngplot+addc), opt.transpose); ci = 1;
+                if strcmpi(opt.plotgroups, 'together'),         mysubplot(ncplot+addr, ngplot+addc, 2 + (c-1)*(ngplot+addc), opt.subplot); ci = g;
+                elseif strcmpi(opt.plotconditions, 'together'), mysubplot(ncplot+addr, ngplot+addc, ngplot + 1, opt.subplot); ci = c;
+                else                                            mysubplot(ncplot+addr, ngplot+addc, ngplot + 1 + (c-1)*(ngplot+addc), opt.subplot); ci = 1;
                 end;
                 if strcmpi(opt.plotconditions, 'together'), condnames = 'Conditions'; else condnames = opt.condnames{c}; end;
                 if ~isnan(opt.threshold)
@@ -412,9 +420,9 @@ for g = 1:ng
     % -----------------------------
     if ~isempty(opt.condstats) & nc > 1
         if ~strcmpi(opt.plotconditions, 'together') | ~isempty(opt.groupstats) | isnan(opt.threshold)
-            if strcmpi(opt.plotgroups, 'together'),         mysubplot(ncplot+addr, ngplot+addc, 1 + c*(ngplot+addc), opt.transpose); ci = g;
-            elseif strcmpi(opt.plotconditions, 'together'), mysubplot(ncplot+addr, ngplot+addc, g + ngplot+addc, opt.transpose); ci = c;
-            else                                            mysubplot(ncplot+addr, ngplot+addc, g + c*(ngplot+addc), opt.transpose); ci = 1;
+            if strcmpi(opt.plotgroups, 'together'),         mysubplot(ncplot+addr, ngplot+addc, 1 + c*(ngplot+addc), opt.subplot); ci = g;
+            elseif strcmpi(opt.plotconditions, 'together'), mysubplot(ncplot+addr, ngplot+addc, g + ngplot+addc, opt.subplot); ci = c;
+            else                                            mysubplot(ncplot+addr, ngplot+addc, g + c*(ngplot+addc), opt.subplot); ci = 1;
             end;
             if strcmpi(opt.plotgroups, 'together'), groupnames = 'Groups'; else groupnames = opt.groupnames{g}; end;
             if ~isnan(opt.threshold)
@@ -456,7 +464,7 @@ end;
 % statistics accross group and conditions
 % ---------------------------------------
 if ~isempty(opt.groupstats) & ~isempty(opt.condstats) & ng > 1 & nc > 1
-    mysubplot(ncplot+addr, ngplot+addc, ngplot + 1 + ncplot*(ngplot+addr), opt.transpose);
+    mysubplot(ncplot+addr, ngplot+addc, ngplot + 1 + ncplot*(ngplot+addr), opt.subplot);
     if ~isnan(opt.threshold)
          tmptitle = sprintf('Interaction (p<%.4f)', opt.threshold);
          if strcmpi(opt.plottopo, 'on'), 
@@ -487,12 +495,14 @@ end;
 
 % mysubplot (allow to transpose if necessary)
 % -------------------------------------------
-function hdl = mysubplot(nr,nc,ind,transp);
+function hdl = mysubplot(nr,nc,ind,subplottype);
 
     r = ceil(ind/nc);
     c = ind -(r-1)*nc;
-    if strcmpi(transp, 'on'), hdl = subplot(nc,nr,(c-1)*nr+r);
-    else                      hdl = subplot(nr,nc,(r-1)*nc+c);
+    if strcmpi(subplottype, 'transpose'),  hdl = subplot(nc,nr,(c-1)*nr+r);
+    elseif strcmpi(subplottype, 'normal'), hdl = subplot(nr,nc,(r-1)*nc+c);
+    elseif strcmpi(subplottype, 'noplot'), hdl = gca;
+    else error('Unknown subplot type');
     end;
 
 % rapid filtering for ERP
