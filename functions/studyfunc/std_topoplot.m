@@ -60,6 +60,8 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+% $Log: not supported by cvs2svn $
+
 function STUDY = std_topoplot(STUDY, ALLEEG,  varargin)
 icadefs;
 
@@ -116,7 +118,7 @@ disp('Drawing components of cluster (all at once)...');
 if ~isfield(STUDY.cluster,'topo'), STUDY.cluster(1).topo = []; end;
 for clus = 1: length(cls) % For each cluster requested
     if isempty(STUDY.cluster(cls(clus)).topo)
-        STUDY = std_scalpcentroid(STUDY,ALLEEG, cls(clus));
+        STUDY = std_toporead(STUDY,ALLEEG, cls(clus));
     end;
 end
 if strcmpi(mode, 'apart')         
@@ -285,7 +287,7 @@ end
 % ---------------------------------------------------------------
 % ---------------------------------------------------------------
 % ---------------------------------------------------------------
-function [STUDY, centroid] = std_scalpcentroid(STUDY,ALLEEG, clsind, tmp);
+function [STUDY, centroid] = std_scalpcentroid(STUDY,ALLEEG, clsind);
 
 if isempty(clsind)
     for k = 2: length(STUDY.cluster) %don't include the ParentCluster
