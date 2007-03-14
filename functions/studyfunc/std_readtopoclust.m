@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2007/03/14 02:59:55  arno
+% reorganizaing code
+%
 % Revision 1.1  2007/03/14 02:46:53  arno
 % Initial revision
 %
@@ -102,8 +105,9 @@ for clust = 1:length(clsind) %go over all requested clusters
                         length(find(pol == -1)), length(pol));
                 nitems = length(centroid{clust}.topo);
                 for k = 1:nitems
-                    if k == 1, allscalp = pol(k)*centroid{clust}.topo{k}/nitems;
-                    else       allscalp = pol(k)*centroid{clust}.topo{k}/nitems + allscalp;
+                    centroid{clust}.topo{k} = pol(k)*centroid{clust}.topo{k};
+                    if k == 1, allscalp = centroid{clust}.topo{k}/nitems;
+                    else       allscalp = centroid{clust}.topo{k}/nitems + allscalp;
                     end;
                 end;
                 STUDY.cluster(clsind(clust)).topox   = centroid{clust}.topox;
