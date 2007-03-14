@@ -77,7 +77,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 %% $Log: not supported by cvs2svn $
+% Revision 1.7  2007/03/14 00:51:35  toby
+% Logging bug
 
+%% function definition, input check
 function event = importevent(event, oldevent, srate, varargin)
 
 if nargin < 1
@@ -87,7 +90,7 @@ end;
 
 I = [];
 
-%% remove the event field
+% remove the event field
 % ----------------------
 if ~isempty(oldevent), allfields = fieldnames(oldevent);
 else                   allfields = {}; end;
@@ -105,13 +108,13 @@ if isstr(g), error(g); end;
 if ~isempty(g.indices), g.append = 'yes'; end;
 g.delim = char(g.delim);    
 
-%% call from pop_importevent
+% call from pop_importevent
 % -------------------------
 if ~isempty(g.event)
     event = g.event;
 end;
 
-%% determine latency for old event alignment
+% determine latency for old event alignment
 % -----------------------------------------
 g.align.val = g.align;
 if ~isnan(g.align.val)
