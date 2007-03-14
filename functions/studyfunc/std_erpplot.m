@@ -83,6 +83,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2007/03/14 00:56:19  arno
+% plotting ERP for multiple components
+%
 % Revision 1.35  2007/02/28 12:03:41  arno
 % output statistics and documentation
 %
@@ -228,7 +231,10 @@ else
     % plot component
     % --------------
     opt.legend = 'off';
-    if length(allinds) > 1, figure('color', 'w'); opt.plotmode = 'condensed'; plotcurveopt = { plotcurveopt{:} 'figure' 'off' }; end;
+    if length(allinds) > 1, figure('color', 'w'); end;
+    if length(allinds) > 1 | strcmpi(opt.plotmode, 'condensed'), 
+        plotcurveopt = { plotcurveopt{:} 'figure' 'off' }; 
+    end;
     nc = ceil(sqrt(length(allinds)));
     nr = ceil(length(allinds)/nc);
     comp_names = {};
