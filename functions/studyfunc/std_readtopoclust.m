@@ -1,8 +1,8 @@
-% std_toporead() - Command line function to read cluster component and scalp maps. 
+% std_readtopoclust() - Command line function to read cluster component and scalp maps. 
 %                  This function automatically invert the polarity of scalp
 %                  maps so they best match the polarity of the mean scalp map.
 % Usage:    
-%              >> [STUDY clsstruct] = std_toporead(STUDY, ALLEEG, cls);  
+%              >> [STUDY clsstruct] = std_readtopoclust(STUDY, ALLEEG, cls);  
 % Inputs:
 %   STUDY      - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
 %   ALLEEG     - global EEGLAB vector of EEG structures for the dataset(s) included in 
@@ -38,9 +38,17 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2007/03/14 02:46:53  arno
+% Initial revision
+%
 
-function [STUDY, centroid] = std_toporead(STUDY,ALLEEG, clsind);
+function [STUDY, centroid] = std_readtopoclust(STUDY,ALLEEG, clsind);
 
+if nargin < 3
+    help readtopoclust;
+    return;
+end;
+    
 if isempty(clsind)
     for k = 2: length(STUDY.cluster) %don't include the ParentCluster
          if ~strncmpi('Notclust',STUDY.cluster(k).name,8) 
@@ -55,15 +63,16 @@ if Ncond == 0
     Ncond = 1;
 end 
 centroid = cell(length(clsind),1);
-fprintf('centroid (only done once)\n');
+fprintf('Computing scalp map centroid (only done once)\n');
+if ~isfield( STUDY.cluster, 'topo' ), STUDY.cluster(1).topo = []; end;
+cond = 1;
 
 for clust = 1:length(clsind) %go over all requested clusters
-    for cond = 1 %compute for all conditions
-        if clsind(clust) > 0
-             numitems = length(STUDY.cluster(clsind(clust)).comps);
-        else numitems = length(STUDY.changrp(-clsind(clust)).chaninds);
-        end;
+    
+    if isempty( STUDY.cluster(clsind(clust)).topo )
 
+        numitems = length(STUDY.cluster(clsind(clust)).comps);
+        
         for k = 1:numitems % go through all components
             comp  = STUDY.cluster(clsind(clust)).comps(k);
             abset = STUDY.cluster(clsind(clust)).sets(cond,k);
@@ -79,30 +88,34 @@ for clust = 1:length(clsind) %go over all requested clusters
             centroid{clust}.topoy = yi;
         end;
         fprintf('\n');
+
+        %update STUDY
+        tmpinds = find(isnan(centroid{clust}.topotmp(:,1)));
+        centroid{clust}.topotmp(tmpinds,:) = [];
+        for clust =  1:length(clsind) %go over all requested clusters
+            for cond  = 1
+                if clsind(1) > 0
+                    ncomp = length(STUDY.cluster(clsind(clust)).comps);
+                end;
+                [ tmp pol ] = std_comppol(centroid{clust}.topotmp);
+                fprintf('%d/%d polarities inverted while reading ICA component scalp maps\n', ...
+                        length(find(pol == -1)), length(pol));
+                nitems = length(centroid{clust}.topo);
+                for k = 1:nitems
+                    if k == 1, allscalp = pol(k)*centroid{clust}.topo{k}/nitems;
+                    else       allscalp = pol(k)*centroid{clust}.topo{k}/nitems + allscalp;
+                    end;
+                end;
+                STUDY.cluster(clsind(clust)).topox   = centroid{clust}.topox;
+                STUDY.cluster(clsind(clust)).topoy   = centroid{clust}.topoy;
+                STUDY.cluster(clsind(clust)).topoall = centroid{clust}.topo;
+                STUDY.cluster(clsind(clust)).topo    = allscalp;
+                STUDY.cluster(clsind(clust)).topopol = pol;
+            end
+        end
+
     end;
+    
 end
 
-%update STUDY
-tmpinds = find(isnan(centroid{clust}.topotmp(:,1)));
-centroid{clust}.topotmp(tmpinds,:) = [];
-for clust =  1:length(clsind) %go over all requested clusters
-    for cond  = 1
-        if clsind(1) > 0
-            ncomp = length(STUDY.cluster(clsind(clust)).comps);
-        end;
-        [ tmp pol ] = std_comppol(centroid{clust}.topotmp);
-        fprintf('%d/%d polarities inverted while reading ICA component scalp maps\n', length(find(pol == -1)), length(pol));
-        nitems = length(centroid{clust}.topo);
-        for k = 1:nitems
-            if k == 1, allscalp = pol(k)*centroid{clust}.topo{k}/nitems;
-            else       allscalp = pol(k)*centroid{clust}.topo{k}/nitems + allscalp;
-            end;
-        end;
-        STUDY.cluster(clsind(clust)).topox   = centroid{clust}.topox;
-        STUDY.cluster(clsind(clust)).topoy   = centroid{clust}.topoy;
-        STUDY.cluster(clsind(clust)).topoall = centroid{clust}.topo;
-        STUDY.cluster(clsind(clust)).topo    = allscalp;
-        STUDY.cluster(clsind(clust)).topopol = pol;
-    end
-end
 fprintf('\n');
