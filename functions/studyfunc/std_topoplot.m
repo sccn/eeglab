@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2007/03/14 03:00:48  arno
+% update function name
+%
 % Revision 1.18  2007/03/14 02:48:56  arno
 % remove scalp centroid
 %
@@ -142,7 +145,7 @@ if strcmpi(mode, 'apart')
                 subject = STUDY.datasetinfo(STUDY.cluster(cls(clus)).sets(1,k)).subject;
                 comp = STUDY.cluster(cls(clus)).comps(k);
                 [Xi,Yi] = meshgrid(clusscalp.topoy,clusscalp.topox);                     
-                scalpmap = squeeze(clusscalp.topoall{k})*clusscalp.topopol(k);
+                scalpmap = squeeze(clusscalp.topoall{k}); % already correct polarity
                 if k <= rowcols(2) - 2 %first sbplot row
                     figure(h_topo);
                     sbplot(rowcols(1),rowcols(2),k+2) , 
