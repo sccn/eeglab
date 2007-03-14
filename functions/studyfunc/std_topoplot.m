@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2007/03/14 02:48:56  arno
+% remove scalp centroid
+%
 % Revision 1.17  2007/03/14 02:46:11  arno
 % now uses toporead(), updated revision history
 %
@@ -121,7 +124,7 @@ disp('Drawing components of cluster (all at once)...');
 if ~isfield(STUDY.cluster,'topo'), STUDY.cluster(1).topo = []; end;
 for clus = 1: length(cls) % For each cluster requested
     if isempty(STUDY.cluster(cls(clus)).topo)
-        STUDY = std_toporead(STUDY,ALLEEG, cls(clus));
+        STUDY = std_readtopoclust(STUDY,ALLEEG, cls(clus));
     end;
 end
 if strcmpi(mode, 'apart')         
