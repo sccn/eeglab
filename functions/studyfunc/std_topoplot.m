@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2007/03/14 02:46:11  arno
+% now uses toporead(), updated revision history
+%
 
 function STUDY = std_topoplot(STUDY, ALLEEG,  varargin)
 icadefs;
@@ -282,76 +285,4 @@ for ci = 1:length(comp_ind)
     set(gcf,'Color', BACKCOLOR);
     axcopy
 end
-
-% ---------------------------------------------------------------
-% ---------------------------------------------------------------
-% ---------------------------------------------------------------
-% ---------------------------------------------------------------
-function [STUDY, centroid] = std_scalpcentroid(STUDY,ALLEEG, clsind);
-
-if isempty(clsind)
-    for k = 2: length(STUDY.cluster) %don't include the ParentCluster
-         if ~strncmpi('Notclust',STUDY.cluster(k).name,8) 
-             % don't include 'Notclust' clusters
-             clsind = [clsind k];
-         end
-    end
-end
-
- Ncond = length(STUDY.condition);
-if Ncond == 0
-    Ncond = 1;
-end 
-centroid = cell(length(clsind),1);
-fprintf('centroid (only done once)\n');
-
-for clust = 1:length(clsind) %go over all requested clusters
-    for cond = 1 %compute for all conditions
-        if clsind(clust) > 0
-             numitems = length(STUDY.cluster(clsind(clust)).comps);
-        else numitems = length(STUDY.changrp(-clsind(clust)).chaninds);
-        end;
-
-        for k = 1:numitems % go through all components
-            comp  = STUDY.cluster(clsind(clust)).comps(k);
-            abset = STUDY.cluster(clsind(clust)).sets(cond,k);
-            [grid yi xi] = std_readtopo(ALLEEG, abset, comp);
-            if ~isfield(centroid{clust}, 'topotmp')
-                centroid{clust}.topotmp = zeros([ size(grid(1:4:end),2) numitems ]);
-            elseif isempty(centroid{clust}.topotmp)
-                centroid{clust}.topotmp = zeros([ size(grid(1:4:end),2) numitems ]);
-            end;
-            centroid{clust}.topotmp(:,k) = grid(1:4:end); % for inversion
-            centroid{clust}.topo{k} = grid;
-            centroid{clust}.topox = xi;
-            centroid{clust}.topoy = yi;
-        end;
-        fprintf('\n');
-    end;
-end
-
-%update STUDY
-tmpinds = find(isnan(centroid{clust}.topotmp(:,1)));
-centroid{clust}.topotmp(tmpinds,:) = [];
-for clust =  1:length(clsind) %go over all requested clusters
-    for cond  = 1
-        if clsind(1) > 0
-            ncomp = length(STUDY.cluster(clsind(clust)).comps);
-        end;
-        [ tmp pol ] = std_comppol(centroid{clust}.topotmp);
-        fprintf('%d/%d polarities inverted while reading ICA component scalp maps\n', length(find(pol == -1)), length(pol));
-        nitems = length(centroid{clust}.topo);
-        for k = 1:nitems
-            if k == 1, allscalp = pol(k)*centroid{clust}.topo{k}/nitems;
-            else       allscalp = pol(k)*centroid{clust}.topo{k}/nitems + allscalp;
-            end;
-        end;
-        STUDY.cluster(clsind(clust)).topox   = centroid{clust}.topox;
-        STUDY.cluster(clsind(clust)).topoy   = centroid{clust}.topoy;
-        STUDY.cluster(clsind(clust)).topoall = centroid{clust}.topo;
-        STUDY.cluster(clsind(clust)).topo    = allscalp;
-        STUDY.cluster(clsind(clust)).topopol = pol;
-    end
-end
-fprintf('\n');
 
