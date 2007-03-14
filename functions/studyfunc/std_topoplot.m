@@ -134,21 +134,17 @@ if strcmpi(mode, 'apart')
                 subject = STUDY.datasetinfo(STUDY.cluster(cls(clus)).sets(1,k)).subject;
                 comp = STUDY.cluster(cls(clus)).comps(k);
                 [Xi,Yi] = meshgrid(clusscalp.topoy,clusscalp.topox);                     
-                % Compute correlation between a component and the average scalp map to determine polarity. 
-                tmp_grid = squeeze(clusscalp.topoall{k});
-                tmp_grid(find(isnan(tmp_grid))) = 0;% remove NaN values from grid for later correlation calculation.  
-                grid_pol = corrcoef(tmp_grid(:), tmp_ave(:)); % compute correlation.  
-                grid_pol = sign(grid_pol(1,2));
+                scalpmap = squeeze(clusscalp.topoall{k})*clusscalp.topopol(k);
                 if k <= rowcols(2) - 2 %first sbplot row
                     figure(h_topo);
                     sbplot(rowcols(1),rowcols(2),k+2) , 
-                    toporeplot(grid_pol*squeeze(clusscalp.topoall{k}), 'style', 'both', 'plotrad',0.5,'intrad',0.5, 'verbose', 'off','xsurface', Xi, 'ysurface', Yi );
+                    toporeplot(scalpmap, 'style', 'both', 'plotrad',0.5,'intrad',0.5, 'verbose', 'off','xsurface', Xi, 'ysurface', Yi );
                     title([ 'ic' num2str(comp) '/' subject ]);
                     %waitbar(k/(len+1),h_wait)
                 else %other sbplot rows
                     figure(h_topo)
                     sbplot(rowcols(1),rowcols(2),k+4) , 
-                    toporeplot(grid_pol*squeeze(clusscalp.topoall{k}), 'style', 'both', 'plotrad',0.5,'intrad',0.5, 'verbose', 'off','xsurface', Xi, 'ysurface', Yi );
+                    toporeplot(scalpmap, 'style', 'both', 'plotrad',0.5,'intrad',0.5, 'verbose', 'off','xsurface', Xi, 'ysurface', Yi );
                     title([ 'ic' num2str(comp) '/' subject ]);
                     %waitbar(k/(len+1),h_wait)
                 end
@@ -333,6 +329,8 @@ for clust = 1:length(clsind) %go over all requested clusters
 end
 
 %update STUDY
+tmpinds = find(isnan(centroid{clust}.topotmp(:,1)));
+centroid{clust}.topotmp(tmpinds,:) = [];
 for clust =  1:length(clsind) %go over all requested clusters
     for cond  = 1
         if clsind(1) > 0
