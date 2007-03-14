@@ -76,7 +76,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: importevent.m,v 
+%% $Log: not supported by cvs2svn $
 
 function event = importevent(event, oldevent, srate, varargin)
 
@@ -87,7 +87,7 @@ end;
 
 I = [];
 
-% remove the event field
+%% remove the event field
 % ----------------------
 if ~isempty(oldevent), allfields = fieldnames(oldevent);
 else                   allfields = {}; end;
@@ -105,13 +105,13 @@ if isstr(g), error(g); end;
 if ~isempty(g.indices), g.append = 'yes'; end;
 g.delim = char(g.delim);    
 
-% call from pop_importevent
+%% call from pop_importevent
 % -------------------------
 if ~isempty(g.event)
     event = g.event;
 end;
 
-% determine latency for old event alignment
+%% determine latency for old event alignment
 % -----------------------------------------
 g.align.val = g.align;
 if ~isnan(g.align.val)
@@ -140,7 +140,7 @@ end;
 
 tmpfields = fieldnames(g);
 event = oldevent;
-% scan all the fields of g
+%% scan all the fields of g
 % ------------------------
 for curfield = tmpfields'
     if ~isempty(event), allfields = fieldnames(event);
@@ -201,7 +201,7 @@ if isempty(event) % usefull 0xNB empty structure
     event = [];
 end;
 
-% remove the events wit out-of-bound latencies
+%% remove the events wit out-of-bound latencies
 % --------------------------------------------
 if isfield(event, 'latency')
     try 
