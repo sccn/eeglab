@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2007/03/14 03:17:11  arno
+% do not invert polarity for plotting
+%
 % Revision 1.19  2007/03/14 03:00:48  arno
 % update function name
 %
@@ -279,11 +282,14 @@ if nargin == 3 % no component indices were given
 else
     comp_ind = varargin{1}; 
 end
+STUDY = std_readtopoclust(STUDY,ALLEEG, cls);
 for ci = 1:length(comp_ind)
     abset = STUDY.datasetinfo(STUDY.cluster(cls).sets(1,comp_ind(ci))).index;
-    comp  = STUDY.cluster(cls).comps(comp_ind(ci));
     subject = STUDY.datasetinfo(STUDY.cluster(cls).sets(1,comp_ind(ci))).subject;
-    [grid, yi, xi] = std_readtopo(ALLEEG, abset, comp);
+    comp  = STUDY.cluster(cls).comps(comp_ind(ci));
+    grid  = STUDY.cluster(cls).topoall{comp_ind(ci)};
+    xi    = STUDY.cluster(cls).topox;
+    yi    = STUDY.cluster(cls).topoy;
     [Xi,Yi] = meshgrid(yi,xi);
     figure;
     toporeplot(grid, 'style', 'both', 'plotrad',0.5,'intrad',0.5,'xsurface', Xi, 'ysurface', Yi, 'verbose', 'off');
