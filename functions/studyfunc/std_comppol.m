@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2006/09/12 18:58:11  arno
+% Debugging
+%
 % Revision 1.2  2006/03/12 04:22:29  arno
 % comppol -> std_comppol
 %
@@ -49,39 +52,20 @@ end;
 
 % run several iterations
 % ----------------------
-compini = compin;
-count = 1;
-while count < size(compin,2)
-    count = count+1;
-    
-    % remove diagonal and put 0 and 1
-    % -------------------------------
-    r = corrcoef( compin );
-    r = r - eye(size(r));
-    
-    % invert component polarities
-    % ---------------------------
+pol     = ones(1,size(compin,2));
+for repeat=1:3
+    compave = mean(compin,2);
     for index = 1:size(compin,2)
-        if sign(sum(r(:,index))) < 0
-            r(:,index) = -r(:,index);
-            r(index,:) = -r(index,:);
-            r(index,index) = r(index,index);
+        
+        % remove diagonal and put 0 and 1
+        % -------------------------------
+        r = corrcoef(compave, compin(:,index) );
+        
+        % invert component polarities
+        % ---------------------------
+        if r(2) < 0
             compin(:,index) = -compin(:,index);
+            pol(index)      = -pol(index);
         end;
     end;
-end;
-
-% get polarities
-% --------------
-for index = 1:size(compin,2)
-    if compin(1,index) == compini(1,index), pol(index) = 1;
-    else                                    pol(index) = -1;
-    end;
-end;
-
-% try to swap minimum
-% -------------------
-if length(pol)/2 < length(find(pol == -1))
-    compin = -compin;
-    pol = -pol;
 end;
