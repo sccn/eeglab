@@ -334,20 +334,20 @@ function epochfield = getnewfields( epochfield, nbfields )
                nbfields = nbfields-1;
        else    count = count+1;
        end;                    
-   end;     
+   end     
 return;
 
 %%
 % ----------------------
 function var = setstruct( var, fieldname, indices, values )
-    if exist('indices') ~= 1, indices = 1:length(var); end;
+    if exist('indices') ~= 1, indices = 1:length(var); end
     if ~isempty(values)
         for index = 1:length(indices)
             var = setfield(var, {indices(index)}, fieldname, values(index));
         end
     else
         for index = 1:length(indices)
-            var = setfield(var, {indices(index)}, fieldname, values);
+            var = setfield(var, {indices(index)}, fieldname, '');
         end
     end
 return;
