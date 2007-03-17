@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2007/02/28 12:04:22  arno
+% output statistics and documentation
+%
 % Revision 1.26  2006/10/03 23:56:40  scott
 % edit help msg -sm
 %
@@ -47,7 +50,7 @@
 % reprogram from scratch (statistics...), backward compatible
 %
                             
-function [STUDY allitc alltimes ] = std_itcplot(STUDY, ALLEEG, varargin)
+function [STUDY, allitc, alltimes, pgroup, pcond, pinter] = std_itcplot(STUDY, ALLEEG, varargin)
 
 if nargin < 2
     help std_itcplot;
