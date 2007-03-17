@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2007/01/26 18:06:15  arno
+% minor bug
+%
 % Revision 1.16  2006/11/23 01:12:46  arno
 % implement mean spectrum subtraction
 %
@@ -177,8 +180,8 @@ for ind = 1:length(finalinds)
     for indtmp = 1:length(alldatasets)
 
         index = alldatasets(indtmp);
-        condind = strmatch( STUDY.datasetinfo(index).condition, STUDY.condition ); if isempty(condind), condind = 1; end;
-        grpind  = strmatch( STUDY.datasetinfo(index).group    , STUDY.group     ); if isempty(grpind) , grpind  = 1; end;
+        condind = strmatch( STUDY.datasetinfo(index).condition, STUDY.condition, 'exact'); if isempty(condind), condind = 1; end;
+        grpind  = strmatch( STUDY.datasetinfo(index).group    , STUDY.group    , 'exact'); if isempty(grpind) , grpind  = 1; end;
         indcellarray = length(allinds{condind, grpind})+1;
 
         % load data
