@@ -83,6 +83,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.38  2007/03/14 03:13:28  arno
+% ERP polarity inversion
+%
 % Revision 1.37  2007/03/14 01:15:37  arno
 % plot condensed mode
 %
@@ -127,7 +130,7 @@
 % reprogram from scratch (statistics...), backward compatible
 %
                             
-function [STUDY erpdata alltimes pgroup pcond pinter] = std_erpplot(STUDY, ALLEEG, varargin)
+function [STUDY, erpdata, alltimes, pgroup, pcond, pinter] = std_erpplot(STUDY, ALLEEG, varargin)
 
 if nargin < 2
     help std_erpplot;

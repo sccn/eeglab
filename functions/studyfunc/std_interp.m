@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2007/02/18 19:05:05  scott
+% help msg consistency and usage -sm
+%
 % Revision 1.2  2006/09/20 12:26:01  arno
 % use function eeg_mergelocs
 %
@@ -51,7 +54,7 @@
 %                a full channel structure (missing channels in the current 
 %                dataset are interpolated).
 
-function [STUDY ALLEEG] = std_interp(STUDY, ALLEEG, chans, method);
+function [STUDY, ALLEEG] = std_interp(STUDY, ALLEEG, chans, method);
 
 if nargin < 2
     help std_interp;
