@@ -60,6 +60,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2007/01/26 18:02:16  arno
+% new topotime option
+%
 % Revision 1.12  2006/11/22 20:04:40  arno
 % same
 %
@@ -173,9 +176,9 @@ if isempty(varargin)
     if ~isequal(res.ylim     , STUDY.etc.erpparams.ylim),      options = { options{:} 'ylim' res.ylim       }; end;
     if ~isequal(res.topotime  , STUDY.etc.erpparams.topotime),   options = { options{:} 'topotime' res.topotime }; end;
     if ~isequal(res.timerange, STUDY.etc.erpparams.timerange), options = { options{:} 'timerange' res.timerange }; end;
-    if isnan(res.threshold) & ~isnan(STUDY.etc.erpparams.threshold) | ...
-            ~isnan(res.threshold) & isnan(STUDY.etc.erpparams.threshold) | ...
-                ~isnan(res.threshold) & res.threshold ~= STUDY.etc.erpparams.threshold
+    if (isnan(res.threshold) & ~isnan(STUDY.etc.erpparams.threshold)) | ...
+            (~isnan(res.threshold) & isnan(STUDY.etc.erpparams.threshold)) | ...
+                (~isnan(res.threshold) & res.threshold ~= STUDY.etc.erpparams.threshold)
                 options = { options{:} 'threshold' res.threshold }; 
     end;
     if ~isempty(options)

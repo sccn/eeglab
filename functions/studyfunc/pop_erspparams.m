@@ -81,6 +81,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2007/01/26 18:02:33  arno
+% new topotime and topofreq options
+%
 % Revision 1.8  2006/11/10 01:34:55  arno
 % GUI units
 %
@@ -201,9 +204,9 @@ if isempty(varargin)
     if ~isequal(res.itclim   , STUDY.etc.erspparams.itclim),    options = { options{:} 'itclim'    res.itclim    }; end;
     if ~isequal(res.timerange, STUDY.etc.erspparams.timerange), options = { options{:} 'timerange' res.timerange }; end;
     if ~isequal(res.freqrange, STUDY.etc.erspparams.freqrange), options = { options{:} 'freqrange' res.freqrange }; end;
-    if isnan(res.threshold) & ~isnan(STUDY.etc.erspparams.threshold) | ...
-            ~isnan(res.threshold) & isnan(STUDY.etc.erspparams.threshold) | ...
-                ~isnan(res.threshold) & res.threshold ~= STUDY.etc.erspparams.threshold
+    if (isnan(res.threshold) & ~isnan(STUDY.etc.erspparams.threshold)) | ...
+            (~isnan(res.threshold) & isnan(STUDY.etc.erspparams.threshold)) | ...
+                (~isnan(res.threshold) & res.threshold ~= STUDY.etc.erspparams.threshold)
                 options = { options{:} 'threshold' res.threshold }; 
     end;
     if ~isempty(options)

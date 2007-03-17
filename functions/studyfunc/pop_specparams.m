@@ -62,6 +62,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2007/01/26 18:03:27  arno
+% new topofreq option
+%
 % Revision 1.12  2006/11/23 00:59:36  arno
 % removing psectral data if subject mean subtract
 %
@@ -173,9 +176,9 @@ if isempty(varargin)
     if ~isequal(res.topofreq, STUDY.etc.specparams.topofreq),   options = { options{:} 'topofreq' res.topofreq }; end;
     if ~isequal(res.ylim, STUDY.etc.specparams.ylim),           options = { options{:} 'ylim' res.ylim      }; end;
     if ~isequal(res.freqrange, STUDY.etc.specparams.freqrange), options = { options{:} 'freqrange' res.freqrange }; end;
-    if isnan(res.threshold) & ~isnan(STUDY.etc.specparams.threshold) | ...
-            ~isnan(res.threshold) & isnan(STUDY.etc.specparams.threshold) | ...
-                ~isnan(res.threshold) & res.threshold ~= STUDY.etc.specparams.threshold
+    if (isnan(res.threshold) & ~isnan(STUDY.etc.specparams.threshold)) | ...
+            (~isnan(res.threshold) & isnan(STUDY.etc.specparams.threshold)) | ...
+                (~isnan(res.threshold) & res.threshold ~= STUDY.etc.specparams.threshold)
                 options = { options{:} 'threshold' res.threshold }; 
     end;
     if ~isempty(options)
