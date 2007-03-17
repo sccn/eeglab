@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2007/03/17 21:11:56  arno
+% fix outputs
+%
 % Revision 1.27  2007/02/28 12:04:22  arno
 % output statistics and documentation
 %
@@ -50,11 +53,11 @@
 % reprogram from scratch (statistics...), backward compatible
 %
                             
-function [STUDY, allitc, alltimes, pgroup, pcond, pinter] = std_itcplot(STUDY, ALLEEG, varargin)
+function [STUDY, allitc, alltimes, allfreqs, pgroup, pcond, pinter] = std_itcplot(STUDY, ALLEEG, varargin)
 
 if nargin < 2
     help std_itcplot;
     return;
 end;
 
-[STUDY allitc alltimes pgroup pcond pinter ] = std_erspplot(STUDY, ALLEEG, 'datatype', 'itc', varargin{:});
+[STUDY allitc alltimes allfreqs pgroup pcond pinter ] = std_erspplot(STUDY, ALLEEG, 'datatype', 'itc', varargin{:});
