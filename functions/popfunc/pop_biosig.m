@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2007/03/20 16:28:32  arno
+% remove toby's fix
+%
 % Revision 1.18  2007/03/20 02:05:03  arno
 % checking dat.out.EVENT
 %
@@ -234,7 +237,7 @@ EEG = eeg_checkset(EEG);
 % --------------
 disp('Extracting events...');
 if ~isempty(dat.EVENT)
-    if isfield(dat, 'out')
+    if isfield(dat, 'out') % Alois fix for event interval does not work
         if isfield(dat.out, 'EVENT')
             dat.EVENT = dat.out.EVENT;
         end;
@@ -244,7 +247,7 @@ if ~isempty(dat.EVENT)
         interval(2) = newblockrange(2) * dat.SampleRate(1);
     else interval = [];
     end
-    EEG.event = biosig2eeglabevent(dat.EVENT);
+    EEG.event = biosig2eeglabevent(dat.EVENT, interval); % Toby's fix
     if strcmpi(g.rmeventchan, 'on') & strcmpi(dat.TYPE, 'BDF') & isfield(dat, 'BDF')
         disp('Removing event channel...');
         EEG.data(dat.BDF.Status,:) = [];
