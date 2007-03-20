@@ -157,7 +157,7 @@
 
 % Coding notes: Useful information on functions and global variables used.
 
-function STUDY = pop_clustedit(varargin)
+function [STUDY, com] = pop_clustedit(varargin)
 icadefs;
 if ~isstr(varargin{1})
     if nargin < 2
@@ -168,6 +168,8 @@ if ~isstr(varargin{1})
     STUDY.etc.specparams.topofreq = NaN; % NaN -> GUI disabled
     STUDY.etc.erspparams.topotime = NaN;
     STUDY.etc.erspparams.topofreq = NaN;
+    oldhistory = STUDY.history;
+    STUDY.history = '';
     ALLEEG = varargin{2};
     clus_comps = 0; % the number of clustered components
     if nargin > 2 % load specific clusters
@@ -414,6 +416,11 @@ if ~isstr(varargin{1})
        end
 
    end
+   
+   % history
+   % -------
+   com = STUDY.history;
+   STUDY.history =  sprintf('%s%s', oldhistory, com);              
  
 else
     hdl = varargin{2};  %figure handle
@@ -522,17 +529,26 @@ else
             set(hdl, 'userdat',userdat);    
             
         case 'erp_opt' % save the list of selected chaners
-            STUDY = pop_erpparams(STUDY);
+            [STUDY com] = pop_erpparams(STUDY);
+            if ~isempty(com)
+                STUDY.history =  sprintf('%s\n%s',  STUDY.history, com);
+            end;
             userdat{1}{2} = STUDY;
             set(hdl, 'userdat',userdat); %update information (STUDY)     
 
-        case 'spec_opt' % save the list of selected chaners
-            STUDY = pop_specparams(STUDY);
+        case 'spec_opt' % save the list of selected channels
+            [STUDY com] = pop_specparams(STUDY);
+            if ~isempty(com)
+                STUDY.history =  sprintf('%s\n%s',  STUDY.history, com);
+            end;
             userdat{1}{2} = STUDY;
             set(hdl, 'userdat',userdat); %update information (STUDY)     
          
-        case 'ersp_opt' % save the list of selected chaners
-            STUDY = pop_erspparams(STUDY);
+        case 'ersp_opt' % save the list of selected channels
+            [STUDY com] = pop_erspparams(STUDY);
+            if ~isempty(com)
+                STUDY.history =  sprintf('%s\n%s',  STUDY.history, com);
+            end;
             userdat{1}{2} = STUDY;
             set(hdl, 'userdat',userdat); %update information (STUDY)     
             
