@@ -37,11 +37,14 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:39:45  jorn
+% Initial revision
+%
 
-function mat = gauss2D( sizeX, sizeY, sigma, meanX, meanY, cut);
+function mat = laplac2d( sizeX, sizeY, sigma, meanX, meanY, cut);
 
 if nargin < 2
-	help gauss2D
+	help laplac2d
 	return; 
 end;
 if nargin < 3
