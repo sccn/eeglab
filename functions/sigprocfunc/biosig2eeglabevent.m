@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2006/12/16 07:37:33  toby
+% Fixed partial data event problem, documentation update.
+%
 % Revision 1.2  2006/01/13 23:09:53  arno
 % default events
 %
@@ -40,6 +43,10 @@
 %
 
 function event = biosig2eeglabevent(EVENT, interval)
+
+if nargin < 2
+    interval = [];
+end;
 
 event = [];
 disp('Importing data events...');
