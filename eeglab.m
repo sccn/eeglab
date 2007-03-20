@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.500  2007/03/07 17:51:50  arno
+% path
+%
 % Revision 1.499  2007/03/07 17:28:59  scott
 % typo
 %
@@ -2015,8 +2018,7 @@ catchstrs.new_non_empty          = e_newset;
     cb_chanplot    = [ nocheck '[STUDYTMP LASTCOM] = pop_chanplot(STUDY, ALLEEG); ALLEEGTMP=ALLEEG;'       e_load_study];
     cb_preclust    = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_preclust(STUDY, ALLEEG);'               e_load_study];
     cb_clust       = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_clust(STUDY, ALLEEG);'                  e_load_study];
-    cb_clustedit   = [ nocheck 'ALLEEGTMP = ALLEEG; LASTCOM = ''[STUDY]  = pop_clustedit(STUDY, ALLEEG);'';' ...
-                                                             '[STUDYTMP] = pop_clustedit(STUDY, ALLEEG);' e_load_study];
+    cb_clustedit   = [ nocheck 'ALLEEGTMP = ALLEEG; [STUDYTMP LASTCOM] = pop_clustedit(STUDY, ALLEEG);'    e_load_study];
     
     % menu definition
     % --------------- 
