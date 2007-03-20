@@ -71,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.48  2006/05/13 13:28:31  arno
+% allow to process event types with space
+%
 % Revision 1.47  2006/02/25 01:47:00  toby
 % Change to handle event types containing spaces.
 %
@@ -295,13 +298,14 @@ if nargin < 3
    if length(result) == 0 return; end;
    
    if strcmpi(result{1}, '[]'), result{1} = ''; end;
-   if ~isempty(result)
+   if ~isempty(result{1})
        if strcmpi(result{1}(1),'''')   % If event type appears to be in single-quotes, use comma
                                        % and single-quote as delimiter between event types. toby 2.24.2006
                                        % fixed Arnaud May 2006
             events = eval( [ '{' result{1} '}' ] );
        else events = parsetxt( result{1});
        end;
+   else events = {};
    end
    lim = eval( [ '[' result{2} ']' ] );
 
