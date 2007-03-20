@@ -60,6 +60,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2007/03/20 03:08:59  arno
+% fix filter history option
+%
 % Revision 1.14  2007/03/17 21:20:06  arno
 % logical operator precedence
 %
@@ -157,7 +160,7 @@ if isempty(varargin)
     if res.condstats , res.condstats  = 'on'; else res.condstats  = 'off'; end;
     if res.plotgroups, res.plotgroups = 'together'; else res.plotgroups = 'apart'; end;
     if res.plotconditions , res.plotconditions  = 'together'; else res.plotconditions  = 'apart'; end;
-    res.topotime   = str2num( res.topotime );
+    res.topotime  = str2num( res.topotime );
     res.timerange = str2num( res.timerange );
     res.ylim      = str2num( res.ylim );
     res.threshold = str2num( res.threshold );
@@ -177,8 +180,12 @@ if isempty(varargin)
     if ~strcmpi( res.condstats , STUDY.etc.erpparams.condstats ), options = { options{:} 'condstats'  res.condstats  }; end;
     if ~strcmpi( res.statistics, STUDY.etc.erpparams.statistics ), options = { options{:} 'statistics' res.statistics }; end;
     if ~isequal(res.ylim     , STUDY.etc.erpparams.ylim),      options = { options{:} 'ylim' res.ylim       }; end;
-    if ~isequal(res.topotime  , STUDY.etc.erpparams.topotime),   options = { options{:} 'topotime' res.topotime }; end;
     if ~isequal(res.timerange, STUDY.etc.erpparams.timerange), options = { options{:} 'timerange' res.timerange }; end;
+    if (isnan(res.topotime) & ~isnan(STUDY.etc.erpparams.topotime)) | ...
+            (~isnan(res.topotime) & isnan(STUDY.etc.erpparams.topotime)) | ...
+                (~isnan(res.topotime) & res.threshold ~= STUDY.etc.erpparams.topotime)
+        options = { options{:} 'topotime' res.topotime }; 
+    end;
     if (isnan(res.threshold) & ~isnan(STUDY.etc.erpparams.threshold)) | ...
             (~isnan(res.threshold) & isnan(STUDY.etc.erpparams.threshold)) | ...
                 (~isnan(res.threshold) & res.threshold ~= STUDY.etc.erpparams.threshold)
