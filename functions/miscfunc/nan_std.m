@@ -23,11 +23,19 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2004/11/23 02:20:52  hilit
+% no more divide by zero problem
+%
 % Revision 1.1  2003/09/04 00:57:11  arno
 % Initial revision
 %
 
 function out = nan_std(in)
+    
+    if nargin < 1
+      help nan_std;
+      return;
+    end;
     
     nans = find(isnan(in));
     in(nans) = 0;
