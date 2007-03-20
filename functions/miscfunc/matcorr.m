@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2003/09/04 23:21:06  scott
+% changed default matching method to Max Abs Corr
+%
 % Revision 1.1  2002/04/05 17:36:45  jorn
 % Initial revision
 %
@@ -108,7 +111,7 @@ dy(find(dy==0)) = 1;
 corrs = x*y'./sqrt(dx'*dy);
 
 if nargin > 4 & ~isempty(weighting) & norm(weighting) > 0,
-  if size(corrs) ~= size(weighting)
+  if any(size(corrs) ~= size(weighting))
     fprintf('matcorr(): weighting matrix size must match that of corrs\n.')
     return
   else
