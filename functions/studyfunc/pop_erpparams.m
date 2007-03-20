@@ -60,6 +60,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2007/03/17 21:20:06  arno
+% logical operator precedence
+%
 % Revision 1.13  2007/01/26 18:02:16  arno
 % new topotime option
 %
@@ -167,7 +170,7 @@ if isempty(varargin)
     % build command call
     % ------------------
     options = {};
-    if ~strcmpi( res.filter, STUDY.etc.erpparams.filter), options = { options{:} 'filter' res.filter }; end;
+    if ~strcmpi( char(res.filter), char(STUDY.etc.erpparams.filter)), options = { options{:} 'filter' res.filter }; end;
     if ~strcmpi( res.plotgroups, STUDY.etc.erpparams.plotgroups), options = { options{:} 'plotgroups' res.plotgroups }; end;
     if ~strcmpi( res.plotconditions , STUDY.etc.erpparams.plotconditions ), options = { options{:} 'plotconditions'  res.plotconditions  }; end;
     if ~strcmpi( res.groupstats, STUDY.etc.erpparams.groupstats), options = { options{:} 'groupstats' res.groupstats }; end;
