@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2007/03/08 03:08:02  toby
+% Bug 216
+%
 % Revision 1.16  2006/12/16 07:36:21  toby
 % Fixed partial data event problem, documentation update.
 %
@@ -228,6 +231,11 @@ EEG = eeg_checkset(EEG);
 % --------------
 disp('Extracting events...');
 if ~isempty(dat.EVENT)
+    if isfield(dat, 'out')
+        if isfield(dat.out, 'EVENT')
+            dat.EVENT = dat.out.EVENT;
+        end;
+    end;
     if ~isempty(newblockrange)
         interval(1) = newblockrange(1) * dat.SampleRate(1) + 1;
         interval(2) = newblockrange(2) * dat.SampleRate(1);
