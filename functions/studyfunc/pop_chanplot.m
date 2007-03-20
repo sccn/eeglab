@@ -347,17 +347,26 @@ else
             set(hdl, 'userdat',userdat); 
             
         case 'erp_opt' % save the list of selected channels
-            STUDY = pop_erpparams(STUDY);
+            [STUDY com] = pop_erpparams(STUDY);
+            if ~isempty(com)
+                STUDY.history =  sprintf('%s\n%s',  STUDY.history, com);
+            end;
             userdat{1}{2} = STUDY;
             set(hdl, 'userdat',userdat); %update information (STUDY)     
 
         case 'spec_opt' % save the list of selected channels
-            STUDY = pop_specparams(STUDY);
+            [STUDY com] = pop_specparams(STUDY);
+            if ~isempty(com)
+                STUDY.history =  sprintf('%s\n%s',  STUDY.history, com);
+            end;
             userdat{1}{2} = STUDY;
             set(hdl, 'userdat',userdat); %update information (STUDY)     
          
         case 'ersp_opt' % save the list of selected channels
-            STUDY = pop_erspparams(STUDY);
+            [STUDY com] = pop_erspparams(STUDY);
+            if ~isempty(com)
+                STUDY.history =  sprintf('%s\n%s',  STUDY.history, com);
+            end;
             userdat{1}{2} = STUDY;
             set(hdl, 'userdat',userdat); %update information (STUDY)     
             
