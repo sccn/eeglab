@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2007/03/20 02:05:03  arno
+% checking dat.out.EVENT
+%
 % Revision 1.17  2007/03/08 03:08:02  toby
 % Bug 216
 %
@@ -241,7 +244,7 @@ if ~isempty(dat.EVENT)
         interval(2) = newblockrange(2) * dat.SampleRate(1);
     else interval = [];
     end
-    EEG.event = biosig2eeglabevent(dat.EVENT, interval);
+    EEG.event = biosig2eeglabevent(dat.EVENT);
     if strcmpi(g.rmeventchan, 'on') & strcmpi(dat.TYPE, 'BDF') & isfield(dat, 'BDF')
         disp('Removing event channel...');
         EEG.data(dat.BDF.Status,:) = [];
