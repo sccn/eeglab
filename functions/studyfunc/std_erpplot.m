@@ -83,6 +83,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.39  2007/03/17 21:10:57  arno
+% Matlab 6.5 compatibility
+%
 % Revision 1.38  2007/03/14 03:13:28  arno
 % ERP polarity inversion
 %
@@ -182,23 +185,26 @@ end;
 if ~isempty(opt.channels)
      [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'channels', opt.channels, 'infotype', 'erp', 'timerange', opt.timerange);
 else [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'clusters', opt.clusters, 'infotype', 'erp', 'timerange', opt.timerange);
-     STUDY = std_readtopoclust(STUDY, ALLEEG, opt.clusters);
      % invert polarity of ERPs
-     if size(STUDY.cluster(opt.clusters(1)).erpdata,2) > 1
-         disp('WARNING: component polarity inversion for ERP not implemented if more than 1 group');
-         disp('WARNING: ERPs may not have the correct polarity');
-     else    
-         disp('Inverting ERP component polarities based on scalp map polarities');
-         for cls = opt.clusters
-             clust = STUDY.cluster(cls);
-             for index = 1:length(clust.erpdata)
-                 for comps = 1:size(clust.erpdata{index},2)
-                     clust.erpdata{index}(:,comps) = clust.erpdata{index}(:,comps)*clust.topopol(index);
-                 end;
-             end;
-             STUDY.cluster(cls) = clust;
-         end;
-     end;
+    filename = fullfile( ALLEEG(1).filepath, ALLEEG(1).filename(1:end-3));
+    if exist([filename 'icatopo']) ~= 0
+        STUDY = std_readtopoclust(STUDY, ALLEEG, opt.clusters);
+        if size(STUDY.cluster(opt.clusters(1)).erpdata,2) > 1
+            disp('WARNING: component polarity inversion for ERP not implemented if more than 1 group');
+            disp('WARNING: ERPs may not have the correct polarity');
+        else    
+            disp('Inverting ERP component polarities based on scalp map polarities');
+            for cls = opt.clusters
+                clust = STUDY.cluster(cls);
+                for index = 1:length(clust.erpdata)
+                    for comps = 1:size(clust.erpdata{index},2)
+                        clust.erpdata{index}(:,comps) = clust.erpdata{index}(:,comps)*clust.topopol(index);
+                    end;
+                end;
+                STUDY.cluster(cls) = clust;
+            end;
+        end;
+    end;
 end;
 
 % channel plotting
