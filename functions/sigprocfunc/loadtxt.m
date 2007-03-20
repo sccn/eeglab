@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2006/10/16 22:11:43  arno
+% typo
+%
 % Revision 1.11  2006/10/16 21:07:49  arno
 % text
 %
@@ -100,7 +103,7 @@ else
     g = [];
 end;
 
-g = finputcheck( varargin, { 'convert'   'string'   { 'on' 'off' }   'on';
+g = finputcheck( varargin, { 'convert'   'string'   { 'on' 'off' 'force' }   'on';
                              'skipline'  'integer'  [0 Inf]          0;
                              'verbose'   'string'   { 'on' 'off' }   'on';
                              'delim'     { 'integer' 'string' } []               [9 32];
