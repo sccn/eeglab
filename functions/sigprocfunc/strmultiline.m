@@ -34,6 +34,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2006/09/20 12:22:37  arno
+% multiple line fix
+%
 % Revision 1.3  2005/09/27 22:02:04  arno
 % allow processing multiple lines
 %
@@ -96,7 +99,7 @@ for index = 1:size(strinori,1) % scan lines
         elseif size(strouttmp, 2) < maxlen
             strouttmp(:,end+1:maxlen) = ' ';
         end;
-        strout = [ strout; strouttmp ];
+        strout = strvcat(strout, strouttmp);
     else
         strouttmp = lines{1};
         for index = 2:length(lines)
