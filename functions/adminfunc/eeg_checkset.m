@@ -150,6 +150,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.210  2007/03/08 02:55:14  toby
+% Documentation edit
+% Bug Fix courtesy Sebastian Jentschke
+%
 % Revision 1.209  2007/03/06 03:13:16  arno
 % dipfitdefs check
 %
@@ -1304,24 +1308,21 @@ end;
 % ----------------
 if isnumeric(EEG.data)
     v = version;
+    EEG.icawinv    = double(EEG.icawinv); % required for dipole fitting, otherwise it crashes
+    EEG.icaweights = double(EEG.icaweights);
+    EEG.icasphere  = double(EEG.icasphere);
     if ~isempty(findstr(v, 'R11')) | ~isempty(findstr(v, 'R12')) | ~isempty(findstr(v, 'R13'))
         EEG.data       = double(EEG.data);
-        EEG.icawinv    = double(EEG.icawinv);
-        EEG.icaweights = double(EEG.icaweights);
-        EEG.icasphere  = double(EEG.icasphere);
         EEG.icaact     = double(EEG.icaact);
     else
         try,
             EEG.data       = single(EEG.data);
+            EEG.icaact     = single(EEG.icaact);
         catch,
             disp('WARNING: EEGLAB ran out of memory while converting dataset to single precision.');
             disp('         Save dataset (preferably saving data to a separate file; see File > Memory options).'); 
             disp('         Then reload it.');
         end;
-        EEG.icawinv    = single(EEG.icawinv);
-        EEG.icaweights = single(EEG.icaweights);
-        EEG.icasphere  = single(EEG.icasphere);
-        EEG.icaact     = single(EEG.icaact);
     end;
 end;
 
@@ -1524,7 +1525,18 @@ end;
                             EEG.icaact = zeros(size(EEG.icaweights,1), size(EEG.data,2)); EEG.icaact(:) = NaN;
                             EEG.icaact(:,tmpindices) = (EEG.icaweights*EEG.icasphere)*EEG.data(:,tmpindices);
                         else
-                            EEG.icaact    = (EEG.icaweights*EEG.icasphere)*EEG.data(EEG.icachansind,:);
+                            v = version;
+                            if ~isempty(findstr(v, 'R11')) | ~isempty(findstr(v, 'R12')) | ~isempty(findstr(v, 'R13'))
+                                EEG.icaact = (EEG.icaweights*EEG.icasphere)*EEG.data(EEG.icachansind,:);
+                            else
+                                % recomputing as double
+                                try
+                                    EEG.icaact = single((EEG.icaweights*EEG.icasphere)*EEG.data(EEG.icachansind,:));
+                                catch,
+                                    disp('Weight matrix computed using single precision because of memory limitations');
+                                    EEG.icaact = (single(tmpmat))*EEG.data(EEG.icachansind,:);
+                                end;
+                            end;
                         end;
                         EEG.icaact    = reshape( EEG.icaact, size(EEG.icaact,1), EEG.pnts, EEG.trials);
                     end;
