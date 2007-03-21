@@ -122,6 +122,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.70  2007/02/20 01:50:42  scott
+% edited a few comments only -sm
+%
 % Revision 1.69  2006/11/21 22:15:49  arno
 % freqscale
 %
@@ -410,9 +413,9 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
             g.erspparams.alpha    = alpha;
             g.erspparams.cycles   = cycles;
             g.erspparams.padratio = padratio;
-            for index = 1:length(STUDY.datasetinfo)
+            for tmpind = 1:length(STUDY.datasetinfo)
                 
-                filename = fullfile( ALLEEG(index).filepath,[ ALLEEG(index).filename(1:end-3) 'icaersp']);
+                filename = fullfile( ALLEEG(tmpind).filepath,[ ALLEEG(tmpind).filename(1:end-3) 'icaersp']);
                 [guimode, g.erspparams] = std_filecheck(filename, g.erspparams, guimode, { 'plotitc' 'plotersp' 'plotphase' 'freqscale' });
                 if strcmpi(guimode, 'cancel'), return; end;
                 
