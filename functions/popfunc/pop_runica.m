@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.71  2007/03/21 23:08:33  arno
+% warning for computing ICA weights
+%
 % Revision 1.70  2007/02/20 14:17:08  arno
 % option to run several conditions of the same subject in a study
 %
@@ -515,6 +518,7 @@ end;
 tmpdata = reshape( EEG.data(g.chanind,:,:), length(g.chanind), EEG.pnts*EEG.trials);
 tmpdata = tmpdata - repmat(mean(tmpdata,2), [1 size(tmpdata,2)]); % zero mean 
 try,
+    disp('Converting data matrix to double precision (more accurate ICA results)')
     tmpdata = double(tmpdata);
 catch,
     disp('*************************************************************')
