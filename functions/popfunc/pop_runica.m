@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.70  2007/02/20 14:17:08  arno
+% option to run several conditions of the same subject in a study
+%
 % Revision 1.69  2006/08/18 01:09:13  toby
 % bug fix, was collecting data from ALLEEG(1) instead of EEG in a particular situation
 %
@@ -511,6 +514,15 @@ end;
 % -----------------------------
 tmpdata = reshape( EEG.data(g.chanind,:,:), length(g.chanind), EEG.pnts*EEG.trials);
 tmpdata = tmpdata - repmat(mean(tmpdata,2), [1 size(tmpdata,2)]); % zero mean 
+try,
+    tmpdata = double(tmpdata);
+catch,
+    disp('*************************************************************')
+    disp('Not enougth memory to convert data Matrix to double precision')
+    disp('All computation will be done in single precision. Matlab 7.x')
+    disp('(under 64-bit Linux and others) is VERY imprecise in this mode')
+    disp('*************************************************************')
+end;
 switch lower(g.icatype)
     case 'runica' 
         if nargin < 2
