@@ -34,21 +34,21 @@
 %                          labels defining the meaning of each column of the input file.
 %                           'channum'   [positive integer] channel number 
 %                           'labels'    [string] channel name (no spaces)
-%                           'theta'     [real degrees] 2-D angle in polar coordinates; 
+%                           'theta'     [real degrees] 2-D angle in polar coordinates. 
 %                                       positive = rotating from nose (0) toward left ear 
 %                           'radius'    [real] radius in 2-D polar coords (0.5 is disk limits)
 %                           'X'         [real] Matlab-cartesian X coordinate (to nose)
 %                           'Y'         [real] Matlab-cartesian Y coordinate (to left ear)
 %                           'Z'         [real] Matlab-cartesian Z coordinate (to vertex)
 %                           '-X','-Y','-Z' Matlab-cartesian coordinates pointing away from above
-%                           'sph_theta' [real degrees] Matlab spherical horizontal angle; 
+%                           'sph_theta' [real degrees] Matlab spherical horizontal angle. 
 %                                       positive = rotating from nose (0) toward left ear.
 %                           'sph_phi'   [real degrees] Matlab spherical elevation angle;
 %                                       positive => rotating from horizontal (0) upwards.
 %                           'sph_radius' [real] distance from head center (unused) 
-%                           'sph_phi_besa' [real degrees] BESA phi angle from vertical; 
+%                           'sph_phi_besa' [real degrees] BESA phi angle from vertical. 
 %                                       positive => rotating from vertex (0) towards right ear.
-%                           'sph_theta_besa' [real degrees] BESA theta horiz/azimuthal angle; 
+%                           'sph_theta_besa' [real degrees] BESA theta horiz/azimuthal angle. 
 %                                       positive => rotating from right ear (0) toward nose.
 %     The input file may also contain other channel information fields
 %                           'type'      channel type: 'EEG', 'MEG', 'EMG', 'ECG', others ...
@@ -90,6 +90,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2007/03/22 23:38:10  toby
+% edit for help2html
+%
 % Revision 1.12  2006/01/10 22:35:25  arno
 % adding type for writing
 %
