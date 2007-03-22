@@ -45,7 +45,7 @@
 %                           'channum'   [positive integer] channel number.
 %                           'labels'    [string] channel name (no spaces).
 %                           'theta'     [real degrees] 2-D angle in polar coordinates.
-%                                       positive = rotating from nose (0) toward left ear
+%                                       positive => rotating from nose (0) toward left ear
 %                           'radius'    [real] radius for 2-D polar coords; 0.5 is the head
 %                                       disk radius and limit for topoplot() plotting).
 %                           'X'         [real] Matlab-Cartesian X coordinate (to nose).
@@ -54,9 +54,9 @@
 %                           '-X','-Y','-Z' Matlab-Cartesian coordinates pointing opposite
 %                                       to the above.
 %                           'sph_theta' [real degrees] Matlab spherical horizontal angle.
-%                                       positive = rotating from nose (0) toward left ear.
+%                                       positive => rotating from nose (0) toward left ear.
 %                           'sph_phi'   [real degrees] Matlab spherical elevation angle.
-%                                       positive = rotating from horizontal (0) upwards.
+%                                       positive => rotating from horizontal (0) upwards.
 %                           'sph_radius' [real] distance from head center (unused).
 %                           'sph_phi_besa' [real degrees] BESA phi angle from vertical.
 %                                       positive => rotating from vertex (0) towards right ear.
@@ -190,6 +190,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.95  2007/03/22 23:17:28  toby
+% for help2html
+%
 % Revision 1.94  2007/03/22 23:09:45  toby
 % edit to accomodate help2html
 %
