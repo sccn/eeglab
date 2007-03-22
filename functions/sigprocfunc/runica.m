@@ -101,6 +101,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2007/02/20 14:18:56  arno
+% nothing
+%
 % Revision 1.28  2006/06/20 02:00:57  toby
 % Modified for speed, about 15% faster
 %
@@ -771,7 +774,7 @@ if strcmp(sphering,'on'), %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   if verbose,
       fprintf('Computing the sphering matrix...\n');
   end
-  sphere = 2.0*inv(sqrtm(cov(data'))); % find the "sphering" matrix = spher()
+  sphere = 2.0*inv(sqrtm(double(cov(data')))); % find the "sphering" matrix = spher()
   if ~weights,
       if verbose,
           fprintf('Starting weights are the identity matrix ...\n');
@@ -884,8 +887,8 @@ if biasflag & extended
                     close; error('USER ABORT');
                 end;
             end
-
-            u=weights*data(:,timeperm(t:t+block-1)) + bias*onesrow;
+            
+            u=weights*double(data(:,timeperm(t:t+block-1))) + bias*onesrow;
             y=tanh(u);                                                       
             weights = weights + lrate*(BI-signs*y*u'-u*u')*weights;
             bias = bias + lrate*sum((-2*y)')';  % for tanh() nonlin.
@@ -914,9 +917,9 @@ if biasflag & extended
                             rp(ou) = fix(rand(1,length(ou))*datalength);
                             ou = find(rp == 0);
                         end
-                        partact=weights*data(:,rp(1:kurtsize));
+                        partact=weights*double(data(:,rp(1:kurtsize)));
                     else                                        % for small data sets,
-                        partact=weights*data;                   % use whole data
+                        partact=weights*double(data);           % use whole data
                     end
                     m2=mean(partact'.^2).^2;
                     m4= mean(partact'.^4);
@@ -1062,7 +1065,7 @@ if biasflag & ~extended
                 close; error('USER ABORT');
             end;
             
-            u=weights*data(:,timeperm(t:t+block-1)) + bias*onesrow;
+            u=weights*double(data(:,timeperm(t:t+block-1))) + bias*onesrow;
             y=1./(1+exp(-u));                                                
             weights = weights + lrate*(BI+(1-2*y)*u')*weights;               
             bias = bias + lrate*sum((1-2*y)')'; % for logistic nonlin. %
@@ -1191,7 +1194,7 @@ if ~biasflag & extended
                 close; error('USER ABORT');
             end
             
-            u=weights*data(:,timeperm(t:t+block-1));
+            u=weights*double(data(:,timeperm(t:t+block-1)));
             y=tanh(u);                                                       %
             weights = weights + lrate*(BI-signs*y*u'-u*u')*weights;
 
@@ -1219,9 +1222,9 @@ if ~biasflag & extended
                             rp(ou) = fix(rand(1,length(ou))*datalength);
                             ou = find(rp == 0);
                         end
-                        partact=weights*data(:,rp(1:kurtsize));
+                        partact=weights*double(data(:,rp(1:kurtsize)));
                     else                                        % for small data sets,
-                        partact=weights*data;                   % use whole data
+                        partact=weights*double(data);           % use whole data
                     end
                     m2=mean(partact'.^2).^2;
                     m4= mean(partact'.^4);
@@ -1364,7 +1367,7 @@ if ~biasflag & ~extended
             if ~isempty(get(0, 'currentfigure')) & strcmp(get(gcf, 'tag'), 'stop')
                 close; error('USER ABORT');
             end;
-            u=weights*data(:,timeperm(t:t+block-1));
+            u=weights*double(data(:,timeperm(t:t+block-1)));
             y=1./(1+exp(-u));                                                %
             weights = weights + lrate*(BI+(1-2*y)*u')*weights;
 
@@ -1493,22 +1496,22 @@ end
   %
   %%%%%%%%%%%%%% Orient components towards max positive activation %%%%%%
   %
-  if strcmp(pcaflag,'off')
-       sr = sphere * rowmeans';
-       for r = 1:ncomps
-         data(r,:) = data(r,:)+sr(r); % add back row means 
-       end
-       data = weights*data;
-       % make activations from data; -sm 7/05
-       % add back the row means removed from data before sphering
-  else
-       ser = sphere*eigenvectors(:,1:ncomps)'*rowmeans';
-       for r = 1:ncomps
-         data(r,:) = data(r,:)+ser(r); % add back row means 
-       end
-       data = weights*data;
-       % make activations from sphered and pca'd data; -sm 7/05
-       % add back the row means removed from data before sphering
+  if nargout > 6 | strcmp(posactflag,'on')
+      % make activations from sphered and pca'd data; -sm 7/05
+      % add back the row means removed from data before sphering
+      if strcmp(pcaflag,'off')
+          sr = sphere * rowmeans';
+          for r = 1:ncomps
+              data(r,:) = data(r,:)+sr(r); % add back row means 
+          end
+          data = weights*data; % OK in single
+      else
+          ser = sphere*eigenvectors(:,1:ncomps)'*rowmeans';
+          for r = 1:ncomps
+              data(r,:) = data(r,:)+ser(r); % add back row means 
+          end
+          data = weights*data; % OK in single
+      end;
   end
   %
   % NOTE: Now 'data' are the component activations = weights*sphere*raw_data
