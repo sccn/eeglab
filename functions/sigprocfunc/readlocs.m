@@ -14,21 +14,21 @@
 % Optional inputs:
 %   'filetype'  - ['loc'|'sph'|'sfp'|'xyz'|'asc'|'polhemus'|'besa'|'chanedit'|'custom'] 
 %                 Type of the file to read. By default the file type is determined 
-%                 using the file extension (see below under File Formats):
-%                  'loc' - an EEGLAB 2-D polar coordinates channel locations file 
+%                 using the file extension (see below under File Formats),
+%                  'loc'   an EEGLAB 2-D polar coordinates channel locations file 
 %                          Coordinates are theta and radius (see definitions below).
-%                  'sph' - Matlab spherical coordinates (Note: spherical
+%                  'sph'   Matlab spherical coordinates (Note: spherical
 %                          coordinates used by Matlab functions are different 
 %                          from spherical coordinates used by BESA - see below).
-%                  'sfp' - EGI Cartesian coordinates (NOT Matlab Cartesian - see below).
-%                  'xyz' - Matlab/EEGLAB Cartesian coordinates (NOT EGI Cartesian).
+%                  'sfp'   EGI Cartesian coordinates (NOT Matlab Cartesian - see below).
+%                  'xyz'   Matlab/EEGLAB Cartesian coordinates (NOT EGI Cartesian).
 %                          z is toward nose; y is toward left ear; z is toward vertex
-%                  'asc' - Neuroscan polar coordinates.
+%                  'asc'   Neuroscan polar coordinates.
 %                  'polhemus' or 'polhemusx' - Polhemus electrode location file recorded 
 %                          with 'X' on sensor pointing to subject (see below and readelp()).
 %                  'polhemusy' - Polhemus electrode location file recorded with 
 %                          'Y' on sensor pointing to subject (see below and readelp()).
-%                  'besa' - BESA-'.elp' spherical coordinates. (Not MATLAB spherical -
+%                  'besa' BESA-'.elp' spherical coordinates. (Not MATLAB spherical -
 %                           see below).
 %                  'chanedit' - EEGLAB channel location file created by pop_chanedit().
 %                  'custom' - Ascii file with columns in user-defined 'format' (see below).
@@ -39,34 +39,34 @@
 %                  original carthesian coordinates (user can then specify the position of
 %                  the nose when calling the topoplot() function; in EEGLAB the position
 %                  of the nose is stored in the EEG.chaninfo structure). {default 'eeglab'}
-%   'format'    - [cell array] Format of a 'custom' channel location file (see above).
-%                          {default: if no file type is defined. The cell array contains
-%                          labels defining the meaning of each column of the input file:
-%                           'channum'   [positive integer] channel number 
+%   'format'    -  [cell array] Format of a 'custom' channel location file (see above).
+%                  {default: if no file type is defined. The cell array contains
+%                  labels defining the meaning of each column of the input file.
+%                           'channum'   [positive integer] channel number
 %                           'labels'    [string] channel name (no spaces)
-%                           'theta'     [real degrees] 2-D angle in polar coordinates; 
-%                                       positive = rotating from nose (0) toward left ear 
-%                           'radius'    [real] radius for 2-D polar coords; 0.5 is the head 
+%                           'theta'     [real degrees] 2-D angle in polar coordinates;
+%                                       positive = rotating from nose (0) toward left ear
+%                           'radius'    [real] radius for 2-D polar coords; 0.5 is the head
 %                                       disk radius and limit for topoplot() plotting)
 %                           'X'         [real] Matlab-Cartesian X coordinate (to nose)
 %                           'Y'         [real] Matlab-Cartesian Y coordinate (to left ear)
 %                           'Z'         [real] Matlab-Cartesian Z coordinate (to vertex)
 %                           '-X','-Y','-Z' Matlab-Cartesian coordinates pointing opposite
 %                                       to the above.
-%                           'sph_theta' [real degrees] Matlab spherical horizontal angle; 
+%                           'sph_theta' [real degrees] Matlab spherical horizontal angle;
 %                                       positive = rotating from nose (0) toward left ear.
 %                           'sph_phi'   [real degrees] Matlab spherical elevation angle;
 %                                       positive = rotating from horizontal (0) upwards.
-%                           'sph_radius' [real] distance from head center (unused) 
-%                           'sph_phi_besa' [real degrees] BESA phi angle from vertical; 
-%                                       positive = rotating from vertex (0) towards right ear.
-%                           'sph_theta_besa' [real degrees] BESA theta horiz/azimuthal angle; 
-%                                       positive = rotating from right ear (0) toward nose.
+%                           'sph_radius' [real] distance from head center (unused)
+%                           'sph_phi_besa' [real degrees] BESA phi angle from vertical;
+%                                       positive => rotating from vertex (0) towards right ear.
+%                           'sph_theta_besa' [real degrees] BESA theta horiz/azimuthal angle;
+%                                       positive => rotating from right ear (0) toward nose.
 %                           'ignore'    ignore column}
 %     The input file may also contain other channel information fields
 %                           'type'      channel type: 'EEG', 'MEG', 'EMG', 'ECG', others ...
 %                           'calib'     [real near 1.0] channel calibration value.
-%                           'gain'      [real > 1] channel gain. 
+%                           'gain'      [real > 1] channel gain.
 %                           'custom1'   custom field #1.
 %                           'custom2', 'custom3', 'custom4', etc.    more custom fields
 %   'skiplines' - [integer] Number of header lines to skip (in 'custom' file types only).
@@ -190,6 +190,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.93  2007/03/22 21:22:34  arno
+% same
+%
 % Revision 1.92  2007/03/22 21:18:47  arno
 % indices of non empty channels
 %
