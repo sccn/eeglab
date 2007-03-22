@@ -190,6 +190,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.91  2007/02/05 16:18:43  arno
+% reading channel types for .ced format
+%
 % Revision 1.90  2006/11/09 20:46:51  arno
 % fixing readling .elp files
 %
@@ -727,7 +730,11 @@ end;
 if nargout > 2
     tmptheta          = { eloc.theta }; % check which channels have (polar) coordinates set
     indices           = find(~cellfun('isempty', tmptheta));
-    indbad            = find(cellfun('isempty', tmptheta));
+    tmpx              = { eloc.X }; % check which channels have (polar) coordinates set
+    indices           = intersect(find(~cellfun('isempty', tmpx)), indices);
+    indices           = sort(indices);
+    
+    indbad            = setdiff(1:length(elocs), indices);
     tmptheta(indbad)  = { NaN };
     theta             = [ tmptheta{:} ];
 end;
