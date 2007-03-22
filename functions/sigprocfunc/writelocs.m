@@ -31,7 +31,7 @@
 %                  'custom' - Ascii files with columns in user-defined 'format' (see below).
 %   'format'    - [cell array] Format of a 'custom' channel location file (see above).
 %                          Default if no file type is defined. The cell array contains
-%                          labels defining the meaning of each column of the input file:
+%                          labels defining the meaning of each column of the input file.
 %                           'channum'   [positive integer] channel number 
 %                           'labels'    [string] channel name (no spaces)
 %                           'theta'     [real degrees] 2-D angle in polar coordinates; 
@@ -44,12 +44,12 @@
 %                           'sph_theta' [real degrees] Matlab spherical horizontal angle; 
 %                                       positive = rotating from nose (0) toward left ear.
 %                           'sph_phi'   [real degrees] Matlab spherical elevation angle;
-%                                       positive = rotating from horizontal (0) upwards.
+%                                       positive => rotating from horizontal (0) upwards.
 %                           'sph_radius' [real] distance from head center (unused) 
 %                           'sph_phi_besa' [real degrees] BESA phi angle from vertical; 
-%                                       positive = rotating from vertex (0) towards right ear.
+%                                       positive => rotating from vertex (0) towards right ear.
 %                           'sph_theta_besa' [real degrees] BESA theta horiz/azimuthal angle; 
-%                                       positive = rotating from right ear (0) toward nose.
+%                                       positive => rotating from right ear (0) toward nose.
 %     The input file may also contain other channel information fields
 %                           'type'      channel type: 'EEG', 'MEG', 'EMG', 'ECG', others ...
 %                           'calib'     [real near 1.0] channel calibration value.
@@ -90,6 +90,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2006/01/10 22:35:25  arno
+% adding type for writing
+%
 % Revision 1.11  2005/03/09 18:49:57  arno
 % new format
 %
