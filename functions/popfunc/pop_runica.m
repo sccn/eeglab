@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.72  2007/03/21 23:11:26  arno
+% help message
+%
 % Revision 1.71  2007/03/21 23:08:33  arno
 % warning for computing ICA weights
 %
@@ -517,15 +520,17 @@ end;
 % -----------------------------
 tmpdata = reshape( EEG.data(g.chanind,:,:), length(g.chanind), EEG.pnts*EEG.trials);
 tmpdata = tmpdata - repmat(mean(tmpdata,2), [1 size(tmpdata,2)]); % zero mean 
-try,
-    disp('Converting data matrix to double precision (more accurate ICA results)')
-    tmpdata = double(tmpdata);
-catch,
-    disp('*************************************************************')
-    disp('Not enougth memory to convert data Matrix to double precision')
-    disp('All computation will be done in single precision. Matlab 7.x')
-    disp('(under 64-bit Linux and others) is VERY imprecise in this mode')
-    disp('*************************************************************')
+if ~strcmpi(lower(g.icatype), 'runica') & ~strcmpi(lower(g.icatype), 'binica')
+    try,
+        disp('Converting data matrix to double precision (more accurate ICA results)')
+        tmpdata = double(tmpdata);
+    catch,
+        disp('*************************************************************')
+        disp('Not enougth memory to convert data Matrix to double precision')
+        disp('All computation will be done in single precision. Matlab 7.x')
+        disp('(under 64-bit Linux and others) is VERY imprecise in this mode')
+        disp('*************************************************************')
+    end;
 end;
 switch lower(g.icatype)
     case 'runica' 
