@@ -190,6 +190,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.92  2007/03/22 21:18:47  arno
+% indices of non empty channels
+%
 % Revision 1.91  2007/02/05 16:18:43  arno
 % reading channel types for .ced format
 %
@@ -734,7 +737,7 @@ if nargout > 2
     indices           = intersect(find(~cellfun('isempty', tmpx)), indices);
     indices           = sort(indices);
     
-    indbad            = setdiff(1:length(elocs), indices);
+    indbad            = setdiff(1:length(eloc), indices);
     tmptheta(indbad)  = { NaN };
     theta             = [ tmptheta{:} ];
 end;
