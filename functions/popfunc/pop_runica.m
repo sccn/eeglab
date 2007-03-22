@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.74  2007/03/22 18:39:29  arno
+% convert to double for rank calculation
+%
 % Revision 1.73  2007/03/22 18:38:46  arno
 % do not convert data to double for runica and binica
 %
@@ -523,15 +526,18 @@ end;
 % -----------------------------
 tmpdata = reshape( EEG.data(g.chanind,:,:), length(g.chanind), EEG.pnts*EEG.trials);
 tmpdata = tmpdata - repmat(mean(tmpdata,2), [1 size(tmpdata,2)]); % zero mean 
-if ~strcmpi(lower(g.icatype), 'runica') & ~strcmpi(lower(g.icatype), 'binica')
+if ~strcmpi(lower(g.icatype), 'binica')
     try,
-        disp('Converting data matrix to double precision (more accurate ICA results)')
+        disp('Attempting to convert data matrix to double precision (more accurate ICA results)')
         tmpdata = double(tmpdata);
+        tmpdata2 = tmpdata+1; % check for more memory
+        clear tmpdata2;
     catch,
         disp('*************************************************************')
         disp('Not enougth memory to convert data Matrix to double precision')
         disp('All computation will be done in single precision. Matlab 7.x')
-        disp('(under 64-bit Linux and others) is VERY imprecise in this mode')
+        disp('(under 64-bit Linux and others) is imprecise in this mode')
+        disp('We advise that you use "binica" instead of "runica"')
         disp('*************************************************************')
     end;
 end;
