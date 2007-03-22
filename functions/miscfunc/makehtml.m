@@ -73,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2006/03/11 06:50:36  arno
+% output only etc...
+%
 % Revision 1.16  2003/05/23 17:45:20  arno
 % update header
 %
@@ -317,10 +320,10 @@ function makehelphtml( files, fo, title, STYLEHEADER, DEST, mode, options, maino
                     catch, fprintf('Cannot copy file %s\n', inputfile); end;
                 end;
             else
-                cd(DEST); com = help2html( files{index}, [], options{:}, 'outputonly', 'on'); cd(tmpdir);
                 fprintf( fo, '%s', com);
-                fprintf('Skipping %s\n', files{index});                
-            end;
+                fprintf('Skipping %s\n', files{index});
+                cd(DEST); com = help2html( files{index}, [], options{:}, 'outputonly', 'on'); cd(tmpdir);
+            end
 		end;
 		fprintf(fo, '</table>' );
 	end;	
