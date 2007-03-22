@@ -42,28 +42,28 @@
 %   'format'    -  [cell array] Format of a 'custom' channel location file (see above).
 %                  {default: if no file type is defined. The cell array contains
 %                  labels defining the meaning of each column of the input file.
-%                           'channum'   [positive integer] channel number
-%                           'labels'    [string] channel name (no spaces)
-%                           'theta'     [real degrees] 2-D angle in polar coordinates;
+%                           'channum'   [positive integer] channel number.
+%                           'labels'    [string] channel name (no spaces).
+%                           'theta'     [real degrees] 2-D angle in polar coordinates.
 %                                       positive = rotating from nose (0) toward left ear
 %                           'radius'    [real] radius for 2-D polar coords; 0.5 is the head
-%                                       disk radius and limit for topoplot() plotting)
-%                           'X'         [real] Matlab-Cartesian X coordinate (to nose)
-%                           'Y'         [real] Matlab-Cartesian Y coordinate (to left ear)
-%                           'Z'         [real] Matlab-Cartesian Z coordinate (to vertex)
+%                                       disk radius and limit for topoplot() plotting).
+%                           'X'         [real] Matlab-Cartesian X coordinate (to nose).
+%                           'Y'         [real] Matlab-Cartesian Y coordinate (to left ear).
+%                           'Z'         [real] Matlab-Cartesian Z coordinate (to vertex).
 %                           '-X','-Y','-Z' Matlab-Cartesian coordinates pointing opposite
 %                                       to the above.
-%                           'sph_theta' [real degrees] Matlab spherical horizontal angle;
+%                           'sph_theta' [real degrees] Matlab spherical horizontal angle.
 %                                       positive = rotating from nose (0) toward left ear.
-%                           'sph_phi'   [real degrees] Matlab spherical elevation angle;
+%                           'sph_phi'   [real degrees] Matlab spherical elevation angle.
 %                                       positive = rotating from horizontal (0) upwards.
-%                           'sph_radius' [real] distance from head center (unused)
-%                           'sph_phi_besa' [real degrees] BESA phi angle from vertical;
+%                           'sph_radius' [real] distance from head center (unused).
+%                           'sph_phi_besa' [real degrees] BESA phi angle from vertical.
 %                                       positive => rotating from vertex (0) towards right ear.
-%                           'sph_theta_besa' [real degrees] BESA theta horiz/azimuthal angle;
+%                           'sph_theta_besa' [real degrees] BESA theta horiz/azimuthal angle.
 %                                       positive => rotating from right ear (0) toward nose.
-%                           'ignore'    ignore column}
-%     The input file may also contain other channel information fields
+%                           'ignore'    ignore column}.
+%     The input file may also contain other channel information fields.
 %                           'type'      channel type: 'EEG', 'MEG', 'EMG', 'ECG', others ...
 %                           'calib'     [real near 1.0] channel calibration value.
 %                           'gain'      [real > 1] channel gain.
@@ -190,6 +190,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.94  2007/03/22 23:09:45  toby
+% edit to accomodate help2html
+%
 % Revision 1.93  2007/03/22 21:22:34  arno
 % same
 %
