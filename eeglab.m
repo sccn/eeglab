@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.501  2007/03/20 03:17:40  arno
+% history for cluster edition
+%
 % Revision 1.500  2007/03/07 17:51:50  arno
 % path
 %
@@ -2990,7 +2993,6 @@ elseif (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG(1).data)
         % ---------------
         if EEG.trials == 1, 
             set( findobj('parent', file_m, 'type', 'uimenu', 'Label', 'Import epoch info' ), 'enable', 'off'); 
-            set( findobj('parent', tool_m, 'type', 'uimenu', 'Label', 'Remove baseline'   ), 'enable', 'off'); 
             set( findobj('parent', tool_m, 'type', 'uimenu', 'Label', 'Reject data epochs'), 'enable', 'off'); 
             set( findobj('parent', ica_m , 'type', 'uimenu'), 'enable', 'off'); 
             set( findobj('parent', ica_m , 'type', 'uimenu', 'label', 'Reject components by map' ), 'enable', 'on'); 
