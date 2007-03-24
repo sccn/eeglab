@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2007/03/24 02:08:29  arno
+% same
+%
 % Revision 1.22  2007/03/24 02:07:13  arno
 % message
 %
@@ -162,9 +165,7 @@ if nargin < 2 & EEG(1).trials > 1
 elseif nargin < 2 & EEG(1).trials == 1
 	% popup window parameters
 	% -----------------------
-    resp = questdlg2(strvcat('Remove mean of each data channel in', ...
-             'each unbroken portion of continuous data', ...
-             '(portions delimited by boundary events))'), 'pop_rmbase', 'Cancel', 'Ok', 'Ok');
+    resp = questdlg2(strvcat('Remove mean of each data channel'), 'pop_rmbase', 'Cancel', 'Ok', 'Ok');
     if strcmpi(resp, 'Cancel'), return; end;
     timerange = [];
     pointrange = [1:EEG(1).pnts];
@@ -204,7 +205,7 @@ if EEG.trials == 1 & ~isempty(EEG.event) ...
                      & isfield(EEG.event, 'type') ...
                         & isstr(EEG.event(1).type)
 	boundaries = strmatch('boundary', {EEG.event.type});
-	if ~isempty(boundaries)
+	if 0 %~isempty(boundaries) % this is crashing
         fprintf('Pop_rmbase(): finding continuous data discontinuities\n');
         boundaries = [ EEG.event(boundaries).latency ] -0.5-pointrange(1)+1;
         boundaries(find(boundaries>=pointrange(end)-pointrange(1))) = [];
