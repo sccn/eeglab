@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2007/02/20 14:18:21  arno
+% now can process several datasets
+%
 % Revision 1.20  2005/08/05 16:44:42  arno
 % fixed time range
 %
@@ -156,8 +159,9 @@ if nargin < 2 & EEG(1).trials > 1
 elseif nargin < 2 & EEG(1).trials == 1
 	% popup window parameters
 	% -----------------------
-    resp = questdlg2(strvcat('Remove baseline of each channel (in', ...
-             'each unbroken portion of continuous data)'), 'pop_rmbase', 'Cancel', 'Ok', 'Ok');
+    resp = questdlg2(strvcat('Remove mean of each data channel (in', ...
+             'each unbroken portion of continuous data,' ...
+             'delimited by boundary events))'), 'pop_rmbase', 'Cancel', 'Ok', 'Ok');
     if strcmpi(resp, 'Cancel'), return; end;
     timerange = [];
     pointrange = [1:EEG(1).pnts];
