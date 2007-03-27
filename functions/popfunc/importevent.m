@@ -77,6 +77,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 %% $Log: not supported by cvs2svn $
+%% Revision 1.8  2007/03/14 00:54:37  toby
+%% cell mode edit
+%%
 % Revision 1.7  2007/03/14 00:51:35  toby
 % Logging bug
 
@@ -179,14 +182,15 @@ for curfield = tmpfields'
                       
                       % add new values
                       % ---------------------
-                      for eventfield = 1:size(tmparray,2)
-                          %if isstr(tmparray{1,eventfield})
-                              for indtmp = 1:length(g.indices)
-                                  event = setstruct( event, g.fields{eventfield}, g.indices(indtmp), tmparray{indtmp,eventfield});
-                              end;
-                          %else event = setstruct( event, g.fields{eventfield}, g.indices, [ tmparray{:,eventfield} ]);
-                          %end;
-                      end;      
+                      event(g.indices) = cell2struct(tmparray{g.indices,:},g.fields,2);
+                      %for eventfield = 1:size(tmparray,2)
+                      %    if isstr(tmparray{1,eventfield})
+                      %        for indtmp = 1:length(g.indices)
+                      %            event = setstruct( event, g.fields{eventfield}, g.indices(indtmp), tmparray{indtmp,eventfield});
+                      %        end;
+                      %    else event = setstruct( event, g.fields{eventfield}, g.indices, [ tmparray{:,eventfield} ]);
+                      %    end;
+                      %end;      
 					  % generate ori fields
 					  % -------------------
 					  offset = length(event)-size(tmparray,2);
