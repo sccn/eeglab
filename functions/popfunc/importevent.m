@@ -182,15 +182,14 @@ for curfield = tmpfields'
                       
                       % add new values
                       % ---------------------
-                      event(g.indices) = cell2struct(tmparray{g.indices,:},g.fields,2);
-                      %for eventfield = 1:size(tmparray,2)
-                      %    if isstr(tmparray{1,eventfield})
-                      %        for indtmp = 1:length(g.indices)
-                      %            event = setstruct( event, g.fields{eventfield}, g.indices(indtmp), tmparray{indtmp,eventfield});
-                      %        end;
-                      %    else event = setstruct( event, g.fields{eventfield}, g.indices, [ tmparray{:,eventfield} ]);
-                      %    end;
-                      %end;      
+                      for eventfield = 1:size(tmparray,2)
+                          %if isstr(tmparray{1,eventfield})
+                              for indtmp = 1:length(g.indices)
+                                  event = setstruct( event, g.fields{eventfield}, g.indices(indtmp), tmparray{indtmp,eventfield});
+                              end;
+                          %else event = setstruct( event, g.fields{eventfield}, g.indices, [ tmparray{:,eventfield} ]);
+                          %end;
+                      end;      
 					  % generate ori fields
 					  % -------------------
 					  offset = length(event)-size(tmparray,2);
