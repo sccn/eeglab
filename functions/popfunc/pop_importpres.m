@@ -54,6 +54,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2006/10/18 01:17:17  scott
+% help file edits -sm
+%
 % Revision 1.16  2004/05/24 22:06:56  arno
 % importing duration field
 %
@@ -192,7 +195,10 @@ fields{indtype} = 'type';
 fields{indlat}  = 'latency';
 if inddur ~= 0
     fields{inddur}  = 'duration';
-end;
+end
+
+% check inputs
+
 
 % regularizing field names
 % ------------------------
@@ -228,7 +234,9 @@ end;
 % -----------
 if isempty(EEG.event), align = NaN; end;
 
-EEG = pop_importevent(EEG, 'append', 'no', 'event', filename, 'timeunit', 1E-4, 'skipline', -3, ...
+%EEG = pop_importevent(EEG, 'append', 'no', 'event', filename, 'timeunit', 1E-4, 'skipline', -3, ...
+%                           'delim', 9, 'align', align, 'fields', fields, varargin{:});
+EEG = pop_importevent(EEG, 'event', filename, 'timeunit', 1E-4, 'skipline', -3, ...
                            'delim', 9, 'align', align, 'fields', fields, varargin{:});
 
 command = sprintf('EEG = pop_importpres(%s, %s);', inputname(1), vararg2str({ filename typefield latfield durfield align })); 
