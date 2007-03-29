@@ -77,6 +77,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 %% $Log: not supported by cvs2svn $
+%% Revision 1.10  2007/03/27 00:55:55  toby
+%% Revert to version 1.8
+%%
 %% Revision 1.8  2007/03/14 00:54:37  toby
 %% cell mode edit
 %%
@@ -183,10 +186,11 @@ for curfield = tmpfields'
                       % add new values
                       % ---------------------
                       for eventfield = 1:size(tmparray,2)
+                          event = setstruct( event, g.fields{eventfield}, g.indices, { tmparray{:,eventfield} });
                           %if isstr(tmparray{1,eventfield})
-                              for indtmp = 1:length(g.indices)
-                                  event = setstruct( event, g.fields{eventfield}, g.indices(indtmp), tmparray{indtmp,eventfield});
-                              end;
+                          %   for indtmp = 1:length(g.indices)
+                          %        event = setstruct( event, g.fields{eventfield}, g.indices(indtmp), tmparray{indtmp,eventfield});
+                          %    end;
                           %else event = setstruct( event, g.fields{eventfield}, g.indices, [ tmparray{:,eventfield} ]);
                           %end;
                       end;      
@@ -349,7 +353,7 @@ function var = setstruct( var, fieldname, indices, values )
     if exist('indices') ~= 1, indices = 1:length(var); end
     if ~isempty(values)
         for index = 1:length(indices)
-            var = setfield(var, {indices(index)}, fieldname, values(index));
+            var = setfield(var, {indices(index)}, fieldname, values{index});
         end
     else
         for index = 1:length(indices)
