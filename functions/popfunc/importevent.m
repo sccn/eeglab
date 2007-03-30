@@ -76,13 +76,17 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-%% $Log: not supported by cvs2svn $
-%% Revision 1.10  2007/03/27 00:55:55  toby
-%% Revert to version 1.8
-%%
-%% Revision 1.8  2007/03/14 00:54:37  toby
-%% cell mode edit
-%%
+%% REVISION HISTORY
+% $Log: not supported by cvs2svn $
+% Revision 1.11  2007/03/29 02:33:35  toby
+% option 'append' debugged. see bugzilla bug230
+%
+% Revision 1.10  2007/03/27 00:55:55  toby
+% Revert to version 1.8
+%
+% Revision 1.8  2007/03/14 00:54:37  toby
+% cell mode edit
+%
 % Revision 1.7  2007/03/14 00:51:35  toby
 % Logging bug
 
@@ -131,6 +135,8 @@ if ~isnan(g.align.val)
         error('Setevent: pre-existing events do not have a latency field for re-alignment');
     end;    
     switch g.append
+        % What is the reasoning behind this warning? It seems misleading. TobyF
+        % 3/28/2007
         case {'yes' '''yes'''}, disp('Setevent warning: using align, events should not be appended but erased');
     end;
     if g.align.val < 0
@@ -187,12 +193,6 @@ for curfield = tmpfields'
                       % ---------------------
                       for eventfield = 1:size(tmparray,2)
                           event = setstruct( event, g.fields{eventfield}, g.indices, { tmparray{:,eventfield} });
-                          %if isstr(tmparray{1,eventfield})
-                          %   for indtmp = 1:length(g.indices)
-                          %        event = setstruct( event, g.fields{eventfield}, g.indices(indtmp), tmparray{indtmp,eventfield});
-                          %    end;
-                          %else event = setstruct( event, g.fields{eventfield}, g.indices, [ tmparray{:,eventfield} ]);
-                          %end;
                       end;      
 					  % generate ori fields
 					  % -------------------
