@@ -155,7 +155,9 @@ if strcmpi(mode, 'apart')  % case each cluster on a separate figure
                    dip_ind = [dip_ind k];
                end
             end % finished going over cluster comps
-            cluster_dip_models(end + 1) = STUDY.cluster(cls(clus)).dipole;
+            cluster_dip_models(end + 1).posxyz = STUDY.cluster(cls(clus)).dipole.posxyz;
+            cluster_dip_models(end + 1).momxyz = STUDY.cluster(cls(clus)).dipole.momxyz;
+            cluster_dip_models(end + 1).rv     = STUDY.cluster(cls(clus)).dipole.rv;
            
            % additional options
            % ------------------
