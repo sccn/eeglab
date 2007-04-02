@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2007/04/02 18:54:52  toby
+% Bug 261, wrong function name. Courtesy Maxim Duester
+%
 % Revision 1.14  2006/04/12 04:16:00  scott
 % angTimeWarp -> angtimewarp()
 %
@@ -403,7 +406,7 @@ end
 
 
 
-function [amps, cohers, nsums]=getAmpCoh(allamps, allphs, MIN_AMP);
+function [amps, cohers, nsums] = getAmpCoh(allamps, allphs, MIN_AMP)
   minampfilter = allamps >= MIN_AMP;
   nsums = sum(minampfilter,2);
 
@@ -413,9 +416,10 @@ function [amps, cohers, nsums]=getAmpCoh(allamps, allphs, MIN_AMP);
                                 %significant power at that frame
                                 %Now average out amplitudes over trials
   allminamps = allamps;
-  if nargout > 3
-    allminamps(~minampfilter) = MIN_AMP;
-  end
+  % nargout is never greater than 3. Bug 262. TF 04/02/2007
+  %if nargout > 3
+  %  allminamps(~minampfilter) = MIN_AMP;
+  %end
   allzeramps = allamps .* minampfilter;
   allzeramps = allzeramps(find(nsums ~= 0),:);
   amps(find(nsums ~= 0)) = sum(allzeramps,2) ./ nsums(find(nsums ~= 0));
