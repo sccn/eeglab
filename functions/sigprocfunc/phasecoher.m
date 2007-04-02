@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2006/04/12 04:16:00  scott
+% angTimeWarp -> angtimewarp()
+%
 % Revision 1.13  2006/04/12 04:11:00  scott
 % timeWarp -> timewarp()
 %
@@ -101,7 +104,7 @@
 % 01-25-02 reformated help & license, added links -ad 
 
 function [amps,cohers,cohsig,ampsig,allamps,allphs] = ...
-      myphasecoher(data, frames, srate, freq, cycles, alpha, times, titl, timeStretchRef, timeStretchMarks)
+      phasecoher(data, frames, srate, freq, cycles, alpha, times, titl, timeStretchRef, timeStretchMarks)
 
 MIN_AMP = 10^-6;
 DEFAULT_ALPHA = nan;% no bootstrap computed
@@ -115,7 +118,7 @@ ampsig = []; % initialize for null output
 cohsig = [];
 
 if nargin<4
-  help myphasecoher
+  help phasecoher
   return
 end
 if nargin<5
