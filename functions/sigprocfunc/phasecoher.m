@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2007/04/02 19:01:11  toby
+% Bug 262. Courtesy Maxim Duester
+%
 % Revision 1.15  2007/04/02 18:54:52  toby
 % Bug 261, wrong function name. Courtesy Maxim Duester
 %
@@ -415,7 +418,8 @@ function [amps, cohers, nsums] = getAmpCoh(allamps, allphs, MIN_AMP)
   cohers(find(nsums == 0)) = 0; %zero the coherence too if no trial shows
                                 %significant power at that frame
                                 %Now average out amplitudes over trials
-  allminamps = allamps;
+  % allminamps is never used. TF 04/02/2007                              
+  %allminamps = allamps;
   % nargout is never greater than 3. Bug 262. TF 04/02/2007
   %if nargout > 3
   %  allminamps(~minampfilter) = MIN_AMP;
