@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2007/04/03 03:07:06  toby
+% bug 259, courtesy Maxim D
+%
 % Revision 1.17  2007/04/02 19:08:36  toby
 % unused variable commented out.
 %
@@ -235,9 +238,6 @@ sinwin = sinwin/(sinwin*sinx');
 % iang = -cycles*pi:angleinc:cycles*pi;
 % iang = iang(1:winlength);
 % figure;plot(iang,[sinwin;coswin]);
-
-realcoh = zeros(1,frames);
-imagcoh = zeros(1,frames);
 amps    = zeros(1,frames);
 if nargout > 3
   allamps = zeros(frames,trials);
@@ -247,7 +247,7 @@ if nargout > 5
 end
 cohers  = zeros(1,frames);
 ix = 0:winlength-1;
-nsums = zeros(1,frames);
+% nsums = zeros(1,frames);  % never called
 
 C = [];
 
@@ -266,11 +266,6 @@ end
 
 allamps = sqrt(C.*conj(C)); %compute all amplitudes for all frames, all trials
 allphs = angle(C); %get the phase
-                   
-%for debugging
-allphampsori = allamps; 
-allphsori = allphs;
-%end debug
 
 if exist('timeStretchRef') & exist('timeStretchMarks') & ...
     length(timeStretchRef) > 0 & length(timeStretchMarks) > 0 %Added -Jean
@@ -285,6 +280,8 @@ end
 [amps, cohers, nsums]=getAmpCoh(allamps, allphs, MIN_AMP);
 
 % Old routine, for archeological purposes
+% $$$ realcoh = zeros(1,frames);
+% $$$ imagcoh = zeros(1,frames);
 % $$$ for f = 1:frames %%%%%%%%%%%%%%% frames %%%%%%%%%%%%%%%%%%%%
 % $$$   epoch = data(ix+f,:);
 % $$$   %epoch = epoch - ones(winlength,1)*mean(epoch); % remove epoch means
@@ -331,7 +328,7 @@ fprintf('\n');
 cohsig = [];
 
 if ~isnan(alpha)  %%%%%%%%%%%%%% Compute cohsig/ampsig %%%%%%%%%%%%%%
- ix = 0:winlength-1;
+ % ix = 0:winlength-1;  % never called
  bootcoher = zeros(1,COHSIG_REPS);
  bootamp   = zeros(1,COHSIG_REPS);
  
@@ -398,7 +395,7 @@ if PLOT_IT %%%%%%%%%%%%%% make two-panel plot of results %%%%%%%%
   ax = axis; 
   plot(wintimes,0.8+window*0.1,'k');
   plot(wintimes,0.8-window*0.1,'k');
-  ax2 = axis; 
+  % ax2 = axis;     % never called
   hold on; plot([0 0],[0 1000],'k');   % vertical line at time 0
   axis([ax(1) ax(2) 0 1]);
      set(gca,'fontSize',TICKFONT);
