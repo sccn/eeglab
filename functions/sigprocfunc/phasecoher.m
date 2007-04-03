@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2007/04/02 19:08:36  toby
+% unused variable commented out.
+%
 % Revision 1.16  2007/04/02 19:01:11  toby
 % Bug 262. Courtesy Maxim Duester
 %
@@ -172,7 +175,7 @@ if length(frames)>1
    return
 end
 if frames == 0,
-   frames = size(data,2);
+   frames = size(data,1);
 end
 trials = size(data,1)*size(data,2)/frames;
 if floor(trials) ~= trials
