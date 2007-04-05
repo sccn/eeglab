@@ -421,7 +421,7 @@ else
         case 'plotsum'
             changrpstr = allchans(changrp);
             [STUDY] = std_propplot(STUDY, ALLEEG, allchans(changrp));
-            a = ['STUDY = std_propplot(STUDY, ALLEEG, ' vararg2str(allchans(changrp)) ' );'  ];
+            a = ['STUDY = std_propplot(STUDY, ALLEEG, ' vararg2str({ allchans(changrp) }) ' );'  ];
             STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
             userdat{1}{2} = STUDY;
             set(hdl, 'userdat',userdat);    
