@@ -70,6 +70,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2007/04/05 23:13:39  arno
+% *** empty log message ***
+%
 % Revision 1.11  2007/02/28 12:05:14  arno
 % option to force recomputation
 %
@@ -176,7 +179,7 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
             if strcmpi(guimode, 'cancel'), return; end;
             
         end;
-        if strcmpi(guimode, 'usedisk'), g.recompute = 'off'; end;
+        if strcmpi(guimode, 'usedisk') | strcmpi(guimode, 'same'), g.recompute = 'off'; end;
         
         % check for existing files
         % ------------------------
