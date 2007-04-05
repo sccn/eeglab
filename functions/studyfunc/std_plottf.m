@@ -96,6 +96,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2007/01/26 18:10:15  arno
+% Initial revision
+%
 % Revision 1.24  2006/11/23 00:26:22  arno
 % cosmetic change
 %
@@ -205,6 +208,7 @@ opt = finputcheck( varargin, { 'channels'    'cell'   []              {};
                                'unitx'       'string' []              'ms'; % just for titles
                                'subject'     'string' []              '';   % just for titles
                                'chanlocs'    'struct' []              struct('labels', {});
+                               'freqscale'   'string' { 'log' 'linear' }  'auto';
                                'plotsubjects' 'string' { 'on' 'off' }  'off';
                                'groupstats'   'string' { 'on' 'off' }   'off';
                                'plottopo'     'string' { 'on' 'off' }   'off';
@@ -247,6 +251,15 @@ if isempty(opt.groupnames)
     if ng == 1, opt.groupnames = { '' }; end;
 end;
 
+% test log frequencies
+% --------------------
+if length(freqs) > 2 & strcmpi(opt.freqscale, 'auto')
+    midfreq = (freqs(3)-freqs(1))/2;
+    if midfreq*.95 < freqs(2) & midfreq*1.05 > freqs(2), opt.freqscale = 'linear';
+    else                                                 opt.freqscale = 'log';
+    end;
+end;
+
 % condensed plot
 % --------------
 if strcmpi(opt.plotmode, 'condensed') 
@@ -257,7 +270,8 @@ if strcmpi(opt.plotmode, 'condensed')
         end;
     end;
     options = { 'chanlocs', opt.chanlocs, 'electrodes', 'off', 'cbar', 'off', ...
-            'cmode', 'separate', 'logfreq', 'native', opt.tftopoopt{:} };
+            'cmode', 'separate', opt.tftopoopt{:} };
+    if strcmpi(opt.freqscale, 'log'), options = { options{:} 'logfreq', 'native' }; end;
     tftopo( meanplot', timevals, freqs, 'title', [ 'Mean ' upper(opt.datatype) ' for all group/cond' ], options{:}); 
     return;
 end;
@@ -333,7 +347,9 @@ if isempty(opt.topovals)
     % plot time/frequency image
     % -------------------------
     options = { 'chanlocs', opt.chanlocs, 'electrodes', 'off', 'cbar', 'off', ...
-                'cmode', 'separate', 'logfreq', 'native', opt.tftopoopt{:} };
+                'cmode', 'separate', opt.tftopoopt{:} };
+    if strcmpi(opt.freqscale, 'log'), options = { options{:} 'logfreq', 'native' }; end;
+
     figure('color', 'w');
     tmpc = single([inf -inf]);
     for c = 1:nc
