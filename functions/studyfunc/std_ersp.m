@@ -116,6 +116,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.42  2006/11/14 03:11:24  arno
+% nothing
+%
 % Revision 1.41  2006/10/05 15:13:28  arno
 % fixing processing ICA data for 'savetrials'
 %
@@ -261,7 +264,7 @@ end;
                         'cycles'        'real'        []      [3 .5];
                         'padratio'      'real'        []      4;
                         'freqs'         'real'        []      [3 50];
-                        'freqscale'     'string'      []      'linear';
+                        'freqscale'     'string'      []      'log';
                         'alpha'         'real'        []      NaN;
                         'type'          'string'      { 'ersp' 'itc' 'both' }  'both'}, 'std_ersp', 'ignore');
 if isstr(g), error(g); end;
