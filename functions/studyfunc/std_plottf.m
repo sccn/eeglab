@@ -96,6 +96,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2007/04/05 21:17:05  arno
+% fixed log freuqncies
+%
 % Revision 1.1  2007/01/26 18:10:15  arno
 % Initial revision
 %
@@ -208,7 +211,7 @@ opt = finputcheck( varargin, { 'channels'    'cell'   []              {};
                                'unitx'       'string' []              'ms'; % just for titles
                                'subject'     'string' []              '';   % just for titles
                                'chanlocs'    'struct' []              struct('labels', {});
-                               'freqscale'   'string' { 'log' 'linear' }  'auto';
+                               'freqscale'   'string' { 'log' 'linear' 'auto' }  'auto';
                                'plotsubjects' 'string' { 'on' 'off' }  'off';
                                'groupstats'   'string' { 'on' 'off' }   'off';
                                'plottopo'     'string' { 'on' 'off' }   'off';
@@ -351,7 +354,7 @@ if isempty(opt.topovals)
     if strcmpi(opt.freqscale, 'log'), options = { options{:} 'logfreq', 'native' }; end;
 
     figure('color', 'w');
-    tmpc = single([inf -inf]);
+    tmpc = [inf -inf];
     for c = 1:nc
         for g = 1:ng
             hdl(c,g) = mysubplot(nc+addr, ng+addc, g + (c-1)*(ng+addc), opt.transpose);
