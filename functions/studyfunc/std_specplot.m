@@ -75,6 +75,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.37  2007/03/14 01:15:39  arno
+% plot condensed mode
+%
 % Revision 1.36  2007/03/14 01:01:13  arno
 % plotting spectrum of several clusters
 %
@@ -175,6 +178,10 @@ if ~isempty(opt.channels)
 else [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'clusters', opt.clusters, 'infotype', 'spec', 'freqrange', opt.freqrange, 'rmsubjmean', STUDY.etc.specparams.subtractsubjectmean);
 end;
 
+if length(allinds) > 1 | strcmpi(opt.plotmode, 'condensed'), 
+    plotcurveopt = { plotcurveopt{:} 'figure' 'off' }; 
+end;
+
 % channel plotting
 % ----------------
 if ~isempty(opt.channels)
@@ -229,9 +236,6 @@ else
     % --------------
     opt.legend = 'off';
     if length(allinds) > 1, figure('color', 'w'); end;
-    if length(allinds) > 1 | strcmpi(opt.plotmode, 'condensed'), 
-        plotcurveopt = { plotcurveopt{:} 'figure' 'off' }; 
-    end;
     nc = ceil(sqrt(length(allinds)));
     nr = ceil(length(allinds)/nc);
     comp_names = {};
