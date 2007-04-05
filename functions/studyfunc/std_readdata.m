@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2007/04/05 21:30:54  arno
+% conversion to single, Matlab 6.5 compatibility
+%
 % Revision 1.18  2007/03/17 21:17:59  arno
 % fix if condition string is a substring of another condition string
 %
@@ -362,7 +365,7 @@ for ind = 1:length(finalinds)
                             else
                                 [ tmpersp allfreqs alltimes tmpparams tmperspbase] = std_readersp( ALLEEG, setinds{c,g}(indtmp), allinds{c,g}(indtmp), ...
                                                                                   opt.timerange, opt.freqrange);
-                                ersp{c, g}(    :,:,indtmp) = (permute(tmpersp    , [2 1]);
+                                ersp{c, g}(    :,:,indtmp) = permute(tmpersp    , [2 1]);
                                 erspbase{c, g}(:,:,indtmp) = 10*log(permute(tmperspbase, [2 1]));
                             end;
                             fprintf('.');
