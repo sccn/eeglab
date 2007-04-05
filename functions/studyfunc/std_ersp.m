@@ -116,6 +116,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.43  2007/04/05 20:59:46  arno
+% default is log for frequencies
+%
 % Revision 1.42  2006/11/14 03:11:24  arno
 % nothing
 %
@@ -264,7 +267,7 @@ end;
                         'cycles'        'real'        []      [3 .5];
                         'padratio'      'real'        []      4;
                         'freqs'         'real'        []      [3 50];
-                        'freqscale'     'string'      []      'log';
+                        'freqscale'     { 'string' 'integer' }     []      'log';
                         'alpha'         'real'        []      NaN;
                         'type'          'string'      { 'ersp' 'itc' 'both' }  'both'}, 'std_ersp', 'ignore');
 if isstr(g), error(g); end;
@@ -326,8 +329,8 @@ end
 
 % Check if ERSP/ITC information found in datasets and if fits requested parameters 
 % ----------------------------------------------------------------------------
-if exist( filenameersp ) & strcmpi(g.recompute, 'off')
-    tmpersp  = load( '-mat', filenameersp, 'parameters');
+if exist( filenameersp ) & strcmpi(g.recompute, 'off') % THERE IS A NEW FUNCTION TO DO THAT
+    tmpersp  = load( '-mat', filenameersp, 'parameters'); % AND IT SHOULD BE USED HERE TOO - ARNO
 	params   = struct(tmpersp.parameters{:});
     if ~isequal(params.cycles, g.cycles)                   ...
             | (g.padratio ~= params.padratio) ...
