@@ -116,6 +116,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.44  2007/04/05 22:09:38  arno
+% default for freqscale
+%
 % Revision 1.43  2007/04/05 20:59:46  arno
 % default is log for frequencies
 %
@@ -267,7 +270,7 @@ end;
                         'cycles'        'real'        []      [3 .5];
                         'padratio'      'real'        []      4;
                         'freqs'         'real'        []      [3 50];
-                        'freqscale'     { 'string' 'integer' }     []      'log';
+                        'freqscale'     'string'      []      'log';
                         'alpha'         'real'        []      NaN;
                         'type'          'string'      { 'ersp' 'itc' 'both' }  'both'}, 'std_ersp', 'ignore');
 if isstr(g), error(g); end;
