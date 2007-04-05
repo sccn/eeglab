@@ -83,6 +83,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.40  2007/03/20 03:30:59  arno
+% fixed reading ERPs if icatopo absent
+%
 % Revision 1.39  2007/03/17 21:10:57  arno
 % Matlab 6.5 compatibility
 %
@@ -207,6 +210,10 @@ else [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'clusters', opt.clusters,
     end;
 end;
 
+if length(allinds) > 1 | strcmpi(opt.plotmode, 'condensed'), 
+    plotcurveopt = { plotcurveopt{:} 'figure' 'off' }; 
+end;
+
 % channel plotting
 % ----------------
 if ~isempty(opt.channels)
@@ -261,9 +268,6 @@ else
     % --------------
     opt.legend = 'off';
     if length(allinds) > 1, figure('color', 'w'); end;
-    if length(allinds) > 1 | strcmpi(opt.plotmode, 'condensed'), 
-        plotcurveopt = { plotcurveopt{:} 'figure' 'off' }; 
-    end;
     nc = ceil(sqrt(length(allinds)));
     nr = ceil(length(allinds)/nc);
     comp_names = {};
@@ -283,7 +287,8 @@ else
             
         if index == length(allinds), opt.legend = 'on'; end;
             std_plotcurve(alltimes, erpdata, 'condnames', STUDY.condition, 'legend', opt.legend, 'subject', opt.subject, ...
-                                          'compinds', comp_names, 'plotmode', opt.plotmode, 'groupnames', STUDY.group, 'topovals', opt.plottime, 'unitx', 'ms',  'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, ...
+                                          'compinds', comp_names, 'plotmode', opt.plotmode, 'groupnames', STUDY.group, 'topovals', ...
+                          opt.plottime, 'unitx', 'ms',  'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, ...
                                           'chanlocs', ALLEEG(1).chanlocs, 'plotsubjects', opt.plotsubjects, plotcurveopt{:});
         if length(allinds) > 1, 
             if isempty(opt.channels), title(sprintf('Cluster %d', allinds(index))); 
