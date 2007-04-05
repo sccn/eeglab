@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2007/03/17 21:17:59  arno
+% fix if condition string is a substring of another condition string
+%
 % Revision 1.17  2007/01/26 18:06:15  arno
 % minor bug
 %
@@ -147,6 +150,11 @@ end;
 
 nc = length(STUDY.condition);
 ng = length(STUDY.group);
+zero = single(0);
+tmpver = version;
+if tmpver(1) == 6 | tmpver(1) == 5
+    zero = double(zero);
+end;
 
 % find channel indices
 % --------------------
@@ -211,7 +219,7 @@ for ind = 1:length(finalinds)
                 [ tmp alltimes ] = std_readerp( ALLEEG, 1, sign(allchanorcomp(1)), opt.timerange);
                 for c = 1:nc
                     for g = 1:ng
-                        allerp{c, g} = single(zeros(length(alltimes), length(allinds{c,g})));
+                        allerp{c, g} = repmat(zero, [length(alltimes), length(allinds{c,g})]);
                     end;
                 end;
 
@@ -255,7 +263,7 @@ for ind = 1:length(finalinds)
                 end;
                 for c = 1:nc
                     for g = 1:ng
-                        allspec{c, g} = single(zeros(length(allfreqs), length(allinds{c,g})));
+                        allspec{c, g} = repmat(zero, [length(allfreqs), length(allinds{c,g}) ]);
                     end;
                 end;
 
@@ -322,10 +330,10 @@ for ind = 1:length(finalinds)
                 [ tmp allfreqs alltimes ] = std_readersp( ALLEEG, 1, Inf*sign(allchanorcomp(1)), opt.timerange, opt.freqrange);
                 for c = 1:nc
                     for g = 1:ng
-                        ersp{c, g}     = single(zeros(length(alltimes), length(allfreqs), length(allinds{c,g})));
-                        erspbase{c, g} = single(zeros(               1, length(allfreqs), length(allinds{c,g})));
+                        ersp{c, g}     = repmat(zero, [length(alltimes), length(allfreqs), length(allinds{c,g}) ]);
+                        erspbase{c, g} = repmat(zero, [               1, length(allfreqs), length(allinds{c,g}) ]);
                         if strcmpi(opt.statmode, 'trials')
-                            ersp{ c, g} = single(zeros(length(alltimes), length(allfreqs), tottrials{c, g}));
+                            ersp{ c, g} = repmat(zero, [length(alltimes), length(allfreqs), tottrials{c, g} ]);
                             count{c, g} = 1;
                         end;
                     end;
@@ -341,7 +349,7 @@ for ind = 1:length(finalinds)
                                 [ tmpersp allfreqs alltimes tmpparams] = std_readtimef( ALLEEG, setinds{c,g}(indtmp), allinds{c,g}(indtmp), ...
                                                                                   opt.timerange, opt.freqrange);
                                 indices = [count{c, g}:count{c, g}+size(tmpersp,3)-1];
-                                ersp{    c, g}(:,:,indices) = single(permute(tmpersp, [2 1 3]));
+                                ersp{    c, g}(:,:,indices) = permute(tmpersp, [2 1 3]);
                                 erspinds{c, g}(1:2,indtmp) = [ count{c, g} count{c, g}+size(tmpersp,3)-1 ];
                                 count{c, g} = count{c, g}+size(tmpersp,3);
                                 if size(tmpersp,3) ~= ALLEEG(STUDY.datasetinfo(index).index).trials
@@ -350,12 +358,12 @@ for ind = 1:length(finalinds)
                             elseif strcmpi(opt.infotype, 'itc')
                                 [ tmpersp allfreqs alltimes tmpparams] = std_readitc( ALLEEG, setinds{c,g}(indtmp), allinds{c,g}(indtmp), ...
                                                                                   opt.timerange, opt.freqrange);
-                                ersp{c, g}(:,:,indtmp)     = single(abs(permute(tmpersp    , [2 1])));
+                                ersp{c, g}(:,:,indtmp)     = abs(permute(tmpersp    , [2 1]));
                             else
                                 [ tmpersp allfreqs alltimes tmpparams tmperspbase] = std_readersp( ALLEEG, setinds{c,g}(indtmp), allinds{c,g}(indtmp), ...
                                                                                   opt.timerange, opt.freqrange);
-                                ersp{c, g}(    :,:,indtmp) = single(permute(tmpersp    , [2 1]));
-                                erspbase{c, g}(:,:,indtmp) = single(10*log(permute(tmperspbase, [2 1])));
+                                ersp{c, g}(    :,:,indtmp) = (permute(tmpersp    , [2 1]);
+                                erspbase{c, g}(:,:,indtmp) = 10*log(permute(tmperspbase, [2 1]));
                             end;
                             fprintf('.');
                         end;
