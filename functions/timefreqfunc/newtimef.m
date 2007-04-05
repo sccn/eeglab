@@ -275,6 +275,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.126  2007/03/08 03:41:25  toby
+% log edit
+%
 % Revision 1.125  2007/03/08 03:34:55  arno
 % axis off  Courtesy Makoto Miyakoshi
 %
@@ -997,6 +1000,7 @@ g = finputcheck(varargin, ...
     'wletmethod'    'string'   {'dftfilt2' 'dftfilt'}  'dftfilt'; ...
     'cycleinc'      'string'   {'linear' 'log'}        'linear'
     });
+if isstr(g), error(g); end;
 
 g.tlimits = tlimits;
 g.frames   = frames;
