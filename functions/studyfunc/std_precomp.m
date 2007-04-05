@@ -70,6 +70,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2007/02/28 12:05:14  arno
+% option to force recomputation
+%
 % Revision 1.6  2007/01/29 10:50:27  arno
 % fix ERSP options
 %
@@ -92,6 +95,7 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
         help std_precomp;
         return;
     end;
+    
     if nargin == 2
         chanlist = []; % default to clustering the whole STUDY 
     end    
@@ -103,7 +107,7 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
     g = finputcheck(varargin, { 'erp'         'string'  { 'on' 'off' }     'off';
                                 'interpolate' 'string'  { 'on' 'off' }     'off';
                                 'ersp'        'string'  { 'on' 'off' }     'off';
-                                'recompute'   'string'  { 'on' 'off' }     'off';
+                                'recompute'   'string'  { 'on' 'off' }     'on';
                                 'spec'        'string'  { 'on' 'off' }     'off';
                                 'itc'         'string'  { 'on' 'off' }     'off';
                                 'specparams'        'cell'    {}                 {};
@@ -172,6 +176,7 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
             if strcmpi(guimode, 'cancel'), return; end;
             
         end;
+        if strcmpi(guimode, 'usedisk'), g.recompute = 'off'; end;
         
         % check for existing files
         % ------------------------

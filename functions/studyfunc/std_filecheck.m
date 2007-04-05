@@ -25,7 +25,7 @@
 %   ignorefields - [cell array] list fields to ignore
 %
 % Outputs:
-%   recompflag - ['same'|'different'|'recompute'|'usedisk'|] 'same' 
+%   recompflag - ['same'|'different'|'recompute'|'usedisk'|'cancel'] 'same' 
 %                (resp. 'different') indicates that the parameters in the 
 %                data file are identical (resp. different). 'recompute' 
 %                indicate that the measure should be recomputed and the 
@@ -57,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2007/04/05 22:25:14  arno
+% typo
+%
 % Revision 1.7  2007/04/05 22:22:22  arno
 % handle freqscale better
 %
