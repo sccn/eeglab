@@ -122,6 +122,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.71  2007/03/21 19:04:37  arno
+% confusing variable names in loop
+%
 % Revision 1.70  2007/02/20 01:50:42  scott
 % edited a few comments only -sm
 %
@@ -374,6 +377,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
         alpha = NaN;
         fun_arg = [];
         savetrials = 'on';
+        recompute  = 'on';
         for subind = 2:2:length(varargin{index})
             switch varargin{index}{subind}
                 case 'npca'
@@ -420,6 +424,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                 if strcmpi(guimode, 'cancel'), return; end;
                 
             end;
+            if strcmpi(guimode, 'usedisk') | strcmpi(guimode, 'same'), recompute = 'off'; end;
             alpha    = g.erspparams.alpha;
             cycles   = g.erspparams.cycles;
             padratio = g.erspparams.padratio;
@@ -623,7 +628,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                             % compute ERSP/ ITC, if doesn't exist.
                             std_ersp(ALLEEG(idat), 'components', succompind{si}, 'freqs', freqrange, ...
                                 'timewindow', timewindow, 'cycles', cycles, 'padratio', padratio, 'alpha', alpha, ...
-                                'type', type, 'savetrials', savetrials);
+                                'type', type, 'savetrials', savetrials, 'recompute', recompute);
                         end
                     end
                     STUDY.preclust.erspclustfreqs = freqrange;
