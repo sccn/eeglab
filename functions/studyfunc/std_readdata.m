@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2007/04/05 21:31:58  arno
+% same
+%
 % Revision 1.19  2007/04/05 21:30:54  arno
 % conversion to single, Matlab 6.5 compatibility
 %
@@ -155,7 +158,7 @@ nc = length(STUDY.condition);
 ng = length(STUDY.group);
 zero = single(0);
 tmpver = version;
-if tmpver(1) == 6 | tmpver(1) == 5
+if tmpver(1) == '6' | tmpver(1) == '5'
     zero = double(zero);
 end;
 
