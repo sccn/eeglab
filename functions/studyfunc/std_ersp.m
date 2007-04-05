@@ -116,6 +116,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.45  2007/04/05 22:17:02  arno
+% freqscale
+%
 % Revision 1.44  2007/04/05 22:09:38  arno
 % default for freqscale
 %
@@ -332,19 +335,21 @@ end
 
 % Check if ERSP/ITC information found in datasets and if fits requested parameters 
 % ----------------------------------------------------------------------------
-if exist( filenameersp ) & strcmpi(g.recompute, 'off') % THERE IS A NEW FUNCTION TO DO THAT
-    tmpersp  = load( '-mat', filenameersp, 'parameters'); % AND IT SHOULD BE USED HERE TOO - ARNO
-	params   = struct(tmpersp.parameters{:});
-    if ~isequal(params.cycles, g.cycles)                   ...
-            | (g.padratio ~= params.padratio) ...
-            | ( (g.alpha~= params.alpha) & ~( isnan(g.alpha) & isnan(params.alpha)) )
-        disp('File ERSP/ITC data already present, computed with the same parameters: no need to recompute...');
-        % if not computed with the requested parameters, recompute ERSP/ITC
-        % i.e., continue
-    else
-        return; % no need to compute ERSP/ITC
-    end
+if exist( filenameersp ) & strcmpi(g.recompute, 'off')
+    return;
 end;
+%    tmpersp  = load( '-mat', filenameersp, 'parameters'); % AND IT SHOULD BE USED HERE TOO - ARNO
+%	params   = struct(tmpersp.parameters{:});
+%    if ~isequal(params.cycles, g.cycles)                   ...
+%            | (g.padratio ~= params.padratio) ...
+%            | ( (g.alpha~= params.alpha) & ~( isnan(g.alpha) & isnan(params.alpha)) )
+%        % if not computed with the requested parameters, recompute ERSP/ITC
+%        % i.e., continue
+%    else
+%        disp('File ERSP/ITC data already present, computed with the same parameters: no need to recompute...');
+%        return; % no need to compute ERSP/ITC
+%    end
+%end;
 
 % No usable ERSP/ITC information available
 % ---------------------------------
