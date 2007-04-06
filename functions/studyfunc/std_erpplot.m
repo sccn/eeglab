@@ -83,6 +83,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.41  2007/04/05 22:01:21  arno
+% condensed mode
+%
 % Revision 1.40  2007/03/20 03:30:59  arno
 % fixed reading ERPs if icatopo absent
 %
@@ -210,7 +213,8 @@ else [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'clusters', opt.clusters,
     end;
 end;
 
-if length(allinds) > 1 | strcmpi(opt.plotmode, 'condensed'), 
+if strcmpi(opt.plotmode, 'condensed') | ...
+   (length(allinds) > 1 & isempty(opt.channels))
     plotcurveopt = { plotcurveopt{:} 'figure' 'off' }; 
 end;
 
