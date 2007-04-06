@@ -65,6 +65,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2007/04/06 01:28:35  arno
+% same
+%
 % Revision 1.5  2007/04/06 01:27:05  arno
 % fixed the axis labels
 %
@@ -280,6 +283,15 @@ else
      leg = 'off';
 end;
 
+% labels
+% ------
+if strcmpi(opt.unitx, 'ms'), xlab = 'Time (ms)';      ylab = 'Potential (\muV)';
+else                         xlab = 'Frequency (Hz)'; ylab = 'Power (10*log_{10}(\muV^{2}/Hz))'; 
+end;
+if ~isnan(threshold), statopt = { xlab 'ylabel' };
+else                  statopt = { 'logpval' 'on' 'xlabel' xlab 'ylabel' '-log10(p)' 'ylim' [0 maxplot] };
+end;
+
 % adjust figure size
 % ------------------
 if strcmpi(opt.figure, 'on')
@@ -371,9 +383,7 @@ for c = 1:ncplot
                 plotopt = { plotopt{:} 'plotmean' 'off' };
             end;
             plotopt = { plotopt{:} 'ylim' opt.ylim 'legend' leg };
-            if strcmpi(opt.unitx, 'ms'), plotopt = { plotopt{:}  'xlabel' 'Time (ms)' 'ylabel' 'Potential (\muV)' };
-            else                         plotopt = { plotopt{:}  'xlabel' 'Frequency (Hz)' 'ylabel' 'Power (10*log_{10}(\muV^{2}/Hz))' }; 
-            end;
+            plotopt = { plotopt{:}  'xlabel' xlab 'ylabel' ylab };
 
             % plot
             % ----
@@ -381,7 +391,7 @@ for c = 1:ncplot
                 metaplottopo(tmpdata, 'chanlocs', opt.chanlocs, 'plotfunc', 'plotcurve', ...
                     'plotargs', { plotopt{:} }, 'datapos', [2 3]);
             elseif iscell(tmpdata)
-                 plotcurve( allx, tmpdata{1}, 'colors', col, 'maskarray', tmpdata{2}, plotopt{3:end});
+                 plotcurve( allx, tmpdata{1}, 'colors', col, 'maskarray', tmpdata{2}, plotopt{3:end}); xlabel(xlab); ylabel(ylab);
             else plotcurve( allx, tmpdata, 'colors', col, plotopt{2:end});
             end;
         end;
@@ -409,14 +419,14 @@ for c = 1:ncplot
                      tmptitle = sprintf('%s (p<%.4f)', condnames, opt.threshold);
                      if strcmpi(opt.plottopo, 'on'), 
                           metaplottopo({zeros(size(pgroupplot{c}')) pgroupplot{c}'}, 'chanlocs', opt.chanlocs, 'plotfunc', 'plotcurve', ...
-                              'plotargs', { allx 'maskarray' }, 'datapos', [2 3], 'title', tmptitle);
-                     else plotcurve(allx, zeros(size(allx)), 'maskarray', mean(pgroupplot{c},2), 'ylim', [0.1 1], 'title', tmptitle);
+                              'plotargs', { allx 'maskarray' statopt{:} }, 'datapos', [2 3], 'title', tmptitle);
+                     else plotcurve(allx, zeros(size(allx)), 'maskarray', mean(pgroupplot{c},2), 'ylim', [0.1 1], 'title', tmptitle, statopt{:});
                      end;
                 else
                      if strcmpi(opt.plottopo, 'on'), 
                           metaplottopo(pgroupplot{c}', 'chanlocs', opt.chanlocs, 'plotfunc', 'plotcurve', ...
-                              'plotargs', { allx 'logpval' 'on' 'ylim' [0 maxplot]}, 'datapos', [2 3], 'title', [ condnames ' (p-value)' ]);
-                     else plotcurve(allx, mean(pgroupplot{c},2), 'logpval', 'on', 'ylim', [0 maxplot], 'title', [ condnames ' (p-value)' ]);
+                              'plotargs', { allx statopt{:} }, 'datapos', [2 3], 'title', [ condnames ' (p-value)' ]);
+                     else plotcurve(allx, mean(pgroupplot{c},2), 'title', [ condnames ' (p-value)' ], statopt{:});
                      end;
                 end;
             end;
@@ -438,19 +448,40 @@ for g = 1:ng
                  tmptitle = sprintf('%s (p<%.4f)', groupnames, opt.threshold);
                  if strcmpi(opt.plottopo, 'on'), 
                       metaplottopo({zeros(size(pcondplot{g}')) pcondplot{g}'}, 'chanlocs', opt.chanlocs, 'plotfunc', 'plotcurve', ...
-                          'plotargs', { allx 'maskarray' }, 'datapos', [2 3], 'title', tmptitle);
-                 else plotcurve(allx, zeros(size(allx)), 'maskarray', mean(pcondplot{g},2), 'ylim', [0.1 1], 'title', tmptitle);
+                          'plotargs', { allx 'maskarray' statopt{:} }, 'datapos', [2 3], 'title', tmptitle);
+                 else plotcurve(allx, zeros(size(allx)), 'maskarray', mean(pcondplot{g},2), 'ylim', [0.1 1], 'title', tmptitle, statopt{:});
                  end;
             else
                  if strcmpi(opt.plottopo, 'on'), 
                       metaplottopo(pcondplot{g}', 'chanlocs', opt.chanlocs, 'plotfunc', 'plotcurve', ...
-                          'plotargs', { allx 'logpval' 'on' 'ylabel' '-log10(p)' 'ylim' [0 maxplot]}, 'datapos', [2 3], 'title', [ groupnames ' (p-value)' ]);
-                 else plotcurve(allx, mean(pcondplot{g},2), 'logpval', 'on', 'ylim', [0 maxplot], 'title',  [ groupnames ' (p-value)' ]);
+                          'plotargs', { allx statopt{:} }, 'datapos', [2 3], 'title', [ groupnames ' (p-value)' ]);
+                 else plotcurve(allx, mean(pcondplot{g},2), 'title',  [ groupnames ' (p-value)' ],statopt{:});
                  end;
             end;
         end;
     end;
 end;
+
+% statistics accross group and conditions
+% ---------------------------------------
+if ~isempty(opt.groupstats) & ~isempty(opt.condstats) & ng > 1 & nc > 1
+    mysubplot(ncplot+addr, ngplot+addc, ngplot + 1 + ncplot*(ngplot+addr), opt.subplot);
+    if ~isnan(opt.threshold)
+         tmptitle = sprintf('Interaction (p<%.4f)', opt.threshold);
+         if strcmpi(opt.plottopo, 'on'), 
+              metaplottopo({zeros(size(pinterplot')) pinterplot'}, 'chanlocs', opt.chanlocs, 'plotfunc', 'plotcurve', ...
+                  'plotargs', { allx 'maskarray' statopt{:} }, 'datapos', [2 3], 'title', tmptitle);
+         else plotcurve(allx, zeros(size(allx)), 'maskarray', mean(pinterplot,2), 'ylim', [0.1 1], 'title', tmptitle, statopt{:});
+              xlabel(xlab); ylabel('-log10(p)');
+        end;
+    else
+         if strcmpi(opt.plottopo, 'on'), 
+              metaplottopo(pinterplot', 'chanlocs', opt.chanlocs, 'plotfunc', 'plotcurve', ...
+                  'plotargs', { allx statopt{:} }, 'datapos', [2 3], 'title', 'Interaction (p-value)');
+         else plotcurve(allx, mean(pinterplot,2), 'title', 'Interaction (p-value)', statopt{:});
+         end;
+    end;
+end;  
 
 % axis limit and legend
 % ---------------------
@@ -470,25 +501,6 @@ for c = 1:ncplot
     end;
 end;
 
-% statistics accross group and conditions
-% ---------------------------------------
-if ~isempty(opt.groupstats) & ~isempty(opt.condstats) & ng > 1 & nc > 1
-    mysubplot(ncplot+addr, ngplot+addc, ngplot + 1 + ncplot*(ngplot+addr), opt.subplot);
-    if ~isnan(opt.threshold)
-         tmptitle = sprintf('Interaction (p<%.4f)', opt.threshold);
-         if strcmpi(opt.plottopo, 'on'), 
-              metaplottopo({zeros(size(pinterplot')) pinterplot'}, 'chanlocs', opt.chanlocs, 'plotfunc', 'plotcurve', ...
-                  'plotargs', { allx 'maskarray' }, 'datapos', [2 3], 'title', tmptitle);
-         else plotcurve(allx, zeros(size(allx)), 'maskarray', mean(pinterplot,2), 'ylim', [0.1 1], 'title', tmptitle);
-         end;
-    else
-         if strcmpi(opt.plottopo, 'on'), 
-              metaplottopo(pinterplot', 'chanlocs', opt.chanlocs, 'plotfunc', 'plotcurve', ...
-                  'plotargs', { allx 'logpval' 'on' 'ylim' [0 maxplot]}, 'datapos', [2 3], 'title', 'Interaction (p-value)');
-         else plotcurve(allx, mean(pinterplot,2), 'logpval', 'on', 'ylim', [0 maxplot]   , 'title', 'Interaction (p-value)');
-         end;
-    end;
-end;  
 if strcmpi(opt.plottopo, 'off'), 
     axcopy;
     % remove axis labels (for most but not all)
