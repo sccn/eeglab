@@ -65,6 +65,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2007/03/14 00:56:17  arno
+% plotting ERP for multiple components
+%
 % Revision 1.3  2007/02/28 12:04:38  arno
 % do not output statistics
 %
@@ -364,7 +367,10 @@ for c = 1:ncplot
             else
                 plotopt = { plotopt{:} 'plotmean' 'off' };
             end;
-            plotopt = { plotopt{:} 'ylim' opt.ylim 'legend' leg 'xlabel' 'Time (ms)' 'ylabel' 'Potential (\muV)' };
+            plotopt = { plotopt{:} 'ylim' opt.ylim 'legend' leg };
+            if strcmpi(opt.xaxis, 'ms'), plotopt = { plotopt{:}  'xlabel' 'Time (ms)' 'ylabel' 'Potential (\muV)' };
+            else                         plotopt = { plotopt{:}  'xlabel' 'Frequency (Hz)' 'ylabel' 'Power (10*log_{10}(\muV^{2}/Hz))' }; 
+            end;
 
             % plot
             % ----
