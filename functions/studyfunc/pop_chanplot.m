@@ -157,6 +157,22 @@ if ~isstr(varargin{1})
     STUDY.etc.specparams.topofreq = []; % NaN -> GUI disabled
     STUDY.etc.erspparams.topotime = [];
     STUDY.etc.erspparams.topofreq = [];
+    
+    % test path
+    % ---------
+    pathwarn = 'off';
+    if ~strcmpi(pwd, STUDY.filepath)
+        if length(STUDY.datasetinfo(1).filepath) < 1
+            pathwarn = 'on';
+        elseif STUDY.datasetinfo(1).filepath(1) == '.'
+            pathwarn = 'on';
+        end;
+    end;
+    if strcmpi(pathwarn, 'on')
+        warndlg2(strvcat('You have changed your working path and data files are', ...
+                         'no longer available; Cancel, and go back to your STUDY folder'), 'warning');
+    end;
+        
     oldhistory = STUDY.history;
     STUDY.history = '';
     ALLEEG = varargin{2};
