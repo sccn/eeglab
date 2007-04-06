@@ -122,6 +122,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.72  2007/04/05 23:16:22  arno
+% recompute tag
+%
 % Revision 1.71  2007/03/21 19:04:37  arno
 % confusing variable names in loop
 %
@@ -424,7 +427,9 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                 if strcmpi(guimode, 'cancel'), return; end;
                 
             end;
-            if strcmpi(guimode, 'usedisk') | strcmpi(guimode, 'same'), recompute = 'off'; end;
+            if strcmpi(guimode, 'usedisk') | strcmpi(guimode, 'same'), recompute = 'off'; 
+            else                                                       recompute = 'on'; 
+            end;
             alpha    = g.erspparams.alpha;
             cycles   = g.erspparams.cycles;
             padratio = g.erspparams.padratio;

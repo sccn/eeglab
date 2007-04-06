@@ -70,6 +70,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2007/04/05 23:17:55  arno
+% guimode
+%
 % Revision 1.12  2007/04/05 23:13:39  arno
 % *** empty log message ***
 %
@@ -110,7 +113,7 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
     g = finputcheck(varargin, { 'erp'         'string'  { 'on' 'off' }     'off';
                                 'interpolate' 'string'  { 'on' 'off' }     'off';
                                 'ersp'        'string'  { 'on' 'off' }     'off';
-                                'recompute'   'string'  { 'on' 'off' }     'on';
+                                'recompute'   'string'  { 'on' 'off' }     'off';
                                 'spec'        'string'  { 'on' 'off' }     'off';
                                 'itc'         'string'  { 'on' 'off' }     'off';
                                 'specparams'        'cell'    {}                 {};
@@ -179,7 +182,9 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
             if strcmpi(guimode, 'cancel'), return; end;
             
         end;
-        if strcmpi(guimode, 'usedisk') | strcmpi(guimode, 'same'), g.recompute = 'off'; end;
+        if strcmpi(guimode, 'usedisk') | strcmpi(guimode, 'same'), g.recompute = 'off'; 
+        else                                                       g.recompute = 'on'; 
+        end;
         
         % check for existing files
         % ------------------------
