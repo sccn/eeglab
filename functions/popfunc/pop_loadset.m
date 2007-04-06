@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.53  2006/04/19 14:17:57  arno
+% multiple datasets
+%
 % Revision 1.51  2006/02/16 19:29:41  arno
 % checking dataset consitency
 %
@@ -280,6 +283,7 @@ else
             if ~strcmp(EEG.filename(1:end-3), EEG.data(1:end-3))
                 disp('Warning: the name of the dataset has changed on disk, updating .dat & .fdt data file to the new name');
                 EEG.data = [ EEG.filename(1:end-3) EEG.data(end-2:end) ];
+                EEG.saved = 'no';
             end;
             
         end;
