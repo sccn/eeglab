@@ -119,6 +119,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2006/12/30 01:16:55  scott
+% help msg
+% quit
+%
 % Revision 1.12  2006/11/22 19:03:28  arno
 % number of dimensions fix
 %
@@ -346,7 +350,7 @@ function pvals = compute_pvals(surrog, oridat, tail)
     
 % shuffle last dimension of arrays
 % --------------------------------
-function [a b] = shuffle_paired(a, b); % for increased speed only shuffle half the indices
+function [a, b] = shuffle_paired(a, b); % for increased speed only shuffle half the indices
     
 
     if nargin > 1 % very fast 2 conditions -> 2 inputs and 2 outputs
