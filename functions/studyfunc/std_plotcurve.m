@@ -65,6 +65,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2007/04/06 01:27:05  arno
+% fixed the axis labels
+%
 % Revision 1.4  2007/03/14 00:56:17  arno
 % plotting ERP for multiple components
 %
@@ -368,7 +371,7 @@ for c = 1:ncplot
                 plotopt = { plotopt{:} 'plotmean' 'off' };
             end;
             plotopt = { plotopt{:} 'ylim' opt.ylim 'legend' leg };
-            if strcmpi(opt.xaxis, 'ms'), plotopt = { plotopt{:}  'xlabel' 'Time (ms)' 'ylabel' 'Potential (\muV)' };
+            if strcmpi(opt.unitx, 'ms'), plotopt = { plotopt{:}  'xlabel' 'Time (ms)' 'ylabel' 'Potential (\muV)' };
             else                         plotopt = { plotopt{:}  'xlabel' 'Frequency (Hz)' 'ylabel' 'Power (10*log_{10}(\muV^{2}/Hz))' }; 
             end;
 
