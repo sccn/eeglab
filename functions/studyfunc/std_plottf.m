@@ -96,6 +96,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2007/04/05 21:38:23  arno
+% now plot in linear scale if necessaru
+%
 % Revision 1.3  2007/04/05 21:35:47  arno
 % fix scale
 %
@@ -261,8 +264,8 @@ end;
 % --------------------
 if length(freqs) > 2 & strcmpi(opt.freqscale, 'auto')
     midfreq = (freqs(3)+freqs(1))/2;
-    if midfreq*.95 < freqs(2) & midfreq*1.05 > freqs(2), opt.freqscale = 'linear';
-    else                                                 opt.freqscale = 'log';
+    if midfreq*.9999 < freqs(2) & midfreq*1.0001 > freqs(2), opt.freqscale = 'linear';
+    else                                                     opt.freqscale = 'log';
     end;
 end;
 
