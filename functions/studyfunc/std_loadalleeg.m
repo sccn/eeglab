@@ -78,20 +78,25 @@ function ALLEEG = std_loadalleeg(varargin)
     
     % read datasets
     % -------------
+    warnfold = 'off';
     for dset = 1:length(paths)
         [sub2 sub1] = fileparts(char(paths{dset}));
         [sub3 sub2] = fileparts(sub2);
+        
         if exist(fullfile(char(paths{dset}), datasets{dset})) == 2
             EEG = pop_loadset(datasets{dset}, char(paths{dset}), 'info');
         elseif exist( fullfile(genpath, datasets{dset})) == 2    
             [tmpp tmpf ext] = fileparts(fullfile(genpath, datasets{dset}));
             EEG = pop_loadset([tmpf ext], tmpp, 'info');
+            warnfold = 'on';
         elseif exist( fullfile(genpath, sub1, datasets{dset})) == 2    
             [tmpp tmpf ext] = fileparts(fullfile(genpath, sub1, datasets{dset}));
             EEG = pop_loadset([tmpf ext], tmpp, 'info');
+            warnfold = 'on';
         elseif exist( fullfile(genpath, sub2, datasets{dset}))  == 2   
             [tmpp tmpf ext] = fileparts(fullfile(genpath, sub2, datasets{dset}));
             EEG = pop_loadset([tmpf ext], tmpp, 'info');
+            warnfold = 'on';
         elseif exist(lower(fullfile(char(paths{dset}), datasets{dset}))) == 2   
             EEG = pop_loadset(lower(datasets{dset}), lower(char(paths{dset})), 'info');
         else
@@ -106,3 +111,13 @@ function ALLEEG = std_loadalleeg(varargin)
         end;
         [ALLEEG EEG] = eeg_store(ALLEEG, EEG, 0, 'notext');
     end
+
+    if strcmpi(warnfold, 'on') & ~strcmpi(pwd, genpath)
+        disp('Changing current path to STUDY path...');
+        cd(genpath);
+    end;
+    if strcmpi(warnfold, 'on') 
+        disp('This STUDY has a relative path set for the datasets');
+        disp('so the current path MUST remain the STUDY path');
+    end;
+        
