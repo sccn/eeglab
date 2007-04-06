@@ -90,6 +90,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.82  2007/01/15 01:42:55  scott
+% working on help msg - the meaning of the word 'concatenate' in the 'sigthresh' definition is ??
+%
 % Revision 1.81  2006/09/12 16:45:19  arno
 % debugging
 %
@@ -775,7 +778,20 @@ if g.showchan>0 & ~isempty(g.chanlocs)
      axis('square');
 end
 if strcmpi(g.axcopy, 'on')
-    axcopy % turn on axis copying on mouse click 
+    if strcmpi(g.logfreq, 'native'), 
+        com = [ 'ft = str2num(get(gca,''''yticklabel''''));' ...
+                'ft = exp(1).^ft;' ...
+                'ft = unique(round(ft));' ...
+                'ftick = get(gca,''''ytick'''');' ...
+                'ftick = exp(1).^ftick;' ...
+                'ftick = unique(round(ftick));' ...
+                'ftick = log(ftick);' ...
+                'set(gca,''''ytick'''',ftick);' ...
+                'set(gca,''''yticklabel'''', num2str(ft));' ];
+        axcopy(gcf, com); % turn on axis copying on mouse click 
+    else
+        axcopy; % turn on axis copying on mouse click 
+    end;
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%% embedded functions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
