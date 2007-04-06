@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2007/02/28 12:02:21  arno
+% recompute tag
+%
 % Revision 1.4  2007/01/26 18:02:55  arno
 % warning message
 %
@@ -86,7 +89,7 @@ if ~isstr(varargin{1}) %intial settings
                    
     % callbacks
     % ---------
-    erspparams_str = [ '''cycles'', [3 0.5], ''padratio'', 4' ];
+    erspparams_str = [ '''cycles'', [3 0.5], ''padratio'', 1' ];
     specparams_str = '';
     set_ersp       = ['pop_precomp(''setersp'',gcf);']; 
     test_ersp      = ['pop_precomp(''testersp'',gcf);']; 
@@ -273,13 +276,13 @@ else
                 set_itc  = get(findobj('parent', hdl, 'tag', 'itc_on'), 'value'); 
                 set_ersp = get(findobj('parent', hdl, 'tag', 'ersp_on'), 'value'); 
                 opt = {};
-                if ~set_itc,  opt = { opt{:} 'plot_itc',  'off' }; end;
-                if ~set_ersp, opt = { opt{:} 'plot_ersp', 'off' }; end;
+                if ~set_itc,  opt = { opt{:} 'plotitc',  'off' }; end;
+                if ~set_ersp, opt = { opt{:} 'plotersp', 'off' }; end;
 
                 EEG = eeg_checkset(ALLEEG(1), 'loaddata');
                 data = EEG.data(1,:,1:min(EEG.trials,10));
                 figure; pos = get(gcf, 'position'); pos(3)=pos(3)*2; set(gcf, 'position', pos);
-                subplot(1,2,1); timef( data, EEG.pnts, [ EEG.xmin EEG.xmax ]*1000, EEG.srate, tmpstruct.cycles, opt{:}, 'maxfreq', EEG.srate/2, ersp_params{:});
+                subplot(1,2,1); newtimef( data, EEG.pnts, [ EEG.xmin EEG.xmax ]*1000, EEG.srate, tmpstruct.cycles, opt{:}, 'maxfreq', EEG.srate/2, ersp_params{:});
                 subplot(1,2,2); 
                 text( 0.2, 0.8, strvcat('This is a test plot performed on', ...
                                                          'the first 10 trials of the first', ....
@@ -289,7 +292,8 @@ else
                                                          'Time and frequency range may also be', ...
                                                          'adjusted after computation.'));
                 axis off;
-            catch, warndlg2('Error while calling function, check parameters'); end;
+            catch, warndlg2(strvcat('Error while calling function, check parameters', lasterr)); 
+            end;
                                                  
     end;
 end
