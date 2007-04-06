@@ -275,6 +275,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.127  2007/04/05 22:12:58  arno
+% error msg
+%
 % Revision 1.126  2007/03/08 03:41:25  toby
 % log edit
 %
@@ -967,6 +970,7 @@ g = finputcheck(varargin, ...
     'mtaper'        'real'      []           []; ...
     'maxfreq'       'real'      [0 Inf]      DEFAULT_MAXFREQ; ...
     'freqs'         'real'      [0 Inf]      [0 DEFAULT_MAXFREQ]; ...
+    'cycles'        'integer'   []           []; ...
     'nfreqs'        'integer'   []           []; ...
     'freqscale'     'string'    []           'linear'; ...
     'vert'          'real'      []           [];  ...
@@ -1005,7 +1009,9 @@ if isstr(g), error(g); end;
 g.tlimits = tlimits;
 g.frames   = frames;
 g.srate   = Fs;
-g.cycles  = varwin;
+if isempty(g.cycles)
+    g.cycles  = varwin;
+end;
 g.AXES_FONT        = AXES_FONT;      % axes text FontSize
 g.TITLE_FONT       = TITLE_FONT;
 g.ERSP_CAXIS_LIMIT = ERSP_CAXIS_LIMIT;
