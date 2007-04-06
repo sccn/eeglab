@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2007/04/06 21:45:39  arno
+% fix channel selection
+%
 % Revision 1.7  2007/04/06 21:36:01  arno
 % fix testing ERSP and ITC
 %
@@ -205,7 +208,6 @@ if ~isstr(varargin{1}) %intial settings
         warndlg2('No measure selected: aborting.'); 
         return; 
     end;
-    dsfdsdsfdsa
     [STUDY ALLEEG] = std_precomp(options{:});
     com = sprintf('%s\n[STUDY ALLEEG] = std_precomp(STUDY, ALLEEG, %s);', ...
                   STUDY.history, vararg2str(options(3:end)));
