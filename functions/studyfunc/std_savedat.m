@@ -30,5 +30,9 @@ function std_savedat( tmpfile, structure)
     if v(1) > '6'
         save('-v6' , tmpfile, '-struct', 'structure');
     else
-        save('-mat', tmpfile, '-struct', 'structure');
+        fields = fieldnames(structure);
+        for i=1:length(fields)
+            eval([ fields{i} '=structure.'  fields{i} ';']);
+        end;
+        save('-mat', tmpfile, fields{:});
     end;
