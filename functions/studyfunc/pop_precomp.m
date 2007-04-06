@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2007/04/06 21:36:01  arno
+% fix testing ERSP and ITC
+%
 % Revision 1.6  2007/02/28 12:02:21  arno
 % recompute tag
 %
@@ -98,12 +101,13 @@ if ~isstr(varargin{1}) %intial settings
     test_spec      = ['pop_precomp(''testspec'',gcf);']; 
     str_name       = ['Pre-compute channel measures for STUDY ''' STUDY.name '''' ];
     chanlist       = ['pop_precomp(''chanlist'',gcf);']; 
+    chaneditbox    = ['pop_precomp(''chaneditbox'',gcf);']; 
     warninterp     = ['warndlg2(''EEGLAB has not yet been tested if some channels are missing; use at your own risk'');' ];
     
     gui_spec = { ...
     {'style' 'text'       'string' str_name 'FontWeight' 'Bold' 'horizontalalignment' 'left'} {} ...
     {'style' 'text'       'string' 'Channel list (default:all)' 'FontWeight' 'Bold'} ...
-    {'Style' 'edit'       'string' '' 'tag' 'chans' }, ...
+    {'Style' 'edit'       'string' '' 'tag' 'chans' 'callback' chaneditbox }, ...
     {'style' 'pushbutton' 'string'  '...', 'enable' fastif(isempty(ALLEEG(1).chanlocs), 'off', 'on') ...
            'callback' chanlist }, ...
     {'style' 'checkbox'   'string' '' 'tag' 'interpolate_on' 'value' 1 'callback' warninterp }  ...
@@ -201,6 +205,7 @@ if ~isstr(varargin{1}) %intial settings
         warndlg2('No measure selected: aborting.'); 
         return; 
     end;
+    dsfdsdsfdsa
     [STUDY ALLEEG] = std_precomp(options{:});
     com = sprintf('%s\n[STUDY ALLEEG] = std_precomp(STUDY, ALLEEG, %s);', ...
                   STUDY.history, vararg2str(options(3:end)));
@@ -221,8 +226,12 @@ else
             set(findobj('parent', hdl, 'tag', 'chans'), 'string', tmp2);
             userdat{4} = tmp3;
             set(hdl, 'userdata',userdat); 
+     
+        case 'chaneditbox'
+            userdat{4} = parsetxt(get(findobj('parent', hdl, 'tag', 'chans'), 'string'));
+            set(hdl, 'userdata',userdat); 
             
-       case { 'setitc' 'setersp' }
+        case { 'setitc' 'setersp' }
             if firsttimeersp
                 warndlg2(strvcat('Checking both ''ERSP'' and ''ITC'' does not require further', ...
                                  'computing time. However it requires disk space'));
