@@ -38,6 +38,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2006/10/10 04:12:33  toby
+% save revision info added
+%
 
 
 function [STUDY, ALLEEG, com] = pop_loadstudy(varargin)
@@ -69,7 +72,9 @@ end
 if (~isempty(filename)) & (~isempty(filepath))
     STUDYfile = fullfile(filepath,filename);
     try 
+        warning off;
         load('-mat', STUDYfile);
+        warning on;
     catch
         error(['pop_loadstudy(): STUDY set file ''STUDYfile'' not loaded -- check filename and path']);
     end
