@@ -83,6 +83,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.42  2007/04/06 02:15:49  arno
+% fix figure creation
+%
 % Revision 1.41  2007/04/05 22:01:21  arno
 % condensed mode
 %
@@ -263,7 +266,7 @@ if ~isempty(opt.channels)
                                       'chanlocs', locs, 'plotsubjects', opt.plotsubjects, 'topovals', titlestr, plotcurveopt{:});
     else
         std_plotcurve(alltimes, erpdata, 'condnames', STUDY.condition, 'plottopo', fastif(length(allinds)==1, 'off', 'on'), ...
-                                      'datatype', 'spec', 'plotmode', opt.plotmode, 'groupnames', STUDY.group, 'unitx', '\muV', ...
+                                      'datatype', 'spec', 'plotmode', opt.plotmode, 'groupnames', STUDY.group, 'unitx', 'ms', ...
                                       'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, ...
                                       'chanlocs', locs, 'plotsubjects', opt.plotsubjects, plotcurveopt{:});
     end;
