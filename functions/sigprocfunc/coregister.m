@@ -121,6 +121,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.57  2006/11/15 00:30:32  arno
+% remove warning for optimization toolbox
+% /
+%
 % Revision 1.56  2006/11/06 22:32:29  arno
 % debug fiducial alignmenent
 %
@@ -330,7 +334,7 @@ if isstr(chanlocs1)
             [ tmp transform ] = align_fiducials(dat.elec1, dat.elec2, dat.elec1.label(clist1), dat.elec2.label(clist2));
             if ~isempty(transform), dat.transform = transform; end;
         catch,
-            warndlg2('Transformation failed');
+            warndlg2(strvcat('Transformation failed', lasterr));
         end;
     elseif strcmpi(com, 'warp')
         [clist1 clist2] = pop_chancoresp( dat.elec1, dat.elec2, 'autoselect', 'all');
@@ -345,7 +349,7 @@ if isstr(chanlocs1)
                 [ tmp dat.transform ] = warp_chans(dat.elec1, dat.elec2, tmpelec2.label(clist2), 'traditional');
                 dat.transform(6) = - dat.transform(6);
             catch,
-                warndlg2('Transformation failed');
+                warndlg2(strvcat('Transformation failed', lasterr));
             end;
         end;
     end;
@@ -370,28 +374,6 @@ g = finputcheck(varargin, { 'alignfid'   'cell'  {}      {};
                             'helpmsg'    'string' { 'on' 'off' } 'off';
                             'mesh'       ''      []   defaultmesh });
 if isstr(g), error(g); end;
-
-% help message
-% ------------
-if strcmpi(g.helpmsg, 'on')
-    mytext = strvcat( 'User channels (sometimes hidden in the 3-D mesh) are in green, reference channels in red.', ...
-            'Press ''Warp'' to automatically warp user channels to corresponding reference channels.', ...
-            'Then, if desired, further edit the transformation manually using the coregister gui buttons.', ...
-            ' ', ...
-            'To use locations of corresponding reference channels (and discard current locations),', ...
-            'select "Edit > Channel locations" in the EEGLAB mensu and press, "Look up loc." Select a ', ...
-            'head model. Then re-open "Tools > Locate dipoles using DIPFIT2 > Head model and settings"',...
-            'in the EEGLAB menu and select the "No coreg" option.');
-    if ~isempty(findstr(lower(chanlocs2), 'standard-10-5-cap385')) | ...
-        ~isempty(findstr(lower(chanlocs2), 'standard_1005')),
-        mytext = strvcat( mytext, 'Then re-open "Tools > Locate dipoles using DIPFIT2 > Head model and settings"', ...
-                          'in the EEGLAB menu and select the "No coreg" option.');
-    else
-        mytext = strvcat( mytext, 'Then re-open the graphic interface function you were using.');
-    end;        
-       
-    warndlg2( mytext, 'Co-register channel locations');
-end;
 
 % load mesh if any
 % ----------------
@@ -517,7 +499,8 @@ dat.elec2      = elec2;
 dat.elecshow1  = 1:length(elec1.label);
 dat.elecshow2  = 1:length(elec2.label);
 dat.color1     = [0 1 0];
-dat.color2     = [1 0 0];
+dat.color2     = [1 .75 .65]*.8;
+%dat.color2     = [1 0 0];
 dat.label1     = 0;
 dat.label2     = 0;
 dat.meshon     = 1;
@@ -606,7 +589,27 @@ if 1
                       'clear tmp tmpres;' ...
                       'coregister(''redraw'', gcbf);' ];
     h = uicontrol( opt{:}, [0 0.75  .13 .05], 'style', 'pushbutton', 'string', 'Mesh off', 'callback', cb_mesh );
-    h = uicontrol( opt{:}, [0.87 0.95 .13 .05], 'style', 'pushbutton', 'string', 'Help', 'callback', 'pophelp(''coregister'');' );
+
+    % help message
+    % ------------
+    
+    cb_helpme = [ 'warndlg2(strvcat( ''User channels (sometimes hidden in the 3-D mesh) are in green, reference channels in brown.'',' ...
+            '''Press "Warp" to automatically warp user channels to corresponding reference channels.'',' ...
+            '''Then, if desired, further edit the transformation manually using the coregister gui buttons.'',' ...
+            ''' '',' ...
+            '''To use locations of corresponding reference channels (and discard current locations),'',' ...
+            '''select "Edit > Channel locations" in the EEGLAB mensu and press, "Look up loc." Select a '',' ...
+            '''head model. Then re-open "Tools > Locate dipoles using DIPFIT2 > Head model and settings"'',' ...
+            '''in the EEGLAB menu and select the "No coreg" option.'',' ];
+    if ~isempty(findstr(lower(chanlocs2), 'standard-10-5-cap385')) | ...
+        ~isempty(findstr(lower(chanlocs2), 'standard_1005')),
+        cb_helpme = [ cb_helpme '''Then re-open "Tools > Locate dipoles using DIPFIT2 > Head model and settings"'',' ...
+                          '''in the EEGLAB menu and select the "No coreg" option.''), ''Warning'');' ];
+    else
+        cb_helpme = [ cb_helpme '''Then re-open the graphic interface function you were using.''), ''Warning'');' ];
+    end;        
+    h = uicontrol( opt{:}, [0.87 0.95 .13 .05], 'style', 'pushbutton', 'string', 'Help me', 'callback',  cb_helpme);
+    h = uicontrol( opt{:}, [0.87 0.90 .13 .05], 'style', 'pushbutton', 'string', 'Funct. help', 'callback', 'pophelp(''coregister'');' );
 
     % change colors
     % -------------
@@ -856,7 +859,7 @@ function redrawgui(fid)
         plotlabels(dat.electransf, dat.elecshow1, dat.color1, 'elec1labels');
     end;
     if dat.label2
-        plotlabels(dat.elec2, dat.elecshow2, dat.color2, 'elec2labels');
+        plotlabels(dat.elec2, dat.elecshow2, dat.color2*0.5, 'elec2labels');
     end;
     
     %view(tmpview);
