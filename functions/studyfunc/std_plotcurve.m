@@ -65,6 +65,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2007/04/06 01:47:23  arno
+% better axis label
+%
 % Revision 1.6  2007/04/06 01:28:35  arno
 % same
 %
@@ -288,8 +291,8 @@ end;
 if strcmpi(opt.unitx, 'ms'), xlab = 'Time (ms)';      ylab = 'Potential (\muV)';
 else                         xlab = 'Frequency (Hz)'; ylab = 'Power (10*log_{10}(\muV^{2}/Hz))'; 
 end;
-if ~isnan(threshold), statopt = { xlab 'ylabel' };
-else                  statopt = { 'logpval' 'on' 'xlabel' xlab 'ylabel' '-log10(p)' 'ylim' [0 maxplot] };
+if ~isnan(opt.threshold), statopt = { xlab 'ylabel' };
+else                      statopt = { 'logpval' 'on' 'xlabel' xlab 'ylabel' '-log10(p)' 'ylim' [0 maxplot] };
 end;
 
 % adjust figure size
@@ -505,10 +508,21 @@ if strcmpi(opt.plottopo, 'off'),
     axcopy;
     % remove axis labels (for most but not all)
     % ------------------
-    for c = 1:size(hdl,1)
-        for g = 1:size(hdl,2)
-            if g ~= 1 & size(hdl,2) ~=1, ylabel(''); legend off; end;
-            if c ~= size(hdl,1) & size(hdl,1) ~= 1, xlabel(''); legend off; end;
+    if strcmpi(opt.subplot, 'transpose')
+        for c = 1:size(hdl,2)
+            for g = 1:size(hdl,1)
+                axes(hdl(g,c));
+                if c ~= 1 & size(hdl,2) ~=1, xlabel(''); legend off; end;
+                if g ~= 1 & size(hdl,1) ~= 1, ylabel(''); legend off; end;
+            end;
+        end;
+    else
+        for c = 1:size(hdl,1)
+            for g = 1:size(hdl,2)
+                axes(hdl(c,g));
+                if g ~= 1 & size(hdl,2) ~=1, ylabel(''); legend off; end;
+                if c ~= size(hdl,1) & size(hdl,1) ~= 1, xlabel(''); legend off; end;
+            end;
         end;
     end;
 end;
