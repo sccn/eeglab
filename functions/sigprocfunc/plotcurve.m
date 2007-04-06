@@ -202,6 +202,7 @@ function plotcurve( times, R, varargin);
         set(hh, 'unit', 'pixels')      
     end;
     ylabel(g.ylabel)
+    xlabel(g.xlabel)
   end;
   
 % -----------------
