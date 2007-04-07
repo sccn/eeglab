@@ -116,6 +116,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.46  2007/04/05 23:13:43  arno
+% recomputing file on disk
+%
 % Revision 1.45  2007/04/05 22:17:02  arno
 % freqscale
 %
@@ -275,7 +278,7 @@ end;
                         'freqs'         'real'        []      [3 50];
                         'freqscale'     'string'      []      'log';
                         'alpha'         'real'        []      NaN;
-                        'type'          'string'      { 'ersp' 'itc' 'both' }  'both'}, 'std_ersp', 'ignore');
+                        'type'          'string'      { 'ersp' 'itc' 'both' 'ersp&itc' }  'both'}, 'std_ersp', 'ignore');
 if isstr(g), error(g); end;
     
 % checking input parameters
@@ -460,10 +463,10 @@ if ~isempty(g.channels)
     end;
 end;
 
-if strcmpi(g.type, 'both') | strcmpi(g.type, 'ersp')
+if strcmpi(g.type, 'both') | strcmpi(g.type, 'ersp') | strcmpi(g.type, 'ersp&itc')
     std_savedat( filenameersp, all_ersp);
 end;
-if strcmpi(g.type, 'both') | strcmpi(g.type, 'itc')
+if strcmpi(g.type, 'both') | strcmpi(g.type, 'itc') | strcmpi(g.type, 'ersp&itc')
     std_savedat( filenameitc , all_itc );
 end;
 if strcmpi(g.savetrials, 'on')
