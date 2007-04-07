@@ -122,6 +122,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.76  2007/04/07 21:52:31  arno
+% same
+%
 % Revision 1.75  2007/04/07 21:51:36  arno
 % compute ERSP and ITC at the same time
 %
@@ -678,7 +681,6 @@ if nargin < 2
                     data = [data; reshape(X, size(X,1), size(X,2)*size(X,3)*size(X,4)) ];
                     clear tmp X 
                 end
-                erspmode = 'already_computed';
                 
              % execute custom command
              % ----------------------
@@ -782,6 +784,9 @@ if nargin < 2
             clustdata(:,end+1:end+size(clustdatatmp,2)) = clustdatatmp;
         end
         
+        if strcmpi(strcom, 'itc') | strcmpi(strcom, 'ersp')
+            erspmode = 'already_computed';
+        end;
     end
     
     % Compute a second PCA of the already PCA'd data if there are too many PCA dimensions.
