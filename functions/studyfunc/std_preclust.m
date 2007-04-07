@@ -122,6 +122,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.74  2007/04/07 01:23:44  arno
+% put savetrials to off by default
+%
 % Revision 1.73  2007/04/06 22:11:12  arno
 % recompute tag
 %
@@ -290,7 +293,7 @@
 
 function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
     
-    if nargin < 2
+if nargin < 2
         help std_preclust;
         return;
     end;
@@ -360,6 +363,18 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
     nodip = 0;
     if update_flag % dipole information is used to select components
         error('Update flag is obsolete');
+    end;
+    
+    % scan all commands for ERSP and ITC
+    % ----------------------------------
+    erspmode = '';
+    for index = 1:length(varargin)
+        if strcmpi(varargin{index}{1}, 'itc')  & isempty(erspmode), erspmode = 'itc';
+        else                                                        erspmode = 'both';
+        end;
+        if strcmpi(varargin{index}{1}, 'ersp') & isempty(erspmode), erspmode = 'ersp';
+        else                                                        erspmode = 'both';
+        end;
     end;
     
     % scan all commands
@@ -614,7 +629,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
               
              % cluster on ica ersp / itc values
              % --------------------------------
-             case  {'ersp', 'itc'}
+             case  {'ersp', 'itc' }
                 for kk = 1:length(STUDY.cluster)
                     if isfield(STUDY.cluster(kk).centroid, 'ersp')
                         STUDY.cluster(kk).centroid = rmfield(STUDY.cluster(kk).centroid, 'ersp');
@@ -626,7 +641,6 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                         STUDY.cluster(kk).centroid = rmfield(STUDY.cluster(kk).centroid, 'itc_times');
                     end;
                 end;
-                type =  strcom;            
                 if ~isempty(succompind{si})
                     idattot = [];
                     for cond = 1:size(STUDY.setind,1)
@@ -634,9 +648,11 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                             idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index;  
                             idattot = [idattot idat];
                             % compute ERSP/ ITC, if doesn't exist.
-                            std_ersp(ALLEEG(idat), 'components', succompind{si}, 'freqs', freqrange, ...
-                                'timewindow', timewindow, 'cycles', cycles, 'padratio', padratio, 'alpha', alpha, ...
-                                'type', type, 'savetrials', savetrials, 'recompute', recompute);
+                            if ~strcmpi(erspmode, 'already_computed';
+                                std_ersp(ALLEEG(idat), 'components', succompind{si}, 'freqs', freqrange, ...
+                                         'timewindow', timewindow, 'cycles', cycles, 'padratio', padratio, 'alpha', alpha, ...
+                                         'type', erspmode, 'savetrials', savetrials, 'recompute', recompute);
+                            end;
                         end
                     end
                     STUDY.preclust.erspclustfreqs = freqrange;
@@ -646,7 +662,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                     % mask and change to a common base if multiple conditions).
                     % --------------------------------------------------------------------
                     for k = 1:length(succompind{si})
-                        if strcmpi(type, 'ersp')
+                        if strcmpi(strcom, 'ersp')
                             tmp = std_readersp(ALLEEG, idattot, succompind{si}(k), timewindow, freqrange); 
                         else
                             tmp = std_readitc( ALLEEG, idattot, succompind{si}(k), timewindow, freqrange); 
@@ -659,6 +675,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                     data = [data; reshape(X, size(X,1), size(X,2)*size(X,3)*size(X,4)) ];
                     clear tmp X 
                 end
+                erspmode = 'already_computed';
                 
              % execute custom command
              % ----------------------
