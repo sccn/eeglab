@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.45  2006/04/10 05:22:32  toby
+% itc weight bug
+%
 % Revision 1.44  2006/03/29 00:47:59  toby
 % dealing with NaNs in STUDY.setind
 %
@@ -182,7 +185,7 @@ if ~isstr(varargin{1}) %intial settings
                                                    [ALLEEG(ref_ind).xmin ALLEEG(ref_ind).xmax]*1000 , minfreq, 4); 
     end;
     erspparams_str = [ '''freqrange'', [' int2str(minfreq) ' 50], ''timewindow'', ' ...
-                       vararg2str(time_range) '''cycles'', [3 0.5], ''padratio'', 4' ];
+                       vararg2str(time_range) '''cycles'', [3 0.5], ''padratio'', 1' ];
 
     % cluster text
     % ------------
@@ -505,7 +508,7 @@ else
                 eval(ersp_str);
                 if ~isfield(ersp_p, 'alpha'),    ersp_p.alpha    = NaN; end;
                 if ~isfield(ersp_p, 'cycle'),    ersp_p.cycle    = [3 0.5]; end;
-                if ~isfield(ersp_p, 'padratio'), ersp_p.padratio = 4; end;
+                if ~isfield(ersp_p, 'padratio'), ersp_p.padratio = 1; end;
                 if ~isfield(ersp_p, 'frange'),   ersp_p.frange   = [3 25]; end;
                 seti = STUDY.datasetinfo(1).index; %first dataset in ALLEEG that is part of STUDY
                 [time_range, winsize] = compute_ersp_times(ersp_p.cycle,  ALLEEG(seti).srate, ...
