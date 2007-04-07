@@ -122,6 +122,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.75  2007/04/07 21:51:36  arno
+% compute ERSP and ITC at the same time
+%
 % Revision 1.74  2007/04/07 01:23:44  arno
 % put savetrials to off by default
 %
@@ -648,7 +651,7 @@ if nargin < 2
                             idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index;  
                             idattot = [idattot idat];
                             % compute ERSP/ ITC, if doesn't exist.
-                            if ~strcmpi(erspmode, 'already_computed';
+                            if ~strcmpi(erspmode, 'already_computed')
                                 std_ersp(ALLEEG(idat), 'components', succompind{si}, 'freqs', freqrange, ...
                                          'timewindow', timewindow, 'cycles', cycles, 'padratio', padratio, 'alpha', alpha, ...
                                          'type', erspmode, 'savetrials', savetrials, 'recompute', recompute);
