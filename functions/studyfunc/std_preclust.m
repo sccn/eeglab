@@ -122,6 +122,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.73  2007/04/06 22:11:12  arno
+% recompute tag
+%
 % Revision 1.72  2007/04/05 23:16:22  arno
 % recompute tag
 %
@@ -379,7 +382,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
         padratio  = 1;
         alpha = NaN;
         fun_arg = [];
-        savetrials = 'on';
+        savetrials = 'off';
         recompute  = 'on';
         for subind = 2:2:length(varargin{index})
             switch varargin{index}{subind}
