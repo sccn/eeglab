@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.85  2006/09/13 09:38:14  arno
+% fixing window pop up problem
+%
 % Revision 1.83  2006/05/07 18:08:07  arno
 % resaving dataset fix
 %
@@ -377,31 +380,35 @@ if length(EEG) == 1
         if isempty(EEG.datfile), EEG = rmfield(EEG, 'datfile'); end;
     end;
     if strcmpi(g.savemode, 'resave') & isfield(EEG, 'datfile') & option_savematlab
-        but = questdlg2(strvcat('This dataset has an associated ''.dat'' file, but since you have', ...
-                          'changed of saving mode, all the data will now be saved within the', ...
-                          'Matlab file and the ''.dat'' file will be deleted.', ...
-                          '(Note: Just press ''No'' if you do not know what you are doing)'), ...
-                          'Warning: saving mode changed', 'Cancel', 'No, save as before', 'Yes, do it', 'Yes, do it');
-        switch but
-            case 'Cancel', return;
-            case 'No, save as before', % nothing
-            case 'Yes, do it', g.savemode = 'onefile';
-        end;
-        g.filename = EEG.filename;
-        g.filepath = EEG.filepath;
+        disp('Note that your memory options for saving datasets does not correspond')
+        disp('to the format of the datasets on disk (ignoring memory options)')
+% $$$         but = questdlg2(strvcat('This dataset has an associated ''.dat'' file, but since you have', ...
+% $$$                           'changed of saving mode, all the data will now be saved within the', ...
+% $$$                           'Matlab file and the ''.dat'' file will be deleted.', ...
+% $$$                           '(Note: Just press ''No'' if you do not know what you are doing)'), ...
+% $$$                           'Warning: saving mode changed', 'Cancel', 'No, save as before', 'Yes, do it', 'Yes, do it');
+% $$$         switch but
+% $$$             case 'Cancel', return;
+% $$$             case 'No, save as before', % nothing
+% $$$             case 'Yes, do it', g.savemode = 'onefile';
+% $$$         end;
+% $$$         g.filename = EEG.filename;
+% $$$         g.filepath = EEG.filepath;
     elseif strcmpi(g.savemode, 'resave') & ~isfield(EEG, 'datfile') & ~option_savematlab
-        but = questdlg2(strvcat('This dataset does not have yet an associated ''.dat'' file, but since you have', ...
-                          'changed of saving mode, all the data will now be saved within the ''.dat''', ...
-                          'file and not in the Matlab file (as it is currently the case).', ...
-                          '(Note: Just press ''No'' if you do not know what you are doing)'), ...
-                          'Warning: saving mode changed', 'Cancel', 'No, save as before', 'Yes, do it', 'Yes, do it');
-        switch but
-            case 'Cancel', return;
-            case 'No, save as before', % nothing
-            case 'Yes, do it', g.savemode = 'twofiles';
-        end;
-        g.filename = EEG.filename;
-        g.filepath = EEG.filepath;
+        disp('Note that your memory options for saving datasets does not correspond')
+        disp('to the format of the datasets on disk (ignoring memory options)')
+% $$$         but = questdlg2(strvcat('This dataset does not have yet an associated ''.dat'' file, but since you have', ...
+% $$$                           'changed of saving mode, all the data will now be saved within the ''.dat''', ...
+% $$$                           'file and not in the Matlab file (as it is currently the case).', ...
+% $$$                           '(Note: Just press ''No'' if you do not know what you are doing)'), ...
+% $$$                           'Warning: saving mode changed', 'Cancel', 'No, save as before', 'Yes, do it', 'Yes, do it');
+% $$$         switch but
+% $$$             case 'Cancel', return;
+% $$$             case 'No, save as before', % nothing
+% $$$             case 'Yes, do it', g.savemode = 'twofiles';
+% $$$         end;
+% $$$         g.filename = EEG.filename;
+% $$$         g.filepath = EEG.filepath;
     end;
 end;
 
