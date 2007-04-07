@@ -67,10 +67,10 @@ if (~strcmp(STUDY.cluster(new_clus).parent, 'manual'))
         return;
     end
 end
-disp('Moving components...');
 for  ci = 1:length(comps)
     comp = STUDY.cluster(old_clus).comps(comps(ci));
     sets = STUDY.cluster(old_clus).sets(:,comps(ci));
+    fprintf('Moving component %d from cluster %d to cluster %d, centroids will be recomputed\n',comp, old_clus, new_clus);
     
     %update new cluster
     indcomp = length(STUDY.cluster(new_clus).comps)+1;
@@ -101,14 +101,11 @@ for  ci = 1:length(comps)
     STUDY.cluster(new_clus).comps = STUDY.cluster(new_clus).comps(sind);
     if ~isempty(STUDY.cluster(new_clus).preclust.preclustdata)
         STUDY.cluster(new_clus).preclust.preclustdata(sind,:) = STUDY.cluster(new_clus).preclust.preclustdata(:,:);
-    end;
+    end
 end
 %STUDY.cluster(new_clus).centroid = []; % remove centroid
 STUDY = rm_centroid(STUDY, new_clus);
 STUDY = rm_centroid(STUDY, old_clus);
-
-fprintf('Removing centroid (will have to be recomputed) for cluster %d\n', new_clus);
-fprintf('Removing centroid (will have to be recomputed) for cluster %d\n', old_clus);
 
 % Remove data from old cluster
 % left_comps - are all the components of the cluster after the
