@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2007/01/26 18:03:09  arno
+% do not know
+%
 % Revision 1.33  2006/11/22 21:28:11  arno
 % scott fix crashed, reverting to previous version
 %
@@ -335,7 +338,7 @@ else
                    ones(1,ERPIMAGELINES)*10000, eegtimes , ...
                          EI_TITLE, ei_smooth, 1, 'caxis', 2/3, 'cbar','yerplabel', '');   
             else
-                    icaacttmp = reshape(EEG.icaweights(numcompo,:) * EEG.icasphere) ...
+                    icaacttmp = EEG.icaweights(numcompo,:) * EEG.icasphere ...
                                      * reshape(EEG.data, erpimageframes, ERPIMAGELINES);
                     offset = nan_mean(icaacttmp);
                     erpimage( icaacttmp-offset, ones(1,ERPIMAGELINES)*10000, eegtimes, ...
