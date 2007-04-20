@@ -26,6 +26,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.45  2007/03/20 20:14:12  arno
+% version
+%
 % Revision 1.44  2007/01/02 01:16:49  scott
 % added debug print
 %
@@ -171,22 +174,23 @@
 % ------------------------------------------------------
 
 EEGLAB_VERSION = '6.0b'; % EEGLAB version s=stable, b=beta, a=alpha (SCCN only)
-TUTORIAL_URL = 'http://sccn.ucsd.edu/eeglab/eeglabdocs.html'; % online version
 
-% If there is a local copy of the web site, uncomment and edit one of the following lines
+TUTORIAL_URL = 'http://sccn.ucsd.edu/eeglab/eeglabdocs.html'; % online version
+% NB: If there is a local copy of the web site, 
+%     replace the line above with a line like the following: 
 %
 % TUTORIAL_URL = 'file://C:\folder\eeglabtutorial\eeglabdocs.html'; % Windows
 % TUTORIAL_URL = 'file:///home/user/eeglabtutorial/eeglabdocs.html'; % Unix
 % TUTORIAL_URL = 'file://::disk:folder:eeglabtutorial:eeglabdocs.html'; % Mac
 
 ICABINARY = '/data/common/matlab/fmrlab/ica_linux'; 
-%                           % <=INSERT name of ica executable for binica.m above
-                            % If none, use []
+%                           % <=INSERT location of ica executable for binica.m above
+%                           % If none, use []
+YDIR  = 1;                  % positive potential up = 1; negative up = -1
+HZDIR = 'up';               % ascending freqs = 'up'; descending = 'down' 
+                            % (e.g., timef/newtimef frequency direction)
+DEFAULT_SRATE = 256.0175;   % default local sampling rate 
 
-SHRINKWARNING = 1;          % Warn user about the shrink factor in topoplot() (1/0)
-YDIR  = 1;                  % positive up = 1; negative up = -1
-HZDIR = 'up';               % ascending = 'up'; descending = 'down' 
-                            % (timef/newtimef frequency direction)
 % Set EEGLAB figure and GUI colors
 % --------------------------------
 if get(0, 'screendepth') <=8 % if mono or 8-bit color
@@ -200,7 +204,7 @@ if get(0, 'screendepth') <=8 % if mono or 8-bit color
     PLUGINMENUCOLOR     = [.5 0 .5];  % plugin menu color
 
 else % if full color screen
-    BACKCOLOR           = [.93 .96 1];    % Background figure color 
+    BACKCOLOR           = [.93 .96 1];    % EEGLAB Background figure color 
     BACKEEGLABCOLOR     = [.66 .76 1];    % EEGLAB main window background
     GUIBUTTONCOLOR      = BACKEEGLABCOLOR;% Buttons colors in figures
     GUIPOPBUTTONCOLOR   = BACKCOLOR;      % Buttons colors in GUI windows
@@ -209,8 +213,11 @@ else % if full color screen
     PLUGINMENUCOLOR     = [.5 0 .5];      % plugin menu color
 end;
 
+
 % THE FOLLOWING PARAMETERS WILL BE DEPRECATED IN LATER VERSIONS
 % -------------------------------------------------------------
+
+SHRINKWARNING = 1;          % Warn user about the shrink factor in topoplot() (1/0)
 
 MAXENVPLOTCHANS   = 264;  % maximum number of channels to plot in envproj.m
 MAXPLOTDATACHANS  = 264;  % maximum number of channels to plot in dataplot.m
@@ -218,7 +225,6 @@ MAXPLOTDATAEPOCHS = 264;  % maximum number of epochs to plot in dataplot.m
 MAXEEGPLOTCHANS   = 264;  % maximum number of channels to plot in eegplot.m
 MAXTOPOPLOTCHANS  = 264;  % maximum number of channels to plot in topoplot.m
 
-DEFAULT_SRATE = 256.0175; % default sampling rate <-- RESET TO LOCAL DEFAULT SRATE
 DEFAULT_ELOC  = 'chan.locs'; % default electrode location file for topoplot.m
 DEFAULT_EPOCH = 10;       % default epoch width to plot in eegplot(s) (in sec)
 
