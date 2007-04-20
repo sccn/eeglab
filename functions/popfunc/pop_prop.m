@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2007/04/18 00:20:33  toby
+% Bug 280, incorrect reshape call, fixed
+%
 % Revision 1.35  2007/01/26 18:03:09  arno
 % do not know
 %
@@ -315,7 +318,7 @@ else
     hh = axes('Units','Normalized', 'Position',[45 62 48 38].*s+q);
     ERPIMAGELINES = 200; % show 200-line erpimage
     while size(EEG.data,2) < ERPIMAGELINES*EEG.srate
-       ERPIMAGELINES = round(0.9 * ERPIMAGESLINES);
+       ERPIMAGELINES = round(0.9 * ERPIMAGELINES);
     end
     if ERPIMAGELINES > 2   % give up if data too small
       if ERPIMAGELINES < 10
