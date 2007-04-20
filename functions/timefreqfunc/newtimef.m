@@ -184,7 +184,9 @@
 %       'erspmax'   = [real dB] set the ERSP max. for the color scale (min= -max) {auto}
 %       'itcmax'    = [real] set the ITC image maximum for the color scale {auto}
 %       'hzdir'     = ['up' or 'normal'|'down' or 'reverse'] Direction of
-%                     the frequency axes.     {'up'}
+%                     the frequency axes.     {'up', or as set in icadefs.m}
+%       'ydir'      = ['up' or 'normal'|'down' or 'reverse'] Direction of
+%                     the ERP axis.     {'up', or as set in icadefs.m}
 %       'erplim'    = [min max] ERP limits for ITC (below ITC image)       {auto}
 %       'itcavglim' = [min max] average ITC limits for all freq. (left of ITC) {auto}
 %       'speclim'   = [min max] average spectrum limits (left of ERSP image)   {auto}
@@ -275,6 +277,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.128  2007/04/06 21:34:09  arno
+% g.cycles input
+%
 % Revision 1.127  2007/04/05 22:12:58  arno
 % error msg
 %
@@ -846,26 +851,32 @@ function [P,R,mbase,timesout,freqs,Pboot,Rboot,alltfX,PA] = newtimef( data, fram
 
 % Read system (or directory) constants and preferences:
 % ------------------------------------------------------
-icadefs
+icadefs % read local EEGLAB constants: HZDIR, YDIR, DEFAULT_SRATE, DEFAULT_TIMLIM
+if ~exist('HZDIR'), HZDIR = 'normal'; end; % ascending freqs
+if ~exist('YDIR'), YDIR = 'normal'; end;   % positive up
+if ~exist('DEFAULT_SRATE'), DEFAULT_SRATE = 250; end; % 250 Hz
+if ~exist('DEFAULT_TIMLIM'), DEFAULT_TIMLIM = [-1000 2000]; end; % [-1 2] s epochs
+
+if YDIR == 1, YDIR = 'normal'; end;  % convert from [-1|1] used in other functions
+if YDIR == -1, YDIR = 'reverse'; end;
 
 % Constants set here:
-%
+% ------------------
 ERSP_CAXIS_LIMIT = 0;           % 0 -> use data limits; else positive value
 % giving symmetric +/- caxis limits.
 ITC_CAXIS_LIMIT  = 0;           % 0 -> use data limits; else positive value
 % giving symmetric +/- caxis limits.
 MIN_ABS          = 1e-8;        % avoid division by ~zero
 
-% Commandline arg defaults:
-DEFAULT_EPOCH	= 750;		% Frames per trial
-DEFAULT_TIMLIM = [-1000 2000];	% Epoch rime range (ms)
-DEFAULT_FS	= 250;		% Sampling frequency (Hz)
+% Command line argument defaults:
+% ------------------------------
 DEFAULT_NWIN	= 200;		% Number of windows = horizontal resolution
 DEFAULT_VARWIN	= 0;		% Fixed window length or fixed number of cycles.
 % =0: fix window length to that determined by nwin
 % >0: set window length equal to varwin cycles
 %     Bounded above by winsize, which determines
 %     the min. freq. to be computed.
+
 DEFAULT_OVERSMP	= 2;		% Number of times to oversample frequencies
 DEFAULT_MAXFREQ = 50;		% Maximum frequency to display (Hz)
 DEFAULT_TITLE	= '';		% Figure title (no default)
@@ -875,10 +886,10 @@ DEFAULT_MARKTIME= NaN;
 
 % Font sizes:
 AXES_FONT       = 10;           % axes text FontSize
-TITLE_FONT      = 8;
+TITLE_FONT      =  8;
 
 if (nargin < 2)
-    frames = DEFAULT_EPOCH;
+    frames = floor((DEFAULT_TIMLIN(2)-DEFAULT_TIMLIM(1))/DEFAULT_SRATE);
 elseif (~isnumeric(frames) | length(frames)~=1 | frames~=round(frames))
     error('Value of frames must be an integer.');
 elseif (frames <= 0)
@@ -917,7 +928,7 @@ elseif (tlimits(1) >= tlimits(2))
 end
 
 if (nargin < 4)
-    Fs = DEFAULT_FS;
+    Fs = DEFAULT_SRATE;
 elseif (~isnumeric(Fs) | length(Fs)~=1)
     error('Value of srate must be a number.');
 elseif (Fs <= 0)
@@ -1001,6 +1012,7 @@ g = finputcheck(varargin, ...
     'timeStretchRefs'   'real'  []           []; ...
     'timeStretchPlot'   'real'  []           []; ...
     'hzdir'         'string'    {'up','down','normal','reverse'}   HZDIR; ...
+    'ydir'          'string'    {'up','down','normal','reverse'}   YDIR; ...
     'wletmethod'    'string'   {'dftfilt2' 'dftfilt'}  'dftfilt'; ...
     'cycleinc'      'string'   {'linear' 'log'}        'linear'
     });
@@ -1156,10 +1168,18 @@ end
 
 if strcmp(g.hzdir,'up')| strcmp(g.hzdir,'normal')
     g.hzdir = 'normal'; % convert to Matlab graphics constants
-elseif strcmp(g.hzdir,'down') | strcmp(g.hzdir,'reverse')
+elseif strcmp(g.hzdir,'down') | strcmp(g.hzdir,'reverse')| g.hzdir==-1
     g.hzdir = 'reverse';
 else
-    error('unknown ''hzdir'' string argument'); 
+    error('unknown ''hzdir'' argument'); 
+end
+
+if strcmp(g.ydir,'up')| strcmp(g.ydir,'normal')
+    g.ydir = 'normal'; % convert to Matlab graphics constants
+elseif strcmp(g.ydir,'down') | strcmp(g.ydir,'reverse')
+    g.ydir = 'reverse';
+else
+    error('unknown ''ydir'' argument'); 
 end
 
 % Multitaper - used in timef
@@ -1950,6 +1970,7 @@ switch lower(g.plotitc)
         plot([times(1) times(length(times))],[0 0], 'k');
         xlim([min(ERPtimes) max(ERPtimes)]);
         ylim(g.erplim)
+        set(gca,'ydir',g.ydir);
 
         tick = get(h(10),'YTick');
         set(h(10),'YTick',[tick(1) ; tick(end)])
