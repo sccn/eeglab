@@ -41,8 +41,9 @@
 %                     To compare two conditions (data1 and data2)
 %                     in place of single data matrix, enter { data1 data2 }
 %       frames      = Frames per trial. Ignored if data is 2-D or 3-D.  {750}
-%       tlimits     = [mintime maxtime] (ms) Epoch time limits {[-1000 2000]}
-%       srate       = data sampling rate (Hz)   {default: 250}
+%       tlimits     = [mintime maxtime] (ms) Epoch time limits {from icadefs.m
+%                     or [-1000 2000]}
+%       srate       = data sampling rate (Hz)   {default: from icadefs.m or 250}
 %       cycles      = [0] Use FFTs with Hanning window tapering. {default}
 %                   = [real positive scalar] Number of cycles in each Morlet
 %                     (gaussian-tapered) wavelet, constant across frequencies.
@@ -184,9 +185,9 @@
 %       'erspmax'   = [real dB] set the ERSP max. for the color scale (min= -max) {auto}
 %       'itcmax'    = [real] set the ITC image maximum for the color scale {auto}
 %       'hzdir'     = ['up' or 'normal'|'down' or 'reverse'] Direction of
-%                     the frequency axes.     {'up', or as set in icadefs.m}
+%                     the frequency axes {as in icadefs.m, or 'up'}
 %       'ydir'      = ['up' or 'normal'|'down' or 'reverse'] Direction of
-%                     the ERP axis.     {'up', or as set in icadefs.m}
+%                     the ERP axis plotted below the ITC {as in icadefs.m, or 'up'}
 %       'erplim'    = [min max] ERP limits for ITC (below ITC image)       {auto}
 %       'itcavglim' = [min max] average ITC limits for all freq. (left of ITC) {auto}
 %       'speclim'   = [min max] average spectrum limits (left of ERSP image)   {auto}
@@ -197,7 +198,7 @@
 %       'linewidth' = Line width for 'marktimes' traces (thick=2, thin=1)      {2}
 %       'axesfont'  = Axes text font size                                      {10}
 %       'titlefont' = Title text font size                                     {8}
-%       'vert'      = [times_vector] -> plot vertical dashed lines at specified timesboottype
+%       'vert'      = [times_vector] -> plot vertical dashed lines at specified times
 %                     in ms. {default: none}
 %       'newfig'    = ['on'|'off'] Create new figure for difference plots {'on'}
 %       'outputformat' = ['old'|'new'] for compatibility with script that used the old
@@ -277,6 +278,12 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.129  2007/04/20 15:25:10  scott
+% added test for HZDIR read from icadefs
+% added read of YDIR (for ERP axis) from icadefs, plus test
+% added DEFAULT_TIMLIM to icadefs
+% added DEFAULT_SRATE to icadefs
+%
 % Revision 1.128  2007/04/06 21:34:09  arno
 % g.cycles input
 %
@@ -852,13 +859,15 @@ function [P,R,mbase,timesout,freqs,Pboot,Rboot,alltfX,PA] = newtimef( data, fram
 % Read system (or directory) constants and preferences:
 % ------------------------------------------------------
 icadefs % read local EEGLAB constants: HZDIR, YDIR, DEFAULT_SRATE, DEFAULT_TIMLIM
-if ~exist('HZDIR'), HZDIR = 'normal'; end; % ascending freqs
-if ~exist('YDIR'), YDIR = 'normal'; end;   % positive up
-if ~exist('DEFAULT_SRATE'), DEFAULT_SRATE = 250; end; % 250 Hz
-if ~exist('DEFAULT_TIMLIM'), DEFAULT_TIMLIM = [-1000 2000]; end; % [-1 2] s epochs
 
-if YDIR == 1, YDIR = 'normal'; end;  % convert from [-1|1] used in other functions
-if YDIR == -1, YDIR = 'reverse'; end;
+if ~exist('HZDIR'), HZDIR = 'up'; end; % ascending freqs
+if ~exist('YDIR'), YDIR = 'up'; end;   % positive up
+
+if YDIR == 1, YDIR = 'up'; end;        % convert from [-1|1] as set in icadefs.m  
+if YDIR == -1, YDIR = 'down'; end;     % and read by other plotting functions
+
+if ~exist('DEFAULT_SRATE'), DEFAULT_SRATE = 250; end;            % 250 Hz
+if ~exist('DEFAULT_TIMLIM'), DEFAULT_TIMLIM = [-1000 2000]; end; % [-1 2] s epochs
 
 % Constants set here:
 % ------------------
