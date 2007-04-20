@@ -26,6 +26,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.46  2007/04/20 14:51:36  scott
+% undeprecated DEFAULT_SRATE
+%
 % Revision 1.45  2007/03/20 20:14:12  arno
 % version
 %
@@ -178,7 +181,6 @@ EEGLAB_VERSION = '6.0b'; % EEGLAB version s=stable, b=beta, a=alpha (SCCN only)
 TUTORIAL_URL = 'http://sccn.ucsd.edu/eeglab/eeglabdocs.html'; % online version
 % NB: If there is a local copy of the web site, 
 %     replace the line above with a line like the following: 
-%
 % TUTORIAL_URL = 'file://C:\folder\eeglabtutorial\eeglabdocs.html'; % Windows
 % TUTORIAL_URL = 'file:///home/user/eeglabtutorial/eeglabdocs.html'; % Unix
 % TUTORIAL_URL = 'file://::disk:folder:eeglabtutorial:eeglabdocs.html'; % Mac
@@ -186,10 +188,12 @@ TUTORIAL_URL = 'http://sccn.ucsd.edu/eeglab/eeglabdocs.html'; % online version
 ICABINARY = '/data/common/matlab/fmrlab/ica_linux'; 
 %                           % <=INSERT location of ica executable for binica.m above
 %                           % If none, use []
+
 YDIR  = 1;                  % positive potential up = 1; negative up = -1
 HZDIR = 'up';               % ascending freqs = 'up'; descending = 'down' 
                             % (e.g., timef/newtimef frequency direction)
 DEFAULT_SRATE = 256.0175;   % default local sampling rate 
+DEFAULT_TIMLIM = [-1000 2000]; % default local epoch limits (ms)
 
 % Set EEGLAB figure and GUI colors
 % --------------------------------
