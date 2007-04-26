@@ -78,6 +78,9 @@
 
 %% REVISION HISTORY
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2007/04/26 23:06:01  arno
+% deal with event input type
+%
 % Revision 1.12  2007/03/30 02:01:39  toby
 % minor doc edits
 %
@@ -125,8 +128,9 @@ g.delim = char(g.delim);
 % -------------------------
 if ~isempty(g.event)
     event = g.event;
-    if isfloat(event), event = mattocell(event); end;
-    if size(event,1) == EEG.trials, event = event'; end;
+    if ~isstr(event)
+        if size(event,2) > size(event,1), event = event'; end;
+    end;
 end;
 
 % determine latency for old event alignment
