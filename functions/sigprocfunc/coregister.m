@@ -25,7 +25,7 @@
 %                 % Note: May need to scale channel x,y,z positions by 100 to see 
 %                 % the imported locations in the default dipfit2() head mesh.
 %
-%        >> [locs_out transform] = coregister( chanlocs, reflocs, 'key', 'val' )
+%        >> [chanlocs_out transform] = coregister( chanlocs, reflocs, 'key', 'val' )
 %                 % Perform custom co-registration to a reference locations and
 %                 % (optional) head mesh. If a ('warp' or 'alignfid') mode is
 %                 % specified, no gui window is produced.
@@ -43,10 +43,15 @@
 %                 file (several formats recognized). By default, loads the 
 %                 dipfit2() MNI head mesh file. Compare 'mheadnew.mat', the 
 %                 mesh used by headplot(); 'mesh',[] shows no head mesh.
-%   'transform' - [real array] homogenous transformation matrix or a 
-%                 1x9 matrix containing traditional 9-parameter "Talairach 
-%                 model" transformation (>> help traditional) to apply to
-%                 the new chanlocs. May be a previous output of coregister(). 
+%   'warpmethod' - ['rigidbody'|'globalrescale'|'traditional'|'nonlin1'|
+%                 'nonlin2'|'nonlin3'|'nonlin4'|'nonlin5']
+%                 'traditional' calls the dipfit2.* function traditional()
+%                 all others are enacted by electrodenormalize()
+%                 {default: 'traditional}
+%   'transform' - [real array] homogenous transformation matrix (>>help 
+%                 electrodenormalize) or a 1x9 matrix containing traditional 
+%                 9-parameter "Talairach model" transformation (>> help traditional) 
+%                 used to calculate locs_out.
 %   'chaninfo1' - [EEG.chaninfo struct] channel information structure for the 
 %                 montage to be coregistered. May contain (no-electrode) fiducial
 %                 locations.
@@ -96,7 +101,7 @@
 %                 (using the coregister() graphic interface). The aligned locations 
 %                 then become reference locations for this mesh.
 %
-% See also: traditional(), headplot(), plotmesh(). 
+% See also: traditional(), headplot(), plotmesh(), electrodenormalize(). 
 %
 % Note: Calls Robert Oostenveld's FieldTrip coregistration functions.
 %
@@ -121,6 +126,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.58  2007/04/06 20:50:45  arno
+% better help
+%
 % Revision 1.57  2006/11/15 00:30:32  arno
 % remove warning for optimization toolbox
 % /
@@ -504,45 +512,45 @@ dat.color2     = [1 .75 .65]*.8;
 dat.label1     = 0;
 dat.label2     = 0;
 dat.meshon     = 1;
-fid = figure('userdata', dat, 'name', 'Co-registration window');
+fid = figure('userdata', dat, 'name', 'coregister()');
 try, icadefs; catch, end;
 
 if 1
     header    = 'dattmp = get(gcbf, ''userdata'');';
     footer    = 'set(gcbf, ''userdata'', dattmp); clear dattmp; coregister(''redraw'', gcbf);';
+    cbright   = [ header 'dattmp.transform(1) = str2num(get(gcbo, ''string''));' footer ];
+    cbforward = [ header 'dattmp.transform(2) = str2num(get(gcbo, ''string''));' footer ];
+    cbup      = [ header 'dattmp.transform(3) = str2num(get(gcbo, ''string''));' footer ];
     cbpitch   = [ header 'dattmp.transform(4) = str2num(get(gcbo, ''string''));' footer ];
     cbroll    = [ header 'dattmp.transform(5) = str2num(get(gcbo, ''string''));' footer ];
     cbyaw     = [ header 'dattmp.transform(6) = str2num(get(gcbo, ''string''));' footer ];
     cbresizex = [ header 'dattmp.transform(7) = str2num(get(gcbo, ''string''));' footer ];
     cbresizey = [ header 'dattmp.transform(8) = str2num(get(gcbo, ''string''));' footer ];
     cbresizez = [ header 'dattmp.transform(9) = str2num(get(gcbo, ''string''));' footer ];
-    cbright   = [ header 'dattmp.transform(1) = str2num(get(gcbo, ''string''));' footer ];
-    cbforward = [ header 'dattmp.transform(2) = str2num(get(gcbo, ''string''));' footer ];
-    cbup      = [ header 'dattmp.transform(3) = str2num(get(gcbo, ''string''));' footer ];
     cb_ok     = 'set(gcbo, ''userdata'', ''ok'')';
     cb_warp   = 'coregister(''warp'', gcbf);';
     cb_fid    = 'coregister(''fiducials'', gcbf);';
     
     opt = { 'unit', 'normalized', 'position' };
     h = uicontrol( opt{:}, [0    .15  1  .02], 'style', 'text', 'string', '');
-    h = uicontrol( opt{:}, [0    .1  .15 .05], 'style', 'text', 'string', 'Pitch (rad)');
-    h = uicontrol( opt{:}, [0    .05 .15 .05], 'style', 'text', 'string', 'Roll (rad)' );
-    h = uicontrol( opt{:}, [0    0   .15 .05], 'style', 'text', 'string', 'Yaw (rad)');
-    h = uicontrol( opt{:}, [0.15 .1  .1  .05], 'tag', 'pitch', 'callback', cbpitch, 'style', 'edit', 'string', '');
-    h = uicontrol( opt{:}, [0.15 .05 .1  .05], 'tag', 'roll' , 'callback', cbroll , 'style', 'edit', 'string', '' );
-    h = uicontrol( opt{:}, [0.15 0   .1  .05], 'tag', 'yaw'  , 'callback', cbyaw  , 'style', 'edit', 'string', '');
-    h = uicontrol( opt{:}, [0.25 .1  .15 .05], 'style', 'text', 'string', 'Resize {x}');
-    h = uicontrol( opt{:}, [0.25 .05 .15 .05], 'style', 'text', 'string', 'Resize {y}' );
-    h = uicontrol( opt{:}, [0.25 0   .15 .05], 'style', 'text', 'string', 'Resize {z}');
-    h = uicontrol( opt{:}, [0.4  .1  .1  .05], 'tag', 'resizex', 'callback', cbresizex, 'style', 'edit', 'string', '');
-    h = uicontrol( opt{:}, [0.4  .05 .1  .05], 'tag', 'resizey', 'callback', cbresizey, 'style', 'edit', 'string', '' );
-    h = uicontrol( opt{:}, [0.4  0   .1  .05], 'tag', 'resizez', 'callback', cbresizez, 'style', 'edit', 'string', '');
-    h = uicontrol( opt{:}, [0.5  .1  .2  .05], 'style', 'text', 'string', 'Move right {mm}');
-    h = uicontrol( opt{:}, [0.5  .05 .2  .05], 'style', 'text', 'string', 'Move front {mm}' );
-    h = uicontrol( opt{:}, [0.5  0   .2  .05], 'style', 'text', 'string', 'Move up {mm}');
-    h = uicontrol( opt{:}, [0.7  .1  .1  .05], 'tag', 'right'  , 'callback', cbright  , 'style', 'edit', 'string', '');
-    h = uicontrol( opt{:}, [0.7  .05 .1  .05], 'tag', 'forward', 'callback', cbforward, 'style', 'edit', 'string', '' );
-    h = uicontrol( opt{:}, [0.7  0   .1  .05], 'tag', 'up'     , 'callback', cbup     , 'style', 'edit', 'string', '');
+    h = uicontrol( opt{:}, [0    .1  .2  .05], 'style', 'text', 'string', 'Move right {mm}');
+    h = uicontrol( opt{:}, [0    .05 .2  .05], 'style', 'text', 'string', 'Move front {mm}' );
+    h = uicontrol( opt{:}, [0    0   .2  .05], 'style', 'text', 'string', 'Move up {mm}');
+    h = uicontrol( opt{:}, [0.2  .1  .1  .05], 'tag', 'right'  , 'callback', cbright  , 'style', 'edit', 'string', '');
+    h = uicontrol( opt{:}, [0.2  .05 .1  .05], 'tag', 'forward', 'callback', cbforward, 'style', 'edit', 'string', '' );
+    h = uicontrol( opt{:}, [0.2  0   .1  .05], 'tag', 'up'     , 'callback', cbup     , 'style', 'edit', 'string', '');
+    h = uicontrol( opt{:}, [0.3  .1  .15 .05], 'style', 'text', 'string', 'Pitch (rad)');
+    h = uicontrol( opt{:}, [0.3  .05 .15 .05], 'style', 'text', 'string', 'Roll (rad)' );
+    h = uicontrol( opt{:}, [0.3  0   .15 .05], 'style', 'text', 'string', 'Yaw (rad)');
+    h = uicontrol( opt{:}, [0.45 .1  .1  .05], 'tag', 'pitch', 'callback', cbpitch, 'style', 'edit', 'string', '');
+    h = uicontrol( opt{:}, [0.45 .05 .1  .05], 'tag', 'roll' , 'callback', cbroll , 'style', 'edit', 'string', '' );
+    h = uicontrol( opt{:}, [0.45 0   .1  .05], 'tag', 'yaw'  , 'callback', cbyaw  , 'style', 'edit', 'string', '');
+    h = uicontrol( opt{:}, [0.55 .1  .15 .05], 'style', 'text', 'string', 'Resize {x}');
+    h = uicontrol( opt{:}, [0.55 .05 .15 .05], 'style', 'text', 'string', 'Resize {y}' );
+    h = uicontrol( opt{:}, [0.55 0   .15 .05], 'style', 'text', 'string', 'Resize {z}');
+    h = uicontrol( opt{:}, [0.7  .1  .1  .05], 'tag', 'resizex', 'callback', cbresizex, 'style', 'edit', 'string', '');
+    h = uicontrol( opt{:}, [0.7  .05 .1  .05], 'tag', 'resizey', 'callback', cbresizey, 'style', 'edit', 'string', '' );
+    h = uicontrol( opt{:}, [0.7  0   .1  .05], 'tag', 'resizez', 'callback', cbresizez, 'style', 'edit', 'string', '');
     h = uicontrol( opt{:}, [0.8  .1  .2  .05], 'style', 'pushbutton', 'string', 'Align fiducials', 'callback', cb_fid);
     h = uicontrol( opt{:}, [0.8  .05 .2  .05], 'style', 'pushbutton', 'string', 'Warp montage', 'callback', cb_warp );
     h = uicontrol( opt{:}, [0.8  0   .1  .05], 'style', 'pushbutton', 'string', 'Cancel', 'callback', 'close(gcbf);' );
