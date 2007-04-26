@@ -1,8 +1,8 @@
-%  statcond()  - compare two or more data conditions statistically using 
-%                standard parametric or nonparametric permutation-based ANOVA 
-%                (1-way or 2-way) or t-test methods. Parametric testing uses 
-%                fcdf() from the Matlab Statistical Toolbox. Use of up to 
-%                4-D data matrices speeds processing.
+% statcond()  - compare two or more data conditions statistically using 
+%               standard parametric or nonparametric permutation-based ANOVA 
+%               (1-way or 2-way) or t-test methods. Parametric testing uses 
+%               fcdf() from the Matlab Statistical Toolbox. Use of up to 
+%               4-D data matrices speeds processing.
 % Usage:
 %          >> [stats, df, pvals, surrog] = statcond( data, 'key','val'... );
 % Inputs:
@@ -119,6 +119,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2007/04/06 19:34:42  arno
+% Matlab 6.5 compatibiltiy
+%
 % Revision 1.13  2006/12/30 01:16:55  scott
 % help msg
 % quit
@@ -212,7 +215,12 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
             cond2 = data{1,2};
             [ori_vals df] = paired_ttest(cond1, cond2);
             if strcmpi(g.mode, 'param')
-                pvals = tcdf(ori_vals, df)*2; return;
+                pvals = tcdf(ori_vals, df)*2;
+                tmppvals = reshape(pvals, prod(size(pvals)),1);
+                inds     = find(tmppvals > 1); 
+                tmppvals(inds) = 2-tmppvals(inds);
+                pvals    = reshape(tmppvals, size(pvals));
+                return;
             else
                 for index = 1:g.naccu
                     
