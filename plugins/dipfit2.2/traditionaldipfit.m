@@ -9,16 +9,22 @@ function [H] = traditional(f);
 %	x-shift
 %	y-shift
 %	z-shift
+%       (in length-units of the coordinate system used. For the MNI brain
+%       the unit is mm)
 % followed by the
 %	pitch (rotation around x-axis)
 %	roll  (rotation around y-axis)
 %	yaw   (rotation around z-axis)
+%       (in radians)
 % followed by the 
 %	x-rescaling factor
 %	y-rescaling factor
 %	z-rescaling factor
+%       (in ratio = newscale/oldscale)
 %
-% See also WARP3D
+% H first applies scaling, then rotations, and finally the shifts.
+%
+% See also fieldtrip*/WARP3D.m
 
 % Copyright (C) 2000-2004, Robert Oostenveld
 %
@@ -37,6 +43,9 @@ function [H] = traditional(f);
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2006/08/01 20:55:28  arno
+% test for legnth of f
+%
 % Revision 1.1  2006/08/01 20:54:52  arno
 % Initial revision
 %
