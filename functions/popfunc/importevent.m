@@ -78,6 +78,9 @@
 
 %% REVISION HISTORY
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2007/03/30 02:01:39  toby
+% minor doc edits
+%
 % Revision 1.11  2007/03/29 02:33:35  toby
 % option 'append' debugged. see bugzilla bug230
 %
@@ -110,7 +113,7 @@ g = finputcheck( varargin, { 'fields'    'cell'     []         {};
                          'indices'   'integer'  [1 Inf]    [];
                          'append'    'string'   {'yes' 'no' '''yes''' '''no''' }         'yes';
                          'timeunit'  'real'     [0 Inf]    1;
-                         'event'     { 'real' 'string' }     []    [];
+                         'event'     { 'cell' 'real' 'string' }     []    [];
                          'align'     'integer'  []         NaN;
                          'optimalign' 'string'  { 'on' 'off' }         'on';
                          'delim'     {'integer' 'string'}   []         char([9 32])}, 'importevent');
@@ -122,6 +125,8 @@ g.delim = char(g.delim);
 % -------------------------
 if ~isempty(g.event)
     event = g.event;
+    if isfloat(event), event = mattocell(event); end;
+    if size(event,1) == EEG.trials, event = event'; end;
 end;
 
 % determine latency for old event alignment
