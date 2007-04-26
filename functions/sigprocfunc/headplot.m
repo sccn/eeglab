@@ -37,9 +37,11 @@
 %   'orilocs'     - ['off'|'on'] use original electrode locations on the head
 %                   {default: 'off'} (extrapolated to spherical). Note that these
 %                   electrode locations must be coregisted with the head mesh.
-%   'transform'   - [real array] tailarach transformation matrix to co-register 
+%   'transform'   - [real array] Talairach-model transformation matrix to co-register 
 %                   the electrode locations with the head mesh:
 %                    [shiftX shiftY shiftZ pitch roll yaw scaleX scaleY scaleZ]
+%                   The transform is applied in the order shift(rotate(scale(elocs)))
+%                   by the dipfit2.* plugin function traditional.m
 %                   This array is returned by coregister().
 %  'plotmeshonly' - [string] plot only mesh and electrode positions. Options are
 %                   'head' to plot the standard head mesh; 'sphere' to plot the
@@ -122,6 +124,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.76  2007/03/07 03:58:30  toby
+% bug151 courtesy Ronny Lindner
+%
 % Revision 1.75  2007/03/07 03:25:35  toby
 % bug151, courtesy Ronny Lindner
 %

@@ -43,7 +43,7 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 20 March 2002
 %
-% See also: headplot(), eegplot()
+% See also: headplot(), eegplot(), traditional()
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.53  2007/02/03 04:07:34  toby
+% 'colorbar' switch added, minor related changes
+%
 % Revision 1.52  2007/01/30 03:23:39  toby
 % edit geometry
 %
@@ -362,7 +365,7 @@ if nargin < 3 % Open GUI input window
             { 'style' 'edit'        'string' 'mheadnew.xyz'  'userdata' 'meshchanfile'                              'tag' 'comp' 'enable' enablecomp } ...
             { 'style' 'pushbutton'  'string' 'Browse'        'callback' cb_browsemeshchan                           'tag' 'comp' 'enable' enablecomp } ... 
             { } ... 
-            { 'style' 'text'        'string' '            Talairach transformation matrix'                          'tag' 'comp' 'enable' enablecomp } ...
+            { 'style' 'text'        'string' '            Talairach-model transformation matrix'                          'tag' 'comp' 'enable' enablecomp } ...
             { 'style' 'edit'        'string' num2str(transform) 'userdata' 'coregtext'                              'tag' 'comp' 'enable' enablecomp } ...
             { 'style' 'pushbutton'  'string' 'Manual coreg.' 'callback' cb_selectcoreg 'userdata' { EEG.chanlocs EEG.chaninfo } 'tag' 'comp' 'enable' enablecomp } ... 
             { } ...
