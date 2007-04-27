@@ -116,6 +116,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.47  2007/04/07 21:40:33  arno
+% ersp and itc
+%
 % Revision 1.46  2007/04/05 23:13:43  arno
 % recomputing file on disk
 %
@@ -451,7 +454,7 @@ all_trials.parameters = parameters;
 all_trials.datatype   = 'TIMEF';
 
 if powbaseexist
-    all_ersp.parameters = { parameters{:}, 'baseline', powbase };
+    all_ersp.parameters = { parameters{:}, 'baseline', g.powbase };
 else
     all_ersp.parameters = parameters;
 end;
