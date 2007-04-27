@@ -119,6 +119,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2007/04/26 22:53:17  arno
+% stat for t-test
+%
 % Revision 1.14  2007/04/06 19:34:42  arno
 % Matlab 6.5 compatibiltiy
 %
@@ -416,8 +419,10 @@ function [a, b] = shuffle_paired(a, b); % for increased speed only shuffle half 
     end;
     
 
- function a = shuffle_unpaired(a); % for increased speed only shuffle half the indices
+ function [a,b] = shuffle_unpaired(a,b); % for increased speed only shuffle half the indices
        
+    if nargin > 1, a = { a b}; end;
+     
     % unpaired
     % --------
     dims      = size(a);
@@ -462,6 +467,7 @@ function [a, b] = shuffle_paired(a, b); % for increased speed only shuffle half 
         end;
     end;
     a = reshape(a, dims);
+    if nargin > 1, b = a{2}; a = a{1}; end;
         
 function [tval, df] = paired_ttest(a,b)
     
