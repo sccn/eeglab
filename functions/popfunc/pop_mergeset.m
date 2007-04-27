@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.42  2006/04/14 17:40:11  arno
+% fixing INEEG1
+%
 % Revision 1.41  2006/04/08 04:02:54  toby
 % corrected problems with events and epochs
 %
@@ -343,8 +346,27 @@ else % INEEG is an EEG struct
         orilen = length(INEEG1.event);
         %allfields = fieldnames(INEEG2.event);
 
+        % ensure similar event structures
+        % -------------------------------
+        if ~isempty(INEEG2.event)
+            fields1 = lower(fieldnames(INEEG1.event));
+            fields2 = lower(fieldnames(INEEG2.event));
+            if length(fields1) > length(fields2)
+                for index = 1:length(fields1)
+                    if isempty(strmatch(fields1{index}, fields2))
+                        INEEG1.event = setfield( INEEG1.event, orilen + 1, fields1{index}, []);
+                    end;
+                end;
+            elseif length(fields1) < length(fields2)
+                for index = 1:length(fields2)
+                    if isempty(strmatch(fields2{index}, fields1))
+                        INEEG2.event = setfield( INEEG2.event, 1, fields2{index}, []);
+                    end;
+                end;
+            end;
+        end;
+        
         for e=1:length(INEEG2.event)
-            % Will break if 'event' doesn't have the same subfields, need to fix this. 
             INEEG1.event(orilen + e) = INEEG2.event(e);
             if isfield(INEEG1.event,'latency') & isfield(INEEG2.event,'latency')
                INEEG1.event(orilen + e).latency = INEEG2.event(e).latency + INEEG1pnts * INEEG1trials;
