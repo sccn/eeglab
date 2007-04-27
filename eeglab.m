@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.502  2007/03/24 02:05:29  arno
+% allow to remove baseline of continous data
+%
 % Revision 1.501  2007/03/20 03:17:40  arno
 % history for cluster edition
 %
@@ -1705,7 +1708,7 @@ addpath(eeglabpath);
 comp = computer;
 OPT_FOLDER = which('eeg_options');
 OPT_FOLDER = fileparts( OPT_FOLDER );
-if (strcmpi(comp(1:3), 'GLN') & exist( [ eeglabpath 'functions/adminfunc' ] ) == 7)
+if (strcmpi(comp(1:3), 'GLN') | strcmpi(comp(1:3), 'MAC')) & exist( [ eeglabpath 'functions/adminfunc' ] ) == 7)
     myaddpath( eeglabpath, 'readeetraklocs.m', 'functions/sigprocfunc');
     myaddpath( eeglabpath, 'eeg_checkset.m',   'functions/adminfunc');
     myaddpath( eeglabpath, 'pop_loadbci.m',    'functions/popfunc');
