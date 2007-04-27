@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.43  2007/04/27 22:26:10  arno
+% trying to fix event merge
+%
 % Revision 1.42  2006/04/14 17:40:11  arno
 % fixing INEEG1
 %
@@ -354,13 +357,13 @@ else % INEEG is an EEG struct
             if length(fields1) > length(fields2)
                 for index = 1:length(fields1)
                     if isempty(strmatch(fields1{index}, fields2))
-                        INEEG1.event = setfield( INEEG1.event, orilen + 1, fields1{index}, []);
+                        INEEG1.event = setfield( INEEG1.event, { orilen + 1}, fields1{index}, []);
                     end;
                 end;
             elseif length(fields1) < length(fields2)
                 for index = 1:length(fields2)
                     if isempty(strmatch(fields2{index}, fields1))
-                        INEEG2.event = setfield( INEEG2.event, 1, fields2{index}, []);
+                        INEEG2.event = setfield( INEEG2.event, { 1 }, fields2{index}, []);
                     end;
                 end;
             end;
