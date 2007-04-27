@@ -116,6 +116,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.48  2007/04/27 18:49:08  arno
+% baseline
+%
 % Revision 1.47  2007/04/07 21:40:33  arno
 % ersp and itc
 %
@@ -416,13 +419,20 @@ all_trials = [];
 all_itc    = [];
 for k = 1:length(g.indices)  % for each (specified) component
     if k>size(tmpdata,1), break; end; % happens for components
+    if powbaseexist
+        tmpparams = parameters;
+        tmpparams{end+1} = 'powbase';
+        tmpparams{end+1} = g.powbase(k,:);
+    else
+        tmpparams = parameters;
+    end;
     
     % Run timef() to get ERSP
     % ------------------------
     timefdata  = reshape(tmpdata(k,pointrange,:), 1, length(pointrange)*size(tmpdata,3));
     if strcmpi(g.plot, 'on'), figure; end;
     [logersp,logitc,logbase,times,logfreqs,logeboot,logiboot,alltfX] ...
-      = newtimef( timefdata, length(pointrange), g.timelimits, EEG(1).srate, parameters{2:end});
+      = newtimef( timefdata, length(pointrange), g.timelimits, EEG(1).srate, tmpparams{2:end});
     %figure; newtimef( TMP.data(32,:), EEG.pnts, [EEG.xmin EEG.xmax]*1000, EEG.srate, cycles, 'freqs', freqs);
     %figure; newtimef( timefdata, length(pointrange), g.timelimits, EEG.srate, cycles, 'freqs', freqs);
     if strcmpi(g.plot, 'on'), return; end;
