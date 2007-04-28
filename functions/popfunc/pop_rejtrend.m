@@ -18,6 +18,9 @@
 %                 parameter in the command line call.
 %   "R-square limit" -[edit box] maximal regression R-square (0 to 1) value
 %                 to allow.  Sets the 'minR' parameter in the command line call.
+%                 This represents how "line-like" the rejected data should be; 0
+%                 accepts everything that meets the slope requirement, 0.9 is visibly
+%                 flat.
 %   "Display previous rejection marks?" - [edit box] either YES or NO. 
 %                 Sets the command line input option 'superpose'.
 %   "Reject marked trials?" - [edit box] either YES or NO. 
@@ -68,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2007/04/28 04:41:40  toby
+% shorted format of extended terminal output
+%
 % Revision 1.18  2007/04/28 04:22:24  toby
 % edited screen output, documentation
 %
