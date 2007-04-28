@@ -13,10 +13,10 @@
 %                  EEG sets are also saved to disk. Called by pop_preclust(). Follow with 
 %                  eeg_clust() or pop_clust(). See Example below.
 % Usage:    
-%                >> [ALLEEG,STUDY] = std_preclust(ALLEEG,STUDY); % prepare to cluster all comps 
+%                >> [STUDY,ALLEEG] = std_preclust(STUDY,ALLEEG); % prepare to cluster all comps 
 %                                                                % in all sets on all measures
 %
-%                >> [ALLEEG,STUDY] = std_preclust(ALLEEG, STUDY, clustind, preproc1, preproc2...);
+%                >> [STUDY,ALLEEG] = std_preclust(STUDY,ALLEEG, clustind, preproc1, preproc2...);
 %                                                                % prepare to cluster specifed 
 %                                                                % cluster on specified measures
 % Required inputs:
@@ -122,6 +122,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.77  2007/04/07 21:58:32  arno
+% debug last
+%
 % Revision 1.76  2007/04/07 21:52:31  arno
 % same
 %
