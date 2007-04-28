@@ -75,6 +75,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.39  2007/04/06 18:52:43  arno
+% figure creation
+%
 % Revision 1.38  2007/04/05 22:02:05  arno
 % plot in condensed mode
 %
@@ -143,13 +146,14 @@ opt = finputcheck( varargin, { 'channels'    'cell'   []              {};
                                'plotfreq'    'real'   []              [];
                                'freqrange'   'real'   []              STUDY.etc.specparams.freqrange;
                                'mode'        'string'  []              ''; % for backward compatibility
-                               'comps'       'integer' []              []; % for backward compatibility
+                               'comps'       { 'string' 'integer' } [] []; % for backward compatibility
                                'plotmode'    'string' { 'normal' 'condensed' }  'normal';
                                'plotsubjects' 'string' { 'on' 'off' }  'off';
                                'subject'     'string' []              '';
                                'statmode'    'string' { 'individual' 'common' 'trials' } 'individual'}, 'std_specplot');
 
 if isstr(opt), error(opt); end;
+if isstr(opt.comps), opt.comps = []; opt.plotsubjects = 'on'; end;
 
 % for backward compatibility
 % --------------------------
