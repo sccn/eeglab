@@ -83,6 +83,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.43  2007/04/06 02:20:54  arno
+% right unit
+%
 % Revision 1.42  2007/04/06 02:15:49  arno
 % fix figure creation
 %
@@ -156,13 +159,14 @@ opt = finputcheck( varargin, { 'channels'    'cell'    []              {};
                                'clusters'    'integer' []              [];
                                'plottime'    'real'    []              [];
                                'mode'        'string'  []              ''; % for backward compatibility
-                               'comps'       'integer' []              []; % for backward compatibility
+                               'comps'       { 'string' 'integer' } [] []; % for backward compatibility
                                'timerange'   'real'    []              STUDY.etc.erpparams.timerange;
                                'plotmode'    'string' { 'normal' 'condensed' }  'normal';
                                'plotsubjects' 'string' { 'on' 'off' }  'off';
                                'subject'     'string'  []              '';
                                'statmode'    'string'  { 'subjects' 'common' 'trials' } 'subjects'}, 'std_erpplot');
 if isstr(opt), error(opt); end;
+if isstr(opt.comps), opt.comps = []; opt.plotsubjects = 'on'; end;
 
 % for backward compatibility
 % --------------------------
