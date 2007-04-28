@@ -20,8 +20,8 @@
 %                                                                % prepare to cluster specifed 
 %                                                                % cluster on specified measures
 % Required inputs:
-%   ALLEEG       - ALLEEG vector of one or more loaded EEG dataset structures
 %   STUDY        - an EEGLAB STUDY set of loaded EEG structures
+%   ALLEEG       - ALLEEG vector of one or more loaded EEG dataset structures
 %
 % Optional inputs:
 %   clustind     - a cluster index for further (hierarchical) clustering -
@@ -76,12 +76,12 @@
 %                                   model residual variance. Only components with a lower residual 
 %                                   variance (rv) will be clustered {default: 0 (all components)}
 % Outputs:
+%   STUDY        - the input STUDY set with pre-clustering data added, for use by pop_clust() 
 %   ALLEEG       - the input ALLEEG vector of EEG dataset structures, modified by adding preprocessing 
 %                  data as pointers to Matlab files that hold the pre-clustering component measures.
-%   STUDY        - the input STUDY set with pre-clustering data added, for use by pop_clust() 
 %
 % Example:
-%   >> [ALLEEG STUDY] = std_preclust(ALLEEG, STUDY, [], [] , { 'dipselect'  'rv'  0.15  } ,...
+%   >> [STUDY ALLEEG] = std_preclust(STUDY, ALLEEG, [], [] , { 'dipselect'  'rv'  0.15  } ,...
 %                        { 'spec'  'npca' 10 'norm' 1 'weight' 1 'freqrange'  [ 3 25 ] } , ...
 %                        { 'erp'   'npca' 10 'norm' 1 'weight' 2 'timewindow' [ 350 500 ] } ,...
 %                        { 'scalp' 'npca' 10 'norm' 1 'weight' 2 'abso' 1 } , ...
@@ -105,7 +105,7 @@
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
-% Copyright (C) Hilit Serby, SCCN, INC, UCSD, May 13,2004, hilit@sccn.ucsd.edu
+% Copyright (C) Arnaud Delorme, SCCN, INC, UCSD, May 13,2004, arno@sccn.ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -122,6 +122,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.78  2007/04/28 00:04:37  arno
+% order of parameter in function header
+%
 % Revision 1.77  2007/04/07 21:58:32  arno
 % debug last
 %
