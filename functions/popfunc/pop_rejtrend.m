@@ -68,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2007/04/28 04:22:24  toby
+% edited screen output, documentation
+%
 % Revision 1.17  2006/01/31 20:15:44  arno
 % options
 %
@@ -218,9 +221,9 @@ end
 rejtrials = find(rej > 0);
 fprintf('%d channel(s) selected\n', size(elecrange(:), 1));
 fprintf('%d/%d trial(s) marked for rejection\n', length(rejtrials), EEG.trials);
-for rejtrials_ind = 1:length(rejtrials)
-    fprintf('trial %d/%d marked for rejection\n', rejtrials(rejtrials_ind), EEG.trials);
-end
+fprintf('The following trials have been marked for rejection\n');
+fprintf([num2str(rejtrials) '\n']);
+
 if calldisp
     if icacomp == 1 macrorej  = 'EEG.reject.rejconst';
         			macrorejE = 'EEG.reject.rejconstE';
