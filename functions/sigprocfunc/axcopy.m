@@ -36,6 +36,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2005/01/24 01:55:09  arno
+% do not erase non-empty fields
+%
 % Revision 1.10  2003/05/21 15:37:53  scott
 % header edit
 %
@@ -93,7 +96,9 @@ hndl= findobj('parent',fig,'type','axes');
 offidx=[];
 for a=1:length(hndl)                    % make all axes visible
     if exist('command') ~= 1
-        set(findobj('parent',hndl(a)),'ButtonDownFcn','copyaxis');
+        if isempty( get(findobj('parent',hndl(a)),'ButtonDownFcn') )
+            set(findobj('parent',hndl(a)),'ButtonDownFcn','copyaxis');
+        end;
     else
         command_dbl = double(command);
         % set(findobj('parent',hndl(a)),'ButtonDownFcn',['copyaxis(''' command ''')']);
