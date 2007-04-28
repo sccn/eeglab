@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.504  2007/04/28 00:04:10  arno
+% fix typo
+%
 % Revision 1.503  2007/04/27 23:55:17  arno
 % support starting on MAC
 %
@@ -2121,7 +2124,7 @@ catchstrs.new_non_empty          = e_newset;
 	uimenu( rej_m1, 'Label', 'Reject data (all methods)'              , 'CallBack', cb_rejmenu1);
 	uimenu( rej_m1, 'Label', 'Reject by inspection'                   , 'CallBack', cb_eegplotrej1);
 	uimenu( rej_m1, 'Label', 'Reject extreme values'                  , 'CallBack', cb_eegthresh1);
-	uimenu( rej_m1, 'Label', 'Reject flat line data'                  , 'CallBack', cb_rejtrend1);
+	uimenu( rej_m1, 'Label', 'Reject by linear trend/variance'        , 'CallBack', cb_rejtrend1);
 	uimenu( rej_m1, 'Label', 'Reject by probability'                  , 'CallBack', cb_jointprob1);
 	uimenu( rej_m1, 'Label', 'Reject by kurtosis'                     , 'CallBack', cb_rejkurt1);
 	uimenu( rej_m1, 'Label', 'Reject by spectra'                      , 'CallBack', cb_rejspec1);
@@ -2131,7 +2134,7 @@ catchstrs.new_non_empty          = e_newset;
 	uimenu( rej_m2, 'Label', 'Reject data (all methods)'              , 'CallBack', cb_rejmenu2, 'Separator', 'on');
 	uimenu( rej_m2, 'Label', 'Reject by inspection'                   , 'CallBack', cb_eegplotrej2);
 	uimenu( rej_m2, 'Label', 'Reject extreme values'                  , 'CallBack', cb_eegthresh2);
-	uimenu( rej_m2, 'Label', 'Reject flat line activity'              , 'CallBack', cb_rejtrend2);
+	uimenu( rej_m2, 'Label', 'Reject by linear trend/variance'        , 'CallBack', cb_rejtrend2);
 	uimenu( rej_m2, 'Label', 'Reject by probability'                  , 'CallBack', cb_jointprob2);
 	uimenu( rej_m2, 'Label', 'Reject by kurtosis'                     , 'CallBack', cb_rejkurt2);
 	uimenu( rej_m2, 'Label', 'Reject by spectra'                      , 'CallBack', cb_rejspec2);
