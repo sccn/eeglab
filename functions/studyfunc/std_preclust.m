@@ -122,6 +122,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.79  2007/04/28 00:05:58  arno
+% same
+%
 % Revision 1.78  2007/04/28 00:04:37  arno
 % order of parameter in function header
 %
@@ -392,6 +395,7 @@ if nargin < 2
     % scan all commands
     % -----------------
     clustdata = [];
+    erspquery = 0;
     for index = 1:length(varargin)
         
         % decode inputs
@@ -441,7 +445,7 @@ if nargin < 2
         % If ersp / itc values already exist in some of the datasets,
         % make sure they are the same as the requested parameters.
         % -----------------------------------------------------------
-        if (strcmpi(strcom,'ersp')  | strcmpi(strcom,'itc') )  
+        if (strcmpi(strcom,'ersp')  | strcmpi(strcom,'itc') ) & ~erspquery
             params = [];
             
             % check for existing files
@@ -460,9 +464,10 @@ if nargin < 2
             if strcmpi(guimode, 'usedisk') | strcmpi(guimode, 'same'), recompute = 'off'; 
             else                                                       recompute = 'on'; 
             end;
-            alpha    = g.erspparams.alpha;
-            cycles   = g.erspparams.cycles;
-            padratio = g.erspparams.padratio;
+            alpha     = g.erspparams.alpha;
+            cycles    = g.erspparams.cycles;
+            padratio  = g.erspparams.padratio;
+            erspquery = 1;
         end
         
         % scan datasets
