@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2007/03/14 03:22:32  arno
+% now uses same functions to plot individual components
+%
 % Revision 1.20  2007/03/14 03:17:11  arno
 % do not invert polarity for plotting
 %
@@ -100,8 +103,9 @@ for k = 3:2:nargin
         case 'plotsubjects' % legacy
             mode = 'apart';
         case 'comps'
-            STUDY = std_plotcompmap(STUDY, ALLEEG,  cls, varargin{k-1});
-            return;
+            if isstr( varargin{k-1} ), mode = 'apart'; 
+            else STUDY = std_plotcompmap(STUDY, ALLEEG,  cls, varargin{k-1}); return;
+            end;
         case 'mode' % Plotting mode 'together' / 'apart'
             mode = varargin{k-1};
         case 'figure'
