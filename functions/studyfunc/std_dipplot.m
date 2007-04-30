@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 %$Log: not supported by cvs2svn $
+%Revision 1.17  2007/04/30 19:19:01  arno
+%double dipole bug fix
+%
 %Revision 1.16  2007/04/06 01:04:56  arno
 %revision control
 %
@@ -402,7 +405,12 @@ for ci = 1:length(comp_ind)
     set(fig_h,'Name', [ 'IC' num2str(comp) ' / ' subject ', ' STUDY.cluster(cls).name],'NumberTitle','off');
 end
         
+% -----------------------
+% load all dipoles and
 % compute dipole centroid
+% DEVELOPMENT: this function
+% should be the only one to
+% access dipole information
 % -----------------------
 function STUDY = std_centroid(STUDY,ALLEEG, clsind, tmp);
 
@@ -454,7 +462,10 @@ function STUDY = std_centroid(STUDY,ALLEEG, clsind, tmp);
     end
     fprintf('\n');
 
+% --------------------------------
 % new function to compute centroid
+% was programmed to debug the function
+% above but is now used in the code
 % --------------------------------
 function dipole = computecentroid(alldipoles)
 
