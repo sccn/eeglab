@@ -28,7 +28,8 @@
 %                condition), each overplotting cluster component ERPs plus the
 %                average cluster ERP in bold. Note this parameter has no effect 
 %                if the 'comps' option (below) is used. {default: 'all'}
-%   'comps'    - [numeric vector|'all']  indices of the cluster components to plot.
+%   'comps'    - [numeric vector|'all'] indices of the cluster components to plot.
+%                Note that 'comps', 'all' is equivalent to 'plotsubjects', 'on'.
 %
 % Optional inputs for channel plotting:
 %   'channels' - [numeric vector]  specific channel group to plot. By
@@ -37,10 +38,16 @@
 %   'subject'  - [numeric vector]  In 'changrp' mode (above), index of 
 %                the subject(s) to plot. Else by default, plot all components 
 %                in the cluster.
+%   'plotsubjects' - ['on'|'off'] When 'on', plot ERP of all subjects.
 %
 % Other optional inputs:
 %   'figure'   - ['on'|'off'] 'on'  -> plot in a new figure; 
 %                'off' -> plot in the current figure {default: 'on'}
+%   'key','val' - All optional inputs to pop_erpparams() are also accepted here
+%                 to plot subset of time, statistics etc. The values used by default
+%                 are the ones set using pop_erpparams() and stored in the
+%                 STUDY structure.
+%
 % Outputs:
 %   STUDY      - the input STUDY set structure with plotted cluster mean
 %                ERPs data to allow quick replotting 
@@ -83,6 +90,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.44  2007/04/28 00:28:21  arno
+% backward compatibility
+%
 % Revision 1.43  2007/04/06 02:20:54  arno
 % right unit
 %
@@ -154,13 +164,22 @@ end;
 
 STUDY = pop_erpparams(STUDY, 'default');
 
-opt = finputcheck( varargin, { 'channels'    'cell'    []              {};
+opt = finputcheck( varargin, { 'topotime'    'real'    [] STUDY.etc.erpparams.topotime;
+                               'filter'      'real'    [] STUDY.etc.erpparams.filter;
+                               'timerange'   'real'    [] STUDY.etc.erpparams.timerange;
+                               'ylim'        'real'    [] STUDY.etc.erpparams.ylim;
+                               'statistics'  'string'  [] STUDY.etc.erpparams.statistics;
+                               'groupstats'  'string'  [] STUDY.etc.erpparams.groupstats;
+                               'condstats'   'string'  [] STUDY.etc.erpparams.condstats;
+                               'plotgroups'  'string'  [] STUDY.etc.erpparams.plotgroups;
+                               'plotconditions' 'string'  [] STUDY.etc.erpparams.plotconditions;
+                               'threshold'   'real'    [] STUDY.etc.erpparams.threshold;
+                               'naccu'       'integer' [] STUDY.etc.erpparams.naccu;
+                               'channels'    'cell'    []              {};
                                'caxis'       'real'    []              [];
                                'clusters'    'integer' []              [];
-                               'plottime'    'real'    []              [];
                                'mode'        'string'  []              ''; % for backward compatibility
                                'comps'       { 'string' 'integer' } [] []; % for backward compatibility
-                               'timerange'   'real'    []              STUDY.etc.erpparams.timerange;
                                'plotmode'    'string' { 'normal' 'condensed' }  'normal';
                                'plotsubjects' 'string' { 'on' 'off' }  'off';
                                'subject'     'string'  []              '';
@@ -171,24 +190,17 @@ if isstr(opt.comps), opt.comps = []; opt.plotsubjects = 'on'; end;
 % for backward compatibility
 % --------------------------
 if strcmpi(opt.mode, 'comps'), opt.plotsubjects = 'on'; end;
-
-if isempty(opt.plottime), opt.plottime = STUDY.etc.erpparams.topotime; end;
-if isnan(  opt.plottime), opt.plottime = []; end;
-if ~isempty(opt.subject), groupstats = 'off'; disp('No group statistics for single subject');
-else                      groupstats = STUDY.etc.erpparams.groupstats;
-end;
-if ~isempty(opt.subject), condstats = 'off'; disp('No condition statistics for single subject');
-else                      condstats = STUDY.etc.erpparams.condstats;
-end;
+if ~isempty(opt.subject), opt.groupstats = 'off'; disp('No group statistics for single subject'); end;
+if ~isempty(opt.subject), opt.condstats = 'off'; disp('No condition statistics for single subject'); end;
 plotcurveopt = { ...
-   'ylim',       STUDY.etc.erpparams.ylim, ...
-   'filter',     STUDY.etc.erpparams.filter, ...
-   'threshold',  STUDY.etc.erpparams.threshold, ...
-   'plotgroups',  STUDY.etc.erpparams.plotgroups, ...
-   'plotconditions',   STUDY.etc.erpparams.plotconditions, ...
-   'statistics', STUDY.etc.erpparams.statistics };
+   'ylim',           opt.ylim, ...
+   'filter',         opt.filter, ...
+   'threshold',      opt.threshold, ...
+   'plotgroups',     opt.plotgroups, ...
+   'plotconditions', opt.plotconditions, ...
+   'statistics',     opt.statistics };
 
-if ~isempty(opt.plottime) & length(opt.channels) < 5
+if ~isnan(opt.topotime) & length(opt.channels) < 5
     warndlg2(strvcat('ERP parameters indicate that you wish to plot scalp maps', 'Select at least 5 channels to plot topography'));
     return;
 end;
@@ -247,23 +259,24 @@ if ~isempty(opt.channels)
     
     % select specific time    
     % --------------------
-    if ~isempty(opt.plottime)
-        [tmp ti1] = min(abs(alltimes-opt.plottime(1)));
-        [tmp ti2] = min(abs(alltimes-opt.plottime(end)));
+    if ~isempty(opt.topotime)
+        [tmp ti1] = min(abs(alltimes-opt.topotime(1)));
+        [tmp ti2] = min(abs(alltimes-opt.topotime(end)));
         for index = 1:length(erpdata(:))
             erpdata{index} = mean(erpdata{index}(ti1:ti2,:,:),1);
         end;
-        if opt.plottime(1) == opt.plottime(end), titlestr = [ num2str(opt.plottime(1)) ' ms'];
-        else                                     titlestr = [ num2str(opt.plottime(1)) '-' num2str(opt.plottime(2)) ' ms'];
+        if opt.topotime(1) == opt.topotime(end), titlestr = [ num2str(opt.topotime(1)) ' ms'];
+        else                                     titlestr = [ num2str(opt.topotime(1)) '-' num2str(opt.topotime(2)) ' ms'];
         end;
     end;
     
     % compute statistics and plot
     % ---------------------------
-    [pcond pgroup pinter] = std_stat(erpdata, STUDY.etc.erpparams, 'groupstats', groupstats, 'condstats', condstats);
+    [pcond pgroup pinter] = std_stat(erpdata, 'groupstats', opt.groupstats, 'condstats', opt.condstats, ...
+                                         'statistics', opt.statistics, 'naccu', opt.naccu, 'threshold', opt.threshold);
     locs = eeg_mergelocs(ALLEEG.chanlocs);
     locs = locs(std_chaninds(STUDY, opt.channels));
-    if ~isempty(opt.plottime)
+    if ~isempty(opt.topotime)
         std_chantopo(erpdata, 'condnames', STUDY.condition, 'plottopo', fastif(length(allinds)==1, 'off', 'on'), ...
                                       'datatype', 'spec', 'plotmode', opt.plotmode, 'groupnames', STUDY.group, 'unitx', '\muV', ...
                                       'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, ...
@@ -294,12 +307,13 @@ else
         % plot specific component
         % -----------------------
         [erpdata opt.subject comp_names] = std_selcomp(STUDY, erpdata, allinds(index), setinds, compinds, opt.comps);
-        [pcond pgroup pinter] = std_stat(erpdata, STUDY.etc.erpparams);
+        [pcond pgroup pinter] = std_stat(erpdata, 'groupstats', opt.groupstats, 'condstats', opt.condstats, ...
+                                         'statistics', opt.statistics, 'naccu', opt.naccu, 'threshold', opt.threshold);
             
         if index == length(allinds), opt.legend = 'on'; end;
             std_plotcurve(alltimes, erpdata, 'condnames', STUDY.condition, 'legend', opt.legend, 'subject', opt.subject, ...
                                           'compinds', comp_names, 'plotmode', opt.plotmode, 'groupnames', STUDY.group, 'topovals', ...
-                          opt.plottime, 'unitx', 'ms',  'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, ...
+                          opt.topotime, 'unitx', 'ms',  'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, ...
                                           'chanlocs', ALLEEG(1).chanlocs, 'plotsubjects', opt.plotsubjects, plotcurveopt{:});
         if length(allinds) > 1, 
             if isempty(opt.channels), title(sprintf('Cluster %d', allinds(index))); 

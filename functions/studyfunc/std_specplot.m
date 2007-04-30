@@ -16,23 +16,35 @@
 %   STUDY      - STUDY structure comprising some or all of the EEG datasets in ALLEEG.
 %   ALLEEG     - vector of EEG dataset structures for the dataset(s) in the STUDY, 
 %                typically created using load_ALLEEG().  
-% Optional inputs:
-%   'clusters' - [int vector|'all'] -> cluster numbers to plot.
-%                'all' -> plot all clusters in STUDY {default: 'all'}.
-%   'comps'    - [int vector|'all'] -> indices of cluster components to plot.
-%                'all' -> plot all the components in the cluster {default: 'all'}.
-%   'mode'     - ['together'|'apart'] plotting mode. In 'together' mode, the average 
-%                spectra of the requested clusters are plotted in the same figure, 
-%                with spectra for  different conditions ??and groups?? (if any) 
-%                plotted in different colors. In 'apart' mode, spectra for each 
-%                specified cluster are plotted in separate figures (per condition 
-%                ??and group??), 
-%                each containing the overplotted individual cluster component spectra 
-%                plus the mean cluster spectrum in bold.
-%                Note that this option is irrelevant when component indices are provided 
-%                as input (via 'apart' above) {default: 'together'}. 
-%   'figure'   - ['on'|'off'] in 'together' mode, 'on' plots in a new figure, 
-%                while 'off' plots in the current figure {default: 'on'}
+% Optional inputs for component plotting:
+%   'clusters' - [numeric vector|'all'] indices of clusters to plot.
+%                If no component indices ('comps' below) are given, the average 
+%                ERPs of the requested clusters are plotted in the same figure, 
+%                with ERPs for different conditions (and groups if any) plotted 
+%                in different colors. In 'comps' (below) mode, spectrum for each 
+%                specified cluster are plotted in separate figures (one per 
+%                condition), each overplotting cluster component spectrum plus the
+%                average cluster spectrum in bold. Note this parameter has no effect 
+%                if the 'comps' option (below) is used. {default: 'all'}
+%   'comps'    - [numeric vector|'all'] indices of the cluster components to plot.
+%                Note that 'comps', 'all' is equivalent to 'plotsubjects', 'on'.
+%
+% Optional inputs for channel plotting:
+%   'channels' - [numeric vector]  specific channel group to plot. By
+%                default, the grand mean channel spectrum is plotted (using the 
+%                same format as for the cluster component means described above)
+%   'subject'  - [numeric vector]  In 'changrp' mode (above), index of 
+%                the subject(s) to plot. Else by default, plot all components 
+%                in the cluster.
+%   'plotsubjects' - ['on'|'off'] When 'on', plot ERP of all subjects.
+%
+% Other optional inputs:
+%   'figure'   - ['on'|'off'] 'on'  -> plot in a new figure; 
+%                'off' -> plot in the current figure {default: 'on'}
+%   'key','val' - All optional inputs to pop_specparams() are also accepted here
+%                 to plot subset of time, statistics etc. The values used by default
+%                 are the ones set using pop_specparams() and stored in the
+%                 STUDY structure.
 % Outputs:
 %   STUDY      - the input STUDY set structure with the plotted cluster mean spectra
 %                added?? to allow quick replotting.
@@ -75,6 +87,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.40  2007/04/28 00:28:11  arno
+% fix backward compatibility
+% .,
+%
 % Revision 1.39  2007/04/06 18:52:43  arno
 % figure creation
 %
@@ -140,11 +156,20 @@ end;
 
 STUDY = pop_specparams(STUDY, 'default');
 
-opt = finputcheck( varargin, { 'channels'    'cell'   []              {};
-                               'caxis'       'real'   []              [];
+opt = finputcheck( varargin, { 'topofreq'    'real'    [] STUDY.etc.specparams.topofreq;
+                               'freqrange'   'real'    [] STUDY.etc.specparams.freqrange;
+                               'ylim'        'real'    [] STUDY.etc.specparams.ylim;
+                               'statistics'  'string'  [] STUDY.etc.specparams.statistics;
+                               'groupstats'  'string'  [] STUDY.etc.specparams.groupstats;
+                               'condstats'   'string'  [] STUDY.etc.specparams.condstats;
+                               'plotgroups'  'string'  [] STUDY.etc.specparams.plotgroups;
+                               'plotconditions'      'string' [] STUDY.etc.specparams.plotconditions;
+                               'subtractsubjectmean' 'string' [] STUDY.etc.specparams.subtractsubjectmean
+                               'threshold'   'real'    [] STUDY.etc.specparams.threshold;
+                               'naccu'       'integer' [] STUDY.etc.specparams.naccu;
+                               'channels'    'cell'    []              {};
+                               'caxis'       'real'    []              [];
                                'clusters'    'integer' []              [];
-                               'plotfreq'    'real'   []              [];
-                               'freqrange'   'real'   []              STUDY.etc.specparams.freqrange;
                                'mode'        'string'  []              ''; % for backward compatibility
                                'comps'       { 'string' 'integer' } [] []; % for backward compatibility
                                'plotmode'    'string' { 'normal' 'condensed' }  'normal';
@@ -157,32 +182,26 @@ if isstr(opt.comps), opt.comps = []; opt.plotsubjects = 'on'; end;
 
 % for backward compatibility
 % --------------------------
-if isempty(opt.plotfreq), opt.plotfreq = STUDY.etc.specparams.topofreq; end;
-if isnan(  opt.plotfreq), opt.plotfreq = []; end;
 if strcmpi(opt.mode, 'comps'), opt.plotsubjects = 'on'; end;
-
-if ~isempty(opt.subject), groupstats = 'off'; disp('No group statistics for single subject');
-else                      groupstats = STUDY.etc.specparams.groupstats;
-end;
-if ~isempty(opt.subject), condstats = 'off'; disp('No condition statistics for single subject');
-else                      condstats = STUDY.etc.specparams.condstats;
-end;
+if ~isempty(opt.subject), opt.groupstats = 'off'; disp('No group statistics for single subject'); end;
+if ~isempty(opt.subject), opt.condstats = 'off'; disp('No condition statistics for single subject'); end;
 plotcurveopt = { ...
-   'ylim',       STUDY.etc.specparams.ylim, ...
-   'threshold',  STUDY.etc.specparams.threshold, ...
-   'plotgroups',  STUDY.etc.specparams.plotgroups, ...
-   'plotconditions', STUDY.etc.specparams.plotconditions, ...
-   'statistics', STUDY.etc.specparams.statistics };
+   'ylim',           opt.ylim, ...
+   'threshold',      opt.threshold, ...
+   'plotgroups',     opt.plotgroups, ...
+   'plotconditions', opt.plotconditions, ...
+   'statistics',     opt.statistics };
 
-if ~isempty(opt.plotfreq) 
-    if length(opt.channels) < 5
-        warndlg2(strvcat('Spectrum parameters indicate that you wish to plot scalp maps', 'Select at least 5 channels to plot topography'));
-        return;
-    end;
+if ~isnan(opt.topofreq) & length(opt.channels) < 5
+    warndlg2(strvcat('Spectrum parameters indicate that you wish to plot scalp maps', 'Select at least 5 channels to plot topography'));
+    return;
 end;
+
+% read data from disk
+% -------------------
 if ~isempty(opt.channels)
-     [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'channels', opt.channels, 'infotype', 'spec', 'freqrange', opt.freqrange, 'rmsubjmean', STUDY.etc.specparams.subtractsubjectmean);
-else [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'clusters', opt.clusters, 'infotype', 'spec', 'freqrange', opt.freqrange, 'rmsubjmean', STUDY.etc.specparams.subtractsubjectmean);
+     [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'channels', opt.channels, 'infotype', 'spec', 'freqrange', opt.freqrange, 'rmsubjmean', opt.subtractsubjectmean);
+else [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'clusters', opt.clusters, 'infotype', 'spec', 'freqrange', opt.freqrange, 'rmsubjmean', opt.subtractsubjectmean);
 end;
 
 if strcmpi(opt.plotmode, 'condensed'), 
@@ -214,23 +233,24 @@ if ~isempty(opt.channels)
     
     % select specific time    
     % --------------------
-    if ~isempty(opt.plotfreq)
-        [tmp ti1] = min(abs(allfreqs-opt.plotfreq(1)));
-        [tmp ti2] = min(abs(allfreqs-opt.plotfreq(end)));
+    if ~isempty(opt.topofreq)
+        [tmp ti1] = min(abs(allfreqs-opt.topofreq(1)));
+        [tmp ti2] = min(abs(allfreqs-opt.topofreq(end)));
         for index = 1:length(specdata(:))
             specdata{index} = mean(specdata{index}(ti1:ti2,:,:),1);
         end;
-        if opt.plotfreq(1) == opt.plotfreq(end), titlestr = [ num2str(opt.plotfreq(1)) ' Hz'];
-        else                                     titlestr = [ num2str(opt.plotfreq(1)) '-' num2str(opt.plotfreq(2)) ' ms'];
+        if opt.topofreq(1) == opt.topofreq(end), titlestr = [ num2str(opt.topofreq(1)) ' Hz'];
+        else                                     titlestr = [ num2str(opt.topofreq(1)) '-' num2str(opt.topofreq(2)) ' ms'];
         end;
     end;
     
     % compute statistics and plot
     % ---------------------------
-    [pcond pgroup pinter] = std_stat(specdata, STUDY.etc.specparams, 'groupstats', groupstats, 'condstats', condstats);
+    [pcond pgroup pinter] = std_stat(specdata, 'groupstats', opt.groupstats, 'condstats', opt.condstats, ...
+                                         'statistics', opt.statistics, 'naccu', opt.naccu, 'threshold', opt.threshold);
     locs = eeg_mergelocs(ALLEEG.chanlocs);
     locs = locs(std_chaninds(STUDY, opt.channels));
-    if ~isempty(opt.plotfreq)
+    if ~isempty(opt.topofreq)
         std_chantopo(specdata, 'condnames', STUDY.condition, 'plottopo', fastif(length(allinds)==1, 'off', 'on'), ...
                                       'datatype', 'spec', 'plotmode', opt.plotmode, 'groupnames', STUDY.group, 'unitx', 'Hz', ...
                                       'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, ...
@@ -261,11 +281,13 @@ else
         % plot specific component
         % -----------------------
         [specdata opt.subject comp_names] = std_selcomp(STUDY, specdata, allinds(index), setinds, compinds, opt.comps);
-        [pcond pgroup pinter] = std_stat(specdata, STUDY.etc.specparams);
+        [pcond pgroup pinter] = std_stat(specdata, 'groupstats', opt.groupstats, 'condstats', opt.condstats, ...
+                                         'statistics', opt.statistics, 'naccu', opt.naccu, 'threshold', opt.threshold);
             
         if index == length(allinds), opt.legend = 'on'; end;
         std_plotcurve(allfreqs, specdata, 'condnames', STUDY.condition, 'legend', opt.legend, 'subject', opt.subject, ...
-                                          'compinds', comp_names, 'plotmode', opt.plotmode, 'groupnames', STUDY.group, 'topovals', opt.plotfreq, 'unitx', 'Hz',  'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, ...
+                                          'compinds', comp_names, 'plotmode', opt.plotmode, 'groupnames', STUDY.group, ...
+                      'topovals', opt.topofreq, 'unitx', 'Hz',  'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, ...
                                           'chanlocs', ALLEEG(1).chanlocs, 'plotsubjects', opt.plotsubjects, plotcurveopt{:});
         if length(allinds) > 1, 
             if isempty(opt.channels), title(sprintf('Cluster %d', allinds(index))); 
