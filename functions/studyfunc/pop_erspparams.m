@@ -51,14 +51,19 @@
 %                  for significance.
 %
 % ERSP/ITC image plotting options:
-%   'timerange'  - [min max] ERSP/ITC plotting latency range in ms. 
+%  'timerange'   - [min max] ERSP/ITC plotting latency range in ms. 
 %                  {default: the whole output latency range}.
-%   'freqrange'  - [min max] ERSP/ITC plotting frequency range in ms. 
+%  'freqrange'   - [min max] ERSP/ITC plotting frequency range in ms. 
 %                  {default: the whole output frequency range}
-%   'ersplim'    - [mindB maxdB] ERSP plotting limits in dB 
+%  'ersplim'     - [mindB maxdB] ERSP plotting limits in dB 
 %                  {default: from [ERSPmin,ERSPmax]}
-%   'itclim'     - [minitc maxitc] ITC plotting limits (range: [0,1]) 
+%  'itclim'      - [minitc maxitc] ITC plotting limits (range: [0,1]) 
 %                  {default: from [0,ITC data max]}
+%  'topotime'    - [float] plot scalp map at specific time. A time range may
+%                  also be provide and the ERSP will be averaged over the
+%                  given time range. Requires 'topofreq' below to be set.
+%  'topofreqs'   - [float] plot scalp map at specific frequencies. As above
+%                  a frequency range may also be provided.
 %
 % See also: std_erspplot(), std_itcplot()
 %
@@ -81,6 +86,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2007/03/17 21:23:38  arno
+% logical operator precedence
+%
 % Revision 1.9  2007/01/26 18:02:33  arno
 % new topotime and topofreq options
 %
