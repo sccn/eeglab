@@ -56,6 +56,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.69  2007/02/08 02:42:45  toby
+% bug fix: plotting more than 7 component maps crashed topoplot
+%
 % Revision 1.68  2007/02/03 04:06:20  toby
 % 'colorbar' switch added, minor related changes
 %
@@ -338,7 +341,7 @@ if nargin < 3
         catch, error('Invalid scalp map options'); end;
     end;        
     if length(arg2) == 1, 
-      figure; curfig=gcf; 
+      figure('paperpositionmode', 'auto'); curfig=gcf; 
       try, icadefs; 
          set(curfig, 'color', BACKCOLOR); 
       catch, end; 
@@ -417,7 +420,7 @@ for index = 1:size(arg2(:),1)
 	if nbgraph > 1
         if mod(index, rowcols(1)*rowcols(2)) == 1
             if index> 1, figure(curfig); a = textsc(0.5, 0.05, topotitle); set(a, 'fontweight', 'bold'); end;
-        	curfig = figure;
+        	curfig = figure('paperpositionmode', 'auto');
 			pos = get(curfig,'Position');
 			posx = max(0, pos(1)+(pos(3)-SIZEBOX*rowcols(2))/2);
 			posy = pos(2)+pos(4)-SIZEBOX*rowcols(1);
