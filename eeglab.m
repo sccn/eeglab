@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.505  2007/04/28 04:48:51  toby
+% menu label edit
+%
 % Revision 1.504  2007/04/28 00:04:10  arno
 % fix typo
 %
@@ -2333,7 +2336,7 @@ WINY		    = WINYDEC*NBLINES;
 
 BORDERINT       = 4;
 BORDEREXT       = 10;
-FONTNAME        = 'courier';
+FONTNAME        = ''; %'courier';
 FONTSIZE        = 11;
 
 hh = findobj('tag', 'EEGLAB');
