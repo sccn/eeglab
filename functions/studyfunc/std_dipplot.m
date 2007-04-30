@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 %$Log: not supported by cvs2svn $
+%Revision 1.16  2007/04/06 01:04:56  arno
+%revision control
+%
 
 function STUDY = std_dipplot(STUDY, ALLEEG, varargin)
 
@@ -157,6 +160,7 @@ if strcmpi(mode, 'apart')  % case each cluster on a separate figure
                    dip_ind = [dip_ind k];
                end
             end % finished going over cluster comps
+            STUDY.cluster(cls(clus)).dipole = computecentroid(cluster_dip_models);
             cluster_dip_models(end + 1) = STUDY.cluster(cls(clus)).dipole;
            
            % additional options
@@ -251,6 +255,7 @@ if strcmpi(mode, 'together')  % case all clusters are plotted in the same figure
                end
            end
         end % finished going over cluster comps
+        STUDY.cluster(cls(clus)).dipole = computecentroid(cluster_dip_models);
         cluster_dip_models(end + 1) = STUDY.cluster(cls(l)).dipole;
         dip_color = cell(1,length(cluster_dip_models));
         dip_color(1:end-1) = {'b'};
@@ -417,9 +422,17 @@ function STUDY = std_centroid(STUDY,ALLEEG, clsind, tmp);
                return;
             end
             if ~isempty(ALLEEG(abset).dipfit.model(comp).posxyz)
-                ndip = ndip +1;
-                tmppos = tmppos + mean(ALLEEG(abset).dipfit.model(comp).posxyz,1);
-                tmpmom = tmpmom + mean(ALLEEG(abset).dipfit.model(comp).momxyz,1);
+                ndip   = ndip +1;
+                posxyz = ALLEEG(abset).dipfit.model(comp).posxyz;
+                momxyz = ALLEEG(abset).dipfit.model(comp).momxyz;
+                if size(posxyz,1) == 2
+                    if all(posxyz(2,:) == [ 0 0 0 ])
+                        posxyz(2,:) = [];
+                        momxyz(2,:) = [];
+                    end;
+                end;
+                tmppos = tmppos + mean(posxyz,1);
+                tmpmom = tmpmom + mean(momxyz,1);
                 tmprv = tmprv + ALLEEG(abset).dipfit.model(comp).rv;
                 if strcmpi(ALLEEG(abset).dipfit.coordformat, 'spherical')
                    if isfield(ALLEEG(abset).dipfit, 'hdmfile') %dipfit 2 spherical model
@@ -440,3 +453,28 @@ function STUDY = std_centroid(STUDY,ALLEEG, clsind, tmp);
         STUDY.cluster(clsind(clust)).dipole = centroid{clust}.dipole;
     end
     fprintf('\n');
+
+% new function to compute centroid
+% --------------------------------
+function dipole = computecentroid(alldipoles)
+
+        max_r = 0;
+        len = length(alldipoles);
+        dipole.posxyz = [ 0 0 0 ];
+        dipole.momxyz = [ 0 0 0 ];
+        dipole.rv = 0;
+        ndip = 0;
+        for k = 1:len 
+            if size(alldipoles(k).posxyz,1) == 2
+                if all(alldipoles(k).posxyz(2,:) == [ 0 0 0 ])
+                    alldipoles(k).posxyz(2,:) = [];
+                    alldipoles(k).momxyz(2,:) = [];
+                end;
+            end;
+            dipole.posxyz = dipole.posxyz + mean(alldipoles(k).posxyz,1)/len;
+            dipole.momxyz = dipole.momxyz + mean(alldipoles(k).momxyz,1)/len;
+            dipole.rv     = dipole.rv     + alldipoles(k).rv/len;
+        end
+        if isfield(alldipoles, 'maxr')
+            dipole.maxr = alldipoles(1).max_r;
+        end;
