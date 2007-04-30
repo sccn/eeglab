@@ -19,8 +19,8 @@
 % Optional inputs for component plotting:
 %   'clusters' - [numeric vector|'all'] indices of clusters to plot.
 %                If no component indices ('comps' below) are given, the average 
-%                ERPs of the requested clusters are plotted in the same figure, 
-%                with ERPs for different conditions (and groups if any) plotted 
+%                spectrums of the requested clusters are plotted in the same figure, 
+%                with spectrums for different conditions (and groups if any) plotted 
 %                in different colors. In 'comps' (below) mode, spectrum for each 
 %                specified cluster are plotted in separate figures (one per 
 %                condition), each overplotting cluster component spectrum plus the
@@ -36,7 +36,7 @@
 %   'subject'  - [numeric vector]  In 'changrp' mode (above), index of 
 %                the subject(s) to plot. Else by default, plot all components 
 %                in the cluster.
-%   'plotsubjects' - ['on'|'off'] When 'on', plot ERP of all subjects.
+%   'plotsubjects' - ['on'|'off'] When 'on', plot spectrum of all subjects.
 %
 % Other optional inputs:
 %   'figure'   - ['on'|'off'] 'on'  -> plot in a new figure; 
@@ -87,6 +87,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.41  2007/04/30 20:11:27  arno
+% update header and code
+%
 % Revision 1.40  2007/04/28 00:28:11  arno
 % fix backward compatibility
 % .,
