@@ -90,6 +90,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.44  2007/04/30 20:53:06  arno
+% *** empty log message ***
+%
 % Revision 1.43  2007/02/28 12:04:12  arno
 % output statistics and documentation
 %
@@ -155,19 +158,19 @@ end;
 
 STUDY = pop_erspparams(STUDY, 'default');
 
-opt = finputcheck( varargin, { 'topofreq'    'real'    [] STUDY.etc.specparams.topofreq;
-                               'topotime'    'real'    [] STUDY.etc.specparams.topotime;
-                               'freqrange'   'real'    [] STUDY.etc.specparams.freqrange;
-                               'timerange'   'real'    [] STUDY.etc.specparams.timerange;
-                               'ersplim'     'real'    [] STUDY.etc.specparams.ersplim;
-                               'itclim'      'real'    [] STUDY.etc.specparams.itclim;
-                               'subbaseline' 'string'  [] STUDY.etc.specparams.subbaseline;
-                               'maskdata'    'string'  [] STUDY.etc.specparams.maskdata;
-                               'statistics'  'string'  [] STUDY.etc.specparams.statistics;
-                               'groupstats'  'string'  [] STUDY.etc.specparams.groupstats;
-                               'condstats'   'string'  [] STUDY.etc.specparams.condstats;
-                               'threshold'   'real'    [] STUDY.etc.specparams.threshold;
-                               'naccu'       'integer' [] STUDY.etc.specparams.naccu;
+opt = finputcheck( varargin, { 'topofreq'    'real'    [] STUDY.etc.erspparams.topofreq;
+                               'topotime'    'real'    [] STUDY.etc.erspparams.topotime;
+                               'freqrange'   'real'    [] STUDY.etc.erspparams.freqrange;
+                               'timerange'   'real'    [] STUDY.etc.erspparams.timerange;
+                               'ersplim'     'real'    [] STUDY.etc.erspparams.ersplim;
+                               'itclim'      'real'    [] STUDY.etc.erspparams.itclim;
+                               'subbaseline' 'string'  [] STUDY.etc.erspparams.subbaseline;
+                               'maskdata'    'string'  [] STUDY.etc.erspparams.maskdata;
+                               'statistics'  'string'  [] STUDY.etc.erspparams.statistics;
+                               'groupstats'  'string'  [] STUDY.etc.erspparams.groupstats;
+                               'condstats'   'string'  [] STUDY.etc.erspparams.condstats;
+                               'threshold'   'real'    [] STUDY.etc.erspparams.threshold;
+                               'naccu'       'integer' [] STUDY.etc.erspparams.naccu;
                                'channels'    'cell'    []              {};
                                'caxis'       'real'    []              [];
                                'clusters'    'integer' []              [];
@@ -183,8 +186,9 @@ if isstr(opt), error(opt); end;
 
 % for backward compatibility
 % --------------------------
-if ~isnan(STUDY.etc.erspparams.topotime),
-    opt.plottf = [ STUDY.etc.erspparams.topofreq STUDY.etc.erspparams.topotime ];
+if ~isnan(opt.topotime),
+     opt.plottf = [ opt.topofreq opt.topotime ];
+else opt.plottf = [];
 end;
 if strcmpi(opt.mode, 'comps'), opt.plotsubjects = 'on'; end;
 
@@ -192,7 +196,7 @@ if ~isempty(opt.subject), opt.groupstats = 'off'; disp('No group statistics for 
 if ~isempty(opt.subject), opt.condstats = 'off'; disp('No condition statistics for single subject'); end;
 
 plotcurveopt = { ...
-   'ersplim',     fastif(strcmpi(opt.datatype, 'ITC', opt.itclim, opt.ersplim), ...
+   'ersplim',     fastif(strcmpi(opt.datatype, 'ITC'), opt.itclim, opt.ersplim), ...
    'threshold',   opt.threshold, ...
    'maskdata',    opt.maskdata, ...
    'groupstats',  opt.groupstats, ...
@@ -203,6 +207,8 @@ if ~isempty(opt.plottf) & length(opt.channels) < 5
     return;
 end;    
 
+% read data from disk
+% -------------------
 if ~isempty(opt.channels)
      [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'channels', opt.channels, 'infotype', opt.datatype, 'statmode', opt.statmode);
 else [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'clusters', opt.clusters, 'infotype', opt.datatype, 'statmode', opt.statmode);
@@ -318,8 +324,9 @@ for index = 1:length(allinds)
     % -----------------------
     
     if index == length(allinds), opt.legend = 'on'; end;
-    [pgroup pcond pinter] = std_plottf(alltimes, allfreqs, allersp, 'condnames', STUDY.condition, 'subject', opt.subject, 'legend', opt.legend, ...
-                                      'compinds', comp_names, 'datatype', opt.datatype,'plotmode', opt.plotmode, 'groupnames', STUDY.group, 'topovals', opt.plottf, 'unitx', 'Hz', ...
+    [pgroup pcond pinter] = std_plottf(alltimes, allfreqs, allersp, 'condnames', STUDY.condition, 'subject', opt.subject, ...
+                                       'legend', opt.legend, 'compinds', comp_names, 'datatype', opt.datatype,'plotmode', ...
+                                       opt.plotmode, 'groupnames', STUDY.group, 'topovals', opt.plottf, 'unitx', 'Hz', ...
                                       'chanlocs', ALLEEG(1).chanlocs, 'plotsubjects', opt.plotsubjects, plotcurveopt{:});
     if length(allinds) > 1, 
         if isempty(opt.channels), title(sprintf('Cluster %d', allinds(index))); 
