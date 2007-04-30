@@ -29,6 +29,9 @@
 %                  If a non-NaN 'threshold' is set (see below) and 'naccu' 
 %                  is too low, it will be automatically increased. This 
 %                  keyword available only from the command line {default:500}
+%  'threshold'   - [NaN|p-value] threshold for computing p-value. In this 
+%                  function, it is only used to compute naccu above. NaN
+%                  means that no threshold has been set.
 %
 % Outputs:
 %  pcond        - [cell] condition pvalues. One element per group.
@@ -51,6 +54,9 @@
 %                  of 'trials' statistics requires a lot of RAM.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2007/01/26 18:09:02  arno
+% Initial revision
+%
 
 function [pcond, pgroup, pinter] = std_stat(data, varargin)
 
