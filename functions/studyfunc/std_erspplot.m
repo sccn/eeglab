@@ -17,30 +17,34 @@
 %              in the STUDY. ALLEEG for a STUDY set is typically created 
 %              using load_ALLEEG().  
 % Optional inputs:
-%   'clusters' - [numeric vector|string 'all']  cluster numbers to plot.
-%                Else 'all' -> plot all clusters in STUDY 
-%                {default: 'all'}.
-%   'comps'    - [numeric vector|string 'all']  cluster components to plot.
-%                Else 'all' -> plot all cluster components 
-%                {default: 'all'}.
-%   'channels' - [numeric vector]  channels to plot. {default: all??}
-%   'mode'     - ['together'|'apart'] plotting mode. In 'together' 
-%                mode, the average ERSPs of the requested clusters|channels  
-%                are plotted in the same figure - one per condition ??and 
-%                group??. In 'apart' mode, component ERSPs for each
-%                cluster (or channel) are plotted in a separate 
-%                figure (per condition ""and group??) along with their mean 
-%                ERSP. Note that for clusters, this option is irrelevant if 
-%                component indices are provided as input (via 'comps' above) 
-%                {default: 'together'} 
-%   'figure'  - ['on'|'off'] 'on' -> plot on a new figure; 
-%                'off' -> plot on current figure. 
-%                Note: 'off' is optional for one cluster in 'together' 
-%                mode. This is useful for incomporating a cluster ERSP 
-%                into a complex figure. In case of multiple conditions, 
-%                only the first condition is displayed, but clicking on 
-%                the figure will open a new figure with all conditions 
-%                plotted separately {default: 'on'} 
+%   'clusters' - [numeric vector|'all'] indices of clusters to plot.
+%                If no component indices ('comps' below) are given, the average 
+%                ERSPs of the requested clusters are plotted in the same figure, 
+%                with ERSPs for different conditions (and groups if any) plotted 
+%                in different colors. In 'comps' (below) mode, ERSP for each 
+%                specified cluster are plotted in separate figures (one per 
+%                condition), each overplotting cluster component ERSP plus the
+%                average cluster ERSP in bold. Note this parameter has no effect 
+%                if the 'comps' option (below) is used. {default: 'all'}
+%   'comps'    - [numeric vector|'all'] indices of the cluster components to plot.
+%                Note that 'comps', 'all' is equivalent to 'plotsubjects', 'on'.
+%
+% Optional inputs for channel plotting:
+%   'channels' - [numeric vector]  specific channel group to plot. By
+%                default, the grand mean channel ERSP is plotted (using the 
+%                same format as for the cluster component means described above)
+%   'subject'  - [numeric vector]  In 'changrp' mode (above), index of 
+%                the subject(s) to plot. Else by default, plot all components 
+%                in the cluster.
+%   'plotsubjects' - ['on'|'off'] When 'on', plot ERSP of all subjects.
+%
+% Other optional inputs:
+%   'figure'   - ['on'|'off'] 'on'  -> plot in a new figure; 
+%                'off' -> plot in the current figure {default: 'on'}
+%   'key','val' - All optional inputs to pop_specparams() are also accepted here
+%                 to plot subset of time, statistics etc. The values used by default
+%                 are the ones set using pop_specparams() and stored in the
+%                 STUDY structure.
 % Output:
 %   STUDY      - the input STUDY set structure with the plotted cluster 
 %                mean ERSPs added to allow quick replotting 
@@ -86,6 +90,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.43  2007/02/28 12:04:12  arno
+% output statistics and documentation
+%
 % Revision 1.42  2007/01/26 18:05:24  arno
 % new handling of scalp plotting
 %
@@ -148,14 +155,25 @@ end;
 
 STUDY = pop_erspparams(STUDY, 'default');
 
-opt = finputcheck( varargin, { 'channels'    'cell'    []              {};
+opt = finputcheck( varargin, { 'topofreq'    'real'    [] STUDY.etc.specparams.topofreq;
+                               'topotime'    'real'    [] STUDY.etc.specparams.topotime;
+                               'freqrange'   'real'    [] STUDY.etc.specparams.freqrange;
+                               'timerange'   'real'    [] STUDY.etc.specparams.timerange;
+                               'ersplim'     'real'    [] STUDY.etc.specparams.ersplim;
+                               'itclim'      'real'    [] STUDY.etc.specparams.itclim;
+                               'subbaseline' 'string'  [] STUDY.etc.specparams.subbaseline;
+                               'maskdata'    'string'  [] STUDY.etc.specparams.maskdata;
+                               'statistics'  'string'  [] STUDY.etc.specparams.statistics;
+                               'groupstats'  'string'  [] STUDY.etc.specparams.groupstats;
+                               'condstats'   'string'  [] STUDY.etc.specparams.condstats;
+                               'threshold'   'real'    [] STUDY.etc.specparams.threshold;
+                               'naccu'       'integer' [] STUDY.etc.specparams.naccu;
+                               'channels'    'cell'    []              {};
                                'caxis'       'real'    []              [];
                                'clusters'    'integer' []              [];
                                'datatype'    'string'  { 'itc' 'ersp' } 'ersp';
                                'mode'        'string'  []              '';
                                'plottf'      'real'    []              [];
-                               'timerange'   'real'    []              STUDY.etc.erspparams.timerange;
-                               'freqrange'   'real'    []              STUDY.etc.erspparams.freqrange;
                                'comps'       'integer' []              []; % for backward compatibility
                                'plotsubjects' 'string' { 'on' 'off' }  'off';
                                'plotmode'    'string' { 'normal' 'condensed' }  'normal';
@@ -165,24 +183,21 @@ if isstr(opt), error(opt); end;
 
 % for backward compatibility
 % --------------------------
-if isempty(opt.plottf) & ~isnan(STUDY.etc.erspparams.topotime),
+if ~isnan(STUDY.etc.erspparams.topotime),
     opt.plottf = [ STUDY.etc.erspparams.topofreq STUDY.etc.erspparams.topotime ];
 end;
 if strcmpi(opt.mode, 'comps'), opt.plotsubjects = 'on'; end;
 
-if ~isempty(opt.subject), groupstats = 'off'; disp('No group statistics for single subject');
-else                      groupstats = STUDY.etc.erspparams.groupstats;
-end;
-if ~isempty(opt.subject), condstats = 'off'; disp('No condition statistics for single subject');
-else                      condstats = STUDY.etc.erspparams.condstats;
-end;
+if ~isempty(opt.subject), opt.groupstats = 'off'; disp('No group statistics for single subject'); end;
+if ~isempty(opt.subject), opt.condstats = 'off'; disp('No condition statistics for single subject'); end;
+
 plotcurveopt = { ...
-   'ersplim',    eval( [ 'STUDY.etc.erspparams.' opt.datatype 'lim' ]), ...
-   'threshold',  STUDY.etc.erspparams.threshold, ...
-   'maskdata',   STUDY.etc.erspparams.maskdata, ...
-   'groupstats',  groupstats, ...
-   'condstats',   condstats, ...
-   'statistics', STUDY.etc.erspparams.statistics };
+   'ersplim',     fastif(strcmpi(opt.datatype, 'ITC', opt.itclim, opt.ersplim), ...
+   'threshold',   opt.threshold, ...
+   'maskdata',    opt.maskdata, ...
+   'groupstats',  opt.groupstats, ...
+   'condstats',   opt.condstats, ...
+   'statistics',  opt.statistics };
 if ~isempty(opt.plottf) & length(opt.channels) < 5
     warndlg2(strvcat('ERSP/ITC parameters indicate that you wish to plot scalp maps', 'Select at least 5 channels to plot topography'));
     return;
