@@ -86,6 +86,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2007/04/30 20:45:45  arno
+% better help message
+%
 % Revision 1.10  2007/03/17 21:23:38  arno
 % logical operator precedence
 %
@@ -166,7 +169,7 @@ if isempty(varargin)
         {} {'style' 'checkbox'   'string' '' 'value' groupstats 'enable' enablegroup 'tag' 'groupstats' 'callback' cb_maskdata } ...
         {'style' 'text'       'string' 'Compute group statistics' 'enable' enablegroup } ...
         {} {'style' 'checkbox'   'string' '' 'value' maskdata 'tag' 'maskdata' 'callback' cb_maskdata } ...
-        {'style' 'text'       'string' 'Mask non-significant data' } };
+        {'style' 'text'       'string' 'Mask non-significant data (only when threshold is set)' } };
     
     geometry = { [ 1 .5 1 .5]  [ 1 .5 1 .5] [ 1 .5 1 .5] [0.1 0.1 1] [1] [ 0.7 .8 1 .5] [ 0.7 .8 1 .5] [0.1 0.1 1] [0.1 0.1 1] [0.1 0.1 1] };
     
