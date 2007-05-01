@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 %$Log: not supported by cvs2svn $
+%Revision 1.18  2007/04/30 19:24:45  arno
+%comments
+%
 %Revision 1.17  2007/04/30 19:19:01  arno
 %double dipole bug fix
 %
@@ -258,7 +261,7 @@ if strcmpi(mode, 'together')  % case all clusters are plotted in the same figure
                end
            end
         end % finished going over cluster comps
-        STUDY.cluster(cls(clus)).dipole = computecentroid(cluster_dip_models);
+        STUDY.cluster(cls(l)).dipole = computecentroid(cluster_dip_models);
         cluster_dip_models(end + 1) = STUDY.cluster(cls(l)).dipole;
         dip_color = cell(1,length(cluster_dip_models));
         dip_color(1:end-1) = {'b'};
