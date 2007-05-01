@@ -190,6 +190,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.96  2007/03/22 23:22:07  toby
+% help2html
+%
 % Revision 1.95  2007/03/22 23:17:28  toby
 % for help2html
 %
@@ -816,9 +819,9 @@ function [str, mult] = checkformat(str)
 	if strcmpi(str, '-X'),             str = upper(str(2:end)); mult = -1; return; end;
 	if strcmpi(str, '-Y'),             str = upper(str(2:end)); mult = -1; return; end;
 	if strcmpi(str, '-Z'),             str = upper(str(2:end)); mult = -1; return; end;
-	if strcmpi(str, 'custum1'), return; end;
-	if strcmpi(str, 'custum2'), return; end;
-	if strcmpi(str, 'custum3'), return; end;
-	if strcmpi(str, 'custum4'), return; end;
+	if strcmpi(str, 'custom1'), return; end;
+	if strcmpi(str, 'custom2'), return; end;
+	if strcmpi(str, 'custom3'), return; end;
+	if strcmpi(str, 'custom4'), return; end;
     error(['readlocs(): undefined field ''' str '''']);
    
