@@ -57,6 +57,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2006/03/21 15:45:36  arno
+% new .sets format; embeding component creation
+%
 % Revision 1.23  2006/03/12 03:20:35  arno
 % study saving
 %
@@ -105,10 +108,13 @@ function [STUDY, ALLEEG, command] = pop_clust(STUDY, ALLEEG, varargin)
 command = '';
 
 if isempty(STUDY.etc)
-    error('No pre-clustering information');
+    error('No pre-clustering information, pre-cluster first!');
+end;
+if ~isfield(STUDY.etc, 'preclust')
+    error('No pre-clustering information, pre-cluster first!');
 end;
 if isempty(STUDY.etc.preclust)
-    error('No pre-clustering information');
+    error('No pre-clustering information, pre-cluster first!');
 end;
 
 if isempty(varargin) %GUI call
