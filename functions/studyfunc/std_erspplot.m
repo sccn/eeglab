@@ -39,8 +39,9 @@
 %   'plotsubjects' - ['on'|'off'] When 'on', plot ERSP of all subjects.
 %
 % Other optional inputs:
-%   'figure'   - ['on'|'off'] 'on'  -> plot in a new figure; 
-%                'off' -> plot in the current figure {default: 'on'}
+%   'plotmode'  - ['normal'|'condensed'] 'normal'  -> plot in a new figure; 
+%                 'condensed' -> plot all curves in the current figure in a 
+%                 condensed fashion {default: 'normal'}
 %   'key','val' - All optional inputs to pop_specparams() are also accepted here
 %                 to plot subset of time, statistics etc. The values used by default
 %                 are the ones set using pop_specparams() and stored in the
@@ -90,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.45  2007/04/30 20:57:27  arno
+% update header and code for options
+%
 % Revision 1.44  2007/04/30 20:53:06  arno
 % *** empty log message ***
 %
