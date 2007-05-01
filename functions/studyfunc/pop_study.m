@@ -69,6 +69,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.51  2006/05/20 18:42:11  arno
+% fix remove dataset
+%
 % Revision 1.50  2006/05/10 14:05:15  arno
 % fix problem when remodyfying the GUI
 %
@@ -282,7 +285,7 @@ elseif strcmpi(mode, 'gui') % GUI mode
     prevpage    = 'pop_study(''prevpage'', gcbf);';
     delset      = 'pop_study(''clear'',    gcbf, get(gcbo, ''userdata''));';
     loadset     = 'pop_study(''load'',     gcbf, get(guiind, ''userdata''), get(guiind, ''string'')); clear guiind;';
-    loadsetedit = [ 'guiing = gcbo;' loadset ];
+    loadsetedit = [ 'guiind = gcbo;' loadset ];
     subcom      = 'pop_study(''subject''  , gcbf, get(gcbo, ''userdata''), get(gcbo, ''string''));';
     sescom      = 'pop_study(''session''  , gcbf, get(gcbo, ''userdata''), get(gcbo, ''string''));';
     condcom     = 'pop_study(''condition'', gcbf, get(gcbo, ''userdata''), get(gcbo, ''string''));';
