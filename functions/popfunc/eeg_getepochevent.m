@@ -76,6 +76,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2005/05/24 17:45:37  arno
+% remove cell2mat
+%
 % Revision 1.21  2005/04/20 21:49:04  arno
 % duration field special cas
 %
@@ -200,7 +203,7 @@ if ~isempty(type)
 		typeval = type{indextype};
 		test = 0;
 		if isstr(typeval)
-			Ieventtmp = [Ieventtmp strmatch(typeval, { EEG.event.type })' ];
+			Ieventtmp = [Ieventtmp strmatch(typeval, { EEG.event.type }, 'exact')' ];
 		else
 			Ieventtmp = [Ieventtmp find(typeval == [ EEG.event.type ] ) ];
 		end;
