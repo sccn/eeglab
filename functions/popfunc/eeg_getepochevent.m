@@ -76,6 +76,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2007/05/03 20:55:02  toby
+% made strmatch 'exact' for selecting events.
+% this way '38' is not selected when searching for type '3'
+%
 % Revision 1.22  2005/05/24 17:45:37  arno
 % remove cell2mat
 %
@@ -201,7 +205,6 @@ if ~isempty(type)
 	Ieventtmp = [];
 	for indextype=1:length(type)
 		typeval = type{indextype};
-		test = 0;
 		if isstr(typeval)
 			Ieventtmp = [Ieventtmp strmatch(typeval, { EEG.event.type }, 'exact')' ];
 		else
