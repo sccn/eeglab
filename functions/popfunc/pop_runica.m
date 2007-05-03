@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.75  2007/03/22 18:59:12  arno
+% conversion to double
+%
 % Revision 1.74  2007/03/22 18:39:29  arno
 % convert to double for rank calculation
 %
@@ -549,7 +552,7 @@ switch lower(g.icatype)
                       {'style' 'pushbutton' 'string' 'Interupt' 'callback' 'figure(gcbf); set(gcbf, ''tag'', ''stop'');' } );
             drawnow;
         end;
-        tmprank = rank(double(tmpdata(:,1:min(3000, size(tmpdata,2)))));
+        tmprank = rank(tmpdata(:,1:min(3000, size(tmpdata,2))));
         if tmprank == size(tmpdata,1) | pca_opt
             [EEG.icaweights,EEG.icasphere] = runica( tmpdata, 'lrate', 0.001, g.options{:} );
         else 
@@ -563,7 +566,7 @@ switch lower(g.icatype)
         if exist(ICABINARY) ~= 2
             error('Pop_runica(): binary ICA executable not found. Edit icadefs.m file to specify the ICABINARY location');
         end;
-        tmprank = rank(double(tmpdata(:,1:min(3000, size(tmpdata,2)))));
+        tmprank = rank(tmpdata(:,1:min(3000, size(tmpdata,2))));
         if tmprank == size(tmpdata,1) | pca_opt
             [EEG.icaweights,EEG.icasphere] = binica( tmpdata, 'lrate', 0.001, g.options{:} );
         else 
