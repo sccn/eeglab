@@ -37,8 +37,8 @@
 % 'bias'      = ['on'/'off'] perform bias adjustment    (default -> 'on')
 % 'momentum'  = [0<f<1] training momentum               (default -> 0)
 % 'specgram'  = [srate loHz hiHz frames winframes] decompose a complex time/frequency
-%               transform of the data (Note: winframes must divide frames) 
-%                            (defaults [srate 0 srate/2 size(data,2) size(data,2)])
+%               transform of the data - though not optimally. (Note: winframes must 
+%               divide frames) (defaults [srate 0 srate/2 size(data,2) size(data,2)])
 % 'posact'    = make all component activations net-positive(default 'off'}
 %               Requires time and memory; posact() may be applied separately.
 % 'ncomps'    = [N] number of ICA components to compute (default -> chans or 'pca' arg)
@@ -101,6 +101,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2007/03/22 20:51:19  arno
+% convert data to double if necessary
+%
 % Revision 1.29  2007/02/20 14:18:56  arno
 % nothing
 %
@@ -807,7 +810,7 @@ elseif strcmp(sphering,'off') %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
       sphere = eye(chans);                 % return the identity matrix
   end
 elseif strcmp(sphering,'none')
-  sphere = eye(chans);                     % return the identity matrix
+  sphere = eye(chans,chans);% return the identity matrix
   if ~weights
       if verbose,
        fprintf('Starting weights are the identity matrix ...\n');
@@ -820,7 +823,6 @@ elseif strcmp(sphering,'none')
        fprintf('Returning the identity matrix in variable "sphere" ...\n');
       end
   end
-  sphere = eye(chans,chans);
   if verbose,
       fprintf('Returned variable "sphere" will be the identity matrix.\n');
   end
@@ -874,21 +876,22 @@ blockno = 1;  % running block counter for kurtosis interrupts
 
 rand('state',sum(100*clock));  % set the random number generator state to
                                % a position dependent on the system clock
-
 %% Compute ICA Weights
 if biasflag & extended
-    while step < maxsteps, %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    while step < maxsteps, %%% ICA step = pass through all the data %%%%%%%%%
         timeperm=randperm(datalength); % shuffle data order at each step
 
         for t=1:block:lastt, %%%%%%%%% ICA Training Block %%%%%%%%%%%%%%%%%%%
             pause(0);
-            if ~isempty(get(0, 'currentfigure')) 
+            if ~isempty(get(0, 'currentfigure'))   % look for user abort
                 if strcmp(get(gcf, 'tag'), 'stop')
                     close; error('USER ABORT');
                 end;
             end
             
+            %% promote data block (only) to double to keep u and weights double
             u=weights*double(data(:,timeperm(t:t+block-1))) + bias*onesrow;
+
             y=tanh(u);                                                       
             weights = weights + lrate*(BI-signs*y*u'-u*u')*weights;
             bias = bias + lrate*sum((-2*y)')';  % for tanh() nonlin.
@@ -989,7 +992,7 @@ if biasflag & extended
             oldsigns = zeros(size(signs));;
 
             if lrate> MIN_LRATE
-                r = rank(data);
+                r = rank(data); % determine if data rank is too low 
                 if r<ncomps
                     fprintf('Data has rank %d. Cannot compute %d components.\n',...
                         r,ncomps);
@@ -1119,7 +1122,7 @@ if biasflag & ~extended
             lrates = zeros(1,maxsteps);
             bias = zeros(ncomps,1);
             if lrate> MIN_LRATE
-                r = rank(data);
+                r = rank(data); % determine if data rank is too low
                 if r<ncomps
                     fprintf('Data has rank %d. Cannot compute %d components.\n',...
                         r,ncomps);
@@ -1186,15 +1189,15 @@ end
 %% Compute ICA Weights
 if ~biasflag & extended
     while step < maxsteps, %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        timeperm=randperm(datalength); % shuffle data order at each step
+        timeperm=randperm(datalength); % shuffle data order at each step through data
 
         for t=1:block:lastt, %%%%%%%%% ICA Training Block %%%%%%%%%%%%%%%%%%%
             pause(0);
             if ~isempty(get(0, 'currentfigure')) & strcmp(get(gcf, 'tag'), 'stop')
-                close; error('USER ABORT');
+                close; error('USER ABORT');   % detect user abort
             end
             
-            u=weights*double(data(:,timeperm(t:t+block-1)));
+            u=weights*double(data(:,timeperm(t:t+block-1))); % promote block to dbl
             y=tanh(u);                                                       %
             weights = weights + lrate*(BI-signs*y*u'-u*u')*weights;
 
@@ -1292,7 +1295,7 @@ if ~biasflag & extended
             signs = diag(signs); % make a diagonal matrix
             oldsigns = zeros(size(signs));
             if lrate> MIN_LRATE
-                r = rank(data);
+                r = rank(data); % find whether data rank is too low
                 if r<ncomps
                     fprintf('Data has rank %d. Cannot compute %d components.\n',...
                         r,ncomps);
@@ -1422,7 +1425,7 @@ if ~biasflag & ~extended
             bias = zeros(ncomps,1);
             
             if lrate> MIN_LRATE
-                r = rank(data);
+                r = rank(data); % find whether data rank is too low
                 if r<ncomps
                     fprintf('Data has rank %d. Cannot compute %d components.\n',...
                         r,ncomps);
