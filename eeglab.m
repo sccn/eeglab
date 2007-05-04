@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.506  2007/04/30 21:59:24  arno
+% back to no fontname (for windows compatibility
+%
 % Revision 1.505  2007/04/28 04:48:51  toby
 % menu label edit
 %
@@ -2023,10 +2026,10 @@ catchstrs.new_non_empty          = e_newset;
 	cb_signalstat1 = [ check         'LASTCOM = pop_signalstat(EEG, 1);' e_hist];
 	cb_signalstat2 = [ checkica      'LASTCOM = pop_signalstat(EEG, 0);' e_hist];
 	cb_eventstat   = [ checkevent    'LASTCOM = pop_eventstat(EEG);'     e_hist];
-	cb_timef1      = [ checkepoch    'LASTCOM = pop_newtimef(EEG, 1, eegh(''find'',''pop_newtimef(EEG,1''));'  e_hist];
-	cb_crossf1     = [ checkepoch    'LASTCOM = pop_newcrossf(EEG, 1,eegh(''find'',''pop_newcrossf(EEG,1''));' e_hist];
-	cb_timef2      = [ checkepochica 'LASTCOM = pop_newtimef(EEG, 0, eegh(''find'',''pop_newtimef(EEG,0''));'  e_hist];
-	cb_crossf2     = [ checkepochica 'LASTCOM = pop_newcrossf(EEG, 0,eegh(''find'',''pop_newcrossf(EEG,0''));' e_hist];
+	cb_timef1      = [ check         'LASTCOM = pop_newtimef(EEG, 1, eegh(''find'',''pop_newtimef(EEG,1''));'  e_hist];
+	cb_crossf1     = [ check         'LASTCOM = pop_newcrossf(EEG, 1,eegh(''find'',''pop_newcrossf(EEG,1''));' e_hist];
+	cb_timef2      = [ checkica      'LASTCOM = pop_newtimef(EEG, 0, eegh(''find'',''pop_newtimef(EEG,0''));'  e_hist];
+	cb_crossf2     = [ checkica      'LASTCOM = pop_newcrossf(EEG, 0,eegh(''find'',''pop_newcrossf(EEG,0''));' e_hist];
 		
     cb_study3      = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_study(STUDY, ALLEEG, ''gui'', ''on'');' e_load_study];
     cb_precomp     = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_precomp(STUDY, ALLEEG);'                e_load_study];
