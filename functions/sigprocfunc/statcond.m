@@ -119,6 +119,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2007/05/04 23:18:18  arno
+% same
+%
 % Revision 1.17  2007/05/04 23:17:02  arno
 % compute correct pval for unpaired t-test
 %
@@ -227,7 +230,6 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
                 pvals = tcdf(ori_vals, df)*2;
                 tmppvals = reshape(pvals, prod(size(pvals)),1);
                 inds     = find(tmppvals > 1); 
-                dsfadsfa
                 tmppvals(inds) = 2-tmppvals(inds);
                 pvals    = reshape(tmppvals, size(pvals));
                 return;
@@ -257,7 +259,6 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
                 pvals = tcdf(ori_vals, df)*2;
                 tmppvals = reshape(pvals, prod(size(pvals)),1);
                 inds     = find(tmppvals > 1); 
-                dsfadsfa
                 tmppvals(inds) = 2-tmppvals(inds);
                 pvals    = reshape(tmppvals, size(pvals));
                 return;
