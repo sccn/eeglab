@@ -119,6 +119,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2007/05/04 23:17:02  arno
+% compute correct pval for unpaired t-test
+%
 % Revision 1.16  2007/04/27 22:06:34  arno
 % unpaired condition shuffling
 %
@@ -251,7 +254,7 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
             cond2 = data{1,2};
             [ori_vals df] = unpaired_ttest(cond1, cond2);
             if strcmpi(g.mode, 'param')
-                pvals = tcdf(ori_vals, df)*2; return;
+                pvals = tcdf(ori_vals, df)*2;
                 tmppvals = reshape(pvals, prod(size(pvals)),1);
                 inds     = find(tmppvals > 1); 
                 dsfadsfa
