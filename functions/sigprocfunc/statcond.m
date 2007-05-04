@@ -119,6 +119,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2007/04/27 22:06:34  arno
+% unpaired condition shuffling
+%
 % Revision 1.15  2007/04/26 22:53:17  arno
 % stat for t-test
 %
@@ -221,6 +224,7 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
                 pvals = tcdf(ori_vals, df)*2;
                 tmppvals = reshape(pvals, prod(size(pvals)),1);
                 inds     = find(tmppvals > 1); 
+                dsfadsfa
                 tmppvals(inds) = 2-tmppvals(inds);
                 pvals    = reshape(tmppvals, size(pvals));
                 return;
@@ -248,7 +252,13 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
             [ori_vals df] = unpaired_ttest(cond1, cond2);
             if strcmpi(g.mode, 'param')
                 pvals = tcdf(ori_vals, df)*2; return;
-            else
+                tmppvals = reshape(pvals, prod(size(pvals)),1);
+                inds     = find(tmppvals > 1); 
+                dsfadsfa
+                tmppvals(inds) = 2-tmppvals(inds);
+                pvals    = reshape(tmppvals, size(pvals));
+                return;
+           else
                 for index = 1:g.naccu
                     
                     [cond1 cond2]    = shuffle_unpaired(cond1, cond2);
