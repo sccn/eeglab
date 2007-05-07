@@ -103,7 +103,8 @@
 %
 % See also: traditional(), headplot(), plotmesh(), electrodenormalize(). 
 %
-% Note: Calls Robert Oostenveld's FieldTrip coregistration functions.
+% Note: Calls Robert Oostenveld's FieldTrip coregistration functions for
+%       automatic coregistration.
 %
 % Author: Arnaud Delorme, SCCN/INC/UCSD, 2005-06
         
@@ -126,6 +127,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.59  2007/04/26 20:57:14  toby
+% Undocumented option 'warpmethod' documented.
+% Minor doc edits.
+%
 % Revision 1.58  2007/04/06 20:50:45  arno
 % better help
 %
@@ -355,7 +360,6 @@ if isstr(chanlocs1)
             end;
             try,
                 [ tmp dat.transform ] = warp_chans(dat.elec1, dat.elec2, tmpelec2.label(clist2), 'traditional');
-                dat.transform(6) = - dat.transform(6);
             catch,
                 warndlg2(strvcat('Transformation failed', lasterr));
             end;
@@ -789,9 +793,33 @@ function [elec1, transf] = warp_chans(elec1, elec2, chanlist, warpmethod)
     
     transf = elec3.m;
     if length(transf) == 6, transf(7:9) = 1; end;
+    transf = checktransf(transf, elec1, elec2);
+    
     transfmat = traditional(transf);
     elec1.pnt = transfmat*[ elec1.pnt ones(size(elec1.pnt,1),1) ]';
     elec1.pnt = elec1.pnt(1:3,:)';
+
+    
+% test difference and invert axis if necessary
+% --------------------------------------------
+function transf = checktransf(transf, elec1, elec2)
+    
+    [tmp ind1 ind2] = intersect( elec1.label, elec2.label );
+    
+    transfmat = traditional(transf);
+    tmppnt = transfmat*[ elec1.pnt ones(size(elec1.pnt,1),1) ]';
+    tmppnt = tmppnt(1:3,:)';
+    diff1  = tmppnt(ind1,:) - elec2.pnt(ind2,:);
+    diff1  = mean(sum(diff1.^2,2));
+    
+    transf(6) = -transf(6); % yaw angle is sometimes inverted
+    transfmat = traditional(transf);
+    tmppnt = transfmat*[ elec1.pnt ones(size(elec1.pnt,1),1) ]';
+    tmppnt = tmppnt(1:3,:)';
+    diff2  = tmppnt(ind1,:) - elec2.pnt(ind2,:);
+    diff2  = mean(sum(diff2.^2,2));
+    
+    if diff1 < diff2, transf(6) = -transf(6); end;
 
 % redraw GUI
 % ----------
