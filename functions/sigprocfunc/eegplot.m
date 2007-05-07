@@ -165,6 +165,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.118  2007/05/07 23:24:26  arno
+% motioncapture
+%
 % Revision 1.117  2007/02/06 19:19:04  toby
 % revert to 1.115
 %
@@ -636,7 +639,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
       switch gfields{index}
       case {'spacing', 'srate' 'eloc_file' 'winlength' 'position' 'title' ...
                'trialstag'  'winrej' 'command' 'tag' 'xgrid' 'ygrid' 'color' 'colmodif'...
-               'freqlimits' 'submean' 'children' 'limits' 'dispchans' 'wincolor' ...
+               'freqlimits' 'motioncapture' 'submean' 'children' 'limits' 'dispchans' 'wincolor' ...
                'ploteventdur' 'butlabel' 'scale' 'events' 'data2' 'plotdata2' },;
       otherwise, error(['eegplot: unrecognized option: ''' gfields{index} '''' ]);
       end;
@@ -1283,7 +1286,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
 
   % release button: check window consistency, adpat to trial boundaries
   % -------------------------------------------------------------------
-  commandrelease = ['ax1 = findobj(''tag'',''backeeg'',''parent'',gcbf);' ... 
+  commandrelease = ['ax1 = findobj(''tag'',''backeeg'',''p arent'',gcbf);' ... 
  			 'g = get(gcbf,''UserData'');' ...
  			 'g.incallback = 0;' ...
 			 'set(gcbf,''UserData'', g); ' ... % early save in case of bug in the following
