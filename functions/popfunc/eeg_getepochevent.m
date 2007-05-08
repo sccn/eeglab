@@ -21,12 +21,15 @@
 % Outputs:
 %   epochval    - A value of the selected field for each epoch. This is
 %                 NaN if no selected event occurred during the epoch. If
-%                 several vales are available for each epoch, only the
+%                 several values are available for each epoch, only the
 %                 first one is taken into consideration.
 %                 Latencies are measured in msec relative to epoch onset.
+%                 Forced to be numerical, where a string is converted by double
+%                 and added like: 'abc' -> 97+98*10^-3+99*10^-6
 %   allepochval - cell array with same length as the number of epoch 
 %                 containing all values for all epochs. This output is
 %                 usefull when several value are found within each epoch.
+%                 Not forced to be numerical.
 %
 % Notes: 1) Each epoch structure refers to the events that occurred
 %        during its time window. This function allows the user to return 
@@ -76,6 +79,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2007/05/03 21:20:50  toby
+% test variable removed
+%
 % Revision 1.23  2007/05/03 20:55:02  toby
 % made strmatch 'exact' for selecting events.
 % this way '38' is not selected when searching for type '3'
@@ -264,14 +270,24 @@ elseif strcmp(fieldname, 'duration')
 		end;
 	end;
 else
-	for index = 1:length(Ieventtmp)
-		eval( [ 'val = EEG.event(Ieventtmp(index)).' fieldname ';']);
-		if ~isempty(val)
-            if ~isfield(EEG.event, 'epoch'), epoch = 1;
-            else                             epoch = EEG.event(Ieventtmp(index)).epoch;
-            end;
-            epochval{epoch}           = val;
-            allepochval{epoch}{end+1} = val;
+    for index = 1:length(Ieventtmp)
+        eval( [ 'val = EEG.event(Ieventtmp(index)).' fieldname ';']);
+        if ~isempty(val)
+            if isstr(val)
+                val_tmp = double(val);  % force epochval output to be numerical
+                % **Turn string into number that will sort in alphebetical order**
+                val = 0;
+                for val_count = 1:length(val_tmp)
+                    val = val + val_tmp(val_count)*10^(3*(-val_count+1));
+                end
+                % **End turn string ...**
+            end
+            if ~isfield(EEG.event, 'epoch'), 
+                epoch = 1;
+            else    epoch = EEG.event(Ieventtmp(index)).epoch;
+            end
+            epochval{epoch}           = val(1);
+            allepochval{epoch}{end+1} = val(1);
 		end;
 	end;
 end;    
