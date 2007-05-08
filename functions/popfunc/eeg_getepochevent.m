@@ -79,6 +79,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2007/05/08 06:45:54  toby
+% made output 'epochval' always numerical, doc edits
+%
 % Revision 1.24  2007/05/03 21:20:50  toby
 % test variable removed
 %
@@ -278,7 +281,10 @@ else
                 % **Turn string into number that will sort in alphebetical order**
                 val = 0;
                 for val_count = 1:length(val_tmp)
-                    val = val + val_tmp(val_count)*10^(3*(-val_count+1));
+                    % -48 so that '1' is scaled to ascii number 1, not 49
+                    % /74 to scale double('z')=122 to 1
+                    % 10^((2-... scale to 0 to 100milliseconds
+                    val = val + (val_tmp(val_count)-48)/74*10^((2-val_count+1));
                 end
                 % **End turn string ...**
             end
