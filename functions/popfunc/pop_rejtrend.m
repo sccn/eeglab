@@ -3,7 +3,7 @@
 % Usage:
 %   >> pop_rejtrend( INEEG, typerej); % pop up an interactive window
 %   >> OUTEEG = pop_rejtrend( INEEG, typerej, elec_comp, ...
-%                winsize, maxslope, minR, superpose, reject);
+%                winsize, maxslope, minR, superpose, reject,calldisp);
 %
 % Pop-up window interface:
 %   "Electrode|Component number(s)" - [edit box] electrode or component number(s) 
@@ -41,6 +41,8 @@
 %                different colors. {Default: 0}
 %   reject     - [1|0] 0 = Do not reject marked trials but store the 
 %                labels; 1 = Reject marked trials. {Default: 1}
+%   calldisp   - [0|1] 1 = Open scroll window indicating rejected trials
+%                0 = Do not open scroll window.  {Default: 1}
 %
 % Outputs:
 %   OUTEEG     - output dataset with rejected trials marked for rejection
@@ -71,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2007/04/28 05:04:20  toby
+% doc edit
+%
 % Revision 1.19  2007/04/28 04:41:40  toby
 % shorted format of extended terminal output
 %
@@ -135,7 +140,7 @@
 % 03-07-02 add the eeglab options -ad
 
 function [EEG, com] = pop_rejtrend( EEG, icacomp, elecrange, winsize, ...
-				minslope, minstd, superpose, reject, topcommand);
+				minslope, minstd, superpose, reject, calldisp);
 
 com = '';
 if nargin < 1
@@ -186,14 +191,18 @@ if nargin < 3
 	winsize      = result{2};
 	minslope     = result{3};
 	minstd       = result{4};
+    calldisp     = 1;
 	switch lower(result{5}), case 'yes', superpose=1; otherwise, superpose=0; end;
 	switch lower(result{6}), case 'yes', reject=1; otherwise, reject=0; end;
 end;
 if nargin < 7
     superpose = 0;
     reject = 0;
-    topcommand = '';
+    calldisp = 1;
 end;
+if nargin < 9
+    calldisp = 1;
+end
 
 if isstr(elecrange) % convert arguments if they are in text format 
 	calldisp = 1;
@@ -201,8 +210,6 @@ if isstr(elecrange) % convert arguments if they are in text format
 	winsize   = eval( [ '[' winsize ']' ]  );
 	minslope  = eval( [ '[' minslope ']' ]  );
 	minstd    = eval( [ '[' minstd ']' ]  );
-else
-	calldisp = 0;
 end;
 
 fprintf('Selecting trials...\n');
