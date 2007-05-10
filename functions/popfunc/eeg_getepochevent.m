@@ -25,7 +25,9 @@
 %                 first one is taken into consideration.
 %                 Latencies are measured in msec relative to epoch onset.
 %                 Forced to be numerical, where a string is converted by double
-%                 and added like: 'abc' -> 97+98*10^-3+99*10^-6
+%                 to its ascii number which is normalized to be between 0 and 1, and
+%                 the string is summed together. See the subfunction ascii2num for
+%                 more details.
 %   allepochval - cell array with same length as the number of epoch 
 %                 containing all values for all epochs. This output is
 %                 usefull when several value are found within each epoch.
@@ -79,6 +81,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2007/05/08 19:46:26  peter
+% changed scaling of ascii letters to 0 to 100 ms
+%
 % Revision 1.25  2007/05/08 06:45:54  toby
 % made output 'epochval' always numerical, doc edits
 %
@@ -277,15 +282,17 @@ else
         eval( [ 'val = EEG.event(Ieventtmp(index)).' fieldname ';']);
         if ~isempty(val)
             if isstr(val)
-                val_tmp = double(val);  % force epochval output to be numerical
+                val = ascii2num(val);
+                %val_tmp = double(val);  % force epochval output to be numerical
                 % **Turn string into number that will sort in alphebetical order**
-                val = 0;
-                for val_count = 1:length(val_tmp)
+                %val = 0;
+                %for val_count = 1:length(val_tmp)
                     % -48 so that '1' is scaled to ascii number 1, not 49
                     % /74 to scale double('z')=122 to 1
                     % 10^((2-... scale to 0 to 100milliseconds
-                    val = val + (val_tmp(val_count)-48)/74*10^((2-val_count+1));
-                end
+                    
+                %    val = val + (val_tmp(val_count)-48)/74*10^(2-(val_count-1));
+                %end
                 % **End turn string ...**
             end
             if ~isfield(EEG.event, 'epoch'), 
@@ -299,10 +306,40 @@ else
 end;    
 
 if isnumeric(epochval{1})
-    try, 
+    try 
         epochval = [ epochval{:} ];
         for index = 1:length(allepochval)
             allepochval{index} = [ allepochval{index}{:} ];
-        end;
-    catch, end;
-end;
+        end
+    catch 
+    end
+end
+
+%% SUBFUNCTION ASCII2NUM
+% Maps ascii characters ['0','9'] to [1, 10], ['a','z'] to [11, 36]
+% This is intended for alphebetically sorting string arrays numerically
+%   ascii_in    [string array]
+%   output      [double]
+function out = ascii2num(ascii_in)
+
+ascii_vector = double(ascii_in);
+out = 0;
+% go through each character in the string and scale and add it to output
+for val_count = 1:length(ascii_vector)
+    ascii_char = ascii_vector(val_count);
+    if ascii_char>=48 & ascii_char<=57            % ['0','9'] to [1, 10]
+        ascii_adj = ascii_char - 47;
+    elseif ascii_char>=65 & ascii_char<=90        % ['A','Z'] to [11, 36]
+        ascii_adj = ascii_char - 64;
+    elseif ascii_char>=97 & ascii_char<=122       % ['a','z'] to [11, 36]
+        ascii_adj = ascii_char - 96;
+    else ascii_adj = ascii_char;
+    end
+    out = out + ascii_adj/36^val_count;
+end
+
+
+
+
+
+
