@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2007/04/28 04:20:30  toby
+% Modified to catch very flat line data, added waitbar, clarified documentation
+%
 % Revision 1.1  2002/04/05 17:39:45  jorn
 % Initial revision
 %
@@ -65,22 +68,14 @@ if nargin < 3
 	return;
 end;	
 if nargin < 5
-	step = 1;
+	step = pointrange;
 end;	
 [chans pnts trials] = size(signal);
 rejE   = zeros( chans, trials);
 
-% normalize each row input
-% ------------------------
-%signal = signal(:,:);
-%signal = (signal-mean(signal,2)*ones(1,size(signal,2)))./ (std(signal,0,2)*ones(1,size(signal,2)));
-%signal = reshape(signal, chans, pnts, trials);
-
-%fprintf('finding stable low variability regions of %d consecutive time points...\n', pointrange);	
 x = linspace( 1/pointrange, 1, pointrange );
 waitbarhandle = waitbar(0,'rejtrend.m Please wait...');
 for c = 1:chans
-	%fprintf('%d ', c);
 	for t = 1:trials 
 		for w = 1:step:(pnts-pointrange+1)
 			y = signal(c, [w:w+pointrange-1], t);
@@ -92,22 +87,19 @@ for c = 1:chans
                 if SST < SST_TOLERANCE      % make sure SST is not too close to zero
                     SST = SST_TOLERANCE;
                 end
-			   	resid = y - ypred;          % residuals - measure of mismatch
-			   	SSE = sum(resid.^2);        % variation NOT accounted for
-			   	Rsq = 1 - SSE/SST;          % percent of error explained
+			   	resid = y - ypred;              % residuals - measure of mismatch
+			   	SSE = sum(resid.^2);           % variation NOT accounted for
+                Rsq = 1 - SSE/SST;             % percent of error explained
 				if Rsq > minstd
 					rejE( c, t ) = 1;
                 end
 				% see the page 	http://www.facstaff.bucknell.edu/maneval/help211/fitting.html
-            end			
-			%rejE( c, t ) = rejE( c, t ) | all( abs(detrend(signal(c, [w:w+pointrange-1], t))) < minstd);
-			%rejE( c, t ) = rejE( c, t ) | all( abs(signal(c, [w:w+pointrange-1], t)) < minstd);
+            end
         end
     end
     waitbar(c/chans);
 end
-close(waitbarhandle);
-%fprintf('\n');					
+close(waitbarhandle);			
 rej = max( rejE, [], 1);
 
 return;
