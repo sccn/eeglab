@@ -54,8 +54,11 @@
 %               column. If fewer colors than event columns, cycles through the given color
 %               labels.  Note: Not compatible with 'vert' (below).
 %   'renorm' = ['yes'|'no'| formula] Normalize sorting variable to epoch
-%               latency range and plot. 'yes'= autoscale. Example of formula:
-%               '3*x+2'. {default: 'no'}
+%               latency range and plot. 'yes'= autoscale. formula must be a linear 
+%               transformation in the format 'a*x+b'
+%               Example of formula: '3*x+2'. {default: 'no'}
+%               If sorting by string values like event type, suggested formulas for:
+%                 letter string: '1000*x', number string: '30000*x-1500'
 %   'noplot' = Do not plot sortvar {default: Plot sortvar if in times range}
 %   'noshow' = ['yes'|'no'] Do not plot erpimage, simply return outputs {default: 'no'}
 %
@@ -203,6 +206,9 @@
 
 %% LOG COMMENTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % $Log: not supported by cvs2svn $
+% Revision 1.271  2007/03/05 21:38:14  toby
+% Changed reference to deprecated function eventlock.m to eegalign.m
+%
 % Revision 1.270  2007/02/09 02:58:35  toby
 % bug fix: auto-calculation of yaxis limits occasionally fails
 %
