@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2007/04/05 21:33:31  arno
+% same
+%
 % Revision 1.20  2007/04/05 21:31:58  arno
 % same
 %
@@ -351,6 +354,9 @@ for ind = 1:length(finalinds)
                 for c = 1:nc
                     for g = 1:ng
                         for indtmp = 1:length(allinds{c,g})
+                            try     % this 'try' is a poor solution the problem of attempting 
+                                    % to read specific channel/component data that doesn't exist
+                                    % called below by: allinds{c,g}(indtmp)
                             if strcmpi(opt.statmode, 'trials')
                                 [ tmpersp allfreqs alltimes tmpparams] = std_readtimef( ALLEEG, setinds{c,g}(indtmp), allinds{c,g}(indtmp), ...
                                                                                   opt.timerange, opt.freqrange);
@@ -370,7 +376,9 @@ for ind = 1:length(finalinds)
                                                                                   opt.timerange, opt.freqrange);
                                 ersp{c, g}(    :,:,indtmp) = permute(tmpersp    , [2 1]);
                                 erspbase{c, g}(:,:,indtmp) = 10*log(permute(tmperspbase, [2 1]));
-                            end;
+                            end
+                            catch
+                            end
                             fprintf('.');
                         end;
                     end;
