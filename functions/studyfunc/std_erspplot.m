@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.46  2007/05/01 21:17:04  arno
+% clarify help message
+%
 % Revision 1.45  2007/04/30 20:57:27  arno
 % update header and code for options
 %
@@ -181,7 +184,7 @@ opt = finputcheck( varargin, { 'topofreq'    'real'    [] STUDY.etc.erspparams.t
                                'datatype'    'string'  { 'itc' 'ersp' } 'ersp';
                                'mode'        'string'  []              '';
                                'plottf'      'real'    []              [];
-                               'comps'       'integer' []              []; % for backward compatibility
+                               'comps'       {'integer','string'}  []              []; % for backward compatibility
                                'plotsubjects' 'string' { 'on' 'off' }  'off';
                                'plotmode'    'string' { 'normal' 'condensed' }  'normal';
                                'subject'     'string'  []              '';
