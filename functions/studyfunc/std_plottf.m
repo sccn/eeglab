@@ -96,6 +96,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2007/04/06 01:18:16  arno
+% frequency scaling
+%
 % Revision 1.4  2007/04/05 21:38:23  arno
 % now plot in linear scale if necessaru
 %
@@ -242,7 +245,11 @@ if strcmpi(opt.datatype, 'spec'), opt.unit = 'Hz'; end;
 if strcmpi(opt.plotsubjects, 'on')
     opt.plotgroups = 'apart';
     opt.plotconditions  = 'apart';
-end;
+end
+if ~isnan(opt.threshold) & length(data) > 1,
+    opt.condstats = 'on';
+    opt.groupstats = 'on';
+end
 onecol  = { 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b' };
 manycol = { 'b' 'r' 'g' 'k' 'c' 'y' };
 
@@ -314,16 +321,15 @@ if ~isempty(opt.topovals)
         data{index} = mean(mean(data{index}(ti1:ti2,fi1:fi2,:,:),1),2);
         data{index} = reshape(data{index}, [1 size(data{index},3) size(data{index},4) ]);
     end;
-end;
+end
 
-% compute significance mask
-% --------------------------
-[pcond pgroup pinter] = std_stat(data, ...
-    'statistics',  opt.statistics, 'naccu', opt.naccu, 'groupstats', opt.groupstats, ...
-    'condstats', opt.condstats);
-if ~isempty(pinter), pinter = pinter{3}; end;
-
-if ~isnan(opt.threshold)    
+if ~isnan(opt.threshold)
+    % compute significance mask
+    % --------------------------
+    [pcond pgroup pinter] = std_stat(data, ...
+        'statistics',  opt.statistics, 'naccu', opt.naccu, 'groupstats', opt.groupstats, ...
+        'condstats', opt.condstats);
+    if ~isempty(pinter), pinter = pinter{3}; end;
     % applying threshold
     % ------------------
     for ind = 1:length(pcond),  pcondplot{ind}  = pcond{ind}  < opt.threshold; end;
@@ -337,7 +343,7 @@ else
     if ~isempty(pinter), pinterplot = -log10(pinter); end;
     maxplot = 3;
     warning on;
-end;
+end
 
 % plotting all conditions
 % -----------------------
