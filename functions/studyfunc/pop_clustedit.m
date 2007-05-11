@@ -447,7 +447,7 @@ else
                     a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''clusters'','  num2str(cls(clus-1)) ', ''comps'', ' num2str(comp_ind-1) ' );' ];
                     eval(a); STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
                  else
-                    a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''clusters'','  num2str(cls(clus-1)) ', ''comps'', ''all'' );' ];
+                    a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''clusters'','  num2str(cls(clus-1)) ', ''plotsubjects'', ''on'' );' ];
                     eval(a); STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
                 end
             else % all clusters - plot average scalp map
