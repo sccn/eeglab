@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2004/05/18 18:02:15  arno
+% commenting 2 not usefull lines
+%
 % Revision 1.4  2004/05/05 16:30:57  arno
 % svd -> svds
 %
@@ -65,6 +68,11 @@ end
 
 rows = size(data,1);
 
+% remove the mean
+for i = 1:rows
+  data(i,:) = data(i,:) - mean(data(i,:));
+end
+
 if nargin < 3
   norm = 0;
 elseif isempty(norm)
@@ -77,6 +85,7 @@ end
 if isempty(N)
   N = 0;
 end
+
 
 if N == 0  | N == rows
   N = rows;
