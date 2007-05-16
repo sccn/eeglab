@@ -56,6 +56,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.70  2007/04/30 22:16:23  arno
+% paperpositionmode for figure
+%
 % Revision 1.69  2007/02/08 02:42:45  toby
 % bug fix: plotting more than 7 component maps crashed topoplot
 %
@@ -415,7 +418,8 @@ counter = 1;
 countobj = 1;
 allobj = zeros(1,1000);
 curfig = gcf;
-if isfield(EEG, 'chaninfo'), options = { options{:} 'chaninfo' EEG.chaninfo }; end;
+if isfield(EEG, 'chaninfo'), options = { options{:} 'chaninfo' EEG.chaninfo }; end
+    
 for index = 1:size(arg2(:),1)
 	if nbgraph > 1
         if mod(index, rowcols(1)*rowcols(2)) == 1
@@ -434,42 +438,57 @@ for index = 1:size(arg2(:),1)
 	% add dipole location if present
     % ------------------------------
     dipoleplotted = 0;
-    if plotdip & typeplot == 0     
+    if plotdip & typeplot == 0
         if isfield(EEG, 'dipfit') & isfield(EEG.dipfit, 'model')
             if length(EEG.dipfit.model) >= index & ~strcmpi(EEG.dipfit.coordformat, 'CTF')
                 %curpos = EEG.dipfit.model(arg2(index)).posxyz/EEG.dipfit.vol.r(end);
                 curpos = EEG.dipfit.model(arg2(index)).posxyz;
                 curmom = EEG.dipfit.model(arg2(index)).momxyz;
-                try, 
-                      select = EEG.dipfit.model(arg2(index)).select;
+                try,
+                    select = EEG.dipfit.model(arg2(index)).select;
                 catch select = 0;
                 end;
                 if ~isempty(curpos)
                     if strcmpi(EEG.dipfit.coordformat, 'MNI') % from MNI to sperical coordinates
-                        transform = pinv( sph2spm );                    
+                        transform = pinv( sph2spm );
                         tmpres = transform * [ curpos(1,:) 1 ]'; curpos(1,:) = tmpres(1:3);
                         tmpres = transform * [ curmom(1,:) 1 ]'; curmom(1,:) = tmpres(1:3);
                         try, tmpres = transform * [ curpos(2,:) 1 ]'; curpos(2,:) = tmpres(1:3); catch, end;
                         try, tmpres = transform * [ curmom(2,:) 1 ]'; curmom(2,:) = tmpres(1:3); catch, end;
                     end;
                     curpos = curpos / 85;
-                   if size(curpos,1) > 1 & length(select) == 2
-                        options = { options{:} 'dipole' [ curpos(:,1:2) curmom(:,1:3) ] };
+                    if size(curpos,1) > 1 & length(select) == 2
+                        dipole_index = find(strcmpi('dipole',options),1);
+                        if  ~isempty(dipole_index) % if 'dipoles' is already defined in options{:}
+                            options{dipole_index+1} = [ curpos(:,1:2) curmom(:,1:3) ];
+                        else
+                            options = { options{:} 'dipole' [ curpos(:,1:2) curmom(:,1:3) ] };
+                        end
                         dipoleplotted = 1;
                     else
                         if any(curpos(1,:) ~= 0)
-                            options = { options{:} 'dipole' [ curpos(1,1:2) curmom(1,1:3) ] };
+                            dipole_index = find(strcmpi('dipole',options),1);
+                            if  ~isempty(dipole_index) % if 'dipoles' is already defined in options{:}
+                                options{dipole_index+1} = [ curpos(1,1:2) curmom(1,1:3) ];
+                            else
+                                options = { options{:} 'dipole' [ curpos(1,1:2) curmom(1,1:3) ] };
+                            end
                             dipoleplotted = 1;
-                        end;
-                    end;
-                end;
+                        end
+                    end
+                end
                 if nbgraph ~= 1
-                    options = {  options{:} 'dipscale' 0.6 };
-                end;
+                    dipscale_index = find(strcmpi('dipscale',options),1);
+                    if ~isempty(dipscale_index) % if 'dipscale' is already defined in options{:}
+                        options{dipscale_index+1} = 0.6;
+                    else
+                        options = {  options{:} 'dipscale' 0.6 };
+                    end
+                end
                 %options = { options{:} 'dipsphere' max(EEG.dipfit.vol.r) };
-            end;
-        end;
-    end;
+            end
+        end
+    end
     
 	% plot scalp map
     % --------------
