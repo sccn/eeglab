@@ -1,4 +1,4 @@
-% pop_newset() - Edit/save EEG dataset structure information.
+% pop_newset() - Edit/save EEG dataset structure information. 
 %
 % Usage:
 %   >> [ALLEEG EEG CURRENTSET] = pop_newset( ALLEEG, EEG, CURRENTSET,...
@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.77  2006/11/01 23:22:33  arno
+% fix documentation
+%
 % Revision 1.76  2006/10/02 11:35:12  arno
 % removing double & for Matlab 6.1
 %
