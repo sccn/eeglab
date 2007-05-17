@@ -61,6 +61,8 @@
 % 5/26/06 added default for N, test for <120 comps, extended help msg, formatted -sm
 % 5/30/06 use only first 120 comps -nb
 
+% $Log: not supported by cvs2svn $
+
 function EEGout = eeg_miclust(EEG,n,comps, clusterMethod)
 
 
