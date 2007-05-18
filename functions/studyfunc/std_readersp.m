@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2007/01/26 18:06:35  arno
+% nothing
+%
 % Revision 1.23  2006/11/10 02:28:46  arno
 % bootstrap concatenation
 %
@@ -131,7 +134,7 @@ end;
 
 % multiple entry
 % --------------
-if (length(comp) > 1 & comp(1) > 0) | length(comp) > length(abset)
+if (length(comp) > 1 & comp(1) > 0) | length(comp) > length(abset) % recursive call if multiple components
     for index = 1:length(comp)
         [tmpersp, logfreqs, timevals, params, tmpbase] = std_readersp(ALLEEG, abset, comp(index), timewindow, freqrange);
         logersp(index,:,:,:) = tmpersp;
@@ -178,7 +181,12 @@ for k = 1: length(abset)
                          [ prefix int2str(comptmp) '_ersp'], ...
                          [ prefix int2str(comptmp) '_erspbase'], ...
                          [ prefix int2str(comptmp) '_erspboot']);
-
+        if ~exist([ prefix int2str(comptmp) '_ersp']) |
+           ~exist([ prefix int2str(comptmp) '_erspbase']) |
+           ~exist([ prefix int2str(comptmp) '_erspboot']) 
+         fprintf('ERSP data for component %d not found\n       in file %s\n',comptmp,filename); 
+         error(' ');
+        end
         erspall{k}     = double(getfield(tmpersp2, [ prefix int2str(comptmp) '_ersp']));
         erspallboot{k} = double(getfield(tmpersp2, [ prefix int2str(comptmp) '_erspboot']));
         erspallbase{k} = double(getfield(tmpersp2, [ prefix int2str(comptmp) '_erspbase']));
