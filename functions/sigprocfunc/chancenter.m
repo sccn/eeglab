@@ -34,6 +34,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2004/02/12 19:48:12  arno
+% gui option obsolete
+%
 % Revision 1.6  2003/12/02 19:13:09  arno
 % debug gui
 %
@@ -108,7 +111,7 @@ else
 	end;
 end;
 
-options = [];
+options = {'MaxFunEvals',1000*length(center)};
 x = x - center(1);  % center the data
 y = y - center(2);
 z = z - center(3);
