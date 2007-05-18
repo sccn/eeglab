@@ -126,6 +126,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.60  2007/04/05 22:34:20  arno
+% default values now set if empty param
+%
 % Revision 1.59  2007/04/05 22:26:44  arno
 % freqscale
 %
@@ -455,8 +458,14 @@ tmpall      = repmat(nan,[length(freqs) length(g.timesout) trials]);
 % compute time freq decomposition
 % -------------------------------
 fprintf('The window size used is %d samples (%g ms) wide.\n',g.winsize, 1000/srate*g.winsize);
+if strcmpi(g.freqscale, 'log') % fastif was having strange "function not available" messages
+    scaletoprint = 'log';
+else scaletoprint = 'linear';
+end
 fprintf('Estimating %d %s-spaced frequencies from %2.1f Hz to %3.1f Hz.\n', length(g.freqs), ...
-    fastif(strcmpi(g.freqscale, 'log'), 'log', 'linear'), g.freqs(1), g.freqs(end));
+    scaletoprint, g.freqs(1), g.freqs(end));
+%fprintf('Estimating %d %s-spaced frequencies from %2.1f Hz to %3.1f Hz.\n', length(g.freqs), ...
+%    fastif(strcmpi(g.freqscale, 'log'), 'log', 'linear'), g.freqs(1), g.freqs(end));
 
 if g.cycles(1) == 0
     fprintf('Processing trial (of %d):',trials);
