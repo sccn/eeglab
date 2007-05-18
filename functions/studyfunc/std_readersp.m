@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2007/05/18 16:15:46  peter
+% typo
+%
 % Revision 1.25  2007/05/18 16:07:09  peter
 % added test for reading ERSP component vars.
 %
@@ -188,7 +191,7 @@ for k = 1: length(abset)
            ~exist([ prefix int2str(comptmp) '_erspbase']) |   ...
            ~exist([ prefix int2str(comptmp) '_erspboot']) 
          fprintf('ERSP data for component %d not found\n       in file %s\n',comptmp,filename); 
-         error(' ');
+         error(['read error ']);
         end
         erspall{k}     = double(getfield(tmpersp2, [ prefix int2str(comptmp) '_ersp']));
         erspallboot{k} = double(getfield(tmpersp2, [ prefix int2str(comptmp) '_erspboot']));
