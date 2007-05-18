@@ -1,17 +1,18 @@
-% std_envtopo() - Creates an envtopo() image for a STUDY set, uses cluster contributions 
-%                 instead of individual components.  Plots the envelope of a data epoch, 
-%                 plus envelopes and average scalp maps for specified or largest-contributing 
-%                 clusters for each condition. Click on individual axes to examine them 
-%                 in detail (using axcopy()). See envtopo() for further details.
+% std_envtopo() - Creates an envtopo() image for a STUDY set using component cluster 
+%                 contributions instead of individual components.  Plots the envelope 
+%                 of the data epoch grand mean ERP, plus envelopes and average scalp maps 
+%                 for specified or largest-contributing clusters for each condition. 
+%                 Click on individual axes to examine them in detail (using axcopy()). 
+%                 See envtopo() for further details.
 % Usage:
-%               >> std_envtopo(STUDY, ALLEEG, 'key1', 'val1', ...);
+%                >> std_envtopo(STUDY, ALLEEG, 'key1', 'val1', ...);
 % Inputs:
 %   STUDY        = an EEGLAB STUDY structure containing EEG structures
 %   ALLEEG       = the ALLEEG data structure; can also be an EEG dataset structure.
 %
 % Optional inputs:
 %  'clusters'    = [integer array] vector of cluster numbers. If one cluster, plots the 
-%                    cluster contribution to the data envelope. If multiple clusters 
+%                    cluster contribution to the data envelope. If multiple clusters,
 %                    selects the largest contributing clusters from within the 
 %                  'limcontrib' region (see below) and plots the envelopes of
 %                    their contributions {default| [] -> 'all'}
@@ -24,29 +25,28 @@
 %                  'all' -> Grand ERP envelope includes all datasets in STUDY. 
 %                   If multiple clusters, this is the only option possible. 
 %  'only_clust'  = [ 'on' | 'off'] dataset components to include in the grand ERP. 
-%                  'on' will include only the components that were part of the clustering 
-%                   For example, if components were rejected from clustering because 
-%                   of high dipole model residual variance, don't include their 
-%                   data in the grand ERP.
-%                  'off' will include all components in the datasets except those 
-%                   in the subtructed ('subclus') clusters {default 'off'}. 
+%                  'on' will include only the components that were part of the 
+%                   clustering. For example, if components were rejected from 
+%                   clustering because of high dipole model residual variance, 
+%                   don't include their data in the grand ERP.
+%                  'off' will include all components in the datasets except 
+%                   those in the subtructed ('subclus') clusters {default 'off'}. 
 %  'baseline'    = [minms maxms] - a new baseline to remove from the grand
 %                   ERP and cluster ERP contributions.
 %  'diff'        = [condition1 condition2] the indexes of two condition.
 %                   Plots additional figure with the difference of the
 %                   two condition envtopo. 
-%  'clustnums'   = [integer array] vector of cluster numbers to plot {default|0 -> all}
-%                   Else if int < 0, the number of largest contributing clusters to plot 
+%  'clustnums'   = [integer array] vector of cluster numbers to plot.  Else if 
+%                   int < 0, the number of largest contributing clusters to plot 
 %                   {default|[] -> 7}
-%  'timerange'   = data start and end input latencies (in ms) 
+%  'timerange'   = data epoch start and end input latencies (in ms) 
 %                   {default: from 'limits' if any}
 %  'limits'      = 0 or [minms maxms] or [minms maxms minuV maxuV]. Specify start/end plot
-%                   (x) limits (in ms) and min/max y-axis limits (in uV). If 0, or if both
+%                   x-axis limits (in ms) and min/max y-axis limits (in uV). If 0, or if both
 %                   minmx & maxms == 0 -> use latencies from 'timerange' (else, 0:frames-1).
 %                   If both minuV and maxuV == 0 -> use data uV limits {default: 0}
-%  'limcontrib'  = [minms maxms]  time range (in ms) in which to rank clusters contribution
-%                   (boundaries shown by thin dotted lines) 
-%                   {default|[]|[0 0] -> plotting limits}
+%  'limcontrib'  = [minms maxms]  time range (in ms) in which to rank cluster contributions
+%                   (boundaries = thin dotted lines) {default|[]|[0 0] -> plotting limits}
 %  'vert'        = vector of times (in ms) at which to plot vertical dashed lines 
 %                   {default|[] -> none}
 %
@@ -54,25 +54,25 @@
 
 function std_envtopo(STUDY, ALLEEG, varargin)
 icadefs;
-if nargin < 4
-    help STUDY_envtopo;
+if nargin < 2
+    help std_envtopo;
     return
 end
 
-if mod(nargin,2)
-    error('STUDY_envtopo: Input argument list must be pairs of: ''keyx'', ''valx'' ');
+if mod(nargin,2) % if not an even number of arguments
+    error('std_envtopo: Input argument list must be pairs of: ''keyx'', ''valx'' ');
 end
 
-clusters = [];
-subclus = []; 
+clusters     = [];       % default: use all clusters
+subclus      = [];       % default: omit no clusters from the ERP envelope
 e_options{1} = 'env_erp';
 e_options{2} = 'contrib';% default: grand ERP includes only the components that 
                          % contribute to the dataset; otherwise 'all' datasets in STUDY.
 e_options{3} = 'only_clust'; % Include only those components that were part of 
                          % the pre-clustering data when computing the grand ERP
 e_options{4} = 'off'; % Default is off: include all components in the datasets 
-                         % execpt those in the subtructed ('subclos') clusters
-p_options = {};
+                         % except those in the subtracted ('subclus') clusters
+p_options = {};       % Default: other options off
 
 for k = 1:2:(nargin-2)
     switch varargin{k}
@@ -125,7 +125,7 @@ if ~exist('timerange')
     p_options{end+1} = timerange;
 end
 
-if isempty(clusters) | strcmpi(clusters,'all') % Default all clusters in STUDY
+if isempty(clusters) | strcmpi(clusters,'all') % Default to all clusters in STUDY
     clusters = [];
     for k = 2:length(STUDY.cluster)
         if ~strncmpi('Notclust',STUDY.cluster(k).name,8)
@@ -134,21 +134,23 @@ if isempty(clusters) | strcmpi(clusters,'all') % Default all clusters in STUDY
     end
 end
 
-% If some of the requested clusters-to-subtruct are in clusters, remove them  
+% If some of the requested clusters-to-subtruct are in clusters, remove them.
+
 clusters = setdiff(clusters,subclus);
 
 %if length(clusters) > 1
 %    e_options{2} = 'all';
 %end
 
-Ncond = length(STUDY.condition); %number of conditions
+Ncond = length(STUDY.condition); % number of conditions
 if Ncond == 0
     Ncond = 1;
 end 
 
 for n = 1:Ncond
-    % compute the grand mean ERP envelope of the cluster (for specific
-   % condition).
+   %
+   % Compute the grand mean ERP envelope of the cluster (for a specific condition).
+   %
    fprintf('\n Computing grand ERP for condition %d.', n); 
    [grandERP, set_len, STUDY, ALLEEG] = std_granderp(STUDY, ALLEEG, 'clusters', clusters, 'condition', n, e_options{:});
    grandERPtot{n} = grandERP;
@@ -179,54 +181,58 @@ end
 
 for n = 1:Ncond
     % 
-    % compute the grand mean ERP envelope of the cluster 
+    % Compute the grand mean ERP envelope of the cluster 
     % (for a specific condition).
     % 
 	for cls = 1:length(clusters)
        len = length(STUDY.cluster(clusters(cls)).comps);
         try
-            clusscalp = std_clustread(STUDY, ALLEEG, clusters(cls),'scalp');
+            clustscalp = std_clustread(STUDY, ALLEEG, clusters(cls),'scalp');
         catch,
-            warndlg2([ 'Some topoplot information is missing, aborting'] , 'Abort - STUDY_envtopo' );   
+            warndlg2([ 'Some topoplot information is missing, aborting'] , 'Abort - std_envtopo' );   
             return;
        end
        try
-           cluserp = std_clustread(STUDY, ALLEEG, clusters(cls),'erp', n);
+           clusterp = std_clustread(STUDY, ALLEEG, clusters(cls),'erp', n);
            if exist('baseline')
-               cluserp.erp = rmbase(cluserp.erp,...
+               clusterp.erp = rmbase(clusterp.erp,...
 			ALLEEG(STUDY.datasetinfo(STUDY.setind(1)).index).pnts,baseline);
            end
        catch,
-            warndlg2([ 'Some ERP information is missing, aborting'] , 'Abort - STUDY_envtopo' );   
+            warndlg2([ 'Some ERP information is missing, aborting'] , 'Abort - std_envtopo' );   
             return;
        end   
-       % compute grand mean back projection ERP for the cluster
+       %
+       % Compute grand mean back projection ERP for the cluster
+       %
        projERP = 0;
-       fprintf('\n Computing projected component ERP of cluster %d: ', (clusters(cls)) ); 
-       val_ind = find(~isnan(clusscalp.scalp{1}(:))); % find non-NAN values
+       fprintf('\n Computing grand ERP projection of cluster %d: ', (clusters(cls)) ); 
+       val_ind = find(~isnan(clustscalp.scalp{1}(:))); % find non-NAN values
        for k = 1:len
-           tmp = clusscalp.scalp{k}(val_ind);
-           projERP = projERP + tmp*cluserp.erp(k,:);
+           tmp = clustscalp.scalp{k}(val_ind);
+           projERP = projERP + tmp*clusterp.erp(k,:);
            fprintf('.'); 
        end
        tot_projERP{cls} = projERP/set_len;
-       clus_names{cls} = [STUDY.cluster(clusters(cls)).name];
+       clust_names{cls} = [STUDY.cluster(clusters(cls)).name];
        numind = strfind(STUDY.cluster(clusters(cls)).name,' ')+1; % find the cluster number
        clus_ind{cls} = [STUDY.cluster(clusters(cls)).name(numind(end):end) ', '];
    end
    p_options{end+1} = 'clustlabels';
-   p_options{end+1} = clus_names;
+   p_options{end+1} = clust_names;
    p_options{end+1} = 'gridind';
    p_options{end+1} = val_ind;
    p_options{end+1} = 'sortvar';
    p_options{end+1} = 'pvaf';
-   % compute the grand mean ERP envelope of the cluster (for specific
-   % condition).   
+
+   %
+   % Compute the grand mean ERP envelope of the cluster (for a specific condition).   
+   %
    if cls == 1
        figure; set(gcf,'Color', BACKCOLOR); 
        orient landscape;
        %
-       % To save memory, once computation of a condition is complete the
+       % To save memory, once computation of a condition is complete 
        % its grand ERP is cleared grandERPtot(1), which makes the current
        % condition grand ERP always in index 1
        %
@@ -239,9 +245,10 @@ for n = 1:Ncond
        envtopo_plot(grandERPtot{1},tot_projERP,'envmode' ,'avg', ...
            'dispmaps', 'on', 'title', [ STUDY.condition{n}], p_options{:} );
    end
-   %chil = get(gcf, 'Children');
-   %childf(n) = chil(end);
 
+    %chil = get(gcf, 'Children');
+    %childf(n) = chil(end);
+    %
     %if n == 1
     %    ylimits = get(childf(n),'YLim');
     %else
@@ -256,9 +263,9 @@ for n = 1:Ncond
           orient landscape;
           set(gcf,'Color', BACKCOLOR);
           if length(clus_ind) < 5
-              maintitle =  ['Projected clusters: ' clus_ind{:}];
+              maintitle =  ['Cluster : ' clus_ind{:}];
           else
-              maintitle =  ['Projected clusters difference between conditions'];
+              maintitle =  ['Difference between conditions'];
           end
           a = textsc(maintitle, 'title'); 
           set(a, 'fontweight', 'bold'); 
@@ -282,7 +289,7 @@ for n = 1:Ncond
        if exist('erp1') & exist('erp2')
            for cls = 1:length(clusters)
                diff_proj{cls}  = proj1{1} - proj2{1};
-               proj1(1) = []; %saving memory
+               proj1(1) = []; % saving memory
                proj2(1) =[];
            end
            clear proj1 proj2
@@ -304,16 +311,17 @@ for n = 1:Ncond
            if cls == 1
                envtopo_plot(erp1-erp2,diff_proj,'envmode' ,'avg', 'fillcomp', 1, ...
                     'dispmaps', 'on', ...
-				'title', 'Difference between the two conditions', p_options{:} );
+				'title', 'Condition difference', p_options{:} );
             else
                 envtopo_plot(erp1-erp2,diff_proj,'envmode' ,'avg', 'dispmaps','on',...
-				'title','Difference between the two conditions',p_options{:} );
+				'title','Condition difference',p_options{:} );
             end
            orient landscape;
        end
    end
    grandERPtot(1) = [];
 end
+
 % envtopo_plot() - Plot the envelope of a data epoch, plus envelopes and scalp maps of specified 
 %             or largest-contributing components. If a 3-D input matrix, operates on the
 %             mean of the data epochs. Click on individual axes to examine them in detail. 
@@ -323,9 +331,9 @@ end
 %                                           = envtopo(grandERP,projERP, 'key1', val1, ...);
 % Inputs:
 %  grandERP     = The grand average ERP (chans, frames),
-%                              (see std_granderp() and STUDY_envtopo() for details).
-%  projERP          = A cell array of the projected ERP of the desired components, each cell size is (chans,frames),
-%                              (see std_granderp() and STUDY_envtopo() for details).
+%                              (see std_granderp() and std_envtopo() for details).
+%  projERP          = A cell array of the projected ERPs of the desired components, each cell size is (chans,frames),
+%                              (see std_granderp() and std_envtopo() for details).
 %
 % Optional inputs:
 %  'clustnums'  = [integer array] vector of clusters numbers to plot {default|0 -> all}
