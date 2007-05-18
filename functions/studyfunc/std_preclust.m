@@ -122,6 +122,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.81  2007/05/18 00:59:12  ywu
+% Error resulting from STUDY.setind having unequal NaNs in columns
+%
 % Revision 1.80  2007/04/28 01:04:44  arno
 % computation of ERSP and ITC
 %
@@ -793,7 +796,10 @@ if nargin < 2
             for icol = 1:size(clustdatatmp,2)
                 clustdatatmp(:,icol) = clustdatatmp(:,icol) /normval;
             end;
-        end;
+        end
+        %if size(clustdata,1) < size(clustdatatmp,1);
+        %    clustdata = padarray(clustdata,[size(clustdatatmp,1)-size(clustdata,1), 0],0,'post');
+        %end
         if weight ~= 1
             clustdata(:,end+1:end+size(clustdatatmp,2)) = clustdatatmp * weight;
         else
