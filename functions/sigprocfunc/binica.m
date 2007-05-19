@@ -74,6 +74,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2006/11/07 02:37:18  arno
+% add third dim compatibility
+%
 % Revision 1.18  2006/05/27 03:21:03  toby
 % bugs
 %
@@ -179,10 +182,11 @@ end
 scriptfile = SC;
 tmpint = 1000;
 while exist(scriptfile)
-  tmpints = randperm(10000);
-  tmpint = int2str(tmpints(tmpint));
-  scriptfile = ['binica' tmpint '.sc'];
-end
+ tmpints = randperm(10000);
+ tmpint = int2str(tmpints(tmpint));
+ tmpint(find(tmpint == ' ')) = []; % to remove white spaces
+ scriptfile = ['binica' tmpint '.sc'];
+end 
 fprintf('scriptfile = %s\n',scriptfile);
 
 nchans = 0;
