@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2007/05/18 16:23:29  peter
+% typo
+%
 % Revision 1.27  2007/05/18 16:17:54  peter
 % typo
 %
@@ -190,9 +193,9 @@ for k = 1: length(abset)
                          [ prefix int2str(comptmp) '_ersp'], ...
                          [ prefix int2str(comptmp) '_erspbase'], ...
                          [ prefix int2str(comptmp) '_erspboot']);
-        if ~exist([ prefix int2str(comptmp) '_ersp']) |   ...
-           ~exist([ prefix int2str(comptmp) '_erspbase']) |   ...
-           ~exist([ prefix int2str(comptmp) '_erspboot']) 
+        if ~isfield(tmpersp2,[ prefix int2str(comptmp) '_ersp']) |   ...
+           ~isfield(tmpersp2,[ prefix int2str(comptmp) '_erspbase']) |   ...
+           ~isfield(tmpersp2,[ prefix int2str(comptmp) '_erspboot']) 
           fprintf('\nERSP data for component %d not found!\n       In file %s\n',comptmp,filename); 
         end
         erspall{k}     = double(getfield(tmpersp2, [ prefix int2str(comptmp) '_ersp']));
