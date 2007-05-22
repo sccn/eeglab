@@ -25,7 +25,7 @@
 %   'select'       - ['normal'|'inverse'] invert the selection of events. 
 %                    {Default is 'normal'}
 %   'deleteepochs' - ['on'|'off'] 'on' = Delete ALL epochs that do not include
-%                   the specified events. {Default = 'on'}.
+%                   any of the specified events {Default = 'on'}.
 %                   This option is relevant only for epoched datasets derived
 %                   from continuous datasets.
 %   'invertepochs' - ['on'|'off'] 'on' = Invert epoch selection. {Default = 'off'}.
@@ -74,6 +74,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.57  2007/02/20 14:19:15  arno
+% added a button to invert epoch selection
+% ,.
+%
 % Revision 1.56  2006/05/13 13:29:05  arno
 % allow to process event types with sapce
 %

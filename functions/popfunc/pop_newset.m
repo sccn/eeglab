@@ -1,4 +1,4 @@
-% pop_newset() - Edit/save EEG dataset structure information. 
+% pop_newset() - Edit/save EEG dataset structure information.
 %
 % Usage:
 %   >> [ALLEEG EEG CURRENTSET] = pop_newset( ALLEEG, EEG, CURRENTSET,...
@@ -338,6 +338,7 @@ CURRENTSET = OLDSET;
 com = sprintf('[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, %s); ', vararg2str( { OLDSET varargin{:} } ));
 
 [g varargin] = finputcheck(varargin, { ...
+                    'gui'           'string'     { 'on' 'off' }   'on'; % []=none; can be multiple numbers
                     'retrieve'      'integer'    []               []; % []=none; can be multiple numbers
                     'study'         'integer'    [0 1]            0;  % important because change behavior for modified datasets
                     }, 'pop_newset', 'ignore');
@@ -388,7 +389,7 @@ end;
 
 if isempty(EEG)
     args = { 'retrieve', OLDSET }; % cancel    
-elseif length(varargin) == 0 & length(EEG) == 1 % if several arguments, assign values 
+elseif length(varargin) == 0 & length(EEG) == 1 & strcmpi(g.gui, 'on') % if several arguments, assign values 
     % popup window parameters	
     % -----------------------
     text_new   = 'What do you want to do with the new dataset?';
@@ -770,7 +771,7 @@ else
     end;
 end;        
 
-com = sprintf('[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, %s); ', vararg2str( { OLDSET args{:} } ));
+com = sprintf('[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, %s); ', vararg2str( { OLDSET args{:} 'gui' 'off' } ));
 return;
 
 function num = popask( text )
