@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2002/11/14 15:38:03  arno
+% debugging for first frame
+%
 % Revision 1.6  2002/08/15 15:07:18  arno
 % debug for no colors
 %
@@ -110,11 +113,12 @@ if ~isempty(TMPREJ)
     TMPREJ(find(TMPREJ(:,1) == 1),1) = 0;
 	tmpsig = TMPREJ(:,1)''/pnts+1;
 	I = find(tmpsig == round(tmpsig));
-	tmprejelec   = zeros( nbchan, sweeps);
-	tmprejelec(:,I) = TMPREJ(I,6:nbchan+5)';
 	tmp = tmpsig(I);
 	tmpsig = zeros(1,sweeps);
 	tmpsig(tmp) = 1;
+    I = find(tmpsig);
+	tmprejelec   = zeros( nbchan, sweeps);
+	tmprejelec(:,I) = TMPREJ(:,6:nbchan+5)';
 end;
 
 return;
