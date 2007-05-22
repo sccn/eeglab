@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2006/09/25 17:46:17  arno
+% fix problem when not all channels
+%
 % Revision 1.17  2006/01/31 20:19:18  arno
 % options
 %
@@ -191,11 +194,11 @@ if nargin < 2 | plotag ~= 0
        		disp('Components removed');
     end % switch
 end;
-EEG.data  = compproj;
+EEG.data(EEG.icachansind,:,:) = compproj;
 EEG.setname = [ EEG.setname ' pruned with ICA'];
 EEG.icaact = [];
-EEG.icawinv    = EEG.icawinv(:,setdiff(1:size(EEG.icaweights,1), components));
-EEG.icaweights = EEG.icaweights(setdiff(1:size(EEG.icaweights,1), components),:);
+EEG.icawinv     = EEG.icawinv(:,setdiff(1:size(EEG.icaweights,1), components));
+EEG.icaweights  = EEG.icaweights(setdiff(1:size(EEG.icaweights,1), components),:);
 
 com = sprintf('%s = pop_subcomp( %s, [%s], %d);', inputname(1), inputname(1), ...
    int2str(components), plotag);
