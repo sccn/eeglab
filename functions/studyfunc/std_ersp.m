@@ -116,6 +116,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.49  2007/04/27 19:05:45  julie
+% added tmpparams to use input baseline
+%
 % Revision 1.48  2007/04/27 18:49:08  arno
 % baseline
 %
@@ -281,7 +284,7 @@ end;
                         'timelimits'    'real'        []      [EEG.xmin EEG.xmax]*1000;
                         'cycles'        'real'        []      [3 .5];
                         'padratio'      'real'        []      4;
-                        'freqs'         'real'        []      [3 50];
+                        'freqs'         'real'        []      [3 EEG.srate/2];
                         'freqscale'     'string'      []      'log';
                         'alpha'         'real'        []      NaN;
                         'type'          'string'      { 'ersp' 'itc' 'both' 'ersp&itc' }  'both'}, 'std_ersp', 'ignore');
@@ -396,7 +399,7 @@ if time_range(1) >= time_range(2)
 end
 parameters = { 'cycles', g.cycles, 'padratio', g.padratio,  'winsize', round(g.winsize), ...
                'alpha', g.alpha, 'freqscale', g.freqscale, timefargs{:} };
-if length(g.freqs) >2, parameters = { parameters{:} 'freqs' g.freqs }; end;
+if length(g.freqs)>0, parameters = { parameters{:} 'freqs' g.freqs }; end;
 if strcmpi(g.plot, 'off')
     parameters = { parameters{:} 'plotersp', 'off', 'plotitc', 'off', 'plotphase', 'off' };
 end;
