@@ -190,6 +190,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.97  2007/05/01 21:35:58  arno
+% fix typo
+%
 % Revision 1.96  2007/03/22 23:22:07  toby
 % help2html
 %
@@ -654,26 +657,29 @@ if isstr(filename)
    % handling BESA coordinates
    % -------------------------
    if isfield(eloc, 'sph_theta_besa')
-       if isnumeric(eloc(1).type)
-           disp('BESA format detected ( Theta | Phi )');
-           for index = 1:length(eloc)
-               eloc(index).sph_phi_besa   = eloc(index).labels;
-               eloc(index).sph_theta_besa = eloc(index).type;
-               eloc(index).labels         = '';
-               eloc(index).type           = '';
+       if isfield(eloc, 'type')
+           if isnumeric(eloc(1).type)
+               disp('BESA format detected ( Theta | Phi )');
+               for index = 1:length(eloc)
+                   eloc(index).sph_phi_besa   = eloc(index).labels;
+                   eloc(index).sph_theta_besa = eloc(index).type;
+                   eloc(index).labels         = '';
+                   eloc(index).type           = '';
+               end;
+               eloc = rmfield(eloc, 'labels');
            end;
-           eloc = rmfield(eloc, 'labels');
-       elseif isnumeric(eloc(1).labels)
-           disp('BESA format detected ( Elec | Theta | Phi )');
-           for index = 1:length(eloc)
-               eloc(index).sph_phi_besa   = eloc(index).sph_theta_besa;
-               eloc(index).sph_theta_besa = eloc(index).labels;
-               eloc(index).labels         = eloc(index).type;
-               eloc(index).type           = '';
-               eloc(index).radius         = 1;
-           end;           
-       else
-           disp('BESA format detected ( Type | Elec | Theta | Phi | Radius )');           
+       end;
+       if isfield(eloc, 'labels')       
+           if isnumeric(eloc(1).labels)
+               disp('BESA format detected ( Elec | Theta | Phi )');
+               for index = 1:length(eloc)
+                   eloc(index).sph_phi_besa   = eloc(index).sph_theta_besa;
+                   eloc(index).sph_theta_besa = eloc(index).labels;
+                   eloc(index).labels         = eloc(index).type;
+                   eloc(index).type           = '';
+                   eloc(index).radius         = 1;
+               end;           
+           end;
        end;
        
        try
