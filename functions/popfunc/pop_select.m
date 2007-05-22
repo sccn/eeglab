@@ -94,6 +94,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.61  2006/07/24 20:25:42  toby
+% nothing
+%
 % Revision 1.60  2006/04/18 01:42:16  toby
 % bug fix for selecting time range
 %
@@ -614,6 +617,7 @@ if ~isempty(EEG.icachansind)
     % new channels indices
     % --------------------
     count   = 1;
+    newinds = [];
     for index = 1:length(g.channel)
         if any(EEG.icachansind == g.channel(index))
             newinds(count) = index;
