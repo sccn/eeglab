@@ -83,6 +83,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2007/02/16 20:12:16  scott
+% added electrode(s) for completeness -sm
+%
 % Revision 1.34  2007/02/16 19:55:30  toby
 % error message formatting
 %
@@ -355,13 +358,13 @@ end;
 
 % exclude electrodes
 % ------------------
-rerefchansout = setdiff(rerefchansout, ref);
 if strcmpi(g.keepref, 'on') & length(ref) > 1
     refmatrix(g.exclude,:) = []; % suppress excluded non-EEG channels
     refmatrix(:,g.exclude) = []; % suppress excluded non-EEG channels
 else
     refmatrix([ref g.exclude],:) = []; % suppress references and non-EEG channels
     refmatrix(:,g.exclude      ) = []; % suppress non-EEG channels
+    rerefchansout = setdiff(rerefchansout, ref);
 end;
 
 % rereferencing, there are faster methods
@@ -372,6 +375,8 @@ Elocs = g.elocs;
 if strcmpi(g.keepref, 'off')
     rmchans = setdiff(1:size(data,1), ref);
     data  = data(rmchans,:);
+else
+    rmchans = [];
 end;
 
 data = reshape(data, size(data,1), dim2, dim3);
