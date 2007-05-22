@@ -134,6 +134,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.53  2006/05/23 11:36:13  arno
+% use of readlocs()
+%
 % Revision 1.52  2006/03/11 16:46:14  scott
 % msg text -sm
 %
@@ -312,7 +315,7 @@ if nargin < 2                 % if several arguments, assign values
    % popup window parameters	
    % -----------------------
     geometry    = { [2 3.38] [1] [2.5 1 1.5 1.5] [2.5 1 1.5 1.5] [2.5 1 1.5 1.5] [2.5 1 1.5 1.5] [2.5 1 1.5 1.5] ...
-                    [1] [1.4 0.7 .8 0.5] [1] [1.4 0.7 .8 0.5] [1.4 0.7 .8 0.5] };
+                    [1] [1.4 0.7 .8 0.5] [1] [1.4 0.7 .8 0.5] [1.4 0.7 .8 0.5] [1.4 0.7 .8 0.5] };
     editcomments = [ 'tmp = pop_comments(get(gcbf, ''userdata''), ''Edit comments of current dataset'');' ...
                      'if ~isempty(tmp), set(gcf, ''userdata'', tmp); end; clear tmp;' ];
     commandload = [ '[filename, filepath] = uigetfile(''*'', ''Select a text file'');' ...
@@ -324,6 +327,7 @@ if nargin < 2                 % if several arguments, assign values
                       'if ~isempty(res),' ...
                       '   set(findobj( ''parent'', gcbf, ''tag'', ''weightfile''), ''string'', sprintf(''ALLEEG(%s).icaweights'', res{1}));' ...
                       '   set(findobj( ''parent'', gcbf, ''tag'', ''sphfile'')   , ''string'', sprintf(''ALLEEG(%s).icasphere'' , res{1}));' ...
+                      '   set(findobj( ''parent'', gcbf, ''tag'', ''icainds'')   , ''string'', sprintf(''ALLEEG(%s).icachansind'' , res{1}));' ...
                       'end;' ];
     commandselchan = [ 'res = inputdlg2({ ''Enter dataset number'' }, ''Select channel information from other dataset'', 1, { ''1'' });' ...
                       'if ~isempty(res),' ...
@@ -382,7 +386,12 @@ if nargin < 2                 % if several arguments, assign values
          { 'Style', 'text', 'string', 'ICA sphere array or text/binary file (if any):', 'horizontalalignment', 'right' },  ...
          { 'Style', 'pushbutton' 'string' 'from other dataset' 'callback' commandselica }, ...
          { 'Style', 'edit', 'string', '', 'horizontalalignment', 'left', 'tag',  'sphfile' } ...
-         { 'Style', 'pushbutton', 'string', 'Browse', 'callback', [ 'tagtest = ''sphfile'';' commandload ] } };
+         { 'Style', 'pushbutton', 'string', 'Browse', 'callback', [ 'tagtest = ''sphfile'';' commandload ] } ...
+         ...
+         { 'Style', 'text', 'string', 'ICA channel indices (by default all):', 'horizontalalignment', 'right' },  ...
+         { 'Style', 'pushbutton' 'string' 'from other dataset' 'callback' commandselica }, ...
+         { 'Style', 'edit', 'string', '', 'horizontalalignment', 'left', 'tag',  'icainds' } ...
+         { } };
 
     [ results newcomments ] = inputgui( geometry, uilist, 'pophelp(''pop_editset'');', 'Edit dataset information - pop_editset()', ...
                                          EEG.comments);
@@ -409,6 +418,7 @@ if nargin < 2                 % if several arguments, assign values
 	if ~isempty( results{i+10} ) , args = { args{:}, 'chanlocs' ,  results{i+10} }; end;
 	if ~isempty( results{i+11} ),  args = { args{:}, 'icaweights', results{i+11} }; end;
 	if ~isempty( results{i+12} ) , args = { args{:}, 'icasphere',  results{i+12} }; end;
+	if ~isempty( results{i+12} ) , args = { args{:}, 'icachansind',  results{i+13} }; end;
     
 else % no interactive inputs
     args = varargin;
@@ -515,6 +525,14 @@ for curfield = tmpfields'
                          if ~isempty(EEGOUT.icaweights) & isempty(EEGOUT.icasphere)
                             EEGOUT.icasphere = eye(size(EEGOUT.icaweights,2));
                          end;
+        case 'icachansind', varname = getfield(g, {1}, curfield{1});
+							 if isempty(varname) 
+								 EEGOUT.icachansind = [];
+							 elseif isstr(varname)
+								 EEGOUT.icachansind = evalin('base', varname, 'fprintf(''pop_editset() warning: variable ''''%s'''' not found, ignoring\n'', varname)' );
+                             else
+  								 EEGOUT.icachansind = varname;
+							 end;
         case 'icasphere', varname = getfield(g, {1}, curfield{1});
                          if isstr(varname) & exist( varname ) == 2
                             fprintf('pop_editset(): ICA sphere matrix file ''%s'' found\n', varname); 
