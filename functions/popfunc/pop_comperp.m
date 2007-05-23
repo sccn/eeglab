@@ -88,6 +88,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2006/12/21 21:20:41  toby
+% Possible Bugzilla bug 166 fix
+%
 % Revision 1.35  2006/10/16 14:16:38  scott
 % added axcopy after figure;
 %
@@ -372,7 +375,7 @@ end
 % compute ERPs for add
 % --------------------
 for index = 1:length(datadd)
-    TMPEEG = eeg_checkset(ALLEEG(datadd(index)));
+    TMPEEG = eeg_checkset(ALLEEG(datadd(index)),'loaddata');
     if flag == 1, erp1ind(:,:,index)  = mean(TMPEEG.data,3);
     elseif isempty(TMPEEG.icaact)
         tmpica              =  reshape((TMPEEG.icaweights*TMPEEG.icasphere)*TMPEEG.data(:,:), ...
