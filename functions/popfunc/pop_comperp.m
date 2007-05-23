@@ -88,6 +88,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.37  2007/05/23 00:31:33  toby
+% bug fixed: loads data if using a split .set/.dat format
+%
 % Revision 1.36  2006/12/21 21:20:41  toby
 % Possible Bugzilla bug 166 fix
 %
@@ -402,7 +405,7 @@ if length(datsub) > 0 % dataset to subtract
     % compute ERPs for sub
     % --------------------
     for index = 1:length(datsub)
-        TMPEEG = eeg_checkset(ALLEEG(datsub(index)));
+        TMPEEG = eeg_checkset(ALLEEG(datsub(index)),'loaddata');
         if flag == 1, erp2ind(:,:,index)  = mean(TMPEEG.data,3);
         elseif isempty(TMPEEG.icaact)
             tmpica              =  reshape((TMPEEG.icaweights*TMPEEG.icasphere)*TMPEEG.data(:,:), ...
