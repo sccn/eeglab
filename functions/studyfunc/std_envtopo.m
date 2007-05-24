@@ -210,7 +210,7 @@ for n = 1:Ncond
        val_ind = find(~isnan(clustscalp.scalp{1}(:))); % find non-NAN values
        for k = 1:len
            tmp = clustscalp.scalp{k}(val_ind);
-           projERP = projERP + tmp*clusterp.erp(k,:);
+           projERP = projERP + tmp*clusterp.erp(k);
            fprintf('.'); 
        end
        tot_projERP{cls} = projERP/set_len;
