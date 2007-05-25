@@ -52,6 +52,8 @@
 %
 % See also: envtopo()
 
+% $Log: not supported by cvs2svn $
+
 function std_envtopo(STUDY, ALLEEG, varargin)
 icadefs;
 if nargin < 2
