@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.47  2007/05/25 03:18:26  toby
+% polarity of component assigned by wrong index, causing crashes and incorrect polarity switching.
+%
 % Revision 1.46  2007/05/01 21:17:07  arno
 % clarify help message
 %
@@ -230,7 +233,7 @@ else [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'clusters', opt.clusters,
                 clust = STUDY.cluster(cls);
                 for index = 1:length(clust.erpdata)
                     for comps = 1:size(clust.erpdata{index},2)
-                        clust.erpdata{index}(:,comps) = clust.erpdata{index}(:,comps)*clust.topopol(comp);
+                        clust.erpdata{index}(:,comps) = clust.erpdata{index}(:,comps)*clust.topopol(comps);
                     end;
                 end;
                 STUDY.cluster(cls) = clust;
