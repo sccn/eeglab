@@ -53,6 +53,9 @@
 % See also: envtopo()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2007/05/26 03:37:39  toby
+% diff option now displays all cluster topoplots and title is meaningful
+%
 % Revision 1.13  2007/05/25 03:44:51  toby
 % RCS commenting added
 %
@@ -251,32 +254,11 @@ for n = 1:Ncond
             'dispmaps', 'on', 'title', [ STUDY.condition{n}], p_options{:} );
     end
 
-    %chil = get(gcf, 'Children');
-    %childf(n) = chil(end);
-    %
-    %if n == 1
-    %    ylimits = get(childf(n),'YLim');
-    %else
-    %    tmp = get(childf(n),'YLim');
-    %    ylimits(1) = min(tmp(1),ylimits(1) );
-    %    ylimits(2) = max(tmp(2),ylimits(2) );
-    %end
-
     if exist('diffc')
         if  ~exist('diff_h')
             diff_h = figure;
             orient landscape;
             set(gcf,'Color', BACKCOLOR);
-            %{
-            if length(clus_ind) < 5
-                % maintitle =  ['Cluster : ' clus_ind{:}];
-                maintitle = ['Difference Between Conditions ',diffc(1),' and ',diffc(2),'.']
-            else
-                maintitle =  ['Difference between conditions'];
-            end
-            a = textsc(maintitle, 'title');
-            set(a, 'fontweight', 'bold');
-            %}
         end
         if n == diffc(1)
             figure(diff_h); subplot(3,1,1)
@@ -302,20 +284,13 @@ for n = 1:Ncond
             %plot difference
             figure(diff_h);
             subplot(3,1,3);
-
-            %           if exist('limits')
-            %               p_options{find(strcmpi({p_options{:}},'limits'))+1} = [limits(1:2) limits(3:4)/2];
-            %           end
             envtopo_plot(erp1-erp2,diff_proj,'envmode' ,'avg', 'dispmaps','off',...
                 'title','Difference',p_options{:} );
-
-            %           tmp =  get(gcf, 'Children');
-            %           set(tmp(4),'YLim',ylimits);
-            %           set(tmp(6),'YLim',ylimits);
-
+            
             figure
             if cls == 1
                 envtopo_plot(erp1-erp2,diff_proj,'envmode' ,'avg', 'fillcomp', 1, ...
+                    'title',['Difference Between Conditions ',int2str(diffc(1)),' and ',int2str(diffc(2)),'.'],...
                     'dispmaps', 'on', p_options{:} );
             else
                 envtopo_plot(erp1-erp2,diff_proj,'envmode' ,'avg', 'dispmaps','on',...
