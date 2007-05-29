@@ -1,7 +1,7 @@
 % readegi() - read EGI Simple Binary datafile (versions 2,3,4,5,6,7).
 %	      Return header info, EEG data, and any event data.
 % Usage:
-%   >> [head, TrialData, EventData, CatIndex] = readegi(filename, dataChunks)
+%   >> [head, TrialData, EventData, CatIndex] = readegi(filename, dataChunks, forceversion)
 %
 % Required Input:
 %   filename = EGI data filename
@@ -11,6 +11,9 @@
 %                datafiles) or segments (for segmented files). If this
 %                input is empty or is not provided then all data will be
 %                returned.
+%   forceversion = integer from 2 to 7 which overrides the EGI version read from the
+%                file header.  This has been occasionally necessary in cases where
+%                the file format was incorrectly indicated in the header.
 % Outputs:
 %   head = struct containing header info (see readegihdr() )
 %   TrialData = EEG channel data
@@ -43,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2006/08/04 19:07:01  zhenkun
+% allowing forceversion arg
+%
 % Revision 1.21  2006/08/04 19:06:19  zhenkun
 % added forceversion
 %
@@ -128,7 +134,7 @@ if ~isvector(dataChunks)
 end
 
 [fid,message] = fopen(filename,'rb','b');
-if (fid == 0),
+if (fid < 0),
    error(message);
 end
 
