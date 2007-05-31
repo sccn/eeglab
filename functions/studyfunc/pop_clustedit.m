@@ -157,6 +157,8 @@
 
 % Coding notes: Useful information on functions and global variables used.
 
+% $Log: not supported by cvs2svn $
+
 function [STUDY, com] = pop_clustedit(varargin)
 icadefs;
 if ~isstr(varargin{1})
