@@ -158,6 +158,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.49  2007/05/31 22:27:46  toby
+% Auto-log line added
+%
 
 function [STUDY, com] = pop_clustedit(varargin)
 icadefs;
@@ -592,10 +595,12 @@ else
                     if ~strncmpi('Notclust',STUDY.cluster(cls(k)).name,8) & ~strncmpi('Outliers',STUDY.cluster(cls(k)).name,8) & ...
                             (~strncmpi('ParentCluster',STUDY.cluster(cls(k)).name,13)) 
                         for l = 1: length(STUDY.cluster(cls(k)).comps)
-                            subject = STUDY.datasetinfo(STUDY.cluster(cls(k)).sets(1,l)).subject;   % This line chokes on NaNs. TF 2007.05.31
-                            compid{count} = [ '''' STUDY.cluster(cls(k)).name ''' comp. ' ...
-                                              num2str(l) ' (' subject  ' IC' num2str(STUDY.cluster(cls(k)).comps(l)) ')'];
-                            count = count +1;
+                            if ~isnan(STUDY.cluster(cls(k)).sets(1,l))
+                                subject = STUDY.datasetinfo(STUDY.cluster(cls(k)).sets(1,l)).subject;   % This line chokes on NaNs. TF 2007.05.31
+                                compid{count} = [ '''' STUDY.cluster(cls(k)).name ''' comp. ' ...
+                                    num2str(l) ' (' subject  ' IC' num2str(STUDY.cluster(cls(k)).comps(l)) ')'];
+                                count = count +1;
+                            end
                         end
                     end
                 end
