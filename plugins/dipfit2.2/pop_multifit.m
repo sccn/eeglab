@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2007/06/02 04:22:33  toby
+% dipolefitting.m option 'symmetry' was mispelled as 'symetry'. This may have been the reason dual dipole fitting failed.
+%
 % Revision 1.19  2006/08/28 12:51:33  arno
 % fixed default for 'rmout' option
 %
@@ -173,8 +176,7 @@ function [EEG, com] = pop_multifit(EEG, comps, varargin);
     
     com = [];
     ncomps = size(EEG.icaweights,1);
-    if ncomps == 0, error('you must run ICA first'); end
-   
+    if ncomps == 0, error('you must run ICA first'); end;
 
     if nargin<2
         cb_chans = 'set(findobj(gcbf, ''tag'', ''chans''), ''string'', int2str(pop_chansel({EEG.chanlocs.labels})));';
