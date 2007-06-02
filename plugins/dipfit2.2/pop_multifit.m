@@ -173,7 +173,8 @@ function [EEG, com] = pop_multifit(EEG, comps, varargin);
     
     com = [];
     ncomps = size(EEG.icaweights,1);
-    if ncomps == 0, error('you must run ICA first'); end;
+    if ncomps == 0, error('you must run ICA first'); end
+   
 
     if nargin<2
         cb_chans = 'set(findobj(gcbf, ''tag'', ''chans''), ''string'', int2str(pop_chansel({EEG.chanlocs.labels})));';
