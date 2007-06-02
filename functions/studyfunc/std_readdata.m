@@ -66,6 +66,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2007/05/11 02:09:23  toby
+% bug when ersp/itc of nonexistent component/channel queried fixed (poorly)
+%
 % Revision 1.21  2007/04/05 21:33:31  arno
 % same
 %
@@ -195,12 +198,12 @@ for ind = 1:length(finalinds)
     allinds = cell( nc, ng );
     setinds = cell( nc, ng );
     for indtmp = 1:length(alldatasets)
-
-        index = alldatasets(indtmp);
-        condind = strmatch( STUDY.datasetinfo(index).condition, STUDY.condition, 'exact'); if isempty(condind), condind = 1; end;
-        grpind  = strmatch( STUDY.datasetinfo(index).group    , STUDY.group    , 'exact'); if isempty(grpind) , grpind  = 1; end;
-        indcellarray = length(allinds{condind, grpind})+1;
-
+        if ~isnan(alldatasets(indtmp))
+            index = alldatasets(indtmp);
+            condind = strmatch( STUDY.datasetinfo(index).condition, STUDY.condition, 'exact'); if isempty(condind), condind = 1; end;
+            grpind  = strmatch( STUDY.datasetinfo(index).group    , STUDY.group    , 'exact'); if isempty(grpind) , grpind  = 1; end;
+            indcellarray = length(allinds{condind, grpind})+1;
+        end
         % load data
         % ---------
         tmpind = allchanorcomp(indtmp); 
