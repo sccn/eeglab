@@ -10,7 +10,7 @@
 %
 % Optional inputs:
 %  'dipoles'   - [1|2] use either 1 dipole or 2 dipoles contrain in
-%                symetry. Default is 1.
+%                symmetry. Default is 1.
 %  'dipplot'   - ['on'|'off'] plot dipoles. Default is 'off'.
 %  'plotopt'   - [cell array] dipplot() 'key', 'val' options. Default is
 %                'normlen', 'on', 'image', 'fullmri'
@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2006/08/28 12:51:33  arno
+% fixed default for 'rmout' option
+%
 % Revision 1.18  2006/03/10 23:52:35  arno
 % multiple dipole fit
 %
@@ -263,7 +266,7 @@ function [EEG, com] = pop_multifit(EEG, comps, varargin);
         disp('Scanning terminated. Refining dipole locations...');
     end;
    
-    % set symetry constraint
+    % set symmetry constraint
     % ----------------------
     if strcmpi(EEG.dipfit.coordformat,'MNI')
         defaultconstraint = 'x';
@@ -291,9 +294,9 @@ function [EEG, com] = pop_multifit(EEG, comps, varargin);
             warning backtrace off;
             try,
                 if g.dipoles == 2,
-                    EEG = dipfit_nonlinear(EEG, 'component', i, 'symetry', defaultconstraint);
+                    EEG = dipfit_nonlinear(EEG, 'component', i, 'symmetry', defaultconstraint);
                 else
-                    EEG = dipfit_nonlinear(EEG, 'component', i, 'symetry', []);
+                    EEG = dipfit_nonlinear(EEG, 'component', i, 'symmetry', []);
                 end;
             catch, EEG.dipfit.model(i).rv = NaN; disp('Maximum number of iterations reached. Fitting failed');
             end;
