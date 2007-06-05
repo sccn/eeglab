@@ -5,8 +5,8 @@
 %                                              bootside, condboot, arg1, arg2 ...);
 %
 % Inputs:
-%    formula  - [string] formula to compute a given measure. Takes arguments
-%               'arg1', 'arg2' ... as inputs. e.g.,
+%    formula  - [string or cell array of strings] formula(s) to compute a given measure.
+%               Takes arguments 'arg1', 'arg2' ... and X as inputs. e.g.,
 %        'sum(arg1(:,:,X),3) ./ sqrt(sum(arg2(:,:,X))) ./ sqrt(sum(arg3(:,:,X)))'
 %    naccu    - [integer] number of accumulations of surrogate data. e.g., 200
 %    alpha    - [float] significance level (0<alpha<0.5)
@@ -19,13 +19,18 @@
 %               ('complex'). Either '' or 'complex' leave the formula unchanged; 
 %               'abs' takes its norm before subtraction, and 'angle' normalizes 
 %               each value (to norm 1) before taking the difference.
-%    arg1     - [cell_array] of 2 nD array of values to compare. 
-%               The last dimension of the array is shuffled to accumulate data.
-%    arg2...  - same as arg1
+%    arg1     - [cell_array] of two 1D,2D,or 3D matrices of values to compare. 
+%               The last dimension of the array is shuffled to accumulate data, the
+%               other dimensions must be the same size across matrices.
+%               e.g. size(arg1{1})=[100 200 500], size(arg1{2})=[100 200 395]
+%    arg2     - same as arg1, note that it is compared only to itself, and has
+%               nothing to do with arg1 besides using the same formula, alpha, etc.
+% ...argn     - may call n number of arguement pairs    
 %
 % Outputs: 
-%    diffres  - difference array for the actual (non-shuffled) data
-%    accdres  - result for shuffled data
+%    diffres  - difference array for the actual (non-shuffled) data, if more than one
+%               arg pair is called, format is a cell array of matrices.
+%    accres  -  [cell array of 3D numerical arrays] for shuffled data, one per formula. 
 %    res1     - result for first condition
 %    res2     - result for second condition
 %
@@ -51,6 +56,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2004/07/27 18:33:09  arno
+% *** empty log message ***
+%
 % Revision 1.6  2003/01/02 16:51:38  scott
 % header edits -sm
 %
@@ -110,10 +118,10 @@ end;
 for index=1:length(varargin)
 	tmpvar1 = varargin{index}{1};
 	tmpvar2 = varargin{index}{2};
-	if index == 1
+	if index == 1   % Shouldn't this be recalculated for arg2, etc.? TF 2007.06.04
 		cond1trials = size(tmpvar1,ndims(tmpvar1));
 		cond2trials = size(tmpvar2,ndims(tmpvar2));
-		for tmpi = 1:length(formula)
+		for tmpi = 1:length(formula) 
 			accres{tmpi} = zeros(size(tmpvar1,1), size(tmpvar1,2), naccu);
 		end;
 	end;
@@ -167,7 +175,7 @@ for index = 1:length(formula)
 	end;
 end;
 
-% accumulating (shufling)
+% accumulating (shuffling)
 % -----------------------
 for index=1:naccu
 	if rem(index,10) == 0,  fprintf(' %d',index); end
@@ -187,7 +195,12 @@ for index= 1:length(formula)
     
     % size = nb_points*naccu
     % size = nb_points*naccu*times
-	if ~isreal(accarray)
+	if ~isreal(accarray)    % might want to introduce a warning here: a complex 
+                            % result may not be desirable, and a single complex value
+                            % in accarray could turn this from a 2-tail to 1-tail
+                            % bootstrap test, leading to false positives. Hard to
+                            % think of a meaningful warning though...
+                            % TF 2007.06.04
 		accarray = sqrt(accarray .* conj(accarray)); % faster than abs()
     end;
 	
