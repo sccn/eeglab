@@ -123,6 +123,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.125  2007/06/07 00:57:11  toby
+% Print component sortvar value (pvaf, etc) to screen, bug 398
+%
 % Revision 1.124  2006/12/19 17:00:54  scott
 % fixed unassigned curenv problem in 'sumenv' loop (thanks to Hyuk Oh) Ref: Bug 163 #3
 % shortened line lengths in help nsg
@@ -886,7 +889,7 @@ envdata(:,1:frames) = envelope(g.icawinv(g.plotchans,:)*g.icaact, g.envmode);
 
 fprintf('Data epoch is from %.0f ms to %.0f ms.\n',1000*xmin,1000*xmax);
 fprintf('Plotting data from %.0f ms to %.0f ms.\n',1000*xmin,1000*xmax);
-fprintf('Comparing maximum projections for components:  ');
+fprintf('Comparing maximum projections for components:  \n');
         if ncomps>32
            fprintf('\n');
         end
@@ -958,22 +961,22 @@ for c = 1:ncomps
       %
       if strcmpi(g.sortvar,'mp')  % Maximum Power of backproj
           sortvar(c) = maxval;
-          fprintf('IC%1.0f maximum mean power of back-projection: %f\n',c,sortvar(c));
+          fprintf('IC%1.0f maximum mean power of back-projection: %g\n',c,sortvar(c));
           
       elseif strcmpi(g.sortvar, 'pv')   % Percent Variance
           % toby 2.19.2006: Changed to be consistent with eeg_pvaf().
           sortvar(c) = 100-100*mean(var(data(g.plotchans,limframe1:limframe2)...
                         - proj(g.plotchans,limframe1:limframe2),1))/vardat;
-          fprintf('IC%1.0f percent variance accounted for(pvaf): %f%%\n',c,sortvar(c));
+          fprintf('IC%1.0f percent variance accounted for(pvaf): %2.2f%%\n',c,sortvar(c));
 
       elseif strcmpi(g.sortvar,'pp')    % Percent Power
           sortvar(c) = 100-100*mean(mean((data(g.plotchans,limframe1:limframe2)...
                         - proj(g.plotchans,limframe1:limframe2)).^2))/powdat;
-          fprintf('IC%1.0f percent power accounted for(ppaf): %f%%\n',c,sortvar(c));
+          fprintf('IC%1.0f percent power accounted for(ppaf): %2.2f%%\n',c,sortvar(c));
           
       elseif strcmpi(g.sortvar,'rp')    % Relative Power
           sortvar(c) = 100*mean(mean((proj(g.plotchans,limframe1:limframe2)).^2))/powdat;
-          fprintf('IC%1.0f relative power of back-projection: %f\n',c,sortvar(c));
+          fprintf('IC%1.0f relative power of back-projection: %g\n',c,sortvar(c));
       else
           error('''sortvar'' argument unknown');
       end;
