@@ -123,6 +123,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.124  2006/12/19 17:00:54  scott
+% fixed unassigned curenv problem in 'sumenv' loop (thanks to Hyuk Oh) Ref: Bug 163 #3
+% shortened line lengths in help nsg
+%
 % Revision 1.123  2006/11/07 20:48:33  toby
 % documentation edit
 %
@@ -919,14 +923,8 @@ else
 	powdat = mean(mean(data(g.plotchans,limframe1:limframe2).^2));
 end
 
-for c = 1:ncomps 
-      if ~rem(c,5) 
-          fprintf('%d ... ',g.compnums(c)); % c is index into compnums
-      end
-      if ~rem(c,100)
-        fprintf('\n');
-      end
-
+for c = 1:ncomps
+    
       if isempty(g.icaact) % make the back-projection of component c
 
           % Changed to include all channels in computation for use in 
@@ -960,18 +958,22 @@ for c = 1:ncomps
       %
       if strcmpi(g.sortvar,'mp')  % Maximum Power of backproj
           sortvar(c) = maxval;
+          fprintf('IC%1.0f maximum mean power of back-projection: %f\n',c,sortvar(c));
           
       elseif strcmpi(g.sortvar, 'pv')   % Percent Variance
           % toby 2.19.2006: Changed to be consistent with eeg_pvaf().
           sortvar(c) = 100-100*mean(var(data(g.plotchans,limframe1:limframe2)...
                         - proj(g.plotchans,limframe1:limframe2),1))/vardat;
+          fprintf('IC%1.0f percent variance accounted for(pvaf): %f%%\n',c,sortvar(c));
 
       elseif strcmpi(g.sortvar,'pp')    % Percent Power
           sortvar(c) = 100-100*mean(mean((data(g.plotchans,limframe1:limframe2)...
                         - proj(g.plotchans,limframe1:limframe2)).^2))/powdat;
+          fprintf('IC%1.0f percent power accounted for(ppaf): %f%%\n',c,sortvar(c));
           
       elseif strcmpi(g.sortvar,'rp')    % Relative Power
           sortvar(c) = 100*mean(mean((proj(g.plotchans,limframe1:limframe2)).^2))/powdat;
+          fprintf('IC%1.0f relative power of back-projection: %f\n',c,sortvar(c));
       else
           error('''sortvar'' argument unknown');
       end;
