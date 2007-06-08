@@ -4,7 +4,7 @@
 %                   Called by cluster plotting functions: std_envtopo(), 
 %                   std_erpplot(), std_erspplot(), ...
 % Usage:
-%         >> [STUDY clustinfo] = std_clustread(STUDY, ALLEEG, cluster, infotype);
+%         >> [STUDY clustinfo] = std_clustread(STUDY, ALLEEG, cluster, infotype,varargin);
 % Inputs:
 %         STUDY - studyset structure containing some or all files in ALLEEG
 %        ALLEEG - vector of loaded EEG datasets
@@ -13,6 +13,19 @@
 %                 cluster information to read. May also be a cell array of
 %                 these types, for example: { 'erp' 'map' 'dipole' }.
 %                 ************* 'map' and 'dipole' not implemented yet
+%
+% Optional Key-Value Inputs:
+%   KEY          TYPE   LEGAL_VALUES    DEFAULT_VALUE
+%   'subject'    'cell'    []       {};
+%   'channels'   'cell'    []       {};
+%   'clusters'   'integer' []       [];
+%   'freqrange'  'real'    []       [];
+%   'timerange'  'real'    []       [];
+%   'group'      'cell'    []       {};
+%   'statmode'   'string'  { 'subjects' 'individual' 'common' 'trials' }       'individual';
+%   'subbaseline' 'string'  { 'on' 'off' }       'off';
+%   'rmsubjmean'  'string'  { 'on' 'off' }       'off';
+%   'infotype'   'string'  { 'erp' 'spec' 'ersp' 'itc' } 'erp' }, 'std_readdata');
 %
 % Output:
 %    STUDY     - updated STUDY structure
@@ -66,6 +79,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2007/06/02 03:12:21  toby
+% trying to fix a NaN indexing problem
+%
 % Revision 1.22  2007/05/11 02:09:23  toby
 % bug when ersp/itc of nonexistent component/channel queried fixed (poorly)
 %
@@ -142,8 +158,8 @@ opt = finputcheck( varargin, { 'condition'  'cell'    []       {};
                              'timerange'  'real'    []       [];
                              'group'      'cell'    []       {};
                              'statmode'   'string'  { 'subjects' 'individual' 'common' 'trials' }       'individual';
-                             'subbaseline' 'string'  { 'on' 'off' }       'on';
-                             'rmsubjmean'  'string'  { 'on' 'off' }       'on';
+                             'subbaseline' 'string'  { 'on' 'off' }       'off';
+                             'rmsubjmean'  'string'  { 'on' 'off' }       'off';
                              'infotype'   'string'  { 'erp' 'spec' 'ersp' 'itc' } 'erp' }, 'std_readdata');
 if isstr(opt), error(opt); end;
 if strcmpi(opt.infotype, 'erp'),
@@ -412,8 +428,8 @@ for ind = 1:length(finalinds)
                 % -----------------------------------------------------
                 if strcmpi(opt.subbaseline, 'on') & strcmpi(opt.infotype, 'ersp')
                     disp('Recomputing baseline...');
-                    for g = 1:ng
-                        for c = 1:nc
+                    for g = 1:ng        % ng = number of groups
+                        for c = 1:nc    % nc = number of components
                             if strcmpi(opt.statmode, 'trials')
                                 if c == 1, meanpowbase = abs(mean(erspbase{c,g}/nc,3));
                                 else       meanpowbase = meanpowbase + abs(mean(erspbase{c,g}/nc,3));
