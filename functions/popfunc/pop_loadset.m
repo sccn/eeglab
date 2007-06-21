@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.54  2007/04/06 17:48:02  arno
+% saved to no
+%
 % Revision 1.53  2006/04/19 14:17:57  arno
 % multiple datasets
 %
@@ -252,11 +255,11 @@ else
     % ---------
     filename = fullfile(g.filepath, g.filename);
     fprintf('pop_loadset(): loading file %s ...\n', filename);
-    try
-        TMPVAR = load(filename, '-mat');
-    catch,
-        error([ filename ': file is protected or does not exist' ]);
-    end;
+    %try
+    TMPVAR = load(filename, '-mat');
+    %catch,
+    %    error([ filename ': file is protected or does not exist' ]);
+    %end;
 
     % variable not found
     % ------------------
