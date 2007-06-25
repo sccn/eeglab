@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.41  2007/02/28 12:02:42  arno
+% minor thing
+%
 % Revision 1.39  2006/12/07 22:19:17  arno
 % removing changrp for now
 %
@@ -198,11 +201,14 @@ rmind = [];
 for k = 1:size(setind,2)
     ind_nonnan = find(~isnan(setind(:,k)));
     if isempty(ind_nonnan), rmind = [ rmind k ]; end;
-end;
+end
 setind(:,rmind) = [];
 if ~isequal(setind, STUDY.setind)
     STUDY.setind = setind; modif = 1;
-end;
+end
+if any(isnan(setind))
+    warndlg('STUDY.setind contains NaNs. There must be a dataset for every subject, condition, and group combination or some study functions will fail.');
+end
 
 % set cluster array if empty
 % --------------------------
