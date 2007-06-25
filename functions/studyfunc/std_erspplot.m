@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.47  2007/05/11 02:12:16  toby
+% statatistical mask wasn't plotting
+%
 % Revision 1.46  2007/05/01 21:17:04  arno
 % clarify help message
 %
@@ -336,7 +339,8 @@ for index = 1:length(allinds)
                                        opt.plotmode, 'groupnames', STUDY.group, 'topovals', opt.plottf, 'unitx', 'Hz', ...
                                       'chanlocs', ALLEEG(1).chanlocs, 'plotsubjects', opt.plotsubjects, plotcurveopt{:});
     if length(allinds) > 1, 
-        if isempty(opt.channels), title(sprintf('Cluster %d', allinds(index))); 
+        if isempty(opt.channels), %title(sprintf('Cluster %d', allinds(index)));
+            title([ STUDY.cluster(allinds(index)).name ' (' num2str(length(STUDY.cluster(allinds(index)).comps)),' ICs, '  num2str(length(unique(STUDY.cluster(allinds(index)).sets(1,:)))) ' Ss)' ]);            
         else                      title(sprintf('%s', opt.channels{index}));  
         end;
     end;
