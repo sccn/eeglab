@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 %$Log: not supported by cvs2svn $
+%Revision 1.19  2007/05/01 21:06:58  arno
+%fix plot all cluster centroids
+%
 %Revision 1.18  2007/04/30 19:24:45  arno
 %comments
 %
@@ -284,8 +287,9 @@ if strcmpi(mode, 'together')  % case all clusters are plotted in the same figure
         end
         subplot(rowcols(1),rowcols(2),l) , 
         dipplot(cluster_dip_models, options{:});
-        diptitle = [STUDY.cluster(cls(l)).name ', ' num2str(length(unique(STUDY.cluster(cls(l)).sets(1,:)))) 'Ss'];
-        title(diptitle, 'Color', 'white');
+        title([ STUDY.cluster(cls(l)).name ' (' num2str(length(STUDY.cluster(cls(l)).comps)),' ICs, '  num2str(length(unique(STUDY.cluster(cls(l)).sets(1,:)))) ' Ss)' ],'color','white');
+        %diptitle = [STUDY.cluster(cls(l)).name ', ' num2str(length(unique(STUDY.cluster(cls(l)).sets(1,:)))) 'Ss'];
+        %title(diptitle, 'Color', 'white');
         % Complex axcopy
         %if l == 1
         %    for gind = 1:length(options) % remove the 'gui' 'off' option
