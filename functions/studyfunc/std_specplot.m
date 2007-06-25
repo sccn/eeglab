@@ -88,6 +88,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.43  2007/05/01 21:17:05  arno
+% clarify help message
+%
 % Revision 1.42  2007/04/30 20:52:43  arno
 % header
 %
@@ -297,7 +300,8 @@ else
                       'topovals', opt.topofreq, 'unitx', 'Hz',  'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, ...
                                           'chanlocs', ALLEEG(1).chanlocs, 'plotsubjects', opt.plotsubjects, plotcurveopt{:});
         if length(allinds) > 1, 
-            if isempty(opt.channels), title(sprintf('Cluster %d', allinds(index))); 
+            if isempty(opt.channels), %title(sprintf('Cluster %d', allinds(index)));
+                title([ STUDY.cluster(allinds(index)).name ' (' num2str(length(STUDY.cluster(allinds(index)).comps)),' ICs, '  num2str(length(unique(STUDY.cluster(allinds(index)).sets(1,:)))) ' Ss)' ]);
             else                      title(sprintf('%s', opt.channels{index}));  
             end;
         end;
