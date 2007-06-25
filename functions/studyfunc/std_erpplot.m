@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.48  2007/05/25 03:23:51  toby
+% oops, mispelled the correct index variable
+%
 % Revision 1.47  2007/05/25 03:18:26  toby
 % polarity of component assigned by wrong index, causing crashes and incorrect polarity switching.
 %
@@ -326,7 +329,8 @@ else
                           opt.topotime, 'unitx', 'ms',  'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, ...
                                           'chanlocs', ALLEEG(1).chanlocs, 'plotsubjects', opt.plotsubjects, plotcurveopt{:});
         if length(allinds) > 1, 
-            if isempty(opt.channels), title(sprintf('Cluster %d', allinds(index))); 
+            if isempty(opt.channels), %title(sprintf('Cluster %d', allinds(index))); 
+            title([ STUDY.cluster(allinds(index)).name ' (' num2str(length(STUDY.cluster(allinds(index)).comps)),' ICs, '  num2str(length(unique(STUDY.cluster(allinds(index)).sets(1,:)))) ' Ss)' ]);
             else                      title(sprintf('%s', opt.channels{index}));  
             end;
         end;
