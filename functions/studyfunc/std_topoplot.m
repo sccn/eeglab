@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2007/04/30 21:13:29  arno
+% backward compatibility
+%
 % Revision 1.21  2007/03/14 03:22:32  arno
 % now uses same functions to plot individual components
 %
@@ -170,7 +173,8 @@ if strcmpi(mode, 'apart')
             figure(h_topo)
             sbplot(rowcols(1),rowcols(2),[1 rowcols(2)+2 ]) ,
             toporeplot(ave_grid, 'style', 'both', 'plotrad',0.5,'intrad',0.5, 'verbose', 'off');
-            title([ STUDY.cluster(cls(clus)).name ' average scalp map, ' num2str(length(unique(STUDY.cluster(cls(clus)).sets(1,:)))) 'Ss']);
+            title([ STUDY.cluster(cls(k)).name ' (' num2str(length(STUDY.cluster(cls(k)).comps)),' ICs, '  num2str(length(unique(STUDY.cluster(cls(k)).sets(1,:)))) ' Ss)' ]);
+            %title([ STUDY.cluster(cls(clus)).name ' average scalp map, ' num2str(length(unique(STUDY.cluster(cls(clus)).sets(1,:)))) 'Ss']);
             set(gcf,'Color', BACKCOLOR);
             %waitbar(1,h_wait)
             %delete(h_wait)
@@ -198,7 +202,8 @@ if strcmpi(mode, 'together')
             sbplot(rowcols(1),rowcols(2),k)  
         end
         toporeplot(STUDY.cluster(cls(k)).topo, 'style', 'both', 'plotrad',0.5,'intrad',0.5, 'verbose', 'off');
-        title([ STUDY.cluster(cls(k)).name ', ' num2str(length(unique(STUDY.cluster(cls(k)).sets(1,:)))) 'Ss' ]);
+        title([ STUDY.cluster(cls(k)).name ' (' num2str(length(STUDY.cluster(cls(k)).comps)),' ICs, '  num2str(length(unique(STUDY.cluster(cls(k)).sets(1,:)))) ' Ss)' ]);
+        %title([ STUDY.cluster(cls(k)).name ', ' num2str(length(unique(STUDY.cluster(cls(k)).sets(1,:)))) 'Ss' ]);
         if figureon
             waitbar(k/len,h_wait)
         end
@@ -211,7 +216,8 @@ if strcmpi(mode, 'together')
         a = textsc(maintitle, 'title'); 
         set(a, 'fontweight', 'bold'); 
     else
-        title([ STUDY.cluster(cls(k)).name ' scalp map, ' num2str(length(unique(STUDY.cluster(cls(k)).sets(1,:)))) 'Ss' ]);
+        title([ STUDY.cluster(cls(k)).name ' (' num2str(length(STUDY.cluster(cls(k)).comps)),' ICs, '  num2str(length(unique(STUDY.cluster(cls(k)).sets(1,:)))) ' Ss)' ]);
+        %title([ STUDY.cluster(cls(k)).name ' scalp map, ' num2str(length(unique(STUDY.cluster(cls(k)).sets(1,:)))) 'Ss' ]);
     end
     set(gcf,'Color', BACKCOLOR);
     orient tall
