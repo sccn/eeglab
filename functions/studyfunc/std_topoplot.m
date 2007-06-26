@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2007/06/25 00:34:24  toby
+% title changed to show number of components in cluster average
+%
 % Revision 1.22  2007/04/30 21:13:29  arno
 % backward compatibility
 %
@@ -173,7 +176,7 @@ if strcmpi(mode, 'apart')
             figure(h_topo)
             sbplot(rowcols(1),rowcols(2),[1 rowcols(2)+2 ]) ,
             toporeplot(ave_grid, 'style', 'both', 'plotrad',0.5,'intrad',0.5, 'verbose', 'off');
-            title([ STUDY.cluster(cls(k)).name ' (' num2str(length(STUDY.cluster(cls(k)).comps)),' ICs, '  num2str(length(unique(STUDY.cluster(cls(k)).sets(1,:)))) ' Ss)' ]);
+            title([ STUDY.cluster(cls(clus)).name ' (' num2str(length(STUDY.cluster(cls(clus)).comps)),' ICs, '  num2str(length(unique(STUDY.cluster(cls(clus)).sets(1,:)))) ' Ss)' ]);
             %title([ STUDY.cluster(cls(clus)).name ' average scalp map, ' num2str(length(unique(STUDY.cluster(cls(clus)).sets(1,:)))) 'Ss']);
             set(gcf,'Color', BACKCOLOR);
             %waitbar(1,h_wait)
