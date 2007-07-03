@@ -57,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2007/04/05 23:10:36  arno
+% *** empty log message ***
+%
 % Revision 1.8  2007/04/05 22:25:14  arno
 % typo
 %
@@ -143,22 +146,24 @@ function [ res, params2 ] = std_filecheck(filename, params2, guiflag, ignorefiel
     % --------------
     txt = {};
     for ind = 1:length(allfields)
-        val1 = getfield(params1, allfields{ind});
-        val2 = getfield(params2, allfields{ind});
-        val1str = fastif(isempty(val1), 'not set', vararg2str({val1(1:min(3, length(val1)))}));
-        val2str = fastif(isempty(val2), 'not set', vararg2str({val2(1:min(3, length(val2)))}));
-        
-        tmptxt = sprintf('        ''%s'' is %s in the file (vs. %s)', allfields{ind}, val1str, val2str);
-        if length(val1) ~= length(val2)
-            res        = 'different';
-            txt{end+1} = tmptxt;
-        elseif any(val1 ~= val2)
-            if ~isnan(val1) & ~isnan(val2)
+        if ~strcmp(allfields{ind},'baseline')
+            val1 = getfield(params1, allfields{ind});
+            val2 = getfield(params2, allfields{ind});
+            val1str = fastif(isempty(val1), 'not set', vararg2str({val1(1:min(3, length(val1)))}));
+            val2str = fastif(isempty(val2), 'not set', vararg2str({val2(1:min(3, length(val2)))}));
+
+            tmptxt = sprintf('        ''%s'' is %s in the file (vs. %s)', allfields{ind}, val1str, val2str);
+            if length(val1) ~= length(val2)
                 res        = 'different';
                 txt{end+1} = tmptxt;
-            end;
-        end;
-    end;
+            elseif any(val1 ~= val2)
+                if ~isnan(val1) & ~isnan(val2)
+                    res        = 'different';
+                    txt{end+1} = tmptxt;
+                end
+            end
+        end
+    end
             
     % build gui or return
     % -------------------
