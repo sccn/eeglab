@@ -73,8 +73,8 @@
 %   "Window center (ms)" - [edit box] erpimage() equivalent: 1st 'phasesort' input
 %   "Percent low-amp. trials to ignore" - [edit box] erpimage() equivalent: 
 %                 2nd 'phasesort' input 
-%   "Wavelet cycle" - [text] Number of wavelet cycles used for spectral 
-%                 decomposition at the specified latency. Cannot be edited.
+%   "Wavelet cycles" - [text] Number of wavelet cycles used for spectral decomposition 
+%                 at the specified latency. To change this, see "More options" {default: 3}
 %   "Inter-trial coherence options > Frequency" - [edit box] Frequency at which  
 %                 to compute coherence. Constrained to be the same as the 
 %                 "Sort by phase > Frequency" edit box. erpimage() equivalent: 'coher' 
@@ -171,6 +171,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.133  2007/02/05 16:19:50  arno
+% correct forwarding of 'auxvar' parameter
+%
 % Revision 1.132  2006/11/07 02:52:15  arno
 % same
 %
@@ -641,7 +644,7 @@ if popup
                'in the data within the range [minHz,maxHz]' 10 '(overrides frequency specified in ''coher'' flag)']  } ...
 			   { 'Style', 'text', 'string', 'Percent low-amp. trials to ignore', 'tooltipstring', ['percent of trials to reject for low' ...
 			    'amplitude. Else,' 10 'if prct is in the range [-100,0] -> percent to reject for high amplitude'] } ...
-			   { 'Style', 'text', 'string', 'Window center (ms)', 'tooltipstring', 'Ending time fo the 3 cycle window'  } ...
+			   { 'Style', 'text', 'string', 'Window center (ms)', 'tooltipstring', 'Center time of the n-cycle window'  } ...
 			   { 'Style', 'text', 'string', 'Wavelet cycles', 'tooltipstring', 'cycles per wavelet window'  } {}...
 			   { 'Style', 'edit', 'string', getkeyval(lastcom, 'phasesort', [3:4]), 'tag', 'phase', 'callback', commandphase } ...
 			   { 'Style', 'edit', 'string', getkeyval(lastcom, 'phasesort', [2]), 'tag', 'phase2' } ...
