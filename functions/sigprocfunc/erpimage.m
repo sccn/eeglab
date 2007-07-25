@@ -206,6 +206,9 @@
 
 %% LOG COMMENTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % $Log: not supported by cvs2svn $
+% Revision 1.272  2007/05/10 03:44:26  toby
+% doc edit related to eeg_getepochevent.m changes
+%
 % Revision 1.271  2007/03/05 21:38:14  toby
 % Changed reference to deprecated function eventlock.m to eegalign.m
 %
@@ -1078,7 +1081,7 @@ YEXPAND = 1.3;      % expansion factor for y-axis about erp, amp data limits
 
 DEFAULT_AVEWIDTH  = 1; % smooth trials with this window size by default
 DEFAULT_DECFACTOR = 1; % decimate by this factor by default
-DEFAULT_CYCLES    = 5; % use this many cycles in amp,coher computation window
+DEFAULT_CYCLES    = 3; % use this many cycles in amp,coher computation window
 cycles = DEFAULT_CYCLES;
 DEFAULT_CBAR      = NO;% do not plot color bar by default
 DEFAULT_PHARGS = [0 25 8 13]; % Default arguments for phase sorting
