@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2007/03/14 03:15:18  arno
+% inverting scalp map polarity
+%
 % Revision 1.2  2007/03/14 02:59:55  arno
 % reorganizaing code
 %
@@ -79,23 +82,25 @@ for clust = 1:length(clsind) %go over all requested clusters
         for k = 1:numitems % go through all components
             comp  = STUDY.cluster(clsind(clust)).comps(k);
             abset = STUDY.cluster(clsind(clust)).sets(cond,k);
-            [grid yi xi] = std_readtopo(ALLEEG, abset, comp);
-            if ~isfield(centroid{clust}, 'topotmp')
-                centroid{clust}.topotmp = zeros([ size(grid(1:4:end),2) numitems ]);
-            elseif isempty(centroid{clust}.topotmp)
-                centroid{clust}.topotmp = zeros([ size(grid(1:4:end),2) numitems ]);
-            end;
-            centroid{clust}.topotmp(:,k) = grid(1:4:end); % for inversion
-            centroid{clust}.topo{k} = grid;
-            centroid{clust}.topox = xi;
-            centroid{clust}.topoy = yi;
-        end;
+            if ~isnan(comp) & ~isnan(abset)
+                [grid yi xi] = std_readtopo(ALLEEG, abset, comp);
+                if ~isfield(centroid{clust}, 'topotmp')
+                    centroid{clust}.topotmp = zeros([ size(grid(1:4:end),2) numitems ]);
+                elseif isempty(centroid{clust}.topotmp)
+                    centroid{clust}.topotmp = zeros([ size(grid(1:4:end),2) numitems ]);
+                end;
+                centroid{clust}.topotmp(:,k) = grid(1:4:end); % for inversion
+                centroid{clust}.topo{k} = grid;
+                centroid{clust}.topox = xi;
+                centroid{clust}.topoy = yi;
+            end
+        end
         fprintf('\n');
 
         %update STUDY
         tmpinds = find(isnan(centroid{clust}.topotmp(:,1)));
-        centroid{clust}.topotmp(tmpinds,:) = [];
-        for clust =  1:length(clsind) %go over all requested clusters
+        %centroid{clust}.topotmp(tmpinds,:) = [];
+        %for clust =  1:length(clsind) %go over all requested clusters
             for cond  = 1
                 if clsind(1) > 0
                     ncomp = length(STUDY.cluster(clsind(clust)).comps);
@@ -116,7 +121,7 @@ for clust = 1:length(clsind) %go over all requested clusters
                 STUDY.cluster(clsind(clust)).topo    = allscalp;
                 STUDY.cluster(clsind(clust)).topopol = pol;
             end
-        end
+        %end
 
     end;
     

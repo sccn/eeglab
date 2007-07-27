@@ -4,7 +4,7 @@
 %                   Called by cluster plotting functions: std_envtopo(), 
 %                   std_erpplot(), std_erspplot(), ...
 % Usage:
-%         >> [STUDY clustinfo] = std_clustread(STUDY, ALLEEG, cluster, infotype,varargin);
+%         >> [STUDY clustinfo, finalinds] = std_clustread(STUDY, ALLEEG, cluster, infotype,varargin);
 % Inputs:
 %         STUDY - studyset structure containing some or all files in ALLEEG
 %        ALLEEG - vector of loaded EEG datasets
@@ -54,6 +54,8 @@
 %
 %         clustinfo.dipole      % array of component dipole information structs
 %                               % with same format as EEG.dipfit.model
+%
+%   finalinds - either the cluster(s) or channel(s) indices selected.
 % Example:
 %         % To obtain the ERPs for all Cluster-3 components from a STUDY
 %         %
@@ -79,6 +81,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2007/06/08 20:10:41  toby
+% Help updated to state optional inputs and the default values. 'subbaseline' and 'rmsubmean' defaults reset to 'off' because they were causing crashes with some studies. It was not clear how they were intended to function, so I did not fix them.
+%
 % Revision 1.23  2007/06/02 03:12:21  toby
 % trying to fix a NaN indexing problem
 %
