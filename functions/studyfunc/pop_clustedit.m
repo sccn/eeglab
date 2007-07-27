@@ -158,6 +158,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.50  2007/06/02 02:57:43  toby
+% NaN choke bug
+%
 % Revision 1.49  2007/05/31 22:27:46  toby
 % Auto-log line added
 %
@@ -578,9 +581,11 @@ else
                 compid = cell(len+1,1);
                 compid{1} = 'All components';
                 % Convert from components numbering to the indexing form 'setXcomY'
-                for l = 1:len % go over the components of the cluster
-                    subject = STUDY.datasetinfo(STUDY.cluster(cls(cind-1)).sets(1,l)).subject;
-                    compid{l+1} = [  subject ' IC' num2str(STUDY.cluster(cls(cind-1)).comps(1,l)) ];
+                for l = 1:len % go over the components of the cluster 
+                    if ~isnan(STUDY.cluster(cls(cind-1)).sets(1,l))
+                        subject = STUDY.datasetinfo(STUDY.cluster(cls(cind-1)).sets(1,l)).subject;
+                        compid{l+1} = [  subject ' IC' num2str(STUDY.cluster(cls(cind-1)).comps(1,l)) ];
+                    end
                 end
                 if isfield(STUDY.cluster, 'selected')
                     if ~isempty(STUDY.cluster(cls(cind-1)).selected)

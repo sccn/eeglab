@@ -69,6 +69,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.52  2007/05/01 23:33:11  arno
+% typo
+%
 % Revision 1.51  2006/05/20 18:42:11  arno
 % fix remove dataset
 %
@@ -323,7 +326,7 @@ elseif strcmpi(mode, 'gui') % GUI mode
     % -----------------
     for index = 1:10
         guigeom = { guigeom{:} [0.2 1 0.2 0.5 0.2 0.5 0.5 0.5 0.3] };
-        select_com = ['[inputname, inputpath] = uigetfile2(''*.set*;*.SET*'', ''Choose dataset to add to STUDY -- pop_study()'');'...
+        select_com = ['[inputname, inputpath] = uigetfile2(''*.set;*.SET'', ''Choose dataset to add to STUDY -- pop_study()'');'...
                       'if inputname ~= 0,' ...
                       '   guiind = findobj(''parent'', gcbf, ''tag'', ''set' int2str(index) ''');' ...
                       '   set( guiind,''string'', [inputpath inputname]);' ...
