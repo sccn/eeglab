@@ -150,6 +150,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.211  2007/03/21 22:47:05  arno
+% computation of ica matrix, all matrices converted to double
+%
 % Revision 1.210  2007/03/08 02:55:14  toby
 % Documentation edit
 % Bug Fix courtesy Sebastian Jentschke
@@ -1171,6 +1174,7 @@ if ~isempty( varargin)
                       valfield = allfieldvals( EEG.epoch(trial).event );
                       if ~isempty(valfield) & strcmp(eventfields{fieldnum}, 'latency')
                           valfield = eeg_point2lat([ valfield{:} ] ,trial,EEG.srate, [EEG.xmin EEG.xmax]*1000, 1E-3);
+                          valfield = round( valfield * 10^8 )/10^8;
                           valfield = mattocell(valfield);
                       end;
                       if ~isempty(valfield) & strcmp(eventfields{fieldnum}, 'duration')
