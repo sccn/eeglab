@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2007/03/06 17:39:50  arno
+% fix comments
+%
 % Revision 1.8  2007/03/05 18:52:23  arno
 % fixed error message
 %
@@ -230,9 +233,14 @@ for sweep = 1:nsweeps
 						for elec = 1:chan
 							buf(elec, :) = (buf(elec, :)-baseline(elec)-0.0)*factor(elec);
 						end;
-						signal(:,[((count_selected-1)*pnts+1):count_selected*pnts]) = buf;
-						count_selected = count_selected + 1;
-						if not(mod(count_selected,10)) fprintf('%d sweeps selected out of %d\n', count_selected-1, sweep); end;
+                        try
+                            signal(:,[((count_selected-1)*pnts+1):count_selected*pnts]) = buf;
+                            count_selected = count_selected + 1;
+                            if not(mod(count_selected,10)) fprintf('%d sweeps selected out of %d\n', count_selected-1, sweep); end;
+                        catch,
+                            disp('Warning: file truncated, abording reading');
+                            sweeps = nsweeps;
+                        end;
 					end;
 				end;
 			end;
