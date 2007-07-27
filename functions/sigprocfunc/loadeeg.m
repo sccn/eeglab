@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2007/07/27 21:19:27  arno
+% same
+%
 % Revision 1.10  2007/07/27 21:18:22  arno
 % truncated file
 %
@@ -242,7 +245,8 @@ for sweep = 1:nsweeps
                             if not(mod(count_selected,10)) fprintf('%d sweeps selected out of %d\n', count_selected-1, sweep); end;
                         catch,
                             disp('Warning: file truncated, abording reading');
-                            sweeps = nsweeps+1;
+                            count_selected = count_selected + 1;
+                            break;
                         end;
 					end;
 				end;
