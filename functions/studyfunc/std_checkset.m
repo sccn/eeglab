@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.42  2007/06/25 07:42:57  toby
+% added warning if NaNs in STUDY.setind
+%
 % Revision 1.41  2007/02/28 12:02:42  arno
 % minor thing
 %
@@ -119,27 +122,26 @@ if ~isequal(STUDY.session,   session  ), STUDY.session   = session;   modif = 1;
 notsameica = [];
 if ~isempty(STUDY.datasetinfo(1).index)
     for is = 1:length(STUDY.subject)
-        alldats = strmatch(STUDY.subject{is}, { STUDY.datasetinfo.subject });
+        alldats = strmatch(STUDY.subject{is}, { STUDY.datasetinfo.subject }, 'exact');
 
         for ig = 1:length(STUDY.group)
-            tmpind  = strmatch(STUDY.group{ig}, { STUDY.datasetinfo(alldats).group });
+            tmpind  = strmatch(STUDY.group{ig}, { STUDY.datasetinfo(alldats).group }, 'exact');
             tmpdats = alldats(tmpind);
             try nc = size(ALLEEG(STUDY.datasetinfo(tmpdats(1)).index).icaweights,1);
             catch nc = [];
             end
             for ir = 2:length(tmpdats)
                 if nc ~= size(ALLEEG(STUDY.datasetinfo(tmpdats(ir)).index).icaweights,1)
-                    notsameica = [ 1 tmpdats(1) tmpdats(ir) ];
+                    notsameica = [ notsameica; tmpdats(1) tmpdats(ir) ];
                 end;
             end;
         end;
     end;
 end;
 if ~isempty(notsameica)
-    %disp('Different ICA decompositions have been found for the same')
-    %disp('subject in two conditions. if the data were recorded at the')
-    %disp('same time, it is best to have run ICA on both datasets
-    %simultanously.')
+    disp('Different ICA decompositions have been found for the same')
+    disp('subject in two conditions. if the data were recorded at the')
+    disp('same time, it is best to have run ICA on both datasets simultanously.')
     setind = [1:length(STUDY.datasetinfo)];
     if ~isequal(STUDY.setind, setind)
         STUDY.setind = setind; modif = 1;
