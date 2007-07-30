@@ -34,6 +34,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2007/01/26 18:04:08  arno
+% backup code at the end
+%
 % Revision 1.4  2006/12/08 19:41:51  arno
 % same
 %
@@ -83,13 +86,15 @@ function changrp = std_chanlookup( STUDY, ALLEEG, changrp);
     for ir = 1:size(STUDY.setind,1)
         for ic = 1:size(STUDY.setind,2)
             datind  = STUDY.setind(ir,ic);
-            tmplocs = { ALLEEG(STUDY.datasetinfo(datind).index).chanlocs.labels };
-
-            for indc = 1:length(changrp.channels)
-                ind = strmatch( changrp.channels(indc), tmplocs, 'exact');
-                if length(ind) > 1, error([ 'Duplicate channel label ''' tmplocs{ind(1)} ''' for dataset ' int2str(datind) ]); end;
-                if ~isempty(ind)
-                    changrp.chaninds(ir,ic) = ind;
+            if ~isnan(datind)
+                tmplocs = { ALLEEG(STUDY.datasetinfo(datind).index).chanlocs.labels };
+                
+                for indc = 1:length(changrp.channels)
+                    ind = strmatch( changrp.channels(indc), tmplocs, 'exact');
+                    if length(ind) > 1, error([ 'Duplicate channel label ''' tmplocs{ind(1)} ''' for dataset ' int2str(datind) ]); end;
+                    if ~isempty(ind)
+                        changrp.chaninds(ir,ic) = ind;
+                    end;
                 end;
             end;
         end;    
