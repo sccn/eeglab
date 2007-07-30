@@ -96,6 +96,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2007/05/11 03:11:36  toby
+% bug when plotting 'threshold' with more than one dataset fixed
+%
 % Revision 1.5  2007/04/06 01:18:16  arno
 % frequency scaling
 %
@@ -246,10 +249,6 @@ if strcmpi(opt.plotsubjects, 'on')
     opt.plotgroups = 'apart';
     opt.plotconditions  = 'apart';
 end
-if ~isnan(opt.threshold) & length(data) > 1,
-    opt.condstats = 'on';
-    opt.groupstats = 'on';
-end
 onecol  = { 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b' };
 manycol = { 'b' 'r' 'g' 'k' 'c' 'y' };
 
@@ -323,12 +322,11 @@ if ~isempty(opt.topovals)
     end;
 end
 
+[pcond pgroup pinter] = std_stat(data, 'statistics',  opt.statistics, 'naccu', opt.naccu, ...
+                                 'groupstats', opt.groupstats, 'condstats', opt.condstats);
 if ~isnan(opt.threshold)
     % compute significance mask
     % --------------------------
-    [pcond pgroup pinter] = std_stat(data, ...
-        'statistics',  opt.statistics, 'naccu', opt.naccu, 'groupstats', opt.groupstats, ...
-        'condstats', opt.condstats);
     if ~isempty(pinter), pinter = pinter{3}; end;
     % applying threshold
     % ------------------
