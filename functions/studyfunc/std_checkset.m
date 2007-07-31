@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.43  2007/07/30 22:20:38  arno
+% *** empty log message ***
+%
 % Revision 1.42  2007/06/25 07:42:57  toby
 % added warning if NaNs in STUDY.setind
 %
@@ -140,8 +143,8 @@ if ~isempty(STUDY.datasetinfo(1).index)
 end;
 if ~isempty(notsameica)
     disp('Different ICA decompositions have been found for the same')
-    disp('subject in two conditions. if the data were recorded at the')
-    disp('same time, it is best to have run ICA on both datasets simultanously.')
+    disp('subject in two conditions. if the data were recorded in the')
+    disp('same session, it might be best to run ICA on both datasets simultanously.')
     setind = [1:length(STUDY.datasetinfo)];
     if ~isequal(STUDY.setind, setind)
         STUDY.setind = setind; modif = 1;
