@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.508  2007/08/01 23:25:51  arno
+% automatic epoch rejection
+%
 % Revision 1.507  2007/05/04 18:07:21  arno
 % allow to run newtimef and newcrossf on continuous data
 %
@@ -2126,10 +2129,10 @@ catchstrs.new_non_empty          = e_newset;
 	uimenu( tools_m, 'Label', 'Reject continuous data by eye'         , 'CallBack', cb_eegplot);
 	uimenu( tools_m, 'Label', 'Extract epochs'                        , 'CallBack', cb_epoch, 'Separator', 'on');
 	uimenu( tools_m, 'Label', 'Remove baseline'                       , 'CallBack', cb_rmbase);
-	uimenu( tools_m, 'Label', 'Automatic epoch rejection'             , 'CallBack', cb_autorej, 'Separator', 'on');
-	rej_m1 = uimenu( tools_m, 'Label', 'Reject data epochs');
 	uimenu( tools_m, 'Label', 'Run ICA'                               , 'CallBack', cb_runica, 'foregroundcolor', 'b', 'Separator', 'on');
 	uimenu( tools_m, 'Label', 'Remove components'                     , 'CallBack', cb_subcomp);
+	uimenu( tools_m, 'Label', 'Automatic epoch rejection'             , 'CallBack', cb_autorej, 'Separator', 'on');
+	rej_m1 = uimenu( tools_m, 'Label', 'Reject data epochs');
 	rej_m2 = uimenu( tools_m, 'Label', 'Reject data using ICA');
 
 	uimenu( rej_m1, 'Label', 'Reject data (all methods)'              , 'CallBack', cb_rejmenu1);
@@ -2310,7 +2313,7 @@ catchstrs.new_non_empty          = e_newset;
     exportsub_m = findobj('parent', exportm);
     filter_m    = findobj('parent', filter_m);
     icadefs; % containing PLUGINMENUCOLOR
-    if length(fourthsub_m) > 10, set(fourthsub_m(1:end-10), 'foregroundcolor', PLUGINMENUCOLOR); end;
+    if length(fourthsub_m) > 11, set(fourthsub_m(1:end-11), 'foregroundcolor', PLUGINMENUCOLOR); end;
     if length(plotsub_m)   > 17, set(plotsub_m  (1:end-17), 'foregroundcolor', PLUGINMENUCOLOR); end;
     if length(importsub_m) > 8,  set(importsub_m(1:end-8) , 'foregroundcolor', PLUGINMENUCOLOR); end;
     if length(epochsub_m ) > 2 , set(epochsub_m (1:end-2 ), 'foregroundcolor', PLUGINMENUCOLOR); end;
