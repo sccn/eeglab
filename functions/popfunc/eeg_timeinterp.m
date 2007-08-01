@@ -1,7 +1,9 @@
-% eeg_splineinterp() - import a BCI2000 ascii file into EEGLAB
+% eeg_timeinterp() - perform spline interpolation of a portion
+%                    of data based on prior and post activity. See
+%                    eeg_interp() for interpolation of bad channels.
 %
 % Usage:
-%   >> OUTEEG = eeg_splineinterp( INEEG, samples, 'key', 'val');
+%   >> OUTEEG = eeg_timeinterp( INEEG, samples, 'key', 'val');
 %
 % Inputs:
 %   INEEG       - input EEG structure
@@ -42,18 +44,21 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2007/08/01 18:54:46  arno
+% Initial revision
+%
 
-function EEG = eeg_splineinterp( EEG, samples, varargin);
+function EEG = eeg_timeinterp( EEG, samples, varargin);
 
     if nargin < 2
-        help eeg_splineinterp;
+        help eeg_timeinterp;
         return;
     end;
     
     opt = finputcheck(varargin, { 'epochinds'   'integer'   []       [1:EEG.trials]; ...
                                   'interpwin'   'integer'   []       5; ...
                                   'elecinds'    'integer'   []       [1:EEG.nbchan]; ...
-                                  'epochcont'   'string'    { 'on' 'off' }  'off' }, 'eeg_splineinterp');
+                                  'epochcont'   'string'    { 'on' 'off' }  'off' }, 'eeg_timeinterp');
 
     if isstr(opt), error(opt); end;
     
