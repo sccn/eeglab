@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.76  2007/05/03 02:46:10  toby
+% Only compute rank of double-precision data if data is double precision
+%
 % Revision 1.75  2007/03/22 18:59:12  arno
 % conversion to double
 %
@@ -399,7 +402,7 @@ if nargin < 2
         options = { options{:} 'concatcond'  fastif(result{5}, 'on', 'off') };
     end;
 else 
-    if ~strcmpi(varargin{1}, 'icatype')
+    if mod(length(varargin{1}),2) == 1
         options = { 'icatype' varargin{1:end} };
     else
         options = varargin;
