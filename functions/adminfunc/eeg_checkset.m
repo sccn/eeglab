@@ -150,6 +150,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.212  2007/07/27 23:09:16  arno
+% rounding durations
+%
 % Revision 1.211  2007/03/21 22:47:05  arno
 % computation of ica matrix, all matrices converted to double
 %
@@ -800,7 +803,7 @@
 function [EEG, res] = eeg_checkset( EEG, varargin );
 msg = '';
 res = 0; % 0 = OK, 1 = error, -1=warning
-com = sprintf('%s = eeg_checkset( %s );', inputname(1), inputname(1));
+com = sprintf('EEG = eeg_checkset( EEG );');
 
 if nargin < 1
     help eeg_checkset;
