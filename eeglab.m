@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.507  2007/05/04 18:07:21  arno
+% allow to run newtimef and newcrossf on continuous data
+%
 % Revision 1.506  2007/04/30 21:59:24  arno
 % back to no fontname (for windows compatibility
 %
@@ -1968,9 +1971,10 @@ catchstrs.new_non_empty          = e_newset;
 	cb_reref       = [ check      '[EEG LASTCOM] = pop_reref(EEG);'    e_newset];
 	cb_eegplot     = [ checkcont  '[LASTCOM] = pop_eegplot(EEG, 1);'      e_hist];
 	cb_epoch       = [ check      '[EEG tmp LASTCOM] = pop_epoch(EEG); clear tmp;' e_newset check '[EEG LASTCOM] = pop_rmbase(EEG);' e_store];
-	cb_rmbase      = [ check      '[EEG LASTCOM]    = pop_rmbase(EEG);'   e_store];
-	cb_runica      = [ check      '[EEG LASTCOM]    = pop_runica(EEG);'   e_store];
+	cb_rmbase      = [ check      '[EEG LASTCOM] = pop_rmbase(EEG);'   e_store];
+	cb_runica      = [ check      '[EEG LASTCOM] = pop_runica(EEG);'   e_store];
 	cb_subcomp     = [ checkica   '[EEG LASTCOM] = pop_subcomp(EEG);'  e_newset];
+	cb_autorej     = [ check      '[EEG LASTCOM] = pop_autorej(EEG);'  e_newset];
 
 	cb_rejmenu1    = [ check      'pop_rejmenu(EEG, 1); LASTCOM = '''';'    e_hist];
 	cb_eegplotrej1 = [ check      '[LASTCOM] = pop_eegplot(EEG, 1);'        e_hist];
@@ -2122,6 +2126,7 @@ catchstrs.new_non_empty          = e_newset;
 	uimenu( tools_m, 'Label', 'Reject continuous data by eye'         , 'CallBack', cb_eegplot);
 	uimenu( tools_m, 'Label', 'Extract epochs'                        , 'CallBack', cb_epoch, 'Separator', 'on');
 	uimenu( tools_m, 'Label', 'Remove baseline'                       , 'CallBack', cb_rmbase);
+	uimenu( tools_m, 'Label', 'Automatic epoch rejection'             , 'CallBack', cb_autorej, 'Separator', 'on');
 	rej_m1 = uimenu( tools_m, 'Label', 'Reject data epochs');
 	uimenu( tools_m, 'Label', 'Run ICA'                               , 'CallBack', cb_runica, 'foregroundcolor', 'b', 'Separator', 'on');
 	uimenu( tools_m, 'Label', 'Remove components'                     , 'CallBack', cb_subcomp);
