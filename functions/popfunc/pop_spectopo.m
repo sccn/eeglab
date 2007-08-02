@@ -100,6 +100,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.46  2006/07/28 02:35:27  toby
+% nothing changed
+%
 % Revision 1.45  2005/05/24 17:23:12  arno
 % remove cell2mat
 %
@@ -387,7 +390,7 @@ else
 	spectopooptions = options;
 end;
 if ~dataflag
-    spectopooptions  = [ spectopooptions ', ''icawinv'', EEG.icawinv' ];
+    spectopooptions  = [ spectopooptions ', ''icawinv'', EEG.icawinv, ''icachaninds'', EEG.icachaninds' ];
 end;
 
 % The programming here is a bit redundant but it tries to optimize 
