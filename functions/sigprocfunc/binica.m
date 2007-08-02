@@ -74,6 +74,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2007/05/19 01:36:56  toby
+% multiple copies of binica bug, fix courtesy Nima Bigdely
+%
 % Revision 1.19  2006/11/07 02:37:18  arno
 % add third dim compatibility
 %
@@ -199,7 +202,11 @@ if ~isstr(data) % data variable given
   nchans = size(data,1);
   nframes = size(data,2);
   tmpdata = ['binica' tmpint '.fdt'];
-  floatwrite(data,tmpdata);
+  if strcmpi(computer, 'MAC')
+      floatwrite(data,tmpdata,'ieee-be');
+  else
+      floatwrite(data,tmpdata);
+  end;
   datafile = tmpdata;
   firstarg = 2;
 
@@ -311,7 +318,11 @@ end
 if exist('wtsin') % specify WeightsInfile from 'weightsin' flag, arg
      if exist('wtsin') == 1 % variable
        winfn = [pwd '/binica' tmpint '.inwts'];
-       floatwrite(wtsin,winfn);
+       if strcmpi(computer, 'MAC')
+           floatwrite(wtsin,winfn,'ieee-be');
+       else
+           floatwrite(wtsin,winfn);
+       end;
        fprintf('   saving input weights:\n  ');
        weightsinfile = winfn; % weights in file name
      elseif exist(wtsin) == 2 % file
