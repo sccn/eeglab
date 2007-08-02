@@ -74,6 +74,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2007/08/02 23:41:17  arno
+% fix for MAC
+%
 % Revision 1.20  2007/05/19 01:36:56  toby
 % multiple copies of binica bug, fix courtesy Nima Bigdely
 %
@@ -362,12 +365,17 @@ if ~exist('ncomps')
   ncomps = nchans;
 end
 
-wts = floatread(weightsfile,[ncomps Inf],[],0);
+if strcmpi(computer, 'MAC')
+    wts = floatread(weightsfile,[ncomps Inf],'ieee-be',0);
+    sph = floatread(spherefile,[nchans Inf],'ieee-be',0);
+else
+    wts = floatread(weightsfile,[ncomps Inf],[],0);
+    sph = floatread(spherefile,[nchans Inf],[],0);
+end;    
 if isempty(wts)
    fprintf('\nbinica(): weight matrix not read.\n')
    return
 end
-sph = floatread(spherefile,[nchans Inf],[],0);
 if isempty(sph)
    fprintf('\nbinica():  sphere matrix not read.\n')
    return
