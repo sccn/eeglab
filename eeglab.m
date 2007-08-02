@@ -189,6 +189,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.509  2007/08/01 23:29:37  arno
+% same
+% /.
+%
 % Revision 1.508  2007/08/01 23:25:51  arno
 % automatic epoch rejection
 %
@@ -2076,6 +2080,7 @@ catchstrs.new_non_empty          = e_newset;
     % ------------
     if biosigflag
         uimenu( neuro_m, 'Label', 'From Biosemi .BDF file using BIOSIG', 'CallBack', cb_biosig, 'Separator', 'on'); 
+        uimenu( neuro_m, 'Label', 'From EDF files using BIOSIG', 'CallBack'        , cb_biosig); 
         uimenu( neuro_m, 'Label', 'From other formats using BIOSIG'    , 'CallBack', cb_biosig); 
     end;
     
