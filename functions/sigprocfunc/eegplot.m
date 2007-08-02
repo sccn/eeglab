@@ -165,6 +165,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.120  2007/08/02 22:54:41  arno
+% movebutton optional input
+%
 % Revision 1.119  2007/05/07 23:27:52  arno
 % motioncapture option
 %
@@ -644,7 +647,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
       case {'spacing', 'srate' 'eloc_file' 'winlength' 'position' 'title' ...
                'trialstag'  'winrej' 'command' 'tag' 'xgrid' 'ygrid' 'color' 'colmodif'...
                'freqlimits' 'motioncapture' 'submean' 'children' 'limits' 'dispchans' 'wincolor' ...
-               'ploteventdur' 'butlabel' 'scale' 'events' 'data2' 'plotdata2' },;
+               'ploteventdur' 'butlabel' 'scale' 'events' 'data2' 'plotdata2' 'movebutton' },;
       otherwise, error(['eegplot: unrecognized option: ''' gfields{index} '''' ]);
       end;
    end;
