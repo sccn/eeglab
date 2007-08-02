@@ -100,6 +100,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.47  2007/08/02 23:15:14  arno
+% adding icachaninds input
+%
 % Revision 1.46  2006/07/28 02:35:27  toby
 % nothing changed
 %
@@ -390,7 +393,7 @@ else
 	spectopooptions = options;
 end;
 if ~dataflag
-    spectopooptions  = [ spectopooptions ', ''icawinv'', EEG.icawinv, ''icachaninds'', EEG.icachaninds' ];
+    spectopooptions  = [ spectopooptions ', ''icawinv'', EEG.icawinv, ''icachansind'', EEG.icachansind' ];
 end;
 
 % The programming here is a bit redundant but it tries to optimize 
