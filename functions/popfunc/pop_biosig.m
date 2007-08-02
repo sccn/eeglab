@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2007/03/20 16:33:35  arno
+% put back interval
+%
 % Revision 1.19  2007/03/20 16:28:32  arno
 % remove toby's fix
 %
@@ -250,9 +253,9 @@ if ~isempty(dat.EVENT)
     EEG.event = biosig2eeglabevent(dat.EVENT, interval); % Toby's fix
     if strcmpi(g.rmeventchan, 'on') & strcmpi(dat.TYPE, 'BDF') & isfield(dat, 'BDF')
         disp('Removing event channel...');
-        EEG.data(dat.BDF.Status,:) = [];
+        EEG.data(dat.BDF.Status.Channel,:) = [];
         EEG.nbchan = size(EEG.data,1);
-        EEG.chanlocs(dat.BDF.Status,:) = [];
+        EEG.chanlocs(dat.BDF.Status.Channel,:) = [];
     end;
     EEG = eeg_checkset(EEG, 'eventconsistency');
 else 
