@@ -65,6 +65,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2007/04/06 01:58:05  arno
+% legend business
+%
 % Revision 1.7  2007/04/06 01:47:23  arno
 % better axis label
 %
@@ -291,7 +294,7 @@ end;
 if strcmpi(opt.unitx, 'ms'), xlab = 'Time (ms)';      ylab = 'Potential (\muV)';
 else                         xlab = 'Frequency (Hz)'; ylab = 'Power (10*log_{10}(\muV^{2}/Hz))'; 
 end;
-if ~isnan(opt.threshold), statopt = { xlab 'ylabel' };
+if ~isnan(opt.threshold), statopt = {  'xlabel' xlab };
 else                      statopt = { 'logpval' 'on' 'xlabel' xlab 'ylabel' '-log10(p)' 'ylim' [0 maxplot] };
 end;
 
