@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2007/03/14 02:19:21  arno
+% fixed comppol
+%
 % Revision 1.3  2006/09/12 18:58:11  arno
 % Debugging
 %
@@ -48,6 +51,12 @@ function [compin, pol] = std_comppol(compin);
 if nargin < 1
     help std_comppol;
     return;
+end;
+
+% remove the NaN
+% --------------
+for index = 1:size(compin,2)
+    compin(isnan(compin(:,index)),:) =[];
 end;
 
 % run several iterations
