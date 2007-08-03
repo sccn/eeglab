@@ -50,6 +50,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.44  2005/11/19 04:29:31  toby
+% Made a more targeted edit after precisely identifying the cause of the sort error.
+% Around line 500.
+%
 % Revision 1.42  2005/09/27 21:58:09  arno
 % disable all fields for boundary events
 %
@@ -728,7 +732,6 @@ function [X, I] = mysort(tmparray);
     try, 
         [X I] = sort(tmparray);
     catch,
-        sadf
         disp('Sorting failed. Check that selected fields contain uniform value format.');
         X = tmparray;
         I = 1:length(X);
@@ -738,7 +741,7 @@ function [X, I] = mysort(tmparray);
 % -----------------------------
 function eventtmp = checkconsistency(eventtmp, valnum, field)
     
-    otherval = mod(valnum+1, length(eventtmp)+1)+1;
+    otherval = mod(valnum+1, length(eventtmp))+1;
     
     if isstr(getfield(eventtmp(valnum), field)) & ~isstr(getfield(eventtmp(otherval), field))
         eventtmp(valnum) = setfield(eventtmp(valnum), field, str2num(getfield(eventtmp(valnum), field)));
