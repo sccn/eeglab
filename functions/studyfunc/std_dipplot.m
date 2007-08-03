@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 %$Log: not supported by cvs2svn $
+%Revision 1.21  2007/08/03 22:51:47  arno
+%plotsubjects option
+%
 %Revision 1.20  2007/06/25 04:14:50  toby
 %altered multiple dipole plot windows to indicate number of components and subjects
 %
@@ -81,8 +84,8 @@ function STUDY = std_dipplot(STUDY, ALLEEG, varargin)
 
 % Set default values
 cls = []; % plot all clusters in STUDY
-mode = 'apart'; % plot clusters on separate figures  
 figureon = 1; % plot on a new figure
+mode = 'apart';
 opt_dipplot = {'normlen', 'on', 'pointout', 'on', 'verbose', 'off', 'dipolelength', 0};
 %, 'spheres', 'on'
 for k = 3:2:nargin
@@ -100,16 +103,13 @@ for k = 3:2:nargin
                     error('std_dipplot: ''clusters'' input takes either specific clusters (numeric vector) or keyword ''all''.');
                 end
             end
+            if length(cls) == 1, mode = 'apart'; else mode = 'together'; end;
         case 'comps'
             STUDY = std_plotcompdip(STUDY, ALLEEG,  cls, varargin{k-1});
             return;
         case 'plotsubjects', % do nothing
-        case 'mode' % Plotting mode 'apart' / 'together'
-            mode = varargin{k-1};
-            if strcmpi(mode, 'centroid') | strcmpi(mode, 'comps') | strcmpi(mode,'together') | strcmpi(mode,'apart')
-                if length(cls) == 1, mode = 'apart'; else mode = 'together'; end;
-            end;
-         case 'figure'
+        case 'mode', mode = varargin{k-1};
+        case 'figure'
             if strcmpi(varargin{k-1},'off') 
                 opt_dipplot{end + 1} = 'gui';
                 opt_dipplot{end + 1} = 'off';
