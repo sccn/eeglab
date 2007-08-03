@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 %$Log: not supported by cvs2svn $
+%Revision 1.20  2007/06/25 04:14:50  toby
+%altered multiple dipole plot windows to indicate number of components and subjects
+%
 %Revision 1.19  2007/05/01 21:06:58  arno
 %fix plot all cluster centroids
 %
@@ -100,6 +103,7 @@ for k = 3:2:nargin
         case 'comps'
             STUDY = std_plotcompdip(STUDY, ALLEEG,  cls, varargin{k-1});
             return;
+        case 'plotsubjects', % do nothing
         case 'mode' % Plotting mode 'apart' / 'together'
             mode = varargin{k-1};
             if strcmpi(mode, 'centroid') | strcmpi(mode, 'comps') | strcmpi(mode,'together') | strcmpi(mode,'apart')
