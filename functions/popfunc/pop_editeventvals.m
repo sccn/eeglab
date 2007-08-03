@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.46  2007/08/03 18:01:43  arno
+% fix bug 454
+%
 % Revision 1.45  2007/08/03 17:18:24  arno
 % fixed choosing othe value when adding a value
 %
@@ -384,18 +387,6 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
       % -----------------
       for tmpind = 1:length(allfields)
           EEG.event = checkconsistency(EEG.event, valnum, allfields{tmpind});
-      end;
-      
-      if ~gui
-          % update field values if command line; According to BUG 454 this does not work (see fix line 235)
-          % ----------------------------------------------------------------------------------------------
-          if any(~cellfun('isempty', tmparg(2:end)))
-              for ind=2:length(tmparg)
-                  if ind-1 <= length(allfields) & ~strcmpi(allfields{ind-1}, 'urevent') % do not include urevent 
-                      EEG = pop_editeventvals(EEG, 'changefield', { valnum allfields{ind-1} tmparg{ind} });
-                  end;
-              end;
-          end;
       end;
       
      case 'delete', % **********************************************************
