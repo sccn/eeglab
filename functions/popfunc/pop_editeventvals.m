@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.47  2007/08/03 18:16:13  arno
+% same
+%
 % Revision 1.46  2007/08/03 18:01:43  arno
 % fix bug 454
 %
@@ -234,33 +237,35 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
         
     end;
     
-    % retinterpret inputs to fix BUG 454
-    % ----------------------------------
-    newvararg = {};
-    for indfield = 1:2:length(varargin)
-        
-        com     = varargin{ indfield   };
-        tmpargs = varargin{ indfield+1 };
-        newvararg = { newvararg{:} com };
-        
-        if strcmpi(com, 'add') | strcmpi(com, 'insert') | strcmpi(com, 'append')
+    % retinterpret inputs (fix BUG 454)
+    % --------------------------------
+    if ~gui
+        newvararg = {};
+        for indfield = 1:2:length(varargin)
             
-            evtind     = tmpargs{1};
-            fields     = fieldnames(EEG.event);
-            emptycells = cell(1,length(fields)-1);
-            newvararg  = { newvararg{:} { evtind emptycells{:} } };
-            if strcmpi(com, 'append'), evtind = evtind+1; end;
-                          
-            for ind = 2:length( tmpargs )
-                if ~strcmpi(fields{ind-1}, 'urevent')
-                    newvararg = { newvararg{:} 'changefield' { evtind fields{ind-1} tmpargs{ind} } };
+            com     = varargin{ indfield   };
+            tmpargs = varargin{ indfield+1 };
+            newvararg = { newvararg{:} com };
+            
+            if strcmpi(com, 'add') | strcmpi(com, 'insert') | strcmpi(com, 'append')
+                
+                evtind     = tmpargs{1};
+                fields     = fieldnames(EEG.event);
+                emptycells = cell(1,length(fields)-1);
+                newvararg  = { newvararg{:} { evtind emptycells{:} } };
+                if strcmpi(com, 'append'), evtind = evtind+1; end;
+                
+                for ind = 2:length( tmpargs )
+                    if ~strcmpi(fields{ind-1}, 'urevent')
+                        newvararg = { newvararg{:} 'changefield' { evtind fields{ind-1} tmpargs{ind} } };
+                    end;
                 end;
+            else
+                newvararg = { newvararg{:} tmpargs };
             end;
-        else
-            newvararg = { newvararg{:} tmpargs };
         end;
+        varargin = newvararg;
     end;
-    varargin = newvararg;
     
     % scan inputs
     % -----------
