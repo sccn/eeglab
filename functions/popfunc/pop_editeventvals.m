@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.45  2007/08/03 17:18:24  arno
+% fixed choosing othe value when adding a value
+%
 % Revision 1.44  2005/11/19 04:29:31  toby
 % Made a more targeted edit after precisely identifying the cause of the sort error.
 % Around line 500.
@@ -228,6 +231,34 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
         
     end;
     
+    % retinterpret inputs to fix BUG 454
+    % ----------------------------------
+    newvararg = {};
+    for indfield = 1:2:length(varargin)
+        
+        com     = varargin{ indfield   };
+        tmpargs = varargin{ indfield+1 };
+        newvararg = { newvararg{:} com };
+        
+        if strcmpi(com, 'add') | strcmpi(com, 'insert') | strcmpi(com, 'append')
+            
+            evtind     = tmpargs{1};
+            fields     = fieldnames(EEG.event);
+            emptycells = cell(1,length(fields)-1);
+            newvararg  = { newvararg{:} { evtind emptycells{:} } };
+            if strcmpi(com, 'append'), evtind = evtind+1; end;
+                          
+            for ind = 2:length( tmpargs )
+                if ~strcmpi(fields{ind-1}, 'urevent')
+                    newvararg = { newvararg{:} 'changefield' { evtind fields{ind-1} tmpargs{ind} } };
+                end;
+            end;
+        else
+            newvararg = { newvararg{:} tmpargs };
+        end;
+    end;
+    varargin = newvararg;
+    
     % scan inputs
     % -----------
     for indfield = 1:2:length(varargin)
@@ -356,8 +387,8 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
       end;
       
       if ~gui
-          % update field values if command line
-          % -----------------------------------
+          % update field values if command line; According to BUG 454 this does not work (see fix line 235)
+          % ----------------------------------------------------------------------------------------------
           if any(~cellfun('isempty', tmparg(2:end)))
               for ind=2:length(tmparg)
                   if ind-1 <= length(allfields) & ~strcmpi(allfields{ind-1}, 'urevent') % do not include urevent 
