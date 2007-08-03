@@ -158,6 +158,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.51  2007/07/27 22:08:56  toby
+% nothing
+%
 % Revision 1.50  2007/06/02 02:57:43  toby
 % NaN choke bug
 %
@@ -446,7 +449,7 @@ else
     
     switch  varargin{1}
         
-        case {'plotcomptopo', 'plotcompersp','plotcompitc','plotcompspec', 'plotcomperp'}
+        case {'plotcomptopo', 'plotcompersp','plotcompitc','plotcompspec', 'plotcomperp', 'plotcompdip'}
             plotting_option = varargin{1};
             plotting_option = [ plotting_option(9:end) 'plot' ];
             if (clus ~= 1 ) %specific cluster
@@ -458,7 +461,7 @@ else
                     a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''clusters'','  num2str(cls(clus-1)) ', ''plotsubjects'', ''on'' );' ];
                     eval(a); STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
                 end
-            else % all clusters - plot average scalp map
+            else
                comp_list = get(findobj('parent', hdl, 'tag', 'clust_comp'), 'String');
                comp_name = comp_list(comp_ind);
                for ci = 1:length(comp_name)
@@ -484,7 +487,7 @@ else
             userdat{1}{2} = STUDY;
             set(hdl, 'userdat',userdat); 
             
-        case {'topoplot', 'erspplot', 'itcplot', 'specplot', 'erpplot'}
+        case {'topoplot', 'erspplot', 'itcplot', 'specplot', 'erpplot', 'dipplot' }
             plotting_option = varargin{1};
             plotting_option = [ plotting_option(1:end-4) 'plot' ];
             if (clus ~= 1 ) % specific cluster option
@@ -502,39 +505,11 @@ else
                     end
                 end
                 a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''clusters'',['  num2str(tmpcls) ']);' ];
+                %if strcmpi(plotting_option, 'dipplot'), a = [a(1:end-2) ',''mode'', ''together'');' ]; end;
                 eval(a); STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
             end
             userdat{1}{2} = STUDY;
             set(hdl, 'userdat',userdat); 
-            
-        case  { 'dipplot', 'plotcompdip' } 
-            if strcmpi(varargin{1}, 'plotcompdip') & comp_ind ~= 1
-                [STUDY] = std_dipplot(STUDY, ALLEEG, 'clusters', cls(clus-1), 'comps', comp_ind-1);
-            else    
-                if (clus ~= 1) % specific cluster option
-                    if ~isempty(STUDY.cluster(cls(clus-1)).comps)
-                        [STUDY] = std_dipplot(STUDY, ALLEEG, 'clusters', cls(clus-1), 'mode', 'apart');
-                        % update Study history
-                        a = ['STUDY = std_dipplot(STUDY, ALLEEG, ''clusters'','  num2str(cls(clus-1)) ',''mode'',''apart'' );'  ];
-                        STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
-                    end
-                else % all clusters
-                    % All clusters does not include 'Notclust' and 'Outliers' clusters. 
-                    tmpcls = [];
-                    for k = 1:length(cls) 
-                        if ~strncmpi(STUDY.cluster(cls(k)).name,'Notclust',8) & ~strncmpi(STUDY.cluster(cls(k)).name,'Outliers',8) & ...
-                                (~strncmpi('ParentCluster',STUDY.cluster(cls(k)).name,13))  & ~isempty(STUDY.cluster(cls(k)).comps)                           
-                            tmpcls = [ tmpcls cls(k)];
-                        end
-                    end
-                    [STUDY] = std_dipplot(STUDY, ALLEEG, 'clusters', tmpcls, 'mode', 'together');
-                    % update Study history
-                    a = ['STUDY = std_dipplot(STUDY, ALLEEG, ''clusters'',[' num2str(tmpcls)  '],''mode'',''together'' );'  ];
-                    STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
-                end
-            end;
-            userdat{1}{2} = STUDY;
-            set(hdl, 'userdat',userdat);    
             
         case 'erp_opt' % save the list of selected chaners
             [STUDY com] = pop_erpparams(STUDY);
