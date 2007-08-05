@@ -53,6 +53,9 @@
 % See also: envtopo()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2007/08/05 20:26:06  arno
+% version with conditions
+%
 % Revision 1.15  2007/05/26 03:40:34  toby
 % Corrected title in case of a single cluster, removed obsolete commented code
 %
@@ -211,8 +214,10 @@ for n = conditions
         try
             clusterp = std_clustread(STUDY, ALLEEG, clusters(cls),'erp', n);
             if exist('baseline')
-                clusterp.erp = rmbase(clusterp.erp,...
-                    ALLEEG(STUDY.datasetinfo(STUDY.setind(1)).index).pnts,baseline);
+                for k = 1:len
+                    clusterp.erp{k} = rmbase(clusterp.erp{k},...
+                        ALLEEG(STUDY.datasetinfo(STUDY.setind(1)).index).pnts,baseline);
+                end;
             end
         catch,
             warndlg2([ 'Some ERP information is missing, aborting'] , 'Abort - std_envtopo' );
@@ -1318,7 +1323,7 @@ if exist('subclus')
         for k = 1: length(sets)
             tmp = [];
             for l = 1:length(subclus)
-                for cond = 1:size(STUDY.setind,2)
+                for cond = 1:size(STUDY.setind,1)
                     compind = find(STUDY.cluster(subclus(l)).sets(cond,:) == sets(k) );
                     tmp     = [tmp STUDY.cluster(subclus(l)).comps(compind)];
                 end;
