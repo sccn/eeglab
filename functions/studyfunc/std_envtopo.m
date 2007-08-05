@@ -53,6 +53,9 @@
 % See also: envtopo()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2007/05/26 03:40:34  toby
+% Corrected title in case of a single cluster, removed obsolete commented code
+%
 % Revision 1.14  2007/05/26 03:37:39  toby
 % diff option now displays all cluster topoplots and title is meaningful
 %
@@ -203,13 +206,16 @@ for n = 1:Ncond
         try
             clusterp = std_clustread(STUDY, ALLEEG, clusters(cls),'erp', n);
             if exist('baseline')
-                clusterp.erp = rmbase(clusterp.erp,...
-                    ALLEEG(STUDY.datasetinfo(STUDY.setind(1)).index).pnts,baseline);
+                for k = 1:len
+                    clusterp.erp{k} = rmbase(clusterp.erp{k}, ...
+                     ALLEEG(STUDY.datasetinfo(STUDY.setind(1)).index).pnts,baseline);
+                end;
             end
         catch,
             warndlg2([ 'Some ERP information is missing, aborting'] , 'Abort - std_envtopo' );
             return;
         end
+    
         %
         % Compute grand mean back projection ERP for the cluster
         %
@@ -1310,7 +1316,7 @@ if exist('subclus')
         for k = 1: length(sets)
             tmp = [];
             for l = 1:length(subclus)
-                for cond = 1:size(STUDY.setind,2)
+                for cond = 1:size(STUDY.setind,1)
                     compind = find(STUDY.cluster(subclus(l)).sets(cond,:) == sets(k) );
                     tmp     = [tmp STUDY.cluster(subclus(l)).comps(compind)];
                 end;
@@ -1341,6 +1347,7 @@ for k = 1:len
     tmp = (tmp_scalp.'*tmp_erp)/len;
     if exist('baseline')
         tmp = rmbase(tmp,EEG.pnts,baseline);
+        if isempty(tmp), asdfsda; end;
     end
     if k == 1
         grandERP = tmp;
