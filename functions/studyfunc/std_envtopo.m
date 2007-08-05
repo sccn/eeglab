@@ -16,6 +16,7 @@
 %                    selects the largest contributing clusters from within the
 %                  'limcontrib' region (see below) and plots the envelopes of
 %                    their contributions {default| [] -> 'all'}
+%  'conditions'  = [integer array] vector of condition indices to plot
 %  'subclus'     = [integer array] vector of cluster numbers to omit when  computing
 %                    the ERP envelope of the data (e.g., artifact clusters)
 %                    {default|[] -> none}
@@ -33,9 +34,8 @@
 %                   those in the subtructed ('subclus') clusters {default 'off'}.
 %  'baseline'    = [minms maxms] - a new baseline to remove from the grand
 %                   ERP and cluster ERP contributions.
-%  'diff'        = [condition1 condition2] the indexes of two condition.
-%                   Plots additional figure with the difference of the
-%                   two condition envtopo.
+%  'diff'        = [condition1 condition2] the numbers of two conditions.
+%                   Plots an additional figure with the difference of the two conditions.
 %  'clustnums'   = [integer array] vector of cluster numbers to plot.  Else if
 %                   int < 0, the number of largest contributing clusters to plot
 %                   {default|[] -> 7}
@@ -89,6 +89,8 @@ for k = 1:2:(nargin-2)
     switch varargin{k}
         case 'clusters'
             clusters = varargin{k+1};
+        case 'conditions'
+            conditions = varargin{k+1};
         case 'env_erp'
             e_options{2} = varargin{k+1};
         case 'only_clust'
@@ -157,8 +159,11 @@ Ncond = length(STUDY.condition); % number of conditions
 if Ncond == 0
     Ncond = 1;
 end
+if isempty(conditions)
+    conditions = 1:Ncond;
+end
 
-for n = 1:Ncond
+for n = conditions
     %
     % Compute the grand mean ERP envelope of the cluster (for a specific condition).
     %
@@ -178,7 +183,7 @@ for n = 1:Ncond
             ymin = min(tmpmin,ymin);
             ymax = max(tmpmax,ymax);
         end
-        if n == Ncond
+        if n == conditions(end)
             p_options{end+1} = 'limits';
             if ~exist('limits')
                 p_options{end+1} = [timerange ymin ymax];
@@ -190,7 +195,7 @@ for n = 1:Ncond
     clear grandERP;
 end
 
-for n = 1:Ncond
+for n = conditions
     %
     % Compute the grand mean ERP envelope of the cluster
     % (for a specific condition).
@@ -198,24 +203,21 @@ for n = 1:Ncond
     for cls = 1:length(clusters)
         len = length(STUDY.cluster(clusters(cls)).comps);
         try
-            clustscalp = std_clustread(STUDY, ALLEEG, clusters(cls),'scalp');
+            clustscalp = std_clustread(STUDY, ALLEEG, clusters(cls),'scalp'); % read scalp maps from cluster
         catch,
-            warndlg2([ 'Some topoplot information is missing, aborting'] , 'Abort - std_envtopo' );
+            warndlg2([ 'Some topoplot information is missing, aborting'] , 'Abort - std_envtopo()' );
             return;
         end
         try
             clusterp = std_clustread(STUDY, ALLEEG, clusters(cls),'erp', n);
             if exist('baseline')
-                for k = 1:len
-                    clusterp.erp{k} = rmbase(clusterp.erp{k}, ...
-                     ALLEEG(STUDY.datasetinfo(STUDY.setind(1)).index).pnts,baseline);
-                end;
+                clusterp.erp = rmbase(clusterp.erp,...
+                    ALLEEG(STUDY.datasetinfo(STUDY.setind(1)).index).pnts,baseline);
             end
         catch,
             warndlg2([ 'Some ERP information is missing, aborting'] , 'Abort - std_envtopo' );
             return;
         end
-    
         %
         % Compute grand mean back projection ERP for the cluster
         %
@@ -1316,7 +1318,7 @@ if exist('subclus')
         for k = 1: length(sets)
             tmp = [];
             for l = 1:length(subclus)
-                for cond = 1:size(STUDY.setind,1)
+                for cond = 1:size(STUDY.setind,2)
                     compind = find(STUDY.cluster(subclus(l)).sets(cond,:) == sets(k) );
                     tmp     = [tmp STUDY.cluster(subclus(l)).comps(compind)];
                 end;
@@ -1331,7 +1333,8 @@ len = length(sets);
 for k = 1:len
     EEG = ALLEEG(sets(k));
     if strcmpi(only_clust, 'on')
-        comps = STUDY.cluster(cls(1)).preclust.preclustcomps{(mod(sets(k),size(STUDY.setind,2)))}; % Only components that were used in the pre-clustering
+        comps = STUDY.cluster(cls(1)).preclust.preclustcomps{(mod(sets(k),size(STUDY.setind,2)))}; 
+                                                             % Only components that were used in the pre-clustering
     else
         comps = 1:size(EEG.icawinv,2);
     end
@@ -1347,7 +1350,6 @@ for k = 1:len
     tmp = (tmp_scalp.'*tmp_erp)/len;
     if exist('baseline')
         tmp = rmbase(tmp,EEG.pnts,baseline);
-        if isempty(tmp), asdfsda; end;
     end
     if k == 1
         grandERP = tmp;
