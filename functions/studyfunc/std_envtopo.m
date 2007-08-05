@@ -53,6 +53,9 @@
 % See also: envtopo()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2007/08/05 20:27:09  arno
+% debug conditions etc...
+%
 % Revision 1.17  2007/08/05 20:26:06  arno
 % version with conditions
 %
@@ -77,6 +80,7 @@ if mod(nargin,2) % if not an even number of arguments
     error('std_envtopo: Input argument list must be pairs of: ''keyx'', ''valx'' ');
 end
 
+conditions   = [];       % default: all conditions
 clusters     = [];       % default: use all clusters
 subclus      = [];       % default: omit no clusters from the ERP envelope
 e_options{1} = 'env_erp';
