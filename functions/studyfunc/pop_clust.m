@@ -17,7 +17,8 @@
 %                    {default: 'kmeans'} 
 %   'clus_num'  - [integer] the number of desired clusters (must be > 1) {default: 20}
 %   'outliers'  - [integer] identify outlier more than the given number standard deviations 
-%                 from any cluster centroid. Inf --> identify no outliers {default: 3}
+%                 from any cluster centroid. Inf --> identify no outliers {default: Inf
+%                 from the command line and 3 from the GUI with 'kmean'}
 %   'save'      - ['on' | 'off'] save the updated STUDY to disk {default: 'off'} 
 %   'filename'  - [string] if save option is 'on', save the STUDY under this file name
 %                    {default: current STUDY filename}
@@ -59,6 +60,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2007/08/06 18:00:26  scott
+% the default value '3' is entered in line 176, I believe...
+%
 % Revision 1.27  2007/08/06 17:35:41  arno
 % update help message according to bug 282
 %
