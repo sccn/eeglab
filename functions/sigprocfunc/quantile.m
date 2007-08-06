@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/11/15 02:50:22  arno
+% header for web
+%
 % Revision 1.1  2002/08/22 00:45:16  luca
 % Initial revision
 %
@@ -60,13 +63,13 @@ end
 [i,j] = size(data);
 sortdata = sort(data);
 if i==1 | j==1 % if data is a vector
-  i = max(i,j); j = 1;
-  if i == 1,
-    fprintf('  quantile() note: input data is a single scalar!\n')
-    y = data*ones(length(pc),1); % if data is scalar, return it
-    return;
-  end
-  sortdata = sortdata(:);
+    i = max(i,j); j = 1;
+    if i == 1,
+        fprintf('  quantile() note: input data is a single scalar!\n')
+        q = data*ones(length(pc),1); % if data is scalar, return it
+        return;
+    end
+    sortdata = sortdata(:);
 end
 pt = [0 ((1:i)-0.5)./i 100];
 sortdata = [min(data); sortdata; max(data)];
