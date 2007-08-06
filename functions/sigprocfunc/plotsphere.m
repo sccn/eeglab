@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2004/06/01 18:37:08  arno
+% Initial revision
+%
 % Revision 1.2  2004/04/01 00:27:22  arno
 % add counter
 %
@@ -81,7 +84,7 @@ function [handles] = plotsphere(pos, rad, varargin);
     % ==============
     [xstmp ystmp zs] = sphere(g.nvert);
     l=sqrt(xstmp.*xstmp+ystmp.*ystmp+zs.*zs);
-    normals = reshape([xstmp./l ystmp./l zs./l],[16 16 3]);
+    normals = reshape([xstmp./l ystmp./l zs./l],[g.nvert+1 g.nvert+1 3]);
     xs = pos(1) + rad*ystmp;
     ys = pos(2) + rad*xstmp;
     zs = pos(3) + rad*zs;
