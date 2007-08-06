@@ -4,7 +4,7 @@
 %                   Called by cluster plotting functions: std_envtopo(), 
 %                   std_erpplot(), std_erspplot(), ...
 % Usage:
-%         >> [STUDY clustinfo, finalinds] = std_clustread(STUDY, ALLEEG, cluster, infotype,varargin);
+%         >> [STUDY clustinfo, finalinds] = std_readdata(STUDY, ALLEEG, cluster, infotype,varargin);
 % Inputs:
 %         STUDY - studyset structure containing some or all files in ALLEEG
 %        ALLEEG - vector of loaded EEG datasets
@@ -59,7 +59,7 @@
 % Example:
 %         % To obtain the ERPs for all Cluster-3 components from a STUDY
 %         %
-%         [STUDY clustinfo] = std_clustread(STUDY, ALLEEG, 3, 'erp');
+%         [STUDY clustinfo] = std_readdata(STUDY, ALLEEG, 3, 'erp');
 %         figure; plot(clustinfo.erptimes, mean(clustinfo.erpdata,2));
 % 
 % Author: Arnaud Delorme, CERCO, 2006-
@@ -81,6 +81,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2007/07/27 22:22:48  toby
+% nothing
+%
 % Revision 1.24  2007/06/08 20:10:41  toby
 % Help updated to state optional inputs and the default values. 'subbaseline' and 'rmsubmean' defaults reset to 'off' because they were causing crashes with some studies. It was not clear how they were intended to function, so I did not fix them.
 %
