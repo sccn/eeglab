@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2007/08/06 22:01:53  arno
+% implement map and dipoles
+%
 % Revision 1.27  2007/08/06 21:49:40  arno
 % reading dipoles
 % /
@@ -522,24 +525,8 @@ for ind = 1:length(finalinds)
          tmpstruct.dipoles = alldips;
 
         case { 'map' 'scalp' 'topo' }
-         fprintf('Reading dipole data...\n');
-         alldips = {};
-         for c = 1:nc
-             for g = 1:ng
-                 for indtmp = 1:length(allinds{c,g})
-                     alldips{c, g}(indtmp) = ALLEEG(setinds{c,g}(indtmp)).dipfit.model(allinds{c,g}(indtmp));
-                 end;
-             end;
-         end;
-         tmpstruct.dipoles = alldips;
-         if n == 1
-             [grid, yi, xi] = std_readtopo(ALLEEG, abset, comp); 
-             if  k == 1
-                 clustinfo.xi = xi;
-                 clustinfo.yi = yi;
-             end
-             clustinfo.scalp{k} = grid;
-         end;
+            % this is currenlty being done by the function std_readtopoclust
+            % at the beginning of this function
         otherwise, error('Unrecognized ''infotype'' entry');
     end; % end switch
     if exist('allinds'),  tmpstruct.allinds = allinds; end;
