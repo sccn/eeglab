@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2005/05/24 17:08:24  arno
+% cell2mat -> celltomat
+%
 % Revision 1.2  2003/12/01 02:38:33  arno
 % *** empty log message ***
 %
@@ -45,7 +48,7 @@
 % Initial revision
 %
 
-function [chanlocs, labels, positions] = readneurodat(filename);
+function [chanlocs, labels, theta, phi] = readneurodat(filename);
     
 % enter file name here
 % --------------------
