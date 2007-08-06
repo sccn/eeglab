@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.47  2007/04/10 16:24:29  arno
+% matching exact names
+%
 % Revision 1.46  2007/04/07 01:21:27  arno
 % *** empty log message ***
 %
@@ -246,7 +249,7 @@ if ~isstr(varargin{1}) %intial settings
     browsesave = [ '[filename, filepath] = uiputfile2(''*.study'', ''Save STUDY with .study extension -- pop_preclust()''); ' ... 
                   'set(findobj(''parent'', gcbf, ''tag'', ''studyfile''), ''string'', [filepath filename]);' ];
     str_name   = ['Pre-compute clustering measures for STUDY ''' STUDY.name '''' ];
-    str_time   = [ num2str(round(ALLEEG(1).xmin*1000)) '  ' num2str(round(ALLEEG(1).xmax*1000)) ];
+    str_time   = '';
     help_secpca = [ 'warndlg2(strvcat(''This is the final number of dimensions (otherwise use the sum'',' ...
                     '''of dimensions for all the selected options). See tutorial for more info''), ''Final number of dimensions'');' ];
     
