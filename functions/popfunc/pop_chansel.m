@@ -16,9 +16,9 @@
 %   'selectionmode' - selection mode 'multiple' or 'single'. See listdlg2().
 %
 % Output:
-%   chanlist  - indices of selected channels
-%   channames - names of selected channels
-%   strallnames - all channel names concatenated
+%   chanlist    - indices of selected channels
+%   channames   - names of selected channels (concatenated string)
+%   strallnames - all channel names in a cell array
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 3 March 2003
 
@@ -41,6 +41,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2007/08/06 17:30:25  arno
+% fix bug 247 about numerical entries
+%
 % Revision 1.20  2006/05/13 13:29:40  arno
 % support for event types with sapce
 %
