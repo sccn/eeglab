@@ -1,4 +1,3 @@
-%
 % timef() - Returns estimates and plots of mean event-related spectral
 %           perturbation (ERSP) and inter-trial coherence (ITC) changes 
 %           across event-related trials (epochs) of a single input time series. 
@@ -160,6 +159,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.92  2007/02/05 16:17:40  arno
+% Unit for components
+%
 % Revision 1.91  2006/10/24 21:29:08  arno
 % last error
 %
