@@ -47,8 +47,6 @@
 %           clustinfo.itctimes  % vector of ITC latencies
 %           clustinfo.itc_freqs % vector of ITC frequencies
 %
-%  ********** SOON **********
-%
 %         clustinfo.topo        % (ncomps,65,65) array of component scalp map grids
 %           clustinfo.topox     % abscissa values for columns of the scalp maps
 %           clustinfo.topoy     % ordinate values for rows of the scalp maps
@@ -82,6 +80,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2007/08/06 21:49:40  arno
+% reading dipoles
+% /
+%
 % Revision 1.26  2007/08/06 21:18:54  arno
 % fix header
 %
@@ -202,6 +204,19 @@ else
     finalinds = opt.clusters;
 end;
     
+% read topography with another function
+% -------------------------------------
+if strcmpi(opt.infotype, 'map') | strcmpi(opt.infotype, 'scalp') | strcmpi(opt.infotype, 'topo')
+    [STUDY tmpclust] = std_readtopoclust(STUDY, ALLEEG, opt.clusters);
+    clustinfo = [];
+    for index = 1:length(tmpclust)
+        if index == 1, clustinfo        = tmpclust{index};
+        else           clustinfo(index) = tmpclust{index};
+        end;
+    end;
+    return;
+end;
+
 % check if data is present
 % ------------------------
 for ind = 1:length(finalinds)
