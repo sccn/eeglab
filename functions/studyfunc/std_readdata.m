@@ -1,58 +1,62 @@
 % std_readdata() - load one or more requested measures 
-%                   ['erp'|'spec'|'ersp'|'itc'|'dipole'|'map']
-%                   for all components of a specified cluster.  
-%                   Called by cluster plotting functions: std_envtopo(), 
-%                   std_erpplot(), std_erspplot(), ...
+%                  ['erp'|'spec'|'ersp'|'itc'|'dipole'|'map']
+%                  for all components of a specified cluster.  
+%                  Called by cluster plotting functions 
+%                  std_envtopo(), std_erpplot(), std_erspplot(), ...
 % Usage:
-%         >> [STUDY clustinfo, finalinds] = std_readdata(STUDY, ALLEEG, ...
+%         >> [STUDY, clustinfo, finalinds] = std_readdata(STUDY, ALLEEG);
+%                                              % return all measures
+%         >> [STUDY, clustinfo, finalinds] = std_readdata(STUDY, ALLEEG, ...
 %                                              cluster, infotype,varargin);
 % Inputs:
 %       STUDY - studyset structure containing some or all files in ALLEEG
 %      ALLEEG - vector of loaded EEG datasets
 %
-% Optiona inputs:
+% Optional inputs:
 %  'infotype'  - ['erp'|'spec'|'ersp'|'itc'|'dipole'|'map'] type of stored
 %                cluster information to read. May also be a cell array of
-%                these types, for example: { 'erp' 'map' 'dipole' }.
-%  'channels'  - [cell] list of channels to import (default is all)
-%  'clusters'  - [integer] list of cluster to import 
-%  'freqrange' - [min max] frequency range {default: as on disk}
-%  'timerange' - [min max] time range {default: as on disk}
-%  'statmode'  - ['individual'|'trials'] statistic mode for ERSP (also 
-%                specify what type of data to import (mean (individual 
-%                subjects) or trials). This functionality is still unstable
-%                for 'trials' { default:'individual'}
-%  'rmsubjmean' - ['on'|'off'] remove subject spectrum from every component
-%                 or channel spectrum data, making them easier to compare
+%                these types, for example: { 'erp' 'map' 'dipole' }
+%                {default: 'erp'}
+%  'channels'  - [cell] list of channels to import {default: all}
+%  'clusters'  - [integer] list of clusters to import {[]|default: all but
+%                the parent cluster (1) and any 'NotClust' clusters}
+%  'freqrange' - [min max] frequency range {default: whole measure range}
+%  'timerange' - [min max] time range {default: whole measure epoch}
+%  'statmode'  - ['individual'|'trials'] statistical mode for ERSP (also 
+%                specify what type of data to import -- mean (of individual 
+%                subjects), or trials. This functionality is still unstable
+%                for 'trials' { default: 'individual'}
+%  'rmsubjmean' - ['on'|'off'] remove mean subject spectrum from every component
+%                 or channel spectrum, making them easier to compare
 %                 { default: 'off' }
-%  'subbaseline' - ['on'|'off'] remove all condition and spectrum baseline 
+%  'subbaseline' - ['on'|'off'] remove all condition and spectrum baselines
 %                  for ERSP data { default: 'on' }
 %
 % Output:
-%    STUDY     - updated STUDY structure
-%    clustinfo - structure of specified cluster information. This is 
-%                equal to STUDY.cluster(cluster)     
+%    STUDY     - (possibly) updated STUDY structure
+%    clustinfo - structure of specified cluster information. 
+%                This is the same as STUDY.cluster(cluster_number)     
+%    Fields:
+%     clustinfo.erpdata    % (ncomps, ntimes) array of component ERPs
+%     clustinfo.erptimes   % vector of ERP epoch latencies (ms)
 %
-%         clustinfo.erpdata   % (ncomps, ntimes) array of component ERPs
-%         clustinfo.erptimes  % vector of ERP epoch latencies
+%     clustinfo.specdata   % (ncomps, nfreqs) array of component spectra
+%     clustinfo.specfreqs  % vector of spectral frequencies (Hz)
 %
-%         clustinfo.specdata  % (ncomps, nfreqs) array of component spectra
-%         clustinfo.specfreqs % vector of spectral frequencies 
+%     clustinfo.erspdata   % (ncomps,ntimes,nfreqs) array of component ERSPs
+%      clustinfo.ersptimes % vector of ERSP latencies (ms)
+%      clustinfo.erspfreqs % vector of ERSP frequencie (Hz)
 %
-%         clustinfo.erspdata    % (ncomps,ntimes,nfreqs) array of component ERSPs
-%           clustinfo.ersptimes % vector of ERSP latencies
-%           clustinfo.erspfreqs % vector of ERSP frequencies
+%     clustinfo.itcdata    % (ncomps,ntimes,nfreqs) array of component ITCs
+%      clustinfo.itctimes  % vector of ITC latencies (ms)
+%      clustinfo.itc_freqs % vector of ITC frequencies (Hz)
 %
-%         clustinfo.itcdata     % (ncomps,ntimes,nfreqs) array of component ITCs
-%           clustinfo.itctimes  % vector of ITC latencies
-%           clustinfo.itc_freqs % vector of ITC frequencies
+%     clustinfo.topo       % (ncomps,65,65) array of component scalp map grids
+%       clustinfo.topox    % abscissa values for columns of the scalp maps
+%       clustinfo.topoy    % ordinate values for rows of the scalp maps
 %
-%         clustinfo.topo        % (ncomps,65,65) array of component scalp map grids
-%           clustinfo.topox     % abscissa values for columns of the scalp maps
-%           clustinfo.topoy     % ordinate values for rows of the scalp maps
-%
-%         clustinfo.dipole      % array of component dipole information structs
-%                               % with same format as EEG.dipfit.model
+%     clustinfo.dipole     % array of component dipole information structs
+%                          % with the same format as EEG.dipfit.model
 %
 %   finalinds - either the cluster(s) or channel(s) indices selected.
 % Example:
@@ -80,6 +84,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2007/08/06 22:23:20  arno
+% remove unused code
+%
 % Revision 1.28  2007/08/06 22:01:53  arno
 % implement map and dipoles
 %
