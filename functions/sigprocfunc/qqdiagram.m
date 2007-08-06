@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2004/10/04 17:02:36  scott
+% add xtick at 1 s.d. to qqdiagram() -sm
+%
 % Revision 1.6  2004/10/02 18:54:57  scott
 % commented out text() calls - gave ??? 'not enough arguments' under 7.0.0 ?? -sm
 %
@@ -147,7 +150,7 @@ if nargin ==1
         % textx = 1.0;
         % texty = mean(y)+3.0*rangey/50.0;
 	% text(double(textx), double(texty),' St. Dev.','horizontalalignment','center')
-        set(gca,'xtick',sort([get(gca,'xtick') 1]));  % show that vertical line is at 1 sd
+    set(gca,'xtick',get(gca,'xtick'));  % show that vertical line is at 1 sd
 	plot([0 0],[ymin  mean(y)],'k--')
 	plot(xlim,[mean(y) mean(y)],'k--')
 	% text(double(xlim(1)), double(mean(y)+rangey/50),'Mean X')
