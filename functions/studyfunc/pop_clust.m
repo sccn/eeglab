@@ -16,8 +16,8 @@
 %                 the 'Neural Network' option requires the Matlab Neural Net toolbox 
 %                    {default: 'kmeans'} 
 %   'clus_num'  - [integer] the number of desired clusters (must be > 1) {default: 20}
-%   'outliers'  - [integer] identify outlier more than X standard deviation from any
-%                 cluster centroid {default is Inf=no outliers}
+%   'outliers'  - [integer] identify outlier more than the given number standard deviations 
+%                 from any cluster centroid. Inf --> identify no outliers {default: 3}
 %   'save'      - ['on' | 'off'] save the updated STUDY to disk {default: 'off'} 
 %   'filename'  - [string] if save option is 'on', save the STUDY under this file name
 %                    {default: current STUDY filename}
@@ -59,6 +59,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2007/08/06 17:35:41  arno
+% update help message according to bug 282
+%
 % Revision 1.26  2007/05/01 21:05:14  arno
 % better help message
 %
