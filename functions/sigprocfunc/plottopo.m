@@ -65,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.50  2007/02/09 01:41:31  toby
+% 3rd attempt, looks good so far
+%
 % Revision 1.49  2007/02/09 00:31:39  toby
 % 2nd attempt to fix bug, tested well
 %
@@ -558,7 +561,6 @@ chans = length(channelnos);
 
   xlabel = 'Time (ms)';
   if ISSPEC
-    ISSPEC = 1;
     g.ydir = 1;
     fprintf('Plotting positive up. Assuming data are spectra.\n');
     xlabel = 'Freq (Hz)';
