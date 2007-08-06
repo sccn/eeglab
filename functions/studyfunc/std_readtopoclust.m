@@ -1,19 +1,19 @@
-% std_readtopoclust() - Command line function to read cluster component and scalp maps. 
-%                  This function automatically invert the polarity of scalp
-%                  maps so they best match the polarity of the mean scalp map.
+% std_readtopoclust() - Compute and return cluster component scalp maps. 
+%                  Automatically inverts the polarity of component scalp maps 
+%                  to best match the polarity of the cluster mean scalp map.
 % Usage:    
-%              >> [STUDY clsstruct] = std_readtopoclust(STUDY, ALLEEG, cls);  
+%              >> [STUDY clsstruct] = std_readtopoclust(STUDY, ALLEEG, clusters);  
 % Inputs:
 %   STUDY      - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
 %   ALLEEG     - global EEGLAB vector of EEG structures for the dataset(s) included in 
 %                the STUDY. 
-%   cls        - specific cluster numbers to read.
+%   clusters   - cluster numbers to read.
 %
 % Outputs:
-%   STUDY      - the input STUDY set structure modified with read cluster scalp
-%                map means, to allow quick replotting (unless clusters means 
-%                already exists in the STUDY).  
-%   clsstruct  - structure of the modified clusters.
+%   STUDY      - the input STUDY set structure with the computed mean cluster scalp
+%                map added (unless cluster scalp map means already exist in the STUDY) 
+%                to allow quick replotting. 
+%   clsstruct  - STUDY.cluster structure array for the modified clusters.
 %
 % See also  std_topoplot(), pop_clustedit()
 %
@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2007/07/27 22:21:43  toby
+% nothing
+%
 % Revision 1.3  2007/03/14 03:15:18  arno
 % inverting scalp map polarity
 %
@@ -56,7 +59,7 @@ if nargin < 3
 end;
     
 if isempty(clsind)
-    for k = 2: length(STUDY.cluster) %don't include the ParentCluster
+    for k = 2: length(STUDY.cluster) % don't include the ParentCluster
          if ~strncmpi('Notclust',STUDY.cluster(k).name,8) 
              % don't include 'Notclust' clusters
              clsind = [clsind k];
@@ -69,7 +72,7 @@ if Ncond == 0
     Ncond = 1;
 end 
 centroid = cell(length(clsind),1);
-fprintf('Computing scalp map centroid (only done once)\n');
+fprintf('Computing the requested mean cluster scalp maps (only done once)\n');
 if ~isfield( STUDY.cluster, 'topo' ), STUDY.cluster(1).topo = []; end;
 cond = 1;
 
@@ -106,7 +109,7 @@ for clust = 1:length(clsind) %go over all requested clusters
                     ncomp = length(STUDY.cluster(clsind(clust)).comps);
                 end;
                 [ tmp pol ] = std_comppol(centroid{clust}.topotmp);
-                fprintf('%d/%d polarities inverted while reading ICA component scalp maps\n', ...
+                fprintf('%d/%d polarities inverted while reading component scalp maps\n', ...
                         length(find(pol == -1)), length(pol));
                 nitems = length(centroid{clust}.topo);
                 for k = 1:nitems
