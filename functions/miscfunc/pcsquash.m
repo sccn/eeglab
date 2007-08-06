@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % 01-25-02 reformated help & license, added links -ad 
 
@@ -81,5 +84,5 @@ EigenValues=rot90(rot90(eigenval))';
 EigenVectors=V(:,index);
 
 if nargout >= 3
-   Compressed = EigenVectors(:,1:ncomps)'*matrix;
+   Compressed = EigenVectors(:,1:ncomps)'*data';
 end
