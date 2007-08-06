@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2007/05/19 01:15:09  toby
+% error message incorrectly claiming precomputed data not found corrected
+%
 % Revision 1.28  2007/05/18 16:23:29  peter
 % typo
 %
@@ -218,13 +221,20 @@ if length(abset) > 1
     % -------------------
     for cond = 1:length(abset)
         % add back former baseline to the ERSP and subtract new baseline
-        erspall{cond} = erspall{cond} + 10*log10(repmat( erspallbase{cond}',[1 tlen]));
-        erspall{cond} = erspall{cond} - 10*log10(repmat( ave_baseline'     ,[1 tlen]));
+        if any(erspallbase{cond}) > 100, 
+            error([ 'You must recompute time-frequency decomposition' 10 
+                    'changes greater than 100dB detected in ERSP which means' 10
+                    'that you have most likely computed these ERSP using a' 10
+                    'version of EEGLAB < 6.00' ]);
+        end;
+        
+        erspall{cond} = erspall{cond} + repmat( erspallbase{cond}',[1 tlen]);
+        erspall{cond} = erspall{cond} - repmat( ave_baseline'     ,[1 tlen]);
         
         % same for bootstrap array
         if ~isempty(erspallboot{cond})
-            erspallboot{cond} = erspallboot{cond} + 10*log10(repmat(erspallbase{cond}',[1 2]));
-            erspallboot{cond} = erspallboot{cond} - 10*log10(repmat(ave_baseline'     ,[1 2]));  
+            erspallboot{cond} = erspallboot{cond} + repmat(erspallbase{cond}',[1 2]);
+            erspallboot{cond} = erspallboot{cond} - repmat(ave_baseline'     ,[1 2]);  
         end;
     end
 end
