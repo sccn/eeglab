@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2006/07/05 22:15:16  arno
+% bug if only channel labels[D[D[D[D[D[D[D[D[D[D[D[D[D[D
+%
 % Revision 1.35  2006/01/31 20:17:27  arno
 % options
 %
@@ -271,7 +274,7 @@ end;
 % compute epoch limits
 % --------------------
 if isempty(tlimits)
-	tlimits = [EEG.xmin, EEG.xmax];
+	tlimits = [EEG.xmin, EEG.xmax]*1000;
 end;	
 pointrange1 = round(max((tlimits(1)/1000-EEG.xmin)*EEG.srate, 1));
 pointrange2 = round(min((tlimits(2)/1000-EEG.xmin)*EEG.srate, EEG.pnts));
