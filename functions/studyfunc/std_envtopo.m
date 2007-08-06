@@ -53,6 +53,9 @@
 % See also: envtopo()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2007/08/05 20:28:15  arno
+% debug conditions
+%
 % Revision 1.18  2007/08/05 20:27:09  arno
 % debug conditions etc...
 %
@@ -210,15 +213,21 @@ for n = conditions
     for cls = 1:length(clusters)
         len = length(STUDY.cluster(clusters(cls)).comps);
         try
-            clustscalp = std_clustread(STUDY, ALLEEG, clusters(cls),'scalp'); % read scalp maps from cluster
+            % clustscalp = std_clustread(STUDY, ALLEEG, clusters(cls),'scalp'); % read scalp maps from cluster
+            [tmp clustscalp] = std_readtopoclust(STUDY, ALLEEG, clusters(cls)); % read scalp maps from cluster
+            clustscalp = clustscalp{1};
         catch,
             warndlg2([ 'Some topoplot information is missing, aborting'] , 'Abort - std_envtopo()' );
             return;
         end
         try
-            clusterp = std_clustread(STUDY, ALLEEG, clusters(cls),'erp', n);
+            %clusterp = std_clustread(STUDY, ALLEEG, clusters(cls),'erp', n);
+            [tmp clusterp] = std_readdata(STUDY, ALLEEG, 'clusters', clusters(cls), 'infotype', 'erp');
+            for index = 1:size(clusterp.erpdata{1},2)
+                clusterp.erp{index} = clusterp.erpdata{n,1}(:,index)';
+            end;
             if exist('baseline')
-                for k = 1:len
+                for k = 1:length(clusterp.erp)
                     clusterp.erp{k} = rmbase(clusterp.erp{k},...
                         ALLEEG(STUDY.datasetinfo(STUDY.setind(1)).index).pnts,baseline);
                 end;
@@ -227,14 +236,15 @@ for n = conditions
             warndlg2([ 'Some ERP information is missing, aborting'] , 'Abort - std_envtopo' );
             return;
         end
+        
         %
         % Compute grand mean back projection ERP for the cluster
         %
         projERP = 0;
         fprintf('\n Computing grand ERP projection of cluster %d: ', (clusters(cls)) );
-        val_ind = find(~isnan(clustscalp.scalp{1}(:))); % find non-NAN values
+        val_ind = find(~isnan(clustscalp.topo{1}(:))); % find non-NAN values
         for k = 1:len
-            tmp = clustscalp.scalp{k}(val_ind);
+            tmp = clustscalp.topo{k}(val_ind);
             projERP = projERP + tmp*clusterp.erp{k};
             fprintf('.');
         end
