@@ -31,7 +31,7 @@
 %                  to a different cluster requested in 'clusters' (above).
 %                  fields of 'centroid' may include centroid.erp, centroid.dipole,
 %                  etc. (as above). The structure is similar as the output
-%                  of the std_clustread() function (with some fields
+%                  of the std_readdata() function (with some fields
 %                  about the cluster name and index missing).
 % Examples:
 %
@@ -68,6 +68,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2006/03/21 15:39:57  arno
+% new .sets format
+%
 % Revision 1.25  2006/03/20 17:34:50  arno
 % new std_clustread
 %
