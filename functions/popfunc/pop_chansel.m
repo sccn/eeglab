@@ -2,7 +2,7 @@
 %
 % Usage:
 %   >> [chanlist] = pop_chansel(chanstruct); % a window pops up
-%   >> [chanlist channames strallnames] = ...
+%   >> [chanlist strchannames cellchannames] = ...
 %                        pop_chansel(chanstruct, 'key', 'val', ...);
 %
 % Inputs:
@@ -16,9 +16,9 @@
 %   'selectionmode' - selection mode 'multiple' or 'single'. See listdlg2().
 %
 % Output:
-%   chanlist    - indices of selected channels
-%   channames   - names of selected channels (concatenated string)
-%   strallnames - all channel names in a cell array
+%   chanlist      - indices of selected channels
+%   strchannames  - names of selected channel names (concatenated in a string)
+%   cellchannames - names of selected channel names in a cell array
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 3 March 2003
 
@@ -41,6 +41,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2007/08/06 17:31:17  arno
+% update help message.
+%
 % Revision 1.21  2007/08/06 17:30:25  arno
 % fix bug 247 about numerical entries
 %
