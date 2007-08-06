@@ -1,5 +1,5 @@
 % numdim() - estimate a lower bound on the (minimum) number of discrete sources 
-%                in the data via their second-order statistics.
+%            in the data via their second-order statistics.
 % Usage:
 %   >> num = numdim( data );
 %
@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2003/02/26 23:02:27  arno
+% numsources -> numdim
+%
 % Revision 1.1  2003/02/26 23:01:10  arno
 % Initial revision
 %
@@ -60,6 +63,11 @@
 %
 
 function lambda = numdim( a )
+    
+    if nargin < 1
+        help numdim;
+        return;
+    end;
     
 % Akaike, Identification toolbox (linear identification)
 
