@@ -4,28 +4,29 @@
 %                   Called by cluster plotting functions: std_envtopo(), 
 %                   std_erpplot(), std_erspplot(), ...
 % Usage:
-%         >> [STUDY clustinfo, finalinds] = std_readdata(STUDY, ALLEEG, cluster, infotype,varargin);
+%         >> [STUDY clustinfo, finalinds] = std_readdata(STUDY, ALLEEG, ...
+%                                              cluster, infotype,varargin);
 % Inputs:
-%         STUDY - studyset structure containing some or all files in ALLEEG
-%        ALLEEG - vector of loaded EEG datasets
-%       cluster - cluster number in STUDY
-%      infotype - ['erp'|'spec'|'ersp'|'itc'|'dipole'|'map'] type of stored
-%                 cluster information to read. May also be a cell array of
-%                 these types, for example: { 'erp' 'map' 'dipole' }.
-%                 ************* 'map' and 'dipole' not implemented yet
+%       STUDY - studyset structure containing some or all files in ALLEEG
+%      ALLEEG - vector of loaded EEG datasets
 %
-% Optional Key-Value Inputs:
-%   KEY          TYPE   LEGAL_VALUES    DEFAULT_VALUE
-%   'subject'    'cell'    []       {};
-%   'channels'   'cell'    []       {};
-%   'clusters'   'integer' []       [];
-%   'freqrange'  'real'    []       [];
-%   'timerange'  'real'    []       [];
-%   'group'      'cell'    []       {};
-%   'statmode'   'string'  { 'subjects' 'individual' 'common' 'trials' }       'individual';
-%   'subbaseline' 'string'  { 'on' 'off' }       'off';
-%   'rmsubjmean'  'string'  { 'on' 'off' }       'off';
-%   'infotype'   'string'  { 'erp' 'spec' 'ersp' 'itc' } 'erp' }, 'std_readdata');
+% Optiona inputs:
+%  'infotype'  - ['erp'|'spec'|'ersp'|'itc'|'dipole'|'map'] type of stored
+%                cluster information to read. May also be a cell array of
+%                these types, for example: { 'erp' 'map' 'dipole' }.
+%  'channels'  - [cell] list of channels to import (default is all)
+%  'clusters'  - [integer] list of cluster to import 
+%  'freqrange' - [min max] frequency range {default: as on disk}
+%  'timerange' - [min max] time range {default: as on disk}
+%  'statmode'  - ['individual'|'trials'] statistic mode for ERSP (also 
+%                specify what type of data to import (mean (individual 
+%                subjects) or trials). This functionality is still unstable
+%                for 'trials' { default:'individual'}
+%  'rmsubjmean' - ['on'|'off'] remove subject spectrum from every component
+%                 or channel spectrum data, making them easier to compare
+%                 { default: 'off' }
+%  'subbaseline' - ['on'|'off'] remove all condition and spectrum baseline 
+%                  for ERSP data { default: 'on' }
 %
 % Output:
 %    STUDY     - updated STUDY structure
@@ -81,6 +82,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2007/08/06 21:18:54  arno
+% fix header
+%
 % Revision 1.25  2007/07/27 22:22:48  toby
 % nothing
 %
@@ -159,16 +163,14 @@ if nargin < 3
 end
 
 opt = finputcheck( varargin, { 'condition'  'cell'    []       {};
-                             'subject'    'cell'    []       {};
                              'channels'   'cell'    []       {};
                              'clusters'   'integer' []       [];
                              'freqrange'  'real'    []       [];
                              'timerange'  'real'    []       [];
-                             'group'      'cell'    []       {};
                              'statmode'   'string'  { 'subjects' 'individual' 'common' 'trials' }       'individual';
                              'subbaseline' 'string'  { 'on' 'off' }       'off';
                              'rmsubjmean'  'string'  { 'on' 'off' }       'off';
-                             'infotype'   'string'  { 'erp' 'spec' 'ersp' 'itc' } 'erp' }, 'std_readdata');
+                             'infotype'   'string'  { 'erp' 'spec' 'ersp' 'itc' 'map' 'topo' 'dipole' 'scalp' } 'erp' }, 'std_readdata');
 if isstr(opt), error(opt); end;
 if strcmpi(opt.infotype, 'erp'),
     STUDY = pop_erpparams(STUDY, 'default');
@@ -492,6 +494,38 @@ for ind = 1:length(finalinds)
                     end;
                 end;
             end;
+        case 'dipole',                        
+         fprintf('Reading dipole data...\n');
+         alldips = {};
+         for c = 1:nc
+             for g = 1:ng
+                 for indtmp = 1:length(allinds{c,g})
+                     alldips{c, g}(indtmp) = ALLEEG(setinds{c,g}(indtmp)).dipfit.model(allinds{c,g}(indtmp));
+                 end;
+             end;
+         end;
+         tmpstruct.dipoles = alldips;
+
+        case { 'map' 'scalp' 'topo' }
+         fprintf('Reading dipole data...\n');
+         alldips = {};
+         for c = 1:nc
+             for g = 1:ng
+                 for indtmp = 1:length(allinds{c,g})
+                     alldips{c, g}(indtmp) = ALLEEG(setinds{c,g}(indtmp)).dipfit.model(allinds{c,g}(indtmp));
+                 end;
+             end;
+         end;
+         tmpstruct.dipoles = alldips;
+         if n == 1
+             [grid, yi, xi] = std_readtopo(ALLEEG, abset, comp); 
+             if  k == 1
+                 clustinfo.xi = xi;
+                 clustinfo.yi = yi;
+             end
+             clustinfo.scalp{k} = grid;
+         end;
+        otherwise, error('Unrecognized ''infotype'' entry');
     end; % end switch
     if exist('allinds'),  tmpstruct.allinds = allinds; end;
     if exist('setinds' ), tmpstruct.setinds = setinds; end;
@@ -499,7 +533,7 @@ for ind = 1:length(finalinds)
     % copy results to structure
     % -------------------------
     fieldnames = { 'erpdata' 'erptimes' 'specdata' 'specfreqs' 'erspdata' 'erspbase' 'erspfreqs' 'ersptimes' ...
-                   'itcfreqs' 'itctimes' 'itcdata' 'erspsubjinds' 'itcsubjinds' 'allinds' 'setinds' };
+                   'itcfreqs' 'itctimes' 'itcdata' 'erspsubjinds' 'itcsubjinds' 'allinds' 'setinds' 'dipoles' };
     for f = 1:length(fieldnames)
         if isfield(tmpstruct, fieldnames{f}), 
             tmpdata = getfield(tmpstruct, fieldnames{f});
