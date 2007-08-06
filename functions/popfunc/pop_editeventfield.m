@@ -9,7 +9,7 @@
 %   EEG      - input dataset
 %
 % Optional inputs:
-%  'FIELDNAME' - [ 'filename'|vector|number|[] ]. Name of a current or new 
+%  'FIELDNAME_X' - [ 'filename'|vector|number|[] ]. Name of a current or new 
 %               user-defined event field. The ascii file, vector variable, 
 %               or explicit numeric vector should contain values for this field 
 %               for all events specified in 'indices' (below) or in new events
@@ -20,7 +20,7 @@
 %               all events in the dataset, or to modify the field values of specified 
 %               events, to specify field information for new events appended to
 %               the event structure, or to remove an event field.
-%  'FIELDNAMEinfo' - new comment string for field FIELDNAME.
+%  'FIELDNAME_X_info' - new comment string for field FIELDNAME_X.
 %  'indices'  - [vector of event indices] The indices of the events to modify. 
 %               If adding a new event field, events not listed here 
 %               will have an empty field value IF they are not in an epoch
@@ -39,7 +39,8 @@
 %  'delold'   - ['yes'|'no'] 'yes' = delete ALL previous events.  {default: 'no'}
 %  'timeunit' - [latency field time unit in fraction of seconds]. Ex: 1e-3 -> 
 %               read specified latencies as msec {default: 1 (-->seconds)}
-%  'skipline' - number of leading text file lines to skip in named text files 
+%  'skipline' - number of leading text file lines to skip in named text files.
+%               {default: 0}.
 %  'delim'    - delimiting characters in named text files {default: tabs and spaces}
 %
 % Outputs:
@@ -87,6 +88,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.40  2006/07/21 22:54:46  arno
+% remove warning Matlab 7
+%
 % Revision 1.39  2005/09/27 22:12:02  arno
 % nothing
 %
@@ -371,11 +375,7 @@ try, g.skipline;      catch, g.skipline = 0; end;
 try, g.indices;       catch, g.indices = [1:length(EEG.event)]; end;
 try, g.delold; 	      catch, g.delold = 'no'; end;
 try, g.timeunit; 	  catch, g.timeunit = 1; end;
-try, g.align; 	      catch, g.align = NaN; end;
 try, g.delim; 	      catch, g.delim = char([9 32]); end;
-tmpval  = g.align;
-g.align = [];
-g.align.val = tmpval;
 if isstr(g.indices), g.indices = eval([ '[' g.indices ']' ]); end;
 
 tmpfields = fieldnames(g);
@@ -385,7 +385,7 @@ for curfield = tmpfields'
     if ~isempty(EEG.event), allfields = fieldnames(EEG.event);
     else                    allfields = {}; end;
     switch lower(curfield{1})
-       case { 'append' 'delold', 'fields', 'skipline', 'indices', 'timeunit', 'align', 'delim' }, ; % do nothing now
+       case { 'append' 'delold', 'fields', 'skipline', 'indices', 'timeunit', 'delim' }, ; % do nothing now
        case 'rename',
             if isempty( findstr('->',g.rename) ), disp('pop_editeventfield() warning: bad syntax for rename'); end;
             oldname = g.rename(1:findstr('->',g.rename)-1);
@@ -437,7 +437,7 @@ for curfield = tmpfields'
 		                      EEG.event = load_file_or_array( getfield(g, curfield{1}), g.skipline, g.delim );
 		                      allfields = { curfield{1} };
                               EEG.event = eeg_eventformat(EEG.event, 'struct', allfields);
-                              EEG.event = recomputelatency( EEG.event, 1:length(EEG.event), EEG.srate, g.timeunit, g.align);
+                              EEG.event = recomputelatency( EEG.event, 1:length(EEG.event), EEG.srate, g.timeunit);
                               EEG = eeg_checkset(EEG, 'makeur');
 		                 case 'no' % match existing fields
 		                           % ---------------------
@@ -454,7 +454,7 @@ for curfield = tmpfields'
                                   error('Wrong size for input array');
                               end;
   							  if strcmp(curfield{1}, 'latency')
-								  EEG.event = recomputelatency( EEG.event, g.indices, EEG.srate, g.timeunit, g.align);
+								  EEG.event = recomputelatency( EEG.event, g.indices, EEG.srate, g.timeunit);
 							  end;
  							  if strcmp(curfield{1}, 'duration')
                                   for indtmp = 1:length(EEG.event)
@@ -526,7 +526,7 @@ function array = load_file_or_array( varname, skipline, delim );
     if isstr(varname)
         if exist(varname) == 2 % mean that it is a filename
                                % --------------------------
-            array = loadtxt( varname );
+            array = loadtxt( varname, 'skipline', skipline, 'delim', delim);
             
         else % variable in the global workspace
              % --------------------------
@@ -542,7 +542,7 @@ return;
 
 % update latency values
 % ---------------------
-function event = recomputelatency( event, indices, srate, timeunit, align);
+function event = recomputelatency( event, indices, srate, timeunit);
     if ~isfield(event, 'latency'), return; end;
     for index = indices
         event(index).latency = round(event(index).latency*srate*timeunit);
