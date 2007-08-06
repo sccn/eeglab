@@ -65,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.51  2007/08/06 17:38:36  arno
+% fix bug 327
+%
 % Revision 1.50  2007/02/09 01:41:31  toby
 % 3rd attempt, looks good so far
 %
@@ -293,7 +296,7 @@ else
 end;
 g = finputcheck(options, { 'chanlocs'  ''    []          '';
                     'frames'    'integer'               [1 Inf]     size(data,2);
-                    'chans'     'integer'               [1 Inf]     0;
+                    'chans'     { 'integer' 'string' }  { [1 Inf] [] }    0;
                     'geom'      'integer'               [1 Inf]     [];
                     'limits'    'float'                 []          0;
                     'ylim'      'float'                 []          [];
