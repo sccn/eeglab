@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2007/08/06 23:14:10  arno
+% return if error (bug 235)
+%
 % Revision 1.2  2007/08/06 17:21:00  arno
 % fix bug 246
 %
@@ -76,7 +79,7 @@ if ncomps > p
    return;
 end
 
-Datamean = mean(data);  % remove column (channel) means
+Datamean = mean(data,1);  % remove column (channel) means
 data = data-ones(n,1)*Datamean;    % remove column (channel) means
 out=data'*data/n;
 [V,D] = eig(out);                  % get eigenvectors/eigenvalues
