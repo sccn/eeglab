@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2007/08/06 17:21:00  arno
+% fix bug 246
+%
 % Revision 1.1  2002/04/05 17:36:45  jorn
 % Initial revision
 %
@@ -70,7 +73,7 @@ data = matrix';                    % transpose data
 [n,p]=size(data);                  % now p chans,n time points
 if ncomps > p
    fprintf('pcsquash(): components must be <= number of data rows (%d).\n',p);
-   help pcsquash
+   return;
 end
 
 Datamean = mean(data);  % remove column (channel) means
