@@ -35,6 +35,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2007/03/09 23:17:34  toby
+% Bug212 courtesy Maxim Duester
+%
 % Revision 1.1  2002/04/05 17:36:45  jorn
 % Initial revision
 %
@@ -87,8 +90,7 @@ chansout = length(chanlist);
 epochs = floor(framestot/frames);
 
 if epochs*frames ~= framestot
-    fprintf(...
-        'matsel(): data length %d was not a multiple of %d frames.\n',...
+    fprintf('matsel(): data length %d was not a multiple of %d frames.\n',...
                           framestot,frames);
     data = data(:,1:epochs*frames);
 end
@@ -99,31 +101,35 @@ end
 epochsout = length(epochlist);
 
 if max(epochlist)>epochs 
-      fprintf('matsel(): max index in epochlist (%d) > epochs in data (%d)\n',...
+      fprintf('matsel() error: max index in epochlist (%d) > epochs in data (%d)\n',...
                         max(epochlist),epochs);
       return
 end
 
 if max(framelist)>frames 
-      fprintf('matsel(): max index in framelist (%d) > frames per epoch (%d)\n',...
+      fprintf('matsel() error: max index in framelist (%d) > frames per epoch (%d)\n',...
                         max(framelist),frames);
       return
 end
     
 if min(framelist)<1
-      fprintf('matsel(): framelist min (%d) < 1\n',...
-                        min(framelist));
+      fprintf('matsel() error: framelist min (%d) < 1\n', min(framelist));
       return
 end
-    
+
+if min(epochlist)<1
+      fprintf('matsel() error: epochlist min (%d) < 1\n', min(epochlist));
+      return
+end
+   
 if max(chanlist)>chans
-      fprintf('matsel(): chanlist max (%d) > chans (%d)\n',...
+      fprintf('matsel() error: chanlist max (%d) > chans (%d)\n',...
                         max(chanlist),chans);
       return
 end
     
 if min(chanlist)<1
-      fprintf('matsel(): chanlist min (%d) <1\n',...
+      fprintf('matsel() error: chanlist min (%d) <1\n',...
                         min(chanlist));
       return
 end
