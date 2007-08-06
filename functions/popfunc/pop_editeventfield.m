@@ -88,6 +88,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.42  2007/08/06 18:20:42  arno
+% fixed bug 542; cleaned up code
+%
 % Revision 1.41  2007/08/06 18:09:31  arno
 % Fixed bug 363
 % ,
@@ -392,19 +395,22 @@ for curfield = tmpfields'
     switch lower(curfield{1})
        case { 'append' 'delold', 'fields', 'skipline', 'indices', 'timeunit', 'delim' }, ; % do nothing now
        case 'rename',
-            if isempty( findstr('->',g.rename) ), disp('pop_editeventfield() warning: bad syntax for rename'); end;
-            oldname = g.rename(1:findstr('->',g.rename)-1);
-            newname = g.rename(findstr('->',g.rename)+2:end);
-            indexmatch = strmatch(oldname, allfields);
-            if isempty(indexmatch), disp('pop_editeventfield() warning: name not found for rename'); 
+            if isempty( findstr('->',g.rename) ), 
+                disp('warning pop_editeventfield() bad syntax for ''rename'', ignoring input'); 
             else
-                for index  = 1:length(EEG.event)
-                     eval([ 'EEG.event(index).' newname '=EEG.event(index).' oldname ';']);  
-                end;    
-                EEG.event = rmfield(EEG.event, oldname);
-            end;
-            if isfield(EEG, 'urevent')
-                disp('pop_editeventfield() warning: field name not renamed in urevent structure');
+                oldname = g.rename(1:findstr('->',g.rename)-1);
+                newname = g.rename(findstr('->',g.rename)+2:end);
+                indexmatch = strmatch(oldname, allfields);
+                if isempty(indexmatch), disp('pop_editeventfield() warning: name not found for rename'); 
+                else
+                    for index  = 1:length(EEG.event)
+                        eval([ 'EEG.event(index).' newname '=EEG.event(index).' oldname ';']);  
+                    end;    
+                    EEG.event = rmfield(EEG.event, oldname);
+                end;
+                if isfield(EEG, 'urevent')
+                    disp('pop_editeventfield() warning: field name not renamed in urevent structure');
+                end;
             end;
        otherwise, % user defined field command
                   % --------------------------
