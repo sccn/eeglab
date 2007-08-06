@@ -15,7 +15,9 @@
 %   'algorithm' - ['kmeans'|'Neural Network'] algorithm to be used for clustering.
 %                 the 'Neural Network' option requires the Matlab Neural Net toolbox 
 %                    {default: 'kmeans'} 
-%   'clust_num' - [num] the number of desired clusters (must be > 1) {default: 20}
+%   'clus_num'  - [integer] the number of desired clusters (must be > 1) {default: 20}
+%   'outliers'  - [integer] identify outlier more than X standard deviation from any
+%                 cluster centroid {default is Inf=no outliers}
 %   'save'      - ['on' | 'off'] save the updated STUDY to disk {default: 'off'} 
 %   'filename'  - [string] if save option is 'on', save the STUDY under this file name
 %                    {default: current STUDY filename}
@@ -57,6 +59,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2007/05/01 21:05:14  arno
+% better help message
+%
 % Revision 1.25  2006/03/21 15:45:36  arno
 % new .sets format; embeding component creation
 %
