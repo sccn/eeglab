@@ -17,7 +17,8 @@
 %
 % Output:
 %   chanlist      - indices of selected channels
-%   strchannames  - names of selected channel names (concatenated in a string)
+%   strchannames  - names of selected channel names in a concatenated string
+%                   (channel names are separated by space characters)
 %   cellchannames - names of selected channel names in a cell array
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 3 March 2003
@@ -41,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2007/08/06 18:24:07  arno
+% help message
+%
 % Revision 1.22  2007/08/06 17:31:17  arno
 % update help message.
 %
