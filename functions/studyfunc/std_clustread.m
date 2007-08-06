@@ -1,4 +1,11 @@
-% std_clustread() - load one or more requested measures 
+% std_clustread() - this function has been replaced by std_readdata() for
+%                   consistency. Please use std_readdata() instead.
+
+
+
+
+
+%                   load one or more requested measures 
 %                   ['erp'|'spec'|'ersp'|'itc'|'dipole'|'map']
 %                   for all components of a specified cluster.  
 %                   Calls std_readerp(), std_readersp(), etc.
@@ -54,9 +61,16 @@
 %
 % RCS-recorded version number, date, editor and comments
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2007/02/23 04:38:59  toby
+% added line to include RCS comments
+% nothing to reconcile between Arno and Scott's edits
+%
 
 function clustinfo = std_clustread(STUDY,ALLEEG, cluster, infotype, condition);
 
+    help std_clustread;
+    return;
+    
 if nargin < 4
     help std_clustread;
     return;
