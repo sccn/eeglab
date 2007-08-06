@@ -29,6 +29,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2006/03/11 06:10:57  arno
+% header
+%
 % Revision 1.12  2005/08/04 22:13:07  arno
 % adapting box size
 %
@@ -68,7 +71,7 @@
 
 function [result] = questdlg2(Prompt,Title,varargin);
 
-result = varargin{end};
+result = '';
 if nargin < 2
    help questdlg2;
    return;
