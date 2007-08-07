@@ -23,6 +23,9 @@
 %          with help from Andrey Vankov
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2006/12/15 20:09:32  toby
+% Reverted to version 1.25. Andre reports 1.26 not working
+%
 % Revision 1.25  2005/05/20 18:39:53  hilit
 % if header is empty not rescaling to uV.
 %
@@ -50,7 +53,12 @@
 %
 
 function [eeg,ev,header] = read_erpss(filename)
-  
+    
+    if nargin < 1
+      help read_erpss;
+      return;
+    end;
+    
     eeg = [];
     ev = [];
     header = [];
