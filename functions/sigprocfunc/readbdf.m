@@ -1,20 +1,6 @@
 % readbdf() -  Loads selected Records of an EDF or BDF File (European Data Format 
-%              for Biosignals) into MATLAB
-% Usage: 
-%          >> [DAT,signal] = readedf(EDF_Struct,Records,Mode);
-% Notes:
-%       Records - List of Records for Loading
-%       Mode    -       0       Default
-%                       1       No AutoCalib
-%                       2       Concatenated (channels with lower sampling rate 
-%                                             if more than 1 record is loaded)
-% Output:
-%       DAT    - EDF data structure
-%       signal - output signal
-%
-% Author: Alois Schloegl, 03.02.1998, updated T.S. Lorig Sept 6, 2002 for BDF read
-%
-% See also: openbdf(), sdfopen(), sdfread(), eeglab()
+%              for Biosignals) into MATLAB. This function is outdate
+%              Use the functions sopen() and sread() instead
 
 %	Version 2.11
 %	03.02.1998
