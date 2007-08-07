@@ -1,7 +1,7 @@
-%  plottopo() - plot concatenated multichannel data epochs in a topographic or
-%               rectangular array. Uses a channel location file with the same 
-%               format as topoplot(), or else plots data on a rectangular grid. 
-%               If data are all positive, they are assumed to be spectra.
+% plottopo() - plot concatenated multichannel data epochs in a topographic or
+%              rectangular array. Uses a channel location file with the same 
+%              format as topoplot(), or else plots data on a rectangular grid. 
+%              If data are all positive, they are assumed to be spectra.
 % Usage:
 %    >> plottopo(data, 'key1', 'val1', 'key2', 'val2')
 %    >> plottopo(data,'chan_locs')   % old function call
@@ -68,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.55  2007/08/07 18:59:32  arno
+% fixed unused variables bug 319
+%
 % Revision 1.54  2007/08/07 18:58:10  arno
 % bug 307
 %
@@ -597,10 +600,6 @@ end;
     fprintf('limits: [xmin,xmax,ymin,ymax] = [%4.1f %4.1f %4.2f %4.2f]\n',...
             xmin,xmax,ymin,ymax);
     fprintf(msg,datasets,g.frames);
-
-    set(h,'YLim',[ymin ymax]);            % set default plotting parameters
-    set(h,'XLim',[xmin xmax]);
-    set(h,'FontSize',FONTSIZE);           % choose font size
 
     set(h,'FontSize',FONTSIZE);           % choose font size
     set(h,'YLim',[ymin ymax]);            % set default plotting parameters
