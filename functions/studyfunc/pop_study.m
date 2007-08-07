@@ -44,7 +44,7 @@
 %                          structure to disk. If no filename is provided, a window will 
 %                          pop up to ask for it. 
 %
-%  See also  pop_loadstudy(), pop_preclust(), pop_clust()
+% See also: std_editset, pop_loadstudy(), pop_preclust(), pop_clust()
 %
 % Authors: Arnaud Delorme, Hilit Serby, Scott Makeig, SCCN, INC, UCSD, July 22, 2005
 
@@ -69,6 +69,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.53  2007/07/27 22:12:28  toby
+% nothing
+%
 % Revision 1.52  2007/05/01 23:33:11  arno
 % typo
 %
