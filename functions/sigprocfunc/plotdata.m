@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2005/03/17 17:51:25  arno
+% fixing text call for Matlab 7
+%
 % Revision 1.16  2005/01/29 01:53:51  scott
 % ??
 %
@@ -294,7 +297,7 @@ end
      colors =['r  ';'b  ';'g  ';'c  ';'m  ';'r  ';'b  ';'g  ';'c  ';'m  ';'r  ';'b  ';'g  ';'c  ';'m  ';'r  ';'b  ';'g  ';'c  ';'m  ';'r  ';'b  ';'g  ';'c  ';'m  ';'r  ';'b  ';'g  ';'c  ';'m  ';'r  ';'b  ';'g  ';'c  ';'m  '];
      colors = [colors; colors];  % make > 64 available
   end;
-  for c=1:length(colors)   % make white traces black unless axis color is white
+  for c=1:size(colors,1)   % make white traces black unless axis color is white
     if colors(c,1)=='w' & axcolor~=[1 1 1]
          colors(c,1)='k';
     end
