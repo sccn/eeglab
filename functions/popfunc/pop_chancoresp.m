@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2007/08/07 18:23:22  arno
+% remove unused variables
+%
 % Revision 1.9  2007/08/07 18:15:49  arno
 % update help and catch error
 %
@@ -181,23 +184,6 @@ function [chanlistout1, chanlistout2, thirdout, outfourth] = pop_chancoresp(chan
     % ------------------
     [ g.newchanstr1 g.newchanstr2 ] = makelisttext( chanstr1, chanstr2, g.chanlist1, g.chanlist2);
     
-    for index = 1:length(chanstr1)
-        if ismember(index, g.chanlist1)
-            pos = find(g.chanlist1 == index);
-            g.newchanstr1{index} = pair( g.chanlist1(pos), g.chanlist2(pos), chanstr1, chanstr2 );
-        else
-            g.newchanstr1{index} = sprintf('%2d - %3s', index, g.chanstr1{index});
-        end;
-    end;
-    for index = 1:length(chanstr2)
-        if ismember(index, g.chanlist2)
-            pos = find(g.chanlist2 == index);
-            [tmp g.newchanstr2{index}] = pair( g.chanlist1(pos), g.chanlist2(pos), chanstr1, chanstr2 );
-        else
-            g.newchanstr2{index} = sprintf('%2d - %3s', index, g.chanstr2{index});
-        end;
-    end;
-
     % callback for paring and unpairing
     % ---------------------------------
     cb_pair = [ 'tmpdat = get(gcbf, ''userdata'');' ...
