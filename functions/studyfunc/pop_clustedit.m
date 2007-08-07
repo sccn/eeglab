@@ -157,6 +157,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.53  2007/08/07 19:21:42  arno
+% update help message (bug 346)
+%
 % Revision 1.52  2007/08/03 22:57:08  arno
 % fixed dipole plotting and made it consistent with other plotting calls
 %
@@ -172,10 +175,13 @@
 
 function [STUDY, com] = pop_clustedit(varargin)
 icadefs;
+
+if nargin < 2
+    help pop_clustedit;
+    return;
+end
+
 if ~isstr(varargin{1})
-    if nargin < 2
-        error('pop_clustedit(): You must provide ALLEEG and STUDY structures');
-    end
     STUDY  = varargin{1};
     STUDY.etc.erpparams.topotime  = NaN; % [] for channels and NaN for components
     STUDY.etc.specparams.topofreq = NaN; % NaN -> GUI disabled
