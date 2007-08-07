@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2007/08/07 18:31:09  arno
+% fix bug 293 for only one color
+%
 % Revision 1.17  2005/03/17 17:51:25  arno
 % fixing text call for Matlab 7
 %
@@ -375,21 +378,18 @@ end
 
   % print plottitle over (left) sbplot 1
   if plottitle==0,
-    plottitle = '';
+      plottitle = '';
   end
   if righttitle==0,
-    righttitle = '';
+      righttitle = '';
   end
-  % sbplot(ceil(chans/2),2,1), h=gca;%title([plottitle],'FontSize',FONTSIZE); % title plot and
-  % set(h,'YLim',[ymin ymax]);            % set default plotting parameters
-  % set(h,'XLim',[xmin xmax]);
-  % set(h,'FontSize',FONTSIZE);            % choose font size
-  % set(h,'visible','off');
-
-  % sbplot(ceil(chans/2),2,2), h=gca;%title([righttitle], 'FontSize',FONTSIZE); % title plot and
-  % set(h,'FontSize',FONTSIZE);            % choose font size
-  % set(h,'YLim',[ymin ymax]);            % set default plotting parameters
-  % set(h,'XLim',[xmin xmax]);
+  
+  if ~isempty(righttitle)
+      sbplot(ceil(chans/2),2,2), h=gca;%title([righttitle], 'FontSize',FONTSIZE); % title plot and
+      set(h,'FontSize',FONTSIZE);            % choose font size
+      set(h,'YLim',[ymin ymax]);            % set default plotting parameters
+      set(h,'XLim',[xmin xmax]);
+  end;
 
   msg = ['\nPlotting %d traces of %d frames with colors: '];
   for c=1:datasets
