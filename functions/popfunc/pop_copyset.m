@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2007/08/07 19:08:06  arno
+% fixed bug 334
+%
 % Revision 1.9  2005/11/04 23:33:04  arno
 % new calling format
 %
@@ -94,8 +97,7 @@ if nargin < 3
 	promptstr    = { 'Index of the new dataset:'};
 	inistr       = { int2str(set_in+1) };
 	result       = inputdlg2( promptstr, 'Copy dataset -- pop_copyset()', 1,  inistr, 'pop_copyset');
-	size_result  = size( result );
-	if size_result(1) == 0 return; end;
+	if size( result ) == 0, EEG = []; CURRENTSET = 0; return; end;
 	set_out   	 = eval( result{1} );
 end;
 ALLEEG = eeg_store(ALLEEG, eeg_retrieve(ALLEEG, set_in), set_out);
