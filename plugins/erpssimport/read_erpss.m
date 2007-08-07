@@ -23,6 +23,9 @@
 %          with help from Andrey Vankov
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2007/08/07 19:48:28  arno
+% fix help (bug 382)
+%
 % Revision 1.27  2006/12/15 20:09:32  toby
 % Reverted to version 1.25. Andre reports 1.26 not working
 %
@@ -194,24 +197,24 @@ function [eeg,ev,header] = read_erpss(filename)
             nchans = fread(fp,1,'uint16');
             fread(fp,1,'uint16');
             block_size = fread(fp,1,'uint16');
-            ndupsamp = fread(fp,1,'uint16');
-            nrun = fread(fp,1,'uint16');
-            err_detect = fread(fp,1,'uint16');
-            nlost = fread(fp,1,'uint16');
-            nevents = fread(fp,1,'uint16');
+            header.ndupsamp   = fread(fp,1,'uint16');
+            header.nrun       = fread(fp,1,'uint16');
+            header.err_detect = fread(fp,1,'uint16');
+            header.nlost      = fread(fp,1,'uint16');
+            nevents    = fread(fp,1,'uint16');
             block_size_compress = fread(fp,1,'uint16');
             %if cnt == 3, return; end;
             
             % Read events
-            tmppos = ftell(fp);
             fseek(fp,48,0);
             for i=1:nevents,
-                samp_off = fread(fp,1,'uint8');
-                cond_code = fread(fp,1,'uint8');
-                ev_code = fread(fp,1,'uint16');
-                ev_cnt = ev_cnt + 1;
+                samp_off  = fread(fp,1,'uint8');
+                cond_code = fread(fp,1,'uint8'); 
+                ev_code   = fread(fp,1,'uint16');
+                ev_cnt    = ev_cnt + 1;
                 ev(ev_cnt).sample_offset = samp_off + (cnt-1)*block_size+1; %+1 for Matlab 
-                ev(ev_cnt).event_code = ev_code;
+                ev(ev_cnt).event_code    = ev_code;
+                ev(ev_cnt).cond_code     = cond_code;
             end
             fseek(fp,4*(110-nevents),0);
             if compressed
