@@ -63,7 +63,7 @@
 %                 bootstrap coherence based on shuffled trials. This estimates
 %                 the coherence arising only from time locking of x and y
 %                 to experimental events (opposite of 'subitc'). For cell array 
-%                 input, one may provide a cell array, for exemple { 1 0 }.
+%                 input, one may provide a cell array, for example { 1 0 }.
 %                 { default 0: no shuffling }.
 %
 %    Optional Detrend:
@@ -213,6 +213,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.80  2007/08/07 19:14:35  arno
+% remove help message warning
+%
 % Revision 1.79  2007/02/02 07:58:13  arno
 % fix log scale
 %
