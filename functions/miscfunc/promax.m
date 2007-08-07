@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2007/08/07 19:36:10  arno
+% revert old version
+%
 % Revision 1.2  2003/09/05 00:47:11  arno
 % replace continue by cont for Matlab 6 compatibility
 %
@@ -112,7 +115,7 @@ fprintf(...
                                                   powr,tol)
 it = 1;
 Pz = zeros(size(B));
-while cont & it <= MAX_ITERATIONS
+while cont & it <= maxit
   P = Pz;
   ii = find(abs(B) > NEAR_ZERO); % avoid division by 0
   P(ii) = (abs(B(ii).^(powr+1)))./B(ii);
