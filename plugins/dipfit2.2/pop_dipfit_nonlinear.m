@@ -34,6 +34,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2007/01/26 18:19:14  arno
+% CTF implementation
+%
 % Revision 1.10  2006/03/10 23:52:46  arno
 % multiple dipole fit
 %
@@ -404,13 +407,13 @@ elseif nargin>=3
         {'style' 'pushbutton' 'string' 'Interupt' 'callback' 'figure(gcbf); set(gcbf, ''tag'', ''stop'');' } );
       drawnow;
       % start the dipole fitting
-      try
+      %try
           warning backtrace off;
           EEG = dipfit_nonlinear(EEG, arg{:});
           warning backtrace on;
-      catch,
-          disp('Dipole localization failed');
-      end;
+      %catch,
+      %    disp('Dipole localization failed');
+      %end;
       
       % should the following string be put into com? ->NOT SUPPORTED
       % --------------------------------------------------------
