@@ -96,6 +96,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2007/07/30 23:03:40  arno
+% do not plot stats automatically
+%
 % Revision 1.6  2007/05/11 03:11:36  toby
 % bug when plotting 'threshold' with more than one dataset fixed
 %
@@ -386,7 +389,11 @@ if isempty(opt.topovals)
             else 
                 caxis(opt.caxis);
             end;
-
+            
+            if c > 1
+                ylabel(''); 
+            end;
+            
             % statistics accross groups
             % -------------------------
             if g == ng && ng > 1 & strcmpi(opt.groupstats, 'on') & ~statmask
@@ -397,7 +404,7 @@ if isempty(opt.topovals)
                 tftopo( pgroupplot{c}', timevals, freqs, 'title', tmp_title, options{:});
                 caxis([-maxplot maxplot]);
             end;
-            
+
         end;
 
     end;
@@ -413,7 +420,7 @@ if isempty(opt.topovals)
             caxis([-maxplot maxplot]);
         end;
     end;
-    
+                ylabel('');  % nima
     % color scale
     % -----------
     if isempty(opt.caxis)
@@ -441,7 +448,7 @@ if isempty(opt.topovals)
     % color bars
     % ----------
     axes(hdl(nc,ng)); 
-    cbar_standard(opt.datatype, ng);
+    cbar_standard(opt.datatype, ng); 
     if nc ~= size(hdl,1) | ng ~= size(hdl,2)
         axes(hdl(end,end));
         cbar_signif(ng, maxplot);
@@ -557,7 +564,7 @@ function cbar_standard(datatype, ng);
     pos = get(gca, 'position');
     tmpc = caxis;
     fact = fastif(ng == 1, 40, 20);
-    tmp = axes('position', [ pos(1)+pos(3)+pos(3)/fact pos(2) pos(3)/fact pos(4) ]);  
+    tmp = axes('position', [ pos(1)+pos(3)+max(pos(3)/fact,0.006) pos(2) max(pos(3)/fact,0.01) pos(4) ]);  
     set(gca, 'unit', 'normalized');
     if strcmpi(datatype, 'itc')
          cbar(tmp, 0, tmpc, 10); ylim([0.5 1]);
@@ -570,7 +577,7 @@ function cbar_signif(ng, maxplot);
     pos = get(gca, 'position');
     tmpc = caxis;
     fact = fastif(ng == 1, 40, 20);
-    tmp = axes('position', [ pos(1)+pos(3)+pos(3)/fact pos(2) pos(3)/fact pos(4) ]);  
+    tmp = axes('position', [ pos(1)+pos(3)+max(pos(3)/fact,0.006) pos(2) max(pos(3)/fact,0.01) pos(4) ]);  
     map = colormap;
     n = size(map,1);
     cols = [ceil(n/2):n]';
