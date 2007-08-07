@@ -9,7 +9,7 @@
 %   EEG      - input dataset
 %
 % Optional inputs:
-%  'FIELDNAME_X' - [ 'filename'|vector|number|[] ]. Name of a current or new 
+%  'FIELDNAME_X' - [ 'filename'|vector ]. Name of a current or new 
 %               user-defined event field. The ascii file, vector variable, 
 %               or explicit numeric vector should contain values for this field 
 %               for all events specified in 'indices' (below) or in new events
@@ -19,8 +19,15 @@
 %               specified (or new) events. Use this option to add a new field to 
 %               all events in the dataset, or to modify the field values of specified 
 %               events, to specify field information for new events appended to
-%               the event structure, or to remove an event field.
+%               the event structure, or to remove an event field. For exemple,
+%               'FIELDNAME_X' may be 'latency', 'type', 'duration'.
+%  'latency'  - [ 'filename'|vector ] exemple of field name (see description above).
+%  'type'     - [ 'filename'|vector ] exemple of field name (see description above).
+%  'duration' - [ 'filename'|vector ] exemple of field name (see description above).
 %  'FIELDNAME_X_info' - new comment string for field FIELDNAME_X.
+%  'latency_info'     - descirption string for the latency field.
+%  'type_info'        - descirption string for the type field.
+%  'duration_info'    - descirption string for the duration field.
 %  'indices'  - [vector of event indices] The indices of the events to modify. 
 %               If adding a new event field, events not listed here 
 %               will have an empty field value IF they are not in an epoch
@@ -88,6 +95,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.45  2007/08/07 19:29:03  arno
+% fixed bug 355
+%
 % Revision 1.44  2007/08/07 19:27:38  arno
 % fix bug 347
 %
