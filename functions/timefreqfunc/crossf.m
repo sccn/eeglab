@@ -169,6 +169,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.73  2007/03/05 21:41:04  toby
+% Document removal of reliance on eventlock.m
+%
 % Revision 1.72  2006/03/13 23:10:50  arno
 % significance masking
 %
@@ -918,13 +921,13 @@ switch g.type
     case 'phasecoher2', fprintf('Phase Coherence 2 (ITC) images for %d trials.\n',length(X)/g.frame);
     case 'coher',       fprintf('Linear Coherence (ITC) images for %d trials.\n',length(X)/g.frame);
 end;
-fprintf('The trial latency range is from %4.5g ms before to %4.5g ms after\n     the time-locking event.\n', 1000*g.tlimits(1),1000*g.tlimits(2));
+fprintf('The trial latency range is from %4.5g ms before to %4.5g ms after\n     the time-locking event.\n', g.tlimits(1),g.tlimits(2));
 fprintf('The frequency range displayed will be %g-%g Hz.\n',min(freqs),g.maxfreq);
 if ~isnan(g.baseline)
    if length(baseln) == length(times)
       fprintf('Using the full trial latency range as baseline.\n');
    else
-      fprintf('Using trial latencies from %4.5g ms to %4.5g ms as baseline.\n', 1000*g.tlimits,g.baseline);
+      fprintf('Using trial latencies from %4.5g ms to %4.5g ms as baseline.\n', g.tlimits,g.baseline);
    end;
 else 
    fprintf('No baseline time range was specified.\n');	
