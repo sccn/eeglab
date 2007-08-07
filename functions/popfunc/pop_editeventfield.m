@@ -46,14 +46,14 @@
 % Outputs:
 %   EEG          - dataset with updated event field
 %
-% Example: [EEG, eventnumbers] = pop_editeventfield(EEG, 'type', 1, ...
+% Example: EEG = pop_editeventfield(EEG, 'type', 1, ...
 %                         'sleepstage', 'sleepstage_values.txt', ...
 %                         'latency', [100 130 123 400],'timeunit',1e-3);
 %          % Append 4 events to the EEG struct, all of type 1, at the latencies
 %          % given (in msec) with user-defined field ('sleepstage') values read 
 %          % from a one-column ascii file ('sleepstage_values.txt').
 %
-% Example: [EEG, eventnumbers] = pop_editeventfield(EEG, 'indices', 1:2:3277, ...
+% Example: EEG = pop_editeventfield(EEG, 'indices', 1:2:3277, ...
 %                          'sleepstage', 'sleepstage_values.txt');
 %          % Add a new 'sleepstage' field to all events in the EEG struct.
 %          % Read 'sleepstage' field values for odd-numbered events from a one-column 
@@ -88,6 +88,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.44  2007/08/07 19:27:38  arno
+% fix bug 347
+%
 % Revision 1.43  2007/08/06 18:29:57  arno
 % fix bug 365 for 'rename' input
 %
