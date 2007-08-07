@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2007/08/06 18:34:06  arno
+% fix typo according to bug 366
+%
 % Revision 1.2  2002/11/15 02:50:22  arno
 % header for web
 %
@@ -48,7 +51,7 @@
 
 function q = quantile(data,pc); 
 
-if nargin < 1
+if nargin < 2
 	help quantile;
 	return;
 end;	
