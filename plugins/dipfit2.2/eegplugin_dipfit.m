@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1.07  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2007/01/26 18:24:04  arno
+% dipfit 2.1
+%
 % Revision 1.22  2006/11/20 18:46:06  arno
 % add menu separator
 %
@@ -206,7 +209,7 @@ function vers = eegplugin_dipfit2_1(fig, trystrs, catchstrs)
     end;
     tmp2 = which('topoplot');
     if ~strcmpi(tmp, tmp2),
-        disp('Warning: you should delete the topoplot.m functions in fieldtrip which might confuse EEGLAB');
+        disp('Warning: duplicate function topoplot.m in fieldtrip and EEGLAB');
         addpath(fileparts(tmp));
     end;
 
