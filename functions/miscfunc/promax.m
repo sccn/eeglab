@@ -20,7 +20,6 @@
 %
 % See also: runica()
 
-
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
 % Copyright (C) Colin Humphries, CNL / Salk Institute, June 1998
@@ -40,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2007/08/07 19:36:49  arno
+% fix maxit (bug 371)
+%
 % Revision 1.4  2007/08/07 19:36:10  arno
 % revert old version
 %
@@ -61,6 +63,8 @@
 
 function [R,V] = promax(data,ncomps,maxit)
 
+
+    
 DEFAULT_POWER     = 4;
 DEFAULT_TOLERANCE = 1e-5;
 MAX_ITERATIONS    = 5;
@@ -85,7 +89,9 @@ chans = size(data,1)
 if ncomps == 0
    ncomps = chans
 end
-
+if ncomps > chans
+    error(sprintf('promax(): components must be <= number of data rows (%d).\n',chans));
+end
 if nargin < 3
   maxit = 0;
 end
