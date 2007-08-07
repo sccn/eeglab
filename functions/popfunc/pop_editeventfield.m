@@ -19,11 +19,11 @@
 %               specified (or new) events. Use this option to add a new field to 
 %               all events in the dataset, or to modify the field values of specified 
 %               events, to specify field information for new events appended to
-%               the event structure, or to remove an event field. For exemple,
+%               the event structure, or to remove an event field. For example,
 %               'FIELDNAME_X' may be 'latency', 'type', 'duration'.
-%  'latency'  - [ 'filename'|vector ] exemple of field name (see description above).
-%  'type'     - [ 'filename'|vector ] exemple of field name (see description above).
-%  'duration' - [ 'filename'|vector ] exemple of field name (see description above).
+%  'latency'  - [ 'filename'|vector ] example of field name (see description above).
+%  'type'     - [ 'filename'|vector ] example of field name (see description above).
+%  'duration' - [ 'filename'|vector ] example of field name (see description above).
 %  'FIELDNAME_X_info' - new comment string for field FIELDNAME_X.
 %  'latency_info'     - descirption string for the latency field.
 %  'type_info'        - descirption string for the type field.
@@ -95,6 +95,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.46  2007/08/07 19:32:36  arno
+% adding 'type', 'latency', ... to the help message (bug 364)
+%
 % Revision 1.45  2007/08/07 19:29:03  arno
 % fixed bug 355
 %
