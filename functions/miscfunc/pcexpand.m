@@ -37,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % 4-15-98  debugged -sm & t-pj
 % 01-25-02 reformated help & license, added links -ad 
@@ -45,13 +48,18 @@ function [expanded_data]=pcexpand(PCAproj,EigenVectors,Datameans)
 
 if nargin < 2
    help pcexpand
+   return;
 end
 
 [ncomps,frames]=size(PCAproj);
 [j,k]=size(EigenVectors);
 
-if j < ncomps | nargin < 2 | j ~= k 
-   help pcexpand
+if j ~= k 
+   error('Wrong array input size (eigenvectors matrix not square');
+end
+
+if j < ncomps
+   error('Wrong array input size (eigenvectors rows must be equal to projection matrix rows');
 end
 
 if size(Datameans,1) == 1,
