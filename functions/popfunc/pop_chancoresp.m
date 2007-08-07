@@ -17,7 +17,7 @@
 %   'chanlist1'     - [integer] selected channel to pair in the graphic interface
 %                     for the first channel structure. This requires the input 
 %                     'chanlist2' below.
-%   'chanlist1'     - [integer] selected channel to pair in the graphic interface
+%   'chanlist2'     - [integer] selected channel to pair in the graphic interface
 %                     for the first channel structure. This requires the input 
 %                     requires the input 'chanlist1' that must be of the same length.
 % Output:
@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2007/08/07 18:25:07  arno
+% remove duplicate text bug 273
+%
 % Revision 1.10  2007/08/07 18:23:22  arno
 % remove unused variables
 %

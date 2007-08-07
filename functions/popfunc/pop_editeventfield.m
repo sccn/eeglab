@@ -25,9 +25,9 @@
 %  'type'     - [ 'filename'|vector ] example of field name (see description above).
 %  'duration' - [ 'filename'|vector ] example of field name (see description above).
 %  'FIELDNAME_X_info' - new comment string for field FIELDNAME_X.
-%  'latency_info'     - descirption string for the latency field.
-%  'type_info'        - descirption string for the type field.
-%  'duration_info'    - descirption string for the duration field.
+%  'latency_info'     - description string for the latency field.
+%  'type_info'        - description string for the type field.
+%  'duration_info'    - description string for the duration field.
 %  'indices'  - [vector of event indices] The indices of the events to modify. 
 %               If adding a new event field, events not listed here 
 %               will have an empty field value IF they are not in an epoch
@@ -95,6 +95,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.47  2007/08/07 19:53:16  arno
+% exemple -> example
+%
 % Revision 1.46  2007/08/07 19:32:36  arno
 % adding 'type', 'latency', ... to the help message (bug 364)
 %
