@@ -35,6 +35,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2007/08/07 18:33:34  arno
+% fix unused variable (bug 293)
+%
 % Revision 1.1  2002/04/05 17:36:45  jorn
 % Initial revision
 %
@@ -148,7 +151,7 @@ set(gca,'GridLineStyle',':')
 set(gca,'Xgrid','off')
 set(gca,'Ygrid','on')
 set(gca,'Color',BACKCOLOR,'FontSize',TICKFONT,'FontWeight','bold');
-plot_handl=plot(x,data(plotchans,(epoch-1)*frames+1:epoch*frames))    % plot the data
+plot_handl=plot(x,data(plotchans,(epoch-1)*frames+1:epoch*frames));    % plot the data
 title(titl,'fontsize',TITLEFONT,'FontWeight','bold');
 
 l= xlabel('Time (ms)');
