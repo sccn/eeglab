@@ -2,13 +2,11 @@
 %            rotation of the rows of the input data. A method for 
 %            linear decomposition by "rotating to simple structure."
 % Usage:
-%        >> [R]   = promax(data,ncomps);
-%        >> [R,V] = promax(data,ncomps,maxit);
+%        >> [R,V] = promax(data,ncomps);
 %
 % Inputs:
 %     data    - Promax operates on rows of the input data matrix
 %     ncomps  - operate on the N largest PCA components (default|0 -> all)
-%     maxit   - maximum number of iterations {default|0 -> 5}
 %
 % Outputs:
 %     R       - is the non-orthogonal Promax rotation matrix 
@@ -19,7 +17,6 @@
 % Author: Colin Humphries, CNL / Salk Institute, 1998
 %
 % See also: runica()
-
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -40,6 +37,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2003/09/05 00:47:11  arno
+% replace continue by cont for Matlab 6 compatibility
+%
 % Revision 1.1  2002/04/05 17:36:45  jorn
 % Initial revision
 %
@@ -53,7 +53,7 @@
 % Hendrickson AE and White PO (1964) Promax: A quick method for rotation 
 % to oblique simple structure, Br J of Stat Psych, X:xxx-xxx.
 
-function [R,V] = promax(data,ncomps,maxit)
+function [R,V] = promax(data,ncomps)
 
 DEFAULT_POWER     = 4;
 DEFAULT_TOLERANCE = 1e-5;
@@ -78,13 +78,6 @@ end
 chans = size(data,1)
 if ncomps == 0
    ncomps = chans
-end
-
-if nargin < 3
-  maxit = 0;
-end
-if maxit == 0
-  maxit = MAX_ITERATIONS;
 end
 
 if ncomps < chans
