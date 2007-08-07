@@ -163,6 +163,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.277  2007/08/07 21:22:34  arno
+% changed optional arguments to use varargin, call topoplot from fieldtrip if necessary
+%
 % Revision 1.276  2007/02/05 20:25:58  toby
 % fixed bug when entering channels to plot instead of channel values as the first Input
 %
@@ -975,8 +978,8 @@ if nargs > 2
     error('Odd number of input arguments??')
   end
   for i = 1:2:length(varargin)
-    Param = varargin{i}
-    Value = varargin{i+1}
+    Param = varargin{i};
+    Value = varargin{i+1};
     if ~isstr(Param)
       error('Flag arguments must be strings')
     end
