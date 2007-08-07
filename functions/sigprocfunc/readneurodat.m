@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2007/08/06 18:55:58  arno
+% fixed outputs
+%
 % Revision 1.3  2005/05/24 17:08:24  arno
 % cell2mat -> celltomat
 %
@@ -50,29 +53,34 @@
 
 function [chanlocs, labels, theta, phi] = readneurodat(filename);
     
-% enter file name here
-% --------------------
-%tmp = loadtxt('/home/ftp/pub/locfiles/neuroscan/cap128.dat');
-%tmp = loadtxt('/home/arno/temp/quik128.DAT');
-tmp = loadtxt(filename);
+    if nargin < 1
+        help readneurodat;
+        return;
+    end;
+    
+    % enter file name here
+    % --------------------
+    %tmp = loadtxt('/home/ftp/pub/locfiles/neuroscan/cap128.dat');
+    %tmp = loadtxt('/home/arno/temp/quik128.DAT');
+    tmp = loadtxt(filename);
 
-% resort electrodes
-% -----------------
-[tmp2 tmpind] = sort(celltomat(tmp(:,1))');
-tmp = tmp(tmpind,:);
+    % resort electrodes
+    % -----------------
+    [tmp2 tmpind] = sort(celltomat(tmp(:,1))');
+    tmp = tmp(tmpind,:);
 
-% convert to polar coordinates
-% ----------------------------
-%figure; plot(celltomat(tmp(:,2)), celltomat(tmp(:,3)), '.');
-[phi,theta] = cart2pol(celltomat(tmp(:,end-1)), celltomat(tmp(:,end)));
-theta = theta/513.1617*44;
-phi   = phi/pi*180;
+    % convert to polar coordinates
+    % ----------------------------
+    %figure; plot(celltomat(tmp(:,2)), celltomat(tmp(:,3)), '.');
+    [phi,theta] = cart2pol(celltomat(tmp(:,end-1)), celltomat(tmp(:,end)));
+    theta = theta/513.1617*44;
+    phi   = phi/pi*180;
 
-% convert to other types of coordinates
-% -------------------------------------
-labels = tmp(:,end-2)';
-chanlocs = struct('labels', labels, 'sph_theta_besa', mattocell(theta)', 'sph_phi_besa', mattocell(phi)');
-chanlocs = convertlocs( chanlocs, 'sphbesa2all');
-for index = 1:length(chanlocs)
-    chanlocs(index).labels = num2str(chanlocs(index).labels);
-end;
+    % convert to other types of coordinates
+    % -------------------------------------
+    labels = tmp(:,end-2)';
+    chanlocs = struct('labels', labels, 'sph_theta_besa', mattocell(theta)', 'sph_phi_besa', mattocell(phi)');
+    chanlocs = convertlocs( chanlocs, 'sphbesa2all');
+    for index = 1:length(chanlocs)
+        chanlocs(index).labels = num2str(chanlocs(index).labels);
+    end;
