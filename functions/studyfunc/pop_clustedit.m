@@ -4,12 +4,11 @@
 %                ERPs, ERSPs, ITCs) that have been computed and saved in the study EEG 
 %                datasets can be visualized. These can be computed during pre-clustering 
 %                using the GUI-based function pop_preclust() or the equivalent command
-%                line functions eeg_createdata() and eeg_preclust(). To use dipole 
-%                locations for clustering, they must first be stored in the EEG dataset 
-%                structures using dipfit(). Supported cluster editing functions include 
-%                new cluster creation, cluster merging, outlier rejection, and cluster 
-%                renaming. Components can also be moved from one cluster to another 
-%                or to the outlier cluster. 
+%                line functions std_preclust(). To use dipole locations for clustering, 
+%                they must first be stored in the EEG dataset structures using dipfit(). 
+%                Supported cluster editing functions include new cluster creation, cluster 
+%                merging, outlier rejection, and cluster renaming. Components can also be 
+%                moved from one cluster to another or to the outlier cluster. 
 % Usage:    
 %                >> STUDY = pop_clustedit(STUDY, ALLEEG, clusters);   
 % Inputs:
@@ -158,6 +157,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.52  2007/08/03 22:57:08  arno
+% fixed dipole plotting and made it consistent with other plotting calls
+%
 % Revision 1.51  2007/07/27 22:08:56  toby
 % nothing
 %
