@@ -2,7 +2,7 @@
 %                    (EEG.chanlocs) automatically (by matching channel labels) 
 %                    else using a user input gui.
 % Usage:
-%   >> [chanlist] = pop_chancoresp(chanstruct1, chanstruc2, 'key', 'val', ...); 
+%   >> [chanlist1 chanlist2] = pop_chancoresp(chanstruct1, chanstruc2, 'key', 'val', ...); 
 %
 % Inputs:
 %   chanstruct1     - first (new) channel locations structure (EEG.chanlocs). 
@@ -14,7 +14,12 @@
 %   'autoselect'    - ['none'|'fiducials'|'all'] automatically pair channels
 %   'chaninfo1'     - EEG.chaninfo structure for first (new) EEG.chanlocs
 %   'chaninfo2'     - EEG.chaninfo structure for second (reference) EEG.chanlocs
-%
+%   'chanlist1'     - [integer] selected channel to pair in the graphic interface
+%                     for the first channel structure. This requires the input 
+%                     'chanlist2' below.
+%   'chanlist1'     - [integer] selected channel to pair in the graphic interface
+%                     for the first channel structure. This requires the input 
+%                     requires the input 'chanlist1' that must be of the same length.
 % Output:
 %   chanlist1       - [int vector] indices of selected channels from first (new) EEG.chanlocs
 %   chanlist2       - [int vector] selected channels from second (reference) EEG.chanlocs
@@ -40,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2006/10/25 22:02:38  arno
+% undo last changes
+%
 % Revision 1.7  2006/10/25 21:40:03  arno
 % handle duplicate channel name
 %
@@ -97,6 +105,9 @@ function [chanlistout1, chanlistout2, thirdout, outfourth] = pop_chancoresp(chan
     if isstr(g), error(g); end;
     g.chanstruct1 = chans1;
     g.chanstruct2 = chans2;
+    if length(g.chanlist1) ~= length(g.chanlist2)
+        error('input arguments ''chanlist1'' and ''chanlist2'' must have the same length');
+    end;
     
     % decode different input formats
     % ------------------------------
