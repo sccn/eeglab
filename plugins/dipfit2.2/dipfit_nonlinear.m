@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2007/08/07 21:50:26  arno
+% same
+%
 % Revision 1.4  2007/08/07 21:49:04  arno
 % upgrade for new fieldtrip
 %
@@ -124,6 +127,8 @@ EEG.dipfit.model(cfg.component).momxyz  = reshape(source.dip.mom, 3, length(sour
 EEG.dipfit.model(cfg.component).diffmap = source.Vmodel - source.Vdata;
 EEG.dipfit.model(cfg.component).sourcepot = source.Vmodel;
 EEG.dipfit.model(cfg.component).datapot   = source.Vdata;
-EEG.dipfit.model(cfg.component).rv      = source.dip.rv;
+
+% compute rv
+EEG.dipfit.model(cfg.component).rv = sum((source.Vdata - source.Vmodel).^2) / sum( source.Vdata.^2 );
 
 EEGOUT = EEG;
