@@ -1,7 +1,7 @@
 % readneurodat() - read neuroscan location file (.dat)
 %
 % Usage:
-%   >> [ CHANLOCS labels theta phi ] = readneurodat( filename );
+%   >> [ CHANLOCS labels theta theta ] = readneurodat( filename );
 %
 % Inputs:
 %   filename       - file name or matlab cell array { names x_coord y_coord }
@@ -11,9 +11,9 @@
 %                    help readlocs()
 %   labels         - [cell arrya] channel labels
 %   theta          - [float array]array containing 3-D theta angle electrode
-%                    position (in radian)
+%                    position (in degree)
 %   phi            - [float array]array containing 3-D phi angle electrode
-%                    position (in radian)
+%                    position (in degree)
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 28 Nov 2003
 %
@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2007/08/07 20:09:03  arno
+% fix bug 394 about help
+%
 % Revision 1.4  2007/08/06 18:55:58  arno
 % fixed outputs
 %
@@ -84,3 +87,4 @@ function [chanlocs, labels, theta, phi] = readneurodat(filename);
     for index = 1:length(chanlocs)
         chanlocs(index).labels = num2str(chanlocs(index).labels);
     end;
+    theta = theta/pi*180;
