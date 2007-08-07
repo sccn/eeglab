@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2007/08/07 18:15:49  arno
+% update help and catch error
+%
 % Revision 1.8  2006/10/25 22:02:38  arno
 % undo last changes
 %
@@ -94,8 +97,6 @@ function [chanlistout1, chanlistout2, thirdout, outfourth] = pop_chancoresp(chan
        return;
     end;
     
-    chanliststr = {};
-    allchanstr  = '';    
     g = finputcheck(varargin, { 'autoselect'     'string'  {'none' 'fiducials' 'all'}   'all';
                                 'chanlist1'      'integer' [1 Inf] []; 
                                 'chanlist2'      'integer' [1 Inf] []; 
@@ -156,8 +157,6 @@ function [chanlistout1, chanlistout2, thirdout, outfourth] = pop_chancoresp(chan
                 end;
             end;
         end;
-        chanlist1 = g.chanlist1;
-        chanlist2 = g.chanlist2;        
     end;
     
     % plot
@@ -180,8 +179,6 @@ function [chanlistout1, chanlistout2, thirdout, outfourth] = pop_chancoresp(chan
     
     % make text for list
     % ------------------
-    allstr1 = '';
-    allstr2 = '';
     [ g.newchanstr1 g.newchanstr2 ] = makelisttext( chanstr1, chanstr2, g.chanlist1, g.chanlist2);
     
     for index = 1:length(chanstr1)
@@ -269,11 +266,6 @@ function [chanlistout1, chanlistout2, thirdout, outfourth] = pop_chancoresp(chan
     % decode output
     % -------------
     okbut = findobj( 'parent', fig, 'tag', 'ok');
-    h1 = findobj( 'parent', fig, 'tag', 'list1');
-    h2 = findobj( 'parent', fig, 'tag', 'list2');
-    okornot = 0;
-    strval = '';
-    vals = [];
     figure(fig);
     drawnow;
     waitfor( okbut, 'userdata');
