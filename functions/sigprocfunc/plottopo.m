@@ -23,7 +23,7 @@
 %  'ylim'      = [ymin ymax] y axis limits. Overwrite option above.
 %  'title'     = [string] plot title {def|'' -> none}
 %  'chans'     = vector of channel numbers to plot {def|0 -> all}
-%  'axsize'    = [x y] axis size {default [.07 .07]}
+%  'axsize'    = [x y] axis size {default [.05 .08]}
 %  'legend'    = [cell array] cell array of string for the legend. Note
 %                the last element can be an integer to set legend 
 %                position.
@@ -33,13 +33,16 @@
 %                in black dashed. Can also contain additional formating.
 %                { { 'k' 'linewidth' 2 } 'k--' } same as above but
 %                the first line is bolded.
-%  'ydir'      = [1|-1] y-axis polarity (pos-up = 1; neg-up = -1) {def -> 1}
+%  'ydir'      = [1|-1] y-axis polarity (pos-up = 1; neg-up = -1) {def -> -1}
 %  'vert'      = [vector] of times (in ms or Hz) to plot vertical lines 
 %                {def none}
+%  'hori'      = [vector] plot horizontal line at given ordinate values.
 %  'regions'   = [cell array] cell array of size nchan. Each cell contains a
 %                float array of size (2,n) each column defining a time region 
 %                [low high] to be highlighted.
-%  'axsize'    = [x y] axis size {default [.07 .07]}
+%  'plotfunc'  = [cell] use different function for plotting data. The format
+%                is { funcname arg2 arg3 arg2 ... }. arg1 is taken from the
+%                data.
 %
 % Author: Scott Makeig and Arnaud Delorme, SCCN/INC/UCSD, La Jolla, 3-2-98 
 %
@@ -65,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.53  2007/08/06 17:55:04  arno
+% remove ISSPEC, clean code and fix bug 328
+%
 % Revision 1.52  2007/08/06 17:42:24  arno
 % 'chans' can now be a string
 %
@@ -488,7 +494,7 @@ end;
     %
     %%%%%%%%%%%%%%%%%%%%%%%%% Read the color names %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %
-    if isstr(g.colors)
+    if isstr(g.colors) % filename for backward compatibility but not documented
         cid = fopen(g.colors,'r');
         % fprintf('cid = %d\n',cid);
         if cid <3,
