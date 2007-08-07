@@ -4,8 +4,7 @@
 %              If data are all positive, they are assumed to be spectra.
 % Usage:
 %    >> plottopo(data, 'key1', 'val1', 'key2', 'val2')
-%    >> plottopo(data,'chan_locs')   % old function call
-%    >> plottopo(data,[rows cols])   % old function call
+% Or
 %    >> plottopo(data,'chan_locs',frames,limits,title,channels,...
 %                      axsize,colors,ydir,vert) % old function call
 % Inputs:
@@ -68,6 +67,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.56  2007/08/07 19:01:02  arno
+% fixed bug 321
+%
 % Revision 1.55  2007/08/07 18:59:32  arno
 % fixed unused variables bug 319
 %
@@ -340,9 +342,9 @@ else
     axheight = g.axsize(2);
 end;
 if isempty(g.chans) | g.chans == 0
-   channelnos = 1:size(data,1);
+   g.chans = 1:size(data,1);
 elseif ~isstr(g.chans)
-   channelnos = g.chans;
+   g.chans = g.chans;
 end
 
 nolegend = 0;
@@ -362,8 +364,8 @@ if length(g.chans) < 4 & ~plotgrid
     plotgrid = 1;
 end;
 if plotgrid & isempty(g.geom)
-  n = ceil(sqrt(length(channelnos)));
-  g.geom = [n ceil(length(channelnos)/n)];
+  n = ceil(sqrt(length(g.chans)));
+  g.geom = [n ceil(length(g.chans)/n)];
 end
 if ~isempty(g.geom)
     plotgrid = 1;
@@ -383,17 +385,17 @@ end;
     datasets = fix(framestotal/g.frames);        % number of traces to overplot
   end;
 
-  if max(channelnos) > chans
+  if max(g.chans) > chans
     fprintf('plottopo(): max channel index > %d channels in data.\n',...
                        chans);
     return
   end
-  if min(channelnos) < 1
+  if min(g.chans) < 1
     fprintf('plottopo(): min channel index (%g) < 1.\n',...
                        min(g.chans));
     return
   end;
-  if length(channelnos)>MAXPLOTDATACHANS,
+  if length(g.chans)>MAXPLOTDATACHANS,
     fprintf('plottopo(): not set up to plot more than %d channels.\n',...
                        MAXPLOTDATACHANS);
     return
@@ -488,8 +490,8 @@ end;
          %
          %%%%%%%%%%%%%%%%%%%%%%%%% Plot and label specified channels %%%%%%%%%%%%%%%%%%
          %
-    data = data(channelnos,:);
-    chans = length(channelnos);
+    data = data(g.chans,:);
+    chans = length(g.chans);
     %
     %%%%%%%%%%%%%%%%%%%%%%%%% Read the color names %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %
@@ -647,7 +649,7 @@ end;
         Th = pi/180*Th;                 % convert degrees to radians
         Rd = Rd; 
         
-        if length(channelnos) > length(g.chanlocs),
+        if length(g.chans) > length(g.chanlocs),
             error('plottopo(): data channels must be <= ''chanlocs'' channels')
         end
         
@@ -664,9 +666,9 @@ end;
             xvals(emptychans(index)) = 0.7+0.2*floor((index-1)/totalchans);
             yvals(emptychans(index)) = -0.4+mod(index-1,totalchans)/totalchans;
         end;
-        channames = channames(channelnos,:);
-        xvals     = xvals(channelnos);
-        yvals     = yvals(channelnos);
+        channames = channames(g.chans,:);
+        xvals     = xvals(g.chans);
+        yvals     = yvals(g.chans);
     end
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
