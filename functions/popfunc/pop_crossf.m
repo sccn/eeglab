@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.37  2007/08/06 17:58:42  arno
+% fix bug 344
+%
 % Revision 1.36  2006/07/05 22:15:16  arno
 % bug if only channel labels[D[D[D[D[D[D[D[D[D[D[D[D[D[D
 %
@@ -247,10 +250,11 @@ if popup
             chanlabel1 = int2str(num1);
             chanlabel2 = int2str(num2);
         end;
-		switch lower(result{5})
-		 case 'coher', options = [options ', ''title'',' fastif(typeproc, '''Channel ', '''Component ') chanlabel1 '-' chanlabel2 ...
+		if result{5}
+            options = [options ', ''title'',' fastif(typeproc, '''Channel ', '''Component ') chanlabel1 '-' chanlabel2 ...
 					' Coherence'''];
-		 otherwise, options = [options ', ''title'',' fastif(typeproc, '''Channel ', '''Component ') chanlabel1 '-' chanlabel2 ...
+        else
+            options = [options ', ''title'',' fastif(typeproc, '''Channel ', '''Component ') chanlabel1 '-' chanlabel2 ...
 					' Phase Coherence''' ];
 		end;
 	end;
