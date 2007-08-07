@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.50  2007/08/07 22:55:27  arno
+% do not reload the data to not reinvert polarities
+%
 % Revision 1.49  2007/06/25 04:33:44  toby
 % altered multiple dipole plot windows to indicate number of components and subjects
 %
@@ -225,7 +228,7 @@ end;
 % -------------------
 if ~isempty(opt.channels)
      [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'channels', opt.channels, 'infotype', 'erp', 'timerange', opt.timerange);
-else [tmp2 tmp allinds] = std_readdata(STUDY, ALLEEG, 'clusters', opt.clusters, 'infotype', 'erp', 'timerange', opt.timerange);
+else 
      % invert polarity of ERPs
      filename = fullfile( ALLEEG(1).filepath, ALLEEG(1).filename(1:end-3));
      if exist([filename 'icatopo']) ~= 0
@@ -236,9 +239,9 @@ else [tmp2 tmp allinds] = std_readdata(STUDY, ALLEEG, 'clusters', opt.clusters, 
              elseif isempty(STUDY.cluster(opt.clusters(1)).erpdata), reload = 1;
              end;
              if reload
-                 STUDY = std_readdata(STUDY, ALLEEG, 'clusters', opt.clusters(cls), 'infotype', 'erp', 'timerange', opt.timerange);
-                 STUDY = std_readtopoclust(STUDY, ALLEEG, opt.clusters(cls));
-                 if size(STUDY.cluster(opt.clusters(1)).erpdata,2) > 1 & cls == 1
+                 STUDY = std_readdata(STUDY, ALLEEG, 'clusters', cls, 'infotype', 'erp', 'timerange', opt.timerange);
+                 STUDY = std_readtopoclust(STUDY, ALLEEG, cls);
+                 if size(STUDY.cluster(opt.clusters(1)).erpdata,2) > 1 & cls == opt.clusters(1)
                      disp('WARNING: component polarity inversion for ERP not implemented if more than 1 group');
                      disp('WARNING: ERPs may not have the correct polarity');
                  end    
@@ -252,6 +255,7 @@ else [tmp2 tmp allinds] = std_readdata(STUDY, ALLEEG, 'clusters', opt.clusters, 
              end;
          end;
      end;
+     [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'clusters', opt.clusters, 'infotype', 'erp', 'timerange', opt.timerange);
 end;
 
 if strcmpi(opt.plotmode, 'condensed') | ...
