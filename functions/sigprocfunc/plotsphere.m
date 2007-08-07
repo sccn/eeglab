@@ -1,11 +1,13 @@
-% plotsphere() - only keep the biggest surface
+% plotsphere() - This function is used to plot sphere and
+%                project them onto specific surfaces. This may
+%                be used for plotting dipoles for instance.
 %
 % Usage:
 %   >> handle = plotsphere(pos, rad, 'key', 'val')
 %
 % Inputs: 
-%   pos       - [x y z] 3-D position
-%   rad       - sphere radius
+%   pos       - [x y z] 3-D position of the sphere center
+%   rad       - [real] sphere radius
 %
 % Optional inputs:
 %   'nvert'   - number of vertices. Default is 15.
@@ -15,6 +17,7 @@
 %               the sphere on the y/z plane axis at position x=-40 and on 
 %               the x/y plane at position z=-80.
 %   'projcol' - color of projected spheres
+%   'colormap' - [real] sphere colormap { default: jet }
 %
 % Output:
 %   handle    - sphere graphic handle(s). If projected sphere are ploted
@@ -44,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2007/08/07 18:40:32  arno
+% fix typo bug 298
+%
 % Revision 1.2  2007/08/06 17:37:00  arno
 % fix typo for bug 306
 %
