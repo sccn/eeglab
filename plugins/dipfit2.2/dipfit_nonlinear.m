@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2007/01/26 18:18:08  arno
+% CTF implementation
+%
 % Revision 1.2  2006/01/10 00:46:07  arno
 % nothing
 %
@@ -115,8 +118,8 @@ source = dipolefitting(cfg, comp);
 % reformat the output dipole sources into EEGLABs data structure
 EEG.dipfit.model(cfg.component).posxyz  = source.dip.pos;
 EEG.dipfit.model(cfg.component).momxyz  = reshape(source.dip.mom, 3, length(source.dip.mom)/3)';
-EEG.dipfit.model(cfg.component).diffmap = source.dip.pot - source.Vdata;
-EEG.dipfit.model(cfg.component).sourcepot = source.dip.pot;
+EEG.dipfit.model(cfg.component).diffmap = source.dip.Vmodel - source.Vdata;
+EEG.dipfit.model(cfg.component).sourcepot = source.dip.Vmodel;
 EEG.dipfit.model(cfg.component).datapot   = source.Vdata;
 EEG.dipfit.model(cfg.component).rv      = source.dip.rv;
 
