@@ -32,7 +32,12 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 function p1 = plotmesh(faces, vertex, normal, newfig)
-    
+       
+    if nargin < 2
+        help plotmesh;
+        return;
+    end;
+       
     FaceColor  = [.8 .55 .35]*1.1; % ~= ruddy Caucasian - pick your complexion!
     
     if any(any(faces == 0)), faces = faces+1; end;
