@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.49  2007/06/25 04:33:44  toby
+% altered multiple dipole plot windows to indicate number of components and subjects
+%
 % Revision 1.48  2007/05/25 03:23:51  toby
 % oops, mispelled the correct index variable
 %
@@ -222,27 +225,33 @@ end;
 % -------------------
 if ~isempty(opt.channels)
      [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'channels', opt.channels, 'infotype', 'erp', 'timerange', opt.timerange);
-else [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'clusters', opt.clusters, 'infotype', 'erp', 'timerange', opt.timerange);
+else [tmp2 tmp allinds] = std_readdata(STUDY, ALLEEG, 'clusters', opt.clusters, 'infotype', 'erp', 'timerange', opt.timerange);
      % invert polarity of ERPs
-    filename = fullfile( ALLEEG(1).filepath, ALLEEG(1).filename(1:end-3));
-    if exist([filename 'icatopo']) ~= 0
-        STUDY = std_readtopoclust(STUDY, ALLEEG, opt.clusters);
-        if size(STUDY.cluster(opt.clusters(1)).erpdata,2) > 1
-            disp('WARNING: component polarity inversion for ERP not implemented if more than 1 group');
-            disp('WARNING: ERPs may not have the correct polarity');
-        else    
-            disp('Inverting ERP component polarities based on scalp map polarities');
-            for cls = opt.clusters
-                clust = STUDY.cluster(cls);
-                for index = 1:length(clust.erpdata)
-                    for comps = 1:size(clust.erpdata{index},2)
-                        clust.erpdata{index}(:,comps) = clust.erpdata{index}(:,comps)*clust.topopol(comps);
-                    end;
-                end;
-                STUDY.cluster(cls) = clust;
-            end;
-        end;
-    end;
+     filename = fullfile( ALLEEG(1).filepath, ALLEEG(1).filename(1:end-3));
+     if exist([filename 'icatopo']) ~= 0
+         disp('Inverting ERP component polarities based on scalp map polarities');
+         for cls = opt.clusters
+             reload = 0;
+             if ~isfield(STUDY.cluster(opt.clusters(1)), 'erpdata'), reload = 1;
+             elseif isempty(STUDY.cluster(opt.clusters(1)).erpdata), reload = 1;
+             end;
+             if reload
+                 STUDY = std_readdata(STUDY, ALLEEG, 'clusters', opt.clusters(cls), 'infotype', 'erp', 'timerange', opt.timerange);
+                 STUDY = std_readtopoclust(STUDY, ALLEEG, opt.clusters(cls));
+                 if size(STUDY.cluster(opt.clusters(1)).erpdata,2) > 1 & cls == 1
+                     disp('WARNING: component polarity inversion for ERP not implemented if more than 1 group');
+                     disp('WARNING: ERPs may not have the correct polarity');
+                 end    
+                 clust = STUDY.cluster(cls);
+                 for index = 1:length(clust.erpdata)
+                     for comps = 1:size(clust.erpdata{index},2)
+                         clust.erpdata{index}(:,comps) = clust.erpdata{index}(:,comps)*clust.topopol(comps);
+                     end;
+                 end;
+                 STUDY.cluster(cls) = clust;
+             end;
+         end;
+     end;
 end;
 
 if strcmpi(opt.plotmode, 'condensed') | ...
