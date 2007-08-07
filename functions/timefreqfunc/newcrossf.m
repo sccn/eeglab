@@ -1,6 +1,3 @@
-% WARNING: this function is not part of the EEGLAB toolbox and should not be distributed
-%           you must contact Arnaud Delorme (arno@salk.edu) for terms of use
-%
 % newcrossf() - Returns estimates and plots event-related coherence (ERCOH) 
 %        between two input data time series. A lower panel (optionally) shows 
 %        the coherence phase difference between the processes. In this panel: 
@@ -216,6 +213,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.79  2007/02/02 07:58:13  arno
+% fix log scale
+%
 % Revision 1.78  2005/08/04 20:40:28  arno
 % fixing savecoher for 'coher' condition
 %
