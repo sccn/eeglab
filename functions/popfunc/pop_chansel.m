@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2007/08/06 18:32:58  arno
+% help message again
+%
 % Revision 1.23  2007/08/06 18:24:07  arno
 % help message
 %
@@ -208,6 +211,5 @@ function [chanlist,chanliststr, allchanstr] = pop_chansel(chans, varargin);
             chanliststr = chanliststr(1:end-1);
         end;
     end;
-    dsafdsfa
        
     return;
