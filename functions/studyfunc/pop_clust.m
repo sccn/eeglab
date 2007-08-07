@@ -60,6 +60,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2007/08/06 18:25:51  scott
+% further help msg edits for accuracy  ('kmean' -> 'kmeans', etc).
+%
 % Revision 1.29  2007/08/06 18:11:48  arno
 % update message
 %
@@ -121,6 +124,10 @@
 function [STUDY, ALLEEG, command] = pop_clust(STUDY, ALLEEG, varargin)
 
 command = '';
+if nargin < 2
+    help pop_clust;
+    return;
+end;
 
 if isempty(STUDY.etc)
     error('No pre-clustering information, pre-cluster first!');
