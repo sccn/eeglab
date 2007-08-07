@@ -46,6 +46,11 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function [DAT,S]=readbdf(DAT,Records,Mode)
+    
+    disp('This function is outdated');
+    disp('Use the functions sopen() and sread() instead');
+    return;
+    
 if nargin<3 Mode=0; end;
  
 EDF=DAT.Head; 
