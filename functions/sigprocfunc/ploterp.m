@@ -35,6 +35,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % 01-25-02 reformated help & license, added links -ad 
 
@@ -63,11 +66,8 @@ if nargin < 5,
    titl = '';     % DEFAULT TITLE
 end
 
-limitset = 0;
 if nargin < 4,
     limits = 0;
-elseif length(limits)>1
-    limitset = 1;
 end
 
 if nargin < 3
@@ -144,11 +144,9 @@ cla % clear the current figure axes
 set(gca,'YColor',BACKCOLOR); % set the background color
 set(gca,'Color',BACKCOLOR);
 
-limits = get(gca,'Ylim');
 set(gca,'GridLineStyle',':')
 set(gca,'Xgrid','off')
 set(gca,'Ygrid','on')
-axcolor = get(gcf,'Color');
 set(gca,'Color',BACKCOLOR,'FontSize',TICKFONT,'FontWeight','bold');
 plot_handl=plot(x,data(plotchans,(epoch-1)*frames+1:epoch*frames))    % plot the data
 title(titl,'fontsize',TITLEFONT,'FontWeight','bold');
