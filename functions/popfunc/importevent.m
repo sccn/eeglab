@@ -78,6 +78,9 @@
 
 %% REVISION HISTORY
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2007/04/26 23:08:10  arno
+% event array format
+%
 % Revision 1.13  2007/04/26 23:06:01  arno
 % deal with event input type
 %
@@ -135,7 +138,9 @@ end;
 
 % determine latency for old event alignment
 % -----------------------------------------
-g.align.val = g.align;
+tmpalign    = g.align;
+g.align     = [];
+g.align.val = tmpalign;
 if ~isnan(g.align.val)
     if isempty(oldevent)
         error('Setevent: no pre-existing event, cannot perform alignment');
