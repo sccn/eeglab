@@ -68,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.54  2007/08/07 18:58:10  arno
+% bug 307
+%
 % Revision 1.53  2007/08/06 17:55:04  arno
 % remove ISSPEC, clean code and fix bug 328
 %
@@ -267,7 +270,6 @@ PLOT_HEIGHT   = 0.88;    % 0.88
 gcapos = get(gca,'Position');
 PLOT_WIDTH    = gcapos(3)*PLOT_WIDTH; % width and height of gca plot array on gca
 PLOT_HEIGHT   = gcapos(4)*PLOT_HEIGHT;
-MAXCHANS      = 256;     % can be increased
 curfig = gcf;            % learn the current graphic figure number
 %
 %%%%%%%%%%%%%%%%%%%% Default settings - use commandline to override %%%%%%%%%%%
@@ -346,10 +348,6 @@ if isempty(g.legend), nolegend = 1; end;
 if ~isempty(g.ylim)
     g.limits(3:4) = g.ylim;
 end;
-limitset = 0;
-if length(g.limits)>1
-    limitset = 1;
-end    
 plotgrid = 0;
 if isempty(g.chanlocs) % plot in a rectangular grid
     plotgrid = 1;
@@ -437,8 +435,6 @@ end;
     axcolor= get(0,'DefaultAxesXcolor'); % find what the default x-axis color is
     vertcolor = 'k';
     horicolor = vertcolor;
-    plotfile = 'plottopo.ps';
-    ls_plotfile = 'ls -l plottopo.ps';
     
     %
     %%%%%%%%%%%%%%%%%%%% Read the channel names %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
