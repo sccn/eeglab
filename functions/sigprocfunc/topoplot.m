@@ -163,6 +163,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.276  2007/02/05 20:25:58  toby
+% fixed bug when entering channels to plot instead of channel values as the first Input
+%
 % Revision 1.275  2006/09/14 09:31:43  arno
 % fix the white background command
 %
@@ -823,7 +826,7 @@
 % 03-25-02 added 'labelpoint' options and allow Values=[] -ad &sm
 % 03-25-02 added details to "Unknown parameter" warning -sm & ad
 
-function [handle,Zi,grid,Xi,Yi] = topoplot(Values,loc_file,p1,v1,p2,v2,p3,v3,p4,v4,p5,v5,p6,v6,p7,v7,p8,v8,p9,v9,p10,v10,p11,v11)
+function [handle,Zi,grid,Xi,Yi] = topoplot(Values,loc_file,varargin)
 
 %
 %%%%%%%%%%%%%%%%%%%%%%%% Set defaults %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -904,6 +907,22 @@ if nargin< 1
    help topoplot;
    return
 end
+
+% calling topoplot from Fieldtrip
+% -------------------------------
+if isstruct(Values)
+    disp('Calling topoplot from Fieldtrip');
+    dir1 = which('topoplot');           dir1 = fileparts(dir1);
+    dir2 = which('electrodenormalize'); dir2 = fileparts(dir2);
+    addpath(dir2);
+    try,
+        topoplot(Values, loc_file, varargin{:});
+    catch, 
+    end;
+    addpath(dir1);
+    return;
+end;
+
 nargs = nargin;
 if nargs == 1
   if isstr(Values)
@@ -955,9 +974,9 @@ if nargs > 2
   if ~(round(nargs/2) == nargs/2)
     error('Odd number of input arguments??')
   end
-  for i = 3:2:nargs
-    Param = eval(['p',int2str((i-3)/2 +1)]);
-    Value = eval(['v',int2str((i-3)/2 +1)]);
+  for i = 1:2:length(varargin)
+    Param = varargin{i}
+    Value = varargin{i+1}
     if ~isstr(Param)
       error('Flag arguments must be strings')
     end
