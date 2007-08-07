@@ -88,6 +88,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.43  2007/08/06 18:29:57  arno
+% fix bug 365 for 'rename' input
+%
 % Revision 1.42  2007/08/06 18:20:42  arno
 % fixed bug 542; cleaned up code
 %
@@ -370,11 +373,8 @@ end;
 
 % create structure
 % ----------------
-if ~isempty(args)
-   try, g = struct(args{:});
-   catch, disp('pop_editeventfield(): wrong syntax in function arguments'); return; end;
-else
-    g = [];
+try, g = struct(args{:});
+catch, disp('pop_editeventfield(): wrong syntax in function arguments'); return; 
 end;
 
 % test the presence of variables
