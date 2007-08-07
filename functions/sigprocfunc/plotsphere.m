@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2007/08/06 17:37:00  arno
+% fix typo for bug 306
+%
 % Revision 1.1  2004/06/01 18:37:08  arno
 % Initial revision
 %
@@ -55,7 +58,7 @@
 
 function [handles] = plotsphere(pos, rad, varargin);
     
-    if nargin < 1
+    if nargin < 2
         help plotsphere;
         return;
     end;
