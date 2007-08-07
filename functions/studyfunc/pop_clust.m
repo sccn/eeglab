@@ -60,6 +60,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2007/08/07 18:26:58  arno
+% added help message
+%
 % Revision 1.30  2007/08/06 18:25:51  scott
 % further help msg edits for accuracy  ('kmean' -> 'kmeans', etc).
 %
@@ -192,7 +195,7 @@ if isempty(varargin) %GUI call
       {'style' 'text'       'string' 'Save STUDY set to disk'} ...
       {'style' 'edit'       'string' fullfile(STUDY.filepath, STUDY.filename) 'enable' 'off' 'tag' 'studyfile' 'userdata' 'save'} ...
       {'style' 'pushbutton' 'string' '...' 'tag' 'browsesave' 'Callback' browsesave 'enable' 'off' 'userdata' 'save'} },...
-                            'pophelp(''eeg_clust'')', 'Set clustering algorithm -- pop_clust()' , [] , 'normal');
+                            'pophelp(''pop_clust'')', 'Set clustering algorithm -- pop_clust()' , [] , 'normal');
 	
 	if ~isempty(clust_param)
         
