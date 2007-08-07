@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.51  2007/08/07 22:58:21  arno
+% debug last change
+%
 % Revision 1.50  2007/08/07 22:55:27  arno
 % do not reload the data to not reinvert polarities
 %
@@ -232,7 +235,6 @@ else
      % invert polarity of ERPs
      filename = fullfile( ALLEEG(1).filepath, ALLEEG(1).filename(1:end-3));
      if exist([filename 'icatopo']) ~= 0
-         disp('Inverting ERP component polarities based on scalp map polarities');
          for cls = opt.clusters
              reload = 0;
              if ~isfield(STUDY.cluster(opt.clusters(1)), 'erpdata'), reload = 1;
@@ -244,6 +246,8 @@ else
                  if size(STUDY.cluster(opt.clusters(1)).erpdata,2) > 1 & cls == opt.clusters(1)
                      disp('WARNING: component polarity inversion for ERP not implemented if more than 1 group');
                      disp('WARNING: ERPs may not have the correct polarity');
+                 elseif cls == opt.clusters(1)
+                     disp('Inverting ERP component polarities based on scalp map polarities');
                  end    
                  clust = STUDY.cluster(cls);
                  for index = 1:length(clust.erpdata)
