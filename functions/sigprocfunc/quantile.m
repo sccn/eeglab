@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2007/08/07 19:43:04  arno
+% fix bug 374
+%
 % Revision 1.3  2007/08/06 18:34:06  arno
 % fix typo according to bug 366
 %
@@ -74,6 +77,6 @@ if i==1 | j==1 % if data is a vector
     end
     sortdata = sortdata(:);
 end
-pt = [0 ((1:i)-0.5)./i 100];
+pt = [0 ((1:i)-0.5)./i 1];
 sortdata = [min(data); sortdata; max(data)];
 q = interp1(pt,sortdata,pc);
