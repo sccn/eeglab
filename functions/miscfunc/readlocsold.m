@@ -1,10 +1,10 @@
-% readlocs() - Read electrode locations file in style of topoplot() or headplot().
+% readlocsold() - Read electrode locations file in style of topoplot() or headplot().
 %              Output channel information is ordered by channel numbers.
 %
-% Usage: >> [nums labels th r x y] = readlocs(locfile);% {default, polar 2-D}
-%        >> [nums labels th r x y] = readlocs(locfile,'polar');     % 2-D
-%        >> [nums labels x y z]    = readlocs(locfile,'spherical'); % 3-D
-%        >> [nums labels x y z]    = readlocs(locfile,'cartesian'); % 3-D
+% Usage: >> [nums labels th r x y] = readlocsold(locfile);% {default, polar 2-D}
+%        >> [nums labels th r x y] = readlocsold(locfile,'polar');     % 2-D
+%        >> [nums labels x y z]    = readlocsold(locfile,'spherical'); % 3-D
+%        >> [nums labels x y z]    = readlocsold(locfile,'cartesian'); % 3-D
 % Input: 
 %        locfile  = 'filename' of electrode location file.
 %        loctype  =  File type:'polar'     2-D {default}. See >> topoplot example
@@ -18,11 +18,14 @@
 % 3-D:     x,y,z  = 3-D Cartesian coordinates (normalized, |x,y,z| = 1)
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % Scott Makeig, CNL / Salk Institute, La Jolla CA 3/01
 %  code from topoplot()
 
-function [channums,labels,o1,o2,o3,o4] = readlocs(loc_file,loctype)
+function [channums,labels,o1,o2,o3,o4] = readlocsold(loc_file,loctype)
 
 verbose = 0;
 
@@ -36,7 +39,7 @@ end
 
 fid = fopen(loc_file);
 if fid<1,
-  fprintf('readlocs(): cannot open electrode location file (%s).\n',loc_file);
+  fprintf('readlocsold(): cannot open electrode location file (%s).\n',loc_file);
   return
 end
 if strcmp(loctype,'spherical')| strcmp(loctype,'polar')
@@ -44,7 +47,7 @@ if strcmp(loctype,'spherical')| strcmp(loctype,'polar')
 elseif strcmp(loctype,'cartesian')
   A = fscanf(fid,'%d %f %f %f %s',[8 Inf]);  
 else
-  fprintf('readlocs(): unknown electrode location file type %s.\n',loctype);
+  fprintf('readlocsold(): unknown electrode location file type %s.\n',loctype);
   return
 end
 
@@ -65,7 +68,7 @@ labels(idx) = setstr(abs(' ')*ones(size(idx)));  % replace them with spaces
 badchars = find(double(labels)<32|double(labels)>127);
 if ~isempty(badchars)
   fprintf(...
-  'readlocs(): Bad label(s) read - Each label must have 4 chars (. => space)\n');
+  'readlocsold(): Bad label(s) read - Each label must have 4 chars (. => space)\n');
   return
 end
 
