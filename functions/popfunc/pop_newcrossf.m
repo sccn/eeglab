@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2006/07/05 22:16:00  arno
+% fixed problem if only channel labels
+%
 % Revision 1.33  2006/01/31 20:53:15  arno
 % eeglab options
 %
@@ -238,10 +241,11 @@ if popup
             chanlabel1 = int2str(num1);
             chanlabel2 = int2str(num2);
         end;
-		switch lower(result{5})
-		 case 'coher', options = [options ', ''title'',' fastif(typeproc, '''Channel ', '''Component ') chanlabel1 '-' chanlabel2 ...
+		if result{5}
+            options = [options ', ''title'',' fastif(typeproc, '''Channel ', '''Component ') chanlabel1 '-' chanlabel2 ...
 					' Coherence'''];
-		 otherwise, options = [options ', ''title'',' fastif(typeproc, '''Channel ', '''Component ') chanlabel1 '-' chanlabel2 ...
+        else
+            options = [options ', ''title'',' fastif(typeproc, '''Channel ', '''Component ') chanlabel1 '-' chanlabel2 ...
 					' Phase Coherence''' ];
 		end;
 	end;
