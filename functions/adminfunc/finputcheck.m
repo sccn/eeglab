@@ -63,6 +63,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2007/08/08 17:27:43  nima
+% added error() if some values of 'key' are not string
+%
 % Revision 1.30  2007/08/08 00:29:55  nima
 % modified removedup (removing duplicates)
 %
@@ -309,20 +312,14 @@ function g = fieldtest( fieldname, fieldtype, fieldval, tmpval, callfunc );
 % -------------------------------------------
 function cella = removedup(cella)
 % make sure if all the values passed to unique() are strings, if not, exist
-s = cella(1:2:end);
-allAreString = false;
-for i=1:length(s)
-    allAreString = allAreString && ischar(s{i});
-end;
-
-if allAreString
+try
     [tmp indices] = unique(cella(1:2:end));
     if length(tmp) ~= length(cella)/2
         fprintf('Note: duplicate ''key'', ''val'' parameter(s), keeping the last one(s)\n');
     end;
     cella = cella(sort(union(indices*2-1, indices*2)));
-else
+catch
     % some elements of cella were not string
     error('some ''key'' values are not string.');
-    
+end;    
 end;
