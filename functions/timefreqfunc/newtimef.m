@@ -192,8 +192,8 @@
 %       'itcavglim' = [min max] average ITC limits for all freq. (left of ITC) {auto}
 %       'speclim'   = [min max] average spectrum limits (left of ERSP image)   {auto}
 %       'erspmarglim' = [min max] average marginal ERSP limits (below ERSP image) {auto}
-%       'title'     = Optional figure or (brief) first-condition title         {none}
-%       'title2'    = Optional second-condition (brief) title                  {none}
+%       'title'     = Optional figure or (brief) title {none}. For multiple conditions
+%                     this must contain a cell array of 2 of 3 title strings.
 %       'marktimes' = Non-0 times to mark with a dotted vertical line (ms)     {none}
 %       'linewidth' = Line width for 'marktimes' traces (thick=2, thin=1)      {2}
 %       'axesfont'  = Axes text font size                                      {10}
@@ -278,6 +278,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.131  2007/08/08 00:45:35  arno
+% fix problem for plotting conditions with 1 freq only
+%
 % Revision 1.130  2007/04/20 15:32:32  scott
 % clarified help msg and comments
 %
@@ -968,7 +971,7 @@ end
 g = finputcheck(varargin, ...
     {'boottype'      'string'    {'shuffle','rand','randall'}    'shuffle'; ...
     'condboot'      'string'    {'abs','angle','complex'}       'abs'; ...
-    'title'         'string'    []          DEFAULT_TITLE; ...
+    'title'         { 'string' 'cell' }   { [] [] }         DEFAULT_TITLE; ...
     'title2'        'string'    []          DEFAULT_TITLE; ...
     'winsize'       'integer'      [0 Inf]  DEFAULT_WINSIZE; ...
     'pad'           'real'      []          DEFAULT_PAD; ...
@@ -1300,9 +1303,11 @@ if iscell(data)
                                               % as cells caused the function to crash (why?) 
                                               % at line 704 (g.tlimits = tlimits) -Jean
         if length(g.title) == 2,
-             g.title{3,1:length('Condition 1 - Condition 2')} = ...
-                 'Condition 1 - Condition 2';
+             g.title{3} = [ g.title{1} ' - '  g.title{2} ];
         end;
+    else
+        disp('Warning: title must be a cell array');
+        g.title = { 'Condition 1' 'Condition 2' 'Condition 1 minus Condition 2' };
     end;
 
     verboseprintf(g.verbose, '\nRunning newtimef() on Condition 1 **********************\n\n');
@@ -1371,16 +1376,16 @@ if iscell(data)
         end;
 
         subplot(1,3,1); % plot Condition 1
-        % g.title = g.titleall{1};
+        g.title = g.titleall{1};
         g = plottimef(P1, R1, Pboot1, Rboot1, mean(data{1},2), freqs, timesout, mbase, g);
         g.itcavglim = [];
 
         subplot(1,3,2); % plot Condition 2
-        g.title = g.title2; 
+        g.title = g.titleall{2};
         plottimef(P2, R2, Pboot2, Rboot2, mean(data{2},2), freqs, timesout, mbase, g);
 
         subplot(1,3,3); % plot Condition 1 - Condition 2
-        g.title = [ g.title ' - ' g.title2];
+        g.title =  g.titleall{3};
     end;
 
     if isnan(g.alpha)
