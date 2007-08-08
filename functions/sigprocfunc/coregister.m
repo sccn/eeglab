@@ -127,6 +127,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.67  2007/08/08 18:20:55  arno
+% same
+%
 % Revision 1.66  2007/08/08 18:19:03  arno
 % detect if using traditional.m from fieldtrip
 %
@@ -513,7 +516,7 @@ else
 end;
 
 tmp = which('traditional');
-if findstr('ieldtrip', tmp), error('Using traditional.m from Fieldtrip (returns angles in degree)'); end;
+if findstr('ieldtrip', tmp), error('Using traditional.m from Fieldtrip instead of EEGLAB (returns angles in degree)'); end;
 
 % manual mode off
 % ---------------
