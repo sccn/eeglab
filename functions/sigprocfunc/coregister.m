@@ -127,6 +127,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.66  2007/08/08 18:19:03  arno
+% detect if using traditional.m from fieldtrip
+%
 % Revision 1.65  2007/08/08 18:12:32  arno
 % fix last changes
 %
@@ -509,6 +512,9 @@ else
     
 end;
 
+tmp = which('traditional');
+if findstr('ieldtrip', tmp), error('Using traditional.m from Fieldtrip (returns angles in degree)'); end;
+
 % manual mode off
 % ---------------
 if strcmpi(g.manual, 'off'), 
@@ -517,8 +523,6 @@ if strcmpi(g.manual, 'off'),
     if size(dat.transform,1) > 1
         dat.electransf.pnt = dat.transform*[ dat.elec1.pnt ones(size(dat.elec1.pnt,1),1) ]';
     else
-        tmp = which('traditional');
-        if findstr('ieldtrip', tmp), error('Using traditional.m from Fieldtrip (returns angles in degree)'); end;
         dat.electransf.pnt = traditional(dat.transform)*[ dat.elec1.pnt ones(size(dat.elec1.pnt,1),1) ]';
     end;
     dat.electransf.pnt   = dat.electransf.pnt(1:3,:)';
