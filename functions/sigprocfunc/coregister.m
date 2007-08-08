@@ -127,6 +127,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.61  2007/08/07 22:29:39  arno
+% compatibility with new version of Fieldtrip
+%
 % Revision 1.60  2007/05/07 20:05:28  arno
 % fix yaw automatic optimization
 %
@@ -519,7 +522,7 @@ dat.color2     = [1 .75 .65]*.8;
 dat.label1     = 0;
 dat.label2     = 0;
 dat.meshon     = 1;
-fid = figure('userdata', dat, 'name', 'coregister()');
+fid = figure('userdata', dat, 'name', 'coregister()', 'numbertitle', 'off');
 try, icadefs; catch, end;
 
 if 1
@@ -1063,6 +1066,9 @@ function [norm] = electrodenormalize(cfg);
 % Copyright (C) 2005, Robert Oostenveld
 %
 % $Log: not supported by cvs2svn $
+% Revision 1.61  2007/08/07 22:29:39  arno
+% compatibility with new version of Fieldtrip
+%
 % Revision 1.5  2005/05/17 17:50:37  roboos
 % changed all "if" occurences of & and | into && and ||
 % this makes the code more compatible with Octave and also seems to be in closer correspondence with Matlab documentation on shortcircuited evaluation of sequential boolean constructs
@@ -1357,7 +1363,7 @@ catch
   [st, i] = dbstack;
   cfg.version.name = st(i);
 end
-cfg.version.id = '$Id: coregister.m,v 1.61 2007-08-07 22:29:39 arno Exp $';
+cfg.version.id = '$Id: coregister.m,v 1.62 2007-08-08 01:22:51 arno Exp $';
 
 % remember the configuration
 norm.cfg = cfg;
