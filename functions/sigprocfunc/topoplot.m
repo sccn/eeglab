@@ -163,6 +163,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.279  2007/08/08 17:38:13  arno
+% handle better fieldtrip
+%
 % Revision 1.278  2007/08/07 21:33:01  arno
 % remove debug message
 %
@@ -916,7 +919,7 @@ end
 
 % calling topoplot from Fieldtrip
 % -------------------------------
-fieldtrip == 0;
+fieldtrip = 0;
 if isstruct(Values) | ~isstruct(loc_file), fieldtrip == 1; end;
 if isstr(loc_file), if exist(loc_file) ~= 2, fieldtrip == 1; end; end;
 if fieldtrip
