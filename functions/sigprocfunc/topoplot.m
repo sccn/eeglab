@@ -163,6 +163,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.278  2007/08/07 21:33:01  arno
+% remove debug message
+%
 % Revision 1.277  2007/08/07 21:22:34  arno
 % changed optional arguments to use varargin, call topoplot from fieldtrip if necessary
 %
@@ -913,7 +916,10 @@ end
 
 % calling topoplot from Fieldtrip
 % -------------------------------
-if isstruct(Values)
+fieldtrip == 0;
+if isstruct(Values) | ~isstruct(loc_file), fieldtrip == 1; end;
+if isstr(loc_file), if exist(loc_file) ~= 2, fieldtrip == 1; end; end;
+if fieldtrip
     disp('Calling topoplot from Fieldtrip');
     dir1 = which('topoplot');           dir1 = fileparts(dir1);
     dir2 = which('electrodenormalize'); dir2 = fileparts(dir2);
