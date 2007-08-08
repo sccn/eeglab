@@ -56,6 +56,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2007/08/08 01:14:48  arno
+% fix bug 336, uses anova2_cell instead
+%
 % Revision 1.4  2006/05/05 18:15:18  arno
 % fix last changes
 %
@@ -71,7 +74,7 @@ function [F, df] = anova1_cell(data)
     % but requires some work. It now calls
     % anova2_cell which returns correct values
     
-    [ F tmp tmp2 df] =  anova2_cell(data)
+    [ F tmp tmp2 df] =  anova2_cell(data);
     return;
     
     % compute all means and all std
