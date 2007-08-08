@@ -278,6 +278,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.130  2007/04/20 15:32:32  scott
+% clarified help msg and comments
+%
 % Revision 1.129  2007/04/20 15:25:10  scott
 % added test for HZDIR read from icadefs
 % added read of YDIR (for ERP axis) from icadefs, plus test
@@ -1630,6 +1633,7 @@ if ~isnan(g.alpha) % if bootstrap analysis included . . .
             'label', 'ERSP', 'bootside', 'both', 'naccu', g.naccu, ...
             'basevect', baselntmp, 'alpha', g.alpha, 'dimaccu', 2 );
         Pboot = 10*log10(Pboot);
+        if size(Pboot,2) == 1, Pboot = Pboot'; end;
 
         % ITC significance
         % ----------------
@@ -1729,6 +1733,7 @@ switch lower(g.plotersp)
             if size(PP,1) == size(Pboot,1) & size(PP,2) == size(Pboot,2)
                 PP(find(PP > Pboot(:,:,1) & (PP < Pboot(:,:,2)))) = 0;
                 Pboot = squeeze(mean(Pboot,2));
+                if size(Pboot,2) == 1, Pboot = Pboot'; end;
             else
                 PP(find((PP > repmat(Pboot(:,1),[1 length(times)])) ...
                     & (PP < repmat(Pboot(:,2),[1 length(times)])))) = 0;
