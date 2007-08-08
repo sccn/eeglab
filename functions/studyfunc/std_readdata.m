@@ -62,7 +62,7 @@
 % Example:
 %         % To obtain the ERPs for all Cluster-3 components from a STUDY
 %         %
-%         [STUDY clustinfo] = std_readdata(STUDY, ALLEEG, 3, 'erp');
+%         [STUDY clustinfo] = std_readdata(STUDY, ALLEEG, 'clusters',3, 'infotype','erp');
 %         figure; plot(clustinfo.erptimes, mean(clustinfo.erpdata,2));
 % 
 % Author: Arnaud Delorme, CERCO, 2006-
@@ -84,6 +84,13 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2007/08/06 23:09:55  scott
+% help msg clarification - please check defaults, Arno.
+% In particular, why is the default for 'infotype' = 'erp' instead of
+% (new option) 'all' ?
+% Is the STUDY.cluster structure returned in the 2nd arg ?
+% Can this function also return the IC and subject numbers for the cluster ICs??
+%
 % Revision 1.29  2007/08/06 22:23:20  arno
 % remove unused code
 %
