@@ -63,6 +63,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2007/08/08 00:29:55  nima
+% modified removedup (removing duplicates)
+%
 % Revision 1.29  2007/03/07 03:54:51  toby
 % Documentation edits
 %
@@ -320,6 +323,6 @@ if allAreString
     cella = cella(sort(union(indices*2-1, indices*2)));
 else
     % some elements of cella were not string
-    return;
+    error('some ''key'' values are not string.');
     
 end;
