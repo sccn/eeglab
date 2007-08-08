@@ -56,11 +56,23 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2006/05/05 18:15:18  arno
+% fix last changes
+%
 % Revision 1.1  2005/12/07 17:25:58  arno
 % Initial revision
 %
 
 function [F, df] = anova1_cell(data)
+    
+    % This function does not return
+    % correct values (see bug 336)
+    % It should be fixed with Schaum's outlines p363
+    % but requires some work. It now calls
+    % anova2_cell which returns correct values
+    
+    [ F tmp tmp2 df] =  anova2_cell(data)
+    return;
     
     % compute all means and all std
     % -----------------------------
@@ -107,8 +119,8 @@ function [F, df] = anova1_cell(data)
     end;
     
     mt = mean(m,nd);
-    ng = length(data);
-        
+    ng = length(data); % number of conditions
+    
     VinterG  = ( sum( n.*(m.^2), nd ) - nt*mt.^2 )/(ng-1);
     VwithinG = sum( (n-1).*(sd.^2), nd )/(nt-ng);
     F  = VinterG./VwithinG;
