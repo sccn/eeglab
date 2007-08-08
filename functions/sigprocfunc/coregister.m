@@ -127,6 +127,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.63  2007/08/08 17:49:06  arno
+% now using electroderealign
+%
 % Revision 1.62  2007/08/08 01:22:51  arno
 % remove numer in the title
 %
@@ -340,44 +343,47 @@ end
 % undocumented commands ?
 % ---------------------
 if isstr(chanlocs1) 
-    com = chanlocs1;
-    fid = chanlocs2;
+    if exist(chanlocs1) == 2 % read file
+        chanlocs1 = readlocs(chanlocs1);
+    else
+        com = chanlocs1;
+        fid = chanlocs2;
 
-    % update GUI
-    % ----------
-    if strcmpi(com, 'redraw'), redrawgui(fid); return; end;
+        % update GUI
+        % ----------
+        if strcmpi(com, 'redraw'), redrawgui(fid); return; end;
 
-    % select electrodes and warp montage
-    % ----------------------------------
-    dat = get(fid, 'userdata');
-    if strcmpi(com, 'fiducials')
-        [clist1 clist2] = pop_chancoresp( dat.elec1, dat.elec2, 'autoselect', 'fiducials');
-        %try,
+        % select electrodes and warp montage
+        % ----------------------------------
+        dat = get(fid, 'userdata');
+        if strcmpi(com, 'fiducials')
+            [clist1 clist2] = pop_chancoresp( dat.elec1, dat.elec2, 'autoselect', 'fiducials');
+            %try,
             [ tmp transform ] = align_fiducials(dat.elec1, dat.elec2, dat.elec1.label(clist1), dat.elec2.label(clist2));
             if ~isempty(transform), dat.transform = transform; end;
-        %catch,
-        %    warndlg2(strvcat('Transformation failed', lasterr));
-        %end;
-    elseif strcmpi(com, 'warp')
-        [clist1 clist2] = pop_chancoresp( dat.elec1, dat.elec2, 'autoselect', 'all');
-
-        % copy electrode names
-        if ~isempty(clist1)
-            tmpelec2 = dat.elec2;
-            for index = 1:length(clist2)
-                tmpelec2.label{clist2(index)} = dat.elec1.label{clist1(index)};
-            end;
-            %try,
-                [ tmp dat.transform ] = warp_chans(dat.elec1, dat.elec2, tmpelec2.label(clist2), 'traditional');
             %catch,
             %    warndlg2(strvcat('Transformation failed', lasterr));
             %end;
+        elseif strcmpi(com, 'warp')
+            [clist1 clist2] = pop_chancoresp( dat.elec1, dat.elec2, 'autoselect', 'all');
+
+            % copy electrode names
+            if ~isempty(clist1)
+                tmpelec2 = dat.elec2;
+                for index = 1:length(clist2)
+                    tmpelec2.label{clist2(index)} = dat.elec1.label{clist1(index)};
+                end;
+                %try,
+                [ tmp dat.transform ] = warp_chans(dat.elec1, dat.elec2, tmpelec2.label(clist2), 'traditional');
+                %catch,
+                %    warndlg2(strvcat('Transformation failed', lasterr));
+                %end;
+            end;
         end;
+        set(fid, 'userdata', dat);
+        redrawgui(fid); 
+        return;
     end;
-    set(fid, 'userdata', dat);
-    redrawgui(fid); 
-    return;
-    
 end;
 
 % check input arguments
