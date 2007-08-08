@@ -193,7 +193,7 @@
 %       'speclim'   = [min max] average spectrum limits (left of ERSP image)   {auto}
 %       'erspmarglim' = [min max] average marginal ERSP limits (below ERSP image) {auto}
 %       'title'     = Optional figure or (brief) title {none}. For multiple conditions
-%                     this must contain a cell array of 2 of 3 title strings.
+%                     this must contain a cell array of 2 or 3 title strings.
 %       'marktimes' = Non-0 times to mark with a dotted vertical line (ms)     {none}
 %       'linewidth' = Line width for 'marktimes' traces (thick=2, thin=1)      {2}
 %       'axesfont'  = Axes text font size                                      {10}
@@ -278,6 +278,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.132  2007/08/08 00:59:32  arno
+% fixed title for multiple conditions
+%
 % Revision 1.131  2007/08/08 00:45:35  arno
 % fix problem for plotting conditions with 1 freq only
 %
