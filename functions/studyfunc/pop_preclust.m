@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.48  2007/08/06 20:20:55  arno
+% roudning problem fix
+%
 % Revision 1.47  2007/04/10 16:24:29  arno
 % matching exact names
 %
@@ -336,7 +339,6 @@ if ~isstr(varargin{1}) %intial settings
     
     % precluster on what?
     % -------------------
-    dipselect = 0;
     options{3} = cls(os.clus_list); % hierarchical clustering
 
     %if ~(os.preclust_PCA) %create PCA data for clustering
