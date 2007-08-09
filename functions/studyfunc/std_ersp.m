@@ -116,6 +116,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.50  2007/05/22 13:56:32  arno
+% default highest frequency
+%
 % Revision 1.49  2007/04/27 19:05:45  julie
 % added tmpparams to use input baseline
 %
@@ -348,6 +351,7 @@ end
 % Check if ERSP/ITC information found in datasets and if fits requested parameters 
 % ----------------------------------------------------------------------------
 if exist( filenameersp ) & strcmpi(g.recompute, 'off')
+    fprintf('Use existing file for ERSP: %s\n', filenameersp);
     return;
 end;
 %    tmpersp  = load( '-mat', filenameersp, 'parameters'); % AND IT SHOULD BE USED HERE TOO - ARNO
