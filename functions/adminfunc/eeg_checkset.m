@@ -150,6 +150,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.213  2007/08/01 01:07:26  arno
+% check data
+%
 % Revision 1.212  2007/07/27 23:09:16  arno
 % rounding durations
 %
@@ -1520,12 +1523,26 @@ end;
                     end;    
                 end;
                 if isempty(EEG.icaact) | (size(EEG.icaact,1) ~= size(EEG.icaweights,1)) | (size(EEG.icaact,2) ~= size(EEG.data,2))
+                    EEG.icaweights = double(EEG.icaweights);
+                    EEG.icawinv = double(EEG.icawinv);
+                    
+                    % scale ICA components to RMS microvolt
+                    if option_scaleicarms
+                        if mean(mean(abs(pinv(EEG.icaweights * EEG.icasphere)-EEG.icawinv))) < 0.0001 
+                            disp('Scaling components to RMS microvolt');
+                            scaling = repmat(sqrt(mean(EEG(1).icawinv(:,:).^2))', [1 size(EEG.icaweights,2)]);
+                            EEG.etc.icaweights_beforerms = EEG.icaweights;
+                            EEG.etc.icasphere_beforerms = EEG.icasphere;
+                            
+                            EEG.icaweights = EEG.icaweights .* scaling;
+                            EEG.icawinv = pinv(EEG.icaweights * EEG.icasphere);
+                        end;
+                    end;
+
                     if option_computeica
                         fprintf('eeg_checkset: recomputing the ICA activation matrix ...\n'); 
                         res = com;
                         % Make compatible with Matlab 7
-                        EEG.icaweights = double(EEG.icaweights);
-                        EEG.icawinv = double(EEG.icawinv);
                         if any(isnan(EEG.data(:)))
                             fprintf('eeg_checkset: recomputing using NaN indices [in first channel] ...\n');
                             tmpindices = find(~sum(isnan(EEG.data))); % was: tmpindices = find(~isnan(EEG.data(1,:)));
