@@ -69,6 +69,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.54  2007/08/07 19:22:24  arno
+% help message
+%
 % Revision 1.53  2007/07/27 22:12:28  toby
 % nothing
 %
@@ -426,6 +429,19 @@ elseif strcmpi(mode, 'gui') % GUI mode
     end;
     if outstruct(1).delclust == 1
         options = { options{:} 'rmclust' 'on' };
+    end;
+    
+    % check channel labels
+    % --------------------
+    allchans = { ALLEEG.chanlocs };
+    if any(cellfun('isempty', allchans))
+        txt = strvcat('Some datasets do not have channel labels. Do you wish to generate', ...
+                'channel labels automatically for all datasets ("1" for channel 1,', ...
+                '"2" for channel 2, ...). Datasets will be overwritten on disk.', ...
+                'If you do not do it, most STUDY functions will not work.');
+        res = questdlg2(txt, 'Dataset format problem', ...
+                         'Yes', 'No, I will deal with it myself', 'Yes');
+        if strcmpi(res, 'yes'), options = { options{:} 'addchannellabels' 'on' 'savedat' 'on'}; end;
     end;
     
     % run command and create history
