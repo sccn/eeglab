@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.53  2007/08/09 18:29:18  arno
+% add warning message and disable statistics for multiple cluster plotting
+%
 % Revision 1.52  2007/08/07 23:00:32  arno
 % fix message
 %
@@ -329,7 +332,8 @@ else
     nr = ceil(length(allinds)/nc);
     comp_names = {};
 
-    if length(opt.clusters) > 1 & isnan(opt.threshold), 
+    if length(opt.clusters) > 1 & isnan(opt.threshold) & ...
+            ( strcmpi(opt.condstats, 'on') | strcmpi(opt.groupstats, 'on'))
         opt.condstats = 'off'; opt.groupstats = 'off'; 
         disp('Statistics disabled for plotting multiple clusters unless a threshold is set');
     end;

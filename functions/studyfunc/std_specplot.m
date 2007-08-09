@@ -88,6 +88,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.45  2007/08/09 18:29:59  arno
+% add warning message and disable statistics for multiple cluster plotting
+%
 % Revision 1.44  2007/06/25 04:38:56  toby
 % altered multiple dipole plot windows to indicate number of components and subjects
 %
@@ -283,7 +286,8 @@ else
     nr = ceil(length(allinds)/nc);
     comp_names = {};
 
-    if length(opt.clusters) > 1 & isnan(opt.threshold), 
+    if length(opt.clusters) > 1 & isnan(opt.threshold) & ...
+            ( strcmpi(opt.condstats, 'on') | strcmpi(opt.groupstats, 'on'))
         opt.condstats = 'off'; opt.groupstats = 'off'; 
         disp('Statistics disabled for plotting multiple clusters unless a threshold is set');
     end;
