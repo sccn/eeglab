@@ -67,6 +67,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.57  2007/08/07 19:06:16  arno
+% fix bug 334 and 330; remove channelnos variable
+%
 % Revision 1.56  2007/08/07 19:01:02  arno
 % fixed bug 321
 %
@@ -396,7 +399,7 @@ end;
     return
   end;
   if length(g.chans)>MAXPLOTDATACHANS,
-    fprintf('plottopo(): not set up to plot more than %d channels.\n',...
+    fprintf('plottopo(): not set up to plot more than %d traces.\n',...
                        MAXPLOTDATACHANS);
     return
   end;
