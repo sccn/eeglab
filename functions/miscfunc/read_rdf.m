@@ -1,7 +1,7 @@
-% read_RDF() - read RDF-formatted EEG files.
+% read_rdf() - read RDF-formatted EEG files.
 %
 % Usage: 
-%   >> [eeg,ev,header] = read_RDF(filename);
+%   >> [eeg,ev,header] = read_rdf(filename);
 %
 % Inputs:
 %   filename - EEG data file in RDF format
@@ -21,8 +21,13 @@
 % Authors: Jeng-Ren Duann, CNL/Salk & INC/UCSD, 2002-12-12
 %          with help from Andrey Vankov, creator of the RDF file format.
 
-function [eeg,ev,header] = read_RDF(filename)
-  
+function [eeg,ev,header] = read_rdf(filename)
+   
+    if nargin < 1
+        help read_rdf;
+        return;
+    end;
+      
   eeg = [];
   ev = [];
   header = [];
