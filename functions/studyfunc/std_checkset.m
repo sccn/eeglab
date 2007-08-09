@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.45  2007/08/09 01:25:54  arno
+% removing all data if old study
+%
 % Revision 1.44  2007/07/31 03:41:57  arno
 % message
 %
@@ -256,6 +259,8 @@ if ~isfield(STUDY, 'changrp'), STUDY.changrp = []; modif = 1; end;
 
 % remove cluster information if old version
 if isempty(STUDY.etc.version)
+    dips('Old STUDY version detected, removing pre-loaded measures');
+    dips('which could potentialy show innacurate results (Bugs 463 & 467)');
     icadefs;
     STUDY.etc.version = EEGLAB_VERSION;
     fields = { 'erpdata' 'erptimes' 'specdata' 'specfreqs' 'erspdata' ...
