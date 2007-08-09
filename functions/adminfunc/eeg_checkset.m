@@ -150,6 +150,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.214  2007/08/09 00:46:47  arno
+% scaling ICA components to RMS
+%
 % Revision 1.213  2007/08/01 01:07:26  arno
 % check data
 %
@@ -1686,6 +1689,8 @@ if ~isempty( EEG.chanlocs )
                         EEG.dipfit.coord_transform = [0 0 0 0 0 0 1 1 1];
                     end;
                     EEG.dipfit.coord_transform(6) = EEG.dipfit.coord_transform(6)+rotategrad;
+                elseif ~isempty(EEG.dipfit)
+                    EEG.dipfit.coord_transform = [0 0 0 0 0 0 1 1 1];
                 end;
             end;
         end;
