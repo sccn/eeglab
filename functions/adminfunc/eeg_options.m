@@ -9,3 +9,5 @@ option_savematlab = 1 ;  % If set, write data in same file as dataset; if unset,
 option_computeica = 1 ;  % If set, precompute ICA activations. Requires more RAM, but allows faster plotting of component activations. 
 % Folder options
 option_rememberfolder = 0 ;  % If set, assume the folder/directory of the previous file read when reading a new dataset; if unset, look first in the present working directory (pwd)
+% ICA options
+option_scaleicarms = 1 ;  % If set, scale ICA component activities to RMS (Root Mean Square) in microvolt
