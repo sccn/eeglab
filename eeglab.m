@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.511  2007/08/09 00:31:11  arno
+% memory option menu
+%
 % Revision 1.510  2007/08/02 23:34:09  arno
 % adding back the EDF menu
 %
@@ -2796,7 +2799,7 @@ if study_selected
     set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Save current study as'   ), 'enable', 'on');
     set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Clear study'             ), 'enable', 'on');
     set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Save history'            ), 'enable', 'on');
-    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Memory options'          ), 'enable', 'on');
+    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Memory and other options'), 'enable', 'on');
     set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Quit'                    ), 'enable', 'on');
     set( findobj('parent', std_m , 'type', 'uimenu', 'label', 'Plot channel measures'), 'enable', 'off');
     if isfield(STUDY, 'changrp')
@@ -2912,7 +2915,7 @@ elseif (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG(1).data)
         set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Clear dataset(s)'        ), 'enable', 'on');
         set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Load existing study'     ), 'enable', 'on');
         set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Save history'            ), 'enable', 'on');
-        set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Memory options'          ), 'enable', 'on');
+        set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Memory and other options'), 'enable', 'on');
         set( findobj('parent', hist_m, 'type', 'uimenu', 'label', 'Dataset history'         ), 'enable', 'off');
         set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Quit'                    ), 'enable', 'on');
 
@@ -3075,7 +3078,7 @@ else
     set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Import data')             , 'enable', 'on');
     set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Load existing dataset'   ), 'enable', 'on');
     set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Load existing study'     ), 'enable', 'on');
-    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Memory options' )         , 'enable', 'on');
+    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Memory and other options'), 'enable', 'on');
     set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Quit')                    , 'enable', 'on');
     set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Create study'    )        , 'enable', 'on');
     set( findobj('type', 'uimenu', 'label', 'Using all loaded datasets'), 'enable', 'off');
