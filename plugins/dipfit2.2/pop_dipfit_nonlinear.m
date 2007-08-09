@@ -34,6 +34,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2007/08/09 16:15:01  arno
+% debug
+%
 % Revision 1.13  2007/08/07 22:30:38  arno
 % remove try catch comments
 %
@@ -413,13 +416,13 @@ elseif nargin>=3
         {'style' 'pushbutton' 'string' 'Interupt' 'callback' 'figure(gcbf); set(gcbf, ''tag'', ''stop'');' } );
       drawnow;
       % start the dipole fitting
-      %try
+      try
           warning backtrace off;
           EEG = dipfit_nonlinear(EEG, arg{:});
           warning backtrace on;
-      %catch,
-      %    disp('Dipole localization failed');
-      %end;
+      catch,
+          disp('Dipole localization failed');
+      end;
       
       % should the following string be put into com? ->NOT SUPPORTED
       % --------------------------------------------------------
