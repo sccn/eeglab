@@ -10,4 +10,4 @@ option_computeica = 1 ;  % If set, precompute ICA activations. This requires mor
 % Folder options
 option_rememberfolder = 1 ;  % If set, when reading dataset assume the folder/directory of previous dataset.
 % ICA options
-option_scaleicarms = 1 ;  % If set, scale ICA component activities to RMS (Root Mean Square) in microvolt
+option_scaleicarms = 0 ;  % If set, scale ICA component activities to RMS (Root Mean Square) in microvolt
