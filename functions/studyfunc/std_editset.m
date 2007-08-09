@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.47  2007/08/09 18:59:05  arno
+% adding channel label code
+%
 % Revision 1.46  2007/03/13 23:41:16  arno
 % undoing reslection of components
 %
@@ -338,6 +341,7 @@ end
 % add channel labels automatically
 % -------------------------------
 if strcmpi(g.addchannellabels, 'on')
+    disp('Generating channel labels for all datasets...');
     for currentind = 1:length(ALLEEG)
         for ind = 1:ALLEEG(currentind).nbchan
             ALLEEG(currentind).chanlocs(ind).labels = int2str(ind);
