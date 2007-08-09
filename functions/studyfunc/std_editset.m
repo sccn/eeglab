@@ -16,6 +16,9 @@
 %   'filename' - [string] filename for the STUDY set.
 %   'filepath' - [string] file path (directory/folder) in which the STUDY file
 %                will be saved.  
+%   'addchannellabels' - ['on'|'off'] add channel labels ('1', '2', '3', ...)
+%                to all datasets of a STUDY to ensure that all STUDY functions
+%                will work {default: 'off'}
 %   'notes'    - [string] notes about the experiment, the datasets, the STUDY, 
 %                or anything else to store with the STUDY itself {default: ''}. 
 %   'updatedat' - ['on'|'off'] update 'subject' 'session' 'condition' and/or
@@ -61,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.46  2007/03/13 23:41:16  arno
+% undoing reslection of components
+%
 % Revision 1.45  2007/02/28 12:03:11  arno
 % removing datasets
 %
@@ -185,6 +191,7 @@ g = finputcheck(varargin, { 'updatedat' 'string'  { 'on' 'off' }  'off';
                             'filepath'  'string'  { }             '';
                             'resave'    'string'  { 'on' 'off' 'info' }  'off';
                             'savedat'   'string'  { 'on' 'off' }  'off';
+                            'addchannellabels' 'string'  { 'on' 'off' }  'off';
                             'rmclust'   'string'  { 'on' 'off' }  'on';
                             'commands'  'cell'    {}              {} }, 'std_editset');
 if isstr(g), error(g); end;
@@ -239,6 +246,8 @@ for k = 1:2:length(g.commands)
             STUDY.datasetinfo(currentind).condition = g.commands{k+1};
         case 'group'
             STUDY.datasetinfo(currentind).group   = g.commands{k+1};
+        case 'session' 
+            STUDY.datasetinfo(currentind).session = g.commands{k+1};
         case 'session' 
             STUDY.datasetinfo(currentind).session = g.commands{k+1};
         case 'remove'
@@ -326,6 +335,18 @@ for k = 1:2:length(g.commands)
     end
 end
 
+% add channel labels automatically
+% -------------------------------
+if strcmpi(g.addchannellabels, 'on')
+    for currentind = 1:length(ALLEEG)
+        for ind = 1:ALLEEG(currentind).nbchan
+            ALLEEG(currentind).chanlocs(ind).labels = int2str(ind);
+        end;
+    end;
+    ALLEEG(currentind).saved = 'no';
+    g.savedat = 'on';
+end;
+    
 % update ALLEEG structure?
 % ------------------------
 if strcmpi(g.updatedat, 'on')
