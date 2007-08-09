@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.44  2007/07/31 03:41:57  arno
+% message
+%
 % Revision 1.43  2007/07/30 22:20:38  arno
 % *** empty log message ***
 %
@@ -86,6 +89,7 @@ if ~isfield(STUDY, 'etc'),       STUDY.etc       = []; modif = 1; end;
 if ~isfield(STUDY, 'etc.warnmemory'), STUDY.etc.warnmemory = 1; modif = 1; end;
 if ~isfield(STUDY, 'preclust'),  STUDY.preclust  = []; modif = 1; end;
 if ~isfield(STUDY, 'datasetinfo'), STUDY.datasetinfo = []; modif = 1; end;
+if ~isfield(STUDY.etc, 'version'), STUDY.etc.version = []; modif = 1; end;
 if ~isfield(STUDY.preclust, 'erpclusttimes' ),  STUDY.preclust.erpclusttimes = []; modif = 1; end;
 if ~isfield(STUDY.preclust, 'specclustfreqs' ), STUDY.preclust.specclustfreqs = []; modif = 1; end;
 if ~isfield(STUDY.preclust, 'erspclustfreqs' ), STUDY.preclust.erspclustfreqs = []; modif = 1; end;
@@ -249,6 +253,21 @@ if ~isfield(STUDY, 'changrp'), STUDY.changrp = []; modif = 1; end;
 %  STUDY = std_changroup(STUDY, ALLEEG);
 %  modif = 1; 
 %end;
+
+% remove cluster information if old version
+if isempty(STUDY.etc.version)
+    icadefs;
+    STUDY.etc.version = EEGLAB_VERSION;
+    fields = { 'erpdata' 'erptimes' 'specdata' 'specfreqs' 'erspdata' ...
+               'ersptimes' 'erspfreqs' 'itcdata' 'itctimes' 'itcfreqs' ...
+               'topo' 'topox' 'topoy' 'topoall' 'topopol' 'dipole' };
+    for ind = 1:length(fields)
+        if isfield(STUDY.cluster, fields{ind})
+            STUDY.cluster = rmfield(STUDY.cluster, fields{ind});
+        end;
+    end;
+    modif = 1;
+end;
 
 % determine if there has been any change
 % --------------------------------------
