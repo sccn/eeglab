@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.52  2007/08/07 23:00:32  arno
+% fix message
+%
 % Revision 1.51  2007/08/07 22:58:21  arno
 % debug last change
 %
@@ -326,6 +329,11 @@ else
     nr = ceil(length(allinds)/nc);
     comp_names = {};
 
+    if length(opt.clusters) > 1 & isnan(opt.threshold), 
+        opt.condstats = 'off'; opt.groupstats = 'off'; 
+        disp('Statistics disabled for plotting multiple clusters unless a threshold is set');
+    end;
+
     for index = 1:length(allinds)
 
         if length(allinds) > 1, subplot(nr,nc,index); end;
@@ -347,7 +355,8 @@ else
                                           'chanlocs', ALLEEG(1).chanlocs, 'plotsubjects', opt.plotsubjects, plotcurveopt{:});
         if length(allinds) > 1, 
             if isempty(opt.channels), %title(sprintf('Cluster %d', allinds(index))); 
-            title([ STUDY.cluster(allinds(index)).name ' (' num2str(length(STUDY.cluster(allinds(index)).comps)),' ICs, '  num2str(length(unique(STUDY.cluster(allinds(index)).sets(1,:)))) ' Ss)' ]);
+                title([ STUDY.cluster(allinds(index)).name ' (' num2str(length(STUDY.cluster(allinds(index)).comps)),...
+                        ' ICs, '  num2str(length(unique(STUDY.cluster(allinds(index)).sets(1,:)))) ' Ss)' ]);
             else                      title(sprintf('%s', opt.channels{index}));  
             end;
         end;
