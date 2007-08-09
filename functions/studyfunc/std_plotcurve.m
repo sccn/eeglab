@@ -65,6 +65,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2007/08/03 23:34:23  arno
+% fix labels
+%
 % Revision 1.8  2007/04/06 01:58:05  arno
 % legend business
 %
@@ -249,7 +252,7 @@ if isempty(opt.topovals) & strcmpi(opt.singlesubject, 'off') & ~strcmpi(opt.plot
     plottag = 0;
     if strcmpi(opt.plotgroups, 'together') & isempty(opt.condstats) & ~isempty(opt.groupstats) & ~isnan(opt.threshold), addc = 0; plottag = 1; end;
     if strcmpi(opt.plotconditions , 'together') & ~isempty(opt.condstats) & isempty(opt.groupstats) & ~isnan(opt.threshold), addr = 0; plottag = 1; end;
-    if ~isnan(opt.threshold) & plottag == 0
+    if ~isnan(opt.threshold) & plottag == 0 & strcmpi(opt.figure, 'on')
         disp('Warning: cannot plot condition/group on the same panel while using a fixed');
         disp('         threshold, unless you only compute statistics for ether groups or conditions');
         opt.plotgroups = 'apart';
