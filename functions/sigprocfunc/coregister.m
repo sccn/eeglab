@@ -127,6 +127,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.68  2007/08/08 18:21:56  arno
+% *** empty log message ***
+%
 % Revision 1.67  2007/08/08 18:20:55  arno
 % same
 %
@@ -820,6 +823,7 @@ function [elec1, transf] = warp_chans(elec1, elec2, chanlist, warpmethod)
     elec3 = electroderealign(cfg);
     
     transf = elec3.m;
+    transf(4:6) = transf(4:6)/180*pi;
     if length(transf) == 6, transf(7:9) = 1; end;
     transf = checktransf(transf, elec1, elec2);
     
