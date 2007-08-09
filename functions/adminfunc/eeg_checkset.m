@@ -150,6 +150,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.216  2007/08/09 16:10:55  arno
+% same
+%
 % Revision 1.215  2007/08/09 16:08:30  arno
 % coord_transform field
 %
@@ -1685,6 +1688,16 @@ if ~isempty( EEG.chanlocs )
                     if EEG.chanlocs(index).sph_theta>180 , EEG.chanlocs(index).sph_theta=EEG.chanlocs(index).sph_theta-360; end;
                 end;
             end;
+            
+            if isfield(EEG, 'dipfit')
+                if isfield(EEG.dipfit, 'coord_transform')
+                    if isempty(EEG.dipfit.coord_transform)
+                        EEG.dipfit.coord_transform = [0 0 0 0 0 0 1 1 1];
+                    end;
+                    EEG.dipfit.coord_transform(6) = EEG.dipfit.coord_transform(6)+rotategrad;
+                end;
+            end;
+
         end;
         EEG.chaninfo.nosedir = '+X';
     end;
@@ -1748,7 +1761,6 @@ elseif exist('dipfitdefs')
         if isempty(EEG.dipfit.coord_transform)
             EEG.dipfit.coord_transform = [0 0 0 0 0 0 1 1 1];
         end;
-        EEG.dipfit.coord_transform(6) = EEG.dipfit.coord_transform(6)+rotategrad;
     elseif ~isempty(EEG.dipfit)
         EEG.dipfit.coord_transform = [0 0 0 0 0 0 1 1 1];
     end;
