@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2007/04/06 21:46:26  arno
+% remove debug msg
+%
 % Revision 1.8  2007/04/06 21:45:39  arno
 % fix channel selection
 %
@@ -141,12 +144,14 @@ if ~isstr(varargin{1}) %intial settings
     % -----------------------------
     allchans  = { };
     keepindex = 0;
-    for index = 1:length(ALLEEG)
-        tmpchans = { ALLEEG(index).chanlocs.labels };
-        allchans = unique({ allchans{:} ALLEEG(index).chanlocs.labels });
-        if length(allchans) == length(tmpchans), keepindex = index; end;
+    if ~isempty(ALLEEG(1).chanlocs)
+        for index = 1:length(ALLEEG)
+            tmpchans = { ALLEEG(index).chanlocs.labels };
+            allchans = unique({ allchans{:} ALLEEG(index).chanlocs.labels });
+            if length(allchans) == length(tmpchans), keepindex = index; end;
+        end;
+        if keepindex, allchans = { ALLEEG(keepindex).chanlocs.labels }; end;
     end;
-    if keepindex, allchans = { ALLEEG(keepindex).chanlocs.labels }; end;
     
     chanlist = {};
     firsttimeersp = 1;
