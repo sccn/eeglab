@@ -1,13 +1,12 @@
 % std_preclust() - prepare STUDY component location and activity measures for later clustering.
-%                  Selected measures (one or more from options: ERPs, dipole locations, spectra,
+%                  Selected measures (one or more from options: ICA activation ERPs, spectra,
 %                  scalp maps, ERSPs, and ITCs) are computed for each dataset in the STUDY 
 %                  set, unless they already present. After all requested measures are computed 
 %                  and saved in the STUDY datasets, each feature dimension is reduced by computing 
 %                  a PCA  decomposition. These PCA matrices (one per measure) are concatenated and 
 %                  used as input to the clustering  algorithm in pop_clust(). std_preclust() allows 
 %                  selection of a subset of components to use in the clustering. This subset 
-%                  may be a user-specified component subset, components with dipole model residual 
-%                  variance lower than a defined threshold (see dipfit()), or components from 
+%                  may be a user-specified component subset, or components selected from 
 %                  an already existing cluster (for hierarchical clustering). The EEG datasets
 %                  in the ALLEEG structure are updated. If new measures are added, the updated 
 %                  EEG sets are also saved to disk. Called by pop_preclust(). Follow with 
@@ -34,8 +33,6 @@
 %            * 'command' = component measure to compute:
 %                    'erp'     = cluster on the component ERPs,
 %                    'dipoles' = cluster on the component [X Y Z] dipole locations
-%                    'dipselect' = select components to cluster that have residual 
-%                                  dipole variance less than a specified threshold. 
 %                    'spec'    = cluster on the component log activity spectra (in dB)
 %                                  (with the baseline mean dB spectrum subtracted).
 %                    'scalp'   = cluster on component (topoplot()) scalp maps 
@@ -72,16 +69,13 @@
 %                                   (>> timef details) {default: 0.01}
 %                    'funarg'  =  [cell array] optional function arguments for mean spectrum 
 %                                   calculation (>> help spectopo) {default: none}
-%                    'rv'      =  [number < 1] for dipole locations ('dipselect'), max component 
-%                                   model residual variance. Only components with a lower residual 
-%                                   variance (rv) will be clustered {default: 0 (all components)}
 % Outputs:
 %   STUDY        - the input STUDY set with pre-clustering data added, for use by pop_clust() 
 %   ALLEEG       - the input ALLEEG vector of EEG dataset structures, modified by adding preprocessing 
 %                  data as pointers to Matlab files that hold the pre-clustering component measures.
 %
 % Example:
-%   >> [STUDY ALLEEG] = std_preclust(STUDY, ALLEEG, [], [] , { 'dipselect'  'rv'  0.15  } ,...
+%   >> [STUDY ALLEEG] = std_preclust(STUDY, ALLEEG, [],...
 %                        { 'spec'  'npca' 10 'norm' 1 'weight' 1 'freqrange'  [ 3 25 ] } , ...
 %                        { 'erp'   'npca' 10 'norm' 1 'weight' 2 'timewindow' [ 350 500 ] } ,...
 %                        { 'scalp' 'npca' 10 'norm' 1 'weight' 2 'abso' 1 } , ...
@@ -93,7 +87,8 @@
 %                        { 'finaldim' 'npca' 10 });
 %                          
 %                   % This prepares, for initial clustering, all components in the STUDY datasets
-%                   % except components with dipole model residual variance above 0.15.
+%                   % except components with dipole model residual variance (see function 
+%                   % std_editset() for how to select such components).
 %                   % Clustering will be based on the components' mean spectra in the [3 25] Hz 
 %                   % frequency range, on the components' ERPs in the [350 500] ms time window, 
 %                   % on the (absolute-value) component scalp maps, on the equivalent dipole 
@@ -122,6 +117,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.83  2007/05/22 04:27:05  ywu
+% not sure, Matlab crashed. TF
+%
 % Revision 1.80  2007/04/28 01:04:44  arno
 % computation of ERSP and ITC
 %
@@ -378,7 +376,6 @@ if nargin < 2
     
     % Scan which component to remove (no dipole info)
     % -----------------------------------------------
-    nodip = 0;
     if update_flag % dipole information is used to select components
         error('Update flag is obsolete');
     end;
