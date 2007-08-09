@@ -159,6 +159,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.93  2007/08/06 19:23:51  arno
+% header typo
+%
 % Revision 1.92  2007/02/05 16:17:40  arno
 % Unit for components
 %
@@ -815,6 +818,11 @@ switch g.type
     case { 'coher', 'phasecoher', 'phasecoher2' },;
     otherwise error('Type must be either ''coher'' or ''phasecoher''');
 end;    
+if isnan(g.baseline)
+    g.unitpower = 'uV/Hz';
+else
+    g.unitpower = 'dB';
+end;
 
 if (g.cycles == 0) %%%%%%%%%%%%%% constant window-length FFTs %%%%%%%%%%%%%%%%
     freqs = linspace(0, g.srate/2, g.padratio*g.winsize/2+1);
@@ -962,10 +970,16 @@ for i=1:trials
                	tmpX = fft(tmpX, g.pad);
     		    tmpX = tmpX(2:g.padratio*g.winsize/2+1);
             else
-		        tmpX = win .* tmpX(:);
+               % TF and MC (12/2006): Calculation changes made so that
+                % power can be correctly calculated from ERSP.
+		        tmpX = win .* tmpX(:);     
                	tmpX = fft(tmpX,g.padratio*g.winsize);
+                tmpX = tmpX / g.winsize;    % TF and MC (12/11/2006): normalization, divide by g.winsize
     		    tmpX = tmpX(2:g.padratio*g.winsize/2+1);
-                PP(:,j) = abs(tmpX).^2; % power
+                PP(:,j) = 2/0.375*abs(tmpX).^2; % power
+                % TF and MC (12/14/2006): multiply by 2 account for negative frequencies,
+                % Counteract the reduction by a factor 0.375 
+                % that occurs as a result of cosine (Hann) tapering. Refer to Bug 446
             end;    
           else % wavelet
             if ~isempty(g.mtaper)  % apply multitaper
@@ -1196,7 +1210,7 @@ switch lower(g.plotersp)
 	h(3) = cbar('vert'); % ERSP colorbar axes
 	set(h(2),'Position',[.1 ordinate1 .8 height].*s+q)
 	set(h(3),'Position',[.95 ordinate1 .05 height].*s+q)
-	title('ERSP (dB)')
+	title([ 'ERSP(' g.unitpower ')' ])
 
 	E = [min(P(dispf,:));max(P(dispf,:))];
 	h(4) = subplot('Position',[.1 ordinate1-0.1 .8 .1].*s+q); % plot marginal ERSP means
@@ -1212,7 +1226,7 @@ switch lower(g.plotersp)
 	set(h(4),'YAxisLocation','right')
     set(h(4),'TickLength',[0.020 0.025]);
 	xlabel('Time (ms)')
-	ylabel('dB')
+	ylabel( g.unitpower )
 
 	E = 10 * log10(mbase(dispf));
 	h(5) = subplot('Position',[0 ordinate1 .1 height].*s+q); % plot mean spectrum
@@ -1232,7 +1246,7 @@ switch lower(g.plotersp)
     set(h(5),'TickLength',[0.020 0.025]);
 	set(h(5),'View',[90 90])
 	xlabel('Frequency (Hz)')
-	ylabel('dB')
+	ylabel( g.unitpower )
     if strcmp(g.hzdir,'normal')
         freqdir = 'reverse';
     else

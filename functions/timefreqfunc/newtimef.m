@@ -278,6 +278,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.134  2007/08/09 01:02:11  arno
+% fixe maxfreqs
+%
 % Revision 1.133  2007/08/08 01:30:03  arno
 % typo in header
 %
@@ -1050,6 +1053,11 @@ g.TITLE_FONT       = TITLE_FONT;
 g.ERSP_CAXIS_LIMIT = ERSP_CAXIS_LIMIT;
 g.ITC_CAXIS_LIMIT  = ITC_CAXIS_LIMIT;
 if ~strcmpi(g.plotphase, 'on'), g.plotphasesign = g.plotphase; end;
+if isnan(g.baseline)
+    g.unitpower = 'uV/Hz';
+else
+    g.unitpower = 'dB';
+end;
 
 % unpack 'timewarp' (and undocumented 'timewarpfr') arguments
 %------------------------------------------------------------
@@ -1543,7 +1551,15 @@ end;
     'padratio', g.padratio, 'freqs', g.freqs, 'freqscale', g.freqscale, ...
     'nfreqs', g.nfreqs, 'timestretch', {g.timeStretchMarks', g.timeStretchRefs});
 
-P  = mean(alltfX.*conj(alltfX), 3); % power
+if g.cycles(1) == 0
+    alltfX2 = alltfX/g.winsize; % TF and MC (12/11/2006): normalization, divide by g.winsize
+    P  = 2/0.375*mean(alltfX2.*conj(alltfX2), 3); % power    
+    % TF and MC (12/14/2006): multiply by 2 account for negative frequencies,
+    % and ounteract the reduction by a factor 0.375 that occurs as a result of 
+    % cosine (Hann) tapering. Refer to Bug 446
+else 
+    P  = mean(alltfX.*conj(alltfX), 3); % power for wavelets
+end;
 
 % ----------------
 % phase amp option
@@ -1801,7 +1817,7 @@ switch lower(g.plotersp)
         h(3) = cbar('vert'); % ERSP colorbar axes
         set(h(2),'Position',[.1 ordinate1 .8 height].*s+q)
         set(h(3),'Position',[.95 ordinate1 .05 height].*s+q)
-        title('ERSP (dB)')
+        title([ 'ERSP(' g.unitpower ')' ])
 
         %
         %%%%% plot marginal ERSP mean below ERSP image %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1825,7 +1841,7 @@ switch lower(g.plotersp)
         set(h(4),'YAxisLocation','right')
         set(h(4),'TickLength',[0.020 0.025]);
         xlabel('Time (ms)')
-        ylabel('dB')
+        ylabel(g.unitpower)
 
         %
         %%%%% plot mean spectrum to left of ERSP image %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1874,7 +1890,7 @@ switch lower(g.plotersp)
             else
                 set(gca,'xdir','normal');
             end
-            ylabel('dB')
+            ylabel(g.unitpower)
             tick = get(h(5),'YTick');
             if (length(tick)>2)
                 set(h(5),'YTick',[tick(1) ; tick(end-1)])
