@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2007/08/09 18:44:40  arno
+% fix function if no channel labels for datasets
+%
 % Revision 1.9  2007/04/06 21:46:26  arno
 % remove debug msg
 %
@@ -144,14 +147,12 @@ if ~isstr(varargin{1}) %intial settings
     % -----------------------------
     allchans  = { };
     keepindex = 0;
-    if ~isempty(ALLEEG(1).chanlocs)
-        for index = 1:length(ALLEEG)
-            tmpchans = { ALLEEG(index).chanlocs.labels };
-            allchans = unique({ allchans{:} ALLEEG(index).chanlocs.labels });
-            if length(allchans) == length(tmpchans), keepindex = index; end;
-        end;
-        if keepindex, allchans = { ALLEEG(keepindex).chanlocs.labels }; end;
+    for index = 1:length(ALLEEG)
+        tmpchans = { ALLEEG(index).chanlocs.labels };
+        allchans = unique({ allchans{:} ALLEEG(index).chanlocs.labels });
+        if length(allchans) == length(tmpchans), keepindex = index; end;
     end;
+    if keepindex, allchans = { ALLEEG(keepindex).chanlocs.labels }; end;
     
     chanlist = {};
     firsttimeersp = 1;
