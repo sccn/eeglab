@@ -67,6 +67,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.39  2007/01/26 18:19:52  arno
+% CTF implementation
+%
 % Revision 1.38  2006/10/25 23:07:46  arno
 % convert comps to double
 %
@@ -196,7 +199,10 @@ if ~isfield(EEG, 'dipfit') & ~isfield(EEG, 'sources')
     end;
     error('No dipole information in dataset'); 
 end;
-
+if ~isfield(EEG.dipfit, 'model')
+    error('No dipole information in dataset'); 
+end;
+    
 typedip = 'nonbesa';
 if nargin < 2
 	% popup window parameters
