@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.510  2007/08/02 23:34:09  arno
+% adding back the EDF menu
+%
 % Revision 1.509  2007/08/01 23:29:37  arno
 % same
 % /.
@@ -2106,7 +2109,7 @@ catchstrs.new_non_empty          = e_newset;
 	uimenu( file_m, 'Label', 'Save current study'                     , 'CallBack', cb_savestudy1);
 	uimenu( file_m, 'Label', 'Save current study as'                  , 'CallBack', cb_savestudy2);
 	uimenu( file_m, 'Label', 'Clear study'                            , 'CallBack', cb_clearstudy);
-	uimenu( file_m, 'Label', 'Memory options'                         , 'CallBack', cb_editoptions, 'Separator', 'on');
+	uimenu( file_m, 'Label', 'Memory and other options'                         , 'CallBack', cb_editoptions, 'Separator', 'on');
     
 	hist_m = uimenu( file_m, 'Label', 'Save history'                  , 'Separator', 'on');
 	uimenu( hist_m, 'Label', 'Dataset history'                        , 'CallBack', cb_saveh1);
