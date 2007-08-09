@@ -278,6 +278,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.133  2007/08/08 01:30:03  arno
+% typo in header
+%
 % Revision 1.132  2007/08/08 00:59:32  arno
 % fixed title for multiple conditions
 %
@@ -1136,6 +1139,7 @@ if (g.maxfreq > Fs/2)
         ' (%3.2f)\n\n'], Fs/2);
     g.maxfreq = Fs/2;
 end
+if g.maxfreq ~= DEFAULT_MAXFREQ, g.freqs(2) = g.maxfreq; end;
 
 if isempty(g.topovec)
     g.topovec = [];
