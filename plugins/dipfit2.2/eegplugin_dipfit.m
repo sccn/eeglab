@@ -1,9 +1,9 @@
-% eegplugin_dipfit2_1() - DIPFIT plugin version 2.0 for EEGLAB menu. 
+% eegplugin_dipfit() - DIPFIT plugin version 2.0 for EEGLAB menu. 
 %                      DIPFIT is the dipole fitting Matlab Toolbox of 
 %                      Robert Oostenveld (in collaboration with A. Delorme).
 %
 % Usage:
-%   >> eegplugin_dipfit2_1(fig, trystrs, catchstrs);
+%   >> eegplugin_dipfit(fig, trystrs, catchstrs);
 %
 % Inputs:
 %   fig        - [integer] eeglab figure.
@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1.07  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2007/08/07 21:11:18  arno
+% help
+%
 % Revision 1.23  2007/01/26 18:24:04  arno
 % dipfit 2.1
 %
@@ -185,19 +188,19 @@
 % Initial revision
 %
 
-function vers = eegplugin_dipfit2_1(fig, trystrs, catchstrs)
+function vers = eegplugin_dipfit(fig, trystrs, catchstrs)
     
-    vers = 'dipfit2.1';
+    vers = 'dipfit2.2';
     if nargin < 3
-        error('eegplugin_dipfit2_1 requires 3 arguments');
+        error('eegplugin_dipfit requires 3 arguments');
     end;
     
     % add dipfit folder to path
     % -----------------------
     tmp  = which('topoplot');
     if ~exist('dipolefitting')
-        p = which('eegplugin_dipfit2_1');
-        p = p(1:findstr(p,'eegplugin_dipfit2_1.m')-1);
+        p = which('eegplugin_dipfit');
+        p = p(1:findstr(p,'eegplugin_dipfit.m')-1);
         dircontent  = dir([ p '..' p(end) '..' p(end) '..'  ]);
         dircontent  = { dircontent.name };
         ind = strmatch('fieldtrip', lower(dircontent));
@@ -226,11 +229,9 @@ function vers = eegplugin_dipfit2_1(fig, trystrs, catchstrs)
 
     % command to check that the '.source' is present in the EEG structure 
     % -------------------------------------------------------------------
-    check_dipfit = ['if ~isfield(EEG, ''dipfit''), error(''Run the dipole setting first''); end;'  ...
-                    'if isempty(EEG.dipfit), error(''Run the dipole setting first''); end;'  ...
-                    trystrs.no_check ];
-    check_dipfitnocheck = ['if ~isfield(EEG, ''dipfit''), error(''Run the dipole setting first''); end; ' ...
-                 trystrs.no_check ];
+    check_dipfit = [trystrs.no_check 'if ~isfield(EEG, ''dipfit''), error(''Run the dipole setting first''); end;'  ...
+                    'if isempty(EEG.dipfit), error(''Run the dipole setting first''); end;'  ];
+    check_dipfitnocheck = [ trystrs.no_check 'if ~isfield(EEG, ''dipfit''), error(''Run the dipole setting first''); end; ' ];
     check_chans = [ '[EEG tmpres] = eeg_checkset(EEG, ''chanlocs_homogeneous'');' ...
                        'if ~isempty(tmpres), h(tmpres), end; clear tmpres;' ];
     
