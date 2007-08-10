@@ -58,6 +58,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2007/08/09 01:10:08  arno
+% remove blank after channels
+%
 % Revision 1.19  2005/10/24 23:33:53  arno
 % fix filename
 %
@@ -163,7 +166,7 @@ end;
 if exist('datformat') ~= 1, datformat = 'short'; end;
 if exist('range_chan') ~= 1   | isempty(range_chan)      , range_chan     = 'all'; end;
 if exist('range_sweeps') ~= 1 | isempty(range_sweeps)    , range_sweeps     = 'all'; end;
-if exist('range_typeeg') ~= 1 | isempty(range_typeeeg)   , range_typeeeg     = 'all'; end;
+if exist('range_typeeeg') ~= 1 | isempty(range_typeeeg)   , range_typeeeg     = 'all'; end;
 if exist('range_response') ~= 1 | isempty(range_response), range_response     = 'all'; end;
 
 % load datas
