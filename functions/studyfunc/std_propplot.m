@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2006/10/03 23:51:53  scott
+% help msg and field updates -sm
+%
 % Revision 1.12  2006/09/12 18:52:37  arno
 % Allow plotting channel properties
 %
@@ -97,7 +100,7 @@ if iscell(varargin{1}) % channel plotting
         end
         subplot(2,2,2),
         try,
-            [STUDY] = std_erspplot(STUDY,ALLEEG, 'channels', chans(k), 'mode', 'together', 'plotmode', 'condensed' );
+            [STUDY] = std_erspplot(STUDY,ALLEEG, 'channels', chans(k), 'mode', 'together', 'plotmode', 'condensed' );            
         catch, 
             axis off; text(0.5, 0.5, 'No ERSP information', 'horizontalalignment', 'center');
             warningon = 1;

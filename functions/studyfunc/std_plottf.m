@@ -96,6 +96,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2007/08/07 01:06:09  allen
+% Nima: Changed cbar for ERSP and P values, also removed redundant labels from y axis (Frequencies)
+%
 % Revision 1.7  2007/07/30 23:03:40  arno
 % do not plot stats automatically
 %
@@ -287,10 +290,15 @@ if strcmpi(opt.plotmode, 'condensed')
             meanplot = meanplot + mean(data{c,g},3)/nc/ng;
         end;
     end;
-    options = { 'chanlocs', opt.chanlocs, 'electrodes', 'off', 'cbar', 'off', ...
-            'cmode', 'separate', opt.tftopoopt{:} };
+    options = { 'chanlocs', opt.chanlocs, 'electrodes', 'off', 'cbar', 'on', ...
+            'cmode', 'separate', opt.tftopoopt{:} };       
+        
     if strcmpi(opt.freqscale, 'log'), options = { options{:} 'logfreq', 'native' }; end;
     tftopo( meanplot', timevals, freqs, 'title', [ 'Mean ' upper(opt.datatype) ' for all group/cond' ], options{:}); 
+%      currentHangle = gca;
+%      colorbarHandle = cbar;
+%      title(colorbarHandle,'dB');
+%      axes(currentHangle); 
     return;
 end;
 
@@ -373,7 +381,7 @@ if isempty(opt.topovals)
             hdl(c,g) = mysubplot(nc+addr, ng+addc, g + (c-1)*(ng+addc), opt.transpose);
             if isempty( opt.condnames{c} ) | isempty( opt.groupnames{g} )
                  fig_title = [ opt.condnames{c} opt.groupnames{g} ];
-            else fig_title = [ opt.condnames{c} ', ' opt.groupnames{g} ];
+            else fig_title = ['Condition ' opt.condnames{c} ', Group ' opt.groupnames{g} ];
             end;
             if ~isempty(opt.compinds), fig_title = [ 'Comp. ' int2str(opt.compinds{c,g}) ', ' fig_title ]; end;            
             if ~isempty(opt.subject) , fig_title = [ fig_title ', ' opt.subject ]; end;
@@ -568,8 +576,10 @@ function cbar_standard(datatype, ng);
     set(gca, 'unit', 'normalized');
     if strcmpi(datatype, 'itc')
          cbar(tmp, 0, tmpc, 10); ylim([0.5 1]);
-    else cbar(tmp, 0, tmpc, 5);
+         title('ITC');
+    else cbar(tmp, 0, tmpc, 5);title('dB');
     end;
+    
 
 % colorbar for significance
 % -------------------------

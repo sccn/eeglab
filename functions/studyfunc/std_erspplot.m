@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.48  2007/06/25 07:19:38  toby
+% altered multiple dipole plot windows to indicate number of components and subjects
+%
 % Revision 1.47  2007/05/11 02:12:16  toby
 % statatistical mask wasn't plotting
 %
@@ -343,5 +346,11 @@ for index = 1:length(allinds)
             title([ STUDY.cluster(allinds(index)).name ' (' num2str(length(STUDY.cluster(allinds(index)).comps)),' ICs, '  num2str(length(unique(STUDY.cluster(allinds(index)).sets(1,:)))) ' Ss)' ]);            
         else                      title(sprintf('%s', opt.channels{index}));  
         end;
-    end;
+    else
+        h = gca;
+        clusterLabelhandle = axes('position',[0.04 0.96 0.1 0.06]);
+        text(0,0,[STUDY.cluster(allinds(index)).name],'fontsize',13 );
+        axis off;
+        axes(h)
+    end
 end;
