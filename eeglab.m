@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.512  2007/08/09 21:57:07  arno
+% change menu title everywhere
+%
 % Revision 1.511  2007/08/09 00:31:11  arno
 % memory option menu
 %
@@ -1987,7 +1990,7 @@ catchstrs.new_non_empty          = e_newset;
 	cb_rmbase      = [ check      '[EEG LASTCOM] = pop_rmbase(EEG);'   e_store];
 	cb_runica      = [ check      '[EEG LASTCOM] = pop_runica(EEG);'   e_store];
 	cb_subcomp     = [ checkica   '[EEG LASTCOM] = pop_subcomp(EEG);'  e_newset];
-	cb_autorej     = [ check      '[EEG LASTCOM] = pop_autorej(EEG);'  e_newset];
+	cb_autorej     = [ check      '[EEG tmpp LASTCOM] = pop_autorej(EEG); clear tmpp;'  e_newset];
 
 	cb_rejmenu1    = [ check      'pop_rejmenu(EEG, 1); LASTCOM = '''';'    e_hist];
 	cb_eegplotrej1 = [ check      '[LASTCOM] = pop_eegplot(EEG, 1);'        e_hist];
