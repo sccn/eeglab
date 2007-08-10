@@ -103,6 +103,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2007/08/10 16:24:46  arno
+% fix last changes
+%
 % Revision 1.32  2007/08/10 16:20:44  arno
 % logfile input, clean up code for verbose etc...
 %
@@ -639,7 +642,7 @@ if ~isempty(logfile)
     fid = fopen(logfile, 'w');
     if fid == -1, error('Cannot open logfile for writing'); end;
 else
-    fid == [];
+    fid = [];
 end;
 verb = verbose;
 
