@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2007/05/22 13:59:15  arno
+% compatibility when not all channels are used for ICA
+%
 % Revision 1.18  2006/09/25 17:46:17  arno
 % fix problem when not all channels
 %
@@ -174,7 +177,7 @@ if nargin < 2 | plotag ~= 0
                              'Confirmation', 'Cancel', 'Plot ERPs', 'Plot single trials', 'Accept', 'Accept');
         if strcmpi(ButtonName, 'Plot ERPs')
             if EEG.trials > 1
-                tracing  = [ squeeze(mean(EEG.data,3)) squeeze(mean(compproj,3))];
+                tracing  = [ squeeze(mean(EEG.data(EEG.icachansind,:,:),3)) squeeze(mean(compproj,3))];
                 figure;   
                 plotdata(tracing, EEG.pnts, [EEG.xmin*1000 EEG.xmax*1000 0 0], ...
                     'Trial ERPs (red) with and (blue) without these components');
@@ -182,7 +185,7 @@ if nargin < 2 | plotag ~= 0
                 warndlg2('Cannot plot ERPs for continuous data');
             end;
         elseif strcmpi(ButtonName, 'Plot single trials')  
-        	eegplot( EEG.data, 'srate', EEG.srate, 'title', 'Black = channel before rejection; red = after rejection -- eegplot()', ...
+        	eegplot( EEG.data(EEG.icachansind,:,:), 'srate', EEG.srate, 'title', 'Black = channel before rejection; red = after rejection -- eegplot()', ...
             	 'limits', [EEG.xmin EEG.xmax]*1000, 'data2', compproj); 
         end;
     end;    
