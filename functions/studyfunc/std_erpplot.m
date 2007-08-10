@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.54  2007/08/09 18:33:00  arno
+% only display warning message if statistics are set
+%
 % Revision 1.53  2007/08/09 18:29:18  arno
 % add warning message and disable statistics for multiple cluster plotting
 %
@@ -333,11 +336,15 @@ else
     comp_names = {};
 
     if length(opt.clusters) > 1 & isnan(opt.threshold) & ...
-            ( strcmpi(opt.condstats, 'on') | strcmpi(opt.groupstats, 'on'))
+            ( strcmpi(opt.condstats, 'on') | strcmpi(opt.groupstats, 'on')) 
         opt.condstats = 'off'; opt.groupstats = 'off'; 
         disp('Statistics disabled for plotting multiple clusters unless a threshold is set');
     end;
-
+    if ~isempty(opt.comps)
+        opt.condstats = 'off'; opt.groupstats = 'off'; 
+        disp('Statistics cannot be computed for single component');
+    end;
+    
     for index = 1:length(allinds)
 
         if length(allinds) > 1, subplot(nr,nc,index); end;

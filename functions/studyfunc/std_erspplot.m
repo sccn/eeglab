@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.49  2007/08/10 19:47:56  nima
+% _
+%
 % Revision 1.48  2007/06/25 07:19:38  toby
 % altered multiple dipole plot windows to indicate number of components and subjects
 %
@@ -207,6 +210,11 @@ if strcmpi(opt.mode, 'comps'), opt.plotsubjects = 'on'; end;
 
 if ~isempty(opt.subject), opt.groupstats = 'off'; disp('No group statistics for single subject'); end;
 if ~isempty(opt.subject), opt.condstats = 'off'; disp('No condition statistics for single subject'); end;
+
+if ~isempty(opt.comps)
+    opt.condstats = 'off'; opt.groupstats = 'off'; 
+    disp('Statistics cannot be computed for single component');
+end;
 
 plotcurveopt = { ...
    'ersplim',     fastif(strcmpi(opt.datatype, 'ITC'), opt.itclim, opt.ersplim), ...
@@ -335,7 +343,6 @@ for index = 1:length(allinds)
     
     % plot specific component
     % -----------------------
-    
     if index == length(allinds), opt.legend = 'on'; end;
     [pgroup pcond pinter] = std_plottf(alltimes, allfreqs, allersp, 'condnames', STUDY.condition, 'subject', opt.subject, ...
                                        'legend', opt.legend, 'compinds', comp_names, 'datatype', opt.datatype,'plotmode', ...
