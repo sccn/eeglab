@@ -103,6 +103,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2007/08/10 16:20:44  arno
+% logfile input, clean up code for verbose etc...
+%
 % Revision 1.31  2007/05/03 14:45:09  scott
 % mentioned that spectral decomp is not optimal in help
 % removed a duplicate code line
@@ -632,7 +635,7 @@ elseif nsub > ncomps
     return
 end;
 
-if ~isempty(logile)
+if ~isempty(logfile)
     fid = fopen(logfile, 'w');
     if fid == -1, error('Cannot open logfile for writing'); end;
 else
@@ -777,40 +780,40 @@ end
 %
 
 if strcmp(sphering,'on'), %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  icaprintf(verb,fid,('Computing the sphering matrix...\n');
+  icaprintf(verb,fid,'Computing the sphering matrix...\n');
   sphere = 2.0*inv(sqrtm(double(cov(data')))); % find the "sphering" matrix = spher()
   if ~weights,
-      icaprintf(verb,fid,('Starting weights are the identity matrix ...\n');
+      icaprintf(verb,fid,'Starting weights are the identity matrix ...\n');
       weights = eye(ncomps,chans); % begin with the identity matrix
   else % weights given on commandline
-      icaprintf(verb,fid,('Using starting weights named on commandline ...\n');
+      icaprintf(verb,fid,'Using starting weights named on commandline ...\n');
   end
-  icaprintf(verb,fid,('Sphering the data ...\n');
+  icaprintf(verb,fid,'Sphering the data ...\n');
   data = sphere*data; % decorrelate the electrode signals by 'sphereing' them
 
 elseif strcmp(sphering,'off') %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   if ~weights % is starting weights not given
-      icaprintf(verb,fid,('Using the sphering matrix as the starting weight matrix ...\n');
-      icaprintf(verb,fid,('Returning the identity matrix in variable "sphere" ...\n');
+      icaprintf(verb,fid,'Using the sphering matrix as the starting weight matrix ...\n');
+      icaprintf(verb,fid,'Returning the identity matrix in variable "sphere" ...\n');
       sphere = 2.0*inv(sqrtm(cov(data'))); % find the "sphering" matrix = spher()
       weights = eye(ncomps,chans)*sphere;  % begin with the identity matrix
       sphere = eye(chans);                 % return the identity matrix
   else % weights ~= 0
-      icaprintf(verb,fid,('Using starting weights from commandline ...\n');
-      icaprintf(verb,fid,('Returning the identity matrix in variable "sphere" ...\n');
+      icaprintf(verb,fid,'Using starting weights from commandline ...\n');
+      icaprintf(verb,fid,'Returning the identity matrix in variable "sphere" ...\n');
       sphere = eye(chans);                 % return the identity matrix
   end
 elseif strcmp(sphering,'none')
   sphere = eye(chans,chans);% return the identity matrix
   if ~weights
-      icaprintf(verb,fid,('Starting weights are the identity matrix ...\n');
-      icaprintf(verb,fid,('Returning the identity matrix in variable "sphere" ...\n');
+      icaprintf(verb,fid,'Starting weights are the identity matrix ...\n');
+      icaprintf(verb,fid,'Returning the identity matrix in variable "sphere" ...\n');
       weights = eye(ncomps,chans); % begin with the identity matrix
   else % weights ~= 0
-      icaprintf(verb,fid,('Using starting weights named on commandline ...\n');
-      icaprintf(verb,fid,('Returning the identity matrix in variable "sphere" ...\n');
+      icaprintf(verb,fid,'Using starting weights named on commandline ...\n');
+      icaprintf(verb,fid,'Returning the identity matrix in variable "sphere" ...\n');
   end
-  icaprintf(verb,fid,('Returned variable "sphere" will be the identity matrix.\n');
+  icaprintf(verb,fid,'Returned variable "sphere" will be the identity matrix.\n');
 end
 %
 %%%%%%%%%%%%%%%%%%%%%%%% Initialize ICA training %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -833,10 +836,10 @@ for k=1:nsub
     signs(k) = -1;
 end
 if extended & extblocks < 0,
-    icaprintf(verb,fid,('Fixed extended-ICA sign assignments:  ');
+    icaprintf(verb,fid,'Fixed extended-ICA sign assignments:  ');
     for k=1:ncomps
-        icaprintf(verb,fid,('%d ',signs(k));
-    end; icaprintf(verb,fid,('\n');
+        icaprintf(verb,fid,'%d ',signs(k));
+    end; icaprintf(verb,fid,'\n');
 end
 signs = diag(signs); % make a diagonal matrix
 oldsigns = zeros(size(signs));;
@@ -848,11 +851,11 @@ old_kk = zeros(1,ncomps);   % for kurtosis momemtum
 %
 %%%%%%%% ICA training loop using the logistic sigmoid %%%%%%%%%%%%%%%%%%%
 %
-icaprintf(verb,fid,('Beginning ICA training ...');
+icaprintf(verb,fid,'Beginning ICA training ...');
 if extended,
-    icaprintf(verb,fid,(' first training step may be slow ...\n');
+    icaprintf(verb,fid,' first training step may be slow ...\n');
 else
-    icaprintf(verb,fid,('\n');
+    icaprintf(verb,fid,'\n');
 end
 step=0;
 laststep=0;
@@ -951,7 +954,7 @@ if biasflag & extended
         %%%%%%%%%%%%%%%%%%%%%% Restart if weights blow up %%%%%%%%%%%%%%%%%%%%
         %
         if wts_blowup | isnan(change)|isinf(change),  % if weights blow up,
-            icaprintf(verb,fid,('');
+            icaprintf(verb,fid,'');
             step = 0;                          % start again
             change = nochange;
             wts_blowup = 0;                    % re-initialize variables
@@ -979,15 +982,15 @@ if biasflag & extended
             if lrate> MIN_LRATE
                 r = rank(data); % determine if data rank is too low 
                 if r<ncomps
-                    icaprintf(verb,fid,('Data has rank %d. Cannot compute %d components.\n',...
+                    icaprintf(verb,fid,'Data has rank %d. Cannot compute %d components.\n',...
                         r,ncomps);
                     return
                 else
-                    icaprintf(verb,fid,(...
+                    icaprintf(verb,fid,...
                         'Lowering learning rate to %g and starting again.\n',lrate);
                 end
             else
-                icaprintf(verb,fid,( ...
+                icaprintf(verb,fid, ...
                     'runica(): QUITTING - weight matrix may not be invertible!\n');
                 return;
             end
@@ -999,7 +1002,7 @@ if biasflag & extended
                 angledelta=acos((delta*olddelta')/sqrt(change*oldchange));
             end
             places = -floor(log10(nochange));
-            icaprintf(verb,fid,('step %d - lrate %5f, wchange %8.8f, angledelta %4.1f deg\n', ...
+            icaprintf(verb,fid,'step %d - lrate %5f, wchange %8.8f, angledelta %4.1f deg\n', ...
                                 step,      lrate,     change, degconst*angledelta);
             %
             %%%%%%%%%%%%%%%%%%%% Save current values %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1078,7 +1081,7 @@ if biasflag & ~extended
         %%%%%%%%%%%%%%%%%%%%%% Restart if weights blow up %%%%%%%%%%%%%%%%%%%%
         %
         if wts_blowup | isnan(change)|isinf(change),  % if weights blow up,
-            icaprintf(verb,fid,('');
+            icaprintf(verb,fid,'');
             step = 0;                          % start again
             change = nochange;
             wts_blowup = 0;                    % re-initialize variables
@@ -1098,13 +1101,13 @@ if biasflag & ~extended
             if lrate> MIN_LRATE
                 r = rank(data); % determine if data rank is too low
                 if r<ncomps
-                    icaprintf(verb,fid,('Data has rank %d. Cannot compute %d components.\n',r,ncomps);
+                    icaprintf(verb,fid,'Data has rank %d. Cannot compute %d components.\n',r,ncomps);
                     return
                 else
-                    icaprintf(verb,fid,('Lowering learning rate to %g and starting again.\n',lrate);
+                    icaprintf(verb,fid,'Lowering learning rate to %g and starting again.\n',lrate);
                 end
             else
-                icaprintf(verb,fid,('runica(): QUITTING - weight matrix may not be invertible!\n');
+                icaprintf(verb,fid,'runica(): QUITTING - weight matrix may not be invertible!\n');
                 return;
             end
         else % if weights in bounds
@@ -1115,7 +1118,7 @@ if biasflag & ~extended
                 angledelta=acos((delta*olddelta')/sqrt(change*oldchange));
             end
             places = -floor(log10(nochange));
-            icaprintf(verb,fid,('step %d - lrate %5f, wchange %8.8f, angledelta %4.1f deg\n', ...
+            icaprintf(verb,fid,'step %d - lrate %5f, wchange %8.8f, angledelta %4.1f deg\n', ...
                                 step,      lrate,     change, degconst*angledelta);
             %
             %%%%%%%%%%%%%%%%%%%% Save current values %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1232,7 +1235,7 @@ if ~biasflag & extended
         %%%%%%%%%%%%%%%%%%%%%% Restart if weights blow up %%%%%%%%%%%%%%%%%%%%
         %
         if wts_blowup | isnan(change)|isinf(change),  % if weights blow up,
-            icaprintf(verb,fid,('');
+            icaprintf(verb,fid,'');
             step = 0;                          % start again
             change = nochange;
             wts_blowup = 0;                    % re-initialize variables
@@ -1258,15 +1261,15 @@ if ~biasflag & extended
             if lrate> MIN_LRATE
                 r = rank(data); % find whether data rank is too low
                 if r<ncomps
-                    icaprintf(verb,fid,('Data has rank %d. Cannot compute %d components.\n',...
+                    icaprintf(verb,fid,'Data has rank %d. Cannot compute %d components.\n',...
                         r,ncomps);
                     return
                 else
-                    icaprintf(verb,fid,(...
+                    icaprintf(verb,fid,...
                         'Lowering learning rate to %g and starting again.\n',lrate);
                 end
             else
-                icaprintf(verb,fid,( ...
+                icaprintf(verb,fid, ...
                     'runica(): QUITTING - weight matrix may not be invertible!\n');
                 return;
             end
@@ -1278,7 +1281,7 @@ if ~biasflag & extended
                 angledelta=acos((delta*olddelta')/sqrt(change*oldchange));
             end
             places = -floor(log10(nochange));
-            icaprintf(verb,fid,('step %d - lrate %5f, wchange %8.8f, angledelta %4.1f deg\n', ...
+            icaprintf(verb,fid,'step %d - lrate %5f, wchange %8.8f, angledelta %4.1f deg\n', ...
                                 step,      lrate,     change, degconst*angledelta);
             %
             %%%%%%%%%%%%%%%%%%%% Save current values %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1356,7 +1359,7 @@ if ~biasflag & ~extended
         %%%%%%%%%%%%%%%%%%%%%% Restart if weights blow up %%%%%%%%%%%%%%%%%%%%
         %
         if wts_blowup | isnan(change)|isinf(change),  % if weights blow up,
-            icaprintf(verb,fid,('');
+            icaprintf(verb,fid,'');
             step = 0;                          % start again
             change = nochange;
             wts_blowup = 0;                    % re-initialize variables
@@ -1377,15 +1380,15 @@ if ~biasflag & ~extended
             if lrate> MIN_LRATE
                 r = rank(data); % find whether data rank is too low
                 if r<ncomps
-                    icaprintf(verb,fid,('Data has rank %d. Cannot compute %d components.\n',...
+                    icaprintf(verb,fid,'Data has rank %d. Cannot compute %d components.\n',...
                         r,ncomps);
                     return
                 else
-                    icaprintf(verb,fid,(...
+                    icaprintf(verb,fid,...
                         'Lowering learning rate to %g and starting again.\n',lrate);
                 end
             else
-                icaprintf(verb,fid,( ...
+                icaprintf(verb,fid, ...
                     'runica(): QUITTING - weight matrix may not be invertible!\n');
                 return;
             end
@@ -1397,7 +1400,7 @@ if ~biasflag & ~extended
                 angledelta=acos((delta*olddelta')/sqrt(change*oldchange));
             end
             places = -floor(log10(nochange));
-            icaprintf(verb,fid,('step %d - lrate %5f, wchange %8.8f, angledelta %4.1f deg\n', ...
+            icaprintf(verb,fid,'step %d - lrate %5f, wchange %8.8f, angledelta %4.1f deg\n', ...
                                 step,      lrate,     change, degconst*angledelta);
             %
             %%%%%%%%%%%%%%%%%%%% Save current values %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1463,8 +1466,8 @@ end
   %%%%%%%%%%%%%% If pcaflag, compose PCA and ICA matrices %%%%%%%%%%%%%%%
   %
   if strcmp(pcaflag,'on')
-    icaprintf(verb,fid,('Composing the eigenvector, weights, and sphere matrices\n');
-    icaprintf(verb,fid,('  into a single rectangular weights matrix; sphere=eye(%d)\n'...
+    icaprintf(verb,fid,'Composing the eigenvector, weights, and sphere matrices\n');
+    icaprintf(verb,fid,'  into a single rectangular weights matrix; sphere=eye(%d)\n'...
                                                                   ,chans);
     weights= weights*sphere*eigenvectors(:,1:ncomps)'; 
     sphere = eye(urchans);
@@ -1480,7 +1483,7 @@ end
   if ncomps == urchans % if weights are square . . .
       winv = inv(weights*sphere);
   else
-      icaprintf(verb,fid,('Using pseudo-inverse of weight matrix to rank order component projections.\n');
+      icaprintf(verb,fid,'Using pseudo-inverse of weight matrix to rank order component projections.\n');
       winv = pinv(weights*sphere);
   end
   %
@@ -1497,7 +1500,7 @@ end
   %%%%%%%%%%%% re-orient max(abs(activations)) to >=0 ('posact') %%%%%%%%
   %
   if strcmp(posactflag,'on') % default is now off to save processing and memory
-      icaprintf(verb,fid,('Making the max(abs(activations)) positive ...\n');
+      icaprintf(verb,fid,'Making the max(abs(activations)) positive ...\n');
       [tmp ix] = max(abs(data')); % = max abs activations
       signsflipped = 0;
       for r=1:ncomps
@@ -1522,7 +1525,7 @@ end
   %%%%%%%%%%%%%%%%%%%%% Filter data using final weights %%%%%%%%%%%%%%%%%%
   %
   if nargout>6, % if activations are to be returned
-      icaprintf(verb,fid,('Permuting the activation wave forms ...\n');
+      icaprintf(verb,fid,'Permuting the activation wave forms ...\n');
       data = data(windex,:); % data is now activations -sm 7/05
   else
       clear data
