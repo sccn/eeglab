@@ -96,6 +96,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2007/08/10 19:47:40  nima
+% _
+%
 % Revision 1.8  2007/08/07 01:06:09  allen
 % Nima: Changed cbar for ERSP and P values, also removed redundant labels from y axis (Frequencies)
 %
@@ -343,13 +346,13 @@ if ~isnan(opt.threshold)
     % ------------------
     for ind = 1:length(pcond),  pcondplot{ind}  = pcond{ind}  < opt.threshold; end;
     for ind = 1:length(pgroup), pgroupplot{ind} = pgroup{ind} < opt.threshold; end;
-    if ~isempty(pinter), pinterplot = pinter < opt.threshold; end;
+    if ~isempty(pinter), pinterplot = pinter{end} < opt.threshold; end;
     maxplot = 1;
 else
     warning off;
     for ind = 1:length(pcond),  pcondplot{ind}  = -log10(pcond{ind}); end;
     for ind = 1:length(pgroup), pgroupplot{ind} = -log10(pgroup{ind}); end;
-    if ~isempty(pinter), pinterplot = -log10(pinter); end;
+    if ~isempty(pinter), pinterplot = -log10(pinter{end}); end;
     maxplot = 3;
     warning on;
 end
