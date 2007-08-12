@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.51  2007/08/12 02:15:17  arno
+% still better warning
+%
 % Revision 1.50  2007/08/12 02:12:14  arno
 % better warning
 %
@@ -289,10 +292,10 @@ end;
 % make channel groups
 % -------------------
 if ~isfield(STUDY, 'changrp'), STUDY.changrp = []; modif = 1; end;
-%if isempty(STUDY.changrp)
-%  STUDY = std_changroup(STUDY, ALLEEG);
-%  modif = 1; 
-%end;
+if isempty(STUDY.changrp)
+  STUDY = std_changroup(STUDY, ALLEEG);
+  modif = 1; 
+end;
 
 % determine if there has been any change
 % --------------------------------------
