@@ -60,6 +60,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2007/08/12 03:38:15  arno
+% change code for scalp latency plotting
+%
 % Revision 1.17  2007/08/12 03:36:20  arno
 % typo
 %
@@ -187,9 +190,9 @@ if isempty(varargin)
     if ~strcmpi( res.statistics, STUDY.etc.erpparams.statistics ), options = { options{:} 'statistics' res.statistics }; end;
     if ~isequal(res.ylim     , STUDY.etc.erpparams.ylim),      options = { options{:} 'ylim' res.ylim       }; end;
     if ~isequal(res.timerange, STUDY.etc.erpparams.timerange), options = { options{:} 'timerange' res.timerange }; end;
-    if (isnan(res.topotime) & ~isnan(STUDY.etc.erpparams.topotime)) | ...
-            (~isnan(res.topotime) & isnan(STUDY.etc.erpparams.topotime)) | ...
-                (~isnan(res.topotime) & ~isequal(res.topotime, STUDY.etc.erpparams.topotime))
+    if (all(isnan(res.topotime)) & all(~isnan(STUDY.etc.erpparams.topotime))) | ...
+            (all(~isnan(res.topotime)) & all(isnan(STUDY.etc.erpparams.topotime))) | ...
+                (all(~isnan(res.topotime)) & ~isequal(res.topotime, STUDY.etc.erpparams.topotime))
         options = { options{:} 'topotime' res.topotime }; 
     end;
     if (isnan(res.threshold) & ~isnan(STUDY.etc.erpparams.threshold)) | ...
