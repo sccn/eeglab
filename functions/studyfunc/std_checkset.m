@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.50  2007/08/12 02:12:14  arno
+% better warning
+%
 % Revision 1.49  2007/08/09 21:27:02  arno
 % messag
 %
@@ -240,14 +243,16 @@ if isempty(STUDY.etc.version)
     icadefs;
     STUDY.etc.version = EEGLAB_VERSION;
     if isfield(STUDY, 'cluster')
-        disp('Old STUDY version detected, removing pre-loaded measures');
-        disp('which could potentially produce inaccurate results (Bugs 463 & 467)');
-        fields = { 'erpdata' 'erptimes' 'specdata' 'specfreqs' 'erspdata' ...
-                   'ersptimes' 'erspfreqs' 'itcdata' 'itctimes' 'itcfreqs' ...
-                   'topo' 'topox' 'topoy' 'topoall' 'topopol' 'dipole' };
-        for ind = 1:length(fields)
-            if isfield(STUDY.cluster, fields{ind})
-                STUDY.cluster = rmfield(STUDY.cluster, fields{ind});
+        if ~isempty(STUDY.cluster)
+            disp('Old STUDY version detected, removing pre-loaded measures');
+            disp('which could potentially produce inaccurate results (Bugs 463 & 467)');
+            fields = { 'erpdata' 'erptimes' 'specdata' 'specfreqs' 'erspdata' ...
+                       'ersptimes' 'erspfreqs' 'itcdata' 'itctimes' 'itcfreqs' ...
+                       'topo' 'topox' 'topoy' 'topoall' 'topopol' 'dipole' };
+            for ind = 1:length(fields)
+                if isfield(STUDY.cluster, fields{ind})
+                    STUDY.cluster = rmfield(STUDY.cluster, fields{ind});
+                end;
             end;
         end;
     end;
