@@ -2,10 +2,8 @@
 %              or data channels of a dataset. Save results into Matlab 
 %              float files. When these output files already exist, loads 
 %              the ERSP/ITC information from them unless the requested 
-%              flag '??' specifies differently. If so, a query window 
-%              pops up??.
-%              Also updates the EEG structure in the calling % Matlab 
-%              environment?? and saves the modified dataset to disk??
+%              flag specifies differently. If so, a query window 
+%              pops up.
 %
 % Function description:
 %              The function returns the masked (as per the requested alpha) 
@@ -14,13 +12,13 @@
 %              (the two are dependent). Frequencies are equally log spaced.
 %              Options specify component numbers, desired frequency range, 
 %              time window length, frequency resolution, significance level, 
-%              and wavelet cycles. See >> help newtimef?? and >> timef details 
+%              and wavelet cycles. See >> help newtimef and >> timef details 
 %
-%              Two Matlab files are saved, one for ERSP and one for ITC 
-%              information. These contain the unmasked?? ERSP|ITC image 
-%              and its significant mask??, plus the transform parameters 
+%              Two Matlab files are saved (for ERSP and ITC). These contain 
+%              the ERSP|ITC image, plus the transform parameters 
 %              used to compute them. Saves the computed dataset mean images 
 %              in dataset-name files with extensions '.icaersp' and '.icaitc'
+%              for ICA components or '.datersp', '.datitc' for data channels.
 %              If the ERSPs/ITCs were previously saved into these files, 
 %              and the same set of ERSP/ITC parameters are used, the values 
 %              are not recomputed, but the information is read from these
@@ -41,36 +39,42 @@
 %                  in the EEG structure for which ERSP and ITC will be computed 
 %                  {default|[]: no channels}
 %   'freqs'      - [minHz maxHz] the ERSP/ITC frequency range to compute 
-%                  and return. {default: ??}
+%                  and return. {default: 3 to EEG sampling rate divided by 3}
 %   'timelimits' - [minms maxms] time window (in ms) to compute.
 %                  {default: whole input epoch}.
 %   'timewindow' - [minms maxms] time window (in ms) to plot.
 %                  {default: all output latencies}
 %   'cycles'     - [wavecycles (factor)]. If 0 -> DFT (constant window length 
-%                  across frequencies). [THEN LOG SPACED??].
+%                  across frequencies).
 %                  If >0 -> the number of cycles in each analysis wavelet. 
 %                  If [wavecycles factor], wavelet cycles increase with 
 %                  frequency, beginning at wavecyles. (0 < factor < 1) 
 %                  factor = 0 -> fixed epoch length (DFT, as in FFT). 
 %                  factor = 1 -> no increase (standard wavelets)
-%                  {default: [0]?? [TO GIVE LOG SPACING??]}
+%                  {default: [0]}
 %   'padratio'   - (power of 2). Multiply the number of output frequencies 
 %                  by dividing their frequency spacing through 0-padding.
 %                  Output frequency spacing is (low_freq/padratio).
 %   'alpha'      - If in (0, 1), compute two-tailed permutation-based 
 %                  probability thresholds and use these to mask the output 
-%                  ERSP/ITC images. The stored ERSP/ITC data are ?? masked 
-%                  {default: ??}
+%                  ERSP/ITC images {default: NaN}
 %   'type'       - ['ersp'|'itc'] though both ERSP and ITC images are computed 
 %                  and saved to disk, only this transform is returned to the 
 %                  command line (see first output, X, below) {default: 'ersp'}
-%   'savetrials' - ['on'|'off'] Also?? save single-trial decompositions in a
-%                  file with extension '.dattimef' (channels) or '.icatimef' 
-%                  (components).  {default: ??}
+%   'savetrials' - ['on'|'off'] Save single-trial time-freq. decompositions in
+%                  a file with extension '.dattimef' (channels) or '.icatimef' 
+%                  (components). {default: 'off'}
 %   'powbase'    - [ncomps,nfreqs] optional input matrix giving baseline power 
 %                  spectra (not dB power, see >> help timef). 
 %                  For use in repeated calls to timef() using the same baseine
 %                  {default|[] -> none; data windows centered before 0 latency}
+%   'recompute'  - ['on'|'off'] 'on' forces recomputation of both ERSP and ITC. 
+%                  {default: 'off'}
+%
+% Other optional inputs:
+%   This function will take any of the newtimef() optional inputs (for instance
+%   to compute log-space frequencies)...
+%
 % Outputs:
 %   X         - the masked log ERSP/ITC of the requested ICA components/channels 
 %               in the selected frequency and time range. 
@@ -117,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.52  2007/08/12 04:10:33  arno
+% help message plus allow g.channels to be an integer array
+%
 % Revision 1.51  2007/08/09 22:12:57  arno
 % file exist for ERSP
 %
