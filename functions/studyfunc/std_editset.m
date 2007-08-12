@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.48  2007/08/09 19:31:17  arno
+% generating channel labels for all datasets
+%
 % Revision 1.47  2007/08/09 18:59:05  arno
 % adding channel label code
 %
@@ -423,3 +426,7 @@ function [ALLEEG, datasetinfo] = removeempty(ALLEEG, datasetinfo);
     end;
     datasetinfo(rmindex) = [];
     ALLEEG(rmindex)      = [];
+    for index = 1:length(datasetinfo)
+        datasetinfo(index).index = index;
+    end;
+    
