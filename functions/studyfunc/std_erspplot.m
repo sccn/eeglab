@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.50  2007/08/10 22:42:53  arno
+% no statistics for single components
+%
 % Revision 1.49  2007/08/10 19:47:56  nima
 % _
 %
@@ -239,11 +242,14 @@ opt.legend = 'off';
 % plot single scalp map
 % ---------------------
 if ~isempty(opt.plottf)
-    allersp = cell(size(STUDY.changrp(1).erspdata));
-    for ind = 1:length(STUDY.changrp(1).erspdata(:))
-        if size(STUDY.changrp(1).erspdata{1},3) == 1
-             allersp{ind} = zeros([ size(STUDY.changrp(1).erspdata{1}) 1 length(opt.channels)]);
-        else allersp{ind} = zeros([ size(STUDY.changrp(1).erspdata{1}) length(opt.channels)]);
+    firstind = 1;
+    while ~isempty(STUDY.changrp(firstind).erspdata
+        firstind = firstind+1;
+    end;
+    for ind = 1:length(STUDY.changrp(firstind).erspdata(:))
+        if size(STUDY.changrp(firstind).erspdata{1},3) == 1
+             allersp{ind} = zeros([ size(STUDY.changrp(firstind).erspdata{1}) 1 length(opt.channels)]);
+        else allersp{ind} = zeros([ size(STUDY.changrp(firstind).erspdata{1}) length(opt.channels)]);
         end;
         for index = 1:length(allinds)
             if ~isempty(opt.channels)
@@ -348,16 +354,18 @@ for index = 1:length(allinds)
                                        'legend', opt.legend, 'compinds', comp_names, 'datatype', opt.datatype,'plotmode', ...
                                        opt.plotmode, 'groupnames', STUDY.group, 'topovals', opt.plottf, 'unitx', 'Hz', ...
                                       'chanlocs', ALLEEG(1).chanlocs, 'plotsubjects', opt.plotsubjects, plotcurveopt{:});
-    if length(allinds) > 1, 
-        if isempty(opt.channels), %title(sprintf('Cluster %d', allinds(index)));
-            title([ STUDY.cluster(allinds(index)).name ' (' num2str(length(STUDY.cluster(allinds(index)).comps)),' ICs, '  num2str(length(unique(STUDY.cluster(allinds(index)).sets(1,:)))) ' Ss)' ]);            
-        else                      title(sprintf('%s', opt.channels{index}));  
+    if isempty(opt.channels), %title(sprintf('Cluster %d', allinds(index)));
+        if length(allinds) > 1, 
+            title([ STUDY.cluster(allinds(index)).name ' (' num2str(length(STUDY.cluster(allinds(index)).comps)),' ICs, ' ...
+                    num2str(length(unique(STUDY.cluster(allinds(index)).sets(1,:)))) ' Ss)' ]);            
+        else
+            h = gca;
+            clusterLabelhandle = axes('position',[0.04 0.96 0.1 0.06]);
+            text(0,0,[STUDY.cluster(allinds(index)).name],'fontsize',13 );
+            axis off;
+            axes(h)
         end;
-    else
-        h = gca;
-        clusterLabelhandle = axes('position',[0.04 0.96 0.1 0.06]);
-        text(0,0,[STUDY.cluster(allinds(index)).name],'fontsize',13 );
-        axis off;
-        axes(h)
-    end
+    else                      
+        title(sprintf('%s', opt.channels{index}));  
+    end;
 end;
