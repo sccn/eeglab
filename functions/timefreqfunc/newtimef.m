@@ -105,11 +105,10 @@
 %                     (ITC) from x and y. This computes an 'intrinsic' coherence
 %                     of x and y not arising directly from common phase locking 
 %                     to experimental events. See notes.    {default: 'off'}
-%       'wletmethod' = ['dftfilt'|'dftfilt2'] Wavelet type to use.
-%                     'dftfilt' -> Morlet wavelets, or Hanning DFT
+%       'wletmethod' = ['dftfilt'|'dftfilt2'|'dftfilt3'] Wavelet type to use.
 %                     'dftfilt2' -> Morlet-variant wavelets, or Hanning DFT.
-%                     There are ??? differences betweeen the Hanning DFTs in the 
-%                     two methods.                      {default: 'dftfilt'}
+%                     'dftfilt3' -> Morlet wavelets.
+%                     See the timefreq function for more detials {default: 'dftfilt3'}
 %       'cycleinc'    ['linear'|'log'] increase mode if [min max] cycles is
 %                     provided in 'cycle' parameter. Applies only to 
 %                     'wletmethod','dftfilt'  {default: 'linear'}
@@ -278,6 +277,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.135  2007/08/09 20:01:59  arno
+% change power unit if baseline is NaN
+%
 % Revision 1.134  2007/08/09 01:02:11  arno
 % fixe maxfreqs
 %
@@ -1037,7 +1039,7 @@ g = finputcheck(varargin, ...
     'timeStretchPlot'   'real'  []           []; ...
     'hzdir'         'string'    {'up','down','normal','reverse'}   HZDIR; ...
     'ydir'          'string'    {'up','down','normal','reverse'}   YDIR; ...
-    'wletmethod'    'string'   {'dftfilt2' 'dftfilt'}  'dftfilt'; ...
+    'wletmethod'    'string'   { 'dftfilt3' 'dftfilt2' 'dftfilt'}  'dftfilt3'; ...
     'cycleinc'      'string'   {'linear' 'log'}        'linear'
     });
 if isstr(g), error(g); end;
@@ -1549,7 +1551,7 @@ end;
     'winsize', g.winsize, 'tlimits', g.tlimits, 'detrend', g.detrend, ...
     'itctype', g.type, 'subitc', g.subitc, 'wavelet', g.cycles, ...
     'padratio', g.padratio, 'freqs', g.freqs, 'freqscale', g.freqscale, ...
-    'nfreqs', g.nfreqs, 'timestretch', {g.timeStretchMarks', g.timeStretchRefs});
+    'nfreqs', g.nfreqs, 'timestretch', {g.timeStretchMarks', g.timeStretchRefs}, 'wletmethod', g.wletmethod);
 
 if g.cycles(1) == 0
     alltfX2 = alltfX/g.winsize; % TF and MC (12/11/2006): normalization, divide by g.winsize
