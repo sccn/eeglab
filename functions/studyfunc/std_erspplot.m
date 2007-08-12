@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.51  2007/08/12 23:33:53  arno
+% fixing data ersp read if channel 1 is not included
+%
 % Revision 1.50  2007/08/10 22:42:53  arno
 % no statistics for single components
 %
@@ -243,9 +246,11 @@ opt.legend = 'off';
 % ---------------------
 if ~isempty(opt.plottf)
     firstind = 1;
-    while ~isempty(STUDY.changrp(firstind).erspdata
+    while isempty(STUDY.changrp(firstind).erspdata)
         firstind = firstind+1;
     end;
+    allersp = cell(size(STUDY.changrp(firstind).erspdata));
+   
     for ind = 1:length(STUDY.changrp(firstind).erspdata(:))
         if size(STUDY.changrp(firstind).erspdata{1},3) == 1
              allersp{ind} = zeros([ size(STUDY.changrp(firstind).erspdata{1}) 1 length(opt.channels)]);
