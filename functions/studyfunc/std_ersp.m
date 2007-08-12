@@ -37,8 +37,9 @@
 %   'components' - [numeric vector] components in the EEG structure for which 
 %                  ERSP and ITC data will be computed {default|[]: all 
 %                  components if no 'channels' are specified (see below)}
-%   'channels'   - [numeric vector] channels in the EEG structure for which 
-%                  ERSP and ITC will be computed {default|[]: no channels}
+%   'channels'   - [numeric vector or cell array of channel labels] channels 
+%                  in the EEG structure for which ERSP and ITC will be computed 
+%                  {default|[]: no channels}
 %   'freqs'      - [minHz maxHz] the ERSP/ITC frequency range to compute 
 %                  and return. {default: ??}
 %   'timelimits' - [minms maxms] time window (in ms) to compute.
@@ -116,6 +117,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.51  2007/08/09 22:12:57  arno
+% file exist for ERSP
+%
 % Revision 1.50  2007/05/22 13:56:32  arno
 % default highest frequency
 %
@@ -277,7 +281,7 @@ end;
 
 [g timefargs] = finputcheck(options, { ...
                         'components'    'integer'     []      [];
-                        'channels'      'cell'        []      {};
+                        'channels'      { 'cell' 'integer' }  { [] [] }     {};
                         'outputfile'    'string'      []      '';
                         'powbase'       'real'        []      [];
                         'savetrials'    'string'      { 'on' 'off' }      'off';
@@ -306,12 +310,14 @@ end
 % find channel index
 % ------------------
 if ~isempty(g.channels)
-    for index = 1:length(g.channels)
-        chanind = strmatch( lower(g.channels{index}), lower({ EEG.chanlocs.labels }), 'exact');
-        if isempty(chanind), error('Channel group not found'); end;
-        chaninds(index) = chanind;
+    if iscell(g.channels)
+        for index = 1:length(g.channels)
+            chanind = strmatch( lower(g.channels{index}), lower({ EEG.chanlocs.labels }), 'exact');
+            if isempty(chanind), error('Channel group not found'); end;
+            chaninds(index) = chanind;
+        end;
+        g.channels = chaninds;
     end;
-    g.channels = chaninds;
 end;
 
 % select ICA components or data channels
