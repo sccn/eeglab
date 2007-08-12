@@ -52,6 +52,9 @@
 
 %
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2006/11/27 23:41:50  arno
+% update documentation
+%
 % Revision 1.2  2006/10/27 23:23:23  toby
 % Doc edit, courtesy Diane
 %
@@ -138,9 +141,9 @@ end
 
 % compute number of cycles at each frequency
 % ------------------------------------------
+type='morlet';
 if length(cycles) == 1 && cycles~=0
     cycles = cycles*ones(size(freqs));
-    type='morlet';
 elseif length(cycles) == 2
     if strcmpi(cycleinc, 'log') % cycleinc
          cycles = linspace(log(cycles(1)), log(cycles(2)), length(freqs));
@@ -149,7 +152,6 @@ elseif length(cycles) == 2
     else
         cycles = linspace(cycles(1), cycles(2), length(freqs));
     end;
-    type='morlet';
 end;
 if cycles==0
     type='sinus';
