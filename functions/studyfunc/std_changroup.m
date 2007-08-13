@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2007/08/13 21:12:40  arno
+% fix error message
+%
 % Revision 1.8  2007/08/13 18:28:31  arno
 % header
 %
@@ -113,7 +116,7 @@ function changrp = std_chanlookupnew( STUDY, ALLEEG, changrp);
         
         if ( isempty(condind) & ~isempty(STUDY.conditions) ) | (isempty(grpind) & ~isempty(STUDY.group) ) 
             fprintf( [ 'Important warning: Dataset %d has a group and condition that is\nnot in the STUDY.condition ' ...
-                             'and STUDY.group structure. This must be fixed.' ], STUDY.datasetinfo(index).index));
+                             'and STUDY.group structure. This must be fixed.' ], STUDY.datasetinfo(index).index);
         else
             % scan all channel labels
             % -----------------------
