@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2007/06/26 00:16:24  allen
+% bug 427: grand mean avg title error
+%
 % Revision 1.23  2007/06/25 00:34:24  toby
 % title changed to show number of components in cluster average
 %
@@ -217,12 +220,15 @@ if strcmpi(mode, 'together')
     if len ~= 1
         maintitle = 'Average scalp map for all clusters';
         a = textsc(maintitle, 'title'); 
-        set(a, 'fontweight', 'bold'); 
+        set(a, 'fontweight', 'bold');
+        set(gcf,'name', maintitle);
     else
         title([ STUDY.cluster(cls(k)).name ' (' num2str(length(STUDY.cluster(cls(k)).comps)),' ICs, '  num2str(length(unique(STUDY.cluster(cls(k)).sets(1,:)))) ' Ss)' ]);
+        set(gcf,'name',['Scalp map of ' STUDY.cluster(cls(k)).name ' (' num2str(length(STUDY.cluster(cls(k)).comps)),' ICs, '  num2str(length(unique(STUDY.cluster(cls(k)).sets(1,:)))) ' Ss)' ]);
         %title([ STUDY.cluster(cls(k)).name ' scalp map, ' num2str(length(unique(STUDY.cluster(cls(k)).sets(1,:)))) 'Ss' ]);
     end
     set(gcf,'Color', BACKCOLOR);
+
     orient tall
     axcopy
 end        

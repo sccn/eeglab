@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.53  2007/08/13 20:36:27  nima
+% _
+%
 % Revision 1.52  2007/08/12 23:56:17  arno
 % fix plotting topographic maps
 %
@@ -366,12 +369,30 @@ for index = 1:length(allinds)
         if length(allinds) > 1, 
             title([ STUDY.cluster(allinds(index)).name ' (' num2str(length(STUDY.cluster(allinds(index)).comps)),' ICs, ' ...
                     num2str(length(unique(STUDY.cluster(allinds(index)).sets(1,:)))) ' Ss)' ]);            
+            if strcmp(opt.datatype,'ersp')
+                set(gcf,'name','Cluster ERSPs')
+            elseif strcmp(opt.datatype,'itc')
+                set(gcf,'name','Cluster ITCs')
+            end;
         elseif ~strcmp(opt.mode,'together') % if it is not the mean ERSP that is being shown (which is the case when 'cluster properties' is plotted then put cluster number on the corner of figure
             h = gca;
             axes('position',[0.04 0.96 0.1 0.06]); 
             text(0,0,[STUDY.cluster(allinds(index)).name],'fontsize',13 );
             axis off;
-            axes(h)
+            if strcmp(opt.datatype,'ersp')
+                if isempty(opt.comps)
+                    set(gcf,'name',['ERSP of ' STUDY.cluster(allinds(index)).name])
+                else
+                    set(gcf,'name',['ERSP of a Component from cluster ' STUDY.cluster(allinds(index)).name])
+                end;
+            elseif strcmp(opt.datatype,'itc')
+                if isempty(opt.comps)
+                    set(gcf,'name',['ITC of ' STUDY.cluster(allinds(index)).name]);
+                else
+                    set(gcf,'name',['ITC of a Component from cluster ' STUDY.cluster(allinds(index)).name]);
+                end;
+            end;
+            axes(h);
         end;
     else                      
         title(sprintf('%s', opt.channels{index}));  

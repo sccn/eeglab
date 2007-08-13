@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2007/08/10 19:47:32  nima
+% _
+%
 % Revision 1.13  2006/10/03 23:51:53  scott
 % help msg and field updates -sm
 %
@@ -217,7 +220,7 @@ for k = 1: len
     maintitle = ['Cluster '''  STUDY.cluster(cls(k)).name ''' mean properties (' num2str(length(STUDY.cluster(cls(k)).comps)) ' comps).' ];
     a = textsc(maintitle, 'title'); 
     set(a, 'fontweight', 'bold');     
-
+    set(gcf,'name',maintitle);
     if warningon
         disp('Some properties could not be plotted. To plot these properties, first');
         disp('include them in pre-clustering. There, specify 0 dimensions if you do');
@@ -226,5 +229,7 @@ for k = 1: len
     end;
 
 end  % Finished all conditions
+
+
 delete(h_wait)
-    
+
