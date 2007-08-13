@@ -69,6 +69,7 @@ function plotcurve( times, R, varargin);
                              'linewidth'     'real'    []                        2;
                              'marktimes'     'real'    []                        [] });
    if isstr(g), error(g); end;
+  % keyboard;
    if isempty(g.colors), g.colors = { 'b' 'r' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' ...
                    'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' }; end;
    if strcmpi(g.plotindiv, 'off'), g.plotmean = 'on'; end;
@@ -122,7 +123,14 @@ function plotcurve( times, R, varargin);
       if ind == size(R,1) & strcmpi(g.plotmean, 'on') & size(R,1) > 1
            plot(times,R(ind,:), 'k', 'linewidth', 2);
       elseif ~isempty(g.colors),
-           tmp = plot(times,R(ind,:), 'k'); set(tmp, 'color', g.colors{mod(ind, length(g.colors))+1}); hold on;
+           tmp = plot(times,R(ind,:), 'k'); 
+           set(tmp, 'color', g.colors{mod(ind, length(g.colors))+1}); 
+           
+           % change the line style when number of plots exceed number of colors in g.colors
+           lineStyles = {'-', '--',':','?.'};
+           set(tmp,'LineStyle',lineStyles{ceil(ind/length(g.colors))});
+          
+           hold on;
       else plot(times,R(ind,:));
       end;
   end;
@@ -152,8 +160,8 @@ function plotcurve( times, R, varargin);
       for ind = 1:size(R,1)
           if ind == size(R,1) & strcmpi(g.plotmean, 'on') & size(R,1) > 1
                plot(times,R(ind,:), 'k', 'linewidth', 2);
-          elseif ~isempty(g.colors),
-               tmp = plot(times,R(ind,:), 'k'); set(tmp, 'color', g.colors{mod(ind, length(g.colors))+1}); hold on;
+          elseif ~isempty(g.colors),             
+              tmp = plot(times,R(ind,:), 'k'); set(tmp, 'color', g.colors{mod(ind, length(g.colors))+1} ); hold on;
           else plot(times,R(ind,:));
           end;
       end;

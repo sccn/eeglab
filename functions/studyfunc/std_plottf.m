@@ -96,6 +96,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2007/08/12 23:53:32  arno
+% new call to std_stat
+%
 % Revision 1.9  2007/08/10 19:47:40  nima
 % _
 %
@@ -298,11 +301,11 @@ if strcmpi(opt.plotmode, 'condensed')
         
     if strcmpi(opt.freqscale, 'log'), options = { options{:} 'logfreq', 'native' }; end;
     tftopo( meanplot', timevals, freqs, 'title', [ 'Mean ' upper(opt.datatype) ' for all group/cond' ], options{:}); 
-%      currentHangle = gca;
-%      colorbarHandle = cbar;
-%      title(colorbarHandle,'dB');
-%      axes(currentHangle); 
-    return;
+     currentHangle = gca;
+     colorbarHandle = cbar;
+     title(colorbarHandle,'dB');
+     axes(currentHangle); 
+    return; 
 end;
 
 % plotting paramters
