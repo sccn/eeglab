@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2007/08/13 18:58:32  arno
+% nothing
+%
 % Revision 1.32  2007/08/13 01:18:45  arno
 % update help message
 %
@@ -183,6 +186,7 @@ end;
 
 [g spec_opt] = finputcheck(options, { 'components' 'integer' []         [];
                                       'channels'   'cell'    {}         {};
+                                      'timerange'  'float'   []         [];
                                       'specmode'   'string'  {'fft' 'psd'} 'psd';
                                       'recompute'  'string'  { 'on' 'off' } 'off';
                                       'nfft'       'integer' []         [];
@@ -237,14 +241,13 @@ if strcmpi(prefix, 'comp'), X = TMP.icaact;
 else                        X = TMP.data;
 end;
 
+if ~isempty(g.timerange)
+    timebef = find(EEG.times > g.timerange(1) & EEG.times < g.timerange(2) );
+    X       = X(:,timebef,:);
+end;
 if strcmpi(g.specmode, 'psd')
      [X, f] = spectopo(X, EEG.pnts, EEG.srate, 'plot', 'off', 'nfft', g.nfft, spec_opt{:});  
 else
-    if ~isempty(spec_opt), 
-        time_limits = spec_opt{2}; 
-        timebef = find(EEG.times > time_limits(1) & EEG.times < time_limits(2) );
-        X       = X(:,timebef,:);
-    end; 
     tmp   = fft(X, g.nfft, 2);
     f     = linspace(0, EEG.srate/2, size(tmp,2)/2);
     f     = f(2:end); % remove DC (match the output of PSD)
@@ -254,11 +257,12 @@ end;
 
 % Save SPECs in file (all components or channels)
 % ----------------------------------
+options = { spec_opt{:} 'timerange' g.timerange 'nfft' g.nfft 'specmode' g.specmode };
 if strcmpi(prefix, 'comp')
-    savetofile( filename, f, X, 'comp', 1:size(X,1), spec_opt);
+    savetofile( filename, f, X, 'comp', 1:size(X,1), options);
     [X f] = std_readspec(EEG, 1, g.components, g.freqrange);
 else
-    savetofile( filename, f, X, 'chan', 1:size(X,1), spec_opt, { TMP.chanlocs.labels });
+    savetofile( filename, f, X, 'chan', 1:size(X,1), options, { TMP.chanlocs.labels });
     [X f] = std_readspec(EEG, 1, g.channels, g.freqrange);
 end;
 return;
