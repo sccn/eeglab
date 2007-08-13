@@ -9,9 +9,17 @@
 %   STUDY      - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
 %
 % Outputs:
-%   STUDY      - The input STUDY set structure modified according to specified user edits,
-%                if any. Plotted channel measure means (maps, ERSPs, etc.) are added to 
-%                the STUDY structure after they are first plotted to allow quick replotting.  
+%   STUDY      - The input STUDY set structure modified according to specified user 
+%                edits, if any. The STUDY.changrp structure is created. It contains as
+%                many elements as there are channels. For example STUDY.changrp(1)
+%                is the first channel. Filds of STUDY.changrp created at this point
+%                are STUDY.changrp.name      : name of the channel group
+%                    STUDY.changrp.channels  : cell array containing channel labels
+%                                              for the group.
+%                    STUDY.changrp.setinds   : indices of datasets containing the
+%                                              selected channels.
+%                    STUDY.changrp.allinds   : indices of channels within the datasets 
+%                                              above.
 %
 % Authors: Arnaud Delorme, CERCO, 2006
 
@@ -34,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2007/07/30 21:56:02  arno
+% debug for missing conditions
+%
 % Revision 1.5  2007/01/26 18:04:08  arno
 % backup code at the end
 %
@@ -66,18 +77,54 @@ end;
 for indc = 1:length(alllocs)
     STUDY.changrp(indc).name = [ alllocs(indc).labels ];
     STUDY.changrp(indc).channels = { alllocs(indc).labels };
-    tmp = std_chanlookup( STUDY, ALLEEG, STUDY.changrp(indc));
-    STUDY.changrp(indc).chaninds = tmp.chaninds;
+    tmp = std_chanlookupnew( STUDY, ALLEEG, STUDY.changrp(indc));
+    STUDY.changrp(indc).setinds = tmp.setinds;
+    STUDY.changrp(indc).allinds = tmp.allinds;
     STUDY.changrp(indc).centroid = [];
 end;
+
+
 %STUDY.changrp(indc).name = [ 'full montage' ];
 %STUDY.changrp(indc).channels = { alllocs.labels };
 %tmp = std_chanlookup( STUDY, ALLEEG, STUDY.changrp(indc));
 %STUDY.changrp(indc).chaninds = tmp.chaninds;
 return; 
     
+% find datasets and channel indices
+% ---------------------------------
+function changrp = std_chanlookupnew( STUDY, ALLEEG, changrp);
+
+    nc = max(length(STUDY.condition),1);
+    ng = max(length(STUDY.group),1);
+    changrp.allinds = cell( nc, ng );
+    changrp.setinds = cell( nc, ng );
+    for index = 1:length(STUDY.datasetinfo)
+        condind = strmatch( STUDY.datasetinfo(index).condition, STUDY.condition, 'exact');
+        grpind  = strmatch( STUDY.datasetinfo(index).group    , STUDY.group    , 'exact');
+        datind  = STUDY.datasetinfo(index).index;
+        tmplocs = { ALLEEG(datind).chanlocs.labels };
+        
+        if isempty(condind) | isempty(grpind),
+            error(sprintf( [ 'Dataset %d has a group and condition that is not in the STUDY.condition' ...
+                             'and STUDY.group structure' ], STUDY.datasetinfo(index).index));
+        end;
+        
+        % scan all channel labels
+        % -----------------------
+        for indc = 1:length(changrp.channels) % usually just one channel
+            ind = strmatch( changrp.channels(indc), tmplocs, 'exact');
+            if length(ind) > 1, error([ 'Duplicate channel label ''' tmplocs{ind(1)} ''' for dataset ' int2str(datind) ]); end;
+            if ~isempty(ind)
+                changrp.allinds{ condind, grpind } = [ changrp.allinds{ condind, grpind } ind ];
+                changrp.setinds{ condind, grpind } = [ changrp.setinds{ condind, grpind } datind ];
+            end;
+        end;
+    end;
+    
+    return; 
+    
 % ---------------
-% channel look-up
+% old channel look-up
 % ---------------
 function changrp = std_chanlookup( STUDY, ALLEEG, changrp);
 
@@ -102,72 +149,3 @@ function changrp = std_chanlookup( STUDY, ALLEEG, changrp);
     
     return; 
     
-    % ----BELOW IS AN OLDER VERSION -----
-    % --------------------------
-    % --------------------------
-    % --------------------------
-    % --------------------------
-    % --------------------------
-    % --------------------------
-    % --------------------------
-    % --------------------------
-    % --------------------------
-    % --------------------------
-    % --------------------------
-    % --------------------------
-    % --------------------------
-    % --------------------------
-    % --------------------------
-    % --------------------------
-    % --------------------------
-    % --------------------------
-    % --------------------------
-% create groups for channels
-% --------------------------
-function STUDY = std_changroupold(STUDY, ALLEEG);
-
-% union of all channel structures
-% -------------------------------
-alllocs = ALLEEG(STUDY.datasetinfo(1).index).chanlocs;
-alllabs = { alllocs.labels };
-for index = 2:length(STUDY.datasetinfo)
-   tmplocs = ALLEEG(STUDY.datasetinfo(index).index).chanlocs;
-   alllocs = eeg_mergechan(alllocs, tmplocs);
-end;
-
-% create group for each electrode
-% -------------------------------
-for indc = 1:length(alllocs)
-    STUDY.changrp(indc).name = [ alllocs(indc).labels ];
-    STUDY.changrp(indc).channels = { alllocs(indc).labels };
-    tmp = std_chanlookup( STUDY, ALLEEG, STUDY.changrp(indc));
-    STUDY.changrp(indc).chaninds = tmp.chaninds;
-    STUDY.changrp(indc).centroid = [];
-end;
-%STUDY.changrp(indc).name = [ 'full montage' ];
-%STUDY.changrp(indc).channels = { alllocs.labels };
-%tmp = std_chanlookup( STUDY, ALLEEG, STUDY.changrp(indc));
-%STUDY.changrp(indc).chaninds = tmp.chaninds;
-
-% ---------------
-% channel look-up
-% ---------------
-function changrp = std_chanlookupold( STUDY, ALLEEG, changrp);
-
-    changrp.chaninds = [];
-    changrp.chaninds = zeros(size(STUDY.setind));
-    for ir = 1:size(STUDY.setind,1)
-        for ic = 1:size(STUDY.setind,2)
-            datind  = STUDY.setind(ir,ic);
-            tmplocs = { ALLEEG(STUDY.datasetinfo(datind).index).chanlocs.labels };
-
-            for indc = 1:length(changrp.channels)
-                ind = strmatch( changrp.channels(indc), tmplocs, 'exact');
-                if length(ind) > 1, error([ 'Duplicate channel label ''' tmplocs{ind(1)} ''' for dataset ' int2str(datind) ]); end;
-                if ~isempty(ind)
-                    changrp.chaninds(ir,ic) = ind;
-                end;
-            end;
-        end;    
-    end;
-
