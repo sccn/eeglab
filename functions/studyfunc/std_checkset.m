@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.53  2007/08/13 18:32:46  arno
+% removing channel group if old version
+%
 % Revision 1.52  2007/08/12 02:45:47  arno
 % aiutomatically generate changrp
 %
@@ -108,7 +111,7 @@ if ~isfield(STUDY, 'subject'),   STUDY.subject   = {}; modif = 1; end;
 if ~isfield(STUDY, 'group'),     STUDY.group     = {}; modif = 1; end;
 if ~isfield(STUDY, 'session'),   STUDY.session   = {}; modif = 1; end;
 if ~isfield(STUDY, 'condition'), STUDY.condition = {}; modif = 1; end;
-if ~isfield(STUDY, 'setind'),    STUDY.setind    = []; modif = 1; end;
+if ~isfield(STUDY, 'setind'),    STUDY.setind    = {}; modif = 1; end;
 if ~isfield(STUDY, 'etc'),       STUDY.etc       = []; modif = 1; end;
 if ~isfield(STUDY, 'etc.warnmemory'), STUDY.etc.warnmemory = 1; modif = 1; end;
 if ~isfield(STUDY, 'preclust'),  STUDY.preclust  = []; modif = 1; end;
