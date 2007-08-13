@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2007/08/13 18:28:31  arno
+% header
+%
 % Revision 1.7  2007/08/13 17:42:52  arno
 % update help message
 %
@@ -108,19 +111,19 @@ function changrp = std_chanlookupnew( STUDY, ALLEEG, changrp);
         datind  = STUDY.datasetinfo(index).index;
         tmplocs = { ALLEEG(datind).chanlocs.labels };
         
-        if isempty(condind) | isempty(grpind),
-            error(sprintf( [ 'Dataset %d has a group and condition that is not in the STUDY.condition' ...
-                             'and STUDY.group structure' ], STUDY.datasetinfo(index).index));
-        end;
-        
-        % scan all channel labels
-        % -----------------------
-        for indc = 1:length(changrp.channels) % usually just one channel
-            ind = strmatch( changrp.channels(indc), tmplocs, 'exact');
-            if length(ind) > 1, error([ 'Duplicate channel label ''' tmplocs{ind(1)} ''' for dataset ' int2str(datind) ]); end;
-            if ~isempty(ind)
-                changrp.allinds{ condind, grpind } = [ changrp.allinds{ condind, grpind } ind ];
-                changrp.setinds{ condind, grpind } = [ changrp.setinds{ condind, grpind } datind ];
+        if ( isempty(condind) & ~isempty(STUDY.conditions) ) | (isempty(grpind) & ~isempty(STUDY.group) ) 
+            fprintf( [ 'Important warning: Dataset %d has a group and condition that is\nnot in the STUDY.condition ' ...
+                             'and STUDY.group structure. This must be fixed.' ], STUDY.datasetinfo(index).index));
+        else
+            % scan all channel labels
+            % -----------------------
+            for indc = 1:length(changrp.channels) % usually just one channel
+                ind = strmatch( changrp.channels(indc), tmplocs, 'exact');
+                if length(ind) > 1, error([ 'Duplicate channel label ''' tmplocs{ind(1)} ''' for dataset ' int2str(datind) ]); end;
+                if ~isempty(ind)
+                    changrp.allinds{ condind, grpind } = [ changrp.allinds{ condind, grpind } ind ];
+                    changrp.setinds{ condind, grpind } = [ changrp.setinds{ condind, grpind } datind ];
+                end;
             end;
         end;
     end;
