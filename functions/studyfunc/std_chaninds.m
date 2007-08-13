@@ -1,7 +1,7 @@
 % std_chaninds() - look up channel indices in a STUDY
 %
 % Usage:
-%         >> [STUDY clustinfo] = std_chaninds(STUDY, channames);
+%         >> inds = std_chaninds(STUDY, channames);
 % Inputs:
 %         STUDY - studyset structure containing a changrp substructure.
 %     channames - [cell] channel names
@@ -28,6 +28,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2007/01/26 18:08:06  arno
+% Initial revision
+%
 
 function finalinds = std_chaninds(STUDY, channames);
 
