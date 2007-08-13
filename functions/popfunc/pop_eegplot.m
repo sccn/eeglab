@@ -72,6 +72,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.39  2006/01/31 20:19:40  arno
+% options
+%
 % Revision 1.38  2006/01/31 20:18:21  arno
 % options
 %
@@ -298,8 +301,14 @@ if EEG.nbchan > 100
 end;
 
 if icacomp == 1
+    %for index = 1:2:length(eegplotoptions)
+    %    if strcmpi(eegplotoptions{index}, 'winlength') eegplotoptions{index+1} = 20; end;
+    %end;
+    %eegplotoptions = { eegplotoptions{:} 'spacing', 100 };
+            
 	eegplot( EEG.data, 'srate', EEG.srate, 'title', 'Scroll channel activities -- eegplot()', ...
 			 'limits', [EEG.xmin EEG.xmax]*1000 , 'command', command, eegplotoptions{:}); 
+    
 	%eeg_multieegplot( EEG.data, [], [], oldrej, oldrejE, 'title', 'Scroll channel activities -- eegplot()', 'srate', ...
 	%	      EEG.srate, 'limits', [EEG.xmin EEG.xmax]*1000 , 'command', command); 
 else
