@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.52  2007/08/12 23:56:17  arno
+% fix plotting topographic maps
+%
 % Revision 1.51  2007/08/12 23:33:53  arno
 % fixing data ersp read if channel 1 is not included
 %
@@ -363,9 +366,9 @@ for index = 1:length(allinds)
         if length(allinds) > 1, 
             title([ STUDY.cluster(allinds(index)).name ' (' num2str(length(STUDY.cluster(allinds(index)).comps)),' ICs, ' ...
                     num2str(length(unique(STUDY.cluster(allinds(index)).sets(1,:)))) ' Ss)' ]);            
-        else
+        elseif ~strcmp(opt.mode,'together') % if it is not the mean ERSP that is being shown (which is the case when 'cluster properties' is plotted then put cluster number on the corner of figure
             h = gca;
-            clusterLabelhandle = axes('position',[0.04 0.96 0.1 0.06]);
+            axes('position',[0.04 0.96 0.1 0.06]); 
             text(0,0,[STUDY.cluster(allinds(index)).name],'fontsize',13 );
             axis off;
             axes(h)
