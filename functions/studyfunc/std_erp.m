@@ -20,22 +20,25 @@
 %                  computation of ERP is so fast, all channels ERP are
 %                  computed and saved. Only selected channels 
 %                  are returned by the function to Matlab
-%                  {default|[] -> all}
-%   'time_range' - [minms maxms] latency window limits (in ms) within which to 
+%                  {default|[] -> none}
+%   'timerange'  - [minms maxms] latency window limits (in ms) within which to 
 %                  compute ERPs {default|[]: [EEG.min EEG.max]}. It is not
 %                  advised to change this range unless you require a
 %                  specific baseline. The plotting 
 %   'recompute'  - ['on'|'off'] force recomputing ERP file even if it is 
 %                  already on disk.
 % Outputs:
-%   erp         - ERP for the requested ICA components in the selected 
-%                 latency window. ERPs are scaled by the RMS over of the
-%                 component scalp map projection over all data channels.
-%   times       - vector of times (epoch latencies in ms) for the ERP
+%   erp          - ERP for the requested ICA components in the selected 
+%                  latency window. ERPs are scaled by the RMS over of the
+%                  component scalp map projection over all data channels.
+%   times        - vector of times (epoch latencies in ms) for the ERP
 %
-% File output:     [dataset_file].icaerp     % component erp file
+% File output:     
+%    [dataset_file].icaerp     % component erp file
+% OR
+%    [dataset_file].daterp     % channel erp file
 %
-% See also:    std_spec(), std_ersp(), std_topo(), std_preclust()
+% See also: std_spec(), std_ersp(), std_topo(), std_preclust()
 %
 % Authors: Arnaud Delorme, SCCN, INC, UCSD, January, 2005
 
@@ -58,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2007/02/28 12:03:28  arno
+% force recomputation
+%
 % Revision 1.26  2006/10/02 11:40:26  arno
 % minor things
 %
