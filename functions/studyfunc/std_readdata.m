@@ -84,6 +84,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2007/08/08 00:31:17  nima
+% the help was incorrect, now we have to explicitly specify the key values, so 'clusters',3, 'infotype','erp'
+%
 % Revision 1.30  2007/08/06 23:09:55  scott
 % help msg clarification - please check defaults, Arno.
 % In particular, why is the default for 'infotype' = 'erp' instead of
@@ -241,34 +244,40 @@ for ind = 1:length(finalinds)
     if ~isempty(opt.channels)
          tmpstruct = STUDY.changrp(finalinds(ind));
          alldatasets = 1:length(STUDY.datasetinfo);
-         allchanorcomp = -tmpstruct.chaninds;
+         %allchanorcomp = -tmpstruct.chaninds;
+         allinds       = tmpstruct.allinds;
+         for i=1:length(allinds(:)), allinds{i} = -allinds{i}; end; % invert sign
+         setinds       = tmpstruct.setinds;
     else tmpstruct = STUDY.cluster(finalinds(ind));
          alldatasets = tmpstruct.sets; 
          allchanorcomp = repmat(tmpstruct.comps, [length(STUDY.condition) 1]);
-    end;
-    alldatasets   = alldatasets(:)';
-    allchanorcomp = allchanorcomp(:)';
-
-    % get indices for all groups and conditions
-    % -----------------------------------------
-    nc = max(length(STUDY.condition),1);
-    ng = max(length(STUDY.group),1);
-    allinds = cell( nc, ng );
-    setinds = cell( nc, ng );
-    for indtmp = 1:length(alldatasets)
-        if ~isnan(alldatasets(indtmp))
-            index = alldatasets(indtmp);
-            condind = strmatch( STUDY.datasetinfo(index).condition, STUDY.condition, 'exact'); if isempty(condind), condind = 1; end;
-            grpind  = strmatch( STUDY.datasetinfo(index).group    , STUDY.group    , 'exact'); if isempty(grpind) , grpind  = 1; end;
-            indcellarray = length(allinds{condind, grpind})+1;
-        end
-        % load data
-        % ---------
-        tmpind = allchanorcomp(indtmp); 
-        if ~isnan(tmpind)
-            allinds{ condind, grpind}(indcellarray) = tmpind;                    
-            setinds{ condind, grpind}(indcellarray) = index;                    
-        end;
+         
+         alldatasets   = alldatasets(:)';
+         allchanorcomp = allchanorcomp(:)';
+         
+         % get indices for all groups and conditions
+         % -----------------------------------------
+         nc = max(length(STUDY.condition),1);
+         ng = max(length(STUDY.group),1);
+         allinds = cell( nc, ng );
+         setinds = cell( nc, ng );
+         for indtmp = 1:length(alldatasets)
+             if ~isnan(alldatasets(indtmp))
+                 index = alldatasets(indtmp);
+                 condind = strmatch( STUDY.datasetinfo(index).condition, STUDY.condition, 'exact'); if isempty(condind), condind = 1; end;
+                 grpind  = strmatch( STUDY.datasetinfo(index).group    , STUDY.group    , 'exact'); if isempty(grpind) , grpind  = 1; end;
+                 indcellarray = length(allinds{condind, grpind})+1;
+             end
+             % load data
+             % ---------
+             tmpind = allchanorcomp(indtmp); 
+             if ~isnan(tmpind)
+                 allinds{ condind, grpind}(indcellarray) = tmpind;                    
+                 setinds{ condind, grpind}(indcellarray) = index;                    
+             end;
+         end;
+         tmpstruct.allinds = allinds;
+         tmpstruct.setinds = setinds;
     end;
                     
     dataread = 0;
@@ -286,7 +295,7 @@ for ind = 1:length(finalinds)
                 % reserve arrays
                 % --------------
                 allerp   = cell( max(length(STUDY.condition),1), max(length(STUDY.group),1) );
-                [ tmp alltimes ] = std_readerp( ALLEEG, 1, sign(allchanorcomp(1)), opt.timerange);
+                [ tmp alltimes ] = std_readerp( ALLEEG, setinds{1,1}(1), allinds{1,1}(1), opt.timerange);
                 for c = 1:nc
                     for g = 1:ng
                         allerp{c, g} = repmat(zero, [length(alltimes), length(allinds{c,g})]);
@@ -325,11 +334,11 @@ for ind = 1:length(finalinds)
                 allspec  = cell( max(length(STUDY.condition),1), max(length(STUDY.group),1) ); 
                 filetype = 'spec';
                 try,
-                    [ tmp allfreqs ] = std_readspec( ALLEEG, 1, sign(allchanorcomp(1)), opt.freqrange);
+                    [ tmp allfreqs ] = std_readspec( ALLEEG, setinds{1,1}(1), allinds{1,1}(1), opt.freqrange);
                 catch 
                     filetype = 'ersp';
                     disp('Cannot find spectral file, trying ERSP baseline file instead');
-                    [ tmpersp allfreqs alltimes tmpparams tmpspec] = std_readersp( ALLEEG, 1, sign(allchanorcomp(1)), [], opt.freqrange);
+                    [ tmpersp allfreqs alltimes tmpparams tmpspec] = std_readersp( ALLEEG, setinds{1,1}(1), allinds{1,1}(1), [], opt.freqrange);
                 end;
                 for c = 1:nc
                     for g = 1:ng
@@ -397,7 +406,7 @@ for ind = 1:length(finalinds)
                 ersp     = cell( max(length(STUDY.condition),1), max(length(STUDY.group),1) );
                 erspbase = cell( max(length(STUDY.condition),1), max(length(STUDY.group),1) );
                 erspinds = cell( max(length(STUDY.condition),1), max(length(STUDY.group),1) );
-                [ tmp allfreqs alltimes ] = std_readersp( ALLEEG, 1, Inf*sign(allchanorcomp(1)), opt.timerange, opt.freqrange);
+                [ tmp allfreqs alltimes ] = std_readersp( ALLEEG, setinds{1,1}(1), Inf*allinds{1,1}(1), opt.timerange, opt.freqrange);
                 for c = 1:nc
                     for g = 1:ng
                         ersp{c, g}     = repmat(zero, [length(alltimes), length(allfreqs), length(allinds{c,g}) ]);
@@ -543,8 +552,6 @@ for ind = 1:length(finalinds)
             % at the beginning of this function
         otherwise, error('Unrecognized ''infotype'' entry');
     end; % end switch
-    if exist('allinds'),  tmpstruct.allinds = allinds; end;
-    if exist('setinds' ), tmpstruct.setinds = setinds; end;
     
     % copy results to structure
     % -------------------------
