@@ -11,9 +11,10 @@
 % Outputs:
 %   STUDY      - The input STUDY set structure modified according to specified user 
 %                edits, if any. The STUDY.changrp structure is created. It contains as
-%                many elements as there are channels. For example STUDY.changrp(1)
-%                is the first channel. Filds of STUDY.changrp created at this point
-%                are STUDY.changrp.name      : name of the channel group
+%                many elements as there are channels. For example, STUDY.changrp(1)
+%                is the first channel. Fields of the changrp structure created at this
+%                point are 
+%                    STUDY.changrp.name      : name of the channel group
 %                    STUDY.changrp.channels  : cell array containing channel labels
 %                                              for the group.
 %                    STUDY.changrp.setinds   : indices of datasets containing the
@@ -42,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2007/08/13 17:42:52  arno
+% update help message
+%
 % Revision 1.6  2007/07/30 21:56:02  arno
 % debug for missing conditions
 %
