@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2007/08/13 01:18:45  arno
+% update help message
+%
 % Revision 1.31  2007/02/28 12:04:59  arno
 % force recompute
 %
@@ -237,8 +240,11 @@ end;
 if strcmpi(g.specmode, 'psd')
      [X, f] = spectopo(X, EEG.pnts, EEG.srate, 'plot', 'off', 'nfft', g.nfft, spec_opt{:});  
 else
-    % Remove baseline mean
-    % --------------------
+    if ~isempty(spec_opt), 
+        time_limits = spec_opt{2}; 
+        timebef = find(EEG.times > time_limits(1) & EEG.times < time_limits(2) );
+        X       = X(:,timebef,:);
+    end; 
     tmp   = fft(X, g.nfft, 2);
     f     = linspace(0, EEG.srate/2, size(tmp,2)/2);
     f     = f(2:end); % remove DC (match the output of PSD)
