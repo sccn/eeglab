@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.52  2007/08/12 02:45:47  arno
+% aiutomatically generate changrp
+%
 % Revision 1.51  2007/08/12 02:15:17  arno
 % still better warning
 %
@@ -257,6 +260,11 @@ if isempty(STUDY.etc.version)
                     STUDY.cluster = rmfield(STUDY.cluster, fields{ind});
                 end;
             end;
+        end;
+    end;
+    if isfield(STUDY, 'changrp')
+        if ~isempty(STUDY.changrp)
+            STUDY.changrp = [];
         end;
     end;
     modif = 1;
