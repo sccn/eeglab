@@ -2,8 +2,7 @@
 %              in the Matlab environment and in the .set file as well. Saves the spectra 
 %              in a file.
 % Usage:    
-%           >> [EEG_etc, X, f, overwrite] = std_spec(EEG, components, ...
-%                                                   freqrange, specargs);
+%           >> [spec freqs] = std_spec(EEG, 'key', 'val', ...);
 %
 %              Computes the mean spectra of the activites of specified components of the 
 %              supplied dataset. The spectra are saved in a Matlab file. If such a file 
@@ -19,23 +18,43 @@
 %              will remove the mean from the requested frequency range. The frequencies 
 %              vector is also returned. 
 % Inputs:
-%   EEG        - an EEGLAB dataset structure. 
-%   components - [numeric vector] components of the EEG structure for which the mean 
-%                spectra  are to be computed {default|[] -> all}
-%   freqrange  - [minHz maxHz] the frequency range in which to compute the spectra.
-%                {default: }
-%   specargs   - {'key1', 'val1',...} cell array of optional spectopo inputs 
-%                {default empty}
-% Outputs:
-%   X         - the mean spectra (in dB) of the requested ICA components in the selected 
-%               frequency range (with the mean of each spectrum removed). 
-%   f         - a vector of frequencies at which the spectra have been computed. 
+%   EEG - a loaded epoched EEG dataset structure. 
 %
-% Files output or overwritten: 
-%               [dataset_filename].icaspec, 
-%               [dataset_filename].icaspecm
+% Optional inputs:
+%   'components' - [numeric vector] components of the EEG structure for which 
+%                  activation ERPs will be computed. Note that because 
+%                  computation of component spectra is relatively fast, all 
+%                  components spectra are computed and saved. Only selected 
+%                  component are returned by the function to Matlab
+%                  {default|[] -> all}
+%   'channels'   - [cell array] channels of the EEG structure for which 
+%                  activation spectrum will be computed. Note that because 
+%                  computation of spectrum is relatively fast, all channels 
+%                  spectrum are computed and saved. Only selected channels 
+%                  are returned by the function to Matlab
+%                  {default|[] -> none}
+%   'freqrange'  - [minhz maxhz] frequency range (in Hz) within which to 
+%                  return the spectrum {default|[]: [0 sample rate/2]}. 
+%   'recompute'  - ['on'|'off'] force recomputing ERP file even if it is 
+%                  already on disk.
+%
+% Other optional spectral parameters:
+%   All optional parameters to the spectopo function may be provided to this function
+%   as well.
+%
+% Outputs:
+%   spec      - the mean spectra (in dB) of the requested ICA components in the selected 
+%               frequency range (with the mean of each spectrum removed). 
+%   freqs     - a vector of frequencies at which the spectra have been computed. 
+%
+% Files output or overwritten for ICA: 
+%               [dataset_filename].icaspec,   % raw spectrum of ICA components
+%               [dataset_filename].icaspecm   % spectrum with the mean baseline removed
+% Files output or overwritten for data: 
+%               [dataset_filename].datspec, 
+%               [dataset_filename].datspecm
 % 
-%  See also  spectopo(), std_erp(), std_ersp(), std_map(), std_preclust()
+% See also  spectopo(), std_erp(), std_ersp(), std_map(), std_preclust()
 %
 % Authors: Arnaud Delorme, SCCN, INC, UCSD, January, 2005
 
@@ -61,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2007/02/28 12:04:59  arno
+% force recompute
+%
 % Revision 1.29  2006/11/21 21:59:45  arno
 % computing ICA activity bug
 %
