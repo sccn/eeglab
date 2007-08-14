@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.54  2007/08/13 23:24:07  nima
+% _
+%
 % Revision 1.53  2007/08/13 20:36:27  nima
 % _
 %
@@ -348,12 +351,14 @@ for index = 1:length(allinds)
         % find component
         % --------------
         for c = 1:size(allersp,1)
-            for ind = 1:length(compinds{1,grpind})
-                if compinds{1,grpind}(ind) == comps & any(setinds{1,grpind}(ind) == sets)
-                    allersp{c} = allersp{c}(:,:,ind);
+            for ind = length(compinds{1,grpind}):-1:1
+                if ~any(compinds{1,grpind}(ind) == comps) | ~any(setinds{1,grpind}(ind) == sets)
+                    allersp{c}(:,:,ind) = [];
+                else
                     comp_names{c,1} = comps;
                 end;
             end;
+            allersp{c} = mean(allersp{c},3);
         end;
         opt.subject = STUDY.datasetinfo(sets(1)).subject;
     end;
