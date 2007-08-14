@@ -147,7 +147,7 @@ function plotcurve( times, R, varargin);
       yl = ylim;
       ylim([g.ylim yl(2)]);
   end
-  yl = ylim;
+  yl = ylim; 
 
   % highlight regions
   % -----------------
@@ -266,5 +266,6 @@ if ~isempty(regions)
     ylim(yl);
 end;
   
+
   function res = dims(array)
     res = min(ndims(array), max(size(array,2),size(array,3)));

@@ -65,6 +65,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2007/08/09 18:29:03  arno
+% plotting statistics
+%
 % Revision 1.9  2007/08/03 23:34:23  arno
 % fix labels
 %
@@ -206,6 +209,9 @@ opt = finputcheck( varargin, { 'channels'    'cell'   []              {};
                                'plotmode'    'string' { 'normal' 'condensed' }  'normal';
                                'statistics'  'string' { 'param' 'perm' }       'param';
                                'statmode'    'string' { 'subjects' 'common' 'trials' } 'subjects'}, 'std_erpmaskdata');
+
+% opt.figure =  'off'; % test by nima
+% opt.plotmode =  'condensed';
 if isstr(opt), error(opt); end;
 opt.singlesubject = 'off';
 if strcmpi(opt.plottopo, 'on') & size(data{1},3) == 1, opt.singlesubject = 'on'; end;

@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2007/08/13 23:24:37  nima
+% _
+%
 % Revision 1.24  2007/06/26 00:16:24  allen
 % bug 427: grand mean avg title error
 %
@@ -314,6 +317,6 @@ for ci = 1:length(comp_ind)
     toporeplot(grid, 'style', 'both', 'plotrad',0.5,'intrad',0.5,'xsurface', Xi, 'ysurface', Yi, 'verbose', 'off');
     title([ 'IC' num2str(comp) ' / ' subject ', ' STUDY.cluster(cls).name ]);
     set(gcf,'Color', BACKCOLOR);
-    axcopy
+    axcopy;
 end
 

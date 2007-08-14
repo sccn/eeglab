@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2007/08/13 23:24:29  nima
+% _
+%
 % Revision 1.14  2007/08/10 19:47:32  nima
 % _
 %
@@ -97,6 +100,7 @@ if iscell(varargin{1}) % channel plotting
         subplot(2,2,1),
         try,
             STUDY = std_erpplot(STUDY,ALLEEG, 'channels', chans(k), 'mode', 'together', 'plotmode', 'condensed' );
+            erpAxisHangle = gca;
         catch
             axis off; text(0.5, 0.5, 'No ERP information', 'horizontalalignment', 'center');
             warningon = 1;
@@ -179,6 +183,7 @@ for k = 1: len
     subplot(2,3,2),
     try,
         STUDY = std_erpplot(STUDY,ALLEEG, 'clusters', cls(k), 'mode', 'together', 'plotmode', 'condensed' );
+        erpAxisHangle = gca;
     catch
         axis off; text(0.5, 0.5, 'No ERP information', 'horizontalalignment', 'center');
         warningon = 1;
@@ -230,6 +235,9 @@ for k = 1: len
 
 end  % Finished all conditions
 
+legend(erpAxisHangle,'off');
 
+set(erpAxisHangle,'YTickLabelMode','auto');
+set(erpAxisHangle,'YTickMode','auto');
 delete(h_wait)
 

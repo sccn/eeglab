@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.56  2007/08/13 23:25:16  nima
+% _
+%
 % Revision 1.55  2007/08/10 22:43:07  arno
 % no statistics for single components
 %
@@ -376,6 +379,7 @@ else
             end;
         end;
     end;
-    set(gcf,'name','Component ERP');
+    set(gcf,'name','ERP');
+    axcopy(gca);
 end;
 
