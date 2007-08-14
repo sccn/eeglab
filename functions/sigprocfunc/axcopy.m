@@ -36,6 +36,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2007/08/14 18:58:56  arno
+% axes fix
+%
 % Revision 1.12  2007/04/28 00:17:53  arno
 % do not erase old copy commands
 %
@@ -97,6 +100,8 @@ end
 
 if ~strcmpi(get(fig, 'type'), 'axes')
     hndl= findobj('parent',fig,'type','axes');
+else
+    hndl=fig;
 end;
 offidx=[];
 for a=1:length(hndl)                    % make all axes visible
@@ -117,7 +122,11 @@ for a=1:length(hndl)                    % make all axes visible
         %set(findobj('parent',hndl(a)),'ButtonDownFcn',char(comstr));
     end;        
 end
-figure(fig);
+if ~strcmpi(get(fig, 'type'), 'axes')
+    figure(fig);
+else
+    figure(get(fig, 'parent'));
+end;
 if exist('command') ~= 1
     set(hndl(a),'ButtonDownFcn','copyaxis');
 else
