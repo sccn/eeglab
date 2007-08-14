@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.55  2007/08/14 02:09:20  arno
+% allow plotting of individual components within the cluster
+%
 % Revision 1.54  2007/08/13 23:24:07  nima
 % _
 %
@@ -226,7 +229,7 @@ if strcmpi(opt.mode, 'comps'), opt.plotsubjects = 'on'; end;
 if ~isempty(opt.subject), opt.groupstats = 'off'; disp('No group statistics for single subject'); end;
 if ~isempty(opt.subject), opt.condstats = 'off'; disp('No condition statistics for single subject'); end;
 
-if ~isempty(opt.comps)
+if length(opt.comps) == 1
     opt.condstats = 'off'; opt.groupstats = 'off'; 
     disp('Statistics cannot be computed for single component');
 end;
