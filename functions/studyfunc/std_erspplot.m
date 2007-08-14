@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.56  2007/08/14 02:47:16  allen
+% fix statistics for more than one component
+%
 % Revision 1.55  2007/08/14 02:09:20  arno
 % allow plotting of individual components within the cluster
 %
@@ -361,7 +364,6 @@ for index = 1:length(allinds)
                     comp_names{c,1} = comps;
                 end;
             end;
-            allersp{c} = mean(allersp{c},3);
         end;
         opt.subject = STUDY.datasetinfo(sets(1)).subject;
     end;
@@ -388,7 +390,7 @@ for index = 1:length(allinds)
             text(0,0,[STUDY.cluster(allinds(index)).name],'fontsize',13 );
             axis off;
             if strcmp(opt.datatype,'ersp')
-                if isempty(opt.comps)
+                if length(opt.comps) ~= 1
                     set(gcf,'name',['ERSP of ' STUDY.cluster(allinds(index)).name])
                 else
                     set(gcf,'name',['ERSP of a Component from cluster ' STUDY.cluster(allinds(index)).name])
