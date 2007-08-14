@@ -96,6 +96,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2007/08/14 02:26:16  allen
+% fix data masking problem
+%
 % Revision 1.11  2007/08/13 21:06:33  nima
 % _
 %
@@ -372,7 +375,7 @@ if isempty(opt.topovals)
     % -------------------------------
     statmask = 0;
     if strcmpi(opt.maskdata, 'on') & ~isnan(opt.threshold) & ...
-            (~strcmpi(opt.condstats, 'off') | ~strcmpi(opt.condstats, 'on'))
+            (strcmpi(opt.condstats, 'on') | strcmpi(opt.condstats, 'on'))
         addc = 0; addr = 0; statmask = 1;
     end;
         
