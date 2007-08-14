@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 %$Log: not supported by cvs2svn $
+%Revision 1.22  2007/08/03 22:55:45  arno
+%automatic plotting mode
+%
 %Revision 1.21  2007/08/03 22:51:47  arno
 %plotsubjects option
 %
@@ -225,11 +228,11 @@ if strcmpi(mode, 'apart')  % case each cluster on a separate figure
                set(gcf, 'UserData', dipinfo);
                set(gca,'UserData', dipinfo);
                rotate3d off;
-               axcopy(gcf, ['dipinfo = get(gca, ''''UserData''''); dipplot(dipinfo.dipmod, dipinfo.op{:}); set(gcf, ''''Name'''', dipinfo.title,''''NumberTitle'''',''''off''''); ']);
+               axcopy(gca, ['dipinfo = get(gca, ''''UserData''''); dipplot(dipinfo.dipmod, dipinfo.op{:}); set(gcf, ''''Name'''', dipinfo.title,''''NumberTitle'''',''''off''''); ']);
            end
         end % finished the if condition that cluster isn't empty
     end % finished going over requested clusters
-end
+end 
 
 if strcmpi(mode, 'together')  % case all clusters are plotted in the same figure (must be a new figure)
     N = length(cls);

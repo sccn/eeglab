@@ -88,6 +88,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.48  2007/08/13 23:24:20  nima
+% _
+%
 % Revision 1.47  2007/08/10 22:33:56  arno
 % no statistics for single components
 %
@@ -331,4 +334,5 @@ else
         end;
     end;
     set(gcf,'name','Component Spectra');
+    axcopy(gca);
 end;
