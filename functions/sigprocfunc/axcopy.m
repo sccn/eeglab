@@ -36,6 +36,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2007/04/28 00:17:53  arno
+% do not erase old copy commands
+%
 % Revision 1.11  2005/01/24 01:55:09  arno
 % do not erase non-empty fields
 %
@@ -92,7 +95,9 @@ if ~(exist('fig') ==1) | isempty(fig) | fig == 0
    fig = gcf;
 end
 
-hndl= findobj('parent',fig,'type','axes');
+if ~strcmpi(get(fig, 'type'), 'axes')
+    hndl= findobj('parent',fig,'type','axes');
+end;
 offidx=[];
 for a=1:length(hndl)                    % make all axes visible
     if exist('command') ~= 1
