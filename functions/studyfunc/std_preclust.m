@@ -1,12 +1,12 @@
 % std_preclust() - prepare STUDY component location and activity measures for later clustering.
-%                  Selected measures (one or more from options: ICA activation ERPs, spectra,
-%                  scalp maps, ERSPs, and ITCs) are computed for each dataset in the STUDY 
-%                  set, unless they already present. After all requested measures are computed 
-%                  and saved in the STUDY datasets, each feature dimension is reduced by computing 
-%                  a PCA  decomposition. These PCA matrices (one per measure) are concatenated and 
-%                  used as input to the clustering  algorithm in pop_clust(). std_preclust() allows 
-%                  selection of a subset of components to use in the clustering. This subset 
-%                  may be a user-specified component subset, or components selected from 
+%                  Selected measures (one or more ICA activation measures from the options: 
+%                  ERPs, spectra, scalp maps, ERSPs, and ITCs) are computed for each dataset 
+%                  in the STUDY set, unless they already present. After all requested measures are 
+%                  computed and saved in the STUDY datasets, each feature dimension is reduced by 
+%                  computing a PCA  decomposition. These PCA matrices (one per measure) are 
+%                  concatenated and used as input to the clustering  algorithm in pop_clust(). 
+%                  std_preclust() allows selection of a subset of components to use in the clustering. 
+%                  This subset may be a user-specified component subset, or components selected from 
 %                  an already existing cluster (for hierarchical clustering). The EEG datasets
 %                  in the ALLEEG structure are updated. If new measures are added, the updated 
 %                  EEG sets are also saved to disk. Called by pop_preclust(). Follow with 
@@ -117,6 +117,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.84  2007/08/09 18:39:18  arno
+% update help message according to bug repport 434
+%
 % Revision 1.83  2007/05/22 04:27:05  ywu
 % not sure, Matlab crashed. TF
 %
