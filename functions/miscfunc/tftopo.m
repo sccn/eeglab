@@ -90,6 +90,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.83  2007/04/06 01:13:41  arno
+% scale for log space
+%
 % Revision 1.82  2007/01/15 01:42:55  scott
 % working on help msg - the meaning of the word 'concatenate' in the 'sigthresh' definition is ??
 %
@@ -375,7 +378,7 @@ fieldlist = { 'chanlocs'      { 'string' 'struct' }       []       '' ;
               'sigthresh'     'integer'  [1 Inf]                   [1 1];
               'smooth'        'real'     [0 Inf]                   1;
               'timefreqs'     'real'     []                        [];
-              'vert'          'real'     [times(1) times(end)]     [max(0, times(1))] };
+              'vert'          'real'     [times(1) times(end)]     [min(max(0, times(1), times(end))] };
 
 [g varargin] = finputcheck( varargin, fieldlist, 'tftopo', 'ignore');
 if isstr(g), error(g); end;
