@@ -127,6 +127,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.69  2007/08/09 16:45:32  arno
+% convert transformation to gradient
+%
 % Revision 1.68  2007/08/08 18:21:56  arno
 % *** empty log message ***
 %
@@ -736,7 +739,7 @@ function plotelec(elec, elecshow, color, tag);
              'FontSize',10)
         box on
     end;
-    axis([-lim lim -lim lim -lim*0.5 lim])
+    lim = abs(lim(1)); axis([-lim lim -lim lim -lim*0.5 lim]);
     axis equal;
 
 % decode labels for electrode caps
