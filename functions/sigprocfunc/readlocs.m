@@ -190,6 +190,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.98  2007/05/22 13:56:50  arno
+% type for custom sphbesa
+%
 % Revision 1.97  2007/05/01 21:35:58  arno
 % fix typo
 %
@@ -463,7 +466,7 @@ chanformat(4).description  = [ 'Standard BESA 3-D cartesian coordinate files wit
                                'Coordinates are re-oriented to fit the EEGLAB standard of having the ' ...
                                'nose along the +X axis.' ];
 chanformat(4).importformat = { 'labels' '-Y' 'X' 'Z' };
-chanformat(4).skipline     = -1;
+chanformat(4).skipline     = 0;
 % ---------------------------------------------------------------------------------------------------
 chanformat(5).type         = 'loc';
 chanformat(5).typestring   = 'EEGLAB polar .loc file';
