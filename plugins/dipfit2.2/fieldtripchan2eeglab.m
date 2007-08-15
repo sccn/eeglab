@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2006/01/20 23:43:18  arno
+% Initial revision
+%
 
 function chanlocs = fieldtripchan2eeglab( loc );
     
@@ -41,7 +44,7 @@ function chanlocs = fieldtripchan2eeglab( loc );
         return;
     end;
     
-    chanlocs = struct('labels', loc.label, 'X', mattocell(loc.pnt(:,1)'), ...
-                                           'Y', mattocell(loc.pnt(:,2)'), ...
-                                           'Z', mattocell(loc.pnt(:,3)'));
+    chanlocs = struct('labels', loc.label', 'X', mattocell(loc.pnt(:,1)'), ...
+                                            'Y', mattocell(loc.pnt(:,2)'), ...
+                                            'Z', mattocell(loc.pnt(:,3)'));
     chanlocs = convertlocs(chanlocs, 'cart2all');
