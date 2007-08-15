@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2007/08/13 19:12:57  arno
+% better saving of options
+%
 % Revision 1.33  2007/08/13 18:58:32  arno
 % nothing
 %
@@ -242,11 +245,12 @@ else                        X = TMP.data;
 end;
 
 if ~isempty(g.timerange)
-    timebef = find(EEG.times > g.timerange(1) & EEG.times < g.timerange(2) );
-    X       = X(:,timebef,:);
+    timebef  = find(EEG.times > g.timerange(1) & EEG.times < g.timerange(2) );
+    X        = X(:,timebef,:);
+    EEG.pnts = length(timebef);
 end;
 if strcmpi(g.specmode, 'psd')
-     [X, f] = spectopo(X, EEG.pnts, EEG.srate, 'plot', 'off', 'nfft', g.nfft, spec_opt{:});  
+    [X, f] = spectopo(X, EEG.pnts, EEG.srate, 'plot', 'off', 'nfft', g.nfft, spec_opt{:});  
 else
     tmp   = fft(X, g.nfft, 2);
     f     = linspace(0, EEG.srate/2, size(tmp,2)/2);
