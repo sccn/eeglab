@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.54  2007/04/26 20:59:18  toby
+% doc edits regarding transformation matrix
+%
 % Revision 1.53  2007/02/03 04:07:34  toby
 % 'colorbar' switch added, minor related changes
 %
@@ -403,6 +406,7 @@ if nargin < 3 % Open GUI input window
     else
         if isempty(result{7})   options = { options{:} 'setup' { result{4} 'meshfile' result{5} } }; % no coreg
         else                    options = { options{:} 'setup' { result{4} 'meshfile' result{5} 'transform' str2num(result{7}) } };
+                                fprintf('Transformation matrix: %s\n', str2num(result{7}));
         end;
         if ~strcmpi(result{5}, 'mheadnew.mat'), EEG.headplotmeshfile = result{5}; end;
     end;
