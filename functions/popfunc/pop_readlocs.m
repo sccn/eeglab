@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2005/03/09 18:41:26  arno
+% adapting to new file format
+%
 % Revision 1.7  2002/12/29 21:57:21  arno
 % skipline -> skiplines
 %
@@ -72,7 +75,7 @@ command = '';
 listtype = { chanformat.type };
 
 if nargin < 1 
-   [filename, filepath] = uigetfile('*', 'Importing electrode location file -- pop_readlocs()'); 
+   [filename, filepath] = uigetfile('*.*', 'Importing electrode location file -- pop_readlocs()'); 
    %filename = 'chan32.locs';
    %filepath = 'c:\eeglab\eeglab4.0\';
    drawnow;
