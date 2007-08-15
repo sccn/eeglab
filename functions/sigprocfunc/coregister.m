@@ -127,6 +127,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.71  2007/08/15 20:46:06  arno
+% fix second input as structure
+%
 % Revision 1.70  2007/08/15 19:11:43  arno
 % fix bug 239
 %
@@ -652,7 +655,7 @@ if 1
             '''select "Edit > Channel locations" in the EEGLAB mensu and press, "Look up loc." Select a '',' ...
             '''head model. Then re-open "Tools > Locate dipoles using DIPFIT2 > Head model and settings"'',' ...
             '''in the EEGLAB menu and select the "No coreg" option.'',' ];
-    if ~isstruct(chanlocs)
+    if ~isstruct(chanlocs2)
         if ~isempty(findstr(lower(chanlocs2), 'standard-10-5-cap385')) | ...
                 ~isempty(findstr(lower(chanlocs2), 'standard_1005')),
             cb_helpme = [ cb_helpme '''Then re-open "Tools > Locate dipoles using DIPFIT2 > Head model and settings"'',' ...
