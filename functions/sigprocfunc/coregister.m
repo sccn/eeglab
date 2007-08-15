@@ -127,6 +127,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.70  2007/08/15 19:11:43  arno
+% fix bug 239
+%
 % Revision 1.69  2007/08/09 16:45:32  arno
 % convert transformation to gradient
 %
@@ -649,13 +652,15 @@ if 1
             '''select "Edit > Channel locations" in the EEGLAB mensu and press, "Look up loc." Select a '',' ...
             '''head model. Then re-open "Tools > Locate dipoles using DIPFIT2 > Head model and settings"'',' ...
             '''in the EEGLAB menu and select the "No coreg" option.'',' ];
-    if ~isempty(findstr(lower(chanlocs2), 'standard-10-5-cap385')) | ...
-        ~isempty(findstr(lower(chanlocs2), 'standard_1005')),
-        cb_helpme = [ cb_helpme '''Then re-open "Tools > Locate dipoles using DIPFIT2 > Head model and settings"'',' ...
+    if ~isstruct(chanlocs)
+        if ~isempty(findstr(lower(chanlocs2), 'standard-10-5-cap385')) | ...
+                ~isempty(findstr(lower(chanlocs2), 'standard_1005')),
+            cb_helpme = [ cb_helpme '''Then re-open "Tools > Locate dipoles using DIPFIT2 > Head model and settings"'',' ...
                           '''in the EEGLAB menu and select the "No coreg" option.''), ''Warning'');' ];
-    else
-        cb_helpme = [ cb_helpme '''Then re-open the graphic interface function you were using.''), ''Warning'');' ];
-    end;        
+        else
+            cb_helpme = [ cb_helpme '''Then re-open the graphic interface function you were using.''), ''Warning'');' ];
+        end;    
+    end;
     h = uicontrol( opt{:}, [0.87 0.95 .13 .05], 'style', 'pushbutton', 'string', 'Help me', 'callback',  cb_helpme);
     h = uicontrol( opt{:}, [0.87 0.90 .13 .05], 'style', 'pushbutton', 'string', 'Funct. help', 'callback', 'pophelp(''coregister'');' );
 
