@@ -26,6 +26,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2007/01/26 18:13:38  arno
+% add MEG model
+%
 % Revision 1.12  2006/11/13 20:02:13  arno
 % change automatic BEM rotation again
 %
@@ -135,20 +138,19 @@ defaultvolume.o = [0 0 0];
 folder = which('pop_dipfit_settings');
 folder = folder(1:end-21);
 delim  = folder(end);
-template_models = { ...
-    { [ folder 'standard_BESA' delim 'standard_BESA.mat' ] ... % model hdmfile for BESA
-      'spherical' ...                                          % coordinate 'spherical' or 'MNI'
-      [ folder 'standard_BESA' delim 'avg152t1.mat' ] ...      % MRI MNI normalized file
-      [ folder 'standard_BESA' delim 'standard-10-5-cap385.elp' ] ... % channel location file
-      [] } ...                                                        % coregistration transform matrix
-    ...                                                                  % associated with model
-    { [ folder 'standard_BEM' delim 'standard_vol.mat' ] ...   % same as above for BEM model
-      'MNI' ...
-      [ folder 'standard_BEM' delim 'standard_mri.mat' ] ...
-      [ folder 'standard_BEM' delim 'elec' delim 'standard_1005.elc' ] ...
-      [ 0 0 0 0 0 -pi/2  1 1 1] } ...
-    ...                                                                  % associated with model
-    { '' 'CTF' '' '' [] } { '' 'MNI' '' '' [] } }; % custom model
+template_models(1).hdmfile  = [ folder 'standard_BESA' delim 'standard_BESA.mat' ];
+template_models(1).mrifile  = [ folder 'standard_BESA' delim 'avg152t1.mat' ];
+template_models(1).chanfile = [ folder 'standard_BESA' delim 'standard-10-5-cap385.elp' ];
+template_models(1).coordformat = 'spherical';
+
+template_models(2).hdmfile  = [ folder 'standard_BEM' delim 'standard_vol.mat' ] ;
+template_models(2).mrifile  = [ folder 'standard_BEM' delim 'standard_mri.mat' ];
+template_models(2).chanfile = [ folder 'standard_BEM' delim 'elec' delim 'standard_1005.elc' ];
+template_models(2).coordformat = 'MNI';
+template_models(2).coord_transform = [ 0 0 0 0 0 -pi/2  1 1 1];
+
+template_models(3).coordformat = 'CTF';
+template_models(4).coordformat = 'MNI'; % custom model
 
 % constrain electrode to sphere
 % -----------------------------
