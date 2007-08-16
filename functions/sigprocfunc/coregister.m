@@ -45,7 +45,7 @@
 %                 mesh used by headplot(); 'mesh',[] shows no head mesh.
 %   'warpmethod' - ['rigidbody'|'globalrescale'|'traditional'|'nonlin1'|
 %                 'nonlin2'|'nonlin3'|'nonlin4'|'nonlin5']
-%                 'traditional' calls the dipfit2.* function traditional()
+%                 'traditional' calls the dipfit2.* function traditionaldipfit()
 %                 all others are enacted by electrodenormalize()
 %                 {default: 'traditional}
 %   'transform' - [real array] homogenous transformation matrix (>>help 
@@ -89,7 +89,7 @@
 %
 % Outputs:
 %  chanlocs_out - transformed input channel locations (chanlocs) structure
-%  transform    - transformation matrix. Use traditional() to convert
+%  transform    - transformation matrix. Use traditionaldipfit() to convert
 %                 this to a homogenous transformation matrix used in
 %                 3-D plotting functions such as headplot().
 %
@@ -101,7 +101,7 @@
 %                 (using the coregister() graphic interface). The aligned locations 
 %                 then become reference locations for this mesh.
 %
-% See also: traditional(), headplot(), plotmesh(), electrodenormalize(). 
+% See also: traditionaldipfit(), headplot(), plotmesh(), electrodenormalize(). 
 %
 % Note: Calls Robert Oostenveld's FieldTrip coregistration functions for
 %       automatic coregistration.
@@ -127,6 +127,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.73  2007/08/16 19:00:50  arno
+% new template_models format
+%
 % Revision 1.72  2007/08/15 20:48:45  arno
 % same
 %
@@ -541,7 +544,7 @@ if strcmpi(g.manual, 'off'),
     if size(dat.transform,1) > 1
         dat.electransf.pnt = dat.transform*[ dat.elec1.pnt ones(size(dat.elec1.pnt,1),1) ]';
     else
-        dat.electransf.pnt = traditional(dat.transform)*[ dat.elec1.pnt ones(size(dat.elec1.pnt,1),1) ]';
+        dat.electransf.pnt = traditionaldipfit(dat.transform)*[ dat.elec1.pnt ones(size(dat.elec1.pnt,1),1) ]';
     end;
     dat.electransf.pnt   = dat.electransf.pnt(1:3,:)';
     dat.electransf.label = dat.elec1.label;
@@ -798,19 +801,19 @@ function [elec1, transf] = align_fiducials(elec1, elec2, fidnames1, fidnames2)
     
     % test difference
     % ---------------
-    diff1 = mean(mean(abs(elec3.m-traditional(transf))));
+    diff1 = mean(mean(abs(elec3.m-traditionaldipfit(transf))));
     transf(6) = -transf(6);
-    diff2 = mean(mean(abs(elec3.m-traditional(transf))));
+    diff2 = mean(mean(abs(elec3.m-traditionaldipfit(transf))));
     if diff1 < diff2, transf(6) = -transf(6); end;
     
-    diff1 = mean(mean(abs(elec3.m-traditional(transf))));
+    diff1 = mean(mean(abs(elec3.m-traditionaldipfit(transf))));
     transf(5) = -transf(5);
-    diff2 = mean(mean(abs(elec3.m-traditional(transf))));
+    diff2 = mean(mean(abs(elec3.m-traditionaldipfit(transf))));
     if diff1 < diff2, transf(5) = -transf(5); end;
     
-    diff1 = mean(mean(abs(elec3.m-traditional(transf))));
+    diff1 = mean(mean(abs(elec3.m-traditionaldipfit(transf))));
     transf(4) = -transf(4);
-    diff2 = mean(mean(abs(elec3.m-traditional(transf))));
+    diff2 = mean(mean(abs(elec3.m-traditionaldipfit(transf))));
     if diff1 < diff2, transf(4) = -transf(4); end;
 
     % rescale if necessary
@@ -823,7 +826,7 @@ function [elec1, transf] = align_fiducials(elec1, elec2, fidnames1, fidnames2)
     ratio = mean(dist_coords2./dist_coords1);
     transf(7:9) = ratio;
     
-    transfmat = traditional(transf);
+    transfmat = traditionaldipfit(transf);
     elec1.pnt = transfmat*[ elec1.pnt ones(size(elec1.pnt,1),1) ]';
     elec1.pnt = elec1.pnt(1:3,:)';
     
@@ -841,7 +844,7 @@ function [elec1, transf] = warp_chans(elec1, elec2, chanlist, warpmethod)
     if length(transf) == 6, transf(7:9) = 1; end;
     transf = checktransf(transf, elec1, elec2);
     
-    transfmat = traditional(transf);
+    transfmat = traditionaldipfit(transf);
     elec1.pnt = transfmat*[ elec1.pnt ones(size(elec1.pnt,1),1) ]';
     elec1.pnt = elec1.pnt(1:3,:)';
 
@@ -852,14 +855,14 @@ function transf = checktransf(transf, elec1, elec2)
     
     [tmp ind1 ind2] = intersect( elec1.label, elec2.label );
     
-    transfmat = traditional(transf);
+    transfmat = traditionaldipfit(transf);
     tmppnt = transfmat*[ elec1.pnt ones(size(elec1.pnt,1),1) ]';
     tmppnt = tmppnt(1:3,:)';
     diff1  = tmppnt(ind1,:) - elec2.pnt(ind2,:);
     diff1  = mean(sum(diff1.^2,2));
     
     transf(6) = -transf(6); % yaw angle is sometimes inverted
-    transfmat = traditional(transf);
+    transfmat = traditionaldipfit(transf);
     tmppnt = transfmat*[ elec1.pnt ones(size(elec1.pnt,1),1) ]';
     tmppnt = tmppnt(1:3,:)';
     diff2  = tmppnt(ind1,:) - elec2.pnt(ind2,:);
@@ -885,7 +888,7 @@ function redrawgui(fid)
     if size(dat.transform,1) > 1
         dat.electransf.pnt = dat.transform*[ dat.elec1.pnt ones(size(dat.elec1.pnt,1),1) ]';
     else
-        dat.electransf.pnt = traditional(dat.transform)*[ dat.elec1.pnt ones(size(dat.elec1.pnt,1),1) ]';
+        dat.electransf.pnt = traditionaldipfit(dat.transform)*[ dat.elec1.pnt ones(size(dat.elec1.pnt,1),1) ]';
     end;
     dat.electransf.pnt   = dat.electransf.pnt(1:3,:)';
     dat.electransf.label = dat.elec1.label;
@@ -1015,7 +1018,7 @@ function s = plotnose(transf, col)
 
     % apply homogenous transformation
     % -------------------------------
-    transfhom = traditional( transf );
+    transfhom = traditionaldipfit( transf );
     xyz       = [ x(:) y(:) z(:) ones(length(x(:)),1) ];
     xyz2      = transfhom * xyz';
     x(:)      = xyz2(1,:)';

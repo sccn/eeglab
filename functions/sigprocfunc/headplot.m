@@ -41,7 +41,7 @@
 %                   the electrode locations with the head mesh:
 %                    [shiftX shiftY shiftZ pitch roll yaw scaleX scaleY scaleZ]
 %                   The transform is applied in the order shift(rotate(scale(elocs)))
-%                   by the dipfit2.* plugin function traditional.m
+%                   by the dipfit2.* plugin function traditionaldipfit.m
 %                   This array is returned by coregister().
 %  'plotmeshonly' - [string] plot only mesh and electrode positions. Options are
 %                   'head' to plot the standard head mesh; 'sphere' to plot the
@@ -124,6 +124,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.77  2007/04/26 20:59:14  toby
+% doc edits regarding transformation matrix
+%
 % Revision 1.76  2007/03/07 03:58:30  toby
 % bug151 courtesy Ronny Lindner
 %
@@ -481,7 +484,7 @@ if isstr(values)
     %newcoords = transformcoords( [ Xeori Yeori Zeori ], g.transform(4:6), g.transform(7:9), g.transform(1:3));
     % same performed below with homogenous transformation matrix
     
-    transmat  = traditional( g.transform ); % arno
+    transmat  = traditionaldipfit( g.transform ); % arno
     newcoords = transmat*[ newcoords ones(size(newcoords,1),1)]';
     newcoords = newcoords(1:3,:)';
     
@@ -725,7 +728,7 @@ else
       % optional transformation
       % -----------------------
       if ~isempty(g.transform)
-          transmat  = traditional( g.transform ); % arno
+          transmat  = traditionaldipfit( g.transform ); % arno
           newElect  = transmat*[ newElect ones(size(newElect,1),1)]';
           newElect  = newElect(1:3,:)';
       end;
