@@ -27,6 +27,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2006/09/14 09:30:49  arno
+% typo
+%
 % Revision 1.3  2005/03/11 16:05:52  arno
 % implement .vol
 %
@@ -44,12 +47,12 @@ function newdipfit = dipfit_1_to_2( dipfit );
     end;
     
     ind = 1; % use first template (BESA)
-    newdipfit.coordformat = template_models{ind}{2};
-    newdipfit.mrifile     = template_models{ind}{3};
-    newdipfit.chanfile    = template_models{ind}{4};
+    newdipfit.coordformat = template_models(ind).coordformat;
+    newdipfit.mrifile     = template_models(ind).mrifile;
+    newdipfit.chanfile    = template_models(ind).chanfile;
     
     if ~isfield(dipfit, 'vol')
-        newdipfit.hdmfile = template_models{ind}{1};
+        newdipfit.hdmfile = template_models(ind).hdmfile;
     else
         newdipfit.vol     = dipfit.vol;
 
