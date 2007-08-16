@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2007/08/16 18:59:25  arno
+% automatic recognition of models
+%
 % Revision 1.34  2007/08/16 17:53:37  arno
 % change the strcuture for templates
 %
@@ -282,18 +285,12 @@ if nargin < 2
         tmpl = tmpdat(tmpval).coord_transform;
         set(findobj(gcf, 'tag', 'coregtext'), 'string', '');
         set(findobj(gcf, 'tag', 'coregcheckbox'), 'value', 0);
-       for ind = 1:length(tmpl)
-            allkeywordstrue = 1;
-            if isempty(tmpl(ind).keywords), allkeywordstrue = 0; end;
-            for k = 1:length(tmpl(ind).keywords)
-                if isempty(findstr(chanfile, tmpl(ind).keywords{k})), allkeywordstrue = 0; end;
-            end;
-            if allkeywordstrue,
-                set(findobj(gcf, 'tag', 'coregtext'), 'string', char(vararg2str({ tmpl(ind).transform })));
-                if isempty(tmpl(ind).transform)
-                     set(findobj(gcf, 'tag', 'coregcheckbox'), 'value', 1);
-                else set(findobj(gcf, 'tag', 'coregcheckbox'), 'value', 0);
-                end;
+        [allkeywordstrue transform] = lookupchantemplate(chanfile, tmpl);
+        if allkeywordstrue,
+            set(findobj(gcf, 'tag', 'coregtext'), 'string', char(vararg2str({ transform })));
+            if isempty(transform)
+                 set(findobj(gcf, 'tag', 'coregcheckbox'), 'value', 1);
+            else set(findobj(gcf, 'tag', 'coregcheckbox'), 'value', 0);
             end;
         end;
         return;
