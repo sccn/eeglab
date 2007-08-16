@@ -127,6 +127,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.74  2007/08/16 21:16:00  arno
+% traditional -> traditionaldipfit
+%
 % Revision 1.73  2007/08/16 19:00:50  arno
 % new template_models format
 %
@@ -532,9 +535,6 @@ else
     end;
     
 end;
-
-tmp = which('traditional');
-if findstr('ieldtrip', tmp), error('Using traditional.m from Fieldtrip instead of EEGLAB (returns angles in degree)'); end;
 
 % manual mode off
 % ---------------
