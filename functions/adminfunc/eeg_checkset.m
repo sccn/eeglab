@@ -150,6 +150,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.217  2007/08/09 16:37:14  arno
+% debug last changes
+%
 % Revision 1.216  2007/08/09 16:10:55  arno
 % same
 %
@@ -1734,26 +1737,26 @@ elseif exist('dipfitdefs')
     if isfield(EEG.dipfit, 'vol') & ~isfield(EEG.dipfit, 'hdmfile')
         if exist('pop_dipfit_settings')
             disp('Old DIPFIT structure detected: converting to DIPFIT 2 format');
-            EEG.dipfit.hdmfile     = template_models{1}{1};
-            EEG.dipfit.coordformat = template_models{1}{2};
-            EEG.dipfit.mrifile     = template_models{1}{3};
-            EEG.dipfit.chanfile    = template_models{1}{4};
+            EEG.dipfit.hdmfile     = template_models(1).hdmfile;
+            EEG.dipfit.coordformat = template_models(1).coordformat;
+            EEG.dipfit.mrifile     = template_models(1).mrifile;
+            EEG.dipfit.chanfile    = template_models(1).chanfile;
             EEG.dipfit.coord_transform = [];
             res = com;
         end;
     end;
     if isfield(EEG.dipfit, 'hdmfile')
         if length(EEG.dipfit.hdmfile) > 8
-            if strcmpi(EEG.dipfit.hdmfile(end-8), template_models{1}{1}(end-8)), EEG.dipfit.hdmfile = template_models{1}{1}; end;
-            if strcmpi(EEG.dipfit.hdmfile(end-8), template_models{2}{1}(end-8)), EEG.dipfit.hdmfile = template_models{2}{1}; end;
+            if strcmpi(EEG.dipfit.hdmfile(end-8), template_models(1).hdmfile(end-8)), EEG.dipfit.hdmfile = template_models(1).hdmfile; end;
+            if strcmpi(EEG.dipfit.hdmfile(end-8), template_models(2).hdmfile(end-8)), EEG.dipfit.hdmfile = template_models(2).hdmfile; end;
         end;
         if length(EEG.dipfit.mrifile) > 8
-            if strcmpi(EEG.dipfit.mrifile(end-8), template_models{1}{3}(end-8)), EEG.dipfit.mrifile = template_models{1}{3}; end;
-            if strcmpi(EEG.dipfit.mrifile(end-8), template_models{2}{3}(end-8)), EEG.dipfit.mrifile = template_models{2}{3}; end;
+            if strcmpi(EEG.dipfit.mrifile(end-8), template_models(1).mrifile(end-8)), EEG.dipfit.mrifile = template_models(1).mrifile; end;
+            if strcmpi(EEG.dipfit.mrifile(end-8), template_models(2).mrifile(end-8)), EEG.dipfit.mrifile = template_models(2).mrifile; end;
         end;
         if length(EEG.dipfit.chanfile) > 8
-            if strcmpi(EEG.dipfit.chanfile(end-8), template_models{1}{4}(end-8)), EEG.dipfit.chanfile = template_models{1}{4}; end;
-            if strcmpi(EEG.dipfit.chanfile(end-8), template_models{2}{4}(end-8)), EEG.dipfit.chanfile = template_models{2}{4}; end;
+            if strcmpi(EEG.dipfit.chanfile(end-8), template_models(1).chanfile(end-8)), EEG.dipfit.chanfile = template_models(1).chanfile; end;
+            if strcmpi(EEG.dipfit.chanfile(end-8), template_models(2).chanfile(end-8)), EEG.dipfit.chanfile = template_models(2).chanfile; end;
         end;
     end;
 
