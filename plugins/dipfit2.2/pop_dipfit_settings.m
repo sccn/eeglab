@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2007/08/16 00:37:40  arno
+% fix last changes
+%
 % Revision 1.30  2007/08/16 00:36:16  arno
 % new automatic EGI locations
 %
@@ -290,14 +293,15 @@ if nargin < 2
     autocoreg_egisfp{1} = [ 0 0 0 0 0 0 8 11 10 ];
     autocoreg_egielp{2} = [ 0 -15 0 0.08 0 -1.571 102 93 100 ];
     autocoreg_egisfp{2} = [ 0 -15 4 0.05 0 -1.571 10.2 12 12.2 ];
+    dsffdsds
     if isfield(EEG.chaninfo, 'filename')
         if ~isempty(findstr(lower(EEG.chaninfo.filename), 'standard-10-5-cap385')), nocoregvalue = 1; end;
         if ~isempty(findstr(lower(EEG.chaninfo.filename), 'standard_1005')),        valmodel = 2; coregvals = num2str(template_models{valmodel}{5}); end;
         if ~isempty(findstr(lower(EEG.chaninfo.filename), 'egi')) & ...
                 ~isempty(findstr(lower(EEG.chaninfo.filename), 'sfp')) & ...
-                ~isempty(findstr(lower(EEG.chaninfo.filename), '12')),              transform = autocoreg_egielp{valmodel}; end;
+                ~isempty(findstr(lower(EEG.chaninfo.filename), '12')),              coregvals = num2str(autocoreg_egisfp{valmodel}); end;
         if ~isempty(findstr(lower(EEG.chaninfo.filename), 'egi')) & ...
-                ~isempty(findstr(lower(EEG.chaninfo.filename), 'elp')),             transform = autocoreg_egisfp{valmodel}; end;
+                ~isempty(findstr(lower(EEG.chaninfo.filename), 'elp')),             coregvals = num2str(autocoreg_egielp{valmodel}); end;
     end;
             
     userdata    = [];
