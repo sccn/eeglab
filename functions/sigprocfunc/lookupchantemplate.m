@@ -13,7 +13,7 @@
 %
 % Author: Arnaud Delorme, SCCN, INC, 2007
 
-[allkeywordstrue, transform] = lookupchantemplate(chanfile, tmpl);
+function [allkeywordstrue, transform] = lookupchantemplate(chanfile, tmpl);
 
 if nargin < 2
     help lookupchantemplate;
