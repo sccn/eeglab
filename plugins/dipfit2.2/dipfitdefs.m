@@ -26,6 +26,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2007/08/16 18:59:29  arno
+% automatic recognition of models
+%
 % Revision 1.15  2007/08/16 18:20:22  arno
 % defining new templates
 %
@@ -163,9 +166,9 @@ template_models(2).chanfile = [ folder 'standard_BEM' delim 'elec' delim 'standa
 template_models(2).coordformat = 'MNI';
 template_models(2).coord_transform(1).transform = [ 0 0 0 0 0 -pi/2  1 1 1];
 template_models(2).coord_transform(1).keywords  = { 'standard_1005' };
-template_models(2).coord_transform(2).transform = [ 0 -15 0 0.08 0 -1.571 102 93 100 ];
+template_models(2).coord_transform(2).transform = [ 0 -15 4 0.05 0 -1.571 10.2 12 12.2 ];
 template_models(2).coord_transform(2).keywords  = { 'gsn' 'sfp' '12' };
-template_models(2).coord_transform(3).transform = [ 0 -15 4 0.05 0 -1.571 10.2 12 12.2 ];
+template_models(2).coord_transform(3).transform = [ 0 -15 0 0.08 0 -1.571 102 93 100 ];
 template_models(2).coord_transform(3).keywords  = { 'egi' 'elp' };
 
 template_models(3).name        = 'CTF MEG';
