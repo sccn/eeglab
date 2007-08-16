@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2007/08/16 00:36:16  arno
+% new automatic EGI locations
+%
 % Revision 1.29  2007/01/26 18:19:34  arno
 % CTF implementation
 %
@@ -284,9 +287,9 @@ if nargin < 2
     coregvals    = '';
     
     autocoreg_egielp{1} = [ 0 0 0 0 0.02 0 85 85 85 ];
-    autocoreg_egispf{1} = [ 0 0 0 0 0 0 8 11 10 ];
+    autocoreg_egisfp{1} = [ 0 0 0 0 0 0 8 11 10 ];
     autocoreg_egielp{2} = [ 0 -15 0 0.08 0 -1.571 102 93 100 ];
-    autocoreg_egispf{2} = [ 0 -15 4 0.05 0 -1.571 10.2 12 12.2 ];
+    autocoreg_egisfp{2} = [ 0 -15 4 0.05 0 -1.571 10.2 12 12.2 ];
     if isfield(EEG.chaninfo, 'filename')
         if ~isempty(findstr(lower(EEG.chaninfo.filename), 'standard-10-5-cap385')), nocoregvalue = 1; end;
         if ~isempty(findstr(lower(EEG.chaninfo.filename), 'standard_1005')),        valmodel = 2; coregvals = num2str(template_models{valmodel}{5}); end;
