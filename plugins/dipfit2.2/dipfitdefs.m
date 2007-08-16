@@ -26,6 +26,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2007/08/16 17:53:27  arno
+% change the strcuture for templates
+%
 % Revision 1.13  2007/01/26 18:13:38  arno
 % add MEG model
 %
@@ -142,12 +145,20 @@ template_models(1).hdmfile  = [ folder 'standard_BESA' delim 'standard_BESA.mat'
 template_models(1).mrifile  = [ folder 'standard_BESA' delim 'avg152t1.mat' ];
 template_models(1).chanfile = [ folder 'standard_BESA' delim 'standard-10-5-cap385.elp' ];
 template_models(1).coordformat = 'spherical';
+template_models(1).coord_tranform_template(1).transform = [ 0 0 0 0 0 0 8 11 10 ];
+template_models(1).coord_tranform_template(1).keywords  = { 'egi' 'sfp' '12' };
+template_models(1).coord_tranform_template(2).transform = [ 0 0 0 0 0.02 0 85 85 85 ];
+template_models(1).coord_tranform_template(2).keywords  = { 'egi' 'elp' };
 
 template_models(2).hdmfile  = [ folder 'standard_BEM' delim 'standard_vol.mat' ] ;
 template_models(2).mrifile  = [ folder 'standard_BEM' delim 'standard_mri.mat' ];
 template_models(2).chanfile = [ folder 'standard_BEM' delim 'elec' delim 'standard_1005.elc' ];
 template_models(2).coordformat = 'MNI';
 template_models(2).coord_transform = [ 0 0 0 0 0 -pi/2  1 1 1];
+template_models(1).coord_tranform_template(1).transform = [ 0 -15 0 0.08 0 -1.571 102 93 100 ];
+template_models(1).coord_tranform_template(1).keywords  = { 'egi' 'sfp' '12' };
+template_models(1).coord_tranform_template(2).transform = [ 0 -15 4 0.05 0 -1.571 10.2 12 12.2 ];
+template_models(1).coord_tranform_template(2).keywords  = { 'egi' 'elp' };
 
 template_models(3).coordformat = 'CTF';
 template_models(4).coordformat = 'MNI'; % custom model
