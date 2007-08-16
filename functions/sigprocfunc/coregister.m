@@ -127,6 +127,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.72  2007/08/15 20:48:45  arno
+% same
+%
 % Revision 1.71  2007/08/15 20:46:06  arno
 % fix second input as structure
 %
@@ -361,7 +364,7 @@ end
     % manually for s2:  transf = [-4 -6 -50 -0.37 0 -1.35 1.1 1.15 1.1]
 
 if isempty(chanlocs2)
-    dipfitdefs; chanlocs2 = template_models{1}{4}; 
+    dipfitdefs; chanlocs2 = template_models(1).chanfile; 
 end
 
 % undocumented commands ?
