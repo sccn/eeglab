@@ -1,9 +1,9 @@
-function [H] = traditional(f);
+function [H] = traditionaldipfit(f);
 
-% TRADITIONAL creates the homogenous spatial transformation matrix
-%   for a 9 parameter traditional "Talairach-model" transformation
+% TRADITIONALDIPFIT creates the homogenous spatial transformation matrix
+%   for a 9 parameter traditionaldipfit "Talairach-model" transformation
 %
-% H = traditional(f)
+% H = traditionaldipfit(f)
 %
 % The transformation vector f should contain the 
 %	x-shift
@@ -43,6 +43,9 @@ function [H] = traditional(f);
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2007/04/26 20:35:14  toby
+% Documentation edits/clarifications.
+%
 % Revision 1.2  2006/08/01 20:55:28  arno
 % test for legnth of f
 %
