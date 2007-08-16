@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2007/06/02 04:37:14  toby
+% log comment fix
+%
 % Revision 1.20  2007/06/02 04:22:33  toby
 % dipolefitting.m option 'symmetry' was mispelled as 'symetry'. This may have been the reason dual dipole fitting failed.
 %
@@ -234,17 +237,7 @@ function [EEG, com] = pop_multifit(EEG, comps, varargin);
     elseif ~isempty(g.settings)
         EEG = pop_dipfit_settings( EEG, g.settings{:}); % will probably not work but who knows
     end;
-    
-    %if strcmpi(g.model, '4Shell'), ind = 1; else ind = 2; end;
-    %dipfitdefs;
-	%[tmpeloc labels Th Rd indices] = readlocs(EEG.chanlocs);
-    %if isempty(g.settings), g.settings = { 'electrodes', indices }; end;
-    %g.settings = { g.settings{:} 'hdmfile'     template_models{ind}{1} ...
-    %                             'coordformat' template_models{ind}{2} ...
-    %                             'mrifile'     template_models{ind}{3} ...
-    %                             'chanfile'    template_models{ind}{4} };
-    %EEG     = pop_dipfit_settings( EEG, g.settings{:} );        
-        
+            
     % Scanning dipole locations
     % -------------------------
     dipfitdefs;
