@@ -147,6 +147,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.167  2007/08/15 19:26:13  arno
+% same
+%
 % Revision 1.166  2007/08/15 19:25:39  arno
 % file filter
 %
@@ -1279,10 +1282,10 @@ else
            params.filename = args{ curfield+1 };
            if strcmpi(params.filename, 'standard-10-5-cap385.elp')
                 dipfitdefs;
-                params.filename = template_models{1}{4};
+                params.filename = template_models(1).chanfile;
            elseif strcmpi(params.filename, 'standard_1005.elc') 
                 dipfitdefs;
-                params.filename = template_models{2}{4};
+                params.filename = template_models(2).chanfile;
            end;
            tmplocs = readlocs( params.filename, 'defaultelp', 'BESA' );
            [tmp ind1 ind2] = intersect(lower({ tmplocs.labels }), lower({ chans.labels }));
@@ -1342,7 +1345,7 @@ else
             try, 
                 EEG = eeg_emptyset; % for dipfitdefs
                 dipfitdefs; 
-                userdata = { template_models{1}{4} template_models{2}{4} };
+                userdata = { template_models(1).chanfile template_models(2).chanfile };
                 clear EEG;
             catch, userdata = { 'Standard-10-5-Cap385.sfp' 'Standard-10-5-Cap385.sfp' };
             end;
