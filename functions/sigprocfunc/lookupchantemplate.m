@@ -20,6 +20,7 @@ if nargin < 2
     return;
 end;
 
+allkeywordstrue = 0;
 transform = [];
 for ind = 1:length(tmpl)
     allkeywordstrue = 1;
