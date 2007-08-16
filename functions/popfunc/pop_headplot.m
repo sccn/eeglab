@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.56  2007/08/16 00:29:31  arno
+% fix channel coordinates
+%
 % Revision 1.55  2007/08/15 19:21:36  arno
 % print transformation matrix
 %
@@ -291,19 +294,18 @@ if nargin < 3 % Open GUI input window
     
  	% graphic interface
 	% -----------------
-    autocoregbem = [ -0.732155 7.58141 11.8939 -0.0249659 0.0148571 0.0227427 0.932423 0.918943 0.793166 ];
-    autocoregsph = [ -0.31937  -5.96928 13.1812 0.0509311 0.0172127 -1.55007  1.08221  1.00037  0.923518 ];
-    autocoregegielp = [ 0.0773 -5.3235 -14.72 -0.1187 -0.0023 -1.5940 92.4 92.5 110.9 ];
-    autocoregegispf = [ 0 -9 -9 -0.12 0 -1.6 9.7 10.7 11.5 ];
+    template(1).keywords  = { 'standard-10-5-cap385' };
+    template(1).transform = [ -0.31937  -5.96928 13.1812 0.0509311 0.0172127 -1.55007  1.08221  1.00037  0.923518 ];
+    template(2).keywords  = { 'standard_1005' };
+    template(2).transform = [ -0.732155 7.58141 11.8939 -0.0249659 0.0148571 0.0227427 0.932423 0.918943 0.793166 ];
+    template(3).keywords  = { 'gsn' 'sfp' '12' };
+    template(3).transform = [ 0 -9 -9 -0.12 0 -1.6 9.7 10.7 11.5 ];
+    template(4).keywords  = { 'egi' 'elp' };
+    template(4).transform =  [ 0.0773 -5.3235 -14.72 -0.1187 -0.0023 -1.5940 92.4 92.5 110.9 ];
+    
     transform = [];
     if isfield(EEG.chaninfo, 'filename')
-        if ~isempty(findstr(lower(EEG.chaninfo.filename), 'standard-10-5-cap385')), transform = autocoregsph; end;
-        if ~isempty(findstr(lower(EEG.chaninfo.filename), 'standard_1005')),        transform = autocoregbem; end;
-        if ~isempty(findstr(lower(EEG.chaninfo.filename), 'egi')) & ...
-                ~isempty(findstr(lower(EEG.chaninfo.filename), 'sfp')) & ...
-                ~isempty(findstr(lower(EEG.chaninfo.filename), '12')),              transform = autocoregegisfp; end;
-        if ~isempty(findstr(lower(EEG.chaninfo.filename), 'egi')) & ...
-                ~isempty(findstr(lower(EEG.chaninfo.filename), 'elp')),             transform = autocoregegielp; end;
+        [tmp transform] = lookupchantemplate(lower(EEG.chaninfo.filename), template);
     end;
             
 	if typeplot
