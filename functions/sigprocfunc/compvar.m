@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2007/08/17 16:49:55  scott
+% reworked help msg; made 2nd output pvaf; rm'd mean of data
+%
 % Revision 1.6  2007/08/07 01:33:57  arno
 % fix help message
 %
@@ -72,8 +75,7 @@ if nargin < 4
 end;   
 
 data = reshape(data, size(data,1), size(data,2)*size(data,3));
-data = data - repmat(mean(data'),size(data,2)); % remove the data channel means (as does ICA)
-squaredata  = sum(sum(data.^2));                % compute the grand sum-squared data
+squaredata  = sum(sum(data.^2));             % compute the grand sum-squared data
 
 if iscell(act)
     sphere = act{1};
