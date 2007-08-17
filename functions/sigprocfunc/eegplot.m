@@ -165,6 +165,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.122  2007/08/17 18:49:25  arno
+% fix the zoom for Matlab 7
+%
 % Revision 1.121  2007/08/02 22:56:15  arno
 % smae
 %
@@ -1427,14 +1430,14 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 else
-  try, p1 = varargin{1}; p2 = varargin{2}; p3 = varargin{3}; catch, end;
+  try, p1 = varargin{1}; p2 = varargin{2}; var3 = varargin{3}; catch, end;
   switch data
   case 'drawp' % Redraw EEG and change position
 
     % this test help to couple eegplot windows
-    if exist('p3')
-    	figh = p3;
-    	figure(p3);
+    if exist('var3')
+    	figh = var3;
+    	figure(var3);
     else	
     	figh = gcf;                          % figure handle
 	end;
