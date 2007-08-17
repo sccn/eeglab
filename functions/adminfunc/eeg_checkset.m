@@ -150,6 +150,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.219  2007/08/17 19:32:34  arno
+% spped up by a 100 for studies
+%
 % Revision 1.218  2007/08/16 19:05:16  arno
 % new template model format
 %
@@ -1854,11 +1857,9 @@ for inddataset = 1:length(ALLEEG)
         if isfield(EEG, 'averef'), EEG = rmfield(EEG, 'averef'); end;
         if isfield(EEG, 'rt'    ), EEG = rmfield(EEG, 'rt');     end;
 
-        if length(ALLEEG) > 1
-            tmpsaved = EEG.saved;
-            [ALLEEG EEG] = eeg_store(ALLEEG, EEG, inddataset);
-            ALLEEG(inddataset).saved = tmpsaved;
-        end;
+        % store in new structure
+        % ----------------------
+        ALLEEGNEW(inddataset) = EEG;
     end;
 end;
 
@@ -1907,8 +1908,13 @@ fieldorder = { 'setname' ...
 
 fieldorder = [ fieldorder, setdiff(fieldnames(EEG), fieldorder) ];
 try 
-    ALLEEG = orderfields(ALLEEG, fieldorder);
+    ALLEEGNEW = orderfields(ALLEEGNEW, fieldorder);
+    EEG = ALLEEGNEW;
 catch, disp('error trying to order fields');
+end;
+
+if exist('ALLEEGNEW')
+    EEG = ALLEEGNEW;
 end;
 
 return;
