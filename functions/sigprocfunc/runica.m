@@ -103,6 +103,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2007/08/10 17:03:52  arno
+% fix
+%
 % Revision 1.33  2007/08/10 16:24:46  arno
 % fix last changes
 %
@@ -1492,7 +1495,7 @@ end
   %
   % compute variances without backprojecting to save time and memory -sm 7/05
   %
-  meanvar = sum(winv.^2).*sum((data').^2)/(ncomps-1)^2; % NB: data is now activations -sm 7/05
+  meanvar = sum(winv.^2).*sum((data').^2)/((chans*frames)-1); % from Rey Ramirez 8/07
   %
   %%%%%%%%%%%%%% Sort components by mean variance %%%%%%%%%%%%%%%%%%%%%%%%
   %
