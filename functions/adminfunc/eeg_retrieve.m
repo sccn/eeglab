@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2006/01/31 20:51:11  arno
+% eeglab options
+%
 % Revision 1.16  2005/11/02 06:35:58  scott
 % added missing help info -sm
 %
@@ -109,7 +112,11 @@ end;
 
     if length(CURRENTSET) > 1 & option_storedisk
         [ EEG tmpcom ] = eeg_checkset(ALLEEG(CURRENTSET)); % do not load data if several datasets
-        [ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);
+        if length(CURRENTSET) ~= length(ALLEEG)
+            [ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);
+        else
+            ALLEEG = EEG;
+        end;
     else
         if CURRENTSET ~= 0
             [ EEG tmpcom ] = eeg_checkset(ALLEEG(CURRENTSET), 'loaddata');
