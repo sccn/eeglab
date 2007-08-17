@@ -1,25 +1,25 @@
-% compvar() - project selected components and compute the variance of
-%             the original signal they account for.
+% compvar()   - project selected components and compute the variance of
+%               the original data they account for.
 %
 % Usage:
-%   >> [proj, variance] = compvar( rawdata, ica_act, winv, components);
+%   >> [proj, variance] = compvar( data, wts_or_act, winv, components);
 %
-% Inputs:
-%   rawdata    - 2D(channels x points) or 3D(channels x frames x trials)
-%              data array.
-%   ica_act    - 2D(channels x points) or 3D(channels x frames x trials)
-%              ica activity array. It can also be a cell array with the
-%              sphere and the weight matrix { sphere weight } that will
-%              be used to recompute the ICA activity.
-%   winv       - inverse of (weights*sphere) matrices returned by the
-%              ica function. It represent the component distribution of
-%              activity across the electrodes.
-%   components - array of components to project.
+% Required Inputs:
+% data        - 2-D (channels, points) or 3-D (channels, frames, trials)
+%               data array.
+% wts_or_act  - {sphere weights} cell array containing the ICA sphere 
+%               and weights matrices. May also be a 2-D (channels, points) 
+%               or 3-D (channels, frames, trials) array of component 
+%               activations.
+% winv        - inverse or pseudo-inverse of the product of the weights
+%               and sphere matrices returned by the ICA decompnumsition,
+%               i.e., inv(weights*sphere) or pinv(weights*sphere).
+% components  - array of component indices to back-project
 %
 % Outputs:
-%   proj       - projection of the components
-%   variance   - variance of the original signal that the selected 
-%              components account for.
+%  proj       - summed back-projections of the specified components
+%  pvaf       - percent variance of the data that the selected 
+%               components account for (range: 100% to -Inf%).
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 
@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2007/08/07 01:33:57  arno
+% fix help message
+%
 % Revision 1.5  2003/10/09 22:35:49  arno
 % correcting sphere*weights
 %
@@ -61,49 +64,27 @@
 % 01-25-02 reformated help & license -ad 
 % 03-08-02 added the sphere and weight option -ad
 
-function [ compproj, varegg ] = compvar( sig, act, winv, compos);
+function [ compproj, varegg ] = compvar( data, act, winv, compnums);
 
 if nargin < 4
    help compvar;
    return;
 end;   
 
-sig = reshape(sig, size(sig,1), size(sig,2)*size(sig,3));
-squaresig  = sum(sum(sig.^2));
+data = reshape(data, size(data,1), size(data,2)*size(data,3));
+data = data - repmat(mean(data'),size(data,2)); % remove the data channel means (as does ICA)
+squaredata  = sum(sum(data.^2));                % compute the grand sum-squared data
 
-if ~iscell(act)
-    compproj   = winv(:,compos)*act(compos,:)-sig;
-else
-    weight = act{2};
+if iscell(act)
     sphere = act{1};
-    acttmp = (weight(compos,:)*sphere)*sig;
-    compproj   = winv(:,compos)*acttmp-sig;
+    weight = act{2};
+    act = (weight(compnums,:)*sphere)*data;
 end;
 
-squarecomp = sum(sum(compproj.^2));
-varegg     = 1- squarecomp/squaresig;
-compproj   = compproj+sig;
-
-%meaneeg( s ) = mean(sum(compproj.*compproj))/(size(compproj,1)-1);
+compproj   = winv(:,compnums)*act-data;      % difference between data and back-projection
+squarecomp = sum(sum(compproj.^2));          % the summed-square difference
+varegg     = 100*(1- squarecomp/squaredata); % compute pvaf of components in data
+compproj   = compproj+data;                  % restore back-projected data
 
 return;
 
-% old version
-% -----------
-for s = compos
-    % compute projection
-    % ------------------
-    fprintf('%d ',s);         % construct single-component data matrix
-
-    %compproj = (winv(:,s)*act(s,:))./sig(:,:);
-    %[I] = find(compproj > 0);
-    %meaneeg( s ) = mean(mean(compproj(I)));
-
-    compproj = winv(:,s)*act(s,:)-sig(:,:);
-	squarecomp = sum(compproj.*compproj);
- 	squaresig  = sum(sig(:,:).*sig(:,:));
-    varegg( s ) = squarecomp / squaresig;
-
-    %meaneeg( s ) = mean(sum(compproj.*compproj))/(size(compproj,1)-1);
-end;
-fprintf('\n');
