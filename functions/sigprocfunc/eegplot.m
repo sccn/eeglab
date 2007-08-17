@@ -165,6 +165,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.121  2007/08/02 22:56:15  arno
+% smae
+%
 % Revision 1.120  2007/08/02 22:54:41  arno
 % movebutton optional input
 %
@@ -1164,35 +1167,37 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
       'Callback','eegplot(''loadelect'');')
   
   % Zooms %%%%%%%%
-  zm = uimenu('Parent',m(2),'Label','Zoom off/on');
-  commandzoom = [ 'set(gcbf, ''windowbuttondownfcn'', [ ''zoom(gcbf,''''down''''); eegplot(''''zoom'''', gcbf, 1);'' ]);' ...
-                  'tmpg = get(gcbf, ''userdata'');' ...
-                  'set(gcbf, ''windowbuttonmotionfcn'', tmpg.commandselect{2}); clear tmpg tmpstr;'];
-    
-  %uimenu('Parent',zm,'Label','Zoom time', 'callback', ...
-  %             [ 'zoom(gcbf, ''xon'');' commandzoom ]);
-  %uimenu('Parent',zm,'Label','Zoom channels', 'callback', ...
-  %             [ 'zoom(gcbf, ''yon'');' commandzoom ]);
-  uimenu('Parent',zm,'Label','Zoom on', 'callback', ...
-               [ 'zoom(gcbf, ''on'');' commandzoom ]);
-  uimenu('Parent',zm,'Label','Zoom off', 'separator', 'on', 'callback', ...
-     ['zoom(gcbf, ''off''); tmpg = get(gcbf, ''userdata'');' ...
-     'set(gcbf, ''windowbuttondownfcn'', tmpg.commandselect{1});' ...
-     'set(gcbf, ''windowbuttonmotionfcn'', tmpg.commandselect{2});' ...
-     'set(gcbf, ''windowbuttonupfcn'', tmpg.commandselect{3});' ...
-     'clear tmpg;' ]);
-  uimenu('Parent',figh,'Label', 'Help', 'callback', 'pophelp(''eegplot'');');
-
+  v = version;
+  if v(1) > '6'
+      zm = uimenu('Parent',m(2),'Label','Zoom off/on');
+      uimenu('Parent',zm,'Label','Zoom on', 'callback', ...
+             ['tmpg = get(gcbf, ''userdata'');' ...
+              'set(tmpg.zoom, ''enable'', ''on'');' ...
+              'clear tmpg;' ]);
+      uimenu('Parent',zm,'Label','Zoom off', 'separator', 'on', 'callback', ...
+             ['tmpg = get(gcbf, ''userdata'');' ...
+              'set(tmpg.zoom, ''enable'', ''off'');' ...
+              'set(gcbf, ''windowbuttondownfcn'', tmpg.commandselect{1});' ...
+              'set(gcbf, ''windowbuttonmotionfcn'', tmpg.commandselect{2});' ...
+              'set(gcbf, ''windowbuttonupfcn'', tmpg.commandselect{3});' ...
+              'clear tmpg;' ]);
+      uimenu('Parent',figh,'Label', 'Help', 'callback', 'pophelp(''eegplot'');');
+      g.zoom = zoom;
+      set(g.zoom, 'ActionPostCallback', 'eegplot(''zoom'', gcbf, 1);'); 
+  else
+      disp('No zoom menu for Matlab version 6 (upgrade to version 7)');
+  end;
+      
   % Events %%%%%%%%
   zm = uimenu('Parent',m(2),'Label','Events');
   complotevent = [ 'tmpg = get(gcbf, ''userdata'');' ...
-                  'tmpg.plotevent = ''on'';' ...                  
-                  'set(gcbf, ''userdata'', tmpg); clear tmpg; eegplot(''drawp'', 0);'];
+                   'tmpg.plotevent = ''on'';' ...                  
+                   'set(gcbf, ''userdata'', tmpg); clear tmpg; eegplot(''drawp'', 0);'];
   comnoevent   = [ 'tmpg = get(gcbf, ''userdata'');' ...
-                  'tmpg.plotevent = ''off'';' ...                  
-                  'set(gcbf, ''userdata'', tmpg); clear tmpg; eegplot(''drawp'', 0);'];
+                   'tmpg.plotevent = ''off'';' ...                  
+                   'set(gcbf, ''userdata'', tmpg); clear tmpg; eegplot(''drawp'', 0);'];
   comeventleg  = [ 'eegplot(''drawlegend'', gcbf);'];
-    
+  
   uimenu('Parent',zm,'Label','Events on'    , 'callback', complotevent, 'enable', fastif(isempty(g.events), 'off', 'on'));
   uimenu('Parent',zm,'Label','Events off'   , 'callback', comnoevent  , 'enable', fastif(isempty(g.events), 'off', 'on'));
   uimenu('Parent',zm,'Label','Events'' legend', 'callback', comeventleg , 'enable', fastif(isempty(g.events), 'off', 'on'));
@@ -1332,7 +1337,6 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
           'eegplot(''drawp'', 0);' ...
           'clear alltrialtag g tmptmp ax1 I1 I2 trialtag hhdat hh;'];
   
-
   set(figh, 'windowbuttondownfcn', commandpush);
   set(figh, 'windowbuttonmotionfcn', commandmove);
   set(figh, 'windowbuttonupfcn', commandrelease);
@@ -1961,7 +1965,7 @@ else
 	  obj = findobj(fig, 'tag', 'Evaluename');delete(obj);
 	  obj = findobj(fig, 'type', 'uimenu');delete(obj);
  
-   case 'zoom' % if zoom
+   case 'zoom' % if zoom, adjust plotting limits and parameters
       fig = varargin{1};
       ax1 = findobj('tag','eegaxis','parent',fig); 
       ax2 = findobj('tag','backeeg','parent',fig); 
@@ -1995,15 +1999,6 @@ else
       set(fig,'UserData', g);
       eegplot('updateslider', fig);
       eegplot('drawp', 0);
-      eegplot('scaleeye', [], fig);
-
-      % reactivate zoom if 3 arguments
-      % ------------------------------
-      if exist('p2') == 1
-          zoom on;
-          set(gcbf, 'windowbuttondownfcn', [ 'zoom(gcbf,''down''); eegplot(''zoom'', gcbf, 1);' ]);
-          set(gcbf, 'windowbuttonmotionfcn', g.commandselect{2});
-      end;
 
 	case 'updateslider' % if zoom
       fig = varargin{1};
