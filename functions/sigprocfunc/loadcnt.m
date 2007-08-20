@@ -54,6 +54,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2007/08/20 22:02:44  arno
+% convert to single
+%
 % Revision 1.21  2005/08/16 22:46:55  arno
 % allowing to read event type 3
 %
@@ -379,6 +382,7 @@ if type == 'cnt'
       fseek(fid, startpos, 0);
 	  if h.channeloffset <= 1
       	  dat=fread(fid, [h.nchannels r.ldnsamples], r.dataformat);
+          v = version;
           if v(1) > '6'
               dat = single(dat);
           else
