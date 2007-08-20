@@ -54,6 +54,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2005/08/16 22:46:55  arno
+% allowing to read event type 3
+%
 % Revision 1.20  2005/05/12 15:50:37  arno
 % keypad modified by Andreas
 %
@@ -376,10 +379,20 @@ if type == 'cnt'
       fseek(fid, startpos, 0);
 	  if h.channeloffset <= 1
       	  dat=fread(fid, [h.nchannels r.ldnsamples], r.dataformat);
+          if v(1) > '6'
+              dat = single(dat);
+          else
+              dat = double(dat);
+          end;
  	  else
           h.channeloffset = h.channeloffset/2;
           % reading data in blocks
-     	  dat = zeros( h.nchannels, r.ldnsamples);
+          v = version;
+          if v(1) > '6'
+              dat = zeros( h.nchannels, r.ldnsamples, 'single');
+          else
+              dat = zeros( h.nchannels, r.ldnsamples);
+          end;
       	  dat(:, 1:h.channeloffset) = fread(fid, [h.channeloffset h.nchannels], r.dataformat)';
 
 		  counter = 1;	
