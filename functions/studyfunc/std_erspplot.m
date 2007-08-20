@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.57  2007/08/14 02:51:30  arno
+% fix statistics for several components
+%
 % Revision 1.56  2007/08/14 02:47:16  allen
 % fix statistics for more than one component
 %
@@ -252,8 +255,8 @@ end;
 % read data from disk
 % -------------------
 if ~isempty(opt.channels)
-     [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'channels', opt.channels, 'infotype', opt.datatype, 'statmode', opt.statmode);
-else [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'clusters', opt.clusters, 'infotype', opt.datatype, 'statmode', opt.statmode);
+     [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'channels', opt.channels, 'infotype', opt.datatype, 'statmode', opt.statmode, 'subbaseline', opt.subbaseline);
+else [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'clusters', opt.clusters, 'infotype', opt.datatype, 'statmode', opt.statmode, 'subbaseline', opt.subbaseline);
 end;
 opt.legend = 'off';
 
