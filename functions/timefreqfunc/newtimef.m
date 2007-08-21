@@ -75,7 +75,7 @@
 %                     specific times (Note: algorithm finds the closest time
 %                     point in data; this could give a slightly unevenly spaced
 %                     time array                                    {default: 200}
-%       'padratio'  = FFT-length/winframes (2^k)                    {default: 1}
+%       'padratio'  = FFT-length/winframes (2^k)                    {default: 2}
 %                     Multiplies the number of output frequencies by dividing
 %                     their spacing (standard FFT padding). When cycles~=0,
 %                     frequency spacing is divided by padratio.
@@ -277,6 +277,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.137  2007/08/21 01:22:34  arno
+% changed default padratio to 1
+%
 % Revision 1.136  2007/08/12 04:34:27  arno
 % wavelet method help and code
 %
@@ -906,7 +909,7 @@ DEFAULT_VARWIN	= 0;		% Fixed window length or fixed number of cycles.
 %     Bounded above by winsize, which determines
 %     the min. freq. to be computed.
 
-DEFAULT_OVERSMP	= 1;		% Number of times to oversample frequencies
+DEFAULT_OVERSMP	= 2;		% Number of times to oversample frequencies
 DEFAULT_MAXFREQ = 50;		% Maximum frequency to display (Hz)
 DEFAULT_TITLE	= '';		% Figure title (no default)
 DEFAULT_ELOC    = 'chan.locs';	% Channel location file
