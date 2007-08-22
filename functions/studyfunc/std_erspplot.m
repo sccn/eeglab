@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.58  2007/08/20 18:49:58  arno
+% subtracting common baseline
+%
 % Revision 1.57  2007/08/14 02:51:30  arno
 % fix statistics for several components
 %
@@ -198,19 +201,7 @@ end;
 
 STUDY = pop_erspparams(STUDY, 'default');
 
-opt = finputcheck( varargin, { 'topofreq'    'real'    [] STUDY.etc.erspparams.topofreq;
-                               'topotime'    'real'    [] STUDY.etc.erspparams.topotime;
-                               'freqrange'   'real'    [] STUDY.etc.erspparams.freqrange;
-                               'timerange'   'real'    [] STUDY.etc.erspparams.timerange;
-                               'ersplim'     'real'    [] STUDY.etc.erspparams.ersplim;
-                               'itclim'      'real'    [] STUDY.etc.erspparams.itclim;
-                               'subbaseline' 'string'  [] STUDY.etc.erspparams.subbaseline;
-                               'maskdata'    'string'  [] STUDY.etc.erspparams.maskdata;
-                               'statistics'  'string'  [] STUDY.etc.erspparams.statistics;
-                               'groupstats'  'string'  [] STUDY.etc.erspparams.groupstats;
-                               'condstats'   'string'  [] STUDY.etc.erspparams.condstats;
-                               'threshold'   'real'    [] STUDY.etc.erspparams.threshold;
-                               'naccu'       'integer' [] STUDY.etc.erspparams.naccu;
+[ opt moreparams ] = finputcheck( varargin, { ...
                                'channels'    'cell'    []              {};
                                'caxis'       'real'    []              [];
                                'clusters'    'integer' []              [];
@@ -220,13 +211,24 @@ opt = finputcheck( varargin, { 'topofreq'    'real'    [] STUDY.etc.erspparams.t
                                'comps'       {'integer','string'}  []              []; % for backward compatibility
                                'plotsubjects' 'string' { 'on' 'off' }  'off';
                                'plotmode'    'string' { 'normal' 'condensed' }  'normal';
-                               'subject'     'string'  []              '';
-                               'statmode'    'string'  { 'subjects' 'common' 'trials' } STUDY.etc.erspparams.statmode}, 'std_erspstatplot');
+                               'subject'     'string'  []              '' }, ...
+                                  'std_erspstatplot', 'ignore');
 if isstr(opt), error(opt); end;
+if length(moreparams) > 1
+    STUDY = pop_erspparams( STUDY, moreparams{:});
+end;
 
+% fuse structures
+% ---------------
+opt1 = struct2cell(opt);
+opt2 = struct2cell(STUDY.etc.erspparams);
+f1   = fieldnames(opt);
+f2   = fieldnames(STUDY.etc.erspparams);
+opt = cell2struct({ opt1{:}, opt2{:} }, {f1{:} f2{:} }, 2);
+                                
 % for backward compatibility
 % --------------------------
-if ~isnan(opt.topotime),
+if ~isnan(STUDY.etc.erspparams.topotime),
      opt.plottf = [ opt.topofreq opt.topotime ];
 else opt.plottf = [];
 end;
