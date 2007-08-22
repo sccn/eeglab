@@ -63,6 +63,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2007/08/08 17:46:23  arno
+% reverting version 1.29
+%
 % Revision 1.32  2007/08/08 17:44:26  nima
 % _
 %
@@ -184,7 +187,6 @@ function [g, varargnew] = finputcheck( vararg, fieldlist, callfunc, mode )
 	% create structure
 	% ----------------
 	if ~isempty(vararg)
-        vararg = removedup(vararg);
 		for index=1:length(vararg)
 			if iscell(vararg{index})
 				vararg{index} = {vararg{index}};
@@ -193,7 +195,12 @@ function [g, varargnew] = finputcheck( vararg, fieldlist, callfunc, mode )
 		try
 			g = struct(vararg{:});
 		catch
-			g = [ callfunc 'error: bad ''key'', ''val'' sequence' ]; return;
+            vararg = removedup(vararg);
+            try,
+                g = struct(vararg{:});
+            catch
+                g = [ callfunc 'error: bad ''key'', ''val'' sequence' ]; return;
+            end;
 		end;
 	else 
 		g = [];
