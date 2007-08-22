@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.55  2007/08/22 01:25:57  arno
+% bettter check for the study
+%
 % Revision 1.54  2007/08/13 21:23:51  arno
 % nothing
 %
@@ -311,9 +314,9 @@ if isempty(STUDY.changrp)
   modif = 1;
 elseif isfield(STUDY.changrp, 'allinds')
     try,
-        if ~isempty(STUDY.changrp.allinds)
-            if any(STUDY.changrp.allinds{1} < 0)
-                STUDY.changrp = [];
+        if ~isempty(STUDY.changrp(1).allinds)
+            if any(STUDY.changrp(1).allinds{1} < 0)
+                STUDY = std_changroup(STUDY, ALLEEG);
             end;
         end;
     catch, end;
