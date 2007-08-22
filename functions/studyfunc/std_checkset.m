@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.54  2007/08/13 21:23:51  arno
+% nothing
+%
 % Revision 1.53  2007/08/13 18:32:46  arno
 % removing channel group if old version
 %
@@ -305,7 +308,15 @@ end;
 if ~isfield(STUDY, 'changrp'), STUDY.changrp = []; modif = 1; end;
 if isempty(STUDY.changrp)
   STUDY = std_changroup(STUDY, ALLEEG);
-  modif = 1; 
+  modif = 1;
+elseif isfield(STUDY.changrp, 'allinds')
+    try,
+        if ~isempty(STUDY.changrp.allinds)
+            if any(STUDY.changrp.allinds{1} < 0)
+                STUDY.changrp = [];
+            end;
+        end;
+    catch, end;
 end;
 
 % determine if there has been any change
