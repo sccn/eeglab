@@ -20,6 +20,8 @@
 
 function f=loglike(W, S);
 
+    W = double(W);
+    S = double(S);
     % normalize activities
     stds = std(S, [], 2);
     S = S./repmat(stds, [1 size(S,2)]);
