@@ -19,6 +19,11 @@
 % Author: Arnaud Delorme and Jorn Anemuller
 
 function f=loglike(W, S);
+
+    % normalize activities
+    stds = std(S, [], 2);
+    S = S./repmat(stds, [1 size(S,2)]);
+    W = W./repmat(stds, [1 size(W,2)]);
     
     M = size(W,1);
     if ndims(S) == 3
