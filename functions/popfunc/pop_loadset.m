@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.55  2007/06/21 00:21:45  allen
+% commented out try catch loop; should output errors to matlab command line instead and these should be more specific. bug #423
+%
 % Revision 1.54  2007/04/06 17:48:02  arno
 % saved to no
 %
@@ -240,6 +243,7 @@ end;
 g = finputcheck( options, ...
                  { 'filename'   'string' []   '';
                    'filepath'   'string' []   '';
+                   'check'      'string' { 'on' 'off' }   'on';
                    'loadmode'   { 'string' 'integer' } { { 'info' 'all' } [] }  'all';
                    'eeg'        'struct' []   struct('data',{}) }, 'pop_loadset');
 if isstr(g), error(g); end;
@@ -332,7 +336,9 @@ end;
 
 % load all data or specific data channel
 % --------------------------------------
-EEG = eeg_checkset(EEG);
+if strcmpi(g.check, 'on')
+    EEG = eeg_checkset(EEG);
+end;
 if isstr(g.loadmode)
     if strcmpi(g.loadmode, 'all')
         EEG = eeg_checkset(EEG, 'loaddata');
