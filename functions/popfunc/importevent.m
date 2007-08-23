@@ -22,6 +22,7 @@
 %               optionally followed by a description. Ex: { 'type', 'latency' }
 %  'skipline' - [Interger] Number of header rows to skip in the text file 
 %  'timeunit' - [ latency unit rel. to seconds ]. Default unit is 1 = seconds. 
+%               NaN indicates that the latencies are given in time points.
 %  'delim'    - [string] String of delimiting characters in the input file. 
 %               Default is tab|space.
 %
@@ -78,6 +79,9 @@
 
 %% REVISION HISTORY
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2007/08/07 20:58:11  arno
+% remove warning for Matlab 7.4
+%
 % Revision 1.14  2007/04/26 23:08:10  arno
 % event array format
 %
@@ -118,7 +122,7 @@ g = finputcheck( varargin, { 'fields'    'cell'     []         {};
                          'skipline'  'integer'  [0 Inf]    0;
                          'indices'   'integer'  [1 Inf]    [];
                          'append'    'string'   {'yes' 'no' '''yes''' '''no''' }         'yes';
-                         'timeunit'  'real'     [0 Inf]    1;
+                         'timeunit'  'real'     []         1;
                          'event'     { 'cell' 'real' 'string' }     []    [];
                          'align'     'integer'  []         NaN;
                          'optimalign' 'string'  { 'on' 'off' }         'on';
@@ -184,11 +188,13 @@ for curfield = tmpfields'
                       event = eeg_eventformat(event, 'struct', allfields);
 					  % generate ori fields
 					  % -------------------
-					  for index = 1:length(event)
-						  event(index).init_index = index;
-						  event(index).init_time  = event(index).latency*g.timeunit;
-					  end;
-					  event = recomputelatency( event, 1:length(event), srate, ...
+                      if ~isnan(timeunit)
+                          for index = 1:length(event)
+                              event(index).init_index = index;
+                              event(index).init_time  = event(index).latency*g.timeunit;
+                          end;
+                      end;
+                      event = recomputelatency( event, 1:length(event), srate, ...
                                                     g.timeunit, g.align, g.oldevents, g.optimalign);
                 case { '''yes''' 'yes' }
                       % match existing fields
@@ -271,10 +277,12 @@ function event = recomputelatency( event, indices, srate, timeunit, align, oldev
         end;
         return; 
     end;
-    for index = indices
-        event(index).latency  = event(index).latency*srate*timeunit;
-        if isfield(event, 'duration')
-            event(index).duration = event(index).duration*srate*timeunit;
+    if ~isnan(timeunit)
+        for index = indices
+            event(index).latency  = event(index).latency*srate*timeunit;
+            if isfield(event, 'duration')
+                event(index).duration = event(index).duration*srate*timeunit;
+            end;
         end;
     end;
 
