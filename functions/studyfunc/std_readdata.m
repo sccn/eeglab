@@ -84,6 +84,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2007/08/13 18:01:36  arno
+% remove all reference to chaninds
+%
 % Revision 1.31  2007/08/08 00:31:17  nima
 % the help was incorrect, now we have to explicitly specify the key values, so 'clusters',3, 'infotype','erp'
 %
@@ -208,8 +211,8 @@ elseif strcmpi(opt.infotype, 'ersp') | strcmpi(opt.infotype, 'itc')
     if strcmpi(opt.subbaseline, 'on'),      opt.subbaseline = STUDY.etc.erspparams.subbaseline; end;
 end;
 
-nc = length(STUDY.condition);
-ng = length(STUDY.group);
+nc = max(length(STUDY.condition),1);
+ng = max(length(STUDY.group),1);
 zero = single(0);
 tmpver = version;
 if tmpver(1) == '6' | tmpver(1) == '5'
@@ -257,8 +260,6 @@ for ind = 1:length(finalinds)
          
          % get indices for all groups and conditions
          % -----------------------------------------
-         nc = max(length(STUDY.condition),1);
-         ng = max(length(STUDY.group),1);
          allinds = cell( nc, ng );
          setinds = cell( nc, ng );
          for indtmp = 1:length(alldatasets)
@@ -304,6 +305,7 @@ for ind = 1:length(finalinds)
 
                 % read the data and select channels
                 % ---------------------------------
+                dsfdsdsfa
                 fprintf('Reading ERP data:');
                 for c = 1:nc
                     for g = 1:ng
