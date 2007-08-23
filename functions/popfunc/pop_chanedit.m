@@ -147,6 +147,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.169  2007/08/23 19:25:40  arno
+% debug if no argument
+%
 % Revision 1.168  2007/08/16 19:02:23  arno
 % different template_models format
 %
@@ -1010,12 +1013,16 @@ if nargin < 3
 			ingui = 0;
             [tmpchans tmpfid] = getfid(chans);
 			if nbchan ~= 0 & nbchan ~= length(tmpchans)
-				if ~popask(strvcat(['The number of data channel (' int2str(length(tmpchans)) ') not including fiducials does not'], ...
-								  ['correspond to the initial number of channel (' int2str(nbchan) '), so for consistency purposes'], ...
-								  'new channel information will be ignored if this function was called from EEGLAB'))
-					ingui = 1;
-				end;
-			end;	
+                % remove additional reference if necessary
+                [tmpchans ref] = getref(tmpchans);
+                if nbchan ~= 0 & nbchan ~= length(tmpchans)
+                    if ~popask(strvcat(['The number of data channel (' int2str(length(tmpchans)) ') not including fiducials does not'], ...
+                                       ['correspond to the initial number of channel (' int2str(nbchan) '), so for consistency purposes'], ...
+                                       'new channel information will be ignored if this function was called from EEGLAB'))
+                        ingui = 1;
+                    end;
+                end;	
+            end;
 		else 
 			guimodif = 1;
 		end;
@@ -1404,6 +1411,8 @@ if isfield(chans, 'sph_theta_besa'), chans = rmfield(chans, 'sph_theta_besa'); e
 % move no data channels to info structure
 % ---------------------------------------
 [chans params.nodatchans] = getfid(chans);
+[chans ref]               = getref(chans);
+params.nodatchans = [ params.nodatchans ref ];
 if isempty(params.nodatchans), params = rmfield(params, 'nodatchans'); end;
 
 if dataset_input, 
@@ -1488,7 +1497,7 @@ function [chans, fids] = getfid(chans)
             if isnumeric(alltypes{indnoempty(1)})
                 %inds = [ find([alltypes{indnoempty}] > 98) ];
                 for index = 1:length(chans)
-                    if chans(index).type > 98, chans(index).type = 'fid'; end;
+                    if chans(index).type > 98, chans(index).type = 'fid'; end; % neuroscan
                     chans(index).type = num2str(chans(index).type);
                 end;
             end;
@@ -1498,7 +1507,20 @@ function [chans, fids] = getfid(chans)
             chans(indnoempty(inds)) = [];
         end;
     end;
-        
+
+function [chans, refs] = getref(chans)
+    fids = [];
+    if isfield(chans, 'type')
+        alltypes          = { chans.type };
+        indnoempty        = find(~cellfun('isempty', alltypes));
+        if ~isempty(indnoempty)
+            alltypes          = { chans.type };
+            inds = strmatch( 'ref', lower(alltypes(indnoempty)) );
+            refs = chans(indnoempty(inds));
+            chans(indnoempty(inds)) = [];
+        end;
+    end;
+    
 function [chans, params] = insertchans(chans, params)
   if isfield(params, 'nodatchans')
     if ~isempty(params.nodatchans)
@@ -1507,8 +1529,8 @@ function [chans, params] = insertchans(chans, params)
         fields = fieldnames( params.nodatchans );
         ind = chanlen+index;
         for f = 1:length( fields )
-          chans = setfield(chans, { ind }, fields{f}, getfield( params.nodatchans, { index },  fields{f}));
-            end;
+            chans = setfield(chans, { ind }, fields{f}, getfield( params.nodatchans, { index },  fields{f}));
+        end;
       end;
       disp('Fiducial have been added at the end of the channel structure');
       params = rmfield(params, 'nodatchans');
