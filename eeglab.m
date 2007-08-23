@@ -132,6 +132,7 @@
 % pop_importepoch()    - import epoch info ASCII file
 % pop_importevent()    - import event info ASCII file
 % pop_importpres()     - import Presentation info file
+% pop_importev2()      - import Neuroscan ev2 file
 % pop_loadset()        - load dataset
 % pop_mergeset()       - merge two datasets
 % pop_rejepoch()       - reject pre-identified epochs in a EEG dataset
@@ -189,6 +190,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.514  2007/08/14 02:36:09  arno
+% fix auto rejection
+%
 % Revision 1.513  2007/08/10 18:05:09  arno
 % fix history for pop_autorej
 %
@@ -1948,6 +1952,7 @@ catchstrs.new_non_empty          = e_newset;
 	cb_importevent = [ check        '[EEG LASTCOM] = pop_importevent(EEG);'   e_store ];
 	cb_chanevent   = [ check        '[EEG LASTCOM]= pop_chanevent(EEG);'      e_store ]; 
 	cb_importpres  = [ check        '[EEG LASTCOM]= pop_importpres(EEG);'     e_store ]; 
+	cb_importev2   = [ check        '[EEG LASTCOM]= pop_importev2(EEG);'      e_store ]; 
 	cb_export      = [ check        'LASTCOM = pop_export(EEG);'              e_histdone ];
 	cb_expica1     = [ check        'LASTCOM = pop_expica(EEG, ''weights'');' e_histdone ]; 
 	cb_expica2     = [ check        'LASTCOM = pop_expica(EEG, ''inv'');'     e_histdone ]; 
@@ -2101,6 +2106,7 @@ catchstrs.new_non_empty          = e_newset;
 	uimenu( event_m, 'Label', 'From Matlab array or ASCII file'       , 'CallBack', cb_importevent);
 	uimenu( event_m, 'Label', 'From data channel'                     , 'CallBack', cb_chanevent); 
 	uimenu( event_m, 'Label', 'From Presentation .LOG file'           , 'CallBack', cb_importpres); 
+	uimenu( event_m, 'Label', 'From Neuroscan .ev2 file'              , 'CallBack', cb_importev2); 
 	uimenu( exportm, 'Label', 'Data and ICA activity to text file'    , 'CallBack', cb_export);
 	uimenu( exportm, 'Label', 'Weight matrix to text file'            , 'CallBack', cb_expica1); 
 	uimenu( exportm, 'Label', 'Inverse weight matrix to text file'    , 'CallBack', cb_expica2); 
