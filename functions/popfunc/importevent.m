@@ -79,6 +79,9 @@
 
 %% REVISION HISTORY
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2007/08/23 18:03:05  arno
+% NaN option for timeunit
+%
 % Revision 1.15  2007/08/07 20:58:11  arno
 % remove warning for Matlab 7.4
 %
@@ -188,7 +191,7 @@ for curfield = tmpfields'
                       event = eeg_eventformat(event, 'struct', allfields);
 					  % generate ori fields
 					  % -------------------
-                      if ~isnan(timeunit)
+                      if ~isnan(g.timeunit)
                           for index = 1:length(event)
                               event(index).init_index = index;
                               event(index).init_time  = event(index).latency*g.timeunit;
