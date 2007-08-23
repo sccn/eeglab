@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2007/08/23 18:48:01  arno
+% generate error if wrong alignment
+%
 % Revision 1.1  2007/08/23 18:43:14  arno
 % Initial revision
 %
@@ -65,7 +68,7 @@ fclose(fid);
 % load datas
 % ----------
 try, oldeventlats = [ EEG.event.latency ]; catch, end;
-EEG = pop_importevent(EEG, 'fields', { 'num' 'Type' 'Response' 'Acc' 'RT' 'latency'}, ...
+EEG = pop_importevent(EEG, 'fields', { 'num' 'type' 'response' 'acc' 'RT' 'latency'}, ...
                       'skipline', skipline, 'timeunit', NaN, 'align', NaN, 'append', 'no', 'event', filename );
 
 neweventlats = [ EEG.event.latency ];
