@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.56  2007/08/22 01:39:52  arno
+% fix special case of negative indices in STUDY
+%
 % Revision 1.55  2007/08/22 01:25:57  arno
 % bettter check for the study
 %
@@ -157,15 +160,21 @@ if ~isequal(STUDY.group,     group    ), STUDY.group     = group;     modif = 1;
 if ~isequal(STUDY.condition, condition), STUDY.condition = condition; modif = 1; end;  
 if ~isequal(STUDY.session,   session  ), STUDY.session   = session;   modif = 1; end;  
 
-% recompute setind matrix
-% -----------------------
+% recompute setind matrix and check that subjects with different group HAVE different sessions
+% --------------------------------------------------------------------------------------------
 notsameica = [];
+correctsession = 0;
 if ~isempty(STUDY.datasetinfo(1).index)
     for is = 1:length(STUDY.subject)
         alldats = strmatch(STUDY.subject{is}, { STUDY.datasetinfo.subject }, 'exact');
 
         for ig = 1:length(STUDY.group)
-            tmpind  = strmatch(STUDY.group{ig}, { STUDY.datasetinfo(alldats).group }, 'exact');
+            tmpind       = strmatch(STUDY.group{ig}, { STUDY.datasetinfo(alldats).group }, 'exact');
+            sessions     = [ STUDY.datasetinfo(alldats(tmpind)).session ];
+            if length(unique(session)) <= 0
+                correctsession = 1;
+            end;
+            
             tmpdats = alldats(tmpind);
             try nc = size(ALLEEG(STUDY.datasetinfo(tmpdats(1)).index).icaweights,1);
             catch nc = [];
@@ -177,6 +186,14 @@ if ~isempty(STUDY.datasetinfo(1).index)
             end;
         end;
     end;
+end;
+if correctsession
+    fprintf('Warning: different group values have the same session, session now assigned automatically\n');
+    for index = 1:length(STUDY.datasetinfo)
+        STUDY.datasetinfo(index).session = strmatch( STUDY.datasetinfo(index).group, STUDY.group, 'exact');
+    end;
+    STUDY.session = unique([STUDY.datasetinfo.session]);
+    modif = 1;
 end;
 if ~isempty(notsameica)
     disp('Different ICA decompositions have been found for the same')
