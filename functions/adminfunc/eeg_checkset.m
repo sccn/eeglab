@@ -150,6 +150,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.222  2007/08/23 17:47:19  arno
+% noting
+%
 % Revision 1.221  2007/08/23 17:23:36  arno
 % fix for studies with only one dataset
 %
@@ -1751,6 +1754,7 @@ for inddataset = 1:length(ALLEEG)
                     EEG.dipfit.mrifile     = template_models(1).mrifile;
                     EEG.dipfit.chanfile    = template_models(1).chanfile;
                     EEG.dipfit.coord_transform = [];
+                    EEG.saved = 'no';
                     res = com;
                 end;
             end;
