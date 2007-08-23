@@ -84,6 +84,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2007/08/23 01:58:38  arno
+% fix nc and ng
+%
 % Revision 1.32  2007/08/13 18:01:36  arno
 % remove all reference to chaninds
 %
@@ -305,7 +308,6 @@ for ind = 1:length(finalinds)
 
                 % read the data and select channels
                 % ---------------------------------
-                dsfdsdsfa
                 fprintf('Reading ERP data:');
                 for c = 1:nc
                     for g = 1:ng
