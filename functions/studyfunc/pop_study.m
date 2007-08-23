@@ -69,6 +69,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.55  2007/08/09 19:30:44  arno
+% *** empty log message ***
+%
 % Revision 1.54  2007/08/07 19:22:24  arno
 % help message
 %
@@ -433,15 +436,19 @@ elseif strcmpi(mode, 'gui') % GUI mode
     
     % check channel labels
     % --------------------
-    allchans = { ALLEEG.chanlocs };
-    if any(cellfun('isempty', allchans))
-        txt = strvcat('Some datasets do not have channel labels. Do you wish to generate', ...
-                'channel labels automatically for all datasets ("1" for channel 1,', ...
-                '"2" for channel 2, ...). Datasets will be overwritten on disk.', ...
-                'If you do not do it, most STUDY functions will not work.');
-        res = questdlg2(txt, 'Dataset format problem', ...
-                         'Yes', 'No, I will deal with it myself', 'Yes');
-        if strcmpi(res, 'yes'), options = { options{:} 'addchannellabels' 'on' 'savedat' 'on'}; end;
+    ALLEEG   = userdat2{1};
+    if isfield(ALLEEG, 'chanlocs')
+        allchans = { ALLEEG.chanlocs };
+        if any(cellfun('isempty', allchans))
+            txt = strvcat('Some datasets do not have channel labels. Do you wish to generate', ...
+                          'channel labels automatically for all datasets ("1" for channel 1,', ...
+                          '"2" for channel 2, ...). Datasets will be overwritten on disk.', ...
+                          'If you abort, the STUDY will not be created.');
+            res = questdlg2(txt, 'Dataset format problem', 'Yes', 'No, abort', 'Yes');
+            if strcmpi(res, 'yes'), options = { options{:} 'addchannellabels' 'on' 'savedat' 'on'}; 
+            else return;
+            end;
+        end;
     end;
     
     % run command and create history
