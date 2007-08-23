@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.59  2007/08/23 17:15:24  arno
+% better testing for correcting session
+%
 % Revision 1.58  2007/08/23 00:52:34  arno
 % delete STUDY.cluster and changrp
 %
@@ -194,7 +197,6 @@ if ~isempty(STUDY.datasetinfo(1).index)
     end;
 end;
 if correctsession
-    dsfafdsadsf
     fprintf('Warning: different group values have the same session, session now assigned automatically\n');
     for index = 1:length(STUDY.datasetinfo)
         STUDY.datasetinfo(index).session = strmatch( STUDY.datasetinfo(index).group, STUDY.group, 'exact');
