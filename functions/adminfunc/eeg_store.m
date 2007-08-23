@@ -53,6 +53,9 @@
 % uses the global variable EEG ALLEEG CURRENTSET 
 
 % $Log: not supported by cvs2svn $
+% Revision 1.49  2007/08/23 00:05:59  arno
+% no check for study loading
+%
 % Revision 1.48  2007/02/05 16:18:15  arno
 % handling more than 200 datasets
 %
@@ -249,6 +252,8 @@ end;
 
 if isempty(varargin) % no text output and no check (study loading)
     [ EEG com ]  = eeg_checkset(EEG);
+else
+    com = '';
 end;
 if nargin > 2, 
     if storeSetIndex == 0
