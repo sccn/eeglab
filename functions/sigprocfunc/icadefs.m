@@ -26,6 +26,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.49  2007/08/23 19:18:35  nima
+% DIPOLEDENSITY_STDBEM variables added to locate mni mesh
+%
 % Revision 1.48  2007/08/13 16:14:07  arno
 % new ICA bin
 %
@@ -202,7 +205,7 @@ DEFAULT_SRATE = 256.0175;   % default local sampling rate
 DEFAULT_TIMLIM = [-1000 2000]; % default local epoch limits (ms)
 
 % Set DipoleDensity path
-DIPOLEDENSITY_STDBEM = '/data/common/matlab/eeglab/plugins/dipfit2.2/standard_BEM/standard_vol.mat'
+DIPOLEDENSITY_STDBEM = '/data/common/matlab/eeglab/plugins/dipfit2.2/standard_BEM/standard_vol.mat';
 
 
 % Set EEGLAB figure and GUI colors
