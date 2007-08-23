@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.58  2007/08/23 00:52:34  arno
+% delete STUDY.cluster and changrp
+%
 % Revision 1.57  2007/08/23 00:43:50  arno
 % checking that different group have different session names
 %
@@ -174,7 +177,7 @@ if ~isempty(STUDY.datasetinfo(1).index)
         for ig = 1:length(STUDY.group)
             tmpind       = strmatch(STUDY.group{ig}, { STUDY.datasetinfo(alldats).group }, 'exact');
             sessions     = [ STUDY.datasetinfo(alldats(tmpind)).session ];
-            if length(unique(session)) <= 0
+            if length(unique(sessions)) < length(STUDY.group) & length(STUDY.group) > 1
                 correctsession = 1;
             end;
             
@@ -191,6 +194,7 @@ if ~isempty(STUDY.datasetinfo(1).index)
     end;
 end;
 if correctsession
+    dsfafdsadsf
     fprintf('Warning: different group values have the same session, session now assigned automatically\n');
     for index = 1:length(STUDY.datasetinfo)
         STUDY.datasetinfo(index).session = strmatch( STUDY.datasetinfo(index).group, STUDY.group, 'exact');
