@@ -53,6 +53,9 @@
 % uses the global variable EEG ALLEEG CURRENTSET 
 
 % $Log: not supported by cvs2svn $
+% Revision 1.48  2007/02/05 16:18:15  arno
+% handling more than 200 datasets
+%
 % Revision 1.47  2006/10/02 11:31:32  arno
 % Matlab 6.1 compatibility
 %
@@ -244,7 +247,9 @@ if nargin < 3
     end;
 end;
 
-[ EEG com ]  = eeg_checkset(EEG);
+if isempty(varargin) % no text output and no check (study loading)
+    [ EEG com ]  = eeg_checkset(EEG);
+end;
 if nargin > 2, 
     if storeSetIndex == 0
         EEG.saved = 'yes'; % just loaded
@@ -275,7 +280,7 @@ if findindex
 			storeSetIndex = i; i = 2000;
 		end;
    end;
-   if isempty(varargin)
+   if isempty(varargin) % no text output and no check
        fprintf('Creating a new ALLEEG dataset %d\n', storeSetIndex);
    end;
 else
