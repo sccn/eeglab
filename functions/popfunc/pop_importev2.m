@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2007/08/23 18:43:14  arno
+% Initial revision
+%
 
 function [EEG, command] = pop_importev2(EEG, filename); 
 command = '';
@@ -61,8 +64,16 @@ fclose(fid);
 
 % load datas
 % ----------
+try, oldeventlats = [ EEG.event.latency ]; catch, end;
 EEG = pop_importevent(EEG, 'fields', { 'num' 'Type' 'Response' 'Acc' 'RT' 'latency'}, ...
                       'skipline', skipline, 'timeunit', NaN, 'align', NaN, 'append', 'no', 'event', filename );
+
+neweventlats = [ EEG.event.latency ];
+if ~exist('oldeventlats'), oldeventlats = neweventlats; end;
+len = min(min(length(oldeventlats), length(neweventlats)), 10);
+if mean(oldeventlats(1:len) - neweventlats(1:len)) > 1
+    error('Wrong alignment of ev2 file with data');
+end;
 
 command = sprintf('%s = pop_importev2(%s, %s);', inputname(1), inputname(1), filename); 
 
