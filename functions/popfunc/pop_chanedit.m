@@ -147,6 +147,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.168  2007/08/16 19:02:23  arno
+% different template_models format
+%
 % Revision 1.167  2007/08/15 19:26:13  arno
 % same
 %
@@ -650,12 +653,12 @@
 function [chansout, params, urchans, com] = pop_chanedit(chans, oriparams, varargin);
 
 urchans  = [];
-chansout = chans;
 com ='';
 if nargin < 1
    help pop_chanedit;
    return;
 end;
+chansout = chans;
 if nargin < 2
    oriparams = [];
 end;
