@@ -26,6 +26,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2007/08/16 19:46:25  arno
+% fix template coordinate assignment
+%
 % Revision 1.16  2007/08/16 18:59:29  arno
 % automatic recognition of models
 %
@@ -194,3 +197,5 @@ xgridstr     = sprintf('linspace(-%d,%d,11)', floor(meanradius), floor(meanradiu
 ygridstr     = sprintf('linspace(-%d,%d,11)', floor(meanradius), floor(meanradius));
 zgridstr     = sprintf('linspace(0,%d,6)', floor(meanradius));
 
+% Set DipoleDensity path
+DIPOLEDENSITY_STDBEM = '/data/common/matlab/eeglab/plugins/dipfit2.2/standard_BEM/standard_vol.mat';
