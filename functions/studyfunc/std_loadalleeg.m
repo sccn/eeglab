@@ -84,21 +84,21 @@ function ALLEEG = std_loadalleeg(varargin)
         [sub3 sub2] = fileparts(sub2);
         
         if exist(fullfile(char(paths{dset}), datasets{dset})) == 2
-            EEG = pop_loadset(datasets{dset}, char(paths{dset}), 'info');
+            EEG = pop_loadset('filename', datasets{dset}, 'filepath', char(paths{dset}), 'loadmode', 'info', 'check', 'off');
         elseif exist( fullfile(genpath, datasets{dset})) == 2    
             [tmpp tmpf ext] = fileparts(fullfile(genpath, datasets{dset}));
-            EEG = pop_loadset([tmpf ext], tmpp, 'info');
+            EEG = pop_loadset('filename', [tmpf ext], 'filepath',tmpp, 'loadmode', 'info', 'check', 'off');
             warnfold = 'on';
         elseif exist( fullfile(genpath, sub1, datasets{dset})) == 2    
             [tmpp tmpf ext] = fileparts(fullfile(genpath, sub1, datasets{dset}));
-            EEG = pop_loadset([tmpf ext], tmpp, 'info');
+            EEG = pop_loadset('filename', [tmpf ext], 'filepath',tmpp, 'loadmode', 'info', 'check', 'off');
             warnfold = 'on';
         elseif exist( fullfile(genpath, sub2, datasets{dset}))  == 2   
             [tmpp tmpf ext] = fileparts(fullfile(genpath, sub2, datasets{dset}));
-            EEG = pop_loadset([tmpf ext], tmpp, 'info');
+            EEG = pop_loadset('filename', [tmpf ext], 'filepath',tmpp, 'loadmode', 'info', 'check', 'off');
             warnfold = 'on';
         elseif exist(lower(fullfile(char(paths{dset}), datasets{dset}))) == 2   
-            EEG = pop_loadset(lower(datasets{dset}), lower(char(paths{dset})), 'info');
+            EEG = pop_loadset('filename', lower(datasets{dset}), 'filepath',lower(char(paths{dset})), 'loadmode', 'info', 'check', 'off');
         else
             error(sprintf('Dataset ''%s'' not found', fullfile(char(paths{dset}), datasets{dset})));
         end;
@@ -109,8 +109,10 @@ function ALLEEG = std_loadalleeg(varargin)
             EEG.data   = 'in set file';
             EEG.icaact = [];
         end;
+        
         [ALLEEG EEG] = eeg_store(ALLEEG, EEG, 0, 'notext');
     end
+    ALLEEG = eeg_checkset(ALLEEG);
 
     if strcmpi(warnfold, 'on') & ~strcmpi(pwd, genpath)
         disp('Changing current path to STUDY path...');
