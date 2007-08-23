@@ -190,6 +190,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.99  2007/08/15 22:28:10  arno
+% changing SFP not to skip any lines
+%
 % Revision 1.98  2007/05/22 13:56:50  arno
 % type for custom sphbesa
 %
@@ -587,6 +590,16 @@ if isstr(filename)
        eloc = readneurolocs( filename );
        eloc = rmfield(eloc, 'sph_theta'); % for the conversion below
        eloc = rmfield(eloc, 'sph_theta_besa'); % for the conversion below
+       if isfield(eloc, 'type')
+           for index = 1:length(eloc)
+               type = eloc(index).type;
+               if type == 69,     eloc(index).type = 'EEG';
+               elseif type == 88, eloc(index).type = 'REF';
+               elseif type >= 76 & type <= 82, eloc(index).type = 'FID';
+               else eloc(index).type = num2str(eloc(index).type);
+               end;
+           end;
+       end;
    elseif strcmp(g.filetype, 'elc')
        eloc = readeetraklocs( filename );
        %eloc = read_asa_elc( filename ); % from fieldtrip
