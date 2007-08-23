@@ -150,6 +150,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.220  2007/08/17 19:40:45  arno
+% fix length problem
+%
 % Revision 1.219  2007/08/17 19:32:34  arno
 % spped up by a 100 for studies
 %
@@ -1216,7 +1219,7 @@ for inddataset = 1:length(ALLEEG)
                   catch, errordlg2(['Warning: minor problem encountered when generating' 10 ...
                                     'the EEG.epoch structure (used only in user scripts)']); return;
                   end;
-                 case { 'loaddata', 'savedata'},;
+                 case { 'loaddata' 'savedata' 'chanconsist' 'icaconsist' 'epochconsist' },;
                  otherwise, error('eeg_checkset: unknown option');
                 end;        
             end;
