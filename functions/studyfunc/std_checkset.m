@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.57  2007/08/23 00:43:50  arno
+% checking that different group have different session names
+%
 % Revision 1.56  2007/08/22 01:39:52  arno
 % fix special case of negative indices in STUDY
 %
@@ -193,6 +196,8 @@ if correctsession
         STUDY.datasetinfo(index).session = strmatch( STUDY.datasetinfo(index).group, STUDY.group, 'exact');
     end;
     STUDY.session = unique([STUDY.datasetinfo.session]);
+    STUDY.cluster = [];
+    STUDY.changrp = [];
     modif = 1;
 end;
 if ~isempty(notsameica)
