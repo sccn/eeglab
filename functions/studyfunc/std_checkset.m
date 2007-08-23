@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.60  2007/08/23 17:16:03  arno
+% remove debug message
+%
 % Revision 1.59  2007/08/23 17:15:24  arno
 % better testing for correcting session
 %
@@ -180,7 +183,7 @@ if ~isempty(STUDY.datasetinfo(1).index)
         for ig = 1:length(STUDY.group)
             tmpind       = strmatch(STUDY.group{ig}, { STUDY.datasetinfo(alldats).group }, 'exact');
             sessions     = [ STUDY.datasetinfo(alldats(tmpind)).session ];
-            if length(unique(sessions)) < length(STUDY.group) & length(STUDY.group) > 1
+            if length(unique(sessions)) < length(tmpind) & length(tmpind) > 1
                 correctsession = 1;
             end;
             
