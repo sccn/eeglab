@@ -1,4 +1,4 @@
- std_editset() - modify a STUDY set structure.
+% std_editset() - modify a STUDY set structure.
 %
 % Usage: 
 %             >> [STUDY, ALLEEG] = std_editset(STUDY, ALLEEG, key1, val1, ...);  
@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.50  2007/08/22 22:20:56  arno
+% recreate channel groups
+%
 % Revision 1.49  2007/08/12 02:23:09  arno
 % update indices properly
 %
