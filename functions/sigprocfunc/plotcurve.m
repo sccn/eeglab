@@ -127,7 +127,7 @@ function plotcurve( times, R, varargin);
            set(tmp, 'color', g.colors{mod(ind, length(g.colors))+1}); 
            
            % change the line style when number of plots exceed number of colors in g.colors
-           lineStyles = {'-', '--',':','?.'};
+           lineStyles = {'-', '--',':','-.'};
            set(tmp,'LineStyle',lineStyles{ceil(ind/length(g.colors))});
           
            hold on;
