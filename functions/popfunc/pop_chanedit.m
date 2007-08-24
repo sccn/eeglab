@@ -147,6 +147,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.170  2007/08/23 23:37:23  arno
+% handle reference
+%
 % Revision 1.169  2007/08/23 19:25:40  arno
 % debug if no argument
 %
@@ -1013,14 +1016,10 @@ if nargin < 3
 			ingui = 0;
             [tmpchans tmpfid] = getfid(chans);
 			if nbchan ~= 0 & nbchan ~= length(tmpchans)
-                % remove additional reference if necessary
-                [tmpchans ref] = getref(tmpchans);
-                if nbchan ~= 0 & nbchan ~= length(tmpchans)
-                    if ~popask(strvcat(['The number of data channel (' int2str(length(tmpchans)) ') not including fiducials does not'], ...
-                                       ['correspond to the initial number of channel (' int2str(nbchan) '), so for consistency purposes'], ...
-                                       'new channel information will be ignored if this function was called from EEGLAB'))
-                        ingui = 1;
-                    end;
+                if ~popask(strvcat(['The number of data channel (' int2str(length(tmpchans)) ') not including fiducials does not'], ...
+                                   ['correspond to the initial number of channel (' int2str(nbchan) '), so for consistency purposes'], ...
+                                   'new channel information will be ignored if this function was called from EEGLAB'))
+                    ingui = 1;
                 end;	
             end;
 		else 
@@ -1411,8 +1410,6 @@ if isfield(chans, 'sph_theta_besa'), chans = rmfield(chans, 'sph_theta_besa'); e
 % move no data channels to info structure
 % ---------------------------------------
 [chans params.nodatchans] = getfid(chans);
-[chans ref]               = getref(chans);
-params.nodatchans = [ params.nodatchans ref ];
 if isempty(params.nodatchans), params = rmfield(params, 'nodatchans'); end;
 
 if dataset_input, 
@@ -1502,9 +1499,13 @@ function [chans, fids] = getfid(chans)
                 end;
             end;
             alltypes          = { chans.type };
-            inds = strmatch( 'fid', lower(alltypes(indnoempty)) );
-            fids = chans(indnoempty(inds));
-            chans(indnoempty(inds)) = [];
+            inds = setdiff( 1:length(alltypes), strmatch( 'eeg', lower(alltypes(indnoempty)) ) );
+            if length(inds) ~= length(alltypes)
+                fids = chans(indnoempty(inds));
+                chans(indnoempty(inds)) = [];
+            else
+                disp('Warning: "EEG" channel type not found (channel may be "EEG", "REF", "FID", etc...)');
+            end;
         end;
     end;
 
