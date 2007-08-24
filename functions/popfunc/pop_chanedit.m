@@ -1,69 +1,66 @@
-% pop_chanedit() - Edit channel locations structure of an EEGLAB dataset,
-%                  EEG.chanlocs. For EEG channel location structure and file 
-%                  formats, see >> help readlocs  
+% pop_chanedit() - Edit the channel locations structure of an EEGLAB dataset,
+%                  EEG.chanlocs. For structure location and file formats, 
+%                  see >> help readlocs  
 %
-% Usage: >> newchans = pop_chanedit( EEG, 'key1', value1, ...
+% Usage:    >> newchans = pop_chanedit( EEG, 'key1', value1, ...
 %                        'key2', value2, ... ); % edit dataset containing chanlocs
-%        >> [ newchans options ] = pop_chanedit( chanlocs, 'key1', value1, ...
+%           >> [ newchans options ] = pop_chanedit( chanlocs, 'key1', value1, ...
 %                        'key2', value2, ... ); % edit separate chanlocs struct
 % Graphic interface:
 %   "Channel information ('field name')" - [edit boxes] display channel field 
-%                   contents for the current channel. Use 'transform' on the command
-%                   line to modify these fields.
+%                   contents for the current channel. Command line equivalent 
+%                   to modify these fields: 'transform'
 %   "Opt. 3D center" - [button] optimally re-center 3-D channel coordinates. Uses 
-%                 chancenter(). Command line equivalent is 'convert', { 'chancenter' 
+%                 chancenter(). Command line equivalent: 'convert', { 'chancenter' 
 %                 [xc yc zc] }, [xc yc zc] being the center of the sphere. Use [] 
-%                 to find the center such that electrode locations best match a sphere.
-%   "Rotate axis" - [button] force one electrode to one position and rotate other
-%                 electrodes accordingly. Command line equivalent is 'forcelocs'.
+%                 to find the center of the best fitting sphere.
+%   "Rotate axis" - [button] force one electrode to one position and rotate the other
+%                 electrodes accordingly. Command line equivalent: 'forcelocs'.
 %   "Transform axis" - [button] perform any operation on channel fields. Command
-%                 line equivalent is 'transform'.
+%                 line equivalent: 'transform'.
 %   "Xyz->polar & sph." - [button] convert 3-D cartesian coordinates to polar and
 %                 3-D spherical coordinates. This is useful when you edit the 
-%                 coordinates manually. Command line equivalent is 'convert', 
-%                 'cart2all'.
+%                 coordinates manually. Command line equivalent: 'convert', 'cart2all'.
 %   "Sph.->polar & xyz" - [button] convert 3-D spherical coordinates to polar and
-%                 3-D cartesian coordinates. Command line equivalent is 'convert', 
-%                 'sph2all'.
+%                 3-D cartesian coordinates. Command line equivalent: 'convert', 'sph2all'.
 %   "Polar->sph & xyz" - [button] convert 2-D polar coordinates to 3-D spherical and
-%                 3-D cartesian coordinates. Command line equivalent is 'convert', 
-%                 'topo2all'. Note that if spherical radii are absent, they are forced
-%                 to 1.
-%   "Set head radius" - [button] change head size radius. This is usefull
-%                 to make channel location compatible with a specified
-%                 spherical model. Command line option: 'headrad'.
+%                 3-D cartesian coordinates. Command line equivalent: 'convert', 'topo2all'. 
+%                 Note that if spherical radii are absent, they are forced to 1.
+%   "Set head radius" - [button] change head size radius. This is useful
+%                 to make channels location compatible with a specified spherical model. 
+%                 Command line equivalent: 'headrad'.
 %   "Set channel types" - [button] set channel type names for a range of data channels.
-%   "Shift data channels" - [button] shift data channel indices. Command
-%                 line equivalent: 'shiftdatachans'.
+%   "Shift data channels" - [button] shift data channel indices. 
+%                 Command line equivalent: 'shiftdatachans'.
 %   "Delete chan" - [button] delete channel. Command line equivalent: 'delete'.
-%   "Insert chan" - [button] insert channel before current channel. Command line 
-%                 equivalent: 'insert'.
+%   "Insert chan" - [button] insert channel before current channel. 
+%                 Command line equivalent: 'insert'.
 %   "<<" - [button] scroll channel backward by 10.
 %   "<" - [button] scroll channel backward by 1.
 %   ">" - [button] scroll channel forward by 1.
 %   ">>" - [button] scroll channel forward by 10.
 %   "Append chan" - [button] append channel after the current channel. 
 %                 Command line equivalent: 'append'.
-%   "Plot 2D" - [button] plot channel positions in 2-D using the topoplot() function.  
+%   "Plot 2D"     - [button] plot channel locations in 2-D using topoplot() 
 %   "Plot radius [value (0.2-1.0), []=auto)" - [edit box] default plotting radius
-%                 in 2-D polar views. This doe NOT affect channel locations and
+%                 in 2-D polar views. This does NOT affect channel locations; it 
 %                 is only used for visualization. This parameter is attached to the 
 %                 chanlocs structure and is then used in all 2-D scalp topoplots. 
 %                 Default -> to data limits. Command line equivalent: 'plotrad'.
-%   "Nose along +X" - [list] Indicate along which direction the nose should be. 
-%                 This information is used in functions like topoplot(), headplot() or 
-%                 dipplot(). Command line option: 'nosedir'.
-%   "Plot 3D" - [button] plot channel positions in 3-D using the plotchans3d() function.
-%   "Read locations" - [button] read location file using the readlocs() function. 
+%   "Nose along +X" - [list] Indicate the direction of the nose. This information 
+%                 is used in functions like topoplot(), headplot() and dipplot(). 
+%                 Command line equivalent: 'nosedir'.
+%   "Plot 3D"     - [button] plot channel positions in 3-D using plotchans3d() 
+%   "Read locations" - [button] read location file using readlocs() 
 %                 Command line equivalent: 'load'.
-%   "Read help" - [button] readlocs() function help.
-%   "Save .ced" - [button] save channel locations in ".ced" format which is the native
-%                 EEGLAB format. Command line equivalent: 'save'.
-%   "Save others" - [button] save channel locations in other formats using the 
-%                 pop_writelocs() function (see also readlocs() for channel formats).
-%   "Cancel" - [button] cancel all editing.
-%   "Help" - [button] this help message.
-%   "OK" - [button] save editing and propagate to parent.
+%   "Read help"   - [button] display readlocs() function help.
+%   "Save .ced"   - [button] save channel locations in native EEGLAB ".ced" format. 
+%                 Command line equivalent: 'save'.
+%   "Save others" - [button] save channel locations in other formats using 
+%                 pop_writelocs() (see readlocs() for available channel formats).
+%   "Cancel"      - [button] cancel all editing.
+%   "Help"        - [button] display this help message.
+%   "OK"          - [button] save edits and propagate to parent.
 % 
 % Inputs:
 %   EEG      - EEG dataset 
@@ -73,8 +70,8 @@
 %   'convert'     - {conversion_type [args]} Conversion type may be: 'cart2topo'
 %                   'sph2topo', 'topo2sph', 'sph2cart', 'cart2sph', or 'chancenter'. 
 %                   See help messages for these functions. Args are only relevant 
-%                   for 'chancenter'. See also graphical interface button for more
-%                   info.
+%                   for 'chancenter'. More info is given in the graphic interface 
+%                   description above.
 %   'transform'   - String command for manipulating arrays. 'chan' is full channel 
 %                   info. Fields that can be manipulated are 'labels', 'theta'
 %                   'radius' (polar angle and radius), 'X', 'Y', 'Z' (cartesian 
@@ -82,24 +79,24 @@
 %                   horizontal angle, azimuth and radius. 
 %                   Ex: 'chans(3) = chans(14)', 'X = -X' or a multi-step transform
 %                   with steps separated by ';': Ex. 'TMP = X; X = Y; Y = TMP'
-%   'changechan'  - {num value1 value2 value3 ...} Change the values of all fields 
-%                   for the given channel num: mimimally {num label theta radius}.
+%   'changechan'  - {number value1 value2 value3 ...} Change the values of all fields 
+%                   for the given channel number, mimimally {num label theta radius}.
 %                   Ex: 'changechan' {12 'PXz' -90 0.30}
-%   'changefield' - {num field value} Change field value for channel number num. 
+%   'changefield' - {number field value} Change field value for channel number number. 
 %                   Ex: {34 'theta' 320.4}.
-%   'insert'      - {num label theta radius X Y Z sph_theta sph_phi sph_radius } 
-%                   Insert new channel before channel number num with the specified 
-%                   values. If the number of values if less than 10, remaining 
-%                   fields are 0. (previously this parameter was termed 'add').
+%   'insert'      - {number label theta radius X Y Z sph_theta sph_phi sph_radius } 
+%                   Insert new channel and specified values before the current channel 
+%                    number. If the number of values is less than 10, remaining 
+%                   fields will be 0. (Previously, this parameter was termed 'add').
 %   'append'      - {num label theta radius X Y Z sph_theta sph_phi sph_radius } 
-%                   same as 'insert' but add the the new channel after the current
-%                   channel.
+%                   same as 'insert' (above) but insert the the new channel after 
+%                   the current channel number.
 %   'delete'      - [int_vector] Vector of channel numbers to delete.
-%   'forcelocs'   - [cell] call forcelocs() function to force a particular channel
-%                   to be at a particular location on the sphere (and rotate other
-%                   channels accordingly).
-%   'shrink'      - Topographical polar shrink factor (see >> help topoplot) 
+%   'forcelocs'   - [cell] call forcelocs() to force a particular channel to be at a
+%                   particular location on the head sphere; rotate other channels 
+%                   accordingly.
 %   'skirt'       - Topographical polar skirt factor (see >> help topoplot) 
+%   'shrink'      - Topographical polar shrink factor (see >> help topoplot) 
 %   'load'        - [filename|{filename, 'key', 'val'}] Load channel location file
 %                   optional arguments (such as file format) to the function 
 %                   readlocs() can be specified if the input is a cell array.
@@ -107,20 +104,19 @@
 %   'eval'        - [string] evaluate string ('chantmp' is the name of the channel
 %                   location structure).
 %   'headrad'     - [float] change head radius.
-%   'lookup'      - [string] lookup channel indices standard location from
+%   'lookup'      - [string] look-up channel numbers for standard locations in the
 %                   channel location file given as input.
-%   'shiftdatachans' - [pos shift] shift data channel indices at position 'pos'
-%                   by 'shift'. This option is useful if some data channel
-%                   do not have location.
+%   'shiftdatachans' - [pos shift] increase data channel indices beginning at position 
+%                   'pos' by 'shift'. This option is useful if some data channels
+%                   do not have locations. ??????????
 %
 % Outputs:
-%   newchans      - new EEGLAB channel locations structure or EEG dataset with
-%                   updated channel location structures (EEG.chanlocs EEG.urchanlocs 
-%                   and EEG.chaninfo }.
+%   newchans      - new EEGLAB channel locations structure or EEG dataset with updated 
+%                   channel location structures EEG.chanlocs, EEG.urchanlocs, EEG.chaninfo
 %   options       - structure containing plotting options (equivalent to EEG.chaninfo)
 %
-% Ex:  EEG = pop_chanedit(EEG,'load', { 'dummy.elp' 'elp' }, 'delete', [3 4], ...
-%          'convert', { 'xyz->polar' [] -1 1 }, 'save', 'mychans.loc' )
+% Ex:    EEG = pop_chanedit(EEG,'load', { 'dummy.elp' 'elp' }, 'delete', [3 4], ...
+%                       'convert', { 'xyz->polar' [] -1 1 }, 'save', 'mychans.loc' )
 %        % Load polhemus file, delete two channels, convert to polar (see 
 %        % cart2topo() for arguments) and save into 'mychans.loc'.
 %
@@ -147,6 +143,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.171  2007/08/24 00:53:36  arno
+% dealing with extra channels
+%
 % Revision 1.170  2007/08/23 23:37:23  arno
 % handle reference
 %
@@ -1016,8 +1015,8 @@ if nargin < 3
 			ingui = 0;
             [tmpchans tmpfid] = getfid(chans);
 			if nbchan ~= 0 & nbchan ~= length(tmpchans)
-                if ~popask(strvcat(['The number of data channel (' int2str(length(tmpchans)) ') not including fiducials does not'], ...
-                                   ['correspond to the initial number of channel (' int2str(nbchan) '), so for consistency purposes'], ...
+                if ~popask(strvcat(['The number of data channels (' int2str(length(tmpchans)) ') not including fiducials does not'], ...
+                                   ['correspond to the initial number of channels (' int2str(nbchan) '), so for consistency purposes'], ...
                                    'new channel information will be ignored if this function was called from EEGLAB'))
                     ingui = 1;
                 end;	
@@ -1374,10 +1373,10 @@ else
             else                                            message =2;
             end;
             if message == 1
-                textcomment = strvcat('Only channel labels are currenlty present but some of these labels have known', ...
+                textcomment = strvcat('Only channel labels are present currently, but some of these labels have known', ...
                                       'positions. Do you want to look up coordinates for these channels using the electrode', ...
                                       'file below? If you have a channel location file for this dataset, press cancel, then', ...
-                                      'use button "Read location" in the next gui. If you do not know, just press OK.'); 
+                                      'use button "Read location" in the following gui. If you do not know, just press OK.'); 
             else
                 textcomment = strvcat('Some channel labels may have known locations.', ...
                                       'Do you want to look up coordinates for these channels using the electrode', ...
@@ -1533,7 +1532,7 @@ function [chans, params] = insertchans(chans, params)
             chans = setfield(chans, { ind }, fields{f}, getfield( params.nodatchans, { index },  fields{f}));
         end;
       end;
-      disp('Fiducial have been added at the end of the channel structure');
+      disp('Fiducial have been added to the end of the channel structure');
       params = rmfield(params, 'nodatchans');
       
       % put these channels first
