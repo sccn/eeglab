@@ -30,8 +30,6 @@
 %                 to make channels location compatible with a specified spherical model. 
 %                 Command line equivalent: 'headrad'.
 %   "Set channel types" - [button] set channel type names for a range of data channels.
-%   "Shift data channels" - [button] shift data channel indices. 
-%                 Command line equivalent: 'shiftdatachans'.
 %   "Delete chan" - [button] delete channel. Command line equivalent: 'delete'.
 %   "Insert chan" - [button] insert channel before current channel. 
 %                 Command line equivalent: 'insert'.
@@ -106,9 +104,6 @@
 %   'headrad'     - [float] change head radius.
 %   'lookup'      - [string] look-up channel numbers for standard locations in the
 %                   channel location file given as input.
-%   'shiftdatachans' - [pos shift] increase data channel indices beginning at position 
-%                   'pos' by 'shift'. This option is useful if some data channels
-%                   do not have locations. ??????????
 %
 % Outputs:
 %   newchans      - new EEGLAB channel locations structure or EEG dataset with updated 
@@ -143,6 +138,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.172  2007/08/24 01:31:00  scott
+% many help msg edits -- Arno, please find and fix ????? if necessary
+%
 % Revision 1.171  2007/08/24 00:53:36  arno
 % dealing with extra channels
 %
