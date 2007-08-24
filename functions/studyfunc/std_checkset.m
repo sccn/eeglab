@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.61  2007/08/23 17:27:49  arno
+% session and group problem
+%
 % Revision 1.60  2007/08/23 17:16:03  arno
 % remove debug message
 %
@@ -291,7 +294,7 @@ if isempty(STUDY.etc.version)
     if isfield(STUDY, 'cluster')
         if ~isempty(STUDY.cluster)
             disp('Old STUDY version detected, removing pre-loaded measures');
-            disp('which could potentially produce inaccurate results (Bugs 463 & 467)');
+            disp('because of the defect in ERSP baseline subtraction (Bugs 484)');
             fields = { 'erpdata' 'erptimes' 'specdata' 'specfreqs' 'erspdata' ...
                        'ersptimes' 'erspfreqs' 'itcdata' 'itctimes' 'itcfreqs' ...
                        'topo' 'topox' 'topoy' 'topoall' 'topopol' 'dipole' };
