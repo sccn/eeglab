@@ -88,6 +88,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.49  2007/08/14 19:20:26  nima
+% _
+%
 % Revision 1.48  2007/08/13 23:24:20  nima
 % _
 %
@@ -298,7 +301,7 @@ else
 
     if length(opt.clusters) > 1 & isnan(opt.threshold) & ...
             ( strcmpi(opt.condstats, 'on') | strcmpi(opt.groupstats, 'on'))
-        opt.condstats = 'off'; opt.groupstats = 'off'; 
+        opt.condstats = 'off'; opt.groupstats = 'off';
         disp('Statistics disabled for plotting multiple clusters unless a threshold is set');
     end;
     if ~isempty(opt.comps)

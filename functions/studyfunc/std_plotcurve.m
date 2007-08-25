@@ -65,6 +65,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2007/08/14 19:29:55  nima
+% _
+%
 % Revision 1.10  2007/08/09 18:29:03  arno
 % plotting statistics
 %
@@ -245,8 +248,10 @@ end;
 if strcmpi(opt.plotmode, 'condensed') 
     opt.plotgroups     = 'together';
     opt.plotconditions = 'together';
-    opt.condstats      = {};
-    opt.groupstats     = {};
+    if ~isempty(opt.condstats) & ~isempty(opt.groupstats)
+        opt.condstats      = {};
+        opt.groupstats     = {};
+    end;
 end;
 
 % plotting paramters
@@ -385,13 +390,14 @@ for c = 1:ncplot
             if strcmpi(opt.plottopo, 'on'), highligth = 'background'; else highligth = 'bottom'; end;
             if strcmpi(opt.plotgroups, 'together') &  isempty(opt.condstats) & ...
                              ~isnan(opt.threshold) & ~isempty(opt.groupstats)
-                plotopt = { plotopt{:} 'maskarray', 'highlightmode', highligth };
+                plotopt = { plotopt{:} 'maskarray' };
                 tmpdata = { tmpdata pgroupplot{c}' };
             elseif strcmpi(opt.plotconditions, 'together') &  isempty(opt.groupstats) & ...
                                      ~isnan(opt.threshold) & ~isempty(opt.condstats)
-                plotopt = { plotopt{:} 'maskarray', 'highlightmode', highligth };
+                plotopt = { plotopt{:} 'maskarray' };
                 tmpdata = { tmpdata pcondplot{c}' };
             end;
+            plotopt = { plotopt{:} 'highlightmode', highligth };
             if strcmpi(opt.plotsubjects, 'on')
                 plotopt = { plotopt{:} 'plotmean' 'on' 'plotindiv' 'on' };
             else
