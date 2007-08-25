@@ -1,5 +1,5 @@
-% std_plotcurve() - plot ERP/spectral traces of a component
-%              or channel cluster in a STUDY. 
+% std_plotcurve() - plot ERP or spectral traces for a STUDY component 
+%                   or channel cluster 
 % Usage:
 %          >> std_plotcurve( axvals, data, 'key', 'val', ...)
 % Inputs:
@@ -58,13 +58,16 @@
 %                  {default: all available data}
 %
 % Scalp map plotting options:
-%  'chanlocs'    - [struct] channel location structure
+%  'chanlocs'    - [struct] channel locations structure
 %
 % Author: Arnaud Delorme, CERCO, CNRS, 2006-
 %
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2007/08/25 01:05:03  arno
+% nothing
+%
 % Revision 1.11  2007/08/14 19:29:55  nima
 % _
 %
@@ -387,7 +390,7 @@ for c = 1:ncplot
             elseif strcmpi(opt.plotsubjects, 'off') & strcmpi(opt.singlesubject, 'off') tmpdata = squeeze(real(mean(tmpdata,2))); 
             end;
             tmpdata = squeeze(permute(tmpdata, [2 1 3]));
-            if strcmpi(opt.plottopo, 'on'), highligth = 'background'; else highligth = 'bottom'; end;
+            if strcmpi(opt.plottopo, 'on'), highlight = 'background'; else highlight = 'bottom'; end;
             if strcmpi(opt.plotgroups, 'together') &  isempty(opt.condstats) & ...
                              ~isnan(opt.threshold) & ~isempty(opt.groupstats)
                 plotopt = { plotopt{:} 'maskarray' };
@@ -397,7 +400,7 @@ for c = 1:ncplot
                 plotopt = { plotopt{:} 'maskarray' };
                 tmpdata = { tmpdata pcondplot{c}' };
             end;
-            plotopt = { plotopt{:} 'highlightmode', highligth };
+            plotopt = { plotopt{:} 'highlightmode', highlight };
             if strcmpi(opt.plotsubjects, 'on')
                 plotopt = { plotopt{:} 'plotmean' 'on' 'plotindiv' 'on' };
             else
