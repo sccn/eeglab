@@ -153,6 +153,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.146  2007/02/02 09:25:48  arno
+%change x axis
+%
 %Revision 1.144  2006/11/20 21:22:12  arno
 %call 2 mni2tal compatible with mni2tal in bioelectromagnetism
 %
@@ -703,12 +706,12 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     if strcmpi(g.coordformat, 'spherical')
          dat.sph2spm    = sph2spm;
     elseif strcmpi(g.coordformat, 'CTF')
-        dat.sph2spm    = traditional([0 0 0 0 0 0 10 -10 10]);
+        dat.sph2spm    = traditionaldipfit([0 0 0 0 0 0 10 -10 10]);
     else
         dat.sph2spm    = []; %traditional([0 0 0 0 0 pi 1 1 1]);
     end;
     
-    if ~isempty(g.transform), dat.sph2spm = traditional(g.transform);
+    if ~isempty(g.transform), dat.sph2spm = traditionaldipfit(g.transform);
     end;
     if isfield(g.mri, 'anatomycol')
         dat.imgs       = g.mri.anatomycol;
