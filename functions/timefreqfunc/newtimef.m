@@ -277,6 +277,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.138  2007/08/21 01:23:11  arno
+% undo last changes
+%
 % Revision 1.137  2007/08/21 01:22:34  arno
 % changed default padratio to 1
 %
@@ -1612,19 +1615,6 @@ if ~isnan(g.alpha) & length(baseln)==0
     verboseprintf(g.verbose, 'timef(): no window centers in baseline (times<%g) - shorten (max) window length.\n', g.baseline)
     return
 end
-if isnan(g.powbase)
-    verboseprintf(g.verbose, 'Computing the mean baseline spectrum\n');
-    mbase = mean(P(:,baseln),2)';
-else
-    verboseprintf(g.verbose, 'Using the input baseline spectrum\n');
-    mbase = 10.^(g.powbase/10);
-end
-baselength = length(baseln);
-if ~isnan( g.baseline(1) ) & ~isnan( mbase )
-    P = 10 * (log10(P) - repmat(log10(mbase(1:size(P,1)))',[1 length(timesout)])); % convert to (10log10) dB
-else
-    P = 10 * log10(P);
-end;
 
 % ---------
 % bootstrap
@@ -1662,13 +1652,9 @@ if ~isnan(g.alpha) % if bootstrap analysis included . . .
         % ------------------
         formula = 'mean(arg1,3);';
         inputdata = alltfX.*conj(alltfX);
-        if ~isnan( g.baseline )
-            inputdata = inputdata ./ repmat(mbase', [1 size(inputdata,2) size(inputdata,3)]);
-        end;
         Pboot = bootstat(inputdata, formula, 'boottype', 'shuffle', ...
             'label', 'ERSP', 'bootside', 'both', 'naccu', g.naccu, ...
             'basevect', baselntmp, 'alpha', g.alpha, 'dimaccu', 2 );
-        Pboot = 10*log10(Pboot);
         if size(Pboot,2) == 1, Pboot = Pboot'; end;
 
         % ITC significance
@@ -1685,10 +1671,31 @@ if ~isnan(g.alpha) % if bootstrap analysis included . . .
         Rboot = bootstat(inputdata, formula, 'boottype', g.boottype, ...
             'label', 'ITC', 'bootside', 'upper', 'naccu', g.naccu, ...
             'basevect', baselntmp, 'alpha', g.alpha, 'dimaccu', 2 );
+        fprintf('\n');
     end;
 else
     Pboot = []; Rboot = [];
 end
+
+if isnan(g.powbase)
+    verboseprintf(g.verbose, 'Computing the mean baseline spectrum\n');
+    mbase = mean(P(:,baseln),2)';
+else
+    verboseprintf(g.verbose, 'Using the input baseline spectrum\n');
+    mbase = 10.^(g.powbase/10);
+end
+baselength = length(baseln);
+if ~isnan( g.baseline(1) ) & ~isnan( mbase )
+    P = 10 * (log10(P) - repmat(log10(mbase(1:size(P,1)))',[1 length(timesout)])); % convert to (10log10) dB
+    if ~isempty(Pboot) & isnan(g.pboot)
+        Pboot = 10 * (log10(Pboot) - repmat(log10(mbase(1:size(P,1)))',[1 size(Pboot,2)])); % convert to (10log10) dB
+    end;
+else
+    P = 10 * log10(P);
+    if ~isempty(Pboot) & isnan(g.pboot)
+        Pboot = 10 * log10(Pboot);
+    end;
+end;
 
 % --------
 % plotting
