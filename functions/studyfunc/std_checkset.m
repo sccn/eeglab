@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.63  2007/09/11 10:40:42  arno
+% detect inconsistent time-frequency decomposition
+%
 % Revision 1.62  2007/08/24 00:56:36  arno
 % better error message
 %
@@ -317,7 +320,7 @@ if isempty(STUDY.etc.version)
     if exist(filename) == 2
         tmp = load('-mat', filename);
         if (length(fieldnames(tmp))-5)/3 < size(ALLEEG(1).icaweights,1)
-            fprintf(2,'Corrupted ERSP files for ICA. THESE FILES MUST BE RECOMPUTED.\n');
+            fprintf(2,'Corrupted ERSP files for ICA. THESE FILES MUST BE RECOMPUTED (bug 497).\n');
             disp('Use menu "Study > Precompute Component Measures", select ERSP and');
             disp('force recomputation. This problem refers to bug 489.');
             STUDY.etc.version = [];
