@@ -65,6 +65,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2007/08/25 02:03:26  scott
+% spelling
+%
 % Revision 1.12  2007/08/25 01:05:03  arno
 % nothing
 %
@@ -221,8 +224,9 @@ opt = finputcheck( varargin, { 'channels'    'cell'   []              {};
 if isstr(opt), error(opt); end;
 opt.singlesubject = 'off';
 if strcmpi(opt.plottopo, 'on') & size(data{1},3) == 1, opt.singlesubject = 'on'; end;
-if size(data{1},2) == 1,                               opt.singlesubject = 'on'; end;
-if strcmpi(opt.singlesubject, 'on'), opt.groupstats = {}; opt.condstats = {}; end;
+%if size(data{1},2) == 1,                              opt.singlesubject = 'on'; end;
+if all(all(cellfun('size', data, 2)==1))               opt.singlesubject = 'on'; end;
+if any(any(cellfun('size', data, 2)==1)), opt.groupstats = {}; opt.condstats = {}; end;
 if ~isempty(opt.compinds), if length(opt.compinds{1}) > 1, opt.compinds = {}; end; end;
 if strcmpi(opt.datatype, 'spec'), opt.unit = 'Hz'; end;
 if strcmpi(opt.plotsubjects, 'on')
@@ -246,7 +250,7 @@ if isempty(opt.groupnames)
     if ng == 1, opt.groupnames = { '' }; end;
 end;
 
-% condensed plot
+% condensed plot (deprecated)
 % --------------
 if strcmpi(opt.plotmode, 'condensed') 
     opt.plotgroups     = 'together';
@@ -298,7 +302,7 @@ end;
 % -----------------------
 if strcmpi(opt.plotgroups, 'together'),      ngplot = 1; else ngplot = ng; end; 
 if strcmpi(opt.plotconditions,  'together'), ncplot = 1; else ncplot = nc; end;     
-if strcmpi(opt.plotgroups, 'together') | strcmpi(opt.plotconditions, 'together')
+if strcmpi(opt.plotgroups, 'together') | strcmpi(opt.plotconditions, 'together') | strcmpi(opt.figure, 'off')
      col = manycol;
      leg = 'on';
 else
@@ -369,8 +373,13 @@ for c = 1:ncplot
                 end;
                 leg = opt.condnames;
             elseif ngplot ~= ng
+                samesize = 1;
+                for ind = 2:size(data,2), if any(size(data{1,ind}) ~= size(data{1})), samesize = 0; end; end;
                 for gg = 1:ng
                     tmptmpdata = real(data{c,gg});
+                    if ~samesize
+                        tmptmpdata = mean(tmptmpdata,2);
+                    end;
                     if gg == 1, tmpdata = zeros([size(tmptmpdata) ng]); end;
                     if ndims(tmptmpdata) == 3, tmpdata(:,:,:,gg) = tmptmpdata;
                     else                       tmpdata(:,:,gg)   = tmptmpdata;
@@ -381,7 +390,7 @@ for c = 1:ncplot
                 leg = {};;
             end;
             if ~isempty(opt.filter), tmpdata = myfilt(tmpdata, 1000/(allx(2)-allx(1)), 0, opt.filter); end;
-
+            
             % plotting options
             % ----------------
             plotopt = { allx };
@@ -408,15 +417,16 @@ for c = 1:ncplot
             end;
             plotopt = { plotopt{:} 'ylim' opt.ylim 'legend' leg };
             plotopt = { plotopt{:}  'xlabel' xlab 'ylabel' ylab };
-
+            
             % plot
             % ----
+            if strcmpi(opt.figure, 'on'), tmpcol = col; else tmpcol = col(mod(c*ncplot+g,length(col))+1); end;
             if strcmpi(opt.plottopo, 'on'), 
                 metaplottopo(tmpdata, 'chanlocs', opt.chanlocs, 'plotfunc', 'plotcurve', ...
                     'plotargs', { plotopt{:} }, 'datapos', [2 3]);
             elseif iscell(tmpdata)
-                 plotcurve( allx, tmpdata{1}, 'colors', col, 'maskarray', tmpdata{2}, plotopt{3:end}); xlabel(xlab); ylabel(ylab);
-            else plotcurve( allx, tmpdata, 'colors', col, plotopt{2:end});
+                 plotcurve( allx, tmpdata{1}, 'colors', tmpcol, 'maskarray', tmpdata{2}, plotopt{3:end}); xlabel(xlab); ylabel(ylab);
+            else plotcurve( allx, tmpdata, 'colors', tmpcol, plotopt{2:end});
             end;
         end;
         
