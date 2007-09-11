@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.62  2007/08/24 00:56:36  arno
+% better error message
+%
 % Revision 1.61  2007/08/23 17:27:49  arno
 % session and group problem
 %
@@ -288,13 +291,18 @@ end
 
 % remove cluster information if old version
 % -----------------------------------------
+if ~isempty(STUDY.etc.version)
+    if strcmpi(STUDY.etc.version, '6.0b')
+        STUDY.etc.version = [];
+    end;
+end;
 if isempty(STUDY.etc.version)
     icadefs;
     STUDY.etc.version = EEGLAB_VERSION;
     if isfield(STUDY, 'cluster')
         if ~isempty(STUDY.cluster)
             disp('Old STUDY version detected, removing pre-loaded measures');
-            disp('because of the defect in ERSP baseline subtraction (Bugs 484)');
+            disp('because of the defect in ERSP baseline subtraction (Bugs 484).');
             fields = { 'erpdata' 'erptimes' 'specdata' 'specfreqs' 'erspdata' ...
                        'ersptimes' 'erspfreqs' 'itcdata' 'itctimes' 'itcfreqs' ...
                        'topo' 'topox' 'topoy' 'topoall' 'topopol' 'dipole' };
@@ -303,6 +311,16 @@ if isempty(STUDY.etc.version)
                     STUDY.cluster = rmfield(STUDY.cluster, fields{ind});
                 end;
             end;
+        end;
+    end;
+    filename = fullfile( ALLEEG(1).filepath,[ ALLEEG(1).filename(1:end-3) 'icaersp']);
+    if exist(filename) == 2
+        tmp = load('-mat', filename);
+        if (length(fieldnames(tmp))-5)/3 < size(ALLEEG(1).icaweights,1)
+            fprintf(2,'Corrupted ERSP files for ICA. THESE FILES MUST BE RECOMPUTED.\n');
+            disp('Use menu "Study > Precompute Component Measures", select ERSP and');
+            disp('force recomputation. This problem refers to bug 489.');
+            STUDY.etc.version = [];
         end;
     end;
     if isfield(STUDY, 'changrp')
