@@ -60,6 +60,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2007/08/07 18:29:22  arno
+% fix help from guy (bug 283)
+%
 % Revision 1.31  2007/08/07 18:26:58  arno
 % added help message
 %
@@ -164,14 +167,15 @@ if isempty(varargin) %GUI call
         if strcmpi(resp, 'cancel'), return; end;
     end;
     
-	alg_options = {'Kmeans' 'Neural Network' }; %'Hierarchical tree' 
+	alg_options = {'Kmeans (stat. toolbox)' 'Neural Network (stat. toolbox)' 'Kmeanscluster (no toolbox)' }; %'Hierarchical tree' 
 	set_outliers = ['set(findobj(''parent'', gcbf, ''tag'', ''outliers_std''), ''enable'', fastif(get(gcbo, ''value''), ''on'', ''off''));'...
                             'set(findobj(''parent'', gcbf, ''tag'', ''std_txt''), ''enable'', fastif(get(gcbo, ''value''), ''on'', ''off''));']; 
-	algoptions = [ 'set(findobj(''parent'', gcbf, ''userdata'', ''kmeans''), ''enable'', fastif(get(gcbo, ''value'')==1, ''on'', ''off''));' ];
+	algoptions = [ 'set(findobj(''parent'', gcbf, ''userdata'', ''kmeans''), ''enable'', fastif(get(gcbo, ''value'')~=2, ''on'', ''off''));' ];
 	saveSTUDY = [ 'set(findobj(''parent'', gcbf, ''userdata'', ''save''), ''enable'', fastif(get(gcbo, ''value'')==1, ''on'', ''off''));' ];
 	browsesave = [ '[filename, filepath] = uiputfile2(''*.study'', ''Save STUDY with .study extension -- pop_clust()''); ' ... 
                       'set(findobj(''parent'', gcbf, ''tag'', ''studyfile''), ''string'', [filepath filename]);' ];
-    
+    if ~exist('kmeans'), valalg = 3; else valalg = 1; end;
+                  
     strclust = '';
     if STUDY.etc.preclust.clustlevel > length(STUDY.cluster)
         STUDY.etc.preclust.clustlevel = 1;
@@ -185,7 +189,7 @@ if isempty(varargin) %GUI call
 	clust_param = inputgui( { [1] [1] [3 1] [3 1] [ 0.2 2.73 1 ] [1] [0.29 2 2.5 0.8] }, ...
 	{ {'style' 'text'       'string' strclust 'fontweight' 'bold'  } {} ...
       {'style' 'text'       'string' 'Clustering algorithm:' } ...
-      {'style' 'popupmenu'  'string' alg_options  'value' 1 'tag' 'clust_algorithm'  'Callback' algoptions } ...
+      {'style' 'popupmenu'  'string' alg_options  'value' valalg 'tag' 'clust_algorithm'  'Callback' algoptions } ...
       {'style' 'text'       'string' 'Number of clusters to compute:' } ...
       {'style' 'edit'       'string' '2' 'tag' 'clust_num' }...
       {'style' 'checkbox'   'string' '' 'tag' 'outliers_on' 'value' 0 'Callback' set_outliers 'userdata' 'kmeans' 'enable' 'on' } ...
@@ -224,22 +228,30 @@ if isempty(varargin) %GUI call
         end;
         command = '[STUDY] = pop_clust(STUDY, ALLEEG,';
         
+        if ~isempty(findstr(clus_alg, 'Kmeanscluster')), clus_alg = 'kmeanscluster'; end;
+        if ~isempty(findstr(clus_alg, 'Kmeans ')), clus_alg = 'kmeans'; end;
+        if ~isempty(findstr(clus_alg, 'Neural ')), clus_alg = 'neural network'; end;
+        
         disp('Clustering ...');
         switch clus_alg
-            case 'Kmeans'
-                command = sprintf('%s %s %d %s', command, '''algorithm'', ''kmeans'',''clus_num'', ', clus_num, ',');
+            case { 'kmeans' 'kmeanscluster' }
+                command = sprintf('%s %s%s%s %d %s', command, '''algorithm'',''', clus_alg, ''',''clus_num'', ', clus_num, ',');
                 if outliers_on
                     command = sprintf('%s %s %s %s', command, '''outliers'', ', stdval, ',');
-                    [IDX,C,sumd,D,outliers] = robust_kmeans(clustdata,clus_num,str2num(stdval),5);
+                    [IDX,C,sumd,D,outliers] = robust_kmeans(clustdata,clus_num,str2num(stdval),5,lower(clus_alg));
                     [STUDY, clusters] = std_createclust2(STUDY,IDX,C,  {'robust_kmeans', clus_num});
                 else
-                    [IDX,C,sumd,D] = kmeans(clustdata,clus_num,'replicates',10,'emptyaction','drop');
+                    if strcmpi(clus_alg, 'kmeans')
+                        [IDX,C,sumd,D] = kmeans(clustdata,clus_num,'replicates',10,'emptyaction','drop');
+                    else
+                        [IDX,C,sumd,D] = kmeanscluster(clustdata,clus_num);
+                    end;
                     [STUDY, clusters] = std_createclust2(STUDY,IDX,C,  {'Kmeans', clus_num});
                 end    
          case 'Hierarchical tree'
              %[IDX,C] = hierarchical_tree(clustdata,clus_num);
              %[STUDY, clusters] = std_createclust2(STUDY,IDX,C,  {'Neural Network', clus_num});
-         case 'Neural Network'
+         case 'neural network'
              [IDX,C] = neural_net(clustdata,clus_num);
              [STUDY, clusters] = std_createclust2(STUDY,IDX,C,  {'Neural Network', clus_num});
              command = sprintf('%s %s %d %s', command, '''algorithm'', ''Neural Network'',''clus_num'', ', clus_num, ',');
@@ -305,13 +317,17 @@ else %command line call
     end
     
     clustdata = STUDY.etc.preclust.preclustdata;
-    switch algorithm
-        case 'kmeans'                
+    switch lower(algorithm)
+        case { 'kmeans' 'kmeanscluster' }
             if outliers == Inf
-                [IDX,C,sumd,D] = kmeans(clustdata,clus_num,'replicates',10,'emptyaction','drop');
+                if strcmpi(algorithm, 'kmeans')
+                    [IDX,C,sumd,D] = kmeans(clustdata,clus_num,'replicates',10,'emptyaction','drop');
+                else
+                    [IDX,C,sumd,D] = kmeanscluster(clustdata,clus_num);
+                end;
                 [STUDY, clusters] = std_createclust2(STUDY,IDX,C,  {'Kmeans', clus_num});
             else
-                [IDX,C,sumd,D,outliers] = robust_kmeans(clustdata,clus_num,outliers,5);
+                [IDX,C,sumd,D,outliers] = robust_kmeans(clustdata,clus_num,outliers,5, algorithm);
                 [STUDY, clusters] = std_createclust2(STUDY,IDX,C,  {'robust_kmeans', clus_num});
             end
         case 'Neural Network'
