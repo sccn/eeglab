@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2007/03/08 17:22:54  scott
+% removed 'debugit' printing and variable -sm
+%
 % Revision 1.26  2007/03/06 17:50:17  scott
 % documented turning off the fastave feature -sm
 %
@@ -300,7 +303,7 @@ for f=1:outframes
 
        % AG fix 3/6/7
        outdata(:,f) = nan_sum((((ones(chans,1)*xwin(ix)).*data(:,i)))')';
-       if abs(sumx) > NEARZERO && nonorm == 0 
+       if abs(sumx) > NEARZERO & nonorm == 0 
           outdata(:,f) = outdata(:,f)/sumx;
        end
    end
