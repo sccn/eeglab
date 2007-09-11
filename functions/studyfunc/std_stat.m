@@ -54,6 +54,9 @@
 %                  of 'trials' statistics requires a lot of RAM.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2007/04/30 19:52:22  arno
+% thrshold entry\
+%
 % Revision 1.1  2007/01/26 18:09:02  arno
 % Initial revision
 %
@@ -89,6 +92,7 @@ opt = finputcheck( varargin, { 'threshold'   'real'   []              NaN;
                                'std_stat', 'ignore');
 if isstr(opt), error(opt); end;
 if ~isnan(opt.threshold) & isempty(opt.naccu), opt.naccu = 1/opt.threshold*2; end;
+if any(any(cellfun('size', data, 2)==1)), opt.groupstats = 'off'; opt.condstats = 'off'; end;
 if isempty(opt.naccu), opt.naccu = 500; end;
 nc = size(data,1);
 ng = size(data,2);
