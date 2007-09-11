@@ -138,6 +138,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.173  2007/08/24 01:45:48  arno
+% remove shiftdatachan obsolete parameter
+%
 % Revision 1.172  2007/08/24 01:31:00  scott
 % many help msg edits -- Arno, please find and fix ????? if necessary
 %
@@ -1496,7 +1499,7 @@ function [chans, fids] = getfid(chans)
                 end;
             end;
             alltypes          = { chans.type };
-            inds = setdiff( 1:length(alltypes), strmatch( 'eeg', lower(alltypes(indnoempty)) ) );
+            inds = [ strmatch( 'fid', lower(alltypes(indnoempty)) ) strmatch( 'aux', lower(alltypes(indnoempty)) ) ];
             if length(inds) ~= length(alltypes)
                 fids = chans(indnoempty(inds));
                 chans(indnoempty(inds)) = [];
