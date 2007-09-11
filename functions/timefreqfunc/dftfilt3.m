@@ -52,6 +52,9 @@
 
 %
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2007/08/12 04:13:24  arno
+% fix crash when all cycles are given
+%
 % Revision 1.3  2006/11/27 23:41:50  arno
 % update documentation
 %
@@ -142,7 +145,7 @@ end
 % compute number of cycles at each frequency
 % ------------------------------------------
 type='morlet';
-if length(cycles) == 1 && cycles~=0
+if length(cycles) == 1 & cycles(1)~=0
     cycles = cycles*ones(size(freqs));
 elseif length(cycles) == 2
     if strcmpi(cycleinc, 'log') % cycleinc
