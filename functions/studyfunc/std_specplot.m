@@ -88,6 +88,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.50  2007/08/25 01:05:01  arno
+% nothing
+%
 % Revision 1.49  2007/08/14 19:20:26  nima
 % _
 %
@@ -261,7 +264,7 @@ if ~isempty(opt.channels)
     
     % select specific time    
     % --------------------
-    if ~isempty(opt.topofreq)
+    if ~isempty(opt.topofreq) & ~isnan(opt.topofreq)
         [tmp ti1] = min(abs(allfreqs-opt.topofreq(1)));
         [tmp ti2] = min(abs(allfreqs-opt.topofreq(end)));
         for index = 1:length(specdata(:))
@@ -278,7 +281,7 @@ if ~isempty(opt.channels)
                                          'statistics', opt.statistics, 'naccu', opt.naccu, 'threshold', opt.threshold);
     locs = eeg_mergelocs(ALLEEG.chanlocs);
     locs = locs(std_chaninds(STUDY, opt.channels));
-    if ~isempty(opt.topofreq)
+    if ~isempty(opt.topofreq) & ~isnan(opt.topofreq)
         std_chantopo(specdata, 'condnames', STUDY.condition, 'plottopo', fastif(length(allinds)==1, 'off', 'on'), ...
                                       'datatype', 'spec', 'plotmode', opt.plotmode, 'groupnames', STUDY.group, 'unitx', 'Hz', ...
                                       'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, ...
@@ -299,10 +302,10 @@ else
     nr = ceil(length(allinds)/nc);
     comp_names = {};
 
-    if length(opt.clusters) > 1 & isnan(opt.threshold) & ...
+    if length(opt.clusters) > 1 & ... % & isnan(opt.threshold) & ... % this feature does not work - ad
             ( strcmpi(opt.condstats, 'on') | strcmpi(opt.groupstats, 'on'))
         opt.condstats = 'off'; opt.groupstats = 'off';
-        disp('Statistics disabled for plotting multiple clusters unless a threshold is set');
+        % disp('Statistics disabled for plotting multiple clusters unless a threshold is set');
     end;
     if ~isempty(opt.comps)
         opt.condstats = 'off'; opt.groupstats = 'off'; 
