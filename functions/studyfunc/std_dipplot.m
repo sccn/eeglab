@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 %$Log: not supported by cvs2svn $
+%Revision 1.23  2007/08/14 19:20:35  nima
+%_
+%
 %Revision 1.22  2007/08/03 22:55:45  arno
 %automatic plotting mode
 %
@@ -390,6 +393,11 @@ for ci = 1:length(comp_ind)
         warndlg2(['No dipole information available in dataset ' num2str(abset) ' , abort plotting'], 'Aborting plot dipoles');
         return;
     end
+    if length(comp_ind) == 1 & isempty(ALLEEG(abset).dipfit.model(comp).posxyz)
+        warndlg2(strvcat('There is no dipole information available in', ...
+                       [ 'dataset ' num2str(abset) ' for this component, abort plotting']), 'Aborting plot dipoles');
+        return;
+    end;
     if ~isfield(STUDY.cluster(cls),'dipole')
         STUDY = std_centroid(STUDY,ALLEEG, cls , 'dipole');
     elseif isempty(STUDY.cluster(cls).dipole)
@@ -489,6 +497,8 @@ function dipole = computecentroid(alldipoles)
         dipole.momxyz = [ 0 0 0 ];
         dipole.rv = 0;
         ndip = 0;
+        count = 0;
+        warningon = 1;
         for k = 1:len 
             if size(alldipoles(k).posxyz,1) == 2
                 if all(alldipoles(k).posxyz(2,:) == [ 0 0 0 ])
@@ -496,10 +506,19 @@ function dipole = computecentroid(alldipoles)
                     alldipoles(k).momxyz(2,:) = [];
                 end;
             end;
-            dipole.posxyz = dipole.posxyz + mean(alldipoles(k).posxyz,1)/len;
-            dipole.momxyz = dipole.momxyz + mean(alldipoles(k).momxyz,1)/len;
-            dipole.rv     = dipole.rv     + alldipoles(k).rv/len;
+            if ~isempty(alldipoles(k).posxyz)
+                dipole.posxyz = dipole.posxyz + mean(alldipoles(k).posxyz,1);
+                dipole.momxyz = dipole.momxyz + mean(alldipoles(k).momxyz,1);
+                dipole.rv     = dipole.rv     + alldipoles(k).rv;
+                count = count+1;
+            elseif warningon
+                disp('Some components do not have dipole information');
+                warningon = 0;
+            end;
         end
+        dipole.posxyz = dipole.posxyz/count;
+        dipole.momxyz = dipole.momxyz/count;
+        dipole.rv     = dipole.rv/count;
         if isfield(alldipoles, 'maxr')
             dipole.maxr = alldipoles(1).max_r;
         end;
