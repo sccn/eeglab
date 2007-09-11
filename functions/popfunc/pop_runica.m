@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.78  2007/08/01 01:14:21  arno
+% same
+%
 % Revision 1.77  2007/08/01 01:13:43  arno
 % decoding optional imputs
 %
@@ -320,7 +323,7 @@ selectalg = {};
 linenb    = 1;
 count     = 1;
 for index = length(allalgs):-1:1
-    if exist(allalgs{index}) ~= 2 && exist(allalgs{index}) ~= 6
+    if exist(allalgs{index}) ~= 2 & exist(allalgs{index}) ~= 6
         allalgs(index) = [];
     end;
 end;
