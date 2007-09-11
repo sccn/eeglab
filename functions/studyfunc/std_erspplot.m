@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.59  2007/08/22 01:18:32  arno
+% better handling of optional arguments
+%
 % Revision 1.58  2007/08/20 18:49:58  arno
 % subtracting common baseline
 %
@@ -202,6 +205,20 @@ end;
 STUDY = pop_erspparams(STUDY, 'default');
 
 [ opt moreparams ] = finputcheck( varargin, { ...
+                               'topotime'    'real'    [] STUDY.etc.erspparams.topotime;
+                               'topofreq'    'real'    [] STUDY.etc.erspparams.topofreq;
+                               'maskdata'    'string'  [] STUDY.etc.erspparams.maskdata;
+                               'timerange'   'real'    [] STUDY.etc.erspparams.timerange;
+                               'freqrange'   'real'    [] STUDY.etc.erspparams.freqrange;
+                               'ersplim'     'real'    [] STUDY.etc.erspparams.ersplim;
+                               'itclim'      'real'    [] STUDY.etc.erspparams.itclim;
+                               'statistics'  'string'  [] STUDY.etc.erspparams.statistics;
+                               'groupstats'  'string'  [] STUDY.etc.erspparams.groupstats;
+                               'condstats'   'string'  [] STUDY.etc.erspparams.condstats;
+                               'subbaseline' 'string'  [] STUDY.etc.erspparams.subbaseline;
+                               'statmode'    'string'  [] STUDY.etc.erspparams.statmode;
+                               'threshold'   'real'    [] STUDY.etc.erspparams.threshold;
+                               'naccu'       'integer' [] STUDY.etc.erspparams.naccu;
                                'channels'    'cell'    []              {};
                                'caxis'       'real'    []              [];
                                'clusters'    'integer' []              [];
@@ -214,17 +231,6 @@ STUDY = pop_erspparams(STUDY, 'default');
                                'subject'     'string'  []              '' }, ...
                                   'std_erspstatplot', 'ignore');
 if isstr(opt), error(opt); end;
-if length(moreparams) > 1
-    STUDY = pop_erspparams( STUDY, moreparams{:});
-end;
-
-% fuse structures
-% ---------------
-opt1 = struct2cell(opt);
-opt2 = struct2cell(STUDY.etc.erspparams);
-f1   = fieldnames(opt);
-f2   = fieldnames(STUDY.etc.erspparams);
-opt = cell2struct({ opt1{:}, opt2{:} }, {f1{:} f2{:} }, 2);
                                 
 % for backward compatibility
 % --------------------------
@@ -318,7 +324,7 @@ comp_names = {};
 
 for index = 1:length(allinds)
 
-    if length(allinds) > 1, subplot(nr,nc,index); end;
+    if length(allinds) > 1, try, subplot(nr,nc,index, 'align'); catch, subplot(nr,nc,index); end; end;
     if ~isempty(opt.channels)
         eval( [ 'allersp  = STUDY.changrp(allinds(index)).' opt.datatype 'data;' ]);
         eval( [ 'alltimes = STUDY.changrp(allinds(index)).' opt.datatype 'times;' ]);
