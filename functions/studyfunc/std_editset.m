@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.51  2007/08/23 16:43:38  arno
+% typo in header
+%
 % Revision 1.50  2007/08/22 22:20:56  arno
 % recreate channel groups
 %
@@ -283,9 +286,11 @@ for k = 1:2:length(g.commands)
                 % ---------------------------
                 idat = 0;
                 for sc = 1:size(STUDY.setind,1)
-                    if ~isnan(STUDY.setind(sc,si)) && isfield(ALLEEG(STUDY.datasetinfo(STUDY.setind(sc,si)).index).dipfit, 'model')
-                        idat = STUDY.datasetinfo(STUDY.setind(sc,si)).index;
-                        break;
+                    if ~isnan(STUDY.setind(sc,si)) 
+                        if isfield(ALLEEG(STUDY.datasetinfo(STUDY.setind(sc,si)).index).dipfit, 'model')
+                            idat = STUDY.datasetinfo(STUDY.setind(sc,si)).index;
+                            break;
+                        end;
                     end;
                 end;
                     
