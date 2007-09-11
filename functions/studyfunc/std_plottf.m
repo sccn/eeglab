@@ -96,6 +96,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2007/08/14 02:27:01  allen
+% Same
+%
 % Revision 1.12  2007/08/14 02:26:16  allen
 % fix data masking problem
 %
@@ -256,10 +259,17 @@ opt = finputcheck( varargin, { 'channels'    'cell'   []              {};
                                'statmode'    'string' { 'subjects' 'common' 'trials' } 'subjects'}, 'std_erpmaskdata');
 if isstr(opt), error(opt); end;
 opt.singlesubject = 'off';
-if strcmpi(opt.plottopo, 'on') & size(data{1},3) == 1, opt.singlesubject = 'on'; end;
-if size(data{1},2) == 1,                               opt.singlesubject = 'on'; end;
-if strcmpi(opt.singlesubject, 'on'), opt.groupstats = 'off'; opt.condstats = 'off'; end;
+if strcmpi(opt.plottopo, 'on') & size(data{1},4) == 1, opt.singlesubject = 'on'; end;
+%if size(data{1},2) == 1,                               opt.singlesubject = 'on'; end;
+%if strcmpi(opt.singlesubject, 'on'), opt.groupstats = 'off'; opt.condstats = 'off'; end;
+if all(all(cellfun('size', data, 3)==1))               opt.singlesubject = 'on'; end;
+if any(any(cellfun('size', data, 3)==1)), opt.groupstats = 'off'; opt.condstats = 'off'; end;
 if ~isempty(opt.compinds), if length(opt.compinds{1}) > 1, opt.compinds = {}; end; end;
+if strcmpi(opt.groupstats, 'on') & strcmpi(opt.condstats, 'on') & strcmpi(opt.maskdata, 'on')
+    disp('Cannot use ''maskdata'' option with both condition stat. and group stat. on');
+    disp('Disabling statistics');
+    opt.groupstats = 'off'; opt.condstats = 'off'; opt.maskdata = 'off'; 
+end;
 if ~isempty(opt.ersplim), opt.caxis = opt.ersplim; end;
 if ~isempty(opt.itclim), opt.caxis = opt.itclim; end;
 if strcmpi(opt.datatype, 'spec'), opt.unit = 'Hz'; end;
@@ -267,6 +277,8 @@ if strcmpi(opt.plotsubjects, 'on')
     opt.plotgroups = 'apart';
     opt.plotconditions  = 'apart';
 end
+if size(data,1) < 2, opt.condstats = 'off'; end;
+if size(data,2) < 2, opt.groupstats = 'off'; end;
 onecol  = { 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b' };
 manycol = { 'b' 'r' 'g' 'k' 'c' 'y' };
 
@@ -297,20 +309,25 @@ end;
 % --------------
 if strcmpi(opt.plotmode, 'condensed') 
     meanplot = zeros(size(data{1},1), size(data{1},2));
+    count = 0;
     for c = 1:nc
         for g = 1:ng
-            meanplot = meanplot + mean(data{c,g},3)/nc/ng;
+            if ~isempty(data{c,g})
+                meanplot = meanplot + mean(data{c,g},3);
+                count = count+1;
+            end;
         end;
     end;
+    meanplot = meanplot/count;
     options = { 'chanlocs', opt.chanlocs, 'electrodes', 'off', 'cbar', 'on', ...
             'cmode', 'separate', opt.tftopoopt{:} };       
         
     if strcmpi(opt.freqscale, 'log'), options = { options{:} 'logfreq', 'native' }; end;
     tftopo( meanplot', timevals, freqs, 'title', [ 'Mean ' upper(opt.datatype) ' for all group/cond' ], options{:}); 
-     currentHangle = gca;
-     colorbarHandle = cbar;
-     title(colorbarHandle,'dB');
-     axes(currentHangle); 
+    currentHangle = gca;
+    colorbarHandle = cbar;
+    title(colorbarHandle,'dB');
+    axes(currentHangle); 
     return; 
 end;
 
@@ -348,9 +365,6 @@ end
 [pcond pgroup pinter] = std_stat(data, 'statistics',  opt.statistics, 'naccu', opt.naccu, ...
                                  'groupstats', opt.groupstats, 'condstats', opt.condstats);
 if ~isnan(opt.threshold)
-    % compute significance mask
-    % --------------------------
-    if ~isempty(pinter), pinter = pinter{3}; end;
     % applying threshold
     % ------------------
     for ind = 1:length(pcond),  pcondplot{ind}  = pcond{ind}  < opt.threshold; end;
@@ -393,7 +407,7 @@ if isempty(opt.topovals)
             hdl(c,g) = mysubplot(nc+addr, ng+addc, g + (c-1)*(ng+addc), opt.transpose);
             if isempty( opt.condnames{c} ) | isempty( opt.groupnames{g} )
                  fig_title = [ opt.condnames{c} opt.groupnames{g} ];
-            else fig_title = ['Condition ' opt.condnames{c} ', Group ' opt.groupnames{g} ];
+            else fig_title = [ opt.condnames{c} ', ' opt.groupnames{g} ];
             end;
             if ~isempty(opt.compinds), fig_title = [ 'Comp. ' int2str(opt.compinds{c,g}) ', ' fig_title ]; end;            
             if ~isempty(opt.subject) , fig_title = [ fig_title ', ' opt.subject ]; end;
@@ -405,7 +419,9 @@ if isempty(opt.topovals)
             end;
             tftopo( tmpplot', timevals, freqs, 'title', fig_title, options{:}); 
             if isempty(opt.caxis)
+                warning off;
                 tmpc = [ min(min(tmpplot(:)), tmpc(1)) max(max(tmpplot(:)), tmpc(2)) ];
+                warning on;
             else 
                 caxis(opt.caxis);
             end;
@@ -416,7 +432,7 @@ if isempty(opt.topovals)
             
             % statistics accross groups
             % -------------------------
-            if g == ng && ng > 1 & strcmpi(opt.groupstats, 'on') & ~statmask
+            if g == ng & ng > 1 & strcmpi(opt.groupstats, 'on') & ~statmask
                 hdl(c,g+1) = mysubplot(nc+addr, ng+addc, g + 1 + (c-1)*(ng+addc), opt.transpose);
                 if isnan(opt.threshold), tmp_title = sprintf('%s (p-value)', opt.condnames{c});
                 else                     tmp_title = sprintf('%s (p<%.4f)',  opt.condnames{c}, opt.threshold);
@@ -431,7 +447,7 @@ if isempty(opt.topovals)
     for g = 1:ng
         % statistics accross conditions
         % -----------------------------
-        if strcmpi(opt.condstats, 'on') & ~statmask && nc > 1
+        if strcmpi(opt.condstats, 'on') & ~statmask & nc > 1
             hdl(nc+1,g) = mysubplot(nc+addr, ng+addc, g + c*(ng+addc), opt.transpose);
             if isnan(opt.threshold), tmp_title = sprintf('%s (p-value)', opt.groupnames{g});
             else                     tmp_title = sprintf('%s (p<%.4f)',  opt.groupnames{g}, opt.threshold);
@@ -455,7 +471,7 @@ if isempty(opt.topovals)
     
     % statistics accross group and conditions
     % ---------------------------------------
-    if strcmpi(opt.groupstats, 'on') & strcmpi(opt.condstats, 'on') && ng > 1 && nc > 1
+    if strcmpi(opt.groupstats, 'on') & strcmpi(opt.condstats, 'on') & ng > 1 & nc > 1
         hdl(nc+1,ng+1) = mysubplot(nc+addr, ng+addc, g + 1 + c*(ng+addr), opt.transpose);
         if isnan(opt.threshold), tmp_title = 'Interaction (p-value)';
         else                     tmp_title = sprintf('Interaction (p<%.4f)', opt.threshold);
