@@ -69,6 +69,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.56  2007/08/23 16:52:54  arno
+% channel label problem
+%
 % Revision 1.55  2007/08/09 19:30:44  arno
 % *** empty log message ***
 %
@@ -416,7 +419,7 @@ elseif strcmpi(mode, 'gui') % GUI mode
     if ~strcmpi(result{1}, STUDY.name ), options = { options{:} 'name'        result{1} }; end;
     if ~strcmpi(result{2}, STUDY.task ), options = { options{:} 'task'        result{2} }; end;
     if ~strcmpi(result{3}, STUDY.notes), options = { options{:} 'notes'       result{3} }; end;
-    if ~isempty(result{4}),              options = { options{:} 'commands'    allcom    }; end;
+    if ~isempty(allcom),                 options = { options{:} 'commands'    allcom    }; end;
     if isnumeric(outstruct(1).studyfile)
         if outstruct(1).studyfile == 1,  options = { options{:} 'resave'      'on' }; end;
     else
