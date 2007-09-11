@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.57  2007/08/14 19:29:47  nima
+% _
+%
 % Revision 1.56  2007/08/13 23:25:16  nima
 % _
 %
@@ -304,7 +307,7 @@ if ~isempty(opt.channels)
     
     % select specific time    
     % --------------------
-    if ~isempty(opt.topotime)
+    if ~isempty(opt.topotime) & ~isnan(opt.topotime)
         [tmp ti1] = min(abs(alltimes-opt.topotime(1)));
         [tmp ti2] = min(abs(alltimes-opt.topotime(end)));
         for index = 1:length(erpdata(:))
@@ -321,7 +324,7 @@ if ~isempty(opt.channels)
                                          'statistics', opt.statistics, 'naccu', opt.naccu, 'threshold', opt.threshold);
     locs = eeg_mergelocs(ALLEEG.chanlocs);
     locs = locs(std_chaninds(STUDY, opt.channels));
-    if ~isempty(opt.topotime)
+    if ~isempty(opt.topotime) & ~isnan(opt.topotime)
         std_chantopo(erpdata, 'condnames', STUDY.condition, 'plottopo', fastif(length(allinds)==1, 'off', 'on'), ...
                                       'datatype', 'spec', 'plotmode', opt.plotmode, 'groupnames', STUDY.group, 'unitx', '\muV', ...
                                       'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, ...
@@ -342,10 +345,10 @@ else
     nr = ceil(length(allinds)/nc);
     comp_names = {};
 
-    if length(opt.clusters) > 1 & isnan(opt.threshold) & ...
+    if length(opt.clusters) > 1 & ... % isnan(opt.threshold) & ... % This might be dependent on the Matlab version
             ( strcmpi(opt.condstats, 'on') | strcmpi(opt.groupstats, 'on')) 
         opt.condstats = 'off'; opt.groupstats = 'off'; 
-        disp('Statistics disabled for plotting multiple clusters unless a threshold is set');
+        %disp('Statistics disabled for plotting multiple clusters unless a threshold is set');
     end;
     if ~isempty(opt.comps)
         opt.condstats = 'off'; opt.groupstats = 'off'; 
@@ -379,6 +382,15 @@ else
             end;
         end;
     end;
+    
+    if length(opt.clusters)==1 % place cluster name in the corner, only if there is only one cluster
+        
+        h = gca;
+        axes('position',[0.04 0.96 0.1 0.06]);
+        text(0,0,[STUDY.cluster(allinds(index)).name],'fontsize',13 );
+        axis off;
+    end;
+    
     set(gcf,'name','ERP');
     axcopy(gca);
 end;
