@@ -30,7 +30,8 @@
 %   'electrodes'      - 'on','off','labels','numbers','ptslabels','ptsnumbers'. To set the 'pts' 
 %                       marker,,see 'Plot detail options' below. {default: 'on' -> mark electrode 
 %                       locations with points ('.') unless more than 64 channels, then 'off'}. 
-%   'plotchans'       - [vector] channel numbers (indices) to use in making the head plot. 
+%   'plotchans'       - [vector] channel numbers (indices) to use in making
+%   the head plot. 
 %                       {default: [] -> plot all chans}
 %   'chantype'        - cell array of channel type(s) to plot. Will also accept a single quoted
 %                       string type. Channel type for channel k is field EEG.chanlocs(k).type. 
@@ -163,6 +164,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.280  2007/08/08 17:50:55  arno
+% fix typo
+%
 % Revision 1.279  2007/08/08 17:38:13  arno
 % handle better fieldtrip
 %
@@ -2123,21 +2127,22 @@ end
 %
 %%%%%%%% Mark specified electrode locations with red filled disks  %%%%%%%%%%%%%%%%%%%%%%
 %
-if strcmpi(STYLE,'blank') % if mark-selected-channel-locations mode
-  if strcmpi(ELECTRODES,'on') | strcmpi(ELECTRODES,'off')
-   for kk = 1:length(plotchans)
-     if strcmpi(EMARKER,'.')
-        hp2 = plot3(y(kk),x(kk),ELECTRODE_HEIGHT,EMARKER,'Color', EMARKERCOLOR1CHAN, ...
-                                              'markersize', EMARKERSIZE1CHAN);
-     else
-        hp2 = plot3(y(kk),x(kk),ELECTRODE_HEIGHT,EMARKER,'Color', EMARKERCOLOR1CHAN, ...
-                                              'markersize', EMARKERSIZE1CHAN);
-     end
-   end
-   hold on
-  end
-end
-
+try,
+    if strcmpi(STYLE,'blank') % if mark-selected-channel-locations mode
+        if strcmpi(ELECTRODES,'on') | strcmpi(ELECTRODES,'off')
+            for kk = 1:length(plotchans)
+                if strcmpi(EMARKER,'.')
+                    hp2 = plot3(y(kk),x(kk),ELECTRODE_HEIGHT,EMARKER,'Color', EMARKERCOLOR1CHAN, ...
+                        'markersize', EMARKERSIZE1CHAN);
+                else
+                    hp2 = plot3(y(kk),x(kk),ELECTRODE_HEIGHT,EMARKER,'Color', EMARKERCOLOR1CHAN, ...
+                        'markersize', EMARKERSIZE1CHAN);
+                end
+            end
+            hold on
+        end
+    end
+catch, end;
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%% Plot dipole(s) on the scalp map  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
