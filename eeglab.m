@@ -190,6 +190,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.516  2007/08/23 18:38:47  arno
+% menu color
+%
 % Revision 1.515  2007/08/23 18:30:34  arno
 % import neuroscan ev2 files
 %
@@ -2062,12 +2065,13 @@ catchstrs.new_non_empty          = e_newset;
 	cb_timef2      = [ checkica      'LASTCOM = pop_newtimef(EEG, 0, eegh(''find'',''pop_newtimef(EEG,0''));'  e_hist];
 	cb_crossf2     = [ checkica      'LASTCOM = pop_newcrossf(EEG, 0,eegh(''find'',''pop_newcrossf(EEG,0''));' e_hist];
 		
-    cb_study3      = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_study(STUDY, ALLEEG, ''gui'', ''on'');' e_load_study];
-    cb_precomp     = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_precomp(STUDY, ALLEEG);'                e_load_study];
-    cb_chanplot    = [ nocheck '[STUDYTMP LASTCOM] = pop_chanplot(STUDY, ALLEEG); ALLEEGTMP=ALLEEG;'       e_load_study];
-    cb_preclust    = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_preclust(STUDY, ALLEEG);'               e_load_study];
-    cb_clust       = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_clust(STUDY, ALLEEG);'                  e_load_study];
-    cb_clustedit   = [ nocheck 'ALLEEGTMP = ALLEEG; [STUDYTMP LASTCOM] = pop_clustedit(STUDY, ALLEEG);'    e_load_study];
+    cb_study3      = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_study(STUDY, ALLEEG, ''gui'', ''on'');'  e_load_study];
+    cb_precomp     = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_precomp(STUDY, ALLEEG);'                 e_load_study];
+    cb_chanplot    = [ nocheck '[STUDYTMP LASTCOM] = pop_chanplot(STUDY, ALLEEG); ALLEEGTMP=ALLEEG;'        e_load_study];
+    cb_precomp2    = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_precomp(STUDY, ALLEEG, ''components'');' e_load_study];
+    cb_preclust    = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_preclust(STUDY, ALLEEG);'                e_load_study];
+    cb_clust       = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_clust(STUDY, ALLEEG);'                   e_load_study];
+    cb_clustedit   = [ nocheck 'ALLEEGTMP = ALLEEG; [STUDYTMP LASTCOM] = pop_clustedit(STUDY, ALLEEG);'     e_load_study];
     
     % menu definition
     % --------------- 
@@ -2227,7 +2231,8 @@ catchstrs.new_non_empty          = e_newset;
     uimenu( std_m,  'Label', 'Edit study info'                        , 'CallBack', cb_study3);
     uimenu( std_m,  'Label', 'Precompute channel measures'            , 'CallBack', cb_precomp, 'separator', 'on');
     uimenu( std_m,  'Label', 'Plot channel measures'                  , 'CallBack', cb_chanplot);
-    uimenu( std_m,  'Label', 'Build preclustering array'              , 'CallBack', cb_preclust, 'separator', 'on');
+    uimenu( std_m,  'Label', 'Precompute component measures'          , 'CallBack', cb_precomp2, 'separator', 'on');
+    uimenu( std_m,  'Label', 'Build preclustering array'              , 'CallBack', cb_preclust);
     uimenu( std_m,  'Label', 'Cluster components'                     , 'CallBack', cb_clust);
     uimenu( std_m,  'Label', 'Edit/plot clusters'                     , 'CallBack', cb_clustedit);
     
