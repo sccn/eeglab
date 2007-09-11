@@ -61,12 +61,6 @@
 %                                   'ersp', and 'itc' measures.  
 %                    'abso'    =  [0|1] 1 = use absolute values of topoplot(), gradient, or 
 %                                   Laplacian maps {default: 1}
-%                    'cycles'  =  [0| cycles_factor] for ERSP and ITC (see >> timef details) 
-%                                   {default: 0 (=> FFT method)}
-%                    'padratio'=  [integer] for ERSP and ITC (see >> timef details) {default:1}
-%                    'alpha'   =  [integer] bootstrap probability significance threshold for 
-%                                   masking component mean ERSP and ITC measures 
-%                                   (>> timef details) {default: 0.01}
 %                    'funarg'  =  [cell array] optional function arguments for mean spectrum 
 %                                   calculation (>> help spectopo) {default: none}
 % Outputs:
@@ -117,6 +111,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.85  2007/08/14 01:56:11  scott
+% checking help msg
+%
 % Revision 1.84  2007/08/09 18:39:18  arno
 % update help message according to bug repport 434
 %
@@ -312,10 +309,11 @@
 
 function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
     
-if nargin < 2
+    if nargin < 2
         help std_preclust;
         return;
     end;
+    
     if nargin == 2
         cluster_ind = 1; % default to clustering the whole STUDY 
     end    
@@ -358,6 +356,21 @@ if nargin < 2
         succompind{ind} = sort(succompind{ind}); % sort the components
     end;
     
+    % scan all commands to see if file exist
+    % --------------------------------------
+    for index = 1:length(varargin) % scan commands
+        strcom = varargin{index}{1};
+        if strcmpi(strcom, 'scalp') | strcmpi(strcom, 'scalplaplac') | strcmpi(strcom, 'scalpgrad') 
+            strcom = 'topo';
+        end;
+        if ~strcmpi(strcom, 'dipoles')
+            tmpfile = fullfile( ALLEEG(1).filepath, [ ALLEEG(1).filename(1:end-3) 'ica' strcom ]); 
+            if exist(tmpfile) ~= 2
+                error([ 'Could not find "' upper(strcom) '" file, they must be precomputed' ]);
+            end;
+        end;
+    end;
+            
     % Decode input arguments
     % ----------------------
     update_flag  = 0;
@@ -383,18 +396,6 @@ if nargin < 2
         error('Update flag is obsolete');
     end;
     
-    % scan all commands for ERSP and ITC
-    % ----------------------------------
-    erspmode = '';
-    for index = 1:length(varargin)
-        if strcmpi(varargin{index}{1}, 'itc')  & isempty(erspmode), erspmode = 'itc';
-        else                                                        erspmode = 'both';
-        end;
-        if strcmpi(varargin{index}{1}, 'ersp') & isempty(erspmode), erspmode = 'ersp';
-        else                                                        erspmode = 'both';
-        end;
-    end;
-    
     % scan all commands
     % -----------------
     clustdata = [];
@@ -412,9 +413,6 @@ if nargin < 2
         freqrange = [];
         timewindow = [];
         abso = 1;
-        cycles = 0;
-        padratio  = 1;
-        alpha = NaN;
         fun_arg = [];
         savetrials = 'off';
         recompute  = 'on';
@@ -433,46 +431,18 @@ if nargin < 2
                 case 'abso'
                     abso = varargin{index}{subind+1};
                 case 'savetrials'
-                    savetrials = varargin{index}{subind+1};
+                    error('You may now use the function std_precomp to precompute measures');
                 case 'cycles'
-                    cycles = varargin{index}{subind+1};
+                    error('You may now use the function std_precomp to precompute measures');
                 case 'alpha'
-                    alpha = varargin{index}{subind+1};
+                    error('You may now use the function std_precomp to precompute measures');
                 case 'padratio'
-                    padratio = varargin{index}{subind+1};
+                    error('You may now use the function std_precomp to precompute measures');
                 otherwise 
                     fun_arg{length(fun_arg)+1} =  varargin{index}{subind+1};
             end
         end
-        
-        % If ersp / itc values already exist in some of the datasets,
-        % make sure they are the same as the requested parameters.
-        % -----------------------------------------------------------
-        if (strcmpi(strcom,'ersp')  | strcmpi(strcom,'itc') ) & ~erspquery
-            params = [];
-            
-            % check for existing files
-            % ------------------------
-            guimode = 'guion';
-            g.erspparams.alpha    = alpha;
-            g.erspparams.cycles   = cycles;
-            g.erspparams.padratio = padratio;
-            for tmpind = 1:length(STUDY.datasetinfo)
                 
-                filename = fullfile( ALLEEG(tmpind).filepath,[ ALLEEG(tmpind).filename(1:end-3) 'icaersp']);
-                [guimode, g.erspparams] = std_filecheck(filename, g.erspparams, guimode, { 'plotitc' 'plotersp' 'plotphase' 'freqscale' });
-                if strcmpi(guimode, 'cancel'), return; end;
-                
-            end;
-            if strcmpi(guimode, 'usedisk') | strcmpi(guimode, 'same'), recompute = 'off'; 
-            else                                                       recompute = 'on'; 
-            end;
-            alpha     = g.erspparams.alpha;
-            cycles    = g.erspparams.cycles;
-            padratio  = g.erspparams.padratio;
-            erspquery = 1;
-        end
-        
         % scan datasets
         % -------------
         data = [];
@@ -496,8 +466,8 @@ if nargin < 2
                                error('No epochs in dataset: ERP information has no meaning');
                             end
                             con_t = []; con_data = [];
-                            [X, t] = std_erp(ALLEEG(idat), succompind{si}, timewindow);
-                            
+                            [X t] = std_readerp( ALLEEG, idat, succompind{si}, timewindow);
+
                             X = abs(X); % take the absolute value of the ERP
                             
                             STUDY.preclust.erpclusttimes = timewindow;
@@ -529,7 +499,7 @@ if nargin < 2
                  idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index;
                  fprintf('Computing/loading interpolated scalp maps for dataset %d...\n', idat);
                  if ~isempty(succompind{si})
-                    X = std_topo(ALLEEG(idat), succompind{si});
+                    X = std_readtopo(ALLEEG, idat, succompind{si});
 
                     if abso % absolute values
                        data = [ data; abs(X) ];
@@ -538,6 +508,7 @@ if nargin < 2
                     end
                     clear X tmp;
                  end
+                 
              % select Laplacian ica comp scalp maps
              % ------------------------------------si
              case 'scalpLaplac'
@@ -546,7 +517,7 @@ if nargin < 2
                  end       
                  idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index;  
                  if ~isempty(succompind{si})
-                    X = std_topo(ALLEEG(idat), succompind{si}, 'laplacian'); 
+                    X = std_readtopo(ALLEEG, idat, succompind{si}, 'laplacian'); 
                     if abso
                        data = [ data; abs(X)];
                     else
@@ -563,7 +534,7 @@ if nargin < 2
                  end
                  idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index;  
                  if ~isempty(succompind{si})
-                    X = std_topo(ALLEEG(idat), succompind{si}, 'gradient'); 
+                    X = std_readtopo(ALLEEG, idat, succompind{si}, 'gradient'); 
                     if abso
                        data = [ data; abs(X)];
                     else
@@ -581,16 +552,12 @@ if nargin < 2
                          STUDY.cluster(kk).centroid = rmfield(STUDY.cluster(kk).centroid, 'spec_freqs');
                      end;
                  end;
-                 if si == 1
-                     overwrite = 0;
-                 end
                  if ~isempty(succompind{si})
                      for cond = 1 : size(STUDY.setind,1)
                          if ~isnan(STUDY.setind(cond,si))
                             idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index; 
                             con_f = []; con_data = [];
-                            [X, f,overwrite] = std_spec(ALLEEG(idat),succompind{si}, ...
-                                                     freqrange, fun_arg,overwrite);
+                            [X, f] = std_readspec(ALLEEG, idat, succompind{si}, freqrange);
                             STUDY.preclust.specclustfreqs = freqrange;
                             if cond == 1
                                 con_data = X;
@@ -667,12 +634,6 @@ if nargin < 2
                         if ~isnan(STUDY.setind(cond,si))
                             idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index;  
                             idattot = [idattot idat];
-                            % compute ERSP/ ITC, if doesn't exist.
-                            if ~strcmpi(erspmode, 'already_computed')
-                                std_ersp(ALLEEG(idat), 'components', succompind{si}, 'freqs', freqrange, ...
-                                         'timewindow', timewindow, 'cycles', cycles, 'padratio', padratio, 'alpha', alpha, ...
-                                         'type', erspmode, 'savetrials', savetrials, 'recompute', recompute);
-                            end;
                         end
                     end
                     STUDY.preclust.erspclustfreqs = freqrange;
