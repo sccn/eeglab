@@ -84,6 +84,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2007/08/23 01:59:36  arno
+% remove debugging comment
+%
 % Revision 1.33  2007/08/23 01:58:38  arno
 % fix nc and ng
 %
@@ -299,7 +302,8 @@ for ind = 1:length(finalinds)
                 % reserve arrays
                 % --------------
                 allerp   = cell( max(length(STUDY.condition),1), max(length(STUDY.group),1) );
-                [ tmp alltimes ] = std_readerp( ALLEEG, setinds{1,1}(1), allinds{1,1}(1), opt.timerange);
+                tmpind = 1; while(isempty(setinds{tmpind})), tmpind = tmpind+1; end;
+                [ tmp alltimes ] = std_readerp( ALLEEG, setinds{tmpind}(1), allinds{tmpind}(1), opt.timerange);
                 for c = 1:nc
                     for g = 1:ng
                         allerp{c, g} = repmat(zero, [length(alltimes), length(allinds{c,g})]);
@@ -337,12 +341,13 @@ for ind = 1:length(finalinds)
                 % --------------
                 allspec  = cell( max(length(STUDY.condition),1), max(length(STUDY.group),1) ); 
                 filetype = 'spec';
+                tmpind = 1; while(isempty(setinds{tmpind})), tmpind = tmpind+1; end;
                 try,
-                    [ tmp allfreqs ] = std_readspec( ALLEEG, setinds{1,1}(1), allinds{1,1}(1), opt.freqrange);
+                    [ tmp allfreqs ] = std_readspec( ALLEEG, setinds{tmpind}(1), allinds{tmpind}(1), opt.freqrange);
                 catch 
                     filetype = 'ersp';
                     disp('Cannot find spectral file, trying ERSP baseline file instead');
-                    [ tmpersp allfreqs alltimes tmpparams tmpspec] = std_readersp( ALLEEG, setinds{1,1}(1), allinds{1,1}(1), [], opt.freqrange);
+                    [ tmpersp allfreqs alltimes tmpparams tmpspec] = std_readersp( ALLEEG, setinds{tmpind}(1), allinds{tmpind}(1), [], opt.freqrange);
                 end;
                 for c = 1:nc
                     for g = 1:ng
@@ -410,7 +415,8 @@ for ind = 1:length(finalinds)
                 ersp     = cell( max(length(STUDY.condition),1), max(length(STUDY.group),1) );
                 erspbase = cell( max(length(STUDY.condition),1), max(length(STUDY.group),1) );
                 erspinds = cell( max(length(STUDY.condition),1), max(length(STUDY.group),1) );
-                [ tmp allfreqs alltimes ] = std_readersp( ALLEEG, setinds{1,1}(1), Inf*allinds{1,1}(1), opt.timerange, opt.freqrange);
+                tmpind = 1; while(isempty(setinds{tmpind})), tmpind = tmpind+1; end;
+                [ tmp allfreqs alltimes ] = std_readersp( ALLEEG, setinds{tmpind}(1), Inf*allinds{tmpind}(1), opt.timerange, opt.freqrange);
                 for c = 1:nc
                     for g = 1:ng
                         ersp{c, g}     = repmat(zero, [length(alltimes), length(allfreqs), length(allinds{c,g}) ]);
