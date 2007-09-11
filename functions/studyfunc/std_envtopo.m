@@ -53,6 +53,9 @@
 % See also: envtopo()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2007/09/11 10:44:52  arno
+% nothing
+%
 % Revision 1.20  2007/08/06 22:18:23  arno
 % do not use std_clustread any more
 %
@@ -189,7 +192,7 @@ for n = conditions
         datarange = tmpmax-tmpmin;
         tmpmin = tmpmin-0.05*datarange;
         tmpmax = tmpmax+0.05*datarange;
-        if n == 1
+        if n == conditions(1)
             ymin = tmpmin;
             ymax = tmpmax;
         else
