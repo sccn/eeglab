@@ -165,6 +165,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.123  2007/08/17 18:51:33  arno
+% removing p3 from code
+%
 % Revision 1.122  2007/08/17 18:49:25  arno
 % fix the zoom for Matlab 7
 %
@@ -1185,8 +1188,13 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
               'set(gcbf, ''windowbuttonupfcn'', tmpg.commandselect{3});' ...
               'clear tmpg;' ]);
       uimenu('Parent',figh,'Label', 'Help', 'callback', 'pophelp(''eegplot'');');
-      g.zoom = zoom;
-      set(g.zoom, 'ActionPostCallback', 'eegplot(''zoom'', gcbf, 1);'); 
+      try,
+          g.zoom = zoom;
+          set(g.zoom, 'ActionPostCallback', 'eegplot(''zoom'', gcbf, 1);'); 
+      catch,
+          set(zm, 'enable', 'off');
+          disp('Zoom is now only available under Matlab 2007a');
+      end;
   else
       disp('No zoom menu for Matlab version 6 (upgrade to version 7)');
   end;
