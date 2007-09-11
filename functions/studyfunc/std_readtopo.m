@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2006/03/14 02:39:40  scott
+% help msg
+%
 % Revision 1.7  2006/03/11 07:23:51  arno
 % header
 %
@@ -62,23 +65,75 @@
 % use fullfile
 %
 
-function [grid, yi, xi ] = std_readtopo(ALLEEG, abset, comp)
+function [X, yi, xi ] = std_readtopo(ALLEEG, abset, comps, option)
 
-grid = [];
+X = [];
 yi = [];
 xi = [];
-filename = fullfile( ALLEEG(abset).filepath,[ ALLEEG(abset).filename(1:end-3) 'icatopo']);
-try
-    topo = load( '-mat', filename, ...
-                 [ 'comp' int2str(comp) '_grid'], ...
-                 [ 'comp' int2str(comp) '_x'], ...
-                 [ 'comp' int2str(comp) '_y'] );
-catch
-    error( [ 'Cannot read file ''' filename '''' ]);
+if nargin < 4
+    option = 'none';
 end;
+filename = fullfile( ALLEEG(abset).filepath,[ ALLEEG(abset).filename(1:end-3) 'icatopo']);
+
+for k = 1:length(comps)
+
+    if length(comps) < 3
+        warning off;
+        try
+            topo = load( '-mat', filename, ...
+                         [ 'comp' int2str(comps(k)) '_grid'], ...
+                         [ 'comp' int2str(comps(k)) '_x'], ...
+                         [ 'comp' int2str(comps(k)) '_y'] );
+        catch
+            error( [ 'Cannot read file ''' filename '''' ]);
+        end;
+        warning on;
+        if ~isfield(topo, [ 'comp' int2str(comps(k)) '_y'])
+            topo = load( '-mat', filename);
+            if isfield(topo, 'file')
+                try
+                    topo = load( '-mat', topo.file, ...
+                                 [ 'comp' int2str(comps(k)) '_grid'], ...
+                                 [ 'comp' int2str(comps(k)) '_x'], ...
+                                 [ 'comp' int2str(comps(k)) '_y'] );
+                catch
+                    error( [ 'Cannot read file ''' topo.file '''' ]);
+                end;
+            end;
+        end;
+    elseif k == 1
+        try
+            topo = load( '-mat', filename);
+            if isfield(topo, 'file')
+                topo = load( '-mat', topo.file);
+            end;
+        catch
+            error( [ 'Cannot read file ''' filename '''' ]);
+        end;
+    end;
     
-grid = getfield(topo, [ 'comp' int2str(comp) '_grid']);
-yi   = getfield(topo, [ 'comp' int2str(comp) '_y']);
-xi   = getfield(topo, [ 'comp' int2str(comp) '_x']);
+    tmp =  getfield(topo, [ 'comp' int2str(comps(k)) '_grid' ]);
+    
+    if strcmpi(option, 'gradient')
+        [tmpx, tmpy]  = gradient(tmp); % Gradient
+        tmp        = tmpx;
+        tmp(:,:,2) = tmpy;
+    elseif strcmpi(option, 'laplacian')
+        tmp = del2(tmp); % Laplacian
+    end;
+
+    if length(comps) > 1
+        tmp = tmp(find(~isnan(tmp))); % remove NaN for more than 1 component
+    end;
+    if k == 1
+        X = zeros([ length(comps) size(tmp) ]) ;
+    end
+    X(k,:,:,:) =  tmp;
+    if k == 1
+        yi   = getfield(topo, [ 'comp' int2str(comps(k)) '_y']);
+        xi   = getfield(topo, [ 'comp' int2str(comps(k)) '_x']);
+    end;
+end
+X = squeeze(X);
 
 return;
