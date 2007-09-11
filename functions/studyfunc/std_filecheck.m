@@ -57,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2007/07/03 00:29:16  klaus
+% don't create error if baseline fields are different
+%
 % Revision 1.9  2007/04/05 23:10:36  arno
 % *** empty log message ***
 %
@@ -182,7 +185,7 @@ function [ res, params2 ] = std_filecheck(filename, params2, guiflag, ignorefiel
         res     = 'recompute';
         disp(['Deleting and recomputing file: ' filename ]);
         return;
-    elseif strcmpi(res, 'same') & strcmpi(guiflag, 'guion'), 
+    elseif strcmpi(res, 'same') & ( strcmpi(guiflag, 'guion') | strcmpi(guiflag, 'same') )
         disp(['Using file on disk: ' filename ]);
         return;
     end;

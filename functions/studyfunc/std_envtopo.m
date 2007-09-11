@@ -189,7 +189,7 @@ for n = conditions
         datarange = tmpmax-tmpmin;
         tmpmin = tmpmin-0.05*datarange;
         tmpmax = tmpmax+0.05*datarange;
-        if n == conditions(1) % sm 9/4/7
+        if n == 1
             ymin = tmpmin;
             ymax = tmpmax;
         else
