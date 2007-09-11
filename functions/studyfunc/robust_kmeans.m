@@ -2,14 +2,24 @@
 %        components from all clusters. 
 %        This is a helper function called from pop_clust(). 
 
-function  [IDX,C,sumd,D,outliers] = robust_kmeans(data,N,STD, MAXiter)
+function  [IDX,C,sumd,D,outliers] = robust_kmeans(data,N,STD,MAXiter,method)
 % data - pre-clustering data matrix.
 % N - number of wanted clusters.
+
+if nargin < 5
+    method = 'kmeans';
+else
+    method = 'kmeanscluster';
+end;
 
 flag  = 1;
 not_outliers = 1:size(data,1);
 old_outliers = [];
-[IDX,C,sumd,D] = kmeans(data,N,'replicates',30,'emptyaction','drop'); % Cluster using K-means algorithm
+if strcmpi(method, 'kmeans')
+    [IDX,C,sumd,D] = kmeans(data,N,'replicates',30,'emptyaction','drop'); % Cluster using K-means algorithm
+else
+    [IDX,C,sumd,D] = kmeanscluster(data,N); % Cluster using K-means algorithm
+end;    
 if STD >= 2 % STD for returned outlier
     rSTD = STD -1;
 else
@@ -64,7 +74,11 @@ while flag
 	tmp(outliers) = 0;
 	not_outliers = (find(tmp==1));
     
-    [IDX,C,sumd,D] = kmeans(data(not_outliers,:),N,'replicates',30,'emptyaction','drop');
+    if strcmpi(method, 'kmeans')
+        [IDX,C,sumd,D] = kmeans(data(not_outliers,:),N,'replicates',30,'emptyaction','drop');
+    else
+        [IDX,C,sumd,D] = kmeanscluster(data(not_outliers,:),N);
+    end;
     old_outliers = outliers;
     old_IDX = zeros(size(data,1),1);
     old_IDX(sort(not_outliers)) = IDX;
