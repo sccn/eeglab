@@ -17,7 +17,8 @@
 %   components - [numeric vector] components in the EEG structure to compute topo maps
 %                      {default|[] -> all}      
 %   option     - ['gradient'|'laplacian'|'none'] compute gradient or laplacian of
-%                the scale topography. {default is 'none' = the interpolated topo map}
+%                the scale topography. This does not acffect the saved file which is
+%                always 'none' {default is 'none' = the interpolated topo map}
 % Outputs:
 %   X          - the topo map grid of the requested ICA components, each grid is 
 %                     one ROW of X. 
@@ -47,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2006/03/10 00:20:39  arno
+% same
+%
 % Revision 1.14  2006/03/10 00:19:49  arno
 % removing reference to etc field
 %
