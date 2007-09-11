@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2007/08/09 18:50:11  arno
+% remove test of channel labels
+%
 % Revision 1.10  2007/08/09 18:44:40  arno
 % fix function if no channel labels for datasets
 %
@@ -70,6 +73,12 @@ if ~isstr(varargin{1}) %intial settings
     end
     STUDY  = varargin{1};
     ALLEEG = varargin{2};
+    comps = false;
+    if nargin > 2
+        if strcmpi(varargin{3}, 'components')
+            comps = true;
+        end;
+    end;
     
     % Create default ERSP / ITC time/freq. paramters 
     % ----------------------------------------------
@@ -90,15 +99,6 @@ if ~isstr(varargin{1}) %intial settings
         error('STUDY contains no datasets');
     end
          
-    maxrange = [ALLEEG(ref_ind).xmin ALLEEG(ref_ind).xmax]*1000;
-    time_range = [0 0];
-    minfreq    = 2;
-    while (time_range(2)-time_range(1)) < (maxrange(2)-maxrange(1))/2
-        minfreq = minfreq+1;
-        [time_range, winsize] = compute_ersp_times([3 0.5],  ALLEEG(ref_ind).srate, ...
-                                                   [ALLEEG(ref_ind).xmin ALLEEG(ref_ind).xmax]*1000 , minfreq, 4); 
-    end;
-                   
     % callbacks
     % ---------
     erspparams_str = [ '''cycles'', [3 0.5], ''padratio'', 1' ];
@@ -113,14 +113,30 @@ if ~isstr(varargin{1}) %intial settings
     chaneditbox    = ['pop_precomp(''chaneditbox'',gcf);']; 
     warninterp     = ['warndlg2(''EEGLAB has not yet been tested if some channels are missing; use at your own risk'');' ];
     
+    if comps == true
+        str_name       = ['Pre-compute component measures for STUDY ''' STUDY.name '''' ];
+        guiadd1 = { {'style' 'checkbox'   'string' '' 'tag' 'compallersp' 'value' 0 }  ...
+                    {'style' 'text'       'string' 'Compute ERP/spectrum/ERSP for all components (set) or only those selected by RV (unset)' } };
+        guiadd2 = { {'style' 'checkbox'   'string' '' 'tag' 'scalp_on' 'value' 0 }  ...
+                    {'style' 'text'       'string' 'Scalp maps' } };
+        geomadd1 = { [0.33 6] };
+        geomadd2 = { [0.33 6] };
+    else
+        str_name       = ['Pre-compute channel measures for STUDY ''' STUDY.name '''' ];
+        guiadd1 = { {'style' 'text'       'string' 'Channel list (default:all)' 'FontWeight' 'Bold'} ...
+            {'Style' 'edit'       'string' '' 'tag' 'chans' 'callback' chaneditbox }, ...
+            {'style' 'pushbutton' 'string'  '...', 'enable' fastif(isempty(ALLEEG(1).chanlocs), 'off', 'on') ...
+            'callback' chanlist }, ...
+            {'style' 'checkbox'   'string' '' 'tag' 'interpolate_on' 'value' 1 'callback' warninterp }  ...
+            {'style' 'text'       'string' 'Interpolate missing channels (datasets will be modified on disk)' } };
+        guiadd2 = {};
+        geomadd1 = { [2 3 0.5] [0.33 6] }; 
+        geomadd2 = { };
+    end;
+            
     gui_spec = { ...
     {'style' 'text'       'string' str_name 'FontWeight' 'Bold' 'horizontalalignment' 'left'} {} ...
-    {'style' 'text'       'string' 'Channel list (default:all)' 'FontWeight' 'Bold'} ...
-    {'Style' 'edit'       'string' '' 'tag' 'chans' 'callback' chaneditbox }, ...
-    {'style' 'pushbutton' 'string'  '...', 'enable' fastif(isempty(ALLEEG(1).chanlocs), 'off', 'on') ...
-           'callback' chanlist }, ...
-    {'style' 'checkbox'   'string' '' 'tag' 'interpolate_on' 'value' 1 'callback' warninterp }  ...
-	{'style' 'text'       'string' 'Interpolate missing channels (datasets will be modified on disk)' } ...
+    guiadd1{:} ...
     {} {'style' 'text'    'string' 'List of measures to precompute' 'FontWeight' 'Bold' 'horizontalalignment' 'left'} ...
     {'style' 'checkbox'   'string' '' 'tag' 'erp_on' 'value' 0 }  ...
 	{'style' 'text'       'string' 'ERPs' } ...
@@ -136,6 +152,7 @@ if ~isstr(varargin{1}) %intial settings
     {'vertshift' 'style'  'pushbutton' 'string' 'Test' 'tag' 'ersp_test' 'enable' 'off' 'callback' test_ersp }...
     {'style' 'checkbox'   'string' '' 'tag' 'itc_on' 'value' 0 'Callback' set_itc } ...
 	{'style' 'text'       'string' 'ITCs' 'horizontalalignment' 'center' } {'link2lines' 'style'  'text'   'string' '' } {} {} {} ...
+    guiadd2{:} ...
     {} {'style' 'checkbox'   'string' '' 'tag' 'recomp_on' 'value' 0 } ...
 	{'style' 'text'       'string' 'Recompute even if present on disk' }
     };
@@ -158,21 +175,34 @@ if ~isstr(varargin{1}) %intial settings
     firsttimeersp = 1;
     fig_arg = { ALLEEG STUDY allchans chanlist firsttimeersp };
     geomline = [0.45 1 0.3 2 3 0.7 ];
-    geometry = { [1] [1] [2 3 0.5] [0.33 6]  [1] [1] [0.33 6] [0.45 1.5 0.3 1.5 3 0.7 ] geomline geomline 1 [0.05 1] };
-    geomvert = [ 1 0.5 1 1 0.5 1 1 1 1 1 1 1 1];
+    geometry = { [1] [1] geomadd1{:}  [1] [1] [0.33 6] [0.45 1.5 0.3 1.5 3 0.7 ] geomline geomline geomadd2{:} 1 [0.05 1] };
+    geomvert = [ 1 0.5 fastif(length(geomadd1) == 1,1,[1 1]) 0.5 1 1 1 1 1 1 fastif(length(geomadd2) == 1,1,[]) 1 1];
 	[precomp_param, userdat2, strhalt, os] = inputgui( 'geometry', geometry, 'uilist', gui_spec, 'geomvert', geomvert, ...
                                                       'helpcom', ' pophelp(''std_precomp'')', ...
                                                       'title', 'Select and compute component measures for later clustering -- pop_precomp()', ...
                                                       'userdata', fig_arg);	
 	if isempty(precomp_param), return; end;
     
-    options = { STUDY, ALLEEG userdat2{4} };
+    if comps == 1
+        options = { STUDY ALLEEG 'components' };
+    else
+        options = { STUDY ALLEEG userdat2{4} };
+    end
+    if ~isfield(os, 'interpolate_on'), os.interpolate_on = 0; end;
+    if ~isfield(os, 'scalp_on'),    os.scalp_on = 0; end;
+    if ~isfield(os, 'compallersp'), os.compallersp = 0; end;
     
     % interpolate option is on
     % ------------------------
     if os.interpolate_on == 1 
         options = { options{:} 'interpolate' 'on' };
     end
+
+    % compallersp option is on
+    % ------------------------
+    if os.compallersp == 1 
+        options = { options{:} 'allcomps' 'on' };
+    end    
     
     % recompute option is on
     % ----------------------
@@ -184,6 +214,12 @@ if ~isstr(varargin{1}) %intial settings
     % ----------------
     if os.erp_on == 1 
         options = { options{:} 'erp' 'on' };
+    end
+    
+    % SCALP option is on
+    % ----------------
+    if os.scalp_on == 1 
+        options = { options{:} 'scalp' 'on' };
     end
     
     % Spectrum option is on
@@ -286,18 +322,27 @@ else
             catch, warndlg2('Error while calling function, check parameters'); end;
 
         case 'testersp'
-            try,
+            %try,
                 ersp_params = eval([ '{' get(findobj('parent', hdl, 'tag', 'ersp_params'), 'string') '}' ]); 
                 tmpstruct = struct(ersp_params{:});
+                [ tmpX tmpt tmpf ersp_params ] = std_ersp(ALLEEG(1), 'channels', 1, 'type', 'ersp', 'recompute', 'on', 'getparams', 'on', ersp_params{:});
 
                 set_itc  = get(findobj('parent', hdl, 'tag', 'itc_on'), 'value'); 
                 set_ersp = get(findobj('parent', hdl, 'tag', 'ersp_on'), 'value'); 
                 opt = {};
+                for ind = length(ersp_params)-1:-2:1, 
+                    if strcmpi(ersp_params{ind}, 'plotitc'),  ersp_params(ind:ind+1) = []; end;
+                    if strcmpi(ersp_params{ind}, 'plotersp'), ersp_params(ind:ind+1) = []; end;
+                end;
                 if ~set_itc,  opt = { opt{:} 'plotitc',  'off' }; end;
                 if ~set_ersp, opt = { opt{:} 'plotersp', 'off' }; end;
 
                 EEG = eeg_checkset(ALLEEG(1), 'loaddata');
                 data = EEG.data(1,:,1:min(EEG.trials,10));
+                %f1   = fieldnames( ersp_params);
+                %f2   = struct2cell(ersp_params);
+                %ersp_params = {f1{:}; f2{:} }; ersp_params = ersp_params(:)';
+                
                 figure; pos = get(gcf, 'position'); pos(3)=pos(3)*2; set(gcf, 'position', pos);
                 subplot(1,2,1); newtimef( data, EEG.pnts, [ EEG.xmin EEG.xmax ]*1000, EEG.srate, tmpstruct.cycles, opt{:}, 'maxfreq', EEG.srate/2, ersp_params{:});
                 subplot(1,2,2); 
@@ -309,22 +354,9 @@ else
                                                          'Time and frequency range may also be', ...
                                                          'adjusted after computation.'));
                 axis off;
-            catch, warndlg2(strvcat('Error while calling function, check parameters', lasterr)); 
-            end;
+            %catch, warndlg2(strvcat('Error while calling function, check parameters', lasterr)); 
+            %end;
                                                  
     end;
 end
 STUDY.saved = 'no';
-
-function get_ersptime(ALLEEG, STUDY, ersphdl) %%%%%%%%%%%%%% get_ersptime() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-cycles = str2num(get(findobj('parent', ersphdl, 'tag', 'ersp_c'), 'string'));
-freq = str2num(get(findobj('parent', ersphdl, 'tag', 'ersp_f'), 'string'));
-padratio = str2num(get(findobj('parent', ersphdl, 'tag', 'ersp_p'), 'string'));
-seti = STUDY.datasetinfo(1).index; %first dataset in ALLEEG that is part of STUDY
-[time_range, winsize] = compute_ersp_times(cycles,  ALLEEG(seti).srate, [ALLEEG(seti).xmin ALLEEG(seti).xmax]*1000, freq(1),padratio);
-if time_range(1) >= time_range(2)
-    warndlg2('ERSP time range is invalid; please change lower frequency bound or other parameters', 'Warning!');
-else
-    set(findobj('parent', ersphdl, 'tag', 'ersp_timewindow'), 'string', [ num2str(round(time_range(1)))  '  ' num2str(round(time_range(2))) ] );
-end
