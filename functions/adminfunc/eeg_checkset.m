@@ -150,6 +150,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.223  2007/08/23 23:28:16  arno
+% not saved if dipfit modified
+%
 % Revision 1.222  2007/08/23 17:47:19  arno
 % noting
 %
@@ -1553,14 +1556,16 @@ for inddataset = 1:length(ALLEEG)
                         
                         % scale ICA components to RMS microvolt
                         if option_scaleicarms
-                            if mean(mean(abs(pinv(EEG.icaweights * EEG.icasphere)-EEG.icawinv))) < 0.0001 
-                                disp('Scaling components to RMS microvolt');
-                                scaling = repmat(sqrt(mean(EEG(1).icawinv(:,:).^2))', [1 size(EEG.icaweights,2)]);
-                                EEG.etc.icaweights_beforerms = EEG.icaweights;
-                                EEG.etc.icasphere_beforerms = EEG.icasphere;
-                                
-                                EEG.icaweights = EEG.icaweights .* scaling;
-                                EEG.icawinv = pinv(EEG.icaweights * EEG.icasphere);
+                            if ~isempty(EEG.icawinv)
+                                if mean(mean(abs(pinv(EEG.icaweights * EEG.icasphere)-EEG.icawinv))) < 0.0001 
+                                    disp('Scaling components to RMS microvolt');
+                                    scaling = repmat(sqrt(mean(EEG(1).icawinv(:,:).^2))', [1 size(EEG.icaweights,2)]);
+                                    EEG.etc.icaweights_beforerms = EEG.icaweights;
+                                    EEG.etc.icasphere_beforerms = EEG.icasphere;
+                                    
+                                    EEG.icaweights = EEG.icaweights .* scaling;
+                                    EEG.icawinv = pinv(EEG.icaweights * EEG.icasphere);
+                                end;
                             end;
                         end;
 
