@@ -35,6 +35,10 @@
 %   'load'      - [filename] load dataset from specified filename 
 %   'dipselect' - [float<1] select components for clustering from all STUDY 
 %                 datasets with dipole model residual var. below this value. 
+%   'inbrain'   - [float<1] select components with dipoles located inside the
+%                 brain volume. Dipoles with residual var. below this value 
+%                 are removed before identifiying in-brain dipoles.                 
+%
 % Outputs:
 %   STUDY      - a new STUDY set containing some or all of the datasets in ALLEEG, 
 %                plus additional information from the optional inputs above. 
@@ -64,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.52  2007/09/11 10:43:47  arno
+% fixed dataset deletion
+%
 % Revision 1.51  2007/08/23 16:43:38  arno
 % typo in header
 %
@@ -276,6 +283,45 @@ for k = 1:2:length(g.commands)
             STUDY.datasetinfo(1).index = [];
             STUDY.changrp = [];
         case 'return', return;
+        case 'inbrain'
+            STUDY = std_checkset(STUDY, ALLEEG); % update setind field
+            rv = g.commands{k+1};
+            
+            for si = 1:size(STUDY.setind,2)% scan datasets that are part of STUDY
+                
+                % find a dataset with dipoles
+                % ---------------------------
+                idat = 0;
+                for sc = 1:size(STUDY.setind,1)
+                    if ~isnan(STUDY.setind(sc,si)) 
+                        if isfield(ALLEEG(STUDY.datasetinfo(STUDY.setind(sc,si)).index).dipfit, 'model')
+                            idat = STUDY.datasetinfo(STUDY.setind(sc,si)).index;
+                            break;
+                        end;
+                    end;
+                end;
+                    
+                if rv ~= 1
+                    if idat ~= 0
+                        fprintf('Selecting dipoles with less than %%%2.1f residual variance and removing dipoles outside brain volume in dataset ''%s''\n', ...
+                                100*rv, ALLEEG(idat).setname)
+                        indleft = select_brain_dipoles(ALLEEG(idat), rv); % main line
+                    else
+                        indleft = [];
+                        fprintf('No dipole information found in ''%s'' dataset, using all components\n', ALLEEG.setname)
+                    end
+                else
+                    indleft = [];
+                end;
+                for sc = 1:size(STUDY.setind,1)
+                    if ~isnan(STUDY.setind(sc,si))
+                       STUDY.datasetinfo(STUDY.setind(sc,si)).comps = indleft;
+                    end
+                end;
+            end;
+            STUDY.cluster = [];
+            STUDY = std_checkset(STUDY, ALLEEG); % recreate parent dataset
+            
         case 'dipselect'
             STUDY = std_checkset(STUDY, ALLEEG); % update setind field
             rv = g.commands{k+1};
@@ -296,7 +342,7 @@ for k = 1:2:length(g.commands)
                     
                 if rv ~= 1
                     if idat ~= 0
-                        fprintf('Selecting dipole with less than %2.1f residual variance in dataset ''%s''\n', ...
+                        fprintf('Selecting dipole with less than %%%2.1f residual variance in dataset ''%s''\n', ...
                                 100*rv, ALLEEG(idat).setname)
                         indleft = []; % components that are left in clustering
                         for icomp = 1:length(ALLEEG(idat).dipfit.model)
