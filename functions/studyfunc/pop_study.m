@@ -69,6 +69,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.57  2007/09/11 10:38:59  arno
+% fix dataset deletion
+%
 % Revision 1.56  2007/08/23 16:52:54  arno
 % channel label problem
 %
@@ -533,12 +536,17 @@ else % internal command
         case 'dipselect'
             STUDY.datasetinfo = datasetinfo;
             
-            res = inputdlg2( { strvcat('Enter maximum residual (topo map - dipole proj.) var. (in %)', ...
+            res = inputdlg2_with_checkbox( { strvcat('Enter maximum residual (topo map - dipole proj.) var. (in %)', ...
                                        'NOTE: This will delete any existing component clusters!') }, ...
-                             'pop_study():  Pre-select components', 1, { '15' } );
+                             'pop_study():  Pre-select components', 1, { '15' },'pop_study' );
             
             if isempty(res), return; end;
-            STUDY = std_editset(STUDY, ALLEEG, 'commands', { 'dipselect' str2num(res{1})/100 'return' });
+            if res{2} == 1
+                STUDY = std_editset(STUDY, ALLEEG, 'commands', { 'inbrain' str2num(res{1})/100 'return' });
+            else
+                STUDY = std_editset(STUDY, ALLEEG, 'commands', { 'dipselect' str2num(res{1})/100 'return' });
+            end;
+                
             allcom = { allcom{:} { 'dipselect' str2num(res{1})/100 } };
             datasetinfo   = STUDY.datasetinfo;
             
