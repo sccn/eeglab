@@ -1,7 +1,7 @@
 function brainComponents = eeg_dipselect(EEG, rvThreshold, selectionType, depthThreshold);
-% eeg_dipselect()  - select componet dipoles of EEG dataset with
-%                    reisdual variance (rv) less than a threshold
-%                    and location inside brain volume.
+% eeg_dipselect()  - select componet dipoles from an EEG dataset with
+%                    reisdual variance (rv) less than a selected threshold
+%                    and equivalent dipole location inside the brain volume.
 % Usage:  
 %  >> selctedComponents = eeg_dipselect(EEG, rvThreshold, selectionType, depthThreshold)
 %
@@ -9,21 +9,21 @@ function brainComponents = eeg_dipselect(EEG, rvThreshold, selectionType, depthT
 %       EEG            - EEGLAB dataset structure
 %
 % Optional Inputs
-%       rvThreshold    - residual variance threshold. Dipoles will residual variance 
-%                        less than this value will be selected. {default = 0.15}
+%       rvThreshold    - residual variance threshold (%). Dipoles with residual variance 
+%                        less than this value will be selected. {default = 15}
 %       selectionType  - criteria for selecting dipoles: 
 %                         'rv'  = only by residual variance, 
 %                         'inbrain' = inside brain volume and residual variance. 
 %                         {default = 'inbrain'}
 %
-%       depthThreshold - maximum accepted distance outside brain volume {default = 1}
+%       depthThreshold - maximum accepted distance outside brain volume (mm) {default = 1}
 %
 % Outputs:
 %   selctedComponents          - vector of selected components
 %
 % Example:
 %  >> selctedComponents = eeg_dipselect(EEG)             % select in-brain dipoles with rv less than 0.15 (default value)
-%  >> selctedComponents = eeg_dipselect(EEG, 0.2,'rv')   % select dipoles with rv less than 0.2
+%  >> selctedComponents = eeg_dipselect(EEG, 20,'rv')   % select dipoles with rv less than 0.2
 %
 % Author: Nima Bigdely Shamlo, Copyright (C) September 2007 
 % based on an script from Julie Onton and sourcedepth() function
@@ -34,7 +34,10 @@ function brainComponents = eeg_dipselect(EEG, rvThreshold, selectionType, depthT
 if nargin<2
     rvThreshold =  0.15;
     fprintf('Maximum residual variance for selected dipoles set to %1.2f (default).\n',rvThreshold);
-end;
+else
+    rvThreshold = rvThreshold/100; % change from percent to value
+end
+
 
 if nargin<4
     depthThreshold = 1;
@@ -47,7 +50,7 @@ for ic = 1:length(EEG.dipfit.model)
 end;
 compLowResidualvariance = find(residualvariance <rvThreshold);
 
-if (nargin>=3) && strcmp(selectionType, 'rv') % if only rv is requested (not in-brain)
+if isempty(compLowResidualvariance) || ( (nargin>=3) && strcmp(selectionType, 'rv')) % if only rv is requested (not in-brain)
     brainComponents = compLowResidualvariance;
     return;
 else
