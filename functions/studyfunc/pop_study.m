@@ -69,6 +69,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.58  2007/09/21 22:34:56  nima
+% added removing out-of-brain components.
+%
 % Revision 1.57  2007/09/11 10:38:59  arno
 % fix dataset deletion
 %
@@ -539,7 +542,7 @@ else % internal command
             res = inputdlg2_with_checkbox( { strvcat('Enter maximum residual (topo map - dipole proj.) var. (in %)', ...
                                        'NOTE: This will delete any existing component clusters!') }, ...
                              'pop_study():  Pre-select components', 1, { '15' },'pop_study' );
-            
+           
             if isempty(res), return; end;
             if res{2} == 1
                 STUDY = std_editset(STUDY, ALLEEG, 'commands', { 'inbrain' str2num(res{1})/100 'return' });
@@ -748,3 +751,45 @@ function strbut = formatbut(complist)
         else                     strbut = [ 'Comp.: ' int2str(complist) ];
         end;
     end;
+
+    
+%---------------------- helper functions -------------------------------------    
+    
+function [result] = inputdlg2_with_checkbox(Prompt,Title,LineNo,DefAns,funcname);
+
+if nargin < 4
+   help inputdlg2;
+   return;
+end;	
+if nargin < 5
+	funcname = '';
+end;
+	
+if length(Prompt) ~= length(DefAns)
+	error('inputdlg2: prompt and default answer cell array must have the smae size');
+end;
+
+geometry = {};
+listgui = {};
+
+% determine if vertical or horizontal
+% -----------------------------------
+geomvert = [];
+for index = 1:length(Prompt)
+	geomvert = [geomvert size(Prompt{index},1) 1];  % default is vertical geometry
+end;
+if all(geomvert == 1) & length(Prompt) > 1
+	geomvert = []; % horizontal
+end;
+
+for index = 1:length(Prompt)
+	if ~isempty(geomvert) % vertical
+		geometry = { geometry{:} [ 1] [1 ]};
+	else
+		geometry = { geometry{:} [ 1 0.6 ]};
+	end;
+	listgui = { listgui{:} { 'Style', 'text', 'string', Prompt{index}}  ...
+				{ 'Style', 'edit', 'string', DefAns{index} } { 'Style', 'checkbox', 'string','Keep only in-brain dipoles.','value',1 }  };
+end;
+geometry = [1 1 1];geomvert = [2 1 1];
+result = inputgui(geometry, listgui, ['pophelp(''' funcname ''');'], Title, [], 'normal', geomvert);

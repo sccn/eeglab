@@ -68,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.54  2007/09/25 00:03:56  nima
+% _
+%
 % Revision 1.53  2007/09/20 23:35:54  nima
 % selecting dipoles inside brain volume is added, option = 'inbrain'
 %
@@ -308,7 +311,7 @@ for k = 1:2:length(g.commands)
                     if idat ~= 0
                         fprintf('Selecting dipoles with less than %%%2.1f residual variance and removing dipoles outside brain volume in dataset ''%s''\n', ...
                                 100*rv, ALLEEG(idat).setname)
-                        indleft = eeg_dipselect(ALLEEG(idat), rv); % main line
+                        indleft = eeg_dipselect(ALLEEG(idat), rv*100); 
                     else
                         indleft = [];
                         fprintf('No dipole information found in ''%s'' dataset, using all components\n', ALLEEG.setname)
