@@ -28,12 +28,12 @@ function brainComponents = eeg_dipselect(EEG, rvThreshold, selectionType, depthT
 % Author: Nima Bigdely Shamlo, Copyright (C) September 2007 
 % based on an script from Julie Onton and sourcedepth() function
 % provided by Robert Oostenveld.
-%
+%  
 % See also: sourcedepth()
 
 if nargin<2
     rvThreshold =  0.15;
-    fprintf('Maximum residual variance for selected dipoles set to %f (default).',rvThreshold);
+    fprintf('Maximum residual variance for selected dipoles set to %1.2f (default).\n',rvThreshold);
 end;
 
 if nargin<4
@@ -47,9 +47,14 @@ for ic = 1:length(EEG.dipfit.model)
 end;
 compLowResidualvariance = find(residualvariance <rvThreshold);
 
-load(EEG.dipfit.hdmfile);
+if (nargin>=3) && strcmp(selectionType, 'rv') % if only rv is requested (not in-brain)
+    brainComponents = compLowResidualvariance;
+    return;
+else
+    load(EEG.dipfit.hdmfile);
 
-posxyz = cell2mat({EEG.dipfit.model(compLowResidualvariance).posxyz}');% select positions for components with low residual variance
-depth = sourcedepth(posxyz, vol);
+    posxyz = cell2mat({EEG.dipfit.model(compLowResidualvariance).posxyz}');% select positions for components with low residual variance
+    depth = sourcedepth(posxyz, vol);
 
-brainComponents = compLowResidualvariance(find(depth<=depthThreshold));
+    brainComponents = compLowResidualvariance(find(depth<=depthThreshold));
+end;
