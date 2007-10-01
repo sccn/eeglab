@@ -56,7 +56,11 @@ if isempty(compLowResidualvariance) || ( (nargin>=3) && strcmp(selectionType, 'r
 else
     load(EEG.dipfit.hdmfile);
 
-    posxyz = cell2mat({EEG.dipfit.model(compLowResidualvariance).posxyz}');% select positions for components with low residual variance
+     posxyz = [];
+     for c = compLowResidualvariance
+         posxyz = cat(1,posxyz,EEG.dipfit.model(c).posxyz(1,:));
+     end;
+
     depth = sourcedepth(posxyz, vol);
 
     brainComponents = compLowResidualvariance(find(depth<=depthThreshold));
