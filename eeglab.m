@@ -190,6 +190,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.517  2007/09/11 12:06:29  arno
+% add new menus for preclustering components
+%
 % Revision 1.516  2007/08/23 18:38:47  arno
 % menu color
 %
@@ -1745,6 +1748,14 @@ function [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab( onearg )
 % -------------
 eeglabpath = which('eeglab.m');
 eeglabpath = eeglabpath(1:end-length('eeglab.m'));
+
+% solve BIOSIG problem
+% --------------------
+pathtmp = which('strncmp');
+if ~all(pathtmp(1:8) == 'built-in'), 
+    septmp = find( pathtmp == filesep );
+    rmpath( pathtmp(1:septmp(end)) );
+end;
 
 % test for local SCCN copy
 % ------------------------
