@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 %$Log: not supported by cvs2svn $
+%Revision 1.24  2007/09/11 10:41:26  arno
+%show warning for empty dipole
+%
 %Revision 1.23  2007/08/14 19:20:35  nima
 %_
 %
@@ -92,7 +95,7 @@ function STUDY = std_dipplot(STUDY, ALLEEG, varargin)
 cls = []; % plot all clusters in STUDY
 figureon = 1; % plot on a new figure
 mode = 'apart';
-opt_dipplot = {'normlen', 'on', 'pointout', 'on', 'verbose', 'off', 'dipolelength', 0};
+opt_dipplot = {'normlen', 'on', 'pointout', 'on', 'verbose', 'off', 'dipolelength', 0,'projlines','on'};
 %, 'spheres', 'on'
 for k = 3:2:nargin
     switch varargin{k-2}
