@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2004/09/01 18:30:14  arno
+% fixed problem with Matlab 7
+%
 % Revision 1.1  2002/04/05 17:36:45  jorn
 % Initial revision
 %
@@ -109,7 +112,7 @@ pos = get(mapaxes,'Position');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if nargin==8
-  if caxis(1,1:2) == 'mi' % min/max of data
+  if strcmp(caxis(1,1:2), 'mi') % min/max of data
      MAPLIMITS = [min(min(Winv(:,compnos))) max(max(Winv(:,compnos)))];
   elseif caxis(1,1:2) == 'ab' % +/-max abs data
      absmax = max([abs(min(min(Winv(:,compnos)))) abs(max(max(Winv(:,compnos))))]);
