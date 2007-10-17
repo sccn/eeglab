@@ -86,6 +86,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2007/10/17 01:13:24  nima
+% accross ->across
+%
 % Revision 1.12  2007/04/30 21:00:03  arno
 % text
 % ,
@@ -128,7 +131,7 @@ if isempty(varargin)
     enablegroup = fastif(length(STUDY.group)>1, 'on', 'off');
     enablecond  = fastif(length(STUDY.condition)>1, 'on', 'off');
     threshstr   = fastif(isnan(STUDY.etc.erspparams.threshold),'', num2str(STUDY.etc.erspparams.threshold));
-    statval     = fastif(strcmpi(STUDY.etc.erspparams.statistics,'param'), 1, 2);
+    statval     = fastif(strcmpi(STUDY.etc.erspparams.statistics,'perm'), 1, 2);
     statmode    = fastif(strcmpi(STUDY.etc.erspparams.statmode,'subjects'), 1, 2);
     subbaseline = fastif(strcmpi(STUDY.etc.erspparams.subbaseline,'on'), 1, 0);
     condstats   = fastif(strcmpi(STUDY.etc.erspparams.condstats, 'on'), 1, 0);
@@ -162,7 +165,7 @@ if isempty(varargin)
         {'style' 'text'       'string' 'Compute ERSP baseline across conditions' } ...
         {} ...
         {'style' 'text'       'string' 'Statistics'} ...
-        {'style' 'popupmenu'  'string' 'Parametric|Permutation-based' 'tag' 'statistics' 'value' statval 'listboxtop' statval } ...
+        {'style' 'popupmenu'  'string' 'Permutation-based|Parametric' 'tag' 'statistics' 'value' statval 'listboxtop' statval } ...
         {'style' 'text'       'string' 'Threshold'} ...
         {'style' 'edit'       'string' threshstr 'tag' 'threshold' } ...
         {'style' 'text'       'string' 'Data for statistics'} ...
@@ -197,8 +200,8 @@ if isempty(varargin)
     res.itclim    = str2num( res.itclim );
     res.threshold = str2num( res.threshold );
     if isempty(res.threshold),res.threshold = NaN; end;
-    if res.statistics == 1, res.statistics  = 'param'; 
-    else                    res.statistics  = 'perm'; 
+    if res.statistics == 1, res.statistics  = 'perm'; 
+    else                    res.statistics  = 'param'; 
     end;
     if res.statmode   == 1, res.statmode    = 'subjects'; 
     else                    res.statmode    = 'trials'; 
@@ -280,7 +283,7 @@ function STUDY = default_params(STUDY)
     if ~isfield(STUDY.etc.erspparams, 'freqrange'),    STUDY.etc.erspparams.freqrange = []; end;
     if ~isfield(STUDY.etc.erspparams, 'ersplim' ),     STUDY.etc.erspparams.ersplim   = []; end;
     if ~isfield(STUDY.etc.erspparams, 'itclim' ),      STUDY.etc.erspparams.itclim    = []; end;
-    if ~isfield(STUDY.etc.erspparams, 'statistics'),   STUDY.etc.erspparams.statistics = 'param'; end;
+    if ~isfield(STUDY.etc.erspparams, 'statistics'),   STUDY.etc.erspparams.statistics = 'perm'; end;
     if ~isfield(STUDY.etc.erspparams, 'groupstats'),    STUDY.etc.erspparams.groupstats = 'off'; end;
     if ~isfield(STUDY.etc.erspparams, 'condstats' ),    STUDY.etc.erspparams.condstats  = 'off'; end;
     if ~isfield(STUDY.etc.erspparams, 'subbaseline' ), STUDY.etc.erspparams.subbaseline = 'on'; end;
