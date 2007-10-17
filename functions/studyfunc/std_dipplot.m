@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 %$Log: not supported by cvs2svn $
+%Revision 1.25  2007/10/17 01:09:51  nima
+%projection lines adde in line 98.
+%
 %Revision 1.24  2007/09/11 10:41:26  arno
 %show warning for empty dipole
 %
@@ -95,7 +98,7 @@ function STUDY = std_dipplot(STUDY, ALLEEG, varargin)
 cls = []; % plot all clusters in STUDY
 figureon = 1; % plot on a new figure
 mode = 'apart';
-opt_dipplot = {'normlen', 'on', 'pointout', 'on', 'verbose', 'off', 'dipolelength', 0,'projlines','on'};
+opt_dipplot = {'normlen', 'on', 'pointout', 'on', 'verbose', 'off', 'dipolelength', 0,'projlines','on','spheres','on'};
 %, 'spheres', 'on'
 for k = 3:2:nargin
     switch varargin{k-2}
