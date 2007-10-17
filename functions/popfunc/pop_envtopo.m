@@ -15,7 +15,7 @@
 %   timerange  - [min max] time range (in ms) in epoch to plot, or if [], from EEG
 %
 % Optional inputs:
-%   'key','val' - optional spectopo() and topoplot() arguments 
+%   'key','val' - optional envtopo() and topoplot() arguments 
 %                 (see >> help topoplot())
 %
 % Outputs: Same as envtopo(). When nargin < 3, a query window pops-up 
@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2006/09/20 12:23:05  arno
+% fix Scott error
+%
 % Revision 1.34  2006/03/13 19:29:08  scott
 % split out envtopo() 'compsplot' argument (new)   -sm
 %
@@ -181,7 +184,7 @@ if nargin < 3
 			 'Else plot these component numbers only (Ex: 2:4,7):', ...
                          'Component numbers to remove from data before plotting:' ...
 			 'Plot title:' ...
-			 'Optional topoplot() and spectopo() arguments:' };
+			 'Optional topoplot() and envtopo() arguments:' };
 	inistr       = { [num2str( EEG(end).xmin*1000) ' ' num2str(EEG(end).xmax*1000)], ...
 	                 [num2str( EEG(end).xmin*1000) ' ' num2str(EEG(end).xmax*1000)], ...
                      '7', ...
