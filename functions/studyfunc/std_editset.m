@@ -26,7 +26,7 @@
 %   'savedat'   - ['on'|'off'] re-save datasets
 %
 %   'inbrain'   - ['on'|'off'] select components for clustering from all STUDY 
-%                 datasets with equivalant dipoles located inside the brain volume. 
+%                 datasets with equivalent dipoles located inside the brain volume. 
 %                 Dipoles are selected based on their residual variance and their 
 %                 location. Default r.v value is %15 and it can be set using 'dipselect'
 %                 command.
@@ -71,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.56  2007/10/18 00:27:04  nima
+% 'inbrain' option changed to toggle ('on' or 'off')
+%
 % Revision 1.55  2007/09/25 18:30:01  nima
 % _
 %
