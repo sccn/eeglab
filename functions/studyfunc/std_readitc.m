@@ -9,7 +9,7 @@
 %                 probability_threshold, and wavelet type (FFT | wavelet 
 %                 cycles). See timef() for details. 
 % Usage:    
-%   >> [logersp, logfreqs, times] = std_readitc(ALLEEG, setindx, component, ...
+%   >> [logitc, logfreqs, times] = std_readitc(ALLEEG, setindx, component, ...
 %                                                       time_range, freq_range);  
 % Inputs:
 %   ALLEEG     - EEG dataset vector (can also be an EEG set). 
@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2007/01/26 18:06:51  arno
+% remove warning
+%
 % Revision 1.12  2006/09/12 18:56:15  arno
 % channel compatibility
 %
