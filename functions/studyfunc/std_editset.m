@@ -25,6 +25,12 @@
 %                'group' fields of STUDY dataset(s).
 %   'savedat'   - ['on'|'off'] re-save datasets
 %
+%   'inbrain'   - ['on'|'off'] select components for clustering from all STUDY 
+%                 datasets with equivalant dipoles located inside the brain volume. 
+%                 Dipoles are selected based on their residual variance and their 
+%                 location. Default r.v value is %15 and it can be set using 'dipselect'
+%                 command.
+%
 % Each of the 'commands' (above) is a cell array composed of any of the following: 
 %   'index'     - [integer] modify dataset index.
 %   'remove'    - [integer] remove dataset index.
@@ -34,10 +40,7 @@
 %   'group'     - [string] dataset group.
 %   'load'      - [filename] load dataset from specified filename 
 %   'dipselect' - [float<1] select components for clustering from all STUDY 
-%                 datasets with dipole model residual var. below this value. 
-%   'inbrain'   - [float<1] select components with dipoles located inside the
-%                 brain volume. Dipoles with residual var. below this value 
-%                 are removed before identifiying in-brain dipoles.                 
+%                 datasets with dipole model residual var. below this value.             
 %
 % Outputs:
 %   STUDY      - a new STUDY set containing some or all of the datasets in ALLEEG, 
@@ -68,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.55  2007/09/25 18:30:01  nima
+% _
+%
 % Revision 1.54  2007/09/25 00:03:56  nima
 % _
 %
@@ -221,12 +227,14 @@ g = finputcheck(varargin, { 'updatedat' 'string'  { 'on' 'off' }  'off';
                             'savedat'   'string'  { 'on' 'off' }  'off';
                             'addchannellabels' 'string'  { 'on' 'off' }  'off';
                             'rmclust'   'string'  { 'on' 'off' }  'on';
+                            'inbrain'   'string'  { 'on' 'off' }  'off';
                             'commands'  'cell'    {}              {} }, 'std_editset');
 if isstr(g), error(g); end;
 
 if ~isempty(g.name),  STUDY.name  = g.name; end
 if ~isempty(g.task),  STUDY.task  = g.task; end
 if ~isempty(g.notes), STUDY.notes = g.notes; end
+
 
 % make one cell array with commands
 % ---------------------------------
@@ -241,6 +249,19 @@ if ~isempty(g.commands)
     end;
 end;
 g.commands = allcoms;
+
+% add 'dipselect' command if 'inbrain' option is selected
+% ---------------------------------
+dipselectExists = false;
+for k = 1:2:length(g.commands)
+    if strcmp(g.commands{k},'dipselect')
+       dipselectExists = true;
+    end;
+end;
+if strcmp(g.inbrain,'on') && ~dipselectExists
+    g.commands{length(g.commands)+1} = 'dipselect';
+    g.commands{length(g.commands)+1} = 0.15;
+end;
 
 % copy values
 % -----------
@@ -257,7 +278,10 @@ if ~isfield(STUDY, 'datasetinfo')
         end;
     end;
 end;
-        
+
+
+
+
 % execute commands
 % ----------------
 currentind = 1;
@@ -289,45 +313,6 @@ for k = 1:2:length(g.commands)
             STUDY.datasetinfo(1).index = [];
             STUDY.changrp = [];
         case 'return', return;
-        case 'inbrain'
-            STUDY = std_checkset(STUDY, ALLEEG); % update setind field
-            rv = g.commands{k+1};
-            
-            for si = 1:size(STUDY.setind,2)% scan datasets that are part of STUDY
-                
-                % find a dataset with dipoles
-                % ---------------------------
-                idat = 0;
-                for sc = 1:size(STUDY.setind,1)
-                    if ~isnan(STUDY.setind(sc,si)) 
-                        if isfield(ALLEEG(STUDY.datasetinfo(STUDY.setind(sc,si)).index).dipfit, 'model')
-                            idat = STUDY.datasetinfo(STUDY.setind(sc,si)).index;
-                            break;
-                        end;
-                    end;
-                end;
-                    
-                if rv ~= 1
-                    if idat ~= 0
-                        fprintf('Selecting dipoles with less than %%%2.1f residual variance and removing dipoles outside brain volume in dataset ''%s''\n', ...
-                                100*rv, ALLEEG(idat).setname)
-                        indleft = eeg_dipselect(ALLEEG(idat), rv*100); 
-                    else
-                        indleft = [];
-                        fprintf('No dipole information found in ''%s'' dataset, using all components\n', ALLEEG.setname)
-                    end
-                else
-                    indleft = [];
-                end;
-                for sc = 1:size(STUDY.setind,1)
-                    if ~isnan(STUDY.setind(sc,si))
-                       STUDY.datasetinfo(STUDY.setind(sc,si)).comps = indleft;
-                    end
-                end;
-            end;
-            STUDY.cluster = [];
-            STUDY = std_checkset(STUDY, ALLEEG); % recreate parent dataset
-            
         case 'dipselect'
             STUDY = std_checkset(STUDY, ALLEEG); % update setind field
             rv = g.commands{k+1};
@@ -348,26 +333,17 @@ for k = 1:2:length(g.commands)
                     
                 if rv ~= 1
                     if idat ~= 0
-                        fprintf('Selecting dipole with less than %%%2.1f residual variance in dataset ''%s''\n', ...
-                                100*rv, ALLEEG(idat).setname)
-                        indleft = []; % components that are left in clustering
-                        for icomp = 1:length(ALLEEG(idat).dipfit.model)
-                            if (ALLEEG(idat).dipfit.model(icomp).rv < rv)
-                                % Restrict search to chosen components, if components have already been chosen.
-                                % Toby 03.21.2006
-                                % Undoing that because after selecting components < 15%, it is not possible to
-                                % select component below 20% of RV - Arno 
-                                indleft = [indleft icomp];
-                                %if isempty(STUDY.datasetinfo(idat).comps)
-                                %   indleft = [indleft icomp];
-                                %else
-                                    %for isdc = 1:length(STUDY.datasetinfo(idat).comps)
-                                    %    if icomp == STUDY.datasetinfo(idat).comps(isdc)
-                                    %       indleft = [indleft STUDY.datasetinfo(idat).comps(isdc)];
-                                    %    end
-                                    %end
-                                %end
-                            end;
+
+                       
+                        
+                        if strcmp(g.inbrain,'on')
+                            fprintf('Selecting dipoles with less than %%%2.1f residual variance and removing dipoles outside brain volume in dataset ''%s''\n', ...
+                                100*rv, ALLEEG(idat).setname);
+                            indleft = eeg_dipselect(ALLEEG(idat), rv*100,'inbrain'); 
+                        else
+                           fprintf('Selecting dipoles with less than %%%2.1f residual variance in dataset ''%s''\n', ...
+                                100*rv, ALLEEG(idat).setname);
+                            indleft = eeg_dipselect(ALLEEG(idat), rv*100,'rv'); 
                         end;
                     else
                         indleft = [];
@@ -383,8 +359,8 @@ for k = 1:2:length(g.commands)
                 end;
             end;
             STUDY.cluster = [];
-            STUDY = std_checkset(STUDY, ALLEEG); % recreate parent dataset
-            
+            STUDY = std_checkset(STUDY, ALLEEG); % recreate parent dataset           
+           
         case 'load'
             TMPEEG = std_loadalleeg( { g.commands{k+1} } );
             ALLEEG = eeg_store(ALLEEG, eeg_checkset(TMPEEG), currentind);
@@ -403,6 +379,11 @@ for k = 1:2:length(g.commands)
             STUDY.datasetinfo(currentind).index     = currentind;                    
     end
 end
+
+
+
+
+
 
 % add channel labels automatically
 % -------------------------------
