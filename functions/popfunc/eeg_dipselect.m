@@ -36,6 +36,8 @@ if nargin<2
     fprintf('Maximum residual variance for selected dipoles set to %1.2f (default).\n',rvThreshold);
 else
     rvThreshold = rvThreshold/100; % change from percent to value
+    if rvThreshold>1
+        error('Error: residual variance threshold should be less than 1.\n');        
 end
 
 
