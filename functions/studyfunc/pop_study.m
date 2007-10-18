@@ -69,6 +69,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.59  2007/09/25 18:29:54  nima
+% _
+%
 % Revision 1.58  2007/09/21 22:34:56  nima
 % added removing out-of-brain components.
 %
@@ -545,9 +548,9 @@ else % internal command
            
             if isempty(res), return; end;
             if res{2} == 1
-                STUDY = std_editset(STUDY, ALLEEG, 'commands', { 'inbrain' str2num(res{1})/100 'return' });
+                STUDY = std_editset(STUDY, ALLEEG, 'inbrain', 'on', 'commands', {'dipselect' str2num(res{1})/100 'return' });
             else
-                STUDY = std_editset(STUDY, ALLEEG, 'commands', { 'dipselect' str2num(res{1})/100 'return' });
+                STUDY = std_editset(STUDY, ALLEEG, 'inbrain', 'off', 'commands', { 'dipselect' str2num(res{1})/100 'return' });
             end;
                 
             allcom = { allcom{:} { 'dipselect' str2num(res{1})/100 } };
