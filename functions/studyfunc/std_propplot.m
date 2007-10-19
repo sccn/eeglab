@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2007/08/14 19:29:33  nima
+% _
+%
 % Revision 1.15  2007/08/13 23:24:29  nima
 % _
 %
@@ -100,7 +103,7 @@ if iscell(varargin{1}) % channel plotting
         subplot(2,2,1),
         try,
             STUDY = std_erpplot(STUDY,ALLEEG, 'channels', chans(k), 'mode', 'together', 'plotmode', 'condensed' );
-            erpAxisHangle = gca;
+            erpAxisHangle = gca;            
         catch
             axis off; text(0.5, 0.5, 'No ERP information', 'horizontalalignment', 'center');
             warningon = 1;
