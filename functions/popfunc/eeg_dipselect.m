@@ -37,7 +37,8 @@ if nargin<2
 else
     rvThreshold = rvThreshold/100; % change from percent to value
     if rvThreshold>1
-        error('Error: residual variance threshold should be less than 1.\n');        
+        error('Error: residual variance threshold should be less than 1.\n');
+    end; 
 end
 
 
