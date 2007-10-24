@@ -1,17 +1,17 @@
-% std_preclust() - prepare STUDY component location and activity measures for later clustering.
-%                  Selected measures (one or more ICA activation measures from the options: 
-%                  ERPs, spectra, scalp maps, ERSPs, and ITCs) are computed for each dataset 
-%                  in the STUDY set, unless they already present. After all requested measures are 
-%                  computed and saved in the STUDY datasets, each feature dimension is reduced by 
-%                  computing a PCA  decomposition. These PCA matrices (one per measure) are 
-%                  concatenated and used as input to the clustering  algorithm in pop_clust(). 
-%                  std_preclust() allows selection of a subset of components to use in the clustering. 
-%                  This subset may be a user-specified component subset, or components selected from 
+% std_preclust() - select measures to be included in computation of preclustering array. 
+%                  This array is used to find component clusters. Selected measures (one 
+%                  or more ICA activation measures from the options: dipole location, ERPs,
+%                  spectra, scalp maps, ERSPs, and ITCs) should have already precomputed 
+%                  using pop-precomp(). Each feature dimension is reduced by computing a PCA 
+%                  decomposition. These PCA matrices (one per measure) are concatenated and 
+%                  used as input to the clustering  algorithm in pop_clust().
+%                  std_preclust() allows selection of a subset of components to use in the clustering.
+%                  This subset may be a user-specified component subset, or components selected from
 %                  an already existing cluster (for hierarchical clustering). The EEG datasets
-%                  in the ALLEEG structure are updated. If new measures are added, the updated 
-%                  EEG sets are also saved to disk. Called by pop_preclust(). Follow with 
+%                  in the ALLEEG structure are updated. If new measures are added, the updated
+%                  EEG sets are also saved to disk. Called by pop_preclust(). Follow with
 %                  eeg_clust() or pop_clust(). See Example below.
-% Usage:    
+% Usage:     
 %                >> [STUDY,ALLEEG] = std_preclust(STUDY,ALLEEG); % prepare to cluster all comps 
 %                                                                % in all sets on all measures
 %
@@ -111,6 +111,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.86  2007/09/11 10:50:56  arno
+% do not precompute measures any more (see std_precomp)
+%
 % Revision 1.85  2007/08/14 01:56:11  scott
 % checking help msg
 %
