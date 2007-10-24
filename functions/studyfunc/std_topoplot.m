@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2007/08/14 19:29:10  nima
+% _
+%
 % Revision 1.25  2007/08/13 23:24:37  nima
 % _
 %
@@ -169,20 +172,20 @@ if strcmpi(mode, 'apart')
                     figure(h_topo);
                     sbplot(rowcols(1),rowcols(2),k+2) , 
                     toporeplot(scalpmap, 'style', 'both', 'plotrad',0.5,'intrad',0.5, 'verbose', 'off','xsurface', Xi, 'ysurface', Yi );
-                    title([ 'ic' num2str(comp) '/' subject ]);
+                    title([subject '/' 'ic' num2str(comp)   ]);
                     %waitbar(k/(len+1),h_wait)
                 else %other sbplot rows
                     figure(h_topo)
                     sbplot(rowcols(1),rowcols(2),k+4) , 
                     toporeplot(scalpmap, 'style', 'both', 'plotrad',0.5,'intrad',0.5, 'verbose', 'off','xsurface', Xi, 'ysurface', Yi );
-                    title([ 'ic' num2str(comp) '/' subject ]);
+                    title([subject '/' 'ic' num2str(comp)]);
                     %waitbar(k/(len+1),h_wait)
                 end
             end
             figure(h_topo)
             sbplot(rowcols(1),rowcols(2),[1 rowcols(2)+2 ]) ,
             toporeplot(ave_grid, 'style', 'both', 'plotrad',0.5,'intrad',0.5, 'verbose', 'off');
-            title([ STUDY.cluster(cls(clus)).name ' (' num2str(length(STUDY.cluster(cls(clus)).comps)),' ICs, '  num2str(length(unique(STUDY.cluster(cls(clus)).sets(1,:)))) ' Ss)' ]);
+            title([ STUDY.cluster(cls(clus)).name ' (' num2str(length(unique(STUDY.cluster(cls(clus)).sets(1,:)))) ' Ss, ' num2str(length(STUDY.cluster(cls(clus)).comps)),' ICs)']);
             %title([ STUDY.cluster(cls(clus)).name ' average scalp map, ' num2str(length(unique(STUDY.cluster(cls(clus)).sets(1,:)))) 'Ss']);
             set(gcf,'Color', BACKCOLOR);
             %waitbar(1,h_wait)
@@ -211,7 +214,7 @@ if strcmpi(mode, 'together')
             sbplot(rowcols(1),rowcols(2),k)  
         end
         toporeplot(STUDY.cluster(cls(k)).topo, 'style', 'both', 'plotrad',0.5,'intrad',0.5, 'verbose', 'off');
-        title([ STUDY.cluster(cls(k)).name ' (' num2str(length(STUDY.cluster(cls(k)).comps)),' ICs, '  num2str(length(unique(STUDY.cluster(cls(k)).sets(1,:)))) ' Ss)' ]);
+        title([ STUDY.cluster(cls(k)).name ' (' num2str(length(unique(STUDY.cluster(cls(k)).sets(1,:)))) ' Ss, ' num2str(length(STUDY.cluster(cls(k)).comps)),' ICs)']);
         %title([ STUDY.cluster(cls(k)).name ', ' num2str(length(unique(STUDY.cluster(cls(k)).sets(1,:)))) 'Ss' ]);
         if figureon
             waitbar(k/len,h_wait)
@@ -226,8 +229,8 @@ if strcmpi(mode, 'together')
         set(a, 'fontweight', 'bold');
         set(gcf,'name', maintitle);
     else
-        title([ STUDY.cluster(cls(k)).name ' (' num2str(length(STUDY.cluster(cls(k)).comps)),' ICs, '  num2str(length(unique(STUDY.cluster(cls(k)).sets(1,:)))) ' Ss)' ]);
-        set(gcf,'name',['Scalp map of ' STUDY.cluster(cls(k)).name ' (' num2str(length(STUDY.cluster(cls(k)).comps)),' ICs, '  num2str(length(unique(STUDY.cluster(cls(k)).sets(1,:)))) ' Ss)' ]);
+        title([ STUDY.cluster(cls(k)).name ' (' num2str(length(unique(STUDY.cluster(cls(k)).sets(1,:)))) ' Ss, ' num2str(length(STUDY.cluster(cls(k)).comps)),' ICs)']);
+        set(gcf,'name',['Scalp map of ' STUDY.cluster(cls(k)).name ' (' num2str(length(unique(STUDY.cluster(cls(k)).sets(1,:)))) ' Ss, ' num2str(length(STUDY.cluster(cls(k)).comps)),' ICs)']);
         %title([ STUDY.cluster(cls(k)).name ' scalp map, ' num2str(length(unique(STUDY.cluster(cls(k)).sets(1,:)))) 'Ss' ]);
     end
     set(gcf,'Color', BACKCOLOR);
@@ -315,7 +318,7 @@ for ci = 1:length(comp_ind)
     [Xi,Yi] = meshgrid(yi,xi);
     figure;
     toporeplot(grid, 'style', 'both', 'plotrad',0.5,'intrad',0.5,'xsurface', Xi, 'ysurface', Yi, 'verbose', 'off');
-    title([ 'IC' num2str(comp) ' / ' subject ', ' STUDY.cluster(cls).name ]);
+    title([subject ' / ' 'IC' num2str(comp) ', ' STUDY.cluster(cls).name ]);
     set(gcf,'Color', BACKCOLOR);
     axcopy;
 end
