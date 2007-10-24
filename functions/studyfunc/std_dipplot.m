@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 %$Log: not supported by cvs2svn $
+%Revision 1.26  2007/10/17 21:21:52  nima
+%Dipole option for 3D spheres set.
+%
 %Revision 1.25  2007/10/17 01:09:51  nima
 %projection lines adde in line 98.
 %
@@ -179,7 +182,7 @@ if strcmpi(mode, 'apart')  % case each cluster on a separate figure
                        max_r = max(max_r,max(ALLEEG(abset).dipfit.vol.r));
                    end
                end
-               comp_to_disp{k} = ['IC' num2str(comp) ', ' subject];
+               comp_to_disp{k} = [subject  ', ' 'IC' num2str(comp) ];
                if ~isempty(cluster_dip_models(k).posxyz)
                    ndip = ndip +1;
                    dip_ind = [dip_ind k];
@@ -303,7 +306,7 @@ if strcmpi(mode, 'together')  % case all clusters are plotted in the same figure
         end
         subplot(rowcols(1),rowcols(2),l) , 
         dipplot(cluster_dip_models, options{:});
-        title([ STUDY.cluster(cls(l)).name ' (' num2str(length(STUDY.cluster(cls(l)).comps)),' ICs, '  num2str(length(unique(STUDY.cluster(cls(l)).sets(1,:)))) ' Ss)' ],'color','white');
+        title([ STUDY.cluster(cls(l)).name ' (' num2str(length(unique(STUDY.cluster(cls(l)).sets(1,:)))) ' Ss, '  num2str(length(STUDY.cluster(cls(l)).comps)),' ICs)'],'color','white');
         %diptitle = [STUDY.cluster(cls(l)).name ', ' num2str(length(unique(STUDY.cluster(cls(l)).sets(1,:)))) 'Ss'];
         %title(diptitle, 'Color', 'white');
         % Complex axcopy
@@ -409,7 +412,7 @@ for ci = 1:length(comp_ind)
     elseif isempty(STUDY.cluster(cls).dipole)
         STUDY = std_centroid(STUDY,ALLEEG, cls , 'dipole');
     end
-    comp_to_disp = ['IC' num2str(comp) ' / ' subject];
+    comp_to_disp = [subject  ' / ' 'IC' num2str(comp) ];
     cluster_dip_models.posxyz = ALLEEG(abset).dipfit.model(comp).posxyz;
     cluster_dip_models.momxyz = ALLEEG(abset).dipfit.model(comp).momxyz;
     cluster_dip_models.rv = ALLEEG(abset).dipfit.model(comp).rv;
@@ -423,14 +426,14 @@ for ci = 1:length(comp_ind)
         end
         dipplot(cluster_dip_models, 'sphere', max_r, 'mri', ALLEEG(abset).dipfit.mrifile,'coordformat', ALLEEG(abset).dipfit.coordformat , ...
            'normlen' ,'on', 'pointout' ,'on','color', {'b', 'r'}, 'dipnames', {comp_to_disp [ STUDY.cluster(cls).name ' mean' ] },...
-            'spheres', 'on', 'verbose', 'off');
+            'spheres', 'on', 'verbose', 'off', 'projlines', 'on');
     else
        dipplot(cluster_dip_models, 'meshdata', ALLEEG(abset).dipfit.hdmfile, 'mri', ALLEEG(abset).dipfit.mrifile,'coordformat', ALLEEG(abset).dipfit.coordformat , ...
           'normlen' ,'on', 'pointout' ,'on','color', {'b', 'r'}, 'dipnames', {comp_to_disp [STUDY.cluster(cls).name ' mean']}, ...
-          'spheres', 'on', 'verbose', 'off');
+          'spheres', 'on', 'verbose', 'off', 'projlines', 'on');
     end
     fig_h = gcf;
-    set(fig_h,'Name', [ 'IC' num2str(comp) ' / ' subject ', ' STUDY.cluster(cls).name],'NumberTitle','off');
+    set(fig_h,'Name', [subject ' / ' 'IC' num2str(comp) ', ' STUDY.cluster(cls).name],'NumberTitle','off');
 end
         
 % -----------------------
