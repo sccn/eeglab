@@ -1,21 +1,17 @@
-% std_preclust() - select measures to be included in computation of preclustering array. 
-%                  This array is used to find component clusters. Selected measures (one 
-%                  or more ICA activation measures from the options: dipole location, ERPs,
-%                  spectra, scalp maps, ERSPs, and ITCs) should have already precomputed 
-%                  using pop-precomp(). Each feature dimension is reduced by computing a PCA 
-%                  decomposition. These PCA matrices (one per measure) are concatenated and 
-%                  used as input to the clustering  algorithm in pop_clust().
-%                  std_preclust() allows selection of a subset of components to use in the clustering.
-%                  This subset may be a user-specified component subset, or components selected from
-%                  an already existing cluster (for hierarchical clustering). The EEG datasets
-%                  in the ALLEEG structure are updated. If new measures are added, the updated
-%                  EEG sets are also saved to disk. Called by pop_preclust(). Follow with
-%                  eeg_clust() or pop_clust(). See Example below.
-% Usage:     
-%                >> [STUDY,ALLEEG] = std_preclust(STUDY,ALLEEG); % prepare to cluster all comps 
+%   std_preclust() - select measures to be included in computation of a preclustering array.
+%                    This array is used by pop_clust() to find component clusters from a
+%                    specified parent cluster.
+%                    Selected measures (dipole location, ERPs, spectra, scalp maps, ERSPs,
+%                    and/or ITCs) should already be precomputed using pop-precomp(). Each 
+%                    feature dimension is reduced by PCA decomposition. These PCA matrices 
+%                    (one per measure) are concatenated and used as input to the clustering
+%                    algorithm in pop_clust(). Follow with pop_clust(). 
+%                    See Example below:
+%
+%  >> [STUDY,ALLEEG] = std_preclust(STUDY,ALLEEG); % prepare to cluster all comps 
 %                                                                % in all sets on all measures
 %
-%                >> [STUDY,ALLEEG] = std_preclust(STUDY,ALLEEG, clustind, preproc1, preproc2...);
+%  >> [STUDY,ALLEEG] = std_preclust(STUDY,ALLEEG, clustind, preproc1, preproc2...);
 %                                                                % prepare to cluster specifed 
 %                                                                % cluster on specified measures
 % Required inputs:
@@ -111,6 +107,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.87  2007/10/24 18:31:03  nima
+% help message updated because the measure are now computed in pop) precomp and not in this function.
+%
 % Revision 1.86  2007/09/11 10:50:56  arno
 % do not precompute measures any more (see std_precomp)
 %
