@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2007/08/21 01:24:11  arno
+% default padratio is now 1
+%
 % Revision 1.35  2007/08/07 19:17:59  arno
 % fix bug 343
 %
@@ -315,6 +318,7 @@ if length( options ) < 2
 end;
 varargout{1} = sprintf('figure; pop_newcrossf( %s, %d, %d, %d, [%s], [%s] %s);', ...
           inputname(1), typeproc, num1, num2, int2str(tlimits), num2str(cycles), options);
+ 
 com = sprintf( '%s newcrossf( tmpsig1, tmpsig2, length(pointrange), [tlimits(1) tlimits(2)], EEG.srate, cycles %s);', outstr, options);
 eval(com)
 

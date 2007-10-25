@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.38  2007/08/07 19:18:14  arno
+% fixe bug 343
+%
 % Revision 1.37  2007/08/06 17:58:42  arno
 % fix bug 344
 %
@@ -321,6 +324,8 @@ if length( options ) < 2
 end;
 varargout{1} = sprintf('figure; pop_crossf( %s, %d, %d, %d, [%s], [%s] %s);', ...
           inputname(1), typeproc, num1, num2, int2str(tlimits), num2str(cycles), options);
+
+%options = [ options ', ''ydir'', ''norm''' ];
 com = sprintf( '%s crossf( tmpsig1, tmpsig2, length(pointrange), [tlimits(1) tlimits(2)], EEG.srate, cycles %s);', outstr, options);
 eval(com)
 
