@@ -213,6 +213,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.82  2007/10/25 21:28:08  nima
+% _
+%
 % Revision 1.81  2007/08/07 19:54:23  arno
 % typo
 %
@@ -1450,6 +1453,7 @@ case 'on'
    set(h(6),'XTickLabel',[],'XTick',[])
    
    h(8) = axes('Position',[.95 ordinate1 .05 height].*s+q);
+     
    if setylim 
         cbar(h(8),151:300, [0 tmpscale(2)]); % use only positive colors (gyorv) 
    else cbar(h(8),1:300  , [-tmpscale(2) tmpscale(2)]); % use only positive colors (gyorv) 
@@ -1540,6 +1544,8 @@ case 'on'
       end;
    end
    
+   set(gca,'xdir','rev'); % nima
+   
    tick = get(h(11),'YTick');
    set(h(11),'YTick',[tick(1) ; tick(length(tick))]); % crashes for log
    set(h(11),'View',[90 90])
@@ -1581,6 +1587,8 @@ case 'on'
        for i=1:length(g.marktimes)
            plot([g.marktimes(i) g.marktimes(i)],[0 freqs(end)],'--m','LineWidth',g.linewidth);
        end;
+       
+       set(gca,'ydir','norm'); % nima
        
        ylabel('Freq. (Hz)')
        xlabel('Time (ms)')
