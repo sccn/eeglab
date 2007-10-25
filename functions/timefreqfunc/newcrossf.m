@@ -213,6 +213,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.81  2007/08/07 19:54:23  arno
+% typo
+%
 % Revision 1.80  2007/08/07 19:14:35  arno
 % remove help message warning
 %
@@ -1429,6 +1432,8 @@ case 'on'
        try, imagesclogy(times,freqs,RR,max(max(RR))*[-1 1]); % plot the coherence image
        catch, imagesclogy(times,freqs,RR,[-1 1]); end;
    end;
+   
+  set(gca,'ydir','norm'); 
    
    if ~isempty(g.maxamp)
 	   caxis([-g.maxamp g.maxamp]);

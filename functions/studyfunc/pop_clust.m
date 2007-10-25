@@ -1,6 +1,6 @@
 % pop_clust() - select and run a clustering algorithm on components from an EEGLAB STUDY 
 %               structure of EEG datasets. Clustering data should be prepared beforehand using 
-%               pop_preclust() and/or eeg_preclust(). The number of clusters must be
+%               pop_preclust() and/or std_preclust(). The number of clusters must be
 %               specified in advance. If called in gui mode, the pop_clustedit() window
 %               appears when the clustering is complete to display clustering results
 %               and allow the user to review and edit them.
@@ -35,7 +35,7 @@
 %  "Save STUDY"         - [check box] check to save the updated STUDY after clustering 
 %                         is performed. If no file entered, overwrites the current STUDY. 
 %
-%  See also  pop_clustedit(), pop_preclust(), eeg_preclust(), pop_clust()
+%  See also  pop_clustedit(), pop_preclust(), std_preclust(), pop_clust()
 %
 % Authors:  Hilit Serby & Arnaud Delorme, SCCN, INC, UCSD, October 11, 2004
 
@@ -60,6 +60,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2007/09/11 10:33:38  arno
+% add new free algorithm for kmeans
+%
 % Revision 1.32  2007/08/07 18:29:22  arno
 % fix help from guy (bug 283)
 %
@@ -244,7 +247,8 @@ if isempty(varargin) %GUI call
                     if strcmpi(clus_alg, 'kmeans')
                         [IDX,C,sumd,D] = kmeans(clustdata,clus_num,'replicates',10,'emptyaction','drop');
                     else
-                        [IDX,C,sumd,D] = kmeanscluster(clustdata,clus_num);
+                        %[IDX,C,sumd,D] = kmeanscluster(clustdata,clus_num);
+                        [C,IDX,sumd] =kmeans_st(real(clustdata),clus_num,150);
                     end;
                     [STUDY, clusters] = std_createclust2(STUDY,IDX,C,  {'Kmeans', clus_num});
                 end    
@@ -358,7 +362,7 @@ function [STUDY, clusters] = std_createclust2(STUDY,IDX,C, algorithm)
 clusters = [];
 sets = [];
 comp = [];
-nsets = length(STUDY.etc.preclust.preclustcomps); 
+nsets = length(STUDY.etc.preclust.preclustcomps); % number of sets from which components are originated, maybe less than actual number of sets in the STUDY since some sets may have not any selected componnets
 for k = 1: nsets
     sets = [sets k*ones(1,length(STUDY.etc.preclust.preclustcomps{k}))];
     comp = [comp STUDY.etc.preclust.preclustcomps{k}];
