@@ -22,11 +22,11 @@
 %                  use 'naccu' >= 200; for p < 0.001, use >= 2000. When 
 %                  threshold (below) is not NaN and 'naccu' is too low, 
 %                  'naccu' will be automatically updated (for now, from
-%                  the command line only). {default: ??}
+%                  the command line only).
 %   'threshold'  - [NaN|0.0x] Significance threshold. NaN will plot the 
 %                  p-value themselves on a different figure. When possible, 
 %                  significant latency regions are shown below the data.
-%                  {default: ??}
+%                  {default: NaN}
 % Plot options:
 %   'freqrange'  - [min max] spectral frequency range (in Hz) to plot. 
 %                  {default: whole frequency range} .
@@ -34,12 +34,12 @@
 %                  {default: from data}
 %   'plotgroups' - ['together'|'apart'] 'together' -> plot subject groups 
 %                  on the same figure in different colors, else ('apart') on 
-%                  different figures {default: ??}
+%                  different figures {default: 'apart'}
 %   'plotconditions' - ['together'|'apart'] 'together' -> plot conditions 
 %                  on the same figure in different colors, else ('apart') 
 %                  on different figures. Note: keywords 'plotgroups' and 
 %                  'plotconditions' cannot both be set to 'together'. 
-%                  {default: ??}
+%                  {default: 'apart'}
 %
 % See also: std_specplot()
 %
@@ -62,6 +62,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2007/03/17 21:23:04  arno
+% logical operator precedence
+%
 % Revision 1.13  2007/01/26 18:03:27  arno
 % new topofreq option
 %
