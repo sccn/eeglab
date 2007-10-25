@@ -157,6 +157,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.54  2007/08/07 19:24:32  arno
+% fix bug 346
+%
 % Revision 1.53  2007/08/07 19:21:42  arno
 % update help message (bug 346)
 %
@@ -393,7 +396,7 @@ if ~isstr(varargin{1})
         {'style' 'pushbutton' 'enable'  ersp_enable 'string' 'Plot ITCs' 'Callback' plot_clus_itcs} { }  ...
         {'style' 'pushbutton' 'enable'  ersp_enable 'string' 'Plot ITC(s)' 'Callback' plot_comp_itcs}...
         {'style' 'pushbutton' 'string' 'Plot cluster properties' 'Callback' plot_clus_sum} {} ... 
-        {'style' 'pushbutton' 'string' 'Plot component properties' 'Callback' plot_comp_sum 'enable' 'off'} ...
+        {'style' 'pushbutton' 'string' 'Plot component properties' 'Callback' plot_comp_sum 'enable' 'on'} ... % nima, was off
         {} ...
         {'style' 'pushbutton' 'string' 'Create new cluster' 'Callback'  create_clus} {} ...
         {'style' 'pushbutton' 'string' 'Reassign selected component(s)' 'Callback' move_comp} ...
@@ -621,6 +624,7 @@ else
            
         case 'plotcompsum'
             for ci = 1 : length(comp_ind)
+                % place holder for component properties % nima
             end
             
         case 'renameclust'
