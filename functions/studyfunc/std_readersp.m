@@ -10,7 +10,7 @@
 %                  resolution, probability threshold, and wavelet type (FFT or 
 %                  wavelet_cycles). See >> timef help and >> timef details
 % Usage:    
-%     >> [logersp, logfreqs, times ] = std_readersp(ALLEEG, setindex, component, ...
+%     >>  [logersp, logfreqs, timevals, params, baseersp] = std_readersp(ALLEEG, setindex, component, ...
 %                                                            time_range, freq_range);  
 % Inputs:
 %   ALLEEG     - vector of EEG datasets (can also be one EEG dataset). Must contain 
@@ -26,10 +26,12 @@
 %   logersp    - the log-frequency ERSP for the requested ICA component 
 %                in the specified dataset. Dimensions: (equal log-spaced) 
 %                frequencies by epoch latencies (unit: dB diff from baseline)
-%   logfreqs   - vector of equal-log-spaced ERSP frequencies (Hz)
-%   times      - vector of ERSP times (latencies) (s)
+%   logfreqs   - vector of equal-log-spaced ERSP frequencies (Hz) 
+%   timevals      - vector of ERSP times (latencies) (s)
 %   params     - structure of timef() parameters saved with the ERSP
-%
+%   baseersp   - condition-specific baseline. Third dimesnsion corresponds to 
+%                conditions.
+%   
 % See also:  std_ersp(), pop_preclust(), std_preclust(), timef()
 %
 % Authors: Arnaud Delorme, SCCN, INC, UCSD, February, 2005
@@ -53,6 +55,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2007/08/06 19:32:18  arno
+% fix last changes
+%
 % Revision 1.30  2007/08/06 19:29:30  arno
 % multiple condition baseline now in log space
 %
