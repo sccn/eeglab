@@ -277,6 +277,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.140  2007/10/25 01:18:22  nima
+% when only ITC is plotted, the scalp map is plotted on upper left instead of in the middle.
+%
 % Revision 1.139  2007/08/29 02:41:50  arno
 % fixing significance level for power
 %
@@ -2105,9 +2108,9 @@ switch lower(g.plotitc)
         if (~isempty(g.topovec))
   
             if strcmp(g.plotersp,'off')
-                h(12) = axes('Position',[-.207 .95 .2 .14].*s+q);
+                h(12) = axes('Position',[-.207 .95 .2 .14].*s+q); % place the scalp map at top-left
             else
-                h(12) = axes('Position',[-.1 .43 .2 .14].*s+q);
+                h(12) = axes('Position',[-.1 .43 .2 .14].*s+q);   % place the scalp map at middle-left
             end;
             if length(g.topovec) == 1
                 topoplot(g.topovec,g.elocs,'electrodes','off', ...
