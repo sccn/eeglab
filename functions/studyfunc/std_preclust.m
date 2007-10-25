@@ -107,6 +107,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.88  2007/10/24 20:42:34  nima
+% help changed.
+%
 % Revision 1.87  2007/10/24 18:31:03  nima
 % help message updated because the measure are now computed in pop) precomp and not in this function.
 %
@@ -648,7 +651,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                         if strcmpi(strcom, 'ersp')
                             tmp = std_readersp(ALLEEG, idattot, succompind{si}(k), timewindow, freqrange); 
                         else
-                            tmp = std_readitc( ALLEEG, idattot, succompind{si}(k), timewindow, freqrange); 
+                            tmp = real(std_readitc( ALLEEG, idattot, succompind{si}(k), timewindow, freqrange)); 
                         end;
                         if k == 1
                             X = zeros(length(succompind{si}), size(tmp,1), size(tmp,2), size(tmp,3)); 
