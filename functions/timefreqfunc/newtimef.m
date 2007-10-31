@@ -277,6 +277,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.141  2007/10/25 17:28:37  nima
+% _
+%
 % Revision 1.140  2007/10/25 01:18:22  nima
 % when only ITC is plotted, the scalp map is plotted on upper left instead of in the middle.
 %
@@ -1540,7 +1543,7 @@ switch g.type
 end;
 verboseprintf(g.verbose, '  of %d frames sampled at %g Hz.\n',g.frames,g.srate);
 verboseprintf(g.verbose, 'Each trial contains samples from %1.0f ms before to\n',g.tlimits(1));
-verboseprintf(g.verbose, '  %1.0 ms after the timelocking event.\n',g.tlimits(2));
+verboseprintf(g.verbose, '  %1.0f ms after the timelocking event.\n',g.tlimits(2));
 if ~isnan(g.alpha)
     verboseprintf(g.verbose, 'Only significant values (bootstrap p<%g) will be colored;\n',g.alpha)
     verboseprintf(g.verbose, '  non-significant values will be plotted in green\n');
