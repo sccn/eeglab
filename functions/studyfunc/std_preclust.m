@@ -107,6 +107,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.89  2007/10/25 00:39:02  nima
+% Only real part of ITC is now used in preclustering array.
+%
 % Revision 1.88  2007/10/24 20:42:34  nima
 % help changed.
 %
@@ -368,7 +371,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
         if strcmpi(strcom, 'scalp') | strcmpi(strcom, 'scalplaplac') | strcmpi(strcom, 'scalpgrad') 
             strcom = 'topo';
         end;
-        if ~strcmpi(strcom, 'dipoles')
+        if ~strcmpi(strcom, 'dipoles') & ~strcmpi(strcom, 'finaldim')
             tmpfile = fullfile( ALLEEG(1).filepath, [ ALLEEG(1).filename(1:end-3) 'ica' strcom ]); 
             if exist(tmpfile) ~= 2
                 error([ 'Could not find "' upper(strcom) '" file, they must be precomputed' ]);
