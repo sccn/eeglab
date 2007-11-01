@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.65  2007/10/18 22:02:51  nima
+% _
+%
 % Revision 1.64  2007/09/11 11:13:57  arno
 % add bug ref
 %
@@ -326,10 +329,10 @@ if isempty(STUDY.etc.version)
         tmp = load('-mat', filename);
         if (length(fieldnames(tmp))-5)/3 < size(ALLEEG(1).icaweights,1)
 %            keyboard; nima
-            fprintf(2,'Corrupted ERSP files for ICA. THESE FILES MUST BE RECOMPUTED (bug 497).\n');
+            fprintf(2,'Possibly corrupted ERSP files for ICA. THESE FILES SHOULD BE RECOMPUTED (bug 497).\n');
+            fprintf(2,'(This message will not appear again).\n');
             disp('Use menu "Study > Precompute Component Measures", select ERSP and');
             disp('force recomputation. This problem refers to bug 489.');
-            STUDY.etc.version = [];
         end;
     end;
     if isfield(STUDY, 'changrp')
