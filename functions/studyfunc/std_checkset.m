@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.66  2007/11/01 23:06:05  arno
+% removing message
+%
 % Revision 1.65  2007/10/18 22:02:51  nima
 % _
 %
@@ -301,11 +304,6 @@ end
 
 % remove cluster information if old version
 % -----------------------------------------
-if ~isempty(STUDY.etc.version)
-    if strcmpi(STUDY.etc.version, '6.0b')
-        STUDY.etc.version = [];
-    end;
-end;
 if isempty(STUDY.etc.version)
     icadefs;
     STUDY.etc.version = EEGLAB_VERSION;
