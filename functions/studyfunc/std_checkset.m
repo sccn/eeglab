@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.67  2007/11/01 23:10:06  arno
+% removing version testing
+%
 % Revision 1.66  2007/11/01 23:06:05  arno
 % removing message
 %
@@ -198,11 +201,9 @@ if ~isempty(STUDY.datasetinfo(1).index)
     for is = 1:length(STUDY.subject)
         alldats = strmatch(STUDY.subject{is}, { STUDY.datasetinfo.subject }, 'exact');
 
-        for ig = 1:length(STUDY.group)
-            tmpind       = strmatch(STUDY.group{ig}, { STUDY.datasetinfo(alldats).group }, 'exact');
-            sessions     = [ STUDY.datasetinfo(alldats(tmpind)).session ];
-            if length(unique(sessions)) < length(tmpind) & length(tmpind) > 1
-%                keyboard; nima
+        for is = 1:length(STUDY.session)
+            tmpind       = find(STUDY.session(is) == [ STUDY.datasetinfo(alldats).session ] );
+            if length(unique({ STUDY.datasetinfo(alldats(tmpind)).group } )) > 1
                 correctsession = 1;
             end;
             
