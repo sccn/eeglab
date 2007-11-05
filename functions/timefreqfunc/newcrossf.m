@@ -19,7 +19,7 @@
 %        or, if 'baseboot' is 1, the whole epoch. 
 % Usage: 
 %        >> [coh,mcoh,timesout,freqsout,cohboot,cohangles,...
-%                  allcoher,alltfX,alltfY] = crossf(x,y,frames,tlimits,srate, ...
+%                  allcoher,alltfX,alltfY] = newcrossf(x,y,frames,tlimits,srate, ...
 %                                        cycles, 'key1', 'val1', 'key2', val2' ...);
 %
 % Required inputs:
@@ -128,7 +128,7 @@
 %                    either subtract complex spectral values' absolute vales 
 %                    ('abs'), angles ('angles') or the complex values themselves
 %                    ('complex').     {default: 'abs'}
-%       'rboot'    = Input bootstrap coherence limits (e.g., from crossf()) 
+%       'rboot'    = Input bootstrap coherence limits (e.g., from newcrossf()) 
 %                    The bootstrap type should be identical to that used
 %                    to obtain the input limits. {default: compute from data}
 % Optional scalp map plot:
@@ -213,6 +213,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.83  2007/10/25 23:29:19  nima
+% direction of frequency axis changed.
+%
 % Revision 1.82  2007/10/25 21:28:08  nima
 % _
 %
@@ -638,7 +641,7 @@
 %    (Boot) function [Boot, Rbootout] = bootcomppost(...) - bootstrap normalization
 % - by real objects under C++ (see C++ code)
 
-function [R,mbase,timesout,freqs,Rbootout,Rangle, coherresout, alltfX, alltfY] = crossf(X, Y, frame, tlimits, Fs, varwin, varargin)
+function [R,mbase,timesout,freqs,Rbootout,Rangle, coherresout, alltfX, alltfY] = newcrossf(X, Y, frame, tlimits, Fs, varwin, varargin)
 
 %varwin,winsize,nwin,oversmp,maxfreq,alpha,verts,caxmax)
 
@@ -960,7 +963,7 @@ if iscell(X)
 		g.title = { 'Condition 1', 'Condition 2', 'Condition 1 - condition 2' };
 	end;
 	
-	fprintf('Running crossf on condition 1 *********************\n');
+	fprintf('Running newcrossf on condition 1 *********************\n');
 	fprintf('Note: if an out-of-memory error occurs, try reducing the\n');
 	fprintf('      number of time points or number of frequencies\n');
 	fprintf('      (the ''coher'' options takes 3 times more memory than other options)\n');
@@ -981,7 +984,7 @@ if iscell(X)
 	end;
 	R1 = R1.*exp(j*Rangle1/180*pi);
 	
-	fprintf('\nRunning crossf on condition 2 *********************\n');
+	fprintf('\nRunning newcrossf on condition 2 *********************\n');
 	if strcmpi(g.plotamp, 'on') | strcmpi(g.plotphase, 'on')
         subplot(1,3,2);
 	end;
