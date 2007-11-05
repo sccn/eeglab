@@ -27,9 +27,9 @@
 %                  newtimef(data, frames, tlimits, srate, cycles,...
 %                       'key1',value1, 'key2',value2, ... );
 %
-% Example using data from two conditions (EEG versus ALLEEG(2)):
+% Example to compare two condition (channel 1 EEG versus ALLEEG(2)):
 %        >> [ersp,itc,powbase,times,freqs,erspboot,itcboot] = ...
-%                  newtimef({EEG.data(chan,:,:) ALLEEG(2).data(chan,:,:)}, ,,,
+%                  newtimef({EEG.data(1,:,:) ALLEEG(2).data(1,:,:)}, ,,,
 %                       EEG.pnts, [EEG.xmin EEG.xmax]*1000, EEG.srate, cycles);
 % NOTE:
 %        >> timef details  % presents more detailed argument information
@@ -153,8 +153,8 @@
 %       'condboot'  = ['abs'|'angle'|'complex'] for comparing 2 conditions,
 %                     either subtract ITC absolute vales ('abs'), angles
 %                     ('angles') or complex values ('complex').   {'abs'}
-%       'pboot'     = Bootstrap power limits (e.g., from timef()) {from data}
-%       'rboot'     = Bootstrap ITC limits (e.g., from timef()). 
+%       'pboot'     = Bootstrap power limits (e.g., from newtimef()) {from data}
+%       'rboot'     = Bootstrap ITC limits (e.g., from newtimef()). 
 %                     Note: Both pboot and rboot must be provided to avoid 
 %                     recomputing the surrogate data!           {from data}
 %
@@ -277,6 +277,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.142  2007/10/31 15:49:05  arno
+% fix typo
+%
 % Revision 1.141  2007/10/25 17:28:37  nima
 % _
 %

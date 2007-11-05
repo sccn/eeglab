@@ -17,9 +17,17 @@
 %        of the output plots are zeroed (and shown in green). The baseline
 %        epoch is all windows with center latencies < the given 'baseline' value 
 %        or, if 'baseboot' is 1, the whole epoch. 
-% Usage: 
+%
+% Usage with single dataset:
 %        >> [coh,mcoh,timesout,freqsout,cohboot,cohangles,...
 %                  allcoher,alltfX,alltfY] = newcrossf(x,y,frames,tlimits,srate, ...
+%                                        cycles, 'key1', 'val1', 'key2', val2' ...);
+%
+% Example to compare two condition (coh. comp 1-2 EEG versus ALLEEG(2)):
+%        >> [coh,mcoh,timesout,freqsout,cohboot,cohangles,...
+%                  allcoher,alltfX,alltfY] = newcrossf({EEG.icaact(1,:,:) ...
+%                  ALLEEG(2).icaact(1,:,:)},{{EEG.icaact(2,:,:) ...
+%                  ALLEEG(2).icaact(2,:,:)}},frames,tlimits,srate, ...
 %                                        cycles, 'key1', 'val1', 'key2', val2' ...);
 %
 % Required inputs:
@@ -213,6 +221,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.84  2007/11/05 23:20:17  arno
+% crossf -> newcrossf
+%
 % Revision 1.83  2007/10/25 23:29:19  nima
 % direction of frequency axis changed.
 %
