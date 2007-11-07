@@ -21,10 +21,6 @@
 %                  computed and saved. Only selected channels 
 %                  are returned by the function to Matlab
 %                  {default|[] -> none}
-%   'timerange'  - [minms maxms] latency window limits (in ms) within which to 
-%                  compute ERPs {default|[]: [EEG.min EEG.max]}. It is not
-%                  advised to change this range unless you require a
-%                  specific baseline. The plotting 
 %   'recompute'  - ['on'|'off'] force recomputing ERP file even if it is 
 %                  already on disk.
 % Outputs:
@@ -61,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2007/11/07 00:14:22  arno
+% Remove baseline subtraction
+%
 % Revision 1.32  2007/08/13 01:20:08  arno
 % updating help message
 %
@@ -165,7 +164,7 @@ end;
 g = finputcheck(options, { 'components' 'integer' []         [];
                            'channels'   'cell'    {}         {};
                            'recompute'  'string'  { 'on' 'off' } 'off';
-                           'timerange'  'real'    []         [EEG.xmin EEG.xmax]*1000 }, 'std_erp');
+                           'timerange'  'real'    []         [] }, 'std_erp');
 if isstr(g), error(g); end;
 if isfield(EEG,'icaweights')
    numc = size(EEG.icaweights,1);
@@ -219,6 +218,9 @@ end;
 
 % Remove baseline mean
 % --------------------
+if ~isempty(g.timerange)
+    disp('Warning: the ''timerange'' option is deprecated and has no effect');
+end;
 %if EEG.trials > 1 %epoched data
 %    time0 = find(EEG.times < 0);
 %    time0 = find(EEG.times(time0) > g.timerange(1));
