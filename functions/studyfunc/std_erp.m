@@ -61,6 +61,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2007/08/13 01:20:08  arno
+% updating help message
+%
 % Revision 1.31  2007/02/28 12:03:28  arno
 % force recomputation
 %
@@ -216,17 +219,17 @@ end;
 
 % Remove baseline mean
 % --------------------
-if EEG.trials > 1 %epoched data
-    time0 = find(EEG.times < 0);
-    time0 = find(EEG.times(time0) > g.timerange(1));
-    if ~isempty(time0)
-        X = rmbase(X,EEG.pnts, time0);
-    else
-        X = rmbase(X,EEG.pnts);
-    end
-else
-    X = rmbase(X);
-end
+%if EEG.trials > 1 %epoched data
+%    time0 = find(EEG.times < 0);
+%    time0 = find(EEG.times(time0) > g.timerange(1));
+%    if ~isempty(time0)
+%        X = rmbase(X,EEG.pnts, time0);
+%    else
+%        X = rmbase(X,EEG.pnts);
+%    end
+%else
+%    X = rmbase(X);
+%end
 X = reshape(X, [ size(X,1) size(TMP.data,2) size(TMP.data,3) ]);
 if strcmpi(prefix, 'comp')
     X = repmat(sqrt(mean(TMP.icawinv.^2))', [1 TMP.pnts]) .* mean(X,3); % calculate ERP
