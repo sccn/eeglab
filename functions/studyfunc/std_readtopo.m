@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2007/09/11 10:53:25  arno
+% handles now one file per dataset
+%
 % Revision 1.8  2006/03/14 02:39:40  scott
 % help msg
 %
@@ -74,6 +77,10 @@ if nargin < 4
     option = 'none';
 end;
 filename = fullfile( ALLEEG(abset).filepath,[ ALLEEG(abset).filename(1:end-3) 'icatopo']);
+while(getfield(dir(filename), 'bytes') < 1000)
+    topo = load( '-mat', filename);
+    filename = topo.file;
+end;
 
 for k = 1:length(comps)
 
@@ -88,25 +95,9 @@ for k = 1:length(comps)
             error( [ 'Cannot read file ''' filename '''' ]);
         end;
         warning on;
-        if ~isfield(topo, [ 'comp' int2str(comps(k)) '_y'])
-            topo = load( '-mat', filename);
-            if isfield(topo, 'file')
-                try
-                    topo = load( '-mat', topo.file, ...
-                                 [ 'comp' int2str(comps(k)) '_grid'], ...
-                                 [ 'comp' int2str(comps(k)) '_x'], ...
-                                 [ 'comp' int2str(comps(k)) '_y'] );
-                catch
-                    error( [ 'Cannot read file ''' topo.file '''' ]);
-                end;
-            end;
-        end;
     elseif k == 1
         try
             topo = load( '-mat', filename);
-            if isfield(topo, 'file')
-                topo = load( '-mat', topo.file);
-            end;
         catch
             error( [ 'Cannot read file ''' filename '''' ]);
         end;
