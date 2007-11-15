@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2007/10/17 00:19:54  nima
+% 'spectopo' replaced by 'envtopo' in all messages.
+%
 % Revision 1.35  2006/09/20 12:23:05  arno
 % fix Scott error
 %
@@ -230,15 +233,17 @@ end;
 if timerange(1) < max([EEG.xmin])*1000, timerange(1) =  max([EEG.xmin])*1000; end;
 if timerange(2) > min([EEG.xmax])*1000, timerange(2) =  min([EEG.xmax])*1000; end;
 
-sigtmp = reshape(EEG(1).data, EEG(1).nbchan, EEG(1).pnts, EEG(1).trials);
+EEG1 = eeg_checkset(EEG(1),'loaddata');
+sigtmp = reshape(EEG1.data, EEG1.nbchan, EEG1.pnts, EEG1.trials);
 if length(EEG) == 2
-    if ~all(EEG(1).icaweights(:) == EEG(2).icaweights(:))
+    EEG2 = eeg_checkset(EEG(2),'loaddata');
+    if ~all(EEG1.icaweights(:) == EEG2.icaweights(:))
         error('The ICA decomposition must be the same for the two datasets');
     end;
-    sigtmp2 = reshape(EEG(2).data, EEG(2).nbchan, EEG(2).pnts, EEG(2).trials);
+    sigtmp2 = reshape(EEG2.data, EEG2.nbchan, EEG2.pnts, EEG2.trials);
 end;
-posi = round( (timerange(1)/1000-EEG(1).xmin) * EEG(1).srate) + 1;
-posf = min(round( (timerange(2)/1000-EEG(1).xmin) * EEG(1).srate) + 1, EEG(1).pnts);
+posi = round( (timerange(1)/1000-EEG1.xmin) * EEG1.srate) + 1;
+posf = min(round( (timerange(2)/1000-EEG1.xmin) * EEG1.srate) + 1, EEG1.pnts);
 
 % outputs
 % -------
