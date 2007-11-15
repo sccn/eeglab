@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % 02-01-01  replaced std() with rms() -sm
 % 02-10-01  made srate optional -sm
@@ -224,7 +227,7 @@ pos = [620,40,550,400]; figure('Position',pos);
 
 if frames > 2048
   windw = 512;
-elseif frames 1024
+elseif frames > 1024
   windw = 256;
 else
   windw = 128;
