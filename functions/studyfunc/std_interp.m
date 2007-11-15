@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2007/03/17 21:09:55  arno
+% Matlab 6.5 compatibility
+%
 % Revision 1.3  2007/02/18 19:05:05  scott
 % help msg consistency and usage -sm
 %
@@ -85,7 +88,7 @@ for index = 1:length(STUDY.datasetinfo)
            % ----------------------------------------
            for ind2 = 1:length(STUDY.datasetinfo)
                tmplocs2 = ALLEEG(ind2).chanlocs;
-               tmpmatch = strmatch(alllocs(id2(ind)).labels, { tmplocs2.labels });
+               tmpmatch = strmatch(alllocs(id2(ind)).labels, { tmplocs2.labels }, 'exact');
                if ~isempty(tmpmatch) 
                    if alllocs(id2(ind)).theta == tmplocs2(tmpmatch).theta
                        datind = ind2;
@@ -105,7 +108,7 @@ end;
 if iscell(chans)
     alllabs = lower({ alllocs.labels });
     for index = 1:length(chans)
-        tmpind = strmatch(lower(chans{index}), alllabs);
+        tmpind = strmatch(lower(chans{index}), alllabs, 'exact');
         if isempty(tmpind)
             error( sprintf('Channel named ''%s'' not found in any dataset', chans{index}));
         end;
