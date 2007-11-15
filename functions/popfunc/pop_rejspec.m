@@ -76,6 +76,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2007/02/06 02:42:19  toby
+% updated for new 'movebutton' feature of eegplot
+%
 % Revision 1.25  2006/01/31 20:16:02  arno
 % options
 %
@@ -168,6 +171,9 @@ end;
 if nargin < 2
    icacomp = 1;
 end;  
+if ~exist('pmtm')
+    error('The signal processing toolbox needs to be installed');
+end;
 
 if icacomp == 0
 	if isempty( EEG.icasphere )
