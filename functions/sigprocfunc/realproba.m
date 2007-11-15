@@ -35,6 +35,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2007/03/05 19:10:44  arno
+% warning message
+%
 % Revision 1.1  2002/04/05 17:39:45  jorn
 % Initial revision
 %
@@ -57,7 +60,7 @@ if bins > 0
 	minimum =  min(data(:));
 	maximum =  max(data(:));
 	data = floor((data - minimum )/(maximum - minimum)*(bins-1))+1;
-    if any(any(isnan(data))), error('Binning failed because probability is 100%'); end;
+    if any(any(isnan(data))), warning('Binning failed - could be due to zeroed out channel'); end;
 	for index=1:SIZE
 		sortbox(data(index)) = sortbox(data(index))+1;
 	end;
