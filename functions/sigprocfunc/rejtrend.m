@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2007/05/10 03:52:00  toby
+% Leaving calculation as classic R^2
+%
 % Revision 1.2  2007/04/28 04:20:30  toby
 % Modified to catch very flat line data, added waitbar, clarified documentation
 %
@@ -61,7 +64,7 @@
 function [rej, rejE] = rejtrend( signal, pointrange, maxslope, minstd, step);
 
 % This is to avoid divide-by-zero and machine errors.
-SST_TOLERANCE = 1000*pointrange*eps('single');
+SST_TOLERANCE = 1000*pointrange*1.1921e-07;
 
 if nargin < 3
 	help rejtrend;
