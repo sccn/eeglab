@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2007/08/10 23:10:13  arno
+% fix plotting if not all channel used
+%
 % Revision 1.19  2007/05/22 13:59:15  arno
 % compatibility when not all channels are used for ICA
 %
@@ -199,9 +202,17 @@ if nargin < 2 | plotag ~= 0
 end;
 EEG.data(EEG.icachansind,:,:) = compproj;
 EEG.setname = [ EEG.setname ' pruned with ICA'];
-EEG.icaact = [];
-EEG.icawinv     = EEG.icawinv(:,setdiff(1:size(EEG.icaweights,1), components));
-EEG.icaweights  = EEG.icaweights(setdiff(1:size(EEG.icaweights,1), components),:);
+EEG.icaact  = [];
+goodinds    = setdiff(1:size(EEG.icaweights,1), components);
+EEG.icawinv     = EEG.icawinv(:,goodinds);
+EEG.icaweights  = EEG.icaweights(goodinds,:);
+EEG.specicaact  = [];
+EEG.spedata     = [];
+EEG.reject      = [];
+
+try,
+    EEG.dipfit.model = EEG.dipfit.model(goodinds);
+catch, end;
 
 com = sprintf('%s = pop_subcomp( %s, [%s], %d);', inputname(1), inputname(1), ...
    int2str(components), plotag);
