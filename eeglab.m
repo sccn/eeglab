@@ -190,6 +190,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.520  2007/10/11 16:09:01  arno
+% handle BIOSIG problem
+%
 % Revision 1.517  2007/09/11 12:06:29  arno
 % add new menus for preclustering components
 %
@@ -2390,7 +2393,12 @@ WINY		    = WINYDEC*NBLINES;
 
 BORDERINT       = 4;
 BORDEREXT       = 10;
-FONTNAME        = ''; %'courier';
+comp = computer;
+if strcmpi(comp(1:3), 'GLN') % Linux
+    FONTNAME        = 'courier';
+else
+    FONTNAME        = '';
+end;    
 FONTSIZE        = 11;
 
 hh = findobj('tag', 'EEGLAB');
