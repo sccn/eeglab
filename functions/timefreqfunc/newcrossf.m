@@ -182,6 +182,18 @@
 %       alltfX      = single trial spectral decomposition of X
 %       alltfY      = single trial spectral decomposition of Y
 %
+% Plot description:
+%   Assuming both 'plotamp' and 'plotphase' options are 'on' (=default), the upper panel
+%   presents the magnitude of either phase coherence or linear coherence, depending on 
+%   the 'type' parameter (above). The lower panel presents the coherence phase difference 
+%   (in degrees). Click on any plot to pop up a new window (using 'axcopy()').
+%   -- The upper left marginal panel shows mean coherence during the baseline period
+%      (blue), and when significance is set, the significance threshold (dotted black-green).
+%   -- The horizontal panel under the coherence magnitude image indicates the maximum 
+%      (green) and minimum (blue) coherence values across all frequencies. When significance 
+%      is set (using option 'trials' for 'boottype'), an additional curve indicates the 
+%      significance threshold (dotted black-green).
+%
 % Notes: 1) When cycles==0, nfreqs is total number of FFT frequencies.
 %        2) 'blue' coherence lag -> x leads y; 'red' -> y leads x
 %        3) The 'boottype' should be ideally 'timestrials', but this creates 
@@ -221,6 +233,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.85  2007/11/05 23:26:41  arno
+% help msg
+%
 % Revision 1.84  2007/11/05 23:20:17  arno
 % crossf -> newcrossf
 %
@@ -1616,7 +1631,7 @@ case 'on'
 end
 
 if g.plot
-	try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
+   try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
    if (length(g.title) > 0) % plot title
       axes('Position',pos,'Visible','Off');               
       h(13) = text(-.05,1.01,g.title);
@@ -1627,7 +1642,7 @@ if g.plot
    %
    %%%%%%%%%%%%%%% plot topoplot() %%%%%%%%%%%%%%%%%%%%%%%
    %
-   if (~isempty(g.topovec))
+   if (~isempty(g.topovec)) & strcmpi(g.plotamp, 'on') & strcmpi(g.plotphase, 'on')
       h(15) = subplot('Position',[-.1 .43 .2 .14].*s+q);
       if size(g.topovec,2) <= 2
          topoplot(g.topovec(1),g.elocs,'electrodes','off', ...
