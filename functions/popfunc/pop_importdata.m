@@ -92,7 +92,7 @@
 %   'pnts'       - [int] Number of data points per data epoch. The number of trial
 %                  is automatically calculated.
 %                   {default: length of the data -> continuous data assumed}
-%   'srate'      - [real] Data sampling rate in Hz {default: ???}
+%   'srate'      - [real] Data sampling rate in Hz
 %   'ref'        - [string or integer] reference channel indices. 'averef' indicates
 %                  average reference. Note that this does not perform referencing
 %                  but only sets the initial reference when the data is imported.
@@ -130,6 +130,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2006/05/23 10:29:08  arno
+% header problem
+%
 % Revision 1.28  2005/11/08 22:16:20  arno
 % editing header
 %
