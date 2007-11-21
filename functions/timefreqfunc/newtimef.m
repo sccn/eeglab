@@ -213,6 +213,24 @@
 %          itcboot  = Matrix (2,nfreqs) of [lower;upper] ITC thresholds (not diffs).
 %           tfdata  = time frequency decomposition of the data (nfreqs,timesout,trials)
 %
+% Plot description:
+%   Assuming both 'plotersp' and 'plotitc' options are 'on' (= default). 
+%   The upper panel presents the data ERSP (Event-Related Spectral Perturbation) 
+%   in dB, with mean baseline spectral activity (in dB) subtracted. Use 
+%   "'baseline', NaN" to prevent timef() from removing the baseline. 
+%   The lower panel presents the data ITC (Inter-Trial Coherence). 
+%   Click on any plot axes to pop up a new window (using 'axcopy()')
+%   -- Upper left marginal panel presents the mean spectrum during the baseline 
+%      period (blue), and when significance is set, the significance threshold 
+%      at each frequency (dotted green-black trace).
+%   -- The marginal panel under the ERSP image shows the maximum (green) and 
+%      minimum (blue) ERSP values relative to baseline power at each frequency.
+%   -- The lower left marginal panel shows mean ITC across the imaged time range 
+%      (blue), and when significance is set, the significance threshold (dotted 
+%      green-black).  
+%   -- The marginal panel under the ITC image shows the ERP (which is produced by 
+%      ITC across the data spectral pass band).
+%
 % Authors: Arnaud Delorme, Sigurd Enghoff, Jean Hausser, & Scott Makeig
 %          CNL / Salk Institute 1998- | SCCN/INC, UCSD 2002-
 %
@@ -277,6 +295,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.143  2007/11/05 23:26:43  arno
+% help msg
+%
 % Revision 1.142  2007/10/31 15:49:05  arno
 % fix typo
 %
@@ -2108,25 +2129,26 @@ switch lower(g.plotitc)
         end
         ylabel('ERP')
 
-        %
-        %%%%%%%%%%%%%%% plot a topoplot() %%%%%%%%%%%%%%%%%%%%%%%
-        %
-        if (~isempty(g.topovec))
-  
-            if strcmp(g.plotersp,'off')
-                h(12) = axes('Position',[-.207 .95 .2 .14].*s+q); % place the scalp map at top-left
-            else
-                h(12) = axes('Position',[-.1 .43 .2 .14].*s+q);   % place the scalp map at middle-left
-            end;
-            if length(g.topovec) == 1
-                topoplot(g.topovec,g.elocs,'electrodes','off', ...
-                    'style', 'blank', 'emarkersize1chan', 10, 'chaninfo', g.chaninfo);
-            else
-                topoplot(g.topovec,g.elocs,'electrodes','off', 'chaninfo', g.chaninfo);
-            end;
-            axis('square')
-        end
 end; %switch
+
+%
+%%%%%%%%%%%%%%% plot a topoplot() %%%%%%%%%%%%%%%%%%%%%%%
+%
+if (~isempty(g.topovec)) & strcmpi(g.plotitc, 'on') & strcmpi(g.plotersp, 'on')
+    
+    if strcmp(g.plotersp,'off')
+        h(12) = axes('Position',[-.207 .95 .2 .14].*s+q); % place the scalp map at top-left
+    else
+        h(12) = axes('Position',[-.1 .43 .2 .14].*s+q);   % place the scalp map at middle-left
+    end;
+    if length(g.topovec) == 1
+        topoplot(g.topovec,g.elocs,'electrodes','off', ...
+                 'style', 'blank', 'emarkersize1chan', 10, 'chaninfo', g.chaninfo);
+    else
+        topoplot(g.topovec,g.elocs,'electrodes','off', 'chaninfo', g.chaninfo);
+    end;
+    axis('square')
+end
 
 if g.plot
     try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
