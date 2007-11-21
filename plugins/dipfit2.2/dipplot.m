@@ -153,6 +153,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.147  2007/08/28 17:15:32  arno
+%fix traditional
+%
 %Revision 1.146  2007/02/02 09:25:48  arno
 %change x axis
 %
@@ -914,11 +917,13 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             hh = mesh(xx, yy, zz, 'cdata', zeros(21,21,3), 'tag', 'mesh'); hidden off;
         end;
     else
-        if isstr(g.meshdata)
-            tmp = load('-mat', g.meshdata);
-            g.meshdata = { 'vertices' tmp.vol.bnd(1).pnt 'faces' tmp.vol.bnd(1).tri };
-        end;
-        hh = patch(g.meshdata{:}, 'facecolor', 'none', 'edgecolor', COLORMESH, 'tag', 'mesh');
+        try, 
+            if isstr(g.meshdata)
+                tmp = load('-mat', g.meshdata);
+                g.meshdata = { 'vertices' tmp.vol.bnd(1).pnt 'faces' tmp.vol.bnd(1).tri };
+            end;
+            hh = patch(g.meshdata{:}, 'facecolor', 'none', 'edgecolor', COLORMESH, 'tag', 'mesh');
+        catch, disp('Unrecognize model file (probably CTF)'); end;
     end;
     
     %x = x*100*scaling; y = y*100*scaling; z=z*100*scaling;
