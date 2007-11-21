@@ -28,16 +28,18 @@
 %               only use pre-selected components in the pop_study interface).
 %  'specparams' - [cell array] Parameters for the spectopo function are given as 
 %              optional arguments:
+%                   'freqrange' = [min max] frequency range to calculate. Changes x-axis limits {default: 
+%                                1 Hz for the min and Nyquist (srate/2) for the max. If specified 
+%                                power distribution maps are plotted, the highest mapped frequency 
+%                                determines the max freq}. Note that it is better here to compute
+%                                spectrum over the largest range of frequency possible (it will then
+%                                be possible another sub-range for plotting).
 %                   'freqfac'  = [integer] ntimes to oversample -> frequency resolution {default: 2}
 %                   'nfft'     = [integer] length to zero-pad data to. Overwrites 'freqfac' above.
 %                   'winsize'  = [integer] window size in data points {default: from data}
 %                   'overlap'  = [integer] window overlap in data points {default: 0}
 %                   'percent'  = [float 0 to 100] percent of the data to sample for computing the 
 %                                spectra. Values < 100 speed up the computation. {default: 100}.
-%                   'freqrange' = [min max] frequency range to calculate. Changes x-axis limits {default: 
-%                                1 Hz for the min and Nyquist (srate/2) for the max. If specified 
-%                                power distribution maps are plotted, the highest mapped frequency 
-%                                determines the max freq}.
 %                   'mapnorm'  = [float vector] If 'data' contain the activity of an independant 
 %                                component, this parameter should contain its scalp map. In this case
 %                                the spectrum amplitude will be scaled to component RMS scalp power.
@@ -94,6 +96,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2007/10/25 00:59:39  nima
+% spectopo parameters described in help message.
+%
 % Revision 1.15  2007/09/11 10:51:16  arno
 % precompute measures for components
 %
