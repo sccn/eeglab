@@ -33,12 +33,12 @@
 %   'ylim'       - [min max] ERP limits in microvolts {default: from data}
 %   'plotgroups' - ['together'|'apart'] 'together' -> plot subject groups 
 %                  on the same axis in different colors, else ('apart') 
-%                  on different axes. {default: 'apart'??}
+%                  on different axes. {default: 'apart'}
 %   'plotconditions' - ['together'|'apart'] 'together' -> plot conditions 
 %                  on the same axis in different colors, else ('apart') 
 %                  on different axes. Note: Keywords 'plotgroups' and 
 %                  'plotconditions' may not both be set to 'together'. 
-%                  {default: 'together'??}
+%                  {default: 'together'}
 % See also: std_erpplot()
 %
 % Authors: Arnaud Delorme, CERCO, CNRS, 2006-
@@ -60,6 +60,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2007/08/12 03:41:29  arno
+% fixing topotime
+%
 % Revision 1.18  2007/08/12 03:38:15  arno
 % change code for scalp latency plotting
 %
