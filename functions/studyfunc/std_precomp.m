@@ -33,7 +33,7 @@
 %                                power distribution maps are plotted, the highest mapped frequency 
 %                                determines the max freq}. Note that it is better here to compute
 %                                spectrum over the largest range of frequency possible (it will then
-%                                be possible another sub-range for plotting).
+%                                be possible to select another subrange for plotting).
 %                   'freqfac'  = [integer] ntimes to oversample -> frequency resolution {default: 2}
 %                   'nfft'     = [integer] length to zero-pad data to. Overwrites 'freqfac' above.
 %                   'winsize'  = [integer] window size in data points {default: from data}
@@ -96,6 +96,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2007/11/21 16:40:53  arno
+% help msg
+%
 % Revision 1.16  2007/10/25 00:59:39  nima
 % spectopo parameters described in help message.
 %
