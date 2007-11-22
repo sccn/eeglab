@@ -32,7 +32,7 @@
 %                                1 Hz for the min and Nyquist (srate/2) for the max. If specified 
 %                                power distribution maps are plotted, the highest mapped frequency 
 %                                determines the max freq}. Note that it is better here to compute
-%                                spectrum over the largest range of frequency possible (it will then
+%                                spectrum over a wide range of frequencies (it will then
 %                                be possible to select another subrange for plotting).
 %                   'freqfac'  = [integer] ntimes to oversample -> frequency resolution {default: 2}
 %                   'nfft'     = [integer] length to zero-pad data to. Overwrites 'freqfac' above.
@@ -96,6 +96,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2007/11/22 23:34:03  arno
+% header
+%
 % Revision 1.17  2007/11/21 16:40:53  arno
 % help msg
 %
