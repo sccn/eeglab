@@ -89,7 +89,7 @@
 %   'pnts'       - [int] Number of data points per data epoch. The number of 
 %                  data trials is automatically calculated.
 %                   {default: length of the data -> continuous data assumed}
-%   'srate'      - [real] Data sampling rate in Hz
+%   'srate'      - [real] Data sampling rate in Hz {default: 1Hz}
 %   'ref'        - [string or integer] reference channel indices; 'averef' 
 %                  indicates average reference. Note that this does not perform 
 %                  referencing but only sets the initial reference when the data 
@@ -134,6 +134,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.55  2007/11/21 16:45:34  arno
+% removing ??
+%
 % Revision 1.54  2007/05/22 13:58:56  arno
 % added icachansind to the GIU
 %
