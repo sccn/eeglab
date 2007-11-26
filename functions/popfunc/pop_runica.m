@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.79  2007/09/11 10:38:43  arno
+% && -> &
+%
 % Revision 1.78  2007/08/01 01:14:21  arno
 % same
 %
@@ -561,7 +564,7 @@ switch lower(g.icatype)
                       {'style' 'pushbutton' 'string' 'Interupt' 'callback' 'figure(gcbf); set(gcbf, ''tag'', ''stop'');' } );
             drawnow;
         end;
-        tmprank = rank(tmpdata(:,1:min(3000, size(tmpdata,2))));
+        tmprank = getrank(tmpdata(:,1:min(3000, size(tmpdata,2))));
         if tmprank == size(tmpdata,1) | pca_opt
             [EEG.icaweights,EEG.icasphere] = runica( tmpdata, 'lrate', 0.001, g.options{:} );
         else 
@@ -575,7 +578,7 @@ switch lower(g.icatype)
         if exist(ICABINARY) ~= 2
             error('Pop_runica(): binary ICA executable not found. Edit icadefs.m file to specify the ICABINARY location');
         end;
-        tmprank = rank(tmpdata(:,1:min(3000, size(tmpdata,2))));
+        tmprank = getrank(tmpdata(:,1:min(3000, size(tmpdata,2))));
         if tmprank == size(tmpdata,1) | pca_opt
             [EEG.icaweights,EEG.icasphere] = binica( tmpdata, 'lrate', 0.001, g.options{:} );
         else 
@@ -664,3 +667,19 @@ if nargin < 2
 end;
 
 return;
+
+function tmprank2 = getrank(tmpdata);
+    
+    tmprank = rank(tmpdata);
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %Here: alternate computation of the rank by Sven Hoffman
+    %tmprank = rank(tmpdata(:,1:min(3000, size(tmpdata,2)))); old code
+    covarianceMatrix = cov(tmpdata', 1);
+    [E, D] = eig (covarianceMatrix);
+    rankTolerance = 1e-7;
+    tmprank2=sum (diag (D) > rankTolerance);
+    if tmprank ~= tmprank2
+        fprintf('Warning: fixing rank computation inconsistency (%d vs %d) most likely because running under Linux 64-bit Matlab', tmprank, tmprank2);
+    end;
+            
+            
