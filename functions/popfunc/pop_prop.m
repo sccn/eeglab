@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.38  2007/08/04 05:18:46  scott
+% filled in help msg, var numcompo -> chanorcomp; added chanorcomp default
+%
 % Revision 1.37  2007/04/20 01:17:30  toby
 % ERPIMAGELINES misspelled ERPIMAGESLINES at line 320. BUG 286
 %
@@ -233,7 +236,7 @@ if nargin == 2
 	if size( result, 1 ) == 0 return; end;
    
 	chanorcomp   = eval( [ '[' result{1} ']' ] );
-        spec_opt     = eval( [ '{' result{2} '}' ] );
+    spec_opt     = eval( [ '{' result{2} '}' ] );
 end;
 
 % plotting several component properties
