@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.40  2007/11/29 22:01:44  arno
+% multi-plot frequency limits
+%
 % Revision 1.39  2007/11/29 21:55:56  arno
 % indent
 %
@@ -248,7 +251,8 @@ if length(chanorcomp) > 1
     for index = chanorcomp
         pop_prop(EEG, typecomp, index, 0, spec_opt);  % call recursively for each chanorcomp
     end;
-	com = sprintf('pop_prop( %s, %d, [%s]);', inputname(1), typecomp, int2str(chanorcomp));
+	com = sprintf('pop_prop( %s, %d, [%s], NaN, %s);', inputname(1), ...
+                  typecomp, int2str(chanorcomp), vararg2str( { spec_opt } ));
     return;
 end;
 
