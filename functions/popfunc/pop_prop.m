@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.39  2007/11/29 21:55:56  arno
+% indent
+%
 % Revision 1.38  2007/08/04 05:18:46  scott
 % filled in help msg, var numcompo -> chanorcomp; added chanorcomp default
 %
@@ -243,7 +246,7 @@ end;
 % -------------------------------------
 if length(chanorcomp) > 1
     for index = chanorcomp
-        pop_prop(EEG, typecomp, index);  % call recursively for each chanorcomp
+        pop_prop(EEG, typecomp, index, 0, spec_opt);  % call recursively for each chanorcomp
     end;
 	com = sprintf('pop_prop( %s, %d, [%s]);', inputname(1), typecomp, int2str(chanorcomp));
     return;
