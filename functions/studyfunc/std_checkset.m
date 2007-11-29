@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.68  2007/11/02 02:13:25  arno
+% fix the correct session code
+%
 % Revision 1.67  2007/11/01 23:10:06  arno
 % removing version testing
 %
@@ -310,7 +313,7 @@ if isempty(STUDY.etc.version)
     STUDY.etc.version = EEGLAB_VERSION;
     if isfield(STUDY, 'cluster')
         if ~isempty(STUDY.cluster)
-            disp('Old STUDY version detected, removing pre-loaded measures');
+            disp('Old STUDY version detected, removing pre-loaded measures (not files)');
             disp('because of the defect in ERSP baseline subtraction (Bugs 484).');
             fields = { 'erpdata' 'erptimes' 'specdata' 'specfreqs' 'erspdata' ...
                        'ersptimes' 'erspfreqs' 'itcdata' 'itctimes' 'itcfreqs' ...
