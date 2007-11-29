@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.41  2007/11/29 22:04:22  arno
+% hostory for multiple plots
+%
 % Revision 1.40  2007/11/29 22:01:44  arno
 % multi-plot frequency limits
 %
@@ -235,7 +238,7 @@ if typecomp == 0 & isempty(EEG.icaweights)
    error('No ICA weights recorded for this dataset -- first run ICA on it');
 end;   
 if nargin == 2
-	promptstr    = { fastif(typecomp,'Channel number to plot:','Component number to plot:') ...
+	promptstr    = { fastif(typecomp,'Channel index(ices) to plot:','Component index(ices) to plot:') ...
                      'Spectral options (see spectopo() help):' };
 	inistr       = { '1' '''freqrange'', [2 50]' };
 	result       = inputdlg2( promptstr, 'Component properties - pop_prop()', 1,  inistr, 'pop_prop');
