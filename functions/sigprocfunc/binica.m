@@ -74,6 +74,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2007/08/02 23:43:21  arno
+% same
+%
 % Revision 1.21  2007/08/02 23:41:17  arno
 % fix for MAC
 %
@@ -298,6 +301,10 @@ for x=1:length(flags)
      args{x} = datafile;
   elseif strcmp(flags{x},'WeightsOutFile')
      weightsfile = ['binica' tmpint '.wts'];
+     weightsfile =  [pwd '/' weightsfile];
+     args{x} = weightsfile;
+  elseif strcmp(flags{x},'WeightsTempFile')
+     weightsfile = ['binicatmp' tmpint '.wts'];
      weightsfile =  [pwd '/' weightsfile];
      args{x} = weightsfile;
   elseif strcmp(flags{x},'SphereFile')
