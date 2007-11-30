@@ -74,6 +74,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2007/11/30 04:27:57  arno
+% chaning computation for random binica file
+%
 % Revision 1.23  2007/11/30 04:24:40  arno
 % adding temp input
 %
@@ -192,11 +195,8 @@ end
 % make sure no such script file already exists in the pwd
 %
 scriptfile = SC;
-tmpint = 1000;
 while exist(scriptfile)
- tmpints = round(rand*10000);
- tmpint = int2str(tmpints(tmpint));
- tmpint(find(tmpint == ' ')) = []; % to remove white spaces
+ tmpint = int2str(round(rand*10000));
  scriptfile = ['binica' tmpint '.sc'];
 end 
 fprintf('scriptfile = %s\n',scriptfile);
