@@ -74,6 +74,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2007/11/30 04:24:40  arno
+% adding temp input
+%
 % Revision 1.22  2007/08/02 23:43:21  arno
 % same
 %
@@ -191,7 +194,7 @@ end
 scriptfile = SC;
 tmpint = 1000;
 while exist(scriptfile)
- tmpints = randperm(10000);
+ tmpints = round(rand*10000);
  tmpint = int2str(tmpints(tmpint));
  tmpint(find(tmpint == ' ')) = []; % to remove white spaces
  scriptfile = ['binica' tmpint '.sc'];
