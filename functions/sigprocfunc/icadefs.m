@@ -26,6 +26,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.53  2007/11/30 00:26:44  arno
+% now using Jason binica
+%
 % Revision 1.52  2007/11/01 23:06:31  arno
 % change version number
 %
@@ -203,7 +206,7 @@ TUTORIAL_URL = 'http://sccn.ucsd.edu/eeglab/eeglabdocs.html'; % online version
 % TUTORIAL_URL = 'file://::disk:folder:eeglabtutorial:eeglabdocs.html'; % Mac
 
 %ICABINARY = '/home/duann/matlab/fmrlab4.0/ica_linux2.4'; 
-ICABINARY = '/home/jason/binica/ica_linux'; 
+ICABINARY = '/data/common/matlab/eeglab/functions/resources/ica_linux'; 
 %                           % <=INSERT location of ica executable for binica.m above
 %                           % If none, use []
 
