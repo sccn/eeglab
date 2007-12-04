@@ -30,8 +30,8 @@
 %                  compnums in the latter case is restricted in size by the 
 %                  internal variable MAXTOPOS (20) {default|[] -> 7}
 %  'subcomps'  = [integer vector] indices of comps. to remove from the whole data 
-%                  before plotting. 0 -> none {default: if 'compnums' listed, 
-%                  remove all others}
+%                  before plotting. 0 -> Remove none. [] -> If 'compnums' 
+%                  also listed, remove *all* except 'compnums' {default: 0}
 %  'limits'    = 0 or [minms maxms] or [minms maxms minuV maxuV]. Specify 
 %                  start/end plot (x) limits (in ms) and min/max y-axis limits 
 %                  (in uV). If 0, or if both minmx & maxms == 0 -> use latencies 
@@ -123,6 +123,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.126  2007/06/07 02:01:26  toby
+% format of sortvar printed to screen adjusted
+%
 % Revision 1.125  2007/06/07 00:57:11  toby
 % Print component sortvar value (pvaf, etc) to screen, bug 398
 %
@@ -514,7 +517,7 @@ if nargin <= 2 | isstr(varargin{1})
 				  'colors'        'string'   []                       '' ;
 				  'compnums'      'integer'  []                       []; 
 				  'compsplot'     'integer'  []                       7; 
-				  'subcomps'      'integer'  []                       []; 
+				  'subcomps'      'integer'  []                       0; 
 				  'envmode'       'string'   {'avg' 'rms'}            'avg'; 
 				  'dispmaps'      'string'   {'on' 'off'}             'on'; 
 				  'pvaf'          'string'   {'mp' 'mv' 'on' 'rp' 'rv' 'pv' 'pvaf' 'pp' 'off' ''} ''; 
@@ -575,7 +578,7 @@ else % dprecated - old style input args
     g.icaact = [];
     g.limcontrib = 0;
     g.icawinv = pinv(weights);
-    g.subcomps = [];
+    g.subcomps = 0;
     g.envmode = 'avg';
     g.dispmaps = 'on';
 end;
@@ -813,7 +816,7 @@ else
       if length(g.subcomps) > 1
          error('Keyword ''subcomps'' argument incorrect.');
       end
-      g.subcomps = [];   % if subcomps contains a 0, don't remove components
+      g.subcomps = [];   % if subcomps contains a 0 (or <1), don't remove components
   elseif max(g.subcomps) > wtcomps
       error('Keyword ''subcomps'' argument out of bounds.');
   end
