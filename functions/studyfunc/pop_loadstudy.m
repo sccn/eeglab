@@ -38,6 +38,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2007/06/21 00:14:33  allen
+% nothing
+%
 % Revision 1.19  2007/04/06 21:19:45  arno
 % warning
 %
@@ -93,6 +96,8 @@ ALLEEG = std_loadalleeg(STUDY);
 % Update the pointers from STUDY to the ALLEEG datasets
 for k = 1:length(STUDY.datasetinfo)
     STUDY.datasetinfo(k).index = k;
+    STUDY.datasetinfo(k).filename = ALLEEG(k).filename;
+    STUDY.datasetinfo(k).filepath = ALLEEG(k).filepath;
 end
 
 [STUDY ALLEEG] = std_checkset(STUDY, ALLEEG);
