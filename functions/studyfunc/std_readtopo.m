@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2007/12/09 01:46:59  arno
+% allow reading windows files under Linux
+%
 % Revision 1.12  2007/12/09 01:02:22  arno
 % fix reading topo file
 %
@@ -139,7 +142,7 @@ X = squeeze(X);
 return;
 
 function filename = correctfile(filename)
-    if filename(2) == ':'
+    if filename(2) == ':' & ~strcmpi(computer, 'pcwin')
         filename = filename(4:end);
         filename(find(filename == '\')) = filesep;
     end;
