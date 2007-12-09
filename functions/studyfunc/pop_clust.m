@@ -12,9 +12,10 @@
 %   ALLEEG      - a vector of loaded EEG dataset structures of all sets in the STUDY set.
 %
 % Optional Inputs:
-%   'algorithm' - ['kmeans'|'Neural Network'] algorithm to be used for clustering.
-%                 the 'Neural Network' option requires the Matlab Neural Net toolbox 
-%                    {default: 'kmeans'} 
+%   'algorithm' - ['kmeans'|'kmeanscluster'|'Neural Network'] algorithm to be used for 
+%                 clustering. The 'kmeans' options requires the statistical toolbox. The
+%                 'kmeanscluster' option is included in EEGLAB. The 'Neural Network' 
+%                  option requires the Matlab Neural Net toolbox {default: 'kmeans'} 
 %   'clus_num'  - [integer] the number of desired clusters (must be > 1) {default: 20}
 %   'outliers'  - [integer] identify outliers further than the given number of standard
 %                 deviations from any cluster centroid. Inf --> identify no such outliers.
@@ -60,6 +61,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2007/10/25 21:33:14  nima
+% _
+%
 % Revision 1.33  2007/09/11 10:33:38  arno
 % add new free algorithm for kmeans
 %
@@ -173,7 +177,7 @@ if isempty(varargin) %GUI call
 	alg_options = {'Kmeans (stat. toolbox)' 'Neural Network (stat. toolbox)' 'Kmeanscluster (no toolbox)' }; %'Hierarchical tree' 
 	set_outliers = ['set(findobj(''parent'', gcbf, ''tag'', ''outliers_std''), ''enable'', fastif(get(gcbo, ''value''), ''on'', ''off''));'...
                             'set(findobj(''parent'', gcbf, ''tag'', ''std_txt''), ''enable'', fastif(get(gcbo, ''value''), ''on'', ''off''));']; 
-	algoptions = [ 'set(findobj(''parent'', gcbf, ''userdata'', ''kmeans''), ''enable'', fastif(get(gcbo, ''value'')~=2, ''on'', ''off''));' ];
+	algoptions = [ 'set(findobj(''parent'', gcbf, ''userdata'', ''kmeans''), ''enable'', fastif(get(gcbo, ''value'')==1, ''on'', ''off''));' ];
 	saveSTUDY = [ 'set(findobj(''parent'', gcbf, ''userdata'', ''save''), ''enable'', fastif(get(gcbo, ''value'')==1, ''on'', ''off''));' ];
 	browsesave = [ '[filename, filepath] = uiputfile2(''*.study'', ''Save STUDY with .study extension -- pop_clust()''); ' ... 
                       'set(findobj(''parent'', gcbf, ''tag'', ''studyfile''), ''string'', [filepath filename]);' ];
