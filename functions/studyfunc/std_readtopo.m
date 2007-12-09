@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2007/12/09 00:10:40  arno
+% [6~loading the correct file
+%
 % Revision 1.10  2007/11/14 02:42:48  arno
 % fix the file reference thing
 %
@@ -138,11 +141,11 @@ function filename = correctfile(filename)
         if exist([tmpf ext])
             filename = [tmpf ext];
         else
-            [tmpp2 tmpp1 tmp] = fileparts(tmpp);
-            if exist(fullfile(tmpp1, tmpf, ext))
-                filename = fullfile(tmpp1, tmpf, ext);
+            [tmpp2 tmpp1] = fileparts(tmpp);
+            if exist(fullfile(tmpp1, [ tmpf ext ]))
+                filename = fullfile(tmpp1, [ tmpf ext ]);
             else
-                error([ 'Cannot load file ''' tmpp '''' ]);
+                error([ 'Cannot load file ''' [ tmpf ext ] '''' ]);
             end;
         end;
     end;        
