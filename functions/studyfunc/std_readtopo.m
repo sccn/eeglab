@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2007/11/14 02:42:48  arno
+% fix the file reference thing
+%
 % Revision 1.9  2007/09/11 10:53:25  arno
 % handles now one file per dataset
 %
@@ -76,10 +79,10 @@ xi = [];
 if nargin < 4
     option = 'none';
 end;
-filename = fullfile( ALLEEG(abset).filepath,[ ALLEEG(abset).filename(1:end-3) 'icatopo']);
-while(getfield(dir(filename), 'bytes') < 1000)
+filename = correctfile(fullfile( ALLEEG(abset).filepath,[ ALLEEG(abset).filename(1:end-3) 'icatopo']));
+while (getfield(dir(filename), 'bytes') < 1000)
     topo = load( '-mat', filename);
-    filename = topo.file;
+    filename = correctfile(topo.file);
 end;
 
 for k = 1:length(comps)
@@ -128,3 +131,19 @@ end
 X = squeeze(X);
 
 return;
+
+function filename = correctfile(filename)
+    if ~exist(filename)
+        [tmpp tmpf ext] = fileparts(filename);
+        if exist([tmpf ext])
+            filename = [tmpf ext];
+        else
+            [tmpp2 tmpp1 tmp] = fileparts(tmpp);
+            if exist(fullfile(tmpp1, tmpf, ext))
+                filename = fullfile(tmpp1, tmpf, ext);
+            else
+                error([ 'Cannot load file ''' tmpp '''' ]);
+            end;
+        end;
+    end;        
+    
