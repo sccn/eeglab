@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2007/12/09 01:02:22  arno
+% fix reading topo file
+%
 % Revision 1.11  2007/12/09 00:10:40  arno
 % [6~loading the correct file
 %
@@ -136,6 +139,10 @@ X = squeeze(X);
 return;
 
 function filename = correctfile(filename)
+    if filename(2) == ':'
+        filename = filename(4:end);
+        filename(find(filename == '\')) = filesep;
+    end;
     if ~exist(filename)
         [tmpp tmpf ext] = fileparts(filename);
         if exist([tmpf ext])
