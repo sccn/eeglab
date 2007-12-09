@@ -80,6 +80,13 @@ function ALLEEG = std_loadalleeg(varargin)
     % -------------
     warnfold = 'off';
     for dset = 1:length(paths)
+        if ~isempty(paths{dset})
+            if paths{dset}(2) == ':' & ~strcmpi(computer, 'pcwin')
+                paths{dset} = paths{dset}(4:end);
+                paths{dset}(find(paths{dset} == '\')) = filesep;
+            end;
+        end;
+        
         [sub2 sub1] = fileparts(char(paths{dset}));
         [sub3 sub2] = fileparts(sub2);
         
