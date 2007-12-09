@@ -96,6 +96,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2007/11/22 23:34:55  arno
+% header
+%
 % Revision 1.18  2007/11/22 23:34:03  arno
 % header
 %
@@ -247,7 +250,7 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
                 tmp.file = fullfile( ALLEEG(found).filepath, [ ALLEEG(found).filename(1:end-3) 'icatopo' ]); 
                 std_savedat(tmpfile1, tmp);
             else
-                std_topo(ALLEEG(index), chanlist{index});
+                std_topo(ALLEEG(index), chanlist{index}, 'none', 'recompute', g.recompute);
             end;
         end;
         if isfield(curstruct, 'topo')
