@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2007/09/11 10:56:12  arno
+% now save one file per subject
+%
 % Revision 1.15  2006/03/10 00:20:39  arno
 % same
 %
@@ -91,7 +94,7 @@
 % now correctly saving data
 %
 
-function [X] = std_topo(EEG, comps, option)
+function [X] = std_topo(EEG, comps, option, varargin)
 
 if nargin < 1
     help std_topo;
@@ -112,11 +115,14 @@ if nargin < 3
     option = 'none';
 end;
 
+g = finputcheck( varargin, { 'recompute'   'string'   { 'on' 'off' }   'off' }, 'std_topo');
+if isstr(g), error(g); end;
+
 % figure; toporeplot(grid,'style', 'both','plotrad', 0.5, 'intrad', 0.5, 'xsurface' ,Xi, 'ysurface',Yi );
 
 % Topo information found in dataset
 % ---------------------------------
-if exist(fullfile(EEG.filepath, [ EEG.filename(1:end-3) 'icatopo' ]))
+if exist(fullfile(EEG.filepath, [ EEG.filename(1:end-3) 'icatopo' ])) & strcmpi(g.recompute, 'off')
     for k = 1:length(comps)
         tmp = std_readtopo( EEG, 1, comps(k));
         if strcmpi(option, 'gradient')
