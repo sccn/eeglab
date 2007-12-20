@@ -123,6 +123,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.127  2007/12/04 19:06:26  scott
+% changed default for 'subcomps' back to 0 -> don't remove the rest of the
+% components by default!
+%
 % Revision 1.126  2007/06/07 02:01:26  toby
 % format of sortvar printed to screen adjusted
 %
@@ -492,7 +496,7 @@ MAXTOPOS = 20;      % max topoplots to plot
 VERTWEIGHT = 2.0;  % lineweight of specified vertical lines
 LIMCONTRIBWEIGHT = 1.2; % lineweight of limonctrib vertical lines
 MAX_FRAMES = 10000; % maximum frames to plot
-
+MAXENVPLOTCHANS = 10;  
 myfig =gcf;         % remember the current figure (for Matlab 7.0.0 bug)
 xmin = 0; xmax = 0;
     
