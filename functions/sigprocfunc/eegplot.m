@@ -33,8 +33,8 @@
 %                  Command line equivalents: 'xgrid' / 'ygrid' 
 %     "Display > Show scale" - [menu] Show (or hide if shown) the scale on the bottom 
 %                  right corner of the activity window. Command line equivalent: 'scale' 
-%     "Display > Title" - [menu] Change the title of the figure. The command line
-%                   equivalent is 'title'
+%     "Display > Title" - [menu] Change the title of the figure. Command line equivalent: 
+%                  'title'
 %     "Settings > Time range to display"  - [menu] For continuous EEG data, this item 
 %                  pops up a query window for entering the number of seconds to display
 %                  in the activity window. For epoched data, the query window asks
@@ -76,15 +76,15 @@
 %                  NOTE: This button's label can be redefined from the command line
 %                  (see 'butlabel' below). If no processing command is specified
 %                  for the 'command' parameter (below), this button does not appear.
-% Required input:
+% Required command line input:
 %    data        - Input data matrix, either continuous 2-D (channels,timepoints) or 
 %                  epoched 3-D (channels,timepoints,epochs). If the data is preceded 
 %                  by keyword 'noui', GUI control elements are omitted (useful for 
 %                  plotting data for presentation). A set of power spectra at
 %                  each channel may also be plotted (see 'freqlimits' below).
-% Optional keywords:
+% Optional command line keywords:
 %    'srate'      - Sampling rate in Hz {default|0: 256 Hz}
-%    'spacing'    - Display range per channel (default|0: max(data)-min(data))
+%    'spacing'    - Display range per channel (default|0: max(whole_data)-min(whole_data))
 %    'eloc_file'  - Electrode filename (as in  >> topoplot example) to read
 %                    ascii channel labels. Else,
 %                   [vector of integers] -> Show specified channel numbers. Else,
@@ -165,6 +165,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.125  2007/10/15 17:41:41  arno
+% fix problem with rejecting portions of data
+%
 % Revision 1.117  2007/02/06 19:19:04  toby
 % revert to 1.115
 %
@@ -684,7 +687,8 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
 		case 'on', g.color = { 'k', 'm', 'c', 'b', 'g' }; 
 		case 'off', g.color = { [ 0 0 0.4] };  
 		otherwise 
-		 disp('Error: color must be either ''on'' or ''off'' or a cell array'); return;
+		 disp('Error: color must be either ''on'' or ''off'' or a cell array'); 
+                return;
 	   end;	
    end;
    if length(g.dispchans) > size(data,1)
@@ -700,7 +704,9 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
    % convert color to modify into array of float
    % -------------------------------------------
    for index = 1:length(g.colmodif)
-	   tmpcolmodif(index) = g.colmodif{index}(1) + g.colmodif{index}(2)*10 + g.colmodif{index}(3)*100;
+	   tmpcolmodif(index) = g.colmodif{index}(1) ...
+                              + g.colmodif{index}(2)*10 ...
+                              + g.colmodif{index}(3)*100;
    end;
    g.colmodif = tmpcolmodif;
    
@@ -721,7 +727,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
       g.spacing = round(g.spacing);
     end
     if g.spacing  == 0 | isnan(g.spacing)
-        g.spacing = 1;
+        g.spacing = 1; % default
     end;
   end
 
@@ -742,7 +748,8 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
   
   figh = figure('UserData', g,... % store the settings here
       'Color',DEFAULT_FIG_COLOR, 'name', g.title,...
-      'MenuBar','none','tag', g.tag ,'Position',g.position, 'numbertitle', 'off', 'visible', 'off');
+      'MenuBar','none','tag', g.tag ,'Position',g.position, ...
+      'numbertitle', 'off', 'visible', 'off');
 
   pos = get(figh,'position'); % plot relative to current axes
   q = [pos(1) pos(2) 0 0];
@@ -760,8 +767,8 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
   YLabels = num2str((1:g.chans)');  % Use numbers as default
   YLabels = flipud(str2mat(YLabels,' '));
   ax1 = axes('Position',DEFAULT_AXES_POSITION,...
-             'userdata', data, ...% store the data here (when in g, slow down display)
-   			'tag','eegaxis','parent',figh,...
+      'userdata', data, ...% store the data here
+      'tag','eegaxis','parent',figh,...%(when in g, slow down display)
       'Box','on','xgrid', g.xgrid,'ygrid', g.ygrid,...
       'gridlinestyle',DEFAULT_GRID_STYLE,...
       'Xlim',[0 g.winlength*g.srate],...
@@ -868,7 +875,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
                'clear tmpg;' ], ...
    'value', 0);
 
-% channels, position, value and tag
+% Channels, position, value and tag
 
   u(9) = uicontrol('Parent',figh, ...
 	'Units', 'normalized', ...
@@ -968,6 +975,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
   % %%%%%%%%%%%%%%%%%%%%%%%%%%%
   
   % Figure Menu %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
   m(7) = uimenu('Parent',figh,'Label','Figure');
   m(8) = uimenu('Parent',m(7),'Label','Print');
   uimenu('Parent',m(7),'Label','Edit figure', 'Callback', 'eegplot(''noui'');');
@@ -975,6 +983,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
   uimenu('Parent',m(7),'Label','Cancel and close', 'Callback','delete(gcbf)')
   
   % Portrait %%%%%%%%
+
   timestring = ['[OBJ1,FIG1] = gcbo;',...
 	        'PANT1 = get(OBJ1,''parent'');',...
 	        'OBJ2 = findobj(''tag'',''orient'',''parent'',PANT1);',...
@@ -1007,26 +1016,30 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
 		 'clear RESULT;' ]);
   
   % Display Menu %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
   m(1) = uimenu('Parent',figh,...
       'Label','Display', 'tag', 'displaymenu');
   
-  % window grid %%%%%%%%%%%%%
-  % userdata = 4 cells : display yes/no, color, electrode yes/no, trial boundary adapt yes/no (1/0)  
-  m(11) = uimenu('Parent',m(1),'Label','Data select/mark', 'tag', 'displaywin', ...
-				 'userdata', { 1, [0.8 1 0.8], 0, fastif( g.trialstag(1) == -1, 0, 1)} );
-  uimenu('Parent',m(11),'Label','Hide marks','Callback', ...
-  	['g = get(gcbf, ''userdata'');' ...
-  	 'if ~g.winstatus' ... 
-  	 '  set(gcbo, ''label'', ''Hide marks'');' ...
-  	 'else' ...
-  	 '  set(gcbo, ''label'', ''Show marks'');' ...
-  	 'end;' ...
-  	 'g.winstatus = ~g.winstatus;' ...
-  	 'set(gcbf, ''userdata'', g);' ...
-  	 'eegplot(''drawb''); clear g;'] )
+  % window grid %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-	% color
-    if isunix % for some reasons, does not work under windows
+  % userdata = 4 cells : display yes/no, color, electrode yes/no, 
+  %                      trial boundary adapt yes/no (1/0)  
+  m(11) = uimenu('Parent',m(1),'Label','Data select/mark', 'tag', 'displaywin', ...
+            'userdata', { 1, [0.8 1 0.8], 0, fastif( g.trialstag(1) == -1, 0, 1)});
+
+          uimenu('Parent',m(11),'Label','Hide marks','Callback', ...
+  	        ['g = get(gcbf, ''userdata'');' ...
+            'if ~g.winstatus' ... 
+            '  set(gcbo, ''label'', ''Hide marks'');' ...
+            'else' ...
+            '  set(gcbo, ''label'', ''Show marks'');' ...
+            'end;' ...
+            'g.winstatus = ~g.winstatus;' ...
+            'set(gcbf, ''userdata'', g);' ...
+            'eegplot(''drawb''); clear g;'] )
+
+	% color %%%%%%%%%%%%%%%%%%%%%%%%%%
+    if isunix % for some reasons, does not work under Windows
         uimenu('Parent',m(11),'Label','Choose color', 'Callback', ...
                [ 'g = get(gcbf, ''userdata'');' ...
                  'g.wincolor = uisetcolor(g.wincolor);' ...
@@ -1035,11 +1048,13 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
     end;
 
 	% set channels
-	%uimenu('Parent',m(11),'Label','Mark channels', 'enable', 'off', 'checked', 'off', 'Callback', ...
+	%uimenu('Parent',m(11),'Label','Mark channels', 'enable', 'off', ...
+    %'checked', 'off', 'Callback', ...
   	%['g = get(gcbf, ''userdata'');' ...
   	% 'g.setelectrode = ~g.setelectrode;' ...
   	% 'set(gcbf, ''userdata'', g); ' ...
-    % 'if ~g.setelectrode setgcbo, ''checked'', ''on''); else set(gcbo, ''checked'', ''off''); end;'...
+    % 'if ~g.setelectrode setgcbo, ''checked'', ''on''); ...
+    % else set(gcbo, ''checked'', ''off''); end;'...
     % ' clear g;'] )
 
 	% trials boundaries
@@ -1053,7 +1068,8 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
   % plot durations
   % --------------
   if g.ploteventdur & isfield(g.events, 'duration')
-      disp('Use menu "Display > Hide event duration" to hide colored regions representing event duration');
+      disp(['Use menu "Display > Hide event duration" to hide colored regions ' ...
+           'representing event duration']);
   end;
   uimenu('Parent',m(1),'Label','Hide event duration','Callback', ...
   	['g = get(gcbf, ''userdata'');' ...
@@ -1078,7 +1094,8 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
 		        '  set(gcbo,''label'',''X grid off'');',...
 		        'end;' ...
 		        'clear FIGH AXESH;' ];
-  uimenu('Parent',m(3),'Label',fastif(strcmp(g.xgrid, 'off'), 'X grid on','X grid off'), 'Callback',timestring)
+  uimenu('Parent',m(3),'Label',fastif(strcmp(g.xgrid, 'off'), ...
+         'X grid on','X grid off'), 'Callback',timestring)
   
   % Y grid %%%%%%%%%%%%%
   timestring = ['FIGH = gcbf;',...
@@ -1091,7 +1108,8 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
 		        '  set(gcbo,''label'',''Y grid off'');',...
 		        'end;' ...
 		        'clear FIGH AXESH;' ];
-  uimenu('Parent',m(3),'Label',fastif(strcmp(g.ygrid, 'off'), 'Y grid on','Y grid off'), 'Callback',timestring)
+  uimenu('Parent',m(3),'Label',fastif(strcmp(g.ygrid, 'off'), ...
+         'Y grid on','Y grid off'), 'Callback',timestring)
 
   % Grid Style %%%%%%%%%
   m(5) = uimenu('Parent',m(3),'Label','Grid Style');
