@@ -72,6 +72,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.40  2007/08/13 19:22:56  arno
+% special plotting options
+%
 % Revision 1.39  2006/01/31 20:19:40  arno
 % options
 %
@@ -213,7 +216,7 @@ if nargin < 4
 end;
 if icacomp == 0
 	if isempty( EEG.icasphere )
-		disp('Error: you must run ICA first'); return;
+		disp('Error: Dataset has no ICA weights - you must run ICA first'); return;
 	end;
 end;
 
@@ -249,7 +252,7 @@ if EEG.trials > 1
 	
 	eeg_rejmacro; % script macro for generating command and old rejection arrays
 
-else % case of a single trial (continuous data)
+else % case of a single trial (= continuous data)
 	     %if icacomp, 
     	 %    	command = ['if isempty(EEG.event) EEG.event = [eegplot2event(TMPREJ, -1)];' ...
          %         'else EEG.event = [EEG.event(find(EEG.event(:,1) ~= -1),:); eegplot2event(TMPREJ, -1, [], [0.8 1 0.8])];' ...
@@ -321,6 +324,7 @@ else
     end;
 	eegplot( tmpdata, 'srate', EEG.srate, 'title', 'Scroll component activities -- eegplot()', ...
 			 'limits', [EEG.xmin EEG.xmax]*1000 , 'command', command, eegplotoptions{:}); 
+
 	%eeg_multieegplot( tmpdata, [], [], oldrej, oldrejE, 'title', 'Scroll component activities -- eegplot()', 'srate', ...
 	%	      EEG.srate, 'limits', [EEG.xmin EEG.xmax]*1000 , 'command', command); 
 end;
