@@ -12,6 +12,7 @@
 %   'channel'   - [integer array] read only specific channels.
 %                 Default is to read all data channels.
 %   'component' - [integer array] read only specific components
+%   'verbose'   - ['on'|'off'] verbose mode. Default is 'on'.
 %
 % Outputs:
 %   signal      - EEG data or component activity
@@ -39,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2008/01/08 22:37:39  arno
+% Initial revision
+%
 
 function data = eeg_getdatact( EEG, varargin);
     
@@ -48,8 +52,10 @@ function data = eeg_getdatact( EEG, varargin);
         return;
     end;
     
-    opt = finputcheck(varargin, { 'channel'   'integer' {} [1:EEG.nbchan];
-                                  'component' 'integer' {} [] }, 'eeg_getdatact');
+    opt = finputcheck(varargin, { ...
+        'channel'   'integer' {} [1:EEG.nbchan];
+        'verbose'   'string'  { 'on' 'off' } 'on';
+        'component' 'integer' {} [] }, 'eeg_getdatact');
     if isstr(opt), error(opt); end;
     
     if strcmpi(EEG.data, 'in set file')
@@ -96,7 +102,9 @@ function data = eeg_getdatact( EEG, varargin);
             error( ['file ' filename ' not found. If you have renamed/moved' 10 ...
                     'the .set file, you must also rename/move the associated data file.' ]);
         else 
-            fprintf('Reading float file ''%s''...\n', filename);
+            if strcmpi(opt.verbose, 'on')
+                fprintf('Reading float file ''%s''...\n', filename);
+            end;
         end;
         
         % old format = .fdt; new format = .dat (transposed)
