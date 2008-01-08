@@ -150,6 +150,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.224  2007/09/13 08:50:08  arno
+% fixed icascalerms for EEG.icawinv empty
+%
 % Revision 1.223  2007/08/23 23:28:16  arno
 % not saved if dipfit modified
 %
@@ -1266,37 +1269,8 @@ for inddataset = 1:length(ALLEEG)
         if isstr(EEG.data) & nargin > 1
             if strcmpi(varargin{1}, 'loaddata')
 
-                if strcmpi(EEG.data, 'in set file')
-                    filename = fullfile(EEG.filepath, EEG.filename);
-                    EEG = pop_loadset(filename);
-                else
-                    % opening data file
-                    % -----------------
-                    filename = fullfile(EEG.filepath, EEG.data);
-                    fid = fopen( filename, 'r', 'ieee-le'); %little endian (see also pop_saveset)
-                    if fid == -1
-                        error( ['file ' filename ' not found. If you have renamed/moved' 10 ...
-                                'the .set file, you must also rename/move the associated data file.' ]);
-                    else 
-                        fprintf('Reading float file ''%s''...\n', filename);
-                    end;
-                    
-                    % old format = .fdt; new format = .dat (transposed)
-                    % -------------------------------------------------
-                    datformat = 0;
-                    if length(filename) > 3
-                        if strcmpi(filename(end-2:end), 'dat')
-                            datformat = 1;
-                        end;
-                    end;
-                    EEG.datfile = EEG.data;
-                    if datformat
-                        EEG.data = fread(fid, [EEG.trials*EEG.pnts EEG.nbchan], 'float32')';
-                    else
-                        EEG.data = fread(fid, [EEG.nbchan Inf], 'float32');
-                    end;
-                    fclose(fid);
-                end;
+                EEG.data = eeg_readdatact(EEG);
+                
             end;
         end;
 
