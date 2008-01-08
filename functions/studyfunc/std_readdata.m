@@ -13,10 +13,10 @@
 %      ALLEEG - vector of loaded EEG datasets
 %
 % Optional inputs:
-%  'infotype'  - ['erp'|'spec'|'ersp'|'itc'|'dipole'|'map'] type of stored
-%                cluster information to read. May also be a cell array of
-%                these types, for example: { 'erp' 'map' 'dipole' }
-%                {default: 'erp'}
+%  'infotype'  - ['erp'|'spec'|'ersp'|'itc'|'dipole'|'map'|'data'] type of 
+%                stored data or cluster information to read. May also be a 
+%                cell array of these types, for example: { 'erp' 'map' 
+%                'dipole' }. {default: 'erp'}
 %  'channels'  - [cell] list of channels to import {default: all}
 %  'clusters'  - [integer] list of clusters to import {[]|default: all but
 %                the parent cluster (1) and any 'NotClust' clusters}
@@ -84,6 +84,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2007/09/11 10:51:33  arno
+% fix indices problems preventing crashes
+%
 % Revision 1.34  2007/08/23 01:59:36  arno
 % remove debugging comment
 %
@@ -201,7 +204,7 @@ opt = finputcheck( varargin, { 'condition'  'cell'    []       {};
                              'statmode'   'string'  { 'subjects' 'individual' 'common' 'trials' }       'individual';
                              'subbaseline' 'string'  { 'on' 'off' }       'off';
                              'rmsubjmean'  'string'  { 'on' 'off' }       'off';
-                             'infotype'   'string'  { 'erp' 'spec' 'ersp' 'itc' 'map' 'topo' 'dipole' 'scalp' } 'erp' }, 'std_readdata');
+                             'infotype'   'string'  { 'erp' 'spec' 'ersp' 'itc' 'map' 'topo' 'dipole' 'scalp' 'data' } 'erp' }, 'std_readdata');
 if isstr(opt), error(opt); end;
 if strcmpi(opt.infotype, 'erp'),
     STUDY = pop_erpparams(STUDY, 'default');
@@ -246,10 +249,10 @@ if strcmpi(opt.infotype, 'map') | strcmpi(opt.infotype, 'scalp') | strcmpi(opt.i
     return;
 end;
 
-% check if data is present
-% ------------------------
 for ind = 1:length(finalinds)
     
+    % find indices
+    % ------------
     if ~isempty(opt.channels)
          tmpstruct = STUDY.changrp(finalinds(ind));
          alldatasets = 1:length(STUDY.datasetinfo);
@@ -289,6 +292,48 @@ for ind = 1:length(finalinds)
                     
     dataread = 0;
     switch opt.infotype
+        case 'data',
+            % check if data is already here
+            % -----------------------------
+            if isfield(tmpstruct, 'data')
+                if ~isempty(tmpstruct.data)
+                    dataread = 1;
+                end;
+            end;
+            
+            if ~dataread
+                % reserve arrays
+                % --------------
+                alldata   = cell( max(length(STUDY.condition),1), max(length(STUDY.group),1) );
+                for c = 1:nc
+                    for g = 1:ng
+                        alldata{c, g} = repmat(zero, [ALLEEG(1).pnts, sum([ ALLEEG(setinds{c,g}).trials ] )]);
+                    end;
+                end;
+            
+                % read the data and select channels
+                % ---------------------------------
+                fprintf('Reading data/activity:');
+                for c = 1:nc
+                    for g = 1:ng
+                        counttrial = 1;
+                        for indtmp = 1:length(allinds{c,g})
+                            if ~isempty(opt.channels)
+                                tmpdata = eeg_getdatact(ALLEEG(setinds{c,g}(indtmp)),  'channel', -allinds{c,g}(indtmp), 'verbose', 'off');
+                            else
+                                tmpdata = eeg_getdatact(ALLEEG(setinds{c,g}(indtmp)), 'component', allinds{c,g}(indtmp), 'verbose', 'off');
+                            end;
+                            alldata{c, g}(:,counttrial:counttrial+ALLEEG(setinds{c,g}(indtmp)).trials-1) = squeeze(tmpdata);
+                            counttrial = counttrial+ALLEEG(setinds{c,g}(indtmp)).trials;
+                            fprintf('.');
+                        end;
+                    end;
+                end;
+                fprintf('\n');
+                tmpstruct.datatimes = ALLEEG(1).times;
+                tmpstruct.data      = alldata;
+            end;
+        
         case 'erp', 
             % check if data is already here
             % -----------------------------
@@ -566,7 +611,7 @@ for ind = 1:length(finalinds)
     % copy results to structure
     % -------------------------
     fieldnames = { 'erpdata' 'erptimes' 'specdata' 'specfreqs' 'erspdata' 'erspbase' 'erspfreqs' 'ersptimes' ...
-                   'itcfreqs' 'itctimes' 'itcdata' 'erspsubjinds' 'itcsubjinds' 'allinds' 'setinds' 'dipoles' };
+                   'itcfreqs' 'itctimes' 'itcdata' 'erspsubjinds' 'itcsubjinds' 'allinds' 'setinds' 'dipoles' 'data' 'datatimes' };
     for f = 1:length(fieldnames)
         if isfield(tmpstruct, fieldnames{f}), 
             tmpdata = getfield(tmpstruct, fieldnames{f});
