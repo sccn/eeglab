@@ -150,6 +150,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.225  2008/01/08 22:17:49  arno
+% new way of reading data
+%
 % Revision 1.224  2007/09/13 08:50:08  arno
 % fixed icascalerms for EEG.icawinv empty
 %
@@ -1269,7 +1272,7 @@ for inddataset = 1:length(ALLEEG)
         if isstr(EEG.data) & nargin > 1
             if strcmpi(varargin{1}, 'loaddata')
 
-                EEG.data = eeg_readdatact(EEG);
+                EEG.data = eeg_getdatact(EEG);
                 
             end;
         end;
