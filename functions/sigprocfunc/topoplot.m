@@ -163,6 +163,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.282  2007/11/29 17:49:56  arno
+% header typo
+%
 % Revision 1.281  2007/09/11 10:57:53  arno
 % catch error when plotting channels outside bounadries
 %
@@ -2198,7 +2201,7 @@ if ~isempty(DIPOLE)
         hh = plot( DIPOLE(index, 1), DIPOLE(index, 2), '.');
         set(hh, 'color', DIPCOLOR, 'markersize', DIPSCALE*30);
         hh = line( [DIPOLE(index, 1) DIPOLE(index, 1)+DIPOLE(index, 3)]', ...
-                   [DIPOLE(index, 2) DIPOLE(index, 2)+DIPOLE(index, 4)]');
+                   [DIPOLE(index, 2) DIPOLE(index, 2)+DIPOLE(index, 4)]',[10 10]);
         set(hh, 'color', DIPCOLOR, 'linewidth', DIPSCALE*30/7);
       end;
     end;
