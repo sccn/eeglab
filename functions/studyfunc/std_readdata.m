@@ -13,10 +13,10 @@
 %      ALLEEG - vector of loaded EEG datasets
 %
 % Optional inputs:
-%  'infotype'  - ['erp'|'spec'|'ersp'|'itc'|'dipole'|'map'|'data'] type of 
-%                stored data or cluster information to read. May also be a 
-%                cell array of these types, for example: { 'erp' 'map' 
-%                'dipole' }. {default: 'erp'}
+%  'infotype'  - ['erp'|'spec'|'ersp'|'itc'|'dipole'|'map'|'data'|'event'] 
+%                type of stored data or cluster information to read. May 
+%                also be a cell array of these types, for example: { 'erp' 
+%                'map' 'dipole' }. {default: 'erp'}
 %  'channels'  - [cell] list of channels to import {default: all}
 %  'clusters'  - [integer] list of clusters to import {[]|default: all but
 %                the parent cluster (1) and any 'NotClust' clusters}
@@ -59,6 +59,7 @@
 %                          % with the same format as EEG.dipfit.model
 %
 %   finalinds - either the cluster(s) or channel(s) indices selected.
+%
 % Example:
 %         % To obtain the ERPs for all Cluster-3 components from a STUDY
 %         %
@@ -84,6 +85,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2008/01/08 23:05:41  arno
+% added data type to read raw data
+%
 % Revision 1.35  2007/09/11 10:51:33  arno
 % fix indices problems preventing crashes
 %
@@ -196,16 +200,19 @@ if nargin < 3
     channel = {};
 end
 
-opt = finputcheck( varargin, { 'condition'  'cell'    []       {};
-                             'channels'   'cell'    []       {};
-                             'clusters'   'integer' []       [];
-                             'freqrange'  'real'    []       [];
-                             'timerange'  'real'    []       [];
-                             'statmode'   'string'  { 'subjects' 'individual' 'common' 'trials' }       'individual';
-                             'subbaseline' 'string'  { 'on' 'off' }       'off';
-                             'rmsubjmean'  'string'  { 'on' 'off' }       'off';
-                             'infotype'   'string'  { 'erp' 'spec' 'ersp' 'itc' 'map' 'topo' 'dipole' 'scalp' 'data' } 'erp' }, 'std_readdata');
+[opt moreopts] = finputcheck( varargin, { ...
+    'condition'  'cell'    []       {};
+    'channels'   'cell'    []       {};
+    'clusters'   'integer' []       [];
+    'freqrange'  'real'    []       [];
+    'timerange'  'real'    []       [];
+    'statmode'   'string'  { 'subjects' 'individual' 'common' 'trials' }       'individual';
+    'subbaseline' 'string'  { 'on' 'off' }       'off';
+    'rmsubjmean'  'string'  { 'on' 'off' }       'off';
+    'infotype'   'string'  { 'erp' 'spec' 'ersp' 'itc' 'map' 'topo' 'dipole' 'scalp' 'data' 'event' } 'erp' }, ...
+                              'std_readdata', 'ignore');
 if isstr(opt), error(opt); end;
+
 if strcmpi(opt.infotype, 'erp'),
     STUDY = pop_erpparams(STUDY, 'default');
     if isempty(opt.timerange), opt.timerange = STUDY.etc.erpparams.timerange; end;
@@ -292,6 +299,47 @@ for ind = 1:length(finalinds)
                     
     dataread = 0;
     switch opt.infotype
+        case 'event',
+            % check if data is already here
+            % -----------------------------
+            if isfield(tmpstruct, 'datasortvals')
+                if ~isempty(tmpstruct.datasortvals)
+                    dataread = 1;
+                end;
+            end;
+            
+            if ~dataread
+                % reserve arrays
+                % --------------
+                datasortvals   = cell( max(length(STUDY.condition),1), max(length(STUDY.group),1) );
+                datacontinds    = cell( max(length(STUDY.condition),1), max(length(STUDY.group),1) );
+                for c = 1:nc
+                    for g = 1:ng
+                        datasortvals{c, g} = repmat(zero, [1, sum([ ALLEEG(setinds{c,g}).trials ] )]);
+                        datacontinds{c, g} = repmat(zero, [1, sum([ ALLEEG(setinds{c,g}).trials ] )]);
+                    end;
+                end;
+            
+                % read the data and select channels
+                % ---------------------------------
+                fprintf('Reading events:');
+                for c = 1:nc
+                    for g = 1:ng
+                        counttrial = 1;
+                        for indtmp = 1:length(allinds{c,g})
+                            tmpdata  = eeg_getepochevent(ALLEEG(setinds{c,g}(indtmp)), moreopts{:});
+                            datasortvals{c, g}(:,counttrial:counttrial+ALLEEG(setinds{c,g}(indtmp)).trials-1) = squeeze(tmpdata);
+                            datacontinds{c, g}(:,counttrial:counttrial+ALLEEG(setinds{c,g}(indtmp)).trials-1) = setinds{c,g}(indtmp);
+                            counttrial = counttrial+ALLEEG(setinds{c,g}(indtmp)).trials;
+                            fprintf('.');
+                        end;
+                    end;
+                end;
+                fprintf('\n');
+                tmpstruct.datasortvals = datasortvals;
+                tmpstruct.datacontinds = datacontinds;
+            end;
+     
         case 'data',
             % check if data is already here
             % -----------------------------
@@ -611,7 +659,8 @@ for ind = 1:length(finalinds)
     % copy results to structure
     % -------------------------
     fieldnames = { 'erpdata' 'erptimes' 'specdata' 'specfreqs' 'erspdata' 'erspbase' 'erspfreqs' 'ersptimes' ...
-                   'itcfreqs' 'itctimes' 'itcdata' 'erspsubjinds' 'itcsubjinds' 'allinds' 'setinds' 'dipoles' 'data' 'datatimes' };
+                   'itcfreqs' 'itctimes' 'itcdata' 'erspsubjinds' 'itcsubjinds' 'allinds' 'setinds' 'dipoles' ...
+                   'data' 'datatimes' 'datasortvals' 'datacontinds' };
     for f = 1:length(fieldnames)
         if isfield(tmpstruct, fieldnames{f}), 
             tmpdata = getfield(tmpstruct, fieldnames{f});
