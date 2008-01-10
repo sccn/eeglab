@@ -1,9 +1,7 @@
 % std_erpimage() - Plot an erpimage using multiple subject data
 %
 % Usage:
-%   >> std_erpimage( STUDY, ALLEEG, typeplot, channel, projchan, title, ...
-%                  smooth, decimate, sortingtype, sortingwin, ...
-%                            sortingeventfield, renorm, options...);
+%   >> std_erpimage( STUDY, ALLEEG, 'key', 'val', ...);
 % Inputs:
 %   STUDY    - STUDY set comprising some or all of the EEG datasets in ALLEEG.
 %   ALLEEG   - global vector of EEG structures for the datasets included 
@@ -76,6 +74,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 %$Log: not supported by cvs2svn $
+%Revision 1.6  2008/01/10 22:57:42  arno
+%first try
+%
 %Revision 1.5  2008/01/10 00:31:33  arno
 %still in dev.
 %
@@ -103,8 +104,9 @@ function [allphases, allsortvar, subjamptime, subjamptrial, globalent ] = std_er
     STUDY = pop_erpimparams(STUDY, 'default');
 
     [ opt moreparams ] = finputcheck( varargin, { ...
-        'sorttype'    'string'  [] STUDY.etc.erpimparams.sortvar;
-        'sortwin'     'string'  [] STUDY.etc.erpimparams.sortwin;
+        'erpimageopt' 'cell'    [] STUDY.etc.erpimparams.erpimageopt;
+        'sorttype'    'string'  [] STUDY.etc.erpimparams.sorttype;
+        'sortwin'     'real'    [] STUDY.etc.erpimparams.sortwin;
         'sortfield'   'string'  [] STUDY.etc.erpimparams.sortfield;
         'statistics'  'string'  [] STUDY.etc.erpimparams.statistics;
         'groupstats'  'string'  [] STUDY.etc.erpimparams.groupstats;
@@ -135,10 +137,12 @@ function [allphases, allsortvar, subjamptime, subjamptrial, globalent ] = std_er
     % -------------------
     if ~isempty(opt.channels)
          [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'channels', opt.channels, 'infotype', 'data');
+         [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'channels', opt.channels, 'infotype', 'event', ...
+                                            'type', opt.sorttype, 'timewin', opt.sortwin, 'fieldname', opt.sortfield);
     else [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'clusters', opt.clusters, 'infotype', 'data');
+         [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'channels', opt.channels, 'infotype', 'event', ...
+                                            'type', opt.sorttype, 'timewin', opt.sortwin, 'fieldname', opt.sortfield);
     end;
-    [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'channels', opt.channels, 'infotype', 'event', ...
-                                       'type', 'sorttype', 'timewin', 'sortwin', 'fieldname', 'sortfield');
     opt.legend = 'off';
     
     for index = 1:length(allinds)
@@ -148,7 +152,7 @@ function [allphases, allsortvar, subjamptime, subjamptrial, globalent ] = std_er
             eval( [ 'alldata     = STUDY.changrp(allinds(index)).data;' ]);
             eval( [ 'alltimes    = STUDY.changrp(allinds(index)).datatimes;' ]);
             eval( [ 'allvals     = STUDY.changrp(allinds(index)).datasortvals;' ]);
-            eval( [ 'allcontinds = STUDY.cluster(allinds(index)).datacontinds;' ]);
+            eval( [ 'allcontinds = STUDY.changrp(allinds(index)).datacontinds;' ]);
             setinds  = STUDY.changrp(allinds(index)).setinds;
         else
             eval( [ 'alldata  = STUDY.cluster(allinds(index)).data;' ]);
@@ -209,12 +213,18 @@ function [allphases, allsortvar, subjamptime, subjamptrial, globalent ] = std_er
         % plot specific component
         % -----------------------
         if index == length(allinds), opt.legend = 'on'; end;
-        figure;
+        figure('color', 'w');
         for c = 1:size(alldata,1)
             for g = 1:size(alldata,2)
                 if ~isempty(alldata{c,g})
-                    subplot(size(alldata,1), size(alldata,2),c+g*size(alldata,1));
-                    erpimage(alldata{c,g}, allsortvar{c,g}, alltimes, moreparams{:});
+                    subplot(size(alldata,1), size(alldata,2),c+(g-1)*size(alldata,1));
+                    if ~isempty(alldata{c,g})
+                        if all(isnan(allvals{c,g}))
+                            erpimage(alldata{c,g}, [], alltimes, opt.erpimageopt{:});
+                        else
+                            erpimage(alldata{c,g}, allvals{c,g}, alltimes, opt.erpimageopt{:});
+                        end;
+                    end;
                 end;
             end;
         end;
