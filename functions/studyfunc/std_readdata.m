@@ -31,6 +31,9 @@
 %                 { default: 'off' }
 %  'subbaseline' - ['on'|'off'] remove all condition and spectrum baselines
 %                  for ERSP data { default: 'on' }
+%  'type','timewin','fieldname' - optional parameters for the function 
+%                  eeg_geteventepoch may also be used to select specific
+%                  events.
 %
 % Output:
 %    STUDY     - (possibly) updated STUDY structure
@@ -54,6 +57,11 @@
 %     clustinfo.topo       % (ncomps,65,65) array of component scalp map grids
 %       clustinfo.topox    % abscissa values for columns of the scalp maps
 %       clustinfo.topoy    % ordinate values for rows of the scalp maps
+%
+%     clustinfo.data           % raw data arrays
+%       clustinfo.datatimes    % time point for raw data
+%       clustinfo.datasortvals % sorting values (one per trial)
+%       clustinfo.datacontinds % dataset indices (contacted for all trials)
 %
 %     clustinfo.dipole     % array of component dipole information structs
 %                          % with the same format as EEG.dipfit.model
@@ -85,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.37  2008/01/10 19:56:18  arno
+% adding even reading
+%
 % Revision 1.36  2008/01/08 23:05:41  arno
 % added data type to read raw data
 %
