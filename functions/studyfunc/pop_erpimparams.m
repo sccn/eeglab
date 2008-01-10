@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2008/01/10 23:00:41  arno
+% adding erpimage opt
+%
 % Revision 1.2  2008/01/10 20:17:23  arno
 % fixing sortvar -> sorttype
 %
@@ -68,6 +71,7 @@ function STUDY = default_params(STUDY)
     if ~isfield(STUDY.etc.erpimparams, 'statistics' ),  STUDY.etc.erpimparams.statistics = 'param'; end;
     if ~isfield(STUDY.etc.erpimparams, 'groupstats' ),  STUDY.etc.erpimparams.groupstats = 'off'; end;
     if ~isfield(STUDY.etc.erpimparams, 'condstats'  ),  STUDY.etc.erpimparams.condstats  = 'off'; end;
+    if ~isfield(STUDY.etc.erpimparams, 'statmode'   ),  STUDY.etc.erpimparams.statmode   = 'param'; end;
     if ~isfield(STUDY.etc.erpimparams, 'threshold'  ),  STUDY.etc.erpimparams.threshold = NaN; end;
     if ~isfield(STUDY.etc.erpimparams, 'naccu') ,       STUDY.etc.erpimparams.naccu     = []; end;
 
