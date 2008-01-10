@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2008/01/10 20:13:36  arno
+% Initial revision
+%
 
 function [ STUDY, com ] = pop_erpimparams(STUDY, varargin);
 
@@ -55,9 +58,9 @@ STUDY = default_params(STUDY);
 
 function STUDY = default_params(STUDY)
     if ~isfield(STUDY.etc, 'erpimparams'), STUDY.etc.erpimparams = []; end;
-    if ~isfield(STUDY.etc.erpimparams, 'sortvar'   ),  STUDY.etc.erpimparams.sortvar = []; end;
-    if ~isfield(STUDY.etc.erpimparams, 'sortwin'   ),  STUDY.etc.erpimparams.sortwin = []; end;
-    if ~isfield(STUDY.etc.erpimparams, 'sortfield' ),  STUDY.etc.erpimparams.sortfield = []; end;
+    if ~isfield(STUDY.etc.erpimparams, 'sorttype'  ),  STUDY.etc.erpimparams.sorttype  = []; end;
+    if ~isfield(STUDY.etc.erpimparams, 'sortwin'   ),  STUDY.etc.erpimparams.sortwin   = []; end;
+    if ~isfield(STUDY.etc.erpimparams, 'sortfield' ),  STUDY.etc.erpimparams.sortfield = 'latency'; end;
     if ~isfield(STUDY.etc.erpimparams, 'statistics'),  STUDY.etc.erpimparams.statistics = 'param'; end;
     if ~isfield(STUDY.etc.erpimparams, 'groupstats'),  STUDY.etc.erpimparams.groupstats = 'off'; end;
     if ~isfield(STUDY.etc.erpimparams, 'condstats' ),  STUDY.etc.erpimparams.condstats  = 'off'; end;
