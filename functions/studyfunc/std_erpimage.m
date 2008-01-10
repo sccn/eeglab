@@ -76,6 +76,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 %$Log: not supported by cvs2svn $
+%Revision 1.5  2008/01/10 00:31:33  arno
+%still in dev.
+%
 %Revision 1.4  2005/11/11 23:40:32  arno
 %nothing
 %
@@ -132,22 +135,26 @@ function [allphases, allsortvar, subjamptime, subjamptrial, globalent ] = std_er
     % -------------------
     if ~isempty(opt.channels)
          [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'channels', opt.channels, 'infotype', 'data');
-         STUDY = std_getepochevent(STUDY, ALLEEG, opt.sorttype, opt.sortwin, opt.softfield);
     else [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'clusters', opt.clusters, 'infotype', 'data');
     end;
-    [STUDY.etc.datasort STUDY.etc.datind]  = std_getepochevent(STUDY, ALLEEG, opt.sorttype, opt.sortwin, opt.softfield);
+    [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'channels', opt.channels, 'infotype', 'event', ...
+                                       'type', 'sorttype', 'timewin', 'sortwin', 'fieldname', 'sortfield');
     opt.legend = 'off';
     
     for index = 1:length(allinds)
 
         if length(allinds) > 1, try, subplot(nr,nc,index, 'align'); catch, subplot(nr,nc,index); end; end;
         if ~isempty(opt.channels)
-            eval( [ 'alldata  = STUDY.changrp(allinds(index)).' opt.datatype 'data;' ]);
-            eval( [ 'alltimes = STUDY.changrp(allinds(index)).' opt.datatype 'datatimes;' ]);
+            eval( [ 'alldata     = STUDY.changrp(allinds(index)).data;' ]);
+            eval( [ 'alltimes    = STUDY.changrp(allinds(index)).datatimes;' ]);
+            eval( [ 'allvals     = STUDY.changrp(allinds(index)).datasortvals;' ]);
+            eval( [ 'allcontinds = STUDY.cluster(allinds(index)).datacontinds;' ]);
             setinds  = STUDY.changrp(allinds(index)).setinds;
         else
-            eval( [ 'alldata  = STUDY.cluster(allinds(index)).' opt.datatype 'data;' ]);
-            eval( [ 'alltimes = STUDY.cluster(allinds(index)).' opt.datatype 'datatimes;' ]);
+            eval( [ 'alldata  = STUDY.cluster(allinds(index)).data;' ]);
+            eval( [ 'alltimes    = STUDY.cluster(allinds(index)).datatimes;' ]);
+            eval( [ 'allvals     = STUDY.cluster(allinds(index)).datasortvals;' ]);
+            eval( [ 'allcontinds = STUDY.cluster(allinds(index)).datacontinds;' ]);
             compinds = STUDY.cluster(allinds(index)).allinds;
             setinds  = STUDY.cluster(allinds(index)).setinds;
         end;
@@ -155,11 +162,14 @@ function [allphases, allsortvar, subjamptime, subjamptrial, globalent ] = std_er
         % plot specific subject
         % ---------------------
         if ~isempty(opt.subject) & isempty(opt.comps)
-            for c = 1:size(allersp,1)
-                for g = 1:size(allersp,2)
+            for c = 1:size(alldata,1)
+                for g = 1:size(alldata,2)
                     for l=length(setinds{c,g}):-1:1
                         if ~strcmpi(opt.subject, STUDY.datasetinfo(setinds{c,g}(l)).subject)
-                            allersp{c,g}(:,:,l) = [];
+                            inds = find(allcontinds == l);
+                            alldata{c,g}(:,:,inds) = [];
+                            allvals{c,g}(:,:,inds) = [];
+                            allcontinds{c,g}(:,:,inds) = [];
                         end;
                     end;
                 end;
@@ -177,14 +187,17 @@ function [allphases, allsortvar, subjamptime, subjamptrial, globalent ] = std_er
             grp    = STUDY.datasetinfo(sets(1)).group;
             grpind = strmatch( grp, STUDY.group );
             if isempty(grpind), grpind = 1; end;
-            allersp = allersp(:,grpind);
+            alldata = alldata(:,grpind);
             
             % find component
             % --------------
-            for c = 1:size(allersp,1)
+            for c = 1:size(alldata,1)
                 for ind = length(compinds{1,grpind}):-1:1
                     if ~any(compinds{1,grpind}(ind) == comps) | ~any(setinds{1,grpind}(ind) == sets)
-                        allersp{c}(:,:,ind) = [];
+                        inds = find(allcontinds == ind);
+                        alldata{c,g}(:,:,inds) = [];
+                        allvals{c,g}(:,:,inds) = [];
+                        allcontinds{c,g}(:,:,inds) = [];
                     else
                         comp_names{c,1} = comps;
                     end;
@@ -196,237 +209,23 @@ function [allphases, allsortvar, subjamptime, subjamptrial, globalent ] = std_er
         % plot specific component
         % -----------------------
         if index == length(allinds), opt.legend = 'on'; end;
-        erpimage(alldata, 
-        
-        
-        [pgroup pcond pinter] = std_plottf(alltimes, allfreqs, allersp, 'condnames', STUDY.condition, 'subject', opt.subject, ...
-                                           'legend', opt.legend, 'compinds', comp_names, 'datatype', opt.datatype,'plotmode', ...
-                                           opt.plotmode, 'groupnames', STUDY.group, 'topovals', opt.plottf, 'unitx', 'Hz', ...
-                                           'chanlocs', ALLEEG(1).chanlocs, 'plotsubjects', opt.plotsubjects, plotcurveopt{:});
-        if isempty(opt.channels), %title(sprintf('Cluster %d', allinds(index)));
-            if length(allinds) > 1, 
-                title([ STUDY.cluster(allinds(index)).name ' (' num2str(length(STUDY.cluster(allinds(index)).comps)),' ICs, ' ...
-                        num2str(length(unique(STUDY.cluster(allinds(index)).sets(1,:)))) ' Ss)' ]);            
-                set(gcf,'name','Cluster ERPIMAGE')
-            elseif ~strcmp(opt.mode,'together') % if it is not the mean ERSP that is being shown (which is the case when 'cluster properties' is plotted then put cluster number on the corner of figure
-                h = gca;
-                axes('position',[0.04 0.96 0.1 0.06]); 
-                text(0,0,[STUDY.cluster(allinds(index)).name],'fontsize',13 );
-                axis off;
-                if length(opt.comps) ~= 1
-                    set(gcf,'name',['ERPIMAGE of ' STUDY.cluster(allinds(index)).name])
-                else
-                    set(gcf,'name',['ERPIMAGE of a Component from cluster ' STUDY.cluster(allinds(index)).name])
+        figure;
+        for c = 1:size(alldata,1)
+            for g = 1:size(alldata,2)
+                if ~isempty(alldata{c,g})
+                    subplot(size(alldata,1), size(alldata,2),c+g*size(alldata,1));
+                    erpimage(alldata{c,g}, allsortvar{c,g}, alltimes, moreparams{:});
                 end;
-                axes(h);
             end;
-        else                      
-            title(sprintf('%s', opt.channels{index}));  
-        end;
-    end;
-    
-    
-    
-    plot_indiv = 1; % 0 or 1
-    
-    if nargin < 7
-        help std_erpimage
-        return;
-    end;
-    if iscell(movewin)
-        erparg1 = movewin;
-        erparg2 = decim;
-        movewin = [ erparg1{1} erparg2{1} ];
-        decim   = [ erparg1{2} erparg2{2} ];
-    else
-        erparg1 = [];
-        erparg2 = [];
-    end;
-    
-    % adapt parameters
-    % ----------------    
-    if size(data,1) == 1 & size(data,3) == 1
-        data = reshape(data, size(data,2)/length(sortvar), length(sortvar));
-    end;
-    if length(movewin) == 1, movewin(2) = 1; end;
-    if length(decim)   == 1, decim(2)   = 0;   end;
-    
-    % sorting
-    % -------
-    if nargin > 2 & ~isempty(sortvar)
-        [tmpsort tmpind] = sort(sortvar);
-        sortind          = subjind(tmpind);
-    else
-        sortind          = subjind;
-    end;
-    
-    % plot all erpimage and retreive values
-    % -------------------------------------
-    values = unique(sortind);
-    nsubj = length(values);
-    realdecim = decim(1);
-    if ~plot_indiv, extra_args = { 'noshow', 'yes' };
-    else            extra_args = { };
-    end;
-    for ival = 1:nsubj
-        idxsubj = find(subjind == values(ival));
-        p(ival) = length(idxsubj);
-        
-        if plot_indiv, figure; end;
-        if movewin(1) >= 0
-            if isempty(erparg1)
-                [ tmpdata tmpvar tmptrials tmplim axhndls,erp, ...
-                  amps,cohers,cohsig,ampsig,outamps,phsangls,pshamp] = erpimage( data(:, idxsubj), sortvar( idxsubj), ...
-                                                              times, titleim, movewin(1), -decim(1), varargin{:}, extra_args{:});
-                %{ times, titleim, movewin(1), -decim(1), varargin{:} }
-            else
-                [ tmpdata tmpvar tmptrials tmplim axhndls,erp, ...
-                  amps,cohers,cohsig,ampsig,outamps,phsangls,pshamp] = erpimage( data(:, idxsubj), sortvar( idxsubj), ...
-                                                              times, titleim, movewin(1), -decim(1), erparg1{3:end}, extra_args{:});
-                %{  times, titleim, movewin(1), -decim(1), erparg1{3:end} }
-            end;
-        else
-            % subtract moving average from erpimage()
-            % ---------------------------------------
-            if isempty(erparg1)
-                [ tmpdata tmpvar tmptrials tmplim axhndls,erp, ...
-                  amps,cohers,cohsig,ampsig,outamps,phsangls,pshamp] = erpimage( data(:, idxsubj), sortvar( idxsubj), ...
-                                                                  times, titleim, -movewin(1), -decim(1), varargin{:}, extra_args{:});
-                [ tmpdata2 tmpvar2 ] = erpimage( data(:, idxsubj), sortvar( idxsubj), ...
-                                                                  times, titleim, 1, 0, varargin{:}, 'noshow', 'yes');
-            else
-                [ tmpdata tmpvar tmptrials tmplim axhndls,erp, ...
-                  amps,cohers,cohsig,ampsig,outamps,phsangls,pshamp] = erpimage( data(:, idxsubj), sortvar( idxsubj), ...
-                                                                  times, titleim, -movewin(1), -decim(1), erparg1{3:end}, extra_args{:});
-                [ tmpdata2 tmpvar2 ] = erpimage( data(:, idxsubj), sortvar( idxsubj), ...
-                                                                  times, titleim, 1, 0, erparg1{3:end}, 'noshow', 'yes');
-            end;
-            if size(tmpdata2,2) > size(tmpdata,2)
-                % randomly remove single trials
-                % -----------------------------
-                diflen   = size(tmpdata2,2) - size(tmpdata,2);
-                indrm = find(shuffle([ ones(1, diflen) zeros(1, size(tmpdata,2)-diflen) ]));
-                tmpdata2(:,indrm) = [];
-                tmpvar2   (indrm) = [];
-            end;
-            maxlen = min(size(tmpdata,2), size(tmpdata2,2));
-            tmpdata   = tmpdata2(:,1:maxlen)-tmpdata(:,1:maxlen);
-            tmpvar    = tmpvar2(1:maxlen); % version non-smooth
-            %tmpvar   = tmpvar(1:maxlen); % smooth version
-            %phsangls  = phsangls(1:maxlen);
         end;
 
-        % copy to variable regrouping all subject info
-        % --------------------------------------------
-        if ival == 1 
-            realdecim  = size(tmpdata,2);
-            outdata    = zeros(size(tmpdata,1), realdecim, nsubj);
-            allsortvar = zeros(realdecim, nsubj);
-            allphases  = zeros(realdecim, nsubj);
-        end;
-        
-        if length(tmpdata) < size(outdata,2)
-            outdata    = outdata   (:,1:length(tmpdata),:);
-            allsortvar = allsortvar(1:length(tmpdata),:);
-            if ~isempty(phsangls)
-                allphases = allphases (1:length(tmpdata),:);
-            end;
-        end;
-        minsize = min( size(outdata,2), size(tmpdata, 2) );
-        outdata (:,1:minsize,ival) = tmpdata(:,1:minsize);     %/sum(sum(abs(tmpdata)));        
-        allsortvar(1:minsize,ival) = tmpvar   (1:minsize)';
-        
-        if ~isempty(phsangls)
-            tmp = movav(phsangls, [1:length(phsangls)], abs(movewin(1)), ...
-                                    (length(phsangls)-abs(movewin(1))*2)/decim(1));
-            allphases (:,ival) = tmp (1:size(allsortvar,1))';
+        if isempty(opt.channels), %title(sprintf('Cluster %d', allinds(index)));
+            title([ STUDY.cluster(allinds(index)).name ' (' num2str(length(STUDY.cluster(allinds(index)).comps)),' ICs, ' ...
+                    num2str(length(unique(STUDY.cluster(allinds(index)).sets(1,:)))) ' Ss)' ]);            
+            set(gcf,'name','Cluster ERPIMAGE')
+        else                      
+            title(sprintf('%s', opt.channels{index}));  
+            set(gcf,'name','Channel grand ERPIMAGE')
         end;
     end;
-    
-    % uniform probability
-    % -------------------
-    uniform = p / sum(p);
-    
-    % resort trials and image them
-    % ----------------------------
-    newoutdata = mean(outdata,    3);
-    newsortvar = mean(allsortvar, 2)';
-    
-    % plot global erpimage
-    % --------------------
-    timevect = linspace(tmplim(1), tmplim(2), size(outdata,1));
-    if isempty(erparg2)
-        % remove some arguments
-        % ---------------------
-        for index = length(varargin):-1:1
-            if isstr(varargin{index}) & strcmpi(varargin{index}, 'align')
-                varargin{index+1} = num2str(varargin{index+1});
-            elseif isstr(varargin{index}) & strcmpi(varargin{index}, 'phasesort')
-                varargin(index:index+1) = [];          
-            elseif isstr(varargin{index}) & strcmpi(varargin{index}, 'plotamps')
-                varargin(index) = [];          
-            end;
-        end;
-        %{ times, titleim, movewin(2), -decim(2), varargin{:} }
-        figure; erpimage( newoutdata, newsortvar, timevect, titleim, movewin(2), decim(2), 'nosort', varargin{:});
-    else
-        %{ times, titleim, movewin(2), -decim(2), erparg2{3:end} }
-        figure; erpimage( newoutdata, newsortvar, timevect, titleim, movewin(2), decim(2), erparg2{3:end});
-    end;
-    return;
-    
-    % compute entropy
-    % ---------------
-    for sind = 1:nsubj % the loop below will select first
-                       % the max trial among all subject
-                       % second iteration will choose the second max...
-                       % the loop has not been optimized
-        
-        % compute entropy array for this index
-        % ------------------------------------
-        subjcont = zeros(1, length(subjind));
-        arrayp   = zeros(size(outdata,1), realdecim, nsubj);
-        for index = 1:realdecim
-            
-            trials = outdata(:, index:realdecim:end); % nsubj trials (1 per subject)
-            
-            for indtime = 1:size(trials,1)
-                [tmp indorder] = sort(trials(indtime,:));
-                arrayp(indtime, index, indorder(sind)) = arrayp(indtime, index, indorder(1))+1;
-            end;
-            
-        end;
-        
-        % compute entropy across time
-        % ---------------------------
-        arrayptime = squeeze(sum(arrayp,2));
-        for indtime = 1:size(trials,1)
-            p = arrayptime(indtime,:);
-            p = p / sum(p);
-            p(find(p == 0)) = [];
-            subjamptime(indtime,sind) = -sum(p.*log(p)) / -sum(uniform.*log(uniform)) ;
-        end;
-        
-        % compute entropy across trials
-        % -----------------------------
-        arrayptrial = squeeze(sum(arrayp,1));
-        for indtrial = 1:size(arrayptrial,1)
-            p = arrayptime(indtrial,:);
-            p = p / sum(p);
-            p(find(p == 0)) = [];
-            subjamptrial(indtrial,sind) = -sum(p.*log(p)) / -sum(uniform.*log(uniform)) ;
-        end;
-    
-        % global entropy
-        % --------------
-        p = squeeze(sum(sum(arrayp,1),2));
-        p = p / sum(p);
-        p(find(p == 0)) = [];
-        globalent(sind) =  -sum(p.*log(p)) / -sum(uniform.*log(uniform));
-    end;
-    
-    figure; plot(timevect, mean(subjamptime,2));
-    figure; plot(1:realdecim, mean(subjamptrial,2));
-    
-    return
     
