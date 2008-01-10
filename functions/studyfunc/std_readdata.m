@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.38  2008/01/10 20:00:10  arno
+% update help message
+%
 % Revision 1.37  2008/01/10 19:56:18  arno
 % adding even reading
 %
@@ -212,6 +215,9 @@ if nargin < 3
 end
 
 [opt moreopts] = finputcheck( varargin, { ...
+    'type'       { 'string' 'cell' } { [] [] } '';
+    'timewin'    'real'    []        [-Inf Inf];
+    'fieldname'  'string'  []        'latency';
     'condition'  'cell'    []       {};
     'channels'   'cell'    []       {};
     'clusters'   'integer' []       [];
@@ -333,16 +339,19 @@ for ind = 1:length(finalinds)
             
                 % read the data and select channels
                 % ---------------------------------
-                fprintf('Reading events:');
-                for c = 1:nc
-                    for g = 1:ng
-                        counttrial = 1;
-                        for indtmp = 1:length(allinds{c,g})
-                            tmpdata  = eeg_getepochevent(ALLEEG(setinds{c,g}(indtmp)), moreopts{:});
-                            datasortvals{c, g}(:,counttrial:counttrial+ALLEEG(setinds{c,g}(indtmp)).trials-1) = squeeze(tmpdata);
-                            datacontinds{c, g}(:,counttrial:counttrial+ALLEEG(setinds{c,g}(indtmp)).trials-1) = setinds{c,g}(indtmp);
-                            counttrial = counttrial+ALLEEG(setinds{c,g}(indtmp)).trials;
-                            fprintf('.');
+                if ~isempty(opt.type)
+                    fprintf('Reading events:');
+                    for c = 1:nc
+                        for g = 1:ng
+                            counttrial = 1;
+                            for indtmp = 1:length(allinds{c,g})
+                                tmpdata  = eeg_getepochevent(ALLEEG(setinds{c,g}(indtmp)), ...
+                                                             'type', opt.type, 'timewin', opt.timewin, 'fieldname', opt.fieldname);
+                                datasortvals{c, g}(:,counttrial:counttrial+ALLEEG(setinds{c,g}(indtmp)).trials-1) = squeeze(tmpdata);
+                                datacontinds{c, g}(:,counttrial:counttrial+ALLEEG(setinds{c,g}(indtmp)).trials-1) = setinds{c,g}(indtmp);
+                                counttrial = counttrial+ALLEEG(setinds{c,g}(indtmp)).trials;
+                                fprintf('.');
+                            end;
                         end;
                     end;
                 end;
