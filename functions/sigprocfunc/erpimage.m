@@ -59,12 +59,12 @@
 %               Example of formula: '3*x+2'. {default: 'no'}
 %               If sorting by string values like event type, suggested formulas for:
 %                 letter string: '1000*x', number string: '30000*x-1500'
-%   'noplot' = Do not plot sortvar {default: Plot sortvar if in times range}
-%   'noshow' = ['yes'|'no'] Do not plot erpimage, simply return outputs {default: 'no'}
+%   'noplot' = ['on'|'off'] Do not plot sortvar {default: Plot sortvar if in times range}
+%   'noshow' = ['on'|'off'] Do not plot erpimage, simply return outputs {default: 'no'}
 %
 % Sort data epochs:
-%   'nosort' = Do not sort data epochs.
-%  {default} = Sort data epochs by sortvar (see sortvar input above).
+%   'nosort' = ['on'|'off'] Do not sort data epochs. {default: Sort data epochs by 
+%              sortvar (see sortvar input above).
 %  'valsort' = [startms endms direction] Sort data on (mean) value
 %               between startms and (optional) endms. Direction is 1 or -1.
 %              If -1, plot max-value epoch at bottom {default: sort on sortvar}
@@ -89,10 +89,10 @@
 %  'sortwin' = [start_ms end_ms] With center_ms == Inf in 'ampsort' ars (above), sorts
 %                by mean amplitude across window centers shifted from start_ms
 %                to end_ms by 10 ms.
-%  'showwin' = Show sorting window behind ERP trace. {default: don't show sorting window}
+%  'showwin' = ['on'|'off'] Show sorting window behind ERP trace. {default: 'off'}
 %
 % Plot time-varying spectral amplitude instead of potential:
-% 'plotamps' = Image amplitudes at each trial and latency instead of potential 
+% 'plotamps' = ['on'|'off'] Image amplitudes at each trial and latency instead of potential 
 %              values. Note: Currently requires 'coher' (below) with alpha signif. 
 %              Use 'cycles' (below) > (default) 3 for better frequency specificity,
 %              {default: plot potential, not amplitudes}
@@ -108,11 +108,11 @@
 %               (+/-)fraction*max(abs(data)) {default: symmetrical, based on data limits}
 %
 % Add epoch-mean ERP to plot:
-%   'erp'    = Plot ERP time average of the trials below the image {default no ERP plotted}
+%   'erp'    = ['on'|'off'] Plot ERP time average of the trials below the image {default no ERP plotted}
 %   'erpalpha' = [alpha] One-sided significance threshold (range: [.001 0.1]).
 %              Requires 'erp' {default: no alpha significance thresholds plotted}
-%   'erpstd' = Plot ERP +/- stdev. Requires 'erp' {default: no std. dev. plotted}
-%   'rmerp'  = Subtract the average ERP from each trial before processing {default: no}
+%   'erpstd' = ['on'|'off'] Plot ERP +/- stdev. Requires 'erp' {default: no std. dev. plotted}
+%   'rmerp'  = ['on'|'off'] Subtract the average ERP from each trial before processing {default: no}
 %
 % Add time/frequency information:
 %   'coher'  = [freq] Plot ERP average plus mean amplitude & coherence at freq (Hz)
@@ -122,10 +122,10 @@
 %               at probability alpha (range: [0,0.1]) {default: no coher, no alpha level}
 %   'srate'  = [freq] Specify the data sampling rate in Hz for amp/coher (if not
 %               implicit in third arg, times) {default: as defined in icadefs.m}
-%   'cycles' = Number of cycles in the wavelet time/frequency decomposition {default: 3}
+%   'cycles' = [float] Number of cycles in the wavelet time/frequency decomposition {default: 3}
 %
 % Add plot features:
-%   'cbar'   = Plot color bar to right of ERP-image {default no}
+%   'cbar'   = ['on'|'off'] Plot color bar to right of ERP-image {default no}
 %   'topo'   = {map,chan_locs,eloc_info} Plot a 2-D scalp map at upper left of image.
 %               map may be a single integer, representing the plotted data channel,
 %               or a vector of scalp map channel values. chan_locs may be a channel locations
@@ -143,7 +143,7 @@
 %               for instance, [0.1 0.5 0.9] plots the 10th percentile, the median
 %               and the 90th percentile.
 % Plot options:
-% 'noxlabel'  = Do not plot "Time (ms)" on the bottom x-axis
+% 'noxlabel'  = ['on'|'off'] Do not plot "Time (ms)" on the bottom x-axis
 % 'yerplabel' = ['string'] ERP ordinate axis label (default is ERP). Print uV with '\muV'
 %
 % Optional outputs:
@@ -206,6 +206,10 @@
 
 %% LOG COMMENTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % $Log: not supported by cvs2svn $
+% Revision 1.273  2007/07/25 23:32:04  scott
+% restored default cycles = 3 !!?!!
+% the change from 3 -> 5 was never documented!?
+%
 % Revision 1.272  2007/05/10 03:44:26  toby
 % doc edit related to eeg_getepochevent.m changes
 %
@@ -1262,8 +1266,10 @@ end
 if nargin > 6
     flagargs = [];
 
-    for a=7:nargin % for each remaining Arg
-
+    a = 6;
+    while a < nargin % for each remaining Arg
+        a = a + 1;
+        
         Arg = eval(['arg' int2str(a-6)]);
         if Caxflag == YES
             if size(Arg,1) ~= 1 | size(Arg,2) > 2
@@ -1581,20 +1587,89 @@ if nargin > 6
                 return
             end
             Erpalphaflag = NO;
-        elseif strcmp(Arg,'plotmode')
-            plotmodeflag = YES;
+        % -----------------------------------------------------------------------
+        % -----------------------------------------------------------------------
+        % -----------------------------------------------------------------------
         elseif strcmp(Arg,'nosort')
             Nosort = YES;
-        elseif strcmp(Arg,'sortvarpercent')
-            percentileflag = YES;
+            if a < nargin, 
+                Arg = eval(['arg' int2str(a+1-6)]); 
+                if strcmpi(Arg, 'on'),     Nosort = YES; a = a+1;
+                elseif strcmpi(Arg, 'off') Nosort = NO;  a = a+1;
+                end;
+            end;
         elseif strcmp(Arg,'showwin')
             Showwin = YES;
+            if a < nargin, 
+                Arg = eval(['arg' int2str(a+1-6)]); 
+                if strcmpi(Arg, 'on'),     Showwin = YES; a = a+1;
+                elseif strcmpi(Arg, 'off') Showwin = NO;  a = a+1;
+                end;
+            end;
+        elseif strcmp(Arg,'noplot')
+            Noshow = YES;
+            if a < nargin, 
+                Arg = eval(['arg' int2str(a+1-6)]); 
+                if strcmpi(Arg, 'on'),     Noshow = YES; a = a+1;
+                elseif strcmpi(Arg, 'off') Noshow = NO;  a = a+1;
+                end;
+            end;
+        elseif strcmp(Arg,'erp')| strcmp(Arg,'ERP')
+            Erpflag = YES;
+            if a < nargin, 
+                Arg = eval(['arg' int2str(a+1-6)]); 
+                if strcmpi(Arg, 'on'),     Erpflag = YES; a = a+1;
+                elseif strcmpi(Arg, 'off') Erpflag = NO;  a = a+1;
+                end;
+            end;            
+        elseif strcmpi(Arg,'rmerp')
+            Rmerp = 'yes';
+            if a < nargin, 
+                Arg = eval(['arg' int2str(a+1-6)]); 
+                if strcmpi(Arg, 'on'),     Rmerp = 'yes'; a = a+1;
+                elseif strcmpi(Arg, 'off') Rmerp = 'no';  a = a+1;
+                end;
+            end;            
+        elseif strcmp(Arg,'cbar') | strcmp(Arg,'colorbar')
+            Colorbar = YES;
+            if a < nargin, 
+                Arg = eval(['arg' int2str(a+1-6)]); 
+                if strcmpi(Arg, 'on'),     Colorbar = YES; a = a+1;
+                elseif strcmpi(Arg, 'off') Colorbar = NO;  a = a+1;
+                end;
+            end;            
+        elseif (strcmp(Arg,'allamps') | strcmp(Arg,'plotamps'))
+            Allampsflag = YES;
+            if a < nargin, 
+                Arg = eval(['arg' int2str(a+1-6)]); 
+                if strcmpi(Arg, 'on'),     Allampsflag = YES; a = a+1;
+                elseif strcmpi(Arg, 'off') Allampsflag = NO;  a = a+1;
+                end;
+            end;            
+        elseif strcmpi(Arg,'erpstd')
+            Erpstdflag = YES;
+            if a < nargin, 
+                Arg = eval(['arg' int2str(a+1-6)]); 
+                if strcmpi(Arg, 'on'),     Erpstdflag = YES; a = a+1;
+                elseif strcmpi(Arg, 'off') Erpstdflag = NO;  a = a+1;
+                end;
+            end;            
+        elseif strcmp(Arg,'noxlabel') | strcmp(Arg,'noxlabels') | strcmp(Arg,'nox')
+            NoTimeflag = YES;
+            if a < nargin, 
+                Arg = eval(['arg' int2str(a+1-6)]); 
+                if strcmpi(Arg, 'on'),     NoTimeflag = YES; a = a+1;
+                elseif strcmpi(Arg, 'off') NoTimeflag = NO;  a = a+1;
+                end;
+            end;            
+        elseif strcmp(Arg,'plotmode')
+            plotmodeflag = YES;
+        elseif strcmp(Arg,'sortvarpercent')
+            percentileflag = YES;
         elseif strcmp(Arg,'renorm')
             Renormflag = YES;
         elseif strcmp(Arg,'noshow')
             Noshowflag = YES;
-        elseif strcmp(Arg,'noplot')|strcmp(Arg,'noshow')
-            Noshow = YES;
         elseif strcmp(Arg,'caxis')
             Caxflag = YES;
         elseif strcmp(Arg,'title')
@@ -1603,26 +1678,16 @@ if nargin > 6
             Coherflag = YES;
         elseif strcmp(Arg,'timestretch') | strcmp(Arg,'timewarp') % Added -JH
             timestretchflag = YES;
-        elseif (strcmp(Arg,'allamps') | strcmp(Arg,'plotamps'))
-            Allampsflag = YES;
         elseif strcmp(Arg,'allcohers')
             Allcohersflag = YES;
         elseif strcmp(Arg,'topo') | strcmp(Arg,'topoplot')
             Topoflag = YES;
         elseif strcmp(Arg,'spec') | strcmp(Arg,'spectrum')
             Specflag = YES;
-        elseif strcmp(Arg,'erp')| strcmp(Arg,'ERP')
-            Erpflag = YES;
-        elseif strcmpi(Arg,'erpstd')
-            Erpstdflag = YES;
         elseif strcmpi(Arg,'erpalpha')
             Erpalphaflag = YES;
-        elseif strcmpi(Arg,'rmerp')
-            Rmerp = 'yes';
         elseif strcmp(Arg,'align')
             Alignflag = YES;
-        elseif strcmp(Arg,'cbar') | strcmp(Arg,'colorbar')
-            Colorbar = YES;
         elseif strcmp(Arg,'limits')
             Limitflag = YES;
         elseif (strcmp(Arg,'phase') | strcmp(Arg,'phasesort'))
@@ -1647,8 +1712,6 @@ if nargin > 6
             Horzflag = YES;
         elseif strcmp(Arg,'signif')|strcmp(Arg,'signifs')|strcmp(Arg,'sig')|strcmp(Arg,'sigs')
             Signifflag = YES;
-        elseif strcmp(Arg,'noxlabel') | strcmp(Arg,'noxlabels') | strcmp(Arg,'nox')
-            NoTimeflag = YES;
         else
             help erpimage
             if isstr(Arg)
@@ -1660,6 +1723,7 @@ if nargin > 6
         end
     end % Arg
 end
+if strcmpi(noshow, 'off'), noshow = 'no'; end;
 
 if   Caxflag == YES ...
         |Coherflag == YES ...
@@ -2906,7 +2970,7 @@ if strcmpi(noshow, 'no')
     end
 end;
 
-if Noshow == NO & ( min(outsort) < timelimits(1) ...
+if strcmpi(noshow, 'no') & ( min(outsort) < timelimits(1) ...
         |max(outsort) > timelimits(2))
     ur_outsort = outsort; % store the pre-adjusted values
     fprintf('Not all sortvar values within time vector limits: \n')
