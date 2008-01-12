@@ -46,6 +46,7 @@
 %                {Default: none}. For further details see >> erpimage help   
 %
 % Outputs:
+%  STUDY       - STUDY structure 
 %  allphases   - all phase from erpimage
 %  allerpimage - all sorting variables from erpimage
 %  subjamp     - value of amplitude contribution [0 to 1] for each trial.
@@ -74,6 +75,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 %$Log: not supported by cvs2svn $
+%Revision 1.7  2008/01/10 23:59:24  arno
+%fix color and non event sorting
+%
 %Revision 1.6  2008/01/10 22:57:42  arno
 %first try
 %
@@ -93,7 +97,7 @@
 %Initial revision
 %
 
-function [allphases, allsortvar, subjamptime, subjamptrial, globalent ] = std_erpimage( STUDY, ALLEEG, varargin);
+function [STUDY, allphases, allsortvar, subjamptime, subjamptrial, globalent ] = std_erpimage( STUDY, ALLEEG, varargin);
     %subjind, data, sortvar, times, titleim, movewin, decim, varargin );
         
     if nargin < 3
