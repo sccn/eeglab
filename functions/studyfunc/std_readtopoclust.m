@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2007/08/06 23:04:14  scott
+% clarified help msg (please check, Arno) -Scott
+%
 % Revision 1.4  2007/07/27 22:21:43  toby
 % nothing
 %
@@ -125,7 +128,12 @@ for clust = 1:length(clsind) %go over all requested clusters
                 STUDY.cluster(clsind(clust)).topopol = pol;
             end
         %end
-
+    else
+        
+        centroid{clust}.topox = STUDY.cluster(clsind(clust)).topox;
+        centroid{clust}.topoy = STUDY.cluster(clsind(clust)).topoy;
+        centroid{clust}.topo  = STUDY.cluster(clsind(clust)).topoall;
+        
     end;
     
 end
