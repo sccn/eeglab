@@ -53,6 +53,9 @@
 % See also: envtopo()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2007/09/11 10:59:41  arno
+% same as 1.20
+%
 % Revision 1.22  2007/09/11 10:44:52  arno
 % nothing
 %
@@ -251,7 +254,7 @@ for n = conditions
         val_ind = find(~isnan(clustscalp.topo{1}(:))); % find non-NAN values
         for k = 1:len
             tmp = clustscalp.topo{k}(val_ind);
-            projERP = projERP + tmp*clusterp.erp{k};
+            projERP = projERP + tmp*clusterp.erpdata{k};
             fprintf('.');
         end
         tot_projERP{cls} = projERP/set_len;
