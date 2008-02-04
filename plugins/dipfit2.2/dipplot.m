@@ -153,6 +153,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.149  2008/02/01 23:12:44  arno
+%cylinder dipoles
+%
 %Revision 1.148  2007/11/21 18:47:52  arno
 %fixed CTF error
 %
@@ -1014,35 +1017,27 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             elseif g.dipolelength>0 % plot dipole direction cylinders with end cap patch
             
                [xc yc zc] = cylinder( 2, 10);
+               [xs ys zs] = sphere(10);
+               xc = [ xc; -xs(7:11,:)*2  ];
+               yc = [ yc; -ys(7:11,:)*2  ];
+               zc = [ zc; zs(7:11,:)/5+1 ];
+               
                colorarray = repmat(reshape(g.color{index}, 1,1,3), [size(zc,1) size(zc,2) 1]);
                handles = surf(xc, yc, zc, colorarray, 'tag', tag, 'edgecolor', 'none', ...
                               'backfacelighting', 'lit', 'facecolor', 'interp', 'facelighting', ...
                               'phong', 'ambientstrength', 0.3);
                [xc yc zc] = adjustcylinder2( handles, [xx yy zz], [xxo1 yyo1 zzo1] );
 
-               cx = mean(xc,2); cx = [(3*cx(1)+cx(2))/4; (cx(1)+3*cx(2))/4];
-               cy = mean(yc,2); cy = [(3*cy(1)+cy(2))/4; (cy(1)+3*cy(2))/4];
-               cz = mean(zc,2); cz = [(3*cz(1)+cz(2))/4; (cz(1)+3*cz(2))/4];
-               tmpx = xc - repmat(cx, [1 11]);
-               tmpy = yc - repmat(cy, [1 11]);
-               tmpz = zc - repmat(cz, [1 11]);
+               cx = mean(xc,2); %cx = [(3*cx(1)+cx(2))/4; (cx(1)+3*cx(2))/4];
+               cy = mean(yc,2); %cy = [(3*cy(1)+cy(2))/4; (cy(1)+3*cy(2))/4];
+               cz = mean(zc,2); %cz = [(3*cz(1)+cz(2))/4; (cz(1)+3*cz(2))/4];
+               tmpx = xc - repmat(cx, [1 size(xc, 2)]);
+               tmpy = yc - repmat(cy, [1 size(xc, 2)]);
+               tmpz = zc - repmat(cz, [1 size(xc, 2)]);
                l=sqrt(tmpx.^2+tmpy.^2+tmpz.^2);
-               normals = reshape([tmpx./l tmpy./l tmpz./l],[2 11 3]);
+               normals = reshape([tmpx./l tmpy./l tmpz./l],[size(tmpx) 3]);
                set( handles, 'vertexnormals', normals);
-            
-               %thetas = 180/pi*atan(sqrt((xxo1-xx).^2+(yyo1-yy).^2)./(zzo1-zz));
-               %for k=1:length(xx)
-               %  [cx cy cz] = cylinder([1 1 1],SPHEREGRAIN);
-               %  % rotate(h1,[yy(k)-yyo1(k) xxo1(k)-xx(k) 0],thetas(k));
-               %  cx = cx*g.spheresize/3 + xx(k);
-               %  cy = cy*g.spheresize/3 + yy(k);
-               %  cz = cz*g.dipolelength + zz(k);
-               %  caxis([0 33])
-               %  cax =caxis;
-               %  s1 = surf(cx,cy,cz);  % draw the 3-D cylinder
-               %  set(s1,'cdatamapping','direct','FaceColor','r'); % tries to make cylinder red - doesnt work!?!
-               %  p1  = patch(cx(end,:),cy(end,:),cz(end,:),cax(2)*ones(size(cz(end,:)))); 
-               %end
+               
             end
 
             [xxmri   yymri   zzmri  ] = transform(xx,   yy,   zz,   pinv(dat.transform));
