@@ -54,6 +54,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2007/08/20 22:56:45  arno
+% same
+%
 % Revision 1.22  2007/08/20 22:02:44  arno
 % convert to single
 %
@@ -367,6 +370,9 @@ end;
 % --------------
 if ~isempty(r.blockread)
     h.channeloffset = r.blockread;
+    if h.channeloffset ~= 1
+        fprintf('WARNING: block size is not 1. If the file does not read properly, try using the option "''blockread'', 1"\n');
+    end;
 end;
 if h.channeloffset > 1
     fprintf('WARNING: reading data in blocks of %d, if this fails, try using option "''blockread'', 1"\n', ...
