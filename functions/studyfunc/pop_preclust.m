@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.50  2007/09/11 10:36:52  arno
+% now can process ICA components
+%
 % Revision 1.49  2007/08/09 18:35:22  arno
 % remove unused variable
 %
@@ -234,6 +237,9 @@ if ~isstr(varargin{1}) %intial settings
     set_ersp     = ['pop_preclust(''setersp'',gcf);']; 
     set_itc      = ['pop_preclust(''setitc'',gcf);']; 
     set_secpca   = ['pop_preclust(''setsec'',gcf);']; 
+    
+    set_mpcluster   = ['tmp_preclust(''mpcluster'',gcf);']; % nima
+    
     help_clusteron = ['pophelp(''std_helpselecton'');']; 
     help_ersp    = ['pophelp(''pop_timef'')'];
     preclust_PCA = ['pop_preclust(''preclustOK'',gcf);'];           
@@ -246,17 +252,17 @@ if ~isstr(varargin{1}) %intial settings
     saveSTUDY  = [ 'set(findobj(''parent'', gcbf, ''userdata'', ''save''), ''enable'', fastif(get(gcbo, ''value'')==1, ''on'', ''off''));' ];
     browsesave = [ '[filename, filepath] = uiputfile2(''*.study'', ''Save STUDY with .study extension -- pop_preclust()''); ' ... 
                   'set(findobj(''parent'', gcbf, ''tag'', ''studyfile''), ''string'', [filepath filename]);' ];
-    str_name   = ['Build pre-clustering matrix for STUDY ''' STUDY.name '''' ];
+    str_name   = ['Build pre-clustering matrix for STUDY set:  ' STUDY.name '' ];
     str_time   = '';
     help_secpca = [ 'warndlg2(strvcat(''This is the final number of dimensions (otherwise use the sum'',' ...
                     '''of dimensions for all the selected options). See tutorial for more info''), ''Final number of dimensions'');' ];
-    
+
     gui_spec = { ...
     {'style' 'text'       'string' str_name 'FontWeight' 'Bold' 'horizontalalignment' 'left'} ...
-	{'style' 'text'       'string' 'Select the cluster to refine during sub-clustering (any existing sub-hierarchy will be overwritten)' } {} ...
+	{'style' 'text'       'string' 'Select the cluster to refine by sub-clustering (any existing sub-hierarchy will be overwritten)' } {} ...
     {'style' 'listbox'    'string' show_options 'value' 1 'tag' 'clus_list' 'Callback' show_clust 'max' 1 } {}  {} ...
-    {'style' 'text'       'string' '(note:only measures that have been precomputed may be used)'} ...
-    {'style' 'text'       'string' 'Load                                  Dims.   Norm.   Rel. Wt.' 'FontWeight' 'Bold'} ...
+    {'style' 'text'       'string' 'Note: Only measures that have been precomputed may be used for clustering.'} ...
+    {'style' 'text'       'string' 'Measures                         Dims.   Norm.   Rel. Wt.' 'FontWeight' 'Bold'} ...
     {'style' 'checkbox'   'string' '' 'tag' 'spectra_on' 'value' 0 'Callback' set_spectra 'userdata' '1'}  ...
 	{'style' 'text'       'string' 'spectra' 'horizontalalignment' 'center' } ...
 	{'style' 'edit'       'string' '10' 'tag' 'spectra_PCA' 'enable' 'off' 'userdata' 'specP'} ...
@@ -305,7 +311,11 @@ if ~isstr(varargin{1}) %intial settings
     {'style' 'checkbox'   'string' '' 'tag' 'sec_on' 'Callback' set_secpca 'value' 0} ...
 	{'style' 'text'       'string' 'Final dimensions' } ...
     {'style' 'edit'       'string' '10' 'enable' 'off' 'tag' 'sec_PCA' 'userdata' 'sec' } ...
-	{} {'style' 'pushbutton' 'string' 'Help' 'callback' help_secpca } {} {} {} {} {} ...
+	{} {'style' 'pushbutton' 'string' 'Help' 'tag' 'finalDimHelp' 'callback' help_secpca } {} {} {} {} ...
+    {} ...
+    {'style' 'checkbox'   'string' '' 'tag' 'mpclust' 'Callback' set_mpcluster 'value' 0} ...
+	{'style' 'text'       'string' 'Use Measure Product clustering' 'FontWeight' 'Bold'  } ...
+    {} ...
     {'style' 'checkbox'   'string' '' 'tag' 'saveSTUDY' 'Callback' saveSTUDY 'value' 0} ...
  	{'style' 'text'       'string' 'Save STUDY to file' 'FontWeight' 'Bold'  } ...
     {'style' 'edit'       'string' fullfile(STUDY.filepath, STUDY.filename) 'enable' 'off' 'tag' 'studyfile' 'userdata' 'save'} ...
@@ -322,8 +332,8 @@ if ~isstr(varargin{1}) %intial settings
     fig_arg{1} = { ALLEEG STUDY cls };
     geomline = [0.45 2 1 0.45 1 2 1 2 1 ];
     geometry = { [1] [1] [1 1 1] [1] [1] ...
-                 [3] geomline geomline geomline [0.45 2 1 0.45 1 2.9 .1 2.9 .1 ] geomline geomline [1] geomline [1] [0.32 2 5 0.8] };
-    geomvert = [ 1 1 3 1 1 1 1 1 1 1 1 1 0.5 1 1 1 1];
+                 [3] geomline geomline geomline [0.45 2 1 0.45 1 2.9 .1 2.9 .1 ] geomline geomline [1] geomline [1] [.2 5] [1] [0.32 2 5 0.8] };
+    geomvert = [ 1 1 3 1 1 1 1 1 1 1 1 1 0.5 1 1 1 1 1 1];
 
     %if length(show_options) < 3
     %    gui_spec(2:6) = { {} ...
@@ -416,9 +426,43 @@ if ~isstr(varargin{1}) %intial settings
         warndlg2('No measure selected: aborting.'); 
         return; 
     end;
-    [STUDY ALLEEG] = std_preclust(options{:});
-    com = sprintf('%s\n[STUDY ALLEEG] = std_preclust(STUDY, ALLEEG, %s);', ...
-                  STUDY.history, vararg2str(options(3:end)));
+    
+    if os.mpclust % if mpcluster is selected
+        STUDY.etc.preclust.clustlevel = cell2mat(options(3));
+        measuresToUseInClustering = {};
+
+        if os.itc_on
+            measuresToUseInClustering = [measuresToUseInClustering 'itc'];
+        end;
+        
+        if os.ersp_on
+            measuresToUseInClustering = [measuresToUseInClustering 'ersp'];
+        end;
+        
+        if os.erp_on
+            measuresToUseInClustering = [measuresToUseInClustering 'erp'];
+        end;
+        
+        if os.spectra_on
+            measuresToUseInClustering = [measuresToUseInClustering 'spec'];
+        end;
+        
+        if os.dipole_on
+            measuresToUseInClustering = [measuresToUseInClustering 'dipole'];
+        end;
+        
+        if os.scalp_on
+            measuresToUseInClustering = [measuresToUseInClustering 'scalp'];
+        end;        
+        
+        STUDY = std_mpreclust(STUDY,ALLEEG, measuresToUseInClustering, true);
+        STUDY.etc.preclust.preclustdata = [];
+        
+    else
+        [STUDY ALLEEG] = std_preclust(options{:});
+        com = sprintf('%s\n[STUDY ALLEEG] = std_preclust(STUDY, ALLEEG, %s);', ...
+            STUDY.history, vararg2str(options(3:end)));
+    end;
     
     % save updated STUDY to the disk
     % ------------------------------
@@ -451,6 +495,106 @@ else
             else
                 set(findobj('parent', hdl, 'userdata', 'specP'), 'enable', fastif(set_spec,'on','off'));
             end
+            
+        case 'mpcluster' % nima
+            mpclust =  get(findobj('parent', hdl, 'tag', 'mpclust'), 'value');
+            if mpclust
+                set(findobj('parent', hdl, 'tag', 'spectra_PCA'), 'visible','off');
+                set(findobj('parent', hdl, 'tag', 'spectra_norm'), 'visible','off');
+                set(findobj('parent', hdl, 'tag', 'spectra_weight'), 'visible','off');
+                set(findobj('parent', hdl, 'tag',  'erp_PCA' ), 'visible','off');
+                set(findobj('parent', hdl, 'tag','erp_norm' ), 'visible','off');
+                set(findobj('parent', hdl, 'tag','erp_weight' ), 'visible','off');
+                set(findobj('parent', hdl, 'tag', 'locations_norm' ), 'visible','off');
+                set(findobj('parent', hdl, 'tag','locations_weight'), 'visible','off');
+                set(findobj('parent', hdl, 'tag', 'scalp_PCA'), 'visible','off');
+                set(findobj('parent', hdl, 'tag','scalp_norm'  ), 'visible','off');
+                set(findobj('parent', hdl, 'tag','scalp_weight'), 'visible','off');
+                set(findobj('parent', hdl, 'tag','ersp_PCA'), 'visible','off');
+                set(findobj('parent', hdl, 'tag', 'ersp_norm'), 'visible','off');
+                set(findobj('parent', hdl, 'tag','ersp_weight' ), 'visible','off');
+                set(findobj('parent', hdl, 'tag', 'itc_PCA'), 'visible','off');
+                set(findobj('parent', hdl, 'tag','itc_norm'), 'visible','off');
+                set(findobj('parent', hdl, 'tag','itc_weight'), 'visible','off');
+
+
+                set(findobj('parent', hdl, 'tag','sec_PCA'), 'visible','off');
+                set(findobj('parent', hdl, 'tag','sec_on'), 'visible','off');
+                set(findobj('parent', hdl, 'userdata' ,'dipoleP'), 'visible','off');
+                set(findobj('parent', hdl, 'string','Final dimensions'), 'visible','off');
+                set(findobj('parent', hdl, 'tag','finalDimHelp' ), 'visible','off');
+                set(findobj('parent', hdl, 'tag','spectra_freq_txt'), 'visible','off');
+                set(findobj('parent', hdl, 'tag','spectra_freq_edit'), 'visible','off');
+
+                %% these are made invisible for now,  but in future we might use them in the new method
+                set(findobj('parent', hdl, 'tag','erp_time_txt'), 'visible','off');
+                set(findobj('parent', hdl, 'tag','erp_time_edit'), 'visible','off');
+                set(findobj('parent', hdl, 'tag','scalp_choice'), 'visible','off');
+                set(findobj('parent', hdl, 'tag', 'scalp_absolute'), 'visible','off');
+                set(findobj('parent', hdl, 'tag','ersp_time_txt'), 'visible','off');
+                set(findobj('parent', hdl, 'tag','ersp_time_edit'), 'visible','off');
+                set(findobj('parent', hdl, 'tag','ersp_freq_edit'), 'visible','off');
+                set(findobj('parent', hdl, 'tag','itc_time_txt'), 'visible','off');
+                set(findobj('parent', hdl, 'tag','itc_time_edit'), 'visible','off');
+                set(findobj('parent', hdl, 'tag','itc_freq_edit'), 'visible','off');
+
+                set(findobj('parent', hdl, 'string','Measures                         Dims.   Norm.   Rel. Wt.'), 'string','Measures');
+            else
+                set(findobj('parent', hdl, 'tag', 'spectra_PCA'), 'visible','on');
+                set(findobj('parent', hdl, 'tag', 'spectra_norm'), 'visible','on');
+                set(findobj('parent', hdl, 'tag', 'spectra_weight'), 'visible','on');
+                set(findobj('parent', hdl, 'tag',  'erp_PCA' ), 'visible','on');
+                set(findobj('parent', hdl, 'tag','erp_norm' ), 'visible','on');
+                set(findobj('parent', hdl, 'tag','erp_weight' ), 'visible','on');
+                set(findobj('parent', hdl, 'tag', 'locations_norm' ), 'visible','on');
+                set(findobj('parent', hdl, 'tag','locations_weight'), 'visible','on');
+                set(findobj('parent', hdl, 'tag', 'scalp_PCA'), 'visible','on');
+                set(findobj('parent', hdl, 'tag','scalp_norm'  ), 'visible','on');
+                set(findobj('parent', hdl, 'tag','scalp_weight'), 'visible','on');
+                set(findobj('parent', hdl, 'tag','ersp_PCA'), 'visible','on');
+                set(findobj('parent', hdl, 'tag', 'ersp_norm'), 'visible','on');
+                set(findobj('parent', hdl, 'tag','ersp_weight' ), 'visible','on');
+                set(findobj('parent', hdl, 'tag', 'itc_PCA'), 'visible','on');
+                set(findobj('parent', hdl, 'tag','itc_norm'), 'visible','on');
+                set(findobj('parent', hdl, 'tag','itc_weight'), 'visible','on');
+
+
+                set(findobj('parent', hdl, 'tag','sec_PCA'), 'visible','on');
+                set(findobj('parent', hdl, 'tag','sec_on'), 'visible','on');
+                set(findobj('parent', hdl, 'userdata' ,'dipoleP'), 'visible','on');
+                set(findobj('parent', hdl, 'string','Final dimensions'), 'visible','on');
+                set(findobj('parent', hdl, 'tag','finalDimHelp' ), 'visible','on');
+                set(findobj('parent', hdl, 'tag','spectra_freq_txt'), 'visible','on');
+                set(findobj('parent', hdl, 'tag','spectra_freq_edit'), 'visible','on');
+
+                %% these are made invisible for now,  but in future we might use them in the new method
+                set(findobj('parent', hdl, 'tag','erp_time_txt'), 'visible','on');
+                set(findobj('parent', hdl, 'tag','erp_time_edit'), 'visible','on');
+                set(findobj('parent', hdl, 'tag','scalp_choice'), 'visible','on');
+                set(findobj('parent', hdl, 'tag', 'scalp_absolute'), 'visible','on');
+                set(findobj('parent', hdl, 'tag','ersp_time_txt'), 'visible','on');
+                set(findobj('parent', hdl, 'tag','ersp_time_edit'), 'visible','on');
+                set(findobj('parent', hdl, 'tag','ersp_freq_edit'), 'visible','on');
+                set(findobj('parent', hdl, 'tag','itc_time_txt'), 'visible','on');
+                set(findobj('parent', hdl, 'tag','itc_time_edit'), 'visible','on');
+                set(findobj('parent', hdl, 'tag','itc_freq_edit'), 'visible','on');
+
+                set(findobj('parent', hdl, 'string','Measures to Cluster on:'), 'string','Load                                  Dims.   Norm.   Rel. Wt.');
+                set(findobj('parent', hdl, 'string','Measures'), 'string', 'Measures                         Dims.   Norm.   Rel. Wt.');
+            end;
+
+                
+%             set_mpcluster =  get(findobj('parent', hdl, 'tag', 'spectra_on'), 'value'); 
+%             set(findobj('parent', hdl, 'userdata', 'spec'), 'enable', fastif(set_spec,'on','off'));
+%             PCA_on = get(findobj('parent', hdl, 'tag', 'preclust_PCA'), 'value');
+%             if PCA_on
+%                 set(findobj('parent', hdl, 'userdata', 'specP'), 'enable', 'off');
+%             else
+%                 set(findobj('parent', hdl, 'userdata', 'specP'), 'enable', fastif(set_spec,'on','off'));
+%             end         
+            
+            
+            
         case 'seterp'
             set_erp =  get(findobj('parent', hdl, 'tag', 'erp_on'), 'value'); 
             set(findobj('parent', hdl, 'userdata', 'erp'), 'enable', fastif(set_erp,'on','off'));
