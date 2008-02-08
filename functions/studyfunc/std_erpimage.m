@@ -75,6 +75,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 %$Log: not supported by cvs2svn $
+%Revision 1.8  2008/01/12 03:08:14  arno
+%add STUDY structure as output
+%
 %Revision 1.7  2008/01/10 23:59:24  arno
 %fix color and non event sorting
 %
@@ -123,6 +126,7 @@ function [STUDY, allphases, allsortvar, subjamptime, subjamptrial, globalent ] =
         'mode'        'string'  []              '';
         'comps'       {'integer','string'}  []              []; % for backward compatibility
         'plotsubjects' 'string' { 'on' 'off' }  'off';
+        'normalize'    'string' { 'on' 'off' }  'off';
         'subject'     'string'  []              '' }, ...
                                       'std_erpimage', 'ignore');
     if isstr(opt), error(opt); end;
@@ -144,7 +148,7 @@ function [STUDY, allphases, allsortvar, subjamptime, subjamptrial, globalent ] =
          [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'channels', opt.channels, 'infotype', 'event', ...
                                             'type', opt.sorttype, 'timewin', opt.sortwin, 'fieldname', opt.sortfield);
     else [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'clusters', opt.clusters, 'infotype', 'data');
-         [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'channels', opt.channels, 'infotype', 'event', ...
+         [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'clusters', opt.clusters, 'infotype', 'event', ...
                                             'type', opt.sorttype, 'timewin', opt.sortwin, 'fieldname', opt.sortfield);
     end;
     opt.legend = 'off';
@@ -175,9 +179,9 @@ function [STUDY, allphases, allsortvar, subjamptime, subjamptrial, globalent ] =
                     for l=length(setinds{c,g}):-1:1
                         if ~strcmpi(opt.subject, STUDY.datasetinfo(setinds{c,g}(l)).subject)
                             inds = find(allcontinds == l);
-                            alldata{c,g}(:,:,inds) = [];
-                            allvals{c,g}(:,:,inds) = [];
-                            allcontinds{c,g}(:,:,inds) = [];
+                            alldata{c,g}(:,inds) = [];
+                            allvals{c,g}(inds) = [];
+                            allcontinds{c,g}(inds) = [];
                         end;
                     end;
                 end;
@@ -203,15 +207,32 @@ function [STUDY, allphases, allsortvar, subjamptime, subjamptrial, globalent ] =
                 for ind = length(compinds{1,grpind}):-1:1
                     if ~any(compinds{1,grpind}(ind) == comps) | ~any(setinds{1,grpind}(ind) == sets)
                         inds = find(allcontinds == ind);
-                        alldata{c,g}(:,:,inds) = [];
-                        allvals{c,g}(:,:,inds) = [];
-                        allcontinds{c,g}(:,:,inds) = [];
+                        alldata{c,g}(:,inds) = [];
+                        allvals{c,g}(inds) = [];
+                        allcontinds{c,g}(inds) = [];
                     else
                         comp_names{c,1} = comps;
                     end;
                 end;
             end;
             opt.subject = STUDY.datasetinfo(sets(1)).subject;
+        end;
+        
+        % normalize data
+        % --------------
+        if strcmpi(opt.normalize, 'on')
+            indbef0 = find(alltimes < 0);
+            for c = 1:size(alldata,1)
+                for g = 1:size(alldata,2)
+                    for tmpind = 1:length(STUDY.subject)
+                        inds = find(allcontinds{c,g} == tmpind);
+                        alldata{c,g}(:,inds) = alldata{c,g}(:,inds) - ...
+                                                repmat(mean(alldata{c,g}(indbef0,inds),1), [size(alldata{c,g},1) 1]);
+                        alldata{c,g}(:,inds) = alldata{c,g}(:,inds) / std(reshape(alldata{c,g}(indbef0,inds), ...
+                                                                          [length(inds)*length(indbef0) 1] ));
+                    end;
+                end;
+            end;
         end;
         
         % plot specific component

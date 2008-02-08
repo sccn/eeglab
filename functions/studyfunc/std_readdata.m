@@ -31,9 +31,15 @@
 %                 { default: 'off' }
 %  'subbaseline' - ['on'|'off'] remove all condition and spectrum baselines
 %                  for ERSP data { default: 'on' }
+%
+% Optional inputs for events:
 %  'type','timewin','fieldname' - optional parameters for the function 
 %                  eeg_geteventepoch may also be used to select specific
 %                  events.
+%
+% Optional inputs for raw data:
+%  'rmclust'  - [integer] list of artifact cluster indices to subtract 
+%               when reading raw data.
 %
 % Output:
 %    STUDY     - (possibly) updated STUDY structure
@@ -93,6 +99,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.39  2008/01/10 23:58:14  arno
+% defining event sorting fields explicitelly
+%
 % Revision 1.38  2008/01/10 20:00:10  arno
 % update help message
 %
@@ -221,6 +230,7 @@ end
     'condition'  'cell'    []       {};
     'channels'   'cell'    []       {};
     'clusters'   'integer' []       [];
+    'rmclust'    'integer' []       [];
     'freqrange'  'real'    []       [];
     'timerange'  'real'    []       [];
     'statmode'   'string'  { 'subjects' 'individual' 'common' 'trials' }       'individual';
@@ -273,6 +283,14 @@ if strcmpi(opt.infotype, 'map') | strcmpi(opt.infotype, 'scalp') | strcmpi(opt.i
     return;
 end;
 
+% read indices for removing component clusters from data
+% ------------------------------------------------------
+if ~isempty(opt.rmclust)
+    for ind = 1:length(opt.rmclust)
+        [tmp setindsrm{ind} allindsrm{ind}] = getsetinds(STUDY, opt.rmclust(ind));
+    end;
+end;
+
 for ind = 1:length(finalinds)
     
     % find indices
@@ -284,34 +302,8 @@ for ind = 1:length(finalinds)
          allinds       = tmpstruct.allinds;
          for i=1:length(allinds(:)), allinds{i} = -allinds{i}; end; % invert sign
          setinds       = tmpstruct.setinds;
-    else tmpstruct = STUDY.cluster(finalinds(ind));
-         alldatasets = tmpstruct.sets; 
-         allchanorcomp = repmat(tmpstruct.comps, [length(STUDY.condition) 1]);
-         
-         alldatasets   = alldatasets(:)';
-         allchanorcomp = allchanorcomp(:)';
-         
-         % get indices for all groups and conditions
-         % -----------------------------------------
-         allinds = cell( nc, ng );
-         setinds = cell( nc, ng );
-         for indtmp = 1:length(alldatasets)
-             if ~isnan(alldatasets(indtmp))
-                 index = alldatasets(indtmp);
-                 condind = strmatch( STUDY.datasetinfo(index).condition, STUDY.condition, 'exact'); if isempty(condind), condind = 1; end;
-                 grpind  = strmatch( STUDY.datasetinfo(index).group    , STUDY.group    , 'exact'); if isempty(grpind) , grpind  = 1; end;
-                 indcellarray = length(allinds{condind, grpind})+1;
-             end
-             % load data
-             % ---------
-             tmpind = allchanorcomp(indtmp); 
-             if ~isnan(tmpind)
-                 allinds{ condind, grpind}(indcellarray) = tmpind;                    
-                 setinds{ condind, grpind}(indcellarray) = index;                    
-             end;
-         end;
-         tmpstruct.allinds = allinds;
-         tmpstruct.setinds = setinds;
+    else 
+        [ tmpstruct setinds allinds ] = getsetinds(STUDY, finalinds(ind));
     end;
                     
     dataread = 0;
@@ -386,11 +378,25 @@ for ind = 1:length(finalinds)
                     for g = 1:ng
                         counttrial = 1;
                         for indtmp = 1:length(allinds{c,g})
+                            settmpind = STUDY.datasetinfo(setinds{c,g}(indtmp)).index;
                             if ~isempty(opt.channels)
-                                tmpdata = eeg_getdatact(ALLEEG(setinds{c,g}(indtmp)),  'channel', -allinds{c,g}(indtmp), 'verbose', 'off');
+                                tmpdata = eeg_getdatact(ALLEEG(settmpind),  'channel', -allinds{c,g}(indtmp), 'verbose', 'off');
                             else
-                                tmpdata = eeg_getdatact(ALLEEG(setinds{c,g}(indtmp)), 'component', allinds{c,g}(indtmp), 'verbose', 'off');
+                                tmpdata = eeg_getdatact(ALLEEG(settmpind), 'component', allinds{c,g}(indtmp), 'verbose', 'off');
                             end;
+                            
+                            % remove artifactual components
+                            % -----------------------------
+                            if ~isempty(opt.rmclust)                            
+                                for rmi = 1:length(opt.rmclust)
+                                    findind   = find(settmpind == STUDY.cluster(opt.rmclust(rmi)).setinds{c,g};
+                                    rmcomps   = [ rmcomps allindsrm{c,g}(findind) ];
+                                end;
+                                ws = ALLEEG(settmpind).icaweights * ALLEEG(settmpind).icasphere;
+                                w = ALLEEG(settmpind).icawinv(-allinds{c,g}(indtmp),rmcomps)*ws(rmcomps,:);
+                                tmpdata = tmpdata - 
+                            end;
+                                
                             alldata{c, g}(:,counttrial:counttrial+ALLEEG(setinds{c,g}(indtmp)).trials-1) = squeeze(tmpdata);
                             counttrial = counttrial+ALLEEG(setinds{c,g}(indtmp)).trials;
                             fprintf('.');
@@ -698,3 +704,39 @@ if ~isempty(opt.channels)
      clustinfo = STUDY.changrp(finalinds);
 else clustinfo = STUDY.cluster(finalinds);
 end;
+
+% get set and indices for components
+% ----------------------------------
+function [ tmpstruct setinds allinds ] = getsetinds(STUDY, ind)
+
+    tmpstruct = STUDY.cluster(ind);
+    alldatasets = tmpstruct.sets; 
+    allchanorcomp = repmat(tmpstruct.comps, [1 size(alldatasets,1)]);
+         
+    alldatasets   = alldatasets(:)';
+    allchanorcomp = allchanorcomp(:)';
+    
+    % get indices for all groups and conditions
+    % -----------------------------------------
+    nc = length(STUDY.condition);
+    ng = length(STUDY.group);
+    allinds = cell( nc, ng );
+    setinds = cell( nc, ng );
+    for indtmp = 1:length(alldatasets)
+        if ~isnan(alldatasets(indtmp))
+            index = alldatasets(indtmp);
+            condind = strmatch( STUDY.datasetinfo(index).condition, STUDY.condition, 'exact'); if isempty(condind), condind = 1; end;
+            grpind  = strmatch( STUDY.datasetinfo(index).group    , STUDY.group    , 'exact'); if isempty(grpind) , grpind  = 1; end;
+            indcellarray = length(allinds{condind, grpind})+1;
+        end
+        % load data
+        % ---------
+        tmpind = allchanorcomp(indtmp); 
+        if ~isnan(tmpind)
+            allinds{ condind, grpind}(indcellarray) = tmpind;                    
+            setinds{ condind, grpind}(indcellarray) = index;                    
+        end;
+    end;
+    tmpstruct.allinds = allinds;
+    tmpstruct.setinds = setinds;
+
