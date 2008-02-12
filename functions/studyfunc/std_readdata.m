@@ -99,6 +99,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.41  2008/02/12 19:07:20  nima
+% _
+%
 % Revision 1.40  2008/02/08 20:21:42  arno
 % *** empty log message ***
 %
@@ -397,7 +400,7 @@ for ind = 1:length(finalinds)
                                 end;
                                 ws = ALLEEG(settmpind).icaweights * ALLEEG(settmpind).icasphere;
                                 w = ALLEEG(settmpind).icawinv(-allinds{c,g}(indtmp),rmcomps)*ws(rmcomps,:);
-                                tmpdata = tmpdata - 
+                                %tmpdata = tmpdata - 
                             end;
                                 
                             alldata{c, g}(:,counttrial:counttrial+ALLEEG(setinds{c,g}(indtmp)).trials-1) = squeeze(tmpdata);
