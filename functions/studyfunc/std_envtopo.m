@@ -53,6 +53,9 @@
 % See also: envtopo()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2008/01/17 21:54:36  elizabeth
+% clusterp.erp -> clusterp.erpdata
+%
 % Revision 1.23  2007/09/11 10:59:41  arno
 % same as 1.20
 %
@@ -229,21 +232,20 @@ for n = conditions
             warndlg2([ 'Some topoplot information is missing, aborting'] , 'Abort - std_envtopo()' );
             return;
         end
-        try
-            %clusterp = std_clustread(STUDY, ALLEEG, clusters(cls),'erp', n);
-            [tmp clusterp] = std_readdata(STUDY, ALLEEG, 'clusters', clusters(cls), 'infotype', 'erp');
-            for index = 1:size(clusterp.erpdata{1},2)
-                clusterp.erp{index} = clusterp.erpdata{n,1}(:,index)';
+        %clusterp = std_clustread(STUDY, ALLEEG, clusters(cls),'erp', n);
+
+        %[tmp clusterp] = std_readdata(STUDY, ALLEEG, 'clusters', clusters(cls), 'infotype', 'erp');
+        for k = 1:len
+            dat  = STUDY.cluster(clusters(cls)).sets(n,k);
+            comp = STUDY.cluster(clusters(cls)).comps(k);
+            clusterp.erp{k} = std_readerp(ALLEEG, dat, comp);
+            %clusterp.erp{k} = clusterp.erpdata{n}(:,k); % only works if 1 group
+        end;
+        if exist('baseline')
+            for k = 1:length(clusterp.erp)
+                clusterp.erp{k} = rmbase(clusterp.erp{k},...
+                    ALLEEG(STUDY.datasetinfo(STUDY.setind(1)).index).pnts,baseline);
             end;
-            if exist('baseline')
-                for k = 1:length(clusterp.erp)
-                    clusterp.erp{k} = rmbase(clusterp.erp{k},...
-                        ALLEEG(STUDY.datasetinfo(STUDY.setind(1)).index).pnts,baseline);
-                end;
-            end
-        catch,
-            warndlg2([ 'Some ERP information is missing, aborting'] , 'Abort - std_envtopo' );
-            return;
         end
         
         %
@@ -254,7 +256,7 @@ for n = conditions
         val_ind = find(~isnan(clustscalp.topo{1}(:))); % find non-NAN values
         for k = 1:len
             tmp = clustscalp.topo{k}(val_ind);
-            projERP = projERP + tmp*clusterp.erpdata{k};
+            projERP = projERP + tmp*clusterp.erp{k};
             fprintf('.');
         end
         tot_projERP{cls} = projERP/set_len;
