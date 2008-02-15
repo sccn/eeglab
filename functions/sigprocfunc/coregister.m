@@ -85,7 +85,9 @@
 %                 nonlinearly warp the 10-20 channel locations in the new
 %                 chanlocs to the 10-20 locations in the reference chanlocs.
 %                 Locations of other channels in the new chanlocs will be 
-%                 adjusted so as to produce a smooth warp.
+%                 adjusted so as to produce a smooth warp. Entering the 
+%                 string 'auto' will automatically select the common channel 
+%                 labels.
 %
 % Outputs:
 %  chanlocs_out - transformed input channel locations (chanlocs) structure
@@ -100,6 +102,17 @@
 %                 (3) Align these locations to the extracted subject head mesh 
 %                 (using the coregister() graphic interface). The aligned locations 
 %                 then become reference locations for this mesh.
+%
+% Example:
+%   % This return the coregistration matrix to the MNI brain
+%   dipfitdefs;
+%   [newlocs transform] = coregister(EEG.chanlocs, template_models(2).chanfile, ...
+%        'warp', 'auto', 'manual', 'off');
+%
+%   % This pops-up the coregistration window for the BEM (MNI) model
+%   dipfitdefs;
+%   [newlocs transform] = coregister(EEG.chanlocs, template_models(2).chanfile, ...
+%        'mesh', template_models(2).hdmfile);
 %
 % See also: traditionaldipfit(), headplot(), plotmesh(), electrodenormalize(). 
 %
@@ -127,6 +140,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.75  2007/08/16 21:21:08  arno
+% remove fieldtrip traditional matrix detection
+%
 % Revision 1.74  2007/08/16 21:16:00  arno
 % traditional -> traditionaldipfit
 %
@@ -373,8 +389,8 @@ if isempty(chanlocs2)
     dipfitdefs; chanlocs2 = template_models(1).chanfile; 
 end
 
-% undocumented commands ?
-% ---------------------
+% undocumented commands run from GUI
+% ----------------------------------
 if isstr(chanlocs1) 
     if ~strcmpi(chanlocs1, 'redraw') & ~strcmpi(chanlocs1, 'fiducials') & ~strcmpi(chanlocs1, 'warp')
         chanlocs1 = readlocs(chanlocs1);
@@ -406,11 +422,11 @@ if isstr(chanlocs1)
                 for index = 1:length(clist2)
                     tmpelec2.label{clist2(index)} = dat.elec1.label{clist1(index)};
                 end;
-                try,
+                %try,
                     [ tmp dat.transform ] = warp_chans(dat.elec1, dat.elec2, tmpelec2.label(clist2), 'traditional');
-                catch,
-                    warndlg2(strvcat('Transformation failed', lasterr));
-                end;
+                %catch,
+                %    warndlg2(strvcat('Transformation failed', lasterr));
+                %end;
             end;
         end;
         set(fid, 'userdata', dat);
@@ -424,7 +440,7 @@ end;
 % defaultmesh = 'D:\matlab\eeglab\plugins\dipfit2.0\standard_BEM\standard_vol.mat';
 defaultmesh = 'standard_vol.mat';
 g = finputcheck(varargin, { 'alignfid'   'cell'  {}      {};
-                            'warp'       'cell'  {}      {};
+                            'warp'       { 'string' 'cell' }  { {} {} }      {};
                             'warpmethod' 'string'  {'rigidbody', 'globalrescale', 'traditional', 'nonlin1', 'nonlin2', 'nonlin3', 'nonlin4', 'nonlin5'} 'traditional';
                             'chaninfo1'  'struct' {}    struct('no', {}); % default empty structure
                             'chaninfo2'  'struct' {}     struct('no', {}); 
@@ -529,7 +545,25 @@ else
         if ~isempty(transform), dat.transform = [ transform(1:6)' ratio ratio ratio ]; end;
         
     elseif ~isempty(g.warp)
-        [ electransf dat.transform ] = warp_chans(elec1, elec2, g.warp, g.warpmethod);
+        if isstr(g.warp)
+            [clist1 clist2] = pop_chancoresp( elec1, elec2, 'autoselect', 'all', 'gui', 'off');
+            % copy electrode names
+            if isempty(clist1)
+                disp('Warning: cannot wrap electrodes (no common channel labels)');
+            else
+                tmpelec2 = elec2;
+                for index = 1:length(clist2)
+                    tmpelec2.label{clist2(index)} = elec1.label{clist1(index)};
+                end;
+                try,
+                    [ electransf dat.transform ] = warp_chans(elec1, elec2, tmpelec2.label(clist2), 'traditional');
+                catch,
+                    warndlg2(strvcat('Transformation failed', lasterr));
+                end;
+            end;
+        else
+            [ electransf dat.transform ] = warp_chans(elec1, elec2, g.warp, g.warpmethod);
+        end;
     else
         dat.transform = [0 0 0 0 0 0 ratio ratio ratio];
     end;
@@ -724,7 +758,7 @@ function plotelec(elec, elecshow, color, tag);
     
     % make bigger if fiducial
     % ------------------------
-    fidlist = { 'nz' 'lpa' 'rpa' };
+    fidlist = { 'nz' 'lpa' 'rpa' 'nazion' 'left' 'right' 'nasion' };
     [tmp fids ] = intersect(lower(elec.label(elecshow)), fidlist);
     nonfids     = setdiff(1:length(elec.label(elecshow)), fids);
     h1 = plot3(X1(nonfids),Y1(nonfids),Z1(nonfids), 'o', 'color', color); hold on;
@@ -837,17 +871,24 @@ function [elec1, transf] = warp_chans(elec1, elec2, chanlist, warpmethod)
     cfg.elec     = elec1;
     cfg.template = elec2;
     cfg.method   = warpmethod;
+    %cfg.feedback = 'yes';
+    cfg.channel  = chanlist;
     elec3 = electroderealign(cfg);
+    [tmp ind1 ] = intersect( lower(elec1.label), lower(chanlist) );
+    [tmp ind2 ] = intersect( lower(elec2.label), lower(chanlist) );
     
     transf = elec3.m;
     transf(4:6) = transf(4:6)/180*pi;
     if length(transf) == 6, transf(7:9) = 1; end;
     transf = checktransf(transf, elec1, elec2);
     
+    dpre = mean(sqrt(sum((elec1.pnt(ind1,:) - elec2.pnt(ind2,:)).^2, 2)));
     transfmat = traditionaldipfit(transf);
     elec1.pnt = transfmat*[ elec1.pnt ones(size(elec1.pnt,1),1) ]';
     elec1.pnt = elec1.pnt(1:3,:)';
-
+    dpost = mean(sqrt(sum((elec1.pnt(ind1,:) - elec2.pnt(ind2,:)).^2, 2)));
+    
+    fprintf('mean distance prior to warping %f, after warping %f\n', dpre, dpost);
     
 % test difference and invert axis if necessary
 % --------------------------------------------
@@ -868,8 +909,17 @@ function transf = checktransf(transf, elec1, elec2)
     diff2  = tmppnt(ind1,:) - elec2.pnt(ind2,:);
     diff2  = mean(sum(diff2.^2,2));
     
-    if diff1 < diff2, transf(6) = -transf(6); end;
+    if diff1 < diff2, transf(6) = -transf(6); else diff1 = diff2; end;
 
+    transf(4) = -transf(4); % yaw angle is sometimes inverted
+    transfmat = traditionaldipfit(transf);
+    tmppnt = transfmat*[ elec1.pnt ones(size(elec1.pnt,1),1) ]';
+    tmppnt = tmppnt(1:3,:)';
+    diff2  = tmppnt(ind1,:) - elec2.pnt(ind2,:);
+    diff2  = mean(sum(diff2.^2,2));
+    
+    if diff1 < diff2, transf(4) = -transf(4); end;
+    
 % redraw GUI
 % ----------
 function redrawgui(fid)
