@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2007/08/23 19:09:26  arno
+% change uppercase to lowercase
+%
 % Revision 1.2  2007/08/23 18:48:01  arno
 % generate error if wrong alignment
 %
@@ -69,7 +72,7 @@ fclose(fid);
 % ----------
 try, oldeventlats = [ EEG.event.latency ]; catch, end;
 EEG = pop_importevent(EEG, 'fields', { 'num' 'type' 'response' 'acc' 'RT' 'latency'}, ...
-                      'skipline', skipline, 'timeunit', NaN, 'align', NaN, 'append', 'no', 'event', filename );
+                      'skipline', skipline, 'timeunit', 1E-3, 'align', NaN, 'append', 'no', 'event', filename );
 
 neweventlats = [ EEG.event.latency ];
 if ~exist('oldeventlats'), oldeventlats = neweventlats; end;

@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2007/11/15 03:14:06  arno
+% exact match
+%
 % Revision 1.4  2007/03/17 21:09:55  arno
 % Matlab 6.5 compatibility
 %
@@ -74,35 +77,6 @@ end;
 % -------------------------------
 alllocs = eeg_mergelocs(ALLEEG(:).chanlocs);
 
-% Check to see if all the channels have the same coordinates
-% (check only the theta field)
-% ----------------------------------------------------------
-for index = 1:length(STUDY.datasetinfo)
-   tmpind  = STUDY.datasetinfo(index).index;
-   tmplocs = ALLEEG(tmpind).chanlocs;
-   [tmp id1 id2] = intersect({tmplocs.labels}, {alllocs.labels});
-   for ind = 1:length(id1)
-       if tmplocs(id1(ind)).theta ~= alllocs(id2(ind)).theta
-           
-           % find datasets with different coordinates
-           % ----------------------------------------
-           for ind2 = 1:length(STUDY.datasetinfo)
-               tmplocs2 = ALLEEG(ind2).chanlocs;
-               tmpmatch = strmatch(alllocs(id2(ind)).labels, { tmplocs2.labels }, 'exact');
-               if ~isempty(tmpmatch) 
-                   if alllocs(id2(ind)).theta == tmplocs2(tmpmatch).theta
-                       datind = ind2;
-                       break;
-                   end;
-               end;
-           end;
-           
-           error(sprintf( [ 'Dataset %d and %d do not have the same channel location\n' ...
-               'for electrode ''%s''' ], datind, tmpind, tmplocs(id1(ind)).labels));
-       end;
-   end;
-end;
-
 % check electrode names to interpolate
 % ------------------------------------
 if iscell(chans)
@@ -132,8 +106,30 @@ for index = 1:length(STUDY.datasetinfo)
    else
        interplocs = chans;
    end;
-
+   
    if length(interplocs) ~= length(tmplocs)
+       
+       % search for position of electrode in backup structure
+       % ----------------------------------------------
+       extrachans = [];
+       if isfield(ALLEEG(tmpind).chaninfo, 'nodatchans')
+            if isfield(ALLEEG(tmpind).chaninfo.nodatchans, 'labels')
+                extrachans = ALLEEG(tmpind).chaninfo.nodatchans;
+            end;
+       end;
+       tmplabels = { tmplocs.labels };
+       for i=1:length(interplocs)
+           ind = strmatch( interplocs(i).labels, tmplabels, 'exact');
+           if ~isempty(ind)
+               interplocs(i) = tmplocs(ind); % this is necessary for polhemus
+           elseif ~isempty(extrachans)
+               ind = strmatch( interplocs(i).labels, { extrachans.labels }, 'exact');
+               if ~isempty(ind)
+                    fprintf('Found position of %s in chaninfo structure\n', interplocs(i).labels);
+                    interplocs(i) = extrachans(ind);
+               end;
+           end;
+       end;
        
         % perform interpolation
         % ---------------------
@@ -161,3 +157,34 @@ for index = 1:length(STUDY.datasetinfo)
 end;
            
        
+function checkchans(STUDY, ALLEEG)
+
+    % Check to see if all the channels have the same coordinates
+    % (check only the theta field)
+    % ----------------------------------------------------------
+    for index = 1:length(STUDY.datasetinfo)
+       tmpind  = STUDY.datasetinfo(index).index;
+       tmplocs = ALLEEG(tmpind).chanlocs;
+       [tmp id1 id2] = intersect({tmplocs.labels}, {alllocs.labels});
+       for ind = 1:length(id1)
+           if tmplocs(id1(ind)).theta ~= alllocs(id2(ind)).theta
+
+               % find datasets with different coordinates
+               % ----------------------------------------
+               for ind2 = 1:length(STUDY.datasetinfo)
+                   tmplocs2 = ALLEEG(ind2).chanlocs;
+                   tmpmatch = strmatch(alllocs(id2(ind)).labels, { tmplocs2.labels }, 'exact');
+                   if ~isempty(tmpmatch) 
+                       if alllocs(id2(ind)).theta == tmplocs2(tmpmatch).theta
+                           datind = ind2;
+                           break;
+                       end;
+                   end;
+               end;
+
+               error(sprintf( [ 'Dataset %d and %d do not have the same channel location\n' ...
+                   'for electrode ''%s''' ], datind, tmpind, tmplocs(id1(ind)).labels));
+           end;
+       end;
+    end;
+
