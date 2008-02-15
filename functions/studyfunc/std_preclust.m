@@ -107,6 +107,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.90  2007/10/31 19:31:21  arno
+% fixing finaldim check
+%
 % Revision 1.89  2007/10/25 00:39:02  nima
 % Only real part of ITC is now used in preclustering array.
 %
@@ -454,6 +457,11 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
         % scan datasets
         % -------------
         data = [];
+        if strcmpi(strcom, 'scalp'),           scalpmodif = 'none';
+        elseif strcmpi(strcom, 'scalpLaplac'), scalpmodif = 'laplacian';
+        else                                   scalpmodif = 'gradient';
+        end;
+        
         for si = 1:size(STUDY.setind,2)
             switch strcom
              
@@ -499,7 +507,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
 
               % select ica scalp maps
               % --------------------------
-             case 'scalp' , % NB: scalp maps must be identical across conditions (within session)
+             case { 'scalp' 'scalpLaplac' 'scalpGrad' }
 
                  for cond = 1:size(STUDY.setind,1)   % Find first nonNaN index
                     if ~isnan(STUDY.setind(cond,si)), break; end
@@ -507,7 +515,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                  idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index;
                  fprintf('Computing/loading interpolated scalp maps for dataset %d...\n', idat);
                  if ~isempty(succompind{si})
-                    X = std_readtopo(ALLEEG, idat, succompind{si});
+                    X = std_readtopo(ALLEEG, idat, succompind{si}, scalpmodif, 'preclust');
 
                     if abso % absolute values
                        data = [ data; abs(X) ];
@@ -516,41 +524,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                     end
                     clear X tmp;
                  end
-                 
-             % select Laplacian ica comp scalp maps
-             % ------------------------------------si
-             case 'scalpLaplac'
-                 for cond = 1:size(STUDY.setind,1)   % Find first nonNaN index
-                    if ~isnan(STUDY.setind(cond,si)), break; end
-                 end       
-                 idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index;  
-                 if ~isempty(succompind{si})
-                    X = std_readtopo(ALLEEG, idat, succompind{si}, 'laplacian'); 
-                    if abso
-                       data = [ data; abs(X)];
-                    else
-                       data = [ data; X];
-                    end
-                       clear X tmp;
-                 end
-
-             % select Gradient ica comp scalp maps
-             % -----------------------------------
-             case 'scalpGrad'
-                 for cond = 1:size(STUDY.setind,1)   % Find first nonNaN index
-                    if ~isnan(STUDY.setind(cond,si)), break; end
-                 end
-                 idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index;  
-                 if ~isempty(succompind{si})
-                    X = std_readtopo(ALLEEG, idat, succompind{si}, 'gradient'); 
-                    if abso
-                       data = [ data; abs(X)];
-                    else
-                       data = [ data; X];
-                    end
-                    clear X tmp;
-                 end 
-                    
+                                     
              % select ica comp spectra
              % -----------------------
              case 'spec', 
