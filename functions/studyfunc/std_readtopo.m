@@ -5,14 +5,22 @@
 %                  function that calls it: pop_preclust() or eeg_preclust().  
 % Usage:    
 %   >> [grid, y, x ] = std_readtopo(ALLEEG, setindx, component);  
+%   >> [grid, y, x ] = std_readtopo(ALLEEG, setindx, component, transform, mode);  
 %
 % Inputs:
 %   ALLEEG     - vector of EEG datasets (can also be one EEG set). 
 %                must contain the dataset of interest (see 'setindx' below).
-%   setind     - [integer] an index of an EEG dataset in the ALLEEG
+%   setindx    - [integer] an index of an EEG dataset in the ALLEEG
 %                structure, for which to get the component ERP.
 %   component  - [integer] index of the component for which the scalp map 
 %                grid should be returned. 
+%   transform  - ['none'!'laplacian'|'gradient'] transform scalp map to
+%                laplacian or gradient map. Default is 'none'.
+%   mode       - ['2dmap'|'preclust'] return either a 2-D array for direct
+%                plotting ('2dmap') or an array formated for preclustering
+%                with all the NaN values removed (ncomps x points). Default
+%                is '2dmap' for 1 component and 'preclust' for several.
+%
 % Outputs:
 %   grid      - square scalp-map color-value grid for the requested ICA component 
 %               in the specified dataset, an interpolated Cartesian grid as output 
@@ -43,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2007/12/09 01:58:23  arno
+% nothing
+%
 % Revision 1.13  2007/12/09 01:46:59  arno
 % allow reading windows files under Linux
 %
@@ -80,13 +91,16 @@
 % use fullfile
 %
 
-function [X, yi, xi ] = std_readtopo(ALLEEG, abset, comps, option)
+function [X, yi, xi ] = std_readtopo(ALLEEG, abset, comps, option, mode)
 
 X = [];
 yi = [];
 xi = [];
 if nargin < 4
     option = 'none';
+end;
+if nargin < 5
+    mode = '2Dmap';
 end;
 filename = correctfile(fullfile( ALLEEG(abset).filepath,[ ALLEEG(abset).filename(1:end-3) 'icatopo']));
 while (getfield(dir(filename), 'bytes') < 1000)
@@ -125,14 +139,14 @@ for k = 1:length(comps)
         tmp = del2(tmp); % Laplacian
     end;
 
-    if length(comps) > 1
+    if length(comps) > 1 | strcmpi(mode, 'preclust')
         tmp = tmp(find(~isnan(tmp))); % remove NaN for more than 1 component
     end;
     if k == 1
         X = zeros([ length(comps) size(tmp) ]) ;
     end
     X(k,:,:,:) =  tmp;
-    if k == 1
+    if k == 1 
         yi   = getfield(topo, [ 'comp' int2str(comps(k)) '_y']);
         xi   = getfield(topo, [ 'comp' int2str(comps(k)) '_x']);
     end;
