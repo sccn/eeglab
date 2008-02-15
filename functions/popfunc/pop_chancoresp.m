@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2007/08/07 19:50:53  arno
+% typo in help
+%
 % Revision 1.11  2007/08/07 18:25:07  arno
 % remove duplicate text bug 273
 %
@@ -137,12 +140,12 @@ function [chanlistout1, chanlistout2, thirdout, outfourth] = pop_chancoresp(chan
         if strcmpi(g.autoselect, 'fiducials')
             % find fiducials in both channel location strustures
             % --------------------------------------------------
-            naz1 = strmatch('nz', lower( chanstr1 ), 'exact');
-            naz2 = strmatch('nz', lower( chanstr2 ), 'exact');
-            lpa1 = strmatch('lpa', lower( chanstr1 ), 'exact');
-            lpa2 = strmatch('lpa', lower( chanstr2 ), 'exact');
-            rpa1 = strmatch('rpa', lower( chanstr1 ), 'exact');
-            rpa2 = strmatch('rpa', lower( chanstr2 ), 'exact');
+            naz1 = strmatch('nz', lower( chanstr1 ), 'exact'); if isempty(naz1), naz1 = strmatch('nasion', lower( chanstr1 ), 'exact'); end;
+            naz2 = strmatch('nz', lower( chanstr2 ), 'exact'); if isempty(naz2), naz2 = strmatch('nasion', lower( chanstr2 ), 'exact'); end;
+            lpa1 = strmatch('lpa', lower( chanstr1 ), 'exact'); if isempty(lpa1), lpa1 = strmatch('left',  lower( chanstr1 ), 'exact'); end;
+            lpa2 = strmatch('lpa', lower( chanstr2 ), 'exact'); if isempty(lpa2), lpa2 = strmatch('left',  lower( chanstr2 ), 'exact'); end;
+            rpa1 = strmatch('rpa', lower( chanstr1 ), 'exact'); if isempty(rpa1), rpa1 = strmatch('right', lower( chanstr1 ), 'exact'); end;
+            rpa2 = strmatch('rpa', lower( chanstr2 ), 'exact'); if isempty(rpa2), rpa2 = strmatch('right', lower( chanstr2 ), 'exact'); end;
             g.chanlist1 = [ naz1 lpa1 rpa1 ];
             g.chanlist2 = [ naz2 lpa2 rpa2 ];
             if length(g.chanlist1) ~= length(g.chanlist2) | length(g.chanlist1) == 0
