@@ -190,6 +190,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.521  2007/11/16 21:45:29  arno
+% special font for linex
+%
 % Revision 1.520  2007/10/11 16:09:01  arno
 % handle BIOSIG problem
 %
@@ -2014,11 +2017,12 @@ catchstrs.new_non_empty          = e_newset;
 	cb_resample    = [ check      '[EEG LASTCOM] = pop_resample(EEG);' e_newset];
 	cb_eegfilt     = [ check      '[EEG LASTCOM] = pop_eegfilt(EEG);'  e_newset];
 	cb_reref       = [ check      '[EEG LASTCOM] = pop_reref(EEG);'    e_newset];
-	cb_eegplot     = [ checkcont  '[LASTCOM] = pop_eegplot(EEG, 1);'      e_hist];
+	cb_eegplot     = [ checkcont  '[LASTCOM] = pop_eegplot(EEG, 1);'   e_hist];
 	cb_epoch       = [ check      '[EEG tmp LASTCOM] = pop_epoch(EEG); clear tmp;' e_newset check '[EEG LASTCOM] = pop_rmbase(EEG);' e_store];
 	cb_rmbase      = [ check      '[EEG LASTCOM] = pop_rmbase(EEG);'   e_store];
 	cb_runica      = [ check      '[EEG LASTCOM] = pop_runica(EEG);'   e_store];
 	cb_subcomp     = [ checkica   '[EEG LASTCOM] = pop_subcomp(EEG);'  e_newset];
+	cb_chanrej     = [ check      'pop_rejchan(EEG); LASTCOM = '''';'  e_hist];
 	cb_autorej     = [ check      '[EEG tmpp LASTCOM] = pop_autorej(EEG); clear tmpp;'  e_hist];
 
 	cb_rejmenu1    = [ check      'pop_rejmenu(EEG, 1); LASTCOM = '''';'    e_hist];
@@ -2176,7 +2180,8 @@ catchstrs.new_non_empty          = e_newset;
 	uimenu( tools_m, 'Label', 'Remove baseline'                       , 'CallBack', cb_rmbase);
 	uimenu( tools_m, 'Label', 'Run ICA'                               , 'CallBack', cb_runica, 'foregroundcolor', 'b', 'Separator', 'on');
 	uimenu( tools_m, 'Label', 'Remove components'                     , 'CallBack', cb_subcomp);
-	uimenu( tools_m, 'Label', 'Automatic epoch rejection'             , 'CallBack', cb_autorej, 'Separator', 'on');
+	uimenu( tools_m, 'Label', 'Automatic channel rejection'           , 'CallBack', cb_chanrej, 'Separator', 'on');
+	uimenu( tools_m, 'Label', 'Automatic epoch rejection'             , 'CallBack', cb_autorej);
 	rej_m1 = uimenu( tools_m, 'Label', 'Reject data epochs');
 	rej_m2 = uimenu( tools_m, 'Label', 'Reject data using ICA');
 
