@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.80  2007/11/26 18:55:59  arno
+% adding rank check
+%
 % Revision 1.79  2007/09/11 10:38:43  arno
 % && -> &
 %
@@ -662,8 +665,12 @@ else
 end;
 
 if nargin < 2
-    com = sprintf('%s = pop_runica(%s, %s);', inputname(1),inputname(1), ...
-                  vararg2str({ 'icatype' g.icatype 'dataset' g.dataset 'options' g.options }) );
+    if length(ALLEEG) == 1
+        com = sprintf('%s = pop_runica(%s, %s);', inputname(1),inputname(1), ...
+                      vararg2str({ 'icatype' g.icatype 'dataset' g.dataset 'options' g.options }) );
+    else
+        com = sprintf('%s = pop_runica(%s, %s);', inputname(1),inputname(1), vararg2str(options) );
+    end;
 end;
 
 return;
