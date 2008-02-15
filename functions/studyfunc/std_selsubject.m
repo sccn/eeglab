@@ -27,6 +27,9 @@
 % See also: std_erpplot(), std_specplot() and std_erspplot()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2007/01/26 18:08:54  arno
+% Initial revision
+%
 
 function [data] = std_selsubject(data, subject, setinds, allsubjects, nsubject);
 
@@ -35,8 +38,10 @@ if nargin < 2
     return;
 end;
 
-if size(data{1,1},2) ~= nsubject, optndims = 3;
-else                              optndims = 2;
+allsizes = cellfun('size', data, 2); 
+sumrow = sum(allsizes,2);
+if size(data{1,1},2) == nsubject | sumrow == nsubject, optndims = 2;
+else                                                   optndims = 3;
 end;
 
 % plot specific subject
