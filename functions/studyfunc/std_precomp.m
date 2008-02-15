@@ -96,6 +96,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2007/12/09 00:40:15  arno
+% recompute for topo
+%
 % Revision 1.19  2007/11/22 23:34:55  arno
 % header
 %
@@ -185,12 +188,7 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
         end;
     end;
     if isempty(chanlist)
-        alllocs = ALLEEG(STUDY.datasetinfo(1).index).chanlocs;
-        alllabs = { alllocs.labels };
-        for index = 2:length(STUDY.datasetinfo)
-           tmplocs = ALLEEG(STUDY.datasetinfo(index).index).chanlocs;
-           alllocs = eeg_mergechan(alllocs, tmplocs);
-        end;
+        alllocs = eeg_mergelocs(ALLEEG(:).chanlocs);
         chanlist = { alllocs.labels };
     end;
     
