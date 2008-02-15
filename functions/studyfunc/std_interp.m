@@ -10,7 +10,7 @@
 %     chans    - [Cell array] cell array of channel names (labels) to interpolate 
 %                into the data if they are missing from one of the datasets.
 %     method   - [string] griddata() method to use for interpolation.
-%                See  >> help griddata()  {default:'invdist'}
+%                See  >> help griddata() {default:'invdist'}
 %
 % Important limitation:
 %     This function currently presuposes that all datasets have the same channel 
@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2008/02/15 16:43:55  arno
+% *** empty log message ***
+%
 % Revision 1.5  2007/11/15 03:14:06  arno
 % exact match
 %
