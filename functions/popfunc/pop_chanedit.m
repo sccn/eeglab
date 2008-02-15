@@ -138,6 +138,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.174  2007/09/11 15:03:05  arno
+% fix channel removal (fiducials etc...)
+%
 % Revision 1.173  2007/08/24 01:45:48  arno
 % remove shiftdatachan obsolete parameter
 %
@@ -1499,7 +1502,8 @@ function [chans, fids] = getfid(chans)
                 end;
             end;
             alltypes          = { chans.type };
-            inds = [ strmatch( 'fid', lower(alltypes(indnoempty)) ) strmatch( 'aux', lower(alltypes(indnoempty)) ) ];
+            inds = [ strmatch( 'fid', lower(alltypes(indnoempty)) )' strmatch( 'aux', lower(alltypes(indnoempty)) )'  ...
+                     strmatch( 'ref', lower(alltypes(indnoempty)) )'  strmatch( 'bad', lower(alltypes(indnoempty)) )'];
             if length(inds) ~= length(alltypes)
                 fids = chans(indnoempty(inds));
                 chans(indnoempty(inds)) = [];
