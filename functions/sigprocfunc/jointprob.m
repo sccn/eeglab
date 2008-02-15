@@ -19,7 +19,8 @@
 %   jp         - pre-computed joint probability (only perform thresholding). 
 %                Default is the empty array [].
 %   normalize  - 0 = do not not normalize entropy. 1 = normalize entropy.
-%                Default is 0.
+%                2 is 20% trimming (10% low and 10% high) proba. before 
+%                normalizing. Default is 0.
 %   discret    - discretization variable for calculation of the 
 %                discrete probability density. Default is 1000 points. 
 % 
@@ -53,6 +54,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2007/03/07 04:35:21  toby
+% Bug 160, courtesy Ronny Lindner
+%
 % Revision 1.3  2007/03/05 19:00:54  arno
 % error message
 %
@@ -110,11 +114,16 @@ else
 	% normalize the last dimension
 	% ----------------------------	
 	if normalize
+        tmpjp = jp;
+        if normalize == 2,
+            tmpjp = sort(jp);
+            tmpjp = tmpjp(round(length(tmpjp)*0.1):end-round(length(tmpjp)*0.1));
+        end;
         try, 
             switch ndims( signal )
-             case 2,	jp = (jp-mean(jp)) / std(jp);
-             case 3,	jp = (jp-mean(jp,2)*ones(1,size(jp,2)))./ ...
-                  (std(jp,0,2)*ones(1,size(jp,2)));
+             case 2,	jp = (jp-mean(tmpjp)) / std(tmpjp);
+             case 3,	jp = (jp-mean(tmpjp,2)*ones(1,size(jp,2)))./ ...
+                  (std(tmpjp,0,2)*ones(1,size(jp,2)));
             end;
         catch, error('Error while normalizing'); end;
 	end;
@@ -123,7 +132,11 @@ end
 % reject
 % ------	
 if threshold ~= 0 
-	rej = abs(jp) > threshold;
+    if length(threshold) > 1
+    	rej = (threshold(1) > jp) | (jp > threshold(2));
+    else
+    	rej = abs(jp) > threshold;
+    end;
 else
 	rej = zeros(size(jp));
 end;	

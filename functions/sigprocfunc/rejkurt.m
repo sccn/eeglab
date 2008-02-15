@@ -17,7 +17,8 @@
 %   kurtosis   - pre-computed kurtosis (only perform thresholding). Default
 %                is the empty array [].
 %   normalize  - 0 = do not not normalize kurtosis. 1 = normalize kurtosis.
-%                Default is 0.
+%                2 is 20% trimming (10% low and 10% high) kurtosis before 
+%                normalizing. Default is 0.
 % 
 % Outputs:
 %   kurtosis    - normalized joint probability  of the single trials 
@@ -52,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2002/04/18 18:27:06  arno
+% typo can not
+%
 % Revision 1.1  2002/04/05 17:39:45  jorn
 % Initial revision
 %
@@ -65,10 +69,10 @@ end;
 if nargin < 2
 	threshold = 0;
 end;	
-if nargin < 3
+if nargin < 4
 	normalize = 0;
 end;	
-if nargin < 4
+if nargin < 3
 	oldkurtosis = [];
 end;	
 
@@ -99,18 +103,27 @@ else
 	% normalize the last dimension
 	% ----------------------------	
 	if normalize
+        tmpkurt = kurto;
+        if normalize == 2,
+            tmpkurt = sort(tmpkurt);
+            tmpkurt = tmpkurt(round(length(tmpkurt)*0.1):end-round(length(tmpkurt)*0.1));
+        end;
 	    switch ndims( signal )
-	    	case 2,	kurto = (kurto-mean(kurto)) / std(kurto);
-	    	case 3,	kurto = (kurto-mean(kurto,2)*ones(1,size(kurto,2)))./ ...
-				        (std(kurto,0,2)*ones(1,size(kurto,2)));
+	    	case 2,	kurto = (kurto-mean(tmpkurt)) / std(tmpkurt);
+	    	case 3,	kurto = (kurto-mean(tmpkurt,2)*ones(1,size(kurto,2)))./ ...
+				        (std(tmpkurt,0,2)*ones(1,size(kurto,2)));
 		end;
 	end;
 end;
 
 % reject
 % ------	
-if threshold ~= 0 
-	rej = abs(kurto) > threshold;
+if threshold(1) ~= 0 
+    if length(threshold) > 1
+    	rej = (threshold(1) > kurto) | (kurto > threshold(2));
+    else
+    	rej = abs(kurto) > threshold;
+    end;
 else
 	rej = zeros(size(kurto));
 end;	
