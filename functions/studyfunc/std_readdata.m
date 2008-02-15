@@ -4,7 +4,7 @@
 %                  Called by cluster plotting functions 
 %                  std_envtopo(), std_erpplot(), std_erspplot(), ...
 % Usage:
-%         >> [STUDY, clustinfo, finalinds] = std_readdata(STUDY, ALLEEG); 
+%         >> [STUDY, clustinfo, finalinds] = std_readdata(STUDY, ALLEEG);
 %                                              % return all measures
 %         >> [STUDY, clustinfo, finalinds] = std_readdata(STUDY, ALLEEG, ...
 %                                              cluster, infotype,varargin);
@@ -99,9 +99,6 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
-% Revision 1.41  2008/02/12 19:07:20  nima
-% _
-%
 % Revision 1.40  2008/02/08 20:21:42  arno
 % *** empty log message ***
 %
