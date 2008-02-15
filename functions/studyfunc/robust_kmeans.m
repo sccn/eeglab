@@ -8,8 +8,6 @@ function  [IDX,C,sumd,D,outliers] = robust_kmeans(data,N,STD,MAXiter,method)
 
 if nargin < 5
     method = 'kmeans';
-else
-    method = 'kmeanscluster';
 end;
 
 flag  = 1;
