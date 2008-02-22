@@ -150,6 +150,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.226  2008/01/10 18:25:40  arno
+% type in new function call
+%
 % Revision 1.225  2008/01/08 22:17:49  arno
 % new way of reading data
 %
@@ -1332,8 +1335,10 @@ for inddataset = 1:length(ALLEEG)
                 EEG.icaact     = double(EEG.icaact);
             else
                 try,
-                    EEG.data       = single(EEG.data);
-                    EEG.icaact     = single(EEG.icaact);
+                    if isa(EEG.data, 'double') 
+                        EEG.data       = single(EEG.data);
+                        EEG.icaact     = single(EEG.icaact);
+                    end;
                 catch,
                     disp('WARNING: EEGLAB ran out of memory while converting dataset to single precision.');
                     disp('         Save dataset (preferably saving data to a separate file; see File > Memory options).'); 
@@ -1371,8 +1376,10 @@ for inddataset = 1:length(ALLEEG)
                     if EEG.trials > 1
                         disp( 'eeg_checkset note: data array made 3-D'); 
                         res = com;
-                    end;    
-                    EEG.data = reshape(EEG.data, EEG.nbchan, EEG.pnts, size(EEG.data,2)/EEG.pnts);         
+                    end;
+                    if size(EEG.data,2) ~= EEG.pnts
+                        EEG.data = reshape(EEG.data, EEG.nbchan, EEG.pnts, size(EEG.data,2)/EEG.pnts);         
+                    end;
                 end;    
             end;
 
