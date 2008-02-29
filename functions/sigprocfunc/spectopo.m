@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.110  2007/08/02 23:35:11  arno
+% fixed icachaninds
+%
 % Revision 1.109  2006/09/09 02:22:42  scott
 % updating the help msg; documented 'plotmean' keyword  -sm
 %
@@ -606,7 +609,12 @@ else
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % compute channel spectra using pwelch()
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    epoch_subset = 1:epochs;
+    epoch_subset = ones(1,epochs);
+    if g.percent ~= 1 & epochs == 1
+        fprintf('Selecting the first %2.1f%% of data for analysis...\n', g.percent*100);
+        frames = round(size(data,2)*g.percent);
+        data = data(:, 1:frames);
+    end;
     if g.percent ~= 1 & epochs > 1
         epoch_subset = zeros(1,epochs);
         nb = ceil( g.percent*epochs);
@@ -619,6 +627,7 @@ else
         end;        
         epoch_subset = find(epoch_subset == 1);
         fprintf('Randomly selecting %d of %d data epochs for analysis...\n', length(epoch_subset),epochs);
+    else
     end;
     if isempty(g.weights)
         %%%%%%%%%%%%%%%%%%%%%%%%%%%
