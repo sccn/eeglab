@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.42  2007/11/29 22:05:45  arno
+% change text in gui
+%
 % Revision 1.41  2007/11/29 22:04:22  arno
 % hostory for multiple plots
 %
@@ -323,7 +326,7 @@ if EEG.trials > 1
                        '', ei_smooth, 1, 'caxis', 2/3, 'cbar','erp', 'yerplabel', '');   
           else
                   icaacttmp = (EEG.icaweights(chanorcomp,:) * EEG.icasphere) ...
-                                   * reshape(EEG.data, EEG.nbchan, EEG.trials*EEG.pnts);
+                                   * reshape(EEG.data(EEG.icachansind,:,:), length(EEG.icachansind), EEG.trials*EEG.pnts);
                   offset = nan_mean(icaacttmp);
                   erpimage( icaacttmp-offset, ones(1,EEG.trials)*10000, EEG.times, ...
                        '', ei_smooth, 1, 'caxis', 2/3, 'cbar','erp', 'yerplabel', '');   
@@ -363,7 +366,7 @@ else
                          EI_TITLE, ei_smooth, 1, 'caxis', 2/3, 'cbar','yerplabel', '');   
             else
                     icaacttmp = EEG.icaweights(chanorcomp,:) * EEG.icasphere ...
-                                     * reshape(EEG.data, erpimageframes, ERPIMAGELINES);
+                                     * EEG.data(EEG.icachansind,1:erpimageframestot);
                     offset = nan_mean(icaacttmp);
                     erpimage( icaacttmp-offset, ones(1,ERPIMAGELINES)*10000, eegtimes, ...
                          EI_TITLE, ei_smooth, 1, 'caxis', 2/3, 'cbar', 'yerplabel', '');   
@@ -394,10 +397,8 @@ try
 	else 
 		if option_computeica  
 			[spectra freqs] = spectopo( EEG.icaact(chanorcomp,:), EEG.pnts, EEG.srate, 'mapnorm', EEG.icawinv(:,chanorcomp), spec_opt{:} );
-		else
-			if exist('icaacttmp')~=1, 
-				icaacttmp = (EEG.icaweights(chanorcomp,:)*EEG.icasphere)*reshape(EEG.data, EEG.nbchan, EEG.trials*EEG.pnts); 
-			end;
+        else
+    		icaacttmp = (EEG.icaweights(chanorcomp,:)*EEG.icasphere)*reshape(EEG.data, EEG.nbchan, EEG.trials*EEG.pnts); 
 			[spectra freqs] = spectopo( icaacttmp, EEG.pnts, EEG.srate, 'mapnorm', EEG.icawinv(:,chanorcomp), spec_opt{:} );
 		end;
 	end;
