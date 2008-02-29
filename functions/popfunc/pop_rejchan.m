@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2008/02/15 16:28:12  arno
+% Initial revision
+%
 
 function [EEG, indelec, measure, com] = pop_rejchan( EEG, varargin);
 
@@ -127,7 +130,9 @@ if nargin < 2
     eegplot(EEG.data(opt.elec,:,:), 'srate', EEG.srate, 'title', 'Scroll component activities -- eegplot()', ...
 			 'limits', [EEG.xmin EEG.xmax]*1000, 'color', colors, 'eloc_file', tmplocs, 'command', tmpcom);
     
-    tmpelec(:,2) = mattocell(measure)
+    tmpelec(:,3) = mattocell(measure);
+    tmpelec(:,2) = tmpelec(:,1);
+    tmpelec(:,1) = mattocell([1:length(measure)]')
 else
     EEG = pop_select(EEG, 'nochannel', opt.elec(indelec));
 end;
