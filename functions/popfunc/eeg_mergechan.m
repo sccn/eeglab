@@ -29,6 +29,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2006/12/08 19:28:32  arno
+% fixing typo bug in counting channels
+%
 % Revision 1.1  2006/09/12 16:49:34  arno
 % Initial revision
 %
@@ -64,7 +67,7 @@ function alllocs = myunion(locs1, locs2)
            alllocs(count3) = locs1(count1);
            count1 = count1 + 1;
            count3 = count3 + 1;
-       else 
+       else
            alllocs(count3) = locs2(count2);
            count2 = count2 + 1;
            count3 = count3 + 1;
