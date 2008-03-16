@@ -144,12 +144,12 @@
 %                     You may also enter one row per region for baseline
 %                     e.g. [0 100; 300 400] considers the window 0 to 100 ms 
 %                     and 300 to 400 ms.
-%       'boottype'  = ['shuffle'|'rand'|'randall'] 'shuffle' times and trials;
-%                     'rand' -> invert polarity of spectral data points (ERSP)
-%                     or randomize phase (ITC). 'randall' -> compute
-%                     significances by accumulating random-polarity inversions
-%                     for each time/frequency point (this is time consuming).
-%                     return identical results {'times'}.
+%       'boottype'  = ['shuffle'|'rand'|'randall'] 'shuffle' -> shuffle times 
+%                     and trials; 'rand' -> invert polarity of spectral data 
+%                     (for ERSP) or randomize phase (for ITC); 'randall' -> 
+%                     compute significances by accumulating random-polarity 
+%                     inversions for each time/frequency point (slow!).
+%                     {'shuffle'}
 %       'condboot'  = ['abs'|'angle'|'complex'] for comparing 2 conditions,
 %                     either subtract ITC absolute vales ('abs'), angles
 %                     ('angles') or complex values ('complex').   {'abs'}
@@ -206,11 +206,13 @@
 % Outputs:
 %            ersp   = Matrix (nfreqs,timesout) of log spectral diffs. from baseline (dB)
 %            itc    = Matrix of inter-trial coherencies (nfreqs,timesout) (range: [0 1])
+%                     Output is complex: ITC magnitude is abs(itc); ITC phase in deg is
+%                     phase(itc)*180/pi.
 %          powbase  = Baseline power spectrum (in dB removed for each window to compute the ersp)
 %            times  = Vector of output times (subwindow centers) (in ms).
 %            freqs  = Vector of frequency bin centers (in Hz).
 %         erspboot  = Matrix (2,nfreqs) of [lower;upper] ERSP significance diffs.boottype
-%          itcboot  = Matrix (2,nfreqs) of [lower;upper] ITC thresholds (not diffs).
+%          itcboot  = Matrix (2,nfreqs) of [lower;upper] abs(itc) threshold pairs.
 %           tfdata  = time frequency decomposition of the data (nfreqs,timesout,trials)
 %
 % Plot description:
@@ -295,6 +297,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.144  2007/11/21 16:22:25  arno
+% adding plot description and fix plot fo scalp maps
+%
 % Revision 1.143  2007/11/05 23:26:43  arno
 % help msg
 %
