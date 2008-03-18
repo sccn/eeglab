@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2007/08/13 21:17:00  arno
+% fix previous changes
+%
 % Revision 1.10  2007/08/13 21:13:53  arno
 % fix typo
 %
@@ -82,6 +85,7 @@ alllocs = ALLEEG(STUDY.datasetinfo(1).index).chanlocs;
 alllabs = { alllocs.labels };
 for index = 2:length(STUDY.datasetinfo)
    tmplocs = ALLEEG(STUDY.datasetinfo(index).index).chanlocs;
+   tmplocs = orderfields(tmplocs, alllocs); % make fields to have the same order so they can be merged
    alllocs = eeg_mergechan(alllocs, tmplocs);
 end;
 
