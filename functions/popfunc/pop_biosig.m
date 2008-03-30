@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2007/08/14 20:07:29  arno
+% fix for new BIOSIG version
+%
 % Revision 1.22  2007/08/02 22:45:39  arno
 % back to previous
 %
@@ -218,7 +221,7 @@ if ~isempty(g.blockrange)
     newblockrange    = newblockrange*dat.Dur;    
     DAT=sread(dat, newblockrange(2)-newblockrange(1), newblockrange(1))';
 else 
-    DAT=sread(dat, Inf)';
+    DAT=sread(dat, Inf);
     newblockrange    = [];
 end
 dat = sclose(dat);
@@ -227,7 +230,14 @@ dat = sclose(dat);
 % ----------------------------
 EEG.nbchan          = size(DAT,1);
 EEG.srate           = dat.SampleRate(1);
-EEG.data            = DAT;
+EEG.data            = DAT; 
+clear DAT;
+try
+    EEG.data            = EEG.data';
+catch,
+    pack;
+    EEG.data            = EEG.data';
+end;    
 EEG.setname 		= sprintf('%s file', dat.TYPE);
 EEG.comments        = [ 'Original file: ' filename ];
 EEG.xmin            = 0; 
