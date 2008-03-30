@@ -99,6 +99,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.43  2008/02/15 16:50:45  arno
+% Refix the typo, just in case
+%
 % Revision 1.40  2008/02/08 20:21:42  arno
 % *** empty log message ***
 %
@@ -714,7 +717,7 @@ function [ tmpstruct setinds allinds ] = getsetinds(STUDY, ind)
 
     tmpstruct = STUDY.cluster(ind);
     alldatasets = tmpstruct.sets; 
-    allchanorcomp = repmat(tmpstruct.comps, [1 size(alldatasets,1)]);
+    allchanorcomp = repmat(tmpstruct.comps, [size(tmpstruct.sets,1) 1]);
          
     alldatasets   = alldatasets(:)';
     allchanorcomp = allchanorcomp(:)';
