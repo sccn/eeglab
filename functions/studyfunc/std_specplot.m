@@ -88,6 +88,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.51  2007/09/11 10:55:03  arno
+% fix numerous small display bugs
+%
 % Revision 1.50  2007/08/25 01:05:01  arno
 % nothing
 %
@@ -271,7 +274,7 @@ if ~isempty(opt.channels)
             specdata{index} = mean(specdata{index}(ti1:ti2,:,:),1);
         end;
         if opt.topofreq(1) == opt.topofreq(end), titlestr = [ num2str(opt.topofreq(1)) ' Hz'];
-        else                                     titlestr = [ num2str(opt.topofreq(1)) '-' num2str(opt.topofreq(2)) ' ms'];
+        else                                     titlestr = [ num2str(opt.topofreq(1)) '-' num2str(opt.topofreq(2)) ' Hz'];
         end;
     end;
     
@@ -284,7 +287,7 @@ if ~isempty(opt.channels)
     if ~isempty(opt.topofreq) & ~isnan(opt.topofreq)
         std_chantopo(specdata, 'condnames', STUDY.condition, 'plottopo', fastif(length(allinds)==1, 'off', 'on'), ...
                                       'datatype', 'spec', 'plotmode', opt.plotmode, 'groupnames', STUDY.group, 'unitx', 'Hz', ...
-                                      'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, ...
+                                      'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, 'caxis', opt.caxis, ...
                                       'chanlocs', locs, 'plotsubjects', opt.plotsubjects, 'topovals', titlestr, plotcurveopt{:});
     else
         std_plotcurve(allfreqs, specdata, 'condnames', STUDY.condition, 'plottopo', fastif(length(allinds)==1, 'off', 'on'), ...
