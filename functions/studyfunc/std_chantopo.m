@@ -63,6 +63,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2007/01/26 18:08:17  arno
+% Initial revision
+%
 % Revision 1.24  2006/11/23 00:26:22  arno
 % cosmetic change
 %
@@ -184,7 +187,7 @@ if strcmpi(opt.plottopo, 'on') & size(data{1},3) == 1, opt.singlesubject = 'on';
 if size(data{1},2) == 1,                               opt.singlesubject = 'on'; end;
 if strcmpi(opt.singlesubject, 'on'), opt.groupstats = {}; opt.condstats = {}; end;
 if ~isempty(opt.compinds), if length(opt.compinds{1}) > 1, opt.compinds = {}; end; end;
-if strcmpi(opt.datatype, 'spec'), opt.unit = 'Hz'; end;
+if strcmpi(opt.datatype, 'spec'), opt.unitx = 'Hz'; end;
 onecol  = { 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b' };
 manycol = { 'b' 'r' 'g' 'k' 'c' 'y' };
 
@@ -257,7 +260,7 @@ for c = 1:nc
         end;
 
         tmpplot = double(mean(data{c,g},3));
-        topoplot( tmpplot, opt.chanlocs);
+        topoplot( tmpplot, opt.chanlocs, 'style', 'map', 'shading', 'interp');
         title(fig_title); 
         if isempty(opt.caxis)
             tmpc = [ min(min(tmpplot), tmpc(1)) max(max(tmpplot), tmpc(2)) ];
