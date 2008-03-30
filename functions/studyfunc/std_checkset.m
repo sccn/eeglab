@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.69  2007/11/29 20:13:46  nima
+% msg comment - Arno
+%
 % Revision 1.68  2007/11/02 02:13:25  arno
 % fix the correct session code
 %
@@ -308,16 +311,15 @@ end
 
 % remove cluster information if old version
 % -----------------------------------------
-if isempty(STUDY.etc.version)
+if isempty(STUDY.etc.version) | strcmpi(STUDY.etc.version, '6.01b')
     icadefs;
-    STUDY.etc.version = EEGLAB_VERSION;
     if isfield(STUDY, 'cluster')
         if ~isempty(STUDY.cluster)
-            disp('Old STUDY version detected, removing pre-loaded measures (not files)');
-            disp('because of the defect in ERSP baseline subtraction (Bugs 484).');
+            disp('Old STUDY version detected, removing pre-loaded measures (not files; Bugs 484 & XXX)');
+            % disp('because of the defect in ERSP baseline subtraction (Bugs 484).');
             fields = { 'erpdata' 'erptimes' 'specdata' 'specfreqs' 'erspdata' ...
                        'ersptimes' 'erspfreqs' 'itcdata' 'itctimes' 'itcfreqs' ...
-                       'topo' 'topox' 'topoy' 'topoall' 'topopol' 'dipole' };
+                       'topo' 'topox' 'topoy' 'topoall' 'topopol' 'dipole' 'setinds' 'allinds' };
             for ind = 1:length(fields)
                 if isfield(STUDY.cluster, fields{ind})
                     STUDY.cluster = rmfield(STUDY.cluster, fields{ind});
@@ -326,15 +328,16 @@ if isempty(STUDY.etc.version)
         end;
     end;
     filename = fullfile( ALLEEG(1).filepath,[ ALLEEG(1).filename(1:end-3) 'icaersp']);
-    if exist(filename) == 2
-
-        tmp = load('-mat', filename);
-        if (length(fieldnames(tmp))-5)/3 < size(ALLEEG(1).icaweights,1)
-%            keyboard; nima
-            fprintf(2,'Possibly corrupted ERSP files for ICA. THESE FILES SHOULD BE RECOMPUTED (bug 497).\n');
-            fprintf(2,'(This message will not appear again).\n');
-            disp('Use menu "Study > Precompute Component Measures", select ERSP and');
-            disp('force recomputation. This problem refers to bug 489.');
+    if isempty(STUDY.etc.version)
+        if exist(filename) == 2
+            tmp = load('-mat', filename);
+            if (length(fieldnames(tmp))-5)/3 < size(ALLEEG(1).icaweights,1)
+    %            keyboard; nima
+                fprintf(2,'Possibly corrupted ERSP files for ICA. THESE FILES SHOULD BE RECOMPUTED (bug 497).\n');
+                fprintf(2,'(This message will not appear again).\n');
+                disp('Use menu "Study > Precompute Component Measures", select ERSP and');
+                disp('force recomputation. This problem refers to bug 489.');
+            end;
         end;
     end;
     if isfield(STUDY, 'changrp')
@@ -343,6 +346,7 @@ if isempty(STUDY.etc.version)
         end;
     end;
     modif = 1;
+    STUDY.etc.version = EEGLAB_VERSION;
 end;
 
 % set cluster array if empty
