@@ -206,6 +206,9 @@
 
 %% LOG COMMENTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % $Log: not supported by cvs2svn $
+% Revision 1.274  2008/01/11 00:28:24  arno
+% make all parameters 'key', 'val' while preserving backward compatibility
+%
 % Revision 1.273  2007/07/25 23:32:04  scott
 % restored default cycles = 3 !!?!!
 % the change from 3 -> 5 was never documented!?
@@ -3866,7 +3869,7 @@ win = win .* repmat(makehanning(length(nwin))',length(freq),1);
 %tmp =gcf; figure; plot(real(win)); figure(tmp);
 %fprintf('ANY NAN ************************* %d\n', any(any(isnan( data(nwin,:)))));
 
-tmpdata = data(nwin,:) - repmat(mean(data(nwin,:), 2), [1 size(data,2)]);
+tmpdata = data(nwin,:) - repmat(mean(data(nwin,:), 1), [size(data,1) 1]);
 resp = win * tmpdata;
 ang = angle(resp);
 amp = abs(resp);
