@@ -89,7 +89,8 @@
 %                   Refframes are given in frames in this version - will be
 %                   changed to ms in future.
 % Outputs:
-%         tf      = time frequency array for all trials (freqs, times, trials)
+%         tf      = complex time frequency array for all trials (freqs, 
+%                   times, trials)
 %         freqs   = vector of computed frequencies (Hz)
 %         times   = vector of computed time points (ms)
 %         itcvals = time frequency "average" for all trials (freqs, times).
@@ -126,6 +127,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.61  2007/05/18 00:35:14  ywu
+% fastif has strange file
+%
 % Revision 1.60  2007/04/05 22:34:20  arno
 % default values now set if empty param
 %
