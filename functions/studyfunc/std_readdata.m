@@ -99,6 +99,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.44  2008/03/30 12:05:26  arno
+% fix wrong index assignment for component clusters
+%
 % Revision 1.43  2008/02/15 16:50:45  arno
 % Refix the typo, just in case
 %
@@ -676,7 +679,30 @@ for ind = 1:length(finalinds)
          for c = 1:nc
              for g = 1:ng
                  for indtmp = 1:length(allinds{c,g})
+                        
+                     % check if some fields are missing and create them (as
+                     % empty values)
+                    
+                     missingFields = ~isfield(ALLEEG(setinds{c,g}(indtmp)).dipfit.model(allinds{c,g}(indtmp)),{'select', 'diffmap', 'sourcepot', 'datapot'});
+
+                     if missingFields(1)
+                         ALLEEG(setinds{c,g}(indtmp)).dipfit.model(allinds{c,g}(indtmp)).select = [];
+                     end;
+
+                     if missingFields(2)
+                         ALLEEG(setinds{c,g}(indtmp)).dipfit.model(allinds{c,g}(indtmp)).diffmap = [];
+                     end;
+
+                     if missingFields(3)
+                         ALLEEG(setinds{c,g}(indtmp)).dipfit.model(allinds{c,g}(indtmp)).sourcepot = [];
+                     end;
+
+                     if missingFields(4)
+                         ALLEEG(setinds{c,g}(indtmp)).dipfit.model(allinds{c,g}(indtmp)).datapot =[];
+                     end;
+
                      alldips{c, g}(indtmp) = ALLEEG(setinds{c,g}(indtmp)).dipfit.model(allinds{c,g}(indtmp));
+   
                  end;
              end;
          end;
