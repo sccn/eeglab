@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2007/02/24 02:14:10  toby
+% description edit
+%
 % Revision 1.3  2006/01/31 19:04:23  arno
 % allow default structure
 %
@@ -78,6 +81,7 @@ function [ header, opt ] = eeg_readoptions( filename, opt_backup );
     % --------------------------------------
     str = fgetl( fid ); % jump a line
     index = 1;
+    opt = [];
     while (str(1) ~= -1)
         if str(1) == '%'
             opt(index).description = str(3:end-1);
@@ -102,10 +106,12 @@ function [ header, opt ] = eeg_readoptions( filename, opt_backup );
     % replace in backup structure if any
     % ----------------------------------
     if ~isempty(opt_backup)
-        for index = 1:length(opt_backup)
-            ind = strmatch(opt_backup(index).varname, { opt.varname }, 'exact');
-            if ~isempty(ind) & ~isempty(opt_backup(index).varname)
-                opt_backup(index).value = opt(ind).value;
+        if ~isempty(opt)
+            for index = 1:length(opt_backup)
+                ind = strmatch(opt_backup(index).varname, { opt.varname }, 'exact');
+                if ~isempty(ind) & ~isempty(opt_backup(index).varname)
+                    opt_backup(index).value = opt(ind).value;
+                end;
             end;
         end;
         opt = opt_backup;
