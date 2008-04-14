@@ -72,7 +72,16 @@ if length(eventNames) == 0
             eventNames =  [eventNames EEG.epoch(i).eventtype];
         end;
     else
-        eventNames = timeWarp.eventSequence; % if event names is not provided only show timeWarp events
+        for i=1:length(timeWarp.eventSequence)
+            if ischar(timeWarp.eventSequence{i})
+                eventNames = [eventNames timeWarp.eventSequence{i}];
+            else % in case it is a cell of strings
+                for j=1:length(timeWarp.eventSequence{i})
+                    eventNames = [eventNames timeWarp.eventSequence{i}{j}];
+                end;
+            end
+        end;
+        %        eventNames = timeWarp.eventSequence; % if event names is not provided only show timeWarp events
     end
 end;
 
