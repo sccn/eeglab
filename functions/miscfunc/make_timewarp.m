@@ -146,7 +146,8 @@ timeWarpStructure.eventSequence = eventSequence;
         resultEventNumbers = [];
         firstLatency = []; % first event latency that meets the critria
         for eventNumber = 1:length(epoch.eventtype)
-            if strcmp(certainEventType, epoch.eventtype(eventNumber)) && epoch.eventlatency{eventNumber} >= certainLatency && eventMeetsCondition(epoch, eventNumber, certainCondition)
+%            if strcmp(certainEventType, epoch.eventtype(eventNumber)) && epoch.eventlatency{eventNumber} >= certainLatency && eventMeetsCondition(epoch, eventNumber, certainCondition)
+             if  eventIsOfType(epoch.eventtype(eventNumber), certainEventType)  && epoch.eventlatency{eventNumber} >= certainLatency && eventMeetsCondition(epoch, eventNumber, certainCondition)
                 resultEventNumbers = [resultEventNumbers eventNumber];
 
                 if isempty(firstLatency)
@@ -173,4 +174,15 @@ timeWarpStructure.eventSequence = eventSequence;
 
     end
 
+    function result = eventIsOfType(eventStr, types)
+        if ischar(types)
+            result = strcmp(eventStr, types);
+        else % it must be a cell of strs
+            result = false;
+            for i=1:length(types)
+                result = result ||  strcmp(eventStr, types{i});                
+            end;
+        end;
+    end
+        
 end
