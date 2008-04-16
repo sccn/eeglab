@@ -65,6 +65,10 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2007/09/11 10:49:57  arno
+% fix numerous small display problems
+% and crash
+%
 % Revision 1.13  2007/08/25 02:03:26  scott
 % spelling
 %
@@ -378,7 +382,7 @@ for c = 1:ncplot
                 for gg = 1:ng
                     tmptmpdata = real(data{c,gg});
                     if ~samesize
-                        tmptmpdata = mean(tmptmpdata,2);
+                        tmptmpdata = nan_mean(tmptmpdata,2);
                     end;
                     if gg == 1, tmpdata = zeros([size(tmptmpdata) ng]); end;
                     if ndims(tmptmpdata) == 3, tmpdata(:,:,:,gg) = tmptmpdata;
@@ -395,8 +399,8 @@ for c = 1:ncplot
             % ----------------
             plotopt = { allx };
             if strcmpi(opt.plottopo, 'on'),
-                if strcmpi(opt.plotsubjects, 'off') & strcmpi(opt.singlesubject, 'off') tmpdata = squeeze(real(mean(tmpdata,3))); end;
-            elseif strcmpi(opt.plotsubjects, 'off') & strcmpi(opt.singlesubject, 'off') tmpdata = squeeze(real(mean(tmpdata,2))); 
+                if strcmpi(opt.plotsubjects, 'off') & strcmpi(opt.singlesubject, 'off') tmpdata = squeeze(real(nan_mean(tmpdata,3))); end;
+            elseif strcmpi(opt.plotsubjects, 'off') & strcmpi(opt.singlesubject, 'off') tmpdata = squeeze(real(nan_mean(tmpdata,2))); 
             end;
             tmpdata = squeeze(permute(tmpdata, [2 1 3]));
             if strcmpi(opt.plottopo, 'on'), highlight = 'background'; else highlight = 'bottom'; end;
