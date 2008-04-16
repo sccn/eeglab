@@ -205,12 +205,14 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
     
     % test if interp and reconstruct channel list
     % -------------------------------------------
-    if strcmpi(g.interp, 'on')
-        STUDY = std_changroup(STUDY, ALLEEG, chanlist, 'interp');
-        g.interplocs = alllocs;
-    else
-        STUDY = std_changroup(STUDY, ALLEEG, chanlist);
-        g.interplocs = [];
+    if strcmpi(computewhat, 'channels')
+        if strcmpi(g.interp, 'on')
+            STUDY = std_changroup(STUDY, ALLEEG, chanlist, 'interp');
+            g.interplocs = alllocs;
+        else
+            STUDY = std_changroup(STUDY, ALLEEG, chanlist);
+            g.interplocs = [];
+        end;
     end;
     
     % components or channels
