@@ -279,7 +279,7 @@ function savetofile(filename, t, X, prefix, comps, params, labels);
     for k = 1:length(comps)
         allerp = setfield( allerp, [ prefix int2str(comps(k)) ], X(k,:));
     end;
-    if nargin > 5
+    if nargin > 6
         allerp.labels = labels;
     end;
     allerp.times      = t;
