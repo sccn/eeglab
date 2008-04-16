@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2007/08/15 23:29:23  arno
+% change EEG.pnts depending on the window time range
+%
 % Revision 1.34  2007/08/13 19:12:57  arno
 % better saving of options
 %
@@ -192,6 +195,8 @@ end;
                                       'timerange'  'float'   []         [];
                                       'specmode'   'string'  {'fft' 'psd'} 'psd';
                                       'recompute'  'string'  { 'on' 'off' } 'off';
+                                      'rmcomps'    'integer' []         [];
+                                      'interp'     'struct'  { }        struct([]);
                                       'nfft'       'integer' []         [];
                                       'freqrange'  'real'    []         [] }, 'std_spec', 'ignore');
 if isstr(g), error(g); end;
@@ -231,18 +236,18 @@ end
  
 % No SPEC information found
 % ------------------------
-if isstr(EEG.data)
-    TMP = eeg_checkset( EEG, 'loaddata' ); % load EEG.data and EEG.icaact
+options = {};
+if strcmpi(prefix, 'comp')
+    X = eeg_getdatact(EEG, 'component', [1:size(EEG.icaweights,1)]);
 else
-    TMP = EEG;
-end
-if strcmpi(prefix, 'comp') & isempty(TMP.icaact)
-    TMP.icaact = (TMP.icaweights*TMP.icasphere)* ...
-        reshape(TMP.data(TMP.icachansind,:,:), [ length(TMP.icachansind) size(TMP.data,2)*size(TMP.data,3) ]);
-end;
-if strcmpi(prefix, 'comp'), X = TMP.icaact;
-else                        X = TMP.data;
-end;
+    EEG.data = eeg_getdatact(EEG, 'channel', [1:EEG.nbchan], 'rmcomps', g.rmcomps);
+    if ~isempty(g.rmcomps), options = { options{:} 'rmcomps' g.rmcomps }; end;
+    if ~isempty(g.interp), 
+        EEG = eeg_interp(EEG, g.interp, 'spherical'); 
+        options = { options{:} 'interp' g.interp };
+    end;
+    X = EEG.data;
+end;        
 
 if ~isempty(g.timerange)
     timebef  = find(EEG.times > g.timerange(1) & EEG.times < g.timerange(2) );
@@ -261,12 +266,12 @@ end;
 
 % Save SPECs in file (all components or channels)
 % ----------------------------------
-options = { spec_opt{:} 'timerange' g.timerange 'nfft' g.nfft 'specmode' g.specmode };
+options = { options{:} spec_opt{:} 'timerange' g.timerange 'nfft' g.nfft 'specmode' g.specmode };
 if strcmpi(prefix, 'comp')
     savetofile( filename, f, X, 'comp', 1:size(X,1), options);
     [X f] = std_readspec(EEG, 1, g.components, g.freqrange);
 else
-    savetofile( filename, f, X, 'chan', 1:size(X,1), options, { TMP.chanlocs.labels });
+    savetofile( filename, f, X, 'chan', 1:size(X,1), options, { EEG.chanlocs.labels });
     [X f] = std_readspec(EEG, 1, g.channels, g.freqrange);
 end;
 return;
@@ -277,12 +282,13 @@ return;
 function savetofile(filename, f, X, prefix, comps, params, labels);
     
     disp([ 'Saving SPECTRAL file ''' filename '''' ]);
-    allspec.freqs      = f;
-    allspec.parameters = params;
-    allspec.datatype   = 'SPECTRUM';
+    allspec = [];
     for k = 1:length(comps)
         allspec = setfield( allspec, [ prefix int2str(comps(k)) ], X(k,:));
     end;
+    allspec.freqs      = f;
+    allspec.parameters = params;
+    allspec.datatype   = 'SPECTRUM';
     allspec.average_spec = mean(X,1);
     std_savedat(filename, allspec);
 

@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.54  2007/09/11 10:46:04  arno
+% fixed computing component ERSP (index problem) bug 497
+%
 % Revision 1.53  2007/08/12 23:20:24  arno
 % clarifying help message
 %
@@ -303,6 +306,8 @@ end;
                         'cycles'        'real'        []      [3 .5];
                         'padratio'      'real'        []      1;
                         'freqs'         'real'        []      [3 EEG.srate/2];
+                        'rmcomps'       'integer'     []      [];
+                        'interp'        'struct'      { }     struct([]);
                         'freqscale'     'string'      []      'log';
                         'alpha'         'real'        []      NaN;
                         'type'          'string'      { 'ersp' 'itc' 'both' 'ersp&itc' }  'both'}, 'std_ersp', 'ignore');
@@ -317,19 +322,6 @@ if isempty(g.components) & isempty(g.channels)
     g.components = 1:size(EEG(1).icaweights,1);
     disp('Computing ERSP with default values for all components of the dataset');
 end
-
-% find channel index
-% ------------------
-if ~isempty(g.channels)
-    if iscell(g.channels)
-        for index = 1:length(g.channels)
-            chanind = strmatch( lower(g.channels{index}), lower({ EEG.chanlocs.labels }), 'exact');
-            if isempty(chanind), error('Channel group not found'); end;
-            chaninds(index) = chanind;
-        end;
-        g.channels = chaninds;
-    end;
-end;
 
 % select ICA components or data channels
 % --------------------------------------
@@ -415,26 +407,52 @@ end;
 
 % No usable ERSP/ITC information available
 % ---------------------------------
-tmpdata = [];
-for index = 1:length(EEG)
-    if isstr(EEG(index).data)
-        TMP = eeg_checkset( EEG(index), 'loaddata' );  % load EEG.data and EEG.icaact
-    else
-        TMP = EEG;
-    end
-    if ~isempty(g.components)
-        if isempty(TMP.icaact)                      % make icaact if necessary
-            TMP.icaact = (TMP.icaweights*TMP.icasphere)* ...
-                          reshape(TMP.data(TMP.icachansind,:,:), [ length(TMP.icachansind) size(TMP.data,2)*size(TMP.data,3) ]);
+% tmpdata = [];
+% for index = 1:length(EEG)
+%     if isstr(EEG(index).data)
+%         TMP = eeg_checkset( EEG(index), 'loaddata' );  % load EEG.data and EEG.icaact
+%     else
+%         TMP = EEG;
+%     end
+%     if ~isempty(g.components)
+%         if isempty(TMP.icaact)                      % make icaact if necessary
+%             TMP.icaact = (TMP.icaweights*TMP.icasphere)* ...
+%                           reshape(TMP.data(TMP.icachansind,:,:), [ length(TMP.icachansind) size(TMP.data,2)*size(TMP.data,3) ]);
+%         end;
+%         tmpdata    = reshape(TMP.icaact, [ size(TMP.icaact,1) size(TMP.data,2) size(TMP.data,3) ]);
+%         tmpdata    = tmpdata(g.indices, :,:);
+%     else
+%         if isempty(tmpdata)
+%             tmpdata = TMP.data(g.indices,:,:);
+%         else    
+%             tmpdata(:,:,end+1:end+size(TMP.data,3)) = TMP.data(g.indices,:,:);
+%         end;
+%     end;
+% end;
+options = {};
+if ~isempty(g.components)
+    tmpdata = eeg_getdatact(EEG, 'component', g.indices);
+else
+    EEG.data = eeg_getdatact(EEG, 'channel', [1:EEG.nbchan], 'rmcomps', g.rmcomps);
+    if ~isempty(g.rmcomps), options = { options{:} 'rmcomps' g.rmcomps }; end;
+    if ~isempty(g.interp), 
+        EEG = eeg_interp(EEG, g.interp, 'spherical'); 
+        options = { options{:} 'interp' g.interp };
+    end;
+    tmpdata = EEG.data;
+end;        
+
+% find channel index
+% ------------------
+if ~isempty(g.channels)
+    if iscell(g.channels)
+        for index = 1:length(g.channels)
+            chanind = strmatch( lower(g.channels{index}), lower({ EEG.chanlocs.labels }), 'exact');
+            if isempty(chanind), error('Channel group not found'); end;
+            chaninds(index) = chanind;
         end;
-        tmpdata    = reshape(TMP.icaact, [ size(TMP.icaact,1) size(TMP.data,2) size(TMP.data,3) ]);
-        tmpdata    = tmpdata(g.indices, :,:);
-    else
-        if isempty(tmpdata)
-            tmpdata = TMP.data(g.indices,:,:);
-        else    
-            tmpdata(:,:,end+1:end+size(TMP.data,3)) = TMP.data(g.indices,:,:);
-        end;
+        g.indices  = chaninds;
+        g.channels = chaninds;
     end;
 end;
 
@@ -491,7 +509,7 @@ all_itc.parameters  = parameters;
 all_itc.datatype    = 'ITC';
 all_trials.freqs    = logfreqs;
 all_trials.times    = times;
-all_trials.parameters = parameters;
+all_trials.parameters = { options{:} parameters{:} };
 all_trials.datatype   = 'TIMEF';
 
 if powbaseexist
