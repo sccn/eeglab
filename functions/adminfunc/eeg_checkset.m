@@ -150,6 +150,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.227  2008/02/22 17:16:18  arno
+% better memory management
+%
 % Revision 1.226  2008/01/10 18:25:40  arno
 % type in new function call
 %
@@ -1311,7 +1314,7 @@ for inddataset = 1:length(ALLEEG)
                     % saving dataset
                     % --------------
                     filename = fullfile(EEG(1).filepath, EEG(1).filename);
-                    if ~isstr(EEG.data), EEG.data = single(EEG.data); end;
+                    if ~isstr(EEG.data) & option_single, EEG.data = single(EEG.data); end;
                     v = version;
                     if str2num(v(1)) >= 7, save( filename, '-v6', '-mat', 'EEG'); % Matlab 7
                     else                   save( filename, '-mat', 'EEG');
@@ -1335,7 +1338,7 @@ for inddataset = 1:length(ALLEEG)
                 EEG.icaact     = double(EEG.icaact);
             else
                 try,
-                    if isa(EEG.data, 'double') 
+                    if isa(EEG.data, 'double') & option_single
                         EEG.data       = single(EEG.data);
                         EEG.icaact     = single(EEG.icaact);
                     end;
@@ -1564,7 +1567,7 @@ for inddataset = 1:length(ALLEEG)
                                 EEG.icaact(:,tmpindices) = (EEG.icaweights*EEG.icasphere)*EEG.data(:,tmpindices);
                             else
                                 v = version;
-                                if ~isempty(findstr(v, 'R11')) | ~isempty(findstr(v, 'R12')) | ~isempty(findstr(v, 'R13'))
+                                if ~isempty(findstr(v, 'R11')) | ~isempty(findstr(v, 'R12')) | ~isempty(findstr(v, 'R13')) | ~option_single
                                     EEG.icaact = (EEG.icaweights*EEG.icasphere)*EEG.data(EEG.icachansind,:);
                                 else
                                     % recomputing as double
