@@ -29,6 +29,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2006/09/20 12:26:44  arno
+% Initial revision
+%
 
 function alllocs = mergelocs(varargin)
 
@@ -57,14 +60,14 @@ function alllocs = myunion(locs1, locs2)
            count3 = count3 + 1;
        elseif count2 > length(locs2)
            alllocs(count3) = locs1(count1);
-           count2 = count1 + 1;
+           count1 = count1 + 1;
            count3 = count3 + 1;
-       elseif strcmpi(labs1(count1), labs2(count2))
+       elseif strcmpi(labs1{count1}, labs2{count2})
            alllocs(count3) = locs1(count1);
            count1 = count1 + 1;
            count2 = count2 + 1;
            count3 = count3 + 1;
-       elseif isempty(strmatch(labs1(count1), labs2))
+       elseif isempty(strmatch(labs1{count1}, labs2, 'exact'))
            alllocs(count3) = locs1(count1);
            count1 = count1 + 1;
            count3 = count3 + 1;
