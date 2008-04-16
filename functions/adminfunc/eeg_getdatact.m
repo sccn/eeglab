@@ -12,6 +12,8 @@
 %   'channel'   - [integer array] read only specific channels.
 %                 Default is to read all data channels.
 %   'component' - [integer array] read only specific components
+%   'rmcomps'   - [integer array] remove selected components from data
+%                 channels
 %   'verbose'   - ['on'|'off'] verbose mode. Default is 'on'.
 %
 % Outputs:
@@ -40,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2008/01/08 23:03:31  arno
+% added verbose mode
+%
 % Revision 1.1  2008/01/08 22:37:39  arno
 % Initial revision
 %
@@ -55,47 +60,53 @@ function data = eeg_getdatact( EEG, varargin);
     opt = finputcheck(varargin, { ...
         'channel'   'integer' {} [1:EEG.nbchan];
         'verbose'   'string'  { 'on' 'off' } 'on';
-        'component' 'integer' {} [] }, 'eeg_getdatact');
+        'component' 'integer' {} [];        
+        'rmcomps'   'integer' {} [] }, 'eeg_getdatact');
+    
     if isstr(opt), error(opt); end;
+    if (~isempty(opt.rmcomps) | ~isempty(opt.component)) & isempty(EEG.icaweights)
+        error('No ICA weight in dataset');
+    end;
     
     if strcmpi(EEG.data, 'in set file')
-        filename = fullfile(EEG.filepath, EEG.filename);
-        EEG = pop_loadset(filename);
-    end;        
+        EEG = eeg_checkset(EEG, 'loaddata');
+    end;
     
-    if isnumeric(EEG.data)
-        if ~isempty(opt.component)
-            if isempty(EEG.icaact)
-                data = (EEG.icaweights(opt.component,:)*EEG.icasphere)*EEG.data;
-            else
-                data = EEG.icaact(opt.component,:,:);
-            end;
+    % getting channel or component activation
+    % ---------------------------------------
+    filename = fullfile(EEG.filepath, [ EEG.filename(1:end-3) 'icaact' ] );
+    if ~isempty(opt.component) & ~isempty(EEG.icaact)
+
+        data = EEG.icaact(opt.component,:,:);
+
+    elseif ~isempty(opt.component) & exist(filename)
+
+        % reading ICA file
+        % ----------------
+        data = repmat(single(0), [ length(opt.component) EEG.pnts EEG.trials ]);
+        fid = fopen( filename, 'r', 'ieee-le'); %little endian (see also pop_saveset)
+        if fid == -1, error( ['file ' filename ' could not be open' ]); end;
+        for ind = 1:length(opt.component)
+            fseek(fid, (opt.component(ind)-1)*EEG.pnts*EEG.trials*4, -1);
+            data(ind,:) = fread(fid, [EEG.trials*EEG.pnts 1], 'float32')';
+        end;
+        fclose(fid);
+
+    elseif ~isempty(opt.component)
+
+        EEG = eeg_checkset(EEG, 'loaddata');
+        if isempty(EEG.icaact)
+            data = (EEG.icaweights(opt.component,:)*EEG.icasphere)*EEG.data(EEG.icachansind,:);
         else
-            data = EEG.data(opt.channel,:,:);
+            data = EEG.icaact(opt.component,:,:);
         end;
-    else
-        % opening data file
-        % -----------------
-        if ~isempty(opt.component)
-            filename = fullfile(EEG.filepath, [ EEG.data(1:end-3) 'icaact' ] );
-            
-            % reading ICA file
-            % ----------------
-            if exist(filename)
-                data = repmat(single(0), [ length(opt.component) EEG.pnts EEG.trials ]);
-                fid = fopen( filename, 'r', 'ieee-le'); %little endian (see also pop_saveset)
-                if fid == -1, error( ['file ' filename ' could not be open' ]); end;
-                for ind = 1:length(opt.component)
-                    fseek(fid, (opt.component(ind)-1)*EEG.pnts*EEG.trials, -1);
-                    data(ind,:) = fread(fid, [EEG.trials*EEG.pnts 1], 'float32')';
-                end;
-                fclose(fid);
-                data = reshape(data, size(data,1), EEG.pnts, EEG.trials);
-                return;
-            end;
-            
-        end;
-        
+
+    elseif isnumeric(EEG.data) % channel
+
+        data = EEG.data(opt.channel,:,:);
+
+    else % channel but no data loaded
+
         filename = fullfile(EEG.filepath, EEG.data);
         fid = fopen( filename, 'r', 'ieee-le'); %little endian (see also pop_saveset)
         if fid == -1
@@ -116,7 +127,7 @@ function data = eeg_getdatact( EEG, varargin);
             end;
         end;
         EEG.datfile = EEG.data;
-        
+
         % reading data file
         % -----------------
         if datformat
@@ -125,7 +136,7 @@ function data = eeg_getdatact( EEG, varargin);
             else
                 data = repmat(single(0), [ length(opt.channel) EEG.pnts EEG.trials ]);
                 for ind = 1:length(opt.channel)
-                    fseek(fid, (opt.channel(ind)-1)*EEG.pnts*EEG.trials, -1);
+                    fseek(fid, (opt.channel(ind)-1)*EEG.pnts*EEG.trials*4, -1);
                     data(ind,:) = fread(fid, [EEG.trials*EEG.pnts 1], 'float32')';
                 end;
             end;
@@ -134,13 +145,34 @@ function data = eeg_getdatact( EEG, varargin);
             data = data(opt.channel,:,:);
         end;
         fclose(fid);
-        
-        % recompute component activity
-        % ----------------------------
-        if ~isempty(opt.component)
-            data = (EEG.icaweights(opt.component,:)*EEG.icasphere)*data;
-        end;
-        
-        data = reshape(data, size(data,1), EEG.pnts, EEG.trials);
+
     end;
  
+    % subracting components from data
+    % -------------------------------
+    if ~isempty(opt.rmcomps)
+        if strcmpi(opt.verbose, 'on')
+            fprintf('Removing %d artifactual components\n', length(opt.rmcomps));
+        end;
+        rmcomps = eeg_getdatact( EEG, 'component', opt.rmcomps); % loaded from file        
+        rmchan    = [];
+        rmchanica = [];
+        for index = 1:length(opt.channel)
+            tmpicaind = find(opt.channel(index) == EEG.icachansind);
+            if ~isempty(tmpicaind)
+                rmchan    = [ rmchan    index ];
+                rmchanica = [ rmchanica tmpicaind ];
+            end;
+        end;
+        data(rmchan,:) = data(rmchan,:) - EEG.icawinv(rmchanica,opt.rmcomps)*rmcomps(:,:);
+
+        %EEG = eeg_checkset(EEG, 'loaddata');
+        %EEG = pop_subcomp(EEG, opt.rmcomps);
+        %data = EEG.data(opt.channel,:,:);
+        
+        %if strcmpi(EEG.subject, 'julien') & strcmpi(EEG.condition, 'oddball') & strcmpi(EEG.group, 'after')
+        %    jjjjf
+        %end;
+    end;
+    
+    data = reshape(data, size(data,1), EEG.pnts, EEG.trials);
