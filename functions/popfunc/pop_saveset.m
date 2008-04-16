@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.86  2007/04/07 01:29:56  arno
+% help message
+%
 % Revision 1.85  2006/09/13 09:38:14  arno
 % fixing window pop up problem
 %
@@ -490,12 +493,35 @@ try,
             EEG = rmfield(EEG, 'datfile');
         end;
     end;
+    
     if str2num(v(1)) > 6, save(fullfile(EEG.filepath, EEG.filename), '-v6', '-mat', 'EEG');
     else                  save(fullfile(EEG.filepath, EEG.filename), '-mat', 'EEG');
     end;
     if save_as_dat_file & strcmpi( no_resave_dat, 'no' )
         EEG.data = tmpdata;
     end;
+    
+    % save ICA activities
+    % -------------------
+    icafile = fullfile(EEG.filepath, [EEG.filename(1:end-4) '.icaact' ]);
+    if isempty(EEG.icaweights) & exist(icafile)
+        disp('ICA activation file found on disk, but no more ICA activities. Deleting file.');
+        delete(icafile);
+    end;
+    if ~option_saveica & exist(icafile)
+        disp('Options indicate not to save ICA activations. Deleting ICA activation file.');
+        delete(icafile);
+    end;
+    if option_saveica & ~isempty(EEG.icaweights)
+        if isempty(tmpica)
+             tmpica2 = (EEG.icaweights*EEG.icapshere)*tmpdata(EEG.icachansind,:);
+        else tmpica2 = tmpica;
+        end;
+        tmpica2 = reshape(tmpica2, size(tmpica2,1), size(tmpica2,2)*size(tmpica2,3));
+        floatwrite( tmpica2', icafile, 'ieee-le');
+        clear tmpica2;
+    end;
+    
 catch,
     error('Pop_saveset: save error, out of space or file permission problem');
 end;
