@@ -69,7 +69,7 @@ function data = eeg_getdatact( EEG, varargin);
     end;
     
     if strcmpi(EEG.data, 'in set file')
-        EEG = eeg_checkset(EEG, 'loaddata');
+        EEG = pop_loadset('filename', EEG.filename, 'filepath', EEG.filepath);
     end;
     
     % getting channel or component activation
@@ -94,7 +94,6 @@ function data = eeg_getdatact( EEG, varargin);
 
     elseif ~isempty(opt.component)
 
-        EEG = eeg_checkset(EEG, 'loaddata');
         if isempty(EEG.icaact)
             data = (EEG.icaweights(opt.component,:)*EEG.icasphere)*EEG.data(EEG.icachansind,:);
         else
