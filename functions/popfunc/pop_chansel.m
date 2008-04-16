@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2007/08/07 00:39:00  arno
+% remove debug message
+%
 % Revision 1.24  2007/08/06 18:32:58  arno
 % help message again
 %
@@ -181,8 +184,14 @@ function [chanlist,chanliststr, allchanstr] = pop_chansel(chans, varargin);
         end;
     end;
     [chanlist,tmp,chanliststr] = listdlg2('PromptString',strvcat('(use shift|Ctrl to', 'select several)'), ...
-                'ListString', tmpfieldnames, 'initialvalue', g.select, 'selectionmode', g.selectionmode);       
-    allchanstr = chans(chanlist);
+                'ListString', tmpfieldnames, 'initialvalue', g.select, 'selectionmode', g.selectionmode);   
+    if tmp == 0
+        chanlist = [];
+        chanliststr = '';
+        return;
+    else
+        allchanstr = chans(chanlist);
+    end;
     
     % test for spaces
     % ---------------
