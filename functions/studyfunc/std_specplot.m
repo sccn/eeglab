@@ -202,7 +202,7 @@ opt = finputcheck( varargin, { 'topofreq'    'real'    [] STUDY.etc.specparams.t
                                'threshold'   'real'    [] STUDY.etc.specparams.threshold;
                                'naccu'       'integer' [] STUDY.etc.specparams.naccu;
                                'channels'    'cell'    []              {};
-                               'caxis'       'real'    []              [];
+                               'caxis'       'real'    []              STUDY.etc.specparams.ylim;
                                'clusters'    'integer' []              [];
                                'mode'        'string'  []              ''; % for backward compatibility
                                'comps'       { 'string' 'integer' } [] []; % for backward compatibility

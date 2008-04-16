@@ -216,7 +216,7 @@ opt = finputcheck( varargin, { 'topotime'    'real'    [] STUDY.etc.erpparams.to
                                'threshold'   'real'    [] STUDY.etc.erpparams.threshold;
                                'naccu'       'integer' [] STUDY.etc.erpparams.naccu;
                                'channels'    'cell'    []              {};
-                               'caxis'       'real'    []              [];
+                               'caxis'       'real'    []              STUDY.etc.erpparams.ylim;
                                'clusters'    'integer' []              [];
                                'mode'        'string'  []              ''; % for backward compatibility
                                'comps'       { 'string' 'integer' } [] []; % for backward compatibility
@@ -291,9 +291,11 @@ if ~isempty(opt.channels)
     structdat = STUDY.changrp;
     erpdata = cell(size(structdat(allinds(1)).erpdata));
     for ind =  1:length(structdat(allinds(1)).erpdata(:))
-        erpdata{ind} = zeros([ size(structdat(allinds(1)).erpdata{1}) length(allinds)]);
+        erpdata{ind} = zeros([ size(structdat(allinds(1)).erpdata{1}) length(allinds)])*NaN;
         for index = 1:length(allinds)
-            erpdata{ind}(:,:,index)  = structdat(allinds(index)).erpdata{ind};
+            try,
+                erpdata{ind}(:,:,index)  = structdat(allinds(index)).erpdata{ind};
+            catch, end;
             alltimes                 = structdat(allinds(index)).erptimes;
             compinds                 = structdat(allinds(index)).allinds;
             setinds                  = structdat(allinds(index)).setinds;

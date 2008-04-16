@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.62  2007/11/15 04:01:36  arno
+% *** empty log message ***
+%
 % Revision 1.61  2007/11/15 03:46:19  arno
 % fix itclim
 %
@@ -237,7 +240,13 @@ STUDY = pop_erspparams(STUDY, 'default');
                                'subject'     'string'  []              '' }, ...
                                   'std_erspstatplot', 'ignore');
 if isstr(opt), error(opt); end;
-                                
+if isempty(opt.caxis), 
+    if strcmpi(opt.datatype, 'ersp')
+         opt.caxis = STUDY.etc.erspparams.ersplim;
+    else opt.caxis = STUDY.etc.erspparams.itclim;
+    end;
+end;
+
 % for backward compatibility
 % --------------------------
 if ~isnan(STUDY.etc.erspparams.topotime),

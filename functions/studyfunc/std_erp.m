@@ -57,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2007/11/07 00:27:46  arno
+% timerange option deprecated
+%
 % Revision 1.33  2007/11/07 00:14:22  arno
 % Remove baseline subtraction
 %
@@ -163,6 +166,9 @@ end;
 
 g = finputcheck(options, { 'components' 'integer' []         [];
                            'channels'   'cell'    {}         {};
+                           'rmbase'     'real'    []         [];
+                           'rmcomps'    'integer' []         [];
+                           'interp'     'struct'  { }        struct([]);
                            'recompute'  'string'  { 'on' 'off' } 'off';
                            'timerange'  'real'    []         [] }, 'std_erp');
 if isstr(g), error(g); end;
@@ -180,17 +186,19 @@ EEG_etc = [];
 % filename 
 % --------
 if ~isempty(g.channels)
-    filename = fullfile( EEG.filepath,[ EEG.filename(1:end-3) 'daterp']);
+    filenameshort = [ EEG.filename(1:end-3) 'daterp'];
     prefix = 'chan';
 else    
-    filename = fullfile( EEG.filepath,[ EEG.filename(1:end-3) 'icaerp']);
+    filenameshort = [ EEG.filename(1:end-3) 'icaerp'];
     prefix = 'comp';
 end;
+filename = fullfile( EEG.filepath,filenameshort);
 
 % ERP information found in datasets
 % ---------------------------------
 if exist(filename) & strcmpi(g.recompute, 'off')
 
+    fprintf('File "%s" found on disk, no need to recompute\n', filenameshort);
     if strcmpi(prefix, 'comp')
         [X, t] = std_readerp(EEG, 1, g.components, g.timerange);
     else
@@ -202,39 +210,51 @@ end
    
 % No ERP information found
 % ------------------------
-if isstr(EEG.data)
-    TMP = eeg_checkset( EEG, 'loaddata' ); % load EEG.data and EEG.icaact
+% if isstr(EEG.data)
+%     TMP = eeg_checkset( EEG, 'loaddata' ); % load EEG.data and EEG.icaact
+% else
+%     TMP = EEG;
+% end
+%    & isempty(TMP.icaact)
+%    TMP.icaact = (TMP.icaweights*TMP.icasphere)* ...
+%        reshape(TMP.data(TMP.icachansind,:,:), [ length(TMP.icachansind) size(TMP.data,2)*size(TMP.data,3) ]);
+%    TMP.icaact = reshape(TMP.icaact, [ size(TMP.icaact,1) size(TMP.data,2) size(TMP.data,3) ]);
+%end;
+%if strcmpi(prefix, 'comp'), X = TMP.icaact;
+%else                        X = TMP.data;
+%end;
+options = {};
+if strcmpi(prefix, 'comp')
+    X = eeg_getdatact(EEG, 'component', [1:size(EEG.icaweights,1)]);
 else
-    TMP = EEG;
-end
-if strcmpi(prefix, 'comp') & isempty(TMP.icaact)
-    TMP.icaact = (TMP.icaweights*TMP.icasphere)* ...
-        reshape(TMP.data(TMP.icachansind,:,:), [ length(TMP.icachansind) size(TMP.data,2)*size(TMP.data,3) ]);
-    TMP.icaact = reshape(TMP.icaact, [ size(TMP.icaact,1) size(TMP.data,2) size(TMP.data,3) ]);
-end;
-if strcmpi(prefix, 'comp'), X = TMP.icaact;
-else                        X = TMP.data;
-end;
+    EEG.data = eeg_getdatact(EEG, 'channel', [1:EEG.nbchan], 'rmcomps', g.rmcomps);
+    if ~isempty(g.rmcomps), options = { options{:} 'rmcomps' g.rmcomps }; end;
+    if ~isempty(g.interp), 
+        EEG = eeg_interp(EEG, g.interp, 'spherical'); 
+        options = { options{:} 'interp' g.interp };
+    end;
+    X = EEG.data;
+end;        
 
 % Remove baseline mean
 % --------------------
 if ~isempty(g.timerange)
     disp('Warning: the ''timerange'' option is deprecated and has no effect');
 end;
-%if EEG.trials > 1 %epoched data
-%    time0 = find(EEG.times < 0);
-%    time0 = find(EEG.times(time0) > g.timerange(1));
-%    if ~isempty(time0)
-%        X = rmbase(X,EEG.pnts, time0);
-%    else
-%        X = rmbase(X,EEG.pnts);
-%    end
-%else
-%    X = rmbase(X);
-%end
-X = reshape(X, [ size(X,1) size(TMP.data,2) size(TMP.data,3) ]);
+if ~isempty(g.rmbase)
+    disp('Removing baseline...');
+    options = { options{:} 'rmbase' g.rmbase };
+    [tmp timebeg] = min(abs(EEG.times - g.rmbase(1)));
+    [tmp timeend] = min(abs(EEG.times - g.rmbase(2)));
+    if ~isempty(timebeg)
+        X = rmbase(X,EEG.pnts, [timebeg:timeend]);
+    else
+        X = rmbase(X,EEG.pnts);
+    end
+end
+X = reshape(X, [ size(X,1) EEG.pnts EEG.trials ]);
 if strcmpi(prefix, 'comp')
-    X = repmat(sqrt(mean(TMP.icawinv.^2))', [1 TMP.pnts]) .* mean(X,3); % calculate ERP
+    X = repmat(sqrt(mean(EEG.icawinv.^2))', [1 EEG.pnts]) .* mean(X,3); % calculate ERP
 else    
     X = mean(X, 3);
 end;
@@ -242,25 +262,27 @@ end;
 % Save ERPs in file (all components or channels)
 % ----------------------------------
 if strcmpi(prefix, 'comp')
-    savetofile( filename, EEG.times, X, 'comp', 1:size(X,1));
+    savetofile( filename, EEG.times, X, 'comp', 1:size(X,1), options);
     [X,t] = std_readerp( EEG, 1, g.components, g.timerange);
 else
-    savetofile( filename, EEG.times, X, 'chan', 1:size(X,1), { TMP.chanlocs.labels });
+    savetofile( filename, EEG.times, X, 'chan', 1:size(X,1), options, { EEG.chanlocs.labels });
     [X,t] = std_readerp( EEG, 1, g.channels, g.timerange);
 end;
 
 % -------------------------------------
 % saving ERP information to Matlab file
 % -------------------------------------
-function savetofile(filename, t, X, prefix, comps, labels);
+function savetofile(filename, t, X, prefix, comps, params, labels);
     
     disp([ 'Saving ERP file ''' filename '''' ]);
-    allerp.times      = t;
-    allerp.datatype   = 'ERP';
+    allerp = [];
     for k = 1:length(comps)
         allerp = setfield( allerp, [ prefix int2str(comps(k)) ], X(k,:));
     end;
     if nargin > 5
         allerp.labels = labels;
     end;
+    allerp.times      = t;
+    allerp.datatype   = 'ERP';
+    allerp.parameters = params;
     std_savedat(filename, allerp);
