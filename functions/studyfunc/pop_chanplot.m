@@ -349,11 +349,18 @@ else
             set(hdl, 'userdat',userdat); 
 
         case {'plotchantopo', 'plotchanersp','plotchanitc','plotchanspec', 'plotchanerp','plotchandip'}
-            changrpstr = allchans(changrp);
+            changrpstr    = allchans(changrp);
+            if length(changrp) > 1
+                subject = STUDY.subject{onechan-1};
+            else
+                changrpstruct = STUDY.changrp(changrp);
+                allsubjects   = unique({ STUDY.datasetinfo([ changrpstruct.setinds{:} ]).subject });
+                subject       = allsubjects{onechan-1};
+            end;
             plotting_option = varargin{1};
             plotting_option = [ plotting_option(9:end) 'plot' ];
             if onechan(1) ~= 1  % check that not all onechan in channel are requested
-                a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''channels'','  vararg2str({changrpstr}) ', ''subject'', ''' STUDY.subject{onechan-1} ''' );' ];
+                a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''channels'','  vararg2str({changrpstr}) ', ''subject'', ''' subject ''' );' ];
                 eval(a); STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
              else
                 a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''channels'','  vararg2str({changrpstr}) ', ''plotsubjects'', ''on'' );' ];
@@ -406,12 +413,17 @@ else
             % Generate channel list
             % ---------------------
             chanid{1} = 'All subjects';
-            for l = 1:length(STUDY.subject)
-                if length(changrp) > 1
-                     chanid{end+1} = [ STUDY.subject{l} ];
-                else chanid{end+1} = [ STUDY.subject{l} ' ' changrp.name ];
+            if length(changrp) == 1
+                allsubjects = unique({ STUDY.datasetinfo([ changrp.setinds{:} ]).subject });
+                for l = 1:length(allsubjects)
+                    chanid{end+1} = [ allsubjects{l} ' ' changrp.name ];
+                end;
+            else
+                for l = 1:length(STUDY.subject)
+                    chanid{end+1} = [ STUDY.subject{l} ];
                 end;
             end;
+                
             selected = 1;
             if isfield(changrp, 'selected') & length(cind) == 1
                 if ~isempty(STUDY.changrp(cind).selected)
