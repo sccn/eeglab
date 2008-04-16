@@ -2,12 +2,14 @@
 %
 % Usage:    
 %                >> STUDY = std_changroup(STUDY, ALLEEG);   
+%                >> STUDY = std_changroup(STUDY, ALLEEG, chanlocs);   
 % Inputs:
 %   ALLEEG     - Top-level EEGLAB vector of loaded EEG structures for the dataset(s) 
 %                in the STUDY. ALLEEG for a STUDY set is typically loaded using 
 %                pop_loadstudy(), or in creating a new STUDY, using pop_createstudy().  
 %   STUDY      - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
-%
+%   chanlocs   - EEGLAB channel structure. Only construct the STUDY.changrp
+%                structure for a subset of channels.
 % Outputs:
 %   STUDY      - The input STUDY set structure modified according to specified user 
 %                edits, if any. The STUDY.changrp structure is created. It contains as
@@ -43,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2008/03/18 01:12:46  nima
+% nima added ordering field before merging.
+%
 % Revision 1.11  2007/08/13 21:17:00  arno
 % fix previous changes
 %
@@ -77,24 +82,34 @@
 % Initial revision
 %
 
-function STUDY = std_changroup(STUDY, ALLEEG);
+function STUDY = std_changroup(STUDY, ALLEEG, alllocs, interp);
+
+if nargin < 4
+    interp = 'off';
+end;
 
 % union of all channel structures
 % -------------------------------
-alllocs = ALLEEG(STUDY.datasetinfo(1).index).chanlocs;
-alllabs = { alllocs.labels };
-for index = 2:length(STUDY.datasetinfo)
-   tmplocs = ALLEEG(STUDY.datasetinfo(index).index).chanlocs;
-   tmplocs = orderfields(tmplocs, alllocs); % make fields to have the same order so they can be merged
-   alllocs = eeg_mergechan(alllocs, tmplocs);
+inputloc = 0;
+if nargin >= 3
+    if ~isempty(alllocs)
+        inputloc = 1;
+    end;
+end;
+if ~inputloc
+    alllocs = eeg_mergelocs(ALLEEG(:).chanlocs);
 end;
 
 % create group for each electrode
 % -------------------------------
+if isstruct(alllocs)
+    alllocs = { alllocs.labels };
+end;
+STUDY.changrp = [];
 for indc = 1:length(alllocs)
-    STUDY.changrp(indc).name = [ alllocs(indc).labels ];
-    STUDY.changrp(indc).channels = { alllocs(indc).labels };
-    tmp = std_chanlookupnew( STUDY, ALLEEG, STUDY.changrp(indc));
+    STUDY.changrp(indc).name     = alllocs{indc};
+    STUDY.changrp(indc).channels = { alllocs{indc} };
+    tmp = std_chanlookupnew( STUDY, ALLEEG, STUDY.changrp(indc), interp);
     STUDY.changrp(indc).setinds = tmp.setinds;
     STUDY.changrp(indc).allinds = tmp.allinds;
     STUDY.changrp(indc).centroid = [];
@@ -109,7 +124,7 @@ return;
     
 % find datasets and channel indices
 % ---------------------------------
-function changrp = std_chanlookupnew( STUDY, ALLEEG, changrp);
+function changrp = std_chanlookupnew( STUDY, ALLEEG, changrp, interp);
 
     nc = max(length(STUDY.condition),1);
     ng = max(length(STUDY.group),1);
@@ -130,13 +145,20 @@ function changrp = std_chanlookupnew( STUDY, ALLEEG, changrp);
                 
             % scan all channel labels
             % -----------------------
-            for indc = 1:length(changrp.channels) % usually just one channel
-                ind = strmatch( changrp.channels(indc), tmplocs, 'exact');
-                if length(ind) > 1, error([ 'Duplicate channel label ''' tmplocs{ind(1)} ''' for dataset ' int2str(datind) ]); end;
-                if ~isempty(ind)
-                    changrp.allinds{ condind, grpind } = [ changrp.allinds{ condind, grpind } ind ];
-                    changrp.setinds{ condind, grpind } = [ changrp.setinds{ condind, grpind } datind ];
+            if strcmpi(interp, 'off')
+                for indc = 1:length(changrp.channels) % usually just one channel
+                    ind = strmatch( changrp.channels{indc}, tmplocs, 'exact');
+                    if length(ind) > 1, error([ 'Duplicate channel label ''' tmplocs{ind(1)} ''' for dataset ' int2str(datind) ]); end;
+                    if ~isempty(ind)
+                        changrp.allinds{ condind, grpind } = [ changrp.allinds{ condind, grpind } ind ];
+                        changrp.setinds{ condind, grpind } = [ changrp.setinds{ condind, grpind } datind ];
+                    end;
                 end;
+            else % interpolation is "on", all channels for all datasets
+                alllocs = { STUDY.changrp.name };
+                ind = strmatch( changrp.name, alllocs, 'exact');
+                changrp.allinds{ condind, grpind } = [ changrp.allinds{ condind, grpind } ind   ];
+                changrp.setinds{ condind, grpind } = [ changrp.setinds{ condind, grpind } index ];
             end;
         end;
     end;
