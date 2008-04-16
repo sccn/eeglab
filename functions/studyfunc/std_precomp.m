@@ -96,6 +96,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2008/02/15 16:51:36  arno
+% simplify code for merging channel location files
+%
 % Revision 1.20  2007/12/09 00:40:15  arno
 % recompute for topo
 %
@@ -158,13 +161,16 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
     end
 
     g = finputcheck(varargin, { 'erp'         'string'  { 'on' 'off' }     'off';
-                                'interpolate' 'string'  { 'on' 'off' }     'off';
+                                'interp'      'string'  { 'on' 'off' }     'off';
                                 'ersp'        'string'  { 'on' 'off' }     'off';
                                 'recompute'   'string'  { 'on' 'off' }     'off';
                                 'spec'        'string'  { 'on' 'off' }     'off';
                                 'scalp'       'string'  { 'on' 'off' }     'off';
                                 'allcomps'    'string'  { 'on' 'off' }     'off';
                                 'itc'         'string'  { 'on' 'off' }     'off';
+                                'rmicacomps'  'string'  { 'on' 'off' }     'off';
+                                'rmclust'     'integer' []                 [];
+                                'rmbase'      'integer' []                 [];
                                 'specparams'        'cell'    {}                 {};
                                 'erspparams'        'cell'    {}                 {}}, 'std_precomp');
     if isstr(g), error(g); end;
@@ -190,6 +196,21 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
     if isempty(chanlist)
         alllocs = eeg_mergelocs(ALLEEG(:).chanlocs);
         chanlist = { alllocs.labels };
+    elseif ~isnumeric(chanlist{1})
+        alllocs = eeg_mergelocs(ALLEEG(:).chanlocs);
+        [tmp c1 c2] = intersect( lower({ alllocs.labels }), lower(chanlist));
+        [tmp c2] = sort(c2);
+        alllocs = alllocs(c1(c2));
+    end;
+    
+    % test if interp and reconstruct channel list
+    % -------------------------------------------
+    if strcmpi(g.interp, 'on')
+        STUDY = std_changroup(STUDY, ALLEEG, chanlist, 'interp');
+        g.interplocs = alllocs;
+    else
+        STUDY = std_changroup(STUDY, ALLEEG, chanlist);
+        g.interplocs = [];
     end;
     
     % components or channels
@@ -199,22 +220,15 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
     else curstruct = STUDY.cluster;
     end;
     
-    % Interpolate all datasets first
-    % ------------------------------
-    if strcmpi(g.interpolate, 'on')
-        fprintf('Interpolation of data channels\n');
-        fprintf('------------------------------\n');
-        [ STUDY, ALLEEG ] = std_interp(STUDY, ALLEEG, chanlist);
-    end;
-    
     % compute ERPs
     % ------------
     if strcmpi(g.erp, 'on')
         for index = 1:length(STUDY.datasetinfo)
             if strcmpi(computewhat, 'channels')
-                std_erp(ALLEEG(STUDY.datasetinfo(index).index), 'channels', chanlist, 'recompute', g.recompute);
+                [tmpchanlist opts] = getchansandopts(STUDY, ALLEEG, chanlist, index, g);
+                std_erp(ALLEEG(STUDY.datasetinfo(index).index), 'channels', tmpchanlist, 'rmbase', g.rmbase, opts{:});
             else
-                std_erp(ALLEEG(STUDY.datasetinfo(index).index), 'components', chanlist{index}, 'recompute', g.recompute);
+                std_erp(ALLEEG(STUDY.datasetinfo(index).index), 'components', chanlist{index}, 'rmbase', g.rmbase, 'recompute', g.recompute);
             end;
         end;
         if isfield(curstruct, 'erpdata')
@@ -265,7 +279,8 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
     if strcmpi(g.spec, 'on')
         for index = 1:length(STUDY.datasetinfo)
             if strcmpi(computewhat, 'channels')
-                std_spec(ALLEEG(STUDY.datasetinfo(index).index), 'channels', chanlist, 'recompute', g.recompute, g.specparams{:});
+                [tmpchanlist opts] = getchansandopts(STUDY, ALLEEG, chanlist, index, g);
+                std_spec(ALLEEG(STUDY.datasetinfo(index).index), 'channels', tmpchanlist, opts{:}, g.specparams{:});
             else
                 std_spec(ALLEEG(STUDY.datasetinfo(index).index), 'components', chanlist{index}, 'recompute', g.recompute);
             end;
@@ -317,7 +332,8 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
         end;
         for index = 1:length(STUDY.datasetinfo)
             if strcmpi(computewhat, 'channels')
-                std_ersp(ALLEEG(STUDY.datasetinfo(index).index), 'channels', chanlist, 'type', type, 'recompute', g.recompute, tmpparams{:});
+                [tmpchanlist opts] = getchansandopts(STUDY, ALLEEG, chanlist, index, g);
+                std_ersp(ALLEEG(STUDY.datasetinfo(index).index), 'channels', tmpchanlist, 'type', type, opts{:}, tmpparams{:});
             else
                 std_ersp(ALLEEG(STUDY.datasetinfo(index).index), 'components', chanlist{index}, 'type', type, 'recompute', g.recompute, tmpparams{:});
             end;
@@ -338,8 +354,50 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
     % ----------------------
     if strcmpi(computewhat, 'channels')
          STUDY.changrp = curstruct;
-         STUDY = std_changroup(STUDY, ALLEEG);
     else STUDY.cluster = curstruct;
     end;
     
     return;
+
+    % get channel indices from changrp structure
+    % ------------------------------------------    
+    function chaninds = getchannelindices(changrp, datasetind);    
+    
+    chaninds = [];
+    for index = 1:length(changrp)    
+        tmpind = find([ changrp(index).setinds{:} ] == datasetind);
+        if ~isempty(tmpind)
+            chaninds = [ chaninds datasetind ];
+        end;
+    end;
+        
+    % find components in cluster for specific dataset
+    % -----------------------------------------------
+    function rmcomps = getclustcomps(STUDY, rmclust, settmpind);    
+    
+        rmcomps   = [ ];
+        for rmi = 1:length(rmclust)
+            findind   = find(settmpind == STUDY.cluster(rmclust(rmi)).setinds{c,g});
+            rmcomps   = [ rmcomps STUDY.cluster(rmclust(rmi)).allinds{c,g}(findind) ];
+        end;
+
+    % make option array and channel list (which depend on interp) for any type of measure
+    % ----------------------------------------------------------------------
+    function [tmpchanlist opts] = getchansandopts(STUDY, ALLEEG, chanlist, index, g);
+        
+        idat = STUDY.datasetinfo(index).index;
+        opts = { 'recompute' g.recompute };
+        if ~isempty(g.rmclust)
+            opts = { opts{:} 'rmcomps' getclustcomps(STUDY, g.rmclust, idat) };                
+        elseif strcmpi(g.rmicacomps, 'on')
+            opts = { opts{:} 'rmcomps' find(ALLEEG(idat).reject.gcompreject) };
+        end;
+        if ~isempty(g.interplocs)
+            alllocs = eeg_mergelocs(ALLEEG(:).chanlocs);
+            tmpchanlist = chanlist;
+            opts = { opts{:} 'interp' g.interplocs };
+        else
+            tmpchanlist = getchannelindices(STUDY.changrp, STUDY.datasetinfo(index).index);
+            tmpchanlist = { ALLEEG(STUDY.datasetinfo(index).index).chanlocs(tmpchanlist).labels };
+        end;
+        

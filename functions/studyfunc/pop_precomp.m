@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2007/09/11 10:38:16  arno
+% now can process ICA components
+%
 % Revision 1.11  2007/08/09 18:50:11  arno
 % remove test of channel labels
 %
@@ -107,11 +110,16 @@ if ~isstr(varargin{1}) %intial settings
     test_ersp      = ['pop_precomp(''testersp'',gcf);']; 
     set_itc        = ['pop_precomp(''setitc'',gcf);']; 
     set_spec       = ['pop_precomp(''setspec'',gcf);']; 
+    set_erp        = ['pop_precomp(''seterp'',gcf);']; 
     test_spec      = ['pop_precomp(''testspec'',gcf);']; 
     str_name       = ['Pre-compute channel measures for STUDY ''' STUDY.name '''' ];
     chanlist       = ['pop_precomp(''chanlist'',gcf);']; 
     chaneditbox    = ['pop_precomp(''chaneditbox'',gcf);']; 
-    warninterp     = ['warndlg2(''EEGLAB has not yet been tested if some channels are missing; use at your own risk'');' ];
+    warninterp     = ''; %['warndlg2(''EEGLAB will crash when plotting a given channel if it is missing in one dataset'');' ];
+    cb_ica1        = [ 'if get(gcbo, ''value''), set(findobj(gcbf, ''tag'', ''rmica2_on''), ''value'', 0); end;' ];
+    cb_ica2        = [ 'if get(gcbo, ''value''), set(findobj(gcbf, ''tag'', ''rmica1_on''), ''value'', 0); end;' ];
+    %cb_ica1        = [ 'get(gcbo, ''value''), findobj(gcbf, ''tag'', ''rmica1_on''),' ];
+    %cb_ica2        = [ 'get(gcbo, ''value''), findobj(gcbf, ''tag'', ''rmica2_on''),' ];
     
     if comps == true
         str_name       = ['Pre-compute component measures for STUDY ''' STUDY.name '''' ];
@@ -119,18 +127,25 @@ if ~isstr(varargin{1}) %intial settings
                     {'style' 'text'       'string' 'Compute ERP/spectrum/ERSP for all components (set) or only those selected by RV (unset)' } };
         guiadd2 = { {'style' 'checkbox'   'string' '' 'tag' 'scalp_on' 'value' 0 }  ...
                     {'style' 'text'       'string' 'Scalp maps' } };
-        geomadd1 = { [0.33 6] };
-        geomadd2 = { [0.33 6] };
+        geomadd1     = { [0.33 6] };
+        geomvertadd1 = [ 1 ];
+        geomadd2     = { [0.33 6] };
     else
-        str_name       = ['Pre-compute channel measures for STUDY ''' STUDY.name '''' ];
-        guiadd1 = { {'style' 'text'       'string' 'Channel list (default:all)' 'FontWeight' 'Bold'} ...
+        str_name = ['Pre-compute channel measures for STUDY ''' STUDY.name '''' ];
+        guiadd1  = { {'style' 'text'       'string' 'Channel list (default:all)' 'FontWeight' 'Bold'} ...
             {'Style' 'edit'       'string' '' 'tag' 'chans' 'callback' chaneditbox }, ...
             {'style' 'pushbutton' 'string'  '...', 'enable' fastif(isempty(ALLEEG(1).chanlocs), 'off', 'on') ...
             'callback' chanlist }, ...
-            {'style' 'checkbox'   'string' '' 'tag' 'interpolate_on' 'value' 1 'callback' warninterp }  ...
-            {'style' 'text'       'string' 'Interpolate missing channels (datasets will be modified on disk)' } };
+            {'style' 'checkbox'   'string' '' 'tag' 'interpolate_on' 'value' 0 'callback' warninterp }  ...
+            {'style' 'text'       'string' 'Spherical interpolation of missing channels (performed after optional ICA removal below)' } ...
+            {'style' 'checkbox'   'string' ' ' 'tag' 'rmica1_on' 'value' 0 'callback' cb_ica1 }  ...
+            {'style' 'text'       'string' 'Remove ICA artifactual components pre-tagged in each dataset' } ...
+            {'style' 'checkbox'   'string' [ ' ' 10 ' ' ] 'tag' 'rmica2_on' 'value' 0 'callback' cb_ica2 }  ...
+            {'style' 'text'       'string' [ 'Remove artifactual ICA cluster or clusters (hold shift key)' 10 ' ' ] } ...
+            {'style' 'listbox'    'string' { STUDY.cluster.name } 'value' 1 'max' 2 } };
         guiadd2 = {};
-        geomadd1 = { [2 3 0.5] [0.33 6] }; 
+        geomadd1 = { [2 3 0.5] [0.33 6] [0.33 6] [0.33 4 2] }; 
+        geomvertadd1 = [ 1 1 1 2 ];
         geomadd2 = { };
     end;
             
@@ -138,11 +153,13 @@ if ~isstr(varargin{1}) %intial settings
     {'style' 'text'       'string' str_name 'FontWeight' 'Bold' 'horizontalalignment' 'left'} {} ...
     guiadd1{:} ...
     {} {'style' 'text'    'string' 'List of measures to precompute' 'FontWeight' 'Bold' 'horizontalalignment' 'left'} ...
-    {'style' 'checkbox'   'string' '' 'tag' 'erp_on' 'value' 0 }  ...
-	{'style' 'text'       'string' 'ERPs' } ...
+    {'style' 'checkbox'   'string' '' 'tag' 'erp_on' 'value' 0 'Callback' set_erp }  ...
+	{'style' 'text'       'string' 'ERPs' } {} ...
+    {'style' 'text'       'string' 'Baseline ([min max] in ms)' 'tag' 'erp_text' 'enable' 'off'}...
+    {'style' 'edit'       'string' '' 'tag' 'erp_base' 'enable' 'off' } { } ...
     {'style' 'checkbox'   'string' '' 'tag' 'spectra_on' 'value' 0 'Callback' set_spec } ...
 	{'style' 'text'       'string' 'Power spectrum' } {} ...
-    {'style' 'text'       'string' 'Parameters' 'tag' 'spec_push' 'value' 1 'enable' 'off'}...
+    {'style' 'text'       'string' 'Spectopo parameters' 'tag' 'spec_push' 'enable' 'off'}...
     {'style' 'edit'       'string' specparams_str 'tag' 'spec_params' 'enable' 'off' } ...
     {'style' 'pushbutton' 'string' 'Test' 'tag' 'spec_test' 'enable' 'off' 'callback' test_spec}...
     {'style' 'checkbox'   'string' '' 'tag' 'ersp_on' 'value' 0 'Callback' set_ersp }  ...
@@ -175,8 +192,8 @@ if ~isstr(varargin{1}) %intial settings
     firsttimeersp = 1;
     fig_arg = { ALLEEG STUDY allchans chanlist firsttimeersp };
     geomline = [0.45 1 0.3 2 3 0.7 ];
-    geometry = { [1] [1] geomadd1{:}  [1] [1] [0.33 6] [0.45 1.5 0.3 1.5 3 0.7 ] geomline geomline geomadd2{:} 1 [0.05 1] };
-    geomvert = [ 1 0.5 fastif(length(geomadd1) == 1,1,[1 1]) 0.5 1 1 1 1 1 1 fastif(length(geomadd2) == 1,1,[]) 1 1];
+    geometry = { [1] [1] geomadd1{:}  [1] [1] [0.40 1.5 0.3 2 2 0.65 ] [0.40 1.5 0.3 2 2 0.65 ] geomline geomline geomadd2{:} 1 [0.05 1] };
+    geomvert = [ 1 0.5 geomvertadd1 0.5 1 1 1 1 1 1 fastif(length(geomadd2) == 1,1,[]) 1 1];
 	[precomp_param, userdat2, strhalt, os] = inputgui( 'geometry', geometry, 'uilist', gui_spec, 'geomvert', geomvert, ...
                                                       'helpcom', ' pophelp(''std_precomp'')', ...
                                                       'title', 'Select and compute component measures for later clustering -- pop_precomp()', ...
@@ -194,8 +211,20 @@ if ~isstr(varargin{1}) %intial settings
     
     % interpolate option is on
     % ------------------------
+    if os.rmica1_on == 1 
+        options = { options{:} 'rmicacomps' 'on' };
+    end
+    
+    % remove ICA cluster
+    % ------------------
+    if os.rmica2_on == 1 
+        options = { options{:} 'rmclust' str2num(os.rmica2_text) };
+    end
+    
+    % interpolate option is on
+    % ------------------------
     if os.interpolate_on == 1 
-        options = { options{:} 'interpolate' 'on' };
+        options = { options{:} 'interp' 'on' };
     end
 
     % compallersp option is on
@@ -214,6 +243,9 @@ if ~isstr(varargin{1}) %intial settings
     % ----------------
     if os.erp_on == 1 
         options = { options{:} 'erp' 'on' };
+        if ~isempty(os.erp_base)
+            options = { options{:} 'rmbase' str2num(os.erp_base) };
+        end
     end
     
     % SCALP option is on
@@ -267,8 +299,10 @@ else
                
         case 'chanlist'
             [tmp tmp2 tmp3] = pop_chansel(allchans, 'select', chansel);
-            set(findobj('parent', hdl, 'tag', 'chans'), 'string', tmp2);
-            userdat{4} = tmp3;
+            if ~isempty(tmp)
+                set(findobj('parent', hdl, 'tag', 'chans'), 'string', tmp2);
+                userdat{4} = tmp3;
+            end;
             set(hdl, 'userdata',userdat); 
      
         case 'chaneditbox'
@@ -305,6 +339,15 @@ else
                  set(findobj('parent', hdl,'tag', 'spec_test'),   'enable', 'off');
             end
 
+        case 'seterp'
+            set_erp = get(findobj('parent', hdl, 'tag', 'erp_on'), 'value'); 
+            if set_erp
+                 set(findobj('parent', hdl,'tag', 'erp_text'), 'enable', 'on');
+                 set(findobj('parent', hdl,'tag', 'erp_base'), 'enable', 'on');
+            else set(findobj('parent', hdl,'tag', 'erp_text'), 'enable', 'off');
+                 set(findobj('parent', hdl,'tag', 'erp_base'), 'enable', 'off');
+            end
+            
         case 'testspec'
             try,
                 spec_params = eval([ '{' get(findobj('parent', hdl, 'tag', 'spec_params'), 'string') '}' ]); 
