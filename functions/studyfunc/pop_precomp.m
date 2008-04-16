@@ -211,15 +211,19 @@ if ~isstr(varargin{1}) %intial settings
     
     % interpolate option is on
     % ------------------------
-    if os.rmica1_on == 1 
-        options = { options{:} 'rmicacomps' 'on' };
-    end
+    if isfield(os, 'rmica1_on')
+        if os.rmica1_on == 1 
+            options = { options{:} 'rmicacomps' 'on' };
+        end
+    end;
     
     % remove ICA cluster
     % ------------------
-    if os.rmica2_on == 1 
-        options = { options{:} 'rmclust' str2num(os.rmica2_text) };
-    end
+    if isfield(os, 'rmica1_on')
+        if os.rmica2_on == 1 
+            options = { options{:} 'rmclust' str2num(os.rmica2_text) };
+        end
+    end;
     
     % interpolate option is on
     % ------------------------
