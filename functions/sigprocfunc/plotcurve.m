@@ -140,9 +140,16 @@ function plotcurve( times, R, varargin);
   if isempty(g.ylim), 
     yl = max(abs(reshape(R, [1 prod(size(R))])))*1.2;
     g.ylim = [-yl yl];
+    if isnan(yl), g.ylim = ylim; end;
   end;
-  if ~isempty(g.ylim) & length(g.ylim) == 2
-      ylim(g.ylim);
+  if ~isempty(g.ylim) & length(g.ylim) == 2 
+      if any(g.ylim)
+          ylim(g.ylim);
+      else
+          ylim([0 1]);
+          axis off;
+          box off;
+      end;
   elseif ~isempty(g.ylim)
       yl = ylim;
       ylim([g.ylim yl(2)]);
