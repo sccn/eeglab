@@ -25,6 +25,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2006/02/03 18:53:30  arno
+% more detailed message
+%
 % Revision 1.1  2006/01/31 20:07:08  arno
 % Initial revision
 %
@@ -58,6 +61,8 @@ try,
     
     eeg_optionsbackup;
     eeg_options;
+    
+    option_savematlab = ~option_savetwofiles;
     
 catch 
     disp('Warning: could not access the local eeg_options file');
