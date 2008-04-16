@@ -67,6 +67,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2007/02/16 18:59:24  scott
+% clarified help msg  -sm
+%
 % Revision 1.31  2006/05/04 10:07:07  arno
 % same
 %
@@ -280,7 +283,7 @@ if nargin < 2
         end;
     end;
     
-    geometry = { [1] [1.8 1] [1.8 1] [1.8] [1.8] [1] [1] };
+    geometry = { [1] [1.8 1] [1.8 1] [1.8] [1] [1.8] [1] [1.8 1] };
     uilist = { { 'style' 'text' 'string' ['Current data reference state is: ' curref] } ...
                { 'style' 'checkbox' 'tag' 'ave' 'value' fastif(strcmp(EEG.ref, 'averef'), 0, 1) 'string' 'Compute average reference' ...
                          'callback' ...
@@ -294,9 +297,10 @@ if nargin < 2
                { 'style' 'checkbox' 'tag' 'rerefstr' 'string' 'Retain reference channels in data (if more than one)' 'enable' enable1 } ...
                { 'style' 'text' 'string' [ 'Note: to include current reference in new reference, include channel ' int2str(EEG.nbchan+1) ' above' ] ...
                  'enable' fastif(includeref, 'on', 'off') } ...
+               { 'style' 'checkbox' 'value' includeref 'enable' fastif(includeref, 'on', 'off') 'string' 'Add current reference channel to data' } ...
                { } ...
-               { 'style' 'checkbox' 'value' includeref 'enable' fastif(includeref, 'on', 'off') ...
-                 'string' 'Add current reference channel to data' } };
+               { 'style' 'text' 'string' 'Exclude channel indices (EMG, EOG)' } ...
+               { 'style' 'edit' 'tag' 'exclude' 'string' '' } };
     
     result = inputgui(geometry, uilist, 'pophelp(''pop_reref'')', 'pop_reref - average reference or re-reference data');
     if isempty(result), return; end;
@@ -310,7 +314,8 @@ if nargin < 2
     elseif result{4}
         options = { options{:} 'keepref' 'on' };
     end;
-    if result{5}, options = { options{:} 'method' 'withref' }; end;
+    if result{5},           options = { options{:} 'method' 'withref' }; end;
+    if ~isempty(result{6}), options = { options{:} 'exclude' eval([ '[' result{6} ']' ] ) }; end;
 else
     options = varargin;
 end;
