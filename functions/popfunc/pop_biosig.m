@@ -307,4 +307,3 @@ if isempty(options)
 else
     command = sprintf('EEG = pop_biosig(''%s'', %s);', filename, vararg2str(options)); 
 end;    
-
