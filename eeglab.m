@@ -190,6 +190,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.522  2008/02/15 16:21:28  arno
+% adding a menu for channel rejection
+%
 % Revision 1.521  2007/11/16 21:45:29  arno
 % special font for linex
 %
@@ -264,7 +267,7 @@
 % spelling and doc update
 %
 % Revision 1.493  2006/11/20 18:48:39  arno
-% fix typo in delimiter
+% fix typo in filesep
 %
 % Revision 1.492  2006/11/15 21:01:37  arno
 % tag for study menu
@@ -1926,6 +1929,7 @@ catchstrs.new_non_empty          = e_newset;
     % create eeglab figure
     % --------------------
     eeg_mainfig(onearg);
+    ptopoplot = which('topoplot');
 
     % detecting icalab
     % ----------------
@@ -1933,31 +1937,72 @@ catchstrs.new_non_empty          = e_newset;
         disp('ICALAB toolbox detected (algo. added to "run ICA" interface)');
     end;
     
-    % BIOSIG plugin (not in plugin folder)
-    % ------------------------------------
+    % adding all folders in external
+    % ------------------------------
+    disp(['Adding path to all EEGLAB functions']);
     p = which('eeglab.m');
     p = p(1:findstr(p,'eeglab.m')-1);
-    delimiter = p(end); if strcmpi(delimiter, ':'), delimiter = '::'; end;
-    path_biosig = [ p '..' delimiter 'biosig' delimiter 't200' ];
+    allseps = find( p == filesep );
+    p_parent = p(1:allseps(end-min(1,length(allseps))));
+    eeglabpath = p(allseps(end-min(1,length(allseps)))+1:end);
+    dircontent  = dir([ p 'external' ]);
+    dircontent  = { dircontent.name };
+    for index = 1:length(dircontent)
+        if dircontent{index}(1) ~= '.'
+            if exist([p 'external' filesep dircontent{index}]) == 7
+                addpath([p 'external' filesep dircontent{index}]);
+                disp(['Adding path to ' eeglabpath 'external' filesep dircontent{index}]);
+            end;
+        end;
+    end;
+    
+    % check for older version of Fieldtrip and presence of topoplot
+    % -------------------------------------------------------------
+    dircontent  = dir([ p '..' filesep ]);
+    dircontent  = { dircontent.name };
+    ind = strmatch('fieldtrip', lower(dircontent));
+    if ~isempty(ind)
+        for index = ind
+            if exist([p_parent dircontent{index}]) == 7
+                disp('   FieldTrip is now in the "external" folder of EEGLAB');
+                disp([ '   Please delete old folder ' [p_parent dircontent{index}] ]);
+            end;
+        end;
+    end;
+    ptopoplot2 = which('topoplot');
+    if ~strcmpi(ptopoplot, ptopoplot2),
+        %disp('  Warning: duplicate function topoplot.m in Fieldtrip and EEGLAB');
+        %disp('  EEGLAB function will prevail and call the Fieldtrip one when appropriate');
+        addpath(fileparts(ptopoplot));
+    end;
+
+    % BIOSIG plugin (not in plugin folder)
+    % ------------------------------------
+    path_biosig = [ p 'external' filesep 'biosig' filesep 't200' ];
+    path_biosig2 = [ p_parent 'biosig' filesep 't200' ];
     biosigflag = 0;
     if exist(path_biosig) == 7
-        try,
-            addpath(path_biosig);
-            addpath([ p '..' delimiter 'biosig' ]); % for str2double
-            addpath([ p '..' delimiter 'biosig' delimiter 't200' ]);
-            addpath([ p '..' delimiter 'biosig' delimiter 't250' ]);
-            addpath([ p '..' delimiter 'biosig' delimiter 't300' ]);
-            addpath([ p '..' delimiter 'biosig' delimiter 't400' ]);
-            addpath([ p '..' delimiter 'biosig' delimiter 't490' ]);
-            % addpath([ p '..' delimiter 'biosig' delimiter 't500' ]); % topoplot conflict
-            version = [ p '..' delimiter 'biosig' delimiter 'VERSION' ];
-            version = loadtxt(version, 'convert', 'off', 'verbose', 'off');
-            version = [ version{2,3}(1) '.' version{2,3}(2:end) ];
-            disp(['eeglab: adding "BIOSIGv' version '" plugin' ]);
-            biosigflag = 1;
-        catch
-            disp([ 'eeglab: cannot find BIOSIG plugin' ] ); 
-            disp([ '   ' lasterr] );
+        if exist(path_biosig2) == 7
+            disp('   BIOSIG is now in the "external" folder of EEGLAB');
+            disp([ '   Please delete old folder ' path_biosig2(1:end-4) ]);
+        else
+            try,
+                addpath(path_biosig);
+                addpath([ p 'external' filesep 'biosig' ]); % for str2double
+                addpath([ p 'external' filesep 'biosig' filesep 't200' ]);
+                addpath([ p 'external' filesep 'biosig' filesep 't250' ]);
+                addpath([ p 'external' filesep 'biosig' filesep 't300' ]);
+                addpath([ p 'external' filesep 'biosig' filesep 't400' ]);
+                addpath([ p 'external' filesep 'biosig' filesep 't490' ]);
+                % addpath([ p 'external' filesep 'biosig' filesep 't500' ]); % topoplot conflict
+                version = [ p 'external' filesep 'biosig' filesep 'VERSION' ];
+                version = loadtxt(version, 'convert', 'off', 'verbose', 'off');
+                version = [ version{2,3}(1) version{2,3}(2:end) ];
+                biosigflag = 1;
+            catch
+                disp([ 'eeglab: cannot find BIOSIG plugin' ] ); 
+                disp([ '   ' lasterr] );
+            end;
         end;
     end;            
     
@@ -1970,6 +2015,7 @@ catchstrs.new_non_empty          = e_newset;
     cb_loadeeg     = [ nocheck '[EEG LASTCOM] = pop_loadeeg;'     e_newset ]; 
 	cb_read_erpss  = [ nocheck '[EEG LASTCOM] = pop_read_erpss;'  e_newset ]; 
     cb_biosig      = [ nocheck '[EEG LASTCOM] = pop_biosig; '     e_newset ]; 
+    cb_fileio      = [ nocheck '[EEG LASTCOM] = pop_fileio; '     e_newset ]; 
 
     cb_importepoch = [ checkepoch   '[EEG LASTCOM] = pop_importepoch(EEG);'   e_store ];
 	cb_loaddat     = [ checkepoch   '[EEG LASTCOM]= pop_loaddat(EEG);'        e_store ]; 
@@ -2122,9 +2168,8 @@ catchstrs.new_non_empty          = e_newset;
     % BIOSIG MENUS
     % ------------
     if biosigflag
-        uimenu( neuro_m, 'Label', 'From Biosemi .BDF file using BIOSIG', 'CallBack', cb_biosig, 'Separator', 'on'); 
-        uimenu( neuro_m, 'Label', 'From EDF files using BIOSIG', 'CallBack'        , cb_biosig); 
-        uimenu( neuro_m, 'Label', 'From other formats using BIOSIG'    , 'CallBack', cb_biosig); 
+        uimenu( neuro_m, 'Label', 'From Biosemi .BDF file', 'CallBack', cb_biosig, 'Separator', 'on'); 
+        uimenu( neuro_m, 'Label', 'From EDF files', 'CallBack'        , cb_biosig); 
     end;
     
     uimenu( epoch_m, 'Label', 'From Matlab array or ASCII file'       , 'CallBack', cb_importepoch);
@@ -2279,7 +2324,6 @@ catchstrs.new_non_empty          = e_newset;
     p = p(1:findstr(p,'eeglab.m')-1);
     dircontent1 = what(p);
     dircontent  = dir([ p 'plugins' ]);
-    delimiter = p(end); if strcmpi(delimiter, ':'), delimiter = '::'; end;
     dircontent  = { dircontent1.m{:} dircontent.name };
 
     % scan plugin folder
@@ -2289,10 +2333,10 @@ catchstrs.new_non_empty          = e_newset;
         % find function
         % -------------
         funcname = '';
-        if exist([p 'plugins' delimiter dircontent{index}]) == 7
+        if exist([p 'plugins' filesep dircontent{index}]) == 7
             if ~strcmpi(dircontent{index}, '.') & ~strcmpi(dircontent{index}, '..')
-                addpath([ p 'plugins' delimiter dircontent{index} ]);
-                tmpdir = dir([ p 'plugins' delimiter dircontent{index}]);
+                addpath([ p 'plugins' filesep dircontent{index} ]);
+                tmpdir = dir([ p 'plugins' filesep dircontent{index}]);
                 for tmpind = 1:length(tmpdir)
                     % find plugin function in subfolder
                     % ---------------------------------
@@ -2304,8 +2348,8 @@ catchstrs.new_non_empty          = e_newset;
                     % spetial case of eeglab subfolder (for BIOSIG)
                     % --------------------------------
                     if strcmpi(tmpdir(tmpind).name, 'eeglab')
-                        addpath([ p 'plugins' delimiter dircontent{index} delimiter 'eeglab' ],'-end');
-                        tmpdir2 = dir([ p 'plugins' delimiter dircontent{index} delimiter 'eeglab' ]);
+                        addpath([ p 'plugins' filesep dircontent{index} filesep 'eeglab' ],'-end');
+                        tmpdir2 = dir([ p 'plugins' filesep dircontent{index} filesep 'eeglab' ]);
                         for tmpind2 = 1:length(tmpdir2)
                             if ~isempty(findstr(tmpdir2(tmpind2).name, 'eegplugin')) ...
                                     & tmpdir2(tmpind2).name(end) == 'm'
@@ -2345,14 +2389,20 @@ catchstrs.new_non_empty          = e_newset;
     % add other import ...
     % --------------------
     cb_others = [ 'warndlg2(strvcat(''Several EEGLAB plugins (not included by default) are available to import cogniscan,'',' ...
-                                   ''' micromed, and TDT formats. To download plugins go to http://www.sccn.ucsd.edu/eeglab/plugins/.'',' ...
+                                   ''' micromed, and TDT formats. To download plugins go to www.sccn.ucsd.edu/eeglab/plugins/.'',' ...
                                    '''  '',' ...
-                                   '''The BIOSIG toolbox (included by default in menu item "File > Import data > From other'',' ...
-                                   '''formats using BIOSIG") also allow to import in EEGLAB a variety of data file formats'',' ...
-                                   '''(see http://biosig.sourceforge.net/SupportedSystems.html for supported file formats)'',' ...
-                                   '''If the EEGLAB import function fails, try also using "From Other formats using BIOSIG"''),' ...
-                                   '''import other data formats'');' ];
-    uimenu( neuro_m, 'Label', 'Troubleshooting, other data formats...', 'CallBack', cb_others, 'separator', 'on');    
+                                   '''The FILEIO and BIOSIG toolboxes interface (included at the end of the import data'',' ...
+                                   '''menu) also allow to import in EEGLAB a wide variety of EEG/MEG data file formats'',' ...
+                                   '''(see www2.ru.nl/fcdonders/fieldtrip/doku.php?id=fieldtrip:dataformat (FILEIO) and'',' ...
+                                   '''biosig.sourceforge.net/SupportedSystems.html (BIOSIG) for supported file formats)'',' ...
+                                   ''' ''));' ];
+    if exist('read_event')
+        uimenu( neuro_m, 'Label', 'From other formats using FILE-IO'  , 'CallBack', cb_fileio, 'separator', 'on'); 
+    end;
+    if biosigflag
+        uimenu( neuro_m, 'Label', 'From other formats using BIOSIG'   , 'CallBack', cb_biosig); 
+    end;
+    uimenu( neuro_m, 'Label', 'Troubleshooting, other data formats...', 'CallBack', cb_others);    
     
     % changing plugin menu color
     % --------------------------
@@ -3168,8 +3218,8 @@ function myaddpath(eeglabpath, functionname, pathtoadd);
     tmpnewpath = [ eeglabpath pathtoadd ];
     if ~isempty(tmpp)
         tmpp = tmpp(1:end-length(functionname));
-        if length(tmpp) > length(tmpnewpath), tmpp = tmpp(1:end-1); end; % remove trailing delimiter
-        if length(tmpp) > length(tmpnewpath), tmpp = tmpp(1:end-1); end; % remove trailing delimiter
+        if length(tmpp) > length(tmpnewpath), tmpp = tmpp(1:end-1); end; % remove trailing filesep
+        if length(tmpp) > length(tmpnewpath), tmpp = tmpp(1:end-1); end; % remove trailing filesep
         %disp([ tmpp '     |        ' tmpnewpath '(' num2str(~strcmpi(tmpnewpath, tmpp)) ')' ]);
         if ~strcmpi(tmpnewpath, tmpp)
             warning off;
