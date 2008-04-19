@@ -163,6 +163,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.283  2008/01/10 01:24:55  nima
+% dipole direction line problem fixed.
+%
 % Revision 1.282  2007/11/29 17:49:56  arno
 % header typo
 %
@@ -853,8 +856,6 @@ icadefs                 % read defaults MAXTOPOPLOTCHANS and DEFAULT_ELOC and BA
 if ~exist('BACKCOLOR')  % if icadefs.m does not define BACKCOLOR
    BACKCOLOR = [.93 .96 1];  % EEGLAB standard
 end
-cmap = colormap;
-cmaplen = size(cmap,1);
 whitebk = 'off';  % by default, make gridplot background color = EEGLAB screen background color
 
 plotgrid = 'off';
@@ -929,6 +930,7 @@ end
 % calling topoplot from Fieldtrip
 % -------------------------------
 fieldtrip = 0;
+if nargin < 2, loc_file = []; end;
 if isstruct(Values) | ~isstruct(loc_file), fieldtrip == 1; end;
 if isstr(loc_file), if exist(loc_file) ~= 2, fieldtrip == 1; end; end;
 if fieldtrip
@@ -1214,6 +1216,9 @@ end
 if strcmpi(whitebk, 'on')
     BACKCOLOR = [ 1 1 1 ];
 end;
+
+cmap = colormap;
+cmaplen = size(cmap,1);
 
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%% test args for plotting an electrode grid %%%%%%%%%%%%%%%%%%%%%%
