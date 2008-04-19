@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2008/04/16 18:41:19  arno
+% do not call recursively eeg_checkset
+%
 % Revision 1.2  2008/01/08 23:03:31  arno
 % added verbose mode
 %
@@ -95,7 +98,8 @@ function data = eeg_getdatact( EEG, varargin);
     elseif ~isempty(opt.component)
 
         if isempty(EEG.icaact)
-            data = (EEG.icaweights(opt.component,:)*EEG.icasphere)*EEG.data(EEG.icachansind,:);
+            data = eeg_getdatact( EEG );
+            data = (EEG.icaweights(opt.component,:)*EEG.icasphere)*data(EEG.icachansind,:);
         else
             data = EEG.icaact(opt.component,:,:);
         end;
