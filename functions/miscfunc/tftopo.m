@@ -90,6 +90,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.86  2007/08/15 00:37:01  arno
+% same
+%
 % Revision 1.85  2007/08/15 00:35:52  arno
 % same
 %
@@ -437,8 +440,13 @@ end;
 if ~isempty(g.signifs)
     if size(g.signifs,1) > 2 | size(g.signifs,2) ~= size(tfdata,1)| ...
             (size(g.signifs,3) ~= size(tfdata,3) & size(g.signifs,4) ~= size(tfdata,3))
-        fprintf('tftopo(): error in ''signifs'' array size not compatible with data size.\n');
-        return
+        fprintf('tftopo(): error in ''signifs'' array size not compatible with data size, trying to transpose.\n');
+        g.signifs = permute(g.signifs, [2 1 3 4]);
+        if size(g.signifs,1) > 2 | size(g.signifs,2) ~= size(tfdata,1)| ...
+            (size(g.signifs,3) ~= size(tfdata,3) & size(g.signifs,4) ~= size(tfdata,3))
+            fprintf('tftopo(): ''signifs'' still the wrong size.\n');
+            return
+        end;
     end
 end;
 
