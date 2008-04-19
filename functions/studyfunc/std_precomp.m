@@ -96,6 +96,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2008/04/16 18:40:32  arno
+% do not initialize changrp for component
+% computation
+%
 % Revision 1.21  2008/02/15 16:51:36  arno
 % simplify code for merging channel location files
 %
@@ -369,7 +373,7 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
     for index = 1:length(changrp)    
         tmpind = find([ changrp(index).setinds{:} ] == datasetind);
         if ~isempty(tmpind)
-            chaninds = [ chaninds datasetind ];
+            chaninds = [ chaninds index ];
         end;
     end;
         
