@@ -543,7 +543,7 @@ for c = 1:ncplot
 end;
 
 if strcmpi(opt.plottopo, 'off'), 
-    %axcopy;
+    axcopy;
     % remove axis labels (for most but not all)
     % ------------------
     if strcmpi(opt.subplot, 'transpose')
