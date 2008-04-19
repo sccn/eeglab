@@ -65,6 +65,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2008/04/16 18:03:41  arno
+% use nan_mean in case some subjects are missing data
+%
 % Revision 1.14  2007/09/11 10:49:57  arno
 % fix numerous small display problems
 % and crash
@@ -540,7 +543,7 @@ for c = 1:ncplot
 end;
 
 if strcmpi(opt.plottopo, 'off'), 
-    axcopy;
+    %axcopy;
     % remove axis labels (for most but not all)
     % ------------------
     if strcmpi(opt.subplot, 'transpose')
