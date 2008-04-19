@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2006/08/04 18:46:55  zhenkun
+% nothing
+%
 % Revision 1.7  2005/10/26 01:27:54  arno
 % filename
 %
@@ -63,7 +66,7 @@ if nargin < 1
 	[filename, filepath] = uigetfile('*.RAW;*.raw', 'Choose first EGI RAW file -- pop_readsegegi()'); 
     drawnow;
 	if filename == 0 return; end;
-	filename = [filepath filename];
+	filename = fullfile(filepath, filename);
 end;
 
 % load datas
@@ -78,7 +81,7 @@ Eventdata = [];
 
 disp('Removing trailing character of selected file to find base file name');
 fprintf('Base file name is: %s\n', basename);
-orifilename = [ basename '/' sprintf('%3.3d', index) tailname ];
+orifilename = [ basename sprintf('%3.3d', index) tailname ];
 if ~exist(orifilename)
     disp ([ 'First file of series ''' orifilename ''' not found' ] );
     error([ 'First file of series ''' orifilename ''' not found' ] );
