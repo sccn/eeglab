@@ -114,7 +114,6 @@ function plotcurve( times, R, varargin);
       end;
   end;
   ax = gca;
-  axes(ax);
   if ~isempty(g.maskarray) & strcmpi(g.highlightmode, 'bottom')
       pos = get(gca, 'position');
       set(gca, 'position', [ pos(1)+pos(3)*0.1 pos(2)+pos(4)*0.1 pos(3)*0.9 pos(4)*0.85 ]);
