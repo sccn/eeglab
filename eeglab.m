@@ -7,7 +7,8 @@
 %   User feedback welcome: email eeglab@sccn.ucsd.edu
 %
 % Authors: Arnaud Delorme and Scott Makeig, with substantial contributions
-%   from Colin Humphries, Sigurd Enghoff, Tzyy-Ping Jung, plus contributions 
+%   from Colin Humphries, Sigurd Enghoff, Tzyy-Ping Jung, plus
+%   contributions 
 %   from Tony Bell, Te-Won Lee, Luca Finelli and many other contributors. 
 %
 % Description:
@@ -190,6 +191,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.523  2008/04/18 15:23:23  arno
+% changing import data menu
+%
 % Revision 1.522  2008/02/15 16:21:28  arno
 % adding a menu for channel rejection
 %
@@ -2484,6 +2488,9 @@ W_MAIN = figure('Units','points', ...
 	'Tag','EEGLAB', ...
     'visible', 'off', ...   
 	'Userdata', {[] []});
+try,
+    set(W_MAIN, 'NextPlot','new');
+catch, end;
 BackgroundColor = get(gcf, 'color'); %[0.701960784313725 0.701960784313725 0.701960784313725];
 H_MAIN(1) = uicontrol('Parent',W_MAIN, ...
 	'Units','points', ...
