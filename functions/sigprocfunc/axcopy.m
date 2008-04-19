@@ -36,6 +36,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2007/08/14 19:01:59  arno
+% same
+%
 % Revision 1.13  2007/08/14 18:58:56  arno
 % axes fix
 %
@@ -104,23 +107,19 @@ else
     hndl=fig;
 end;
 offidx=[];
+if exist('command') ~= 1
+    comstr = 'copyaxis';
+else
+   command_dbl = double(command);
+   comstr = double(['copyaxis(''' char(command_dbl) ''')']); 
+end;
 for a=1:length(hndl)                    % make all axes visible
-    if exist('command') ~= 1
-        if isempty( get(findobj('parent',hndl(a)),'ButtonDownFcn') )
-            set(findobj('parent',hndl(a)),'ButtonDownFcn','copyaxis');
+    allobjs = findobj('parent',hndl(a));
+    for index = 1:length(allobjs)
+        if isempty(get(allobjs(index), 'ButtonDownFcn'))
+            set(allobjs(index), 'ButtonDownFcn', char(comstr));
         end;
-    else
-        command_dbl = double(command);
-        % set(findobj('parent',hndl(a)),'ButtonDownFcn',['copyaxis(''' command ''')']);
-        comstr = double(['copyaxis(''' char(command_dbl) ''')']);
-        allobjs = findobj('parent',hndl(a));
-        for index = 1:length(allobjs)
-            if isempty(get(allobjs(index), 'ButtonDownFcn'))
-                set(allobjs(index), 'ButtonDownFcn', char(comstr));
-            end;
-        end;
-        %set(findobj('parent',hndl(a)),'ButtonDownFcn',char(comstr));
-    end;        
+    end;
 end
 if ~strcmpi(get(fig, 'type'), 'axes')
     figure(fig);
