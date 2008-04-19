@@ -213,8 +213,8 @@
 %                      to compute the ERSP.
 %            times  = vector of output times (spectral time window centers) (in ms).
 %            freqs  = vector of frequency bin centers (in Hz).
-%         erspboot  = (nfreqs,2) matrix of [lower;upper] ERSP significance diffs.boottype
-%          itcboot  = (nfreqs,2) matrix of [lower;upper] abs(itc) threshold pairs.
+%         erspboot  = (nfreqs,2) matrix of [lower upper] ERSP significance.
+%          itcboot  = (nfreqs) matrix of [upper] abs(itc) threshold.
 %           tfdata  = optional (nfreqs,timesout,trials) time/frequency decomposition 
 %                      of the single data trials
 %
@@ -239,7 +239,7 @@
 % Authors: Arnaud Delorme, Sigurd Enghoff, Jean Hausser, & Scott Makeig
 %          CNL / Salk Institute 1998- | SCCN/INC, UCSD 2002-
 %
-% See also: timefreq(), condstat(), newcrossf()
+% See also: timefreq(), condstat(), newcrossf(), tftopo()
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -1096,7 +1096,8 @@ g = finputcheck(varargin, ...
     'cycleinc'      'string'   {'linear' 'log'}        'linear'
     });
 if isstr(g), error(g); end;
-
+if strcmpi(g.freqscale, 'log') & g.freqs(1) == 0, g.freqs(1) = 3; end;
+    
 g.tlimits = tlimits;
 g.frames   = frames;
 g.srate   = Fs;
@@ -1756,6 +1757,10 @@ end;
 if strcmpi(g.outputformat, 'old')
     R = abs(R); % convert coherence vector to magnitude
     mbase = 10^(mbase/10);
+end;
+if strcmpi(g.verbose, 'on')
+    disp('Note: Add output variables to command line call in history to');
+    disp('      retrieve results and use the tftopo function to replot them');
 end;
 return;
 
