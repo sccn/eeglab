@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2007/01/26 18:10:30  arno
+% Initial revision
+%
 
 function [Axes, outchannames ]= metaplottopo(data, varargin);
 
@@ -62,7 +65,7 @@ TICKFONTSIZE  = 8;       % font size to use for axis labels
 TITLEFONTSIZE = 12;      % font size to use for the plot title
 PLOT_WIDTH    = 0.95;     % 0.75, width and height of plot array on figure
 PLOT_HEIGHT   = 0.88;    % 0.88
-gcapos = get(gca,'Position');
+gcapos = get(gca,'Position'); axis off;
 PLOT_WIDTH    = gcapos(3)*PLOT_WIDTH; % width and height of gca plot array on gca
 PLOT_HEIGHT   = gcapos(4)*PLOT_HEIGHT;
 MAXCHANS      = 256;     % can be increased
@@ -134,9 +137,6 @@ set(h,'PaperUnits','normalized'); % use percentages to avoid US/A4 difference
 set(h,'PaperPosition',[0.0235308 0.0272775 0.894169 0.909249]); % equivalent
 orient portrait
 axis('normal');
-
-icadefs;
-set(gca,'Color',BACKCOLOR);               % set the background color
 
 axcolor= get(0,'DefaultAxesXcolor'); % find what the default x-axis color is
 vertcolor = 'k';
@@ -257,7 +257,6 @@ yvals = gcapos(2)+gcapos(4)/2+PLOT_HEIGHT*yvals;  % controls height of plot
 %
 
 Axes = [];
-
 fprintf('Plotting all channel...');
 for c=1:length(g.chans), %%%%%%%% for each data channel %%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -265,7 +264,6 @@ for c=1:length(g.chans), %%%%%%%% for each data channel %%%%%%%%%%%%%%%%%%%%%%%%
     ycenter = yvals(c);
     Axes = [Axes axes('Units','Normal','Position', ...
         [xcenter-axwidth/2 ycenter-axheight/2 axwidth axheight])];
-    axes(Axes(c));
     hold on;
     axis('off');
     %axes('Units','Normal','Position', [xcenter-axwidth/2 ycenter-axheight/2 axwidth axheight])
@@ -275,7 +273,7 @@ for c=1:length(g.chans), %%%%%%%% for each data channel %%%%%%%%%%%%%%%%%%%%%%%%
     %%%%%%%%%%%%%%%%%%%%%%% Plot data traces %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %
     if ~isempty( g.plotfunc )
-        figure(curfig);
+        %figure(curfig);
         eval( [ 'func = @' g.plotfunc ';' ] );
         if iscell(data), tmp = { g.plotargs{1:g.datapos(1)-1} data{1}(c,:) g.plotargs{g.datapos(1):g.datapos(2)-1} data{2}(c,:) g.plotargs{g.datapos(2):end}};
         else             tmp = { g.plotargs{1:g.datapos-1}    data(c,:)    g.plotargs{g.datapos:end} };
@@ -340,14 +338,16 @@ if ~isempty(g.calbar)
     
 end;
 
+%        'set(gcbf, ''''unit'''', ''''pixel'''');' ...
+%        'tmp = get(gcbf, ''''position'''');' ...
+%        'tmp2 = get(0, ''''screensize'''');' ...
+%        'if tmp(2)+500 > tmp2(4), tmp(2) = tmp2(4)-500; end;' ...
+%        'set(gcbf, ''''position'''', [ tmp(1) tmp(2) 560   420]);' ...
 g.axcopycom = [ 'axis on;' ...
-        'set(gcf, ''''unit'''', ''''pixel'''');' ...
-        'tmp = get(gcf, ''''position'''');' ...
-        'tmp2 = get(0, ''''screensize'''');' ...
-        'if tmp(2)+500 > tmp2(4), tmp(2) = tmp2(4)-500; end;' ...
-        'set(gcf, ''''position'''', [ tmp(1) tmp(2) 560   420]);' ...
         'tmp = get(gca, ''''userdata'''');' ...
         'if ~isempty(tmp), xlabel(tmp{1});' ...
         'ylabel(tmp{2});' ...
         'legend(tmp{3}{:}); end; clear tmp tmp2;' ];
 axcopy(gcf, g.axcopycom); % turn on popup feature
+icadefs;
+set(gca,'Color',BACKCOLOR);               % set the background color
