@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.111  2008/02/29 16:10:08  arno
+% allow percentage plotting for continuous data
+%
 % Revision 1.110  2007/08/02 23:35:11  arno
 % fixed icachaninds
 %
@@ -687,6 +690,17 @@ else
         else 
             eegspecdBtoplot = eegspecdB;
         end;
+        tmpc = find(eegspecdB(:,1)); 			% > 0 power chans
+        zchans = int2str(find(eegspecdB(:,1) == 0)); 	% 0-power chans
+        if length(tmpc) ~= size(eegspecdB,1)
+            fprintf('\nWarning: channels [%s] have 0 values, so will be omitted from the display', ...
+                       zchans);
+            eegspecdB = eegspecdB(tmpc,:);
+            if ~isempty(specstd),  specstd = specstd(tmpc,:); end
+            if ~isempty(g.chanlocs)
+                g.chanlocs2 = g.chanlocs(tmpc);
+            end
+        end;
         specstd   = 10*log10(specstd);
         eegspecdB = 10*log10(eegspecdB);
         eegspecdBtoplot = 10*log10(eegspecdBtoplot);
@@ -1012,7 +1026,8 @@ if ~isempty(g.freq) &  strcmpi(g.plot, 'on')
 	fprintf('Plotting scalp distributions: ')
 	for f=1:length(g.freq)
 		axes(headax(realpos(f)));
-		topodata = eegspecdB(:,freqidx(f))-mean(eegspecdB(:,freqidx(f)));
+        
+  		topodata = eegspecdB(:,freqidx(f))-mean(eegspecdB(:,freqidx(f)));
 
 		if isnan(g.limits(5)),     
 			maplimits = 'absmax';
