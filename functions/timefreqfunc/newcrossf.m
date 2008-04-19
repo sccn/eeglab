@@ -233,6 +233,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.86  2007/11/21 16:28:08  arno
+% help and topographic plots
+%
 % Revision 1.85  2007/11/05 23:26:41  arno
 % help msg
 %
@@ -843,6 +846,7 @@ if g.trials == 1 & ~strcmpi(g.type, 'crossspec')
     disp('Continuous data: switching to crossspectrum');
     g.type = 'crossspec';
 end;
+if strcmpi(g.freqscale, 'log') & g.freqs(1) == 0, g.freqs(1) = 3; end;
 
 % reshape 3D inputs
 % -----------------
