@@ -1,4 +1,5 @@
-% plottopo() - plot concatenated multichannel data epochs in a topographic or
+% plottopo() - plot concatenated multichannel data epochs in a topographic
+% or
 %              rectangular array. Uses a channel location file with the same 
 %              format as topoplot(), or else plots data on a rectangular grid. 
 %              If data are all positive, they are assumed to be spectra.
@@ -67,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.58  2007/08/09 22:22:57  arno
+% typo
+%
 % Revision 1.57  2007/08/07 19:06:16  arno
 % fix bug 334 and 330; remove channelnos variable
 %
@@ -275,7 +279,7 @@ TICKFONTSIZE  = 8;       % font size to use for axis labels
 TITLEFONTSIZE = 12;      % font size to use for the plot title
 PLOT_WIDTH    = 0.95;     % 0.75, width and height of plot array on figure
 PLOT_HEIGHT   = 0.88;    % 0.88
-gcapos = get(gca,'Position');
+gcapos = get(gca,'Position'); axis off;
 PLOT_WIDTH    = gcapos(3)*PLOT_WIDTH; % width and height of gca plot array on gca
 PLOT_HEIGHT   = gcapos(4)*PLOT_HEIGHT;
 curfig = gcf;            % learn the current graphic figure number
