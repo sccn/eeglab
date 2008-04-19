@@ -1,4 +1,4 @@
-% newtimef() - Returns estimates and plots of mean event-related (log) spectral
+% newtimef() - Return estimates and plots of mean event-related (log) spectral
 %           perturbation (ERSP) and inter-trial coherence (ITC) events
 %           across event-related trials (epochs) of a single input time series.
 %
@@ -6,20 +6,21 @@
 %           series. Use to compare ERSP and ITC means in two conditions.
 %
 %         * Uses either fixed-window, zero-padded FFTs (fastest), wavelet
-%           0-padded DFTs (FFT uses Hanning tapers; wavelets use similar Morlet
-%           tapers),
+%           0-padded DFTs. FFT uses Hanning tapers; wavelets use similar Morlet
+%           tapers.
 %
 %         * For the wavelet and FFT methods, output frequency spacing
 %           is the lowest frequency ('srate'/'winsize') divided by 'padratio'.
 %           NaN input values (such as returned by eventlock()) are ignored.
 %
-%         * If 'alpha' is given, then bootstrap statistics are computed
+%         * If 'alpha' is given (see below), bootstrap statistics are computed
 %           (from a distribution of 'naccu' surrogate data trials) and
 %           non-significant features of the output plots are zeroed out
-%           (i.e., plotted in green).
+%           (and plotted in green).
 %
 %         * Given a 'topovec' topo vector and 'elocs' electrode location file,
-%           the figure also shows a topoplot() of the specified scalp map.
+%           the figure also shows a topoplot() view of the specified scalp map.
+%
 %         * Note: Left-click on subplots to view and zoom in separate windows.
 %
 % Usage with single dataset:
@@ -36,14 +37,14 @@
 %                          % Note: timef() also computes multitaper transforms
 %
 % Required inputs:    Value                                 {default}
-%       data        = Single-channel data vector (1,frames*ntrials) (required)
-%                     2-D array (frames,trials) or 3-D array (1,frames,trials)
-%                     To compare two conditions (data1 and data2)
-%                     in place of single data matrix, enter { data1 data2 }
+%       data        = Single-channel data vector (1,frames*ntrials), else 
+%                     2-D array (frames,trials) or 3-D array (1,frames,trials).
+%                     To compare two conditions (data1 and data2), in place of 
+%                     a single data matrix enter a cell array {data1 data2}
 %       frames      = Frames per trial. Ignored if data is 2-D or 3-D.  {750}
-%       tlimits     = [mintime maxtime] (ms) Epoch time limits {from icadefs.m
-%                     or [-1000 2000]}
-%       srate       = data sampling rate (Hz)   {default: from icadefs.m or 250}
+%       tlimits     = [mintime maxtime] (ms). Epoch time limits {taken from 
+%                     reading icadefs.m, else if none there, [-1000 2000]}
+%       srate       = data sampling rate (Hz)  {default: from icadefs.m or 250}
 %       cycles      = [0] Use FFTs with Hanning window tapering. {default}
 %                   = [real positive scalar] Number of cycles in each Morlet
 %                     (gaussian-tapered) wavelet, constant across frequencies.
@@ -176,7 +177,7 @@
 %                     frequencies given as input. {default: 'on'}
 %       'highlightmode'  = ['background'|'bottom'] For 'curve' plots only,
 %                     display significant time regions either in the plot background
-%                     or underneatht the curve.
+%                     or underneath the curve.
 %       'plotersp'  = ['on'|'off'] Plot power spectral perturbations    {'on'}
 %       'plotitc'   = ['on'|'off'] Plot inter trial coherence           {'on'}
 %       'plotphasesign' = ['on'|'off'] Plot phase sign in the inter trial coherence {'on'}
@@ -204,16 +205,18 @@
 %                        output format, set to 'old' (mbase in absolute amplitude (not
 %                        dB) and real itc instead of complex itc). {default: 'new'}
 % Outputs:
-%            ersp   = Matrix (nfreqs,timesout) of log spectral diffs. from baseline (dB)
-%            itc    = Matrix of inter-trial coherencies (nfreqs,timesout) (range: [0 1])
-%                     Output is complex: ITC magnitude is abs(itc); ITC phase in deg is
-%                     phase(itc)*180/pi.
-%          powbase  = Baseline power spectrum (in dB removed for each window to compute the ersp)
-%            times  = Vector of output times (subwindow centers) (in ms).
-%            freqs  = Vector of frequency bin centers (in Hz).
-%         erspboot  = Matrix (2,nfreqs) of [lower;upper] ERSP significance diffs.boottype
-%          itcboot  = Matrix (2,nfreqs) of [lower;upper] abs(itc) threshold pairs.
-%           tfdata  = time frequency decomposition of the data (nfreqs,timesout,trials)
+%            ersp   = (nfreqs,timesout) matrix of log spectral diffs. from baseline (in dB)
+%            itc    = (nfreqs,timesout) matrix of complex inter-trial coherencies.
+%                     itc is complex -- ITC magnitude is abs(itc); ITC phase in radians
+%                     is phase(itc), or in deg phase(itc)*180/pi.
+%          powbase  = baseline power spectrum (in dB) that was removed for each window 
+%                      to compute the ERSP.
+%            times  = vector of output times (spectral time window centers) (in ms).
+%            freqs  = vector of frequency bin centers (in Hz).
+%         erspboot  = (nfreqs,2) matrix of [lower;upper] ERSP significance diffs.boottype
+%          itcboot  = (nfreqs,2) matrix of [lower;upper] abs(itc) threshold pairs.
+%           tfdata  = optional (nfreqs,timesout,trials) time/frequency decomposition 
+%                      of the single data trials
 %
 % Plot description:
 %   Assuming both 'plotersp' and 'plotitc' options are 'on' (= default). 
@@ -297,6 +300,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.145  2008/03/16 00:48:56  scott
+% added explanation of complex itc output; 'boottype' help msg
+%
 % Revision 1.144  2007/11/21 16:22:25  arno
 % adding plot description and fix plot fo scalp maps
 %
