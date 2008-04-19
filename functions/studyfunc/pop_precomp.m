@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2008/04/16 18:40:10  arno
+% fix additional GUI for channels when dealing with compoents
+%
 % Revision 1.12  2007/09/11 10:38:16  arno
 % now can process ICA components
 %
@@ -123,8 +126,8 @@ if ~isstr(varargin{1}) %intial settings
     
     if comps == true
         str_name       = ['Pre-compute component measures for STUDY ''' STUDY.name '''' ];
-        guiadd1 = { {'style' 'checkbox'   'string' '' 'tag' 'compallersp' 'value' 0 }  ...
-                    {'style' 'text'       'string' 'Compute ERP/spectrum/ERSP for all components (set) or only those selected by RV (unset)' } };
+        guiadd1 = { {'style' 'checkbox'   'string' '' 'tag' 'compallersp' 'value' 1 }  ...
+                    {'style' 'text'       'string' 'Compute ERP/spectrum/ERSP only for components selected by RV (set) or for all components (unset)' } };
         guiadd2 = { {'style' 'checkbox'   'string' '' 'tag' 'scalp_on' 'value' 0 }  ...
                     {'style' 'text'       'string' 'Scalp maps' } };
         geomadd1     = { [0.33 6] };
@@ -233,7 +236,7 @@ if ~isstr(varargin{1}) %intial settings
 
     % compallersp option is on
     % ------------------------
-    if os.compallersp == 1 
+    if os.compallersp == 0 
         options = { options{:} 'allcomps' 'on' };
     end    
     
