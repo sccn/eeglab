@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1.07  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2007/08/09 22:52:55  arno
+% change check strings
+%
 % Revision 1.24  2007/08/07 21:11:18  arno
 % help
 %
@@ -197,23 +200,11 @@ function vers = eegplugin_dipfit(fig, trystrs, catchstrs)
     
     % add dipfit folder to path
     % -----------------------
-    tmp  = which('topoplot');
     if ~exist('dipolefitting')
         p = which('eegplugin_dipfit');
+        disp('Fieldtrip functions for dipole localization not found, removing Dipfit2');
         p = p(1:findstr(p,'eegplugin_dipfit.m')-1);
-        dircontent  = dir([ p '..' p(end) '..' p(end) '..'  ]);
-        dircontent  = { dircontent.name };
-        ind = strmatch('fieldtrip', lower(dircontent));
-        if ~isempty(ind)
-            addpath([ p '..' p(end) '..' p(end) '..' p(end) dircontent{ind} ] );
-        else
-            disp('Warning: Add Fieldtrip folder path manualy or dipfit2 will not be functional');
-        end;
-    end;
-    tmp2 = which('topoplot');
-    if ~strcmpi(tmp, tmp2),
-        disp('Warning: duplicate function topoplot.m in fieldtrip and EEGLAB');
-        addpath(fileparts(tmp));
+        rmpath(p);
     end;
 
     % find tools menu
