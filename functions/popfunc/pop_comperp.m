@@ -88,6 +88,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.38  2007/05/23 00:35:04  toby
+% same
+%
 % Revision 1.37  2007/05/23 00:31:33  toby
 % bug fixed: loads data if using a split .set/.dat format
 %
@@ -617,7 +620,7 @@ disp(['Computing t-values, df:' int2str(df) ]);
 d1 = d1-repmat(a1, [ones(1,dim-1) size(d1,3)]);
 d2 = d2-repmat(a2, [ones(1,dim-1) size(d2,3)]);
 %cab = (x1 - a1)' * (x2 - a2) / (n1 - 1);
-cab = mean(d1.*d2,3)/(n1-1);
+cab = sum(d1.*d2,3)/(n1-1);
 % use abs to avoid numerical errors for very similar data
 % for which v1+v2-2cab may be close to 0.
 t = (a1 - a2) ./ sqrt(abs(v1 + v2 - 2 * cab) / n1) ;
