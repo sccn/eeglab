@@ -56,6 +56,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.71  2007/05/16 22:30:46  toby
+% problem with dipoles and multiple maps (NaN)
+%
 % Revision 1.70  2007/04/30 22:16:23  arno
 % paperpositionmode for figure
 %
@@ -361,8 +364,21 @@ end;
 
 % additional options
 % ------------------
-options    = { options{:} 'masksurf' 'on' };
 outoptions = { options{:} }; % for command
+options    = { options{:} 'masksurf' 'on' };
+
+% find maplimits
+% --------------
+maplimits = [];
+for i=1:2:length(options)
+    if isstr(options{i})
+        if strcmpi(options{i}, 'maplimits')
+            maplimits = options{i+1};
+            options(i:i+1) = [];
+            break;
+        end;
+    end;
+end;
 
 nbgraph = size(arg2(:),1);
 if ~exist('topotitle')
@@ -394,20 +410,24 @@ end
 % determine the scale for plot of different times (same scales)
 % -------------------------------------------------------------
 if typeplot
-	SIGTMP = reshape(EEG.data, EEG.nbchan, EEG.pnts, EEG.trials);
-	pos = round( (arg2/1000-EEG.xmin)/(EEG.xmax-EEG.xmin) * (EEG.pnts-1))+1;
-	indexnan = find(isnan(pos));
-	nanpos = find(isnan(pos));
-	pos(nanpos) = 1;
-	SIGTMPAVG = mean(SIGTMP(:,pos,:),3);
-	SIGTMPAVG(:, nanpos) = NaN;
-	maxlim = max(SIGTMPAVG(:));
-	minlim = min(SIGTMPAVG(:));
-	maplimits = [ -max(maxlim, -minlim) max(maxlim, -minlim)];
+    SIGTMP = reshape(EEG.data, EEG.nbchan, EEG.pnts, EEG.trials);
+    pos = round( (arg2/1000-EEG.xmin)/(EEG.xmax-EEG.xmin) * (EEG.pnts-1))+1;
+    indexnan = find(isnan(pos));
+    nanpos = find(isnan(pos));
+    pos(nanpos) = 1;
+    SIGTMPAVG = mean(SIGTMP(:,pos,:),3);
+    SIGTMPAVG(:, nanpos) = NaN;
+    if isempty(maplimits)
+        maxlim = max(SIGTMPAVG(:));
+        minlim = min(SIGTMPAVG(:));
+        maplimits = [ -max(maxlim, -minlim) max(maxlim, -minlim)];
+    end;
 else
-    maplimits = [-1 1];
+    if isempty(maplimits)
+        maplimits = [-1 1];
+    end;
 end;
-	
+
 if plotdip & strcmpi(EEG.dipfit.coordformat, 'CTF')
     disp('Cannot plot dipole on scalp map for CTF MEG data');
 end;
@@ -501,7 +521,8 @@ for index = 1:size(arg2(:),1)
     if ~isnan(arg2(index))
 		if typeplot
             if nbgraph > 1, axes(curax); end;
-            tmpobj = topoplot( SIGTMPAVG(:,index), EEG.chanlocs, 'maplimits', maplimits, addopt{:}, options{:});
+            options = {  'maplimits' maplimits options{:} addopt{:} };
+            tmpobj = topoplot( SIGTMPAVG(:,index), EEG.chanlocs, options{:});
 			if nbgraph == 1, 
                  figure(curfig); if nbgraph > 1, axes(curax); end;
                  title( [ 'Latency ' int2str(arg2(index)) ' ms from ' topotitle]);
