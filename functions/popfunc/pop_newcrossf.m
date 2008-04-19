@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.37  2007/10/25 18:32:41  nima
+% _
+%
 % Revision 1.36  2007/08/21 01:24:11  arno
 % default padratio is now 1
 %
@@ -178,7 +181,7 @@ end;
 if popup
 	[txt vars] = gethelpvar('timef.m');
 	
-	geometry = { [1 0.5 0.5] [1 0.5 0.5] [1 0.5 0.5] [1 0.5 0.5] [0.92 0.1 0.78] [1 0.5 0.5] [1 0.8 0.2] [1] [1 1]};
+	geometry = { [1 0.5 0.5] [1 0.5 0.5] [1 0.5 0.5] [1 0.5 0.5] [0.92 0.1 0.78] [0.92 0.1 0.78] [1 0.5 0.5] [1 0.8 0.2] [1] [1 1]};
     uilist = { { 'Style', 'text', 'string', fastif(typeproc, 'First channel number', 'First component number'), 'fontweight', 'bold'  } ...
 			   { 'Style', 'edit', 'string', getkeyval(lastcom,3,[],'1') } {} ...
 			   { 'Style', 'text', 'string', fastif(typeproc, 'Second channel number', 'Second component number'), 'fontweight', 'bold'  } ...
@@ -189,6 +192,8 @@ if popup
 			   { 'Style', 'text', 'string', 'Wavelet cycles (0->FFT, see >> help timef)', 'fontweight', 'bold', ...
 				 'tooltipstring', context('cycles',vars,txt) } ...
 			   { 'Style', 'edit', 'string', getkeyval(lastcom,6,[],'3 0.5') } {} ...
+			   { 'Style', 'text', 'string',  '[set]->log. scale for frequencies (match STUDY)', 'fontweight', 'bold' } ...
+			   { 'Style', 'checkbox', 'value', getkeyval(lastcom,'logscale',1,0) } { } ...
 			   { 'Style', 'text', 'string',  '[set]->Linear coher / [unset]->Phase coher', 'fontweight', 'bold', ...
 				 'tooltipstring', ['Compute linear inter-trial coherence (coher)' 10 ...
 					'OR Amplitude-normalized inter-trial phase coherence (phasecoher)'] } ...
@@ -218,7 +223,12 @@ if popup
 	num2     = eval( [ '[' result{2} ']' ] ); 
 	tlimits	 = eval( [ '[' result{3} ']' ] ); 
 	cycles	 = eval( [ '[' result{4} ']' ] );
-    if result{5}
+    if result{5}, 
+        if isempty(result{8}), result{8} = '''freqscale'', ''log''';
+        else     result{8} = [ result{8} ', ''freqscale'', ''log''' ];
+        end;
+    end;
+    if result{6}
     	options = [',''type'', ''coher''' ];
     else
 		options = [',''type'', ''phasecoher''' ];
@@ -239,7 +249,7 @@ if popup
     
     % add title
     % ---------
-	if isempty( findstr(  'title', result{7}))
+	if isempty( findstr(  'title', result{8}))
         if ~isempty(EEG.chanlocs) & typeproc
             chanlabel1 = EEG.chanlocs(num1).labels;
             chanlabel2 = EEG.chanlocs(num2).labels;
@@ -247,7 +257,7 @@ if popup
             chanlabel1 = int2str(num1);
             chanlabel2 = int2str(num2);
         end;
-		if result{5}
+		if result{6}
             options = [options ', ''title'',' fastif(typeproc, '''Channel ', '''Component ') chanlabel1 '-' chanlabel2 ...
 					' Coherence'''];
         else
@@ -255,16 +265,16 @@ if popup
 					' Phase Coherence''' ];
 		end;
 	end;
-	if ~isempty( result{6} )
-		options      = [ options ', ''alpha'',' result{6} ];
-	end;
 	if ~isempty( result{7} )
-		  options = [ options ',' result{7} ];
+		options      = [ options ', ''alpha'',' result{7} ];
 	end;
-	if ~result{8}
-		options = [ options ', ''plotersp'', ''off''' ];
+	if ~isempty( result{8} )
+		  options = [ options ',' result{8} ];
 	end;
 	if ~result{9}
+		options = [ options ', ''plotersp'', ''off''' ];
+	end;
+	if ~result{10}
 		options = [ options ', ''plotphase'', ''off''' ];
 	end;
     figure; try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end; 
