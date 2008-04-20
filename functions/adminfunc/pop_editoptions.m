@@ -72,6 +72,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.44  2007/02/24 02:21:12  toby
+% see also .. edit
+%
 % Revision 1.43  2006/03/19 05:29:16  toby
 % spelling edit
 %
@@ -331,7 +334,13 @@ end;
 for index = 1:2:length(args)
     ind = strmatch(args{index}, { opt.varname }, 'exact');
     if isempty(ind)
-        error(['Variable name ''' args{index} ''' is invalid']);
+        if strcmpi(args{index}, 'option_savematlab')
+            disp('pop_editoptions: option_savematlab is obsolete, use option_savetwofiles instead'); 
+            ind = strmatch('option_savetwofiles', { opt.varname }, 'exact');
+            opt(ind).value = ~args{index+1};
+        else
+            error(['Variable name ''' args{index} ''' is invalid']);
+        end;
     else
         opt(ind).value = args{index+1};
     end;
