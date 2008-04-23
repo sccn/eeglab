@@ -65,6 +65,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2008/04/23 00:37:09  nima
+% _
+%
 % Revision 1.17  2008/04/19 21:05:49  arno
 % putting back axcopy
 %
@@ -310,7 +313,7 @@ end;
 
 % plotting all conditions
 % -----------------------
-if strcmpi(opt.plotgroups, 'together'),      ngplot = 1; else ngplot = ng; end; 
+if strcmpi(opt.plotgroups, 'together'),      ngplot = 1; else ngplot = ng; end;
 if strcmpi(opt.plotconditions,  'together'), ncplot = 1; else ncplot = nc; end;     
 if strcmpi(opt.plotgroups, 'together') | strcmpi(opt.plotconditions, 'together') | strcmpi(opt.figure, 'off')
      col = manycol;
