@@ -437,7 +437,7 @@ for c = 1:ncplot
             elseif iscell(tmpdata)
                  plotcurve( allx, tmpdata{1}, 'colors', tmpcol, 'maskarray', tmpdata{2}, plotopt{3:end}); xlabel(xlab); ylabel(ylab);
             else
-                tmpcol = col;  % by nima, fixed for now but might have causes othr bugs
+                tmpcol = col;  % by nima, fixed for now but might have causes other bugs
                 plotcurve( allx, tmpdata, 'colors', tmpcol, plotopt{2:end});
             end;
         end;
