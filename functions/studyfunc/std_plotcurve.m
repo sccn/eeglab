@@ -65,6 +65,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2008/04/19 21:05:49  arno
+% putting back axcopy
+%
 % Revision 1.15  2008/04/16 18:03:41  arno
 % use nan_mean in case some subjects are missing data
 %
@@ -190,7 +193,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function std_plotcurve(allx, data, varargin)
+function std_plotcurve(allx, data, varargin) 
 
 pgroup = [];
 pcond  = [];
@@ -433,7 +436,9 @@ for c = 1:ncplot
                     'plotargs', { plotopt{:} }, 'datapos', [2 3]);
             elseif iscell(tmpdata)
                  plotcurve( allx, tmpdata{1}, 'colors', tmpcol, 'maskarray', tmpdata{2}, plotopt{3:end}); xlabel(xlab); ylabel(ylab);
-            else plotcurve( allx, tmpdata, 'colors', tmpcol, plotopt{2:end});
+            else
+                tmpcol = col;  % by nima, fixed for now but might have causes othr bugs
+                plotcurve( allx, tmpdata, 'colors', tmpcol, plotopt{2:end});
             end;
         end;
         
