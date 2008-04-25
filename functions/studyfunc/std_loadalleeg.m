@@ -49,7 +49,7 @@ function ALLEEG = std_loadalleeg(varargin)
         help std_loadalleeg;
         return;
     end;
-     keyboard;
+
     if isstruct(varargin{1})
         datasets = {varargin{1}.datasetinfo.filename};
         try,
