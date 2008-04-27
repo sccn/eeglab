@@ -29,6 +29,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2005/09/03 00:13:23  scott
+% rm'ed extra-verbose fprintf repeats
+%
 % Revision 1.5  2005/03/20 18:40:49  scott
 % help msg
 %
@@ -112,18 +115,18 @@ function [dataout,datamean] = rmbase(data,frames,basevector)
 
     dataout = data;
     for e=1:epochs
-        if basevector(1)~=0,
-			rmeans = nan_mean(data(:,(e-1)*frames+basevector)');
-		else
-			rmeans = nan_mean(data(:,(e-1)*frames+1:e*frames)');
-                        if e==1
-			   fprintf('rmbase(): whole-data channel means removed. \n\n');
-                        end
+        for c=1:chans
+            if basevector(1)~=0,
+                rmeans = nan_mean(double(data(c,(e-1)*frames+basevector)'));
+            else
+                rmeans = nan_mean(double(data(c,(e-1)*frames+1:e*frames)'));
+                            if e==1
+                   fprintf('rmbase(): whole-data channel means removed. \n\n');
+                            end
+            end;
+            datamean(c,e) = rmeans;
+            dataout(c,(e-1)*frames+1:e*frames) = data(c,(e-1)*frames+1:e*frames) - rmeans;
         end;
-        datamean(:,e) = rmeans';
-		diff = rmeans'*ones(1,frames);
-		dataout(:,(e-1)*frames+1:e*frames) = ...
-                data(:,(e-1)*frames+1:e*frames) - diff;
     end;
 
 	if reshape_flag
@@ -131,16 +134,16 @@ function [dataout,datamean] = rmbase(data,frames,basevector)
 	end
     
     
-function out = nan_mean(in)
-    
-    nans = find(isnan(in));
-    in(nans) = 0;
-    sums = sum(in);
-    nonnans = ones(size(in));
-    nonnans(nans) = 0;
-    nonnans = sum(nonnans);
-    nononnans = find(nonnans==0);
-    nonnans(nononnans) = 1;
-    out = sum(in)./nonnans;
-    out(nononnans) = NaN;
-
+% function out = nan_mean(in)
+%     
+%     nans = find(isnan(in));
+%     in(nans) = 0;
+%     sums = sum(in);
+%     nonnans = ones(size(in));
+%     nonnans(nans) = 0;
+%     nonnans = sum(nonnans);
+%     nononnans = find(nonnans==0);
+%     nonnans(nononnans) = 1;
+%     out = sum(in)./nonnans;
+%     out(nononnans) = NaN;
+% 
