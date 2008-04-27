@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.112  2008/04/19 21:06:06  arno
+% detect bad channel when plotting component contribution
+%
 % Revision 1.111  2008/02/29 16:10:08  arno
 % allow percentage plotting for continuous data
 %
@@ -617,6 +620,10 @@ else
         fprintf('Selecting the first %2.1f%% of data for analysis...\n', g.percent*100);
         frames = round(size(data,2)*g.percent);
         data = data(:, 1:frames);
+        g.boundaries(find(g.boundaries > frames)) = [];
+        if ~isempty(g.boundaries)
+            g.boundaries(end+1) = frames;
+        end;            
     end;
     if g.percent ~= 1 & epochs > 1
         epoch_subset = zeros(1,epochs);
