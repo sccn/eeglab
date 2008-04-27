@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2007/03/24 02:13:49  arno
+% remove baseline with boundaries
+%
 % Revision 1.23  2007/03/24 02:08:29  arno
 % same
 %
@@ -205,9 +208,9 @@ if EEG.trials == 1 & ~isempty(EEG.event) ...
                      & isfield(EEG.event, 'type') ...
                         & isstr(EEG.event(1).type)
 	boundaries = strmatch('boundary', {EEG.event.type});
-	if 0 %~isempty(boundaries) % this is crashing
+	if ~isempty(boundaries) % this is crashing
         fprintf('Pop_rmbase(): finding continuous data discontinuities\n');
-        boundaries = [ EEG.event(boundaries).latency ] -0.5-pointrange(1)+1;
+        boundaries = round([ EEG.event(boundaries).latency ] -0.5-pointrange(1)+1);
         boundaries(find(boundaries>=pointrange(end)-pointrange(1))) = [];
         boundaries(find(boundaries<1)) = [];
         boundaries = [0 boundaries pointrange(end)-pointrange(1)];
