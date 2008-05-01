@@ -48,6 +48,7 @@ function  im = show_events(EEG, varargin)
 % See also: make_timewarp(), newtimef()
 
 %% check inputs
+EEG = change_events_to_string(EEG);
 
 inputKeyValues = finputcheck(varargin, ...
    {'eventThicknessCoef'     'real'    [0 Inf]          1; ...
@@ -177,4 +178,19 @@ if ~accepted
     color = color*0.3; % dim the color of unaccepted events.
 end;
 
+function EEG = change_events_to_string(EEG)
+needChange = false; 
+for i=1:length(EEG.event)
+    if ~ischar(EEG.event(i).type)
+        EEG.event(i).type = num2str( EEG.event(i).type );
+        needChange = true;
+    end;
+end;
 
+if needChange
+    for e=1:length(EEG.epoch)
+        for i=1:length(EEG.epoch(e).eventtype)
+            EEG.epoch(e).eventtype(i) = {num2str(cell2mat(EEG.epoch(e).eventtype(i)))};
+        end;
+    end;
+end;
