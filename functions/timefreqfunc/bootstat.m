@@ -87,6 +87,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2004/12/07 22:31:54  arno
+% FUNCTION HAS BEEN COMPLETELY REWRITTEN
+%
 % Revision 1.24  2004/06/08 01:16:40  scott
 % help msg, ref. typo
 %
@@ -172,7 +175,7 @@
 % Technimetrics, 1979, 21: 201-214.
 % *************************************
 
-function [accarrayout, Rbootout] = bootstat(oriargs, formula, varargin)
+function [accarrayout, Rbootout, Rbootout2] = bootstat(oriargs, formula, varargin)
 %	nb_points, timesout, naccu, baselength, baseboot, boottype, alpha, rboot);
 	
 if nargin < 2
@@ -411,6 +414,7 @@ if strcmpi(g.distfit, 'off')
     % compute bootstrap significance level
     % ------------------------------------
     accarray  = sort(accarray,1); % always sort on naccu
+    Rbootout2 = accarray;
     i         = round(g.naccu*g.alpha);
     accarray1 = squeeze(mean(accarray(g.naccu-i+1:end,:,:),1));
     accarray2 = squeeze(mean(accarray(1:i            ,:,:),1));
