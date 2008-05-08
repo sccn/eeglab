@@ -307,6 +307,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.149  2008/05/08 20:46:48  arno
+% fdr etc...
+%
 % Revision 1.147  2008/04/19 21:13:03  arno
 % header edits (plus Scott's ones) and default log lower frequency
 %
@@ -1753,10 +1756,16 @@ if ~isnan(g.alpha)
     
     if strcmpi(g.mcorrect, 'fdr')
         alphafdr = fdr(exactp_ersp, g.alpha);
-        fprintf('ERSP correction for multiple comparisons using FDR, alpha_fdr = %3.6f\n', alphafdr);
+        if alphafdr ~= 0
+             fprintf('ERSP correction for multiple comparisons using FDR, alpha_fdr = %3.6f\n', alphafdr);
+        else fprintf('ERSP correction for multiple comparisons using FDR, nothing significant\n', alphafdr);
+        end;
         maskersp = exactp_ersp <= alphafdr;
         alphafdr = fdr(exactp_itc, g.alpha);
-        fprintf('ITC  correction for multiple comparisons using FDR, alpha_fdr = %3.6f\n', alphafdr);
+        if alphafdr ~= 0
+             fprintf('ITC  correction for multiple comparisons using FDR, alpha_fdr = %3.6f\n', alphafdr);
+        else fprintf('ITC  correction for multiple comparisons using FDR, nothing significant\n', alphafdr);
+        end;
         maskitc = exactp_itc <= alphafdr;
     else
         maskersp = exactp_ersp <= g.alpha;
