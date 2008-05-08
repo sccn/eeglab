@@ -138,6 +138,13 @@
 %       'alpha'     = If non-0, compute two-tailed bootstrap significance 
 %                      probability level. Show non-signif. output values 
 %                      as green.                                     {0}
+%       'mcorrect'  = ['none'|'fdr'] correction for multiple comparison
+%                     'fdr' uses false detection rate (see function fdr()).
+%                     Default is 'none'. Not available for condition 
+%                     comparisons.
+%       'pcontour'  = ['on'|'off'] draw contour around significant regions
+%                     instead of masking them. Default is 'off'. Not 
+%                     available for condition comparisons.
 %       'naccu'     = Number of bootstrap replications to accumulate {200}
 %       'baseboot'  = Bootstrap baseline subtract (1 -> use 'baseline';
 %                                                  0 -> use whole trial
@@ -1073,6 +1080,7 @@ g = finputcheck(varargin, ...
     'plotphaseonly' 'string'    {'on','off'} 'off'; ...
     'plotphasesign' 'string'    {'on','off'} 'on'; ...
     'plotphase'     'string'    {'on','off'} 'on'; ... % same as above for backward compatibility
+    'pcontour'      'string'    {'on','off'} 'off'; ... 
     'outputformat'  'string'    {'old','new'} 'new'; ...
     'itcmax'        'real'      []           []; ...
     'erspmax'       'real'      []           []; ...
@@ -1090,6 +1098,7 @@ g = finputcheck(varargin, ...
     'timewarp'      'real'      []           []; ...
     'timewarpms'    'real'      []           []; ...
     'timewarpfr'    'real'      []           []; ...
+    'timewarpidx'   'real'      []           []; ...
     'timewarpidx'   'real'      []           []; ...
     'timeStretchMarks'  'real'  []           []; ...
     'timeStretchRefs'   'real'  []           []; ...
@@ -1345,7 +1354,7 @@ if strcmpi(g.lowmem, 'on') & length(data) ~= g.frames & isempty(g.nfreqs) & ~isc
 
     % plot results 
     %-------------
-    plottimef(P, R, Pboot, Rboot, ERP, freqsout, timesout, mbase, g);
+    plottimef(P, R, Pboot, Rboot, ERP, freqsout, timesout, mbase, [], [], g);
 
     return; % finished
 end;
@@ -1355,6 +1364,11 @@ end;
 % compare 2 conditions 
 %%%%%%%%%%%%%%%%%%%%%%%
 if iscell(data)
+    
+    if ~strcmpi(g.mcorrect, 'none')
+        error('Correction for multiple comparison not implemented for comparing conditions');
+    end;
+    
     vararginori = varargin;
     if length(data) ~= 2
         error('newtimef: to compare two conditions, data must be a length-2 cell array');
@@ -1393,17 +1407,17 @@ if iscell(data)
 
     cond_1_epochs = size(data{1},2);
 
-  if ~isempty(g.timeStretchMarks)
-    [P1,R1,mbase1,timesout,freqs,Pboot1,Rboot1,alltfX1] = ...
+    if ~isempty(g.timeStretchMarks)
+        [P1,R1,mbase1,timesout,freqs,Pboot1,Rboot1,alltfX1] = ...
         newtimef( data{1}, frames, tlimits, Fs, varwin, 'plotitc', 'off', ...
           'plotersp', 'off', vararginori{:}, 'lowmem', 'off', ...
             'timeStretchMarks', g.timeStretchMarks(:,1:cond_1_epochs), ... 
               'timeStretchRefs', g.timeStretchRefs);
-  else
-    [P1,R1,mbase1,timesout,freqs,Pboot1,Rboot1,alltfX1] = ...
+    else
+        [P1,R1,mbase1,timesout,freqs,Pboot1,Rboot1,alltfX1] = ...
         newtimef( data{1}, frames, tlimits, Fs, varwin, 'plotitc', 'off', ...
           'plotersp', 'off', vararginori{:}, 'lowmem', 'off');
-  end
+    end
 
     verboseprintf(g.verbose,'\nRunning newtimef() on Condition 2 **********************\n\n');
 
@@ -1452,12 +1466,12 @@ if iscell(data)
 
         subplot(1,3,1); % plot Condition 1
         g.title = g.titleall{1};
-        g = plottimef(P1, R1, Pboot1, Rboot1, mean(data{1},2), freqs, timesout, mbase, g);
+        g = plottimef(P1, R1, Pboot1, Rboot1, mean(data{1},2), freqs, timesout, mbase, [], [], g);
         g.itcavglim = [];
 
         subplot(1,3,2); % plot Condition 2
         g.title = g.titleall{2};
-        plottimef(P2, R2, Pboot2, Rboot2, mean(data{2},2), freqs, timesout, mbase, g);
+        plottimef(P2, R2, Pboot2, Rboot2, mean(data{2},2), freqs, timesout, mbase, [], [], g);
 
         subplot(1,3,3); % plot Condition 1 - Condition 2
         g.title =  g.titleall{3};
@@ -1470,7 +1484,7 @@ if iscell(data)
             case 'complex',  Rdiff = R1-R2;
         end;
         if strcmpi(g.plotersp, 'on') | strcmpi(g.plotitc, 'on')
-            plottimef(P1-P2, Rdiff, [], [], mean(data{1},2)-mean(data{2},2), freqs, timesout, mbase, g);
+            plottimef(P1-P2, Rdiff, [], [], mean(data{1},2)-mean(data{2},2), freqs, timesout, mbase, [], [], g);
         end;
     else
         % preprocess data and run compstat() function
@@ -1556,7 +1570,7 @@ if iscell(data)
             g.erspmax = []; % auto scale
             g.itcmax  = []; % auto scale
             plottimef(10*resdiff{1}, resdiff{2}, 10*resimages{1}, resimages{2}, ...
-                mean(data{1},2)-mean(data{2},2), freqs, timesout, mbase, g);
+                mean(data{1},2)-mean(data{2},2), freqs, timesout, mbase, [], [], g);
         end;
         R1 = res1{2};
         R2 = res2{2};
@@ -1612,8 +1626,8 @@ end;
     'nfreqs', g.nfreqs, 'timestretch', {g.timeStretchMarks', g.timeStretchRefs}, 'wletmethod', g.wletmethod);
 
 if g.cycles(1) == 0
-    alltfX2 = alltfX/g.winsize; % TF and MC (12/11/2006): normalization, divide by g.winsize
-    P  = 2/0.375*mean(alltfX2.*conj(alltfX2), 3); % power    
+    alltfX = 2*0.375*alltfX/g.winsize; % TF and MC (12/11/2006): normalization, divide by g.winsize
+    P  = mean(alltfX.*conj(alltfX), 3); % power    
     % TF and MC (12/14/2006): multiply by 2 account for negative frequencies,
     % and ounteract the reduction by a factor 0.375 that occurs as a result of 
     % cosine (Hann) tapering. Refer to Bug 446
@@ -1701,9 +1715,10 @@ if ~isnan(g.alpha) % if bootstrap analysis included . . .
         % ------------------
         formula = 'mean(arg1,3);';
         inputdata = alltfX.*conj(alltfX);
-        [ Pboot Pboottrials Pboottrials2] = bootstat(inputdata, formula, 'boottype', 'shuffle', ...
+        [ Pboot Pboottrialstmp Pboottrials] = bootstat(inputdata, formula, 'boottype', 'shuffle', ...
             'label', 'ERSP', 'bootside', 'both', 'naccu', g.naccu, ...
             'basevect', baselntmp, 'alpha', g.alpha, 'dimaccu', 2 );
+        clear Pboottrialstmp;
         
         if size(Pboot,2) == 1, Pboot = Pboot'; end;
 
@@ -1718,10 +1733,11 @@ if ~isnan(g.alpha) % if bootstrap analysis included . . .
         if strcmpi(g.boottype, 'randall'), dimaccu = []; g.boottype = 'rand';
         else										 dimaccu = 2;
         end;
-        Rboot = bootstat(inputdata, formula, 'boottype', g.boottype, ...
+        [Rboot Rboottmp Rboottrials] = bootstat(inputdata, formula, 'boottype', g.boottype, ...
             'label', 'ITC', 'bootside', 'upper', 'naccu', g.naccu, ...
             'basevect', baselntmp, 'alpha', g.alpha, 'dimaccu', 2 );
         fprintf('\n');
+        clear Rboottmp;
     end;
 else
     Pboot = []; Rboot = [];
@@ -1729,13 +1745,23 @@ end
 
 % correction for multiple comparisons
 % -----------------------------------
-if strcmpi(g.mcorrect, 'fdr')
-    % compute significance for each timefreq
-    exactp = compute_pvals(P, Pboottrials2');
+maskersp = [];
+maskitc  = [];
+if ~isnan(g.alpha)
+    exactp_ersp = compute_pvals(P, Pboottrials');
+    exactp_itc  = compute_pvals(abs(R), abs(Rboottrials'));
     
-    [pval mask] = fdr(exactp, g.alpha);
-    fprintf('Correction for multiple comparisons using FDR (false detection rate) alpha_fdr = %3.6f\n', pval);
-    sdafsd
+    if strcmpi(g.mcorrect, 'fdr')
+        alphafdr = fdr(exactp_ersp, g.alpha);
+        fprintf('ERSP correction for multiple comparisons using FDR, alpha_fdr = %3.6f\n', alphafdr);
+        maskersp = exactp_ersp <= alphafdr;
+        alphafdr = fdr(exactp_itc, g.alpha);
+        fprintf('ITC  correction for multiple comparisons using FDR, alpha_fdr = %3.6f\n', alphafdr);
+        maskitc = exactp_itc <= alphafdr;
+    else
+        maskersp = exactp_ersp <= g.alpha;
+        maskitc  = exactp_itc  <= g.alpha;
+    end
 end;
 
 if isnan(g.powbase)
@@ -1765,9 +1791,9 @@ ERP = mean(data,2);
 mbase = log10(mbase)*10;
 if strcmpi(g.plotersp, 'on') | strcmpi(g.plotitc, 'on')
     if strcmpi(g.plottype, 'image')
-        plottimef(P, R, Pboot, Rboot, ERP, freqs, timesout, mbase, g);
+        plottimef(P, R, Pboot, Rboot, ERP, freqs, timesout, mbase, maskersp, maskitc, g);
     else
-        plotallcurves(P, R, Pboot, Rboot, ERP, freqs, timesout, mbase, g);
+        plotallcurves(P, R, Pboot, Rboot, ERP, freqs, timesout, mbase, maskersp, maskitc, g);
     end;
 end;
 if strcmpi(g.outputformat, 'old')
@@ -1783,7 +1809,7 @@ return;
 % -----------------
 % plotting function
 % -----------------
-function g = plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, g);
+function g = plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, maskersp, maskitc, g);
 %
 % compute ERP
 %
@@ -1837,16 +1863,20 @@ switch lower(g.plotersp)
         set(h(1), 'tag', 'ersp');
 
         PP = P;
-        if ~isnan(g.alpha) % zero out nonsignif. power differences
-            if size(PP,1) == size(Pboot,1) & size(PP,2) == size(Pboot,2)
-                PP(find(PP > Pboot(:,:,1) & (PP < Pboot(:,:,2)))) = 0;
-                Pboot = squeeze(mean(Pboot,2));
-                if size(Pboot,2) == 1, Pboot = Pboot'; end;
-            else
-                PP(find((PP > repmat(Pboot(:,1),[1 length(times)])) ...
-                    & (PP < repmat(Pboot(:,2),[1 length(times)])))) = 0;
-            end
-        end
+        if ~isnan(g.alpha)
+            if strcmpi(g.pcontour, 'off') & ~isempty(maskersp) % zero out nonsignif. power differences
+                PP = PP .* maskersp;
+            elseif isempty(maskersp)
+                if size(PP,1) == size(Pboot,1) & size(PP,2) == size(Pboot,2)
+                    PP(find(PP > Pboot(:,:,1) & (PP < Pboot(:,:,2)))) = 0;
+                    Pboot = squeeze(mean(Pboot,2));
+                    if size(Pboot,2) == 1, Pboot = Pboot'; end;
+                else
+                    PP(find((PP > repmat(Pboot(:,1),[1 length(times)])) ...
+                        & (PP < repmat(Pboot(:,2),[1 length(times)])))) = 0;
+                end
+            end;
+        end;
 
         if isempty(g.erspmax)
             if g.ERSP_CAXIS_LIMIT == 0
@@ -1876,7 +1906,12 @@ switch lower(g.plotersp)
         end;
         set(gca,'ydir',g.hzdir);  % make frequency ascend or descend
 
-
+        % put contour for multiple comparison masking
+        if ~isempty(maskersp) & strcmpi(g.pcontour, 'on')
+            hold on; [tmpc tmph] = contour(times, freqs, maskersp);
+            set(tmph, 'linecolor', 'k', 'linewidth', 0.25)
+        end;
+        
         hold on
         plot([0 0],[0 freqs(end)],'--m','LineWidth',g.linewidth); % plot time 0
         if ~isnan(g.marktimes) % plot marked time
@@ -1993,14 +2028,18 @@ switch lower(g.plotitc)
             RR = R;
         end;
         if ~isnan(g.alpha)
-            if size(RR,1) == size(Rboot,1) & size(RR,2) == size(Rboot,2)
-                tmp = gcf;
-                if size(Rboot,3) == 2	 RR(find(RR > Rboot(:,:,1) & RR < Rboot(:,:,2))) = 0;
-                else                   RR(find(RR < Rboot)) = 0;
+            if ~isempty(maskitc) & strcmpi(g.pcontour, 'off')
+                RR = RR .* maskitc;
+            elseif isempty(maskitc)
+                if size(RR,1) == size(Rboot,1) & size(RR,2) == size(Rboot,2)
+                    tmp = gcf;
+                    if size(Rboot,3) == 2	 RR(find(RR > Rboot(:,:,1) & RR < Rboot(:,:,2))) = 0;
+                    else                   RR(find(RR < Rboot)) = 0;
+                    end;
+                    Rboot = mean(Rboot(:,:,end),2);
+                else
+                    RR(find(RR < repmat(Rboot(:),[1 length(times)]))) = 0;
                 end;
-                Rboot = mean(Rboot(:,:,end),2);
-            else
-                RR(find(RR < repmat(Rboot(:),[1 length(times)]))) = 0;
             end;
         end
 
@@ -2037,6 +2076,12 @@ switch lower(g.plotitc)
             end;
         end;
         set(gca,'ydir',g.hzdir);  % make frequency ascend or descend
+
+        % plot contour if necessary
+        if ~isempty(maskitc) & strcmpi(g.pcontour, 'on')
+            hold on; [tmpc tmph] = contour(times, freqs, maskitc);
+            set(tmph, 'linecolor', 'k', 'linewidth', 0.25)
+        end;
 
         if isempty(g.itcmax)
             g.itcmax = caxis;
@@ -2379,7 +2424,7 @@ function pvals = compute_pvals(oridat, surrog, tail)
         end;
     end;
 
-    surrog        = sort(surrog, myndims(surrog)); % sort last dimension
+    surrog = sort(surrog, myndims(surrog)); % sort last dimension
     
     if myndims(surrog) == 1    
         surrog(end+1) = oridat;        
