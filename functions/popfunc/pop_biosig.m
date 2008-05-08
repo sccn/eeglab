@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2008/04/17 18:33:17  nima
+% replaced by arno files version of the file
+%
 % Revision 1.23  2007/08/14 20:07:29  arno
 % fix for new BIOSIG version
 %
@@ -272,7 +275,9 @@ if ~isempty(dat.EVENT)
         disp('Removing event channel...');
         EEG.data(dat.BDF.Status.Channel,:) = [];
         EEG.nbchan = size(EEG.data,1);
-        EEG.chanlocs(dat.BDF.Status.Channel,:) = [];
+        if ~isempty(EEG.chanlocs)
+            EEG.chanlocs(dat.BDF.Status.Channel,:) = [];
+        end;
     end;
     EEG = eeg_checkset(EEG, 'eventconsistency');
 else 
