@@ -113,6 +113,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.76  2005/07/18 18:58:26  arno
+% temporary modif
+%
 % Revision 1.75  2005/07/08 21:24:15  arno
 % debug g.coordinates call
 %
@@ -353,7 +356,7 @@ if nargin < 2
 	help pop_brainmovie;
 	return;
 end;
-g = finputcheck(varargin, { 'mode'	      'string'        { 'compute' 'movie' 'computemovie' 'auto' }     'auto';
+[g movopts] = finputcheck(varargin, { 'mode'	      'string'        { 'compute' 'movie' 'computemovie' 'auto' }     'auto';
                             'comps'       'integer'       [1 Inf]                                  1:size(ALLEEG(1).icaact,1);
 							'freqparams'  'cell'          {}                                       {};
 							'diffmovie'   'string'        { 'on' 'off' }                           'off';
@@ -376,7 +379,7 @@ g = finputcheck(varargin, { 'mode'	      'string'        { 'compute' 'movie' 'co
                             'quality'     'string'        { 'ultrafast' 'fast' 'getframe' 'slow' } 'ultrafast';
                             'makemovie'   'cell'          {}                                       {};
                             'type'        'string'        { '2d' '3d' }                            '2d';
-                            'eventprob'   ''              []                                       [] });
+                            'eventprob'   ''              []                                       [] }, 'pop_brainmovie', 'ignore');
 if isstr(g), error(g); end;
 clear functions;
 %g.diffmovie = 'off';
@@ -661,17 +664,11 @@ elseif strcmpi(g.type, '2d')
                         g.movparams{:}};
 else %%%%%%%%%%%%% 3D MOVIE PARAMS %%%%%%%%%%%%%%%%
     disp('******************************** 3D MOVIE *******************************');
-    if ~isempty(g.coordinates)
-        coordinates = g.coordinates;
-    else
-        coordinates = founddipoles(ALLEEG, g.comps);
+    for index = 1:length(g.comps)
+        coordinates(index,:) = ALLEEG(1).dipfit.model(g.comps(index)).posxyz(1,:);
     end;
-    tmp = coordinates(:,1);
-    coordinates(:,1) =  -coordinates(:,2);
-    coordinates(:,2) =  tmp;
-    coordinates(:,3) =  -coordinates(:,3); % restore dipplot coordinates
-    brainmovieoptions = { 'condtitle' alltitles 'coordinates', coordinates, ...
-                        'circfactor', g.circfactor, 'size', [505 505] };
+    brainmovieoptions = { 'condtitle' alltitles 'coordformat' ALLEEG(1).dipfit.coordformat 'coordinates', coordinates, ...
+                        'circfactor', g.circfactor, 'size', [505 505] g.movparams{:} };
     if iscell(g.movparams), brainmovieoptions = { brainmovieoptions{:} g.movparams{:}}; 
     elseif strcmpi(g.movparams, 'mrirear'), brainmovieoptions = { brainmovieoptions{:} 'view', [0 -1 0] };
     elseif strcmpi(g.movparams, 'mriside'), brainmovieoptions = { brainmovieoptions{:} 'view', [1 0 0] };
@@ -825,7 +822,11 @@ function [coordinates, compdipoles] = founddipoles(ALLEEG, comps)
             error('Field ''dipfit'' containing dipole location is empty');
         end;
         tmpstruct  = ALLEEG(indexeeg(1)).dipfit.model;
-        spheresize = max(ALLEEG(indexeeg(1)).dipfit.vol.r);
+        if ~isfield(ALLEEG(indexeeg(1)).dipfit, 'vol')
+            load('-mat', ALLEEG(indexeeg(1)).dipfit.hdmfile);
+        else
+            vol = ALLEEG(indexeeg(1)).dipfit.vol;
+        end;
         fprintf('Using Dipfit sources from dataset number %d\n', indexeeg(1));
     end;
     

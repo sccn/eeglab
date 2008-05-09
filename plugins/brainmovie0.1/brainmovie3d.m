@@ -133,6 +133,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2007/03/09 18:58:33  arno
+% axes size and coherence thickness
+%
 % Revision 1.19  2007/03/06 18:56:01  arno
 % *** empty log message ***
 %
@@ -251,6 +254,7 @@ try, g.condtitleformat;	catch, g.condtitleformat = {'fontsize', 14', 'fontweight
 try, g.title;			catch, g.title = []; end; 
 try, g.envylabel;		catch, g.envylabel = 'Potential \muV'; end; 
 try, g.plotorder;       catch, g.plotorder = selected; end;
+try, g.coordformat;     catch, g.coordformat = 'spherical'; end;
 try, g.stereo;          catch, g.stereo = []; end;
 try, g.backcolor;       catch, g.backcolor = [0 0 0]; end;
 try, g.path3d;          catch, g.path3d = 'off'; end;
@@ -569,7 +573,7 @@ for i=1:nbconditions
     % ------------
 	hh(i) = axes('position', [0+maxcoordx/nbconditions*(i-1), ordinate, maxcoordx/nbconditions*0.9, max_ordinate].*s+q );
     gr = [ 0.3 0.3 0.3 ];
-    g.dipplotopt = { 'gui', 'off', 'image', 'fullmri', 'cornermri', 'on', 'color', { gr gr gr gr gr gr gr gr gr } };
+    g.dipplotopt = { 'coordformat' g.coordformat 'gui', 'off', 'cornermri', 'on', 'color', { gr gr gr gr gr gr gr gr gr } };
     if iscell(coords)
         for index = 1:size(coords{1}, 1);
             dipstruct(index).posxyz = coords{1}(index,:);
@@ -585,6 +589,7 @@ for i=1:nbconditions
             dipstruct(index).rv = 0.1;
         end;
     end;        
+    
     dipplot( dipstruct, 'view', g.view, g.dipplotopt{:}); axis off;
     
     %surface([-2 -2; -2 -2]*g.maxc, [-20 20; -20 20]*g.maxc,[-20 -20; 20 20]*g.maxc, repmat(reshape([0 0 0], 1, 1, 3), [2 2 1]), 'facelighting', 'none');
@@ -603,7 +608,14 @@ for i=1:nbconditions
         for dipindex = 1:length(htmp)
             tmpstruct = get(htmp(dipindex), 'userdata');
             if isstruct(tmpstruct) % look for dipole location % THIS DOES NOT WORK
-                 g.coordinates{i}(index, :) = tmpstruct.pos3d;
+                if isfield(tmpstruct, 'pos3d')
+                    g.coordinates{i}(index, :) = tmpstruct.pos3d;
+                elseif isfield(tmpstruct, 'eleccoord')
+                    g.coordinates{i}(index, :) = tmpstruct.eleccoord;
+                else
+                    tmpstruct
+                    error('Field not found in tmpstruct');
+                end;
             end;
         end;
         delete(htmp);
