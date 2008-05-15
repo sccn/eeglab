@@ -56,6 +56,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.72  2008/04/19 21:07:01  arno
+% fix maplimits
+%
 % Revision 1.71  2007/05/16 22:30:46  toby
 % problem with dipoles and multiple maps (NaN)
 %
@@ -293,7 +296,7 @@ if nargin < 3
         editwhat2plot = ['1:' int2str(size(EEG.icaweights,1))];
  	end;	
         if EEG.nbchan > 64, 
-            elecdef = ['''electrodes'', ''on''']; 
+            elecdef = ['''electrodes'', ''off''']; 
         else, 
             elecdef = ['''electrodes'', ''on''']; 
         end;
