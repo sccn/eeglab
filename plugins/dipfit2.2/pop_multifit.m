@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2007/08/16 17:51:51  arno
+% remove obsolete comments
+%
 % Revision 1.22  2007/06/02 04:37:14  toby
 % log comment fix
 %
@@ -303,6 +306,7 @@ function [EEG, com] = pop_multifit(EEG, comps, varargin);
     
     % set RV to 1 for dipole with higher than 40% residual variance
     % -------------------------------------------------------------
+   
     EEG.dipfit.model  = dipfit_reject(EEG.dipfit.model, g.threshold/100);
 
     % removing dipoles outside the head
