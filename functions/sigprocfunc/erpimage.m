@@ -98,14 +98,14 @@
 %              {default: plot potential, not amplitudes}
 %
 % Specify plot parameters:
-%   'limits' = [lotime hitime minerp maxerp loamp hiamp locoher hicoher bamp]
+%   'limits' = [lotime hitime minerp maxerp lodB hidB locoher hicoher basedB]
 %               Plot axes limits. Can use NaN (or nan, but not Nan) for missing items
-%               and omit late items. Use last input, bamp (in dB), to set the 
-%               baseline amplitude in 'plotamps' plots {default: from data}
-%   'signif' = [lo_amp, hi_amp, coher_signif_level] Use precomputed significance
+%               and omit late items. Use last input, basedB, to set the 
+%               baseline dB amplitude in 'plotamps' plots {default: from data}
+%   'signif' = [lo_dB, hi_dB, coher_signif_level] Use precomputed significance
 %               thresholds (as from outputs ampsig, cohsig) to save time. {default: none}
 %   'caxis'  = [lo hi] Set color axis limits. Else [fraction] Set caxis limits at
-%               (+/-)fraction*max(abs(data)) {default: symmetrical, based on data limits}
+%               (+/-)fraction*max(abs(data)) {default: symmetrical in dB, based on data limits}
 %
 % Add epoch-mean ERP to plot:
 %   'erp'    = ['on'|'off'] Plot ERP time average of the trials below the image {default no ERP plotted}
@@ -206,6 +206,9 @@
 
 %% LOG COMMENTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % $Log: not supported by cvs2svn $
+% Revision 1.278  2008/06/24 00:37:43  scott
+% documented the default bamp in limits - should be in dB
+%
 % Revision 1.277  2008/06/24 00:34:09  scott
 % corrected use of baseamp for allamps plotting -sm & rsh
 %
@@ -2711,7 +2714,7 @@ elseif Allampsflag %%%%%%%%%%%%%%%% Plot allamps instead of data %%%%%%%%%%%%%%
         % amplitude
         ampsig = ampsig - baseamp; % subtract dB baseline from ampsig
 
-    else % if baseamp specified in 'limits' (as last argument 'bamp', see help)
+    else % if baseamp specified in 'limits' (as last argument 'basedB', see help)
         amps = amps-baseamp; % use specified (log) baseamp
         allamps = allamps - baseamp; % subtract dB baseline 
         if isnan(signifs);
@@ -3377,20 +3380,9 @@ if ~isnan(coherfreq)
             [amps,cohers,cohsig,ampsig] = ...
                 phasecoher(urdata,size(times,2),srate,coherfreq,cycles,alpha);
             fprintf('Coherence significance level: %g\n',cohsig);
-
-            ampsig = 20*(log10(ampsig) - log10(mean(amps))); % convert to dB
-
-            %ampsig = 20*log10(ampsig./mean(ampsig)); % convert to dB
+            ampsig = 20*log10(ampsig); convert to dB
         end
-
-        amps = 20*(log10(amps) - log10(mean(amps))); % convert to dB
-
-        %amps   = 20*log10(amps./mean(amps));      % convert to dB
-
-        fprintf('Data amplitude levels: [%g %g] dB\n',min(amps),max(amps));
-        if alpha>0 % if computed significance levels
-            fprintf('Data amplitude significance levels: [%g %g] dB\n',ampsig(1),ampsig(2));
-        end
+        amps = 20*log10(amps); % convert to dB 
 
         if isnan(baseamp) % if baseamp not specified in 'limits'
             base = find(times<=DEFAULT_BASELINE_END); % use default baseline end point (ms)
@@ -3399,16 +3391,21 @@ if ~isnan(coherfreq)
                 fprintf('Using %g to %g ms as amplitude baseline.\n',...
                     times(1),times(base(end)));
             end
-            [amps,baseamp] = rmbase(amps,length(times),base); % remove (log) baseline
+            [amps,baseamp] = rmbase(amps,length(times),base); % remove dB baseline
             fprintf('Removed baseline amplitude of %d dB for plotting.\n',baseamp);
-        else
+
+        else % if 'basedB' specified in 'limits' (in dB)
             fprintf('Removing specified baseline amplitude of %d dB for plotting.\n',...
                 baseamp);
-            amps = amps-baseamp;
+            amps = amps-baseamp; % remove specified dB baseline
         end
-        if Cohsigflag
+
+        fprintf('Data amplitude levels: [%g %g] dB\n',min(amps),max(amps));
+
+        if alpha>0 % if computed significance levels
             ampsig = ampsig - baseamp;
-        end;
+            fprintf('Data amplitude significance levels: [%g %g] dB\n',ampsig(1),ampsig(2));
+        end
 
     end % ~Allampsflag
 
