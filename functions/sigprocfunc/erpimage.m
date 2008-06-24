@@ -206,6 +206,9 @@
 
 %% LOG COMMENTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % $Log: not supported by cvs2svn $
+% Revision 1.276  2008/06/24 00:19:27  scott
+% nothing
+%
 % Revision 1.275  2008/04/08 15:00:32  arno
 % fix phasedet baseline removal
 %
@@ -2690,31 +2693,29 @@ elseif Allampsflag %%%%%%%%%%%%%%%% Plot allamps instead of data %%%%%%%%%%%%%%
         outsort = sortvar;
     end
 
-    allamps = log10(allamps); % convert to dB
-    amps = log10(amps);
-    ampsig = log10(ampsig);
+    allamps = 20*log10(allamps); % convert allamps to dB
+    amps = 20*log10(amps);       % convert latency mean amps to dB
+    ampsig = 20*log10(ampsig);   % convert amplitude signif thresholds to dB
 
     if alpha>0
         fprintf('Amplitude significance levels: [%g %g] dB\n',ampsig(1),ampsig(2));
     end
 
     if isnan(baseamp) % if not specified in 'limits'
-        [amps,baseamp] = rmbase(amps,length(times),base); % remove (log)
-        % baseline
-        allamps = allamps - baseamp; % divide by (non-log) baseline
+        [amps,baseamp] = rmbase(amps,length(times),base); % subtract the dB baseline (baseamp)
+                                                          % amps are the means at each latency
+        allamps = allamps - baseamp; % subtract dB baseline from allamps
         % amplitude
-        ampsig = ampsig - baseamp;
-    else % if specified in 'limits'
+        ampsig = ampsig - baseamp; % subtract dB baseline from ampsig
+
+    else % if baseamp specified in 'limits' (as last argument 'bamp', see help)
         amps = amps-baseamp; % use specified (log) baseamp
-        allamps = allamps - baseamp; % = divide by (non-log) baseline amplitude
+        allamps = allamps - baseamp; % subtract dB baseline 
         if isnan(signifs);
-            ampsig = ampsig-baseamp;
+            ampsig = ampsig-baseamp; % subtract dB baseline 
         end
     end
 
-    amps = 20*amps;
-    allamps = 20*allamps;
-    ampsig = 20*ampsig;
 
     %
     %%%%%%%%%%%%%%%%%%%%%%%%% Find color axis limits %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
