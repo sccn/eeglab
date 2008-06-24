@@ -206,6 +206,9 @@
 
 %% LOG COMMENTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % $Log: not supported by cvs2svn $
+% Revision 1.275  2008/04/08 15:00:32  arno
+% fix phasedet baseline removal
+%
 % Revision 1.274  2008/01/11 00:28:24  arno
 % make all parameters 'key', 'val' while preserving backward compatibility
 %
@@ -2578,7 +2581,7 @@ elseif Allampsflag %%%%%%%%%%%%%%%% Plot allamps instead of data %%%%%%%%%%%%%%
         [amps,cohers,cohsig,ampsig,allamps] = ...
             phasecoher(urdata,length(times),srate,coherfreq,cycles,0, ...
             [], [], timeStretchRef, timeStretchMarks);
-        % need to receive cohsig and ampsig to get allamps
+        % need to receive cohsig and ampsig to get allamps <---
         ampsig = signifs([1 2]); % assume these already in dB
         cohsig = signifs(3);
 
@@ -2590,6 +2593,7 @@ elseif Allampsflag %%%%%%%%%%%%%%%% Plot allamps instead of data %%%%%%%%%%%%%%
             timeStretchRef, timeStretchMarks');
         % need to receive cohsig and ampsig to get allamps
         fprintf('Coherence significance level: %g\n',cohsig);
+
     else % no plotting of significance
         [amps,cohers,cohsig,ampsig,allamps] = ...
             phasecoher(urdata,length(times),srate,coherfreq, ...
@@ -2700,7 +2704,7 @@ elseif Allampsflag %%%%%%%%%%%%%%%% Plot allamps instead of data %%%%%%%%%%%%%%
         allamps = allamps - baseamp; % divide by (non-log) baseline
         % amplitude
         ampsig = ampsig - baseamp;
-    else
+    else % if specified in 'limits'
         amps = amps-baseamp; % use specified (log) baseamp
         allamps = allamps - baseamp; % = divide by (non-log) baseline amplitude
         if isnan(signifs);
