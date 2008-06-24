@@ -100,8 +100,8 @@
 % Specify plot parameters:
 %   'limits' = [lotime hitime minerp maxerp loamp hiamp locoher hicoher bamp]
 %               Plot axes limits. Can use NaN (or nan, but not Nan) for missing items
-%               and omit late items. Use last input, bamp, to fix the baseline amplitude.
-%               {default: from data}
+%               and omit late items. Use last input, bamp (in dB), to set the 
+%               baseline amplitude in 'plotamps' plots {default: from data}
 %   'signif' = [lo_amp, hi_amp, coher_signif_level] Use precomputed significance
 %               thresholds (as from outputs ampsig, cohsig) to save time. {default: none}
 %   'caxis'  = [lo hi] Set color axis limits. Else [fraction] Set caxis limits at
@@ -206,6 +206,9 @@
 
 %% LOG COMMENTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % $Log: not supported by cvs2svn $
+% Revision 1.277  2008/06/24 00:34:09  scott
+% corrected use of baseamp for allamps plotting -sm & rsh
+%
 % Revision 1.276  2008/06/24 00:19:27  scott
 % nothing
 %
