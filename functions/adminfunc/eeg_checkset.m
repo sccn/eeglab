@@ -150,6 +150,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.228  2008/04/16 17:51:00  arno
+% optional double precision implementation
+%
 % Revision 1.227  2008/02/22 17:16:18  arno
 % better memory management
 %
@@ -1037,6 +1040,16 @@ for inddataset = 1:length(ALLEEG)
                   % remove the events which latency are out of boundary
                   % ---------------------------------------------------
                   if isfield(EEG.event, 'latency')
+                      if isstr(EEG.event(1).type)
+                          if strcmpi(EEG.event(1).type, 'boundary')
+                              if EEG.event(1).duration < 1
+                                  EEG.event(1) = [];
+                              elseif EEG.event(1).latency > 0 & EEG.event(1).latency < 1
+                                  EEG.event(1).latency = 0.5;
+                              end;
+                          end;
+                      end;
+                      
                       try, alllatencies = [ EEG.event.latency ];
                       catch, error('Checkset: error empty latency entry for new events added by user');
                       end;
