@@ -127,6 +127,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.62  2008/04/08 15:00:16  arno
+% header edit
+%
 % Revision 1.61  2007/05/18 00:35:14  ywu
 % fastif has strange file
 %
@@ -710,21 +713,26 @@ end;
 
 % find closet points in data
 % --------------------------
-oldtimevals = timevals;
-for index = 1:length(timevals)
-    [dum ind] = min(abs(timevect-timevals(index)));
-    timeindices(index) = ind;
-    timevals(index)    = timevect(ind);
-end;
-if length(timevals) < length(unique(timevals))
-    disp('Warning: duplicate times, reduce the number of output times');
-end;
-if all(oldtimevals == timevals)
-    disp('Debug msg: Time value unchanged by finding closest in data');
+tmptimes = (timevals/1000*srate)+1;
+if sum(abs(round(tmptimes)-tmptimes)) < 1E-5
+    timeindices = round(tmptimes);
 else
-    %disp('Debug msg: Time value updated by finding closest points in data');
+    oldtimevals = timevals;
+    timeindices = zeros(size(timevals));
+    for index = 1:length(timevals)
+        [dum ind] = min(abs(timevect-timevals(index)));
+        timeindices(index) = ind;
+        timevals(index)    = timevect(ind);
+    end;
+    if length(timevals) < length(unique(timevals))
+        disp('Warning: duplicate times, reduce the number of output times');
+    end;
+    if all(oldtimevals == timevals)
+        disp('Debug msg: Time value unchanged by finding closest in data');
+    else
+        %disp('Debug msg: Time value updated by finding closest points in data');
+    end;
 end;
-
 
 % DEPRECATED, FOR C INTERFACE
 function nofunction()
