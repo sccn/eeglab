@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2008/05/08 22:47:27  elizabeth
+% Test for empty chanlocs - Arno
+%
 % Revision 1.25  2008/04/17 18:33:17  nima
 % replaced by arno files version of the file
 %
@@ -150,13 +153,13 @@
 % Initial revision
 %
 
-function [EEG, command] = pop_biosig(filename, varargin); 
+function [EEG, command] = my_pop_biosig(filename, varargin); 
 EEG = [];
 command = '';
 
 if nargin < 1
 	% ask user
-	[filename, filepath] = uigetfile('*.*', 'Choose an BDF file -- pop_readbdf()'); 
+	[filename, filepath] = uigetfile('*.*', 'Choose an BDF file -- pop_biosig()'); %%% this is incorrect in original version!!!!!!!!!!!!!!
     drawnow;
     
 	if filename == 0 return; end;
@@ -224,7 +227,7 @@ if ~isempty(g.blockrange)
     newblockrange    = newblockrange*dat.Dur;    
     DAT=sread(dat, newblockrange(2)-newblockrange(1), newblockrange(1))';
 else 
-    DAT=sread(dat, Inf);
+    DAT=sread(dat, Inf)';% this isn't transposed in original!!!!!!!!
     newblockrange    = [];
 end
 dat = sclose(dat);
@@ -235,12 +238,12 @@ EEG.nbchan          = size(DAT,1);
 EEG.srate           = dat.SampleRate(1);
 EEG.data            = DAT; 
 clear DAT;
-try
-    EEG.data            = EEG.data';
-catch,
-    pack;
-    EEG.data            = EEG.data';
-end;    
+% $$$ try  % why would you do the following???????  JO
+% $$$     EEG.data            = EEG.data';
+% $$$ catch,
+% $$$     pack;
+% $$$     EEG.data            = EEG.data';
+% $$$ end;    
 EEG.setname 		= sprintf('%s file', dat.TYPE);
 EEG.comments        = [ 'Original file: ' filename ];
 EEG.xmin            = 0; 
@@ -256,34 +259,67 @@ if isfield(dat, 'Label') & ~isempty(dat.Label)
 end
 EEG = eeg_checkset(EEG);
 
-% extract events
+% extract events % this part I totally revamped to work...  JO
 % --------------
-disp('Extracting events...');
-if ~isempty(dat.EVENT)
-    if isfield(dat, 'out') % Alois fix for event interval does not work
-        if isfield(dat.out, 'EVENT')
-            dat.EVENT = dat.out.EVENT;
-        end;
+disp('Extracting events from last EEG channel...');
+EEG.event = [];
+
+% $$$ startval = mode(EEG.data(end,:)); % my code
+% $$$ for p = 2:size(EEG.data,2)-1
+% $$$     [codeout] = code(EEG.data(end,p));
+% $$$     if EEG.data(end,p) > EEG.data(end,p-1) & EEG.data(end,p) >= EEG.data(end,p+1)
+% $$$         EEG.event(end+1).latency =  p;
+% $$$         EEG.event(end).type = bitand(double(EEG.data(end,p)-startval),255);
+% $$$     end;
+% $$$ end;
+
+lastout = mod(EEG.data(end,1),256);newevs = []; % andrey's code
+codeout = mod(EEG.data(end,2),256);
+for p = 2:size(EEG.data,2)-1
+    nextcode = mod(EEG.data(end,p+1),256);
+    if codeout > lastout & codeout >= nextcode
+        newevs = [newevs codeout];
+        EEG.event(end+1).latency =  p;
+        EEG.event(end).type = codeout;
     end;
-    if ~isempty(newblockrange)
-        interval(1) = newblockrange(1) * dat.SampleRate(1) + 1;
-        interval(2) = newblockrange(2) * dat.SampleRate(1);
-    else interval = [];
-    end
-    EEG.event = biosig2eeglabevent(dat.EVENT, interval); % Toby's fix
-    if strcmpi(g.rmeventchan, 'on') & strcmpi(dat.TYPE, 'BDF') & isfield(dat, 'BDF')
-        disp('Removing event channel...');
-        EEG.data(dat.BDF.Status.Channel,:) = [];
-        EEG.nbchan = size(EEG.data,1);
-        if ~isempty(EEG.chanlocs)
-            EEG.chanlocs(dat.BDF.Status.Channel,:) = [];
-        end;
-    end;
-    EEG = eeg_checkset(EEG, 'eventconsistency');
-else 
-    disp('Warning: no event found. Events might be embeded in a data channel.');
-    disp('         To extract events, use menu File > Import Event Info > From data channel');
+    lastout = codeout;
+    codeout = nextcode;
 end;
+
+if strcmpi(g.rmeventchan, 'on')
+    EEG.data(dat.BDF.Status.Channel,:) = [];
+    EEG.nbchan = size(EEG.data,1);
+    if ~isempty(EEG.chanlocs)
+        EEG.chanlocs(dat.BDF.Status.Channel,:) = [];
+    end;
+end;
+EEG = eeg_checkset(EEG, 'eventconsistency');
+
+% $$$ if ~isempty(dat.EVENT)    
+% $$$     if isfield(dat, 'out') % Alois fix for event interval does not work
+% $$$         if isfield(dat.out, 'EVENT')
+% $$$             dat.EVENT = dat.out.EVENT;
+% $$$         end;
+% $$$     end;
+% $$$     if ~isempty(newblockrange)
+% $$$         interval(1) = newblockrange(1) * dat.SampleRate(1) + 1;
+% $$$         interval(2) = newblockrange(2) * dat.SampleRate(1);
+% $$$     else interval = [];
+% $$$     end
+% $$$     EEG.event = biosig2eeglabevent(dat.EVENT, interval); % Toby's fix
+% $$$     if strcmpi(g.rmeventchan, 'on') & strcmpi(dat.TYPE, 'BDF') & isfield(dat, 'BDF')
+% $$$         disp('Removing event channel...');
+% $$$         EEG.data(dat.BDF.Status.Channel,:) = [];
+% $$$         EEG.nbchan = size(EEG.data,1);
+% $$$         if ~isempty(EEG.chanlocs)
+% $$$             EEG.chanlocs(dat.BDF.Status.Channel,:) = [];
+% $$$         end;
+% $$$     end;
+% $$$     EEG = eeg_checkset(EEG, 'eventconsistency');
+% $$$ else 
+% $$$     disp('Warning: no event found. Events might be embeded in a data channel.');
+% $$$     disp('         To extract events, use menu File > Import Event Info > From data channel');
+% $$$ end;
 
 % rerefencing
 % -----------
@@ -308,7 +344,7 @@ EEG = eeg_checkset(EEG);
 % history
 % -------
 if isempty(options)
-    command = sprintf('EEG = pop_biosig(''%s'');', filename); 
+    command = sprintf('EEG = my_pop_biosig(''%s'');', filename); 
 else
-    command = sprintf('EEG = pop_biosig(''%s'', %s);', filename, vararg2str(options)); 
+    command = sprintf('EEG = my_pop_biosig(''%s'', %s);', filename, vararg2str(options)); 
 end;    
