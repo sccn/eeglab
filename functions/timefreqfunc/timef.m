@@ -10,8 +10,10 @@
 %           (from a distribution of 'naccu' surrogate data trials) and 
 %           non-significant features of the output plots are zeroed out 
 %           (i.e., plotted in green). 
-%        * Given a 'topovec' topo vector and 'elocs' electrode location file,
-%           the figure also shows a topoplot() of the specified scalp map.
+%        * Given a 'topovec' scalp map weights vector and an 'elocs' electrode 
+%           location file or structure, the figure also shows a topoplot() 
+%           image of the specified scalp map.
+%
 %        * Note: Left-click on subplots to view and zoom in separate windows.
 % Usage: 
 %        >> [ersp,itc,powbase,times,freqs,erspboot,itcboot,itcphase] = ...
@@ -159,6 +161,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.94  2007/08/09 20:01:54  arno
+% change power unit if baseline is NaN
+%
 % Revision 1.93  2007/08/06 19:23:51  arno
 % header typo
 %
