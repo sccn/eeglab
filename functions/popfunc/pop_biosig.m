@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2008/06/30 22:19:03  arno
+% julie's changes
+%
 % Revision 1.26  2008/05/08 22:47:27  elizabeth
 % Test for empty chanlocs - Arno
 %
@@ -273,17 +276,41 @@ EEG.event = [];
 % $$$     end;
 % $$$ end;
 
-lastout = mod(EEG.data(end,1),256);newevs = []; % andrey's code
-codeout = mod(EEG.data(end,2),256);
-for p = 2:size(EEG.data,2)-1
-    nextcode = mod(EEG.data(end,p+1),256);
-    if codeout > lastout & codeout >= nextcode
-        newevs = [newevs codeout];
+% lastout = mod(EEG.data(end,1),256);newevs = []; % andrey's code 8 bits
+% codeout = mod(EEG.data(end,2),256);
+% for p = 2:size(EEG.data,2)-1
+%     nextcode = mod(EEG.data(end,p+1),256);
+%     if codeout > lastout & codeout >= nextcode
+%         newevs = [newevs codeout];
+%         EEG.event(end+1).latency =  p;
+%         EEG.event(end).type = codeout;
+%     end;
+%     lastout = codeout;
+%     codeout = nextcode;
+% end;
+
+%lastout = mod(EEG.data(end,1),256*256);newevs = []; % andrey's code 16 bits
+%codeout = mod(EEG.data(end,2),256*256);
+%for p = 2:size(EEG.data,2)-1
+%    nextcode = mod(EEG.data(end,p+1),256*256);
+%    if (codeout > lastout) & (codeout >= nextcode)
+%        newevs = [newevs codeout];
+%        EEG.event(end+1).latency =  p;
+%        EEG.event(end).type = codeout;
+%    end;
+%    lastout = codeout;
+%    codeout = nextcode;
+%end;
+
+% Modifieded by Andrey (Aug.5,2008) to detect all non-zero codes: 
+thiscode = 0;
+for p = 1:size(EEG.data,2)-1
+    prevcode = thiscode;
+    thiscode = mod(EEG.data(end,p),256*256);   % andrey's code - 16 bits 
+    if (thiscode ~= 0) && (thiscode~=prevcode) 
         EEG.event(end+1).latency =  p;
-        EEG.event(end).type = codeout;
+        EEG.event(end).type = thiscode;
     end;
-    lastout = codeout;
-    codeout = nextcode;
 end;
 
 if strcmpi(g.rmeventchan, 'on')
