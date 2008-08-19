@@ -74,6 +74,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2003/10/07 17:30:06  arno
+% remove debug message
+%
 % Revision 1.13  2003/10/07 17:25:21  arno
 % removing saving filenames
 %
@@ -197,6 +200,7 @@ end;
 return;
 
 function array = applyboot(array, arrayboot)
+    if isempty(arrayboot), return; end;
     if size(arrayboot,3) == 2
         array(find((array > arrayboot(:,:,1)) & (array < arrayboot(:,:,2)))) = 0;
     elseif size(arrayboot,2) > 2
