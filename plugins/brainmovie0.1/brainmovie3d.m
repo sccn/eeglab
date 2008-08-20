@@ -1,11 +1,11 @@
-%brainmovie3d() - generate a sequence of images showing event-related coherence,
+% brainmovie3d() - generate a sequence of images showing event-related coherence,
 %               event-related spectral perturbations, and inter-trial coherence
 %               of localized EEG waveforms. Uses outputs of timef() and cross().
-%Usage:
+% Usage:
 %   >> brainmovie3d(ersps,itcs,crossfs_amp,crossfs_phase,times,freqs,selected,...
 %                         'keyword1',value1,...); % creates files image0001.eps, etc.
 %
-%Inputs:
+% Inputs:
 % ersps         - Cell array (components,conditions) of ERSP arrays (freqs,times)
 %                 ERSP = event-related spectral perturbation; returned by timef()
 % itcs          - Cell array (components,conditions) of ITC arrays (freqs,times)
@@ -21,37 +21,20 @@
 %                 These indexes determine for which freqs plotting will be performed.
 % selected      - Component indices to plot (default all)
 %
-%Optional 'keyword' parameters:
+% Optional 'keyword' parameters:
 % 'latency'   - plot only a subset of latencies. The time point closest to the 
 %               latency given are plotted. Default = empty, all latencies.
-% 'frames'    - vector of frame indices to compute
-% 'framesout' - ['eps'|'ppm'|'fig'] Default format for saving frames on disk. Default is '.eps'.
-% 'framefolder' - [string] frames output folder. Default uses current directory.
-%               the directory is created if it does not exist.
+% 'frames'    - vector of frame indices to compute. [1:2] only computes the
+%               first two frames.
+% 'envelope'  - (2,points,conditions) envelopes of the average data (ERP) in each condition
+%               (envelope =  min and max traces of each ERP across all channels and times)
 % 'rt'        - cell array of vector containing reaction times of the subject in 
-%               each conditions (default {} -> ignored)
-% 'rthistloc' - location and size of rt histograms in individual axes. 
-%               [abscissa ordinate width maxheight].
-% 'square'    - ['on'|'off'] re-square all coordinates (so X and Y width is the same)
-%               default is 'on';
-% 'magnify'   - integer magnification factor for graphics. Default is 1.
-% 'size'      - [widthcond height] output image size {default [400,400]}
-%               widthcond is the width of a single condition plot (in pixels)
-% 'polarity'  - ['pos'|'posneg'] polarity for ITC and crossf. 'pos' = only positive values
-%               'posneg' = positive and negative values.
-% 'visible'   - ['on'|'off'] show the images on the screen or keep them hidden {default 'on'}
-% 'view'      - 3D static starting view.  See help view. Default is [1 0 0].
-% 'path3d'    - ['on'|'off'|[thetafact phifact]] 'on' activate automatic rotation in 3-D. Use
-%               [exttheta extphi] to specify theta and phi multiplicative factor (default is
-%               [1 0.75]. Use parameter 'view' to specify starting view point. Default is
-%               'off'.
-% 'backcolor' - [float array] background color. Default is [1 1 1] (white).
-% 'stereo'    - [Real] Create a stereo movie. The figure should contain a [left right]
-%               display of two identical 3-D plots. The left plot view will follow the 
-%               given 'path' (see above). The right plot axis will be 3-D rotated by an 
-%               additional horizontal disparity angle specified by the 'stereo' argument:
-%               6 (degrees) suggested. Default is [] = mono display.
-% 'project3d' - ['on'|'off'] project disks on each 3-D axis. Default is 'off'.
+%               each conditions. This will plot a small bar which height will vary
+%               based on the probability of response (default {} -> ignored)
+% 'flashes'   - vector of time indices at which the background flashes.  Specify the color 
+%               of the flash with a cell array of [1,2] cell arrays. 
+%               Ex. { { 200 'y' } { 1500 '5' }} will generate two flashes, 
+%               yellow at 200 ms and red at 1500 ms 
 %
 % Movie ITC, Power and Crossf options:
 % 'power'     - ['on'|'off'] vary the size of the component disks according to spectral power 
@@ -63,7 +46,7 @@
 %                               according to cross-coherence magnitude {def: on}
 % 'crossfphasecolor' -['on'|'off'] vary the arc color according to coherence {default: on}
 % 'crossfphasespeed' - ['on'|'off'] vary the arc speed according to 
-%                                      cross-coherence phase {def: on}
+%                                      cross-coherence phase {def: off}
 % 'crossfphaseunit'  - ['degree'|'radian']. Coherence phase angle unit {Default is degree}.
 % 'colmapcrossf' - colormap array for arcs {default: hsv(64) with green as 0} 
 % 'colmapcoh'   - colormap array for disks (according to inter-trial coherence) 
@@ -71,35 +54,59 @@
 % 'scalepower'  - [min max] dB range for power (and disk size) variation {default: [-5 5]}  
 % 'scalecoher'  - [min max] coherence range {default: [0 1]}
 % 'scaleitc'    - [absmax] maximum itc {Default: 1}
-% 'diskscale'   - numeric value that scales the size of disks {default: [1.0]}   
+% 'polarity'  - ['pos'|'posneg'] polarity for ITC and crossf. 'pos' = only positive values
+%               'posneg' = positive and negative values.
 %
-% Movie coordinates and axis options
+% Movie coordinates and axis options:
+% 'magnify'   - integer magnification factor for graphics. Default is 1.
+% 'diskscale'   - numeric value that scales the size of disks {default: [1.0]}   
 % 'xlimaxes'    - x-axis limits axis for the component locations {default: [-1 1]}
 % 'ylimaxes'    - y-axis limits axis for the component locations {default: [-1 to 1]}
 % 'coordinates' - 2-column array of [x y] coordinates of the selected components 
 %                 {default: spaced evenly around the head circle boundary}  
+% 'square'    - ['on'|'off'] re-square all coordinates (so X and Y width is the same)
+%               default is 'on';
+% 'project3d' - ['on'|'off'] project disks on each 3-D axis. Default is 'off'.
 % 'circfactor'  - (ncomps,ncomps) array of arc curvatures (0=straight; 1=half-round, 
 %                 positive or negative values give the sense of rotation) {def: 0s}
-% 'envelope'    - (2,points,conditions) envelopes of the average data (ERP) in each condition
-%                 (envelope =  min and max traces of each ERP across all channels and times)
 % 'envylabel'   - ordinate label for envelope. {Default 'Potential \muV'}
 % 'envvert'     - cell array of time indices at which to draw vertical lines.
 %                 Can also be a cell array of cell to specify line aspect. For instance
 %                 { { 0 'color' 'b' 'linewidth' 2 } {1000 'color' 'r' }} would draw two
 %                 lines, one blue thick line at latency 0 and one thin red line at latency 1000.
-% 'flashes'     - vector of time indices at which the background flashes.  Specify the color 
-%                 of the flash with a cell array of [1,2] cell arrays. 
-%                 Ex. { { 200 'y' } { 1500 '5' }} will generate two flashes, 
-%                 yellow at 200 ms and red at 1500 ms 
+% 'rthistloc' - location and size of rt histograms in individual axes. 
+%               [abscissa ordinate width maxheight].
 % 'title'       - (string) main movie title
 % 'condtitle'   - (string array) condition titles (one condition title per row)
 % 'condtitleformat' - list of title properties. Ex: { 'fontize', 12, 'fontweight', 'bold' }
 % 'plotorder'   - [integer vector] component plot order from 1 to the number of selected 
 %                 components. 
+% 'backcolor' - [float array] background color. Default is [1 1 1] (white).
 %
+% Picture and movie output options:
+% 'moviename'  - ['string'] Movie file name. Default is "output.avi".
+% 'movieopts'  - [cell] Movie options for avifile function. See "help avifile".
+% 'framesout'  - ['eps'|'ppm'|'fig'|'tiff'|'none'] Default format for saving frames on disk. 
+%                Default is 'tiff'.
+% 'framefolder' - [string] frames output folder. Default uses current directory.
+%               the directory is created if it does not exist.
+% 'visible'    - ['on'|'off'] show the images on the screen or keep them hidden {default 'on'}
+% 'size'      - [widthcond height] output image size {default [400,400]}
+%               widthcond is the width of a single condition plot (in pixels)
+% 'view'      - 3D static starting view.  See help view. Default is [1 0 0].
+% 'path3d'    - ['on'|'off'|[thetafact phifact]] 'on' activate automatic rotation in 3-D. Use
+%               [exttheta extphi] to specify theta and phi multiplicative factor (default is
+%               [1 0.75]. Use parameter 'view' to specify starting view point. Default is
+% 'stereo'    - [Real] Create a stereo movie. The figure should contain a [left right]
+%               display of two identical 3-D plots. The left plot view will follow the 
+%               given 'path' (see above). The right plot axis will be 3-D rotated by an 
+%               additional horizontal disparity angle specified by the 'stereo' argument:
+%               6 (degrees) suggested. Default is [] = mono display.
+%               'off'.
 %Outputs to disk:
-% imageX      - brainmovie3d() saves a sequence of image files to disk (image0001.eps, ...)
-%
+% imageX      - brainmovie3d() saves an output.avi movie (see 'moviename' option above)
+%               and a sequence of image files to disk (image0001.eps, as define in the 
+%               'framesout' option).
 %Example:
 %
 % % Given ICA activations in array icaact (size ncomps,nframes,ntrials), animate (here) 
@@ -107,22 +114,21 @@
 % % re stimulus onset) assuming a 250-Hz sampling rate and 100 output frames
 %
 % >> [ersps{1,1},itcs{1,1},powbase,times,freqs] = ...                          % timef for
-%                timef(icaact(1,:),176,[-100 600],'Component 1',250,1,32,100); %     1st comp
+%                timef(icaact(1,:),176,[-100 600],'Component
+%                1',250,1,32,100); %     1st comp
 % >> [ersps{2,1},itcs{2,1},powbase,times,freqs] = ...                          % timef for
 %                timef(icaact(2,:),176,[-100 600],'Component 2',250,1,32,100); %     2nd comp
 % >> [crossfs_amp{1,2},mcoh,times,freqs,cohboot,crossfs_phase{1,2}] = ...      % crossf for
 %      crossf_(icaact(1,:),icaact(2,:),176,[-100 600],'Crossf 1 and 2',250,1,32,100); % both
 %
-% >> brainmovie3d( ersps, itcs, crossfs_amp, crossfs_phase, times, [1:2] ); % makes files in pwd
-%                                                          image0001.eps, ... image0100.eps
-%
-% >> !/usr/local/bin/convert images*.eps movie.mpg % Now use ImageMagic 'convert' 
-%                                                  % to generate the movie.
+% >> brainmovie3d( ersps, itcs, crossfs_amp, crossfs_phase, times, [1:2] );
 %
 % Author: Arnaud Delorme, SCCN, INC, UCSD, 30 Mai 2003
 %
 % Note: Better resolution movies can be generated by .eps -> .ppm -> .avi, 
 %       (or, under a planned upgrade to brainmovie3d, from Matlab6 to .avi directly).
+% >> !/usr/local/bin/convert images*.eps movie.mpg % ImageMagic 'convert' may be
+%                                                  % used to generate the movie.
    
 % arno@salk.edu, Arnaud Delorme, CNL / Salk Institute, 2003
 
@@ -133,6 +139,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2008/05/09 23:30:05  arno
+% new coordinate format for dipoles
+%
 % Revision 1.20  2007/03/09 18:58:33  arno
 % axes size and coherence thickness
 %
@@ -194,7 +203,7 @@
 % Initial revision
 %
 
-function alltimepoints = brainmovie3d(ALLERSP,ALLITC,ALLCROSSF,ALLCROSSFANGLE,times,FREQS,selected,varargin);
+function [alltimepoints mov] = brainmovie3d(ALLERSP,ALLITC,ALLCROSSF,ALLCROSSFANGLE,times,FREQS,selected,varargin);
     
 if nargin < 6
 	help brainmovie3d;
@@ -223,9 +232,25 @@ nbcomponents = size(ALLERSP,1);
 
 % add defaults
 %-------------
+defmaxpow = 0;
+defmaxitc = 0;
+for i=1:length(ALLERSP)
+    defmaxpow = max(defmaxpow, max(abs(ALLERSP{  i}(:))));
+    defmaxitc = max(defmaxitc, max(abs(ALLITC{   i}(:))));
+end;    
+defmaxcoh = 0;
+for i=1:length(ALLCROSSF(:))
+    tmpmax = max(abs(ALLCROSSF{i}(:)));
+    if ~isempty(tmpmax), defmaxcoh = max(defmaxcoh, tmpmax); end;
+end;
+defmaxpow = ceil(defmaxpow*100)/100;
+defmaxitc = ceil(defmaxitc*100)/100;
+defmaxcoh = ceil(defmaxcoh*100)/100;
 try, g.head; 			catch, g.head=''; end;
 try, g.visible; 		catch, g.visible='on'; end;
-try, g.square; 		    catch, g.square='on'; end;
+try, g.square; 		    catch, g.square='on'; end;defmaxpow = ceil(defmaxpow*100)/100;
+try, g.moviename; 	    catch, g.moviename='output.avi'; end;
+try, g.movieopts; 	    catch, g.movieopts={}; end;
 try, g.rt; 	        	catch, g.rt={}; end;
 try, g.power; 	    	catch, g.power='on'; end;
 try, g.latency; 	   	catch, g.latency=[]; end;
@@ -235,20 +260,20 @@ try, g.crossf; 			catch, g.crossf='on'; end;
 try, g.crossfcoh; 		catch, g.crossfcoh='on'; end;
 try, g.size; 			catch, g.size=[400 400]; end;
 try, g.crossfphasecolor;catch, g.crossfphasecolor='on'; end;
-try, g.crossfphasespeed;catch, g.crossfphasespeed='on'; end;
+try, g.crossfphasespeed;catch, g.crossfphasespeed='off'; end;
 try, g.crossfphaseunit; catch, g.crossfphaseunit='degree'; end;
-try, g.scalepower;      catch, g.scalepower = [-5 5]; end;
-try, g.scalecoher;      catch, g.scalecoher = [0 1]; end;
-try, g.scaleitc;        catch, g.scaleitc = 1; end;
+try, g.scalepower;      catch, g.scalepower = [-defmaxpow defmaxpow]; end;
+try, g.scalecoher;      catch, g.scalecoher = [0 defmaxcoh]; end;
+try, g.scaleitc;        catch, g.scaleitc = defmaxitc; end;
 try, g.diskscale;       catch, g.diskscale = 1; end;
-try, g.framefolder;    catch, g.framefolder = ''; end;
+try, g.framefolder;     catch, g.framefolder = ''; end;
 try, g.envelope;        catch, g.envelope = []; end; 
 try, g.caption;			catch, g.caption = 'on'; end; 
 try, g.frames;			catch, g.frames = []; end; 
 try, g.envvert;			catch, g.envvert = {}; end; 
 try, g.flashes;			catch, g.flashes = []; end; 
 try, g.polarity;		catch, g.polarity = 'pos'; end; 
-try, g.framesout;	    catch, g.framesout = 'eps'; end; 
+try, g.framesout;	    catch, g.framesout = 'tiff'; end; 
 try, g.condtitle;		catch, g.condtitle = []; end; 
 try, g.condtitleformat;	catch, g.condtitleformat = {'fontsize', 14', 'fontweight', 'bold' }; end;
 try, g.title;			catch, g.title = []; end; 
@@ -307,6 +332,12 @@ if isstr(g.path3d)
 else
     if length(g.path3d) ~= 2, error('path3d length have to be a string or a 2 element vector'); end;
 end;  
+
+% messages for defaults
+% ---------------------
+if g.scalepower(1) == -defmaxpow, fprintf('Power limits set to %1.2f to %1.2f dB\n', -defmaxpow, defmaxpow); end;
+if g.scaleitc(1)   ==  defmaxitc, fprintf('ITC limits set to 0 to %1.2f\n', defmaxitc); end;
+if g.scalecoher(2) ==  defmaxcoh, fprintf('Coherence limits set to 0 to %1.2f\n', defmaxcoh); end;
 
 % check size of inputs
 % --------------------
@@ -454,13 +485,19 @@ if ~isempty(g.framefolder)
     if g.framefolder(end) == '/', g.framefolder(end) = []; end;
 end;  
 
+% create movie
+% ------------
+disp('A movie is being saved under output.avi (movie parameters shown below):');
+mov = avifile(g.moviename, g.movieopts{:});
+
 % other variables
 % ---------------
 %limits: power -6 to 6
 %limits: ITC 0-1
 %limits: coherence 0-1
 %limits: coherence angle -180 to 180 
-g.maxc         = 100;
+g.factproj = [-71 88 -71];
+g.projcolor = [0.35 0.35 0.35];
 g.rthistcolor  = [1 1 1];
 g.resmult = 1;
 currentphase   = zeros( length(selected), length(selected), nbconditions);
@@ -592,6 +629,7 @@ for i=1:nbconditions
     
     dipplot( dipstruct, 'view', g.view, g.dipplotopt{:}); axis off;
     
+    %g.maxc = 100;
     %surface([-2 -2; -2 -2]*g.maxc, [-20 20; -20 20]*g.maxc,[-20 -20; 20 20]*g.maxc, repmat(reshape([0 0 0], 1, 1, 3), [2 2 1]), 'facelighting', 'none');
     %surface([-20 20; -20 20]*g.maxc,[2 2; 2 2]*g.maxc, [-20 -20; 20 20]*g.maxc,     repmat(reshape([0 0 0], 1, 1, 3), [2 2 1]), 'facelighting', 'none');
 
@@ -634,10 +672,10 @@ for i=1:nbconditions
 		end;
 	end;	
 
-	if ~isempty(g.envelope) % draw axis for the envelope
-		e(i) = axes('position', [0.1/nbconditions+maxcoordx/nbconditions*(i-1), 0, ...
-					maxcoordx/nbconditions-0.1/nbconditions, ordinate].*s+q,'visible', g.visible);
-	end;
+    % this axis is used for the enveloppe but
+    % also used to print current time (which is why it is always created
+    e(i) = axes('position', [0.1/nbconditions+maxcoordx/nbconditions*(i-1), 0, ...
+                maxcoordx/nbconditions-0.1/nbconditions, ordinate].*s+q,'visible', g.visible);
 end;
 
 % draw captions if necessary
@@ -796,7 +834,7 @@ for indeximage = alltimepoints
               tmptimef = ALLERSP{ index1, tmpcond};
               tmppow   = mean(tmptimef( FREQS, indeximage)); % size is power
               tmptimef = ALLITC{ index1, tmpcond};
-              tmpitc = mean(tmptimef( FREQS, indeximage)); % color is ITC
+              tmpitc = mean(abs(tmptimef( FREQS, indeximage))); % color is ITC
                                                            %index1, tmpitc, tmppow,
               drawcircle( g.coordinates{tmpcond}( index1,: ), tmppow, tmpitc, g);
           end;
@@ -820,11 +858,12 @@ for indeximage = alltimepoints
 
 	% draw the enveloppe of the signal if necessary
 	% ---------------------------------------------
+    axes(e(tmpcond)); cla; axis off; set (gcf, 'visible', g.visible);
 	if ~isempty( g.envelope )
           minordinate = min(min(min(g.envelope)));
           maxordinate = max(max(max(g.envelope)));
           for tmpcond = 1:nbconditions
-            axes(e(tmpcond)); cla; set (gcf, 'visible', g.visible);
+            axes(e(tmpcond)); cla; axis on; set (gcf, 'visible', g.visible);
             plot(times, g.envelope(:,:,tmpcond), 'k', 'linewidth', 2*g.resmult); hold on;
             set(gca, 'ylim', [minordinate maxordinate]);
             set(gca, 'xlim', [times(1) times(end)]);
@@ -846,11 +885,13 @@ for indeximage = alltimepoints
           % ----------------------------
           %coordx1 = (g.xlimaxes(2)-g.xlimaxes(1))*0.1 + g.xlimaxes(1);
           %coordy1 = (g.ylimaxes(2)-g.ylimaxes(1))*0.87 + g.ylimaxes(1);
-          tt = text(-0.1, -0.25, sprintf('%d ms', round(times(indeximage))), 'unit', 'normalized');
-          set(tt, 'fontsize', 12*g.resmult, 'horizontalalignment', 'right', 'tag', 'tmpmov', 'color', 'w');
-	end;		   
-
-
+	end;
+    
+    % put the time in the left bottom corner
+    % --------------------------------------
+    tt = text(-0.1, -0.25, sprintf('%d ms', round(times(indeximage))), 'unit', 'normalized');
+    set(tt, 'fontsize', 12*g.resmult, 'horizontalalignment', 'right', 'tag', 'tmpmov', 'color', 'w');
+    
     % last 3-D settings
     % -----------------
     lighting phong;
@@ -862,7 +903,12 @@ for indeximage = alltimepoints
         
 	% save the file for a movie
 	% -------------------------
-    if strcmpi(g.framesout, 'eps')
+    movframes = getframe(gcf);
+    mov = addframe(mov,movframes);
+    if strcmpi(g.framesout, 'tiff')
+        command2 = sprintf('print -dtiff %s/image%4.4d.tiff', g.framefolder, indeximage);
+        eval(command2);
+    elseif strcmpi(g.framesout, 'eps')
         command2 = sprintf('print -depsc -loose %s/image%4.4d.eps', g.framefolder, indeximage);
         eval(command2);
     elseif 	strcmpi(g.framesout, 'ppm')
@@ -874,7 +920,8 @@ for indeximage = alltimepoints
             drawnow;
         end;
     end;
-end;		 
+end;
+mov = close(mov);
 return;
 
 % function to draw circles
@@ -909,7 +956,7 @@ function [tmpsize, tmpcolor, handles] = drawcircle( tmpcoord, tmpersp, tmpitc, g
 			dashed = 0;
 		end;		
         
-        tmpsize = g.diskscale*tmpsize*g.maxc;
+        tmpsize = g.diskscale*tmpsize*100;
 		if tmpsize > 0
             if length(tmpcoord) > 2
                 [xstmp ystmp zs] = sphere(15);
@@ -927,10 +974,10 @@ function [tmpsize, tmpcolor, handles] = drawcircle( tmpcoord, tmpersp, tmpitc, g
                                'backfacelighting', 'lit', 'facelighting', 'phong', 'facecolor', 'interp', 'ambientstrength', 0.3);
                 %axis off; axis equal; lighting phong; camlight left; rotate3d
                 if strcmpi(g.project3d, 'on')
-                    colorarray  = repmat(reshape([0.15 0.15 0.15], 1,1,3), [size(zs,1) size(zs,2) 1]);
-                    surf(xs, ys, -g.maxc*1.25*ones(size(zs)), colorarray, 'tag', 'tmpmov', 'edgecolor', 'none', 'facelighting', 'none');
-                    surf(xs,  g.maxc*1.25*ones(size(ys)), zs, colorarray, 'tag', 'tmpmov', 'edgecolor', 'none', 'facelighting', 'none');
-                    surf(-g.maxc*0.98*ones(size(xs)), ys, zs, colorarray, 'tag', 'tmpmov', 'edgecolor', 'none', 'facelighting', 'none');
+                    colorarray = repmat(reshape(g.projcolor, 1,1,3), [size(zs,1) size(zs,2) 1]);
+                    surf(xs, ys, g.factproj(3)*ones(size(zs)), colorarray, 'tag', 'tmpmov', 'edgecolor', 'none', 'facelighting', 'none');
+                    surf(xs, g.factproj(2)*ones(size(ys)), zs, colorarray, 'tag', 'tmpmov', 'edgecolor', 'none', 'facelighting', 'none');
+                    surf(g.factproj(1)*ones(size(xs)), ys, zs, colorarray, 'tag', 'tmpmov', 'edgecolor', 'none', 'facelighting', 'none');
                 end;
             else
                 circle( tmpcoord(1), tmpcoord(2), tmpsize, tmpcolor, 'k', 0, 360, dashed, fastif(dashed, 2, 1));
@@ -980,7 +1027,7 @@ function handles = drawconnections( pos1, pos2, crossfpower, crossfangle, circfa
     if crossfpower == 0, tmpthick = 0; end;
     
 	if tmpthick > 0        
-        [xc yc zc] = cylinder( g.resmult*tmpthick/300*g.maxc, 10);
+        [xc yc zc] = cylinder( g.resmult*tmpthick/300*100, 10);
         colorarray = repmat(reshape(tmpcolor, 1,1,3), [size(zc,1) size(zc,2) 1]);
         handles = surf(xc, yc, zc, colorarray, 'tag', 'tmpmov', 'edgecolor', 'none', ...
               'backfacelighting', 'lit', 'facecolor', 'interp', 'facelighting', 'phong', 'ambientstrength', 0.3);
@@ -1001,10 +1048,10 @@ function handles = drawconnections( pos1, pos2, crossfpower, crossfangle, circfa
         %figure
         %axis off; axis equal; lighting phong; camlight left; rotate3d
         if strcmpi(g.project3d, 'on')
-            colorarray  = repmat(reshape([0.15 0.15 0.15], 1,1,3), [size(zc,1) size(zc,2) 1]);
-            surf(xc, yc, -g.maxc*1.25*ones(size(zc)), colorarray, 'tag', 'tmpmov', 'edgecolor', 'none', 'facelighting', 'none');
-            surf(xc,  g.maxc*1.25*ones(size(yc)), zc, colorarray, 'tag', 'tmpmov', 'edgecolor', 'none', 'facelighting', 'none');
-            surf(-g.maxc*0.98*ones(size(xc)), yc, zc, colorarray, 'tag', 'tmpmov', 'edgecolor', 'none', 'facelighting', 'none');
+            colorarray  = repmat(reshape(g.projcolor, 1,1,3), [size(zc,1) size(zc,2) 1]);
+            surf(xc, yc, g.factproj(3)*ones(size(zc)), colorarray, 'tag', 'tmpmov', 'edgecolor', 'none', 'facelighting', 'none');
+            surf(xc, g.factproj(2)*ones(size(yc)), zc, colorarray, 'tag', 'tmpmov', 'edgecolor', 'none', 'facelighting', 'none');
+            surf(g.factproj(1)*ones(size(xc)), yc, zc, colorarray, 'tag', 'tmpmov', 'edgecolor', 'none', 'facelighting', 'none');
         end;
         %if round(tmpthick) == 7, asdf; end;
 	end;
@@ -1052,7 +1099,7 @@ function scalecoher(posx, posy, thickness,g);
 	end;	
 	%ylabel('Phase-Coh', 'fontweight', 'bold', 'fontsize', 12*g.resmult);
 	set(gca, 'box', 'on', 'ylim', [0 1], 'ytick', [0 0.5 1], ...
-			 'yticklabel', strvcat('-180º','0º','180º'), 'xlim', [0 1], 'xtick', [], 'xticklabel', [], 'fontsize', 10*g.resmult);
+			 'yticklabel', strvcat('-180ï¿½','0ï¿½','180ï¿½'), 'xlim', [0 1], 'xtick', [], 'xticklabel', [], 'fontsize', 10*g.resmult);
 	%hold on; ff = fill([0 0.02 0.02 0], [0 0 1 1], 'w'); set(ff, 'edgecolor', 'w');
 	%hold on; ff = fill([0 0 1 1], [0 0.02 0.02 0], 'w'); set(ff, 'edgecolor', 'w');
 return;
