@@ -113,6 +113,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.77  2008/05/09 23:30:05  arno
+% new coordinate format for dipoles
+%
 % Revision 1.76  2005/07/18 18:58:26  arno
 % temporary modif
 %
@@ -359,6 +362,7 @@ end;
 [g movopts] = finputcheck(varargin, { 'mode'	      'string'        { 'compute' 'movie' 'computemovie' 'auto' }     'auto';
                             'comps'       'integer'       [1 Inf]                                  1:size(ALLEEG(1).icaact,1);
 							'freqparams'  'cell'          {}                                       {};
+							'erp'         'string'        { 'on' 'off' }                           'on';
 							'diffmovie'   'string'        { 'on' 'off' }                           'off';
 							'confirm'     'string'        { 'on' 'off' }                           'on';
 							'moviename'   'string'		  {}									   'movie';
@@ -374,7 +378,7 @@ end;
                             'title'       'string'        []                                       '';
                             'freqs'       'real'          []                                       [];
                             'continuity'  'integer'       [1 Inf]                                  3;
-                            'threshold'   'float'         [0 Inf]                                  [0.1 0.1 0.1];
+                            'threshold'   'float'         [0 Inf]                                  []; %[0.1 0.1 0.1];
                             'oneframe'    'string'        { 'on' 'off' }                           'off';
                             'quality'     'string'        { 'ultrafast' 'fast' 'getframe' 'slow' } 'ultrafast';
                             'makemovie'   'cell'          {}                                       {};
@@ -679,6 +683,7 @@ end;
 
 % additional options
 % ------------------
+brainmovieoptions = { brainmovieoptions{:} movopts{:} };
 if strcmp(g.oneframe, 'on')
    brainmovieoptions = { brainmovieoptions{:} 'frames' [1] };
 end;
@@ -694,7 +699,9 @@ end;
 if strcmpi(g.diffmovie, 'on')
 	allenv(:,:,3) = env(mean(ALLEEG(1).data,3)-mean(ALLEEG(2).data,3), [min(times) max(times)], times);
 end;
-brainmovieoptions = { brainmovieoptions{:} 'envelope' allenv };
+if strcmpi(g.erp, 'on')
+    brainmovieoptions = { brainmovieoptions{:} 'envelope' allenv };
+end;
 
 % plot polarity
 % -------------
@@ -765,16 +772,16 @@ if ~strcmpi(g.mode, 'compute')
         
         % Run makemovie
         % -------------
-        if ~isempty(g.moviefolder)
-             outname = sprintf('%s/%s%3.2f', g.moviefolder, g.moviename, freqs(freqindex));
-        else outname = sprintf('%s%3.2f', g.moviename, freqs(freqindex));
-        end;
-        if strcmpi(g.quality, 'ultrafast')
-            unix(sprintf('mkavi -file %s.avi %s/image*.ppm', outname, g.framefolder));
-        else
-            g.makemovie = removedup({ 'mode' g.quality g.makemovie{:} 'dir', g.framefolder, 'outname', outname });
-            makemovie( { 'image' min(allframes) max(allframes) 4 }, g.makemovie{:});
-        end;
+        %if ~isempty(g.moviefolder)
+        %     outname = sprintf('%s/%s%3.2f', g.moviefolder, g.moviename, freqs(freqindex));
+        %else outname = sprintf('%s%3.2f', g.moviename, freqs(freqindex));
+        %end;
+        %if strcmpi(g.quality, 'ultrafast')
+        %    unix(sprintf('mkavi -file %s.avi %s/image*.ppm', outname, g.framefolder));
+        %else
+        %    g.makemovie = removedup({ 'mode' g.quality g.makemovie{:} 'dir', g.framefolder, 'outname', outname });
+        %    makemovie( { 'image' min(allframes) max(allframes) 4 }, g.makemovie{:});
+        %end;
     end;    
 	cd(origdir);
 end;
