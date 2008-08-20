@@ -139,6 +139,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2008/08/20 22:28:37  arno
+% Reworded documentation, fixed various problems
+%
 % Revision 1.21  2008/05/09 23:30:05  arno
 % new coordinate format for dipoles
 %
@@ -422,10 +425,6 @@ switch lower(g.polarity)
 	case {'pos', 'posneg'} ;  
 	otherwise disp('Error: Polarity must be either ''pos'' or ''posneg'''); return;
 end;
-switch lower(g.framesout)
-	case {'eps', 'fig', 'ppm'} ;  
-	otherwise disp('Error: Framesout must be either ''eps'', ''ppm'' or ''fig'''); return;
-end;	
 if ~isempty(g.envvert),
     if ~iscell(g.envvert) & ~( isstruct(g.envvert{1}) | isnumeric(g.envvert{1}) )
         disp('Error: Invalid type for Envvert.'); return;
