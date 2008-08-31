@@ -1,8 +1,8 @@
-% acsobiro() - A.C.'s Robust second-order blind identification (SOBI) by joint 
-%              diagonalization of the time-delayed covariance matrices. NOTE:
-%              THIS CODE ASSUMES TEMPORALLY CORRELATED SIGNALS Thus, estimated 
-%              time-delayed covariance matrices must be nonsingular for at least 
-%              some time delays.
+% acsobiro() - A. Chickocki's robust Second-Order Blind Identification (SOBI) 
+%              by joint diagonalization of the time-delayed covariance matrices. 
+%              NOTE: THIS CODE ASSUMES TEMPORALLY CORRELATED SIGNALS.
+%              Thus, the estimated time-delayed covariance matrices 
+%              for at least some time delays must be nonsingular.
 %
 % Usage:  >>   [H] = acsobiro(X);
 %         >> [H,S] = acsobiro(X,n,p);
@@ -11,7 +11,7 @@
 %                    m is the number of sensors
 %                    N is the number of samples
 %         n - number of sources {Default: n=m}
-%         p - number of correlation matrices to be diagonalized {default: p=100}
+%         p - number of correlation matrices to be diagonalized {default: 100}
 %             For noisy data, use at least 100 time delays.
 % Outputs:
 %         H - matrix of dimension [m,n] an estimate of the *mixing* matrix
@@ -20,11 +20,12 @@
 %
 % Authors: Implemented and improved by A. Cichocki on the basis of 
 %          the classical SOBI algorithm of Belouchrani and publications of: 
-%           A. Belouchrani et al., F. Cardoso et al.,
-%           S. Choi, S. Cruces, S. Amari, and P. Georgiev
+%            A. Belouchrani et al., F. Cardoso et al.,
+%            S. Choi, S. Cruces, S. Amari, and P. Georgiev
+%          For references: see function body
 %
-% Note: updated by Arnaud Delorme and Scott Makeig to process data epochs
-%       (compute an average correlation matrix respecting epoch boundaries).
+% Note: Extended by Arnaud Delorme and Scott Makeig to process data epochs
+%       (computes the correlation matrix respecting epoch boundaries).
 
 % REFERENCES:
 %  A. Belouchrani, K. Abed-Meraim, J.-F. Cardoso, and E. Moulines, ``Second-order
@@ -42,13 +43,19 @@ function [H,S,D]=acsobiro(X,n,p),
 
 [m,N,ntrials]=size(X);
 if nargin<1 | nargin > 3
-  help sobi
+
+  help acsobiro
+
 elseif nargin==1,
+
+ DEFAULT_LAGS = 100;
  n=m; % source detection (hum...)
- p=min(100,ceil(N/3)); % number of time delayed correlation matrices to be diagonalized 
-                 % Note: For noisy data, use at least p=100 the time-delayed covariance matrices.
+ p=min(DEFAULT_LAGS,ceil(N/3)); % number of time delayed correlation matrices to be diagonalized 
+                                % Note: For noisy data, use at least p=100.
 elseif nargin==2,
- p=min(100,ceil(N/3)); % number of correlation matrices to be diagonalized
+
+ p=min(DEFAULT_LAGS,ceil(N/3)); % number of correlation matrices to be diagonalized
+
 end; 
 
 X(:,:)=X(:,:)-(mean(X(:,:)')'*ones(1,N*ntrials));        % Remove data means 
@@ -66,9 +73,9 @@ for t = 1:ntrials
 end;
 
 [Ux,Dx,Vx]=svd(Rxx);
-Dx=diag(Dx);
-% n=11;
- if n<m, % under assumption of additive white noise and when the number 
+        Dx=diag(Dx);
+
+if n<m, % under assumption of additive white noise and when the number 
          % of sources is known, or can be estimated a priori 
   Dx=Dx-real((mean(Dx(n+1:m))));
   Q= diag(real(sqrt(1./Dx(1:n))))*Ux(:,1:n)';
