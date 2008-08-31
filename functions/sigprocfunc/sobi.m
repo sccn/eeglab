@@ -10,26 +10,29 @@
 %   data - data matrix of size [m,N] ELSE of size [m,N,t] where
 %                m is the number of sensors,
 %                N is the  number of samples, 
-%                t is the  number of trials (here, correlations avoid epoch boundaries)
-%      n - number of sources {Default: n=m}
-%      p - number of correlation matrices to be diagonalized {Default: min(100, N/3)}
-%          Note that for noisy data, the authors strongly recommend using at least 100 
-%          time delays.
+%                t is the  number of trials (avoid epoch boundaries)
+%         n - number of sources {Default: n=m}
+%         p - number of correlation matrices to be diagonalized 
+%             {Default: min(100, N/3)} Note that for non-ideal data, 
+%             the authors strongly recommend using at least 100 time delays.
 %
 % Outputs:
 %   winv - Matrix of size [m,n], an estimate of the *mixing* matrix. Its
 %          columns are the component scalp maps. NOTE: This is the inverse
 %          of the usual ICA unmixing weight matrix. Sphering (pre-whitening),
 %          used in the algorithm, is incorporated into winv. i.e.,
+%
 %             >> icaweights = pinv(winv); icasphere = eye(m);
+% 
 %   act  - matrix of dimension [n,N] an estimate of the source activities 
+%
 %             >> data            = winv            * act; 
 %                [size m,N]        [size m,n]        [size n,N]
 %             >> act = pinv(winv) * data;
 %
-% Authors:  A. Belouchrani and A. Cichocki (papers listed in function source)
-%
-% Note: Adapted by Arnaud Delorme and Scott Makeig to process data epochs
+% Authors:  A. Belouchrani and A. Cichocki (references: See function body)
+% Note:     Adapted by Arnaud Delorme and Scott Makeig to process data epochs by
+%           computing covariances while respecting epoch boundaries.
  
 % REFERENCES:
 % A. Belouchrani, K. Abed-Meraim, J.-F. Cardoso, and E. Moulines, ``Second-order
@@ -49,16 +52,24 @@
 
 function [H,S,D]=sobi(X,n,p),
 
+% Authors note: For non-ideal data, use at least p=100 the time-delayed covariance matrices.
+DEFAULT_LAGS = 100;
+
 [m,N,ntrials]=size(X);
+
 if nargin<1 | nargin > 3
+
   help sobi
+
 elseif nargin==1,
+
  n=m; % Source detection (hum...)
- p=min(100,ceil(N/3)); % Number of time delayed correlation matrices to be diagonalized 
- % Authors note: For noisy data, use at least p=100 the time-delayed covariance matrices.
+ p=min(DEFAULT_LAGS,ceil(N/3)); % Number of time delayed correlation matrices to be diagonalized 
+
 elseif nargin==2,
- p=min(100,ceil(N/3)); % Default number of correlation matrices to be diagonalized
-                       % Use < 100 delays if necessary for short data epochs
+
+ p=min(DEFAULT_LAGS,ceil(N/3)); % Default number of correlation matrices to be diagonalized
+                                % Use < DEFAULT_LAGS delays if necessary for short data epochs
 end; 
 
 %
