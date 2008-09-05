@@ -1,20 +1,22 @@
 % eeg_getepochevent() - Return dataset event field values for all events 
 %                                of one or more specified types
 % Usage:
-%       >> epochval = eeg_getepochevent( EEG, types);
-%       >> epochval = eeg_getepochevent( EEG, types, timewin, fieldname);
+%       >> epochval = eeg_getepochevent( EEG );
+%       >> epochval = eeg_getepochevent( EEG, 'key', 'val');
+%       >> epochval = eeg_getepochevent( EEG, type, timewin, ...
+%                                                 fieldname); % old format
 %
 % Inputs:
 %   EEG       - Input dataset
 %
 % Optional inputs:
-%   types     - String containing an event type. Cell array of string
+%   'type'    - String containing an event type. Cell array of string
 %               may be used to select several event types; 
 %               {} is all types of events. Note: Requires that 
 %               a field named 'type' is defined in 'EEG.event'.
-%   timewin   - Event time window [start, end] in milliseconds
+%   'timewin' - [start end] Event time window in milliseconds
 %               (default []=whole epoch).
-%   fieldname - Name of the field to return the values for. 
+%   'fieldname' - Name of the field to return the values for. 
 %               Default field is 'EEG.event.latency' in milliseconds
 %               (though internally this information is stored in 
 %               real frames).
@@ -24,10 +26,10 @@
 %                 several values are available for each epoch, only the
 %                 first one is taken into consideration.
 %                 Latencies are measured in msec relative to epoch onset.
-%                 Forced to be numerical, where a string is converted by double
-%                 to its ascii number which is normalized to be between 0 and 1, and
-%                 the string is summed together. See the subfunction ascii2num for
-%                 more details.
+%                 Forced to be numerical, where a string is converted by 
+%                 double to its ascii number which is normalized to be 
+%                 between 0 and 1, and the string is summed together. See 
+%                 the subfunction ascii2num for more details.
 %   allepochval - cell array with same length as the number of epoch 
 %                 containing all values for all epochs. This output is
 %                 usefull when several value are found within each epoch.
@@ -81,6 +83,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2008/01/10 19:45:24  arno
+% new calling format
+%
 % Revision 1.27  2007/05/10 03:44:10  toby
 % changed character scaling to maximize spread while avoiding sort inaccuracy
 %
@@ -160,24 +165,37 @@
 
 % 02/15/02 modified function according to new event structure -ad
 
-function [epochval, allepochval] = eeg_getepochevent(EEG, type, timewin, fieldname, timeformat);
-
-if nargin <2
+function [epochval, allepochval] = eeg_getepochevent(EEG, varargin);
+    
+if nargin < 2
     help eeg_getepochevent;
     return;
-end;    
-if nargin <3
-    timewin = [-Inf Inf];
-else 
-	if isempty(timewin)
-        timewin = [-Inf Inf];
-	end;
 end;
-if nargin <4
-    fieldname = 'latency';
+
+% deal with old input format
+% -------------------------
+options = {};
+oldformat = 0;
+if nargin < 3
+    oldformat = 1;
+elseif isnumeric(varargin{2})
+    oldformat = 1;
 end;
-if nargin <5
-    timeformat = 'points';
+if oldformat
+    if nargin > 1, options = { options{:} 'type'      varargin{1} }; end;
+    if nargin > 2, options = { options{:} 'timewin'   varargin{2} }; end;
+    if nargin > 3, options = { options{:} 'fieldname' varargin{3} }; end;
+else
+    options = varargin; 
+end;
+opt = finputcheck(options, { 'type'       { 'string' 'cell' } { [] [] } '';
+                             'timewin'    'real'              []        [-Inf Inf];
+                             'fieldname'  'string'            []        'latency' }, ...
+                  'eeg_getepochevent');
+if isstr(opt), error(opt); end;
+
+if isempty(opt.timewin)
+    opt.timewin = [-Inf Inf];
 end;
 
 if isempty(EEG.event)
@@ -192,36 +210,36 @@ end;
     
 % check if EEG.epoch and EEG.event contains 'latency' field
 % ------------------------------------------
-if ~isfield( EEG.event, fieldname)
-    disp(['Getepochevent: no ''' fieldname ''' field in events, aborting.']); return;
+if ~isfield( EEG.event, opt.fieldname)
+    disp(['Getepochevent: no ''' opt.fieldname ''' field in events, aborting.']); return;
 end;
 
 % deal with empty types
 % ---------------------
-if ~isempty(type) & ~iscell(type)
-	type = { type };
+if ~isempty(opt.type) & ~iscell(opt.type)
+	opt.type = { opt.type };
 end;
 
 % convert types
 % -------------
-for indextype=1:length(type)
-     if isstr(type{indextype}) & isnumeric(EEG.event(1).type)
-         if ~isempty(str2num(type{indextype}))   
-			 type{indextype} = str2num(type{indextype}); 
+for indextype=1:length(opt.type)
+     if isstr(opt.type{indextype}) & isnumeric(EEG.event(1).type)
+         if ~isempty(str2num(opt.type{indextype}))   
+			 opt.type{indextype} = str2num(opt.type{indextype}); 
 		 else
 			 error('eeg_getepochevent: string type cannot be found in numeric event type array');
 		 end;		 
-	 elseif isnumeric(type{indextype}) & isstr(EEG.event(1).type)
-		  type{indextype} = num2str(type{indextype});
+	 elseif isnumeric(opt.type{indextype}) & isstr(EEG.event(1).type)
+		  opt.type{indextype} = num2str(opt.type{indextype});
 	 end;
 end;
 
 % select epochs
 % -------------
-if ~isempty(type)
+if ~isempty(opt.type)
 	Ieventtmp = [];
-	for indextype=1:length(type)
-		typeval = type{indextype};
+	for indextype=1:length(opt.type)
+		typeval = opt.type{indextype};
 		if isstr(typeval)
 			Ieventtmp = [Ieventtmp strmatch(typeval, { EEG.event.type }, 'exact')' ];
 		else
@@ -234,7 +252,7 @@ end;
 
 % select latencies
 % ----------------
-if isfield(EEG.event, 'latency') & (timewin(1) ~= -Inf | timewin(2) ~= Inf)
+if isfield(EEG.event, 'latency') & (opt.timewin(1) ~= -Inf | opt.timewin(2) ~= Inf)
 	selected = ones(size(Ieventtmp));
 	for index=1:length(Ieventtmp)
         if ~isfield(EEG.event, 'epoch'), epoch = 1;
@@ -242,7 +260,7 @@ if isfield(EEG.event, 'latency') & (timewin(1) ~= -Inf | timewin(2) ~= Inf)
         end;
 		reallat = eeg_point2lat(EEG.event(Ieventtmp(index)).latency, epoch, ...
 								EEG.srate, [EEG.xmin EEG.xmax]*1000, 1E-3); 
-		if reallat < timewin(1) | reallat > timewin(2)
+		if reallat < opt.timewin(1) | reallat > opt.timewin(2)
 			selected(index) = 0;
 		end;
 	end;
@@ -253,7 +271,7 @@ end;
 % -------------
 epochval       = cell(1,EEG.trials);  epochval(:) = { nan };
 allepochval    = cell(1, EEG.trials); allepochval(:) = { {} };
-if strcmp(fieldname, 'latency')
+if strcmp(opt.fieldname, 'latency')
 	for index = 1:length(Ieventtmp)
         if ~isfield(EEG.event, 'epoch'), epoch = 1;
         else                             epoch = EEG.event(Ieventtmp(index)).epoch;
@@ -269,9 +287,9 @@ if strcmp(fieldname, 'latency')
             end;
 		end;
 	end;
-elseif strcmp(fieldname, 'duration')
+elseif strcmp(opt.fieldname, 'duration')
 	for index = 1:length(Ieventtmp)
-		eval( [ 'val = EEG.event(Ieventtmp(index)).' fieldname ';']);
+		eval( [ 'val = EEG.event(Ieventtmp(index)).' opt.fieldname ';']);
 		if ~isempty(val)
             if ~isfield(EEG.event, 'epoch'), epoch = 1;
             else                             epoch = EEG.event(Ieventtmp(index)).epoch;
@@ -282,7 +300,7 @@ elseif strcmp(fieldname, 'duration')
 	end;
 else
     for index = 1:length(Ieventtmp)
-        eval( [ 'val = EEG.event(Ieventtmp(index)).' fieldname ';']);
+        eval( [ 'val = EEG.event(Ieventtmp(index)).' opt.fieldname ';']);
         if ~isempty(val)
             if isstr(val)
                 val = ascii2num(val);
