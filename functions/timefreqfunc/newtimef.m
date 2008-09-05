@@ -307,6 +307,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.151  2008/05/08 22:33:08  arno
+% plotamp option for backward compatibility
+%
 % Revision 1.150  2008/05/08 20:54:15  arno
 % correcting text
 %
@@ -2428,7 +2431,7 @@ function pvals = compute_pvals(oridat, surrog, tail)
     end;
     
     if myndims(oridat) > 1        
-        if size(oridat,2) ~= size(surrog, 2)
+        if size(oridat,2) ~= size(surrog, 2) | myndims(surrog) == 2
             if size(oridat,1) == size(surrog, 1)
                 surrog = repmat( reshape(surrog, [size(surrog,1) 1 size(surrog,2)]), [1 size(oridat,2) 1]);
             elseif size(oridat,2) == size(surrog, 1)
