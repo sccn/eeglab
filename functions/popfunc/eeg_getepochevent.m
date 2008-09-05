@@ -21,12 +21,17 @@
 % Outputs:
 %   epochval    - A value of the selected field for each epoch. This is
 %                 NaN if no selected event occurred during the epoch. If
-%                 several vales are available for each epoch, only the
+%                 several values are available for each epoch, only the
 %                 first one is taken into consideration.
 %                 Latencies are measured in msec relative to epoch onset.
+%                 Forced to be numerical, where a string is converted by double
+%                 to its ascii number which is normalized to be between 0 and 1, and
+%                 the string is summed together. See the subfunction ascii2num for
+%                 more details.
 %   allepochval - cell array with same length as the number of epoch 
 %                 containing all values for all epochs. This output is
 %                 usefull when several value are found within each epoch.
+%                 Not forced to be numerical.
 %
 % Notes: 1) Each epoch structure refers to the events that occurred
 %        during its time window. This function allows the user to return 
@@ -76,6 +81,18 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2007/05/10 03:44:10  toby
+% changed character scaling to maximize spread while avoiding sort inaccuracy
+%
+% Revision 1.26  2007/05/08 19:46:26  peter
+% changed scaling of ascii letters to 0 to 100 ms
+%
+% Revision 1.25  2007/05/08 06:45:54  toby
+% made output 'epochval' always numerical, doc edits
+%
+% Revision 1.24  2007/05/03 21:20:50  toby
+% test variable removed
+%
 % Revision 1.23  2007/05/03 20:55:02  toby
 % made strmatch 'exact' for selecting events.
 % this way '38' is not selected when searching for type '3'
@@ -205,7 +222,6 @@ if ~isempty(type)
 	Ieventtmp = [];
 	for indextype=1:length(type)
 		typeval = type{indextype};
-		test = 0;
 		if isstr(typeval)
 			Ieventtmp = [Ieventtmp strmatch(typeval, { EEG.event.type }, 'exact')' ];
 		else
@@ -265,23 +281,68 @@ elseif strcmp(fieldname, 'duration')
 		end;
 	end;
 else
-	for index = 1:length(Ieventtmp)
-		eval( [ 'val = EEG.event(Ieventtmp(index)).' fieldname ';']);
-		if ~isempty(val)
-            if ~isfield(EEG.event, 'epoch'), epoch = 1;
-            else                             epoch = EEG.event(Ieventtmp(index)).epoch;
-            end;
-            epochval{epoch}           = val;
-            allepochval{epoch}{end+1} = val;
+    for index = 1:length(Ieventtmp)
+        eval( [ 'val = EEG.event(Ieventtmp(index)).' fieldname ';']);
+        if ~isempty(val)
+            if isstr(val)
+                val = ascii2num(val);
+                %val_tmp = double(val);  % force epochval output to be numerical
+                % **Turn string into number that will sort in alphebetical order**
+                %val = 0;
+                %for val_count = 1:length(val_tmp)
+                    % -48 so that '1' is scaled to ascii number 1, not 49
+                    % /74 to scale double('z')=122 to 1
+                    % 10^((2-... scale to 0 to 100milliseconds
+                    
+                %    val = val + (val_tmp(val_count)-48)/74*10^(2-(val_count-1));
+                %end
+                % **End turn string ...**
+            end
+            if ~isfield(EEG.event, 'epoch'), 
+                epoch = 1;
+            else    epoch = EEG.event(Ieventtmp(index)).epoch;
+            end
+            epochval{epoch}           = val(1);
+            allepochval{epoch}{end+1} = val(1);
 		end;
 	end;
 end;    
 
 if isnumeric(epochval{1})
-    try, 
+    try 
         epochval = [ epochval{:} ];
         for index = 1:length(allepochval)
             allepochval{index} = [ allepochval{index}{:} ];
-        end;
-    catch, end;
-end;
+        end
+    catch 
+    end
+end
+
+%% SUBFUNCTION ASCII2NUM
+% Maps ascii characters ['0','9'] to [1, 10], ['a','z'] to [11, 36]
+% This is intended for alphebetically sorting string arrays numerically
+%   ascii_in    [string array]
+%   output      [double]
+function out = ascii2num(ascii_in)
+
+ascii_vector = double(ascii_in);
+out = 0;
+% go through each character in the string and scale and add it to output
+for val_count = 1:length(ascii_vector)
+    ascii_char = ascii_vector(val_count);
+    if ascii_char>=48 & ascii_char<=57            % ['0','9'] to [1, 10]
+        ascii_adj = ascii_char - 47;
+    elseif ascii_char>=65 & ascii_char<=90        % ['A','Z'] to [11, 36]
+        ascii_adj = ascii_char - 64;
+    elseif ascii_char>=97 & ascii_char<=122       % ['a','z'] to [11, 36]
+        ascii_adj = ascii_char - 96;
+    else ascii_adj = ascii_char;
+    end
+    out = out + ascii_adj/36^val_count;
+end
+
+
+
+
+
+
