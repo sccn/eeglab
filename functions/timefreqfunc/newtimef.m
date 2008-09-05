@@ -307,6 +307,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.152  2008/09/05 21:43:50  arno
+% fixe compute_pvals naccu dimention problem (bug 658)
+%
 % Revision 1.151  2008/05/08 22:33:08  arno
 % plotamp option for backward compatibility
 %
@@ -1376,7 +1379,8 @@ end;
 % compare 2 conditions 
 %%%%%%%%%%%%%%%%%%%%%%%
 if iscell(data)
-    
+    Pboot = [];
+    Rboot = [];
     if ~strcmpi(g.mcorrect, 'none')
         error('Correction for multiple comparison not implemented for comparing conditions');
     end;
