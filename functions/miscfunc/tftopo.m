@@ -56,6 +56,8 @@
 %  'verbose'   = ['on'|'off'] comment on operations on command line {default: 'on'}.
 %  'axcopy'  = ['on'|'off'] creates a copy of the figure axis and its graphic objects in a new pop-up window 
 %                    using the left mouse button {default: 'on'}.. 
+%  'denseLogTicks' = ['on'|'off'] creates denser labels on log freuqncy axis {default: 'off'} 
+%
 %
 % Notes:
 %  1) Additional topoplot() optional arguments can be used.
@@ -390,7 +392,9 @@ fieldlist = { 'chanlocs'      { 'string' 'struct' }       []       '' ;
               'sigthresh'     'integer'  [1 Inf]                   [1 1];
               'smooth'        'real'     [0 Inf]                   1;
               'timefreqs'     'real'     []                        [];
-              'vert'          'real'     [times(1) times(end)]     [min(max(0, times(1)), times(end))] };
+              'vert'          'real'     [times(1) times(end)]     [min(max(0, times(1)), times(end))];
+              'denseLogTicks' 'string'   {'on' 'off'}               'off'              
+              };
 
 [g varargin] = finputcheck( varargin, fieldlist, 'tftopo', 'ignore');
 if isstr(g), error(g); end;
@@ -673,9 +677,11 @@ elseif strcmpi(g.logfreq, 'native'),
     imagesc(times(tftimes),log(freqs(tffreqs)),tfave);
     axis([g.limits(1:2) log(g.limits(3:4))]);
     
-%    minTick = min(ylim);
-%    maxTick = max(ylim);
-%    set(gca,'ytick',linspace(minTick, maxTick,20));
+    if g.denseLogTicks
+        minTick = min(ylim);
+        maxTick = max(ylim);
+        set(gca,'ytick',linspace(minTick, maxTick,20));
+    end;
     
     ft = str2num(get(gca,'yticklabel'));
     ft = exp(1).^ft;
