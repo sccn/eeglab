@@ -90,6 +90,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.87  2008/04/19 21:01:53  arno
+% allow newtimef input for significance (auto-transpose)
+%
 % Revision 1.86  2007/08/15 00:37:01  arno
 % same
 %
@@ -669,6 +672,11 @@ if strcmpi(g.logfreq, 'on'),
 elseif strcmpi(g.logfreq, 'native'), 
     imagesc(times(tftimes),log(freqs(tffreqs)),tfave);
     axis([g.limits(1:2) log(g.limits(3:4))]);
+    
+%    minTick = min(ylim);
+%    maxTick = max(ylim);
+%    set(gca,'ytick',linspace(minTick, maxTick,20));
+    
     ft = str2num(get(gca,'yticklabel'));
     ft = exp(1).^ft;
     ft = unique(round(ft));
