@@ -42,7 +42,7 @@
 %                Either a string or an integer.
 %   'sortwin'    - Sorting event window [start, end] in seconds ([]=whole epoch)
 %   'sortfield'  - Sorting field name. {default: none}. See Notes below.
-%   options      - erpimage() options, separated by commas (Ex: 'erp', 'cbar'). 
+%   'erpimageopt'  - erpimage() options, separated by commas (Ex: 'erp', 'cbar'). 
 %                {Default: none}. For further details see >> erpimage help   
 %
 % Outputs:
@@ -75,6 +75,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 %$Log: not supported by cvs2svn $
+%Revision 1.10  2008/09/19 00:10:18  nima
+%sorttype can now accept more than one string in a cell.
+%
 %Revision 1.9  2008/02/08 20:21:32  arno
 %*** empty log message ***
 %
