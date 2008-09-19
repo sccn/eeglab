@@ -75,6 +75,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 %$Log: not supported by cvs2svn $
+%Revision 1.9  2008/02/08 20:21:32  arno
+%*** empty log message ***
+%
 %Revision 1.8  2008/01/12 03:08:14  arno
 %add STUDY structure as output
 %
@@ -112,7 +115,7 @@ function [STUDY, allphases, allsortvar, subjamptime, subjamptrial, globalent ] =
 
     [ opt moreparams ] = finputcheck( varargin, { ...
         'erpimageopt' 'cell'    [] STUDY.etc.erpimparams.erpimageopt;
-        'sorttype'    'string'  [] STUDY.etc.erpimparams.sorttype;
+        'sorttype'    { 'string' 'cell' } [] STUDY.etc.erpimparams.sorttype;
         'sortwin'     'real'    [] STUDY.etc.erpimparams.sortwin;
         'sortfield'   'string'  [] STUDY.etc.erpimparams.sortfield;
         'statistics'  'string'  [] STUDY.etc.erpimparams.statistics;
