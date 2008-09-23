@@ -134,6 +134,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.56  2007/11/23 00:11:59  arno
+% default srate
+%
 % Revision 1.55  2007/11/21 16:45:34  arno
 % removing ??
 %
@@ -418,13 +421,13 @@ if nargin < 2                 % if several arguments, assign values
     if ~strcmp(EEG.comments, newcomments)             , args = { args{:}, 'comments' , newcomments }; end;
     
     if abs(str2num(results{i+5})) > 10,
-        fprintf('WARNING: are you sure the epoch start time (%3.2f) is in seconds\n');
+        fprintf('WARNING: are you sure the epoch start time (%3.2f) is in seconds\n', str2num(results{i+5}));
     end;
     
+	if ~isempty( results{i+12} ) , args = { args{:}, 'icachansind',  results{i+13} }; end;
 	if ~isempty( results{i+10} ) , args = { args{:}, 'chanlocs' ,  results{i+10} }; end;
 	if ~isempty( results{i+11} ),  args = { args{:}, 'icaweights', results{i+11} }; end;
 	if ~isempty( results{i+12} ) , args = { args{:}, 'icasphere',  results{i+12} }; end;
-	if ~isempty( results{i+12} ) , args = { args{:}, 'icachansind',  results{i+13} }; end;
     
 else % no interactive inputs
     args = varargin;
@@ -506,13 +509,14 @@ for curfield = tmpfields'
                          end;
         case 'icaweights', varname = getfield(g, {1}, curfield{1});
                          if isstr(varname) & exist( varname ) == 2
-                            fprintf('pop_editset(): ICA weight matrix file ''%s'' found\n', varname); 
+                            fprintf('pop_editset(): ICA weight matrix file ''%s'' found\n', varname);
+                            if ~isempty(EEGOUT.icachansind), nbcol = length(EEGOUT.icachansind); else nbcol = EEG.nbchan; end;                            
 							try, EEGOUT.icaweights = load(varname, '-ascii');
 								EEGOUT.icawinv = [];
                             catch, 
                                 try
                                     EEGOUT.icaweights = floatread(varname, [1 Inf]);
-                                    EEGOUT.icaweights = reshape( EEGOUT.icaweights, [length(EEGOUT.icaweights)/EEG.nbchan EEG.nbchan]);
+                                    EEGOUT.icaweights = reshape( EEGOUT.icaweights, [length(EEGOUT.icaweights)/nbcol nbcol]);
                                 catch
                                     fprintf('pop_editset() warning: error while reading filename ''%s'' for ICA weight matrix\n', varname); 
                                 end;
@@ -542,12 +546,13 @@ for curfield = tmpfields'
         case 'icasphere', varname = getfield(g, {1}, curfield{1});
                          if isstr(varname) & exist( varname ) == 2
                             fprintf('pop_editset(): ICA sphere matrix file ''%s'' found\n', varname); 
+                            if ~isempty(EEGOUT.icachansind), nbcol = length(EEGOUT.icachansind); else nbcol = EEG.nbchan; end;
                             try, EEGOUT.icasphere = load(varname, '-ascii');
 								EEGOUT.icawinv = [];
                             catch,
                                 try
                                     EEGOUT.icasphere = floatread(varname, [1 Inf]);
-                                    EEGOUT.icasphere = reshape( EEGOUT.icasphere, [length(EEGOUT.icasphere)/EEG.nbchan EEG.nbchan]);
+                                    EEGOUT.icasphere = reshape( EEGOUT.icasphere, [length(EEGOUT.icasphere)/nbcol nbcol]);
                                 catch
                                     fprintf('pop_editset() warning: erro while reading filename ''%s'' for ICA weight matrix\n', varname); 
                                 end;
