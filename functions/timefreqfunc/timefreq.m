@@ -127,6 +127,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.63  2008/06/25 16:26:26  arno
+% speed up time index lookup
+%
 % Revision 1.62  2008/04/08 15:00:16  arno
 % header edit
 %
@@ -357,9 +360,7 @@ if g.cycles == 0
     g.cycles = g.wavelet;
 end
 
-if (g.cycles(1) == 0 & pow2(nextpow2(g.winsize)) ~= g.winsize)
-    error('Value of winsize with DFT must be an integer power of two [1,2,4,8,16,...]');
-elseif (g.winsize > frame)
+if (g.winsize > frame)
     error('Value of winsize must be less than frame length.');
 end
 if (pow2(nextpow2(g.padratio)) ~= g.padratio)
@@ -442,7 +443,7 @@ else % %%%%%%%%%%%%%%%%%% Constant-Q (wavelet) DFTs %%%%%%%%%%%%%%%%%%%%%%%%%%%%
     elseif length(g.cycles) == 1
         fprintf('Using %d cycles at all frequencies.\n',g.cycles);
     else
-        fprintf('Using user-defined cycle for each frequency\n',g.cycles);
+        fprintf('Using user-defined cycle for each frequency\n');
     end
     if strcmp(g.wletmethod, 'dftfilt2')
         g.win    = dftfilt2(g.freqs,g.cycles,srate, g.freqscale); % uses Morlet taper by default
@@ -488,7 +489,7 @@ if g.cycles(1) == 0
             end;
 
             tmpX = g.win .* tmpX(:);
-            tmpX = fft(tmpX,g.padratio*g.winsize);
+            tmpX = fft(tmpX,2^ceil(log2(g.padratio*g.winsize)));
             tmpX = tmpX(2:g.padratio*g.winsize/2+1);
             tmpall(:,index, trial) = tmpX(:);
         end;
@@ -720,7 +721,8 @@ else
     oldtimevals = timevals;
     timeindices = zeros(size(timevals));
     for index = 1:length(timevals)
-        [dum ind] = min(abs(timevect-timevals(index)));
+        ind = round((timevals(index)-timevect(1))/(timevect(end)-timevect(1))*length(timevect));
+        %[dum ind] = min(abs(timevect-timevals(index)));
         timeindices(index) = ind;
         timevals(index)    = timevect(ind);
     end;
