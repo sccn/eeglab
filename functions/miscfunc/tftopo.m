@@ -16,7 +16,8 @@
 % Optional inputs:
 %  'timefreqs' = Array of time/frequency points at which to plot topoplot() maps.
 %                Size: (nrows,2), each row given the [ms Hz] location 
-%                of one point.
+%                of one point. Or size (nrows,4), each row given [min_ms
+%                max_ms min_hz max_hz].
 %  'showchan'  = [integer] Channel number of the tfdata to image. Else 0 to image
 %                the (median-signed) RMS values across channels. {default: 0}
 %  'chanlocs'  = ['string'|structure] Electrode locations file (for format, see 
@@ -464,23 +465,28 @@ end;
 % process time/freq data points
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if ~isempty(g.timefreqs)
+    if size(g.timefreqs,2) == 2
+        g.timefreqs(:,3) = g.timefreqs(:,2);
+        g.timefreqs(:,4) = g.timefreqs(:,2);
+        g.timefreqs(:,2) = g.timefreqs(:,1);
+    end;
     if isempty(g.chanlocs)
         error('tftopo(): ''chanlocs'' must be defined to plot time/freq points');
     end;
-    if min(g.timefreqs(:,2))<min(freqs) 
-        fprintf('tftopo(): selected plotting frequency %g out of range.\n',min(g.timefreqs(:,2)));
+    if min(min(g.timefreqs(:,[3 4])))<min(freqs)
+        fprintf('tftopo(): selected plotting frequency %g out of range.\n',min(min(g.timefreqs(:,[3 4]))));
         return
     end
-    if max(g.timefreqs(:,2))>max(freqs) 
-        fprintf('tftopo(): selected plotting frequency %g out of range.\n',max(g.timefreqs(:,2)));
+    if max(max(g.timefreqs(:,[3 4])))>max(freqs) 
+        fprintf('tftopo(): selected plotting frequency %g out of range.\n',max(max(g.timefreqs(:,[3 4]))));
         return
     end
-    if min(g.timefreqs(:,1))<min(times) 
-        fprintf('tftopo(): selected plotting time %g out of range.\n',min(g.timefreqs(:,1)));
+    if min(min(g.timefreqs(:,[1 2])))<min(times) 
+        fprintf('tftopo(): selected plotting time %g out of range.\n',min(min(g.timefreqs(:,[1 2]))));
         return
     end
-    if max(g.timefreqs(:,1))>max(times) 
-        fprintf('tftopo(): selected plotting time %g out of range.\n',max(g.timefreqs(:,1)));
+    if max(max(g.timefreqs(:,[1 2])))>max(times) 
+        fprintf('tftopo(): selected plotting time %g out of range.\n',max(max(g.timefreqs(:,[1 2]))));
         return
     end
 
@@ -497,17 +503,16 @@ if ~isempty(g.timefreqs)
     % Compute timefreqs point indices
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     tfpoints = size(g.timefreqs,1);
-    freqidx = zeros(1,tfpoints);
     for f=1:tfpoints
-        [tmp fi] = min(abs(freqs-g.timefreqs(f,2)));
-        freqidx(f)=fi;
+        [tmp fi1] = min(abs(freqs-g.timefreqs(f,3)));
+        [tmp fi2] = min(abs(freqs-g.timefreqs(f,4)));
+        freqidx{f}=[fi1:fi2];
     end
-    timeidx = zeros(1,tfpoints);
     for f=1:tfpoints
-        [tmp fi] = min(abs(times-g.timefreqs(f,1)));
-        timeidx(f)=fi;
+        [tmp fi1] = min(abs(times-g.timefreqs(f,1)));
+        [tmp fi2] = min(abs(times-g.timefreqs(f,2)));
+        timeidx{f}=[fi1:fi2];
     end
-    tfpidx = [timeidx' freqidx'];
 else 
     tfpoints = 0;
 end;
@@ -752,10 +757,11 @@ if ~isempty(g.timefreqs)
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % Plot connecting lines using changeunits()
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        tmptimefreq = [ mean(g.timefreqs(n,[1 2])) mean(g.timefreqs(n,[3 4])) ];
         if strcmpi(g.logfreq, 'off')
-            from = changeunits([g.timefreqs(n,:)],imgax,wholeax);
+            from = changeunits(tmptimefreq,imgax,wholeax);
         else  
-            from = changeunits([g.timefreqs(n,1) log(g.timefreqs(n,2))],imgax,wholeax);        
+            from = changeunits([tmptimefreq(1) log(tmptimefreq(2))],imgax,wholeax);        
         end;
         to   = changeunits([0.5,0.5],topoaxes(n),wholeax);
         axes(wholeax);
@@ -773,7 +779,7 @@ if ~isempty(g.timefreqs)
         % Plot scalp map using topoplot()
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         axes(topoaxes(n));
-        scalpmap = squeeze(tfdataori(tfpidx(n,2),tfpidx(n,1),g.selchans));   
+        scalpmap = squeeze(mean(mean(tfdataori(freqidx{n},timeidx{n},g.selchans),1),2));   
 
         %topoplot(scalpmap,g.chanlocs,'maplimits',[g.limits(5) g.limits(6)],...
         %            'electrodes','on');
@@ -786,7 +792,12 @@ if ~isempty(g.timefreqs)
         % 'interlimits','electrodes')
         axis square;
         hold on
-        tl=title([int2str(g.timefreqs(n,1)),' ms, ',int2str(g.timefreqs(n,2)),' Hz']);
+        if g.timefreqs(n,1) == g.timefreqs(n,2)
+            tl=title([int2str(g.timefreqs(n,1)),' ms, ',int2str(g.timefreqs(n,3)),' Hz']);
+        else
+            tl=title([int2str(g.timefreqs(n,1)) '-' int2str(g.timefreqs(n,2)) 'ms, ' ...
+                int2str(g.timefreqs(n,3)) '-' int2str(g.timefreqs(n,4)) ' Hz']);
+        end;
         set(tl,'fontsize',13);
         endcaxis = max(endcaxis,max(abs(caxis)));
         %caxis([g.limits(5:6)]);
@@ -855,4 +866,3 @@ function [tfdatnew, times, freqs] = magnifytwice(tfdat, times, freqs);
         end;
     end;
     %tfdatnew = convn(tfdatnew, gauss2, 'same'); % is equivalent to the loop for slowlier
-
