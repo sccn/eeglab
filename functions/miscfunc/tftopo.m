@@ -92,6 +92,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.89  2008/09/11 21:34:21  nima
+% 'denseLogTicks' option added.
+%
 % Revision 1.87  2008/04/19 21:01:53  arno
 % allow newtimef input for significance (auto-transpose)
 %
@@ -680,7 +683,7 @@ elseif strcmpi(g.logfreq, 'native'),
     if g.denseLogTicks
         minTick = min(ylim);
         maxTick = max(ylim);
-        set(gca,'ytick',linspace(minTick, maxTick,20));
+        set(gca,'ytick',linspace(minTick, maxTick,50));
     end;
     
     ft = str2num(get(gca,'yticklabel'));
