@@ -307,6 +307,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.153  2008/09/05 22:26:38  arno
+% fixed non-returned output when using statsitics in more than 1 condition
+%
 % Revision 1.152  2008/09/05 21:43:50  arno
 % fixe compute_pvals naccu dimention problem (bug 658)
 %
@@ -1209,9 +1212,7 @@ if g.tlimits(2)-g.tlimits(1) < 30
 end
 
 
-if (g.cycles(1) == 0 & pow2(nextpow2(g.winsize)) ~= g.winsize)
-    error('Value of winsize must be an integer power of two [1,2,4,8,16,...]');
-elseif (g.winsize > g.frames)
+if (g.winsize > g.frames)
     error('Value of winsize must be smaller than epoch frames.');
 end
 
