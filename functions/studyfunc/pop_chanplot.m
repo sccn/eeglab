@@ -355,7 +355,6 @@ else
             else
                 changrpstruct = STUDY.changrp(changrp);
                 allsubjects   = unique({ STUDY.datasetinfo([ changrpstruct.setinds{:} ]).subject });
-                subject       = allsubjects{onechan-1};
             end;
             plotting_option = varargin{1};
             plotting_option = [ plotting_option(9:end) 'plot' ];
