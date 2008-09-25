@@ -350,17 +350,19 @@ else
 
         case {'plotchantopo', 'plotchanersp','plotchanitc','plotchanspec', 'plotchanerp','plotchandip'}
             changrpstr    = allchans(changrp);
-            if length(changrp) > 1
-                subject = STUDY.subject{onechan-1};
-            else
-                changrpstruct = STUDY.changrp(changrp);
-                allsubjects   = unique({ STUDY.datasetinfo([ changrpstruct.setinds{:} ]).subject });
-            end;
+            %if length(changrp) > 1
+            %    subject = STUDY.subject{onechan-1};
+            %else
+            %    changrpstruct = STUDY.changrp(changrp);
+            %    allsubjects   = unique({ STUDY.datasetinfo([ changrpstruct.setinds{:} ]).subject });
+            %    subject = allsubjects{onechan-1};
+            %end;
             plotting_option = varargin{1};
             plotting_option = [ plotting_option(9:end) 'plot' ];
             if onechan(1) ~= 1  % check that not all onechan in channel are requested
-                a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''channels'','  vararg2str({changrpstr}) ', ''subject'', ''' subject ''' );' ];
-                eval(a); STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
+                 subject = STUDY.subject{onechan-1};
+                 a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''channels'','  vararg2str({changrpstr}) ', ''subject'', ''' subject ''' );' ];
+                 eval(a); STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
              else
                 a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''channels'','  vararg2str({changrpstr}) ', ''plotsubjects'', ''on'' );' ];
                 eval(a); STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);
