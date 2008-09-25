@@ -88,6 +88,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.53  2008/04/16 17:55:27  arno
+% fix color axis for scalp maps
+%
 % Revision 1.51  2007/09/11 10:55:03  arno
 % fix numerous small display bugs
 %
@@ -251,7 +254,7 @@ if ~isempty(opt.channels)
     structdat = STUDY.changrp;
     specdata = cell(size(structdat(allinds(1)).specdata));
     for ind =  1:length(structdat(allinds(1)).specdata(:))
-        specdata{ind} = zeros([ size(structdat(allinds(1)).specdata{1}) length(allinds)]);
+        specdata{ind} = zeros([ size(structdat(allinds(1)).specdata{ind}) length(allinds)]);
         for index = 1:length(allinds)
             specdata{ind}(:,:,index) = structdat(allinds(index)).specdata{ind};
             allfreqs                 = structdat(allinds(index)).specfreqs;
