@@ -1,8 +1,9 @@
 % newcrossf() - Returns estimates and plots event-related coherence (ERCOH) 
 %        between two input data time series. A lower panel (optionally) shows 
 %        the coherence phase difference between the processes. In this panel: 
-%           -90 degrees (blue)   means x leads y by a quarter cycle.
-%            90 degrees (orange) means y leads x by a quarter cycle.
+%        In the plot output by   > newcrossf(x,y,...);
+%            90 degrees (orange) means x leads y by a quarter cycle.
+%           -90 degrees (blue)   means y leads x by a quarter cycle.
 %        Click on any subplot to view separately and zoom in/out.
 %
 % Function description:
@@ -233,6 +234,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.87  2008/04/19 21:13:37  arno
+% default log lower frequency
+%
 % Revision 1.86  2007/11/21 16:28:08  arno
 % help and topographic plots
 %
