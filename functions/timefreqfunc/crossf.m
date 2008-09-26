@@ -1,9 +1,9 @@
 % crossf() - Returns estimates and plots event-related coherence (ERCOH) 
 %        between two input data time series (X,Y). A lower panel (optionally) 
 %        shows the coherence phase difference between the processes. 
-%        In this panel:
-%           -90 degrees (blue)   means X leads Y by a quarter cycle.
-%            90 degrees (orange) means Y leads X by a quarter cycle.
+%        In this panel, output by   > crossf(X,Y,...);
+%            90 degrees (orange) means X leads Y by a quarter cycle.
+%           -90 degrees (blue)   means Y leads X by a quarter cycle.
 %        Coherence phase units may be radians, degrees, or msec.
 %        Click on any subplot to view separately and zoom in/out.
 %
@@ -169,6 +169,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.74  2007/08/07 19:13:06  arno
+% fix wrong message output (bug 338)
+%
 % Revision 1.73  2007/03/05 21:41:04  toby
 % Document removal of reliance on eventlock.m
 %
