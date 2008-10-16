@@ -206,6 +206,10 @@
 
 %% LOG COMMENTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % $Log: not supported by cvs2svn $
+% Revision 1.279  2008/06/24 01:06:29  scott
+% in help specified 'limits'  loamp & hiamp --> lodB & hidB
+% changed 'bamp' to basedB for clarity in help and code
+%
 % Revision 1.278  2008/06/24 00:37:43  scott
 % documented the default bamp in limits - should be in dB
 %
@@ -3380,7 +3384,7 @@ if ~isnan(coherfreq)
             [amps,cohers,cohsig,ampsig] = ...
                 phasecoher(urdata,size(times,2),srate,coherfreq,cycles,alpha);
             fprintf('Coherence significance level: %g\n',cohsig);
-            ampsig = 20*log10(ampsig); convert to dB
+            ampsig = 20*log10(ampsig); % convert to dB
         end
         amps = 20*log10(amps); % convert to dB 
 
