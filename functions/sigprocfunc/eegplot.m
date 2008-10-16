@@ -132,6 +132,8 @@
 %                    the dependent window. Allows comparison of two concurrent datasets,
 %                    or of channel and component data from the same dataset.
 %    'scale'      - ['on'|'off'] Display the amplitude scale {default: 'on'}.
+%    'mocap'      - ['on'|'off'] Display motion capture data in a separate figure  
+%                    {default: 'off'}.
 % Outputs:
 %    TMPREJ       -  Matrix (same format as 'winrej' above) placed as a variable in
 %                    the global workspace (only) when the REJECT button is clicked. 
@@ -165,6 +167,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.127  2008/10/16 15:56:18  arno
+% fix negative epoch (no 0)
+%
 % Revision 1.126  2007/12/27 23:49:02  scott
 % help formatting
 %
@@ -630,7 +635,8 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
    try, g.ploteventdur;     catch, g.ploteventdur = 'on'; end;
    try, g.data2;            catch, g.data2      = []; end;
    try, g.plotdata2;        catch, g.plotdata2 = 'off'; end;
-
+   try, g.mocap;		    catch, g.mocap		= 'off'; end; % nima
+   
    if strcmpi(g.ploteventdur, 'on'), g.ploteventdur = 1; else g.ploteventdur = 0; end;
    if ndims(data) > 2
    		g.trialstag = size(	data, 2);
@@ -642,7 +648,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
       case {'spacing', 'srate' 'eloc_file' 'winlength' 'position' 'title' ...
                'trialstag'  'winrej' 'command' 'tag' 'xgrid' 'ygrid' 'color' 'colmodif'...
                'freqlimits' 'submean' 'children' 'limits' 'dispchans' 'wincolor' ...
-               'ploteventdur' 'butlabel' 'scale' 'events' 'data2' 'plotdata2' },;
+               'ploteventdur' 'butlabel' 'scale' 'events' 'data2' 'plotdata2' 'mocap'},;
       otherwise, error(['eegplot: unrecognized option: ''' gfields{index} '''' ]);
       end;
    end;
@@ -1262,7 +1268,8 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
 			 		
   % motion button: move windows or display current position (channel, g.time and activation)
   % ----------------------------------------------------------------------------------------
-  commandmove = ['ax1 = findobj(''tag'',''backeeg'',''parent'',gcbf);' ... 
+  commandmove = ['show_mocap_timer = timerfind(''tag'',''mocapDisplayTimer''); if ~isempty(show_mocap_timer),  end;' ... %nima
+             'ax1 = findobj(''tag'',''backeeg'',''parent'',gcbf);' ... 
 			 'tmppos = get(ax1, ''currentpoint'');' ...
  			 'g = get(gcbf,''UserData'');' ...
     		 'if isstruct(g)' ...      %check if we are dealing with the right window
@@ -1303,6 +1310,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
  			 'g = get(gcbf,''UserData'');' ...
  			 'g.incallback = 0;' ...
 			 'set(gcbf,''UserData'', g); ' ... % early save in case of bug in the following
+			 'if strcmp(g.mocap,''on''), g.winrej = g.winrej(end,:);end;'... % only keep the last window for mocap, nima
 			 'if ~isempty(g.winrej)', ...
 			 '	if g.winrej(end,1) == g.winrej(end,2)' ... % remove unitary windows
 			 '		g.winrej = g.winrej(1:end-1,:);' ...
@@ -1334,7 +1342,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
 			 'end;' ...
           'set(gcbf,''UserData'', g);' ...
           'eegplot(''drawp'', 0);' ...
-          'clear alltrialtag g tmptmp ax1 I1 I2 trialtag hhdat hh;'];
+          'if strcmp(g.mocap,''on''), show_mocap_for_eegplot(g.winrej); g.winrej = g.winrej(end,:); end;clear alltrialtag g tmptmp ax1 I1 I2 trialtag hhdat hh; ']; % nima
   
 
   set(figh, 'windowbuttondownfcn', commandpush);
