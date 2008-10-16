@@ -165,6 +165,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.126  2007/12/27 23:49:02  scott
+% help formatting
+%
 % Revision 1.125  2007/10/15 17:41:41  arno
 % fix problem with rejecting portions of data
 %
@@ -1723,7 +1726,9 @@ else
 		[tmp indexdiv] = min(abs(nbdiv*divpossible-(g.limits(2)-g.limits(1)))); % closest possible increment
 
 		incrementpoint = divpossible(indexdiv)/1000*g.srate;
-		tagzerooffset  = -g.limits(1)/1000*g.srate; 
+        if g.limits(2) < 0, tagzerooffset  = (g.limits(2)-g.limits(1))/1000*g.srate+1; 
+        else                tagzerooffset  = -g.limits(1)/1000*g.srate; 
+        end;
 
 		for i=1:length(alltag)-1
 			if ~isempty(tagpos) & tagpos(end)-alltag(i)<2*incrementpoint/3
@@ -1743,7 +1748,8 @@ else
         % find corresponding epochs
         % -------------------------
         tagtext = eeg_point2lat(tagpos, floor((tagpos)/g.trialstag)+1, g.srate, g.limits, 1E-3);
-     	set(ax1,'XTickLabel', tagtext,'XTick', tagpos-lowlim);
+        set(ax1,'XTickLabel', tagtext,'XTick', tagpos-lowlim);
+
 			
     else
      	set(ax0,'XTickLabel', [],'YTickLabel', [],...
