@@ -132,7 +132,11 @@
 %                    the dependent window. Allows comparison of two concurrent datasets,
 %                    or of channel and component data from the same dataset.
 %    'scale'      - ['on'|'off'] Display the amplitude scale {default: 'on'}.
-%    'mocap'      - ['on'|'off'] Display motion capture data in a separate figure  
+%    'mocap'      - ['on'|'off'] Display motion capture data in a separate figure.
+%                     To run, select an EEG data period in the scolling display using 
+%                     the mouse. Motion capture (mocap) data should be
+%                     under EEG.moredata.mocap.markerPosition in xs, ys and zs fields which are
+%                     (number of markers, number of time points) arrays.                
 %                    {default: 'off'}.
 % Outputs:
 %    TMPREJ       -  Matrix (same format as 'winrej' above) placed as a variable in
