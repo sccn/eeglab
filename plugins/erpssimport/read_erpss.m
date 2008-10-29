@@ -23,6 +23,9 @@
 %          with help from Andrey Vankov
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2007/08/07 20:01:08  arno
+% unused variables
+%
 % Revision 1.28  2007/08/07 19:48:28  arno
 % fix help (bug 382)
 %
@@ -219,7 +222,15 @@ function [eeg,ev,header] = read_erpss(filename)
             fseek(fp,4*(110-nevents),0);
             if compressed
                 data = uint8(fread(fp,2*block_size_compress,'uchar'));
-                data = decompresserpss(data, nchans, block_size, complendian);
+                try
+                    data = decompresserpss(data, nchans, block_size, complendian);
+                catch,
+                    disp('Error executing the decompresserpss function');
+                    disp('Likely this function has not been compiled for your system');
+                    disp('Under Matlab, go to eeglabXXXX/functions/sigprocfunc/');
+                    disp('and type mex decompresserpss.cc');
+                    error('decompresserpss function error (see message above)');
+                end;
             else 
                 data = fread(fp,nchans*block_size,'int16');
             end;
