@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.87  2008/04/16 18:01:03  arno
+% optionaly save ICA activities
+%
 % Revision 1.86  2007/04/07 01:29:56  arno
 % help message
 %
@@ -514,7 +517,7 @@ try,
     end;
     if option_saveica & ~isempty(EEG.icaweights)
         if isempty(tmpica)
-             tmpica2 = (EEG.icaweights*EEG.icapshere)*tmpdata(EEG.icachansind,:);
+             tmpica2 = (EEG.icaweights*EEG.icasphere)*tmpdata(EEG.icachansind,:);
         else tmpica2 = tmpica;
         end;
         tmpica2 = reshape(tmpica2, size(tmpica2,1), size(tmpica2,2)*size(tmpica2,3));
