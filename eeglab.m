@@ -191,6 +191,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.524  2008/04/19 21:18:44  arno
+% plot to the next figure any new plot
+%
 % Revision 1.523  2008/04/18 15:23:23  arno
 % changing import data menu
 %
@@ -2918,7 +2921,7 @@ if study_selected
     %    set( findobj('parent', edit_m, 'type', 'uimenu', 'label', 'Select data'      ), 'enable', 'on');
     %end;
     
-elseif (exist('EEG') == 1) & isstruct(EEG) & ~isempty(EEG(1).data)        
+elseif (exist('EEG') == 1) & ~isnumeric(EEG) & ~isempty(EEG(1).data)        
     hh = findobj('parent', gcf, 'userdata', 'fullline'); set(hh, 'visible', 'off');
     hh = findobj('parent', gcf, 'userdata', 'datinfo');  set(hh, 'visible', 'on');
     
