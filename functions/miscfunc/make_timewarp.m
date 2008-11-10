@@ -175,7 +175,12 @@ timeWarpStructure.eventSequence = eventSequence;
     end
 
     function result = eventIsOfType(eventStr, types)
+        % if events are numbers, turn them into strings before comparison
         if ischar(types)
+            if iscell(eventStr) && isnumeric(cell2mat(eventStr))
+                eventStr = num2str(cell2mat(eventStr));
+            end;
+            
             result = strcmp(eventStr, types);
         else % it must be a cell of strs
             result = false;
