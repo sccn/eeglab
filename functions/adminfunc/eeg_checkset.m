@@ -150,6 +150,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.229  2008/06/25 15:43:49  arno
+% deal with first event boundary
+%
 % Revision 1.228  2008/04/16 17:51:00  arno
 % optional double precision implementation
 %
@@ -1874,7 +1877,9 @@ for inddataset = 1:length(ALLEEG)
 
         % store in new structure
         % ----------------------
-        ALLEEGNEW(inddataset) = EEG;
+        if isstruct(EEG)
+            ALLEEGNEW(inddataset) = EEG;
+        end;
     end;
 end;
 
