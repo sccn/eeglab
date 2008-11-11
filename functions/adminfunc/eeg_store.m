@@ -53,6 +53,9 @@
 % uses the global variable EEG ALLEEG CURRENTSET 
 
 % $Log: not supported by cvs2svn $
+% Revision 1.50  2007/08/23 00:07:58  arno
+% debug last changes
+%
 % Revision 1.49  2007/08/23 00:05:59  arno
 % no check for study loading
 %
@@ -245,9 +248,7 @@ if nargin < 3
     % ---------------------------
     EEG.filename = '';
     EEG.filepath = '';
-    if isfield(EEG, 'datfile')
-        EEG = rmfield(EEG, 'datfile');
-    end;
+    EEG.datfile  = '';
 end;
 
 if isempty(varargin) % no text output and no check (study loading)
