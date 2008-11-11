@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.88  2008/10/31 21:56:36  arno
+% fixing typoe
+%
 % Revision 1.87  2008/04/16 18:01:03  arno
 % optionaly save ICA activities
 %
@@ -382,9 +385,6 @@ end
 % -------------------------------
 eeglab_options;
 if length(EEG) == 1
-    if isfield(EEG, 'datfile')
-        if isempty(EEG.datfile), EEG = rmfield(EEG, 'datfile'); end;
-    end;
     if strcmpi(g.savemode, 'resave') & isfield(EEG, 'datfile') & option_savematlab
         disp('Note that your memory options for saving datasets does not correspond')
         disp('to the format of the datasets on disk (ignoring memory options)')
@@ -438,9 +438,7 @@ if strcmpi(g.savemode, 'resave')
     g.filename = EEG.filename;
     g.filepath = EEG.filepath;
     if isfield(EEG, 'datfile')
-        if isempty(EEG.datfile)
-            EEG = rmfield(EEG, 'datfile');
-        else
+        if ~isempty(EEG.datfile)
             save_as_dat_file = 1;
         end;
     end;
