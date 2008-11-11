@@ -93,8 +93,8 @@ if length(timeWarp) == 0
 end;
 %% set image parameters
 
-imWidth = 300;
-imHeight = 240;
+imWidth = 300*4;
+imHeight = 240*4;
 im = double(zeros(imHeight, imWidth, 3));
 
 %% find latencies for events of interest in each epoch
