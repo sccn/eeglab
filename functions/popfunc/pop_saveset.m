@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.89  2008/11/11 02:06:57  arno
+% do not remove datfile field
+%
 % Revision 1.88  2008/10/31 21:56:36  arno
 % fixing typoe
 %
@@ -491,7 +494,7 @@ try,
                     catch, end;
                 end;
             end;
-            EEG = rmfield(EEG, 'datfile');
+            EEG.datfile = [];
         end;
     end;
     
