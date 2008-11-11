@@ -138,6 +138,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.175  2008/02/15 16:32:20  arno
+% adding more recognized channel types
+%
 % Revision 1.174  2007/09/11 15:03:05  arno
 % fix channel removal (fiducials etc...)
 %
@@ -676,7 +679,7 @@ end;
 % -------------------------------------------
 dataset_input = 0;
 params = oriparams;
-if isstruct(chans) & isfield(chans, 'chanlocs')
+if isfield(chans, 'chanlocs')
     dataset_input = 1;
     EEG           = chans;
     chans         = EEG(1).chanlocs;
