@@ -96,6 +96,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2008/04/19 21:02:25  arno
+% fix problem concerning computation of channel indices
+%
 % Revision 1.23  2008/04/16 18:40:32  arno
 % do not initialize changrp for component
 % computation
@@ -389,7 +392,7 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
 
     % make option array and channel list (which depend on interp) for any type of measure
     % ----------------------------------------------------------------------
-    function [tmpchanlist opts] = getchansandopts(STUDY, ALLEEG, chanlist, index, g);
+    function [tmpchanlist, opts] = getchansandopts(STUDY, ALLEEG, chanlist, index, g);
         
         idat = STUDY.datasetinfo(index).index;
         opts = { 'recompute' g.recompute };
