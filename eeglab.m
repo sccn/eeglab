@@ -191,6 +191,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.525  2008/11/07 22:42:04  arno
+% isstruct -> isnumeric
+%
 % Revision 1.524  2008/04/19 21:18:44  arno
 % plot to the next figure any new plot
 %
@@ -1784,6 +1787,7 @@ if (strcmpi(comp(1:3), 'GLN') | strcmpi(comp(1:3), 'MAC')) & exist( [ eeglabpath
     myaddpath( eeglabpath, 'readeetraklocs.m', 'functions/sigprocfunc');
     myaddpath( eeglabpath, 'eeg_checkset.m',   'functions/adminfunc');
     myaddpath( eeglabpath, 'pop_loadbci.m',    'functions/popfunc');
+    myaddpath( eeglabpath, 'pop_loadbci.m',    'functions');
     myaddpath( eeglabpath, 'timefreq.m',       'functions/timefreqfunc');
     myaddpath( eeglabpath, 'pop_study.m',      'functions/studyfunc');
     myaddpath( eeglabpath, 'icademo.m',        'functions/miscfunc');
@@ -1793,6 +1797,7 @@ elseif (strcmpi(computer, 'pcwin') & exist( [ eeglabpath 'functions\adminfunc' ]
     myaddpath( eeglabpath, 'eeg_checkset.m',   'functions\adminfunc');
     myaddpath( eeglabpath, 'pop_study.m',      'functions\studyfunc');
     myaddpath( eeglabpath, 'pop_loadbci.m',    'functions\popfunc');
+    myaddpath( eeglabpath, 'pop_loadbci.m',    'functions');
     myaddpath( eeglabpath, 'timefreq.m',       'functions\timefreqfunc');
     myaddpath( eeglabpath, 'icademo.m',        'functions\miscfunc');
     myaddpath( eeglabpath, 'eeglab1020.ced',   'functions\resources');
