@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2007/02/20 14:18:37  arno
+%  now can process several datasets
+%
 % Revision 1.23  2006/11/17 22:07:40  arno
 % help message
 %
