@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2008/04/19 21:17:04  arno
+% fix reading components
+%
 % Revision 1.4  2008/04/16 18:41:19  arno
 % do not call recursively eeg_checkset
 %
@@ -133,21 +136,27 @@ function data = eeg_getdatact( EEG, varargin);
 
         % reading data file
         % -----------------
-        if datformat
-            if length(opt.channel) == EEG.nbchan
-                data = fread(fid, [EEG.trials*EEG.pnts EEG.nbchan], 'float32')';
-            else
-                data = repmat(single(0), [ length(opt.channel) EEG.pnts EEG.trials ]);
-                for ind = 1:length(opt.channel)
-                    fseek(fid, (opt.channel(ind)-1)*EEG.pnts*EEG.trials*4, -1);
-                    data(ind,:) = fread(fid, [EEG.trials*EEG.pnts 1], 'float32')';
-                end;
-            end;
+        eeglab_options;
+        if length(opt.channel) == EEG.nbchan & option_memmapdata
+            fclose(fid);
+            data = memmapdata(filename, [EEG.nbchan EEG.pnts EEG.trials]);
         else
-            data = fread(fid, [EEG.nbchan Inf], 'float32');
-            data = data(opt.channel,:,:);
+            if datformat
+                if length(opt.channel) == EEG.nbchan
+                    data = fread(fid, [EEG.trials*EEG.pnts EEG.nbchan], 'float32')';
+                else
+                    data = repmat(single(0), [ length(opt.channel) EEG.pnts EEG.trials ]);
+                    for ind = 1:length(opt.channel)
+                        fseek(fid, (opt.channel(ind)-1)*EEG.pnts*EEG.trials*4, -1);
+                        data(ind,:) = fread(fid, [EEG.trials*EEG.pnts 1], 'float32')';
+                    end;
+                end;
+            else
+                data = fread(fid, [EEG.nbchan Inf], 'float32');
+                data = data(opt.channel,:,:);
+            end;
+            fclose(fid);
         end;
-        fclose(fid);
 
     end;
  
