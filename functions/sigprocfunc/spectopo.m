@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.113  2008/04/27 15:43:04  arno
+% fix bounadry issue
+%
 % Revision 1.112  2008/04/19 21:06:06  arno
 % detect bad channel when plotting component contribution
 %
@@ -638,6 +641,7 @@ else
         epoch_subset = find(epoch_subset == 1);
         fprintf('Randomly selecting %d of %d data epochs for analysis...\n', length(epoch_subset),epochs);
     else
+        epoch_subset = find(epoch_subset == 1);
     end;
     if isempty(g.weights)
         %%%%%%%%%%%%%%%%%%%%%%%%%%%
