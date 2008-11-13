@@ -57,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2007/09/11 10:49:12  arno
+% nothing
+%
 % Revision 1.10  2007/07/03 00:29:16  klaus
 % don't create error if baseline fields are different
 %
@@ -95,7 +98,7 @@ function [ res, params2 ] = std_filecheck(filename, params2, guiflag, ignorefiel
         return;
     end;
     if nargin < 3
-        guiflag = 'on';
+        guiflag = 'guion';
     end;
     if nargin < 4
         ignorefields = {};
@@ -159,7 +162,7 @@ function [ res, params2 ] = std_filecheck(filename, params2, guiflag, ignorefiel
             if length(val1) ~= length(val2)
                 res        = 'different';
                 txt{end+1} = tmptxt;
-            elseif any(val1 ~= val2)
+            elseif ~isequal(val1, val2)
                 if ~isnan(val1) & ~isnan(val2)
                     res        = 'different';
                     txt{end+1} = tmptxt;
