@@ -96,6 +96,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2008/11/13 02:45:23  arno
+% revert version 1.26
+%
 % Revision 1.26  2008/11/13 02:34:54  arno
 % nothing
 %
@@ -220,15 +223,11 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
     % -------------------------------------------
     if strcmpi(computewhat, 'channels')
         if strcmpi(g.interp, 'on')
-            if strcmpi(STUDY.interpolated, 'off')
-                STUDY.changrp = [];
-            end;
+            STUDY.changrp = [];
             STUDY = std_changroup(STUDY, ALLEEG, chanlist, 'interp');
             g.interplocs = alllocs;
         else
-            if strcmpi(STUDY.interpolated, 'on')
-                STUDY.changrp = [];
-            end;
+            STUDY.changrp = [];
             STUDY = std_changroup(STUDY, ALLEEG, chanlist);
             g.interplocs = struct([]);
         end;
