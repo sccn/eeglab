@@ -96,6 +96,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2008/11/12 23:09:25  arno
+% Matlab 6.5 compatibility
+%
 % Revision 1.24  2008/04/19 21:02:25  arno
 % fix problem concerning computation of channel indices
 %
@@ -214,11 +217,17 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
     % -------------------------------------------
     if strcmpi(computewhat, 'channels')
         if strcmpi(g.interp, 'on')
+            if strcmpi(STUDY.interpolated, 'off')
+                STUDY.changrp = [];
+            end;
             STUDY = std_changroup(STUDY, ALLEEG, chanlist, 'interp');
             g.interplocs = alllocs;
         else
+            if strcmpi(STUDY.interpolated, 'on')
+                STUDY.changrp = [];
+            end;
             STUDY = std_changroup(STUDY, ALLEEG, chanlist);
-            g.interplocs = [];
+            g.interplocs = struct([]);
         end;
     end;
     
@@ -406,7 +415,11 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
             tmpchanlist = chanlist;
             opts = { opts{:} 'interp' g.interplocs };
         else
-            tmpchanlist = getchannelindices(STUDY.changrp, STUDY.datasetinfo(index).index);
-            tmpchanlist = { ALLEEG(STUDY.datasetinfo(index).index).chanlocs(tmpchanlist).labels };
+            newchanlist = [];
+            chanlocs = { ALLEEG(STUDY.datasetinfo(index).index).chanlocs.labels };
+            for i=1:length(chanlist)
+                newchanlist = [ newchanlist strmatch(chanlist(i), chanlocs, 'exact') ];
+            end;
+            tmpchanlist = { ALLEEG(STUDY.datasetinfo(index).index).chanlocs(newchanlist).labels };
         end;
         
