@@ -88,6 +88,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.39  2008/04/19 21:14:02  arno
+% fix statistics (too conservative)
+%
 % Revision 1.38  2007/05/23 00:35:04  toby
 % same
 %
@@ -293,7 +296,7 @@ end
 % -------------
 if isempty(datadd), error('First edit box (datasets to add) can not be empty'); end;
 g = finputcheck( options, ... 
-                 { 'chans'    'integer'  [0:ALLEEG(datadd(1)).nbchan] 0;
+                 { 'chans'    'integer'  [1:ALLEEG(datadd(1)).nbchan] 0;
                    'title'    'string'   []               '';
                    'alpha'    'float'    []               [];
                    'geom'     'string'  {'scalp' 'array'} fastif(flag, 'scalp', 'array');
@@ -442,7 +445,7 @@ if length(datsub) > 0 % dataset to subtract
     % highlight significant regions
     % -----------------------------
     if ~isempty(g.alpha)
-        pvalues = pttest(erp1ind, erp2ind, 3);
+        pvalues = pttest(erp1ind(g.chans,:,:), erp2ind(g.chans,:,:), 3);
         regions = p2regions(pvalues, g.alpha, [xmin xmax]*1000);
     else 
         pvalues= [];
