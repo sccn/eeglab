@@ -234,6 +234,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.88  2008/09/26 03:10:46  scott
+% CHANGED DEOC. OF LEAD VS LAG !! after making a numerical example...
+%
 % Revision 1.87  2008/04/19 21:13:37  arno
 % default log lower frequency
 %
@@ -1668,6 +1671,7 @@ if g.plot
          topoplot(g.topovec(2,:),g.elocs,'electrodes','off', 'chaninfo', g.chaninfo);
       end;
       axis('square')
+      adsffdsa
    end
    
    try, axcopy(gcf); catch, end;
