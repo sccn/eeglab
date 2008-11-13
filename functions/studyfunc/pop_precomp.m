@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2008/04/19 21:07:59  arno
+% change polarity of checkbox for components
+%
 % Revision 1.14  2008/04/16 18:40:10  arno
 % fix additional GUI for channels when dealing with compoents
 %
@@ -212,8 +215,8 @@ if ~isstr(varargin{1}) %intial settings
     if ~isfield(os, 'scalp_on'),    os.scalp_on = 0; end;
     if ~isfield(os, 'compallersp'), os.compallersp = 0; end;
     
-    % interpolate option is on
-    % ------------------------
+    % rm_ica option is on
+    % -------------------
     if isfield(os, 'rmica1_on')
         if os.rmica1_on == 1 
             options = { options{:} 'rmicacomps' 'on' };
