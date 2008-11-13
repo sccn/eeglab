@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.56  2007/08/22 23:57:51  arno
+% conditional checking of datasets
+%
 % Revision 1.55  2007/06/21 00:21:45  allen
 % commented out try catch loop; should output errors to matlab command line instead and these should be more specific. bug #423
 %
@@ -347,15 +350,25 @@ else
     % load/select specific channel
     % ----------------------------
     EEG.datachannel = g.loadmode;
-    if isstr(EEG.data)
-        EEG.datfile = EEG.data;
-        fid = fopen(fullfile(EEG.filepath, EEG.data), 'r', 'ieee-le');
-        fseek(fid, EEG.pnts*EEG.trials*( g.loadmode - 1), 0 );
-        EEG.data    = fread(fid, EEG.pnts*EEG.trials, 'float32');
-        fclose(fid);
-    else
-        EEG.data        = EEG.data(g.loadmode,:,:);
+    EEG.data   = eeg_getdatact(EEG, 'channel', g.loadmode);
+    EEG.nbchan = length(g.loadmode);
+    if ~isempty(EEG.chanlocs)
+        EEG.chanlocs = EEG.chanlocs(g.loadmode);
     end;
+    EEG.icachansind = [];
+    EEG.icaact = [];
+    EEG.icaweights = [];
+    EEG.icasphere = [];
+    EEG.icawinv = [];
+    %if isstr(EEG.data)
+    %    EEG.datfile = EEG.data;
+    %    fid = fopen(fullfile(EEG.filepath, EEG.data), 'r', 'ieee-le');
+    %    fseek(fid, EEG.pnts*EEG.trials*( g.loadmode - 1), 0 );
+    %    EEG.data    = fread(fid, EEG.pnts*EEG.trials, 'float32');
+    %    fclose(fid);
+    %else
+    %    EEG.data        = EEG.data(g.loadmode,:,:);
+    %end;
 end;
 
 % set file name and path
