@@ -219,8 +219,19 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
     % test if interp and reconstruct channel list
     % -------------------------------------------
     if strcmpi(computewhat, 'channels')
-        STUDY = std_changroup(STUDY, ALLEEG, chanlist, 'interp');
-        g.interplocs = alllocs;
+        if strcmpi(g.interp, 'on')
+            if strcmpi(STUDY.interpolated, 'off')
+                STUDY.changrp = [];
+            end;
+            STUDY = std_changroup(STUDY, ALLEEG, chanlist, 'interp');
+            g.interplocs = alllocs;
+        else
+            if strcmpi(STUDY.interpolated, 'on')
+                STUDY.changrp = [];
+            end;
+            STUDY = std_changroup(STUDY, ALLEEG, chanlist);
+            g.interplocs = struct([]);
+        end;
     end;
     
     % components or channels
@@ -402,6 +413,16 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
         elseif strcmpi(g.rmicacomps, 'on')
             opts = { opts{:} 'rmcomps' find(ALLEEG(idat).reject.gcompreject) };
         end;
-        alllocs = eeg_mergelocs(ALLEEG(:).chanlocs);
-        tmpchanlist = chanlist;
-        opts = { opts{:} 'interp' g.interplocs };
+        if ~isempty(g.interplocs)
+            alllocs = eeg_mergelocs(ALLEEG(:).chanlocs);
+            tmpchanlist = chanlist;
+            opts = { opts{:} 'interp' g.interplocs };
+        else
+            newchanlist = [];
+            chanlocs = { ALLEEG(STUDY.datasetinfo(index).index).chanlocs.labels };
+            for i=1:length(chanlist)
+                newchanlist = [ newchanlist strmatch(chanlist(i), chanlocs, 'exact') ];
+            end;
+            tmpchanlist = { ALLEEG(STUDY.datasetinfo(index).index).chanlocs(newchanlist).labels };
+        end;
+        
