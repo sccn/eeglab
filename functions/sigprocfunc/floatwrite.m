@@ -31,6 +31,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2008/11/17 19:33:46  ywu
+% same
+%
 % Revision 1.3  2008/11/17 19:30:07  ywu
 % same
 %
@@ -58,7 +61,7 @@ if strcmpi(class(A), 'memmapdata')
             fwrite(fid,A(:,:,ind),'float');
         end;
     else
-        blocks = [ 1:round(size(A,2))/10:size(A,2)];
+        blocks = [ 1:round(size(A,2)/10):size(A,2)];
         if blocks(end) ~= size(A,2), blocks = [blocks size(A,2)]; end;
         for ind = 1:length(blocks)-1
             tmpdata = A(:, blocks(ind):blocks(ind+1));
