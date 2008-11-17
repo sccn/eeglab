@@ -171,6 +171,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.129  2008/10/17 19:24:31  nima
+% mocap help modified.
+%
 % Revision 1.127  2008/10/16 15:56:18  arno
 % fix negative epoch (no 0)
 %
@@ -710,7 +713,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
    if ~iscell(g.colmodif)
    		g.colmodif = { g.colmodif };
    end;
-   if any(isnan(data(:))) & strcmpi(g.submean, 'on')
+   if strcmpi(g.submean, 'on')
        g.submean = 'nan';
    end;
    
@@ -1501,15 +1504,21 @@ else
     % -------------------------
     if ~isempty(g.data2)
         switch lower(g.submean) % subtract the mean ?
-            case 'on', meandata = mean(g.data2(:,lowlim:highlim)');  
-            case 'nan',meandata = nan_mean(g.data2(:,lowlim:highlim)');
-            otherwise, meandata = zeros(1,g.chans);
+         case 'on', 
+          meandata = mean(g.data2(:,lowlim:highlim)');  
+          if any(isnan(memdata))
+              meandata = nan_mean(g.data2(:,lowlim:highlim)');
+          end;
+         otherwise, meandata = zeros(1,g.chans);
         end;
     else
         switch lower(g.submean) % subtract the mean ?
-            case 'on', meandata = mean(data(:,lowlim:highlim)');  
-            case 'nan',meandata = nan_mean(data(:,lowlim:highlim)');
-            otherwise, meandata = zeros(1,g.chans);
+         case 'on', 
+          meandata = mean(data(:,lowlim:highlim)');
+          if any(isnan(memdata))
+              meandata = nan_mean(data(:,lowlim:highlim)');
+          end;
+         otherwise, meandata = zeros(1,g.chans);
         end;
     end;
     if strcmpi(g.plotdata2, 'off')
