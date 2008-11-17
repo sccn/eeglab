@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.90  2008/11/11 02:07:44  arno
+% same
+%
 % Revision 1.89  2008/11/11 02:06:57  arno
 % do not remove datfile field
 %
@@ -470,7 +473,11 @@ end;
 tmpica       = EEG.icaact;
 EEG.icaact   = [];
 if ~isstr(EEG.data)
-    tmpdata       = single(reshape(EEG.data, EEG.nbchan,  EEG.pnts*EEG.trials));
+    if ~strcmpi(class(EEG.data), 'memmapdata') & ~strcmpi(class(EEG.data), 'single')
+        tmpdata       = single(reshape(EEG.data, EEG.nbchan,  EEG.pnts*EEG.trials));
+    else 
+        tmpdata = EEG.data;
+    end;
     no_resave_dat = 'no';
 else 
     no_resave_dat = 'yes';
