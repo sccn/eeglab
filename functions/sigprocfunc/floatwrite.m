@@ -31,6 +31,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2008/11/17 19:26:34  ywu
+% support for memory map data
+%
 % Revision 1.1  2002/04/05 17:36:45  jorn
 % Initial revision
 %
@@ -52,7 +55,8 @@ if strcmpi(class(A), 'memmapdata')
             fwrite(fid,A(:,:,ind),'float');
         end;
     else
-        blocks = [ 1:size(A,2)/10:size(A,2) size(A,2)];
+        blocks = [ 1:size(A,2)/10:size(A,2)];
+        if blocks(end) ~= size(A,2), blocks = [blocks size(A,2)]; end;
         for ind = 1:length(blocks)-1
             tmpdata = A(:, blocks(ind):blocks(ind+1));
             fwrite(fid,tmpdata,'float');
