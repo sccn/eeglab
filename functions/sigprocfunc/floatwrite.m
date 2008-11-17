@@ -31,6 +31,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % 07-08-99  FORMAT argument added -se
 % 02-08-00  new version included in toolbox -sm
@@ -43,5 +46,19 @@ if ~exist('fform')
 end
 
 fid = fopen(fname,'wb',fform);
-fwrite(fid,A,'float');
+if strcmpi(class(A), 'memmapdata')
+    if size(A,3) > 1
+        for ind = 1:size(A,3)
+            fwrite(fid,A(:,:,ind),'float');
+        end;
+    else
+        blocks = [ 1:size(A,2)/10:size(A,2) size(A,2)];
+        for ind = 1:length(blocks)-1
+            tmpdata = A(:, blocks(ind):blocks(ind+1));
+            fwrite(fid,tmpdata,'float');
+        end;
+    end;
+else
+    fwrite(fid,A,'float');
+end;
 fclose(fid);
