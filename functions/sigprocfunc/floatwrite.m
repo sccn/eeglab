@@ -7,6 +7,7 @@
 %   filename - name of the file
 %   'format' - The option FORMAT argument specifies the storage format as
 %              defined by fopen. Default format is 'native'.
+%   'transp|normal' - save the data transposed (.dat files) or not.
 %
 % Author: Sigurd Enghoff, CNL / Salk Institute, La Jolla, 7/1998 
 %
@@ -31,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2008/11/17 19:34:55  ywu
+% same
+%
 % Revision 1.4  2008/11/17 19:33:46  ywu
 % same
 %
@@ -48,27 +52,37 @@
 % 02-08-00  new version included in toolbox -sm
 % 01-25-02 reformated help & license, added links -ad 
 
-function floatwrite(A,fname,fform)
+function floatwrite(A, fname, fform, transp)
 
 if ~exist('fform')
 	fform = 'native';
 end
+if nargin < 4
+    transp = 'normal';
+end;
 
 fid = fopen(fname,'wb',fform);
-if strcmpi(class(A), 'memmapdata')
-    if size(A,3) > 1
-        for ind = 1:size(A,3)
-            fwrite(fid,A(:,:,ind),'float');
+if strcmpi(transp,'normal')
+    if strcmpi(class(A), 'memmapdata')
+        if size(A,3) > 1
+            for ind = 1:size(A,3)
+                fwrite(fid,A(:,:,ind),'float');
+            end;
+        else
+            blocks = [ 1:round(size(A,2)/10):size(A,2)];
+            if blocks(end) ~= size(A,2), blocks = [blocks size(A,2)]; end;
+            for ind = 1:length(blocks)-1
+                tmpdata = A(:, blocks(ind):blocks(ind+1));
+                fwrite(fid,tmpdata,'float');
+            end;
         end;
     else
-        blocks = [ 1:round(size(A,2)/10):size(A,2)];
-        if blocks(end) ~= size(A,2), blocks = [blocks size(A,2)]; end;
-        for ind = 1:length(blocks)-1
-            tmpdata = A(:, blocks(ind):blocks(ind+1));
-            fwrite(fid,tmpdata,'float');
-        end;
+        fwrite(fid,A,'float');
     end;
 else
-    fwrite(fid,A,'float');
-end;
+    % save transposed
+    for ind = 1:size(A,1)
+        fwrite(fid,A(ind,:),'float');
+    end;
+end;    
 fclose(fid);
