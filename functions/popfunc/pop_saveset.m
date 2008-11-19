@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.91  2008/11/17 19:37:12  arno
+% fixing memory mapped data
+%
 % Revision 1.90  2008/11/11 02:07:44  arno
 % same
 %
@@ -464,7 +467,7 @@ else
     end;
     if strcmpi(g.savemode, 'twofiles')
         save_as_dat_file = 1;
-        EEG.datfile = [ filenamenoext '.dat' ];
+        EEG.datfile = [ filenamenoext '.fdt' ];
     end;
 end;
 
@@ -489,7 +492,7 @@ try,
     if save_as_dat_file
         if ~isstr(EEG.data)
             EEG.data = EEG.datfile;
-            floatwrite( tmpdata', fullfile(EEG.filepath, EEG.data), 'ieee-le');
+            floatwrite( tmpdata, fullfile(EEG.filepath, EEG.data), 'ieee-le');
         end;
     else
         if isfield(EEG, 'datfile')
@@ -514,7 +517,7 @@ try,
     
     % save ICA activities
     % -------------------
-    icafile = fullfile(EEG.filepath, [EEG.filename(1:end-4) '.icaact' ]);
+    icafile = fullfile(EEG.filepath, [EEG.filename(1:end-4) '.icafdt' ]);
     if isempty(EEG.icaweights) & exist(icafile)
         disp('ICA activation file found on disk, but no more ICA activities. Deleting file.');
         delete(icafile);
@@ -529,7 +532,7 @@ try,
         else tmpica2 = tmpica;
         end;
         tmpica2 = reshape(tmpica2, size(tmpica2,1), size(tmpica2,2)*size(tmpica2,3));
-        floatwrite( tmpica2', icafile, 'ieee-le');
+        floatwrite( tmpica2, icafile, 'ieee-le');
         clear tmpica2;
     end;
     
@@ -539,9 +542,9 @@ end;
 
 % try to delete old .fdt or .dat files
 % ------------------------------------
-tmpfilename = fullfile(EEG.filepath, [ filenamenoext '.fdt' ]);
+tmpfilename = fullfile(EEG.filepath, [ filenamenoext '.dat' ]);
 if exist(tmpfilename) == 2
-    disp('Old .fdt file format detected on disk, now replaced by .dat file; trying to erase file...');
+    disp('Deleting old .dat file format detected on disk (now replaced by .fdt file)');
     try,
         delete(tmpfilename);
         disp('Delete sucessfull.');
@@ -549,9 +552,9 @@ if exist(tmpfilename) == 2
     end;
 end;
 if save_as_dat_file == 0
-    tmpfilename = fullfile(EEG.filepath, [ filenamenoext '.dat' ]);
+    tmpfilename = fullfile(EEG.filepath, [ filenamenoext '.fdt' ]);
     if exist(tmpfilename) == 2
-        disp('Old .dat file detected on disk for this dataset, deleting file to avoid confusion...');
+        disp('Old .fdt file detected on disk, deleting file the Matlab file contains all data...');
         try,
             delete(tmpfilename);
             disp('Delete sucessfull.');
