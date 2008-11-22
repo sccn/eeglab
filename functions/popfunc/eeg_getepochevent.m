@@ -83,6 +83,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2008/09/05 23:07:07  arno
+% fix new calling format
+%
 % Revision 1.28  2008/01/10 19:45:24  arno
 % new calling format
 %
@@ -276,6 +279,7 @@ if strcmp(opt.fieldname, 'latency')
         if ~isfield(EEG.event, 'epoch'), epoch = 1;
         else                             epoch = EEG.event(Ieventtmp(index)).epoch;
         end;
+        
         allepochval{epoch}{end+1} = eeg_point2lat(EEG.event(Ieventtmp(index)).latency, epoch, ...
                                             EEG.srate, [EEG.xmin EEG.xmax]*1000, 1E-3);
 		if length(allepochval{epoch}) == 1
