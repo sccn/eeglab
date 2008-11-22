@@ -69,6 +69,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.84  2008/11/22 03:17:32  arno
+% edit boxes size
+% /
+%
 % Revision 1.83  2008/11/22 02:38:15  arno
 % text output for AMICA
 %
@@ -352,11 +356,11 @@ if nargin > 1
         if strcmpi(varargin{1}, 'selectamica')
             selectamica = 1;
             allalgs = { 'amica' allalgs{:} };
-            defaultopts = sprintf('''outdir'', ''%s''', pwd);
+            defaultopts = sprintf('''outdir'', ''%s''', fullfile(pwd, 'amicaout'));
         elseif strcmpi(varargin{1}, 'selectamicaloc')
             selectamica = 1;
             allalgs = { 'amica' allalgs{:} };
-            defaultopts = sprintf('''outdir'', ''%s'', ''qsub'', ''off''', pwd);
+            defaultopts = sprintf('''outdir'', ''%s'', ''qsub'', ''off''', fullfile(pwd, 'amicaout'));
         end;
     end;
 end;
