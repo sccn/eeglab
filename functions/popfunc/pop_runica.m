@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.85  2008/11/22 03:18:18  arno
+% default amicaout
+%
 % Revision 1.84  2008/11/22 03:17:32  arno
 % edit boxes size
 % /
@@ -478,7 +481,7 @@ elseif length(ALLEEG) > 1 & strcmpi(g.concatcond, 'on')
     allgroups   = { ALLEEG.group };
     alltags     = zeros(1,length(allsubjects));
     if any(cellfun('isempty', allsubjects))
-        disp('Abording, some datasets do not have subject names');
+        disp('Aborting: Subject names missing from at least one dataset.');
         return;
     end;
     dats = {};
@@ -577,16 +580,16 @@ tmpdata = reshape( EEG.data(g.chanind,:,:), length(g.chanind), EEG.pnts*EEG.tria
 tmpdata = tmpdata - repmat(mean(tmpdata,2), [1 size(tmpdata,2)]); % zero mean 
 if ~strcmpi(lower(g.icatype), 'binica')
     try,
-        disp('Attempting to convert data matrix to double precision (more accurate ICA results)')
+        disp('Attempting to convert data matrix to double precision for more accurate ICA results.')
         tmpdata = double(tmpdata);
         tmpdata2 = tmpdata+1; % check for more memory
         clear tmpdata2;
     catch,
         disp('*************************************************************')
-        disp('Not enougth memory to convert data Matrix to double precision')
-        disp('All computation will be done in single precision. Matlab 7.x')
-        disp('(under 64-bit Linux and others) is imprecise in this mode')
-        disp('We advise that you use "binica" instead of "runica"')
+        disp('Not enough memory to convert data matrix to double precision.')
+        disp('All computations will be done in single precision. Matlab 7.x')
+        disp('under 64-bit Linux and others is imprecise in this mode.')
+        disp('We advise use of "binica" instead of "runica."')
         disp('*************************************************************')
     end;
 end;
@@ -602,7 +605,7 @@ switch lower(g.icatype)
         if tmprank == size(tmpdata,1) | pca_opt
             [EEG.icaweights,EEG.icasphere] = runica( tmpdata, 'lrate', 0.001, g.options{:} );
         else 
-            disp(['Data rank (' int2str(tmprank) ') less than the number of channels (' int2str(size(tmpdata,1)) ').']);
+            disp(['Data rank (' int2str(tmprank) ') is smaller than the number of channels (' int2str(size(tmpdata,1)) ').']);
             [EEG.icaweights,EEG.icasphere] = runica( tmpdata, 'lrate', 0.001, 'pca', tmprank, g.options{:} );
         end;
      case 'binica'
@@ -616,7 +619,7 @@ switch lower(g.icatype)
         if tmprank == size(tmpdata,1) | pca_opt
             [EEG.icaweights,EEG.icasphere] = binica( tmpdata, 'lrate', 0.001, g.options{:} );
         else 
-            disp(['Data rank (' int2str(tmprank) ') is less than the number of channels (' int2str(size(tmpdata,1)) ').']);
+            disp(['Data rank (' int2str(tmprank) ') is smaller than the number of channels (' int2str(size(tmpdata,1)) ').']);
             [EEG.icaweights,EEG.icasphere] = binica( tmpdata, 'lrate', 0.001, 'pca', tmprank, g.options{:} );
         end;
     case 'amica' 
@@ -637,12 +640,12 @@ switch lower(g.icatype)
         end;
      case 'pearson_ica' 
         if isempty(g.options)
-            disp('Warning: EEG default for pearson ICA changed to 1000 iterations and epsilon=0.0005');
+            disp('Warning: EEGLAB default for pearson ICA is 1000 iterations and epsilon=0.0005');
             [tmp EEG.icaweights] = pearson_ica( tmpdata, 'maxNumIterations', 1000,'epsilon',0.0005);
         else    
             [tmp EEG.icaweights] = pearson_ica( tmpdata, g.options{:});
         end;
-     case 'egld_ica', disp('Warning: this algorithm is very slow!!!');
+     case 'egld_ica', disp('Warning: This algorithm is very slow!!!');
                       [tmp EEG.icaweights] = egld_ica( tmpdata, g.options{:} );
      case 'tfbss' 
         if  isempty(g.options)
