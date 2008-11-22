@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.83  2008/11/22 02:38:15  arno
+% text output for AMICA
+%
 % Revision 1.82  2008/11/22 02:32:44  arno
 % implementing AMICA
 %
@@ -391,7 +394,7 @@ if nargin < 2 | selectamica
                      { 'style' 'edit'       'string' '' 'tag' 'chantype' }  ...
                      { 'style' 'pushbutton' 'string' '... types' 'callback' commandtype } ...
                      { 'style' 'pushbutton' 'string' '... channels' 'callback' commandchans } };
-    geometry = { [2 1] [2 1] [2 1 1 1] };
+    geometry = { [2 1.5] [2 1.5] [2 1 1 1] };
     if length(ALLEEG) > 1
         cb1 = 'set(findobj(''parent'', gcbf, ''tag'', ''concat2''), ''value'', 0);';
         cb2 = 'set(findobj(''parent'', gcbf, ''tag'', ''concat1''), ''value'', 0);';
