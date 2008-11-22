@@ -9,27 +9,27 @@
 % Inputs:
 %   filename     - [string] Input Neuroscan .eeg file      
 %   chanlist     - [integer array] Only import selected channels
-%                  Ex: 3,4:10 {Default: 'all'} 
-%   triallist    - [integer array] Only import selected trials {Default: import 'all'}
+%                  Ex: [3,4:10] {default: 'all'} 
+%   triallist    - [integer array] Only import selected trials {default: import all}
 %   typerange    - [integer array] Only import trials of selected type
-%                  {Default: import 'all'}
+%                  {default: import all}
 %   accepttype   - [integer array] Only import trials with the selected
-%                  'accept' field values {Default: 'all'}
+%                  'accept' field values {default: import all}
 %   rtrange      - [float array] [min max] (ms) Only import trials with subject
-%                  reaction times in this range {Default: 'all'}
+%                  reaction times in this range {default: import all}
 %   responsetype - [integer array] Only import trials with selected 
-%                  response type values {Default: 'all'}
-%   format       - ['short'|'int32'] data format. Neuroscan 4.3 uses 32-bit data
-%                  while older version uses 16-bit. Default is 'short' (16-bit).
+%                  response type values {default: import all}
+%   format       - ['short'|'int32'] data format. Neuroscan v4.3+ assume 32-bit data
+%                  while older versions assume 16-bit. {default: 'short' = 16-bit}
 %
 % Outputs:
-%   signal       - output signal of size (trials,  points)	
+%   signal       - Output signal of size (trials, points)	
 %   accept       - [1/0] vector of values for the accept field (one per trial)
-%   typeeeg      - [Integer] values for the accept type (size trials) 
+%   typeeeg      - [Integer] values for the accept type (size 1,trials) 
 %   rt           - [float] values for the accept rt (size trials) 
-%   response     - [Integer] values for the accept response (size trials) 
-%   chan_names   - ['string' array] containing channel names 
-%   pnts         - Number of points per trial
+%   response     - [Integer] values for the accept response (size 1,trials) 
+%   chan_names   - ['string' array] channel names 
+%   pnts         - Number of time points per trial
 %   ntrials      - Number of trials
 %   srate        - Sampling rate (Hz)
 %   xmin         - Trial start latency (ms)
@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2007/07/27 21:27:42  arno
+% read truncated datasets
+%
 % Revision 1.11  2007/07/27 21:19:27  arno
 % same
 %
@@ -244,7 +247,7 @@ for sweep = 1:nsweeps
                             count_selected = count_selected + 1;
                             if not(mod(count_selected,10)) fprintf('%d sweeps selected out of %d\n', count_selected-1, sweep); end;
                         catch,
-                            disp('Warning: file truncated, abording reading');
+                            disp('Warning: File truncated, aborting file read.');
                             count_selected = count_selected + 1;
                             break;
                         end;
