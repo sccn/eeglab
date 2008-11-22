@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.82  2008/11/22 02:32:44  arno
+% implementing AMICA
+%
 % Revision 1.81  2008/02/15 16:41:06  arno
 % fixing history problem for processing multiple datasets
 %
@@ -611,13 +614,13 @@ switch lower(g.icatype)
         end;
     case 'amica' 
         tmprank = getrank(tmpdata(:,1:min(3000, size(tmpdata,2))));
-        fprintf('Now Running AMICA');
+        fprintf('Now Running AMICA\n');
         if length(g.options) > 1
             if isstr(g.options{2})
-                fprintf('See folder %s for outputs: ', g.options{2});
+                fprintf('See folder %s for outputs\n', g.options{2});
             end;
         end;
-        fprintf('Use menu item "Tools > ');
+        fprintf('To import results, use menu item "Tools > Run AMICA > Load AMICA components\n');
         modres = runamica( tmpdata, [], size(tmpdata,1), size(tmpdata,2), g.options{:} );
         if ~isempty(modres)
             EEG.icaweights = modres.W;
