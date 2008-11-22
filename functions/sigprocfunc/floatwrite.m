@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2008/11/19 23:26:02  arno
+% save as transposed if necessary
+%
 % Revision 1.5  2008/11/17 19:34:55  ywu
 % same
 %
@@ -66,7 +69,8 @@ if strcmpi(transp,'normal')
     if strcmpi(class(A), 'memmapdata')
         if size(A,3) > 1
             for ind = 1:size(A,3)
-                fwrite(fid,A(:,:,ind),'float');
+                tmpdata = A(:,:,ind);
+                fwrite(fid,tmpdata,'float');
             end;
         else
             blocks = [ 1:round(size(A,2)/10):size(A,2)];
