@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.81  2008/02/15 16:41:06  arno
+% fixing history problem for processing multiple datasets
+%
 % Revision 1.80  2007/11/26 18:55:59  arno
 % adding rank check
 %
@@ -334,10 +337,28 @@ for index = length(allalgs):-1:1
     end;
 end;
 
+% special AMICA
+% -------------
+selectamica = 0;
+defaultopts = [ '''extended'', 1' ] ;
+if nargin > 1
+    if isstr(varargin{1})
+        if strcmpi(varargin{1}, 'selectamica')
+            selectamica = 1;
+            allalgs = { 'amica' allalgs{:} };
+            defaultopts = sprintf('''outdir'', ''%s''', pwd);
+        elseif strcmpi(varargin{1}, 'selectamicaloc')
+            selectamica = 1;
+            allalgs = { 'amica' allalgs{:} };
+            defaultopts = sprintf('''outdir'', ''%s'', ''qsub'', ''off''', pwd);
+        end;
+    end;
+end;
+
 % popup window parameters
 % -----------------------
 fig = [];
-if nargin < 2
+if nargin < 2 | selectamica
     commandchans = [ 'tmpchans = get(gcbf, ''userdata'');' ...
                      'tmpchans = tmpchans{1};' ...
                      'set(findobj(gcbf, ''tag'', ''chantype''), ''string'', ' ...
@@ -362,7 +383,7 @@ if nargin < 2
     promptstr    = { { 'style' 'text'       'string' 'ICA algorithm to use (click to select)' } ...
                      { 'style' 'listbox'    'string' strvcat(allalgs{:}) 'callback', cb_ica } ...
                      { 'style' 'text'       'string' 'Commandline options (See help messages)' } ...
-                     { 'style' 'edit'       'string' '''extended'', 1' 'tag' 'params' } ...
+                     { 'style' 'edit'       'string' defaultopts 'tag' 'params' } ...
                      { 'style' 'text'       'string' 'Channel type(s) or channel indices' } ...
                      { 'style' 'edit'       'string' '' 'tag' 'chantype' }  ...
                      { 'style' 'pushbutton' 'string' '... types' 'callback' commandtype } ...
@@ -588,6 +609,22 @@ switch lower(g.icatype)
             disp(['Data rank (' int2str(tmprank) ') is less than the number of channels (' int2str(size(tmpdata,1)) ').']);
             [EEG.icaweights,EEG.icasphere] = binica( tmpdata, 'lrate', 0.001, 'pca', tmprank, g.options{:} );
         end;
+    case 'amica' 
+        tmprank = getrank(tmpdata(:,1:min(3000, size(tmpdata,2))));
+        fprintf('Now Running AMICA');
+        if length(g.options) > 1
+            if isstr(g.options{2})
+                fprintf('See folder %s for outputs: ', g.options{2});
+            end;
+        end;
+        fprintf('Use menu item "Tools > ');
+        modres = runamica( tmpdata, [], size(tmpdata,1), size(tmpdata,2), g.options{:} );
+        if ~isempty(modres)
+            EEG.icaweights = modres.W;
+            EEG.icasphere  = modres.S;
+        else
+            return;
+        end;
      case 'pearson_ica' 
         if isempty(g.options)
             disp('Warning: EEG default for pearson ICA changed to 1000 iterations and epsilon=0.0005');
@@ -664,7 +701,7 @@ else
     ALLEEG = eeg_store(ALLEEG, EEG, g.dataset);
 end;
 
-if nargin < 2
+if nargin < 2 | selectamica
     if length(ALLEEG) == 1
         com = sprintf('%s = pop_runica(%s, %s);', inputname(1),inputname(1), ...
                       vararg2str({ 'icatype' g.icatype 'dataset' g.dataset 'options' g.options }) );
