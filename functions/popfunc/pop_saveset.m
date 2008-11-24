@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.92  2008/11/19 23:36:25  arno
+% back to .fdt format
+%
 % Revision 1.91  2008/11/17 19:37:12  arno
 % fixing memory mapped data
 %
@@ -329,7 +332,7 @@
 %
 
 % 01-25-02 reformated help & license -ad 
-
+ 
 function [EEG, com] = pop_saveset( EEG, varargin);
 
 com = '';
@@ -365,6 +368,7 @@ else
         options = varargin;
     end;
 end;
+dsgsdf
 
 % decode input parameters
 % -----------------------
