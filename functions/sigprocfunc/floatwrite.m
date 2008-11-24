@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2008/11/22 02:59:00  arno
+% use temporary variable
+%
 % Revision 1.6  2008/11/19 23:26:02  arno
 % save as transposed if necessary
 %
@@ -67,6 +70,20 @@ end;
 fid = fopen(fname,'wb',fform);
 if strcmpi(transp,'normal')
     if strcmpi(class(A), 'memmapdata')
+        
+        % check file to overwrite
+        % -----------------------
+        [fpath1 fname1 ext1] = fileparts(fname);
+        [fpath2 fname2 ext2] = fileparts(A.data.Filename);
+        if isempty(fpath1), fpath1 = pwd; end;
+        
+        fname1 = fullfile(fpath1, [fname1 ext1]);
+        fname2 = fullfile(fpath2, [fname2 ext2]);
+        if ~isempty(findstr(fname1, fname2))
+            disp('Warning: data already saved (cannot overwrite memory map file)');
+            return;
+        end;
+        
         if size(A,3) > 1
             for ind = 1:size(A,3)
                 tmpdata = A(:,:,ind);
