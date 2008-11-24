@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.93  2008/11/24 22:31:10  arno
+% *** empty log message ***
+%
 % Revision 1.92  2008/11/19 23:36:25  arno
 % back to .fdt format
 %
@@ -368,7 +371,6 @@ else
         options = varargin;
     end;
 end;
-dsgsdf
 
 % decode input parameters
 % -----------------------
