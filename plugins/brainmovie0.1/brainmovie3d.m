@@ -139,6 +139,9 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2008/08/20 22:42:15  arno
+% fixed last changes
+%
 % Revision 1.22  2008/08/20 22:28:37  arno
 % Reworded documentation, fixed various problems
 %
@@ -451,7 +454,7 @@ end;
 if size(g.circfactor,1) ~= size(g.circfactor,2)
 	disp('Error: Circfactor must be a square matrix'); return;
 end;
-if ~iscell(g.coordinates)
+if ~iscell(g.coordinates) & ~isempty(g.circfactor)
     if size(g.circfactor,1) ~= size(g.coordinates,1)
         disp('Error: Circfactor must have the same number of rows as the number of rows of coordinates'); return;
     end;
