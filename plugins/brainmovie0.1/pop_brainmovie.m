@@ -113,6 +113,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.78  2008/08/20 22:29:26  arno
+% Compatibility, erp option
+%
 % Revision 1.77  2008/05/09 23:30:05  arno
 % new coordinate format for dipoles
 %
@@ -370,7 +373,7 @@ end;
 							'tfname'      'string'		  {}									   'tfparams';
 							'tffolder'    'string'        {}                                       '';
 							'framefolder' 'string'        {}                                       [ addfinalsep(pwd) 'movieframes'];
-							'movparams'   {'string' 'cell'}       []							   'mriside';
+							'movparams'   {'string' 'cell'}       []							   {}; % default 'mriside' for 2D I think
                             'addmovparams'  'cell'          {}							           {};
 							'showcomps'   'integer'       []									   [];
 							'coordinates' 'real'          []                                       [];
