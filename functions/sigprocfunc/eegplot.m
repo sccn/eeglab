@@ -171,6 +171,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.131  2008/11/18 19:15:02  nima
+% Arno's changes for moving callback into code ported and combined with mocap code.
+%
 % Revision 1.130  2008/11/17 19:53:14  arno
 % fix submean for memmap data
 %
@@ -1519,13 +1522,44 @@ else
     % ---------
     axes(ax1)
     hold on
+    
+     % plot channels whose "badchan" field is set to 1.
+    % Bad channels are plotted first so that they appear behind the good
+    % channels in the eegplot figure window.
     for i = 1:g.chans
         if strcmpi(g.plotdata2, 'on')
              tmpcolor = [ 1 0 0 ];
         else tmpcolor = g.color{mod(i-1,length(g.color))+1};
-        end; 
-        plot(data(g.chans-i+1,lowlim:highlim) -meandata(g.chans-i+1)+i*g.spacing, ...
-             'color', tmpcolor, 'clipping','on')
+        end;
+        
+        if isfield(g, 'eloc_file') && ...
+                   isfield(g.eloc_file, 'badchan') && ...
+                   g.eloc_file(g.chans-i+1).badchan;
+            tmpcolor = [ .85 .85 .85 ];
+            plot(data(g.chans-i+1,lowlim:highlim) -meandata(g.chans-i+1)+i*g.spacing, ...
+                'color', tmpcolor, 'clipping','on')
+            plot(1,mean(data(g.chans-i+1,lowlim:highlim) -meandata(g.chans-i+1)+i*g.spacing,2),'<r','MarkerFaceColor','r','MarkerSize',6);
+        end
+               
+    end
+    
+    % plot good channels on top of bad channels (if g.eloc_file(i).badchan = 0... or there is no bad channel information)
+    for i = 1:g.chans
+        if strcmpi(g.plotdata2, 'on')
+             tmpcolor = [ 1 0 0 ];
+        else tmpcolor = g.color{mod(i-1,length(g.color))+1};
+        end;
+        
+        keyboard;  
+        if (isfield(g, 'eloc_file') & ...
+                   isfield(g.eloc_file, 'badchan') & ...
+                   ~g.eloc_file(g.chans-i+1).badchan) | ...
+                   (~isfield(g, 'eloc_file')) | ...
+                   (~isfield(g.eloc_file, 'badchan'));
+               plot(data(g.chans-i+1,lowlim:highlim) -meandata(g.chans-i+1)+i*g.spacing, ...
+                   'color', tmpcolor, 'clipping','on')
+        end
+               
     end
      
     % draw selected channels
