@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2006/04/27 17:04:30  arno
+% fixing Andreas addition
+%
 % Revision 1.30  2005/10/24 23:33:15  arno
 % fix filename
 %
@@ -237,7 +240,8 @@ try, % this piece of code makes the function crash sometimes - Arnaud Delorme 20
     if ~isempty(temp)
         disp('pop_loadcnt note: event field ''type'' set to ''boundary'' for data discontinuities');
         for index = 1:length(temp)
-            EEG.event(temp(index)).type = 'boundary';
+            EEG.event(temp(index)).type     = 'boundary';
+            EEG.event(temp(index)).duration = NaN;
         end;
     end
 catch, end;
