@@ -1370,8 +1370,6 @@ end;
 if length(Values) > 1
     inds          = union(find(isnan(Values)), find(isinf(Values))); % NaN and Inf values
     plotchans     = setdiff(plotchans, inds);
-else
-    plotchans     = Values;
 end;
 if strcmp(plotgrid,'on')
     plotchans = setxor(plotchans,gchans);   % remove grid chans from head plotchans   
@@ -2059,15 +2057,15 @@ end
 ELECTRODE_HEIGHT = 2.1;  % z value for plotting electrode information (above the surf)
 
 if strcmp(ELECTRODES,'on')   % plot electrodes as spots
-    if isempty(EMARKER2CHANS)
-        hp2 = plot3(y,x,ones(size(x))*ELECTRODE_HEIGHT,...
-                    EMARKER,'Color',ECOLOR,'markersize',EMARKERSIZE,'linewidth',EMARKERLINEWIDTH);
-    else % plot markers for normal chans and EMARKER2CHANS separately
-        hp2 = plot3(y(mark1chans),x(mark1chans),ones(size((mark1chans)))*ELECTRODE_HEIGHT,...
-                    EMARKER,'Color',ECOLOR,'markersize',EMARKERSIZE,'linewidth',EMARKERLINEWIDTH);
-        hp2b = plot3(y(mark2chans),x(mark2chans),ones(size((mark2chans)))*ELECTRODE_HEIGHT,...
-                     EMARKER2,'Color',EMARKER2COLOR,'markerfacecolor',EMARKER2COLOR,'linewidth',EMARKER2LINEWIDTH,'markersize',EMARKERSIZE2);
-    end
+  if isempty(EMARKER2CHANS)
+    hp2 = plot3(y,x,ones(size(x))*ELECTRODE_HEIGHT,...
+        EMARKER,'Color',ECOLOR,'markersize',EMARKERSIZE,'linewidth',EMARKERLINEWIDTH);
+  else % plot markers for normal chans and EMARKER2CHANS separately
+    hp2 = plot3(y(mark1chans),x(mark1chans),ones(size((mark1chans)))*ELECTRODE_HEIGHT,...
+        EMARKER,'Color',ECOLOR,'markersize',EMARKERSIZE,'linewidth',EMARKERLINEWIDTH);
+    hp2b = plot3(y(mark2chans),x(mark2chans),ones(size((mark2chans)))*ELECTRODE_HEIGHT,...
+        EMARKER2,'Color',EMARKER2COLOR,'markerfacecolor',EMARKER2COLOR,'linewidth',EMARKER2LINEWIDTH,'markersize',EMARKERSIZE2);
+  end
 %
 %%%%%%%%%%%%%%%%%%%%%%%% Print electrode labels only %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
