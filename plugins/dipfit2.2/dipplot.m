@@ -69,7 +69,8 @@
 %                Color is dashed black for BESA head and dashed black for the
 %                MNI brain {Default 'off'}
 %  'projcol'   - [color] color for the projected line {Default is same as dipole}
-%  'dipolesize' - Size of the dipole sphere(s) {Default: 30}
+%  'dipolesize' - Size of the dipole sphere(s). This option may also contain one
+%               value per dipole {Default: 30}
 %  'dipolelength' - Length of the dipole bar(s) {Default: 1}
 %  'pointout' - ['on'|'off'] Point the dipoles outward. {Default: 'off'}
 %  'sphere'   - [float] radius of sphere corresponding to the skin. Default is 1.
@@ -156,6 +157,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.152  2008/12/23 02:16:26  arno
+%adding custom dipole size
+%
 %Revision 1.151  2008/05/15 23:19:39  arno
 %hold on option
 %
