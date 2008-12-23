@@ -156,6 +156,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.151  2008/05/15 23:19:39  arno
+%hold on option
+%
 %Revision 1.150  2008/02/04 23:01:16  arno
 %cap for cylinder
 %
@@ -640,6 +643,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
 
     if isstr(g), error(g); end;
     if strcmpi(g.holdon, 'on'), g.gui = 'off'; end;
+    if length(g.dipolesize) == 1, g.dipolesize = repmat(g.dipolesize, [1 length(sourceordi)]); end;
     
     g.zoom = 1500;
 
@@ -1080,7 +1084,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                 dipstruct.name = g.dipnames{index};
             end;
             if ~strcmpi(g.spheres,'on') % plot disk markers
-               set(h1,'userdata',dipstruct,'tag',tag,'color','k','linewidth',g.dipolesize/7.5);
+               set(h1,'userdata',dipstruct,'tag',tag,'color','k','linewidth',g.dipolesize(index)/7.5);
                if strcmp(BACKCOLOR, 'k'), set(h1, 'color', g.color{index}); end;
             end
             
@@ -1101,12 +1105,12 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                 else
                     %h = plotsphere([xx yy zz], g.dipolesize/6, 'color', g.color{index});
                 end;                    
-                h = plotsphere([xx yy zz], g.dipolesize/6, 'color', g.color{index});
+                h = plotsphere([xx yy zz], g.dipolesize(index)/6, 'color', g.color{index});
                 set(h(1), 'userdata', dipstruct, 'tag', tag);
             else % plot dipole markers
                h = plot3(xx,  yy,  zz); 
                set(h, 'userdata', dipstruct, 'tag', tag, ...
-                   'marker', '.', 'markersize', g.dipolesize, 'color', g.color{index});
+                   'marker', '.', 'markersize', g.dipolesize(index), 'color', g.color{index});
             end
             
             %
@@ -1126,34 +1130,34 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                 tag = [ 'dipole' num2str(index) ];
                 if ~strcmpi(g.image, 'besa')
                     h = line( [tmp1xx tmp1xxo1]', [tmp1yy tmp1yyo1]', [tmp1zz tmp1zzo1]');
-                    set(h, 'userdata', 'proj', 'tag', tag, 'color','k', 'linewidth', g.dipolesize/7.5);
+                    set(h, 'userdata', 'proj', 'tag', tag, 'color','k', 'linewidth', g.dipolesize(index)/7.5);
                 end;
                 if strcmp(BACKCOLOR, 'k'), set(h, 'color', tmpcolor); end;
                 h = plot3(tmp1xx,  tmp1yy,  tmp1zz); 
                 set(h, 'userdata', 'proj', 'tag', tag, ...
-                       'marker', '.', 'markersize', g.dipolesize, 'color', tmpcolor);
+                       'marker', '.', 'markersize', g.dipolesize(index), 'color', tmpcolor);
                 
                 % project onto y axis
                 tag = [ 'dipole' num2str(index) ];
                 if ~strcmpi(g.image, 'besa')
                     h = line( [tmp2xx tmp2xxo1]', [tmp2yy tmp2yyo1]', [tmp2zz tmp2zzo1]');
-                    set(h, 'userdata', 'proj', 'tag', tag, 'color','k', 'linewidth', g.dipolesize/7.5);
+                    set(h, 'userdata', 'proj', 'tag', tag, 'color','k', 'linewidth', g.dipolesize(index)/7.5);
                 end;
                 if strcmp(BACKCOLOR, 'k'), set(h, 'color', tmpcolor); end;
                 h = plot3(tmp2xx,  tmp2yy,  tmp2zz); 
                 set(h, 'userdata', 'proj', 'tag', tag, ...
-                       'marker', '.', 'markersize', g.dipolesize, 'color', tmpcolor);
+                       'marker', '.', 'markersize', g.dipolesize(index), 'color', tmpcolor);
                    
                 % project onto x axis
                 tag = [ 'dipole' num2str(index) ];
                 if ~strcmpi(g.image, 'besa')
                     h = line( [tmp3xx tmp3xxo1]', [tmp3yy tmp3yyo1]', [tmp3zz tmp3zzo1]');
-                    set(h, 'userdata', 'proj', 'tag', tag, 'color','k', 'linewidth', g.dipolesize/7.5);
+                    set(h, 'userdata', 'proj', 'tag', tag, 'color','k', 'linewidth', g.dipolesize(index)/7.5);
                 end;
                 if strcmp(BACKCOLOR, 'k'), set(h, 'color', tmpcolor); end;
                 h = plot3(tmp3xx,  tmp3yy,  tmp3zz); 
                 set(h, 'userdata', 'proj', 'tag', tag, ...
-                       'marker', '.', 'markersize', g.dipolesize, 'color', tmpcolor);
+                       'marker', '.', 'markersize', g.dipolesize(index), 'color', tmpcolor);
             end;
 
             %
@@ -1165,19 +1169,19 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                 tag = [ 'dipole' num2str(index) ];
                 h(1) = line( [xx tmp1xx]', [yy tmp1yy]', [zz tmp1zz]);
                 set(h(1), 'userdata', 'proj', 'linestyle', '--', ...
-                             'tag', tag, 'color', g.color{index}, 'linewidth', g.dipolesize/7.5/5);
+                             'tag', tag, 'color', g.color{index}, 'linewidth', g.dipolesize(index)/7.5/5);
                 
                 % project onto x axis
                 tag = [ 'dipole' num2str(index) ];
                 h(2) = line( [xx tmp2xx]', [yy tmp2yy]', [zz tmp2zz]);
                 set(h(2), 'userdata', 'proj', 'linestyle', '--', ...
-                             'tag', tag, 'color', g.color{index}, 'linewidth', g.dipolesize/7.5/5);
+                             'tag', tag, 'color', g.color{index}, 'linewidth', g.dipolesize(index)/7.5/5);
                 
                 % project onto y axis
                 tag = [ 'dipole' num2str(index) ];
                 h(3) = line( [xx tmp3xx]', [yy tmp3yy]', [zz tmp3zz]);
                 set(h(3), 'userdata', 'proj', 'linestyle', '--', ...
-                             'tag', tag, 'color', g.color{index}, 'linewidth', g.dipolesize/7.5/5);
+                             'tag', tag, 'color', g.color{index}, 'linewidth', g.dipolesize(index)/7.5/5);
                 if ~isempty(g.projcol)
                     set(h, 'color', g.projcol{index});
                 end;
@@ -1188,7 +1192,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             if isfield(sources, 'component')
                 if strcmp(g.num, 'on')
                     h = text(xx,  yy,  zz, [ '  ' int2str(sources(index).component)]);
-                    set(h, 'userdata', dipstruct, 'tag', tag, 'fontsize', g.dipolesize/2 );
+                    set(h, 'userdata', dipstruct, 'tag', tag, 'fontsize', g.dipolesize(index)/2 );
                     if ~strcmpi(g.image, 'besa'), set(h, 'color', 'w'); end;
                 end;
             end;
