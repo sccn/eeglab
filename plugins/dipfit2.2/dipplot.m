@@ -157,6 +157,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.153  2008/12/23 02:17:13  arno
+%fix help message
+%
 %Revision 1.152  2008/12/23 02:16:26  arno
 %adding custom dipole size
 %
@@ -647,7 +650,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
 
     if isstr(g), error(g); end;
     if strcmpi(g.holdon, 'on'), g.gui = 'off'; end;
-    if length(g.dipolesize) == 1, g.dipolesize = repmat(g.dipolesize, [1 length(sourceordi)]); end;
+    if length(g.dipolesize) == 1, g.dipolesize = repmat(g.dipolesize, [1 length(sourcesori)]); end;
     
     g.zoom = 1500;
 
