@@ -171,6 +171,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.133  2008/12/01 20:03:51  nima
+% James bachannel coloring code integrated.
+%
 % Revision 1.132  2008/12/01 19:53:42  nima
 % _
 %
@@ -599,7 +602,8 @@ DEFAULT_NOUI_PLOT_COLOR = 'k';    % EEG line color for noui option
                                   %   0 - 1st color in AxesColorOrder
 SPACING_EYE = 'on';               % g.spacingI on/off
 SPACING_UNITS_STRING = '';        % '\muV' for microvolt optional units for g.spacingI Ex. uV
-DEFAULT_AXES_POSITION = [0.0964286 0.15 0.842 0.75];
+MAXEVENTSTRING = 5;
+DEFAULT_AXES_POSITION = [0.0964286 0.15 0.842 0.75-(MAXEVENTSTRING-5)/100];
                                   % dimensions of main EEG axes
 ORIGINAL_POSITION = [50 50 800 500];
                                   
@@ -624,7 +628,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
    catch
    		disp('eegplot() error: calling convention {''key'', value, ... } error'); return;
    end;	
-  defctrldowncom = ['ax1 = findobj(''tag'',''backeeg'',''parent'',gcbf);' ... 
+   defctrldowncom = ['ax1 = findobj(''tag'',''backeeg'',''parent'',gcbf);' ... 
 			 'tmppos = get(ax1, ''currentpoint'');' ...
              ...
              ... % Store "UserData" and "temppos" variables to "g" amd "EEG.g" structures.             
@@ -1712,7 +1716,6 @@ else
     
             % schtefan: add Event types text above event latency line
             % -------------------------------------------------------
-            MAXEVENTSTRING = 5;
             EVENTFONT = ' \fontsize{10} ';
             ylims=ylim;
             evntxt = strrep(num2str(g.events(event2plot(index)).type),'_','-');
