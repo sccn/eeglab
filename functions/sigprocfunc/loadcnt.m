@@ -54,6 +54,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2009/01/07 01:24:45  arno
+% memory mapped version
+%
 % Revision 1.21  2005/08/16 22:46:55  arno
 % allowing to read event type 3
 %
@@ -100,8 +103,7 @@ try, r.scale;      catch, r.scale='on'; end
 try, r.blockread;  catch, r.blockread = []; end
 try, r.dataformat; catch, r.dataformat = 'int16'; end
 try, r.memmapfile; catch, r.memmapfile = ''; end
-
-
+  
 sizeEvent1 = 8  ; %%% 8  bytes for Event1  
 sizeEvent2 = 19 ; %%% 19 bytes for Event2 
 sizeEvent3 = 19 ; %%% 19 bytes for Event3 
