@@ -54,6 +54,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2009/01/07 01:32:19  arno
+% nothing
+%
 % Revision 1.25  2009/01/07 01:24:45  arno
 % memory mapped version
 %
@@ -425,7 +428,8 @@ if type == 'cnt'
 
          end ;
 
-         fclose (foutid) ;
+         fclose (foutid);
+         r.data = r.memmapfile;
 
          dat = [] ;
      else
