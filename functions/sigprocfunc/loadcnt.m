@@ -54,6 +54,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2009/01/07 01:35:37  arno
+% fix output for memory mapping
+%
 % Revision 1.27  2009/01/07 01:34:16  arno
 % output
 %
@@ -550,6 +553,7 @@ t = fread(fid,'char');
 
 f.header   = h;
 f.electloc = e;
+f.header.TOTALSAMPLES = r.ldnsamples;
 if isempty(r.memmapfile)
      f.data     = dat;
 else f.data     = r.memmapfile;
