@@ -54,6 +54,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2009/01/07 01:34:16  arno
+% output
+%
 % Revision 1.26  2009/01/07 01:32:19  arno
 % nothing
 %
@@ -429,7 +432,6 @@ if type == 'cnt'
          end ;
 
          fclose (foutid);
-         r.data = r.memmapfile;
 
          dat = [] ;
      else
@@ -548,7 +550,10 @@ t = fread(fid,'char');
 
 f.header   = h;
 f.electloc = e;
-f.data     = dat;
+if isempty(r.memmapfile)
+     f.data     = dat;
+else f.data     = r.memmapfile;
+end;
 f.Teeg     = eT;
 f.event    = ev2;
 f.tag=t;
