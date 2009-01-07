@@ -37,6 +37,7 @@
 % was stored in the file.
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
+%         Help Craig Rypstat for memory mapping functionalities
 %
 % See also: loadcnt(), eeglab()
 
@@ -59,6 +60,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2009/01/07 01:53:37  arno
+% final fix
+% for memory mapping
+%
 % Revision 1.34  2009/01/07 01:38:35  arno
 % import memory map file
 %
