@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2009/01/07 01:38:35  arno
+% import memory map file
+%
 % Revision 1.33  2009/01/07 01:24:18  arno
 % memory mapped version
 %
@@ -308,14 +311,18 @@ EEG.chanlocs  = struct('labels', names);
 %disp('WARNING: Electrode locations imported from CNT files may not reflect true locations');
 
 EEG.srate    = r.header.rate;
-EEG.nbchan   = size(EEG.data,1);
 EEG.trials   = 1;
-EEG.pnts     = size(EEG.data,2);
+if isstr(r.data),
+    EEG.nbchan   = r.header.nchannels;
+    EEG.pnts     = r.header.TOTALSAMPLES;
+    EEG = eeg_checkset(EEG, 'loaddata');
+else
+    EEG.nbchan   = size(EEG.data,1);
+    EEG.pnts     = size(EEG.data,2);
+end;
 EEG          = eeg_checkset(EEG, 'eventconsistency');
 EEG          = eeg_checkset(EEG, 'makeur');
-if isstr(r.data),
-    EEG = eeg_checkset(EEG, 'loaddata');
-end;
+
 if length(options) > 2
    command = sprintf('EEG = pop_loadcnt(''%s'' %s);',fullFileName, options); 
 else
