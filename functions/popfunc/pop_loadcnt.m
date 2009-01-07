@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2009/01/07 01:24:18  arno
+% memory mapped version
+%
 % Revision 1.31  2006/04/27 17:04:30  arno
 % fixing Andreas addition
 %
@@ -310,7 +313,9 @@ EEG.trials   = 1;
 EEG.pnts     = size(EEG.data,2);
 EEG          = eeg_checkset(EEG, 'eventconsistency');
 EEG          = eeg_checkset(EEG, 'makeur');
-
+if isstr(r.data),
+    EEG = eeg_checkset(EEG, 'loaddata');
+end;
 if length(options) > 2
    command = sprintf('EEG = pop_loadcnt(''%s'' %s);',fullFileName, options); 
 else
