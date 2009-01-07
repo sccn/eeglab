@@ -19,6 +19,9 @@
 %                 from the file header, though sometimes it finds an 
 %                 incorect value, so you may want to enter a value manually 
 %                 here (1 is the most standard value).
+%  'memmapfile' - [string] file name for memory file. If a file name
+%                 is provided for memory mapping, CNT data is flushed 
+%                 directly to that file allowing to read large CNT files.
 %
 % Outputs:
 %  cnt          - structure with the continuous data and other informations
@@ -55,6 +58,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2009/01/07 01:55:53  arno
+% more acknoledgements
+%
 % Revision 1.29  2009/01/07 01:51:30  arno
 % output total number of samples
 %
