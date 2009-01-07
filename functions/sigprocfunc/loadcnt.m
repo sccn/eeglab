@@ -54,12 +54,6 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
-% Revision 1.23  2007/08/20 22:56:45  arno
-% same
-%
-% Revision 1.22  2007/08/20 22:02:44  arno
-% convert to single
-%
 % Revision 1.21  2005/08/16 22:46:55  arno
 % allowing to read event type 3
 %
@@ -105,6 +99,7 @@ try, r.ldnsamples; catch, r.ldnsamples=[]; end
 try, r.scale;      catch, r.scale='on'; end
 try, r.blockread;  catch, r.blockread = []; end
 try, r.dataformat; catch, r.dataformat = 'int16'; end
+try, r.memmapfile; catch, r.memmapfile = ''; end
 
 
 sizeEvent1 = 8  ; %%% 8  bytes for Event1  
@@ -113,7 +108,7 @@ sizeEvent3 = 19 ; %%% 19 bytes for Event3
 
 type='cnt';
 if nargin ==1 
-    scan=0;
+   scan=0;
 end     
 
 fid = fopen(filename,'r', 'l');
@@ -306,37 +301,37 @@ h.autocorrectflag   = fread(fid,1,'char');
 h.dcthreshold       = fread(fid,1,'uchar');
 
 for n = 1:h.nchannels
-    e(n).lab            = deblank(char(fread(fid,10,'char')'));
-    e(n).reference      = fread(fid,1,'char');
-    e(n).skip           = fread(fid,1,'char');
-    e(n).reject         = fread(fid,1,'char');
-    e(n).display        = fread(fid,1,'char');
-    e(n).bad            = fread(fid,1,'char');
-    e(n).n              = fread(fid,1,'ushort');
-    e(n).avg_reference  = fread(fid,1,'char');
-    e(n).clipadd        = fread(fid,1,'char');
-    e(n).x_coord        = fread(fid,1,'float');
-    e(n).y_coord        = fread(fid,1,'float');
-    e(n).veog_wt        = fread(fid,1,'float');
-    e(n).veog_std       = fread(fid,1,'float');
-    e(n).snr            = fread(fid,1,'float');
-    e(n).heog_wt        = fread(fid,1,'float');
-    e(n).heog_std       = fread(fid,1,'float');
-    e(n).baseline       = fread(fid,1,'short');
-    e(n).filtered       = fread(fid,1,'char');
-    e(n).fsp            = fread(fid,1,'char');
-    e(n).aux1_wt        = fread(fid,1,'float');
-    e(n).aux1_std       = fread(fid,1,'float');
-    e(n).senstivity     = fread(fid,1,'float');
-    e(n).gain           = fread(fid,1,'char');
-    e(n).hipass         = fread(fid,1,'char');
-    e(n).lopass         = fread(fid,1,'char');
-    e(n).page           = fread(fid,1,'uchar');
-    e(n).size           = fread(fid,1,'uchar');
-    e(n).impedance      = fread(fid,1,'uchar');
-    e(n).physicalchnl   = fread(fid,1,'uchar');
-    e(n).rectify        = fread(fid,1,'char');
-    e(n).calib          = fread(fid,1,'float');
+   e(n).lab            = deblank(char(fread(fid,10,'char')'));
+   e(n).reference      = fread(fid,1,'char');
+   e(n).skip           = fread(fid,1,'char');
+   e(n).reject         = fread(fid,1,'char');
+   e(n).display        = fread(fid,1,'char');
+   e(n).bad            = fread(fid,1,'char');
+   e(n).n              = fread(fid,1,'ushort');
+   e(n).avg_reference  = fread(fid,1,'char');
+   e(n).clipadd        = fread(fid,1,'char');
+   e(n).x_coord        = fread(fid,1,'float');
+   e(n).y_coord        = fread(fid,1,'float');
+   e(n).veog_wt        = fread(fid,1,'float');
+   e(n).veog_std       = fread(fid,1,'float');
+   e(n).snr            = fread(fid,1,'float');
+   e(n).heog_wt        = fread(fid,1,'float');
+   e(n).heog_std       = fread(fid,1,'float');
+   e(n).baseline       = fread(fid,1,'short');
+   e(n).filtered       = fread(fid,1,'char');
+   e(n).fsp            = fread(fid,1,'char');
+   e(n).aux1_wt        = fread(fid,1,'float');
+   e(n).aux1_std       = fread(fid,1,'float');
+   e(n).senstivity     = fread(fid,1,'float');
+   e(n).gain           = fread(fid,1,'char');
+   e(n).hipass         = fread(fid,1,'char');
+   e(n).lopass         = fread(fid,1,'char');
+   e(n).page           = fread(fid,1,'uchar');
+   e(n).size           = fread(fid,1,'uchar');
+   e(n).impedance      = fread(fid,1,'uchar');
+   e(n).physicalchnl   = fread(fid,1,'uchar');
+   e(n).rectify        = fread(fid,1,'char');
+   e(n).calib          = fread(fid,1,'float');
 end
 
 % finding if 32-bits of 16-bits file
@@ -344,166 +339,202 @@ end
 begdata = ftell(fid);
 enddata = h.eventtablepos;   % after data
 if strcmpi(r.dataformat, 'int16')
-     nums    = (enddata-begdata)/h.nchannels/2;
+    nums    = (enddata-begdata)/h.nchannels/2;
 else nums    = (enddata-begdata)/h.nchannels/4;
 end;
 
 % number of sample to read
 % ------------------------
 if ~isempty(r.sample1)
-   r.t1      = r.sample1/h.rate;
+  r.t1      = r.sample1/h.rate;
 else 
-   r.sample1 = r.t1*h.rate;
+  r.sample1 = r.t1*h.rate;
 end;
 if strcmpi(r.dataformat, 'int16')
-     startpos = r.t1*h.rate*2*h.nchannels;
+    startpos = r.t1*h.rate*2*h.nchannels;
 else startpos = r.t1*h.rate*4*h.nchannels;
 end;
 if isempty(r.ldnsamples)
-     if ~isempty(r.lddur)
-          r.ldnsamples = round(r.lddur*h.rate); 
-     else r.ldnsamples = nums; 
-     end;
+    if ~isempty(r.lddur)
+         r.ldnsamples = round(r.lddur*h.rate); 
+    else r.ldnsamples = nums; 
+    end;
 end;
 
 % channel offset
 % --------------
 if ~isempty(r.blockread)
-    h.channeloffset = r.blockread;
-    if h.channeloffset ~= 1
-        fprintf('WARNING: block size is not 1. If the file does not read properly, try using the option "''blockread'', 1"\n');
-    end;
+   h.channeloffset = r.blockread;
 end;
 if h.channeloffset > 1
-    fprintf('WARNING: reading data in blocks of %d, if this fails, try using option "''blockread'', 1"\n', ...
-            h.channeloffset);
+   fprintf('WARNING: reading data in blocks of %d, if this fails, try using option "''blockread'', 1"\n', ...
+           h.channeloffset);
 end;
 
 disp('Reading data .....')
 if type == 'cnt' 
-  
-      % while (ftell(fid) +1 < h.eventtablepos)
-      %d(:,i)=fread(fid,h.nchannels,'int16');
-      %end
-      fseek(fid, startpos, 0);
-	  if h.channeloffset <= 1
-      	  dat=fread(fid, [h.nchannels r.ldnsamples], r.dataformat);
-          v = version;
-          if v(1) > '6'
-              dat = single(dat);
-          else
-              dat = double(dat);
-          end;
- 	  else
-          h.channeloffset = h.channeloffset/2;
-          % reading data in blocks
-          v = version;
-          if v(1) > '6'
-              dat = zeros( h.nchannels, r.ldnsamples, 'single');
-          else
-              dat = zeros( h.nchannels, r.ldnsamples);
-          end;
-      	  dat(:, 1:h.channeloffset) = fread(fid, [h.channeloffset h.nchannels], r.dataformat)';
 
-		  counter = 1;	
- 		  while counter*h.channeloffset < r.ldnsamples
-              dat(:, counter*h.channeloffset+1:counter*h.channeloffset+h.channeloffset) = ...
-                  fread(fid, [h.channeloffset h.nchannels], r.dataformat)';
-              counter = counter + 1;
-		  end;
-	  end;	
-      
-      %ftell(fid)
-      if strcmpi(r.scale, 'on')
-          disp('Scaling data .....')
-          %%% scaling to microvolts
-          for i=1:h.nchannels
-              bas=e(i).baseline;sen=e(i).senstivity;cal=e(i).calib;
-              mf=sen*(cal/204.8);
-              dat(i,:)=(dat(i,:)-bas).*mf;
-          end
-      end     
-      
-      ET_offset = (double(h.prevfile) * (2^32)) + double(h.eventtablepos);    % prevfile contains high order bits of event table offset, eventtablepos contains the low order bits
-      fseek(fid, ET_offset, 'bof'); 
+     % while (ftell(fid) +1 < h.eventtablepos)
+     %d(:,i)=fread(fid,h.nchannels,'int16');
+     %end
+     fseek(fid, startpos, 0);
+     if (~isempty(r.memmapfile))
+         % open a file for writing
+         foutid = fopen(r.memmapfile, 'w') ;
 
-      disp('Reading Event Table...')
-      eT.teeg   = fread(fid,1,'uchar');
-      eT.size   = fread(fid,1,'ulong');
-      eT.offset = fread(fid,1,'ulong');
-      
-      if eT.teeg==2
-          nevents=eT.size/sizeEvent2;
-          if nevents > 0
-              ev2(nevents).stimtype  = [];
-              for i=1:nevents
-                  ev2(i).stimtype      = fread(fid,1,'ushort');
-                  ev2(i).keyboard      = fread(fid,1,'char');
-                  temp                 = fread(fid,1,'uint8');
-                  ev2(i).keypad_accept = bitand(15,temp);
-                  ev2(i).accept_ev1    = bitshift(temp,-4);
-                  ev2(i).offset        = fread(fid,1,'long');
-                  ev2(i).type          = fread(fid,1,'short'); 
-                  ev2(i).code          = fread(fid,1,'short');
-                  ev2(i).latency       = fread(fid,1,'float');
-                  ev2(i).epochevent    = fread(fid,1,'char');
-                  ev2(i).accept        = fread(fid,1,'char');
-                  ev2(i).accuracy      = fread(fid,1,'char');
-              end     
-          else
-              ev2 = [];
-          end;
-      elseif eT.teeg==3  % type 3 is similar to type 2 except the offset field encodes the global sample frame
-          nevents=eT.size/sizeEvent3;
-          if nevents > 0
-              ev2(nevents).stimtype  = [];
-              if r.dataformat == 'int32'
-                  bytes_per_samp = 4;   % I only have 32 bit data, unable to check whether this is necessary,
-              else                      % perhaps there is no type 3 file with 16 bit data
-                  bytes_per_samp = 2;
-              end
-              for i=1:nevents
-                  ev2(i).stimtype      = fread(fid,1,'ushort');
-                  ev2(i).keyboard      = fread(fid,1,'char');
-                  temp                 = fread(fid,1,'uint8');
-                  ev2(i).keypad_accept = bitand(15,temp);
-                  ev2(i).accept_ev1    = bitshift(temp,-4);
-                  os                   = fread(fid,1,'ulong');
-                  ev2(i).offset = os * bytes_per_samp * h.nchannels;
-                  ev2(i).type          = fread(fid,1,'short'); 
-                  ev2(i).code          = fread(fid,1,'short');
-                  ev2(i).latency       = fread(fid,1,'float');
-                  ev2(i).epochevent    = fread(fid,1,'char');
-                  ev2(i).accept        = fread(fid,1,'char');
-                  ev2(i).accuracy      = fread(fid,1,'char');
-              end     
-          else
-              ev2 = [];
-          end;
-      elseif eT.teeg==1
-          nevents=eT.size/sizeEvent1;
-          if nevents > 0
-              ev2(nevents).stimtype  = [];
-              for i=1:nevents
-                  ev2(i).stimtype      = fread(fid,1,'ushort');
-                  ev2(i).keyboard      = fread(fid,1,'char');
+         % This portion of the routine reads in a section of the EEG file
+         % and then writes it out to the harddisk.
+         samples_left = h.nchannels * r.ldnsamples ;
+
+         data_block = 4000000 ;
+         max_rows =  data_block / h.nchannels ;
+
+         warning off ;
+         max_written = h.nchannels * uint32(max_rows) ;
+         warning on ;
+
+         while (samples_left > 0)
+
+             to_read = max_rows ;
+             if (data_block > samples_left)
+                 to_read = samples_left / h.nchannels ;                 
+             end ;              
+
+             temp_dat = fread(fid, [h.nchannels to_read], r.dataformat) ;
+
+             if strcmpi(r.scale, 'on')
+                 disp('Scaling data .....')
+                 %%% scaling to microvolts
+                 for i=1:h.nchannels
+                     bas=e(i).baseline;sen=e(i).senstivity;cal=e(i).calib;
+                     mf=sen*(cal/204.8);
+                     temp_dat(i,:)=(temp_dat(i,:)-bas).*mf;
+                 end
+             end         
+
+             % Write out data in float32 form
+             written = fwrite (foutid, temp_dat, 'float32') ;
+
+             if (written ~= max_written) 
+                 samples_left = 0 ;
+             else
+                 samples_left = samples_left - written ;
+             end ;
+
+         end ;
+
+         fclose (foutid) ;
+
+         dat = [] ;
+     else
+         if h.channeloffset <= 1
+               dat=fread(fid, [h.nchannels r.ldnsamples], r.dataformat);
+         else
+             h.channeloffset = h.channeloffset/2;
+             % reading data in blocks
+             dat = zeros( h.nchannels, r.ldnsamples);
+             dat(:, 1:h.channeloffset) = fread(fid, [h.channeloffset h.nchannels], r.dataformat)';
+
+             counter = 1;	
+             while counter*h.channeloffset < r.ldnsamples
+                 dat(:, counter*h.channeloffset+1:counter*h.channeloffset+h.channeloffset) = ...
+                     fread(fid, [h.channeloffset h.nchannels], r.dataformat)';
+                 counter = counter + 1;
+             end;
+
+             if strcmpi(r.scale, 'on')
+                 disp('Scaling data .....')
+                 %%% scaling to microvolts
+                 for i=1:h.nchannels
+                     bas=e(i).baseline;sen=e(i).senstivity;cal=e(i).calib;
+                     mf=sen*(cal/204.8);
+                     dat(i,:)=(dat(i,:)-bas).*mf;
+                 end
+             end        
+         end;	
+     end ;
+     %ftell(fid)
+
+     ET_offset = (double(h.prevfile) * (2^32)) + double(h.eventtablepos);    % prevfile contains high order bits of event table offset, eventtablepos contains the low order bits
+     fseek(fid, ET_offset, 'bof'); 
+
+     disp('Reading Event Table...')
+     eT.teeg   = fread(fid,1,'uchar');
+     eT.size   = fread(fid,1,'ulong');
+     eT.offset = fread(fid,1,'ulong');
+
+     if eT.teeg==2
+         nevents=eT.size/sizeEvent2;
+         if nevents > 0
+             ev2(nevents).stimtype  = [];
+             for i=1:nevents
+                 ev2(i).stimtype      = fread(fid,1,'ushort');
+                 ev2(i).keyboard      = fread(fid,1,'char');
+                 temp                 = fread(fid,1,'uint8');
+                 ev2(i).keypad_accept = bitand(15,temp);
+                 ev2(i).accept_ev1    = bitshift(temp,-4);
+                 ev2(i).offset        = fread(fid,1,'long');
+                 ev2(i).type          = fread(fid,1,'short'); 
+                 ev2(i).code          = fread(fid,1,'short');
+                 ev2(i).latency       = fread(fid,1,'float');
+                 ev2(i).epochevent    = fread(fid,1,'char');
+                 ev2(i).accept        = fread(fid,1,'char');
+                 ev2(i).accuracy      = fread(fid,1,'char');
+             end     
+         else
+             ev2 = [];
+         end;
+     elseif eT.teeg==3  % type 3 is similar to type 2 except the offset field encodes the global sample frame
+         nevents=eT.size/sizeEvent3;
+         if nevents > 0
+             ev2(nevents).stimtype  = [];
+             if r.dataformat == 'int32'
+                 bytes_per_samp = 4;   % I only have 32 bit data, unable to check whether this is necessary,
+             else                      % perhaps there is no type 3 file with 16 bit data
+                 bytes_per_samp = 2;
+             end
+             for i=1:nevents
+                 ev2(i).stimtype      = fread(fid,1,'ushort');
+                 ev2(i).keyboard      = fread(fid,1,'char');
+                 temp                 = fread(fid,1,'uint8');
+                 ev2(i).keypad_accept = bitand(15,temp);
+                 ev2(i).accept_ev1    = bitshift(temp,-4);
+                 os                   = fread(fid,1,'ulong');
+                 ev2(i).offset = os * bytes_per_samp * h.nchannels;
+                 ev2(i).type          = fread(fid,1,'short'); 
+                 ev2(i).code          = fread(fid,1,'short');
+                 ev2(i).latency       = fread(fid,1,'float');
+                 ev2(i).epochevent    = fread(fid,1,'char');
+                 ev2(i).accept        = fread(fid,1,'char');
+                 ev2(i).accuracy      = fread(fid,1,'char');
+             end     
+         else
+             ev2 = [];
+         end;
+     elseif eT.teeg==1
+         nevents=eT.size/sizeEvent1;
+         if nevents > 0
+             ev2(nevents).stimtype  = [];
+             for i=1:nevents
+                 ev2(i).stimtype      = fread(fid,1,'ushort');
+                 ev2(i).keyboard      = fread(fid,1,'char');
 
 % modified by Andreas Widmann  2005/05/12  14:15:00
-                  %ev2(i).keypad_accept = fread(fid,1,'char');
-                  temp                 = fread(fid,1,'uint8');
-                  ev2(i).keypad_accept = bitand(15,temp);
-                  ev2(i).accept_ev1    = bitshift(temp,-4);
+                 %ev2(i).keypad_accept = fread(fid,1,'char');
+                 temp                 = fread(fid,1,'uint8');
+                 ev2(i).keypad_accept = bitand(15,temp);
+                 ev2(i).accept_ev1    = bitshift(temp,-4);
 % end modification
 
-                  ev2(i).offset        = fread(fid,1,'long');
-              end;
-          else
-              ev2 = [];
-          end;
-     else
-          disp('Skipping event table (tag != 1,2,3 ; theoritically impossible)');
-          ev2 = [];
-      end     
+                 ev2(i).offset        = fread(fid,1,'long');
+             end;
+         else
+             ev2 = [];
+         end;
+    else
+         disp('Skipping event table (tag != 1,2,3 ; theoritically impossible)');
+         ev2 = [];
+     end     
 end 
 
 fseek(fid, -1, 'eof');
@@ -518,31 +549,29 @@ f.tag=t;
 
 %%%% channels labels
 for i=1:h.nchannels
-  plab=sprintf('%c',f.electloc(i).lab);
-  if i>1 
-   lab=str2mat(lab,plab);
-  else 
-   lab=plab;  
-  end  
+ plab=sprintf('%c',f.electloc(i).lab);
+ if i>1 
+  lab=str2mat(lab,plab);
+ else 
+  lab=plab;  
+ end  
 end  
 
 %%%% to change offest in bytes to points 
 if ~isempty(ev2)
-    ev2p=ev2; 
-    ioff=900+(h.nchannels*75); %% initial offset : header + electordes desc 
-    if strcmpi(r.dataformat, 'int16')
-        for i=1:nevents 
-            ev2p(i).offset=(ev2p(i).offset-ioff)/(2*h.nchannels) - r.sample1; %% 2 short int end 
-        end     
-    else % 32 bits
-        for i=1:nevents 
-            ev2p(i).offset=(ev2p(i).offset-ioff)/(4*h.nchannels) - r.sample1; %% 4 short int end 
-        end     
-    end;        
-    f.event = ev2p;
+   ev2p=ev2; 
+   ioff=900+(h.nchannels*75); %% initial offset : header + electordes desc 
+   if strcmpi(r.dataformat, 'int16')
+       for i=1:nevents 
+           ev2p(i).offset=(ev2p(i).offset-ioff)/(2*h.nchannels) - r.sample1; %% 2 short int end 
+       end     
+   else % 32 bits
+       for i=1:nevents 
+           ev2p(i).offset=(ev2p(i).offset-ioff)/(4*h.nchannels) - r.sample1; %% 4 short int end 
+       end     
+   end;        
+   f.event = ev2p;
 end;
 
 frewind(fid);
 fclose(fid);
-
-
