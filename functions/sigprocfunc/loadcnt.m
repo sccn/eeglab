@@ -28,6 +28,7 @@
 %               cnt.tag
 %
 % Authors:   Sean Fitzgibbon, Arnaud Delorme, 2000-
+%            Craig Rypstat for memory mapping, 2009
 %
 % Note: function original name was load_scan41.m
 %
@@ -54,6 +55,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2009/01/07 01:51:30  arno
+% output total number of samples
+%
 % Revision 1.28  2009/01/07 01:35:37  arno
 % fix output for memory mapping
 %
