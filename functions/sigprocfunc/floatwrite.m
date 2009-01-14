@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2008/11/24 21:51:17  arno
+% prevent overwriting memory map file
+%
 % Revision 1.7  2008/11/22 02:59:00  arno
 % use temporary variable
 %
@@ -67,7 +70,6 @@ if nargin < 4
     transp = 'normal';
 end;
 
-fid = fopen(fname,'wb',fform);
 if strcmpi(transp,'normal')
     if strcmpi(class(A), 'memmapdata')
         
@@ -84,6 +86,8 @@ if strcmpi(transp,'normal')
             return;
         end;
         
+        fid = fopen(fname,'wb',fform);
+        if fid == -1, error('Cannot write output file, check permission and space'); end;
         if size(A,3) > 1
             for ind = 1:size(A,3)
                 tmpdata = A(:,:,ind);
@@ -98,6 +102,8 @@ if strcmpi(transp,'normal')
             end;
         end;
     else
+        fid = fopen(fname,'wb',fform);
+        if fid == -1, error('Cannot write output file, check permission and space'); end;
         fwrite(fid,A,'float');
     end;
 else
