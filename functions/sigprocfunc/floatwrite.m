@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2009/01/14 23:59:17  arno
+% better memory mapping implementation
+%
 % Revision 1.8  2008/11/24 21:51:17  arno
 % prevent overwriting memory map file
 %
@@ -82,7 +85,7 @@ if strcmpi(transp,'normal')
         fname1 = fullfile(fpath1, [fname1 ext1]);
         fname2 = fullfile(fpath2, [fname2 ext2]);
         if ~isempty(findstr(fname1, fname2))
-            disp('Warning: data already saved (cannot overwrite memory map file)');
+            disp('Warning: raw data already saved in memory mapped file (no need to resave it)');
             return;
         end;
         
