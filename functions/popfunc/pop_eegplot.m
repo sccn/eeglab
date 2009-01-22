@@ -216,7 +216,7 @@ if nargin < 4
 end;
 if icacomp == 0
 	if isempty( EEG.icasphere )
-		disp('Error: Dataset has no ICA weights - you must run ICA first'); return;
+		disp('Error: you must run ICA first'); return;
 	end;
 end;
 
@@ -252,7 +252,7 @@ if EEG.trials > 1
 	
 	eeg_rejmacro; % script macro for generating command and old rejection arrays
 
-else % case of a single trial (= continuous data)
+else % case of a single trial (continuous data)
 	     %if icacomp, 
     	 %    	command = ['if isempty(EEG.event) EEG.event = [eegplot2event(TMPREJ, -1)];' ...
          %         'else EEG.event = [EEG.event(find(EEG.event(:,1) ~= -1),:); eegplot2event(TMPREJ, -1, [], [0.8 1 0.8])];' ...
@@ -322,12 +322,17 @@ else
         tmpdata = (EEG.icaweights*EEG.icasphere)*reshape(EEG.data, EEG.nbchan, EEG.trials*EEG.pnts);
         tmpdata = reshape( tmpdata, size(tmpdata,1), EEG.pnts, EEG.trials);
     end;
+    for i=1:length(EEG.icaweights(:,1));
+        chans(i).labels=sprintf('%s%s','comp',num2str(i));
+        chans(i).badchan=EEG.reject.gcompreject(i);
+    end
+    eegplotoptions {14} = [chans];
+    
 	eegplot( tmpdata, 'srate', EEG.srate, 'title', 'Scroll component activities -- eegplot()', ...
 			 'limits', [EEG.xmin EEG.xmax]*1000 , 'command', command, eegplotoptions{:}); 
-
 	%eeg_multieegplot( tmpdata, [], [], oldrej, oldrejE, 'title', 'Scroll component activities -- eegplot()', 'srate', ...
-	%	      EEG.srate, 'limits', [EEG.xmin EEG.xmax]*1000 , 'command', command); 
+	%	      EEG.srate, 'limits', [EEG.xmin EEG.xmax]*1000 , 'command',
+	%	      command);
 end;
-
 com = [ com sprintf('pop_eegplot( %s, %d, %d, %d);', inputname(1), icacomp, superpose, reject) ]; 
 return;
