@@ -44,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2008/03/30 12:06:37  arno
+% Initial revision
+%
 
 function [STUDY, M] = std_movie(STUDY, ALLEEG, varargin);
 
@@ -59,7 +62,7 @@ end;
                                'freqslim'    'real'    [] [];
                                'limitbeg'    'real'    [] [];
                                'limitend'    'real'    [] [];
-                               'moviemode'   'string'  { 'ersptime' 'erp' 'spec' } 'spec' }, 'std_topomovie', 'ignore');
+                               'moviemode'   'string'  { 'ersptime' 'erp' 'spec' } 'spec' }, 'std_movie', 'ignore');
 
 if isstr(opt), error(opt); end;
 if isempty(opt.channels), opt.channels = { ALLEEG(1).chanlocs.labels }; end;
