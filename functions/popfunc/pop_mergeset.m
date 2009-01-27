@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.45  2007/04/27 22:30:49  arno
+% same
+%
 % Revision 1.44  2007/04/27 22:29:07  arno
 % same
 %
@@ -249,9 +252,9 @@ else % INEEG is an EEG struct
     % Concatenate data
     % ----------------
     if INEEG1.trials > 1 | INEEG2.trials > 1
-        INEEG1.data(:,:,end+1:end+size(INEEG2.data,3)) = INEEG2.data;
+        INEEG1.data(:,:,end+1:end+size(INEEG2.data,3)) = INEEG2.data(:,:,:);
     else
-        INEEG1.data(:,end+1:end+size(INEEG2.data,2)) = INEEG2.data;
+        INEEG1.data(:,end+1:end+size(INEEG2.data,2)) = INEEG2.data(:,:);
     end;
 
     INEEG1.setname = 'Merged datasets';
