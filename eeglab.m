@@ -71,7 +71,6 @@
 % pophelp()       - format the help header  !!!
 % readedf()       - read binary EEG EDF file
 % readegi()       - read binary EEG EGI file 
-% read_erpss()    - read ERPSS data 
 % readegihdr()    - read binary EEG EGI file header
 % rejkurt()       - calculate and reject data based on kurtosis
 % rejtrend()      - reject EEG showing linear trends  !!!
@@ -97,7 +96,6 @@
 % pop_loadeeg()   - load Neuroscan .EEG data (loadeeg())
 % pop_loadbva()   - load Brain Vision Analyser matlab files
 % pop_plotdata()  - plot data epochs in rectangular array (plotdata())
-% pop_read_erpss() - read ERPSS data (read_erpss())
 % pop_readegi()   - load binary EGI data file (readegi())
 % pop_rejkurt()   - compute data kurtosis (rejkurt())
 % pop_rejtrend()  - reject EEG epochs showing linear trends  (rejtrend())
@@ -191,6 +189,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.526  2008/11/12 23:05:51  arno
+% adding the function
+% folder
+%
 % Revision 1.525  2008/11/07 22:42:04  arno
 % isstruct -> isnumeric
 %
@@ -2025,7 +2027,6 @@ catchstrs.new_non_empty          = e_newset;
     cb_snapread    = [ nocheck '[EEG LASTCOM] = pop_snapread;'    e_newset ]; 
 	cb_loadcnt     = [ nocheck '[EEG LASTCOM] = pop_loadcnt;'     e_newset ]; 
     cb_loadeeg     = [ nocheck '[EEG LASTCOM] = pop_loadeeg;'     e_newset ]; 
-	cb_read_erpss  = [ nocheck '[EEG LASTCOM] = pop_read_erpss;'  e_newset ]; 
     cb_biosig      = [ nocheck '[EEG LASTCOM] = pop_biosig; '     e_newset ]; 
     cb_fileio      = [ nocheck '[EEG LASTCOM] = pop_fileio; '     e_newset ]; 
 
@@ -2175,7 +2176,6 @@ catchstrs.new_non_empty          = e_newset;
 	uimenu( neuro_m, 'Label', 'From Snapmaster .SMA file'            , 'CallBack', cb_snapread,   'Separator', 'on'); 
 	uimenu( neuro_m, 'Label', 'From Neuroscan .CNT file'             , 'CallBack', cb_loadcnt,    'Separator', 'on'); 
 	uimenu( neuro_m, 'Label', 'From Neuroscan .EEG file'             , 'CallBack', cb_loadeeg); 
-	uimenu( neuro_m, 'Label', 'From ERPSS .RAW or .RDF file'         , 'CallBack', cb_read_erpss, 'Separator', 'on'); 
     
     % BIOSIG MENUS
     % ------------
