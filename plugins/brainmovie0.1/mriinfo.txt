@@ -1,0 +1,11 @@
+Strutural MRI was downloaded from http://www.bic.mni.mcgill.ca/cgi/icbm_view/
+(average of 152 T1-weighted stereotaxic volumes from the ICBM project)
+
+mrirear.pcx
+mriside.pcx
+mritop.pcx
+
+Images were converted from GIF to PCX and the side-view image was rotated so the head would be horizontal.
+These images are used by the function besaplot to vizualize dipole location imported from the BESA software.
+
+Oct 03, 2002 - Arnaud Delorme
