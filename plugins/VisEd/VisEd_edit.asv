@@ -1,0 +1,43 @@
+function EEG = VisEd_edit(EEG, ChanIndex, EventType)
+
+% Create data vector containing EEG channels selected in pop_VisEd
+data=EEG.data(eval(ChanIndex),:,:);
+
+% Create VisEd.chan field containing channel information for channels in
+% data vector.
+for i=1:length(EEG.chanlocs);
+    EEG.chanlocs(i).index=i;
+end
+VisEd.chan=EEG.chanlocs(eval(ChanIndex));
+
+% Create VisEd.event field containing events selected in pop_VisEd.
+j=0;
+for i=1:length(EEG.event);
+    if ~isempty(strmatch(EEG.event(i).type,EventType, 'exact'));
+        event=EEG.event(i);
+        event.index=i;
+        event.proc='none';
+        j=j+1;
+        VisEd.event(j)=event;
+    end
+end
+
+
+command=sprintf('%s','EEG=VisEd_UpdateEvents(EEG, g, TMPREJ);');
+
+% Call eegplot with variables set from pop-VisEd and ctrlselectcommand
+% option set to { 'VisEd_ctrldowncom;' 'eegplot(''defmotioncom'', gcbf);' '' }.
+eegplot(data, ...
+              'eloc_file', VisEd.chan, ...
+              'events', VisEd.event, ...
+              'srate', EEG.srate, ...
+              'winrej',
+              'butlabel', 'Update Events & Exit', ...
+              'command', command, ...
+              'ctrlselectcommand',{ 'VisEd_ctrldowncom;' 'eegplot(''defmotioncom'', gcbf);' '' } ...
+        );
+
+return
+
+
+    

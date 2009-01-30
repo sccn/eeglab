@@ -1,0 +1,120 @@
+% pop_VisEd() - Collect variables for visual editing.
+%
+% Usage: 
+%   >>  EEG = pop_VisEd( EEG, ChanIndex, EventType);
+%
+%   ChanIndex   - EEG channels to display in eegplot figure window while editing events and identifying bad channels.
+%   EventType   - Event types to display in eegplot figure window while editing events and identifying bad channels.
+%    
+% Outputs:
+%   EEG  - output dataset
+%
+% UI for selecting EEG channels and event types to be displayed in eegplot
+% figure window while editing events and identifying bad channels.
+%
+% Calls function EEG=VisEd(EEG,ChanIndex,EventType);
+%
+% See also:
+%   EEGLAB 
+
+% Copyright (C) <2008>  <James Desjardins> Brock University
+%
+% This program is free software; you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation; either version 2 of the License, or
+% (at your option) any later version.
+%
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+% You should have received a copy of the GNU General Public License
+% along with this program; if not, write to the Free Software
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+function [EEG,com]=pop_VisEd(EEG, ChanIndex, EventType)
+
+
+% the command output is a hidden output that does not have to
+% be described in the header
+com = ''; % this initialization ensure that the function will return something
+          % if the user press the cancel button            
+          % display help if not enough arguments
+% ------------------------------------
+
+if nargin < 1
+	help pop_VisEd;
+	return;
+end;	
+
+DataTypeCell={'EEG'}
+if ~isempty(EEG.icaweights);
+    DataTypeCell={'EEG','ICA'};
+    for i=1:length(EEG.icaweights(:,1));EEG.ic(i).labels=sprintf('%s%s','comp',num2str(i));end
+end
+% pop up window
+% -------------
+if nargin < 3
+
+    results=inputgui( ...
+    {[1] [1] [4 4 1] [4 4 1] [4 4 1] [1]}, ...
+    {...
+        ...1
+        {'Style', 'text', 'string', 'Enter visual editing parameters.', 'FontWeight', 'bold'}, ...
+        ...2
+        {}, ...
+        ...3
+        {'Style', 'text', 'string', 'Data type to display:'}, ...
+        {'Style', 'popup', 'string', DataTypeCell, 'tag', 'DataTypePop'... 
+                  'callback', ['switch get(findobj(gcbf, ''tag'', ''DataTypePop''), ''value'');' ...
+                               '    case 1;' ...
+                               '        set(findobj(gcbf, ''tag'', ''ChanLabelButton''), ''callback'',' ...
+                               '            [''[ChanLabelIndex,ChanLabelStr,ChanLabelCell]=pop_chansel({EEG.chanlocs.labels});' ...
+                               '             set(findobj(gcbf, ''''tag'''', ''''ChanIndexEdit''''), ''''string'''', vararg2str(ChanLabelIndex))'']);' ...
+                               '        set(findobj(gcbf, ''tag'', ''ChanIndexEdit''), ''string'', vararg2str(1:EEG.nbchan));' ...
+                               '    case 2;' ...
+                               '        set(findobj(gcbf, ''tag'', ''ChanLabelButton''), ''callback'',' ...
+                               '            [''for i=1:length(EEG.icaweights(:,1));IC(i).labels=sprintf(''''%s%s'''',''''comp'''',num2str(i));end;' ...
+                               '            [ChanLabelIndex,ChanLabelStr,ChanLabelCell]=pop_chansel({IC.labels});' ...
+                               '             set(findobj(gcbf, ''''tag'''', ''''ChanIndexEdit''''), ''''string'''', vararg2str(ChanLabelIndex))'']);' ...
+                               '        set(findobj(gcbf, ''tag'', ''ChanIndexEdit''), ''string'', vararg2str(1:length(EEG.icaweights(:,1))));' ...
+                               'end']}, ...
+        {}, ...
+        ...4
+        {'Style', 'text', 'string', 'Channels to display in eegplot figure window:'}, ...
+        {'Style', 'edit', 'string', vararg2str(1:EEG.nbchan),'tag', 'ChanIndexEdit'}, ...
+        {'Style', 'pushbutton', 'string', '...', 'tag', 'ChanLabelButton',... 
+                  'callback', ['[ChanLabelIndex,ChanLabelStr,ChanLabelCell]=pop_chansel({EEG.chanlocs.labels});' ...
+                  'set(findobj(gcbf, ''tag'', ''ChanIndexEdit''), ''string'', vararg2str(ChanLabelIndex))']}, ...
+        ...5
+        {'Style', 'text', 'string', 'Event type(s) to display and edit:'}, ...
+        {'Style', 'edit', 'string', vararg2str(unique({EEG.event.type})), 'tag', 'PatIDEventTypeEdit'}, ...
+        {'Style', 'pushbutton', 'string', '...', ... 
+                  'callback', ['[EventTypeIndex,EventTypeStr,EventTypeCell]=pop_chansel(unique({EEG.event.type}));' ...
+                  'set(findobj(gcbf, ''tag'', ''PatIDEventTypeEdit''), ''string'', vararg2str(EventTypeCell))']}, ...
+        ...6
+        {}, ...
+     }, ...
+     'pophelp(''pop_VisEd'');', 'Select visual editing parameters -- pop_VisEd()' ...
+     );
+ 
+     if isempty(results);return;end
+     
+     DataType=results{1};
+     ChanIndex=results{2};
+     EventType=results{3};
+end
+
+
+% return command
+% -------------------------
+com=sprintf('EEG = pop_VisEd( %s, %s, %s, {%s});', inputname(1), DataType, vararg2str(ChanIndex), EventType)
+
+% call command
+% ------------
+exec=sprintf('EEG = VisEd( %s, %s, %s, {%s});', inputname(1), vararg2str(ChanIndex), EventType);
+eval(exec);
+
+
+return;
