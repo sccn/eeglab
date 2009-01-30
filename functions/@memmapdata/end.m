@@ -1,4 +1,4 @@
-% subsref() - index eegdata class
+% end() - last index to memmapdata array
 %
 % Author: Arnaud Delorme, SCCN, INC, UCSD, Nov. 2008
 
@@ -21,6 +21,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2009/01/29 00:26:45  arno
+% Initial revision
+%
 % Revision 1.2  2008/11/04 00:26:56  arno
 % debuging
 %
