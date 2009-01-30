@@ -1,0 +1,20 @@
+
+Here, you might want to install the following packages: 
+
+== mex/mexSLOAD.mex
+contains a mex-file for improving the speed of sload
+
+== eeprobe
+mex files for reading ANT/EEProbe file format 
+
+== meg-pd 
+functions for reading Neuromag FIFF-file from 
+http://boojum.hut.fi/~kuutela/meg-pd/
+
+
+
+
+
+
+
+

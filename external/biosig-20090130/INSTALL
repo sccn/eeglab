@@ -1,0 +1,28 @@
+
+% BIOSIG runs on Matlab and Octave. 
+
+% 1) extract the files and
+% 2) save the BIOSIG files in <your_directory>
+% 3) start Octave or Matlab and change directory to .../biosig/
+% 4) run install.m, this adds all the directories into your path. 
+
+% you can apply the following commands to load
+% your EEG data into the workspace.
+
+[s,HDR]=sload(your_eeg_file);
+
+HDR=sopen(your_eeg_file,'r');
+[s,HDR]=sread(HDR);
+HDR=sclose(HDR);
+
+% Now, s contains the EEG, and HDR the header information.
+% The following help commands
+% provide some more information.
+
+help sopen
+help sread
+help sload
+
+%	$Revision: 1.1 $
+%	$Id: INSTALL,v 1.1 2009-01-30 06:04:39 arno Exp $
+%	Copyright (C) 2003,2007 by Alois Schloegl <a.schloegl@ieee.org>		
