@@ -1,6 +1,9 @@
 % readbdf() -  Loads selected Records of an EDF or BDF File (European Data Format 
 %              for Biosignals) into MATLAB. This function is outdate
 %              Use the functions sopen() and sread() instead
+%
+% This program is deprecated (obsolete). Use the sopen() and sread()
+% function instead
 
 %	Version 2.11
 %	03.02.1998
