@@ -1,4 +1,4 @@
-%adminfunc/eeg_helpsigproc.m() - Help file for EEGLAB
+% eeg_helpsigproc.m() - Help file for EEGLAB
 
 function noname();
 
