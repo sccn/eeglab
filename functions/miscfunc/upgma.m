@@ -23,7 +23,7 @@
 % To boostrap cluster support, see cluster().
 
 % RE Strauss, 5/27/96
-%   9/7/99 -  miscellaneous changes for Matlab v5.
+%   9/7/99  -  miscellaneous changes for Matlab v5.
 %   9/24/01 - check diagonal elements against eps rather than zero.
 %   3/14/04 - changed 'suppress' flag to 'doplot'.
 

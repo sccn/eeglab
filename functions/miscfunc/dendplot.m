@@ -12,7 +12,7 @@
 %
 
 % RE Strauss, 5/27/98
-%   8/20/99 - miscellaneous changes for Matlab v5.
+%   8/20/99 - miscellaneous changes for Matlab v5
 
 function dendplot(topology,labels,fontsize)
   if (nargin<2)

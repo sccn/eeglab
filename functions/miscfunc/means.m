@@ -24,7 +24,7 @@
 %   12/26/99 - added standard errors.
 %   10/19/00 - sort group-identifiers into collating sequence.
 %   12/21/00 - corrected problem with uninitialized 'fg' for single group.
-%   2/24/02 -  added estimation of variances.
+%    2/24/02 - added estimation of variances.
 %   10/15/02 - corrected documentation.
 
 function [M,stderr,V,grpids] = means(X,grps)

@@ -18,7 +18,7 @@
 %                [N1 x N2] rectangular matrix of pairwise distances (if crds1
 %                   & crds2 are specified);
 %                [1 x 1]   scalar (if crds1 is a [2 x P] matrix or ref1 & ref2
-%                   are specified).
+%                   are specified);
 %
 
 % RE Strauss, 5/4/94

@@ -22,7 +22,7 @@
 % RE Strauss, 6/5/95
 %   6/29/98 - modified to return indices.
 %   1/25/00 - changed name from unique to uniquef to avoid conflict with 
-%               Matlab v5 function.
+%             Matlab v5 function.
 
 function [value,freq,index] = uniquef(grp,sortflag)
   if (nargin < 2) sortflag = []; end;

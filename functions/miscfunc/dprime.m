@@ -1,5 +1,3 @@
-function [d,beta] = dprime(pHit,pFA)
-
 % DPRIME  --  Signal-detection theory sensitivity measure.
 %
 %  d = dprime(pHit,pFA)
@@ -22,7 +20,7 @@ function [d,beta] = dprime(pHit,pFA)
 %  See also NORMINV, NORMPDF.
 
 % Original coding by Alexander Petrov, Ohio State University.
-% $Revision: 1.1 $  $Date: 2009-01-29 00:03:15 $
+% $Revision: 1.2 $  $Date: 2009-02-09 10:49:29 $
 %
 % Part of the utils toolbox version 1.1 for MATLAB version 5 and up.
 % http://alexpetrov.com/softw/utils/
@@ -414,6 +412,8 @@ function [d,beta] = dprime(pHit,pFA)
 % Public License instead of this License.
 % 
 % ==============================================================================
+
+function [d,beta] = dprime(pHit,pFA)
 
 %-- Convert to Z scores, no error checking
 zHit = norminv(pHit) ;
