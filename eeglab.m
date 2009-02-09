@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.527  2009/01/29 00:21:09  arno
+% make ERPSS as a plugin
+%
 % Revision 1.526  2008/11/12 23:05:51  arno
 % adding the function
 % folder
@@ -1992,7 +1995,11 @@ catchstrs.new_non_empty          = e_newset;
 
     % BIOSIG plugin (not in plugin folder)
     % ------------------------------------
-    path_biosig = [ p 'external' filesep 'biosig' filesep 't200' ];
+    dircontent  = dir([ p 'external' ]);
+    dircontent  = { dircontent.name };
+    ind = strmatch('biosig', lower(dircontent));
+    biosig = dircontent{ind};
+    path_biosig = [ p 'external' filesep biosig filesep 't200' ];
     path_biosig2 = [ p_parent 'biosig' filesep 't200' ];
     biosigflag = 0;
     if exist(path_biosig) == 7
@@ -2002,14 +2009,14 @@ catchstrs.new_non_empty          = e_newset;
         else
             try,
                 addpath(path_biosig);
-                addpath([ p 'external' filesep 'biosig' ]); % for str2double
-                addpath([ p 'external' filesep 'biosig' filesep 't200' ]);
-                addpath([ p 'external' filesep 'biosig' filesep 't250' ]);
-                addpath([ p 'external' filesep 'biosig' filesep 't300' ]);
-                addpath([ p 'external' filesep 'biosig' filesep 't400' ]);
-                addpath([ p 'external' filesep 'biosig' filesep 't490' ]);
-                % addpath([ p 'external' filesep 'biosig' filesep 't500' ]); % topoplot conflict
-                version = [ p 'external' filesep 'biosig' filesep 'VERSION' ];
+                addpath([ p 'external' filesep biosig ]); % for str2double
+                addpath([ p 'external' filesep biosig filesep 't200' ]);
+                addpath([ p 'external' filesep biosig filesep 't250' ]);
+                addpath([ p 'external' filesep biosig filesep 't300' ]);
+                addpath([ p 'external' filesep biosig filesep 't400' ]);
+                addpath([ p 'external' filesep biosig filesep 't490' ]);
+                % addpath([ p 'external' filesep biosig filesep 't500' ]); % topoplot conflict
+                version = [ p 'external' filesep biosig filesep 'VERSION' ];
                 version = loadtxt(version, 'convert', 'off', 'verbose', 'off');
                 version = [ version{2,3}(1) version{2,3}(2:end) ];
                 biosigflag = 1;
