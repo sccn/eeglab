@@ -71,7 +71,7 @@
 %       Using negative counterparts of all options, any logical combination is
 %       possible.
 % 
-% Author: Arnaud Delorme, CNL / Salk Institute, 2001; SCCN/INC/UCSD, 2002-
+% Author: Arnaud Delorme, CNL/Salk Institute, 2001; SCCN/INC/UCSD, 2002-
 % 
 % see also: eeglab()
 
@@ -94,6 +94,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.62  2007/05/22 13:58:31  arno
+% selection of channels (icachansind)
+%
 % Revision 1.61  2006/07/24 20:25:42  toby
 % nothing
 %

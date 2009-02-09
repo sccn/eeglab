@@ -28,7 +28,7 @@
 % Outputs:
 %   dat            - EEGLAB data structure
 %
-% Author: Arnaud Delorme, CNL / Salk Institute, 13 March 2002
+% Author: Arnaud Delorme, CNL/Salk Institute, 13 March 2002
 %
 % See also: eeglab(), snapread()
 
@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2005/10/27 05:21:50  arno
+% nothing
+%
 % Revision 1.9  2005/10/26 01:29:30  arno
 % filename read
 %

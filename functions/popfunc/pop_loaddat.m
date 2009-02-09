@@ -20,7 +20,7 @@
 % Outputs:
 %   OUTEEG         - EEGLAB data structure
 %
-% Author: Arnaud Delorme, CNL / Salk Institute, 2001
+% Author: Arnaud Delorme, CNL/Salk Institute, 2001
 %
 % See also: loaddat(), eeglab()
 
@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2007/02/20 14:19:36  arno
+% fix command line call
+%
 % Revision 1.11  2005/05/24 17:27:22  arno
 % remove cell2mat
 %

@@ -93,7 +93,7 @@
 %    user convenience the "EEG.epoch" structure is generated automatically
 %    from the event structure. See EEGLAB manual for more information.
 %
-% Authors: Arnaud Delorme & Scott Makeig, CNL / Salk Institute, 11 March 2002
+% Authors: Arnaud Delorme & Scott Makeig, CNL/Salk Institute, 11 March 2002
 %
 % See also: eeglab()
  
@@ -116,6 +116,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2006/04/14 18:15:38  arno
+% nothing
+%
 % Revision 1.34  2006/03/11 05:27:54  arno
 % header
 %

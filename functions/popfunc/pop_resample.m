@@ -16,7 +16,7 @@
 % Outputs:
 %   OUTEEG     - output dataset
 %
-% Author: Arnaud Delorme, CNL / Salk Institute, 2001
+% Author: Arnaud Delorme, CNL/Salk Institute, 2001
 %
 % Note: uses the resample() function from the signal processing toolbox
 %       if present. Otherwise use griddata interpolation method (it should be
@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2008/11/12 22:43:54  arno
+% nothing
+%
 % Revision 1.24  2007/02/20 14:18:37  arno
 %  now can process several datasets
 %

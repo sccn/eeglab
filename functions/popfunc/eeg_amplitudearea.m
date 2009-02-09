@@ -28,8 +28,6 @@
 %         Retested and debugged Tom Campbell 2/2/05
 %         Reconceived, factored somewhat, tested and debugged Tom Campbell 13:24 23.3.2005
 
-
-
 function [channels,overall_amplitude] = eeg_amplitudearea2(EEG, channels, resrate, wstart, wend)
 
 if wstart > wend

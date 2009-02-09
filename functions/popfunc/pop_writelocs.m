@@ -15,7 +15,7 @@
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
-% Copyright (C) 17 Dec 2002 Arnaud Delorme, Salk Institute, arno@salk.edu
+% Copyright (C) Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2005/09/27 22:09:03  arno
+% fixing writing locations (removing .ced)
+%
 % Revision 1.11  2005/03/09 18:50:12  arno
 % nothing
 %

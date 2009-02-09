@@ -25,7 +25,7 @@
 %                                         % print numbers of 'rt' and 'break' 
 %                                         % type urevents 
 %
-% Author: Scott Makeig, SCCN/INC/UCSD, April 28, 2004
+% Author: Scott Makeig, SCCN/INC/UCSD, April 28, 2004-
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 

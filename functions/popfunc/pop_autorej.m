@@ -37,7 +37,7 @@
 %     as XXXXXXXXXX.  Finally it detects trials with relative kurtosis 
 %     larger than 6 standard deviations.
 %
-% Authors: Julie Onton and Arnaud Delorme, SCCN/INC/UCSD, 2007
+% Authors: Julie Onton and Arnaud Delorme, SCCN/INC/UCSD, 2007-
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -58,6 +58,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2008/02/26 14:56:20  arno
+% Initial revision
+%
 % Revision 1.14  2008/02/07 00:14:22  julie
 % corrected quantification of number of trials rejected to be for channel OR IC rejection method.
 %
