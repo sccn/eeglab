@@ -10,7 +10,7 @@
 %         node =      current node; pass as N-1
 %
 
-% RE Strauss, 7/13/95
+% RE Strauss, 7/13/95 
 
 function [links,topology,node] = dendhier(links,topology,node)
   n = size(topology,1)+1;             % Number of OTUs
