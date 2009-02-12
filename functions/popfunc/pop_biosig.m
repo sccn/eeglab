@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2008/11/13 00:41:49  arno
+% close file later on
+%
 % Revision 1.28  2008/08/11 22:04:15  nima
 % Andrey fixed a subtle bug that prevented events from being detected when they were in adjacent samples (not separated by zeros). Also, the function now can import 16 bit codes (1 to 65535) from the event channel.
 %
@@ -316,7 +319,9 @@ for p = 1:size(EEG.data,2)-1
 end;
 
 if strcmpi(g.rmeventchan, 'on')
-    EEG.data(dat.BDF.Status.Channel,:) = [];
+    if dat.BDF.Status.Channel <= size(EEG.data,1)
+        EEG.data(dat.BDF.Status.Channel,:) = [];
+    end;
     EEG.nbchan = size(EEG.data,1);
     if ~isempty(EEG.chanlocs)
         EEG.chanlocs(dat.BDF.Status.Channel,:) = [];
