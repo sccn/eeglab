@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.529  2009/02/12 21:54:47  arno
+% biosig compatibility
+%
 % Revision 1.527  2009/01/29 00:21:09  arno
 % make ERPSS as a plugin
 %
@@ -2019,7 +2022,6 @@ catchstrs.new_non_empty          = e_newset;
             version = loadtxt(version, 'convert', 'off', 'verbose', 'off');
             version = [ version{2,3}(1) version{2,3}(2:end) ];
             biosigflag = 1;
-            'here'
         catch
             disp([ 'eeglab: cannot find BIOSIG plugin' ] ); 
             disp([ '   ' lasterr] );
