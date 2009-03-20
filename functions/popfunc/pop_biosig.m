@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2009/02/12 21:55:24  arno
+% fix new event channel etc...
+%
 % Revision 1.29  2008/11/13 00:41:49  arno
 % close file later on
 %
@@ -246,12 +249,12 @@ EEG.nbchan          = size(DAT,1);
 EEG.srate           = dat.SampleRate(1);
 EEG.data            = DAT; 
 clear DAT;
-% $$$ try  % why would you do the following???????  JO
-% $$$     EEG.data            = EEG.data';
-% $$$ catch,
-% $$$     pack;
-% $$$     EEG.data            = EEG.data';
-% $$$ end;    
+% try  % why would you do the following???????  JO
+%     EEG.data            = EEG.data';
+% catch,
+%     pack;
+%     EEG.data            = EEG.data';
+% end;    
 EEG.setname 		= sprintf('%s file', dat.TYPE);
 EEG.comments        = [ 'Original file: ' filename ];
 EEG.xmin            = 0; 
@@ -272,14 +275,14 @@ EEG = eeg_checkset(EEG);
 disp('Extracting events from last EEG channel...');
 EEG.event = [];
 
-% $$$ startval = mode(EEG.data(end,:)); % my code
-% $$$ for p = 2:size(EEG.data,2)-1
-% $$$     [codeout] = code(EEG.data(end,p));
-% $$$     if EEG.data(end,p) > EEG.data(end,p-1) & EEG.data(end,p) >= EEG.data(end,p+1)
-% $$$         EEG.event(end+1).latency =  p;
-% $$$         EEG.event(end).type = bitand(double(EEG.data(end,p)-startval),255);
-% $$$     end;
-% $$$ end;
+% startval = mode(EEG.data(end,:)); % my code
+% for p = 2:size(EEG.data,2)-1
+%     [codeout] = code(EEG.data(end,p));
+%     if EEG.data(end,p) > EEG.data(end,p-1) & EEG.data(end,p) >= EEG.data(end,p+1)
+%         EEG.event(end+1).latency =  p;
+%         EEG.event(end).type = bitand(double(EEG.data(end,p)-startval),255);
+%     end;
+% end;
 
 % lastout = mod(EEG.data(end,1),256);newevs = []; % andrey's code 8 bits
 % codeout = mod(EEG.data(end,2),256);
@@ -308,15 +311,15 @@ EEG.event = [];
 %end;
 
 % Modifieded by Andrey (Aug.5,2008) to detect all non-zero codes: 
-thiscode = 0;
-for p = 1:size(EEG.data,2)-1
-    prevcode = thiscode;
-    thiscode = mod(EEG.data(end,p),256*256);   % andrey's code - 16 bits 
-    if (thiscode ~= 0) && (thiscode~=prevcode) 
-        EEG.event(end+1).latency =  p;
-        EEG.event(end).type = thiscode;
-    end;
-end;
+% thiscode = 0;
+% for p = 1:size(EEG.data,2)-1
+%     prevcode = thiscode;
+%     thiscode = mod(EEG.data(end,p),256*256);   % andrey's code - 16 bits 
+%     if (thiscode ~= 0) && (thiscode~=prevcode) 
+%         EEG.event(end+1).latency =  p;
+%         EEG.event(end).type = thiscode;
+%     end;
+% end;
 
 if strcmpi(g.rmeventchan, 'on')
     if dat.BDF.Status.Channel <= size(EEG.data,1)
@@ -330,31 +333,33 @@ end;
 dat = sclose(dat);
 EEG = eeg_checkset(EEG, 'eventconsistency');
 
-% $$$ if ~isempty(dat.EVENT)    
-% $$$     if isfield(dat, 'out') % Alois fix for event interval does not work
-% $$$         if isfield(dat.out, 'EVENT')
-% $$$             dat.EVENT = dat.out.EVENT;
-% $$$         end;
-% $$$     end;
-% $$$     if ~isempty(newblockrange)
-% $$$         interval(1) = newblockrange(1) * dat.SampleRate(1) + 1;
-% $$$         interval(2) = newblockrange(2) * dat.SampleRate(1);
-% $$$     else interval = [];
-% $$$     end
-% $$$     EEG.event = biosig2eeglabevent(dat.EVENT, interval); % Toby's fix
-% $$$     if strcmpi(g.rmeventchan, 'on') & strcmpi(dat.TYPE, 'BDF') & isfield(dat, 'BDF')
-% $$$         disp('Removing event channel...');
-% $$$         EEG.data(dat.BDF.Status.Channel,:) = [];
-% $$$         EEG.nbchan = size(EEG.data,1);
-% $$$         if ~isempty(EEG.chanlocs)
-% $$$             EEG.chanlocs(dat.BDF.Status.Channel,:) = [];
-% $$$         end;
-% $$$     end;
-% $$$     EEG = eeg_checkset(EEG, 'eventconsistency');
-% $$$ else 
-% $$$     disp('Warning: no event found. Events might be embeded in a data channel.');
-% $$$     disp('         To extract events, use menu File > Import Event Info > From data channel');
-% $$$ end;
+if ~isempty(dat.EVENT)    
+    if isfield(dat, 'out') % Alois fix for event interval does not work
+        if isfield(dat.out, 'EVENT')
+            dat.EVENT = dat.out.EVENT;
+        end;
+    end;
+    if ~isempty(newblockrange)
+        interval(1) = newblockrange(1) * dat.SampleRate(1) + 1;
+        interval(2) = newblockrange(2) * dat.SampleRate(1);
+    else interval = [];
+    end
+    EEG.event = biosig2eeglabevent(dat.EVENT, interval); % Toby's fix
+    if strcmpi(g.rmeventchan, 'on') & strcmpi(dat.TYPE, 'BDF') & isfield(dat, 'BDF')
+        disp('Removing event channel...');
+        if size(EEG.data,1) >= dat.BDF.Status.Channel, 
+            EEG.data(dat.BDF.Status.Channel,:) = []; 
+            if ~isempty(EEG.chanlocs)
+                EEG.chanlocs(dat.BDF.Status.Channel,:) = [];
+            end;
+        end;
+        EEG.nbchan = size(EEG.data,1);
+    end;
+    EEG = eeg_checkset(EEG, 'eventconsistency');
+else 
+    disp('Warning: no event found. Events might be embeded in a data channel.');
+    disp('         To extract events, use menu File > Import Event Info > From data channel');
+end;
 
 % rerefencing
 % -----------
