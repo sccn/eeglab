@@ -52,7 +52,7 @@
 %
 % Standard-mode Usage thereafter:
 %
-%       >> [hdaxis cbaraxis] = headplot(values,'spline_file','Param','Value',...)
+%       >> headplot(values,'spline_file','Param','Value',...)
 %
 % Required Standard-mode Inputs:
 %
@@ -94,10 +94,6 @@
 %   'transform'  - [real array] homogeneous transformation matrix to apply
 %                  to the original locations ('orilocs') before plotting them.
 %
-% Outputs:
-%      hdaxis    - handle of the head axes (the existing gca when headplot() was called)
-%      cbaraxis  - handle of the color bar axes
-%
 % Note: if an error is generated, headplot() may close the current figure
 %
 % Authors: Arnaud Delorme, Colin Humphries, Scott Makeig, SCCN/INC/UCSD, 
@@ -124,6 +120,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.78  2007/08/16 21:14:20  arno
+% traditional -> traditionaldipfit
+%
 % Revision 1.77  2007/04/26 20:59:14  toby
 % doc edits regarding transformation matrix
 %
