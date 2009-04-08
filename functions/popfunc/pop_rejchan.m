@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2009/04/08 21:38:09  julie
+% Fix threshold and measure
+%
 % Revision 1.2  2008/02/29 16:10:35  arno
 % show electrode index in front of electrode name
 %
@@ -74,16 +77,19 @@ if nargin < 2
                { 'style' 'text' 'string' 'Measure to use:' } ...
                { 'style' 'popupmenu' 'string' 'Probability|Kurtosis' 'value' 2 } ...
                { 'style' 'text' 'string' 'Normalize measure (check=on):' } ...
-               { 'style' 'checkbox' 'string' '' 'value' 0 } { } ...
-               { 'style' 'text' 'string' 'Threshold limits [lower upper]:' } ...
-               { 'style' 'edit' 'string' '3 400' } };
+               { 'style' 'checkbox' 'string' '' 'value' 1 } { } ...
+               { 'style' 'text' 'string' 'Threshold limits [max]:' } ...
+               { 'style' 'edit' 'string' '5' } };
     geom = { [2 1] [2 1] [2 0.2 0.8] [2 1] };
     result = inputgui( 'uilist', uilist, 'geometry', geom, 'title', 'Reject channel -- pop_rejchan()', ...
         'helpcom', 'pophelp(''pop_rejchan'')');
     if isempty(result), return; end;
     
     options = { 'elec' eval( [ '[' result{1} ']' ] ) 'threshold' str2num(result{4}) };
-    if ~result{3}, options = { options{:} 'norm', 'off' }; end;
+    if result{3}, 
+         options = { options{:} 'norm', 'on' }; 
+    else options = { options{:} 'norm', 'off' }; 
+    end;
     
     if result{2} == 1, options = { options{:} 'measure', 'prob' };
     else               options = { options{:} 'measure', 'kurt' }; 
