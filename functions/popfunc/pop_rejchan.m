@@ -12,7 +12,8 @@
 % Optional inputs:
 %   'elec'     - [n1 n2 ...] electrode number(s) to take into 
 %                consideration for rejection
-%   'limits'   - [low high] activity probability limit(s) (in std. dev.).
+%   'threshold' - [max] absolute thresold or activity probability 
+%                 limit(s) (in std. dev.) if norm is 'on'.
 %   'measure'  - ['prob'|'kurt'] compute probability 'prob' or kurtosis 'kurt'
 %                for each channel. Default is 'kurt'.
 %   'norm'     - ['on'|'off'] normalize measure above (using trimmed 
@@ -47,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2008/02/29 16:10:35  arno
+% show electrode index in front of electrode name
+%
 % Revision 1.1  2008/02/15 16:28:12  arno
 % Initial revision
 %
@@ -80,7 +84,10 @@ if nargin < 2
     
     options = { 'elec' eval( [ '[' result{1} ']' ] ) 'threshold' str2num(result{4}) };
     if ~result{3}, options = { options{:} 'norm', 'off' }; end;
-    if result{2} == 2, options = { options{:} 'measure', 'kurt' }; end;
+    
+    if result{2} == 1, options = { options{:} 'measure', 'prob' };
+    else               options = { options{:} 'measure', 'kurt' }; 
+    end;
 
 else
     options = varargin;
@@ -89,7 +96,7 @@ end;
 opt = finputcheck( options, { 'norm'    'string'    { 'on' 'off' }       'off';
                               'measure' 'string'    { 'prob' 'kurt' }    'kurt';
                               'elec'    'integer'   []                   [1:EEG.nbchan];
-                              'threshold' 'real'   []                    [3 400] }, 'pop_rejchan');
+                              'threshold' 'real'   []                    400 }, 'pop_rejchan');
 if isstr(opt), error(opt); end;
 
 % compute the joint probability
