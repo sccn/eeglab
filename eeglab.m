@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.530  2009/02/12 21:58:36  arno
+% Remove comment
+%
 % Revision 1.529  2009/02/12 21:54:47  arno
 % biosig compatibility
 %
@@ -2089,8 +2092,9 @@ catchstrs.new_non_empty          = e_newset;
 	cb_rmbase      = [ check      '[EEG LASTCOM] = pop_rmbase(EEG);'   e_store];
 	cb_runica      = [ check      '[EEG LASTCOM] = pop_runica(EEG);'   e_store];
 	cb_subcomp     = [ checkica   '[EEG LASTCOM] = pop_subcomp(EEG);'  e_newset];
-	cb_chanrej     = [ check      'pop_rejchan(EEG); LASTCOM = '''';'  e_hist];
-	cb_autorej     = [ check      '[EEG tmpp LASTCOM] = pop_autorej(EEG); clear tmpp;'  e_hist];
+	%cb_chanrej     = [ check      'pop_rejchan(EEG); LASTCOM = '''';'  e_hist];
+	cb_chanrej     = [ check      '[EEG tmp1 tmp2 LASTCOM] = pop_rejchan(EEG); clear tmp1 tmp2;'  e_newset];
+    cb_autorej     = [ check      '[EEG tmpp LASTCOM] = pop_autorej(EEG); clear tmpp;'  e_hist];
 
 	cb_rejmenu1    = [ check      'pop_rejmenu(EEG, 1); LASTCOM = '''';'    e_hist];
 	cb_eegplotrej1 = [ check      '[LASTCOM] = pop_eegplot(EEG, 1);'        e_hist];
