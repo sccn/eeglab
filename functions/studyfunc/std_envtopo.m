@@ -11,11 +11,9 @@
 %   ALLEEG       = the ALLEEG data structure; can also be an EEG dataset structure.
 %
 % Optional inputs:
-%  'clusters'    = [integer array] vector of cluster numbers. If one cluster, plots the
-%                    cluster contribution to the data envelope. If multiple clusters,
-%                    selects the largest contributing clusters from within the
-%                  'limcontrib' region (see below) and plots the envelopes of
-%                    their contributions {default| [] -> 'all'}
+%  'clustnums'   = [integer array] vector of cluster numbers to plot.  Else if
+%                   int < 0, the number of largest contributing clusters to plot
+%                   {default|[] -> 7}
 %  'conditions'  = [integer array] vector of condition indices to plot
 %  'subclus'     = [integer array] vector of cluster numbers to omit when  computing
 %                    the ERP envelope of the data (e.g., artifact clusters)
@@ -36,15 +34,9 @@
 %                   ERP and cluster ERP contributions.
 %  'diff'        = [condition1 condition2] the numbers of two conditions.
 %                   Plots an additional figure with the difference of the two conditions.
-%  'clustnums'   = [integer array] vector of cluster numbers to plot.  Else if
-%                   int < 0, the number of largest contributing clusters to plot
-%                   {default|[] -> 7}
 %  'timerange'   = data epoch start and end input latencies (in ms)
 %                   {default: from 'limits' if any}
-%  'limits'      = 0 or [minms maxms] or [minms maxms minuV maxuV]. Specify start/end plot
-%                   x-axis limits (in ms) and min/max y-axis limits (in uV). If 0, or if both
-%                   minmx & maxms == 0 -> use latencies from 'timerange' (else, 0:frames-1).
-%                   If both minuV and maxuV == 0 -> use data uV limits {default: 0}
+%  'limits'      = [minuV maxuV]. {default: use data uV limits}
 %  'limcontrib'  = [minms maxms]  time range (in ms) in which to rank cluster contributions
 %                   (boundaries = thin dotted lines) {default|[]|[0 0] -> plotting limits}
 %  'vert'        = vector of times (in ms) at which to plot vertical dashed lines
@@ -53,6 +45,9 @@
 % See also: envtopo()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2008/02/15 16:42:11  arno
+% Allow plotting envtopo when processing multiple groups
+%
 % Revision 1.24  2008/01/17 21:54:36  elizabeth
 % clusterp.erp -> clusterp.erpdata
 %
@@ -109,8 +104,6 @@ p_options = {};       % Default: other options off
 
 for k = 1:2:(nargin-2)
     switch varargin{k}
-        case 'clusters'
-            clusters = varargin{k+1};
         case 'conditions'
             conditions = varargin{k+1};
         case 'env_erp'
@@ -125,13 +118,11 @@ for k = 1:2:(nargin-2)
             p_options{end+1} = 'limcontrib';
             p_options{end+1} = varargin{k+1};
         case  'limits'
-            limits = varargin{k+1};
-            if length(limits) == 4
-                p_options{end+1} = 'limits';
-                p_options{end+1} = limits;
-            end
+            limits = varargin{k+1};            
+             p_options{end+1} = 'limits';
+             p_options{end+1} = limits;            
         case 'baseline'
-            t = ALLEEG(STUDY.datasetinfo(STUDY.setind(1)).index).times;
+            t = ALLEEG(1).times;
             % convert baseline from ms to indexes
             maxind = max(find(t <= varargin{k+1}(end)));
             minind = min(find(t >= varargin{k+1}(1)));
@@ -143,39 +134,48 @@ for k = 1:2:(nargin-2)
             p_options{end+1} = 'vert';
             p_options{end+1} = vert;
         case 'clustnums'
+          if varargin{k+1}(1) > 0 % not just 'largest' clusters (neg number) or []
+              clusters = varargin{k+1};    
+          else % list all clusters to find largest later
+              if STUDY.cluster(2).name(1:3) == 'out'
+                  clusters = [3:length(STUDY.cluster)];% not parent or outliers
+              else
+                  clusters = [2:length(STUDY.cluster)];% not parent
+              end;
+          end;
             p_options{end+1} = 'clustnums';
-            p_options{end+1} = varargin{k+1};
+            p_options{end+1} = varargin{k+1}; % pass on exact input
         case 'diff'
             diffc = varargin{k+1};
         case 'timerange'
             timerange = varargin{k+1};
-            p_options{end+1} = 'timerange';
-            p_options{end+1} = timerange;
-    end
+            if ~isempty(timerange) % this is if timerange input was [] JO
+              p_options{end+1} = 'timerange';
+              p_options{end+1} = timerange;
+            end;
+       end
 end
 
 if ~exist('timerange')
-    timerange = [ALLEEG(STUDY.datasetinfo(STUDY.setind(1)).index).times([1 end])];
+    timerange = [ALLEEG(1).times([1 end])];
     p_options{end+1} = 'timerange';
     p_options{end+1} = timerange;
 end
 
-if isempty(clusters) | strcmpi(clusters,'all') % Default to all clusters in STUDY
+if isempty(clusters)  % Default to all clusters in STUDY
     clusters = [];
     for k = 2:length(STUDY.cluster)
         if ~strncmpi('Notclust',STUDY.cluster(k).name,8)
             clusters = [clusters k];
         end
     end
+    p_options{end+1} = 'clustnums'; % default clustnums is -7
+    p_options{end+1} = -7;
 end
 
 % If some of the requested clusters-to-subtruct are in clusters, remove them.
 
 clusters = setdiff(clusters,subclus);
-
-%if length(clusters) > 1
-%    e_options{2} = 'all';
-%end
 
 Ncond = length(STUDY.condition); % number of conditions
 if Ncond == 0
@@ -191,30 +191,27 @@ for n = conditions
     %
     fprintf('\n Computing grand ERP for condition %d.', n);
     [grandERP, set_len, STUDY, ALLEEG] = std_granderp(STUDY, ALLEEG, 'clusters', clusters, 'condition', n, e_options{:});
-    grandERPtot{n} = grandERP;
-    if ~exist('limits') | (length(limits)  == 2) % make limits same all conditions
-        tmpmin = min(min(grandERP));
-        tmpmax = max(max(grandERP));
-        datarange = tmpmax-tmpmin;
-        tmpmin = tmpmin-0.05*datarange;
-        tmpmax = tmpmax+0.05*datarange;
-        if n == conditions(1)
-            ymin = tmpmin;
-            ymax = tmpmax;
-        else
-            ymin = min(tmpmin,ymin);
-            ymax = max(tmpmax,ymax);
-        end
-        if n == conditions(end)
-            p_options{end+1} = 'limits';
-            if ~exist('limits')
-                p_options{end+1} = [timerange ymin ymax];
-            else
-                p_options{end+1} = [limits ymin ymax];
-            end
-        end
-    end
-    clear grandERP;
+        times = ALLEEG(1).times; % just get times from first dataset
+        tms = find(times>=timerange(1) & times <= timerange(2));
+        grandERPtot{n} = grandERP(:,tms);clear grandERP;
+        if ~exist('limits')  % determine limits if not specified
+          tmpmin = min(min(grandERPtot{n}));
+          tmpmax = max(max(grandERPtot{n}));
+          datarange = tmpmax-tmpmin;
+          tmpmin = tmpmin-0.05*datarange;
+          tmpmax = tmpmax+0.05*datarange;
+          if n == conditions(1)
+              ymin = tmpmin;
+              ymax = tmpmax;
+          else
+              ymin = min(tmpmin,ymin);
+              ymax = max(tmpmax,ymax);
+          end
+          if n == conditions(end)
+              p_options{end+1} = 'limits';
+              p_options{end+1} = [ymin ymax];          
+          end
+        end     
 end
 
 for n = conditions
@@ -225,26 +222,22 @@ for n = conditions
     for cls = 1:length(clusters)
         len = length(STUDY.cluster(clusters(cls)).comps);
         try
-            % clustscalp = std_clustread(STUDY, ALLEEG, clusters(cls),'scalp'); % read scalp maps from cluster
             [tmp clustscalp] = std_readtopoclust(STUDY, ALLEEG, clusters(cls)); % read scalp maps from cluster
             clustscalp = clustscalp{1};
         catch,
-            warndlg2([ 'Some topoplot information is missing, aborting'] , 'Abort - std_envtopo()' );
+            warndlg2([ 'Some topoplot information is missing, Plot all cluster scalp maps and try again.'] , 'Abort - std_envtopo()' );
             return;
         end
-        %clusterp = std_clustread(STUDY, ALLEEG, clusters(cls),'erp', n);
-
-        %[tmp clusterp] = std_readdata(STUDY, ALLEEG, 'clusters', clusters(cls), 'infotype', 'erp');
         for k = 1:len
             dat  = STUDY.cluster(clusters(cls)).sets(n,k);
             comp = STUDY.cluster(clusters(cls)).comps(k);
-            clusterp.erp{k} = std_readerp(ALLEEG, dat, comp);
+            clusterp.erp{k} = std_readerp(ALLEEG, dat, comp,timerange);
             %clusterp.erp{k} = clusterp.erpdata{n}(:,k); % only works if 1 group
         end;
         if exist('baseline')
             for k = 1:length(clusterp.erp)
                 clusterp.erp{k} = rmbase(clusterp.erp{k},...
-                    ALLEEG(STUDY.datasetinfo(STUDY.setind(1)).index).pnts,baseline);
+                  ALLEEG(1).pnts,baseline);
             end;
         end
         
@@ -259,36 +252,34 @@ for n = conditions
             projERP = projERP + tmp*clusterp.erp{k};
             fprintf('.');
         end
-        tot_projERP{cls} = projERP/set_len;
+        tot_projERP{cls} = projERP/len; % not set_len
         clust_names{cls} = [STUDY.cluster(clusters(cls)).name];
         numind = strfind(STUDY.cluster(clusters(cls)).name,' ')+1; % find the cluster number
         clus_ind{cls} = [STUDY.cluster(clusters(cls)).name(numind(end):end) ', '];
     end
-    p_options{end+1} = 'clustlabels';
-    p_options{end+1} = clust_names;
-    p_options{end+1} = 'gridind';
-    p_options{end+1} = val_ind;
-    p_options{end+1} = 'sortvar';
-    p_options{end+1} = 'pvaf';
+    
+    if n == conditions(1) %% only do this once
+      p_options{end+1} = 'clustlabels';
+      p_options{end+1} = clust_names;
+      p_options{end+1} = 'gridind';
+      p_options{end+1} = val_ind;
+      p_options{end+1} = 'sortvar';
+      p_options{end+1} = 'pvaf';
+    end;
 
     %
     % Compute the grand mean ERP envelope of the cluster (for a specific condition).
     %
-    if cls == 1
+    if cls == 1% (cls is loop var through clusters)if plotting only one cluster: fill envelope
         figure; set(gcf,'Color', BACKCOLOR);
         orient landscape;
-        %
-        % To save memory, once computation of a condition is complete
-        % its grand ERP is cleared grandERPtot(1), which makes the current
-        % condition grand ERP always in index 1
-        %
-        envtopo_plot(grandERPtot{1},tot_projERP,'envmode' ,'avg', 'fillcomp', 1, ...
+        envtopo_plot(grandERPtot{n},tot_projERP,'envmode' ,'avg', 'fillcomp', 1, ...
             'dispmaps', 'on', 'title', ...
             ['Projected cluster: ' clus_ind{:} ' ' STUDY.condition{n}], p_options{:} );
     else
         figure; set(gcf,'Color', BACKCOLOR);
         orient landscape;
-        envtopo_plot(grandERPtot{1},tot_projERP,'envmode' ,'avg', ...
+        envtopo_plot(grandERPtot{n},tot_projERP,'envmode' ,'avg', ...
             'dispmaps', 'on', 'title', [ STUDY.condition{n}], p_options{:} );
     end
 
@@ -302,7 +293,7 @@ for n = conditions
             figure(diff_h); subplot(3,1,1)
             envtopo_plot(grandERPtot{1},tot_projERP,'envmode' ,'avg', 'dispmaps', 'off', p_options{:},...
                 'title', STUDY.condition{n} ,'xlabel', 'off' );
-            erp1 = grandERPtot{1}; % The grand ERP
+            erp1 = grandERPtot{n}; % The grand ERP
             proj1 = tot_projERP;
             clear  tot_projERP
         end
@@ -310,7 +301,7 @@ for n = conditions
             figure(diff_h); subplot(3,1,2)
             envtopo_plot(grandERPtot{1},tot_projERP,'envmode' ,'avg', 'dispmaps', 'off', p_options{:}, ...
                 'title', STUDY.condition{n} ,'xlabel', 'off' );
-            erp2 = grandERPtot{1}; % The grand ERP
+            erp2 = grandERPtot{n}; % The grand ERP
             proj2 = tot_projERP;
             clear  tot_projERP
         end
@@ -339,7 +330,7 @@ for n = conditions
             clear erp1 erp2  % remove variables so this loop runs only once
         end
     end
-    grandERPtot(1) = [];
+    grandERPtot{n} = []; % deleted when done with current condition
 end
 
 % envtopo_plot() - Plot the envelope of a data epoch, plus envelopes and scalp maps of specified
@@ -719,19 +710,6 @@ for c = 1:ncomps
     [maxval,maxi] = max(sum(projERP{c}(:,limframe1:limframe2).*projERP{c}(:,limframe1:limframe2)));
     % find point of max variance for comp c
     compvars(c)   = maxval;
-    %
-    %%%%%% find variance in interval after removing component %%%%%%%%%%%
-    %
-    if isempty(g.pvaf)
-        g.pvaf = g.sortvar;
-    end
-    if strcmpi(g.pvaf, 'pvaf') | strcmpi('pvaf','on') | strcmpi(g.pvaf,'mv')
-        %pvaf(c) = mean(mean((grandERP(:,limframe1:limframe2)-projERP{c}(:,limframe1:limframe2)).^2));
-        pvaf(c) = var(reshape(grandERP(:,limframe1:limframe2)-projERP{c}(:,limframe1:limframe2),1,nvals));
-    else % if 'pvaf' is 'rv' (or, formerly, 'off')
-        %pvaf(c) = mean(mean(projERP{c}(:,limframe1:limframe2).^2));
-        pvaf(c) = var(reshape(projERP{c}(:,limframe1:limframe2),1,nvals));
-    end;
     maxi = maxi+limframe1-1;
     plotframes(c) = maxi;
     maxproj(:,c)  = projERP{c}(:,maxi); % Note: maxproj contains only g.plotchans -sm 11/04
@@ -748,45 +726,55 @@ if ~xunitframes
     fprintf('  in the interval %3.0f ms to %3.0f ms.\n',1000*times(limframe1),1000*times(limframe2));
 end
 %vardat = mean(mean((grandERP(:,limframe1:limframe2).^2))); % find data variance in interval
-vardat = var(reshape(grandERP(:,limframe1:limframe2),1,nvals)); % find data variance in interval
-
-if strcmpi(g.pvaf, 'pvaf') | strcmpi(g.pvaf,'on') | strcmpi(g.pvaf,'mv')
-    pvaf = 100-100*pvaf/vardat;
-    ot   = g.pvaf;
-    if strcmpi(ot,'on'), ot = 'pvaf'; end
-elseif strcmpi(g.pvaf, 'rv')| strcmpi(g.pvaf,'off')
-    pvaf = 100*pvaf/vardat;
-    ot   = 'rv';
-end;
-[sortpvaf spx] = sort(pvaf);
-sortpvaf = sortpvaf(end:-1:1);
-spx      = spx(end:-1:1);
-npercol = ceil(ncomps/3);
+vardat = var(reshape(grandERP(:,limframe1:limframe2),1,nvals)); % find full data variance in interval
+for c = 1:length(projERP)
+        % now calculate the pvaf over the whole time period for printing
+        if strcmpi(g.pvaf, 'pvaf') | strcmpi(g.pvaf,'on') | strcmpi(g.pvaf,'mv')
+            diffdat = grandERP(:,limframe1:limframe2)-projERP{c}(:,limframe1:limframe2);
+            diffdat = reshape(diffdat,1,nvals);
+            pvaf(c) = 100-100*(var(diffdat)/vardat); %var of diff div by var of full data
+            ot   = g.pvaf;
+            if strcmpi(ot,'on'), 
+                ot = 'pvaf'; 
+            end
+        elseif strcmpi(g.pvaf, 'rv')| strcmpi(g.pvaf,'off')% var(comp)/var(data)
+            pvaf(c) = 100*(var(reshape(projERP{c}(:,limframe1:limframe2),1,nvals))/vardat);
+            ot   = 'rv';
+        end;
+end
+%[sortpvaf spx] = sort(pvaf);
+%sortpvaf = sortpvaf(end:-1:1);
+%spx      = spx(end:-1:1);
+%npercol = ceil(ncomps/3);
 
 %
 %%%%%%%%%%%%%%%%%%%%%%%%% Sort by max variance in data %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-if strcmpi(g.pvaf,'mv') | strcmpi(g.pvaf,'on')
-    [compvars,compx] = sort(compvars');  % sort clustnums on max variance
-else % if 'pvaf' is 'pvaf' or 'rv'
-    [tmp,compx]  = sort(pvaf');   % sort clustnums on pvaf or rv
+if strcmpi(g.pvaf, 'pvaf') | strcmpi(g.pvaf,'mv') | strcmpi(g.pvaf,'on')
+        [pvaf,compx] = sort(pvaf');  % sort clustnums on max pvaf
+else % if 'g.pvaf' is 'rv'
+        [compvars,compx]  = sort(compvars');   % sort clustnums on max variance
 end
+pvaf = pvaf(ncomps:-1:1); 
 
 compx        = compx(ncomps:-1:1);    % reverse order of sort
 compvars     = compvars(ncomps:-1:1)';% reverse order of sort (output var)
 compvarorder = g.clustnums(compx);     % actual component numbers (output var)
 plotframes   = plotframes(compx);     % plotted comps have these max frames
-compframes   = plotframes';           % frame of max variance in each comp (output var)
+%compframes   = plotframes';           % frame of max variance in each comp (output var)
 comptimes    = times(plotframes(compx));  % time of max variance in each comp (output var)
 compsplotted = compvarorder(1:ntopos);% (output var)
+maxproj    = maxproj(:,compx);        % maps in plotting order (JO)
 %
 %%%%%%%%%%%%%%%%%%%%%%%% Reduce to ntopos %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 [plotframes,ifx] = sort(plotframes(1:ntopos));% sort plotframes on their temporal order
 plottimes  = times(plotframes);       % convert to times in ms
 compx      = compx(ifx);              % indices into clustnums, in plotting order
-maporder   = g.clustnums(compx);       % comp. numbers, in plotting order (l->r)
-maxproj    = maxproj(:,compx);        % maps in plotting order
+maporder   = compvarorder(ifx); % I think you need to use sorted list now (JO)
+%maporder   = g.clustnums(compx);       % comp. numbers, in plotting order (l->r)
+maxproj    = maxproj(:,ifx);        % maps in plotting order
+pvaf = pvaf(ifx);
 
 vlen = length(g.voffsets); % extend voffsets if necessary
 while vlen< ntopos
@@ -835,19 +823,17 @@ sumproj = zeros(size(projERP{1}));
 for n = 1:ntopos
     sumproj = sumproj + projERP{compx(n)};
 end
-varproj = mean(mean((grandERP(:,limframe1:limframe2).^2))); % find data variance in interval
-if strcmpi(g.pvaf, 'on')
-    sumpvaf = mean(mean((grandERP(:,limframe1:limframe2)-sumproj(:,limframe1:limframe2)).^2));
-else
-    sumpvaf = mean(mean(sumproj(:,limframe1:limframe2).^2));
-end;
-if strcmpi(g.pvaf, 'on') | strcmpi(g.pvaf,'pv') | strcmpi(g.pvaf,'pvaf') | strcmpi(g.pvaf,'mv')
-    sumpvaf = 100-100*sumpvaf/varproj;
+
+totlimdat = grandERP(:,limframe1:limframe2);
+sumlimdat = sumproj(:,limframe1:limframe2);
+if strcmpi(g.pvaf, 'on')    
+    sumpvaf = 100-100*(var(reshape(totlimdat-sumlimdat,1,nvals))/vardat); %JO
     ot   = 'pvaf';
-else % if strcmpi(g.pvaf, 'off') | strcmpi(g.pvaf,'rv')
-    sumpvaf = 100*sumpvaf/varproj;
+else
+    sumpvaf = 100*var(reshape(sumproj(:,limframe1:limframe2),1,nvals))/vardat; 
     ot   = 'rv';
 end;
+
 if ~xunitframes
     fprintf('    Summed component %s in interval [%4g %4g] ms: %4.2f%%\n',ot, 1000*times(limframe1),1000*times(limframe2), sumpvaf);
 end
@@ -880,10 +866,10 @@ set(axe,'Color',axcolor);
 ylimset = 0; % flag whether hard limits have been set by the user
 ymin = min(min(grandERP(:,pframes))); % begin by setting limits from plotted data
 ymax = max(max(grandERP(:,pframes)));
-if length(g.limits) == 4
-    if g.limits(3)~=0 | g.limits(4)~=0 % collect plotting limits from 'limits'
-        ymin = g.limits(3);
-        ymax = g.limits(4);
+if length(g.limits) == 2
+    if g.limits(1)~=0 | g.limits(2)~=0 % collect plotting limits from 'limits'
+        ymin = g.limits(1);
+        ymax = g.limits(2);
         ylimset = 1;
     end
 end
@@ -1152,8 +1138,8 @@ if strcmpi(g.dispmaps, 'on')
         end;
     end;
 
-    [tmp tmpsort] = sort(maporder);
-    [tmp tmpsort] = sort(tmpsort);
+    %[tmp tmpsort] = sort(maporder);
+    %[tmp tmpsort] = sort(tmpsort);
 
     for t=1:ntopos % left to right order  (maporder)
         axt = axes('Units','Normalized','Position',...
@@ -1309,11 +1295,11 @@ if mod(nargin,2)
     error('std_granderp: Input argument list must be pairs of: ''keyx'', ''valx'' ');
 end
 
-clusters = [];
 subclus = [];
 env_erp = 'contrib';% default grand ERP include only the sets that contribute to the dataset, otherwise 'all' datasets in STUDY.
-n = 1;
 only_clust = 'off'; % Include only components that were part of the pre-clustering data in the grand ERP
+
+n = 1; % default for condition index
 
 for k = 1:2:(nargin-2)
     switch varargin{k}
@@ -1363,8 +1349,9 @@ len = length(sets);
 for k = 1:len
     EEG = ALLEEG(sets(k));
     if strcmpi(only_clust, 'on')
-        comps = STUDY.cluster(cls(1)).preclust.preclustcomps{(mod(sets(k),size(STUDY.setind,2)))}; 
-                                                             % Only components that were used in the pre-clustering
+      comps =STUDY.datasetinfo(sets(k)).comps; % this is an easier way to access all clustered ICs (JO)
+      %comps = STUDY.cluster(cls(1)).preclust.preclustcomps{(mod(sets(k),size(STUDY.setind,2)))}; 
+      % Only components that were used in the pre-clustering
     else
         comps = 1:size(EEG.icawinv,2);
     end
@@ -1377,9 +1364,10 @@ for k = 1:len
     [tmp_erp] = std_erp(EEG, comps);
     [tmp_scalp] = std_topo(EEG, comps);
     tmp = 0;
-    tmp = (tmp_scalp.'*tmp_erp)/len;
+    tmp = tmp_scalp'*tmp_erp;
     if exist('baseline')
-        tmp = rmbase(tmp,EEG.pnts,baseline);
+        btms = find(EEG.times > baseline(1) & EEG.times < baseline(2));
+        tmp = rmbase(tmp,EEG.pnts,btms);
     end
     if k == 1
         grandERP = tmp;
@@ -1388,3 +1376,5 @@ for k = 1:len
     end
     ALLEEG(sets(k)) = EEG;
 end
+grandERP = grandERP/length(sets); % normalize by number of datasets... 
+
