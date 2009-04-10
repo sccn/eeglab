@@ -45,6 +45,9 @@
 % See also: envtopo()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2009/04/10 18:58:25  julie
+% Fixed several issues regarding ERP collection and pvaf calculation
+%
 % Revision 1.25  2008/02/15 16:42:11  arno
 % Allow plotting envtopo when processing multiple groups
 %
@@ -498,42 +501,38 @@ delete(gca)
 %%% Convert g.timerange, g.limits and g.limcontrib to sec from ms %%%%
 %
 g.timerange = g.timerange/1000;   % the time range of the input data
-g.limits(1) = g.limits(1)/1000;   % the time range to plot
-if length(g.limits) == 1   % make g.limits at least of length 2
-    g.limits(1) = 0; g.limits(2) = 0;
-else
-    g.limits(2) = g.limits(2)/1000;  %
-end;
+%g.limits(1) = g.limits(1)/1000;   % the time range to plot
+%if length(g.limits) == 1   % make g.limits at least of length 2
+%    g.limits(1) = 0; g.limits(2) = 0;
+%else
+%    g.limits(2) = g.limits(2)/1000;  %
+%end;
 g.limcontrib = g.limcontrib/1000; % the time range in which to select largest components
 
 %
 %%%%%%%%%%%% Collect time range information %%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-if length(g.limits) == 3 | length(g.limits) > 4 % if g.limits wrong length
-    fprintf('envtopo: limits should be 0, [minms maxms], or [minms maxms minuV maxuV].\n');
+if length(g.limits) > 2 % if g.limits wrong length
+    fprintf('envtopo: limits should be 0, or [miny maxy].\n');
 end
 
 xunitframes = 0; % flag plotting if xmin & xmax are in frames instead of sec
 if ~isempty(g.timerange)   % if 'timerange' given
-    if g.limits(1)==0 & g.limits(2)==0
-        g.limits(1) = min(g.timerange); % if no time 'limits
-        g.limits(2) = max(g.timerange); % plot whole data epoch
-    end
+    %if g.limits(1)==0 & g.limits(2)==0
+            g.limits(1) = g.timerange(1); % 
+            g.limits(2) = g.timerange(2); % 
+            xmin = g.timerange(1); % (xmin, xmax) are data limits in sec
+            xmax = g.timerange(2);
+    %end
 else % if no 'timerange' given
-    if g.limits(1)==0 & g.limits(2)==0 % if no time limits as well,
+    %if g.limits(1)==0 & g.limits(2)==0 % if no time limits as well,
         fprintf('\nNOTE: No time limits given: using 0 to %d frames\n',frames-1);
         g.limits(1) = 0;
         g.limits(2) = frames-1;
-        xunitframes     = 1; % mark frames as time unit instead of sec
-    end
-end
-
-if isempty(g.timerange)
-    xmin = g.limits(1); % (xmin, xmax) are data limits in sec
-    xmax = g.limits(2);
-else
-    xmin = g.timerange(1); % (xmin, xmax) are data limits in sec
-    xmax = g.timerange(2);
+        xunitframes     = 1; % mark as frames instead of sec
+        xmin = g.limits(1); % (xmin, xmax) are data limits in sec
+        xmax = g.limits(2);
+    %end
 end
 
 pmin = g.limits(1); % plot min and max sec
