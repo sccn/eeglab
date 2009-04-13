@@ -45,6 +45,9 @@
 % See also: envtopo()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2009/04/10 19:27:31  julie
+% fixes to new 'limits' variable
+%
 % Revision 1.26  2009/04/10 18:58:25  julie
 % Fixed several issues regarding ERP collection and pvaf calculation
 %
@@ -216,7 +219,7 @@ for n = conditions
           end
         end     
 end
-
+p_options{end}
 for n = conditions
     %
     % Compute the grand mean ERP envelope of the cluster
@@ -269,7 +272,7 @@ for n = conditions
       p_options{end+1} = 'sortvar';
       p_options{end+1} = 'pvaf';
     end;
-
+p_options
     %
     % Compute the grand mean ERP envelope of the cluster (for a specific condition).
     %
@@ -476,7 +479,8 @@ if nargin <= 2 | isstr(varargin{1})
     [g varargin] = finputcheck( varargin, fieldlist, 'envtopo_plot', 'ignore');
     if isstr(g), error(g); end;
 end
-
+g.pvaf = g.sortvar; % vestigial confusion over these variables.
+g.limits
 %
 % Check input flags and arguments
 %
@@ -514,6 +518,8 @@ g.limcontrib = g.limcontrib/1000; % the time range in which to select largest co
 %
 if length(g.limits) > 2 % if g.limits wrong length
     fprintf('envtopo: limits should be 0, or [miny maxy].\n');
+elseif length(g.limits == 2) % ymin ymax only
+    g.limits(3) = g.limits(1); g.limits(4) = g.limits(2); % vestigial confusion
 end
 
 xunitframes = 0; % flag plotting if xmin & xmax are in frames instead of sec
@@ -547,6 +553,7 @@ end
 dt = (xmax-xmin)/(frames-1);  % sampling interval in sec
 times=xmin*ones(1,frames)+dt*(0:frames-1); % time points in sec
 
+g.limits
 %
 %%%%%%%%%%%%%%% Find limits of the component selection window %%%%%%%%%
 %
@@ -825,10 +832,10 @@ end
 
 totlimdat = grandERP(:,limframe1:limframe2);
 sumlimdat = sumproj(:,limframe1:limframe2);
-if strcmpi(g.pvaf, 'on')    
+if strcmpi(g.pvaf, 'on') | strcmpi(g.pvaf,'pvaf')   
     sumpvaf = 100-100*(var(reshape(totlimdat-sumlimdat,1,nvals))/vardat); %JO
     ot   = 'pvaf';
-else
+else strcmpi(g.pvaf, 'rv')
     sumpvaf = 100*var(reshape(sumproj(:,limframe1:limframe2),1,nvals))/vardat; 
     ot   = 'rv';
 end;
@@ -1161,13 +1168,13 @@ if strcmpi(g.dispmaps, 'on')
         end
 
         axis square
-        if strcmpi(g.pvaf, 'on') | strcmpi(g.pvaf, 'pvaf') | strcmpi(g.pvaf, 'mv')
-            set(gca, 'userdata', ...
-                ['text(-0.6, -0.6, ''pvaf: ' sprintf('%6.2f', pvaf(compx(t))) ''');'] );
-        else
-            set(gca, 'userdata', ...
-                ['text(-0.6, -0.6, ''rv: ' sprintf('%6.2f', pvaf(compx(t))) ''');'] );
-        end;
+%         if strcmpi(g.pvaf, 'on') | strcmpi(g.pvaf, 'pvaf') | strcmpi(g.pvaf, 'mv')
+%             set(gca, 'userdata', ...
+%                 ['text(-0.6, -0.6, ''pvaf: ' sprintf('%6.2f', pvaf(compx(t))) ''');'] );
+%         else
+%             set(gca, 'userdata', ...
+%                 ['text(-0.6, -0.6, ''rv: ' sprintf('%6.2f', pvaf(compx(t))) ''');'] );
+%         end;
         %
         %%%%%%%%%%%%% Scale colors %%%%%%%%%%%%%%%%%%%%%%%%%
         %
@@ -1198,7 +1205,7 @@ if strcmpi(g.dispmaps, 'on')
         end
         if numlabels == 1
             if ~isempty(g.clustlabels)
-                complabel = g.clustlabels(maporder(t));
+                complabel = g.clustlabels(compx(t));
             else
                 complabel = int2str(maporder(t));        % label comp. numbers
             end
@@ -1208,9 +1215,9 @@ if strcmpi(g.dispmaps, 'on')
         text(0.00,0.80,complabel,'FontSize',14,...
             'FontWeight','Bold','HorizontalAlignment','Center');
         if strcmpi(g.pvaf, 'on') | strcmpi(g.pvaf, 'pvaf') | strcmpi(g.pvaf, 'mv')
-            text(-0.6, -0.6, ['pvaf: ' sprintf('%6.2f', pvaf(compx(t))) ] );
+            text(-0.6, -0.6, ['pvaf: ' sprintf('%6.2f', pvaf(t)) ] );
         else
-            text(-0.6, -0.6, ['rv: ' sprintf('%6.2f', pvaf(compx(t))) ] );
+            text(-0.6, -0.6, ['rv: ' sprintf('%6.2f', pvaf(t)) ] );
         end;
         % axt = axes('Units','Normalized','Position',[0 0 1 1],...
         axt = axes('Position',[0 0 1 1],...
