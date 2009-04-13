@@ -46,6 +46,9 @@
 % See also: envtopo()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2009/04/13 20:03:35  julie
+% Minor edits, no change to plotted output
+%
 % Revision 1.31  2009/04/13 18:25:57  julie
 % fixed minor printing options to matlab window.
 %
@@ -744,7 +747,7 @@ for c = 1:length(projERP)
             diffdat = grandERP(:,limframe1:limframe2)-projERP{c}(:,limframe1:limframe2);
             diffdat = reshape(diffdat,1,nvals);
             pvaf(c) = 100-100*(var(diffdat)/vardat); %var of diff div by var of full data
-            ot   = 'pvaf'
+            ot   = 'pvaf';
         elseif strcmpi(g.pvaf, 'rv')| strcmpi(g.pvaf,'off')% var(comp)/var(data)
             pvaf(c) = 100*(var(reshape(projERP{c}(:,limframe1:limframe2),1,nvals))/vardat);
             ot   = 'rv';
