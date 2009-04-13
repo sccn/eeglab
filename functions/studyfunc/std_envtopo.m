@@ -46,6 +46,9 @@
 % See also: envtopo()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2009/04/13 18:25:57  julie
+% fixed minor printing options to matlab window.
+%
 % Revision 1.30  2009/04/13 17:47:20  julie
 % Took out baseline option for clusters because it is calling in already-baselined ERPs. Kept grand ERP baselining because this is a recalculation.
 %
@@ -366,11 +369,11 @@ end
 %                  If both minuV and maxuV == 0 -> use data uV limits {default: 0}
 %  'limcontrib' = [minms maxms]  time range (in ms) in which to rank component contribution
 %                  (boundaries shown with thin dotted lines) {default|[]|[0 0] -> plotting limits}
-%  'sortvar'    = ['mv'|'pv'|'rv'] if 'mv', sort components by back-projected variance; if 'pv',
-%                  sort by percent variance accounted for (pvaf). If 'rv', sort by relative
+%  'sortvar'    = ['pvaf'|'rv'] if 'rv', sort components by back-projected variance; if 'pvaf',
+%                  sort by percent variance accounted for. If 'rv', sort by relative
 %                  variance. Here:
 %                   pvaf(component) = 100-100*variance(data-component))/variance(data)
-%                   rv(component)   = 100*variance(component)/variance(data) {default: 'mv'}
+%                   rv(component)   = 100*variance(component)/variance(data) {default: 'pvaf'}
 %  'title'      = [string] plot title {default|[] -> none}
 %  'plotchans'  = [integer array] data channels to use in computing contributions and envelopes,
 %                  and also for making scalp topo plots {default|[] -> all}
@@ -472,7 +475,7 @@ if nargin <= 2 | isstr(varargin{1})
         'ylabel'      'string'   {'on' 'off'}             'on';
         'pvaf'          'string'   {'mv' 'rv' 'pv' 'pvaf' 'on' 'off' ''}  '';
         'envmode'       'string'   {'avg' 'rms'}            'avg';
-        'sortvar'       'string'   {'mv' 'rv' 'pv' 'pvaf' 'on' 'off'} 'mv';
+        'sortvar'       'string'   {'rv' 'pvaf'}          'pvaf';
         'actscale'      'string'   {'on' 'off'}             'off';
         'limcontrib'    'real'     []                       0;
         'topoarg'    'real'     []                       0;
@@ -741,10 +744,7 @@ for c = 1:length(projERP)
             diffdat = grandERP(:,limframe1:limframe2)-projERP{c}(:,limframe1:limframe2);
             diffdat = reshape(diffdat,1,nvals);
             pvaf(c) = 100-100*(var(diffdat)/vardat); %var of diff div by var of full data
-            ot   = g.pvaf;
-            if strcmpi(ot,'on'), 
-                ot = 'pvaf'; 
-            end
+            ot   = 'pvaf'
         elseif strcmpi(g.pvaf, 'rv')| strcmpi(g.pvaf,'off')% var(comp)/var(data)
             pvaf(c) = 100*(var(reshape(projERP{c}(:,limframe1:limframe2),1,nvals))/vardat);
             ot   = 'rv';
@@ -759,23 +759,27 @@ if strcmpi(g.pvaf, 'pvaf') | strcmpi(g.pvaf,'mv') | strcmpi(g.pvaf,'on')
 else % if 'g.pvaf' is 'rv'
         [compvars,compx]  = sort(compvars');   % sort clustnums on max variance
 end
-pvaf = pvaf(ncomps:-1:1); 
-
+pvaf = pvaf(ncomps:-1:1);             % reverse order of sort (max:min)
 compx        = compx(ncomps:-1:1);    % reverse order of sort
 compvars     = compvars(ncomps:-1:1)';% reverse order of sort (output var)
-compvarorder = g.clustnums(compx);     % actual component numbers (output var)
+compvarorder = g.clustnums(compx);     % actual cluster numbers (output var)
 plotframes   = plotframes(compx);     % plotted comps have these max frames
-comptimes    = times(plotframes(compx));  % time of max variance in each comp (output var)
 compsplotted = compvarorder(1:ntopos);% (output var)
-maxproj    = maxproj(:,compx);        % maps in plotting order (JO)
+maxproj    = maxproj(:,compx);        % maps in plotting order 
+if ~isempty(g.clustlabels) 
+   complabels = g.clustlabels(compx);     % actual component numbers (output var)
+end;
 %
 %%%%%%%%%%%%%%%%%%%%%%%% Reduce to ntopos %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-[plotframes,ifx] = sort(plotframes(1:ntopos));% sort plotframes on their temporal order
+[plotframes,ifx] = sort(plotframes(1:ntopos));% sort plotframes on their temporal order (min:max)
 plottimes  = times(plotframes);       % convert to times in ms
 compx      = compx(ifx);              % indices into clustnums, in plotting order
 maporder   = compvarorder(ifx);       % reorder cluster numbers
 maxproj    = maxproj(:,ifx);          % maps in plotting order
+if ~isempty(g.clustlabels) 
+   complabels = complabels(ifx);     % actual component numbers (output var)
+end;
 pvaf = pvaf(ifx);
 
 vlen = length(g.voffsets); % extend voffsets if necessary
@@ -828,11 +832,12 @@ end
 
 totlimdat = grandERP(:,limframe1:limframe2);
 sumlimdat = sumproj(:,limframe1:limframe2);
-if strcmpi(g.pvaf, 'on') | strcmpi(g.pvaf,'pvaf')   
-    sumpvaf = 100-100*(var(reshape(totlimdat-sumlimdat,1,nvals))/vardat); %JO
+
+if strcmpi(g.pvaf, 'on') | strcmpi(g.pvaf,'pvaf')   | strcmpi(g.pvaf,'mv')
+    sumpvaf = 100-100*(var(reshape(totlimdat-sumlimdat,1,nvals))/vardat); 
     ot   = 'pvaf';
 elseif strcmpi(g.pvaf, 'rv')
-    sumpvaf = 100*var(reshape(sumproj(:,limframe1:limframe2),1,nvals))/vardat; 
+    sumpvaf = 100*var(reshape(sumlimdat,1,nvals))/vardat; 
     ot   = 'rv';
 end;
 
@@ -1140,9 +1145,6 @@ if strcmpi(g.dispmaps, 'on')
         end;
     end;
 
-    %[tmp tmpsort] = sort(maporder);
-    %[tmp tmpsort] = sort(tmpsort);
-
     for t=1:ntopos % left to right order  (maporder)
         axt = axes('Units','Normalized','Position',...
             [pos(3)*topoleft+pos(1)+(t-1)*head_sep*topowidth pos(2)+0.66*pos(4) ...
@@ -1153,7 +1155,8 @@ if strcmpi(g.dispmaps, 'on')
         if g.gridind ~= 0
             tmp = zeros(67,67);
             tmp(:)=nan ;
-            tmp(g.gridind) = projERP{compx(t)}(:,plotframes(t));
+            tmp(g.gridind) = maxproj(:,t);
+            %tmp(g.gridind) = projERP{compx(t)}(:,plotframes(t));
         end
         if ~isempty(varargin)
             figure(myfig);
@@ -1164,13 +1167,6 @@ if strcmpi(g.dispmaps, 'on')
         end
 
         axis square
-%         if strcmpi(g.pvaf, 'on') | strcmpi(g.pvaf, 'pvaf') | strcmpi(g.pvaf, 'mv')
-%             set(gca, 'userdata', ...
-%                 ['text(-0.6, -0.6, ''pvaf: ' sprintf('%6.2f', pvaf(compx(t))) ''');'] );
-%         else
-%             set(gca, 'userdata', ...
-%                 ['text(-0.6, -0.6, ''rv: ' sprintf('%6.2f', pvaf(compx(t))) ''');'] );
-%         end;
         %
         %%%%%%%%%%%%% Scale colors %%%%%%%%%%%%%%%%%%%%%%%%%
         %
@@ -1200,8 +1196,8 @@ if strcmpi(g.dispmaps, 'on')
             end
         end
         if numlabels == 1
-            if ~isempty(g.clustlabels)
-                complabel = g.clustlabels(compx(t));
+            if ~isempty(complabels)
+                complabel = complabels(t);
             else
                 complabel = int2str(maporder(t));        % label comp. numbers
             end
