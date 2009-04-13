@@ -31,7 +31,8 @@
 %                  'off' will include all components in the datasets except
 %                   those in the subtructed ('subclus') clusters {default 'off'}.
 %  'baseline'    = [minms maxms] - a new baseline to remove from the grand
-%                   ERP and cluster ERP contributions.
+%                   ERP only (cluster ERP baselines have already been removed 
+%                   in pre-clustering).
 %  'diff'        = [condition1 condition2] the numbers of two conditions.
 %                   Plots an additional figure with the difference of the two conditions.
 %  'timerange'   = data epoch start and end input latencies (in ms)
@@ -45,6 +46,9 @@
 % See also: envtopo()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2009/04/13 05:34:04  julie
+% fixed the polarity of scalp maps in back-projection
+%
 % Revision 1.28  2009/04/13 01:55:31  julie
 % Multiple fixes that didn't take last time
 %
@@ -242,22 +246,14 @@ for n = conditions
             dat  = STUDY.cluster(clusters(cls)).sets(n,k);
             comp = STUDY.cluster(clusters(cls)).comps(k);
             clusterp.erp{k} = std_readerp(ALLEEG, dat, comp,timerange);
-        end;
-        if exist('baseline')
-            for k = 1:length(clusterp.erp)
-                btms = find(times > baseline(1) & times < baseline(2));
-                clusterp.erp{k} = rmbase(clusterp.erp{k},...
-                  ALLEEG(1).pnts,btms);
-            end;
-        end
-        
+        end;      
         %
         % Compute grand mean back projection ERP for the cluster
         %
         projERP = 0;
         fprintf('\n Computing grand ERP projection of cluster %d: ', (clusters(cls)) );
-        val_ind = find(~isnan(clustscalp.topo{k}(:))); % find non-NAN values
         for k = 1:len
+            val_ind = find(~isnan(clustscalp.topo{k}(:))); % find non-NAN values
             tmp = clustscalp.topo{k}(val_ind)*pols(k);% re-orient polarities
             projERP = projERP + tmp*clusterp.erp{k};
             fprintf('.');
@@ -1371,14 +1367,15 @@ for k = 1:len
         end
     end
     fprintf(' .' );
+    if exist('baseline')
+        btms = find(EEG.times > baseline(1) & EEG.times < baseline(2));
+        tmp = rmbase(EEG.icaact(comps,:,:),EEG.pnts,btms);
+        fprintf('\nBaseline removed from grand ERP.\n');
+    end
     tmp_erp = mean(EEG.icaact(comps,:,:),3);       
     %[tmp_erp] = std_erp(EEG, comps); % this scales by RMS
     [tmp_scalp] = std_topo(EEG, comps);
     tmp = tmp_scalp'*tmp_erp;
-    if exist('baseline')
-        btms = find(EEG.times > baseline(1) & EEG.times < baseline(2));
-        tmp = rmbase(tmp,EEG.pnts,btms);
-    end
     if k == 1
         grandERP = tmp;
     else
