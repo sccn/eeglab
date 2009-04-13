@@ -46,6 +46,9 @@
 % See also: envtopo()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2009/04/13 17:47:20  julie
+% Took out baseline option for clusters because it is calling in already-baselined ERPs. Kept grand ERP baselining because this is a recalculation.
+%
 % Revision 1.29  2009/04/13 05:34:04  julie
 % fixed the polarity of scalp maps in back-projection
 %
@@ -730,7 +733,7 @@ fprintf('\n');
 if ~xunitframes
     fprintf('  in the interval %3.0f ms to %3.0f ms.\n',1000*times(limframe1),1000*times(limframe2));
 end
-%vardat = mean(mean((grandERP(:,limframe1:limframe2).^2))); % find data variance in interval
+
 vardat = var(reshape(grandERP(:,limframe1:limframe2),1,nvals)); % find full data variance in interval
 for c = 1:length(projERP)
         % now calculate the pvaf over the whole time period for printing
@@ -747,10 +750,6 @@ for c = 1:length(projERP)
             ot   = 'rv';
         end;
 end
-%[sortpvaf spx] = sort(pvaf);
-%sortpvaf = sortpvaf(end:-1:1);
-%spx      = spx(end:-1:1);
-%npercol = ceil(ncomps/3);
 
 %
 %%%%%%%%%%%%%%%%%%%%%%%%% Sort by max variance in data %%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -766,7 +765,6 @@ compx        = compx(ncomps:-1:1);    % reverse order of sort
 compvars     = compvars(ncomps:-1:1)';% reverse order of sort (output var)
 compvarorder = g.clustnums(compx);     % actual component numbers (output var)
 plotframes   = plotframes(compx);     % plotted comps have these max frames
-%compframes   = plotframes';           % frame of max variance in each comp (output var)
 comptimes    = times(plotframes(compx));  % time of max variance in each comp (output var)
 compsplotted = compvarorder(1:ntopos);% (output var)
 maxproj    = maxproj(:,compx);        % maps in plotting order (JO)
@@ -776,9 +774,8 @@ maxproj    = maxproj(:,compx);        % maps in plotting order (JO)
 [plotframes,ifx] = sort(plotframes(1:ntopos));% sort plotframes on their temporal order
 plottimes  = times(plotframes);       % convert to times in ms
 compx      = compx(ifx);              % indices into clustnums, in plotting order
-maporder   = compvarorder(ifx); % I think you need to use sorted list now (JO)
-%maporder   = g.clustnums(compx);       % comp. numbers, in plotting order (l->r)
-maxproj    = maxproj(:,ifx);        % maps in plotting order
+maporder   = compvarorder(ifx);       % reorder cluster numbers
+maxproj    = maxproj(:,ifx);          % maps in plotting order
 pvaf = pvaf(ifx);
 
 vlen = length(g.voffsets); % extend voffsets if necessary
@@ -819,14 +816,14 @@ fprintf('\n');
 if strcmpi(g.pvaf,'on') | strcmpi(g.pvaf,'pvaf')
     fprintf('    Component pvaf in interval:  ');
     for t=1:ntopos
-        fprintf('%4.2f ',pvaf(t));
+        fprintf('%s ',num2str(pvaf(t)));
     end
     fprintf('\n');
 end
 
 sumproj = zeros(size(projERP{1}));
 for n = 1:ntopos
-    sumproj = sumproj + projERP{compx(n)};
+    sumproj = sumproj + projERP{n}; % add up all cluster projections
 end
 
 totlimdat = grandERP(:,limframe1:limframe2);
@@ -834,13 +831,13 @@ sumlimdat = sumproj(:,limframe1:limframe2);
 if strcmpi(g.pvaf, 'on') | strcmpi(g.pvaf,'pvaf')   
     sumpvaf = 100-100*(var(reshape(totlimdat-sumlimdat,1,nvals))/vardat); %JO
     ot   = 'pvaf';
-else strcmpi(g.pvaf, 'rv')
+elseif strcmpi(g.pvaf, 'rv')
     sumpvaf = 100*var(reshape(sumproj(:,limframe1:limframe2),1,nvals))/vardat; 
     ot   = 'rv';
 end;
 
 if ~xunitframes
-    fprintf('    Summed component %s in interval [%4g %4g] ms: %4.2f%%\n',ot, 1000*times(limframe1),1000*times(limframe2), sumpvaf);
+    fprintf('    Summed component %s in interval [%s %s] ms: %4.2f%%\n',ot, int2str(1000*times(limframe1)),int2str(1000*times(limframe2)), sumpvaf);
 end
 %
 %%%%%%%%%%%%%%%%%%%%% Plot the data envelopes %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1366,7 +1363,6 @@ for k = 1:len
             comps = setdiff(comps,subcomps{k});
         end
     end
-    fprintf(' .' );
     if exist('baseline')
         btms = find(EEG.times > baseline(1) & EEG.times < baseline(2));
         tmp = rmbase(EEG.icaact(comps,:,:),EEG.pnts,btms);
