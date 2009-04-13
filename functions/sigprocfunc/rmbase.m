@@ -29,6 +29,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2008/04/27 15:48:22  arno
+% remove mean in double precision and save RAM
+%
 % Revision 1.6  2005/09/03 00:13:23  scott
 % rm'ed extra-verbose fprintf repeats
 %
@@ -120,9 +123,9 @@ function [dataout,datamean] = rmbase(data,frames,basevector)
                 rmeans = nan_mean(double(data(c,(e-1)*frames+basevector)'));
             else
                 rmeans = nan_mean(double(data(c,(e-1)*frames+1:e*frames)'));
-                            if e==1
-                   fprintf('rmbase(): whole-data channel means removed. \n\n');
-                            end
+                   %if e==1
+                   %    fprintf('rmbase(): whole-data channel means removed. \n\n');
+                   %end
             end;
             datamean(c,e) = rmeans;
             dataout(c,(e-1)*frames+1:e*frames) = data(c,(e-1)*frames+1:e*frames) - rmeans;
