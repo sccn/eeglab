@@ -45,6 +45,9 @@
 % See also: envtopo()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2009/04/13 01:55:31  julie
+% Multiple fixes that didn't take last time
+%
 % Revision 1.27  2009/04/10 19:27:31  julie
 % fixes to new 'limits' variable
 %
@@ -219,7 +222,7 @@ for n = conditions
           end
         end     
 end
-p_options{end}
+
 for n = conditions
     %
     % Compute the grand mean ERP envelope of the cluster
@@ -229,7 +232,8 @@ for n = conditions
         len = length(STUDY.cluster(clusters(cls)).comps);
         try
             [tmp clustscalp] = std_readtopoclust(STUDY, ALLEEG, clusters(cls)); % read scalp maps from cluster
-            clustscalp = clustscalp{1};
+            clustscalp = clustscalp{1}; clear tmp
+            pols = STUDY.cluster(clusters(cls)).topopol;% see if topopol exists
         catch,
             warndlg2([ 'Some topoplot information is missing, Plot all cluster scalp maps and try again.'] , 'Abort - std_envtopo()' );
             return;
@@ -238,12 +242,12 @@ for n = conditions
             dat  = STUDY.cluster(clusters(cls)).sets(n,k);
             comp = STUDY.cluster(clusters(cls)).comps(k);
             clusterp.erp{k} = std_readerp(ALLEEG, dat, comp,timerange);
-            %clusterp.erp{k} = clusterp.erpdata{n}(:,k); % only works if 1 group
         end;
         if exist('baseline')
             for k = 1:length(clusterp.erp)
+                btms = find(times > baseline(1) & times < baseline(2));
                 clusterp.erp{k} = rmbase(clusterp.erp{k},...
-                  ALLEEG(1).pnts,baseline);
+                  ALLEEG(1).pnts,btms);
             end;
         end
         
@@ -252,12 +256,12 @@ for n = conditions
         %
         projERP = 0;
         fprintf('\n Computing grand ERP projection of cluster %d: ', (clusters(cls)) );
-        val_ind = find(~isnan(clustscalp.topo{1}(:))); % find non-NAN values
+        val_ind = find(~isnan(clustscalp.topo{k}(:))); % find non-NAN values
         for k = 1:len
-            tmp = clustscalp.topo{k}(val_ind);
+            tmp = clustscalp.topo{k}(val_ind)*pols(k);% re-orient polarities
             projERP = projERP + tmp*clusterp.erp{k};
             fprintf('.');
-        end
+        end;
         tot_projERP{cls} = projERP/len; % not set_len
         clust_names{cls} = [STUDY.cluster(clusters(cls)).name];
         numind = strfind(STUDY.cluster(clusters(cls)).name,' ')+1; % find the cluster number
@@ -272,7 +276,7 @@ for n = conditions
       p_options{end+1} = 'sortvar';
       p_options{end+1} = 'pvaf';
     end;
-p_options
+
     %
     % Compute the grand mean ERP envelope of the cluster (for a specific condition).
     %
@@ -480,7 +484,7 @@ if nargin <= 2 | isstr(varargin{1})
     if isstr(g), error(g); end;
 end
 g.pvaf = g.sortvar; % vestigial confusion over these variables.
-g.limits
+
 %
 % Check input flags and arguments
 %
@@ -553,7 +557,6 @@ end
 dt = (xmax-xmin)/(frames-1);  % sampling interval in sec
 times=xmin*ones(1,frames)+dt*(0:frames-1); % time points in sec
 
-g.limits
 %
 %%%%%%%%%%%%%%% Find limits of the component selection window %%%%%%%%%
 %
@@ -1352,11 +1355,12 @@ end
 
 fprintf('\n' );
 len = length(sets);
+CURRENTSET = [1:length(STUDY.datasetinfo)];CURRENTSTUDY = 0;EEG = ALLEEG;
 for k = 1:len
-    EEG = ALLEEG(sets(k));
+    [ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, CURRENTSET, 'retrieve',sets(k));
+    %EEG = ALLEEG(sets(k));
     if strcmpi(only_clust, 'on')
-      comps =STUDY.datasetinfo(sets(k)).comps; % this is an easier way to access all clustered ICs (JO)
-      %comps = STUDY.cluster(cls(1)).preclust.preclustcomps{(mod(sets(k),size(STUDY.setind,2)))}; 
+      comps =STUDY.datasetinfo(sets(k)).comps; % 
       % Only components that were used in the pre-clustering
     else
         comps = 1:size(EEG.icawinv,2);
@@ -1367,9 +1371,9 @@ for k = 1:len
         end
     end
     fprintf(' .' );
-    [tmp_erp] = std_erp(EEG, comps);
+    tmp_erp = mean(EEG.icaact(comps,:,:),3);       
+    %[tmp_erp] = std_erp(EEG, comps); % this scales by RMS
     [tmp_scalp] = std_topo(EEG, comps);
-    tmp = 0;
     tmp = tmp_scalp'*tmp_erp;
     if exist('baseline')
         btms = find(EEG.times > baseline(1) & EEG.times < baseline(2));
@@ -1380,7 +1384,7 @@ for k = 1:len
     else
         grandERP = grandERP + tmp;
     end
-    ALLEEG(sets(k)) = EEG;
+    %ALLEEG(sets(k)) = EEG;
 end
 grandERP = grandERP/length(sets); % normalize by number of datasets... 
 
