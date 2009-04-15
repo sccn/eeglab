@@ -46,6 +46,9 @@
 % See also: envtopo()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2009/04/13 20:15:21  julie
+% typo
+%
 % Revision 1.32  2009/04/13 20:03:35  julie
 % Minor edits, no change to plotted output
 %
@@ -1364,7 +1367,7 @@ for k = 1:len
     end
     if exist('baseline')
         btms = find(EEG.times > baseline(1) & EEG.times < baseline(2));
-        tmp = rmbase(EEG.icaact(comps,:,:),EEG.pnts,btms);
+        EEG.icaact = rmbase(EEG.icaact,EEG.pnts,btms);
         fprintf('\nBaseline removed from grand ERP.\n');
     end
     tmp_erp = mean(EEG.icaact(comps,:,:),3);       
