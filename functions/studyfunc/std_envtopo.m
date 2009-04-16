@@ -31,8 +31,7 @@
 %                  'off' will include all components in the datasets except
 %                   those in the subtructed ('subclus') clusters {default 'off'}.
 %  'baseline'    = [minms maxms] - a new baseline to remove from the grand
-%                   ERP only (cluster ERP baselines have already been removed 
-%                   in pre-clustering).
+%                   and cluster ERPs.
 %  'diff'        = [condition1 condition2] the numbers of two conditions.
 %                   Plots an additional figure with the difference of the two conditions.
 %  'timerange'   = data epoch start and end input latencies (in ms)
@@ -46,6 +45,9 @@
 % See also: envtopo()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2009/04/15 14:49:14  julie
+% fix of rmbase in grand ERP calculation
+%
 % Revision 1.33  2009/04/13 20:15:21  julie
 % typo
 %
@@ -114,7 +116,7 @@ end
 if mod(nargin,2) % if not an even number of arguments
     error('std_envtopo: Input argument list must be pairs of: ''keyx'', ''valx'' ');
 end
-
+diffsonly = 0;
 conditions   = [];       % default: all conditions
 clusters     = [];       % default: use all clusters
 subclus      = [];       % default: omit no clusters from the ERP envelope
@@ -172,6 +174,7 @@ for k = 1:2:(nargin-2)
             p_options{end+1} = varargin{k+1}; % pass on exact input
         case 'diff'
             diffc = varargin{k+1};
+            diffsonly = varargin{k+1};
         case 'timerange'
             timerange = varargin{k+1};
             if ~isempty(timerange) % this is if timerange input was [] JO
@@ -207,7 +210,11 @@ if Ncond == 0
     Ncond = 1;
 end
 if isempty(conditions)
-    conditions = 1:Ncond;
+    if diffsonly ~= 0
+        conditions = diffsonly;
+    else
+        conditions = 1:Ncond;
+    end;    
 end
 
 for n = conditions
@@ -216,27 +223,27 @@ for n = conditions
     %
     fprintf('\n Computing grand ERP for condition %d.', n);
     [grandERP, set_len, STUDY, ALLEEG] = std_granderp(STUDY, ALLEEG, 'clusters', clusters, 'condition', n, e_options{:});
-        times = ALLEEG(1).times; % just get times from first dataset
-        tms = find(times>=timerange(1) & times <= timerange(2));
-        grandERPtot{n} = grandERP(:,tms);clear grandERP;
-        if ~exist('limits')  % determine limits if not specified
-          tmpmin = min(min(grandERPtot{n}));
-          tmpmax = max(max(grandERPtot{n}));
-          datarange = tmpmax-tmpmin;
-          tmpmin = tmpmin-0.05*datarange;
-          tmpmax = tmpmax+0.05*datarange;
-          if n == conditions(1)
-              ymin = tmpmin;
-              ymax = tmpmax;
-          else
-              ymin = min(tmpmin,ymin);
-              ymax = max(tmpmax,ymax);
-          end
-          if n == conditions(end)
-              p_options{end+1} = 'limits';
-              p_options{end+1} = [ymin ymax];          
-          end
-        end     
+    times = ALLEEG(1).times; % just get times from first dataset
+    tms = find(times>=timerange(1) & times <= timerange(2));
+    grandERPtot{n} = grandERP(:,tms);clear grandERP;
+    if ~exist('limits')  % determine limits if not specified
+        tmpmin = min(min(grandERPtot{n}));
+        tmpmax = max(max(grandERPtot{n}));
+        datarange = tmpmax-tmpmin;
+        tmpmin = tmpmin-0.05*datarange;
+        tmpmax = tmpmax+0.05*datarange;
+        if n == conditions(1)
+            ymin = tmpmin;
+            ymax = tmpmax;
+        else
+            ymin = min(tmpmin,ymin);
+            ymax = max(tmpmax,ymax);
+        end
+        if n == conditions(end)
+            p_options{end+1} = 'limits';
+            p_options{end+1} = [ymin ymax];
+        end
+    end
 end
 
 for n = conditions
@@ -244,45 +251,78 @@ for n = conditions
     % Compute the grand mean ERP envelope of the cluster
     % (for a specific condition).
     %
+    CURRENTSET = [1:length(STUDY.datasetinfo)];CURRENTSTUDY = 0;EEG = ALLEEG;
     for cls = 1:length(clusters)
         len = length(STUDY.cluster(clusters(cls)).comps);
-        try
-            [tmp clustscalp] = std_readtopoclust(STUDY, ALLEEG, clusters(cls)); % read scalp maps from cluster
-            clustscalp = clustscalp{1}; clear tmp
-            pols = STUDY.cluster(clusters(cls)).topopol;% see if topopol exists
-        catch,
-            warndlg2([ 'Some topoplot information is missing, Plot all cluster scalp maps and try again.'] , 'Abort - std_envtopo()' );
-            return;
-        end
-        for k = 1:len
-            dat  = STUDY.cluster(clusters(cls)).sets(n,k);
-            comp = STUDY.cluster(clusters(cls)).comps(k);
-            clusterp.erp{k} = std_readerp(ALLEEG, dat, comp,timerange);
-        end;      
-        %
-        % Compute grand mean back projection ERP for the cluster
-        %
-        projERP = 0;
-        fprintf('\n Computing grand ERP projection of cluster %d: ', (clusters(cls)) );
-        for k = 1:len
-            val_ind = find(~isnan(clustscalp.topo{k}(:))); % find non-NAN values
-            tmp = clustscalp.topo{k}(val_ind)*pols(k);% re-orient polarities
-            projERP = projERP + tmp*clusterp.erp{k};
-            fprintf('.');
+        allsets = STUDY.cluster(clusters(cls)).sets(n,:);
+        sets = unique(allsets);
+%         try
+%             [tmp clustscalp] = std_readtopoclust(STUDY, ALLEEG, clusters(cls)); % read scalp maps from cluster
+%             clustscalp = clustscalp{1}; clear tmp
+%             pols = STUDY.cluster(clusters(cls)).topopol;% see if topopol exists
+%         catch,
+%             warndlg2([ 'Some topoplot information is missing, Plot all cluster scalp maps and try again.'] , 'Abort - std_envtopo()' );
+%             return;
+%         end
+%         for k = 1:len
+%             dat  = STUDY.cluster(clusters(cls)).sets(n,k);
+%             comp = STUDY.cluster(clusters(cls)).comps(k);
+%             clusterp.erp{k} = std_readerp(ALLEEG, dat, comp,timerange);% this calls scaled ERPs
+%         end;      
+%         projERP = 0;
+%         fprintf('\n Computing grand ERP projection of cluster %d: ', (clusters(cls)) );
+%         for k = 1:len
+%             val_ind = find(~isnan(clustscalp.topo{k}(:))); % find non-NAN values
+%             tmp = clustscalp.topo{k}(val_ind)*pols(k);% re-orient polarities
+%             projERP = projERP + tmp*clusterp.erp{k};
+%             fprintf('.');
+%         end;
+%         tot_projERP{cls} = projERP/len; % not set_len
+        for k = 1:length(sets) % for each unique dataset           
+            [ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, CURRENTSET, 'retrieve',sets(k), 'study',CURRENTSTUDY);
+            comp = STUDY.cluster(clusters(cls)).comps(find(allsets == sets(k)));
+            %comp = STUDY.cluster(clusters(cls)).comps(k);
+            if exist('baseline')
+                szdat = size(EEG.data);
+                EEG = pop_rmbase(EEG,EEG.pnts,baseline);        
+                EEG.icaact = (EEG.icaweights*EEG.icasphere)*reshape(EEG.data,[szdat(1),szdat(2)*szdat(3)]); % recalculate acts
+                EEG.icaact = reshape(EEG.icaact,[size(EEG.icawinv,2) szdat(2) szdat(3)]);
+            end;
+            % calculate ERP:-------------------------
+            tmp_erp = mean(EEG.icaact(comp,tms,:),3); % calculate erp limit to times of interest
+            % calculate scalp projection:------------
+            clear tmp_scalp
+            for c = 1:length(comp) % for all comps from a single subj in a single cluster
+                [hh gridvals p] = topoplot(EEG.icawinv(:,comp(c)),EEG.chanlocs,'noplot','on');
+                tmp_scalp(c,:) = reshape(gridvals,[1 size(gridvals,1)*size(gridvals,2)])';
+            end;
+            val_ind = find(~isnan(tmp_scalp(1,:)));
+    
+            % calculate back-projection of scalp map and ERP:-----------------
+            tmp = tmp_scalp(:,val_ind)'*tmp_erp;
+            % create matrix with all ICs
+            if k == 1
+                projERP = tmp;
+            else
+                projERP(:,:,end+1) = tmp;
+            end;
         end;
-        tot_projERP{cls} = projERP/len; % not set_len
+        tot_projERP{cls} = mean(projERP,3);
+
         clust_names{cls} = [STUDY.cluster(clusters(cls)).name];
         numind = strfind(STUDY.cluster(clusters(cls)).name,' ')+1; % find the cluster number
         clus_ind{cls} = [STUDY.cluster(clusters(cls)).name(numind(end):end) ', '];
     end
-    
+    if exist('baseline')
+        fprintf('\nBaseline removed from cluster ERPs.\n');
+    end;  
     if n == conditions(1) %% only do this once
       p_options{end+1} = 'clustlabels';
       p_options{end+1} = clust_names;
       p_options{end+1} = 'gridind';
       p_options{end+1} = val_ind;
       p_options{end+1} = 'sortvar';
-      p_options{end+1} = 'pvaf';
+      p_options{end+1} = 'rv';
     end;
 
     %
@@ -309,7 +349,7 @@ for n = conditions
         end
         if n == diffc(1)
             figure(diff_h); subplot(3,1,1)
-            envtopo_plot(grandERPtot{1},tot_projERP,'envmode' ,'avg', 'dispmaps', 'off', p_options{:},...
+            envtopo_plot(grandERPtot{n},tot_projERP,'envmode' ,'avg', 'dispmaps', 'off', p_options{:},...
                 'title', STUDY.condition{n} ,'xlabel', 'off' );
             erp1 = grandERPtot{n}; % The grand ERP
             proj1 = tot_projERP;
@@ -317,7 +357,7 @@ for n = conditions
         end
         if n == diffc(2)
             figure(diff_h); subplot(3,1,2)
-            envtopo_plot(grandERPtot{1},tot_projERP,'envmode' ,'avg', 'dispmaps', 'off', p_options{:}, ...
+            envtopo_plot(grandERPtot{n},tot_projERP,'envmode' ,'avg', 'dispmaps', 'off', p_options{:}, ...
                 'title', STUDY.condition{n} ,'xlabel', 'off' );
             erp2 = grandERPtot{n}; % The grand ERP
             proj2 = tot_projERP;
@@ -334,12 +374,16 @@ for n = conditions
             envtopo_plot(erp1-erp2,diff_proj,'envmode' ,'avg', 'dispmaps','off',...
                 'title','Difference',p_options{:} );
             
-            figure
+            
             if cls == 1
+                figure; set(gcf,'Color', BACKCOLOR);
+                orient landscape;        
                 envtopo_plot(erp1-erp2,diff_proj,'envmode' ,'avg', 'fillcomp', 1, ...
                     'title',['Difference Between Conditions ',int2str(diffc(1)),' and ',int2str(diffc(2)),'.'],...
                     'dispmaps', 'on', p_options{:} );
             else
+                figure; set(gcf,'Color', BACKCOLOR);
+                orient landscape;        
                 envtopo_plot(erp1-erp2,diff_proj,'envmode' ,'avg', 'dispmaps','on',...
                     'title',['Difference Between Conditions ',int2str(diffc(1)),' and ',int2str(diffc(2)),'.'],...
                     p_options{:} );
@@ -378,8 +422,8 @@ end
 %  'sortvar'    = ['pvaf'|'rv'] if 'rv', sort components by back-projected variance; if 'pvaf',
 %                  sort by percent variance accounted for. If 'rv', sort by relative
 %                  variance. Here:
-%                   pvaf(component) = 100-100*variance(data-component))/variance(data)
-%                   rv(component)   = 100*variance(component)/variance(data) {default: 'pvaf'}
+%                   pvaf(component) = 100-100*variance(data-cluster))/variance(data)
+%                   rv(component)   = 100*variance(component)/variance(data) {default: 'rv'}
 %  'title'      = [string] plot title {default|[] -> none}
 %  'plotchans'  = [integer array] data channels to use in computing contributions and envelopes,
 %                  and also for making scalp topo plots {default|[] -> all}
@@ -479,7 +523,7 @@ if nargin <= 2 | isstr(varargin{1})
         'dispmaps'      'string'   {'on' 'off'}             'on';
         'xlabel'      'string'   {'on' 'off'}             'on';
         'ylabel'      'string'   {'on' 'off'}             'on';
-        'pvaf'          'string'   {'mv' 'rv' 'pv' 'pvaf' 'on' 'off' ''}  '';
+        'pvaf'          'string'   {'mv' 'rv' 'pv' 'pvaf' 'on' 'off' ''}  'rv';
         'envmode'       'string'   {'avg' 'rms'}            'avg';
         'sortvar'       'string'   {'rv' 'pvaf'}          'pvaf';
         'actscale'      'string'   {'on' 'off'}             'off';
@@ -745,39 +789,43 @@ end
 
 vardat = var(reshape(grandERP(:,limframe1:limframe2),1,nvals)); % find full data variance in interval
 for c = 1:length(projERP)
-        % now calculate the pvaf over the whole time period for printing
-        if strcmpi(g.pvaf, 'pvaf') | strcmpi(g.pvaf,'on') | strcmpi(g.pvaf,'mv')
-            diffdat = grandERP(:,limframe1:limframe2)-projERP{c}(:,limframe1:limframe2);
-            diffdat = reshape(diffdat,1,nvals);
-            pvaf(c) = 100-100*(var(diffdat)/vardat); %var of diff div by var of full data
-            ot   = 'pvaf';
-        elseif strcmpi(g.pvaf, 'rv')| strcmpi(g.pvaf,'off')% var(comp)/var(data)
-            pvaf(c) = 100*(var(reshape(projERP{c}(:,limframe1:limframe2),1,nvals))/vardat);
-            ot   = 'rv';
-        end;
+    % now calculate the pvaf over the whole time period for printing
+    if strcmpi(g.pvaf, 'pvaf') | strcmpi(g.pvaf,'pv')
+        diffdat = grandERP(:,limframe1:limframe2)-projERP{c}(:,limframe1:limframe2);
+        diffdat = reshape(diffdat,1,nvals);
+        pvaf(c) = 100-100*(var(diffdat)/vardat); %var of diff div by var of full data
+        ot   = 'pvaf';
+    elseif strcmpi(g.pvaf, 'rv')% var(clust)/var(data)
+        pvaf(c) = 100*(var(reshape(projERP{c}(:,limframe1:limframe2),1,nvals))/vardat);
+        ot   = 'rv';
+    end;
 end
 
 %
 %%%%%%%%%%%%%%%%%%%%%%%%% Sort by max variance in data %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-if strcmpi(g.pvaf, 'pvaf') | strcmpi(g.pvaf,'mv') | strcmpi(g.pvaf,'on')
-        [pvaf,compx] = sort(pvaf');  % sort clustnums on max pvaf
-else % if 'g.pvaf' is 'rv'
-        [compvars,compx]  = sort(compvars');   % sort clustnums on max variance
-end
-pvaf = pvaf(ncomps:-1:1);             % reverse order of sort (max:min)
+[pvaf,compx] = sort(pvaf);  % sort clustnums on max pvaf
+pvaf = pvaf(ncomps:-1:1);  % reverse order of sort (max:min)       
 compx        = compx(ncomps:-1:1);    % reverse order of sort
-compvars     = compvars(ncomps:-1:1)';% reverse order of sort (output var)
 compvarorder = g.clustnums(compx);     % actual cluster numbers (output var)
 plotframes   = plotframes(compx);     % plotted comps have these max frames
-compsplotted = compvarorder(1:ntopos);% (output var)
-maxproj    = maxproj(:,compx);        % maps in plotting order 
+
+maxproj    = maxproj(:,compx); % maps in plotting order 
+compvars = compvars(compx);
 if ~isempty(g.clustlabels) 
-   complabels = g.clustlabels(compx);     % actual component numbers (output var)
+   complabels = g.clustlabels(compx);  
+   complabels = complabels(1:ntopos);% actual component numbers (output var)
 end;
+
 %
 %%%%%%%%%%%%%%%%%%%%%%%% Reduce to ntopos %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
+compx = compx(1:ntopos);
+pvaf = pvaf(1:ntopos);
+compvars = compvars(1:ntopos);% max variances
+maxproj    = maxproj(:,1:ntopos);
+compsplotted = compvarorder(1:ntopos);% (output var)
+compvarorder = compvarorder(1:ntopos);
 [plotframes,ifx] = sort(plotframes(1:ntopos));% sort plotframes on their temporal order (min:max)
 plottimes  = times(plotframes);       % convert to times in ms
 compx      = compx(ifx);              % indices into clustnums, in plotting order
@@ -833,17 +881,20 @@ end
 
 sumproj = zeros(size(projERP{1}));
 for n = 1:ntopos
-    sumproj = sumproj + projERP{n}; % add up all cluster projections
+    sumproj = sumproj + projERP{compx(n)}; % add up all cluster projections
 end
 
 totlimdat = grandERP(:,limframe1:limframe2);
 sumlimdat = sumproj(:,limframe1:limframe2);
+diffdat = totlimdat - sumlimdat; 
+diffdat = reshape(diffdat,1,nvals);
 
-if strcmpi(g.pvaf, 'on') | strcmpi(g.pvaf,'pvaf')   | strcmpi(g.pvaf,'mv')
-    sumpvaf = 100-100*(var(reshape(totlimdat-sumlimdat,1,nvals))/vardat); 
+if strcmpi(g.pvaf,'pvaf')   | strcmpi(g.pvaf,'pv')
+    sumpvaf = 100-100*(var(diffdat)/vardat); 
+    %sumpvaf = 100-100*(var(reshape(totlimdat-sumlimdat,1,nvals))/vardat); 
     ot   = 'pvaf';
 elseif strcmpi(g.pvaf, 'rv')
-    sumpvaf = 100*var(reshape(sumlimdat,1,nvals))/vardat; 
+    sumpvaf = 100*(var(reshape(sumlimdat,1,nvals))/vardat); 
     ot   = 'rv';
 end;
 
@@ -885,6 +936,15 @@ if length(g.limits) == 2
         ymax = g.limits(2);
         ylimset = 1;
     end
+else
+    ttymin = min(min(sumproj));
+    ttymax = max(max(sumproj));
+    if ttymin < ymin
+        ymin = ttymin;
+    end;
+    if ttymax > ymax
+        ymax = ttymax;
+    end;    
 end
 
 %
@@ -924,13 +984,13 @@ if strcmpi(g.sumenv,'on')  | strcmpi(g.sumenv,'fill')
         set(p,'color',FILLCOLOR);
     end
 end
-if strcmpi(g.pvaf,'pvaf')
+if strcmpi(g.pvaf,'pvaf')| strcmpi(g.pvaf,'pv')
     t = text(double(xmin+0.1*(xmax-xmin)), ...
         double(ymin+0.1*(ymax-ymin)), ...
         ['pvaf ' num2str(sumpvaf,'%4.2f') '%']);
     set(t,'fontsize',12,'fontweight','bold')
-elseif strcmpi(g.pvaf,'rv') | strcmpi(g.pvaf,'off')
-    t = text(double(xmin+0.1*(xmaxxpmin)), ...
+elseif strcmpi(g.pvaf,'rv') 
+    t = text(double(xmin+0.1*(xmax-xmin)), ...
         double(ymin+0.1*(ymax-ymin)), ...
         ['rv ' num2str(sumpvaf,'%4.2f') '%']);
     set(t,'fontsize',12,'fontweight','bold')
@@ -939,7 +999,10 @@ end
 %
 % %%%%%%%%%%%%%%%%%%%%%%%% Plot the computed component envelopes %%%%%%%%%%%%%%%%%%
 %
-envx = [1;compx+1];
+%envx = [1;compx+1]; % this depends on the orientation of compx, this is a
+%column vector
+envx = [1,compx+1];
+
 for c = 1:ntopos+1
     curenv = matsel(envdata,frames,0,1,envx(c));
     if ~ylimset & max(curenv) > ymax, ymax = max(curenv); end
@@ -1212,10 +1275,10 @@ if strcmpi(g.dispmaps, 'on')
         end
         text(0.00,0.80,complabel,'FontSize',14,...
             'FontWeight','Bold','HorizontalAlignment','Center');
-        if strcmpi(g.pvaf, 'on') | strcmpi(g.pvaf, 'pvaf') | strcmpi(g.pvaf, 'mv')
+        if strcmpi(g.pvaf, 'pvaf') | strcmpi(g.pvaf, 'pv')
             text(-0.6, -0.6, ['pvaf: ' sprintf('%6.2f', pvaf(t)) ] );
-        else
-            text(-0.6, -0.6, ['rv: ' sprintf('%6.2f', pvaf(t)) ] );
+        elseif strcmpi(g.pvaf, 'rv')
+            text(-0.4, -0.7, ['rv: ' sprintf('%6.2f', pvaf(t)) ] );
         end;
         % axt = axes('Units','Normalized','Position',[0 0 1 1],...
         axt = axes('Position',[0 0 1 1],...
@@ -1300,7 +1363,7 @@ if mod(nargin,2)
 end
 
 subclus = [];
-env_erp = 'contrib';% default grand ERP include only the sets that contribute to the dataset, otherwise 'all' datasets in STUDY.
+env_erp = 'all';% default grand ERP include only the sets that contribute to the dataset, otherwise 'all' datasets in STUDY.
 only_clust = 'off'; % Include only components that were part of the pre-clustering data in the grand ERP
 
 n = 1; % default for condition index
@@ -1366,20 +1429,36 @@ for k = 1:len
         end
     end
     if exist('baseline')
-        btms = find(EEG.times > baseline(1) & EEG.times < baseline(2));
-        EEG.icaact = rmbase(EEG.icaact,EEG.pnts,btms);
-        fprintf('\nBaseline removed from grand ERP.\n');
-    end
+        szdat = size(EEG.data);
+        EEG = pop_rmbase(EEG,EEG.pnts,baseline);        
+        EEG.icaact = (EEG.icaweights*EEG.icasphere)*reshape(EEG.data,[szdat(1),szdat(2)*szdat(3)]); % recalculate acts
+        EEG.icaact = reshape(EEG.icaact,[size(EEG.icawinv,2) szdat(2) szdat(3)]);
+    end    
+
+    % calculate IC ERPs:-------
     tmp_erp = mean(EEG.icaact(comps,:,:),3);       
     %[tmp_erp] = std_erp(EEG, comps); % this scales by RMS
-    [tmp_scalp] = std_topo(EEG, comps);
+    % calculate IC scalp projections:-------
+    %[tmp_scalp] = std_topo(EEG, comps);
+    for c = 1:length(comps)
+        [h valinterp grid, xmesh, ymesh]= topoplot(EEG.icawinv(:,comps(c)),EEG.chanlocs,'noplot','on');
+        allinterps(c,:) = reshape(valinterp,[1 size(valinterp,1)*size(valinterp,2)]);
+    end;
+    val_ind = find(~isnan(allinterps(1,:)));
+    tmp_scalp = allinterps(:,val_ind); clear allinterps
+    % back-project scalp map and activation ERP:-------
     tmp = tmp_scalp'*tmp_erp;
     if k == 1
         grandERP = tmp;
     else
-        grandERP = grandERP + tmp;
+        grandERP(:,:,end+1) = tmp;
+        %grandERP = grandERP + tmp;
     end
     %ALLEEG(sets(k)) = EEG;
 end
-grandERP = grandERP/length(sets); % normalize by number of datasets... 
+grandERP = mean(grandERP,3);
+%grandERP = grandERP/length(sets); % normalize by number of datasets... 
+if exist('baseline')
+   fprintf('\nBaseline removed from grand ERP.\n');
+end;    
 
