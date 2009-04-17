@@ -61,6 +61,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2007/12/09 01:06:59  arno
+% docuemntation and auto-disable checkbox
+%
 % Revision 1.34  2007/10/25 21:33:14  nima
 % _
 %
@@ -292,6 +295,29 @@ if isempty(varargin) %GUI call
 	end
     
 else %command line call
+    % remove clusters below clustering level (done also after GUI)
+    % --------------------------------------
+    rmindex    = [];
+    clustlevel = STUDY.etc.preclust.clustlevel;
+    nameclustbase = STUDY.cluster(clustlevel).name;
+    if clustlevel == 1
+        rmindex = [2:length(STUDY.cluster)];
+    else
+        for index = 2:length(STUDY.cluster)
+            if strcmpi(STUDY.cluster(index).parent{1}, nameclustbase) & ~strncmpi('Notclust',STUDY.cluster(index).name,8)
+                rmindex = [ rmindex index ];
+            end;
+        end;        
+    end;
+    if ~isempty(rmindex)
+        fprintf('Removing child clusters of ''%s''...\n', nameclustbase);
+        STUDY.cluster(rmindex)          = [];
+        STUDY.cluster(clustlevel).child = [];
+        if clustlevel == 1 & length(STUDY.cluster) > 1
+            STUDY.cluster(1).child = { STUDY.cluster(2).name }; % "Notclust" cluster
+        end;
+    end;
+
     %default values
     algorithm = 'kmeans';
     clus_num = 20;
