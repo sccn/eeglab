@@ -23,6 +23,11 @@
 % Optional inputs:
 %   'keystroke'    - ['on'|'off'] set the option to 'on' to import 
 %                    keystroke event types. Default is off.
+%   'memmapfile'   - ['memmapfile_name'] use this option if the .cnt file
+%                    is too large to read in conventially.  The suffix of 
+%                    the memmapfile_name must be .fdt.  the memmapfile
+%                    functions process files based on their suffix and an
+%                    error will occur if you use a different suffix.
 %   Same as loadcnt() function.
 % 
 % Outputs:
@@ -37,7 +42,6 @@
 % was stored in the file.
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
-%         Help Craig Rypstat for memory mapping functionalities
 %
 % See also: loadcnt(), eeglab()
 
@@ -60,15 +64,8 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
-% Revision 1.35  2009/01/07 01:53:37  arno
-% final fix
-% for memory mapping
-%
-% Revision 1.34  2009/01/07 01:38:35  arno
-% import memory map file
-%
-% Revision 1.33  2009/01/07 01:24:18  arno
-% memory mapped version
+% Revision 1.32 2009/03/27 18:12:00 rypstat
+% adding large file processing option
 %
 % Revision 1.31  2006/04/27 17:04:30  arno
 % fixing Andreas addition
@@ -174,55 +171,44 @@ if nargin < 1
 
 	% ask user
 	[filename, filepath] = uigetfile('*.CNT;*.cnt', 'Choose a CNT file -- pop_loadcnt()'); 
-   drawnow;
+    drawnow;
 	if filename == 0 return; end;
 
 	% popup window parameters
 	% -----------------------
-   callback16 = 'set(findobj(gcbf, ''tag'', ''32''), ''value'', ~get(gcbo, ''value''));';
-   callback32 = 'set(findobj(gcbf, ''tag'', ''16''), ''value'', ~get(gcbo, ''value''));';
-   cb = [ '[tmpf tmpp] = uiputfile(''*.*'');' ...
-          'if tmpf(1) ~= 0, set(findobj(gcbf, ''tag'', ''filename''), ''string'', fullfile(tmpp, tmpf)); end;' ...
-          'clear tmpf tmpp;' ];
-   uigeom       = { [1.3 0.5 0.5] [1 0.5] [1.09 0.13 0.4] [1 0.5] [0.75 0.55 0.2] } ;
-   uilist       = { { 'style' 'text' 'string' 'Data format' } ...
-                    { 'style' 'checkbox' 'tag' '16' 'string' '16-bits' 'value' 1 'callback' callback16 } ...
-                    { 'style' 'checkbox' 'tag' '32' 'string' '32-bits' 'value' 0 'callback' callback32 } ...
-                    { 'style' 'text' 'string' 'Time interval in seconds (i.e. [0 100]; default all):' } ...
-                    { 'style' 'edit' 'string' '' } ...                  
-                    { 'style' 'text' 'string' 'Check to Import keystrokes:' } ...
-                    { 'style' 'checkbox' 'string' '' } { } ...                     
-                    { 'style' 'text' 'string' 'loadcnt() ''key'', ''val'' params' } ...
-                    { 'style' 'edit' 'string' '' } ...
-                    { 'style' 'text' 'string' 'Output memory map file name' } ...
-                    { 'style' 'edit' 'string' '' 'tag' 'filename' } ...
-                    { 'style' 'pushbutton' 'string' '...' 'callback' cb } ...
-                    };
+    callback16 = 'set(findobj(gcbf, ''tag'', ''32''), ''value'', ~get(gcbo, ''value''));';
+    callback32 = 'set(findobj(gcbf, ''tag'', ''16''), ''value'', ~get(gcbo, ''value''));';
+    uigeom       = { [1.3 0.5 0.5] [1 0.5] [1.09 0.13 0.4] [1 0.5] [0.75 0.75] } ;
+    uilist       = { { 'style' 'text' 'string' 'Data format' } ...
+                     { 'style' 'checkbox' 'tag' '16' 'string' '16-bits' 'value' 1 'callback' callback16 } ...
+                     { 'style' 'checkbox' 'tag' '32' 'string' '32-bits' 'value' 0 'callback' callback32 } ...
+                     { 'style' 'text' 'string' 'Time interval in seconds (i.e. [0 100]; default all):' } ...
+                     { 'style' 'edit' 'string' '' } ...                  
+                     { 'style' 'text' 'string' 'Check to Import keystrokes:' } ...
+                     { 'style' 'checkbox' 'string' '' } { } ...                     
+                     { 'style' 'text' 'string' 'loadcnt() ''key'', ''val'' params' } ...
+                     { 'style' 'edit' 'string' '' } ...
+                     { 'style' 'text' 'string' 'memmapfile (large - must use *.fdt filename)' } ...
+                     { 'style' 'edit' 'string' '' } };                  
 	result = inputgui( uigeom, uilist, 'pophelp(''pop_loadcnt'')', 'Load a CNT dataset');    
 	if length( result ) == 0 return; end;
 
 	% decode parameters
 	% -----------------
-   options = [];
-   if result{1}, options = [ options ', ''dataformat'', ''int16''' ];
-   else          options = [ options ', ''dataformat'', ''int32''' ];
-   end;
-   if ~isempty(result{3}), 
-       timer =  eval( [ '[' result{3} ']' ]);
-       options = [ options ', ''t1'', ' num2str(timer(1)) ', ''lddur'', '  num2str(timer(2)-timer(1)) ]; 
-   end;   
-   if result{4}, options = [ options ', ''keystroke'', ''on''' ]; end;
-   if ~isempty(result{5}), options = [ options ',' result{5} ]; end;
-   % Conditional pass if ~isempty(result{6}), options = ... 
-   % [options ', ''memmapfile''', result{6} ] ; end ;
-   % Always pass the memmapfile paramter?
-   if ~isempty(result{6})
-       if isempty(findstr('.fdt', result{6}))
-           results{6} = [ result{6} '.fdt' ];
-           disp('Memory mapped file must have ".fdt" extension. Adding ".fdt" extension to file name');
-       end;
-       options = [ options ', ''memmapfile'', ', '''' result{6} '''' ] ;
-   end;
+    options = [];
+    if result{1}, options = [ options ', ''dataformat'', ''int16''' ];
+    else          options = [ options ', ''dataformat'', ''int32''' ];
+    end;
+    if ~isempty(result{3}), 
+        timer =  eval( [ '[' result{3} ']' ]);
+        options = [ options ', ''t1'', ' num2str(timer(1)) ', ''lddur'', '  num2str(timer(2)-timer(1)) ]; 
+    end;   
+    if result{4}, options = [ options ', ''keystroke'', ''on''' ]; end;
+    if ~isempty(result{5}), options = [ options ',' result{5} ]; end;
+    % Conditional pass if ~isempty(result{6}), options = ... 
+    % [options ', ''memmapfile''', result{6} ] ; end ;
+    % Always pass the memmapfile paramter? 
+    options = [ options ', ''memmapfile'', ', 'result{6}' ] ;
 else
 	options = vararg2str(varargin);
 end;
@@ -246,61 +232,62 @@ else
 end;
 
 if isfield(r, 'dat')
-   error('pop_loadcnt is not compatible with current loadcnt version, please use latest loadcnt() version');
+    error('pop_loadcnt is not compatible with current loadcnt version, please use latest loadcnt() version');
 end;
+% Check to see if data is in memory or in a file.
 EEG.data            = r.data;
 EEG.comments        = [ 'Original file: ' fullFileName ];
 EEG.setname 		= 'CNT file';
-EEG.nbchan          = r.header.nchannels; 
+EEG.nbchan          = r.header.nchannels;
 
 % inport events
 % -------------
 I = 1:length(r.event);
 if ~isempty(I)
-   EEG.event(1:length(I),1) = [ r.event(I).stimtype ];
-   EEG.event(1:length(I),2) = [ r.event(I).offset ]+1;
-   EEG.event = eeg_eventformat (EEG.event, 'struct', { 'type' 'latency' });
+    EEG.event(1:length(I),1) = [ r.event(I).stimtype ];
+    EEG.event(1:length(I),2) = [ r.event(I).offset ]+1;
+    EEG.event = eeg_eventformat (EEG.event, 'struct', { 'type' 'latency' });
 end;
 
 % modified by Andreas Widmann  2005/05/12  14:15:00
 try, % this piece of code makes the function crash sometimes - Arnaud Delorme 2006/04/27
-   temp = find([r.event.accept_ev1] == 14 | [r.event.accept_ev1] == 11); % 14: Discontinuity, 11: DC reset
-   if ~isempty(temp)
-       disp('pop_loadcnt note: event field ''type'' set to ''boundary'' for data discontinuities');
-       for index = 1:length(temp)
-           EEG.event(temp(index)).type = 'boundary';
-       end;
-   end
+    temp = find([r.event.accept_ev1] == 14 | [r.event.accept_ev1] == 11); % 14: Discontinuity, 11: DC reset
+    if ~isempty(temp)
+        disp('pop_loadcnt note: event field ''type'' set to ''boundary'' for data discontinuities');
+        for index = 1:length(temp)
+            EEG.event(temp(index)).type = 'boundary';
+        end;
+    end
 catch, end;
 % end modification
 
 % process keyboard entries
 % ------------------------
 if ~isempty(findstr('keystroke', lower(options)))
-   tmpkbd  = [ r.event(I).keyboard ];
-   tmpkbd2 = [ r.event(I).keypad_accept ];
-   for index = 1:length(EEG.event)
-       if EEG.event(index).type == 0
-           if r.event(index).keypad_accept,
-               EEG.event(index).type = [ 'keypad' num2str(r.event(index).keypad_accept) ];
-           else
-               EEG.event(index).type = [ 'keyboard' num2str(r.event(index).keyboard) ];
-           end;
-       end;
-   end;
+    tmpkbd  = [ r.event(I).keyboard ];
+    tmpkbd2 = [ r.event(I).keypad_accept ];
+    for index = 1:length(EEG.event)
+        if EEG.event(index).type == 0
+            if r.event(index).keypad_accept,
+                EEG.event(index).type = [ 'keypad' num2str(r.event(index).keypad_accept) ];
+            else
+                EEG.event(index).type = [ 'keyboard' num2str(r.event(index).keyboard) ];
+            end;
+        end;
+    end;
 else
-   % removeing keystroke events
-   % --------------------------
-   rmind = [];
-   for index = 1:length(EEG.event)
-       if EEG.event(index).type == 0
-           rmind = [rmind index];
-       end;
-   end;
-   if ~isempty(rmind)
-       fprintf('Ignoring %d keystroke events\n', length(rmind));
-       EEG.event(rmind) = [];
-   end;
+    % removeing keystroke events
+    % --------------------------
+    rmind = [];
+    for index = 1:length(EEG.event)
+        if EEG.event(index).type == 0
+            rmind = [rmind index];
+        end;
+    end;
+    if ~isempty(rmind)
+        fprintf('Ignoring %d keystroke events\n', length(rmind));
+        EEG.event(rmind) = [];
+    end;
 end;
 
 % import channel locations (Neuroscan coordinates are not wrong)
@@ -308,29 +295,36 @@ end;
 %x            = celltomat( { r.electloc.x_coord } );
 %y            = celltomat( { r.electloc.y_coord } );
 for index = 1:length(r.electloc)
-   names{index} = deblank(char(r.electloc(index).lab'));
-   if size(names{index},1) > size(names{index},2), names{index} = names{index}'; end;
+    names{index} = deblank(char(r.electloc(index).lab'));
+    if size(names{index},1) > size(names{index},2), names{index} = names{index}'; end;
 end;
 EEG.chanlocs  = struct('labels', names);
 %EEG.chanlocs = readneurolocs( { names x y } );
 %disp('WARNING: Electrode locations imported from CNT files may not reflect true locations');
 
+% Check to see if data is in a file or in memory
+% If in memory, leave alone
+% If in a file, use values set in loadcnt.m for nbchan and pnts.
 EEG.srate    = r.header.rate;
+EEG.nbchan   = size(EEG.data,1) ;
+EEG.nbchan   = r.header.nchannels ;
+% EEG.nbchan       = size(EEG.data,1);
 EEG.trials   = 1;
-if isstr(r.data),
-    EEG.nbchan   = r.header.nchannels;
-    EEG.pnts     = r.header.TOTALSAMPLES;
-    EEG = eeg_checkset(EEG, 'loaddata');
-else
-    EEG.nbchan   = size(EEG.data,1);
-    EEG.pnts     = size(EEG.data,2);
-end;
+EEG.pnts     = r.ldnsamples ;
+%size(EEG.data,2)
+
+%EEG.pnts     = r.header.pnts 
+%size(EEG.data,2);
 EEG          = eeg_checkset(EEG, 'eventconsistency');
 EEG          = eeg_checkset(EEG, 'makeur');
 
+if ((size(EEG.data,1) ~= EEG.nbchan) && (size(EEG.data,2) ~= EEG.pnts))
+   % Assume a data file
+   EEG      = eeg_checkset(EEG, 'loaddata');
+end
 if length(options) > 2
-   command = sprintf('EEG = pop_loadcnt(''%s'' %s);',fullFileName, options); 
+    command = sprintf('EEG = pop_loadcnt(''%s'' %s);',fullFileName, options); 
 else
-   command = sprintf('EEG = pop_loadcnt(''%s'');',fullFileName); 
+    command = sprintf('EEG = pop_loadcnt(''%s'');',fullFileName); 
 end;
 return;
