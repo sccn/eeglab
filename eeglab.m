@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.532  2009/04/21 20:31:04  arno
+% Plugin for edit menu
+%
 % Revision 1.531  2009/04/08 21:33:33  julie
 % fix pop_rejchan call
 %
@@ -3123,8 +3126,12 @@ elseif (exist('EEG') == 1) & ~isnumeric(EEG) & ~isempty(EEG(1).data)
         
         set( g.val11, 'String', fastif(isempty(EEG.icasphere), 'No', 'Yes'));
         tmp = whos('EEG');
-        set( g.val12, 'String', num2str(round(tmp.bytes/1E6*10)/10));
-    
+        if ~isa(EEG.data, 'memmapdata')
+            set( g.val12, 'String', num2str(round(tmp.bytes/1E6*10)/10));
+        else
+            set( g.val12, 'String', [ num2str(round(tmp.bytes/1E6*10)/10) ' (memory mapped)' ]);
+        end;
+        
         % enable menus
         % ------------
         file_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'File');  set(file_m, 'enable', 'on');

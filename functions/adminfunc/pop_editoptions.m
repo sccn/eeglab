@@ -72,6 +72,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.45  2008/04/20 16:15:47  arno
+% fix backward compatibility
+%
 % Revision 1.44  2007/02/24 02:21:12  toby
 % see also .. edit
 %
@@ -295,6 +298,9 @@ if nargin < 2
         if strcmpi(opt(index).varname, 'option_storedisk') & datasets_in_memory
             cb_nomodif = [ 'set(gcbo, ''value'', ~get(gcbo, ''value''));' ...
                            'warndlg2(strvcat(''This option may only be modified when at most one dataset is stored in memory.''));' ];
+            
+        elseif strcmpi(opt(index).varname, 'option_memmapdata')
+            cb_nomodif = [ 'if get(gcbo, ''value''), warndlg2(strvcat(''Matlab memory is unstable, use at your own risk'')); end;' ];
             
         else
             cb_nomodif = '';
