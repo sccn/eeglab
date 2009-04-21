@@ -171,6 +171,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.135  2009/01/22 15:16:03  arno
+% James Desjardin's change
+%
 % Revision 1.133  2008/12/01 20:03:51  nima
 % James bachannel coloring code integrated.
 %
@@ -1825,7 +1828,8 @@ else
       return
     end
     
-	YLabels = { eloc_file.labels };
+    tmplocs = readlocs(eloc_file);
+	YLabels = { tmplocs.labels };
     YLabels = strvcat(YLabels);
     
     YLabels = flipud(str2mat(YLabels,' '));
