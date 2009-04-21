@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2009/03/20 21:58:00  arno
+% Put back old event format
+%
 % Revision 1.30  2009/02/12 21:55:24  arno
 % fix new event channel etc...
 %
@@ -322,12 +325,14 @@ EEG.event = [];
 % end;
 
 if strcmpi(g.rmeventchan, 'on')
-    if dat.BDF.Status.Channel <= size(EEG.data,1)
-        EEG.data(dat.BDF.Status.Channel,:) = [];
-    end;
-    EEG.nbchan = size(EEG.data,1);
-    if ~isempty(EEG.chanlocs)
-        EEG.chanlocs(dat.BDF.Status.Channel,:) = [];
+    if isfield(dat, 'BDF')
+        if dat.BDF.Status.Channel <= size(EEG.data,1)
+            EEG.data(dat.BDF.Status.Channel,:) = [];
+        end;
+        EEG.nbchan = size(EEG.data,1);
+        if ~isempty(EEG.chanlocs)
+            EEG.chanlocs(dat.BDF.Status.Channel,:) = [];
+        end;
     end;
 end;
 dat = sclose(dat);
