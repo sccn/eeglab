@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.79  2007/05/22 13:57:54  arno
+% history problem
+%
 % Revision 1.77  2006/11/01 23:22:33  arno
 % fix documentation
 %
@@ -359,7 +362,14 @@ if length(EEG) > 1
     % ***************************************************
     % case 3 -> multiple datasets processed, storing new copies (not used in EEGLAB)
     % ***************************************************
-        [ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG);
+        if strcmpi(EEG(1).saved, 'justloaded')
+            for ieeg = 1:length(EEG)
+                [ALLEEG TMP CURRENTSET] = eeg_store(ALLEEG, EEG(ieeg), 0);
+            end;
+            EEG = TMP;
+        else
+            [ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG);
+        end;
     end;
     return;
 elseif ~isempty(g.retrieve) % command line call
