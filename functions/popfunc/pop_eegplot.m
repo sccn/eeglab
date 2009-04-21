@@ -72,6 +72,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.42  2009/01/22 15:15:44  arno
+% James Desjardin's change
+%
 % Revision 1.40  2007/08/13 19:22:56  arno
 % special plotting options
 %
@@ -326,8 +329,7 @@ else
         chans(i).labels=sprintf('%s%s','comp',num2str(i));
         chans(i).badchan=EEG.reject.gcompreject(i);
     end
-    eegplotoptions {14} = [chans];
-    
+
 	eegplot( tmpdata, 'srate', EEG.srate, 'title', 'Scroll component activities -- eegplot()', ...
 			 'limits', [EEG.xmin EEG.xmax]*1000 , 'command', command, eegplotoptions{:}); 
 	%eeg_multieegplot( tmpdata, [], [], oldrej, oldrejE, 'title', 'Scroll component activities -- eegplot()', 'srate', ...
