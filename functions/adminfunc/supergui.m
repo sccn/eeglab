@@ -76,6 +76,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.55  2007/01/08 05:21:00  toby
+% help edit
+%
 % Revision 1.54  2007/01/06 08:48:27  toby
 % Help clarified concerning 'geomhoriz'
 %
@@ -412,10 +415,10 @@ end;
 % -------
 warning off;
 try, 
-	if strcmp(computer, 'MAC')
+	if strcmpi(computer, 'MAC') | strcmpi(computer, 'MACI')
 		hh = findobj(allhandlers, 'style', 'edit');
 		if ~isempty(hh)
-			factmulty = factmulty;
+			factmulty = factmulty*1.5;
 		end;
 	elseif ~isunix % windows
 		hh = findobj(allhandlers, 'style', 'edit');
