@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.531  2009/04/08 21:33:33  julie
+% fix pop_rejchan call
+%
 % Revision 1.530  2009/02/12 21:58:36  arno
 % Remove comment
 %
@@ -2434,7 +2437,8 @@ catchstrs.new_non_empty          = e_newset;
     plotsub_m   = findobj('parent', plot_m);
     importsub_m = findobj('parent', neuro_m);
     epochsub_m  = findobj('parent', epoch_m);
-    eventsub_m  = findobj('parent', event_m);
+    eventsub_m  = findobj('parent', event_m);    
+    editsub_m   = findobj('parent', edit_m);
     exportsub_m = findobj('parent', exportm);
     filter_m    = findobj('parent', filter_m);
     icadefs; % containing PLUGINMENUCOLOR
@@ -2444,6 +2448,7 @@ catchstrs.new_non_empty          = e_newset;
     if length(epochsub_m ) > 2 , set(epochsub_m (1:end-2 ), 'foregroundcolor', PLUGINMENUCOLOR); end;
     if length(eventsub_m ) > 4 , set(eventsub_m (1:end-4 ), 'foregroundcolor', PLUGINMENUCOLOR); end;
     if length(exportsub_m) > 3 , set(exportsub_m(1:end-3 ), 'foregroundcolor', PLUGINMENUCOLOR); end;
+    if length(editsub_m)   > 10, set(editsub_m(  1:end-10), 'foregroundcolor', PLUGINMENUCOLOR); end;
     if length(filter_m)    > 3 , set(filter_m   (1:end-1 ), 'foregroundcolor', PLUGINMENUCOLOR); end;
 
 EEGMENU = uimenu( set_m, 'Label', '------', 'Enable', 'off');
