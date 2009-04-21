@@ -116,7 +116,7 @@ end
 
 % return command
 % -------------------------
-com=sprintf('EEG = pop_VisEd( %s, %d, %s, {%s});', inputname(1), DataType, vararg2str(ChanIndex), EventType)
+com=sprintf('EEG = pop_VisEd( %s, %d, %s, {%s});', inputname(1), DataType, vararg2str(ChanIndex), EventType);
 
 % call command
 % ------------

@@ -3,6 +3,11 @@ function EEG = VisEd(EEG, DataType, ChanIndex, EventType)
 
 chans=eval(ChanIndex);
 
+if ~isfield(EEG.chanlocs,'badchan')
+    for i=1:EEG.nbchan;
+        EEG.chanlocs(i).badchan=0;
+    end
+end
 switch DataType
 
     case 1
@@ -41,6 +46,7 @@ switch DataType
 end
 
 % Create VisEd.event field containing events selected in pop_VisEd.
+
 j=0;
 for i=1:length(EEG.event);
     if ~isempty(strmatch(EEG.event(i).type,EventType, 'exact'));
@@ -100,7 +106,8 @@ eegplot(data, ...
               'winrej', rejeegplot, ...
               'butlabel', 'Update EEG structure', ...
               'command', command, ...
-              'ctrlselectcommand',{ 'VisEd_ctrldowncom;' 'eegplot(''defmotioncom'', gcbf);' '' } ...
+              'ctrlselectcommand',{ 'VisEd_ctrldowncom;' 'eegplot(''defmotioncom'', gcbf);' '' }, ...
+              'extselectcommand',{ 'VisEd_extdowncom;' 'eegplot(''defmotioncom'', gcbf);' '' } ...
         );
 
 return
