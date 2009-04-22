@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.86  2008/11/22 22:39:50  scott
+% editing Abord -> abort
+%
 % Revision 1.85  2008/11/22 03:18:18  arno
 % default amicaout
 %
@@ -504,6 +507,10 @@ elseif length(ALLEEG) > 1 & strcmpi(g.concatcond, 'on')
     for index = 1:length(dats)
         ALLEEG(dats{index}) = pop_runica(ALLEEG(dats{index}), 'icatype', g.icatype, ...
             'options', g.options, 'chanind', g.chanind, 'concatenate', 'on');
+        for idat = 1:length(dats{index})
+            ALLEEG(dats{index}(idat)).saved = 'off';
+            pop_saveset(ALLEEG(dats{index}(idat)), 'savemode', 'resave');
+        end;
     end;
     com = sprintf('%s = pop_runica(%s, %s);', inputname(1),inputname(1), ...
               vararg2str({ 'icatype' g.icatype 'concatcond' 'on' 'options' g.options }) );
