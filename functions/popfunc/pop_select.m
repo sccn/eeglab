@@ -94,6 +94,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.63  2009/02/09 11:06:08  arno
+% Fix CVS problem with Windows
+%
 % Revision 1.62  2007/05/22 13:58:31  arno
 % selection of channels (icachansind)
 %
@@ -323,7 +326,7 @@ if nargin < 2
          { 'Style', 'edit', 'string', '', 'tag', 'chans' }, ...
          { }, { 'Style', 'checkbox', 'string', '    ' }, ...
          { 'style' 'pushbutton' 'string'  '...', 'enable' fastif(isempty(EEG.chanlocs), 'off', 'on') ...
-           'callback' 'set(findobj(gcbf, ''tag'', ''chans''), ''string'', int2str(pop_chansel({EEG(1).chanlocs.labels}, ''withindex'', ''on'')));' }, ...
+           'callback' '[tmp tmpval] = pop_chansel({EEG(1).chanlocs.labels}, ''withindex'', ''on''); set(findobj(gcbf, ''tag'', ''chans''), ''string'',tmpval); clear tmp tmpval' }, ...
            { }, { }, { 'Style', 'pushbutton', 'string', 'Scroll dataset', 'enable', fastif(length(EEG)>1, 'off', 'on'), 'callback', ...
                           'eegplot(EEG.data, ''srate'', EEG.srate, ''winlength'', 5, ''limits'', [EEG.xmin EEG.xmax]*1000, ''position'', [100 300 800 500], ''xgrid'', ''off'', ''eloc_file'', EEG.chanlocs);' } {}};
    results = inputgui( geometry, uilist, 'pophelp(''pop_select'');', 'Select data -- pop_select()' );
@@ -349,8 +352,9 @@ if nargin < 2
    end;
 
    if ~isempty( results{7} )
-       if ~results{8}, args = { args{:}, 'channel', eval( [ '[' results{7} ']' ] ) };
-       else            args = { args{:}, 'nochannel', eval( [ '[' results{7} ']' ] ) }; end;
+       [ chaninds chanlist ] = eeg_decodechan(EEG.chanlocs, results{7});
+       if ~results{8}, args = { args{:}, 'channel'  , chanlist };
+       else            args = { args{:}, 'nochannel', chanlist }; end;
    end;
 
 else
@@ -364,24 +368,19 @@ if length(EEG) > 1
     return;
 end;
 
-% create structure
-if ~isempty(args)
-   try, g = struct(args{:});
-   catch, error('Wrong syntax in function arguments'); end;
-else
-    g = [];
+if isempty(EEG.chanlocs), chanlist = [1:EEG.nbchan];
+else                      chanlist = { EEG.chanlocs.labels };
 end;
-
-try, g.time;     catch, g.time = []; end;
-try, g.notime;   catch, g.notime = []; end;
-try, g.trial;    catch, g.trial = [1:EEG.trials]; end;
-try, g.notrial;  catch, g.notrial = []; end;
-try, g.point;    catch, g.point = []; end; % will be set up later
-try, g.nopoint;  catch, g.nopoint = []; end;
-try, g.channel;  catch, g.channel = [1:EEG.nbchan]; end;
-try, g.nochannel;        catch, g.nochannel = []; end;
-try, g.trialcond;        catch, g.trialcond = []; end;
-try, g.notrialcond;      catch, g.notrialcond = []; end;
+g = finputcheck(args, { 'time'    'real'      []         []; ...
+                        'notime'  'real'      []         []; ...
+                        'trial'   'integer'   []         [1:EEG.trials]; ...
+                        'notrial' 'integer'   []         []; ...
+                        'point'   'integer'   []         []; ...
+                        'nopoint' 'integer'   []         []; ...
+                        'channel'   { 'integer' 'cell' }   []  chanlist;
+                        'nochannel' { 'integer' 'cell' }   []  [];
+                        'trialcond'   'integer'   []         []; ...
+                        'notrialcond' 'integer'   []         [] }, 'pop_select');
 
 allfields = fieldnames(g);
 for index = 1:length(allfields)
@@ -392,7 +391,11 @@ for index = 1:length(allfields)
 end;
 
 g.trial   = sort(setdiff( g.trial, g.notrial ));
-g.channel = sort(setdiff( g.channel, g.nochannel ));
+if ~iscell(g.nochannel) & iscell(chanlist)
+    g.channel = [1:EEG.nbchan];
+end;
+g.channel = sort(setdiff( lower(g.channel), lower(g.nochannel) ));
+g.channel = eeg_decodechan(EEG.chanlocs, g.channel);
 
 if ~isempty(g.time) & (g.time(1) < EEG.xmin*1000) & (g.time(2) > EEG.xmax*1000)
    error('Wrong time range');
