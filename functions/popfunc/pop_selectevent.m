@@ -8,13 +8,13 @@
 %   EEG  - EEG dataset
 %
 % Optional inputs:
-%   'type'        - [type_range] event type(s) to include
-%                      Ex: 'type',3  or [2 3 5] or 1:10
-%   'omittype'    - [type_range], type(s) of events to exclude
 %   'latency'     - [latency_range] latency range of events to include
 %                      Ex: 'latency','400 <= 700' Include all events with
 %                           latnecy in the range [400,700]
 %   'omitlatency' - [latency_range] latency range of events to exclude
+%   'type'        - [type_range] event type(s) to include
+%                      Ex: 'type',3  or [2 3 5] or 1:10
+%   'omittype'    - [type_range], type(s) of events to exclude
 %   'event'       - [event_range], indices of events to include
 %   'omitevent'   - [event_range], indices of events to exclude
 %   'USER_VAR'    - [VAR_range], 'USER_VAR' is any user-defined field in
@@ -51,7 +51,7 @@
 % Note: By default, if several optional inputs are given, the function
 %       performs their conjunction (&).
 %
-% Author: Arnaud Delorme, CNL / Salk Institute, 27 Jan 2002
+% Author: Arnaud Delorme, CNL / Salk Institute, 27 Jan 2002-
 %
 % See also: eeg_eventformat(), pop_importevent()
 
@@ -74,6 +74,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.58  2007/05/22 13:58:15  arno
+% history problem
+%
 % Revision 1.57  2007/02/20 14:19:15  arno
 % added a button to invert epoch selection
 % ,.
@@ -235,42 +238,39 @@ end;
 % remove the event field if present
 % ---------------------------------
 allfields = fieldnames(EEG.event);
-if isfield(EEG, 'tmpevent') & strmatch('event', allfields)
-    indexmatch = strmatch('event', allfields);
-	allfields = { allfields{1:indexmatch-1} allfields{indexmatch+1:end}};
-end;   
- 
+indexmatch = strmatch('urevent', allfields);
+if ~isempty(indexmatch)
+    allfields = { allfields{1:indexmatch-1} allfields{indexmatch+1:end} };
+end;
+
 if nargin<2
-    geometry = { [0.6 1.3 2.0 0.8 ] [0.6 1.3 2.0 0.8 ] [0.55 0.65 1.3 0.1 0.22 0.1] };
+    geometry = { [0.6 2.1 1.2 0.8 ] };
     uilist = { ...
-         { 'Style', 'text', 'string', 'Selection', 'horizontalalignment', 'center', 'fontweight', 'bold'  }, ...
-         { 'Style', 'text', 'string', 'Field Descriptions', 'fontweight', 'bold'  }, ...
-         { 'Style', 'text', 'string', 'Selection (value, list or real range "min<=max")', 'fontweight', 'bold'  }, ...
-         { 'Style', 'text', 'string', 'If set, select', 'fontweight', 'bold'  }, ...
-         { 'Style', 'text', 'string', '  Field', 'fontweight', 'bold'  }, ...
-         { 'Style', 'text', 'string', 'To edit: Edit > Event fields'  }, ...
-         { 'Style', 'text', 'string', 'Ex: "Target" or 2:4,5  or  4.5 <= 13'  }, ...
-         { 'Style', 'text', 'string', 'all BUT these', 'fontweight', 'bold'  }, ...
-         ...
-         { 'Style', 'text', 'string', 'Event indices' }, ...
-         { }, ...
-         { 'Style', 'edit', 'string', '' }, ...
-         { }, { 'Style', 'checkbox', 'string', '    ' },{ } };
+         { 'Style', 'text', 'string', 'Field', 'horizontalalignment', 'center', 'fontweight', 'bold'  }, ...
+         {} ...
+         { 'Style', 'text', 'string', 'Selection', 'fontweight', 'bold'  }, ...
+         { 'Style', 'text', 'string', 'Set=NOT THESE', 'fontweight', 'bold'  } };
 					   
     % add all fields to graphic interface
     % -----------------------------------
+    ind1 = strmatch('type', allfields, 'exact');
+    ind2 = strmatch('latency' , allfields, 'exact');
+    ind3 = strmatch('duration', allfields, 'exact');
+    neworder = [ ind2 ind3 ind1 setdiff(1:length(allfields), [ind1 ind2 ind3]) ];
+    allfields = { allfields{neworder} }; 
+    
     for index = 1:length(allfields)
         % format the description to fit a help box
         % ----------------------------------------
         if index <= length( EEG.eventdescription )
-             tmptext = EEG.eventdescription{ index };
+             tmptext = EEG.eventdescription{ neworder(index) };
 			 if ~isempty(tmptext)
 				 if size(tmptext,1) > 15,    stringtext = [ tmptext(1,1:15) '...' ]; 
 				 else                        stringtext = tmptext(1,:); 
 				 end;
-			 else stringtext = 'no description'; tmptext = 'no description';
+			 else stringtext = 'no description'; tmptext = 'no description (use menu Edit > Event Field)';
 			 end;
-        else stringtext = 'no description'; tmptext = 'no description';
+        else stringtext = 'no description'; tmptext = 'no description (use menu Edit > Event Field)';
         end;
 
 		descrip = { 'string', stringtext, 'callback', ['questdlg2(' vararg2str(tmptext) ...
@@ -279,87 +279,126 @@ if nargin<2
         % create the gui for this field
         % -----------------------------
         textfield = allfields{index};
-        if strcmp(allfields{index}, 'latency')
+        if strcmp(textfield, 'latency') | strcmp(textfield, 'duration')
             if EEG.trials > 1, textfield = [ textfield ' (ms)' ];
             else textfield = [ textfield ' (s)' ];
             end;
+            middletxt  = { { 'Style', 'text', 'string', 'min' } { 'Style', 'edit', 'string', '' 'tag' [ 'min' allfields{index} ] } ...
+                           { 'Style', 'text', 'string', 'max' } { 'Style', 'edit', 'string', '' 'tag' [ 'max' allfields{index} ] } };
+            middlegeom = [ 0.2 0.44 0.2 0.44 ];
+        elseif strcmp(textfield, 'type')
+            commandtype = [ 'if ~isfield(EEG.event, ''type'')' ...
+                           '   errordlg2(''No type field'');' ...
+                           'else' ...
+                           '   if isnumeric(EEG.event(1).type),' ...
+                           '        [tmps,tmpstr] = pop_chansel(unique([ EEG.event.type ]));' ...
+                           '   else,' ...
+                           '        [tmps,tmpstr] = pop_chansel(unique({ EEG.event.type }));' ...
+                           '   end;' ...
+                           '   if ~isempty(tmps)' ...
+                           '       set(findobj(''parent'', gcbf, ''tag'', ''type''), ''string'', tmpstr);' ...
+                           '   end;' ...
+                           'end;' ...
+                           'clear tmps tmpv tmpstr tmpfieldnames;' ];
+            middletxt  = { { 'Style', 'edit', 'string', '' 'tag' 'type' } { 'Style', 'pushbutton', 'string', '...' 'callback' commandtype } };
+            middlegeom = [ 1.1 0.2 ];
+        else
+            middletxt  = { { 'Style', 'edit', 'string', '' 'tag' textfield } };
+            middlegeom = 1.3;
         end;
-        if strcmp(allfields{index}, 'duration')
-            if EEG.trials > 1, textfield = [ textfield ' (ms)' ];
-            else textfield = [ textfield ' (s)' ];
-            end;
-        end;
-        geometry = { geometry{:} [0.55 0.65 1.3 0.1 0.22 0.1] };
+        geometry = { geometry{:} [0.55 0.65 middlegeom 0.1 0.22 0.1] };
         uilist   = { uilist{:}, ...
          { 'Style', 'text', 'string', textfield }, ...
          { 'Style', 'pushbutton', descrip{:}, 'horizontalalignment', 'left' }, ...
-         { 'Style', 'edit', 'string', '' }, ...
-         { }, { 'Style', 'checkbox', 'string', '    ' },{ } };
+         middletxt{:}, ...
+         { }, { 'Style', 'checkbox', 'string', '    ' 'tag' [ 'not' allfields{index} ] },{ } };
     end;
-
-    geometry = { geometry{:} [1] [1.3 2] };
+    
+    % event indices
+    % -------------
+    uilist = { uilist{:} ...
+            { 'Style', 'text', 'string', 'Event indices' }, ...
+            { }, ...
+            { 'Style', 'edit', 'string', '' 'tag' 'indices' }, ...
+            { }, { 'Style', 'checkbox', 'string', '    ' 'tag' 'notindices' },{ } };
+    geometry = { geometry{:} [0.55 0.65 1.3 0.1 0.22 0.1] };
+    
+    % invert event selection
+    % ----------------------
+    geometry = { geometry{:} [1.3 2] };
     uilist   = { uilist{:} ...
-                 { }, ...
-                 { 'Style', 'checkbox', 'string','Select all events NOT selected above',} ...
+                 { 'Style', 'checkbox', 'string','Select all events NOT selected above' 'tag' 'invertevent' } ...
                  { 'Style', 'text', 'string','Set this button (to left) and "all BUT" buttons (above) for logical OR' } ...
                };
 
+    % rename/keep events
+    % ------------------
     geometry = { geometry{:} [1] [2 1 1] [2 1 1] [2 1] };
     uilist = { uilist{:} { } ...
                 { 'Style', 'text', 'string', 'Rename selected event type(s) as type:' } ...
-                { 'Style', 'edit', 'string', '' } { } ...
+                { 'Style', 'edit', 'string', ''  'tag' 'rename' } { } ...
                 { 'Style', 'text', 'string', 'Retain old event type name(s) in (new) field named:' } ...
-                { 'Style', 'edit', 'string', '' } { } ...
+                { 'Style', 'edit', 'string', '' 'tag' 'retainfield'  } { } ...
                 { 'Style', 'checkbox', 'string','Keep only selected events and remove all other events', ...
-                'value', fastif(EEG.trials>1, 0, 1) } { } };
+                'value', fastif(EEG.trials>1, 0, 1) 'tag' 'rmevents' } { } };
 
+    % epoch selections
+    % ----------------
     if EEG.trials > 1
         geometry = { geometry{:} [2 1] [2 1]};
         uilist   = { uilist{:} ...
                      { 'Style', 'checkbox', 'string','Remove epochs not referenced by any selected event', ...
-                       'fontweight', 'bold', 'value', 1  } { } ...
+                       'fontweight', 'bold', 'value', 1  'tag' 'rmepochs' } { } ...
                        { 'Style', 'checkbox', 'string','Invert epoch selection', ...
-                       'value', 0 } { }};
+                       'value', 0 'tag' 'invertepoch' } { }};
     end;
     
-	results = inputgui( geometry, uilist, 'pophelp(''pop_selectevent'')', 'Select events -- pop_selectevent()');
+	[results tmp2 tmp3 res] = inputgui( geometry, uilist, 'pophelp(''pop_selectevent'')', 'Select events -- pop_selectevent()');
     if length(results) == 0, return; end;
    
     % decode inputs
     % -------------
     args = {};
-    if ~results{2}, args = { args{:},     'event', eval( [ '[' results{1} ']' ]) };
-    else            args = { args{:}, 'omitevent', eval( [ '[' results{1} ']' ]) }; 
+    if ~res.notindices, args = { args{:},     'event', eval( [ '[' res.indices ']' ]) };
+    else                args = { args{:}, 'omitevent', eval( [ '[' res.indices ']' ]) }; 
     end;
-    for index = 1:length(allfields) 
-        tmpres = results{2*index+1};
-        if isempty(findstr(tmpres, '<=')), 
-            try, tmpres = eval( [ '[' tmpres ']' ] );
-                if ~isnumeric(tmpres),
-                    if results{2*index+1}(1) == ''''
-                        tmpres = eval( [ '{' results{2*index+1} '}' ] );
+    for index = 1:length(allfields)
+        textfield = allfields{index};
+        tmpflag = getfield(res, [ 'not' textfield ]);
+        if strcmpi(textfield, 'duration') | strcmpi(textfield, 'latency') 
+            tmpres = [];
+            minlat = getfield(res, [ 'min' textfield ]);
+            maxlat = getfield(res, [ 'max' textfield ]);
+            if ~isempty(minlat) & ~isempty(maxlat)
+                tmpres = [ minlat '<=' maxlat ];
+            end;
+        else
+            tmpres  = getfield(res, textfield);
+            try, tmpres2 = eval( [ '[' tmpres ']' ] );
+                if ~isnumeric(tmpres2),
+                    if tmpres(1) == ''''
+                        tmpres = eval( [ '{' tmpres '}' ] );
                     else
-                        tmpres = parsetxt( results{2*index+1} ); 
+                        tmpres = parsetxt( tmpres ); 
                     end;
+                else
+                    tmpres = tmpres2;
                 end;
             catch, tmpres = parsetxt( tmpres ); end;
-        end;
-        if ~results{2*index+2}, args = { args{:}, allfields{index}, tmpres };
-        else                    args = { args{:}, [ 'omit' allfields{index}], tmpres }; 
+        end
+        if ~isempty(tmpres)
+            if ~tmpflag, args = { args{:}, textfield, tmpres };
+            else         args = { args{:}, [ 'omit' textfield], tmpres }; 
+            end;
         end;
     end;
+    if res.invertevent,  args = { args{:}, 'select', 'inverse' }; end;
+    if ~isempty(res.rename),       args = { args{:}, 'renametype', res.rename }; end;
+    if ~isempty(res.retainfield),  args = { args{:}, 'oldtypefield', res.retainfield }; end;
+    args = { args{:}, 'deleteevents', fastif(res.rmevents,     'on', 'off') };
     if EEG.trials > 1
-        if results{end-5},  args = { args{:}, 'select', 'inverse' }; end;
-        if ~isempty(results{end-4}),  args = { args{:}, 'renametype', results{end-4} }; end;
-        if ~isempty(results{end-3}),  args = { args{:}, 'oldtypefield', results{end-3} }; end;
-        args = { args{:}, 'deleteevents', fastif(results{end-2}, 'on', 'off') };
-        args = { args{:}, 'deleteepochs', fastif(results{end-1}, 'on', 'off') };        
-        args = { args{:}, 'invertepochs', fastif(results{end}, 'on', 'off') };
-    else
-        if results{end-3},  args = { args{:}, 'select', 'inverse' }; end;
-        if ~isempty(results{end-2}),  args = { args{:}, 'renametype', results{end-2} }; end;
-        if ~isempty(results{end-1}),  args = { args{:}, 'oldtypefield', results{end-1} }; end;
-        args = { args{:}, 'deleteevents', fastif(results{end}, 'on', 'off') };
+        args = { args{:}, 'deleteepochs', fastif(res.rmepochs    , 'on', 'off') };        
+        args = { args{:}, 'invertepochs', fastif(res.invertepoch , 'on', 'off') };
     end;
 else % no interactive inputs
     args = varargin;
