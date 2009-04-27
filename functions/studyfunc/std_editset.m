@@ -71,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.58  2007/10/18 17:28:51  nima
+% help message for 'inbrain' revised.
+%
 % Revision 1.57  2007/10/18 00:29:35  nima
 % _
 %
@@ -264,7 +267,7 @@ for k = 1:2:length(g.commands)
        dipselectExists = true;
     end;
 end;
-if strcmp(g.inbrain,'on') && ~dipselectExists
+if strcmp(g.inbrain,'on') & ~dipselectExists
     g.commands{length(g.commands)+1} = 'dipselect';
     g.commands{length(g.commands)+1} = 0.15;
 end;
