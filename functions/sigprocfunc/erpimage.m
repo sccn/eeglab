@@ -15,7 +15,7 @@
 %                        erp,amps,cohers,cohsig,ampsig,outamps,...
 %                        phsangls,phsamp,sortidx,erpsig] ...
 %                            = erpimage(data,sortvar,times,'title',avewidth,decimate,...
-%                                  flag1,arg1, flag2,arg2, ...); % use options
+%                                  'key', 'val', ...); % use options
 % Required input:
 %   data     = [vector or matrix] Single-channel input data to image.
 %               Formats (1,frames*trials) or (frames,trials)
@@ -206,6 +206,12 @@
 
 %% LOG COMMENTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % $Log: not supported by cvs2svn $
+% Revision 1.280  2008/10/16 17:06:32  julie
+% was missing a % in line 3387.
+%
+% exit
+% exit
+%
 % Revision 1.279  2008/06/24 01:06:29  scott
 % in help specified 'limits'  loamp & hiamp --> lodB & hidB
 % changed 'bamp' to basedB for clarity in help and code
