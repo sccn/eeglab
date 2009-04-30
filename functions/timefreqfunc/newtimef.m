@@ -307,6 +307,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.154  2008/09/24 16:39:11  arno
+% parameter checking
+%
 % Revision 1.153  2008/09/05 22:26:38  arno
 % fixed non-returned output when using statsitics in more than 1 condition
 %
@@ -1698,10 +1701,10 @@ end
 
 % ---------
 % bootstrap
-% ---------
-if ~isnan(g.alpha) % if bootstrap analysis included . . .
-    if ~isnan(g.pboot) & ~isnan(g.rboot)
-        Rboot = g.rboot;
+% --------- % this ensures that if bootstrap limits provided that no
+% 'alpha' won't prevent application of the provided limits
+if ~isnan(g.alpha) | ~isempty(find(~isnan(g.pboot))) | ~isempty(find(~isnan(g.rboot)))% if bootstrap analysis requested . . .
+    if ~isempty(find(~isnan(g.pboot))) % if ERSP bootstrap limits provided already
         Pboot = g.pboot;
     else
         if size(g.baseboot,2) == 1
@@ -1727,7 +1730,7 @@ if ~isnan(g.alpha) % if bootstrap analysis included . . .
         elseif g.baseboot
             fprintf('   %d bootstrap windows in baseline (times<%g).\n', length(baselntmp), g.baseboot)
         end;
-
+        
         % power significance
         % ------------------
         formula = 'mean(arg1,3);';
@@ -1738,7 +1741,35 @@ if ~isnan(g.alpha) % if bootstrap analysis included . . .
         clear Pboottrialstmp;
         
         if size(Pboot,2) == 1, Pboot = Pboot'; end;
-
+    end;
+    if ~isempty(find(~isnan(g.rboot))) % if itc bootstrap provided
+        Rboot = g.rboot;
+    else
+        if ~isempty(find(~isnan(g.pboot))) % if ERSP limits were provided (but ITC not)
+            if size(g.baseboot,2) == 1
+                if g.baseboot == 0, baselntmp = [];
+                elseif ~isnan(g.baseline(1))
+                    baselntmp = baseln;
+                else baselntmp = find(timesout <= 0); % if it is empty use whole epoch
+                end;
+            else
+                baselntmp = [];
+                for index = 1:size(g.baseboot,1)
+                    tmptime   = find(timesout >= g.baseboot(index,1) & timesout <= g.baseboot(index,2));
+                    if isempty(tmptime),
+                        fprintf('Warning: empty baseline bootstrap interval [%3.2f %3.2f]\n', g.baseboot(index,1), g.baseboot(index,2));
+                    end;
+                    baselntmp = union(baselntmp, tmptime);
+                end;
+            end;
+            if prod(size(g.baseboot)) > 2
+                fprintf('Bootstrap analysis will use data in multiple selected windows.\n');
+            elseif size(g.baseboot,2) == 2
+                fprintf('Bootstrap analysis will use data in range %3.2g-%3.2g ms.\n', g.baseboot(1),  g.baseboot(2));
+            elseif g.baseboot
+                fprintf('   %d bootstrap windows in baseline (times<%g).\n', length(baselntmp), g.baseboot)
+            end;
+        end;        
         % ITC significance
         % ----------------
         inputdata = alltfX;
@@ -1754,7 +1785,7 @@ if ~isnan(g.alpha) % if bootstrap analysis included . . .
             'label', 'ITC', 'bootside', 'upper', 'naccu', g.naccu, ...
             'basevect', baselntmp, 'alpha', g.alpha, 'dimaccu', 2 );
         fprintf('\n');
-        clear Rboottmp;
+        clear Rboottmp;        
     end;
 else
     Pboot = []; Rboot = [];
@@ -1763,28 +1794,34 @@ end
 % correction for multiple comparisons
 % -----------------------------------
 maskersp = [];
-maskitc  = [];
+maskitc  = []; 
 if ~isnan(g.alpha)
-    exactp_ersp = compute_pvals(P, Pboottrials');
-    exactp_itc  = compute_pvals(abs(R), abs(Rboottrials'));
-    
-    if strcmpi(g.mcorrect, 'fdr')
-        alphafdr = fdr(exactp_ersp, g.alpha);
-        if alphafdr ~= 0
-             fprintf('ERSP correction for multiple comparisons using FDR, alpha_fdr = %3.6f\n', alphafdr);
-        else fprintf('ERSP correction for multiple comparisons using FDR, nothing significant\n', alphafdr);
+    if isempty(find(~isnan(g.pboot))) % if ERSP lims not provided
+        exactp_ersp = compute_pvals(P, Pboottrials');
+        if strcmpi(g.mcorrect, 'fdr')
+            alphafdr = fdr(exactp_ersp, g.alpha);
+            if alphafdr ~= 0
+                fprintf('ERSP correction for multiple comparisons using FDR, alpha_fdr = %3.6f\n', alphafdr);
+            else fprintf('ERSP correction for multiple comparisons using FDR, nothing significant\n', alphafdr);
+            end;
+            maskersp = exactp_ersp <= alphafdr;
+        else
+            maskersp = exactp_ersp <= g.alpha;
         end;
-        maskersp = exactp_ersp <= alphafdr;
-        alphafdr = fdr(exactp_itc, g.alpha);
-        if alphafdr ~= 0
-             fprintf('ITC  correction for multiple comparisons using FDR, alpha_fdr = %3.6f\n', alphafdr);
-        else fprintf('ITC  correction for multiple comparisons using FDR, nothing significant\n', alphafdr);
-        end;
-        maskitc = exactp_itc <= alphafdr;
-    else
-        maskersp = exactp_ersp <= g.alpha;
-        maskitc  = exactp_itc  <= g.alpha;
-    end
+    end;    
+    if isempty(find(~isnan(g.rboot))) % if ITC lims not provided
+        exactp_itc  = compute_pvals(abs(R), abs(Rboottrials'));        
+        if strcmpi(g.mcorrect, 'fdr')
+            alphafdr = fdr(exactp_itc, g.alpha);
+            if alphafdr ~= 0
+                fprintf('ITC  correction for multiple comparisons using FDR, alpha_fdr = %3.6f\n', alphafdr);
+            else fprintf('ITC  correction for multiple comparisons using FDR, nothing significant\n', alphafdr);
+            end;
+            maskitc = exactp_itc <= alphafdr;
+        else
+            maskitc  = exactp_itc  <= g.alpha;
+        end
+    end;
 end;
 
 if isnan(g.powbase)
