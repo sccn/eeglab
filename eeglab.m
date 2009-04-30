@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.533  2009/04/21 22:11:21  arno
+% Now warning for memory mapping and showing it in the main interface
+%
 % Revision 1.532  2009/04/21 20:31:04  arno
 % Plugin for edit menu
 %
@@ -2056,6 +2059,7 @@ catchstrs.new_non_empty          = e_newset;
 	cb_export      = [ check        'LASTCOM = pop_export(EEG);'              e_histdone ];
 	cb_expica1     = [ check        'LASTCOM = pop_expica(EEG, ''weights'');' e_histdone ]; 
 	cb_expica2     = [ check        'LASTCOM = pop_expica(EEG, ''inv'');'     e_histdone ]; 
+	cb_expdata     = [ check        'LASTCOM = pop_writeeeg(EEG);'            e_histdone ]; 
     
     cb_loadset     = [ nocheck '[EEG LASTCOM] = pop_loadset;'                                e_newset];
     cb_saveset     = [ check   '[EEG LASTCOM] = pop_saveset(EEG, ''savemode'', ''resave'');' e_store ];
@@ -2211,6 +2215,7 @@ catchstrs.new_non_empty          = e_newset;
 	uimenu( exportm, 'Label', 'Data and ICA activity to text file'    , 'CallBack', cb_export);
 	uimenu( exportm, 'Label', 'Weight matrix to text file'            , 'CallBack', cb_expica1); 
 	uimenu( exportm, 'Label', 'Inverse weight matrix to text file'    , 'CallBack', cb_expica2); 
+	uimenu( exportm, 'Label', 'Data to EDF/BDF/GDF file'              , 'CallBack', cb_expdata, 'separator', 'on'); 
 
 	uimenu( file_m, 'Label', 'Load existing dataset'                  , 'CallBack', cb_loadset, 'Separator', 'on'); 
 	uimenu( file_m, 'Label', 'Save current dataset(s)'                , 'CallBack', cb_saveset);
