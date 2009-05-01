@@ -40,7 +40,7 @@ function [HDR,H1,h2] = sopen(arg1,PERMISSION,CHAN,MODE,arg5,arg6)
 % see also: SLOAD, SREAD, SSEEK, STELL, SCLOSE, SWRITE, SEOF
 
 
-%	$Id: sopen.m,v 1.1 2009-01-30 06:04:42 arno Exp $
+%	$Id: sopen.m,v 1.2 2009-05-01 01:06:29 arno Exp $
 %	(C) 1997-2006,2007,2008 by Alois Schloegl <a.schloegl@ieee.org>	
 %    	This is part of the BIOSIG-toolbox http://biosig.sf.net/
 %
@@ -1902,9 +1902,9 @@ elseif strmatch(HDR.TYPE,{'CNT';'AVG';'EEG'},'exact')
                         count = fwrite(HDR.FILE.FID,zeros(2,1),'uint8');
                         
                         count = fwrite(HDR.FILE.FID,zeros(7,1),'float');
-                        count = fwrite(HDR.FILE.FID,HDR.Off(k),int16);
+                        count = fwrite(HDR.FILE.FID,HDR.Off(k),'int16');
                         count = fwrite(HDR.FILE.FID,zeros(2,1),'uint8');
-                        count = fwrite(HDR.FILE.FID,[zeros(2,1),e.sensitivity(k)],'float');
+                        count = fwrite(HDR.FILE.FID,[zeros(2,1);e.sensitivity(k)],'float');
                         count = fwrite(HDR.FILE.FID,zeros(3,1),'uint8');
                         count = fwrite(HDR.FILE.FID,zeros(4,1),'uint8');
                         count = fwrite(HDR.FILE.FID,zeros(1,1),'uint8');

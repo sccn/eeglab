@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2009/04/21 21:24:45  arno
+% Biosig fix for EDF
+%
 % Revision 1.31  2009/03/20 21:58:00  arno
 % Put back old event format
 %
@@ -168,7 +171,7 @@
 % Initial revision
 %
 
-function [EEG, command] = my_pop_biosig(filename, varargin); 
+function [EEG, command, dat] = my_pop_biosig(filename, varargin); 
 EEG = [];
 command = '';
 
@@ -195,13 +198,16 @@ if nargin < 1
     if strcmpi(dat.TYPE, 'BDF')
         disp('We highly recommend that you choose a reference channel IF these are Biosemi data');
         disp('(e.g., a mastoid or other channel). Otherwise the data will lose 40 dB of SNR!');
-        uilist = { uilist{:} ...
-                 { 'style' 'text' 'String' 'Delete event channel (after extracting events, set=yes)' } ...
+    end;
+    uilist = { uilist{:} ...
+                 { 'style' 'text' 'String' 'Extract event from last channel (set=yes)' } ...
                  { 'style' 'checkbox' 'string' '' 'value' 1 } {} ...
+                 { 'style' 'text' 'String' 'Import continuous data (set=yes)' } ...
+                 { 'style' 'checkbox' 'string' '' 'value' 0 } {} ...
                  { 'style' 'text' 'String' 'Biosemi: reference chan(s) number(s) (''all''= average ref)' } ...
                  { 'style' 'edit' 'string' '' } };
-        geom = { geom{:} [3 0.2 0.5] [3 1] };
-    end;    
+    geom = { geom{:} [3 0.2 0.5] [3 0.2 0.5] [3 1] };
+
     result = inputgui( geom, uilist, 'pophelp(''pop_biosig'')', ...
                                  'Load data using BIOSIG -- pop_biosig()');
     if length(result) == 0 return; end;
@@ -212,8 +218,9 @@ if nargin < 1
     if ~isempty(result{1}), options = { options{:} 'channels'   eval( [ '[' result{1} ']' ] ) }; end;
     if ~isempty(result{2}), options = { options{:} 'blockrange' eval( [ '[' result{2} ']' ] ) }; end;
     if length(result) > 2
-        if ~isempty(result{4}), options = { options{:} 'ref'        eval( [ '[' result{4} ']' ] ) }; end;
+        if ~isempty(result{5}), options = { options{:} 'ref'        eval( [ '[' result{5} ']' ] ) }; end;
         if ~result{3},          options = { options{:} 'rmeventchan' 'off' }; end;
+        if  result{4},          options = { options{:} 'blockepoch'  'off'  }; end;
     end;
 else
     options = varargin;
@@ -224,7 +231,8 @@ end;
 g = finputcheck( options, { 'blockrange'  'integer' [0 Inf]    [];
                             'channels'    'integer' [0 Inf]    [];
                             'ref'         'integer' [0 Inf]    [];
-                            'rmeventchan' 'string'  { 'on' 'off' } 'on' }, 'pop_biosig');
+                            'rmeventchan' 'string'  { 'on' 'off' } 'on';
+                            'blockepoch'  'string'  { 'on' 'off' } 'on' }, 'pop_biosig');
 if isstr(g), error(g); end;
 
 % import data
@@ -260,14 +268,14 @@ clear DAT;
 % end;    
 EEG.setname 		= sprintf('%s file', dat.TYPE);
 EEG.comments        = [ 'Original file: ' filename ];
-EEG.xmin            = 0; 
-if strcmpi(dat.TYPE, 'BDF') || strcmpi(dat.TYPE, 'EDF')
-    EEG.trials   = 1;
-    EEG.pnts     = size(EEG.data,2);
-else
-    EEG.trials   = dat.NRec;
-    EEG.pnts     = size(EEG.data,2)/dat.NRec;
-end
+EEG.xmin            = 0;
+nepoch              = dat.NRec;
+if strcmpi(g.blockepoch, 'off')
+    nepoch = 1;
+end;
+EEG.trials   = nepoch;
+EEG.pnts     = size(EEG.data,2)/nepoch;
+
 if isfield(dat, 'Label') & ~isempty(dat.Label)
     EEG.chanlocs = struct('labels', cellstr(char(dat.Label)));
 end
@@ -275,7 +283,6 @@ EEG = eeg_checkset(EEG);
 
 % extract events % this part I totally revamped to work...  JO
 % --------------
-disp('Extracting events from last EEG channel...');
 EEG.event = [];
 
 % startval = mode(EEG.data(end,:)); % my code
@@ -313,17 +320,6 @@ EEG.event = [];
 %    codeout = nextcode;
 %end;
 
-% Modifieded by Andrey (Aug.5,2008) to detect all non-zero codes: 
-% thiscode = 0;
-% for p = 1:size(EEG.data,2)-1
-%     prevcode = thiscode;
-%     thiscode = mod(EEG.data(end,p),256*256);   % andrey's code - 16 bits 
-%     if (thiscode ~= 0) && (thiscode~=prevcode) 
-%         EEG.event(end+1).latency =  p;
-%         EEG.event(end).type = thiscode;
-%     end;
-% end;
-
 if strcmpi(g.rmeventchan, 'on')
     if isfield(dat, 'BDF')
         if dat.BDF.Status.Channel <= size(EEG.data,1)
@@ -333,12 +329,37 @@ if strcmpi(g.rmeventchan, 'on')
         if ~isempty(EEG.chanlocs)
             EEG.chanlocs(dat.BDF.Status.Channel,:) = [];
         end;
+    elseif isempty(dat.EVENT.POS)
+        disp('Extracting events from last EEG channel...');
+        %Modifieded by Andrey (Aug.5,2008) to detect all non-zero codes: 
+        if length(unique(EEG.data(end, 1:100))) > 20
+            disp('Warning: event extraction failure, the last channel contains data');
+        else
+            for p = 1:size(EEG.data,2)*size(EEG.data,3)-1
+                thiscode = 0;
+                prevcode = thiscode;
+                thiscode = mod(EEG.data(end,p),256*256);   % andrey's code - 16 bits 
+                if (thiscode ~= 0) && (thiscode~=prevcode) 
+                    EEG.event(end+1).latency =  p;
+                    EEG.event(end).type = thiscode;
+                end;
+            end;
+            EEG.data(end,:) = [];
+            EEG.chanlocs(end) = [];
+        end;
+        % recreate the epoch field if necessary
+        % -------------------------------------
+        if EEG.trials > 1
+            for i = 1:length(EEG.event)
+                EEG.event(i).epoch = ceil(EEG.event(i).latency/EEG.pnts);
+            end;
+        end;
+        EEG = eeg_checkset(EEG, 'eventconsistency');
     end;
 end;
 dat = sclose(dat);
-EEG = eeg_checkset(EEG, 'eventconsistency');
 
-if ~isempty(dat.EVENT)    
+if ~isempty(dat.EVENT.POS)    
     if isfield(dat, 'out') % Alois fix for event interval does not work
         if isfield(dat.out, 'EVENT')
             dat.EVENT = dat.out.EVENT;
@@ -350,6 +371,15 @@ if ~isempty(dat.EVENT)
     else interval = [];
     end
     EEG.event = biosig2eeglabevent(dat.EVENT, interval); % Toby's fix
+    
+    % recreate the epoch field if necessary
+    % -------------------------------------
+    if EEG.trials > 1
+        for i = 1:length(EEG.event)
+            EEG.event(i).epoch = ceil(EEG.event(i).latency/EEG.pnts);
+        end;
+    end;
+    
     if strcmpi(g.rmeventchan, 'on') & strcmpi(dat.TYPE, 'BDF') & isfield(dat, 'BDF')
         disp('Removing event channel...');
         if size(EEG.data,1) >= dat.BDF.Status.Channel, 
@@ -361,7 +391,7 @@ if ~isempty(dat.EVENT)
         EEG.nbchan = size(EEG.data,1);
     end;
     EEG = eeg_checkset(EEG, 'eventconsistency');
-else 
+elseif isempty(EEG.event) 
     disp('Warning: no event found. Events might be embeded in a data channel.');
     disp('         To extract events, use menu File > Import Event Info > From data channel');
 end;
