@@ -127,6 +127,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.64  2008/09/24 16:39:36  arno
+% Faster computation if custom time points and allow non power of 2 FFT
+%
 % Revision 1.63  2008/06/25 16:26:26  arno
 % speed up time index lookup
 %
@@ -700,7 +703,8 @@ else
     % check boundaries
     % ----------------
     wintime = 500*winsize/srate;
-    tmpind  = find( (timevals >= tlimits(1)+wintime) & (timevals <= tlimits(2)-wintime) );
+    tmpind  = find( (timevals >= tlimits(1)+wintime-0.0001) & (timevals <= tlimits(2)-wintime+0.0001) ); 
+    % 0.0001 account for numerical innacuracies on opterons
     if isempty(tmpind)
         error('No time points. Reduce time window or minimum frequency.');
     end;
