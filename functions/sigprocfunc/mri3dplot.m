@@ -57,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2009/05/07 23:32:47  arno
+% adding mri3dplot
+%
 % Revision 1.18  2009/03/30 23:14:31  arno
 % Implement the overwrite method
 %
@@ -181,6 +184,11 @@ function [smoothprob3d, mriplanes] = mri3dplot(prob3d, mri, varargin)
 
     disp('Plotting...');
 
+    % custom view for each slice
+    if length( g.mriview ) < length( g.mrislices )
+        g.mriview(2:length( g.mrislices )) = g.mriview(1);
+    end;
+    
     for index = 1:length( g.mrislices ) %%%%%%% for each plotted MR image slice %%%%%%%%
 
         mysubplot(g.geom(1), g.geom(2), index); % get an image slice axis
