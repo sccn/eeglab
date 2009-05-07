@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2009/05/07 00:01:23  arno
+% now calling biosig2eeglab
+%
 % Revision 1.33  2009/05/01 01:06:32  arno
 % Allow writing EDF/BDF/GDF files
 %
@@ -211,9 +214,9 @@ if nargin < 1
     uilist = { uilist{:} ...
                  { 'style' 'text' 'String' 'Extract event - cannot be unset (set=yes)' } ...
                  { 'style' 'checkbox' 'string' '' 'value' 1 'enable' 'off' } {} ...
-                 { 'style' 'text' 'String' 'Import continuous data (set=yes)' } ...
+                 { 'style' 'text' 'String' 'Import continuous data (set=yes)' 'value' 1} ...
                  { 'style' 'checkbox' 'string' '' 'value' 0 } {} ...
-                 { 'style' 'text' 'String' 'Reference chan(s) indices - required for BIOSEMI (''all''= average ref)' } ...
+                 { 'style' 'text' 'String' 'Reference chan(s) indices - required for BIOSEMI' } ...
                  { 'style' 'edit' 'string' '' } };
     geom = { geom{:} [3 0.2 0.5] [3 0.2 0.5] [3 1] };
 
@@ -241,7 +244,7 @@ g = finputcheck( options, { 'blockrange'  'integer' [0 Inf]    [];
                             'channels'    'integer' [0 Inf]    [];
                             'ref'         'integer' [0 Inf]    [];
                             'rmeventchan' 'string'  { 'on' 'off' } 'on';
-                            'blockepoch'  'string'  { 'on' 'off' } 'on' }, 'pop_biosig');
+                            'blockepoch'  'string'  { 'on' 'off' } 'off' }, 'pop_biosig');
 if isstr(g), error(g); end;
 
 % import data
