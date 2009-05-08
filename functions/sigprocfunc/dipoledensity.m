@@ -85,6 +85,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2009/05/08 21:52:27  arno
+% fix calling convention
+%
 % Revision 1.3  2009/05/08 20:53:57  arno
 % more parameters for dipolendesity
 %
@@ -230,8 +233,10 @@ if ~iscell(dipplotargs) % convert input
         end;
         dipplotargs = model;
     end;
+    dipplotargs = { dipplotargs 'coordformat' g.coordformat };
+else 
+    dipplotargs = { dipplotargs{:} 'coordformat' g.coordformat };
 end;
-dipplotargs = { dipplotargs{:} 'coordformat' g.coordformat };
 struct = dipplot(dipplotargs{:}, 'plot', g.dipplot);
 if nargout == 0
     drawnow;
