@@ -8,7 +8,9 @@
 % Input: 
 %   array3d     - 3-D array to plot translucently on top of MRI image planes
 %                  (e.g., as returned by dipoledensity(), unit: dipoles/cc).
-%   mri         - base MR image structure (as returned by dipoledensity())
+%   mri         - [string or struct] base MR image structure (as returned by 
+%                 dipoledensity.m or mri file (matlab format or file format read 
+%                 by fcdc_read_mri. See dipplot.m help for more information.
 %
 % Optional inputs:
 %   'mriview'   - ['top'|'side'|rear'] MR image slices to plot. 'axial',
@@ -27,6 +29,9 @@
 %   'cmax'      - [float] color palette max value {default: array3d max}
 %   'cmin'      - [float] color palette min value {default: 0}
 %   'cbar'      - ['on'|'off'] plot colorbar. Default is 'on'.  
+%   'subplot'   - ['on'|'off'] for single slice only, plot within a sub-plot
+%                 panel. If 'on', this automatically sets 'cbar' to 'off'.
+%                 Default is 'off'.  
 %   'mixfact'   - [float] factor for mixing the background image with the
 %                 array3d information. Default is 0.5.
 %   'mixmode'   - ['add'|'overwrite'] 'add' will allow for trasnparency
@@ -58,6 +63,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2009/05/08 02:13:21  arno
+% better aspect ratio for figure
+%
 % Revision 1.4  2009/05/08 02:04:43  arno
 % better figure geometry
 %
@@ -143,6 +151,7 @@ function [smoothprob3d, mriplanes] = mri3dplot(prob3d, mri, varargin)
                         'mixfact'   'float'    []                        0.5;
                         'cmin'      'float'    []                        0;
                         'cbar'      'string'   { 'on' 'off' }            'on';
+                        'subplot'   'string'   { 'on' 'off' }            'off';
                         'rotate'    'integer'  { 0 90 180 270 }          90;
                         'kernel'    'float'    []                        0 });
     if isstr(g), error(g); end;
@@ -150,6 +159,30 @@ function [smoothprob3d, mriplanes] = mri3dplot(prob3d, mri, varargin)
     if strcmpi(g.mriview,'sagittal'),    g.mriview = 'side'; 
     elseif strcmpi(g.mriview,'axial'),   g.mriview = 'top'; 
     elseif strcmpi(g.mriview,'coronal'), g.mriview = 'rear';
+    end;
+    if strcmpi(g.subplot, 'on') % plot colorbar
+        g.cbar = 'off';
+    end;
+    if isstr(mri)
+         try, 
+            mri = load('-mat', mri);
+            mri = mri.mri;
+        catch,
+            disp('Failed to read Matlab file. Attempt to read MRI file using function read_fcdc_mri');
+            try,
+                warning off;
+                mri = read_fcdc_mri(mri);
+                mri.anatomy = round(gammacorrection( mri.anatomy, 0.8));
+                mri.anatomy = uint8(round(mri.anatomy/max(reshape(mri.anatomy, prod(mri.dim),1))*255));
+                % WARNING: if using double instead of int8, the scaling is different 
+                % [-128 to 128 and 0 is not good]
+                % WARNING: the transform matrix is not 1, 1, 1 on the diagonal, some slices may be 
+                % misplaced
+                warning on;
+            catch,
+                error('Cannot load file using read_fcdc_mri');
+            end;
+         end;
     end;
     
     % normalize prob3d for 1 to ncolors and create 3-D dim
@@ -190,11 +223,13 @@ function [smoothprob3d, mriplanes] = mri3dplot(prob3d, mri, varargin)
         g.geom(2) = ceil((length(g.mrislices)+add1)/g.geom);
     end;
 
-    fig = figure;
-
-    pos = get(fig, 'position');
-    set(fig, 'position', [ pos(1)+15 pos(2)+15 pos(3)/4*g.geom(1) pos(4)/3*g.geom(2) ]);
-
+    if strcmpi(g.subplot, 'off')
+        fig = figure;
+        
+        pos = get(fig, 'position');
+        set(fig, 'position', [ pos(1)+15 pos(2)+15 pos(3)/4*g.geom(1) pos(4)/3*g.geom(2) ]);
+    end;
+    
     disp('Plotting...');
     
     % custom view for each slice
@@ -287,7 +322,9 @@ function [smoothprob3d, mriplanes] = mri3dplot(prob3d, mri, varargin)
     end;
     
     fprintf('\n');
-    set(fig,'color', g.cmap(1,:)/2);
+    if exist('fig') == 1
+        set(fig,'color', g.cmap(1,:)/2);
+    end;
 return;
 
 function mat = rotatemat(mat, angle);
