@@ -13,7 +13,8 @@
 % Optional inputs:
 %   'mriview'   - ['top'|'side'|rear'] MR image slices to plot. 'axial',
 %                    'coronal', and 'saggital' are also recognized keywords
-%                    {default|[]: 'top'|'axial'}
+%                    {default|[]: 'top'|'axial'}. May also be a cell array
+%                    of such keyword (one per slice).
 %   'mrislices' - [real vector] MR slice plotting coordinates in 'mriview' 
 %                    direction {default|[]: -50 to +50 in steps of 11 mm}
 %   'kernel'    - 3-D smoothing ht, width, & depth in voxels {default|0: none}
@@ -25,6 +26,7 @@
 %                    {default: 'hot'}
 %   'cmax'      - [float] color palette max value {default: array3d max}
 %   'cmin'      - [float] color palette min value {default: 0}
+%   'cbar'      - ['on'|'off'] plot colorbar. Default is 'on'.  
 %   'mixfact'   - [float] factor for mixing the background image with the
 %                 array3d information. Default is 0.5.
 %   'mixmode'   - ['add'|'overwrite'] 'add' will allow for trasnparency
@@ -33,8 +35,7 @@
 %
 % Outputs:
 %   smoothed_3ddens - the plotted (optionally smoothed) 3-D density matrix
-%   mriplanes       - depth (in the 'mriview' direction) of the plotted MR 
-%                     image slices
+%   mriplanes       - cell array of the plotted MR image slices
 %
 % Author: Arnaud Delorme & Scott Makeig, SCCN, 10 June 2003
 %
@@ -57,6 +58,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2009/05/07 23:35:36  arno
+% custom view for each slice
+%
 % Revision 1.1  2009/05/07 23:32:47  arno
 % adding mri3dplot
 %
@@ -122,8 +126,8 @@ function [smoothprob3d, mriplanes] = mri3dplot(prob3d, mri, varargin)
     translucency    = 0.5;    % default alpha value
     mri_lim         = 85;     % +/- axis limits of MNI head image
     
-    g = finputcheck( varargin, { 'mriview'   'string'   { 'sagital' 'axial' 'coronal' ...
-                                                          'top' 'side' 'rear' }   'top';
+    g = finputcheck( varargin, { 'mriview'   { 'string' 'cell' }  { { 'sagital' 'axial' 'coronal' ...
+                                                          'top' 'side' 'rear' } {} }   'top';
                         'mixmode'   'string'   { 'add' 'overwrite' }     'add';
                         'mrislices' 'float'    []                        [];
                         'view'      'float'    []                        [];
@@ -132,6 +136,7 @@ function [smoothprob3d, mriplanes] = mri3dplot(prob3d, mri, varargin)
                         'cmax'      'float'    []                        [];
                         'mixfact'   'float'    []                        0.5;
                         'cmin'      'float'    []                        0;
+                        'cbar'      'string'   { 'on' 'off' }            'on';
                         'rotate'    'integer'  { 0 90 180 270 }          90;
                         'kernel'    'float'    []                        0 });
     if isstr(g), error(g); end;
@@ -172,18 +177,20 @@ function [smoothprob3d, mriplanes] = mri3dplot(prob3d, mri, varargin)
     if isempty(g.mrislices), 
         g.mrislices = linspace(-50, 50, DEFAULT_SPACING); 
     end;
-    if isempty(g.geom), 
-        g.geom = ceil(sqrt(length(g.mrislices)+1)); 
-        g.geom(2) = ceil((length(g.mrislices)+1)/g.geom);
-    end;
     
-    figure;
+    if strcmpi(g.cbar, 'on'), add1 = 1; else add1 = 0; end;
+    if isempty(g.geom), 
+        g.geom = ceil(sqrt(length(g.mrislices)+add1)); 
+        g.geom(2) = ceil((length(g.mrislices)+add1)/g.geom);
+    end;
 
-    pos = get(gcf, 'position');
-    set(gcf, 'position', [ pos(1)+15 pos(2)+15 pos(3) pos(4)/g.geom(2)*g.geom(1) ]);
+    fig = figure;
+
+    pos = get(fig, 'position');
+    set(fig, 'position', [ pos(1)+15 pos(2)+15 pos(3) pos(4)/g.geom(2)*g.geom(1) ]);
 
     disp('Plotting...');
-
+    
     % custom view for each slice
     if length( g.mriview ) < length( g.mrislices )
         g.mriview(2:length( g.mrislices )) = g.mriview(1);
@@ -192,7 +199,7 @@ function [smoothprob3d, mriplanes] = mri3dplot(prob3d, mri, varargin)
     for index = 1:length( g.mrislices ) %%%%%%% for each plotted MR image slice %%%%%%%%
 
         mysubplot(g.geom(1), g.geom(2), index); % get an image slice axis
-        switch g.mriview
+        switch g.mriview{index}
          case 'side', coord = [  g.mrislices(index) 0 0 1 ]; 
          case 'top' , coord = [  0 0 g.mrislices(index) 1 ]; 
          case 'rear', coord = [  0 g.mrislices(index) 0 1 ]; 
@@ -200,7 +207,7 @@ function [smoothprob3d, mriplanes] = mri3dplot(prob3d, mri, varargin)
         
         coord = round( pinv(mri.transform)*coord' )';
         
-        switch g.mriview
+        switch g.mriview{index}
          case 'side', mriplot  = squeeze( mri.anatomy(coord(1), :, :) );
          case 'top' , mriplot  = squeeze( mri.anatomy(:, :, coord(3)) );
          case 'rear', mriplot  = squeeze( mri.anatomy(:, coord(2), :) );
@@ -210,7 +217,7 @@ function [smoothprob3d, mriplanes] = mri3dplot(prob3d, mri, varargin)
         mriplot(:,:,3) = mriplot(:,:,1);
         mriplot = rotatemat( mriplot, g.rotate );
         
-        switch g.mriview
+        switch g.mriview{index}
          case 'side', densplot = squeeze( newprob3d  (coord(1), :, :, :) );
          case 'top' , densplot = squeeze( newprob3d  (:, :, coord(3), :) );
          case 'rear', densplot = squeeze( newprob3d  (:, coord(2), :, :) );
@@ -228,7 +235,7 @@ function [smoothprob3d, mriplanes] = mri3dplot(prob3d, mri, varargin)
             tmpmri = mriplot(:,:,3); tmpdens = densplot(:,:,3); tmpmri(indsnon0) = tmpdens(indsnon0); mriplot(:,:,3) = tmpmri;
         end;
         
-        mriplanes(:,:,:,index) = mriplot;
+        mriplanes{index} = mriplot;
         
         imagesc(mriplot); % plot [background MR image + density image]
 
@@ -250,7 +257,7 @@ function [smoothprob3d, mriplanes] = mri3dplot(prob3d, mri, varargin)
     
     % plot colorbar
     % -------------
-    if 1 % plot colorbar
+    if strcmpi(g.cbar, 'on') % plot colorbar
 
         h = mysubplot(g.geom(1), g.geom(2), length(g.mrislices)+1);
         pos = get(h, 'position');
@@ -273,7 +280,7 @@ function [smoothprob3d, mriplanes] = mri3dplot(prob3d, mri, varargin)
     end;
     
     fprintf('\n');
-    set(gcf,'color', g.cmap(1,:)/2);
+    set(fig,'color', g.cmap(1,:)/2);
 return;
 
 function mat = rotatemat(mat, angle);
