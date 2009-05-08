@@ -58,6 +58,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2009/05/08 02:02:52  arno
+% cbar etc...
+%
 % Revision 1.2  2009/05/07 23:35:36  arno
 % custom view for each slice
 %
@@ -187,7 +190,7 @@ function [smoothprob3d, mriplanes] = mri3dplot(prob3d, mri, varargin)
     fig = figure;
 
     pos = get(fig, 'position');
-    set(fig, 'position', [ pos(1)+15 pos(2)+15 pos(3) pos(4)/g.geom(2)*g.geom(1) ]);
+    set(fig, 'position', [ pos(1)+15 pos(2)+15 pos(3)/4*g.geom(1) pos(4)/4*g.geom(2)*g.geom(1) ]);
 
     disp('Plotting...');
     
