@@ -43,6 +43,8 @@
 %                 dipole density per session {default: 1}
 % 'plot'        - ['on'|'off'] force plotting dipole density|entropy 
 %                 {default: 'on' if no output arguments, else 'off'}
+% 'dipplot'     - ['on'|'off'] plot the dipplot image (used for converting
+%                 coordinates (default is 'off')
 % 'plotargs'    - {cell array} plotting arguments for mri3dplot() function.
 %
 % Outputs:
@@ -77,6 +79,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2009/05/07 22:47:16  arno
+% adding mri3dplot and dipoledensity
+%
 % Revision 1.30  2008/09/08 22:40:58  nima
 % _
 %
@@ -188,6 +193,7 @@ g = finputcheck(varargin, { 'subjind'     'integer'  []               [];
                             'subsample'   'integer'  []               2;
                             'plotargs'    'cell'     []               {};
                             'plot'        'string'  { 'on' 'off' }    fastif(nargout == 0, 'on', 'off');
+                            'dipplot'     'string'  { 'on' 'off' }   'off';
                             'normalization' 'string'  { 'on' 'off' } 'on';
                             'mri'         { 'struct' 'string' } [] ''});
 if isstr(g), error(g); end;
@@ -197,7 +203,7 @@ end;
 
 % plotting
 % --------
-struct = dipplot(dipplotargs{:});
+struct = dipplot(dipplotargs{:}, 'plot', g.dipplot);
 if nargout == 0
     drawnow;
 end;
