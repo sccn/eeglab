@@ -38,6 +38,7 @@
 %               superior-inferior). Use 'coregist' to coregister electrodes
 %               with the MRI. {default: 'mri'} 
 %  'verbose' - ['on'|'off'] comment on operations on command line {default: 'on'}.
+%  'plot'    - ['on'|'off'] only return outputs                  {default: 'off'}.
 %
 % Plotting options:
 %  'color'    - [cell array of color strings or (1,3) color arrays]. For
@@ -157,6 +158,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.154  2009/01/03 00:06:44  arno
+%fixed typo
+%
 %Revision 1.153  2008/12/23 02:17:13  arno
 %fix help message
 %
@@ -644,6 +648,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                                  'spheres'   'string'  {'on' 'off'}         'off';
                                  'links'     'real'   []                    [];
                                  'image'     { 'string' 'real' } []         'mri';
+                                 'plot'      'string'   { 'on' 'off' }      'on';
                                  'meshdata'  { 'string' 'cell' } []         '' }, 'dipplot');
     %                             'std'       'cell'     []                  {}; 
     %                             'coreg'     'real'     []                  [];
@@ -900,7 +905,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     % plot head graph in 3D
     % ---------------------
     if strcmp(g.gui, 'on')
-        figure; 
+        fig = figure('visible', g.plot); 
         pos = get(gca, 'position');
         set(gca, 'position', [pos(1)+0.05 pos(2:end)]);
     end;
@@ -1354,6 +1359,12 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     updatedipplot(gcf);
     
     rotate3d on;
+    
+    % close figure if necessary
+    if strcmpi(g.plot, 'off')
+        try, close(fig); catch, end;
+    end;
+    
 return;
 
 % electrode space to MRI space
