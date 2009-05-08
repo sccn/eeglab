@@ -63,6 +63,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2009/05/08 20:57:38  arno
+% fix subplot
+%
 % Revision 1.6  2009/05/08 20:54:10  arno
 % more parameters for mri3dplot
 %
@@ -149,7 +152,7 @@ function [smoothprob3d, mriplanes] = mri3dplot(prob3d, mri, varargin)
                         'mrislices' 'float'    []                        [];
                         'view'      'float'    []                        [];
                         'geom'      'float'    []                        [];
-                        'cmap'      'float'    []                        jet;
+                        'cmap'      'float'    []                        jet(64);
                         'cmax'      'float'    []                        [];
                         'mixfact'   'float'    []                        0.5;
                         'cmin'      'float'    []                        0;
