@@ -63,6 +63,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2009/05/08 20:54:10  arno
+% more parameters for mri3dplot
+%
 % Revision 1.5  2009/05/08 02:13:21  arno
 % better aspect ratio for figure
 %
@@ -240,7 +243,9 @@ function [smoothprob3d, mriplanes] = mri3dplot(prob3d, mri, varargin)
     
     for index = 1:length( g.mrislices ) %%%%%%% for each plotted MR image slice %%%%%%%%
 
-        mysubplot(g.geom(1), g.geom(2), index); % get an image slice axis
+        if strcmpi(g.subplot, 'off')
+            mysubplot(g.geom(1), g.geom(2), index); % get an image slice axis
+        end;
         switch g.mriview{index}
          case 'side', coord = [  g.mrislices(index) 0 0 1 ]; 
          case 'top' , coord = [  0 0 g.mrislices(index) 1 ]; 
@@ -294,7 +299,8 @@ function [smoothprob3d, mriplanes] = mri3dplot(prob3d, mri, varargin)
 
         axis equal;
         if ~isempty(g.view), view(g.view); end;
-        title( [ int2str(g.mrislices(index)) ' mm' ], 'color', 'w');
+        tit = title( [ int2str(g.mrislices(index)) ' mm' ]);
+        if strcmpi(g.subplot, 'off'), set(tit, 'color', 'w'); end;
     end;
     
     % plot colorbar
