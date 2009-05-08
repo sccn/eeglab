@@ -9,17 +9,18 @@
 %                   MR brain image ('standard_BESA/avg152t1.mat'). Calls dipplot(), 
 %                   mri3dplot(), and Fieldtrip function find_inside_vol(). 
 % Usage:
-%               >> [dens3d mri] = dipoledensity( dipplotargs, 'key',val, ... );
+%               >> [dens3d mri] = dipoledensity( dipoles, 'key',val, ... );
 % Inputs: 
-%    dipplotargs - dipplot() style arguments for specifying and plotting dipoles 
-%                  The dipplot() function is used to convert dipole coordinates to 
-%                  MNI brain coordinates. See >> help dipplot
+%    dipoles - this may be either the same dipole structure given as input to 
+%              the dipplot() function, a 3 by n array of dipole localization or
+%              a cell array containing arguments for the dipplot function. Note that
+%              the 'coordformat' option below defines the coordinate space for these
+%              dipoles (default is MNI). See help dipplot for more information.
 %
 % Optional 'key', val input pairs:
-%
-%    'subjind'  - [(1,ncomps) array] subject index for each dipole model. If two 
-%                 dipoles are in one component model, give only one subject index. 
-%    'method'   - ['alldistance'|'distance'|'entropy'|'relentropy'] method for 
+%  'mri'        - [string or struct] mri file (matlab format or file format read 
+%                 by fcdc_read_mri. See dipplot.m help for more information.
+%  'method'     - ['alldistance'|'distance'|'entropy'|'relentropy'] method for 
 %                            computing density: 
 %                 'alldistance' - {default} take into account the gaussian-weighted 
 %                            distances from each voxel to all the dipoles. See 
@@ -38,6 +39,10 @@
 % 'subsample'   - [integer] subsampling of native MNI image {default: 2 -> 2x2x2}
 % 'weight'      - [(1,ncomps) array] for 'distance'|'alldistance' methods, the 
 %                 relative weight of each component dipole {default: ones()}
+% 'coordformat' - ['mni'|'spherical'] coordinate format if dipole location or 
+%                 a structure is given as input. Default is 'mni'.
+% 'subjind'     - [(1,ncomps) array] subject index for each dipole model. If two 
+%                 dipoles are in one component model, give only one subject index. 
 % 'nsessions'   - [integer] for 'alldistance' method, the number of sessions to 
 %                 divide the output values by, so that the returned measure is 
 %                 dipole density per session {default: 1}
@@ -53,10 +58,11 @@
 %  mri          - {MRI structure} used in mri3dplot().
 %
 % Example: 
-%         >> [dens3d mri] = dipoledensity( dipplotargs, ... % save outputs, no plot
-%                                   'method', 'alldistance', 'methodparam', 20);
-%         >> mri3dplot(dens3d,mri);                         % plot outputs - see its
-%                                                           % help msg for options
+%         >> fakedipoles = (rand(3,10)-0.5)*80;
+%         >> [dens3d mri] = dipoledensity( fakedipoles, 'coordformat', 'mni'); 
+%         >> mri3dplot(dens3d,mri); % replot if no output is given above
+%                                   % function is called automatically
+%
 % See also:
 %           EEGLAB: dipplot(), mri3dplot(), Fieldtrip: find_inside_vol() 
 %
@@ -79,6 +85,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2009/05/08 01:56:52  arno
+% nothing
+%
 % Revision 1.1  2009/05/07 22:47:16  arno
 % adding mri3dplot and dipoledensity
 %
@@ -194,6 +203,7 @@ g = finputcheck(varargin, { 'subjind'     'integer'  []               [];
                             'plotargs'    'cell'     []               {};
                             'plot'        'string'  { 'on' 'off' }    fastif(nargout == 0, 'on', 'off');
                             'dipplot'     'string'  { 'on' 'off' }   'off';
+                            'coordformat' 'string'  { 'mni' 'spherical' }   'mni';
                             'normalization' 'string'  { 'on' 'off' } 'on';
                             'mri'         { 'struct' 'string' } [] ''});
 if isstr(g), error(g); end;
@@ -201,8 +211,24 @@ if ~strcmpi(g.method, 'alldistance') & isempty(g.subjind)
     error('Subject indices are required for this method');
 end;
 
-% plotting
-% --------
+% plotting dipplot
+% ----------------
+if ~iscell(dipplotargs) % convert input
+    if ~isstruct(dipplotargs)
+        if size(dipplotargs,1) == 3, dipplotargs = dipplotargs';
+        elseif size(dipplotargs,2) ~= 3
+            error('If an array of dipoles is given as entry, there must be 3 columns or 3 rows for x y z');
+        end;
+        model = [];
+        for idip = 1:length(dipplotargs)
+            model(idip).posxyz = dipplotargs(idip,:);
+            model(idip).momxyz = [1 0 0];
+            model(idip).rv = 0.5;
+        end;
+        dipplotargs = model;
+    end;
+end;
+dipplotargs = { dipplotargs 'coordformat' g.coordformat };
 struct = dipplot(dipplotargs{:}, 'plot', g.dipplot);
 if nargout == 0
     drawnow;
@@ -281,10 +307,29 @@ if isempty(g.mri) % default MRI file
     delim  = folder(end);
     g.mri = [ folder 'standard_BESA' delim 'avg152t1.mat' ];
 end
-g.mri = load('-mat', g.mri); % read anatomic image structure
-g.mri = g.mri.mri; % replace it by the image itself
+if isstr(g.mri)
+    try, 
+        mri = load('-mat', g.mri);
+        mri = mri.mri;
+    catch,
+        disp('Failed to read Matlab file. Attempt to read MRI file using function read_fcdc_mri');
+        try,
+            warning off;
+            mri = read_fcdc_mri(g.mri);
+            mri.anatomy = round(gammacorrection( mri.anatomy, 0.8));
+            mri.anatomy = uint8(round(mri.anatomy/max(reshape(mri.anatomy, prod(mri.dim),1))*255));
+            % WARNING: if using double instead of int8, the scaling is different 
+            % [-128 to 128 and 0 is not good]
+            % WARNING: the transform matrix is not 1, 1, 1 on the diagonal, some slices may be 
+            % misplaced
+            warning on;
+        catch,
+            error('Cannot load file using read_fcdc_mri');
+        end;
+    end;
+end;
 
-mri = g.mri; % output the anatomic mri image 
+g.mri = mri; % output the anatomic mri image 
 
 % reserve array for density
 % -------------------------
