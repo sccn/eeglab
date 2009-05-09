@@ -322,6 +322,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.156  2009/05/09 01:53:12  arno
+% adding new baseline options
+%
 % Revision 1.155  2009/04/30 19:26:09  julie
 % Fixed the 'rboot' and 'pboot' input options
 %
@@ -1132,7 +1135,7 @@ g = finputcheck(varargin, ...
     'itcavglim'     'real'      []           []; ...
     'erplim'        'real'      []           []; ...
     'speclim'       'real'      []           []; ...
-    'scale'         'string'    { 'log' 'abs'} 'abs'; ...
+    'scale'         'string'    { 'log' 'abs'} 'log'; ...
     'timewarp'      'real'      []           []; ...
     'timewarpms'    'real'      []           []; ...
     'timewarpfr'    'real'      []           []; ...
@@ -1878,9 +1881,9 @@ baselength = length(baseln);
 % original ERSP baseline removal (log)
 if ~isnan( g.baseline(1) ) & ~isnan( mbase ) & strcmpi(g.scale, 'log') & strcmpi(g.trialbase, 'off')
     
-    P = 10 * (log10(P) - repmat(log10(mbase(1:size(P,1)))',[1 length(timesout)])); % convert to (10log10) dB
+    P = 10 * (log10(P) - repmat(log10(mbase),[1 length(timesout)])); % convert to (10log10) dB
     if ~isempty(Pboot) & isnan(g.pboot)
-        Pboot = 10 * (log10(Pboot) - repmat(log10(mbase(1:size(P,1)))',[1 size(Pboot,2)])); % convert to (10log10) dB
+        Pboot = 10 * (log10(Pboot) - repmat(log10(mbase),[1 size(Pboot,2)])); % convert to (10log10) dB
     end;
     
 % ERSP baseline normalized
