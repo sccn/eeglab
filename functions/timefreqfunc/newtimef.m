@@ -93,12 +93,6 @@
 %                     Note that for obtaining 'log' spaced freqs using FFT,
 %                     closest correspondant frequencies in the 'linear' space
 %                     are returned.
-%       'baseline'  = Spectral baseline end-time (in ms). NaN imply that no
-%                      baseline is used. A range [min max] may also be entered
-%                     You may also enter one row per region for baseline
-%                     e.g. [0 100; 300 400] considers the window 0 to 100 ms and
-%                     300 to 400 ms {default: 0}
-%       'powbase'   = Baseline spectrum to log-subtract {default|NaN -> from data}
 %       'lowmem'    = ['on'|'off'] compute frequency by frequency to save
 %                     memory. {default: 'off'}
 %       'verbose'   = ['on'|'off'] print text {'on'}
@@ -113,6 +107,22 @@
 %       'cycleinc'    ['linear'|'log'] increase mode if [min max] cycles is
 %                     provided in 'cycle' parameter. Applies only to 
 %                     'wletmethod','dftfilt'  {default: 'linear'}
+%
+%   Optional baseline parameters:
+%       'baseline'  = Spectral baseline end-time (in ms). NaN imply that no
+%                     baseline is used. A range [min max] may also be entered
+%                     You may also enter one row per region for baseline
+%                     e.g. [0 100; 300 400] considers the window 0 to 100 ms and
+%                     300 to 400 ms {default: 0 -> all negative time values}. 
+%                     This parameter is valid to define all baseline types below.
+%                     Once more "NaN" prevents baseline subtraction.
+%       'powbase'   = Baseline spectrum to log-subtract {default|NaN -> from data}
+%       'basenorm'  = ['on'|'off'] 'on' normalize baseline in the power spectral
+%                     average instead of 'off' dividing by the average power across 
+%                     trials at each frequency (gain model). Default: 'off'.
+%       'trialbase' = ['on'|'off'] perform baseline (normalization or division 
+%                     above in single trial instead of the trial average. Default
+%                     if 'off'. 
 %
 %    Optional time warping parameter: 
 %       'timewarp'  = [eventms matrix] Time-warp amplitude and phase time-
@@ -133,6 +143,8 @@
 %                     the time-warped 'eventms' columns (above) to plot with 
 %                     vertical lines. If undefined, all columns are plotted. 
 %                     Overwrites the 'vert' argument (below) if any.
+%     'trialbase'   = ['on'|'off'] compute baseline in single trial {'off'}
+%     'trialnorm'   = ['on'|'off'] normalize single trial activity {'off'}
 %
 %    Optional bootstrap parameters:
 %       'alpha'     = If non-0, compute two-tailed bootstrap significance 
@@ -177,7 +189,10 @@
 %                     'nosedir', 'plotrad', and/or 'chantype'. See these 
 %                     field definitions above, below.
 %                     {default: nosedir +X, plotrad 0.5, all channels}
+%
 %     Optional Plotting Parameters:
+%       'scale'     = ['log'|'abs'] visualize power in log scale (dB) or absolute
+%                     scale. Default is 'log'.
 %       'plottype'  = ['image'|'curve'] plot time frequency images or
 %                     curves (one curve per frequency). {default: 'image'}
 %       'plotmean'  = ['on'|'off'] For 'curve' plots only. Average all
@@ -307,6 +322,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.155  2009/04/30 19:26:09  julie
+% Fixed the 'rboot' and 'pboot' input options
+%
 % Revision 1.154  2008/09/24 16:39:11  arno
 % parameter checking
 %
@@ -1050,7 +1068,6 @@ elseif (varwin < 0)
     error('Value of cycles must be zero or positive.');
 end
 
-%{
 % build a structure for keyword arguments
 % --------------------------------------
 if ~isempty(varargin)
@@ -1082,6 +1099,7 @@ g = finputcheck(varargin, ...
     'plotitc'       'string'    {'on','off'} 'on'; ...
     'detrend'       'string'    {'on','off'} 'off'; ...
     'rmerp'         'string'    {'on','off'} 'off'; ...
+    'basenorm'      'string'    {'on','off'} 'off'; ...
     'baseline'      'real'      []           0; ...
     'baseboot'      'real'      []           1; ...
     'linewidth'     'integer'   [1 2]        2; ...
@@ -1114,6 +1132,7 @@ g = finputcheck(varargin, ...
     'itcavglim'     'real'      []           []; ...
     'erplim'        'real'      []           []; ...
     'speclim'       'real'      []           []; ...
+    'scale'         'string'    { 'log' 'abs'} 'abs'; ...
     'timewarp'      'real'      []           []; ...
     'timewarpms'    'real'      []           []; ...
     'timewarpfr'    'real'      []           []; ...
@@ -1122,6 +1141,7 @@ g = finputcheck(varargin, ...
     'timeStretchMarks'  'real'  []           []; ...
     'timeStretchRefs'   'real'  []           []; ...
     'timeStretchPlot'   'real'  []           []; ...
+    'trialbase'     'string'    {'on','off'} 'off'; 
     'hzdir'         'string'    {'up','down','normal','reverse'}   HZDIR; ...
     'ydir'          'string'    {'up','down','normal','reverse'}   YDIR; ...
     'wletmethod'    'string'   { 'dftfilt3' 'dftfilt2' 'dftfilt'}  'dftfilt3'; ...
@@ -1130,7 +1150,7 @@ g = finputcheck(varargin, ...
 if isstr(g), error(g); end;
 if strcmpi(g.freqscale, 'log') & g.freqs(1) == 0, g.freqs(1) = 3; end;
 if strcmpi(g.plotamp, 'off'), g.plotersp = 'off'; end;    
-
+if strcmpi(g.basenorm, 'on'), g.scale = 'abs'; end;
 
 g.tlimits = tlimits;
 g.frames   = frames;
@@ -1143,11 +1163,6 @@ g.TITLE_FONT       = TITLE_FONT;
 g.ERSP_CAXIS_LIMIT = ERSP_CAXIS_LIMIT;
 g.ITC_CAXIS_LIMIT  = ITC_CAXIS_LIMIT;
 if ~strcmpi(g.plotphase, 'on'), g.plotphasesign = g.plotphase; end;
-if isnan(g.baseline)
-    g.unitpower = 'uV/Hz';
-else
-    g.unitpower = 'dB';
-end;
 
 % unpack 'timewarp' (and undocumented 'timewarpfr') arguments
 %------------------------------------------------------------
@@ -1647,36 +1662,17 @@ end;
 
 if g.cycles(1) == 0
     alltfX = 2*0.375*alltfX/g.winsize; % TF and MC (12/11/2006): normalization, divide by g.winsize
-    P  = mean(alltfX.*conj(alltfX), 3); % power    
+    P  = alltfX.*conj(alltfX); % power    
     % TF and MC (12/14/2006): multiply by 2 account for negative frequencies,
     % and ounteract the reduction by a factor 0.375 that occurs as a result of 
     % cosine (Hann) tapering. Refer to Bug 446
 else 
-    P  = mean(alltfX.*conj(alltfX), 3); % power for wavelets
+    P  = alltfX.*conj(alltfX); % power for wavelets
 end;
 
-% ----------------
-% phase amp option
-% ----------------
-if strcmpi(g.phsamp, 'on')
-    %  switch g.phsamp
-    %  case 'on'
-    PA = zeros(size(P,1),size(P,1),g.timesout); % NB: (freqs,freqs,times)
-    % $$$ end                                             %       phs   amp
-    %PA (freq x freq x time)
-    PA(:,:,j) = PA(:,:,j)  + (tmpX ./ abs(tmpX)) * ((PP(:,j)))';
-    % x-product: unit phase column
-    % times amplitude row
-
-    tmpcx(1,:,:) = cumulX; % allow ./ below
-    for jj=1:g.timesout
-        PA(:,:,jj) = PA(:,:,jj) ./ repmat(PP(:,jj)', [size(PP,1) 1]);
-    end
-end
-
-% --------
-% baseline
-% --------
+% ---------------
+% baseline length
+% ---------------
 if size(g.baseline,2) == 2
     baseln = [];
     for index = 1:size(g.baseline,1)
@@ -1699,11 +1695,48 @@ if ~isnan(g.alpha) & length(baseln)==0
     return
 end
 
+% -----------------------------------------
+% remove baseline on a trial by trial basis
+% -----------------------------------------
+if strcmpi(g.trialbase, 'on') & isnan( g.powbase )
+    mbase = mean(P(:,baseln,:),2);
+    if strcmpi(g.basenorm, 'on')
+        mstd = std(P(:,baseln,:),[],2);
+        P = (P-repmat(mbase,[1 size(P,2) 1]))./repmat(mstd,[1 size(P,2) 1]); % convert to log then back to normal
+    else
+        P = P./repmat(mbase,[1 size(P,2) 1]); 
+        %P = 10 .^ (log10(P) - repmat(log10(mbase),[1 size(P,2) 1])); % same as above
+    end;
+end;    
+
+% ----------------
+% phase amp option
+% ----------------
+if strcmpi(g.phsamp, 'on')
+    disp( 'phsamp option is deprecated');
+    %  switch g.phsamp
+    %  case 'on'
+    %PA = zeros(size(P,1),size(P,1),g.timesout); % NB: (freqs,freqs,times)
+    % $$$ end                                             %       phs   amp
+    %PA (freq x freq x time)
+    %PA(:,:,j) = PA(:,:,j)  + (tmpX ./ abs(tmpX)) * ((P(:,j)))';
+    % x-product: unit phase column
+    % times amplitude row
+
+    %tmpcx(1,:,:) = cumulX; % allow ./ below
+    %for jj=1:g.timesout
+    %    PA(:,:,jj) = PA(:,:,jj) ./ repmat(P(:,jj)', [size(P,1) 1]);
+    %end
+end
+
 % ---------
 % bootstrap
 % --------- % this ensures that if bootstrap limits provided that no
 % 'alpha' won't prevent application of the provided limits
 if ~isnan(g.alpha) | ~isempty(find(~isnan(g.pboot))) | ~isempty(find(~isnan(g.rboot)))% if bootstrap analysis requested . . .
+    
+    % ERSP bootstrap
+    % --------------
     if ~isempty(find(~isnan(g.pboot))) % if ERSP bootstrap limits provided already
         Pboot = g.pboot;
     else
@@ -1734,14 +1767,16 @@ if ~isnan(g.alpha) | ~isempty(find(~isnan(g.pboot))) | ~isempty(find(~isnan(g.rb
         % power significance
         % ------------------
         formula = 'mean(arg1,3);';
-        inputdata = alltfX.*conj(alltfX);
-        [ Pboot Pboottrialstmp Pboottrials] = bootstat(inputdata, formula, 'boottype', 'shuffle', ...
+        [ Pboot Pboottrialstmp Pboottrials] = bootstat(P, formula, 'boottype', 'shuffle', ...
             'label', 'ERSP', 'bootside', 'both', 'naccu', g.naccu, ...
             'basevect', baselntmp, 'alpha', g.alpha, 'dimaccu', 2 );
         clear Pboottrialstmp;
         
         if size(Pboot,2) == 1, Pboot = Pboot'; end;
     end;
+    
+    % ITC bootstrap
+    % -------------
     if ~isempty(find(~isnan(g.rboot))) % if itc bootstrap provided
         Rboot = g.rboot;
     else
@@ -1791,6 +1826,10 @@ else
     Pboot = []; Rboot = [];
 end
 
+% average the power
+% -----------------
+P    = mean(P, 3);
+
 % correction for multiple comparisons
 % -----------------------------------
 maskersp = [];
@@ -1826,21 +1865,61 @@ end;
 
 if isnan(g.powbase)
     verboseprintf(g.verbose, 'Computing the mean baseline spectrum\n');
-    mbase = mean(P(:,baseln),2)';
+    mbase = mean(P(:,baseln),2);
 else
     verboseprintf(g.verbose, 'Using the input baseline spectrum\n');
     mbase = 10.^(g.powbase/10);
 end
 baselength = length(baseln);
-if ~isnan( g.baseline(1) ) & ~isnan( mbase )
+
+% ---------------
+% remove baseline
+% ---------------
+% original ERSP baseline removal (log)
+if ~isnan( g.baseline(1) ) & ~isnan( mbase ) & strcmpi(g.scale, 'log') & strcmpi(g.trialbase, 'off')
+    
     P = 10 * (log10(P) - repmat(log10(mbase(1:size(P,1)))',[1 length(timesout)])); % convert to (10log10) dB
     if ~isempty(Pboot) & isnan(g.pboot)
         Pboot = 10 * (log10(Pboot) - repmat(log10(mbase(1:size(P,1)))',[1 size(Pboot,2)])); % convert to (10log10) dB
     end;
-else
+    
+% ERSP baseline normalized
+elseif ~isnan( g.baseline(1) ) & ~isnan( mbase ) & strcmpi(g.basenorm, 'on')
+
+    mstd = std(P(:,baseln),[],2);
+    P = (P-repmat(mbase,[1 size(P,2)]))./repmat(mstd,[1 size(P,2)]); % convert to log then back to normal
+    if ~isempty(Pboot) & isnan(g.pboot)
+        Pboot = (Pboot-repmat(mbase,[1 size(Pboot,2)]))./repmat(mstd,[1 size(Pboot,2)]); % convert to log then back to normal
+    end;
+    
+% ERSP no baseline log
+elseif strcmpi(g.scale, 'log')
+    
     P = 10 * log10(P);
     if ~isempty(Pboot) & isnan(g.pboot)
         Pboot = 10 * log10(Pboot);
+    end;
+    
+end;
+
+% -----------------
+% ERSP scaling unit
+% -----------------
+if strcmpi(g.scale, 'log')
+    if strcmpi(g.basenorm, 'on')
+        g.unitpower = '10*log(std.)'; % impossible
+    elseif isnan(g.baseline)
+        g.unitpower = '10*log10(\muV/Hz)';
+    else
+        g.unitpower = 'dB';
+    end;
+else
+    if strcmpi(g.basenorm, 'on')
+        g.unitpower = 'std.';
+    elseif isnan(g.baseline)
+        g.unitpower = '\muV/Hz';
+    else
+        g.unitpower = '% of baseline';
     end;
 end;
 
@@ -1937,7 +2016,7 @@ switch lower(g.plotersp)
                 end
             end;
         end;
-
+ 
         if isempty(g.erspmax)
             if g.ERSP_CAXIS_LIMIT == 0
                 g.erspmax = [-1 1]*1.1*max(max(abs(P(:,:))));
@@ -2037,8 +2116,13 @@ switch lower(g.plotersp)
             if ~strcmpi(g.freqscale, 'log')
                 plot(freqs,E,'LineWidth',g.linewidth); hold on;
                 if ~isnan(g.alpha)
-                    plot(freqs,Pboot(:,:)'+[E;E], 'g', 'LineWidth',g.linewidth)
-                    plot(freqs,Pboot(:,:)'+[E;E], 'k:','LineWidth',g.linewidth)
+                    try
+                        plot(freqs,Pboot(:,:)'+[E;E], 'g', 'LineWidth',g.linewidth)
+                        plot(freqs,Pboot(:,:)'+[E;E], 'k:','LineWidth',g.linewidth)
+                    catch
+                        plot(freqs,Pboot(:,:)+[E E], 'g', 'LineWidth',g.linewidth)
+                        plot(freqs,Pboot(:,:)+[E E], 'k:','LineWidth',g.linewidth)
+                    end;
                 end
                 if freqs(1) ~= freqs(end), xlim([freqs(1) freqs(end)]); end;
                 ylim(g.speclim)
@@ -2046,8 +2130,13 @@ switch lower(g.plotersp)
             else % 'log'
                 semilogx(freqs,E,'LineWidth',g.linewidth); hold on;
                 if ~isnan(g.alpha)
-                    semilogx(freqs,Pboot(:,:)'+[E;E],'g', 'LineWidth',g.linewidth)
-                    semilogx(freqs,Pboot(:,:)'+[E;E],'k:','LineWidth',g.linewidth)
+                    try
+                        semilogx(freqs,Pboot(:,:)'+[E;E],'g', 'LineWidth',g.linewidth)
+                        semilogx(freqs,Pboot(:,:)'+[E;E],'k:','LineWidth',g.linewidth)
+                    catch
+                        semilogx(freqs,Pboot(:,:)+[E E],'g', 'LineWidth',g.linewidth)
+                        semilogx(freqs,Pboot(:,:)+[E E],'k:','LineWidth',g.linewidth)
+                    end;
                 end
                 if freqs(1) ~= freqs(end), xlim([freqs(1) freqs(end)]); end;
                 ylim(g.speclim)
