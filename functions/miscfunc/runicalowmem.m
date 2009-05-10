@@ -66,8 +66,6 @@
 % Tzyy-Ping Jung, Sigurd Enghoff, Michael Zibulevsky, Delorme Arnaud,
 % CNL/The Salk Institute, La Jolla, 1996-
 
-% Uses: posact()
-
 % Reference (please cite):
 %
 % Makeig, S., Bell, A.J., Jung, T-P and Sejnowski, T.J.,
@@ -104,6 +102,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2009/01/29 00:04:44  arno
+% Initial revision
+%
 % Revision 1.35  2007/08/17 05:57:07  scott
 % corrected meanvar normalization as per R Ramirez
 %
