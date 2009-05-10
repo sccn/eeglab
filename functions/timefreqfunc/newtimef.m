@@ -143,8 +143,6 @@
 %                     the time-warped 'eventms' columns (above) to plot with 
 %                     vertical lines. If undefined, all columns are plotted. 
 %                     Overwrites the 'vert' argument (below) if any.
-%     'trialbase'   = ['on'|'off'] compute baseline in single trial {'off'}
-%     'trialnorm'   = ['on'|'off'] normalize single trial activity {'off'}
 %
 %    Optional bootstrap parameters:
 %       'alpha'     = If non-0, compute two-tailed bootstrap significance 
@@ -204,7 +202,7 @@
 %       'plotitc'   = ['on'|'off'] Plot inter trial coherence           {'on'}
 %       'plotphasesign' = ['on'|'off'] Plot phase sign in the inter trial coherence {'on'}
 %       'plotphaseonly' = ['on'|'off'] Plot ITC phase instead of ITC amplitude {'off'}
-%       'erspmax'   = [real dB] set the ERSP max. for the color scale (min= -max) {auto}
+%       'erspmax'   = [real] set the ERSP max. For the color scale (min= -max) {auto}
 %       'itcmax'    = [real] set the ITC image maximum for the color scale {auto}
 %       'hzdir'     = ['up' or 'normal'|'down' or 'reverse'] Direction of
 %                     the frequency axes {as in icadefs.m, or 'up'}
@@ -322,6 +320,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.157  2009/05/09 01:56:58  arno
+% fix
+%
 % Revision 1.156  2009/05/09 01:53:12  arno
 % adding new baseline options
 %
@@ -1135,6 +1136,7 @@ g = finputcheck(varargin, ...
     'itcavglim'     'real'      []           []; ...
     'erplim'        'real'      []           []; ...
     'speclim'       'real'      []           []; ...
+    'ntimesout'     'real'      []           []; ...
     'scale'         'string'    { 'log' 'abs'} 'log'; ...
     'timewarp'      'real'      []           []; ...
     'timewarpms'    'real'      []           []; ...
@@ -1660,7 +1662,7 @@ end;
 [alltfX freqs timesout R] = timefreq(data, g.srate, tmioutopt{:}, ...
     'winsize', g.winsize, 'tlimits', g.tlimits, 'detrend', g.detrend, ...
     'itctype', g.type, 'subitc', g.subitc, 'wavelet', g.cycles, ...
-    'padratio', g.padratio, 'freqs', g.freqs, 'freqscale', g.freqscale, ...
+    'padratio', g.padratio, 'freqs', g.freqs, 'ntimesout', g.ntimesout, 'freqscale', g.freqscale, ...
     'nfreqs', g.nfreqs, 'timestretch', {g.timeStretchMarks', g.timeStretchRefs}, 'wletmethod', g.wletmethod);
 
 if g.cycles(1) == 0
@@ -1935,7 +1937,7 @@ if strcmpi(g.plotersp, 'on') | strcmpi(g.plotitc, 'on')
     if strcmpi(g.plottype, 'image')
         plottimef(P, R, Pboot, Rboot, ERP, freqs, timesout, mbase, maskersp, maskitc, g);
     else
-        plotallcurves(P, R, Pboot, Rboot, ERP, freqs, timesout, mbase, maskersp, maskitc, g);
+        plotallcurves(P, R, Pboot, Rboot, ERP, freqs, timesout, mbase, g);
     end;
 end;
 if strcmpi(g.outputformat, 'old')
@@ -2020,6 +2022,8 @@ switch lower(g.plotersp)
             end;
         end;
  
+        % find color limits
+        % -----------------
         if isempty(g.erspmax)
             if g.ERSP_CAXIS_LIMIT == 0
                 g.erspmax = [-1 1]*1.1*max(max(abs(P(:,:))));
@@ -2030,21 +2034,18 @@ switch lower(g.plotersp)
             g.erspmax = [ -g.erspmax g.erspmax];
         end
         if max(g.erspmax) == 0,     % toby 10.02.2006
-            g.erspmax = [-1 1]; 
+            g.erspmax = [-1 1];
         end
+        if isnan( g.baseline ) & g.erspmax(1) < 0
+            g.erspmax = [ min(min(P(:,:))) max(max(P(:,:)))];
+        end;
 
+        % plot image
+        % ----------
         if ~strcmpi(g.freqscale, 'log')
-            if ~isnan( g.baseline )
-                imagesc(times,freqs,PP(:,:),g.erspmax);
-            else
-                imagesc(times,freqs,PP(:,:));
-            end
+            imagesc(times,freqs,PP(:,:), g.erspmax);
         else
-            if ~isnan( g.baseline )
-                imagesclogy(times,freqs,PP(:,:),g.erspmax);
-            else
-                imagesclogy(times,freqs,PP(:,:));
-            end;
+            imagesclogy(times,freqs,PP(:,:),g.erspmax);
         end;
         set(gca,'ydir',g.hzdir);  % make frequency ascend or descend
 
@@ -2429,13 +2430,13 @@ if strcmpi(g.plotersp, 'on')
     if strcmpi(g.plotitc, 'on'), subplot(2,1,1); end;
     set(gca, 'tag', 'ersp');
     alllegend = {};
+
+    for index = 1:length(freqs)
+        alllegend{index} = [ num2str(freqs(index)) 'Hz baseline ' num2str(mbase(index)) ' dB' ];
+    end;
     if strcmpi(g.plotmean, 'on') & freqs(1) ~= freqs(end)
-        alllegend = { [ num2str(freqs(1)) '-' num2str(freqs(end)) ...
+        alllegend = { alllegend{:} [ num2str(freqs(1)) '-' num2str(freqs(end)) ...
             'Hz mean baseline ' num2str(mean(mbase)) ' dB' ] };
-    else
-        for index = 1:length(freqs)
-            alllegend{index} = [ num2str(freqs(index)) 'Hz baseline ' num2str(mbase(index)) ' dB' ];
-        end;
     end;
     plotcurve(times, P, 'maskarray', Pboot, 'title', 'ERSP', ...
         'xlabel', [ 'Time (' timeunit ')' ], 'ylabel', 'dB', 'ylim', [-g.erspmax g.erspmax], ...
@@ -2458,12 +2459,12 @@ if strcmpi(g.plotitc, 'on')
     % find regions of significance
     % ----------------------------
     alllegend = {};
+    for index = 1:length(freqs)
+        alllegend{index} = [ num2str(freqs(index)) 'Hz baseline ' num2str(mbase(index)) ' dB' ];
+    end;
     if strcmpi(g.plotmean, 'on') & freqs(1) ~= freqs(end)
-        alllegend = { [ num2str(freqs(1)) '-' num2str(freqs(end)) 'Hz' ] };
-    else
-        for index = 1:length(freqs)
-            alllegend{index} = [ num2str(freqs(index)) 'Hz' ];
-        end;
+        alllegend = { alllegend{:} [ num2str(freqs(1)) '-' num2str(freqs(end)) ...
+            'Hz mean baseline ' num2str(mean(mbase)) ' dB' ] };
     end;
     plotcurve(times, RR, 'maskarray', Rboot, 'val2mask', R, 'title', 'ITC', ...
         'xlabel', [ 'Time (' timeunit ')' ], 'ylabel', 'dB', 'ylim', g.itcmax, ...

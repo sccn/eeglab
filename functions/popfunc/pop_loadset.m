@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.58  2009/04/21 04:43:16  arno
+% Allowing to load multiple files
+%
 % Revision 1.57  2008/11/13 00:02:56  arno
 % fix loadmode
 %
@@ -264,7 +267,15 @@ if ~isempty(g.eeg)
 else
     ALLEEGLOC = [];
     for ifile = 1:length(g.filename)
-
+        
+        if ifile > 1
+            eeglab_options;
+            if option_storedisk,
+                warndlg2(strvcat('You may only load a single dataset','when selecting the "Store at most one', 'dataset in memory" option'));
+            end;
+            break;
+        end;
+        
         % read file
         % ---------
         filename = fullfile(g.filepath, g.filename{ifile});
@@ -343,7 +354,8 @@ else
             if isstr(EEG.data), EEG.filepath = g.filepath; end;
         end;
         
-        ALLEEGLOC = eeg_store(ALLEEGLOC, EEG, 0);
+        %ALLEEGLOC = pop_newset(ALLEEGLOC, EEG, 1);
+        ALLEEGLOC = eeg_store(ALLEEGLOC, EEG, 0, 'verbose', 'off');
     end;
     EEG = ALLEEGLOC;
 end;

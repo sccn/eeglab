@@ -53,6 +53,9 @@
 % uses the global variable EEG ALLEEG CURRENTSET 
 
 % $Log: not supported by cvs2svn $
+% Revision 1.51  2008/11/11 02:05:40  arno
+% making datfile empty
+%
 % Revision 1.50  2007/08/23 00:07:58  arno
 % debug last changes
 %
@@ -210,7 +213,7 @@ function [ALLEEG, EEG, storeSetIndex] = eeg_store(ALLEEG, EEG, storeSetIndex, va
 
 % check parameter consistency
 % ------------------------------
-if nargin == 3
+if nargin >= 3
     if length(EEG) ~= length(storeSetIndex) & storeSetIndex(1) ~= 0
         error('Length of input dataset structure must equal the length of the index array');
     end;
