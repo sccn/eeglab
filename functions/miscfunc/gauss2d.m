@@ -19,7 +19,7 @@
 % Ouput:
 %   gaussmatrix - 2-D gaussian matrix
 %
-% Author: Arnaud Delorme, CNL / Salk Institute, 2001
+% Author: Arnaud Delorme, CNL/Salk Institute, 2001
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2004/02/07 00:55:50  scott
+% helpd message edits
+%
 % Revision 1.2  2004/02/07 00:35:36  arno
 % header typo
 %
