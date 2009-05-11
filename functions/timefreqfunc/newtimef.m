@@ -320,6 +320,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.158  2009/05/10 04:10:00  arno
+% newtimef and pop_newtimef interface
+%
 % Revision 1.157  2009/05/09 01:56:58  arno
 % fix
 %
@@ -1948,6 +1951,7 @@ if strcmpi(g.verbose, 'on')
     disp('Note: Add output variables to command line call in history to');
     disp('      retrieve results and use the tftopo function to replot them');
 end;
+mbase = mbase';
 return;
 
 % -----------------
