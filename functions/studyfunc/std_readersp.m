@@ -55,6 +55,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2007/10/25 21:18:28  nima
+% output parameters updated.
+%
 % Revision 1.31  2007/08/06 19:32:18  arno
 % fix last changes
 %
@@ -236,8 +239,8 @@ if length(abset) > 1
                     'version of EEGLAB < 6.00' ]);
         end;
         
-        erspall{cond} = erspall{cond} + repmat( erspallbase{cond}',[1 tlen]);
-        erspall{cond} = erspall{cond} - repmat( ave_baseline'     ,[1 tlen]);
+        erspall{cond} = erspall{cond} + repmat( erspallbase{cond}(:),[1 tlen]);
+        erspall{cond} = erspall{cond} - repmat( ave_baseline(:)     ,[1 tlen]);
         
         % same for bootstrap array
         if ~isempty(erspallboot{cond})
