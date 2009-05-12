@@ -320,6 +320,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.159  2009/05/11 22:22:27  arno
+% transpose mbase
+%
 % Revision 1.158  2009/05/10 04:10:00  arno
 % newtimef and pop_newtimef interface
 %
@@ -1323,6 +1326,27 @@ else
     error('unknown ''ydir'' argument'); 
 end
 
+% -----------------
+% ERSP scaling unit
+% -----------------
+if strcmpi(g.scale, 'log')
+    if strcmpi(g.basenorm, 'on')
+        g.unitpower = '10*log(std.)'; % impossible
+    elseif isnan(g.baseline)
+        g.unitpower = '10*log10(\muV/Hz)';
+    else
+        g.unitpower = 'dB';
+    end;
+else
+    if strcmpi(g.basenorm, 'on')
+        g.unitpower = 'std.';
+    elseif isnan(g.baseline)
+        g.unitpower = '\muV/Hz';
+    else
+        g.unitpower = '% of baseline';
+    end;
+end;
+
 % Multitaper - used in timef
 % --------------------------
 if ~isempty(g.mtaper) % multitaper, inspired from a Bijan Pesaran matlab function
@@ -1908,27 +1932,6 @@ elseif strcmpi(g.scale, 'log')
         Pboot = 10 * log10(Pboot);
     end;
     
-end;
-
-% -----------------
-% ERSP scaling unit
-% -----------------
-if strcmpi(g.scale, 'log')
-    if strcmpi(g.basenorm, 'on')
-        g.unitpower = '10*log(std.)'; % impossible
-    elseif isnan(g.baseline)
-        g.unitpower = '10*log10(\muV/Hz)';
-    else
-        g.unitpower = 'dB';
-    end;
-else
-    if strcmpi(g.basenorm, 'on')
-        g.unitpower = 'std.';
-    elseif isnan(g.baseline)
-        g.unitpower = '\muV/Hz';
-    else
-        g.unitpower = '% of baseline';
-    end;
 end;
 
 % --------
