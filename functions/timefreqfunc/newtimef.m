@@ -320,6 +320,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.160  2009/05/12 18:39:04  arno
+% unitpower problem
+%
 % Revision 1.159  2009/05/11 22:22:27  arno
 % transpose mbase
 %
@@ -1688,7 +1691,7 @@ end;
 
 [alltfX freqs timesout R] = timefreq(data, g.srate, tmioutopt{:}, ...
     'winsize', g.winsize, 'tlimits', g.tlimits, 'detrend', g.detrend, ...
-    'itctype', g.type, 'subitc', g.subitc, 'wavelet', g.cycles, ...
+    'itctype', g.type, 'subitc', g.subitc, 'wavelet', g.cycles, 'timesout', g.timesout, ...
     'padratio', g.padratio, 'freqs', g.freqs, 'ntimesout', g.ntimesout, 'freqscale', g.freqscale, ...
     'nfreqs', g.nfreqs, 'timestretch', {g.timeStretchMarks', g.timeStretchRefs}, 'wletmethod', g.wletmethod);
 
