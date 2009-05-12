@@ -190,6 +190,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.100  2007/08/23 23:25:38  arno
+% encode type for neuroscan channel electrode files
+%
 % Revision 1.99  2007/08/15 22:28:10  arno
 % changing SFP not to skip any lines
 %
@@ -794,7 +797,7 @@ end;
 
 % process fiducials if any
 % ------------------------
-fidnames = { 'nz' 'lpa' 'rpa' };
+fidnames = { 'nz' 'lpa' 'rpa' 'nasion' 'left' 'right' 'nazion' 'fidnz' 'fidt9' 'fidt10' };
 for index = 1:length(fidnames)
     ind = strmatch(fidnames{index}, lower(labels), 'exact');
     if ~isempty(ind), eloc(ind).type = 'FID'; end;
