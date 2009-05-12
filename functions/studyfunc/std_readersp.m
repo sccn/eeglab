@@ -55,6 +55,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2009/05/12 17:47:20  arno
+% fix baseline orientation
+%
 % Revision 1.33  2009/05/11 22:24:06  arno
 % fix orientation problem for ERSP baseline
 %
@@ -226,9 +229,9 @@ end
 if length(abset) > 1 
     % mean baseline for requested component across conditions
     % -------------------------------------------------------
-	ave_baseline = zeros(size(erspallbase{1})); 
+	ave_baseline = zeros(size(erspallbase{1}(:)')); 
 	for cond = 1:length(abset)
-        ave_baseline = ave_baseline + erspallbase{cond}(:)/length(abset);
+        ave_baseline = ave_baseline + erspallbase{cond}(:)'/length(abset);
 	end    
     
     % apply mean baseline
