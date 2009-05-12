@@ -320,6 +320,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.161  2009/05/12 21:20:16  arno
+% trying to correct timesout
+%
 % Revision 1.160  2009/05/12 18:39:04  arno
 % unitpower problem
 %
@@ -1685,14 +1688,15 @@ end;
 % ----------------------------------------------------
 % compute time frequency decompositions, power and ITC
 % ----------------------------------------------------
-if length(g.timesout) > 1, tmioutopt = { 'timesout' , g.timesout };
-else                       tmioutopt = { 'ntimesout', g.timesout };
+if length(g.timesout) > 1,   tmioutopt = { 'timesout' , g.timesout };
+elseif ~isempty(g.ntimesout) tmioutopt = { 'ntimesout', g.ntimesout };
+else                         tmioutopt = { 'ntimesout', g.timesout };
 end;
 
 [alltfX freqs timesout R] = timefreq(data, g.srate, tmioutopt{:}, ...
     'winsize', g.winsize, 'tlimits', g.tlimits, 'detrend', g.detrend, ...
-    'itctype', g.type, 'subitc', g.subitc, 'wavelet', g.cycles, 'timesout', g.timesout, ...
-    'padratio', g.padratio, 'freqs', g.freqs, 'ntimesout', g.ntimesout, 'freqscale', g.freqscale, ...
+    'itctype', g.type, 'subitc', g.subitc, 'wavelet', g.cycles, ...
+    'padratio', g.padratio, 'freqs', g.freqs, 'freqscale', g.freqscale, ...
     'nfreqs', g.nfreqs, 'timestretch', {g.timeStretchMarks', g.timeStretchRefs}, 'wletmethod', g.wletmethod);
 
 if g.cycles(1) == 0
