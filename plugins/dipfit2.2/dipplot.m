@@ -18,8 +18,8 @@
 % Optional input:
 %  'rvrange'  - [min max] or [max] Only plot dipoles with residual variace
 %               within the given range. Default: plot all dipoles.
-%  'summary'  - ['on'|'off'] Build a summary plot with three views (top, back, side)
-%               {default: 'off'}
+%  'summary'  - ['on'|'off'|'3d'] Build a summary plot with three views (top, 
+%               back, side). {default: 'off'}
 %  'mri'      - Matlab file containing an MRI volume and a 4-D transformation
 %               matrix to go from voxel space to electrode space:
 %               mri.anatomy   contains a 3-D anatomical data array
@@ -158,6 +158,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.156  2009/05/12 02:37:49  arno
+%fix hold on option
+%
 %Revision 1.155  2009/05/08 01:48:18  arno
 %invisible figure
 %
@@ -630,7 +633,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                                  'drawedges' 'string'   { 'on' 'off' }     'off';
                                  'mesh'      'string'   { 'on' 'off' }     'off';
                                  'gui'       'string'   { 'on' 'off' }     'on';
-                                 'summary'   'string'   { 'on2' 'on' 'off' }     'off';
+                                 'summary'   'string'   { 'on2' 'on' 'off' '3d' }     'off';
                                  'verbose'   'string'   { 'on' 'off' }     'on';
                                  'view'      'real'     []                 [0 0 1];
                                  'rvrange'   'real'     [0 Inf]             [];
@@ -861,7 +864,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     
     % build summarized figure
     % -----------------------
-    if ~strcmp(g.summary, 'off')
+    if strcmpi(g.summary, 'on') | strcmpi(g.summary, 'on2')
         figure;
         options = { 'gui', 'off', 'dipolesize', g.dipolesize/1.5,'dipolelength', g.dipolelength, 'sphere', g.sphere ...
                     'color', g.color, 'mesh', g.mesh, 'num', g.num, 'image', g.image 'normlen' g.normlen ...
@@ -902,6 +905,15 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             if strcmp(BACKCOLOR, 'k'), set(h, 'color', 'w'); end;
         end;
         axis off;
+        return;
+    elseif strcmpi(g.summary, '3d')
+        options = { 'gui', 'off', 'dipolesize', g.dipolesize/1.5,'dipolelength', g.dipolelength, 'sphere', g.sphere, 'spheres', g.spheres ...
+                    'color', g.color, 'mesh', g.mesh, 'num', g.num, 'image', g.image 'normlen' g.normlen ...
+                    'coordformat' g.coordformat 'mri' g.mri 'meshdata' g.meshdata 'axistight' g.axistight };
+        figure('position', [ 100 600 600 200 ]);
+        axes('position', [0   0 1/3 1]); dipplot(sourcesori, options{:}, 'holdon', 'on'); view([0 -1 0]);
+        axes('position', [1/3 0 1/3 1]); dipplot(sourcesori, options{:}, 'holdon', 'on'); view([0  0 1]);
+        axes('position', [2/3 0 1/3 1]); dipplot(sourcesori, options{:}, 'holdon', 'on'); view([1 -0.01 0]);
         return;
     end;
         
