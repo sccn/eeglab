@@ -107,7 +107,7 @@
 %       'cycleinc'    ['linear'|'log'] increase mode if [min max] cycles is
 %                     provided in 'cycle' parameter. Applies only to 
 %                     'wletmethod','dftfilt'  {default: 'linear'}
-%
+%       
 %   Optional baseline parameters:
 %       'baseline'  = Spectral baseline end-time (in ms). NaN imply that no
 %                     baseline is used. A range [min max] may also be entered
@@ -221,11 +221,14 @@
 %       'vert'      = [times_vector] -> plot vertical dashed lines at specified times
 %                     in ms. {default: none}
 %       'newfig'    = ['on'|'off'] Create new figure for difference plots {'on'}
-%       'outputformat' = ['old'|'new'] for compatibility with script that used the old
-%                        output format, set to 'old' (mbase in absolute amplitude (not
+%       'outputformat' = ['old'|'new'|'plot'] for compatibility with script that used the 
+%                        old output format, set to 'old' (mbase in absolute amplitude (not
 %                        dB) and real itc instead of complex itc). {default: 'new'}
 % Outputs:
-%            ersp   = (nfreqs,timesout) matrix of log spectral diffs. from baseline (in dB)
+%            ersp   = (nfreqs,timesout) matrix of log spectral diffs from baseline (in dB)
+%                     NOTE THAT THIS OUTPUT IS ALWAYS IN LOG SCALE BY DEFAULT to ensure 
+%                     backward with higher level functions. Use the 'plot' output format
+%                     above to output the ERSP as shown on the plot.
 %            itc    = (nfreqs,timesout) matrix of complex inter-trial coherencies.
 %                     itc is complex -- ITC magnitude is abs(itc); ITC phase in radians
 %                     is phase(itc), or in deg phase(itc)*180/pi.
@@ -320,6 +323,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.162  2009/05/12 21:26:49  arno
+% fixing ntimesout
+%
 % Revision 1.161  2009/05/12 21:20:16  arno
 % trying to correct timesout
 %
@@ -1134,7 +1140,7 @@ g = finputcheck(varargin, ...
     'plotphasesign' 'string'    {'on','off'} 'on'; ...
     'plotphase'     'string'    {'on','off'} 'on'; ... % same as above for backward compatibility
     'pcontour'      'string'    {'on','off'} 'off'; ... 
-    'outputformat'  'string'    {'old','new'} 'new'; ...
+    'outputformat'  'string'    {'old','new' 'plot' } 'new'; ...
     'itcmax'        'real'      []           []; ...
     'erspmax'       'real'      []           []; ...
     'lowmem'        'string'    {'on','off'} 'off'; ...
@@ -1737,6 +1743,7 @@ end
 % -----------------------------------------
 % remove baseline on a trial by trial basis
 % -----------------------------------------
+Pori = mean(P, 3);
 if strcmpi(g.trialbase, 'on') & isnan( g.powbase )
     mbase = mean(P(:,baseln,:),2);
     if strcmpi(g.basenorm, 'on')
@@ -1904,10 +1911,12 @@ end;
 
 if isnan(g.powbase)
     verboseprintf(g.verbose, 'Computing the mean baseline spectrum\n');
-    mbase = mean(P(:,baseln),2);
+    mbase    = mean(P(:,baseln),2);
+    mbaseori = mean(Pori(:,baseln),2);
 else
     verboseprintf(g.verbose, 'Using the input baseline spectrum\n');
-    mbase = 10.^(g.powbase/10);
+    mbase    = 10.^(g.powbase/10);
+    mbaseori = 10.^(g.powbase/10);
 end
 baselength = length(baseln);
 
@@ -1915,7 +1924,7 @@ baselength = length(baseln);
 % remove baseline
 % ---------------
 % original ERSP baseline removal (log)
-if ~isnan( g.baseline(1) ) & ~isnan( mbase ) & strcmpi(g.scale, 'log') & strcmpi(g.trialbase, 'off')
+if ~isnan( g.baseline(1) ) & any(~isnan( mbase )) & strcmpi(g.scale, 'log') & strcmpi(g.trialbase, 'off')
     
     P = 10 * (log10(P) - repmat(log10(mbase),[1 length(timesout)])); % convert to (10log10) dB
     if ~isempty(Pboot) & isnan(g.pboot)
@@ -1953,9 +1962,28 @@ if strcmpi(g.plotersp, 'on') | strcmpi(g.plotitc, 'on')
         plotallcurves(P, R, Pboot, Rboot, ERP, freqs, timesout, mbase, g);
     end;
 end;
+
+% --------------
+% format outputs
+% --------------
 if strcmpi(g.outputformat, 'old')
     R = abs(R); % convert coherence vector to magnitude
     mbase = 10^(mbase/10);
+end;
+if ~strcmpi(g.outputformat, 'plot')
+    P = Pori;
+    if ~isnan( g.baseline(1) ) & any(~isnan( mbaseori ))
+        P = 10 * (log10(P) - repmat(log10(mbaseori),[1 length(timesout)])); % convert to (10log10) dB
+        if ~isempty(Pboot) & isnan(g.pboot)
+            Pboot = 10 * (log10(Pboot) - repmat(log10(mbaseori),[1 size(Pboot,2)])); % convert to (10log10) dB
+        end;
+    else
+        P = 10 * log10(P);
+        if ~isempty(Pboot) & isnan(g.pboot)
+            Pboot = 10 * log10(Pboot);
+        end;
+    end;
+    mbase = log10(mbaseori)*10;
 end;
 if strcmpi(g.verbose, 'on')
     disp('Note: Add output variables to command line call in history to');
