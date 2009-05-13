@@ -323,6 +323,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.163  2009/05/13 00:20:07  arno
+% make output uniforms
+%
 % Revision 1.162  2009/05/12 21:26:49  arno
 % fixing ntimesout
 %
@@ -1784,7 +1787,7 @@ if ~isnan(g.alpha) | ~isempty(find(~isnan(g.pboot))) | ~isempty(find(~isnan(g.rb
     % ERSP bootstrap
     % --------------
     if ~isempty(find(~isnan(g.pboot))) % if ERSP bootstrap limits provided already
-        Pboot = g.pboot;
+        Pboot = g.pboot(:);
     else
         if size(g.baseboot,2) == 1
             if g.baseboot == 0, baselntmp = [];
