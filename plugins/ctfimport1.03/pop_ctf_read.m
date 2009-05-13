@@ -35,6 +35,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2009/01/30 03:49:28  arno
+% *** empty log message ***
+%
 % Revision 1.12  2007/08/14 19:38:04  arnodelorme
 % EEGLAB compatibility
 %
@@ -235,47 +238,31 @@ function [EEG, com] = pop_ctf_read(orifolder, varargin)
       otherfields = {};
       
       eventstruct = ctf_read_markerfile(ctf);
+      if isfield(eventstruct, 'markers')
+          eventstruct = eventstruct.markers;
+      end;
       
-      if isfield(eventstruct,'markers'),
-          if ~isempty(eventstruct.markers),
+      if isfield(eventstruct,'trial_times'),
               
-              eventarray = zeros(EEG.trials, length(eventstruct.markers));
-              allfields  = { eventstruct.markers.marker_names };
-              
-              for index = 1:length(eventstruct.markers)
-                  if ~isempty( eventstruct.markers(index).trial_times )
-                      indval  = eventstruct.markers(index).trial_times(:,1);
-                      values  = eventstruct.markers(index).trial_times(:,2);
-                      if length(indval) < EEG.trials & length(unique(values)) == 1
-                          
-                          % non latency field
-                          % -----------------
-                          otherfields{end+1} =  eventstruct.markers(index).marker_names;
-                          if unique(values) == 0
-                              eventarray(:,index)      = 1;
-                              eventarray(indval,index) = 0;
-                          else
-                              eventarray(:,index)      = 0;
-                              eventarray(indval,index) = values;
-                          end;
-                      else
-                          timefields{end+1} =  eventstruct.markers(index).marker_names;
-                          eventarray(indval,index) = values;
+              for index = 1:length(eventstruct)
+                  trialtimes = eventstruct(index).trial_times(:,2)*EEG.srate;
+                  if EEG.trials > 1
+                      trialtimes = trialtimes+(eventstruct(index).trial_times(:,1)-1)*EEG.pnts - ctf.setup.start_msec/1000*EEG.srate;
+                  end;
+                  
+                  for numev = 1:length(trialtimes)
+                      EEG.event(end+1).latency = trialtimes(numev);
+                      EEG.event(end).type      = eventstruct(index).marker_names;
+                      if EEG.trials > 1
+                          EEG.event(end).epoch = floor(trialtimes(numev)/EEG.pnts)+1;
                       end;
                   end;
               end;
               
-          end
+              EEG = eeg_checkset(EEG, 'eventconsistency');
       end
       
-      EEG.eventdescription = {};
-      if ~isempty(eventarray),
-          if isempty(alltrials)
-              EEG = pop_importepoch(EEG, eventarray, allfields, 'latencyfields', timefields, 'timeunit', 1);
-          else
-              EEG = pop_importepoch(EEG, eventarray(alltrials,:), allfields, 'latencyfields', timefields, 'timeunit', 1);
-          end;
-      end;
+
   %catch
   %    disp(lasterr);
   %    disp('error (see above) while importing events: events not imported');
