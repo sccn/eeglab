@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.63  2008/04/16 17:56:33  arno
+% fix color axis for scalp maps
+%
 % Revision 1.62  2007/11/15 04:01:36  arno
 % *** empty log message ***
 %
@@ -249,9 +252,8 @@ end;
 
 % for backward compatibility
 % --------------------------
-if ~isnan(STUDY.etc.erspparams.topotime),
-     opt.plottf = [ opt.topofreq opt.topotime ];
-else opt.plottf = [];
+if isempty(opt.plottf) & ~isempty(opt.topofreq) & ~isempty(opt.topotime)
+     opt.plottf = [ opt.topofreq(1) opt.topofreq(end) opt.topotime(1) opt.topotime(end) ];
 end;
 if strcmpi(opt.mode, 'comps'), opt.plotsubjects = 'on'; end;
 
@@ -328,7 +330,18 @@ if ~isempty(opt.plottf)
     locs = locs(std_chaninds(STUDY, opt.channels));
     [pgroup pcond pinter] = std_plottf(alltimes, allfreqs, allersp, 'condnames', STUDY.condition, 'subject', opt.subject, 'legend', opt.legend, ...
                                       'datatype', opt.datatype,'plotmode', opt.plotmode, 'groupnames', STUDY.group, 'topovals', opt.plottf, 'unitx', 'Hz', ...
-                                      'chanlocs', locs, 'plotsubjects', opt.plotsubjects, 'topovals', opt.plottf, plotcurveopt{:});
+                                      'chanlocs', locs, 'plotsubjects', opt.plotsubjects, plotcurveopt{:});
+    % reselect time and frequency
+    % ---------------------------
+    maxind   = max(find( alltimes <= opt.plottf(4)));
+    minind   = min(find( alltimes >= opt.plottf(3)));
+    fmaxind  = max(find( allfreqs <= opt.plottf(2)));
+    fminind  = min(find( allfreqs >= opt.plottf(1)));
+    alltimes = mean(alltimes(minind:maxind));
+    allfreqs = mean(allfreqs(fminind:fmaxind));
+    for i =1:length(allersp(:))
+        allersp{i}  = squeeze(mean(mean(allersp{i}(fminind:fmaxind,minind:maxind,:,:),1),2));
+    end;
     return;
 end;
 
