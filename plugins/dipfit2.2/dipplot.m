@@ -158,6 +158,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.157  2009/05/12 18:23:51  arno
+%summary mode 3d
+%
 %Revision 1.156  2009/05/12 02:37:49  arno
 %fix hold on option
 %
@@ -910,10 +913,12 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
         options = { 'gui', 'off', 'dipolesize', g.dipolesize/1.5,'dipolelength', g.dipolelength, 'sphere', g.sphere, 'spheres', g.spheres ...
                     'color', g.color, 'mesh', g.mesh, 'num', g.num, 'image', g.image 'normlen' g.normlen ...
                     'coordformat' g.coordformat 'mri' g.mri 'meshdata' g.meshdata 'axistight' g.axistight };
-        figure('position', [ 100 600 600 200 ]);
+        figure('position', [ 100 600 600 200 ]); 
+        axes('position', [-0.1 -0.1 1.2 1.2], 'color', 'k'); axis off; blackimg = zeros(10,10,3); image(blackimg);
         axes('position', [0   0 1/3 1]); dipplot(sourcesori, options{:}, 'holdon', 'on'); view([0 -1 0]);
         axes('position', [1/3 0 1/3 1]); dipplot(sourcesori, options{:}, 'holdon', 'on'); view([0  0 1]);
         axes('position', [2/3 0 1/3 1]); dipplot(sourcesori, options{:}, 'holdon', 'on'); view([1 -0.01 0]);
+        set(gcf, 'paperpositionmode', 'auto');
         return;
     end;
         
