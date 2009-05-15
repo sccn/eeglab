@@ -30,6 +30,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2009/01/30 03:58:08  arno
+% *** empty log message ***
+%
 
 function [EEG, com] = pop_loadascinstep( filename );
 
@@ -42,12 +45,22 @@ end;
 
 EEG = eeg_emptyset;
 fid = fopen(filename, 'r');
-EEG.nbchan = fscanf(fid, '%d', 1); tmp   = fgetl(fid);
-EEG.pnts   = fscanf(fid, '%d', 1); tmp   = fgetl(fid);
-EEG.srate  = 1000/fscanf(fid, '%f', 1); tmp   = fgetl(fid);
+num1 = fscanf(fid, '%f', 1);tmp   = fgetl(fid);
+num2 = fscanf(fid, '%f', 1);tmp   = fgetl(fid);
+num3 = fscanf(fid, '%f', 1);tmp   = fgetl(fid);
 
-tline = fgetl(fid);
-tline = fgetl(fid);
+if ~isempty(num3)
+    EEG.nbchan = num1;
+    EEG.pnts   = num2;
+    EEG.srate  = 1000/num3;
+    tline = fgetl(fid);
+    tline = fgetl(fid);
+else 
+    EEG.nbchan = num1;
+    EEG.srate  = 1000/num2;
+    tline = tmp;
+end;
+
 allf  = parsetxt(tline);
 
 EEG.data = fscanf(fid, '%f', [EEG.nbchan+5 Inf]);
