@@ -158,6 +158,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.158  2009/05/15 23:33:19  arno
+%3d mode
+%
 %Revision 1.157  2009/05/12 18:23:51  arno
 %summary mode 3d
 %
@@ -915,9 +918,9 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                     'coordformat' g.coordformat 'mri' g.mri 'meshdata' g.meshdata 'axistight' g.axistight };
         figure('position', [ 100 600 600 200 ]); 
         axes('position', [-0.1 -0.1 1.2 1.2], 'color', 'k'); axis off; blackimg = zeros(10,10,3); image(blackimg);
-        axes('position', [0   0 1/3 1]); dipplot(sourcesori, options{:}, 'holdon', 'on'); view([0 -1 0]);
-        axes('position', [1/3 0 1/3 1]); dipplot(sourcesori, options{:}, 'holdon', 'on'); view([0  0 1]);
-        axes('position', [2/3 0 1/3 1]); dipplot(sourcesori, options{:}, 'holdon', 'on'); view([1 -0.01 0]);
+        axes('position', [0   0 1/3 1], 'tag', 'rear'); dipplot(sourcesori, options{:}, 'holdon', 'on'); view([0 -1 0]);
+        axes('position', [1/3 0 1/3 1], 'tag', 'top' ); dipplot(sourcesori, options{:}, 'holdon', 'on'); view([0  0 1]);
+        axes('position', [2/3 0 1/3 1], 'tag', 'side'); dipplot(sourcesori, options{:}, 'holdon', 'on'); view([1 -0.01 0]);
         set(gcf, 'paperpositionmode', 'auto');
         return;
     end;
