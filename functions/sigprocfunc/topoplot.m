@@ -84,6 +84,9 @@
 %   'hcolor'          - color of the cartoon head. Use 'hcolor','none' to plot no head. {default: 'k' = black}
 %   'shading'         - 'flat','interp'  {default: 'flat'}
 %   'numcontour'      - number of contour lines {default: 6}
+%   'contourvals'     - values for contour {default: same as input values}
+%   'pmask'           - values for masking topoplot. Array of zeros and 1 of the same size as the input 
+%                       value array {default: []}
 %   'color'           - color of the contours {default: dark grey}
 %   'whitebk '        -  ('on'|'off') make the background color white (e.g., to print empty plotgrid channels) 
 %                       {default: 'off'}
@@ -163,6 +166,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.286  2008/12/20 00:45:10  arno
+% revert 1.284
+%
 % Revision 1.284  2008/04/19 21:01:34  arno
 % fix 'example'.
 %
@@ -909,6 +915,8 @@ MASKSURF = 'off';
 CONVHULL = 'off';       % dont mask outside the electrodes convex hull
 DRAWAXIS = 'off';
 CHOOSECHANTYPE = 0;
+ContourVals = Values;
+PMASKFLAG   = 0;
 
 %%%%%% Dipole defaults %%%%%%%%%%%%
 DIPOLE  = [];           
@@ -920,6 +928,7 @@ DIPORIENT  = 1;
 DIPCOLOR  = [0 0 0];
 NOSEDIR   = '+X';
 CHANINFO  = [];
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %
@@ -1102,6 +1111,11 @@ if nargs > 2
 	  DIPLEN = Value;
 	 case 'dipscale'
 	  DIPSCALE = Value;
+	 case 'contourvals'
+	  ContourVals = Value;
+	 case 'pmask'
+	  ContourVals = Value;
+      PMASKFLAG   = 1;
 	 case 'diporient'
 	  DIPORIENT = Value;
 	 case 'dipcolor'
@@ -1260,6 +1274,7 @@ if r>1 & c>1,
   error('input data must be a single vector');
 end
 Values = Values(:); % make Values a column vector
+ContourVals = ContourVals(:); % values for contour
 
 if ~isempty(intrad) & ~isempty(plotrad) & intrad < plotrad
    error('intrad must be >= plotrad');
@@ -1349,6 +1364,9 @@ if isfield(CHANINFO, 'icachansind') & ~isempty(Values) & length(Values) ~= lengt
         tmpvals   = zeros(1, length(tmpeloc));
         tmpvals(CHANINFO.icachansind) = Values;
         Values    = tmpvals;
+        tmpvals   = zeros(1, length(tmpeloc));
+        tmpvals(CHANINFO.icachansind) = ContourVals;
+        ContourVals = tmpvals;
         
     end;
 end;
@@ -1385,7 +1403,8 @@ y         = y(plotchans);
 labels    = labels(plotchans); % remove labels for electrodes without locations
 labels    = strvcat(labels); % make a label string matrix
 if ~isempty(Values) & length(Values) > 1 & ~strcmpi( STYLE, 'blank')
-    Values    = Values(plotchans);
+    Values      = Values(plotchans);
+    ContourVals = ContourVals(plotchans);
 end;
 
 %
@@ -1526,8 +1545,10 @@ end
 
 if ~isempty(Values)
 	if length(Values) == length(Th)  % if as many map Values as channel locs
-		intValues = Values(intchans);
-		Values = Values(pltchans);
+		intValues      = Values(intchans);
+		intContourVals = ContourVals(intchans);
+        Values         = Values(pltchans);
+		ContourVals    = ContourVals(pltchans);
 	else 
         if strcmp(STYLE,'blank')    % else if Values holds numbers of channels to mark
             tmpValues=[];
@@ -1626,12 +1647,15 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
   yi = linspace(ymin,ymax,GRID_SCALE);   % y-axis description (row vector)
 
   [Xi,Yi,Zi] = griddata(inty,intx,intValues,yi',xi,'invdist'); % interpolate data
+  [Xi,Yi,ZiC] = griddata(inty,intx,intContourVals,yi',xi,'invdist'); % interpolate data
+  
   %
   %%%%%%%%%%%%%%%%%%%%%%% Mask out data outside the head %%%%%%%%%%%%%%%%%%%%%
   %
   mask = (sqrt(Xi.^2 + Yi.^2) <= rmax); % mask outside the plotting circle
   ii = find(mask == 0);
-  Zi(ii) = NaN;                         % mask non-plotting voxels with NaNs
+  Zi(ii)  = NaN;                         % mask non-plotting voxels with NaNs  
+  ZiC(ii) = NaN;                         % mask non-plotting voxels with NaNs
   grid = plotrad;                       % unless 'noplot', then 3rd output arg is plotrad
   %
   %%%%%%%%%% Return interpolated value at designated scalp location %%%%%%%%%%
@@ -1786,25 +1810,37 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
   %%%%%%%%%%%%%%%%%%%%%%%% Plot map contours only %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %
   elseif strcmp(STYLE,'contour')                     % plot surface contours only
-    [cls chs] = contour(Xi,Yi,Zi,CONTOURNUM,'k'); 
+    [cls chs] = contour(Xi,Yi,ZiC,CONTOURNUM,'k'); 
     % for h=chs, set(h,'color',CCOLOR); end
   %
   %%%%%%%%%%%%%%%%%%%%%%%% Else plot map and contours %%%%%%%%%%%%%%%%%%%%%%%%%
   %
   elseif strcmp(STYLE,'both')  % plot interpolated surface and surface contours
       if strcmp(SHADING,'interp')
-       tmph = surface(Xi*unsh,Yi*unsh,zeros(size(Zi)),Zi,...
+       tmph = surface(Xi*unsh,Yi*unsh,zeros(size(Zi))-0.1,Zi,...
                'EdgeColor','none','FaceColor',SHADING);                    
     else % SHADING == 'flat'
-       tmph = surface(Xi-delta/2,Yi-delta/2,zeros(size(Zi)),Zi,...
+       tmph = surface(Xi-delta/2,Yi-delta/2,zeros(size(Zi))-0.1,Zi,...
                'EdgeColor','none','FaceColor',SHADING);                    
     end
     if strcmpi(MASKSURF, 'on')
         set(tmph, 'visible', 'off');
         handle = tmph;
     end;
-    [cls chs] = contour(Xi,Yi,Zi,CONTOURNUM,'k'); 
+    
+    if ~PMASKFLAG
+        [cls chs] = contour(Xi,Yi,ZiC,CONTOURNUM,'k'); 
+    else
+        ZiC(find(ZiC > 0.5 )) = NaN;
+        [cls chs] = contourf(Xi,Yi,ZiC,0,'k');
+        subh = get(chs, 'children');
+        for indsubh = 1:length(subh)
+            numfaces = size(get(subh(indsubh), 'XData'),1); 
+            set(subh(indsubh), 'FaceVertexCData', ones(numfaces,3), 'Cdatamapping', 'direct', 'facealpha', 0.2);
+        end;
+    end;
     for h=chs, set(h,'color',CCOLOR); end
+    
   %
   %%%%%%%%%%%%%%%%%%%%%%%% Else plot map only %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %
