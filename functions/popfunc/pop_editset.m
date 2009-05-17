@@ -134,6 +134,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.57  2008/09/23 16:04:19  arno
+% fix icachansind
+%
 % Revision 1.56  2007/11/23 00:11:59  arno
 % default srate
 %
@@ -328,7 +331,7 @@ if nargin < 2                 % if several arguments, assign values
     editcomments = [ 'tmp = pop_comments(get(gcbf, ''userdata''), ''Edit comments of current dataset'');' ...
                      'if ~isempty(tmp), set(gcf, ''userdata'', tmp); end; clear tmp;' ];
     commandload = [ '[filename, filepath] = uigetfile(''*'', ''Select a text file'');' ...
-                    'if filename ~=0,' ...
+                    'if filename(1) ~=0,' ...
                     '   set(findobj(''parent'', gcbf, ''tag'', tagtest), ''string'', [ filepath filename ]);' ...
                     'end;' ...
                     'clear filename filepath tagtest;' ];
@@ -579,7 +582,7 @@ for curfield = tmpfields'
                             switch lower(g.dataformat)
 							 case 'ascii' , 
 							  try, EEGOUT.data = load(varname, '-ascii');
-							  catch, error(['pop_editset() error: cannot read ascii file ''' varname ''' ']); 
+							  catch, disp(lasterr); error(['pop_editset() error: cannot read ascii file ''' varname ''' ']); 
 							  end;
 							  if ndims(EEGOUT.data)<3 & size(EEGOUT.data,1) > size(EEGOUT.data,2), EEGOUT.data = transpose(EEGOUT.data); end;
 							 case 'matlab', 
