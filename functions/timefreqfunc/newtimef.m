@@ -323,6 +323,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.164  2009/05/13 23:35:44  arno
+% fixing pboot
+%
 % Revision 1.163  2009/05/13 00:20:07  arno
 % make output uniforms
 %
@@ -1513,7 +1516,7 @@ if iscell(data)
 
     % recompute power baselines 
     % -------------------------
-    if ~isnan( g.baseline(1) ) & ~isnan( mbase1 ) & isnan(g.powbase)
+    if ~isnan( g.baseline(1) ) & ~isnan( mbase1(1) ) & isnan(g.powbase(1))
         disp('Recomputing baseline power: using the grand mean of both conditions ...');
         mbase = (mbase1 + mbase2)/2;
         P1 = P1 + repmat(mbase1(1:size(P1,1))',[1 size(P1,2)]);
@@ -1747,7 +1750,7 @@ end
 % remove baseline on a trial by trial basis
 % -----------------------------------------
 Pori = mean(P, 3);
-if strcmpi(g.trialbase, 'on') & isnan( g.powbase )
+if strcmpi(g.trialbase, 'on') & isnan( g.powbase(1) )
     mbase = mean(P(:,baseln,:),2);
     if strcmpi(g.basenorm, 'on')
         mstd = std(P(:,baseln,:),[],2);
@@ -1912,7 +1915,7 @@ if ~isnan(g.alpha)
     end;
 end;
 
-if isnan(g.powbase)
+if isnan(g.powbase(1))
     verboseprintf(g.verbose, 'Computing the mean baseline spectrum\n');
     mbase    = mean(P(:,baseln),2);
     mbaseori = mean(Pori(:,baseln),2);
