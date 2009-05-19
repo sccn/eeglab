@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.64  2009/05/13 00:52:12  arno
+% fixing the ouput for scalp maps
+%
 % Revision 1.63  2008/04/16 17:56:33  arno
 % fix color axis for scalp maps
 %
@@ -340,7 +343,7 @@ if ~isempty(opt.plottf)
     alltimes = mean(alltimes(minind:maxind));
     allfreqs = mean(allfreqs(fminind:fmaxind));
     for i =1:length(allersp(:))
-        allersp{i}  = squeeze(mean(mean(allersp{i}(fminind:fmaxind,minind:maxind,:,:),1),2));
+        allersp{i}  = squeeze(mean(mean(allersp{i}(minind:maxind,fminind:fmaxind,:,:),1),2));
     end;
     return;
 end;
@@ -365,7 +368,7 @@ for index = 1:length(allinds)
         compinds = STUDY.cluster(allinds(index)).allinds;
         setinds  = STUDY.cluster(allinds(index)).setinds;
     end;
-
+    
     % plot specific subject
     % ---------------------
     if ~isempty(opt.subject) & isempty(opt.comps)
