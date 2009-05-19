@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2008/05/05 22:47:06  arno
+% fixing epoch field problem
+%
 % Revision 1.1  2008/04/18 15:24:12  arno
 % Initial revision
 %
@@ -129,7 +132,7 @@ if ~isempty(event)
         offset = fastif(isempty(event(index).offset), 0, event(index).offset);
         EEG.event(index).type     = event(index).type;
         EEG.event(index).value    = event(index).value;
-        EEG.event(index).latency  = event(index).sample-offset+subsample;
+        EEG.event(index).latency  = event(index).sample+offset+subsample;
         EEG.event(index).duration = event(index).duration;
         if EEG.trials > 1
             EEG.event(index).epoch = ceil(EEG.event(index).latency/EEG.pnts);        
