@@ -42,8 +42,10 @@
 %                     To compare two conditions (data1 and data2), in place of 
 %                     a single data matrix enter a cell array {data1 data2}
 %       frames      = Frames per trial. Ignored if data is 2-D or 3-D.  {750}
-%       tlimits     = [mintime maxtime] (ms). Epoch time limits {taken from 
-%                     reading icadefs.m, else if none there, [-1000 2000]}
+%       tlimits     = [mintime maxtime] (ms). Epoch time limits default is 
+%                     [-1000 2000]. Note that this is the time limit of the 
+%                     data itself NOT A SUB-WINDOW TO EXTRACT FROM EXISTING
+%                     EPOCHS as this is the case in pop_newtimef.
 %       srate       = data sampling rate (Hz)  {default: from icadefs.m or 250}
 %       cycles      = [0] Use FFTs with Hanning window tapering. {default}
 %                   = [real positive scalar] Number of cycles in each Morlet
@@ -323,6 +325,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.165  2009/05/17 01:31:34  arno
+% fix powbase
+%
 % Revision 1.164  2009/05/13 23:35:44  arno
 % fixing pboot
 %
