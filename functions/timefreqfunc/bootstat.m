@@ -87,6 +87,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2009/05/22 23:05:36  arno
+% fix header and default value
+%
 % Revision 1.26  2008/05/06 03:48:59  arno
 % returns rbootout2
 %
@@ -187,7 +190,7 @@ if nargin < 2
 end;
 
 if ~isstr(formula)
-	error('The first argument must be a string formula');
+	error('The second argument must be a string formula');
 end;
 
 g = finputcheck(varargin, ...
