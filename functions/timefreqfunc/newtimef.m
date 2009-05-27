@@ -325,6 +325,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.166  2009/05/20 21:15:51  arno
+% change help message
+%
 % Revision 1.165  2009/05/17 01:31:34  arno
 % fix powbase
 %
@@ -1356,7 +1359,7 @@ if strcmpi(g.scale, 'log')
     if strcmpi(g.basenorm, 'on')
         g.unitpower = '10*log(std.)'; % impossible
     elseif isnan(g.baseline)
-        g.unitpower = '10*log10(\muV/Hz)';
+        g.unitpower = '10*log10(\muV^{2}/Hz)';
     else
         g.unitpower = 'dB';
     end;
@@ -1364,7 +1367,7 @@ else
     if strcmpi(g.basenorm, 'on')
         g.unitpower = 'std.';
     elseif isnan(g.baseline)
-        g.unitpower = '\muV/Hz';
+        g.unitpower = '\muV^{2}/Hz';
     else
         g.unitpower = '% of baseline';
     end;
@@ -1942,6 +1945,20 @@ if ~isnan( g.baseline(1) ) & any(~isnan( mbase )) & strcmpi(g.scale, 'log') & st
         Pboot = 10 * (log10(Pboot) - repmat(log10(mbase),[1 size(Pboot,2)])); % convert to (10log10) dB
     end;
     
+% original ERSP baseline removal (log) but abs vizualization
+elseif ~isnan( g.baseline(1) ) & any(~isnan( mbase )) & strcmpi(g.scale, 'abs') & strcmpi(g.trialbase, 'off') & ~strcmpi(g.basenorm, 'on')
+
+    P = 10 * (log10(P) - repmat(log10(mbase),[1 length(timesout)])); % convert to (10log10) dB
+    P = 10.^(P/10);
+    if ~isempty(Pboot) & isnan(g.pboot)
+        Pboot = 10 * (log10(Pboot) - repmat(log10(mbase),[1 size(Pboot,2)])); % convert to (10log10) dB
+        Pboot = 10.^(Pboot/10);
+    end;
+    if isempty(g.erspmax)
+        g.erspmax = [max(max(abs(P)))/2];
+        g.erspmax = [-g.erspmax g.erspmax]+1;
+    end;
+    
 % ERSP baseline normalized
 elseif ~isnan( g.baseline(1) ) & ~isnan( mbase ) & strcmpi(g.basenorm, 'on')
 
@@ -1958,7 +1975,10 @@ elseif strcmpi(g.scale, 'log')
     if ~isempty(Pboot) & isnan(g.pboot)
         Pboot = 10 * log10(Pboot);
     end;
-    
+        
+elseif strcmpi(g.trialbase, 'on')
+        g.erspmax = [max(max(abs(P)))/2];
+        g.erspmax = [-g.erspmax g.erspmax]+1;
 end;
 
 % --------
@@ -2060,17 +2080,22 @@ switch lower(g.plotersp)
         set(h(1), 'tag', 'ersp');
 
         PP = P;
+        if strcmpi(g.scale, 'abs') & strcmpi(g.basenorm, 'off')
+             baseval = 1;
+        else baseval = 0;
+        end;
         if ~isnan(g.alpha)
             if strcmpi(g.pcontour, 'off') & ~isempty(maskersp) % zero out nonsignif. power differences
-                PP = PP .* maskersp;
+                PP(~maskersp) = baseval;
+                %PP = PP .* maskersp;
             elseif isempty(maskersp)
                 if size(PP,1) == size(Pboot,1) & size(PP,2) == size(Pboot,2)
-                    PP(find(PP > Pboot(:,:,1) & (PP < Pboot(:,:,2)))) = 0;
+                    PP(find(PP > Pboot(:,:,1) & (PP < Pboot(:,:,2)))) = baseval;
                     Pboot = squeeze(mean(Pboot,2));
                     if size(Pboot,2) == 1, Pboot = Pboot'; end;
                 else
                     PP(find((PP > repmat(Pboot(:,1),[1 length(times)])) ...
-                        & (PP < repmat(Pboot(:,2),[1 length(times)])))) = 0;
+                        & (PP < repmat(Pboot(:,2),[1 length(times)])))) = baseval;
                 end
             end;
         end;
@@ -2085,9 +2110,6 @@ switch lower(g.plotersp)
             end
         elseif length(g.erspmax) == 1
             g.erspmax = [ -g.erspmax g.erspmax];
-        end
-        if max(g.erspmax) == 0,     % toby 10.02.2006
-            g.erspmax = [-1 1];
         end
         if isnan( g.baseline ) & g.erspmax(1) < 0
             g.erspmax = [ min(min(P(:,:))) max(max(P(:,:)))];
