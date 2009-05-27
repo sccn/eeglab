@@ -32,6 +32,8 @@
 %   'subplot'   - ['on'|'off'] for single slice only, plot within a sub-plot
 %                 panel. If 'on', this automatically sets 'cbar' to 'off'.
 %                 Default is 'off'.  
+%   'plotintersect' - ['on'|'off'] plot intersection between plotted slices.
+%                 Default is 'on'.
 %   'mixfact'   - [float] factor for mixing the background image with the
 %                 array3d information. Default is 0.5.
 %   'mixmode'   - ['add'|'overwrite'] 'add' will allow for trasnparency
@@ -63,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2009/05/08 22:21:50  arno
+% fix double figure plotting
+%
 % Revision 1.7  2009/05/08 20:57:38  arno
 % fix subplot
 %
@@ -156,6 +161,7 @@ function [smoothprob3d, mriplanes] = mri3dplot(prob3d, mri, varargin)
                         'cmax'      'float'    []                        [];
                         'mixfact'   'float'    []                        0.5;
                         'cmin'      'float'    []                        0;
+                        'plotintersect' 'string'   { 'on' 'off' }            'on';
                         'cbar'      'string'   { 'on' 'off' }            'on';
                         'subplot'   'string'   { 'on' 'off' }            'off';
                         'rotate'    'integer'  { 0 90 180 270 }          90;
@@ -244,11 +250,36 @@ function [smoothprob3d, mriplanes] = mri3dplot(prob3d, mri, varargin)
         g.mriview(2:length( g.mrislices )) = g.mriview(1);
     end;
     
+    newprob3dori = newprob3d;
     for index = 1:length( g.mrislices ) %%%%%%% for each plotted MR image slice %%%%%%%%
 
+        % plot intersection between plotted slices
+        % ----------------------------------------
+        newprob3d = newprob3dori;
+        if strcmpi(g.plotintersect, 'on')
+            for index2 = setdiff(1:length( g.mrislices ), index)
+                switch g.mriview{index2}
+                 case 'side', coord = [  g.mrislices(index2) 0 0 1 ]; 
+                 case 'top' , coord = [  0 0 g.mrislices(index2) 1 ]; 
+                 case 'rear', coord = [  0 g.mrislices(index2) 0 1 ]; 
+                end;
+                coord = round( pinv(mri.transform)*[ 0 0 0 1]' )';
+                switch g.mriview{index2}
+                 case 'side', newprob3d(coord(1), :, :, :) = 0;
+                 case 'top' , newprob3d(:, :, coord(3), :) = 0;
+                 case 'rear', newprob3d(:, coord(2), :, :) = 0;
+                end;
+            end;
+        end;
+
+        % create axis if necessary
+        % ------------------------
         if strcmpi(g.subplot, 'off')
             mysubplot(g.geom(1), g.geom(2), index); % get an image slice axis
         end;
+        
+        % find coordinate
+        % ---------------
         switch g.mriview{index}
          case 'side', coord = [  g.mrislices(index) 0 0 1 ]; 
          case 'top' , coord = [  0 0 g.mrislices(index) 1 ]; 
@@ -257,6 +288,8 @@ function [smoothprob3d, mriplanes] = mri3dplot(prob3d, mri, varargin)
         
         coord = round( pinv(mri.transform)*coord' )';
         
+        % get MRI slice
+        % -------------
         switch g.mriview{index}
          case 'side', mriplot  = squeeze( mri.anatomy(coord(1), :, :) );
          case 'top' , mriplot  = squeeze( mri.anatomy(:, :, coord(3)) );
@@ -267,6 +300,8 @@ function [smoothprob3d, mriplanes] = mri3dplot(prob3d, mri, varargin)
         mriplot(:,:,3) = mriplot(:,:,1);
         mriplot = rotatemat( mriplot, g.rotate );
         
+        % get dipole density slice
+        % ------------------------
         switch g.mriview{index}
          case 'side', densplot = squeeze( newprob3d  (coord(1), :, :, :) );
          case 'top' , densplot = squeeze( newprob3d  (:, :, coord(3), :) );
