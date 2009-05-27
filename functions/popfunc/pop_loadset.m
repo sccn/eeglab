@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.59  2009/05/10 04:10:00  arno
+% newtimef and pop_newtimef interface
+%
 % Revision 1.58  2009/04/21 04:43:16  arno
 % Allowing to load multiple files
 %
@@ -265,14 +268,12 @@ if ~isempty(g.eeg)
     EEG = pop_loadset( 'filepath', EEG.filepath, 'filename', EEG.filename);
 
 else
+    eeglab_options;
     ALLEEGLOC = [];
     for ifile = 1:length(g.filename)
         
-        if ifile > 1
-            eeglab_options;
-            if option_storedisk,
-                warndlg2(strvcat('You may only load a single dataset','when selecting the "Store at most one', 'dataset in memory" option'));
-            end;
+        if ifile > 1 & option_storedisk
+            warndlg2(strvcat('You may only load a single dataset','when selecting the "Store at most one', 'dataset in memory" option'));
             break;
         end;
         
