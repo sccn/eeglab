@@ -150,6 +150,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.231  2009/04/08 21:44:17  julie
+% Fix boundary problem
+%
 % Revision 1.230  2008/11/11 01:59:24  arno
 % take EEG class into account
 %
@@ -1210,6 +1213,16 @@ for inddataset = 1:length(ALLEEG)
                           end;
                       catch,
                           disp('eeg_checkset: problem when attempting to resort event latencies.');     
+                      end;
+                  end;
+                  
+                  % check latency of first event
+                  % ----------------------------
+                  if ~isempty(EEG.event)
+                      if isfield(EEG.event, 'latency')
+                          if EEG.event(1).latency < 0.5
+                              EEG.event(1).latency = 0.5;
+                          end;
                       end;
                   end;
                   
