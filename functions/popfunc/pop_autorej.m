@@ -58,6 +58,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2009/02/09 11:06:08  arno
+% Fix CVS problem with Windows
+%
 % Revision 1.1  2008/02/26 14:56:20  arno
 % Initial revision
 %
@@ -179,13 +182,13 @@ function [EEG, rmep, com ] = pop_autorej(EEG, varargin);
     alleps = [1:EEG.trials];
     EEG = pop_eegthresh(EEG,1,[1:size(EEG.data,1)],-opt.threshold,opt.threshold,EEG.xmin,EEG.xmax,0,0);
     numrej = length(find(EEG.reject.rejthresh));  % count number of epochs marked
-    if numrej > 0
-        rmep(1,end+1:end+length(find(EEG.reject.rejthresh))) = alleps(find(EEG.reject.rejthresh));
-        alleps(find(EEG.reject.rejthresh)) = [];
-        EEG = pop_rejepoch( EEG,EEG.reject.rejthresh,0); % actually reject high prob epochs
-        fprintf('\nRe-baselining after large amplitude artifact removed (does not affect the data)...\n');
-        EEG = pop_rmbase( EEG, [EEG.xmin*1000 EEG.xmax*1000]);
-    end;
+%     if numrej > 0
+%         rmep(1,end+1:end+length(find(EEG.reject.rejthresh))) = alleps(find(EEG.reject.rejthresh));
+%         alleps(find(EEG.reject.rejthresh)) = [];
+%         EEG = pop_rejepoch( EEG,EEG.reject.rejthresh,0); % actually reject high prob epochs
+%         fprintf('\nRe-baselining after large amplitude artifact removed (does not affect the data)...\n');
+%         EEG = pop_rmbase( EEG, [EEG.xmin*1000 EEG.xmax*1000]);
+%     end;
     
     %--------------------------------------------
 
