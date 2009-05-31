@@ -33,12 +33,14 @@
 % Optional inputs:
 %   'paired'   = ['on'|'off'] pair the data array {default: 'on' unless 
 %                the last dimension of data array is of different lengths}.
-%   'mode'     = ['perm'|'param'] mode for computing the p-values:
+%   'mode'     = ['perm'|'bootstrap'|'param'] mode for computing the p-values:
 %                 'param' = parametric testing (standard ANOVA or t-test); 
-%                 'perm' = non-parametric testing using surrogate data 
-%                  made by permuting the input data {default: 'perm'}
+%                 'perm' = non-parametric testing using surrogate data
+%                 'bootstrap' = non-parametric bootstrap 
+%                  made by permuting the input data {default: 'param'}
 %   'naccu'    = [integer] Number of surrogate data copies to use in 'perm' 
-%                 mode estimation (see above) {default: 200}.
+%                 or 'bootstrap' mode estimation (see above) {default: 200}.
+%   'verbose'  = ['on'|'off'] print info on the command line {default: 'on'}.
 % Outputs:
 %   stats      = F- or T-value array of the same size as input data without 
 %                the last dimension. A T value is returned only when the data 
@@ -119,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2007/05/04 23:19:02  arno
+% *** empty log message ***
+%
 % Revision 1.18  2007/05/04 23:18:18  arno
 % same
 %
@@ -177,12 +182,14 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
     end;
     
     g = finputcheck( varargin, { 'naccu'   'integer'   [1 Inf]             200;
-                                 'mode'    'string'    { 'param' 'perm' }  'param';
-                                 'paired'  'string'    { 'on' 'off' }      'on' }, 'statcond');
+                                 'mode'    'string'    { 'param' 'perm' 'bootstrap' }  'param';
+                                 'paired'  'string'    { 'on' 'off' }      'on' 
+                                 'verbose' 'string'    { 'on' 'off' }      'on' }, 'statcond');
     if isstr(g), error(g); end;
     
+    if strcmpi(g.verbose, 'on'), verb = 1; else verb = 0; end;
     if strcmp(g.mode, 'param' ) & exist('fcdf') ~= 2
-      fprintf(['statcond(): parametric testing requires fcdf() \n' ...
+      myfprintf(verb,['statcond(): parametric testing requires fcdf() \n' ...
                '            from the Matlab StatsticaL Toolbox.\n' ...
                '            Running nonparametric permutation tests\n.']);
       g.mode = 'perm';
@@ -200,20 +207,34 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
     if length(unique(cellfun('size', data, ndims(data{1}) ))) > 1
         g.paired = 'off'; 
     end;
-    fprintf('%d x %d, ', size(data,1), size(data,2));
+    myfprintf(verb,'%d x %d, ', size(data,1), size(data,2));
     if strcmpi(g.paired, 'on')
-         fprintf('paired data, ');
-    else fprintf('unpaired data, ');
+         myfprintf(verb,'paired data, ');
+         pairflag = 1;
+    else myfprintf(verb,'unpaired data, ');
+         pairflag = 0;
     end;
     if size(data,1) == 1 & size(data,2) == 2
-         fprintf('computing T values\n');
-    else fprintf('computing F values\n');
+         myfprintf(verb,'computing T values\n');
+    else myfprintf(verb,'computing F values\n');
     end;
+    
+    % bootstrap flag
+    % --------------
+    if strcmpi(g.mode, 'bootstrap'), bootflag = 1;
+    else                             bootflag = 0;
+    end;
+    
+    % concatenate all data arrays
+    % ---------------------------
+    [ datavals datalen datadims ] = concatdata( data );
     
     % output text
     % -----------
     if ~strcmpi(g.mode, 'param')
-        fprintf('Accumulating (of %d):', g.naccu);
+        if bootflag, myfprintf(verb,'Bootstraps (of %d):', g.naccu);
+        else         myfprintf(verb,'Permutations (of %d):', g.naccu);
+        end;
     end;
 
     if size(data,1) == 1, % only one row
@@ -234,11 +255,15 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
                 pvals    = reshape(tmppvals, size(pvals));
                 return;
             else
+                cond1ori = cond1;
+                cond2ori = cond2;
                 for index = 1:g.naccu
                     
-                    [cond1 cond2]    = shuffle_paired(cond1, cond2);
-                    if mod(index, 10) == 0, fprintf('%d ', index); end;
-                    if mod(index, 100) == 0, fprintf('\n'); end;
+                    res = surrogate( datavals, datalen, datadims, bootflag, pairflag);
+                    cond1 = res{1,1};
+                    cond2 = res{1,2};
+                    if mod(index, 10) == 0, myfprintf(verb,'%d ', index); end;
+                    if mod(index, 100) == 0, myfprintf(verb,'\n'); end;
                     switch myndims(cond1)
                      case 1   , surrogval(index)     = paired_ttest( cond1, cond2);
                      case 2   , surrogval(:,index)   = paired_ttest( cond1, cond2);
@@ -252,6 +277,8 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
             % unpaired t-test (very fast)
             % -------------
             tail = 'both';
+            [datac datalim ] = concatdata(data);
+            
             cond1 = data{1,1};
             cond2 = data{1,2};
             [ori_vals df] = unpaired_ttest(cond1, cond2);
@@ -262,12 +289,14 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
                 tmppvals(inds) = 2-tmppvals(inds);
                 pvals    = reshape(tmppvals, size(pvals));
                 return;
-           else
+            else
                 for index = 1:g.naccu
                     
-                    [cond1 cond2]    = shuffle_unpaired(cond1, cond2);
-                    if mod(index, 10) == 0 , fprintf('%d ', index); end;
-                    if mod(index, 100) == 0, fprintf('\n'); end;
+                    res = surrogate( datavals, datalen, datadims, bootflag, pairflag);
+                    cond1 = res{1,1};
+                    cond2 = res{1,2};
+                    if mod(index, 10) == 0 , myfprintf(verb,'%d ', index); end;
+                    if mod(index, 100) == 0, myfprintf(verb,'\n'); end;
                     switch myndims(cond1)
                      case 1   , surrogval(index)     = unpaired_ttest( cond1, cond2);
                      case 2   , surrogval(:,index)   = unpaired_ttest( cond1, cond2);
@@ -287,18 +316,14 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
             else
                 for index = 1:g.naccu
                     
-                    if mod(index, 10) == 0, fprintf('%d ', index); end;
-                    if mod(index, 100) == 0, fprintf('\n'); end;
+                    if mod(index, 10) == 0, myfprintf(verb,'%d ', index); end;
+                    if mod(index, 100) == 0, myfprintf(verb,'\n'); end;
                     
-                    if strcmpi(g.paired, 'on')
-                         data = shuffle_paired(   data );
-                    else data = shuffle_unpaired( data );
-                    end;
-                    
+                    res = surrogate( datavals, datalen, datadims, bootflag, pairflag);                    
                     switch myndims(data{1})
-                     case 1   , surrogval(index)     = anova1_cell( data );
-                     case 2   , surrogval(:,index)   = anova1_cell( data );
-                     otherwise, surrogval(:,:,index) = anova1_cell( data );
+                     case 1   , surrogval(index)     = anova1_cell( res );
+                     case 2   , surrogval(:,index)   = anova1_cell( res );
+                     otherwise, surrogval(:,:,index) = anova1_cell( res );
                     end;
                     
                 end;
@@ -306,7 +331,7 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
         end;
     else
         % two-way ANOVA (paired)
-        % -------------
+        % ----------------------
         tail = 'one';
         [ ori_vals{1} ori_vals{2} ori_vals{3} df{1} df{2} df{3} ] = anova2_cell( data );
         if strcmpi(g.mode, 'param')
@@ -316,26 +341,23 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
             return;
         else
             surrogval = { surrogval surrogval surrogval };
+            dataori   = data;
             for index = 1:g.naccu
                 
-                if mod(index, 10) == 0, fprintf('%d ', index); end;
-                if mod(index, 100) == 0, fprintf('\n'); end;
+                if mod(index, 10) == 0, myfprintf(verb,'%d ', index); end;
+                if mod(index, 100) == 0, myfprintf(verb,'\n'); end;
                 
-                if strcmpi(g.paired, 'on')
-                     data = shuffle_paired(   data );
-                else data = shuffle_unpaired( data );
-                end;
-                
+                res = surrogate( datavals, datalen, datadims, bootflag, pairflag);                    
                 switch myndims(data{1})
-                 case 1   , [ surrogval{1}(index)     surrogval{2}(index)     surrogval{3}(index)     ] = anova2_cell( data );
-                 case 2   , [ surrogval{1}(:,index)   surrogval{2}(:,index)   surrogval{3}(:,index)   ] = anova2_cell( data );
-                 otherwise, [ surrogval{1}(:,:,index) surrogval{2}(:,:,index) surrogval{3}(:,:,index) ] = anova2_cell( data );
+                 case 1   , [ surrogval{1}(index)     surrogval{2}(index)     surrogval{3}(index)     ] = anova2_cell( res );
+                 case 2   , [ surrogval{1}(:,index)   surrogval{2}(:,index)   surrogval{3}(:,index)   ] = anova2_cell( res );
+                 otherwise, [ surrogval{1}(:,:,index) surrogval{2}(:,:,index) surrogval{3}(:,:,index) ] = anova2_cell( res );
                 end;
                 
             end;
         end;
     end;
-    fprintf('\n');
+    myfprintf(verb,'\n');
     
     % compute p-values
     % ----------------
@@ -372,117 +394,43 @@ function pvals = compute_pvals(surrog, oridat, tail)
         pvals = min(pvals, 1-pvals);
         pvals = 2*pvals;
     end;    
-    
-% shuffle last dimension of arrays
-% --------------------------------
-function [a, b] = shuffle_paired(a, b); % for increased speed only shuffle half the indices
-    
-
-    if nargin > 1 % very fast 2 conditions -> 2 inputs and 2 outputs
         
-        indswap = find(round(rand( 1,size(a,myndims(a)) )));
-        if myndims(a) == 1
-            tmp        = a(indswap);
-            a(indswap) = b(indswap);
-            b(indswap) = tmp;
-        elseif myndims(a) == 2    
-            tmp          = a(:,indswap);
-            a(:,indswap) = b(:,indswap);
-            b(:,indswap) = tmp;
-        elseif myndims(a) == 3
-            tmp            = a(:,:,indswap);
-            a(:,:,indswap) = b(:,:,indswap);
-            b(:,:,indswap) = tmp;
-        else
-            tmp              = a(:,:,:,indswap);
-            a(:,:,:,indswap) = b(:,:,:,indswap);
-            b(:,:,:,indswap) = tmp;
-        end;
-        
-    else % more than 2 conditions -> one cell array input and one cell array output
-        
-        dims      = size(a);
-        a         = a(:)';
-        in1       = a{1};
-        indswap   = rand( length(a)-1,size(in1,myndims(in1)) ); % array of 0 and 1
-        [tmp1 indswap] = find( indswap );                       % only shuffle half of them
-        indarg1        = ceil(rand(1,length(indswap))*length(a));
-        indarg2        = ceil(rand(1,length(indswap))*length(a));
-    
-        for i = 1:length(indswap)
-            if myndims(in1) == 1
-                tmp                       = a{indarg1(i)}(indswap(i)); % do not shuffle index
-                a{indarg1(i)}(indswap(i)) = a{indarg2(i)}(indswap(i));
-                a{indarg2(i)}(indswap(i)) = tmp;
-            elseif myndims(in1) == 2    
-                tmp                         = a{indarg1(i)}(:,indswap(i));
-                a{indarg1(i)}(:,indswap(i)) = a{indarg2(i)}(:,indswap(i));
-                a{indarg2(i)}(:,indswap(i)) = tmp;
-            elseif myndims(in1) == 3
-                tmp                           = a{indarg1(i)}(:,:,indswap(i));
-                a{indarg1(i)}(:,:,indswap(i)) = a{indarg2(i)}(:,:,indswap(i));
-                a{indarg2(i)}(:,:,indswap(i)) = tmp;
-            else
-                tmp                             = a{indarg1(i)}(:,:,:,indswap(i));
-                a{indarg1(i)}(:,:,:,indswap(i)) = a{indarg2(i)}(:,:,:,indswap(i));
-                a{indarg2(i)}(:,:,:,indswap(i)) = tmp;
-            end;
-        end;
-        a = reshape(a, dims);
-        
-    end;
-    
-
- function [a,b] = shuffle_unpaired(a,b); % for increased speed only shuffle half the indices
+function res = surrogate(dataconcat, lens, dims, bootstrapflag, pairedflag); % for increased speed only shuffle half the indices
        
-    if nargin > 1, a = { a b}; end;
-     
-    % unpaired
-    % --------
-    dims      = size(a);
-    a         = a(:)';                
-    alllen    = cellfun('size', a, myndims(a{1}) ); % by chance, pick up the last dimension
-    
-    indswap1 = ceil(rand( 1, ceil(sum(alllen)/2) )*sum(alllen)); % origin index (cumulated indices)
-    indswap2 = ceil(rand( 1, ceil(sum(alllen)/2) )*sum(alllen)); % origin target
-    indtarg1 = ones(1, sum(alllen) );                    % origin set
-    indtarg2 = ones(1, sum(alllen) );                    % target set
-    
     % recompute indices in set and target cell indices
     % ------------------------------------------------
-    for index = 1:(length(a)-1)
-        tmpind1 = find(indswap1 > alllen(index));
-        tmpind2 = find(indswap2 > alllen(index));
-        indswap1(tmpind1) = indswap1(tmpind1)-alllen(index);
-        indswap2(tmpind2) = indswap2(tmpind2)-alllen(index);
-        indtarg1(tmpind1) = indtarg1(tmpind1)+1;
-        indtarg2(tmpind2) = indtarg2(tmpind2)+1;
-    end;
-    
-    % perform swaping
-    % ---------------
-    for i = 1:length(indswap1)
-        if myndims(a{1}) == 1
-            tmp                         = a{indtarg1(i)}(indswap1(i));
-            a{indtarg1(i)}(indswap1(i)) = a{indtarg2(i)}(indswap2(i));
-            a{indtarg2(i)}(indswap2(i)) = tmp;
-        elseif myndims(a{1}) == 2    
-            tmp                           = a{indtarg1(i)}(:,indswap1(i));
-            a{indtarg1(i)}(:,indswap1(i)) = a{indtarg2(i)}(:,indswap2(i));
-            a{indtarg2(i)}(:,indswap2(i)) = tmp;
-        elseif myndims(a{1}) == 3    
-            tmp                             = a{indtarg1(i)}(:,:,indswap1(i));
-            a{indtarg1(i)}(:,:,indswap1(i)) = a{indtarg2(i)}(:,:,indswap2(i));
-            a{indtarg2(i)}(:,:,indswap2(i)) = tmp;
+    if bootstrapflag
+        if pairedflag
+             indswap  = mod( [1:lens(end)]+ ceil(rand(1,lens(end))*length(lens))*lens(2)-1, lens(end) )+1;
+        else indswap  = ceil(rand(1,lens(end))*lens(end));
+        end;
+    else
+        if pairedflag
+            indswap  = [1:lens(end)];
+            indswap  = reshape(indswap, [lens(2) length(lens)-1]);
+            for i = 1:size(indswap,1) % shuffle each row
+                [tmp idx] = sort(rand(1,size(indswap,2)));
+                indswap(i,:) = indswap(i,idx);
+            end;    
+            indswap  = reshape(indswap, [1 lens(2)*(length(lens)-1)]);
         else
-            tmp                               = a{indtarg1(i)}(:,:,:,indswap1(i));
-            a{indtarg1(i)}(:,:,:,indswap1(i)) = a{indtarg2(i)}(:,:,:,indswap2(i));
-            a{indtarg2(i)}(:,:,:,indswap2(i)) = tmp;
+            oriindices = [1:lens(end)]; % just shuffle indices
+            [tmp idx] = sort(rand(1,length(oriindices)));
+            indswap   = oriindices(idx);
         end;
     end;
-    a = reshape(a, dims);
-    if nargin > 1, b = a{2}; a = a{1}; end;
-        
+    
+    res = {};
+    for i = 1:length(lens)-1
+        switch myndims(dataconcat)
+            case 1, res{i} = dataconcat(indswap(lens(i)+1:lens(i+1)));
+            case 2, res{i} = dataconcat(:,indswap(lens(i)+1:lens(i+1)));
+            case 3, res{i} = dataconcat(:,:,indswap(lens(i)+1:lens(i+1)));
+            case 1, res{i} = dataconcat(:,:,:,indswap(lens(i)+1:lens(i+1)));
+        end;
+    end;
+    res = reshape(res, dims);
+    
 function [tval, df] = paired_ttest(a,b)
     
     tmpdiff = a-b;
@@ -524,3 +472,9 @@ function res = mymean( data, varargin) % deal with complex numbers
 
 function res = mystd( data, varargin) % deal with complex numbers
     res = std( abs(data), varargin{:});
+
+function myfprintf(verb, varargin)
+    if verb
+        fprintf(varargin{:});
+    end;
+      

@@ -54,6 +54,9 @@
 %                  of 'trials' statistics requires a lot of RAM.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2007/09/11 10:55:48  arno
+% disable stats if not enough info
+%
 % Revision 1.2  2007/04/30 19:52:22  arno
 % thrshold entry\
 %
@@ -84,11 +87,12 @@ if nargin > 1
         varargin       = { tmpparams{:} varargin{2:end} };
     end;
 end;
-opt = finputcheck( varargin, { 'threshold'   'real'   []              NaN;
-                               'naccu'       'integer' []             [];
+opt = finputcheck( varargin, { 'threshold'   'real'    []               NaN;
+                               'mcorrect'    'string'  { 'none' 'fdr' } 'none';
+                               'naccu'       'integer' []               [];
                                'groupstats'   'string' { 'on' 'off' }   'off';
                                'condstats'    'string' { 'on' 'off' }   'off';
-                               'statistics'  'string' { 'param' 'perm' }       'param' }, ...
+                               'statistics'  'string' { 'param' 'perm' 'bootstrap' }       'param' }, ...
                                'std_stat', 'ignore');
 if isstr(opt), error(opt); end;
 if ~isnan(opt.threshold) & isempty(opt.naccu), opt.naccu = 1/opt.threshold*2; end;

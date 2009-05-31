@@ -88,6 +88,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.54  2008/09/25 15:04:18  arno
+% allow plotting groups of different sizes
+%
 % Revision 1.53  2008/04/16 17:55:27  arno
 % fix color axis for scalp maps
 %
@@ -203,6 +206,7 @@ opt = finputcheck( varargin, { 'topofreq'    'real'    [] STUDY.etc.specparams.t
                                'plotconditions'      'string' [] STUDY.etc.specparams.plotconditions;
                                'subtractsubjectmean' 'string' [] STUDY.etc.specparams.subtractsubjectmean
                                'threshold'   'real'    [] STUDY.etc.specparams.threshold;
+                               'mcorrect'    'string'  [] STUDY.etc.specparams.mcorrect;
                                'naccu'       'integer' [] STUDY.etc.specparams.naccu;
                                'channels'    'cell'    []              {};
                                'caxis'       'real'    []              STUDY.etc.specparams.ylim;
@@ -225,6 +229,7 @@ if ~isempty(opt.subject), opt.condstats = 'off'; disp('No condition statistics f
 plotcurveopt = { ...
    'ylim',           opt.ylim, ...
    'threshold',      opt.threshold, ...
+   'mcorrect',       opt.mcorrect, ...
    'plotgroups',     opt.plotgroups, ...
    'plotconditions', opt.plotconditions, ...
    'statistics',     opt.statistics };

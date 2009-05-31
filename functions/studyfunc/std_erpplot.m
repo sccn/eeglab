@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.59  2008/04/16 17:55:53  arno
+% fix color axis for scalp maps
+%
 % Revision 1.57  2007/08/14 19:29:47  nima
 % _
 %
@@ -211,6 +214,7 @@ opt = finputcheck( varargin, { 'topotime'    'real'    [] STUDY.etc.erpparams.to
                                'statistics'  'string'  [] STUDY.etc.erpparams.statistics;
                                'groupstats'  'string'  [] STUDY.etc.erpparams.groupstats;
                                'condstats'   'string'  [] STUDY.etc.erpparams.condstats;
+                               'mcorrect'    'string'  [] STUDY.etc.erpparams.mcorrect;
                                'plotgroups'  'string'  [] STUDY.etc.erpparams.plotgroups;
                                'plotconditions' 'string'  [] STUDY.etc.erpparams.plotconditions;
                                'threshold'   'real'    [] STUDY.etc.erpparams.threshold;
@@ -236,6 +240,7 @@ plotcurveopt = { ...
    'ylim',           opt.ylim, ...
    'filter',         opt.filter, ...
    'threshold',      opt.threshold, ...
+   'mcorrect',       opt.mcorrect, ...
    'plotgroups',     opt.plotgroups, ...
    'plotconditions', opt.plotconditions, ...
    'statistics',     opt.statistics };

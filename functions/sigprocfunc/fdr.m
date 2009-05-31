@@ -1,11 +1,13 @@
 % fdr() - compute false detection rate mask
 %
 % Usage:
-%   >> [p_masked, p_fdr] = fdr( pvals, alpha);
+%   >> [p_fdr, p_masked] = fdr( pvals, alpha);
 %
 % Inputs:
 %   pvals - vector or array of p-values
-%   alpha - threshold value (non-corrected)
+%   alpha - threshold value (non-corrected). If no alpha is given
+%           each p-value is used as its own alpha and FDR corrected
+%           array is returned.
 %
 % Outputs:
 %   p_fdr    - pvalue used for threshold (based on independence
@@ -36,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2008/05/06 22:32:52  arno
+% Initial revision
+%
 
 function [pID, p_masked] = fdr(pvals, q);
 
@@ -46,8 +51,17 @@ I = (1:V)';
 cVID = 1;
 cVN = sum(1./(1:V));
 
-pID = p(max(find(p<=I/V*q/cVID))); % standard FDR
-pN =  p(max(find(p<=I/V*q/cVN)));  % non-parametric FDR (not used)
+if nargin < 2
+    pID = ones(size(pvals));
+    thresholds = exp(linspace(log(0.1),log(0.000001), 100));
+    for index = 1:length(thresholds)
+        [tmp p_masked] = fdr(pvals, thresholds(index));
+        pID(p_masked) = thresholds(index);    
+    end;
+else
+    pID = p(max(find(p<=I/V*q/cVID))); % standard FDR
+    %pN = p(max(find(p<=I/V*q/cVN)));  % non-parametric FDR (not used)
+end;
 if isempty(pID), pID = 0; end;
 
 if nargout > 1

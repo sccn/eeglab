@@ -65,6 +65,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2008/04/23 01:23:12  nima
+% _
+%
 % Revision 1.19  2008/04/23 00:37:09  nima
 % _
 %
@@ -213,6 +216,7 @@ opt = finputcheck( varargin, { 'channels'    'cell'   []              {};
                                'groupnames'  'cell'   []              {};
                                'compinds'    'cell'   []              {};
                                'threshold'   'real'   []              NaN;
+                               'mcorrect'    'string'  { 'none' 'fdr' } 'none';
                                'topovals'       'real'   []              []; % same as above
                                'naccu'       'integer' []             500;
                                'unitx'       'string' []              'ms'; % just for titles
@@ -229,7 +233,7 @@ opt = finputcheck( varargin, { 'channels'    'cell'   []              {};
                                'plotgroups'   'string' { 'together' 'apart' }  'apart';
                                'plotconditions'    'string' { 'together' 'apart' }  'apart';
                                'plotmode'    'string' { 'normal' 'condensed' }  'normal';
-                               'statistics'  'string' { 'param' 'perm' }       'param';
+                               'statistics'  'string' { 'param' 'perm' 'bootstrap' }       'param';
                                'statmode'    'string' { 'subjects' 'common' 'trials' } 'subjects'}, 'std_erpmaskdata');
 
 % opt.figure =  'off'; % test by nima
@@ -295,14 +299,27 @@ end;
 % --------------------------
 if ~isempty(opt.interstats), pinter = opt.interstats{3}; end;
 
-if ~isnan(opt.threshold)    
+if ~isnan(opt.threshold) & ( ~isempty(opt.groupstats) | ~isempty(opt.condstats) )    
     % applying threshold
     % ------------------
-    for ind = 1:length(opt.condstats),  pcondplot{ind}  = opt.condstats{ind}  < opt.threshold; end;
-    for ind = 1:length(opt.groupstats), pgroupplot{ind} = opt.groupstats{ind} < opt.threshold; end;
-    if ~isempty(pinter), pinterplot = pinter < opt.threshold; end;
+    if strcmpi(opt.mcorrect, 'fdr'), 
+        disp('Applying FDR correction for multiple comparisons');
+        for ind = 1:length(opt.condstats),  [ tmp pcondplot{ ind}] = fdr(opt.condstats{ind} , opt.threshold); end;
+        for ind = 1:length(opt.groupstats), [ tmp pgroupplot{ind}] = fdr(opt.groupstats{ind}, opt.threshold); end;
+        if ~isempty(pinter), [tmp pinterplot] = fdr(pinter, opt.threshold); end;
+    else
+        for ind = 1:length(opt.condstats),  pcondplot{ind}  = opt.condstats{ind}  < opt.threshold; end;
+        for ind = 1:length(opt.groupstats), pgroupplot{ind} = opt.groupstats{ind} < opt.threshold; end;
+        if ~isempty(pinter), pinterplot = pinter < opt.threshold; end;
+    end;
     maxplot = 1;
 else
+    if strcmpi(opt.mcorrect, 'fdr'), 
+        disp('Applying FDR correction for multiple comparisons');
+        for ind = 1:length(opt.condstats), opt.condstats{ind} = fdr( opt.condstats{ind} ); end;
+        for ind = 1:length(opt.groupstats), opt.groupstats{ind} = fdr( opt.groupstats{ind} ); end;
+        if ~isempty(pinter), pinter = fdr(pinter); end;
+    end;
     warning off;
     for ind = 1:length(opt.condstats),  pcondplot{ind}  = -log10(opt.condstats{ind}); end;
     for ind = 1:length(opt.groupstats), pgroupplot{ind} = -log10(opt.groupstats{ind}); end;

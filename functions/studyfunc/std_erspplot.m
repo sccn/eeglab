@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.65  2009/05/19 21:43:09  arno
+% fix retruning values
+%
 % Revision 1.64  2009/05/13 00:52:12  arno
 % fixing the ouput for scalp maps
 %
@@ -234,6 +237,7 @@ STUDY = pop_erspparams(STUDY, 'default');
                                'statmode'    'string'  [] STUDY.etc.erspparams.statmode;
                                'threshold'   'real'    [] STUDY.etc.erspparams.threshold;
                                'naccu'       'integer' [] STUDY.etc.erspparams.naccu;
+                               'mcorrect'    'string'  [] STUDY.etc.erspparams.mcorrect;
                                'channels'    'cell'    []              {};
                                'caxis'       'real'    []              [];
                                'clusters'    'integer' []              [];
@@ -271,6 +275,7 @@ end;
 plotcurveopt = { ...
    'ersplim',     fastif(strcmpi(opt.datatype, 'ITC'), [-opt.itclim opt.itclim], opt.ersplim), ...
    'threshold',   opt.threshold, ...
+   'mcorrect',    opt.mcorrect, ...
    'maskdata',    opt.maskdata, ...
    'groupstats',  opt.groupstats, ...
    'condstats',   opt.condstats, ...
