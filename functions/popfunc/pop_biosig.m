@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2009/05/07 20:29:33  arno
+% edit message
+%
 % Revision 1.34  2009/05/07 00:01:23  arno
 % now calling biosig2eeglab
 %
@@ -313,7 +316,7 @@ EEG = eeg_checkset(EEG);
 % history
 % -------
 if isempty(options)
-    command = sprintf('EEG = my_pop_biosig(''%s'');', filename); 
+    command = sprintf('EEG = pop_biosig(''%s'');', filename); 
 else
-    command = sprintf('EEG = my_pop_biosig(''%s'', %s);', filename, vararg2str(options)); 
+    command = sprintf('EEG = pop_biosig(''%s'', %s);', filename, vararg2str(options)); 
 end;    
