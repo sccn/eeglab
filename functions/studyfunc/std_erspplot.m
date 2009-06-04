@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.66  2009/05/31 02:22:10  arno
+% Adding FDR and bootstrap to all STUDY functions
+%
 % Revision 1.65  2009/05/19 21:43:09  arno
 % fix retruning values
 %
@@ -259,7 +262,7 @@ end;
 
 % for backward compatibility
 % --------------------------
-if isempty(opt.plottf) & ~isempty(opt.topofreq) & ~isempty(opt.topotime)
+if isempty(opt.plottf) & ~isempty(opt.topofreq) & ~isempty(opt.topotime) & ~isnan(opt.topofreq) & ~isnan(opt.topotime)
      opt.plottf = [ opt.topofreq(1) opt.topofreq(end) opt.topotime(1) opt.topotime(end) ];
 end;
 if strcmpi(opt.mode, 'comps'), opt.plotsubjects = 'on'; end;
