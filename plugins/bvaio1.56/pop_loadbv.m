@@ -41,7 +41,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Id: pop_loadbv.m,v 1.1 2009-01-30 03:49:00 arno Exp $
+% $Id: pop_loadbv.m,v 1.2 2009-06-09 21:01:32 arno Exp $
 
 function [EEG, com] = pop_loadbv(path, hdrfile, srange, chans)
 
@@ -92,7 +92,10 @@ function [EEG, com] = pop_loadbv(path, hdrfile, srange, chans)
     end
 
     % Channel Infos
-    if ~exist('chans', 'var') || isempty(chans)
+    if ~exist('chans', 'var')
+        chans = 1:hdr.commoninfos.numberofchannels;
+        EEG.nbchan = hdr.commoninfos.numberofchannels;
+    elseif isempty(chans)
         chans = 1:hdr.commoninfos.numberofchannels;
         EEG.nbchan = hdr.commoninfos.numberofchannels;
     else
