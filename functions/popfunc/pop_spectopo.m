@@ -100,6 +100,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.48  2007/08/02 23:20:41  arno
+% fix typo
+%
 % Revision 1.47  2007/08/02 23:15:14  arno
 % adding icachaninds input
 %
@@ -407,8 +410,8 @@ if timerange(1)/1000~=EEG.xmin | timerange(2)/1000~=EEG.xmax
 	fprintf('pop_spectopo(): selecting time range %6.2f ms to %6.2f ms (points %d to %d)\n', ...
 			timerange(1), timerange(2), posi, posf);
 end;
-if exist('pointrange') == 1, SIGTMP = EEG.data(:,pointrange,:); totsiz = length( pointrange);
-else                         SIGTMP = EEG.data; totsiz = EEG.pnts;
+if exist('pointrange') == 1, SIGTMP = EEG.data(EEG.icachansind,pointrange,:); totsiz = length( pointrange);
+else                         SIGTMP = EEG.data(EEG.icachansind,:,:); totsiz = EEG.pnts;
 end;
 
 % add boundaries if continuous data
