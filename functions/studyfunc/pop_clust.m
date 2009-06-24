@@ -61,6 +61,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2009/04/17 15:01:20  julie
+% Remove old clusters when called from commandline
+%
 % Revision 1.35  2007/12/09 01:06:59  arno
 % docuemntation and auto-disable checkbox
 %
@@ -291,7 +294,8 @@ if isempty(varargin) %GUI call
            STUDY.history =  sprintf('%s\n%s',  STUDY.history, command);            
        end
            
-       [STUDY] = pop_clustedit(STUDY, ALLEEG);           
+       [STUDY com] = pop_clustedit(STUDY, ALLEEG); 
+       command = [ command com];
 	end
     
 else %command line call
