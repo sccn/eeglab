@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.60  2009/05/27 23:29:07  arno
+% fix problem with warning message
+%
 % Revision 1.59  2009/05/10 04:10:00  arno
 % newtimef and pop_newtimef interface
 %
@@ -237,7 +240,7 @@ if nargin < 1
 else
     % account for old calling format
     % ------------------------------
-    if ~strcmpi(inputname, 'filename'), 
+    if ~strcmpi(inputname, 'filename') & ~strcmpi(inputname, 'filepath')
         options = { 'filename' inputname }; 
         if nargin > 1
             options = { options{:} 'filepath' inputpath }; 
