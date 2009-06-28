@@ -150,6 +150,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.232  2009/05/27 23:32:23  arno
+% fix first event latency
+%
 % Revision 1.231  2009/04/08 21:44:17  julie
 % Fix boundary problem
 %
@@ -1692,6 +1695,14 @@ for inddataset = 1:length(ALLEEG)
             if isfield( EEG.chanlocs, 'shrink')
                 EEG.chaninfo.shrink = EEG.chanlocs(1).shrink;
                 EEG.chanlocs = rmfield( EEG.chanlocs, 'shrink');
+            end;
+            if ~isfield( EEG.chanlocs, 'ref')
+                EEG.chanlocs(1).ref = '';
+            end;
+            for tmpind = 1:length(EEG.chanlocs)
+                if ~isstr(EEG.chanlocs(tmpind).ref)
+                    EEG.chanlocs(tmpind).ref = '';
+                end;
             end;
 
             % check if duplicate channel label
