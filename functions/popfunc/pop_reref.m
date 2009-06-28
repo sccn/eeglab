@@ -60,6 +60,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2009/06/28 05:49:56  arno
+% Adding reference and reprogramming pop_chanedit
+%
 % Revision 1.33  2008/04/16 17:52:46  arno
 % Additional entry to exclude reference from rereferencing
 %
@@ -206,6 +209,7 @@ if nargin < 2
                     'else,' ...
                     '   [tmp tmpval] = pop_chansel({EEG(1).chaninfo.nodatchans.labels}, ''withindex'', ''on''); set(findobj(gcbf, ''tag'', ''refloc''  ), ''string'',tmpval); clear tmp tmpval;' ...
                     'end;' ];
+    if isempty(EEG.chanlocs), cb_chansel1 = ''; cb_chansel2 = ''; cb_chansel3 = ''; end;
     
     % find current reference (= reference most used)
     % ----------------------------------------------
@@ -280,17 +284,40 @@ end;
 
 nchans = EEG.nbchan;
 fprintf('Re-referencing data\n');
-[EEG.data EEG.chanlocs inds ] = reref(EEG.data, ref, optionscall{:});
+oldchanlocs = EEG.chanlocs;
+[EEG.data EEG.chanlocs refchan ] = reref(EEG.data, ref, optionscall{:});
+g = struct(optionscall{:});
+if ~isfield(g, 'exclude'), g.exclude = []; end;
+if ~isfield(g, 'keepref'), g.keepref = 'off'; end;
+if ~isfield(g, 'refloc') , g.refloc  = []; end;
+
+% deal with reference
+% -------------------
+if ~isempty(refchan)
+    if ~isfield(EEG.chaninfo, 'nodatchans')
+        EEG.chaninfo.nodatchans = refchan;
+    elseif isempty(EEG.chaninfo.nodatchans)
+        EEG.chaninfo.nodatchans = refchan;
+    else
+        allf = fieldnames(refchan);
+        n    = length(EEG.chaninfo.nodatchans);
+        for ind = 1:length(allf)
+            EEG.chaninfo.nodatchans = setfield(EEG.chaninfo.nodatchans, { n }, ...
+                allf{ind}, getfield(refchan, allf{ind}));
+        end;
+    end;
+end;
+if ~isempty(g.refloc)
+    tmpind = strmatch( g.refloc.labels, { EEG.chaninfo.nodatchans.labels });
+     EEG.chaninfo.nodatchans(tmpind) = [];
+end;
+    
 EEG.nbchan = size(EEG.data,1);
 EEG = eeg_checkset(EEG);
 
 % include ICA or not
 % ------------------
 if ~isempty(EEG.icaweights)
-    g = struct(optionscall{:});
-    if ~isfield(g, 'exclude'), g.exclude = []; end;
-    if ~isfield(g, 'keepref'), g.keepref = 'off'; end;
-    if ~isfield(g, 'refloc') , g.refloc  = []; end;
     
     if ~isempty(intersect(EEG.icachansind, g.exclude))
         disp('Warning: some channels used for ICA were excluded from referencing');

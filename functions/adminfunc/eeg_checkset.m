@@ -150,6 +150,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.233  2009/06/28 05:49:56  arno
+% Adding reference and reprogramming pop_chanedit
+%
 % Revision 1.232  2009/05/27 23:32:23  arno
 % fix first event latency
 %
@@ -1702,6 +1705,16 @@ for inddataset = 1:length(ALLEEG)
             for tmpind = 1:length(EEG.chanlocs)
                 if ~isstr(EEG.chanlocs(tmpind).ref)
                     EEG.chanlocs(tmpind).ref = '';
+                end;
+            end;
+            if isfield( EEG.chaninfo, 'nodatchan')
+                if ~isfield( EEG.chaninfo.nodatchan, 'ref')
+                    EEG.chaninfo.nodatchan(1).ref = '';
+                end;
+                for tmpind = 1:length(EEG.chaninfo.nodatchan)
+                    if ~isstr(EEEG.chaninfo.nodatchan(tmpind).ref)
+                        EEG.chaninfo.nodatchan(tmpind).ref = '';
+                    end;
                 end;
             end;
 
