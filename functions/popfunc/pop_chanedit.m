@@ -1,4 +1,7 @@
 % pop_chanedit() - Edit the channel locations structure of an EEGLAB dataset,
+%                  EEG.chanlocs. For structure location and file formats, 
+%                  see >> help readlocs  
+% 
 %                  EEG.chanlocs. For structure location and file formats,
 %                  see >> help readlocs
 %
@@ -139,6 +142,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.178  2009/06/28 06:33:38  arno
+% Fixing rereferencing futher
+%
 % Revision 1.177  2009/06/28 05:49:56  arno
 % Adding reference and reprogramming pop_chanedit
 %
