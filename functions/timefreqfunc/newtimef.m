@@ -50,7 +50,7 @@
 %       cycles      = [0] Use FFTs with Hanning window tapering. {default}
 %                   = [real positive scalar] Number of cycles in each Morlet
 %                     (gaussian-tapered) wavelet, constant across frequencies.
-%                   = [cycles(1) cycles(2)] wavelet cycles increase with 
+%                     [cycles(1) cycles(2)] wavelet cycles increase with 
 %                     frequency, beginning at cycles(1) and, if cycles(2) > 1,
 %                     increasing to cycles(2) at the highest frequency. Else:
 %                     If cycles(2) < 1, increasing by a factor of cycles(2),
@@ -325,6 +325,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.167  2009/05/27 05:17:14  arno
+% Fixing scale etc...
+%
 % Revision 1.166  2009/05/20 21:15:51  arno
 % change help message
 %
