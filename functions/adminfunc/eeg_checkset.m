@@ -150,6 +150,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.234  2009/06/28 06:33:38  arno
+% Fixing rereferencing futher
+%
 % Revision 1.233  2009/06/28 05:49:56  arno
 % Adding reference and reprogramming pop_chanedit
 %
@@ -1699,12 +1702,18 @@ for inddataset = 1:length(ALLEEG)
                 EEG.chaninfo.shrink = EEG.chanlocs(1).shrink;
                 EEG.chanlocs = rmfield( EEG.chanlocs, 'shrink');
             end;
+            if strcmpi(EEG.ref, 'averef')
+                 ref = 'average';
+            else ref = '';
+            end;
             if ~isfield( EEG.chanlocs, 'ref')
-                EEG.chanlocs(1).ref = '';
+                EEG.chanlocs(1).ref = ref;
             end;
             for tmpind = 1:length(EEG.chanlocs)
                 if ~isstr(EEG.chanlocs(tmpind).ref)
-                    EEG.chanlocs(tmpind).ref = '';
+                    EEG.chanlocs(tmpind).ref = ref;
+                else
+                    ref = '';
                 end;
             end;
             if isfield( EEG.chaninfo, 'nodatchan')
