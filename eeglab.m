@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.535  2009/05/01 01:06:18  arno
+% Allow writing EDF/BDF/GDF files
+%
 % Revision 1.534  2009/04/30 23:00:03  arno
 % Adding writing menu
 %
@@ -3079,7 +3082,7 @@ elseif (exist('EEG') == 1) & ~isnumeric(EEG) & ~isempty(EEG(1).data)
         set( g.win6, 'String', 'Sampling rate (Hz)');
         set( g.win7, 'String', 'Epoch start (sec)');
         set( g.win8, 'String', 'Epoch end (sec)');
-        set( g.win9, 'String', 'Average reference');
+        set( g.win9, 'String', 'Reference');
         set( g.win10, 'String', 'Channel locations');
         set( g.win11, 'String', 'ICA weights');
         set( g.win12, 'String', 'Dataset size (Mb)');
@@ -3121,7 +3124,20 @@ elseif (exist('EEG') == 1) & ~isnumeric(EEG) & ~isempty(EEG(1).data)
             set( g.val8, 'String', sprintf('%6.3f\n', EEG.xmax));
         end;
 
-        set( g.val9, 'String', fastif(strcmpi(EEG.ref, 'averef'), 'Yes', 'No'));
+        % reference
+        if isfield(EEG(1).chanlocs, 'ref')
+            [curref tmp allinds] = unique( { EEG(1).chanlocs.ref });
+            maxind = 1;
+            for ind = unique(allinds)
+                if length(find(allinds == ind)) > length(find(allinds == maxind))
+                    maxind = ind;
+                end;
+            end;
+            curref = curref{maxind};
+            if isempty(curref), curref = 'unknown'; end;
+        else curref = 'unknown';
+        end;
+        set( g.val9, 'String', curref);
         if isempty(EEG.chanlocs)
             set( g.val10, 'String', 'No');
         else
