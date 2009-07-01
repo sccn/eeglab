@@ -29,6 +29,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2006/02/07 19:15:03  arno
+% adding saved field
+%
 % Revision 1.8  2005/03/09 17:24:00  arno
 % add chaninfo
 %
@@ -58,27 +61,48 @@
 
 function EEG = eeg_emptyset();
 
-EEG.setname    = '';
-EEG.filename   = '';
-EEG.filepath   = '';
-EEG.pnts       = 0;
-EEG.nbchan     = 0;
-EEG.trials     = 0;
-EEG.srate      = 1;
-EEG.xmin       = 0;
-EEG.xmax       = 0;
-EEG.data       = [];
-EEG.icawinv    = [];
-EEG.icasphere  = [];
-EEG.icaweights = [];
-EEG.icaact    = [];
-EEG.event     = [];
-EEG.epoch  = [];
-EEG.chanlocs    = '';
-EEG.chaninfo    = '';
+function EEG = eeg_emptyset();
+
+EEG.setname     = '';
+EEG.filename    = '';
+EEG.filepath    = '';
+EEG.subject     = '';
+EEG.group       = '';
+EEG.condition   = '';
+EEG.session     = [];
 EEG.comments    = '';
-EEG.ref         = []; % unspecified
+EEG.nbchan      = 0;
+EEG.trials      = 0;
+EEG.pnts        = 0;
+EEG.srate       = 1;
+EEG.xmin        = 0;
+EEG.xmax        = 0;
+EEG.times       = [];
+EEG.data        = [];
+EEG.icaact      = [];
+EEG.icawinv     = [];
+EEG.icasphere   = [];
+EEG.icaweights  = [];
+EEG.icachansind = [];
+EEG.chanlocs    = [];
+EEG.urchanlocs  = [];
+EEG.chaninfo    = [];
+EEG.ref         = [];
+EEG.event       = [];
+EEG.urevent     = [];
+EEG.eventdescription = {};
+EEG.epoch       = [];
+EEG.epochdescription = {};
+EEG.reject      = [];
+EEG.stats       = [];
+EEG.specdata    = [];
+EEG.specicaact  = [];
+EEG.splinefile  = '';
+EEG.icasplinefile = '';
+EEG.dipfit      = [];
+EEG.history     = '';
 EEG.saved       = 'no';
+EEG.etc         = [];
 
 %EEG.reject.threshold  = [1 0.8 0.85];
 %EEG.reject.icareject  = [];
