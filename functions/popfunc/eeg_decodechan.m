@@ -2,14 +2,15 @@
 %                retaining and/or excluding specified time/latency, data point, channel, 
 %                and/or epoch range(s).
 % Usage:
-%   >> chanlist = eeg_decodechan(chanlocs, chanlist);
+%   >> [chaninds chanlist] = eeg_decodechan(chanlocs, chanlist);
 %
 % Inputs:
 %   chanlocs  - channel location structure
 %   chanlist  - list of channels 'cz pz fz' etc or { 'cz' 'pz' 'fz' }
 %
 % Outputs:
-%   chanlist  - cell array with a list of channel
+%   chaninds  - integer array with the list of channel indices
+%   chanlist  - cell array with a list of channel labels
 %
 % Author: Arnaud Delorme, SCCN/INC/UCSD, 2009-
 % 
@@ -34,6 +35,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2009/04/27 21:26:07  arno
+% New func to decode channels
+%
 
 function [ chaninds chanlist ] = eeg_decodechan(chanlocs, chanstr);
 
@@ -64,8 +68,8 @@ chanval  = [];
 if iscell(chanlist)
     for ind = 1:length(chanlist)
 
-        valtmp = str2num(chanlist{ind});
-        if ~isempty(valtmp)
+        valtmp = str2double(chanlist{ind});
+        if ~isnan(valtmp)
              chanval(end+1) = valtmp;
         else chanval(end+1) = 0;
         end;
@@ -89,8 +93,18 @@ else
             for tmpi = 1:length(indmatch)
                 chaninds(end+1) = indmatch(tmpi);
             end;
-        else error([ 'Channel ''' chanlist{ind} ''' not found' ]);
+        else
+            try,
+                eval([ 'chaninds = ' chanlist{ind} ';' ]);
+                if isempty(chaninds)
+                     error([ 'Channel ''' chanlist{ind} ''' not found' ]);
+                else 
+                end;
+            catch
+                error([ 'Channel ''' chanlist{ind} ''' not found' ]);
+            end;
         end;
     end;
 end;
 chaninds = sort(chaninds);
+chanlist = { chanlocs(chaninds).labels };
