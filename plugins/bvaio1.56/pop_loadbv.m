@@ -41,7 +41,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Id: pop_loadbv.m,v 1.2 2009-06-09 21:01:32 arno Exp $
+% $Id: pop_loadbv.m,v 1.3 2009-07-01 01:08:54 arno Exp $
 
 function [EEG, com] = pop_loadbv(path, hdrfile, srange, chans)
 
@@ -145,7 +145,10 @@ function [EEG, com] = pop_loadbv(path, hdrfile, srange, chans)
     disp('pop_loadbv(): reading EEG data');
     [IN, message] = fopen(fullfile(path, hdr.commoninfos.datafile));
     if IN == -1
-        error(message)
+        [IN, message] = fopen(fullfile(path, lower(hdr.commoninfos.datafile)));
+        if IN == -1
+            error(message)
+        end;
     end
     if isfield(hdr.commoninfos, 'datapoints')
         hdr.commoninfos.datapoints = str2double(hdr.commoninfos.datapoints);
@@ -334,7 +337,10 @@ function config = readconfig(path, file)
     % Open and read file
     [IN, message] = fopen(fullfile(path,file));
     if IN == -1
-        error(message);
+        [IN, message] = fopen(fullfile(path,lower(file)));
+        if IN == -1
+            error(message);
+        end;
     end
     raw={};
     while ~feof(IN)
