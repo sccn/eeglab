@@ -142,6 +142,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.179  2009/06/29 18:56:01  arno
+% *** empty log message ***
+%
 % Revision 1.178  2009/06/28 06:33:38  arno
 % Fixing rereferencing futher
 %
@@ -818,7 +821,7 @@ if nargin < 3
 
     % special checkbox for chandata field
     % -----------------------------------
-    geometry = { geometry{:} [1.9 0.6 0.2 1] };
+    geometry = { geometry{:} [1.95 0.15 0.6 1] };
     cbfield = [ 'valnumtmp   = str2num(get(findobj(gcbf, ''tag'', ''chaneditnumval''), ''string''));' ...
                 'pop_chanedit(gcbf, [], ''changefield'', { valnumtmp ''' allfields{end} ''' get(gcbo, ''value'') });' ...
                 'clear valnumtmp;' ];
