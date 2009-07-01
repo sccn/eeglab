@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.537  2009/07/01 21:18:00  arno
+% 64-bit PC windows and solaris
+%
 % Revision 1.536  2009/06/30 19:29:00  arno
 % show correct reference in main interface
 %
@@ -1809,20 +1812,27 @@ end;
 % test for local SCCN copy
 % ------------------------
 addpath(eeglabpath);
-comp = computer;
 OPT_FOLDER = which('eeg_options');
 OPT_FOLDER = fileparts( OPT_FOLDER );
-if (strcmpi(comp(1:3), 'GLN') | strcmpi(comp(1:3), 'MAC')) ...
-        | strcmpi(comp(1:3), 'SOL')) & exist( [ eeglabpath 'functions/adminfunc' ] ) == 7
-    myaddpath( eeglabpath, 'readeetraklocs.m', 'functions/sigprocfunc');
-    myaddpath( eeglabpath, 'eeg_checkset.m',   'functions/adminfunc');
-    myaddpath( eeglabpath, 'pop_loadbci.m',    'functions/popfunc');
-    myaddpath( eeglabpath, 'pop_loadbci.m',    'functions');
-    myaddpath( eeglabpath, 'timefreq.m',       'functions/timefreqfunc');
-    myaddpath( eeglabpath, 'pop_study.m',      'functions/studyfunc');
-    myaddpath( eeglabpath, 'icademo.m',        'functions/miscfunc');
-    myaddpath( eeglabpath, 'VolumeMNI.bin',    'functions/resources');
-elseif (strcmpi(computer(1:5), 'pcwin') & exist( [ eeglabpath 'functions\adminfunc' ] ) == 7)
+if exist( fullfile( eeglabpath, 'functions', 'adminfunc') ) ~= 7
+    warning('EEGLAB subfolders not found');
+end;
+
+% determine file format
+% ---------------------
+fileformat = 'maclinux';
+comp = computer;
+try
+    if strcmpi(comp(1:3), 'GLN') | strcmpi(comp(1:3), 'MAC') | strcmpi(comp(1:3), 'SOL')
+        fileformat = 'maclinux';
+    elseif strcmpi(com(1:5), 'pcwin')
+        fileformat = 'pcwin';
+    end;
+end;
+
+% add paths
+% ---------
+if strcmpi(fileformat, 'pcwin ')
     myaddpath( eeglabpath, 'readeetraklocs.m', 'functions\sigprocfunc');
     myaddpath( eeglabpath, 'eeg_checkset.m',   'functions\adminfunc');
     myaddpath( eeglabpath, 'pop_study.m',      'functions\studyfunc');
@@ -1831,11 +1841,15 @@ elseif (strcmpi(computer(1:5), 'pcwin') & exist( [ eeglabpath 'functions\adminfu
     myaddpath( eeglabpath, 'timefreq.m',       'functions\timefreqfunc');
     myaddpath( eeglabpath, 'icademo.m',        'functions\miscfunc');
     myaddpath( eeglabpath, 'eeglab1020.ced',   'functions\resources');
-else
-    myaddpath( eeglabpath, 'readeetraklocs.m', 'functions');    
-    funcpath = which('readeetraklocs.m');
-    funcpath = funcpath(1:end-length('readeetraklocs.m'));
-    myaddpath( funcpath , 'eeglab1020.ced', 'resources');    
+else 
+    myaddpath( eeglabpath, 'readeetraklocs.m', 'functions/sigprocfunc');
+    myaddpath( eeglabpath, 'eeg_checkset.m',   'functions/adminfunc');
+    myaddpath( eeglabpath, 'pop_loadbci.m',    'functions/popfunc');
+    myaddpath( eeglabpath, 'pop_loadbci.m',    'functions');
+    myaddpath( eeglabpath, 'timefreq.m',       'functions/timefreqfunc');
+    myaddpath( eeglabpath, 'pop_study.m',      'functions/studyfunc');
+    myaddpath( eeglabpath, 'icademo.m',        'functions/miscfunc');
+    myaddpath( eeglabpath, 'VolumeMNI.bin',    'functions/resources');
 end;
 myaddpath( eeglabpath, 'eegplugin_dipfit', 'plugins');
 
