@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2009/06/19 05:04:22  arno
+% bdf plugin
+%
 
 function vers = eegplugin_ctfimport(fig, trystrs, catchstrs)
 
@@ -66,4 +69,4 @@ function vers = eegplugin_ctfimport(fig, trystrs, catchstrs)
     
     % create menus
     % ------------
-    uimenu( menu, 'label', 'From BDF file (EEGLAB)', 'callback', comcnt, 'separator', 'on' );
+    uimenu( menu, 'label', 'From BDF file (secondary backup funct.)', 'callback', comcnt, 'separator', 'on' );
