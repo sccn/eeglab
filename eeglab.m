@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.536  2009/06/30 19:29:00  arno
+% show correct reference in main interface
+%
 % Revision 1.535  2009/05/01 01:06:18  arno
 % Allow writing EDF/BDF/GDF files
 %
@@ -1809,7 +1812,8 @@ addpath(eeglabpath);
 comp = computer;
 OPT_FOLDER = which('eeg_options');
 OPT_FOLDER = fileparts( OPT_FOLDER );
-if (strcmpi(comp(1:3), 'GLN') | strcmpi(comp(1:3), 'MAC')) & exist( [ eeglabpath 'functions/adminfunc' ] ) == 7
+if (strcmpi(comp(1:3), 'GLN') | strcmpi(comp(1:3), 'MAC')) ...
+        | strcmpi(comp(1:3), 'SOL')) & exist( [ eeglabpath 'functions/adminfunc' ] ) == 7
     myaddpath( eeglabpath, 'readeetraklocs.m', 'functions/sigprocfunc');
     myaddpath( eeglabpath, 'eeg_checkset.m',   'functions/adminfunc');
     myaddpath( eeglabpath, 'pop_loadbci.m',    'functions/popfunc');
@@ -1818,7 +1822,7 @@ if (strcmpi(comp(1:3), 'GLN') | strcmpi(comp(1:3), 'MAC')) & exist( [ eeglabpath
     myaddpath( eeglabpath, 'pop_study.m',      'functions/studyfunc');
     myaddpath( eeglabpath, 'icademo.m',        'functions/miscfunc');
     myaddpath( eeglabpath, 'VolumeMNI.bin',    'functions/resources');
-elseif (strcmpi(computer, 'pcwin') & exist( [ eeglabpath 'functions\adminfunc' ] ) == 7)
+elseif (strcmpi(computer(1:5), 'pcwin') & exist( [ eeglabpath 'functions\adminfunc' ] ) == 7)
     myaddpath( eeglabpath, 'readeetraklocs.m', 'functions\sigprocfunc');
     myaddpath( eeglabpath, 'eeg_checkset.m',   'functions\adminfunc');
     myaddpath( eeglabpath, 'pop_study.m',      'functions\studyfunc');
