@@ -86,7 +86,7 @@ if nargin > 2
     if strcmpi(transform, 'dipfit') 
         if ~isempty(EEG.dipfit.coord_transform)
             disp('Transforming electrode coordinates to match head model');
-            transfmat = traditional(EEG.dipfit.coord_transform);
+            transfmat = traditionaldipfit(EEG.dipfit.coord_transform);
             data.elec.pnt = transfmat * [ data.elec.pnt ones(size(data.elec.pnt,1),1) ]';
             data.elec.pnt = data.elec.pnt(1:3,:)';
         else
@@ -143,6 +143,6 @@ catch
 end
 
 % add the version details of this function call to the configuration
-data.cfg.version.id   = '$Id: eeglab2fieldtrip.m,v 1.4 2006-01-12 22:43:02 arno Exp $';
+data.cfg.version.id   = '$Id: eeglab2fieldtrip.m,v 1.5 2009-07-01 20:46:17 arno Exp $';
 
 return
