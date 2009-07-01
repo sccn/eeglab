@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.46  2009/01/27 00:48:38  ywu
+% fix memory mapping problem
+%
 % Revision 1.45  2007/04/27 22:30:49  arno
 % same
 %
@@ -363,7 +366,7 @@ else % INEEG is an EEG struct
             if length(fields1) > length(fields2)
                 for index = 1:length(fields1)
                     if isempty(strmatch(fields1{index}, fields2))
-                        INEEG2.event = setfield( INEEG2.event, { orilen + 1}, fields1{index}, []);
+                        INEEG2.event = setfield( INEEG2.event, { orilen }, fields1{index}, []);
                     end;
                 end;
             elseif length(fields1) < length(fields2)
@@ -373,6 +376,9 @@ else % INEEG is an EEG struct
                     end;
                 end;
             end;
+            allfields = union(fields1,fields2);
+            INEEG1.event = orderfields(INEEG1.event, allfields);
+            INEEG2.event = orderfields(INEEG2.event, allfields);
         end;
         
         for e=1:length(INEEG2.event)
@@ -386,7 +392,7 @@ else % INEEG is an EEG struct
          end
 
         INEEG1.epoch = []; % epoch info regenerated below by 'eventconsistency' in eeg_checkset()
-  
+        
         % add discontinuity event if continuous
         % -------------------------------------
         if INEEG1trials  == 1 & INEEG2trials == 1
