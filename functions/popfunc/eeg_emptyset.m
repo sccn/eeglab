@@ -29,6 +29,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2009/07/01 20:21:47  arno
+% adding more empty fields
+%
 % Revision 1.9  2006/02/07 19:15:03  arno
 % adding saved field
 %
@@ -58,8 +61,6 @@
 %
 
 % 01-25-02 reformated help & license -ad 
-
-function EEG = eeg_emptyset();
 
 function EEG = eeg_emptyset();
 
