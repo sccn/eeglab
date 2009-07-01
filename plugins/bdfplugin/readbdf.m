@@ -66,26 +66,31 @@ for nrec=1:length(Records),
 
     try, 
         S(EDF.AS.IDX2)=s;
+        %%%%% Test on  Over- (Under-) Flow
+    %	V=sum([(S'==EDF.DigMax(:,ones(RecLen,1))) + (S'==EDF.DigMin(:,ones(RecLen,1)))])==0;
+        V=sum([(S(:,EDF.Chan_Select)'>=EDF.DigMax(EDF.Chan_Select,ones(RecLen,1))) + ...
+               (S(:,EDF.Chan_Select)'<=EDF.DigMin(EDF.Chan_Select,ones(RecLen,1)))])==0;
+        EDF.ERROR.DigMinMax_Warning(find(sum([(S'>EDF.DigMax(:,ones(RecLen,1))) + (S'<EDF.DigMin(:,ones(RecLen,1)))]')>0))=1;
+        %	invalid=[invalid; find(V==0)+l*k];
+
+        if floor(Mode/2)==1
+            for k=1:EDF.NS,
+                DAT.Record(nrec*EDF.SPR(k)+(1-EDF.SPR(k):0),k)=S(1:EDF.SPR(k),k);
+            end;
+        else
+            DAT.Record(nrec*RecLen+(1-RecLen:0),:)=S;
+        end;
+
+        DAT.Valid(nrec*RecLen+(1-RecLen:0))=V;
     catch,
-        error('File is incomplete (try reading begining of file)');
+        warning backtrace off;
+        warning('Warning: file might be incomplete');
+        Records(nrec:end) = [];
+        DAT.Record(RecLen*length(Records)+1:end,:) = [];
+        S(nrec:end,:) = [];
+        break;
     end;
 
-	%%%%% Test on  Over- (Under-) Flow
-%	V=sum([(S'==EDF.DigMax(:,ones(RecLen,1))) + (S'==EDF.DigMin(:,ones(RecLen,1)))])==0;
-	V=sum([(S(:,EDF.Chan_Select)'>=EDF.DigMax(EDF.Chan_Select,ones(RecLen,1))) + ...
-	       (S(:,EDF.Chan_Select)'<=EDF.DigMin(EDF.Chan_Select,ones(RecLen,1)))])==0;
-	EDF.ERROR.DigMinMax_Warning(find(sum([(S'>EDF.DigMax(:,ones(RecLen,1))) + (S'<EDF.DigMin(:,ones(RecLen,1)))]')>0))=1;
-	%	invalid=[invalid; find(V==0)+l*k];
-                             
-	if floor(Mode/2)==1
-		for k=1:EDF.NS,
-			DAT.Record(nrec*EDF.SPR(k)+(1-EDF.SPR(k):0),k)=S(1:EDF.SPR(k),k);
-		end;
-	else
-		DAT.Record(nrec*RecLen+(1-RecLen:0),:)=S;
-	end;
-
-	DAT.Valid(nrec*RecLen+(1-RecLen:0))=V;
 end;
 if rem(Mode,2)==0	% Autocalib
 	DAT.Record=[ones(RecLen*length(Records),1) DAT.Record]*EDF.Calib;

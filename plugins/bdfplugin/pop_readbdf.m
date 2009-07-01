@@ -56,6 +56,9 @@
 % programmed from pop_readedf() version 1.15
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2009/06/19 05:04:22  arno
+% bdf plugin
+%
 % Revision 1.24  2004/05/24 21:44:32  arno
 % same
 %
@@ -199,6 +202,7 @@ EEG = eeg_checkset(EEG);
 % extract events
 % --------------
 disp('Extracting events...');
+warning off;
 if ~isempty(eventchans)
     if any(eventchans > EEG.nbchan) | any(eventchans < 1)
         error('Event channel index or indices out of range');
@@ -207,6 +211,7 @@ if ~isempty(eventchans)
     EEG.data(eventchans,:) = bitand(uint16(EEG.data(eventchans,:)), 255);
     EEG = pop_chanevent(EEG, eventchans, 'edge', 'leading', 'delchan', 'on');
 end;
+warning on;
 
 % rerefencing
 % -----------
