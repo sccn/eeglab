@@ -10,7 +10,7 @@
 %     chans    - [Cell array] cell array of channel names (labels) to interpolate 
 %                into the data if they are missing from one of the datasets.
 %     method   - [string] griddata() method to use for interpolation.
-%                See  >> help griddata() {default:'invdist'}
+%                See  >> help eeg_interp() {default:'spherical'}
 %
 % Important limitation:
 %     This function currently presuposes that all datasets have the same channel 
@@ -21,7 +21,7 @@
 %     STUDY    - study structure.
 %     ALLEEG   - updated datasets.
 %
-% Author: Arnaud Delorme, CERCO, CNRS, August 2006
+% Author: Arnaud Delorme, CERCO, CNRS, August 2006-
 %
 % See also: eeg_interp()
 
@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2008/02/15 16:44:50  arno
+% can now use stored bad channel location for interpolation
+%
 % Revision 1.6  2008/02/15 16:43:55  arno
 % *** empty log message ***
 %
@@ -73,7 +76,7 @@ if nargin < 3
     chans = [];
 end;
 if nargin < 4
-    method = 'invdist';
+    method = 'spherical';
 end;
 
 % union of all channel structures
