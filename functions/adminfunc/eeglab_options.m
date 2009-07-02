@@ -25,6 +25,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2008/04/16 17:43:42  arno
+% nothing
+%
 % Revision 1.2  2006/02/03 18:53:30  arno
 % more detailed message
 %
@@ -35,7 +38,7 @@
 % load local file
 % ---------------
 try,
-    clear functions;
+    clear eeg_options;
     
     W_MAIN = findobj('tag', 'EEGLAB');
     if ~isempty(W_MAIN)
