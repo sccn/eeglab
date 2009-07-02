@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2008/10/31 01:15:22  arno
+% Andreas modification
+%
 % Revision 1.34  2006/11/16 22:33:20  arno
 % fix notch, reimplementation of GUI
 %
@@ -176,6 +179,7 @@ if exist('filtfilt') ~= 2
    usefft = 1;
 end;
 
+plotfreqz = 0;
 if nargin < 2
 	% which set to save
 	% -----------------
@@ -272,23 +276,25 @@ if EEG.trials == 1
            try, warning off MATLAB:divideByZero
            catch, end;
 			for n=1:length(boundaries)-1
-				try
-                   fprintf('Processing continuous data (%d:%d)\n',boundaries(n),boundaries(n+1)); 
-                   if ~usefft
-                       [EEG.data(:,boundaries(n)+1:boundaries(n+1)), b] = ...
-                           eegfilt(EEG.data(:,boundaries(n)+1:boundaries(n+1)), options{:});
-                   else
-                       EEG.data(:,boundaries(n)+1:boundaries(n+1)) = ...
-                           eegfiltfft(EEG.data(:,boundaries(n)+1:boundaries(n+1)), options{:});
-                   end;
-				catch
-					fprintf('\nFilter error: continuous data portion too narrow (DC removed if highpass only)\n');
-                   if locutoff ~= 0 & hicutoff == 0
-                       tmprange = [boundaries(n)+1:boundaries(n+1)];
-                       EEG.data(:,tmprange) = ...
-                           EEG.data(:,tmprange) - repmat(mean(EEG.data(:,tmprange),2), [1 length(tmprange)]);
-                   end;
-				end;
+                if boundaries(n)+1 < boundaries(n+1)
+                    try
+                        fprintf('Processing continuous data (%d:%d)\n',boundaries(n),boundaries(n+1)); 
+                        if ~usefft
+                            [EEG.data(:,boundaries(n)+1:boundaries(n+1)), b] = ...
+                                eegfilt(EEG.data(:,boundaries(n)+1:boundaries(n+1)), options{:});
+                        else
+                            EEG.data(:,boundaries(n)+1:boundaries(n+1)) = ...
+                                eegfiltfft(EEG.data(:,boundaries(n)+1:boundaries(n+1)), options{:});
+                        end;
+                    catch
+                        fprintf('\nFilter error: continuous data portion too narrow (DC removed if highpass only)\n');
+                        if locutoff ~= 0 & hicutoff == 0
+                            tmprange = [boundaries(n)+1:boundaries(n+1)];
+                            EEG.data(:,tmprange) = ...
+                                EEG.data(:,tmprange) - repmat(mean(EEG.data(:,tmprange),2), [1 length(tmprange)]);
+                        end;
+                    end;
+                end;
 			end
            try, warning on MATLAB:divideByZero
            catch, end;
@@ -312,7 +318,7 @@ else
 end;	
 EEG.icaact = [];
 
-if ~usefft && plotfreqz
+if ~usefft & plotfreqz & exist('b') == 1
    freqz(b, 1, [], EEG.srate);
 end
 
