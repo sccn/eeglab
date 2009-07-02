@@ -112,7 +112,10 @@ switch fieldbox
     for index = 1:EEG.trials
       % the trials correspond to the raw data trials, except that they
       % contain the component activations
-      data.trial{index}  = EEG.icaact(:,:,index);
+      try,
+          data.trial{index}  = EEG.icaact(:,:,index);
+      catch
+      end;
       data.offset(index) = EEG.xmin*EEG.srate+1;                   % should be checked in FIELDTRIP
       data.time{index}   = linspace(EEG.xmin, EEG.xmax, EEG.pnts); % should be checked in FIELDTRIP
     end;
@@ -143,6 +146,6 @@ catch
 end
 
 % add the version details of this function call to the configuration
-data.cfg.version.id   = '$Id: eeglab2fieldtrip.m,v 1.5 2009-07-01 20:46:17 arno Exp $';
+data.cfg.version.id   = '$Id: eeglab2fieldtrip.m,v 1.6 2009-07-02 23:39:29 arno Exp $';
 
 return
