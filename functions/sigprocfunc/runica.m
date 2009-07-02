@@ -48,6 +48,7 @@
 % 'verbose'   = give ascii messages ('on'/'off')        (default -> 'on')
 % 'logfile'   = [filename] save all message in a log file in addition to showing them
 %               on screen (default -> none)
+% 'interput'  = ['on'|'off'] draw interupt figure. Default is off.
 %
 % Outputs:    [Note: RO means output in reverse order of projected mean variance
 %                    unless starting weight matrix passed ('weights' above)]
@@ -103,6 +104,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2007/08/17 05:57:07  scott
+% corrected meanvar normalization as per R Ramirez
+%
 % Revision 1.34  2007/08/10 17:03:52  arno
 % fix
 %
@@ -288,6 +292,7 @@ SIGNCOUNT_STEP       = 2;         % extblocks increment factor
 
 DEFAULT_SPHEREFLAG   = 'on';      % use the sphere matrix as the default
                                   %   starting weight matrix
+DEFAULT_INTERUPT     = 'off';     % figure interuption
 DEFAULT_PCAFLAG      = 'off';     % don't use PCA reduction
 DEFAULT_POSACTFLAG   = 'off';     % don't use posact(), to save space -sm 7/05
 DEFAULT_VERBOSE      = 1;         % write ascii info to calling screen
@@ -319,6 +324,7 @@ weights    = 0;                      % defaults defined below
 ncomps     = chans;
 biasflag   = DEFAULT_BIASFLAG;
 
+interupt   = DEFAULT_INTERUPT;
 extended   = DEFAULT_EXTENDED;
 extblocks  = DEFAULT_EXTBLOCKS;
 kurtsize   = MAX_KURTSIZE;
@@ -386,7 +392,19 @@ wts_passed = 0;                      % flag weights passed as argument
             return
          end
          chans = ncomps;
-      elseif strcmp(Keyword,'posact') 
+       elseif strcmp(Keyword,'interupt') 
+         if ~isstr(Value)
+           fprintf('runica(): interupt value must be on or off')
+           return
+         else 
+           Value = lower(Value);
+           if ~strcmp(Value,'on') & ~strcmp(Value,'off'),
+             fprintf('runica(): interupt value must be on or off')
+             return
+           end
+           interupt = Value;
+         end
+     elseif strcmp(Keyword,'posact') 
          if ~isstr(Value)
            fprintf('runica(): posact value must be on or off')
            return
@@ -869,19 +887,32 @@ blockno = 1;  % running block counter for kurtosis interrupts
 
 rand('state',sum(100*clock));  % set the random number generator state to
                                % a position dependent on the system clock
+% interupt figure
+% --------------- 
+if strcmpi(interupt, 'on')
+    fig = figure('visible', 'off');
+    supergui( fig, {1 1}, [], {'style' 'text' 'string' 'Press button to interrupt runica()' }, ...
+              {'style' 'pushbutton' 'string' 'Interupt' 'callback' 'setappdata(gcf, ''run'', 0);' } );
+    set(fig, 'visible', 'on');
+    setappdata(gcf, 'run', 1);
+    drawnow;
+end;
+
+
 %% Compute ICA Weights
 if biasflag & extended
     while step < maxsteps, %%% ICA step = pass through all the data %%%%%%%%%
         timeperm=randperm(datalength); % shuffle data order at each step
 
         for t=1:block:lastt, %%%%%%%%% ICA Training Block %%%%%%%%%%%%%%%%%%%
-            pause(0);
-            if ~isempty(get(0, 'currentfigure'))   % look for user abort
-                if strcmp(get(gcf, 'tag'), 'stop')
+            if strcmpi(interupt, 'on')
+                drawnow;
+                flag = getappdata(fig, 'run');
+                if ~flag,
                     if ~isempty(fid), fclose(fid); end;
                     close; error('USER ABORT');
                 end;
-            end
+            end;
             
             %% promote data block (only) to double to keep u and weights double
             u=weights*double(data(:,timeperm(t:t+block-1))) + bias*onesrow;
@@ -1046,9 +1077,13 @@ if biasflag & ~extended
         timeperm=randperm(datalength); % shuffle data order at each step
 
         for t=1:block:lastt, %%%%%%%%% ICA Training Block %%%%%%%%%%%%%%%%%%%
-            pause(0);
-            if ~isempty(get(0, 'currentfigure')) & strcmp(get(gcf, 'tag'), 'stop')
-                close; error('USER ABORT');
+            if strcmpi(interupt, 'on')
+                drawnow;
+                flag = getappdata(fig, 'run');
+                if ~flag,
+                    if ~isempty(fid), fclose(fid); end;
+                    close; error('USER ABORT');
+                end;
             end;
             
             u=weights*double(data(:,timeperm(t:t+block-1))) + bias*onesrow;
@@ -1162,10 +1197,14 @@ if ~biasflag & extended
         timeperm=randperm(datalength); % shuffle data order at each step through data
 
         for t=1:block:lastt, %%%%%%%%% ICA Training Block %%%%%%%%%%%%%%%%%%%
-            pause(0);
-            if ~isempty(get(0, 'currentfigure')) & strcmp(get(gcf, 'tag'), 'stop')
-                close; error('USER ABORT');   % detect user abort
-            end
+            if strcmpi(interupt, 'on')
+                drawnow;
+                flag = getappdata(fig, 'run');
+                if ~flag,
+                    if ~isempty(fid), fclose(fid); end;
+                    close; error('USER ABORT');
+                end;
+            end;
             
             u=weights*double(data(:,timeperm(t:t+block-1))); % promote block to dbl
             y=tanh(u);                                                       %
@@ -1325,9 +1364,13 @@ if ~biasflag & ~extended
         timeperm=randperm(datalength); % shuffle data order at each step
 
         for t=1:block:lastt, %%%%%%%%% ICA Training Block %%%%%%%%%%%%%%%%%%%
-            pause(0);
-            if ~isempty(get(0, 'currentfigure')) & strcmp(get(gcf, 'tag'), 'stop')
-                close; error('USER ABORT');
+            if strcmpi(interupt, 'on')
+                drawnow;
+                flag = getappdata(fig, 'run');
+                if ~flag,
+                    if ~isempty(fid), fclose(fid); end;
+                    close; error('USER ABORT');
+                end;
             end;
             u=weights*double(data(:,timeperm(t:t+block-1)));
             y=1./(1+exp(-u));                                                %
@@ -1440,6 +1483,11 @@ if ~biasflag & ~extended
 end
 %% Finalize Computed Data for Output
   
+if strcmpi(interupt, 'on')
+    close(fig);
+end;
+
+
   if ~laststep
     laststep = step;
   end;
