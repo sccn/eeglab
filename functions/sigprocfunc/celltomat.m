@@ -27,6 +27,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2005/05/24 17:52:29  arno
+% cell2mat -> celltomat
+%
 % Revision 1.2  2003/01/01 17:55:53  scott
 % header edits
 %
@@ -41,6 +44,7 @@ if nargin < 1
 	return;
 end;
 
+M = zeros(size(C));
 for i=1:size(C,1)
     for j=1:size(C,2)
         M(i,j) = C{i,j};
