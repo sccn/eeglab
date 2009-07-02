@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2009/04/21 19:10:52  arno
+% memory mapped
+%
 % Revision 1.22  2009/03/27 18:12:00  rypstat
 % implemented memmapfile option for large .cnt files
 % If you have questions or problems with this code, contact Craig Rypstat
@@ -575,11 +578,12 @@ if type == 'cnt'
           else
               ev2 = [];
           end;
-     else
+      else
           disp('Skipping event table (tag != 1,2,3 ; theoritically impossible)');
           ev2 = [];
       end     
 
+      
 fseek(fid, -1, 'eof');
 t = fread(fid,'char');
 
@@ -604,6 +608,9 @@ end
 
 %%%% to change offest in bytes to points 
 if ~isempty(ev2)
+    if r.sample1 ~= 0
+        fprintf(2,'Warning: events imported with a time shift might be innacurate (bug 661)\n');
+    end;
     ev2p=ev2; 
     ioff=900+(h.nchannels*75); %% initial offset : header + electordes desc 
     if strcmpi(r.dataformat, 'int16')
