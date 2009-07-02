@@ -150,6 +150,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.235  2009/06/30 19:34:08  arno
+% backward compatibility for reference
+%
 % Revision 1.234  2009/06/28 06:33:38  arno
 % Fixing rereferencing futher
 %
@@ -1342,6 +1345,7 @@ for inddataset = 1:length(ALLEEG)
             if strcmpi(varargin{1}, 'savedata') & option_storedisk
                 error('eeg_checkset: cannot call savedata any more');
                 
+                % the code below is deprecated
                 if ~isstr(EEG.data) % not already saved
                     disp('Writing previous dataset to disk...');
                     
