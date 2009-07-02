@@ -13,7 +13,7 @@
 %           is the lowest frequency ('srate'/'winsize') divided by 'padratio'.
 %           NaN input values (such as returned by eventlock()) are ignored.
 %
-%         * If 'alpha' is given (see below), bootstrap statistics are computed
+%         * If 'alpha' is given (see below), permutation statistics are computed
 %           (from a distribution of 'naccu' surrogate data trials) and
 %           non-significant features of the output plots are zeroed out
 %           (and plotted in green).
@@ -119,6 +119,8 @@
 %                     This parameter is valid to define all baseline types below.
 %                     Once more "NaN" prevents baseline subtraction.
 %       'powbase'   = Baseline spectrum to log-subtract {default|NaN -> from data}
+%       'commonbase' = ['on'|'off'] use common baseline when comparing two 
+%                     conditions (default is 'on').
 %       'basenorm'  = ['on'|'off'] 'on' normalize baseline in the power spectral
 %                     average instead of 'off' dividing by the average power across 
 %                     trials at each frequency (gain model). Default: 'off'.
@@ -146,8 +148,8 @@
 %                     vertical lines. If undefined, all columns are plotted. 
 %                     Overwrites the 'vert' argument (below) if any.
 %
-%    Optional bootstrap parameters:
-%       'alpha'     = If non-0, compute two-tailed bootstrap significance 
+%    Optional permutation parameters:
+%       'alpha'     = If non-0, compute two-tailed permutation significance 
 %                      probability level. Show non-signif. output values 
 %                      as green.                                     {0}
 %       'mcorrect'  = ['none'|'fdr'] correction for multiple comparison
@@ -157,8 +159,8 @@
 %       'pcontour'  = ['on'|'off'] draw contour around significant regions
 %                     instead of masking them. Default is 'off'. Not 
 %                     available for condition comparisons.
-%       'naccu'     = Number of bootstrap replications to accumulate {200}
-%       'baseboot'  = Bootstrap baseline subtract (1 -> use 'baseline';
+%       'naccu'     = Number of permutation replications to accumulate {200}
+%       'baseboot'  = permutation baseline subtract (1 -> use 'baseline';
 %                                                  0 -> use whole trial
 %                                          [min max] -> use time range) {1}
 %                     You may also enter one row per region for baseline
@@ -168,13 +170,15 @@
 %                     and trials; 'rand' -> invert polarity of spectral data 
 %                     (for ERSP) or randomize phase (for ITC); 'randall' -> 
 %                     compute significances by accumulating random-polarity 
-%                     inversions for each time/frequency point (slow!).
-%                     {'shuffle'}
+%                     inversions for each time/frequency point (slow!). Note
+%                     that in previous revision of this function, we use to 
+%                     call this method bootstrap while it is really permutation
+%                     per say {'shuffle'}
 %       'condboot'  = ['abs'|'angle'|'complex'] for comparing 2 conditions,
 %                     either subtract ITC absolute vales ('abs'), angles
 %                     ('angles') or complex values ('complex').   {'abs'}
-%       'pboot'     = Bootstrap power limits (e.g., from newtimef()) {from data}
-%       'rboot'     = Bootstrap ITC limits (e.g., from newtimef()). 
+%       'pboot'     = permutation power limits (e.g., from newtimef()) {from data}
+%       'rboot'     = permutation ITC limits (e.g., from newtimef()). 
 %                     Note: Both pboot and rboot must be provided to avoid 
 %                     recomputing the surrogate data!           {from data}
 %
@@ -325,6 +329,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.168  2009/06/29 19:08:29  arno
+% Edit header
+%
 % Revision 1.167  2009/05/27 05:17:14  arno
 % Fixing scale etc...
 %
@@ -1139,6 +1146,7 @@ g = finputcheck(varargin, ...
     'detrend'       'string'    {'on','off'} 'off'; ...
     'rmerp'         'string'    {'on','off'} 'off'; ...
     'basenorm'      'string'    {'on','off'} 'off'; ...
+    'commonbase'    'string'    {'on','off'} 'on'; ...
     'baseline'      'real'      []           0; ...
     'baseboot'      'real'      []           1; ...
     'linewidth'     'integer'   [1 2]        2; ...
@@ -1302,17 +1310,17 @@ end
 if (round(g.naccu*g.alpha) < 2)
     verboseprintf(g.verbose, 'Value of alpha is outside its normal range [%g,0.5]\n',2/g.naccu);
     g.naccu = round(2/g.alpha);
-    verboseprintf(g.verbose, '  Increasing the number of bootstrap iterations to %d\n',g.naccu);
+    verboseprintf(g.verbose, '  Increasing the number of iterations to %d\n',g.naccu);
 end
 
 if ~isnan(g.alpha)
     if length(g.baseboot) == 2
-        verboseprintf(g.verbose, 'Bootstrap analysis will use data from %3.2g to %3.2g ms.\n', ...
+        verboseprintf(g.verbose, 'Permutation analysis will use data from %3.2g to %3.2g ms.\n', ...
             g.baseboot(1),  g.baseboot(2))
     elseif g.baseboot > 0
-        verboseprintf(g.verbose, 'Bootstrap analysis will use data in (pre-0) baseline subwindows only.\n')
+        verboseprintf(g.verbose, 'Permutation analysis will use data in (pre-0) baseline subwindows only.\n')
     else
-        verboseprintf(g.verbose, 'Bootstrap analysis will use data in all subwindows.\n')
+        verboseprintf(g.verbose, 'Permutation analysis will use data in all subwindows.\n')
     end
 end
 
@@ -1527,7 +1535,7 @@ if iscell(data)
 
     % recompute power baselines 
     % -------------------------
-    if ~isnan( g.baseline(1) ) & ~isnan( mbase1(1) ) & isnan(g.powbase(1))
+    if ~isnan( g.baseline(1) ) & ~isnan( mbase1(1) ) & isnan(g.powbase(1)) & strcmpi(g.commonbase, 'on')
         disp('Recomputing baseline power: using the grand mean of both conditions ...');
         mbase = (mbase1 + mbase2)/2;
         P1 = P1 + repmat(mbase1(1:size(P1,1))',[1 size(P1,2)]);
@@ -1541,8 +1549,13 @@ if iscell(data)
             Pboot2 = Pboot2 - repmat(mbase (1:size(Pboot1,1))',[1 size(Pboot1,2) size(Pboot1,3)]);
         end;
         verboseprintf(g.verbose, '\nSubtracting the common power baseline ...\n');
-    else
-        mbase = NaN;
+        meanmbase = mbase;
+        mbase = { mbase mbase };
+    elseif strcmpi(g.commonbase, 'on')
+        mbase = { NaN NaN };
+    else 
+        meanmbase = (mbase1 + mbase2)/2;
+        mbase = { mbase1 mbase2 };
     end;
 
     % plotting
@@ -1562,12 +1575,12 @@ if iscell(data)
 
         subplot(1,3,1); % plot Condition 1
         g.title = g.titleall{1};
-        g = plottimef(P1, R1, Pboot1, Rboot1, mean(data{1},2), freqs, timesout, mbase, [], [], g);
+        g = plottimef(P1, R1, Pboot1, Rboot1, mean(data{1},2), freqs, timesout, mbase{1}, [], [], g);
         g.itcavglim = [];
 
         subplot(1,3,2); % plot Condition 2
         g.title = g.titleall{2};
-        plottimef(P2, R2, Pboot2, Rboot2, mean(data{2},2), freqs, timesout, mbase, [], [], g);
+        plottimef(P2, R2, Pboot2, Rboot2, mean(data{2},2), freqs, timesout, mbase{2}, [], [], g);
 
         subplot(1,3,3); % plot Condition 1 - Condition 2
         g.title =  g.titleall{3};
@@ -1580,7 +1593,7 @@ if iscell(data)
             case 'complex',  Rdiff = R1-R2;
         end;
         if strcmpi(g.plotersp, 'on') | strcmpi(g.plotitc, 'on')
-            plottimef(P1-P2, Rdiff, [], [], mean(data{1},2)-mean(data{2},2), freqs, timesout, mbase, [], [], g);
+            plottimef(P1-P2, Rdiff, [], [], mean(data{1},2)-mean(data{2},2), freqs, timesout, meanmbase, [], [], g);
         end;
     else
         % preprocess data and run compstat() function
@@ -1588,6 +1601,15 @@ if iscell(data)
         alltfX1power = alltfX1.*conj(alltfX1);
         alltfX2power = alltfX2.*conj(alltfX2);
 
+        if ~isnan(mbase{1}(1))
+            mbase1 = 10.^(mbase{1}(1:size(alltfX1,1))'/20);
+            mbase2 = 10.^(mbase{2}(1:size(alltfX1,1))'/20);
+            alltfX1 = alltfX1./repmat(mbase1/2,[1 size(alltfX1,2) size(alltfX1,3)]);
+            alltfX2 = alltfX2./repmat(mbase2/2,[1 size(alltfX2,2) size(alltfX2,3)]);
+            alltfX1power = alltfX1power./repmat(mbase1,[1 size(alltfX1power,2) size(alltfX1power,3)]);
+            alltfX2power = alltfX2power./repmat(mbase2,[1 size(alltfX2power,2) size(alltfX2power,3)]);
+        end;
+        
         %formula = {'log10(mean(arg1,3))'};              % toby 10.02.2006
         %formula = {'log10(mean(arg1(:,:,data),3))'};
 
@@ -1666,7 +1688,7 @@ if iscell(data)
             g.erspmax = []; % auto scale
             g.itcmax  = []; % auto scale
             plottimef(10*resdiff{1}, resdiff{2}, 10*resimages{1}, resimages{2}, ...
-                mean(data{1},2)-mean(data{2},2), freqs, timesout, mbase, [], [], g);
+                mean(data{1},2)-mean(data{2},2), freqs, timesout, meanmbase, [], [], g);
         end;
         R1 = res1{2};
         R2 = res2{2};
@@ -1695,7 +1717,7 @@ verboseprintf(g.verbose, '  of %d frames sampled at %g Hz.\n',g.frames,g.srate);
 verboseprintf(g.verbose, 'Each trial contains samples from %1.0f ms before to\n',g.tlimits(1));
 verboseprintf(g.verbose, '  %1.0f ms after the timelocking event.\n',g.tlimits(2));
 if ~isnan(g.alpha)
-    verboseprintf(g.verbose, 'Only significant values (bootstrap p<%g) will be colored;\n',g.alpha)
+    verboseprintf(g.verbose, 'Only significant values (permutation statistics p<%g) will be colored;\n',g.alpha)
     verboseprintf(g.verbose, '  non-significant values will be plotted in green\n');
 end
 verboseprintf(g.verbose,'  Image frequency direction: %s\n',g.hzdir);
@@ -1814,17 +1836,17 @@ if ~isnan(g.alpha) | ~isempty(find(~isnan(g.pboot))) | ~isempty(find(~isnan(g.rb
             for index = 1:size(g.baseboot,1)
                 tmptime   = find(timesout >= g.baseboot(index,1) & timesout <= g.baseboot(index,2));
                 if isempty(tmptime),
-                    fprintf('Warning: empty baseline bootstrap interval [%3.2f %3.2f]\n', g.baseboot(index,1), g.baseboot(index,2));
+                    fprintf('Warning: empty baseline interval [%3.2f %3.2f]\n', g.baseboot(index,1), g.baseboot(index,2));
                 end;
                 baselntmp = union(baselntmp, tmptime);
             end;
         end;
         if prod(size(g.baseboot)) > 2
-            fprintf('Bootstrap analysis will use data in multiple selected windows.\n');
+            fprintf('Permutation statistics will use data in multiple selected windows.\n');
         elseif size(g.baseboot,2) == 2
-            fprintf('Bootstrap analysis will use data in range %3.2g-%3.2g ms.\n', g.baseboot(1),  g.baseboot(2));
+            fprintf('Permutation statistics will use data in range %3.2g-%3.2g ms.\n', g.baseboot(1),  g.baseboot(2));
         elseif g.baseboot
-            fprintf('   %d bootstrap windows in baseline (times<%g).\n', length(baselntmp), g.baseboot)
+            fprintf('   %d permutation statistics windows in baseline (times<%g).\n', length(baselntmp), g.baseboot)
         end;
         
         % power significance
@@ -1855,17 +1877,17 @@ if ~isnan(g.alpha) | ~isempty(find(~isnan(g.pboot))) | ~isempty(find(~isnan(g.rb
                 for index = 1:size(g.baseboot,1)
                     tmptime   = find(timesout >= g.baseboot(index,1) & timesout <= g.baseboot(index,2));
                     if isempty(tmptime),
-                        fprintf('Warning: empty baseline bootstrap interval [%3.2f %3.2f]\n', g.baseboot(index,1), g.baseboot(index,2));
+                        fprintf('Warning: empty baseline interval [%3.2f %3.2f]\n', g.baseboot(index,1), g.baseboot(index,2));
                     end;
                     baselntmp = union(baselntmp, tmptime);
                 end;
             end;
             if prod(size(g.baseboot)) > 2
-                fprintf('Bootstrap analysis will use data in multiple selected windows.\n');
+                fprintf('Permutation statistics will use data in multiple selected windows.\n');
             elseif size(g.baseboot,2) == 2
-                fprintf('Bootstrap analysis will use data in range %3.2g-%3.2g ms.\n', g.baseboot(1),  g.baseboot(2));
+                fprintf('Permutation statistics will use data in range %3.2g-%3.2g ms.\n', g.baseboot(1),  g.baseboot(2));
             elseif g.baseboot
-                fprintf('   %d bootstrap windows in baseline (times<%g).\n', length(baselntmp), g.baseboot)
+                fprintf('   %d permutation statistics windows in baseline (times<%g).\n', length(baselntmp), g.baseboot)
             end;
         end;        
         % ITC significance
@@ -1937,15 +1959,23 @@ else
 end
 baselength = length(baseln);
 
+% standard output 
+% ---------------
+Pout = 10 * (log10(P) - repmat(log10(mbase),[1 length(timesout)]));
+if ~isempty(Pboot) & isnan(g.pboot)
+     Pbootout = 10 * (log10(Pboot) - repmat(log10(mbase),[1 size(Pboot,2)])); % convert to (10log10) dB
+else Pbootout = [];
+end;
+
 % ---------------
 % remove baseline
 % ---------------
 % original ERSP baseline removal (log)
 if ~isnan( g.baseline(1) ) & any(~isnan( mbase )) & strcmpi(g.scale, 'log') & strcmpi(g.trialbase, 'off')
     
-    P = 10 * (log10(P) - repmat(log10(mbase),[1 length(timesout)])); % convert to (10log10) dB
+    P = Pout;
     if ~isempty(Pboot) & isnan(g.pboot)
-        Pboot = 10 * (log10(Pboot) - repmat(log10(mbase),[1 size(Pboot,2)])); % convert to (10log10) dB
+        Pboot = Pbootout;
     end;
     
 % original ERSP baseline removal (log) but abs vizualization
@@ -2005,18 +2035,8 @@ if strcmpi(g.outputformat, 'old')
     mbase = 10^(mbase/10);
 end;
 if ~strcmpi(g.outputformat, 'plot')
-    P = Pori;
-    if ~isnan( g.baseline(1) ) & any(~isnan( mbaseori ))
-        P = 10 * (log10(P) - repmat(log10(mbaseori),[1 length(timesout)])); % convert to (10log10) dB
-        if ~isempty(Pboot) & isnan(g.pboot)
-            Pboot = 10 * (log10(Pboot) - repmat(log10(mbaseori),[1 size(Pboot,2)])); % convert to (10log10) dB
-        end;
-    else
-        P = 10 * log10(P);
-        if ~isempty(Pboot) & isnan(g.pboot)
-            Pboot = 10 * log10(Pboot);
-        end;
-    end;
+    P = Pout;
+    Pboot = Pbootout;
     mbase = log10(mbaseori)*10;
 end;
 if strcmpi(g.verbose, 'on')
@@ -2187,7 +2207,7 @@ switch lower(g.plotersp)
 
         E = mbase;
 
-        if ~isnan(E)
+        if ~isnan(E(1))
 
             % plotting limits
             if isempty(g.speclim)
@@ -2650,7 +2670,7 @@ function pvals = compute_pvals(oridat, surrog, tail)
             elseif size(oridat,2) == size(surrog, 1)
                 surrog = repmat( reshape(surrog, [1 size(surrog,1) size(surrog,2)]), [size(oridat,1) 1 1]);
             else
-                error('Bootstrap array size error');
+                error('Permutation statistics array size error');
             end;
         end;
     end;

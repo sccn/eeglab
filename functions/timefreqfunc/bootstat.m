@@ -1,4 +1,4 @@
-% bootstat() - accumulate surrogate data to assess significance by bootstrap of some 
+% bootstat() - accumulate surrogate data to assess significance by permutation of some 
 %              measure of two input variables. 
 %
 %              If 'distfit','on', fits the psd with a 4th-order polynomial using the 
@@ -87,6 +87,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2009/05/22 23:32:22  arno
+% fix header
+%
 % Revision 1.27  2009/05/22 23:05:36  arno
 % fix header and default value
 %
@@ -243,7 +246,7 @@ if times == 1, disp('Warning 1 value only for shuffling dimension'); end;
 % only consider baseline
 % ----------------------
 if ~isempty(g.basevect)
-    fprintf('\nBootstrap baseline length is %d (out of %d) points\n', length(g.basevect), times);
+    fprintf('\nPermutation statistics baseline length is %d (out of %d) points\n', length(g.basevect), times);
     arg1 = oriarg1(:,g.basevect,:);
     if ~isempty(oriarg2)
         arg2 = oriarg2(:,g.basevect,:);
@@ -285,8 +288,8 @@ if ~isnan(g.rboot)
 % case 2: randomize polarity or phase
 % ***********************************
 elseif strcmpi(g.boottype, 'rand') & strcmpi(g.randmode, 'inverse')
-    fprintf('Bootstat: randomize inverse values\n');
-    fprintf('Processing bootstrap for %s (naccu=%d):', g.label, g.naccu);
+    fprintf('Bootstat function: randomize inverse values\n');
+    fprintf('Processing permutation statistics for %s (naccu=%d):', g.label, g.naccu);
     
     % compute random array
     % --------------------
@@ -316,8 +319,8 @@ elseif strcmpi(g.boottype, 'rand') & strcmpi(g.randmode, 'inverse')
         eval( g.formulapost ); % also contains index = index+1
     end
 elseif strcmpi(g.boottype, 'rand') % opposite
-    fprintf('Bootstat: randomize polarity or phase\n');
-    fprintf('Processing bootstrap for %s (naccu=%d):', g.label, g.naccu);
+    fprintf('Bootstat function: randomize polarity or phase\n');
+    fprintf('Processing permutation statistics for %s (naccu=%d):', g.label, g.naccu);
     
     % compute random array
     % --------------------
@@ -350,8 +353,8 @@ elseif strcmpi(g.boottype, 'rand') % opposite
 % case 3: shuffle vector of only one dimension
 % ********************************************
 elseif length(g.shuffledim) == 1
-    fprintf('Bootstat: shuffling along dimension %d only\n', g.shuffledim);
-    fprintf('Processing bootstrap for %s (naccu=%d):', g.label, g.naccu);
+    fprintf('Bootstat function: shuffling along dimension %d only\n', g.shuffledim);
+    fprintf('Processing permutation statistics for %s (naccu=%d):', g.label, g.naccu);
 
     index = 1;
     count = 1;
@@ -365,8 +368,8 @@ elseif length(g.shuffledim) == 1
 % ***********************************************
 else 
     if strcmpi(g.shufflemode, 'swap') % swap mode
-        fprintf('Bootstat: shuffling along dimension %s (swap mode)\n', int2str(g.shuffledim));
-        fprintf('Processing bootstrap for %s (naccu=%d):', g.label, g.naccu);
+        fprintf('Bootstat function: shuffling along dimension %s (swap mode)\n', int2str(g.shuffledim));
+        fprintf('Processing permutation statistics for %s (naccu=%d):', g.label, g.naccu);
         index = 1;
         count = 1;
         while index <= g.naccu
@@ -377,8 +380,8 @@ else
             eval( g.formulapost );
         end
     else  % regular shuffling
-        fprintf('Bootstat: shuffling along dimension %s (regular mode)\n', int2str(g.shuffledim));
-        fprintf('Processing bootstrap for %s (naccu=%d):', g.label, g.naccu);
+        fprintf('Bootstat function: shuffling along dimension %s (regular mode)\n', int2str(g.shuffledim));
+        fprintf('Processing permutation statistics for %s (naccu=%d):', g.label, g.naccu);
         index = 1;
         count = 1;
         while index <= g.naccu
