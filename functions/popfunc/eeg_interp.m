@@ -10,10 +10,11 @@
 %                either locations of channels to interpolate or a full
 %                channel structure (missing channels in the current 
 %                dataset are interpolated).
-%     method   - [string] griddata method used for interpolation
-%                (default is 'invdist'). 'spherical' uses superfast
-%                spherical interpolation. 'spacetime' uses griddata3 to
-%                interpolate both in space and time (very slow).
+%     method   - [string] method used for interpolation (default is 'spherical').
+%                'invdist' uses inverse distance on the scalp
+%                'spherical' uses superfast spherical interpolation. 
+%                'spacetime' uses griddata3 to interpolate both in space 
+%                and time (very slow and cannot be interupted).
 % Output: 
 %     EEGOUT   - data set with bad electrode data replaced by
 %                interpolated data
@@ -37,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2009/04/21 21:48:53  arno
+% make default spherical in eeg_interp
+%
 % Revision 1.2  2008/04/16 17:34:45  arno
 % added spherical and 3-D interpolation
 %
@@ -117,8 +121,11 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method)
     else
         badchans  = bad_elec;
         goodchans = setdiff(1:EEG.nbchan, badchans);
+        oldelocs  = EEG.chanlocs;
+        EEG       = pop_select(EEG, 'nochannel', badchans);
+        EEG.chanlocs = oldelocs;
     end;
-    
+
     % find non-empty good channels
     % ----------------------------
     nonemptychans = find(~cellfun('isempty', { EEG.chanlocs.theta }));
@@ -154,14 +161,20 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method)
         %max(EEG.data(badchans,1)), std(EEG.data(badchans,1))
         EEG.data = reshape(EEG.data, EEG.nbchan, EEG.pnts, EEG.trials);
     elseif strcmpi(method, 'spacetime') % 3D interpolation, works but x10 times slower
+        disp('Warning: if processing epoch data, epoch boundary are ignored...');
+        disp('3-D interpolation, this can take a long (long) time...');
+        [xbad ,ybad]  = pol2cart([EEG.chanlocs( badchans).theta],[EEG.chanlocs( badchans).radius]);
+        [xgood,ygood] = pol2cart([EEG.chanlocs(goodchans).theta],[EEG.chanlocs(goodchans).radius]);
         pnts = size(EEG.data,2)*size(EEG.data,3);
         zgood = [1:pnts];
-        zgood = repmat(zgood, [length(xgood) 1]);    zgood = reshape(zgood,prod(size(zgood)),1);
+        zgood = repmat(zgood, [length(xgood) 1]);    
+        zgood = reshape(zgood,prod(size(zgood)),1);
         xgood = repmat(xgood, [1 pnts]); xgood = reshape(xgood,prod(size(xgood)),1);
         ygood = repmat(ygood, [1 pnts]); ygood = reshape(ygood,prod(size(ygood)),1);
         tmpdata = reshape(EEG.data, prod(size(EEG.data)),1);
         zbad = 1:pnts;
-        zbad = repmat(zbad, [length(xbad) 1]);     zbad = reshape(zbad,prod(size(zbad)),1);
+        zbad = repmat(zbad, [length(xbad) 1]);     
+        zbad = reshape(zbad,prod(size(zbad)),1);
         xbad = repmat(xbad, [1 pnts]); xbad = reshape(xbad,prod(size(xbad)),1);
         ybad = repmat(ybad, [1 pnts]); ybad = reshape(ybad,prod(size(ybad)),1);
         badchansdata = griddata3(ygood, xgood, zgood, tmpdata,...
