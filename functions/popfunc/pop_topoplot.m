@@ -56,6 +56,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.73  2008/05/15 17:39:11  nima
+% electrode plot set to off for more than 64 channels.
+%
 % Revision 1.72  2008/04/19 21:07:01  arno
 % fix maplimits
 %
@@ -415,7 +418,6 @@ end
 if typeplot
     SIGTMP = reshape(EEG.data, EEG.nbchan, EEG.pnts, EEG.trials);
     pos = round( (arg2/1000-EEG.xmin)/(EEG.xmax-EEG.xmin) * (EEG.pnts-1))+1;
-    indexnan = find(isnan(pos));
     nanpos = find(isnan(pos));
     pos(nanpos) = 1;
     SIGTMPAVG = mean(SIGTMP(:,pos,:),3);
