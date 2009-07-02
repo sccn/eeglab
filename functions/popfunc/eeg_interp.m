@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2009/07/02 18:23:33  arno
+% fixing interpolation
+%
 % Revision 1.3  2009/04/21 21:48:53  arno
 % make default spherical in eeg_interp
 %
@@ -128,9 +131,11 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method)
 
     % find non-empty good channels
     % ----------------------------
+    origoodchans = goodchans;
     nonemptychans = find(~cellfun('isempty', { EEG.chanlocs.theta }));
     [tmp indgood ] = intersect(goodchans, nonemptychans);
     goodchans = goodchans( sort(indgood) );
+    datachans = getdatachans(goodchans,badchans);
 
     % scan data points
     % ----------------
@@ -156,7 +161,7 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method)
         %[tmp1 tmp2 tmp3 tmpchans] = spheric_spline_old( xelec, yelec, zelec, EEG.data(goodchans,1));
         %max(tmpchans(:,1)), std(tmpchans(:,1)), 
         %[tmp1 tmp2 tmp3 EEG.data(badchans,:)] = spheric_spline( xelec, yelec, zelec, xbad, ybad, zbad, EEG.data(goodchans,:));
-        [tmp1 tmp2 tmp3 badchansdata] = spheric_spline( xelec, yelec, zelec, xbad, ybad, zbad, EEG.data);
+        [tmp1 tmp2 tmp3 badchansdata] = spheric_spline( xelec, yelec, zelec, xbad, ybad, zbad, EEG.data(datachans,:));
         %max(EEG.data(goodchans,1)), std(EEG.data(goodchans,1))
         %max(EEG.data(badchans,1)), std(EEG.data(badchans,1))
         EEG.data = reshape(EEG.data, EEG.nbchan, EEG.pnts, EEG.trials);
@@ -187,27 +192,38 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method)
 
         fprintf('Points (/%d):', size(EEG.data,2)*size(EEG.data,3));
         badchansdata = zeros(length(badchans), size(EEG.data,2)*size(EEG.data,3));
+        
         for t=1:(size(EEG.data,2)*size(EEG.data,3)) % scan data points
             if mod(t,100) == 0, fprintf('%d ', t); end;
-            if mod(t,1000) == 0, fprintf('\n'); end;
+            if mod(t,1000) == 0, fprintf('\n'); end;          
+        
             %for c = 1:length(badchans)
             %   [h EEG.data(badchans(c),t)]= topoplot(EEG.data(goodchans,t),EEG.chanlocs(goodchans),'noplot', ...
             %        [EEG.chanlocs( badchans(c)).radius EEG.chanlocs( badchans(c)).theta]);
             %end;
             tmpdata = reshape(EEG.data, size(EEG.data,1), size(EEG.data,2)*size(EEG.data,3) );
-            [Xi,Yi,badchansdata(:,t)] = griddata(ygood, xgood , tmpdata(:,t)',...
+            [Xi,Yi,badchansdata(:,t)] = griddata(ygood, xgood , tmpdata(datachans,t)',...
                                                     ybad, xbad, method); % interpolate data                                            
         end
         fprintf('\n');
     end;
     
     tmpdata               = zeros(length(bad_elec), EEG.pnts, EEG.trials);
-    tmpdata(goodchans, :,:) = EEG.data;
+    tmpdata(origoodchans, :,:) = EEG.data;
     tmpdata(badchans , :) = badchansdata;
     EEG.data = tmpdata;
     EEG.nbchan = size(EEG.data,1);
     EEG = eeg_checkset(EEG);
-    
+
+% get data channels
+% -----------------
+function datachans = getdatachans(goodchans, badchans);
+      datachans = goodchans;
+      badchans  = sort(badchans);
+      for index = length(badchans):-1:1
+          datachans(find(datachans > badchans(index))) = datachans(find(datachans > badchans(index)))-1;
+      end;
+        
 % -----------------
 % spherical splines
 % -----------------
