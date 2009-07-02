@@ -56,6 +56,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2007/06/05 03:49:32  toby
+% Documentation edits, comments on code lines that may need clarification.
+%
 % Revision 1.7  2004/07/27 18:33:09  arno
 % *** empty log message ***
 %
@@ -137,7 +140,7 @@ for index=1:length(varargin)
 	end;
 end;
 
-fprintf('Accumulating bootstrap:');
+fprintf('Accumulating permutation statistics:');
 alltrials = [1:cond1trials+cond2trials];
 
 % processing formulas
