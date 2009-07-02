@@ -27,6 +27,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2005/05/24 17:53:27  arno
+% mat2cell -> mattocell
+%
 % Revision 1.2  2002/08/09 00:11:45  arno
 % empty case
 %
@@ -44,6 +47,7 @@ if isempty(M)
 	C = [];
 	return;
 end;
+C = cell(size(M));
 for i=1:size(M,1)
     for j=1:size(M,2)
         C{i,j} = M(i,j);
