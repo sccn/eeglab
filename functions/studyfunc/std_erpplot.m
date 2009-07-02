@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.60  2009/05/31 02:22:10  arno
+% Adding FDR and bootstrap to all STUDY functions
+%
 % Revision 1.59  2008/04/16 17:55:53  arno
 % fix color axis for scalp maps
 %
@@ -296,7 +299,7 @@ if ~isempty(opt.channels)
     structdat = STUDY.changrp;
     erpdata = cell(size(structdat(allinds(1)).erpdata));
     for ind =  1:length(structdat(allinds(1)).erpdata(:))
-        erpdata{ind} = zeros([ size(structdat(allinds(1)).erpdata{1}) length(allinds)])*NaN;
+        erpdata{ind} = zeros([ size(structdat(allinds(1)).erpdata{ind}) length(allinds)])*NaN;
         for index = 1:length(allinds)
             try,
                 erpdata{ind}(:,:,index)  = structdat(allinds(index)).erpdata{ind};
