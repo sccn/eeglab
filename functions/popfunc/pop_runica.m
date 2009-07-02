@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.87  2009/04/22 04:50:29  arno
+% Fixing saving datasets for pop_runica.m
+%
 % Revision 1.86  2008/11/22 22:39:50  scott
 % editing Abord -> abort
 %
@@ -602,18 +605,12 @@ if ~strcmpi(lower(g.icatype), 'binica')
 end;
 switch lower(g.icatype)
     case 'runica' 
-        if nargin < 2
-            fig = figure('visible', 'off');
-            supergui( fig, {1 1}, [], {'style' 'text' 'string' 'Press button to interrupt runica()' }, ...
-                      {'style' 'pushbutton' 'string' 'Interupt' 'callback' 'figure(gcbf); set(gcbf, ''tag'', ''stop'');' } );
-            drawnow;
-        end;
         tmprank = getrank(tmpdata(:,1:min(3000, size(tmpdata,2))));
         if tmprank == size(tmpdata,1) | pca_opt
-            [EEG.icaweights,EEG.icasphere] = runica( tmpdata, 'lrate', 0.001, g.options{:} );
+            [EEG.icaweights,EEG.icasphere] = runica( tmpdata, 'lrate', 0.001, 'interupt', 'on', g.options{:} );
         else 
             disp(['Data rank (' int2str(tmprank) ') is smaller than the number of channels (' int2str(size(tmpdata,1)) ').']);
-            [EEG.icaweights,EEG.icasphere] = runica( tmpdata, 'lrate', 0.001, 'pca', tmprank, g.options{:} );
+            [EEG.icaweights,EEG.icasphere] = runica( tmpdata, 'lrate', 0.001, 'interupt', 'on', 'pca', tmprank, g.options{:} );
         end;
      case 'binica'
         icadefs;
