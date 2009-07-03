@@ -65,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2009/06/27 01:31:25  arno
+% fix intersection
+%
 % Revision 1.9  2009/05/27 00:14:13  arno
 % adding the plotintersection option
 %
@@ -170,8 +173,7 @@ function [smoothprob3d, mriplanes] = mri3dplot(prob3d, mri, varargin)
                         'rotate'    'integer'  { 0 90 180 270 }          90;
                         'kernel'    'float'    []                        0 });
     if isstr(g), error(g); end;
-    if isstr(g.mriview) == 1, g.intersect = 'off'; end;
-    if isstr(g.mriview) == 1, g.intersect = 'off'; end;
+    if isstr(g.mriview) == 1, g.plotintersect = 'off'; end;
     if strcmpi(g.mriview,'sagittal'),    g.mriview = 'side'; 
     elseif strcmpi(g.mriview,'axial'),   g.mriview = 'top'; 
     elseif strcmpi(g.mriview,'coronal'), g.mriview = 'rear';
