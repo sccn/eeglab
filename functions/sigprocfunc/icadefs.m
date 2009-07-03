@@ -26,6 +26,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.59  2009/06/30 21:18:03  arno
+% *** empty log message ***
+%
 % Revision 1.58  2009/06/30 19:37:00  arno
 % fix reference in GUI and eeg_checkset
 %
@@ -211,7 +214,7 @@
 % -------------- EEGLAB DEFINITION (V 4.0) -------------
 % ------------------------------------------------------
 
-EEGLAB_VERSION = '7.0.0.2b'; % EEGLAB version s=stable, b=beta, a=alpha (SCCN only)
+EEGLAB_VERSION = '7.0.1.3b'; % EEGLAB version s=stable, b=beta, a=alpha (SCCN only)
 
 TUTORIAL_URL = 'http://sccn.ucsd.edu/eeglab/eeglabdocs.html'; % online version
 % NB: If there is a local copy of the web site, 
