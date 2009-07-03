@@ -206,6 +206,9 @@
 
 %% LOG COMMENTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % $Log: not supported by cvs2svn $
+% Revision 1.281  2009/04/28 01:52:09  arno
+% header
+%
 % Revision 1.280  2008/10/16 17:06:32  julie
 % was missing a % in line 3387.
 %
@@ -1395,8 +1398,7 @@ if nargin > 6
             percentileflag = NO;
         elseif Limitflag == YES
             %  [lotime hitime loerp hierp loamp hiamp locoher hicoher]
-            if size(Arg,1) ~= 1 | size(Arg,2) < 2 ...
-                    | size(Arg,2) > 9 ...
+            if size(Arg,1) ~= 1 | size(Arg,2) < 2 | size(Arg,2) > 9
                     help erpimage
                 fprintf('\nerpimage(): limits arg must be a vector sized (1,2<->9).\n');
                 return
