@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2009/07/02 21:55:10  arno
+% show warning for bug 661
+%
 % Revision 1.32  2009/04/21 19:10:52  arno
 % memory mapped
 %
@@ -167,9 +170,9 @@ h.nchannels         = fread(fid,1,'ushort');
 h.avgupdate         = fread(fid,1,'ushort');
 h.domain            = fread(fid,1,'char');
 h.variance          = fread(fid,1,'char');
-h.rate              = fread(fid,1,'ushort');
-h.scale             = fread(fid,1,'double');
-h.veogcorrect       = fread(fid,1,'char');
+h.rate              = fread(fid,1,'ushort'); % A USER CLAIMS THAT SAMPLING RATE CAN BE 
+h.scale             = fread(fid,1,'double'); % FRACTIONAL IN NEUROSCAN WHICH IS 
+h.veogcorrect       = fread(fid,1,'char');   % OBVIOUSLY NOT POSSIBLE HERE (BUG 606)
 h.heogcorrect       = fread(fid,1,'char');
 h.aux1correct       = fread(fid,1,'char');
 h.aux2correct       = fread(fid,1,'char');
