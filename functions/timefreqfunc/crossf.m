@@ -169,6 +169,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.75  2008/09/26 03:15:22  scott
+% REVERSED DOC. OF LEAD vs LEAD! based on a numerical example...
+%
 % Revision 1.74  2007/08/07 19:13:06  arno
 % fix wrong message output (bug 338)
 %
@@ -1651,7 +1654,7 @@ if ~isnan(Boot.alpha) & isnan(Boot.rboot) % if bootstrap analysis included . . .
    %Rboot = [mean(Rboot(1:i,:)) ; mean(Rboot(g.naccu-i+1:g.naccu,:))];
 elseif ~isnan(Boot.rboot)
 	Boot.Coherboot.R = Boot.rboot;
-	Boot.Rsignif     = Boot.rboot
+	Boot.Rsignif     = Boot.rboot;
 	Rbootout         = Boot.rboot;
 else 
 	Boot.Coherboot.R = [];
