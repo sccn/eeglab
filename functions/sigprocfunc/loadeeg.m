@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2008/11/22 22:36:20  scott
+% editing abord -> abort
+%
 % Revision 1.12  2007/07/27 21:27:42  arno
 % read truncated datasets
 %
@@ -106,7 +109,7 @@
 % Initial revision
 %
 
-function [signal, accept, typeeeg, rt, response, chan_names, pnts, ....
+function [signal, accept, typeeeg, rt, response, chan_names, pnts, ...
 	nsweeps, rate, xmin, xmax]=loadeeg( FILENAME, chanlist, ...
 	TrialList, typerange, acceptype, rtrange, responsetype, format)
 if nargin<1 
