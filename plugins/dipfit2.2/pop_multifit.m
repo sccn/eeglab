@@ -45,6 +45,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2008/05/29 19:14:21  nima
+% add[D[D[C.
+% keybaodr
+%
 % Revision 1.23  2007/08/16 17:51:51  arno
 % remove obsolete comments
 %
@@ -282,10 +286,20 @@ function [EEG, com] = pop_multifit(EEG, comps, varargin);
     for i = comps(:)'
         if i <= length(EEG.dipfit.model) & ~isempty(EEG.dipfit.model(i).posxyz)
             if g.dipoles == 2,
+                % try to find a good origin for automatic dipole localization
                 EEG.dipfit.model(i).active = [1 2];
                 EEG.dipfit.model(i).select = [1 2];
-                EEG.dipfit.model(i).posxyz = zeros(2,3);
-                EEG.dipfit.model(i).momxyz = zeros(2,3);
+                if isempty(EEG.dipfit.model(i).posxyz)
+                    EEG.dipfit.model(i).posxyz = zeros(1,3);
+                    EEG.dipfit.model(i).momxyz = zeros(2,3);
+                else
+                    EEG.dipfit.model(i).posxyz(2,:) = EEG.dipfit.model(i).posxyz;
+                    if strcmpi(EEG.dipfit.coordformat, 'MNI')
+                         EEG.dipfit.model(i).posxyz(:,1) = [-40;40];
+                    else EEG.dipfit.model(i).posxyz(:,2) = [-40;40];
+                    end;
+                    EEG.dipfit.model(i).momxyz(2,:) = EEG.dipfit.model(i).momxyz;
+                end;
             else 
                 EEG.dipfit.model(i).active = [1];
                 EEG.dipfit.model(i).select = [1];
