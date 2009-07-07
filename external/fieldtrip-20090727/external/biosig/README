@@ -1,0 +1,41 @@
+    
+The BIOSIG-tools are part of a large free software project for 
+biomedical signal processing. 
+http;//biosig.sf.net/ is the project homepage. 
+
+All software is published under the free software license GPL.
+Read the LICENSE and http://www.fsf.org for more information. 
+
+Copyright (C) by Alois Schloegl <a.schloegl@ieee.org>
+
+
+
+
+
+=== Files  ===
+
+README		this file
+LICENSE		GPL license 
+INSTALL		how to install 
+
+
+DOC/* Documentation
+
+T100/* [Data Acquistion] 
+
+T200/* Data Formats
+T250/* Quality Control and Artifact Processing
+
+T300/* Signal Processing and Feature extraction
+
+T400/* Classification, Single Trial Analysis
+T410/* Statistics, False Discovery Rate
+T490/* Evaluation criteria
+
+T500/* Presentation, Output
+T501/* Visualization of EEG coupling
+
+T600/* Interactive Viewer and Scoring  
+
+
+

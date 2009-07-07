@@ -1,0 +1,48 @@
+./maybe-missing/README.TXT
+
+The functions in this directory are a "must have". They are provided, 
+in case they are not installed in your system.
+It is sufficient to include this directory at the end of the path. 
+
+% Copyright (C) 2004,2005,2006,2007,2008 by Alois Schloegl <a.schloegl@ieee.org>
+% This is part of the BIOSIG-toolbox http://biosig.sf.net/
+
+
+function   	missing in 
+---------------------------------------------------------        
+binocdf.m	Matlab w/o statistics toolbox
+bitand.cc	Octave < 2.1.60(?) w/o Octave-forge
+bitshift.m	Octave < 2.1.60(?) w/o Octave-forge
+datenum.m	Octave w/o Octave-forge
+datestr.m	Octave w/o Octave-forge
+datevec.m	Octave w/o Octave-forge
+freqz.m		Matlab w/o signal processing toolbox 
+full.m		Octave 2.1
+interp1		Octave w/o Octave forge
+ischar		Octave 2.1.50
+isdir.m		Octave < 2.1.60(?) w/o Octave-forge
+isscalar.m	Matlab 
+isvector.m	Matlab 
+logit.m         Matlab
+probit.m        Matlab
+numel.m		Octave 2.1.50
+rat.m		Octave w/o Octave-forge
+ranksum.m	(see u_test)
+regexp.cc	Octave w/o Octave-forge
+signtest.m	Matlab w/o statistics toolbox
+sparse.m	Octave w/o Octave-forge
+spdiag.m	Matlab 2007b and higher
+speye.m		Octave 2.1
+strcmpi.m	Octave w/o Octave-forge
+strfind.m	Matlab <= 5.x, Octave w/o latest Octave-forge, FreeMat
+strcmpi.m	Octave w/o Octave-forge
+strncmp.m	Octave w/o Octave-forge
+strncmpi.m	Octave w/o Octave-forge
+strtok.m	Octave w/o Octave-forge
+strvcat.m	Octave w/o Octave-forge
+ctranspose.m 	Octave <= 2.9.9
+transpose.m 	Octave <= 2.9.9
+u_test.m 	instead of ranksum (missing in Matlab w/o statistics toolbox)
+xmlstruct.m	reads XML data
+__xmldata__.cc	OCT function used my xmlstruct (broken?, obsolete)
+xmldata.c	MEX function used by xmlstruct

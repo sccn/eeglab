@@ -1,0 +1,10 @@
+This software is made available under the Creative Commons
+Attribution-Noncommercial License <http://creativecommons.org/licenses/by-nc/3.0/>.  
+
+Any re-distribution or adaptation of this work must contain a 
+link to the software's original webpage.  For example, any 
+re-distribution of the 'minFunc' software must contain a link to:
+http://www.cs.ubc.ca/~schmidtm/Software/minFunc.html
+
+All use of these programs is entirely at the user's own risk.
+

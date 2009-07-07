@@ -1,0 +1,15 @@
+0.468750	0.703203	1.869421	random classifier
+0.718750	0.000491	3.188889	ensemble method
+0.640625	0.036389	50.001205	gnb with normal distribution
+0.640625	0.036389	2.181172	gaussian naive bayes
+0.804688	0.000001	2.388704	logistic regression
+0.828125	0.000000	4.394361	gaussian process
+0.546875	0.488074	1.828664	nearest neighbour classifier
+0.484375	0.863832	2.759171	probabilistic neural network
+0.648438	0.027874	2.309174	linear discriminant analysis
+0.757812	0.000023	1.980759	regularized fished discriminant analysis
+0.757812	0.000023	2.008801	regularized linear discriminant analysis
+0.804688	0.000001	2.232172	kernel method (svm)
+0.789062	0.000002	2.201470	svm method
+0.242188	0.000055	2.188439	libsvm wrapper
+0.703125	0.001778	19.100478	group-sparsifying logistic regression
