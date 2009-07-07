@@ -99,6 +99,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.46  2008/04/17 18:39:43  nima
+% arno abnd nima changes merged.
+%
 % Revision 1.44  2008/03/30 12:05:26  arno
 % fix wrong index assignment for component clusters
 %
@@ -756,8 +759,8 @@ allchanorcomp = allchanorcomp(:)';
 
 % get indices for all groups and conditions
 % -----------------------------------------
-nc = length(STUDY.condition);
-ng = length(STUDY.group);
+nc = max(length(STUDY.condition),1);
+ng = max(length(STUDY.group),1);
 allinds = cell( nc, ng );
 setinds = cell( nc, ng );
 for indtmp = 1:length(alldatasets)
