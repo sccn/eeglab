@@ -206,6 +206,9 @@
 
 %% LOG COMMENTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % $Log: not supported by cvs2svn $
+% Revision 1.282  2009/07/03 18:00:58  arno
+% typo for octave
+%
 % Revision 1.281  2009/04/28 01:52:09  arno
 % header
 %
@@ -1071,12 +1074,13 @@
 %       on the coher axis when printed (-djpeg or -depsc)
 % 'allcohers' - not fully implemented, and has been omitted from the help msg
 
-function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,allamps,phaseangles,phsamp,sortidx,erpsig] = myerpimage(data,sortvar,times,titl,avewidth,decfactor,arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13,arg14,arg15,arg16,arg17,arg18,arg19,arg20,arg21,arg22,arg23,arg24,arg25,arg26)
+function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,allamps,phaseangles,phsamp,sortidx,erpsig] = erpimage(data,sortvar,times,titl,avewidth,decfactor,arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13,arg14,arg15,arg16,arg17,arg18,arg19,arg20,arg21,arg22,arg23,arg24,arg25,arg26)
 
 %
 %% %%%%%%%%%%%%%%%%% Define defaults %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % Initialize optional output variables:
+warning off;
 erp = []; amps = []; cohers = []; cohsig = []; ampsig = [];
 allamps = []; phaseangles = []; phsamp = []; sortidx = [];
 auxvar = []; erpsig = []; winloc = [];winlocs = [];
@@ -3798,6 +3802,7 @@ if strcmpi(noshow, 'no')
     axes('position',gcapos);
     axis off
 end;
+warning on;
 
 return
 %
