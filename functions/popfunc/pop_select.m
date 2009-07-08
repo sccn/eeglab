@@ -27,7 +27,7 @@
 %                  Command line equivalent: 'trial' (or 'notrial' - see below)
 %   "Epoch range" - [checkbox] EXCLUDE the specified data epochs. 
 %                   Command line equivalent: [if checked] 'notrial' 
-%   "Channel range" - [edit box] RETAIN the indicdated vector of data channels 
+%   "Channel range" - [edit box] RETAIN the indicated vector of data channels 
 %                  Command line equivalent: 'channel' (or 'nochannel' - see below)
 %   "Channel range" - [checkbox] EXCLUDE the indicated channels.
 %                  Command line equivalent: [if checked] 'nochannel' 
@@ -60,8 +60,10 @@
 %                   or the last point (EEG.pnts), as a central point range cannot be removed. 
 %   'trial'       - array of trial indices to retain in the new dataset
 %   'notrial'     - array of trial indices to exclude from the new dataset
-%   'channel'     - vector of channel indices to retain in the new dataset
-%   'nochannel'   - vector of channel indices to exclude from the new dataset
+%   'channel'     - vector of channel indices to retain in the new 
+%                   dataset. Can also be a cell array of channel names.
+%   'nochannel'   - vector of channel indices to exclude from the new
+%                   dataset. Can also be a cell array of channel names.
 %   'newname'     - name for the new dataset (OUTEEG)
 %
 % Outputs:
@@ -94,6 +96,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.64  2009/04/22 18:29:17  arno
+% Allowing channel selection by name
+%
 % Revision 1.63  2009/02/09 11:06:08  arno
 % Fix CVS problem with Windows
 %
@@ -353,6 +358,7 @@ if nargin < 2
 
    if ~isempty( results{7} )
        [ chaninds chanlist ] = eeg_decodechan(EEG.chanlocs, results{7});
+       chanlist
        if ~results{8}, args = { args{:}, 'channel'  , chanlist };
        else            args = { args{:}, 'nochannel', chanlist }; end;
    end;
@@ -391,7 +397,7 @@ for index = 1:length(allfields)
 end;
 
 g.trial   = sort(setdiff( g.trial, g.notrial ));
-if ~iscell(g.nochannel) & iscell(chanlist)
+if ~iscell(g.nochannel) & ~iscell(chanlist)
     g.channel = [1:EEG.nbchan];
 end;
 g.channel = sort(setdiff( lower(g.channel), lower(g.nochannel) ));
