@@ -15,7 +15,10 @@
 %       'mode'      = ['amp_amp'|'amp_phase'|'phase_phase'] correlation mode
 %                     is either amplitude-amplitude ('amp_amp'), amplitude
 %                     and phase ('amp_phase') and phase-phase ('phase_phase').
-%                     Default is 'amp_phase'.
+%                     Default is 'amp_phase'. 
+%       'method'    = ['mod'|'corrsin'|'corrcos'] modulation method ('mod')
+%                     or correlation of amplitude with sine or cosine of 
+%                     angle (see ref).
 %       'freqs'     = [min max] frequency limits. Default [minfreq 50], 
 %                     minfreq being determined by the number of data points, 
 %                     cycles and sampling frequency. Use 0 for minimum frequency
@@ -121,6 +124,8 @@
 %
 % Author: Arnaud Delorme & Scott Makeig, SCCN/INC, UCSD 2003-
 %
+% Ref: Testing for Nested Oscilations (2008) J Neuro Methods 174(1):50-61
+%
 % See also: timefreq(), crossf()
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
@@ -142,6 +147,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2009/07/08 02:21:48  arno
+% *** empty log message ***
+%
 % Revision 1.6  2009/05/22 23:57:06  klaus
 % latest compatibility fixes
 %
@@ -187,6 +195,7 @@ g = finputcheck(varargin, ...
                   'nfreqs'        'integer'  [0 Inf]                  [];
                   'lowmem'        'string'   {'on' 'off'}              'off';
                   'mode'          'string'   { 'amp_amp' 'amp_phase' 'phase_phase' } 'amp_phase';
+                  'method'        'string'   { 'mod' 'corrsin' 'corrcos' }         'mod';
                   'naccu'         'integer'  [1 Inf]                   250;
                   'newfig'        'string'   {'on' 'off'}              'on';
                   'padratio'      'integer'  [1 Inf]                   2;
@@ -270,14 +279,23 @@ for find1 = 1:length(freqs1)
             tmpalltfy = squeeze(alltfY(find2,ti,:));
 
             if ~isempty(g.alpha)
+                tmpalltfy = angle(tmpalltfy);
+                tmpalltfx = abs(  tmpalltfx);
                 [ tmp cohboot(find1,find2,ti,:) newamp newangle ] = ...
-                    bootcircle(abs(tmpalltfx), angle(tmpalltfy), 'naccu', g.naccu); 
-                crossfcoh(find1,find2,ti) = sum ( newamp .* exp(j*newangle) ) ...
-                    ./ sqrt( sum(abs(newamp).^2) * length(newangle) );
+                    bootcircle(tmpalltfx, tmpalltfy, 'naccu', g.naccu); 
+                crossfcoh(find1,find2,ti) = sum ( newamp .* exp(j*newangle) );
             else 
                 tmpalltfy = angle(tmpalltfy);
-                crossfcoh(find1,find2,ti) = sum( tmpalltfx .* exp(j*tmpalltfy) ) ...
-                    ./ sqrt( sum(abs(tmpalltfx).^2) * length(tmpalltfx) );
+                tmpalltfx = abs(  tmpalltfx);
+                if strcmpi(g.method, 'mod')
+                    crossfcoh(find1,find2,ti) = sum( tmpalltfx .* exp(j*tmpalltfy) );
+                elseif strcmpi(g.method, 'corrsin')
+                    tmp = corrcoef( sin(tmpalltfy), tmpalltfx);
+                    crossfcoh(find1,find2,ti) = tmp(2);
+                else
+                    tmp = corrcoef( cos(tmpalltfy), tmpalltfx);
+                    crossfcoh(find1,find2,ti) = tmp(2);
+                end;
             end;
         end;
     end;
