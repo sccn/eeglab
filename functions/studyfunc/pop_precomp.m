@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2008/11/13 02:17:36  arno
+% comment
+%
 % Revision 1.15  2008/04/19 21:07:59  arno
 % change polarity of checkbox for components
 %
@@ -89,22 +92,7 @@ if ~isstr(varargin{1}) %intial settings
         end;
     end;
     
-    % Create default ERSP / ITC time/freq. paramters 
-    % ----------------------------------------------
-    % Find the first entry in STUDY.setind that is not NaN
-    ref_ind = 0;
-    found_ind1 = 0;
-    for ri = 1:size(STUDY.setind,1)
-        for ci = 1:size(STUDY.setind,2)
-            if ~isnan(STUDY.setind(ri,ci))
-                ref_ind = STUDY.setind(ri,ci);
-                found_ind1 = 1;
-                break
-            end
-        end
-        if found_ind1 == 1, break; end
-    end
-    if ref_ind == 0     % If STUDY.setind contains only NaNs, or is empty.
+    if isempty(ALLEEG)
         error('STUDY contains no datasets');
     end
          
