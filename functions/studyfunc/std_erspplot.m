@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.67  2009/06/04 11:55:40  arno
+% Fix component plotting
+%
 % Revision 1.66  2009/05/31 02:22:10  arno
 % Adding FDR and bootstrap to all STUDY functions
 %
@@ -232,6 +235,7 @@ STUDY = pop_erspparams(STUDY, 'default');
                                'timerange'   'real'    [] STUDY.etc.erspparams.timerange;
                                'freqrange'   'real'    [] STUDY.etc.erspparams.freqrange;
                                'ersplim'     'real'    [] STUDY.etc.erspparams.ersplim;
+                               'paclim'      'real'    [] [];
                                'itclim'      'real'    [] STUDY.etc.erspparams.itclim;
                                'statistics'  'string'  [] STUDY.etc.erspparams.statistics;
                                'groupstats'  'string'  [] STUDY.etc.erspparams.groupstats;
@@ -244,7 +248,7 @@ STUDY = pop_erspparams(STUDY, 'default');
                                'channels'    'cell'    []              {};
                                'caxis'       'real'    []              [];
                                'clusters'    'integer' []              [];
-                               'datatype'    'string'  { 'itc' 'ersp' } 'ersp';
+                               'datatype'    'string'  { 'itc' 'ersp' 'pac' } 'ersp';
                                'mode'        'string'  []              '';
                                'plottf'      'real'    []              [];
                                'comps'       {'integer','string'}  []              []; % for backward compatibility
@@ -255,8 +259,11 @@ STUDY = pop_erspparams(STUDY, 'default');
 if isstr(opt), error(opt); end;
 if isempty(opt.caxis), 
     if strcmpi(opt.datatype, 'ersp')
-         opt.caxis = STUDY.etc.erspparams.ersplim;
-    else opt.caxis = STUDY.etc.erspparams.itclim;
+         opt.caxis = opt.ersplim;
+    elseif strcmpi(opt.datatype, 'itc')
+        opt.caxis = [-opt.itclim opt.itclim];
+    else
+        opt.caxis = opt.paclim;
     end;
 end;
 
@@ -276,7 +283,7 @@ if length(opt.comps) == 1
 end;
 
 plotcurveopt = { ...
-   'ersplim',     fastif(strcmpi(opt.datatype, 'ITC'), [-opt.itclim opt.itclim], opt.ersplim), ...
+   'ersplim',     opt.caxis, ...
    'threshold',   opt.threshold, ...
    'mcorrect',    opt.mcorrect, ...
    'maskdata',    opt.maskdata, ...
@@ -428,29 +435,17 @@ for index = 1:length(allinds)
     if isempty(opt.channels), %title(sprintf('Cluster %d', allinds(index)));
         if length(allinds) > 1, 
             title([ STUDY.cluster(allinds(index)).name ' (' num2str(length(STUDY.cluster(allinds(index)).comps)),' ICs, ' ...
-                    num2str(length(unique(STUDY.cluster(allinds(index)).sets(1,:)))) ' Ss)' ]);            
-            if strcmp(opt.datatype,'ersp')
-                set(gcf,'name','Cluster ERSPs')
-            elseif strcmp(opt.datatype,'itc')
-                set(gcf,'name','Cluster ITCs')
-            end;
+                    num2str(length(unique(STUDY.cluster(allinds(index)).sets(1,:)))) ' Ss)' ]);    
+            set(gcf, 'name', [ 'Cluster ' upper(opt.datatype) ]);
         elseif ~strcmp(opt.mode,'together') % if it is not the mean ERSP that is being shown (which is the case when 'cluster properties' is plotted then put cluster number on the corner of figure
             h = gca;
             axes('position',[0.04 0.96 0.1 0.06]); 
             text(0,0,[STUDY.cluster(allinds(index)).name],'fontsize',13 );
             axis off;
-            if strcmp(opt.datatype,'ersp')
-                if length(opt.comps) ~= 1
-                    set(gcf,'name',['ERSP of ' STUDY.cluster(allinds(index)).name])
-                else
-                    set(gcf,'name',['ERSP of a Component from cluster ' STUDY.cluster(allinds(index)).name])
-                end;
-            elseif strcmp(opt.datatype,'itc')
-                if isempty(opt.comps)
-                    set(gcf,'name',['ITC of ' STUDY.cluster(allinds(index)).name]);
-                else
-                    set(gcf,'name',['ITC of a Component from cluster ' STUDY.cluster(allinds(index)).name]);
-                end;
+            if length(opt.comps) ~= 1
+                set(gcf,'name',[upper(opt.datatype) ' of ' STUDY.cluster(allinds(index)).name])
+            else
+                set(gcf,'name',[upper(opt.datatype) ' of a Component from cluster ' STUDY.cluster(allinds(index)).name])
             end;
             axes(h);
         end;
