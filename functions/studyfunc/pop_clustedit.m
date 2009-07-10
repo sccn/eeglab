@@ -157,6 +157,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.57  2009/07/10 00:57:54  arno
+% error when no dataet in study
+%
 % Revision 1.56  2007/10/25 21:30:40  nima
 % _
 %
@@ -348,7 +351,7 @@ if ~isstr(varargin{1})
 
     % enable buttons
     % --------------
-    filename = fullfile( ALLEEG(ref_ind).filepath, ALLEEG(ref_ind).filename(1:end-3));
+    filename = fullfile( ALLEEG(1).filepath, ALLEEG(1).filename(1:end-3));
     if exist([filename 'icaspec']) , spec_enable = 'on'; else spec_enable  = 'off'; end;
     if exist([filename 'icaerp'] )  , erp_enable = 'on'; else erp_enable   = 'off'; end;
     if exist([filename 'icatopo']), scalp_enable = 'on'; else scalp_enable = 'off'; end;
