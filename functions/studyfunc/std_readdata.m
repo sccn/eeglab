@@ -99,6 +99,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.48  2009/07/07 23:05:24  arno
+% fix index bug
+%
 % Revision 1.46  2008/04/17 18:39:43  nima
 % arno abnd nima changes merged.
 %
@@ -314,9 +317,14 @@ for ind = 1:length(finalinds)
         alldatasets = 1:length(STUDY.datasetinfo);
         %allchanorcomp = -tmpstruct.chaninds;
         allinds       = tmpstruct.allinds;
-        for i=1:length(allinds(:)), allinds{i} = -allinds{i}; end; % invert sign
+        for i=1:length(allinds(:)), allinds{i} = -allinds{i}; end; % invert sign for reading
         setinds       = tmpstruct.setinds;
     else
+        % Use the 3 lines below and comment the last one when ready
+        % to switch and remove all .comps and .inds
+        %tmpstruct = STUDY.cluster(finalinds(ind));
+        %allinds = tmpstruct.allinds;
+        %setinds = tmpstruct.setinds;
         [ tmpstruct setinds allinds ] = getsetinds(STUDY, finalinds(ind));
     end;
 
@@ -505,7 +513,7 @@ for ind = 1:length(finalinds)
                 tmpstruct.specdata  = allspec;
             end;
 
-        case { 'ersp' 'itc' },
+        case { 'ersp' 'itc' 'pac' },
             % check if data is already here
             % -----------------------------
             if strcmpi(opt.infotype, 'ersp')
@@ -515,12 +523,16 @@ for ind = 1:length(finalinds)
                         dataread = 1;
                     end;
                 end;
-            else
+            elseif strcmpi(opt.infotype, 'itc')
                 if isfield(tmpstruct, 'itcdata')
                     if isequal( STUDY.etc.erspparams.timerange, opt.timerange) & ...
                             isequal( STUDY.etc.erspparams.freqrange, opt.freqrange) & ~isempty(tmpstruct.itcdata)
                         dataread = 1;
                     end;
+                end;
+            else
+                if isfield(tmpstruct, 'pacdata')
+                    dataread = 1;
                 end;
             end;
 
@@ -577,6 +589,10 @@ for ind = 1:length(finalinds)
                                     end;
                                 elseif strcmpi(opt.infotype, 'itc')
                                     [ tmpersp allfreqs alltimes tmpparams] = std_readitc( ALLEEG, setinds{c,g}(indtmp), allinds{c,g}(indtmp), ...
+                                        opt.timerange, opt.freqrange);
+                                    ersp{c, g}(:,:,indtmp)     = abs(permute(tmpersp    , [2 1]));
+                                elseif strcmpi(opt.infotype, 'pac')
+                                    [ tmpersp allfreqs alltimes tmpparams] = std_readpac( ALLEEG, setinds{c,g}(indtmp), allinds{c,g}(indtmp), ...
                                         opt.timerange, opt.freqrange);
                                     ersp{c, g}(:,:,indtmp)     = abs(permute(tmpersp    , [2 1]));
                                 else
@@ -664,13 +680,17 @@ for ind = 1:length(finalinds)
                     if strcmpi(opt.statmode, 'trials')
                         tmpstruct.erspsubjinds  = erspinds;
                     end;
-                else
+                elseif strcmpi(opt.infotype, 'itc')
                     tmpstruct.itcfreqs = allfreqs;
                     tmpstruct.itctimes = alltimes;
                     tmpstruct.itcdata  = ersp;
                     if strcmpi(opt.statmode, 'trials')
                         tmpstruct.itcsubjinds  = erspinds;
                     end;
+                else
+                    tmpstruct.pacfreqs = allfreqs;
+                    tmpstruct.pactimes = alltimes;
+                    tmpstruct.pacdata  = ersp;
                 end;
             end;
         case 'dipole',
@@ -746,13 +766,13 @@ for rmi = 1:length(rmclust)
     rmcomps   = [ rmcomps STUDY.cluster(rmclust(rmi)).allinds{c,g}(findind) ];
 end;
 
-% get set and indices for components
-% ----------------------------------
+% get set and indices for components cluster
+% ------------------------------------------
 function [ tmpstruct setinds allinds ] = getsetinds(STUDY, ind)
 
 tmpstruct = STUDY.cluster(ind);
 alldatasets = tmpstruct.sets;
-allchanorcomp = repmat(tmpstruct.comps, [size(tmpstruct.sets,1) 1]);
+allchanorcomp = repmat(tmpstruct.comps, [size(tmpstruct.sets,1) 1]); % old format
 
 alldatasets   = alldatasets(:)';
 allchanorcomp = allchanorcomp(:)';
