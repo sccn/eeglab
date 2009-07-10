@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.55  2008/04/16 17:54:51  arno
+% interpolation plus removing ICA components
+%
 % Revision 1.54  2007/09/11 10:46:04  arno
 % fixed computing component ERSP (index problem) bug 497
 %
@@ -439,7 +442,7 @@ else
         EEG = eeg_interp(EEG, g.interp, 'spherical'); 
         options = { options{:} 'interp' g.interp };
     end;
-    tmpdata = EEG.data;
+    tmpdata = EEG.data(g.indices,:,:);
 end;        
 
 % find channel index
