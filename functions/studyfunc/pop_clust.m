@@ -61,6 +61,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.37  2009/06/24 22:10:30  arno
+% fixed history
+%
 % Revision 1.36  2009/04/17 15:01:20  julie
 % Remove old clusters when called from commandline
 %
@@ -393,17 +396,9 @@ STUDY.saved = 'no';
 %     width of the preclustering matrix
 function [STUDY, clusters] = std_createclust2(STUDY,IDX,C, algorithm)
 
-clusters = [];
-sets = [];
-comp = [];
-nsets = length(STUDY.etc.preclust.preclustcomps); % number of sets from which components are originated, maybe less than actual number of sets in the STUDY since some sets may have not any selected componnets
-for k = 1: nsets
-    sets = [sets k*ones(1,length(STUDY.etc.preclust.preclustcomps{k}))];
-    comp = [comp STUDY.etc.preclust.preclustcomps{k}];
-end
-
 % Find the next available cluster index
 % -------------------------------------
+clusters = [];
 cls = size(C,1); % number of cluster = number of row of centroid matrix
 nc  = 0; % index of last cluster 
 for k =  1:length(STUDY.cluster)
@@ -439,7 +434,7 @@ for k = firstind:cls
 
     % find indices
     % ------------
-    tmp = find(IDX==k);
+    tmp = find(IDX==k); % IDX contains the cluster index for each component
     STUDY.cluster(k+len).sets  = STUDY.cluster(STUDY.etc.preclust.clustlevel).sets(:,tmp);
     STUDY.cluster(k+len).comps = STUDY.cluster(STUDY.etc.preclust.clustlevel).comps(tmp);
     STUDY.cluster(k+len).algorithm = algorithm;
