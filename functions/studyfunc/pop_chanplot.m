@@ -223,29 +223,10 @@ if ~isstr(varargin{1})
     for index = 1:length(STUDY.changrp)
         show_options{end+1} = [ 'All ' STUDY.changrp(index).name ];
     end;
-                           
-    % Create default ERSP / ITC time/freq. paramters 
-    % ----------------------------------------------
-    % Find the first entry in STUDY.setind that is not NaN
-    ref_ind = 0;
-    found_ind1 = 0;
-    for ri = 1:size(STUDY.setind,1)
-        for ci = 1:size(STUDY.setind,2)
-            if ~isnan(STUDY.setind(ri,ci))
-                ref_ind = STUDY.setind(ri,ci);
-                found_ind1 = 1;
-                break
-            end
-        end
-        if found_ind1 == 1, break; end
-    end
-    if ref_ind == 0     % If STUDY.setind contains only NaNs, or is empty.
-        error('STUDY contains no datasets');
-    end
-
+    
     % enable buttons
     % --------------
-    filename = fullfile( ALLEEG(ref_ind).filepath, ALLEEG(ref_ind).filename(1:end-3));
+    filename = fullfile( ALLEEG(1).filepath, ALLEEG(1).filename(1:end-3));
     if exist([filename 'datspec']) , spec_enable = 'on'; else spec_enable  = 'off'; end;
     if exist([filename 'daterp'] )  , erp_enable = 'on'; else erp_enable   = 'off'; end;
     if exist([filename 'datersp']) , ersp_enable = 'on'; else ersp_enable  = 'off'; end;
