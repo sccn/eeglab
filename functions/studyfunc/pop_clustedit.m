@@ -157,6 +157,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.56  2007/10/25 21:30:40  nima
+% _
+%
 % Revision 1.55  2007/10/25 19:14:42  nima
 % _
 %
@@ -339,20 +342,7 @@ if ~isstr(varargin{1})
     
     % Create default ERSP / ITC time/freq. paramters 
     % ----------------------------------------------
-    % Find the first entry in STUDY.setind that is not NaN
-    ref_ind = 0;
-    found_ind1 = 0;
-    for ri = 1:size(STUDY.setind,1)
-        for ci = 1:size(STUDY.setind,2)
-            if ~isnan(STUDY.setind(ri,ci))
-                ref_ind = STUDY.setind(ri,ci);
-                found_ind1 = 1;
-                break
-            end
-        end
-        if found_ind1 == 1, break; end
-    end
-    if ref_ind == 0     % If STUDY.setind contains only NaNs, or is empty.
+    if isempty(ALLEEG)
         error('STUDY contains no datasets');
     end
 
