@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2008/04/16 17:42:03  arno
+% now only include electrode actually present in datasets if no interpolation
+%
 % Revision 1.12  2008/03/18 01:12:46  nima
 % nima added ordering field before merging.
 %
@@ -161,32 +164,6 @@ function changrp = std_chanlookupnew( STUDY, ALLEEG, changrp, interp);
                 changrp.setinds{ condind, grpind } = [ changrp.setinds{ condind, grpind } index ];
             end;
         end;
-    end;
-    
-    return; 
-    
-% ---------------
-% old channel look-up
-% ---------------
-function changrp = std_chanlookup( STUDY, ALLEEG, changrp);
-
-    changrp.chaninds = [];
-    changrp.chaninds = zeros(size(STUDY.setind));
-    for ir = 1:size(STUDY.setind,1)
-        for ic = 1:size(STUDY.setind,2)
-            datind  = STUDY.setind(ir,ic);
-            if ~isnan(datind)
-                tmplocs = { ALLEEG(STUDY.datasetinfo(datind).index).chanlocs.labels };
-                
-                for indc = 1:length(changrp.channels)
-                    ind = strmatch( changrp.channels(indc), tmplocs, 'exact');
-                    if length(ind) > 1, error([ 'Duplicate channel label ''' tmplocs{ind(1)} ''' for dataset ' int2str(datind) ]); end;
-                    if ~isempty(ind)
-                        changrp.chaninds(ir,ic) = ind;
-                    end;
-                end;
-            end;
-        end;    
     end;
     
     return; 
