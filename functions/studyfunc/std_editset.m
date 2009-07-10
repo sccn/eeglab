@@ -71,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.59  2009/04/27 21:08:14  arno
+% Matlab 6.1 compatibility
+%
 % Revision 1.58  2007/10/18 17:28:51  nima
 % help message for 'inbrain' revised.
 %
@@ -244,7 +247,6 @@ if ~isempty(g.name),  STUDY.name  = g.name; end
 if ~isempty(g.task),  STUDY.task  = g.task; end
 if ~isempty(g.notes), STUDY.notes = g.notes; end
 
-
 % make one cell array with commands
 % ---------------------------------
 allcoms = {};
@@ -323,28 +325,21 @@ for k = 1:2:length(g.commands)
             STUDY.changrp = [];
         case 'return', return;
         case 'dipselect'
-            STUDY = std_checkset(STUDY, ALLEEG); % update setind field
+            STUDY = std_checkset(STUDY, ALLEEG);
             rv = g.commands{k+1};
+            clusters = std_findsameica(ALLEEG);
             
-            for si = 1:size(STUDY.setind,2)% scan datasets that are part of STUDY
+            for cc = 1:length(clusters)
                 
-                % find a dataset with dipoles
-                % ---------------------------
-                idat = 0;
-                for sc = 1:size(STUDY.setind,1)
-                    if ~isnan(STUDY.setind(sc,si)) 
-                        if isfield(ALLEEG(STUDY.datasetinfo(STUDY.setind(sc,si)).index).dipfit, 'model')
-                            idat = STUDY.datasetinfo(STUDY.setind(sc,si)).index;
-                            break;
-                        end;
+                for tmpi = 1:length(clusters{cc})
+                    if isfield(ALLEEG(clusters{cc}(tmpi)).dipfit, 'model')
+                        idat = clusters{cc}(tmpi);
                     end;
                 end;
-                    
+                
+                indleft = [];
                 if rv ~= 1
                     if idat ~= 0
-
-                       
-                        
                         if strcmp(g.inbrain,'on')
                             fprintf('Selecting dipoles with less than %%%2.1f residual variance and removing dipoles outside brain volume in dataset ''%s''\n', ...
                                 100*rv, ALLEEG(idat).setname);
@@ -355,16 +350,11 @@ for k = 1:2:length(g.commands)
                             indleft = eeg_dipselect(ALLEEG(idat), rv*100,'rv'); 
                         end;
                     else
-                        indleft = [];
                         fprintf('No dipole information found in ''%s'' dataset, using all components\n', ALLEEG.setname)
                     end
-                else
-                    indleft = [];
                 end;
-                for sc = 1:size(STUDY.setind,1)
-                    if ~isnan(STUDY.setind(sc,si))
-                       STUDY.datasetinfo(STUDY.setind(sc,si)).comps = indleft;
-                    end
+                for tmpi = 1:length(clusters{cc})                
+                    STUDY.datasetinfo(clusters{cc}(tmpi)).comps = indleft;
                 end;
             end;
             STUDY.cluster = [];
