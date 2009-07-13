@@ -118,6 +118,11 @@ end;
 
 % since latencies and accepted epochs always have to be together, we put them in one structure
 timeWarpStructure.latencies = timeWarp'; % make it suitable for newtimef()
+
+if isempty(timeWarpStructure.latencies) % when empty, it becomes a {} instead of [], so we change it to []
+    timeWarpStructure.latencies = [];
+end;
+
 timeWarpStructure.epochs = acceptableEpochs;
 timeWarpStructure.eventSequence = eventSequence;
 
