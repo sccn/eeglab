@@ -22,6 +22,9 @@
 % GNU General Public License for more information
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2009/07/10 01:50:14  arno
+% adding new functions
+%
 
 % How to remove .setind
 %   It is now only in std_preclust but is really embeded in the function
@@ -48,8 +51,8 @@ for index = 1:length(STUDY.cluster)
     STUDY.cluster(index).setinds = setinds;
     STUDY.cluster(index).allinds = allinds;
 end;
-STUDY.cluster = rmfield(STUDY.cluster, 'sets');
-STUDY.cluster = rmfield(STUDY.cluster, 'comps');
+%STUDY.cluster = rmfield(STUDY.cluster, 'sets');
+%STUDY.cluster = rmfield(STUDY.cluster, 'comps');
 
 % get set and indices for components cluster
 % ------------------------------------------

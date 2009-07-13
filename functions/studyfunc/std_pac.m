@@ -1,16 +1,20 @@
 % std_pac() - Compute or read PAC data (Phase Amplitude Coupling).
 %
 % Usage:  
-%              >> [X times logfreqs ] = std_pac(EEG, 'key', 'val', ...);
+%   >> [X times logfreqs ] = std_pac(EEG, 'key', 'val', ...);
 % Inputs:
 %   EEG          - an EEG dataset structure. 
 %
 % Optional inputs:
-%   'components' - [numeric vector] components in the EEG structure for which 
-%                  PAC data will be computed {default|[]: all 
-%                  components if no 'channels' are specified (see below)}
-%   'channels'   - [numeric vector or cell array of channel labels] channels 
-%                  in the EEG structure for which PAC will be computed 
+%   'components1'- [numeric vector] components in the EEG structure used 
+%                  for spectral amplitude in PAC {default|[]: all }
+%   'components2'- [numeric vector] components in the EEG structure used
+%                  for phase in PAC {default|[]: all }
+%   'channels1'  - [numeric vector or cell array of channel labels] channels 
+%                  in the EEG structure for spectral amplitude in PAC 
+%                  {default|[]: no channels}
+%   'channels2'  - [numeric vector or cell array of channel labels] channels 
+%                  in the EEG structure for phase in PAC 
 %                  {default|[]: no channels}
 %   'freqs'      - [minHz maxHz] the PAC frequency range to compute power.
 %                  {default: 12 to EEG sampling rate divided by 2}
@@ -25,8 +29,6 @@
 %   'freqphase'  - [valHz] single number for computing the phase at a given
 %                  frequency.
 %   'cyclephase' - [valcycle] single cycle number.
-%   'timelimits' - [minms maxms] time window (in ms) to compute.
-%                  {default: whole input epoch}.
 %   'timewindow' - [minms maxms] time window (in ms) to plot.
 %                  {default: all output latencies}
 %   'padratio'   - (power of 2). Multiply the number of output frequencies 
@@ -74,6 +76,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2009/07/10 01:50:14  arno
+% adding new functions
+%
 
 function [X, times, freqs, parameters] = std_pac(EEG, varargin)
 
@@ -83,22 +88,7 @@ if nargin < 1
 end;
 
 options = {};
-if length(varargin) > 1 
-    if ~isstr(varargin{1})
-        if length(varargin) > 0, options = { options{:} 'components' varargin{1} }; end;
-        if length(varargin) > 1, options = { options{:} 'freqs'      varargin{2} }; end;
-        if length(varargin) > 2, options = { options{:} 'timewindow' varargin{3} }; end;
-        if length(varargin) > 3, options = { options{:} 'cycles'     varargin{4} }; end;
-        if length(varargin) > 4, options = { options{:} 'padratio'   varargin{5} }; end;
-        if length(varargin) > 5, options = { options{:} 'alpha'      varargin{6} }; end;
-        if length(varargin) > 6, options = { options{:} 'type'       varargin{7} }; end;
-        if length(varargin) > 7, options = { options{:} 'powbase'    varargin{8} }; end;
-    else
-        options = varargin;
-    end;
-end;
-
-[g timefargs] = finputcheck(options, { ...
+[g timefargs] = finputcheck(varargin, { ...
                         'components1'    'integer'     []      [];
                         'channels1'      { 'cell' 'integer' }  { [] [] }     {};
                         'components2'    'integer'     []      [];
@@ -119,7 +109,7 @@ end;
                         'rmcomps'       'integer'     []      [];
                         'freqscale'     'string'      []      'log' }, 'std_pac', 'ignore');
 if isstr(g), error(g); end;
-    
+
 % checking input parameters
 % -------------------------
 if isempty(g.components1) & isempty(g.channels1)
@@ -135,8 +125,8 @@ end
 % --------------------------------------
 if ~isempty(g.outputfile)
     filenamepac   = fullfile('', [ g.outputfile '.datpac' ]);
-    g.indices1 = g.channels1;
-    g.indices2 = g.channels2;
+    g.indices1 = std_chaninds(EEG, g.channels1);
+    g.indices2 = std_chaninds(EEG, g.channels2);
     prefix = 'chan';
 elseif ~isempty(g.components1)
     g.indices1 = g.components1;
@@ -147,8 +137,8 @@ elseif ~isempty(g.components1)
         error('Cannot compute PAC for components and channels at the same time');
     end;
 elseif ~isempty(g.channels1)
-    g.indices1 = g.channels2;
-    g.indices2 = g.channels2;
+    g.indices1 = std_chaninds(EEG, g.channels1);
+    g.indices2 = std_chaninds(EEG, g.channels2);
     prefix = 'chan';
     filenamepac   = fullfile(EEG.filepath, [ EEG.filename(1:end-3) 'datpac' ]);
 end;
@@ -158,31 +148,6 @@ end;
 parameters = { 'wavelet', g.cycles, 'padratio', g.padratio, ...
                'freqs2', g.freqphase, 'wavelet2', g.cyclephase, 'freqscale', g.freqscale, timefargs{:} };
 if length(g.freqs)>0, parameters = { parameters{:} 'freqs' g.freqs }; end;
-
-% find channel index
-% ------------------
-if ~isempty(g.channels1)
-    if iscell(g.channels1)
-        for index = 1:length(g.channels1)
-            chanind = strmatch( lower(g.channels1{index}), lower({ EEG.chanlocs.labels }), 'exact');
-            if isempty(chanind), error('Channel group not found'); end;
-            chaninds(index) = chanind;
-        end;
-        g.indices1  = chaninds;
-        g.channels1 = chaninds;
-    end;
-end;
-if ~isempty(g.channels2)
-    if iscell(g.channels2)
-        for index = 1:length(g.channels2)
-            chanind = strmatch( lower(g.channels2{index}), lower({ EEG.chanlocs.labels }), 'exact');
-            if isempty(chanind), error('Channel group not found'); end;
-            chaninds(index) = chanind;
-        end;
-        g.indices2  = chaninds;
-        g.channels2 = chaninds;
-    end;
-end;
 
 % Check if PAC information found in datasets and if fits requested parameters 
 % ----------------------------------------------------------------------------
@@ -243,8 +208,8 @@ all_pac.parameters = tmpparams;
 
 if ~isempty(g.channels1)
     if ~isempty(EEG(1).chanlocs)
-        all_pac.chanlabels1   = { EEG(1).chanlocs(g.channels1).labels };
-        all_pac.chanlabels2   = { EEG(1).chanlocs(g.channels2).labels };
+        all_pac.chanlabels1   = { EEG(1).chanlocs(g.indices1).labels };
+        all_pac.chanlabels2   = { EEG(1).chanlocs(g.indices2).labels };
     end;
 end;
 

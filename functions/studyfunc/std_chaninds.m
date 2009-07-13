@@ -1,7 +1,8 @@
 % std_chaninds() - look up channel indices in a STUDY
 %
 % Usage:
-%         >> inds = std_chaninds(STUDY, channames);
+%         >> inds = std_chaninds(STUDY,  channames);
+%         >> inds = std_chaninds(EEG, channames);
 % Inputs:
 %         STUDY - studyset structure containing a changrp substructure.
 %     channames - [cell] channel names
@@ -28,6 +29,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2007/08/13 17:09:30  arno
+% update header
+%
 % Revision 1.1  2007/01/26 18:08:06  arno
 % Initial revision
 %
@@ -35,8 +39,14 @@
 function finalinds = std_chaninds(STUDY, channames);
 
     finalinds   = [];
-    tmpallchans = lower({ STUDY.changrp.name });
-    if isempty(channames), finalinds = [1:length(STUDY.changrp)]; return; end;
+    if isfield(STUDY, 'chanlocs')
+        EEG = STUDY;
+        tmpallchans = lower({ EEG.chanlocs.labels });
+    else
+        tmpallchans = lower({ STUDY.changrp.name });
+    end;
+    
+    if isempty(channames), finalinds = [1:length(tmpallchans)]; return; end;
     for c = 1:length(channames)
         chanind = strmatch( lower(channames{c}), tmpallchans, 'exact');
         if isempty(chanind), error('Channel group not found'); end;
