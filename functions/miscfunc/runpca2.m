@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2009/01/29 00:04:48  arno
+% Initial revision
+%
 % Revision 1.6  2007/05/12 02:36:14  jason
 % added code to remove mean, which pca should do.
 %
@@ -67,14 +70,19 @@
 % 01/31/00 renamed runpca() and improved usage message -sm
 % 01-25-02 reformated help & license, added links -ad 
 
-function [pc,sph]= runpca2(data,N)
+function [pc,A,sv]= runpca2(data,K,dosym)
+[chans,frames] = size(data);
 
+if nargin < 3 || K < chans
+    dosym = 1;
+end
+if nargin < 2
+    K = chans;
+end
 if nargin < 1
   help runpca
   return
 end
-
-[chans,frames] = size(data);
 
 % remove the mean
 for i = 1:chans
@@ -84,6 +92,11 @@ end
 % do svd
 [U,S,V] = svd(data*data'/frames); % U and V should be the same since data*data' is symmetric
 
-sv = diag(S);
-pc = U(:,1:N) * diag(sv(1:N)) * V(:,1:N)';
-sph = U(:,1:N) * pinv(diag(sqrt(sv(1:N)))) * V(:,1:N)';
+sv = sqrt(diag(S));
+if dosym == 0
+    pc = pinv(diag(sv(1:K))) * V(:,1:K)' * data;
+    A = U(:,1:K) * diag(sv(1:K));
+else
+    pc = U * pinv(diag(sv)) * V' * data;
+    A = U * diag(sv) * V';
+end
