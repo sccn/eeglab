@@ -138,6 +138,10 @@
 %                     under EEG.moredata.mocap.markerPosition in xs, ys and zs fields which are
 %                     (number of markers, number of time points) arrays.                
 %                    {default: 'off'}.
+%    'selectcommand' - [cell array] list of 3 commands (strings) to run when the mouse 
+%                      button is down, when it is moving and when the mouse button is up.
+%    'ctrlselectcommand' - [cell array] same as above in conjunction with pressing the 
+%                      CTRL key.
 % Outputs:
 %    TMPREJ       -  Matrix (same format as 'winrej' above) placed as a variable in
 %                    the global workspace (only) when the REJECT button is clicked. 
@@ -171,6 +175,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.137  2009/07/03 21:07:14  arno
+% menu event duration only if they are present
+%
 % Revision 1.136  2009/04/21 20:32:08  arno
 % fix load channel location file problem
 %
