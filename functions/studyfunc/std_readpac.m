@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2009/07/13 21:10:26  arno
+% still working on std_pac
+%
 
 function [STUDY, clustinfo, finalinds] = std_readpac(STUDY, ALLEEG, varargin);
 
@@ -145,8 +148,8 @@ for ind1 = 1:len1 % usually only one channel/component
                         
                         if ~isempty(inds1) & ~isempty(inds2)
                             if ~isempty(opt.channels1)
-                                 [pacarraytmp allfreqs alltimes] = std_pac( ALLEEG(subj), 'channels1'  , allinds1{c,g}(inds1), 'channels2',   allinds2{c,g}(inds2), 'timerange', opt.timerange, 'freqrange', opt.freqrange);
-                            else [pacarraytmp allfreqs alltimes] = std_pac( ALLEEG(subj), 'components1', allinds1{c,g}(inds1), 'components2', allinds2{c,g}(inds2), 'timerange', opt.timerange, 'freqrange', opt.freqrange);
+                                 [pacarraytmp allfreqs alltimes] = std_pac( ALLEEG(subj), 'channels1'  , allinds1{c,g}(inds1), 'channels2',   allinds2{c,g}(inds2), 'timerange', opt.timerange, 'freqrange', opt.freqrange, moreopts{:});
+                            else [pacarraytmp allfreqs alltimes] = std_pac( ALLEEG(subj), 'components1', allinds1{c,g}(inds1), 'components2', allinds2{c,g}(inds2), 'timerange', opt.timerange, 'freqrange', opt.freqrange, moreopts{:});
                             end;
                             
                             % collapse first 2 dimentions (comps x comps)
@@ -193,13 +196,15 @@ end;
 % ----------------------------------------
 function [inds1 inds2] = getsubjcomps(STUDY, subj, setlist1, setlist2, complist1, complist2)
 
+    inds1 = [];
+    inds2 = [];
     datasets = strmatch(STUDY.subject{subj}, { STUDY.datasetinfo.subject } ); % all datasets of subject
     [tmp1] = intersect(setlist1, datasets);
     [tmp2] = intersect(setlist2, datasets);
     if length(tmp1) > 1, error('This function does not support sessions for subjects'); end;
     if length(tmp2) > 1, error('This function does not support sessions for subjects'); end;
     if tmp1 ~= tmp2, error('Different datasets while it should be the same'); end;
-    inds1 = find(setlist1 == tmp1);
-    inds2 = find(setlist2 == tmp2);
+    if ~isempty(tmp1), inds1 = find(setlist1 == tmp1); end;
+    if ~isempty(tmp2), inds2 = find(setlist2 == tmp2); end;
 
 
