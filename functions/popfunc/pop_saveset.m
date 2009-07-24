@@ -50,6 +50,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.94  2008/11/24 22:31:52  arno
+% remove debug msg
+%
 % Revision 1.93  2008/11/24 22:31:10  arno
 % *** empty log message ***
 %
@@ -464,6 +467,9 @@ if strcmpi(g.savemode, 'resave')
     end;
 else
     if length(EEG) >1, error('For reasons of consistency, this function  does not save multiple datasets any more'); end;
+    if ~strcmpi(EEG.filename, g.filename) | ~strcmpi(EEG.filepath, g.filepath)
+         EEG.datfile = '';
+    end;
     EEG.filename    = g.filename;
     EEG.filepath    = g.filepath;
     if isempty(g.savemode)
@@ -506,7 +512,7 @@ try,
                 if exist(fullfile(EEG.filepath, EEG.datfile))
                     try, 
                         delete(fullfile(EEG.filepath, EEG.datfile));
-                        disp('Deleting .dat file on disk (all data is within the Matlab file)');
+                        disp('Deleting .dat/.fdt file on disk (all data is within the Matlab file)');
                     catch, end;
                 end;
             end;
