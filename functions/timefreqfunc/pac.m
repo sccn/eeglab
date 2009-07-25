@@ -13,9 +13,11 @@
 %    srate   = data sampling rate (Hz)
 %
 %    Most important optional inputs
-%       'method'    = ['mod'|'corrsin'|'corrcos'] modulation method ('mod')
-%                     or correlation of amplitude with sine or cosine of 
-%                     angle (see ref).
+%       'method'    = ['mod'|'corrsin'|'corrcos'|'latphase'] modulation
+%                     method or correlation of amplitude with sine or cosine of 
+%                     angle (see ref). 'laphase' compute the phase
+%                     histogram at a specific time and requires the
+%                     'powerlat' option to be set.
 %       'freqs'     = [min max] frequency limits. Default [minfreq 50], 
 %                     minfreq being determined by the number of data points, 
 %                     cycles and sampling frequency. Use 0 for minimum frequency
@@ -46,6 +48,8 @@
 %                     specific time values (note: algorithm find closest time 
 %                     point in data and this might result in an unevenly spaced
 %                     time array). Overwrite 'ntimesout'. {def: automatic}
+%       'powerlat'  = [float] latency in ms at which to compute phase
+%                     histogram
 %       'tlimits'   = [min max] time limits in ms.
 %
 %    Optional Detrending:
@@ -112,6 +116,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2009/07/10 01:50:45  arno
+% new function
+%
 % Revision 1.2  2009/07/08 23:44:47  arno
 % Now working with test script
 %
@@ -161,7 +168,7 @@ g = finputcheck(varargin, ...
                   'itctype'       'string'   {'phasecoher' 'phasecoher2' 'coher'}  'phasecoher';
                   'nfreqs'        'integer'  [0 Inf]                  [];
                   'lowmem'        'string'   {'on' 'off'}              'off';
-                  'method'        'string'   { 'mod' 'corrsin' 'corrcos' }         'mod';
+                  'method'        'string'   { 'mod' 'corrsin' 'corrcos' 'latphase' }         'mod';
                   'naccu'         'integer'  [1 Inf]                   250;
                   'newfig'        'string'   {'on' 'off'}              'on';
                   'padratio'      'integer'  [1 Inf]                   2;
@@ -169,6 +176,7 @@ g = finputcheck(varargin, ...
                   'rboot'         'real'     []                        [];
                   'subitc'        'string'   {'on' 'off'}              'off';
                   'subwin'        'real'     []                        []; ...
+                  'powerlat'      'real'     []                        []; ...
                   'timesout'      'real'     []                        []; ...
                   'ntimesout'     'integer'  []                        200; ...
                   'tlimits'       'real'     []                        [0 frame/srate];
@@ -235,36 +243,70 @@ end;
 %end;
 
 cohboot =[];
-for find1 = 1:length(freqs1)
-    for find2 = 1:length(freqs2)           
-        for ti = 1:length(timesout1)
-            
-            % get data
-            % --------
-            tmpalltfx = squeeze(alltfX(find1,ti,:));            
-            tmpalltfy = squeeze(alltfY(find2,ti,:));
+if ~strcmpi(g.method, 'latphase')
+    for find1 = 1:length(freqs1)
+        for find2 = 1:length(freqs2)           
+            for ti = 1:length(timesout1)
 
-            %if ~isempty(g.alpha)
-            %    tmpalltfy = angle(tmpalltfy);
-            %    tmpalltfx = abs(  tmpalltfx);
-            %    [ tmp cohboot(find1,find2,ti,:) newamp newangle ] = ...
-            %        bootcircle(tmpalltfx, tmpalltfy, 'naccu', g.naccu); 
-            %    crossfcoh(find1,find2,ti) = sum ( newamp .* exp(j*newangle) );
-            %else 
-            tmpalltfy = angle(tmpalltfy);
-            tmpalltfx = abs(  tmpalltfx);
-            if strcmpi(g.method, 'mod')
-                crossfcoh(find1,find2,ti) = sum( tmpalltfx .* exp(j*tmpalltfy) );
-            elseif strcmpi(g.method, 'corrsin')
-                tmp = corrcoef( sin(tmpalltfy), tmpalltfx);
-                crossfcoh(find1,find2,ti) = tmp(2);
-            else
-                tmp = corrcoef( cos(tmpalltfy), tmpalltfx);
-                crossfcoh(find1,find2,ti) = tmp(2);
+                % get data
+                % --------
+                tmpalltfx = squeeze(alltfX(find1,ti,:));            
+                tmpalltfy = squeeze(alltfY(find2,ti,:));
+
+                %if ~isempty(g.alpha)
+                %    tmpalltfy = angle(tmpalltfy);
+                %    tmpalltfx = abs(  tmpalltfx);
+                %    [ tmp cohboot(find1,find2,ti,:) newamp newangle ] = ...
+                %        bootcircle(tmpalltfx, tmpalltfy, 'naccu', g.naccu); 
+                %    crossfcoh(find1,find2,ti) = sum ( newamp .* exp(j*newangle) );
+                %else 
+                tmpalltfy = angle(tmpalltfy);
+                tmpalltfx = abs(  tmpalltfx);
+                if strcmpi(g.method, 'mod')
+                    crossfcoh(find1,find2,ti) = sum( tmpalltfx .* exp(j*tmpalltfy) );
+                elseif strcmpi(g.method, 'corrsin')
+                    tmp = corrcoef( sin(tmpalltfy), tmpalltfx);
+                    crossfcoh(find1,find2,ti) = tmp(2);
+                else
+                    tmp = corrcoef( cos(tmpalltfy), tmpalltfx);
+                    crossfcoh(find1,find2,ti) = tmp(2);
+                end;
             end;
         end;
     end;
+else
+    % this option computes power at a given latency
+    % then computes the same as above (vectors)
+    
+    %if isempty(g.powerlat)
+    %    error('You need to specify a latency for the ''powerlat'' option');
+    %end;
+        
+    power = mean(alltfX(:,:,:).*conj(alltfX),1); % average all frequencies for power
+    
+    for t = 1:size(alltfX,3) % scan trials
+            
+        % find latency with max power (and store angle)
+        % ---------------------------------------------
+        [tmp maxlat] = max(power(1,:,t));
+        tmpalltfy(:,t) = angle(alltfY(:,maxlat,t));
+            
+    end;
+    
+    vect = linspace(-pi,pi,50);    
+    for f = 1:length(freqs2)
+        crossfcoh(f,:) = hist(tmpalltfy(f,:), vect);
+    end;
+    
+    % smoothing of output image
+    % -------------------------
+    gs = gauss2d(6, 6);
+    crossfcoh = conv2(crossfcoh, gs, 'same');
+    freqs1    = freqs2;
+    timesout1 = linspace(-180, 180, size(crossfcoh,2));
+
 end;
 
     
+
 
