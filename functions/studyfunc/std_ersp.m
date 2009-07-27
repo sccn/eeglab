@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.56  2009/07/10 01:48:52  arno
+% fix computing ERSP for small set of channels
+%
 % Revision 1.55  2008/04/16 17:54:51  arno
 % interpolation plus removing ICA components
 %
@@ -432,18 +435,6 @@ end;
 %         end;
 %     end;
 % end;
-options = {};
-if ~isempty(g.components)
-    tmpdata = eeg_getdatact(EEG, 'component', g.indices);
-else
-    EEG.data = eeg_getdatact(EEG, 'channel', [1:EEG.nbchan], 'rmcomps', g.rmcomps);
-    if ~isempty(g.rmcomps), options = { options{:} 'rmcomps' g.rmcomps }; end;
-    if ~isempty(g.interp), 
-        EEG = eeg_interp(EEG, g.interp, 'spherical'); 
-        options = { options{:} 'interp' g.interp };
-    end;
-    tmpdata = EEG.data(g.indices,:,:);
-end;        
 
 % find channel index
 % ------------------
@@ -458,6 +449,19 @@ if ~isempty(g.channels)
         g.channels = chaninds;
     end;
 end;
+
+options = {};
+if ~isempty(g.components)
+    tmpdata = eeg_getdatact(EEG, 'component', g.indices);
+else
+    EEG.data = eeg_getdatact(EEG, 'channel', [1:EEG.nbchan], 'rmcomps', g.rmcomps);
+    if ~isempty(g.rmcomps), options = { options{:} 'rmcomps' g.rmcomps }; end;
+    if ~isempty(g.interp), 
+        EEG = eeg_interp(EEG, g.interp, 'spherical'); 
+        options = { options{:} 'interp' g.interp };
+    end;
+    tmpdata = EEG.data(g.indices,:,:);
+end;        
 
 % frame range
 % -----------
