@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.57  2009/07/27 05:17:52  arno
+% fix channel call
+%
 % Revision 1.56  2009/07/10 01:48:52  arno
 % fix computing ERSP for small set of channels
 %
@@ -436,20 +439,6 @@ end;
 %     end;
 % end;
 
-% find channel index
-% ------------------
-if ~isempty(g.channels)
-    if iscell(g.channels)
-        for index = 1:length(g.channels)
-            chanind = strmatch( lower(g.channels{index}), lower({ EEG.chanlocs.labels }), 'exact');
-            if isempty(chanind), error('Channel group not found'); end;
-            chaninds(index) = chanind;
-        end;
-        g.indices  = chaninds;
-        g.channels = chaninds;
-    end;
-end;
-
 options = {};
 if ~isempty(g.components)
     tmpdata = eeg_getdatact(EEG, 'component', g.indices);
@@ -460,8 +449,23 @@ else
         EEG = eeg_interp(EEG, g.interp, 'spherical'); 
         options = { options{:} 'interp' g.interp };
     end;
-    tmpdata = EEG.data(g.indices,:,:);
-end;        
+    
+    % find channel index
+    % ------------------
+    if iscell(g.channels)
+        for index = 1:length(g.channels)
+            chanind = strmatch( lower(g.channels{index}), lower({ EEG.chanlocs.labels }), 'exact');
+            if isempty(chanind), error('Channel group not found'); end;
+            chaninds(index) = chanind;
+        end;
+        g.indices  = chaninds;
+        g.channels = chaninds;
+    end;
+    
+    if ~iscell(g.indices)
+        tmpdata = EEG.data(g.indices,:,:);
+    end;
+end;
 
 % frame range
 % -----------
