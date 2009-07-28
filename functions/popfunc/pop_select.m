@@ -96,6 +96,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.65  2009/07/08 00:21:21  arno
+% *** empty log message ***
+%
 % Revision 1.64  2009/04/22 18:29:17  arno
 % Allowing channel selection by name
 %
@@ -358,7 +361,7 @@ if nargin < 2
 
    if ~isempty( results{7} )
        [ chaninds chanlist ] = eeg_decodechan(EEG.chanlocs, results{7});
-       chanlist
+       if isempty(chanlist), chanlist = chaninds; end;
        if ~results{8}, args = { args{:}, 'channel'  , chanlist };
        else            args = { args{:}, 'nochannel', chanlist }; end;
    end;

@@ -35,6 +35,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2009/07/01 23:12:38  arno
+% fix reading different formats
+%
 % Revision 1.1  2009/04/27 21:26:07  arno
 % New func to decode channels
 %
@@ -107,4 +110,8 @@ else
     end;
 end;
 chaninds = sort(chaninds);
-chanlist = { chanlocs(chaninds).labels };
+if ~isempty(chanlocs)
+    chanlist = { chanlocs(chaninds).labels };
+else
+    chanlist = {};
+end;
