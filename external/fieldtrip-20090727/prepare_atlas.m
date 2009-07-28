@@ -14,6 +14,9 @@ function [atlas] = prepare_atlas(filename)
 % Copyright (C) 2005-2008, Robert Oostenveld, Ingrid Nieuwenhuis
 %
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2009/07/14 07:27:30  roboos
+% replaced read_fcdc_mri with read_mri to avoid warning
+%
 % Revision 1.1  2008/12/05 13:46:24  ingnie
 % this function replaces atlas_init
 %
@@ -35,7 +38,7 @@ if useafni
   % check whether the required AFNI toolbox is available
   hastoolbox('afni', 1);
 
-  atlas = read_fcdc_mri(filename);
+  atlas = read_mri(filename);
 
   % the AFNI atlas contains two volumes at 1mm resolution
   atlas.brick0 = atlas.anatomy(:,:,:,1);

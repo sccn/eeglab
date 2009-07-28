@@ -54,6 +54,9 @@ function [segment] = volumesegment(cfg, mri)
 %   cfg.segment          = 'yes' or 'no'
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2009/07/14 07:27:30  roboos
+% replaced read_fcdc_mri with read_mri to avoid warning
+%
 % Revision 1.13  2009/01/20 13:01:31  sashae
 % changed configtracking such that it is only enabled when BOTH explicitly allowed at start
 % of the fieldtrip function AND requested by the user
@@ -176,7 +179,7 @@ if ischar(mri),
   % read the anatomical MRI data from file   
   filename = mri;
   fprintf('reading MRI from file\n');
-  mri = read_fcdc_mri(filename);
+  mri = read_mri(filename);
   if filetype(filename, 'ctf_mri') && isempty(cfg.coordinates)
     % based on the filetype assume that the coordinates correspond with CTF convention
     cfg.coordinates = 'ctf';
@@ -333,7 +336,7 @@ catch
   [st, i] = dbstack;
   cfg.version.name = st(i).name;
 end
-cfg.version.id = '$Id: volumesegment.m,v 1.1 2009-07-07 02:23:17 arno Exp $';
+cfg.version.id = '$Id: volumesegment.m,v 1.2 2009-07-28 14:05:58 arno Exp $';
 % remember the configuration details of the input data
 try, cfg.previous = mri.cfg; end
 % remember the exact configuration details in the output 

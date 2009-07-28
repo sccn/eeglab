@@ -2,7 +2,9 @@ function [interp] = megplanar(cfg, data);
 
 % MEGPLANAR computes planar MEG gradients gradients for raw data
 % obtained from PREPROCESSING or an average ERF that was computed using
-% TIMELOCKANALYSIS.
+% TIMELOCKANALYSIS. It can also work on data in the frequency domain, 
+% obtained with FREQANALYSIS. Prerequisite for this is that the data contain
+% complex-valued fourierspectra.
 %
 % Use as
 %    [interp] = megplanar(cfg, data)
@@ -21,7 +23,8 @@ function [interp] = megplanar(cfg, data);
 % large number of dipoles that are placed in the upper layer of the brain
 % surface, followed by a forward computation towards a planar gradiometer
 % array. This requires the specification of a volume conduction model of
-% the head and of a source model.
+% the head and of a source model. The 'sourceproject' method is not supported for
+% frequency domain data.
 %
 % A head model must be specified with
 %   cfg.hdmfile     = string, file containing the volume conduction model
@@ -59,6 +62,22 @@ function [interp] = megplanar(cfg, data);
 % Copyright (C) 2004, Robert Oostenveld
 %
 % $Log: not supported by cvs2svn $
+% Revision 1.45  2009/07/19 13:19:42  jansch
+% fixed re-conversion into timelock datatype when input is timelock datatype
+%
+% Revision 1.44  2009/07/17 08:05:12  jansch
+% fixed small bug
+%
+% Revision 1.43  2009/07/16 15:07:26  jansch
+% updated documentation
+%
+% Revision 1.42  2009/07/16 15:05:15  jansch
+% added possibility to perform planar transformation on frequency domain data.
+% the frequency data of course should contain fourierspectra
+%
+% Revision 1.41  2009/07/14 12:35:36  roboos
+% ensure that the input data is meg with a grad field
+%
 % Revision 1.40  2009/06/04 10:03:46  roboos
 % fixed problem in the input og cfg.headshape when it was not required
 %
@@ -201,8 +220,16 @@ fieldtripdefs
 
 cfg = checkconfig(cfg, 'trackconfig', 'on');
 
+isfreq = datatype(data, 'freq');
+israw  = datatype(data, 'raw');
+istlck = datatype(data, 'timelock');
+
 % check if the input data is valid for this function
-data  = checkdata(data, 'datatype', 'raw', 'feedback', 'yes', 'senstype', {'ctf151', 'ctf275', 'bti148', 'bti248'});
+data  = checkdata(data, 'datatype', {'raw' 'freq'}, 'feedback', 'yes', 'ismeg', 'yes', 'senstype', {'ctf151', 'ctf275', 'bti148', 'bti248'});
+
+if isfreq,
+  if ~isfield(data, 'fourierspctrm'), error('freq data should containt fourier spectra'); end
+end
 
 % set the default configuration 
 if ~isfield(cfg, 'channel'),       cfg.channel = 'MEG';             end
@@ -226,7 +253,7 @@ cfg = checkconfig(cfg, 'createsubcfg',  {'grid'});
 cfg = checkconfig(cfg, 'renamedvalue',  {'headshape', 'headmodel', []});
 
 % select trials of interest
-if ~strcmp(cfg.trials, 'all')
+if ~strcmp(cfg.trials, 'all') && israw
   if islogical(cfg.trials),  cfg.trials=find(cfg.trials);  end
   fprintf('selecting %d trials\n', length(cfg.trials));
   data.trial  = data.trial(cfg.trials);
@@ -244,9 +271,21 @@ if ~strcmp(cfg.trials, 'all')
     cfg.trlold=trl;
     cfg.trl=trl(cfg.trials,:);
   end
+elseif ~strcmp(cfg.trials, 'all') && isfreq
+  warning('subselection of trials is only supported for raw data as input');
 end
 
-Ntrials = length(data.trial);
+if israw || istlck,
+  Ntrials = length(data.trial);
+elseif isfreq,
+  Ntrials = length(data.cumtapcnt);
+  Nfreq   = length(data.freq);
+  if isfield(data, 'time')
+    Ntime = length(data.time);
+  else
+    Ntime = 1;
+  end
+end
 Nchan   = length(data.label);
 
 % find the corresponding channels in the data and the gradiometer array
@@ -444,7 +483,7 @@ elseif strcmp(cfg.planarmethod, 'fitplane')
     gradC(chan,[chan neighbindx]) = A(3,:);
   end
   
-elseif strcmp(cfg.planarmethod, 'sourceproject')
+elseif strcmp(cfg.planarmethod, 'sourceproject') && israw
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % Do an inverse computation with a simplified distributed source model 
   % and compute forward again with the axial gradiometer array replaced by
@@ -515,6 +554,8 @@ elseif strcmp(cfg.planarmethod, 'sourceproject')
     end
   end
 
+elseif strcmp(cfg.planarmethod, 'sourceproject') && isfreq
+  error('the method ''sourceproject'' is not supported for frequency data as input');
 else
   error('unknown method for computation of planar gradient');
 end % cfg.planarmethod
@@ -569,11 +610,6 @@ if ~strcmp(cfg.planarmethod, 'sourceproject')
   % combine the different sections in one linear transformation matrix
   transform = [transformH; transformV; transformC; transformO];
 
-  % compute the planar gradient by multiplying the gradient-matrices with the data
-  for trial=1:Ntrials
-    interp.trial{trial} = transform * data.trial{trial};
-  end
-
   % combine the new labels into a single cell-array
   interp.label = [labelH(:); labelV(:); labelC(:); labelO(:)];
 
@@ -589,11 +625,41 @@ if ~strcmp(cfg.planarmethod, 'sourceproject')
   % remember the planar gradiometer definition
   interp.grad = planar.grad;
   
-end % nearest neighbours methods
+  if israw || istlck,
+    % compute the planar gradient by multiplying the gradient-matrices with the data
+    for trial=1:Ntrials
+      interp.trial{trial} = transform * data.trial{trial};
+    end
+  
+    % these should be remembered from the original data
+    interp.fsample = data.fsample;
+    interp.time    = data.time;
+  
+    if istlck
+      % convert back into timelock structure
+      interp = checkdata(interp, 'datatype', 'timelock');
+    end
 
-% these should be remembered from the original data
-interp.fsample = data.fsample;
-interp.time    = data.time;
+  elseif isfreq
+    % compute the planar gradient by multiplying the gradient-matrices with the data
+    siz       = size(data.fourierspctrm);
+    planardat = zeros(siz(1), size(transform,1), Nfreq, Ntime);
+    for foilop=1:Nfreq
+      for timlop = 1:Ntime
+        planardat(:,:,foilop,timlop) = data.fourierspctrm(:,:,foilop,timlop) * transform';
+      end
+    end
+    interp.fourierspctrm = planardat;
+
+    if isfield(data, 'time'), interp.time = data.time; end
+    if isfield(data, 'cumtapcnt'), interp.cumtapcnt = data.cumtapcnt; end
+    if isfield(data, 'cumsumcnt'), interp.cumsumcnt = data.cumsumcnt; end
+    interp.freq   = data.freq;
+    interp.dimord = data.dimord;  
+    interp.transform = transform;
+  end
+
+end % nearest neighbours methods
 
 % get the output cfg
 cfg = checkconfig(cfg, 'trackconfig', 'off', 'checksize', 'yes'); 
@@ -607,7 +673,7 @@ catch
   [st, i] = dbstack;
   cfg.version.name = st(i);
 end
-cfg.version.id   = '$Id: megplanar.m,v 1.1 2009-07-07 02:23:15 arno Exp $';
+cfg.version.id   = '$Id: megplanar.m,v 1.2 2009-07-28 14:05:58 arno Exp $';
 % remember the configuration details of the input data
 try, cfg.previous = data.cfg; end
 % remember the exact configuration details in the output 

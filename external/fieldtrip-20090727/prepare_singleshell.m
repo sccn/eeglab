@@ -1,4 +1,4 @@
-function [vol, cfg] = prepare_singleshell(cfg, mri);
+function [vol, cfg] = prepare_singleshell(cfg, mri)
 
 % PREPARE_SINGLESHELL creates a simple and fast method for the MEG forward
 % calculation for one shell of arbitrary shape. This is based on a
@@ -7,14 +7,15 @@ function [vol, cfg] = prepare_singleshell(cfg, mri);
 % constructed from spherical harmonics.
 %
 % Use as
-%   [vol] = prepare_singleshell(cfg)
-%   [vol] = prepare_singleshell(cfg, seg)
+%   [vol, cfg] = prepare_singleshell(cfg, seg), or
+%   [vol, cfg] = prepare_singleshell(cfg, mri), or
+%   [vol, cfg] = prepare_singleshell(cfg)
 %
 % If you do not use a segmented MRI, the configuration should contain
 %   cfg.headshape   = a filename containing headshape, a structure containing a
 %                     single triangulated boundary, or a Nx3 matrix with surface
 %                     points
-%   cfg.spheremesh  = number, to retriangulate the mesh with a sphere (default = 3000)
+%   cfg.numvertices = number, to retriangulate the mesh with a sphere (default = 3000)
 %                     instead of specifying a number, you can specify 'same' to keep the
 %                     vertices of the mesh identical to the original headshape points
 %
@@ -35,6 +36,9 @@ function [vol, cfg] = prepare_singleshell(cfg, mri);
 % Copyright (C) 2006-2007, Robert Oostenveld
 %
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2009/07/16 09:08:32  crimic
+% added link with prepare_mesh function
+%
 % Revision 1.21  2009/05/29 12:31:04  roboos
 % only convert cfg.headshape from config to struct in case it is present
 %
@@ -104,158 +108,24 @@ function [vol, cfg] = prepare_singleshell(cfg, mri);
 fieldtripdefs
 
 cfg = checkconfig(cfg, 'trackconfig', 'on');
+cfg = checkconfig(cfg, 'renamed', {'spheremesh', 'numvertices'});
 
 % set the defaults
 if ~isfield(cfg, 'smooth');        cfg.smooth = 5;          end % in voxels
 if ~isfield(cfg, 'mriunits');      cfg.mriunits = 'mm';     end
 if ~isfield(cfg, 'sourceunits'),   cfg.sourceunits = 'cm';  end
 if ~isfield(cfg, 'threshold'),     cfg.threshold = 0.5;     end % relative
-if ~isfield(cfg, 'spheremesh'),    cfg.spheremesh = 4000;   end % approximate number of vertices in spere
-
-if isfield(cfg, 'headshape') && isa(cfg.headshape, 'config')
-  % convert the nested config-object back into a normal structure
-  cfg.headshape = struct(cfg.headshape);
-end
-
-if nargin>1 && (~isfield(cfg,'headshape') || isempty(cfg.headshape))
-  basedonmri       = 1;
-  basedonheadshape = 0;
-elseif nargin==1 && isfield(cfg,'headshape') && ~isempty(cfg.headshape)
-  basedonmri       = 0;
-  basedonheadshape = 1;
-else
-  error('inconsistent configuration, cfg.headshape should not be used in combination with an mri input')
-end
-
-if basedonmri
-  % obtain the head shape from the segmented MRI
-  seg = zeros(mri.dim);
-  if isfield(mri, 'gray')
-    fprintf('including gray matter in segmentation for brain compartment\n')
-    seg = seg | (mri.gray>(cfg.threshold*max(mri.gray(:))));
-  end
-  if isfield(mri, 'white')
-    fprintf('including white matter in segmentation for brain compartment\n')
-    seg = seg | (mri.white>(cfg.threshold*max(mri.white(:))));
-  end
-  if isfield(mri, 'csf')
-    fprintf('including CSF in segmentation for brain compartment\n')
-    seg = seg | (mri.csf>(cfg.threshold*max(mri.csf(:))));
-  end
-  if ~strcmp(cfg.smooth, 'no'),
-    % check whether the required SPM2 toolbox is available
-    hastoolbox('spm2', 1);
-    fprintf('smoothing the segmentation with a %d-pixel FWHM kernel\n',cfg.smooth);
-    seg = double(seg);
-    spm_smooth(seg, seg, cfg.smooth);
-  end
-  % threshold for the last time
-  seg = (seg>(cfg.threshold*max(seg(:))));
-  % determine the center of gravity of the segmented brain
-  xgrid = 1:mri.dim(1);
-  ygrid = 1:mri.dim(2);
-  zgrid = 1:mri.dim(3);
-  [X, Y, Z] = ndgrid(xgrid, ygrid, zgrid);
-  ori(1) = mean(X(seg));
-  ori(2) = mean(Y(seg));
-  ori(3) = mean(Z(seg));
-  pnt = triangulate_seg(seg, cfg.spheremesh, ori);
-  pnt(:,4) = 1;
-  pnt = (mri.transform * pnt')';
-  % convert the MRI surface points into the same units as the source/gradiometer
-  scale = 1;
-  switch cfg.sourceunits
-    case 'mm'
-      scale = scale * 1000;
-    case 'cm'
-      scale = scale * 100;
-    case 'dm'
-      scale = scale * 10;
-    case 'm'
-      scale = scale * 1;
-    otherwise
-      error('unknown physical dimension in cfg.sourceunits');
-  end
-  switch cfg.mriunits
-    case 'mm'
-      scale = scale / 1000;
-    case 'cm'
-      scale = scale / 100;
-    case 'dm'
-      scale = scale / 10;
-    case 'm'
-      scale = scale / 1;
-    otherwise
-      error('unknown physical dimension in cfg.mriunits');
-  end
-  if scale~=1
-    fprintf('converting MRI surface points from %s into %s\n', cfg.sourceunits, cfg.mriunits);
-    shape = pnt(:,1:3) * scale;
-  else
-    shape = pnt(:,1:3);
-  end
-
-  % compute triangulation
-  shape = unique(shape, 'rows');
-  pnt  = shape;
-  Npnt = size(pnt,1);
-  avg  = mean(pnt, 1);
-  pnt  = pnt - repmat(avg, Npnt, 1);  % shift center of points towards the origin
-  dist = sqrt(sum(pnt.^2,2));
-  pnt  = pnt ./ repmat(dist, 1, 3);   % normalize to a unit sphere
-  tri  = convhulln(pnt);              % construct the triangulation using a convex hull
-  pnt  = shape;  
-  
-  fprintf('placed %d points on the brain surface\n', length(shape));
-elseif basedonheadshape
-  % get the surface describing the head shape
-  if isstruct(cfg.headshape) && isfield(cfg.headshape, 'pnt')
-    % use the headshape surface specified in the configuration
-    headshape = cfg.headshape;
-  elseif isnumeric(cfg.headshape) && size(cfg.headshape,2)==3
-    % use the headshape points specified in the configuration
-    headshape.pnt = cfg.headshape;
-  elseif ischar(cfg.headshape)
-    % read the headshape from file
-    headshape = read_headshape(cfg.headshape);
-  else
-    error('cfg.headshape is not specified correctly')
-  end
-  if ~isfield(headshape, 'tri')
-    % generate a closed triangulation from the surface points
-    headshape.pnt = unique(headshape.pnt, 'rows');
-    headshape.tri = projecttri(headshape.pnt);
-  end
-  
-  pnt  = headshape.pnt;
-  tri  = headshape.tri;
-  
-end % basedonmri or basedonheadshape
-
-if nargin<2
-  % the triangulation is based on the shape,
-  if isequal(cfg.spheremesh, 'same')
-    % keep the same triangulation
-    tri = projecttri(pnt); % the triangulation is not guaranteed closed, reconstruct it
-  else
-    [tri1, pnt1] = reducepatch(tri, pnt, 3*cfg.spheremesh);
-    % remove double vertices
-    pnt1 = unique(pnt1, 'rows');
-    % reconstruct the triangulation
-    tri1 = projecttri(pnt1);
-    % replace the probably unevenly distributed triangulation with a regular one
-    % and retriangulate it to the desired accuracy
-    [pnt2, tri2] = msphere(cfg.spheremesh); % this is a regular triangulation
-    [pnt, tri] = retriangulate(pnt1, tri1, pnt2, tri2, 2);
-  end
-end
+if ~isfield(cfg, 'spheremesh'),    cfg.numvertices = 4000;  end % approximate number of vertices in sphere
 
 % construct the geometry of the volume conductor model, containing a single boundary
 % the initialization of the forward computation code is done later in prepare_headmodel
 vol = [];
-vol.bnd.pnt = pnt;
-vol.bnd.tri = tri;
-vol.type    = 'nolte';
+if nargin==1
+  vol.bnd = prepare_mesh(cfg);
+else
+  vol.bnd = prepare_mesh(cfg, mri);
+end
+vol.type = 'nolte';
 
 % get the output cfg
 cfg = checkconfig(cfg, 'trackconfig', 'off', 'checksize', 'yes'); 

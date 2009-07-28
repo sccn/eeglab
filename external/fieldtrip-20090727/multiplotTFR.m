@@ -39,7 +39,7 @@ function [cfg] = multiplotTFR(cfg, data)
 %                        interactive plot when a selected area is clicked. Multiple areas 
 %                        can be selected by holding down the SHIFT key.
 % cfg.masknans         = 'yes' or 'no' (default = 'yes')
-%
+% cfg.renderer         = 'painters', 'zbuffer',' opengl' or 'none' (default = [])
 % cfg.layout           = specify the channel layout for plotting using one of 
 %                        the following ways:
 %
@@ -73,6 +73,12 @@ function [cfg] = multiplotTFR(cfg, data)
 % Copyright (C) 2003-2006, Ole Jensen
 %
 % $Log: not supported by cvs2svn $
+% Revision 1.51  2009/07/14 13:52:16  roboos
+% changed the interactive plotting: instead of using plotSelection it now uses the selection function from the new plotting module (select_range and select_channel) and uses a local subfunction to update the cfg and call the next figure
+%
+% Revision 1.50  2009/07/14 13:27:25  roboos
+% consistent handling of cfg.renderer, default is to let matlab decide
+%
 % Revision 1.49  2009/06/17 13:44:52  roboos
 % cleaned up help
 %
@@ -311,7 +317,7 @@ if (strcmp(cfg.zparam,'cohspctrm')),
     info.y     = lay.pos(:,2);
     info.label = lay.label;
     guidata(h, info);
-    set(gcf, 'WindowButtonUpFcn', {@select_channel, 'callback', {@select_cohrefchannel, cfg, data}});
+    set(gcf, 'WindowButtonUpFcn', {@select_channel, 'callback', {@select_multiplotTFR, cfg, data}});
     return
   end
 
@@ -497,45 +503,22 @@ if isfield(cfg,'colormap')
 end;
 
 % plot colorbar:
-if isfield(cfg, 'colorbar') & (strcmp(cfg.colorbar, 'yes'))
+if isfield(cfg, 'colorbar') && (strcmp(cfg.colorbar, 'yes'))
   colorbar;
 end
 
 % Make the figure interactive:
 if strcmp(cfg.interactive, 'yes')
-  userData.hFigure = gcf;
-  userData.hAxes = gca;
-  for i=1:10
-    userData.hSelection{i} = plot(mean(chanX), mean(chanY));
-    set(userData.hSelection{i}, 'XData', [mean(chanX)]);
-    set(userData.hSelection{i}, 'YData', [mean(chanY)]);
-    set(userData.hSelection{i}, 'Color', [0 0 0]);
-    set(userData.hSelection{i}, 'EraseMode', 'xor');
-    set(userData.hSelection{i}, 'LineStyle', '--');
-    set(userData.hSelection{i}, 'LineWidth', 1.5);
-    set(userData.hSelection{i}, 'Visible', 'on');
-    userData.range{i} = [];
-  end
-  userData.iSelection = 0;
-  userData.plotType = 'multiplot';
-  userData.selecting = 0;
-  userData.selectionType = '';
-  userData.selectAxes = 'z';
-  userData.lastClick = [];
-  userData.cfg = cfg;
-  userData.data = data;
-  userData.chanX = chanX;
-  userData.chanY = chanY;
-  userData.chanLabels = chanLabels;
-  tag = sprintf('%.5f', 10000 * rand(1));
-  if ~isempty(cfg.renderer)
-    set(gcf, 'Renderer', cfg.renderer);
-  end
-  set(gcf, 'Tag', tag);
-  set(gcf, 'UserData', userData);
-  set(gcf, 'WindowButtonMotionFcn', ['plotSelection(get(findobj(''Tag'', ''' tag '''), ''UserData''), 0);']);
-  set(gcf, 'WindowButtonDownFcn', ['plotSelection(get(findobj(''Tag'', ''' tag '''), ''UserData''), 1);']);
-  set(gcf, 'WindowButtonUpFcn', ['plotSelection(get(findobj(''Tag'', ''' tag '''), ''UserData''), 2);']);
+    % add the channel information to the figure
+    info       = guidata(gcf);
+    info.x     = lay.pos(:,1);
+    info.y     = lay.pos(:,2);
+    info.label = lay.label;
+    guidata(gcf, info);
+
+    set(gcf, 'WindowButtonUpFcn',     {@select_channel, 'multiple', true, 'callback', {@select_singleplotTFR, cfg, data}, 'event', 'WindowButtonUpFcn'});
+    set(gcf, 'WindowButtonDownFcn',   {@select_channel, 'multiple', true, 'callback', {@select_singleplotTFR, cfg, data}, 'event', 'WindowButtonDownFcn'});
+    set(gcf, 'WindowButtonMotionFcn', {@select_channel, 'multiple', true, 'callback', {@select_singleplotTFR, cfg, data}, 'event', 'WindowButtonMotionFcn'});
 end
 
 axis tight
@@ -562,12 +545,32 @@ for k=1:length(strlist)
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% SUBFUNCTION
-% this function is called by select_channel
+% SUBFUNCTION which is called by select_channel in case cfg.cohrefchannel='gui'
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function select_cohrefchannel(label, cfg, varargin)
-fprintf('selected "%s" as reference channel\n', label);
+function select_multiplotTFR(label, cfg, varargin)
 cfg.cohrefchannel = label;
-figure
+fprintf('selected cfg.cohrefchannel = ''%s''\n', cfg.cohrefchannel);
+p = get(gcf, 'Position');
+f = figure;
+set(f, 'Position', p);
 multiplotTFR(cfg, varargin{:});
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SUBFUNCTION which is called after selecting channels in case of cfg.interactive='yes'
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function select_singleplotTFR(label, cfg, varargin)
+if ~isempty(label)
+  cfg.xlim = 'maxmin';
+  cfg.ylim = 'maxmin';
+  cfg.channel = label;
+  fprintf('selected cfg.channel = {');
+  for i=1:(length(cfg.channel)-1)
+    fprintf('''%s'', ', cfg.channel{i});
+  end
+  fprintf('''%s''}\n', cfg.channel{end});
+  p = get(gcf, 'Position');
+  f = figure;
+  set(f, 'Position', p);
+  singleplotTFR(cfg, varargin{:});
+end
 

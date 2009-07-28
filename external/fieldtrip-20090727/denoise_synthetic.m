@@ -15,6 +15,9 @@ function [data] = denoise_synthetic(cfg, data);
 % Copyright (C) 2004-2008, Robert Oostenveld
 %
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2009/07/08 07:20:48  roboos
+% allow for arbitrary balancing and not only a small hardcoded list
+%
 % Revision 1.7  2008/09/22 20:17:43  roboos
 % added call to fieldtripdefs to the begin of the function
 %
@@ -80,41 +83,31 @@ labelorg = data.label;
 current = data.grad.balance.current;
 desired = cfg.gradient;
 
-% first undo/invert the previously applied balancing
-switch current
-  case 'none'
-    % nothing to do
-  case 'G1BR'
-    data.grad = apply_montage(data.grad, data.grad.balance.G1BR, 'keepunused', 'yes', 'inverse', 'yes');
-    data      = apply_montage(data     , data.grad.balance.G1BR, 'keepunused', 'yes', 'inverse', 'yes');
-  case 'G2BR'
-    data.grad = apply_montage(data.grad, data.grad.balance.G2BR, 'keepunused', 'yes', 'inverse', 'yes');
-    data      = apply_montage(data     , data.grad.balance.G2BR, 'keepunused', 'yes', 'inverse', 'yes');
-  case 'G3BR'
-    data.grad = apply_montage(data.grad, data.grad.balance.G3BR, 'keepunused', 'yes', 'inverse', 'yes');
-    data      = apply_montage(data     , data.grad.balance.G3BR, 'keepunused', 'yes', 'inverse', 'yes');
-  otherwise
+if ~strcmp(current, 'none')
+  % first undo/invert the previously applied balancing
+  try
+    current_montage = getfield(data.grad.balance, data.grad.balance.current);
+  catch
     error('unknown balancing for input data');
-end
-data.grad.balance.current = 'none';
+  end
+  fprintf('converting from "%s" to "none"\n', current);
+  data.grad = apply_montage(data.grad, current_montage, 'keepunused', 'yes', 'inverse', 'yes');
+  data      = apply_montage(data     , current_montage, 'keepunused', 'yes', 'inverse', 'yes');
+  data.grad.balance.current = 'none';
+end % if
 
-% then apply the desired balancing
-switch desired
-  case 'none'
-    % nothing to do
-  case 'G1BR'
-    data.grad = apply_montage(data.grad, data.grad.balance.G1BR, 'keepunused', 'yes', 'inverse', 'no');
-    data      = apply_montage(data     , data.grad.balance.G1BR, 'keepunused', 'yes', 'inverse', 'no');
-  case 'G2BR'
-    data.grad = apply_montage(data.grad, data.grad.balance.G2BR, 'keepunused', 'yes', 'inverse', 'no');
-    data      = apply_montage(data     , data.grad.balance.G2BR, 'keepunused', 'yes', 'inverse', 'no');
-  case 'G3BR'
-    data.grad = apply_montage(data.grad, data.grad.balance.G3BR, 'keepunused', 'yes', 'inverse', 'no');
-    data      = apply_montage(data     , data.grad.balance.G3BR, 'keepunused', 'yes', 'inverse', 'no');
-  otherwise
+if ~strcmp(desired, 'none')
+  % then apply the desired balancing
+  try
+    desired_montage = getfield(data.grad.balance, cfg.gradient);
+  catch
     error('unknown balancing for input data');
-end
-data.grad.balance.current = desired;
+  end
+  fprintf('converting from "none" to "%s"\n', desired);
+  data.grad = apply_montage(data.grad, desired_montage, 'keepunused', 'yes', 'inverse', 'yes');
+  data      = apply_montage(data     , desired_montage, 'keepunused', 'yes', 'inverse', 'yes');
+  data.grad.balance.current = desired;
+end % if
 
 % reorder the channels to stay close to the original ordering
 [selorg, selnew] = match_str(labelorg, data.label);
@@ -136,7 +129,7 @@ catch
   [st, i] = dbstack;
   cfg.version.name = st(i);
 end
-cfg.version.id = '$Id: denoise_synthetic.m,v 1.1 2009-07-07 02:23:14 arno Exp $';
+cfg.version.id = '$Id: denoise_synthetic.m,v 1.2 2009-07-28 14:05:57 arno Exp $';
 % remember the configuration details of the input data
 try, cfg.previous = data.cfg; end
 % remember the exact configuration details in the output

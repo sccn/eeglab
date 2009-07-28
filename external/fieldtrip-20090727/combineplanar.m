@@ -28,6 +28,13 @@ function [data] = combineplanar(cfg, data)
 % Copyright (C) 2004, Ole Jensen, Robert Oostenveld
 %
 % $Log: not supported by cvs2svn $
+% Revision 1.43  2009/07/23 08:11:29  crimic
+% fixed tiny bug
+%
+% Revision 1.42  2009/07/17 08:17:24  jansch
+% rewriting of big parts of the code; incorporating checkdata etc. implementation
+% of 'svd' combinemethod also for time domain data
+%
 % Revision 1.41  2009/01/20 13:01:31  sashae
 % changed configtracking such that it is only enabled when BOTH explicitly allowed at start
 % of the fieldtrip function AND requested by the user
@@ -171,8 +178,12 @@ fieldtripdefs
 cfg = checkconfig(cfg, 'trackconfig', 'on');
 
 % check if the input data is valid for this function
-% TODO this is not yet consistent with the code that is approx. 15 lines below
 data = checkdata(data, 'datatype', {'raw', 'freq', 'timelock'}, 'feedback', 'yes', 'senstype', {'ctf151_planar', 'ctf275_planar', 'neuromag122', 'neuromag306', 'bti248_planar', 'bti148_planar'});
+
+israw      = datatype(data, 'raw');
+isfreq     = datatype(data, 'freq');
+istimelock = datatype(data, 'timelock');
+try, dimord = data.dimord; end
 
 % set the defaults
 if ~isfield(cfg, 'blc'),           cfg.blc           = 'no';  end
@@ -181,6 +192,7 @@ if ~isfield(cfg, 'combinegrad'),   cfg.combinegrad   = 'no';  end
 if ~isfield(cfg, 'combinemethod'), cfg.combinemethod = 'sum'; end 
 if ~isfield(cfg, 'foilim'),        cfg.foilim        = [];    end
 if ~isfield(cfg, 'trials'),        cfg.trials        = 'all'; end
+if ~isfield(cfg, 'feedback'),      cfg.feedback      = 'none'; end
 if isfield(cfg, 'baseline')
   warning('only supporting cfg.baseline for backwards compatibility, please update your cfg');
   cfg.blc = 'yes';
@@ -188,12 +200,6 @@ if isfield(cfg, 'baseline')
 end
 if strcmp(cfg.blc, 'yes') && isempty(cfg.blcwindow)
   cfg.blcwindow = [min(data.time) max(data.time)];
-end
-
-% check the input data
-% TODO make consistent with checkdata
-if (~isfield(data, 'avg') && ~isfield(data, 'powspctrm')) && ~isfield(data, 'fourierspctrm') && ~isfield(data, 'trial'),
-  error('unsupported data format')
 end
 
 % select trials of interest
@@ -223,7 +229,7 @@ lab_comb  = planar(sel_planar,3);
 
 % perform baseline correction
 if strcmp(cfg.blc, 'yes') 
-  if ~isfield(data, 'avg')
+  if ~istimelock,
     error('baseline correction is only supported for ERFs')
   else
     if ischar(cfg.blcwindow) && strcmp(cfg.blcwindow, 'all')
@@ -238,76 +244,112 @@ if strcmp(cfg.blc, 'yes')
   end
 end
 
-if strcmp(cfg.combinemethod, 'sum'),
-  if isfield(data, 'powspctrm')
-    % compute the power of each planar channel, simply by adding the power
-    if strcmp(data.dimord, 'chan_freq')
-      tmp1 = data.powspctrm(sel_dH,:) + data.powspctrm(sel_dV,:);
-      tmp2 = data.powspctrm(sel_other,:);
-      data.powspctrm = [tmp1; tmp2];
-    elseif strcmp(data.dimord, 'chan_freq_time')
-      tmp1 = data.powspctrm(sel_dH,:,:) + data.powspctrm(sel_dV,:,:);
-      tmp2 = data.powspctrm(sel_other,:,:);
-      data.powspctrm = cat(1, tmp1, tmp2);
-    elseif strcmp(data.dimord, 'rpt_chan_freq')
-      tmp1 = data.powspctrm(:,sel_dH,:) + data.powspctrm(:,sel_dV,:);
-      tmp2 = data.powspctrm(:,sel_other,:);
-      data.powspctrm = cat(2, tmp1, tmp2);
-    elseif strcmp(data.dimord, 'rpt_chan_freq_time')
-      tmp1 = data.powspctrm(:,sel_dH,:,:) + data.powspctrm(:,sel_dV,:,:);
-      tmp2 = data.powspctrm(:,sel_other,:,:);
-      data.powspctrm = cat(2, tmp1, tmp2);
-    else
-      error('unsupported dimension order of frequency data');
-    end    
-  else
-    % convert average to raw data using simple helper function
-    % this allows the same function to work on multiple data types
-    % TODO make consistent with checkdata
-    [data, inputdimord] = data2raw(data);
-    ntrial = length(data.trial);
-    for i=1:ntrial
-      % compute the magnitude of each planar channel, simply by pythagoras
-      tmp1 = sqrt(data.trial{i}(sel_dH,:).^2 + data.trial{i}(sel_dV,:).^2);
-      tmp2 = data.trial{i}(sel_other,:);
-      data.trial{i} = [tmp1; tmp2];
-    end
-    % convert raw data back to average using simple helper function
-    % this allows the same function to work on multiple data types
-    % TODO make consistent with checkdata
-    [data] = raw2data(data, inputdimord);
-  end
-elseif strcmp(cfg.combinemethod, 'svd'),
-  if isempty(cfg.foilim), cfg.foilim = [data.freq(1) data.freq(end)]; end;
-  fbin = nearest(data.freq, cfg.foilim(1)):nearest(data.freq, cfg.foilim(2));
-  if isfield(data, 'fourierspctrm'),
-     Nrpt   = size(data.fourierspctrm,1);
-     Nsgn   = length(sel_dH);
-     Nfrq   = length(fbin);
-     Ntim   = size(data.fourierspctrm,4);
-     %fourier= complex(zeros(Nrpt,Nsgn,Nfrq,Ntim),zeros(Nrpt,Nsgn,Nfrq,Ntim));
-     fourier= zeros(Nrpt,Nsgn,Nfrq,Ntim)+nan;
-     progress('init', 'textbar', 'computing the svd');
-     for j = 1:Nsgn
-       progress(j/Nsgn, 'computing the svd of signal %d/%d\n', j, Nsgn);
-       for k = 1:Nfrq
-         for m = 1:Ntim
-           dum                     = data.fourierspctrm(:,[sel_dH(j) sel_dV(j)],fbin(k),m);
-           timbin                  = find(~isnan(dum(:,1)));
-           [fourier(timbin,j,k,m)] = svdfft(transpose(dum(timbin,:)),1);
-         end
-       end
-     end
-     progress('close');
-     other              = data.fourierspctrm(:,sel_other,fbin,:);
-     data               = rmfield(data,'fourierspctrm');
-     data.fourierspctrm = cat(2, fourier, other);
-     data.freq          = data.freq(fbin);
-  else
-    error('this method is not yet implemented');
+if isfreq
+  switch cfg.combinemethod
+    case 'sum'
+      if isfield(data, 'powspctrm'),
+        % compute the power of each planar channel, by summing the horizontal and vertical gradients
+	dimtok = tokenize(dimord,'_');
+	catdim = strmatch('chan',dimtok);
+	if catdim==1,
+	  tmp1 = data.powspctrm(sel_dH,:,:,:) + data.powspctrm(sel_dV,:,:,:);
+	  tmp2 = data.powspctrm(sel_other,:,:,:);
+	elseif catdim==2,
+	  tmp1 = data.powspctrm(:,sel_dH,:,:,:) + data.powspctrm(:,sel_dV,:,:,:);
+	  tmp2 = data.powspctrm(:,sel_other,:,:,:);
+        else
+          error('unsupported dimension order of frequency data');
+        end
+        data.powspctrm = cat(catdim, tmp1, tmp2);
+      else
+        error('cfg.combinemethod = ''sum'' only works for frequency data with powspctrm');
+      end
+    case 'svd'
+      if isfield(data, 'fourierspctrm'), 
+        if isempty(cfg.foilim), cfg.foilim = [data.freq(1) data.freq(end)]; end;
+        fbin = nearest(data.freq, cfg.foilim(1)):nearest(data.freq, cfg.foilim(2));
+        
+	Nrpt   = size(data.fourierspctrm,1);
+        Nsgn   = length(sel_dH);
+        Nfrq   = length(fbin);
+        Ntim   = size(data.fourierspctrm,4);
+        %fourier= complex(zeros(Nrpt,Nsgn,Nfrq,Ntim),zeros(Nrpt,Nsgn,Nfrq,Ntim));
+        fourier= zeros(Nrpt,Nsgn,Nfrq,Ntim)+nan;
+        progress('init', cfg.feedback, 'computing the svd');
+        for j = 1:Nsgn
+          progress(j/Nsgn, 'computing the svd of signal %d/%d\n', j, Nsgn);
+          for k = 1:Nfrq
+	    dum = reshape(data.fourierspctrm(:,[sel_dH(j) sel_dV(j)],fbin(k),:), [Nrpt 2 Ntim]);
+	    dum = permute(dum, [2 3 1]);
+	    dum = reshape(dum, [2 Ntim*Nrpt]);
+	    timbin = ~isnan(dum(1,:));
+	    dum2   = svdfft(dum(:,timbin),1);
+            dum(1,timbin) = dum2;
+	    dum = reshape(dum(1,:),[Ntim Nrpt]);
+	    fourier(:,j,k,:) = transpose(dum);
+
+	    %for m = 1:Ntim
+            %  dum                     = data.fourierspctrm(:,[sel_dH(j) sel_dV(j)],fbin(k),m);
+            %  timbin                  = find(~isnan(dum(:,1)));
+            %  [fourier(timbin,j,k,m)] = svdfft(transpose(dum(timbin,:)),1);
+            %end
+          end
+        end
+        progress('close');
+        other              = data.fourierspctrm(:,sel_other,fbin,:);
+        data               = rmfield(data,'fourierspctrm');
+        data.fourierspctrm = cat(2, fourier, other);
+        data.freq          = data.freq(fbin);
+      else
+        error('cfg.combinemethod = ''svd'' only works for frequency data with fourierspctrm');
+      end
+    otherwise
   end
 else
-  error('unknown combinemethod');
+  if istimelock,
+    data = checkdata(data, 'datatype', 'raw', 'feedback', 'yes');
+  end
+  
+  switch cfg.combinemethod
+    case 'sum'
+      Nrpt = length(data.trial);
+      for k = 1:Nrpt
+        tmp1 = sqrt(data.trial{k}(sel_dH,:).^2 + data.trial{k}(sel_dV,:).^2);
+	tmp2 = data.trial{k}(sel_other,:);
+	data.trial{k} = [tmp1;tmp2];
+      end
+    case 'svd'
+      Nrpt = length(data.trial);
+      Nsgn = length(sel_dH);
+      Nsmp = cellfun('size', data.trial, 2);
+      Csmp = cumsum([0 Nsmp]);
+      %do a 'fixed orientation' across all trials approach here
+      %this is different from the frequency case FIXME
+      tmpdat = zeros(2, sum(Nsmp));
+      for k = 1:Nsgn
+        for m = 1:Nrpt
+	  tmpdat(:, (Csmp(m)+1):Csmp(m+1)) = data.trial{m}([sel_dH(k) sel_dV(k)],:);
+	end
+        tmpdat2 = abs(svdfft(tmpdat,1));
+	tmpdat2 = mat2cell(tmpdat2, 1, Nsmp);
+        for m = 1:Nrpt
+	  if k==1, trial{m} = zeros(Nsgn, Nsmp(m)); end
+	  trial{m}(k,:) = tmpdat2{m};
+	end
+      end
+      
+      for m = 1:Nrpt
+        other = data.trial{m}(sel_other,:);
+	trial{m} = [trial{m}; other];
+      end
+      data.trial = trial;
+
+    otherwise
+  end
+
+  if istimelock,
+    data = checkdata(data, 'datatype', 'timelock', 'feedback', 'yes');
+  end
 end
 
 if strcmp(cfg.combinegrad, 'no') && ~isfield(data, 'grad')
@@ -372,7 +414,7 @@ catch
   [st, i] = dbstack;
   cfg.version.name = st(i);
 end
-cfg.version.id  = '$Id: combineplanar.m,v 1.1 2009-07-07 02:23:14 arno Exp $';
+cfg.version.id  = '$Id: combineplanar.m,v 1.2 2009-07-28 14:05:57 arno Exp $';
 % remember the configuration details of the input data
 try, cfg.previous = data.cfg; end
 % remember the exact configuration details in the output 

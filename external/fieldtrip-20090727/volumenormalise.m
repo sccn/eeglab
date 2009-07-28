@@ -38,6 +38,9 @@ function [normalise] = volumenormalise(cfg, interp)
 % Copyright (C) 2004-2006, Jan-Mathijs Schoffelen
 %
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2009/07/14 07:27:30  roboos
+% replaced read_fcdc_mri with read_mri to avoid warning
+%
 % Revision 1.20  2009/01/20 13:01:31  sashae
 % changed configtracking such that it is only enabled when BOTH explicitly allowed at start
 % of the fieldtrip function AND requested by the user
@@ -137,7 +140,7 @@ end
 if ischar(interp),
   fprintf('reading source MRI from file\n');
   filename = interp;
-  interp   = read_fcdc_mri(filename);
+  interp   = read_mri(filename);
   if filetype(filename, 'ctf_mri')
     % based on the filetype assume that the coordinates correspond with CTF convention
     source_coordinates = 'ctf';
@@ -312,7 +315,7 @@ catch
   [st, i] = dbstack;
   cfg.version.name = st(i);
 end
-cfg.version.id = '$Id: volumenormalise.m,v 1.1 2009-07-07 02:23:17 arno Exp $';
+cfg.version.id = '$Id: volumenormalise.m,v 1.2 2009-07-28 14:05:58 arno Exp $';
 % remember the configuration details of the input data
 try, cfg.previous = interp.cfg; end
 % remember the exact configuration details in the output

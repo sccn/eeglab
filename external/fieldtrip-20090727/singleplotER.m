@@ -54,6 +54,15 @@ function [cfg] = singleplotER(cfg, varargin)
 % Copyright (C) 2003-2006, Ole Jensen
 %
 % $Log: not supported by cvs2svn $
+% Revision 1.41  2009/07/14 13:51:31  roboos
+% some small changes related to the new interactive data selection
+%
+% Revision 1.40  2009/07/14 13:21:09  roboos
+% changed the interactive plotting: instead of using plotSelection it now uses the selection function from the new plotting module (select_range and select_channel) and uses a local subfunction to update the cfg and call the next figure
+%
+% Revision 1.39  2009/07/13 13:25:52  crimic
+% inserted new plotting tool functions
+%
 % Revision 1.38  2009/06/17 13:44:52  roboos
 % cleaned up help
 %
@@ -291,12 +300,13 @@ for k=1:length(varargin)
       cfg.layout = lay;
       plot_lay(cfg.layout, 'box', false);
       title('Select the reference channel by clicking on it...');
-      info       = [];
+      % add the channel information to the figure
+      info       = guidata(h);
       info.x     = lay.pos(:,1);
       info.y     = lay.pos(:,2);
       info.label = lay.label;
       guidata(h, info);
-      set(gcf, 'WindowButtonUpFcn', {@select_channel, 'callback', {@select_cohrefchannel, cfg, varargin{:}}});
+      set(gcf, 'WindowButtonUpFcn', {@select_channel, 'callback', {@select_singleplotER, cfg, varargin{:}}});
       return
     end
 
@@ -372,16 +382,16 @@ for k=2:nargin
     chansel = match_str(varargin{k-1}.label, cfg.channel);
   end
 
-  % cfg.maskparameter only possible for single channel
-  if length(chansel) > 1 && ~isempty(cfg.maskparameter)
-    warning('no masking possible for average over multiple channels')
-    masking = 0;
-  elseif length(chansel) == 1 && ~isempty(cfg.maskparameter)
-    masking = 1;
-  end
-
   % Average across selected channels:
   P = squeeze(mean(P(chansel,:), 1));
+  
+  % select mask
+  if ~isempty(cfg.maskparameter) %&& masking
+    M = varargin{1}.(cfg.maskparameter); % mask always from only first dataset
+    M = squeeze(mean(M(chansel,:), 1));
+  else
+    M = [];
+  end
   
   % Update ymin and ymax for the current data set:
   if strcmp(cfg.ylim, 'maxmin')
@@ -395,96 +405,27 @@ for k=2:nargin
   end
 
   style = GRAPHCOLOR(k);
-  plot(varargin{k-1}.(cfg.xparam), P, style);
-end
-
-% select mask
-if ~isempty(cfg.maskparameter) && masking
-  M = varargin{1}.(cfg.maskparameter); % mask always from only first dataset
-  mask = squeeze(M(chansel,:));
-end
-  
-% Add mask box
-if ~isempty(cfg.maskparameter) && masking
-  % determine how many boxes
-  foundbeg = 0;
-  foundend = 0;
-  beg  = [];
-  eind = [];
-  for i = 1:length(mask)
-    if ~foundbeg  && mask(i) == 1 
-      beg(length(beg)+1) = i;
-      foundbeg = 1;
-      foundend = 0;
-    elseif ~foundbeg  && mask(i) == 0
-      %next
-    elseif ~foundend  && mask(i) == 1
-      %next
-    elseif ~foundend  && mask(i) == 0
-      eind(length(eind)+1) = i-1;
-      foundend = 1;
-      foundbeg = 0;
-    end
-  end
-  if length(eind) == length(beg)-1
-    eind(length(eind)+1) = length(mask);
-  end
-  numbox = length(beg);
-  for i = 1:numbox
-    xmaskmin = varargin{1}.(cfg.xparam)(beg(i));
-    xmaskmax = varargin{1}.(cfg.xparam)(eind(i));
-    hs = patch([xmaskmin xmaskmax xmaskmax xmaskmin xmaskmin],[ymin ymin ymax ymax ymin], [.6 .6 .6]);
-    set(hs, 'EdgeColor', 'none');
-  end
+  plot_vector(varargin{k-1}.(cfg.xparam), P, 'style', style, 'highlight', M);  
 end
 
 % Set xlim and ylim:
 xlim([xmin xmax]);
 ylim([ymin ymax]);
 
-% Make the figure interactive:
+% Make the figure interactive
 if strcmp(cfg.interactive, 'yes')
-  userData.hFigure = gcf;
-  userData.hAxes = gca;
-  for i=1:1 % no multiple selection regions
-    userData.hSelection{i} = plot(0,0);
-    set(userData.hSelection{i}, 'XData', mean([xmin xmax]));
-    set(userData.hSelection{i}, 'YData', mean([ymin ymax]));
-    set(userData.hSelection{i}, 'Color', [0 0 0]);
-    set(userData.hSelection{i}, 'EraseMode', 'xor');
-    set(userData.hSelection{i}, 'LineStyle', '--');
-    set(userData.hSelection{i}, 'LineWidth', 1.5);
-    set(userData.hSelection{i}, 'Visible', 'on');
-    userData.range{i} = [];
-  end
-  userData.iSelection = 0;
-  userData.plotType = 'singleplot';
-  userData.selecting = 0;
-  userData.selectionType = '';
-  userData.selectAxes = 'x';
-  userData.lastClick = [];
-  userData.cfg = cfg;
-  userData.data = varargin;
-  userData.chanX = [];
-  userData.chanY = [];
-  userData.chanLabels = [];
-  tag = sprintf('%.5f', 10000 * rand(1));
-  set(gcf, 'Renderer', cfg.renderer);
-  set(gcf, 'Tag', tag);
-  set(gcf, 'UserData', userData);
-  set(gcf, 'WindowButtonMotionFcn', ['plotSelection(get(findobj(''Tag'', ''' tag '''), ''UserData''), 0);']);
-  set(gcf, 'WindowButtonDownFcn', ['plotSelection(get(findobj(''Tag'', ''' tag '''), ''UserData''), 1);']);
-  set(gcf, 'WindowButtonUpFcn', ['plotSelection(get(findobj(''Tag'', ''' tag '''), ''UserData''), 2);']);
+  set(gcf, 'WindowButtonUpFcn',     {@select_range, 'multiple', false, 'yrange', false, 'callback', {@select_topoplotER, cfg, varargin{:}}, 'event', 'WindowButtonUpFcn'});
+  set(gcf, 'WindowButtonDownFcn',   {@select_range, 'multiple', false, 'yrange', false, 'callback', {@select_topoplotER, cfg, varargin{:}}, 'event', 'WindowButtonDownFcn'});
+  set(gcf, 'WindowButtonMotionFcn', {@select_range, 'multiple', false, 'yrange', false, 'callback', {@select_topoplotER, cfg, varargin{:}}, 'event', 'WindowButtonMotionFcn'});
 end
 
 % Create title text containing channel name(s) and channel number(s):
 if length(chansel) == 1
-  t=[char(cfg.channel) ' / ' num2str(chansel) ];
+  t = [char(cfg.channel) ' / ' num2str(chansel) ];
 else
-  t=sprintf('mean(%0s)', join(',',cfg.channel));
+  t = sprintf('mean(%0s)', join(',', cfg.channel));
 end
-
-h=title(t,'fontsize', cfg.fontsize);
+h = title(t,'fontsize', cfg.fontsize);
 
 % get the output cfg
 cfg = checkconfig(cfg, 'trackconfig', 'off', 'checksize', 'yes'); 
@@ -493,7 +434,7 @@ cfg = checkconfig(cfg, 'trackconfig', 'off', 'checksize', 'yes');
 % SUBFUNCTION
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function t = join(separator,cells)
-if length(cells)==0
+if isempty(cells)
   t = '';
   return;
 end
@@ -504,23 +445,25 @@ for i=2:length(cells)
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% SUBFUNCTION
+% SUBFUNCTION which is called by select_channel in case cfg.cohrefchannel='gui'
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function l = cellstrmatch(str,strlist)
-l = [];
-for k=1:length(strlist)
-  if strcmp(char(str),char(strlist(k)))
-    l = [l k];
-  end
-end
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% SUBFUNCTION
-% this function is called by select_channel
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function select_cohrefchannel(label, cfg, varargin)
-fprintf('selected "%s" as reference channel\n', label);
+function select_singleplotER(label, cfg, varargin)
 cfg.cohrefchannel = label;
-figure
+fprintf('selected cfg.cohrefchannel = ''%s''\n', cfg.cohrefchannel);
+p = get(gcf, 'Position');
+f = figure;
+set(f, 'Position', p);
 singleplotER(cfg, varargin{:});
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SUBFUNCTION which is called after selecting a time range
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function select_topoplotER(range, cfg, varargin)
+cfg.comment = 'auto';
+cfg.yparam = [];
+cfg.xlim = range(1:2);
+fprintf('selected cfg.xlim = [%f %f]\n', cfg.xlim(1), cfg.xlim(2));
+p = get(gcf, 'Position');
+f = figure;
+set(f, 'Position', p);
+topoplotER(cfg, varargin{:});

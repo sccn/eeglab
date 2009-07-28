@@ -1,12 +1,13 @@
-function [vol, cfg] = prepare_localspheres(cfg, mri);
+function [vol, cfg] = prepare_localspheres(cfg, mri)
 
 % PREPARE_LOCALSPHERES creates a MEG volume conductor model with a sphere
 % for every sensor. You can also use it to create a single sphere
 % model that is fitted to the MRI or to the head shape points.
 %
 % Use as
+%   [vol, cfg] = prepare_localspheres(cfg, seg), or
+%   [vol, cfg] = prepare_localspheres(cfg, mri), or
 %   [vol, cfg] = prepare_localspheres(cfg)
-%   [vol, cfg] = prepare_localspheres(cfg, seg)
 %
 % The input configuration should contain
 %   cfg.grad         = structure with gradiometer definition, or
@@ -40,6 +41,9 @@ function [vol, cfg] = prepare_localspheres(cfg, mri);
 % Copyright (C) 2005-2006, Jan-Mathijs Schoffelen & Robert Oostenveld
 %
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2009/07/16 09:17:17  crimic
+% link to prepare_mesh.m function
+%
 % Revision 1.27  2009/05/29 10:47:19  roboos
 % only convert to struct in case headshape is specified
 %
@@ -145,110 +149,12 @@ if ~isfield(cfg, 'spheremesh'),    cfg.spheremesh = 4000;   end
 if ~isfield(cfg, 'singlesphere'),  cfg.singlesphere = 'no'; end
 if ~isfield(cfg, 'headshape'),     cfg.headshape = [];      end
 
-if isfield(cfg, 'headshape') && isa(cfg.headshape, 'config')
-  % convert the nested config-object back into a normal structure
-  cfg.headshape = struct(cfg.headshape);
-end
-
-if nargin>1 && isempty(cfg.headshape)
-  basedonmri       = 1;
-  basedonheadshape = 0;
-elseif nargin==1 && ~isempty(cfg.headshape)
-  basedonmri       = 0;
-  basedonheadshape = 1;
+% construct the geometry of the headshape using a single boundary
+if nargin==1
+  headshape = prepare_mesh(cfg);
 else
-  error('inconsistent configuration, cfg.headshape should not be used in combination with an mri input')
+  headshape = prepare_mesh(cfg, mri);
 end
-
-if basedonmri
-  % obtain the head shape from the segmented MRI
-  seg = zeros(mri.dim);
-  if isfield(mri, 'gray')
-    fprintf('including gray matter in segmentation for brain compartment\n')
-    seg = seg | (mri.gray>(cfg.threshold*max(mri.gray(:))));
-  end
-  if isfield(mri, 'white')
-    fprintf('including white matter in segmentation for brain compartment\n')
-    seg = seg | (mri.white>(cfg.threshold*max(mri.white(:))));
-  end
-  if isfield(mri, 'csf')
-    fprintf('including CSF in segmentation for brain compartment\n')
-    seg = seg | (mri.csf>(cfg.threshold*max(mri.csf(:))));
-  end
-  if ~strcmp(cfg.smooth, 'no'),
-    % check whether the required SPM2 toolbox is available
-    hastoolbox('spm2', 1);
-    fprintf('smoothing the segmentation with a %d-pixel FWHM kernel\n',cfg.smooth);
-    seg = double(seg);
-    spm_smooth(seg, seg, cfg.smooth);
-  end
-  % threshold for the last time
-  seg = (seg>(cfg.threshold*max(seg(:))));
-  % determine the center of gravity of the segmented brain
-  xgrid = 1:mri.dim(1);
-  ygrid = 1:mri.dim(2);
-  zgrid = 1:mri.dim(3);
-  [X, Y, Z] = ndgrid(xgrid, ygrid, zgrid);
-  ori(1) = mean(X(seg));
-  ori(2) = mean(Y(seg));
-  ori(3) = mean(Z(seg));
-  pnt = triangulate_seg(seg, cfg.spheremesh, ori);
-  pnt(:,4) = 1;
-  pnt = (mri.transform * pnt')';
-  % convert the MRI surface points into the same units as the source/gradiometer
-  scale = 1;
-  switch cfg.sourceunits
-    case 'mm'
-      scale = scale * 1000;
-    case 'cm'
-      scale = scale * 100;
-    case 'dm'
-      scale = scale * 10;
-    case 'm'
-      scale = scale * 1;
-    otherwise
-      error('unknown physical dimension in cfg.sourceunits');
-  end
-  switch cfg.mriunits
-    case 'mm'
-      scale = scale / 1000;
-    case 'cm'
-      scale = scale / 100;
-    case 'dm'
-      scale = scale / 10;
-    case 'm'
-      scale = scale / 1;
-    otherwise
-      error('unknown physical dimension in cfg.mriunits');
-  end
-  if scale~=1
-    fprintf('converting MRI surface points from %s into %s\n', cfg.sourceunits, cfg.mriunits);
-    headshape.pnt = pnt(:,1:3) * scale;
-  else
-    headshape.pnt = pnt(:,1:3);
-  end
-  fprintf('placed %d points on the brain surface\n', length(headshape.pnt));
-  
-elseif basedonheadshape
-  % get the surface describing the head shape
-  if isstruct(cfg.headshape) && isfield(cfg.headshape, 'pnt')
-    % use the headshape surface specified in the configuration
-    headshape = cfg.headshape;
-  elseif isnumeric(cfg.headshape) && size(cfg.headshape,2)==3
-    % use the headshape points specified in the configuration
-    headshape.pnt = cfg.headshape;
-  elseif ischar(cfg.headshape)
-    % read the headshape from file
-    headshape = read_headshape(cfg.headshape);
-  else
-    error('cfg.headshape is not specified correctly')
-  end
-  headshape.pnt = unique(headshape.pnt, 'rows');
-  % this function does not use the triangulation
-  if isfield(headshape, 'tri')
-    headshape = rmfield(headshape, 'tri');
-  end
-end % basedonmri or basedonheadshape
 
 % read the gradiometer definition from file or copy it from the configuration
 if isfield(cfg, 'gradfile')
@@ -282,6 +188,8 @@ end
 [single_o, single_r] = fitsphere(headshape.pnt);
 fprintf('single sphere,   %5d surface points, center = [%4.1f %4.1f %4.1f], radius = %4.1f\n', Nshape, single_o(1), single_o(2), single_o(3), single_r);
 
+vol = [];
+
 if strcmp(cfg.singlesphere, 'yes')
   % only return a single sphere
   vol.r = single_r;
@@ -298,13 +206,13 @@ for chan=1:Nchan
   coilsel = find(grad.tra(chan,:)~=0);
   allpnt  = grad.pnt(coilsel, :);	% position of all coils belonging to this channel
   allori  = grad.ori(coilsel, :);	% orientation of all coils belonging to this channel
-
+  
   if strcmp(cfg.feedback, 'yes')
     cla
     plot3(grad.pnt(:,1), grad.pnt(:,2), grad.pnt(:,3), 'b.');	% all coils
     plot3(allpnt(:,1), allpnt(:,2), allpnt(:,3), 'r*');		% this channel in red
   end
-
+  
   % determine the average position and orientation of this channel
   thispnt = mean(allpnt,1);
   [u, s, v] = svd(allori);
@@ -313,13 +221,13 @@ for chan=1:Nchan
     % the orientation should be outwards pointing
     thisori = -thisori;
   end
-
+  
   % compute the distance from every coil along this channels orientation
   dist = [];
   for i=1:length(coilsel)
     dist(i) = dot((allpnt(i,:)-thispnt), thisori);
   end
-
+  
   [m, i] = min(dist);
   % check whether the minimum difference is larger than a typical distance
   if abs(m)>(cfg.baseline/4)
@@ -327,7 +235,7 @@ for chan=1:Nchan
     % except when the center of the channel is approximately just as good (planar gradiometer)
     thispnt = allpnt(i,:);
   end
-
+  
   % find the headshape points that are close to this channel
   dist = sqrt(sum((headshape.pnt-repmat(thispnt,Nshape,1)).^2, 2));
   shapesel = find(dist<cfg.radius);
@@ -335,7 +243,7 @@ for chan=1:Nchan
     plot3(headshape.pnt(shapesel,1), headshape.pnt(shapesel,2), headshape.pnt(shapesel,3), 'g.');
     drawnow
   end
-
+  
   % fit a sphere to these headshape points
   if length(shapesel)>10
     [o, r] = fitsphere(headshape.pnt(shapesel,:));
@@ -345,21 +253,21 @@ for chan=1:Nchan
     o = single_o;
     r = single_r;
   end
-
+  
   if r > cfg.maxradius
     fprintf('channel = %s, not enough surface points, using all points\n', grad.label{chan});
     o = single_o;
     r = single_r;
   end
-
+  
   % add this sphere to the volume conductor
   vol.o(chan,:)   = o;
   vol.r(chan)     = r;
   vol.label{chan} = grad.label{chan};
-end
+end % for all channels
 
 vol.type = 'multisphere';
 
 % get the output cfg
-cfg = checkconfig(cfg, 'trackconfig', 'off', 'checksize', 'yes'); 
+cfg = checkconfig(cfg, 'trackconfig', 'off', 'checksize', 'yes');
 

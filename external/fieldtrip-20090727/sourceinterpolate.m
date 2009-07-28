@@ -33,6 +33,9 @@ function [interp] = sourceinterpolate(cfg, functional, anatomical);
 % Copyright (C) 2003-2007, Robert Oostenveld
 %
 % $Log: not supported by cvs2svn $
+% Revision 1.53  2009/07/09 16:08:22  vlalit
+% replaced read_fcdc_mri with read_mri to avoid warning
+%
 % Revision 1.52  2009/03/11 11:30:45  roboos
 % use autodetection of source and MRI units
 %
@@ -192,7 +195,7 @@ cfg = checkconfig(cfg, 'deprecated', {'sourceunits', 'mriunits'});
 if ischar(anatomical)
   % read the anatomical MRI data from file
   fprintf('reading MRI from file\n');
-  anatomical = read_fcdc_mri(anatomical);
+  anatomical = read_mri(anatomical);
 end
 
 % check if the input data is valid for this function and ensure that the structures correctly describes a volume
@@ -329,7 +332,7 @@ catch
   [st, i] = dbstack;
   cfg.version.name = st(i);
 end
-cfg.version.id = '$Id: sourceinterpolate.m,v 1.1 2009-07-07 02:23:16 arno Exp $';
+cfg.version.id = '$Id: sourceinterpolate.m,v 1.2 2009-07-28 14:05:58 arno Exp $';
 % remember the configuration details of the input data
 cfg.previous = [];
 try, cfg.previous{1} = functional.cfg; end

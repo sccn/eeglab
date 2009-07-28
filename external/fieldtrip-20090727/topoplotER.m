@@ -71,6 +71,12 @@ function [cfg] = topoplotER(cfg, varargin)
 % Copyright (C) 2005-2006, F.C. Donders Centre
 %
 % $Log: not supported by cvs2svn $
+% Revision 1.58  2009/07/14 13:51:32  roboos
+% some small changes related to the new interactive data selection
+%
+% Revision 1.57  2009/07/14 13:21:09  roboos
+% changed the interactive plotting: instead of using plotSelection it now uses the selection function from the new plotting module (select_range and select_channel) and uses a local subfunction to update the cfg and call the next figure
+%
 % Revision 1.56  2009/06/17 14:05:25  roboos
 % use ischar instead of isstr
 %
@@ -192,6 +198,7 @@ function [cfg] = topoplotER(cfg, varargin)
 fieldtripdefs
 
 cfg = checkconfig(cfg, 'trackconfig', 'on');
+cfg = checkconfig(cfg, 'unused',  {'cohtargetchannel'});
 
 cla
 
@@ -305,9 +312,6 @@ elseif strcmp(data.dimord, 'chan_comp')
   if ~isfield(cfg, 'zparam'),      cfg.zparam='topo';         end
 end
 
-% Old style coherence plotting with cohtargetchannel is no longer supported:
-cfg = checkconfig(cfg, 'unused',  {'cohtargetchannel'});
-
 % Read or create the layout that will be used for plotting:
 lay = prepare_layout(cfg, data);
 cfg.layout = lay;
@@ -338,12 +342,13 @@ if (strcmp(cfg.zparam,'cohspctrm')) && isfield(data, 'labelcmb')
     h = clf;
     plot_lay(lay, 'box', false);
     title('Select the reference channel by clicking on it...');
-    info       = [];
+    % add the channel information to the figure
+    info       = guidata(gcf);
     info.x     = lay.pos(:,1);
     info.y     = lay.pos(:,2);
     info.label = lay.label;
     guidata(h, info);
-    set(gcf, 'WindowButtonUpFcn', {@select_channel, 'callback', {@select_cohrefchannel, cfg, data}});
+    set(gcf, 'WindowButtonUpFcn', {@select_channel, 'callback', {@select_topoplotER, cfg, data}});
     return
   end
 
@@ -476,39 +481,26 @@ topoplot(cfg,chanX,chanY,datavector,chanLabels);
 % The remainder of the code is meant to make the figure interactive
 hold on;
 
+% Make the figure interactive
 if strcmp(cfg.interactive, 'yes')
-  userData.hFigure = gcf;
-  userData.hAxes = gca;
-  for i=1:10
-    userData.hSelection{i} = plot(0,0);
-    set(userData.hSelection{i}, ...
-      'XData', [0], ...
-      'YData', [0], ...
-      'Color', [0 0 0], ...
-      'EraseMode', 'xor', ...
-      'LineStyle', '--', ...
-      'LineWidth', 1.5, ...
-      'Visible', 'on');
-    userData.range{i} = [];
+    % add the channel information to the figure
+    info       = guidata(gcf);
+    info.x     = lay.pos(:,1);
+    info.y     = lay.pos(:,2);
+    info.label = lay.label;
+    guidata(gcf, info);
+
+  if any(strcmp(data.dimord, {'chan_time', 'chan_freq', 'subj_chan_time', 'rpt_chan_time'}))
+    set(gcf, 'WindowButtonUpFcn',     {@select_channel, 'multiple', true, 'callback', {@select_singleplotER, cfg, varargin{:}}, 'event', 'WindowButtonUpFcn'});
+    set(gcf, 'WindowButtonDownFcn',   {@select_channel, 'multiple', true, 'callback', {@select_singleplotER, cfg, varargin{:}}, 'event', 'WindowButtonDownFcn'});
+    set(gcf, 'WindowButtonMotionFcn', {@select_channel, 'multiple', true, 'callback', {@select_singleplotER, cfg, varargin{:}}, 'event', 'WindowButtonMotionFcn'});
+  elseif any(strcmp(data.dimord, {'chan_freq_time', 'subj_chan_freq_time', 'rpt_chan_freq_time', 'rpttap_chan_freq_time'}))
+    set(gcf, 'WindowButtonUpFcn',     {@select_channel, 'multiple', true, 'callback', {@select_singleplotTFR, cfg, varargin{:}}, 'event', 'WindowButtonUpFcn'});
+    set(gcf, 'WindowButtonDownFcn',   {@select_channel, 'multiple', true, 'callback', {@select_singleplotTFR, cfg, varargin{:}}, 'event', 'WindowButtonDownFcn'});
+    set(gcf, 'WindowButtonMotionFcn', {@select_channel, 'multiple', true, 'callback', {@select_singleplotTFR, cfg, varargin{:}}, 'event', 'WindowButtonMotionFcn'});
+  else
+    error('unsupported dimord "%" for interactive plotting', data.dimord);
   end
-  userData.iSelection    = 0;
-  userData.plotType      = 'topoplot';
-  userData.selecting     = 0;
-  userData.selectionType = '';
-  userData.selectAxes    = 'z';
-  userData.lastClick     = [];
-  userData.cfg           = cfg;
-  userData.data          = data;
-  userData.chanX         = chanX;
-  userData.chanY         = chanY;
-  userData.chanLabels    = chanLabels;
-  tag                    = sprintf('%.5f', 10000 * rand(1));
-  set(gcf, 'Renderer',              cfg.renderer);
-  set(gcf, 'Tag',                   tag);
-  set(gcf, 'UserData',              userData);
-  set(gcf, 'WindowButtonMotionFcn', ['plotSelection(get(findobj(''Tag'', ''' tag '''), ''UserData''), 0);']);
-  set(gcf, 'WindowButtonDownFcn',   ['plotSelection(get(findobj(''Tag'', ''' tag '''), ''UserData''), 1);']);
-  set(gcf, 'WindowButtonUpFcn',     ['plotSelection(get(findobj(''Tag'', ''' tag '''), ''UserData''), 2);']);
 end
 
 axis off;
@@ -518,12 +510,49 @@ hold off;
 cfg = checkconfig(cfg, 'trackconfig', 'off', 'checksize', 'yes'); 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% SUBFUNCTION
-% this function is called by select_channel
+% SUBFUNCTION which is called after selecting channels in case of cfg.cohrefchannel='gui'
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function select_cohrefchannel(label, cfg, varargin)
-fprintf('selected "%s" as reference channel\n', label);
+function select_topoplotER(label, cfg, varargin)
 cfg.cohrefchannel = label;
-figure
+fprintf('selected cfg.cohrefchannel = ''%s''\n', cfg.cohrefchannel);
+p = get(gcf, 'Position');
+f = figure;
+set(f, 'Position', p);
 topoplotER(cfg, varargin{:});
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SUBFUNCTION which is called after selecting channels in case of cfg.interactive='yes'
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function select_singleplotER(label, cfg, varargin)
+if ~isempty(label)
+  cfg.xlim = 'maxmin';
+  cfg.channel = label;
+  fprintf('selected cfg.channel = {');
+  for i=1:(length(cfg.channel)-1)
+    fprintf('''%s'', ', cfg.channel{i});
+  end
+  fprintf('''%s''}\n', cfg.channel{end});
+  p = get(gcf, 'Position');
+  f = figure;
+  set(f, 'Position', p);
+  singleplotER(cfg, varargin{:});
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SUBFUNCTION which is called after selecting channels in case of cfg.interactive='yes'
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function select_singleplotTFR(label, cfg, varargin)
+if ~isempty(label)
+  cfg.xlim = 'maxmin';
+  cfg.ylim = 'maxmin';
+  cfg.channel = label;
+  fprintf('selected cfg.channel = {');
+  for i=1:(length(cfg.channel)-1)
+    fprintf('''%s'', ', cfg.channel{i});
+  end
+  fprintf('''%s''}\n', cfg.channel{end});
+  p = get(gcf, 'Position');
+  f = figure;
+  set(f, 'Position', p);
+  singleplotTFR(cfg, varargin{:});
+end

@@ -1,8 +1,7 @@
 function [vol, cfg] = prepare_concentricspheres(cfg)
 
-% PREPARE_CONCENTRICSPHERES creates a MEG volume conductor model with a sphere
-% for every sensor. You can also use it to create a single sphere
-% model that is fitted to the MRI or to the head shape points.
+% PREPARE_CONCENTRICSPHERES creates a EEG volume conductor model with
+% multiple concentric spheres.
 %
 % Use as
 %   [vol, cfg] = prepare_concentricspheres(cfg)
@@ -14,7 +13,6 @@ function [vol, cfg] = prepare_concentricspheres(cfg)
 %   cfg.fitind        = indices of shapes to use for fitting the center (default = 'all')
 %   cfg.nonlinear     = 'yes' or 'no' (default = 'yes')
 %   cfg.feedback      = 'yes' or 'no' (default = 'yes')
-%
 %
 % Example:
 %
@@ -38,6 +36,9 @@ function [vol, cfg] = prepare_concentricspheres(cfg)
 % Copyright (C) 2009, Vladimir Litvak & Robert Oostenveld
 %
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2009/07/16 09:14:52  crimic
+% part of code reimplemented in function prepare_mesh_headshape.m
+%
 % Revision 1.7  2009/06/23 14:59:28  crimic
 % use of plotting toolbox funtion: plot_mesh
 %
@@ -68,6 +69,7 @@ cfg = checkconfig(cfg, 'trackconfig', 'on');
 if ~isfield(cfg, 'fitind'),        cfg.fitind = 'all';                            end
 if ~isfield(cfg, 'feedback'),      cfg.feedback = 'yes';                          end
 if ~isfield(cfg, 'conductivity'),  cfg.conductivity = [0.3300 1 0.0042 0.3300];   end
+if ~isfield(cfg, 'numvertices'),   cfg.numvertices = 'same';                      end
 
 if isfield(cfg, 'headshape') && isa(cfg.headshape, 'config')
   % convert the nested config-object back into a normal structure
@@ -77,25 +79,7 @@ end
 cfg = checkconfig(cfg, 'forbidden', 'nonlinear');
 
 % get the surface describing the head shape
-if isstruct(cfg.headshape) && isfield(cfg.headshape, 'pnt')
-  % use the headshape surface specified in the configuration
-  headshape = cfg.headshape;
-elseif isnumeric(cfg.headshape) && size(cfg.headshape,2)==3
-  % use the headshape points specified in the configuration
-  headshape.pnt = cfg.headshape;
-elseif ischar(cfg.headshape)
-  % read the headshape from file
-  headshape = read_headshape(cfg.headshape);
-else
-  error('cfg.headshape is not specified correctly')
-end
-if ~isfield(headshape, 'tri')
-  for i=1:length(headshape)
-    % generate a closed triangulation from the surface points
-    headshape(i).pnt = unique(headshape(i).pnt, 'rows');
-    headshape(i).tri = projecttri(headshape(i).pnt);
-  end
-end
+headshape = prepare_mesh_headshape(cfg);
 
 if strcmp(cfg.fitind, 'all')
   fitind = 1:numel(headshape);

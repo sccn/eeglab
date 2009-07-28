@@ -7,13 +7,13 @@ function [cfg] = singleplotTFR(cfg, data)
 %   singleplotTFR(cfg,data)
 %
 % The data can be a time-frequency representation of power that was
-% computed using the FREQANALYSIS function. 
+% computed using the FREQANALYSIS function.
 %
 % The configuration can have the following parameters:
 % cfg.xparam        = field to be plotted on x-axis, e.g. 'time' (default depends on data.dimord)
 % cfg.yparam        = field to be plotted on y-axis, e.g. 'freq' (default depends on data.dimord)
 % cfg.zparam        = field to be plotted on y-axis, e.g. 'powspcrtrm' (default depends on data.dimord)
-% cfg.maskparameter = field in the data to be used for opacity masking of data 
+% cfg.maskparameter = field in the data to be used for opacity masking of data
 %                     (not possible for mean over multiple channels)
 % cfg.xlim          = 'maxmin' or [xmin xmax] (default = 'maxmin')
 % cfg.ylim          = 'maxmin' or [ymin ymax] (default = 'maxmin')
@@ -29,9 +29,9 @@ function [cfg] = singleplotTFR(cfg, data)
 % cfg.colorbar      = 'yes', 'no' (default = 'yes')
 % cfg.interactive   = Interactive plot 'yes' or 'no' (default = 'no')
 %                     In a interactive plot you can select areas and produce a new
-%                     interactive plot when a selected area is clicked. Multiple areas 
+%                     interactive plot when a selected area is clicked. Multiple areas
 %                     can be selected by holding down the SHIFT key.
-% cfg.renderer      = 'painters', 'zbuffer',' opengl' or 'none' (default = 'opengl')
+% cfg.renderer      = 'painters', 'zbuffer',' opengl' or 'none' (default = [])
 % cfg.masknans      = 'yes' or 'no' (default = 'yes')
 %
 % See also:
@@ -44,6 +44,12 @@ function [cfg] = singleplotTFR(cfg, data)
 % Copyright (C) 2005-2006, F.C. Donders Centre
 %
 % $Log: not supported by cvs2svn $
+% Revision 1.37  2009/07/14 13:52:16  roboos
+% changed the interactive plotting: instead of using plotSelection it now uses the selection function from the new plotting module (select_range and select_channel) and uses a local subfunction to update the cfg and call the next figure
+%
+% Revision 1.36  2009/07/14 13:27:25  roboos
+% consistent handling of cfg.renderer, default is to let matlab decide
+%
 % Revision 1.35  2009/06/17 13:44:52  roboos
 % cleaned up help
 %
@@ -147,7 +153,7 @@ function [cfg] = singleplotTFR(cfg, data)
 %
 % Revision 1.5  2006/03/14 08:09:22  roboos
 % added copyrigth and cvs log statement
-% 
+%
 
 fieldtripdefs
 
@@ -168,7 +174,7 @@ if ~isfield(cfg,'zlim'),            cfg.zlim = 'maxmin';               end
 if ~isfield(cfg,'fontsize'),        cfg.fontsize = 8;                  end
 if ~isfield(cfg,'colorbar'),        cfg.colorbar = 'yes';              end
 if ~isfield(cfg,'interactive'),     cfg.interactive = 'no';            end
-if ~isfield(cfg,'renderer'),        cfg.renderer = 'opengl';           end
+if ~isfield(cfg,'renderer'),        cfg.renderer = [];                 end
 if ~isfield(cfg,'masknans'),        cfg.masknans = 'yes';              end
 if ~isfield(cfg,'maskparameter'),   cfg.maskparameter = [];            end
 
@@ -212,38 +218,39 @@ if ~isfield(cfg,'channel')
   cfg = checkconfig(cfg, 'renamed', {'channelname',   'channel'});
 end
 
-  % Check for unconverted coherence spectrum data
-  if (strcmp(cfg.zparam,'cohspctrm')) && (isfield(data, 'labelcmb'))
-    % A reference channel is required:
-    if ~isfield(cfg,'cohrefchannel'),
-      error('no reference channel specified');
-    end
-
-    if strcmp(cfg.cohrefchannel, 'gui')
-      % Open a single figure with the channel layout, the user can click on a reference channel
-      h = clf;
-      lay = prepare_layout(cfg, data)
-      cfg.layout = lay;
-      plot_lay(lay, 'box', false);
-      title('Select the reference channel by clicking on it...');
-      info       = [];
-      info.x     = lay.pos(:,1);
-      info.y     = lay.pos(:,2);
-      info.label = lay.label;
-      guidata(h, info);
-      set(gcf, 'WindowButtonUpFcn', {@select_channel, 'callback', {@select_cohrefchannel, cfg, data}});
-      return
-    end
-
-    % Convert 2-dimensional channel matrix to a single dimension:
-    sel1                  = strmatch(cfg.cohrefchannel, data.labelcmb(:,2));
-    sel2                  = strmatch(cfg.cohrefchannel, data.labelcmb(:,1));
-    fprintf('selected %d channels for coherence\n', length(sel1)+length(sel2));
-    data.cohspctrm = data.cohspctrm([sel1;sel2],:,:);
-    data.label     = [data.labelcmb(sel1,1);data.labelcmb(sel2,2)];
-    data.labelcmb  = data.labelcmb([sel1;sel2],:);
-    data           = rmfield(data, 'labelcmb');
+% Check for unconverted coherence spectrum data
+if (strcmp(cfg.zparam,'cohspctrm')) && (isfield(data, 'labelcmb'))
+  % A reference channel is required:
+  if ~isfield(cfg,'cohrefchannel'),
+    error('no reference channel specified');
   end
+
+  if strcmp(cfg.cohrefchannel, 'gui')
+    % Open a single figure with the channel layout, the user can click on a reference channel
+    h = clf;
+    lay = prepare_layout(cfg, data);
+    cfg.layout = lay;
+    plot_lay(lay, 'box', false);
+    title('Select the reference channel by clicking on it...');
+    % add the channel information to the figure
+    info       = guidata(h);
+    info.x     = lay.pos(:,1);
+    info.y     = lay.pos(:,2);
+    info.label = lay.label;
+    guidata(h, info);
+    set(gcf, 'WindowButtonUpFcn', {@select_channel, 'callback', {@select_singleplotTFR, cfg, data}});
+    return
+  end
+
+  % Convert 2-dimensional channel matrix to a single dimension:
+  sel1                  = strmatch(cfg.cohrefchannel, data.labelcmb(:,2));
+  sel2                  = strmatch(cfg.cohrefchannel, data.labelcmb(:,1));
+  fprintf('selected %d channels for coherence\n', length(sel1)+length(sel2));
+  data.cohspctrm = data.cohspctrm([sel1;sel2],:,:);
+  data.label     = [data.labelcmb(sel1,1);data.labelcmb(sel2,2)];
+  data.labelcmb  = data.labelcmb([sel1;sel2],:);
+  data           = rmfield(data, 'labelcmb');
+end
 
 cfg.channel = channelselection(cfg.channel, data.label);
 if isempty(cfg.channel)
@@ -363,72 +370,36 @@ if isfield(cfg,'colormap')
 end;
 
 if isequal(cfg.colorbar,'yes')
-colorbar;
+  colorbar;
 end
 
 % Make the figure interactive:
 if strcmp(cfg.interactive, 'yes')
-  userData.hFigure = gcf;
-  userData.hAxes = gca;
-  for i=1:1 % no multiple selection regions
-    userData.hSelection{i} = plot(mean([xmin xmax]),mean([ymin ymax]));
-    set(userData.hSelection{i}, 'XData', mean([xmin xmax]));
-    set(userData.hSelection{i}, 'YData', mean([ymin ymax]));
-    set(userData.hSelection{i}, 'Color', [0 0 0]);
-    set(userData.hSelection{i}, 'EraseMode', 'xor');
-    set(userData.hSelection{i}, 'LineStyle', '--');
-    set(userData.hSelection{i}, 'LineWidth', 1.5);
-    set(userData.hSelection{i}, 'Visible', 'on');
-    userData.range{i} = [];
-  end
-  userData.iSelection = 0;
-  userData.plotType = 'singleplot';
-  userData.selecting = 0;
-  userData.selectionType = '';
-  userData.selectAxes = 'xy';
-  userData.lastClick = [];
-  userData.cfg = cfg;
-  userData.data = data;
-  userData.chanX = [];
-  userData.chanY = [];
-  userData.chanLabels = [];
-  tag = sprintf('%.5f', 10000 * rand(1));
-  set(gcf, 'Renderer', cfg.renderer);
-  set(gcf, 'Tag', tag);
-  set(gcf, 'UserData', userData);
-  set(gcf, 'WindowButtonMotionFcn', ['plotSelection(get(findobj(''Tag'', ''' tag '''), ''UserData''), 0);']);
-  set(gcf, 'WindowButtonDownFcn', ['plotSelection(get(findobj(''Tag'', ''' tag '''), ''UserData''), 1);']);
-  set(gcf, 'WindowButtonUpFcn', ['plotSelection(get(findobj(''Tag'', ''' tag '''), ''UserData''), 2);']);
+  set(gcf, 'WindowButtonUpFcn',     {@select_range, 'multiple', false, 'callback', {@select_topoplotTFR, cfg, data}, 'event', 'WindowButtonUpFcn'});
+  set(gcf, 'WindowButtonDownFcn',   {@select_range, 'multiple', false, 'callback', {@select_topoplotTFR, cfg, data}, 'event', 'WindowButtonDownFcn'});
+  set(gcf, 'WindowButtonMotionFcn', {@select_range, 'multiple', false, 'callback', {@select_topoplotTFR, cfg, data}, 'event', 'WindowButtonMotionFcn'});
 end
 
+% Create title text containing channel name(s) and channel number(s):
 if length(chansel) == 1
-  title([char(cfg.channel) ' / ' num2str(chansel)])
+  t = [char(cfg.channel) ' / ' num2str(chansel) ];
 else
-  title(sprintf('mean(%0s)', join(',',cfg.channel)));
+  t = sprintf('mean(%0s)', join(',', cfg.channel));
 end
+h = title(t,'fontsize', cfg.fontsize);
 
 axis tight;
 hold off;
 
 % get the output cfg
-cfg = checkconfig(cfg, 'trackconfig', 'off', 'checksize', 'yes'); 
+cfg = checkconfig(cfg, 'trackconfig', 'off', 'checksize', 'yes');
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% SUBFUNCTION
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function l = cellstrmatch(str,strlist)
-l = [];
-for k=1:length(strlist)
-  if strcmp(char(str),char(strlist(k)))
-    l = [l k];
-  end
-end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % SUBFUNCTION
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function t = join(separator,cells)
-if length(cells)==0
+if isempty(cells)
   t = '';
   return;
 end
@@ -439,12 +410,26 @@ for i=2:length(cells)
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% SUBFUNCTION
-% this function is called by select_channel
+% SUBFUNCTION which is called by select_channel in case cfg.cohrefchannel='gui'
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function select_cohrefchannel(label, cfg, varargin)
-fprintf('selected "%s" as reference channel\n', label);
+function select_singleplotTFR(label, cfg, varargin)
 cfg.cohrefchannel = label;
-figure
+fprintf('selected cfg.cohrefchannel = ''%s''\n', cfg.cohrefchannel);
+p = get(gcf, 'Position');
+f = figure;
+set(f, 'Position', p);
 singleplotTFR(cfg, varargin{:});
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SUBFUNCTION which is called after selecting a time range
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function select_topoplotTFR(range, cfg, varargin)
+cfg.comment = 'auto';
+cfg.xlim = range(1:2);
+cfg.ylim = range(3:4);
+fprintf('selected cfg.xlim = [%f %f]\n', cfg.xlim(1), cfg.xlim(2));
+fprintf('selected cfg.ylim = [%f %f]\n', cfg.ylim(1), cfg.ylim(2));
+p = get(gcf, 'Position');
+f = figure;
+set(f, 'Position', p);
+topoplotER(cfg, varargin{:});
