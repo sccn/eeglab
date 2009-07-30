@@ -142,6 +142,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.180  2009/07/01 23:01:09  arno
+% nicer checkbox
+%
 % Revision 1.179  2009/06/29 18:56:01  arno
 % *** empty log message ***
 %
@@ -1287,6 +1290,7 @@ else
                         chans(ind2(index)).sph_theta  = tmplocs(ind1(index)).sph_theta;
                         chans(ind2(index)).sph_phi    = tmplocs(ind1(index)).sph_phi;
                         chans(ind2(index)).sph_radius = tmplocs(ind1(index)).sph_radius;
+                        chans(ind2(index)).ref        = '';
                         chans(ind2(index)).datachan   = 1;
                     end;
                     tmpdiff = setdiff([1:length(chans)], ind2);
@@ -1409,6 +1413,7 @@ else
 
     % move no data channels to info structure
     % ---------------------------------------
+    if isfield(chans, 'datachan'), chans = rmfield(chans, 'datachan'); end;
     [chans chaninfo.nodatchans] = getnodatchan(chans);
     if isempty(chaninfo.nodatchans), chaninfo = rmfield(chaninfo, 'nodatchans'); end;
 
