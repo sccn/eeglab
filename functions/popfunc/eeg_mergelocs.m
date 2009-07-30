@@ -29,15 +29,41 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2008/04/16 17:35:57  arno
+% simplify code, added one optional input
+%
 % Revision 1.1  2006/09/20 12:26:44  arno
 % Initial revision
 %
 
-function alllocs = mergelocs(varargin)
+function alllocs = eeg_mergelocs(varargin)
 
 alllocs = varargin{1};
 for index = 2:length(varargin)
-    alllocs = myunion(alllocs, varargin{index});
+    tmplocs = varargin{index};
+    newlocs = myunion(alllocs, tmplocs);
+    if length(newlocs) > length(union({ alllocs.labels }, { tmplocs.labels }))
+
+        disp('Warning: different channel montage order for the different datasets');
+
+        % trying to preserve order of the longest array
+        %----------------------------------------------
+        if length(alllocs) < length(tmplocs)
+            tmp     = alllocs;
+            alllocs = tmplocs;
+            tmplocs = tmp;
+        end;
+        allchans = { alllocs.labels tmplocs.labels };
+        [uniquechan ord1 ord2 ]  = unique( allchans );
+        
+        [tmp rminds] = intersect( uniquechan, { alllocs.labels });
+        ord1(rminds) = [];
+        tmplocsind = ord1-length(alllocs);
+        
+        newlocs = [ alllocs tmplocs(tmplocsind) ];
+
+    end;
+    alllocs = newlocs;
 end;
 
 % union of two channel location structure
