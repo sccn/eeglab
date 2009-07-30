@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2008/04/16 17:55:12  arno
+% interpolation plus removing ICA components
+%
 % Revision 1.35  2007/08/15 23:29:23  arno
 % change EEG.pnts depending on the window time range
 %
@@ -255,7 +258,12 @@ if ~isempty(g.timerange)
     EEG.pnts = length(timebef);
 end;
 if strcmpi(g.specmode, 'psd')
-    [X, f] = spectopo(X, EEG.pnts, EEG.srate, 'plot', 'off', 'nfft', g.nfft, spec_opt{:});  
+    if ~isempty(EEG.event)
+         boundaries = strmatch('boundary', lower({ EEG.event.type }));
+         boundaries = [0 [ EEG.event(boundaries).latency ]-0.5 EEG.pnts ];
+    else boundaries = [];
+    end;
+    [X, f] = spectopo(X, EEG.pnts, EEG.srate, 'plot', 'off', 'boundaries', boundaries, 'nfft', g.nfft, spec_opt{:});
 else
     tmp   = fft(X, g.nfft, 2);
     f     = linspace(0, EEG.srate/2, size(tmp,2)/2);
