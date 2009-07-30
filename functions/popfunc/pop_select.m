@@ -96,6 +96,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.66  2009/07/28 04:01:27  arno
+% fixing channel selection when no channel labels are present
+%
 % Revision 1.65  2009/07/08 00:21:21  arno
 % *** empty log message ***
 %
@@ -404,7 +407,9 @@ if ~iscell(g.nochannel) & ~iscell(chanlist)
     g.channel = [1:EEG.nbchan];
 end;
 g.channel = sort(setdiff( lower(g.channel), lower(g.nochannel) ));
-g.channel = eeg_decodechan(EEG.chanlocs, g.channel);
+if ~isempty(EEG.chanlocs)
+    g.channel = eeg_decodechan(EEG.chanlocs, g.channel);
+end;
 
 if ~isempty(g.time) & (g.time(1) < EEG.xmin*1000) & (g.time(2) > EEG.xmax*1000)
    error('Wrong time range');
