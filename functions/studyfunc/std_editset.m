@@ -71,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.60  2009/07/10 01:30:00  arno
+% remove reference to setind field
+%
 % Revision 1.59  2009/04/27 21:08:14  arno
 % Matlab 6.1 compatibility
 %
@@ -320,7 +323,9 @@ for k = 1:2:length(g.commands)
             STUDY.datasetinfo(end+2)           = STUDY.datasetinfo(end);
             STUDY.datasetinfo(g.commands{k+1}) = STUDY.datasetinfo(end-1);
             STUDY.datasetinfo(end-1:end)       = [];
-            STUDY.datasetinfo = rmfield(STUDY.datasetinfo, 'index');
+            if isfield(STUDY.datasetinfo, 'index')
+                STUDY.datasetinfo = rmfield(STUDY.datasetinfo, 'index');
+            end;
             STUDY.datasetinfo(1).index = [];
             STUDY.changrp = [];
         case 'return', return;
