@@ -150,6 +150,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.236  2009/07/02 22:18:56  arno
+% comment code
+%
 % Revision 1.235  2009/06/30 19:34:08  arno
 % backward compatibility for reference
 %
@@ -1706,6 +1709,9 @@ for inddataset = 1:length(ALLEEG)
                 EEG.chaninfo.shrink = EEG.chanlocs(1).shrink;
                 EEG.chanlocs = rmfield( EEG.chanlocs, 'shrink');
             end;
+            
+            % reference
+            % ---------
             if strcmpi(EEG.ref, 'averef')
                  ref = 'average';
             else ref = '';
@@ -1720,6 +1726,11 @@ for inddataset = 1:length(ALLEEG)
                     ref = '';
                 end;
             end;
+            
+            if isfield(EEG.chanlocs, 'datachan'), EEG.chanlocs = rmfield(EEG.chanlocs, 'datachan'); end;
+            try
+                EEG.chanlocs = orderfields(EEG.chanlocs, { 'labels' 'theta' 'radius' 'X' 'Y' 'Z' 'sph_theta' 'sph_phi' 'sph_radius' 'type' 'urchan' 'ref' });
+            catch, end;
             if isfield( EEG.chaninfo, 'nodatchan')
                 if ~isfield( EEG.chaninfo.nodatchan, 'ref')
                     EEG.chaninfo.nodatchan(1).ref = '';
@@ -1729,6 +1740,7 @@ for inddataset = 1:length(ALLEEG)
                         EEG.chaninfo.nodatchan(tmpind).ref = '';
                     end;
                 end;
+                if isfield(EEG.chaninfo.nodatchan, 'datachan'), EEG.chaninfo.nodatchan = rmfield(EEG.chaninfo.nodatchan, 'datachan'); end;
             end;
 
             % check if duplicate channel label
