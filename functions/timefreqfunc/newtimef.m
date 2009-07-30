@@ -329,6 +329,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.170  2009/07/28 16:56:33  arno
+% remove baseline from output only when necessary
+%
 % Revision 1.169  2009/07/02 23:29:36  arno
 % rename all instanced of bootstrap to permutation
 %
@@ -1966,12 +1969,12 @@ baselength = length(baseln);
 % ---------------
 Pout = 10 * log10(P);
 if ~isnan(g.baseline)
-    Pout = Pout - 10*log10(repmat(log10(mbase),[1 length(timesout)]));
+    Pout = Pout - 10*repmat(log10(mbase),[1 length(timesout)]);
 end;
 if ~isempty(Pboot) & isnan(g.pboot)
      Pbootout = 10 * log10(Pboot);
      if ~isnan(g.baseline)
-        Pbootout = Pbootout - 10*log10(repmat(log10(mbase),[1 size(Pboot,2)])); % convert to (10log10) dB
+        Pbootout = Pbootout - 10*log10(repmat(mbase,[1 size(Pboot,2)])); % convert to (10log10) dB
      end;
 else Pbootout = [];
 end;
