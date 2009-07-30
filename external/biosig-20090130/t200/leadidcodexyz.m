@@ -23,7 +23,7 @@ function [HDR] = leadidcodexyz(arg1)
 % as published by the Free Software Foundation; either version 3
 % of the License, or (at your option) any later version.
 
-%	$Id: leadidcodexyz.m,v 1.1 2009-01-30 06:04:41 arno Exp $
+%	$Id: leadidcodexyz.m,v 1.2 2009-07-30 04:38:04 arno Exp $
 %	Copyright (C) 2006,2007,2008,2009 by Alois Schloegl <a.schloegl@ieee.org>	
 %    	This is part of the BIOSIG-toolbox http://biosig.sf.net/
 
@@ -45,7 +45,10 @@ if ~BIOSIG_GLOBAL.ISLOADED_XYZ;
         BIOSIG_GLOBAL.ISLOADED_XYZ = 0 ;
 
         N = 0;
-        fid = fopen(fullfile(p,'doc','leadidtable_scpecg.txt'),'r');
+        if exist('leadidtable_scpecg.txt')
+             fid = fopen('leadidtable_scpecg.txt','r');
+        else fid = fopen(fullfile(p,'doc','leadidtable_scpecg.txt'),'r');
+        end;
         s = char(fread(fid,[1,inf],'uint8')); 
         fclose(fid);
         
@@ -72,7 +75,10 @@ if ~BIOSIG_GLOBAL.ISLOADED_XYZ;
         N1 = N;
 
         % load table 
-        fid = fopen(fullfile(p,'doc','elecpos.txt'),'r');
+        if exist('elecpos.txt')
+             fid = fopen('elecpos.txt','r');
+        else fid = fopen(fullfile(p,'doc','elecpos.txt'),'r');
+        end;
         t = char(fread(fid,[1,inf],'uint8'));
         fclose(fid);
 

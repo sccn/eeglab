@@ -28,7 +28,7 @@ function [out,scale] = physicalunits(arg1)
 % as published by the Free Software Foundation; either version 3
 % of the License, or (at your option) any later version.
 
-%	$Id: physicalunits.m,v 1.1 2009-01-30 06:04:42 arno Exp $
+%	$Id: physicalunits.m,v 1.2 2009-07-30 04:38:04 arno Exp $
 %	Copyright (C) 2005,2008 by Alois Schloegl <a.schloegl@ieee.org>	
 %    	This is part of the BIOSIG-toolbox http://biosig.sf.net/
 
@@ -45,7 +45,10 @@ if ~BIOSIG_GLOBAL.ISLOADED;
 	
 	%%%---------- Load Decimal factors ------------%%%
 	BIOSIG_GLOBAL.ISLOADED = 0 ; 
-	[fid,msg]  = fopen(fullfile(p,'doc','DecimalFactors.txt'),'rt','ieee-le');
+    if exist('DecimalFactors.txt')
+         [fid,msg]  = fopen('DecimalFactors.txt','rt','ieee-le');
+    else [fid,msg]  = fopen(fullfile(p,'doc','DecimalFactors.txt'),'rt','ieee-le');
+    end;
         line = fgetl(fid);
         N1   = 0; N2 = 0; 
         while ~feof(fid), 
@@ -67,7 +70,11 @@ if ~BIOSIG_GLOBAL.ISLOADED;
 	BIOSIG_GLOBAL.DecimalFactor = DecimalFactor;
 
 	%%%---------- Physical units ------------%%%
-	fid = fopen(fullfile(p,'doc','units.csv'));
+    if exist('units.csv')
+         fid = fopen('units.csv');
+    else fid = fopen(fullfile(p,'doc','units.csv'));
+    end;
+	
         line = fgetl(fid);
         N1 = 0; N2 = 0;
         while ~feof(fid),
