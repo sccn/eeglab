@@ -59,6 +59,18 @@ function [type] = senstype(sens, desired)
 % Copyright (C) 2007-2008, Robert Oostenveld
 %
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2009/07/29 08:04:38  roboos
+% cleaned up the code, no functional change
+%
+% Revision 1.18  2009/07/28 11:16:23  roboos
+% removed keyboard statement, thanks to Jurrian
+%
+% Revision 1.17  2009/07/28 10:17:41  roboos
+% make distinction between only label, label+pnt and label+pnt+ori
+%
+% Revision 1.16  2009/07/27 16:04:51  roboos
+% improved distinction between eeg and meg, fixes problem with biosemi-eeg being detected as "ctf" due to reference channel match
+%
 % Revision 1.15  2009/06/19 16:51:50  vlalit
 % Added biosemi64 system of  Diane Whitmer, I don't know how generic it is.
 %
@@ -142,14 +154,20 @@ if isfield(sens, 'type')
   % preferably the structure specifies its own type
   type = sens.type;
 
+elseif issubfield(sens, 'orig.FileHeader') &&  issubfield(sens, 'orig.VarHeader')
+  % this is a complete header that was read from a Plexon *.nex file using read_plexon_nex
+  type = 'plexon';
+
 else
   % start with unknown, then try to determine the proper type by looking at the labels
   type = 'unknown';
 
-  if isfield(sens, 'label')
+  if isfield(sens, 'label') && isfield(sens, 'pnt') && isfield(sens, 'ori')
     % probably this is MEG, determine the type of magnetometer/gradiometer system
     % note that the order here is important: first check whether it matches a 275 channel system, then a 151 channel system, since the 151 channels are a subset of the 275
-    if (mean(ismember(senslabel('ctf275'),            sens.label)) > 0.8) || (mean(ismember(senslabel('ctfheadloc'), sens.label)) > 0.8)
+    if     (mean(ismember(senslabel('ctf275'),        sens.label)) > 0.8)
+      type = 'ctf275';
+    elseif (mean(ismember(senslabel('ctfheadloc'),    sens.label)) > 0.8)  % look at the head localization channels
       type = 'ctf275';
     elseif (mean(ismember(senslabel('ctf151'),        sens.label)) > 0.8)
       type = 'ctf151';
@@ -181,14 +199,18 @@ else
       type = 'ctf'; % it might be 151 or 275 channels
     elseif isfield(sens, 'pnt') && isfield(sens, 'ori') && numel(sens.label)==numel(sens.pnt)
       type = 'magnetometer';
-    elseif isfield(sens, 'pnt') && isfield(sens, 'ori')
+    else
       type = 'meg';
-    elseif (mean(ismember(senslabel('biosemi256'),    sens.label)) > 0.8)
+    end
+
+  elseif isfield(sens, 'label') && isfield(sens, 'pnt') && ~isfield(sens, 'ori')
+    % probably this is EEG
+    if     (mean(ismember(senslabel('biosemi256'),    sens.label)) > 0.8)
       type = 'biosemi256';
     elseif (mean(ismember(senslabel('biosemi128'),    sens.label)) > 0.8)
-        type = 'biosemi128';
+      type = 'biosemi128';
     elseif (mean(ismember(senslabel('biosemi64'),     sens.label)) > 0.8)
-        type = 'biosemi64';
+      type = 'biosemi64';
     elseif (mean(ismember(senslabel('egi256'),        sens.label)) > 0.8)
       type = 'egi256';
     elseif (mean(ismember(senslabel('egi128'),        sens.label)) > 0.8)
@@ -199,19 +221,65 @@ else
       type = 'egi32';
     elseif (sum(ismember(sens.label,         senslabel('eeg1005'))) > 10) % Otherwise it's not even worth recognizing
       type = 'ext1020';
-    elseif isfield(sens, 'label') && isfield(sens, 'pnt') && ~isfield(sens, 'ori')  % looks like EEG
+    else
       type = 'electrode';
     end
-  end
 
+  elseif isfield(sens, 'label') && ~isfield(sens, 'pnt') && ~isfield(sens, 'ori')
+    % look only at the channel labels
+    if     (mean(ismember(senslabel('ctf275'),        sens.label)) > 0.8)
+      type = 'ctf275';
+    elseif (mean(ismember(senslabel('ctfheadloc'),    sens.label)) > 0.8)  % look at the head localization channels
+      type = 'ctf275';
+    elseif (mean(ismember(senslabel('ctf151'),        sens.label)) > 0.8)
+      type = 'ctf151';
+    elseif (mean(ismember(senslabel('ctf64'),         sens.label)) > 0.8)
+      type = 'ctf64';
+    elseif (mean(ismember(senslabel('ctf275_planar'), sens.label)) > 0.8)
+      type = 'ctf275_planar';
+    elseif (mean(ismember(senslabel('ctf151_planar'), sens.label)) > 0.8)
+      type = 'ctf151_planar';
+    elseif (mean(ismember(senslabel('bti248'),        sens.label)) > 0.8)
+      type = 'bti248';
+    elseif (mean(ismember(senslabel('bti148'),        sens.label)) > 0.8)
+      type = 'bti148';
+    elseif (mean(ismember(senslabel('bti248_planar'), sens.label)) > 0.8)
+      type = 'bti248_planar';
+    elseif (mean(ismember(senslabel('bti148_planar'), sens.label)) > 0.8)
+      type = 'bti148_planar';
+    elseif (mean(ismember(senslabel('neuromag306'),   sens.label)) > 0.8)
+      type = 'neuromag306';
+    elseif (mean(ismember(senslabel('neuromag306alt'),sens.label)) > 0.8)  % an alternative set without spaces in the name
+      type = 'neuromag306';
+    elseif (mean(ismember(senslabel('neuromag122'),   sens.label)) > 0.8)
+      type = 'neuromag122';
+    elseif (mean(ismember(senslabel('neuromag122alt'),sens.label)) > 0.8)  % an alternative set without spaces in the name
+      type = 'neuromag122';
+    elseif (mean(ismember(senslabel('biosemi256'),    sens.label)) > 0.8)
+      type = 'biosemi256';
+    elseif (mean(ismember(senslabel('biosemi128'),    sens.label)) > 0.8)
+      type = 'biosemi128';
+    elseif (mean(ismember(senslabel('biosemi64'),     sens.label)) > 0.8)
+      type = 'biosemi64';
+    elseif (mean(ismember(senslabel('egi256'),        sens.label)) > 0.8)
+      type = 'egi256';
+    elseif (mean(ismember(senslabel('egi128'),        sens.label)) > 0.8)
+      type = 'egi128';
+    elseif (mean(ismember(senslabel('egi64'),         sens.label)) > 0.8)
+      type = 'egi64';
+    elseif (mean(ismember(senslabel('egi32'),         sens.label)) > 0.8)
+      type = 'egi32';
+    elseif (sum(ismember(sens.label,         senslabel('eeg1005'))) > 10) % Otherwise it's not even worth recognizing
+      type = 'ext1020';
+    elseif any(ismember(senslabel('btiref'), sens.label))
+      type = 'bti'; % it might be 148 or 248 channels
+    elseif any(ismember(senslabel('ctfref'), sens.label))
+      type = 'ctf'; % it might be 151 or 275 channels
+    end
+
+  end % look at label, ori and/or pnt
 end % if isfield(sens, 'type')
 
-% use an alternative approach if it is still unknown
-if strcmp(type, 'unknown') && issubfield(sens, 'orig.FileHeader') &&  issubfield(sens, 'orig.VarHeader')
-  % this is a complete header that was read from a Plexon *.nex file using read_plexon_nex
-  type = 'plexon';
-end
-  
 if ~isempty(desired)
   % return a boolean flag
   switch desired
@@ -239,8 +307,8 @@ if ~isempty(desired)
       type = any(strcmp(type, {'neuromag122' 'neuromag306' 'ctf151_planar' 'ctf275_planar' 'bti148_planar' 'bti248_planar' 'yokogawa160_planar'}));
     otherwise
       type = any(strcmp(type, desired));
-  end
-end
+  end % switch desired
+end % detemine the correspondence to the desired type
 
 % remember the current input and output arguments, so that they can be
 % reused on a subsequent call in case the same input argument is given
@@ -250,4 +318,4 @@ if isempty(previous_argin)
   previous_argout = current_argout;
 end
 
-return % voltype main()
+return % senstype main()
