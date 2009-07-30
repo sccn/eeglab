@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2009/07/02 19:30:33  arno
+% fix problem with empty channel
+%
 % Revision 1.4  2009/07/02 18:23:33  arno
 % fixing interpolation
 %
@@ -136,7 +139,8 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method)
     [tmp indgood ] = intersect(goodchans, nonemptychans);
     goodchans = goodchans( sort(indgood) );
     datachans = getdatachans(goodchans,badchans);
-
+    badchans  = intersect(badchans, nonemptychans);
+    
     % scan data points
     % ----------------
     if strcmpi(method, 'spherical')
