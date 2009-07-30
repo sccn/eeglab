@@ -73,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.38  2009/02/09 11:03:20  arno
+% Fix CVS problem for Windows
+%
 % Revision 1.37  2007/03/05 18:55:00  arno
 % fixed helpcom for string and cell array
 %
@@ -265,8 +268,10 @@ if ~isempty(g.eval), eval(g.eval); end;
 
 % create figure and wait for return
 % ---------------------------------
-if isstr(g.mode) & strcmpi(g.mode, 'plot')
-   return; % only plot and returns
+if isstr(g.mode) & (strcmpi(g.mode, 'plot') | strcmpi(g.mode, 'return') )
+    if strcmpi(g.mode, 'plot')
+       return; % only plot and returns
+    end;
 else 
 	waitfor( findobj('parent', fig, 'tag', 'ok'), 'userdata');
 end;
@@ -300,7 +305,7 @@ if nargout >= 4
 	resstruct = myguihandles(fig);
 end;
 
-if isstr(g.mode) & strcmp(g.mode, 'normal')
+if isstr(g.mode) & ( strcmp(g.mode, 'normal') | strcmp(g.mode, 'return') )
 	close(fig);
 end;
 drawnow; % for windows
