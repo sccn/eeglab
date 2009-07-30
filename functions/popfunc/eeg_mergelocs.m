@@ -29,6 +29,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2009/07/30 19:27:10  arno
+% handles dataset with different channel order
+%
 % Revision 1.2  2008/04/16 17:35:57  arno
 % simplify code, added one optional input
 %
@@ -38,10 +41,20 @@
 
 function alllocs = eeg_mergelocs(varargin)
 
+% sort by length
+% --------------
+len = cellfun(@length, varargin);
+[tmp so] = sort(len, 2, 'descend');
+varargin = varargin(so);
+
 alllocs = varargin{1};
 for index = 2:length(varargin)
+    
+    % fuse while preserving order (assumes the same channel order)
+    % ------------------------------------------------------------
     tmplocs = varargin{index};
     newlocs = myunion(alllocs, tmplocs);
+    
     if length(newlocs) > length(union({ alllocs.labels }, { tmplocs.labels }))
 
         disp('Warning: different channel montage order for the different datasets');
