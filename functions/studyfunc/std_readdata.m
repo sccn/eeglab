@@ -99,6 +99,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.49  2009/07/10 01:49:14  arno
+% Implement reading PAC data
+%
 % Revision 1.48  2009/07/07 23:05:24  arno
 % fix index bug
 %
@@ -498,7 +501,7 @@ for ind = 1:length(finalinds)
                     for g = 1:ng
                         for indtmp = 1:length(allinds{c,g})
                             if strcmpi(filetype, 'spec')
-                                [ tmpspec allfreqs ] = std_readspec( ALLEEG, setinds{c,g}(indtmp), allinds{c,g}(indtmp), opt.freqrange, strcmpi(opt.rmsubjmean, 'on'));
+                                [ tmpspec allfreqs ] = std_readspec( ALLEEG, setinds{c,g}(indtmp), allinds{c,g}(indtmp), opt.freqrange); %, strcmpi(opt.rmsubjmean, 'on'));
                                 allspec{c, g}(:,indtmp) = tmpspec(:);
                             else
                                 [ tmpersp allfreqs alltimes tmpparams tmpspec] = std_readersp( ALLEEG, setinds{c,g}(indtmp), allinds{c,g}(indtmp), [], opt.freqrange);
@@ -509,6 +512,26 @@ for ind = 1:length(finalinds)
                     end;
                 end;
                 fprintf('\n');
+                
+                % remove mean of each subject across groups and conditions
+                if strcmpi(opt.rmsubjmean, 'on') & ~isempty(opt.channels)
+                    disp('Removing mean spectrum accross subjects');
+                    for indtmp = 1:length(allinds{c,g}) % scan subjects
+                       meanspec =zeros(size( allspec{1, 1}(:,indtmp) ));
+                       for c = 1:nc
+                            for g = 1:ng
+                                meanspec = meanspec + allspec{c, g}(:,indtmp)/(nc*ng);
+                            end;
+                       end;
+                       for c = 1:nc
+                            for g = 1:ng
+                                allspec{c, g}(:,indtmp) = allspec{c, g}(:,indtmp) - meanspec; % subtractive model
+                                % allspec{c, g}(:,indtmp) = allspec{c, g}(:,indtmp)./meanspec; % divisive model
+                            end;
+                       end;
+                    end;
+                end;
+                
                 tmpstruct.specfreqs = allfreqs;
                 tmpstruct.specdata  = allspec;
             end;
