@@ -26,6 +26,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2007/08/23 19:23:11  nima
+% DIPOLEDENSITY_STDBEM variables added to locate mni mesh
+%
 % Revision 1.17  2007/08/16 19:46:25  arno
 % fix template coordinate assignment
 %
@@ -149,30 +152,33 @@ defaultvolume.o = [0 0 0];
 % ----------------------
 folder = which('pop_dipfit_settings');
 folder = folder(1:end-21);
-delim  = folder(end);
-template_models(1).name     = 'Spherical Four-Shell (BESA)';
-template_models(1).hdmfile  = [ folder 'standard_BESA' delim 'standard_BESA.mat' ];
-template_models(1).mrifile  = [ folder 'standard_BESA' delim 'avg152t1.mat' ];
-template_models(1).chanfile = [ folder 'standard_BESA' delim 'standard-10-5-cap385.elp' ];
-template_models(1).coordformat = 'spherical';
-template_models(1).coord_transform(1).transform = [ ];
-template_models(1).coord_transform(1).keywords  = { 'standard-10-5-cap385' };
-template_models(1).coord_transform(2).transform = [ 0 0 0 0 0 0 8 11 10 ];
-template_models(1).coord_transform(2).keywords  = { 'gsn' 'sfp' '12' };
-template_models(1).coord_transform(3).transform = [ 0 0 0 0 0.02 0 85 85 85 ];
-template_models(1).coord_transform(3).keywords  = { 'egi' 'elp' };
+try,
+    delim  = folder(end);
+    template_models(1).name     = 'Spherical Four-Shell (BESA)';
+    template_models(1).hdmfile  = [ folder 'standard_BESA' delim 'standard_BESA.mat' ];
+    template_models(1).mrifile  = [ folder 'standard_BESA' delim 'avg152t1.mat' ];
+    template_models(1).chanfile = [ folder 'standard_BESA' delim 'standard-10-5-cap385.elp' ];
+    template_models(1).coordformat = 'spherical';
+    template_models(1).coord_transform(1).transform = [ ];
+    template_models(1).coord_transform(1).keywords  = { 'standard-10-5-cap385' };
+    template_models(1).coord_transform(2).transform = [ 0 0 0 0 0 0 8 11 10 ];
+    template_models(1).coord_transform(2).keywords  = { 'gsn' 'sfp' '12' };
+    template_models(1).coord_transform(3).transform = [ 0 0 0 0 0.02 0 85 85 85 ];
+    template_models(1).coord_transform(3).keywords  = { 'egi' 'elp' };
 
-template_models(2).name     = 'Boundary Element Model (MNI)';
-template_models(2).hdmfile  = [ folder 'standard_BEM' delim 'standard_vol.mat' ] ;
-template_models(2).mrifile  = [ folder 'standard_BEM' delim 'standard_mri.mat' ];
-template_models(2).chanfile = [ folder 'standard_BEM' delim 'elec' delim 'standard_1005.elc' ];
-template_models(2).coordformat = 'MNI';
-template_models(2).coord_transform(1).transform = [ 0 0 0 0 0 -pi/2  1 1 1];
-template_models(2).coord_transform(1).keywords  = { 'standard_1005' };
-template_models(2).coord_transform(2).transform = [ 0 -15 4 0.05 0 -1.571 10.2 12 12.2 ];
-template_models(2).coord_transform(2).keywords  = { 'gsn' 'sfp' '12' };
-template_models(2).coord_transform(3).transform = [ 0 -15 0 0.08 0 -1.571 102 93 100 ];
-template_models(2).coord_transform(3).keywords  = { 'egi' 'elp' };
+    template_models(2).name     = 'Boundary Element Model (MNI)';
+    template_models(2).hdmfile  = [ folder 'standard_BEM' delim 'standard_vol.mat' ] ;
+    template_models(2).mrifile  = [ folder 'standard_BEM' delim 'standard_mri.mat' ];
+    template_models(2).chanfile = [ folder 'standard_BEM' delim 'elec' delim 'standard_1005.elc' ];
+    template_models(2).coordformat = 'MNI';
+    template_models(2).coord_transform(1).transform = [ 0 0 0 0 0 -pi/2  1 1 1];
+    template_models(2).coord_transform(1).keywords  = { 'standard_1005' };
+    template_models(2).coord_transform(2).transform = [ 0 -15 4 0.05 0 -1.571 10.2 12 12.2 ];
+    template_models(2).coord_transform(2).keywords  = { 'gsn' 'sfp' '12' };
+    template_models(2).coord_transform(3).transform = [ 0 -15 0 0.08 0 -1.571 102 93 100 ];
+    template_models(2).coord_transform(3).keywords  = { 'egi' 'elp' };
+catch,
+end;
 
 template_models(3).name        = 'CTF MEG';
 template_models(3).coordformat = 'CTF';
