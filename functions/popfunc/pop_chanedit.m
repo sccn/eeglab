@@ -142,6 +142,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.181  2009/07/30 05:22:18  arno
+% fix ref filed when looking up file`
+%
 % Revision 1.180  2009/07/01 23:01:09  arno
 % nicer checkbox
 %
@@ -722,7 +725,7 @@ if isempty(chans) | ~isnumeric(chans)
     % ----------------------------------------------
     nbchan = length(chans);
     [chans chaninfo] = insertchans(chans, chaninfo, nchansori);
-
+    
     allfields = { 'labels' 'theta' 'radius' 'X' 'Y' 'Z' 'sph_theta' 'sph_phi' 'sph_radius' 'type' 'ref' 'urchan' 'datachan' };
 
     if isfield(chans, 'shrink')
@@ -1413,8 +1416,8 @@ else
 
     % move no data channels to info structure
     % ---------------------------------------
-    if isfield(chans, 'datachan'), chans = rmfield(chans, 'datachan'); end;
     [chans chaninfo.nodatchans] = getnodatchan(chans);
+    if isfield(chans, 'datachan'), chans = rmfield(chans, 'datachan'); end;
     if isempty(chaninfo.nodatchans), chaninfo = rmfield(chaninfo, 'nodatchans'); end;
 
     if dataset_input,
@@ -1522,7 +1525,7 @@ if nargin < 3, nchans = length(chans); end;
 for ind = 1:length(chans)
     chans(ind).datachan = 1;
 end;
-if length(chans) > nchans % reference at the end of the structure
+if length(chans) > nchans & nchans ~= 0 % reference at the end of the structure
     chans(end).datachan = 0;
 end;
 if isfield(chaninfo, 'nodatchans')
