@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2009/07/17 21:59:10  arno
+% fixing std_readpac
+%
 % Revision 1.1  2009/07/13 21:10:26  arno
 % still working on std_pac
 %
@@ -58,6 +61,7 @@ end
     'clusters2'  'integer' []       [];
     'onepersubj' 'string' { 'on' 'off' } 'off';
     'forceread'  'string' { 'on' 'off' } 'off';
+    'recompute'  'string' { 'on' 'off' } 'off';
     'freqrange'  'real'    []       [];
     'timerange'  'real'    []       [] }, ...
     'std_readpac', 'ignore');
@@ -107,7 +111,7 @@ for ind1 = 1:len1 % usually only one channel/component
         % check if data is already here
         % -----------------------------
         dataread = 0;
-        if isfield(tmpstruct1, 'pacdata') & strcmpi(opt.forceread, 'off')
+        if isfield(tmpstruct1, 'pacdata') & strcmpi(opt.forceread, 'off') & strcmpi(opt.recompute, 'off')
             if ~isempty(tmpstruct1.pacdata) & iscell(tmpstruct1.pacdata) & length(tmpstruct1.pacdata) >= opt.indices2(ind2)
                 if ~isempty(tmpstruct1.pacdata{opt.indices2(ind2)})
                     %if isequal( STUDY.etc.pacparams.timerange, opt.timerange) & ...
@@ -148,8 +152,8 @@ for ind1 = 1:len1 % usually only one channel/component
                         
                         if ~isempty(inds1) & ~isempty(inds2)
                             if ~isempty(opt.channels1)
-                                 [pacarraytmp allfreqs alltimes] = std_pac( ALLEEG(subj), 'channels1'  , allinds1{c,g}(inds1), 'channels2',   allinds2{c,g}(inds2), 'timerange', opt.timerange, 'freqrange', opt.freqrange, moreopts{:});
-                            else [pacarraytmp allfreqs alltimes] = std_pac( ALLEEG(subj), 'components1', allinds1{c,g}(inds1), 'components2', allinds2{c,g}(inds2), 'timerange', opt.timerange, 'freqrange', opt.freqrange, moreopts{:});
+                                 [pacarraytmp allfreqs alltimes] = std_pac( ALLEEG(subj), 'channels1'  , allinds1{c,g}(inds1), 'channels2',   allinds2{c,g}(inds2), 'timerange', opt.timerange, 'freqrange', opt.freqrange, 'recompute', opt.recompute, moreopts{:});
+                            else [pacarraytmp allfreqs alltimes] = std_pac( ALLEEG(subj), 'components1', allinds1{c,g}(inds1), 'components2', allinds2{c,g}(inds2), 'timerange', opt.timerange, 'freqrange', opt.freqrange, 'recompute', opt.recompute, moreopts{:});
                             end;
                             
                             % collapse first 2 dimentions (comps x comps)
