@@ -27,6 +27,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2006/02/17 02:46:52  scott
+% edited error msg -sm
+%
 % Revision 1.2  2006/01/31 19:59:42  arno
 % fixing matlab 5 etc ...
 %
@@ -42,15 +45,34 @@ function eeglab_error;
     % handling errords
     % ----------------
     tmplasterr = lasterr;
-    try
-        tmp = lasterror;
-        tmperr = [ 'EEGLAB error in function ' tmp.stack(1).name '() at line ' int2str(tmp.stack(1).line) ':' 10 10 lasterr ];
-    catch % Matlab 5 and when the stack is empty
-        tmperr = [ 'EEGLAB error:' 10 10 tmplasterr ];
+    [iseeglaberror tmplasterr header] = testeeglaberror(tmplasterr);
+    if iseeglaberror
+        errordlg2(tmplasterr, header);
+    else
+        try
+            tmp = lasterror;
+            tmperr = [ 'EEGLAB error in function ' tmp.stack(1).name '() at line ' int2str(tmp.stack(1).line) ':' 10 10 lasterr ];
+        catch % Matlab 5 and when the stack is empty
+            tmperr = [ 'EEGLAB error:' 10 10 tmplasterr ];
+        end;
+        tmperr = [ tmperr 10 10 'If you think this is a bug, please send a detailed' 10 ...
+                                'description of how to reproduce the problem, with' 10 ...
+                                'a (small) test dataset, to eeglab@sccn.ucsd.edu' ];
+        errordlg2(tmperr, header);
     end;
-    tmperr = [ tmperr 10 10 'If you think this is a bug, please send a detailed' 10 ...
-                            'description of how to reproduce the problem, with' 10 ...
-                            'a (small) test dataset, to eeglab@sccn.ucsd.edu' ];
-    errordlg2(tmperr, 'EEGLAB error');
     
+    function [ val str header ] = testeeglaberror(str);
+        header = 'EEGLAB error';
+        val = 0;
+        try,
+            if strcmp(str(1:5), 'Error'), 
+                val = 1; 
+                str = str(17:end);
+                indspace = find(str == ' ');
+                funcname = str(1:indspace(1));
+                indendofline = find(str == 10);
+                str = str(indendofline(1)+1:end);
+                header = [ funcname ' error' ];
+            end;
+        catch, end;
     

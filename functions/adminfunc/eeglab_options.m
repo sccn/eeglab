@@ -25,6 +25,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2009/07/02 21:04:34  arno
+% only clearing the eeg_options function
+%
 % Revision 1.3  2008/04/16 17:43:42  arno
 % nothing
 %
@@ -40,30 +43,37 @@
 try,
     clear eeg_options;
     
-    W_MAIN = findobj('tag', 'EEGLAB');
-    if ~isempty(W_MAIN)
-        tmpuserdata = get(W_MAIN, 'userdata');
-        tmp_opt_path = tmpuserdata{3}; % this contain the default path to the option file
+    if iseeglabdeployed
+        com1 = evaltxtfile(fullfile(eeglabexefolder, 'eeg_optionsbackup.txt'));
+        com2 = evaltxtfile(fullfile(eeglabexefolder, 'eeg_options.txt'));
+        eval( com1 );
+        eval( com2 );
     else
-        tmp_opt_path = '';
-    end;
-    
-    tmp_opt_path2 = which('eeg_options');
-    tmp_opt_path2 = fileparts( tmp_opt_path2 );
-    if ~isempty(tmp_opt_path) & ~strcmpi(tmp_opt_path2, tmp_opt_path)
-        if exist(fullfile(tmp_opt_path, 'eeg_options.m')) == 2
-            fprintf('Warning: you should delete the eeg_option.m file in folder %s\n', tmp_opt_path2);
-            fprintf('         using instead the eeg_option.m file accessible at EEGLAB startup in %s\n', tmp_opt_path);
-            fprintf('         To use the first option file, restart EEGLAB and reload datasets\n');
-            addpath(tmp_opt_path);
+        W_MAIN = findobj('tag', 'EEGLAB');
+        if ~isempty(W_MAIN)
+            tmpuserdata = get(W_MAIN, 'userdata');
+            tmp_opt_path = tmpuserdata{3}; % this contain the default path to the option file
         else
-            fprintf('IMPORTANT WARNING: the current eeg_option.m file in %s HAS BEEN DELETED\n', tmp_opt_path);
-            fprintf('                   EEGLAB SHOULD BE RESTARTED TO ENSURE STABILITY\n', tmp_opt_path);
+            tmp_opt_path = '';
         end;
-    end;
+
+        tmp_opt_path2 = which('eeg_options');
+        tmp_opt_path2 = fileparts( tmp_opt_path2 );
+        if ~isempty(tmp_opt_path) & ~strcmpi(tmp_opt_path2, tmp_opt_path)
+            if exist(fullfile(tmp_opt_path, 'eeg_options.m')) == 2
+                fprintf('Warning: you should delete the eeg_option.m file in folder %s\n', tmp_opt_path2);
+                fprintf('         using instead the eeg_option.m file accessible at EEGLAB startup in %s\n', tmp_opt_path);
+                fprintf('         To use the first option file, restart EEGLAB and reload datasets\n');
+                addpath(tmp_opt_path);
+            else
+                fprintf('IMPORTANT WARNING: the current eeg_option.m file in %s HAS BEEN DELETED\n', tmp_opt_path);
+                fprintf('                   EEGLAB SHOULD BE RESTARTED TO ENSURE STABILITY\n', tmp_opt_path);
+            end;
+        end;
     
-    eeg_optionsbackup;
-    eeg_options;
+        eeg_optionsbackup;
+        eeg_options;
+    end;
     
     option_savematlab = ~option_savetwofiles;
     

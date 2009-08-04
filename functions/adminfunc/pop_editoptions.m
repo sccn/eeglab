@@ -72,6 +72,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.46  2009/04/21 22:11:21  arno
+% Now warning for memory mapping and showing it in the main interface
+%
 % Revision 1.45  2008/04/20 16:15:47  arno
 % fix backward compatibility
 %
@@ -224,7 +227,13 @@ end;
 % parse the eeg_options file
 % ----------------------------
 eeglab_options;
-filename = which('eeg_options.m');
+if iseeglabdeployed
+    filename = fullfile(eeglabexefolder,'eeg_options.txt');
+    eegoptionbackup = fullfile(eeglabexefolder,'eeg_optionsbackup.txt');
+else
+    filename = which('eeg_options.m');
+    eegoptionbackup = which('eeg_optionsbackup.m');
+end;
 fid = fopen( filename, 'r+');
 storelocal = 0;
 if	fid == -1
@@ -240,19 +249,19 @@ if	fid == -1
             try
                 filepath = uigetdir('', 'Pick a Directory');
             catch,
-                [filename filepath] = uigetfile('*.m', 'Pick a folder', 'eeg_options');
+                [tmp filepath] = uigetdir('*.m', 'Pick a folder', 'eeg_options');
             end;
 		end;
         if filepath(1) == 0, return; end;
         
         % see if the folder can be written into
         % -------------------------------------
-        fid = fopen( fullfile(filepath, 'eeg_options.m'), 'w');
+        fid = fopen( fullfile(filepath, filename), 'w');
         if fid == -1
             error('Cannot write into this folder');
         end;
         fclose(fid);
-        delete(fullfile(filepath, 'eeg_options.m'));
+        delete(fullfile(filepath, filename));
         
         % change default folder option
         % ----------------------------
@@ -265,17 +274,18 @@ if	fid == -1
         
         % read variables values and description
         % --------------------------------------
-        [ header opt ] = eeg_readoptions( 'eeg_optionsbackup.m' ); 
+        [ header opt ] = eeg_readoptions( eegoptionbackup ); 
 	else
 		error('File not found');
 	end;
 else 
     [filepath filename ext] = fileparts(filename);
+    filename  = [ filename ext ];
     fprintf('Using option file in directory %s\n', filepath);
     
     % read variables values and description
     % --------------------------------------
-    [ header opt ] = eeg_readoptions( 'eeg_optionsbackup.m' ); 
+    [ header opt ] = eeg_readoptions( eegoptionbackup ); 
     [ header opt ] = eeg_readoptions( fid, opt  ); % use opt from above as default
 end;
 
@@ -354,10 +364,10 @@ end;
 
 % write to eeg_options file
 % -------------------------
-fid = fopen( fullfile(filepath, 'eeg_options.m'), 'w');
+fid = fopen( fullfile(filepath, filename), 'w');
 addpath(filepath);
 if fid == -1
-	error('File error, check writing permission');
+	error('File writing error, check writing permission');
 end;
 fprintf(fid, '%s\n', header);
 for index = 1:length(opt)

@@ -73,8 +73,7 @@ function ALLEEG = std_loadalleeg(varargin)
     set = 1;
     ALLEEG = [];
     
-    eeg_optionsbackup;
-    eeg_options;
+    eeglab_options;
     
     % read datasets
     % -------------

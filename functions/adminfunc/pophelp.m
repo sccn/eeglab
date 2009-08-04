@@ -29,6 +29,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2006/10/02 11:33:52  arno
+% Just copy and paste
+% for another program?
+%
 % Revision 1.11  2005/02/03 18:51:34  arno
 % fixing missing character
 %
@@ -108,6 +112,10 @@ return;
 function [doc] = readfunc(funct, nonmatlab)
 
 doc = {};
+if iseeglabdeployed
+    if isempty(find(funct == '.')), funct = [ funct '.m' ]; end;
+    funct = fullfile(eeglabexefolder, 'help', funct);
+end;
 if nonmatlab	
 	fid = fopen( funct, 'r');
 else

@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.538  2009/07/01 21:38:53  arno
+% adding path better
+%
 % Revision 1.537  2009/07/01 21:18:00  arno
 % 64-bit PC windows and solaris
 %
@@ -1793,6 +1796,8 @@
 % 03-16-02 text interface editing -sm & ad 
 % 3/19/02 Help msg edited by sm 
 
+%#function matlabrc
+
 function [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab( onearg )
 
 % add the paths
@@ -1811,12 +1816,14 @@ end;
 
 % test for local SCCN copy
 % ------------------------
-addpath(eeglabpath);
+if ~iseeglabdeployed2
+    addpath(eeglabpath);
+    if exist( fullfile( eeglabpath, 'functions', 'adminfunc') ) ~= 7
+        warning('EEGLAB subfolders not found');
+    end;
+end;
 OPT_FOLDER = which('eeg_options');
 OPT_FOLDER = fileparts( OPT_FOLDER );
-if exist( fullfile( eeglabpath, 'functions', 'adminfunc') ) ~= 7
-    warning('EEGLAB subfolders not found');
-end;
 
 % determine file format
 % ---------------------
@@ -1832,27 +1839,28 @@ end;
 
 % add paths
 % ---------
-if strcmpi(fileformat, 'pcwin ')
-    myaddpath( eeglabpath, 'readeetraklocs.m', 'functions\sigprocfunc');
-    myaddpath( eeglabpath, 'eeg_checkset.m',   'functions\adminfunc');
-    myaddpath( eeglabpath, 'pop_study.m',      'functions\studyfunc');
-    myaddpath( eeglabpath, 'pop_loadbci.m',    'functions\popfunc');
-    myaddpath( eeglabpath, 'pop_loadbci.m',    'functions');
-    myaddpath( eeglabpath, 'timefreq.m',       'functions\timefreqfunc');
-    myaddpath( eeglabpath, 'icademo.m',        'functions\miscfunc');
-    myaddpath( eeglabpath, 'eeglab1020.ced',   'functions\resources');
-else 
-    myaddpath( eeglabpath, 'readeetraklocs.m', 'functions/sigprocfunc');
-    myaddpath( eeglabpath, 'eeg_checkset.m',   'functions/adminfunc');
-    myaddpath( eeglabpath, 'pop_loadbci.m',    'functions/popfunc');
-    myaddpath( eeglabpath, 'pop_loadbci.m',    'functions');
-    myaddpath( eeglabpath, 'timefreq.m',       'functions/timefreqfunc');
-    myaddpath( eeglabpath, 'pop_study.m',      'functions/studyfunc');
-    myaddpath( eeglabpath, 'icademo.m',        'functions/miscfunc');
-    myaddpath( eeglabpath, 'VolumeMNI.bin',    'functions/resources');
+if ~iseeglabdeployed2
+    if strcmpi(fileformat, 'pcwin ')
+        myaddpath( eeglabpath, 'readeetraklocs.m', 'functions\sigprocfunc');
+        myaddpath( eeglabpath, 'eeg_checkset.m',   'functions\adminfunc');
+        myaddpath( eeglabpath, 'pop_study.m',      'functions\studyfunc');
+        myaddpath( eeglabpath, 'pop_loadbci.m',    'functions\popfunc');
+        myaddpath( eeglabpath, 'pop_loadbci.m',    'functions');
+        myaddpath( eeglabpath, 'timefreq.m',       'functions\timefreqfunc');
+        myaddpath( eeglabpath, 'icademo.m',        'functions\miscfunc');
+        myaddpath( eeglabpath, 'eeglab1020.ced',   'functions\resources');
+    else 
+        myaddpath( eeglabpath, 'readeetraklocs.m', 'functions/sigprocfunc');
+        myaddpath( eeglabpath, 'eeg_checkset.m',   'functions/adminfunc');
+        myaddpath( eeglabpath, 'pop_loadbci.m',    'functions/popfunc');
+        myaddpath( eeglabpath, 'pop_loadbci.m',    'functions');
+        myaddpath( eeglabpath, 'timefreq.m',       'functions/timefreqfunc');
+        myaddpath( eeglabpath, 'pop_study.m',      'functions/studyfunc');
+        myaddpath( eeglabpath, 'icademo.m',        'functions/miscfunc');
+        myaddpath( eeglabpath, 'VolumeMNI.bin',    'functions/resources');
+    end;
+    myaddpath( eeglabpath, 'eegplugin_dipfit', 'plugins');
 end;
-myaddpath( eeglabpath, 'eegplugin_dipfit', 'plugins');
-
 eeglab_options; 
 if nargin == 1 &  strcmp(onearg, 'redraw')
     if evalin('base', 'exist(''EEG'')', '0') == 1
@@ -1908,13 +1916,14 @@ colordef white
 
 % default option folder
 % ---------------------
-if ~isempty(OPT_FOLDER)
-    fprintf('eeglab: options file is %s%seeg_options.m\n', OPT_FOLDER, filesep);
-    addpath( OPT_FOLDER );
-else
-    disp('eeglab: using default options');
+if ~iseeglabdeployed2
+    if ~isempty(OPT_FOLDER)
+        fprintf('eeglab: options file is %s%seeg_options.m\n', OPT_FOLDER, filesep);
+        addpath( OPT_FOLDER );
+    else
+        disp('eeglab: using default options');
+    end;
 end;
-
 % checking strings
 % ----------------
 e_try             = 'try,';
@@ -1993,76 +2002,80 @@ catchstrs.new_non_empty          = e_newset;
         disp('ICALAB toolbox detected (algo. added to "run ICA" interface)');
     end;
     
-    % adding all folders in external
-    % ------------------------------
-    disp(['Adding path to all EEGLAB functions']);
-    p = which('eeglab.m');
-    p = p(1:findstr(p,'eeglab.m')-1);
-    allseps = find( p == filesep );
-    p_parent = p(1:allseps(end-min(1,length(allseps))));
-    eeglabpath = p(allseps(end-min(1,length(allseps)))+1:end);
-    dircontent  = dir([ p 'external' ]);
-    dircontent  = { dircontent.name };
-    for index = 1:length(dircontent)
-        if dircontent{index}(1) ~= '.'
-            if exist([p 'external' filesep dircontent{index}]) == 7
-                addpath([p 'external' filesep dircontent{index}]);
-                disp(['Adding path to ' eeglabpath 'external' filesep dircontent{index}]);
+    if iseeglabdeployed2
+        biosigflag = 1;
+    else
+        % adding all folders in external
+        % ------------------------------
+        disp(['Adding path to all EEGLAB functions']);
+        p = which('eeglab.m');
+        p = p(1:findstr(p,'eeglab.m')-1);
+        allseps = find( p == filesep );
+        p_parent = p(1:allseps(end-min(1,length(allseps))));
+        eeglabpath = p(allseps(end-min(1,length(allseps)))+1:end);
+        dircontent  = dir([ p 'external' ]);
+        dircontent  = { dircontent.name };
+        for index = 1:length(dircontent)
+            if dircontent{index}(1) ~= '.'
+                if exist([p 'external' filesep dircontent{index}]) == 7
+                    addpath([p 'external' filesep dircontent{index}]);
+                    disp(['Adding path to ' eeglabpath 'external' filesep dircontent{index}]);
+                end;
             end;
         end;
-    end;
-    
-    % check for older version of Fieldtrip and presence of topoplot
-    % -------------------------------------------------------------
-    dircontent  = dir([ p '..' filesep ]);
-    dircontent  = { dircontent.name };
-    ind = strmatch('fieldtrip', lower(dircontent));
-    ind2 = strmatch('biosig', lower(dircontent));
-    if ~isempty(ind)
-        for index = ind
-            if exist([p_parent dircontent{index}]) == 7
-                disp('   FieldTrip is now in the "external" folder of EEGLAB');
-                disp([ '   Please delete old folder ' [p_parent dircontent{index}] ]);
-            end;
-        end;
-    end;
-    ptopoplot2 = which('topoplot');
-    if ~strcmpi(ptopoplot, ptopoplot2),
-        %disp('  Warning: duplicate function topoplot.m in Fieldtrip and EEGLAB');
-        %disp('  EEGLAB function will prevail and call the Fieldtrip one when appropriate');
-        addpath(fileparts(ptopoplot));
-    end;
 
-    % BIOSIG plugin (not in plugin folder)
-    % ------------------------------------
-    path_biosig2 = [ p_parent 'biosig' filesep 't200' ];
-    if exist(path_biosig2) == 7
-        disp('   BIOSIG is now in the "external" folder of EEGLAB');
-        disp([ '   Please delete old folder ' path_biosig2(1:end-4) ]);
-    end;
-    dircontent  = dir([ p 'external' filesep ]);
-    dircontent  = { dircontent.name };
-    ind2 = strmatch('biosig', lower(dircontent));
-    biosigflag = 0;
-    if ~isempty(ind2)
-        path_biosig = [ p 'external' filesep dircontent{ind2(end)} ];
-        try,
-            addpath(path_biosig);
-            addpath([ path_biosig filesep 't200' ]);
-            addpath([ path_biosig filesep 't250' ]);
-            addpath([ path_biosig filesep 't300' ]);
-            addpath([ path_biosig filesep 't400' ]);
-            addpath([ path_biosig filesep 't490' ]);
-            % addpath([ p 'external' filesep 'biosig' filesep 't500' ]); % topoplot conflict
-            version = [ path_biosig filesep 'VERSION' ];
-            version = loadtxt(version, 'convert', 'off', 'verbose', 'off');
-            version = [ version{2,3}(1) version{2,3}(2:end) ];
-            biosigflag = 1;
-        catch
-            disp([ 'eeglab: cannot find BIOSIG plugin' ] ); 
-            disp([ '   ' lasterr] );
+        % check for older version of Fieldtrip and presence of topoplot
+        % -------------------------------------------------------------
+        dircontent  = dir([ p '..' filesep ]);
+        dircontent  = { dircontent.name };
+        ind = strmatch('fieldtrip', lower(dircontent));
+        ind2 = strmatch('biosig', lower(dircontent));
+        if ~isempty(ind)
+            for index = ind
+                if exist([p_parent dircontent{index}]) == 7
+                    disp('   FieldTrip is now in the "external" folder of EEGLAB');
+                    disp([ '   Please delete old folder ' [p_parent dircontent{index}] ]);
+                end;
+            end;
         end;
-    end;            
+        ptopoplot2 = which('topoplot');
+        if ~strcmpi(ptopoplot, ptopoplot2),
+            %disp('  Warning: duplicate function topoplot.m in Fieldtrip and EEGLAB');
+            %disp('  EEGLAB function will prevail and call the Fieldtrip one when appropriate');
+            addpath(fileparts(ptopoplot));
+        end;
+
+        % BIOSIG plugin (not in plugin folder)
+        % ------------------------------------
+        path_biosig2 = [ p_parent 'biosig' filesep 't200' ];
+        if exist(path_biosig2) == 7
+            disp('   BIOSIG is now in the "external" folder of EEGLAB');
+            disp([ '   Please delete old folder ' path_biosig2(1:end-4) ]);
+        end;
+        dircontent  = dir([ p 'external' filesep ]);
+        dircontent  = { dircontent.name };
+        ind2 = strmatch('biosig', lower(dircontent));
+        biosigflag = 0;
+        if ~isempty(ind2)
+            path_biosig = [ p 'external' filesep dircontent{ind2(end)} ];
+            try,
+                addpath(path_biosig);
+                addpath([ path_biosig filesep 't200' ]);
+                addpath([ path_biosig filesep 't250' ]);
+                addpath([ path_biosig filesep 't300' ]);
+                addpath([ path_biosig filesep 't400' ]);
+                addpath([ path_biosig filesep 't490' ]);
+                % addpath([ p 'external' filesep 'biosig' filesep 't500' ]); % topoplot conflict
+                version = [ path_biosig filesep 'VERSION' ];
+                version = loadtxt(version, 'convert', 'off', 'verbose', 'off');
+                version = [ version{2,3}(1) version{2,3}(2:end) ];
+                biosigflag = 1;
+            catch
+                disp([ 'eeglab: cannot find BIOSIG plugin' ] ); 
+                disp([ '   ' lasterr] );
+            end;
+        end;            
+    end;
     
 	cb_importdata  = [ nocheck '[EEG LASTCOM] = pop_importdata;'  e_newset ];
 	cb_readegi     = [ nocheck '[EEG LASTCOM] = pop_readegi;'     e_newset ];
@@ -2100,6 +2113,7 @@ catchstrs.new_non_empty          = e_newset;
     
 	cb_saveh1      = [ nocheck 'LASTCOM = pop_saveh(EEG.history);' e_hist_nh];
 	cb_saveh2      = [ nocheck 'LASTCOM = pop_saveh(ALLCOM);'      e_hist_nh];
+	cb_runsc       = [ nocheck 'LASTCOM = pop_runscript;'          e_hist   ];
     cb_quit        = [ 'close(gcf); disp(''To save the EEGLAB command history  >> pop_saveh(ALLCOM);'');' ...
                        'clear global EEG ALLEEG LASTCOM CURRENTSET;'];
     
@@ -2254,12 +2268,13 @@ catchstrs.new_non_empty          = e_newset;
 	uimenu( file_m, 'Label', 'Save current study'                     , 'CallBack', cb_savestudy1);
 	uimenu( file_m, 'Label', 'Save current study as'                  , 'CallBack', cb_savestudy2);
 	uimenu( file_m, 'Label', 'Clear study'                            , 'CallBack', cb_clearstudy);
-	uimenu( file_m, 'Label', 'Memory and other options'                         , 'CallBack', cb_editoptions, 'Separator', 'on');
+	uimenu( file_m, 'Label', 'Memory and other options'               , 'CallBack', cb_editoptions, 'Separator', 'on');
     
-	hist_m = uimenu( file_m, 'Label', 'Save history'                  , 'Separator', 'on');
-	uimenu( hist_m, 'Label', 'Dataset history'                        , 'CallBack', cb_saveh1);
-	uimenu( hist_m, 'Label', 'Session history'                        , 'CallBack', cb_saveh2);    
-	
+	hist_m = uimenu( file_m, 'Label', 'History scripts'               , 'Separator', 'on');
+	uimenu( hist_m, 'Label', 'Save dataset history script'            , 'CallBack', cb_saveh1);
+	uimenu( hist_m, 'Label', 'Save session history script'            , 'CallBack', cb_saveh2);    
+	uimenu( hist_m, 'Label', 'Run script'                             , 'CallBack', cb_runsc);    
+
     uimenu( file_m, 'Label', 'Quit'                                   , 'CallBack', cb_quit, 'Separator', 'on');
 
 	uimenu( edit_m, 'Label', 'Dataset info'                           , 'CallBack', cb_editset);
@@ -2360,91 +2375,125 @@ catchstrs.new_non_empty          = e_newset;
     uimenu( std_m,  'Label', 'Cluster components'                     , 'CallBack', cb_clust);
     uimenu( std_m,  'Label', 'Edit/plot clusters'                     , 'CallBack', cb_clustedit);
     
-    uimenu( help_m, 'Label', 'About EEGLAB'                           , 'CallBack', 'pophelp(''eeglab'');');
-    uimenu( help_m, 'Label', 'About EEGLAB help'                      , 'CallBack', 'pophelp(''eeg_helphelp'');');
-    uimenu( help_m, 'Label', 'EEGLAB license'                         , 'CallBack', 'pophelp(''eeglablicense.txt'', 1);');
-    uimenu( help_m, 'Label', 'EEGLAB menus'                           , 'CallBack', 'eeg_helpmenu;','separator','on');
-    
-    help_1 = uimenu( help_m, 'Label', 'EEGLAB functions');
-    uimenu( help_1, 'Label', 'Toolbox functions'                      , 'CallBack', 'pophelp(''ica'');');
-	uimenu( help_1, 'Label', 'Signal processing functions'            , 'Callback', 'eeg_helpsigproc;');	
-	uimenu( help_1, 'Label', 'Interactive pop_ functions'             , 'Callback', 'eeg_helppop;');	
-    
-    help_2 = uimenu( help_m, 'Label', 'EEGLAB advanced');
-    uimenu( help_2, 'Label', 'Dataset structure'                      , 'CallBack', 'pophelp(''eeg_checkset'');');
-	uimenu( help_2, 'Label', 'Admin functions'                        , 'Callback', 'eeg_helpadmin;');	
-    
-    uimenu( help_m, 'Label', 'Web tutorial'                         , 'CallBack', 'tutorial;');
-    uimenu( help_m, 'Label', 'Email EEGLAB'                     , 'CallBack', 'web(''mailto:eeglab@sccn.ucsd.edu'');');
+    if ~iseeglabdeployed2
+        uimenu( help_m, 'Label', 'About EEGLAB'                           , 'CallBack', 'pophelp(''eeglab'');');
+        uimenu( help_m, 'Label', 'About EEGLAB help'                      , 'CallBack', 'pophelp(''eeg_helphelp'');');
+        uimenu( help_m, 'Label', 'EEGLAB menus'                           , 'CallBack', 'eeg_helpmenu;','separator','on');
+        
+        help_1 = uimenu( help_m, 'Label', 'EEGLAB functions');
+        uimenu( help_1, 'Label', 'Toolbox functions'                      , 'CallBack', 'pophelp(''ica'');');
+        uimenu( help_1, 'Label', 'Signal processing functions'            , 'Callback', 'eeg_helpsigproc;');	
+        uimenu( help_1, 'Label', 'Interactive pop_ functions'             , 'Callback', 'eeg_helppop;');	
 
-    % looking for eeglab plugins
-    % --------------------------
-    p = which('eeglab.m');
-    p = p(1:findstr(p,'eeglab.m')-1);
-    dircontent1 = what(p);
-    dircontent  = dir([ p 'plugins' ]);
-    dircontent  = { dircontent1.m{:} dircontent.name };
+        help_2 = uimenu( help_m, 'Label', 'EEGLAB advanced');
+        uimenu( help_2, 'Label', 'Dataset structure'                      , 'CallBack', 'pophelp(''eeg_checkset'');');
+        uimenu( help_2, 'Label', 'Admin functions'                        , 'Callback', 'eeg_helpadmin;');	
+        uimenu( help_m, 'Label', 'EEGLAB license'                         , 'CallBack', 'pophelp(''eeglablicense.txt'', 1);');
+    else
+        uimenu( help_m, 'Label', 'About EEGLAB'                           , 'CallBack', 'abouteeglab;');
+        uimenu( help_m, 'Label', 'EEGLAB license'                         , 'CallBack', 'pophelp(''eeglablicense.txt'', 1);');
+    end;
+    
+    uimenu( help_m, 'Label', 'Web tutorial'                               , 'CallBack', 'tutorial;', 'Separator', 'on');
+    uimenu( help_m, 'Label', 'Email the EEGLAB team'                      , 'CallBack', 'web(''mailto:eeglab@sccn.ucsd.edu'');');
 
-    % scan plugin folder
-    % ------------------
-    for index = 1:length(dircontent)
+    if iseeglabdeployed2
+        disp('Adding FIELDTRIP toolbox functions');
+        disp('Adding BIOSIG toolbox functions');
+        disp('Adding FILE-IO toolbox functions');
+        funcname = {  'eegplugin_VisEd' ...
+                      'eegplugin_eepimport' ...
+                      'eegplugin_bdfimport' ...
+                      'eegplugin_brainmovie' ...
+                      'eegplugin_bva_io' ...
+                      'eegplugin_ctfimport' ...
+                      'eegplugin_dipfit' ...
+                      'eegplugin_erpssimport' ...
+                      'eegplugin_fmrib' ...
+                      'eegplugin_iirfilt' ...
+                      'eegplugin_ascinstep' ...
+                      'eegplugin_loreta' ...
+                      'eegplugin_miclust' ...
+                      'eegplugin_4dneuroimaging' };
+        for indf = 1:length(funcname)
+            try 
+                eval( [ 'vers =' funcname{indf} '(gcf, trystrs, catchstrs);' ]);
+                disp(['EEGLAB: adding "' vers '" plugin' ]);  
+            catch
+                eval( [ funcname{indf} '(gcf, trystrs, catchstrs)' ]);
+                disp(['EEGLAB: adding plugin function "' funcname{indf} '"' ]);   
+            end;
+        end;
+    else
+        % looking for eeglab plugins
+        % --------------------------
+        p = which('eeglab.m');
+        p = p(1:findstr(p,'eeglab.m')-1);
+        dircontent1 = what(p);
+        dircontent  = dir([ p 'plugins' ]);
+        dircontent  = { dircontent1.m{:} dircontent.name };
 
-        % find function
-        % -------------
-        funcname = '';
-        if exist([p 'plugins' filesep dircontent{index}]) == 7
-            if ~strcmpi(dircontent{index}, '.') & ~strcmpi(dircontent{index}, '..')
-                addpath([ p 'plugins' filesep dircontent{index} ]);
-                tmpdir = dir([ p 'plugins' filesep dircontent{index}]);
-                for tmpind = 1:length(tmpdir)
-                    % find plugin function in subfolder
-                    % ---------------------------------
-                    if ~isempty(findstr(tmpdir(tmpind).name, 'eegplugin')) & tmpdir(tmpind).name(end) == 'm'
-                        funcname = tmpdir(tmpind).name(1:end-2);
-                        tmpind = length(tmpdir);
-                    end;
-                    
-                    % spetial case of eeglab subfolder (for BIOSIG)
-                    % --------------------------------
-                    if strcmpi(tmpdir(tmpind).name, 'eeglab')
-                        addpath([ p 'plugins' filesep dircontent{index} filesep 'eeglab' ],'-end');
-                        tmpdir2 = dir([ p 'plugins' filesep dircontent{index} filesep 'eeglab' ]);
-                        for tmpind2 = 1:length(tmpdir2)
-                            if ~isempty(findstr(tmpdir2(tmpind2).name, 'eegplugin')) ...
-                                    & tmpdir2(tmpind2).name(end) == 'm'
-                                funcname = tmpdir2(tmpind2).name(1:end-2);
-                                tmpind2  = length(tmpdir2);
-                                tmpind   = length(tmpdir);
+        % scan plugin folder
+        % ------------------
+        for index = 1:length(dircontent)
+
+            % find function
+            % -------------
+            funcname = '';
+            if exist([p 'plugins' filesep dircontent{index}]) == 7
+                if ~strcmpi(dircontent{index}, '.') & ~strcmpi(dircontent{index}, '..')
+                    addpath([ p 'plugins' filesep dircontent{index} ]);
+                    tmpdir = dir([ p 'plugins' filesep dircontent{index}]);
+                    for tmpind = 1:length(tmpdir)
+                        % find plugin function in subfolder
+                        % ---------------------------------
+                        if ~isempty(findstr(tmpdir(tmpind).name, 'eegplugin')) & tmpdir(tmpind).name(end) == 'm'
+                            funcname = tmpdir(tmpind).name(1:end-2);
+                            tmpind = length(tmpdir);
+                        end;
+
+                        % special case of eeglab subfolder (for BIOSIG)
+                        % --------------------------------
+                        if strcmpi(tmpdir(tmpind).name, 'eeglab')
+                            addpath([ p 'plugins' filesep dircontent{index} filesep 'eeglab' ],'-end');
+                            tmpdir2 = dir([ p 'plugins' filesep dircontent{index} filesep 'eeglab' ]);
+                            for tmpind2 = 1:length(tmpdir2)
+                                if ~isempty(findstr(tmpdir2(tmpind2).name, 'eegplugin')) ...
+                                        & tmpdir2(tmpind2).name(end) == 'm'
+                                    funcname = tmpdir2(tmpind2).name(1:end-2);
+                                    tmpind2  = length(tmpdir2);
+                                    tmpind   = length(tmpdir);
+                                end;
                             end;
                         end;
                     end;
                 end;
+            else 
+                if ~isempty(findstr(dircontent{index}, 'eegplugin')) & dircontent{index}(end) == 'm'
+                    funcname = dircontent{index}(1:end-2); % remove .m
+                end;
             end;
-        else 
-            if ~isempty(findstr(dircontent{index}, 'eegplugin')) & dircontent{index}(end) == 'm'
-                funcname = dircontent{index}(1:end-2); % remove .m
-            end;
-        end;
-        
-        % execute function
-        % ----------------
-        if ~isempty(funcname)
-            vers = ''; % version
-            try,
-                eval( [ 'vers =' funcname '(gcf, trystrs, catchstrs);' ]);
-                disp(['eeglab: adding "' vers '" plugin (see >> help ' funcname ')' ]);    
-           catch
+
+            % execute function
+            % ----------------
+            if ~isempty(funcname)
+                vers = ''; % version
                 try,
-                    eval( [ funcname '(gcf, trystrs, catchstrs)' ]);
-                    disp(['eeglab: adding plugin function "' funcname '"' ]);    
-                catch
-                    disp([ 'eeglab: error while adding plugin "' funcname '"' ] ); 
-                    disp([ '   ' lasterr] );
+                    eval( [ 'vers =' funcname '(gcf, trystrs, catchstrs);' ]);
+                    disp(['EEGLAB: adding "' vers '" plugin (see >> help ' funcname ')' ]);    
+               catch
+                    try,
+                        eval( [ funcname '(gcf, trystrs, catchstrs)' ]);
+                        disp(['EEGLAB: adding plugin function "' funcname '"' ]);    
+                    catch
+                        disp([ 'EEGLAB: error while adding plugin "' funcname '"' ] ); 
+                        disp([ '   ' lasterr] );
+                    end;
                 end;
             end;
         end;
-    end;
-
+    end; % iseeglabdeployed2
+    
     % add other import ...
     % --------------------
     cb_others = [ 'warndlg2(strvcat(''Several EEGLAB plugins (not included by default) are available to import cogniscan,'',' ...
@@ -3311,4 +3360,12 @@ function myaddpath(eeglabpath, functionname, pathtoadd);
         %disp([ 'Adding new path ' tmpnewpath ]);
         addpath(tmpnewpath);
     end;
-    
+
+
+function val = iseeglabdeployed2;
+%val = 1; return;
+if exist('isdeployed')
+     val = isdeployed;
+else val = 0;
+end;
+

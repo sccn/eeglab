@@ -158,6 +158,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.159  2009/05/16 00:11:42  arno
+%adding tag to axis
+%
 %Revision 1.158  2009/05/15 23:33:19  arno
 %3d mode
 %
@@ -717,10 +720,8 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
         if strcmpi(g.verbose, 'on'),
             disp('No MRI file given as input. Looking up one.');
         end
-        folder = which('pop_dipfit_settings');
-        folder = folder(1:end-21);
-        delim  = folder(end);
-        g.mri = [ folder 'standard_BESA' delim 'avg152t1.mat' ];
+        dipfitdefs;
+        g.mri = template_models(1).mrifile;
     end;
         
     % read anatomical MRI using Fieldtrip and SPM2 functons
