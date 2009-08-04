@@ -54,6 +54,9 @@
 %                  of 'trials' statistics requires a lot of RAM.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2009/05/31 02:22:10  arno
+% Adding FDR and bootstrap to all STUDY functions
+%
 % Revision 1.3  2007/09/11 10:55:48  arno
 % disable stats if not enough info
 %
@@ -97,7 +100,7 @@ opt = finputcheck( varargin, { 'threshold'   'real'    []               NaN;
 if isstr(opt), error(opt); end;
 if ~isnan(opt.threshold) & isempty(opt.naccu), opt.naccu = 1/opt.threshold*2; end;
 if any(any(cellfun('size', data, 2)==1)), opt.groupstats = 'off'; opt.condstats = 'off'; end;
-if isempty(opt.naccu), opt.naccu = 500; end;
+if isempty(opt.naccu), opt.naccu = 2000; end;
 nc = size(data,1);
 ng = size(data,2);
 

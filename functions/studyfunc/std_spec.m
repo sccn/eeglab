@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.37  2009/07/30 04:42:30  arno
+% Take into account boundaries for spectopo
+%
 % Revision 1.36  2008/04/16 17:55:12  arno
 % interpolation plus removing ICA components
 %
@@ -260,7 +263,9 @@ end;
 if strcmpi(g.specmode, 'psd')
     if ~isempty(EEG.event)
          boundaries = strmatch('boundary', lower({ EEG.event.type }));
-         boundaries = [0 [ EEG.event(boundaries).latency ]-0.5 EEG.pnts ];
+         if ~isempty(boundaries)
+             boundaries = [0 [ EEG.event(boundaries).latency ]-0.5 EEG.pnts ];
+         end;
     else boundaries = [];
     end;
     [X, f] = spectopo(X, EEG.pnts, EEG.srate, 'plot', 'off', 'boundaries', boundaries, 'nfft', g.nfft, spec_opt{:});

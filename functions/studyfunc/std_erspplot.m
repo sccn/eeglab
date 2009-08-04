@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.68  2009/07/10 01:49:57  arno
+% Implement PAC (partly)
+%
 % Revision 1.67  2009/06/04 11:55:40  arno
 % Fix component plotting
 %
@@ -348,7 +351,7 @@ if ~isempty(opt.plottf)
     locs = locs(std_chaninds(STUDY, opt.channels));
     [pgroup pcond pinter] = std_plottf(alltimes, allfreqs, allersp, 'condnames', STUDY.condition, 'subject', opt.subject, 'legend', opt.legend, ...
                                       'datatype', opt.datatype,'plotmode', opt.plotmode, 'groupnames', STUDY.group, 'topovals', opt.plottf, 'unitx', 'Hz', ...
-                                      'chanlocs', locs, 'plotsubjects', opt.plotsubjects, plotcurveopt{:});
+                                      'chanlocs', locs, 'plotsubjects', opt.plotsubjects, 'naccu', opt.naccu, plotcurveopt{:});
     % reselect time and frequency
     % ---------------------------
     maxind   = max(find( alltimes <= opt.plottf(4)));
