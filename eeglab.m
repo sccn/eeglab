@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.539  2009/08/04 04:44:22  arno
+% All functions necessary for compiling EEGLAB code
+%
 % Revision 1.538  2009/07/01 21:38:53  arno
 % adding path better
 %
@@ -2134,7 +2137,8 @@ catchstrs.new_non_empty          = e_newset;
 
 	cb_resample    = [ check      '[EEG LASTCOM] = pop_resample(EEG);' e_newset];
 	cb_eegfilt     = [ check      '[EEG LASTCOM] = pop_eegfilt(EEG);'  e_newset];
-	cb_reref       = [ check      '[EEG LASTCOM] = pop_reref(EEG);'    e_newset];
+	cb_interp      = [ check      '[EEG LASTCOM] = pop_interp(EEG); '  e_newset];
+    cb_reref       = [ check      '[EEG LASTCOM] = pop_reref(EEG);'    e_newset];
 	cb_eegplot     = [ checkcont  '[LASTCOM] = pop_eegplot(EEG, 1);'   e_hist];
 	cb_epoch       = [ check      '[EEG tmp LASTCOM] = pop_epoch(EEG); clear tmp;' e_newset check '[EEG LASTCOM] = pop_rmbase(EEG);' e_store];
 	cb_rmbase      = [ check      '[EEG LASTCOM] = pop_rmbase(EEG);'   e_store];
@@ -2294,7 +2298,8 @@ catchstrs.new_non_empty          = e_newset;
 	uimenu( filter_m, 'Label', 'Basic FIR filter'   , 'CallBack', cb_eegfilt);
     
 	uimenu( tools_m, 'Label', 'Re-reference'                          , 'CallBack', cb_reref);
-	uimenu( tools_m, 'Label', 'Reject continuous data by eye'         , 'CallBack', cb_eegplot);
+	uimenu( tools_m, 'Label', 'Interpolate electrodes'                , 'CallBack', cb_interp);
+    uimenu( tools_m, 'Label', 'Reject continuous data by eye'         , 'CallBack', cb_eegplot);
 	uimenu( tools_m, 'Label', 'Extract epochs'                        , 'CallBack', cb_epoch, 'Separator', 'on');
 	uimenu( tools_m, 'Label', 'Remove baseline'                       , 'CallBack', cb_rmbase);
 	uimenu( tools_m, 'Label', 'Run ICA'                               , 'CallBack', cb_runica, 'foregroundcolor', 'b', 'Separator', 'on');
