@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2009/07/30 03:32:47  arno
+% fixed interpolating bad channels
+%
 % Revision 1.5  2009/07/02 19:30:33  arno
 % fix problem with empty channel
 %
@@ -56,11 +59,11 @@
 
 function EEG = eeg_interp(ORIEEG, bad_elec, method)
 
-    EEG = ORIEEG;
     if nargin < 2
         help eeg_interp;
         return;
     end;
+    EEG = ORIEEG;
     
     if nargin < 3
         method = 'spherical';
@@ -71,7 +74,17 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method)
         % find missing channels
         % ---------------------
         if length(bad_elec) < length(EEG.chanlocs)
-            bad_elec = [ EEG.chanlocs bad_elec ];
+            newchanlocs = EEG.chanlocs;
+            fields = fieldnames(newchanlocs);
+            for index = 1:length(fields)
+                if isfield(bad_elec, fields{index})
+                    for cind = 1:length(bad_elec)
+                        fieldval = getfield(bad_elec, { cind },  fields{index});
+                        newchanlocs = setfield(newchanlocs, { length(EEG.chanlocs)+cind }, fields{index}, fieldval);
+                    end;
+                end;
+            end;
+            bad_elec = newchanlocs;
         end;
         if length(EEG.chanlocs) == length(bad_elec), return; end;
         
@@ -79,6 +92,7 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method)
         lab2 = { EEG.chanlocs.labels };
         [tmp badchans] = setdiff( lab1, lab2);
         fprintf('Interpolating %d channels...\n', length(badchans));
+        if length(badchans) == 0, return; end;
         goodchans      = sort(setdiff(1:length(bad_elec), badchans));
        
         % re-order good channels
