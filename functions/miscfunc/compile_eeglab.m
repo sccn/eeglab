@@ -72,10 +72,17 @@ fieldt  = [ ' -a ' files_fieldtrip_private ...
 % other mex files in file-io private folder
 [allfiles1 plugins]   = scanfold('plugins/');
 [allfiles2 functions] = scanfold('functions/');
-eval([ 'mcc -v -C -m eeglab' biosig plugins functions fieldt ]);
+%eval([ 'mcc -v -C -m eeglab' biosig plugins functions fieldt ]);
 mkdir(fullfile(outputfolder));
-copyfile( 'eeglab.exe', fullfile(outputfolder, 'eeglab.exe'), 'f');
-copyfile( 'eeglab.ctf', fullfile(outputfolder, 'eeglab.ctf'), 'f');
+comp = computer;
+if strcmpi(comp(1:2), 'PC')
+    copyfile( 'eeglab.exe', fullfile(outputfolder, 'eeglab.exe'), 'f');
+    copyfile( 'eeglab.ctf', fullfile(outputfolder, 'eeglab.ctf'), 'f');
+else
+    copyfile( 'eeglab', fullfile(outputfolder, 'eeglab'), 'f');
+    copyfile( 'eeglab', fullfile(outputfolder, 'eeglab'), 'f');
+    copyfile( 'eeglab.ctf', fullfile(outputfolder, 'eeglab.ctf'), 'f');
+end;
 
 % copy BESA files etc
 % -------------------
@@ -101,6 +108,8 @@ copyfile(fullfile(path_biosig, 'doc', 'units.csv'),              fullfile(output
 copyfile(fullfile(path_biosig, 'doc', 'leadidtable_scpecg.txt'), fullfile(outputfolder, 'leadidtable_scpecg.txt'));
 copyfile(fullfile(path_biosig, 'doc', 'elecpos.txt'),            fullfile(outputfolder, 'elecpos.txt'));
 copyfile(fullfile(path_biosig, 'doc', 'DecimalFactors.txt'),     fullfile(outputfolder, 'DecimalFactors.txt'));
+copyfile('sample_locs', fullfile(outputfolder, 'sample_locs'));
+copyfile('sample_data', fullfile(outputfolder, 'sample_data'));
 
 % copy all files for help
 % -----------------------
