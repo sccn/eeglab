@@ -25,6 +25,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2009/08/04 04:44:22  arno
+% All functions necessary for compiling EEGLAB code
+%
 % Revision 1.4  2009/07/02 21:04:34  arno
 % only clearing the eeg_options function
 %
@@ -44,8 +47,8 @@ try,
     clear eeg_options;
     
     if iseeglabdeployed
-        com1 = evaltxtfile(fullfile(eeglabexefolder, 'eeg_optionsbackup.txt'));
-        com2 = evaltxtfile(fullfile(eeglabexefolder, 'eeg_options.txt'));
+        com1 = readtxtfile(fullfile(eeglabexefolder, 'eeg_optionsbackup.txt'));
+        com2 = readtxtfile(fullfile(eeglabexefolder, 'eeg_options.txt'));
         eval( com1 );
         eval( com2 );
     else
@@ -78,5 +81,6 @@ try,
     option_savematlab = ~option_savetwofiles;
     
 catch 
+    lasterr
     disp('Warning: could not access the local eeg_options file');
 end;
