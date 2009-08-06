@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2009/05/31 02:22:10  arno
+% Adding FDR and bootstrap to all STUDY functions
+%
 % Revision 1.19  2007/05/04 23:19:02  arno
 % *** empty log message ***
 %
@@ -438,7 +441,11 @@ function [tval, df] = paired_ttest(a,b)
     sd   = mystd( tmpdiff,[], myndims(a));
     tval = diff./sd*sqrt(size(a, myndims(a)));
     df   = size(a, myndims(a))-1;
-            
+    
+    % check values againg Matlab statistics toolbox
+    %[h p ci stats] = ttest(a', b');
+    % [ tval stats.tstat' ]     
+    
 function [tval, df] = unpaired_ttest(a,b) % assumes equal variances
     
     meana = mymean(a, myndims(a));
@@ -450,6 +457,10 @@ function [tval, df] = unpaired_ttest(a,b) % assumes equal variances
     sp    = sqrt(((na-1)*sda.^2+(nb-1)*sdb.^2)/(na+nb-2));
     tval  = (meana-meanb)./sp/sqrt(1/na+1/nb);
     df    = na+nb-2;
+    
+    % check values againg Matlab statistics toolbox
+    % [h p ci stats] = ttest2(a', b');
+    % [ tval stats.tstat' ]     
             
 function val = myndims(a)
     if ndims(a) > 2
@@ -471,7 +482,11 @@ function res = mymean( data, varargin) % deal with complex numbers
     end;
 
 function res = mystd( data, varargin) % deal with complex numbers
-    res = std( abs(data), varargin{:});
+    if ~isreal(data)
+        res = std( abs(data), varargin{:});
+    else
+        res = std( data, varargin{:});
+    end;
 
 function myfprintf(verb, varargin)
     if verb

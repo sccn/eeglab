@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2009/08/05 03:21:23  arno
+% New header and new options
+%
 % Revision 1.1  2009/08/04 23:19:22  arno
 % *** empty log message ***
 
@@ -95,7 +98,7 @@ function [ ori_vals, df, pvals, surrogval ] = statcondfieldtrip( data, varargin 
         tmpcfg = eeglab2fieldtrip(EEG, 'preprocessing', 'none');
         lay = prepare_layout(tmpcfg, tmpcfg);
         tmpcfg.layout        = lay;
-        tmpcfg.neighbourdist = 1000; %mean(abs([ EEG.chanlocs.X ]));
+        tmpcfg.neighbourdist = 30; %mean(abs([ EEG.chanlocs.X ]));
         cfg.neighbours    = neighbourselection(tmpcfg, []);
     else
         cfg.neighbours  = {};
@@ -140,8 +143,9 @@ function [ ori_vals, df, pvals, surrogval ] = statcondfieldtrip( data, varargin 
             end;
             cfg.design      = [ design1; design3 ];
             cfg.uvar        = 2;
+            cfg.alpha       = 0.05;
+            fsdasd
             cfg
-            newdata{1}
             stat            = freqstatistics(cfg, newdata{:});
             ori_vals        = stat.stat;
             df              = [];
