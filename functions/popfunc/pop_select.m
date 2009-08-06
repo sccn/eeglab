@@ -96,6 +96,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.67  2009/07/30 03:51:45  arno
+% fix processing single channel
+%
 % Revision 1.66  2009/07/28 04:01:27  arno
 % fixing channel selection when no channel labels are present
 %
@@ -573,9 +576,10 @@ if ~isempty(g.time) | ~isempty(g.notime)
         EEG.epoch = [];
     else
         if isempty(g.notime)
-            g.time = g.time';
-            if g.time(1) ~= 0, g.notime = [0 g.time(1:end)'];
-            else               g.notime = [g.time(2:end)'];
+            g.notime = g.time';
+            g.notime = g.notime(:);
+            if g.notime(1) ~= 0, g.notime = [0 g.notime(:)'];
+            else                 g.notime = [g.time(2:end)'];
             end;
             if g.time(end) == EEG.xmax, g.notime(end) = [];
             else                        g.notime(end+1) = EEG.xmax;
