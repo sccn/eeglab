@@ -71,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.61  2009/07/30 04:40:20  arno
+% dataset index problem fix
+%
 % Revision 1.60  2009/07/10 01:30:00  arno
 % remove reference to setind field
 %
@@ -293,9 +296,6 @@ if ~isfield(STUDY, 'datasetinfo')
     end;
 end;
 
-
-
-
 % execute commands
 % ----------------
 currentind = 1;
@@ -425,7 +425,8 @@ if strcmpi(g.updatedat, 'on')
     end;
 end;
 
-% remove empty datasets (cnnot be done above because some empty datasets might not have been removed
+% remove empty datasets (cannot be done above because some empty datasets
+% might not have been removed)
 % ---------------------
 [ ALLEEG STUDY.datasetinfo ] = removeempty(ALLEEG, STUDY.datasetinfo);
 
@@ -478,4 +479,13 @@ function [ALLEEG, datasetinfo] = removeempty(ALLEEG, datasetinfo);
     for index = 1:length(datasetinfo)
         datasetinfo(index).index = index;
     end;
+    
+    % remove empty ALLEEG structures
+    % ------------------------------
+    while length(ALLEEG) > length(datasetinfo)
+       ALLEEG(end) = [];
+    end;
+        
+    
+    
     
