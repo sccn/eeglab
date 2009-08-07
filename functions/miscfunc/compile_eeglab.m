@@ -29,6 +29,12 @@ eeglab; close;
 path_eeglab = fileparts(which('eeglab'));
 cd(path_eeglab);
 
+% deal with VisEd plugin (VisEd is both the name of the folder and the
+% function inside and this creates a problem
+path_vised = fileparts(which('VisEd'))
+try, movefile( path_vised, [ path_vised '2' ]); catch, end;
+addpath([ path_vised '2' ]);
+
 path_fileio = fileparts(which('chantype'));
 try, movefile( fullfile(path_fileio, '@uint64'), fullfile(path_fileio, 'uint64') ); catch, end;
 try, movefile( fullfile(path_fileio, 'private', 'buffer.m')      ,  fullfile(path_fileio, 'private', 'bufferold.m') ); catch, end;
@@ -122,6 +128,7 @@ end;
 
 % cleaning up
 % -----------
+try, movefile( [ path_vised '2' ], path_vised); catch, end;
 try, movefile( fullfile(path_fileio, 'uint64'), fullfile(path_fileio, '@uint64') ); catch, end;
 try, movefile( fullfile(path_fileio, 'private', 'bufferold.m')      ,  fullfile(path_fileio, 'private', 'buffer.m') ); catch, end;
 try, movefile( fullfile(path_fileio, 'private', 'read_24bitold.m')  ,  fullfile(path_fileio, 'private', 'read_24bit.m')); catch, end;
