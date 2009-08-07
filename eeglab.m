@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.540  2009/08/05 03:22:23  arno
+% new interpolation menu
+%
 % Revision 1.539  2009/08/04 04:44:22  arno
 % All functions necessary for compiling EEGLAB code
 %
@@ -2978,11 +2981,17 @@ if study_selected
     else
         set( g.win1, 'String', sprintf('Study filename: %s\n'   , fullfilename));
     end;        	
+    condconsist  = std_checkconsist(STUDY, 'uniform', 'condition');
+    groupconsist = std_checkconsist(STUDY, 'uniform', 'group');
+    sessconsist  = std_checkconsist(STUDY, 'uniform', 'session');
+    txtcond  = fastif(condconsist , ' per subject', ' (some missing)');
+    txtgroup = fastif(groupconsist, ' per subject', ' (some missing)');
+    txtsess  = fastif(sessconsist , ' per subject', ' (some missing)');
     set( g.val2, 'String', STUDY.task);
     set( g.val3, 'String', int2str(max(1, length(STUDY.subject))));
-    set( g.val4, 'String', int2str(max(1, length(STUDY.condition))));
-    set( g.val5, 'String', int2str(max(1, length(STUDY.session))));
-    set( g.val6, 'String', int2str(max(1, length(STUDY.group))));
+    set( g.val4, 'String', [ int2str(max(1, length(STUDY.condition))) txtcond ]);
+    set( g.val5, 'String', [ int2str(max(1, length(STUDY.session)))   txtsess ]);
+    set( g.val6, 'String', [ int2str(max(1, length(STUDY.group)))    txtgroup ]);
     set( g.val7, 'String', epochconsist);
     set( g.val8, 'String', chanlenstr);
     set( g.val9, 'String', chanlocs);
