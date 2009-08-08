@@ -96,6 +96,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.68  2009/08/06 01:34:28  arno
+% Fix time slice selection
+%
 % Revision 1.67  2009/07/30 03:51:45  arno
 % fix processing single channel
 %
@@ -579,7 +582,7 @@ if ~isempty(g.time) | ~isempty(g.notime)
             g.notime = g.time';
             g.notime = g.notime(:);
             if g.notime(1) ~= 0, g.notime = [0 g.notime(:)'];
-            else                 g.notime = [g.time(2:end)'];
+            else                 g.notime = [g.notime(2:end)'];
             end;
             if g.time(end) == EEG.xmax, g.notime(end) = [];
             else                        g.notime(end+1) = EEG.xmax;
