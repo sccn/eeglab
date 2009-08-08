@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.541  2009/08/07 21:50:25  arno
+% Adding comment for studies
+%
 % Revision 1.540  2009/08/05 03:22:23  arno
 % new interpolation menu
 %
@@ -2133,8 +2136,9 @@ catchstrs.new_non_empty          = e_newset;
                        'disp(''     to convert between channel location file formats'');' ...
                        '[EEG TMPINFO TMP LASTCOM] = pop_chanedit(EEG); if ~isempty(LASTCOM), EEG = eeg_checkset(EEG, ''chanlocsize'');' ...
                        'clear TMPINFO TMP; EEG = eegh(LASTCOM, EEG);' storecall 'end; eeglab(''redraw'');'];
-    cb_select      = [ check      '[EEG LASTCOM] = pop_select(EEG);'                e_newset];
-	cb_selectevent = [ checkevent      '[EEG TMP LASTCOM] = pop_selectevent(EEG); clear TMP;' e_newset ];
+    cb_select      = [ check      '[EEG LASTCOM] = pop_select(EEG);'                     e_newset];
+    cb_rmdat       = [ checkevent '[EEG LASTCOM] = pop_rmdat(EEG);'                      e_newset];
+	cb_selectevent = [ checkevent '[EEG TMP LASTCOM] = pop_selectevent(EEG); clear TMP;' e_newset ];
 	cb_copyset     = [ check      '[ALLEEG EEG CURRENTSET LASTCOM] = pop_copyset(ALLEEG, CURRENTSET); eeglab(''redraw'');' e_hist_nh];
 	cb_mergeset    = [ check      '[EEG LASTCOM] = pop_mergeset(ALLEEG);' e_newset];
 
@@ -2290,7 +2294,8 @@ catchstrs.new_non_empty          = e_newset;
 	uimenu( edit_m, 'Label', 'About this dataset'                     , 'CallBack', cb_comments);
 	uimenu( edit_m, 'Label', 'Channel locations'                      , 'CallBack', cb_chanedit);
 	uimenu( edit_m, 'Label', 'Select data'                            , 'CallBack', cb_select, 'Separator', 'on');
-	uimenu( edit_m, 'Label', 'Select epochs/events'                   , 'CallBack', cb_selectevent);
+	uimenu( edit_m, 'Label', 'Select data using events'               , 'CallBack', cb_rmdat);
+    uimenu( edit_m, 'Label', 'Select epochs or events'                , 'CallBack', cb_selectevent);
 	uimenu( edit_m, 'Label', 'Copy current dataset'                   , 'CallBack', cb_copyset, 'Separator', 'on');
 	uimenu( edit_m, 'Label', 'Append datasets'                        , 'CallBack', cb_mergeset);
 	uimenu( edit_m, 'Label', 'Delete dataset(s)'                      , 'CallBack', cb_delset);

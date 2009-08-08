@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2009/08/07 21:50:10  arno
+% New funcs
+%
 
 function [EEG, com] = pop_rmdat( EEG, events, timelims, invertsel );
 
@@ -64,7 +67,6 @@ end;
 if ~isfield(EEG.event, 'latency'),
     error( 'Absent latency field in event array/structure: must name one of the fields ''latency''');
 end;    
-OLDEEG = EEG;
 
 if nargin < 3
 	% popup window parameters
@@ -139,27 +141,24 @@ for bind = 1:length(allinds)
     evtlat = EEG.event(allinds(bind)).latency;
     evtbeg = evtlat+EEG.srate*timelims(1);
     evtend = evtlat+EEG.srate*timelims(2);
+    if any(bndlat > evtbeg & bndlat < evtend)
+        % find the closer upper and lower boundaries
+        bndlattmp = bndlat(bndlat > evtbeg & bndlat < evtend);
+        diffbound = bndlattmp-evtlat;
+        allneginds = find(diffbound < 0);
+        allposinds = find(diffbound > 0);
+        if ~isempty(allneginds), evtbeg = bndlattmp(allneginds(1)); end;
+        if ~isempty(allposinds), evtend = bndlattmp(allposinds(1)); end;       
+        fprintf('Boundary found: time limits for event %d reduced from %3.2f to %3.2f\n', allinds(bind), ...
+            (evtbeg-evtlat)/EEG.srate, (evtend-evtlat)/EEG.srate);
+    end
     if ~isempty(array) && evtbeg < array(end)
         array(end) = evtend;
-    elseif ~any(bndlat > evtbeg & bndlat < evtend)
-        array = [ array; evtbeg  evtend];
     else
-        if ~invertsel
-            fprintf('Boundary found within time limits for event %d\n', allinds(bind));
-        else
-            % find the closer upper and lower boundaries
-            bndlattmp = bndlat(bndlat > evtbeg & bndlat < evtend);
-            diffbound = bndlattmp-evtlat;
-            allneginds = find(diffbound < 0);
-            allposinds = find(diffbound > 0);
-            if ~isempty(allneginds), evtbeg = bndlattmp(allneginds(1)); end;
-            if ~isempty(allposinds), evtend = bndlattmp(allposinds(1)); end;       
-            array = [ array; evtbeg  evtend];
-            fprintf('Boundary found: time limits for event %d reduced from %3.2f to %3.2f\n', allinds(bind), ...
-                (evtbeg-evtlat)/EEG.srate, (evtend-evtlat)/EEG.srate);
-        end;
-    end
+        array = [ array; evtbeg  evtend];
+    end;
 end;
+array
 
 if ~isempty(array) && array(1) < 1, array(1) = 1; end;
 if ~isempty(array) && array(end) > EEG.pnts, array(end) = EEG.pnts; end;
