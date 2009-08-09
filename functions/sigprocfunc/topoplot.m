@@ -166,6 +166,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.287  2009/05/17 21:53:04  arno
+% add pmask and contourvals option
+%
 % Revision 1.286  2008/12/20 00:45:10  arno
 % revert 1.284
 %
@@ -1836,7 +1839,7 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
         subh = get(chs, 'children');
         for indsubh = 1:length(subh)
             numfaces = size(get(subh(indsubh), 'XData'),1); 
-            set(subh(indsubh), 'FaceVertexCData', ones(numfaces,3), 'Cdatamapping', 'direct', 'facealpha', 0.2);
+            set(subh(indsubh), 'FaceVertexCData', ones(numfaces,3), 'Cdatamapping', 'direct', 'facealpha', 0.5);
         end;
     end;
     for h=chs, set(h,'color',CCOLOR); end
