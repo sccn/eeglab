@@ -144,7 +144,7 @@ function [ ori_vals, df, pvals, surrogval ] = statcondfieldtrip( data, varargin 
             cfg.design      = [ design1; design3 ];
             cfg.uvar        = 2;
             cfg.alpha       = 0.05;
-            fsdasd
+
             cfg
             stat            = freqstatistics(cfg, newdata{:});
             ori_vals        = stat.stat;
