@@ -29,6 +29,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2009/08/07 21:50:10  arno
+% New funcs
+%
 
 function [boolval npersubj] = std_checkconsist(STUDY, varargin);
 
@@ -47,7 +50,10 @@ elseif strcmpi(opt.uniform, 'group')
     vallist = STUDY.group;
 elseif strcmpi(opt.uniform, 'session')
     allvals = { STUDY.datasetinfo.session };
+    allvals = cellfun(@num2str, allvals, 'uniformoutput', false);
     vallist = STUDY.session;
+    if isempty(vallist), boolval = 1; return; end;
+    vallist = cellfun(@num2str, mattocell(vallist), 'uniformoutput', false);
 else
     error('unknown option');
 end;
