@@ -113,6 +113,9 @@
 % See also: brainmovie(), timecrossf()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.79  2008/11/25 23:00:58  arno
+% mriside default
+%
 % Revision 1.78  2008/08/20 22:29:26  arno
 % Compatibility, erp option
 %
@@ -372,7 +375,7 @@ end;
 							'moviefolder' 'string'        {}                                       '';
 							'tfname'      'string'		  {}									   'tfparams';
 							'tffolder'    'string'        {}                                       '';
-							'framefolder' 'string'        {}                                       [ addfinalsep(pwd) 'movieframes'];
+							'framefolder' 'string'        {}                                       fullfile(pwd, 'movieframes');
 							'movparams'   {'string' 'cell'}       []							   {}; % default 'mriside' for 2D I think
                             'addmovparams'  'cell'          {}							           {};
 							'showcomps'   'integer'       []									   [];
@@ -795,12 +798,8 @@ return
 % ----------------------
 function str = addfinalsep(str)
     if isempty(str), return; end;
-    if strcmpi(computer, 'PCWIN')
-        if str(end) ~= '\', str(end+1) = '\'; end;
-    elseif strcmpi(computer, 'MAC')
-        if str(end) ~= ':', str(end+1) = ':'; end;
-    else
-        if str(end) ~= '/', str(end+1) = '/'; end;
+    if str(end) ~= filesep
+        str(end+1) = filesep;
     end;
     
 % remove duplicates in the list of parameters

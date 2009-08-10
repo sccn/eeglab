@@ -21,6 +21,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2009/08/04 04:44:22  arno
+% All functions necessary for compiling EEGLAB code
+%
 
 function histforexe( funct, fold );
 
@@ -75,7 +78,7 @@ end;
 
 sub = 1;
 try, 
-    if strcmpi(computer, 'PCWIN') | strcmp(computer, 'MAC'), sub = 0; end;
+    if ~isunix, sub = 0; end;
 catch, end;
 
 if nonmatlab

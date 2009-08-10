@@ -29,6 +29,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2009/08/04 04:44:22  arno
+% All functions necessary for compiling EEGLAB code
+%
 % Revision 1.12  2006/10/02 11:33:52  arno
 % Just copy and paste
 % for another program?
@@ -132,7 +135,7 @@ end;
 
 sub = 1;
 try, 
-    if strcmpi(computer, 'PCWIN') | strcmp(computer, 'MAC'), sub = 0; end;
+    if ~isunix, sub = 0; end;
 catch, end;
 
 if nonmatlab

@@ -56,6 +56,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.74  2009/07/02 22:08:42  arno
+% removing unused variable
+%
 % Revision 1.73  2008/05/15 17:39:11  nima
 % electrode plot set to off for more than 64 channels.
 %
@@ -433,8 +436,10 @@ else
     end;
 end;
 
-if plotdip & strcmpi(EEG.dipfit.coordformat, 'CTF')
-    disp('Cannot plot dipole on scalp map for CTF MEG data');
+if plotdip
+    if strcmpi(EEG.dipfit.coordformat, 'CTF')
+        disp('Cannot plot dipole on scalp map for CTF MEG data');
+    end;
 end;
     
 % plot the graphs
@@ -442,7 +447,6 @@ end;
 counter = 1;
 countobj = 1;
 allobj = zeros(1,1000);
-curfig = gcf;
 if isfield(EEG, 'chaninfo'), options = { options{:} 'chaninfo' EEG.chaninfo }; end
     
 for index = 1:size(arg2(:),1)

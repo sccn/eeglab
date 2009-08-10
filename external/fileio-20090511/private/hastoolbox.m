@@ -10,6 +10,9 @@ function [status] = hastoolbox(toolbox, autoadd, silent)
 % Copyright (C) 2005-2008, Robert Oostenveld
 %
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2009/05/13 01:59:33  arno
+% update fileIO
+%
 % Revision 1.35  2009/04/21 09:54:15  roboos
 % added prtools
 %
@@ -318,7 +321,7 @@ if autoadd && ~status
 
   % for windows computers in the F.C. Donders Centre
   prefix = 'h:\common\matlab';
-  if ~status && strcmp(computer, 'PCWIN')
+  if ~status && ( strcmp(computer, 'PCWIN') || strcmp(computer, 'PCWIN'))
     status = myaddpath(fullfile(prefix, lower(toolbox)), silent);
   end
 

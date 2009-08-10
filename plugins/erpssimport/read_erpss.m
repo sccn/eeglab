@@ -23,6 +23,9 @@
 %          with help from Andrey Vankov
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2008/10/29 23:10:42  arno
+% Better error message
+%
 % Revision 1.29  2007/08/07 20:01:08  arno
 % unused variables
 %
@@ -85,10 +88,8 @@ function [eeg,ev,header] = read_erpss(filename)
         complendian = 0;
         switch computer
          case {'MAC2','SUN4','SOL2','SGI','SGI64'}, complendian = 1;
-         case {'PCWIN','LNX86','GLNX86'}, complendian = 0;
-         otherwise 
-          disp('Disp: endian of computer not known, set to PC (windows/linux) by default');
         end;
+        fprintf('read_erpss: endian of computer set to %s endian (Intel/AMD)\n', fastif(complendian, 'big', 'little'));        
     end;
     fseek(fp,6,-1);
     header.nchans = fread(fp,1,'uint16');
