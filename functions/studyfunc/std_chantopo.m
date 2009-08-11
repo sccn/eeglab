@@ -63,6 +63,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2009/05/31 02:22:10  arno
+% Adding FDR and bootstrap to all STUDY functions
+%
 % Revision 1.2  2008/03/30 12:04:11  arno
 % fix minor problem (title...)
 %
@@ -182,7 +185,7 @@ opt = finputcheck( varargin, { 'channels'    'cell'   []              {};
                                'legend'      'string' { 'on' 'off' }   'off';
                                'datatype'    'string' { 'ersp' 'itc' 'erp' 'spec' }    'erp';
                                'plotmode'    'string' { 'normal' 'condensed' }  'normal';
-                               'statistics'  'string' { 'param' 'perm' }       'param';
+                               'statistics'  'string' { 'param' 'perm' 'bootstrap' }       'param';
                                'caxis'       'real'   []              [];
                                'statmode'    'string' { 'subjects' 'common' 'trials' } 'subjects'}, 'std_chanplot', 'ignore');
 if isstr(opt), error(opt); end;
