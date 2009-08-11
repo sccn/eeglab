@@ -142,6 +142,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.182  2009/07/30 22:27:24  arno
+% fix problem with datachan
+%
 % Revision 1.181  2009/07/30 05:22:18  arno
 % fix ref filed when looking up file`
 %
@@ -1293,8 +1296,6 @@ else
                         chans(ind2(index)).sph_theta  = tmplocs(ind1(index)).sph_theta;
                         chans(ind2(index)).sph_phi    = tmplocs(ind1(index)).sph_phi;
                         chans(ind2(index)).sph_radius = tmplocs(ind1(index)).sph_radius;
-                        chans(ind2(index)).ref        = '';
-                        chans(ind2(index)).datachan   = 1;
                     end;
                     tmpdiff = setdiff([1:length(chans)], ind2);
                     if ~isempty(tmpdiff)
@@ -1315,7 +1316,9 @@ else
                 end;
                 urchans = chans;
                 for index = 1:length(chans)
-                    chans(index).urchan = index;
+                    chans(index).urchan    = index;
+                    chans(index).ref       = '';
+                    chans(index).datachan  = 1;
                 end;
                 
             case 'lookupgui'
@@ -1492,6 +1495,15 @@ for index = 1:length(fields)
         else
             for indchan = 1:length(chans)
                 chans = setfield(chans, {indchan}, fields{index}, indchan);
+            end;
+        end;
+    else
+        if strcmpi(fields{index}, 'ref')
+            for indval = 1:length(chans)
+                tmpval = getfield(chans, {indval}, fields{index} );
+                if isempty( tmpval ) & ~isstr( tmpval )
+                    chans = setfield(chans, {indval}, fields{index}, '');
+                end;
             end;
         end;
     end;
