@@ -39,9 +39,9 @@
 %   'plotsubjects' - ['on'|'off'] When 'on', plot ERSP of all subjects.
 %
 % Other optional inputs:
-%   'plotmode'  - ['normal'|'condensed'] 'normal'  -> plot in a new figure; 
+%   'plotmode'  - ['normal'|'condensed'|'none'] 'normal'  -> plot in a new figure; 
 %                 'condensed' -> plot all curves in the current figure in a 
-%                 condensed fashion {default: 'normal'}
+%                 condensed fashion. 'none' toggles off plotting {default: 'normal'}
 %   'key','val' - All optional inputs to pop_specparams() are also accepted here
 %                 to plot subset of time, statistics etc. The values used by default
 %                 are the ones set using pop_specparams() and stored in the
@@ -70,6 +70,9 @@
 %           % Plot the mean ERSPs of all clusters in STUDY together 
 %           % on the same figure. 
 %
+% Known limitations: when plotting multiple clusters, the output
+%                    contains the last plotted cluster.
+%
 % See also: pop_clustedit(), pop_preclust(), eeg_createdata(), eeg_preclust(), pop_clustedit()
 %
 % Authors: Arnaud Delorme, CERCO, August, 2006
@@ -91,6 +94,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.69  2009/08/04 23:21:25  arno
+% naccu
+%
 % Revision 1.68  2009/07/10 01:49:57  arno
 % Implement PAC (partly)
 %
@@ -256,7 +262,7 @@ STUDY = pop_erspparams(STUDY, 'default');
                                'plottf'      'real'    []              [];
                                'comps'       {'integer','string'}  []              []; % for backward compatibility
                                'plotsubjects' 'string' { 'on' 'off' }  'off';
-                               'plotmode'    'string' { 'normal' 'condensed' }  'normal';
+                               'plotmode'    'string' { 'normal' 'condensed' 'none' }  'normal';
                                'subject'     'string'  []              '' }, ...
                                   'std_erspstatplot', 'ignore');
 if isstr(opt), error(opt); end;
@@ -301,14 +307,14 @@ end;
 % read data from disk
 % -------------------
 if ~isempty(opt.channels)
-     [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'channels', opt.channels, 'infotype', opt.datatype, 'statmode', opt.statmode, 'subbaseline', opt.subbaseline);
-else [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'clusters', opt.clusters, 'infotype', opt.datatype, 'statmode', opt.statmode, 'subbaseline', opt.subbaseline);
+     [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'channels', opt.channels, 'infotype', opt.datatype, 'statmode', opt.statmode, 'subbaseline', opt.subbaseline, 'timerange', opt.timerange, 'freqrange', opt.freqrange);
+else [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'clusters', opt.clusters, 'infotype', opt.datatype, 'statmode', opt.statmode, 'subbaseline', opt.subbaseline, 'timerange', opt.timerange, 'freqrange', opt.freqrange);
 end;
 opt.legend = 'off';
 
 % plot single scalp map
 % ---------------------
-if ~isempty(opt.plottf)
+if ~isempty(opt.plottf) | (strcmpi(opt.plotmode, 'none') & length(opt.channels) > 1)
     firstind = 1;
     while isempty(STUDY.changrp(firstind).erspdata)
         firstind = firstind+1;
@@ -349,24 +355,29 @@ if ~isempty(opt.plottf)
     
     locs = eeg_mergelocs(ALLEEG.chanlocs);
     locs = locs(std_chaninds(STUDY, opt.channels));
-    [pgroup pcond pinter] = std_plottf(alltimes, allfreqs, allersp, 'condnames', STUDY.condition, 'subject', opt.subject, 'legend', opt.legend, ...
+    if ~strcmpi(opt.plotmode, 'none')
+        [pgroup pcond pinter] = std_plottf(alltimes, allfreqs, allersp, 'condnames', STUDY.condition, 'subject', opt.subject, 'legend', opt.legend, ...
                                       'datatype', opt.datatype,'plotmode', opt.plotmode, 'groupnames', STUDY.group, 'topovals', opt.plottf, 'unitx', 'Hz', ...
                                       'chanlocs', locs, 'plotsubjects', opt.plotsubjects, 'naccu', opt.naccu, plotcurveopt{:});
-    % reselect time and frequency
-    % ---------------------------
-    maxind   = max(find( alltimes <= opt.plottf(4)));
-    minind   = min(find( alltimes >= opt.plottf(3)));
-    fmaxind  = max(find( allfreqs <= opt.plottf(2)));
-    fminind  = min(find( allfreqs >= opt.plottf(1)));
-    alltimes = mean(alltimes(minind:maxind));
-    allfreqs = mean(allfreqs(fminind:fmaxind));
-    for i =1:length(allersp(:))
-        allersp{i}  = squeeze(mean(mean(allersp{i}(minind:maxind,fminind:fmaxind,:,:),1),2));
+    end;
+    
+    if ~isempty(opt.plottf)
+        % reselect time and frequency
+        % ---------------------------
+        maxind   = max(find( alltimes <= opt.plottf(4)));
+        minind   = min(find( alltimes >= opt.plottf(3)));
+        fmaxind  = max(find( allfreqs <= opt.plottf(2)));
+        fminind  = min(find( allfreqs >= opt.plottf(1)));
+        alltimes = mean(alltimes(minind:maxind));
+        allfreqs = mean(allfreqs(fminind:fmaxind));
+        for i =1:length(allersp(:))
+            allersp{i}  = squeeze(mean(mean(allersp{i}(minind:maxind,fminind:fmaxind,:,:),1),2));
+        end;
     end;
     return;
 end;
 
-if length(allinds) > 1, figure; opt.plotmode = 'condensed'; end;
+if length(allinds) > 1 & ~strcmpi(opt.plotmode, 'none'), figure; opt.plotmode = 'condensed'; end;
 nc = ceil(sqrt(length(allinds)));
 nr = ceil(length(allinds)/nc);
 comp_names = {};
@@ -431,28 +442,30 @@ for index = 1:length(allinds)
     % plot specific component
     % -----------------------
     if index == length(allinds), opt.legend = 'on'; end;
-    [pgroup pcond pinter] = std_plottf(alltimes, allfreqs, allersp, 'condnames', STUDY.condition, 'subject', opt.subject, ...
+    if ~strcmpi(opt.plotmode, 'none')
+        [pgroup pcond pinter] = std_plottf(alltimes, allfreqs, allersp, 'condnames', STUDY.condition, 'subject', opt.subject, ...
                                        'legend', opt.legend, 'compinds', comp_names, 'datatype', opt.datatype,'plotmode', ...
                                        opt.plotmode, 'groupnames', STUDY.group, 'topovals', opt.plottf, 'unitx', 'Hz', ...
                                       'chanlocs', ALLEEG(1).chanlocs, 'plotsubjects', opt.plotsubjects, plotcurveopt{:});
-    if isempty(opt.channels), %title(sprintf('Cluster %d', allinds(index)));
-        if length(allinds) > 1, 
-            title([ STUDY.cluster(allinds(index)).name ' (' num2str(length(STUDY.cluster(allinds(index)).comps)),' ICs, ' ...
-                    num2str(length(unique(STUDY.cluster(allinds(index)).sets(1,:)))) ' Ss)' ]);    
-            set(gcf, 'name', [ 'Cluster ' upper(opt.datatype) ]);
-        elseif ~strcmp(opt.mode,'together') % if it is not the mean ERSP that is being shown (which is the case when 'cluster properties' is plotted then put cluster number on the corner of figure
-            h = gca;
-            axes('position',[0.04 0.96 0.1 0.06]); 
-            text(0,0,[STUDY.cluster(allinds(index)).name],'fontsize',13 );
-            axis off;
-            if length(opt.comps) ~= 1
-                set(gcf,'name',[upper(opt.datatype) ' of ' STUDY.cluster(allinds(index)).name])
-            else
-                set(gcf,'name',[upper(opt.datatype) ' of a Component from cluster ' STUDY.cluster(allinds(index)).name])
+        if isempty(opt.channels), %title(sprintf('Cluster %d', allinds(index)));
+            if length(allinds) > 1, 
+                title([ STUDY.cluster(allinds(index)).name ' (' num2str(length(STUDY.cluster(allinds(index)).comps)),' ICs, ' ...
+                        num2str(length(unique(STUDY.cluster(allinds(index)).sets(1,:)))) ' Ss)' ]);    
+                set(gcf, 'name', [ 'Cluster ' upper(opt.datatype) ]);
+            elseif ~strcmp(opt.mode,'together') % if it is not the mean ERSP that is being shown (which is the case when 'cluster properties' is plotted then put cluster number on the corner of figure
+                h = gca;
+                axes('position',[0.04 0.96 0.1 0.06]); 
+                text(0,0,[STUDY.cluster(allinds(index)).name],'fontsize',13 );
+                axis off;
+                if length(opt.comps) ~= 1
+                    set(gcf,'name',[upper(opt.datatype) ' of ' STUDY.cluster(allinds(index)).name])
+                else
+                    set(gcf,'name',[upper(opt.datatype) ' of a Component from cluster ' STUDY.cluster(allinds(index)).name])
+                end;
+                axes(h);
             end;
-            axes(h);
+        else                      
+            title(sprintf('%s', opt.channels{index}));  
         end;
-    else                      
-        title(sprintf('%s', opt.channels{index}));  
     end;
 end;
