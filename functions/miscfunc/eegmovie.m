@@ -3,7 +3,7 @@
 %              Use seemovie() to display the movie.
 % Usage:
 %
-% >> [Movie,Colormap] = eegmovie(data,srate,elec_locs,title,movieframes,minmax);
+% >> [Movie,Colormap] = eegmovie(data,srate,elec_locs,title,movieframes,minmax,startsec,...);
 %
 % Inputs:
 %   data        = (chans,frames) EEG data set to plot
@@ -14,6 +14,8 @@
 %   minmax      = [blue_lower_bound, red_upper_bound] 
 %                 {0 -> +/-abs max of data}
 %  startsec     = starting time in seconds {0 -> 0.0}
+%  additional options from topoplot are allowed
+%  
 %
 % Author: Colin Humphries & Scott Makeig, CNL, Salk Institute, La Jolla, 3/97
 %
@@ -36,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2007/02/24 02:24:54  toby
+% default value assignment fix
+%
 % Revision 1.2  2002/10/28 23:37:49  arno
 % special case for chanlocs structure
 %
@@ -53,7 +58,7 @@
 % 01/24/02 updated eegplot to eegplotold -ad
 % 01-25-02 reformated help & license, added links -ad 
 
-function [Movie, Colormap] = eegmovie(data,srate,eloc_locs,titl,movieframes,minmax,startsec)
+function [Movie, Colormap] = eegmovie(data,srate,eloc_locs,titl,movieframes,minmax,startsec,varargin)
 
 if nargin<1
 	help eegmovie
@@ -153,7 +158,7 @@ for f = 1:length(movieframes)                      % make the movie, frame by fr
    axes(axtopoplot)
    cla
    set(axtopoplot,'Color',axcolor);
-   topoplot(data(:,i),eloc_locs,'style','both','maplimits',minmax); 
+   topoplot(data(:,i),eloc_locs,'style','both','maplimits',minmax, varargin{:}); 
 					                     % use channel locations file
    txt = [ int2str(f)];  
    text(-0.5,-0.5,txt,'FontSize',14);    % show frame number
