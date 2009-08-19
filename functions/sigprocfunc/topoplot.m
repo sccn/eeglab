@@ -166,6 +166,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.288  2009/08/09 04:57:25  arno
+% change transparency
+%
 % Revision 1.287  2009/05/17 21:53:04  arno
 % add pmask and contourvals option
 %
@@ -1839,7 +1842,7 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
         subh = get(chs, 'children');
         for indsubh = 1:length(subh)
             numfaces = size(get(subh(indsubh), 'XData'),1); 
-            set(subh(indsubh), 'FaceVertexCData', ones(numfaces,3), 'Cdatamapping', 'direct', 'facealpha', 0.5);
+            set(subh(indsubh), 'FaceVertexCData', ones(numfaces,3), 'Cdatamapping', 'direct', 'facealpha', 0.5, 'linewidth', 2);
         end;
     end;
     for h=chs, set(h,'color',CCOLOR); end
