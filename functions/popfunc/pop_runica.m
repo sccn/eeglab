@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.88  2009/07/02 23:26:42  arno
+% interupt for runica
+%
 % Revision 1.87  2009/04/22 04:50:29  arno
 % Fixing saving datasets for pop_runica.m
 %
@@ -420,11 +423,17 @@ if nargin < 2 | selectamica
     end;                 
     % channel types
     % -------------
-    if isfield(ALLEEG(1).chanlocs, 'type'), alltypes = { ALLEEG(1).chanlocs.type };
-                                            indempty = cellfun('isempty', alltypes);
-                                            alltypes(indempty) = '';
-                                            alltypes = unique(alltypes);
-    else                                    alltypes = '';
+    if isfield(ALLEEG(1).chanlocs, 'type'), 
+        alltypes = { ALLEEG(1).chanlocs.type };
+        indempty = cellfun('isempty', alltypes);
+        alltypes(indempty) = '';
+        try, 
+            alltypes = unique(alltypes);
+        catch, 
+            alltypes = '';
+        end;
+    else
+        alltypes = '';
     end;
     
     % channel labels
