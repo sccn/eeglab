@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2009/07/10 00:59:46  arno
+% error if no dataset
+%
 % Revision 1.16  2008/11/13 02:17:36  arno
 % comment
 %
@@ -98,7 +101,7 @@ if ~isstr(varargin{1}) %intial settings
          
     % callbacks
     % ---------
-    erspparams_str = [ '''cycles'', [3 0.5], ''padratio'', 1' ];
+    erspparams_str = [ '''cycles'', [3 0.5], ''nfreqs'', 100' ];
     specparams_str = '';
     set_ersp       = ['pop_precomp(''setersp'',gcf);']; 
     test_ersp      = ['pop_precomp(''testersp'',gcf);']; 
