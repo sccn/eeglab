@@ -71,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.49  2007/03/20 02:59:50  arno
+% fixed Toby's code
+%
 % Revision 1.48  2006/05/13 13:28:31  arno
 % allow to process event types with space
 %
@@ -367,7 +370,7 @@ if ~isempty( events )
     else
         error('pop_epoch(): multiple event types must be entered as {''a'', ''cell'', ''array''}'); return;
     end;
-    Ievent = Ieventtmp;
+    Ievent = sort(intersect(Ievent, Ieventtmp));
 end;
 
 % select event latencies for epoching
