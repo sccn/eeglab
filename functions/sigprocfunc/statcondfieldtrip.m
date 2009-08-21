@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2009/08/09 04:57:53  arno
+% Fixes
+%
 % Revision 1.2  2009/08/05 03:21:23  arno
 % New header and new options
 %
@@ -136,10 +139,12 @@ function [ ori_vals, df, pvals, surrogval ] = statcondfieldtrip( data, varargin 
             % -------------
             cfg.statistic   = 'depsamplesT';
             [newdata design1 design2 design3] = makefieldtripdata(data, 0);
-            for index = 1:length(newdata)
-                newdata{index}.powspctrm = squeeze(newdata{index}.powspctrm);
-                newdata{index}.label     = { g.chanlocs.labels };
-                newdata{index}.freq      = 1;
+            if ~isempty(g.chanlocs)
+                for index = 1:length(newdata)
+                    newdata{index}.powspctrm = squeeze(newdata{index}.powspctrm);
+                    newdata{index}.label     = { g.chanlocs.labels };
+                    newdata{index}.freq      = 1;
+                end;
             end;
             cfg.design      = [ design1; design3 ];
             cfg.uvar        = 2;
