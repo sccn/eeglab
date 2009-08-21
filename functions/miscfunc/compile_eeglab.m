@@ -78,7 +78,7 @@ fieldt  = [ ' -a ' files_fieldtrip_private ...
 % other mex files in file-io private folder
 [allfiles1 plugins]   = scanfold('plugins/');
 [allfiles2 functions] = scanfold('functions/');
-%eval([ 'mcc -v -C -m eeglab' biosig plugins functions fieldt ]);
+eval([ 'mcc -v -C -m eeglab' biosig plugins functions fieldt ]);
 mkdir(fullfile(outputfolder));
 comp = computer;
 if strcmpi(comp(1:2), 'PC')
@@ -124,6 +124,44 @@ allfiles = { allfiles1{:} allfiles2{:} };
 for index = 1:length(allfiles)
     tmpp = which(allfiles{index});
     copyfile(tmpp, fullfile(outputfolder, 'help', allfiles{index}));
+end;
+
+% copy MCR file and visual C++ librairies
+% ---------------------------------------
+if strcmpi(comp(1:2), 'PC')
+    copyfile(fullfile(matlabroot, 'toolbox', 'compiler', 'deploy', 'win32', 'MCRInstaller.exe'), fullfile(outputfolder, 'MCRInstaller.exe'));
+    copyfile(fullfile(matlabroot, 'bin', 'win32', 'vcredist_x86.exe'), fullfile(outputfolder, 'vcredist_x86.exe'));
+
+    fid = fopen(fullfile(outputfolder, 'setup.bat'), 'w');
+    if fid == -1, disp('Error: cannot create setup file');
+    else
+        fprintf(fid, 'echo off\r\n');
+        fprintf(fid, 'echo Deploying EEGLAB project.\r\n');
+        fprintf(fid, 'echo Running MCRInstaller\r\n');
+        fprintf(fid, 'echo You may delete the MCRInstaller.exe and vcredist_x86.exe file after setup is complete\r\n');
+        fprintf(fid, 'MCRInstaller.exe\r\n');
+        fprintf(fid, 'echo Running Visual C++ deployment functions\r\n');
+        fprintf(fid, 'vcredist_x86.exe\r\n');
+        fprintf(fid, 'echo Installation complete.\r\n');
+        fprintf(fid, 'echo Please refer to the documentation for any additional setup steps.\r\n');
+        fprintf(fid, 'echo Now starting EEGLAB...\r\n');
+        fprintf(fid, 'echo To start EEGLAB in the future, simply click on the EEGLAB.EXE file\r\n');
+        fprintf(fid, 'eeglab.exe\r\n');
+        fclose(fid);
+    end;
+    fid = fopen(fullfile(outputfolder, 'eeglab.exe.manifest'), 'w');
+    if fid == -1, disp('Error: cannot create manifest file');
+    else
+        fprintf(fid, '<?xml version=''1.0'' encoding=''UTF-8'' standalone=''yes''?>\r\n'); 
+        fprintf(fid, '<assembly xmlns=''urn:schemas-microsoft-com:asm.v1'' manifestVersion=''1.0''>\r\n');
+        fprintf(fid, '  <dependency>\r\n');
+        fprintf(fid, '    <dependentAssembly>\r\n');
+        fprintf(fid, '      <assemblyIdentity type=''win32'' name=''Microsoft.VC80.CRT'' version=''8.0.50727.762'' processorArchitecture=''x86'' publicKeyToken=''1fc8b3b9a1e18e3b'' />\r\n'); 
+        fprintf(fid, '    </dependentAssembly>\r\n');
+        fprintf(fid, '  </dependency>\r\n');
+        fprintf(fid, '</assembly>\r\n');
+        fclose(fid);
+    end;
 end;
 
 % cleaning up
