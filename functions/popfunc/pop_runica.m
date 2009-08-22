@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.89  2009/08/19 01:38:56  arno
+% fix numeric types
+%
 % Revision 1.88  2009/07/02 23:26:42  arno
 % interupt for runica
 %
@@ -522,6 +525,7 @@ elseif length(ALLEEG) > 1 & strcmpi(g.concatcond, 'on')
         for idat = 1:length(dats{index})
             ALLEEG(dats{index}(idat)).saved = 'off';
             pop_saveset(ALLEEG(dats{index}(idat)), 'savemode', 'resave');
+            ALLEEG(dats{index}(idat)).saved = 'on';
         end;
     end;
     com = sprintf('%s = pop_runica(%s, %s);', inputname(1),inputname(1), ...
