@@ -56,6 +56,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.75  2009/08/10 23:31:13  arno
+% Fix for windows 64 bit
+%
 % Revision 1.74  2009/07/02 22:08:42  arno
 % removing unused variable
 %
@@ -447,6 +450,7 @@ end;
 counter = 1;
 countobj = 1;
 allobj = zeros(1,1000);
+curfig = gcf;
 if isfield(EEG, 'chaninfo'), options = { options{:} 'chaninfo' EEG.chaninfo }; end
     
 for index = 1:size(arg2(:),1)
