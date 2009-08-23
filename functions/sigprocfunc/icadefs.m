@@ -53,7 +53,13 @@ DEFAULT_TIMLIM = [-1000 2000]; % default local epoch limits (ms)
 
 % Set EEGLAB figure and GUI colors
 % --------------------------------
-if get(0, 'screendepth') <=8 % if mono or 8-bit color
+lowscreendepth = 0;
+if ~exist('OCTAVE_VERSION')
+    if get(0, 'screendepth') <=8 % if mono or 8-bit color
+	lowscreendepth = 1; 
+    end;
+end;
+if lowscreendepth    
     fprintf('icadefs(): Setting display parameters for mono or 8-bit color\n');
     BACKCOLOR           = [1 1 1];    % Background figure color 
     BACKEEGLABCOLOR     = [1 1 1];    % EEGLAB main window background
