@@ -329,6 +329,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.171  2009/07/30 23:31:47  arno
+% fix baseline issue
+%
 % Revision 1.170  2009/07/28 16:56:33  arno
 % remove baseline from output only when necessary
 %
@@ -1635,8 +1638,11 @@ if iscell(data)
                         res2{1}(indarr,:)        = res2tmp{1};      res2{2}(indarr,:)        = res2tmp{2};
                     end;
                 else
-                    [resdiff resimages res1 res2] = condstat(formula, g.naccu, g.alpha, {'both' 'upper'}, { '' g.condboot}, ...
-                        { alltfX1power alltfX2power }, {alltfX1 alltfX2});
+                    alltfXpower = { alltfX1power alltfX2power };
+                    alltfX      = { alltfX1 alltfX2 };
+                    alltfXabs   = { alltfX1abs alltfX2abs };
+                    [resdiff resimages res1 res2] = condstat(formula, g.naccu, g.alpha, {'both' 'upper'}, { '' g.condboot}, alltfXpower, alltfX, 
+alltfXabs);
                 end;
             case 'phasecoher2', % normalize first to speed up
 
@@ -1659,8 +1665,10 @@ if iscell(data)
                         res2{1}(indarr,:)        = res2tmp{1};      res2{2}(indarr,:)        = res2tmp{2};
                     end;
                 else
-                    [resdiff resimages res1 res2] = condstat(formula, g.naccu, g.alpha, {'both' 'upper'}, { '' g.condboot}, ...
-                        { alltfX1power alltfX2power }, {alltfX1 alltfX2}, { alltfX1abs alltfX2abs });
+                    alltfXpower = { alltfX1power alltfX2power };
+                    alltfX      = { alltfX1 alltfX2 };
+                    alltfXabs   = { alltfX1abs alltfX2abs };
+                    [resdiff resimages res1 res2] = condstat(formula, g.naccu, g.alpha, {'both' 'upper'}, { '' g.condboot}, alltfXpower, alltfX, alltfXabs);
                 end;
             case 'phasecoher',
 
@@ -1673,9 +1681,11 @@ if iscell(data)
                         if ind == size(alltfX1,1), indarr = ind; else indarr = [ind:ind+1]; end;
                         alltfX1norm = alltfX1(indarr,:,:)./sqrt(alltfX1(indarr,:,:).*conj(alltfX1(indarr,:,:)));
                         alltfX2norm = alltfX2(indarr,:,:)./sqrt(alltfX2(indarr,:,:).*conj(alltfX2(indarr,:,:)));
+                        alltfXpower = { alltfX1power(indarr,:,:) alltfX2power(indarr,:,:) };
+                        alltfXnorm  = { alltfX1norm alltfX2norm };
                         [resdifftmp resimagestmp res1tmp res2tmp] = ...
                             condstat(formula, g.naccu, g.alpha, {'both' 'both'}, { '' g.condboot}, ...
-                            { alltfX1power(indarr,:,:) alltfX2power(indarr,:,:) }, { alltfX1norm alltfX2norm });
+                            alltfXpower, alltfXnorm);
                         resdiff{1}(indarr,:)     = resdifftmp{1};   resdiff{2}(indarr,:)     = resdifftmp{2};
                         resimages{1}(indarr,:,:) = resimagestmp{1}; resimages{2}(indarr,:,:) = resimagestmp{2};
                         res1{1}(indarr,:)        = res1tmp{1};      res1{2}(indarr,:)        = res1tmp{2};
@@ -1684,9 +1694,11 @@ if iscell(data)
                 else
                     alltfX1norm = alltfX1./sqrt(alltfX1.*conj(alltfX1));
                     alltfX2norm = alltfX2./sqrt(alltfX2.*conj(alltfX2)); % maybe have to suppress preprocessing -> lot of memory
+                    alltfXpower = { alltfX1power alltfX2power };
+                    alltfXnorm  = { alltfX1norm alltfX2norm };
                     [resdiff resimages res1 res2] = condstat(formula, g.naccu, g.alpha, {'both' 'both'}, { '' g.condboot}, ...
-                        { alltfX1power alltfX2power }, { alltfX1norm alltfX2norm });
-                end;
+                        alltfXpower, alltfXnorm);
+		end;
         end;
 
         % same as below: plottimef(P1-P2, R2-R1, 10*resimages{1}, resimages{2}, mean(data{1},2)-mean(data{2},2), freqs, times, mbase, g);
