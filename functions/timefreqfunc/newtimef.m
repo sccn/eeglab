@@ -329,6 +329,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.172  2009/08/23 00:14:36  arno
+% octave compatibility
+%
 % Revision 1.171  2009/07/30 23:31:47  arno
 % fix baseline issue
 %
@@ -1641,8 +1644,7 @@ if iscell(data)
                     alltfXpower = { alltfX1power alltfX2power };
                     alltfX      = { alltfX1 alltfX2 };
                     alltfXabs   = { alltfX1abs alltfX2abs };
-                    [resdiff resimages res1 res2] = condstat(formula, g.naccu, g.alpha, {'both' 'upper'}, { '' g.condboot}, alltfXpower, alltfX, 
-alltfXabs);
+                    [resdiff resimages res1 res2] = condstat(formula, g.naccu, g.alpha, {'both' 'upper'}, { '' g.condboot}, alltfXpower, alltfX, alltfXabs);
                 end;
             case 'phasecoher2', % normalize first to speed up
 
