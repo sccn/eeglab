@@ -116,6 +116,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2009/08/27 23:06:20  arno
+% New density measure
+%
 % Revision 1.2  2009/07/25 00:28:30  arno
 % new format
 %
@@ -335,6 +338,7 @@ else
         %tmpmat = posx(index,:)+(posy(index,:)-1)*64+(gammapower(:)-1)*64*64;
         matrixfinalgammapower(freq,:,:) = conv2(squeeze(matrixfinalgammapower(freq,:,:)), gauss2d(5,5), 'same');
     end;
+    matrixfinalgammapower = matrixfinalgammapower/size(alltfX,3)/size(alltfX,2);
     
     %vect = linspace(-pi,pi,50);    
     %for f = 1:length(freqs2)
