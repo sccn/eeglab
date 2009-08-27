@@ -116,6 +116,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2009/07/25 00:28:30  arno
+% new format
+%
 % Revision 1.1  2009/07/10 01:50:45  arno
 % new function
 %
@@ -176,6 +179,8 @@ g = finputcheck(varargin, ...
                   'rboot'         'real'     []                        [];
                   'subitc'        'string'   {'on' 'off'}              'off';
                   'subwin'        'real'     []                        []; ...
+                  'gammapowerlim' 'real'     []                        []; ...
+                  'powerlim'      'real'     []                        []; ...
                   'powerlat'      'real'     []                        []; ...
                   'timesout'      'real'     []                        []; ...
                   'ntimesout'     'integer'  []                        200; ...
@@ -282,29 +287,69 @@ else
     %    error('You need to specify a latency for the ''powerlat'' option');
     %end;
         
-    power = mean(alltfX(:,:,:).*conj(alltfX),1); % average all frequencies for power
+    gammapower = mean(10*log10(alltfX(:,:,:).*conj(alltfX)),1); % average all frequencies for power
+    if isempty(g.gammapowerlim)
+        g.gammapowerlim = [ min(gammapower(:)) max(gammapower(:)) ];
+    end;
+    power = 10*log10(alltfY(:,:,:).*conj(alltfY));
+    if isempty(g.powerlim)
+        for freq = 1:size(power,1)
+            g.powerlim(freq,:) = [ min(power(freq,:)) max(power(freq,:)) ];
+        end;
+    end;
+
+    % power plot
+    %figure; plot(timesout2/1000, (mean(power(9,:,:),3)-mean(power(9,:)))/50);
+    %hold on; plot(linspace(0, length(Y)/srate, length(Y)), mean(Y'), 'g');
+
+    % phase with power
+    % figure; plot(timesout2/1000, (mean(phaseangle(9,:,:),3)-mean(phaseangle(9,:)))/50);
+    % hold on; plot(timesout1/1000, (mean(gammapower,3)-mean(gammapower(:)))/100, 'r');
+    %figure; plot((mean(phaseangle(9,:,:),3)-mean(phaseangle(9,:)))/50+j*(mean(gammapower,3)-mean(gammapower(:)))/100, '.');
     
-    for t = 1:size(alltfX,3) % scan trials
-            
-        % find latency with max power (and store angle)
-        % ---------------------------------------------
-        [tmp maxlat] = max(power(1,:,t));
-        tmpalltfy(:,t) = angle(alltfY(:,maxlat,t));
-            
+    matrixfinal           = zeros(size(alltfY,1),64,64,64);
+    matrixfinalgammapower = zeros(size(alltfY,1),64,64);
+    
+    % get power indices
+    gammapoweradd  = gammapower-mean(gammapower(:));
+    gammapower     = floor((gammapower-g.gammapowerlim(1))/(g.gammapowerlim(2)-g.gammapowerlim(1))*63)+1;
+    phaseangle     = angle(alltfY);
+    posx           = zeros(size(power));
+    posy           = zeros(size(power));
+    gs             = gauss3d(6, 6, 6);
+    for freq = 1:size(alltfY)
+        fprintf('Processing frequency %3.2f\n', freqs2(freq));
+        power(freq,:,:) = (power(freq,:,:)-g.powerlim(freq,1))/(g.powerlim(freq,2)-g.powerlim(freq,1))*30+1;
+        complexval      = power(freq,:,:).*exp(j*phaseangle(freq,:,:));
+        posx(freq,:,:)  = floor(real(complexval))+32;
+        posy(freq,:,:)  = floor(imag(complexval))+32;
+        for trial = 1:size(alltfX,3) % scan trials
+            for time = 1:size(alltfX,2)
+                matrixfinal(freq,posx(freq,time,trial),posy(freq,time,trial),gammapower(1,time,trial)) = ...
+                    matrixfinal(freq,posx(freq,time,trial),posy(freq,time,trial),gammapower(1,time,trial))+1;
+                matrixfinalgammapower(freq,posx(freq,time,trial),posy(freq,time,trial)) = ...
+                    matrixfinalgammapower(freq,posx(freq,time,trial),posy(freq,time,trial))+gammapoweradd(1,time,trial);
+            end;
+        end;
+        %matrixfinal(freq,:,:,:) = convn(squeeze(matrixfinal(freq,:,:,:)), gs, 'same');
+        %tmpmat = posx(index,:)+(posy(index,:)-1)*64+(gammapower(:)-1)*64*64;
+        matrixfinalgammapower(freq,:,:) = conv2(squeeze(matrixfinalgammapower(freq,:,:)), gauss2d(5,5), 'same');
     end;
     
-    vect = linspace(-pi,pi,50);    
-    for f = 1:length(freqs2)
-        crossfcoh(f,:) = hist(tmpalltfy(f,:), vect);
-    end;
+    %vect = linspace(-pi,pi,50);    
+    %for f = 1:length(freqs2)
+    %    crossfcoh(f,:) = hist(tmpalltfy(f,:), vect);
+    %end;
     
     % smoothing of output image
     % -------------------------
-    gs = gauss2d(6, 6);
-    crossfcoh = conv2(crossfcoh, gs, 'same');
-    freqs1    = freqs2;
-    timesout1 = linspace(-180, 180, size(crossfcoh,2));
+    %gs = gauss2d(6, 6, 6);
+    %crossfcoh = convn(crossfcoh, gs, 'same');
+    %freqs1    = freqs2;
+    %timesout1 = linspace(-180, 180, size(crossfcoh,2));
 
+    crossfcoh = matrixfinalgammapower;
+    
 end;
 
     
