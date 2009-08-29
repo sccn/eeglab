@@ -63,6 +63,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2009/08/29 00:38:31  arno
+% move all statistics to std_stat
+%
 % Revision 1.4  2009/08/11 00:22:59  arno
 % fix bootstrap problem
 %
@@ -225,26 +228,10 @@ if nc > 1 & ~isempty(opt.condstats ), addr = 1; else addr = 0; end;
 if ~isempty(opt.interstats), pinter = opt.interstats{3}; end;
 
 if ~isnan(opt.threshold) & ( ~isempty(opt.groupstats) | ~isempty(opt.condstats) )    
-    % applying threshold
-    % ------------------
-    if strcmpi(opt.mcorrect, 'fdr'), 
-        disp('Applying FDR correction for multiple comparisons');
-        for ind = 1:length(opt.condstats),  [ tmp pcondplot{ ind}] = fdr(opt.condstats{ind} , opt.threshold); end;
-        for ind = 1:length(opt.groupstats), [ tmp pgroupplot{ind}] = fdr(opt.groupstats{ind}, opt.threshold); end;
-        if ~isempty(pinter), [tmp pinterplot] = fdr(pinter, opt.threshold); end;
-    else
-        for ind = 1:length(opt.condstats),  pcondplot{ind}  = opt.condstats{ind}  < opt.threshold; end;
-        for ind = 1:length(opt.groupstats), pgroupplot{ind} = opt.groupstats{ind} < opt.threshold; end;
-        if ~isempty(pinter), pinterplot = pinter < opt.threshold; end;
-    end;
+    pcondplot  = opt.condstats;
+    pgroupplot = opt.groupstats;
     maxplot = 1;
 else
-    if strcmpi(opt.mcorrect, 'fdr'), 
-        disp('Applying FDR correction for multiple comparisons');
-        for ind = 1:length(opt.condstats), opt.condstats{ind} = fdr( opt.condstats{ind} ); end;
-        for ind = 1:length(opt.groupstats), opt.groupstats{ind} = fdr( opt.groupstats{ind} ); end;
-        if ~isempty(pinter), pinter = fdr(pinter); end;
-    end;
     warning off;
     for ind = 1:length(opt.condstats),  pcondplot{ind}  = -log10(opt.condstats{ind}); end;
     for ind = 1:length(opt.groupstats), pgroupplot{ind} = -log10(opt.groupstats{ind}); end;
@@ -321,9 +308,6 @@ for g = 1:ng
     if ~isempty(opt.condstats) & nc > 1
         hdl(nc+1,g) = mysubplot(nc+addr, ng+addc, g + c*(ng+addc), opt.transpose);
         topoplot( pcondplot{g}, opt.chanlocs);
-        if all(pcondplot{g} == 0)
-            fprintf('Debug note: the text [-1 1] is returned in topoplot() when the input contains only 0s; could not find where though -Arno, 2007\n');
-        end;
         if isnan(opt.threshold), title(sprintf('%s (p-value)', opt.groupnames{g}));
         else                     title(sprintf('%s (p<%.4f)',  opt.groupnames{g}, opt.threshold));
         end;

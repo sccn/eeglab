@@ -166,6 +166,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.289  2009/08/19 01:40:02  arno
+% change line size for significance masking
+%
 % Revision 1.288  2009/08/09 04:57:25  arno
 % change transparency
 %
@@ -1834,6 +1837,7 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
         handle = tmph;
     end;
     
+    warning off;
     if ~PMASKFLAG
         [cls chs] = contour(Xi,Yi,ZiC,CONTOURNUM,'k'); 
     else
@@ -1846,7 +1850,7 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
         end;
     end;
     for h=chs, set(h,'color',CCOLOR); end
-    
+    warning on;
   %
   %%%%%%%%%%%%%%%%%%%%%%%% Else plot map only %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %
@@ -1878,7 +1882,7 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
   %
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Set color axis  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %
-  caxis([amin amax]) % set coloraxis
+  caxis([amin amax]); % set coloraxis
 
 else % if STYLE 'blank'
 %

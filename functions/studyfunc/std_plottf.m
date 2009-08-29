@@ -96,6 +96,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2009/05/31 02:22:10  arno
+% Adding FDR and bootstrap to all STUDY functions
+%
 % Revision 1.14  2007/09/11 10:50:30  arno
 % fix numerous small display problems and crash
 %
@@ -250,9 +253,10 @@ opt = finputcheck( varargin, { 'channels'    'cell'   []              {};
                                'chanlocs'    'struct' []              struct('labels', {});
                                'freqscale'   'string' { 'log' 'linear' 'auto' }  'auto';
                                'plotsubjects' 'string' { 'on' 'off' }  'off';
-                               'groupstats'   'string' { 'on' 'off' }   'off';
+                               'groupstats'   'cell'   []              {};
+                               'condstats'    'cell'   []              {};
+                               'interstats'   'cell'   []              {};                               
                                'plottopo'     'string' { 'on' 'off' }   'off';
-                               'condstats'    'string' { 'on' 'off' }   'off';
                                'maskdata'    'string' { 'on' 'off' }   'off';
                                'legend'      'string' { 'on' 'off' }   'off';
                                'datatype'    'string' { 'ersp' 'itc' 'erp' 'spec' }    'erp';
@@ -267,12 +271,11 @@ if strcmpi(opt.plottopo, 'on') & size(data{1},4) == 1, opt.singlesubject = 'on';
 %if size(data{1},2) == 1,                               opt.singlesubject = 'on'; end;
 %if strcmpi(opt.singlesubject, 'on'), opt.groupstats = 'off'; opt.condstats = 'off'; end;
 if all(all(cellfun('size', data, 3)==1))               opt.singlesubject = 'on'; end;
-if any(any(cellfun('size', data, 3)==1)), opt.groupstats = 'off'; opt.condstats = 'off'; end;
 if ~isempty(opt.compinds), if length(opt.compinds{1}) > 1, opt.compinds = {}; end; end;
-if strcmpi(opt.groupstats, 'on') & strcmpi(opt.condstats, 'on') & strcmpi(opt.maskdata, 'on')
+if ~isempty(opt.groupstats) & ~isempty(opt.condstats) & strcmpi(opt.maskdata, 'on')
     disp('Cannot use ''maskdata'' option with both condition stat. and group stat. on');
     disp('Disabling statistics');
-    opt.groupstats = 'off'; opt.condstats = 'off'; opt.maskdata = 'off'; 
+    opt.groupstats = {}; opt.condstats = {}; opt.maskdata = 'off'; 
 end;
 if ~isempty(opt.ersplim), opt.caxis = opt.ersplim; end;
 if ~isempty(opt.itclim), opt.caxis = opt.itclim; end;
@@ -281,8 +284,6 @@ if strcmpi(opt.plotsubjects, 'on')
     opt.plotgroups = 'apart';
     opt.plotconditions  = 'apart';
 end
-if size(data,1) < 2, opt.condstats = 'off'; end;
-if size(data,2) < 2, opt.groupstats = 'off'; end;
 onecol  = { 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b' };
 manycol = { 'b' 'r' 'g' 'k' 'c' 'y' };
 
@@ -337,12 +338,12 @@ end;
 
 % plotting paramters
 % ------------------
-if ng > 1 & strcmpi(opt.groupstats, 'on'), addc = 1; else addc = 0; end;
-if nc > 1 & strcmpi(opt.condstats , 'on'), addr = 1; else addr = 0; end;
+if ng > 1 & ~isempty(opt.groupstats), addc = 1; else addc = 0; end;
+if nc > 1 & ~isempty(opt.condstats  ), addr = 1; else addr = 0; end;
 if isempty(opt.topovals) & strcmpi(opt.singlesubject, 'off') % only for curves
     plottag = 0;
-    if strcmpi(opt.plotgroups, 'together') & strcmpi(opt.condstats, 'off') & strcmpi(opt.groupstats, 'on' ) & ~isnan(opt.threshold), addc = 0; plottag = 1; end;
-    if strcmpi(opt.plotconditions , 'together') & strcmpi(opt.condstats, 'on' ) & strcmpi(opt.groupstats, 'off') & ~isnan(opt.threshold), addr = 0; plottag = 1; end;
+    if strcmpi(opt.plotgroups, 'together') & ~isempty(opt.condstats) & ~isempty(opt.groupstats) & ~isnan(opt.threshold), addc = 0; plottag = 1; end;
+    if strcmpi(opt.plotconditions , 'together') & ~isempty(opt.condstats) & ~isempty(opt.groupstats) & ~isnan(opt.threshold), addr = 0; plottag = 1; end;
     if ~isnan(opt.threshold) & plottag == 0
         disp('Warning: cannot plot condition/group on the same panel while using a fixed');
         disp('         threshold, unless you only compute statistics for ether groups or conditions');
@@ -351,254 +352,128 @@ if isempty(opt.topovals) & strcmpi(opt.singlesubject, 'off') % only for curves
     end;
 end;
 
-if ~isempty(opt.topovals)
-    if length(opt.topovals) < 3, 
-        opt.topovals(3:4) = opt.topovals(2);
-        opt.topovals(2) = opt.topovals(1);
-    end;
-    [tmp fi1] = min(abs(freqs-opt.topovals(1)));
-    [tmp fi2] = min(abs(freqs-opt.topovals(2)));
-    [tmp ti1] = min(abs(timevals-opt.topovals(3)));
-    [tmp ti2] = min(abs(timevals-opt.topovals(4)));
-    for index = 1:length(data(:))
-        data{index} = mean(mean(data{index}(ti1:ti2,fi1:fi2,:,:),1),2);
-        data{index} = reshape(data{index}, [1 size(data{index},3) size(data{index},4) ]);
-    end;
-end
+% compute significance mask
+% --------------------------
+if ~isempty(opt.interstats), pinter = opt.interstats{3}; end;
 
-[pcond pgroup pinter] = std_stat(data, 'statistics',  opt.statistics, 'naccu', opt.naccu, ...
-                                 'groupstats', opt.groupstats, 'condstats', opt.condstats);
 if ~isnan(opt.threshold) & ( ~isempty(opt.groupstats) | ~isempty(opt.condstats) )    
-    % applying threshold
-    % ------------------
-    if strcmpi(opt.mcorrect, 'fdr'), 
-        disp('Applying FDR correction for multiple comparisons');
-        for ind = 1:length(pcond),  [ tmp pcondplot{ ind}] = fdr(pcond{ind} , opt.threshold); end;
-        for ind = 1:length(pgroup), [ tmp pgroupplot{ind}] = fdr(pgroup{ind}, opt.threshold); end;
-        if ~isempty(pinter), [tmp pinterplot] = fdr(pinter{end}, opt.threshold); end;
-    else
-        for ind = 1:length(pcond),  pcondplot{ind}  = pcond{ind}  < opt.threshold; end;
-        for ind = 1:length(pgroup), pgroupplot{ind} = pgroup{ind} < opt.threshold; end;
-        if ~isempty(pinter), pinterplot = pinter{end} < opt.threshold; end;
-    end;
+    pcondplot  = opt.condstats;
+    pgroupplot = opt.groupstats;
     maxplot = 1;
 else
-    if strcmpi(opt.mcorrect, 'fdr'), 
-        disp('Applying FDR correction for multiple comparisons');
-        for ind = 1:length(pcond),  pcond{ind}  = fdr( pcond{ind} ); end;
-        for ind = 1:length(pgroup), pgroup{ind} = fdr( pgroup{ind} ); end;
-        if ~isempty(pinter), pinter{end} = fdr(pinter{end}); end;
-    end;
     warning off;
-    for ind = 1:length(pcond),  pcondplot{ind}  = -log10(pcond{ind}); end;
-    for ind = 1:length(pgroup), pgroupplot{ind} = -log10(pgroup{ind}); end;
-    if ~isempty(pinter), pinterplot = -log10(pinter{end}); end;
+    for ind = 1:length(opt.condstats),  pcondplot{ind}  = -log10(opt.condstats{ind}); end;
+    for ind = 1:length(opt.groupstats), pgroupplot{ind} = -log10(opt.groupstats{ind}); end;
+    if ~isempty(pinter), pinterplot = -log10(pinter); end;
     maxplot = 3;
     warning on;
-end
-
-% plotting all conditions
-% -----------------------
-if isempty(opt.topovals)
-    
-    % -------------------------------
-    % masking for significance of not
-    % -------------------------------
-    statmask = 0;
-    if strcmpi(opt.maskdata, 'on') & ~isnan(opt.threshold) & ...
-            (strcmpi(opt.condstats, 'on') | strcmpi(opt.condstats, 'on'))
-        addc = 0; addr = 0; statmask = 1;
-    end;
-        
-    % -------------------------
-    % plot time/frequency image
-    % -------------------------
-    options = { 'chanlocs', opt.chanlocs, 'electrodes', 'off', 'cbar', 'off', ...
-                'cmode', 'separate', opt.tftopoopt{:} };
-    if strcmpi(opt.freqscale, 'log'), options = { options{:} 'logfreq', 'native' }; end;
-
-    figure('color', 'w');
-    tmpc = [inf -inf];
-    for c = 1:nc
-        for g = 1:ng
-            hdl(c,g) = mysubplot(nc+addr, ng+addc, g + (c-1)*(ng+addc), opt.transpose);
-            if isempty( opt.condnames{c} ) | isempty( opt.groupnames{g} )
-                 fig_title = [ opt.condnames{c} opt.groupnames{g} ];
-            else fig_title = [ opt.condnames{c} ', ' opt.groupnames{g} ];
-            end;
-            if ~isempty(opt.compinds), fig_title = [ 'Comp. ' int2str(opt.compinds{c,g}) ', ' fig_title ]; end;            
-            if ~isempty(opt.subject) , fig_title = [ fig_title ', ' opt.subject ]; end;
-            tmpplot = mean(data{c,g},3);
-            if statmask, 
-                if strcmpi(opt.condstats, 'on'), tmpplot(find(pcondplot{g}(:) == 0)) = 0;
-                else                            tmpplot(find(pgroupplot{c}(:) == 0)) = 0;
-                end;
-            end;
-            tftopo( tmpplot', timevals, freqs, 'title', fig_title, options{:}); 
-            if isempty(opt.caxis)
-                warning off;
-                tmpc = [ min(min(tmpplot(:)), tmpc(1)) max(max(tmpplot(:)), tmpc(2)) ];
-                warning on;
-            else 
-                caxis(opt.caxis);
-            end;
-            
-            if c > 1
-                ylabel(''); 
-            end;
-            
-            % statistics accross groups
-            % -------------------------
-            if g == ng & ng > 1 & strcmpi(opt.groupstats, 'on') & ~statmask
-                hdl(c,g+1) = mysubplot(nc+addr, ng+addc, g + 1 + (c-1)*(ng+addc), opt.transpose);
-                if isnan(opt.threshold), tmp_title = sprintf('%s (p-value)', opt.condnames{c});
-                else                     tmp_title = sprintf('%s (p<%.4f)',  opt.condnames{c}, opt.threshold);
-                end;
-                tftopo( pgroupplot{c}', timevals, freqs, 'title', tmp_title, options{:});
-                caxis([-maxplot maxplot]);
-            end;
-
-        end;
-
-    end;
-    for g = 1:ng
-        % statistics accross conditions
-        % -----------------------------
-        if strcmpi(opt.condstats, 'on') & ~statmask & nc > 1
-            hdl(nc+1,g) = mysubplot(nc+addr, ng+addc, g + c*(ng+addc), opt.transpose);
-            if isnan(opt.threshold), tmp_title = sprintf('%s (p-value)', opt.groupnames{g});
-            else                     tmp_title = sprintf('%s (p<%.4f)',  opt.groupnames{g}, opt.threshold);
-            end;
-            tftopo( pcondplot{g}', timevals, freqs, 'title', tmp_title, options{:});
-            caxis([-maxplot maxplot]);
-        end;
-    end;
-                ylabel('');  % nima
-    % color scale
-    % -----------
-    if isempty(opt.caxis)
-        tmpc = [-max(abs(tmpc)) max(abs(tmpc))];
-        for c = 1:nc
-            for g = 1:ng
-                axes(hdl(c,g));
-                caxis(tmpc);
-            end;
-        end;
-    end;
-    
-    % statistics accross group and conditions
-    % ---------------------------------------
-    if strcmpi(opt.groupstats, 'on') & strcmpi(opt.condstats, 'on') & ng > 1 & nc > 1
-        hdl(nc+1,ng+1) = mysubplot(nc+addr, ng+addc, g + 1 + c*(ng+addr), opt.transpose);
-        if isnan(opt.threshold), tmp_title = 'Interaction (p-value)';
-        else                     tmp_title = sprintf('Interaction (p<%.4f)', opt.threshold);
-        end;
-        tftopo( pinterplot',  timevals, freqs, 'title', tmp_title, options{:});
-        caxis([-maxplot maxplot]);
-        ylabel('');
-    end;    
-    
-    % color bars
-    % ----------
-    axes(hdl(nc,ng)); 
-    cbar_standard(opt.datatype, ng); 
-    if nc ~= size(hdl,1) | ng ~= size(hdl,2)
-        axes(hdl(end,end));
-        cbar_signif(ng, maxplot);
-    end;
-else    
-    
-    % topoplot
-    % --------
-    figure('color', 'w');
-    tmpc = [inf -inf];
-    for c = 1:nc
-        for g = 1:ng
-            hdl(c,g) = mysubplot(nc+addr, ng+addc, g + (c-1)*(ng+addc), opt.transpose);
-            if opt.topovals(1) == opt.topovals(2), fig_title = [ opt.condnames{c} ', ' opt.groupnames{g} ', ' num2str(opt.topovals(1)) ' Hz' ];
-            else                                   fig_title = [ opt.condnames{c} ', ' opt.groupnames{g} ', ' num2str(opt.topovals(1)) '-' num2str(opt.topovals(2)) ' Hz'];
-            end;
-            if length(opt.topovals) > 2
-                if opt.topovals(3) == opt.topovals(4), fig_title = [ fig_title ', ' num2str(opt.topovals(3)) ' ms'];
-                else                                   fig_title = [ fig_title ', ' num2str(opt.topovals(3)) '-' num2str(opt.topovals(4)) ' ms' ];
-                end;
-            end;
-                
-            tmpplot = double(mean(data{c,g},3));
-            topoplot( tmpplot, opt.chanlocs);
-            title(fig_title); 
-            if isempty(opt.caxis)
-                tmpc = [ min(min(tmpplot), tmpc(1)) max(max(tmpplot), tmpc(2)) ];
-            else 
-                caxis(opt.caxis);
-            end;
-
-            % statistics accross groups
-            % -------------------------
-            if g == ng & ng > 1 & strcmpi(opt.groupstats, 'on')
-                hdl(c,g+1) = mysubplot(nc+addr, ng+addc, g + 1 + (c-1)*(ng+addc), opt.transpose);
-                topoplot( pgroupplot{c}, opt.chanlocs);
-                if isnan(opt.threshold), title(sprintf('%s (p-value)', opt.condnames{c}));
-                else                     title(sprintf('%s (p<%.4f)',  opt.condnames{c}, opt.threshold));
-                end;
-                caxis([-maxplot maxplot]);
-            end;
-        end;
-    end;
-
-    % color scale
-    % -----------
-    if isempty(opt.caxis)
-        for c = 1:nc
-            for g = 1:ng
-                axes(hdl(c,g));
-                caxis(tmpc);
-            end;
-        end;
-    end;
-    
-    for g = 1:ng
-        % statistics accross conditions
-        % -----------------------------
-        if strcmpi(opt.condstats, 'on') & nc > 1
-            hdl(nc+1,g) = mysubplot(nc+addr, ng+addc, g + c*(ng+addc), opt.transpose);
-            topoplot( pcondplot{g}, opt.chanlocs);
-            if isnan(opt.threshold), title(sprintf('%s (p-value)', opt.groupnames{g}));
-            else                     title(sprintf('%s (p<%.4f)',  opt.groupnames{g}, opt.threshold));
-            end;
-            caxis([-maxplot maxplot]);
-        end;
-    end;
-
-    % statistics accross group and conditions
-    % ---------------------------------------
-    if strcmpi(opt.groupstats, 'on') & strcmpi(opt.condstats, 'on') & ng > 1 & nc > 1
-        hdl(nc+1,ng+1) = mysubplot(nc+addr, ng+addc, g + 1 + c*(ng+addr), opt.transpose);
-        topoplot( pinterplot, opt.chanlocs);
-        if isnan(opt.threshold), title('Interaction (p-value)');
-        else                     title(sprintf('Interaction (p<%.4f)', opt.threshold));
-        end;
-        caxis([-maxplot maxplot]);
-    end;    
-    
-    % color bars
-    % ----------
-    axes(hdl(nc,ng)); 
-    cbar_standard(opt.datatype, ng);
-    if nc ~= size(hdl,1) | ng ~= size(hdl,2)
-        axes(hdl(end,end));
-        cbar_signif(ng, maxplot);
-    end;
-
 end;
 
-% remove axis labels
-% ------------------
-for c = 1:size(hdl,1)
-    for g = 1:size(hdl,2)
-        if g ~= 1 & size(hdl,2) ~=1, ylabel(''); end;
-        if c ~= size(hdl,1) & size(hdl,1) ~= 1, xlabel(''); end;
+% -------------------------------
+% masking for significance of not
+% -------------------------------
+statmask = 0;
+if strcmpi(opt.maskdata, 'on') & ~isnan(opt.threshold) & ...
+        (~isempty(opt.condstats) | ~isempty(opt.condstats))
+    addc = 0; addr = 0; statmask = 1;
+end;
+
+% -------------------------
+% plot time/frequency image
+% -------------------------
+options = { 'chanlocs', opt.chanlocs, 'electrodes', 'off', 'cbar', 'off', ...
+            'cmode', 'separate', opt.tftopoopt{:} };
+if strcmpi(opt.freqscale, 'log'), options = { options{:} 'logfreq', 'native' }; end;
+
+figure('color', 'w');
+tmpc = [inf -inf];
+for c = 1:nc
+    for g = 1:ng
+        hdl(c,g) = mysubplot(nc+addr, ng+addc, g + (c-1)*(ng+addc), opt.transpose);
+        if isempty( opt.condnames{c} ) | isempty( opt.groupnames{g} )
+             fig_title = [ opt.condnames{c} opt.groupnames{g} ];
+        else fig_title = [ opt.condnames{c} ', ' opt.groupnames{g} ];
+        end;
+        if ~isempty(opt.compinds), fig_title = [ 'Comp. ' int2str(opt.compinds{c,g}) ', ' fig_title ]; end;            
+        if ~isempty(opt.subject) , fig_title = [ fig_title ', ' opt.subject ]; end;
+        tmpplot = mean(data{c,g},3);
+        if statmask, 
+            if ~isempty(opt.condstats), tmpplot(find(pcondplot{g}(:) == 0)) = 0;
+            else                        tmpplot(find(pgroupplot{c}(:) == 0)) = 0;
+            end;
+        end;
+        tftopo( tmpplot', timevals, freqs, 'title', fig_title, options{:}); 
+        if isempty(opt.caxis)
+            warning off;
+            tmpc = [ min(min(tmpplot(:)), tmpc(1)) max(max(tmpplot(:)), tmpc(2)) ];
+            warning on;
+        else 
+            caxis(opt.caxis);
+        end;
+
+        if c > 1
+            ylabel(''); 
+        end;
+
+        % statistics accross groups
+        % -------------------------
+        if g == ng & ng > 1 & ~isempty(opt.groupstats) & ~statmask
+            hdl(c,g+1) = mysubplot(nc+addr, ng+addc, g + 1 + (c-1)*(ng+addc), opt.transpose);
+            if isnan(opt.threshold), tmp_title = sprintf('%s (p-value)', opt.condnames{c});
+            else                     tmp_title = sprintf('%s (p<%.4f)',  opt.condnames{c}, opt.threshold);
+            end;
+            tftopo( pgroupplot{c}', timevals, freqs, 'title', tmp_title, options{:});
+            caxis([-maxplot maxplot]);
+        end;
+
     end;
+end;
+
+
+for g = 1:ng
+    % statistics accross conditions
+    % -----------------------------
+    if ~isempty(opt.condstats) & ~statmask & nc > 1
+        hdl(nc+1,g) = mysubplot(nc+addr, ng+addc, g + c*(ng+addc), opt.transpose);
+        if isnan(opt.threshold), tmp_title = sprintf('%s (p-value)', opt.groupnames{g});
+        else                     tmp_title = sprintf('%s (p<%.4f)',  opt.groupnames{g}, opt.threshold);
+        end;
+        tftopo( pcondplot{g}', timevals, freqs, 'title', tmp_title, options{:});
+        caxis([-maxplot maxplot]);
+    end;
+end;
+            ylabel('');  % nima
+% color scale
+% -----------
+if isempty(opt.caxis)
+    tmpc = [-max(abs(tmpc)) max(abs(tmpc))];
+    for c = 1:nc
+        for g = 1:ng
+            axes(hdl(c,g));
+            caxis(tmpc);
+        end;
+    end;
+end;
+
+% statistics accross group and conditions
+% ---------------------------------------
+if ~isempty(opt.groupstats) & ~isempty(opt.condstats) & ng > 1 & nc > 1
+    hdl(nc+1,ng+1) = mysubplot(nc+addr, ng+addc, g + 1 + c*(ng+addr), opt.transpose);
+    if isnan(opt.threshold), tmp_title = 'Interaction (p-value)';
+    else                     tmp_title = sprintf('Interaction (p<%.4f)', opt.threshold);
+    end;
+    tftopo( pinterplot',  timevals, freqs, 'title', tmp_title, options{:});
+    caxis([-maxplot maxplot]);
+    ylabel('');
+end;    
+
+% color bars
+% ----------
+axes(hdl(nc,ng)); 
+cbar_standard(opt.datatype, ng); 
+if nc ~= size(hdl,1) | ng ~= size(hdl,2)
+    axes(hdl(end,end));
+    cbar_signif(ng, maxplot);
 end;
 
 % mysubplot (allow to transpose if necessary)

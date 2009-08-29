@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.61  2009/07/02 19:05:08  arno
+% plotting groups of unequal size
+%
 % Revision 1.60  2009/05/31 02:22:10  arno
 % Adding FDR and bootstrap to all STUDY functions
 %
@@ -331,7 +334,7 @@ if ~isempty(opt.channels)
     % compute statistics and plot
     % ---------------------------
     [pcond pgroup pinter] = std_stat(erpdata, 'groupstats', opt.groupstats, 'condstats', opt.condstats, ...
-                                         'statistics', opt.statistics, 'naccu', opt.naccu, 'threshold', opt.threshold);
+                                         'statistics', opt.statistics, 'naccu', opt.naccu, 'threshold', opt.threshold, 'mcorrect', opt.mcorrect);
     locs = eeg_mergelocs(ALLEEG.chanlocs);
     locs = locs(std_chaninds(STUDY, opt.channels));
     if ~isempty(opt.topotime) & ~isnan(opt.topotime)
@@ -377,7 +380,7 @@ else
         % -----------------------
         [erpdata opt.subject comp_names] = std_selcomp(STUDY, erpdata, allinds(index), setinds, compinds, opt.comps);
         [pcond pgroup pinter] = std_stat(erpdata, 'groupstats', opt.groupstats, 'condstats', opt.condstats, ...
-                                         'statistics', opt.statistics, 'naccu', opt.naccu, 'threshold', opt.threshold);
+                                         'statistics', opt.statistics, 'naccu', opt.naccu, 'threshold', opt.threshold, 'mcorrect', opt.mcorrect);
             
         if index == length(allinds), opt.legend = 'on'; end;
             std_plotcurve(alltimes, erpdata, 'condnames', STUDY.condition, 'legend', opt.legend, 'subject', opt.subject, ...

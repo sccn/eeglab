@@ -31,11 +31,12 @@
 %                  keyword available only from the command line {default:500}
 %  'threshold'   - [NaN|p-value] threshold for computing p-value. In this 
 %                  function, it is only used to compute naccu above. NaN
-%                  means that no threshold has been set.
+%                  means that no threshold has been set. 
+%  'mcorrect'    - ['none'|'fdr'] apply correcting for multiple comparisons.
 %
 % Outputs:
-%  pcond        - [cell] condition pvalues. One element per group.
-%  pgroup       - [cell] group pvalues. One element per condition.
+%  pcond        - [cell] condition pvalues or mask (0 or 1). One element per group.
+%  pgroup       - [cell] group pvalues or mask (0 or 1). One element per condition.
 %  pinter       - [cell] three elements, condition pvalues (group pooled),
 %                 group pvalues (condition pooled) and interaction pvalues.
 %
@@ -54,6 +55,9 @@
 %                  of 'trials' statistics requires a lot of RAM.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2009/08/29 00:38:32  arno
+% move all statistics to std_stat
+%
 % Revision 1.5  2009/08/04 23:21:25  arno
 % naccu
 %
@@ -76,7 +80,7 @@ pgroup = [];
 pcond  = [];
 pinter = [];
 if nargin < 1
-    help std_plot;
+    help std_stat;
     return;
 end;
 
@@ -103,6 +107,7 @@ opt = finputcheck( varargin, { 'threshold'   'real'    []               NaN;
 if isstr(opt), error(opt); end;
 if ~isnan(opt.threshold) & isempty(opt.naccu), opt.naccu = 1/opt.threshold*2; end;
 if any(any(cellfun('size', data, 2)==1)), opt.groupstats = 'off'; opt.condstats = 'off'; end;
+if strcmpi(opt.mcorrect, 'fdr'), opt.naccu = opt.naccu*20; end;
 if isempty(opt.naccu), opt.naccu = 2000; end;
 nc = size(data,1);
 ng = size(data,2);
@@ -133,3 +138,26 @@ if ( strcmpi(opt.groupstats, 'on') & strcmpi(opt.condstats, 'on') ) & ng > 1 & n
 else
     pinter = {};
 end;
+
+if ~isnan(opt.threshold) & ( ~isempty(opt.groupstats) | ~isempty(opt.condstats) )    
+    % applying threshold
+    % ------------------
+    if strcmpi(opt.mcorrect, 'fdr'), 
+        disp('Applying FDR correction for multiple comparisons');
+        for ind = 1:length(pcond),  [ tmp pcond{ ind}] = fdr(pcond{ind} , opt.threshold); end;
+        for ind = 1:length(pgroup), [ tmp pgroup{ind}] = fdr(pgroup{ind}, opt.threshold); end;
+        if ~isempty(pinter), [tmp pinter] = fdr(pinter, opt.threshold); end;
+    else
+        for ind = 1:length(pcond),  pcond{ind}  = pcond{ind}  < opt.threshold; end;
+        for ind = 1:length(pgroup), pgroup{ind} = pgroup{ind} < opt.threshold; end;
+        if ~isempty(pinter), pinter = pinter < opt.threshold; end;
+    end;
+else
+    if strcmpi(opt.mcorrect, 'fdr'), 
+        disp('Applying FDR correction for multiple comparisons');
+        for ind = 1:length(pcond),  pcond{ind} = fdr( pcond{ind} ); end;
+        for ind = 1:length(pgroup), pgroup{ind} = fdr( pgroup{ind} ); end;
+        if ~isempty(pinter), pinter = fdr(pinter); end;
+    end;
+end;
+

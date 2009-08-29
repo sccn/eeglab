@@ -94,6 +94,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.70  2009/08/19 01:41:37  arno
+% fix output for multiple channels, add the no plotting option
+%
 % Revision 1.69  2009/08/04 23:21:25  arno
 % naccu
 %
@@ -294,10 +297,7 @@ end;
 plotcurveopt = { ...
    'ersplim',     opt.caxis, ...
    'threshold',   opt.threshold, ...
-   'mcorrect',    opt.mcorrect, ...
    'maskdata',    opt.maskdata, ...
-   'groupstats',  opt.groupstats, ...
-   'condstats',   opt.condstats, ...
    'statistics',  opt.statistics };
 if ~isempty(opt.plottf) & length(opt.channels) < 5
     warndlg2(strvcat('ERSP/ITC parameters indicate that you wish to plot scalp maps', 'Select at least 5 channels to plot topography'));
@@ -314,140 +314,164 @@ opt.legend = 'off';
 
 % plot single scalp map
 % ---------------------
-if ~isempty(opt.plottf) | (strcmpi(opt.plotmode, 'none') & length(opt.channels) > 1)
-    firstind = 1;
-    while isempty(STUDY.changrp(firstind).erspdata)
-        firstind = firstind+1;
-    end;
-    allersp = cell(size(STUDY.changrp(firstind).erspdata));
-   
-    for ind = 1:length(STUDY.changrp(firstind).erspdata(:))
-        if size(STUDY.changrp(firstind).erspdata{1},3) == 1
-             allersp{ind} = zeros([ size(STUDY.changrp(firstind).erspdata{1}) 1 length(opt.channels)]);
-        else allersp{ind} = zeros([ size(STUDY.changrp(firstind).erspdata{1}) length(opt.channels)]);
-        end;
+if ~isempty(opt.channels)
+
+    %if length(allinds) > 1, try, subplot(nr,nc,index, 'align'); catch,
+    %subplot(nr,nc,index); end; end;
+    structdat = STUDY.changrp;
+    eval( [ 'allersp = cell(size(structdat(allinds(1)).' opt.datatype 'data));' ]);
+    for ind =  1:length(allersp(:))
+        eval( [ 'allersp{ind} = zeros([ size(structdat(allinds(1)).' opt.datatype 'data{ind}) length(allinds)])*NaN;' ]);
         for index = 1:length(allinds)
-            if ~isempty(opt.channels)
-                eval( [ 'allersp{ind}(:,:,:,index)  = STUDY.changrp(allinds(index)).' opt.datatype 'data{ind};' ]);
-                eval( [ 'alltimes                   = STUDY.changrp(allinds(index)).' opt.datatype 'times;' ]);
-                eval( [ 'allfreqs                   = STUDY.changrp(allinds(index)).' opt.datatype 'freqs;' ]);
-            else % not sure clusters are actually of any use here
-                eval( [ 'allersp{ind}(:,:,:,index)  = STUDY.cluster(allinds(index)).' opt.datatype 'data{ind};' ]);
-                eval( [ 'alltimes                   = STUDY.cluster(allinds(index)).' opt.datatype 'times;' ]);
-                eval( [ 'allfreqs                   = STUDY.cluster(allinds(index)).' opt.datatype 'freqs;' ]);
-            end;
+            try,
+                eval( [ 'allersp{ind}(:,:,:,index)  = structdat(allinds(index)).' opt.datatype 'data{ind};' ] );
+            catch, end;
+            eval( [ 'allfreqs = structdat(allinds(index)).' opt.datatype 'freqs;' ]);
+            eval( [ 'alltimes = structdat(allinds(index)).' opt.datatype 'times;' ]);
+            eval( [ 'setinds  = structdat(allinds(index)).setinds;' ]);
         end;
-        allersp{ind} = permute(allersp{ind}, [1 2 4 3]);
-    end;
-    %erspbase(:,2) = [];
-    %erspbase(:,1) = [];
-    
-    % select individual subject
-    % -------------------------
-    if ~isempty(opt.subject)
-        subjind = strmatch(opt.subject, STUDY.subject);
-        for c = 1:size(allersp,1)
-            for g = 1:size(allersp,2)
-                allersp{c,g} = allersp{c,g}(:,:,:,subjind);
-            end;
-        end;
+        allersp{ind} = squeeze(permute(allersp{ind}, [1 2 4 3])); % time elec subjects
     end;
     
-    locs = eeg_mergelocs(ALLEEG.chanlocs);
-    locs = locs(std_chaninds(STUDY, opt.channels));
-    if ~strcmpi(opt.plotmode, 'none')
-        [pgroup pcond pinter] = std_plottf(alltimes, allfreqs, allersp, 'condnames', STUDY.condition, 'subject', opt.subject, 'legend', opt.legend, ...
-                                      'datatype', opt.datatype,'plotmode', opt.plotmode, 'groupnames', STUDY.group, 'topovals', opt.plottf, 'unitx', 'Hz', ...
-                                      'chanlocs', locs, 'plotsubjects', opt.plotsubjects, 'naccu', opt.naccu, plotcurveopt{:});
-    end;
-    
+    % plot specific subject
+    % ---------------------
+    if ~isempty(opt.subject), allersp = std_selsubject(allersp, opt.subject, setinds, { STUDY.datasetinfo(:).subject }, length(STUDY.subject)); end;
+        
+    % select specific time and freq
+    % -----------------------------
     if ~isempty(opt.plottf)
-        % reselect time and frequency
-        % ---------------------------
-        maxind   = max(find( alltimes <= opt.plottf(4)));
-        minind   = min(find( alltimes >= opt.plottf(3)));
-        fmaxind  = max(find( allfreqs <= opt.plottf(2)));
-        fminind  = min(find( allfreqs >= opt.plottf(1)));
-        alltimes = mean(alltimes(minind:maxind));
-        allfreqs = mean(allfreqs(fminind:fmaxind));
-        for i =1:length(allersp(:))
-            allersp{i}  = squeeze(mean(mean(allersp{i}(minind:maxind,fminind:fmaxind,:,:),1),2));
+        if length(opt.plottf) < 3, 
+            opt.plottf(3:4) = opt.plottf(2);
+            opt.plottf(2) = opt.plottf(1);
+        end;
+        [tmp fi1] = min(abs(allfreqs-opt.plottf(1)));
+        [tmp fi2] = min(abs(allfreqs-opt.plottf(2)));
+        [tmp ti1] = min(abs(alltimes-opt.plottf(3)));
+        [tmp ti2] = min(abs(alltimes-opt.plottf(4)));
+        for index = 1:length(allersp(:))
+            allersp{index} = mean(mean(allersp{index}(ti1:ti2,fi1:fi2,:,:),1),2);
+            allersp{index} = reshape(allersp{index}, [1 size(allersp{index},3) size(allersp{index},4) ]);
+        end;
+        if opt.plottf(1) == opt.plottf(2), titlestr = [ num2str(opt.plottf(1)) ' Hz'];
+        else                               titlestr = [ num2str(opt.plottf(1)) '-' num2str(opt.plottf(2)) ' Hz'];
+        end;
+        if opt.plottf(3) == opt.plottf(4), titlestr = [ ', ' num2str(opt.plottf(3)) ' ms'];
+        else                               titlestr = [ ', ' num2str(opt.plottf(3)) '-' num2str(opt.plottf(4)) ' ms'];
+        end;
+        locs = eeg_mergelocs(ALLEEG.chanlocs);
+        locs = locs(std_chaninds(STUDY, opt.channels));
+    end
+    
+    [pcond pgroup pinter] = std_stat(allersp, 'groupstats', opt.groupstats, 'condstats', opt.condstats, ...
+                                         'statistics', opt.statistics, 'naccu', opt.naccu, 'threshold', opt.threshold, 'mcorrect', opt.mcorrect);
+                                     
+    % plot specific component
+    % -----------------------
+    %if index == length(allinds), opt.legend = 'on'; end;
+    if ~strcmpi(opt.plotmode, 'none')
+        if ~isempty(opt.plottf) & ~isnan(opt.plottf)
+            std_chantopo(allersp, 'condnames', STUDY.condition, 'plottopo', fastif(length(allinds)==1, 'off', 'on'), ...
+                                      'datatype', 'ersp', 'plotmode', opt.plotmode, 'groupnames', STUDY.group, 'unitx', '\muV', ...
+                                      'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, ...
+                                      'chanlocs', locs, 'plotsubjects', opt.plotsubjects, 'topovals', titlestr, plotcurveopt{:});
+        else
+            for index = 1:size(allersp{1},4)
+                for ind = 1:length(allersp(:))
+                    tmpersp{ind} = allersp{ind}(:,:,:,index); 
+                end;
+                std_plottf(alltimes, allfreqs, tmpersp, 'condnames', STUDY.condition, 'subject', opt.subject, ...
+                                           'legend', opt.legend, 'compinds', {}, 'datatype', opt.datatype, ...
+                                           'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, 'plotmode', ...
+                                           opt.plotmode, 'groupnames', STUDY.group, 'topovals', opt.plottf, 'unitx', 'Hz', ...
+                                          'chanlocs', ALLEEG(1).chanlocs, 'plotsubjects', opt.plotsubjects, plotcurveopt{:});
+                title(sprintf('%s', opt.channels{index}));  
+            end;
         end;
     end;
-    return;
-end;
+else
+    
+    if length(allinds) > 1 & ~strcmpi(opt.plotmode, 'none'), figure; opt.plotmode = 'condensed'; end;
+    nc = ceil(sqrt(length(allinds)));
+    nr = ceil(length(allinds)/nc);
+    comp_names = {};
 
-if length(allinds) > 1 & ~strcmpi(opt.plotmode, 'none'), figure; opt.plotmode = 'condensed'; end;
-nc = ceil(sqrt(length(allinds)));
-nr = ceil(length(allinds)/nc);
-comp_names = {};
+    for index = 1:length(allinds)
 
-for index = 1:length(allinds)
-
-    if length(allinds) > 1, try, subplot(nr,nc,index, 'align'); catch, subplot(nr,nc,index); end; end;
-    if ~isempty(opt.channels)
-        eval( [ 'allersp  = STUDY.changrp(allinds(index)).' opt.datatype 'data;' ]);
-        eval( [ 'alltimes = STUDY.changrp(allinds(index)).' opt.datatype 'times;' ]);
-        eval( [ 'allfreqs = STUDY.changrp(allinds(index)).' opt.datatype 'freqs;' ]);
-        setinds  = STUDY.changrp(allinds(index)).setinds;
-    else
+        if length(allinds) > 1, try, subplot(nr,nc,index, 'align'); catch, subplot(nr,nc,index); end; end;
         eval( [ 'allersp  = STUDY.cluster(allinds(index)).' opt.datatype 'data;' ]);
         eval( [ 'alltimes = STUDY.cluster(allinds(index)).' opt.datatype 'times;' ]);
         eval( [ 'allfreqs = STUDY.cluster(allinds(index)).' opt.datatype 'freqs;' ]);
         compinds = STUDY.cluster(allinds(index)).allinds;
         setinds  = STUDY.cluster(allinds(index)).setinds;
-    end;
-    
-    % plot specific subject
-    % ---------------------
-    if ~isempty(opt.subject) & isempty(opt.comps)
-        for c = 1:size(allersp,1)
-            for g = 1:size(allersp,2)
-                for l=length(setinds{c,g}):-1:1
-                    if ~strcmpi(opt.subject, STUDY.datasetinfo(setinds{c,g}(l)).subject)
-                        allersp{c,g}(:,:,l) = [];
+
+        % plot specific subject
+        % ---------------------
+        if ~isempty(opt.subject), erpdata = std_selsubject(erspdata, opt.subject, setinds, { STUDY.datasetinfo(:).subject }, length(STUDY.subject)); end;
+
+        % plot specific component
+        % -----------------------
+        if ~isempty(opt.comps)
+
+            % find and select group
+            % ---------------------
+            sets   = STUDY.cluster(allinds(index)).sets(:,opt.comps);
+            comps  = STUDY.cluster(allinds(index)).comps(opt.comps);
+            grp    = STUDY.datasetinfo(sets(1)).group;
+            grpind = strmatch( grp, STUDY.group );
+            if isempty(grpind), grpind = 1; end;
+            allersp = allersp(:,grpind);
+
+            % find component
+            % --------------
+            for c = 1:size(allersp,1)
+                for ind = length(compinds{1,grpind}):-1:1
+                    if ~any(compinds{1,grpind}(ind) == comps) | ~any(setinds{1,grpind}(ind) == sets)
+                        allersp{c}(:,:,ind) = [];
+                    else
+                        comp_names{c,1} = comps;
                     end;
                 end;
             end;
+            opt.subject = STUDY.datasetinfo(sets(1)).subject;
         end;
-    end;
-    
-    % plot specific component
-    % -----------------------
-    if ~isempty(opt.comps)
-        
-        % find and select group
-        % ---------------------
-        sets   = STUDY.cluster(allinds(index)).sets(:,opt.comps);
-        comps  = STUDY.cluster(allinds(index)).comps(opt.comps);
-        grp    = STUDY.datasetinfo(sets(1)).group;
-        grpind = strmatch( grp, STUDY.group );
-        if isempty(grpind), grpind = 1; end;
-        allersp = allersp(:,grpind);
-            
-        % find component
-        % --------------
-        for c = 1:size(allersp,1)
-            for ind = length(compinds{1,grpind}):-1:1
-                if ~any(compinds{1,grpind}(ind) == comps) | ~any(setinds{1,grpind}(ind) == sets)
-                    allersp{c}(:,:,ind) = [];
-                else
-                    comp_names{c,1} = comps;
-                end;
+
+        % select specific time and freq
+        % -----------------------------
+        if ~isempty(opt.plottf)
+            if length(opt.plottf) < 3, 
+                opt.plottf(3:4) = opt.plottf(2);
+                opt.plottf(2) = opt.plottf(1);
             end;
-        end;
-        opt.subject = STUDY.datasetinfo(sets(1)).subject;
-    end;
-    
-    % plot specific component
-    % -----------------------
-    if index == length(allinds), opt.legend = 'on'; end;
-    if ~strcmpi(opt.plotmode, 'none')
-        [pgroup pcond pinter] = std_plottf(alltimes, allfreqs, allersp, 'condnames', STUDY.condition, 'subject', opt.subject, ...
-                                       'legend', opt.legend, 'compinds', comp_names, 'datatype', opt.datatype,'plotmode', ...
-                                       opt.plotmode, 'groupnames', STUDY.group, 'topovals', opt.plottf, 'unitx', 'Hz', ...
-                                      'chanlocs', ALLEEG(1).chanlocs, 'plotsubjects', opt.plotsubjects, plotcurveopt{:});
-        if isempty(opt.channels), %title(sprintf('Cluster %d', allinds(index)));
+            [tmp fi1] = min(abs(allfreqs-opt.plottf(1)));
+            [tmp fi2] = min(abs(allfreqs-opt.plottf(2)));
+            [tmp ti1] = min(abs(alltimes-opt.plottf(3)));
+            [tmp ti2] = min(abs(alltimes-opt.plottf(4)));
+            for index = 1:length(allersp(:))
+                allersp{index} = mean(mean(allersp{index}(ti1:ti2,fi1:fi2,:,:),1),2);
+                allersp{index} = reshape(allersp{index}, [1 size(allersp{index},3) size(allersp{index},4) ]);
+            end;
+            if opt.plottf(1) == opt.plottf(2), titlestr = [ num2str(opt.plottf(1)) ' Hz'];
+            else                               titlestr = [ num2str(opt.plottf(1)) '-' num2str(opt.plottf(2)) ' Hz'];
+            end;
+            if opt.plottf(3) == opt.plottf(4), titlestr = [ ', ' num2str(opt.plottf(3)) ' ms'];
+            else                               titlestr = [ ', ' num2str(opt.plottf(3)) '-' num2str(opt.plottf(4)) ' ms'];
+            end;
+            locs = eeg_mergelocs(ALLEEG.chanlocs);
+            locs = locs(std_chaninds(STUDY, opt.channels));
+        end
+
+        [pcond pgroup pinter] = std_stat(allersp, 'groupstats', opt.groupstats, 'condstats', opt.condstats, ...
+                                             'statistics', opt.statistics, 'naccu', opt.naccu, 'threshold', opt.threshold, 'mcorrect', opt.mcorrect);
+
+        % plot specific component
+        % -----------------------
+        if index == length(allinds), opt.legend = 'on'; end;
+        if ~strcmpi(opt.plotmode, 'none')
+            std_plottf(alltimes, allfreqs, allersp, 'condnames', STUDY.condition, 'subject', opt.subject, ...
+                                           'legend', opt.legend, 'compinds', comp_names, 'datatype', opt.datatype, ...
+                                           'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, 'plotmode', ...
+                                           opt.plotmode, 'groupnames', STUDY.group, 'topovals', opt.plottf, 'unitx', 'Hz', ...
+                                          'chanlocs', ALLEEG(1).chanlocs, 'plotsubjects', opt.plotsubjects, plotcurveopt{:});
             if length(allinds) > 1, 
                 title([ STUDY.cluster(allinds(index)).name ' (' num2str(length(STUDY.cluster(allinds(index)).comps)),' ICs, ' ...
                         num2str(length(unique(STUDY.cluster(allinds(index)).sets(1,:)))) ' Ss)' ]);    
@@ -464,8 +488,6 @@ for index = 1:length(allinds)
                 end;
                 axes(h);
             end;
-        else                      
-            title(sprintf('%s', opt.channels{index}));  
         end;
     end;
 end;

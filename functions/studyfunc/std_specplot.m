@@ -88,6 +88,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.56  2009/08/29 00:38:32  arno
+% move all statistics to std_stat
+%
 % Revision 1.55  2009/05/31 02:22:10  arno
 % Adding FDR and bootstrap to all STUDY functions
 %
@@ -292,7 +295,7 @@ if ~isempty(opt.channels)
     % compute statistics and plot
     % ---------------------------
     [pcond pgroup pinter] = std_stat(specdata, 'groupstats', opt.groupstats, 'condstats', opt.condstats, ...
-                                         'statistics', opt.statistics, 'naccu', opt.naccu, 'threshold', opt.threshold);
+                                         'statistics', opt.statistics, 'naccu', opt.naccu, 'threshold', opt.threshold, 'mcorrect', opt.mcorrect );
     locs = eeg_mergelocs(ALLEEG.chanlocs);
     locs = locs(std_chaninds(STUDY, opt.channels));
     if ~isempty(opt.topofreq) & ~isnan(opt.topofreq)
@@ -338,7 +341,7 @@ else
         % -----------------------
         [specdata opt.subject comp_names] = std_selcomp(STUDY, specdata, allinds(index), setinds, compinds, opt.comps);
         [pcond pgroup pinter] = std_stat(specdata, 'groupstats', opt.groupstats, 'condstats', opt.condstats, ...
-                                         'statistics', opt.statistics, 'naccu', opt.naccu, 'threshold', opt.threshold);
+                                         'statistics', opt.statistics, 'naccu', opt.naccu, 'threshold', opt.threshold, 'mcorrect', opt.mcorrect);
             
         if index == length(allinds), opt.legend = 'on'; end;
         std_plotcurve(allfreqs, specdata, 'condnames', STUDY.condition, 'legend', opt.legend, 'subject', opt.subject, ...
