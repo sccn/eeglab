@@ -292,7 +292,7 @@ if ~isempty(opt.channels)
     % compute statistics and plot
     % ---------------------------
     [pcond pgroup pinter] = std_stat(specdata, 'groupstats', opt.groupstats, 'condstats', opt.condstats, ...
-                                         'statistics', opt.statistics, 'naccu', opt.naccu, 'threshold', opt.threshold, 'mcorrect', opt.mcorrect );
+                                         'statistics', opt.statistics, 'naccu', opt.naccu, 'threshold', opt.threshold);
     locs = eeg_mergelocs(ALLEEG.chanlocs);
     locs = locs(std_chaninds(STUDY, opt.channels));
     if ~isempty(opt.topofreq) & ~isnan(opt.topofreq)

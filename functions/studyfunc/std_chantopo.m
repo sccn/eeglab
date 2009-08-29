@@ -225,8 +225,26 @@ if nc > 1 & ~isempty(opt.condstats ), addr = 1; else addr = 0; end;
 if ~isempty(opt.interstats), pinter = opt.interstats{3}; end;
 
 if ~isnan(opt.threshold) & ( ~isempty(opt.groupstats) | ~isempty(opt.condstats) )    
+    % applying threshold
+    % ------------------
+    if strcmpi(opt.mcorrect, 'fdr'), 
+        disp('Applying FDR correction for multiple comparisons');
+        for ind = 1:length(opt.condstats),  [ tmp pcondplot{ ind}] = fdr(opt.condstats{ind} , opt.threshold); end;
+        for ind = 1:length(opt.groupstats), [ tmp pgroupplot{ind}] = fdr(opt.groupstats{ind}, opt.threshold); end;
+        if ~isempty(pinter), [tmp pinterplot] = fdr(pinter, opt.threshold); end;
+    else
+        for ind = 1:length(opt.condstats),  pcondplot{ind}  = opt.condstats{ind}  < opt.threshold; end;
+        for ind = 1:length(opt.groupstats), pgroupplot{ind} = opt.groupstats{ind} < opt.threshold; end;
+        if ~isempty(pinter), pinterplot = pinter < opt.threshold; end;
+    end;
     maxplot = 1;
 else
+    if strcmpi(opt.mcorrect, 'fdr'), 
+        disp('Applying FDR correction for multiple comparisons');
+        for ind = 1:length(opt.condstats), opt.condstats{ind} = fdr( opt.condstats{ind} ); end;
+        for ind = 1:length(opt.groupstats), opt.groupstats{ind} = fdr( opt.groupstats{ind} ); end;
+        if ~isempty(pinter), pinter = fdr(pinter); end;
+    end;
     warning off;
     for ind = 1:length(opt.condstats),  pcondplot{ind}  = -log10(opt.condstats{ind}); end;
     for ind = 1:length(opt.groupstats), pgroupplot{ind} = -log10(opt.groupstats{ind}); end;
