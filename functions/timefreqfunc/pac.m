@@ -116,6 +116,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2009/08/27 23:25:21  arno
+% normalizing
+%
 % Revision 1.3  2009/08/27 23:06:20  arno
 % New density measure
 %
@@ -312,6 +315,7 @@ else
     
     matrixfinal           = zeros(size(alltfY,1),64,64,64);
     matrixfinalgammapower = zeros(size(alltfY,1),64,64);
+    matrixfinalcount      = zeros(size(alltfY,1),64,64);    
     
     % get power indices
     gammapoweradd  = gammapower-mean(gammapower(:));
@@ -332,13 +336,17 @@ else
                     matrixfinal(freq,posx(freq,time,trial),posy(freq,time,trial),gammapower(1,time,trial))+1;
                 matrixfinalgammapower(freq,posx(freq,time,trial),posy(freq,time,trial)) = ...
                     matrixfinalgammapower(freq,posx(freq,time,trial),posy(freq,time,trial))+gammapoweradd(1,time,trial);
+                matrixfinalcount(freq,posx(freq,time,trial),posy(freq,time,trial)) = ...
+                    matrixfinalcount(freq,posx(freq,time,trial),posy(freq,time,trial))+1;
             end;
         end;
         %matrixfinal(freq,:,:,:) = convn(squeeze(matrixfinal(freq,:,:,:)), gs, 'same');
         %tmpmat = posx(index,:)+(posy(index,:)-1)*64+(gammapower(:)-1)*64*64;
+        matrixfinalcount(freq, find(matrixfinalcount(freq,:) == 0)) = 1;
+        matrixfinalgammapower(freq,:,:) = matrixfinalgammapower(freq,:,:)./matrixfinalcount(freq, :,:);
         matrixfinalgammapower(freq,:,:) = conv2(squeeze(matrixfinalgammapower(freq,:,:)), gauss2d(5,5), 'same');
     end;
-    matrixfinalgammapower = matrixfinalgammapower/size(alltfX,3)/size(alltfX,2);
+    %matrixfinalgammapower = matrixfinalgammapower/size(alltfX,3)/size(alltfX,2);
     
     %vect = linspace(-pi,pi,50);    
     %for f = 1:length(freqs2)
