@@ -94,6 +94,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.71  2009/08/29 04:24:56  arno
+% new statistics
+%
 % Revision 1.70  2009/08/19 01:41:37  arno
 % fix output for multiple channels, add the no plotting option
 %
@@ -330,13 +333,13 @@ if ~isempty(opt.channels)
             eval( [ 'alltimes = structdat(allinds(index)).' opt.datatype 'times;' ]);
             eval( [ 'setinds  = structdat(allinds(index)).setinds;' ]);
         end;
-        allersp{ind} = squeeze(permute(allersp{ind}, [1 2 4 3])); % time elec subjects
+        allersp{ind} = permute(allersp{ind}, [1 2 4 3]); % time elec subjects
     end;
     
     % plot specific subject
     % ---------------------
     if ~isempty(opt.subject), allersp = std_selsubject(allersp, opt.subject, setinds, { STUDY.datasetinfo(:).subject }, length(STUDY.subject)); end;
-        
+    
     % select specific time and freq
     % -----------------------------
     if ~isempty(opt.plottf)
@@ -366,7 +369,7 @@ if ~isempty(opt.channels)
                                          'statistics', opt.statistics, 'naccu', opt.naccu, 'threshold', opt.threshold, 'mcorrect', opt.mcorrect);
                                      
     % plot specific component
-    % -----------------------
+    % -----------------------comp_names
     %if index == length(allinds), opt.legend = 'on'; end;
     if ~strcmpi(opt.plotmode, 'none')
         if ~isempty(opt.plottf) & ~isnan(opt.plottf)
@@ -375,9 +378,13 @@ if ~isempty(opt.channels)
                                       'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, ...
                                       'chanlocs', locs, 'plotsubjects', opt.plotsubjects, 'topovals', titlestr, plotcurveopt{:});
         else
-            for index = 1:size(allersp{1},4)
+            if length(allinds) > 1 & ~strcmpi(opt.plotmode, 'none'), figure; opt.plotmode = 'condensed'; end;
+            nc = ceil(sqrt(length(allinds)));
+            nr = ceil(length(allinds)/nc);
+            for index = 1:size(allersp{1},3)
+                if length(allinds) > 1, try, subplot(nr,nc,index, 'align'); catch, subplot(nr,nc,index); end; end;
                 for ind = 1:length(allersp(:))
-                    tmpersp{ind} = allersp{ind}(:,:,:,index); 
+                    tmpersp{ind} = squeeze(allersp{ind}(:,:,index,:)); 
                 end;
                 std_plottf(alltimes, allfreqs, tmpersp, 'condnames', STUDY.condition, 'subject', opt.subject, ...
                                            'legend', opt.legend, 'compinds', {}, 'datatype', opt.datatype, ...
