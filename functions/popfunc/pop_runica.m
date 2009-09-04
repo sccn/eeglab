@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.90  2009/08/22 01:14:24  arno
+% fix saving tag
+%
 % Revision 1.89  2009/08/19 01:38:56  arno
 % fix numeric types
 %
@@ -505,7 +508,7 @@ elseif length(ALLEEG) > 1 & strcmpi(g.concatcond, 'on')
     dats = {};
     for index = 1:length(allsubjects)
         if ~alltags(index)
-            allinds = strmatch(allsubjects{index}, allsubjects);
+            allinds = strmatch(allsubjects{index}, allsubjects, 'exact');
             rmind = [];
             for tmpi = 2:length(allinds)
                 if ~isequal(allsessions(allinds(1)), allsessions(allinds(tmpi))), rmind = [rmind tmpi];
