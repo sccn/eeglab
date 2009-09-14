@@ -116,6 +116,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2009/09/02 23:52:44  arno
+% fix normailization
+%
 % Revision 1.4  2009/08/27 23:25:21  arno
 % normalizing
 %
@@ -153,7 +156,7 @@
 % Initial revision
 %
 
-function [crossfcoh, timesout1, freqs1, freqs2, alltfX, alltfY] = pac(X, Y, srate, varargin);
+function [crossfcoh, timesout1, freqs1, freqs2, crossfcohall, alltfX, alltfY] = pac(X, Y, srate, varargin);
     
 if nargin < 1
     help pac; 
@@ -188,6 +191,7 @@ g = finputcheck(varargin, ...
                   'gammapowerlim' 'real'     []                        []; ...
                   'powerlim'      'real'     []                        []; ...
                   'powerlat'      'real'     []                        []; ...
+                  'gammabase'     'real'     []                        []; ...
                   'timesout'      'real'     []                        []; ...
                   'ntimesout'     'integer'  []                        200; ...
                   'tlimits'       'real'     []                        [0 frame/srate];
@@ -285,6 +289,97 @@ if ~strcmpi(g.method, 'latphase')
             end;
         end;
     end;
+elseif 1
+    % this option computes power at a given latency
+    % then computes the same as above (vectors)
+    
+    %if isempty(g.powerlat)
+    %    error('You need to specify a latency for the ''powerlat'' option');
+    %end;
+        
+    gammapower = mean(10*log10(alltfX(:,:,:).*conj(alltfX)),1); % average all frequencies for power
+    if isempty(g.gammapowerlim)
+        g.gammapowerlim = [ min(gammapower(:)) max(gammapower(:)) ];
+    end;
+    fprintf('Gamma power limits: %3.2f to %3.2f\n', g.gammapowerlim(1), g.gammapowerlim(2)); 
+    power = 10*log10(alltfY(:,:,:).*conj(alltfY));
+    if isempty(g.powerlim)
+        for freq = 1:size(power,1)
+            g.powerlim(freq,:) = [ min(power(freq,:)) max(power(freq,:)) ];
+        end;
+    end;
+    for freq = 1:size(power,1)
+        fprintf('Freq %d power limits: %3.2f to %3.2f\n', freqs2(freq), g.powerlim(freq,1), g.powerlim(freq,2)); 
+    end;
+            
+    % power plot
+    %figure; plot(timesout2/1000, (mean(power(9,:,:),3)-mean(power(9,:)))/50);
+    %hold on; plot(linspace(0, length(Y)/srate, length(Y)), mean(Y'), 'g');
+
+    % phase with power
+    % figure; plot(timesout2/1000, (mean(phaseangle(9,:,:),3)-mean(phaseangle(9,:)))/50);
+    % hold on; plot(timesout1/1000, (mean(gammapower,3)-mean(gammapower(:)))/100, 'r');
+    %figure; plot((mean(phaseangle(9,:,:),3)-mean(phaseangle(9,:)))/50+j*(mean(gammapower,3)-mean(gammapower(:)))/100, '.');
+    
+    matsize               = 32;
+    matcenter             = (matsize-1)/2+1;
+    matrixfinalgammapower = zeros(size(alltfY,1),size(alltfX,3),matsize,matsize);
+    matrixfinalcount      = zeros(size(alltfY,1),size(alltfX,3),matsize,matsize);    
+    
+    % get power indices
+    if isempty(g.gammabase)
+        g.gammabase = mean(gammapower(:));
+    end;
+    fprintf('Gamma power average: %3.2f\n', g.gammabase); 
+    gammapoweradd  = gammapower-g.gammabase;
+    gammapower     = floor((gammapower-g.gammapowerlim(1))/(g.gammapowerlim(2)-g.gammapowerlim(1))*(matsize-2))+1;
+    phaseangle     = angle(alltfY);
+    posx           = zeros(size(power));
+    posy           = zeros(size(power));
+    for freq = 1:length(freqs2)
+        fprintf('Processing frequency %3.2f\n', freqs2(freq));
+        power(freq,:,:) = (power(freq,:,:)-g.powerlim(freq,1))/(g.powerlim(freq,2)-g.powerlim(freq,1))*(matsize-3)/2+1;
+        complexval      = power(freq,:,:).*exp(j*phaseangle(freq,:,:));
+        posx(freq,:,:)  = round(real(complexval)+matcenter);
+        posy(freq,:,:)  = round(imag(complexval)+matcenter);
+        for trial = 1:size(alltfX,3) % scan trials
+            for time = 1:size(alltfX,2)
+                %matrixfinal(freq,posx(freq,time,trial),posy(freq,time,trial),gammapower(1,time,trial)) = ...
+                %    matrixfinal(freq,posx(freq,time,trial),posy(freq,time,trial),gammapower(1,time,trial))+1;
+                matrixfinalgammapower(freq,trial,posx(freq,time,trial),posy(freq,time,trial)) = ...
+                    matrixfinalgammapower(freq,trial,posx(freq,time,trial),posy(freq,time,trial))+gammapoweradd(1,time,trial);
+                matrixfinalcount(freq,trial,posx(freq,time,trial),posy(freq,time,trial)) = ...
+                    matrixfinalcount(freq,trial,posx(freq,time,trial),posy(freq,time,trial))+1;
+            end;
+        end;
+        %matrixfinal(freq,:,:,:) = convn(squeeze(matrixfinal(freq,:,:,:)), gs, 'same');
+        %tmpmat = posx(index,:)+(posy(index,:)-1)*64+(gammapower(:)-1)*64*64;
+        matrixfinalcount(freq, find(matrixfinalcount(freq,:) == 0)) = 1;
+        matrixfinalgammapower(freq,:,:,:) = matrixfinalgammapower(freq,:,:,:)./matrixfinalcount(freq,:,:,:);
+    end;
+    
+    % average and smooth
+    matrixfinalgammapowermean = squeeze(mean(matrixfinalgammapower,2));
+    for freq = 1:length(freqs2)
+        matrixfinalgammapowermean(freq,:,:) = conv2(squeeze(matrixfinalgammapowermean(freq,:,:)), gauss2d(5,5), 'same');
+    end;
+    %matrixfinalgammapower = matrixfinalgammapower/size(alltfX,3)/size(alltfX,2);
+    
+    %vect = linspace(-pi,pi,50);    
+    %for f = 1:length(freqs2)
+    %    crossfcoh(f,:) = hist(tmpalltfy(f,:), vect);
+    %end;
+    
+    % smoothing of output image
+    % -------------------------
+    %gs = gauss2d(6, 6, 6);
+    %crossfcoh = convn(crossfcoh, gs, 'same');
+    %freqs1    = freqs2;
+    %timesout1 = linspace(-180, 180, size(crossfcoh,2));
+
+    crossfcoh    = matrixfinalgammapowermean;
+    crossfcohall = matrixfinalgammapower;
+     
 else
     % this option computes power at a given latency
     % then computes the same as above (vectors)
@@ -313,27 +408,29 @@ else
     % hold on; plot(timesout1/1000, (mean(gammapower,3)-mean(gammapower(:)))/100, 'r');
     %figure; plot((mean(phaseangle(9,:,:),3)-mean(phaseangle(9,:)))/50+j*(mean(gammapower,3)-mean(gammapower(:)))/100, '.');
     
+    matsize               = 64;
+    matcenter             = (matsize-1)/2+1;
     matrixfinal           = zeros(size(alltfY,1),64,64,64);
-    matrixfinalgammapower = zeros(size(alltfY,1),64,64);
-    matrixfinalcount      = zeros(size(alltfY,1),64,64);    
+    matrixfinalgammapower = zeros(size(alltfY,1),matsize,matsize);
+    matrixfinalcount      = zeros(size(alltfY,1),matsize,matsize);    
     
     % get power indices
     gammapoweradd  = gammapower-mean(gammapower(:));
-    gammapower     = floor((gammapower-g.gammapowerlim(1))/(g.gammapowerlim(2)-g.gammapowerlim(1))*63)+1;
+    gammapower     = floor((gammapower-g.gammapowerlim(1))/(g.gammapowerlim(2)-g.gammapowerlim(1))*(matsize-1))+1;
     phaseangle     = angle(alltfY);
     posx           = zeros(size(power));
     posy           = zeros(size(power));
     gs             = gauss3d(6, 6, 6);
     for freq = 1:size(alltfY)
         fprintf('Processing frequency %3.2f\n', freqs2(freq));
-        power(freq,:,:) = (power(freq,:,:)-g.powerlim(freq,1))/(g.powerlim(freq,2)-g.powerlim(freq,1))*30+1;
+        power(freq,:,:) = (power(freq,:,:)-g.powerlim(freq,1))/(g.powerlim(freq,2)-g.powerlim(freq,1))*(matsize-2)/2;
         complexval      = power(freq,:,:).*exp(j*phaseangle(freq,:,:));
-        posx(freq,:,:)  = floor(real(complexval))+32;
-        posy(freq,:,:)  = floor(imag(complexval))+32;
+        posx(freq,:,:)  = round(real(complexval)+matcenter);
+        posy(freq,:,:)  = round(imag(complexval)+matcenter);
         for trial = 1:size(alltfX,3) % scan trials
             for time = 1:size(alltfX,2)
-                matrixfinal(freq,posx(freq,time,trial),posy(freq,time,trial),gammapower(1,time,trial)) = ...
-                    matrixfinal(freq,posx(freq,time,trial),posy(freq,time,trial),gammapower(1,time,trial))+1;
+                %matrixfinal(freq,posx(freq,time,trial),posy(freq,time,trial),gammapower(1,time,trial)) = ...
+                %    matrixfinal(freq,posx(freq,time,trial),posy(freq,time,trial),gammapower(1,time,trial))+1;
                 matrixfinalgammapower(freq,posx(freq,time,trial),posy(freq,time,trial)) = ...
                     matrixfinalgammapower(freq,posx(freq,time,trial),posy(freq,time,trial))+gammapoweradd(1,time,trial);
                 matrixfinalcount(freq,posx(freq,time,trial),posy(freq,time,trial)) = ...
