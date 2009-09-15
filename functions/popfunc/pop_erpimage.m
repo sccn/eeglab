@@ -15,7 +15,7 @@
 %   "Project to channel #" - [edit box] (for plotting independent components). 
 %                 Allow reprojecting the component activity 
 %                 to a given channel or group of channels. 
-%                 erpimage() equivalent: 'projchan' 
+%                 erpimage() equivalent: [none]
 %   "Smoothing" - [text box] Smoothing parameter in number of trials.
 %                 erpimage() equivalent: 'smooth' 
 %   "Downsampling" - [edit box] Decimate parameter. 
@@ -171,6 +171,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.138  2008/01/12 02:48:56  arno
+% adapted calling format for future pop_erpimparams
+%
 % Revision 1.137  2007/11/15 03:33:33  arno
 % use blue warning boxes
 %
@@ -724,7 +727,7 @@ if popup
 		uilist{1} = uilist{6};
 		uilist{2} = uilist{7};
 		uilist{6} = { 'Style', 'text', 'string', 'Project to channel #', 'fontweight', 'bold','tooltipstring', ['Project component(s) to data channel' 10 ...
-												  'This allow to plot component activity in microvolt'] };
+												  'This allows plotting projected component activity at one channel in microvolts'] };
 		uilist{7} = { 'Style', 'edit', 'string', getkeyval(lastcom, 4), 'tag', 'projchan' };
 	end;
     [oldres a b res] = inputgui( geometry, uilist, 'pophelp(''pop_erpimage'');', ...
@@ -924,7 +927,7 @@ try, icadefs; set(gcf, 'color', BACKCOLOR,'Name',' erpimage()'); catch, end;
 % testing inputs
 % --------------
 if typeplot == 0 & length(channel) > 1 & isempty(projchan)
-	error('A channel must be selected for plotting several components');
+	error('A channel must be selected to plot (the sum of) several component projections');
 end;
 
 % find sorting latencies
@@ -987,7 +990,7 @@ if ~popup
     if ~isempty(outstr), outstr = [ '[' outstr(1:end-1) '] =' ]; end;
 end;
 
-% plot the datas and generate output command
+% plot the data and generate output command
 % --------------------------------------------
 if isempty( options )
     if isfield(opt, 'topo')
