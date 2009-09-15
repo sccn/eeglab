@@ -206,6 +206,9 @@
 
 %% LOG COMMENTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % $Log: not supported by cvs2svn $
+% Revision 1.283  2009/07/08 00:04:13  arno
+% remove warnings
+%
 % Revision 1.282  2009/07/03 18:00:58  arno
 % typo for octave
 %
@@ -1317,6 +1320,10 @@ if nargin > 6
             Caxflag = NO;
 
         elseif timestretchflag == YES % Added -JH
+            if ~isstruct(Arg)
+		fprintf('erpimage(): Timewarp argument must be a cell array.\n')
+                return
+            end
             timeStretchMarks = Arg{1};
             timeStretchMarks = round(1+(timeStretchMarks-times(1))*srate/1000); % convert from ms to frames -sm
             [smc smr] = find(diff(timeStretchMarks') < 0);
