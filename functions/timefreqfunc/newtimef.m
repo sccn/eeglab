@@ -329,6 +329,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.173  2009/08/23 00:43:21  arno
+% fix last change
+%
 % Revision 1.172  2009/08/23 00:14:36  arno
 % octave compatibility
 %
@@ -1974,7 +1977,10 @@ if isnan(g.powbase(1))
     mbaseori = mean(Pori(:,baseln),2);
 else
     verboseprintf(g.verbose, 'Using the input baseline spectrum\n');
-    mbase    = 10.^(g.powbase/10);
+    mbase    = 10.^(g.powbase/10); 
+    if size(mbase,1) == 1 % if input was a row vector, flip to be a column
+        mbase = mbase';
+    end;
     mbaseori = 10.^(g.powbase/10);
 end
 baselength = length(baseln);
