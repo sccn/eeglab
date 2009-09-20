@@ -96,6 +96,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.69  2009/08/08 00:51:26  arno
+% mportant fix for g.time
+%
 % Revision 1.68  2009/08/06 01:34:28  arno
 % Fix time slice selection
 %
@@ -412,7 +415,13 @@ g.trial   = sort(setdiff( g.trial, g.notrial ));
 if ~iscell(g.nochannel) & ~iscell(chanlist)
     g.channel = [1:EEG.nbchan];
 end;
+
+if iscell(g.channel) && iscell(g.nochannel)
+    
+end;
+
 g.channel = sort(setdiff( lower(g.channel), lower(g.nochannel) ));
+
 if ~isempty(EEG.chanlocs)
     g.channel = eeg_decodechan(EEG.chanlocs, g.channel);
 end;
