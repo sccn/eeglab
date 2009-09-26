@@ -142,6 +142,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.183  2009/08/11 00:24:27  arno
+% fix reference
+%
 % Revision 1.182  2009/07/30 22:27:24  arno
 % fix problem with datachan
 %
@@ -776,6 +779,10 @@ if nargin < 3
     % -------------------------------------
     if ~all(cellfun('isempty', {chans.labels})) && all(cellfun('isempty', {chans.theta}))
         [chans chaninfo urchans com] = pop_chanedit(chans, chaninfo, 'lookupgui', []);
+        for index = 1:length(chans)
+            chans(index).ref       = '';
+            chans(index).datachan  = 1;
+        end;
         if ~isempty(com)
             totaluserdat = com;
             [chans chaninfo urchans com] = pop_chanedit(chans, chaninfo, com{:});
@@ -936,7 +943,8 @@ else
                 if nchansori ~= 0 & nchansori ~= length(tmpchans)
                     if ~popask(strvcat(['The number of data channels (' int2str(length(tmpchans)) ') not including fiducials does not'], ...
                             ['correspond to the initial number of channels (' int2str(nchansori) '), so for consistency purposes'], ...
-                            'new channel information will be ignored if this function was called from EEGLAB'))
+                            'new channel information will be ignored if this function was called from EEGLAB', ...
+                            'If you have added a reference channel manually, check the "Data channel" checkbox is off'))
                     else
                         set(findobj(fig, 'tag', 'ok'), 'userdata', 'stop');
                     end;
@@ -1218,6 +1226,11 @@ else
                     urchans = chans;
                     for index = 1:length(chans)
                         chans(index).urchan = index;
+                    end;
+                end;
+                if ~isfield(chans, 'datachan')
+                    for index = 1:length(chans)
+                        chans(index).datachan = 1;
                     end;
                 end;
                 
