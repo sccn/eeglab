@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.542  2009/08/08 00:50:16  arno
+% fix rmdat
+%
 % Revision 1.541  2009/08/07 21:50:25  arno
 % Adding comment for studies
 %
@@ -2029,6 +2032,10 @@ catchstrs.new_non_empty          = e_newset;
                 if exist([p 'external' filesep dircontent{index}]) == 7
                     addpath([p 'external' filesep dircontent{index}]);
                     disp(['Adding path to ' eeglabpath 'external' filesep dircontent{index}]);
+                end;
+                if ~isempty(findstr('fieldtrip', lower(dircontent{index})))
+                    addpath([p 'external' filesep dircontent{index} filesep 'fileio' ]);
+                    disp(['Adding path to ' eeglabpath 'external' filesep dircontent{index} filesep 'fileio' ]);
                 end;
             end;
         end;
