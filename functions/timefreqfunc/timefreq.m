@@ -1,4 +1,7 @@
-% timefreq() - compute time/frequency decomposition of data trials.
+% timefreq() - compute time/frequency decomposition of data trials. This 
+%              function is a compute-only function called by
+%              the more complete time/frequency functions newtimef()
+%              and newcrossf() which also plot timefreq() results.
 %
 % Usage:
 %     >> [tf, freqs, times]          = timefreq(data, srate);
@@ -127,6 +130,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.65  2009/05/07 19:49:43  arno
+% fix for numerical innacuracies in time calculation
+%
 % Revision 1.64  2008/09/24 16:39:36  arno
 % Faster computation if custom time points and allow non power of 2 FFT
 %

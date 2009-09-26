@@ -92,7 +92,6 @@ end
 % print info on commandline
 % -------------------------
 eplength = epochlimits(2)-epochlimits(1);
-epochlimits(2) = epochlimits(1)+recur-1/EEG.srate; % rm last point in each epoch
 fprintf('The input dataset will be split into %d epochs of %g s\n',nu,eplength);
 fprintf('Epochs will overlap by %2.0f%%.\n',(eplength-recur)/eplength*100);
 
@@ -136,13 +135,14 @@ fprintf('Splitting the data into %d %2.2f-s epochs\n',nu,eplength);
 setname = sprintf('%s - %g-s epochs', EEG.setname, recur);
 EEG = pop_epoch( EEG, { 'X' }, epochlimits, 'newname', ...
                                   setname, 'epochinfo', 'yes');
+                              
 % baseline zero the epochs
 % ------------------------
 if  epochlimits(1) < 0 
     fprintf('Removing the pre-0 baseline mean of each epoch.\n');
     EEG = pop_rmbase( EEG, [epochlimits(1) 0]);
 else
-    fprintf('Removing the mean of each epoch.\n');
-    EEG = pop_rmbase( EEG, 'timerange',[] );
+    %fprintf('Removing the mean of each epoch.\n');
+    %EEG = pop_rmbase( EEG, 'timerange',[] );
 end
 

@@ -70,6 +70,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2009/05/01 01:06:34  arno
+% Allow writing EDF/BDF/GDF files
+%
 
 function HDR = writeeeg(filename, x, srate, varargin)
 
@@ -93,6 +96,7 @@ end;
 HDR.FileName = filename;
 
 % select file format 
+if ~isfield(HDR, 'EVENT'),                     HDR.EVENT = []; end;
 if ~isfield(HDR, 'TYPE'),                      HDR.TYPE ='GDF'; end;
 if ~isfield(HDR, 'Patient')                    HDR.Patient = []; end;
 if ~isfield(HDR.Patient, 'ID')                 HDR.Patient.ID = 'P0000'; end;
@@ -148,6 +152,9 @@ if ~isempty(HDR.EVENT)
         EVENT.DUR = ones( length(HDR.EVENT),1);
         EVENT.VAL = zeros(length(HDR.EVENT),1)*NaN;
         if isfield(HDR.EVENT, 'type')
+            for index = 1:length(HDR.EVENT)
+                HDR.EVENT(index).type = num2str(HDR.EVENT(index).type);
+            end;
             alltypes = unique( { HDR.EVENT.type } );
         end;
         for i = 1:length(HDR.EVENT)

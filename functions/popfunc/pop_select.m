@@ -96,6 +96,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.70  2009/09/20 03:05:53  arno
+% try fix channel
+%
 % Revision 1.69  2009/08/08 00:51:26  arno
 % mportant fix for g.time
 %
@@ -416,8 +419,12 @@ if ~iscell(g.nochannel) & ~iscell(chanlist)
     g.channel = [1:EEG.nbchan];
 end;
 
-if iscell(g.channel) && iscell(g.nochannel)
-    
+if iscell(g.channel) && ~iscell(g.nochannel) && ~isempty(EEG.chanlocs)
+     noChannelAsCell = {};
+     for nochanId = 1:length(g.nochannel)
+         noChannelAsCell{nochanId} = EEG.chanlocs(g.nochannel(nochanId)).labels;
+     end;
+     g.nochannel =   noChannelAsCell; 
 end;
 
 g.channel = sort(setdiff( lower(g.channel), lower(g.nochannel) ));

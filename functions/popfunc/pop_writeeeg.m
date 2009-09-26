@@ -34,6 +34,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2009/05/01 01:06:32  arno
+% Allow writing EDF/BDF/GDF files
+%
 
 function [command] = pop_writeeeg(EEG, filename, varargin); 
 command = '';
@@ -59,11 +62,13 @@ else
     options = varargin;
 end;
 
+warning('off', 'MATLAB:intConvertNonIntVal');
 if ~isempty(EEG.chanlocs)
     writeeeg(filename, EEG.data, EEG.srate, 'label', { EEG.chanlocs.labels }, 'EVENT', EEG.event, options{:});
 else
     writeeeg(filename, EEG.data, EEG.srate, 'EVENT', EEG.event, options{:});
 end;
+warning('on', 'MATLAB:intConvertNonIntVal');
 
 command = sprintf('pop_writeeeg(EEG, ''%s'', %s);', filename, vararg2str(options)); 
 

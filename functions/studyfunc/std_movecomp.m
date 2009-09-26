@@ -114,7 +114,10 @@ left_comps = find(~ismember([1:length(STUDY.cluster(old_clus).comps)],comps));
 STUDY.cluster(old_clus).comps = STUDY.cluster(old_clus).comps(left_comps);
 STUDY.cluster(old_clus).sets = STUDY.cluster(old_clus).sets(:,left_comps);
 if ~isempty(STUDY.cluster(old_clus).preclust.preclustdata)
-    STUDY.cluster(old_clus).preclust.preclustdata = STUDY.cluster(old_clus).preclust.preclustdata(left_comps,:);
+    try,
+        STUDY.cluster(old_clus).preclust.preclustdata = STUDY.cluster(old_clus).preclust.preclustdata(left_comps,:);
+    catch, % this generates an unknown error but I was not able to reproduce it - AD Sept. 26, 2009        
+    end;
 end;
 disp('Done.');
 
