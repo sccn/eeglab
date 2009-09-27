@@ -190,6 +190,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.101  2009/05/12 18:15:40  arno
+% nasion list
+%
 % Revision 1.100  2007/08/23 23:25:38  arno
 % encode type for neuroscan channel electrode files
 %
@@ -631,7 +634,11 @@ if isstr(filename)
        % importing file
        % --------------
        if isempty(g.skiplines), g.skiplines = 0; end;
-       array = load_file_or_array( filename, g.skiplines);
+       if strcmpi(g.filetype, 'chanedit')
+           array = loadtxt( filename, 'delim', 9, 'skipline', g.skiplines);
+       else
+           array = load_file_or_array( filename, g.skiplines);
+       end;
        if size(array,2) < length(g.format)
            fprintf(['readlocs() warning: Fewer columns in the input than expected.\n' ...
                     '                    See >> help readlocs\n']);
