@@ -113,7 +113,7 @@ EEG.nbchan          = dat.nChans;
 EEG.data            = alldata;
 EEG.setname 		= '';
 EEG.comments        = [ 'Original file: ' filename ];
-EEG.xmin            = dat.nSamplesPre; 
+EEG.xmin = -dat.nSamplesPre/EEG.srate; 
 EEG.trials          = dat.nTrials;
 EEG.pnts            = dat.nSamples;
 if isfield(dat, 'Label') & ~isempty(dat.Label)
@@ -135,7 +135,7 @@ if ~isempty(event)
         offset = fastif(isempty(event(index).offset), 0, event(index).offset);
         EEG.event(index).type     = event(index).value;
         EEG.event(index).value    = event(index).type;
-        EEG.event(index).latency  = event(index).sample+offset+subsample;
+        EEG.event(index).latency  = event(index).sample-offset+subsample;
         EEG.event(index).duration = event(index).duration;
         if EEG.trials > 1
             EEG.event(index).epoch = ceil(EEG.event(index).latency/EEG.pnts);        
