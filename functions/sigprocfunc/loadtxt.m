@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2007/03/20 02:32:38  arno
+% fixed finputcheck (Andreas)
+%
 % Revision 1.12  2006/10/16 22:11:43  arno
 % typo
 %
@@ -148,8 +151,7 @@ while isempty(inputline) | inputline~=-1
 	        case 'on',
 			     while ~isempty(deblank(inputline))
 			         [tmp inputline] = mystrtok(inputline, g.delim);
-			         if ~isempty(tmp) & tmp(1) > 43 & tmp(1) < 59, tmp2 = str2num(tmp);
-                     else tmp2 = []; end;
+                     tmp2 = str2num(tmp);
 			         if isempty( tmp2 )  , array{linenb, colnb} = tmp;
 			         else                  array{linenb, colnb} = tmp2;
 			         end;
