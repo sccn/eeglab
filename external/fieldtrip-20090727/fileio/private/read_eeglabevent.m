@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2009/07/07 02:23:58  arno
+% Adding files to repository
+%
 % Revision 1.2  2009/02/02 20:45:34  josdie
 % FieldTrip's .value field now set to EEGlab's .type field.  FieldTrip's .type field set to 'trigger'.  FieldTrip's .duration field set to 0 rather than empty.
 %
@@ -65,7 +68,7 @@ event = [];
 oldevent = header.orig.event;
 for index = 1:length(oldevent)
   event(index).value   = num2str( oldevent(index).type );
-  event(index).type   = 'trigger';
+  event(index).type    = oldevent(index).type;
 if header.nTrials > 1
     event(index).sample = oldevent(index).latency-header.nSamplesPre;
     event(index).offset = header.nSamplesPre;

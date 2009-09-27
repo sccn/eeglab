@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2009/05/19 21:58:28  arno
+% fix absolute sample limit
+%
 % Revision 1.2  2008/05/05 22:47:06  arno
 % fixing epoch field problem
 %
@@ -130,8 +133,8 @@ if ~isempty(event)
     
     for index = 1:length(event)
         offset = fastif(isempty(event(index).offset), 0, event(index).offset);
-        EEG.event(index).type     = event(index).type;
-        EEG.event(index).value    = event(index).value;
+        EEG.event(index).type     = event(index).value;
+        EEG.event(index).value    = event(index).type;
         EEG.event(index).latency  = event(index).sample+offset+subsample;
         EEG.event(index).duration = event(index).duration;
         if EEG.trials > 1
