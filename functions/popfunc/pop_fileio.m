@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2009/09/27 03:43:58  arno
+% Joe Dien modif
+%
 % Revision 1.3  2009/05/19 21:58:28  arno
 % fix absolute sample limit
 %
