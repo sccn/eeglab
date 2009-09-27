@@ -22,7 +22,7 @@ function [CLASS,ERR,POSTERIOR,LOGP,COEF]=classify(sample,training,classlabel,TYP
 % [1] R. Duda, P. Hart, and D. Stork, Pattern Classification, second ed. 
 %       John Wiley & Sons, 2001. 
 
-%	$Id: classify.m,v 1.1 2009-01-30 06:04:48 arno Exp $
+%	$Id: classify_biosig.m,v 1.1 2009-09-27 01:03:53 arno Exp $
 %	Copyright (C) 2008 by Alois Schloegl <a.schloegl@ieee.org>	
 %    	This is part of the BIOSIG-toolbox http://biosig.sf.net/
 
