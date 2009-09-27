@@ -32,7 +32,9 @@
 %                  'lrate' arg (above) when resuming training, and/or 
 %                  to reduce the 'stop' arg (above). By default, binary 
 %                  ica begins with the identity matrix after sphering. 
-%   'verbose     - 'on'/'off'    {default: 'off'}    
+%   'verbose'    - 'on'/'off'    {default: 'off'}
+%   'filenum'    - the number to be used in the name of the output files.  Otherwise chosen randomly.
+%                  Will choose random number if file with that number already exists.
 %
 % Less frequently used input flags:
 %   'posact'     - ('on'/'off') Make maximum value for each comp positive.
@@ -74,6 +76,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2007/11/30 04:31:25  arno
+% same
+%
 % Revision 1.24  2007/11/30 04:27:57  arno
 % chaning computation for random binica file
 %
@@ -190,61 +195,20 @@ else
 	end;
 end
 
-%
-% select random integer 1-10000 to index the binica data files
-% make sure no such script file already exists in the pwd
-%
-scriptfile = SC;
-while exist(scriptfile)
- tmpint = int2str(round(rand*10000));
- scriptfile = ['binica' tmpint '.sc'];
-end 
-fprintf('scriptfile = %s\n',scriptfile);
-
-nchans = 0;
-tmpdata = [];
-if ~isstr(data) % data variable given
-  if ~exist('data')
-    fprintf('\nbinica(): Variable name data not found.\n');
-    return
-  end
-  nchans = size(data,1);
-  nframes = size(data,2);
-  tmpdata = ['binica' tmpint '.fdt'];
-  if strcmpi(computer, 'MAC')
-      floatwrite(data,tmpdata,'ieee-be');
-  else
-      floatwrite(data,tmpdata);
-  end;
-  datafile = tmpdata;
-  firstarg = 2;
-
-else % data filename given
-  if ~exist(data)
-    fprintf('\nbinica(): File data not found.\n')
-    return
-  end
-  datafile = data;
-  if nargin<3
-    fprintf(...
-'\nbinica(): Data file name must be followed by chans, frames\n');
-    return
-  end
-  nchans = var2;
-  nframes = var3;
-  if isstr(nchans) | isstr(nframes)
-    fprintf(...
-'\nbinica(): chans, frames args must be given after data file name\n');
-    return
-  end
-  firstarg = 4;
-end
-
 [flags,args] = read_sc(SC); % read flags and args in master SC file
 
 %
 % substitute the flags/args pairs in the .sc file
 %
+
+tmpint=[];
+
+if ~isstr(data) % data variable given
+  firstarg = 2;
+else % data filename given
+  firstarg = 4;
+end
+
 arg = firstarg;
 if arg > nargin
    fprintf('binica(): no optional (flag, argument) pairs received.\n');
@@ -283,6 +247,16 @@ else
            return
         end
   end
+  
+  if strcmpi(OPTIONFLAG,'filenum')
+        tmpint = Arg; % get number for name of output files
+        if ~isnumeric(tmpint)
+            fprintf('\nbinica(): FileNum argument needs to be a number.  Will use random number instead.\n')
+            tmpint=[];
+        end;
+        tmpint=int2str(tmpint);
+  end
+
   arg = arg+2;
 
   nflags = length(flags);
@@ -293,6 +267,54 @@ else
     end
   end
  end
+end
+
+%
+% select random integer 1-10000 to index the binica data files
+% make sure no such script file already exists in the pwd
+%
+scriptfile = ['binica' tmpint '.sc'];
+while exist(scriptfile)
+    tmpint = int2str(round(rand*10000));
+    scriptfile = ['binica' tmpint '.sc'];
+end
+fprintf('scriptfile = %s\n',scriptfile);
+
+nchans = 0;
+tmpdata = [];
+if ~isstr(data) % data variable given
+  if ~exist('data')
+    fprintf('\nbinica(): Variable name data not found.\n');
+    return
+  end
+  nchans = size(data,1);
+  nframes = size(data,2);
+  tmpdata = ['binica' tmpint '.fdt'];
+  if strcmpi(computer, 'MAC')
+      floatwrite(data,tmpdata,'ieee-be');
+  else
+      floatwrite(data,tmpdata);
+  end;
+  datafile = tmpdata;
+
+else % data filename given
+  if ~exist(data)
+    fprintf('\nbinica(): File data not found.\n')
+    return
+  end
+  datafile = data;
+  if nargin<3
+    fprintf(...
+'\nbinica(): Data file name must be followed by chans, frames\n');
+    return
+  end
+  nchans = var2;
+  nframes = var3;
+  if isstr(nchans) | isstr(nframes)
+    fprintf(...
+'\nbinica(): chans, frames args must be given after data file name\n');
+    return
+  end
 end
 
 %
