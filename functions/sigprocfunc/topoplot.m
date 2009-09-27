@@ -166,6 +166,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.290  2009/08/29 04:24:52  arno
+% new statistics
+%
 % Revision 1.289  2009/08/19 01:40:02  arno
 % change line size for significance masking
 %
@@ -1295,7 +1298,7 @@ if ~strcmpi(STYLE,'grid')                     % if not plot grid only
 %%%%%%%%%%%%%%%%%%%% Read the channel location information %%%%%%%%%%%%%%%%%%%%%%%%
 % 
   if isstr(loc_file)
-      [tmpeloc labels Th Rd indices] = readlocs( loc_file,'filetype','loc');
+      [tmpeloc labels Th Rd indices] = readlocs( loc_file);
   elseif isstruct(loc_file) % a locs struct
       [tmpeloc labels Th Rd indices] = readlocs( loc_file );
       % Note: Th and Rd correspond to indices channels-with-coordinates only
