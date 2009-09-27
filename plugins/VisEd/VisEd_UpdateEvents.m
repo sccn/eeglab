@@ -80,7 +80,7 @@ if isfield(g,'eloc_file');
     end
 end
 if ~exist('DataType');
-    DataType=2;
+    DataType=1;
 end
 
 if isfield(g.eloc_file, 'badchan');

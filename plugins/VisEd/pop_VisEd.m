@@ -55,10 +55,23 @@ if ~isempty(EEG.icaweights);
 end
 
 if isempty(EEG.chanlocs);
+    disp('Labelling channels by number.');
     for i=1:EEG.nbchan;
         EEG.chanlocs(i).labels=num2str(i);
     end
 end
+
+Num2StrEvCount=0
+for i=1:length(EEG.event);
+    if isnumeric(EEG.event(i).type);
+        Num2StrEvCount=Num2StrEvCount+1;
+        EEG.event(i).type=num2str(EEG.event(i).type);
+    end
+end
+if Num2StrEvCount>0;
+    disp(sprintf('%s%s', num2str(Num2StrEvCount), 'event types converted from num2str'));
+end
+
 
 % pop up window
 % -------------
@@ -116,7 +129,7 @@ end
 
 % return command
 % -------------------------
-com=sprintf('EEG = pop_VisEd( %s, %d, %s, {%s});', inputname(1), DataType, vararg2str(ChanIndex), EventType)
+com=sprintf('EEG = pop_VisEd( %s, %d, %s, {%s});', inputname(1), DataType, vararg2str(ChanIndex), EventType);
 
 % call command
 % ------------

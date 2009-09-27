@@ -1,7 +1,9 @@
 function g = fig_EditEvent(g, Latency, EventType, EventIndex, Proc)
 
-if strcmp(Proc, 'New');
+switch Proc; %if strcmp(Proc, 'New');
     
+    case 'New'
+        
     if ~isfield(g, 'newindex');
         g.newindex=g.nevents+1;
     else
@@ -38,10 +40,10 @@ if strcmp(Proc, 'New');
     end
 
         
-end
+%end
 
 
-if strcmp(Proc, 'Delete');
+case 'Delete'; %if strcmp(Proc, 'Delete');
     
     % log event update field.
     if ~isfield(g, 'eventupdate');
@@ -58,10 +60,10 @@ if strcmp(Proc, 'Delete');
     % Clear SelEvent.
     g.events(EventIndex)=[];
 
-end
+%end
 
 
-if strcmp(Proc, 'Edit');
+    case 'Edit';% if strcmp(Proc, 'Edit');
     
     
     % Set default "edittime" if edit time has not already been set for this
@@ -147,7 +149,7 @@ if strcmp(Proc, 'Edit');
     x=ginput;
     close(EditFig);
 %    tmpLatency=g.events(EventIndex).latency;
-    g.events(EventIndex).latency=round(x(1)*(g.srate/1000));
+    g.events(EventIndex).latency=round(x(length(x(:,1)),1)*(g.srate/1000));
 
     
     %Update "g.eventupdate" field.
