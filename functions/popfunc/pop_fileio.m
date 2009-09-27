@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2009/09/27 03:46:10  arno
+% *** empty log message ***
+%
 % Revision 1.5  2009/09/27 03:43:58  arno
 % Joe Dien modif
 %
@@ -138,7 +141,7 @@ if ~isempty(event)
         offset = fastif(isempty(event(index).offset), 0, event(index).offset);
         EEG.event(index).type     = event(index).value;
         EEG.event(index).value    = event(index).type;
-        EEG.event(index).latency  = event(index).sample-offset+subsample;
+        EEG.event(index).latency  = event(index).sample+offset+subsample;
         EEG.event(index).duration = event(index).duration;
         if EEG.trials > 1
             EEG.event(index).epoch = ceil(EEG.event(index).latency/EEG.pnts);        
