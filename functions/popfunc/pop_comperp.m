@@ -88,6 +88,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.40  2008/11/13 00:18:43  arno
+% fix ttest for subset of channel
+%
 % Revision 1.39  2008/04/19 21:14:02  arno
 % fix statistics (too conservative)
 %
@@ -319,6 +322,10 @@ g = finputcheck( options, ...
                    'mode'     'string'  {'ave' 'rms'}    'ave';
                    'multcmp'  'integer'  [0 Inf]         [] });
 if isstr(g), error(g); end;
+if length(datadd) == 1
+    disp('Cannot perform statistics using only 1 dataset');
+    g.alpha = [];
+end;
 
 figure; axcopy
 
