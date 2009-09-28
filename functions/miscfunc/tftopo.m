@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.91  2008/09/24 17:53:59  nima
+% added 'timeunit' option, allow time and freq. range for timefreqs input (Arno)
+%
 % Revision 1.89  2008/09/11 21:34:21  nima
 % 'denseLogTicks' option added.
 %
@@ -698,8 +701,9 @@ elseif strcmpi(g.logfreq, 'native'),
     ftick = exp(1).^ftick;
     ftick = unique(round(ftick));
     ftick = log(ftick);
-    set(gca,'ytick',ftick);
-    set(gca,'yticklabel', num2str(ft));
+    inds = unique(round(exp(linspace(log(1), log(length(ft))))));
+    set(gca,'ytick',ftick(inds(1:2:end)));
+    set(gca,'yticklabel', num2str(ft(inds(1:2:end))));
 else
     imagesc(times(tftimes),freqs(tffreqs),tfave);
     axis([g.limits(1:4)]);
