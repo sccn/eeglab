@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2009/08/21 01:13:19  arno
+% fix channels and time cluster comparison
+%
 % Revision 1.4  2009/08/09 04:57:53  arno
 % Fixes
 %
@@ -108,6 +111,7 @@ function [ ori_vals, df, pvals, surrogval ] = statcondfieldtrip( data, varargin 
     end;
     cfg.feedback    = 'no';
     cfg.ivar        = 1;
+    cfg.alpha       = 0.05;
     cfg.numrandomization = g.naccu;
     
     % test if data can be paired
@@ -138,17 +142,9 @@ function [ ori_vals, df, pvals, surrogval ] = statcondfieldtrip( data, varargin 
             % paired t-test (very fast)
             % -------------
             cfg.statistic   = 'depsamplesT';
-            [newdata design1 design2 design3] = makefieldtripdata(data, 0);
-            if ~isempty(g.chanlocs)
-                for index = 1:length(newdata)
-                    newdata{index}.powspctrm = squeeze(newdata{index}.powspctrm);
-                    newdata{index}.label     = { g.chanlocs.labels };
-                    newdata{index}.freq      = 1;
-                end;
-            end;
+            [newdata design1 design2 design3] = makefieldtripdata(data, 0, g.chanlocs);
             cfg.design      = [ design1; design3 ];
             cfg.uvar        = 2;
-            cfg.alpha       = 0.05;
 
             cfg
             stat            = freqstatistics(cfg, newdata{:});
@@ -162,7 +158,7 @@ function [ ori_vals, df, pvals, surrogval ] = statcondfieldtrip( data, varargin 
             % paired t-test (very fast)
             % -------------
             cfg.statistic   = 'indepsamplesT';
-            [newdata design1] = makefieldtripdata(data, 0);
+            [newdata design1] = makefieldtripdata(data, 0, g.chanlocs);
             cfg.design      = design1;            
             stat            = freqstatistics(cfg, newdata{:});
             ori_vals        = stat.stat;
@@ -175,7 +171,7 @@ function [ ori_vals, df, pvals, surrogval ] = statcondfieldtrip( data, varargin 
             % one-way ANOVA (paired) this is equivalent to unpaired t-test
             % -------------
             cfg.statistic   = 'depsamplesF';
-            [newdata design1 design2 design3] = makefieldtripdata(data, 0);
+            [newdata design1 design2 design3] = makefieldtripdata(data, 0, g.chanlocs);
             cfg.design      = [ design1; design3 ];
             cfg.uvar        = 2;
             stat            = freqstatistics(cfg, newdata{:});
@@ -188,7 +184,7 @@ function [ ori_vals, df, pvals, surrogval ] = statcondfieldtrip( data, varargin 
             % one-way ANOVA (unpaired) 
             % -------------
             cfg.statistic   = 'indepsamplesF';
-            [newdata design1] = makefieldtripdata(data, 0);
+            [newdata design1] = makefieldtripdata(data, 0, g.chanlocs);
             cfg.design      = [ design1 ];
             stat            = freqstatistics(cfg, newdata{:});
             ori_vals        = stat.stat;
@@ -203,7 +199,7 @@ function [ ori_vals, df, pvals, surrogval ] = statcondfieldtrip( data, varargin 
             % two-way ANOVA (paired) 
             % -------------
             cfg.statistic   = 'anovan';
-            [newdata design1 design2 design3] = makefieldtripdata(data, 0);
+            [newdata design1 design2 design3] = makefieldtripdata(data, 0, g.chanlocs);
             cfg.design      = [ design1; design2; design3 ];
             cfg.effect      = 'X1*X2';
             cfg.ivar        = [1 2];
@@ -219,7 +215,17 @@ function [ ori_vals, df, pvals, surrogval ] = statcondfieldtrip( data, varargin 
             % two-way ANOVA (unpaired)
             % -------------
             cfg.statistic   = 'anovan';
-            [newdata design1 design2] = makefieldtripdata(data, 0);
+            cfg.clustercritval = 4.5416; % 95 percentile of n =10000; a = { rand(n,10) rand(n,10); rand(n,10) rand(n,10) }; [F df p ] = statcondfieldtrip(a, 'paired', 'off');
+            [newdata design1 design2] = makefieldtripdata(data, 0, g.chanlocs);
+            if ~isempty(g.chanlocs)
+                for index = 1:length(newdata)
+                    newdata{index}.powspctrm = squeeze(newdata{index}.powspctrm);
+                    newdata{index}.label     = { g.chanlocs.labels };
+                    newdata{index}.freq      = 1;
+                end;
+            end;
+            cfg
+            newdata{1}
             cfg.design      = [ design1; design2 ];
             cfg.effect      = 'X1*X2';
             cfg.ivar        = [1 2];
@@ -245,7 +251,7 @@ function val = myndims(a)
         end;
     end; 
   
-function [newdata, design1, design2, design3] = makefieldtripdata(data, chanflag);
+function [newdata, design1, design2, design3] = makefieldtripdata(data, chanflag, chanlocs);
     
     newdata = {};
     for i = 1:length(data(:))
@@ -279,6 +285,16 @@ function [newdata, design1, design2, design3] = makefieldtripdata(data, chanflag
         newdata{i}.label(:)  = { 'cz' };
         newdata{i}.freq      = [1:size(newdata{i}.powspctrm,3)];
         newdata{i}.time      = [1:size(newdata{i}.powspctrm,4)];
+        
+        % below in case channels are specified
+        % not that statistics are done on time x frequencies or channels
+        % so time x frequency x channels do not work yet here
+        if ~isempty(chanlocs)
+            newdata{i}.powspctrm = squeeze(newdata{i}.powspctrm);
+            newdata{i}.label     = { chanlocs.labels };
+            newdata{i}.freq      = 1;
+            newdata{i}.time      = 1;
+        end;
 
     end;
     
