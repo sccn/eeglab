@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2009/08/10 23:31:13  arno
+% Fix for windows 64 bit
+%
 % Revision 1.15  2008/02/15 16:47:53  arno
 % Added new option to output either for preclusteringor for plotting
 %
@@ -106,7 +109,7 @@ if nargin < 5
     mode = '2Dmap';
 end;
 filename = correctfile(fullfile( ALLEEG(abset).filepath,[ ALLEEG(abset).filename(1:end-3) 'icatopo']));
-while (getfield(dir(filename), 'bytes') < 1000)
+while (getfield(dir(which(filename)), 'bytes') < 1000)
     topo = load( '-mat', filename);
     filename = correctfile(topo.file);
 end;
