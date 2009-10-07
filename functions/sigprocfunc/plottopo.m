@@ -68,6 +68,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.59  2008/04/19 21:14:32  arno
+% do not draw axis while plotting
+%
 % Revision 1.58  2007/08/09 22:22:57  arno
 % typo
 %
@@ -755,8 +758,22 @@ end;
                 end % ISRECT
                 
                 
+                %
+                %%%%%%%%%%%%%%%%%%%%%%% Highlight regions %%%%%%%%%%%%%%%%%%%%%%%%%%
+                %
+                if ~isempty(g.regions)
+                    for index=1:size(g.regions{c},2)
+                        tmpreg = g.regions{c}(:,index);
+                        if tmpreg(1) ~= tmpreg(2)
+                            tmph = patch([tmpreg(1) tmpreg(2) tmpreg(2) tmpreg(1)], ...
+                                         [-100 -100 100 100], [0.9 0.9 0.9]); hold on;
+                            set(tmph, 'edgecolor', [0.9 0.9 0.9]); %,'facealpha',0.5,'edgealpha',0.5);
+                        end;
+                    end;
+                end;
+                
             end; % P=0 
-
+            
             %
             %%%%%%%%%%%%%%%%%%%%%%% Plot data traces %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             %
@@ -822,17 +839,6 @@ end;
                     end
                 end
 
-                %
-                %%%%%%%%%%%%%%%%%%%%%%% Highlight regions %%%%%%%%%%%%%%%%%%%%%%%%%%
-                %
-                if ~isempty(g.regions)
-                    for index=1:size(g.regions{c},2)
-                        tmpreg = g.regions{c}(:,index);
-                        tmph = patch([tmpreg(1) tmpreg(2) tmpreg(2) tmpreg(1)], ...
-                                     [-100 -100 100 100], [0.9 0.9 0.9]); hold on;
-                        set(tmph, 'edgecolor', [0.9 0.9 0.9],'facealpha',0.5,'edgealpha',0.5);
-                    end;
-                end;
             end;
             
             fprintf(' %d',c); % finished with channel plot
