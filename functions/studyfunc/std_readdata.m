@@ -99,6 +99,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.50  2009/07/30 04:41:48  arno
+% Subtracting mean accross conditions
+%
 % Revision 1.49  2009/07/10 01:49:14  arno
 % Implement reading PAC data
 %
@@ -813,6 +816,7 @@ for indtmp = 1:length(alldatasets)
         grpind  = strmatch( STUDY.datasetinfo(index).group    , STUDY.group    , 'exact'); if isempty(grpind) , grpind  = 1; end;
         indcellarray = length(allinds{condind, grpind})+1;
     end
+    
     % load data
     % ---------
     tmpind = allchanorcomp(indtmp);

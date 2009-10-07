@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.62  2009/08/29 04:24:56  arno
+% new statistics
+%
 % Revision 1.61  2009/07/02 19:05:08  arno
 % plotting groups of unequal size
 %
@@ -316,7 +319,7 @@ if ~isempty(opt.channels)
 
     % select specific subject or component then plot
     % ----------------------------------------------
-    if ~isempty(opt.subject), erpdata = std_selsubject(erpdata, opt.subject, setinds, { STUDY.datasetinfo(:).subject }, length(STUDY.subject)); end;
+    if ~isempty(opt.subject), erpdata = std_selsubject(erpdata, opt.subject, setinds, { STUDY.datasetinfo(:).subject }, 2); end;
     
     % select specific time    
     % --------------------

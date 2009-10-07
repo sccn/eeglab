@@ -96,6 +96,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2009/08/29 04:24:56  arno
+% new statistics
+%
 % Revision 1.15  2009/05/31 02:22:10  arno
 % Adding FDR and bootstrap to all STUDY functions
 %
@@ -402,13 +405,17 @@ for c = 1:nc
             else                        tmpplot(find(pgroupplot{c}(:) == 0)) = 0;
             end;
         end;
-        tftopo( tmpplot', timevals, freqs, 'title', fig_title, options{:}); 
-        if isempty(opt.caxis)
+        if ~isempty(tmpplot)
+            tftopo( tmpplot', timevals, freqs, 'title', fig_title, options{:}); 
+        end;
+        if isempty(opt.caxis) & ~isempty(tmpc)
             warning off;
             tmpc = [ min(min(tmpplot(:)), tmpc(1)) max(max(tmpplot(:)), tmpc(2)) ];
             warning on;
         else 
-            caxis(opt.caxis);
+            if ~isempty(opt.caxis)
+                caxis(opt.caxis);
+            end;
         end;
 
         if c > 1
@@ -450,7 +457,9 @@ if isempty(opt.caxis)
     for c = 1:nc
         for g = 1:ng
             axes(hdl(c,g));
-            caxis(tmpc);
+            if ~isempty(tmpc)
+                caxis(tmpc);
+            end;
         end;
     end;
 end;

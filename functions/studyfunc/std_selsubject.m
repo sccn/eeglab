@@ -27,21 +27,18 @@
 % See also: std_erpplot(), std_specplot() and std_erspplot()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2008/02/15 16:29:54  arno
+% handling of several groups for subject selection
+%
 % Revision 1.1  2007/01/26 18:08:54  arno
 % Initial revision
 %
 
-function [data] = std_selsubject(data, subject, setinds, allsubjects, nsubject);
+function [data] = std_selsubject(data, subject, setinds, allsubjects, optndims);
 
 if nargin < 2
     help std_selsubject;
     return;
-end;
-
-allsizes = cellfun('size', data, 2); 
-sumrow = sum(allsizes,2);
-if size(data{1,1},2) == nsubject | sumrow == nsubject, optndims = 2;
-else                                                   optndims = 3;
 end;
 
 % plot specific subject

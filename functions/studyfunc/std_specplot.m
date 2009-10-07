@@ -88,6 +88,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.58  2009/08/29 04:24:56  arno
+% new statistics
+%
 % Revision 1.56  2009/08/29 00:38:32  arno
 % move all statistics to std_stat
 %
@@ -277,7 +280,7 @@ if ~isempty(opt.channels)
 
     % select specific subject or component then plot
     % ----------------------------------------------
-    if ~isempty(opt.subject), specdata = std_selsubject(specdata, opt.subject, setinds, { STUDY.datasetinfo(:).subject }, length(STUDY.subject)); end;
+    if ~isempty(opt.subject), specdata = std_selsubject(specdata, opt.subject, setinds, { STUDY.datasetinfo(:).subject }, 2); end;
     
     % select specific time    
     % --------------------

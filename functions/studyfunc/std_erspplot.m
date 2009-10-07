@@ -94,6 +94,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.73  2009/09/03 01:49:05  arno
+% std_erspplot fix
+%
 % Revision 1.71  2009/08/29 04:24:56  arno
 % new statistics
 %
@@ -338,7 +341,7 @@ if ~isempty(opt.channels)
     
     % plot specific subject
     % ---------------------
-    if ~isempty(opt.subject), allersp = std_selsubject(allersp, opt.subject, setinds, { STUDY.datasetinfo(:).subject }, length(STUDY.subject)); end;
+    if ~isempty(opt.subject), allersp = std_selsubject(allersp, opt.subject, setinds, { STUDY.datasetinfo(:).subject }, 3); end;
     
     % select specific time and freq
     % -----------------------------
@@ -381,10 +384,13 @@ if ~isempty(opt.channels)
             if length(allinds) > 1 & ~strcmpi(opt.plotmode, 'none'), figure; opt.plotmode = 'condensed'; end;
             nc = ceil(sqrt(length(allinds)));
             nr = ceil(length(allinds)/nc);
-            for index = 1:size(allersp{1},3)
+            for index = 1:max(cellfun(@(x)(size(x,3)), allersp))
                 if length(allinds) > 1, try, subplot(nr,nc,index, 'align'); catch, subplot(nr,nc,index); end; end;
+                tmpersp = cell(size(allersp));
                 for ind = 1:length(allersp(:))
-                    tmpersp{ind} = squeeze(allersp{ind}(:,:,index,:)); 
+                    if ~isempty(allersp{ind})
+                        tmpersp{ind} = squeeze(allersp{ind}(:,:,index,:)); 
+                    end;
                 end;
                 std_plottf(alltimes, allfreqs, tmpersp, 'condnames', STUDY.condition, 'subject', opt.subject, ...
                                            'legend', opt.legend, 'compinds', {}, 'datatype', opt.datatype, ...
