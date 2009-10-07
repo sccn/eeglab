@@ -76,6 +76,9 @@ if min(numberOfChannelsInSubset) < 2
 end;
 
 rand('state',0);
+if nargin < 5
+    mandatoryChannelsForSet = {};
+end;
 
 if nargin < 4
     plotSubsets = false;
