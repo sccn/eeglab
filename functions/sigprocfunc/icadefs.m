@@ -45,7 +45,7 @@ HZDIR = 'up';               % ascending freqs = 'up'; descending = 'down'
 % ----------------------------------------------------------------------
 
 % EEGLAB version s=stable, b=beta, a=alpha (SCCN only)
-EEGLAB_VERSION = '7.1.4.16b';
+EEGLAB_VERSION = '7.1.4.17b';
 
 TUTORIAL_URL = 'http://sccn.ucsd.edu/wiki/EEGLAB'; % online version
 DEFAULT_SRATE = 256.0175;      % default local sampling rate (rarely used)
