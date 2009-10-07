@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2009/09/29 22:08:21  arno
+% better path lookup
+%
 % Revision 1.16  2009/08/10 23:31:13  arno
 % Fix for windows 64 bit
 %
@@ -109,9 +112,14 @@ if nargin < 5
     mode = '2Dmap';
 end;
 filename = correctfile(fullfile( ALLEEG(abset).filepath,[ ALLEEG(abset).filename(1:end-3) 'icatopo']));
-while (getfield(dir(which(filename)), 'bytes') < 1000)
+tmpfile  = which(filename);
+if ~isempty(tmpfile), filename = tmpfile; end;
+
+while getfield(dir(filename), 'bytes') < 1000
     topo = load( '-mat', filename);
     filename = correctfile(topo.file);
+    tmpfile  = which(filename);
+    if ~isempty(tmpfile), filename = tmpfile; end;
 end;
 
 for k = 1:length(comps)
