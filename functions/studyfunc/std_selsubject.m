@@ -27,6 +27,9 @@
 % See also: std_erpplot(), std_specplot() and std_erspplot()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2009/10/10 01:31:23  arno
+% fix scalp maps plotting for ERP (single subjects)
+%
 % Revision 1.3  2009/10/07 05:07:19  arno
 % Fix missing conditions/groups
 %
@@ -54,8 +57,10 @@ for c = 1:size(data,1)
             if ~strcmpi(subject, allsubjects{setinds{c,g}(l)})
                 if optndims == 2
                     data{c,g}(:,l) = []; %2-D
-                else
+                elseif optndims == 3
                     data{c,g}(:,:,l) = []; %3-D
+                else
+                    data{c,g}(:,:,:,l) = []; %3-D
                 end;
             end;
         end;
