@@ -23,6 +23,12 @@
 %                           events to use as epoch boundaries. Stated epoch length 
 %                           will be reduced by one data point to avoid overlaps 
 %                           {default: [0 recurrence_interval]}
+%     rmbase              - [NaN|latency] remove baseline. NaN does not remove
+%                           baseline. 0 remove the pre-0 baseline. To
+%                           remove the full epoch baseline, enter a value
+%                           larger than the upper epoch limit. Default is
+%                           0.
+%
 % Outputs:
 %     EEGout              - the input EEG structure separated into consecutive 
 %                           epochs.
@@ -49,7 +55,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function EEG = eeg_regepochs(EEG, recur, epochlimits)
+function EEG = eeg_regepochs(EEG, recur, epochlimits, rmbase)
 
 % test input variables
 % --------------------
@@ -61,6 +67,10 @@ end
 
 if nargin < 2
   recur = 1;
+end
+
+if nargin < 4
+  rmbase = 0;
 end
 
 if recur < 0 | recur > EEG.xmax
@@ -138,11 +148,8 @@ EEG = pop_epoch( EEG, { 'X' }, epochlimits, 'newname', ...
                               
 % baseline zero the epochs
 % ------------------------
-if  epochlimits(1) < 0 
-    fprintf('Removing the pre-0 baseline mean of each epoch.\n');
-    EEG = pop_rmbase( EEG, [epochlimits(1) 0]);
-else
-    %fprintf('Removing the mean of each epoch.\n');
-    %EEG = pop_rmbase( EEG, 'timerange',[] );
+if ~isnan(rmbase)
+    fprintf('Removing the pre %3.2f second baseline mean of each epoch.\n', rmbase);
+    EEG = pop_rmbase( EEG, [epochlimits(1) rmbase]);
 end
 
