@@ -27,6 +27,9 @@
 % See also: std_erpplot(), std_specplot() and std_erspplot()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2009/10/07 05:07:19  arno
+% Fix missing conditions/groups
+%
 % Revision 1.2  2008/02/15 16:29:54  arno
 % handling of several groups for subject selection
 %
@@ -40,6 +43,8 @@ if nargin < 2
     help std_selsubject;
     return;
 end;
+
+optndims = max(optndims, ndims(data{1}));
 
 % plot specific subject
 % ---------------------

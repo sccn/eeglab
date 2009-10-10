@@ -63,6 +63,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2009/08/29 04:24:56  arno
+% new statistics
+%
 % Revision 1.5  2009/08/29 00:38:31  arno
 % move all statistics to std_stat
 %
@@ -269,13 +272,17 @@ for c = 1:nc
         else fig_title = [ opt.condnames{c} ', ' opt.groupnames{g} ', ' opt.topovals];
         end;
 
-        tmpplot = double(mean(data{c,g},3));
-        topoplot( tmpplot, opt.chanlocs, 'style', 'map', 'shading', 'interp');
-        title(fig_title); 
-        if isempty(opt.caxis)
-            tmpc = [ min(min(tmpplot), tmpc(1)) max(max(tmpplot), tmpc(2)) ];
-        else 
-            caxis(opt.caxis);
+        if ~isempty(data{c,g})
+            tmpplot = double(mean(data{c,g},3));
+            topoplot( tmpplot, opt.chanlocs, 'style', 'map', 'shading', 'interp');
+            if isempty(opt.caxis)
+                tmpc = [ min(min(tmpplot), tmpc(1)) max(max(tmpplot), tmpc(2)) ];
+            else 
+                caxis(opt.caxis);
+            end;
+            title(fig_title); 
+        else
+            axis off;
         end;
 
         % statistics accross groups
