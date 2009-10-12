@@ -70,6 +70,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2009/09/26 22:19:03  arno
+% Various fixes to pop_writeeeg, std_movecomp,
+%
 % Revision 1.1  2009/05/01 01:06:34  arno
 % Allow writing EDF/BDF/GDF files
 %
@@ -159,7 +162,7 @@ if ~isempty(HDR.EVENT)
         end;
         for i = 1:length(HDR.EVENT)
             if isfield(HDR.EVENT, 'type')
-                ind = strmatch(HDR.EVENT(i).type, alltypes);
+                ind = strmatch(HDR.EVENT(i).type, alltypes, 'exact');
                 EVENT.TYP(i) = ind;
             end;
             if isfield(HDR.EVENT, 'latency')
