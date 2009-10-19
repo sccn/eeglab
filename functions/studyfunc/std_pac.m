@@ -76,6 +76,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2009/07/13 21:10:26  arno
+% still working on std_pac
+%
 % Revision 1.1  2009/07/10 01:50:14  arno
 % adding new functions
 %
@@ -194,7 +197,6 @@ for k = 1:length(g.indices1)  % for each (specified) component
         if strcmpi(g.plot, 'on'), figure; end;
         %[logersp,logitc,logbase,times,logfreqs,logeboot,logiboot,alltfX] ...
         [pacvals, times, freqs1, freqs2] = pac( timefdata1, timefdata2, EEG(1).srate, 'tlimits', [EEG.xmin EEG.xmax]*1000, tmpparams{1:end});
-
         all_pac = setfield( all_pac, [ prefix int2str(g.indices1(k)) '_' int2str(g.indices2(l)) '_pac' ], squeeze(single(pacvals )));
     end;
 end
@@ -309,7 +311,11 @@ end
 % return parameters
 % ----------------
 for cond  = 1:length(abset)
-    pac = pacall{cond}(fminind:fmaxind,minind:maxind);
+    try
+        pac = pacall{cond}(fminind:fmaxind,minind:maxind);
+    catch
+        pac = pacall{cond}; % for 'method', 'latphase'
+    end;
     pacvals(:,:,cond) = pac;
 end;
 freqs    = tmppac.freqs(fminind:fmaxind);

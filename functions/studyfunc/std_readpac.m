@@ -1,8 +1,8 @@
 % std_readpac() - read phase-amplitude correlation
 %
 % Usage:
-%         >> [STUDY, clustinfo, finalinds] = std_readpac(STUDY, ALLEEG);
-%         >> [STUDY, clustinfo, finalinds] = std_readpac(STUDY, ALLEEG, ...
+%         >> [STUDY, clustinfo] = std_readpac(STUDY, ALLEEG);
+%         >> [STUDY, clustinfo] = std_readpac(STUDY, ALLEEG, ...
 %                                                'key', 'val');
 % Inputs:
 %       STUDY - studyset structure containing some or all files in ALLEEG
@@ -18,7 +18,6 @@
 % Output:
 %    STUDY     - (possibly) updated STUDY structure
 %    clustinfo - structure of specified cluster information.
-%    finalinds - either the cluster(s) or channel(s) indices selected.
 %
 % Author: Arnaud Delorme, CERCO, 2009-
 
@@ -39,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2009/07/30 03:13:46  arno
+% fixed recompute
+%
 % Revision 1.2  2009/07/17 21:59:10  arno
 % fixing std_readpac
 %
@@ -46,7 +48,7 @@
 % still working on std_pac
 %
 
-function [STUDY, clustinfo, finalinds] = std_readpac(STUDY, ALLEEG, varargin);
+function [STUDY, clustinfo] = std_readpac(STUDY, ALLEEG, varargin);
 
 if nargin < 2
     help std_readpac;
@@ -80,8 +82,8 @@ ng = max(length(STUDY.group),1);
 if ~isempty(opt.channels1)
     len1 = length(opt.channels1);
     len2 = length(opt.channels2);
-    opt.indices1 = std_chaninds(STUDY, g.channels1);
-    opt.indices2 = std_chaninds(STUDY, g.channels2);
+    opt.indices1 = std_chaninds(STUDY, opt.channels1);
+    opt.indices2 = std_chaninds(STUDY, opt.channels2);
 else
     len1 = length(opt.clusters1);
     len2 = length(opt.clusters2);
@@ -148,12 +150,15 @@ for ind1 = 1:len1 % usually only one channel/component
                     count = 1;
                     for subj = 1:length(STUDY.subject)
                         
+                        % get dataset indices for this subject
                         [inds1 inds2] = getsubjcomps(STUDY, subj, setinds1{c,g}, setinds2{c,g});
-                        
+                        if setinds1{c,g}(inds1) ~= setinds2{c,g}(inds2), error('Wrong subject index'); end;
+                        if ~strcmpi(ALLEEG(setinds1{c,g}(inds1)).subject, STUDY.subject(subj)), error('Wrong subject index'); end;
+                                                
                         if ~isempty(inds1) & ~isempty(inds2)
                             if ~isempty(opt.channels1)
-                                 [pacarraytmp allfreqs alltimes] = std_pac( ALLEEG(subj), 'channels1'  , allinds1{c,g}(inds1), 'channels2',   allinds2{c,g}(inds2), 'timerange', opt.timerange, 'freqrange', opt.freqrange, 'recompute', opt.recompute, moreopts{:});
-                            else [pacarraytmp allfreqs alltimes] = std_pac( ALLEEG(subj), 'components1', allinds1{c,g}(inds1), 'components2', allinds2{c,g}(inds2), 'timerange', opt.timerange, 'freqrange', opt.freqrange, 'recompute', opt.recompute, moreopts{:});
+                                 [pacarraytmp allfreqs alltimes] = std_pac( ALLEEG(setinds1{c,g}(subj)), 'channels1'  , allinds1{c,g}(inds1), 'channels2',   allinds2{c,g}(inds2), 'timerange', opt.timerange, 'freqrange', opt.freqrange, 'recompute', opt.recompute, moreopts{:});
+                            else [pacarraytmp allfreqs alltimes] = std_pac( ALLEEG(setinds1{c,g}(subj)), 'components1', allinds1{c,g}(inds1), 'components2', allinds2{c,g}(inds2), 'timerange', opt.timerange, 'freqrange', opt.freqrange, 'recompute', opt.recompute, moreopts{:});
                             end;
                             
                             % collapse first 2 dimentions (comps x comps)
