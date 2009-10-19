@@ -29,6 +29,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2009/07/13 21:10:26  arno
+% still working on std_pac
+%
 % Revision 1.2  2007/08/13 17:09:30  arno
 % update header
 %
@@ -48,7 +51,11 @@ function finalinds = std_chaninds(STUDY, channames);
     
     if isempty(channames), finalinds = [1:length(tmpallchans)]; return; end;
     for c = 1:length(channames)
-        chanind = strmatch( lower(channames{c}), tmpallchans, 'exact');
-        if isempty(chanind), error('Channel group not found'); end;
+        if isnumeric(channames)
+            chanind = channames(c);
+        else
+            chanind = strmatch( lower(channames{c}), tmpallchans, 'exact');
+            if isempty(chanind), error('Channel group not found'); end;
+        end;
         finalinds   = [ finalinds chanind ];
     end;
