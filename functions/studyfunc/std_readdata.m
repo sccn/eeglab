@@ -99,6 +99,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.51  2009/10/07 05:07:19  arno
+% Fix missing conditions/groups
+%
 % Revision 1.50  2009/07/30 04:41:48  arno
 % Subtracting mean accross conditions
 %
@@ -331,6 +334,10 @@ for ind = 1:length(finalinds)
         %tmpstruct = STUDY.cluster(finalinds(ind));
         %allinds = tmpstruct.allinds;
         %setinds = tmpstruct.setinds;
+        [ tmpstruct setinds allinds ] = getsetinds(STUDY, finalinds(ind));
+        tic
+        [STUDY.cluster(finalinds(ind)).sets STUDY.cluster(finalinds(ind)).comps] = getsetlist( STUDY, ALLEEG, finalinds(ind)); 
+        toc
         [ tmpstruct setinds allinds ] = getsetinds(STUDY, finalinds(ind));
     end;
 
@@ -827,4 +834,61 @@ for indtmp = 1:length(alldatasets)
 end;
 tmpstruct.allinds = allinds;
 tmpstruct.setinds = setinds;
+
+
+function [setlist complist] = getsetlist(STUDY, ALLEEG, clusterind);
+
+sets = STUDY.cluster(clusterind).setinds;
+inds = STUDY.cluster(clusterind).allinds;
+
+% initialize flag array
+% ---------------------
+flag = cell(size(inds));
+for i = 1:size(inds,1)
+    for j = 1:size(inds,2)
+        flag{i,j} = zeros(size(inds{i,j}));
+    end;
+end;
+
+% find datasets with common ICA decompositions
+clusters = std_findsameica(ALLEEG);
+
+setlist  = [];
+complist = [];
+count    = 1;
+for i = 1:size(inds,1)
+    for j = 1:size(inds,2)
+        for ind = 1:length(inds{i,j})
+            if ~flag{i,j}(ind)
+                
+                % found one good component
+                complist(count) = inds{i,j}(ind);
+                %if complist(count) == 12, dfds; end;
+                
+                % search for the same component in other datasets
+                for c = 1:length(clusters)
+                    if any(clusters{c} == sets{i,j}(ind))
+                        
+                        setlist(:,count)  = clusters{c}';
+                        
+                        % flag all of these datasets
+                        for i2 = 1:size(inds,1)
+                            for j2 = 1:size(inds,2)
+                                for ind2 = 1:length(sets{i2,j2})
+                                    if any(sets{i2,j2}(ind2) == clusters{c}) && complist(count) == inds{i2, j2}(ind2)
+                                        flag{i2,j2}(ind2) = 1;
+                                    end;
+                                end;
+                            end;
+                        end;
+                    end;
+                end;
+                
+                count = count+1;
+                
+            end;
+        end;
+    end;
+end;
+
 
