@@ -80,8 +80,9 @@ function ALLEEG = std_loadalleeg(varargin)
     warnfold = 'off';
     for dset = 1:length(paths)
         if ~isempty(paths{dset})
-            if paths{dset}(2) == ':'
-                paths{dset} = paths{dset}(4:end);
+            comp = computer;
+            if paths{dset}(2) == ':' & ~strcmpi(comp(1:2), 'PC') 
+                paths{dset} = [ filesep paths{dset}(4:end) ];
                 paths{dset}(find(paths{dset} == '\')) = filesep;
             end;
         end;
