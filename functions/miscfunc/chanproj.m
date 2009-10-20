@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2002/04/05 17:36:45  jorn
+% Initial revision
+%
 
 % 11-30-96 Scott Makeig  CNL / Salk Institute, La Jolla as plotprojchan.m
 % 03-19-97 changed var() to diag(cov()) -sm
@@ -163,7 +166,7 @@ end
 %%%%%%%%%%%%%%%%%%% Read the color names %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 if colorfile ~=0,
-    if ~isstr(colorfile)
+    if ~ischar(colorfile)
        fprintf('chanproj(); color file name must be a string.\n');
        return
     end
