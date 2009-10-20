@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2009/08/05 03:20:42  arno
+% new interpolation function
+%
 
 function [EEG com] = pop_interp(EEG, bad_elec, method)
 
@@ -98,7 +101,7 @@ function [EEG com] = pop_interp(EEG, bad_elec, method)
                    };
                
         geom = { 1 1 1 1 1 1 [1.8 1] };
-        [res userdata tmp restag ] = inputgui( 'uilist', uilist, 'geometry', geom, 'helpcom', 'pophelp(''pop_interp'')');
+        [res userdata tmp restag ] = inputgui( 'uilist', uilist, 'title', 'Interpolate channel(s) -- pop_interp()', 'geometry', geom, 'helpcom', 'pophelp(''pop_interp'')');
         if isempty(res) | isempty(userdata), return; end;
         
         if restag.method == 1

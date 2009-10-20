@@ -27,12 +27,15 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2009/08/04 04:44:22  arno
+% All functions necessary for compiling EEGLAB code
+%
 
 function com = pop_runscript(filename);
 
 com = [];
 if nargin <1
-    [filename filepath] = uigetfile('*.*', 'Please select input script');
+    [filename filepath] = uigetfile('*.*', 'Please select input script -- pop_runscript()');
     
     if filename(1) == 0, return; end;
 
