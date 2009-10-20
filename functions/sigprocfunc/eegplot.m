@@ -175,6 +175,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.138  2009/07/16 20:08:20  arno
+% update help message
+%
 % Revision 1.137  2009/07/03 21:07:14  arno
 % menu event duration only if they are present
 %
@@ -631,16 +634,16 @@ end
 
 if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
 
-   try
+   %try
        options = varargin;
        for index = 1:length(options)
            if iscell(options{index}) & ~iscell(options{index}{1}), options{index} = { options{index} }; end;
        end;
        if ~isempty( varargin ), g=struct(options{:}); 
        else g= []; end;
-   catch
-   		disp('eegplot() error: calling convention {''key'', value, ... } error'); return;
-   end;	
+   %catch
+   %		disp('eegplot() error: calling convention {''key'', value, ... } error'); return;
+   %end;	
 
    
    
@@ -1499,7 +1502,7 @@ else
      
     % draw selected channels
     % ------------------------
-    if ~isempty(g.winrej)
+    if ~isempty(g.winrej) & size(g.winrej,2) > 2
     	for tpmi = 1:size(g.winrej,1) % scan rows
 			if (g.winrej(tpmi,1) >= lowlim & g.winrej(tpmi,1) <= highlim) | ...
 				(g.winrej(tpmi,2) >= lowlim & g.winrej(tpmi,2) <= highlim)
@@ -1579,7 +1582,10 @@ else
 			if ~isempty(indices)
 				tmpwins1 = g.winrej(indices,1)';
 				tmpwins2 = g.winrej(indices,2)';
-				tmpcols  = g.winrej(indices,3:5);
+                if size(g.winrej,2) > 2
+    				 tmpcols  = g.winrej(indices,3:5);
+                else tmpcols  = g.wincolor;
+                end;
 				try, eval('[cumul indicescount] = histc(tmpwins1, (min(tmpwins1)-1):g.trialstag:max(tmpwins2));');
 				catch, [cumul indicescount] = myhistc(tmpwins1, (min(tmpwins1)-1):g.trialstag:max(tmpwins2));
 				end;
@@ -1604,9 +1610,13 @@ else
             event2plot  = union(union(event2plot1, event2plot2), event2plot3);
       
 			for tpmi = event2plot(:)'
+                if size(g.winrej,2) > 2
+    				 tmpcols  = g.winrej(tpmi,3:5);
+                else tmpcols  = g.wincolor;
+                end;
                 h = patch([g.winrej(tpmi,1)-lowlim g.winrej(tpmi,2)-lowlim ...
                            g.winrej(tpmi,2)-lowlim g.winrej(tpmi,1)-lowlim], ...
-                          [0 0 1 1], [g.winrej(tpmi,3) g.winrej(tpmi,4) g.winrej(tpmi,5)]);  
+                          [0 0 1 1], tmpcols);  
                 set(h, 'EdgeColor', get(h, 'facecolor')) 
 			end;
 		end;
@@ -2165,7 +2175,13 @@ else
                             g.winrej = [g.winrej' [alltrialtag(I1(end)) alltrialtag(I1(end)+1) g.wincolor zeros(1,g.chans)]']';
                         end;
                     else,
-    	                  g.incallback = 1;  % set this variable for callback for continuous data
+    	                g.incallback = 1;  % set this variable for callback for continuous data
+                        if size(g.winrej,2) < 5
+                            g.winrej(:,3:5) = repmat(g.wincolor, [size(g.winrej,1) 1]);
+                        end;
+                        if size(g.winrej,2) < 5+g.chans
+                            g.winrej(:,6:(5+g.chans)) = zeros(size(g.winrej,1),g.chans);
+                        end;
                         g.winrej = [g.winrej' [tmppos(1)+lowlim tmppos(1)+lowlim g.wincolor zeros(1,g.chans)]']';
                     end;
                 end;
