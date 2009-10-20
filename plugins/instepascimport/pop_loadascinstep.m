@@ -30,6 +30,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2009/05/15 02:20:46  arno
+% new continuous format for instep
+%
 % Revision 1.1  2009/01/30 03:58:08  arno
 % *** empty log message ***
 %
@@ -45,6 +48,7 @@ end;
 
 EEG = eeg_emptyset;
 fid = fopen(filename, 'r');
+if fid == -1, error('Cannot open file'); end;
 num1 = fscanf(fid, '%f', 1);tmp   = fgetl(fid);
 num2 = fscanf(fid, '%f', 1);tmp   = fgetl(fid);
 num3 = fscanf(fid, '%f', 1);tmp   = fgetl(fid);
