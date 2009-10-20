@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2007/12/09 00:26:39  arno
+% adding the recompute option
+%
 % Revision 1.16  2007/09/11 10:56:12  arno
 % now save one file per subject
 %
@@ -149,11 +152,12 @@ for k = 1:numc
 
     % compute topo map grid (topoimage)
     % ---------------------------------
-    [hfig grid plotrad Xi Yi] = topoplot( EEG.icawinv(:,k), EEG.chanlocs, ...
+    [hfig grid plotrad Xi Yi] = topoplot( EEG.icawinv(:,k), EEG.chanlocs(EEG.icachansind), ...
                                           'verbose', 'off',...
                                            'electrodes', 'on' ,'style','both',...
-                                           'plotrad',0.5,'intrad',0.5,...
+                                           'plotrad',0.55,'intrad',0.55,...
                                            'noplot', 'on', 'chaninfo', EEG.chaninfo);
+
     all_topos = setfield(all_topos, [ 'comp' int2str(k) '_grid' ], grid);
     all_topos = setfield(all_topos, [ 'comp' int2str(k) '_x' ]   , Xi(:,1));
     all_topos = setfield(all_topos, [ 'comp' int2str(k) '_y' ]   , Yi(:,1));
