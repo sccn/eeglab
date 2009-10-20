@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.91  2009/09/04 23:40:43  arno
+% fix concatenation
+%
 % Revision 1.90  2009/08/22 01:14:24  arno
 % fix saving tag
 %
@@ -605,12 +608,11 @@ end;
 tmpdata = reshape( EEG.data(g.chanind,:,:), length(g.chanind), EEG.pnts*EEG.trials);
 tmpdata = tmpdata - repmat(mean(tmpdata,2), [1 size(tmpdata,2)]); % zero mean 
 if ~strcmpi(lower(g.icatype), 'binica')
-    try,
+    try
         disp('Attempting to convert data matrix to double precision for more accurate ICA results.')
         tmpdata = double(tmpdata);
-        tmpdata2 = tmpdata+1; % check for more memory
-        clear tmpdata2;
-    catch,
+        tmpdata = tmpdata - repmat(mean(tmpdata,2), [1 size(tmpdata,2)]); % zero mean (more precise than single precision)
+    catch
         disp('*************************************************************')
         disp('Not enough memory to convert data matrix to double precision.')
         disp('All computations will be done in single precision. Matlab 7.x')
