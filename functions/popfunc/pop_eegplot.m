@@ -72,6 +72,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.43  2009/04/21 14:04:54  arno
+% fix James bug in eegplot
+%
 % Revision 1.42  2009/01/22 15:15:44  arno
 % James Desjardin's change
 %
@@ -201,7 +204,7 @@
 % 03-07-02 added srate argument to eegplot call -ad
 % 03-27-02 added event latency recalculation for continuous data -ad
 
-function [com] = pop_eegplot( EEG, icacomp, superpose, reject, topcommand);
+function [com] = pop_eegplot( EEG, icacomp, superpose, reject, topcommand, varargin);
 
 com = '';
 if nargin < 1
@@ -313,7 +316,7 @@ if icacomp == 1
     %eegplotoptions = { eegplotoptions{:} 'spacing', 100 };
             
 	eegplot( EEG.data, 'srate', EEG.srate, 'title', 'Scroll channel activities -- eegplot()', ...
-			 'limits', [EEG.xmin EEG.xmax]*1000 , 'command', command, eegplotoptions{:}); 
+			 'limits', [EEG.xmin EEG.xmax]*1000 , 'command', command, eegplotoptions{:}, varargin{:}); 
     
 	%eeg_multieegplot( EEG.data, [], [], oldrej, oldrejE, 'title', 'Scroll channel activities -- eegplot()', 'srate', ...
 	%	      EEG.srate, 'limits', [EEG.xmin EEG.xmax]*1000 , 'command', command); 
@@ -331,7 +334,7 @@ else
     end
 
 	eegplot( tmpdata, 'srate', EEG.srate, 'title', 'Scroll component activities -- eegplot()', ...
-			 'limits', [EEG.xmin EEG.xmax]*1000 , 'command', command, eegplotoptions{:}); 
+			 'limits', [EEG.xmin EEG.xmax]*1000 , 'command', command, eegplotoptions{:}, varargin{:}); 
 	%eeg_multieegplot( tmpdata, [], [], oldrej, oldrejE, 'title', 'Scroll component activities -- eegplot()', 'srate', ...
 	%	      EEG.srate, 'limits', [EEG.xmin EEG.xmax]*1000 , 'command',
 	%	      command);
