@@ -1,3 +1,4 @@
+
 % arrow() - Draw a line with an arrowhead.
 %
 % Usage:
@@ -59,6 +60,7 @@
 % suggestions and beta testing.  Check out his shareware package MATDRAW.
 % He has permission to distribute ARROW with MATDRAW.
 
+
 function [h,yy,zz] = arrow(arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8, ...
                            arg9,arg10,arg11,arg12,arg13,arg14,arg15,arg16, ...
                            arg17,arg18,arg19,arg20,arg21,arg22,arg23,arg24)
@@ -66,7 +68,7 @@ function [h,yy,zz] = arrow(arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8, ...
 % Are we doing the demo?
 c = sprintf('\n');
 if (nargin==1),
-	if (isstr(arg1)),
+	if (ischar(arg1)),
 		arg1 = lower([arg1 '                ']);
 		if (strcmp(arg1(1:4),'prop')),
 			disp([c ...
@@ -295,15 +297,15 @@ end;
 firstprop = nargin+1;
 if (nargin<=3), % to speed things up a bit
 	if (nargin==1),
-	elseif (isstr(arg1)), firstprop=1;
-	elseif (isstr(arg2)), firstprop=2;
+	elseif (ischar(arg1)), firstprop=1;
+	elseif (ischar(arg2)), firstprop=2;
 	elseif (nargin==3),
-		if (isstr(arg3)), firstprop=3; end;
+		if (ischar(arg3)), firstprop=3; end;
 	end;
 else,
 	for k=1:nargin,
 		curarg = eval(['arg' num2str(k)]);
-		if (isstr(curarg)),
+		if (ischar(curarg)),
 			firstprop = k;
 			break;
 		end;
@@ -314,7 +316,7 @@ end;
 if (firstprop<=nargin),
 	for k=firstprop:2:nargin,
 		curarg = eval(['arg' num2str(k)]);
-		if ((~isstr(curarg))|(min(size(curarg))~=1)),
+		if ((~ischar(curarg))|(min(size(curarg))~=1)),
 			error('ARROW requires that a property name be a single string.');
 		end;
 	end;
@@ -381,7 +383,7 @@ elseif (firstprop==2),
 end;
 
 % parse property pairs
-extraprops=setstr([]);
+extraprops=char([]);
 for k=firstprop:2:nargin,
 	prop = eval(['arg' num2str(k)]);
 	val  = eval(['arg' num2str(k+1)]);
@@ -394,7 +396,7 @@ for k=firstprop:2:nargin,
 	elseif (all(prop(1:3)=='wid')),        wid        = val(:);
 	elseif (all(prop(1:4)=='page')),       page       = val;
 	elseif (all(prop(1:5)=='cross')),      crossdir   = val;
-	elseif (all(prop(1:4)=='norm')),       if (isstr(val)), crossdir=val; else, crossdir=val*sqrt(-1); end;
+	elseif (all(prop(1:4)=='norm')),       if (ischar(val)), crossdir=val; else, crossdir=val*sqrt(-1); end;
 	elseif (all(prop(1:3)=='end')),        ends       = val;
 	elseif (all(prop(1:5)=='linew')),      linewidth  = val(:);
 	elseif (all(prop(1:5)=='lines')),      linestyle  = val;
@@ -409,20 +411,20 @@ for k=firstprop:2:nargin,
 end;
 
 % Check if we got 'default' values
-if (isstr(start     )),  s=lower([start(:)'      '   ']); if (all(s(1:3)=='def')), start      = defstart;      else, error(['ARROW does not recognize ''' start(:)'     ''' as a valid ''Start'' string.']); end; end;
-if (isstr(stop      )),  s=lower([stop(:)'       '   ']); if (all(s(1:3)=='def')), stop       = defstop;       else, error(['ARROW does not recognize ''' stop(:)'      ''' as a valid ''Stop'' string.']); end; end;
-if (isstr(len       )),  s=lower([len(:)'        '   ']); if (all(s(1:3)=='def')), len        = deflen;        else, error(['ARROW does not recognize ''' len(:)'       ''' as a valid ''Length'' string.']); end; end;
-if (isstr(baseangle )),  s=lower([baseangle(:)'  '   ']); if (all(s(1:3)=='def')), baseangle  = defbaseangle;  else, error(['ARROW does not recognize ''' baseangle(:)' ''' as a valid ''BaseAngle'' string.']); end; end;
-if (isstr(tipangle  )),  s=lower([tipangle(:)'   '   ']); if (all(s(1:3)=='def')), tipangle   = deftipangle;   else, error(['ARROW does not recognize ''' tipangle(:)'  ''' as a valid ''TipAngle'' string.']); end; end;
-if (isstr(wid       )),  s=lower([wid(:)'        '   ']); if (all(s(1:3)=='def')), wid        = defwid;        else, error(['ARROW does not recognize ''' wid(:)'       ''' as a valid ''Width'' string.']); end; end;
-if (isstr(crossdir  )),  s=lower([crossdir(:)'   '   ']); if (all(s(1:3)=='def')), crossdir   = defcrossdir;   else, error(['ARROW does not recognize ''' crossdir(:)'  ''' as a valid ''CrossDir'' or ''NormalDir'' string.']); end; end;
-if (isstr(page      )),  s=lower([page(:)'       '   ']); if (all(s(1:3)=='def')), page       = defpage;       else, error(['ARROW does not recognize ''' page(:)'      ''' as a valid ''Page'' string.']); end; end;
-if (isstr(ends      )),  s=lower([ends(:)'       '   ']); if (all(s(1:3)=='def')), ends       = defends;       end; end;
-if (isstr(linewidth )),  s=lower([linewidth(:)'  '   ']); if (all(s(1:3)=='def')), linewidth  = deflinewidth;  else, error(['ARROW does not recognize ''' linewidth(:)' ''' as a valid ''LineWidth'' string.']); end; end;
-if (isstr(linestyle )),  s=lower([linestyle(:)'  '   ']); if (all(s(1:3)=='def')), linestyle  = deflinestyle;  end; end;
-if (isstr(edgecolor )),  s=lower([edgecolor(:)'  '   ']); if (all(s(1:3)=='def')), edgecolor  = defedgecolor;  end; end;
-if (isstr(facecolor )),  s=lower([facecolor(:)'  '   ']); if (all(s(1:3)=='def')), facecolor  = deffacecolor;  end; end;
-if (isstr(oldh      )),  s=lower([oldh(:)'       '   ']); if (all(s(1:3)=='def')), oldh       = [];            else, error(['ARROW does not recognize ''' oldh(:)'      ''' as a valid ''ObjectHandles'' string.']); end; end;
+if (ischar(start     )),  s=lower([start(:)'      '   ']); if (all(s(1:3)=='def')), start      = defstart;      else, error(['ARROW does not recognize ''' start(:)'     ''' as a valid ''Start'' string.']); end; end;
+if (ischar(stop      )),  s=lower([stop(:)'       '   ']); if (all(s(1:3)=='def')), stop       = defstop;       else, error(['ARROW does not recognize ''' stop(:)'      ''' as a valid ''Stop'' string.']); end; end;
+if (ischar(len       )),  s=lower([len(:)'        '   ']); if (all(s(1:3)=='def')), len        = deflen;        else, error(['ARROW does not recognize ''' len(:)'       ''' as a valid ''Length'' string.']); end; end;
+if (ischar(baseangle )),  s=lower([baseangle(:)'  '   ']); if (all(s(1:3)=='def')), baseangle  = defbaseangle;  else, error(['ARROW does not recognize ''' baseangle(:)' ''' as a valid ''BaseAngle'' string.']); end; end;
+if (ischar(tipangle  )),  s=lower([tipangle(:)'   '   ']); if (all(s(1:3)=='def')), tipangle   = deftipangle;   else, error(['ARROW does not recognize ''' tipangle(:)'  ''' as a valid ''TipAngle'' string.']); end; end;
+if (ischar(wid       )),  s=lower([wid(:)'        '   ']); if (all(s(1:3)=='def')), wid        = defwid;        else, error(['ARROW does not recognize ''' wid(:)'       ''' as a valid ''Width'' string.']); end; end;
+if (ischar(crossdir  )),  s=lower([crossdir(:)'   '   ']); if (all(s(1:3)=='def')), crossdir   = defcrossdir;   else, error(['ARROW does not recognize ''' crossdir(:)'  ''' as a valid ''CrossDir'' or ''NormalDir'' string.']); end; end;
+if (ischar(page      )),  s=lower([page(:)'       '   ']); if (all(s(1:3)=='def')), page       = defpage;       else, error(['ARROW does not recognize ''' page(:)'      ''' as a valid ''Page'' string.']); end; end;
+if (ischar(ends      )),  s=lower([ends(:)'       '   ']); if (all(s(1:3)=='def')), ends       = defends;       end; end;
+if (ischar(linewidth )),  s=lower([linewidth(:)'  '   ']); if (all(s(1:3)=='def')), linewidth  = deflinewidth;  else, error(['ARROW does not recognize ''' linewidth(:)' ''' as a valid ''LineWidth'' string.']); end; end;
+if (ischar(linestyle )),  s=lower([linestyle(:)'  '   ']); if (all(s(1:3)=='def')), linestyle  = deflinestyle;  end; end;
+if (ischar(edgecolor )),  s=lower([edgecolor(:)'  '   ']); if (all(s(1:3)=='def')), edgecolor  = defedgecolor;  end; end;
+if (ischar(facecolor )),  s=lower([facecolor(:)'  '   ']); if (all(s(1:3)=='def')), facecolor  = deffacecolor;  end; end;
+if (ischar(oldh      )),  s=lower([oldh(:)'       '   ']); if (all(s(1:3)=='def')), oldh       = [];            else, error(['ARROW does not recognize ''' oldh(:)'      ''' as a valid ''ObjectHandles'' string.']); end; end;
 
 % check transpose on arguments; convert strings to numbers
 if (((size(start   ,1)==2)|(size(start   ,1)==3))&((size(start   ,2)==1)|(size(start   ,2)>3))), start    = start';    end;
@@ -430,7 +432,7 @@ if (((size(stop    ,1)==2)|(size(stop    ,1)==3))&((size(stop    ,2)==1)|(size(s
 if (((size(crossdir,1)==2)|(size(crossdir,1)==3))&((size(crossdir,2)==1)|(size(crossdir,2)>3))), crossdir = crossdir'; end;
 if ((size(linestyle,2)>2)&(size(linestyle,1)<=2)), linestyle=linestyle'; end;
 if (all(size(edgecolor))),
-	if (isstr(edgecolor)),
+	if (ischar(edgecolor)),
 		col = lower(edgecolor(:,1));
 		edgecolor = zeros(length(col),3);
 		ii=find(col=='y'); if (all(size(ii))), edgecolor(ii,:)=ones(length(ii),1)*[1 1 0]; end;
@@ -450,7 +452,7 @@ if (all(size(edgecolor))),
 	end;
 end;
 if (all(size(facecolor))),
-	if (isstr(facecolor)),
+	if (ischar(facecolor)),
 		col = lower(facecolor(:,1));
 		facecolor = zeros(length(col),3);
 		ii=find(col=='y'); if (all(size(ii))), facecolor(ii,:)=ones(length(ii),1)*[1 1 0]; end;
@@ -470,7 +472,7 @@ if (all(size(facecolor))),
 	end;
 end;
 if (all(size(ends))),
-	if (isstr(ends)),
+	if (ischar(ends)),
 		endsorig = ends;
 		col = lower([ends(:,1:min(3,size(ends,2))) ones(size(ends,1),max(0,3-size(ends,2)))*' ']);
 		ends = NaN*ones(size(ends,1),1);
@@ -561,7 +563,7 @@ if (all(size(ii))),
 	s = s';
 	s = s(:)';
 	s = s(1:length(s)-1);
-	error(setstr(s));
+	error(char(s));
 end;
 
 % check element length in Start, Stop, and CrossDir
@@ -602,7 +604,7 @@ if (~all(size(page      ))),   page       = NaN;                end;
 if (~all(size(crossdir  ))),   crossdir   = [NaN NaN NaN];      end;
 if (~all(size(ends      ))),   ends       = NaN;                end;
 if (~all(size(linewidth ))),   linewidth  = NaN;                end;
-if (~all(size(linestyle ))),   linestyle  = setstr(['-']);      end; % was NaN
+if (~all(size(linestyle ))),   linestyle  = char(['-']);      end; % was NaN
 if (~all(size(edgecolor ))),   edgecolor  = [NaN NaN NaN];      end;
 if (~all(size(facecolor ))),   facecolor  = [NaN NaN NaN];      end;
 
@@ -622,12 +624,12 @@ if (size(linestyle ,1)==1),   linestyle  = o * linestyle ;   end;
 if (size(edgecolor ,1)==1),   edgecolor  = o * edgecolor ;   end;
 if (size(facecolor ,1)==1),   facecolor  = o * facecolor ;   end;
 ax = o * gca;
-if (size(linestyle ,2)==1),   linestyle  = setstr([linestyle o*' ']); end;
-linestyle = setstr(linestyle);
+if (size(linestyle ,2)==1),   linestyle  = char([linestyle o*' ']); end;
+linestyle = char(linestyle);
 
 % if we've got handles, get the defaults from the handles
 oldlinewidth = NaN*ones(narrows,1);
-oldlinestyle = setstr(zeros(narrows,2));
+oldlinestyle = char(zeros(narrows,2));
 oldedgecolor = NaN*ones(narrows,3);
 oldfacecolor = NaN*ones(narrows,3);
 if (all(size(oldh))),
@@ -671,20 +673,20 @@ if (all(size(oldh))),
 					stop0  = [x(2) y(2) z(2)];
 				end;
 				ec = get(oh,'Color');
-				ls = [get(oh,'LineStyle') '  ']; ls=setstr(ls(1:2));
+				ls = [get(oh,'LineStyle') '  ']; ls=char(ls(1:2));
 				lw = get(oh,'LineWidth');
 			else, % an arrow patch
-				fc = get(oh,'FaceColor');if (isstr(fc)),
+				fc = get(oh,'FaceColor');if (ischar(fc)),
 					if (strcmp(fc,'none')), fc=-inf*[1 1 1];
 					elseif (strcmp(fc,'flat')), fc=inf*[1 1 1];
 					else, fc=[1 1 1]; end;
 					end;
-				ec = get(oh,'EdgeColor');if (isstr(ec)),
+				ec = get(oh,'EdgeColor');if (ischar(ec)),
 					if (strcmp(ec,'none')), ec=-inf*[1 1 1];
 					elseif (strcmp(ec,'flat')), ec=inf*[1 1 1];
 					else, ec=[1 1 1]; end;
 					end;
-				ls = setstr('- ');
+				ls = char('- ');
 				lw = get(oh,'LineWidth');
 			end;
 			ax(k) = get(oh,'Parent');
@@ -1161,7 +1163,7 @@ if (nargout<=1),
 				end;
 			end;
 		else, % a line
-			s = [s ',''LineStyle'',''' deblank(setstr(linestyle(:,k)')) ''''];
+			s = [s ',''LineStyle'',''' deblank(char(linestyle(:,k)')) ''''];
 			if (any(facecolor(:,k)~=oldfacecolor(:,k))|any(edgecolor(:,k)~=oldedgecolor(:,k))), % a line
 				if (isinf(edgecolor(1,k))&(facecolor(1,k)~=-inf)),
 					s = [s ',''Color'',facecolor(:,k)'''];
