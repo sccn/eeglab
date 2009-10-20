@@ -96,6 +96,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2008/11/13 02:45:52  arno
+% better interpolation
+%
 % Revision 1.28  2008/11/13 02:45:23  arno
 % revert version 1.26
 %
@@ -302,7 +305,7 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
                 [tmpchanlist opts] = getchansandopts(STUDY, ALLEEG, chanlist, index, g);
                 std_spec(ALLEEG(STUDY.datasetinfo(index).index), 'channels', tmpchanlist, opts{:}, g.specparams{:});
             else
-                std_spec(ALLEEG(STUDY.datasetinfo(index).index), 'components', chanlist{index}, 'recompute', g.recompute);
+                std_spec(ALLEEG(STUDY.datasetinfo(index).index), 'components', chanlist{index}, 'recompute', g.recompute, g.specparams{:});
             end;
         end;
         if isfield(curstruct, 'specdata')
