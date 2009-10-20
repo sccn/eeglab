@@ -69,6 +69,13 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+%
+% Revision 1.6  2009/10/20 14:52:21  dev
+% replace isstr() with ischar()
+%
+% Revision 1.5  2005/05/24 17:04:47  arno
+% cell2mat and mat2cell
+%
 % Revision 1.4  2003/12/17 23:18:02  arno
 % debug scaling
 %
@@ -101,7 +108,7 @@ function chanlocs = adjustlocs( chanlocs, varargin)
                                  'autorotate' 'string'  { 'on' 'off' }    'on';
                                  'uniform'    'string'  { 'on' 'off' }    'on';
                                  'coordinates' 'string'  { 'pol' 'sph' 'cart' } 'sph' });
-    if isstr(g), error(g); end;
+    if ischar(g), error(g); end;
     
     names = { chanlocs.labels };
     
