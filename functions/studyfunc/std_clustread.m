@@ -1,10 +1,5 @@
 % std_clustread() - this function has been replaced by std_readdata() for
 %                   consistency. Please use std_readdata() instead.
-
-
-
-
-
 %                   load one or more requested measures 
 %                   ['erp'|'spec'|'ersp'|'itc'|'dipole'|'map']
 %                   for all components of a specified cluster.  
@@ -61,6 +56,9 @@
 %
 % RCS-recorded version number, date, editor and comments
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2007/08/06 22:20:38  arno
+% message for deprecated functions
+%
 % Revision 1.33  2007/02/23 04:38:59  toby
 % added line to include RCS comments
 % nothing to reconcile between Arno and Scott's edits
