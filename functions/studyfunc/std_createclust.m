@@ -45,31 +45,99 @@ if nargin< 2
     return;
 end;
 
-if isempty(varargin) | strcmpi(varargin,'')
-    name = 'Cls';
+% decoding options
+% ----------------
+options = {};
+if length(varargin) < 2
+    if isempty(varargin) | strcmpi(varargin,'')
+        options = 'Cls';
+    else
+        options = { 'name' varargin{1} };
+    end
 else
-    name = varargin{1};
-end
+    options =  varargin;
+end;
+opt = finputcheck(options, { 'name'       'string'   []  '';
+                             'subjects'   'cell'     []  [];
+                             'datasets'   {'cell' 'integer'}  { [] [] } [];
+                             'components' {'cell' 'integer'}  { [] [] } [] }, 'std_createclust');
+if isstr(opt), error(opt); end;
+    
 % Find out the highst cluster id number (in cluster name), to find
 % next available cluster index
 max_id = 0;
+if ~isfield(STUDY, 'cluster'), STUDY.cluster = []; end;
 for k = 1:length(STUDY.cluster)
     ti = strfind(STUDY.cluster(k).name, ' ');
     clus_id = STUDY.cluster(k).name(ti(end) + 1:end);
     max_id = max(max_id, str2num(clus_id));
 end
 max_id = max_id + 1;
-name = sprintf('%s %d', name, max_id);
-STUDY.cluster(end+1).name = name;
+opt.name = sprintf('%s %d', opt.name, max_id);
+clustind = length(STUDY.cluster)+1;
 % Initialize the new cluster fields.
-STUDY.cluster(end).parent{1} = 'manual'; % update parent cluster if exists.
-STUDY.cluster(end).child = [];
-STUDY.cluster(end).comps = [];
-STUDY.cluster(end).sets = [];
-STUDY.cluster(end).algorithm = [];
-STUDY.cluster(end).centroid = [];
-STUDY.cluster(end).preclust.preclustparams = [];
-STUDY.cluster(end).preclust.preclustdata = [];
+if length(STUDY.cluster) > 0
+    STUDY.cluster(clustind).parent{1} = STUDY.cluster(1).name;
+    if ~iscell(STUDY.cluster(1).child)
+         STUDY.cluster(1).child = { opt.name };
+    else STUDY.cluster(1).child = { STUDY.cluster(1).child{:} opt.name };
+    end;
+else  
+    STUDY.cluster(clustind).parent{1} = 'manual'; % update parent cluster if exists.
+end;
+STUDY.cluster(clustind).name = opt.name;
+STUDY.cluster(clustind).child = [];
+STUDY.cluster(clustind).comps = [];
+STUDY.cluster(clustind).sets = [];
+STUDY.cluster(clustind).algorithm = [];
+STUDY.cluster(clustind).centroid = [];
+STUDY.cluster(clustind).preclust.preclustparams = [];
+STUDY.cluster(clustind).preclust.preclustdata = [];
 
-
-
+if (~isempty(opt.datasets) | ~isempty(opt.subjects)) & ~isempty(opt.components)
+    
+    % convert subjects to dataset indices
+    % -----------------------------------
+    if ~isempty(opt.subjects)
+        if length(opt.subjects) ~= length(opt.components)
+            error('If subjects are specified, the length of the cell array must be the same as for the components');
+        end;
+        alls = { ALLEEG.subject };
+        for index = 1:length(opt.subjects)
+            tmpinds = strmatch(opt.subjects{index}, alls, 'exact');
+            if isempty(tmpinds)
+                error('Cannot find subject');
+            end;
+            opt.datasets(1:length(tmpinds),index) = tmpinds;
+        end;
+        opt.datasets(opt.datasets(:) == 0) = NaN;
+    end;
+    
+    % deal with cell array inputs
+    % ---------------------------
+    if iscell(opt.components)
+        newcomps = [];
+        newdats  = [];
+        for ind1 = 1:length(opt.components)
+            for ind2 = 1:length(opt.components{ind1})
+                if iscell(opt.datasets)
+                     newdats  = [ newdats  opt.datasets{ind1}' ];
+                else newdats  = [ newdats  opt.datasets(:,ind1) ];
+                end;
+                newcomps = [ newcomps opt.components{ind1}(ind2) ];
+            end;
+        end;
+        opt.datasets   = newdats;
+        opt.components = newcomps;
+    end;
+    
+    % create .sets, .comps, .setinds, .allinds fields
+    % -----------------------------------------------
+    [tmp setinds allinds] = std_setcomps2cell( STUDY, opt.datasets, opt.components);
+    STUDY.cluster(clustind).setinds = setinds;
+    STUDY.cluster(clustind).allinds = allinds;
+    STUDY.cluster(clustind) = std_cell2setcomps( STUDY, ALLEEG, clustind); 
+    STUDY.cluster(clustind) = std_setcomps2cell( STUDY, clustind);
+    %[ STUDY.cluster(finalinds(ind)) setinds allinds ] =
+        %std_setcomps2cell(STUDY, finalinds(ind));
+end;

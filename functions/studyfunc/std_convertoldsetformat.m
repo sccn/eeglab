@@ -22,6 +22,9 @@
 % GNU General Public License for more information
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2009/07/13 21:10:26  arno
+% still working on std_pac
+%
 % Revision 1.1  2009/07/10 01:50:14  arno
 % adding new functions
 %
@@ -47,44 +50,10 @@
 function STUDY = std_convertoldsetformat(STUDY);
 
 for index = 1:length(STUDY.cluster)
-    [ tmpstruct setinds allinds ] = getsetinds(STUDY, index);
+    [ tmpstruct setinds allinds ] = std_setcomps2cell(STUDY, index);
     STUDY.cluster(index).setinds = setinds;
     STUDY.cluster(index).allinds = allinds;
 end;
 %STUDY.cluster = rmfield(STUDY.cluster, 'sets');
 %STUDY.cluster = rmfield(STUDY.cluster, 'comps');
 
-% get set and indices for components cluster
-% ------------------------------------------
-function [ tmpstruct setinds allinds ] = getsetinds(STUDY, ind)
-
-tmpstruct = STUDY.cluster(ind);
-alldatasets = tmpstruct.sets;
-allchanorcomp = repmat(tmpstruct.comps, [size(tmpstruct.sets,1) 1]); % old format
-
-alldatasets   = alldatasets(:)';
-allchanorcomp = allchanorcomp(:)';
-
-% get indices for all groups and conditions
-% -----------------------------------------
-nc = max(length(STUDY.condition),1);
-ng = max(length(STUDY.group),1);
-allinds = cell( nc, ng );
-setinds = cell( nc, ng );
-for indtmp = 1:length(alldatasets)
-    if ~isnan(alldatasets(indtmp))
-        index = alldatasets(indtmp);
-        condind = strmatch( STUDY.datasetinfo(index).condition, STUDY.condition, 'exact'); if isempty(condind), condind = 1; end;
-        grpind  = strmatch( STUDY.datasetinfo(index).group    , STUDY.group    , 'exact'); if isempty(grpind) , grpind  = 1; end;
-        indcellarray = length(allinds{condind, grpind})+1;
-    end
-    % load data
-    % ---------
-    tmpind = allchanorcomp(indtmp);
-    if ~isnan(tmpind)
-        allinds{ condind, grpind}(indcellarray) = tmpind;
-        setinds{ condind, grpind}(indcellarray) = index;
-    end;
-end;
-tmpstruct.allinds = allinds;
-tmpstruct.setinds = setinds;
