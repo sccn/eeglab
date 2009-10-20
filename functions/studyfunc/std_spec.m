@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.38  2009/08/04 23:21:25  arno
+% naccu
+%
 % Revision 1.37  2009/07/30 04:42:30  arno
 % Take into account boundaries for spectopo
 %
@@ -199,9 +202,10 @@ end;
 [g spec_opt] = finputcheck(options, { 'components' 'integer' []         [];
                                       'channels'   'cell'    {}         {};
                                       'timerange'  'float'   []         [];
-                                      'specmode'   'string'  {'fft' 'psd'} 'psd';
+                                      'specmode'   'string'  {'fft' 'psd' 'pmtm'} 'psd';
                                       'recompute'  'string'  { 'on' 'off' } 'off';
                                       'rmcomps'    'integer' []         [];
+                                      'nw'         'float'   []         4;
                                       'interp'     'struct'  { }        struct([]);
                                       'nfft'       'integer' []         [];
                                       'freqrange'  'real'    []         [] }, 'std_spec', 'ignore');
@@ -269,12 +273,22 @@ if strcmpi(g.specmode, 'psd')
     else boundaries = [];
     end;
     [X, f] = spectopo(X, EEG.pnts, EEG.srate, 'plot', 'off', 'boundaries', boundaries, 'nfft', g.nfft, spec_opt{:});
+elseif strcmpi(g.specmode, 'pmtm')
+    fprintf('Computing multitaper:');
+    for cind = 1:size(X,1)
+        fprintf('.');
+        for tind = 1:size(X,3)
+            [X2(cind,:,tind) f] = pmtm(X(cind,:,tind), g.nw, g.nfft, EEG.srate);
+        end;
+    end;
+    fprintf('\n');
+    X     = 10*log10(mean(X2,3));    
 else
     tmp   = fft(X, g.nfft, 2);
     f     = linspace(0, EEG.srate/2, size(tmp,2)/2);
     f     = f(2:end); % remove DC (match the output of PSD)
     tmp   = tmp(:,2:size(tmp,2)/2,:);
-    X     = 10*log10(mean(abs(tmp).^2,3));     
+    X     = 10*log10(mean(abs(tmp).^2,3));    
 end;
 
 % Save SPECs in file (all components or channels)
