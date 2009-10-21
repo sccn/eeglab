@@ -3,7 +3,7 @@
 % Usage:
 %   >> EEG = pop_readbdf;             % an interactive window pops up
 %   >> EEG = pop_readbdf( filename ); % no pop-up window 
-%   >> EEG = pop_readbdf( filename, range, eventchans, ref );
+%   >> EEG = pop_readbdf( filename, range, eventchans, ref, delchan);
 %
 % Graphical interface:
 %   "Data block range to read" - {edit box] see command line 
@@ -28,6 +28,8 @@
 %                    if no reference is used!. If you do not know which
 %                    channel to use, pick one and then re-reference after 
 %                    the channel locations are read in. {default: none}
+%   delchan        - ['on'|'off'] delete event channel. Default if 'on'\
+%
 % Outputs:
 %   EEG            - EEGLAB data structure
 %
@@ -56,6 +58,9 @@
 % programmed from pop_readedf() version 1.15
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2009/07/01 23:29:50  arno
+% fix partial reading
+%
 % Revision 1.1  2009/06/19 05:04:22  arno
 % bdf plugin
 %
@@ -134,7 +139,7 @@
 % Initial revision
 %
 
-function [EEG, command] = pop_readbdf(filename, blockrange, eventchans, ref); 
+function [EEG, command] = pop_readbdf(filename, blockrange, eventchans, ref, delchan); 
 EEG = [];
 command = '';
 
@@ -161,13 +166,15 @@ if nargin < 1
     dat = openbdf(filename);
     promptstr    = { [ 'Data block range to read (default all [1 ' int2str(dat.Head.NRec) '])' ]
                      [ 'Event channel number(s) (default:none [1-' int2str(dat.Head.NS)  '])' ]
-                     'If Biosemi data, reference chan(s) number(s)' };
-    inistr       = { '' int2str(dat.Head.NS) '' };
+                     'If Biosemi data, reference chan(s) number(s)' 
+                     'Delete event channel' };
+    inistr       = { '' int2str(dat.Head.NS) '' 'on' };
     result       = inputdlg2( promptstr, 'Import BDF file -- pop_readbdf()', 1,  inistr, 'pop_readbdf');
     if length(result) == 0 return; end;
     blockrange   = eval( [ '[' result{1} ']' ] );
     eventchans   = eval( [ '[' result{2} ']' ] );
     ref          = eval( [ '[' result{3} ']' ] );
+    delchan      = result{4};
 end;
 
 % load datas
@@ -208,8 +215,29 @@ if ~isempty(eventchans)
         error('Event channel index or indices out of range');
     end;
     disp('Applying 8-bit masks to event channels (only for BIOSEMI files).');
-    EEG.data(eventchans,:) = bitand(uint16(EEG.data(eventchans,:)), 255);
-    EEG = pop_chanevent(EEG, eventchans, 'edge', 'leading', 'delchan', 'on');
+    %EEG.data(eventchans,:) = bitand(uint32(EEG.data(eventchans,:)), 32767);
+    
+    %thiscode = 0;lastcode=0;
+    %for p = 1:size(EEG.data,2)-1
+    %    prevcode = thiscode;
+    %    thiscode = mod(EEG.data(end,p),256*256);   % andrey's code - 16 bits 
+    %    if (thiscode ~= 0) && (thiscode~=prevcode) && (thiscode~=lastcode) % fix to avoid repeated codes (per Ying's demand)
+    %        EEG.event(end+1).latency =  p;
+    %        EEG.event(end).type = thiscode;
+    %        lastcode = thiscode;
+    %    end;
+    %end;
+    thiscode = 0;
+    for p = 1:size(EEG.data,2)-1
+        prevcode = thiscode;
+        thiscode = mod(EEG.data(end,p),256*256);   % andrey's code - 16 bits 
+        if (thiscode ~= 0) && (thiscode~=prevcode) 
+            EEG.event(end+1).latency =  p;
+            EEG.event(end).type = thiscode;
+        end;
+    end;
+
+    %EEG = pop_chanevent(EEG, eventchans, 'edge', 'leading', 'delchan', delchan);
 end;
 warning on;
 
