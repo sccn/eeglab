@@ -31,6 +31,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2009/07/10 01:50:14  arno
+% adding new functions
+%
 
 function cluster = std_findsameica(ALLEEG);
 
@@ -39,11 +42,13 @@ for index = 2:length(ALLEEG)
     
     found = 0;
     for c = 1:length(cluster)
-        %if isequal(ALLEEG(cluster{c}(1)).icaweights, ALLEEG(index).icaweights) 
-        if sum(sum(abs(ALLEEG(cluster{c}(1)).icaweights-ALLEEG(index).icaweights))) < 1e-6
-            cluster{c}(end+1) = index;
-            found = 1;
-            break;
+        if all(size(ALLEEG(cluster{c}(1)).icaweights) == size(ALLEEG(index).icaweights))
+            %if isequal(ALLEEG(cluster{c}(1)).icaweights, ALLEEG(index).icaweights) 
+            if sum(sum(abs(ALLEEG(cluster{c}(1)).icaweights-ALLEEG(index).icaweights))) < 1e-6
+                cluster{c}(end+1) = index;
+                found = 1;
+                break;
+            end;
         end;
     end;
     if ~found
