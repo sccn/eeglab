@@ -150,6 +150,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.237  2009/07/30 05:21:09  arno
+% remove datachan field if present in channel structure
+%
 % Revision 1.236  2009/07/02 22:18:56  arno
 % comment code
 %
@@ -1064,7 +1067,7 @@ for inddataset = 1:length(ALLEEG)
                   % remove the events which latency are out of boundary
                   % ---------------------------------------------------
                   if isfield(EEG.event, 'latency')
-                      if isstr(EEG.event(1).type)
+                      if ischar(EEG.event(1).type)
                           if strcmpi(EEG.event(1).type, 'boundary') & isfield(EEG.event, 'duration')
                               if EEG.event(1).duration < 1
                                   EEG.event(1) = [];
@@ -1298,7 +1301,7 @@ for inddataset = 1:length(ALLEEG)
         % check name consistency
         % ----------------------
         if ~isempty(EEG.setname)
-            if ~isstr(EEG.setname)
+            if ~ischar(EEG.setname)
                 EEG.setname = '';
             else
                 if size(EEG.setname,1) > 1
@@ -1322,7 +1325,7 @@ for inddataset = 1:length(ALLEEG)
 
         % read data if necessary
         % ----------------------
-        if isstr(EEG.data) & nargin > 1
+        if ischar(EEG.data) & nargin > 1
             if strcmpi(varargin{1}, 'loaddata')
 
                 EEG.data = eeg_getdatact(EEG);
@@ -1349,7 +1352,7 @@ for inddataset = 1:length(ALLEEG)
                 error('eeg_checkset: cannot call savedata any more');
                 
                 % the code below is deprecated
-                if ~isstr(EEG.data) % not already saved
+                if ~ischar(EEG.data) % not already saved
                     disp('Writing previous dataset to disk...');
                     
                     if datfile
@@ -1362,12 +1365,12 @@ for inddataset = 1:length(ALLEEG)
                     % saving dataset
                     % --------------
                     filename = fullfile(EEG(1).filepath, EEG(1).filename);
-                    if ~isstr(EEG.data) & option_single, EEG.data = single(EEG.data); end;
+                    if ~ischar(EEG.data) & option_single, EEG.data = single(EEG.data); end;
                     v = version;
                     if str2num(v(1)) >= 7, save( filename, '-v6', '-mat', 'EEG'); % Matlab 7
                     else                   save( filename, '-mat', 'EEG');
                     end;
-                    if ~isstr(EEG.data), EEG.data = 'in set file'; end;
+                    if ~ischar(EEG.data), EEG.data = 'in set file'; end;
                     
                     res = sprintf('%s = eeg_checkset( %s, ''savedata'');', inputname(1), inputname(1));
                 end;
@@ -1688,9 +1691,9 @@ for inddataset = 1:length(ALLEEG)
                 end;
             end;
             if isstruct( EEG.chanlocs)
-                if ~isstr(EEG.chanlocs(1).labels)
+                if ~ischar(EEG.chanlocs(1).labels)
                     for index = 1:length(EEG.chanlocs)
-                        if ~isstr(EEG.chanlocs(index).labels)
+                        if ~ischar(EEG.chanlocs(index).labels)
                             EEG.chanlocs(index).labels = [ 'E' int2str(EEG.chanlocs(index).labels) ];
                         end;
                     end;
@@ -1720,7 +1723,7 @@ for inddataset = 1:length(ALLEEG)
                 EEG.chanlocs(1).ref = ref;
             end;
             for tmpind = 1:length(EEG.chanlocs)
-                if ~isstr(EEG.chanlocs(tmpind).ref)
+                if ~ischar(EEG.chanlocs(tmpind).ref)
                     EEG.chanlocs(tmpind).ref = ref;
                 else
                     ref = '';
@@ -1736,7 +1739,7 @@ for inddataset = 1:length(ALLEEG)
                     EEG.chaninfo.nodatchan(1).ref = '';
                 end;
                 for tmpind = 1:length(EEG.chaninfo.nodatchan)
-                    if ~isstr(EEEG.chaninfo.nodatchan(tmpind).ref)
+                    if ~ischar(EEG.chaninfo.nodatchan(tmpind).ref)
                         EEG.chaninfo.nodatchan(tmpind).ref = '';
                     end;
                 end;
@@ -1807,7 +1810,7 @@ for inddataset = 1:length(ALLEEG)
         if ~isfield(EEG, 'ref')
             EEG.ref = 'common';
         end;
-        if isstr(EEG.ref) & strcmpi(EEG.ref, 'common')
+        if ischar(EEG.ref) & strcmpi(EEG.ref, 'common')
             if length(EEG.chanlocs) > EEG.nbchan
                 disp('Extra common reference electrode location detected');
                 EEG.ref = EEG.nbchan+1;

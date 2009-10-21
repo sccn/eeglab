@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2006/12/06 00:13:42  arno
+% no mandatory plotting
+%
 % Revision 1.5  2006/01/22 00:09:58  arno
 % header message
 %
@@ -81,7 +84,7 @@ GRID_SCALE = 2*MAXCHANS+5;
 
 % Read the channel file
 % ---------------------
-if isstr( filename ) | isstruct( filename )
+if ischar( filename ) | isstruct( filename )
     [tmp lb Th Rd] = readlocs(filename);
 	Th = pi/180*Th;                               % convert degrees to rads
 	[x,y] = pol2cart(Th,Rd);

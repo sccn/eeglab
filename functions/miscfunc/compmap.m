@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2007/10/17 00:26:43  nima
+% strcmp in line 115 for comparing sstrings.
+%
 % Revision 1.2  2004/09/01 18:30:14  arno
 % fixed problem with Matlab 7
 %
@@ -251,7 +254,7 @@ for i = (1:pages)
       if isempty(srclabels)
         title(int2str(compnos(comp)))   ;
       else
-        if isstr(srclabels)      
+        if ischar(srclabels)      
           title(srclabels(comp,:));
         else
 	      title(num2str(srclabels(comp)));
