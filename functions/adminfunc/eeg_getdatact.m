@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2008/11/12 22:31:12  arno
+% memory mapped data
+%
 % Revision 1.5  2008/04/19 21:17:04  arno
 % fix reading components
 %
@@ -187,4 +190,9 @@ function data = eeg_getdatact( EEG, varargin);
         %end;
     end;
     
-    data = reshape(data, size(data,1), EEG.pnts, EEG.trials);
+    try,
+        data = reshape(data, size(data,1), EEG.pnts, EEG.trials);
+    catch
+        error('The file on disk does not correspond to the dataset information. Close and reopen the STUDY');
+    end;
+    
