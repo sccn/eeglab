@@ -67,7 +67,7 @@
 %   STUDY        - the input STUDY set with pre-clustering data added, for use by pop_clust() 
 %
 % Example:
-%   >> [ALLEEG STUDY] = std_precomp(ALLEEG, STUDY, { 'cz' 'oz' }, 'interpolate', 'on', 'erp', 'on', ...
+%   >> [ALLEEG STUDY] = std_precomp(STUDY, ALLEEG, { 'cz' 'oz' }, 'interpolate', 'on', 'erp', 'on', ...
 %          'spec', 'on', 'ersp', 'on', 'erspparams', { 'cycles' [ 3 0.5 ], 'alpha', 0.01, 'padratio' 1 });
 %                          
 %           % This prepares, channels 'cz' and 'oz' in the STUDY datasets.
@@ -96,6 +96,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.30  2009/10/20 02:30:23  arno
+% Fix options for component spectrum
+%
 % Revision 1.29  2008/11/13 02:45:52  arno
 % better interpolation
 %
