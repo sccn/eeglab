@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2009/10/07 03:37:26  arno
+% fix which problem
+%
 % Revision 1.17  2009/09/29 22:08:21  arno
 % better path lookup
 %
@@ -170,10 +173,12 @@ X = squeeze(X);
 return;
 
 function filename = correctfile(filename)
-    if filename(2) == ':'
-        filename = filename(4:end);
+    comp = computer;
+    if filename(2) == ':' & ~strcmpi(comp(1:2), 'PC') 
+        filename = [filesep filename(4:end) ];
         filename(find(filename == '\')) = filesep;
     end;
+    
     if ~exist(filename)
         [tmpp tmpf ext] = fileparts(filename);
         if exist([tmpf ext])
