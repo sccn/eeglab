@@ -76,6 +76,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2009/09/27 04:05:59  arno
+% Joe Dien Filenum option to binica
+%
 % Revision 1.25  2007/11/30 04:31:25  arno
 % same
 %
@@ -203,7 +206,7 @@ end
 
 tmpint=[];
 
-if ~isstr(data) % data variable given
+if ~ischar(data) % data variable given
   firstarg = 2;
 else % data filename given
   firstarg = 4;
@@ -282,7 +285,7 @@ fprintf('scriptfile = %s\n',scriptfile);
 
 nchans = 0;
 tmpdata = [];
-if ~isstr(data) % data variable given
+if ~ischar(data) % data variable given
   if ~exist('data')
     fprintf('\nbinica(): Variable name data not found.\n');
     return
@@ -310,7 +313,7 @@ else % data filename given
   end
   nchans = var2;
   nframes = var3;
-  if isstr(nchans) | isstr(nframes)
+  if ischar(nchans) | ischar(nframes)
     fprintf(...
 '\nbinica(): chans, frames args must be given after data file name\n');
     return
@@ -419,7 +422,7 @@ if exist('wtsin')
 end
 fprintf('\n');
 
-if isstr(data)
+if ischar(data)
   whos wts sph
 else
   whos data wts sph

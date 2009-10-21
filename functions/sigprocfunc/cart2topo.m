@@ -54,6 +54,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2004/02/15 19:30:01  scott
+% help msg
+%
 % Revision 1.18  2003/06/30 15:19:40  arno
 % adding warning if z<0
 %
@@ -126,7 +129,7 @@ if nargin<1
     return;
 end;
 if nargin >= 2
-	if ~isstr(varargin{1})
+	if ~ischar(varargin{1})
 		y = varargin{1};
 		z = varargin{2};
 		varargin = varargin(3:end);

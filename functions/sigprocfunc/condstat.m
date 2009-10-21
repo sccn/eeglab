@@ -56,6 +56,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2009/07/02 21:01:14  arno
+% changing comments
+%
 % Revision 1.8  2007/06/05 03:49:32  toby
 % Documentation edits, comments on code lines that may need clarification.
 %
@@ -89,13 +92,13 @@ if nargin < 6
 	return;
 end;
 
-if ~isstr(formula) & ~iscell(formula)
+if ~ischar(formula) & ~iscell(formula)
 	error('The first argument must be a string formula or cell array of string');
 end;
-if isstr(formula)
+if ischar(formula)
 	formula = { formula };
 end;
-if isstr(bootside)
+if ischar(bootside)
 	bootside = { bootside };
 end;
 for index = 1:length(bootside)
@@ -103,7 +106,7 @@ for index = 1:length(bootside)
 		error('Bootside must be either ''both'' or ''upper''');
 	end;
 end;	
-if isstr(condboot)
+if ischar(condboot)
 	condboot = { condboot };
 end;
 for index = 1:length(condboot)

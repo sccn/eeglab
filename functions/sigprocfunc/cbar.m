@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2007/02/03 04:05:32  toby
+% Help edit
+%
 % Revision 1.6  2006/09/12 16:52:04  arno
 % Minor fix and debugging (this function should be reprogrammed)
 %
@@ -90,7 +93,7 @@ else
     arg = 'vert';
     posscale = 'on';
   else      
-    if isstr(arg)
+    if ischar(arg)
       ax = [];
     else
       ax = arg;

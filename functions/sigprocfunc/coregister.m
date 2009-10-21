@@ -140,6 +140,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.76  2008/02/15 16:09:19  arno
+% Added automatic command line wrapping and fixed it (auto angle inversion if necessary)
+%
 % Revision 1.75  2007/08/16 21:21:08  arno
 % remove fieldtrip traditional matrix detection
 %
@@ -391,7 +394,7 @@ end
 
 % undocumented commands run from GUI
 % ----------------------------------
-if isstr(chanlocs1) 
+if ischar(chanlocs1) 
     if ~strcmpi(chanlocs1, 'redraw') & ~strcmpi(chanlocs1, 'fiducials') & ~strcmpi(chanlocs1, 'warp')
         chanlocs1 = readlocs(chanlocs1);
     else
@@ -449,12 +452,12 @@ g = finputcheck(varargin, { 'alignfid'   'cell'  {}      {};
                             'autoscale'  'string' { 'on' 'off' } 'on';
                             'helpmsg'    'string' { 'on' 'off' } 'off';
                             'mesh'       ''      []   defaultmesh });
-if isstr(g), error(g); end;
+if ischar(g), error(g); end;
 
 % load mesh if any
 % ----------------
 if ~isempty(g.mesh)
-    if isstr(g.mesh)
+    if ischar(g.mesh)
         try
             g.mesh  = load(g.mesh);
         catch, g.mesh = [];
@@ -545,7 +548,7 @@ else
         if ~isempty(transform), dat.transform = [ transform(1:6)' ratio ratio ratio ]; end;
         
     elseif ~isempty(g.warp)
-        if isstr(g.warp)
+        if ischar(g.warp)
             [clist1 clist2] = pop_chancoresp( elec1, elec2, 'autoselect', 'all', 'gui', 'off');
             % copy electrode names
             if isempty(clist1)
@@ -797,7 +800,7 @@ function indices = decodelabels( chanlocs, strchan );
     label1020 = { 'nz' 'lpa' 'rpa' 'Fp1', 'Fpz', 'Fp2', 'F7', 'F3', 'Fz', 'F4', 'F8',  'T7', 'C3', 'Cz', 'C4', 'T8',  'P7', 'P3', 'Pz', 'P4', 'P8', 'O1', 'Oz', 'O2'}'; % 21 channels
     label1010 = { 'nz' 'lpa' 'rpa' 'Fp1', 'Fpz', 'Fp2', 'AF9', 'AF7', 'AF5', 'AF3', 'AF1', 'AFz', 'AF2', 'AF4', 'AF6', 'AF8', 'AF10', 'F9', 'F7', 'F5', 'F3', 'F1', 'Fz', 'F2', 'F4', 'F6', 'F8', 'F10', 'FT9', 'FT7', 'FC5', 'FC3', 'FC1', 'FCz', 'FC2', 'FC4', 'FC6', 'FT8', 'FT10', 'T9', 'T7', 'C5', 'C3', 'C1', 'Cz', 'C2', ...
              'C4', 'C6', 'T8', 'T10', 'TP9', 'TP7', 'CP5', 'CP3', 'CP1', 'CPz', 'CP2', 'CP4', 'CP6', 'TP8', 'TP10', 'P9', 'P7', 'P5', 'P3', 'P1', 'Pz', 'P2', 'P4', 'P6', 'P8', 'P10', 'PO9', 'PO7', 'PO5', 'PO3', 'PO1', 'POz', 'PO2', 'PO4', 'PO6', 'PO8', 'PO10', 'O1', 'Oz', 'O2', 'I1', 'Iz', 'I2'}'; ...
-    if ~isstr(strchan), indices = strchan; return; end;
+    if ~ischar(strchan), indices = strchan; return; end;
     switch strchan
      case '21 elec (10/20 system)', indices = pop_chancoresp( struct('labels', chanlocs.label), struct('labels', label1020), 'gui', 'off');
      case '86 elec (10/10 system)', indices = pop_chancoresp( struct('labels', chanlocs.label), struct('labels', label1010), 'gui', 'off');

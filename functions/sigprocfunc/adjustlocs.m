@@ -69,8 +69,7 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
-%
-% Revision 1.6  2009/10/20 14:52:21  dev
+% Revision 1.6  2009/10/20 22:13:57  dev
 % replace isstr() with ischar()
 %
 % Revision 1.5  2005/05/24 17:04:47  arno
