@@ -9,7 +9,7 @@ function S = LoadSpikes(tfilelist,varargin)
 
 % ADR 1998
 %  version L4.0
-%  status: PROMOTED
+%   status: PROMOTED
 
 tsflag = 'sec';
 display = 1;
