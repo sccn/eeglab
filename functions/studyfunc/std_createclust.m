@@ -58,7 +58,7 @@ else
     options =  varargin;
 end;
 opt = finputcheck(options, { 'name'       'string'   []  '';
-                             'subjects'   'cell'     []  [];
+                             'subjects'   'cell'     []  {};
                              'datasets'   {'cell' 'integer'}  { [] [] } [];
                              'components' {'cell' 'integer'}  { [] [] } [] }, 'std_createclust');
 if isstr(opt), error(opt); end;
