@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.543  2009/09/26 23:22:05  arno
+% Removing fileio from eeglab.m
+%
 % Revision 1.542  2009/08/08 00:50:16  arno
 % fix rmdat
 %
@@ -2006,7 +2009,7 @@ catchstrs.new_non_empty          = e_newset;
     % create eeglab figure
     % --------------------
     eeg_mainfig(onearg);
-    ptopoplot = which('topoplot');
+    ptopoplot = fileparts(which('spectopo'));
 
     % detecting icalab
     % ----------------
@@ -2054,11 +2057,11 @@ catchstrs.new_non_empty          = e_newset;
                 end;
             end;
         end;
-        ptopoplot2 = which('topoplot');
+        ptopoplot2 = fileparts(which('topoplot'));
         if ~strcmpi(ptopoplot, ptopoplot2),
             %disp('  Warning: duplicate function topoplot.m in Fieldtrip and EEGLAB');
             %disp('  EEGLAB function will prevail and call the Fieldtrip one when appropriate');
-            addpath(fileparts(ptopoplot));
+            addpath(ptopoplot);
         end;
 
         % BIOSIG plugin (not in plugin folder)
@@ -2077,10 +2080,6 @@ catchstrs.new_non_empty          = e_newset;
             try,
                 addpath(path_biosig);
                 addpath([ path_biosig filesep 't200' ]);
-                addpath([ path_biosig filesep 't250' ]);
-                addpath([ path_biosig filesep 't300' ]);
-                addpath([ path_biosig filesep 't400' ]);
-                addpath([ path_biosig filesep 't490' ]);
                 % addpath([ p 'external' filesep 'biosig' filesep 't500' ]); % topoplot conflict
                 version = [ path_biosig filesep 'VERSION' ];
                 version = loadtxt(version, 'convert', 'off', 'verbose', 'off');
