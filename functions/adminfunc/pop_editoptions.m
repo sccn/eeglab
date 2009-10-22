@@ -72,6 +72,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.47  2009/08/04 04:44:22  arno
+% All functions necessary for compiling EEGLAB code
+%
 % Revision 1.46  2009/04/21 22:11:21  arno
 % Now warning for memory mapping and showing it in the main interface
 %
@@ -231,21 +234,34 @@ if iseeglabdeployed
     filename = fullfile(eeglabexefolder,'eeg_options.txt');
     eegoptionbackup = fullfile(eeglabexefolder,'eeg_optionsbackup.txt');
 else
-    filename = which('eeg_options.m');
+    W_MAIN = findobj('tag', 'EEGLAB');
+    if ~isempty(W_MAIN)
+        filename = get(W_MAIN, 'userdata');
+        filename = fullfile(filename{3}, 'eeg_options.m'); % this contain the default path to the option file
+    else
+        filename = which('eeg_options.m');
+    end;
     eegoptionbackup = which('eeg_optionsbackup.m');
 end;
 fid = fopen( filename, 'r+');
 storelocal = 0;
 if	fid == -1
 	if exist(filename) == 2 
-		if ~popask(['Cannot modify read-only file ''' filename '''' 10 'Do you want to store the option file somewhere else ?']);
+        if length(filename) > 20
+             tmpdispname =  [ '...' filename(end-20:end) ];
+        else tmpdispname = filename;
+        end;
+		if ~popask(['Cannot modify read-only file ''' tmpdispname '''' 10 ...
+                'Do you want to store the option file somewhere else ?' 10 ...
+                'Store the path in a path accessible at startup so EEGLAB' 10 ...
+                'can reuse it' ]);
 			return;
 		else 
-            warndlg2(strvcat('Warning: you must store the file in a FOLDER always accessible', ...
-                             'from Matlab (i.e. a folder in the Matlab path) and not necessarily in', ...
-                             'the local folder. Otherwise, every time you restart EEGLAB, the default', ...
-                             'EEGLAB options will apply (the path you choose will be added temporarily', ...
-                             'for this session). Select a folder in the next pop-up file window.'), 'Warning');
+%             warndlg2(strvcat('Warning: you must store the file in a FOLDER always accessible', ...
+%                              'from Matlab (i.e. a folder in the Matlab path) and not necessarily in', ...
+%                              'the local folder. Otherwise, every time you restart EEGLAB, the default', ...
+%                              'EEGLAB options will apply (the path you choose will be added temporarily', ...
+%                              'for this session). Select a folder in the next pop-up file window.'), 'Warning');
             try
                 filepath = uigetdir('', 'Pick a Directory');
             catch,
@@ -256,21 +272,13 @@ if	fid == -1
         
         % see if the folder can be written into
         % -------------------------------------
+        filename = 'eeg_options.m';
         fid = fopen( fullfile(filepath, filename), 'w');
         if fid == -1
             error('Cannot write into this folder');
         end;
         fclose(fid);
         delete(fullfile(filepath, filename));
-        
-        % change default folder option
-        % ----------------------------
-        W_MAIN = findobj('tag', 'EEGLAB');
-        if ~isempty(W_MAIN)
-            tmpuserdata    = get(W_MAIN, 'userdata');
-            tmpuserdata{3} = filepath;
-            set(W_MAIN, 'userdata', tmpuserdata);
-        end;
         
         % read variables values and description
         % --------------------------------------
@@ -291,6 +299,19 @@ end;
 
 if nargin < 2
     geometry = { [6 1] };
+    tmpfile = fullfile(filepath, filename);
+    
+    cb_file = [ '[filename, filepath] = uiputfile(''eeg_options.txt'', ''Pick a folder to save option file'');' ...
+                'if filename(1) ~= 0,' ...
+                '   filepath = fullfile(filepath, ''eeg_options.m'');' ...
+                '   set(gcf, ''userdata'', filepath);' ...
+                '   if length(filepath) > 100,' ...
+                '        filepath =  [ ''...'' filepath(end-100:end) ];' ...
+                '   end;' ...
+                '   set(findobj(gcf, ''tag'', ''filename''), ''string'', filepath);' ...
+                'end;' ...
+                'clear filepath;' ];
+            
     uilist = { ...
          { 'Style', 'text', 'string', '', 'fontweight', 'bold'  }, ...
          { 'Style', 'text', 'string', 'Set/Unset', 'fontweight', 'bold'   } };
@@ -325,8 +346,18 @@ if nargin < 2
         end;
     end;
 
-    results = inputgui( geometry, uilist, 'pophelp(''pop_editoptions'');', 'Memory options - pop_editoptions()', ...
+    % change option file
+    uilist = { uilist{:} {} ...
+                 { 'Style', 'text', 'string', 'Option file:' 'fontweight', 'bold' }, ...
+                 { 'Style', 'text', 'string', tmpfile 'tag' 'filename'  }, ...
+                 { 'Style', 'pushbutton', 'string', '...'  'callback' cb_file } {} };
+    geometry = { geometry{:} [1] [1 6 0.5 0.5] };
+    [results userdat ] = inputgui( geometry, uilist, 'pophelp(''pop_editoptions'');', 'Memory options - pop_editoptions()', ...
                         [], 'normal');
+    if ~isempty(userdat)
+        filepath = fileparts(userdat);
+        args = { 'filename' filename };
+    end;
     if length(results) == 0, return; end;
    
     % decode inputs
@@ -345,6 +376,16 @@ else
     args = varargin;
 end;
 
+        
+% change default folder option
+% ----------------------------
+W_MAIN = findobj('tag', 'EEGLAB');
+if ~isempty(W_MAIN)
+    tmpuserdata    = get(W_MAIN, 'userdata');
+    tmpuserdata{3} = filepath;
+    set(W_MAIN, 'userdata', tmpuserdata);
+end;
+        
 % decode inputs
 % -------------
 for index = 1:2:length(args)

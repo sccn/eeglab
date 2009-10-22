@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.544  2009/10/21 20:31:39  arno
+% Fix topoplot detection for EEGLAB. Remove path to BIOSIG that are not relevant
+%
 % Revision 1.543  2009/09/26 23:22:05  arno
 % Removing fileio from eeglab.m
 %
@@ -1855,28 +1858,18 @@ end;
 % add paths
 % ---------
 if ~iseeglabdeployed2
-    if strcmpi(fileformat, 'pcwin ')
-        myaddpath( eeglabpath, 'readeetraklocs.m', 'functions\sigprocfunc');
-        myaddpath( eeglabpath, 'eeg_checkset.m',   'functions\adminfunc');
-        myaddpath( eeglabpath, 'pop_study.m',      'functions\studyfunc');
-        myaddpath( eeglabpath, 'pop_loadbci.m',    'functions\popfunc');
-        myaddpath( eeglabpath, 'pop_loadbci.m',    'functions');
-        myaddpath( eeglabpath, 'timefreq.m',       'functions\timefreqfunc');
-        myaddpath( eeglabpath, 'icademo.m',        'functions\miscfunc');
-        myaddpath( eeglabpath, 'eeglab1020.ced',   'functions\resources');
-    else 
-        myaddpath( eeglabpath, 'readeetraklocs.m', 'functions/sigprocfunc');
-        myaddpath( eeglabpath, 'eeg_checkset.m',   'functions/adminfunc');
-        myaddpath( eeglabpath, 'pop_loadbci.m',    'functions/popfunc');
-        myaddpath( eeglabpath, 'pop_loadbci.m',    'functions');
-        myaddpath( eeglabpath, 'timefreq.m',       'functions/timefreqfunc');
-        myaddpath( eeglabpath, 'pop_study.m',      'functions/studyfunc');
-        myaddpath( eeglabpath, 'icademo.m',        'functions/miscfunc');
-        myaddpath( eeglabpath, 'VolumeMNI.bin',    'functions/resources');
-    end;
+    myaddpath( eeglabpath, 'readeetraklocs.m', [ 'functions' filesep 'sigprocfunc'  ]);
+    myaddpath( eeglabpath, 'eeg_checkset.m',   [ 'functions' filesep 'adminfunc'    ]);
+    myaddpath( eeglabpath, 'pop_study.m',      [ 'functions' filesep 'studyfunc'    ]);
+    myaddpath( eeglabpath, 'pop_loadbci.m',    [ 'functions' filesep 'popfunc'      ]);
+    myaddpath( eeglabpath, 'timefreq.m',       [ 'functions' filesep 'timefreqfunc' ]);
+    myaddpath( eeglabpath, 'icademo.m',        [ 'functions' filesep 'miscfunc'     ]);
+    myaddpath( eeglabpath, 'eeglab1020.ced',   [ 'functions' filesep 'resources'    ]);
     myaddpath( eeglabpath, 'eegplugin_dipfit', 'plugins');
 end;
+    
 eeglab_options; 
+
 if nargin == 1 &  strcmp(onearg, 'redraw')
     if evalin('base', 'exist(''EEG'')', '0') == 1
         evalin('base', 'warning off; eeg_global; warning on;');
@@ -1936,9 +1929,11 @@ if ~iseeglabdeployed2
         fprintf('eeglab: options file is %s%seeg_options.m\n', OPT_FOLDER, filesep);
         addpath( OPT_FOLDER );
     else
+        OPT_FOLDER = fileparts(which('eeg_options'));
         disp('eeglab: using default options');
     end;
 end;
+
 % checking strings
 % ----------------
 e_try             = 'try,';

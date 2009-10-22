@@ -25,6 +25,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2009/08/06 01:34:44  arno
+% Fix compilation
+%
 % Revision 1.5  2009/08/04 04:44:22  arno
 % All functions necessary for compiling EEGLAB code
 %
@@ -52,30 +55,36 @@ try,
         eval( com1 );
         eval( com2 );
     else
+        eeg_optionsbackup;
         W_MAIN = findobj('tag', 'EEGLAB');
         if ~isempty(W_MAIN)
             tmpuserdata = get(W_MAIN, 'userdata');
             tmp_opt_path = tmpuserdata{3}; % this contain the default path to the option file
-        else
-            tmp_opt_path = '';
-        end;
-
-        tmp_opt_path2 = which('eeg_options');
-        tmp_opt_path2 = fileparts( tmp_opt_path2 );
-        if ~isempty(tmp_opt_path) & ~strcmpi(tmp_opt_path2, tmp_opt_path)
-            if exist(fullfile(tmp_opt_path, 'eeg_options.m')) == 2
-                fprintf('Warning: you should delete the eeg_option.m file in folder %s\n', tmp_opt_path2);
-                fprintf('         using instead the eeg_option.m file accessible at EEGLAB startup in %s\n', tmp_opt_path);
-                fprintf('         To use the first option file, restart EEGLAB and reload datasets\n');
+            tmpp = pwd;
+            
+            tmpp = fileparts(which('eeg_options.m'));
+            curpathconflict = 0;
+            if ~strcmpi(tmpp, tmp_opt_path)
+                if ~isempty(findstr(tmp_opt_path, path)), rmpath(tmp_opt_path); end;
+                if strcmpi(pwd, tmpp)
+                    curpathconflict = 1;
+                    fprintf('Warning: conflicting eeg_options.m file in current path (ignored)\n');
+                else
+                    fprintf('Warning: adding path for eeg_options.m, %s\n', tmp_opt_path);
+                end;
                 addpath(tmp_opt_path);
-            else
-                fprintf('IMPORTANT WARNING: the current eeg_option.m file in %s HAS BEEN DELETED\n', tmp_opt_path);
-                fprintf('                   EEGLAB SHOULD BE RESTARTED TO ENSURE STABILITY\n', tmp_opt_path);
+                clear functions;
             end;
+            if curpathconflict
+                cd(tmp_opt_path);
+                eeg_options;
+                cd(tmpp);
+            else
+                eeg_options;
+            end;
+        else
+            eeg_options;
         end;
-    
-        eeg_optionsbackup;
-        eeg_options;
     end;
     
     option_savematlab = ~option_savetwofiles;
