@@ -45,7 +45,15 @@
 % it under the terms of the GNU General Public License as published by
 % the Free Software Foundation; either version 2 of the License, or
 % (at your option) any later version.
+%adbdf( filename ); % no pop-up window 
+%   >> EEG = pop_readbdf( filename, range, eventchans, ref, delchan);
 %
+% Graphical interface:
+%   "Data block range to read" - {edit box] see command line 
+%                    parameter 'range' below.
+%   "Event channel index(s)" - {edit box] see command line 
+%                    parameter 'eventchans' below.
+%   "Index(s) of reference channel(s)" - {edit box] see command line 
 % This program is distributed in the hope that it will be useful,
 % but WITHOUT ANY WARRANTY; without even the implied warranty of
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -58,6 +66,9 @@
 % programmed from pop_readedf() version 1.15
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2009/10/21 20:56:08  arno
+% Andrey's fix for events
+%
 % Revision 1.2  2009/07/01 23:29:50  arno
 % fix partial reading
 %
@@ -183,9 +194,8 @@ EEG = eeg_emptyset;
 fprintf('Reading BDF data in 24-bit format...\n');
 dat = openbdf(filename);
 %dat.Head = sopen(filename);
-dat.Head.NRec = 100;
 if isempty(dat.Head.NRec)
-    dsafsd
+    dat.Head.NRec = 100;
 end;
 if isempty(blockrange)
     blockrange = [1 dat.Head.NRec];
@@ -236,7 +246,10 @@ if ~isempty(eventchans)
             EEG.event(end).type = thiscode;
         end;
     end;
-
+    if strcmpi(delchan, 'on')
+        EEG = pop_select(EEG, 'nochannel', size(EEG.data,1));
+    end;
+    
     %EEG = pop_chanevent(EEG, eventchans, 'edge', 'leading', 'delchan', delchan);
 end;
 warning on;
