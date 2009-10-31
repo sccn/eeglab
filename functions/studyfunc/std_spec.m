@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.39  2009/10/20 02:30:41  arno
+% Implement pmtm
+%
 % Revision 1.38  2009/08/04 23:21:25  arno
 % naccu
 %
@@ -265,7 +268,7 @@ if ~isempty(g.timerange)
     EEG.pnts = length(timebef);
 end;
 if strcmpi(g.specmode, 'psd')
-    if ~isempty(EEG.event)
+    if ~isempty(EEG.event) && isfield(EEG.event, 'type') && ischar(EEG.event(1).type)
          boundaries = strmatch('boundary', lower({ EEG.event.type }));
          if ~isempty(boundaries)
              boundaries = [0 [ EEG.event(boundaries).latency ]-0.5 EEG.pnts ];
