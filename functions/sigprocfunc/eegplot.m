@@ -175,6 +175,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.139  2009/10/20 02:32:07  arno
+% Now accept windows for continuous rejection from eeg_eegrej
+%
 % Revision 1.138  2009/07/16 20:08:20  arno
 % update help message
 %
@@ -1197,6 +1200,20 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
 		'clear FIGH AXESH;'];
   uimenu('Parent',m(5),'Label','__','Callback',timestring)
   
+  % Submean menu %%%%%%%%%%%%%
+  cb =       ['g = get(gcbf, ''userdata'');' ...
+              'if strcmpi(g.submean, ''on''),' ... 
+              '  set(gcbo, ''label'', ''Remove DC offset'');' ...
+              '  g.submean =''off'';' ...
+              'else' ...
+              '  set(gcbo, ''label'', ''Do not remove DC offset'');' ...
+              '  g.submean =''on'';' ...
+              'end;' ...
+              'set(gcbf, ''userdata'', g);' ...
+              'eegplot(''drawp'', 0); clear g;'];
+  uimenu('Parent',m(1),'Label',fastif(strcmp(g.submean, 'on'), ...
+         'Do not remove DC offset','Remove DC offset'), 'Callback',cb)
+
   % Scale Eye %%%%%%%%%
   timestring = ['[OBJ1,FIG1] = gcbo;',...
 	        'eegplot(''scaleeye'',OBJ1,FIG1);',...
@@ -1445,7 +1462,7 @@ else
         switch lower(g.submean) % subtract the mean ?
          case 'on', 
           meandata = mean(data(:,lowlim:highlim)');
-          if any(isnan(memdata))
+          if any(isnan(meandata))
               meandata = nan_mean(data(:,lowlim:highlim)');
           end;
          otherwise, meandata = zeros(1,g.chans);
