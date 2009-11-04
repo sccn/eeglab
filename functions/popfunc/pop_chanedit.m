@@ -142,6 +142,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.184  2009/09/26 23:05:14  arno
+% Fix channel look up problem for datachan
+%
 % Revision 1.183  2009/08/11 00:24:27  arno
 % fix reference
 %
@@ -989,10 +992,6 @@ else
                     args{curfield  } = 'eval';
                     args{curfield+1} = tmpcom;
                 end;
-            case 'eval',
-                chantmp = chans;
-                eval( args{curfield+1} );
-                chans = chantmp;
             case 'convert',
                 if iscell(args{curfield+1})
                     method=args{curfield+1}{1};
