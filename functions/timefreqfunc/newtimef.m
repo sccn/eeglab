@@ -329,6 +329,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.174  2009/09/16 19:29:40  arno
+% powebase flip from Julie
+%
 % Revision 1.173  2009/08/23 00:43:21  arno
 % fix last change
 %
@@ -1211,7 +1214,6 @@ g = finputcheck(varargin, ...
     'cycleinc'      'string'   {'linear' 'log'}        'linear'
     });
 if isstr(g), error(g); end;
-if strcmpi(g.freqscale, 'log') & g.freqs(1) == 0, g.freqs(1) = 3; end;
 if strcmpi(g.plotamp, 'off'), g.plotersp = 'off'; end;    
 if strcmpi(g.basenorm, 'on'), g.scale = 'abs'; end;
 
