@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.58  2009/07/28 16:42:01  arno
+% fixing interpolation in std_ersp.m
+%
 % Revision 1.57  2009/07/27 05:17:52  arno
 % fix channel call
 %
@@ -314,7 +317,7 @@ end;
                         'timelimits'    'real'        []      [EEG.xmin EEG.xmax]*1000;
                         'cycles'        'real'        []      [3 .5];
                         'padratio'      'real'        []      1;
-                        'freqs'         'real'        []      [3 EEG.srate/2];
+                        'freqs'         'real'        []      [0 EEG.srate/2];
                         'rmcomps'       'integer'     []      [];
                         'interp'        'struct'      { }     struct([]);
                         'freqscale'     'string'      []      'log';
@@ -387,17 +390,14 @@ end;
 
 % Compute ERSP parameters
 % -----------------------
-[time_range, g.winsize] = compute_ersp_times(g.cycles,  EEG(1).srate, ...
-                                 [EEG(1).xmin EEG(1).xmax]*1000 , g.freqs(1), g.padratio); 
-if time_range(1) >= time_range(2)
-    error(['std_ersp(): parameters given for ' upper(g.type) ...
-           'calculation result in an invalid time range. Aborting.' ...
-           'Please increase the lower frequency bound or change other' ...
-           'parameters to resolve the problem. See >> timef details'] )
-end
-parameters = { 'cycles', g.cycles, 'padratio', g.padratio,  'winsize', round(g.winsize), ...
+parameters = { 'cycles', g.cycles, 'padratio', g.padratio, ...
                'alpha', g.alpha, 'freqscale', g.freqscale, timefargs{:} };
-if length(g.freqs)>0, parameters = { parameters{:} 'freqs' g.freqs }; end;
+[time_range] = compute_ersp_times(g.cycles,  EEG(1).srate, ...
+                                 [EEG(1).xmin EEG(1).xmax]*1000 , g.freqs(1), g.padratio); 
+if time_range(1) < time_range(2) && g.freqs(1) == 0
+     g.freqs(1) = 3; % for backward compatibility
+end
+parameters = { parameters{:} 'freqs' g.freqs };
 if strcmpi(g.plot, 'off')
     parameters = { parameters{:} 'plotersp', 'off', 'plotitc', 'off', 'plotphase', 'off' };
 end;
@@ -493,7 +493,7 @@ for k = 1:length(g.indices)  % for each (specified) component
     timefdata  = reshape(tmpdata(k,pointrange,:), 1, length(pointrange)*size(tmpdata,3));
     if strcmpi(g.plot, 'on'), figure; end;
     [logersp,logitc,logbase,times,logfreqs,logeboot,logiboot,alltfX] ...
-      = newtimef( timefdata, length(pointrange), g.timelimits, EEG(1).srate, tmpparams{2:end});
+          = newtimef( timefdata, length(pointrange), g.timelimits, EEG(1).srate, tmpparams{2:end});
     %figure; newtimef( TMP.data(32,:), EEG.pnts, [EEG.xmin EEG.xmax]*1000, EEG.srate, cycles, 'freqs', freqs);
     %figure; newtimef( timefdata, length(pointrange), g.timelimits, EEG.srate, cycles, 'freqs', freqs);
     if strcmpi(g.plot, 'on'), return; end;
