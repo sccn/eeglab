@@ -1,3 +1,49 @@
+% std_substudy()  - create a sub-STUDY set by removing datasets, conditions, groups, or
+%                   subjects.
+% Usage:  
+%  >> [ STUDY ALLEEG ] = std_substudy(STUDY, ALLEEG, 'key', 'val', ...);
+%
+% Optional Inputs:
+%   STUDY                - existing study structure. 
+%   ALLEEG               - vector of EEG dataset structures to be included in the STUDY. 
+%
+% Optional Inputs:
+%   'dataset'   - [integer array] indices of dataset to include in sub-STUDY
+%                 Default is all datasets.
+%   'subject'   - [cell array] name of subjects to include in sub-STUDY.
+%                 Default is all subjects.%
+%   'condition' - [cell array] name of conditions to include in sub-STUDY
+%                 Default is all conditions.
+%   'group'     - [cell array] name of gourps to include in sub-STUDY
+%                 Default is all groups.
+%
+% Example:
+%    % create a sub-STUDY using only the first 3 subjects
+%    % WARNING: make sure your STUDY is saved before creating a sub-STUDY
+%    [STUDY ALLEEG] = std_substudy(STUDY, ALLEEG, 'subject', STUDY.subjects(1:3));
+%
+% Authors: Arnaud Delorme, CERCO/CNSR & SCCN, INC, UCSD, 2009-
+
+%123456789012345678901234567890123456789012345678901234567890123456789012
+
+% Copyright (C) Arnaud Delorme, SCCN, INC, UCSD, arno@sccn.ucsd.edu
+%
+% This program is free software; you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation; either version 2 of the License, or
+% (at your option) any later version.
+%
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+% You should have received a copy of the GNU General Public License
+% along with this program; if not, write to the Free Software
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+% $Log: not supported by cvs2svn $
+
 function [ STUDY ALLEEG ] = std_substudy(STUDY, ALLEEG, varargin);
 
 if nargin < 3
@@ -5,9 +51,10 @@ if nargin < 3
     return;
 end
 
-opt = finputcheck(varargin, { 'condition' 'string' {}   '';
-                              'group'     'string' {}   '';
-                              'subject'   'string' {}   '' }, 'std_substudy');
+opt = finputcheck(varargin, { 'condition' 'cell' {}      {};
+                              'dataset'   'integer' {}   [];
+                              'group'     'cell' {}      {};
+                              'subject'   'cell' {}      {} }, 'std_substudy');
 if isstr(opt), return; end;
 
 % find datasets to remove
@@ -34,6 +81,10 @@ if ~isempty(opt.group)
         end;
     end;
 end;
+if ~isempty(opt.dataset)
+    tagdel = [ tagdel setdiff([1:length(ALLEEG)], opt.dataset) ];
+end;
+tagdel = unique(tagdel);
 
 % find new dataset indices
 % ------------------------
