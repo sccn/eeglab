@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2009/11/04 02:27:27  arno
+% implement optional rmdat
+%
 % Revision 1.3  2009/11/04 02:15:59  arno
 % fixed comps
 %
@@ -120,6 +123,19 @@ else
     end;
 end;
 
+% check channel consistency
+% -------------------------
+for i = 1:length(STUDY.changrp)
+    for c = 1:size(STUDY.changrp(i).setinds,1)
+       for g = 1:size(STUDY.changrp(i).setinds,2)
+           newinds = datcoresp(STUDY.changrp(i).setinds{c,g});
+           nonnans = find(~isnan(newinds));
+           STUDY.changrp(i).setinds{c,g} = newinds(nonnans);
+           STUDY.changrp(i).allinds{c,g} = STUDY.changrp(i).allinds{c,g}(nonnans);
+       end;
+    end;
+end;
+
 % check cluster consistency
 % -------------------------
 for index = 1:length(STUDY.cluster)
@@ -130,6 +146,7 @@ for index = 1:length(STUDY.cluster)
             STUDY.cluster(index).comps(:,i) = [];
         end;
     end;
+    [tmp STUDY.cluster(index).setinds STUDY.cluster(index).allinds] = std_setcomps2cell(STUDY, STUDY.cluster(index).sets, STUDY.cluster(index).comps);
 end;
 
 STUDY = std_reset(STUDY);
