@@ -130,6 +130,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.66  2009/09/26 22:19:03  arno
+% Various fixes to pop_writeeeg, std_movecomp,
+%
 % Revision 1.65  2009/05/07 19:49:43  arno
 % fix for numerical innacuracies in time calculation
 %
@@ -430,7 +433,6 @@ if length(g.freqs) == 2
 end;
 g.nfreqs = length(g.freqs);
 
-
 % function for time freq initialisation
 % -------------------------------------
 if (g.cycles(1) == 0) %%%%%%%%%%%%%% constant window-length FFTs %%%%%%%%%%%%%%%%
@@ -567,12 +569,20 @@ if ~isempty(g.timestretch) & length(g.timestretch{1}) > 0
 
         %[dummy pos]=min(abs(repmat(timemarks(2:7,1), [1 length(g.indexout)])-repmat(g.indexout,[6 1])));
 
+        outOfTimeRangeTimeWarpMarkers = find(timemarks(:,t) < min(g.indexout) | timemarks(:,t) > max(g.indexout));
+        
+%         if ~isempty(outOfTimeRangeTimeWarpMarkers)
+%             fprintf('Timefreq warning: time-warp latencies in epoch %d are out of time range defined for calculation of ERSP.\n', t);
+%         end;
+        
         [dummy marksPos] = min(transpose( ...
             abs( ...
             repmat(timemarks(:,t), [1 length(g.indexout)]) ...
             - repmat(g.indexout, [size(timemarks,1) 1]) ...
             ) ...
             ));
+         
+
         marksPos(end+1) = 1;
         marksPos(end+1) = length(g.indexout);
         marksPos = sort(marksPos);
@@ -586,11 +596,12 @@ if ~isempty(g.timestretch) & length(g.timestretch{1}) > 0
         % whos marksPos refsPos
 
         M = timeWarp(marksPos, refsPos);
+        
         TSr = transpose(M*r');
         TStheta = zeros(size(theta,1), size(theta,2));
 
         for freqInd=1:size(TStheta,1)
-            TStheta(freqInd, :) = angTimeWarp(marksPos, refsPos, theta(freqInd, :));
+            TStheta(freqInd, :) = angTimeWarp(marksPos, refsPos, theta(freqInd, :));            
         end
         TStmpall = TSr.*exp(i*TStheta);
 
