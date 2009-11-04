@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2009/08/21 18:40:47  arno
+% changing default
+%
 % Revision 1.17  2009/07/10 00:59:46  arno
 % error if no dataset
 %
@@ -388,7 +391,7 @@ else
                 %ersp_params = {f1{:}; f2{:} }; ersp_params = ersp_params(:)';
                 
                 figure; pos = get(gcf, 'position'); pos(3)=pos(3)*2; set(gcf, 'position', pos);
-                subplot(1,2,1); newtimef( data, EEG.pnts, [ EEG.xmin EEG.xmax ]*1000, EEG.srate, tmpstruct.cycles, opt{:}, 'maxfreq', EEG.srate/2, ersp_params{:});
+                subplot(1,2,1); newtimef( data, EEG.pnts, [ EEG.xmin EEG.xmax ]*1000, EEG.srate, tmpstruct.cycles, opt{:}, ersp_params{:});
                 subplot(1,2,2); 
                 text( 0.2, 0.8, strvcat('This is a test plot performed on', ...
                                                          'the first 10 trials of the first', ....
