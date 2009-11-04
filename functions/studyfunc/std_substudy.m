@@ -16,6 +16,9 @@
 %                 Default is all conditions.
 %   'group'     - [cell array] name of gourps to include in sub-STUDY
 %                 Default is all groups.
+%   'rmdat'     - ['on'|'off'] actually remove datasets 'on', or simply 
+%                 remove all references to these datasets for channels and
+%                 clusters ('off').
 %
 % Example:
 %    % create a sub-STUDY using only the first 3 subjects
@@ -43,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2009/11/04 02:15:59  arno
+% fixed comps
+%
 % Revision 1.2  2009/11/04 01:51:54  arno
 % added header and fix input format
 %
@@ -57,6 +63,7 @@ end
 opt = finputcheck(varargin, { 'condition' 'cell' {}      {};
                               'dataset'   'integer' {}   [];
                               'group'     'cell' {}      {};
+                              'rmdat'     'string' { 'on' 'off' }      'on';
                               'subject'   'cell' {}      {} }, 'std_substudy');
 if isstr(opt), return; end;
 
@@ -92,40 +99,24 @@ tagdel = unique(tagdel);
 % find new dataset indices
 % ------------------------
 alldats = [1:length(ALLEEG)];
-alldats(tagdel) = [];
-for index = 1:length(ALLEEG)
-    tmp = find(alldats == index);
-    if isempty(tmp), tmp = NaN; end;
-    datcoresp(index) = tmp;
-end;
-ALLEEG(tagdel) = [];
-STUDY.datasetinfo(tagdel) = [];
-for index = 1:length(STUDY.datasetinfo)
-    STUDY.datasetinfo(index).index = index;
-end;
-
-% scan clusters to remove datasets
-% -----------------------
-tagdel = [];
-if ~isempty(opt.subject)
-    for index = 1:length(STUDY.datasetinfo)
-        if ~strmatch(STUDY.datasetinfo.subject, opt.subject, 'exact')
-            tagdel = [ tagdel index ];
-        end;
+if strcmpi(opt.rmdat, 'on')
+    alldats(tagdel) = [];
+    for index = 1:length(ALLEEG)
+        tmp = find(alldats == index);
+        if isempty(tmp), tmp = NaN; end;
+        datcoresp(index) = tmp;
     end;
-end;
-if ~isempty(opt.condition)
+    ALLEEG(tagdel) = [];
+    STUDY.datasetinfo(tagdel) = [];
     for index = 1:length(STUDY.datasetinfo)
-        if ~strmatch(STUDY.datasetinfo.condition, opt.condition, 'exact')
-            tagdel = [ tagdel index ];
-        end;
+        STUDY.datasetinfo(index).index = index;
     end;
-end;
-if ~isempty(opt.group)
-    for index = 1:length(STUDY.datasetinfo)
-        if ~strmatch(STUDY.datasetinfo.group, opt.group, 'exact')
-            tagdel = [ tagdel index ];
-        end;
+else
+    alldats(tagdel) = [];
+    for index = 1:length(ALLEEG)
+        tmp = find(alldats == index);
+        if isempty(tmp), tmp = NaN; else tmp = index; end;
+        datcoresp(index) = tmp;
     end;
 end;
 
@@ -141,4 +132,5 @@ for index = 1:length(STUDY.cluster)
     end;
 end;
 
+STUDY = std_reset(STUDY);
 STUDY = std_checkset(STUDY, ALLEEG);
