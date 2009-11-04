@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2004/09/08 15:16:23  scott
+% made ydir 1 = default  -sm
+%
 % Revision 1.14  2004/04/06 17:31:33  arno
 % adding edit box for options
 %
@@ -101,27 +104,32 @@ if isempty(EEG.chanlocs)
 end;
 
 if nargin < 2
-	promptstr    = { 'Channels to plot:' ...
-					 'Plot title:' ...
-					 'Plot single trials (yes|no)' ... 
-                     'Vertical lines (ms)' ...
-                     'Plotting options (see Help)' };
-	inistr       = { [ '1:' num2str( EEG.nbchan ) ] ...
-					 fastif(isempty(EEG.setname), '',EEG.setname) ...
-					 'no' '' '''ydir'', 1'};
-	result       = inputdlg2( promptstr, 'Topographic ERP plot - pop_plottopo()', 1, inistr, 'pop_plottopo');
-	if size(result,1) == 0 return; end;
-	channels     = eval( [ '[' result{1} ']' ] );
-	plottitle    = result{2};
-	singletrials = strcmp( lower(result{3}), 'yes');
-	vert         = eval( [ '[' result{4} ']' ] );
-    addoptions   = eval( [ '{' result{5} '}' ] );
+	uilist    = { { 'style' 'text' 'string' 'Channels to plot' } ...
+                  { 'style' 'edit' 'string' [ '1:' num2str( EEG.nbchan ) ] 'tag' 'chan' } ...
+                  { 'style' 'text' 'string' 'Plot title' } ...
+                  { 'style' 'edit' 'string' fastif(isempty(EEG.setname), '',EEG.setname)  'tag' 'title' } ...                  
+                  { 'style' 'text' 'string' 'Plot single trials' } ...
+                  { 'style' 'checkbox' 'string' '(set=yes)' 'tag' 'cbst' } ...
+                  { 'style' 'text' 'string' 'Plot in rect. array' } ...
+                  { 'style' 'checkbox' 'string' '(set=yes)' 'tag' 'cbra' } ...
+                  { 'style' 'text' 'string' 'Other plot options (see help)' } ...
+                  { 'style' 'edit' 'string' '''ydir'', 1' 'tag' 'opt' } };
+    geometry = { [1 1] [1 1] [1 1] [1 1] [1 1] };
+    [result userdata tmphalt restag ] = inputgui( 'uilist', uilist, 'geometry', geometry, 'helpcom', 'pophelp(''pop_plottopo'')', 'title', 'Topographic ERP plot - pop_plottopo()');
+	if length(result) == 0 return; end;
+    
+	channels     = eval( [ '[' restag.chan ']' ] );
+	plottitle    = restag.title;
+	singletrials = restag.cbst;
+    addoptions   = eval( [ '{' restag.opt '}' ] );
+    rect         = restag.cbra;
+    
     figure('name', ' plottopo()');
-	if ~isempty(vert)
-		addoptions ={ addoptions{:} 'vert' vert };
-	end;
-    options ={ 'chanlocs' EEG.chanlocs 'frames' EEG.pnts 'limits' [EEG.xmin EEG.xmax 0 0]*1000 ...
+    options ={ 'frames' EEG.pnts 'limits' [EEG.xmin EEG.xmax 0 0]*1000 ...
                'title' plottitle 'chans' channels addoptions{:} };
+    if ~rect
+        options = { options{:} 'chanlocs' EEG.chanlocs };
+    end;
 else 
 	options ={ 'chanlocs' EEG.chanlocs 'frames' EEG.pnts 'limits' [EEG.xmin EEG.xmax 0 0]*1000 ...
                'title' plottitle 'chans' channels varargin{:}};
