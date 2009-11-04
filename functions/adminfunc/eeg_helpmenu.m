@@ -30,6 +30,9 @@
 % Foundation Inc. 59 Temple Place Suite 330 Boston MA  02111-1307  USA  
        
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2009/10/20 01:47:02  arno
+% menu update
+%
 % Revision 1.20  2009/10/12 03:10:12  dev
 % update of menu function to EEGLAB v7.1.5.17b
 %
@@ -148,7 +151,7 @@ allmenus = { ...
 '   History Scripts' '' ...
 '      Save dataset history script'           'pop_saveh'          ... %       Save current dataset history
 '      Save session history script'           'pop_saveh'          ... %       Save current session history
-'      Run Script'                            ''                   ... %       Run History script     
+'      Run Script'                            'pop_runscript'      ... %       Run History script     
 '   Quit' ''      ...
 'Edit' ''      ...
 '   Dataset info'                             'pop_editset'        ... %       Edit dataset info      
@@ -170,7 +173,7 @@ allmenus = { ...
 '      ERPLAB Butterworth Digital Filter'     'pop_ERPLAB_butter1' ... %       ERPLAB Butterworth filter
 '      ERPLAB Polynomial Detrending'          'pop_ERPLAB_polydetrend' ... % Polynomial detrending
 '   Re-referencing'                           'pop_reref'          ... %       Average reference      
-'   Interpolate electrodes'                   ''                   ...
+'   Interpolate electrodes'                   'pop_interp'         ...
 '   Reject continuous data by eye'            'pop_eegplot'        ... %       Reject continuous data      
 '   Extract epochs'                           'pop_epoch'          ... %       Extract epochs      
 '   Remove baseline'                          'pop_rmbase'         ... %       Remove baseline
