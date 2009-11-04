@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.70  2008/03/30 12:04:47  arno
+% text if old version and remove fields allinds and setinds
+%
 % Revision 1.69  2007/11/29 20:13:46  nima
 % msg comment - Arno
 %
@@ -314,18 +317,7 @@ end
 if isempty(STUDY.etc.version) | strcmpi(STUDY.etc.version, '6.01b')
     icadefs;
     if isfield(STUDY, 'cluster')
-        if ~isempty(STUDY.cluster)
-            disp('Old STUDY version detected, removing pre-loaded measures (not files; Bugs 484 & XXX)');
-            % disp('because of the defect in ERSP baseline subtraction (Bugs 484).');
-            fields = { 'erpdata' 'erptimes' 'specdata' 'specfreqs' 'erspdata' ...
-                       'ersptimes' 'erspfreqs' 'itcdata' 'itctimes' 'itcfreqs' ...
-                       'topo' 'topox' 'topoy' 'topoall' 'topopol' 'dipole' 'setinds' 'allinds' };
-            for ind = 1:length(fields)
-                if isfield(STUDY.cluster, fields{ind})
-                    STUDY.cluster = rmfield(STUDY.cluster, fields{ind});
-                end;
-            end;
-        end;
+        STUDY = std_reset(STUDY);
     end;
     filename = fullfile( ALLEEG(1).filepath,[ ALLEEG(1).filename(1:end-3) 'icaersp']);
     if isempty(STUDY.etc.version)
