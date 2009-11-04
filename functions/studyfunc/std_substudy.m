@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2009/11/04 01:51:54  arno
+% added header and fix input format
+%
 
 function [ STUDY ALLEEG ] = std_substudy(STUDY, ALLEEG, varargin);
 
@@ -133,7 +136,9 @@ for index = 1:length(STUDY.cluster)
     for i = size(STUDY.cluster(index).sets,2):-1:1
         if all(isnan(STUDY.cluster(index).sets(:,i)))
             STUDY.cluster(index).sets(:,i) = [];
+            STUDY.cluster(index).comps(:,i) = [];
         end;
     end;
 end;
+
 STUDY = std_checkset(STUDY, ALLEEG);
