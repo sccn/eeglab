@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.545  2009/10/22 21:08:54  arno
+% Change the eeg_option framework for better consistency
+%
 % Revision 1.544  2009/10/21 20:31:39  arno
 % Fix topoplot detection for EEGLAB. Remove path to BIOSIG that are not relevant
 %
@@ -2191,7 +2194,6 @@ catchstrs.new_non_empty          = e_newset;
 	cb_erpimage1   = [ checkepoch    'LASTCOM = pop_erpimage(EEG, 1, eegh(''find'',''pop_erpimage(EEG,1''));' e_hist];
 	cb_timtopo     = [ checkplot     'LASTCOM = pop_timtopo(EEG);'            e_hist];
 	cb_plottopo    = [ checkplot     'LASTCOM = pop_plottopo(EEG);'           e_hist];
-	cb_plotdata1   = [ checkepoch    '[tmpeeg LASTCOM] = pop_plotdata(EEG, 1); clear tmpeeg;' e_hist];
 	cb_topoplot1   = [ checkplot     'LASTCOM = pop_topoplot(EEG, 1);'        e_hist];
 	cb_headplot1   = [ checkplot     '[EEG LASTCOM] = pop_headplot(EEG, 1);'  e_store];
 	cb_comperp1    = [ checkepoch    'LASTCOM = pop_comperp(ALLEEG);'         e_hist];
@@ -2348,7 +2350,6 @@ catchstrs.new_non_empty          = e_newset;
 	ERP_m = uimenu( plot_m, 'Label', 'Channel ERPs');
     uimenu( ERP_m,  'Label', 'With scalp maps'                        , 'CallBack', cb_timtopo);
     uimenu( ERP_m,  'Label', 'In scalp/rect. array'                   , 'CallBack', cb_plottopo);
-    uimenu( ERP_m,  'Label', 'In rect. array'                         , 'CallBack', cb_plotdata1);
     
 	topo_m = uimenu( plot_m, 'Label', 'ERP map series');
     uimenu( topo_m, 'Label', 'In 2-D'                                 , 'CallBack', cb_topoplot1);
