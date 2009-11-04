@@ -111,7 +111,10 @@ function ALLEEG = std_loadalleeg(varargin)
         elseif exist(lower(fullfile(char(paths{dset}), datasets{dset}))) == 2   
             EEG = pop_loadset('filename', lower(datasets{dset}), 'filepath',lower(char(paths{dset})), 'loadmode', 'info', 'check', 'off');
         else
-            error(sprintf('Dataset ''%s'' not found', fullfile(char(paths{dset}), datasets{dset})));
+            txt = [ sprintf('The dataset %s is missing\n', datasets{dset}) 10 ...
+                          'Is it possible that it might have been deleted?' 10 ...
+                          'If this is the case, re-create the STUDY using the remaining datasets' ];
+            error(txt);
         end;
         
         if ~option_storedisk
