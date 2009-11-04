@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.52  2009/07/10 00:59:08  arno
+% error if no dataset in STUDY
+%
 % Revision 1.51  2008/02/07 22:08:39  nima
 % Measure Product preclustring added.
 %
@@ -645,34 +648,6 @@ else
         case 'setsec'
             set_sec =  get(findobj('parent', hdl, 'tag', 'sec_on'), 'value'); 
             set(findobj('parent', hdl,'userdata', 'sec'), 'enable', fastif(set_sec,'on','off'));
-        case 'erspedit'
-            ersp_params = get(findobj('parent', hdl, 'tag', 'ersp_params'), 'string');
-            if ~isempty( ersp_params)
-                ersp_str = [ 'ersp_p = struct( ' ersp_params ');' ];
-                eval(ersp_str);
-                if ~isfield(ersp_p, 'alpha'),    ersp_p.alpha    = NaN; end;
-                if ~isfield(ersp_p, 'cycle'),    ersp_p.cycle    = [3 0.5]; end;
-                if ~isfield(ersp_p, 'padratio'), ersp_p.padratio = 1; end;
-                if ~isfield(ersp_p, 'frange'),   ersp_p.frange   = [3 25]; end;
-                seti = STUDY.datasetinfo(1).index; %first dataset in ALLEEG that is part of STUDY
-                [time_range, winsize] = compute_ersp_times(ersp_p.cycle,  ALLEEG(seti).srate, ...
-                                                           [ALLEEG(seti).xmin ALLEEG(seti).xmax]*1000, ersp_p.frange(1),ersp_p.padratio); 
-                ersp.t = [num2str(round(time_range(1))) ' ' num2str(round(time_range(2))) ];
-                if ~isfield(ersp_p, 'tlimits'),  ersp_p.tlimits  = ersp.t; end;
-                ersp.c = ersp_p.cycles;
-                ersp.a = ersp_p.alpha;
-                ersp.p = ersp_p.padratio;
-                ersp.t = ersp_p.tlimits;
-                ersp.f = ersp_p.frange;
-                userdat{2} = ersp;
-                set(findobj('parent', hdl, 'tag', 'ersp_params'), 'string', ...
-                    ['                                                             ''frange'', [' num2str([ersp.f]) '], ''cycles'', [' ...
-                        num2str([ersp.c]) '], ''alpha'', ' num2str(ersp.a) ', ''padratio'', ' num2str(ersp.p) ', ''tlimits'', [' num2str([ersp.t]) ']']);
-                set(findobj('parent', hdl, 'tag', 'itc_params'), 'string', ...
-                    ['                                                             ''frange'', [' num2str([ersp.f]) '], ''cycles'', [' ...
-                    num2str([ersp.c]) '], ''alpha'', ' num2str(ersp.a) ', ''padratio'', ' num2str(ersp.p) ', ''tlimits'', [' num2str([ersp.t]) ']']);                       
-                set(hdl, 'userdat',userdat); 
-            end
         case 'erspparams'
             ersp = userdat{2};
             [ersp_paramsout, erspuserdat, strhalt, erspstruct] = inputgui( { [1] [3 1] [3 1] [3 1] [3 1] [3 1] [1]}, ...
