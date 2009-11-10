@@ -37,7 +37,8 @@
 %               volume (dim 1: left to right; dim 2: anterior-posterior; dim 3: 
 %               superior-inferior). Use 'coregist' to coregister electrodes
 %               with the MRI. {default: 'mri'} 
-%  'verbose' - ['on'|'off'] comment on operations on command line {default: 'on'}.
+%  'verbose' - ['on'|'off'] comment on operations on command line {default:
+%  'on'}.
 %  'plot'    - ['on'|'off'] only return outputs                  {default: 'off'}.
 %
 % Plotting options:
@@ -158,6 +159,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.160  2009/08/04 04:44:22  arno
+%All functions necessary for compiling EEGLAB code
+%
 %Revision 1.159  2009/05/16 00:11:42  arno
 %adding tag to axis
 %
@@ -1044,16 +1048,33 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             yo = sources(index).momxyz(dip,2)*g.dipolelength*multfactor;
             zo = sources(index).momxyz(dip,3)*g.dipolelength*multfactor;
             
-            if strcmpi(g.pointout,'on') & abs([x+xo,y+yo,z+zo]) < abs([x,y,z])
-                xo1 = x-xo; % make dipole point outward from head center
-                yo1 = y-yo;
-                zo1 = z-zo; 
+            xc = 0;
+            yc = 0;
+            zc = 0;
+            
+            centvec = [xo-xc yo-yc zo-zc]; % vector pointing into center
+            dipole_orient = [x+xo y+yo z+zo]/norm([x+xo y+yo z+zo]);
+            c = dot(centvec, dipole_orient);
+            
+            if strcmpi(g.pointout,'on')
+                if (c < 0) | (abs([x+xo,y+yo,z+zo]) < abs([x,y,z]))
+                    xo1 = x-xo; % make dipole point outward from head center
+                    yo1 = y-yo;
+                    zo1 = z-zo; 
+                    fprintf('invert because: %e  \n', c);
+                else
+                    xo1 = x+xo;
+                    yo1 = y+yo;
+                    zo1 = z+zo;
+                    fprintf('NO invert because: %e  \n', c);
+                end
             else
                 xo1 = x+xo;
                 yo1 = y+yo;
                 zo1 = z+zo;
+                fprintf('NO invert because: %e  \n', c);
             end
-
+            
             %
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% draw dipole bar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             %
