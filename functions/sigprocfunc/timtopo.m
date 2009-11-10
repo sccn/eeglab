@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.73  2006/10/28 00:50:24  arno
+% now clicking plot scalp map at that latency
+%
 % Revision 1.72  2005/05/16 20:27:46  scott
 % adjusted several plotting details, oblique line height, cbar, text, etc.
 %
@@ -269,11 +272,11 @@
 % 01-25-02 reformated help & license, added link -ad 
 % 03-15-02 add all topoplot options -ad
 
-function M = timtopo(data,chan_locs,limits,plottimes,titl,plotchans,voffsets, varargin)
+function M = timtopo(data, chan_locs, varargin)
 
 MAX_TOPOS = 24;
 
-if nargin < 1
+if nargin < 1 %should this be 2?
    help timtopo;
    return
 end
@@ -281,60 +284,104 @@ end
 [chans,frames] = size(data);
 icadefs;   
 
-if nargin < 7 | voffsets == 0
-  voffsets = zeros(1,MAX_TOPOS);
-end
+% 
+% if nargin > 2
+%     if ischar(limits)
+%         varargin = { limits,plottimes,titl,plotchans,voffsets varargin{:} };
+%         
+%     else
+%         varargin = { 'limits' limits 'plottimes' plottimes 'title' titl 'plotchans' plotchans 'voffsets' voffsets varargin{:} };        
+%     end;
+% end;
 
-if nargin < 6
-   plotchans = 0;
-end
 
-if plotchans==0
-   plotchans = 1:chans;
-end
 
-if nargin < 5,
-   titl = '';     % DEFAULT NO TITLE
-end
+if nargin > 2 && ~ischar(varargin{1})
+   options = {};
+   if length(varargin) > 0, options = { options{:} 'limits' varargin{1} }; end;
+   if length(varargin) > 1, options = { options{:} 'plottimes' varargin{2} }; end;
+   if length(varargin) > 2, options = { options{:} 'title'      varargin{3} }; end;
+   if length(varargin) > 3, options = { options{:} 'plotchans' varargin{4} }; end;
+   if length(varargin) > 4, options = { options{:} 'voffsets'     varargin{5} }; end;
+   if length(varargin) > 5, options = { options{:} varargin{6:end} }; end;
+else
+   options = varargin;
+end;
 
+fieldlist = { 'limits'        'real'     []                       0;
+              'plottimes'     'real'     []                       [];
+              'title'         'string'   []                       '';
+              'plotchans'     'integer'  [1:size(data,1)]         [] ;
+              'voffsets'      'real'     []                       [] ;};
+[g topoargs] = finputcheck(options, fieldlist, 'timtopo', 'ignore');
+
+if ischar(g), error(g); end;
+%Set Defaults
+if isempty(g.title), g.title = ''; end;
+if isempty(g.voffsets) || g.voffsets == 0, g.voffsets = zeros(1,MAX_TOPOS); end;
+if isempty(g.plotchans) || g.plotchans == 0, g.plotchans = 1:chans; end;
 plottimes_set=1;   % flag variable
-if nargin< 4 | isempty(plottimes) | any(isnan(plottimes))
-   plottimes_set = 0;
-end
+if isempty(g.plottimes) || any(isnan(g.plottimes)), plottimes_set = 0;end;
+limitset = 0; %flag variable
+if isempty(g.limits), g.limits = 0; end;
+if length(g.limits)>1, limitset = 1; end;
 
-limitset = 0;
-if nargin < 3,
-    limits = 0;
-elseif length(limits)>1
-    limitset = 1;
-end
 
-if nargin < 2
+% if nargin < 7 | voffsets == 0
+%   voffsets = zeros(1,MAX_TOPOS);
+% end
+% 
+% if nargin < 6
+%    plotchans = 0;
+% end
+% 
+% if plotchans==0
+%    plotchans = 1:chans;
+% end
+% 
+% if nargin < 5,
+%    titl = '';     % DEFAULT NO TITLE
+% end
+% 
+% plottimes_set=1;   % flag variable
+% if nargin< 4 | isempty(plottimes) | any(isnan(plottimes))
+%    plottimes_set = 0;
+% end
+% 
+% limitset = 0;
+% if nargin < 3,
+%     limits = 0;
+% elseif length(limits)>1
+%     limitset = 1;
+% end
+
+if nargin < 2 %if first if-statement is changed to 2 should this be 3?
     chan_locs = 'chan.locs';  % DEFAULT CHAN_FILE
 end
-if isnumeric(chan_locs) & chan_locs == 0,
+if isnumeric(chan_locs) && chan_locs == 0,
     chan_locs = 'chan.locs';  % DEFAULT CHAN_FILE
 end
+
 
   %
   %%%%%%%%%%%%%%%%%%%%%%% Read and adjust limits %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % defaults: limits == 0 or [0 0 0 0]
-  if ( length(limits) == 1 & limits==0) | (length(limits)==4 & ~any(limits))  
+  if ( length(g.limits) == 1 & g.limits==0) | (length(g.limits)==4 & ~any(g.limits))  
     xmin=0;
     xmax=frames-1;
     ymin=min(min(data));
     ymax=max(max(data));
-  elseif length(limits) == 2  % [minms maxms] only
+  elseif length(g.limits) == 2  % [minms maxms] only
     ymin=min(min(data));
     ymax=max(max(data));
-    xmin = limits(1);
-    xmax = limits(2);
- elseif length(limits) == 4
-    xmin = limits(1);
-    xmax = limits(2);
-    if any(limits([3 4]))
-      ymin = limits(3);
-      ymax = limits(4);
+    xmin = g.limits(1);
+    xmax = g.limits(2);
+ elseif length(g.limits) == 4
+    xmin = g.limits(1);
+    xmax = g.limits(2);
+    if any(g.limits([3 4]))
+      ymin = g.limits(3);
+      ymax = g.limits(4);
     else % both 0
       ymin=min(min(data));
       ymax=max(max(data));
@@ -375,42 +422,42 @@ x = xmin:sampint:xmax;   % make vector of x-values
 if plottimes_set == 0
   [mx plotframes] = max(sum(data.*data)); 
                   % default plotting frame has max variance
-  if nargin< 4 | isempty(plottimes)
-	  plottimes = x(plotframes);
+  if nargin< 4 | isempty(g.plottimes)
+	  g.plottimes = x(plotframes);
   else
-	  plottimes(find(isnan(plottimes))) = x(plotframes);
+	  g.plottimes(find(isnan(g.plottimes))) = x(plotframes);
   end;
   plottimes_set = 1;
 end;
 
 if plottimes_set == 1
-  ntopos = length(plottimes);
+  ntopos = length(g.plottimes);
   if ntopos > MAX_TOPOS
     fprintf('timtopo(): too many plottimes - only first %d will be shown!\n',MAX_TOPOS);
-    plottimes = plottimes(1:MAX_TOPOS);
+    g.plottimes = g.plottimes(1:MAX_TOPOS);
     ntopos = MAX_TOPOS;
   end
 
-  if max(plottimes) > xmax | min(plottimes)< xmin
+  if max(g.plottimes) > xmax | min(g.plottimes)< xmin
     fprintf(...
 'timtopo(): at least one plottimes value outside of epoch latency range - cannot plot.\n');
     return
   end
 
-  plottimes = sort(plottimes); % put map latencies in ascending order, 
+  g.plottimes = sort(g.plottimes); % put map latencies in ascending order, 
                                % else map lines would cross.
   xshift = [x(2:frames) xmax];
-  plotframes = ones(size(plottimes));
+  plotframes = ones(size(g.plottimes));
   for t = 1:ntopos
-    time = plottimes(t);
+    time = g.plottimes(t);
     plotframes(t) = find(time>=x & time < xshift);
   end
 end
 
-vlen = length(voffsets); % extend voffsets if necessary
+vlen = length(g.voffsets); % extend voffsets if necessary
 i=1;
 while vlen< ntopos
-        voffsets = [voffsets voffsets(i)];
+        g.voffsets = [g.voffsets g.voffsets(i)];
         i=i+1;
         vlen=vlen+1;
 end
@@ -466,7 +513,7 @@ end
 
 fprintf('Scalp maps will show latencies: ');
 for t=1:ntopos
-  fprintf('%4.0f ',plottimes(t));
+  fprintf('%4.0f ',g.plottimes(t));
 end
 fprintf('\n');
 fprintf('                     at frames: ');
@@ -484,15 +531,15 @@ fprintf('\n');
 axdata = axes('Units','Normalized','Position',[pos(1) pos(2) pos(3) 0.6*pos(4)],'FontSize',axfont);
 set(axdata,'Color',BACKCOLOR);
 
-limits = get(axdata,'Ylim');
+g.limits = get(axdata,'Ylim');
 set(axdata,'GridLineStyle',':')
 set(axdata,'Xgrid','off')
 set(axdata,'Ygrid','on')
 axes(axdata)
 axcolor = get(gcf,'Color');
 set(axdata,'Color',BACKCOLOR);
-pl=plot(x,data(plotchans,:));    % plot the data
-if length(plotchans)==1
+pl=plot(x,data(g.plotchans,:));    % plot the data
+if length(g.plotchans)==1
   set(pl,'color','k');
   set(pl,'linewidth',2);
 end
@@ -520,14 +567,14 @@ height = ymax-ymin;
 lwidth = 1.5;  % increment line thickness
 
 for t=1:ntopos % dfraw vertical lines through the data at topoplot frames
- if length(plotchans)>1 | voffsets(t)
-  l1 = plot([plottimes(t) plottimes(t)],...
-       [min(data(plotchans,plotframes(t))) ...
-       voffsets(t) + max(data(plotchans,plotframes(t)))],'w'); % white underline behind
+ if length(g.plotchans)>1 | g.voffsets(t)
+  l1 = plot([g.plottimes(t) g.plottimes(t)],...
+       [min(data(g.plotchans,plotframes(t))) ...
+       g.voffsets(t) + max(data(g.plotchans,plotframes(t)))],'w'); % white underline behind
   set(l1,'linewidth',2);
-  l1 = plot([plottimes(t) plottimes(t)],...
-       [min(data(plotchans,plotframes(t))) ...
-       voffsets(t) + max(data(plotchans,plotframes(t)))],'b'); % blue line
+  l1 = plot([g.plottimes(t) g.plottimes(t)],...
+       [min(data(g.plotchans,plotframes(t))) ...
+       g.voffsets(t) + max(data(g.plotchans,plotframes(t)))],'b'); % blue line
   set(l1,'linewidth',lwidth);
  end
 end
@@ -553,7 +600,7 @@ for t=1:ntopos % draw oblique lines through to the topoplots
                        % topowidth]); % this will be the topoplot axes
   axis([-1 1 -1 1]);
 
-  from = changeunits([plottimes(t),maxdata],axdata,axall); % data axes
+  from = changeunits([g.plottimes(t),maxdata],axdata,axall); % data axes
   to   = changeunits([0,-0.74],axtp,axall);                % topoplot axes
   delete(axtp);
   axes(axall);                                             % whole figure axes
@@ -578,11 +625,6 @@ for t=1:ntopos
   topoaxes(t) = axtp; % save axes handles
   cla
 
-  if ~isempty(varargin)
-    topoargs = varargin;
-  else
-    topoargs = {};
-  end
   if topowidth<0.12
       topoargs = { topoargs{:} 'electrodes' 'off' };
   end
@@ -592,7 +634,7 @@ for t=1:ntopos
   %
   % headplot(data(:,plotframes(t)),'chan.spline'); 
   
-  timetext = [num2str(plottimes(t),'%4.0f')];
+  timetext = [num2str(g.plottimes(t),'%4.0f')];
   % timetext = [num2str(plottimes(t),'%4.0f') ' ms']; % add ' ms'
   text(0.00,0.80,timetext,'FontSize',axfont-3,'HorizontalAlignment','Center'); % ,'fontweight','bold');
 end
@@ -616,8 +658,9 @@ text(0.986,0.625,'-','FontSize',axfont,'HorizontalAlignment','Center');
 %
 %%%%%%%%%%%%%%%%%%%%%%%%% Plot the plot title if any %%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% plot title between data panel and topoplots (to avoid crowding at top of figure), on the left
-ttl = text(0.03,0.635,titl,'FontSize',titlefont,'HorizontalAlignment','left'); % 'FontWeight','Bold');
+% plot title between data panel and topoplots (to avoid crowding at top of
+% figure), on the left
+ttl = text(0.03,0.635,g.title,'FontSize',titlefont,'HorizontalAlignment','left'); % 'FontWeight','Bold');
 
 % textent = get(ttl,'extent');
 % titlwidth = textent(3);
