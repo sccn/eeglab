@@ -1,24 +1,23 @@
 % timtopo()   - plot all channels of a data epoch on the same axis 
 %               and map its scalp map(s) at selected latencies.
 % Usage:
-%  >> timtopo(data,'chan_locs');
-%  >> timtopo(data,'chan_locs',[limits],[plottimes]','title',[plotchans], ...
-%                                                     [voffsets], 'key', 'val', ...);
+%  >> timtopo(data, chan_locs);
+%  >> timtopo(data, chan_locs, 'key', 'val', ...);
 % Inputs:
 %  data       = (channels,frames) single-epoch data matrix
 %  chan_locs  = channel location file or EEG.chanlocs structure. 
 %               See >> topoplot example for file format.
 %
 % Optional ordered inputs:
-%  [limits]   = [minms maxms minval maxval] data limits for latency (in ms) and y-values
-%                (assumes uV) {default|0 -> use [0 npts-1 data_min data_max]; 
-%               else [minms maxms] or [minms maxms 0 0] -> use
+%  'limits'    = [minms maxms minval maxval] data limits for latency (in ms) and y-values
+%                 (assumes uV) {default|0 -> use [0 npts-1 data_min data_max]; 
+%                 else [minms maxms] or [minms maxms 0 0] -> use
 %                [minms maxms data_min data_max]
-%  plottimes  = [vector] latencies (in ms) at which to plot scalp maps 
+%  'plottimes' = [vector] latencies (in ms) at which to plot scalp maps 
 %                {default|NaN -> latency of maximum variance}
-% 'title'     = [string] plot title {default|0 -> none}
-%  plotchans  = vector of data channel(s) to plot {default|0 -> all}
-%  voffsets   = vector of (plotting-unit) distances vertical lines should extend 
+% 'title'      = [string] plot title {default|0 -> none}
+% 'plotchans'  = vector of data channel(s) to plot {default|0 -> all}
+% 'voffsets'   = vector of (plotting-unit) distances vertical lines should extend 
 %                above the data (in special cases) {default -> all = standard}
 %
 % Optional keyword, arg pair inputs (must come after the above):
@@ -45,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.74  2009/11/10 23:10:14  dev
+% Updated Options and menu call format.
+%
 % Revision 1.73  2006/10/28 00:50:24  arno
 % now clicking plot scalp map at that latency
 %
