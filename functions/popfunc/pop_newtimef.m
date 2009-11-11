@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.42  2009/11/11 00:28:53  arno
+% New GUI format
+%
 % Revision 1.41  2009/05/10 04:10:00  arno
 % newtimef and pop_newtimef interface
 %
@@ -287,7 +290,7 @@ if popup
       end;
     end;
     
-	if ~isempty( result.baseline ),  options = [ options ', ''baseline'',' result.baseline ]; end;
+	if ~isempty( result.baseline ),  options = [ options ', ''baseline'',['result.baseline']' ]; end;
     if ~isempty( result.alpha ),     options = [ options ', ''alpha'',' result.alpha ];   end;
 	if ~isempty( result.options ),   options = [ options ',' result.options ];            end;
 	if ~isempty( result.freqs ),     options = [ options ', ''freqs'', [' result.freqs ']'   ]; end;
