@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2009/08/06 01:11:16  arno
+% fixing statistical functions
+%
 % Revision 1.20  2009/05/31 02:22:10  arno
 % Adding FDR and bootstrap to all STUDY functions
 %
@@ -429,7 +432,7 @@ function res = surrogate(dataconcat, lens, dims, bootstrapflag, pairedflag); % f
             case 1, res{i} = dataconcat(indswap(lens(i)+1:lens(i+1)));
             case 2, res{i} = dataconcat(:,indswap(lens(i)+1:lens(i+1)));
             case 3, res{i} = dataconcat(:,:,indswap(lens(i)+1:lens(i+1)));
-            case 1, res{i} = dataconcat(:,:,:,indswap(lens(i)+1:lens(i+1)));
+            case 4, res{i} = dataconcat(:,:,:,indswap(lens(i)+1:lens(i+1)));
         end;
     end;
     res = reshape(res, dims);
