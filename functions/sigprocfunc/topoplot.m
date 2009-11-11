@@ -166,6 +166,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.291  2009/09/27 05:15:29  arno
+% Do not assume file type
+%
 % Revision 1.290  2009/08/29 04:24:52  arno
 % new statistics
 %
@@ -2084,20 +2087,20 @@ end
 
  if isempty(EMARKERSIZE)
    EMARKERSIZE = 10;
-   if length(y)>=32 
-    EMARKERSIZE = 8;
-   elseif length(y)>=48
-    EMARKERSIZE = 6;
-   elseif length(y)>=64
-    EMARKERSIZE = 5;
-   elseif length(y)>=80
-    EMARKERSIZE = 4;
-   elseif length(y)>=100
+   if length(y)>=160
     EMARKERSIZE = 3;
    elseif length(y)>=128
     EMARKERSIZE = 3;
-   elseif length(y)>=160
+   elseif length(y)>=100
     EMARKERSIZE = 3;
+   elseif length(y)>=80
+    EMARKERSIZE = 4;
+   elseif length(y)>=64
+    EMARKERSIZE = 5;
+   elseif length(y)>=48
+    EMARKERSIZE = 6;
+   elseif length(y)>=32 
+    EMARKERSIZE = 8;
    end
  end
 %
