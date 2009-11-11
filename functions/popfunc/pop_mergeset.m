@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.47  2009/07/01 20:49:14  arno
+% fixe mergin datasets with dissimuilar event structures
+%
 % Revision 1.46  2009/01/27 00:48:38  ywu
 % fix memory mapping problem
 %
@@ -195,18 +198,16 @@ if nargin < 2 & length(INEEG1) == 1
 end;
 
 if nargin == 1
-	promptstr    = { 'Dataset indices to merge', ...
-					 'Preserve ICA weights of the first dataset ?' };
-	inistr       = { '1', 'no' };
-	result       = inputdlg2( promptstr, 'Merge datasets -- pop_mergeset()', 1,  inistr, 'pop_mergeset');
-	size_result  = size( result );
-	if size_result(1) == 0 return; end;
+	uilist    = { { 'style' 'text' 'string' 'Dataset indices to merge' } ...
+                  { 'style' 'edit' 'string' '1' } ...
+                  { 'style' 'text' 'string' 'Preserve ICA weights of the first dataset ?' } ...
+                  { 'style' 'checkbox' 'string' '' } };
+    res = inputgui( 'uilist', uilist, 'geometry', { [3 1] [3 1] }, 'helpcom', 'pophelp(''pop_mergeset'')');
+    
+	if isempty(res) return; end;
    
-    INEEG2  = eval( [ '[' result{1} ']' ] );
-    switch lower(result{2})
-    	case 'yes', keepall = 1;
-    	otherwise, keepall = 0;
-    end;
+    INEEG2  = eval( [ '[' res{1} ']' ] );
+    keepall = res{2};
 else
 	if nargin < 3
 		keepall = 0; % default
