@@ -2,6 +2,10 @@
 %                     the respective number of events of each type. Ouput event 
 %                     or urevent types are sorted in reverse order of their number.
 %                     If no outputs, print this list on the commandline instead.
+%
+% WARNING: this function returns the wrong frequency of events (see bug 519)
+%          this is a deprecated function.
+%
 % Usage:
 %        >> [types,numbers] = eeg_eventtypes(EEG);
 %        >> [types,numbers] = eeg_eventtypes(EEG,types);
