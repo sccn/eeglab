@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2009/06/03 08:43:47  arno
+% fix command line call
+%
 % Revision 1.35  2009/05/07 20:29:33  arno
 % edit message
 %
@@ -221,7 +224,7 @@ if nargin < 1
                  { 'style' 'checkbox' 'string' '' 'value' 0 } {} ...
                  { 'style' 'text' 'String' 'Reference chan(s) indices - required for BIOSEMI' } ...
                  { 'style' 'edit' 'string' '' } };
-    geom = { geom{:} [3 0.2 0.5] [3 0.2 0.5] [3 1] };
+    geom = { geom{:} [3 0.35 0.5] [3 0.35 0.5] [3 1] };
 
     result = inputgui( geom, uilist, 'pophelp(''pop_biosig'')', ...
                                  'Load data using BIOSIG -- pop_biosig()');

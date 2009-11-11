@@ -142,6 +142,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.186  2009/11/11 00:28:53  arno
+% New GUI format
+%
 % Revision 1.185  2009/11/04 01:37:00  arno
 % fix eval problem for pop_chancenter
 %
@@ -843,7 +846,7 @@ if nargin < 3
 
     % special checkbox for chandata field
     % -----------------------------------
-    geometry = { geometry{:} [1.9 0.35 0.5 1] };
+    geometry = { geometry{:} [2 0.35 0.5 1] };
     cbfield = [ 'valnumtmp   = str2num(get(findobj(gcbf, ''tag'', ''chaneditnumval''), ''string''));' ...
                 'pop_chanedit(gcbf, [], ''changefield'', { valnumtmp ''' allfields{end} ''' get(gcbo, ''value'') });' ...
                 'clear valnumtmp;' ];

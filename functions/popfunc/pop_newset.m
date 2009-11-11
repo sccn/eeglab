@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.80  2009/04/21 04:46:03  arno
+% Allow reading several datafiles
+%
 % Revision 1.79  2007/05/22 13:57:54  arno
 % history problem
 %
@@ -520,7 +523,7 @@ elseif length(varargin) == 0 & length(EEG) == 1 & strcmpi(g.gui, 'on') % if seve
         cb_overwrite   = 'Overwrite current dataset|New dataset';
     end;
         
-    geometry    = { [1] [0.12 0.5 1 0.5] [0.12 0.5 1 0.5] [1] [1] [0.12 1.8 0.1 0.1] [0.12 0.5 1 0.5] };
+    geometry    = { [1] [0.15 0.5 1 0.5] [0.15 0.5 1 0.5] [1] [1] [0.15 1.8 0.1 0.1] [0.15 0.5 1 0.5] };
     geomvert    = [ ];
     uilist = { ...
          { 'style', 'text',       'string', text_new, 'fontweight', 'bold' } ...

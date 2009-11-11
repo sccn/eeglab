@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.37  2009/04/21 19:11:19  arno
+% memory mapping
+%
 % Revision 1.32 2009/03/27 18:12:00 rypstat
 % adding large file processing option
 %
@@ -178,7 +181,7 @@ if nargin < 1
 	% -----------------------
     callback16 = 'set(findobj(gcbf, ''tag'', ''32''), ''value'', ~get(gcbo, ''value''));';
     callback32 = 'set(findobj(gcbf, ''tag'', ''16''), ''value'', ~get(gcbo, ''value''));';
-    uigeom       = { [1.3 0.5 0.5] [1 0.5] [1.09 0.13 0.4] [1 0.5] [0.75 0.75] } ;
+    uigeom       = { [1.3 0.5 0.5] [1 0.5] [1.09 0.13 0.4] [1 0.5] [1 0.5] } ;
     uilist       = { { 'style' 'text' 'string' 'Data format' } ...
                      { 'style' 'checkbox' 'tag' '16' 'string' '16-bits' 'value' 1 'callback' callback16 } ...
                      { 'style' 'checkbox' 'tag' '32' 'string' '32-bits' 'value' 0 'callback' callback32 } ...
@@ -188,7 +191,7 @@ if nargin < 1
                      { 'style' 'checkbox' 'string' '' } { } ...                     
                      { 'style' 'text' 'string' 'loadcnt() ''key'', ''val'' params' } ...
                      { 'style' 'edit' 'string' '' } ...
-                     { 'style' 'text' 'string' 'memmapfile (large - must use *.fdt filename)' } ...
+                     { 'style' 'text' 'string' 'Large files, enter a file name for memory mapping (xxx.fdt)' } ...
                      { 'style' 'edit' 'string' '' } };                  
 	result = inputgui( uigeom, uilist, 'pophelp(''pop_loadcnt'')', 'Load a CNT dataset');    
 	if length( result ) == 0 return; end;
