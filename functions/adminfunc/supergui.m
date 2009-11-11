@@ -87,6 +87,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.57  2009/11/11 00:28:52  arno
+% New GUI format
+%
 % Revision 1.56  2009/04/21 19:24:36  arno
 % Fix Mac GUI ratio problem
 %
@@ -546,13 +549,8 @@ hh =findobj(allhandlers, 'parent', g.fig, 'style', 'popupmenu');
 set(hh, 'backgroundcolor', GUIPOPBUTTONCOLOR);
 set(hh, 'foregroundcolor', GUITEXTCOLOR);
 hh =findobj(allhandlers, 'parent', g.fig, 'style', 'checkbox');
-if isunix
-	set(hh, 'backgroundcolor', GUIPOPBUTTONCOLOR);
-	set(hh, 'foregroundcolor', GUITEXTCOLOR);	
-else 
-	set(hh, 'backgroundcolor', GUIBACKCOLOR);
-	set(hh, 'foregroundcolor', GUITEXTCOLOR);
-end;
+set(hh, 'backgroundcolor', GUIBACKCOLOR);
+set(hh, 'foregroundcolor', GUITEXTCOLOR);
 hh =findobj(allhandlers, 'parent', g.fig, 'style', 'listbox');
 set(hh, 'backgroundcolor', GUIPOPBUTTONCOLOR);
 set(hh, 'foregroundcolor', GUITEXTCOLOR);
