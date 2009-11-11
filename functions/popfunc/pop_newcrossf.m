@@ -42,6 +42,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.38  2008/04/19 21:08:55  arno
+% added a GUI entry for log scale
+% \.
+%
 % Revision 1.37  2007/10/25 18:32:41  nima
 % _
 %
@@ -181,7 +185,7 @@ end;
 if popup
 	[txt vars] = gethelpvar('timef.m');
 	
-	geometry = { [1 0.5 0.5] [1 0.5 0.5] [1 0.5 0.5] [1 0.5 0.5] [0.92 0.1 0.78] [0.92 0.1 0.78] [1 0.5 0.5] [1 0.8 0.2] [1] [1 1]};
+	geometry = { [1 0.5 0.5] [1 0.5 0.5] [1 0.5 0.5] [1 0.5 0.5] [0.92 0.15 0.73] [0.92 0.15 0.73] [1 0.5 0.5] [1 0.8 0.2] [1] [1 1]};
     uilist = { { 'Style', 'text', 'string', fastif(typeproc, 'First channel number', 'First component number'), 'fontweight', 'bold'  } ...
 			   { 'Style', 'edit', 'string', getkeyval(lastcom,3,[],'1') } {} ...
 			   { 'Style', 'text', 'string', fastif(typeproc, 'Second channel number', 'Second component number'), 'fontweight', 'bold'  } ...

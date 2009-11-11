@@ -11,6 +11,10 @@
 % 
 % Inputs:
 %   'fig'       - figure handler, if not given, create a new figure.
+%   'geom'      - cell array of cell array of integer vector. Each cell
+%               array defines the coordinate of a given input in the following
+%               manner: { nb_row nb_col [x_topcorner y_topcorner]
+%               [x_bottomcorner y_bottomcorner] };
 %   'geomhoriz' - integer vector or cell array of numerical vectors describing the 
 %               geometry of the elements in the figure. 
 %               - if integer vector, vector length is the number of rows and vector 
@@ -31,12 +35,19 @@
 %               { { ui1 }, { ui2 }... }, { 'uiX' } being GUI matlab 
 %               uicontrol arguments such as { 'style', 'radiobutton', 
 %               'String', 'hello' }. See Matlab function uicontrol() for details.
+%   'borders'  - [left right top bottom] GUI internal borders in normalized
+%               units (0 to 1). Default values are 
 %   'title'    - optional figure title
 %   'userdata' - optional userdata input for the figure
 %   'inseth'   - horizontal space between elements. Default is 2% 
 %                of window size.
 %   'insetv'   - vertical space between elements. Default is 2% 
 %                of window height.
+%   'spacing'  - [horiz vert] spacing in normalized units. Default 
+%   'spacingtype' - ['absolute'|'proportional'] abolute means that the 
+%                spacing values are fixed. Proportional means that they
+%                depend on the number of element in a line.
+%   'minwidth' - [integer] minimal width in pixels. Default is none.
 %
 % Hint:
 %    use 'print -mfile filemane' to save a matlab file of the figure.
@@ -76,6 +87,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.56  2009/04/21 19:24:36  arno
+% Fix Mac GUI ratio problem
+%
 % Revision 1.55  2007/01/08 05:21:00  toby
 % help edit
 %
@@ -246,6 +260,8 @@ function [handlers, outheight, allhandlers] = supergui( varargin);
 
 % handlers cell format
 % allhandlers linear format
+handlers = {};
+outheight = 0;
 
 if nargin < 2
 	help supergui;
@@ -260,16 +276,38 @@ else
     options = { 'fig'      varargin{1} 'geomhoriz' varargin{2} ...
                 'geomvert' varargin{3} 'uilist'    varargin(4:end) }; 
 end
-g = finputcheck(options, { 'geomhoriz' 'cell'   []      [];
+g = finputcheck(options, { 'geomhoriz' 'cell'   []      {};
                            'fig'       'real'   []      0;
+                           'geom'      'cell'   []      {};
                            'uilist'    'cell'   []      {};
                            'title'     'string' []      '';
                            'userdata'  ''       []      [];
                            'geomvert'  'real'   []      [];
+                           'horizontalalignment'  'string'   { 'left' 'right' 'center' } 'left';
+                           'minwidth'  'real'   []      10;
+                           'borders'   'real'   []      [0.05 0.04 0.07 0.06];
+                           'spacing'   'real'   []      [0.02 0.01];
                            'inseth'    'real'   []      0.02; % x border absolute (5% of width)
                            'insetv'    'real'   []      0.02 }, 'supergui');
 if isstr(g), error(g); end
-g.insetv = g.insetv/length(g.geomhoriz);
+if ~isempty(g.geomhoriz)
+    maxcount = sum(cellfun(@length, g.geomhoriz));
+    if maxcount ~= length(g.uilist)
+        warning('Wrong size for ''geomhoriz'' input');
+    end;
+    if ~isempty(g.geomvert)
+        if length(g.geomvert) ~= length(g.geomhoriz)
+            warning('Wrong size for ''geomvert'' input');
+        end;
+    end;
+    g.insetv = g.insetv/length(g.geomhoriz);
+end;
+if ~isempty(g.geom)
+    if length(g.geom) ~= length(g.uilist)
+        warning('Wrong size for ''geom'' input');
+    end;
+    maxcount = length(g.geom);
+end;
 
 % create new figure
 % -----------------
@@ -279,7 +317,7 @@ end
 
 % converting the geometry formats
 % -------------------------------
-if ~iscell( g.geomhoriz )
+if ~isempty(g.geomhoriz) & ~iscell( g.geomhoriz )
 	oldgeom = g.geomhoriz;
 	g.geomhoriz = {};
 	for row = 1:length(oldgeom)
@@ -290,125 +328,150 @@ if isempty(g.geomvert)
 	g.geomvert = ones(1, length(g.geomhoriz));
 end
 
-% setting relative width in percent
-% ---------------------------------
-for row = 1:length(g.geomhoriz)
-	tmprow = g.geomhoriz{row};
-	sumrow = sum(g.geomhoriz{row});
-	g.geomhoriz{row} = 1.05*g.geomhoriz{row}/sumrow;
-	g.geomhoriz{row} = g.geomhoriz{row} - g.inseth*(length(tmprow)-1)/length(tmprow);
-end
-
-% setting relative height in percent
-% ---------------------------------
-sumcol = sum(g.geomvert);
-ind1   = find(g.geomvert == 1); ind1 = ind1(1);
-g.geomvert  = (1.03+0.003*sumcol)*g.geomvert/sumcol;
-g.geomvert  = g.geomvert - g.insetv*(length(g.geomvert)-1)/length(g.geomvert);
+% converting to the new format
+% ----------------------------
+if isempty(g.geom)
+    count = 1;
+    incy  = 0;
+    sumvert  = sum(g.geomvert);
+    maxhoriz = 1;
+    for row = 1:length(g.geomhoriz)
+        incx = 0;
+        maxhoriz = max(maxhoriz, length(g.geomhoriz{row}));
+        ratio = length(g.geomhoriz{row})/sum(g.geomhoriz{row});
+        for column = 1:length(g.geomhoriz{row})
+            g.geom{count} = { length(g.geomhoriz{row}) sumvert [incx incy] [g.geomhoriz{row}(column)*ratio g.geomvert(row)] };
+            incx = incx+g.geomhoriz{row}(column)*ratio;
+            count = count+1;
+        end;
+        incy = incy+g.geomvert(row);
+    end;
+    g.borders(1:2) = g.borders(1:2)/maxhoriz*5;
+    g.borders(3:4) = g.borders(3:4)/sumvert*10;
+    g.spacing(1)   = g.spacing(1)/maxhoriz*5;
+    g.spacing(2)   = g.spacing(2)/sumvert*10;
+end;
 
 % get axis coordinates
 % --------------------
 set(g.fig, 'menubar', 'none', 'numbertitle', 'off');		
-pos = get(gca,'position'); % plot relative to current axes
+pos = [0 0 1 1]; % plot relative to current axes
 q = [pos(1) pos(2) 0 0];
 s = [pos(3) pos(4) pos(3) pos(4)]; % allow to use normalized position [0 100] for x and y
 axis('off');
 
 % creating guis
 % -------------
-counter = 1; % count the elements
-outwidth = 0;
-outheight = 0;
-%height = 1.05/(length(g.geomhoriz)+1)*(1-g.insetv);
-%posy = 1 - height - 1/length(g.geomhoriz)*g.insetv;
+row    = 1; % count the elements
+column = 1; % count the elements
 factmultx = 0;
 factmulty = 0; %zeros(length(g.geomhoriz));
-posy = 0.98+(0.003*sumcol)/2+g.insetv;
-for row = 1:length(g.geomhoriz)
+for counter = 1:maxcount
 
 	% init
-    posx = -0.05;
 	clear rowhandle;
-	tmprow = g.geomhoriz{row};
-    height = g.geomvert(row);
-	posy = posy - height - g.insetv;
-	
-	for column = 1:length(tmprow)
-
-		width  = tmprow(column);
-		try
-			currentelem = g.uilist{ counter };
-		catch
-			fprintf('Warning: not all boxes were filled\n');
-			return;
-		end;		
-		if ~isempty(currentelem)
-            if strcmpi(currentelem{1}, 'link2lines'), 
-                currentelem(1) = []; 
-                rowhandle(column) = uicontrol(g.fig, 'unit', 'normalized', 'position', ...
-						                      [posx-width posy+3.6*height/2 width 0.005].*s+q, 'style', 'pushbutton', 'string', '');
-                rowhandle(column) = uicontrol(g.fig, 'unit', 'normalized', 'position', ...
-						                      [posx-width posy+0.7*height/2 width 0.005].*s+q, 'style', 'pushbutton', 'string', '');
-                rowhandle(column) = uicontrol(g.fig, 'unit', 'normalized', 'position', ...
-						                      [posx posy+0.7*height/2 0.005 3/2*height].*s+q, 'style', 'pushbutton', 'string', '');
-                rowhandle(column) = uicontrol(g.fig, 'unit', 'normalized', 'position', ...
-						                      [posx posy+2.1*height/2 width 0.005].*s+q, 'style', 'pushbutton', 'string', '');
+    gm = g.geom{counter};
+    [posx posy width height] = getcoord(gm{1}, gm{2}, gm{3}, gm{4}, g.borders, g.spacing);
+    
+    try
+        currentelem = g.uilist{ counter };
+    catch
+        fprintf('Warning: not all boxes were filled\n');
+        return;
+    end;		
+    if ~isempty(currentelem)
+        % decode metadata
+        % ---------------
+        if strcmpi(currentelem{1}, 'link2lines'), 
+            currentelem(1) = []; 
+            allhandlers(counter) = uicontrol(g.fig, 'unit', 'normalized', 'position', ...
+                                          [posx-width/2 posy+3.6*height/2 width/2 0.005].*s+q, 'style', 'pushbutton', 'string', '');
+            allhandlers(counter) = uicontrol(g.fig, 'unit', 'normalized', 'position', ...
+                                          [posx-width/2 posy+0.7*height/2 width/2 0.005].*s+q, 'style', 'pushbutton', 'string', '');
+            allhandlers(counter) = uicontrol(g.fig, 'unit', 'normalized', 'position', ...
+                                          [posx posy+0.7*height/2 0.005 3/2*height].*s+q, 'style', 'pushbutton', 'string', '');
+            allhandlers(counter) = uicontrol(g.fig, 'unit', 'normalized', 'position', ...
+                                          [posx posy+2.1*height/2 width/2 0.005].*s+q, 'style', 'pushbutton', 'string', '');
+            allhandlers(counter) = 0;
+        else
+            if strcmpi(currentelem{1}, 'width'),
+                 curwidth = currentelem{2};
+                 currentelem(1:2) = [];
+            else curwidth = 0;
+            end;
+            if strcmpi(currentelem{1}, 'align'),
+                 align = currentelem{2};
+                 currentelem(1:2) = [];
+            else align = 'right';
+            end;
+            if strcmpi(currentelem{1}, 'stickto'),
+                 stickto = currentelem{2};
+                 currentelem(1:2) = [];
+            else stickto = 'none';
             end;
             if strcmpi(currentelem{1}, 'vertshift'), currentelem(1) = []; addvert = -height/2; 
-            else                                                         addvert = 0;   
+            else                                                          addvert = 0;   
             end;
-            if ~strcmp(currentelem{2}, 'popupmenu') & ~strcmp(currentelem{2}, 'pushbutton')
-                rowhandle(column) = uicontrol(g.fig, 'unit', 'normalized', 'position', ...
-						                      [posx posy+addvert width height].*s+q, currentelem{:});
-            else % force height to be unitary
-                rowhandle(column) = uicontrol(g.fig, 'unit', 'normalized', 'position', ...
-						[posx posy+height-(height+g.geomvert(ind1))/2+addvert width g.geomvert(ind1)].*s+q, currentelem{:});
+            allhandlers(counter) = uicontrol(g.fig, 'unit', 'normalized', 'position', ...
+                                          [posx posy+addvert width height].*s+q, currentelem{:});
+
+            % this simply compute a factor so that all uicontrol will be visible
+            % ------------------------------------------------------------------
+            style = get( allhandlers(counter), 'style');			
+            set( allhandlers(counter), 'units', 'pixels');		
+            curpos = get(allhandlers(counter), 'position');
+            curext = get(allhandlers(counter), 'extent');
+            if curwidth ~= 0
+                curwidth = curwidth/((factmultx-1)/1.85+1);
+                if strcmpi(align, 'right')
+                    curpos(1) = curpos(1)+curpos(3)-curwidth;
+                elseif strcmpi(align, 'center')
+                    curpos(1) = curpos(1)+curpos(3)/2-curwidth/2;
+                end;
+                set(allhandlers(counter), 'position', [ curpos(1) curpos(2) curwidth curpos(4) ]);
+                if strcmpi(stickto, 'on')
+                    set( allhandlers(counter-1), 'units', 'pixels');
+                    curpos2 = get(allhandlers(counter-1), 'position');
+                    set(allhandlers(counter-1), 'position', [ curpos(1)-curpos2(3)-10 curpos2(2) curpos2(3) curpos2(4) ]);
+                    set( allhandlers(counter-1), 'units', 'normalized');
+                end;
+                curext(3) = curwidth;
             end;
-            
-			% this simply compute a factor so that all uicontrol will be visible
-			% ------------------------------------------------------------------
-			style = get( rowhandle(column), 'style');			
-			set( rowhandle(column), 'units', 'pixels');			
-			curpos = get(rowhandle(column), 'position');
-			curext = get(rowhandle(column), 'extent');
-			if ~strcmp(style, 'edit') & ~strcmp(style, 'pushbutton')
-				factmultx = max(factmultx, curext(3)/curpos(3));
-			end;
+            set( allhandlers(counter), 'units', 'normalized');			
+
+            if ~strcmp(style, 'edit') & ~strcmp(style, 'pushbutton')
+                %tmp = curext(3)/curpos(3);
+                %if tmp > 3*factmultx && factmultx > 0, adsfasd; end;
+                factmultx = max(factmultx, curext(3)/curpos(3));
+            end;
             if  ~strcmp(style, 'listbox')
                 factmulty = max(factmulty, curext(4)/curpos(4));
             end;
-			set( rowhandle(column), 'units', 'normalized');			
 
-			% Uniformize button text aspect (first letter must be Capital)
+            % Uniformize button text aspect (first letter must be upercase)
             % -----------------------------
             if strcmp(style, 'pushbutton')
-                tmptext = get(rowhandle(column), 'string');
+                tmptext = get(allhandlers(counter), 'string');
                 if length(tmptext) > 1
                     if upper(tmptext(1)) ~= tmptext(1) | lower(tmptext(2)) ~= tmptext(2)
                         tmptext = lower(tmptext);
                         try, tmptext(1) = upper(tmptext(1)); catch, end;
                     end;
                 end;
-                set(rowhandle(column), 'string', tmptext);
+                set(allhandlers(counter), 'string', tmptext);
             end;
-        else 
-			rowhandle(column) = 0;
-		end;
-		
-		handlers{ row } = rowhandle;
-		allhandlers(counter) = rowhandle(column);
-		
-		posx   = posx + width + g.inseth;
-		counter = counter+1;
-	end;
-	%posy      = posy - height - 1/length(g.geomhoriz)*g.insetv; %compensate for inset 
+        end;
+    else 
+        allhandlers(counter) = 0;
+    end;
 end;
 
 % adjustments
 % -----------
-factmultx = factmultx+0.1; % because some text was still hidden
-if factmultx < 0.3
-	factmultx = 0.3;
+factmultx = factmultx*1.02;% because some text was still hidden
+%factmultx = factmultx*1.2; 
+if factmultx < 0.1
+	factmultx = 0.1;
 end;
 
 % for MAC (magnify figures that have edit fields)
@@ -419,7 +482,7 @@ try,
 		hh = findobj(allhandlers, 'style', 'edit');
 		if ~isempty(hh)
 			factmulty = factmulty*1.5;
-		end;
+        end;
 	elseif ~isunix % windows
 		hh = findobj(allhandlers, 'style', 'edit');
 		if ~isempty(hh)
@@ -427,6 +490,7 @@ try,
 		end;
     end;
 catch, end;
+factmulty = factmulty*0.9; % global shinking
 warning on;	
 
 % scale and replace the figure in the screen
@@ -436,7 +500,7 @@ if factmulty > 1
 	pos(2) = max(0,pos(2)+pos(4)-pos(4)*factmulty);
 end;
 pos(1) = pos(1)+pos(3)*(1-factmultx)/2;
-pos(3) = pos(3)*factmultx;
+pos(3) = max(pos(3)*factmultx, g.minwidth);
 pos(4) = pos(4)*factmulty;
 set(g.fig, 'position', pos);
 
@@ -445,9 +509,11 @@ set(g.fig, 'position', pos);
 for index = 1:length(allhandlers)
 	if allhandlers(index) ~= 0
 		if strcmp(get(allhandlers(index), 'style'), 'text')
+            set(allhandlers(index), 'unit', 'pixel');
 			curpos = get(allhandlers(index), 'position');
 			curext = get(allhandlers(index), 'extent');
-			set(allhandlers(index), 'position',[curpos(1) curpos(2) curpos(3) curext(4)]);
+			set(allhandlers(index), 'position', [curpos(1) curpos(2)-4 curpos(3) curext(4)]);
+            set(allhandlers(index), 'unit', 'normalized');
 		end;
 	end;
 end;
@@ -466,14 +532,16 @@ hh = findobj(allhandlers, 'parent', g.fig, 'style', 'text');
 set(hh, 'Backgroundcolor', GUIBACKCOLOR);
 set(hh, 'foregroundcolor', GUITEXTCOLOR);
 set(g.fig, 'color',GUIBACKCOLOR );
-set(hh, 'horizontalalignment', 'left');
+set(hh, 'horizontalalignment', g.horizontalalignment);
 
 hh = findobj(allhandlers, 'style', 'edit');
 set(hh, 'BackgroundColor', [1 1 1]); %, 'horizontalalignment', 'right');
 
 hh =findobj(allhandlers, 'parent', g.fig, 'style', 'pushbutton');
-set(hh, 'backgroundcolor', GUIPOPBUTTONCOLOR);
-set(hh, 'foregroundcolor', GUITEXTCOLOR);
+if ~strcmpi(computer, 'MAC') & ~strcmpi(computer, 'MACI') % this puts the wrong background on macs
+    set(hh, 'backgroundcolor', GUIPOPBUTTONCOLOR);
+    set(hh, 'foregroundcolor', GUITEXTCOLOR);
+end;
 hh =findobj(allhandlers, 'parent', g.fig, 'style', 'popupmenu');
 set(hh, 'backgroundcolor', GUIPOPBUTTONCOLOR);
 set(hh, 'foregroundcolor', GUITEXTCOLOR);
@@ -499,3 +567,69 @@ if ~isempty(g.userdata), set(g.fig, 'userdata', g.userdata); end;
 if ~isempty(g.title   ), set(g.fig, 'name',     g.title   ); end;
 
 return;
+
+function [posx posy width height] = getcoord(geom1, geom2, coord1, sz, borders, spacing);
+    
+    coord2 = coord1+sz;
+    borders(1:2) = borders(1:2)-spacing(1);
+    borders(3:4) = borders(3:4)-spacing(2);
+    
+    % absolute positions
+    posx   = coord1(1)/geom1;
+    posy   = coord1(2)/geom2;
+    posx2  = coord2(1)/geom1;
+    posy2  = coord2(2)/geom2;
+    width  = posx2-posx;
+    height = posy2-posy;
+
+    % add spacing
+    posx   = posx+spacing(1)/2;
+    width  = max(posx2-posx-spacing(1), 0.001);
+    height = max(posy2-posy-spacing(2), 0.001);
+    posy   = max(0, 1-posy2)+spacing(2)/2;
+    
+    % add border
+    posx   = posx*(1-borders(1)-borders(2))+borders(1);
+    posy   = posy*(1-borders(3)-borders(4))+borders(4);
+    width  = width*( 1-borders(1)-borders(2));
+    height = height*(1-borders(3)-borders(4));
+    
+function [posx posy width height] = getcoordold(geom1, geom2, coord1, sz);
+    
+    coord2 = coord1+sz;
+    horiz_space  = 0.05/geom1;
+    vert_space   = 0.05/geom2;
+    horiz_border = min(0.1, 1/geom1)-horiz_space;
+    vert_border  = min(0.2, 1.5/geom2)-vert_space;
+    
+    % absolute positions
+    posx   = coord1(1)/geom1;
+    posy   = coord1(2)/geom2;
+    posx2  = coord2(1)/geom1;
+    posy2  = coord2(2)/geom2;
+    width  = posx2-posx;
+    height = posy2-posy;
+
+    % add spacing
+    posx   = posx+horiz_space/2;
+    width  = max(posx2-posx-horiz_space, 0.001);
+    height = max(posy2-posy- vert_space, 0.001);
+    posy   = max(0, 1-posy2)+vert_space/2;
+    
+    % add border
+    posx   = posx*(1-horiz_border)+horiz_border/2;
+    posy   = posy*(1- vert_border)+vert_border/2;
+    width  = width*(1-horiz_border);
+    height = height*(1-vert_border);
+ 
+    %     posx   = coord1(1)/geom1+horiz_border*1/geom1/2;
+%     posy   = 1-(coord1(2)/geom2+vert_border*1/geom2/2)-1/geom2;
+%     
+%     posx2  = coord2(1)/geom1+horiz_border*1/geom1/2;
+%     posy2  = 1-(coord2(2)/geom2+vert_border*1/geom2/2)-1/geom2;
+%     
+%     width  = posx2-posx;
+%     height = posy-posy2;
+    
+    %h = axes('unit', 'normalized', 'position', [ posx posy width height ]);
+    %h = axes('unit', 'normalized', 'position', [ coordx/geom1 1-coordy/geom2-1/geom2 1/geom1 1/geom2 ]);

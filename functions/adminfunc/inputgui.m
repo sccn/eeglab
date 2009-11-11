@@ -73,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.39  2009/07/30 04:45:11  arno
+% adding return mode
+%
 % Revision 1.38  2009/02/09 11:03:20  arno
 % Fix CVS problem for Windows
 %
@@ -211,7 +214,8 @@ end;
 
 % checking inputs
 % ---------------
-g = finputcheck(options, { 'geometry' {'cell','integer'}    []      []; ...
+g = finputcheck(options, { 'geom'     'cell'                []      {}; ...
+                           'geometry' {'cell','integer'}    []      []; ...
                            'uilist'   'cell'                []      {}; ...
                            'helpcom'  { 'string' 'cell' }   { [] [] }      ''; ...
                            'title'    'string'              []      ''; ...
@@ -234,26 +238,40 @@ if isstr(g.mode)
         end;
     end
 	g.geometry = { g.geometry{:} [1] [1 1 1] }; % add button to geometry
+    if ~isempty(g.geom)
+        for ind = 1:length(g.geom)
+            g.geom{ind}{2} = g.geom{ind}{2}+2;
+        end;
+        g.geom = { g.geom{:} ...
+                  {1 g.geom{1}{2} [0 g.geom{1}{2}-2] [1 1] } ... 
+                  {3 g.geom{1}{2} [0 g.geom{1}{2}-1] [1 1] } ... 
+                  {3 g.geom{1}{2} [1 g.geom{1}{2}-1] [1 1] } ...
+                  {3 g.geom{1}{2} [2 g.geom{1}{2}-1] [1 1] } };
+    end;
 	
 	% add the three buttons (CANCEL HELP OK) at the bottom of the GUI
 	% ---------------------------------------------------------------
-	g.uilist = { g.uilist{:}, {}, { 'Style', 'pushbutton', 'string', 'Cancel', 'callback', 'close gcbf' } };
+	g.uilist = { g.uilist{:}, {} };
+    options = { 'width' 80 'stickto' 'on' };
 	if ~isempty(g.helpcom)
-        if ~iscell(g.helpcom)
-            g.uilist = { g.uilist{:}, { 'Style', 'pushbutton', 'string', 'Help', 'callback', g.helpcom } };
+        if ~iscell(g.helpcom) | isempty(g.geom)
+            g.uilist = { g.uilist{:}, { 'width' 80 'align' 'left' 'Style', 'pushbutton', 'string', 'Help', 'callback', g.helpcom } };
         else
-            g.uilist = { g.uilist{:}, { 'Style', 'pushbutton', 'string', 'Help gui', 'callback', g.helpcom{1} } };
-            g.uilist = { g.uilist{:}, { 'Style', 'pushbutton', 'string', 'More help', 'callback', g.helpcom{2} } };
+            g.uilist = { g.uilist{:}, { 'width' 80 'align' 'left' 'Style', 'pushbutton', 'string', 'Help gui', 'callback', g.helpcom{1} } };
+            g.uilist = { g.uilist{:}, { 'width' 80 'align' 'left' 'Style', 'pushbutton', 'string', 'More help', 'callback', g.helpcom{2} } };
             g.geometry{end} = [1 1 1 1];
         end;
 	else
 		g.uilist = { g.uilist{:}, {} };
-	end;   
-	g.uilist = { g.uilist{:}, { 'Style', 'pushbutton', 'tag', 'ok', 'string', 'OK', 'callback', 'set(gcbo, ''userdata'', ''retuninginputui'');' } };
-	if isempty(g.geomvert)
-		[tmp tmp2 allobj] = supergui( fig, g.geometry, [], g.uilist{:} );
+	end;
+	g.uilist = { g.uilist{:}, { 'width' 80 'align' 'right' 'Style', 'pushbutton', 'string', 'Cancel', 'callback', 'close gcbf' } };
+	g.uilist = { g.uilist{:}, { 'width' 80 'align' 'right' 'stickto' 'on' 'Style', 'pushbutton', 'tag', 'ok', 'string', 'OK', 'callback', 'set(gcbo, ''userdata'', ''retuninginputui'');' } };
+    if ~isempty(g.geom)
+		[tmp tmp2 allobj] = supergui( 'fig', fig, 'minwidth', 200, 'geom', g.geom, 'uilist', g.uilist );
+    elseif isempty(g.geomvert)
+		[tmp tmp2 allobj] = supergui( 'fig', fig, 'minwidth', 200, 'geomhoriz', g.geometry, 'uilist', g.uilist );
 	else
-		[tmp tmp2 allobj] = supergui( fig, g.geometry, [g.geomvert(:)' 1 1], g.uilist{:} );
+		[tmp tmp2 allobj] = supergui( 'fig', fig, 'minwidth', 200, 'geomhoriz', g.geometry, 'uilist', g.uilist, 'geomvert', [g.geomvert(:)' 1 1] );
 	end;
 else 
 	fig = g.mode;

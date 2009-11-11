@@ -29,6 +29,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2007/08/07 19:47:23  arno
+% fix bug 377
+%
 % Revision 1.15  2007/08/06 18:48:30  arno
 % same
 %
@@ -95,11 +98,11 @@ fig = figure('visible', 'off');
 set(gcf, 'name', Title);
 
 geometry = {[1]};
-listui = {{ 'Style', 'text', 'string' Prompt }};
+listui = {{ 'Style', 'text', 'string' Prompt } {} };
 
-geometry = { geometry{:} ones(1,length(varargin)-1) };
+geometry = { geometry{:} 1 ones(1,length(varargin)-1) };
 for index = 1:length(varargin)-1 % ignoring default val
-	listui = {listui{:} { 'Style', 'pushbutton', 'string', varargin{index}, 'callback', ['set(gcbf, ''userdata'', ''' varargin{index} ''');'] }  };
+	listui = {listui{:} { 'width' 80 'align' 'center' 'Style', 'pushbutton', 'string', varargin{index}, 'callback', ['set(gcbf, ''userdata'', ''' varargin{index} ''');'] }  };
 	if strcmp(varargin{index}, varargin{end})
 		listui{end}{end+1} = 'fontweight';
 		listui{end}{end+1} = 'bold';
@@ -112,7 +115,8 @@ if cr == 1
 end;
 if cr >= 8, cr = cr-1; end;
 if cr >= 4, cr = cr-1; end;
-[tmp tmp2 allobj] = supergui( fig, geometry, [cr 1], listui{:} );
+[tmp tmp2 allobj] = supergui( 'fig', fig, 'geomhoriz', geometry, 'geomvert', [cr 1 1], 'uilist', listui, ...
+    'borders', [0.02 0.015 0.08 0.06], 'spacing', [0 0], 'horizontalalignment', 'left' );
 
 waitfor( fig, 'userdata');
 try,

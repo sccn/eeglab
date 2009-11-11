@@ -35,6 +35,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2006/09/12 16:37:33  arno
+% Initial revision
+%
 
 function command = pop_eeglab2loreta(EEG, varargin); 
 
@@ -69,7 +72,7 @@ function command = pop_eeglab2loreta(EEG, varargin);
                { 'style' 'text'       'string' 'Export component indices' } ...
                { 'style' 'edit'       'string' [ '1:' num2str(size(EEG.icawinv,2)) ] } ...
                { 'style' 'pushbutton' 'string' 'Plot topo.' 'callback' cb_plotcomps } };
-    geom = { [1 1 0.5] [0.8 0.2 1] [1 1 0.5] [1 1 0.5] };
+    geom = { [1 1 0.5] [0.8 0.25 1] [1 1 0.5] [1 1 0.5] };
     results = inputgui('geometry', geom, 'uilist', listui, 'helpcom', 'pophelp(''pop_eeglab2loreta'')', ...
         'title', 'Export EEG info to LORETA');
     if isempty(results), return; end;

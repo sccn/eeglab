@@ -69,6 +69,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.60  2007/10/18 00:34:41  nima
+% _
+%
 % Revision 1.59  2007/09/25 18:29:54  nima
 % _
 %
@@ -327,12 +330,12 @@ elseif strcmpi(mode, 'gui') % GUI mode
                    'end;' ...
                    'clear filename filepath;' ];
 	
-    texthead = fastif(newstudy, 'Create a new STUDY set', 'Edit STUDY set information');
+    texthead = fastif(newstudy, 'Create a new STUDY set', 'Edit STUDY set information - remember to save changes');
 	guispec = { ...
         {'style' 'text' 'string' texthead 'FontWeight' 'Bold' 'HorizontalAlignment' 'center'} ...
-        {'style' 'text' 'string' 'STUDY set name:' } { 'style' 'edit' 'string' STUDY.name 'tag' 'study_name' } ...
-        {'style' 'text' 'string' 'STUDY set task name:' } { 'style' 'edit' 'string' STUDY.task 'tag' 'study_task' } ...
-        {'style' 'text' 'string' 'STUDY set notes:' } { 'style' 'edit' 'string' STUDY.notes 'tag' 'study_notes' } {}...
+        {} {'style' 'text' 'string' 'STUDY set name:' } { 'style' 'edit' 'string' STUDY.name 'tag' 'study_name' } ...
+        {} {'style' 'text' 'string' 'STUDY set task name:' } { 'style' 'edit' 'string' STUDY.task 'tag' 'study_task' } ...
+        {} {'style' 'text' 'string' 'STUDY set notes:' } { 'style' 'edit' 'string' STUDY.notes 'tag' 'study_notes' } {}...
         {} ...
         {'style' 'text' 'string' 'dataset filename' 'userdata' 'addt'} {'style' 'text' 'string' 'browse' 'userdata' 'addt'} ...
         {'style' 'text' 'string' 'subject'    'userdata' 'addt'} ...
@@ -341,7 +344,7 @@ elseif strcmpi(mode, 'gui') % GUI mode
         {'style' 'text' 'string' 'group'      'userdata' 'addt'} ...
         {'style' 'pushbutton' 'string' 'Select by r.v.' 'userdata' 'addt' 'callback' cb_dipole } ...
         {} };
-	guigeom = { [1] [1 2] [1 2] [1 2] [1] [0.2 1.05 0.35 0.4 0.35 0.6 0.4 0.6 0.3]};
+	guigeom = { [1] [0.2 1 3.5] [0.2 1 3.5] [0.2 1 3.5] [1] [0.2 1.05 0.35 0.4 0.35 0.6 0.4 0.6 0.3]};
 	
     % create edit boxes
     % -----------------
@@ -383,18 +386,15 @@ elseif strcmpi(mode, 'gui') % GUI mode
                 {'style' 'checkbox'   'value'   value_cb 'tag' 'copy_to_dataset' } ...
                 {'style' 'text'       'string'  text1 } ...
                 {'style' 'checkbox'   'value'   0        'tag' 'delclust' 'callback' cb_del } ...
-                {'style' 'text'       'string'  'Delete cluster information (to allow loading new datasets, set new components for clustering, etc.)' } ...
-                {'style' 'text'       'string'  '                 Save this study to a disk file named:'} ...
-                {'style' 'edit'       'string'  ''       'tag' 'studyfile'                        'userdata' 'save'} ...
-                {'style' 'pushbutton' 'string'  '...'    'tag' 'browsesave' 'Callback' browsesave 'userdata' 'save'} {} };
-	guigeom = { guigeom{:} [1] [1 0.2 0.3 0.2 1] [1] [0.14 3] [0.14 3] [1 1.5 0.3] [1]};
+                {'style' 'text'       'string'  'Delete cluster information (to allow loading new datasets, set new components for clustering, etc.)' } };
+	guigeom = { guigeom{:} [1] [1 0.2 0.3 0.2 1] [1] [0.14 3] [0.14 3] };
 
-    if ~isempty(STUDY.filename)
-        guispec{end-3} = {'style' 'checkbox' 'string' '' 'value' 0 'tag' 'studyfile' };
-        guispec{end-2} = {'style' 'text'     'string' 'Re-save STUDY. Uncheck and use menu File > Save study as to save under a new filename'};
-        guispec{end-1} = {};
-        guigeom{end-1} = [0.08 1.5 0.1];
-    end;
+%     if ~isempty(STUDY.filename)
+%         guispec{end-3} = {'style' 'checkbox' 'string' '' 'value' 0 'tag' 'studyfile' };
+%         guispec{end-2} = {'style' 'text'     'string' 'Re-save STUDY. Uncheck and use menu File > Save study as to save under a new filename'};
+%         guispec(end-1) = [];
+%         guigeom{end-1} = [0.14 3];
+%     end;
 	
     fig_arg{1} = ALLEEG;      % datasets         
     fig_arg{2} = datasetinfo; % datasetinfo
@@ -429,11 +429,11 @@ elseif strcmpi(mode, 'gui') % GUI mode
     if ~strcmpi(result{2}, STUDY.task ), options = { options{:} 'task'        result{2} }; end;
     if ~strcmpi(result{3}, STUDY.notes), options = { options{:} 'notes'       result{3} }; end;
     if ~isempty(allcom),                 options = { options{:} 'commands'    allcom    }; end;
-    if isnumeric(outstruct(1).studyfile)
-        if outstruct(1).studyfile == 1,  options = { options{:} 'resave'      'on' }; end;
-    else
-        if ~isempty(outstruct(1).studyfile), options = { options{:} 'filename' outstruct(1).studyfile }; end;
-    end;
+%     if isnumeric(outstruct(1).studyfile)
+%         if outstruct(1).studyfile == 1,  options = { options{:} 'resave'      'on' }; end;
+%     else
+%         if ~isempty(outstruct(1).studyfile), options = { options{:} 'filename' outstruct(1).studyfile }; end;
+%     end;
     if outstruct(1).copy_to_dataset == 1
          options = { options{:} 'updatedat' 'on' };
          eeglab_options;

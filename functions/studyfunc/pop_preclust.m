@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.53  2009/11/04 01:39:30  arno
+% remove the option editor for spectral options
+%
 % Revision 1.52  2009/07/10 00:59:08  arno
 % error if no dataset in STUDY
 %
@@ -305,12 +308,7 @@ if ~isstr(varargin{1}) %intial settings
 	{} {'style' 'pushbutton' 'string' 'Help' 'tag' 'finalDimHelp' 'callback' help_secpca } {} {} {} {} ...
     {} ...
     {'style' 'checkbox'   'string' '' 'tag' 'mpclust' 'Callback' set_mpcluster 'value' 0} ...
-	{'style' 'text'       'string' 'Use Measure Product clustering' 'FontWeight' 'Bold'  } ...
-    {} ...
-    {'style' 'checkbox'   'string' '' 'tag' 'saveSTUDY' 'Callback' saveSTUDY 'value' 0} ...
- 	{'style' 'text'       'string' 'Save STUDY to file' 'FontWeight' 'Bold'  } ...
-    {'style' 'edit'       'string' fullfile(STUDY.filepath, STUDY.filename) 'enable' 'off' 'tag' 'studyfile' 'userdata' 'save'} ...
-	{'style' 'pushbutton' 'string' '...' 'tag' 'browsesave' 'Callback' browsesave 'enable' 'off' 'userdata' 'save'} };
+	{'style' 'text'       'string' 'Use Measure Product clustering' 'FontWeight' 'Bold'  } };
   
 
 %    {'link2lines' 'style'  'text'   'string' '' } {} {} {} ...
@@ -321,10 +319,10 @@ if ~isstr(varargin{1}) %intial settings
 %    {'style' 'text'       'string' 'Do not prepare dataset for clustering at this time.' 'FontWeight' 'Bold'  } {} ...
 
     fig_arg{1} = { ALLEEG STUDY cls };
-    geomline = [0.45 2 1 0.45 1 2 1 2 1 ];
+    geomline = [0.5 2 1 0.5 1 2 1 2 1 ];
     geometry = { [1] [1] [1 1 1] [1] [1] ...
-                 [3] geomline geomline geomline [0.45 2 1 0.45 1 2.9 .1 2.9 .1 ] geomline geomline [1] geomline [1] [.2 5] [1] [0.32 2 5 0.8] };
-    geomvert = [ 1 1 3 1 1 1 1 1 1 1 1 1 0.5 1 1 1 1 1 1];
+                 [3] geomline geomline geomline [0.5 2 1 0.5 1 2.9 .1 2.9 .1 ] geomline geomline [1] geomline [1] [.25 5] };
+    geomvert = [ 1 1 3 1 1 1 1 1 1 1 1 1 0.5 1 1 1];
 
     %if length(show_options) < 3
     %    gui_spec(2:6) = { {} ...
@@ -457,16 +455,16 @@ if ~isstr(varargin{1}) %intial settings
     
     % save updated STUDY to the disk
     % ------------------------------
-    if os.saveSTUDY == 1 
-        if ~isempty(os.studyfile)
-            [filepath filename ext] = fileparts(os.studyfile);
-            STUDY.filename = [ filename ext ];
-            STUDY.filepath = filepath;
-        end;
-        STUDY = pop_savestudy(STUDY, ALLEEG, 'filename', STUDY.filename, 'filepath', STUDY.filepath);
-        com = sprintf('%s\nSTUDY = pop_savestudy(STUDY, ALLEEG, %s);',  com, ...
-                      vararg2str( { 'filename', STUDY.filename, 'filepath', STUDY.filepath }));
-    end
+%     if os.saveSTUDY == 1 
+%         if ~isempty(os.studyfile)
+%             [filepath filename ext] = fileparts(os.studyfile);
+%             STUDY.filename = [ filename ext ];
+%             STUDY.filepath = filepath;
+%         end;
+%         STUDY = pop_savestudy(STUDY, ALLEEG, 'filename', STUDY.filename, 'filepath', STUDY.filepath);
+%         com = sprintf('%s\nSTUDY = pop_savestudy(STUDY, ALLEEG, %s);',  com, ...
+%                       vararg2str( { 'filename', STUDY.filename, 'filepath', STUDY.filepath }));
+%     end
 else
     hdl = varargin{2}; %figure handle
     userdat = get(varargin{2}, 'userdat');    

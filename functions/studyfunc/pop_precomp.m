@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2009/11/04 01:40:13  arno
+% remove timefreq. option already provided by std_ersp
+%
 % Revision 1.18  2009/08/21 18:40:47  arno
 % changing default
 %
@@ -121,15 +124,16 @@ if ~isstr(varargin{1}) %intial settings
     %cb_ica1        = [ 'get(gcbo, ''value''), findobj(gcbf, ''tag'', ''rmica1_on''),' ];
     %cb_ica2        = [ 'get(gcbo, ''value''), findobj(gcbf, ''tag'', ''rmica2_on''),' ];
     
+    geomline = [0.33 6];
     if comps == true
         str_name       = ['Pre-compute component measures for STUDY ''' STUDY.name '''' ];
         guiadd1 = { {'style' 'checkbox'   'string' '' 'tag' 'compallersp' 'value' 1 }  ...
                     {'style' 'text'       'string' 'Compute ERP/spectrum/ERSP only for components selected by RV (set) or for all components (unset)' } };
         guiadd2 = { {'style' 'checkbox'   'string' '' 'tag' 'scalp_on' 'value' 0 }  ...
                     {'style' 'text'       'string' 'Scalp maps' } };
-        geomadd1     = { [0.33 6] };
+        geomadd1     = { geomline };
         geomvertadd1 = [ 1 ];
-        geomadd2     = { [0.33 6] };
+        geomadd2     = { geomline };
     else
         str_name = ['Pre-compute channel measures for STUDY ''' STUDY.name '''' ];
         guiadd1  = { {'style' 'text'       'string' 'Channel list (default:all)' 'FontWeight' 'Bold'} ...
@@ -144,7 +148,7 @@ if ~isstr(varargin{1}) %intial settings
             {'style' 'text'       'string' [ 'Remove artifactual ICA cluster or clusters (hold shift key)' 10 ' ' ] } ...
             {'style' 'listbox'    'string' { STUDY.cluster.name } 'value' 1 'max' 2 } };
         guiadd2 = {};
-        geomadd1 = { [2 3 0.5] [0.33 6] [0.33 6] [0.33 4 2] }; 
+        geomadd1 = { [2 3 0.5] geomline geomline [0.33 4 2] }; 
         geomvertadd1 = [ 1 1 1 2 ];
         geomadd2 = { };
     end;
@@ -170,8 +174,7 @@ if ~isstr(varargin{1}) %intial settings
     {'style' 'checkbox'   'string' '' 'tag' 'itc_on' 'value' 0 'Callback' set_itc } ...
 	{'style' 'text'       'string' 'ITCs' 'horizontalalignment' 'center' } {'link2lines' 'style'  'text'   'string' '' } {} {} {} ...
     guiadd2{:} ...
-    {} {'style' 'checkbox'   'string' '' 'tag' 'recomp_on' 'value' 0 } ...
-	{'style' 'text'       'string' 'Recompute even if present on disk' }
+    {} {'style' 'checkbox'   'string' 'Recompute even if present on disk' 'tag' 'recomp_on' 'value' 0 } {}
     };
   
 	%{'style' 'checkbox'   'string' '' 'tag' 'precomp_PCA'  'Callback' precomp_PCA 'value' 0} ...
@@ -191,9 +194,9 @@ if ~isstr(varargin{1}) %intial settings
     chanlist = {};
     firsttimeersp = 1;
     fig_arg = { ALLEEG STUDY allchans chanlist firsttimeersp };
-    geomline = [0.45 1 0.3 2 3 0.7 ];
-    geometry = { [1] [1] geomadd1{:}  [1] [1] [0.40 1.5 0.3 2 2 0.65 ] [0.40 1.5 0.3 2 2 0.65 ] geomline geomline geomadd2{:} 1 [0.05 1] };
-    geomvert = [ 1 0.5 geomvertadd1 0.5 1 1 1 1 1 1 fastif(length(geomadd2) == 1,1,[]) 1 1];
+    geomline = [0.45 1 0.8 2 3 0.78 ];
+    geometry = { [1] [1] geomadd1{:}  [1] [1] [0.40 1.5 0.3 2 2 0.65 ] [0.40 1.5 0.3 2 2 0.65 ] geomline geomline geomadd2{:} 1 [1 0.1] };
+    geomvert = [ 1 0.5 geomvertadd1 0.5 1 1 1 1 1 1 fastif(length(geomadd2) == 1,1,[]) 1];
 	[precomp_param, userdat2, strhalt, os] = inputgui( 'geometry', geometry, 'uilist', gui_spec, 'geomvert', geomvert, ...
                                                       'helpcom', ' pophelp(''std_precomp'')', ...
                                                       'title', 'Select and compute component measures for later clustering -- pop_precomp()', ...

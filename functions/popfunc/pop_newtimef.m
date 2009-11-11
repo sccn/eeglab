@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.41  2009/05/10 04:10:00  arno
+% newtimef and pop_newtimef interface
+%
 % Revision 1.40  2007/08/21 01:23:42  arno
 % default padratio is now 1
 %
@@ -201,7 +204,7 @@ if popup
 	[txt vars] = gethelpvar('newtimef.m');
 	
     g = [1 0.3 0.6 0.34];
-	geometry = { g g g g g g g g [1 1.27] [1] [1.2 1 1.2]};
+	geometry = { g g g g g g g g [1.025 1.27] [1] [1.2 1 1.2]};
     uilist = { ...
                { 'Style', 'text', 'string', fastif(typeproc, 'Channel number', 'Component number'), 'fontweight', 'bold'  } ...
 			   { 'Style', 'edit', 'string', getkeyval(lastcom,3,[],'1') 'tag' 'chan'} {} {} ...

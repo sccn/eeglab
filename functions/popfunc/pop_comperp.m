@@ -88,6 +88,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.41  2009/09/27 01:02:07  arno
+% Added check to pop_comperp
+%
 % Revision 1.40  2008/11/13 00:18:43  arno
 % fix ttest for subset of channel
 %
@@ -228,8 +231,8 @@ allcolors = { 'b' 'r' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b
               'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm'};
 erp1 = '';
 if nargin < 3
-    gtmp = [1.1 0.8 .18 .18 .18 0.1]; gtmp2 = [1.48 1.07 0.93];
-    uigeom = { [2.6 0.95] gtmp gtmp gtmp [1] gtmp2 gtmp2 [1.48 0.21 1.79] gtmp2 [0.6 0.5 0.9] };
+    gtmp = [1.1 0.8 .21 .21 .21 0.1]; gtmp2 = [1.48 1.03 1];
+    uigeom = { [2.6 0.95] gtmp gtmp gtmp [1] gtmp2 gtmp2 [1.48 0.25 1.75] gtmp2 gtmp2 };
     commulcomp= ['if get(gcbo, ''value''),' ...
                  '    set(findobj(gcbf, ''tag'', ''multcomp''), ''enable'', ''on'');' ...
                  'else,' ...
@@ -261,8 +264,9 @@ if nargin < 3
 	           { 'style' 'text' 'string' 'Low pass (Hz) (for display only)' } ...
                { 'style' 'edit' 'string' '' } { } ...
                { 'style' 'text' 'string' 'Plottopo options (''key'', ''val''):' } ...
+               { 'style' 'edit' 'string' '''ydir'', -1' } ...
                { 'style' 'pushbutton' 'string' 'Help' 'callback', 'pophelp(''plottopo'')' } ...
-               { 'style' 'edit' 'string' '''ydir'', -1' }};
+               };
     
     % remove geometry textbox for ICA components
     result = inputgui( uigeom, uilist, 'pophelp(''pop_comperp'')', 'ERP grand average/RMS - pop_comperp()');

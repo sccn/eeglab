@@ -72,6 +72,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.48  2009/10/22 21:08:54  arno
+% Change the eeg_option framework for better consistency
+%
 % Revision 1.47  2009/08/04 04:44:22  arno
 % All functions necessary for compiling EEGLAB code
 %
@@ -350,8 +353,8 @@ if nargin < 2
     uilist = { uilist{:} {} ...
                  { 'Style', 'text', 'string', 'Option file:' 'fontweight', 'bold' }, ...
                  { 'Style', 'text', 'string', tmpfile 'tag' 'filename'  }, ...
-                 { 'Style', 'pushbutton', 'string', '...'  'callback' cb_file } {} };
-    geometry = { geometry{:} [1] [1 6 0.5 0.5] };
+                 {} { 'Style', 'pushbutton', 'string', '...'  'callback' cb_file } };
+    geometry = { geometry{:} [1] [1 6 0.1 0.8] };
     [results userdat ] = inputgui( geometry, uilist, 'pophelp(''pop_editoptions'');', 'Memory options - pop_editoptions()', ...
                         [], 'normal');
     if ~isempty(userdat)

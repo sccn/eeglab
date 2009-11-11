@@ -48,6 +48,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2009/04/08 21:41:19  julie
+% fix norm
+%
 % Revision 1.3  2009/04/08 21:38:09  julie
 % Fix threshold and measure
 %
@@ -80,7 +83,7 @@ if nargin < 2
                { 'style' 'checkbox' 'string' '' 'value' 1 } { } ...
                { 'style' 'text' 'string' 'Threshold limits [max]:' } ...
                { 'style' 'edit' 'string' '5' } };
-    geom = { [2 1] [2 1] [2 0.2 0.8] [2 1] };
+    geom = { [2 1] [2 1] [2 0.3 0.7] [2 1] };
     result = inputgui( 'uilist', uilist, 'geometry', geom, 'title', 'Reject channel -- pop_rejchan()', ...
         'helpcom', 'pophelp(''pop_rejchan'')');
     if isempty(result), return; end;

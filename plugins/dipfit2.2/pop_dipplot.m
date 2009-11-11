@@ -67,6 +67,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.40  2007/08/09 23:15:21  arno
+% error
+%
 % Revision 1.39  2007/01/26 18:19:52  arno
 % CTF implementation
 %
@@ -213,8 +216,8 @@ if nargin < 2
                     'end;' ...
                     'clear filename filepath tagtest;' ];
     
-    geometry = { [2 1] [2 1] [0.8 0.3 1.5] [2.05 0.23 .75] [2.05 0.23 .75] [2.05 0.23 .75] ...
-                 [2.05 0.23 .75] [2.05 0.23 .75] [2.05 0.23 .75] [2.05 0.23 .75] [2 1] };
+    geometry = { [2 1] [2 1] [0.8 0.3 1.5] [2.05 0.26 .75] [2.05 0.26 .75] [2.05 0.26 .75] ...
+                 [2.05 0.26 .75] [2.05 0.26 .75] [2.05 0.26 .75] [2.05 0.26 .75] [2 1] };
     uilist = { { 'style' 'text' 'string' 'Components indices ([]=all avaliable)' } ...
                { 'style' 'edit' 'string' '' } ...
                { 'style' 'text' 'string' 'Plot dipoles within RV (%) range ([min max])' } ...

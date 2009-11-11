@@ -25,6 +25,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2007/02/20 14:24:26  arno
+% Initial revision
+%
 
 res = 0;
 
@@ -38,5 +41,6 @@ if ~option_storedisk
                    'NOTE that this is a REQUIRED step to load the tutorial study since it does not', ...
                    'contain the EEG data.', ' ');
     
-    warndlg2(text, 'Study warning');
+    res = questdlg2(text, 'Study warning', 'Cancel', 'Ok', 'Ok');
+    if strcmpi(res, 'Cancel'), break; return; end;
 end;

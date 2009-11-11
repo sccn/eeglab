@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.39  2007/10/25 18:32:56  nima
+% _
+%
 % Revision 1.38  2007/08/07 19:18:14  arno
 % fixe bug 343
 %
@@ -49,7 +52,7 @@
 % fix bug 344
 %
 % Revision 1.36  2006/07/05 22:15:16  arno
-% bug if only channel labels[D[D[D[D[D[D[D[D[D[D[D[D[D[D
+% bug if only channel labels
 %
 % Revision 1.35  2006/01/31 20:17:27  arno
 % options
