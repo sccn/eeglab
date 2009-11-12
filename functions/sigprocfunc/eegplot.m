@@ -175,6 +175,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.140  2009/11/01 02:03:44  arno
+% Added submean menu
+%
 % Revision 1.139  2009/10/20 02:32:07  arno
 % Now accept windows for continuous rejection from eeg_eegrej
 %
@@ -1136,7 +1139,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
            'representing event duration']);
   end;
   if isfield(g.events, 'duration')
-      uimenu('Parent',m(1),'Label','Hide event duration','Callback', ...
+      uimenu('Parent',m(1),'Label',fastif(g.ploteventdur, 'Hide event duration', 'Plot event duration'),'Callback', ...
              ['g = get(gcbf, ''userdata'');' ...
               'if ~g.ploteventdur' ... 
               '  set(gcbo, ''label'', ''Hide event duration'');' ...
