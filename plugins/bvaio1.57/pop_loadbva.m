@@ -148,27 +148,31 @@ function [EEG, com] =  pop_loadbva(filename)
     index = 0;
     for index1 = 1:size(bva.Markers,1)
         for index2 = 0:size(bva.Markers,2)-1
-            index = index + 1;
-            EEG.event(index).type        = bva.Markers(index2*size(bva.Markers,1)+index1).Type;
-            EEG.event(index).latency     = bva.Markers(index2*size(bva.Markers,1)+index1).Position;
-            EEG.event(index).points      = bva.Markers(index2*size(bva.Markers,1)+index1).Points;
-            try
-                EEG.event(index).description = bva.Markers(index2*size(bva.Markers,1)+index1).Description;
-            catch, end;
-            try
-                EEG.event(index).chan        = bva.Markers(index2*size(bva.Markers,1)+index1).Chan;
-            catch, end;
-            try
-                EEG.event(index).channelnumber = bva.Markers(index2*size(bva.Markers,1)+index1).ChannelNumber;
-            catch, end;
-            if bva.SegmentCount > 1
-                EEG.event(index).epoch       = index1;
-                EEG.event(index).latency     = bva.Markers(index2*size(bva.Markers,1)+index1).Position+(index1-1)*EEG.pnts;
-            else
+            if ~isempty(bva.Markers(index2*size(bva.Markers,1)+index1).Description)
+                index = index + 1;
+                EEG.event(index).type        = bva.Markers(index2*size(bva.Markers,1)+index1).Description;
                 EEG.event(index).latency     = bva.Markers(index2*size(bva.Markers,1)+index1).Position;
+                EEG.event(index).Points      = bva.Markers(index2*size(bva.Markers,1)+index1).Points;
+                try
+                    EEG.event(index).bvatype     = bva.Markers(index2*size(bva.Markers,1)+index1).Type;     
+                    EEG.event(index).description = bva.Markers(index2*size(bva.Markers,1)+index1).Description;                
+                catch, end;
+                try
+                    EEG.event(index).chan        = bva.Markers(index2*size(bva.Markers,1)+index1).Chan;
+                catch, end;
+                try
+                    EEG.event(index).channelnumber = bva.Markers(index2*size(bva.Markers,1)+index1).ChannelNumber;
+                catch, end;
+                if bva.SegmentCount > 1
+                    EEG.event(index).epoch       = index1;
+                    EEG.event(index).latency     = bva.Markers(index2*size(bva.Markers,1)+index1).Position+(index1-1)*EEG.pnts;
+                else
+                    EEG.event(index).latency     = bva.Markers(index2*size(bva.Markers,1)+index1).Position;
+                end;
             end;
         end;
     end;
     EEG = eeg_checkset(EEG, 'makeur');
+    EEG = eeg_checkset(EEG, 'eventconsistency');
     
     com = sprintf('EEG = pop_loadbva(''%s'');', filename);

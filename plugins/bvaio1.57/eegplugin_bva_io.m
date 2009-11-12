@@ -32,7 +32,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Id: eegplugin_bva_io.m,v 1.1 2009-01-30 03:49:00 arno Exp $
+% $Id: eegplugin_bva_io.m,v 1.1 2009-11-12 01:51:14 arno Exp $
 
 function vers = eegplugin_bva_io(fig, trystrs, catchstrs)
 

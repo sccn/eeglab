@@ -110,7 +110,7 @@ fprintf(fid1, '; Data orientation: VECTORIZED=ch1,pt1, ch1,pt2..., MULTIPLEXED=c
 fprintf(fid1, 'DataOrientation=VECTORIZED\n');
 fprintf(fid1, 'DataType=TIMEDOMAIN\n');
 fprintf(fid1, 'NumberOfChannels=%d\n', EEG.nbchan);
-fprintf(fid1, 'DataPoints=\n', EEG.pnts*EEG.trials);
+fprintf(fid1, 'DataPoints=%d\n', EEG.pnts*EEG.trials);
 fprintf(fid1, '; Sampling interval in microseconds if time domain (convert to Hertz:\n');
 fprintf(fid1, '; 1000000 / SamplingInterval) or in Hertz if frequency domain:\n');
 fprintf(fid1, 'SamplingInterval=%d\n', 1000000/EEG.srate);
