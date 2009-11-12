@@ -31,7 +31,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Id: readbvconf.m,v 1.1 2009-11-12 01:51:14 arno Exp $
+% $Id: readbvconf.m,v 1.2 2009-11-12 01:59:44 arno Exp $
 
 function CONF = readbvconf(pathname, filename)
 
@@ -42,7 +42,10 @@ end
 % Open and read file
 [IN, message] = fopen(fullfile(pathname, filename));
 if IN == -1
-    error(message);
+    [IN, message] = fopen(fullfile(pathname, lower(filename)));
+    if IN == -1
+        error(message)
+    end;
 end
 raw={};
 while ~feof(IN)
