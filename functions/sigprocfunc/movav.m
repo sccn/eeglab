@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2007/09/11 10:33:16  arno
+% && -> &
+%
 % Revision 1.27  2007/03/08 17:22:54  scott
 % removed 'debugit' printing and variable -sm
 %
@@ -222,7 +225,7 @@ end
 
 wlen = 1;  % default;
 if flag_fastave==0
-  if length(xwin)==1 & xwin ~=0,  % should be a vector or 0
+  if length(xwin)==1 & (xwin~=0) & (xwin~=1),  % should be a vector or 0
     error('xwin not vector or 0');
   elseif size(xwin,1)>1 & size(xwin,2)>1 % not a matrix
     error('xwin cannot be a matrix'); 
