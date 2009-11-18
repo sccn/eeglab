@@ -27,6 +27,12 @@ function std_savedat( tmpfile, structure)
     delims = find( tmpfile == '.');
     structure.datafile = [ tmpfile(1:delims(end)-1) '.set' ];
     v = version;
+    
+    % fix reading problem (bug 764)
+    tmpfile2  = which(tmpfile);
+    if isempty(tmpfile2), tmpfile2 = tmpfile; end;    
+    tmpfile = tmpfile2;
+    
     if v(1) > '6'
         save('-v6' , tmpfile, '-struct', 'structure');
     else
