@@ -74,6 +74,9 @@
 % 5/06/04 completed the function -sm
 %
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2007/03/08 15:31:00  scott
+% error msgs -sm
+%
 % Revision 1.14  2005/11/01 15:58:33  scott
 % fixed apparent bug in assigning trglt (was evlt); allowed target and neighbor strings
 % improved help message; turned off debug_print  -sm
@@ -345,12 +348,22 @@ if ~strcmp(EEG.event(evidx).type,'boundary')       % ignore boundary events (no 
               ep = EEG.event(evidx).epoch(z);
               for e = 1:length(EEG.epoch(ep).event) % for each event in the epoch
                 if EEG.epoch(ep).event(e) == evidx  % if current event
-                  if length(EEG.epoch(ep).eventlatency{e}) == 1  
-                    trglt = EEG.epoch(ep).eventlatency{e};    % get its epoch latency 
+                    % js : added the if ~iscell loop
+                  if ~iscell(EEG.epoch(ep).eventlatency) % i.e. not more than 1 eventtype in the epoch
+                    if length(EEG.epoch(ep).eventlatency(e)) == 1
+                      trglt = EEG.epoch(ep).eventlatency(e);    % get its epoch latency
+                    else
+                      trglt = EEG.epoch(ep).eventlatency(1); % this shouldn't happen
+                      fprintf('EEG.epoch(%d).eventlatency(%d) length > 1 ??\n',ep,e);
+                    end
                   else
-                    trglt = EEG.epoch(ep).eventlatency{e}(1); % this shouldn't happen
-                    fprintf('EEG.epoch(%d).eventlatency{%d} length > 1 ??\n',ep,e);
-                  end;
+                    if length(EEG.epoch(ep).eventlatency{e}) == 1  
+                      trglt = EEG.epoch(ep).eventlatency{e};    % get its epoch latency 
+                    else
+                      trglt = EEG.epoch(ep).eventlatency{e}(1); % this shouldn't happen
+                      fprintf('EEG.epoch(%d).eventlatency{%d} length > 1 ??\n',ep,e);
+                    end;
+                  end
                   if trglt == 0
                       targepochs(targetcount) = ep;
                       is0epoch = 1;
