@@ -61,6 +61,12 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2009/11/17 23:16:40  nima
+% plotrad option added by nima
+%
+% Revision 1.27  2007/10/24 19:04:27  nima
+% subjects are moved in fron tof ICs in figure titles.
+%
 % Revision 1.26  2007/08/14 19:29:10  nima
 % _
 %
@@ -127,6 +133,8 @@ for k = 3:2:nargin
             if strcmpi(varargin{k-1},'off')
                 figureon = 0;
             end
+        case 'plotrad'
+            inputPlotrad = varargin{k-1};
     end
 end
         
