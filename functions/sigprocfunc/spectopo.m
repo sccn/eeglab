@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.114  2008/11/13 00:06:45  arno
+% fix epoch subset
+%
 % Revision 1.113  2008/04/27 15:43:04  arno
 % fix bounadry issue
 %
@@ -502,7 +505,7 @@ if nargin <= 3 | isstr(varargin{1})
 				  'limits'        'real'     []                       [nan nan nan nan nan nan];
 				  'freqfac'       'integer'  []                        FREQFAC;
 				  'percent'       'real'     [0 100]                  100 ;
-				  'reref'         'string'   { 'averef' 'no' }         'no' ;
+				  'reref'         'string'   { 'averef' 'off' 'no' }  'off' ;
 				  'boundaries'    'integer'  []                       [] ;
 				  'nfft'          'integer'  [1 Inf]                  [] ;
 				  'winsize'       'integer'  [1 Inf]                  [] ;
@@ -559,7 +562,7 @@ else
 	else              g.percent = 100;
 	end;
 	if nargin > 10,    g.reref = 'averef';
-	else               g.reref = 'no';
+	else               g.reref = 'off';
 	end;
 	g.weights = [];
 	g.icamaps = [];
@@ -681,11 +684,11 @@ else
             fprintf('\n'); % log below
         else
             fprintf('Computing spectra at specified channel')
-            g.reref = 'no';
+            g.reref = 'off';
             [eegspecdB freqs specstd] = spectcomp( data(g.plotchan,:), frames, srate, epoch_subset, g);
             fprintf('\n'); % log below
         end;
-        g.reref = 'no';
+        g.reref = 'off';
 
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % select channels and spectra
