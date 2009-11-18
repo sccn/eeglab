@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.546  2009/11/04 01:35:21  arno
+% remove menu for plot rect. array
+%
 % Revision 1.545  2009/10/22 21:08:54  arno
 % Change the eeg_option framework for better consistency
 %
@@ -2078,6 +2081,7 @@ catchstrs.new_non_empty          = e_newset;
             try,
                 addpath(path_biosig);
                 addpath([ path_biosig filesep 't200' ]);
+                addpath([ path_biosig filesep 't250' ]);
                 % addpath([ p 'external' filesep 'biosig' filesep 't500' ]); % topoplot conflict
                 version = [ path_biosig filesep 'VERSION' ];
                 version = loadtxt(version, 'convert', 'off', 'verbose', 'off');
