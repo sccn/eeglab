@@ -74,6 +74,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.60  2009/11/11 00:28:53  arno
+% New GUI format
+%
 % Revision 1.59  2009/04/22 20:55:46  arno
 % update pop_selectevents for better GUI
 %
@@ -331,7 +334,7 @@ if nargin<2
     geometry = { geometry{:} [1] [1] [.1 2 .3 .2] [.1 1.5 0.5 0.5]  [.1 1 0.5 1] [.1 1 0.5 1] };
     uilist = { uilist{:} { } ...
                 { 'Style', 'text', 'string','Event selection', 'fontweight', 'bold' } ...
-                {} { 'Style', 'checkbox', 'string','Select all events NOT selected above (Set this button and "all BUT" buttons (above) for logical OR)' } { } { } ...
+                {} { 'Style', 'checkbox', 'string','Select all events NOT selected above (Set this button and "all BUT" buttons (above) for logical OR)' 'tag' 'invertevent' } { } { } ...
                 {} { 'Style', 'checkbox', 'string','Keep only selected events and remove all other events', ...
                 'value', fastif(EEG.trials>1, 0, 1) 'tag' 'rmevents' } { } { } ...
                 {} { 'Style', 'text', 'string', 'Rename selected event type(s) as type:' } ...
@@ -363,7 +366,7 @@ if nargin<2
     for index = 1:length(allfields)
         textfield = allfields{index};
         tmpflag = getfield(res, [ 'not' textfield ]);
-        if strcmpi(textfield, 'duration') | strcmpi(textfield, 'latency') 
+        if strcmp(textfield, 'duration') | strcmp(textfield, 'latency') 
             tmpres = [];
             minlat = getfield(res, [ 'min' textfield ]);
             maxlat = getfield(res, [ 'max' textfield ]);
