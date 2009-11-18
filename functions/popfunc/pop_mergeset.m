@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.48  2009/11/11 03:29:42  arno
+% update GUI
+%
 % Revision 1.47  2009/07/01 20:49:14  arno
 % fixe mergin datasets with dissimuilar event structures
 %
@@ -362,8 +365,8 @@ else % INEEG is an EEG struct
         % ensure similar event structures
         % -------------------------------
         if ~isempty(INEEG2.event)
-            fields1 = lower(fieldnames(INEEG1.event));
-            fields2 = lower(fieldnames(INEEG2.event));
+            fields1 = fieldnames(INEEG1.event);
+            fields2 = fieldnames(INEEG2.event);
             if length(fields1) > length(fields2)
                 for index = 1:length(fields1)
                     if isempty(strmatch(fields1{index}, fields2))
