@@ -142,6 +142,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.187  2009/11/11 03:27:54  arno
+% GUI aspect
+%
 % Revision 1.186  2009/11/11 00:28:53  arno
 % New GUI format
 %
@@ -1164,7 +1167,11 @@ else
                 for index = 1:length( allfields )
                     chans = setfield(chans, {num}, allfields{index}, tmpargs{index+1});
                 end;
-                
+                if isfield(chans, 'datachan')
+                    if isempty(chans(num).datachan)
+                        chans(num).datachan = 0;
+                    end;
+                end;
             case 'changechan'
                 tmpargs = args{ curfield+1 };
                 num = tmpargs{1};
@@ -1217,9 +1224,6 @@ else
                         chaninfo = [];
                         chaninfo.filename = tmpargs{1};
                     end;
-                    for ind = 1:length(chans)
-                        chans(ind).datachan = 1;
-                    end;
                     
                     % backup file content etc...
                     % --------------------------
@@ -1234,7 +1238,10 @@ else
                     end;
                 end;
                 if ~isfield(chans, 'datachan')
-                    for index = 1:length(chans)
+                    chans(1).datachan = [];
+                end;
+                for index = 1:length(chans)
+                    if isempty(chans(index).datachan)
                         chans(index).datachan = 1;
                     end;
                 end;
@@ -1289,8 +1296,73 @@ else
                     error('Wrong value for nose direction');
                 end;
                 
-            case 'lookup'
-                chaninfo.filename = args{ curfield+1 };
+            case { 'lookup' 'lookupgui' }
+                if strcmpi(lower(args{curfield}), 'lookupgui')
+                    standardchans = { 'Fp1' 'Fpz' 'Fp2' 'Nz' 'AF9' 'AF7' 'AF3' 'AFz' 'AF4' 'AF8' 'AF10' 'F9' 'F7' 'F5' ...
+                        'F3' 'F1' 'Fz' 'F2' 'F4' 'F6' 'F8' 'F10' 'FT9' 'FT7' 'FC5' 'FC3' 'FC1' 'FCz' 'FC2' ...
+                        'FC4' 'FC6' 'FT8' 'FT10' 'T9' 'T7' 'C5' 'C3' 'C1' 'Cz' 'C2' 'C4' 'C6' 'T8' 'T10' ...
+                        'TP9' 'TP7' 'CP5' 'CP3' 'CP1' 'CPz' 'CP2' 'CP4' 'CP6' 'TP8' 'TP10' 'P9' 'P7' 'P5' ...
+                        'P3' 'P1' 'Pz' 'P2' 'P4' 'P6' 'P8' 'P10' 'PO9' 'PO7' 'PO3' 'POz' 'PO4' 'PO8' 'PO10' ...
+                        'O1' 'Oz' 'O2' 'O9' 'O10' 'CB1' 'CB2' 'Iz' };
+                    [tmp1 ind1 ind2] = intersect( lower(standardchans), lower({ chans.labels }));
+                    if ~isempty(tmp1) | isfield(chans, 'theta')
+
+                        % finding template location files
+                        % -------------------------------
+                        setmodel = [ 'tmpdat = get(gcbf, ''userdata'');' ...
+                            'tmpval = get(gcbo, ''value'');' ...
+                            'set(findobj(gcbf, ''tag'', ''elec''), ''string'', tmpdat{tmpval});' ...
+                            'clear tmpval tmpdat;' ];
+                        try
+                            EEG = eeg_emptyset; % for dipfitdefs
+                            dipfitdefs;
+                            userdatatmp = { template_models(1).chanfile template_models(2).chanfile };
+                            clear EEG;
+                        catch, userdatatmp = { 'Standard-10-5-Cap385.sfp' 'Standard-10-5-Cap385.sfp' };
+                        end;
+
+                        % other commands for help/load
+                        % ----------------------------
+                        comhelp = [ 'warndlg2(strvcat(''The template file depends on the model'',' ...
+                            '''you intend to use for dipole fitting. The default file is fine for'',' ...
+                            '''spherical model.'');' ];
+                        commandload = [ '[filename, filepath] = uigetfile(''*'', ''Select a text file'');' ...
+                            'if filename ~=0,' ...
+                            '   set(findobj(''parent'', gcbf, ''tag'', ''elec''), ''string'', [ filepath filename ]);' ...
+                            'end;' ...
+                            'clear filename filepath tagtest;' ];
+                        if ~isfield(chans, 'theta'),                    message =1;
+                        elseif all(cellfun('isempty', {chans.theta })), message =1;
+                        else                                            message =2;
+                        end;
+                        if message == 1
+                            textcomment = strvcat('Only channel labels are present currently, but some of these labels have known', ...
+                                'positions. Do you want to look up coordinates for these channels using the electrode', ...
+                                'file below? If you have a channel location file for this dataset, press cancel, then', ...
+                                'use button "Read location" in the following gui. If you do not know, just press OK.');
+                        else
+                            textcomment = strvcat('Some channel labels may have known locations.', ...
+                                'Do you want to look up coordinates for these channels using the electrode', ...
+                                'file below? If you do not know, press OK.');
+                        end;
+                        uilist = { { 'style' 'text' 'string' textcomment } ...
+                            { 'style' 'popupmenu'  'string' [ 'use BESA file for 4-shell dipfit spherical model' ...
+                            '|use MNI coordinate file for BEM dipfit model' ] ...
+                            'callback' setmodel } ...
+                            { } ...
+                            { 'style' 'edit'       'string' userdatatmp{1} 'tag' 'elec' } ...
+                            { 'style' 'pushbutton' 'string' '...' 'callback' commandload } };
+
+                        res = inputgui( { 1 [1 0.3] [1 0.3] }, uilist, 'pophelp(''pop_chanedit'')', 'Look up channel locations?', userdatatmp, 'normal', [4 1 1] );
+                        if ~isempty(res)
+                            chaninfo.filename = res{2};
+                        else
+                            return;
+                        end;
+                    end;
+                else    
+                    chaninfo.filename = args{ curfield+1 };
+                end;
                 if strcmpi(chaninfo.filename, 'standard-10-5-cap385.elp')
                     dipfitdefs;
                     chaninfo.filename = template_models(1).chanfile;
@@ -1301,7 +1373,7 @@ else
                 tmplocs = readlocs( chaninfo.filename, 'defaultelp', 'BESA' );
                 [tmp ind1 ind2] = intersect(lower({ tmplocs.labels }), lower({ chans.labels }));
                 if ~isempty(tmp)
-                    chans = struct('labels', { chans.labels });
+                    chans = struct('labels', { chans.labels }, 'datachan', { chans.datachan });
                     [ind2 ind3] = sort(ind2);
                     ind1 = ind1(ind3);
                     
@@ -1336,72 +1408,6 @@ else
                 for index = 1:length(chans)
                     chans(index).urchan    = index;
                     chans(index).ref       = '';
-                    chans(index).datachan  = 1;
-                end;
-                
-            case 'lookupgui'
-                standardchans = { 'Fp1' 'Fpz' 'Fp2' 'Nz' 'AF9' 'AF7' 'AF3' 'AFz' 'AF4' 'AF8' 'AF10' 'F9' 'F7' 'F5' ...
-                    'F3' 'F1' 'Fz' 'F2' 'F4' 'F6' 'F8' 'F10' 'FT9' 'FT7' 'FC5' 'FC3' 'FC1' 'FCz' 'FC2' ...
-                    'FC4' 'FC6' 'FT8' 'FT10' 'T9' 'T7' 'C5' 'C3' 'C1' 'Cz' 'C2' 'C4' 'C6' 'T8' 'T10' ...
-                    'TP9' 'TP7' 'CP5' 'CP3' 'CP1' 'CPz' 'CP2' 'CP4' 'CP6' 'TP8' 'TP10' 'P9' 'P7' 'P5' ...
-                    'P3' 'P1' 'Pz' 'P2' 'P4' 'P6' 'P8' 'P10' 'PO9' 'PO7' 'PO3' 'POz' 'PO4' 'PO8' 'PO10' ...
-                    'O1' 'Oz' 'O2' 'O9' 'O10' 'CB1' 'CB2' 'Iz' };
-                [tmp1 ind1 ind2] = intersect( lower(standardchans), lower({ chans.labels }));
-                if ~isempty(tmp1) | isfield(chans, 'theta')
-                    
-                    % finding template location files
-                    % -------------------------------
-                    setmodel = [ 'tmpdat = get(gcbf, ''userdata'');' ...
-                        'tmpval = get(gcbo, ''value'');' ...
-                        'set(findobj(gcbf, ''tag'', ''elec''), ''string'', tmpdat{tmpval});' ...
-                        'clear tmpval tmpdat;' ];
-                    try
-                        EEG = eeg_emptyset; % for dipfitdefs
-                        dipfitdefs;
-                        userdatatmp = { template_models(1).chanfile template_models(2).chanfile };
-                        clear EEG;
-                    catch, userdatatmp = { 'Standard-10-5-Cap385.sfp' 'Standard-10-5-Cap385.sfp' };
-                    end;
-                    
-                    % other commands for help/load
-                    % ----------------------------
-                    comhelp = [ 'warndlg2(strvcat(''The template file depends on the model'',' ...
-                        '''you intend to use for dipole fitting. The default file is fine for'',' ...
-                        '''spherical model.'');' ];
-                    commandload = [ '[filename, filepath] = uigetfile(''*'', ''Select a text file'');' ...
-                        'if filename ~=0,' ...
-                        '   set(findobj(''parent'', gcbf, ''tag'', ''elec''), ''string'', [ filepath filename ]);' ...
-                        'end;' ...
-                        'clear filename filepath tagtest;' ];
-                    if ~isfield(chans, 'theta'),                    message =1;
-                    elseif all(cellfun('isempty', {chans.theta })), message =1;
-                    else                                            message =2;
-                    end;
-                    if message == 1
-                        textcomment = strvcat('Only channel labels are present currently, but some of these labels have known', ...
-                            'positions. Do you want to look up coordinates for these channels using the electrode', ...
-                            'file below? If you have a channel location file for this dataset, press cancel, then', ...
-                            'use button "Read location" in the following gui. If you do not know, just press OK.');
-                    else
-                        textcomment = strvcat('Some channel labels may have known locations.', ...
-                            'Do you want to look up coordinates for these channels using the electrode', ...
-                            'file below? If you do not know, press OK.');
-                    end;
-                    uilist = { { 'style' 'text' 'string' textcomment } ...
-                        { 'style' 'popupmenu'  'string' [ 'use BESA file for 4-shell dipfit spherical model' ...
-                        '|use MNI coordinate file for BEM dipfit model' ] ...
-                        'callback' setmodel } ...
-                        { } ...
-                        { 'style' 'edit'       'string' userdatatmp{1} 'tag' 'elec' } ...
-                        { 'style' 'pushbutton' 'string' '...' 'callback' commandload } };
-                    
-                    res = inputgui( { 1 [1 0.3] [1 0.3] }, uilist, 'pophelp(''pop_chanedit'')', 'Look up channel locations?', userdatatmp, 'normal', [4 1 1] );
-                    if ~isempty(res)
-                        [chans chaninfo] = pop_chanedit(chans, chaninfo, 'lookup', res{2} );
-                        args = { 'lookup', res{2} };
-                    else
-                        args = {};
-                    end;
                 end;
         end;
     end;
@@ -1423,7 +1429,7 @@ if ~isempty(fig)
     allfields = fieldnames(chans);
     for index = 1:length(allfields)
         obj = findobj(fig, 'tag', [ 'chanedit' allfields{index}]);
-        if strcmpi(allfields{index}, 'datachan')
+        if strcmpi(allfields{index}, 'datachan') 
             set(obj, 'value', getfield(chans(currentpos), allfields{index}));
         else
             set(obj, 'string', num2str(getfield(chans(currentpos), allfields{index})));
