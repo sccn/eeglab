@@ -71,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.50  2009/08/21 01:11:24  arno
+% fix eventindices selection
+%
 % Revision 1.49  2007/03/20 02:59:50  arno
 % fixed Toby's code
 %
@@ -285,7 +288,7 @@ if nargin < 3
 				   'end;' ...
 				   'clear tmps tmpv tmpstr tmpfieldnames;' ];
    
-   geometry = { [2 1 0.5] [2 1 0.5] [1.93 1.5] [2 1 0.5] };
+   geometry = { [2 1 0.5] [2 1 0.5] [2 1.5] [2 1 0.5] };
    uilist = { { 'style' 'text'       'string' 'Time-locking event type(s) ([]=all)' } ...
               { 'style' 'edit'       'string' '' 'tag' 'events' } ...
               { 'style' 'pushbutton' 'string' '...' 'callback' cbevent } ...
