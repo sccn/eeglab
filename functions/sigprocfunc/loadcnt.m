@@ -59,6 +59,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2009/07/03 21:28:26  arno
+% add comment
+%
 % Revision 1.33  2009/07/02 21:55:10  arno
 % show warning for bug 661
 %
@@ -104,7 +107,7 @@
 function [f,lab,ev2p] = loadcnt(filename,varargin)
 
 if ~isempty(varargin)
-	 r=struct(varargin{:});
+         r=struct(varargin{:});
 else r = []; 
 end;
 
@@ -485,7 +488,7 @@ if type == 'cnt'
               dat = zeros( h.nchannels, r.ldnsamples);
               dat(:, 1:h.channeloffset) = fread(fid, [h.channeloffset h.nchannels], r.dataformat)';
 
-              counter = 1;	
+              counter = 1;      
               while counter*h.channeloffset < r.ldnsamples
                   dat(:, counter*h.channeloffset+1:counter*h.channeloffset+h.channeloffset) = ...
                       fread(fid, [h.channeloffset h.nchannels], r.dataformat)';
@@ -502,7 +505,7 @@ if type == 'cnt'
                 mf=sen*(cal/204.8);
                 dat(i,:)=(dat(i,:)-bas).*mf;
             end % end for i=1:h.nchannels
-          end;	% end if (strcmpi(r.scale, 'on')
+          end;  % end if (strcmpi(r.scale, 'on')
       end ;
    
       ET_offset = (double(h.prevfile) * (2^32)) + double(h.eventtablepos);    % prevfile contains high order bits of event table offset, eventtablepos contains the low order bits
