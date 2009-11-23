@@ -71,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.62  2009/08/07 21:46:35  arno
+% Fix bug if empty dataset at the end of ALLEEG
+%
 % Revision 1.61  2009/07/30 04:40:20  arno
 % dataset index problem fix
 %
@@ -336,6 +339,7 @@ for k = 1:2:length(g.commands)
             
             for cc = 1:length(clusters)
                 
+                idat = 0;
                 for tmpi = 1:length(clusters{cc})
                     if isfield(ALLEEG(clusters{cc}(tmpi)).dipfit, 'model')
                         idat = clusters{cc}(tmpi);
