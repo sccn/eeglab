@@ -63,6 +63,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2009/10/10 01:31:23  arno
+% fix scalp maps plotting for ERP (single subjects)
+%
 % Revision 1.7  2009/08/29 04:24:56  arno
 % new statistics
 %
@@ -203,6 +206,7 @@ if strcmpi(opt.plottopo, 'on') & size(data{1},3) == 1, opt.singlesubject = 'on';
 if size(data{1},2) == 1,                               opt.singlesubject = 'on'; end;
 if strcmpi(opt.singlesubject, 'on'), opt.groupstats = {}; opt.condstats = {}; end;
 if ~isempty(opt.compinds), if length(opt.compinds{1}) > 1, opt.compinds = {}; end; end;
+if ~isempty(opt.ylim), opt.caxis = opt.ylim; end;
 if strcmpi(opt.datatype, 'spec'), opt.unitx = 'Hz'; end;
 onecol  = { 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b' };
 manycol = { 'b' 'r' 'g' 'k' 'c' 'y' };
