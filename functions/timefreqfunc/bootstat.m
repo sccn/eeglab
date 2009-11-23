@@ -87,6 +87,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2009/07/02 23:29:36  arno
+% rename all instanced of bootstrap to permutation
+%
 % Revision 1.28  2009/05/22 23:32:22  arno
 % fix header
 %
@@ -424,9 +427,9 @@ if strcmpi(g.distfit, 'off')
     % ------------------------------------
     accarray  = sort(accarray,1); % always sort on naccu
     Rbootout2 = accarray;
-    i         = round(g.naccu*g.alpha);
-    accarray1 = squeeze(mean(accarray(g.naccu-i+1:end,:,:),1));
-    accarray2 = squeeze(mean(accarray(1:i            ,:,:),1));
+    i         = round(size(accarray,1)*g.alpha);
+    accarray1 = squeeze(mean(accarray(size(accarray,1)-i+1:end,:,:),1));
+    accarray2 = squeeze(mean(accarray(1:i                     ,:,:),1));
     if abs(accarray(1,1,1) - accarray(end,1,1)) < abs(accarray(1,1,1))*1e-15
         accarray1(:) = NaN;
         accarray2(:) = NaN;
