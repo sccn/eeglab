@@ -142,6 +142,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.188  2009/11/18 20:25:27  arno
+% fix issue with appending one data channel
+%
 % Revision 1.187  2009/11/11 03:27:54  arno
 % GUI aspect
 %
@@ -1445,7 +1448,8 @@ else
     % ---------------------------------------
     [chans chaninfo.nodatchans] = getnodatchan(chans);
     if isfield(chans, 'datachan'), chans = rmfield(chans, 'datachan'); end;
-    if isempty(chaninfo.nodatchans), chaninfo = rmfield(chaninfo, 'nodatchans'); end;
+    if ~isfield(chaninfo, 'nodatchans'), chaninfo.nodatchans = []; end;
+    if ~isempty(chaninfo.nodatchans), chaninfo.nodatchans = rmfield(chaninfo.nodatchans, 'datachan'); end;
 
     if dataset_input,
          if nchansori == length(chans)
