@@ -96,6 +96,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.31  2009/10/21 20:31:07  arno
+% Fix header
+%
 % Revision 1.30  2009/10/20 02:30:23  arno
 % Fix options for component spectrum
 %
@@ -249,6 +252,12 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
     % compute ERPs
     % ------------
     if strcmpi(g.erp, 'on')
+        % check dataset consistency
+        % -------------------------
+        if length(unique([ALLEEG.pnts])) > 1
+            error([ 'Cannot compute ERPs because datasets' 10 'do not have the same number of data points' ])
+        end;
+        
         for index = 1:length(STUDY.datasetinfo)
             if strcmpi(computewhat, 'channels')
                 [tmpchanlist opts] = getchansandopts(STUDY, ALLEEG, chanlist, index, g);
@@ -320,6 +329,12 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
     % compute ERSP and ITC
     % --------------------
     if strcmpi(g.ersp, 'on') | strcmpi(g.itc, 'on')
+        % check dataset consistency
+        % -------------------------
+        if length(unique([ALLEEG.pnts])) > 1
+            error([ 'Cannot compute ERPs because datasets' 10 'do not have the same number of data points' ])
+        end;
+        
         if strcmpi(g.ersp, 'on') & strcmpi(g.itc, 'on'), type = 'both';
         elseif strcmpi(g.ersp, 'on')                   , type = 'ersp';
         else                                             type = 'itc';
