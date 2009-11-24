@@ -33,8 +33,9 @@
 %                  to reduce the 'stop' arg (above). By default, binary 
 %                  ica begins with the identity matrix after sphering. 
 %   'verbose'    - 'on'/'off'    {default: 'off'}
-%   'filenum'    - the number to be used in the name of the output files.  Otherwise chosen randomly.
-%                  Will choose random number if file with that number already exists.
+%   'filenum'    - the number to be used in the name of the output files.  
+%                  Otherwise chosen randomly. Will choose random number 
+%                  if file with that number already exists.
 %
 % Less frequently used input flags:
 %   'posact'     - ('on'/'off') Make maximum value for each comp positive.
@@ -76,6 +77,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2009/10/21 02:44:24  dev
+% replace isstr() with ischar()
+%
 % Revision 1.26  2009/09/27 04:05:59  arno
 % Joe Dien Filenum option to binica
 %
