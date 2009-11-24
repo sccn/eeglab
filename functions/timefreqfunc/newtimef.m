@@ -58,7 +58,7 @@
 %                     one value for 'cycles'). For multitaper, use timef().
 %
 %    Optional inter-trial coherence (ITC) Type:
-%       'type'      = ['coher'|'phasecoher'|'phasecoher2'] Compute either linear
+%       'itctype'   = ['coher'|'phasecoher'|'phasecoher2'] Compute either linear
 %                     coherence ('coher') or phase coherence ('phasecoher'),
 %                     first called 'phase-locking factor' {default: 'phasecoher'}
 %
@@ -329,6 +329,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.175  2009/11/04 02:46:49  arno
+% remove default lower frequency for log transform
+%
 % Revision 1.174  2009/09/16 19:29:40  arno
 % powebase flip from Julie
 %
@@ -1178,6 +1181,7 @@ g = finputcheck(varargin, ...
     'vert'          'real'      []           [];  ...
     'newfig'        'string'    {'on','off'} 'on'; ...
     'type'          'string'    {'coher','phasecoher','phasecoher2'}  'phasecoher'; ...
+    'itctype'       'string'    {'coher','phasecoher','phasecoher2'}  'phasecoher'; ...
     'phsamp'        'string'    {'on','off'} 'off'; ...  % phsamp not completed - Toby 9.28.2006
     'plotphaseonly' 'string'    {'on','off'} 'off'; ...
     'plotphasesign' 'string'    {'on','off'} 'on'; ...
@@ -1216,6 +1220,7 @@ g = finputcheck(varargin, ...
 if isstr(g), error(g); end;
 if strcmpi(g.plotamp, 'off'), g.plotersp = 'off'; end;    
 if strcmpi(g.basenorm, 'on'), g.scale = 'abs'; end;
+if ~strcmpi(g.itctype , 'phasecoher'), g.type = g.itctype; end;
 
 g.tlimits = tlimits;
 g.frames   = frames;
