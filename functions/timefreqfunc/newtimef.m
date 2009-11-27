@@ -237,7 +237,7 @@
 %                     above to output the ERSP as shown on the plot.
 %            itc    = (nfreqs,timesout) matrix of complex inter-trial coherencies.
 %                     itc is complex -- ITC magnitude is abs(itc); ITC phase in radians
-%                     is phase(itc), or in deg phase(itc)*180/pi.
+%                     is angle(itc), or in deg phase(itc)*180/pi.
 %          powbase  = baseline power spectrum (in dB) that was removed for each window 
 %                      to compute the ERSP.
 %            times  = vector of output times (spectral time window centers) (in ms).
@@ -329,6 +329,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.176  2009/11/24 21:03:19  arno
+% new option "itctype" to replace "type"
+%
 % Revision 1.175  2009/11/04 02:46:49  arno
 % remove default lower frequency for log transform
 %
