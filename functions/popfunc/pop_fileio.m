@@ -1,4 +1,4 @@
-% pop_fileio() - import data files into EEGLAB using BIOSIG toolbox
+% pop_fileio() - import data files into EEGLAB using FileIO 
 %
 % Usage:
 %   >> OUTEEG = pop_fileio; % pop up window
@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2009/09/27 03:51:17  arno
+% Fix latency issue
+%
 % Revision 1.6  2009/09/27 03:46:10  arno
 % *** empty log message ***
 %
@@ -50,7 +53,7 @@
 % Revision 1.2  2008/05/05 22:47:06  arno
 % fixing epoch field problem
 %
-% Revision 1.1  2008/04/18 15:24:12  arno
+% Revision 1.1  2008/04/18 15:24:module of the FieldTrip toolbox12  arno
 % Initial revision
 %
 
@@ -122,7 +125,7 @@ EEG.comments        = [ 'Original file: ' filename ];
 EEG.xmin = -dat.nSamplesPre/EEG.srate; 
 EEG.trials          = dat.nTrials;
 EEG.pnts            = dat.nSamples;
-if isfield(dat, 'Label') & ~isempty(dat.Label)
+if isfield(dat, 'label') && ~isempty(dat.label)
     EEG.chanlocs = struct('labels', dat.label);
 end
 
