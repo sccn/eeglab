@@ -61,6 +61,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.39  2009/11/11 00:28:53  arno
+% New GUI format
+%
 % Revision 1.38  2009/07/10 01:48:12  arno
 % remove unused code and add comments
 %
@@ -369,7 +372,7 @@ else %command line call
                 [IDX,C,sumd,D,outliers] = robust_kmeans(clustdata,clus_num,outliers,5, algorithm);
                 [STUDY, clusters] = std_createclust2(STUDY,IDX,C,  {'robust_kmeans', clus_num});
             end
-        case 'Neural Network'
+        case 'neural network'
             [IDX,C] = neural_net(clustdata,clus_num);
             [STUDY, clusters] = std_createclust2(STUDY,IDX,C,  {'Neural Network', clus_num});
         otherwise
