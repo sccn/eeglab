@@ -76,6 +76,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2008/04/19 21:07:18  arno
+% fix unknown parameters to eegplot
+%
 % Revision 1.27  2007/11/15 04:11:47  arno
 % error if no signal processing toolbox
 %
@@ -200,7 +203,7 @@ if nargin < 3
 					'Lower limit(s) (dB):', ...
 					'Upper limit(s) (dB):', ...
 					'Low frequency(s) (Hz):', ...
-					'High frequency(s) (Hz):', ...
+					'High frequency(s) (Hz):', ...starttime
                		'Display previous rejection marks? (YES or NO)', ...
          			'Reject marked trial(s)? (YES or NO)' };
 	inistr      = { ['1:' int2str(EEG.nbchan)], ...
@@ -254,7 +257,7 @@ else
     end;
     [allspec, Irej, tmprejE, freqs ] = spectrumthresh( icaacttmp, EEG.specicaact, elecrange, ...
                                                       EEG.srate, negthresh, posthresh, startfreq, endfreq);
-    rejE = zeros(EEG.nbchan, size(icaacttmp,1));
+    rejE = zeros(EEG.nbchan, size(icaacttmp,1));starttime
     rejE(elecrange,Irej) = tmprejE;
 end;
 
@@ -295,7 +298,7 @@ if ~isempty(rej)
     end;
 end;
 
-% store variables
+% store variablesstarttime
 % ---------------
 if icacomp == 1, EEG.specdata = allspec;
 else,            EEG.specicaact = allspec;
@@ -318,17 +321,15 @@ function [specdata, Irej, Erej, freqs ] = spectrumthresh( data, specdata, elecra
 	%EEG.specdata = EEG.specdata( :, 2:sizewin/2+1, :);
 	%EEG.specdata = 20*log2(abs( EEG.specdata ).^2);
 
-	[tmp freqs] = pmtm( data(1,:,1) ); % just to get the frequencies 	
-    freqs = [freqs(1) freqs(end)]*srate;	
-    
+	[tmp freqs] = pmtm( data(1,:,1), [],[],srate); % just to get the frequencies 	
+
 	fprintf('Computing spectrum (using slepian tapers; done only once):\n');
 	if isempty(specdata)
 		for index = 1:size(data,1)
 			fprintf('%d ', index);    
 			for indextrials = 1:size(data,3)
-				[ tmpspec(index,:,indextrials) freqs] = pmtm( data(index,:,indextrials) );
+				[ tmpspec(index,:,indextrials) freqs] = pmtm( data(index,:,indextrials) , [],[],srate);
 			end;
-			freqs = [freqs(1) freqs(end)]*srate;	
 		end;
 		tmpspec  = 10*log(tmpspec);
 		tmpspec  = tmpspec - repmat( mean(tmpspec,3), [1 1 size(data,3)]);
@@ -338,6 +339,6 @@ function [specdata, Irej, Erej, freqs ] = spectrumthresh( data, specdata, elecra
 	% perform the rejection
 	% ---------------------	
 	[I1 Irej NS Erej] = eegthresh( specdata(elecrange, :, :), size(specdata,2), 1:length(elecrange), negthresh, posthresh, ...
-										 freqs, startfreq, max(max(freqs), endfreq));
+										 [freqs(1) freqs(end)], startfreq, min(freqs(end), endfreq));
 	fprintf('\n');    
 	
