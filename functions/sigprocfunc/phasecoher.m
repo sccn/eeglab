@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2008/04/08 14:59:54  arno
+% fix baseline removal for each epoch
+%
 % Revision 1.19  2007/04/03 03:20:40  toby
 % Bug260, uncalled variables. Courtesy Maxim Duester
 %
@@ -436,3 +439,18 @@ function [amps, cohers, nsums] = getAmpCoh(allamps, allphs, MIN_AMP)
   allzerphs = allzerphs(find(nsums ~= 0), :);
   cohers(find(nsums ~= 0)) = sum(allzerphs,2) ./ nsums(find(nsums ~= 0));
   cohers = sqrt(cohers .* conj(cohers));
+
+  function outvec = gauss(frames,sds)
+
+outvec = [];
+if nargin < 2
+  help gauss
+  return
+end
+if sds <=0 | frames < 1
+  help gauss
+  return
+end
+
+incr = 2*sds/(frames-1);
+outvec = exp(-(-sds:incr:sds).^2);
