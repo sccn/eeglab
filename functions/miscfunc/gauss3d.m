@@ -7,7 +7,7 @@
 %                              centerX, centerY, centerZ, mask)
 %
 % Example:
-%   >> gauss(3,3,3); % generate a 3x3x3 gaussian matrix
+%   >> gauss3d(3,3,3); % generate a 3x3x3 gaussian matrix
 %
 % Inputs:
 %   nX    - number of values in first dimension
@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2009/08/27 23:16:01  arno
+% adding gauss3d
+%
 
 function mat = gauss3d( sizeX, sizeY, sizeZ, sigmaX, sigmaY, sigmaZ, meanX, meanY, meanZ, cut);
 
