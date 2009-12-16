@@ -64,6 +64,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2009/05/06 22:28:10  arno
+% adding spectrogram functions
+%
 
 % eeg_specgram() - Compute spectrogramme taking into account boundaries in
 %                  the data.
@@ -102,11 +105,14 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2009/05/06 22:28:10  arno
+% adding spectrogram functions
+%
 
 function [erspinterp t f ] = eeg_specgram(EEG, varargin);
 
 if nargin < 1
-    help eeg_specgram;
+    help std_specgram;
     return;
 end;
 
@@ -248,7 +254,8 @@ end;
 if ~isempty(opt.filter)
     filterlen = opt.filter(1);
     filterstd = opt.filter(2);
-    filter = gauss(filterlen,filterstd);
+    incr = 2*filterstd/(filterlen-1); %gaussian filter
+    filter = exp(-(-filterstd:incr:filterstd).^2);
     
     erspinterp = convn(erspinterp, filter/sum(filter), 'same');
     %erspinterp = conv2(erspinterp, filter/sum(filter)); 
