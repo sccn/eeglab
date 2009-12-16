@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.59  2009/11/04 01:41:20  arno
+% Remove dependency on compute_ersp_params (still used for backward comp.)
+%
 % Revision 1.58  2009/07/28 16:42:01  arno
 % fixing interpolation in std_ersp.m
 %
@@ -392,10 +395,11 @@ end;
 % -----------------------
 parameters = { 'cycles', g.cycles, 'padratio', g.padratio, ...
                'alpha', g.alpha, 'freqscale', g.freqscale, timefargs{:} };
+defaultlowfreq = 3;
 [time_range] = compute_ersp_times(g.cycles,  EEG(1).srate, ...
-                                 [EEG(1).xmin EEG(1).xmax]*1000 , g.freqs(1), g.padratio); 
+                                 [EEG(1).xmin EEG(1).xmax]*1000 , defaultlowfreq, g.padratio); 
 if time_range(1) < time_range(2) && g.freqs(1) == 0
-     g.freqs(1) = 3; % for backward compatibility
+     g.freqs(1) = defaultlowfreq; % for backward compatibility
 end
 parameters = { parameters{:} 'freqs' g.freqs };
 if strcmpi(g.plot, 'off')
