@@ -72,6 +72,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2006/01/31 20:18:40  arno
+% options
+%
 % Revision 1.18  2004/03/17 22:58:21  arno
 % debug pop_rejmenu
 %
@@ -232,6 +235,8 @@ fprintf('%d/%d trials marked for rejection\n', length(Irej), EEG.trials);
 tmprejectelec = zeros( 1, EEG.trials);
 tmprejectelec(Irej) = 1;
 
+rej  = tmprejectelec;
+rejE = tmpelecIout;
 if calldisp
     if icacomp == 1 macrorej  = 'EEG.reject.rejthresh';
         			macrorejE = 'EEG.reject.rejthreshE';
@@ -240,8 +245,6 @@ if calldisp
     end;
 	
 	colrej = EEG.reject.rejthreshcol;
-	rej  = tmprejectelec;
-	rejE = tmpelecIout;
 	eeg_rejmacro; % script macro for generating command and old rejection arrays
 	     
     if icacomp == 1
@@ -250,19 +253,17 @@ if calldisp
         eegplot( icaacttmp, 'srate', EEG.srate, 'limits', [EEG.xmin EEG.xmax]*1000 , 'command', command, eegplotoptions{:}); 
     end;
 else 
-    rej  = tmprejectelec;
-    rejE = tmpelecIout;
-    if ~isempty(tmprejectelec)
-        if icacomp	== 1
-            EEG.reject.rejthresh  = rej;
-            EEG.reject.rejthreshE = rejE;
-        else
-            EEG.reject.icarejthresh  = rej;
-            EEG.reject.icarejthreshE = rejE;
-        end;
-    end;
     if reject == 1
         EEG = pop_rejepoch(EEG, rej, 0);
+    end;
+end;
+if ~isempty(rej)
+    if icacomp	== 1
+        EEG.reject.rejthresh  = rej;
+        EEG.reject.rejthreshE = rejE;
+    else
+        EEG.reject.icarejthresh  = rej;
+        EEG.reject.icarejthreshE = rejE;
     end;
 end;
 
