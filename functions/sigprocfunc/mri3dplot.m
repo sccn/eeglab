@@ -46,6 +46,12 @@
 %
 % Author: Arnaud Delorme & Scott Makeig, SCCN, 10 June 2003
 %
+% Example:
+%   dipfitdefs;
+%   load('-mat', template_models(1).mrifile); % load mri variable
+%   array = gauss3d(91,109,91);
+%   mri3dplot(array, mri);
+%
 % See also: plotmri()
 
 % Copyright (C) Arnaud Delorme, sccn, INC, UCSD, 2003-
@@ -65,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2009/07/03 15:59:54  arno
+% fixed plotintersect call
+%
 % Revision 1.10  2009/06/27 01:31:25  arno
 % fix intersection
 %
@@ -159,7 +168,7 @@ function [smoothprob3d, mriplanes] = mri3dplot(prob3d, mri, varargin)
     
     g = finputcheck( varargin, { 'mriview'   { 'string' 'cell' }  { { 'sagital' 'axial' 'coronal' ...
                                                           'top' 'side' 'rear' } {} }   'top';
-                        'mixmode'   'string'   { 'add' 'overwrite' }     'add';
+                        'mixmode'   'string'   { 'add' 'overwrite' 'min' }     'add';
                         'mrislices' 'float'    []                        [];
                         'view'      'float'    []                        [];
                         'geom'      'float'    []                        [];
@@ -205,29 +214,15 @@ function [smoothprob3d, mriplanes] = mri3dplot(prob3d, mri, varargin)
     
     % normalize prob3d for 1 to ncolors and create 3-D dim
     % ----------------------------------------------------
-    if g.kernel ~= 0
-        disp('Smoothing...');
-        smoothprob3d    = smooth3(prob3d, 'gaussian', g.kernel);
-        prob3d          = smoothprob3d;
-    end;
-
-    ncolors = size(g.cmap,1);
-    maxdens = max(prob3d(:));
-
-    if isempty(g.cmax), g.cmax = maxdens; end;
-        
-    fprintf('Brightest color denotes a density of: %1.6f (presumed unit: dipoles/cc)\n', maxdens);
-
-    prob3d    = round((prob3d-g.cmin)/(g.cmax - g.cmin)*(ncolors-1))+1; % project desnity image into the color space: [1:ncolors]
-    prob3d( find(prob3d > ncolors) ) = ncolors;
-    newprob3d = zeros(size(prob3d,1), size(prob3d,2), size(prob3d,3), 3);
-
-    outOfBrainMask = find(isnan(prob3d)); % place NaNs in a mask, NaNs are assumed for points outside the brain
-    prob3d(outOfBrainMask) = 1;
-    
-    tmp = g.cmap(prob3d,1); newprob3d(:,:,:,1) = reshape(tmp, size(prob3d));
-    tmp = g.cmap(prob3d,2); newprob3d(:,:,:,2) = reshape(tmp, size(prob3d));
-    tmp = g.cmap(prob3d,3); newprob3d(:,:,:,3) = reshape(tmp, size(prob3d));
+    if iscell(prob3d)
+        if isempty(g.cmax), g.cmax = max(max(prob3d{1}(:)),max(prob3d{2}(:))); end;
+        [newprob3d{1}] = prepare_dens(prob3d{1}, g, 'abscolor');
+        [newprob3d{2}] = prepare_dens(prob3d{2}, g, 'abscolor');
+    else
+        if isempty(g.cmax), g.cmax = max(prob3d(:)); end;
+        [newprob3d{1} maxdens1] = prepare_dens(prob3d, g, 'usecmap');
+    end;    
+    fprintf('Brightest color denotes a density of: %1.6f (presumed unit: dipoles/cc)\n', g.cmax);
     
     % plot MRI slices
     % ---------------
@@ -265,15 +260,17 @@ function [smoothprob3d, mriplanes] = mri3dplot(prob3d, mri, varargin)
         if strcmpi(g.plotintersect, 'on')
             for index2 = setdiff(1:length( g.mrislices ), index)
                 switch g.mriview{index2}
-                 case 'side', coord = [  g.mrislices(index2) 0 0 1 ]; 
-                 case 'top' , coord = [  0 0 g.mrislices(index2) 1 ]; 
-                 case 'rear', coord = [  0 g.mrislices(index2) 0 1 ]; 
+                    case 'side', coord = [  g.mrislices(index2) 0 0 1 ]; 
+                    case 'top' , coord = [  0 0 g.mrislices(index2) 1 ]; 
+                    case 'rear', coord = [  0 g.mrislices(index2) 0 1 ]; 
                 end;
                 coord = round( pinv(mri.transform)*[ 0 0 0 1]' )';
-                switch g.mriview{index2}
-                 case 'side', newprob3d(coord(1), :, :, :) = 0;
-                 case 'top' , newprob3d(:, :, coord(3), :) = 0;
-                 case 'rear', newprob3d(:, coord(2), :, :) = 0;
+                for i = 1:length(newprob3d)
+                    switch g.mriview{index2}
+                     case 'side', newprob3d{i}(  coord(1), :, :, :) = 0;
+                     case 'top' , newprob3d{i}(  :, :, coord(3), :) = 0;
+                     case 'rear', newprob3d{i}(  :, coord(2), :, :) = 0;
+                    end;
                 end;
             end;
         end;
@@ -308,24 +305,47 @@ function [smoothprob3d, mriplanes] = mri3dplot(prob3d, mri, varargin)
         
         % get dipole density slice
         % ------------------------
-        switch g.mriview{index}
-         case 'side', densplot = squeeze( newprob3d  (coord(1), :, :, :) );
-         case 'top' , densplot = squeeze( newprob3d  (:, :, coord(3), :) );
-         case 'rear', densplot = squeeze( newprob3d  (:, coord(2), :, :) );
+        for i = 1:length(newprob3d)
+            switch g.mriview{index}
+             case 'side', densplot{i} = squeeze( newprob3d{i}(coord(1), :, :, :) );
+             case 'top' , densplot{i} = squeeze( newprob3d{i}(:, :, coord(3), :) );
+             case 'rear', densplot{i} = squeeze( newprob3d{i}(:, coord(2), :, :) );
+            end;
+            densplot{i} = rotatemat( densplot{i}, g.rotate );
         end;
-
-        densplot = rotatemat( densplot, g.rotate );
-
-        if strcmpi(g.mixmode, 'add')
-            densplot(isnan(densplot)) = 0; % do not plot colors outside the brain, as indicated by NaNs
-            mriplot  = mriplot*g.mixfact + densplot*(1-g.mixfact); % Mix 1/2 MR image + 1/2 density image
+  
+        if length(densplot) == 1
+            densplot = densplot{1};
+            if strcmpi(g.mixmode, 'add')
+                densplot(isnan(densplot)) = 0; % do not plot colors outside the brain, as indicated by NaNs
+                mriplot  = mriplot*g.mixfact + densplot*(1-g.mixfact); % Mix 1/2 MR image + 1/2 density image
+            elseif strcmpi(g.mixmode, 'overwrite')
+                indsnon0 = sum(densplot(:,:,:),3) > 0;
+                tmpmri = mriplot(:,:,1); tmpdens = densplot(:,:,1); tmpmri(indsnon0) = tmpdens(indsnon0); mriplot(:,:,1) = tmpmri;
+                tmpmri = mriplot(:,:,2); tmpdens = densplot(:,:,2); tmpmri(indsnon0) = tmpdens(indsnon0); mriplot(:,:,2) = tmpmri;
+                tmpmri = mriplot(:,:,3); tmpdens = densplot(:,:,3); tmpmri(indsnon0) = tmpdens(indsnon0); mriplot(:,:,3) = tmpmri;
+            elseif strcmpi(g.mixmode, 'min')
+                densplot(isnan(densplot)) = 0; % do not plot colors outside the brain, as indicated by NaNs
+                mriplot  = min(mriplot, densplot); % min
+            end;
+            clear densplot;
         else
-            indsnon0 = sum(densplot(:,:,:),3) > 0;
-            tmpmri = mriplot(:,:,1); tmpdens = densplot(:,:,1); tmpmri(indsnon0) = tmpdens(indsnon0); mriplot(:,:,1) = tmpmri;
-            tmpmri = mriplot(:,:,2); tmpdens = densplot(:,:,2); tmpmri(indsnon0) = tmpdens(indsnon0); mriplot(:,:,2) = tmpmri;
-            tmpmri = mriplot(:,:,3); tmpdens = densplot(:,:,3); tmpmri(indsnon0) = tmpdens(indsnon0); mriplot(:,:,3) = tmpmri;
+            densplot{1}(isnan(densplot{1})) = 0; % do not plot colors outside the brain, as indicated by NaNs
+            densplot{2}(isnan(densplot{2})) = 0; % do not plot colors outside the brain, as indicated by NaNs
+            if strcmpi(g.mixmode, 'add')
+                mriplot(:,:,1) = mriplot(:,:,1)*g.mixfact + densplot{1}(:,:)*(1-g.mixfact); % min
+                mriplot(:,:,3) = mriplot(:,:,3)*g.mixfact + densplot{2}(:,:)*(1-g.mixfact); % min
+                mriplot(:,:,2) = mriplot(:,:,2)*g.mixfact; % min
+            elseif strcmpi(g.mixmode, 'overwrite')
+                indsnon01 = densplot{1}(:,:,:) > 0;
+                indsnon02 = densplot{2}(:,:,:) > 0;
+                tmpmri = mriplot(:,:,1); tmpdens = densplot{1}(:,:); tmpmri(indsnon01) = tmpdens(indsnon01); mriplot(:,:,1) = tmpmri;
+                tmpmri = mriplot(:,:,2); tmpdens = densplot{2}(:,:); tmpmri(indsnon02) = tmpdens(indsnon02); mriplot(:,:,2) = tmpmri;
+            else
+                mriplot(:,:,1) = max(mriplot(:,:,1), densplot{1}); % min
+                mriplot(:,:,2) = max(mriplot(:,:,2), densplot{2}); % min
+            end;
         end;
-        
         mriplanes{index} = mriplot;
         
         imagesc(mriplot); % plot [background MR image + density image]
@@ -372,33 +392,69 @@ function [smoothprob3d, mriplanes] = mri3dplot(prob3d, mri, varargin)
     end;
     
     fprintf('\n');
-    if exist('fig') == 1
-        set(fig,'color', g.cmap(1,:)/2);
+    if exist('fig') == 1 
+        if ~iscell(prob3d)
+            set(fig,'color', g.cmap(1,:)/2);
+        else
+            set(fig,'color', [0.0471 0.0471 0.0471]/1.3);
+        end;
     end;
 return;
 
 function mat = rotatemat(mat, angle);
-    
+
     if angle == 0, return; end;
-    if angle >= 90,
-        newmat(:,:,1) = rot90(mat(:,:,1));
-        newmat(:,:,2) = rot90(mat(:,:,2));
-        newmat(:,:,3) = rot90(mat(:,:,3));
-        mat = newmat;
+    if ndims(mat) == 2
+        if angle >= 90,  mat = rot90(mat); end;
+        if angle >= 180, mat = rot90(mat); end;
+        if angle >= 270, mat = rot90(mat); end;
+    else
+        if angle >= 90,
+            newmat(:,:,1) = rot90(mat(:,:,1));
+            newmat(:,:,2) = rot90(mat(:,:,2));
+            newmat(:,:,3) = rot90(mat(:,:,3));
+            mat = newmat;
+        end;
+        if angle >= 180,
+            newmat(:,:,1) = rot90(mat(:,:,1));
+            newmat(:,:,2) = rot90(mat(:,:,2));
+            newmat(:,:,3) = rot90(mat(:,:,3));
+            mat = newmat;
+        end;
+        if angle >= 270,
+            newmat(:,:,1) = rot90(mat(:,:,1));
+            newmat(:,:,2) = rot90(mat(:,:,2));
+            newmat(:,:,3) = rot90(mat(:,:,3));
+            mat = newmat;
+        end;
     end;
-    if angle >= 180,
-        newmat(:,:,1) = rot90(mat(:,:,1));
-        newmat(:,:,2) = rot90(mat(:,:,2));
-        newmat(:,:,3) = rot90(mat(:,:,3));
-        mat = newmat;
-    end;
-    if angle >= 270,
-        newmat(:,:,1) = rot90(mat(:,:,1));
-        newmat(:,:,2) = rot90(mat(:,:,2));
-        newmat(:,:,3) = rot90(mat(:,:,3));
-        mat = newmat;
+    
+function [newprob3d maxdens] = prepare_dens(prob3d, g, col);
+
+    if g.kernel ~= 0
+        disp('Smoothing...');
+        smoothprob3d    = smooth3(prob3d, 'gaussian', g.kernel);
+        prob3d          = smoothprob3d;
     end;
 
+    maxdens = max(prob3d(:));
+    ncolors = size(g.cmap,1);
+    
+    prob3d    = round((prob3d-g.cmin)/(g.cmax - g.cmin)*(ncolors-1))+1; % project desnity image into the color space: [1:ncolors]
+    prob3d( find(prob3d > ncolors) ) = ncolors;
+    newprob3d = zeros(size(prob3d,1), size(prob3d,2), size(prob3d,3), 3);
+
+    outOfBrainMask = find(isnan(prob3d)); % place NaNs in a mask, NaNs are assumed for points outside the brain
+    prob3d(outOfBrainMask) = 1;
+    
+    if strcmpi(col, 'abscolor')
+        newprob3d = prob3d/ncolors;
+    else
+        tmp = g.cmap(prob3d,1); newprob3d(:,:,:,1) = reshape(tmp, size(prob3d));
+        tmp = g.cmap(prob3d,2); newprob3d(:,:,:,2) = reshape(tmp, size(prob3d));
+        tmp = g.cmap(prob3d,3); newprob3d(:,:,:,3) = reshape(tmp, size(prob3d));
+    end;
+    
 function h = mysubplot(geom1, geom2, coord);
     
     coord = coord-1;
