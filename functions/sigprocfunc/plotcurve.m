@@ -27,6 +27,10 @@
 %                string elements {none}
 %  'vert'      = Latencies to mark with a dotted vertical line   {none}
 %  'linewidth' = Line width for marktimes traces (thick=2, thin=1) {2}
+%  'chanlocs'  = channel location structure.
+%  'plottopo'  = [min max] plot topography within the time limits defined
+%                in this function. If several lines are given as input, one
+%                scalp map is plot for each line.
 %
 % Authors: Arnaud Delorme, 2004, Bhaktivedanta Institute
 
@@ -64,8 +68,11 @@ function plotcurve( times, R, varargin);
                              'ylabel'        'string'  []                        '';
                              'legend'        'cell'    []                        {};
                              'colors'        'cell'    []                        {};
+                             'plottopotitle' 'cell'    []                        {};
+                             'chanlocs'      'struct'  []                        struct;
                              'ylim'          'real'    []                        [];
                              'vert'          'real'    []                        [];
+                             'plottopo'      'real'    []                        [];
                              'linewidth'     'real'    []                        2;
                              'marktimes'     'real'    []                        [] });
    if isstr(g), error(g); end;
@@ -73,6 +80,7 @@ function plotcurve( times, R, varargin);
    if isempty(g.colors), g.colors = { 'b' 'r' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' ...
                    'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' }; end;
    if strcmpi(g.plotindiv, 'off'), g.plotmean = 'on'; end;
+   
    if ~any(length(times) == size(R))
        try,
            R = reshape(R, length(times), length(R)/length(times))';
@@ -118,6 +126,26 @@ function plotcurve( times, R, varargin);
       pos = get(gca, 'position');
       set(gca, 'position', [ pos(1)+pos(3)*0.1 pos(2)+pos(4)*0.1 pos(3)*0.9 pos(4)*0.85 ]);
   end;
+  
+  % plot topographies
+  % -----------------
+  if ~isempty(g.plottopo)
+      tmpax = gca;
+      pos = get(gca, 'position');
+      set(gca, 'position', [ pos(1) pos(2) pos(3) pos(4)/2 ]);
+      
+      for index = 1:size(g.plottopo)
+          axes('position', [ (index-1)*pos(3)/size(g.plottopo,1)+pos(1) pos(2)+pos(4)/2 pos(3)/size(g.plottopo,1) pos(4)/2 ]);
+          %topoplot(g.plottopo(index,:), g.chanlocs, 'maplimits', 'minmax');
+          topoplot(g.plottopo(index,:), g.chanlocs);
+          if ~isempty(g.plottopotitle)
+              title(g.plottopotitle{index});
+          end;
+      end;
+      
+      axes(tmpax);
+  end;
+      
   for ind = 1:size(R,1)
       if ind == size(R,1) & strcmpi(g.plotmean, 'on') & size(R,1) > 1
            plot(times,R(ind,:), 'k', 'linewidth', 2);
