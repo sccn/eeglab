@@ -87,6 +87,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.58  2009/11/11 03:27:18  arno
+% checkbox color under Linux
+%
 % Revision 1.57  2009/11/11 00:28:52  arno
 % New GUI format
 %
@@ -482,15 +485,9 @@ end;
 warning off;
 try, 
 	if strcmpi(computer, 'MAC') | strcmpi(computer, 'MACI')
-		hh = findobj(allhandlers, 'style', 'edit');
-		if ~isempty(hh)
-			factmulty = factmulty*1.5;
-        end;
+        factmulty = factmulty*1.5;
 	elseif ~isunix % windows
-		hh = findobj(allhandlers, 'style', 'edit');
-		if ~isempty(hh)
-			factmulty = factmulty*1.08;
-		end;
+        factmulty = factmulty*1.08;
     end;
 catch, end;
 factmulty = factmulty*0.9; % global shinking
