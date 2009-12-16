@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2009/11/11 00:28:53  arno
+% New GUI format
+%
 % Revision 1.19  2009/11/04 01:40:13  arno
 % remove timefreq. option already provided by std_ersp
 %
@@ -317,10 +320,6 @@ else
             set(hdl, 'userdata',userdat); 
             
         case { 'setitc' 'setersp' }
-            if firsttimeersp
-                warndlg2(strvcat('Checking both ''ERSP'' and ''ITC'' does not require further', ...
-                                 'computing time. However it requires disk space'));
-            end;
             set_itc  = get(findobj('parent', hdl, 'tag', 'itc_on'), 'value'); 
             set_ersp = get(findobj('parent', hdl, 'tag', 'ersp_on'), 'value'); 
             if  (~set_ersp & ~set_itc )
@@ -334,6 +333,10 @@ else
             end
             userdat{5} = 0;
             set(hdl, 'userdata',userdat); 
+            if firsttimeersp
+                warndlg2(strvcat('Checking both ''ERSP'' and ''ITC'' does not require further', ...
+                                 'computing time. However it requires disk space'));
+            end;
             
         case 'setspec'
             set_spec = get(findobj('parent', hdl, 'tag', 'spectra_on'), 'value'); 
