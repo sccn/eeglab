@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.548  2009/12/17 21:34:54  arno
+% change clustring menus
+%
 % Revision 1.547  2009/11/18 22:20:00  arno
 % adding biosig path to read BDF
 %
@@ -2009,6 +2012,7 @@ catchstrs.add_to_hist            = e_hist;
 catchstrs.store_and_hist         = e_store;
 catchstrs.new_and_hist           = e_newset;
 catchstrs.new_non_empty          = e_newset;
+catchstrs.update_study           = e_load_study;
 
     % create eeglab figure
     % --------------------
