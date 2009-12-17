@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.547  2009/11/18 22:20:00  arno
+% adding biosig path to read BDF
+%
 % Revision 1.546  2009/11/04 01:35:21  arno
 % remove menu for plot rect. array
 %
@@ -2390,8 +2393,9 @@ catchstrs.new_non_empty          = e_newset;
     uimenu( std_m,  'Label', 'Precompute channel measures'            , 'CallBack', cb_precomp, 'separator', 'on');
     uimenu( std_m,  'Label', 'Plot channel measures'                  , 'CallBack', cb_chanplot);
     uimenu( std_m,  'Label', 'Precompute component measures'          , 'CallBack', cb_precomp2, 'separator', 'on');
-    uimenu( std_m,  'Label', 'Build preclustering array'              , 'CallBack', cb_preclust);
-    uimenu( std_m,  'Label', 'Cluster components'                     , 'CallBack', cb_clust);
+    clust_m = uimenu( std_m, 'Label', 'PCA clustering (original)');
+    uimenu( clust_m,  'Label', 'Build preclustering array'            , 'CallBack', cb_preclust);
+    uimenu( clust_m,  'Label', 'Cluster components'                   , 'CallBack', cb_clust);
     uimenu( std_m,  'Label', 'Edit/plot clusters'                     , 'CallBack', cb_clustedit);
     
     if ~iseeglabdeployed2
