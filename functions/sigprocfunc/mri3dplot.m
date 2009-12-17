@@ -71,6 +71,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2009/12/16 20:28:27  arno
+% new arguments
+%
 % Revision 1.11  2009/07/03 15:59:54  arno
 % fixed plotintersect call
 %
@@ -180,7 +183,9 @@ function [smoothprob3d, mriplanes] = mri3dplot(prob3d, mri, varargin)
                         'cbar'      'string'   { 'on' 'off' }            'on';
                         'subplot'   'string'   { 'on' 'off' }            'off';
                         'rotate'    'integer'  { 0 90 180 270 }          90;
-                        'kernel'    'float'    []                        0 });
+                        'kernel'    'float'    []                        0; 
+                        'addrow'    'integer'  []                        0;
+                        'fighandle' 'integer'  []                        []});
     if isstr(g), error(g); end;
     if isstr(g.mriview) == 1, g.plotintersect = 'off'; end;
     if strcmpi(g.mriview,'sagittal'),    g.mriview = 'side'; 
@@ -214,13 +219,14 @@ function [smoothprob3d, mriplanes] = mri3dplot(prob3d, mri, varargin)
     
     % normalize prob3d for 1 to ncolors and create 3-D dim
     % ----------------------------------------------------
-    if iscell(prob3d)
+    if ~iscell(prob3d), prob3d = { prob3d }; end;
+    if length(prob3d) > 1
         if isempty(g.cmax), g.cmax = max(max(prob3d{1}(:)),max(prob3d{2}(:))); end;
         [newprob3d{1}] = prepare_dens(prob3d{1}, g, 'abscolor');
         [newprob3d{2}] = prepare_dens(prob3d{2}, g, 'abscolor');
     else
-        if isempty(g.cmax), g.cmax = max(prob3d(:)); end;
-        [newprob3d{1} maxdens1] = prepare_dens(prob3d, g, 'usecmap');
+        if isempty(g.cmax), g.cmax = max(prob3d{1}(:)); end;
+        [newprob3d{1} maxdens1] = prepare_dens(prob3d{1}, g, 'usecmap');
     end;    
     fprintf('Brightest color denotes a density of: %1.6f (presumed unit: dipoles/cc)\n', g.cmax);
     
@@ -233,11 +239,16 @@ function [smoothprob3d, mriplanes] = mri3dplot(prob3d, mri, varargin)
     if strcmpi(g.cbar, 'on'), add1 = 1; else add1 = 0; end;
     if isempty(g.geom), 
         g.geom = ceil(sqrt(length(g.mrislices)+add1)); 
-        g.geom(2) = ceil((length(g.mrislices)+add1)/g.geom);
+        g.geom(2) = ceil((length(g.mrislices)+add1)/g.geom)+g.addrow;
     end;
 
     if strcmpi(g.subplot, 'off')
-        fig = figure;
+        if isempty(g.fighandle)
+             fig = figure;
+        else
+             fig = g.fighandle;
+             clf(fig);
+        end
         
         pos = get(fig, 'position');
         set(fig, 'position', [ pos(1)+15 pos(2)+15 pos(3)/4*g.geom(1) pos(4)/3*g.geom(2) ]);
@@ -393,7 +404,7 @@ function [smoothprob3d, mriplanes] = mri3dplot(prob3d, mri, varargin)
     
     fprintf('\n');
     if exist('fig') == 1 
-        if ~iscell(prob3d)
+        if length(prob3d) == 1
             set(fig,'color', g.cmap(1,:)/2);
         else
             set(fig,'color', [0.0471 0.0471 0.0471]/1.3);
