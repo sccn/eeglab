@@ -756,7 +756,7 @@ for c=1:m
                            secmarker(ss)+post_peak)];   
                     avg_art=mean(slice_art1,1);
                 end
-                
+            disp('If you get an error "line 746 of fmrib_fastr: index exceeds matrix dimensions" it means there is an inconsistency in your TR triggers, either the TR length or the number of markers')    
             end
 		           		
             % For first channel, find shift in artifact position to minimise 
@@ -879,7 +879,7 @@ for c=1:m
             end
             
             pcamat=detrend(pcamat','constant')';
-            [apc,ascore,asvar]=pca_calc(pcamat(1:pccount,:)');
+            [apc,ascore,asvar]=pca_calc(pcamat(1:(pccount-1),:)');
 
             oev=100*asvar/sum(asvar);
             if sec==1
