@@ -130,6 +130,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.67  2009/11/04 02:47:56  arno
+% timewraper business
+%
 % Revision 1.66  2009/09/26 22:19:03  arno
 % Various fixes to pop_writeeeg, std_movecomp,
 %
@@ -712,7 +715,7 @@ if isempty(timevar) % no pre-defined time points
         % --------------
         nsub     = -ntimevar(1);
         timeindices = [ceil(winsize/2+nsub/2):nsub:length(timevect)-ceil(winsize/2)-1];
-        timevals    = timevect( timeindices );
+        timevals    = timevect( timeindices ); % the conversion at line 741 leaves timeindices unchanged
         fprintf('Subsampling by %d (%1.1f to %1.1f ms)\n', nsub, min(timevals), max(timevals));
     end;
 else
@@ -721,7 +724,7 @@ else
     % ----------------
     wintime = 500*winsize/srate;
     tmpind  = find( (timevals >= tlimits(1)+wintime-0.0001) & (timevals <= tlimits(2)-wintime+0.0001) ); 
-    % 0.0001 account for numerical innacuracies on opterons
+    % 0.0001 account for numerical innacuracies on opteron computers
     if isempty(tmpind)
         error('No time points. Reduce time window or minimum frequency.');
     end;
@@ -735,27 +738,18 @@ end;
 
 % find closet points in data
 % --------------------------
-tmptimes = (timevals/1000*srate)+1;
-if sum(abs(round(tmptimes)-tmptimes)) < 1E-5
-    timeindices = round(tmptimes);
-else
-    oldtimevals = timevals;
-    timeindices = zeros(size(timevals));
-    for index = 1:length(timevals)
-        ind = round((timevals(index)-timevect(1))/(timevect(end)-timevect(1))*length(timevect));
-        %[dum ind] = min(abs(timevect-timevals(index)));
-        timeindices(index) = ind;
-        timevals(index)    = timevect(ind);
-    end;
-    if length(timevals) < length(unique(timevals))
-        disp('Warning: duplicate times, reduce the number of output times');
-    end;
-    if all(oldtimevals == timevals)
-        disp('Debug msg: Time value unchanged by finding closest in data');
-    else
-        %disp('Debug msg: Time value updated by finding closest points in data');
-    end;
+disp('Finding closest points for time variable');
+timeindices = round(eeg_lat2point(timevals, 1, srate, tlimits, 1E-3));
+if length(timeindices) < length(unique(timeindices))
+    timeindices = unique(timeindices)
+    disp('Warning: duplicate times, reduce the number of output times');
 end;
+if length(unique(timeindices(2:end)-timeindices(1:end-1))) > 1
+    disp('Finding closest points for time variable');
+else
+    disp('Distribution of data point for teim/freq decomposition is perfectly uniform');
+end;
+timevals    = timevect(timeindices);
 
 % DEPRECATED, FOR C INTERFACE
 function nofunction()
