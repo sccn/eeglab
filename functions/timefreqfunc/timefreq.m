@@ -130,6 +130,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.68  2009/12/23 23:19:37  arno
+% simplifying time index and values
+%
 % Revision 1.67  2009/11/04 02:47:56  arno
 % timewraper business
 %
@@ -738,7 +741,6 @@ end;
 
 % find closet points in data
 % --------------------------
-disp('Finding closest points for time variable');
 timeindices = round(eeg_lat2point(timevals, 1, srate, tlimits, 1E-3));
 if length(timeindices) < length(unique(timeindices))
     timeindices = unique(timeindices)
@@ -746,8 +748,9 @@ if length(timeindices) < length(unique(timeindices))
 end;
 if length(unique(timeindices(2:end)-timeindices(1:end-1))) > 1
     disp('Finding closest points for time variable');
+    disp('Time values for time/freq decomposition is not perfectly uniformly distributed');
 else
-    disp('Distribution of data point for teim/freq decomposition is perfectly uniform');
+    disp('Distribution of data point for time/freq decomposition is perfectly uniform');
 end;
 timevals    = timevect(timeindices);
 
