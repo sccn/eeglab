@@ -61,9 +61,14 @@ for nrec=1:length(Records),
 	NREC=(DAT.Idx(nrec)-1);
 	if NREC<0 fprintf(2,'Warning READEDF: invalid Record Number %i \n',NREC);end;
 
-	fseek(EDF.FILE.FID,(EDF.HeadLen+NREC*EDF.AS.spb*3),'bof');
-	[s, count]=fread(EDF.FILE.FID,EDF.AS.spb,'bit24');
-
+    if ~isempty(findstr(EDF.VERSION, 'BIOSEMI'))
+        fseek(EDF.FILE.FID,(EDF.HeadLen+NREC*EDF.AS.spb*3),'bof');
+        [s, count]=fread(EDF.FILE.FID,EDF.AS.spb,'bit24');
+    else
+        fseek(EDF.FILE.FID,(EDF.HeadLen+NREC*EDF.AS.spb*2),'bof');
+        [s, count]=fread(EDF.FILE.FID,EDF.AS.spb,'bit16');
+    end;
+    
     try, 
         S(EDF.AS.IDX2)=s;
         %%%%% Test on  Over- (Under-) Flow

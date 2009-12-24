@@ -70,6 +70,10 @@ EDF.FileName = [EDF.FILE.Path SLASH EDF.FILE.Name '.' EDF.FILE.Ext];
 
 H1=setstr(fread(EDF.FILE.FID,256,'char'))';     %
 EDF.VERSION=H1(1:8);                     % 8 Byte  Versionsnummer 
+if strncmp(EDF.VERSION,'0       ',8)
+     EDF.TYPE = 'EDF';
+else EDF.TYPE = 'BDF';
+end;
 %if 0 fprintf(2,'LOADEDF: WARNING  Version EDF Format %i',ver); end;
 EDF.PID = deblank(H1(9:88));                  % 80 Byte local patient identification
 EDF.RID = deblank(H1(89:168));                % 80 Byte local recording identification
