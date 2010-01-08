@@ -17,7 +17,7 @@ To use EEGLAB:
 1. Place the Matlab functions in a directory ($DIR) and add 
    $DIR/eeglab4.x to (Unix) your matlabpath environment variable. 
    Else, within Matlab 
-                       >> addpath('full_path_here')
+                      >> addpath('full_path_here')
 
 2. Optional: Edit file "icadefs.m" under the function directory to specify the location of
    the faster binary "ica" function (equivalent to Matlab runica() and called from within
