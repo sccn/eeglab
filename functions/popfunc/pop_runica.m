@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.92  2009/10/20 01:44:08  arno
+% fix mean removal
+%
 % Revision 1.91  2009/09/04 23:40:43  arno
 % fix concatenation
 %
@@ -759,6 +762,7 @@ function tmprank2 = getrank(tmpdata);
     tmprank2=sum (diag (D) > rankTolerance);
     if tmprank ~= tmprank2
         fprintf('Warning: fixing rank computation inconsistency (%d vs %d) most likely because running under Linux 64-bit Matlab', tmprank, tmprank2);
+        tmprank2 = max(tmprank, tmprank2);
     end;
             
             
