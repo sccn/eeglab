@@ -66,6 +66,9 @@
 % programmed from pop_readedf() version 1.15
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2009/10/28 20:45:30  arno
+% fix dat.Head.NREC and deleting event channel
+%
 % Revision 1.3  2009/10/21 20:56:08  arno
 % Andrey's fix for events
 %
@@ -163,6 +166,9 @@ end;
 if nargin < 4
     ref = [];
 end;
+if nargin < 5
+    delchan = 'on';
+end;
 
 if nargin < 1 
 	% ask user
@@ -256,8 +262,8 @@ warning on;
 
 % rerefencing
 % -----------
-disp('Re-referencing...');
 if ~isempty(ref)
+    disp('Re-referencing...');
     if ~isempty(eventchans) & any(ref > eventchans(1))
         error('Event channel index cannot be before ref channel index, contact arno@salk.edu');
     end;
