@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2009/05/31 02:22:10  arno
+% Adding FDR and bootstrap to all STUDY functions
+%
 % Revision 1.1  2008/05/06 22:32:52  arno
 % Initial revision
 %
@@ -65,5 +68,5 @@ end;
 if isempty(pID), pID = 0; end;
 
 if nargout > 1
-    p_masked = pvals < pID;
+    p_masked = pvals<=I/V*q/cVID;
 end;
