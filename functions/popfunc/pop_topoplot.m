@@ -56,6 +56,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.76  2009/08/22 00:48:42  arno
+% fix plotting
+%
 % Revision 1.75  2009/08/10 23:31:13  arno
 % Fix for windows 64 bit
 %
@@ -531,10 +534,10 @@ for index = 1:size(arg2(:),1)
         addopt = { 'verbose', 'off' };
     end;
     %fprintf('Printing to figure %d.\n',curfig);
+    options = {  'maplimits' maplimits options{:} addopt{:} };
     if ~isnan(arg2(index))
 		if typeplot
             if nbgraph > 1, axes(curax); end;
-            options = {  'maplimits' maplimits options{:} addopt{:} };
             tmpobj = topoplot( SIGTMPAVG(:,index), EEG.chanlocs, options{:});
 			if nbgraph == 1, 
                  figure(curfig); if nbgraph > 1, axes(curax); end;
@@ -546,10 +549,10 @@ for index = 1:size(arg2(:),1)
 		else
             if arg2(index) < 0
                  figure(curfig);  if nbgraph > 1, axes(curax); end;
-                 tmpobj = topoplot( -EEG.icawinv(:, -arg2(index)), EEG.chanlocs, addopt{:}, options{:} );
+                 tmpobj = topoplot( -EEG.icawinv(:, -arg2(index)), EEG.chanlocs, options{:} );
             else
                  figure(curfig);  if nbgraph > 1, axes(curax); end;
-                 tmpobj = topoplot( EEG.icawinv(:, arg2(index)), EEG.chanlocs, addopt{:}, options{:} );
+                 tmpobj = topoplot( EEG.icawinv(:, arg2(index)), EEG.chanlocs, options{:} );
             end;    			
 			if nbgraph == 1, texttitle = [ 'IC ' int2str(arg2(index)) ' from ' topotitle];
 			else             texttitle = ['' int2str(arg2(index))];
