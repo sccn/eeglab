@@ -72,6 +72,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.44  2009/10/20 02:19:26  arno
+% Adding varargin
+%
 % Revision 1.43  2009/04/21 14:04:54  arno
 % fix James bug in eegplot
 %
@@ -324,8 +327,9 @@ else
 	eeglab_options; % changed from eeglaboptions 3/30/02 -sm
 	if option_computeica  
 	    tmpdata = EEG.icaact;
-	else
-        tmpdata = (EEG.icaweights*EEG.icasphere)*reshape(EEG.data, EEG.nbchan, EEG.trials*EEG.pnts);
+    else
+        %tmpdata = (EEG.icaweights*EEG.icasphere)*reshape(EEG.data, EEG.nbchan, EEG.trials*EEG.pnts);
+        tmpdata = (EEG.icaweights*EEG.icasphere)*reshape(EEG.data(EEG.icachansind,:,:), length(EEG.icachansind), EEG.trials*EEG.pnts); % bug 799
         tmpdata = reshape( tmpdata, size(tmpdata,1), EEG.pnts, EEG.trials);
     end;
     for i=1:length(EEG.icaweights(:,1));
