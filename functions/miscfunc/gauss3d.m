@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2009/12/16 02:04:51  arno
+% header
+%
 % Revision 1.1  2009/08/27 23:16:01  arno
 % adding gauss3d
 %
@@ -74,7 +77,7 @@ end;
 if nargin < 9
 	meanZ = (sizeZ+1)/2;
 end;
-if nargin < 7
+if nargin < 10
 	cut = 0;
 end;
 
