@@ -87,6 +87,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.59  2009/12/16 02:02:31  arno
+% spacing for Mac`
+%
 % Revision 1.58  2009/11/11 03:27:18  arno
 % checkbox color under Linux
 %
@@ -297,7 +300,7 @@ g = finputcheck(options, { 'geomhoriz' 'cell'   []      {};
                            'insetv'    'real'   []      0.02 }, 'supergui');
 if isstr(g), error(g); end
 if ~isempty(g.geomhoriz)
-    maxcount = sum(cellfun(@length, g.geomhoriz));
+    maxcount = sum(cellfun('length', g.geomhoriz));
     if maxcount ~= length(g.uilist)
         warning('Wrong size for ''geomhoriz'' input');
     end;
