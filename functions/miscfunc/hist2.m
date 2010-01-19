@@ -30,7 +30,7 @@
 % ---------------
 function hist2(data1, data2, bins);
 
-figure; hist(data1, bins);
+hist(data1, bins);
 hold on; hist(data2, bins);
 %figure; hist( [ measure{:,5} ], 20);
 %hold on; hist([ measure{:,2} ], 20);
