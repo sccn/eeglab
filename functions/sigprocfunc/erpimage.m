@@ -1,7 +1,7 @@
 % erpimage() - Plot a colored image of a collection of single-trial data epochs, optionally 
 %              sorted on and/or aligned to an input sorting variable and smoothed across 
-%              trials with a moving-average. (To return event-aligned data without 
-%              plotting, use eegalign()).  Optionally sort trials on value, amplitude 
+%              trials with a Gaussian weighted moving-average. (To return event-aligned data 
+%              without plotting, use eegalign()).  Optionally sort trials on value, amplitude 
 %              or phase within a specified latency window. Optionally plot the ERP mean 
 %              and std. dev.and moving-window spectral amplitude and inter-trial coherence
 %              at aselected or peak frequency. Optionally 'time warp' the single trial 
@@ -30,8 +30,15 @@
 %               (=frames) per epoch, sampling rate (Hz)]. Else [] -> 0:nframes-1
 %               {default: []}
 %  'title'   = ['string'] Plot title {default: none}
-%   avewidth = Number of trials to smooth (vertically) with a moving-average
-%               Note: May be non-integer.  {default|0 -> 1}
+%   avewidth = [positive scalar (may be non-integer)]. If avg_type is set to 'boxcar'
+%               (the default), this is the number of trials used to smooth
+%               (vertically) with a moving-average. If avg_type is set to
+%               'Gaussian,' this is the standard deviation (in units of
+%               trials) of the Gaussian window used to smooth (vertically)
+%               with a moving-average.  Gaussian window extends three
+%               standard deviations below and three standard deviations above window
+%               center (trials beyond window are not incorporated into average). {default: no
+%               smoothing}
 %   decimate = Factor to decimate|interpolate ntrials by (may be non-integer)
 %               Else, if this is large (> sqrt(ntrials)), output this many epochs.
 %               {default|0->1}
@@ -60,36 +67,39 @@
 %               If sorting by string values like event type, suggested formulas for:
 %                 letter string: '1000*x', number string: '30000*x-1500'
 %   'noplot' = ['on'|'off'] Do not plot sortvar {default: Plot sortvar if in times range}
-%   'noshow' = ['on'|'off'] Do not plot erpimage, simply return outputs {default: 'no'}
+%   'noshow' = ['on'|'off'] Do not plot erpimage, simply return outputs {default: 'off'}
 %
 % Sort data epochs:
-%   'nosort' = ['on'|'off'] Do not sort data epochs. {default: Sort data epochs by 
-%              sortvar (see sortvar input above).
-%  'valsort' = [startms endms direction] Sort data on (mean) value
-%               between startms and (optional) endms. Direction is 1 or -1.
-%              If -1, plot max-value epoch at bottom {default: sort on sortvar}
-% 'phasesort' = [ms_center prct freq maxfreq topphase] Sort epochs by phase in
-%                a 3-cycle window centered at latency ms_center (ms).
-%                Percentile (prct) in range [0,100] gives percent of trials
-%                to reject for (too) low amplitude. Else, if in range [-100,0],
-%                percent of trials to reject for (too) high amplitude; 
-%                freq (Hz) is the phase-sorting frequency. With optional 
-%                maxfreq, sort by phase at freq of max power in the data in 
-%                the range [freq,maxfreq] (Note: 'phasesort' arg freq overrides 
-%                the frequency specified in 'coher'). With optional topphase,
-%                sort by phase, putting topphase (degrees, in range [-180,180])
-%                at the top of the image. Note: 'phasesort' now uses circular
-%                smoothing. Use 'cycles' (below) for wavelet length.
-%                {default: [0 25 8 13 180]}
-%  'ampsort' = [center_ms prcnt freq maxfreq]  Sort epochs by amplitude.
-%                (See 'phasesort' above). If ms_center is 'Inf', then sorting
-%                is by mean power across the time window specified by 'sortwin' 
-%                below. If third arg, freq, is < 0, sort by mean power in the range
-%                                [ abs(freq)   maxfreq ].
-%  'sortwin' = [start_ms end_ms] With center_ms == Inf in 'ampsort' ars (above), sorts
-%                by mean amplitude across window centers shifted from start_ms
-%                to end_ms by 10 ms.
-%  'showwin' = ['on'|'off'] Show sorting window behind ERP trace. {default: 'off'}
+% 'nosort'       = ['on'|'off'] Do not sort data epochs. {default: Sort data epochs by 
+%                  sortvar (see sortvar input above)}
+% 'replace_ties' = ['yes'|'no'] Replace trials with the same value of
+%                  sortvar with the mean of those trials.  Only works if sorting trials
+%                  by sortvar. {default: 'no'}
+% 'valsort'      = [startms endms direction] Sort data on (mean) value
+%                  between startms and (optional) endms. Direction is 1 or -1.
+%                  If -1, plot max-value epoch at bottom {default: sort on sortvar}
+% 'phasesort'    = [ms_center prct freq maxfreq topphase] Sort epochs by phase in
+%                  a 3-cycle window centered at latency ms_center (ms).
+%                  Percentile (prct) in range [0,100] gives percent of trials
+%                  to reject for (too) low amplitude. Else, if in range [-100,0],
+%                  percent of trials to reject for (too) high amplitude; 
+%                  freq (Hz) is the phase-sorting frequency. With optional 
+%                  maxfreq, sort by phase at freq of max power in the data in 
+%                  the range [freq,maxfreq] (Note: 'phasesort' arg freq overrides 
+%                  the frequency specified in 'coher'). With optional topphase,
+%                  sort by phase, putting topphase (degrees, in range [-180,180])
+%                  at the top of the image. Note: 'phasesort' now uses circular
+%                  smoothing. Use 'cycles' (below) for wavelet length.
+%                  {default: [0 25 8 13 180]}
+%  'ampsort'     = [center_ms prcnt freq maxfreq]  Sort epochs by amplitude.
+%                  (See 'phasesort' above). If ms_center is 'Inf', then sorting
+%                  is by mean power across the time window specified by 'sortwin' 
+%                  below. If third arg, freq, is < 0, sort by mean power in the range
+%                  [ abs(freq)   maxfreq ].
+%  'sortwin'     = [start_ms end_ms] If center_ms == Inf in 'ampsort' arg (above), sorts
+%                  by mean amplitude across window centers shifted from start_ms
+%                  to end_ms by 10 ms.
+%  'showwin'     = ['on'|'off'] Show sorting window behind ERP trace. {default: 'off'}
 %
 % Plot time-varying spectral amplitude instead of potential:
 % 'plotamps' = ['on'|'off'] Image amplitudes at each trial and latency instead of potential 
@@ -98,21 +108,37 @@
 %              {default: plot potential, not amplitudes}
 %
 % Specify plot parameters:
-%   'limits' = [lotime hitime minerp maxerp lodB hidB locoher hicoher basedB]
-%               Plot axes limits. Can use NaN (or nan, but not Nan) for missing items
-%               and omit late items. Use last input, basedB, to set the 
-%               baseline dB amplitude in 'plotamps' plots {default: from data}
-%   'signif' = [lo_dB, hi_dB, coher_signif_level] Use precomputed significance
-%               thresholds (as from outputs ampsig, cohsig) to save time. {default: none}
-%   'caxis'  = [lo hi] Set color axis limits. Else [fraction] Set caxis limits at
-%               (+/-)fraction*max(abs(data)) {default: symmetrical in dB, based on data limits}
+%   'limits'         = [lotime hitime minerp maxerp lodB hidB locoher hicoher basedB]
+%                      Plot axes limits. Can use NaN (or nan, but not Nan) for missing items
+%                      and omit late items. Use last input, basedB, to set the 
+%                      baseline dB amplitude in 'plotamps' plots {default: from data}
+%   'sortvar_limits' = [min max] minimum and maximum sorting variable
+%                      values to image. This only affects visualization of 
+%                      ERPimage and ERPs (not smoothing).  Cannot be used
+%                      if sorting by any factor besides sortvar (e.g.,
+%                      phase).
+%   'signif'         = [lo_dB, hi_dB, coher_signif_level] Use precomputed significance
+%                      thresholds (as from outputs ampsig, cohsig) to save time. {default: none}
+%   'caxis'          = [lo hi] Set color axis limits. Else [fraction] Set caxis limits at
+%                      (+/-)fraction*max(abs(data)) {default: symmetrical in dB, based on data limits}
 %
 % Add epoch-mean ERP to plot:
-%   'erp'    = ['on'|'off'] Plot ERP time average of the trials below the image {default no ERP plotted}
-%   'erpalpha' = [alpha] One-sided significance threshold (range: [.001 0.1]).
-%              Requires 'erp' {default: no alpha significance thresholds plotted}
-%   'erpstd' = ['on'|'off'] Plot ERP +/- stdev. Requires 'erp' {default: no std. dev. plotted}
-%   'rmerp'  = ['on'|'off'] Subtract the average ERP from each trial before processing {default: no}
+%   'erp'      = ['on'|'off'|1|2|3|4] Plot ERP time average of the trials below the 
+%                image.  If 'on' or 1, a single ERP (the mean of all trials) is shown.  If 2,
+%                two ERPs (super and sub median trials) are shown.  If 3, the trials are split into 
+%                tertiles and their three ERPs are shown.  If 4, the trials are split into quartiles
+%                and four ERPs are shown. Note, if you want negative voltage plotted up, change YDIR
+%                to -1 in icadefs.m.  If 'erpalpha' option is used, any values of 'erp' greater than
+%                1 will be reset to 1. {default no ERP plotted}
+%   'erpalpha' = [alpha] Visualizes two-sided significance threshold (i.e., a two-tailed test) for the 
+%                null hypothesis of a zero mean, symmetric distribution (range: [.001 0.1]). Thresholds 
+%                are determined via a permutation test. Requires 'erp' to be a value other than 'off'.
+%                If 'erp' is set  to a value greater than 1, it is reset to 1 to increase plot readability.
+%                {default: no alpha significance thresholds plotted}
+%   'erpstd'   = ['on'|'off'] Plot ERP +/- stdev. Requires 'erp' {default: no std. dev. plotted}
+%   'erp_grid' = If 'erp_grid' is added as an option voltage axis dashed grid lines will be
+%                 added to the ERP plot to facilitate judging ERP amplitude
+%   'rmerp'    = ['on'|'off'] Subtract the average ERP from each trial before processing {default: no}
 %
 % Add time/frequency information:
 %   'coher'  = [freq] Plot ERP average plus mean amplitude & coherence at freq (Hz)
@@ -125,26 +151,65 @@
 %   'cycles' = [float] Number of cycles in the wavelet time/frequency decomposition {default: 3}
 %
 % Add plot features:
-%   'cbar'   = ['on'|'off'] Plot color bar to right of ERP-image {default no}
-%   'topo'   = {map,chan_locs,eloc_info} Plot a 2-D scalp map at upper left of image.
-%               map may be a single integer, representing the plotted data channel,
-%               or a vector of scalp map channel values. chan_locs may be a channel locations
-%               file or a chanlocs structure (EEG.chanlocs). See '>> topoplot example'
-%               eloc_info (EEG.chaninfo), if empty ([]) or absent, implies the 'X' direction
-%               points towards the nose and all channels are plotted {default: no scalp map}
-%   'spec'   = [loHz,hiHz] Plot the mean data spectrum at upper right of image.
-%   'horz'   = [epochs_vector] Plot horizontal lines at specified epoch numbers.
-%   'vert'   = [times_vector] Plot vertical dashed lines at specified latencies
-%   'auxvar' = [size(nvars,ntrials) matrix] Plot auxiliary variable(s) for each trial
-%               as separate traces. Else, 'auxvar',{[matrix],{colorstrings}}
-%               to specify N trace colors.  Ex: colorstrings = {'r','bo-','','k:'}
-%               (See also: 'vert' and 'timewarp' above). {default: none}
-%   'sortvarpercent' - [float vector] Plot percentiles for the sorting variable
-%               for instance, [0.1 0.5 0.9] plots the 10th percentile, the median
-%               and the 90th percentile.
+%   'cbar'           = ['on'|'off'] Plot color bar to right of ERP-image {default no}
+%   'cbar_title'     = [string] The title for the color bar (e.g., '\muV' for
+%                       microvolts).
+%   'topo'           = {map,chan_locs,eloc_info} Plot a 2-D scalp map at upper left of image.
+%                       map may be a single integer, representing the plotted data channel,
+%                       or a vector of scalp map channel values. chan_locs may be a channel locations
+%                       file or a chanlocs structure (EEG.chanlocs). See '>> topoplot example'
+%                       eloc_info (EEG.chaninfo), if empty ([]) or absent, implies the 'X' direction
+%                       points towards the nose and all channels are plotted {default: no scalp map}
+%   'spec'           = [loHz,hiHz] Plot the mean data spectrum at upper right of image.
+%   'horz'           = [epochs_vector] Plot horizontal lines at specified epoch numbers.
+%   'vert'           = [times_vector] Plot vertical dashed lines at specified latencies
+%   'auxvar'         = [size(nvars,ntrials) matrix] Plot auxiliary variable(s) for each trial
+%                       as separate traces. Else, 'auxvar',{[matrix],{colorstrings}}
+%                       to specify N trace colors.  Ex: colorstrings = {'r','bo-','','k:'}
+%                       (See also: 'vert' and 'timewarp' above). {default: none}
+%   'sortvarpercent' = [float vector] Plot percentiles for the sorting variable
+%                       for instance, [0.1 0.5 0.9] plots the 10th percentile, the median
+%                       and the 90th percentile.
 % Plot options:
-% 'noxlabel'  = ['on'|'off'] Do not plot "Time (ms)" on the bottom x-axis
-% 'yerplabel' = ['string'] ERP ordinate axis label (default is ERP). Print uV with '\muV'
+% 'noxlabel'          = ['on'|'off'] Do not plot "Time (ms)" on the bottom x-axis
+% 'yerplabel'         = ['string'] ERP ordinate axis label (default is ERP). Print uV with '\muV'
+% 'avg_type'          = ['boxcar'|'Gaussian'] The type of moving average used to smooth 
+%                        the data. 'Boxcar' smoothes the data by simply taking the mean of
+%                        a certain number of trials above and below each trial.
+%                        'Gaussian' does the same but first weights the trials
+%                        according to a Gaussian distribution (e.g., nearby trials
+%                        receive greater weight).  The Gaussian is better than the
+%                        boxcar in that it rather evenly filters out high frequency
+%                        vertical components in the ERPimage. See 'avewidth' argument
+%                        description for more information. {default: boxcar}
+% 'img_trialax_label' = ['string'] The label of the axis corresponding to trials in the ERPimage 
+%                        (e.g., 'Reaction Time').  Note, if img_trialax_label is set to something 
+%                        besides 'Trials' or [], the tick marks on this axis will be set in units 
+%                        of the sorting variable.  This is a useful alternative to plotting the 
+%                        sorting variable when the sorting variable is not in milliseconds. This 
+%                        option is not effective if sorting by amplitude, phase, or EEG value. {default: 'Trials'}
+% 'img_trialax_ticks' = Vector of sorting variable values at which tick marks (e.g., [300 350 400 450] 
+%                        for reaction time in msec) will appear on the trial axis of the erpimage. Tick mark
+%                        values should be given in units img_trialax_label (e.g., 'Trials' or msec). 
+%                        This option is not effective if sorting by amplitude, phase, or EEG value.
+%                        {default: automatic}
+% 'baseline'          = [low_boundary high_boundary] a time window (in msec) whose mean amplitude in 
+%                        each trial will be removed from each trial (e.g., [-100 0]) after filtering.  
+%                        Useful in conjunction with 'filt' option to re-basline trials after they have been 
+%                        filtered. Not necessary if data have already been baselined and erpimage 
+%                        processing does not affect baseline amplitude {default: no further baselining 
+%                        of data}
+% 'filt'              = [low_boundary high_boundary] a two element vector indicating the frequency
+%                        cut-offs for a 3rd order Butterworth filter that will be applied to each
+%                        trial of data.  If low_boundary=0, the filter is a low pass filter.  If
+%                        high_boundary=srate/2, then the filter is a high pass filter.  If both
+%                        boundaries are between 0 and srate/2, then the filter is a bandpass filter.
+%                        If both boundaries are between 0 and -srate/2, then the filter is a bandstop
+%                        filter (with boundaries equal to the absolute values of low_boundary and 
+%                        high_boundary).  Note, using this option requires the 'srate' option to be
+%                        specified and the signal processing toolbox function butter.m.  You should 
+%                        probably use the 'baseline' option as well since the mean prestimulus baseline 
+%                        may no longer be 0 after the filter is applied {default: no filtering}
 %
 % Optional outputs:
 %    outdata  = (times,epochsout) data matrix (after smoothing)
@@ -206,9 +271,30 @@
 
 %% LOG COMMENTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % $Log: not supported by cvs2svn $
-% Revision 1.284  2009/09/15 23:17:40  scott
 %
-% nothing
+% 2010/01/01 David Groppe, Kutaslab
+% -Fixed error in help description of 'filt' option and orderofmag bug
+%
+% 2009/09/25 David Groppe, Kutaslab
+% Added:
+% -option avg_type (thanks to Jeffrey S. Johnson for the idea)
+% -option for plotting median/tertile/quartile split ERPs 
+% -option erp_grid
+% -erps are plot in front of voltage=0 and time=0 lines
+% -Added y-axis ticks for ERP
+% -option cbar_title
+% -Removed xticks for colorbar
+% -option img_trialax_label
+% -option img_trialax_ticks
+% -option filt
+% -option baseline
+% -max and min ERP voltage limits can now be independently specified
+%  (before max=max(abs([minerp maxerp])); and min=-max)
+% -sortvar limits can be specified (affects visualization, not smoothing)
+% -erpalpha documentation is fixed (It used to say significance thresholds
+% were based on bootstrapping. They are actually based on a permutation
+% test.)
+% -option erp_vltg_ticks
 %
 % Revision 1.283  2009/07/08 00:04:13  arno
 % remove warnings
@@ -221,9 +307,6 @@
 %
 % Revision 1.280  2008/10/16 17:06:32  julie
 % was missing a % in line 3387.
-%
-% exit
-% exit
 %
 % Revision 1.279  2008/06/24 01:06:29  scott
 % in help specified 'limits'  loamp & hiamp --> lodB & hidB
@@ -1081,7 +1164,7 @@
 %       on the coher axis when printed (-djpeg or -depsc)
 % 'allcohers' - not fully implemented, and has been omitted from the help msg
 
-function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,allamps,phaseangles,phsamp,sortidx,erpsig] = erpimage(data,sortvar,times,titl,avewidth,decfactor,arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13,arg14,arg15,arg16,arg17,arg18,arg19,arg20,arg21,arg22,arg23,arg24,arg25,arg26)
+function [data,outsort,outtrials,limits,axhndls,erp,amps,cohers,cohsig,ampsig,allamps,phaseangles,phsamp,sortidx,erpsig] = erpimage(data,sortvar,times,titl,avewidth,decfactor,arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13,arg14,arg15,arg16,arg17,arg18,arg19,arg20,arg21,arg22,arg23,arg24,arg25,arg26,arg27,arg28,arg29,arg30,arg31,arg32,arg33,arg34,arg35,arg36,arg37,arg38,arg39,arg40,arg41,arg42,arg43,arg44,arg45,arg46,arg47,arg48,arg49,arg50,arg51,arg52,arg53,arg54,arg55,arg56,arg57,arg58,arg59,arg60,arg61,arg62,arg63,arg64,arg65,arg66)
 
 %
 %% %%%%%%%%%%%%%%%%% Define defaults %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1122,6 +1205,7 @@ PLOT_HEIGHT = 0.2;  % fraction of y dim taken up by each time series axes
 YGAP = 0.03;        % fraction gap between time axes
 YEXPAND = 1.3;      % expansion factor for y-axis about erp, amp data limits
 
+DEFAULT_SDEV  = 1/7; % smooth trials with this window size by default if Gaussian window
 DEFAULT_AVEWIDTH  = 1; % smooth trials with this window size by default
 DEFAULT_DECFACTOR = 1; % decimate by this factor by default
 DEFAULT_CYCLES    = 3; % use this many cycles in amp,coher computation window
@@ -1139,6 +1223,18 @@ Nosort    = NO;     % sort on sortvar by default
 Caxflag   = NO;     % use default caxis by default
 
 timestretchflag = NO; % Added -JH
+
+mvavg_type='boxcar'; % use the original rectangular moving average -DG
+erp_grid = NO; % add y-tick grids to ERP plot -DG
+cbar_title = []; % title to add above ERPimage color bar (e.g., '\muV') -DG
+img_ylab = 'Trials'; % make the ERPimage y-axis in units of the sorting variable -DG
+img_ytick_lab = []; % the values at which tick marks will appear on the trial axis of the ERPimage (the y-axis by default).
+%Note, this is in units of the sorting variable if img_ylab~='Trials', otherwise it is in units of trials -DG
+baseline = []; %time window of each trial whose mean amp will be used to baseline the trial -DG
+flt=[]; %frequency domain filter parameters -DG
+sortvar_limits=[]; %plotting limits for sorting variable/trials; limits only affect visualization, not smoothing -DG
+replace_ties = NO; %if YES, trials with the exact same value of a sorting variable will be replaced by their average -DG
+erp_vltg_ticks=[]; %if non-empty, these are the voltage axis ticks for the ERP plot
 
 Caxis     = [];
 caxfraction = [];
@@ -1165,7 +1261,6 @@ titleflag = NO;
 Noshowflag  = NO;
 Renormflag = NO;
 Showwin = NO;
-% yerplabel = '\muV';
 yerplabel = 'ERP';
 yerplabelflag = NO;
 verttimes = [];
@@ -1190,6 +1285,7 @@ noshow    = 'no';
 Rmerp     = 'no';
 percentiles = [];
 percentileflag = NO;
+erp_ptiles = 1;
 
 minerp = NaN; % default limits
 maxerp = NaN;
@@ -1205,6 +1301,7 @@ axcb   = NaN;
 ax2    = NaN;
 ax3    = NaN;
 ax4    = NaN;
+
 
 timeStretchRef = [];
 timeStretchMarks = [];
@@ -1260,7 +1357,7 @@ end
 if nargin<3
     times = NO;
 end
-if length(times) == 1 | times == NO,  % make default times
+if (length(times) == 1) | (times == NO),  % make default times
     times = 0:frames-1;
     srate = 1000*(length(times)-1)/(times(length(times))-times(1));
     fprintf('Using sampling rate %g Hz.\n',srate);
@@ -1280,22 +1377,10 @@ if length(times) ~= frames
         framestot,              length(sortvar),   length(times));
     return
 end
-if avewidth == 0,
-    avewidth = DEFAULT_AVEWIDTH;
-end
+
 if decfactor == 0,
     decfactor = DEFAULT_DECFACTOR;
-end
-if avewidth < 1
-    help erpimage
-    fprintf('\nerpimage(): Variable avewidth cannot be < 1.\n')
-    return
-end
-if avewidth > ntrials
-    fprintf('Setting variable avewidth to max %d.\n',ntrials)
-    avewidth = ntrials;
-end
-if decfactor > ntrials
+elseif decfactor > ntrials
     fprintf('Setting variable decfactor to max %d.\n',ntrials)
     decfactor = ntrials;
 end
@@ -1311,7 +1396,7 @@ if nargin > 6
         
         Arg = eval(['arg' int2str(a-6)]);
         if Caxflag == YES
-            if size(Arg,1) ~= 1 | size(Arg,2) > 2
+            if size(Arg,1) ~= 1 || size(Arg,2) > 2
                 help erpimage
                 fprintf('\nerpimage(): caxis arg must be a scalar or (1,2) vector.\n');
                 return
@@ -1324,10 +1409,6 @@ if nargin > 6
             Caxflag = NO;
 
         elseif timestretchflag == YES % Added -JH
-            if ~isstruct(Arg)
-		fprintf('erpimage(): Timewarp argument must be a cell array.\n')
-                return
-            end
             timeStretchMarks = Arg{1};
             timeStretchMarks = round(1+(timeStretchMarks-times(1))*srate/1000); % convert from ms to frames -sm
             [smc smr] = find(diff(timeStretchMarks') < 0);
@@ -1340,14 +1421,14 @@ if nargin > 6
                 repmat(1, [size(timeStretchMarks,1), 1]), ...% Epoch begins
                 timeStretchMarks, ...
                 repmat(length(times), [size(timeStretchMarks,1), 1])]; % Epoch ends
-            if length(Arg) < 2 | isempty(Arg{2})
+            if length(Arg) < 2 || isempty(Arg{2})
                 timeStretchRef = median(timeStretchMarks);
             else
                 timeStretchRef = Arg{2};
                 timeStretchRef = round(1+(timeStretchRef-times(1))*srate/1000); % convert from ms to frames -sm
                 timeStretchRef = [1 timeStretchRef length(times)];  % add epoch beginning, end
             end
-            if length(Arg) < 3 | isempty(Arg{3})
+            if length(Arg) < 3 || isempty(Arg{3})
                 timeStretchColors = {};
             else
                 timeStretchColors = Arg{3};
@@ -1357,7 +1438,7 @@ if nargin > 6
             fprintf(' ms\n');
             timestretchflag = NO;
         elseif Coherflag == YES
-            if length(Arg) > 3 | length(Arg) < 1
+            if length(Arg) > 3 || length(Arg) < 1
                 help erpimage
                 fprintf('\nerpimage(): coher arg must be size <= 3.\n');
                 return
@@ -1371,7 +1452,7 @@ if nargin > 6
             if size(Arg,2) == 3
                 Cohsigflag = YES;
                 alpha  = Arg(3);
-                if alpha < 0 | alpha > 0.1
+                if alpha < 0 || alpha > 0.1
                     fprintf('erpimage(): alpha value %g out of bounds.\n',alpha);
                     return
                 end
@@ -1413,7 +1494,7 @@ if nargin > 6
             percentileflag = NO;
         elseif Limitflag == YES
             %  [lotime hitime loerp hierp loamp hiamp locoher hicoher]
-            if size(Arg,1) ~= 1 | size(Arg,2) < 2 | size(Arg,2) > 9
+            if size(Arg,1) ~= 1 || size(Arg,2) < 2 || size(Arg,2) > 9
                     help erpimage
                 fprintf('\nerpimage(): limits arg must be a vector sized (1,2<->9).\n');
                 return
@@ -1424,11 +1505,11 @@ if nargin > 6
                 return
             end
             if Arg(1) < min(times)
-                Arg(1) = min(times);
+                Arg(1) = min(times); 
                 fprintf('Adjusting mintime limit to first data value %g\n',min(times));
             end
             if Arg(2) > max(times)
-                Arg(2) = max(times);
+                Arg(2) = max(times); 
                 fprintf('Adjusting maxtime limit to last data value %g\n',max(times));
             end
             timelimits = Arg(1:2);
@@ -1477,7 +1558,7 @@ if nargin > 6
             cycles = Arg;
             Cycleflag = NO;
         elseif Auxvarflag == YES;
-            if isa(Arg,'cell')==YES & length(Arg)==2
+            if isa(Arg,'cell')==YES && length(Arg)==2
                 auxvar = Arg{1};
                 auxcolors = Arg{2};
             elseif isa(Arg,'cell')==YES
@@ -1488,9 +1569,9 @@ if nargin > 6
             end
             [xr,xc] = size(auxvar);
             lns = length(sortvar);
-            if xr ~= lns & xc ~= lns
+            if xr ~= lns && xc ~= lns
                error('auxvar columns different from the number of epochs in data');
-            elseif xr == lns & xc ~= lns
+            elseif xr == lns && xc ~= lns
                auxvar = auxvar';   % exchange rows/cols
             end
             Auxvarflag = NO;
@@ -1632,6 +1713,17 @@ if nargin > 6
         % -----------------------------------------------------------------------
         % -----------------------------------------------------------------------
         % -----------------------------------------------------------------------
+       elseif strcmpi(Arg,'avg_type')
+            if a < nargin, 
+                a=a+1;
+                Arg = eval(['arg' int2str(a-6)]); 
+                if strcmpi(Arg, 'Gaussian'), mvavg_type='gaussian'; 
+                elseif strcmpi(Arg, 'Boxcar'), mvavg_type='boxcar'; 
+                else error('Invalid value for optional argument ''avg_type''.');
+                end;
+            else
+                error('Optional argument ''avg_type'' needs to be assigned a value.');
+            end
         elseif strcmp(Arg,'nosort')
             Nosort = YES;
             if a < nargin, 
@@ -1656,12 +1748,40 @@ if nargin > 6
                 elseif strcmpi(Arg, 'off') Noshow = NO;  a = a+1;
                 end;
             end;
-        elseif strcmp(Arg,'erp')| strcmp(Arg,'ERP')
+        elseif strcmpi(Arg,'replace_ties')
+            if a < nargin,
+                a = a+1;
+                temp = eval(['arg' int2str(a-6)]);
+                if strcmpi(temp,'on'),
+                    replace_ties = YES;
+                elseif strcmpi(temp,'off') replace_ties = NO;
+                else
+                    error('Argument ''replace_ties'' needs to be followed by the string ''on'' or ''off''.');
+                end
+            else
+                error('Argument ''replace_ties'' needs to be followed by the string ''on'' or ''off''.');
+            end
+        elseif strcmpi(Arg,'sortvar_limits')
+            if a < nargin,
+                a = a+1;
+                sortvar_limits = eval(['arg' int2str(a-6)]);
+                if ischar(sortvar_limits) || length(sortvar_limits)~=2
+                  error('Argument ''sortvar_limits'' needs to be followed by a two element vector.');  
+                end
+            else
+                error('Argument ''sortvar_limits'' needs to be followed by a two element vector.');
+            end
+        elseif strcmpi(Arg,'erp')
             Erpflag = YES;
+            erp_ptiles=1;
             if a < nargin, 
                 Arg = eval(['arg' int2str(a+1-6)]); 
-                if strcmpi(Arg, 'on'),     Erpflag = YES; a = a+1;
+                if strcmpi(Arg, 'on'),     Erpflag = YES; erp_ptiles=1; a = a+1;
                 elseif strcmpi(Arg, 'off') Erpflag = NO;  a = a+1;
+                elseif strcmpi(Arg,'1') | (Arg==1) Erplag = YES; erp_ptiles=1; a=a+1;
+                elseif strcmpi(Arg,'2') | (Arg==2) Erplag = YES; erp_ptiles=2; a=a+1;
+                elseif strcmpi(Arg,'3') | (Arg==3) Erplag = YES; erp_ptiles=3; a=a+1;
+                elseif strcmpi(Arg,'4') | (Arg==4) Erplag = YES; erp_ptiles=4; a=a+1;
                 end;
             end;            
         elseif strcmpi(Arg,'rmerp')
@@ -1744,15 +1864,59 @@ if nargin > 6
             Auxvarflag = YES;
         elseif strcmp(Arg,'cycles')
             Cycleflag = YES;
-        elseif strcmp(Arg,'yerplabel')
+        elseif strcmpi(Arg,'yerplabel')
             yerplabelflag = YES;
-        elseif strcmp(Arg,'srate')
+        elseif strcmpi(Arg,'srate')
             Srateflag = YES;
-        elseif strcmp(Arg,'vert') |  strcmp(Arg,'verttimes')
+        elseif strcmpi(Arg,'erp_grid')
+            erp_grid = YES;
+        elseif strcmpi(Arg,'baseline')
+            if a < nargin,
+                a = a+1;
+                baseline = eval(['arg' int2str(a-6)]);
+            else
+                error('Argument ''baseline'' needs to be followed by a two element vector.');
+            end
+        elseif strcmpi(Arg,'filt')
+            if a < nargin,
+                a = a+1;
+                flt = eval(['arg' int2str(a-6)]);
+            else
+                error('Argument ''filt'' needs to be followed by a two element vector.');
+            end
+        elseif strcmpi(Arg,'erp_vltg_ticks')
+            if a < nargin,
+                a = a+1;
+                erp_vltg_ticks=eval(['arg' int2str(a-6)]);
+            else
+                error('Argument ''erp_vltg_ticks'' needs to be followed by a vector.');
+            end          
+        elseif strcmpi(Arg,'img_trialax_label')
+            if a < nargin,
+                a = a+1;
+                img_ylab = eval(['arg' int2str(a-6)]);
+            else
+                error('Argument ''img_trialax_label'' needs to be followed by a string.');
+            end;
+        elseif strcmpi(Arg,'img_trialax_ticks')
+            if a < nargin,
+                a = a+1;
+                img_ytick_lab = eval(['arg' int2str(a-6)]);
+            else
+                error('Argument ''img_trialax_ticks'' needs to be followed by a vector of values at which tick marks will appear.');
+            end;
+        elseif strcmpi(Arg,'cbar_title')
+            if a < nargin, 
+                a = a+1;
+                cbar_title = eval(['arg' int2str(a-6)]); 
+            else
+                error('Argument ''cbar_title'' needs to be followed by a string.');
+            end;   
+        elseif strcmp(Arg,'vert') ||  strcmp(Arg,'verttimes')
             Vertflag = YES;
-        elseif strcmp(Arg,'horz') |  strcmp(Arg,'horiz') | strcmp(Arg,'horizontal')
+        elseif strcmp(Arg,'horz') ||  strcmp(Arg,'horiz') || strcmp(Arg,'horizontal')
             Horzflag = YES;
-        elseif strcmp(Arg,'signif')|strcmp(Arg,'signifs')|strcmp(Arg,'sig')|strcmp(Arg,'sigs')
+        elseif strcmp(Arg,'signif') || strcmp(Arg,'signifs') || strcmp(Arg,'sig') || strcmp(Arg,'sigs')
             Signifflag = YES;
         else
             help erpimage
@@ -1765,6 +1929,29 @@ if nargin > 6
         end
     end % Arg
 end
+
+if exist('img_ylab','var') || exist('img_ytick_lab','var'),
+    oops=0;
+    if exist('phargs','var'),
+        fprintf('********* Warning *********\n');
+        fprintf('Options ''img_ylab'' and ''img_ytick_lab'' have no effect when sorting by phase.\n');
+        oops=0;
+    elseif exist('valargs','var'),
+        fprintf('********* Warning *********\n');
+        fprintf('Options ''img_ylab'' and ''img_ytick_lab'' have no effect when sorting by EEG voltage.\n');
+        oops=0;
+    elseif exist('ampargs','var'),
+        fprintf('********* Warning *********\n');
+        fprintf('Options ''img_ylab'' and ''img_ytick_lab'' have no effect when sorting by frequency amplitude.\n');
+        oops=0;
+    end
+    if oops
+        img_ylab=[];
+        img_ytick_lab=[];
+    end
+end
+
+
 if strcmpi(noshow, 'off'), noshow = 'no'; end;
 
 if   Caxflag == YES ...
@@ -1963,9 +2150,6 @@ if any(isnan(sortvar))
     fprintf('Removing %d trials with NaN sortvar values.\n', length(nanlocs));
     data(:,nanlocs) = [];
     sortvar(nanlocs) = [];
-    if length(sortvar) < 4 & avewidth > 1
-        error('Not enough trials');
-    end;
     if exist('data2') == 1
         data2(:,nanlocs) = [];
     end;
@@ -1980,6 +2164,129 @@ if any(isnan(sortvar))
     ntrials = size(data,2);
     if ntrials <= 1, close(gcf); error('Too few trials'); end;
 end;
+
+%% Create moving average window %%
+if strcmpi(mvavg_type,'Gaussian'),
+    %construct Gaussian window to weight trials
+    if avewidth == 0,
+        avewidth = DEFAULT_SDEV;
+    elseif avewidth < 1,
+        help erpimage
+        fprintf('\nerpimage(): Variable avewidth cannot be < 1.\n')
+        fprintf('\nerpimage(): avewidth needs to be a positive integer.\n')
+        return
+    end
+    wt_wind=exp(-0.5*([-3*avewidth:3*avewidth]/avewidth).^2)';
+    wt_wind=wt_wind/sum(wt_wind); %normalize to unit sum
+    avewidth=length(wt_wind);
+    
+    if avewidth > ntrials
+        avewidth=floor((ntrials-1)/6);
+        if avewidth==0,
+            avewidth=DEFAULT_SDEV; %should be a window with one time point (smallest possible)
+        end
+        wt_wind=exp(-0.5*([-3*avewidth:3*avewidth]/avewidth).^2)';
+        wt_wind=wt_wind/sum(wt_wind);
+        fprintf('avewidth is too big for this number of trials.\n');
+        fprintf('Changing avewidth to maximum possible size: %d\n',avewidth);
+        avewidth=length(wt_wind);
+    end
+else
+    %construct rectangular "boxcar" window to equally weight trials within
+    %window
+    if avewidth == 0,
+        avewidth = DEFAULT_AVEWIDTH;
+    elseif avewidth < 1
+        help erpimage
+        fprintf('\nerpimage(): Variable avewidth cannot be < 1.\n')
+        return
+    elseif avewidth > ntrials
+        fprintf('Setting variable avewidth to max %d.\n',ntrials)
+        avewidth = ntrials;
+    end
+    wt_wind=ones(1,avewidth)/avewidth; 
+end
+
+
+%% Filter data with Butterworth filter (if requested) %%%%%%%%%%%%
+%
+if ~isempty(flt)
+    %error check
+    if length(flt)~=2,
+       error('''filt'' parameter argument should be a two element vector.');
+    elseif max(flt)>(srate/2),
+       error('''filt'' parameters need to be less than or equal to sampling rate/2 (i.e., %f).',srate/2);
+    elseif (flt(2)==(srate/2)) && (flt(1)==0),
+        error('If second element of ''filt'' parameter is srate/2, then the first element must be greater than 0.');
+    elseif abs(flt(2))<=abs(flt(1)),
+       error('Second element of ''filt'' parameters must be greater than first in absolute value.'); 
+    elseif (flt(1)<0) || (flt(2)<0),
+        if (flt(1)>=0) || (flt(2)>=0),
+           error('BOTH parameters of ''filt'' need to be greater than or equal to zero OR need to be negative.');
+        end
+        if min(flt)<=(-srate/2),
+            error('''filt'' parameters need to be greater than sampling rate/2 (i.e., -%f) when creating a stop band.',srate/2);
+        end
+    end
+    
+    fprintf('\nFiltering data with 3rd order Butterworth filter: ');
+    if (flt(1)==0),
+        %lowpass filter the data
+        [B A]=butter(3,flt(2)*2/srate,'low');
+        fprintf('lowpass at %.0f Hz\n',flt(2));
+    elseif (flt(2)==(srate/2)),
+        %highpass filter the data
+        [B A]=butter(3,flt(1)*2/srate,'high');
+        fprintf('highpass at %.0f Hz\n',flt(1));
+    elseif (flt(1)<0)
+        %bandstop filter the data
+        flt=-flt;
+        [B A]=butter(3,flt*2/srate,'stop');
+        fprintf('stopband from %.0f to %.0f Hz\n',flt(1),flt(2));
+    else
+        %bandpass filter the data
+        [B A]=butter(3,flt*2/srate);
+        fprintf('bandpass from %.0f to %.0f Hz\n',flt(1),flt(2));
+    end
+    s=size(data);
+    for trial=1:s(2),
+        data(:,trial)=filtfilt(B,A,data(:,trial));
+    end
+    if isempty(baseline)
+        fprintf('Note, you might want to re-baseline the data using the erpiamge ''baseline'' option.\n\n');
+    end
+end
+
+%% Mean Baseline Each Trial (if requested) %%
+if ~isempty(baseline),
+    %check argument values for errors    
+    if baseline(2)<baseline(1),
+       error('First element of ''baseline'' argument needs to be less than or equal to second argument.'); 
+    elseif baseline(2)<times(1),
+        error('Second element of ''baseline'' argument needs to be greater than or equal to epoch start time %.1f.',times(1));
+    elseif baseline(1)>times(end),
+        error('First element of ''baseline'' argument needs to be less than or equal to epoch end time %.1f.',times(end));
+    end
+    
+    %convert msec into time points
+    if baseline(1)<times(1),
+        strt_pt=1;
+    else
+        strt_pt=find_crspnd_pt(baseline(1),times,1:length(times));
+        strt_pt=ceil(strt_pt);
+    end
+    if baseline(end)>times(end),
+        end_pt=length(times);
+    else
+        end_pt=find_crspnd_pt(baseline(2),times,1:length(times));
+        end_pt=floor(end_pt);
+    end
+    fprintf('\nRemoving pre-stimulus mean baseline from %.1f to %.1f msec.\n\n',times(strt_pt),times(end_pt));
+    bsln_mn=mean(data(strt_pt:end_pt,:),1);
+    data=data-repmat(bsln_mn,length(times),1);
+end
+
+
 
 %
 %% %%%%%%%%%%%%%%%%% Renormalize sortvar %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -2333,7 +2640,7 @@ elseif exist('valargs')
         endframe = stframe;
         endtime = times(endframe);
     end
-    if length(valargs)==1 | sttime == endtime
+    if length(valargs)==1 || sttime == endtime
         fprintf('Sorting data on value at time %4.0f ms.\n',sttime);
     elseif length(valargs)>1
         fprintf('Sorting data on mean value between %4.0f and %4.0f ms.\n',...
@@ -2371,6 +2678,36 @@ else
     if ~isempty(auxvar)
         auxvar = auxvar(:,sortidx);
     end
+    uni_svar=unique(sortvar);
+    n_ties=0;
+    tie_dist=zeros(1,length(uni_svar));
+    loop_ct=0;
+    for tie_loop=uni_svar,
+        ids=find(sortvar==tie_loop);
+        n_ids=length(ids);
+        if n_ids>1,
+            if replace_ties==YES,
+                mn=mean(data(:,ids),2);
+                data(:,ids)=repmat(mn,1,n_ids);
+                if ~isempty(auxvar)
+                    mn=mean(auxvar(:,ids),2);
+                    auxvar(:,ids) = repmat(mn,1,n_ids);
+                end
+            end
+            n_ties=n_ties+n_ids;
+            loop_ct=loop_ct+1;
+            tie_dist(loop_ct)=n_ids;
+        end
+    end
+    fprintf('%.2f%c of the trials (i.e., %d out of %d) have the same sortvar value as at least one other trial.\n', ...
+        100*n_ties/length(sortvar),37,n_ties,length(sortvar));
+    fprintf('Distribution of number ties per unique value of sortvar:\n');
+    fprintf('Min: %d, 25th ptile: %d, Median: %d, 75th ptile: %d, Max: %d\n',min(tie_dist),round(prctile(tie_dist,25)), ...
+        round(median(tie_dist)),round(prctile(tie_dist,75)),max(tie_dist));
+    if replace_ties==YES,
+        fprintf('Trials with tied sorting values will be replaced by their mean.\n');
+    end
+    fprintf('\n');
 end
 
 %if max(sortvar)<0
@@ -2426,7 +2763,7 @@ if ~Allampsflag & ~exist('data2') % if imaging potential,
     tsurdata = data;
     % Time-stretching ends here %%%%%%%%%%%%%%
 
-    if avewidth > 1 | decfactor > 1
+    if avewidth > 1 || decfactor > 1
         if Nosort == YES
             fprintf('Smoothing the data using a window width of %g epochs ',avewidth);
         else
@@ -2437,9 +2774,9 @@ if ~Allampsflag & ~exist('data2') % if imaging potential,
         fprintf('  and a decimation factor of %g\n',decfactor);
 
         if ~exist('phargs') % if not phase-sorted trials
-            [data,outtrials] = movav(data,1:ntrials,avewidth,decfactor);
+            [data,outtrials] = movav(data,1:ntrials,avewidth,decfactor,[],[],wt_wind);
             % Note: movav() here sorts using square window
-            [outsort,outtrials] = movav(sortvar,1:ntrials,avewidth,decfactor);
+            [outsort,outtrials] = movav(sortvar,1:ntrials,avewidth,decfactor,[],[],wt_wind);
 
         else % if phase-sorted trials, use circular / wrap-around smoothing
             backhalf  = floor(avewidth/2);
@@ -2448,19 +2785,19 @@ if ~Allampsflag & ~exist('data2') % if imaging potential,
                 [data,outtrials] = movav([data(:,[(end-backhalf+1):end]),...
                     data,...
                     data(:,[1:fronthalf])],...
-                    [1:(ntrials+backhalf+fronthalf)],avewidth,decfactor);
+                    [1:(ntrials+backhalf+fronthalf)],avewidth,decfactor,[],[],wt_wind);
                 [outsort,outtrials] = movav([sortvar((end-backhalf+1):end),...
                     sortvar,...
                     sortvar(1:fronthalf)],...
-                    1:(ntrials+backhalf+fronthalf),avewidth,decfactor);
+                    1:(ntrials+backhalf+fronthalf),avewidth,decfactor,[],[],wt_wind);
                 % Shift elements of outtrials so the first element is 1
                 outtrials = outtrials - outtrials(1) + 1;
             else % avewidth==2
                 [data,outtrials] = movav([data(:,end),data],...
-                    [1:(ntrials+1)],avewidth,decfactor);
+                    [1:(ntrials+1)],avewidth,decfactor,[],[],wt_wind);
                 % Note: movav() here sorts using square window
                 [outsort,outtrials] = movav([sortvar(end) sortvar],...
-                    1:(ntrials+1),avewidth,decfactor);
+                    1:(ntrials+1),avewidth,decfactor,[],[],wt_wind);
                 % Shift elements of outtrials so the first element is 1
                 outtrials = outtrials - outtrials(1) + 1;
             end
@@ -2470,25 +2807,27 @@ if ~Allampsflag & ~exist('data2') % if imaging potential,
         end;
         if ~isempty(auxvar)
             if ~exist('phargs') % if not phase-sorted trials
-                [auxvar,tmp] = movav(auxvar,1:ntrials,avewidth,decfactor);
+                [auxvar,tmp] = movav(auxvar,1:ntrials,avewidth,decfactor,[],[],wt_wind);
             else % if phase-sorted trials
                 if avewidth>2
                     [auxvar,tmp] = movav([auxvar(:,[(end-backhalf+1):end]),...
                         auxvar,...
                         auxvar(:,[1:fronthalf])],...
-                        [1:(ntrials+backhalf+fronthalf)],avewidth,decfactor);
+                        [1:(ntrials+backhalf+fronthalf)],avewidth,decfactor,[],[],wt_wind);
                     % Shift elements of tmp so the first element is 1
                     tmp = tmp - tmp(1) + 1;
                 else % avewidth==2
-                    [auxvar,tmp] = movav([auxvar(:,end),auxvar],[1:(ntrials+1)],avewidth,decfactor);
+                    [auxvar,tmp] = movav([auxvar(:,end),auxvar],[1:(ntrials+1)],avewidth,decfactor,[],[],wt_wind);
                     % Shift elements of tmp so the first element is 1
                     tmp = tmp - tmp(1) + 1;
                 end
             end
         end
-        fprintf('Output data will be %d frames by %d smoothed trials.\n',...
-            frames,length(outtrials));
-        fprintf('Outtrials: %3.2f to %4.2f\n',min(outtrials),max(outtrials));
+      %  if ~isempty(sortvar_limits),
+      %      fprintf('Output data will be %d frames by %d smoothed trials.\n',...
+      %          frames,length(outtrials));
+      %      fprintf('Outtrials: %3.2f to %4.2f\n',min(outtrials),max(outtrials));
+      %  end
     else % don't smooth
         outtrials = 1:ntrials;
         outsort = sortvar;
@@ -2557,8 +2896,6 @@ if ~isempty(i)
     data(i,j) = 0;      % plot shifted nan data as 0 (=green)
 end
 
-% $$$ keyboard; %Change ind, data, or urdata ?
-
 %
 %% %%%%%%%%%%% Determine coherence freqeuncy %%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -2592,12 +2929,12 @@ if ~Allampsflag & ~exist('data2') %%%%%%%% Plot ERP image %%%%%%%%%%
 
     if strcmpi(noshow, 'no')
         if TIMEX
-            imagesc(times,outtrials,data',[mindat,maxdat]);% plot time on x-axis
+            h_eim=imagesc(times,outtrials,data',[mindat,maxdat]);% plot time on x-axis
             set(gca,'Ydir','normal');
             axis([timelimits(1) timelimits(2) ...
                 min(outtrials) max(outtrials)]);
         else
-            imagesc(outtrials,times,data,[mindat,maxdat]); % plot trials on x-axis
+            h_eim=imagesc(outtrials,times,data,[mindat,maxdat]); % plot trials on x-axis
             axis([min(outtrials) max(outtrials)...
                 timelimits(1) timelimits(2)]);
         end
@@ -2655,8 +2992,7 @@ elseif Allampsflag %%%%%%%%%%%%%%%% Plot allamps instead of data %%%%%%%%%%%%%%
     % allamps = allamps./baseall;
     % fprintf('#3 Size of allamps = [%d %d]\n',size(allamps,1),size(allamps,2));
 
-    if avewidth > 1 | decfactor > 1
-        % Note: using square window
+    if avewidth > 1 || decfactor > 1
         if Nosort == YES
             fprintf(...
                 'Smoothing the amplitude epochs using a window width of %g epochs ',...
@@ -2678,41 +3014,40 @@ elseif Allampsflag %%%%%%%%%%%%%%%% Plot allamps instead of data %%%%%%%%%%%%%%
                 [allamps,outtrials] = movav([allamps(:,[(end-backhalf+1):end]),...
                     allamps,...
                     allamps(:,[1:fronthalf])],...
-                    [1:(ntrials+backhalf+fronthalf)],avewidth,decfactor);
+                    [1:(ntrials+backhalf+fronthalf)],avewidth,decfactor,[],[],wt_wind);
                 % Note: sort using square window
                 [outsort,outtrials] = movav([sortvar((end-backhalf+1):end),...
                     sortvar,...
                     sortvar(1:fronthalf)],...
-                    1:(ntrials+backhalf+fronthalf),avewidth,decfactor);
+                    1:(ntrials+backhalf+fronthalf),avewidth,decfactor,[],[],wt_wind);
                 % Shift elements of outtrials so the first element is 1
                 outtrials = outtrials - outtrials(1) + 1;
                 if ~isempty(auxvar)
                     [auxvar,tmp] = movav([auxvar(:,[(end-backhalf+1):end]),...
                         auxvar,...
                         auxvar(:,[1:fronthalf])],...
-                        [1:(ntrials+backhalf+fronthalf)],avewidth,decfactor);
+                        [1:(ntrials+backhalf+fronthalf)],avewidth,decfactor,[],[],wt_wind);
                     % Shift elements of outtrials so the first element is 1
                     outtrials = outtrials - outtrials(1) + 1;
                 end
             else % avewidth==2
                 [allamps,outtrials] = movav([allamps(:,end),allamps],...
-                    [1:(ntrials+1)],avewidth,decfactor);
+                    [1:(ntrials+1)],avewidth,decfactor,[],[],wt_wind);
                 % Note: sort using square window
                 [outsort,outtrials] = movav([sortvar(end) sortvar],...
-                    1:(ntrials+1),avewidth,decfactor);
+                    1:(ntrials+1),avewidth,decfactor,[],[],wt_wind);
                 % Shift elements of outtrials so the first element is 1
                 outtrials = outtrials - outtrials(1) + 1;
-                [auxvar,tmp] = movav([auxvar(:,end),auxvar],[1:(ntrials+1)],avewidth,decfactor);
+                [auxvar,tmp] = movav([auxvar(:,end),auxvar],[1:(ntrials+1)],avewidth,decfactor,[],[],wt_wind);
                 % Shift elements of tmp so the first element is 1
                 tmp = tmp - tmp(1) + 1;
             end
         else % if trials not phase sorted, no wrap-around
-            [allamps,outtrials] = movav(allamps,1:ntrials,avewidth,decfactor);
-            % Note: using square window
+            [allamps,outtrials] = movav(allamps,1:ntrials,avewidth,decfactor,[],[],wt_wind);
             %fprintf('5 Size of allamps = [%d %d]\n',size(allamps,1),size(allamps,2));
-            [outsort,outtrials] = movav(sortvar,1:ntrials,avewidth,decfactor);
+            [outsort,outtrials] = movav(sortvar,1:ntrials,avewidth,decfactor,[],[],wt_wind);
             if ~isempty(auxvar)
-                [auxvar,tmp] = movav(auxvar,1:ntrials,avewidth,decfactor);
+                [auxvar,tmp] = movav(auxvar,1:ntrials,avewidth,decfactor,[],[],wt_wind);
             end
         end
         for index=1:length(percentiles)
@@ -2845,8 +3180,7 @@ elseif exist('data2') %%%%%% Plot allcohers instead of data %%%%%%%%%%%%%%%%%%%
     end
     % fprintf('#2 Size of allcohers = [%d %d]\n',size(allcohers,1),size(allcohers,2));
 
-    if avewidth > 1 | decfactor > 1
-        % Note: using square window
+    if avewidth > 1 || decfactor > 1
         if Nosort == YES
             fprintf(...
                 'Smoothing the amplitude epochs using a window width of %g epochs '...
@@ -2860,12 +3194,11 @@ elseif exist('data2') %%%%%% Plot allcohers instead of data %%%%%%%%%%%%%%%%%%%
         fprintf('  and a decimation factor of %g\n',decfactor);
         % fprintf('4 Size of allcohers = [%d %d]\n',size(allcohers,1),size(allcohers,2));
 
-        [allcohers,outtrials] = movav(allcohers,1:ntrials,avewidth,decfactor);
-        % Note: using square window
+        [allcohers,outtrials] = movav(allcohers,1:ntrials,avewidth,decfactor,[],[],wt_wind);
         % fprintf('5 Size of allcohers = [%d %d]\n',size(allcohers,1),size(allcohers,2));
-        [outsort,outtrials] = movav(sortvar,1:ntrials,avewidth,decfactor);
-        fprintf('Output data will be %d frames by %d smoothed trials.\n',...
-            frames,length(outtrials));
+        [outsort,outtrials] = movav(sortvar,1:ntrials,avewidth,decfactor,[],[],wt_wind);
+%        fprintf('Output data will be %d frames by %d smoothed trials.\n',...
+%            frames,length(outtrials));
     else
         outtrials = 1:ntrials;
         outsort = sortvar;
@@ -2904,7 +3237,98 @@ elseif exist('data2') %%%%%% Plot allcohers instead of data %%%%%%%%%%%%%%%%%%%
         hold on
     end;
 
-end %%%%%%%%%%%%%%%%%%%%%%%%%%% End plot image %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+end 
+
+%Change limits on ERPimage y-axis if requested
+if ~isempty(sortvar_limits)
+    if exist('phargs','var'),
+        fprintf('********* Warning *********\n');
+        fprintf('Specifying sorting variable limits has no effect when sorting by phase.\n');
+    elseif exist('valargs','var'),
+        fprintf('********* Warning *********\n');
+        fprintf('Specifying sorting variable limits has no effect when sorting by mean EEG voltage.\n');
+    elseif exist('ampargs','var'),
+        fprintf('********* Warning *********\n');
+        fprintf('Specifying sorting variable limits has no effect when sorting by frequency amp.\n'); 
+    else
+        v=axis;
+        img_mn=find_crspnd_pt(sortvar_limits(1),outsort,outtrials);
+        if isempty(img_mn),
+            img_mn=1;
+            sortvar_limits(1)=outsort(1);
+        end
+        img_mx=find_crspnd_pt(sortvar_limits(2),outsort,outtrials);
+        if isempty(img_mx),
+            img_mx=length(outsort);
+            sortvar_limits(2)=outsort(img_mx);
+        end
+        axis([v(1:2) img_mn img_mx]);
+        id1=find(sortvar>=sortvar_limits(1));
+        id2=find(sortvar<=sortvar_limits(2));
+        id=intersect(id1,id2);
+        fprintf('%d epochs fall within sortvar limits.\n',length(id));
+        urdata=urdata(:,id);
+        if ~isempty(tsurdata),
+            tsurdata=tsurdata(:,id);
+        end
+    end
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%% End plot image %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+v=axis;
+fprintf('Output data will be %d frames by %d smoothed trials.\n',...
+    frames,v(4)-v(3)+1);
+fprintf('Outtrials: %3.2f to %4.2f\n',v(3),v(4));
+
+%
+%%%%%%%%%%%%%%%%%%%%% Compute y-axis tick values and labels (if requested) %%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+
+if ~isempty(img_ylab) && ~strcmpi(img_ylab,'Trials')
+    %make ERPimage y-tick labels in units of sorting variable
+    if isempty(sortvar_limits),
+        mn=min(outsort);
+        mx=max(outsort);
+    else
+        mn=sortvar_limits(1);
+        mx=sortvar_limits(2);
+    end
+    ord=orderofmag(mx-mn);
+    rng_rnd=round([mn mx]/ord)*ord;
+    if isempty(img_ytick_lab)
+        img_ytick_lab=[rng_rnd(1):ord:rng_rnd(2)];
+        in_range=find((img_ytick_lab>=mn) & (img_ytick_lab<=mx));
+        img_ytick_lab=img_ytick_lab(in_range);
+    else
+        img_ytick_lab=unique(img_ytick_lab); %make sure it is sorted
+        in_range=find((img_ytick_lab>=mn) & (img_ytick_lab<=mx));
+        if length(img_ytick_lab)~=length(in_range),
+            fprintf('\n***Warning***\n');
+            fprintf('''img_trialax_ticks'' exceed smoothed sorting variable values. Max/min values are %f/%f.\n\n',mn,mx);
+            img_ytick_lab=img_ytick_lab(in_range);
+        end
+    end
+    n_tick=length(img_ytick_lab);
+    img_ytick=zeros(1,n_tick);
+    for tickloop=1:n_tick,
+        img_ytick(tickloop)=find_crspnd_pt(img_ytick_lab(tickloop),outsort,outtrials);
+    end
+elseif ~isempty(img_ylab), %make ERPimage y-tick labels in units of Trials
+    if isempty(img_ytick_lab)
+        v=axis; %note: sorting variable limits have already been used to determine range of ERPimage y-axis
+        mn=v(3);
+        mx=v(4);
+        ord=orderofmag(mx-mn);
+        rng_rnd=round([mn mx]/ord)*ord;
+        img_ytick=[rng_rnd(1):ord:rng_rnd(2)];
+        in_range=find((img_ytick>=mn) & (img_ytick<=mx));
+        img_ytick=img_ytick(in_range);
+    else
+        img_ytick=img_ytick_lab;
+    end
+end
+
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%% plot vert lines %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if ~isempty(verttimes)
@@ -2933,28 +3357,28 @@ if ~isempty(verttimes)
                         end
                         figure(curfig);plot([vt vt],[0 max(outtrials)],mydotstyle,'Linewidth',VERTWIDTH);
                     elseif length(vt)==ntrials
-                        [outvt,ix] = movav(vt,1:ntrials,avewidth,decfactor);
+                        [outvt,ix] = movav(vt,1:ntrials,avewidth,decfactor,[],[],wt_wind);
                         figure(curfig);plot(outvt,outtrials,DOTSTYLE,'Linewidth',VERTWIDTH);
                     end
                 else
                     if length(vt)==1
                         figure(curfig);plot([0 max(outtrials)],[vt vt],DOTSTYLE,'Linewidth',VERTWIDTH);
                     elseif length(vt)==ntrials
-                        [outvt,ix] = movav(vt,1:ntrials,avewidth,decfactor);
+                        [outvt,ix] = movav(vt,1:ntrials,avewidth,decfactor,[],[],wt_wind);
                         figure(curfig);plot(outtrials,outvt,DOTSTYLE,'Linewidth',VERTWIDTH);
                     end
                 end
             else % re-aligned data
                 if TIMEX          % overplot vt on image
                     if length(vt)==ntrials
-                        [outvt,ix] = movav(vt,1:ntrials,avewidth,decfactor);
+                        [outvt,ix] = movav(vt,1:ntrials,avewidth,decfactor,[],[],wt_wind);
                         figure(curfig);plot(aligntime+outvt-outsort,outtrials,DOTSTYLE,'LineWidth',VERTWIDTH);
                     elseif length(vt)==1
                         figure(curfig);plot(aligntime+vt-outsort,outtrials,DOTSTYLE,'LineWidth',VERTWIDTH);
                     end
                 else
                     if length(vt)==ntrials
-                        [outvt,ix] = movav(vt,1:ntrials,avewidth,decfactor);
+                        [outvt,ix] = movav(vt,1:ntrials,avewidth,decfactor,[],[],wt_wind);
                         figure(curfig);plot(outtrials,aligntime+outvt-outsort,DOTSTYLE,'LineWidth',VERTWIDTH);
                     elseif length(vt)==1
                         figure(curfig);plot(outtrials,aligntime+vt-outsort,DOTSTYLE,'LineWidth',VERTWIDTH);
@@ -2976,16 +3400,36 @@ if ~isempty(horzepochs)
         return
     end;
     if strcmpi(noshow, 'no')
-        fprintf('Plotting %d lines at epochs: ',length(horzepochs));
-        for he = horzepochs % for each horizontal line
-            fprintf('%g ',he);
-            if TIMEX          % overplot he on image
-                figure(curfig);plot([timelimits(1) timelimits(2)],[he he],LINESTYLE,'Linewidth',HORZWIDTH);
-            else
-                figure(curfig);plot([he he], [timelimits(1) timelimits(2)],LINESTYLE,'Linewidth',HORZWIDTH);
+        if ~isempty(img_ylab) && ~strcmpi(img_ylab,'Trials'),
+            %trial axis in units of sorting variable
+            mx=max(outsort);
+            mn=min(outsort);
+            fprintf('Plotting %d lines at epochs corresponding to sorting variable values: ',length(horzepochs));
+            for he = horzepochs % for each horizontal line             
+                fprintf('%g ',he);
+                %find trial number corresponding to this value of sorting
+                %variable:
+                if (he>mn) && (he<mx)
+                    he_ep=find_crspnd_pt(he,outsort,outtrials);
+                    if TIMEX          % overplot he_ep on image
+                        figure(curfig);plot([timelimits(1) timelimits(2)],[he_ep he_ep],LINESTYLE,'Linewidth',HORZWIDTH);
+                    else
+                        figure(curfig);plot([he_ep he_ep], [timelimits(1) timelimits(2)],LINESTYLE,'Linewidth',HORZWIDTH);
+                    end
+                end
+            end
+            
+        else %trial axis in units of trials
+            fprintf('Plotting %d lines at epochs: ',length(horzepochs));
+            for he = horzepochs % for each horizontal line
+                fprintf('%g ',he);
+                if TIMEX          % overplot he on image
+                    figure(curfig);plot([timelimits(1) timelimits(2)],[he he],LINESTYLE,'Linewidth',HORZWIDTH);
+                else
+                    figure(curfig);plot([he he], [timelimits(1) timelimits(2)],LINESTYLE,'Linewidth',HORZWIDTH);
+                end
             end
         end
-        %end
         fprintf('\n');
     end;
 end
@@ -3025,24 +3469,45 @@ end
 if strcmpi(noshow, 'no')
     if TIMEX
         if Nosort == YES
-            figure(curfig);l=ylabel('Trials');
+            figure(curfig);
+            l=ylabel(img_ylab);
+            if ~isempty(img_ylab) && ~strcmpi(img_ylab,'Trials')
+                set(gca,'ytick',img_ytick,'yticklabel',img_ytick_lab);
+            end
         else
-            if exist('phargs')
+            if exist('phargs','var')
                 figure(curfig);l=ylabel('Phase-sorted Trials');
-            elseif exist('ampargs')
+            elseif exist('ampargs','var')
                 figure(curfig);l=ylabel('Amplitude-sorted Trials');
+            elseif exist('valargs','var')
+                figure(curfig);l=ylabel('Voltage-sorted Trials');
             else
-                l=ylabel('');
+                l=ylabel(img_ylab);
+                if ~isempty(img_ylab)
+                      set(gca,'ytick',img_ytick);
+                end
+                if ~strcmpi(img_ylab,'Trials')
+                    set(gca,'yticklabel',img_ytick_lab);
+                end
             end
         end
     else % if switch x<->y axes
         if Nosort == YES & NoTimeflag==NO
-            figure(curfig);l=xlabel('Trials');
+            figure(curfig);
+            l=xlabel(img_ylab);
+            if ~isempty(img_ylab) && ~strcmpi(img_ylab,'Trials')
+                set(gca,'xtick',img_ytick,'xticklabel',img_ytick_lab);
+            end
         else
             if exist('phargs')
                 figure(curfig);l=ylabel('Phase-sorted Trials');
             elseif NoTimeflag == NO
                 figure(curfig);l=xlabel('Sorted Trials');
+            else
+                l=xlabel(img_ylab);
+                if ~isempty(img_ylab) && ~strcmpi(img_ylab,'Trials')
+                    set(gca,'xtick',img_ytick,'xticklabel',img_ytick_lab);
+                end
             end
         end
     end
@@ -3179,7 +3644,8 @@ if strcmpi(noshow, 'no')
             [pos(1)+pos(3)+0.02 pos(2) ...
             0.03 pos(4)]);
         figure(curfig);cbar(axcb,0,[mindat,maxdat]); % plot colorbar to right of image
-        set(axcb,'fontsize',TICKFONT);
+        title(cbar_title);
+        set(axcb,'fontsize',TICKFONT,'xtick',[]);
         % drawnow
         axes(ax1); % reset current axes to the erpimage
     end
@@ -3189,14 +3655,37 @@ end;
 %% %%%%%%%%%%%%%%%%%%%%% Compute ERP %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 erp = [];
+
 if Erpflag == YES
     if exist('erpalpha')
+        if erp_ptiles>1,
+           fprintf(['\nOnly plotting one ERP (i.e., not plotting ERPs from %d percentile splits) ' ...
+               'because ''erpalpha'' option was chosen.  You can''t plot both.\n\n'],erp_ptiles)
+        end
         [erp erpsig] = nan_mean(fastif(length(tsurdata) > 0, tsurdata',urdata'), ...
             erpalpha);
         fprintf('   Mean ERP (p<%g) significance threshold: +/-%g\n', ...
             erpalpha,mean(erpsig));
     else
-        [erp] = nan_mean(fastif(length(tsurdata) > 0, tsurdata', urdata'));
+        %potentially make ERPs of 50%, 33%, or 25% split of trials 
+        n_trials=size(urdata,2);
+        trials_step=round(n_trials/erp_ptiles);
+        erp=zeros(erp_ptiles,size(urdata,1));
+        for ploop=1:erp_ptiles,
+            ptile_trials=[1:trials_step]+(ploop-1)*trials_step;
+            if max(ptile_trials)>n_trials,
+               ptile_trials=ptile_trials(1):n_trials; 
+            end
+            if length(tsurdata) > 0
+                erp(ploop,:) = nan_mean(tsurdata(:,ptile_trials)');
+            else
+                erp(ploop,:) = nan_mean(urdata(:,ptile_trials)');
+            end;
+        end
+       % else
+            %orig line
+            %[erp] = nan_mean(fastif(length(tsurdata) > 0, tsurdata', urdata'));
+        %end
     end % compute average ERP, ignoring nan's
 end;
 
@@ -3231,6 +3720,11 @@ if Erpflag == YES & strcmpi(noshow, 'no')
             fac = fac/10;
             maxerp = max(maxerp, round(fac*YEXPAND*max(erp+stdev))/fac);
         end;
+        if ~isempty(erpsig)
+            erpsig = [erpsig;-1*erpsig];
+            maxerp = max(maxerp, round(fac*YEXPAND*max(erpsig))/fac);
+        end
+        maxerp=max(maxerp);
     end
     if isnan(minerp)
         fac = 1;
@@ -3243,9 +3737,13 @@ if Erpflag == YES & strcmpi(noshow, 'no')
             fac = fac/10;
             minerp = min(minerp, round(fac*YEXPAND*min(erp-stdev))/fac);
         end;
+        if ~isempty(erpsig)
+            minerp = min(minerp, round(fac*YEXPAND*min(erpsig))/fac);
+        end
+        minerp=min(minerp);
     end
-    limit = [timelimits(1:2) -max(abs([minerp maxerp])) max(abs([minerp maxerp]))];
-
+    limit = [timelimits(1:2) minerp maxerp];
+    
     if ~isnan(coherfreq)
         set(ax1,'Xticklabel',[]);     % remove tick labels from bottom of image
         ax2=axes('Position',...
@@ -3259,22 +3757,21 @@ if Erpflag == YES & strcmpi(noshow, 'no')
     fprintf('Plotting the ERP trace below the ERP image\n');
     if Erpstdflag == YES
         if Showwin
-            tmph = plot1trace(ax2,times,erp,limit, [], stdev,times(winlocs)); % plot ERP +/-stdev
+            tmph = plot1trace(ax2,times,erp,limit,[],stdev,times(winlocs),erp_grid,erp_vltg_ticks); % plot ERP +/-stdev
         else
-            tmph = plot1trace(ax2,times,erp,limit, [], stdev,[]); % plot ERP +/-stdev
+            tmph = plot1trace(ax2,times,erp,limit, [], stdev,[],erp_grid,erp_vltg_ticks); % plot ERP +/-stdev
         end
     elseif ~isempty('erpsig')
-        erpsig = [erpsig;-1*erpsig];
         if Showwin
-            tmph = plot1trace(ax2,times,erp,limit,erpsig,[],times(winlocs)); % plot ERP and 0+/-alpha threshold
+            tmph = plot1trace(ax2,times,erp,limit,erpsig,[],times(winlocs),erp_grid,erp_vltg_ticks); % plot ERP and 0+/-alpha threshold
         else
-            tmph = plot1trace(ax2,times,erp,limit,erpsig,[],[]); % plot ERP and 0+/-alpha threshold
+            tmph = plot1trace(ax2,times,erp,limit,erpsig,[],[],erp_grid,erp_vltg_ticks); % plot ERP and 0+/-alpha threshold
         end
     else % plot ERP alone - no significance or std dev plotted
         if Showwin
-            tmph = plot1trace(ax2,times,erp,limit,[],[],times(winlocs)); % plot ERP alone
+            tmph = plot1trace(ax2,times,erp,limit,[],[],times(winlocs),erp_grid,erp_vltg_ticks); % plot ERP alone
         else
-            tmph = plot1trace(ax2,times,erp,limit,[],[],[]); % plot ERP alone
+            tmph = plot1trace(ax2,times,erp,limit,[],[],[],erp_grid,erp_vltg_ticks); % plot ERP alone
         end
     end;
 
@@ -3294,8 +3791,6 @@ if Erpflag == YES & strcmpi(noshow, 'no')
         set(ax2,'Xticklabel',xticklabel); % add ticklabels to ERP x-axis
     end
 
-    set(ax2,'Yticklabel',[]);      % remove tick labels from left of image
-    set(ax2,'YColor',BACKCOLOR);
     if isnan(coherfreq)            % if no amp and coher plots below . . .
         if TIMEX & NoTimeflag == NO
             if exist('NoTimesPassed')~=1
@@ -3353,11 +3848,12 @@ if Erpflag == YES & strcmpi(noshow, 'no')
     ytextoffset = double(limit(1)-1.1*ydelta);
     ynumoffset  = double(limit(1)-0.3*ydelta); % double for Matlab 7
 
-    t=text(ynumoffset,0.7*limit(3), num2str(limit(3)));
-    set(t,'HorizontalAlignment','right','FontSize',TICKFONT)
-
-    t=text(ynumoffset,0.7*limit(4), num2str(limit(4)));
-    set(t,'HorizontalAlignment','right','FontSize',TICKFONT)
+    %Far left axis max and min labels not needed now that there are tick
+    %marks
+    %t=text(ynumoffset,0.7*limit(3), num2str(limit(3)));
+    %set(t,'HorizontalAlignment','right','FontSize',TICKFONT)
+    %t=text(ynumoffset,0.7*limit(4), num2str(limit(4)));
+    %set(t,'HorizontalAlignment','right','FontSize',TICKFONT)
 
     ynum = 0.7*(limit(3)+limit(4))/2;
     t=text(ytextoffset,ynum,yerplabel,'Rotation',90);
@@ -3438,6 +3934,25 @@ if ~isnan(coherfreq)
 
     if strcmpi(noshow, 'no')
         axis('off') % rm ERP axes axis and labels
+        
+        v=axis;
+        minampERP=v(3);
+        maxampERP=v(4);
+        
+        if ~exist('ynumoffset')
+            limit = [timelimits(1:2) -max(abs([minampERP maxampERP])) max(abs([minampERP maxampERP]))];
+            limit = double(limit);
+            ydelta = double(1/10*(limit(2)-limit(1)));
+            ytextoffset = double(limit(1)-1.1*ydelta);
+            ynumoffset  = double(limit(1)-0.3*ydelta); % double for Matlab 7
+        end
+
+        t=text(ynumoffset,maxampERP,num2str(maxampERP,3));
+        set(t,'HorizontalAlignment','right','FontSize',TICKFONT);
+
+        t=text(ynumoffset,minampERP, num2str(minampERP,3));
+        set(t,'HorizontalAlignment','right','FontSize',TICKFONT);    
+        
         ax3=axes('Position',...
             [gcapos(1) gcapos(2)+1/3*image_loy*gcapos(4) ...
             gcapos(3) (image_loy/3-YGAP)*gcapos(4)]);
@@ -3491,9 +4006,9 @@ if ~isnan(coherfreq)
         if Cohsigflag
             ampsiglims = [repmat(ampsig(1)-mean(ampsig),1,length(times))];
             ampsiglims = [ampsiglims;-1*ampsiglims];
-            plot1trace(ax3,times,amps,[timelimits minamp(1) maxamp(1)],ampsiglims,[],[]); % plot AMP
+            plot1trace(ax3,times,amps,[timelimits minamp(1) maxamp(1)],ampsiglims,[],[],0); % plot AMP
         else
-            plot1trace(ax3,times,amps,[timelimits minamp(1) maxamp(1)],[],[],[]); % plot AMP
+            plot1trace(ax3,times,amps,[timelimits minamp(1) maxamp(1)],[],[],[],0); % plot AMP
         end
 
         if ~isnan(aligntime)
@@ -3609,10 +4124,10 @@ if ~isnan(coherfreq)
         fprintf('Plotting the ITC trace below the ERSP\n');
         if Cohsigflag % plot coherence significance level
             cohsiglims = [repmat(cohsig,1,length(times));zeros(1,length(times))];
-            coh_handle = plot1trace(ax4,times,cohers,[timelimits mincoh maxcoh],cohsiglims,[],[]);
+            coh_handle = plot1trace(ax4,times,cohers,[timelimits mincoh maxcoh],cohsiglims,[],[],0);
             % plot COHER, fill sorting window
         else
-            coh_handle = plot1trace(ax4,times,cohers,[timelimits mincoh maxcoh],[],[],[]); % plot COHER
+            coh_handle = plot1trace(ax4,times,cohers,[timelimits mincoh maxcoh],[],[],[],0); % plot COHER
         end
         if ~isnan(aligntime)
             line([aligntime aligntime],[[mincoh maxcoh]*1.1],'Color','k');
@@ -3819,7 +4334,8 @@ return
 %
 %% %%%%%%%%%%%%%%%%% function plot1trace() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-function [plot_handle] = plot1trace(ax,times,trace,axlimits,signif,stdev,winlocs)
+function [plot_handle] = plot1trace(ax,times,trace,axlimits,signif,stdev,winlocs,erp_grid,erp_vltg_ticks)
+%function [plot_handle] = plot1trace(ax,times,trace,axlimits,signif,stdev,winlocs,erp_grid,erp_vltg_ticks)
 %                           If signif is [], plot trace +/- stdev
 %                           Else if signif, plot trace and signif(1,:)&signif(2,:) fill.
 %                           Else, plot trace alone.
@@ -3827,11 +4343,17 @@ function [plot_handle] = plot1trace(ax,times,trace,axlimits,signif,stdev,winlocs
 %                                       winlocs(1,1)-> winlocs(1,end) (ms)
 %                                        ...
 %                                       winlocs(end,1)-> winlocs(end,end) (ms)
+
 FILLCOLOR    = [.66 .76 1];
 WINFILLCOLOR    = [.88 .92 1];
 ERPDATAWIDTH = 2;
 ERPZEROWIDTH = 2;
 axes(ax);
+
+if nargin<9,
+    erp_vltg_ticks=[]; %if erp_vltg_ticks is not empty, those will be the ticks used on the y-axis (voltage axis for ERPs)
+end
+
 if ~isempty(winlocs)
     for k=1:size(winlocs,1)
         winloc = winlocs(k,:);
@@ -3866,17 +4388,73 @@ if ~isempty(stdev)
     [st1] = plot(times,trace+stdev, 'r--','LineWidth',1); hold on % plot trace+stdev
     [st2] = plot(times,trace-stdev, 'r--','LineWidth',1); hold on % plot trace-stdev
 end
-[plot_handle] = plot(times,trace,'LineWidth',ERPDATAWIDTH); hold on
-if ~isempty(axlimits) & sum(isnan(axlimits))==0
-    if axlimits(2)>axlimits(1) & axlimits(4)>axlimits(3)
+%linestyles={'r','m','c','b'};
+% 'LineStyle',linestyles{traceloop}); hold on
+linecolor={[0 0 1],[.25 0 .75],[.75 0 .25],[1 0 0]};
+plot_handle=zeros(1,size(trace,1));
+for traceloop=1:size(trace,1),
+    [plot_handle(traceloop)] = plot(times,trace(traceloop,:),'LineWidth',ERPDATAWIDTH, ...
+        'color',linecolor{traceloop}); hold on
+end
+
+%Assume that multiple traces are equally sized divisions of data
+switch size(trace,1),
+    case 2
+        legend('Lower 50%','Higher 50%');
+    case 3
+        legend('Lowest 33%','Middle 33%','Highest 33%');
+    case 4
+        legend('Lowest 25%','2nd Lowest 25%','3rd Lowest 25%','Highest 25%');
+end
+    
+if ~isempty(axlimits) && sum(isnan(axlimits))==0
+    if axlimits(2)>axlimits(1) && axlimits(4)>axlimits(3)
         axis([axlimits(1:2) 1.1*axlimits(3:4)])
     end
     l1=line([axlimits(1:2)],[0 0],    'Color','k',...
         'linewidth',ERPZEROWIDTH); % y=zero-line
-    l2=line([0 0],[axlimits(3:4)*1.1],'Color','k',...
+    timebar=0; 
+    l2=line([1 1]*timebar,axlimits(3:4)*1.1,'Color','k',...
         'linewidth',ERPZEROWIDTH); % x=zero-line
-    plot_handle = [plot_handle l1 l2];
+
+    %y-ticks
+    if isempty(erp_vltg_ticks),
+        shrunk_ylimits=axlimits(3:4)*.8;
+        ystep=(shrunk_ylimits(2)-shrunk_ylimits(1))/4;
+        if ystep>1,
+            ystep=round(ystep);
+        else
+            ord=orderofmag(ystep);
+            ystep=round(ystep/ord)*ord;
+        end
+        if (sign(shrunk_ylimits(2))*sign(shrunk_ylimits(1)))==1, %y shrunk_ylimits don't include 0
+            erp_yticks=shrunk_ylimits(1):ystep:shrunk_ylimits(2);
+        else %y limits include 0
+            % erp_yticks=0:ystep:shrunk_ylimits(2); %ensures 0 is a tick point
+            % erp_yticks=[erp_yticks [0:-ystep:shrunk_ylimits(1)]];
+            erp_yticks=0:ystep:axlimits(4); %ensures 0 is a tick point
+            erp_yticks=[erp_yticks [0:-ystep:axlimits(3)]];
+        end
+        if erp_grid,
+            set(gca,'ytick',unique(erp_yticks),'ygrid','on');
+        else
+            set(gca,'ytick',unique(erp_yticks));
+        end
+    else    
+        set(gca,'ytick',erp_vltg_ticks); 
+    end
 end
+
+%make ERP traces on top
+kids=get(gca,'children')';
+for hndl_loop=plot_handle,
+   id=find(kids==hndl_loop);
+   kids(id)=[];
+   kids=[hndl_loop kids];
+end
+set(gca,'children',kids');
+plot_handle=[plot_handle l1 l2];
+
 %
 %% %%%%%%%%%%%%%%%%% function phasedet() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -3939,7 +4517,7 @@ prctl = interp1(pt,sortdata,pc);
 %              Return significance bounds if alpha (0 < alpha< <1) is given.
 %
 function [out, outalpha]  = nan_mean(in,alpha)
-NBOOT = 500;
+NPERM = 500;
 
 intrials = size(in,1);
 inframes = size(in,2);
@@ -3954,22 +4532,22 @@ nonnans(nononnans) = 1;
 out = sum(in)./nonnans;
 outalpha = [];
 if nargin>1
-    if NBOOT < round(3/alpha)
-        NBOOT = round(3/alpha);
+    if NPERM < round(3/alpha)
+        NPERM = round(3/alpha);
     end
-    fprintf('Computing %d bootstrap ERP values... ',NBOOT);
-    booterps = zeros(NBOOT,inframes);
-    for n=1:NBOOT
+    fprintf('Performing a permuration test using %d permutations to determine ERP significance thresholds... ',NPERM);
+    permerps = zeros(NPERM,inframes);
+    for n=1:NPERM
         signs = sign(randn(1,intrials)'-0.5);
-        booterps(n,:) = sum(repmat(signs,1,inframes).*in)./nonnans;
+        permerps(n,:) = sum(repmat(signs,1,inframes).*in)./nonnans;
         if ~rem(n,50)
             fprintf('%d ',n);
         end
     end
     fprintf('\n');
-    booterps = sort(abs(booterps));
-    alpha = 1+floor(2*alpha*NBOOT); % one-sided probability threshold
-    outalpha = booterps(end+1-alpha,:);
+    permerps = sort(abs(permerps));
+    alpha_bnd = floor(2*alpha*NPERM); % two-sided probability threshold
+    outalpha = permerps(end-alpha_bnd,:);
 end
 out(nononnans) = NaN;
 %
@@ -4003,6 +4581,7 @@ end
 %
 function outpercent = compute_percentile(sortvar, percent, outtrials, winsize);
 ntrials = length(sortvar);
+outtrials=round(outtrials);
 sortvar = [ sortvar sortvar sortvar ];
 winvals = [round(-winsize/2):round(winsize/2)];
 outpercent = zeros(size(outtrials));
@@ -4012,3 +4591,88 @@ for index = 1:length(outtrials)
     outpercent(index) = sortvarval(round((length(winvals)-1)*percent)+1);
 end;
 
+%
+%% %%%%%%%%%%%%%%%%%%%%% function orderofmag() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+function ord=orderofmag(val)
+%function ord=orderofmag(val)
+%
+% Returns the order of magnitude of the value of 'val' in multiples of 10
+% (e.g., 10^-1, 10^0, 10^1, 10^2, etc ...)
+% used for computing erpimage trial axis tick labels as an alternative for
+% plotting sorting variable
+
+val=abs(val);
+if val>=1
+    ord=1;
+    val=floor(val/10);
+    while val>=1,
+        ord=ord*10;
+        val=floor(val/10);
+    end
+    return;
+else
+    ord=1/10;
+    val=val*10;
+    while val<1,
+        ord=ord/10;
+        val=val*10;
+    end
+    return;
+end
+
+%
+%% %%%%%%%%%%%%%%%%%%%%% function find_crspnd_pt() %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+function y_pt=find_crspnd_pt(targ,vals,outtrials)
+%function id=find_crspnd_pt(targ,vals,outtrials)
+%
+% Inputs:
+%   targ      - desired value of sorting variable
+%   vals      - a vector of observed sorting variables (possibly smoothed)
+%   outtrials - a vector of y-axis values corresponding to trials in the
+%               ERPimage (this will just be 1:n_trials if there's no
+%               smoothing)
+%
+% Output:
+%   y_pt  - y-axis value (in units of trials) corresponding to "targ".
+%          If "targ" matches more than one y-axis pt, the median point is
+%          returned.  If "targ" falls between two points, y_pt is linearly
+%          interpolated.
+%
+% Note: targ and vals should be in the same units (e.g., milliseconds)
+
+    %find closest point above
+    abv=find(vals>=targ);
+    if isempty(abv),
+        %point lies outside of vals range, can't interpolate
+        y_pt=[];
+        return
+    end
+    abv=abv(1);
+    
+    %find closest point below
+    blw=find(vals<=targ);
+    if isempty(blw),
+        %point lies outside of vals range, can't interpolate
+        y_pt=[];
+        return
+    end
+    blw=blw(end);
+    
+    if (vals(abv)==vals(blw)),
+        %exact match
+        ids=find(vals==targ);
+        y_pt=median(outtrials(ids));
+    else
+        %interpolate point
+        
+        %lst squares inear regression
+        B=regress([outtrials(abv) outtrials(blw)]',[ones(2,1) [vals(abv) vals(blw)]']);
+        
+        %predict outtrial point from target value
+        y_pt=[1 targ]*B;
+        
+    end
+
+    
