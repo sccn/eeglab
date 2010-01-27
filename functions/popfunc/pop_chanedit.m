@@ -142,6 +142,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.189  2009/11/24 21:01:03  arno
+% fix .datachan for chaninfo
+%
 % Revision 1.188  2009/11/18 20:25:27  arno
 % fix issue with appending one data channel
 %
@@ -1359,6 +1362,8 @@ else
                         res = inputgui( { 1 [1 0.3] [1 0.3] }, uilist, 'pophelp(''pop_chanedit'')', 'Look up channel locations?', userdatatmp, 'normal', [4 1 1] );
                         if ~isempty(res)
                             chaninfo.filename = res{2};
+                            args{ curfield   } = 'lookup';
+                            args{ curfield+1 } = res{2};
                         else
                             return;
                         end;
