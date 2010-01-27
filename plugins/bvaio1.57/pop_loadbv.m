@@ -41,7 +41,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Id: pop_loadbv.m,v 1.1 2009-11-12 01:51:14 arno Exp $
+% $Id: pop_loadbv.m,v 1.2 2010-01-27 20:39:02 arno Exp $
 
 function [EEG, com] = pop_loadbv(path, hdrfile, srange, chans)
 
@@ -121,6 +121,7 @@ end;
 % Coordinates
 if isfield(hdr, 'coordinates')
     hdr.coordinates(end+1:length(chans)) = { [] };
+    onenon0channel = 0;
     for chan = 1:length(chans)
         if ~isempty(hdr.coordinates{chans(chan)})
             [EEG.chanlocs(chan).sph_radius, theta, phi] = strread(hdr.coordinates{chans(chan)}, '%f%f%f', 'delimiter', ',');
@@ -129,14 +130,17 @@ if isfield(hdr, 'coordinates')
                 EEG.chanlocs(chan).sph_theta = [];
                 EEG.chanlocs(chan).sph_phi = [];
             else
+                onenon0channel = 1;
                 EEG.chanlocs(chan).sph_theta = phi - 90 * sign(theta);
                 EEG.chanlocs(chan).sph_phi = -abs(theta) + 90;
             end
         end;
     end
     try,
-        [EEG.chanlocs, EEG.chaninfo] = pop_chanedit(EEG.chanlocs, 'convert', 'sph2topo');
-        [EEG.chanlocs, EEG.chaninfo] = pop_chanedit(EEG.chanlocs, 'convert', 'sph2cart');
+        if onenon0channel
+            [EEG.chanlocs, EEG.chaninfo] = pop_chanedit(EEG.chanlocs, 'convert', 'sph2topo');
+            [EEG.chanlocs, EEG.chaninfo] = pop_chanedit(EEG.chanlocs, 'convert', 'sph2cart');
+        end;
     catch, end
 end
 
@@ -166,14 +170,9 @@ if ~strcmpi(hdr.commoninfos.dataformat, 'binary') % ASCII
     tmpdata = fscanf(IN, '%f', inf);
     hdr.commoninfos.datapoints = length(tmpdata);
     chanlabels = 1;
-    if str2double(tmpchan) == 0, 
+    if isnan(str2double(tmpchan)) 
         hdr.commoninfos.datapoints = hdr.commoninfos.datapoints+1; 
         chanlabels = 0;
-    end;
-    if ~isnan(tmppoint) 
-        if tmppoint ~= hdr.commoninfos.datapoints
-            error('Error in computing number of data points; try exporting in a different format');
-        end;
     end;
 end;
 
