@@ -150,6 +150,10 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.238  2009/10/21 02:42:30  dev
+%
+% replace isstr() with ischar()
+%
 % Revision 1.237  2009/07/30 05:21:09  arno
 % remove datachan field if present in channel structure
 %
@@ -1612,23 +1616,13 @@ for inddataset = 1:length(ALLEEG)
                             res = com;
                             % Make compatible with Matlab 7
                             if any(isnan(EEG.data(:)))
-                                fprintf('eeg_checkset: recomputing using NaN indices [in first channel] ...\n');
-                                tmpindices = find(~sum(isnan(EEG.data))); % was: tmpindices = find(~isnan(EEG.data(1,:)));
-                                EEG.icaact = zeros(size(EEG.icaweights,1), size(EEG.data,2)); EEG.icaact(:) = NaN;
-                                EEG.icaact(:,tmpindices) = (EEG.icaweights*EEG.icasphere)*EEG.data(:,tmpindices);
+                                tmpdata = EEG.data(EEG.icachansind,:);
+                                fprintf('eeg_checkset: recomputing ICA ignoring NaN indices ...\n');
+                                tmpindices = find(~sum(isnan(tmpdata))); % was: tmpindices = find(~isnan(EEG.data(1,:)));
+                                EEG.icaact = zeros(size(EEG.icaweights,1), size(tmpdata,2)); EEG.icaact(:) = NaN;
+                                EEG.icaact(:,tmpindices) = (EEG.icaweights*EEG.icasphere)*tmpdata(:,tmpindices);
                             else
-                                v = version;
-                                if ~isempty(findstr(v, 'R11')) | ~isempty(findstr(v, 'R12')) | ~isempty(findstr(v, 'R13')) | ~option_single
-                                    EEG.icaact = (EEG.icaweights*EEG.icasphere)*EEG.data(EEG.icachansind,:);
-                                else
-                                    % recomputing as double
-                                    try
-                                        EEG.icaact = single((EEG.icaweights*EEG.icasphere)*EEG.data(EEG.icachansind,:));
-                                    catch,
-                                        disp('Weight matrix computed using single precision because of memory limitations');
-                                        EEG.icaact = (single(tmpmat))*EEG.data(EEG.icachansind,:);
-                                    end;
-                                end;
+                                EEG.icaact = (EEG.icaweights*EEG.icasphere)*EEG.data(EEG.icachansind,:); % automatically does single or double
                             end;
                             EEG.icaact    = reshape( EEG.icaact, size(EEG.icaact,1), EEG.pnts, EEG.trials);
                         end;
