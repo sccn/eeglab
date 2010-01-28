@@ -57,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2008/04/16 18:39:51  arno
+% fix computing for components
+%
 % Revision 1.34  2007/11/07 00:27:46  arno
 % timerange option deprecated
 %
@@ -261,11 +264,13 @@ end;
 
 % Save ERPs in file (all components or channels)
 % ----------------------------------
+timevals = EEG.times;
+if isempty(timevals), timevals = linspace(EEG.xmin, EEG.xmax, EEG.pnts)*1000; end;
 if strcmpi(prefix, 'comp')
-    savetofile( filename, EEG.times, X, 'comp', 1:size(X,1), options);
+    savetofile( filename, timevals, X, 'comp', 1:size(X,1), options);
     [X,t] = std_readerp( EEG, 1, g.components, g.timerange);
 else
-    savetofile( filename, EEG.times, X, 'chan', 1:size(X,1), options, { EEG.chanlocs.labels });
+    savetofile( filename, timevals, X, 'chan', 1:size(X,1), options, { EEG.chanlocs.labels });
     [X,t] = std_readerp( EEG, 1, g.channels, g.timerange);
 end;
 
