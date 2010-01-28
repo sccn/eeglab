@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2009/07/03 18:01:26  arno
+% typo in header
+%
 % Revision 1.13  2008/11/22 22:36:20  scott
 % editing abord -> abort
 %
@@ -126,7 +129,7 @@ if nargin<7 responsetype='all'; end;
 if nargin<8 format='short'; end;
 format = lower(format);
 
-if ~strcmpi(format, 'short') & ~strcmpi(format, 'int32'), error('loadeeg: format error'); end;
+if ~strcmpi(format, 'short') && ~strcmpi(format, 'int32'), error('loadeeg: format error'); end;
 
 % open file for reading
 % ---------------------
@@ -191,16 +194,20 @@ buf_size = chan * pnts ;			% size in shorts
 
 % set tags for conditions
 % -----------------------
-if isstr(chanlist) & strcmpi(chanlist, 'all'), chanlist = [1:chan]; end;
-if isstr(TrialList) & strcmpi(TrialList, 'all'),	trialtagI     = 1; else trialtagI     = 0; end;
-if isstr(acceptype) & strcmpi(acceptype, 'all'),	acceptagI     = 1; else acceptagI     = 0; end;
-if isstr(typerange) & strcmpi(typerange, 'all'), 	typetagI      = 1; else typetagI      = 0; end;
-if isstr(responsetype) & strcmpi(responsetype, 'all'),	responsetagI  = 1; else responsetagI  = 0; end;
-if isstr(rtrange) & strcmpi(rtrange, 'all'), 	rttagI        = 1; else rttagI        = 0; end;
+if isstr(chanlist) && strcmpi(chanlist, 'all'), chanlist = [1:chan]; end;
+if isstr(TrialList) && strcmpi(TrialList, 'all'),	trialtagI     = 1; else trialtagI     = 0; end;
+if isstr(acceptype) && strcmpi(acceptype, 'all'),	acceptagI     = 1; else acceptagI     = 0; end;
+if isstr(typerange) && strcmpi(typerange, 'all'), 	typetagI      = 1; else typetagI      = 0; end;
+if isstr(responsetype) && strcmpi(responsetype, 'all'),	responsetagI  = 1; else responsetagI  = 0; end;
+if isstr(rtrange) && strcmpi(rtrange, 'all'), 	rttagI        = 1; else rttagI        = 0; end;
 
 count_selected = 1;
 fprintf('Reserving array (can take some time)\n');
-signal = zeros( chan, pnts*nsweeps);
+if isstr(TrialList)
+    signal = zeros( chan, pnts*nsweeps);
+else
+    signal = zeros( chan, pnts*length(TrialList));
+end;
 fprintf('Array reserved, scanning file\n');
 
 for sweep = 1:nsweeps
