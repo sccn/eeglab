@@ -55,6 +55,9 @@
 %                  of 'trials' statistics requires a lot of RAM.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2009/08/29 04:24:56  arno
+% new statistics
+%
 % Revision 1.6  2009/08/29 00:38:32  arno
 % move all statistics to std_stat
 %
@@ -157,7 +160,11 @@ else
         disp('Applying FDR correction for multiple comparisons');
         for ind = 1:length(pcond),  pcond{ind} = fdr( pcond{ind} ); end;
         for ind = 1:length(pgroup), pgroup{ind} = fdr( pgroup{ind} ); end;
-        if ~isempty(pinter), pinter = fdr(pinter); end;
+        if ~isempty(pinter), 
+            pinter{1} = fdr(pinter{1}); 
+            pinter{2} = fdr(pinter{2}); 
+            pinter{3} = fdr(pinter{3}); 
+        end;
     end;
 end;
 
