@@ -142,6 +142,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.190  2010/01/27 19:51:46  arno
+% fix history for channel lookup
+%
 % Revision 1.189  2009/11/24 21:01:03  arno
 % fix .datachan for chaninfo
 %
@@ -803,7 +806,7 @@ if nargin < 3
         end;
         if ~isempty(com)
             totaluserdat = com;
-            [chans chaninfo urchans com] = pop_chanedit(chans, chaninfo, com{:});
+            %[chans chaninfo urchans com] = pop_chanedit(chans, chaninfo, com{:});
         end;
     end;
 
@@ -918,7 +921,7 @@ if nargin < 3
     userdata.chans     = chans;
     userdata.nchansori = nchansori;
     userdata.chaninfo  = chaninfo;
-    userdata.commands  = {};
+    userdata.commands  = totaluserdat;
 
     [results userdata returnmode] = inputgui( 'geometry', geometry, 'uilist', uilist, 'helpcom', ...
         'pophelp(''pop_chanedit'');', 'title', 'Edit channel info -- pop_chanedit()', ...
@@ -1364,6 +1367,7 @@ else
                             chaninfo.filename = res{2};
                             args{ curfield   } = 'lookup';
                             args{ curfield+1 } = res{2};
+                            com = args;
                         else
                             return;
                         end;
