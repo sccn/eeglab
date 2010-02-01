@@ -63,6 +63,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2009/11/23 22:13:20  arno
+% Fixed the caxis problem
+%
 % Revision 1.8  2009/10/10 01:31:23  arno
 % fix scalp maps plotting for ERP (single subjects)
 %
@@ -193,6 +196,7 @@ opt = finputcheck( varargin, { 'channels'    'cell'   []              {};
                                'groupstats'   'cell'   []              {};
                                'condstats'    'cell'   []              {};
                                'interstats'   'cell'   []              {};
+                               'binarypval'   'string' { 'on' 'off' }  'off';
                                'plottopo'     'string' { 'on' 'off' }   'off';
                                'legend'      'string' { 'on' 'off' }   'off';
                                'datatype'    'string' { 'ersp' 'itc' 'erp' 'spec' }    'erp';
@@ -208,6 +212,8 @@ if strcmpi(opt.singlesubject, 'on'), opt.groupstats = {}; opt.condstats = {}; en
 if ~isempty(opt.compinds), if length(opt.compinds{1}) > 1, opt.compinds = {}; end; end;
 if ~isempty(opt.ylim), opt.caxis = opt.ylim; end;
 if strcmpi(opt.datatype, 'spec'), opt.unitx = 'Hz'; end;
+if strcmpi(opt.binarypval, 'on'), opt.ptopoopt = { 'style' 'blank' }; else opt.ptopoopt = {}; end;
+    
 onecol  = { 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b' };
 manycol = { 'b' 'r' 'g' 'k' 'c' 'y' };
 
@@ -293,7 +299,7 @@ for c = 1:nc
         % -------------------------
         if g == ng & ng > 1 & ~isempty(opt.groupstats)
             hdl(c,g+1) = mysubplot(nc+addr, ng+addc, g + 1 + (c-1)*(ng+addc), opt.transpose);
-            topoplot( pgroupplot{c}, opt.chanlocs);
+            topoplot( pgroupplot{c}, opt.chanlocs, opt.ptopoopt{:});
             if isnan(opt.threshold), title(sprintf('%s (p-value)', opt.condnames{c}));
             else                     title(sprintf('%s (p<%.4f)',  opt.condnames{c}, opt.threshold));
             end;
@@ -318,7 +324,7 @@ for g = 1:ng
     % -----------------------------
     if ~isempty(opt.condstats) & nc > 1
         hdl(nc+1,g) = mysubplot(nc+addr, ng+addc, g + c*(ng+addc), opt.transpose);
-        topoplot( pcondplot{g}, opt.chanlocs);
+        topoplot( pcondplot{g}, opt.chanlocs, opt.ptopoopt{:});
         if isnan(opt.threshold), title(sprintf('%s (p-value)', opt.groupnames{g}));
         else                     title(sprintf('%s (p<%.4f)',  opt.groupnames{g}, opt.threshold));
         end;
@@ -330,7 +336,7 @@ end;
 % ---------------------------------------
 if ~isempty(opt.condstats) & ~isempty(opt.groupstats) & ng > 1 & nc > 1
     hdl(nc+1,ng+1) = mysubplot(nc+addr, ng+addc, g + 1 + c*(ng+addr), opt.transpose);
-    topoplot( pinterplot, opt.chanlocs);
+    topoplot( pinterplot, opt.chanlocs, opt.ptopoopt{:});
     if isnan(opt.threshold), title('Interaction (p-value)');
     else                     title(sprintf('Interaction (p<%.4f)', opt.threshold));
     end;
