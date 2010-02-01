@@ -166,6 +166,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.292  2009/11/11 03:21:28  dev
+% Changed the EMARKERSIZE if statements as per bug 748
+%
 % Revision 1.291  2009/09/27 05:15:29  arno
 % Do not assume file type
 %
@@ -907,7 +910,7 @@ EMARKER = '.';          % mark electrode locations with small disks
 ECOLOR = [0 0 0];       % default electrode color = black
 EMARKERSIZE = [];       % default depends on number of electrodes, set in code
 EMARKERLINEWIDTH = 1;   % default edge linewidth for emarkers
-EMARKERSIZE1CHAN = 40;  % default selected channel location marker size
+EMARKERSIZE1CHAN = 20;  % default selected channel location marker size
 EMARKERCOLOR1CHAN = 'red'; % selected channel location marker color
 EMARKER2CHANS = [];      % mark subset of electrode locations with small disks
 EMARKER2 = 'o';          % mark subset of electrode locations with small disks
@@ -1252,6 +1255,14 @@ end;
 cmap = colormap;
 cmaplen = size(cmap,1);
 
+if strcmp(STYLE,'blank')    % else if Values holds numbers of channels to mark
+    if length(Values) < length(loc_file)
+        ContourVals = zeros(1,length(loc_file));
+        ContourVals(Values) = 1;
+        Values = ContourVals;
+    end;
+end;
+
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%% test args for plotting an electrode grid %%%%%%%%%%%%%%%%%%%%%%
 %
@@ -1311,28 +1322,6 @@ if ~strcmpi(STYLE,'grid')                     % if not plot grid only
   Th = pi/180*Th;                              % convert degrees to radians
   allchansind = 1:length(Th);
 
-%
-%%%%%%%%%% if channels-to-mark-only are given in Values vector %%%%%%%%%%%%%%%%%
-%
-  if length(Values) < length(tmpeloc) & strcmpi( STYLE, 'blank') % if Values contains int channel indices to mark
-      if isempty(plotchans)
-          if Values ~= abs(round(Values)) | min(abs(Values))< 1  % if not positive integer values
-              error('Negative channel indices');
-          elseif strcmpi(VERBOSE, 'on')
-              fprintf('topoplot(): max chan number (%d) in locs > channels in data (%d).\n',...
-                      max(indices),length(Values));
-              fprintf('            Marking the locations of the %d indicated channels.\n', ...
-                      length(Values));
-          end
-          plotchans = Values;
-          STYLE = 'blank'; % plot channels only, marking the indicated channel number
-          if strcmpi(ELECTRODES,'off')
-              ELECTRODES = 'on';
-          end
-      else
-          error('input ''plotchans'' not allowed when input data are channel numbers');
-      end
-  end
   
   if ~isempty(plotchans)
       if max(plotchans) > length(Th)
@@ -1417,7 +1406,7 @@ x         = x(plotchans);
 y         = y(plotchans);
 labels    = labels(plotchans); % remove labels for electrodes without locations
 labels    = strvcat(labels); % make a label string matrix
-if ~isempty(Values) & length(Values) > 1 & ~strcmpi( STYLE, 'blank')
+if ~isempty(Values) & length(Values) > 1
     Values      = Values(plotchans);
     ContourVals = ContourVals(plotchans);
 end;
@@ -1527,7 +1516,7 @@ end
 
 pltchans = find(Rd <= plotrad); % plot channels inside plotting circle
 
-if strcmpi(INTSQUARE,'on') &  ~strcmpi(STYLE,'blank') % interpolate channels in the radius intrad square
+if strcmpi(INTSQUARE,'on') % interpolate channels in the radius intrad square
   intchans = find(x <= intrad & y <= intrad); % interpolate and plot channels inside interpolation square
 else
   intchans = find(Rd <= intrad); % interpolate channels in the radius intrad circle only
@@ -1564,19 +1553,6 @@ if ~isempty(Values)
 		intContourVals = ContourVals(intchans);
         Values         = Values(pltchans);
 		ContourVals    = ContourVals(pltchans);
-	else 
-        if strcmp(STYLE,'blank')    % else if Values holds numbers of channels to mark
-            tmpValues=[];
-            cc=1;
-            for kk=1:length(Values)
-                tmpind = find(pltchans == Values(kk));
-                if ~isempty(tmpind)
-                    tmpValues(cc) = tmpind;
-                    cc=cc+1;
-                end;
-            end
-            Values=tmpValues;     % eliminate the channel indices outside plotting area
-		end;
 	end;	
 end;   % now channel parameters and values all refer to plotting channels only
 
@@ -2194,17 +2170,12 @@ end
 %
 try,
     if strcmpi(STYLE,'blank') % if mark-selected-channel-locations mode
-        if strcmpi(ELECTRODES,'on') | strcmpi(ELECTRODES,'off')
-            for kk = 1:length(plotchans)
-                if strcmpi(EMARKER,'.')
-                    hp2 = plot3(y(kk),x(kk),ELECTRODE_HEIGHT,EMARKER,'Color', EMARKERCOLOR1CHAN, ...
-                        'markersize', EMARKERSIZE1CHAN);
-                else
-                    hp2 = plot3(y(kk),x(kk),ELECTRODE_HEIGHT,EMARKER,'Color', EMARKERCOLOR1CHAN, ...
-                        'markersize', EMARKERSIZE1CHAN);
-                end
+        for kk = 1:length(1:length(x))
+            if Values(kk)
+                hp2 = plot3(y(kk),x(kk),ELECTRODE_HEIGHT,EMARKER,'Color', EMARKERCOLOR1CHAN, 'markersize', EMARKERSIZE1CHAN);
+            elseif strcmpi(ELECTRODES,'on')
+                hp2 = plot3(y(kk),x(kk),ELECTRODE_HEIGHT,EMARKER,'Color', ECOLOR, 'markersize', EMARKERSIZE);
             end
-            hold on
         end
     end
 catch, end;
