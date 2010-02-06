@@ -77,7 +77,7 @@ function plotcurve( times, R, varargin);
                              'marktimes'     'real'    []                        [] });
    if isstr(g), error(g); end;
   % keyboard;
-   if isempty(g.colors), g.colors = { 'b' 'r' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' ...
+   if isempty(g.colors), g.colors = { 'r' 'g' 'b' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' ...
                    'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' }; end;
    if strcmpi(g.plotindiv, 'off'), g.plotmean = 'on'; end;
    
@@ -151,7 +151,7 @@ function plotcurve( times, R, varargin);
            plot(times,R(ind,:), 'k', 'linewidth', 2);
       elseif ~isempty(g.colors),
            tmp = plot(times,R(ind,:), 'k'); 
-           set(tmp, 'color', g.colors{mod(ind, length(g.colors))+1}); 
+           set(tmp, 'color', g.colors{mod(ind-1, length(g.colors))+1}); 
            
            % change the line style when number of plots exceed number of colors in g.colors
            lineStyles = {'-', '--',':','-.'};
@@ -165,9 +165,11 @@ function plotcurve( times, R, varargin);
   % ordinate limits
   % ---------------
   if isempty(g.ylim), 
-    yl = max(abs(reshape(R, [1 prod(size(R))])))*1.2;
-    g.ylim = [-yl yl];
-    if isnan(yl), g.ylim = ylim; end;
+      yll = min(reshape(R, [1 prod(size(R))]));
+      ylh = max(reshape(R, [1 prod(size(R))]));
+      yll2 = yll - (ylh-yll)/10;
+      ylh2 = ylh + (ylh-yll)/10;
+      if ~isnan(yll), g.ylim = [yll2 ylh2]; end;
   end;
   if ~isempty(g.ylim) & length(g.ylim) == 2 
       if any(g.ylim)
@@ -195,7 +197,7 @@ function plotcurve( times, R, varargin);
           if ind == size(R,1) & strcmpi(g.plotmean, 'on') & size(R,1) > 1
                plot(times,R(ind,:), 'k', 'linewidth', 2);
           elseif ~isempty(g.colors),             
-              tmp = plot(times,R(ind,:), 'k'); set(tmp, 'color', g.colors{mod(ind, length(g.colors))+1} ); hold on;
+              tmp = plot(times,R(ind,:), 'k'); set(tmp, 'color', g.colors{mod(ind-1, length(g.colors))+1} ); hold on;
           else plot(times,R(ind,:));
           end;
       end;
