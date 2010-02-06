@@ -150,7 +150,6 @@
 function EEG=fmrib_fastr(EEG,lpf,L,Window,Trigs,strig,anc_chk,tc_chk,...
    Volumes,Slices,varargin)
 
-
 tic;
 % Check Input & Intialize Params
 % ------------------------------
@@ -756,9 +755,8 @@ for c=1:m
                            secmarker(ss)+post_peak)];   
                     avg_art=mean(slice_art1,1);
                 end
-            disp('If you get an error "line 746 of fmrib_fastr: index exceeds matrix dimensions" it means there is an inconsistency in your TR triggers, either the TR length or the number of markers')    
             end
-		           		
+       		
             % For first channel, find shift in artifact position to minimise 
             % sum of squared error between data and artifact template
             % - Assume same shift applies for all channels-
@@ -897,7 +895,7 @@ for c=1:m
                     TMPTH=find(oev<TH_VAREXP);
                     VAREXPTH_PC=TMPTH(1)-1;
                     pcs=floor(mean([SLOPETH_PC CUMVARTH_PC VAREXPTH_PC]));
-                    fprintf('\n%d residual PCs will be removed from channel %d\n',pcs,c);                    
+                    fprintf('\n%d residual PCs will be removed from channel %d\n . If you get an error "line 746 of fmrib_fastr: index exceeds matrix dimensions" it means there is an inconsistency in your TR triggers, either the TR length or the number of markers',pcs,c);                    
                 else
                     pcs=npc;
                 end
