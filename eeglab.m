@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.549  2009/12/17 21:56:48  arno
+% adding catch string
+%
 % Revision 1.548  2009/12/17 21:34:54  arno
 % change clustring menus
 %
@@ -2101,15 +2104,16 @@ catchstrs.update_study           = e_load_study;
         end;            
     end;
     
-	cb_importdata  = [ nocheck '[EEG LASTCOM] = pop_importdata;'  e_newset ];
-	cb_readegi     = [ nocheck '[EEG LASTCOM] = pop_readegi;'     e_newset ];
-    cb_readsegegi  = [ nocheck '[EEG LASTCOM] = pop_readsegegi;'  e_newset ];
-    cb_loadbci     = [ nocheck '[EEG LASTCOM] = pop_loadbci;'     e_newset ];
-    cb_snapread    = [ nocheck '[EEG LASTCOM] = pop_snapread;'    e_newset ]; 
-	cb_loadcnt     = [ nocheck '[EEG LASTCOM] = pop_loadcnt;'     e_newset ]; 
-    cb_loadeeg     = [ nocheck '[EEG LASTCOM] = pop_loadeeg;'     e_newset ]; 
-    cb_biosig      = [ nocheck '[EEG LASTCOM] = pop_biosig; '     e_newset ]; 
-    cb_fileio      = [ nocheck '[EEG LASTCOM] = pop_fileio; '     e_newset ]; 
+	cb_importdata  = [ nocheck '[EEG LASTCOM] = pop_importdata;'   e_newset ];
+	cb_readegi     = [ nocheck '[EEG LASTCOM] = pop_readegi;'      e_newset ];
+    cb_readsegegi  = [ nocheck '[EEG LASTCOM] = pop_readsegegi;'   e_newset ];
+    cb_readegiepo  = [ nocheck '[EEG LASTCOM] = pop_importegimat;' e_newset ];
+    cb_loadbci     = [ nocheck '[EEG LASTCOM] = pop_loadbci;'      e_newset ];
+    cb_snapread    = [ nocheck '[EEG LASTCOM] = pop_snapread;'     e_newset ]; 
+	cb_loadcnt     = [ nocheck '[EEG LASTCOM] = pop_loadcnt;'      e_newset ]; 
+    cb_loadeeg     = [ nocheck '[EEG LASTCOM] = pop_loadeeg;'      e_newset ]; 
+    cb_biosig      = [ nocheck '[EEG LASTCOM] = pop_biosig; '      e_newset ]; 
+    cb_fileio      = [ nocheck '[EEG LASTCOM] = pop_fileio; '      e_newset ]; 
 
     cb_importepoch = [ checkepoch   '[EEG LASTCOM] = pop_importepoch(EEG);'   e_store ];
 	cb_loaddat     = [ checkepoch   '[EEG LASTCOM]= pop_loaddat(EEG);'        e_store ]; 
@@ -2255,9 +2259,10 @@ catchstrs.update_study           = e_load_study;
     help_m  = uimenu( W_MAIN, 'Label', 'Help');
     
 	uimenu( neuro_m, 'Label', 'From ASCII/float file or Matlab array', 'CallBack', cb_importdata);
-	uimenu( neuro_m, 'Label', 'From continuous or seg. EGI .RAW file', 'CallBack', cb_readegi,    'Separator', 'on'); 
-	uimenu( neuro_m, 'Label', 'From Multiple seg. EGI .RAW files'    , 'CallBack', cb_readsegegi); 
-	uimenu( neuro_m, 'Label', 'From BCI2000 ASCII file'              , 'CallBack', cb_loadbci,    'Separator', 'on'); 
+	uimenu( neuro_m, 'Label', 'From Netstation binary simple file'   , 'CallBack', cb_readegi,    'Separator', 'on'); 
+	uimenu( neuro_m, 'Label', 'From Multiple seg. Netstation files'  , 'CallBack', cb_readsegegi); 
+	uimenu( neuro_m, 'Label', 'From Netstation Epoch Matlab files'   , 'CallBack', cb_readegiepo); 
+    uimenu( neuro_m, 'Label', 'From BCI2000 ASCII file'              , 'CallBack', cb_loadbci,    'Separator', 'on'); 
 	uimenu( neuro_m, 'Label', 'From Snapmaster .SMA file'            , 'CallBack', cb_snapread,   'Separator', 'on'); 
 	uimenu( neuro_m, 'Label', 'From Neuroscan .CNT file'             , 'CallBack', cb_loadcnt,    'Separator', 'on'); 
 	uimenu( neuro_m, 'Label', 'From Neuroscan .EEG file'             , 'CallBack', cb_loadeeg); 
