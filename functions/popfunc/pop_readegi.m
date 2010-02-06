@@ -35,6 +35,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2006/08/04 22:30:19  toby
+% forceversion bugfix
+%
 % Revision 1.19  2006/08/04 19:01:17  zhenkun
 % added forceversion argument
 %
@@ -206,9 +209,13 @@ if ~isempty(SegCatIndex) & EEG.trials > 1
         end;
     end;
 end;
-
 EEG = eeg_checkset(EEG, 'makeur');
 EEG = eeg_checkset(EEG, 'eventconsistency');
+
+% importing channel locations
+% ---------------------------
+EEG = readegilocs(EEG);
+
 if nargin < 1 
     command = sprintf('EEG = pop_readegi(''%s'', %s);', filename, vararg2str({datachunks}) ); 
 end;

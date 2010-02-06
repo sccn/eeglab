@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2008/04/19 21:07:40  arno
+% fix first file name
+%
 % Revision 1.8  2006/08/04 18:46:55  zhenkun
 % nothing
 %
@@ -124,6 +127,7 @@ if ~isempty(Eventdata)
                              'nbtype', 1, 'delchan', 'on');
     end;
 end;
+EEG = readegilocs(EEG);
 EEG = eeg_checkset(EEG);
 command = sprintf('EEG = pop_readsegegi(''%s'');', filename); 
 
