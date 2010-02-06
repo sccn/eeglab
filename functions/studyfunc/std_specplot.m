@@ -88,6 +88,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.59  2009/10/07 05:07:19  arno
+% Fix missing conditions/groups
+%
 % Revision 1.58  2009/08/29 04:24:56  arno
 % new statistics
 %
@@ -208,6 +211,7 @@ STUDY = pop_specparams(STUDY, 'default');
 opt = finputcheck( varargin, { 'topofreq'    'real'    [] STUDY.etc.specparams.topofreq;
                                'freqrange'   'real'    [] STUDY.etc.specparams.freqrange;
                                'ylim'        'real'    [] STUDY.etc.specparams.ylim;
+                               'caxis'       'real'    [] STUDY.etc.specparams.ylim;
                                'statistics'  'string'  [] STUDY.etc.specparams.statistics;
                                'groupstats'  'string'  [] STUDY.etc.specparams.groupstats;
                                'condstats'   'string'  [] STUDY.etc.specparams.condstats;
@@ -218,7 +222,6 @@ opt = finputcheck( varargin, { 'topofreq'    'real'    [] STUDY.etc.specparams.t
                                'mcorrect'    'string'  [] STUDY.etc.specparams.mcorrect;
                                'naccu'       'integer' [] STUDY.etc.specparams.naccu;
                                'channels'    'cell'    []              {};
-                               'caxis'       'real'    []              STUDY.etc.specparams.ylim;
                                'clusters'    'integer' []              [];
                                'mode'        'string'  []              ''; % for backward compatibility
                                'comps'       { 'string' 'integer' } [] []; % for backward compatibility
@@ -238,10 +241,8 @@ if ~isempty(opt.subject), opt.condstats = 'off'; disp('No condition statistics f
 plotcurveopt = { ...
    'ylim',           opt.ylim, ...
    'threshold',      opt.threshold, ...
-   'mcorrect',       opt.mcorrect, ...
    'plotgroups',     opt.plotgroups, ...
-   'plotconditions', opt.plotconditions, ...
-   'statistics',     opt.statistics };
+   'plotconditions', opt.plotconditions  };
 
 if ~isnan(opt.topofreq) & length(opt.channels) < 5
     warndlg2(strvcat('Spectrum parameters indicate that you wish to plot scalp maps', 'Select at least 5 channels to plot topography'));
@@ -290,9 +291,6 @@ if ~isempty(opt.channels)
         for index = 1:length(specdata(:))
             specdata{index} = mean(specdata{index}(ti1:ti2,:,:),1);
         end;
-        if opt.topofreq(1) == opt.topofreq(end), titlestr = [ num2str(opt.topofreq(1)) ' Hz'];
-        else                                     titlestr = [ num2str(opt.topofreq(1)) '-' num2str(opt.topofreq(2)) ' Hz'];
-        end;
     end;
     
     % compute statistics and plot
@@ -301,16 +299,17 @@ if ~isempty(opt.channels)
                                          'statistics', opt.statistics, 'naccu', opt.naccu, 'threshold', opt.threshold, 'mcorrect', opt.mcorrect );
     locs = eeg_mergelocs(ALLEEG.chanlocs);
     locs = locs(std_chaninds(STUDY, opt.channels));
-    if ~isempty(opt.topofreq) & ~isnan(opt.topofreq)
-        std_chantopo(specdata, 'condnames', STUDY.condition, 'plottopo', fastif(length(allinds)==1, 'off', 'on'), ...
-                                      'datatype', 'spec', 'plotmode', opt.plotmode, 'groupnames', STUDY.group, 'unitx', 'Hz', ...
-                                      'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, 'caxis', opt.caxis, ...
-                                      'chanlocs', locs, 'plotsubjects', opt.plotsubjects, 'topovals', titlestr, plotcurveopt{:});
+    alltitles = std_figtitle('threshold', opt.threshold, 'mcorrect', opt.mcorrect, 'condstat', opt.condstats, 'cond2stat', opt.groupstats, ...
+                             'statistics', opt.statistics, 'condnames', STUDY.condition, 'cond2names', STUDY.group, 'chanlabels', { locs.labels }, ...
+                             'subject', opt.subject, 'valsunit', 'Hz', 'vals', opt.topofreq, 'datatype', 'Spectrum', 'cond2group', opt.plotgroups, 'condgroup', opt.plotconditions);
+    
+    if ~isempty(opt.topofreq) & all(~isnan(opt.topofreq))
+        std_chantopo(specdata, 'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, 'caxis', opt.caxis, ...
+                                      'chanlocs', locs, 'threshold', opt.threshold, 'titles', alltitles);
     else
-        std_plotcurve(allfreqs, specdata, 'condnames', STUDY.condition, 'plottopo', fastif(length(allinds)==1, 'off', 'on'), ...
-                                      'datatype', 'spec', 'plotmode', opt.plotmode, 'groupnames', STUDY.group, 'unitx', 'Hz', ...
-                                      'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, ...
-                                      'chanlocs', locs, 'plotsubjects', opt.plotsubjects, plotcurveopt{:});
+        std_plotcurve(allfreqs, specdata, 'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, ...
+            'chanlocs', locs, 'titles', alltitles, 'plotsubjects', opt.plotsubjects, 'unitx', 'Hz', ...
+            'condnames', STUDY.condition, 'groupnames', STUDY.group, 'plottopo', fastif(length(allinds) > 1, 'on', 'off'), plotcurveopt{:});
     end;
     set(gcf,'name','Channel Spectra');
 else 
@@ -347,17 +346,13 @@ else
                                          'statistics', opt.statistics, 'naccu', opt.naccu, 'threshold', opt.threshold, 'mcorrect', opt.mcorrect);
             
         if index == length(allinds), opt.legend = 'on'; end;
-        std_plotcurve(allfreqs, specdata, 'condnames', STUDY.condition, 'legend', opt.legend, 'subject', opt.subject, ...
-                                          'compinds', comp_names, 'plotmode', opt.plotmode, 'groupnames', STUDY.group, ...
-                      'topovals', opt.topofreq, 'unitx', 'Hz',  'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, ...
+        alltitles = std_figtitle('threshold', opt.threshold, 'mcorrect', opt.mcorrect, 'condstat', opt.condstats, 'cond2stat', opt.groupstats, ...
+                                 'statistics', opt.statistics, 'condnames', STUDY.condition, 'cond2names', STUDY.group, 'clustname', STUDY.cluster(allinds(index)).name, 'compnames', comp_names, ...
+                                 'subject', opt.subject, 'datatype', 'ERP', 'cond2group', opt.plotgroups, 'condgroup', opt.plotconditions);
+        
+        std_plotcurve(allfreqs, specdata, 'condnames', STUDY.condition, 'legend', opt.legend, 'groupnames', STUDY.group,  ...
+                                          'titles', alltitles, 'unitx', 'Hz',  'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, ...
                                           'chanlocs', ALLEEG(1).chanlocs, 'plotsubjects', opt.plotsubjects, plotcurveopt{:});
-        if length(allinds) > 1, 
-            if isempty(opt.channels), %title(sprintf('Cluster %d', allinds(index)));
-                title([ STUDY.cluster(allinds(index)).name ' (' num2str(length(STUDY.cluster(allinds(index)).comps)), ...
-                        ' ICs, '  num2str(length(unique(STUDY.cluster(allinds(index)).sets(1,:)))) ' Ss)' ]);
-            else title(sprintf('%s', opt.channels{index}));  
-            end;
-        end;
     end;
     set(gcf,'name','Component Spectra');
     axcopy(gca);

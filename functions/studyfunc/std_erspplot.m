@@ -94,6 +94,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.74  2009/10/07 05:07:19  arno
+% Fix missing conditions/groups
+%
 % Revision 1.73  2009/09/03 01:49:05  arno
 % std_erspplot fix
 %
@@ -253,6 +256,7 @@ STUDY = pop_erspparams(STUDY, 'default');
                                'timerange'   'real'    [] STUDY.etc.erspparams.timerange;
                                'freqrange'   'real'    [] STUDY.etc.erspparams.freqrange;
                                'ersplim'     'real'    [] STUDY.etc.erspparams.ersplim;
+                               'caxis'       'real'    [] STUDY.etc.erspparams.ersplim;
                                'paclim'      'real'    [] [];
                                'itclim'      'real'    [] STUDY.etc.erspparams.itclim;
                                'statistics'  'string'  [] STUDY.etc.erspparams.statistics;
@@ -264,7 +268,6 @@ STUDY = pop_erspparams(STUDY, 'default');
                                'naccu'       'integer' [] STUDY.etc.erspparams.naccu;
                                'mcorrect'    'string'  [] STUDY.etc.erspparams.mcorrect;
                                'channels'    'cell'    []              {};
-                               'caxis'       'real'    []              [];
                                'clusters'    'integer' []              [];
                                'datatype'    'string'  { 'itc' 'ersp' 'pac' } 'ersp';
                                'mode'        'string'  []              '';
@@ -300,11 +303,10 @@ if length(opt.comps) == 1
     disp('Statistics cannot be computed for single component');
 end;
 
-plotcurveopt = { ...
+plottfopt = { ...
    'ersplim',     opt.caxis, ...
    'threshold',   opt.threshold, ...
-   'maskdata',    opt.maskdata, ...
-   'statistics',  opt.statistics };
+   'maskdata',    opt.maskdata };
 if ~isempty(opt.plottf) & length(opt.channels) < 5
     warndlg2(strvcat('ERSP/ITC parameters indicate that you wish to plot scalp maps', 'Select at least 5 channels to plot topography'));
     return;
@@ -358,14 +360,7 @@ if ~isempty(opt.channels)
             allersp{index} = mean(mean(allersp{index}(ti1:ti2,fi1:fi2,:,:),1),2);
             allersp{index} = reshape(allersp{index}, [1 size(allersp{index},3) size(allersp{index},4) ]);
         end;
-        if opt.plottf(1) == opt.plottf(2), titlestr = [ num2str(opt.plottf(1)) ' Hz'];
-        else                               titlestr = [ num2str(opt.plottf(1)) '-' num2str(opt.plottf(2)) ' Hz'];
-        end;
-        if opt.plottf(3) == opt.plottf(4), titlestr = [ ', ' num2str(opt.plottf(3)) ' ms'];
-        else                               titlestr = [ ', ' num2str(opt.plottf(3)) '-' num2str(opt.plottf(4)) ' ms'];
-        end;
-        locs = eeg_mergelocs(ALLEEG.chanlocs);
-        locs = locs(std_chaninds(STUDY, opt.channels));
+        opt.plottf = { opt.plottf(1:2) opt.plottf(3:4) };
     end
     
     [pcond pgroup pinter] = std_stat(allersp, 'groupstats', opt.groupstats, 'condstats', opt.condstats, ...
@@ -375,11 +370,15 @@ if ~isempty(opt.channels)
     % -----------------------comp_names
     %if index == length(allinds), opt.legend = 'on'; end;
     if ~strcmpi(opt.plotmode, 'none')
-        if ~isempty(opt.plottf) & ~isnan(opt.plottf)
-            std_chantopo(allersp, 'condnames', STUDY.condition, 'plottopo', fastif(length(allinds)==1, 'off', 'on'), ...
-                                      'datatype', 'ersp', 'plotmode', opt.plotmode, 'groupnames', STUDY.group, 'unitx', '\muV', ...
-                                      'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, ...
-                                      'chanlocs', locs, 'plotsubjects', opt.plotsubjects, 'topovals', titlestr, plotcurveopt{:});
+        locs = eeg_mergelocs(ALLEEG.chanlocs);
+        locs = locs(std_chaninds(STUDY, opt.channels));
+        alltitles = std_figtitle('threshold', opt.threshold, 'mcorrect', opt.mcorrect, 'condstat', opt.condstats, 'cond2stat', opt.groupstats, ...
+                                 'statistics', opt.statistics, 'condnames', STUDY.condition, 'cond2names', STUDY.group, 'chanlabels', { locs.labels }, ...
+                                 'subject', opt.subject, 'valsunit', { 'Hz' 'ms' }, 'vals', opt.plottf, 'datatype', upper(opt.datatype));
+        
+        if ~isempty(opt.plottf)
+            std_chantopo(allersp, 'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, 'caxis', opt.caxis, ...
+                                          'chanlocs', locs, 'threshold', opt.threshold, 'titles', alltitles);
         else
             if length(allinds) > 1 & ~strcmpi(opt.plotmode, 'none'), figure; opt.plotmode = 'condensed'; end;
             nc = ceil(sqrt(length(allinds)));
@@ -393,10 +392,10 @@ if ~isempty(opt.channels)
                     end;
                 end;
                 std_plottf(alltimes, allfreqs, tmpersp, 'condnames', STUDY.condition, 'subject', opt.subject, ...
-                                           'legend', opt.legend, 'compinds', {}, 'datatype', opt.datatype, ...
+                                           'datatype', opt.datatype, 'titles', alltitles, ...
                                            'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, 'plotmode', ...
-                                           opt.plotmode, 'groupnames', STUDY.group, 'topovals', opt.plottf, 'unitx', 'Hz', ...
-                                          'chanlocs', ALLEEG(1).chanlocs, 'plotsubjects', opt.plotsubjects, plotcurveopt{:});
+                                           opt.plotmode, 'groupnames', STUDY.group, 'unitx', 'Hz', ...
+                                          'chanlocs', ALLEEG(1).chanlocs, plottfopt{:});
                 title(sprintf('%s', opt.channels{index}));  
             end;
         end;
@@ -480,11 +479,15 @@ else
         % -----------------------
         if index == length(allinds), opt.legend = 'on'; end;
         if ~strcmpi(opt.plotmode, 'none')
+            alltitles = std_figtitle('threshold', opt.threshold, 'mcorrect', opt.mcorrect, 'condstat', opt.condstats, 'cond2stat', opt.groupstats, ...
+                                     'statistics', opt.statistics, 'condnames', STUDY.condition, 'cond2names', STUDY.group, 'clustname', STUDY.cluster(allinds(index)).name, 'compnames', comp_names, ...
+                                     'subject', opt.subject, 'datatype', upper(opt.datatype)); %, 'plotmode', opt.plotmode);
+            
             std_plottf(alltimes, allfreqs, allersp, 'condnames', STUDY.condition, 'subject', opt.subject, ...
-                                           'legend', opt.legend, 'compinds', comp_names, 'datatype', opt.datatype, ...
+                                           'compinds', comp_names, 'datatype', opt.datatype, ...
                                            'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, 'plotmode', ...
-                                           opt.plotmode, 'groupnames', STUDY.group, 'topovals', opt.plottf, 'unitx', 'Hz', ...
-                                          'chanlocs', ALLEEG(1).chanlocs, 'plotsubjects', opt.plotsubjects, plotcurveopt{:});
+                                           opt.plotmode, 'groupnames', STUDY.group, 'unitx', 'Hz', 'titles', alltitles, ...
+                                          'chanlocs', ALLEEG(1).chanlocs, plottfopt{:});
             if length(allinds) > 1, 
                 title([ STUDY.cluster(allinds(index)).name ' (' num2str(length(STUDY.cluster(allinds(index)).comps)),' ICs, ' ...
                         num2str(length(unique(STUDY.cluster(allinds(index)).sets(1,:)))) ' Ss)' ]);    

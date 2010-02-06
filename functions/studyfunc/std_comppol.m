@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2007/08/03 23:10:00  arno
+% remove the NaN for computing polarity switching
+%
 % Revision 1.4  2007/03/14 02:19:21  arno
 % fixed comppol
 %
@@ -68,7 +71,10 @@ for repeat=1:3
         
         % remove diagonal and put 0 and 1
         % -------------------------------
-        r = corrcoef(compave, compin(:,index) );
+        if ~all(compin(:,index) == 0)
+             r = corrcoef(compave, compin(:,index) );
+        else r = zeros(2,2);
+        end;
         
         % invert component polarities
         % ---------------------------

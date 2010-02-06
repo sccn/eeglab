@@ -34,26 +34,13 @@
 %                  p-values themselves on a different figure. When possible, 
 %                  significance regions are indicated below the data.
 %                  {default: NaN}
+%  'binarypval'  - ['on'|'off'] if a threshold is set, show only significant
+%                  channels as red dots. Default is 'off'.
 %
-% Curve plotting options (ERP and spectrum):
-%  'plotgroups'  - ['together'|'apart'] 'together' -> plot mean results 
-%                  for subject groups in the same figure panel in different 
-%                  colors. 'apart' -> plot group results on different figure
-%                  panels {default: 'apart'}
-%  'plotconditions' - ['together'|'apart'] 'together' -> plot mean results 
-%                  for data conditions on the same figure panel in different 
-%                  colors. 'apart' -> plot conditions on different figure
-%                  panel. Note: 'plotgroups' and 'plotconditions' arguments 
-%                  cannot both be 'together' {default: 'apart'}
-%  'legend'      - ['on'|'off'] turn plot legend on/off {default: 'off'}
-%  'plotmode'    - ['normal'|'condensed'] statistics plotting mode:
-%                  'condensed' -> plot statistics under the curves 
-%                  (when possible); 'normal' -> plot them in separate 
-%                  axes {default: 'normal'}
-% 'plotsubjects' - ['on'|'off'] overplot traces for individual components
-%                  or channels {default: 'off'}
+% Curve plotting options:
 % 'ylim'         - [min max] ordinate limits for ERP and spectrum plots
 %                  {default: all available data}
+% 'caxis'        - [min max] same as above
 %
 % Scalp map plotting options:
 %  'chanlocs'    - [struct] channel location structure
@@ -63,6 +50,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2010/02/01 19:00:48  arno
+% New binary pval option
+%
 % Revision 1.9  2009/11/23 22:13:20  arno
 % Fixed the caxis problem
 %
@@ -179,56 +169,25 @@ if nargin < 2
     return;
 end;
 
-opt = finputcheck( varargin, { 'channels'    'cell'   []              {};
-                               'ylim'        'real'   []              [];
-                               'filter'      'real'   []              [];
-                               'condnames'   'cell'   []              {};
-                               'groupnames'  'cell'   []              {};
-                               'compinds'    'cell'   []              {};
+opt = finputcheck( varargin, { 'ylim'        'real'   []              [];
+                               'titles'      'cell'   []              {};
                                'threshold'   'real'   []              NaN;
-                               'mcorrect'    'string'  { 'none' 'fdr' } 'none';
-                               'topovals'    'string'   []            ''; % same as above
-                               'naccu'       'integer' []             500;
-                               'unitx'       'string' []              'ms'; % just for titles
-                               'subject'     'string' []              '';   % just for titles
                                'chanlocs'    'struct' []              struct('labels', {});
-                               'plotsubjects' 'string' { 'on' 'off' }  'off';
-                               'groupstats'   'cell'   []              {};
-                               'condstats'    'cell'   []              {};
-                               'interstats'   'cell'   []              {};
-                               'binarypval'   'string' { 'on' 'off' }  'off';
-                               'plottopo'     'string' { 'on' 'off' }   'off';
-                               'legend'      'string' { 'on' 'off' }   'off';
+                               'groupstats'  'cell'   []              {};
+                               'condstats'   'cell'   []              {};
+                               'interstats'  'cell'   []              {};
+                               'binarypval'  'string' { 'on' 'off' }  'off';
                                'datatype'    'string' { 'ersp' 'itc' 'erp' 'spec' }    'erp';
-                               'plotmode'    'string' { 'normal' 'condensed' }  'normal';
-                               'statistics'  'string' { 'param' 'perm' 'bootstrap' }       'param';
-                               'caxis'       'real'   []              [];
-                               'statmode'    'string' { 'subjects' 'common' 'trials' } 'subjects'}, 'std_chanplot', 'ignore');
+                               'caxis'       'real'   []              [] }, 'std_chantopo', 'ignore'); %, 'ignore');
 if isstr(opt), error(opt); end;
-opt.singlesubject = 'off';
-if strcmpi(opt.plottopo, 'on') & size(data{1},3) == 1, opt.singlesubject = 'on'; end;
-if size(data{1},2) == 1,                               opt.singlesubject = 'on'; end;
-if strcmpi(opt.singlesubject, 'on'), opt.groupstats = {}; opt.condstats = {}; end;
-if ~isempty(opt.compinds), if length(opt.compinds{1}) > 1, opt.compinds = {}; end; end;
 if ~isempty(opt.ylim), opt.caxis = opt.ylim; end;
-if strcmpi(opt.datatype, 'spec'), opt.unitx = 'Hz'; end;
 if strcmpi(opt.binarypval, 'on'), opt.ptopoopt = { 'style' 'blank' }; else opt.ptopoopt = {}; end;
-    
-onecol  = { 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b' };
-manycol = { 'b' 'r' 'g' 'k' 'c' 'y' };
+if isempty(opt.titles), opt.titles = cell(10,10); opt.titles(:) = { '' }; end;
 
 nc = size(data,1);
 ng = size(data,2);
 if nc >= ng, opt.transpose = 'on';
 else         opt.transpose = 'off';
-end;
-if isempty(opt.condnames)
-    for c=1:nc, opt.condnames{c} = sprintf('Cond. %d', c); end;
-    if nc == 1, opt.condnames = { '' }; end;
-end;
-if isempty(opt.groupnames)
-    for g=1:ng, opt.groupnames{g} = sprintf('Group. %d', g); end;
-    if ng == 1, opt.groupnames = { '' }; end;
 end;
 
 % plotting paramters
@@ -237,7 +196,7 @@ if ng > 1 & ~isempty(opt.groupstats), addc = 1; else addc = 0; end;
 if nc > 1 & ~isempty(opt.condstats ), addr = 1; else addr = 0; end;
 
 % compute significance mask
-% --------------------------
+% -------------------------
 if ~isempty(opt.interstats), pinter = opt.interstats{3}; end;
 
 if ~isnan(opt.threshold) & ( ~isempty(opt.groupstats) | ~isempty(opt.condstats) )    
@@ -252,11 +211,6 @@ else
     maxplot = 3;
     warning on;
 end;
-
-% plotting all conditions
-% -----------------------
-ngplot = ng;
-ncplot = nc;
 
 % adjust figure size
 % ------------------
@@ -275,13 +229,6 @@ tmpc = [inf -inf];
 for c = 1:nc
     for g = 1:ng
         hdl(c,g) = mysubplot(nc+addr, ng+addc, g + (c-1)*(ng+addc), opt.transpose);
-        if isempty(opt.condnames{c}) & isempty(opt.groupnames{g}) 
-            fig_title = [ opt.topovals];
-        elseif isempty(opt.condnames{c}) | isempty(opt.groupnames{g}) 
-            fig_title = [ opt.condnames{c} opt.groupnames{g} ', ' opt.topovals];
-        else fig_title = [ opt.condnames{c} ', ' opt.groupnames{g} ', ' opt.topovals];
-        end;
-
         if ~isempty(data{c,g})
             tmpplot = double(mean(data{c,g},3));
             topoplot( tmpplot, opt.chanlocs, 'style', 'map', 'shading', 'interp');
@@ -290,7 +237,7 @@ for c = 1:nc
             else 
                 caxis(opt.caxis);
             end;
-            title(fig_title); 
+            title(opt.titles{c,g}); 
         else
             axis off;
         end;
@@ -300,9 +247,7 @@ for c = 1:nc
         if g == ng & ng > 1 & ~isempty(opt.groupstats)
             hdl(c,g+1) = mysubplot(nc+addr, ng+addc, g + 1 + (c-1)*(ng+addc), opt.transpose);
             topoplot( pgroupplot{c}, opt.chanlocs, opt.ptopoopt{:});
-            if isnan(opt.threshold), title(sprintf('%s (p-value)', opt.condnames{c}));
-            else                     title(sprintf('%s (p<%.4f)',  opt.condnames{c}, opt.threshold));
-            end;
+            title(opt.titles{c,g+1}); 
             caxis([-maxplot maxplot]);
         end;
     end;
@@ -325,9 +270,7 @@ for g = 1:ng
     if ~isempty(opt.condstats) & nc > 1
         hdl(nc+1,g) = mysubplot(nc+addr, ng+addc, g + c*(ng+addc), opt.transpose);
         topoplot( pcondplot{g}, opt.chanlocs, opt.ptopoopt{:});
-        if isnan(opt.threshold), title(sprintf('%s (p-value)', opt.groupnames{g}));
-        else                     title(sprintf('%s (p<%.4f)',  opt.groupnames{g}, opt.threshold));
-        end;
+        title(opt.titles{nc+1,g}); 
         caxis([-maxplot maxplot]);
     end;
 end;
@@ -337,9 +280,7 @@ end;
 if ~isempty(opt.condstats) & ~isempty(opt.groupstats) & ng > 1 & nc > 1
     hdl(nc+1,ng+1) = mysubplot(nc+addr, ng+addc, g + 1 + c*(ng+addr), opt.transpose);
     topoplot( pinterplot, opt.chanlocs, opt.ptopoopt{:});
-    if isnan(opt.threshold), title('Interaction (p-value)');
-    else                     title(sprintf('Interaction (p<%.4f)', opt.threshold));
-    end;
+    title(opt.titles{nc+1,ng+1}); 
     caxis([-maxplot maxplot]);
 end;    
 

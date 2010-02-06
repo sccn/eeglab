@@ -41,9 +41,6 @@
 %   'plotsubjects' - ['on'|'off'] When 'on', plot ERP of all subjects.
 %
 % Other optional inputs:
-%   'plotmode'  - ['normal'|'condensed'] 'normal'  -> plot in a new figure; 
-%                 'condensed' -> plot all curves in the current figure in a 
-%                 condensed fashion {default: 'normal'}
 %   'key','val' - All optional inputs to pop_erpparams() are also accepted here
 %                 to plot subset of time, statistics etc. The values used by default
 %                 are the ones set using pop_erpparams() and stored in the
@@ -91,6 +88,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.63  2009/10/07 05:07:19  arno
+% Fix missing conditions/groups
+%
 % Revision 1.62  2009/08/29 04:24:56  arno
 % new statistics
 %
@@ -220,6 +220,7 @@ opt = finputcheck( varargin, { 'topotime'    'real'    [] STUDY.etc.erpparams.to
                                'filter'      'real'    [] STUDY.etc.erpparams.filter;
                                'timerange'   'real'    [] STUDY.etc.erpparams.timerange;
                                'ylim'        'real'    [] STUDY.etc.erpparams.ylim;
+                               'caxis'       'real'    [] STUDY.etc.erpparams.ylim;                               
                                'statistics'  'string'  [] STUDY.etc.erpparams.statistics;
                                'groupstats'  'string'  [] STUDY.etc.erpparams.groupstats;
                                'condstats'   'string'  [] STUDY.etc.erpparams.condstats;
@@ -229,7 +230,6 @@ opt = finputcheck( varargin, { 'topotime'    'real'    [] STUDY.etc.erpparams.to
                                'threshold'   'real'    [] STUDY.etc.erpparams.threshold;
                                'naccu'       'integer' [] STUDY.etc.erpparams.naccu;
                                'channels'    'cell'    []              {};
-                               'caxis'       'real'    []              STUDY.etc.erpparams.ylim;
                                'clusters'    'integer' []              [];
                                'mode'        'string'  []              ''; % for backward compatibility
                                'comps'       { 'string' 'integer' } [] []; % for backward compatibility
@@ -247,12 +247,10 @@ if ~isempty(opt.subject), opt.groupstats = 'off'; disp('No group statistics for 
 if ~isempty(opt.subject), opt.condstats = 'off'; disp('No condition statistics for single subject'); end;
 plotcurveopt = { ...
    'ylim',           opt.ylim, ...
-   'filter',         opt.filter, ...
    'threshold',      opt.threshold, ...
-   'mcorrect',       opt.mcorrect, ...
+   'filter',         opt.filter, ...
    'plotgroups',     opt.plotgroups, ...
-   'plotconditions', opt.plotconditions, ...
-   'statistics',     opt.statistics };
+   'plotconditions', opt.plotconditions };
 
 if ~isnan(opt.topotime) & length(opt.channels) < 5
     warndlg2(strvcat('ERP parameters indicate that you wish to plot scalp maps', 'Select at least 5 channels to plot topography'));
@@ -294,8 +292,7 @@ else
      [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'clusters', opt.clusters, 'infotype', 'erp', 'timerange', opt.timerange);
 end;
 
-if strcmpi(opt.plotmode, 'condensed') | ...
-   (length(allinds) > 1 & isempty(opt.channels))
+if length(allinds) > 1 & isempty(opt.channels)
     plotcurveopt = { plotcurveopt{:} 'figure' 'off' }; 
 end;
 
@@ -329,27 +326,26 @@ if ~isempty(opt.channels)
         for index = 1:length(erpdata(:))
             erpdata{index} = mean(erpdata{index}(ti1:ti2,:,:),1);
         end;
-        if opt.topotime(1) == opt.topotime(end), titlestr = [ num2str(opt.topotime(1)) ' ms'];
-        else                                     titlestr = [ num2str(opt.topotime(1)) '-' num2str(opt.topotime(2)) ' ms'];
-        end;
     end;
     
     % compute statistics and plot
     % ---------------------------
     [pcond pgroup pinter] = std_stat(erpdata, 'groupstats', opt.groupstats, 'condstats', opt.condstats, ...
                                          'statistics', opt.statistics, 'naccu', opt.naccu, 'threshold', opt.threshold, 'mcorrect', opt.mcorrect);
+                                     
     locs = eeg_mergelocs(ALLEEG.chanlocs);
     locs = locs(std_chaninds(STUDY, opt.channels));
-    if ~isempty(opt.topotime) & ~isnan(opt.topotime)
-        std_chantopo(erpdata, 'condnames', STUDY.condition, 'plottopo', fastif(length(allinds)==1, 'off', 'on'), ...
-                                      'datatype', 'spec', 'plotmode', opt.plotmode, 'groupnames', STUDY.group, 'unitx', '\muV', ...
-                                      'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, ...
-                                      'chanlocs', locs, 'plotsubjects', opt.plotsubjects, 'topovals', titlestr, plotcurveopt{:});
+    alltitles = std_figtitle('threshold', opt.threshold, 'mcorrect', opt.mcorrect, 'condstat', opt.condstats, 'cond2stat', opt.groupstats, ...
+                             'statistics', opt.statistics, 'condnames', STUDY.condition, 'cond2names', STUDY.group, 'chanlabels', { locs.labels }, ...
+                             'subject', opt.subject, 'valsunit', 'ms', 'vals', opt.topotime, 'datatype', 'ERP', 'cond2group', opt.plotgroups, 'condgroup', opt.plotconditions);
+    
+    if ~isempty(opt.topotime) & all(~isnan(opt.topotime))
+        std_chantopo(erpdata, 'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, 'caxis', opt.caxis, ...
+                                      'chanlocs', locs, 'threshold', opt.threshold, 'titles', alltitles);
     else
-        std_plotcurve(alltimes, erpdata, 'condnames', STUDY.condition, 'plottopo', fastif(length(allinds)==1, 'off', 'on'), ...
-                                      'datatype', 'spec', 'plotmode', opt.plotmode, 'groupnames', STUDY.group, 'unitx', 'ms', ...
-                                      'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, ...
-                                      'chanlocs', locs, 'plotsubjects', opt.plotsubjects, plotcurveopt{:});
+        std_plotcurve(alltimes, erpdata, 'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, ...
+            'chanlocs', locs, 'titles', alltitles, 'plotsubjects', opt.plotsubjects, ...
+            'condnames', STUDY.condition, 'groupnames', STUDY.group, 'plottopo', fastif(length(allinds) > 1, 'on', 'off'), plotcurveopt{:});
     end;
     set(gcf,'name','Channel ERP');
 else 
@@ -386,28 +382,16 @@ else
                                          'statistics', opt.statistics, 'naccu', opt.naccu, 'threshold', opt.threshold, 'mcorrect', opt.mcorrect);
             
         if index == length(allinds), opt.legend = 'on'; end;
-            std_plotcurve(alltimes, erpdata, 'condnames', STUDY.condition, 'legend', opt.legend, 'subject', opt.subject, ...
-                                          'compinds', comp_names, 'plotmode', opt.plotmode, 'groupnames', STUDY.group, 'topovals', ...
-                          opt.topotime, 'unitx', 'ms',  'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, ...
-                                          'chanlocs', ALLEEG(1).chanlocs, 'plotsubjects', opt.plotsubjects, plotcurveopt{:});
-        if length(allinds) > 1, 
-            if isempty(opt.channels), %title(sprintf('Cluster %d', allinds(index))); 
-                title([ STUDY.cluster(allinds(index)).name ' (' num2str(length(STUDY.cluster(allinds(index)).comps)),...
-                        ' ICs, '  num2str(length(unique(STUDY.cluster(allinds(index)).sets(1,:)))) ' Ss)' ]);
-            else                      title(sprintf('%s', opt.channels{index}));  
-            end;
-        end;
-    end;
-    
-    if length(opt.clusters)==1 % place cluster name in the corner, only if there is only one cluster
+        alltitles = std_figtitle('threshold', opt.threshold, 'mcorrect', opt.mcorrect, 'condstat', opt.condstats, 'cond2stat', opt.groupstats, ...
+                                 'statistics', opt.statistics, 'condnames', STUDY.condition, 'cond2names', STUDY.group, 'clustname', STUDY.cluster(allinds(index)).name, 'compnames', comp_names, ...
+                                 'subject', opt.subject, 'valsunit', 'ms', 'vals', opt.topotime, 'datatype', 'ERP', 'cond2group', opt.plotgroups, 'condgroup', opt.plotconditions);
         
-        h = gca;
-        axes('position',[0.04 0.96 0.1 0.06]);
-        text(0,0,[STUDY.cluster(allinds(index)).name],'fontsize',13 );
-        axis off;
+        std_plotcurve(alltimes, erpdata, 'condnames', STUDY.condition, 'legend', opt.legend, 'groupnames', STUDY.group,  ...
+                                          'titles', alltitles, 'unitx', 'ms',  'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, ...
+                                          'chanlocs', ALLEEG(1).chanlocs, 'plotsubjects', opt.plotsubjects, plotcurveopt{:});
     end;
     
-    set(gcf,'name','ERP');
+    set(gcf,'name','Component ERP');
     axcopy(gca);
 end;
 

@@ -26,6 +26,7 @@
 %  'groupnames'  - [cell array] names of subject groups (for titles)
 %                  {default: none}
 %  'subject'     - [string] plot subject name (for title)
+%  'compinds'    - [integer] plot component index (for title)
 %
 % Statistics options:
 %  'groupstats'  - [cell] One p-value array per group {default: {}}
@@ -48,12 +49,12 @@
 %                  panel. Note: 'plotgroups' and 'plotconditions' arguments 
 %                  cannot both be 'together' {default: 'apart'}
 %  'legend'      - ['on'|'off'] turn plot legend on/off {default: 'off'}
-%  'plotmode'    - ['normal'|'condensed'] statistics plotting mode:
-%                  'condensed' -> plot statistics under the curves 
-%                  (when possible); 'normal' -> plot them in separate 
-%                  axes {default: 'normal'}
+%  'figure'      - ['on'|'off'] creates a new figure ('on'). The 'off' mode
+%                  plots all of the groups and conditions on the same pannel.
 % 'plotsubjects' - ['on'|'off'] overplot traces for individual components
 %                  or channels {default: 'off'}
+% 'singlesubject' - ['on'|'off'] set to 'on' to plot single subject.
+%                  {default: 'off'}
 % 'ylim'         - [min max] ordinate limits for ERP and spectrum plots
 %                  {default: all available data}
 %
@@ -65,6 +66,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.24  2009/08/29 04:24:56  arno
+% new statistics
+%
 % Revision 1.22  2009/08/29 00:38:32  arno
 % move all statistics to std_stat
 %
@@ -215,49 +219,49 @@ if nargin < 2
     return;
 end;
 
-opt = finputcheck( varargin, { 'channels'    'cell'   []              {};
-                               'ylim'        'real'   []              [];
-                               'filter'      'real'   []              [];
-                               'condnames'   'cell'   []              {};
-                               'groupnames'  'cell'   []              {};
-                               'compinds'    'cell'   []              {};
-                               'threshold'   'real'   []              NaN;
-                               'mcorrect'    'string'  { 'none' 'fdr' } 'none';
-                               'topovals'       'real'   []              []; % same as above
-                               'naccu'       'integer' []             500;
-                               'unitx'       'string' []              'ms'; % just for titles
-                               'subject'     'string' []              '';   % just for titles
-                               'chanlocs'    'struct' []              struct('labels', {});
-                               'plotsubjects' 'string' { 'on' 'off' }  'off';
-                               'groupstats'   'cell'   []              {};
-                               'condstats'    'cell'   []              {};
-                               'interstats'   'cell'   []              {};
-                               'plottopo'     'string' { 'on' 'off' }   'off';
-                               'figure'       'string' { 'on' 'off' }   'on';
-                               'legend'      'string' { 'on' 'off' }   'off';
-                               'datatype'    'string' { 'ersp' 'itc' 'erp' 'spec' }    'erp';
-                               'plotgroups'   'string' { 'together' 'apart' }  'apart';
-                               'plotconditions'    'string' { 'together' 'apart' }  'apart';
-                               'plotmode'    'string' { 'normal' 'condensed' }  'normal';
-                               'statistics'  'string' { 'param' 'perm' 'bootstrap' }       'param';
-                               'statmode'    'string' { 'subjects' 'common' 'trials' } 'subjects'}, 'std_erpmaskdata');
+opt = finputcheck( varargin, { 'ylim'          'real'   []              [];
+                               'filter'        'real'   []              [];
+                               'threshold'     'real'   []              NaN;
+                               'unitx'         'string' []              'ms';
+                               'chanlocs'      'struct' []              struct('labels', {});
+                               'plotsubjects'  'string' { 'on' 'off' }  'off';
+                               'condnames'     'cell'   []              {}; % just for legends
+                               'groupnames'    'cell'   []              {}; % just for legends
+                               'groupstats'    'cell'   []              {};
+                               'condstats'     'cell'   []              {};
+                               'interstats'    'cell'   []              {};
+                               'titles'        'cell'   []              {};
+                               'figure'        'string' { 'on' 'off' }   'on';
+                               'plottopo'      'string' { 'on' 'off' }   'off';
+                               'legend'        'string' { 'on' 'off' }   'off';
+                               'datatype'      'string' { 'ersp' 'itc' 'erp' 'spec' }    'erp';
+                               'plotgroups'    'string' { 'together' 'apart' }  'apart';
+                               'plotmode'      'string' { 'test' 'condensed' }  'test'; % deprecated
+                               'plotconditions'    'string' { 'together' 'apart' }  'apart' }, 'std_plotcurve');
 
 % opt.figure =  'off'; % test by nima
-% opt.plotmode =  'condensed';
 if isstr(opt), error(opt); end;
 opt.singlesubject = 'off';
 if strcmpi(opt.plottopo, 'on') & size(data{1},3) == 1, opt.singlesubject = 'on'; end;
 %if size(data{1},2) == 1,                              opt.singlesubject = 'on'; end;
 if all(all(cellfun('size', data, 2)==1))               opt.singlesubject = 'on'; end;
 if any(any(cellfun('size', data, 2)==1)), opt.groupstats = {}; opt.condstats = {}; end;
-if ~isempty(opt.compinds), if length(opt.compinds{1}) > 1, opt.compinds = {}; end; end;
 if strcmpi(opt.datatype, 'spec'), opt.unit = 'Hz'; end;
 if strcmpi(opt.plotsubjects, 'on')
     opt.plotgroups      = 'apart';
     opt.plotconditions  = 'apart';
 end;
-onecol  = { 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b' };
-manycol = { 'b' 'r' 'g' 'k' 'c' 'y' };
+if isempty(opt.titles), opt.titles = cell(10,10); opt.titles(:) = { '' }; end;
+
+% if not the same number of subjects
+% ----------------------------------
+if strcmpi(opt.plotconditions, 'together') || strcmpi(opt.plotgroups, 'together')
+    allsizes = cellfun('size', data, ndims(data{1}));
+    if length(unique(allsizes(:,1))) > 1
+        warndlg2('Cannot group conditions in plot when one subject is missing');
+        return;
+    end;
+end;
 
 nc = size(data,1);
 ng = size(data,2);
@@ -273,22 +277,11 @@ if isempty(opt.groupnames)
     if ng == 1, opt.groupnames = { '' }; end;
 end;
 
-% condensed plot (deprecated)
-% --------------
-if strcmpi(opt.plotmode, 'condensed') 
-    opt.plotgroups     = 'together';
-    opt.plotconditions = 'together';
-    if ~isempty(opt.condstats) & ~isempty(opt.groupstats)
-        opt.condstats      = {};
-        opt.groupstats     = {};
-    end;
-end;
-
 % plotting paramters
 % ------------------
 if ng > 1 & ~isempty(opt.groupstats), addc = 1; else addc = 0; end;
 if nc > 1 & ~isempty(opt.condstats ), addr = 1; else addr = 0; end;
-if isempty(opt.topovals) & strcmpi(opt.singlesubject, 'off') & ~strcmpi(opt.plotmode, 'condensed') ...
+if strcmpi(opt.singlesubject, 'off') ...
         & ( ~isempty(opt.condstats) | ~isempty(opt.groupstats) ) % only for curves
     plottag = 0;
     if strcmpi(opt.plotgroups, 'together') & isempty(opt.condstats) & ~isempty(opt.groupstats) & ~isnan(opt.threshold), addc = 0; plottag = 1; end;
@@ -320,6 +313,9 @@ end;
 
 % plotting all conditions
 % -----------------------
+onecol  = { 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b' };
+manycol = { 'r' 'g' 'b' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' ...
+                   'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' };
 if strcmpi(opt.plotgroups, 'together'),      ngplot = 1; else ngplot = ng; end;
 if strcmpi(opt.plotconditions,  'together'), ncplot = 1; else ncplot = nc; end;     
 if strcmpi(opt.plotgroups, 'together') | strcmpi(opt.plotconditions, 'together') | strcmpi(opt.figure, 'off')
@@ -359,6 +355,7 @@ else
 end;
 
 tmplim = [Inf -Inf];
+colcount = 1; % only when plotting all conditions on the same figure
 for c = 1:ncplot
     for g = 1:ngplot
         if strcmpi(opt.plotgroups, 'together'),         hdl(c,g)=mysubplot(ncplot+addr, ngplot+addc, 1 + (c-1)*(ngplot+addc), opt.subplot); ci = g;
@@ -440,15 +437,14 @@ for c = 1:ncplot
             
             % plot
             % ----
-            if strcmpi(opt.figure, 'on'), tmpcol = col; else tmpcol = col(mod(c*ncplot+g,length(col))+1); end;
+            if strcmpi(opt.figure, 'on'), tmpcol = col; else tmpcol = col(colcount); colcount = mod(colcount, length(col))+1; end;
             if strcmpi(opt.plottopo, 'on'), 
                 metaplottopo(tmpdata, 'chanlocs', opt.chanlocs, 'plotfunc', 'plotcurve', ...
-                    'plotargs', { plotopt{:} }, 'datapos', [2 3]);
+                    'plotargs', { plotopt{:} }, 'datapos', [2 3], 'title', opt.titles{c,g});
             elseif iscell(tmpdata)
-                 plotcurve( allx, tmpdata{1}, 'colors', tmpcol, 'maskarray', tmpdata{2}, plotopt{3:end}); xlabel(xlab); ylabel(ylab);
+                 plotcurve( allx, tmpdata{1}, 'colors', tmpcol, 'maskarray', tmpdata{2}, plotopt{3:end}, 'title', opt.titles{c,g}); xlabel(xlab); ylabel(ylab);
             else
-                tmpcol = col;  % by nima, fixed for now but might have causes other bugs
-                plotcurve( allx, tmpdata, 'colors', tmpcol, plotopt{2:end});
+                plotcurve( allx, tmpdata, 'colors', tmpcol, plotopt{2:end}, 'title', opt.titles{c,g});
             end;
         end;
         
@@ -472,17 +468,16 @@ for c = 1:ncplot
                 end;
                 if strcmpi(opt.plotconditions, 'together'), condnames = 'Conditions'; else condnames = opt.condnames{c}; end;
                 if ~isnan(opt.threshold)
-                     tmptitle = sprintf('%s (p<%.4f)', condnames, opt.threshold);
                      if strcmpi(opt.plottopo, 'on'), 
                           metaplottopo({zeros(size(pgroupplot{c}')) pgroupplot{c}'}, 'chanlocs', opt.chanlocs, 'plotfunc', 'plotcurve', ...
-                              'plotargs', { allx 'maskarray' statopt{:} }, 'datapos', [2 3], 'title', tmptitle);
-                     else plotcurve(allx, zeros(size(allx)), 'maskarray', mean(pgroupplot{c},2), 'ylim', [0.1 1], 'title', tmptitle, statopt{:});
+                              'plotargs', { allx 'maskarray' statopt{:} }, 'datapos', [2 3], 'title', opt.titles{c, g+1});
+                     else plotcurve(allx, zeros(size(allx)), 'maskarray', mean(pgroupplot{c},2), 'ylim', [0.1 1], 'title', opt.titles{c, g+1}, statopt{:});
                      end;
                 else
                      if strcmpi(opt.plottopo, 'on'), 
                           metaplottopo(pgroupplot{c}', 'chanlocs', opt.chanlocs, 'plotfunc', 'plotcurve', ...
-                              'plotargs', { allx statopt{:} }, 'datapos', [2 3], 'title', [ condnames ' (p-value)' ]);
-                     else plotcurve(allx, mean(pgroupplot{c},2), 'title', [ condnames ' (p-value)' ], statopt{:});
+                              'plotargs', { allx statopt{:} }, 'datapos', [2 3], 'title', opt.titles{c, g+1});
+                     else plotcurve(allx, mean(pgroupplot{c},2), 'title', opt.titles{c, g+1}, statopt{:});
                      end;
                 end;
             end;
@@ -501,17 +496,16 @@ for g = 1:ng
             end;
             if strcmpi(opt.plotgroups, 'together'), groupnames = 'Groups'; else groupnames = opt.groupnames{g}; end;
             if ~isnan(opt.threshold)
-                 tmptitle = sprintf('%s (p<%.4f)', groupnames, opt.threshold);
                  if strcmpi(opt.plottopo, 'on'), 
                       metaplottopo({zeros(size(pcondplot{g}')) pcondplot{g}'}, 'chanlocs', opt.chanlocs, 'plotfunc', 'plotcurve', ...
-                          'plotargs', { allx 'maskarray' statopt{:} }, 'datapos', [2 3], 'title', tmptitle);
-                 else plotcurve(allx, zeros(size(allx)), 'maskarray', mean(pcondplot{g},2), 'ylim', [0.1 1], 'title', tmptitle, statopt{:});
+                          'plotargs', { allx 'maskarray' statopt{:} }, 'datapos', [2 3], 'title', opt.titles{end, g});
+                 else plotcurve(allx, zeros(size(allx)), 'maskarray', mean(pcondplot{g},2), 'ylim', [0.1 1], 'title', opt.titles{end, g}, statopt{:});
                  end;
             else
                  if strcmpi(opt.plottopo, 'on'), 
                       metaplottopo(pcondplot{g}', 'chanlocs', opt.chanlocs, 'plotfunc', 'plotcurve', ...
-                          'plotargs', { allx statopt{:} }, 'datapos', [2 3], 'title', [ groupnames ' (p-value)' ]);
-                 else plotcurve(allx, mean(pcondplot{g},2), 'title',  [ groupnames ' (p-value)' ],statopt{:});
+                          'plotargs', { allx statopt{:} }, 'datapos', [2 3], 'title', opt.titles{end, g});
+                 else plotcurve(allx, mean(pcondplot{g},2), 'title',  opt.titles{end, g}, statopt{:});
                  end;
             end;
         end;
@@ -523,37 +517,28 @@ end;
 if ~isempty(opt.groupstats) & ~isempty(opt.condstats) & ng > 1 & nc > 1
     mysubplot(ncplot+addr, ngplot+addc, ngplot + 1 + ncplot*(ngplot+addr), opt.subplot);
     if ~isnan(opt.threshold)
-         tmptitle = sprintf('Interaction (p<%.4f)', opt.threshold);
          if strcmpi(opt.plottopo, 'on'), 
               metaplottopo({zeros(size(pinterplot')) pinterplot'}, 'chanlocs', opt.chanlocs, 'plotfunc', 'plotcurve', ...
-                  'plotargs', { allx 'maskarray' statopt{:} }, 'datapos', [2 3], 'title', tmptitle);
-         else plotcurve(allx, zeros(size(allx)), 'maskarray', mean(pinterplot,2), 'ylim', [0.1 1], 'title', tmptitle, statopt{:});
+                  'plotargs', { allx 'maskarray' statopt{:} }, 'datapos', [2 3], 'title', opt.titles{end, end});
+         else plotcurve(allx, zeros(size(allx)), 'maskarray', mean(pinterplot,2), 'ylim', [0.1 1], 'title', opt.titles{end, end}, statopt{:});
               xlabel(xlab); ylabel('-log10(p)');
         end;
     else
          if strcmpi(opt.plottopo, 'on'), 
               metaplottopo(pinterplot', 'chanlocs', opt.chanlocs, 'plotfunc', 'plotcurve', ...
-                  'plotargs', { allx statopt{:} }, 'datapos', [2 3], 'title', 'Interaction (p-value)');
-         else plotcurve(allx, mean(pinterplot,2), 'title', 'Interaction (p-value)', statopt{:});
+                  'plotargs', { allx statopt{:} }, 'datapos', [2 3], 'title', opt.titles{end, end});
+         else plotcurve(allx, mean(pinterplot,2), 'title', opt.titles{end, end}, statopt{:});
          end;
     end;
 end;  
 
-% axis limit and legend
-% ---------------------
+% axis limit
+% ----------
 for c = 1:ncplot
     for g = 1:ngplot
         if isempty(opt.ylim) & strcmpi(opt.plottopo, 'off')
             set(hdl(c,g), 'ylim', tmplim);
         end;
-        if strcmpi(opt.plotgroups, 'together'),                        fig_title = opt.condnames{c};
-        elseif strcmpi(opt.plotconditions, 'together'),                fig_title = opt.groupnames{g};
-        elseif isempty(opt.condnames{c}) | isempty(opt.groupnames{g}), fig_title = [ opt.condnames{c} opt.groupnames{g} ];
-        else                                                           fig_title = [ opt.condnames{c} ', ' opt.groupnames{g} ];
-        end;
-        if ~isempty(opt.compinds), fig_title = [ 'Comp.' int2str(opt.compinds{c,g}) ', ' fig_title ]; end;
-        if ~isempty(opt.subject),  fig_title = [ opt.subject ', ' fig_title ]; end;
-        set(get(hdl(c,g), 'title'), 'string', fig_title);
     end;
 end;
 

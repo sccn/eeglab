@@ -21,36 +21,21 @@
 %           for more information about the statistical computations.
 %
 % Optional display parameters:
-%  'datatype'    - ['ersp'|'itc'|'erp'|'spec'] data type {default: 'erp'}
+%  'datatype'    - ['ersp'|'itc'] data type {default: 'ersp'}
 %  'channels'    - [cell array] channel names (for titles) {default: all}
 %  'condnames'   - [cell array] names of conditions (for titles} 
 %                  {default: none}
 %  'groupnames'  - [cell array] names of subject groups (for titles)
 %                  {default: none}
 %  'subject'     - [string] plot subject name (for title)
+%  'compinds'    - [integer] plot component index (for title)
 %
 % Statistics options:
 %  'groupstats'  - ['on'|'off'] Compute (or not) statistics across groups.
 %                  {default: 'off'}
 %  'condstats'   - ['on'|'off'] Compute (or not) statistics across groups.
 %                  {default: 'off'}
-%  'statistics'  - ['param'|'perm'] Type of statistics to use: 'param' for
-%                  parametric; 'perm' for permutations {default: 'param'}
-%  'naccu'       - [integer] Number of surrogate averges fo accumulate when 
-%                  computing permutation-based statistics. For example, to
-%                  test p<0.01 use naccu>=200; for p<0.001, use naccu>=2000. 
-%                  If a non-NaN 'threshold' is set (see below) and 'naccu' 
-%                  is too low, it will be automatically increased. This 
-%                  keyword available only from the command line {default:500}
-%  'statmode'    - ['subjects'|'trials'] standard statistics are 
-%                  'subjects' where the statistics is performed accross
-%                  the mean ERSP (or ITC) of single subjects. For 'trials'
-%                  statistics, the single-trial data epochs of all subjects
-%                  are pooled together. This requires that they were
-%                  saved on disk using option 'savetrials', 'on' at the time
-%                  of computation. Note that these single-trial data
-%                  may use several GB of disk space and that computation 
-%                  of 'trials' statistics requires a lot of RAM.
+
 %  'threshold'   - [NaN|real<<1] Significance threshold. NaN -> plot the 
 %                  p-values themselves on a different figure. When possible, 
 %                  significance regions are indicated below the data.
@@ -60,31 +45,17 @@
 %                  has the option to mask the data for significance.
 %                  {defualt: 'off'}
 %
-% Curve plotting options (ERP and spectrum):
-%  'plotgroups'  - ['together'|'apart'] 'together' -> plot mean results 
-%                  for subject groups in the same figure panel in different 
-%                  colors. 'apart' -> plot group results on different figure
-%                  panels {default: 'apart'}
-%  'plotconditions' - ['together'|'apart'] 'together' -> plot mean results 
-%                  for data conditions on the same figure panel in different 
-%                  colors. 'apart' -> plot conditions on different figure
-%                  panel. Note: 'plotgroups' and 'plotconditions' arguments 
-%                  cannot both be 'together' {default: 'apart'}
-%  'legend'      - ['on'|'off'] turn plot legend on/off {default: 'off'}
+% Other plotting options:
 %  'plotmode'    - ['normal'|'condensed'] statistics plotting mode:
 %                  'condensed' -> plot statistics under the curves 
 %                  (when possible); 'normal' -> plot them in separate 
 %                  axes {default: 'normal'}
-% 'plotsubjects' - ['on'|'off'] overplot traces for individual components
-%                  or channels {default: 'off'}
-%  'topovals'    - [real] plot a scalp map for the specified latency (ms)
-%                  or frequency (Hz) {default: no topoplot}
+%  'freqscale'   - ['log'|'linear'|'auto'] frequency plotting scale.
+%                  {default: 'auto'}
 %  'ylim'        - [min max] ordinate limits for ERP and spectrum plots
 %                  {default: all available data}
 %
 % ITC/ERSP image plotting options:
-%  'topovals'    - [latency frequency] plot a scalp map at specific 
-%                  latency (in ms) and frequency (in Hz).
 %  'tftopoopt'   - [cell array] tftopo() plotting options (ERSP and ITC)
 %  'caxis'       - [min max] color axis (ERSP, ITC, scalp maps)
 %
@@ -96,6 +67,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2009/11/18 02:17:35  dev
+% fix bug 782
+%
 % Revision 1.17  2009/10/07 05:07:19  arno
 % Fix missing conditions/groups
 %
@@ -240,42 +214,28 @@ if nargin < 2
     return;
 end;
 
-opt = finputcheck( varargin, { 'channels'    'cell'   []              {};
-                               'caxis'       'real'   []              [];
-                               'ersplim'     'real'   []              []; % same as above
-                               'itclim'      'real'   []              []; % same as above
-                               'ylim'        'real'   []              [];
-                               'filter'      'real'   []              [];
-                               'condnames'   'cell'   []              {};
-                               'groupnames'  'cell'   []              {};
-                               'compinds'    'cell'   []              {};
-                               'tftopoopt'   'cell'   []              {};
-                               'threshold'   'real'   []              NaN;
-                               'mcorrect'    'string'  { 'none' 'fdr' } 'none';
-                               'topovals'       'real'   []              []; % same as above
-                               'naccu'       'integer' []             500;
-                               'unitx'       'string' []              'ms'; % just for titles
-                               'subject'     'string' []              '';   % just for titles
-                               'chanlocs'    'struct' []              struct('labels', {});
-                               'freqscale'   'string' { 'log' 'linear' 'auto' }  'auto';
-                               'plotsubjects' 'string' { 'on' 'off' }  'off';
-                               'groupstats'   'cell'   []              {};
-                               'condstats'    'cell'   []              {};
-                               'interstats'   'cell'   []              {};                               
-                               'plottopo'     'string' { 'on' 'off' }   'off';
-                               'maskdata'    'string' { 'on' 'off' }   'off';
-                               'legend'      'string' { 'on' 'off' }   'off';
-                               'datatype'    'string' { 'ersp' 'itc' 'erp' 'spec' }    'erp';
-                               'plotgroups'   'string' { 'together' 'apart' }  'apart';
-                               'plotconditions'    'string' { 'together' 'apart' }  'apart';
-                               'plotmode'    'string' { 'normal' 'condensed' }  'normal';
-                               'statistics'  'string' { 'param' 'perm' 'bootstrap' }       'param';
-                               'statmode'    'string' { 'subjects' 'common' 'trials' } 'subjects'}, 'std_erpmaskdata');
+opt = finputcheck( varargin, { 'channels'       'cell'   []              {};
+                               'titles'         'cell'   []              {};
+                               'caxis'          'real'   []              [];
+                               'ersplim'        'real'   []              []; % same as above
+                               'itclim'         'real'   []              []; % same as above
+                               'ylim'           'real'   []              [];
+                               'condnames'      'cell'   []              {}; % just for titles
+                               'groupnames'     'cell'   []              {}; % just for titles
+                               'compinds'       'cell'   []              {};
+                               'tftopoopt'      'cell'   []              {};
+                               'threshold'      'real'   []              NaN;
+                               'unitx'          'string' []              'ms'; % just for titles
+                               'subject'        'string' []              '';   % just for titles
+                               'chanlocs'       'struct' []              struct('labels', {});
+                               'freqscale'      'string' { 'log' 'linear' 'auto' }  'auto';
+                               'groupstats'     'cell'   []              {};
+                               'condstats'      'cell'   []              {};
+                               'interstats'     'cell'   []              {};                               
+                               'maskdata'       'string' { 'on' 'off' }   'off';
+                               'datatype'       'string' { 'ersp' 'itc' }    'ersp';
+                               'plotmode'       'string' { 'normal' 'condensed' }  'normal' }, 'std_plottf');
 if isstr(opt), error(opt); end;
-opt.singlesubject = 'off';
-if strcmpi(opt.plottopo, 'on') & size(data{1},4) == 1, opt.singlesubject = 'on'; end;
-%if size(data{1},2) == 1,                               opt.singlesubject = 'on'; end;
-%if strcmpi(opt.singlesubject, 'on'), opt.groupstats = 'off'; opt.condstats = 'off'; end;
 if all(all(cellfun('size', data, 3)==1))               opt.singlesubject = 'on'; end;
 if ~isempty(opt.compinds), if length(opt.compinds{1}) > 1, opt.compinds = {}; end; end;
 if ~isempty(opt.groupstats) & ~isempty(opt.condstats) & strcmpi(opt.maskdata, 'on')
@@ -285,11 +245,6 @@ if ~isempty(opt.groupstats) & ~isempty(opt.condstats) & strcmpi(opt.maskdata, 'o
 end;
 if ~isempty(opt.ersplim), opt.caxis = opt.ersplim; end;
 if ~isempty(opt.itclim), opt.caxis = opt.itclim; end;
-if strcmpi(opt.datatype, 'spec'), opt.unit = 'Hz'; end;
-if strcmpi(opt.plotsubjects, 'on')
-    opt.plotgroups = 'apart';
-    opt.plotconditions  = 'apart';
-end
 onecol  = { 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b' };
 manycol = { 'b' 'r' 'g' 'k' 'c' 'y' };
 
@@ -349,17 +304,6 @@ end;
 % ------------------
 if ng > 1 & ~isempty(opt.groupstats), addc = 1; else addc = 0; end;
 if nc > 1 & ~isempty(opt.condstats  ), addr = 1; else addr = 0; end;
-if isempty(opt.topovals) & strcmpi(opt.singlesubject, 'off') % only for curves
-    plottag = 0;
-    if strcmpi(opt.plotgroups, 'together') & ~isempty(opt.condstats) & ~isempty(opt.groupstats) & ~isnan(opt.threshold), addc = 0; plottag = 1; end;
-    if strcmpi(opt.plotconditions , 'together') & ~isempty(opt.condstats) & ~isempty(opt.groupstats) & ~isnan(opt.threshold), addr = 0; plottag = 1; end;
-    if ~isnan(opt.threshold) & plottag == 0
-        disp('Warning: cannot plot condition/group on the same panel while using a fixed');
-        disp('         threshold, unless you only compute statistics for ether groups or conditions');
-        opt.plotgroups = 'apart';
-        opt.plotconditions  = 'apart';
-    end;
-end;
 
 % compute significance mask
 % --------------------------
@@ -399,43 +343,36 @@ tmpc = [inf -inf];
 for c = 1:nc
     for g = 1:ng
         hdl(c,g) = mysubplot(nc+addr, ng+addc, g + (c-1)*(ng+addc), opt.transpose);
-        if isempty( opt.condnames{c} ) | isempty( opt.groupnames{g} )
-             fig_title = [ opt.condnames{c} opt.groupnames{g} ];
-        else fig_title = [ opt.condnames{c} ', ' opt.groupnames{g} ];
-        end;
-        if ~isempty(opt.compinds), fig_title = [ 'Comp. ' int2str(opt.compinds{c,g}) ', ' fig_title ]; end;            
-        if ~isempty(opt.subject) , fig_title = [ fig_title ', ' opt.subject ]; end;
-        tmpplot = mean(data{c,g},3);
-        if statmask, 
-            if ~isempty(opt.condstats), tmpplot(find(pcondplot{g}(:) == 0)) = 0;
-            else                        tmpplot(find(pgroupplot{c}(:) == 0)) = 0;
+        if ~isempty(data{c,g})
+            tmpplot = mean(data{c,g},3);
+            if statmask, 
+                if ~isempty(opt.condstats), tmpplot(find(pcondplot{g}(:) == 0)) = 0;
+                else                        tmpplot(find(pgroupplot{c}(:) == 0)) = 0;
+                end;
+            end;
+
+            tftopo( tmpplot', timevals, freqs, 'title', opt.titles{c,g}, options{:}); 
+                
+            if isempty(opt.caxis) & ~isempty(tmpc)
+                warning off;
+                tmpc = [ min(min(tmpplot(:)), tmpc(1)) max(max(tmpplot(:)), tmpc(2)) ];
+                warning on;
+            else 
+                if ~isempty(opt.caxis)
+                    caxis(opt.caxis);
+                end;
+            end;
+
+            if c > 1
+                ylabel(''); 
             end;
         end;
-        if ~isempty(tmpplot)
-            tftopo( tmpplot', timevals, freqs, 'title', fig_title, options{:}); 
-        end;
-        if isempty(opt.caxis) & ~isempty(tmpc)
-            warning off;
-            tmpc = [ min(min(tmpplot(:)), tmpc(1)) max(max(tmpplot(:)), tmpc(2)) ];
-            warning on;
-        else 
-            if ~isempty(opt.caxis)
-                caxis(opt.caxis);
-            end;
-        end;
-
-        if c > 1
-            ylabel(''); 
-        end;
-
+    
         % statistics accross groups
         % -------------------------
         if g == ng & ng > 1 & ~isempty(opt.groupstats) & ~statmask
             hdl(c,g+1) = mysubplot(nc+addr, ng+addc, g + 1 + (c-1)*(ng+addc), opt.transpose);
-            if isnan(opt.threshold), tmp_title = sprintf('%s (p-value)', opt.condnames{c});
-            else                     tmp_title = sprintf('%s (p<%.4f)',  opt.condnames{c}, opt.threshold);
-            end;
-            tftopo( pgroupplot{c}', timevals, freqs, 'title', tmp_title, options{:});
+            tftopo( pgroupplot{c}', timevals, freqs, 'title', opt.titles{c,g+1}, options{:});
             caxis([-maxplot maxplot]);
         end;
 
@@ -448,10 +385,7 @@ for g = 1:ng
     % -----------------------------
     if ~isempty(opt.condstats) & ~statmask & nc > 1
         hdl(nc+1,g) = mysubplot(nc+addr, ng+addc, g + c*(ng+addc), opt.transpose);
-        if isnan(opt.threshold), tmp_title = sprintf('%s (p-value)', opt.groupnames{g});
-        else                     tmp_title = sprintf('%s (p<%.4f)',  opt.groupnames{g}, opt.threshold);
-        end;
-        tftopo( pcondplot{g}', timevals, freqs, 'title', tmp_title, options{:});
+        tftopo( pcondplot{g}', timevals, freqs, 'title', title(opt.titles{nc+1,g}), options{:});
         caxis([-maxplot maxplot]);
     end;
 end;
@@ -474,10 +408,7 @@ end;
 % ---------------------------------------
 if ~isempty(opt.groupstats) & ~isempty(opt.condstats) & ng > 1 & nc > 1
     hdl(nc+1,ng+1) = mysubplot(nc+addr, ng+addc, g + 1 + c*(ng+addr), opt.transpose);
-    if isnan(opt.threshold), tmp_title = 'Interaction (p-value)';
-    else                     tmp_title = sprintf('Interaction (p<%.4f)', opt.threshold);
-    end;
-    tftopo( pinterplot',  timevals, freqs, 'title', tmp_title, options{:});
+    tftopo( pinterplot',  timevals, freqs, 'title', opt.titles{nc+1,ng+1}, options{:});
     caxis([-maxplot maxplot]);
     ylabel('');
 end;    
