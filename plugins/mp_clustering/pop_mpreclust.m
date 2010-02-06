@@ -24,25 +24,30 @@ returnedFromGui = inputgui( 'geometry', { 1 1 [1 2 1] [1 2 1] [1 2 1] [1 2 1] [1
     {}, { 'Style', 'checkbox', 'string' 'Re-calculate All' 'tag' 'scale' 'value' 0}, ...
     }, 'helpcom','pophelp(''pop_mpreclust'');', 'title', 'MP pre-clustering -- pop_mpreclust()');
 
-
-answers = cell2mat(returnedFromGui);
-measureNamesInGUIorder = {'dipole', 'erp', 'ersp', 'itc', 'spec', 'map'};
-
-measuresToUseInClustering = measureNamesInGUIorder(find(answers(1:end-1))); %#ok<FNDSB>
-reCalculateAll = answers(end);
-STUDY = std_mpreclust(STUDY,ALLEEG, measuresToUseInClustering, reCalculateAll);
-
-% prepare 'command' variable for placing both in eeglab histry (accessible with eegh() ) and also
-% adding to  STUDY.history
-
-measuresInOneString = [];
-for i=1:length(measuresToUseInClustering)
-    if i>1
-        measuresInOneString = [measuresInOneString ' , ' '''' measuresToUseInClustering{i} ''''];
-    else
-        measuresInOneString = ['''' measuresToUseInClustering{1} ''''];
+if isempty(returnedFromGui) % an empty returnedFromGui means the Cancel button has been pressed so nothing should be done.
+    command = '';
+    return; % Cancel button is pressed, so do nothing.
+else
+    
+    answers = cell2mat(returnedFromGui);
+    measureNamesInGUIorder = {'dipole', 'erp', 'ersp', 'itc', 'spec', 'map'};
+    
+    measuresToUseInClustering = measureNamesInGUIorder(find(answers(1:end-1))); %#ok<FNDSB>
+    reCalculateAll = answers(end);
+    STUDY = std_mpreclust(STUDY,ALLEEG, measuresToUseInClustering, reCalculateAll);
+    
+    % prepare 'command' variable for placing both in eeglab histry (accessible with eegh() ) and also
+    % adding to  STUDY.history
+    
+    measuresInOneString = [];
+    for i=1:length(measuresToUseInClustering)
+        if i>1
+            measuresInOneString = [measuresInOneString ' , ' '''' measuresToUseInClustering{i} ''''];
+        else
+            measuresInOneString = ['''' measuresToUseInClustering{1} ''''];
+        end;
     end;
+    
+    command = ['[STUDY ALLEEG]= std_mpreclust(STUDY,ALLEEG, {' measuresInOneString '} , ' num2str(reCalculateAll) ');'];
+    STUDY.history =  sprintf('%s\n%s',  STUDY.history, command);
 end;
-
-command = ['[STUDY ALLEEG]= std_mpreclust(STUDY,ALLEEG, {' measuresInOneString '} , ' num2str(reCalculateAll) ');'];
-STUDY.history =  sprintf('%s\n%s',  STUDY.history, command);

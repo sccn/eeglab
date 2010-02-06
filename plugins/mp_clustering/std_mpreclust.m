@@ -71,9 +71,15 @@ if  ismember('erp', measuresToUseInClustering)
         
 
         % combine conditions in each group, then combine groups together
-        for group=1:numberOfGroups
-            combinedConditions{group} = cat(1,clustinfo.erpdata{:,group});
+        try
+            for group=1:numberOfGroups
+                combinedConditions{group} = cat(1,clustinfo.erpdata{:,group});
+            end;
+        catch exception
+            fprintf('Error in concatenating condition. Some conditions for certain subjects might be missing.\n');
+            disp(exception.message);
         end;
+        
         erpdata = cat(2, combinedConditions{:});
 
         % calculate correlations

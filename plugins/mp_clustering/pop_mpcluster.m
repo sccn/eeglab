@@ -90,38 +90,50 @@ returnedFromGui = inputgui( 'geometry', { [1 0.5]  [1 0.5] 1 1 [1 1 1] [1 1 1] [
     {},{ 'Style', 'checkbox', 'string' 'ITC' 'tag' 'scale' 'value' itcChecked 'enable' itcEnable}, {},...
     {},{ 'Style', 'checkbox', 'string' 'Spectra' 'tag' 'scale' 'value' specChecked 'enable' specEnable}, {}, ...
     {}, { 'Style', 'checkbox', 'string' 'Scalp map' 'tag' 'scale' 'value' 0 'enable' scalpEnable}, {},...
-    {}, { 'Style', 'checkbox', 'string' 'Separate outliers (enter std.)' 'tag' 'scale' 'value' 0}, { 'style', 'edit', 'string', '3' 'tag' 'outlierSTD' }, ...
+    {}, { 'Style', 'checkbox', 'string' 'Separate outliers (enter std.)' 'tag' 'scale' 'value' 1}, { 'style', 'edit', 'string', '3' 'tag' 'outlierSTD' }, ...
 
     }, 'helpcom','pophelp(''pop_mpcluster'');', 'title', 'Measure Product clustering -- pop_mpcluster()');
 
 
-% analysze answers returned from the GUI
-numberOfClusters = str2num(returnedFromGui{1});
-methodParameter = str2num(returnedFromGui{2});
 
-answers = cell2mat(returnedFromGui(3:end-1));
-measureNamesInGUIorder = {'dipole', 'erp', 'ersp', 'itc', 'spec', 'map'};
-measuresToUseInClustering = measureNamesInGUIorder(find(answers(1:end-1))); %#ok<FNDSB>
-
-if answers(end) % checkbox for outlier
-    outlierSTD = str2num(returnedFromGui{end});
+if isempty(returnedFromGui) % an empty returnedFromGui means the Cancel button has been pressed so nothing should be done.
+    command = '';
+    return; % Cancel button is pressed, so do nothing.
 else
-    outlierSTD = Inf;
-end;
-
-STUDY = std_mpcluster(STUDY, ALLEEG, numberOfClusters, outlierSTD, measuresToUseInClustering, methodParameter);
-
-% prepare 'command' variable for placing both in eeglab histry (accessible with eegh() ) and also
-% adding to  STUDY.history
-
-measuresInOneString = [];
-for i=1:length(measuresToUseInClustering)
-    if i>1
-        measuresInOneString = [measuresInOneString ' , ' '''' measuresToUseInClustering{i} ''''];
+    
+    % analysze answers returned from the GUI
+    numberOfClusters = str2num(returnedFromGui{1});
+    methodParameter = str2num(returnedFromGui{2});
+    
+    answers = cell2mat(returnedFromGui(3:end-1));
+    measureNamesInGUIorder = {'dipole', 'erp', 'ersp', 'itc', 'spec', 'map'};
+    measuresToUseInClustering = measureNamesInGUIorder(find(answers(1:end-1))); %#ok<FNDSB>
+    
+    if answers(end) % checkbox for outlier
+        outlierSTD = str2num(returnedFromGui{end});
     else
-        measuresInOneString = ['''' measuresToUseInClustering{1} ''''];
+        outlierSTD = Inf;
     end;
+    
+    STUDY = std_mpcluster(STUDY, ALLEEG, numberOfClusters, outlierSTD, measuresToUseInClustering, methodParameter);
+    
+    % prepare 'command' variable for placing both in eeglab histry (accessible with eegh() ) and also
+    % adding to  STUDY.history
+    
+    measuresInOneString = [];
+    for i=1:length(measuresToUseInClustering)
+        if i>1
+            measuresInOneString = [measuresInOneString ' , ' '''' measuresToUseInClustering{i} ''''];
+        else
+            measuresInOneString = ['''' measuresToUseInClustering{1} ''''];
+        end;
+    end;
+    
+    % pop up the cluster edit and visualization .
+    [STUDY commandFromPop_clustedit] = pop_clustedit(STUDY, ALLEEG); 
+    
+    command = ['STUDY = std_mpcluster(STUDY, ALLEEG, ' num2str(numberOfClusters) ', ' num2str(outlierSTD) ', {' measuresInOneString '} , ' num2str(methodParameter) ');'];
+    command = [command '\n' commandFromPop_clustedit];     % add the command from pop_clustedit() to the history too.
+    STUDY.history =  sprintf('%s\n%s',  STUDY.history, command);
+        
 end;
-
-command = ['STUDY = std_mpcluster(STUDY, ALLEEG, ' num2str(numberOfClusters) ', ' num2str(outlierSTD) ', {' measuresInOneString '} , ' num2str(methodParameter) ');'];
-STUDY.history =  sprintf('%s\n%s',  STUDY.history, command);
