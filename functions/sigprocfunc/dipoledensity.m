@@ -6,7 +6,8 @@
 %                   dipole from each of the subjects. If no output arguments, 
 %                   or if 'plot','on', paints a 3-D density|entropy brain image 
 %                   on slices of the Montreal Neurological Institute (MNI) mean 
-%                   MR brain image ('standard_BESA/avg152t1.mat'). Calls dipplot(), 
+%                   MR brain image ('standard_BESA/avg152t1.mat'). Calls
+%                   dipplot(), 
 %                   mri3dplot(), and Fieldtrip function find_inside_vol(). 
 % Usage:
 %               >> [dens3d mri] = dipoledensity( dipoles, 'key',val, ... );
@@ -100,6 +101,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.6  2009/12/17 21:15:00  arno
+% new format for plotting 2 densities simultaneously
+%
 % Revision 1.5  2009/05/08 22:06:08  arno
 % fix calling
 %
@@ -397,7 +401,11 @@ end;
 dipfitdefs; % get the location of standard BEM volume file
 tmp = load('-mat',DIPOLEDENSITY_STDBEM); % load MNI mesh
 
-filename = g.volmesh_fname; %[ '/home/arno/matlab/MNI_VoxelTsearch' int2str(g.subsample) '.mat' ];
+if isempty(g.volmesh_fname)  % default
+    filename = [ '/home/arno/matlab/MNI_VoxelTsearch' int2str(g.subsample) '.mat' ];
+else
+    filename = g.volmesh_fname; %
+end
 if ~exist(filename)
     disp('Computing volume within head mesh...');
     [X Y Z]           = meshgrid(g.mri.xgrid(1:g.subsample:end)+g.subsample/2, ...
