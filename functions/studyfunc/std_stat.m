@@ -55,6 +55,9 @@
 %                  of 'trials' statistics requires a lot of RAM.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2010/01/28 20:46:01  arno
+% fixed computing FDR for Anova interactions
+%
 % Revision 1.8  2009/08/29 04:24:56  arno
 % new statistics
 %
@@ -108,7 +111,7 @@ opt = finputcheck( varargin, { 'threshold'   'real'    []               NaN;
                                'statistics'  'string' { 'param' 'perm' 'bootstrap' }       'param' }, ...
                                'std_stat', 'ignore');
 if isstr(opt), error(opt); end;
-if ~isnan(opt.threshold) & isempty(opt.naccu), opt.naccu = 1/opt.threshold*2; end;
+if ~isnan(opt.threshold) & isempty(opt.naccu), opt.naccu = 1/opt.threshold(end)*2; end;
 if any(any(cellfun('size', data, 2)==1)), opt.groupstats = 'off'; opt.condstats = 'off'; end;
 if strcmpi(opt.mcorrect, 'fdr'), opt.naccu = opt.naccu*20; end;
 if isempty(opt.naccu), opt.naccu = 2000; end;
@@ -142,20 +145,7 @@ else
     pinter = {};
 end;
 
-if ~isnan(opt.threshold) & ( ~isempty(opt.groupstats) | ~isempty(opt.condstats) )    
-    % applying threshold
-    % ------------------
-    if strcmpi(opt.mcorrect, 'fdr'), 
-        disp('Applying FDR correction for multiple comparisons');
-        for ind = 1:length(pcond),  [ tmp pcond{ ind}] = fdr(pcond{ind} , opt.threshold); end;
-        for ind = 1:length(pgroup), [ tmp pgroup{ind}] = fdr(pgroup{ind}, opt.threshold); end;
-        if ~isempty(pinter), [tmp pinter] = fdr(pinter, opt.threshold); end;
-    else
-        for ind = 1:length(pcond),  pcond{ind}  = pcond{ind}  < opt.threshold; end;
-        for ind = 1:length(pgroup), pgroup{ind} = pgroup{ind} < opt.threshold; end;
-        if ~isempty(pinter), pinter = pinter < opt.threshold; end;
-    end;
-else
+if ~isempty(opt.groupstats) || ~isempty(opt.condstats)   
     if strcmpi(opt.mcorrect, 'fdr'), 
         disp('Applying FDR correction for multiple comparisons');
         for ind = 1:length(pcond),  pcond{ind} = fdr( pcond{ind} ); end;
@@ -166,5 +156,19 @@ else
             pinter{3} = fdr(pinter{3}); 
         end;
     end;
+    if ~isnan(opt.threshold)
+        for ind = 1:length(pcond),  pcond{ind}  = applythreshold(pcond{ind},  opt.threshold); end;
+        for ind = 1:length(pgroup), pgroup{ind} = applythreshold(pgroup{ind}, opt.threshold); end;
+        if ~isempty(pinter), pinter = applythreshold(pinter, opt.threshold); end;
+    end;
 end;
 
+function newdata = applythreshold(data, threshold)
+    threshold = sort(threshold);
+    newdata = zeros(size(data));
+    for index = 1:length(threshold)
+        inds = data < threshold(index);
+        data(inds)    = 1;
+        newdata(inds) = length(threshold)-index+1;
+    end;
+    

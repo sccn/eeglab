@@ -88,6 +88,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.64  2010/02/06 05:47:52  arno
+% New titles for figures
+%
 % Revision 1.63  2009/10/07 05:07:19  arno
 % Fix missing conditions/groups
 %
@@ -294,6 +297,8 @@ end;
 
 if length(allinds) > 1 & isempty(opt.channels)
     plotcurveopt = { plotcurveopt{:} 'figure' 'off' }; 
+    opt.plotconditions = 'together';
+    opt.plotgroups     = 'together';
 end;
 
 % channel plotting
@@ -336,7 +341,7 @@ if ~isempty(opt.channels)
     locs = eeg_mergelocs(ALLEEG.chanlocs);
     locs = locs(std_chaninds(STUDY, opt.channels));
     alltitles = std_figtitle('threshold', opt.threshold, 'mcorrect', opt.mcorrect, 'condstat', opt.condstats, 'cond2stat', opt.groupstats, ...
-                             'statistics', opt.statistics, 'condnames', STUDY.condition, 'cond2names', STUDY.group, 'chanlabels', { locs.labels }, ...
+                             'statistics', opt.statistics, 'condnames', STUDY.condition, 'plotsubjects', opt.plotsubjects, 'cond2names', STUDY.group, 'chanlabels', { locs.labels }, ...
                              'subject', opt.subject, 'valsunit', 'ms', 'vals', opt.topotime, 'datatype', 'ERP', 'cond2group', opt.plotgroups, 'condgroup', opt.plotconditions);
     
     if ~isempty(opt.topotime) & all(~isnan(opt.topotime))
@@ -347,6 +352,7 @@ if ~isempty(opt.channels)
             'chanlocs', locs, 'titles', alltitles, 'plotsubjects', opt.plotsubjects, ...
             'condnames', STUDY.condition, 'groupnames', STUDY.group, 'plottopo', fastif(length(allinds) > 1, 'on', 'off'), plotcurveopt{:});
     end;
+
     set(gcf,'name','Channel ERP');
 else 
     % plot component
@@ -382,7 +388,7 @@ else
                                          'statistics', opt.statistics, 'naccu', opt.naccu, 'threshold', opt.threshold, 'mcorrect', opt.mcorrect);
             
         if index == length(allinds), opt.legend = 'on'; end;
-        alltitles = std_figtitle('threshold', opt.threshold, 'mcorrect', opt.mcorrect, 'condstat', opt.condstats, 'cond2stat', opt.groupstats, ...
+        alltitles = std_figtitle('threshold', opt.threshold, 'plotsubjects', opt.plotsubjects, 'mcorrect', opt.mcorrect, 'condstat', opt.condstats, 'cond2stat', opt.groupstats, ...
                                  'statistics', opt.statistics, 'condnames', STUDY.condition, 'cond2names', STUDY.group, 'clustname', STUDY.cluster(allinds(index)).name, 'compnames', comp_names, ...
                                  'subject', opt.subject, 'valsunit', 'ms', 'vals', opt.topotime, 'datatype', 'ERP', 'cond2group', opt.plotgroups, 'condgroup', opt.plotconditions);
         

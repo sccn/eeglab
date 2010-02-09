@@ -88,6 +88,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.60  2010/02/06 05:47:53  arno
+% New titles for figures
+%
 % Revision 1.59  2009/10/07 05:07:19  arno
 % Fix missing conditions/groups
 %
@@ -256,11 +259,10 @@ if ~isempty(opt.channels)
 else [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'clusters', opt.clusters, 'infotype', 'spec', 'freqrange', opt.freqrange, 'rmsubjmean', opt.subtractsubjectmean);
 end;
 
-if strcmpi(opt.plotmode, 'condensed'), 
-    plotcurveopt = { plotcurveopt{:} 'figure' 'off' }; 
-end;
 if length(allinds) > 1 & isempty(opt.channels)
     plotcurveopt = { plotcurveopt{:} 'figure' 'off' }; 
+    opt.plotconditions = 'together';
+    opt.plotgroups     = 'together';
 end;
 
 % channel plotting
@@ -299,7 +301,7 @@ if ~isempty(opt.channels)
                                          'statistics', opt.statistics, 'naccu', opt.naccu, 'threshold', opt.threshold, 'mcorrect', opt.mcorrect );
     locs = eeg_mergelocs(ALLEEG.chanlocs);
     locs = locs(std_chaninds(STUDY, opt.channels));
-    alltitles = std_figtitle('threshold', opt.threshold, 'mcorrect', opt.mcorrect, 'condstat', opt.condstats, 'cond2stat', opt.groupstats, ...
+    alltitles = std_figtitle('threshold', opt.threshold, 'mcorrect', opt.mcorrect, 'plotsubjects', opt.plotsubjects, 'condstat', opt.condstats, 'cond2stat', opt.groupstats, ...
                              'statistics', opt.statistics, 'condnames', STUDY.condition, 'cond2names', STUDY.group, 'chanlabels', { locs.labels }, ...
                              'subject', opt.subject, 'valsunit', 'Hz', 'vals', opt.topofreq, 'datatype', 'Spectrum', 'cond2group', opt.plotgroups, 'condgroup', opt.plotconditions);
     
@@ -346,9 +348,9 @@ else
                                          'statistics', opt.statistics, 'naccu', opt.naccu, 'threshold', opt.threshold, 'mcorrect', opt.mcorrect);
             
         if index == length(allinds), opt.legend = 'on'; end;
-        alltitles = std_figtitle('threshold', opt.threshold, 'mcorrect', opt.mcorrect, 'condstat', opt.condstats, 'cond2stat', opt.groupstats, ...
+        alltitles = std_figtitle('threshold', opt.threshold, 'plotsubjects', opt.plotsubjects, 'mcorrect', opt.mcorrect, 'condstat', opt.condstats, 'cond2stat', opt.groupstats, ...
                                  'statistics', opt.statistics, 'condnames', STUDY.condition, 'cond2names', STUDY.group, 'clustname', STUDY.cluster(allinds(index)).name, 'compnames', comp_names, ...
-                                 'subject', opt.subject, 'datatype', 'ERP', 'cond2group', opt.plotgroups, 'condgroup', opt.plotconditions);
+                                 'subject', opt.subject, 'datatype', 'spectrum', 'cond2group', opt.plotgroups, 'condgroup', opt.plotconditions);
         
         std_plotcurve(allfreqs, specdata, 'condnames', STUDY.condition, 'legend', opt.legend, 'groupnames', STUDY.group,  ...
                                           'titles', alltitles, 'unitx', 'Hz',  'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, ...

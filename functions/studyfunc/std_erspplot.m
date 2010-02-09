@@ -94,6 +94,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.75  2010/02/06 05:47:52  arno
+% New titles for figures
+%
 % Revision 1.74  2009/10/07 05:07:19  arno
 % Fix missing conditions/groups
 %
@@ -372,11 +375,11 @@ if ~isempty(opt.channels)
     if ~strcmpi(opt.plotmode, 'none')
         locs = eeg_mergelocs(ALLEEG.chanlocs);
         locs = locs(std_chaninds(STUDY, opt.channels));
-        alltitles = std_figtitle('threshold', opt.threshold, 'mcorrect', opt.mcorrect, 'condstat', opt.condstats, 'cond2stat', opt.groupstats, ...
-                                 'statistics', opt.statistics, 'condnames', STUDY.condition, 'cond2names', STUDY.group, 'chanlabels', { locs.labels }, ...
-                                 'subject', opt.subject, 'valsunit', { 'Hz' 'ms' }, 'vals', opt.plottf, 'datatype', upper(opt.datatype));
         
         if ~isempty(opt.plottf)
+            alltitles = std_figtitle('threshold', opt.threshold, 'mcorrect', opt.mcorrect, 'condstat', opt.condstats, 'cond2stat', opt.groupstats, ...
+                                     'statistics', opt.statistics, 'condnames', STUDY.condition, 'cond2names', STUDY.group, 'chanlabels', { locs.labels }, ...
+                                     'subject', opt.subject, 'valsunit', { 'Hz' 'ms' }, 'vals', opt.plottf, 'datatype', upper(opt.datatype));
             std_chantopo(allersp, 'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, 'caxis', opt.caxis, ...
                                           'chanlocs', locs, 'threshold', opt.threshold, 'titles', alltitles);
         else
@@ -391,12 +394,12 @@ if ~isempty(opt.channels)
                         tmpersp{ind} = squeeze(allersp{ind}(:,:,index,:)); 
                     end;
                 end;
-                std_plottf(alltimes, allfreqs, tmpersp, 'condnames', STUDY.condition, 'subject', opt.subject, ...
-                                           'datatype', opt.datatype, 'titles', alltitles, ...
+                alltitles = std_figtitle('threshold', opt.threshold, 'mcorrect', opt.mcorrect, 'condstat', opt.condstats, 'cond2stat', opt.groupstats, ...
+                                         'statistics', opt.statistics, 'condnames', STUDY.condition, 'cond2names', STUDY.group, 'chanlabels', { locs(index).labels }, ...
+                                         'subject', opt.subject, 'datatype', upper(opt.datatype), 'plotmode', opt.plotmode);
+                std_plottf(alltimes, allfreqs, tmpersp, 'datatype', opt.datatype, 'titles', alltitles, ...
                                            'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, 'plotmode', ...
-                                           opt.plotmode, 'groupnames', STUDY.group, 'unitx', 'Hz', ...
-                                          'chanlocs', ALLEEG(1).chanlocs, plottfopt{:});
-                title(sprintf('%s', opt.channels{index}));  
+                                           opt.plotmode, 'chanlocs', ALLEEG(1).chanlocs, plottfopt{:});
             end;
         end;
     end;
@@ -481,29 +484,12 @@ else
         if ~strcmpi(opt.plotmode, 'none')
             alltitles = std_figtitle('threshold', opt.threshold, 'mcorrect', opt.mcorrect, 'condstat', opt.condstats, 'cond2stat', opt.groupstats, ...
                                      'statistics', opt.statistics, 'condnames', STUDY.condition, 'cond2names', STUDY.group, 'clustname', STUDY.cluster(allinds(index)).name, 'compnames', comp_names, ...
-                                     'subject', opt.subject, 'datatype', upper(opt.datatype)); %, 'plotmode', opt.plotmode);
+                                     'subject', opt.subject, 'datatype', upper(opt.datatype), 'plotmode', opt.plotmode);
             
-            std_plottf(alltimes, allfreqs, allersp, 'condnames', STUDY.condition, 'subject', opt.subject, ...
-                                           'compinds', comp_names, 'datatype', opt.datatype, ...
+            std_plottf(alltimes, allfreqs, allersp, 'datatype', opt.datatype, ...
                                            'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, 'plotmode', ...
-                                           opt.plotmode, 'groupnames', STUDY.group, 'unitx', 'Hz', 'titles', alltitles, ...
+                                           opt.plotmode, 'titles', alltitles, ...
                                           'chanlocs', ALLEEG(1).chanlocs, plottfopt{:});
-            if length(allinds) > 1, 
-                title([ STUDY.cluster(allinds(index)).name ' (' num2str(length(STUDY.cluster(allinds(index)).comps)),' ICs, ' ...
-                        num2str(length(unique(STUDY.cluster(allinds(index)).sets(1,:)))) ' Ss)' ]);    
-                set(gcf, 'name', [ 'Cluster ' upper(opt.datatype) ]);
-            elseif ~strcmp(opt.mode,'together') % if it is not the mean ERSP that is being shown (which is the case when 'cluster properties' is plotted then put cluster number on the corner of figure
-                h = gca;
-                axes('position',[0.04 0.96 0.1 0.06]); 
-                text(0,0,[STUDY.cluster(allinds(index)).name],'fontsize',13 );
-                axis off;
-                if length(opt.comps) ~= 1
-                    set(gcf,'name',[upper(opt.datatype) ' of ' STUDY.cluster(allinds(index)).name])
-                else
-                    set(gcf,'name',[upper(opt.datatype) ' of a Component from cluster ' STUDY.cluster(allinds(index)).name])
-                end;
-                axes(h);
-            end;
         end;
     end;
 end;

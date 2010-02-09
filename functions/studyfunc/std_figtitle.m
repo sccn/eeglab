@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2010/02/06 05:47:52  arno
+% New titles for figures
+%
 
 function all_titles = std_figtitle(varargin)
 
@@ -67,6 +70,8 @@ opt = finputcheck( varargin, { 'chanlabels'  {'cell' 'string'}   []     {};
                                'cond2stat'   'string'            {'on' 'off'}     'off';
                                'condgroup'   'string'            {'on' 'off' 'together' 'apart'}     'off';
                                'cond2group'  'string'            {'on' 'off' 'together' 'apart'}     'off';
+                               'plotmode'    'string'            {'normal' 'condensed'}              'normal';
+                               'plotsubjects' 'string'           {'on' 'off'}                        'off';
                                'threshold'   'real'              []     NaN;
                                'statistics'  'string'            []     '';
                                'mcorrect'    'string'            []     '';
@@ -78,7 +83,11 @@ opt = finputcheck( varargin, { 'chanlabels'  {'cell' 'string'}   []     {};
                                'subject'     'string'            []              '' }, 'std_figtitle'); %, 'ignore');
 if isstr(opt), error(opt); end;
 if ~iscell(opt.vals),       opt.vals       = { opt.vals }; end;
+ncori  = length(opt.condnames);
+nc2ori = length(opt.cond2names);
 if ~isempty(opt.vals) && ~isempty(opt.vals{1}) && ~isnan(opt.vals{1}(1)), opt.condgroup = 'off'; opt.cond2group = 'off'; end;
+if strcmpi(opt.plotmode, 'condensed'), opt.condgroup = 'on';  opt.cond2group = 'on';  end;
+if strcmpi(opt.plotsubjects, 'on'),    opt.condgroup = 'off'; opt.cond2group = 'off'; end;
 if strcmpi(opt.condgroup,  'on') || strcmpi(opt.condgroup,  'together'), opt.condnames  = ''; end;
 if strcmpi(opt.cond2group, 'on') || strcmpi(opt.cond2group, 'together'), opt.cond2names = ''; end;
 if ~iscell(opt.valsunit),   opt.valsunit   = { opt.valsunit }; end;
@@ -164,6 +173,16 @@ for c1 = 1:length(opt.condnames)
         if strcmpi(fig_title(end-1:end), '- '), fig_title(end-1:end) = []; end;
         
         all_titles{c1, c2} = fig_title;
+    end;
+end;
+
+% copy titles in other cells if both grouping are on (condensed mode)
+% -------------------------------------------------------------------
+if strcmpi(opt.cond2group, 'together') && strcmpi(opt.condgroup, 'together')
+    for c1 = 1:ncori
+        for c2 = 1:nc2ori
+            all_titles{c1,c2} = all_titles{1};
+        end;
     end;
 end;
 

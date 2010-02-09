@@ -22,13 +22,8 @@
 %
 % Optional display parameters:
 %  'datatype'    - ['ersp'|'itc'] data type {default: 'ersp'}
-%  'channels'    - [cell array] channel names (for titles) {default: all}
-%  'condnames'   - [cell array] names of conditions (for titles} 
-%                  {default: none}
-%  'groupnames'  - [cell array] names of subject groups (for titles)
-%                  {default: none}
-%  'subject'     - [string] plot subject name (for title)
-%  'compinds'    - [integer] plot component index (for title)
+%  'titles'      - [cell array of string] titles for each of the subplots. 
+%                  { default: none}
 %
 % Statistics options:
 %  'groupstats'  - ['on'|'off'] Compute (or not) statistics across groups.
@@ -67,6 +62,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2010/02/06 05:47:52  arno
+% New titles for figures
+%
 % Revision 1.18  2009/11/18 02:17:35  dev
 % fix bug 782
 %
@@ -214,19 +212,14 @@ if nargin < 2
     return;
 end;
 
-opt = finputcheck( varargin, { 'channels'       'cell'   []              {};
-                               'titles'         'cell'   []              {};
+opt = finputcheck( varargin, { 'titles'         'cell'   []              cell(20,20);
                                'caxis'          'real'   []              [];
                                'ersplim'        'real'   []              []; % same as above
                                'itclim'         'real'   []              []; % same as above
                                'ylim'           'real'   []              [];
-                               'condnames'      'cell'   []              {}; % just for titles
-                               'groupnames'     'cell'   []              {}; % just for titles
-                               'compinds'       'cell'   []              {};
                                'tftopoopt'      'cell'   []              {};
                                'threshold'      'real'   []              NaN;
                                'unitx'          'string' []              'ms'; % just for titles
-                               'subject'        'string' []              '';   % just for titles
                                'chanlocs'       'struct' []              struct('labels', {});
                                'freqscale'      'string' { 'log' 'linear' 'auto' }  'auto';
                                'groupstats'     'cell'   []              {};
@@ -237,7 +230,6 @@ opt = finputcheck( varargin, { 'channels'       'cell'   []              {};
                                'plotmode'       'string' { 'normal' 'condensed' }  'normal' }, 'std_plottf');
 if isstr(opt), error(opt); end;
 if all(all(cellfun('size', data, 3)==1))               opt.singlesubject = 'on'; end;
-if ~isempty(opt.compinds), if length(opt.compinds{1}) > 1, opt.compinds = {}; end; end;
 if ~isempty(opt.groupstats) & ~isempty(opt.condstats) & strcmpi(opt.maskdata, 'on')
     disp('Cannot use ''maskdata'' option with both condition stat. and group stat. on');
     disp('Disabling statistics');
@@ -252,14 +244,6 @@ nc = size(data,1);
 ng = size(data,2);
 if nc >= ng, opt.transpose = 'on';
 else         opt.transpose = 'off';
-end;
-if isempty(opt.condnames)
-    for c=1:nc, opt.condnames{c} = sprintf('Cond. %d', c); end;
-    if nc == 1, opt.condnames = { '' }; end;
-end;
-if isempty(opt.groupnames)
-    for g=1:ng, opt.groupnames{g} = sprintf('Group. %d', g); end;
-    if ng == 1, opt.groupnames = { '' }; end;
 end;
 
 % test log frequencies
@@ -289,7 +273,7 @@ if strcmpi(opt.plotmode, 'condensed')
             'cmode', 'separate', opt.tftopoopt{:} };       
         
     if strcmpi(opt.freqscale, 'log'), options = { options{:} 'logfreq', 'native' }; end;
-    tftopo( meanplot', timevals, freqs, 'title', [ 'Mean ' upper(opt.datatype) ' for all group/cond' ], options{:}); 
+    tftopo( meanplot', timevals, freqs, 'title', opt.titles{1}, options{:}); 
     currentHangle = gca;
     if ~isempty( opt.caxis )
         caxis( currentHangle, opt.caxis )
@@ -385,7 +369,7 @@ for g = 1:ng
     % -----------------------------
     if ~isempty(opt.condstats) & ~statmask & nc > 1
         hdl(nc+1,g) = mysubplot(nc+addr, ng+addc, g + c*(ng+addc), opt.transpose);
-        tftopo( pcondplot{g}', timevals, freqs, 'title', title(opt.titles{nc+1,g}), options{:});
+        tftopo( pcondplot{g}', timevals, freqs, 'title', opt.titles{nc+1,g}, options{:});
         caxis([-maxplot maxplot]);
     end;
 end;

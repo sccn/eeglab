@@ -20,13 +20,8 @@
 %
 % Optional display parameters:
 %  'datatype'    - ['erp'|'spec'] data type {default: 'erp'}
-%  'channels'    - [cell array] channel names (for titles) {default: all}
-%  'condnames'   - [cell array] names of conditions (for titles} 
-%                  {default: none}
-%  'groupnames'  - [cell array] names of subject groups (for titles)
-%                  {default: none}
-%  'subject'     - [string] plot subject name (for title)
-%  'compinds'    - [integer] plot component index (for title)
+%  'titles'      - [cell array of string] titles for each of the subplots. 
+%                  { default: none}
 %
 % Statistics options:
 %  'groupstats'  - [cell] One p-value array per group {default: {}}
@@ -66,6 +61,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2010/02/06 05:47:52  arno
+% New titles for figures
+%
 % Revision 1.24  2009/08/29 04:24:56  arno
 % new statistics
 %
@@ -230,7 +228,7 @@ opt = finputcheck( varargin, { 'ylim'          'real'   []              [];
                                'groupstats'    'cell'   []              {};
                                'condstats'     'cell'   []              {};
                                'interstats'    'cell'   []              {};
-                               'titles'        'cell'   []              {};
+                               'titles'        'cell'   []              cell(20,20);
                                'figure'        'string' { 'on' 'off' }   'on';
                                'plottopo'      'string' { 'on' 'off' }   'off';
                                'legend'        'string' { 'on' 'off' }   'off';
