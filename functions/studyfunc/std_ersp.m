@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.60  2009/12/16 02:10:24  arno
+% default lower frequency
+%
 % Revision 1.59  2009/11/04 01:41:20  arno
 % Remove dependency on compute_ersp_params (still used for backward comp.)
 %
@@ -415,6 +418,9 @@ end
 % -----------------
 if strcmpi(g.getparams, 'on')
     X = []; times = []; freqs = [];
+    if strcmpi(g.savetrials, 'on')
+        parameters = { parameters{:} 'savetrials', g.savetrials };
+    end;
     return;
 end;
 
