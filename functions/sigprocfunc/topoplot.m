@@ -166,6 +166,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.293  2010/02/01 18:57:40  arno
+% Plotting single channels
+%
 % Revision 1.292  2009/11/11 03:21:28  dev
 % Changed the EMARKERSIZE if statements as per bug 748
 %
@@ -2171,8 +2174,12 @@ end
 try,
     if strcmpi(STYLE,'blank') % if mark-selected-channel-locations mode
         for kk = 1:length(1:length(x))
-            if Values(kk)
-                hp2 = plot3(y(kk),x(kk),ELECTRODE_HEIGHT,EMARKER,'Color', EMARKERCOLOR1CHAN, 'markersize', EMARKERSIZE1CHAN);
+            if Values(kk) == 3
+                hp2 = plot3(y(kk),x(kk),ELECTRODE_HEIGHT,EMARKER,'Color', [0 0 1], 'markersize', EMARKERSIZE1CHAN);
+            elseif Values(kk) == 2
+                hp2 = plot3(y(kk),x(kk),ELECTRODE_HEIGHT,EMARKER,'Color', [0 1 0], 'markersize', EMARKERSIZE1CHAN);
+            elseif Values(kk) == 1
+                hp2 = plot3(y(kk),x(kk),ELECTRODE_HEIGHT,EMARKER,'Color', [1 0 0], 'markersize', EMARKERSIZE1CHAN);
             elseif strcmpi(ELECTRODES,'on')
                 hp2 = plot3(y(kk),x(kk),ELECTRODE_HEIGHT,EMARKER,'Color', ECOLOR, 'markersize', EMARKERSIZE);
             end
