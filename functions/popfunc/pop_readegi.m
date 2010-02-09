@@ -35,6 +35,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2010/02/06 05:49:34  arno
+% EGI new functions
+%
 % Revision 1.20  2006/08/04 22:30:19  toby
 % forceversion bugfix
 %
@@ -214,6 +217,12 @@ EEG = eeg_checkset(EEG, 'eventconsistency');
 
 % importing channel locations
 % ---------------------------
+if all(EEG.data(end,1:10) == 0)
+    disp('Deleting empty data reference channel (reference channel location is retained)');
+    EEG.data(end,:)   = [];
+    EEG.nbchan        = size(EEG.data,1);
+    EEG = eeg_checkset(EEG);
+end;
 EEG = readegilocs(EEG);
 
 if nargin < 1 

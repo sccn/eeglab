@@ -1,7 +1,7 @@
 % pop_importegimat() - import EGI Matlab segmented file
 %
 % Usage:    
-%   >> EEG = pop_importegimat(filename, srate, latpoint0, getchanfile); 
+%   >> EEG = pop_importegimat(filename, srate, latpoint0); 
 %
 % Inputs:
 %   filename    - Matlab file name
@@ -10,7 +10,6 @@
 %                 When data files are exported using Netstation, the user specify
 %                 a time range (-100 ms to 500 ms for instance). In this 
 %                 case, the latency of the stimulus is 100 (ms). Default is 0 (ms)
-%   getchanfile - [0|1] automatically look up channel location file
 %
 % Output:
 %   EEG        - EEGLAB dataset structure
@@ -34,8 +33,11 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2010/02/06 05:49:34  arno
+% EGI new functions
+%
 
-function [EEG com] = pop_importegimat(filename, srate, latpoint0, lookupchanfile);
+function [EEG com] = pop_importegimat(filename, srate, latpoint0);
 
     if nargin < 3, latpoint0 = 0; end;
     if nargin < 4, lookupchanfile = 0; end;
@@ -48,10 +50,8 @@ function [EEG com] = pop_importegimat(filename, srate, latpoint0, lookupchanfile
         promptstr    = { { 'style' 'text'       'string' 'Sampling rate (Hz)' } ...
                          { 'style' 'edit'       'string' '250' } ...
                          { 'style' 'text'       'string' 'Sample latency for stimulus (ms)' } ...
-                         { 'style' 'edit'       'string' '0' } ...
-                         { 'style' 'text'       'string' 'Look up channel location file (set=yes)' } ...
-                         { 'style' 'checkbox'   'string' '' 'value' 0 } };
-        geometry = { [2 1] [2 1] [2 1] };
+                         { 'style' 'edit'       'string' '0' } };
+        geometry = { [2 1] [2 1] };
         result       = inputgui( 'geometry', geometry, 'uilist', promptstr, ...
                                  'helpcom', 'pophelp(''pop_importegimat'')', ...
                                  'title', 'Import a Matlab file from Netstation -- pop_runica()');
@@ -60,7 +60,6 @@ function [EEG com] = pop_importegimat(filename, srate, latpoint0, lookupchanfile
         srate = str2num(result{1});
         latpoint0 = str2num(result{2});
         if isempty(latpoint0), latpoint0 = 0; end;
-        lookupchanfile = result{3};
     end;
    
     EEG = eeg_emptyset;
@@ -113,9 +112,13 @@ function [EEG com] = pop_importegimat(filename, srate, latpoint0, lookupchanfile
     
     % channel location
     % ----------------
-    if lookupchanfile
-        EEG = readegilocs(EEG);
+    if all(EEG.data(end,1:10) == 0)
+        disp('Deleting empty data reference channel (reference channel location is retained)');
+        EEG.data(end,:)   = [];
+        EEG.nbchan        = size(EEG.data,1);
+        EEG = eeg_checkset(EEG);
     end;
+    EEG = readegilocs(EEG);
     
     com = sprintf('EEG = pop_importegimat(''%s'', %3.2f, %3.2f, %d);', filename, srate, latpoint0, lookupchanfile);
     

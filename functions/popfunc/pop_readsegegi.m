@@ -33,6 +33,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2010/02/06 05:49:34  arno
+% EGI new functions
+%
 % Revision 1.9  2008/04/19 21:07:40  arno
 % fix first file name
 %
@@ -127,7 +130,17 @@ if ~isempty(Eventdata)
                              'nbtype', 1, 'delchan', 'on');
     end;
 end;
+
+% importing channel locations
+% ---------------------------
+if all(EEG.data(end,1:10) == 0)
+    disp('Deleting empty data reference channel (reference channel location is retained)');
+    EEG.data(end,:)   = [];
+    EEG.nbchan        = size(EEG.data,1);
+    EEG = eeg_checkset(EEG);
+end;
 EEG = readegilocs(EEG);
+
 EEG = eeg_checkset(EEG);
 command = sprintf('EEG = pop_readsegegi(''%s'');', filename); 
 
