@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2010/02/06 05:49:34  arno
+% EGI new functions
+%
 
 function EEG = readegilocs(EEG);
 
@@ -63,9 +66,13 @@ if found
     locs(2).type = 'FID';
     locs(3).type = 'FID';
     locs(end).type = 'REF';
-    if mod(EEG.nbchan,2) == 0, locs(end) = []; end; % remove reference
-    chaninfo.nodatchans = locs([1 2 3]);
-    locs([1 2 3]) = [];
+    if mod(EEG.nbchan,2) == 0, 
+        chaninfo.nodatchans = locs([1 2 3 end]);
+        locs([1 2 3 end]) = [];
+    else
+        chaninfo.nodatchans = locs([1 2 3]);
+        locs([1 2 3]) = [];
+    end; % remove reference
     EEG.chanlocs = locs;
     EEG.chaninfo = chaninfo;
 end;
