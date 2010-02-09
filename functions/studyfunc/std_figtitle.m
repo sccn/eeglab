@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2010/02/09 06:07:27  arno
+% Fixed new title problem and implemented 3-level significance
+%
 % Revision 1.1  2010/02/06 05:47:52  arno
 % New titles for figures
 %
@@ -94,6 +97,8 @@ if ~iscell(opt.valsunit),   opt.valsunit   = { opt.valsunit }; end;
 if ~iscell(opt.chanlabels), opt.chanlabels = { opt.chanlabels }; end;
 if ~iscell(opt.condnames),  opt.condnames  = { opt.condnames }; end;
 if ~iscell(opt.cond2names), opt.cond2names = { opt.cond2names }; end;
+if isempty(opt.condnames),  opt.condnames{1}  = ''; end;
+if isempty(opt.cond2names), opt.cond2names{1} = ''; end;
 
 for c1 = 1:length(opt.condnames)
     for c2 = 1:length(opt.cond2names)
@@ -169,8 +174,8 @@ for c1 = 1:length(opt.condnames)
             end;
         end;    
         
-        if strcmpi(fig_title(end-1:end), ', '), fig_title(end-1:end) = []; end;
-        if strcmpi(fig_title(end-1:end), '- '), fig_title(end-1:end) = []; end;
+        if ~isempty(fig_title) && strcmpi(fig_title(end-1:end), ', '), fig_title(end-1:end) = []; end;
+        if ~isempty(fig_title) && strcmpi(fig_title(end-1:end), '- '), fig_title(end-1:end) = []; end;
         
         all_titles{c1, c2} = fig_title;
     end;
