@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.550  2010/02/06 05:44:40  arno
+% updated EGI menu
+%
 % Revision 1.549  2009/12/17 21:56:48  arno
 % adding catch string
 %
@@ -2049,7 +2052,9 @@ catchstrs.update_study           = e_load_study;
                 end;
                 if ~isempty(findstr('fieldtrip', lower(dircontent{index})))
                     addpath([p 'external' filesep dircontent{index} filesep 'fileio' ]);
+                    addpath([p 'external' filesep dircontent{index} filesep 'forwinv' ]);
                     disp(['Adding path to ' eeglabpath 'external' filesep dircontent{index} filesep 'fileio' ]);
+                    disp(['Adding path to ' eeglabpath 'external' filesep dircontent{index} filesep 'forwinv' ]);
                 end;
             end;
         end;
