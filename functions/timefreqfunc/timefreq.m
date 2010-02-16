@@ -32,6 +32,9 @@
 %                              to generate wavelets).
 %                   'dftfilt3' Morlet wavelet or Hanning DFT (exact Tallon 
 %                              Baudry). Calls dftfilt3().
+%       'ffttaper' = ['none'|'hanning'|'hamming'|'blackmanharris'] FFT tapering
+%                   function. Default is 'hanning'. Note that 'hamming' and 
+%                   'blackmanharris' require the signal processing toolbox.
 % Optional ITC type:
 %        'type'   = ['coher'|'phasecoher'] Compute either linear coherence
 %                   ('coher') or phase coherence ('phasecoher') also known
@@ -80,6 +83,9 @@
 %                   'dftfilt2' Morlet-variant or Hanning DFT.
 %                   Note that there are differences betweeen the Hanning
 %                   DFTs in the two programs.
+%       'causal'  = ['on'|'off'] apply FFT or time-frequency in a causal
+%                   way where only data before any given latency can 
+%                   influence the spectral decomposition. (default: 'off'}
 %
 % Optional time warping:
 %   'timestretch' = {[Refmarks], [Refframes]}
@@ -130,6 +136,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.69  2009/12/24 00:20:05  arno
+% edit text
+%
 % Revision 1.68  2009/12/23 23:19:37  arno
 % simplifying time index and values
 %
@@ -352,9 +361,11 @@ g = finputcheck(varargin, ...
     'winsize'       'integer'  [0 Inf]                  []; ...
     'tlimits'       'real'     []                       []; ...
     'detrend'       'string'   {'on' 'off'}             'off'; ...
+    'causal'        'string'   {'on' 'off'}             'off'; ...
     'freqs'         'real'     [0 Inf]                  []; ...
     'nfreqs'        'integer'  [0 Inf]                  []; ...
     'freqscale'     'string'   { 'linear' 'log' '' }    'linear'; ...
+    'ffttaper'      'string'   { 'hanning' 'hamming' 'blackmanharris' 'none' }  'hanning';
     'wavelet'       'real'     [0 Inf]                  0; ...
     'cycles'        {'real','integer'}    [0 Inf]       0; ...
     'padratio'      'integer'  [1 Inf]                  2; ...
@@ -445,8 +456,13 @@ if (g.cycles(1) == 0) %%%%%%%%%%%%%% constant window-length FFTs %%%%%%%%%%%%%%%
     freqs = linspace(0, srate/2, g.winsize*g.padratio/2+1);
     freqs = freqs(2:end); % remove DC (match the output of PSD)
     %srate/g.winsize*[1:2/g.padratio:g.winsize]/2
-    g.win   = hanning(g.winsize);
-
+    fprintf('Using %s FFT tapering\n', g.ffttaper);
+    switch g.ffttaper
+        case 'hanning',        g.win   = hanning(g.winsize);
+        case 'hamming',        g.win   = hamming(g.winsize);
+        case 'blackmanharris', g.win   = blackmanharris(g.winsize);
+        case 'none',           g.win   = ones(g.winsize,1);
+    end;
 else % %%%%%%%%%%%%%%%%%% Constant-Q (wavelet) DFTs %%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %freqs = srate*g.cycles/g.winsize*[2:2/g.padratio:g.winsize]/2;
     %g.win = dftfilt(g.winsize,g.freqs(2)/srate,g.cycles,g.padratio,g.cyclesfact);
@@ -476,7 +492,7 @@ end;
 
 % compute time vector
 % -------------------
-[ g.timesout g.indexout ] = gettimes(frame, g.tlimits, g.timesout, g.winsize, g.ntimesout);
+[ g.timesout g.indexout ] = gettimes(frame, g.tlimits, g.timesout, g.winsize, g.ntimesout, g.causal);
 tmpall      = repmat(nan,[length(freqs) length(g.timesout) trials]);
 
 % -------------------------------
@@ -498,7 +514,11 @@ if g.cycles(1) == 0
         if rem(trial,10) == 0,  fprintf(' %d',trial); end
         if rem(trial,120) == 0, fprintf('\n'); end
         for index = 1:length(g.indexout)
-            tmpX = data([-g.winsize/2+1:g.winsize/2]+g.indexout(index)+(trial-1)*frame); % 1 point imprecision
+            if strcmpi(g.causal, 'off')
+                tmpX = data([-g.winsize/2+1:g.winsize/2]+g.indexout(index)+(trial-1)*frame); % 1 point imprecision
+            else
+                tmpX = data([-g.winsize+1:0]+g.indexout(index)+(trial-1)*frame); % 1 point imprecision
+            end;
 
             tmpX = tmpX - mean(tmpX);
             if strcmpi(g.detrend, 'on'),
@@ -525,10 +545,15 @@ else % wavelet
         if rem(index,10) == 0,  fprintf(' %d',index); end
         if rem(index,120) == 0, fprintf('\n'); end
         for freqind = 1:length(g.win)
-            wav = g.win{freqind}; sizewav = size(wav,1)-1;
+            wav = g.win{freqind}; 
+            sizewav = size(wav,1)-1;
             %g.indexout(index), size(wav,1), g.freqs(freqind)
-            tmpX = data([-sizewav/2:sizewav/2]+g.indexout(index),:);
-
+            if strcmpi(g.causal, 'off')
+                tmpX = data([-sizewav/2:sizewav/2]+g.indexout(index),:);
+            else
+                tmpX = data([-sizewav:0]+g.indexout(index),:);
+            end;
+            
             tmpX = tmpX - ones(size(tmpX,1),1)*mean(tmpX);
             if strcmpi(g.detrend, 'on'),
                 for trial = 1:trials
@@ -694,7 +719,7 @@ end
 
 % get time points
 % ---------------
-function [ timevals, timeindices ] = gettimes(frames, tlimits, timevar, winsize, ntimevar);
+function [ timevals, timeindices ] = gettimes(frames, tlimits, timevar, winsize, ntimevar, causal);
 timevect = linspace(tlimits(1), tlimits(2), frames);
 srate    = 1000*(frames-1)/(tlimits(2)-tlimits(1));
 
@@ -711,13 +736,19 @@ if isempty(timevar) % no pre-defined time points
         end
         npoints = ntimevar(1);
         wintime = 500*winsize/srate;
-        timevals = linspace(tlimits(1)+wintime, tlimits(2)-wintime, npoints);
+        if strcmpi(causal, 'on')
+             timevals = linspace(tlimits(1)+2*wintime, tlimits(2), npoints);
+        else timevals = linspace(tlimits(1)+wintime, tlimits(2)-wintime, npoints);
+        end;
         fprintf('Generating %d time points (%1.1f to %1.1f ms)\n', npoints, min(timevals), max(timevals));
     else
         % subsample data
         % --------------
         nsub     = -ntimevar(1);
-        timeindices = [ceil(winsize/2+nsub/2):nsub:length(timevect)-ceil(winsize/2)-1];
+        if strcmpi(causal, 'on')
+             timeindices = [ceil(winsize+nsub):nsub:length(timevect)];
+        else timeindices = [ceil(winsize/2+nsub/2):nsub:length(timevect)-ceil(winsize/2)-1];
+        end;
         timevals    = timevect( timeindices ); % the conversion at line 741 leaves timeindices unchanged
         fprintf('Subsampling by %d (%1.1f to %1.1f ms)\n', nsub, min(timevals), max(timevals));
     end;
@@ -726,7 +757,10 @@ else
     % check boundaries
     % ----------------
     wintime = 500*winsize/srate;
-    tmpind  = find( (timevals >= tlimits(1)+wintime-0.0001) & (timevals <= tlimits(2)-wintime+0.0001) ); 
+    if strcmpi(causal, 'on')
+         tmpind  = find( (timevals >= tlimits(1)+2*wintime-0.0001) & (timevals <= tlimits(2)) ); 
+    else tmpind  = find( (timevals >= tlimits(1)+wintime-0.0001) & (timevals <= tlimits(2)-wintime+0.0001) ); 
+    end;
     % 0.0001 account for numerical innacuracies on opteron computers
     if isempty(tmpind)
         error('No time points. Reduce time window or minimum frequency.');

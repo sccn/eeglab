@@ -99,6 +99,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.53  2009/10/20 02:28:35  arno
+% Updated conversion between sets and indices formats
+%
 % Revision 1.52  2009/10/19 01:25:18  arno
 % new funtion to revert sets and comps
 %
@@ -261,9 +264,10 @@ end
     'freqrange'  'real'    []       [];
     'timerange'  'real'    []       [];
     'statmode'   'string'  { 'subjects' 'individual' 'common' 'trials' }       'individual';
-    'rmicacomps'  'string'  { 'on' 'off' }       'off';
-    'subbaseline' 'string'  { 'on' 'off' }       'off';
-    'rmsubjmean'  'string'  { 'on' 'off' }       'off';
+    'rmicacomps'   'string'  { 'on' 'off' }       'off';
+    'subbaseline'  'string'  { 'on' 'off' }       'off';
+    'rmsubjmean'   'string'  { 'on' 'off' }       'off';
+    'singletrials' 'string'  { 'on' 'off' }       'on';
     'infotype'   'string'  { 'erp' 'spec' 'ersp' 'itc' 'map' 'topo' 'dipole' 'scalp' 'data' 'event' '' } '' }, ...
     'std_readdata', 'ignore');
 if isstr(opt), error(opt); end;
@@ -314,6 +318,7 @@ end;
 
 % read indices for removing component clusters from data
 % ------------------------------------------------------
+% NOT USED ANY MORE
 if ~isempty(opt.rmclust)
     for ind = 1:length(opt.rmclust)
         [tmp setindsrm{ind} allindsrm{ind}] = std_setinds2cell(STUDY, opt.rmclust(ind));
@@ -508,18 +513,22 @@ for ind = 1:length(finalinds)
 
                 % read the data and select channels
                 % ---------------------------------
-                fprintf('Reading Spectrum data:');
-                for c = 1:nc
-                    for g = 1:ng
-                        for indtmp = 1:length(allinds{c,g})
-                            if strcmpi(filetype, 'spec')
-                                [ tmpspec allfreqs ] = std_readspec( ALLEEG, setinds{c,g}(indtmp), allinds{c,g}(indtmp), opt.freqrange); %, strcmpi(opt.rmsubjmean, 'on'));
-                                allspec{c, g}(:,indtmp) = tmpspec(:);
-                            else
+                if strcmpi(filetype, 'spec')
+                    fprintf('Reading Spectrum data...');
+                    for c = 1:nc
+                        for g = 1:ng
+                            allspec{c, g} = std_readspec( ALLEEG, setinds{c,g}(:), allinds{c,g}(:), opt.freqrange)';
+                        end;
+                    end;
+                else % std_readersp cannot be converted to read multiple datasets since it subtracts data between conditions
+                    fprintf('Reading Spectrum data:');
+                    for c = 1:nc
+                        for g = 1:ng
+                            for indtmp = 1:length(allinds{c,g})
                                 [ tmpersp allfreqs alltimes tmpparams tmpspec] = std_readersp( ALLEEG, setinds{c,g}(indtmp), allinds{c,g}(indtmp), [], opt.freqrange);
                                 allspec{c, g}(:,indtmp) = 10*log(tmpspec(:));
+                                fprintf('.');
                             end;
-                            fprintf('.');
                         end;
                     end;
                 end;

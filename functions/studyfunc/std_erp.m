@@ -57,6 +57,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.37  2010/01/28 20:46:34  arno
+% fixed problem with unique trial epoch (when subject only have one epoch)
+%
 % Revision 1.36  2008/04/16 18:39:51  arno
 % fix computing for components
 %
@@ -171,6 +174,7 @@ g = finputcheck(options, { 'components' 'integer' []         [];
                            'channels'   'cell'    {}         {};
                            'rmbase'     'real'    []         [];
                            'rmcomps'    'integer' []         [];
+                           'savetrials' 'string'  { 'on' 'off' } 'off';
                            'interp'     'struct'  { }        struct([]);
                            'recompute'  'string'  { 'on' 'off' } 'off';
                            'timerange'  'real'    []         [] }, 'std_erp');
@@ -257,8 +261,12 @@ if ~isempty(g.rmbase)
 end
 X = reshape(X, [ size(X,1) EEG.pnts EEG.trials ]);
 if strcmpi(prefix, 'comp')
-    X = repmat(sqrt(mean(EEG.icawinv.^2))', [1 EEG.pnts]) .* mean(X,3); % calculate ERP
-else    
+    if strcmpi(g.savetrials, 'on')
+        X = repmat(sqrt(mean(EEG.icawinv.^2))', [1 EEG.pnts EEG.trials]) .* X;
+    else
+        X = repmat(sqrt(mean(EEG.icawinv.^2))', [1 EEG.pnts]) .* mean(X,3); % calculate ERP
+    end;
+elseif strcmpi(g.savetrials, 'off')
     X = mean(X, 3);
 end;
 
@@ -282,7 +290,7 @@ function savetofile(filename, t, X, prefix, comps, params, labels);
     disp([ 'Saving ERP file ''' filename '''' ]);
     allerp = [];
     for k = 1:length(comps)
-        allerp = setfield( allerp, [ prefix int2str(comps(k)) ], X(k,:));
+        allerp = setfield( allerp, [ prefix int2str(comps(k)) ], squeeze(X(k,:,:)));
     end;
     if nargin > 6
         allerp.labels = labels;

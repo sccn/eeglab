@@ -329,6 +329,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.177  2009/11/27 16:14:52  arno
+% help typo
+%
 % Revision 1.176  2009/11/24 21:03:19  arno
 % new option "itctype" to replace "type"
 %
@@ -1132,8 +1135,9 @@ end
 
 if (nargin < 5)
     varwin = DEFAULT_VARWIN;
-elseif ~isnumeric(varwin)
-    error('Value of cycles must be a number.');
+elseif ~isnumeric(varwin) && strcmpi(varwin, 'cycles')
+    varwin = varargin{1};
+    varargin(1) = [];
 elseif (varwin < 0)
     error('Value of cycles must be zero or positive.');
 end
@@ -1147,7 +1151,7 @@ if ~isempty(varargin)
     catch, error('Argument error in the {''param'', value} sequence'); end;
 end
 %}
-g = finputcheck(varargin, ...
+[ g timefreqopts ] = finputcheck(varargin, ...
     {'boottype'      'string'    {'shuffle','rand','randall'}    'shuffle'; ...
     'condboot'      'string'    {'abs','angle','complex'}       'abs'; ...
     'title'         { 'string' 'cell' }   { [] [] }         DEFAULT_TITLE; ...
@@ -1165,7 +1169,6 @@ g = finputcheck(varargin, ...
     'rboot'         'real'      []          NaN; ...
     'plotersp'      'string'    {'on','off'} 'on'; ...
     'plotamp'       'string'    {'on','off'} 'on'; ...
-    'subitc'        'string'    {'on','off'} 'off'; ...
     'plotitc'       'string'    {'on','off'} 'on'; ...
     'detrend'       'string'    {'on','off'} 'off'; ...
     'rmerp'         'string'    {'on','off'} 'off'; ...
@@ -1207,6 +1210,7 @@ g = finputcheck(varargin, ...
     'ntimesout'     'real'      []           []; ...
     'scale'         'string'    { 'log' 'abs'} 'log'; ...
     'timewarp'      'real'      []           []; ...
+    'precomputed'   'struct'    []           struct([]); ...
     'timewarpms'    'real'      []           []; ...
     'timewarpfr'    'real'      []           []; ...
     'timewarpidx'   'real'      []           []; ...
@@ -1217,9 +1221,8 @@ g = finputcheck(varargin, ...
     'trialbase'     'string'    {'on','off'} 'off'; 
     'hzdir'         'string'    {'up','down','normal','reverse'}   HZDIR; ...
     'ydir'          'string'    {'up','down','normal','reverse'}   YDIR; ...
-    'wletmethod'    'string'   { 'dftfilt3' 'dftfilt2' 'dftfilt'}  'dftfilt3'; ...
     'cycleinc'      'string'   {'linear' 'log'}        'linear'
-    });
+    }, 'newtimef', 'ignore');
 if isstr(g), error(g); end;
 if strcmpi(g.plotamp, 'off'), g.plotersp = 'off'; end;    
 if strcmpi(g.basenorm, 'on'), g.scale = 'abs'; end;
@@ -1755,27 +1758,43 @@ if ~isnan(g.alpha)
 end
 verboseprintf(g.verbose,'  Image frequency direction: %s\n',g.hzdir);
 
-% -----------------------------------------
-% detrend over epochs (trials) if requested
-% -----------------------------------------
-data = reshape(data, g.frames, prod(size(data))/g.frames);
-if strcmpi(g.rmerp, 'on')
-    data = data - mean(data,2)*ones(1, length(data(:))/g.frames);
-end;
+if isempty(g.precomputed)
+    % -----------------------------------------
+    % detrend over epochs (trials) if requested
+    % -----------------------------------------
+    data = reshape(data, g.frames, prod(size(data))/g.frames);
+    if strcmpi(g.rmerp, 'on')
+        data = data - mean(data,2)*ones(1, length(data(:))/g.frames);
+    end;
 
-% ----------------------------------------------------
-% compute time frequency decompositions, power and ITC
-% ----------------------------------------------------
-if length(g.timesout) > 1,   tmioutopt = { 'timesout' , g.timesout };
-elseif ~isempty(g.ntimesout) tmioutopt = { 'ntimesout', g.ntimesout };
-else                         tmioutopt = { 'ntimesout', g.timesout };
-end;
+    % ----------------------------------------------------
+    % compute time frequency decompositions, power and ITC
+    % ----------------------------------------------------
+    if length(g.timesout) > 1,   tmioutopt = { 'timesout' , g.timesout };
+    elseif ~isempty(g.ntimesout) tmioutopt = { 'ntimesout', g.ntimesout };
+    else                         tmioutopt = { 'ntimesout', g.timesout };
+    end;
 
-[alltfX freqs timesout R] = timefreq(data, g.srate, tmioutopt{:}, ...
-    'winsize', g.winsize, 'tlimits', g.tlimits, 'detrend', g.detrend, ...
-    'itctype', g.type, 'subitc', g.subitc, 'wavelet', g.cycles, ...
-    'padratio', g.padratio, 'freqs', g.freqs, 'freqscale', g.freqscale, ...
-    'nfreqs', g.nfreqs, 'timestretch', {g.timeStretchMarks', g.timeStretchRefs}, 'wletmethod', g.wletmethod);
+    [alltfX freqs timesout R] = timefreq(data, g.srate, tmioutopt{:}, ...
+        'winsize', g.winsize, 'tlimits', g.tlimits, 'detrend', g.detrend, ...
+        'itctype', g.type, 'wavelet', g.cycles, ...
+        'padratio', g.padratio, 'freqs', g.freqs, 'freqscale', g.freqscale, ...
+        'nfreqs', g.nfreqs, 'timestretch', {g.timeStretchMarks', g.timeStretchRefs}, timefreqopts{:});
+else
+    alltfX   = g.precomputed.tfdata;
+    timesout = g.precomputed.times;
+    freqs    = g.precomputed.freqs;
+    if strcmpi(g.precomputed.recompute, 'ersp')
+        R = [];
+    else
+        switch g.itctype
+            case 'coher',       R = alltfX ./ repmat(sqrt(sum(alltfX .* conj(alltfX),3) * size(alltfX,3)), [1 1 size(alltfX,3)]);
+            case 'phasecoher2', R = alltfX ./ repmat(sum(sqrt(alltfX .* conj(alltfX)),3), [1 1 size(alltfX,3)]);
+            case 'phasecoher',  R = alltfX ./ sqrt(alltfX .* conj(alltfX));
+        end;
+        P = []; mbase = []; return;
+    end;
+end;
 
 if g.cycles(1) == 0
     alltfX = 2*0.375*alltfX/g.winsize; % TF and MC (12/11/2006): normalization, divide by g.winsize
@@ -1826,6 +1845,9 @@ if strcmpi(g.trialbase, 'on') & isnan( g.powbase(1) )
         %P = 10 .^ (log10(P) - repmat(log10(mbase),[1 size(P,2) 1])); % same as above
     end;
 end;    
+if ~isempty(g.precomputed)
+    return; % return single trial power
+end;
 
 % ----------------
 % phase amp option
@@ -1927,7 +1949,7 @@ if ~isnan(g.alpha) | ~isempty(find(~isnan(g.pboot))) | ~isempty(find(~isnan(g.rb
         % ----------------
         inputdata = alltfX;
         switch g.type
-            case 'coher',       formula = [ 'sum(arg1,3)./sqrt(sum(arg1.*conj(arg1),3))/ sqrt(' int2str(trials) ');' ];
+            case 'coher',       formula = [ 'sum(arg1,3)./sqrt(sum(arg1.*conj(arg1),3))/ sqrt(' int2str(size(alltfX,3)) ');' ];
             case 'phasecoher',  formula = [ 'mean(arg1,3);' ]; inputdata = alltfX./sqrt(alltfX.*conj(alltfX));
             case 'phasecoher2', formula = [ 'sum(arg1,3)./sum(sqrt(arg1.*conj(arg1)),3);' ];
         end;

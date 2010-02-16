@@ -80,6 +80,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.40  2009/10/31 00:37:08  dev
+% fixing boundary event problem for numerical type
+%
 % Revision 1.39  2009/10/20 02:30:41  arno
 % Implement pmtm
 %
@@ -205,10 +208,12 @@ end;
 [g spec_opt] = finputcheck(options, { 'components' 'integer' []         [];
                                       'channels'   'cell'    {}         {};
                                       'timerange'  'float'   []         [];
-                                      'specmode'   'string'  {'fft' 'psd' 'pmtm'} 'psd';
+                                      'specmode'   'string'  {'fft' 'psd' 'pmtm' 'pburg'} 'psd';
                                       'recompute'  'string'  { 'on' 'off' } 'off';
+                                      'savetrials' 'string'  { 'on' 'off' } 'off';
                                       'rmcomps'    'integer' []         [];
                                       'nw'         'float'   []         4;
+                                      'burgorder'  'integer' []         20;
                                       'interp'     'struct'  { }        struct([]);
                                       'nfft'       'integer' []         [];
                                       'freqrange'  'real'    []         [] }, 'std_spec', 'ignore');
@@ -221,6 +226,10 @@ end
 if isempty(g.components)
     g.components = 1:numc;
 end
+if strcmpi(g.savetrials, 'on') && EEG.trials == 1
+    disp('Cannot yet save trials for continuous data');
+    g.savetrials = 'off';
+end;
 
 EEG_etc = [];
 
@@ -263,7 +272,7 @@ else
 end;        
 
 if ~isempty(g.timerange)
-    timebef  = find(EEG.times > g.timerange(1) & EEG.times < g.timerange(2) );
+    timebef  = find(EEG.times >= g.timerange(1) & EEG.times < g.timerange(2) );
     X        = X(:,timebef,:);
     EEG.pnts = length(timebef);
 end;
@@ -276,22 +285,53 @@ if strcmpi(g.specmode, 'psd')
     else boundaries = [];
     end;
     [X, f] = spectopo(X, EEG.pnts, EEG.srate, 'plot', 'off', 'boundaries', boundaries, 'nfft', g.nfft, spec_opt{:});
+    if strcmpi(g.savetrials, 'on')
+        disp('Cannot save trials using ''psd'' specmode option');
+    end;
 elseif strcmpi(g.specmode, 'pmtm')
+    if EEG.trials == 1, error('PMTM method for data trials only (not continuous data)'); end;
     fprintf('Computing multitaper:');
     for cind = 1:size(X,1)
         fprintf('.');
         for tind = 1:size(X,3)
-            [X2(cind,:,tind) f] = pmtm(X(cind,:,tind), g.nw, g.nfft, EEG.srate);
+            [tmpdat f] = pmtm(X(cind,:,tind), g.nw, g.nfft, EEG.srate);
+            if cind == 1 && tind == 1
+                X2 = zeros(size(X,1), length(tmpdat), size(X,3));
+            end;
+            X2(cind,:,tind) = tmpdat;
         end;
     end;
     fprintf('\n');
-    X     = 10*log10(mean(X2,3));    
+    X     = 10*log10(X2);  
+    if strcmpi(g.savetrials, 'off')
+        X = mean(X,3);
+    end;
+elseif strcmpi(g.specmode, 'pburg')
+    if EEG.trials == 1, error('PBURG method for data trials only (not continuous data)'); end;
+    for cind = 1:size(X,1)
+        fprintf('.');
+        for tind = 1:size(X,3)
+            [tmpdat f] = pburg(X(cind,:,tind), g.burgorder, g.nfft, EEG.srate);
+            if cind == 1 && tind == 1
+                X2 = zeros(size(X,1), length(tmpdat), size(X,3));
+            end;
+            X2(cind,:,tind) = tmpdat;
+        end;
+    end;
+    fprintf('\n');
+    if strcmpi(g.savetrials, 'off')
+        X = mean(X,3);    
+    end;
 else
+    if EEG.trials == 1, error('FFT method for data trials only (not continuous data)'); end;
     tmp   = fft(X, g.nfft, 2);
     f     = linspace(0, EEG.srate/2, size(tmp,2)/2);
     f     = f(2:end); % remove DC (match the output of PSD)
     tmp   = tmp(:,2:size(tmp,2)/2,:);
-    X     = 10*log10(mean(abs(tmp).^2,3));    
+    X     = 10*log10(abs(tmp).^2);    
+    if strcmpi(g.savetrials, 'off')
+        X = mean(X,3);  
+    end;
 end;
 
 % Save SPECs in file (all components or channels)
@@ -314,7 +354,7 @@ function savetofile(filename, f, X, prefix, comps, params, labels);
     disp([ 'Saving SPECTRAL file ''' filename '''' ]);
     allspec = [];
     for k = 1:length(comps)
-        allspec = setfield( allspec, [ prefix int2str(comps(k)) ], X(k,:));
+        allspec = setfield( allspec, [ prefix int2str(comps(k)) ], squeeze(X(k,:,:)));
     end;
     allspec.freqs      = f;
     allspec.parameters = params;

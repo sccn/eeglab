@@ -51,6 +51,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.54  2009/11/11 00:28:53  arno
+% New GUI format
+%
 % Revision 1.53  2009/11/04 01:39:30  arno
 % remove the option editor for spectral options
 %
@@ -305,10 +308,7 @@ if ~isstr(varargin{1}) %intial settings
     {'style' 'checkbox'   'string' '' 'tag' 'sec_on' 'Callback' set_secpca 'value' 0} ...
 	{'style' 'text'       'string' 'Final dimensions' } ...
     {'style' 'edit'       'string' '10' 'enable' 'off' 'tag' 'sec_PCA' 'userdata' 'sec' } ...
-	{} {'style' 'pushbutton' 'string' 'Help' 'tag' 'finalDimHelp' 'callback' help_secpca } {} {} {} {} ...
-    {} ...
-    {'style' 'checkbox'   'string' '' 'tag' 'mpclust' 'Callback' set_mpcluster 'value' 0} ...
-	{'style' 'text'       'string' 'Use Measure Product clustering' 'FontWeight' 'Bold'  } };
+	{} {'style' 'pushbutton' 'string' 'Help' 'tag' 'finalDimHelp' 'callback' help_secpca } {} {} {} {} };
   
 
 %    {'link2lines' 'style'  'text'   'string' '' } {} {} {} ...
@@ -321,8 +321,8 @@ if ~isstr(varargin{1}) %intial settings
     fig_arg{1} = { ALLEEG STUDY cls };
     geomline = [0.5 2 1 0.5 1 2 1 2 1 ];
     geometry = { [1] [1] [1 1 1] [1] [1] ...
-                 [3] geomline geomline geomline [0.5 2 1 0.5 1 2.9 .1 2.9 .1 ] geomline geomline [1] geomline [1] [.25 5] };
-    geomvert = [ 1 1 3 1 1 1 1 1 1 1 1 1 0.5 1 1 1];
+                 [3] geomline geomline geomline [0.5 2 1 0.5 1 2.9 .1 2.9 .1 ] geomline geomline [1] geomline };
+    geomvert = [ 1 1 3 1 1 1 1 1 1 1 1 1 0.5 1 ];
 
     %if length(show_options) < 3
     %    gui_spec(2:6) = { {} ...
@@ -416,42 +416,9 @@ if ~isstr(varargin{1}) %intial settings
         return; 
     end;
     
-    if os.mpclust % if mpcluster is selected
-        STUDY.etc.preclust.clustlevel = cell2mat(options(3));
-        measuresToUseInClustering = {};
-
-        if os.itc_on
-            measuresToUseInClustering = [measuresToUseInClustering 'itc'];
-        end;
-        
-        if os.ersp_on
-            measuresToUseInClustering = [measuresToUseInClustering 'ersp'];
-        end;
-        
-        if os.erp_on
-            measuresToUseInClustering = [measuresToUseInClustering 'erp'];
-        end;
-        
-        if os.spectra_on
-            measuresToUseInClustering = [measuresToUseInClustering 'spec'];
-        end;
-        
-        if os.dipole_on
-            measuresToUseInClustering = [measuresToUseInClustering 'dipole'];
-        end;
-        
-        if os.scalp_on
-            measuresToUseInClustering = [measuresToUseInClustering 'scalp'];
-        end;        
-        
-        STUDY = std_mpreclust(STUDY,ALLEEG, measuresToUseInClustering, true);
-        STUDY.etc.preclust.preclustdata = [];
-        
-    else
-        [STUDY ALLEEG] = std_preclust(options{:});
-        com = sprintf('%s\n[STUDY ALLEEG] = std_preclust(STUDY, ALLEEG, %s);', ...
-            STUDY.history, vararg2str(options(3:end)));
-    end;
+    [STUDY ALLEEG] = std_preclust(options{:});
+    com = sprintf('%s\n[STUDY ALLEEG] = std_preclust(STUDY, ALLEEG, %s);', ...
+        STUDY.history, vararg2str(options(3:end)));
     
     % save updated STUDY to the disk
     % ------------------------------

@@ -61,6 +61,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.26  2010/02/09 06:07:27  arno
+% Fixed new title problem and implemented 3-level significance
+%
 % Revision 1.25  2010/02/06 05:47:52  arno
 % New titles for figures
 %
@@ -256,8 +259,8 @@ if isempty(opt.titles), opt.titles = cell(10,10); opt.titles(:) = { '' }; end;
 if strcmpi(opt.plotconditions, 'together') || strcmpi(opt.plotgroups, 'together')
     allsizes = cellfun('size', data, ndims(data{1}));
     if length(unique(allsizes(:,1))) > 1
-        warndlg2('Cannot group conditions in plot when one subject is missing');
-        return;
+        %warndlg2('Cannot group conditions in plot when one subject is missing');
+        %return;
     end;
 end;
 
@@ -365,6 +368,7 @@ for c = 1:ncplot
 
             % read all data from one condition or group
             % -----------------------------------------
+            dimreduced_sizediffers = 0;
             if ncplot ~= nc & ngplot ~= ng
                 for cc = 1:length(data,1)
                     for gg = 1:length(data,2)
@@ -379,8 +383,12 @@ for c = 1:ncplot
                     end;
                 end;
             elseif ncplot ~= nc
+                for ind = 2:size(data,1), if any(size(data{ind,1}) ~= size(data{1})), dimreduced_sizediffers = 1; end; end;
                 for cc = 1:nc
                     tmptmpdata = real(data{cc,g});
+                    if dimreduced_sizediffers
+                        tmptmpdata = nan_mean(tmptmpdata,ndims(tmptmpdata));
+                    end;
                     if cc == 1, tmpdata = zeros([size(tmptmpdata) nc]); end;
                     if ndims(tmptmpdata) == 3, tmpdata(:,:,:,cc) = tmptmpdata;
                     else                       tmpdata(:,:,cc)   = tmptmpdata;
@@ -388,12 +396,11 @@ for c = 1:ncplot
                 end;
                 leg = opt.condnames;
             elseif ngplot ~= ng
-                samesize = 1;
-                for ind = 2:size(data,2), if any(size(data{1,ind}) ~= size(data{1})), samesize = 0; end; end;
+                for ind = 2:size(data,2), if any(size(data{1,ind}) ~= size(data{1})), dimreduced_sizediffers = 1; end; end;
                 for gg = 1:ng
                     tmptmpdata = real(data{c,gg});
-                    if ~samesize
-                        tmptmpdata = nan_mean(tmptmpdata,2);
+                    if dimreduced_sizediffers
+                        tmptmpdata = nan_mean(tmptmpdata,ndims(tmptmpdata));
                     end;
                     if gg == 1, tmpdata = zeros([size(tmptmpdata) ng]); end;
                     if ndims(tmptmpdata) == 3, tmpdata(:,:,:,gg) = tmptmpdata;
@@ -409,9 +416,11 @@ for c = 1:ncplot
             % plotting options
             % ----------------
             plotopt = { allx };
-            if strcmpi(opt.plottopo, 'on'),
-                if strcmpi(opt.plotsubjects, 'off') & strcmpi(opt.singlesubject, 'off') tmpdata = squeeze(real(nan_mean(tmpdata,3))); end;
-            elseif strcmpi(opt.plotsubjects, 'off') & strcmpi(opt.singlesubject, 'off') tmpdata = squeeze(real(nan_mean(tmpdata,2))); 
+            if ~dimreduced_sizediffers
+                if strcmpi(opt.plottopo, 'on'),
+                    if strcmpi(opt.plotsubjects, 'off') & strcmpi(opt.singlesubject, 'off') tmpdata = squeeze(real(nan_mean(tmpdata,3))); end;
+                elseif strcmpi(opt.plotsubjects, 'off') & strcmpi(opt.singlesubject, 'off') tmpdata = squeeze(real(nan_mean(tmpdata,2))); 
+                end;
             end;
             tmpdata = squeeze(permute(tmpdata, [2 1 3]));
             if strcmpi(opt.plottopo, 'on'), highlight = 'background'; else highlight = 'bottom'; end;

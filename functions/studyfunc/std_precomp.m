@@ -96,6 +96,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.32  2009/11/24 21:02:45  arno
+% better error messages
+%
 % Revision 1.31  2009/10/21 20:31:07  arno
 % Fix header
 %
@@ -197,6 +200,7 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
                                 'rmclust'     'integer' []                 [];
                                 'rmbase'      'integer' []                 [];
                                 'specparams'        'cell'    {}                 {};
+                                'erpparams'         'cell'    {}                 {};
                                 'erspparams'        'cell'    {}                 {}}, 'std_precomp');
     if isstr(g), error(g); end;
     
@@ -261,9 +265,9 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
         for index = 1:length(STUDY.datasetinfo)
             if strcmpi(computewhat, 'channels')
                 [tmpchanlist opts] = getchansandopts(STUDY, ALLEEG, chanlist, index, g);
-                std_erp(ALLEEG(STUDY.datasetinfo(index).index), 'channels', tmpchanlist, 'rmbase', g.rmbase, opts{:});
+                std_erp(ALLEEG(STUDY.datasetinfo(index).index), 'channels', tmpchanlist, 'rmbase', g.rmbase, opts{:}, g.erpparams{:});
             else
-                std_erp(ALLEEG(STUDY.datasetinfo(index).index), 'components', chanlist{index}, 'rmbase', g.rmbase, 'recompute', g.recompute);
+                std_erp(ALLEEG(STUDY.datasetinfo(index).index), 'components', chanlist{index}, 'rmbase', g.rmbase, 'recompute', g.recompute, g.erpparams{:});
             end;
         end;
         if isfield(curstruct, 'erpdata')

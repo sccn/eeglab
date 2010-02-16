@@ -88,6 +88,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.61  2010/02/09 06:07:27  arno
+% Fixed new title problem and implemented 3-level significance
+%
 % Revision 1.60  2010/02/06 05:47:53  arno
 % New titles for figures
 %
@@ -209,6 +212,9 @@ if nargin < 2
     return;
 end;
 
+[STUDY, specdata, allfreqs, pgroup, pcond, pinter] = std_erpplot(STUDY, ALLEEG, 'datatype', 'spec', 'unitx', 'Hz', varargin{:});
+return;
+
 STUDY = pop_specparams(STUDY, 'default');
 
 opt = finputcheck( varargin, { 'topofreq'    'real'    [] STUDY.etc.specparams.topofreq;
@@ -230,17 +236,22 @@ opt = finputcheck( varargin, { 'topofreq'    'real'    [] STUDY.etc.specparams.t
                                'comps'       { 'string' 'integer' } [] []; % for backward compatibility
                                'plotmode'    'string' { 'normal' 'condensed' }  'normal';
                                'plotsubjects' 'string' { 'on' 'off' }  'off';
+                               'singletrials' 'string' { 'on' 'off' }  'off';
                                'subject'     'string' []              '';
                                'statmode'    'string' { 'individual' 'common' 'trials' } 'individual'}, 'std_specplot');
 
 if isstr(opt), error(opt); end;
-if isstr(opt.comps), opt.comps = []; opt.plotsubjects = 'on'; end;
+if isstr(opt.comps), opt.comps = []; opt.plotsubjects = 'on'; end; % comps all
 
 % for backward compatibility
 % --------------------------
 if strcmpi(opt.mode, 'comps'), opt.plotsubjects = 'on'; end;
-if ~isempty(opt.subject), opt.groupstats = 'off'; disp('No group statistics for single subject'); end;
-if ~isempty(opt.subject), opt.condstats = 'off'; disp('No condition statistics for single subject'); end;
+if strcmpi(opt.condstats, 'on') || strcmpi(opt.groupstats, 'on') || ...
+        (~isempty(opt.subject) || ~isempty(opt.comps)) && strcmpi(opt.singletrials, 'off'), 
+    opt.groupstats = 'off';
+    opt.constats   = 'off'; 
+    disp('No statistics for single subject/component'); 
+end;
 plotcurveopt = { ...
    'ylim',           opt.ylim, ...
    'threshold',      opt.threshold, ...
@@ -252,14 +263,7 @@ if ~isnan(opt.topofreq) & length(opt.channels) < 5
     return;
 end;
 
-% read data from disk
-% -------------------
-if ~isempty(opt.channels)
-     [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'channels', opt.channels, 'infotype', 'spec', 'freqrange', opt.freqrange, 'rmsubjmean', opt.subtractsubjectmean);
-else [STUDY tmp allinds] = std_readdata(STUDY, ALLEEG, 'clusters', opt.clusters, 'infotype', 'spec', 'freqrange', opt.freqrange, 'rmsubjmean', opt.subtractsubjectmean);
-end;
-
-if length(allinds) > 1 & isempty(opt.channels)
+if length(opt.clusters) > 1 && isempty(opt.channels)
     plotcurveopt = { plotcurveopt{:} 'figure' 'off' }; 
     opt.plotconditions = 'together';
     opt.plotgroups     = 'together';
@@ -268,23 +272,10 @@ end;
 % channel plotting
 % ----------------
 if ~isempty(opt.channels)
-    structdat = STUDY.changrp;
-    specdata = cell(size(structdat(allinds(1)).specdata));
-    for ind =  1:length(structdat(allinds(1)).specdata(:))
-        specdata{ind} = zeros([ size(structdat(allinds(1)).specdata{ind}) length(allinds)]);
-        for index = 1:length(allinds)
-            specdata{ind}(:,:,index) = structdat(allinds(index)).specdata{ind};
-            allfreqs                 = structdat(allinds(index)).specfreqs;
-            compinds                 = structdat(allinds(index)).allinds;
-            setinds                  = structdat(allinds(index)).setinds;
-        end;
-        specdata{ind} = squeeze(permute(specdata{ind}, [1 3 2])); % time elec subjects
-    end;
-
-    % select specific subject or component then plot
-    % ----------------------------------------------
-    if ~isempty(opt.subject), specdata = std_selsubject(specdata, opt.subject, setinds, { STUDY.datasetinfo(:).subject }, 2); end;
-    
+    [STUDY specdata allfreqs setinds allinds] = std_readspec(STUDY, ALLEEG, 'channels', opt.channels, 'freqrange', opt.freqrange, ...
+        'rmsubjmean', opt.subtractsubjectmean, 'subject', opt.subject, 'singletrials', opt.singletrials);
+    if isempty(specdata), return; end;
+        
     % select specific time    
     % --------------------
     if ~isempty(opt.topofreq) & ~isnan(opt.topofreq)
@@ -311,45 +302,42 @@ if ~isempty(opt.channels)
     else
         std_plotcurve(allfreqs, specdata, 'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, ...
             'chanlocs', locs, 'titles', alltitles, 'plotsubjects', opt.plotsubjects, 'unitx', 'Hz', ...
-            'condnames', STUDY.condition, 'groupnames', STUDY.group, 'plottopo', fastif(length(allinds) > 1, 'on', 'off'), plotcurveopt{:});
+            'condnames', STUDY.condition, 'groupnames', STUDY.group, 'plottopo', fastif(length(allinds) > 5, 'on', 'off'), plotcurveopt{:});
     end;
     set(gcf,'name','Channel Spectra');
 else 
     % plot component
     % --------------
     opt.legend = 'off';
-    if length(allinds) > 1, figure('color', 'w'); end;
-    nc = ceil(sqrt(length(allinds)));
-    nr = ceil(length(allinds)/nc);
+    if length(opt.clusters) > 1, figure('color', 'w'); end;
+    nc = ceil(sqrt(length(opt.clusters)));
+    nr = ceil(length(opt.clusters)/nc);
     comp_names = {};
 
-    if length(opt.clusters) > 1 & ... % & isnan(opt.threshold) & ... % this feature does not work - ad
-            ( strcmpi(opt.condstats, 'on') | strcmpi(opt.groupstats, 'on'))
+    if length(opt.clusters) > 1 && ( strcmpi(opt.condstats, 'on') || strcmpi(opt.groupstats, 'on'))
         opt.condstats = 'off'; opt.groupstats = 'off';
-        % disp('Statistics disabled for plotting multiple clusters unless a threshold is set');
-    end;
-    if ~isempty(opt.comps)
-        opt.condstats = 'off'; opt.groupstats = 'off'; 
-        disp('Statistics cannot be computed for single component');
     end;
     
-    for index = 1:length(allinds)
+    for index = 1:length(opt.clusters)
 
-        if length(allinds) > 1, subplot(nr,nc,index); end;
-        specdata  = STUDY.cluster(allinds(index)).specdata;
-        allfreqs  = STUDY.cluster(allinds(index)).specfreqs;
-        compinds  = STUDY.cluster(allinds(index)).allinds;
-        setinds   = STUDY.cluster(allinds(index)).setinds;
-
+        if length(opt.clusters) > 1, subplot(nr,nc,index); end;
+        
+        [STUDY specdata allfreqs setinds compinds] = std_readspec(STUDY, ALLEEG, 'clusters', opt.clusters(index), 'freqrange', opt.freqrange, ...
+                    'rmsubjmean', opt.subtractsubjectmean, 'component', opt.comps, 'singletrials', opt.singletrials);
+        if isempty(specdata), return; end;
+        
         % plot specific component
         % -----------------------
-        [specdata opt.subject comp_names] = std_selcomp(STUDY, specdata, allinds(index), setinds, compinds, opt.comps);
+        if ~isempty(opt.comps)
+            comp_names = { STUDY.cluster(opt.clusters(index)).comps(opt.comps) };
+            opt.subject = STUDY.datasetinfo(STUDY.cluster(opt.clusters(index)).sets(1,opt.comps)).subject;
+        end;
         [pcond pgroup pinter] = std_stat(specdata, 'groupstats', opt.groupstats, 'condstats', opt.condstats, ...
                                          'statistics', opt.statistics, 'naccu', opt.naccu, 'threshold', opt.threshold, 'mcorrect', opt.mcorrect);
             
-        if index == length(allinds), opt.legend = 'on'; end;
+        if index == length(opt.clusters), opt.legend = 'on'; end;
         alltitles = std_figtitle('threshold', opt.threshold, 'plotsubjects', opt.plotsubjects, 'mcorrect', opt.mcorrect, 'condstat', opt.condstats, 'cond2stat', opt.groupstats, ...
-                                 'statistics', opt.statistics, 'condnames', STUDY.condition, 'cond2names', STUDY.group, 'clustname', STUDY.cluster(allinds(index)).name, 'compnames', comp_names, ...
+                                 'statistics', opt.statistics, 'condnames', STUDY.condition, 'cond2names', STUDY.group, 'clustname', STUDY.cluster(opt.clusters(index)).name, 'compnames', comp_names, ...
                                  'subject', opt.subject, 'datatype', 'spectrum', 'cond2group', opt.plotgroups, 'condgroup', opt.plotconditions);
         
         std_plotcurve(allfreqs, specdata, 'condnames', STUDY.condition, 'legend', opt.legend, 'groupnames', STUDY.group,  ...
