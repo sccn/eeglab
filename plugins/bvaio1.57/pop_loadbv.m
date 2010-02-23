@@ -41,7 +41,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Id: pop_loadbv.m,v 1.2 2010-01-27 20:39:02 arno Exp $
+% $Id: pop_loadbv.m,v 1.3 2010-02-23 21:32:07 roy Exp $
 
 function [EEG, com] = pop_loadbv(path, hdrfile, srange, chans)
 
@@ -154,8 +154,14 @@ if IN == -1
         error(message)
     end;
 end
-if isfield(hdr.commoninfos, 'datapoints')
-    hdr.commoninfos.datapoints = str2double(hdr.commoninfos.datapoints);
+if isfield(hdr.commoninfos, 'datapoints')    
+    if isempty(hdr.commoninfos.datapoints)
+        fseek(IN, 0, 'eof');
+        hdr.commoninfos.datapoints = ftell(IN) / (hdr.commoninfos.numberofchannels * bps);
+        fseek(IN, 0, 'bof');
+    else
+        hdr.commoninfos.datapoints = str2double(hdr.commoninfos.datapoints);
+    end;
 elseif strcmpi(hdr.commoninfos.dataformat, 'binary')
     fseek(IN, 0, 'eof');
     hdr.commoninfos.datapoints = ftell(IN) / (hdr.commoninfos.numberofchannels * bps);
