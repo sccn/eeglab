@@ -188,7 +188,7 @@ function plotcurve( times, R, varargin);
   % highlight regions
   % -----------------
   if ~isempty(g.maskarray)
-      highlight(ax, times, Rregions, g.highlightmode, g.xlabel);
+      axsignif = highlight(ax, times, Rregions, g.highlightmode, g.xlabel);
 
       % replot data (above highlighted regions)
       % ---------
@@ -245,8 +245,10 @@ function plotcurve( times, R, varargin);
         hh = legend(g.legend);
         set(hh, 'unit', 'pixels')      
     end;
+    if isempty(g.maskarray)
+       xlabel(g.xlabel);
+    end;
     ylabel(g.ylabel)
-    xlabel(g.xlabel)
   end;
   
 % -----------------
@@ -260,7 +262,6 @@ yl(1) = yl(1)-max(abs(yl));
 yl(2) = yl(2)+max(abs(yl));
 
 if ~strcmpi(highlightmode, 'background')
-    xlabel(myxlabel);
     pos = get(ax, 'position');
     set(gca, 'xtick', []);
     axsignif = axes('position', [pos(1) pos(2)-pos(4)*0.05 pos(3) pos(4)*0.05 ]);
@@ -270,7 +271,9 @@ if ~strcmpi(highlightmode, 'background')
     yl2(1) = yl2(1)-max(abs(yl2));
     yl2(2) = yl2(2)+max(abs(yl2));
     xlim([times(1) times(end)]);
+    xlabel(myxlabel);
 else
+    axsignif = [];
     xlabel(myxlabel);
 end;
 
