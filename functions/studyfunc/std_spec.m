@@ -87,6 +87,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.42  2010/02/24 10:52:37  arno
+% Implemented new single trial statistics
+%
 % Revision 1.41  2010/02/16 08:43:21  arno
 % New single-trial reading/writing
 %
@@ -265,6 +268,14 @@ if exist(filename) & strcmpi(g.recompute, 'off')
     return;
     
 end 
+
+if ~strcmpi(g.specmode, 'psd')
+    if EEG.trials == 1, 
+        EEG = eeg_checkset(EEG, 'loaddata');
+        EEG = eeg_regepochs(EEG, 1, [0 1]);
+        disp('Warning: continuous data, extracting 1-second epochs'); 
+    end;
+end;
  
 % No SPEC information found
 % ------------------------
@@ -299,7 +310,6 @@ if strcmpi(g.specmode, 'psd')
         disp('Cannot save trials using ''psd'' specmode option');
     end;
 elseif strcmpi(g.specmode, 'pmtm')
-    if EEG.trials == 1, error('PMTM method for data trials only (not continuous data)'); end;
     fprintf('Computing multitaper:');
     for cind = 1:size(X,1)
         fprintf('.');
@@ -317,7 +327,6 @@ elseif strcmpi(g.specmode, 'pmtm')
         X = mean(X,3);
     end;
 elseif strcmpi(g.specmode, 'pburg')
-    if EEG.trials == 1, error('PBURG method for data trials only (not continuous data)'); end;
     for cind = 1:size(X,1)
         fprintf('.');
         for tind = 1:size(X,3)
@@ -333,7 +342,6 @@ elseif strcmpi(g.specmode, 'pburg')
         X = mean(X,3);    
     end;
 else % fft mode
-    if EEG.trials == 1, error('FFT method for data trials only (not continuous data)'); end;
     tmp   = fft(X, g.nfft, 2);
     f     = linspace(0, EEG.srate/2, size(tmp,2)/2);
     f     = f(2:end); % remove DC (match the output of PSD)
