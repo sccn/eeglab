@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2010/02/16 08:43:21  arno
+% New single-trial reading/writing
+%
 % Revision 1.18  2007/02/05 16:17:13  arno
 % fix crash for old study subtracting average spectrum
 %
@@ -359,6 +362,9 @@ end;
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2010/02/16 08:43:21  arno
+% New single-trial reading/writing
+%
 
 function [X, f, singletrialdatapresent] = std_readspecsub(ALLEEG, abset, comp, freqrange, rmsubjmean, singletrial);
 
@@ -401,7 +407,7 @@ if iscell(comp)
     for index = 1:length(comp)
         tmp = strmatch(lower(comp{index}), chanlabs, 'exact');
         if isempty(tmp)
-            error([ 'Channel ''' comp{index} ''' not found in dataset ' int2str(abset)]);
+            error([ 'Channel ''' comp{index} ''' not found in dataset ' int2str(abset(1))]);
         else    
             chanind = [ chanind tmp ];
         end;
