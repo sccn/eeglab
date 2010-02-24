@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2009/11/11 00:28:53  arno
+% New GUI format
+%
 % Revision 1.16  2009/05/31 04:37:38  arno
 % Better GUI for Study plotting options
 %
@@ -138,32 +141,12 @@
 function [ STUDY, com ] = pop_erspparams(STUDY, varargin);
 
 STUDY = default_params(STUDY);
+STUDY.etc.erspparams = pop_statparams(STUDY.etc.erspparams, 'default');
 TMPSTUDY = STUDY;
 com = '';
 if isempty(varargin)
     
-    enablegroup = fastif(length(STUDY.group)>1, 'on', 'off');
-    enablecond  = fastif(length(STUDY.condition)>1, 'on', 'off');
-    threshstr   = fastif(isnan(STUDY.etc.erspparams.threshold),'', num2str(STUDY.etc.erspparams.threshold));
-    statmode    = fastif(strcmpi(STUDY.etc.erspparams.statmode,'subjects'), 1, 2);
     subbaseline = fastif(strcmpi(STUDY.etc.erspparams.subbaseline,'on'), 1, 0);
-    condstats   = fastif(strcmpi(STUDY.etc.erspparams.condstats, 'on'), 1, 0);
-    mcorrect    = fastif(strcmpi(STUDY.etc.erspparams.mcorrect,  'fdr'), 1, 0);
-    groupstats  = fastif(strcmpi(STUDY.etc.erspparams.groupstats,'on'), 1, 0);
-    maskdata    = fastif(strcmpi(STUDY.etc.erspparams.maskdata,'on'), 1, 0);
-    if strcmpi(STUDY.etc.erspparams.statistics,'param'),    statval = 1;
-    elseif strcmpi(STUDY.etc.erspparams.statistics,'perm'), statval = 2;
-    else                                                    statval = 3;
-    end;
-    cb_maskdata = [ 'tmpcond  = get(findobj(gcbf, ''tag'', ''condstats'') , ''value'');' ...
-                    'tmpgroup = get(findobj(gcbf, ''tag'', ''groupstats''), ''value'');' ...
-                    'tmpplot  = get(findobj(gcbf, ''tag'', ''maskdata'') , ''value'');' ...
-                    'if tmpcond & tmpgroup & tmpplot,' ...
-                    '    warndlg2(strvcat(''Cannot mask time/freq. image if both statistics for conditions'',' ...
-                    '           ''and statistics for groups are used.''));' ...
-                    '    set(gcbo, ''value'', 0);' ...
-                    'end;' ...
-                    'clear tmpcond tmpgroup tmpplot;' ];
     vis = fastif(isnan(STUDY.etc.erspparams.topotime), 'off', 'on');
     
     uilist = { ...
@@ -179,59 +162,33 @@ if isempty(varargin)
         {'style' 'edit'       'string' num2str(STUDY.etc.erspparams.ersplim) 'tag' 'ersplim' } ...
         {'style' 'text'       'string' 'ITC limit (0-1) [High]'} ...
         {'style' 'edit'       'string' num2str(STUDY.etc.erspparams.itclim) 'tag' 'itclim' } ...
-        {} {'style' 'checkbox'   'string' 'Compute ERSP baseline across conditions' 'value' subbaseline 'tag' 'subbaseline' } ...
-        {} ...
-        {'style' 'text'        'string' 'Statistical method to use'} ...
-        {'style' 'popupmenu'   'string' 'Parametric|Permutation|Bootstrap' 'tag' 'statistics' 'value' statval 'listboxtop' statval } ...
-        {'style' 'text'        'string' 'Statistical threshold (p<)' } ...
-        {'style' 'edit'        'string' threshstr 'tag' 'threshold' } ...
-        {} {'style' 'checkbox' 'string' 'Compute condition statistics' 'value' condstats  'enable' enablecond  'tag' 'condstats' 'callback' cb_maskdata } ...
-        {} {'style' 'checkbox' 'string' 'Compute group statistics' 'value' groupstats 'enable' enablegroup 'tag' 'groupstats' 'callback' cb_maskdata } ...
-        {} {'style' 'checkbox' 'string' 'Mask non-significant data (only when threshold is set)' 'value' maskdata 'tag' 'maskdata' 'callback' cb_maskdata } ...
-        {} {'style' 'checkbox' 'string' 'Use False Discovery Rate to correct for multiple comparisons' 'value' mcorrect 'tag' 'mcorrect' }  };
+        {} {'style' 'checkbox'   'string' 'Compute ERSP baseline across conditions' 'value' subbaseline 'tag' 'subbaseline' }  };
     
     cbline = [0.07 1.1];
     otherline = [ 0.7 .5 0.6 .5];
-    geometry = { otherline otherline otherline cbline [1] otherline cbline cbline cbline cbline };
+    geometry = { otherline otherline otherline cbline };
+    enablegroup = fastif(length(STUDY.group)>1,     'on', 'off');
+    enablecond  = fastif(length(STUDY.condition)>1, 'on', 'off');
     
-    [out_param userdat tmp res] = inputgui( 'geometry' , geometry, 'uilist', uilist, ...
-                                   'helpcom', 'pophelp(''std_erspparams'')', ...
+    [STUDY.etc.erspparams res options] = pop_statparams(STUDY.etc.erspparams, 'geometry' , geometry, 'uilist', uilist, ...
+                                   'helpcom', 'pophelp(''std_erspparams'')', 'enablegroup', enablegroup, ...
+                                   'enablecond', enablecond, ...
                                    'title', 'Set ERSP|ITC plotting parameters -- pop_erspparams()');
-
+                               
     if isempty(res), return; end;
     
     % decode input
     % ------------
-    res.statmode = 1;
-    if res.groupstats, res.groupstats = 'on'; else res.groupstats = 'off'; end;
-    if res.condstats , res.condstats  = 'on'; else res.condstats  = 'off'; end;
-    if res.maskdata , res.maskdata  = 'on'; else res.maskdata  = 'off'; end;
     if res.subbaseline, res.subbaseline = 'on'; else res.subbaseline = 'off'; end;
-    if res.mcorrect,   res.mcorrect   = 'fdr'; else res.mcorrect  = 'none'; end;
     res.topotime  = str2num( res.topotime );
     res.topofreq  = str2num( res.topofreq );
     res.timerange = str2num( res.timerange );
     res.freqrange = str2num( res.freqrange );
     res.ersplim   = str2num( res.ersplim );
     res.itclim    = str2num( res.itclim );
-    res.threshold = str2num( res.threshold );
-    if isempty(res.threshold),res.threshold = NaN; end;
-    if res.statistics == 1, res.statistics  = 'param'; 
-    elseif res.statistics == 2, res.statistics  = 'perm'; 
-    else res.statistics  = 'bootstrap'; 
-    end;
-    if res.statmode   == 1, res.statmode    = 'subjects'; 
-    else                    res.statmode    = 'trials'; 
-    end;
     
     % build command call
     % ------------------
-    options = {};
-    if ~strcmpi( res.groupstats, STUDY.etc.erspparams.groupstats), options = { options{:} 'groupstats' res.groupstats }; end;
-    if ~strcmpi( res.condstats , STUDY.etc.erspparams.condstats ), options = { options{:} 'condstats'  res.condstats  }; end;
-    if ~strcmpi( res.maskdata,  STUDY.etc.erspparams.maskdata ), options = { options{:} 'maskdata'  res.maskdata  }; end;
-    if ~strcmpi( res.statmode,  STUDY.etc.erspparams.statmode ), options = { options{:} 'statmode'  res.statmode }; end;
-    if ~strcmpi( res.statistics, STUDY.etc.erspparams.statistics ), options = { options{:} 'statistics' res.statistics }; end;
     if ~strcmpi( res.subbaseline , STUDY.etc.erspparams.subbaseline ), options = { options{:} 'subbaseline' res.subbaseline }; end;
     if ~isequal(res.topotime , STUDY.etc.erspparams.topotime),  options = { options{:} 'topotime'   res.topotime  }; end;
     if ~isequal(res.topofreq , STUDY.etc.erspparams.topofreq),  options = { options{:} 'topofreq'   res.topofreq  }; end;
@@ -239,12 +196,6 @@ if isempty(varargin)
     if ~isequal(res.itclim   , STUDY.etc.erspparams.itclim),    options = { options{:} 'itclim'    res.itclim    }; end;
     if ~isequal(res.timerange, STUDY.etc.erspparams.timerange), options = { options{:} 'timerange' res.timerange }; end;
     if ~isequal(res.freqrange, STUDY.etc.erspparams.freqrange), options = { options{:} 'freqrange' res.freqrange }; end;
-    if ~strcmpi(res.mcorrect,  STUDY.etc.erspparams.mcorrect),  options = { options{:} 'mcorrect' res.mcorrect }; end;
-    if (isnan(res.threshold) & ~isnan(STUDY.etc.erspparams.threshold)) | ...
-            (~isnan(res.threshold) & isnan(STUDY.etc.erspparams.threshold)) | ...
-                (~isnan(res.threshold) & res.threshold ~= STUDY.etc.erspparams.threshold)
-                options = { options{:} 'threshold' res.threshold }; 
-    end;
     if ~isempty(options)
         STUDY = pop_erspparams(STUDY, options{:});
         com = sprintf('STUDY = pop_erspparams(STUDY, %s);', vararg2str( options ));
@@ -301,13 +252,5 @@ function STUDY = default_params(STUDY)
     if ~isfield(STUDY.etc.erspparams, 'freqrange'),    STUDY.etc.erspparams.freqrange = []; end;
     if ~isfield(STUDY.etc.erspparams, 'ersplim' ),     STUDY.etc.erspparams.ersplim   = []; end;
     if ~isfield(STUDY.etc.erspparams, 'itclim' ),      STUDY.etc.erspparams.itclim    = []; end;
-    if ~isfield(STUDY.etc.erspparams, 'statistics'),   STUDY.etc.erspparams.statistics = 'perm'; end;
-    if ~isfield(STUDY.etc.erspparams, 'groupstats'),    STUDY.etc.erspparams.groupstats = 'off'; end;
-    if ~isfield(STUDY.etc.erspparams, 'condstats' ),    STUDY.etc.erspparams.condstats  = 'off'; end;
-    if ~isfield(STUDY.etc.erspparams, 'subbaseline' ), STUDY.etc.erspparams.subbaseline = 'on'; end;
-    if ~isfield(STUDY.etc.erspparams, 'threshold' ),   STUDY.etc.erspparams.threshold = NaN; end;
-    if ~isfield(STUDY.etc.erspparams, 'mcorrect' ),    STUDY.etc.erspparams.mcorrect   = 'none'; end;    
-    if ~isfield(STUDY.etc.erspparams, 'maskdata') ,    STUDY.etc.erspparams.maskdata  = 'on'; end;
-    if ~isfield(STUDY.etc.erspparams, 'naccu')    ,    STUDY.etc.erspparams.naccu     = []; end;
-    if ~isfield(STUDY.etc.erspparams, 'statmode') ,    STUDY.etc.erspparams.statmode  = 'subjects'; end;
+    if ~isfield(STUDY.etc.erspparams, 'subbaseline' ),  STUDY.etc.erspparams.subbaseline = 'on';  end;
 

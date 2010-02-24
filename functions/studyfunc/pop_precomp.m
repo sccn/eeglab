@@ -32,6 +32,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2009/12/16 02:09:59  arno
+% cosmetic change
+%
 % Revision 1.20  2009/11/11 00:28:53  arno
 % New GUI format
 %
@@ -111,7 +114,9 @@ if ~isstr(varargin{1}) %intial settings
     % callbacks
     % ---------
     erspparams_str = [ '''cycles'', [3 0.5], ''nfreqs'', 100' ];
-    specparams_str = '';
+    if ALLEEG(1).trials > 1,  specparams_str = '''specmode'', ''fft''';
+    else                      specparams_str = '';
+    end;
     set_ersp       = ['pop_precomp(''setersp'',gcf);']; 
     test_ersp      = ['pop_precomp(''testersp'',gcf);']; 
     set_itc        = ['pop_precomp(''setitc'',gcf);']; 
@@ -177,7 +182,9 @@ if ~isstr(varargin{1}) %intial settings
     {'style' 'checkbox'   'string' '' 'tag' 'itc_on' 'value' 0 'Callback' set_itc } ...
 	{'style' 'text'       'string' 'ITCs' 'horizontalalignment' 'center' } {'link2lines' 'style'  'text'   'string' '' } {} {} {} ...
     guiadd2{:} ...
-    {} {'style' 'checkbox'   'string' 'Recompute even if present on disk' 'tag' 'recomp_on' 'value' 0 } {}
+    {} ...
+    {'style' 'checkbox'   'string' 'Save single-trial measures for single-trial statistics - requires disk space' 'tag' 'savetrials_on' 'value' 0 } {} ...
+    {'style' 'checkbox'   'string' 'Recompute even if present on disk' 'tag' 'recomp_on' 'value' 0 } {} ...
     };
   
 	%{'style' 'checkbox'   'string' '' 'tag' 'precomp_PCA'  'Callback' precomp_PCA 'value' 0} ...
@@ -198,8 +205,8 @@ if ~isstr(varargin{1}) %intial settings
     firsttimeersp = 1;
     fig_arg = { ALLEEG STUDY allchans chanlist firsttimeersp };
     geomline = [0.45 1 0.8 2 3 0.78 ];
-    geometry = { [1] [1] geomadd1{:}  [1] [1] [0.40 1.5 0.3 2 2 0.65 ] [0.40 1.5 0.3 2 2 0.65 ] geomline geomline geomadd2{:} 1 [1 0.1] };
-    geomvert = [ 1 0.5 geomvertadd1 0.5 1 1 1 1 1 1 fastif(length(geomadd2) == 1,1,[]) 1];
+    geometry = { [1] [1] geomadd1{:}  [1] [1] [0.40 1.5 0.3 2 2 0.65 ] [0.40 1.5 0.3 2 2 0.65 ] geomline geomline geomadd2{:} 1 [1 0.1] [1 0.1] };
+    geomvert = [ 1 0.5 geomvertadd1 0.5 1 1 1 1 1 1 fastif(length(geomadd2) == 1,1,[]) 1 1];
 	[precomp_param, userdat2, strhalt, os] = inputgui( 'geometry', geometry, 'uilist', gui_spec, 'geomvert', geomvert, ...
                                                       'helpcom', ' pophelp(''std_precomp'')', ...
                                                       'title', 'Select and compute component measures for later clustering -- pop_precomp()', ...
@@ -230,6 +237,12 @@ if ~isstr(varargin{1}) %intial settings
             options = { options{:} 'rmclust' str2num(os.rmica2_text) };
         end
     end;
+    
+    % interpolate option is on
+    % ------------------------
+    if os.savetrials_on == 1 
+        options = { options{:} 'savetrials' 'on' };
+    end
     
     % interpolate option is on
     % ------------------------

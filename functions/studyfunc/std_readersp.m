@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2010/02/16 08:43:21  arno
+% New single-trial reading/writing
+%
 % Revision 1.35  2009/05/12 17:53:00  arno
 % fixing dimension problem
 %
@@ -227,6 +230,19 @@ for ind = 1:length(finalinds)
         ersp     = cell( max(length(STUDY.condition),1), max(length(STUDY.group),1) );
         erspbase = cell( max(length(STUDY.condition),1), max(length(STUDY.group),1) );
         erspinds = cell( max(length(STUDY.condition),1), max(length(STUDY.group),1) );
+        
+        % find total nb of trials
+        % -----------------------
+        if strcmpi(opt.singletrials, 'on')
+            tottrials = cell( length(STUDY.condition), length(STUDY.group) );
+            for index = 1:length( STUDY.datasetinfo )
+                condind = strmatch( STUDY.datasetinfo(index).condition, STUDY.condition );
+                grpind  = strmatch( STUDY.datasetinfo(index).group    , STUDY.group     );
+                if isempty(tottrials{condind, grpind}), tottrials{condind, grpind} = ALLEEG(index).trials;
+                else       tottrials{condind, grpind} = tottrials{condind, grpind} + ALLEEG(index).trials;
+                end;
+            end;
+        end;
 
         % read the data and select channels
         % ---------------------------------
@@ -311,7 +327,7 @@ for ind = 1:length(finalinds)
 
         % compute average baseline across groups and conditions
         % -----------------------------------------------------
-        if strcmpi(opt.subbaseline, 'on') && strcmpi(dtype, 'ersp')
+        if strcmpi(opt.subbaseline, 'on') && strcmpi(dtype, 'ersp') && strcmpi(opt.singletrials, 'off')
             disp('Recomputing baseline...');
             for g = 1:ng        % ng = number of groups
                 for c = 1:nc    % nc = number of components
@@ -486,6 +502,9 @@ end;
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2010/02/16 08:43:21  arno
+% New single-trial reading/writing
+%
 
 function [logersp, logfreqs, timevals, params, baseersp] = std_readerspsub(ALLEEG, abset, comp, timewindow, freqrange);
 
@@ -699,6 +718,9 @@ function cella = removedup(cella)
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2010/02/16 08:43:21  arno
+% New single-trial reading/writing
+%
 
 function [logtimef, logfreqs, timevals, params] = std_readtimef(ALLEEG, abset, comp, timewindow, freqrange);
 

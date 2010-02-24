@@ -94,6 +94,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.77  2010/02/16 08:43:21  arno
+% New single-trial reading/writing
+%
 % Revision 1.76  2010/02/09 06:07:27  arno
 % Fixed new title problem and implemented 3-level significance
 %
@@ -273,6 +276,7 @@ STUDY = pop_erspparams(STUDY, 'default');
                                'threshold'   'real'    [] STUDY.etc.erspparams.threshold;
                                'naccu'       'integer' [] STUDY.etc.erspparams.naccu;
                                'mcorrect'    'string'  [] STUDY.etc.erspparams.mcorrect;
+                               'singletrials' 'string' { 'on' 'off' }  STUDY.etc.erspparams.singletrials;
                                'channels'    'cell'    []              {};
                                'clusters'    'integer' []              [];
                                'datatype'    'string'  { 'itc' 'ersp' 'pac' } 'ersp';
@@ -280,7 +284,6 @@ STUDY = pop_erspparams(STUDY, 'default');
                                'plottf'      'real'    []              [];
                                'comps'       {'integer','string'}  []              []; % for backward compatibility
                                'plotsubjects' 'string' { 'on' 'off' }  'off';
-                               'singletrials' 'string' { 'on' 'off' }  'off';
                                'plotmode'    'string' { 'normal' 'condensed' 'none' }  'normal';
                                'subject'     'string'  []              '' }, ...
                                   'std_erspstatplot', 'ignore');

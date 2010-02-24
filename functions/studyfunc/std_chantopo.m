@@ -46,6 +46,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.12  2010/02/09 06:07:27  arno
+% Fixed new title problem and implemented 3-level significance
+%
 % Revision 1.11  2010/02/06 05:47:52  arno
 % New titles for figures
 %
@@ -175,12 +178,13 @@ opt = finputcheck( varargin, { 'ylim'        'real'   []              [];
                                'groupstats'  'cell'   []              {};
                                'condstats'   'cell'   []              {};
                                'interstats'  'cell'   []              {};
+                               'topoplotopt' 'cell'   []              { 'style', 'map', 'shading', 'interp' };
                                'binarypval'  'string' { 'on' 'off' }  'off';
                                'datatype'    'string' { 'ersp' 'itc' 'erp' 'spec' }    'erp';
                                'caxis'       'real'   []              [] }, 'std_chantopo', 'ignore'); %, 'ignore');
 if isstr(opt), error(opt); end;
 if ~isempty(opt.ylim), opt.caxis = opt.ylim; end;
-if strcmpi(opt.binarypval, 'on'), opt.ptopoopt = { 'style' 'blank' }; else opt.ptopoopt = {}; end;
+if strcmpi(opt.binarypval, 'on'), opt.ptopoopt = { 'style' 'blank' }; else opt.ptopoopt = opt.topoplotopt; end;
 if isempty(opt.titles), opt.titles = cell(10,10); opt.titles(:) = { '' }; end;
 
 nc = size(data,1);
@@ -198,7 +202,7 @@ if nc > 1 & ~isempty(opt.condstats ), addr = 1; else addr = 0; end;
 % -------------------------
 if ~isempty(opt.interstats), pinter = opt.interstats{3}; end;
 
-if ~isnan(opt.threshold) & ( ~isempty(opt.groupstats) | ~isempty(opt.condstats) )    
+if ~isnan(opt.threshold) && ( ~isempty(opt.groupstats) || ~isempty(opt.condstats) )    
     pcondplot  = opt.condstats;
     pgroupplot = opt.groupstats;
     maxplot = 1;
@@ -230,7 +234,7 @@ for c = 1:nc
         hdl(c,g) = mysubplot(nc+addr, ng+addc, g + (c-1)*(ng+addc), opt.transpose);
         if ~isempty(data{c,g})
             tmpplot = double(mean(data{c,g},3));
-            topoplot( tmpplot, opt.chanlocs, 'style', 'map', 'shading', 'interp');
+            topoplot( tmpplot, opt.chanlocs, opt.topoplotopt{:});
             if isempty(opt.caxis)
                 tmpc = [ min(min(tmpplot), tmpc(1)) max(max(tmpplot), tmpc(2)) ];
             else 

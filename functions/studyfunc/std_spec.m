@@ -33,6 +33,13 @@
 %                  spectrum are computed and saved. Only selected channels 
 %                  are returned by the function to Matlab
 %                  {default|[] -> none}
+%   'specmode'   - ['psd'|'fft'] method to compute spectral 
+%                  decomposition. 'psd' uses the spectopo function. 'fft' 
+%                  uses a simple fft on each trial.
+%   'timerange'  - [min max] use data within a specific time range before 
+%                  computing the data spectrum. For instance, for evoked 
+%                  data trials, it is recommended to use the baseline time 
+%                  period. 
 %   'freqrange'  - [minhz maxhz] frequency range (in Hz) within which to 
 %                  return the spectrum {default|[]: [0 sample rate/2]}. 
 %   'recompute'  - ['on'|'off'] force recomputing ERP file even if it is 
@@ -80,6 +87,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.41  2010/02/16 08:43:21  arno
+% New single-trial reading/writing
+%
 % Revision 1.40  2009/10/31 00:37:08  dev
 % fixing boundary event problem for numerical type
 %
@@ -322,7 +332,7 @@ elseif strcmpi(g.specmode, 'pburg')
     if strcmpi(g.savetrials, 'off')
         X = mean(X,3);    
     end;
-else
+else % fft mode
     if EEG.trials == 1, error('FFT method for data trials only (not continuous data)'); end;
     tmp   = fft(X, g.nfft, 2);
     f     = linspace(0, EEG.srate/2, size(tmp,2)/2);

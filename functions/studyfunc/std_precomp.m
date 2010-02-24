@@ -96,6 +96,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2010/02/16 08:43:21  arno
+% New single-trial reading/writing
+%
 % Revision 1.32  2009/11/24 21:02:45  arno
 % better error messages
 %
@@ -196,6 +199,7 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
                                 'scalp'       'string'  { 'on' 'off' }     'off';
                                 'allcomps'    'string'  { 'on' 'off' }     'off';
                                 'itc'         'string'  { 'on' 'off' }     'off';
+                                'savetrials'  'string'  { 'on' 'off' }     'off';
                                 'rmicacomps'  'string'  { 'on' 'off' }     'off';
                                 'rmclust'     'integer' []                 [];
                                 'rmbase'      'integer' []                 [];
@@ -203,6 +207,7 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
                                 'erpparams'         'cell'    {}                 {};
                                 'erspparams'        'cell'    {}                 {}}, 'std_precomp');
     if isstr(g), error(g); end;
+    if ~isempty(g.rmbase), g.erpparams = { g.erpparams{:} 'rmbase' g.rmbase }; end;
     
     % union of all channel structures
     % -------------------------------
@@ -265,9 +270,9 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
         for index = 1:length(STUDY.datasetinfo)
             if strcmpi(computewhat, 'channels')
                 [tmpchanlist opts] = getchansandopts(STUDY, ALLEEG, chanlist, index, g);
-                std_erp(ALLEEG(STUDY.datasetinfo(index).index), 'channels', tmpchanlist, 'rmbase', g.rmbase, opts{:}, g.erpparams{:});
+                std_erp(ALLEEG(STUDY.datasetinfo(index).index), 'channels', tmpchanlist, opts{:}, 'savetrials', g.savetrials, g.erpparams{:});
             else
-                std_erp(ALLEEG(STUDY.datasetinfo(index).index), 'components', chanlist{index}, 'rmbase', g.rmbase, 'recompute', g.recompute, g.erpparams{:});
+                std_erp(ALLEEG(STUDY.datasetinfo(index).index), 'components', chanlist{index}, 'savetrials', g.savetrials, 'recompute', g.recompute, g.erpparams{:});
             end;
         end;
         if isfield(curstruct, 'erpdata')
@@ -319,9 +324,9 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
         for index = 1:length(STUDY.datasetinfo)
             if strcmpi(computewhat, 'channels')
                 [tmpchanlist opts] = getchansandopts(STUDY, ALLEEG, chanlist, index, g);
-                std_spec(ALLEEG(STUDY.datasetinfo(index).index), 'channels', tmpchanlist, opts{:}, g.specparams{:});
+                std_spec(ALLEEG(STUDY.datasetinfo(index).index), 'channels', tmpchanlist, opts{:}, 'savetrials', g.savetrials, g.specparams{:});
             else
-                std_spec(ALLEEG(STUDY.datasetinfo(index).index), 'components', chanlist{index}, 'recompute', g.recompute, g.specparams{:});
+                std_spec(ALLEEG(STUDY.datasetinfo(index).index), 'components', chanlist{index}, 'savetrials', g.savetrials, 'recompute', g.recompute, g.specparams{:});
             end;
         end;
         if isfield(curstruct, 'specdata')
@@ -347,7 +352,7 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
         % check for existing files
         % ------------------------
         guimode = 'guion';
-        [ tmpX tmpt tmpf g.erspparams ] = std_ersp(ALLEEG(1), 'channels', 1, 'type', type, 'recompute', 'on', 'getparams', 'on', g.erspparams{:});
+        [ tmpX tmpt tmpf g.erspparams ] = std_ersp(ALLEEG(1), 'channels', 1, 'type', type, 'recompute', 'on', 'getparams', 'on', 'savetrials', g.savetrials, g.erspparams{:});
         if strcmpi(g.recompute, 'off')
             for index = 1:length(STUDY.datasetinfo)
             
@@ -380,7 +385,7 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
                 [tmpchanlist opts] = getchansandopts(STUDY, ALLEEG, chanlist, index, g);
                 std_ersp(ALLEEG(STUDY.datasetinfo(index).index), 'channels', tmpchanlist, 'type', type, opts{:}, tmpparams{:});
             else
-                std_ersp(ALLEEG(STUDY.datasetinfo(index).index), 'components', chanlist{index}, 'type', type, 'recompute', g.recompute, tmpparams{:});
+                std_ersp(ALLEEG(STUDY.datasetinfo(index).index), 'components', chanlist{index}, 'type', type, tmpparams{:});
             end;
         end;
         if isfield(curstruct, 'erspdata')

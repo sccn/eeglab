@@ -88,6 +88,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.66  2010/02/16 08:43:21  arno
+% New single-trial reading/writing
+%
 % Revision 1.65  2010/02/09 06:07:27  arno
 % Fixed new title problem and implemented 3-level significance
 %
@@ -254,6 +257,7 @@ opt = finputcheck( varargin, { 'topotime'    'real'    [] params.topotime;
                                'subtractsubjectmean' 'string' [] params.subtractsubjectmean;
                                'threshold'   'real'    [] params.threshold;
                                'naccu'       'integer' [] params.naccu;
+                               'singletrials' 'string' { 'on' 'off' }  params.singletrials;
                                'channels'    'cell'    []              {};
                                'clusters'    'integer' []              [];
                                'datatype'    'string'  { 'erp' 'spec' } 'erp';      
@@ -262,7 +266,6 @@ opt = finputcheck( varargin, { 'topotime'    'real'    [] params.topotime;
                                'plotmode'    'string' { 'normal' 'condensed' }  'normal';
                                'unitx'       'string' { 'ms' 'Hz' }    'ms';
                                'plotsubjects' 'string' { 'on' 'off' }  'off';
-                               'singletrials' 'string' { 'on' 'off' }  'off';
                                'subject'     'string'  []              '';
                                'statmode'    'string'  { 'subjects' 'common' 'trials' } 'subjects'}, 'std_erpplot');
 if isstr(opt), error(opt); end;
@@ -279,8 +282,8 @@ if strcmpi(datatypestr, 'spec'), datatypestr = 'Spectrum'; end;
 % for backward compatibility
 % --------------------------
 if strcmpi(opt.mode, 'comps'), opt.plotsubjects = 'on'; end;
-if strcmpi(opt.condstats, 'on') || strcmpi(opt.groupstats, 'on') || ...
-        (~isempty(opt.subject) || ~isempty(opt.comps)) && strcmpi(opt.singletrials, 'off'), 
+if strcmpi(opt.singletrials, 'off') && (strcmpi(opt.condstats, 'on') || strcmpi(opt.groupstats, 'on') || ...
+        (~isempty(opt.subject) || ~isempty(opt.comps)))
     opt.groupstats = 'off';
     opt.constats   = 'off'; 
     disp('No statistics for single subject/component'); 

@@ -67,6 +67,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2009/11/11 00:28:53  arno
+% New GUI format
+%
 % Revision 1.17  2009/05/31 04:37:38  arno
 % Better GUI for Study plotting options
 %
@@ -117,23 +120,16 @@
 function [ STUDY, com ] = pop_specparams(STUDY, varargin);
 
 STUDY = default_params(STUDY);
+STUDY.etc.specparams = pop_statparams(STUDY.etc.specparams, 'default');
 TMPSTUDY = STUDY;
 com = '';
 if isempty(varargin)
     
     enablegroup = fastif(length(STUDY.group)>1, 'on', 'off');
     enablecond  = fastif(length(STUDY.condition)>1, 'on', 'off');
-    threshstr   = fastif(isnan(STUDY.etc.specparams.threshold),'', num2str(STUDY.etc.specparams.threshold));
     plotconditions    = fastif(strcmpi(STUDY.etc.specparams.plotconditions, 'together'), 1, 0);
     plotgroups   = fastif(strcmpi(STUDY.etc.specparams.plotgroups,'together'), 1, 0);
     submean      = fastif(strcmpi(STUDY.etc.specparams.subtractsubjectmean,'on'), 1, 0);
-    condstats    = fastif(strcmpi(STUDY.etc.specparams.condstats, 'on'), 1, 0);
-    groupstats   = fastif(strcmpi(STUDY.etc.specparams.groupstats,'on'), 1, 0);
-    mcorrect     = fastif(strcmpi(STUDY.etc.specparams.mcorrect,  'fdr'), 1, 0);
-    if strcmpi(STUDY.etc.specparams.statistics,'param'),    statval = 1;
-    elseif strcmpi(STUDY.etc.specparams.statistics,'perm'), statval = 2;
-    else                                                    statval = 3;
-    end;
     vis = fastif(isnan(STUDY.etc.specparams.topofreq), 'off', 'on');
     
     uilist = { ...
@@ -146,63 +142,37 @@ if isempty(varargin)
         {} {} ...
         {} {'style' 'checkbox'   'string' 'Subtract individual subject mean spectrum' 'value' submean 'tag' 'submean' } ...
         {} {'style' 'checkbox'   'string' 'Plot conditions on the same panel' 'value' plotconditions 'enable' enablecond  'tag' 'plotconditions' } ...
-        {} {'style' 'checkbox'   'string' 'Plot groups on the same panel' 'value' plotgroups 'enable' enablegroup 'tag' 'plotgroups' } ...
-        {} ...
-        {'style' 'text'       'string' 'Statistical method to use'} ...
-        {'style' 'popupmenu'  'string' 'Parametric|Permutations|Bootstrap' 'tag' 'statistics' 'value' statval 'listboxtop' statval } ...
-        {'style' 'text'       'string' 'Statistical threshold (p<)' } ...
-        {'style' 'edit'       'string' threshstr 'tag' 'threshold' } ...
-        {} {'style' 'checkbox'   'string' 'Compute condition statistics' 'value' condstats  'enable' enablecond  'tag' 'condstats' } ...
-        {} {'style' 'checkbox'   'string' 'Compute group statistics'     'value' groupstats 'enable' enablegroup 'tag' 'groupstats' } ...
-        {} {'style' 'checkbox'  'string' 'Use False Discovery Rate to correct for multiple comparisons' 'value' mcorrect 'tag' 'mcorrect' } };
+        {} {'style' 'checkbox'   'string' 'Plot groups on the same panel' 'value' plotgroups 'enable' enablegroup 'tag' 'plotgroups' } };
 
     cbline = [0.07 1.1];
     otherline = [ 0.7 .5 0.6 .5];
-    geometry = { otherline otherline cbline cbline cbline [1] otherline cbline cbline cbline };
+    geometry = { otherline otherline cbline cbline cbline };
     
-    [out_param userdat tmp res] = inputgui( 'geometry' , geometry, 'uilist', uilist, ...
-                                   'helpcom', 'pophelp(''std_specparams'')', ...
-                                   'title', 'Set parameters for plotting specs -- pop_specparams()');
+    [STUDY.etc.specparams res options] = pop_statparams(STUDY.etc.specparams, 'geometry' , geometry, 'uilist', uilist, ...
+                                   'helpcom', 'pophelp(''std_specparams'')', 'enablegroup', enablegroup, ...
+                                   'enablecond', enablecond, ...
+                                   'title', 'Set ERP plotting parameters -- pop_specparams()');
 
     if isempty(res), return; end;
     
     % decode inputs
     % -------------
     if res.plotgroups & res.plotconditions, warndlg2('Both conditions and group cannot be plotted on the same panel'); return; end;
-    if res.groupstats, res.groupstats = 'on'; else res.groupstats = 'off'; end;
-    if res.condstats , res.condstats  = 'on'; else res.condstats  = 'off'; end;
-    if res.mcorrect,   res.mcorrect   = 'fdr'; else res.mcorrect  = 'none'; end;
     if res.submean   , res.submean    = 'on'; else res.submean    = 'off'; end;
     if res.plotgroups, res.plotgroups = 'together'; else res.plotgroups = 'apart'; end;
     if res.plotconditions , res.plotconditions  = 'together'; else res.plotconditions  = 'apart'; end;
     res.topofreq  = str2num( res.topofreq );
     res.freqrange = str2num( res.freqrange );
     res.ylim      = str2num( res.ylim );
-    res.threshold = str2num( res.threshold );
-    if isempty(res.threshold),res.threshold = NaN; end;
-    if res.statistics == 1, res.statistics  = 'param'; 
-    elseif res.statistics == 2, res.statistics  = 'perm'; 
-    else res.statistics  = 'bootstrap'; 
-    end;
     
     % build command call
     % ------------------
-    options = {};
     if ~strcmpi( res.plotgroups, STUDY.etc.specparams.plotgroups), options = { options{:} 'plotgroups' res.plotgroups }; end;
     if ~strcmpi( res.plotconditions , STUDY.etc.specparams.plotconditions ), options = { options{:} 'plotconditions'  res.plotconditions  }; end;
-    if ~strcmpi( res.groupstats, STUDY.etc.specparams.groupstats), options = { options{:} 'groupstats' res.groupstats }; end;
-    if ~strcmpi( res.condstats , STUDY.etc.specparams.condstats ), options = { options{:} 'condstats'  res.condstats  }; end;
-    if ~strcmpi( res.mcorrect,   STUDY.etc.specparams.mcorrect),   options = { options{:} 'mcorrect' res.mcorrect }; end;
     if ~strcmpi( res.submean   , STUDY.etc.specparams.subtractsubjectmean ), options = { options{:} 'subtractsubjectmean'  res.submean  }; end;
-    if ~strcmpi( res.statistics, STUDY.etc.specparams.statistics ), options = { options{:} 'statistics' res.statistics }; end;
     if ~isequal(res.topofreq, STUDY.etc.specparams.topofreq),   options = { options{:} 'topofreq' res.topofreq }; end;
     if ~isequal(res.ylim, STUDY.etc.specparams.ylim),           options = { options{:} 'ylim' res.ylim      }; end;
     if ~isequal(res.freqrange, STUDY.etc.specparams.freqrange), options = { options{:} 'freqrange' res.freqrange }; end;
-    if (isnan(res.threshold) & ~isnan(STUDY.etc.specparams.threshold)) | ...
-            (~isnan(res.threshold) & isnan(STUDY.etc.specparams.threshold)) | ...
-                (~isnan(res.threshold) & res.threshold ~= STUDY.etc.specparams.threshold)
-                options = { options{:} 'threshold' res.threshold }; 
-    end;
     if ~isempty(options)
         STUDY = pop_specparams(STUDY, options{:});
         com = sprintf('STUDY = pop_specparams(STUDY, %s);', vararg2str( options ));
@@ -241,12 +211,6 @@ function STUDY = default_params(STUDY)
     if ~isfield(STUDY.etc.specparams, 'topofreq'),   STUDY.etc.specparams.topofreq = []; end;
     if ~isfield(STUDY.etc.specparams, 'freqrange'),  STUDY.etc.specparams.freqrange = []; end;
     if ~isfield(STUDY.etc.specparams, 'ylim'     ),  STUDY.etc.specparams.ylim      = []; end;
-    if ~isfield(STUDY.etc.specparams, 'statistics'), STUDY.etc.specparams.statistics = 'param'; end;
-    if ~isfield(STUDY.etc.specparams, 'groupstats'), STUDY.etc.specparams.groupstats = 'off'; end;
-    if ~isfield(STUDY.etc.specparams, 'condstats' ), STUDY.etc.specparams.condstats  = 'off'; end;
     if ~isfield(STUDY.etc.specparams, 'subtractsubjectmean' ), STUDY.etc.specparams.subtractsubjectmean  = 'off'; end;
-    if ~isfield(STUDY.etc.specparams, 'threshold' ), STUDY.etc.specparams.threshold = NaN; end;
-    if ~isfield(STUDY.etc.specparams, 'mcorrect' ),  STUDY.etc.specparams.mcorrect   = 'none'; end;
     if ~isfield(STUDY.etc.specparams, 'plotgroups'), STUDY.etc.specparams.plotgroups = 'apart'; end;
     if ~isfield(STUDY.etc.specparams, 'plotconditions'),  STUDY.etc.specparams.plotconditions  = 'apart'; end;
-    if ~isfield(STUDY.etc.specparams, 'naccu'),      STUDY.etc.specparams.naccu     = []; end;

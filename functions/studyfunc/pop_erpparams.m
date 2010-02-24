@@ -65,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.23  2009/11/11 00:28:53  arno
+% New GUI format
+%
 % Revision 1.22  2009/05/31 04:37:38  arno
 % Better GUI for Study plotting options
 %
@@ -134,22 +137,15 @@
 function [ STUDY, com ] = pop_erpparams(STUDY, varargin);
 
 STUDY = default_params(STUDY);
+STUDY.etc.erpparams = pop_statparams(STUDY.etc.erpparams, 'default');
 TMPSTUDY = STUDY;
 com = '';
 if isempty(varargin)
     
     enablegroup = fastif(length(STUDY.group)>1, 'on', 'off');
     enablecond  = fastif(length(STUDY.condition)>1, 'on', 'off');
-    threshstr   = fastif(isnan(STUDY.etc.erpparams.threshold),'', num2str(STUDY.etc.erpparams.threshold));
     plotconditions    = fastif(strcmpi(STUDY.etc.erpparams.plotconditions, 'together'), 1, 0);
     plotgroups  = fastif(strcmpi(STUDY.etc.erpparams.plotgroups,'together'), 1, 0);
-    condstats    = fastif(strcmpi(STUDY.etc.erpparams.condstats, 'on'), 1, 0);
-    groupstats   = fastif(strcmpi(STUDY.etc.erpparams.groupstats,'on'), 1, 0);
-    mcorrect     = fastif(strcmpi(STUDY.etc.erpparams.mcorrect,  'fdr'), 1, 0);
-    if strcmpi(STUDY.etc.erpparams.statistics,'param'),    statval = 1;
-    elseif strcmpi(STUDY.etc.erpparams.statistics,'perm'), statval = 2;
-    else                                                   statval = 3;
-    end;
     vis = fastif(isnan(STUDY.etc.erpparams.topotime), 'off', 'on');
     
     uilist = { ...
@@ -162,66 +158,40 @@ if isempty(varargin)
         {'style' 'text'       'string' 'Display filter in Hz [high]' } ...
         {'style' 'edit'       'string' num2str(STUDY.etc.erpparams.filter) 'tag' 'filter' } ...
         {} {'style' 'checkbox'   'string' 'Plot conditions on the same panel' 'value' plotconditions 'enable' enablecond  'tag' 'plotconditions' } ...
-        {} {'style' 'checkbox'   'string' 'Plot groups on the same panel' 'value' plotgroups 'enable' enablegroup 'tag' 'plotgroups' } ...
-        {} ...
-        {'style' 'text'       'string' 'Statistical method to use'} ...
-        {'style' 'popupmenu'  'string' 'Parametric|Permutations|Bootstrap' 'tag' 'statistics' 'value' statval 'listboxtop' statval } ...
-        {'style' 'text'       'string' 'Statistical threshold (p<)' } ...
-        {'style' 'edit'       'string' threshstr 'tag' 'threshold' } ...
-        {} {'style' 'checkbox'   'string' 'Compute condition statistics' 'value' condstats  'enable' enablecond  'tag' 'condstats' } ...
-        {} {'style' 'checkbox'   'string' 'Compute group statistics' 'value' groupstats 'enable' enablegroup 'tag' 'groupstats' } ...
-        {} {'style' 'checkbox'  'string' 'Use False Discovery Rate to correct for multiple comparisons' 'value' mcorrect 'tag' 'mcorrect' } };
+        {} {'style' 'checkbox'   'string' 'Plot groups on the same panel' 'value' plotgroups 'enable' enablegroup 'tag' 'plotgroups' } };
     
     cbline = [0.07 1.1];
     otherline = [ 0.7 .5 0.6 .5];
-    geometry = { otherline otherline cbline cbline [1] otherline cbline cbline cbline };
+    geometry = { otherline otherline cbline cbline };
     
-    [out_param userdat tmp res] = inputgui( 'geometry' , geometry, 'uilist', uilist, ...
-                                   'helpcom', 'pophelp(''std_erpparams'')', ...
-                                   'title', 'Set parameters for plotting ERPs -- pop_erpparams()');
-
+    [STUDY.etc.erpparams res options] = pop_statparams(STUDY.etc.erpparams, 'geometry' , geometry, 'uilist', uilist, ...
+                                   'helpcom', 'pophelp(''std_erpparams'')', 'enablegroup', enablegroup, ...
+                                   'enablecond', enablecond, ...
+                                   'title', 'Set ERP plotting parameters -- pop_erpparams()');
+                               
     if isempty(res), return; end;
     
     % decode inputs
     % -------------
     if res.plotgroups & res.plotconditions, warndlg2('Both conditions and group cannot be plotted on the same panel'); return; end;
-    if res.groupstats, res.groupstats = 'on'; else res.groupstats = 'off'; end;
-    if res.condstats , res.condstats  = 'on'; else res.condstats  = 'off'; end;
-    if res.mcorrect,   res.mcorrect   = 'fdr'; else res.mcorrect  = 'none'; end;
     if res.plotgroups, res.plotgroups = 'together'; else res.plotgroups = 'apart'; end;
     if res.plotconditions , res.plotconditions  = 'together'; else res.plotconditions  = 'apart'; end;
     res.topotime  = str2num( res.topotime );
     res.timerange = str2num( res.timerange );
     res.ylim      = str2num( res.ylim );
-    res.threshold = str2num( res.threshold );
     res.filter    = str2num( res.filter );
-    if isempty(res.threshold),res.threshold = NaN; end;
-    if res.statistics == 1, res.statistics  = 'param'; 
-    elseif res.statistics == 2, res.statistics  = 'perm'; 
-    else res.statistics  = 'bootstrap'; 
-    end;
     
     % build command call
     % ------------------
-    options = {};
     if ~strcmpi( char(res.filter), char(STUDY.etc.erpparams.filter)), options = { options{:} 'filter' res.filter }; end;
     if ~strcmpi( res.plotgroups, STUDY.etc.erpparams.plotgroups), options = { options{:} 'plotgroups' res.plotgroups }; end;
     if ~strcmpi( res.plotconditions , STUDY.etc.erpparams.plotconditions ), options = { options{:} 'plotconditions'  res.plotconditions  }; end;
-    if ~strcmpi( res.groupstats, STUDY.etc.erpparams.groupstats), options = { options{:} 'groupstats' res.groupstats }; end;
-    if ~strcmpi( res.condstats , STUDY.etc.erpparams.condstats ), options = { options{:} 'condstats'  res.condstats  }; end;
-    if ~strcmpi( res.mcorrect,   STUDY.etc.erpparams.mcorrect),   options = { options{:} 'mcorrect' res.mcorrect }; end;
-    if ~strcmpi( res.statistics, STUDY.etc.erpparams.statistics ), options = { options{:} 'statistics' res.statistics }; end;
     if ~isequal(res.ylim     , STUDY.etc.erpparams.ylim),      options = { options{:} 'ylim' res.ylim       }; end;
     if ~isequal(res.timerange, STUDY.etc.erpparams.timerange), options = { options{:} 'timerange' res.timerange }; end;
     if (all(isnan(res.topotime)) & all(~isnan(STUDY.etc.erpparams.topotime))) | ...
             (all(~isnan(res.topotime)) & all(isnan(STUDY.etc.erpparams.topotime))) | ...
                 (all(~isnan(res.topotime)) & ~isequal(res.topotime, STUDY.etc.erpparams.topotime))
         options = { options{:} 'topotime' res.topotime }; 
-    end;
-    if (isnan(res.threshold) & ~isnan(STUDY.etc.erpparams.threshold)) | ...
-            (~isnan(res.threshold) & isnan(STUDY.etc.erpparams.threshold)) | ...
-                (~isnan(res.threshold) & res.threshold ~= STUDY.etc.erpparams.threshold)
-                options = { options{:} 'threshold' res.threshold }; 
     end;
     if ~isempty(options)
         STUDY = pop_erpparams(STUDY, options{:});
@@ -260,12 +230,6 @@ function STUDY = default_params(STUDY)
     if ~isfield(STUDY.etc.erpparams, 'filter'),     STUDY.etc.erpparams.filter = []; end;
     if ~isfield(STUDY.etc.erpparams, 'timerange'),  STUDY.etc.erpparams.timerange = []; end;
     if ~isfield(STUDY.etc.erpparams, 'ylim'     ),  STUDY.etc.erpparams.ylim      = []; end;
-    if ~isfield(STUDY.etc.erpparams, 'statistics'), STUDY.etc.erpparams.statistics = 'param'; end;
-    if ~isfield(STUDY.etc.erpparams, 'groupstats'),  STUDY.etc.erpparams.groupstats = 'off'; end;
-    if ~isfield(STUDY.etc.erpparams, 'condstats' ),  STUDY.etc.erpparams.condstats  = 'off'; end;
-    if ~isfield(STUDY.etc.erpparams, 'mcorrect' ),   STUDY.etc.erpparams.mcorrect   = 'none'; end;
-    if ~isfield(STUDY.etc.erpparams, 'threshold' ),  STUDY.etc.erpparams.threshold = NaN; end;
     if ~isfield(STUDY.etc.erpparams, 'plotgroups') , STUDY.etc.erpparams.plotgroups = 'apart'; end;
-    if ~isfield(STUDY.etc.erpparams, 'naccu') ,      STUDY.etc.erpparams.naccu     = []; end;
     if ~isfield(STUDY.etc.erpparams, 'plotconditions') ,  STUDY.etc.erpparams.plotconditions  = 'apart'; end;
 

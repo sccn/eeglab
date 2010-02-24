@@ -61,6 +61,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.27  2010/02/16 08:43:21  arno
+% New single-trial reading/writing
+%
 % Revision 1.26  2010/02/09 06:07:27  arno
 % Fixed new title problem and implemented 3-level significance
 %
@@ -449,7 +452,7 @@ for c = 1:ncplot
                 metaplottopo(tmpdata, 'chanlocs', opt.chanlocs, 'plotfunc', 'plotcurve', ...
                     'plotargs', { plotopt{:} }, 'datapos', [2 3], 'title', opt.titles{c,g});
             elseif iscell(tmpdata)
-                 plotcurve( allx, tmpdata{1}, 'colors', tmpcol, 'maskarray', tmpdata{2}, plotopt{3:end}, 'title', opt.titles{c,g}); xlabel(xlab); ylabel(ylab);
+                 plotcurve( allx, tmpdata{1}, 'colors', tmpcol, 'maskarray', tmpdata{2}, plotopt{3:end}, 'title', opt.titles{c,g}, 'xlabel', xlab, 'ylabel', ylab);
             else
                 plotcurve( allx, tmpdata, 'colors', tmpcol, plotopt{2:end}, 'title', opt.titles{c,g});
             end;
