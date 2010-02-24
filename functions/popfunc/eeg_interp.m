@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2009/08/05 03:20:42  arno
+% new interpolation function
+%
 % Revision 1.6  2009/07/30 03:32:47  arno
 % fixed interpolating bad channels
 %
@@ -71,16 +74,19 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method)
 
     if isstruct(bad_elec)
         
-        % find missing channels
-        % ---------------------
-        if length(bad_elec) < length(EEG.chanlocs)
-            newchanlocs = EEG.chanlocs;
-            fields = fieldnames(newchanlocs);
+        % add missing channels in interpolation structure
+        % -----------------------------------------------
+        lab1 = { bad_elec.labels };
+        lab2 = { EEG.chanlocs.labels };
+        [tmp tmpchan] = setdiff( lab2, lab1);
+        if ~isempty(tmpchan)
+            newchanlocs = bad_elec;
+            fields = fieldnames(bad_elec);
             for index = 1:length(fields)
                 if isfield(bad_elec, fields{index})
-                    for cind = 1:length(bad_elec)
-                        fieldval = getfield(bad_elec, { cind },  fields{index});
-                        newchanlocs = setfield(newchanlocs, { length(EEG.chanlocs)+cind }, fields{index}, fieldval);
+                    for cind = 1:length(tmpchan)
+                        fieldval = getfield( EEG.chanlocs, { tmpchan(cind) },  fields{index});
+                        newchanlocs = setfield(newchanlocs, { length(bad_elec)+cind }, fields{index}, fieldval);
                     end;
                 end;
             end;
@@ -154,6 +160,7 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method)
     goodchans = goodchans( sort(indgood) );
     datachans = getdatachans(goodchans,badchans);
     badchans  = intersect(badchans, nonemptychans);
+    if isempty(badchans), return; end;
     
     % scan data points
     % ----------------
