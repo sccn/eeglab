@@ -87,6 +87,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.43  2010/02/24 15:19:27  claire
+% compute FFT for continuous datasets
+%
 % Revision 1.42  2010/02/24 10:52:37  arno
 % Implemented new single trial statistics
 %
@@ -373,6 +376,9 @@ function savetofile(filename, f, X, prefix, comps, params, labels);
     allspec = [];
     for k = 1:length(comps)
         allspec = setfield( allspec, [ prefix int2str(comps(k)) ], squeeze(X(k,:,:)));
+    end;
+    if nargin > 6
+        allspec.labels = labels;
     end;
     allspec.freqs      = f;
     allspec.parameters = params;
