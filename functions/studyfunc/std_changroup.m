@@ -2,7 +2,7 @@
 %
 % Usage:    
 %                >> STUDY = std_changroup(STUDY, ALLEEG);   
-%                >> STUDY = std_changroup(STUDY, ALLEEG, chanlocs);   
+%                >> STUDY = std_changroup(STUDY, ALLEEG, chanlocs, 'interp');   
 % Inputs:
 %   ALLEEG     - Top-level EEGLAB vector of loaded EEG structures for the dataset(s) 
 %                in the STUDY. ALLEEG for a STUDY set is typically loaded using 
@@ -10,6 +10,8 @@
 %   STUDY      - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
 %   chanlocs   - EEGLAB channel structure. Only construct the STUDY.changrp
 %                structure for a subset of channels.
+%   'interp'   - optional input in case channel locations are interpolated
+%
 % Outputs:
 %   STUDY      - The input STUDY set structure modified according to specified user 
 %                edits, if any. The STUDY.changrp structure is created. It contains as
@@ -45,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2009/07/10 01:03:42  arno
+% remove old channel lookup
+%
 % Revision 1.13  2008/04/16 17:42:03  arno
 % now only include electrode actually present in datasets if no interpolation
 %
@@ -118,6 +123,13 @@ for indc = 1:length(alllocs)
     STUDY.changrp(indc).centroid = [];
 end;
 
+if strcmpi(interp, 'off')
+    if length(unique( cellfun(@length, { ALLEEG.chanlocs }))) ~= 1
+         STUDY.changrpstatus = 'some channels missing in some datasets';
+    else STUDY.changrpstatus = 'all channels present in all datasets';
+    end;
+else STUDY.changrpstatus = 'all channels present in all datasets - interpolated';
+end;
 
 %STUDY.changrp(indc).name = [ 'full montage' ];
 %STUDY.changrp(indc).channels = { alllocs.labels };
