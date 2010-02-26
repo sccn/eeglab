@@ -121,7 +121,7 @@
 %                   If an RGB cell array {'r' 'b' 'g'}, channels will be plotted 
 %                   using the cell-array color elements in cyclic order {default:'off'}. 
 %    'wincolor'   - [color] Color to use to mark data stretches or epochs {default: 
-%                   [ 0.8345 1 0.956] is the default marking color}
+%                   [ 0.7 1 0.9] is the default marking color}
 %    'events'     - [struct] EEGLAB event structure (EEG.event) to use to show events.
 %    'submean'    - ['on'|'off'] Remove channel means in each window {default: 'on'}
 %    'position'   - [lowleft_x lowleft_y width height] Position of the figure in pixels.
@@ -175,6 +175,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.141  2009/11/12 21:52:00  arno
+% fix event duration menu
+%
 % Revision 1.140  2009/11/01 02:03:44  arno
 % Added submean menu
 %
@@ -681,7 +684,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
    try, g.limits;		    catch, g.limits	    = [0 1000*(size(data,2)-1)/g.srate]; end;
    try, g.freqlimits;	    catch, g.freqlimits	= []; end;
    try, g.dispchans; 		catch, g.dispchans  = size(data,1); end;
-   try, g.wincolor; 		catch, g.wincolor   = [ 0.8345 1 0.9560]; end;
+   try, g.wincolor; 		catch, g.wincolor   = [ 0.7 1 0.9]; end;
    try, g.butlabel; 		catch, g.butlabel   = 'REJECT'; end;
    try, g.colmodif; 		catch, g.colmodif   = { g.wincolor }; end;
    try, g.scale; 		    catch, g.scale      = 'on'; end;
