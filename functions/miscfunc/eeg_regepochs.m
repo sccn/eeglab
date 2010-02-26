@@ -126,10 +126,10 @@ for k = 1:nu
    end
 
    EEG.event(nevents+k).type = 'X';
-   EEG.event(nevents+k).latency = recur*k*EEG.srate;
+   EEG.event(nevents+k).latency = recur*(k-1)*EEG.srate+1;
 
    EEG.urevent(nurevents+k).type = 'X';
-   EEG.urevent(nurevents+k).latency = recur*k*EEG.srate;
+   EEG.urevent(nurevents+k).latency = recur*(k-1)*EEG.srate+1;
    EEG.event(nevents+k).urevent = nurevents+k;
 end
 fprintf('\n');
