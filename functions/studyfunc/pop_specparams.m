@@ -67,6 +67,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2010/02/24 10:52:36  arno
+% Implemented new single trial statistics
+%
 % Revision 1.18  2009/11/11 00:28:53  arno
 % New GUI format
 %
@@ -151,7 +154,7 @@ if isempty(varargin)
     [STUDY.etc.specparams res options] = pop_statparams(STUDY.etc.specparams, 'geometry' , geometry, 'uilist', uilist, ...
                                    'helpcom', 'pophelp(''std_specparams'')', 'enablegroup', enablegroup, ...
                                    'enablecond', enablecond, ...
-                                   'title', 'Set ERP plotting parameters -- pop_specparams()');
+                                   'title', 'Set spectrum plotting parameters -- pop_specparams()');
 
     if isempty(res), return; end;
     
