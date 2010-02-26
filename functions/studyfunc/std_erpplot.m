@@ -88,6 +88,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.67  2010/02/24 10:52:36  arno
+% Implemented new single trial statistics
+%
 % Revision 1.66  2010/02/16 08:43:21  arno
 % New single-trial reading/writing
 %
@@ -222,6 +225,8 @@ if nargin < 2
     help std_erpplot;
     return;
 end;
+erpdata = []; alltimes = []; 
+pgroup = []; pcond = []; pinter = [];
 
 % find datatype and default options
 % ---------------------------------
@@ -282,11 +287,12 @@ if strcmpi(datatypestr, 'spec'), datatypestr = 'Spectrum'; end;
 % for backward compatibility
 % --------------------------
 if strcmpi(opt.mode, 'comps'), opt.plotsubjects = 'on'; end;
-if strcmpi(opt.singletrials, 'off') && (strcmpi(opt.condstats, 'on') || strcmpi(opt.groupstats, 'on') || ...
-        (~isempty(opt.subject) || ~isempty(opt.comps)))
-    opt.groupstats = 'off';
-    opt.constats   = 'off'; 
-    disp('No statistics for single subject/component'); 
+if strcmpi(opt.singletrials, 'off') && ((~isempty(opt.subject) || ~isempty(opt.comps)))
+    if strcmpi(opt.condstats, 'on') || strcmpi(opt.groupstats, 'on')
+        opt.groupstats = 'off';
+        opt.condstats   = 'off'; 
+        disp('No statistics for single subject/component'); 
+    end;
 end;
 plotcurveopt = { ...
    'ylim',           opt.ylim, ...
@@ -337,7 +343,7 @@ if ~isempty(opt.channels)
     locs = locs(std_chaninds(STUDY, opt.channels));
     alltitles = std_figtitle('threshold', opt.threshold, 'mcorrect', opt.mcorrect, 'condstat', opt.condstats, 'cond2stat', opt.groupstats, ...
                              'statistics', opt.statistics, 'condnames', STUDY.condition, 'plotsubjects', opt.plotsubjects, 'cond2names', STUDY.group, 'chanlabels', { locs.labels }, ...
-                             'subject', opt.subject, 'valsunit', 'ms', 'vals', opt.topotime, 'datatype', datatypestr, 'cond2group', opt.plotgroups, 'condgroup', opt.plotconditions);
+                             'subject', opt.subject, 'valsunit', opt.unitx, 'vals', opt.topotime, 'datatype', datatypestr, 'cond2group', opt.plotgroups, 'condgroup', opt.plotconditions);
     
     if ~isempty(opt.topotime) & all(~isnan(opt.topotime))
         std_chantopo(erpdata, 'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, 'caxis', opt.caxis, ...
