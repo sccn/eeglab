@@ -19,6 +19,9 @@ function [inside] = inside_vol(pos, vol)
 % Copyright (C) 2003-2007, Robert Oostenveld
 %
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2009/07/07 02:24:08  arno
+% Adding files to repository
+%
 % Revision 1.5  2009/02/05 10:20:35  roboos
 % added bemcp as volume type
 %
@@ -135,4 +138,5 @@ switch voltype(vol)
 end
 
 % ensure that these are column vectors
+inside(isnan(inside)) = 0; % nans are considered outside 
 inside  = logical(inside(:));
