@@ -41,7 +41,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Id: pop_loadbv.m,v 1.3 2010-02-23 21:32:07 roy Exp $
+% $Id: pop_loadbv.m,v 1.4 2010-03-03 22:07:09 roy Exp $
 
 function [EEG, com] = pop_loadbv(path, hdrfile, srange, chans)
 
@@ -238,9 +238,25 @@ else % ASCII data
             end;
         end;
     elseif strcmpi(lower(hdr.commoninfos.dataorientation), 'multiplexed')
-        fclose(IN);
-        error('ASCII multiplexed reading not implemeted yet; export as a different format');
+%         fclose(IN);
+%         error('ASCII multiplexed reading not implemeted yet; export as a different format');
+        if EEG.nbchan == hdr.commoninfos.numberofchannels % Read all channels
+            tmpchan= fgetl(IN);
+            count = 1;
+            while ~feof(IN)
+                tmpstr = fgetl(IN);
+                temp_ind = tmpstr==',';
+                tmpstr(temp_ind) = '.';
+                tmpdata = strread(tmpstr);
+                EEG.data(:,count) = tmpdata';
+                count = count + 1;
+            end;
+            EEG.pnts = count - 1;
+        else
+            
+        end;
     end;
+    
 end;
 
 fclose(IN);
