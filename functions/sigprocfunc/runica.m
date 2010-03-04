@@ -104,6 +104,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.36  2009/07/02 23:27:25  arno
+% better interupt buttin
+%
 % Revision 1.35  2007/08/17 05:57:07  scott
 % corrected meanvar normalization as per R Ramirez
 %
@@ -866,7 +869,7 @@ if extended & extblocks < 0,
     end; icaprintf(verb,fid,'\n');
 end
 signs = diag(signs); % make a diagonal matrix
-oldsigns = zeros(size(signs));;
+oldsigns = zeros(size(signs));
 signcount = 0;              % counter for same-signs
 signcounts = [];
 urextblocks = extblocks;    % original value, for resets

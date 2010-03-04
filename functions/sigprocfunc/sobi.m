@@ -122,6 +122,7 @@ X(:,:)=Q*X(:,:);
 epsil=1/sqrt(N)/100; 
 encore=1; 
 V=eye(m);
+step_n=0;
 while encore, 
  encore=0;
  for p=1:m-1,
@@ -154,6 +155,8 @@ while encore,
    end%% if
   end%% q loop
  end%% p loop
+ step_n=step_n+1;
+fprintf('%d step\n',step_n);
 end%% while
 
 %
