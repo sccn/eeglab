@@ -91,6 +91,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2010/02/24 10:52:36  arno
+% Implemented new single trial statistics
+%
 % Revision 1.17  2009/11/11 00:28:53  arno
 % New GUI format
 %
@@ -214,7 +217,6 @@ end;
 % ---------------------------------------------------------------------------------
 if ~isequal(STUDY.etc.erspparams.timerange, TMPSTUDY.etc.erspparams.timerange) | ... 
     ~isequal(STUDY.etc.erspparams.freqrange, TMPSTUDY.etc.erspparams.freqrange) | ... 
-    ~isequal(STUDY.etc.erspparams.statmode, TMPSTUDY.etc.erspparams.statmode) | ...
     ~isequal(STUDY.etc.erspparams.subbaseline, TMPSTUDY.etc.erspparams.subbaseline)
     if isfield(STUDY.cluster, 'erspdata')
         for index = 1:length(STUDY.cluster)
