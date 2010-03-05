@@ -94,6 +94,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.78  2010/02/24 10:52:36  arno
+% Implemented new single trial statistics
+%
 % Revision 1.77  2010/02/16 08:43:21  arno
 % New single-trial reading/writing
 %
@@ -261,7 +264,7 @@ STUDY = pop_erspparams(STUDY, 'default');
 [ opt moreparams ] = finputcheck( varargin, { ...
                                'topotime'    'real'    [] STUDY.etc.erspparams.topotime;
                                'topofreq'    'real'    [] STUDY.etc.erspparams.topofreq;
-                               'maskdata'    'string'  [] STUDY.etc.erspparams.maskdata;
+                               'maskdata'    'string'  [] 'off';
                                'timerange'   'real'    [] STUDY.etc.erspparams.timerange;
                                'freqrange'   'real'    [] STUDY.etc.erspparams.freqrange;
                                'ersplim'     'real'    [] STUDY.etc.erspparams.ersplim;
@@ -272,7 +275,7 @@ STUDY = pop_erspparams(STUDY, 'default');
                                'groupstats'  'string'  [] STUDY.etc.erspparams.groupstats;
                                'condstats'   'string'  [] STUDY.etc.erspparams.condstats;
                                'subbaseline' 'string'  [] STUDY.etc.erspparams.subbaseline;
-                               'statmode'    'string'  [] STUDY.etc.erspparams.statmode;
+                               'statmode'    'string'  [] ''; % deprecated
                                'threshold'   'real'    [] STUDY.etc.erspparams.threshold;
                                'naccu'       'integer' [] STUDY.etc.erspparams.naccu;
                                'mcorrect'    'string'  [] STUDY.etc.erspparams.mcorrect;
