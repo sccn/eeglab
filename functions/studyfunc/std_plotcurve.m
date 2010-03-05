@@ -61,6 +61,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.28  2010/02/24 10:52:36  arno
+% Implemented new single trial statistics
+%
 % Revision 1.27  2010/02/16 08:43:21  arno
 % New single-trial reading/writing
 %
@@ -305,6 +308,7 @@ if ~isempty(opt.interstats), pinter = opt.interstats{3}; end;
 if ~isnan(opt.threshold) & ( ~isempty(opt.groupstats) | ~isempty(opt.condstats) )    
     pcondplot  = opt.condstats;
     pgroupplot = opt.groupstats;
+    pinterplot = pinter;
     maxplot = 1;
 else
     warning off;

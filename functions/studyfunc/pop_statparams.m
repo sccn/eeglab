@@ -69,6 +69,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2010/02/24 15:18:38  claire
+% fix singletrials
+%
 % Revision 1.1  2010/02/24 10:52:36  arno
 % Implemented new single trial statistics
 %
@@ -128,6 +131,7 @@ if res.groupstats,   res.groupstats   = 'on';  else res.groupstats = 'off';  end
 if res.condstats ,   res.condstats    = 'on';  else res.condstats  = 'off';  end;
 if res.mcorrect,     res.mcorrect     = 'fdr'; else res.mcorrect   = 'none'; end;
 if res.singletrials, res.singletrials = 'on';  else res.singletrials   = 'off';  end;
+res.threshold = str2num(res.threshold);
 if isempty(res.threshold),res.threshold = NaN; end;
 if res.statistics == 1, res.statistics  = 'param'; 
 elseif res.statistics == 2, res.statistics  = 'perm'; 
@@ -141,9 +145,9 @@ if ~strcmpi( res.condstats ,   paramstruct.condstats ),    options = { options{:
 if ~strcmpi( res.singletrials, paramstruct.singletrials ), options = { options{:} 'singletrials'  res.singletrials }; end;
 if ~strcmpi( res.statistics,   paramstruct.statistics ),   options = { options{:} 'statistics' res.statistics }; end;
 if ~strcmpi( res.mcorrect,     paramstruct.mcorrect),      options = { options{:} 'mcorrect' res.mcorrect }; end;
-if (isnan(res.threshold) & ~isnan(paramstruct.threshold)) | ...
-        (~isnan(res.threshold) & isnan(paramstruct.threshold)) | ...
-            (~isnan(res.threshold) & res.threshold ~= paramstruct.threshold)
+if (~isempty(res.threshold) && isnan(res.threshold(1)) && ~isnan(paramstruct.threshold(1))) || ...
+        (~isempty(res.threshold) && ~isnan(res.threshold(1)) && isnan(paramstruct.threshold(1))) || ...
+            (~isempty(res.threshold) && ~isnan(res.threshold(1)) && ~isequal(res.threshold, paramstruct.threshold))
             options = { options{:} 'threshold' res.threshold }; 
 end;
 

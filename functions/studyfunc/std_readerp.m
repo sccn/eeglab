@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2010/02/16 08:43:21  arno
+% New single-trial reading/writing
+%
 % Revision 1.17  2006/09/12 18:55:46  arno
 % channel compatibility
 %
@@ -167,6 +170,15 @@ for ind = 1:length(finalinds)
     end;
     
     if ~dataread
+        % check file consistency
+        % ----------------------
+        if ~isempty(opt.channels) 
+            if ~checkchanconsist( ALLEEG, STUDY.changrp(finalinds(ind)), setinds{tmpind}, allinds{tmpind})
+                errordlg2('Error: channel structure not consistent with data files');
+                STUDY.changrp = std_changroup(STUDY, ALLEEG, [], 'interp');
+            end;
+        end;
+        
         % reserve arrays
         % --------------
         alldata  = cell( max(length(STUDY.condition),1), max(length(STUDY.group),1) );
@@ -390,7 +402,7 @@ end;
 %
 % Authors: Arnaud Delorme, SCCN, INC, UCSD, February, 2005
 
-function [X, t, singletrialdatapresent] = std_readerpsub(ALLEEG, abset, comp, timerange, singletrial)
+function [X, t, singletrialdatapresent, chanlab] = std_readerpsub(ALLEEG, abset, comp, timerange, singletrial)
 
 if nargin < 4
     timerange = [];
@@ -400,6 +412,7 @@ if nargin < 5
 end;
 
 X = [];
+chanlab = {};
 if length(abset) < length(comp)
     abset = ones(1,length(comp))*abset;
 end;
@@ -441,7 +454,9 @@ for k = 1:length(abset)
     end;
 
     try,
-        erpstruct = load( '-mat', filename, [ prefix int2str(inds(k)) ], 'times' );
+        warning('off', 'MATLAB:load:variableNotFound');
+        erpstruct = load( '-mat', filename, [ prefix int2str(inds(k)) ], 'times', 'labels' );
+        warning('on', 'MATLAB:load:variableNotFound');
     catch
         error( [ 'Cannot read file ''' filename '''' ]);
     end;
@@ -467,6 +482,7 @@ for k = 1:length(abset)
         end;
     end;
     t = getfield(erpstruct, 'times');
+    if isfield(erpstruct, 'labels'), chanlab{k} = erpstruct.labels{k}; end;
 end;
 
 % select time range of interest

@@ -62,6 +62,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2010/02/09 06:07:27  arno
+% Fixed new title problem and implemented 3-level significance
+%
 % Revision 1.19  2010/02/06 05:47:52  arno
 % New titles for figures
 %
@@ -296,6 +299,7 @@ if ~isempty(opt.interstats), pinter = opt.interstats{3}; end;
 if ~isnan(opt.threshold) & ( ~isempty(opt.groupstats) | ~isempty(opt.condstats) )    
     pcondplot  = opt.condstats;
     pgroupplot = opt.groupstats;
+    pinterplot = pinter;
     maxplot = 1;
 else
     warning off;

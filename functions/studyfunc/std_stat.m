@@ -55,6 +55,9 @@
 %                  of 'trials' statistics requires a lot of RAM.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.10  2010/02/09 06:07:27  arno
+% Fixed new title problem and implemented 3-level significance
+%
 % Revision 1.9  2010/01/28 20:46:01  arno
 % fixed computing FDR for Anova interactions
 %
@@ -159,7 +162,7 @@ if ~isempty(opt.groupstats) || ~isempty(opt.condstats)
     if ~isnan(opt.threshold)
         for ind = 1:length(pcond),  pcond{ind}  = applythreshold(pcond{ind},  opt.threshold); end;
         for ind = 1:length(pgroup), pgroup{ind} = applythreshold(pgroup{ind}, opt.threshold); end;
-        if ~isempty(pinter), pinter = applythreshold(pinter, opt.threshold); end;
+        for ind = 1:length(pinter), pinter{ind} = applythreshold(pinter{ind}, opt.threshold); end;
     end;
 end;
 
