@@ -46,6 +46,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2010/02/24 10:52:36  arno
+% Implemented new single trial statistics
+%
 % Revision 1.12  2010/02/09 06:07:27  arno
 % Fixed new title problem and implemented 3-level significance
 %
@@ -220,6 +223,7 @@ end;
 figure('color', 'w');
 pos = get(gcf, 'position');
 basewinsize = 200/max(nc,ng)*3;
+pos(2) = pos(2)-200*(ng+addc)+pos(3);
 pos(3) = 200*(ng+addc);
 pos(4) = 200*(nc+addr);
 if strcmpi(opt.transpose, 'on'), set(gcf, 'position', [ pos(1) pos(2) pos(4) pos(3)]);
