@@ -46,6 +46,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.15  2010/03/05 01:25:19  arno
+% Fix threshold and interstat plotting
+%
 % Revision 1.14  2010/03/05 01:08:29  arno
 % figure geometry
 %
@@ -227,7 +230,7 @@ end;
 figure('color', 'w');
 pos = get(gcf, 'position');
 basewinsize = 200/max(nc,ng)*3;
-pos(2) = pos(2)-200*(ng+addc)+pos(3);
+pos(2) = pos(2)-200*(nc+addr)+pos(4);
 pos(3) = 200*(ng+addc);
 pos(4) = 200*(nc+addr);
 if strcmpi(opt.transpose, 'on'), set(gcf, 'position', [ pos(1) pos(2) pos(4) pos(3)]);
