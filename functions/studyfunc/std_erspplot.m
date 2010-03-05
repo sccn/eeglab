@@ -94,6 +94,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.79  2010/03/05 00:18:07  arno
+% Fix optional parameters
+%
 % Revision 1.78  2010/02/24 10:52:36  arno
 % Implemented new single trial statistics
 %
@@ -269,7 +272,6 @@ STUDY = pop_erspparams(STUDY, 'default');
                                'freqrange'   'real'    [] STUDY.etc.erspparams.freqrange;
                                'ersplim'     'real'    [] STUDY.etc.erspparams.ersplim;
                                'caxis'       'real'    [] STUDY.etc.erspparams.ersplim;
-                               'paclim'      'real'    [] [];
                                'itclim'      'real'    [] STUDY.etc.erspparams.itclim;
                                'statistics'  'string'  [] STUDY.etc.erspparams.statistics;
                                'groupstats'  'string'  [] STUDY.etc.erspparams.groupstats;
@@ -296,8 +298,6 @@ if isempty(opt.caxis),
          opt.caxis = opt.ersplim;
     elseif strcmpi(opt.datatype, 'itc')
         opt.caxis = [-opt.itclim opt.itclim];
-    else
-        opt.caxis = opt.paclim;
     end;
 end;
 
@@ -307,11 +307,12 @@ if isempty(opt.plottf) & ~isempty(opt.topofreq) & ~isempty(opt.topotime) & ~isna
      opt.plottf = [ opt.topofreq(1) opt.topofreq(end) opt.topotime(1) opt.topotime(end) ];
 end;
 if strcmpi(opt.mode, 'comps'), opt.plotsubjects = 'on'; end;
-if strcmpi(opt.condstats, 'on') || strcmpi(opt.groupstats, 'on') || ...
-        (~isempty(opt.subject) || ~isempty(opt.comps)) && strcmpi(opt.singletrials, 'off'), 
-    opt.groupstats = 'off';
-    opt.constats   = 'off'; 
-    disp('No statistics for single subject/component'); 
+if strcmpi(opt.singletrials, 'off') && ((~isempty(opt.subject) || ~isempty(opt.comps)))
+    if strcmpi(opt.condstats, 'on') || strcmpi(opt.groupstats, 'on')
+        opt.groupstats = 'off';
+        opt.condstats   = 'off'; 
+        disp('No statistics for single subject/component'); 
+    end;
 end;
 
 if length(opt.comps) == 1
