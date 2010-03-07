@@ -46,6 +46,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.16  2010/03/05 01:31:18  arno
+% geometry
+%
 % Revision 1.15  2010/03/05 01:25:19  arno
 % Fix threshold and interstat plotting
 %
@@ -188,11 +191,12 @@ opt = finputcheck( varargin, { 'ylim'        'real'   []              [];
                                'condstats'   'cell'   []              {};
                                'interstats'  'cell'   []              {};
                                'topoplotopt' 'cell'   []              { 'style', 'map', 'shading', 'interp' };
-                               'binarypval'  'string' { 'on' 'off' }  'off';
+                               'binarypval'  'string' { 'on' 'off' }  'on';
                                'datatype'    'string' { 'ersp' 'itc' 'erp' 'spec' }    'erp';
                                'caxis'       'real'   []              [] }, 'std_chantopo', 'ignore'); %, 'ignore');
 if isstr(opt), error(opt); end;
 if ~isempty(opt.ylim), opt.caxis = opt.ylim; end;
+if isnan(opt.threshold), opt.binarypval = 'off'; end;
 if strcmpi(opt.binarypval, 'on'), opt.ptopoopt = { 'style' 'blank' }; else opt.ptopoopt = opt.topoplotopt; end;
 if isempty(opt.titles), opt.titles = cell(10,10); opt.titles(:) = { '' }; end;
 
@@ -281,7 +285,7 @@ end;
 for g = 1:ng
     % statistics accross conditions
     % -----------------------------
-    if ~isempty(opt.condstats) & nc > 1
+    if ~isempty(opt.condstats) && nc > 1
         hdl(nc+1,g) = mysubplot(nc+addr, ng+addc, g + c*(ng+addc), opt.transpose);
         topoplot( pcondplot{g}, opt.chanlocs, opt.ptopoopt{:});
         title(opt.titles{nc+1,g}); 
@@ -291,7 +295,7 @@ end;
 
 % statistics accross group and conditions
 % ---------------------------------------
-if ~isempty(opt.condstats) & ~isempty(opt.groupstats) & ng > 1 & nc > 1
+if ~isempty(opt.condstats) && ~isempty(opt.groupstats) && ng > 1 && nc > 1
     hdl(nc+1,ng+1) = mysubplot(nc+addr, ng+addc, g + 1 + c*(ng+addr), opt.transpose);
     topoplot( pinterplot, opt.chanlocs, opt.ptopoopt{:});
     title(opt.titles{nc+1,ng+1}); 
@@ -302,7 +306,7 @@ end;
 % ----------
 axes(hdl(nc,ng)); 
 cbar_standard(opt.datatype, ng);
-if nc ~= size(hdl,1) | ng ~= size(hdl,2)
+if isnan(opt.threshold) && (nc ~= size(hdl,1) || ng ~= size(hdl,2))
     axes(hdl(end,end));
     cbar_signif(ng, maxplot);
 end;
@@ -311,8 +315,8 @@ end;
 % ------------------
 for c = 1:size(hdl,1)
     for g = 1:size(hdl,2)
-        if g ~= 1 & size(hdl,2) ~=1, ylabel(''); end;
-        if c ~= size(hdl,1) & size(hdl,1) ~= 1, xlabel(''); end;
+        if g ~= 1 && size(hdl,2) ~=1, ylabel(''); end;
+        if c ~= size(hdl,1) && size(hdl,1) ~= 1, xlabel(''); end;
     end;
 end;
 
