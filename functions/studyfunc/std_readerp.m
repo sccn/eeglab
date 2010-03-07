@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2010/03/05 01:25:19  arno
+% Fix threshold and interstat plotting
+%
 % Revision 1.18  2010/02/16 08:43:21  arno
 % New single-trial reading/writing
 %
@@ -169,16 +172,7 @@ for ind = 1:length(finalinds)
         end;
     end;
     
-    if ~dataread
-        % check file consistency
-        % ----------------------
-        if ~isempty(opt.channels) 
-            if ~checkchanconsist( ALLEEG, STUDY.changrp(finalinds(ind)), setinds{tmpind}, allinds{tmpind})
-                errordlg2('Error: channel structure not consistent with data files');
-                STUDY.changrp = std_changroup(STUDY, ALLEEG, [], 'interp');
-            end;
-        end;
-        
+    if ~dataread        
         % reserve arrays
         % --------------
         alldata  = cell( max(length(STUDY.condition),1), max(length(STUDY.group),1) );
