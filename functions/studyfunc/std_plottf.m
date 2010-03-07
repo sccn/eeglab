@@ -62,6 +62,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2010/03/05 01:25:19  arno
+% Fix threshold and interstat plotting
+%
 % Revision 1.20  2010/02/09 06:07:27  arno
 % Fixed new title problem and implemented 3-level significance
 %
@@ -289,14 +292,14 @@ end;
 
 % plotting paramters
 % ------------------
-if ng > 1 & ~isempty(opt.groupstats), addc = 1; else addc = 0; end;
-if nc > 1 & ~isempty(opt.condstats  ), addr = 1; else addr = 0; end;
+if ng > 1 && ~isempty(opt.groupstats), addc = 1; else addc = 0; end;
+if nc > 1 && ~isempty(opt.condstats  ), addr = 1; else addr = 0; end;
 
 % compute significance mask
 % --------------------------
 if ~isempty(opt.interstats), pinter = opt.interstats{3}; end;
 
-if ~isnan(opt.threshold) & ( ~isempty(opt.groupstats) | ~isempty(opt.condstats) )    
+if ~isnan(opt.threshold) && ( ~isempty(opt.groupstats) || ~isempty(opt.condstats) )    
     pcondplot  = opt.condstats;
     pgroupplot = opt.groupstats;
     pinterplot = pinter;
@@ -314,8 +317,8 @@ end;
 % masking for significance of not
 % -------------------------------
 statmask = 0;
-if strcmpi(opt.maskdata, 'on') & ~isnan(opt.threshold) & ...
-        (~isempty(opt.condstats) | ~isempty(opt.condstats))
+if strcmpi(opt.maskdata, 'on') && ~isnan(opt.threshold) && ...
+        (~isempty(opt.condstats) || ~isempty(opt.condstats))
     addc = 0; addr = 0; statmask = 1;
 end;
 
@@ -367,7 +370,6 @@ for c = 1:nc
     end;
 end;
 
-
 for g = 1:ng
     % statistics accross conditions
     % -----------------------------
@@ -377,7 +379,7 @@ for g = 1:ng
         caxis([-maxplot maxplot]);
     end;
 end;
-            ylabel('');  % nima
+
 % color scale
 % -----------
 if isempty(opt.caxis)
@@ -394,7 +396,7 @@ end;
 
 % statistics accross group and conditions
 % ---------------------------------------
-if ~isempty(opt.groupstats) & ~isempty(opt.condstats) & ng > 1 & nc > 1
+if ~isempty(opt.groupstats) && ~isempty(opt.condstats) && ng > 1 && nc > 1
     hdl(nc+1,ng+1) = mysubplot(nc+addr, ng+addc, g + 1 + c*(ng+addr), opt.transpose);
     tftopo( pinterplot',  timevals, freqs, 'title', opt.titles{nc+1,ng+1}, options{:});
     caxis([-maxplot maxplot]);
@@ -405,7 +407,7 @@ end;
 % ----------
 axes(hdl(nc,ng)); 
 cbar_standard(opt.datatype, ng); 
-if nc ~= size(hdl,1) | ng ~= size(hdl,2)
+if isnan(opt.threshold) && (nc ~= size(hdl,1) || ng ~= size(hdl,2))
     axes(hdl(end,end));
     cbar_signif(ng, maxplot);
 end;
