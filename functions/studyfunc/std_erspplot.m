@@ -94,6 +94,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.80  2010/03/05 00:39:19  arno
+% Fixed statistic for groups
+%
 % Revision 1.79  2010/03/05 00:18:07  arno
 % Fix optional parameters
 %
@@ -352,11 +355,18 @@ if ~isempty(opt.channels)
             allersp{index} = reshape(allersp{index}, [1 size(allersp{index},3) size(allersp{index},4) ]);
         end;
         opt.plottf = { opt.plottf(1:2) opt.plottf(3:4) };
+        [pcond pgroup pinter] = std_stat(allersp, 'groupstats', opt.groupstats, 'condstats', opt.condstats, ...
+                                                  'statistics', opt.statistics, 'naccu', opt.naccu, 'threshold', opt.threshold, 'mcorrect', opt.mcorrect);
+        if (~isempty(pcond ) && length(pcond{1}) == 1) || (~isempty(pgroup) && length(pgroup{1}) == 1), pcond = {}; pgroup = {}; pinter = {}; end;
+    else
+        [pcond pgroup pinter] = std_stat(allersp, 'groupstats', opt.groupstats, 'condstats', opt.condstats, ...
+                                                  'statistics', opt.statistics, 'naccu', opt.naccu, 'threshold', opt.threshold, 'mcorrect', opt.mcorrect);
+        if (~isempty(pcond ) && (size( pcond{1},1) == 1 || size( pcond{1},2) == 1)) || ...
+           (~isempty(pgroup) && (size(pgroup{1},1) == 1 || size(pgroup{1},2) == 1)), 
+            pcond = {}; pgroup = {}; pinter = {}; 
+            disp('No statistics possible for single subject STUDY');
+        end; % single subject STUDY                                
     end
-    
-    [pcond pgroup pinter] = std_stat(allersp, 'groupstats', opt.groupstats, 'condstats', opt.condstats, ...
-                                         'statistics', opt.statistics, 'naccu', opt.naccu, 'threshold', opt.threshold, 'mcorrect', opt.mcorrect);
-    if (~isempty(pcond) && length(pcond{1}) == 1) || (~isempty(pgroup) && length(pgroup) == 1), pcond = {}; pgroup = {}; pinter = {}; end; % single subject STUDY                                
     
     % plot specific component
     % -----------------------
