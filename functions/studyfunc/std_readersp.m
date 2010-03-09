@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.37  2010/02/24 10:52:37  arno
+% Implemented new single trial statistics
+%
 % Revision 1.36  2010/02/16 08:43:21  arno
 % New single-trial reading/writing
 %
@@ -211,14 +214,20 @@ for ind = 1:length(finalinds)
     eqtfb = eqtf && isequal( STUDY.etc.erspparams.subbaseline, opt.subbaseline);
     if strcmpi(opt.singletrials,'off')
         if isfield(tmpstruct, [ dtype 'data']) && eqtfb && ~isempty(getfield(tmpstruct, [ dtype 'data']))
-            dataread = 1;
+            if size(getfield(tmpstruct, [ dtype 'data']),1) == length(opt.timerange) && ...
+                size(getfield(tmpstruct, [ dtype 'data']),2) == length(opt.freqrange)
+                    dataread = 1;
+            end;
         end;
     else
         if isfield(tmpstruct, [ dtype 'datatrials']) && eqtf && ~isempty(getfield(tmpstruct, [ dtype 'datatrials']))
-            if ~isempty(opt.channels) && strcmpi(getfield(tmpstruct, [ dtype 'trialinfo' ]), opt.subject)
-                dataread = 1; 
-            elseif isequal(getfield(tmpstruct, [ dtype 'trialinfo' ]), opt.component) 
-                dataread = 1; 
+            if size(getfield(tmpstruct, [ dtype 'datatrials']),1) == length(opt.timerange) && ...
+                size(getfield(tmpstruct, [ dtype 'datatrials']),2) == length(opt.freqrange)
+                if ~isempty(opt.channels) && strcmpi(getfield(tmpstruct, [ dtype 'trialinfo' ]), opt.subject)
+                    dataread = 1; 
+                elseif isempty(opt.channels) && isequal(getfield(tmpstruct, [ dtype 'trialinfo' ]), opt.component) 
+                    dataread = 1; 
+                end;
             end;
         end;
     end;
@@ -312,15 +321,17 @@ for ind = 1:length(finalinds)
             precomp.recompute = dtype;
             for c = 1:nc
                 for g = 1:ng
-                    precomp.tfdata = permute(ersp{c,g}, [2 1 3]);                    
-                    if strcmpi(dtype, 'itc')
-                        [tmp ersp{c,g}] = newtimef(zeros(ALLEEG(1).pnts,2), ALLEEG(1).pnts, [ALLEEG(1).xmin ALLEEG(1).xmax]*1000, ...
-                            ALLEEG(1).srate, tmpparams{:}, 'precomputed', precomp, 'verbose', 'off');
-                    elseif strcmpi(dtype, 'ersp')
-                        ersp{c,g} = newtimef(zeros(ALLEEG(1).pnts,2), ALLEEG(1).pnts, [ALLEEG(1).xmin ALLEEG(1).xmax]*1000, ...
-                            ALLEEG(1).srate, tmpparams{:}, 'precomputed', precomp, 'verbose', 'off');
+                    if ~isempty(ersp{c,g})
+                        precomp.tfdata = permute(ersp{c,g}, [2 1 3]);   
+                        if strcmpi(dtype, 'itc')
+                            [tmp ersp{c,g}] = newtimef(zeros(ALLEEG(1).pnts,2), ALLEEG(1).pnts, [ALLEEG(1).xmin ALLEEG(1).xmax]*1000, ...
+                                ALLEEG(1).srate, tmpparams{:}, 'precomputed', precomp, 'verbose', 'off');
+                        elseif strcmpi(dtype, 'ersp')
+                            ersp{c,g} = newtimef(zeros(ALLEEG(1).pnts,2), ALLEEG(1).pnts, [ALLEEG(1).xmin ALLEEG(1).xmax]*1000, ...
+                                ALLEEG(1).srate, tmpparams{:}, 'precomputed', precomp, 'verbose', 'off');
+                        end;
+                        ersp{c,g} = permute(ersp{c,g}, [2 1 3]);
                     end;
-                    ersp{c,g} = permute(ersp{c,g}, [2 1 3]);
                 end;
             end;
         end;
@@ -502,6 +513,9 @@ end;
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.37  2010/02/24 10:52:37  arno
+% Implemented new single trial statistics
+%
 % Revision 1.36  2010/02/16 08:43:21  arno
 % New single-trial reading/writing
 %
@@ -718,6 +732,9 @@ function cella = removedup(cella)
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.37  2010/02/24 10:52:37  arno
+% Implemented new single trial statistics
+%
 % Revision 1.36  2010/02/16 08:43:21  arno
 % New single-trial reading/writing
 %
