@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2010/03/07 04:03:55  arno
+% Fix extra code
+%
 % Revision 1.19  2010/03/05 01:25:19  arno
 % Fix threshold and interstat plotting
 %
@@ -166,7 +169,7 @@ for ind = 1:length(finalinds)
         if isfield(tmpstruct, [ dtype 'datatrials' ]) && ~isempty(getfield(tmpstruct, [ dtype 'datatrials' ])) && eqtf
             if ~isempty(opt.channels) && strcmpi(getfield(tmpstruct, [ dtype 'trialinfo' ]), opt.subject)
                 dataread = 1; 
-            elseif isequal(getfield(tmpstruct, [ dtype 'trialinfo' ]), opt.component) 
+            elseif isempty(opt.channels) && isequal(getfield(tmpstruct, [ dtype 'trialinfo' ]), opt.component) 
                 dataread = 1; 
             end;
         end;
