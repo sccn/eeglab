@@ -62,6 +62,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2010/03/07 15:24:20  arno
+% Remove colorbar when threshold is set
+%
 % Revision 1.21  2010/03/05 01:25:19  arno
 % Fix threshold and interstat plotting
 %
@@ -236,6 +239,12 @@ opt = finputcheck( varargin, { 'titles'         'cell'   []              cell(20
                                'plotmode'       'string' { 'normal' 'condensed' }  'normal' }, 'std_plottf');
 if isstr(opt), error(opt); end;
 if all(all(cellfun('size', data, 3)==1))               opt.singlesubject = 'on'; end;
+
+% remove empty entries
+datapresent = ~cellfun(@isempty, data);
+for c = size(data,1):-1:1, if sum(datapresent(c,:)) == 0, data(c,:) = []; opt.titles(c,:) = []; if ~isempty(opt.groupstats), opt.groupstats(c) = []; end; end; end;
+for g = size(data,2):-1:1, if sum(datapresent(:,g)) == 0, data(:,g) = []; opt.titles(:,g) = []; if ~isempty(opt.condstats ), opt.condstats( g) = []; end; end; end;
+
 if ~isempty(opt.groupstats) & ~isempty(opt.condstats) & strcmpi(opt.maskdata, 'on')
     disp('Cannot use ''maskdata'' option with both condition stat. and group stat. on');
     disp('Disabling statistics');
@@ -329,13 +338,23 @@ options = { 'chanlocs', opt.chanlocs, 'electrodes', 'off', 'cbar', 'off', ...
             'cmode', 'separate', opt.tftopoopt{:} };
 if strcmpi(opt.freqscale, 'log'), options = { options{:} 'logfreq', 'native' }; end;
 
-figure('color', 'w');
+% adjust figure size
+% ------------------
+fig = figure('color', 'w');
+pos = get(fig, 'position');
+set(fig, 'position', [ pos(1)+15 pos(2)+15 pos(3)/2.5*(nc+addr), pos(4)/2*(ng+addc) ]);
+pos = get(fig, 'position');
+if strcmpi(opt.transpose, 'off'), set(gcf, 'position', [ pos(1) pos(2) pos(4) pos(3)]);
+else                              set(gcf, 'position', pos);
+end;
+
 tmpc = [inf -inf];
 for c = 1:nc
     for g = 1:ng
         hdl(c,g) = mysubplot(nc+addr, ng+addc, g + (c-1)*(ng+addc), opt.transpose);
         if ~isempty(data{c,g})
             tmpplot = mean(data{c,g},3);
+            if ~isreal(tmpplot(1)), tmpplot = abs(tmpplot); end;
             if statmask, 
                 if ~isempty(opt.condstats), tmpplot(find(pcondplot{g}(:) == 0)) = 0;
                 else                        tmpplot(find(pgroupplot{c}(:) == 0)) = 0;
@@ -344,7 +363,7 @@ for c = 1:nc
 
             tftopo( tmpplot', timevals, freqs, 'title', opt.titles{c,g}, options{:}); 
                 
-            if isempty(opt.caxis) & ~isempty(tmpc)
+            if isempty(opt.caxis) && ~isempty(tmpc)
                 warning off;
                 tmpc = [ min(min(tmpplot(:)), tmpc(1)) max(max(tmpplot(:)), tmpc(2)) ];
                 warning on;
@@ -361,19 +380,18 @@ for c = 1:nc
     
         % statistics accross groups
         % -------------------------
-        if g == ng & ng > 1 & ~isempty(opt.groupstats) & ~statmask
+        if g == ng && ng > 1 && ~isempty(opt.groupstats) && ~isinf(pgroupplot{c}(1)) && ~statmask
             hdl(c,g+1) = mysubplot(nc+addr, ng+addc, g + 1 + (c-1)*(ng+addc), opt.transpose);
             tftopo( pgroupplot{c}', timevals, freqs, 'title', opt.titles{c,g+1}, options{:});
             caxis([-maxplot maxplot]);
         end;
-
     end;
 end;
 
 for g = 1:ng
     % statistics accross conditions
     % -----------------------------
-    if ~isempty(opt.condstats) & ~statmask & nc > 1
+    if ~isempty(opt.condstats) && ~isinf(pcondplot{g}(1)) && ~statmask && nc > 1
         hdl(nc+1,g) = mysubplot(nc+addr, ng+addc, g + c*(ng+addc), opt.transpose);
         tftopo( pcondplot{g}', timevals, freqs, 'title', opt.titles{nc+1,g}, options{:});
         caxis([-maxplot maxplot]);
@@ -408,7 +426,8 @@ end;
 axes(hdl(nc,ng)); 
 cbar_standard(opt.datatype, ng); 
 if isnan(opt.threshold) && (nc ~= size(hdl,1) || ng ~= size(hdl,2))
-    axes(hdl(end,end));
+    ind = find(hdl(end:-1:1));
+    axes(hdl(end-ind(1)+1));
     cbar_signif(ng, maxplot);
 end;
 

@@ -46,6 +46,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2010/03/07 15:23:01  arno
+% Default binarypval and coorbar when threshold is set
+%
 % Revision 1.16  2010/03/05 01:31:18  arno
 % geometry
 %
@@ -198,7 +201,11 @@ if isstr(opt), error(opt); end;
 if ~isempty(opt.ylim), opt.caxis = opt.ylim; end;
 if isnan(opt.threshold), opt.binarypval = 'off'; end;
 if strcmpi(opt.binarypval, 'on'), opt.ptopoopt = { 'style' 'blank' }; else opt.ptopoopt = opt.topoplotopt; end;
-if isempty(opt.titles), opt.titles = cell(10,10); opt.titles(:) = { '' }; end;
+
+% remove empty entries
+datapresent = ~cellfun(@isempty, data);
+for c = size(data,1):-1:1, if sum(datapresent(c,:)) == 0, data(c,:) = []; opt.titles(c,:) = []; if ~isempty(opt.groupstats), opt.groupstats(c) = []; end; end; end;
+for g = size(data,2):-1:1, if sum(datapresent(:,g)) == 0, data(:,g) = []; opt.titles(:,g) = []; if ~isempty(opt.condstats ), opt.condstats( g) = []; end; end; end;
 
 nc = size(data,1);
 ng = size(data,2);
@@ -215,7 +222,7 @@ if nc > 1 & ~isempty(opt.condstats ), addr = 1; else addr = 0; end;
 % -------------------------
 if ~isempty(opt.interstats), pinter = opt.interstats{3}; end;
 
-if ~isnan(opt.threshold) && ( ~isempty(opt.groupstats) || ~isempty(opt.condstats) )    
+if ~isnan(opt.threshold(1)) && ( ~isempty(opt.groupstats) || ~isempty(opt.condstats) )    
     pcondplot  = opt.condstats;
     pgroupplot = opt.groupstats;
     pinterplot = pinter;
@@ -231,14 +238,12 @@ end;
 
 % adjust figure size
 % ------------------
-figure('color', 'w');
-pos = get(gcf, 'position');
-basewinsize = 200/max(nc,ng)*3;
-pos(2) = pos(2)-200*(nc+addr)+pos(4);
-pos(3) = 200*(ng+addc);
-pos(4) = 200*(nc+addr);
-if strcmpi(opt.transpose, 'on'), set(gcf, 'position', [ pos(1) pos(2) pos(4) pos(3)]);
-else                             set(gcf, 'position', pos);
+fig = figure('color', 'w');
+pos = get(fig, 'position');
+set(fig, 'position', [ pos(1)+15 pos(2)+15 pos(3)/2.5*(nc+addr), pos(4)/2*(ng+addc) ]);
+pos = get(fig, 'position');
+if strcmpi(opt.transpose, 'off'), set(gcf, 'position', [ pos(1) pos(2) pos(4) pos(3)]);
+else                              set(gcf, 'position', pos);
 end;
 
 % topoplot
@@ -306,7 +311,7 @@ end;
 % ----------
 axes(hdl(nc,ng)); 
 cbar_standard(opt.datatype, ng);
-if isnan(opt.threshold) && (nc ~= size(hdl,1) || ng ~= size(hdl,2))
+if isnan(opt.threshold(1)) && (nc ~= size(hdl,1) || ng ~= size(hdl,2))
     axes(hdl(end,end));
     cbar_signif(ng, maxplot);
 end;
