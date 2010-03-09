@@ -55,6 +55,9 @@
 %                  of 'trials' statistics requires a lot of RAM.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.11  2010/03/05 01:25:19  arno
+% Fix threshold and interstat plotting
+%
 % Revision 1.10  2010/02/09 06:07:27  arno
 % Fixed new title problem and implemented 3-level significance
 %
@@ -85,9 +88,9 @@
 
 function [pcond, pgroup, pinter] = std_stat(data, varargin)
 
-pgroup = [];
-pcond  = [];
-pinter = [];
+pgroup = {};
+pcond  = {};
+pinter = {};
 if nargin < 1
     help std_stat;
     return;
@@ -118,6 +121,10 @@ if ~isnan(opt.threshold) & isempty(opt.naccu), opt.naccu = 1/opt.threshold(end)*
 if any(any(cellfun('size', data, 2)==1)), opt.groupstats = 'off'; opt.condstats = 'off'; end;
 if strcmpi(opt.mcorrect, 'fdr'), opt.naccu = opt.naccu*20; end;
 if isempty(opt.naccu), opt.naccu = 2000; end;
+if strcmpi(opt.statistics, 'param') && ~isreal(data{1})
+    fprintf('*** Cannot use parametric statistics for single-trial ITC significance ***\n');
+    return;
+end;
 nc = size(data,1);
 ng = size(data,2);
 
