@@ -38,6 +38,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2010/01/28 20:43:16  arno
+% revert back to version prior to Jan 19
+%
 % Revision 1.3  2010/01/19 20:58:20  arno
 % fix problem with very discontinous values
 %
@@ -50,6 +53,7 @@
 
 function [pID, p_masked] = fdr(pvals, q);
 
+if isempty(pvals), pID = []; return; end;
 p = sort(pvals(:));
 V = length(p);
 I = (1:V)';
