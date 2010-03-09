@@ -61,6 +61,9 @@
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
 % $Log: not supported by cvs2svn $
+% Revision 1.29  2010/03/05 01:25:19  arno
+% Fix threshold and interstat plotting
+%
 % Revision 1.28  2010/02/24 10:52:36  arno
 % Implemented new single trial statistics
 %
@@ -259,6 +262,11 @@ if strcmpi(opt.plotsubjects, 'on')
     opt.plotconditions  = 'apart';
 end;
 if isempty(opt.titles), opt.titles = cell(10,10); opt.titles(:) = { '' }; end;
+
+% remove empty entries
+datapresent = ~cellfun(@isempty, data);
+for c = size(data,1):-1:1, if sum(datapresent(c,:)) == 0, data(c,:) = []; opt.titles(c,:) = []; if ~isempty(opt.groupstats), opt.groupstats(c) = []; end; end; end;
+for g = size(data,2):-1:1, if sum(datapresent(:,g)) == 0, data(:,g) = []; opt.titles(:,g) = []; if ~isempty(opt.condstats ), opt.condstats( g) = []; end; end; end;
 
 % if not the same number of subjects
 % ----------------------------------
