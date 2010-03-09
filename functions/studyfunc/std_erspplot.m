@@ -94,6 +94,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.81  2010/03/07 15:23:33  arno
+% Fix single subject study problem
+%
 % Revision 1.80  2010/03/05 00:39:19  arno
 % Fixed statistic for groups
 %
@@ -384,7 +387,7 @@ if ~isempty(opt.channels)
             if length(opt.channels) > 1 & ~strcmpi(opt.plotmode, 'none'), figure; opt.plotmode = 'condensed'; end;
             nc = ceil(sqrt(length(opt.channels)));
             nr = ceil(length(opt.channels)/nc);
-            for index = 1:max(cellfun(@(x)(size(x,3)), allersp))
+            for index = 1:max(cellfun(@(x)(size(x,3)), allersp(:)))
                 if length(opt.channels) > 1, try, subplot(nr,nc,index, 'align'); catch, subplot(nr,nc,index); end; end;
                 tmpersp = cell(size(allersp));
                 for ind = 1:length(allersp(:))
