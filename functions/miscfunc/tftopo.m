@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.92  2009/09/28 20:09:58  arno
+% decrease density of ordinate labels for native frequency plot
+%
 % Revision 1.91  2008/09/24 17:53:59  nima
 % added 'timeunit' option, allow time and freq. range for timefreqs input (Arno)
 %
@@ -681,6 +684,7 @@ else % g.showchan==0 -> image std() of selchans
     end;
 end
 
+if ~isreal(tfave(1)), tfave = abs(tfave); end;
 if strcmpi(g.logfreq, 'on'), 
     logimagesc(times(tftimes),freqs(tffreqs),tfave);
     axis([g.limits(1) g.limits(2) log(g.limits(3)), log(g.limits(4))]);
