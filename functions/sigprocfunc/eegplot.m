@@ -175,6 +175,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.142  2010/02/26 15:53:36  claire
+% Changed default color
+%
 % Revision 1.141  2009/11/12 21:52:00  arno
 % fix event duration menu
 %
@@ -662,7 +665,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
   defdowncom   = 'eegplot(''defdowncom'',   gcbf);'; % push button: create/remove window
   defmotioncom = 'eegplot(''defmotioncom'', gcbf);'; % motion button: move windows or display current position
   defupcom     = 'eegplot(''defupcom'',     gcbf);';
-  defctrldowncom = ''; % CTRL press and motion -> do nothing by default
+  defctrldowncom = 'eegplot(''topoplot'',   gcbf);'; % CTRL press and motion -> do nothing by default
   defctrlmotioncom = ''; % CTRL press and motion -> do nothing by default
   defctrlupcom = ''; % CTRL press and up -> do nothing by default
 		 
@@ -2114,6 +2117,41 @@ else
         
     end;
          
+  % add topoplot
+  % ------------
+  case 'topoplot'
+    fig = varargin{1};
+    g = get(fig,'UserData');
+    if ~isstruct(g.eloc_file) && ~isfield(g.eloc_file, 'theta');
+        return;
+    end;
+    ax1 = findobj('tag','backeeg','parent',fig); 
+    tmppos = get(ax1, 'currentpoint');
+    ax1 = findobj('tag','eegaxis','parent',fig); % axes handle
+    % plot vertical line
+    yl = ylim;
+    plot([ tmppos tmppos ], yl, 'color', [0.8 0.8 0.8]);
+    
+    if g.trialstag ~= -1,
+          lowlim = round(g.time*g.trialstag+1);
+    else, lowlim = round(g.time*g.srate+1);
+    end;
+    data = get(ax1,'UserData');
+    datapos = max(1, round(tmppos(1)+lowlim));
+    datapos = min(datapos, g.frames);
+        
+    figure; topoplot(data(:,datapos), g.eloc_file);
+    if g.trialstag == -1,
+         latsec = (datapos-1)/g.srate;
+         title(sprintf('Latency of %d seconds and %d milliseconds', floor(latsec), round(1000*(latsec-floor(latsec)))));
+    else
+        trial = ceil((datapos-1)/g.trialstag);
+        
+        latintrial = eeg_point2lat(datapos, trial, g.srate, g.limits, 0.001);
+        title(sprintf('Latency of %d ms in trial %d', round(latintrial), trial));
+    end;
+    return;
+    
   % release button: check window consistency, add to trial boundaries
   % -------------------------------------------------------------------
   case 'defupcom'
@@ -2155,7 +2193,7 @@ else
     set(fig,'UserData', g);
     eegplot('drawp', 0);
     if strcmp(g.mocap,'on'), show_mocap_for_eegplot(g.winrej); g.winrej = g.winrej(end,:); end; % nima
-        
+            
   % push button: create/remove window
   % ---------------------------------
   case 'defdowncom'
