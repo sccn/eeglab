@@ -87,6 +87,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.44  2010/02/25 10:00:41  arno
+% fixed saving channel labels
+%
 % Revision 1.43  2010/02/24 15:19:27  claire
 % compute FFT for continuous datasets
 %
@@ -242,10 +245,6 @@ end
 if isempty(g.components)
     g.components = 1:numc;
 end
-if strcmpi(g.savetrials, 'on') && EEG.trials == 1
-    disp('Cannot yet save trials for continuous data');
-    g.savetrials = 'off';
-end;
 
 EEG_etc = [];
 
