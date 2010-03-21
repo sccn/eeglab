@@ -2,9 +2,12 @@
 %
 % Usage:    
 %    >> [cellres textres] = scanfold(foldname);
+%    >> [cellres textres] = scanfold(foldname, ignorelist, maxdepth);
 %
 % Inputs:
-%   foldname  - name of the folder
+%   foldname   - [string] name of the folder
+%   ignorelist - [cell] list of folders to ignore
+%   maxdepth   - [integer] maximum folder depth
 %
 % Outputs:
 %   cellres   - cell array containing all the files
@@ -31,17 +34,23 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2009/08/04 04:44:22  arno
+% All functions necessary for compiling EEGLAB code
+%
 
-function [ cellres, textres ] = scanfold(foldname)
+function [ cellres, textres ] = scanfold(foldname, ignorelist, maxdepth)
 
+if nargin < 2, ignorelist = {}; end;
+if nargin < 3, maxdepth = 100; end;
 foldcontent = dir(foldname);
 textres = '';
 cellres = {};
+if maxdepth == 0, return; end;
 for i = 1:length(foldcontent)
-    if exist(foldcontent(i).name) == 7
+    if exist(foldcontent(i).name) == 7 && ~ismember(foldcontent(i).name, ignorelist)
         if ~strcmpi(foldcontent(i).name, '..') & ~strcmpi(foldcontent(i).name, '.')
             disp(fullfile(foldname, foldcontent(i).name));
-            [tmpcellres tmpres] = scanfold(fullfile(foldname, foldcontent(i).name));
+            [tmpcellres tmpres] = scanfold(fullfile(foldname, foldcontent(i).name), ignorelist, maxdepth-1);
             textres = [ textres tmpres ];
             cellres = { cellres{:} tmpcellres{:} };
         end;
