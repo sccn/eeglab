@@ -38,6 +38,9 @@
 % Coding notes: Useful information on functions and global variables used.
 
 % $Log: not supported by cvs2svn $
+% Revision 1.21  2007/12/08 23:38:07  arno
+% updating datasetinfo
+%
 % Revision 1.20  2007/06/21 00:14:33  allen
 % nothing
 %
@@ -99,6 +102,14 @@ for k = 1:length(STUDY.datasetinfo)
     STUDY.datasetinfo(k).filename = ALLEEG(k).filename;
     STUDY.datasetinfo(k).filepath = ALLEEG(k).filepath;
 end
+
+if ~isfield(STUDY, 'changrp') || isempty(STUDY.changrp)
+    if std_uniformfiles(STUDY, ALLEEG) == 0
+         STUDY = std_changroup(STUDY, ALLEEG);
+    else STUDY = std_changroup(STUDY, ALLEEG, [], 'interp');
+    end;
+end;
+std_checkfiles(STUDY, ALLEEG);
 
 [STUDY ALLEEG] = std_checkset(STUDY, ALLEEG);
 STUDY.saved = 'yes';

@@ -1,7 +1,7 @@
 % std_checkfiles() - Check all STUDY files consistency
 %
 % Usage:    
-%                >> boolval = std_checkfiles(STUDY, ALLEEG);   
+%                >> boolval = std_checkfiles(STUDY, ALLEEG);
 % Inputs:
 %   STUDY      - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
 %   ALLEEG     - All EEGLAB datasets
@@ -28,6 +28,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2010/03/05 00:22:05  arno
+% New function
+%
 
 function [boolval npersubj] = std_checkfiles(STUDY, ALLEEG);
 
@@ -41,60 +44,23 @@ filetypes = { 'daterp' 'datspec' 'datersp' 'datitc' 'dattimef' ...
 
 % set channel interpolation mode
 % ------------------------------
-uniformchannels = 'on';
-% if strcmpi(STUDY.changrpstatus, 'all channels present in all datasets')
-% else nonuniformchannels = 0;
-% end;
-          
+uniformchannels = std_uniformsetinds( STUDY );
+
+disp('---------------------------------------------');
 disp('Checking data files integrity and consistency');
 passall = 1;
 for index = 1:length(filetypes)
     
     % scan datasets
     % -------------
-    firstpass   = 1;
-    notequal = 0;
-    filepresent = zeros(1,length(ALLEEG));
-    clear tmpstruct;
-    for dat = 1:length(ALLEEG)
-        
-        filename = fullfile(ALLEEG(dat).filepath, [ ALLEEG(dat).filename(1:end-3) filetypes{index} ]);
-        thisfilepresent = exist(filename);
-        if thisfilepresent && firstpass == 1
-            fprintf('Files of type "%s" detected, checking...',  filetypes{index});
-        elseif firstpass == 1
-            notequal = 1;
-        end;
-        firstpass = 0;
-        filepresent(dat) = thisfilepresent;
-        
-        if filepresent(dat)
-            try
-                warning('off', 'MATLAB:load:variableNotFound');
-                tmpstruct(dat) = load( '-mat', filename, 'times', 'freqs', 'parameters', 'labels' );
-                warning('on', 'MATLAB:load:variableNotFound');
-            catch
-                passall = 0;
-                fprintf(' Error\n');
-                break;
-            end;
-            if filetypes{index}(1) ~= 'd' % ICA components
-                allvars = whos('-file', filename);
-                tmpinds = [];
-                for cind = 1:length(allvars)
-                    str = allvars(cind).name(5:end);
-                    ind_ = find(str == '_');
-                    if ~isempty(ind_), str(ind_:end) = []; end;
-                    tmpinds = [ tmpinds str2num(str) ];
-                end;
-                compinds(dat) = { unique(tmpinds) };
-            end;
-        end;
+    [ tmpstruct compinds filepresent ] = std_fileinfo(ALLEEG, filetypes{index});
+    if ~isempty(tmpstruct)
+        fprintf('Files of type "%s" detected, checking...',  filetypes{index});
     end;
     
     % check if the structures are equal
     % ---------------------------------
-    if ~all(filepresent == 0)
+    if ~isempty(tmpstruct)
         if any(filepresent == 0)
             fprintf(' Error, file missing for some subjects\n');
             notequal = 1;
@@ -140,6 +106,8 @@ for index = 1:length(filetypes)
     
     % check the consistency of changrp and cluster with saved information
     % -------------------------------------------------------------------
+    notequal = any(~filepresent);
+    if isempty(tmpstruct), notequal = 1; end;
     if filetypes{index}(1) == 'd' && notequal == 0        
         % scan all channel labels
         % -----------------------
@@ -149,13 +117,17 @@ for index = 1:length(filetypes)
                     for inddat = 1:length(ALLEEG)
                         tmpind = cellfun(@(x)(find(x == inddat)), STUDY.changrp(cind).setinds(:), 'uniformoutput', false);
                         indnonempty = find(~cellfun(@isempty, tmpind(:)));
-                        tmpchan = STUDY.changrp(cind).allinds{indnonempty}(tmpind{indnonempty}); % channel index for dataset inddat
+                        if ~isempty(indnonempty)
+                            tmpchan = STUDY.changrp(cind).allinds{indnonempty}(tmpind{indnonempty}); % channel index for dataset inddat
 
-                        tmpchan2 = strmatch(STUDY.changrp(cind).name, tmpstruct(inddat).labels, 'exact'); % channel index in file
-                        if ~isequal(tmpchan2, tmpchan)
-                            fprintf('\nError: channel index in STUDY.changrp(%d) for dataset %d is %d but %d in data files\n', cind, inddat, tmpchan2, tmpchan);
-                            notequal = 1;
-                            break;
+                            tmpchan2 = strmatch(STUDY.changrp(cind).name, tmpstruct(inddat).labels, 'exact'); % channel index in file
+                            if ~isempty(tmpchan2) || ~strcmpi(filetypes{index}, 'datspec') % the last statement is because channel labels did not use to be saved in spec files
+                                if ~isequal(tmpchan2, tmpchan)
+                                    fprintf('\nError: channel index in STUDY.changrp(%d) for dataset %d is "%d" but "%d" in data files\n', cind, inddat, tmpchan, tmpchan2);
+                                    notequal = 1;
+                                    break;
+                                end;
+                            end;
                         end;
                     end;
                 end;
@@ -184,9 +156,12 @@ for index = 1:length(filetypes)
                     end;
                     
                     if ~isempty(setdiff(tmpcomp, compinds{inddat}))
-                        fprintf('\nError: some components in clusters %d are absent from data files\n', cind);
-                        notequal = 1;
-                        break;
+                        if ~(isempty(compinds{inddat}) && strcmpi(filetypes{index}, 'icatopo'))
+                            fprintf('\nError: some components in clusters %d are absent from data files\n', cind);
+                            notequal = 1;
+                            passall  = 0;
+                            break;
+                        end;
                     end;
                 end;
             end;
@@ -196,7 +171,7 @@ for index = 1:length(filetypes)
 end;
 
 if ~passall
-    disp('We advise that you recompute any mesure showing errors')
-    disp('Do not forget to select the "Recompute even if present on disk" checkbox');
+    disp('**** We advise that you recompute any mesure showing errors while')
+    disp('**** selecting the "Recompute even if present on disk" checkbox');
 end;
 disp('Checking completed.');
