@@ -9,13 +9,14 @@
 %   INEEG      - input dataset
 %
 % Optional inputs:
-%   'freqlimts' - [min max] frequency limits. May also be an array where
+%   'freqlims'  - [min max] frequency limits. May also be an array where
 %                 each row defines a different set of limits.
 %   'stdthresh' - [max] positive threshold in terms of standard deviation
 %   'averef'    - ['on'|'off'] 'on' computes average reference before
 %                 applying threshold. Default is 'off'.
 %   'plothist'  - ['on'|'off'] 'on' plot the histogram of values along 
 %                 with the threshold.
+%   'elec'      - [integer array] only include specific channels.
 %
 % Outputs:
 %   OUTEEG    - output dataset with updated joint probability array
@@ -44,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2010/03/01 09:45:09  arno
+% New func
+%
 
 function [EEG allrmchan] = pop_rejchanspec(EEG, varargin)
 
