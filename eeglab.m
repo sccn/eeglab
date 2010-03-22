@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.551  2010/02/16 08:44:51  arno
+% fix fieldtrip sourcedepth path
+%
 % Revision 1.550  2010/02/06 05:44:40  arno
 % updated EGI menu
 %
@@ -2596,7 +2599,7 @@ WINY		    = WINYDEC*NBLINES;
 BORDERINT       = 4;
 BORDEREXT       = 10;
 comp = computer;
-if strcmpi(comp(1:3), 'GLN') % Linux
+if strcmpi(comp(1:3), 'GLN') || strcmpi(comp(1:3), 'MAC') % Linux
     FONTNAME        = 'courier';
 else
     FONTNAME        = '';
