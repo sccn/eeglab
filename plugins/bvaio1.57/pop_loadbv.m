@@ -41,7 +41,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Id: pop_loadbv.m,v 1.4 2010-03-03 22:07:09 roy Exp $
+% $Id: pop_loadbv.m,v 1.5 2010-03-23 21:19:52 roy Exp $
 
 function [EEG, com] = pop_loadbv(path, hdrfile, srange, chans)
 
@@ -245,11 +245,13 @@ else % ASCII data
             count = 1;
             while ~feof(IN)
                 tmpstr = fgetl(IN);
-                temp_ind = tmpstr==',';
-                tmpstr(temp_ind) = '.';
-                tmpdata = strread(tmpstr);
-                EEG.data(:,count) = tmpdata';
-                count = count + 1;
+                if ~isempty(tmpstr)
+                    temp_ind = tmpstr==',';
+                    tmpstr(temp_ind) = '.';
+                    tmpdata = strread(tmpstr);
+                    EEG.data(:,count) = tmpdata';
+                    count = count + 1;
+                end;
             end;
             EEG.pnts = count - 1;
         else
