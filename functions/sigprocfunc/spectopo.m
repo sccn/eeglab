@@ -71,8 +71,6 @@
 %                However, if any components were removed from the supplied 'weights'mapchans
 %                then the component maps will not be correctly drawn and the 'icawinv'
 %                matrix should be supplied here {default: from component 'weights'}
-%   'icachansind' = [integer array] indices of the data channels used for ICA.
-%                { default: all channels }
 %   'memory'   = ['low'|'high'] a 'low' setting will use less memory for computing 
 %                component activities, will take longer {default: 'high'}
 %
@@ -121,6 +119,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.115  2009/11/18 20:33:34  arno
+% reref 'no' -> 'off'
+%
 % Revision 1.114  2008/11/13 00:06:45  arno
 % fix epoch subset
 %
@@ -517,7 +518,7 @@ if nargin <= 3 | isstr(varargin{1})
 				  'nicamaps'      'integer'  []                       4 ;
 				  'icawinv'       'real'     []                       [] ;
 				  'icacomps'      'integer'  []                       [] ;
-				  'icachansind'   'integer'  []                       [1:size(data,1)] ;
+				  'icachansind'   'integer'  []                       [1:size(data,1)] ; % deprecated
 				  'icamaps'       'integer'  []                       [] ;
                   'rmdc'           'string'   {'on' 'off'}          'off';
 				  'mapchans'      'integer'  [1:size(data,1)]         [] 
@@ -725,7 +726,7 @@ else
         newweights = g.weights;
         if strcmp(g.memory, 'high') & strcmp(g.icamode, 'normal')
             fprintf('Computing component spectra: ')
-            [compeegspecdB freqs] = spectcomp( newweights*data(g.icachansind,:), frames, srate, epoch_subset, g);
+            [compeegspecdB freqs] = spectcomp( newweights*data(:,:), frames, srate, epoch_subset, g);
         else % in case out of memory error, multiply conmponent sequencially
             if strcmp(g.icamode, 'sub') & ~isempty(g.plotchan) & g.plotchan == 0
                 % scan all electrodes
