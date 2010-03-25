@@ -150,6 +150,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.239  2010/01/27 20:08:08  arno
+% taking into account NaN
+%
 % Revision 1.238  2009/10/21 02:42:30  dev
 %
 % replace isstr() with ischar()
@@ -1665,6 +1668,23 @@ for inddataset = 1:length(ALLEEG)
         end;
         if ~isempty( EEG.chanlocs )
             
+            % reference
+            % ---------
+            if strcmpi(EEG.ref, 'averef')
+                 ref = 'average';
+            else ref = '';
+            end;
+            if ~isfield( EEG.chanlocs, 'ref')
+                EEG.chanlocs(1).ref = ref;
+            end;
+            for tmpind = 1:length(EEG.chanlocs)
+                if ~ischar(EEG.chanlocs(tmpind).ref)
+                    EEG.chanlocs(tmpind).ref = ref;
+                else
+                    ref = '';
+                end;
+            end;
+            
             if ~isstruct( EEG.chanlocs)
                 if exist( EEG.chanlocs ) ~= 2
                     disp( [ 'eeg_checkset warning: channel file does not exist or is not in Matlab path: filename removed from EEG struct' ]); 
@@ -1675,7 +1695,14 @@ for inddataset = 1:length(ALLEEG)
                     try, EEG.chanlocs = readlocs( EEG.chanlocs );
                         disp( [ 'eeg_checkset: channel file read' ]); 
                     catch, EEG.chanlocs = []; end;
-                end;     
+                end;
+            else
+                fields = fieldnames(EEG.chanlocs);
+                if isempty(strmatch('labels', fields))
+                    disp('eeg_checkset warning: no field label in channel location structure, removing it');
+                    EEG.chanlocs = [];
+                    res = com;
+                end;
             end;
             if isstruct( EEG.chanlocs)
                 if length( EEG.chanlocs) ~= EEG.nbchan & length( EEG.chanlocs) ~= EEG.nbchan+1
@@ -1705,23 +1732,6 @@ for inddataset = 1:length(ALLEEG)
             if isfield( EEG.chanlocs, 'shrink')
                 EEG.chaninfo.shrink = EEG.chanlocs(1).shrink;
                 EEG.chanlocs = rmfield( EEG.chanlocs, 'shrink');
-            end;
-            
-            % reference
-            % ---------
-            if strcmpi(EEG.ref, 'averef')
-                 ref = 'average';
-            else ref = '';
-            end;
-            if ~isfield( EEG.chanlocs, 'ref')
-                EEG.chanlocs(1).ref = ref;
-            end;
-            for tmpind = 1:length(EEG.chanlocs)
-                if ~ischar(EEG.chanlocs(tmpind).ref)
-                    EEG.chanlocs(tmpind).ref = ref;
-                else
-                    ref = '';
-                end;
             end;
             
             if isfield(EEG.chanlocs, 'datachan'), EEG.chanlocs = rmfield(EEG.chanlocs, 'datachan'); end;
