@@ -41,7 +41,9 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Id: pop_loadbv.m,v 1.5 2010-03-23 21:19:52 roy Exp $
+% $Id: pop_loadbv.m,v 1.6 2010-03-25 19:54:55 arno Exp $
+% Revision 1.5 2010/03/23 21:19:52 roy
+% added some lines so that the function can deal with the space lines in the ASCII multiplexed data file
 
 function [EEG, com] = pop_loadbv(path, hdrfile, srange, chans)
 
