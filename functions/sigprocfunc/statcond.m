@@ -121,6 +121,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.22  2009/11/11 03:20:30  dev
+% Fixed type as per bug 753
+%
 % Revision 1.21  2009/08/06 01:11:16  arno
 % fixing statistical functions
 %
@@ -186,6 +189,7 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
         help statcond;
         return;
     end;
+    try, warning('off', 'MATLAB:divideByZero'); catch, end;    
     
     g = finputcheck( varargin, { 'naccu'   'integer'   [1 Inf]             200;
                                  'mode'    'string'    { 'param' 'perm' 'bootstrap' }  'param';
@@ -374,6 +378,7 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
     else
         pvals = compute_pvals(surrogval, ori_vals, tail);
     end;
+    try, warning('on', 'MATLAB:divideByZero'); catch, end;
     
 % compute p-values
 % ----------------
