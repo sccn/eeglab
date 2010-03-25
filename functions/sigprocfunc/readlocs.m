@@ -190,6 +190,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.102  2009/09/27 05:14:55  arno
+% Fix rereading CED file
+%
 % Revision 1.101  2009/05/12 18:15:40  arno
 % nasion list
 %
@@ -654,6 +657,14 @@ if isstr(filename)
            array = load_file_or_array( filename, g.skiplines-1);
            if isempty(array{1,2})
                array = load_file_or_array( filename, g.skiplines-1);
+           end;
+       end;
+
+       % xyz format, is the first col absent
+       % -----------------------------------
+       if strcmp(g.filetype, 'xyz')
+           if size(array, 2) == 4
+               array(:, 2:5) = array(:, 1:4);
            end;
        end;
        
