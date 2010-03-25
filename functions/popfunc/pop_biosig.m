@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.37  2009/11/11 03:28:28  arno
+% GUI aspect
+%
 % Revision 1.36  2009/06/03 08:43:47  arno
 % fix command line call
 %
@@ -283,14 +286,14 @@ if ~isempty(newblockrange)
 else interval = [];
 end
     
-EEG = biosig2eeglab(dat, DAT, interval);
+EEG = biosig2eeglab(dat, DAT, interval, g.channels);
 
 if strcmpi(g.rmeventchan, 'on') & strcmpi(dat.TYPE, 'BDF') & isfield(dat, 'BDF')
     if size(EEG.data,1) >= dat.BDF.Status.Channel, 
         disp('Removing event channel...');
         EEG.data(dat.BDF.Status.Channel,:) = []; 
-        if ~isempty(EEG.chanlocs)
-            EEG.chanlocs(dat.BDF.Status.Channel,:) = [];
+        if ~isempty(EEG.chanlocs) && length(EEG.chanlocs) >= dat.BDF.Status.Channel
+            EEG.chanlocs(dat.BDF.Status.Channel) = [];
         end;
     end;
     EEG.nbchan = size(EEG.data,1);

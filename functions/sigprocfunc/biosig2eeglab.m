@@ -40,8 +40,11 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.1  2009/05/07 00:01:58  arno
+% adding biosig2eeglab
+%
 
-function EEG = biosig2eeglab(dat, DAT, interval);
+function EEG = biosig2eeglab(dat, DAT, interval, channels);
 
 if nargin < 2
     help biosig2eeglab;
@@ -49,6 +52,9 @@ if nargin < 2
 end;
 if nargin < 3
     interval = [];
+end;
+if nargin < 4
+    channels = [];
 end;
 
 % import data
@@ -77,6 +83,9 @@ EEG.pnts     = size(EEG.data,2)/nepoch;
 
 if isfield(dat, 'Label') & ~isempty(dat.Label)
     EEG.chanlocs = struct('labels', cellstr(char(dat.Label)));
+    if ~isempty(channels)
+        EEG.chanlocs = EEG.chanlocs(channels);
+    end;
 end
 EEG = eeg_checkset(EEG);
 
