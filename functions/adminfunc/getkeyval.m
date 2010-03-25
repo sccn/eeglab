@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2007/08/03 21:45:02  arno
+% fix when input does not have quotes
+%
 % Revision 1.7  2007/03/06 23:26:12  toby
 % bug 145, courtesy Ronny Lindner
 %
@@ -87,19 +90,26 @@ function txt = getkeyval(lastcom, var, mode, default)
 		comas = findstr(lastcom, ',');
 		if length(comas) >= var
 			txt = lastcom(comas(var-1)+1:comas(var)-1);
-			txt = deblank(txt(end:-1:1));
-			txt = deblank(txt(end:-1:1));
-			if ~isempty(txt) & txt(end) == '}', txt = txt(2:end-1); end;
-			if ~isempty(txt)
-				txt = deblank(txt(end:-1:1));
-				txt = deblank(txt(end:-1:1));
-			end;
-			if ~isempty(txt) & txt(end) == ']', txt = txt(2:end-1); end;
-			if ~isempty(txt)
-				txt = deblank(txt(end:-1:1));
-				txt = deblank(txt(end:-1:1));
-			end;
-			if ~isempty(txt) & txt(end) == '''', txt = txt(2:end-1); end;
+            tmpval = eval( txt );
+            if isempty(tmpval), txt = '';
+            else txt = vararg2str( tmpval );
+            end;
+            return;
+            
+% 			txt = deblank(txt(end:-1:1));
+% 			txt = deblank(txt(end:-1:1));
+%             
+% 			if ~isempty(txt) & txt(end) == '}', txt = txt(2:end-1); end;
+% 			if ~isempty(txt)
+% 				txt = deblank(txt(end:-1:1));
+% 				txt = deblank(txt(end:-1:1));
+% 			end;
+% 			if ~isempty(txt) & txt(end) == ']', txt = txt(2:end-1); end;
+% 			if ~isempty(txt)
+% 				txt = deblank(txt(end:-1:1));
+% 				txt = deblank(txt(end:-1:1));
+% 			end;
+% 			if ~isempty(txt) & txt(end) == '''', txt = txt(2:end-1); end;
 		else
 			txt = default;
 		end;

@@ -39,6 +39,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.18  2006/10/02 11:34:36  arno
+% fix string containing special characters
+%
 % Revision 1.17  2006/07/10 20:09:08  arno
 % nothing
 %
@@ -143,7 +146,10 @@ for index = 1:length(allargs)
 		elseif isnumeric( tmpvar ) | islogical( tmpvar )
 			strout = [ strout ',' array2str( tmpvar ) ];
 		elseif iscell( tmpvar )
-			strout = [ strout ',{' vararg2str( tmpvar ) '}' ];
+            tmpres = vararg2str( tmpvar );
+            comas  = find( tmpres == ',' );
+            tmpres(comas) = ' ';
+			strout = [ strout ',{' tmpres '}' ];
 		elseif isstruct(tmpvar)
 			strout = [ strout ',' struct2str( tmpvar ) ];		
 		else
@@ -164,9 +170,9 @@ function str = str2str( array )
 	for index = 1:size(array,1)
         tmparray = deblank(array(index,:));
         if isempty(tmparray)
-            str = [ str ', '' ''' ];
+            str = [ str ','' ''' ];
         else    
-            str = [ str ', ''' doublequotes(tmparray) '''' ];
+            str = [ str ',''' doublequotes(tmparray) '''' ];
         end;
 	end;
 	if size(array,1) > 1
