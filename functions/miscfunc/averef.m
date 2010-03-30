@@ -1,4 +1,6 @@
 % averef() - convert common-reference EEG data to average reference
+%            Note that this old function is not being used in EEGLAB. The
+%            function used by EEGLAB is reref().
 %
 % Usage:
 %   >> data = averef(data);
@@ -43,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.9  2002/11/15 01:40:38  arno
+% header for web
+%
 % Revision 1.8  2002/11/12 18:01:21  arno
 % header typo
 %
