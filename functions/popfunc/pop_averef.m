@@ -1,20 +1,12 @@
 % pop_averef() - Convert an EEG dataset to average reference.
 %                This function is obsolete. See pop_reref() instead.
 %
-%
 % Usage:
-%       >> EEGOUT = pop_averef( EEG, confirm);
-%
-% Inputs:
-%   EEG         - input dataset
-%   confirm     - [0|1] ask for confirmation
-%
-% Inputs:
-%   EEGOUT      - output dataset (with variable EEG.rmave added)
+%       >> EEGOUT = pop_averef( EEG );
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 22 March 2002
 %
-% See also: eeglab(), averef()
+% See also: eeglab(), reref(), averef()
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -35,6 +27,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.13  2003/12/10 02:45:14  arno
+% same
+%
 % Revision 1.12  2003/12/10 02:44:03  arno
 % msg
 %
@@ -73,6 +68,9 @@
 %
 
 function [EEG, com] = pop_averef( EEG, confirm);
+
+[EEG, com] = pop_reref(EEG, []);
+return;
 
 com = '';
 if nargin < 1

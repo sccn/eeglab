@@ -60,6 +60,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.35  2009/06/28 06:33:38  arno
+% Fixing rereferencing futher
+%
 % Revision 1.34  2009/06/28 05:49:56  arno
 % Adding reference and reprogramming pop_chanedit
 %
@@ -312,6 +315,16 @@ if ~isempty(g.refloc)
      EEG.chaninfo.nodatchans(tmpind) = [];
 end;
     
+% legacy EEG.ref field
+% --------------------
+if isfield(EEG, 'ref')
+    if strcmpi(EEG.ref, 'common') && isempty(ref)
+        EEG.ref = 'averef';
+    elseif strcmpi(EEG.ref, 'averef') && ~isempty(ref)
+        EEG.ref = 'common';
+    end;
+end;
+
 EEG.nbchan = size(EEG.data,1);
 EEG = eeg_checkset(EEG);
 
