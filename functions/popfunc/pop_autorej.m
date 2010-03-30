@@ -31,11 +31,18 @@
 % Function description: 
 %     pop_autorej() first detects extremely large potential fluctuations;
 %     this is mostly to detect artifacts from electrical surges or other 
-%     unreasonably large amplitude events. 
-%     It then detects improbable trials recursively (8 passes at most) 
-%     until no improbable trials are found, defining improbable trials
-%     as XXXXXXXXXX.  Finally it detects trials with relative kurtosis 
-%     larger than 6 standard deviations.
+%     unreasonably large amplitude events. Then it applies the following.
+%     The function rejects data epochs containing data values outside a 
+%     given standard deviation (s.d.) threshold entered by the user (e.g., 
+%     3 s.d.'s). In each iteration, if the number of epochs that are
+%     thus marked for rejection are fewer than 'maxrej' (by default, 5%), it  
+%     then rejects the beyond-threshold data epochs and iterates. If the number 
+%     of epochs marked  for rejection is more than 5% of the total number 
+%     of data epochs, it does not reject them, but instead  increases the 
+%     s.d. threshold by 0.5 s.d. and iterates. When no more data epochs are 
+%     found to exceed the current s.d. threshold, it lowers the threshold 
+%     by 0.5 s.d. and continues to iterate until either no more epochs are 
+%     rejected or until 8 iterations have been performed.
 %
 % Authors: Julie Onton and Arnaud Delorme, SCCN/INC/UCSD, 2007-
 
@@ -58,6 +65,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.3  2009/05/28 16:01:14  arno
+% Commenting out baselining
+%
 % Revision 1.2  2009/02/09 11:06:08  arno
 % Fix CVS problem with Windows
 %
