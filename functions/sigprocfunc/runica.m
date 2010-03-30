@@ -41,10 +41,6 @@
 %               divide frames) (defaults [srate 0 srate/2 size(data,2) size(data,2)])
 % 'posact'    = make all component activations net-positive(default 'off'}
 %               Requires time and memory; posact() may be applied separately.
-% 'ncomps'    = [N] number of ICA components to compute (default -> chans or 'pca' arg)
-%               using rectangular ICA decomposition. This parameter may return
-%               strange results. This is because the weight matrix is rectangular
-%               instead of being square. Do not use except to try to fix the problem.
 % 'verbose'   = give ascii messages ('on'/'off')        (default -> 'on')
 % 'logfile'   = [filename] save all message in a log file in addition to showing them
 %               on screen (default -> none)
@@ -67,6 +63,11 @@
 % CNL/The Salk Institute, La Jolla, 1996-
 
 % Uses: posact()
+
+% 'ncomps'    = [N] number of ICA components to compute (default -> chans or 'pca' arg) 
+%               using rectangular ICA decomposition. This parameter may return 
+%               strange results. This is because the weight matrix is rectangular 
+%               instead of being square. Do not use except to try to fix the problem. 
 
 % Reference (please cite):
 %
@@ -104,6 +105,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.37  2010/03/04 22:24:54  arno
+% Fix typos and add doc
+%
 % Revision 1.36  2009/07/02 23:27:25  arno
 % better interupt buttin
 %
