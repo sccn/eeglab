@@ -96,6 +96,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.71  2009/09/26 22:19:03  arno
+% Various fixes to pop_writeeeg, std_movecomp,
+%
 % Revision 1.70  2009/09/20 03:05:53  arno
 % try fix channel
 %
@@ -405,6 +408,7 @@ g = finputcheck(args, { 'time'    'real'      []         []; ...
                         'nochannel' { 'integer' 'cell' }   []  [];
                         'trialcond'   'integer'   []         []; ...
                         'notrialcond' 'integer'   []         [] }, 'pop_select');
+if isstr(g), error(g); end;
 
 allfields = fieldnames(g);
 for index = 1:length(allfields)
