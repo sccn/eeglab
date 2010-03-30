@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.17  2007/10/19 20:52:07  nima
+% _
+%
 % Revision 1.16  2007/08/14 19:29:33  nima
 % _
 %
@@ -235,12 +238,15 @@ for k = 1: len
         disp('not want a property (scalp map, ERSP, etc...) to be included');
         disp('in the clustering procedure. See the clustering tutorial.');
     end;
-
+    
 end  % Finished all conditions
 
-legend(erpAxisHangle,'off');
-
-set(erpAxisHangle,'YTickLabelMode','auto');
-set(erpAxisHangle,'YTickMode','auto');
+if ishandle(erpAxisHangle) % make sure it is a valid graphics handle
+    legend(erpAxisHangle,'off');
+    
+    
+    set(erpAxisHangle,'YTickLabelMode','auto');
+    set(erpAxisHangle,'YTickMode','auto');
+end;
 delete(h_wait)
 
