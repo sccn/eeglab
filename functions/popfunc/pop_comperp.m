@@ -88,6 +88,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.42  2009/11/11 00:28:53  arno
+% New GUI format
+%
 % Revision 1.41  2009/09/27 01:02:07  arno
 % Added check to pop_comperp
 %
@@ -398,11 +401,11 @@ for index = 1:length(datadd)
     TMPEEG = eeg_checkset(ALLEEG(datadd(index)),'loaddata');
     if flag == 1, erp1ind(:,:,index)  = mean(TMPEEG.data,3);
     elseif isempty(TMPEEG.icaact)
-        tmpica              =  reshape((TMPEEG.icaweights*TMPEEG.icasphere)*TMPEEG.data(:,:), ...
+        tmpica              =  reshape((TMPEEG.icaweights*TMPEEG.icasphere)*TMPEEG.data(TMPEEG.icachansind,:), ...
                                        size(TMPEEG.icaweights,1), size(TMPEEG.data,2), size(TMPEEG.data,3));
         erp1ind(:,:,index)  = mean(tmpica,3);
     else          
-        tmpica              =  reshape((TMPEEG.icaweights*TMPEEG.icasphere)*TMPEEG.data(:,:), ...
+        tmpica              =  reshape((TMPEEG.icaweights*TMPEEG.icasphere)*TMPEEG.data(TMPEEG.icachansind,:), ...
                                        size(TMPEEG.icaweights,1), size(TMPEEG.data,2), size(TMPEEG.data,3));
         erp1ind(:,:,index)  = mean(tmpica,3);
         erp1ind(:,:,index)  = mean(TMPEEG.icaact,3);
@@ -425,10 +428,10 @@ if length(datsub) > 0 % dataset to subtract
         TMPEEG = eeg_checkset(ALLEEG(datsub(index)),'loaddata');
         if flag == 1, erp2ind(:,:,index)  = mean(TMPEEG.data,3);
         elseif isempty(TMPEEG.icaact)
-            tmpica              =  reshape((TMPEEG.icaweights*TMPEEG.icasphere)*TMPEEG.data(:,:), ...
+            tmpica              =  reshape((TMPEEG.icaweights*TMPEEG.icasphere)*TMPEEG.data(TMPEEG.icachansind,:), ...
                                        size(TMPEEG.icaweights,1), size(TMPEEG.data,2), size(TMPEEG.data,3));
             erp2ind(:,:,index)  = mean(tmpica,3);
-        else          tmpica              =  reshape((TMPEEG.icaweights*TMPEEG.icasphere)*TMPEEG.data(:,:), ...
+        else          tmpica              =  reshape((TMPEEG.icaweights*TMPEEG.icasphere)*TMPEEG.data(TMPEEG.icachansind,:), ...
                                                      size(TMPEEG.icaweights,1), size(TMPEEG.data,2), size(TMPEEG.data,3));
                       erp2ind(:,:,index)  = mean(tmpica,3);
                       erp2ind(:,:,index)  = mean(TMPEEG.icaact,3);
