@@ -91,7 +91,7 @@ function plotcurve( times, R, varargin);
    % regions of significance
    % -----------------------
    if ~isempty(g.maskarray)
-       if length(unique(g.maskarray)) < 3
+       if length(unique(g.maskarray)) < 4
           Rregions = g.maskarray;
        else
           Rregions = ones(size(g.val2mask));
@@ -99,6 +99,9 @@ function plotcurve( times, R, varargin);
                case 3, Rregions  (find(g.val2mask > g.maskarray(:,:,1) & (g.val2mask < g.maskarray(:,:,2)))) = 0;
                case 2, if size(g.val2mask,2) == size(g.maskarray,2)
                            Rregions  (find(g.val2mask < g.maskarray)) = 0;
+                       elseif size(g.val2mask,1) == size(g.maskarray,1)
+                           Rregions(find((g.val2mask > repmat(g.maskarray(:,1),[1 length(times)])) ...
+                             & (g.val2mask < repmat(g.maskarray(:,2),[1 length(times)])))) = 0;
                        else
                            Rregions(find((g.val2mask > repmat(g.maskarray(:,1),[1 length(times)])) ...
                              & (g.val2mask < repmat(g.maskarray(:,2),[1 length(times)])))) = 0;
