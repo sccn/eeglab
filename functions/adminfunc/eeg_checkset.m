@@ -31,8 +31,7 @@
 %   'chanlocs_homogenous' - check whether EEG contains consistent channel
 %                           information; if not, correct it.
 %   'eventconsistency'    - check whether EEG.event information are consistent; 
-%                           remake 'epoch' field (can be time consuming).
-%
+%                           rebuild event* subfields of the 'EEG.epoch' structure (can be time consuming).
 % Outputs:
 %       EEGOUT     - output EEGLAB dataset or dataset array
 %       result     - result code:  0 = OK; 1 = error; -1 = warning
@@ -84,7 +83,7 @@
 %   EEG.urevent      - original (ur) event structure containing all experimental
 %                      events recorded as occurring at the original data time points
 %                      (before data rejection)
-%   EEG.epoch        - epoch event information structure array (one per epoch)
+%   EEG.epoch        - epoch event information and epoch-associated data structure array (one per epoch)
 %   EEG.eventdescription - cell array of strings describing event fields.
 %   EEG.epochdescription - cell array of strings describing epoch fields.
 %   --> See the http://sccn.ucsd.edu/eeglab/maintut/eeglabscript.html for details
@@ -150,6 +149,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.240  2010/03/25 19:45:29  arno
+% better checking of channel structure
+%
 % Revision 1.239  2010/01/27 20:08:08  arno
 % taking into account NaN
 %
@@ -1256,7 +1258,25 @@ for inddataset = 1:length(ALLEEG)
                   try,
                       if EEG.trials > 1 & ~isempty(EEG.event)
                           maxlen = 0;
-                          EEG.epoch = [];
+                          
+                          % erase existing event-related fields
+                          % ------------------------------
+                          if ~isfield(EEG,'epoch')
+                              EEG.epoch = [];
+                          end
+                          if ~isempty(EEG.epoch)
+                              if length(EEG.epoch) ~= EEG.trials
+                                  disp('Warning: number of epoch entries does not match number of dataset trials;');
+                                  disp('         user-defined epoch entries will be erased.');
+                                  EEG.epoch = [];
+                              else
+                                  fn = fieldnames(EEG.epoch);
+                                  EEG.epoch = rmfield(EEG.epoch,{fn{strmatch('event',fn)}});
+                              end
+                          end
+                          
+                          % set event field
+                          % ---------------
                           EEG.epoch(1).event = [];    
                           EEG.epoch(EEG.trials).event = [];    
                           for index = 1:length(EEG.event)
