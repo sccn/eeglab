@@ -49,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2010/02/24 15:20:22  claire
+% typo for error message
+%
 % Revision 1.19  2010/02/16 08:43:21  arno
 % New single-trial reading/writing
 %
@@ -362,6 +365,9 @@ end;
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.20  2010/02/24 15:20:22  claire
+% typo for error message
+%
 % Revision 1.19  2010/02/16 08:43:21  arno
 % New single-trial reading/writing
 %
@@ -384,7 +390,13 @@ tmpfile = fullfile( ALLEEG(abset(1)).filepath,[ ALLEEG(abset(1)).filename(1:end-
 if ~exist(tmpfile) && ~singletrial
     disp('Cannot find spectral file, trying ERSP baseline file instead');
     for indtmp = 1:length(abset)
-        [ tmpersp f alltimes tmpparams tmpspec] = std_readersp( ALLEEG, abset(indtmp), comp(indtmp), [], opt.freqrange);
+        % if opt variable exists, use it, otherwise use default values.
+        if exist('opt', 'var') && isfield(opt, 'freqrange')
+            [ tmpersp f alltimes tmpparams tmpspec] = std_readersp( ALLEEG, abset(indtmp), comp(indtmp), [], opt.freqrange);
+        else
+            [ tmpersp f alltimes tmpparams tmpspec] = std_readersp( ALLEEG, abset(indtmp), comp(indtmp));
+        end;
+        
         if indtmp == 1, X = repmat(single(0), [ size(tmpspec) length(comp) ]); end;
         X(:,indtmp) = 10*log(tmpspec(:));
         fprintf('.');
