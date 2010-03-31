@@ -408,7 +408,6 @@ g = finputcheck(args, { 'time'    'real'      []         []; ...
                         'nochannel' { 'integer' 'cell' }   []  [];
                         'trialcond'   'integer'   []         []; ...
                         'notrialcond' 'integer'   []         [] }, 'pop_select');
-if isstr(g), error(g); end;
 
 allfields = fieldnames(g);
 for index = 1:length(allfields)
@@ -596,7 +595,12 @@ if ~isempty(g.time) | ~isempty(g.notime)
             end;
         end;
         EEG.event = newevent;
-        EEG.epoch = [];
+        
+        % erase event-related fields from the epochs
+        % ------------------------------------------
+        fn = fieldnames(EEG.epoch);
+        EEG.epoch = rmfield(EEG.epoch,{fn{strmatch('event',fn)}});
+        
     else
         if isempty(g.notime)
             g.notime = g.time';
