@@ -13,8 +13,8 @@
 %  ALLEEG  - array of EEG dataset structures
 %  indices - indices of EEG datasets to merge
 %
-%  keepall - [0|1] 0 -> remove, or 1 -> preserve, ICA activations 
-%            of the first dataset and recompute the activations 
+%  keepall - [0|1] 0 -> remove, or 1 -> preserve, ICA activations
+%            of the first dataset and recompute the activations
 %            of the merged data {default: 0}
 %
 % Outputs:
@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.49  2009/11/18 20:26:36  arno
+% fix bug for merging fileds
+%
 % Revision 1.48  2009/11/11 03:29:42  arno
 % update GUI
 %
@@ -183,79 +186,122 @@
 % Initial revision
 %
 
-% 01-25-02 reformated help & license -ad 
+% 01-25-02 reformated help & license -ad
 % 01-26-02 change format for events and trial conditions -ad
 
 function [INEEG1, com] = pop_mergeset( INEEG1, INEEG2, keepall);
 
-com = ''; 
+com = '';
 if nargin < 1
-	help pop_mergeset;
-	return;
+    help pop_mergeset;
+    return;
 end;
 if isempty(INEEG1)
-	error('needs at least two datasets');
+    error('needs at least two datasets');
 end;
 if nargin < 2 & length(INEEG1) == 1
-	error('needs at least two datasets');
+    error('needs at least two datasets');
 end;
 
 if nargin == 1
-	uilist    = { { 'style' 'text' 'string' 'Dataset indices to merge' } ...
-                  { 'style' 'edit' 'string' '1' } ...
-                  { 'style' 'text' 'string' 'Preserve ICA weights of the first dataset ?' } ...
-                  { 'style' 'checkbox' 'string' '' } };
+    uilist    = { { 'style' 'text' 'string' 'Dataset indices to merge' } ...
+        { 'style' 'edit' 'string' '1' } ...
+        { 'style' 'text' 'string' 'Preserve ICA weights of the first dataset ?' } ...
+        { 'style' 'checkbox' 'string' '' } };
     res = inputgui( 'uilist', uilist, 'geometry', { [3 1] [3 1] }, 'helpcom', 'pophelp(''pop_mergeset'')');
-    
-	if isempty(res) return; end;
-   
+
+    if isempty(res) return; end;
+
     INEEG2  = eval( [ '[' res{1} ']' ] );
     keepall = res{2};
 else
-	if nargin < 3
-		keepall = 0; % default
-	end;	
+    if nargin < 3
+        keepall = 0; % default
+    end;
 end;
 
-fprintf('Merging datasets...\n');		
+fprintf('Merging datasets...\n');
 
-if ~isstruct(INEEG2) % if INEEG2 is a vector of ALLEEG indices	
-	indices = INEEG2;
-	if length(indices) < 2
-		error('needs at least two datasets');
-	end;
+if ~isstruct(INEEG2) % if INEEG2 is a vector of ALLEEG indices
+    indices = INEEG2;
+    if length(indices) < 2
+        error('needs at least two datasets');
+    end;
 
-	NEWEEG = eeg_retrieve(INEEG1, indices(1)); % why abandoned?
+    NEWEEG = eeg_retrieve(INEEG1, indices(1)); % why abandoned?
 
-	for index = 2:length(indices)
-		INEEG2 = eeg_retrieve(INEEG1, indices(index));
+    for index = 2:length(indices)
+        INEEG2 = eeg_retrieve(INEEG1, indices(index));
         NEWEEG = pop_mergeset(NEWEEG, INEEG2, keepall); % recursive call
-	end;
-	INEEG1 = NEWEEG;
+    end;
+    INEEG1 = NEWEEG;
 
 else % INEEG is an EEG struct
-	% check consistency
-	% -----------------
-	if INEEG1.nbchan ~= INEEG2.nbchan
-		error('The two datasets must have the same number of channels');
-	end;	
-	if INEEG1.srate ~= INEEG2.srate
-		error('The two datasets must have the same sampling rate');
-	end;	
-	if INEEG1.trials > 1 | INEEG2.trials > 1
-		if INEEG1.pnts ~= INEEG2.pnts
-			error('The two epoched datasets must have the same number of points');
-		end;
-		if INEEG1.xmin ~= INEEG2.xmin
-                        INEEG2.xmin = INEEG1.xmin;
-			fprintf('Warning: the two epoched datasets do not have the same time onset, adjusted');
-		end;
-		if INEEG1.xmax ~= INEEG2.xmax
-                        INEEG2.xmax = INEEG1.xmax;
-			fprintf('Warning: the two epoched datasets do not have the same time offset, adjusted');
-		end;
-	end;	
+    % check consistency
+    % -----------------
+    if INEEG1.nbchan ~= INEEG2.nbchan
+        error('The two datasets must have the same number of channels');
+    end;
+    if INEEG1.srate ~= INEEG2.srate
+        error('The two datasets must have the same sampling rate');
+    end;
+    if INEEG1.trials > 1 | INEEG2.trials > 1
+        if INEEG1.pnts ~= INEEG2.pnts
+            error('The two epoched datasets must have the same number of points');
+        end;
+        if INEEG1.xmin ~= INEEG2.xmin
+            INEEG2.xmin = INEEG1.xmin;
+            fprintf('Warning: the two epoched datasets do not have the same time onset, adjusted');
+        end;
+        if INEEG1.xmax ~= INEEG2.xmax
+            INEEG2.xmax = INEEG1.xmax;
+            fprintf('Warning: the two epoched datasets do not have the same time offset, adjusted');
+        end;
+    end;
 
+    % Merge the epoch field
+    % ---------------------
+    if INEEG1.trials > 1 | INEEG2.trials > 1
+        INEEGX = {INEEG1,INEEG2};
+        for n = 1:2
+            % make sure that both have an (appropriately-sized) epoch field
+            % -------------------------------------------------------------
+            if ~isfield(INEEGX{n},'epoch')
+                INEEGX{n}.epoch = repmat(struct(),[1,INEEGX{n}.trials]);
+            end
+            % make sure that the epoch number is correct in each dataset
+            % ----------------------------------------------------------
+            if ~isempty(INEEGX{n}.epoch) && length(INEEGX{n}.epoch) ~= INEEGX{n}.trials
+                disp('Warning: The number of trials does not match the length of the EEG.epoch field in one of');
+                disp('         the datasets. Its epoch info will be reset and derived from the respective events.');
+                INEEGX{n}.epoch = repmat(struct(),[1,INEEGX{n}.trials]);
+            end
+        end
+        for n=1:2
+            % purge all event-related epoch fields from each dataset (EEG.epoch.event* fields)
+            % --------------------------------------------------------------------------------
+            fn = fieldnames(INEEGX{n}.epoch);
+            INEEGX{n}.epoch = rmfield(INEEGX{n}.epoch,{fn{strmatch('event',fn)}});
+            % copy remaining field names to the other dataset
+            % -----------------------------------------------
+            for f = fieldnames(INEEGX{n}.epoch)'
+                if ~isfield(INEEGX{3-n}.epoch,f{1})
+                    INEEGX{3-n}.epoch(1).(f{1}) = [];
+                end
+            end
+            % after this, both sets have an epoch field with the appropriate number of items
+            % and possibly some user-defined fields, but no event* fields.
+        end
+
+        % concatenate epochs & write back
+        % -------------------------------
+        INEEGX{1}.epoch(end+1:end+INEEGX{2}.trials) = orderfields(INEEGX{2}.epoch,INEEGX{1}.epoch);
+        INEEG1 = INEEGX{1};
+        INEEG2 = INEEGX{2};
+        INEEGX = {};
+    end
+
+    
     % Concatenate data
     % ----------------
     if INEEG1.trials > 1 | INEEG2.trials > 1
@@ -270,52 +316,53 @@ else % INEEG is an EEG struct
     INEEG1pnts   = INEEG1.pnts;
     INEEG2pnts   = INEEG2.pnts;
 
-	if INEEG1.trials > 1 | INEEG2.trials > 1 % epoched data
-		INEEG1.trials  =  INEEG1.trials + INEEG2.trials;
+    if INEEG1.trials > 1 | INEEG2.trials > 1 % epoched data
+        INEEG1.trials  =  INEEG1.trials + INEEG2.trials;
 
-	else % continuous data
-		INEEG1.pnts = INEEG1.pnts + INEEG2.pnts;
-	end;
-	
-	if isfield(INEEG1, 'reject')
-		INEEG1 = rmfield(INEEG1, 'reject' );
-	end;
-	INEEG1.specicaact = [];
-	INEEG1.specdata = [];
+    else % continuous data
+        INEEG1.pnts = INEEG1.pnts + INEEG2.pnts;
+    end;
 
-	if keepall == 0
-		INEEG1.icaact = [];
-		INEEG1.icawinv = [];
-		INEEG1.icasphere = [];
-		INEEG1.icaweights = [];
-		if isfield(INEEG1, 'stats')
-			INEEG1 = rmfield(INEEG1, 'stats' );
-		end;
-	else
-		INEEG1.icaact = [];
-	end;
+    if isfield(INEEG1, 'reject')
+        INEEG1 = rmfield(INEEG1, 'reject' );
+    end;
+    INEEG1.specicaact = [];
+    INEEG1.specdata = [];
 
-	% concatenate events
-	% ------------------
-	if isempty(INEEG2.event)
+    if keepall == 0
+        INEEG1.icaact = [];
+        INEEG1.icawinv = [];
+        INEEG1.icasphere = [];
+        INEEG1.icaweights = [];
+        if isfield(INEEG1, 'stats')
+            INEEG1 = rmfield(INEEG1, 'stats' );
+        end;
+    else
+        INEEG1.icaact = [];
+    end;
+
+
+    % concatenate events
+    % ------------------
+    if isempty(INEEG2.event)
 
         % boundary event
         % -------------
         disp('Inserting boundary event...');
         INEEG1.event(end+1).type    = 'boundary';     % add boundary event between datasets
         INEEG1.event(end  ).latency = INEEG1pnts+0.5; % make boundary halfway between last,first pts
-        
+
         % check urevents
         % --------------
-        if ~isfield(INEEG1, 'urevent'), 
-   			INEEG1.urevent = []; 
+        if ~isfield(INEEG1, 'urevent'),
+            INEEG1.urevent = [];
             fprintf('Warning: first dataset has no urevent structure.\n');
-		end;
+        end;
 
         % add boundary urevent
         % --------------------
         disp('Inserting boundary urevent...');
-        INEEG1.urevent(end+1).type    = 'boundary';  
+        INEEG1.urevent(end+1).type    = 'boundary';
 
         if length(INEEG1.urevent) > 1 % if previous INEEG1 urevents
             INEEG1.urevent(end  ).latency = max(INEEG1pnts, INEEG1.urevent(end-1).latency)+0.5;
@@ -327,33 +374,33 @@ else % INEEG is an EEG struct
 
         % concatenate urevents
         % --------------------
-        if isfield(INEEG2, 'urevent') 
-		  if ~isempty(INEEG2.urevent) 
-            
-            % insert boundary event
-            % ---------------------
-            disp('Inserting boundary event...');
-            INEEG1.urevent(end+1).type    = 'boundary';
-            INEEG1.urevent(end  ).latency = max(INEEG1pnts, INEEG1.urevent(end-1).latency)+0.5;
-            
-            % update urevent indices for second dataset
-            % -----------------------------------------
-            disp('Concatenating urevents...');
-            orilen    = length(INEEG1.urevent);
-            for e=1:length(INEEG2.event)
-                INEEG2.event(e).urevent = INEEG2.event(e).urevent + orilen;
-            end;
-            
-            allfields = fieldnames(INEEG2.urevent);
-            for i=1:length( allfields )
-                for e=1:length(INEEG2.urevent)
-                    tmpval = getfield(INEEG2.urevent, { e }, allfields{i});
-                    INEEG1.urevent = setfield(INEEG1.urevent, {orilen + e}, allfields{i}, tmpval);
+        if isfield(INEEG2, 'urevent')
+            if ~isempty(INEEG2.urevent)
+
+                % insert boundary event
+                % ---------------------
+                disp('Inserting boundary event...');
+                INEEG1.urevent(end+1).type    = 'boundary';
+                INEEG1.urevent(end  ).latency = max(INEEG1pnts, INEEG1.urevent(end-1).latency)+0.5;
+
+                % update urevent indices for second dataset
+                % -----------------------------------------
+                disp('Concatenating urevents...');
+                orilen    = length(INEEG1.urevent);
+                for e=1:length(INEEG2.event)
+                    INEEG2.event(e).urevent = INEEG2.event(e).urevent + orilen;
+                end;
+
+                allfields = fieldnames(INEEG2.urevent);
+                for i=1:length( allfields )
+                    for e=1:length(INEEG2.urevent)
+                        tmpval = getfield(INEEG2.urevent, { e }, allfields{i});
+                        INEEG1.urevent = setfield(INEEG1.urevent, {orilen + e}, allfields{i}, tmpval);
+                    end
                 end
+            else
+                fprintf('Warning: second dataset has empty urevent structure.\n');
             end
-		  else
-            fprintf('Warning: second dataset has empty urevent structure.\n');
-          end 
         end;
 
         % concatenate events
@@ -365,38 +412,29 @@ else % INEEG is an EEG struct
         % ensure similar event structures
         % -------------------------------
         if ~isempty(INEEG2.event)
-            fields1 = fieldnames(INEEG1.event);
-            fields2 = fieldnames(INEEG2.event);
-            if length(fields1) > length(fields2)
-                for index = 1:length(fields1)
-                    if isempty(strmatch(fields1{index}, fields2))
-                        INEEG2.event = setfield( INEEG2.event, { orilen }, fields1{index}, []);
-                    end;
-                end;
-            elseif length(fields1) < length(fields2)
-                for index = 1:length(fields2)
-                    if isempty(strmatch(fields2{index}, fields1))
-                        INEEG1.event = setfield( INEEG1.event, { 1 }, fields2{index}, []);
-                    end;
-                end;
-            end;
-            allfields = union(fields1,fields2);
-            INEEG1.event = orderfields(INEEG1.event, allfields);
-            INEEG2.event = orderfields(INEEG2.event, allfields);
+            for f = fieldnames(INEEG1.event)'
+                if ~isfield(INEEG2.event,f{1})
+                    INEEG2.event(1).(f{1}) = [];
+                end
+            end
+            for f = fieldnames(INEEG2.event)'
+                if ~isfield(INEEG1.event,f{1})
+                    INEEG1.event(1).(f{1}) = [];
+                end
+            end
+            INEEG2.event = orderfields(INEEG2.event, INEEG1.event);
         end;
-        
+
         for e=1:length(INEEG2.event)
             INEEG1.event(orilen + e) = INEEG2.event(e);
             if isfield(INEEG1.event,'latency') & isfield(INEEG2.event,'latency')
-               INEEG1.event(orilen + e).latency = INEEG2.event(e).latency + INEEG1pnts * INEEG1trials;
+                INEEG1.event(orilen + e).latency = INEEG2.event(e).latency + INEEG1pnts * INEEG1trials;
             end
             if isfield(INEEG1.event,'epoch') & isfield(INEEG2.event,'epoch')
-               INEEG1.event(orilen + e).epoch = INEEG2.event(e).epoch + INEEG1trials;
+                INEEG1.event(orilen + e).epoch = INEEG2.event(e).epoch + INEEG1trials;
             end
-         end
+        end
 
-        INEEG1.epoch = []; % epoch info regenerated below by 'eventconsistency' in eeg_checkset()
-        
         % add discontinuity event if continuous
         % -------------------------------------
         if INEEG1trials  == 1 & INEEG2trials == 1
@@ -404,33 +442,22 @@ else % INEEG is an EEG struct
             INEEG1.event = eeg_insertbound(INEEG1.event, INEEG1.pnts, INEEG1pnts+1, 0); % +1 since 0.5 is subtracted
         end;
 
-	end;
-        
-	if isfield(INEEG1, 'epoch') && isfield(INEEG2, 'epoch') && ~isempty(INEEG1.epoch) && ~isempty(INEEG2.epoch)
-		try 
-			INEEG1.epoch(end+1:end+INEEG2.trials) = INEEG2.epoch(:);
-		catch
-			disp('pop_mergetset: epoch info removed (information not consistent across datasets)');
-		end;
-	else
-		INEEG1.epoch =[];
-	end;
+    end;
 
-  	% check consistency of merged dataset, regenerate epoch structure
-  	% ---------------------------------------------------------------
-	if ~isempty(INEEG2.event)
-        INEEG1.pnts = size(INEEG1.data,2);
-        disp('Reconstituting epoch information...');
-        INEEG1 = eeg_checkset(INEEG1, 'eventconsistency');
-    end
+    INEEG1.pnts = size(INEEG1.data,2);
+
+    % rebuild event-related epoch fields
+    % ----------------------------------
+    disp('Reconstituting epoch information...');
+    INEEG1 = eeg_checkset(INEEG1, 'eventconsistency');
 end
 
 % build the command
 % -----------------
 if exist('indices') == 1
-	com = sprintf('EEG = pop_mergeset( %s, [%s], %d);', inputname(1), int2str(indices), keepall);
+    com = sprintf('EEG = pop_mergeset( %s, [%s], %d);', inputname(1), int2str(indices), keepall);
 else
-	com = sprintf('EEG = pop_mergeset( %s, %s, %d);', inputname(1), inputname(2), keepall);		
+    com = sprintf('EEG = pop_mergeset( %s, %s, %d);', inputname(1), inputname(2), keepall);
 end
 
 return
