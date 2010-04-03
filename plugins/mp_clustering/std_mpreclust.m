@@ -6,36 +6,36 @@ function STUDY = std_mpreclust(STUDY,ALLEEG, measuresToUseInClustering, reCalcul
 %     >> STUDY = std_mpreclust(STUDY,ALLEEG, measures, reCalculate);
 %
 % Inputs:
-%     
+%
 %     STUDY      - STUDY data structure
 %     ALLEEG     - ALLEEG vector of loaded EEG data structures
 %     measures   - a cell-array of strings telling which measures should be calculated for each STUDY condition:
-%     
+%
 %     'erp' = component ERPs
-%     'spec' = component log mean spectra    
-%     'ersp' = component ERSPs     
-%     'itc' = component ITCs     
+%     'spec' = component log mean spectra
+%     'ersp' = component ERSPs
+%     'itc' = component ITCs
 %     'dipole' = equivalent dipole locations
 %     'map' = component scalp maps ('dipole' may be preferable)
-%     
+%
 % Example:
-%     
-%     >> STUDY = std_mpreclust(STUDY,ALLEEG,{'dipole' ,'erp' ,'ersp'});    
-%     indicates that similarity matrices for component equivalent dipole locations, ERPs, and ERSPs     
+%
+%     >> STUDY = std_mpreclust(STUDY,ALLEEG,{'dipole' ,'erp' ,'ersp'});
+%     indicates that similarity matrices for component equivalent dipole locations, ERPs, and ERSPs
 %     should be pre-computed prior to MP clustering.
-%     
+%
 % Optional Inputs:
-%     
+%
 %     reCalculate - (boolean) If true, the function will remove all previously calculated similarity values
-%     
+%
 %     and re-calculate the similariry matrices.
-%     
+%
 % Output:
-%     
+%
 %     STUDY      - STUDY data structure with STUDY.preclust.similarity field updated
-%     
+%
 %     See also: pop_mpreclust(), std_mpcluster()
-% 
+%
 % Author: Nima Bigdely-Shamlo and and Brandon Burdge, SCCN/INC/UCSD, 2009
 
 
@@ -44,7 +44,7 @@ STUDY.preclust.similarity.measuresToUseInClustering = measuresToUseInClustering;
 if nargin < 4
     reCalculateAll = true;
 end;
- 
+
 % if isempty(parentClusterID)%isempty(STUDY.etc) || ~isfield(STUDY.etc, 'preclust') || isempty(STUDY.etc.preclust)
 %      parentClusterID = 1;
 % end;
@@ -69,7 +69,7 @@ if  ismember('erp', measuresToUseInClustering)
         [STUDY clustinfo] = std_readdata(STUDY,ALLEEG,'clusters',STUDY.etc.preclust.clustlevel,'infotype','erp');
         clustinfo = STUDY.cluster(STUDY.etc.preclust.clustlevel);
         
-
+        
         % combine conditions in each group, then combine groups together
         try
             for group=1:numberOfGroups
@@ -81,7 +81,7 @@ if  ismember('erp', measuresToUseInClustering)
         end;
         
         erpdata = cat(2, combinedConditions{:});
-
+        
         % calculate correlations
         erpCorr = [];
         fprintf('\nERP: percent done = ');
@@ -89,7 +89,7 @@ if  ismember('erp', measuresToUseInClustering)
             if mod(i, 50)  == 0
                 fprintf('%d...',round(100*i/size(erpdata,2)));
             end;
-
+            
             for j=1:size(erpdata,2)
                 c = corrcoef(erpdata(:,i), erpdata(:,j));
                 erpCorr(i,j) = c(1,2);
@@ -108,13 +108,13 @@ if ismember('ersp', measuresToUseInClustering)
         fprintf('\n');
         [STUDY clustinfo] = std_readdata(STUDY,ALLEEG,'clusters',STUDY.etc.preclust.clustlevel,'infotype','ersp');
         clustinfo = STUDY.cluster(STUDY.etc.preclust.clustlevel);
-
+        
         % combine conditions in each group, then combine groups together
         for group=1:numberOfGroups
             combinedConditions{group} = cat(1,clustinfo.erspdata{:,group});
         end;
         erspdata = cat(3, combinedConditions{:});
-
+        
         % calculate correlations
         erspCorr = [];
         fprintf('\nERSP: percent done = ');
@@ -122,7 +122,7 @@ if ismember('ersp', measuresToUseInClustering)
             if mod(i, 50)  == 0
                 fprintf('%d...',round(100*i/size(erspdata,3)));
             end;
-
+            
             for j=1:size(erspdata,3)
                 c = corrcoef( erspdata(:,:,i), erspdata(:,:,j));
                 erspCorr(i,j) = c(1,2);
@@ -142,13 +142,13 @@ if ismember('itc', measuresToUseInClustering)
         fprintf('\n');
         [STUDY clustinfo] = std_readdata(STUDY,ALLEEG,'clusters',STUDY.etc.preclust.clustlevel,'infotype','itc');
         clustinfo = STUDY.cluster(STUDY.etc.preclust.clustlevel);
-
+        
         % combine conditions in each group, then combine groups together
         for group=1:numberOfGroups
             combinedConditions{group} = cat(1,clustinfo.itcdata{:,group});
         end;
         itcdata = cat(3, combinedConditions{:});
-
+        
         % calculate correlations
         itcCorr = [];
         fprintf('\nITC: percent done = ');
@@ -156,7 +156,7 @@ if ismember('itc', measuresToUseInClustering)
             if mod(i, 50)  == 0
                 fprintf('%d...',round(100*i/size(itcdata,3)));
             end;
-
+            
             for j=1:size(itcdata,3)
                 c = corrcoef(itcdata(:,:,i), itcdata(:,:,j));
                 itcCorr(i,j) = c(1,2);
@@ -175,21 +175,21 @@ if ismember('dipole', measuresToUseInClustering)
         fprintf('\n');
         [STUDY clustinfo] = std_readdata(STUDY,ALLEEG,'clusters',STUDY.etc.preclust.clustlevel,'infotype','dipole');
         clustinfo = STUDY.cluster(STUDY.etc.preclust.clustlevel);
-
+        
         % combine conditions in each group, then combine groups together
         for group=1:numberOfGroups
-%            combinedConditions{group} = cat(1,clustinfo.dipoles{:,group});
+            %            combinedConditions{group} = cat(1,clustinfo.dipoles{:,group});
             combinedConditions{group} = cat(1,clustinfo.dipoles{1,group}); % only dipoles from the first condition
         end;
         dipoles = cat(2, combinedConditions{:});
-
+        
         % calculate distance between dipoles
         compPos = [];compDistance = [];
-
+        
         for i=1:size(dipoles,2)
             for j=1:size(dipoles,2)
                 compDistance(i,j) = norm(dipoles(i).posxyz(1,:)- dipoles(j).posxyz(1,:),'fro');
-      %          compDistance(i,j) = distanceBetweenDipoles(dipoles(i).posxyz, dipoles(j).posxyz);
+                %          compDistance(i,j) = distanceBetweenDipoles(dipoles(i).posxyz, dipoles(j).posxyz);
             end;
             compPos(i,:) = dipoles(i).posxyz(1,:);
         end;
@@ -209,28 +209,42 @@ if ismember('spec', measuresToUseInClustering)
         fprintf('\nSpectra: percent done = ');
         [STUDY clustinfo] = std_readdata(STUDY,ALLEEG,'clusters',STUDY.etc.preclust.clustlevel,'infotype','spec');
         clustinfo = STUDY.cluster(STUDY.etc.preclust.clustlevel);
-     %   specdata = cat(2,clustinfo.specdata{1}, clustinfo.specdata{2});
-
+        %   specdata = cat(2,clustinfo.specdata{1}, clustinfo.specdata{2});
+        
         % combine conditions in each group, then combine groups together
         for group=1:numberOfGroups
             combinedConditions{group} = cat(1,clustinfo.specdata{:,group});
         end;
         specdata = cat(2, combinedConditions{:});
-
-         specCorr = [];
+        
+        specdataEachMeanRemoved = specdata - repmat(mean(specdata, 1), size(specdata,1), 1);
+        meanSpec= mean(specdataEachMeanRemoved, 2);
+        normalizedSpec = specdataEachMeanRemoved - repmat(meanSpec, 1, size(specdata,2));
+        
+        specCorr = [];
+        normalizedSpecCorr = [];
         for i=1:size(specdata,2)
             if mod(i, 50)  == 0
                 fprintf('%d...',round(100*i/size(specdata,2)));
             end;
-
+            
             for j=1:size(specdata,2)
                 combinedConditionsI = specdata(:,i);
                 combinedConditionsJ = specdata(:,j);
                 c = corrcoef(combinedConditionsI, combinedConditionsJ);
                 specCorr(i,j) = c(1,2);
+                
+                % for normalized spec
+                combinedConditionsI = normalizedSpec(:,i);
+                combinedConditionsJ = normalizedSpec(:,j);
+                c = corrcoef(combinedConditionsI, combinedConditionsJ);
+                normalizedSpecCorr(i,j) = c(1,2);
+                
             end;
         end;
         STUDY.preclust.similarity.specCorr = specCorr;
+        STUDY.preclust.similarity.normalizedSpecCorr = normalizedSpecCorr;
+        
     else
         specCorr =  STUDY.preclust.similarity.specCorr;
     end;
@@ -252,7 +266,7 @@ if ismember('map', measuresToUseInClustering)
             mapdata(:,i) = clustinfo.topoall{i}(:);
         end;
         
-        % removing NAN indices 
+        % removing NAN indices
         s = sum(mapdata,2);
         mapdata(find(isnan(s)),:) = [];
         
@@ -261,7 +275,7 @@ if ismember('map', measuresToUseInClustering)
             if mod(i, 50)  == 0
                 fprintf('%d...',round(100*i/size(mapdata,2)));
             end;
-
+            
             for j=1:size(mapdata,2)
                 c = corrcoef(mapdata(:,i), mapdata(:,j));
                 mapCorr(i,j) = c(1,2);
@@ -304,17 +318,17 @@ end
 
 function result = distanceBetweenDipoles(posA,posB)
 if size(posA,1) == 1 && size(posB,1)==3
-     result = norm(posA-posB,'fro');
+    result = norm(posA-posB,'fro');
 else
     if size(posA,1) == 1
         posA = repmat(posA,2,1);
     end;
-
+    
     if size(posB,1) == 1
         posB = repmat(posB,2,1);
     end;
-
-     d = squareform(pdist([posA;posB]));
-     result = min([d(1,3) d(1,4) d(2,3) d(2,4)]); % minimum of pairwise dipoles no belonging to the same IC
+    
+    d = squareform(pdist([posA;posB]));
+    result = min([d(1,3) d(1,4) d(2,3) d(2,4)]); % minimum of pairwise dipoles no belonging to the same IC
 end
 end
