@@ -1,8 +1,8 @@
 % pop_export() - export EEG dataset
 %
 % Usage:
-%   >> EEG = pop_export(EEG);   % a window pops up
-%   >> EEG = pop_export(EEG, filename, 'key', 'val', ... );
+%   >> com = pop_export(EEG);   % a window pops up
+%   >> com = pop_export(EEG, filename, 'key', 'val', ... );
 %
 % Inputs:
 %   EEG            - eeglab dataset
@@ -22,7 +22,7 @@
 %   'precision'    - [float] number of significant digits in output. Default 4. 
 % 
 % Outputs:
-%   EEG            - EEGLAB data structure
+%   com            - The expresion that execute this function. i.e. 'pop_export(MyEEG, 'ExpEEG.mat')'
 %
 % Note: tabulation are used as a delimiter.
 %
@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.4  2006/01/31 20:21:30  arno
+% eeglab options
+%
 % Revision 1.3  2003/05/22 15:03:41  arno
 % [A[Awindow size and header typo
 %
