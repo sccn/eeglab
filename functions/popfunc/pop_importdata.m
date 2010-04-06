@@ -1,7 +1,7 @@
 % pop_importdata() - import data from a Matlab variable or disk file by calling
 %                    importdata().
 % Usage:
-%   >> EEGOUT = pop_importdata( EEG ); % pop-up a data entry window 
+%   >> EEGOUT = pop_importdata(); % pop-up a data entry window 
 %   >> EEGOUT = pop_importdata( 'key', val,...); % no pop-up window
 %
 % Graphic interface (refer to a previous version of the GUI):
@@ -130,6 +130,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.33  2009/11/11 00:28:53  arno
+% New GUI format
+%
 % Revision 1.32  2009/05/17 21:52:43  arno
 % fix crash when cancel loading
 %
