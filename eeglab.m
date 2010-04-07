@@ -189,6 +189,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.552  2010/03/22 01:13:27  arno
+% Font for mac
+%
 % Revision 1.551  2010/02/16 08:44:51  arno
 % fix fieldtrip sourcedepth path
 %
@@ -1841,6 +1844,7 @@ function [ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab( onearg )
 
 % add the paths
 % -------------
+warning('off', 'dispatcher:nameConflict');
 eeglabpath = which('eeglab.m');
 eeglabpath = eeglabpath(1:end-length('eeglab.m'));
 
@@ -1883,6 +1887,7 @@ if ~iseeglabdeployed2
     myaddpath( eeglabpath, 'eeg_checkset.m',   [ 'functions' filesep 'adminfunc'    ]);
     myaddpath( eeglabpath, 'pop_study.m',      [ 'functions' filesep 'studyfunc'    ]);
     myaddpath( eeglabpath, 'pop_loadbci.m',    [ 'functions' filesep 'popfunc'      ]);
+    myaddpath( eeglabpath, 'statcond.m',       [ 'functions' filesep 'statistics'   ]);
     myaddpath( eeglabpath, 'timefreq.m',       [ 'functions' filesep 'timefreqfunc' ]);
     myaddpath( eeglabpath, 'icademo.m',        [ 'functions' filesep 'miscfunc'     ]);
     myaddpath( eeglabpath, 'eeglab1020.ced',   [ 'functions' filesep 'resources'    ]);
@@ -2109,7 +2114,7 @@ catchstrs.update_study           = e_load_study;
                 disp([ 'eeglab: cannot find BIOSIG plugin' ] ); 
                 disp([ '   ' lasterr] );
             end;
-        end;            
+        end;
     end;
     
 	cb_importdata  = [ nocheck '[EEG LASTCOM] = pop_importdata;'   e_newset ];
@@ -2141,7 +2146,7 @@ catchstrs.update_study           = e_load_study;
 	cb_study1      = [ nocheck 'pop_stdwarn; [STUDYTMP ALLEEGTMP LASTCOM] = pop_study([], ALLEEG         , ''gui'', ''on'');' e_load_study]; 
 	cb_study2      = [ nocheck 'pop_stdwarn; [STUDYTMP ALLEEGTMP LASTCOM] = pop_study([], isempty(ALLEEG), ''gui'', ''on'');' e_load_study]; 
 	cb_loadstudy   = [ nocheck 'pop_stdwarn; [STUDYTMP ALLEEGTMP LASTCOM] = pop_loadstudy;'                                   e_load_study]; 
-	cb_savestudy1  = [ check   '[STUDYTMP ALLEEGTMP LASTCOM] = pop_savestudy(STUDY, EEG, ''savemode'', ''resave'');'      e_load_study];
+    cb_savestudy1  = [ check   '[STUDYTMP ALLEEGTMP LASTCOM] = pop_savestudy(STUDY, EEG, ''savemode'', ''resave'');'      e_load_study];
 	cb_savestudy2  = [ check   '[STUDYTMP ALLEEGTMP LASTCOM] = pop_savestudy(STUDY, EEG);'                                e_load_study];
 	cb_clearstudy  =           'LASTCOM = ''STUDY = []; CURRENTSTUDY = 0; ALLEEG = []; EEG=[]; CURRENTSET=[];''; eval(LASTCOM); eegh( LASTCOM ); eeglab redraw;';
 	cb_editoptions = [ nocheck 'if isfield(ALLEEG, ''nbchan''), LASTCOM = pop_editoptions(length([ ALLEEG.nbchan ]) >1);' ...
@@ -2241,6 +2246,7 @@ catchstrs.update_study           = e_load_study;
 	cb_crossf2     = [ checkica      'LASTCOM = pop_newcrossf(EEG, 0,eegh(''find'',''pop_newcrossf(EEG,0''));' e_hist];
 		
     cb_study3      = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_study(STUDY, ALLEEG, ''gui'', ''on'');'  e_load_study];
+	cb_studydesign = [ nocheck '[STUDYTMP LASTCOM] = pop_studydesign(STUDY, ALLEEG); ALLEEGTMP = ALLEEG;'   e_load_study];     
     cb_precomp     = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_precomp(STUDY, ALLEEG);'                 e_load_study];
     cb_chanplot    = [ nocheck '[STUDYTMP LASTCOM] = pop_chanplot(STUDY, ALLEEG); ALLEEGTMP=ALLEEG;'        e_load_study];
     cb_precomp2    = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_precomp(STUDY, ALLEEG, ''components'');' e_load_study];
@@ -2407,6 +2413,7 @@ catchstrs.update_study           = e_load_study;
     uimenu( spec_m, 'Label', 'Component cross-coherence'              , 'CallBack', cb_crossf2);
 		
     uimenu( std_m,  'Label', 'Edit study info'                        , 'CallBack', cb_study3);
+    %uimenu( std_m,  'Label', 'Select/Edit study design(s)'            , 'CallBack', cb_studydesign);
     uimenu( std_m,  'Label', 'Precompute channel measures'            , 'CallBack', cb_precomp, 'separator', 'on');
     uimenu( std_m,  'Label', 'Plot channel measures'                  , 'CallBack', cb_chanplot);
     uimenu( std_m,  'Label', 'Precompute component measures'          , 'CallBack', cb_precomp2, 'separator', 'on');
@@ -2599,12 +2606,16 @@ WINY		    = WINYDEC*NBLINES;
 BORDERINT       = 4;
 BORDEREXT       = 10;
 comp = computer;
-if strcmpi(comp(1:3), 'GLN') || strcmpi(comp(1:3), 'MAC') % Linux
+if strcmpi(comp(1:3), 'GLN') % Linux
     FONTNAME        = 'courier';
+    FONTSIZE        = 8;
+elseif strcmpi(comp(1:3), 'MAC') 
+    FONTNAME        = 'courier';
+    FONTSIZE        = 8;
 else
     FONTNAME        = '';
+    FONTSIZE        = 11;
 end;    
-FONTSIZE        = 11;
 
 hh = findobj('tag', 'EEGLAB');
 if ~isempty(hh)
@@ -3299,6 +3310,7 @@ elseif (exist('EEG') == 1) & ~isnumeric(EEG) & ~isempty(EEG(1).data)
         if EEG.trials == 1, 
             set( findobj('parent', file_m, 'type', 'uimenu', 'Label', 'Import epoch info' ), 'enable', 'off'); 
             set( findobj('parent', tool_m, 'type', 'uimenu', 'Label', 'Reject data epochs'), 'enable', 'off'); 
+            set( findobj('parent', tool_m, 'type', 'uimenu', 'Label', 'Automatic epoch rejection'), 'enable', 'off'); 
             set( findobj('parent', ica_m , 'type', 'uimenu'), 'enable', 'off'); 
             set( findobj('parent', ica_m , 'type', 'uimenu', 'label', 'Reject components by map' ), 'enable', 'on'); 
             set( findobj('parent', tools_m, 'type', 'uimenu', 'Label', 'Channel ERP image'), 'enable', 'off'); 
