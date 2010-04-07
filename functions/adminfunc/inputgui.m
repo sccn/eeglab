@@ -73,6 +73,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.40  2009/11/11 00:28:52  arno
+% New GUI format
+%
 % Revision 1.39  2009/07/30 04:45:11  arno
 % adding return mode
 %
@@ -255,7 +258,7 @@ if isstr(g.mode)
     options = { 'width' 80 'stickto' 'on' };
 	if ~isempty(g.helpcom)
         if ~iscell(g.helpcom) | isempty(g.geom)
-            g.uilist = { g.uilist{:}, { 'width' 80 'align' 'left' 'Style', 'pushbutton', 'string', 'Help', 'callback', g.helpcom } };
+            g.uilist = { g.uilist{:}, { 'width' 80 'align' 'left' 'Style', 'pushbutton', 'string', 'Help', 'tag', 'help', 'callback', g.helpcom } };
         else
             g.uilist = { g.uilist{:}, { 'width' 80 'align' 'left' 'Style', 'pushbutton', 'string', 'Help gui', 'callback', g.helpcom{1} } };
             g.uilist = { g.uilist{:}, { 'width' 80 'align' 'left' 'Style', 'pushbutton', 'string', 'More help', 'callback', g.helpcom{2} } };
@@ -264,7 +267,7 @@ if isstr(g.mode)
 	else
 		g.uilist = { g.uilist{:}, {} };
 	end;
-	g.uilist = { g.uilist{:}, { 'width' 80 'align' 'right' 'Style', 'pushbutton', 'string', 'Cancel', 'callback', 'close gcbf' } };
+	g.uilist = { g.uilist{:}, { 'width' 80 'align' 'right' 'Style', 'pushbutton', 'string', 'Cancel', 'tag' 'cancel' 'callback', 'close gcbf' } };
 	g.uilist = { g.uilist{:}, { 'width' 80 'align' 'right' 'stickto' 'on' 'Style', 'pushbutton', 'tag', 'ok', 'string', 'OK', 'callback', 'set(gcbo, ''userdata'', ''retuninginputui'');' } };
     if ~isempty(g.geom)
 		[tmp tmp2 allobj] = supergui( 'fig', fig, 'minwidth', 200, 'geom', g.geom, 'uilist', g.uilist );
