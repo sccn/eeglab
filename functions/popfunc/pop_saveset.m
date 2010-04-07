@@ -24,8 +24,7 @@
 %   EEG        - saved dataset (after extensive syntax checks)
 %   ALLEEG     - saved datasets (after extensive syntax checks)
 %
-% Note: An individual dataset should be saved with a '.set' file extension,
-%       multiple datasets (at once) with a '.sets' file extension
+% Note: An individual dataset should be saved with a '.set' file extension
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
@@ -50,6 +49,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.95  2009/07/24 22:22:33  arno
+% fixing deleting .fdt file
+%
 % Revision 1.94  2008/11/24 22:31:52  arno
 % remove debug msg
 %
