@@ -14,6 +14,8 @@
 %   'component' - [integer array] read only specific components
 %   'rmcomps'   - [integer array] remove selected components from data
 %                 channels
+%   'trialindices' - [integer array] only read specific trials. Default is
+%                 to read all trials.
 %   'verbose'   - ['on'|'off'] verbose mode. Default is 'on'.
 %
 % Outputs:
@@ -42,6 +44,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2010/04/07 22:17:19  arno
+% Add trial indices
+%
 % Revision 1.7  2009/10/21 20:52:39  arno
 % add error if file changed on disk
 %
