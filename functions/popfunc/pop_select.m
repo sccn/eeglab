@@ -96,6 +96,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.73  2010/03/31 21:00:53  arno
+% Christian allowed non-empty fields for EEG.epoch
+%
 % Revision 1.71  2009/09/26 22:19:03  arno
 % Various fixes to pop_writeeeg, std_movecomp,
 %
@@ -605,7 +608,7 @@ if ~isempty(g.time) | ~isempty(g.notime)
         if isempty(g.notime)
             g.notime = g.time';
             g.notime = g.notime(:);
-            if g.notime(1) ~= 0, g.notime = [0 g.notime(:)'];
+            if g.notime(1) ~= 0, g.notime = [EEG.xmin g.notime(:)'];
             else                 g.notime = [g.notime(2:end)'];
             end;
             if g.time(end) == EEG.xmax, g.notime(end) = [];
