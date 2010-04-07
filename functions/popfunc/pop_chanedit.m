@@ -142,6 +142,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.191  2010/01/31 20:01:55  arno
+% Fix history for channel lookup
+%
 % Revision 1.190  2010/01/27 19:51:46  arno
 % fix history for channel lookup
 %
@@ -869,11 +872,11 @@ if nargin < 3
     % add buttons
     % -----------
     geometry =  { geometry{:} [1] [1.15 0.5 0.6 1.9 0.4 0.4 1.15] [1.15 0.7 0.7 1 0.7 0.7 1.15] };
-    cb_del    = [ 'valnum   = str2num(char(get(findobj(''tag'', ''chaneditnumval''), ''string'')));' ...
-                  'pop_chanedit(gcbf, [], ''delete'', valnum);' ];
-    cb_insert = [ 'valnum   = str2num(char(get(findobj(''tag'', ''chaneditnumval''), ''string'')));' ...
+    cb_del    = [ 'valnum   = str2num(char(get(findobj(gcbf,''tag'', ''chaneditnumval''), ''string'')));' ...
+                  'pop_chanedit(gcbf, [], ''deletegui'', valnum);' ];
+    cb_insert = [ 'valnum   = str2num(char(get(findobj(gcbf,''tag'', ''chaneditnumval''), ''string'')));' ...
                   'pop_chanedit(gcbf, [], ''insert'', valnum);' ];
-    cb_append = [ 'valnum   = str2num(char(get(findobj(''tag'', ''chaneditnumval''), ''string'')));' ...
+    cb_append = [ 'valnum   = str2num(char(get(findobj(gcbf,''tag'', ''chaneditnumval''), ''string'')));' ...
                   'pop_chanedit(gcbf, [], ''append'', valnum);' ];
 
     uilist   = { uilist{:}, ...
@@ -1146,6 +1149,11 @@ else
                 
             case 'plotrad'
                 chans(1).plotrad = args{ curfield+1 };
+                
+            case 'deletegui'
+                chans(args{ curfield+1 })=[];
+                currentpos = min(length(chans), currentpos);
+                args{ curfield   } = 'delete';
                 
             case 'delete'
                 chans(args{ curfield+1 })=[];
@@ -1439,12 +1447,23 @@ if ~isempty(fig)
 
     % update GUI with current channel info
     allfields = fieldnames(chans);
-    for index = 1:length(allfields)
-        obj = findobj(fig, 'tag', [ 'chanedit' allfields{index}]);
-        if strcmpi(allfields{index}, 'datachan') 
-            set(obj, 'value', getfield(chans(currentpos), allfields{index}));
-        else
-            set(obj, 'string', num2str(getfield(chans(currentpos), allfields{index})));
+    if ~isempty(chans)
+        for index = 1:length(allfields)
+            obj = findobj(fig, 'tag', [ 'chanedit' allfields{index}]);
+            if strcmpi(allfields{index}, 'datachan') 
+                set(obj, 'value', getfield(chans(currentpos), allfields{index}));
+            else
+                set(obj, 'string', num2str(getfield(chans(currentpos), allfields{index})));
+            end;
+        end;
+    else
+        for index = 1:length(allfields)
+            obj = findobj(fig, 'tag', [ 'chanedit' allfields{index}]);
+            if strcmpi(allfields{index}, 'datachan') 
+                set(obj, 'value', 0);
+            else
+                set(obj, 'string', '');
+            end;
         end;
     end;
 else
