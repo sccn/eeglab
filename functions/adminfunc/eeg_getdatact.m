@@ -42,6 +42,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.7  2009/10/21 20:52:39  arno
+% add error if file changed on disk
+%
 % Revision 1.6  2008/11/12 22:31:12  arno
 % memory mapped data
 %
@@ -70,6 +73,7 @@ function data = eeg_getdatact( EEG, varargin);
         'channel'   'integer' {} [1:EEG.nbchan];
         'verbose'   'string'  { 'on' 'off' } 'on';
         'component' 'integer' {} [];        
+        'trialindices' 'integer' {} [];        
         'rmcomps'   'integer' {} [] }, 'eeg_getdatact');
     
     if isstr(opt), error(opt); end;
@@ -195,4 +199,9 @@ function data = eeg_getdatact( EEG, varargin);
     catch
         error('The file on disk does not correspond to the dataset information. Close and reopen the STUDY');
     end;
+    
+    if ~isempty(opt.trialindices)
+        data = data(:,:,opt.trialindices);
+    end;
+    
     
