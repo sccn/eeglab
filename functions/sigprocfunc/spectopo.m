@@ -119,6 +119,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.116  2010/03/25 19:46:18  arno
+% fix performing spectral decomposition on dataset components when only a subset of channels are selected
+%
 % Revision 1.115  2009/11/18 20:33:34  arno
 % reref 'no' -> 'off'
 %
@@ -1042,7 +1045,7 @@ if ~isempty(g.freq) &  strcmpi(g.plot, 'on')
 	for f=1:length(g.freq)
 		axes(headax(realpos(f)));
         
-  		topodata = eegspecdB(:,freqidx(f))-mean(eegspecdB(:,freqidx(f)));
+  		topodata = eegspecdB(:,freqidx(f))-nan_mean(eegspecdB(:,freqidx(f)));
 
 		if isnan(g.limits(5)),     
 			maplimits = 'absmax';
