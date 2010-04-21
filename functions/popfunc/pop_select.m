@@ -60,11 +60,14 @@
 %                   or the last point (EEG.pnts), as a central point range cannot be removed. 
 %   'trial'       - array of trial indices to retain in the new dataset
 %   'notrial'     - array of trial indices to exclude from the new dataset
+%   'sorttrial'   - ['on'|'off'] sort trial indices before extracting them (default: 'on').
 %   'channel'     - vector of channel indices to retain in the new 
 %                   dataset. Can also be a cell array of channel names.
 %   'nochannel'   - vector of channel indices to exclude from the new
 %                   dataset. Can also be a cell array of channel names.
 %   'newname'     - name for the new dataset (OUTEEG)
+%   'sort'        - automatically sort the specified trial range and channel range 
+%                   (0|1, default: 1)
 %
 % Outputs:
 %   OUTEEG        - new EEG dataset structure
@@ -96,9 +99,6 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
-% Revision 1.73  2010/03/31 21:00:53  arno
-% Christian allowed non-empty fields for EEG.epoch
-%
 % Revision 1.71  2009/09/26 22:19:03  arno
 % Various fixes to pop_writeeeg, std_movecomp,
 %
@@ -407,20 +407,25 @@ g = finputcheck(args, { 'time'    'real'      []         []; ...
                         'notrial' 'integer'   []         []; ...
                         'point'   'integer'   []         []; ...
                         'nopoint' 'integer'   []         []; ...
-                        'channel'   { 'integer' 'cell' }   []  chanlist;
+                        'channel'   { 'integer' 'cell' }  []  chanlist;
                         'nochannel' { 'integer' 'cell' }   []  [];
                         'trialcond'   'integer'   []         []; ...
-                        'notrialcond' 'integer'   []         [] }, 'pop_select');
+                        'notrialcond' 'integer'   []         []; ...
+                        'sorttrial'   'string'    { 'on' 'off' } 'on' }, 'pop_select');
+if isstr(g), error(g); end;
 
-allfields = fieldnames(g);
-for index = 1:length(allfields)
-        switch allfields{index}
-         case { 'time' 'notime' 'trial' 'notrial' 'point' 'nopoint' 'channel' 'nochannel' 'trialcond' 'notrialcond' };
-         otherwise disp('pop_select error: unrecognized option'); beep; return;
-        end;
-end;
+if strcmpi(g.sorttrial, 'on')
+    g.trial = sort(setdiff( g.trial, g.notrial ));
+else
+    g.trial(ismember(g.trial,g.notrial)) = [];
+    % still warn about & remove duplicate trials (may be removed in the future)
+    [p,q] = unique(g.trial);
+    if length(p) ~= length(g.trial)
+        disp('Warning: trial selection contained duplicated elements, which were removed.'); 
+    end    
+    g.trial = g.trial(sort(q));
+end
 
-g.trial   = sort(setdiff( g.trial, g.notrial ));
 if ~iscell(g.nochannel) & ~iscell(chanlist)
     g.channel = [1:EEG.nbchan];
 end;
@@ -433,10 +438,31 @@ if iscell(g.channel) && ~iscell(g.nochannel) && ~isempty(EEG.chanlocs)
      g.nochannel =   noChannelAsCell; 
 end;
 
-g.channel = sort(setdiff( lower(g.channel), lower(g.nochannel) ));
+if strcmpi(g.sorttrial, 'on')
+    g.channel = sort(setdiff( lower(g.channel), lower(g.nochannel) ));
+else
+    g.channel(ismember(lower(g.channel),lower(g.nochannel))) = [];
+    % still warn about & remove duplicate channels (may be removed in the future)
+    [p,q] = unique(g.channel);
+    if length(p) ~= length(g.channel)
+        disp('Warning: channel selection contained duplicated elements, which were removed.'); 
+    end    
+    g.channel = g.channel(sort(q));    
+end
 
 if ~isempty(EEG.chanlocs)
-    g.channel = eeg_decodechan(EEG.chanlocs, g.channel);
+    if strcmpi(g.sorttrial, 'on')
+        g.channel = eeg_decodechan(EEG.chanlocs, g.channel);
+    else
+        % we have to protect the channel order against changes by eeg_decodechan
+        if iscell(g.channel)
+            % translate channel names into indices
+            [inds,names] = eeg_decodechan(EEG.chanlocs, g.channel);
+            % and sort the indices back into the original order of channel names
+            [tmp,I] = ismember(lower(g.channel),lower(names)); 
+            g.channel = inds(I);
+        end
+    end
 end;
 
 if ~isempty(g.time) & (g.time(1) < EEG.xmin*1000) & (g.time(2) > EEG.xmax*1000)
