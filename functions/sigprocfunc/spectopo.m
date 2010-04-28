@@ -119,6 +119,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.117  2010/04/07 22:20:52  arno
+% fix NaN channels
+%
 % Revision 1.116  2010/03/25 19:46:18  arno
 % fix performing spectral decomposition on dataset components when only a subset of channels are selected
 %
@@ -1133,8 +1136,7 @@ end;
 % Draw title
 %%%%%%%%%%%%%%%%
 if ~isempty(g.title) & strcmpi(g.plot, 'on')
-	axes(mainfig);
-	tl = text(-0.1,1.06,g.title, 'interpreter', 'none');
+    tl = textsc(g.title);
 	set(tl,'fontsize',15)
 end
 
