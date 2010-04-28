@@ -24,6 +24,12 @@
 % Outputs: same as newtimef(), no outputs are returned when a
 %          window pops-up to ask for additional arguments
 %
+% Getting the ERSP and ITC output values:
+% Simply look up the history using the eegh function (type eegh).
+% Then copy and paste the pop_newtimef command call and manually add output
+% (see the newtimef function for a list of outputs). For instance
+% [ersp itc powbase times frequencies] = pop_newtimef( EEG, ....);
+%
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
 % See also: newtimef(), eeglab() 
@@ -47,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.44  2009/11/18 20:28:30  arno
+% fix baseline issue
+%
 % Revision 1.43  2009/11/11 22:50:21  dev
 % Added Brackets around results.baseline (line 209)
 %
