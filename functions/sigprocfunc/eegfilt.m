@@ -40,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.19  2004/11/19 23:28:11  arno
+% same
+%
 % Revision 1.18  2004/11/19 23:27:27  arno
 % better error messsage
 %
@@ -219,14 +222,17 @@ filtwts = firls(filtorder,f,m); % get FIR filter coefficients
 smoothdata = zeros(chans,frames);
 for e = 1:epochs                % filter each epoch, channel 
     for c=1:chans
-      smoothdata(c,(e-1)*epochframes+1:e*epochframes) ...
-        = filtfilt(filtwts,1,data(c,(e-1)*epochframes+1:e*epochframes));
+        try
+            smoothdata(c,(e-1)*epochframes+1:e*epochframes) ...
+                = filtfilt(filtwts,1,data(c,(e-1)*epochframes+1:e*epochframes));
+        catch,
+            smoothdata(c,(e-1)*epochframes+1:e*epochframes) ...
+                = filtfilt(filtwts,1,double(data(c,(e-1)*epochframes+1:e*epochframes)));
+        end;
       if epochs == 1 
-       if rem(c,20) ~= 0
-         fprintf('.');
-       else 
-         fprintf('%d',c);
-       end
+           if rem(c,20) ~= 0, fprintf('.');
+           else               fprintf('%d',c);
+           end
       end
     end
 end
