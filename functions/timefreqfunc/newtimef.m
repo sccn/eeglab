@@ -245,7 +245,7 @@
 %         erspboot  = (nfreqs,2) matrix of [lower upper] ERSP significance.
 %          itcboot  = (nfreqs) matrix of [upper] abs(itc) threshold.
 %           tfdata  = optional (nfreqs,timesout,trials) time/frequency decomposition 
-%                      of the single data trials
+%                      of the single data trials. Values are complex.
 %
 % Plot description:
 %   Assuming both 'plotersp' and 'plotitc' options are 'on' (= default). 
@@ -329,6 +329,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.178  2010/02/16 08:43:21  arno
+% New single-trial reading/writing
+%
 % Revision 1.177  2009/11/27 16:14:52  arno
 % help typo
 %
