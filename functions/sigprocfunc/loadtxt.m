@@ -53,6 +53,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.14  2009/09/27 05:14:37  arno
+% Fixed conversion to numeric
+%
 % Revision 1.13  2007/03/20 02:32:38  arno
 % fixed finputcheck (Andreas)
 %
@@ -151,9 +154,9 @@ while isempty(inputline) | inputline~=-1
 	        case 'on',
 			     while ~isempty(deblank(inputline))
 			         [tmp inputline] = mystrtok(inputline, g.delim);
-                     tmp2 = str2num(tmp);
-			         if isempty( tmp2 )  , array{linenb, colnb} = tmp;
-			         else                  array{linenb, colnb} = tmp2;
+                     tmp2 = str2double(tmp);
+			         if isnan( tmp2 )  , array{linenb, colnb} = tmp;
+                     else                array{linenb, colnb} = tmp2;
 			         end;
 			         colnb = colnb+1;
 			     end;
