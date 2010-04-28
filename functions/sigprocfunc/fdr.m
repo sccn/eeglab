@@ -4,10 +4,12 @@
 %   >> [p_fdr, p_masked] = fdr( pvals, alpha);
 %
 % Inputs:
-%   pvals - vector or array of p-values
-%   alpha - threshold value (non-corrected). If no alpha is given
-%           each p-value is used as its own alpha and FDR corrected
-%           array is returned.
+%   pvals   - vector or array of p-values
+%   alpha   - threshold value (non-corrected). If no alpha is given
+%             each p-value is used as its own alpha and FDR corrected
+%             array is returned.
+%   fdrtype - ['parametric'|'nonParametric'] FDR type. Default is  
+%             'parametric'.
 %
 % Outputs:
 %   p_fdr    - pvalue used for threshold (based on independence
@@ -17,7 +19,7 @@
 % Author: Arnaud Delorme, SCCN, 2008-
 %         Based on a function by Tom Nichols
 %
-% See also: eeglab()
+% Reference: Bejamini & Yekutieli (2001) The Annals of Statistics
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -38,6 +40,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.5  2010/03/09 06:09:55  arno
+% Fix empty output when the input is empty
+%
 % Revision 1.4  2010/01/28 20:43:16  arno
 % revert back to version prior to Jan 19
 %
@@ -51,8 +56,9 @@
 % Initial revision
 %
 
-function [pID, p_masked] = fdr(pvals, q);
+function [pID, p_masked] = fdr(pvals, q, fdrType);
 
+if nargin < 3, fdrType = 'parametric'; end;
 if isempty(pvals), pID = []; return; end;
 p = sort(pvals(:));
 V = length(p);
@@ -69,8 +75,11 @@ if nargin < 2
         pID(p_masked) = thresholds(index);    
     end;
 else
-    pID = p(max(find(p<=I/V*q/cVID))); % standard FDR
-    %pN = p(max(find(p<=I/V*q/cVN)));  % non-parametric FDR (not used)
+    if strcmpi(fdrType, 'parametric')
+        pID = p(max(find(p<=I/V*q/cVID))); % standard FDR
+    else
+        pID = p(max(find(p<=I/V*q/cVN)));  % non-parametric FDR
+    end;
 end;
 if isempty(pID), pID = 0; end;
 
