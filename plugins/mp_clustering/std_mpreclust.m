@@ -69,6 +69,9 @@ if  ismember('erp', measuresToUseInClustering)
         [STUDY clustinfo] = std_readdata(STUDY,ALLEEG,'clusters',STUDY.etc.preclust.clustlevel,'infotype','erp');
         clustinfo = STUDY.cluster(STUDY.etc.preclust.clustlevel);
         
+        % perform a 20 Hz lowpass before comparing ERPs, this will reduce the noise and create
+        % better correlations.
+         [b,a] = butter(2,20/(ALLEEG(1).srate / 2),'low');
         
         % combine conditions in each group, then combine groups together
         try
