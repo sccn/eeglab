@@ -159,6 +159,9 @@
 % - Gca 'userdata' stores imqge names and position
 
 %$Log: not supported by cvs2svn $
+%Revision 1.161  2009/11/10 22:43:52  dev
+%fixed the 'point out' option
+%
 %Revision 1.160  2009/08/04 04:44:22  arno
 %All functions necessary for compiling EEGLAB code
 %
@@ -1061,18 +1064,18 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                     xo1 = x-xo; % make dipole point outward from head center
                     yo1 = y-yo;
                     zo1 = z-zo; 
-                    fprintf('invert because: %e  \n', c);
+                    %fprintf('invert because: %e  \n', c);
                 else
                     xo1 = x+xo;
                     yo1 = y+yo;
                     zo1 = z+zo;
-                    fprintf('NO invert because: %e  \n', c);
+                    %fprintf('NO invert because: %e  \n', c);
                 end
             else
                 xo1 = x+xo;
                 yo1 = y+yo;
                 zo1 = z+zo;
-                fprintf('NO invert because: %e  \n', c);
+                %fprintf('NO invert because: %e  \n', c);
             end
             
             %
