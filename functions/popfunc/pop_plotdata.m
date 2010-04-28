@@ -43,6 +43,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.25  2009/11/04 01:37:41  arno
+% remove menu for single trials
+%
 % Revision 1.24  2007/02/05 16:21:26  arno
 % now uses the correct of components
 %
@@ -240,11 +243,9 @@ end
 % inputname(1), typeplot, vararg2str(indices), EEG.trials, plottitle, singletrials,ydir,ymin,ymax);
 % fprintf([com '\n']);
 
-if ~isempty(EEG.chanlocs) & typeplot
-    plotdata(sigtmp, EEG.pnts, [EEG.xmin*1000 EEG.xmax*1000 ymin ymax], plottitle, EEG.chanlocs(indices),0,0,ydir); 
-else
-    plotdata(sigtmp, EEG.pnts, [EEG.xmin*1000 EEG.xmax*1000 ymin ymax], plottitle, indices,0,0,ydir);
-end;
+plottopo( sigtmp, 'frames', EEG.pnts, 'limits', [EEG.xmin*1000 EEG.xmax*1000 ymin ymax], 'title', plottitle, 'chans', indices, 'ydir', ydir);
+%plotdata(sigtmp, EEG.pnts, [EEG.xmin*1000 EEG.xmax*1000 ymin ymax], plottitle, indices,0,0,ydir);
+
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%% add figure title %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
