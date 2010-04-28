@@ -130,6 +130,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.34  2010/04/06 03:29:52  roy
+% fix typo in help comments
+%
 % Revision 1.33  2009/11/11 00:28:53  arno
 % New GUI format
 %
@@ -345,9 +348,10 @@ if nargin < 1                 % if several arguments, assign values
 	   case 4, args = { args{:}, 'dataformat', 'float32be' };
 	   case 5, args = { args{:}, 'dataformat', 'matlab' };
 	end;
-	if ~isempty( results{2} ) ,  args = { args{:}, 'data',              results{2}  }; end;
-
     i = 3;
+	if ~isempty( results{i+7} ) , args = { args{:}, 'nbchan',    str2num(results{i+7}) }; end;
+	if ~isempty( results{2} ) ,   args = { args{:}, 'data',              results{2}  }; end;
+
 	if ~isempty( results{i  } ) , args = { args{:}, 'setname',           results{i  }  }; end;    
 	if ~isempty( results{i+1} ) , args = { args{:}, 'srate',     str2num(results{i+1}) }; end;
 	if ~isempty( results{i+2} ) , args = { args{:}, 'subject',           results{i+2}  }; end;
@@ -355,7 +359,6 @@ if nargin < 1                 % if several arguments, assign values
 	if ~isempty( results{i+4} ) , args = { args{:}, 'condition',         results{i+4}  }; end;
     if ~isempty( results{i+5} ) , args = { args{:}, 'xmin',      str2num(results{i+5}) }; end;
     if ~isempty( results{i+6} ) , args = { args{:}, 'session',   str2num(results{i+6}) }; end;
-	if ~isempty( results{i+7} ) , args = { args{:}, 'nbchan',    str2num(results{i+7}) }; end;
     if ~isempty( results{i+8} ) , args = { args{:}, 'group',             results{i+8}  }; end;
     if ~isempty( results{i+9} ) , args = { args{:}, 'ref',       str2num(results{i+9}) }; end;
 	if ~isempty( newcomments ) , args = { args{:}, 'comments',  newcomments          }; end;
