@@ -52,6 +52,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.38  2010/03/25 19:47:15  arno
+% fix loading channel labels for EDF and BDF files when only a subset of channels are selected
+%
 % Revision 1.37  2009/11/11 03:28:28  arno
 % GUI aspect
 %
@@ -186,7 +189,7 @@
 % Initial revision
 %
 
-function [EEG, command, dat] = my_pop_biosig(filename, varargin); 
+function [EEG, command, dat] = pop_biosig(filename, varargin); 
 EEG = [];
 command = '';
 
