@@ -56,6 +56,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.77  2010/01/19 19:45:00  arno
+% allowing color scaling for components
+%
 % Revision 1.76  2009/08/22 00:48:42  arno
 % fix plotting
 %
@@ -438,7 +441,7 @@ if typeplot
     end;
 else
     if isempty(maplimits)
-        maplimits = [-1 1];
+        maplimits = 'absmax';
     end;
 end;
 
@@ -447,15 +450,15 @@ if plotdip
         disp('Cannot plot dipole on scalp map for CTF MEG data');
     end;
 end;
-    
+
 % plot the graphs
 % ---------------
 counter = 1;
 countobj = 1;
 allobj = zeros(1,1000);
-curfig = gcf;
+curfig = get(0, 'currentfigure');
 if isfield(EEG, 'chaninfo'), options = { options{:} 'chaninfo' EEG.chaninfo }; end
-    
+
 for index = 1:size(arg2(:),1)
 	if nbgraph > 1
         if mod(index, rowcols(1)*rowcols(2)) == 1
@@ -466,7 +469,7 @@ for index = 1:size(arg2(:),1)
 			posy = pos(2)+pos(4)-SIZEBOX*rowcols(1);
 			set(curfig,'Position', [posx posy  SIZEBOX*rowcols(2)  SIZEBOX*rowcols(1)]);
 			try, icadefs; set(curfig, 'color', BACKCOLOR); catch, end;
-       end;    
+        end;    
 		curax = subplot( rowcols(1), rowcols(2), mod(index-1, rowcols(1)*rowcols(2))+1);
         set(curax, 'visible', 'off')
     end;
@@ -575,8 +578,9 @@ if colorbar_switch
         ColorbarHandle = cbar(0,0,[maplimits(1) maplimits(2)]); 
         pos = get(ColorbarHandle,'position');  % move left & shrink to match head size
         set(ColorbarHandle,'position',[pos(1)-.05 pos(2)+0.13 pos(3)*0.7 pos(4)-0.26]);
-    else
-        cbar('vert',0,[maplimits(1) maplimits(2)]);
+    elseif ~isstr(maplimits)
+         cbar('vert',0,[maplimits(1) maplimits(2)]);
+    else cbar('vert',0,get(gca, 'clim'));
     end
     if ~typeplot    % Draw '+' and '-' instead of numbers for colorbar tick labels
         tmp = get(gca, 'ytick');
