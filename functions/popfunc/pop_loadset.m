@@ -45,6 +45,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.61  2009/06/28 06:40:43  arno
+% Minor problem with new calling format
+%
 % Revision 1.60  2009/05/27 23:29:07  arno
 % fix problem with warning message
 %
@@ -240,7 +243,7 @@ if nargin < 1
 else
     % account for old calling format
     % ------------------------------
-    if ~strcmpi(inputname, 'filename') & ~strcmpi(inputname, 'filepath')
+    if ~strcmpi(inputname, 'filename') && ~strcmpi(inputname, 'filepath') && ~strcmpi(inputname, 'eeg')
         options = { 'filename' inputname }; 
         if nargin > 1
             options = { options{:} 'filepath' inputpath }; 
@@ -268,7 +271,7 @@ if isstr(g.filename), g.filename = { g.filename }; end;
 % ---------------------------------
 if ~isempty(g.eeg)
 
-    EEG = pop_loadset( 'filepath', EEG.filepath, 'filename', EEG.filename);
+    EEG = pop_loadset( 'filepath', g.eeg.filepath, 'filename', g.eeg.filename);
 
 else
     eeglab_options;
