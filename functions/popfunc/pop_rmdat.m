@@ -46,6 +46,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.2  2009/08/08 00:50:17  arno
+% fix rmdat
+%
 % Revision 1.1  2009/08/07 21:50:10  arno
 % New funcs
 %
@@ -124,6 +127,7 @@ alltypes =  { EEG.event.type };
 allinds = [];
 for index = 1:length(events)
     inds = strmatch(events{index},alltypes, 'exact');
+    inds = inds';
     allinds = [allinds inds ];
 end;
 allinds = sort(allinds);
