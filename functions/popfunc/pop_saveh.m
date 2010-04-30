@@ -34,6 +34,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.8  2005/11/02 19:55:29  arno
+% history
+%
 % Revision 1.7  2004/06/01 21:35:46  arno
 % msg
 %
@@ -74,7 +77,7 @@ if nargin < 3
 end;
 
 
-fid = fopen( [ curfilepath curfilename ], 'w');
+fid = fopen( [ curfilepath '/' curfilename ], 'w');
 if fid == -1
     error('pop_saveh(): Cannot open named file');
 end;    
