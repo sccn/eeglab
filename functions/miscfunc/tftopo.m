@@ -93,6 +93,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: not supported by cvs2svn $
+% Revision 1.93  2010/03/10 05:16:16  arno
+% Allow plotting complex input
+%
 % Revision 1.92  2009/09/28 20:09:58  arno
 % decrease density of ordinate labels for native frequency plot
 %
@@ -372,13 +375,14 @@ end
 % reshape tfdata
 % --------------
 if length(size(tfdata))==2
-   nchans = round(size(tfdata,2)/length(times));
-   tfdata = reshape(tfdata, size(tfdata,1), length(times), nchans); 
+    if size(tfdata,1) ~= length(freqs), tfdata = tfdata'; end;
+    nchans = round(size(tfdata,2)/length(times));
+    tfdata = reshape(tfdata, size(tfdata,1), length(times), nchans); 
 elseif length(size(tfdata))>=3
-   nchans = size(tfdata,3);
+    nchans = size(tfdata,3);
 else
-   help tftopo
-   return
+    help tftopo
+    return
 end
 tfdataori = mean(tfdata,4); % for topoplot
 
