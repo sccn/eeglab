@@ -190,7 +190,8 @@ for ind = 1:length(finalinds) % scan channels or components
         tmpind  = 1; while(isempty(setinds{tmpind})), tmpind = tmpind+1; end;
         setinfo = STUDY.design(opt.design).setinfo;
         chanlab = { ALLEEG(setinfo(1).setindex(1)).chanlocs.labels };
-        [ tmp params xvals] = std_readfile(setinfo(setinds{1,1}(1)), 'dataindices', allinds{1,1}(1), 'measure', dtype, 'getparamonly', 'on', 'singletrials', opt.singletrials);
+        [ tmp params xvals] = std_readfile(setinfo(setinds{1,1}(1)), 'dataindices', allinds{1,1}(1), 'measure', dtype, ...
+                                           'getparamonly', 'on', 'singletrials', opt.singletrials, 'timelimits', opt.timerange, 'freqlimits', opt.freqrange);
 
         % read the data and select channels
         % ---------------------------------
@@ -214,7 +215,7 @@ for ind = 1:length(finalinds) % scan channels or components
                     end;
                     if ~isempty(inds)
                         if strcmpi(dtype, 'erp') alldata{c, g} = squeeze(std_readfile(setinfo(setinds{c,g}(:)), 'measure', 'erp' , 'dataindices', allinds{c,g}(:), 'timelimits', opt.timerange, 'singletrials', 'on'));
-                        else                     alldata{c, g} = squeeze(std_readfile(setinfo(setinds{c,g}(:)), 'measure', 'spec', 'dataindices', allinds{c,g}(:), 'timelimits', opt.timerange, 'singletrials', 'on'));
+                        else                     alldata{c, g} = squeeze(std_readfile(setinfo(setinds{c,g}(:)), 'measure', 'spec', 'dataindices', allinds{c,g}(:), 'freqlimits', opt.freqrange, 'singletrials', 'on'));
                         end;
                     end;
                 end;

@@ -300,6 +300,7 @@ for ind = 1:length(finalinds)
                          erspbase{c, g}                             = std_readfile( setinfo(setinds{c,g}(:)), 'measure', 'erspbase', options{:});
                          [ ersp{c, g} tmpparams alltimes allfreqs ] = std_readfile( setinfo(setinds{c,g}(:)), 'measure', 'ersp'    , options{:});
                     else [ ersp{c, g} tmpparams alltimes allfreqs ] = std_readfile( setinfo(setinds{c,g}(:)), 'measure', 'itc'     , options{:});
+                         ersp{c, g} = abs(ersp{c, g});
                     end;
                     fprintf('.');
                     %ersp{c, g}      = permute(ersp{c, g}           , [3 2 1]);
@@ -349,14 +350,16 @@ for ind = 1:length(finalinds)
                         end;
                     end;
                 end;
-
+                erspbasetmp = reshape(erspbase{c,g}, [size(meanpowbase,1) 1 size(meanpowbase,2)]);
+                meanpowbase = reshape(meanpowbase  , [size(meanpowbase,1) 1 size(meanpowbase,2)]);
+                
                 % subtract average baseline
                 % -------------------------
                 for c = 1:nc
-                    if strcmpi(opt.singletrials, 'on'), tmpmeanpowbase = repmat(meanpowbase, [length(alltimes) 1 tottrials{c,g}]);
-                    else                                tmpmeanpowbase = repmat(meanpowbase, [length(alltimes) 1 1]);
+                    if strcmpi(opt.singletrials, 'on'), tmpmeanpowbase = repmat(meanpowbase, [1 length(alltimes) tottrials{c,g}]);
+                    else                                tmpmeanpowbase = repmat(meanpowbase, [1 length(alltimes) 1]);
                     end;
-                    ersp{c,g} = ersp{c,g} - repmat(abs(erspbase{c,g}), [length(alltimes) 1 1 1]) + tmpmeanpowbase;
+                    ersp{c,g} = ersp{c,g} - repmat(abs(erspbasetmp), [1 length(alltimes) 1 1]) + tmpmeanpowbase;
                 end;
                 clear meanpowbase;
             end;

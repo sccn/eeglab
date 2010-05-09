@@ -184,10 +184,10 @@ if ~isstr(varargin{1})
         disp('Warning: history not saved for group creation');
     end;
     
-    show_chan          = [ 'pop_chanplot(''showchan'',gcf);'];
-    show_onechan       = [ 'pop_chanplot(''showchanlist'',gcf);'];
-	plot_chan_maps     = [ 'pop_chanplot(''topoplot'',gcf); ']; 
-    plot_onechan_maps  = [ 'pop_chanplot(''plotchantopo'',gcf); ']; 
+    show_chan          = ['pop_chanplot(''showchan'',gcf);'];
+    show_onechan       = ['pop_chanplot(''showchanlist'',gcf);'];
+	plot_chan_maps     = ['pop_chanplot(''topoplot'',gcf); ']; 
+    plot_onechan_maps  = ['pop_chanplot(''plotchantopo'',gcf); ']; 
     plot_chan_ersps    = ['pop_chanplot(''erspplot'',gcf); '];
     plot_onechan_ersps = ['pop_chanplot(''plotchanersp'',gcf); '];
     plot_chan_itcs     = ['pop_chanplot(''itcplot'',gcf); '];
@@ -228,8 +228,9 @@ if ~isstr(varargin{1})
     % --------------
     filename = STUDY.design(STUDY.currentdesign).setinfo(1).filebase;
     if exist([filename '.datspec']) , spec_enable = 'on'; else spec_enable  = 'off'; end;
-    if exist([filename '.daterp'] )  , erp_enable = 'on'; else erp_enable   = 'off'; end;
+    if exist([filename '.daterp'] )  , erp_enable = 'on'; else  erp_enable  = 'off'; end;
     if exist([filename '.datersp']) , ersp_enable = 'on'; else ersp_enable  = 'off'; end;
+    if exist([filename '.datitc'])  ,  itc_enable = 'on'; else  itc_enable  = 'off'; end;
     
     if isfield(ALLEEG(1).dipfit, 'model'), dip_enable   = 'on'; else dip_enable   = 'off'; end;
     
@@ -262,8 +263,8 @@ if ~isstr(varargin{1})
         {'style' 'pushbutton' 'enable'  ersp_enable 'string' 'Plot ERSPs' 'Callback' plot_chan_ersps} ...
         {'vertshift' 'style' 'pushbutton' 'enable'  ersp_enable 'string' 'Params' 'Callback' ersp_opt }  ...
         {'style' 'pushbutton' 'enable'  ersp_enable 'string' 'Plot ERSP(s)' 'Callback' plot_onechan_ersps}...
-        {'style' 'pushbutton' 'enable'  ersp_enable 'string' 'Plot ITCs' 'Callback' plot_chan_itcs} { }  ...
-        {'style' 'pushbutton' 'enable'  ersp_enable 'string' 'Plot ITC(s)' 'Callback' plot_onechan_itcs}...
+        {'style' 'pushbutton' 'enable'   itc_enable 'string' 'Plot ITCs' 'Callback' plot_chan_itcs} { }  ...
+        {'style' 'pushbutton' 'enable'   itc_enable 'string' 'Plot ITC(s)' 'Callback' plot_onechan_itcs}...
         {'style' 'pushbutton' 'string' 'Plot channel properties' 'Callback' plot_chan_sum} {} ... 
         {'style' 'pushbutton' 'string' 'Plot channel properties (soon)' 'Callback' plot_onechan_sum 'enable' 'off'} };
     

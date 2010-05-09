@@ -102,15 +102,16 @@ end;
 
 % get fields to read
 % ------------------
+erspFreqOnly = 0;
 switch opt.measure
     case 'erp'     , fieldExt = '';
     case 'spec'    , fieldExt = '';
     case 'ersp'    , fieldExt = '_ersp';
     case 'itc'     , fieldExt = '_itc';
     case 'timef'   , fieldExt = '_timef';
-    case 'erspbase', fieldExt = '_erspbase'; fileExt = fileExt(1:end-4);
-    case 'erspboot', fieldExt = '_erspboot'; fileExt = fileExt(1:end-4);
-    case 'itcboot' , fieldExt = '_itcboot';  fileExt = fileExt(1:end-4);
+    case 'erspbase', fieldExt = '_erspbase'; fileExt = fileExt(1:end-4); erspFreqOnly = 1;
+    case 'erspboot', fieldExt = '_erspboot'; fileExt = fileExt(1:end-4); erspFreqOnly = 1;
+    case 'itcboot' , fieldExt = '_itcboot';  fileExt = fileExt(1:end-4); erspFreqOnly = 1;
 end;
 
 % get channel or component indices
@@ -179,7 +180,9 @@ for fInd = 1:length(opt.dataindices) % usually only one value
     % if the function is only called to get parameters
     % ------------------------------------------------
     if strcmpi(opt.getparamonly, 'on'), 
-        if isempty(measureRange1), measureRange1 = measureRange2; end;
+        measureRange1 = indicesselect(measureRange1, opt.timelimits);
+        measureRange2 = indicesselect(measureRange2, opt.freqlimits);
+        if strcmpi(opt.measure, 'spec'), measureRange1 = measureRange2; end;
         
         parameters.singletrials = 'off';
         if strcmpi(opt.measure, 'timef')
@@ -247,24 +250,18 @@ end;
 
 % select plotting or clustering time/freq range
 % ---------------------------------------------
-tminind = 1;
-tmaxind = length(measureRange1);
-if ~isempty(opt.timelimits) && (opt.timelimits(1) > measureRange1(1) || opt.timelimits(end) < measureRange1(end))
-    tmaxind = max(find(measureRange1 <= opt.timelimits(end)));
-    tminind = min(find(measureRange1 >= opt.timelimits(1)));
-    if isempty(measureRange2), 
-         measureData = measureData(:,tminind:tmaxind,:,:);
-    else measureData = measureData(:,:,tminind:tmaxind,:);
+if ~isempty(measureRange1) && ~erspFreqOnly
+    [measureRange1 indBegin indEnd] = indicesselect(measureRange1, opt.timelimits);
+    if strcmpi(opt.measure, 'erp')
+         measureData = measureData(indBegin:indEnd,:,:);
+    else measureData = measureData(:,indBegin:indEnd,:);
     end;
-end
-fminind = 1;
-fmaxind = length(measureRange2);
-if ~isempty(opt.freqlimits) && (opt.freqlimits(1) > measureRange2(1) || opt.freqlimits(end) < measureRange2(end))
-    fmaxind = max(find(measureRange2 <= opt.freqlimits(end)));
-    fminind = min(find(measureRange2 >= opt.freqlimits(1)));
-    measureData = measureData(:,fminind:fmaxind,:,:);
-end
-if isempty(measureRange2), measureRange1 = measureRange2; end;
+end;
+if ~isempty(measureRange2)
+    [measureRange2 indBegin indEnd] = indicesselect(measureRange2, opt.freqlimits);
+    measureData = measureData(indBegin:indEnd,:,:);
+    if strcmpi(opt.measure, 'spec'), measureRange1 = measureRange2; end;
+end;
 
 % remove duplicates in the list of parameters
 % -------------------------------------------
@@ -274,3 +271,15 @@ function cella = removedup(cella)
         %fprintf('Warning: duplicate ''key'', ''val'' parameter(s), keeping the last one(s)\n');
     end;
     cella = cella(sort(union(indices*2-1, indices*2)));
+    
+% find indices for selection of measure
+% -------------------------------------
+function [measureRange indBegin indEnd] = indicesselect(measureRange, measureLimits);
+    indBegin = 1;
+    indEnd   = length(measureRange);
+    if ~isempty(measureLimits) && (measureLimits(1) > measureRange(1) || measureLimits(end) < measureRange(end))
+        indBegin   = min(find(measureRange >= measureLimits(1)));
+        indEnd     = max(find(measureRange <= measureLimits(end)));
+        measureRange = measureRange(indBegin:indEnd);
+    end;
+

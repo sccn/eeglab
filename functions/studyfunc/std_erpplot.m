@@ -356,7 +356,7 @@ if ~isempty(opt.channels)
                              'statistics', opt.statistics, 'condnames', allconditions, 'plotsubjects', opt.plotsubjects, 'cond2names', allgroups, 'chanlabels', { locs.labels }, ...
                              'subject', opt.subject, 'valsunit', opt.unitx, 'vals', opt.topotime, 'datatype', datatypestr, 'cond2group', opt.plotgroups, 'condgroup', opt.plotconditions);
     
-    if ~isempty(opt.topotime) & all(~isnan(opt.topotime))
+    if ~isempty(opt.topotime) && all(~isnan(opt.topotime))
         std_chantopo(erpdata, 'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, 'caxis', opt.caxis, ...
                                       'chanlocs', locs, 'threshold', opt.threshold, 'titles', alltitles);
     else
