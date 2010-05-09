@@ -4,8 +4,7 @@
 %                 Else, displays ERP for each specified cluster in separate figures 
 %                 (per condition), each containing the cluster component ERPs plus 
 %                 the grand mean cluster ERP (in bold). ERPs can be plotted only if 
-%                 component ERPs were computed and saved in the STUDY EEG
-%                 datasets. 
+%                 component ERPs were computed and saved in the STUDY EEG datasets. 
 %                 These can be computed during pre-clustering using the gui-based 
 %                 function pop_preclust() or the equivalent command line functions 
 %                 eeg_createdata() and eeg_preclust(). Called by pop_clustedit().
@@ -89,15 +88,6 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: std_erpplot.m,v $
-% Revision 1.68  2010/02/26 10:58:31  claire
-% fixing unitx and disabling condstats and groupstats for single subjects
-%
-% Revision 1.67  2010/02/24 10:52:36  arno
-% Implemented new single trial statistics
-%
-% Revision 1.66  2010/02/16 08:43:21  arno
-% New single-trial reading/writing
-%
 % Revision 1.65  2010/02/09 06:07:27  arno
 % Fixed new title problem and implemented 3-level significance
 %
@@ -229,85 +219,46 @@ if nargin < 2
     help std_erpplot;
     return;
 end;
-erpdata = []; alltimes = []; 
-pgroup = []; pcond = []; pinter = [];
 
-% find datatype and default options
-% ---------------------------------
-dtype = 'erp';
-for ind = 1:2:length(varargin)
-    if strcmpi(varargin{ind}, 'datatype')
-        dtype = varargin{ind+1}; 
-    end;
-end;
-eval( [ 'STUDY = pop_' dtype 'params(STUDY, ''default'');' ...
-        'params = STUDY.etc.' dtype 'params;' ] );
-fields     = { 'filter' 'subtractsubjectmean' 'timerange' 'freqrange' 'topotime' 'topofreq' };
-defaultval = { [] 'off' [] [] [] [] };
-for ind=1:length(fields)
-    if ~isfield(params, fields{ind}), 
-        params = setfield(params, fields{ind}, defaultval{ind}); 
-    end;
-end;
+STUDY = pop_erpparams(STUDY, 'default');
 
-opt = finputcheck( varargin, { 'topotime'    'real'    [] params.topotime;
-                               'topofreq'    'real'    [] params.topofreq;
-                               'filter'      'real'    [] params.filter;
-                               'timerange'   'real'    [] params.timerange;
-                               'freqrange'   'real'    [] params.freqrange;
-                               'ylim'        'real'    [] params.ylim;
-                               'caxis'       'real'    [] params.ylim;                               
-                               'statistics'  'string'  [] params.statistics;
-                               'groupstats'  'string'  [] params.groupstats;
-                               'condstats'   'string'  [] params.condstats;
-                               'mcorrect'    'string'  [] params.mcorrect;
-                               'plotgroups'  'string'  [] params.plotgroups;
-                               'plotconditions' 'string'  [] params.plotconditions;
-                               'subtractsubjectmean' 'string' [] params.subtractsubjectmean;
-                               'threshold'   'real'    [] params.threshold;
-                               'naccu'       'integer' [] params.naccu;
-                               'singletrials' 'string' { 'on' 'off' }  params.singletrials;
-                               'design'      'integer' []              STUDY.currentdesign;
+opt = finputcheck( varargin, { 'topotime'    'real'    [] STUDY.etc.erpparams.topotime;
+                               'filter'      'real'    [] STUDY.etc.erpparams.filter;
+                               'timerange'   'real'    [] STUDY.etc.erpparams.timerange;
+                               'ylim'        'real'    [] STUDY.etc.erpparams.ylim;
+                               'caxis'       'real'    [] STUDY.etc.erpparams.ylim;                               
+                               'statistics'  'string'  [] STUDY.etc.erpparams.statistics;
+                               'groupstats'  'string'  [] STUDY.etc.erpparams.groupstats;
+                               'condstats'   'string'  [] STUDY.etc.erpparams.condstats;
+                               'mcorrect'    'string'  [] STUDY.etc.erpparams.mcorrect;
+                               'plotgroups'  'string'  [] STUDY.etc.erpparams.plotgroups;
+                               'plotconditions' 'string'  [] STUDY.etc.erpparams.plotconditions;
+                               'threshold'   'real'    [] STUDY.etc.erpparams.threshold;
+                               'naccu'       'integer' [] STUDY.etc.erpparams.naccu;
                                'channels'    'cell'    []              {};
                                'clusters'    'integer' []              [];
-                               'datatype'    'string'  { 'erp' 'spec' } 'erp';      
                                'mode'        'string'  []              ''; % for backward compatibility
                                'comps'       { 'string' 'integer' } [] []; % for backward compatibility
                                'plotmode'    'string' { 'normal' 'condensed' }  'normal';
-                               'unitx'       'string' { 'ms' 'Hz' }    'ms';
                                'plotsubjects' 'string' { 'on' 'off' }  'off';
+                               'singletrials' 'string' { 'on' 'off' }  'off';
                                'subject'     'string'  []              '';
                                'statmode'    'string'  { 'subjects' 'common' 'trials' } 'subjects'}, 'std_erpplot');
 if isstr(opt), error(opt); end;
 if isstr(opt.comps), opt.comps = []; opt.plotsubjects = 'on'; end;
-if ~isempty(opt.topofreq),  opt.topotime  = opt.topofreq; end;
-if ~isempty(opt.freqrange), opt.timerange = opt.freqrange; end;
-datatypestr = upper(opt.datatype);
-if strcmpi(datatypestr, 'spec'), datatypestr = 'Spectrum'; end;
-
-% =======================================================================
-% below this line, all the code should be non-specific to ERP or spectrum
-% =======================================================================
-
-allconditions = STUDY.design(opt.design).condition;
-allgroups     = STUDY.design(opt.design).group;
-paired = { fastif(strcmpi(STUDY.design(opt.design).statvar1, 'paired'), 'on', 'off') ...
-           fastif(strcmpi(STUDY.design(opt.design).statvar2, 'paired'), 'on', 'off') };
 
 % for backward compatibility
 % --------------------------
 if strcmpi(opt.mode, 'comps'), opt.plotsubjects = 'on'; end;
-if strcmpi(opt.singletrials, 'off') && ((~isempty(opt.subject) || ~isempty(opt.comps)))
-    if strcmpi(opt.condstats, 'on') || strcmpi(opt.groupstats, 'on')
-        opt.groupstats = 'off';
-        opt.condstats   = 'off'; 
-        disp('No statistics for single subject/component'); 
-    end;
+if strcmpi(opt.condstats, 'on') || strcmpi(opt.groupstats, 'on') || ...
+        (~isempty(opt.subject) || ~isempty(opt.comps)) && strcmpi(opt.singletrials, 'off'), 
+    opt.groupstats = 'off';
+    opt.constats   = 'off'; 
+    disp('No statistics for single subject/component'); 
 end;
 plotcurveopt = { ...
    'ylim',           opt.ylim, ...
    'threshold',      opt.threshold, ...
-   'unitx'           opt.unitx, ...
    'filter',         opt.filter, ...
    'plotgroups',     opt.plotgroups, ...
    'plotconditions', opt.plotconditions };
@@ -326,13 +277,8 @@ end;
 % channel plotting
 % ----------------
 if ~isempty(opt.channels)
-    if strcmpi(opt.datatype, 'erp')
-        [STUDY erpdata alltimes] = std_readerp(STUDY, ALLEEG, 'channels', opt.channels, 'timerange', opt.timerange, ...
-                'subject', opt.subject, 'singletrials', opt.singletrials, 'design', opt.design);
-    else
-        [STUDY erpdata alltimes] = std_readspec(STUDY, ALLEEG, 'channels', opt.channels, 'freqrange', opt.freqrange, ...
-            'rmsubjmean', opt.subtractsubjectmean, 'subject', opt.subject, 'singletrials', opt.singletrials, 'design', opt.design);
-    end;
+    [STUDY erpdata alltimes setinds allinds] = std_readerp(STUDY, ALLEEG, 'channels', opt.channels, 'timerange', opt.timerange, ...
+            'subject', opt.subject, 'singletrials', opt.singletrials);
     if isempty(erpdata), return; end;
     
     % select specific time    
@@ -347,14 +293,14 @@ if ~isempty(opt.channels)
     
     % compute statistics and plot
     % ---------------------------
-    [pcond pgroup pinter] = std_stat(erpdata, 'groupstats', opt.groupstats, 'condstats', opt.condstats, 'paired', paired, ...
+    [pcond pgroup pinter] = std_stat(erpdata, 'groupstats', opt.groupstats, 'condstats', opt.condstats, ...
                                          'statistics', opt.statistics, 'naccu', opt.naccu, 'threshold', opt.threshold, 'mcorrect', opt.mcorrect);
-    if (~isempty(pcond) && length(pcond{1}) == 1) || (~isempty(pgroup) && length(pgroup{1}) == 1), pcond = {}; pgroup = {}; pinter = {}; end; % single subject STUDY                                
+                                     
     locs = eeg_mergelocs(ALLEEG.chanlocs);
     locs = locs(std_chaninds(STUDY, opt.channels));
     alltitles = std_figtitle('threshold', opt.threshold, 'mcorrect', opt.mcorrect, 'condstat', opt.condstats, 'cond2stat', opt.groupstats, ...
-                             'statistics', opt.statistics, 'condnames', allconditions, 'plotsubjects', opt.plotsubjects, 'cond2names', allgroups, 'chanlabels', { locs.labels }, ...
-                             'subject', opt.subject, 'valsunit', opt.unitx, 'vals', opt.topotime, 'datatype', datatypestr, 'cond2group', opt.plotgroups, 'condgroup', opt.plotconditions);
+                             'statistics', opt.statistics, 'condnames', STUDY.condition, 'plotsubjects', opt.plotsubjects, 'cond2names', STUDY.group, 'chanlabels', { locs.labels }, ...
+                             'subject', opt.subject, 'valsunit', 'ms', 'vals', opt.topotime, 'datatype', 'ERP', 'cond2group', opt.plotgroups, 'condgroup', opt.plotconditions);
     
     if ~isempty(opt.topotime) & all(~isnan(opt.topotime))
         std_chantopo(erpdata, 'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, 'caxis', opt.caxis, ...
@@ -362,10 +308,10 @@ if ~isempty(opt.channels)
     else
         std_plotcurve(alltimes, erpdata, 'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, ...
             'chanlocs', locs, 'titles', alltitles, 'plotsubjects', opt.plotsubjects, ...
-            'condnames', allconditions, 'groupnames', allgroups, 'plottopo', fastif(length(opt.channels) > 5, 'on', 'off'), plotcurveopt{:});
+            'condnames', STUDY.condition, 'groupnames', STUDY.group, 'plottopo', fastif(length(opt.channels) > 5, 'on', 'off'), plotcurveopt{:});
     end;
 
-    set(gcf,'name',['Channel ' datatypestr ]);
+    set(gcf,'name','Channel ERP');
 else 
     % plot component
     % --------------
@@ -382,13 +328,8 @@ else
     for index = 1:length(opt.clusters)
 
         if length(opt.clusters) > 1, subplot(nr,nc,index); end;
-        if strcmpi(opt.datatype, 'erp')
-            [STUDY erpdata alltimes] = std_readerp(STUDY, ALLEEG, 'clusters', opt.clusters(index), 'timerange', opt.timerange, ...
-                        'component', opt.comps, 'singletrials', opt.singletrials, 'design', opt.design);
-        else
-            [STUDY erpdata alltimes] = std_readspec(STUDY, ALLEEG, 'clusters', opt.clusters(index), 'freqrange', opt.freqrange, ...
-                        'rmsubjmean', opt.subtractsubjectmean, 'component', opt.comps, 'singletrials', opt.singletrials, 'design', opt.design);
-        end;
+        [STUDY erpdata alltimes setinds compinds] = std_readerp(STUDY, ALLEEG, 'clusters', opt.clusters(index), 'timerange', opt.timerange, ...
+                    'component', opt.comps, 'singletrials', opt.singletrials);
         if isempty(erpdata), return; end;
 
         % plot specific component
@@ -397,20 +338,20 @@ else
             comp_names = { STUDY.cluster(opt.clusters(index)).comps(opt.comps) };
             opt.subject = STUDY.datasetinfo(STUDY.cluster(opt.clusters(index)).sets(1,opt.comps)).subject;
         end;
-        [pcond pgroup pinter] = std_stat(erpdata, 'groupstats', opt.groupstats, 'condstats', opt.condstats, 'paired', paired, ...
+        [pcond pgroup pinter] = std_stat(erpdata, 'groupstats', opt.groupstats, 'condstats', opt.condstats, ...
                                          'statistics', opt.statistics, 'naccu', opt.naccu, 'threshold', opt.threshold, 'mcorrect', opt.mcorrect);
             
         if index == length(opt.clusters), opt.legend = 'on'; end;
         alltitles = std_figtitle('threshold', opt.threshold, 'plotsubjects', opt.plotsubjects, 'mcorrect', opt.mcorrect, 'condstat', opt.condstats, 'cond2stat', opt.groupstats, ...
-                                 'statistics', opt.statistics, 'condnames', allconditions, 'cond2names', allgroups, 'clustname', STUDY.cluster(opt.clusters(index)).name, 'compnames', comp_names, ...
-                                 'subject', opt.subject, 'valsunit', opt.unitx, 'vals', opt.topotime, 'datatype', datatypestr, 'cond2group', opt.plotgroups, 'condgroup', opt.plotconditions);
+                                 'statistics', opt.statistics, 'condnames', STUDY.condition, 'cond2names', STUDY.group, 'clustname', STUDY.cluster(opt.clusters(index)).name, 'compnames', comp_names, ...
+                                 'subject', opt.subject, 'valsunit', 'ms', 'vals', opt.topotime, 'datatype', 'ERP', 'cond2group', opt.plotgroups, 'condgroup', opt.plotconditions);
         
-        std_plotcurve(alltimes, erpdata, 'condnames', allconditions, 'legend', opt.legend, 'groupnames', allgroups,  ...
-                                          'titles', alltitles, 'unitx', opt.unitx,  'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, ...
+        std_plotcurve(alltimes, erpdata, 'condnames', STUDY.condition, 'legend', opt.legend, 'groupnames', STUDY.group,  ...
+                                          'titles', alltitles, 'unitx', 'ms',  'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, ...
                                           'chanlocs', ALLEEG(1).chanlocs, 'plotsubjects', opt.plotsubjects, plotcurveopt{:});
     end;
     
-    set(gcf,'name', ['Component ' datatypestr ] );
+    set(gcf,'name','Component ERP');
     axcopy(gca);
 end;
 

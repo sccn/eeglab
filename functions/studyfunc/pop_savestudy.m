@@ -108,12 +108,15 @@ end
 STUDY.filepath = g.filepath;
 STUDY.filename = g.filename;
 STUDYfile = fullfile(STUDY.filepath,STUDY.filename);
+STUDYTMP = STUDY;
+STUDY = std_rmalldatafields(STUDY);
 v = version;
 if v(1) > '6'
     save('-v6' , STUDYfile, 'STUDY');
 else
     save('-mat', STUDYfile, 'STUDY');
 end;
+STUDY = STUDYTMP;
 
 % history
 % -------

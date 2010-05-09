@@ -37,7 +37,10 @@
 
 % Coding notes: Useful information on functions and global variables used.
 
-% $Log: not supported by cvs2svn $
+% $Log: pop_loadstudy.m,v $
+% Revision 1.22  2010/03/21 20:58:44  arno
+% New STUDY file checking functions and processes
+%
 % Revision 1.21  2007/12/08 23:38:07  arno
 % updating datasetinfo
 %
@@ -68,6 +71,10 @@ if isempty(varargin)
         end
     end
 else
+    filepath = '';
+    if nargin == 1
+        varargin = { 'filename' varargin{:} };
+    end;
     for k = 1:2:length(varargin)
         switch varargin{k}
             case 'filename'
@@ -78,7 +85,7 @@ else
     end
 end
 
-if (~isempty(filename)) & (~isempty(filepath))
+if ~isempty(filename)
     STUDYfile = fullfile(filepath,filename);
     try 
         warning off;
@@ -109,9 +116,9 @@ if ~isfield(STUDY, 'changrp') || isempty(STUDY.changrp)
     else STUDY = std_changroup(STUDY, ALLEEG, [], 'interp');
     end;
 end;
-std_checkfiles(STUDY, ALLEEG);
 
 [STUDY ALLEEG] = std_checkset(STUDY, ALLEEG);
+std_checkfiles(STUDY, ALLEEG);
 STUDY.saved = 'yes';
 
 com = sprintf('[STUDY ALLEEG] = pop_loadstudy(''filename'', ''%s'', ''filepath'', ''%s'');', STUDY.filename, STUDY.filepath);

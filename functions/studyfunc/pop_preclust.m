@@ -50,7 +50,10 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
+% $Log: pop_preclust.m,v $
+% Revision 1.55  2010/02/16 08:43:20  arno
+% New single-trial reading/writing
+%
 % Revision 1.54  2009/11/11 00:28:53  arno
 % New GUI format
 %

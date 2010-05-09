@@ -31,7 +31,10 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
+% $Log: pop_precomp.m,v $
+% Revision 1.22  2010/02/24 10:52:36  arno
+% Implemented new single trial statistics
+%
 % Revision 1.21  2009/12/16 02:09:59  arno
 % cosmetic change
 %
@@ -123,7 +126,6 @@ if ~isstr(varargin{1}) %intial settings
     set_spec       = ['pop_precomp(''setspec'',gcf);']; 
     set_erp        = ['pop_precomp(''seterp'',gcf);']; 
     test_spec      = ['pop_precomp(''testspec'',gcf);']; 
-    str_name       = ['Pre-compute channel measures for STUDY ''' STUDY.name '''' ];
     chanlist       = ['pop_precomp(''chanlist'',gcf);']; 
     chaneditbox    = ['pop_precomp(''chaneditbox'',gcf);']; 
     warninterp     = ''; %['warndlg2(''EEGLAB will crash when plotting a given channel if it is missing in one dataset'');' ];
@@ -134,7 +136,9 @@ if ~isstr(varargin{1}) %intial settings
     
     geomline = [0.33 6];
     if comps == true
-        str_name       = ['Pre-compute component measures for STUDY ''' STUDY.name '''' ];
+        str_name       = sprintf('Pre-compute component measures for STUDY ''%s'' - ''%s''', ...
+                         STUDY.name, STUDY.design(STUDY.currentdesign).name);
+        if length(str_name) > 80, str_name = [ str_name(1:80) '...' ]; end;
         guiadd1 = { {'style' 'checkbox'   'string' '' 'tag' 'compallersp' 'value' 1 }  ...
                     {'style' 'text'       'string' 'Compute ERP/spectrum/ERSP only for components selected by RV (set) or for all components (unset)' } };
         guiadd2 = { {'style' 'checkbox'   'string' '' 'tag' 'scalp_on' 'value' 0 }  ...
@@ -143,7 +147,9 @@ if ~isstr(varargin{1}) %intial settings
         geomvertadd1 = [ 1 ];
         geomadd2     = { geomline };
     else
-        str_name = ['Pre-compute channel measures for STUDY ''' STUDY.name '''' ];
+        str_name       = sprintf('Pre-compute channel measures for STUDY ''%s'' - ''%s''', ...
+                         STUDY.name, STUDY.design(STUDY.currentdesign).name);
+        if length(str_name) > 80, str_name = [ str_name(1:80) '...''' ]; end;
         guiadd1  = { {'style' 'text'       'string' 'Channel list (default:all)' 'FontWeight' 'Bold'} ...
             {'Style' 'edit'       'string' '' 'tag' 'chans' 'callback' chaneditbox }, ...
             {'style' 'pushbutton' 'string'  '...', 'enable' fastif(isempty(ALLEEG(1).chanlocs), 'off', 'on') ...

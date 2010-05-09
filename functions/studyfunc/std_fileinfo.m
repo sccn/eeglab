@@ -29,7 +29,10 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
+% $Log: std_fileinfo.m,v $
+% Revision 1.1  2010/03/21 20:58:44  arno
+% New STUDY file checking functions and processes
+%
 
 function [tmpstructout compinds filepresent] = std_fileinfo( ALLEEG, filetype );
 
@@ -82,8 +85,12 @@ function [tmpstructout compinds filepresent] = std_fileinfo( ALLEEG, filetype );
                 allvarnames = { allvars.name };
                 tmptmpstruct.labels = allvarnames(strmatch('chan', allvarnames));
             end;
-            
-            tmpstruct(dat) = tmptmpstruct;
+            try,
+                tmpstruct(dat) = tmptmpstruct;
+            catch,
+                passall = 0;
+                break;
+            end;
         end;
     end;
     if exist('tmpstruct') == 1

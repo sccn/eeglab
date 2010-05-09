@@ -70,7 +70,10 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
+% $Log: std_editset.m,v $
+% Revision 1.63  2009/11/23 22:10:08  arno
+% Fix dipselect if no dipole have been computed
+%
 % Revision 1.62  2009/08/07 21:46:35  arno
 % Fix bug if empty dataset at the end of ALLEEG
 %
@@ -387,11 +390,6 @@ for k = 1:2:length(g.commands)
             STUDY.datasetinfo(currentind).index     = currentind;                    
     end
 end
-
-
-
-
-
 
 % add channel labels automatically
 % -------------------------------

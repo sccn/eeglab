@@ -32,7 +32,10 @@
 % 
 % See also: std_erpplot(), std_specplot() and std_erspplot()
 
-% $Log: not supported by cvs2svn $
+% $Log: std_selcomp.m,v $
+% Revision 1.2  2010/02/06 05:47:53  arno
+% New titles for figures
+%
 % Revision 1.1  2007/01/26 18:08:43  arno
 % Initial revision
 %
@@ -62,7 +65,8 @@ comps  = STUDY.cluster(clust).comps(compsel);
 % --------------
 for c = 1:length(data(:))
     for ind = 1:length(compinds{c})
-        if compinds{c}(ind) == comps & any(setinds{c}(ind) == sets)
+        setindex = STUDY.design(STUDY.currentdesign).setinfo(setinds{c}(ind)).setindex;
+        if compinds{c}(ind) == comps && any(setindex == sets)
             if optndims == 2
                  data{c} = data{c}(:,ind);
             else data{c} = data{c}(:,:,ind);

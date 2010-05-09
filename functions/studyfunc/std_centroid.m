@@ -67,7 +67,10 @@
 
 % Coding notes: Useful information on functions and global variables used.
 
-% $Log: not supported by cvs2svn $
+% $Log: std_centroid.m,v $
+% Revision 1.27  2007/08/06 21:19:41  arno
+% header info
+%
 % Revision 1.26  2006/03/21 15:39:57  arno
 % new .sets format
 %

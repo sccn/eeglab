@@ -60,7 +60,10 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-%$Log: not supported by cvs2svn $
+%$Log: std_dipplot.m,v $
+%Revision 1.29  2009/10/22 00:50:35  arno
+%revert previous version
+%
 %Revision 1.27  2007/10/24 20:37:36  nima
 %subject name moved before cluster name in title and projection lines added for single dipoles.
 %

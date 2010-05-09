@@ -34,7 +34,10 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
+% $Log: std_pacplot.m,v $
+% Revision 1.1  2009/07/10 01:50:14  arno
+% adding new functions
+%
                             
 function [STUDY, allpac, alltimes, allfreqs, pgroup, pcond, pinter] = std_pacplot(STUDY, ALLEEG, varargin)
 

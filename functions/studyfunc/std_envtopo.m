@@ -44,7 +44,10 @@
 %
 % See also: envtopo()
 
-% $Log: not supported by cvs2svn $
+% $Log: std_envtopo.m,v $
+% Revision 1.35  2009/04/16 02:49:01  julie
+% Because std erp are scaled by RMS, changed to recalculate from original datasets and uses scalp projections from datsets too (not std maps that are oriented for clusters) Changed default from pvaf to relative variance. In cluster back-proj, uses all ICs from each subj if more than one in a cluster.
+%
 % Revision 1.34  2009/04/15 14:49:14  julie
 % fix of rmbase in grand ERP calculation
 %

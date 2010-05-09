@@ -90,7 +90,10 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
+% $Log: pop_erspparams.m,v $
+% Revision 1.19  2010/03/05 00:18:40  arno
+% fix statmode option
+%
 % Revision 1.18  2010/02/24 10:52:36  arno
 % Implemented new single trial statistics
 %

@@ -54,7 +54,10 @@
 %                  may use several GB of disk space and that computation 
 %                  of 'trials' statistics requires a lot of RAM.
 
-% $Log: not supported by cvs2svn $
+% $Log: std_stat.m,v $
+% Revision 1.12  2010/03/09 06:14:16  arno
+% fixed default output
+%
 % Revision 1.11  2010/03/05 01:25:19  arno
 % Fix threshold and interstat plotting
 %
@@ -112,12 +115,14 @@ end;
 opt = finputcheck( varargin, { 'threshold'   'real'    []               NaN;
                                'mcorrect'    'string'  { 'none' 'fdr' } 'none';
                                'naccu'       'integer' []               [];
-                               'groupstats'   'string' { 'on' 'off' }   'off';
-                               'condstats'    'string' { 'on' 'off' }   'off';
-                               'statistics'  'string' { 'param' 'perm' 'bootstrap' }       'param' }, ...
+                               'groupstats'  'string'  { 'on' 'off' }   'off';
+                               'paired'      'cell'    { 'on' 'off' }   { 'on' 'on' };
+                               'condstats'   'string'  { 'on' 'off' }   'off';
+                               'statistics'  'string'  { 'param' 'perm' 'bootstrap' }       'param' }, ...
                                'std_stat', 'ignore');
+
 if isstr(opt), error(opt); end;
-if ~isnan(opt.threshold) & isempty(opt.naccu), opt.naccu = 1/opt.threshold(end)*2; end;
+if ~isnan(opt.threshold(1)) && isempty(opt.naccu), opt.naccu = 1/opt.threshold(end)*2; end;
 if any(any(cellfun('size', data, 2)==1)), opt.groupstats = 'off'; opt.condstats = 'off'; end;
 if strcmpi(opt.mcorrect, 'fdr'), opt.naccu = opt.naccu*20; end;
 if isempty(opt.naccu), opt.naccu = 2000; end;
@@ -130,24 +135,25 @@ ng = size(data,2);
 
 % compute significance mask
 % --------------------------
-if strcmpi(opt.condstats, 'on') & nc > 1
+if strcmpi(opt.condstats, 'on') && nc > 1
     for g = 1:ng
-        [F df pval] = statcond(data(:,g), 'mode', opt.statistics, 'naccu', opt.naccu); 
+        [F df pval] = statcond(data(:,g), 'mode', opt.statistics, 'naccu', opt.naccu, 'paired', opt.paired{1}); 
         pcond{g} = squeeze(pval);
     end;
 else
     pcond = {};
 end;
-if strcmpi(opt.groupstats, 'on') & ng > 1
+if strcmpi(opt.groupstats, 'on') && ng > 1
     for c = 1:nc
-        [F df pval] = statcond(data(c,:), 'mode', opt.statistics, 'naccu', opt.naccu); 
+        [F df pval] = statcond(data(c,:), 'mode', opt.statistics, 'naccu', opt.naccu, 'paired', opt.paired{2}); 
         pgroup{c} = squeeze(pval);
     end;
 else
     pgroup = {};
 end;
-if ( strcmpi(opt.groupstats, 'on') & strcmpi(opt.condstats, 'on') ) & ng > 1 & nc > 1
-    [F df pval] = statcond(data, 'mode', opt.statistics, 'naccu', opt.naccu);
+if ( strcmpi(opt.groupstats, 'on') && strcmpi(opt.condstats, 'on') ) & ng > 1 & nc > 1
+    opt.paired = sort(opt.paired); % put 'off' first if present
+    [F df pval] = statcond(data, 'mode', opt.statistics, 'naccu', opt.naccu, 'paired', opt.paired{1});
     for index = 1:length(pval)
         pinter{index} = squeeze(pval{index});
     end;

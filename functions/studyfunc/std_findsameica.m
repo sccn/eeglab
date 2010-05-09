@@ -30,7 +30,10 @@
 
 % Coding notes: Useful information on functions and global variables used.
 
-% $Log: not supported by cvs2svn $
+% $Log: std_findsameica.m,v $
+% Revision 1.2  2009/10/21 23:43:53  arno
+% Fix find the same ICA for ICA matrices of different size
+%
 % Revision 1.1  2009/07/10 01:50:14  arno
 % adding new functions
 %

@@ -68,7 +68,10 @@
 
 % Coding notes: Useful information on functions and global variables used.
 
-% $Log: not supported by cvs2svn $
+% $Log: pop_study.m,v $
+% Revision 1.61  2009/11/11 00:28:53  arno
+% New GUI format
+%
 % Revision 1.60  2007/10/18 00:34:41  nima
 % _
 %

@@ -156,7 +156,10 @@
 
 % Coding notes: Useful information on functions and global variables used.
 
-% $Log: not supported by cvs2svn $
+% $Log: pop_clustedit.m,v $
+% Revision 1.59  2009/11/11 00:28:53  arno
+% New GUI format
+%
 % Revision 1.58  2009/07/10 01:56:33  arno
 % fix ref_ind
 %
@@ -804,7 +807,7 @@ else
                   '', 'Create new empty cluster - from pop_clustedit()' );
             if ~isempty(create_param) %if not canceled
                 clus_name = create_param{1}; % the name of the new cluster
-                [STUDY] = std_createclust(STUDY, ALLEEG, clus_name); 
+                [STUDY] = std_createclust(STUDY, ALLEEG, 'name', clus_name); 
                 % Update cluster list
                 clus_name_list = get(findobj('parent', hdl, 'tag', 'clus_list'), 'String');
                 clus_name_list{end+1} = [STUDY.cluster(end).name ' (0 ICs)']; %update the cluster list with the new cluster
@@ -818,7 +821,7 @@ else
                 if isempty(clus_name)
                     a = ['STUDY = std_createclust(STUDY, ALLEEG);'];
                 else
-                    a = ['STUDY = std_createclust(STUDY, ALLEEG, ' clus_name ');'];
+                    a = ['STUDY = std_createclust(STUDY, ALLEEG, ''name'', ' clus_name ');'];
                 end                
                 STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
                 userdat{1}{2} = STUDY;

@@ -56,7 +56,10 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
+% $Log: std_erp.m,v $
+% Revision 1.38  2010/02/16 08:43:21  arno
+% New single-trial reading/writing
+%
 % Revision 1.37  2010/01/28 20:46:34  arno
 % fixed problem with unique trial epoch (when subject only have one epoch)
 %
@@ -173,14 +176,18 @@ end;
 g = finputcheck(options, { 'components' 'integer' []         [];
                            'channels'   'cell'    {}         {};
                            'rmbase'     'real'    []         [];
+                           'trialindices' { 'integer' 'cell' } []         [];
                            'rmcomps'    'integer' []         [];
+                           'fileout'    'string'  []         '';
                            'savetrials' 'string'  { 'on' 'off' } 'off';
                            'interp'     'struct'  { }        struct([]);
                            'recompute'  'string'  { 'on' 'off' } 'off';
                            'timerange'  'real'    []         [] }, 'std_erp');
 if isstr(g), error(g); end;
+if isempty(g.trialindices), g.trialindices = cell(length(EEG)); end;
+if ~iscell(g.trialindices), g.trialindices = { g.trialindices }; end;
 if isfield(EEG,'icaweights')
-   numc = size(EEG.icaweights,1);
+   numc = size(EEG(1).icaweights,1);
 else
    error('EEG.icaweights not found');
 end
@@ -190,28 +197,35 @@ end
 
 EEG_etc = [];
 
-% filename 
-% --------
+% % THIS SECTION WOULD NEED TO TEST THAT THE PARAMETERS ON DISK ARE CONSISTENT
+%
+% % filename 
+% % --------
+if isempty(g.fileout), g.fileout = fullfile(EEG(1).filepath, EEG(1).filename(1:end-4)); end;
 if ~isempty(g.channels)
-    filenameshort = [ EEG.filename(1:end-3) 'daterp'];
+    filenameshort = [ g.fileout '.daterp'];
     prefix = 'chan';
 else    
-    filenameshort = [ EEG.filename(1:end-3) 'icaerp'];
+    filenameshort = [ g.fileout '.icaerp'];
     prefix = 'comp';
 end;
-filename = fullfile( EEG.filepath,filenameshort);
+%filename = fullfile( EEG(1).filepath, filenameshort);
+filename = filenameshort;
 
 % ERP information found in datasets
 % ---------------------------------
 if exist(filename) & strcmpi(g.recompute, 'off')
 
     fprintf('File "%s" found on disk, no need to recompute\n', filenameshort);
+    setinfo.filebase = g.fileout;
     if strcmpi(prefix, 'comp')
-        [X, t] = std_readerp(EEG, 1, g.components, g.timerange);
+        %[X, t] = std_readerp(EEG, 1, g.components, g.timerange);
+        [X, t] = std_readerp(setinfo, g.components, g.timerange);
     else
-        [X, t] = std_readerp(EEG, 1, g.channels, g.timerange);
+        %[X, t] = std_readerp(EEG, 1, g.channels, g.timerange);
+        [X, t] = std_readerp(setinfo, g.channels, g.timerange);
     end;
-    return;
+    if ~isempty(X), return; end;
     
 end 
    
@@ -231,35 +245,49 @@ end
 %else                        X = TMP.data;
 %end;
 options = {};
-if strcmpi(prefix, 'comp')
-    X = eeg_getdatact(EEG, 'component', [1:size(EEG.icaweights,1)]);
-else
-    EEG.data = eeg_getdatact(EEG, 'channel', [1:EEG.nbchan], 'rmcomps', g.rmcomps);
-    if ~isempty(g.rmcomps), options = { options{:} 'rmcomps' g.rmcomps }; end;
-    if ~isempty(g.interp), 
-        EEG = eeg_interp(EEG, g.interp, 'spherical'); 
-        options = { options{:} 'interp' g.interp };
+X       = [];
+for dat = 1:length(EEG)
+    if strcmpi(prefix, 'comp')
+        tmpdata = eeg_getdatact(EEG(dat), 'component', [1:size(EEG(dat).icaweights,1)], 'trialindices', g.trialindices{dat} );
+    else
+        EEG(dat).data = eeg_getdatact(EEG(dat), 'channel', [1:EEG(dat).nbchan], 'rmcomps', g.rmcomps, 'trialindices', g.trialindices{dat});
+        if ~isempty(g.rmcomps), options = { options{:} 'rmcomps' g.rmcomps }; end;
+        if ~isempty(g.interp), 
+            TMPEEG = eeg_interp(EEG(dat), g.interp, 'spherical'); 
+            options = { options{:} 'interp' g.interp };
+            tmpdata = TMPEEG.data;
+        else
+            tmpdata = EEG(dat).data;
+        end;
     end;
-    X = EEG.data;
-end;        
+    if isempty(X), X = tmpdata;
+    else
+        if size(X,1) ~= size(tmpdata,1), error('Datasets to be concatenated do not have the same number of channels'); end;
+        if size(X,2) ~= size(tmpdata,2), error('Datasets to be concatenated do not have the same number of time points'); end;
+        X(:,:,end+1:end+size(tmpdata,3)) = tmpdata; % concatenating trials
+    end;
+end;
 
 % Remove baseline mean
 % --------------------
+pnts     = EEG(1).pnts;
+trials   = size(X,3);
+timevals = EEG(1).times;
 if ~isempty(g.timerange)
     disp('Warning: the ''timerange'' option is deprecated and has no effect');
 end;
 if ~isempty(g.rmbase)
     disp('Removing baseline...');
     options = { options{:} 'rmbase' g.rmbase };
-    [tmp timebeg] = min(abs(EEG.times - g.rmbase(1)));
-    [tmp timeend] = min(abs(EEG.times - g.rmbase(2)));
+    [tmp timebeg] = min(abs(timevals - g.rmbase(1)));
+    [tmp timeend] = min(abs(timevals - g.rmbase(2)));
     if ~isempty(timebeg)
-        X = rmbase(X,EEG.pnts, [timebeg:timeend]);
+        X = rmbase(X,pnts, [timebeg:timeend]);
     else
-        X = rmbase(X,EEG.pnts);
+        X = rmbase(X,pnts);
     end
 end
-X = reshape(X, [ size(X,1) EEG.pnts EEG.trials ]);
+X = reshape(X, [ size(X,1) pnts trials ]);
 if strcmpi(prefix, 'comp')
     if strcmpi(g.savetrials, 'on')
         X = repmat(sqrt(mean(EEG.icawinv.^2))', [1 EEG.pnts EEG.trials]) .* X;
@@ -272,14 +300,13 @@ end;
 
 % Save ERPs in file (all components or channels)
 % ----------------------------------
-timevals = EEG.times;
-if isempty(timevals), timevals = linspace(EEG.xmin, EEG.xmax, EEG.pnts)*1000; end;
+if isempty(timevals), timevals = linspace(EEG(1).xmin, EEG(1).xmax, EEG(1).pnts)*1000; end; % continuous data
 if strcmpi(prefix, 'comp')
     savetofile( filename, timevals, X, 'comp', 1:size(X,1), options);
-    [X,t] = std_readerp( EEG, 1, g.components, g.timerange);
+    %[X,t] = std_readerp( EEG, 1, g.components, g.timerange);
 else
-    savetofile( filename, timevals, X, 'chan', 1:size(X,1), options, { EEG.chanlocs.labels });
-    [X,t] = std_readerp( EEG, 1, g.channels, g.timerange);
+    savetofile( filename, timevals, X, 'chan', 1:size(X,1), options, { EEG(1).chanlocs.labels });
+    %[X,t] = std_readerp( EEG, 1, g.channels, g.timerange);
 end;
 
 % -------------------------------------

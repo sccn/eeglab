@@ -120,7 +120,10 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
+% $Log: std_ersp.m,v $
+% Revision 1.61  2010/02/09 06:24:51  arno
+% Fixed savetrials option
+%
 % Revision 1.60  2009/12/16 02:10:24  arno
 % default lower frequency
 %
@@ -315,11 +318,13 @@ end;
                         'channels'      { 'cell' 'integer' }  { [] [] }     {};
                         'outputfile'    'string'      []      '';
                         'powbase'       'real'        []      [];
+                        'trialindices' { 'integer' 'cell' } []         [];
                         'savetrials'    'string'      { 'on' 'off' }      'off';
                         'plot'          'string'      { 'on' 'off' }      'off';
                         'recompute'     'string'      { 'on' 'off' }      'off';
                         'getparams'     'string'      { 'on' 'off' }      'off';
                         'timewindow'    'real'        []      [];
+                        'fileout'       'string'  []         '';
                         'timelimits'    'real'        []      [EEG.xmin EEG.xmax]*1000;
                         'cycles'        'real'        []      [3 .5];
                         'padratio'      'real'        []      1;
@@ -330,6 +335,8 @@ end;
                         'alpha'         'real'        []      NaN;
                         'type'          'string'      { 'ersp' 'itc' 'both' 'ersp&itc' }  'both'}, 'std_ersp', 'ignore');
 if isstr(g), error(g); end;
+if isempty(g.trialindices), g.trialindices = cell(length(EEG)); end;
+if ~iscell(g.trialindices), g.trialindices = { g.trialindices }; end;
     
 % checking input parameters
 % -------------------------
@@ -343,27 +350,22 @@ end
 
 % select ICA components or data channels
 % --------------------------------------
-if ~isempty(g.outputfile)
-    filenameersp   = fullfile('', [ g.outputfile '.datersp' ]);
-    filenameitc    = fullfile('', [ g.outputfile '.datitc' ]);    
-    filenametrials = fullfile('', [ g.outputfile '.dattimef' ]);    
-    g.indices = g.channels;
-    prefix = 'chan';
-elseif ~isempty(g.components)
+if isempty(g.fileout), g.fileout = fullfile(EEG(1).filepath, EEG(1).filename(1:end-4)); end;
+if ~isempty(g.components)
     g.indices = g.components;
     prefix = 'comp';
-    filenameersp   = fullfile(EEG.filepath, [ EEG.filename(1:end-3) 'icaersp' ]);
-    filenameitc    = fullfile(EEG.filepath, [ EEG.filename(1:end-3) 'icaitc' ]);
-    filenametrials = fullfile(EEG.filepath, [ EEG.filename(1:end-3) 'icatimef' ]);    
+    filenameersp   = [ g.fileout '.icaersp'  ];
+    filenameitc    = [ g.fileout '.icaitc'   ];
+    filenametrials = [ g.fileout '.icatimef' ];    
     if ~isempty(g.channels)
         error('Cannot compute ERSP/ITC for components and channels at the same time');
     end;
 elseif ~isempty(g.channels)
     g.indices = g.channels;
     prefix = 'chan';
-    filenameersp   = fullfile(EEG.filepath, [ EEG.filename(1:end-3) 'datersp' ]);
-    filenameitc    = fullfile(EEG.filepath, [ EEG.filename(1:end-3) 'datitc' ]);
-    filenametrials = fullfile(EEG.filepath, [ EEG.filename(1:end-3) 'dattimef' ]);    
+    filenameersp   = [ g.fileout '.datersp'  ];
+    filenameitc    = [ g.fileout '.datitc'   ];
+    filenametrials = [ g.fileout '.dattimef' ];    
 end;
 
 powbaseexist = 1; % used also later
@@ -451,9 +453,9 @@ end;
 
 options = {};
 if ~isempty(g.components)
-    tmpdata = eeg_getdatact(EEG, 'component', g.indices);
+    tmpdata = eeg_getdatact(EEG, 'component', g.indices, 'trialindices', g.trialindices{dat});
 else
-    EEG.data = eeg_getdatact(EEG, 'channel', [1:EEG.nbchan], 'rmcomps', g.rmcomps);
+    EEG.data = eeg_getdatact(EEG, 'channel', [1:EEG.nbchan], 'rmcomps', g.rmcomps, 'trialindices', g.trialindices{1});
     if ~isempty(g.rmcomps), options = { options{:} 'rmcomps' g.rmcomps }; end;
     if ~isempty(g.interp), 
         EEG = eeg_interp(EEG, g.interp, 'spherical'); 

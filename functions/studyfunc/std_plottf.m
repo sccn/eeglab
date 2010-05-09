@@ -61,7 +61,11 @@
 %
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
-% $Log: not supported by cvs2svn $
+% $Log: std_plottf.m,v $
+% Revision 1.23  2010/03/09 06:11:55  arno
+% remove colorbar in std_chantopo and std_plottf when threshold is set
+% Adjust figure geometry
+%
 % Revision 1.22  2010/03/07 15:24:20  arno
 % Remove colorbar when threshold is set
 %

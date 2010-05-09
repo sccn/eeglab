@@ -31,7 +31,10 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
+% $Log: std_checkset.m,v $
+% Revision 1.71  2009/11/04 02:28:28  arno
+% now uses std_reset
+%
 % Revision 1.70  2008/03/30 12:04:47  arno
 % text if old version and remove fields allinds and setinds
 %
@@ -202,90 +205,6 @@ if ~isequal(STUDY.group,     group    ), STUDY.group     = group;     modif = 1;
 if ~isequal(STUDY.condition, condition), STUDY.condition = condition; modif = 1; end;  
 if ~isequal(STUDY.session,   session  ), STUDY.session   = session;   modif = 1; end;  
 
-% recompute setind matrix and check that subjects with different group HAVE different sessions
-% --------------------------------------------------------------------------------------------
-notsameica = [];
-correctsession = 0;
-if ~isempty(STUDY.datasetinfo(1).index)
-    for is = 1:length(STUDY.subject)
-        alldats = strmatch(STUDY.subject{is}, { STUDY.datasetinfo.subject }, 'exact');
-
-        for is = 1:length(STUDY.session)
-            tmpind       = find(STUDY.session(is) == [ STUDY.datasetinfo(alldats).session ] );
-            if length(unique({ STUDY.datasetinfo(alldats(tmpind)).group } )) > 1
-                correctsession = 1;
-            end;
-            
-            tmpdats = alldats(tmpind);
-            try nc = size(ALLEEG(STUDY.datasetinfo(tmpdats(1)).index).icaweights,1);
-            catch nc = [];
-            end
-            for ir = 2:length(tmpdats)
-                if nc ~= size(ALLEEG(STUDY.datasetinfo(tmpdats(ir)).index).icaweights,1)
-                    notsameica = [ notsameica; tmpdats(1) tmpdats(ir) ];
-                end;
-            end;
-        end;
-    end;
-end;
-if correctsession
-    fprintf('Warning: different group values have the same session, session now assigned automatically\n');
-    for index = 1:length(STUDY.datasetinfo)
-        STUDY.datasetinfo(index).session = strmatch( STUDY.datasetinfo(index).group, STUDY.group, 'exact');
-    end;
-    STUDY.session = unique([STUDY.datasetinfo.session]);
-    STUDY.cluster = [];
-    STUDY.changrp = [];
-    modif = 1;
-end;
-if ~isempty(notsameica)
-    disp('Different ICA decompositions have been found for the same')
-    disp('subject in two conditions. if the data were recorded in the')
-    disp('same session, it might be best to run ICA on both datasets simultanously.')
-    setind = [1:length(STUDY.datasetinfo)];
-    if ~isequal(STUDY.setind, setind)
-        STUDY.setind = setind; modif = 1;
-    end;
-else
-    if ~isempty(STUDY.condition)
-        if ~isempty(STUDY.session)
-            setind = zeros(length(STUDY.condition), length(STUDY.subject) *length(STUDY.session));
-        else
-            setind = zeros(length(STUDY.condition), length(STUDY.subject) );
-        end
-    else
-        if ~isempty(STUDY.session)        
-            setind = zeros(1, length(STUDY.subject) *length(STUDY.session));
-        else
-            setind = zeros(1, length(STUDY.subject) );
-        end
-    end
-    for k = 1:length(STUDY.datasetinfo)
-        setcond = find(strcmp(STUDY.datasetinfo(k).condition, STUDY.condition));
-        setsubj = find(strcmp(STUDY.datasetinfo(k).subject,   STUDY.subject));
-        setsess = find(STUDY.datasetinfo(k).session == STUDY.session);
-        ncomps  = [];
-        if ~isempty(setcond)
-            if ~isempty(setsess)
-                setind(setcond, setsubj * length(STUDY.session)+setsess-1) = k; 
-                %A 2D matrix of size [conditions (subjects x sessions)]
-            else
-                setind(setcond, setsubj ) = k; 
-            end
-        else
-            if ~isempty(setsess)
-                setind(1, setsubj * length(STUDY.session)+setsess-1) = k; 
-            else
-                setind(1, setsubj) = k; 
-            end
-        end
-
-        if ~isequal(STUDY.datasetinfo(k).index, k)
-            STUDY.datasetinfo(k).index = k; modif = 1; %The dataset index in the current ALLEEG structure
-        end;
-    end
-end;
-
 % check dataset info consistency 
 % ------------------------------
 for k = 1:length(STUDY.datasetinfo)
@@ -296,92 +215,39 @@ for k = 1:length(STUDY.datasetinfo)
     end;
 end;
 
-% set to NaN empty indices and remove nan columns
-% -----------------------------------------------
-setind( find(setind(:) == 0) ) = NaN;
-rmind = [];
-for k = 1:size(setind,2)
-    ind_nonnan = find(~isnan(setind(:,k)));
-    if isempty(ind_nonnan), rmind = [ rmind k ]; end;
-end
-setind(:,rmind) = [];
-if ~isequal(setind, STUDY.setind)
-    STUDY.setind = setind; modif = 1;
-end
-if any(isnan(setind))
-    warndlg('STUDY.setind contains NaNs. There must be a dataset for every subject, condition, and group combination or some study functions will fail.');
-end
-
-% remove cluster information if old version
-% -----------------------------------------
-if isempty(STUDY.etc.version) | strcmpi(STUDY.etc.version, '6.01b')
-    icadefs;
-    if isfield(STUDY, 'cluster')
-        STUDY = std_reset(STUDY);
-    end;
-    filename = fullfile( ALLEEG(1).filepath,[ ALLEEG(1).filename(1:end-3) 'icaersp']);
-    if isempty(STUDY.etc.version)
-        if exist(filename) == 2
-            tmp = load('-mat', filename);
-            if (length(fieldnames(tmp))-5)/3 < size(ALLEEG(1).icaweights,1)
-    %            keyboard; nima
-                fprintf(2,'Possibly corrupted ERSP files for ICA. THESE FILES SHOULD BE RECOMPUTED (bug 497).\n');
-                fprintf(2,'(This message will not appear again).\n');
-                disp('Use menu "Study > Precompute Component Measures", select ERSP and');
-                disp('force recomputation. This problem refers to bug 489.');
-            end;
-        end;
-    end;
-    if isfield(STUDY, 'changrp')
-        if ~isempty(STUDY.changrp)
-            STUDY.changrp = [];
-        end;
-    end;
-    modif = 1;
-    STUDY.etc.version = EEGLAB_VERSION;
+% recompute setind array (setind is deprecated but we keep it anyway)
+% -------------------------------------------------------------------
+setind  = [];
+sameica = std_findsameica(ALLEEG);
+for index = 1:length(sameica)
+    setind(length(sameica{index}):-1:1,index) = sameica{index}';
 end;
+setind(find(setind == 0)) = NaN;
+if any(isnan(setind))
+    warndlg('Warning: non-uniform set of dataset, some function might not work');
+end
+if ~isequal(setind, STUDY.setind), STUDY.setind = setind; modif = 1; end;
 
-% set cluster array if empty
-% --------------------------
+% check cluster array
+% -------------------
 if ~isfield(STUDY, 'cluster'), STUDY.cluster = []; modif = 1; end;
 if isempty(STUDY.cluster)
     modif = 1; 
-    [STUDY] = std_createclust(STUDY, ALLEEG, 'ParentCluster');
-    STUDY.cluster(1).parent = []; 
-    for k = 1:size(STUDY.setind,2)
-        
-        ind_nonnan = find(~isnan(STUDY.setind(:,k)));
-        ind_nonnan = STUDY.setind(ind_nonnan(1),k);
-        comps = STUDY.datasetinfo(ind_nonnan).comps;
-        if isempty(comps)
-            comps = 1:size(ALLEEG(STUDY.datasetinfo(ind_nonnan).index).icaweights,1);
-        end;
-        STUDY.cluster(1).sets =  [STUDY.cluster(1).sets       STUDY.setind(:,k)*ones(1,length(comps))];
-        STUDY.cluster(1).comps = [STUDY.cluster(1).comps      comps];
-    end
-else
-    for index = 1:length(STUDY.cluster)
-        if ~isempty(STUDY.cluster(index).centroid) & ~isstruct(STUDY.cluster(index).centroid)
-            STUDY.cluster(index).centroid = [];
-            modif = 1; 
-        end;
-    end;    
+    [STUDY] = std_createclust(STUDY, ALLEEG, 'parentcluster', 'on');
+end;
+
+% create STUDY design if it is not present
+% ----------------------------------------
+if ~isfield(STUDY, 'design') || isempty(STUDY.design) || ~isfield(STUDY.design, 'indvar1')
+    STUDY = std_makedesign(STUDY, ALLEEG);
+    STUDY = std_selectdesign(STUDY, ALLEEG,1);
 end;
 
 % make channel groups
 % -------------------
-if ~isfield(STUDY, 'changrp'), STUDY.changrp = []; modif = 1; end;
-if isempty(STUDY.changrp)
-  STUDY = std_changroup(STUDY, ALLEEG);
-  modif = 1;
-elseif isfield(STUDY.changrp, 'allinds')
-    try,
-        if ~isempty(STUDY.changrp(1).allinds)
-            if any(STUDY.changrp(1).allinds{1} < 0)
-                STUDY = std_changroup(STUDY, ALLEEG);
-            end;
-        end;
-    catch, end;
+if ~isfield(STUDY, 'changrp') || isempty(STUDY.changrp)
+    STUDY = std_changroup(STUDY, ALLEEG);
+    modif = 1;
 end;
 
 % determine if there has been any change

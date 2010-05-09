@@ -26,7 +26,10 @@
 % 
 % See also: std_erpplot(), std_specplot() and std_erspplot()
 
-% $Log: not supported by cvs2svn $
+% $Log: std_selsubject.m,v $
+% Revision 1.5  2009/10/10 01:38:23  arno
+% fix for std_ersp
+%
 % Revision 1.4  2009/10/10 01:31:23  arno
 % fix scalp maps plotting for ERP (single subjects)
 %

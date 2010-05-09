@@ -50,7 +50,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
+% $Log: std_readtopo.m,v $
 % Revision 1.19  2009/10/21 20:30:53  arno
 % Fix reading files under windows
 %
@@ -121,7 +121,7 @@ filename = correctfile(fullfile( ALLEEG(abset).filepath,[ ALLEEG(abset).filename
 tmpfile  = which(filename);
 if ~isempty(tmpfile), filename = tmpfile; end;
 
-while getfield(dir(filename), 'bytes') < 500 %1000
+while getfield(dir(filename), 'bytes') < 1000
     topo = load( '-mat', filename);
     filename = correctfile(topo.file);
     tmpfile  = which(filename);

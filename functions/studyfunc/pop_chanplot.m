@@ -126,7 +126,7 @@
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
-% Copyright (C) Hilit Serby, SCCN, INC, UCSD, October 11, 2004, hilit@sccn.ucsd.edu
+% Copyright (C) Arnaud Delorme, SCCN, INC, UCSD, October 11, 2004, arno@sccn.ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -226,10 +226,10 @@ if ~isstr(varargin{1})
     
     % enable buttons
     % --------------
-    filename = fullfile( ALLEEG(1).filepath, ALLEEG(1).filename(1:end-3));
-    if exist([filename 'datspec']) , spec_enable = 'on'; else spec_enable  = 'off'; end;
-    if exist([filename 'daterp'] )  , erp_enable = 'on'; else erp_enable   = 'off'; end;
-    if exist([filename 'datersp']) , ersp_enable = 'on'; else ersp_enable  = 'off'; end;
+    filename = STUDY.design(STUDY.currentdesign).setinfo(1).filebase;
+    if exist([filename '.datspec']) , spec_enable = 'on'; else spec_enable  = 'off'; end;
+    if exist([filename '.daterp'] )  , erp_enable = 'on'; else erp_enable   = 'off'; end;
+    if exist([filename '.datersp']) , ersp_enable = 'on'; else ersp_enable  = 'off'; end;
     
     if isfield(ALLEEG(1).dipfit, 'model'), dip_enable   = 'on'; else dip_enable   = 'off'; end;
     
@@ -243,9 +243,11 @@ if ~isstr(varargin{1})
         
     geometry = { [4] [1] [0.7 0.3 0.3 0.1 0.9] [1 0.3 1] [1 0.3 1] [1 0.3 1] [1 0.3 1] ...
                  [1 0.3 1] [1 0.3 1] };
+    str_name       = sprintf('STUDY name ''%s'' - ''%s''', STUDY.name, STUDY.design(STUDY.currentdesign).name);
+    if length(str_name) > 80, str_name = [ str_name(1:80) '...''' ]; end;
+             
     uilist   = { ...
-        {'style' 'text' 'string' ['Study name: ''' STUDY.name '''' ] ...
-            'FontWeight' 'Bold' 'HorizontalAlignment' 'center'} {} ...
+        {'style' 'text' 'string' str_name 'FontWeight' 'Bold' 'HorizontalAlignment' 'center'} {} ...
         {'style' 'text'       'string' 'Select channel to plot' 'FontWeight' 'Bold' } ...
         {'style' 'pushbutton' 'string' 'Sel. all' 'callback' sel_all_chans } {} {} ...
         {'style' 'text'       'string' 'Select subject(s) to plot' 'FontWeight' 'Bold'} ...
@@ -315,7 +317,7 @@ else
             plotting_option = varargin{1};
             plotting_option = [ plotting_option(9:end) 'plot' ];
             if onechan(1) ~= 1  % check that not all onechan in channel are requested
-                 subject = STUDY.subject{onechan-1};
+                 subject = STUDY.design(STUDY.currentdesign).subject{onechan-1};
                  a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''channels'','  vararg2str({changrpstr}) ', ''subject'', ''' subject ''' );' ];
                  eval(a); STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
              else
@@ -370,13 +372,13 @@ else
             % ---------------------
             chanid{1} = 'All subjects';
             if length(changrp) == 1
-                allsubjects = unique({ STUDY.datasetinfo([ changrp.setinds{:} ]).subject });
+                allsubjects = unique({ STUDY.design(STUDY.currentdesign).setinfo([ changrp.setinds{:} ]).subject });
                 for l = 1:length(allsubjects)
                     chanid{end+1} = [ allsubjects{l} ' ' changrp.name ];
                 end;
             else
-                for l = 1:length(STUDY.subject)
-                    chanid{end+1} = [ STUDY.subject{l} ];
+                for l = 1:length(STUDY.design(STUDY.currentdesign).subject)
+                    chanid{end+1} = [ STUDY.design(STUDY.currentdesign).subject{l} ];
                 end;
             end;
                 
@@ -396,8 +398,8 @@ else
             % Generate channel list
             % ---------------------
             chanid{1} = 'All subjects';
-            for l = 1:length(STUDY.subject)
-                chanid{end+1} = [ STUDY.subject{l} ' All' ];
+            for l = 1:length(STUDY.design(STUDY.currentdesign).subject)
+                chanid{end+1} = [ STUDY.design(STUDY.currentdesign).subject{l} ' All' ];
             end;
             selected = 1;
             set(findobj('parent', hdl, 'tag', 'chan_onechan'), 'value', selected, 'String', chanid);

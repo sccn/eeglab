@@ -106,7 +106,11 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
+% $Log: std_preclust.m,v $
+% Revision 1.91  2008/02/15 16:46:17  arno
+% fixed sub clustering using scalp topographies
+% and clean up the code
+%
 % Revision 1.90  2007/10/31 19:31:21  arno
 % fixing finaldim check
 %

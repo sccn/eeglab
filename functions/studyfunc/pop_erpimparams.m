@@ -47,7 +47,10 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
+% $Log: pop_erpimparams.m,v $
+% Revision 1.5  2008/01/10 23:30:32  arno
+% sorttype as string
+%
 % Revision 1.4  2008/01/10 23:02:38  arno
 % statmode
 %

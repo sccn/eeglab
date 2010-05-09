@@ -28,7 +28,10 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
+% $Log: std_chaninds.m,v $
+% Revision 1.4  2009/10/19 01:16:02  arno
+% handle numerical channel indices
+%
 % Revision 1.3  2009/07/13 21:10:26  arno
 % still working on std_pac
 %

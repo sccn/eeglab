@@ -51,7 +51,10 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
+% $Log: std_figtitle.m,v $
+% Revision 1.3  2010/02/09 20:05:40  arno
+% fixed empty group problem
+%
 % Revision 1.2  2010/02/09 06:07:27  arno
 % Fixed new title problem and implemented 3-level significance
 %
@@ -193,8 +196,18 @@ end;
 
 % statistic titles
 % ----------------
-if isnan(opt.threshold), basicstat = '(p-value)';
-else                     basicstat = sprintf('(p<%.4f)', opt.threshold);
+if isnan(opt.threshold), 
+    basicstat = '(p-value)';
+else
+    if length(opt.threshold) >= 1
+        basicstat = sprintf([ '(p<%.' thresh_pres(opt.threshold(1)) 'f)'], opt.threshold(1));
+    end;
+    if length(opt.threshold) >= 2
+        basicstat = [ basicstat(1:end-1) sprintf([' yellow;p<%.' thresh_pres(opt.threshold(2))  'f orange)'], opt.threshold(2)) ];
+    end;
+    if length(opt.threshold) >= 3
+        basicstat = [ basicstat(1:end-1) sprintf([';\np<%.' thresh_pres(opt.threshold(3)) 'f red)' ], opt.threshold(3)) ];  
+    end;
 end;    
 if ~isempty(opt.statistics), basicstat = [ basicstat ' ' opt.statistics    ]; end;
 if ~isempty(opt.mcorrect) && ~strcmpi(opt.mcorrect, 'none'),   basicstat = [ basicstat ' with ' opt.mcorrect ]; end;
@@ -213,3 +226,14 @@ end;
 if strcmpi(opt.condstat, 'on') && strcmpi(opt.cond2stat, 'on')
    all_titles{rown, coln} = [ 'Interaction ' basicstat ];   
 end;
+
+function pres = thresh_pres(thresh_pres);
+    if (round(thresh_pres*100)-thresh_pres*100) == 0
+        pres = 2;
+    elseif (round(thresh_pres*1000)-thresh_pres*1000) == 0
+        pres = 3;
+    else
+        pres = -round(log10(thresh_pres))+1;
+    end;
+    pres = num2str(pres);
+

@@ -32,25 +32,22 @@ function [ tmpstruct setlist complist ] = std_cell2setcomps(STUDY, ALLEEG, setin
 
 if nargin < 4
     tmpstruct = STUDY.cluster(setinds);
-    sets = STUDY.cluster(setinds).setinds;
-    inds = STUDY.cluster(setinds).allinds;
+    sets = [ STUDY.cluster(setinds).setinds{:} ];
+    inds = [ STUDY.cluster(setinds).allinds{:} ];
 else
     tmpstruct  = [];
-    sets       = setinds;
-    inds       = allinds;
-end;
-
-% initialize flag array
-% ---------------------
-flag = cell(size(inds));
-for i = 1:size(inds,1)
-    for j = 1:size(inds,2)
-        flag{i,j} = zeros(size(inds{i,j}));
-    end;
+    sets       = [ setinds{:} ];
+    inds       = [ allinds{:} ];
 end;
 
 % find datasets with common ICA decompositions
 clusters = std_findsameica(ALLEEG);
+
+for ind = 1:length(clusters)
+    for c = 2:length(clusters{ind})
+        sets(find(sets == clusters{ind}(c))) = clusters{ind}(1);
+    end;
+end;
 
 setlist  = [];
 complist = [];

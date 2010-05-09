@@ -46,7 +46,10 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
+% $Log: std_changroup.m,v $
+% Revision 1.15  2010/02/25 10:02:17  arno
+% added the changrpstatus field
+%
 % Revision 1.14  2009/07/10 01:03:42  arno
 % remove old channel lookup
 %
@@ -123,13 +126,13 @@ for indc = 1:length(alllocs)
     STUDY.changrp(indc).centroid = [];
 end;
 
-if strcmpi(interp, 'off')
-    if length(unique( cellfun(@length, { ALLEEG.chanlocs }))) ~= 1
-         STUDY.changrpstatus = 'some channels missing in some datasets';
-    else STUDY.changrpstatus = 'all channels present in all datasets';
-    end;
-else STUDY.changrpstatus = 'all channels present in all datasets - interpolated';
-end;
+% if strcmpi(interp, 'off')
+%     if length(unique( cellfun(@length, { ALLEEG.chanlocs }))) ~= 1
+%          STUDY.changrpstatus = 'some channels missing in some datasets';
+%     else STUDY.changrpstatus = 'all channels present in all datasets';
+%     end;
+% else STUDY.changrpstatus = 'all channels present in all datasets - interpolated';
+% end;
 
 %STUDY.changrp(indc).name = [ 'full montage' ];
 %STUDY.changrp(indc).channels = { alllocs.labels };
@@ -141,42 +144,39 @@ return;
 % ---------------------------------
 function changrp = std_chanlookupnew( STUDY, ALLEEG, changrp, interp);
 
-    nc = max(length(STUDY.condition),1);
-    ng = max(length(STUDY.group),1);
+    setinfo       = STUDY.design(STUDY.currentdesign).setinfo;
+    allconditions = STUDY.design(STUDY.currentdesign).condition;
+    allgroups     = STUDY.design(STUDY.currentdesign).group;
+    nc = max(length(allconditions),1);
+    ng = max(length(allgroups),    1);
     changrp.allinds = cell( nc, ng );
     changrp.setinds = cell( nc, ng );
-    for index = 1:length(STUDY.datasetinfo)
-        condind = strmatch( STUDY.datasetinfo(index).condition, STUDY.condition, 'exact');
-        grpind  = strmatch( STUDY.datasetinfo(index).group    , STUDY.group    , 'exact');
-        datind  = STUDY.datasetinfo(index).index;
-        tmplocs = { ALLEEG(datind).chanlocs.labels };
+    for index = 1:length(setinfo)
+        condind = strmatch( setinfo(index).condition, allconditions, 'exact');
+        grpind  = strmatch( setinfo(index).group    , allgroups    , 'exact');
         
-        if ( isempty(condind) & ~isempty(STUDY.condition) ) | (isempty(grpind) & ~isempty(STUDY.group) ) 
-            fprintf( [ 'Important warning: Dataset %d has a group and condition that is\nnot in the STUDY.condition ' ...
-                             'and STUDY.group structure. This must be fixed.' ], STUDY.datasetinfo(index).index);
-        else
-            if isempty(STUDY.condition), condind = 1; end;
-            if isempty(STUDY.group),     grpind  = 1; end;
-                
-            % scan all channel labels
-            % -----------------------
-            if strcmpi(interp, 'off')
-                for indc = 1:length(changrp.channels) % usually just one channel
-                    ind = strmatch( changrp.channels{indc}, tmplocs, 'exact');
-                    if length(ind) > 1, error([ 'Duplicate channel label ''' tmplocs{ind(1)} ''' for dataset ' int2str(datind) ]); end;
-                    if ~isempty(ind)
-                        changrp.allinds{ condind, grpind } = [ changrp.allinds{ condind, grpind } ind ];
-                        changrp.setinds{ condind, grpind } = [ changrp.setinds{ condind, grpind } datind ];
-                    end;
+        if isempty(allconditions), condind = 1; end;
+        if isempty(allgroups),     grpind  = 1; end;
+
+        % scan all channel labels
+        % -----------------------
+        if strcmpi(interp, 'off')
+            datind  = setinfo(index).setindex;
+            tmplocs = { ALLEEG(datind(1)).chanlocs.labels };
+            for indc = 1:length(changrp.channels) % usually just one channel
+                ind = strmatch( changrp.channels{indc}, tmplocs, 'exact');
+                if length(ind) > 1, error([ 'Duplicate channel label ''' tmplocs{ind(1)} ''' for dataset ' int2str(datind) ]); end;
+                if ~isempty(ind)
+                    changrp.allinds{ condind, grpind } = [ changrp.allinds{ condind, grpind } ind ];
+                    changrp.setinds{ condind, grpind } = [ changrp.setinds{ condind, grpind } index ];
                 end;
-            else % interpolation is "on", all channels for all datasets
-                alllocs = { STUDY.changrp.name };
-                ind = strmatch( changrp.name, alllocs, 'exact');
-                changrp.allinds{ condind, grpind } = [ changrp.allinds{ condind, grpind } ind   ];
-                changrp.setinds{ condind, grpind } = [ changrp.setinds{ condind, grpind } index ];
             end;
+        else % interpolation is "on", all channels for all datasets
+            alllocs = { STUDY.changrp.name };
+            ind = strmatch( changrp.name, alllocs, 'exact');
+            changrp.allinds{ condind, grpind } = [ changrp.allinds{ condind, grpind } ind   ];
+            changrp.setinds{ condind, grpind } = [ changrp.setinds{ condind, grpind } index ];
         end;
     end;
     
     return; 
-    

@@ -86,7 +86,10 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
+% $Log: std_spec.m,v $
+% Revision 1.45  2010/03/21 20:57:56  arno
+% fix single trial computation for continuous data
+%
 % Revision 1.44  2010/02/25 10:00:41  arno
 % fixed saving channel labels
 %
@@ -232,13 +235,14 @@ end;
                                       'savetrials' 'string'  { 'on' 'off' } 'off';
                                       'rmcomps'    'integer' []         [];
                                       'nw'         'float'   []         4;
+                                      'fileout'    'string'  []         '';
                                       'burgorder'  'integer' []         20;
                                       'interp'     'struct'  { }        struct([]);
                                       'nfft'       'integer' []         [];
                                       'freqrange'  'real'    []         [] }, 'std_spec', 'ignore');
 if isstr(g), error(g); end;
 if isfield(EEG,'icaweights')
-   numc = size(EEG.icaweights,1);
+   numc = size(EEG(1).icaweights,1);
 else
    error('EEG.icaweights not found');
 end
@@ -250,11 +254,12 @@ EEG_etc = [];
 
 % filename 
 % --------
+if isempty(g.fileout), g.fileout = fullfile(EEG(1).filepath, EEG(1).filename(1:end-4)); end;
 if ~isempty(g.channels)
-    filename = fullfile( EEG.filepath,[ EEG.filename(1:end-3) 'datspec']);
+    filename = [ g.fileout '.datspec'];
     prefix = 'chan';
 else    
-    filename = fullfile( EEG.filepath,[ EEG.filename(1:end-3) 'icaspec']);
+    filename = [ g.fileout '.icaspec'];
     prefix = 'comp';
 end;
 
@@ -262,17 +267,18 @@ end;
 % ---------------------------------
 if exist(filename) & strcmpi(g.recompute, 'off')
 
+    fprintf('File "%s" found on disk, no need to recompute\n', filename);
+    setinfo.filebase = g.fileout;
     if strcmpi(prefix, 'comp')
-        [X, f] = std_readspec(EEG, 1, g.components, g.freqrange);
+        [X, t] = std_readspec(setinfo, g.components, g.timerange);
     else
-        [X, f] = std_readspec(EEG, 1, g.channels, g.freqrange);
+        [X, t] = std_readspec(setinfo, g.channels, g.timerange);
     end;
-    return;
-    
-end 
+    if ~isempty(X), return; end;
+end
 
 if ~strcmpi(g.specmode, 'psd')
-    if EEG.trials == 1, 
+    if EEG(1).trials == 1, 
         EEG = eeg_checkset(EEG, 'loaddata');
         EEG = eeg_regepochs(EEG, 1, [0 1]);
         disp('Warning: continuous data, extracting 1-second epochs'); 
@@ -282,17 +288,28 @@ end;
 % No SPEC information found
 % ------------------------
 options = {};
-if strcmpi(prefix, 'comp')
-    X = eeg_getdatact(EEG, 'component', [1:size(EEG.icaweights,1)]);
-else
-    EEG.data = eeg_getdatact(EEG, 'channel', [1:EEG.nbchan], 'rmcomps', g.rmcomps);
-    if ~isempty(g.rmcomps), options = { options{:} 'rmcomps' g.rmcomps }; end;
-    if ~isempty(g.interp), 
-        EEG = eeg_interp(EEG, g.interp, 'spherical'); 
-        options = { options{:} 'interp' g.interp };
+X       = [];
+for dat = 1:length(EEG)
+    if strcmpi(prefix, 'comp')
+        tmpdata = eeg_getdatact(EEG(dat), 'component', [1:size(EEG(dat).icaweights,1)], 'trialindices', g.trialindices{dat} );
+    else
+        EEG(dat).data = eeg_getdatact(EEG(dat), 'channel', [1:EEG(dat).nbchan], 'rmcomps', g.rmcomps, 'trialindices', g.trialindices{dat});
+        if ~isempty(g.rmcomps), options = { options{:} 'rmcomps' g.rmcomps }; end;
+        if ~isempty(g.interp), 
+            TMPEEG = eeg_interp(EEG(dat), g.interp, 'spherical'); 
+            options = { options{:} 'interp' g.interp };
+            tmpdata = TMPEEG.data;
+        else
+            tmpdata = EEG(dat).data;
+        end;
     end;
-    X = EEG.data;
-end;        
+    if isempty(X), X = tmpdata;
+    else
+        if size(X,1) ~= size(tmpdata,1), error('Datasets to be concatenated do not have the same number of channels'); end;
+        if size(X,2) ~= size(tmpdata,2), error('Datasets to be concatenated do not have the same number of time points'); end;
+        X(:,:,end+1:end+size(tmpdata,3)) = tmpdata; % concatenating trials
+    end;
+end;
 
 if ~isempty(g.timerange)
     timebef  = find(EEG.times >= g.timerange(1) & EEG.times < g.timerange(2) );
@@ -300,10 +317,10 @@ if ~isempty(g.timerange)
     EEG.pnts = length(timebef);
 end;
 if strcmpi(g.specmode, 'psd')
-    if ~isempty(EEG.event) && isfield(EEG.event, 'type') && ischar(EEG.event(1).type)
-         boundaries = strmatch('boundary', lower({ EEG.event.type }));
+    if ~isempty(EEG.event) && isfield(EEG.event, 'type') && ischar(EEG(1).event(1).type)
+         boundaries = strmatch('boundary', lower({ EEG(1).event.type }));
          if ~isempty(boundaries)
-             boundaries = [0 [ EEG.event(boundaries).latency ]-0.5 EEG.pnts ];
+             boundaries = [0 [ EEG.event(boundaries).latency ]-0.5 EEG(1).pnts ];
          end;
     else boundaries = [];
     end;
@@ -359,10 +376,8 @@ end;
 options = { options{:} spec_opt{:} 'timerange' g.timerange 'nfft' g.nfft 'specmode' g.specmode };
 if strcmpi(prefix, 'comp')
     savetofile( filename, f, X, 'comp', 1:size(X,1), options);
-    [X f] = std_readspec(EEG, 1, g.components, g.freqrange);
 else
     savetofile( filename, f, X, 'chan', 1:size(X,1), options, { EEG.chanlocs.labels });
-    [X f] = std_readspec(EEG, 1, g.channels, g.freqrange);
 end;
 return;
 

@@ -41,7 +41,10 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
+% $Log: std_interp.m,v $
+% Revision 1.8  2009/07/02 23:29:06  arno
+% fixed interpolation
+%
 % Revision 1.7  2008/02/15 16:44:50  arno
 % can now use stored bad channel location for interpolation
 %

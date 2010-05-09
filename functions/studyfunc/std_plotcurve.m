@@ -60,7 +60,10 @@
 %
 % See also: pop_erspparams(), pop_erpparams(), pop_specparams(), statcond()
 
-% $Log: not supported by cvs2svn $
+% $Log: std_plotcurve.m,v $
+% Revision 1.30  2010/03/09 06:15:08  arno
+% Adjust figure geometry to input data
+%
 % Revision 1.29  2010/03/05 01:25:19  arno
 % Fix threshold and interstat plotting
 %
@@ -433,20 +436,20 @@ for c = 1:ncplot
             plotopt = { allx };
             if ~dimreduced_sizediffers
                 if strcmpi(opt.plottopo, 'on'),
-                    if strcmpi(opt.plotsubjects, 'off') & strcmpi(opt.singlesubject, 'off') tmpdata = squeeze(real(nan_mean(tmpdata,3))); end;
-                elseif strcmpi(opt.plotsubjects, 'off') & strcmpi(opt.singlesubject, 'off') tmpdata = squeeze(real(nan_mean(tmpdata,2))); 
+                    if strcmpi(opt.plotsubjects, 'off') && strcmpi(opt.singlesubject, 'off') tmpdata = squeeze(real(nan_mean(tmpdata,3))); end;
+                elseif strcmpi(opt.plotsubjects, 'off') && strcmpi(opt.singlesubject, 'off') tmpdata = squeeze(real(nan_mean(tmpdata,2))); 
                 end;
             end;
             tmpdata = squeeze(permute(tmpdata, [2 1 3]));
             if strcmpi(opt.plottopo, 'on'), highlight = 'background'; else highlight = 'bottom'; end;
-            if strcmpi(opt.plotgroups, 'together') &  isempty(opt.condstats) & ...
-                             ~isnan(opt.threshold) & ~isempty(opt.groupstats)
+            if strcmpi(opt.plotgroups, 'together') &&  isempty(opt.condstats) && ...
+                             ~isnan(opt.threshold) && ~isempty(opt.groupstats)
                 plotopt = { plotopt{:} 'maskarray' };
                 tmpdata = { tmpdata pgroupplot{c}' };
-            elseif strcmpi(opt.plotconditions, 'together') &  isempty(opt.groupstats) & ...
-                                     ~isnan(opt.threshold) & ~isempty(opt.condstats)
+            elseif strcmpi(opt.plotconditions, 'together') &&  isempty(opt.groupstats) && ...
+                                     ~isnan(opt.threshold) && ~isempty(opt.condstats)
                 plotopt = { plotopt{:} 'maskarray' };
-                tmpdata = { tmpdata pcondplot{c}' };
+                tmpdata = { tmpdata pcondplot{g}' };
             end;
             plotopt = { plotopt{:} 'highlightmode', highlight };
             if strcmpi(opt.plotsubjects, 'on')

@@ -1,4 +1,6 @@
-% std_readdata() - load one or more requested measures
+% std_readdata() - LEGACY FUNCTION, SHOULD NOT BE USED ANYMORE. INSTEAD
+%                  USE std_readerp, std_readspec, ...
+%                  load one or more requested measures
 %                  ['erp'|'spec'|'ersp'|'itc'|'dipole'|'map']
 %                  for all components of a specified cluster.
 %                  Called by cluster plotting functions
@@ -98,7 +100,10 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
+% $Log: std_readdata.m,v $
+% Revision 1.54  2010/02/16 08:43:21  arno
+% New single-trial reading/writing
+%
 % Revision 1.53  2009/10/20 02:28:35  arno
 % Updated conversion between sets and indices formats
 %
@@ -446,6 +451,8 @@ for ind = 1:length(finalinds)
             end;
 
         case 'erp',
+            disp('std_readdata is a legacy function, it should not be used to read ERP data, use std_readerp instead');
+            
             % check if data is already here
             % -----------------------------
             if isfield(tmpstruct, 'erpdata')
@@ -484,6 +491,7 @@ for ind = 1:length(finalinds)
             end;
 
         case 'spec',
+            disp('std_readdata is a legacy function, it should not be used to read SPECTRUM data, use std_readspec instead');
             % check if data is already here
             % -----------------------------
             if isfield(tmpstruct, 'specdata')
@@ -558,6 +566,7 @@ for ind = 1:length(finalinds)
             end;
 
         case { 'ersp' 'itc' 'pac' },
+            disp('std_readdata is a legacy function, it should not be used to read ERSP/ITC data, use std_readersp instead');
             % check if data is already here
             % -----------------------------
             if strcmpi(opt.infotype, 'ersp')

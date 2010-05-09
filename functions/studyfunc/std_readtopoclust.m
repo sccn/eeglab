@@ -37,7 +37,10 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
+% $Log: std_readtopoclust.m,v $
+% Revision 1.6  2008/01/17 21:51:58  elizabeth
+% Return cluster info even if already read.
+%
 % Revision 1.5  2007/08/06 23:04:14  scott
 % clarified help msg (please check, Arno) -Scott
 %

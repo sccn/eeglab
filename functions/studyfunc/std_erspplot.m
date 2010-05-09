@@ -93,7 +93,10 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
+% $Log: std_erspplot.m,v $
+% Revision 1.82  2010/03/09 06:13:28  arno
+% fix std_erspplot for single subject study
+%
 % Revision 1.81  2010/03/07 15:23:33  arno
 % Fix single subject study problem
 %
@@ -271,6 +274,7 @@ end;
 STUDY = pop_erspparams(STUDY, 'default');
 
 [ opt moreparams ] = finputcheck( varargin, { ...
+                               'design'      'integer' []              STUDY.currentdesign;
                                'topotime'    'real'    [] STUDY.etc.erspparams.topotime;
                                'topofreq'    'real'    [] STUDY.etc.erspparams.topofreq;
                                'maskdata'    'string'  [] 'off';
@@ -307,6 +311,11 @@ if isempty(opt.caxis),
     end;
 end;
 
+allconditions = STUDY.design(opt.design).condition;
+allgroups     = STUDY.design(opt.design).group;
+paired = { fastif(strcmpi(STUDY.design(opt.design).statvar1, 'paired'), 'on', 'off') ...
+           fastif(strcmpi(STUDY.design(opt.design).statvar2, 'paired'), 'on', 'off') };
+
 % for backward compatibility
 % --------------------------
 if isempty(opt.plottf) & ~isempty(opt.topofreq) & ~isempty(opt.topotime) & ~isnan(opt.topofreq) & ~isnan(opt.topotime)
@@ -340,7 +349,7 @@ end;
 if ~isempty(opt.channels)
 
     [STUDY allersp alltimes allfreqs] = std_readersp(STUDY, ALLEEG, 'channels', opt.channels, 'infotype', opt.datatype, 'subject', opt.subject, ...
-        'singletrials', opt.singletrials, 'subbaseline', opt.subbaseline, 'timerange', opt.timerange, 'freqrange', opt.freqrange);
+        'singletrials', opt.singletrials, 'subbaseline', opt.subbaseline, 'timerange', opt.timerange, 'freqrange', opt.freqrange, 'design', opt.design);
     
     % select specific time and freq
     % -----------------------------
@@ -358,11 +367,11 @@ if ~isempty(opt.channels)
             allersp{index} = reshape(allersp{index}, [1 size(allersp{index},3) size(allersp{index},4) ]);
         end;
         opt.plottf = { opt.plottf(1:2) opt.plottf(3:4) };
-        [pcond pgroup pinter] = std_stat(allersp, 'groupstats', opt.groupstats, 'condstats', opt.condstats, ...
+        [pcond pgroup pinter] = std_stat(allersp, 'groupstats', opt.groupstats, 'condstats', opt.condstats, 'paired', paired, ...
                                                   'statistics', opt.statistics, 'naccu', opt.naccu, 'threshold', opt.threshold, 'mcorrect', opt.mcorrect);
-        if (~isempty(pcond ) && length(pcond{1}) == 1) || (~isempty(pgroup) && length(pgroup{1}) == 1), pcond = {}; pgroup = {}; pinter = {}; end;
+        if (~isempty(pcond) && length(pcond{1}) == 1) || (~isempty(pgroup) && length(pgroup{1}) == 1), pcond = {}; pgroup = {}; pinter = {}; end; % single subject STUDY                                
     else
-        [pcond pgroup pinter] = std_stat(allersp, 'groupstats', opt.groupstats, 'condstats', opt.condstats, ...
+        [pcond pgroup pinter] = std_stat(allersp, 'groupstats', opt.groupstats, 'condstats', opt.condstats, 'paired', paired, ...
                                                   'statistics', opt.statistics, 'naccu', opt.naccu, 'threshold', opt.threshold, 'mcorrect', opt.mcorrect);
         if (~isempty(pcond ) && (size( pcond{1},1) == 1 || size( pcond{1},2) == 1)) || ...
            (~isempty(pgroup) && (size(pgroup{1},1) == 1 || size(pgroup{1},2) == 1)), 
@@ -379,7 +388,7 @@ if ~isempty(opt.channels)
         
         if ~isempty(opt.plottf)
             alltitles = std_figtitle('threshold', opt.threshold, 'mcorrect', opt.mcorrect, 'condstat', opt.condstats, 'cond2stat', opt.groupstats, ...
-                                     'statistics', opt.statistics, 'condnames', STUDY.condition, 'cond2names', STUDY.group, 'chanlabels', { locs.labels }, ...
+                                     'statistics', opt.statistics, 'condnames', allconditions, 'cond2names', allgroups, 'chanlabels', { locs.labels }, ...
                                      'subject', opt.subject, 'valsunit', { 'Hz' 'ms' }, 'vals', opt.plottf, 'datatype', upper(opt.datatype));
             std_chantopo(allersp, 'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, 'caxis', opt.caxis, ...
                                           'chanlocs', locs, 'threshold', opt.threshold, 'titles', alltitles);
@@ -396,7 +405,7 @@ if ~isempty(opt.channels)
                     end;
                 end;
                 alltitles = std_figtitle('threshold', opt.threshold, 'mcorrect', opt.mcorrect, 'condstat', opt.condstats, 'cond2stat', opt.groupstats, ...
-                                         'statistics', opt.statistics, 'condnames', STUDY.condition, 'cond2names', STUDY.group, 'chanlabels', { locs(index).labels }, ...
+                                         'statistics', opt.statistics, 'condnames', allconditions, 'cond2names', allgroups, 'chanlabels', { locs(index).labels }, ...
                                          'subject', opt.subject, 'datatype', upper(opt.datatype), 'plotmode', opt.plotmode);
                 std_plottf(alltimes, allfreqs, tmpersp, 'datatype', opt.datatype, 'titles', alltitles, ...
                                            'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, 'plotmode', ...
@@ -411,10 +420,14 @@ else
     nr = ceil(length(opt.clusters)/nc);
     comp_names = {};
 
+    if length(opt.clusters) > 1 && ( strcmpi(opt.condstats, 'on') || strcmpi(opt.groupstats, 'on'))
+        opt.condstats = 'off'; opt.groupstats = 'off';
+    end;
+    
     for index = 1:length(opt.clusters)
 
         [STUDY allersp alltimes allfreqs] = std_readersp(STUDY, ALLEEG, 'clusters', opt.clusters(index), 'infotype', opt.datatype, ...
-            'component', opt.comps, 'singletrials', opt.singletrials, 'subbaseline', opt.subbaseline, 'timerange', opt.timerange, 'freqrange', opt.freqrange);
+            'component', opt.comps, 'singletrials', opt.singletrials, 'subbaseline', opt.subbaseline, 'timerange', opt.timerange, 'freqrange', opt.freqrange, 'design', opt.design);
         if length(opt.clusters) > 1, try, subplot(nr,nc,index, 'align'); catch, subplot(nr,nc,index); end; end;
 
         % plot specific component
@@ -423,30 +436,6 @@ else
             comp_names = { STUDY.cluster(opt.clusters(index)).comps(opt.comps) };
             opt.subject = STUDY.datasetinfo(STUDY.cluster(opt.clusters(index)).sets(1,opt.comps)).subject;
         end;
-%         if ~isempty(opt.comps)
-% 
-%             % find and select group
-%             % ---------------------
-%             sets   = STUDY.cluster(opt.clusters(index)).sets(:,opt.comps);
-%             comps  = STUDY.cluster(opt.clusters(index)).comps(opt.comps);
-%             grp    = STUDY.datasetinfo(sets(1)).group;
-%             grpind = strmatch( grp, STUDY.group );
-%             if isempty(grpind), grpind = 1; end;
-%             allersp = allersp(:,grpind);
-% 
-%             % find component
-%             % --------------
-%             for c = 1:size(allersp,1)
-%                 for ind = length(compinds{1,grpind}):-1:1
-%                     if ~any(compinds{1,grpind}(ind) == comps) | ~any(setinds{1,grpind}(ind) == sets)
-%                         allersp{c}(:,:,ind) = [];
-%                     else
-%                         comp_names{c,1} = comps;
-%                     end;
-%                 end;
-%             end;
-%             opt.subject = STUDY.datasetinfo(sets(1)).subject;
-%         end;
 
         % select specific time and freq
         % -----------------------------
@@ -473,7 +462,7 @@ else
             locs = locs(std_chaninds(STUDY, opt.channels));
         end
 
-        [pcond pgroup pinter] = std_stat(allersp, 'groupstats', opt.groupstats, 'condstats', opt.condstats, ...
+        [pcond pgroup pinter] = std_stat(allersp, 'groupstats', opt.groupstats, 'condstats', opt.condstats, 'paired', paired, ...
                                              'statistics', opt.statistics, 'naccu', opt.naccu, 'threshold', opt.threshold, 'mcorrect', opt.mcorrect);
 
         % plot specific component
@@ -481,7 +470,7 @@ else
         if index == length(opt.clusters), opt.legend = 'on'; end;
         if ~strcmpi(opt.plotmode, 'none')
             alltitles = std_figtitle('threshold', opt.threshold, 'mcorrect', opt.mcorrect, 'condstat', opt.condstats, 'cond2stat', opt.groupstats, ...
-                                     'statistics', opt.statistics, 'condnames', STUDY.condition, 'cond2names', STUDY.group, 'clustname', STUDY.cluster(opt.clusters(index)).name, 'compnames', comp_names, ...
+                                     'statistics', opt.statistics, 'condnames', allconditions, 'cond2names', allgroups, 'clustname', STUDY.cluster(opt.clusters(index)).name, 'compnames', comp_names, ...
                                      'subject', opt.subject, 'datatype', upper(opt.datatype), 'plotmode', opt.plotmode);
             
             std_plottf(alltimes, allfreqs, allersp, 'datatype', opt.datatype, ...

@@ -87,7 +87,10 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
+% $Log: std_specplot.m,v $
+% Revision 1.62  2010/02/16 08:43:21  arno
+% New single-trial reading/writing
+%
 % Revision 1.61  2010/02/09 06:07:27  arno
 % Fixed new title problem and implemented 3-level significance
 %

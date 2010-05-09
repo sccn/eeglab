@@ -45,7 +45,10 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
+% $Log: std_substudy.m,v $
+% Revision 1.5  2009/11/04 02:45:31  arno
+% create sub STUDY
+%
 % Revision 1.4  2009/11/04 02:27:27  arno
 % implement optional rmdat
 %

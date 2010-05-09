@@ -47,7 +47,10 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
+% $Log: std_topo.m,v $
+% Revision 1.18  2009/10/20 02:31:28  arno
+% Seting raidus to 0.55 instead of 0.5 for topoplot
+%
 % Revision 1.17  2007/12/09 00:26:39  arno
 % adding the recompute option
 %

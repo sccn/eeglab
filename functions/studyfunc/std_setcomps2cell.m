@@ -24,47 +24,58 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
+% $Log: std_setcomps2cell.m,v $
+% Revision 1.1  2009/10/20 02:28:35  arno
+% Updated conversion between sets and indices formats
+%
 
 function [ tmpstruct setinds allinds ] = std_setcomps2cell(STUDY, sets, comps)
 
 if nargin < 3
     tmpstruct = STUDY.cluster(sets);
-    alldatasets = tmpstruct.sets;
-    allchanorcomp = repmat(tmpstruct.comps, [size(tmpstruct.sets,1) 1]); % old format
+    sets  = tmpstruct.sets;
+    comps = tmpstruct.comps; % old format
 else
     tmpstruct     = [];
-    alldatasets   = sets;
-    allchanorcomp = comps;
-    if length(comps) < length(sets(:))
-        allchanorcomp = repmat(comps, [size(sets,1) 1]); % old format
-    end;
 end;
-
-alldatasets   = alldatasets(:)';
-allchanorcomp = allchanorcomp(:)';
+comps   = repmat(comps, [size(sets,1) 1]);
+oldsets = sets;
+sets    = reshape(sets , 1, size(sets ,1)*size(sets ,2));
+comps   = reshape(comps, 1, size(comps,1)*size(comps,2));
 
 % get indices for all groups and conditions
 % -----------------------------------------
-nc = max(length(STUDY.condition),1);
-ng = max(length(STUDY.group),1);
+setinfo       = STUDY.design(STUDY.currentdesign).setinfo;
+allconditions = STUDY.design(STUDY.currentdesign).condition;
+allgroups     = STUDY.design(STUDY.currentdesign).group;
+nc = max(length(allconditions),1);
+ng = max(length(allgroups),    1);
 allinds = cell( nc, ng );
 setinds = cell( nc, ng );
-for indtmp = 1:length(alldatasets)
-    if ~isnan(alldatasets(indtmp))
-        index = alldatasets(indtmp);
-        condind = strmatch( STUDY.datasetinfo(index).condition, STUDY.condition, 'exact'); if isempty(condind), condind = 1; end;
-        grpind  = strmatch( STUDY.datasetinfo(index).group    , STUDY.group    , 'exact'); if isempty(grpind) , grpind  = 1; end;
-        indcellarray = length(allinds{condind, grpind})+1;
-    end
-    
-    % load data
-    % ---------
-    tmpind = allchanorcomp(indtmp);
-    if ~isnan(tmpind)
-        allinds{ condind, grpind}(indcellarray) = tmpind;
-        setinds{ condind, grpind}(indcellarray) = index;
+
+for index = 1:length(setinfo)
+    condind = strmatch( setinfo(index).condition, allconditions, 'exact');
+    grpind  = strmatch( setinfo(index).group    , allgroups    , 'exact');
+
+    if isempty(allconditions), condind = 1; end;
+    if isempty(allgroups),     grpind  = 1; end;
+
+    % get the position in sets where the dataset is
+    % if several datasets check that they all have the same
+    % ICA and component index
+    % -----------------------
+    datind  = setinfo(index).setindex;
+    ind     = find(datind(1) == sets);
+    if ~isempty(ind) && length(datind) > 1
+        [ind1 ind2] = find(datind(1) == oldsets);
+        columnica   = oldsets(ind2(1),:);
+        if ~all(ismember(datind, columnica));
+            warning(' ***** Some datasets in the STUDY design have uniform ICA distributions');
+        end;
     end;
+        
+    allinds{ condind, grpind } = [ allinds{ condind, grpind } comps(ind) ];
+    setinds{ condind, grpind } = [ setinds{ condind, grpind } repmat(index, [1 length(ind)]) ];
 end;
 tmpstruct.allinds = allinds;
 tmpstruct.setinds = setinds;

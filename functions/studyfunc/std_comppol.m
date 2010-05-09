@@ -32,7 +32,10 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
+% $Log: std_comppol.m,v $
+% Revision 1.6  2010/02/06 05:47:52  arno
+% New titles for figures
+%
 % Revision 1.5  2007/08/03 23:10:00  arno
 % remove the NaN for computing polarity switching
 %

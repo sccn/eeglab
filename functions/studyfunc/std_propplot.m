@@ -48,7 +48,10 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
+% $Log: std_propplot.m,v $
+% Revision 1.18  2010/03/30 19:33:25  arno
+% graphic handle check
+%
 % Revision 1.17  2007/10/19 20:52:07  nima
 % _
 %

@@ -60,7 +60,10 @@
 
 % Coding notes: Useful information on functions and global variables used.
 
-% $Log: not supported by cvs2svn $
+% $Log: pop_clust.m,v $
+% Revision 1.40  2009/12/09 23:24:43  dev
+% Fixed Bug 790 (line 375 neural network)
+%
 % Revision 1.39  2009/11/11 00:28:53  arno
 % New GUI format
 %
@@ -255,7 +258,7 @@ if isempty(varargin) %GUI call
                 if outliers_on
                     command = sprintf('%s %s %s %s', command, '''outliers'', ', stdval, ',');
                     [IDX,C,sumd,D,outliers] = robust_kmeans(clustdata,clus_num,str2num(stdval),5,lower(clus_alg));
-                    [STUDY, clusters] = std_createclust2(STUDY,IDX,C,  {'robust_kmeans', clus_num});
+                    [STUDY] = std_createclust(STUDY, ALLEEG, 'clusterind', IDX, 'algorithm', {'robust_kmeans', clus_num});
                 else
                     if strcmpi(clus_alg, 'kmeans')
                         [IDX,C,sumd,D] = kmeans(clustdata,clus_num,'replicates',10,'emptyaction','drop');
@@ -263,14 +266,14 @@ if isempty(varargin) %GUI call
                         %[IDX,C,sumd,D] = kmeanscluster(clustdata,clus_num);
                         [C,IDX,sumd] =kmeans_st(real(clustdata),clus_num,150);
                     end;
-                    [STUDY, clusters] = std_createclust2(STUDY,IDX,C,  {'Kmeans', clus_num});
+                    [STUDY] = std_createclust(STUDY, ALLEEG, 'clusterind', IDX, 'algorithm', {'Kmeans', clus_num});
                 end    
          case 'Hierarchical tree'
              %[IDX,C] = hierarchical_tree(clustdata,clus_num);
-             %[STUDY, clusters] = std_createclust2(STUDY,IDX,C,  {'Neural Network', clus_num});
+             %[STUDY] = std_createclust(STUDY,IDX,C,  {'Neural Network', clus_num});
          case 'neural network'
              [IDX,C] = neural_net(clustdata,clus_num);
-             [STUDY, clusters] = std_createclust2(STUDY,IDX,C,  {'Neural Network', clus_num});
+             [STUDY] = std_createclust(STUDY, ALLEEG, 'clusterind', IDX, 'algorithm',  {'Neural Network', clus_num});
              command = sprintf('%s %s %d %s', command, '''algorithm'', ''Neural Network'',''clus_num'', ', clus_num, ',');
         end
         disp('Done.');
@@ -367,14 +370,14 @@ else %command line call
                 else
                     [IDX,C,sumd,D] = kmeanscluster(clustdata,clus_num);
                 end;
-                [STUDY, clusters] = std_createclust2(STUDY,IDX,C,  {'Kmeans', clus_num});
+                [STUDY] = std_createclust(STUDY, ALLEEG, 'clusterind', IDX, 'algorithm', {'Kmeans', clus_num});
             else
                 [IDX,C,sumd,D,outliers] = robust_kmeans(clustdata,clus_num,outliers,5, algorithm);
-                [STUDY, clusters] = std_createclust2(STUDY,IDX,C,  {'robust_kmeans', clus_num});
+                [STUDY] = std_createclust(STUDY, ALLEEG, 'clusterind', IDX, 'algorithm', {'robust_kmeans', clus_num});
             end
         case 'neural network'
             [IDX,C] = neural_net(clustdata,clus_num);
-            [STUDY, clusters] = std_createclust2(STUDY,IDX,C,  {'Neural Network', clus_num});
+            [STUDY] = std_createclust(STUDY, ALLEEG, 'clusterind', IDX, 'algorithm',  {'Neural Network', clus_num});
         otherwise
             disp('pop_clust: unknown algorithm return');
             return
@@ -395,7 +398,7 @@ STUDY.saved = 'no';
 % clusters: IDX will be a 61x1 vector of 1 and 2 (and 0=outlisers)
 % C - centroid for clusters. If 2 clusters, size will be 2 x
 %     width of the preclustering matrix
-function [STUDY, clusters] = std_createclust2(STUDY,IDX,C, algorithm)
+function [STUDY] = std_createclust2_old(STUDY,IDX,C, algorithm)
 
 % Find the next available cluster index
 % -------------------------------------

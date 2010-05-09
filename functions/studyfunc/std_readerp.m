@@ -10,6 +10,8 @@
 %      ALLEEG - vector of loaded EEG datasets
 %
 % Optional inputs:
+%  'design'    - [integer] read files from a specific STUDY design. Default
+%                is empty (no design)
 %  'channels'  - [cell] list of channels to import {default: all}
 %  'clusters'  - [integer] list of clusters to import {[]|default: all but
 %                the parent cluster (1) and any 'NotClust' clusters}
@@ -45,7 +47,10 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
+% $Log: std_readerp.m,v $
+% Revision 1.21  2010/03/09 06:19:10  arno
+% Fixed reading single trials for multiple subject history
+%
 % Revision 1.20  2010/03/07 04:03:55  arno
 % Fix extra code
 %
@@ -119,6 +124,7 @@ STUDY = pop_erpparams(STUDY, 'default');
 STUDY = pop_specparams(STUDY, 'default');
 [opt moreopts] = finputcheck( varargin, { ...
     'type'          { 'string' 'cell' } { [] [] } '';
+    'design'        'integer' []             STUDY.currentdesign;
     'channels'      'cell'    []             {};
     'clusters'      'integer' []             [];
     'timerange'     'real'    []             STUDY.etc.erpparams.timerange;
@@ -130,8 +136,8 @@ STUDY = pop_specparams(STUDY, 'default');
     'subject'       'string'  []             '' }, ...
     'std_readerp', 'ignore');
 if isstr(opt), error(opt); end;
-nc = max(length(STUDY.condition),1);
-ng = max(length(STUDY.group),1);
+nc = max(length(STUDY.design(opt.design).condition),1);
+ng = max(length(STUDY.design(opt.design).group),1);
 dtype = opt.datatype;
 
 % find channel indices
@@ -141,17 +147,19 @@ if ~isempty(opt.channels)
 else finalinds = opt.clusters;
 end;
 
-for ind = 1:length(finalinds)
+for ind = 1:length(finalinds) % scan channels or components
 
     % find indices
     % ------------
     if ~isempty(opt.channels)
         tmpstruct = STUDY.changrp(finalinds(ind));
         allinds       = tmpstruct.allinds;
-        for i=1:length(allinds(:)), allinds{i} = -allinds{i}; end; % invert sign for reading
         setinds       = tmpstruct.setinds;
+        for i=1:length(allinds(:)), allinds{i} = -allinds{i}; end; % invert sign for reading
     else
-        [ tmpstruct setinds allinds ] = std_setcomps2cell(STUDY, finalinds(ind));
+        tmpstruct = STUDY.cluster(finalinds(ind));
+        allinds       = tmpstruct.allinds;
+        setinds       = tmpstruct.setinds;
     end;
 
     % check if data is already here
@@ -178,23 +186,23 @@ for ind = 1:length(finalinds)
     if ~dataread        
         % reserve arrays
         % --------------
-        alldata  = cell( max(length(STUDY.condition),1), max(length(STUDY.group),1) );
-        tmpind = 1; while(isempty(setinds{tmpind})), tmpind = tmpind+1; end;
-        if strcmpi(dtype, 'erp'), [ tmp xvals datatrialpresent] = std_readerpsub(ALLEEG, setinds{tmpind}(1), allinds{tmpind}(1), opt.timerange, fastif(strcmpi(opt.singletrials, 'on'),1,0));
-        else                      [ tmp xvals datatrialpresent] = std_readspec(  ALLEEG, setinds{tmpind}(1), allinds{tmpind}(1), opt.freqrange, 0, fastif(strcmpi(opt.singletrials, 'on'),1,0));
-        end;
+        alldata  = cell( nc, ng );
+        tmpind  = 1; while(isempty(setinds{tmpind})), tmpind = tmpind+1; end;
+        setinfo = STUDY.design(opt.design).setinfo;
+        chanlab = { ALLEEG(setinfo(1).setindex(1)).chanlocs.labels };
+        [ tmp params xvals] = std_readfile(setinfo(setinds{1,1}(1)), 'dataindices', allinds{1,1}(1), 'measure', dtype, 'getparamonly', 'on', 'singletrials', opt.singletrials);
 
         % read the data and select channels
         % ---------------------------------
         fprintf([ 'Reading ' dtype ' data...' ]);
         if strcmpi(opt.singletrials, 'on')
-            if ~datatrialpresent
+            if strcmpi(params.singletrials, 'off')
                 fprintf('\n');
                 errordlg2('No single trial data - recompute data files');
                 datavals = [];
                 return;
             end;
-            allsubjects = { STUDY.datasetinfo(:).subject };
+            allsubjects = { setinfo.subject };
             for c = 1:nc
                 for g = 1:ng
                     if ~isempty(opt.channels)
@@ -205,8 +213,8 @@ for ind = 1:length(finalinds)
                         else inds = 1:length(allinds{c,g}); end;
                     end;
                     if ~isempty(inds)
-                        if strcmpi(dtype, 'erp') alldata{c, g} = squeeze(std_readerpsub(ALLEEG, setinds{c,g}(inds), allinds{c,g}(inds), opt.timerange, 1));
-                        else                     alldata{c, g} = squeeze(std_readspec(  ALLEEG, setinds{c,g}(inds), allinds{c,g}(inds), opt.freqrange, 0, 1));
+                        if strcmpi(dtype, 'erp') alldata{c, g} = squeeze(std_readfile(setinfo(setinds{c,g}(:)), 'measure', 'erp' , 'dataindices', allinds{c,g}(:), 'timelimits', opt.timerange, 'singletrials', 'on'));
+                        else                     alldata{c, g} = squeeze(std_readfile(setinfo(setinds{c,g}(:)), 'measure', 'spec', 'dataindices', allinds{c,g}(:), 'timelimits', opt.timerange, 'singletrials', 'on'));
                         end;
                     end;
                 end;
@@ -214,8 +222,8 @@ for ind = 1:length(finalinds)
         else
             for c = 1:nc
                 for g = 1:ng
-                    if strcmpi(dtype, 'erp') alldata{c, g} = std_readerpsub( ALLEEG, setinds{c,g}(:), allinds{c,g}(:), opt.timerange)';
-                    else                     alldata{c, g} = std_readspec(   ALLEEG, setinds{c,g}(:), allinds{c,g}(:), opt.freqrange)';
+                    if strcmpi(dtype, 'erp') alldata{c, g} = std_readfile( setinfo(setinds{c,g}(:)), 'measure', 'erp' , 'dataindices', allinds{c,g}(:), 'timelimits', opt.timerange);
+                    else                     alldata{c, g} = std_readfile( setinfo(setinds{c,g}(:)), 'measure', 'spec', 'dataindices', allinds{c,g}(:), 'freqlimits', opt.freqrange);
                     end;
                 end;
             end;
@@ -289,34 +297,34 @@ for ind = 1:length(finalinds)
     end;
 end;
 
-% return structure
-% ----------------
+% if several channels, agregate them
+% ----------------------------------
 allinds   = finalinds;
 if ~isempty(opt.channels)
     structdat = STUDY.changrp;
     datavals = cell(nc, ng);
+    if strcmpi( dtype, 'spec'), xvals = getfield(structdat(allinds(1)), [ dtype 'freqs' ]);
+    else                        xvals = getfield(structdat(allinds(1)), [ dtype 'times' ]);
+    end;
     for ind =  1:length(datavals(:))
         if strcmpi(opt.singletrials, 'on')
              tmpdat = getfield(structdat(allinds(1)), [ dtype 'datatrials' ]);
         else tmpdat = getfield(structdat(allinds(1)), [ dtype 'data' ]);
         end;
         datavals{ind} = zeros([ size(tmpdat{ind}) length(allinds)]);
-        for index = 1:length(allinds)
+        for chan = 1:length(allinds)
             if strcmpi(opt.singletrials, 'on')
-                 tmpdat = getfield(structdat(allinds(index)), [ dtype 'datatrials' ]);
-            else tmpdat = getfield(structdat(allinds(index)), [ dtype 'data' ]);
+                 tmpdat = getfield(structdat(allinds(chan)), [ dtype 'datatrials' ]);
+            else tmpdat = getfield(structdat(allinds(chan)), [ dtype 'data' ]);
             end;
-            datavals{ind}(:,:,index) = tmpdat{ind};
-        end;
-        if strcmpi( dtype, 'spec'), xvals = getfield(structdat(allinds(index)), [ dtype 'freqs' ]);
-        else                        xvals = getfield(structdat(allinds(index)), [ dtype 'times' ]);
+            datavals{ind}(:,:,chan) = tmpdat{ind};
         end;
         
         datavals{ind} = squeeze(permute(datavals{ind}, [1 3 2])); % time elec subjects
     end;
     setinds  = structdat(allinds(1)).setinds;
     if ~isempty(opt.subject) && strcmpi(opt.singletrials,'off')
-        datavals = std_selsubject(datavals, opt.subject, setinds, { STUDY.datasetinfo(:).subject }, 2); 
+        datavals = std_selsubject(datavals, opt.subject, setinds, { STUDY.design(opt.design).setinfo.subject }, 2); 
     end;
 else
     if strcmpi(opt.singletrials, 'on')
@@ -332,164 +340,3 @@ else
         datavals = std_selcomp(STUDY, datavals, allinds, setinds, compinds, opt.component);
     end;
 end;
-
-% % return structure
-% % ----------------
-% allinds   = finalinds;
-% if ~isempty(opt.channels)
-%     structdat = STUDY.changrp;
-%     datavals = cell(nc, ng);
-%     for ind =  1:length(datavals(:))
-%         if strcmpi(opt.singletrials, 'on')
-%              datavals{ind} = zeros([ size(structdat(allinds(1)).datavalstrials{ind}) length(allinds)]);
-%         else datavals{ind} = zeros([ size(structdat(allinds(1)).datavals{ind}) length(allinds)]);
-%         end;
-%         for index = 1:length(allinds)
-%             if strcmpi(opt.singletrials, 'on')
-%                  datavals{ind}(:,:,index) = structdat(allinds(index)).datavalstrials{ind};
-%             else datavals{ind}(:,:,index) = structdat(allinds(index)).datavals{ind};
-%             end;
-%             xvals                 = structdat(allinds(index)).erptimes;
-%             compinds                 = structdat(allinds(index)).allinds;
-%             setinds                  = structdat(allinds(index)).setinds;
-%         end;
-%         datavals{ind} = squeeze(permute(datavals{ind}, [1 3 2])); % time elec subjects
-%         datavals{ind} = squeeze(permute(datavals{ind}, [1 3 2])); % time elec subjects
-%     end;
-%     if ~isempty(opt.subject) && strcmpi(opt.singletrials,'off')
-%         datavals = std_selsubject(datavals, opt.subject, setinds, { STUDY.datasetinfo(:).subject }, 2); 
-%     end;
-% else
-%     if strcmpi(opt.singletrials, 'on')
-%          datavals = STUDY.cluster(allinds(1)).datavalstrials;
-%     else datavals = STUDY.cluster(allinds(1)).datavals;
-%     end;
-%     xvals = STUDY.cluster(allinds(1)).erptimes;
-%     compinds = STUDY.cluster(allinds(1)).allinds;
-%     setinds  = STUDY.cluster(allinds(1)).setinds;
-%     if ~isempty(opt.component) && length(allinds) == 1 && strcmpi(opt.singletrials,'off')
-%         datavals = std_selcomp(STUDY, datavals, allinds, setinds, compinds, opt.component);
-%     end;
-% end;
-
-% std_readerp() - returns the ERP for an ICA component in an epoched dataset.
-%                 The ERPs of the dataset ICA components are assumed to have 
-%                 been saved in a Matlab file, [dataset_name].icaerp, in the
-%                 same directory as the dataset file. If this file doesn't exist, 
-%                 use std_erp() to create it, else use a pre-clustering function 
-%                 that calls it: pop_preclust() or std_preclust()  
-% Usage:    
-%   >> [erp, times] = std_readerp(ALLEEG, setindx, component, timewindow);  
-%
-% Inputs:
-%   ALLEEG     - an EEGLAB dataset vector (else one EEG dataset). 
-%                ALLEEG must contain the dataset of interest (see 'setindx').
-%   setindx    - [integer] index of the EEG dataset in the ALLEEG structure 
-%                for which to read the component ERP.
-%   component  - [integer] index of the component in the selected EEG dataset 
-%                for which to return the ERP. 
-%   timewindow - [min max] ERP time (latency) window, in ms. Must be in
-%                the dataset epoch latency range.
-% Outputs:
-%   erp        - ERP for the requested ICA component in the selected dataset; 
-%                the average of the ICA activations in all the dataset epochs.
-%   times      - vector of ERP time points (latencies) in ms.
-%
-%  See also  std_erp(), pop_preclust(), std_preclust()          
-%
-% Authors: Arnaud Delorme, SCCN, INC, UCSD, February, 2005
-
-function [X, t, singletrialdatapresent, chanlab] = std_readerpsub(ALLEEG, abset, comp, timerange, singletrial)
-
-if nargin < 4
-    timerange = [];
-end;
-if nargin < 5
-    singletrial = 0;
-end;
-
-X = [];
-chanlab = {};
-if length(abset) < length(comp)
-    abset = ones(1,length(comp))*abset;
-end;
-
-% convert components or channel indices
-% -------------------------------------
-if iscell(comp)
-    % find channel indices list
-    % -------------------------
-    chanind  = [];
-    chanlabs = lower({ ALLEEG(abset(1)).chanlocs.labels });
-    for index = 1:length(comp)
-        tmp = strmatch(lower(comp{index}), chanlabs, 'exact');
-        if isempty(tmp)
-            error([ 'Channel ''' comp{index} ''' not found in dataset ' int2str(abset)]);
-        else    
-            chanind = [ chanind tmp ];
-        end;
-    end;
-    filename = fullfile( ALLEEG(abset(1)).filepath,[ ALLEEG(abset(1)).filename(1:end-3) 'daterp']);
-    prefix = 'chan';
-    inds   = chanind;
-elseif comp(1) < 0
-    filename = fullfile( ALLEEG(abset(1)).filepath,[ ALLEEG(abset(1)).filename(1:end-3) 'daterp']);
-    prefix = 'chan';
-    inds   = -comp;
-else
-    filename = fullfile( ALLEEG(abset(1)).filepath,[ ALLEEG(abset(1)).filename(1:end-3) 'icaerp']);
-    prefix = 'comp';
-    inds   = comp;
-end;
-
-singletrialdatapresent = 1;
-for k = 1:length(abset)
-
-    if strcmpi(prefix, 'chan')
-         filename = fullfile( ALLEEG(abset(k)).filepath,[ ALLEEG(abset(k)).filename(1:end-3) 'daterp']);
-    else filename = fullfile( ALLEEG(abset(k)).filepath,[ ALLEEG(abset(k)).filename(1:end-3) 'icaerp']);
-    end;
-
-    try,
-        warning('off', 'MATLAB:load:variableNotFound');
-        erpstruct = load( '-mat', filename, [ prefix int2str(inds(k)) ], 'times', 'labels' );
-        warning('on', 'MATLAB:load:variableNotFound');
-    catch
-        error( [ 'Cannot read file ''' filename '''' ]);
-    end;
-    
-    tmpdat    = getfield(erpstruct, [ prefix int2str(inds(k)) ]);
-    if singletrial == 0,
-        if size(tmpdat,2) > 1 && size(tmpdat,1) > 1, tmpdat = mean(tmpdat,2); end;
-        if k == 1
-            if size(tmpdat,1) == 1, tmpdat = tmpdat'; end;
-            X = zeros([ length(comp) size(tmpdat) ]);
-        end;
-        X(k,:,:) = tmpdat;
-    else
-        if size(tmpdat,1) == 1 || size(tmpdat,2) == 1
-            singletrialdatapresent = 0;
-        end;
-        if k == 1
-            if size(tmpdat,1) == 1, tmpdat = tmpdat'; end;
-            X = zeros([ 1 size(tmpdat) ]);
-            X(1,:,:) = tmpdat;
-        else
-            X(1,:,end+1:end+size(tmpdat,2)) = tmpdat;
-        end;
-    end;
-    t = getfield(erpstruct, 'times');
-    if isfield(erpstruct, 'labels'), chanlab{k} = erpstruct.labels{k}; end;
-end;
-
-% select time range of interest
-% -----------------------------
-if ~isempty(timerange)
-    maxind = max(find(t <= timerange(end)));
-    minind = min(find(t >= timerange(1)));
-else
-    maxind = length(t);
-    minind = 1;
-end;
-X = X(:,minind:maxind,:);
-t = t(minind:maxind)';

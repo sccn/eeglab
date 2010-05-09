@@ -56,7 +56,10 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
+% $Log: std_filecheck.m,v $
+% Revision 1.12  2008/11/13 02:06:12  arno
+% fix guion option
+%
 % Revision 1.11  2007/09/11 10:49:12  arno
 % nothing
 %

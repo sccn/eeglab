@@ -74,7 +74,10 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-%$Log: not supported by cvs2svn $
+%$Log: std_erpimage.m,v $
+%Revision 1.11  2008/09/19 18:45:13  nima
+%_
+%
 %Revision 1.10  2008/09/19 00:10:18  nima
 %sorttype can now accept more than one string in a cell.
 %

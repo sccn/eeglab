@@ -27,7 +27,10 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
+% $Log: std_checkfiles.m,v $
+% Revision 1.2  2010/03/21 20:58:44  arno
+% New STUDY file checking functions and processes
+%
 % Revision 1.1  2010/03/05 00:22:05  arno
 % New function
 %
@@ -60,9 +63,10 @@ for index = 1:length(filetypes)
     
     % check if the structures are equal
     % ---------------------------------
+    notequal = any(~filepresent);
     if ~isempty(tmpstruct)
         if any(filepresent == 0)
-            fprintf(' Error, file missing for some subjects\n');
+            fprintf(' Error, some files inconsistent or missing\n');
             notequal = 1;
             passall = 0;
         else
@@ -78,12 +82,12 @@ for index = 1:length(filetypes)
                         % check for NaNs
                         if iscell(firstval) && iscell(tmpval)
                             for cind = 1:length(firstval)
-                                if isreal(firstval{cind}) && isnan(firstval{cind}(1))
+                                if isreal(firstval{cind}) && ~isempty(firstval{cind}) && isnan(firstval{cind}(1))
                                     firstval{cind} = 'NaN';
                                 end;
                             end;
                             for cind = 1:length(tmpval)
-                                if isreal(tmpval{cind}) && isnan(tmpval{cind}(1))
+                                if isreal(tmpval{cind}) && ~isempty(tmpval{cind}) && isnan(tmpval{cind}(1))
                                     tmpval{cind} = 'NaN';
                                 end;
                             end;
@@ -106,7 +110,6 @@ for index = 1:length(filetypes)
     
     % check the consistency of changrp and cluster with saved information
     % -------------------------------------------------------------------
-    notequal = any(~filepresent);
     if isempty(tmpstruct), notequal = 1; end;
     if filetypes{index}(1) == 'd' && notequal == 0        
         % scan all channel labels
@@ -157,7 +160,7 @@ for index = 1:length(filetypes)
                     
                     if ~isempty(setdiff(tmpcomp, compinds{inddat}))
                         if ~(isempty(compinds{inddat}) && strcmpi(filetypes{index}, 'icatopo'))
-                            fprintf('\nError: some components in clusters %d are absent from data files\n', cind);
+                            fprintf('\nError: some components in clusters %d are absent from .%s files\n', cind, filetypes{index});
                             notequal = 1;
                             passall  = 0;
                             break;
@@ -171,7 +174,8 @@ for index = 1:length(filetypes)
 end;
 
 if ~passall
-    disp('**** We advise that you recompute any mesure showing errors while')
-    disp('**** selecting the "Recompute even if present on disk" checkbox');
+    disp('**** Recompute any measure above not receiving a "Pass" by')
+    disp('**** calling menu items "STUDY > Precompute Channel/Component measures" ');
+    disp('**** and by selecting the "Recompute even if present on disk" checkbox');
 end;
 disp('Checking completed.');

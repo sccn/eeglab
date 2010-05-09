@@ -64,7 +64,10 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
+% $Log: pop_erpparams.m,v $
+% Revision 1.24  2010/02/24 10:52:36  arno
+% Implemented new single trial statistics
+%
 % Revision 1.23  2009/11/11 00:28:53  arno
 % New GUI format
 %
@@ -142,8 +145,8 @@ TMPSTUDY = STUDY;
 com = '';
 if isempty(varargin)
     
-    enablegroup = fastif(length(STUDY.group)>1, 'on', 'off');
-    enablecond  = fastif(length(STUDY.condition)>1, 'on', 'off');
+    enablecond  = fastif(length(STUDY.design(STUDY.currentdesign).indvar1)>1, 'on', 'off');
+    enablegroup = fastif(length(STUDY.design(STUDY.currentdesign).indvar2)>1, 'on', 'off');
     plotconditions    = fastif(strcmpi(STUDY.etc.erpparams.plotconditions, 'together'), 1, 0);
     plotgroups  = fastif(strcmpi(STUDY.etc.erpparams.plotgroups,'together'), 1, 0);
     vis = fastif(isnan(STUDY.etc.erpparams.topotime), 'off', 'on');

@@ -52,7 +52,10 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
+% $Log: std_readitc.m,v $
+% Revision 1.14  2007/10/18 20:49:08  nima
+% 'logersp' changed to 'logitc'.
+%
 % Revision 1.13  2007/01/26 18:06:51  arno
 % remove warning
 %

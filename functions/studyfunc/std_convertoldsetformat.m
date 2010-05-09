@@ -21,7 +21,10 @@
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 % GNU General Public License for more information
 
-% $Log: not supported by cvs2svn $
+% $Log: std_convertoldsetformat.m,v $
+% Revision 1.3  2009/10/20 02:28:35  arno
+% Updated conversion between sets and indices formats
+%
 % Revision 1.2  2009/07/13 21:10:26  arno
 % still working on std_pac
 %
