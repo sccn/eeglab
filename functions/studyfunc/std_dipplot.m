@@ -64,7 +64,7 @@ function STUDY = std_dipplot(STUDY, ALLEEG, varargin)
 cls = []; % plot all clusters in STUDY
 figureon = 1; % plot on a new figure
 mode = 'apart';
-opt_dipplot = {'normlen', 'on', 'pointout', 'on', 'verbose', 'off', 'dipolelength', 0,'projlines','on','spheres','on'};
+opt_dipplot = {'projlines','off', 'normlen', 'on', 'pointout', 'on', 'verbose', 'off', 'dipolelength', 0,'spheres','on'};
 %, 'spheres', 'on'
 for k = 3:2:nargin
     switch varargin{k-2}
@@ -175,9 +175,8 @@ if strcmpi(mode, 'apart')  % case each cluster on a separate figure
                options{end+1} = 'meshdata';
                options{end+1} = ALLEEG(abset).dipfit.hdmfile;
            end
-           if ndip < 6 % less than 6 dipoles, plot projected lines 
-               options{end+1} = 'projlines';
-               options{end+1} = 'on';
+           if ndip < 6 && strcmpi(options{1}, 'projlines') && length(cls) == 1 % less than 6 dipoles, project lines 
+               options{2} = 'on';
            end
            
            if figureon

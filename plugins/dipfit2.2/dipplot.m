@@ -644,7 +644,9 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                tmpy = yc - repmat(cy, [1 size(xc, 2)]);
                tmpz = zc - repmat(cz, [1 size(xc, 2)]);
                l=sqrt(tmpx.^2+tmpy.^2+tmpz.^2);
-               normals = reshape([tmpx./l tmpy./l tmpz./l],[size(tmpx) 3]);
+               warning('off', 'MATLAB:divideByZero');                       % this is due to a Matlab 2008b (or later) 
+               normals = reshape([tmpx./l tmpy./l tmpz./l],[size(tmpx) 3]); % in the rotate function in adjustcylinder2
+               warning('off', 'MATLAB:divideByZero');                       % one of the z (the last row is not rotated)
                set( handles, 'vertexnormals', normals);
                
             end
