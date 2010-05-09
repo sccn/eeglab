@@ -34,6 +34,9 @@ if nargin < 2
 end;
 
 optndims = max(optndims, ndims(data{1}));
+if isempty(strmatch(subject, allsubjects))
+    error(sprintf('Cannot select subject %s in list %s', subject, vararg2str({ allsubjects })));
+end;
 
 % plot specific subject
 % ---------------------

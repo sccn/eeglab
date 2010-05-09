@@ -300,7 +300,14 @@ for c = 1:ncplot
             
             % plot
             % ----
-            if strcmpi(opt.figure, 'on'), tmpcol = col; else tmpcol = col(colcount); colcount = mod(colcount, length(col))+1; end;
+            if strcmpi(opt.figure, 'on'), 
+                tmpcol = col; 
+            else
+                % all groups and conditions in the same figure
+                ncol = size(tmpdata,1);
+                tmpcol = col(colcount:colcount+ncol-1);
+                colcount = mod(colcount+ncol-1, length(col))+1; 
+            end;
             if strcmpi(opt.plottopo, 'on'), 
                 metaplottopo(tmpdata, 'chanlocs', opt.chanlocs, 'plotfunc', 'plotcurve', ...
                     'plotargs', { plotopt{:} }, 'datapos', [2 3], 'title', opt.titles{c,g});
