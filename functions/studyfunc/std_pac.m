@@ -57,8 +57,6 @@
 %
 % Authors: Arnaud Delorme, SCCN, INC, UCSD, July, 2009-
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) Arnaud Delorme, SCCN, INC, UCSD, arno@sccn.ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -74,17 +72,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: std_pac.m,v $
-% Revision 1.3  2009/10/19 01:16:55  arno
-% computing and reading PAC data
-%
-% Revision 1.2  2009/07/13 21:10:26  arno
-% still working on std_pac
-%
-% Revision 1.1  2009/07/10 01:50:14  arno
-% adding new functions
-%
 
 function [X, times, freqs, parameters] = std_pac(EEG, varargin)
 

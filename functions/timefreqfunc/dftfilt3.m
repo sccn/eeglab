@@ -51,22 +51,6 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 %
-% $Log: not supported by cvs2svn $
-% Revision 1.5  2007/09/11 10:31:47  arno
-%
-% Revision 1.4  2007/08/12 04:13:24  arno
-% fix crash when all cycles are given
-%
-% Revision 1.3  2006/11/27 23:41:50  arno
-% update documentation
-%
-% Revision 1.2  2006/10/27 23:23:23  toby
-% Doc edit, courtesy Diane
-%
-% Revision 1.1  2006/09/28 01:05:51  toby
-% Initial revision
-%
-
 % Revision 1.12 2006/09/25  rey r
 % Almost complete rewriting of dftfilt2.m, changing both Morlet and Hanning
 % DFT to be more in line with conventional implementations.

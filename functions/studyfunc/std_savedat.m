@@ -4,8 +4,6 @@
 %
 % Authors:  Arnaud Delorme, SCCN, INC, UCSD, 2006-
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) Arnaud Delorme, SCCN, INC, UCSD, October 11, 2004, arno@sccn.ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify

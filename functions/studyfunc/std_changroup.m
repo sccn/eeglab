@@ -28,8 +28,6 @@
 %
 % Authors: Arnaud Delorme, CERCO, 2006
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) Arnaud Delorme, CERCO, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -45,53 +43,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: std_changroup.m,v $
-% Revision 1.15  2010/02/25 10:02:17  arno
-% added the changrpstatus field
-%
-% Revision 1.14  2009/07/10 01:03:42  arno
-% remove old channel lookup
-%
-% Revision 1.13  2008/04/16 17:42:03  arno
-% now only include electrode actually present in datasets if no interpolation
-%
-% Revision 1.12  2008/03/18 01:12:46  nima
-% nima added ordering field before merging.
-%
-% Revision 1.11  2007/08/13 21:17:00  arno
-% fix previous changes
-%
-% Revision 1.10  2007/08/13 21:13:53  arno
-% fix typo
-%
-% Revision 1.9  2007/08/13 21:12:40  arno
-% fix error message
-%
-% Revision 1.8  2007/08/13 18:28:31  arno
-% header
-%
-% Revision 1.7  2007/08/13 17:42:52  arno
-% update help message
-%
-% Revision 1.6  2007/07/30 21:56:02  arno
-% debug for missing conditions
-%
-% Revision 1.5  2007/01/26 18:04:08  arno
-% backup code at the end
-%
-% Revision 1.4  2006/12/08 19:41:51  arno
-% same
-%
-% Revision 1.3  2006/12/08 19:40:49  arno
-% error for duplicate channel label
-%
-% Revision 1.2  2006/11/15 22:55:46  arno
-% last channel problem
-%
-% Revision 1.1  2006/09/12 18:45:16  arno
-% Initial revision
-%
 
 function STUDY = std_changroup(STUDY, ALLEEG, alllocs, interp);
 

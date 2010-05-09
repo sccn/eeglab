@@ -9,8 +9,6 @@
 
 % S. Makeig CNL / Salk Institute, La Jolla CA 7-17-97
 
-% $Log: not supported by cvs2svn $
-
 function sphere = spher(data)
 
 

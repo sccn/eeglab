@@ -28,8 +28,6 @@
 %
 % See also: compvar()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -45,71 +43,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.21  2007/11/15 00:09:39  arno
-% removing dipoles
-%
-% Revision 1.20  2007/08/10 23:10:13  arno
-% fix plotting if not all channel used
-%
-% Revision 1.19  2007/05/22 13:59:15  arno
-% compatibility when not all channels are used for ICA
-%
-% Revision 1.18  2006/09/25 17:46:17  arno
-% fix problem when not all channels
-%
-% Revision 1.17  2006/01/31 20:19:18  arno
-% options
-%
-% Revision 1.16  2006/01/25 21:27:30  arno
-% nothing
-%
-% Revision 1.15  2006/01/25 21:26:15  arno
-% add icachansind
-%
-% Revision 1.14  2006/01/25 21:24:16  arno
-% fixing remove components
-%
-% Revision 1.13  2005/09/27 22:10:02  arno
-% change default set name; allow to plot single trials
-%
-% Revision 1.12  2005/09/05 21:37:50  scott
-% clarified trial-ERP and Confirmation window comments. -sm
-%
-% Revision 1.11  2003/12/24 19:40:58  scott
-% edti help msg and text
-%
-% Revision 1.10  2003/02/19 19:17:25  arno
-% update header for GUI
-%
-% Revision 1.9  2003/01/28 18:34:45  arno
-% adding an option to keep components
-%
-% Revision 1.8  2003/01/16 18:10:56  arno
-% debugging for PCA
-%
-% Revision 1.7  2002/08/12 18:36:35  arno
-% questdlg2
-%
-% Revision 1.6  2002/08/12 02:22:53  arno
-% inpudlg2
-%
-% Revision 1.5  2002/05/03 16:18:50  scott
-% icaweight -> icaweights -sm
-%
-% Revision 1.4  2002/04/11 00:58:12  arno
-% updating result size check
-%
-% Revision 1.3  2002/04/08 02:50:11  scott
-% *** empty log message ***
-%
-% Revision 1.2  2002/04/08 02:48:32  scott
-% worked on spelling, made text msg depend on number of pre-labeled comps -sm
-%
-% Revision 1.1  2002/04/05 17:32:13  jorn
-% Initial revision
-%
 
 % 01-25-02 reformated help & license -ad 
 % 02-15-02 propagate ica weight matrix -ad sm jorn 

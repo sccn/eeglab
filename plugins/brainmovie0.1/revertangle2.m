@@ -1,5 +1,3 @@
-%123456789012345678901234567890123456789012345678901234567890123456789012
-% revertangle() - optimize angles. Reverse component activity (= flip 
 %                 angles 0->180 and 180->0) to maximize synchronization
 %                 between components. 
 %
@@ -31,8 +29,6 @@
 % revertangle( ALLCROSSFANGLE, ALLCROSSF );
 % ALLCROSSFANGLE
 % ALLCROSSF
-
-% $Log: not supported by cvs2svn $
 
 function [ALLCROSSFANGLE, inversion] = revertangle( ALLCROSSFANGLE, ALLCROSSF );
 

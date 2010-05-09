@@ -32,8 +32,6 @@
 %
 % See also: eeglab(), snapread()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 13 March 2002 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -49,38 +47,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.10  2005/10/27 05:21:50  arno
-% nothing
-%
-% Revision 1.9  2005/10/26 01:29:30  arno
-% filename read
-%
-% Revision 1.8  2005/05/24 17:00:38  arno
-% mattocell
-%
-% Revision 1.7  2004/11/10 02:15:33  arno
-% nothing
-%
-% Revision 1.6  2003/11/04 01:14:18  arno
-% removing warnings
-%
-% Revision 1.5  2003/06/19 21:12:32  arno
-% nothing
-%
-% Revision 1.4  2003/06/19 16:14:17  arno
-% make ur
-%
-% Revision 1.3  2003/04/10 17:36:28  arno
-% header edit
-%
-% Revision 1.2  2003/03/02 22:51:56  arno
-% gain
-%
-% Revision 1.1  2002/04/05 17:32:13  jorn
-% Initial revision
-%
 
 function [EEG, command] = pop_snapread(filename, gain); 
 command = '';

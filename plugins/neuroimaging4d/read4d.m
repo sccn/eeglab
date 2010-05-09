@@ -21,11 +21,6 @@
 %
 % See also: read4dhdr()
 
-% $Log: not supported by cvs2svn $
-% Revision 1.1  2005/06/08 13:41:21  chris
-% Initial revision
-%
-
 function  [head, MegData, EventData] = read4d(filename, epochnumber)
 
 if nargin <1 | nargin >2,

@@ -28,8 +28,6 @@
 %  decomposition, ICA, ... under Matlab for which this command
 %  was designed).
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2001 Arnaud Delorme, SCCN/INC/UCSD, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -48,50 +46,6 @@
 
 % To increase/decrease the maximum depth of the stack, edit the eeg_consts file
  
-% $Log: not supported by cvs2svn $
-% Revision 1.14  2005/08/02 16:41:11  arno
-% remove history display when removing elements
-%
-% Revision 1.13  2005/07/28 18:29:59  arno
-% same
-%
-% Revision 1.12  2005/07/28 18:25:43  arno
-% hostory for multiple dataset command
-%
-% Revision 1.11  2005/07/28 18:05:50  arno
-% history
-%
-% Revision 1.10  2004/03/13 03:06:35  arno
-% remove dbug msg
-%
-% Revision 1.9  2004/03/13 03:05:29  arno
-% add output
-%
-% Revision 1.8  2004/03/13 02:40:58  arno
-% only adding history once
-%
-% Revision 1.7  2003/12/05 20:06:32  arno
-% eeg_hist call
-%
-% Revision 1.6  2003/12/05 00:48:51  arno
-% comment
-%
-% Revision 1.5  2003/12/05 00:26:54  arno
-% comment
-%
-% Revision 1.4  2003/12/05 00:06:34  arno
-% dataset history
-%
-% Revision 1.3  2002/08/11 19:23:34  arno
-% remove eeg_const
-%
-% Revision 1.2  2002/07/27 00:42:10  arno
-% implementing findstr
-%
-% Revision 1.1  2002/04/05 17:39:45  jorn
-% Initial revision
-%
-
 function str = eegh( command, str );
 
 mode = 1; % mode = 1, full print, mode = 0, truncated print

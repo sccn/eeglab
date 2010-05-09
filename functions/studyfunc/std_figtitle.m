@@ -51,17 +51,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: std_figtitle.m,v $
-% Revision 1.3  2010/02/09 20:05:40  arno
-% fixed empty group problem
-%
-% Revision 1.2  2010/02/09 06:07:27  arno
-% Fixed new title problem and implemented 3-level significance
-%
-% Revision 1.1  2010/02/06 05:47:52  arno
-% New titles for figures
-%
-
 function all_titles = std_figtitle(varargin)
 
 if nargin < 1

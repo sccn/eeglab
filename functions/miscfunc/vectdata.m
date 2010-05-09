@@ -34,8 +34,6 @@
 %
 % See also: griddata()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2002 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -51,44 +49,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.12  2004/02/06 23:31:22  arno
-% implementing new option 'avgtype'
-%
-% Revision 1.11  2004/02/06 22:36:23  arno
-% new option 'border'
-%
-% Revision 1.10  2004/02/06 00:55:28  arno
-% conv2 -> convolve
-%
-% Revision 1.9  2004/02/05 23:11:51  arno
-% remove debug msg
-%
-% Revision 1.8  2004/02/05 23:11:13  arno
-% minspace problem
-%
-% Revision 1.7  2003/10/15 18:48:54  arno
-% *** empty log message ***
-%
-% Revision 1.6  2003/07/04 00:04:39  arno
-% same
-%
-% Revision 1.5  2003/07/04 00:01:09  arno
-% newanglevalless constraint for uniform data (on precision)
-%
-% Revision 1.4  2002/10/21 15:52:16  arno
-% debug indices
-%
-% Revision 1.3  2002/10/21 15:30:19  arno
-% updating message
-%
-% Revision 1.2  2002/10/21 15:22:17  arno
-% update.m
-%
-% Revision 1.1  2002/10/21 14:53:04  arno
-% Initial revision
-%
 
 function [interparray, timesout] = vectdata( array, timevect, varargin );
 

@@ -17,8 +17,6 @@
 
 % Authors: Tzyy-Ping Jung & Scott Makeig, SCCN/INC/UCSD, La Jolla, 2000 
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2000 Tzyy-Ping Jung & Scott Makeig, SCCN/INC/UCSD, 3-16-00 
 %
 % This program is free software; you can redistribute it and/or modify
@@ -34,51 +32,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.14  2007/08/14 19:01:59  arno
-% same
-%
-% Revision 1.13  2007/08/14 18:58:56  arno
-% axes fix
-%
-% Revision 1.12  2007/04/28 00:17:53  arno
-% do not erase old copy commands
-%
-% Revision 1.11  2005/01/24 01:55:09  arno
-% do not erase non-empty fields
-%
-% Revision 1.10  2003/05/21 15:37:53  scott
-% header edit
-%
-% Revision 1.9  2003/03/07 22:03:37  scott
-% type
-% typo
-%
-% Revision 1.8  2003/03/07 22:02:57  scott
-% more '''???
-%
-% Revision 1.7  2003/03/07 21:56:56  scott
-% trying ''' again
-%
-% Revision 1.6  2003/03/07 21:53:11  scott
-% typo
-%
-% Revision 1.5  2003/03/07 21:52:28  scott
-% adding spaces
-%
-% Revision 1.4  2003/03/07 21:50:45  scott
-% trying char(double(string)) to avoid nested '''' -sm
-%
-% Revision 1.3  2002/12/05 22:55:37  arno
-% header
-%
-% Revision 1.2  2002/11/09 20:50:26  scott
-% help msg
-%
-% Revision 1.1  2002/04/05 17:36:45  jorn
-% Initial revision
-%
 
 % requires copyaxes.m
 % 4-2-00 added 'noticks' -sm

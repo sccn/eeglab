@@ -31,38 +31,6 @@
 %
 % See also: angTimeWarp(), phasecoher(), erpimage(), newtimef()
 
-% $Log: not supported by cvs2svn $
-%
-function M=timeWarp(evLatency, newLatency)
-  M = [0];
-  if min(sort(evLatency) == evLatency) == 0
-    error('evLatency should be sorted');
-    return;
-  end
-  if min(sort(newLatency) == newLatency) == 0
-    error('newLatency should be sorted');
-    return;
-  end
-  if length(evLatency) ~= length(newLatency)
-    error('evLatency and newLatency must have the same length.');
-    return;
-  end
-  if length(evLatency) < 2 | length(newLatency) < 2
-    error(['There should be at least two events in evLatency and ' ...
-          'newLatency, that is "begin" and "end"' ]);
-    return;
-  end
-  if evLatency(1) ~= 1
-    disp(['Assuming old and new time series beginnings are ' ...
-          'synchronized']);
-    disp(['Make sure you defined an end event for both old and new time ' ...
-          'series !']);
-    evLatency(end+1)=1;
-    newLatency(end+1)=1;
-    evLatency = sort(evLatency);
-    newLatency = sort(newLatency);
-  end
-    
   t = 1:max(evLatency);
   
   for k=1:length(evLatency)-1

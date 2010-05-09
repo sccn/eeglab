@@ -33,8 +33,6 @@
 % Known limitations: 
 %  For more see http://www.cnl.salk.edu/~arno/cntload/index.html    
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2000 Sean Fitzgibbon, <psspf@id.psy.flinders.edu.au>
 % Copyright (C) 2003 Arnaud Delorme, Salk Institute, arno@salk.edu
 %

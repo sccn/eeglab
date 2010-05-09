@@ -54,8 +54,6 @@
 %
 % See also: rejtrend(), eeglab(), eegplot(), pop_rejepoch() 
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -71,69 +69,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.20  2007/04/28 05:04:20  toby
-% doc edit
-%
-% Revision 1.19  2007/04/28 04:41:40  toby
-% shorted format of extended terminal output
-%
-% Revision 1.18  2007/04/28 04:22:24  toby
-% edited screen output, documentation
-%
-% Revision 1.17  2006/01/31 20:15:44  arno
-% options
-%
-% Revision 1.16  2003/12/24 19:30:16  scott
-% help msg and text edits
-%
-% Revision 1.15  2003/12/17 18:15:25  arno
-% default reject
-%
-% Revision 1.14  2003/12/04 23:27:06  arno
-% reject trials
-%
-% Revision 1.13  2003/02/18 22:43:06  arno
-% same.
-%
-% Revision 1.12  2003/02/18 22:20:21  arno
-% update header for GUI
-% /
-%
-% Revision 1.11  2002/11/13 01:19:42  arno
-% debug for command line call
-%
-% Revision 1.10  2002/11/12 23:56:52  luca
-% now saving outputs -ad
-%
-% Revision 1.9  2002/08/12 21:53:22  arno
-% text
-%
-% Revision 1.8  2002/08/12 02:31:36  arno
-% inputdlg2
-%
-% Revision 1.7  2002/08/07 22:39:38  arno
-% same
-%
-% Revision 1.6  2002/08/07 22:28:38  arno
-% editing
-%
-% Revision 1.5  2002/07/30 23:00:28  arno
-% new rejection type
-%
-% Revision 1.4  2002/07/26 17:32:49  arno
-% better output command
-%
-% Revision 1.3  2002/07/26 17:04:24  arno
-% adding message
-%
-% Revision 1.2  2002/07/26 16:35:57  arno
-% chaning icacomp
-%
-% Revision 1.1  2002/04/05 17:32:13  jorn
-% Initial revision
-%
 
 % 01-25-02 reformated help & license -ad 
 % 03-07-02 added srate argument to eegplot call -ad

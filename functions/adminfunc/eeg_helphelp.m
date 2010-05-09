@@ -28,8 +28,6 @@
 % calls the function 'pop_erpimage()'. This function in turn serves as a 
 % graphic user interface for the computing and plotting function 'erpimage()'.
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -45,28 +43,5 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.7  2002/11/15 01:29:59  arno
-% header for web
-%
-% Revision 1.6  2002/08/13 18:54:14  scott
-% editing help message
-%
-% Revision 1.5  2002/08/13 16:25:40  scott
-% test
-%
-% Revision 1.4  2002/08/11 17:29:34  arno
-% editing header
-%
-% Revision 1.3  2002/05/01 03:35:25  arno
-% editing header
-%
-% Revision 1.2  2002/04/21 01:04:56  scott
-% edited help msg -sm
-%
-% Revision 1.1  2002/04/05 17:46:04  jorn
-% Initial revision
-%
 
 help eeg_helphelp

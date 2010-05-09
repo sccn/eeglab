@@ -26,8 +26,6 @@
 %
 % See also: reref()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 1999 Scott Makeig, SCCN/INC/UCSD, scott@sccn.ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -43,35 +41,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.9  2002/11/15 01:40:38  arno
-% header for web
-%
-% Revision 1.8  2002/11/12 18:01:21  arno
-% header typo
-%
-% Revision 1.7  2002/09/05 00:30:23  scott
-% added meandata output -sm
-%
-% Revision 1.6  2002/08/21 02:08:19  arno
-% nothing
-%
-% Revision 1.5  2002/08/21 02:03:32  arno
-% debugging ica averef
-%
-% Revision 1.4  2002/08/21 00:21:51  arno
-% debugging
-%
-% Revision 1.3  2002/04/11 18:37:33  scott
-% revised help msg
-%
-% Revision 1.2  2002/04/11 18:02:03  arno
-% computing average reference of components
-%
-% Revision 1.1  2002/04/05 17:36:45  jorn
-% Initial revision
-%
 
 % 12/16/99 Corrected denomiator on the suggestion of Ian Nimmo-Smith, Cambridge UK
 % 01-25-02 reformated help & license -ad 

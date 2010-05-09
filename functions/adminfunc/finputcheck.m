@@ -44,8 +44,6 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 10 July 2002
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) Arnaud Delorme, CNL / Salk Institute, 10 July 2002, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -61,107 +59,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.33  2007/08/08 17:46:23  arno
-% reverting version 1.29
-%
-% Revision 1.32  2007/08/08 17:44:26  nima
-% _
-%
-% Revision 1.31  2007/08/08 17:27:43  nima
-% added error() if some values of 'key' are not string
-%
-% Revision 1.30  2007/08/08 00:29:55  nima
-% modified removedup (removing duplicates)
-%
-% Revision 1.29  2007/03/07 03:54:51  toby
-% Documentation edits
-%
-% Revision 1.28  2007/01/26 17:59:20  arno
-% msg wording
-%
-% Revision 1.27  2006/09/30 07:38:52  toby
-% help message edit
-%
-% Revision 1.26  2006/09/28 03:20:21  toby
-% more doc edits
-%
-% Revision 1.25  2006/09/28 02:59:59  toby
-% documentation correction
-%
-% Revision 1.24  2006/03/11 05:37:07  arno
-% header
-%
-% Revision 1.23  2004/11/06 02:54:06  scott
-% a few further small edits to the help msg -sm
-%
-% Revision 1.22  2004/11/05 15:23:37  arno
-% ,sg
-%
-% Revision 1.21  2004/11/05 04:10:44  scott
-% help msg. -sm
-%
-% Revision 1.20  2004/06/09 16:30:42  arno
-% adding or if several types
-%
-% Revision 1.19  2003/10/29 16:35:57  arno
-% msg typo
-%
-% Revision 1.18  2003/07/30 23:53:58  arno
-% debug multiple return values
-%
-% Revision 1.17  2003/07/26 00:21:17  arno
-% allowing cell array for values
-%
-% Revision 1.16  2003/06/30 02:10:10  arno
-% strmatch exact
-%
-% Revision 1.15  2003/01/31 02:35:38  arno
-% debugging lowercase/upercase problem
-%
-% Revision 1.14  2002/11/20 01:05:44  arno
-% take into account duplicate parameters
-%
-% Revision 1.13  2002/11/18 17:15:18  arno
-% adding float arg (=real)
-%
-% Revision 1.12  2002/11/15 02:16:50  arno
-% header for web
-%
-% Revision 1.11  2002/09/30 15:29:23  arno
-% autorizing cell arrays for types
-%
-% Revision 1.10  2002/09/30 00:42:08  arno
-% debug input arguments
-%
-% Revision 1.9  2002/07/29 18:00:53  arno
-% debugging for NaN
-%
-% Revision 1.8  2002/07/29 17:24:22  arno
-% header
-%
-% Revision 1.7  2002/07/20 19:10:41  arno
-% debugging output
-%
-% Revision 1.6  2002/07/19 17:58:11  arno
-% returning non-matched 'key' 'val' arguments
-%
-% Revision 1.5  2002/07/19 17:46:53  arno
-% g empty if no varargin
-%
-% Revision 1.4  2002/07/19 16:27:14  arno
-% adding ignore mode
-%
-% Revision 1.3  2002/07/10 02:18:32  arno
-% header info
-%
-% Revision 1.2  2002/07/10 02:17:27  arno
-% debugging error message passing
-%
-% Revision 1.1  2002/07/10 01:03:19  arno
-% Initial revision
-%
 
 function [g, varargnew] = finputcheck( vararg, fieldlist, callfunc, mode )
 

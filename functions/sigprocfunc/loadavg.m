@@ -19,8 +19,6 @@
 %
 % See also: eeglab()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -48,17 +46,6 @@
 % microvolts, multiply by the channel-specific calibration factor (i.e., for
 % electrode j: channel[j]->calib) and divide by the number of sweeps in the
 % average (i.e., channel[j]->n).
-
-% $Log: not supported by cvs2svn $
-% Revision 1.3  2004/12/17 02:46:00  arno
-% divide by number of accepted sweeps
-%
-% Revision 1.2  2002/11/04 02:31:51  arno
-% adding sweeps
-%
-% Revision 1.1  2002/04/05 17:39:45  jorn
-% Initial revision
-%
 
 function [signal, variance, chan_names, pnts, rate, xmin, xmax]=loadavg( FILENAME)
 

@@ -10,8 +10,6 @@
 %
 % See also: inputdlg2(), errordlg2(), supergui(), inputgui()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) Arnaud Delorme, CNL / Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -27,56 +25,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.16  2007/08/07 19:47:23  arno
-% fix bug 377
-%
-% Revision 1.15  2007/08/06 18:48:30  arno
-% same
-%
-% Revision 1.14  2007/08/06 18:47:24  arno
-% fix bug 381
-%
-% Revision 1.13  2006/03/11 06:10:57  arno
-% header
-%
-% Revision 1.12  2005/08/04 22:13:07  arno
-% adapting box size
-%
-% Revision 1.11  2002/10/15 17:23:50  arno
-% drawnow
-%
-% Revision 1.10  2002/10/15 16:54:09  arno
-% add drawnow ofr windows
-%
-% Revision 1.9  2002/10/15 14:45:12  arno
-% display warning
-%
-% Revision 1.8  2002/10/15 14:35:52  arno
-% default case for buttons
-%
-% Revision 1.7  2002/08/14 18:17:00  arno
-% new supergui arg
-%
-% Revision 1.6  2002/08/13 22:36:43  arno
-% debug for error
-%
-% Revision 1.5  2002/08/13 17:29:35  arno
-% new superguicall
-%
-% Revision 1.4  2002/08/12 18:49:20  arno
-% header
-%
-% Revision 1.3  2002/08/12 18:24:29  arno
-% debug
-%
-% Revision 1.2  2002/08/12 18:02:47  arno
-% debug
-%
-% Revision 1.1  2002/08/12 18:01:34  arno
-% Initial revision
-%
 
 function [result] = questdlg2(Prompt,Title,varargin);
 

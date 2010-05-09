@@ -35,8 +35,6 @@
 %
 % Author: Arnaud Delorme, SCCN, INC, UCSD, 2005
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) Arnaud Delorme, SCCN, INC, UCSD, 2005 arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -52,14 +50,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.2  2005/04/20 22:08:30  arno
-% warning backrace off
-%
-% Revision 1.1  2005/04/20 21:54:08  arno
-% Initial revision
-%
 
 function [mri, act, mristruct] = loreta_importcomp(mrifile, fileact, varargin)
     

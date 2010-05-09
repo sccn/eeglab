@@ -28,17 +28,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
-% Revision 1.3  2009/07/30 19:27:10  arno
-% handles dataset with different channel order
-%
-% Revision 1.2  2008/04/16 17:35:57  arno
-% simplify code, added one optional input
-%
-% Revision 1.1  2006/09/20 12:26:44  arno
-% Initial revision
-%
-
 function alllocs = eeg_mergelocs(varargin)
 
 % sort by length

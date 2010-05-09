@@ -17,8 +17,6 @@
 %
 % See also: runica(), icaproj(), icavar()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 4-3-97 Scott Makeig, SCCN/INC/UCSD, scott@sccn.ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -34,8 +32,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
 
 % 6-17-97 extended to non-square weight matrices -sm
 % 1-12-01 removed sphere argument -sm

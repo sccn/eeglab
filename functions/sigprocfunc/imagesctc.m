@@ -15,8 +15,6 @@
 %
 % See also: image(), imagesc()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -33,12 +31,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
-% Revision 1.1  2002/07/31 00:46:58  arno
-% Initial revision
-%
-function h = imagesctc(a, varargin);
-	
 if ~isempty(varargin)
 	imagesc(a, varargin{:});
 else

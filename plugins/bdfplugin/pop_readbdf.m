@@ -37,8 +37,6 @@
 %
 % See also: openbdf(), readbdf()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 13 March 2002 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -64,94 +62,6 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % programmed from pop_readedf() version 1.15
-
-% $Log: not supported by cvs2svn $
-% Revision 1.4  2009/10/28 20:45:30  arno
-% fix dat.Head.NREC and deleting event channel
-%
-% Revision 1.3  2009/10/21 20:56:08  arno
-% Andrey's fix for events
-%
-% Revision 1.2  2009/07/01 23:29:50  arno
-% fix partial reading
-%
-% Revision 1.1  2009/06/19 05:04:22  arno
-% bdf plugin
-%
-% Revision 1.24  2004/05/24 21:44:32  arno
-% same
-%
-% Revision 1.23  2004/05/24 21:43:47  arno
-% show number of channels
-%
-% Revision 1.22  2004/05/15 22:56:50  scott
-% edit text
-%
-% Revision 1.21  2004/05/08 16:06:01  scott
-% edited text box, help message
-%
-% Revision 1.20  2004/03/20 00:51:25  arno
-% message
-%
-% Revision 1.19  2004/03/19 00:50:25  arno
-% header msg
-%
-% Revision 1.18  2004/03/18 02:09:13  arno
-% change channel event default
-%
-% Revision 1.17  2004/01/29 02:05:03  arno
-% gui edit
-%
-% Revision 1.16  2004/01/29 02:02:53  arno
-% putting block number in GUI
-%
-% Revision 1.15  2003/12/18 00:28:46  arno
-% reading channel label
-%
-% Revision 1.14  2003/12/18 00:10:10  arno
-% same
-%
-% Revision 1.13  2003/12/18 00:08:27  arno
-% data bug
-%
-% Revision 1.12  2003/12/18 00:03:37  arno
-% debug
-% last
-%
-% Revision 1.11  2003/12/18 00:02:00  arno
-% remove event channels
-%
-% Revision 1.10  2003/12/17 19:01:16  arno
-% do not remove reference channels
-%
-% Revision 1.9  2003/12/17 17:48:40  arno
-% adding entry for reference
-%
-% Revision 1.8  2003/12/11 20:07:59  arno
-% eventindices -> eventchans
-% .,
-%
-% Revision 1.7  2003/12/11 20:01:48  arno
-% debug history
-%
-% Revision 1.6  2003/12/11 19:23:50  arno
-% header and now import events automatically
-%
-% Revision 1.5  2003/11/04 01:22:40  arno
-% removing warnings
-%
-% Revision 1.4  2003/10/13 17:42:44  arno
-% fix blockrage
-%
-% Revision 1.3  2003/10/10 17:11:12  arno
-% fixing default arg
-%
-% Revision 1.2  2003/08/29 18:44:16  arno
-% adding gui for block range
-%
-% Revision 1.1  2003/06/05 15:38:44  arno
-% Initial revision
-%
 
 function [EEG, command] = pop_readbdf(filename, blockrange, eventchans, ref, delchan); 
 EEG = [];

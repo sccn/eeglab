@@ -66,63 +66,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: pop_specparams.m,v $
-% Revision 1.20  2010/02/26 10:57:36  claire
-% typo
-%
-% Revision 1.19  2010/02/24 10:52:36  arno
-% Implemented new single trial statistics
-%
-% Revision 1.18  2009/11/11 00:28:53  arno
-% New GUI format
-%
-% Revision 1.17  2009/05/31 04:37:38  arno
-% Better GUI for Study plotting options
-%
-% Revision 1.16  2009/05/31 02:22:10  arno
-% Adding FDR and bootstrap to all STUDY functions
-%
-% Revision 1.15  2007/10/25 18:50:07  nima
-% ??s filled.
-%
-% Revision 1.14  2007/03/17 21:23:04  arno
-% logical operator precedence
-%
-% Revision 1.13  2007/01/26 18:03:27  arno
-% new topofreq option
-%
-% Revision 1.12  2006/11/23 00:59:36  arno
-% removing psectral data if subject mean subtract
-%
-% Revision 1.11  2006/11/23 00:48:13  arno
-% typo
-%
-% Revision 1.10  2006/11/23 00:47:41  arno
-% subject mean buttont
-%
-% Revision 1.9  2006/11/10 01:29:49  arno
-% GUI size
-%
-% Revision 1.8  2006/11/04 00:19:43  arno
-% text
-%
-% Revision 1.7  2006/10/03 21:29:15  scott
-% help msg edits.  Some ?? remain.  -sm
-%
-% Revision 1.6  2006/10/03 18:10:30  scott
-% minor help edit
-%
-% Revision 1.5  2006/10/02 20:58:43  scott
-% plotcond -> plotconditions
-%
-% Revision 1.4  2006/10/02 17:19:49  scott
-% edited help msg for clarity and grammar. changed to English 'apart'
-% changed 'plotgroup' to 'plotgroups'; in help, changed 'panel' to 'axis'
-%
-% Revision 1.3  2006/10/02 11:39:15  arno
-% header documentation
-%
-
 function [ STUDY, com ] = pop_specparams(STUDY, varargin);
 
 STUDY = default_params(STUDY);

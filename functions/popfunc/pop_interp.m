@@ -37,11 +37,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
-% Revision 1.1  2009/08/05 03:20:42  arno
-% new interpolation function
-%
-
 function [EEG com] = pop_interp(EEG, bad_elec, method)
 
     com = '';

@@ -15,8 +15,6 @@
 % Authors: Maksym Pozdin (mpozdin.ece04@gtalumni.org, IOL/ONRC,2004), 
 %          with Arnaud Delorme and Scott Makeig (SCCN/INC/UCSD, La Jolla CA)
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2003 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify

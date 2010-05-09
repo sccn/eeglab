@@ -31,8 +31,6 @@
 %
 % Author: Scott Makeig, SCCN/INC/UCSD, April 28, 2004-
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2004 Scott Makeig, SCCN/INC/UCSD, smakeig@ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify

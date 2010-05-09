@@ -47,8 +47,6 @@
 %
 % Authors: Hilit Serby & Arnaud Delorme, SCCN, INC, UCSD, Feb 03, 2005
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) Hilit Serby, SCCN, INC, UCSD, Feb 03, 2005, hilit@sccn.ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -66,82 +64,6 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % Coding notes: Useful information on functions and global variables used.
-
-% $Log: std_centroid.m,v $
-% Revision 1.27  2007/08/06 21:19:41  arno
-% header info
-%
-% Revision 1.26  2006/03/21 15:39:57  arno
-% new .sets format
-%
-% Revision 1.25  2006/03/20 17:34:50  arno
-% new std_clustread
-%
-% Revision 1.24  2006/03/14 02:55:44  scott
-% help msg
-%
-% Revision 1.23  2006/03/12 04:29:24  arno
-% G247
-% transpose ERP
-%
-% Revision 1.22  2006/03/12 04:27:45  arno
-% message
-%
-% Revision 1.21  2006/03/12 04:21:06  arno
-% component polarity
-%
-% Revision 1.20  2006/03/11 07:04:18  arno
-% header
-%
-% Revision 1.19  2006/03/11 00:29:15  arno
-% header
-%
-% Revision 1.18  2006/03/10 18:22:17  arno
-% renaming variables
-%
-% Revision 1.17  2006/03/10 16:27:08  arno
-% new call for spectrum
-%
-% Revision 1.16  2006/03/10 16:00:00  arno
-% reading ERP
-% ./
-%
-% Revision 1.15  2006/03/10 15:56:04  arno
-% changing log and var name
-%
-% Revision 1.14  2006/03/10 03:17:57  scott
-% help msg -sm
-%
-% Revision 1.13  2006/03/09 23:48:43  arno
-% fix new file format
-%
-% Revision 1.12  2006/03/09 23:31:29  arno
-% log of frequencies
-%
-% Revision 1.11  2006/03/09 23:13:38  arno
-% debug adding times field
-%
-% Revision 1.10  2006/03/09 23:11:00  arno
-% adding field ersp_times to centroid
-%
-% Revision 1.9  2006/03/09 23:05:19  arno
-% fixing call to std_readersp
-%
-% Revision 1.8  2006/03/09 22:26:25  arno
-% reading ERSP to compute centroid
-%
-% Revision 1.7  2006/03/09 18:19:31  arno
-% spectrum read
-%
-% Revision 1.6  2006/03/08 21:05:25  arno
-% rename func
-%
-% Revision 1.5  2006/02/16 21:33:50  arno
-% do not jump line for scalp centroid
-%
-% Revision 1.4  2006/02/15 22:12:42  arno
-% revision
-%
 
 function [STUDY, centroid] = std_centroid(STUDY,ALLEEG, clsind, varargin);
 

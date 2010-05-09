@@ -16,8 +16,6 @@
 %
 % Author: Scott Makeig, SCCN/INC/UCSD, La Jolla, 5-21-96 
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 5-21-96 Scott Makeig, SCCN/INC/UCSD, scott@sccn.ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -33,14 +31,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.2  2007/03/09 23:17:34  toby
-% Bug212 courtesy Maxim Duester
-%
-% Revision 1.1  2002/04/05 17:36:45  jorn
-% Initial revision
-%
 
 % 5-25-96 added chanlist, epochlist -sm
 % 10-05-97 added out of bounds tests for chanlist and framelist -sm

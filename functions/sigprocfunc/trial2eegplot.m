@@ -18,8 +18,6 @@
 %
 % See also: eegtresh(), eeglab(), eegplot(), pop_rejepoch()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify

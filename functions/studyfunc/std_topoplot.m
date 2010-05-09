@@ -42,8 +42,6 @@
 %
 % Authors:  Hilit Serby, Arnaud Delorme, Scott Makeig, SCCN, INC, UCSD, June, 2005
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) Hilit Serby, SCCN, INC, UCSD, June 07, 2005, hilit@sccn.ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -59,47 +57,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: std_topoplot.m,v $
-% Revision 1.28  2009/11/18 22:16:43  arno
-% plotrad
-%
-% Revision 1.1  2009/11/17 23:16:40  nima
-% plotrad option added by nima
-%
-% Revision 1.27  2007/10/24 19:04:27  nima
-% subjects are moved in fron tof ICs in figure titles.
-%
-% Revision 1.26  2007/08/14 19:29:10  nima
-% _
-%
-% Revision 1.25  2007/08/13 23:24:37  nima
-% _
-%
-% Revision 1.24  2007/06/26 00:16:24  allen
-% bug 427: grand mean avg title error
-%
-% Revision 1.23  2007/06/25 00:34:24  toby
-% title changed to show number of components in cluster average
-%
-% Revision 1.22  2007/04/30 21:13:29  arno
-% backward compatibility
-%
-% Revision 1.21  2007/03/14 03:22:32  arno
-% now uses same functions to plot individual components
-%
-% Revision 1.20  2007/03/14 03:17:11  arno
-% do not invert polarity for plotting
-%
-% Revision 1.19  2007/03/14 03:00:48  arno
-% update function name
-%
-% Revision 1.18  2007/03/14 02:48:56  arno
-% remove scalp centroid
-%
-% Revision 1.17  2007/03/14 02:46:11  arno
-% now uses toporead(), updated revision history
-%
 
 function STUDY = std_topoplot(STUDY, ALLEEG,  varargin)
 icadefs;
@@ -283,8 +240,6 @@ end
 %  See also  pop_clustedit, pop_preclust, eeg_createdata, std_topoplot         
 %
 % Authors:  Hilit Serby, Arnaud Delorme, Scott Makeig, SCCN, INC, UCSD, June, 2005
-
-%123456789012345678901234567890123456789012345678901234567890123456789012
 
 % Copyright (C) Hilit Serby, SCCN, INC, UCSD, June 07, 2005, hilit@sccn.ucsd.edu
 %

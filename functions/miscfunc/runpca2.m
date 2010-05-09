@@ -19,8 +19,6 @@
 %
 % See also: runica()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) Colin Humphries, CNL / Salk Institute, Aug, 1997
 %
 % This program is free software; you can redistribute it and/or modify
@@ -36,36 +34,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.1  2009/01/29 00:04:48  arno
-% Initial revision
-%
-% Revision 1.6  2007/05/12 02:36:14  jason
-% added code to remove mean, which pca should do.
-%
-%
-%
-%
-% ls
-% ls
-% pwd
-%
-% Revision 1.5  2004/05/18 18:02:15  arno
-% commenting 2 not usefull lines
-%
-% Revision 1.4  2004/05/05 16:30:57  arno
-% svd -> svds
-%
-% Revision 1.3  2004/05/05 15:22:20  arno
-% remove svds
-%
-% Revision 1.2  2004/05/05 01:37:17  arno
-% lowercase n -> uppercase N
-%
-% Revision 1.1  2002/04/05 17:36:45  jorn
-% Initial revision
-%
 
 % 01/31/00 renamed runpca() and improved usage message -sm
 % 01-25-02 reformated help & license, added links -ad 

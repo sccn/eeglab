@@ -19,8 +19,6 @@
 %
 % See also: eeglab(), eegplot(), pop_rejepoch()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2002 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -36,92 +34,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.27  2005/08/04 15:38:40  arno
-% remove comments
-%
-% Revision 1.26  2005/05/24 17:48:27  arno
-% remove cell2mat
-%
-% Revision 1.25  2004/12/09 19:59:09  arno
-% using old EEG.pnts
-%
-% Revision 1.24  2004/06/11 01:27:29  arno
-% now recompute event latencies in eeg_insertbound
-%
-% Revision 1.23  2004/06/11 01:00:09  arno
-% recompute latencies before inserting events
-%
-% Revision 1.22  2004/06/08 20:08:34  arno
-% new insertbound
-%
-% Revision 1.21  2004/06/08 17:09:51  arno
-% checking consistency later
-%
-% Revision 1.20  2004/06/07 18:39:18  arno
-% replace indold by indnew
-%
-% Revision 1.19  2004/06/04 01:30:59  arno
-% better msg
-%
-% Revision 1.18  2004/06/02 17:38:41  arno
-% index of index problem
-%
-% Revision 1.17  2004/06/02 17:26:53  arno
-% index to old event
-%
-% Revision 1.16  2004/06/02 17:21:54  arno
-% typo
-%
-% Revision 1.15  2004/06/02 17:18:00  arno
-% insert bound before removing events
-%
-% Revision 1.14  2004/05/24 20:56:35  arno
-% checking event consistency
-%
-% Revision 1.13  2004/05/14 21:12:51  arno
-% same
-%
-% Revision 1.12  2004/05/14 21:10:10  arno
-% update insertbound call
-%
-% Revision 1.11  2004/04/20 02:08:45  arno
-% calling eeg_insertbound
-%
-% Revision 1.10  2004/03/20 01:48:16  arno
-% same
-%
-% Revision 1.9  2004/03/20 01:46:50  arno
-% debug last
-%
-% Revision 1.8  2004/03/20 01:44:27  arno
-% removing bother message of removed events
-%
-% Revision 1.7  2003/02/27 03:06:47  arno
-% debug, handle regions from eegplot
-%
-% Revision 1.6  2002/11/15 02:14:07  arno
-% diabling rejection on
-% disk
-%
-% Revision 1.5  2002/10/22 17:16:53  arno
-% debug command line call
-%
-% Revision 1.4  2002/08/08 14:46:46  arno
-% boundary events
-%
-% Revision 1.3  2002/08/08 01:20:13  arno
-% same
-%
-% Revision 1.2  2002/08/08 01:18:33  arno
-% empty regions ?
-%
-% Revision 1.1  2002/08/08 01:17:31  arno
-% Initial revision
-%
-% Revision 1.12  2002/08/07 22:41:01  arno
-% editing text
 
 function [EEG, com] = eeg_eegrej( EEG, regions);
 

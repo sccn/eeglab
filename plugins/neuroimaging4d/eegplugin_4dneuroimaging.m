@@ -15,8 +15,6 @@
 % Author: Christian Wienbruch, University of Konstanz, Clinical Psychology, 2005
 %         (plugin interface: Arnaud Delorme, SCCN, INC, UCSD)
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2005 Christian Wienbruch, University of Konstanz, Clinical Psychology
 %
 

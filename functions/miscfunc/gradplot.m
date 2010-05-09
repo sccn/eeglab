@@ -18,8 +18,6 @@
 %
 % See also: topoplot(), lapplot()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 3/10/01 Marissa Westerfield & Arnaud Delorme, CNL/Salk Institute, La Jolla
 %
 % This program is free software; you can redistribute it and/or modify
@@ -35,38 +33,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.10  2007/03/07 01:25:37  toby
-% bug 149, courtesy Ronny Lindner
-%
-% Revision 1.9  2004/03/22 03:32:15  scott
-% shrink commandline message edit
-%
-% Revision 1.8  2004/01/29 21:16:54  scott
-% more
-%
-% Revision 1.7  2004/01/29 21:04:05  scott
-% more
-%
-% Revision 1.6  2004/01/29 03:17:31  scott
-% same
-%
-% Revision 1.5  2004/01/29 02:15:56  scott
-% update locs_file reading from topoplot.m
-%
-% Revision 1.4  2004/01/28 21:52:52  scott
-% same
-%
-% Revision 1.3  2004/01/28 21:38:40  scott
-% added auto-shrink ... -sm
-%
-% Revision 1.2  2004/01/28 21:06:32  scott
-% added test for NCHANS in locs file -sm
-%
-% Revision 1.1  2002/04/05 17:36:45  jorn
-% Initial revision
-%
 
 % 01-25-02 reformated help & license, added links -ad 
 

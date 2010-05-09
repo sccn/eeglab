@@ -128,8 +128,6 @@
 %
 % See also: timefreq(), crossf()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2002 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -145,29 +143,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.1  2009/07/08 02:21:48  arno
-% *** empty log message ***
-%
-% Revision 1.6  2009/05/22 23:57:06  klaus
-% latest compatibility fixes
-%
-% Revision 1.5  2003/07/09 22:00:55  arno
-% fixing normalization problem
-%
-% Revision 1.4  2003/07/09 01:29:46  arno
-% bootstat -> bootcircle
-%
-% Revision 1.3  2003/07/03 23:43:10  arno
-% *** empty log message ***
-%
-% Revision 1.2  2003/06/28 01:25:23  arno
-% help if no arg
-%
-% Revision 1.1  2003/06/27 23:35:32  arno
-% Initial revision
-%
 
 function [crossfcoh, timesout1, freqs1, freqs2, cohboot, alltfX, alltfY] = ...
         crossfreq(X, Y, srate, varargin);

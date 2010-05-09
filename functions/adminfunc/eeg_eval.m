@@ -20,8 +20,6 @@
 % 
 % see also: eeglab()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2005 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -37,50 +35,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.14  2006/03/12 04:12:59  arno
-% nothing
-%
-% Revision 1.13  2006/03/10 21:24:22  arno
-% fixing saveing datasets etc...
-%
-% Revision 1.12  2006/03/10 20:59:41  arno
-% fixing save mode
-%
-% Revision 1.11  2006/03/10 20:56:37  arno
-% fixing new eeg
-%
-% Revision 1.10  2006/03/10 20:49:30  arno
-% set saved to 'no'
-%
-% Revision 1.9  2006/03/10 19:10:16  arno
-% fixing eeg_eval
-%
-% Revision 1.8  2006/03/10 18:52:32  arno
-% only store on disk if necessary
-%
-% Revision 1.7  2006/01/31 20:57:12  arno
-% fixing history
-%
-% Revision 1.6  2006/01/31 20:51:45  arno
-% eeglab options
-%
-% Revision 1.5  2005/10/19 21:38:18  arno
-% nothing
-%
-% Revision 1.4  2005/09/27 22:04:07  arno
-% warnings
-%
-% Revision 1.3  2005/08/18 15:22:34  arno
-% fix version call
-%
-% Revision 1.2  2005/08/01 17:02:29  arno
-% allowing to process multiple files
-%
-% Revision 1.1  2005/08/01 16:43:11  arno
-% Initial revision
-%
 
 function [EEG, com] = eeg_eval( funcname, EEG, varargin);
     

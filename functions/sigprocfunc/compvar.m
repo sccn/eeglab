@@ -23,8 +23,6 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -40,32 +38,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.7  2007/08/17 16:49:55  scott
-% reworked help msg; made 2nd output pvaf; rm'd mean of data
-%
-% Revision 1.6  2007/08/07 01:33:57  arno
-% fix help message
-%
-% Revision 1.5  2003/10/09 22:35:49  arno
-% correcting sphere*weights
-%
-% Revision 1.4  2003/01/09 18:29:34  arno
-% debuging compvar
-% absolute value instead of square
-%
-% Revision 1.3  2002/04/10 19:34:39  arno
-% futher debuging
-%
-% Revision 1.2  2002/04/10 19:31:12  arno
-% debugging (variable name error)
-%
-% Revision 1.1  2002/04/05 17:39:45  jorn
-% Initial revision
-%
-% 01-25-02 reformated help & license -ad 
-% 03-08-02 added the sphere and weight option -ad
 
 function [ compproj, varegg ] = compvar( data, act, winv, compnums);
 

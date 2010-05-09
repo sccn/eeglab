@@ -42,65 +42,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
-% Revision 1.18  2007/08/07 18:31:09  arno
-% fix bug 293 for only one color
-%
-% Revision 1.17  2005/03/17 17:51:25  arno
-% fixing text call for Matlab 7
-%
-% Revision 1.16  2005/01/29 01:53:51  scott
-% ??
-%
-% Revision 1.15  2005/01/28 22:47:58  scott
-% fixed scaling bug; increased subplot --> sbplot window
-% sizes to be vertically overlapping. Now correctly handles
-% ymin ymax] limits input, and correctly shows given or from-data
-% y limits.
-%
-% Revision 1.14  2004/11/22 18:20:57  scott
-% adjusting same
-%
-% Revision 1.13  2004/11/22 18:14:26  scott
-% set ydir from YDIR in 'icadefs.m'; update help message
-%
-% Revision 1.12  2004/08/31 01:12:33  arno
-% fixed Matlab 7 bug
-%
-% Revision 1.11  2004/08/03 15:10:42  arno
-% ydir
-%
-% Revision 1.10  2004/07/26 21:11:37  arno
-% fixed problem if flat channel
-%
-% Revision 1.9  2003/07/25 17:39:14  arno
-% allowing to plot more trials
-%
-% Revision 1.8  2003/03/05 16:32:02  arno
-% plotting lines after data
-%
-% Revision 1.7  2002/10/20 21:30:33  arno
-% normalization for all plots
-%
-% Revision 1.6  2002/10/16 15:54:22  arno
-% nothing
-%
-% Revision 1.5  2002/10/13 23:54:18  arno
-% implmenting nan_mean
-%
-% Revision 1.4  2002/09/05 15:46:04  arno
-% update header
-%
-% Revision 1.3  2002/08/15 00:43:31  arno
-% corrected fontsize and plot problem
-%
-% Revision 1.2  2002/08/12 21:14:25  arno
-% updating error message
-%
-% Revision 1.1  2002/04/05 17:36:45  jorn
-% Initial revision
-%
-
 % 5-1-96 from showerps.m  -sm from showerp.m -tpj
 % 5-3-96 added default channel numbering, frames & title -sm
 % 5-17-96 added nargin tests below -sm

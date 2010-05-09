@@ -42,8 +42,6 @@
 %
 % Authors:  Hilit Serby, Arnaud Delorme, Scott Makeig, SCCN, INC, UCSD, June, 2005
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) Hilit Serby, SCCN, INC, UCSD, June 08, 2005, hilit@sccn.ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -59,47 +57,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-%$Log: std_dipplot.m,v $
-%Revision 1.29  2009/10/22 00:50:35  arno
-%revert previous version
-%
-%Revision 1.27  2007/10/24 20:37:36  nima
-%subject name moved before cluster name in title and projection lines added for single dipoles.
-%
-%Revision 1.26  2007/10/17 21:21:52  nima
-%Dipole option for 3D spheres set.
-%
-%Revision 1.25  2007/10/17 01:09:51  nima
-%projection lines adde in line 98.
-%
-%Revision 1.24  2007/09/11 10:41:26  arno
-%show warning for empty dipole
-%
-%Revision 1.23  2007/08/14 19:20:35  nima
-%_
-%
-%Revision 1.22  2007/08/03 22:55:45  arno
-%automatic plotting mode
-%
-%Revision 1.21  2007/08/03 22:51:47  arno
-%plotsubjects option
-%
-%Revision 1.20  2007/06/25 04:14:50  toby
-%altered multiple dipole plot windows to indicate number of components and subjects
-%
-%Revision 1.19  2007/05/01 21:06:58  arno
-%fix plot all cluster centroids
-%
-%Revision 1.18  2007/04/30 19:24:45  arno
-%comments
-%
-%Revision 1.17  2007/04/30 19:19:01  arno
-%double dipole bug fix
-%
-%Revision 1.16  2007/04/06 01:04:56  arno
-%revision control
-%
 
 function STUDY = std_dipplot(STUDY, ALLEEG, varargin)
 
@@ -366,8 +323,6 @@ end % finished case of 'all' clusters
 %  See also  pop_clustedit, dipfit, std_dipplot         
 %
 % Authors:  Hilit Serby, Arnaud Delorme, Scott Makeig, SCCN, INC, UCSD, June, 2005
-
-%123456789012345678901234567890123456789012345678901234567890123456789012
 
 % Copyright (C) Hilit Serby, SCCN, INC, UCSD, June 08, 2005, hilit@sccn.ucsd.edu
 %

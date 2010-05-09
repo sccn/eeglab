@@ -15,8 +15,6 @@
 %
 % See also: conv2(), conv()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -32,18 +30,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.3  2002/10/21 01:45:45  arno
-% remove it
-%
-% Revision 1.2  2002/07/29 22:29:25  arno
-% put bug
-%
-% Revision 1.1  2002/04/05 17:39:45  jorn
-% Initial revision
-%
-% 01-25-02 reformated help & license -ad 
 
 function R = convolve( A, B )
 

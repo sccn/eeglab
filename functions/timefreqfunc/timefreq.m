@@ -135,219 +135,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
-% Revision 1.69  2009/12/24 00:20:05  arno
-% edit text
-%
-% Revision 1.68  2009/12/23 23:19:37  arno
-% simplifying time index and values
-%
-% Revision 1.67  2009/11/04 02:47:56  arno
-% timewraper business
-%
-% Revision 1.66  2009/09/26 22:19:03  arno
-% Various fixes to pop_writeeeg, std_movecomp,
-%
-% Revision 1.65  2009/05/07 19:49:43  arno
-% fix for numerical innacuracies in time calculation
-%
-% Revision 1.64  2008/09/24 16:39:36  arno
-% Faster computation if custom time points and allow non power of 2 FFT
-%
-% Revision 1.63  2008/06/25 16:26:26  arno
-% speed up time index lookup
-%
-% Revision 1.62  2008/04/08 15:00:16  arno
-% header edit
-%
-% Revision 1.61  2007/05/18 00:35:14  ywu
-% fastif has strange file
-%
-% Revision 1.60  2007/04/05 22:34:20  arno
-% default values now set if empty param
-%
-% Revision 1.59  2007/04/05 22:26:44  arno
-% freqscale
-%
-% Revision 1.58  2006/11/28 20:35:33  arno
-% dftfilt3 as default
-%
-% Revision 1.57  2006/11/27 23:35:24  arno
-% using dftfilt2 as default until further testing
-%
-% Revision 1.56  2006/11/27 23:23:44  arno
-% revert version 1.53
-%
-% Revision 1.53  2006/10/11 02:54:52  toby
-% timewarp bug fix
-%
-% Revision 1.52  2006/10/04 19:58:51  toby
-% updated to use Rey's Morlet wavelet, documentation updates, code cleanup
-% 'wletmethod' option to choose the freq analysis program you want to use.
-%
-% Revision 1.51  2006/09/26 18:33:38  scott
-% testing
-%
-% Revision 1.50  2006/09/26 17:58:59  scott
-% no changes
-%
-% Revision 1.49  2006/09/07 18:57:57  scott
-% clarified use of Hanning (FFT) or Morlet (wavelet) tapering -sm
-%
-% Revision 1.48  2006/05/05 16:17:02  arno
-% implementing cycle array
-%
-% Revision 1.47  2006/04/18 16:00:45  scott
-% text edits
-%
-% Revision 1.46  2006/04/11 20:11:48  toby
-% Jean's update for timewarp and erpimage()
-%
-% Revision 1.45  2005/05/23 18:24:08  arno
-% error
-%
-% Revision 1.44  2004/02/27 19:11:09  arno
-% reintroducing non-FFT min
-%
-% Revision 1.43  2004/02/27 19:07:07  arno
-% fixing fft limits
-%
-% Revision 1.42  2004/02/24 18:46:33  arno
-% debug FFT log ...
-%
-% Revision 1.41  2004/02/17 19:56:05  arno
-% debug frequency assigment for FFT
-%
-% Revision 1.40  2003/12/10 18:15:11  arno
-% msg
-%
-% Revision 1.39  2003/11/24 20:58:50  arno
-% debug last modif
-%
-% Revision 1.38  2003/11/22 02:28:15  arno
-% msg for removing time points
-%
-% Revision 1.37  2003/11/12 02:49:00  arno
-% adding warnings, reprograming freqs
-%
-% Revision 1.36  2003/10/30 18:46:06  arno
-% time limits in ms
-%
-% Revision 1.35  2003/10/29 01:43:27  arno
-% typo in error msg
-%
-% Revision 1.34  2003/10/29 01:22:06  arno
-% remve debug msg
-%
-% Revision 1.33  2003/10/29 01:20:21  arno
-% more error checking
-%
-% Revision 1.32  2003/10/29 00:13:57  arno
-% processing a single frequency
-%
-% Revision 1.31  2003/10/22 18:07:37  arno
-% if only 1 input for g.freqs
-%
-% Revision 1.30  2003/10/22 17:48:17  arno
-% debuging default spacing between frequencies
-% ,
-%
-% Revision 1.29  2003/10/22 17:06:54  arno
-% winsize length
-%
-% Revision 1.28  2003/07/09 21:29:57  arno
-% implementing ntimesout
-%
-% Revision 1.27  2003/06/27 15:29:45  arno
-% removing deprecated arguments
-%
-% Revision 1.26  2003/06/27 01:00:26  arno
-% updating timeout help
-%
-% Revision 1.25  2003/06/19 00:24:01  arno
-% adding error message if negative number of time points
-%
-% Revision 1.24  2003/05/29 15:14:30  arno
-% allowing vector for timesout
-%
-% Revision 1.23  2003/05/29 14:59:07  arno
-% nothing
-%
-% Revision 1.22  2003/05/22 01:18:56  arno
-% header typo
-%
-% Revision 1.21  2003/05/02 17:57:42  arno
-% removing maxfreq
-%
-% Revision 1.20  2003/05/02 17:34:12  arno
-% implementing ITC option for very big arrays
-%
-% Revision 1.19  2003/04/30 00:07:25  arno
-% debug if window size changes
-%
-% Revision 1.18  2003/04/29 21:53:35  arno
-% rounding trials
-%
-% Revision 1.17  2003/04/29 18:41:27  arno
-% debug computation
-% .,
-%
-% Revision 1.16  2003/04/29 01:08:44  arno
-% new version which can generate wavelets at any frequencies
-%
-% Revision 1.15  2003/01/10 01:26:59  arno
-% nothing
-%
-% Revision 1.14  2003/01/08 23:32:04  arno
-% typo in linear coherence formula
-%
-% Revision 1.13  2003/01/06 17:52:38  arno
-% nothing
-%
-% Revision 1.12  2003/01/05 18:55:12  arno
-% testing
-%
-% Revision 1.11  2003/01/02 20:01:39  arno
-% removing the complex transpose bug
-%
-% Revision 1.10  2002/10/18 14:43:35  arno
-% header
-%
-% Revision 1.9  2002/10/16 01:21:16  arno
-% removing debug plots
-%
-% Revision 1.8  2002/10/16 00:18:34  arno
-% debuging with cooper
-%
-% Revision 1.7  2002/10/15 23:47:29  arno
-% subitc options
-%
-% Revision 1.6  2002/10/15 22:58:59  arno
-% nothing
-%
-% Revision 1.5  2002/10/15 18:29:46  arno
-% changing default wavelet factor
-%
-% Revision 1.4  2002/10/15 00:08:50  arno
-% g.frame -> frame
-%
-% Revision 1.3  2002/10/09 00:03:20  arno
-% debugging
-%
-% Revision 1.2  2002/10/02 00:36:08  arno
-% update condstat, debug
-%
-% Revision 1.1  2002/10/01 16:09:52  arno
-% Initial revision
-%
-% Revision 1.1  2002/09/24 23:28:02  arno
-% Initial revision
-%
-% function for bootstrap initialisation
-% -------------------------------------
-
 function [tmpall, freqs, timesout, itcvals] = timefreq(data, srate, varargin)
-%	nb_points, timesout, naccu, baselength, baseboot, boottype, alpha, rboot);
 
 if nargin < 2
     help timefreq;
@@ -493,7 +281,6 @@ end;
 % compute time vector
 % -------------------
 [ g.timesout g.indexout ] = gettimes(frame, g.tlimits, g.timesout, g.winsize, g.ntimesout, g.causal);
-tmpall      = repmat(nan,[length(freqs) length(g.timesout) trials]);
 
 % -------------------------------
 % compute time freq decomposition
@@ -509,60 +296,109 @@ fprintf('Estimating %d %s-spaced frequencies from %2.1f Hz to %3.1f Hz.\n', leng
 %    fastif(strcmpi(g.freqscale, 'log'), 'log', 'linear'), g.freqs(1), g.freqs(end));
 
 if g.cycles(1) == 0
-    fprintf('Processing trial (of %d):',trials);
-    for trial = 1:trials
-        if rem(trial,10) == 0,  fprintf(' %d',trial); end
-        if rem(trial,120) == 0, fprintf('\n'); end
-        for index = 1:length(g.indexout)
-            if strcmpi(g.causal, 'off')
-                tmpX = data([-g.winsize/2+1:g.winsize/2]+g.indexout(index)+(trial-1)*frame); % 1 point imprecision
-            else
-                tmpX = data([-g.winsize+1:0]+g.indexout(index)+(trial-1)*frame); % 1 point imprecision
-            end;
+    if 1
+        % build large matrix to compute FFT
+        % ---------------------------------
+        indices = repmat([-g.winsize/2+1:g.winsize/2]', [1 length(g.indexout) trials]);
+        indices = indices + repmat(g.indexout, [size(indices,1) 1 trials]);
+        indices = indices + repmat(reshape(([1:trials]-1)*frame,1,1,trials), [size(indices,1) length(g.indexout) 1]);
+        tmpX    = data(indices);
+        tmpX = bsxfun(@minus, tmpX, mean( tmpX, 1)); % avoids repmat - faster than tmpX = tmpX - repmat(mean(tmpX), [size(tmpX,1) 1 1]);
+        tmpX = bsxfun(@times, tmpX, g.win);
+        tmpX = fft(tmpX,2^ceil(log2(g.padratio*g.winsize)));
+        tmpall = tmpX(2:g.padratio*g.winsize/2+1,:,:);
+    else
+        tmpall = repmat(nan,[length(freqs) length(g.timesout) trials]);
+        fprintf('Processing trial (of %d):',trials);
+        for trial = 1:trials
+            if rem(trial,10) == 0,  fprintf(' %d',trial); end
+            if rem(trial,120) == 0, fprintf('\n'); end
+            for index = 1:length(g.indexout)
+                if strcmpi(g.causal, 'off')
+                    tmpX = data([-g.winsize/2+1:g.winsize/2]+g.indexout(index)+(trial-1)*frame); % 1 point imprecision
+                else
+                    tmpX = data([-g.winsize+1:0]+g.indexout(index)+(trial-1)*frame); % 1 point imprecision
+                end;
 
-            tmpX = tmpX - mean(tmpX);
-            if strcmpi(g.detrend, 'on'),
-                tmpX = detrend(tmpX);
-            end;
+                tmpX = tmpX - mean(tmpX);
+                if strcmpi(g.detrend, 'on'),
+                    tmpX = detrend(tmpX);
+                end;
 
-            tmpX = g.win .* tmpX(:);
-            tmpX = fft(tmpX,2^ceil(log2(g.padratio*g.winsize)));
-            tmpX = tmpX(2:g.padratio*g.winsize/2+1);
-            tmpall(:,index, trial) = tmpX(:);
+                tmpX = g.win .* tmpX(:);
+                tmpX = fft(tmpX,2^ceil(log2(g.padratio*g.winsize)));
+                tmpX = tmpX(2:g.padratio*g.winsize/2+1);
+                tmpall(:,index, trial) = tmpX(:);
+            end;
         end;
     end;
 else % wavelet
-    % prepare wavelet filters
-    % -----------------------
-    for index = 1:length(g.win)
-        g.win{index} = transpose(repmat(g.win{index}, [trials 1]));
-    end;
-
-    % apply filters
-    % -------------
-    fprintf('Processing time point (of %d):',length(g.timesout));
-    for index = 1:length(g.indexout)
-        if rem(index,10) == 0,  fprintf(' %d',index); end
-        if rem(index,120) == 0, fprintf('\n'); end
+    tmpall = repmat(nan,[length(freqs) length(g.timesout) trials]);
+    if 0
+        % wavelets are processed in groups of the same size
+        % to speed up computation. Wavelet of groups of different size
+        % can be processed together but at a cost of a lot of RAM and 
+        % a lot of extra computation
+        wt = [ 1 find(diff(cellfun(@length,g.win)))+1 length(g.win)+1];
+        for ind = 1:length(wt)-1
+            wavarray = reshape([ g.win{wt(ind):wt(ind+1)-1} ], [ length(g.win{wt(ind)}) wt(ind+1)-wt(ind) ]);
+            sizewav = size(wavarray,1)-1;
+            indices = repmat([-sizewav/2:sizewav/2]', [1 size(wavarray,2) length(g.indexout) trials]);
+            indices = indices + repmat(reshape(g.indexout, 1,1,length(g.indexout)), [size(indices,1) size(indices,2) 1 trials]);
+            indices = indices + repmat(reshape(([1:trials]-1)*frame,1,1,1,trials), [size(indices,1) size(indices,2) size(indices,3) 1]);
+            tmpX    = data(indices);
+            tmpX    = bsxfun(@minus, tmpX, mean( tmpX, 1)); % avoids repmat - faster than tmpX = tmpX - repmat(mean(tmpX), [size(tmpX,1) 1 1]);
+            tmpall(wt(ind):wt(ind+1)-1,:,:)  = squeeze(sum(bsxfun(@times, tmpX, wavarray),1));
+        end;
+    elseif 0
+        sizewav = length(g.win{1})-1; % max window size
+        mainc   = sizewav/2;
+        indices = repmat([-sizewav/2:sizewav/2]', [1 length(g.indexout) trials]);
+        indices = indices + repmat(g.indexout, [size(indices,1) 1 trials]);
+        indices = indices + repmat(reshape(([1:trials]-1)*frame,1,1,trials), [size(indices,1) length(g.indexout) 1]);
+        
         for freqind = 1:length(g.win)
-            wav = g.win{freqind}; 
-            sizewav = size(wav,1)-1;
-            %g.indexout(index), size(wav,1), g.freqs(freqind)
-            if strcmpi(g.causal, 'off')
-                tmpX = data([-sizewav/2:sizewav/2]+g.indexout(index),:);
-            else
-                tmpX = data([-sizewav:0]+g.indexout(index),:);
-            end;
-            
-            tmpX = tmpX - ones(size(tmpX,1),1)*mean(tmpX);
-            if strcmpi(g.detrend, 'on'),
-                for trial = 1:trials
-                    tmpX(:,trial) = detrend(tmpX(:,trial));
-                end;
-            end;
+            winc = (length(g.win{freqind})-1)/2;
+            wins = length(g.win{freqind})-1;
+            wini = [-wins/2:wins/2]+winc+mainc-winc+1;
+            tmpX = data(indices(wini,:,:));
+            tmpX = bsxfun(@minus, tmpX, mean( tmpX, 1)); % avoids repmat - faster than tmpX = tmpX - repmat(mean(tmpX), [size(tmpX,1) 1 1]);
+            tmpX = sum(bsxfun(@times, tmpX, g.win{freqind}'),1);
+            tmpall(freqind,:,:) = tmpX;
+        end;
+    else
+        % prepare wavelet filters
+        % -----------------------
+        for index = 1:length(g.win)
+            g.win{index} = transpose(repmat(g.win{index}, [trials 1]));
+        end;
 
-            tmpX = sum(wav .* tmpX);
-            tmpall( freqind, index, :) = tmpX;
+        % apply filters
+        % -------------
+        fprintf('Processing time point (of %d):',length(g.timesout));
+        for index = 1:length(g.indexout)
+            if rem(index,10) == 0,  fprintf(' %d',index); end
+            if rem(index,120) == 0, fprintf('\n'); end
+            for freqind = 1:length(g.win)
+                wav = g.win{freqind}; 
+                sizewav = size(wav,1)-1;
+                %g.indexout(index), size(wav,1), g.freqs(freqind)
+                if strcmpi(g.causal, 'off')
+                    tmpX = data([-sizewav/2:sizewav/2]+g.indexout(index),:);
+                else
+                    tmpX = data([-sizewav:0]+g.indexout(index),:);
+                end;
+
+                tmpX = tmpX - ones(size(tmpX,1),1)*mean(tmpX);
+                if strcmpi(g.detrend, 'on'),
+                    for trial = 1:trials
+                        tmpX(:,trial) = detrend(tmpX(:,trial));
+                    end;
+                end;
+
+                tmpX = sum(wav .* tmpX);
+                tmpall( freqind, index, :) = tmpX;
+            end;
         end;
     end;
 end;

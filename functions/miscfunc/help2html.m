@@ -73,8 +73,6 @@
 %        5) if [type] is present in a "descriptor2  - [type] text line 1"
 %           type is bolded.
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -90,74 +88,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.22  2006/03/11 06:40:45  arno
-% close input file
-%
-% Revision 1.21  2003/03/06 01:32:51  arno
-% header typo
-%
-% Revision 1.20  2003/02/17 02:51:36  arno
-% max image size set to 600 instead of 400
-%
-% Revision 1.19  2003/02/17 02:39:57  arno
-% debug feature and document
-%
-% Revision 1.18  2003/02/17 02:36:15  arno
-% do not force image size to 400 if less than 400
-%
-% Revision 1.17  2003/02/17 02:25:10  arno
-% documenting new features
-%
-% Revision 1.16  2003/02/17 02:19:14  arno
-% including gif images now. Also new format
-%
-% Revision 1.15  2002/09/07 23:08:28  scott
-% help msg -sm & ad
-%
-% Revision 1.14  2002/09/07 22:14:54  scott
-% help msg -scott
-%
-% Revision 1.13  2002/08/17 00:52:45  arno
-% [Adebug
-%
-% Revision 1.12  2002/08/17 00:35:56  arno
-% debugging
-%
-% Revision 1.11  2002/08/16 16:53:14  arno
-% debug
-%
-% Revision 1.10  2002/08/16 16:43:58  arno
-% debug componly
-%
-% Revision 1.9  2002/08/16 15:09:33  arno
-% programming output only
-%
-% Revision 1.8  2002/08/15 22:23:25  arno
-% add outputonly param
-%
-% Revision 1.7  2002/08/15 21:42:23  arno
-% add default for outputtext
-%
-% Revision 1.6  2002/08/15 21:16:07  arno
-% debug
-%
-% Revision 1.5  2002/08/15 18:23:17  arno
-% implementing outputtext
-%
-% Revision 1.4  2002/08/12 17:14:33  arno
-% debug
-%
-% Revision 1.3  2002/07/29 00:51:20  arno
-% adding ref search for variable names
-%
-% Revision 1.2  2002/04/22 22:58:30  arno
-% adding extra output parameters
-%
-% Revision 1.1  2002/04/05 17:39:45  jorn
-% Initial revision
-%
 
 function [linktext,allvars,alltext] = help2html( filename, htmlfile, varargin)
 

@@ -12,8 +12,6 @@
 %
 % See also: eeglab(), plottopo()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -29,20 +27,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.4  2002/08/12 16:23:42  arno
-% inputdlg2
-%
-% Revision 1.3  2002/08/12 02:15:37  arno
-% colors
-%
-% Revision 1.2  2002/08/11 22:11:41  arno
-% color
-%
-% Revision 1.1  2002/04/05 17:32:13  jorn
-% Initial revision
-%
 
 % 01-25-02 reformated help & license -ad 
 % 03-11-02 added empty ALLEEG check -ad

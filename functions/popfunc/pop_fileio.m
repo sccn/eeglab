@@ -19,8 +19,6 @@
 %
 % Note: FILEIO toolbox must be installed. 
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2008 Arnaud Delorme, SCCN, INC, UCSD, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -36,26 +34,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.7  2009/09/27 03:51:17  arno
-% Fix latency issue
-%
-% Revision 1.6  2009/09/27 03:46:10  arno
-% *** empty log message ***
-%
-% Revision 1.5  2009/09/27 03:43:58  arno
-% Joe Dien modif
-%
-% Revision 1.3  2009/05/19 21:58:28  arno
-% fix absolute sample limit
-%
-% Revision 1.2  2008/05/05 22:47:06  arno
-% fixing epoch field problem
-%
-% Revision 1.1  2008/04/18 15:24:module of the FieldTrip toolbox12  arno
-% Initial revision
-%
 
 function [EEG, command] = pop_fileio(filename, varargin); 
 EEG = [];

@@ -38,20 +38,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
-% Revision 1.4  2007/08/07 19:43:04  arno
-% fix bug 374
-%
-% Revision 1.3  2007/08/06 18:34:06  arno
-% fix typo according to bug 366
-%
-% Revision 1.2  2002/11/15 02:50:22  arno
-% header for web
-%
-% Revision 1.1  2002/08/22 00:45:16  luca
-% Initial revision
-%
-
 function q = quantile(data,pc); 
 
 if nargin < 2

@@ -46,25 +46,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
-% Revision 1.4  2007/08/07 18:46:02  arno
-% update help message (bug 305)
-%
-% Revision 1.3  2007/08/07 18:40:32  arno
-% fix typo bug 298
-%
-% Revision 1.2  2007/08/06 17:37:00  arno
-% fix typo for bug 306
-%
-% Revision 1.1  2004/06/01 18:37:08  arno
-% Initial revision
-%
-% Revision 1.2  2004/04/01 00:27:22  arno
-% add counter
-%
-% Revision 1.1  2004/04/01 00:26:05  arno
-% Initial revision
-
 function [handles] = plotsphere(pos, rad, varargin);
     
     if nargin < 2

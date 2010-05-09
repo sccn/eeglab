@@ -56,8 +56,6 @@
 %
 % Author: Arnaud Delorme, SCCN & CERCO, CNRS, 2004-
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2004 Arnaud Delorme
 %
 % This program is free software; you can redistribute it and/or modify
@@ -74,43 +72,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-%$Log: std_erpimage.m,v $
-%Revision 1.11  2008/09/19 18:45:13  nima
-%_
-%
-%Revision 1.10  2008/09/19 00:10:18  nima
-%sorttype can now accept more than one string in a cell.
-%
-%Revision 1.9  2008/02/08 20:21:32  arno
-%*** empty log message ***
-%
-%Revision 1.8  2008/01/12 03:08:14  arno
-%add STUDY structure as output
-%
-%Revision 1.7  2008/01/10 23:59:24  arno
-%fix color and non event sorting
-%
-%Revision 1.6  2008/01/10 22:57:42  arno
-%first try
-%
-%Revision 1.5  2008/01/10 00:31:33  arno
-%still in dev.
-%
-%Revision 1.4  2005/11/11 23:40:32  arno
-%nothing
-%
-%Revision 1.3  2005/02/16 02:52:38  arno
-%debug sumary array size
-%
-%Revision 1.2  2005/02/15 02:21:43  arno
-%plot_indiv option
-%
-%Revision 1.1  2005/02/03 00:10:48  arno
-%Initial revision
-%
-
 function [STUDY, allphases, allsortvar, subjamptime, subjamptrial, globalent ] = std_erpimage( STUDY, ALLEEG, varargin);
-    %subjind, data, sortvar, times, titleim, movewin, decim, varargin );
         
     if nargin < 3
         help std_erpimage;

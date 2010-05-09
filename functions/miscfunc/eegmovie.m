@@ -37,17 +37,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
-% Revision 1.3  2007/02/24 02:24:54  toby
-% default value assignment fix
-%
-% Revision 1.2  2002/10/28 23:37:49  arno
-% special case for chanlocs structure
-%
-% Revision 1.1  2002/04/05 17:36:45  jorn
-% Initial revision
-%
-
 % 6/6/97 added movieframes arg -sm
 % 6/12/97 removed old 'startframes' var., fixed vertical line frame selection -sm
 % 6/27/97 debugged vertical line position -sm

@@ -21,8 +21,6 @@
 %
 % See also: icaproj()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2000 Colin Humphries & Scott Makeig, SCCN/INC/UCSD
 %
 % This program is free software; you can redistribute it and/or modify
@@ -38,8 +36,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
 
 % 6-07-97 changed order of args in icaproj above -sm
 % Revised for Matlab 5.0.0.4064 11/97 -ch & sm

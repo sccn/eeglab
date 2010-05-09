@@ -20,8 +20,6 @@
 %
 % See also: eeg_point2lat(), eeglab()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2 Mai 2002 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -37,20 +35,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.4  2005/05/24 17:43:55  arno
-% remove cell2mat
-%
-% Revision 1.3  2003/01/01 18:28:11  scott
-% header edit
-%
-% Revision 1.2  2002/08/08 22:03:37  arno
-% update
-%
-% Revision 1.1  2002/05/03 01:04:30  arno
-% Initial revision
-%
 
 function newlat = eeg_lat2point( lat_array, epoch_array, srate, timewin, timeunit);
 

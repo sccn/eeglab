@@ -38,8 +38,6 @@
 %
 % Author: Scott Makeig & Arnaud Delorme, SCCN, INC, UCSD, Fri Feb 13, 2004
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2004- Scott Makeig & Arnaud Delorme, SCCN, INC, UCSD
 %
 % This program is free software; you can redistribute it and/or modify
@@ -55,8 +53,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
 
 function [pvaf,pvafs,pvall] = eeg_pvaf(EEG,comps, varargin)
 

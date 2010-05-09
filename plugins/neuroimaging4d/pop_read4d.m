@@ -14,14 +14,6 @@
 %
 % See also: eeglab(), read4d(), read4dhdr()
 
-% $Log: not supported by cvs2svn $
-% Revision 1.1  2005/06/08 13:41:21  chris
-% Initial revision
-%
-% Revision 1.1  2004/11/15 19:36:53  chris
-% Initial revision
-%
-
 function [EEG, command] = pop_read4d(filename); 
     
 EEG = [];

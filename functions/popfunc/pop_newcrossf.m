@@ -23,8 +23,6 @@
 %
 % See also: timef(), eeglab() 
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 11 March 2002 arno@salk.edu, Arnaud Delorme, CNL / Salk Institute
 %
 % This program is free software; you can redistribute it and/or modify
@@ -40,123 +38,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.38  2008/04/19 21:08:55  arno
-% added a GUI entry for log scale
-% \.
-%
-% Revision 1.37  2007/10/25 18:32:41  nima
-% _
-%
-% Revision 1.36  2007/08/21 01:24:11  arno
-% default padratio is now 1
-%
-% Revision 1.35  2007/08/07 19:17:59  arno
-% fix bug 343
-%
-% Revision 1.34  2006/07/05 22:16:00  arno
-% fixed problem if only channel labels
-%
-% Revision 1.33  2006/01/31 20:53:15  arno
-% eeglab options
-%
-% Revision 1.32  2005/10/11 16:18:05  arno
-% typo
-%
-% Revision 1.31  2005/08/05 17:15:17  arno
-% fixed command line call
-%
-% Revision 1.30  2005/04/08 23:01:55  arno
-% new version for chaninfo
-%
-% Revision 1.29  2005/03/07 21:21:50  arno
-% chaninfo option
-%
-% Revision 1.28  2004/11/06 03:18:25  arno
-% plotitc -> plotphase
-%
-% Revision 1.27  2004/09/20 18:18:42  hilit
-% added round() on pointrange2 so, the indices will be integers and not double
-%
-% Revision 1.26  2003/08/08 22:17:03  arno
-% comment is_sccn
-%
-% Revision 1.25  2003/08/05 23:28:50  arno
-% fixed tlimit problem
-%
-% Revision 1.24  2003/05/12 02:15:36  arno
-% remove debug msg
-%
-% Revision 1.23  2003/04/22 21:34:58  arno
-% run newnewcrossf at SCCN
-%
-% Revision 1.22  2003/02/23 08:25:16  scott
-% header edits -sm
-%
-% Revision 1.21  2003/02/13 00:04:33  arno
-% debugging last
-%
-% Revision 1.20  2003/02/13 00:00:55  arno
-% background color
-%
-% Revision 1.19  2003/02/01 00:22:01  arno
-% adding title with electrode name
-%
-% Revision 1.18  2002/08/12 01:48:19  arno
-% [6~[6~same
-%
-% Revision 1.17  2002/08/12 01:45:20  arno
-% color
-%
-% Revision 1.16  2002/08/12 01:31:50  arno
-% update color
-%
-% Revision 1.15  2002/08/11 20:50:28  arno
-% color
-%
-% Revision 1.14  2002/08/09 22:32:26  arno
-% updating for wavelet facotr
-%
-% Revision 1.13  2002/07/30 00:21:26  arno
-% new gui and history
-%
-% Revision 1.12  2002/05/03 00:35:47  arno
-% further check
-%
-% Revision 1.11  2002/04/25 02:54:18  arno
-% debugging topovec
-%
-% Revision 1.10  2002/04/24 22:08:58  arno
-% adding tabs
-%
-% Revision 1.9  2002/04/24 21:53:09  scott
-% [same] -sm
-%
-% Revision 1.8  2002/04/24 21:37:25  scott
-% editing topovec call -sm
-%
-% Revision 1.7  2002/04/24 21:15:40  scott
-% editing topovec call -sm
-%
-% Revision 1.6  2002/04/24 21:13:45  scott
-% adjust topovec args -sm
-%
-% Revision 1.5  2002/04/24 21:11:18  scott
-% added topoplots to plot -sm
-%
-% Revision 1.4  2002/04/10 01:27:12  arno
-% padratio=4 default
-%
-% Revision 1.3  2002/04/09 19:28:43  arno
-% modifying argument passing
-%
-% Revision 1.2  2002/04/05 23:59:36  arno
-% correcting figure title.
-%
-% Revision 1.1  2002/04/05 17:32:13  jorn
-% Initial revision
-%
 
 % 03-18-02 added title -ad & sm
 % 04-04-02 added outputs -ad & sm

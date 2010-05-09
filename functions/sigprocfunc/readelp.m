@@ -18,8 +18,6 @@
 %
 % See also: readlocs(), snapread(), floatread(), cart2pol()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) Arnaud Delorme, CNL / Salk Institute, 28 Feb 2002
 %
 % This program is free software; you can redistribute it and/or modify
@@ -35,39 +33,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.10  2005/03/15 18:46:56  arno
-% now reading fidutials
-%
-% Revision 1.9  2004/03/19 18:19:22  arno
-% same
-%
-% Revision 1.8  2004/03/19 18:16:58  arno
-% same
-%
-% Revision 1.7  2004/03/19 18:16:23  arno
-% debug
-%
-% Revision 1.6  2003/11/27 02:44:15  arno
-% header typo
-%
-% Revision 1.5  2002/12/27 23:25:45  scott
-% edit header msg -sm
-%
-% Revision 1.4  2002/12/27 22:48:43  arno
-% fg
-% name -> labels
-%
-% Revision 1.3  2002/11/15 01:39:58  scott
-% Can not -> cannot
-%
-% Revision 1.2  2002/04/21 23:11:17  scott
-% edited help msg -sm
-%
-% Revision 1.1  2002/04/05 17:36:45  jorn
-% Initial revision
-%
 
 function [eloc, names, x, y, z] = readelp( filename ); 
 

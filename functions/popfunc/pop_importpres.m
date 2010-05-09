@@ -35,8 +35,6 @@
 %
 % See also: eeglab(), pop_importevent()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 13 March 2002 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -52,59 +50,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.17  2006/10/18 01:17:17  scott
-% help file edits -sm
-%
-% Revision 1.16  2004/05/24 22:06:56  arno
-% importing duration field
-%
-% Revision 1.15  2004/03/19 00:48:16  arno
-% propagate varargin
-%
-% Revision 1.14  2004/01/29 01:51:16  arno
-% debug cancel button
-%
-% Revision 1.13  2004/01/29 01:39:34  arno
-% debug history
-%
-% Revision 1.12  2004/01/29 01:35:57  arno
-% allow to import any field for type and latency
-%
-% Revision 1.11  2003/12/11 19:52:42  arno
-% allowing different alignments
-%
-% Revision 1.10  2003/11/19 19:28:29  arno
-% allow to import different fields for type
-%
-% Revision 1.9  2003/11/19 18:28:57  arno
-% debug code and event type
-%
-% Revision 1.8  2003/11/07 02:10:39  arno
-% debuging decoding of fields
-%
-% Revision 1.7  2003/11/07 01:45:11  arno
-% reading fields automatically
-%
-% Revision 1.6  2003/11/04 01:11:47  arno
-% change default file filter
-%
-% Revision 1.5  2003/01/24 04:14:46  scott
-% header edit -sm
-%
-% Revision 1.4  2003/01/24 02:14:16  arno
-% changing delimiter to 9
-%
-% Revision 1.3  2002/10/15 17:05:02  arno
-% drawnow
-%
-% Revision 1.2  2002/08/07 17:40:24  arno
-% header
-%
-% Revision 1.1  2002/04/05 17:32:13  jorn
-% Initial revision
-%
 
 function [EEG, command] = pop_importpres(EEG, filename, typefield, latfield, durfield, align, varargin); 
 

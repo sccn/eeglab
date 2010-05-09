@@ -20,8 +20,6 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 9 April 2002
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) Arnaud Delorme, CNL / Salk Institute, 9 April 2002
 %
 % This program is free software; you can redistribute it and/or modify
@@ -37,63 +35,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.18  2006/10/02 11:34:36  arno
-% fix string containing special characters
-%
-% Revision 1.17  2006/07/10 20:09:08  arno
-% nothing
-%
-% Revision 1.16  2005/09/27 22:02:35  arno
-% concatenating lines
-%
-% Revision 1.15  2005/08/05 17:08:13  arno
-% fixing structure to string for Matlab
-% 7
-%
-% Revision 1.14  2005/03/30 22:36:27  arno
-% matlab 5.3 compatibility
-%
-% Revision 1.13  2004/05/28 19:21:05  arno
-% fixing history for 2 elements
-%
-% Revision 1.12  2003/12/09 21:57:13  arno
-% now can process logical values
-%
-% Revision 1.11  2003/12/09 21:48:58  arno
-% convert 2 double
-%
-% Revision 1.10  2003/06/16 15:32:04  arno
-% debug for arrays of indentical numbers
-%
-% Revision 1.9  2003/05/10 19:08:51  arno
-% replacing comma by space
-%
-% Revision 1.8  2003/05/10 19:05:38  arno
-% allowing numerical non integer to form small compact list
-%
-% Revision 1.7  2003/05/10 18:58:21  arno
-% allowing NaN in numerical integer array
-%
-% Revision 1.6  2003/03/06 02:22:10  arno
-% handle spetial case
-%
-% Revision 1.5  2003/01/28 19:00:47  arno
-% making ouput nicer for arrays
-%
-% Revision 1.4  2003/01/28 18:47:33  arno
-% alowing to find non unitary intervals
-%
-% Revision 1.3  2002/04/21 00:52:30  scott
-% edited help -sm
-%
-% Revision 1.2  2002/04/10 01:37:03  arno
-% doubling the quotes in string
-%
-% Revision 1.1  2002/04/10 00:33:44  arno
-% Initial revision
-%
 
 function strout = vararg2str(allargs, inputnam, inputnum, int2str );
 

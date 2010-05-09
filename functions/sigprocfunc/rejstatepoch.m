@@ -54,8 +54,6 @@
 %   normalise the measure given as input and reject trials based on 
 %   an uniform distribution of the data
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -82,29 +80,6 @@
 %           rej2 - global rejection array (size trials)
 %           thr1 - threshold (electrodes)
 %           thr2 - threshold global
-
-% $Log: not supported by cvs2svn $
-% Revision 1.7  2002/08/20 22:25:34  arno
-% debug
-%
-% Revision 1.6  2002/08/12 22:19:34  arno
-% same
-%
-% Revision 1.5  2002/08/12 22:19:15  arno
-% update button and color
-%
-% Revision 1.4  2002/08/11 22:17:09  arno
-% color
-%
-% Revision 1.3  2002/08/07 23:17:24  arno
-% editing text
-%
-% Revision 1.2  2002/08/05 23:43:05  arno
-% update text
-%
-% Revision 1.1  2002/04/05 17:39:45  jorn
-% Initial revision
-%
 
 function [ Irej, Irejdetails, n, threshold, thresholdg] = rejstatepoch( signal, ...
 		rej, varargin); % pnts, th_E, th_rejg, command, commandplot, typetitle, E, rejg);

@@ -57,8 +57,6 @@
 %
 % See also: jointprob(), rejstatepoch(), eegplot(), eeglab(), pop_rejepoch()  
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -74,77 +72,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.23  2006/01/31 20:20:26  arno
-% options
-%
-% Revision 1.22  2004/05/07 22:09:37  arno
-% debug rejecttrials
-%
-% Revision 1.21  2003/12/24 18:12:50  scott
-% help msg and text edits
-%
-% Revision 1.20  2003/12/24 16:52:15  scott
-% pop window text edits
-%
-% Revision 1.19  2003/12/17 18:14:38  arno
-% default reject
-%
-% Revision 1.18  2003/12/04 23:18:26  arno
-% adding code to reject trials
-%
-% Revision 1.17  2003/02/18 22:41:48  arno
-% updating header for GUI
-%
-% Revision 1.16  2002/08/20 22:25:39  arno
-% debug rej_statepoch call
-%
-% Revision 1.15  2002/08/14 00:51:50  arno
-% debug multi-elec
-%
-% Revision 1.14  2002/08/12 21:51:17  arno
-% same
-%
-% Revision 1.13  2002/08/12 21:50:49  arno
-% text
-%
-% Revision 1.12  2002/08/12 02:42:10  arno
-% inputdlg2
-%
-% Revision 1.11  2002/08/07 23:19:43  arno
-% text
-%
-% Revision 1.10  2002/08/07 22:39:54  arno
-% same
-%
-% Revision 1.9  2002/08/07 22:36:04  arno
-% editing
-%
-% Revision 1.8  2002/08/07 22:33:42  arno
-% editing header
-%
-% Revision 1.7  2002/07/31 00:04:10  arno
-% debugging
-%
-% Revision 1.6  2002/07/30 23:21:55  arno
-% debugging
-%
-% Revision 1.5  2002/07/30 22:27:55  arno
-% new type of rejection
-%
-% Revision 1.4  2002/07/26 17:29:54  arno
-% output command debug
-%
-% Revision 1.3  2002/07/26 17:21:03  arno
-% return command if 2 outputs
-%
-% Revision 1.2  2002/07/26 16:40:54  arno
-% switching icacomp
-%
-% Revision 1.1  2002/04/05 17:32:13  jorn
-% Initial revision
-%
 
 % 01-25-02 reformated help & license -ad 
 % 03-07-02 added srate argument to eegplot call -ad

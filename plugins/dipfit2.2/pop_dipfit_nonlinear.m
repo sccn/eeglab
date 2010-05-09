@@ -33,50 +33,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
-% Revision 1.14  2007/08/09 16:15:01  arno
-% debug
-%
-% Revision 1.13  2007/08/07 22:30:38  arno
-% remove try catch comments
-%
-% Revision 1.12  2007/08/07 22:30:01  arno
-% nothing
-%
-% Revision 1.11  2007/01/26 18:19:14  arno
-% CTF implementation
-%
-% Revision 1.10  2006/03/10 23:52:46  arno
-% multiple dipole fit
-%
-% Revision 1.9  2006/03/10 23:33:48  arno
-% GUI wording
-%
-% Revision 1.8  2005/04/08 23:09:05  arno
-% fix defaultconstraint
-%
-% Revision 1.7  2005/03/31 03:02:04  arno
-% auto gui select
-%
-% Revision 1.6  2005/03/31 03:00:02  arno
-% *** empty log message ***
-%
-% Revision 1.5  2005/03/17 19:17:55  arno
-% remove image mri
-%
-% Revision 1.4  2005/03/17 02:21:56  arno
-% com not supported
-%
-% Revision 1.3  2005/03/10 18:14:52  arno
-% warning backtrace
-%
-% Revision 1.2  2005/03/09 19:42:52  arno
-% deactivating diffmap
-%
-% Revision 1.1  2005/03/09 19:42:37  arno
-% Initial revision
-%
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [EEGOUT, com] = pop_dipfit_nonlinear( EEG, subfunction, parent, dipnum )
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

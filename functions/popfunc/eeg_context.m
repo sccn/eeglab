@@ -73,33 +73,6 @@
 % 3/31/04 ruled out searching 'boundary' events -sm
 % 5/06/04 completed the function -sm
 %
-% $Log: not supported by cvs2svn $
-% Revision 1.15  2007/03/08 15:31:00  scott
-% error msgs -sm
-%
-% Revision 1.14  2005/11/01 15:58:33  scott
-% fixed apparent bug in assigning trglt (was evlt); allowed target and neighbor strings
-% improved help message; turned off debug_print  -sm
-%
-% Revision 1.13  2005/10/26 21:15:20  scott
-% ignore 'boundary' type events
-%
-% Revision 1.12  2005/10/26 21:00:52  scott
-% print warning if EEG.event.urevent is empty
-%
-% Revision 1.11  2005/10/26 20:52:44  scott
-% adding break
-%
-% Revision 1.10  2005/08/07 22:46:53  diane
-% allowed urevent type to be a string, 'boundary' for merged datasets! -sm
-%
-% Revision 1.9  2005/08/06 13:33:54  scott
-% checking edit logging -sm
-%
-% Revision 1.8  2005/08/06 13:33:03  scott
-% trying to add edit logging -sm
-%
-
 function [targs,ur_nbrs,ur_nbrtypes,delays,tfields,nfields] = eeg_context(EEG,targets,neighbors,positions,field,alltargs)
 
 verbose     = 0;    % flag useful info printout (1=on|0=off)

@@ -28,8 +28,6 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, May 13, 2003
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) May 13, 2003, Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -45,20 +43,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.4  2006/01/31 20:21:30  arno
-% eeglab options
-%
-% Revision 1.3  2003/05/22 15:03:41  arno
-% [A[Awindow size and header typo
-%
-% Revision 1.2  2003/05/22 03:44:58  scott
-% changed pop-up window text, header message and defaults
-%
-% Revision 1.1  2003/05/14 02:24:03  arno
-% Initial revision
-%
 
 
 function com = pop_export(EEG, filename, varargin); 

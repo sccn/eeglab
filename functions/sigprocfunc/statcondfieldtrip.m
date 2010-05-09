@@ -40,8 +40,6 @@
 %
 % See also: freqanalysis(), statistics_montecarlol()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) Arnaud Delorme
 %
 % This program is free software; you can redistribute it and/or modify
@@ -57,19 +55,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.5  2009/08/21 01:13:19  arno
-% fix channels and time cluster comparison
-%
-% Revision 1.4  2009/08/09 04:57:53  arno
-% Fixes
-%
-% Revision 1.2  2009/08/05 03:21:23  arno
-% New header and new options
-%
-% Revision 1.1  2009/08/04 23:19:22  arno
-% *** empty log message ***
 
 
 function [ ori_vals, df, pvals, surrogval ] = statcondfieldtrip( data, varargin );

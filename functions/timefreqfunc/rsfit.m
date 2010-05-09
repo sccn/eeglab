@@ -43,32 +43,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
-% Revision 1.8  2005/04/27 23:59:14  arno
-% finer fitting
-%
-% Revision 1.7  2004/06/04 17:03:28  arno
-% changing function evaluation
-%
-% Revision 1.6  2003/07/10 00:47:58  arno
-% text typo
-%
-% Revision 1.5  2003/07/10 00:36:52  arno
-% adding plot option
-%
-% Revision 1.4  2003/07/10 00:12:52  arno
-% fix goodness of fit
-%
-% Revision 1.3  2003/07/10 00:00:43  arno
-% compute chi2 goodness of fit
-%
-% Revision 1.2  2003/07/09 16:23:01  arno
-% adding error messages
-%
-% Revision 1.1  2003/07/08 15:59:53  arno
-% Initial revision
-%
-
 function [p, c, l, res] = rsfit(x, val, plotflag)
 
     if nargin < 2

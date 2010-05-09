@@ -38,8 +38,6 @@
 %
 % Authors: Arnaud Delorme, 2006-
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) Arnaud Delorme, SCCN, INC, UCSD, 2006, arno@sccn.ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -55,44 +53,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: std_filecheck.m,v $
-% Revision 1.12  2008/11/13 02:06:12  arno
-% fix guion option
-%
-% Revision 1.11  2007/09/11 10:49:12  arno
-% nothing
-%
-% Revision 1.10  2007/07/03 00:29:16  klaus
-% don't create error if baseline fields are different
-%
-% Revision 1.9  2007/04/05 23:10:36  arno
-% *** empty log message ***
-%
-% Revision 1.8  2007/04/05 22:25:14  arno
-% typo
-%
-% Revision 1.7  2007/04/05 22:22:22  arno
-% handle freqscale better
-%
-% Revision 1.6  2007/03/07 21:41:06  arno
-% do not crash if duplicate fields
-%
-% Revision 1.5  2006/11/16 01:01:57  arno
-% same
-%
-% Revision 1.4  2006/11/16 01:00:54  arno
-% more detailed message
-%
-% Revision 1.3  2006/11/14 04:10:34  arno
-% better messages
-%
-% Revision 1.2  2006/11/14 03:56:38  arno
-% fixed inorefields
-%
-% Revision 1.1  2006/11/14 03:53:31  arno
-% Initial revision
-%
 
 function [ res, params2 ] = std_filecheck(filename, params2, guiflag, ignorefields);
     

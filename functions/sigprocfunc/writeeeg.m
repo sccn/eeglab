@@ -51,8 +51,6 @@
 % Author: Arnaud Delorme, SCCN, UCSD/CERCO, 2009
 %         Based on BIOSIG, sopen and swrite
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 22 March 2002 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -68,17 +66,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.3  2009/10/12 04:57:54  arno
-% Fix strmatch exact for writeeeg
-%
-% Revision 1.2  2009/09/26 22:19:03  arno
-% Various fixes to pop_writeeeg, std_movecomp,
-%
-% Revision 1.1  2009/05/01 01:06:34  arno
-% Allow writing EDF/BDF/GDF files
-%
 
 function HDR = writeeeg(filename, x, srate, varargin)
 

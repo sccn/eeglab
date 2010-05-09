@@ -16,8 +16,6 @@
 %
 % See also: ctf_read(), ctf_readmarkerfile()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2003 Arnaud Delorme, SCCN, UCSD, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -33,42 +31,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.1  2009/01/30 03:49:28  arno
-% *** empty log message ***
-%
-% Revision 1.12  2007/08/14 19:38:04  arnodelorme
-% EEGLAB compatibility
-%
-% Revision 1.11  2007/02/20 20:33:48  psdlw
-% 1. perform the array conversion in a better way to save memory.
-% 2. solved a channel label bug for the UCSD MEG machine.
-%
-% Revision 1.10  2005/12/13 18:56:43  psdlw
-% Resolved EEG.comment initialization and added comments about EEG.filename and EEG.filepath fields.
-%
-% Revision 1.9  2005/10/27 05:34:17  arnodelorme
-% change file name option in pop_read_ctf.m
-%
-% Revision 1.8  2004/07/28 15:44:59  arnodelorme
-% remove command line debug msg
-%
-% Revision 1.7  2004/07/28 15:41:25  arnodelorme
-% command line history for pop_ctf_read
-%
-% Revision 1.5  2004/07/06 23:42:21  psdlw
-% bug fixing an error when no marker file is present
-%
-% Revision 1.4  2004/06/15 17:36:08  arnodelorme
-% updated reading files in 4 functions, pop_ctf_read.m, ctf_read_markerfile.m, ctf_read_meg4.m, ctf_read_res4.m + lots of minor debuging
-%
-% Revision 1.3  2004/06/03 00:15:03  psdlw
-% updated to handle ctf.data as a 3D matrix rather than a cell array of trials
-%
-% Revision 1.2  2004/04/02 17:16:41  arnodelorme
-% Read this file to set up a menu for this toolbox in EEGLAB
-%
 
 % from ctf2eeglab - script to convert and save ctf .ds into eeglab .set data
 %

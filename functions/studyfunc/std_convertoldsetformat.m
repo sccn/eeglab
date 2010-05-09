@@ -7,8 +7,6 @@
 %
 % Author: Arnaud Delorme, SCCN/INC, UCSD 2009-
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2002 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -20,17 +18,6 @@
 % but WITHOUT ANY WARRANTY; without even the implied warranty of
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 % GNU General Public License for more information
-
-% $Log: std_convertoldsetformat.m,v $
-% Revision 1.3  2009/10/20 02:28:35  arno
-% Updated conversion between sets and indices formats
-%
-% Revision 1.2  2009/07/13 21:10:26  arno
-% still working on std_pac
-%
-% Revision 1.1  2009/07/10 01:50:14  arno
-% adding new functions
-%
 
 % How to remove .setind
 %   It is now only in std_preclust but is really embeded in the function

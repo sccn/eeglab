@@ -35,8 +35,6 @@
 %
 % See also: topo2sph(), sph2topo(), chancenter()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 11/1999 Scott Makeig, SCCN/INC/UCSD, scott@sccn.ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -52,66 +50,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.19  2004/02/15 19:30:01  scott
-% help msg
-%
-% Revision 1.18  2003/06/30 15:19:40  arno
-% adding warning if z<0
-%
-% Revision 1.17  2003/06/30 15:13:23  arno
-% added warning
-%
-% Revision 1.16  2002/11/15 01:47:42  arno
-% function typo
-%
-% Revision 1.15  2002/05/02 01:42:22  arno
-% debugging center
-%
-% Revision 1.14  2002/05/02 01:38:10  arno
-% same
-%
-% Revision 1.13  2002/05/02 01:36:46  arno
-% debuging returned values
-%
-% Revision 1.12  2002/05/02 01:33:18  arno
-% returning XYZ
-%
-% Revision 1.11  2002/05/02 01:24:41  arno
-% debugging radius
-%
-% Revision 1.10  2002/05/02 01:23:29  arno
-% using chancenter
-%
-% Revision 1.9  2002/05/02 00:33:14  arno
-% introduce minus
-%
-% Revision 1.8  2002/05/02 00:03:29  arno
-% updating header
-%
-% Revision 1.7  2002/04/27 01:45:18  arno
-% debuged center
-%
-% Revision 1.6  2002/04/26 20:33:37  arno
-% updating message
-% ,
-%
-% Revision 1.5  2002/04/26 20:32:49  arno
-% debugging center empty
-%
-% Revision 1.4  2002/04/26 20:31:23  arno
-% modifying gui
-%
-% Revision 1.3  2002/04/23 01:31:37  erik
-% edited msgs -sm
-%
-% Revision 1.2  2002/04/21 19:46:15  arno
-% reprogrammed with optional arguments and gui
-%
-% Revision 1.1  2002/04/05 17:36:45  jorn
-% Initial revision
-%
 
 % 3-16-00 improved help message -sm
 % 1-25-02 put spherror subfunction inside cart2topo -ad

@@ -29,8 +29,6 @@
 
 % Author: Jason Palmer, SCCN / INC / UCSD, 2008
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) Jason Palmer, SCCN / INC / UCSD , La Jolla 2008
 %
 % This program is free software; you can redistribute it and/or modify

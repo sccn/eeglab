@@ -25,8 +25,6 @@
 %
 % Author: Arnaud Delorme, SCCN, INC, UCSD, 2005
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) Arnaud Delorme, SCCN, INC, UCSD, 2005 arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -42,29 +40,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.7  2005/07/08 16:50:28  arno
-% adding colormap
-%
-% Revision 1.6  2005/07/08 16:48:32  arno
-% scaled activity
-%
-% Revision 1.5  2005/07/01 00:31:46  arno
-% nothing
-%
-% Revision 1.4  2005/05/25 21:24:28  arno
-% header
-%
-% Revision 1.3  2005/05/25 21:22:47  arno
-% making all sizes the same
-%
-% Revision 1.2  2005/04/20 22:19:22  arno
-% button position
-%
-% Revision 1.1  2005/04/20 21:54:38  arno
-% Initial revision
-%
 
 function mri = plotmri( mri, activations, varargin)
     

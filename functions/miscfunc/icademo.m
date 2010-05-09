@@ -10,8 +10,6 @@
 %
 % See also: runica(), icavar(), icaproj(), icaact()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 5-18-97 Scott Makeig, SCCN/INC/UCSD, scott@sccn.ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -27,51 +25,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.14  2005/02/06 01:32:33  arno
-% updating eegplot call
-%
-% Revision 1.13  2004/12/14 15:32:33  arno
-% fixing envtopo
-%
-% Revision 1.12  2004/04/28 06:03:13  scott
-% restoring full function
-%
-% Revision 1.11  2004/04/28 06:02:10  scott
-% othing
-% nothing
-%
-% Revision 1.10  2003/12/04 01:54:10  arno
-% updating paths
-%
-% Revision 1.9  2003/12/03 00:28:50  arno
-% channel location file
-%
-% Revision 1.8  2003/09/20 01:10:56  arno
-% add try, catch clause for movie
-%
-% Revision 1.7  2003/09/17 02:13:53  arno
-% allow automatic run
-%
-% Revision 1.6  2003/09/16 23:34:21  arno
-% debug channel location
-%
-% Revision 1.5  2002/11/13 18:15:36  arno
-% debugging for new function format
-%
-% Revision 1.4  2002/09/06 19:48:40  arno
-% updating eegplot calls
-%
-% Revision 1.3  2002/09/05 17:28:13  arno
-% debugging
-%
-% Revision 1.2  2002/09/05 15:38:39  arno
-% debug for new functions
-%
-% Revision 1.1  2002/04/05 17:36:45  jorn
-% Initial revision
-%
 
 % This version tested on package version
 % Added envproj(), used maxmap in compplot() 6-18-97 -sm

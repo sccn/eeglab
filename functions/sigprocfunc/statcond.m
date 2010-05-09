@@ -102,8 +102,6 @@
 % [F df pval] = statcond(a, 'mode', 'perm', 'naccu', 200); pval
 % [h p t stat] = ttest( a{1}(1,:), a{2}(1,:)); p
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) Arnaud Delorme
 %
 % This program is free software; you can redistribute it and/or modify
@@ -119,69 +117,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.22  2009/11/11 03:20:30  dev
-% Fixed type as per bug 753
-%
-% Revision 1.21  2009/08/06 01:11:16  arno
-% fixing statistical functions
-%
-% Revision 1.20  2009/05/31 02:22:10  arno
-% Adding FDR and bootstrap to all STUDY functions
-%
-% Revision 1.19  2007/05/04 23:19:02  arno
-% *** empty log message ***
-%
-% Revision 1.18  2007/05/04 23:18:18  arno
-% same
-%
-% Revision 1.17  2007/05/04 23:17:02  arno
-% compute correct pval for unpaired t-test
-%
-% Revision 1.16  2007/04/27 22:06:34  arno
-% unpaired condition shuffling
-%
-% Revision 1.15  2007/04/26 22:53:17  arno
-% stat for t-test
-%
-% Revision 1.14  2007/04/06 19:34:42  arno
-% Matlab 6.5 compatibiltiy
-%
-% Revision 1.13  2006/12/30 01:16:55  scott
-% help msg
-% quit
-%
-% Revision 1.12  2006/11/22 19:03:28  arno
-% number of dimensions fix
-%
-% Revision 1.11  2006/11/22 18:46:15  arno
-% fix typo
-%
-% Revision 1.10  2006/11/07 23:11:16  arno
-% implement umpaired t-test, add documentation
-%
-% Revision 1.9  2006/10/03 22:00:58  scott
-% minor help msg edits -sm
-%
-% Revision 1.8  2006/05/11 15:48:07  arno
-% now better detect unpaired data
-%
-% Revision 1.5  2005/12/11 03:06:40  scott
-% help msg editing -sm
-%
-% Revision 1.4  2005/12/09 19:05:13  arno
-% editing header
-%
-% Revision 1.3  2005/12/09 18:43:39  arno
-% scott's edit
-%
-% Revision 1.2  2005/12/07 23:31:23  arno
-% chaging help message - allowing 4-D permutation
-%
-% Revision 1.1  2005/12/07 17:26:09  arno
-% Initial revision
-%
 
 function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
     

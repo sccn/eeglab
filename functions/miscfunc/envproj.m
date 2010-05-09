@@ -42,11 +42,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
-% Revision 1.1  2002/04/05 17:36:45  jorn
-% Initial revision
-%
-
 % 03-19-97 use datamean instead of frames/baseframes, diag(cov()) for var() -sm
 % 04-03-97 changed name to envproj() -sm
 % 05-20-97 used sum-of-squares for var instead of diag() to allow long data 

@@ -30,32 +30,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
-% Revision 1.8  2006/05/12 04:03:00  toby
-% use stable interpolation 'v4' if fast int. from qhull crashes
-%
-% Revision 1.7  2006/05/12 03:41:53  toby
-% qhull related bug, this fix works but slows things down
-%
-% Revision 1.6  2005/06/30 17:48:06  scott
-% same
-%
-% Revision 1.5  2005/06/30 17:46:23  scott
-% fixed bug in yticklabel (sometimes was non-monotonic) -sm
-%
-% Revision 1.4  2005/02/12 01:42:29  hilit
-% added a plot 'on'|'off' option
-%
-% Revision 1.3  2002/10/09 17:37:28  arno
-% set NaNs to 0
-%
-% Revision 1.2  2002/09/27 17:24:22  scott
-% help msg -sm
-%
-% Revision 1.1  2002/04/05 17:36:45  jorn
-% Initial revision
-%
-
 % 08-07-00 made ydir normal -sm
 % 01-25-02 reformated help & license -ad 
 

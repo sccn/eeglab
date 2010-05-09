@@ -38,32 +38,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
-% Revision 1.15  2005/01/24 00:24:57  arno
-% fixed plotting channel location if no chanlocs
-%
-% Revision 1.14  2004/10/03 19:16:56  scott
-% commented out text() calls to work in v7. -sm
-%
-% Revision 1.13  2003/12/03 18:47:21  arno
-% modify command output
-%
-% Revision 1.12  2003/11/18 16:19:42  scott
-% text labels
-%
-% Revision 1.11  2002/11/12 21:32:41  luca
-% added check for empty EEG.chanlocs array
-%
-% Revision 1.10  2002/08/23 22:20:22  luca
-% changed message
-%
-% Revision 1.9  2002/08/23 21:42:50  luca
-% call to signalstat() includes topographic information
-%
-% Revision 1.8  2002/08/12 20:42:47  luca
-% added Log tag, changed popup title, added title for table
-%
-
 function varargout = pop_signalstat( EEG, typeproc, cnum, percent );
 
 % the command output is a hidden output that does not have to

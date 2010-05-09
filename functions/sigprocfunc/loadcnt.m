@@ -39,8 +39,6 @@
 % Known limitations: 
 %  For more see http://www.cnl.salk.edu/~arno/cntload/index.html    
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2000 Sean Fitzgibbon, <psspf@id.psy.flinders.edu.au>
 % Copyright (C) 2003 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
@@ -57,52 +55,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.34  2009/07/03 21:28:26  arno
-% add comment
-%
-% Revision 1.33  2009/07/02 21:55:10  arno
-% show warning for bug 661
-%
-% Revision 1.32  2009/04/21 19:10:52  arno
-% memory mapped
-%
-% Revision 1.22  2009/03/27 18:12:00  rypstat
-% implemented memmapfile option for large .cnt files
-% If you have questions or problems with this code, contact Craig Rypstat
-% at (608)-262-6638 or Rypstat@wisc.edu
-%
-% Revision 1.21  2005/08/16 22:46:55  arno
-% allowing to read event type 3
-%
-% Revision 1.20  2005/05/12 15:50:37  arno
-% keypad modified by Andreas
-%
-% Revision 1.19  2004/11/23 17:08:57  hilit
-% fixed a typo
-%
-% Revision 1.18  2004/09/14 23:31:57  arno
-% dataformat
-%
-% Revision 1.17  2004/09/14 23:27:44  arno
-% opening file as little endian
-%
-% Revision 1.16  2004/03/19 18:52:42  arno
-% blockread msg
-%
-% Revision 1.15  2004/03/19 18:51:26  arno
-% allowing blockread option
-%
-% Revision 1.14  2003/11/05 16:38:08  arno
-% reading events for 32-bit data
-%
-% Revision 1.13  2003/10/30 19:41:01  arno
-% updating error message
-%
-% Revision 1.12  2003/10/30 19:23:54  arno
-% adding revision line
-%
 
 function [f,lab,ev2p] = loadcnt(filename,varargin)
 

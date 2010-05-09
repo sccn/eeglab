@@ -59,8 +59,6 @@
 %
 % See also: pop_importevent()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) Arnaud Delorme, CNL / Salk Institute, 2004, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -78,34 +76,6 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 %% REVISION HISTORY
-% $Log: not supported by cvs2svn $
-% Revision 1.16  2007/08/23 18:03:05  arno
-% NaN option for timeunit
-%
-% Revision 1.15  2007/08/07 20:58:11  arno
-% remove warning for Matlab 7.4
-%
-% Revision 1.14  2007/04/26 23:08:10  arno
-% event array format
-%
-% Revision 1.13  2007/04/26 23:06:01  arno
-% deal with event input type
-%
-% Revision 1.12  2007/03/30 02:01:39  toby
-% minor doc edits
-%
-% Revision 1.11  2007/03/29 02:33:35  toby
-% option 'append' debugged. see bugzilla bug230
-%
-% Revision 1.10  2007/03/27 00:55:55  toby
-% Revert to version 1.8
-%
-% Revision 1.8  2007/03/14 00:54:37  toby
-% cell mode edit
-%
-% Revision 1.7  2007/03/14 00:51:35  toby
-% Logging bug
-
 %% function definition, input check
 function event = importevent(event, oldevent, srate, varargin)
 

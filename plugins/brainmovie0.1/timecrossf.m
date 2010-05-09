@@ -73,54 +73,6 @@
 % but WITHOUT ANY WARRANTY; without even the implied warranty of
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-% $Log: not supported by cvs2svn $
-% Revision 1.14  2003/10/07 17:30:06  arno
-% remove debug message
-%
-% Revision 1.13  2003/10/07 17:25:21  arno
-% removing saving filenames
-%
-% Revision 1.12  2003/08/04 21:43:40  arno
-% change applyboot
-%
-% Revision 1.11  2003/06/18 17:21:04  arno
-% allowing to read file on disk
-%
-% Revision 1.10  2003/04/24 15:46:00  arno
-% debuging standard movie
-%
-% Revision 1.9  2003/04/23 02:04:28  arno
-% updating header
-%
-% Revision 1.8  2002/11/21 00:37:41  arno
-% debugging bootstrap for real negative values
-%
-% Revision 1.7  2002/11/20 01:34:44  arno
-% nbcompo for difference
-% timef and crossf
-%
-% Revision 1.6  2002/11/20 01:27:54  arno
-% redebugging bootstrap
-%
-% Revision 1.5  2002/11/20 01:21:05  arno
-% erspboot -> array
-%
-% Revision 1.4  2002/11/18 19:26:30  arno
-% new output format for condition difference
-%
-% Revision 1.3  2002/11/18 01:46:00  arno
-% debugging new version
-%
-% Revision 1.2  2002/11/18 00:53:43  arno
-% new version
-%
-% Revision 1.1  2002/11/18 00:43:32  arno
-% Initial revision
-%
-% Revision 1.1  2002/11/18 00:33:30  arno
-% Initial revision
-%
-
 function [ ALLERSP, ALLITC, ALLCROSSF, ALLCROSSFANGLE, times, freqs ] = timecrossf(data, frames, tlimits, srate, cycle, varargin);
 
 if nargin < 3

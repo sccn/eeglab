@@ -41,29 +41,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: std_interp.m,v $
-% Revision 1.8  2009/07/02 23:29:06  arno
-% fixed interpolation
-%
-% Revision 1.7  2008/02/15 16:44:50  arno
-% can now use stored bad channel location for interpolation
-%
-% Revision 1.6  2008/02/15 16:43:55  arno
-% *** empty log message ***
-%
-% Revision 1.5  2007/11/15 03:14:06  arno
-% exact match
-%
-% Revision 1.4  2007/03/17 21:09:55  arno
-% Matlab 6.5 compatibility
-%
-% Revision 1.3  2007/02/18 19:05:05  scott
-% help msg consistency and usage -sm
-%
-% Revision 1.2  2006/09/20 12:26:01  arno
-% use function eeg_mergelocs
-%
-
 % Deprecated:
 %              - [chanlocs structure] channel location structure containing
 %                a full channel structure (missing channels in the current 

@@ -31,68 +31,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: pop_precomp.m,v $
-% Revision 1.22  2010/02/24 10:52:36  arno
-% Implemented new single trial statistics
-%
-% Revision 1.21  2009/12/16 02:09:59  arno
-% cosmetic change
-%
-% Revision 1.20  2009/11/11 00:28:53  arno
-% New GUI format
-%
-% Revision 1.19  2009/11/04 01:40:13  arno
-% remove timefreq. option already provided by std_ersp
-%
-% Revision 1.18  2009/08/21 18:40:47  arno
-% changing default
-%
-% Revision 1.17  2009/07/10 00:59:46  arno
-% error if no dataset
-%
-% Revision 1.16  2008/11/13 02:17:36  arno
-% comment
-%
-% Revision 1.15  2008/04/19 21:07:59  arno
-% change polarity of checkbox for components
-%
-% Revision 1.14  2008/04/16 18:40:10  arno
-% fix additional GUI for channels when dealing with compoents
-%
-% Revision 1.12  2007/09/11 10:38:16  arno
-% now can process ICA components
-%
-% Revision 1.11  2007/08/09 18:50:11  arno
-% remove test of channel labels
-%
-% Revision 1.10  2007/08/09 18:44:40  arno
-% fix function if no channel labels for datasets
-%
-% Revision 1.9  2007/04/06 21:46:26  arno
-% remove debug msg
-%
-% Revision 1.8  2007/04/06 21:45:39  arno
-% fix channel selection
-%
-% Revision 1.7  2007/04/06 21:36:01  arno
-% fix testing ERSP and ITC
-%
-% Revision 1.6  2007/02/28 12:02:21  arno
-% recompute tag
-%
-% Revision 1.4  2007/01/26 18:02:55  arno
-% warning message
-%
-% Revision 1.3  2006/11/22 21:05:56  arno
-% fixing time limits
-%
-% Revision 1.2  2006/11/08 01:49:00  arno
-% remove newtimef
-%
-% Revision 1.1  2006/09/12 18:43:23  arno
-% Initial revision
-%
-
 function [STUDY, ALLEEG, com] = pop_precomp(varargin)
 
 com = '';

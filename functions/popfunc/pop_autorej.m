@@ -46,8 +46,6 @@
 %
 % Authors: Julie Onton and Arnaud Delorme, SCCN/INC/UCSD, 2007-
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) Arnaud Delorme, SCCN/INC/UCSD, 2007
 %
 % This program is free software; you can redistribute it and/or modify
@@ -63,59 +61,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.3  2009/05/28 16:01:14  arno
-% Commenting out baselining
-%
-% Revision 1.2  2009/02/09 11:06:08  arno
-% Fix CVS problem with Windows
-%
-% Revision 1.1  2008/02/26 14:56:20  arno
-% Initial revision
-%
-% Revision 1.14  2008/02/07 00:14:22  julie
-% corrected quantification of number of trials rejected to be for channel OR IC rejection method.
-%
-% Revision 1.13  2007/08/14 03:06:18  arno
-% fix rejections of windows
-%
-% Revision 1.12  2007/08/10 00:59:11  arno
-% nothing
-%
-% Revision 1.11  2007/08/10 00:36:16  arno
-% fix bug
-%
-% Revision 1.10  2007/08/02 18:39:43  julie
-% put baseline removal limits into ms.
-%
-% Revision 1.9  2007/08/02 18:37:03  julie
-% nothing
-%
-% Revision 1.8  2007/08/02 18:35:32  julie
-% change baseline removal
-%
-% Revision 1.7  2007/08/02 03:58:37  arno
-% *** empty log message ***
-%
-% Revision 1.6  2007/08/02 03:56:42  arno
-% fix if no ICA
-%
-% Revision 1.5  2007/08/02 03:54:13  arno
-% typo
-%
-% Revision 1.4  2007/08/02 03:14:29  scott
-% help msg -- see XXXXXXX
-%
-% Revision 1.3  2007/08/01 23:50:31  julie
-% minor changes to help
-%
-% Revision 1.2  2007/08/01 23:32:46  julie
-% *** empty log message ***
-%
-% Revision 1.1  2007/08/01 23:23:48  arno
-% Initial revision
-%
 
 function [EEG, rmep, com ] = pop_autorej(EEG, varargin);
     

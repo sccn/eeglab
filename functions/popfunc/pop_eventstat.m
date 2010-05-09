@@ -41,47 +41,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
-% Revision 1.12  2006/05/13 13:36:16  arno
-% allow to process event types with space
-%
-% Revision 1.11  2004/06/03 18:39:38  arno
-% debug to process all events
-%
-% Revision 1.10  2004/06/03 18:29:47  arno
-% debug label
-%
-% Revision 1.9  2004/06/03 18:28:28  arno
-% debug for empty field
-%
-% Revision 1.8  2004/04/28 15:59:15  arno
-% fixing command line call
-%
-% Revision 1.7  2003/12/06 02:09:03  arno
-% same
-%
-% Revision 1.6  2003/12/06 02:08:39  arno
-% header
-%
-% Revision 1.5  2003/11/18 16:28:25  scott
-% Enter ... -> ...
-%
-% Revision 1.4  2002/11/12 16:35:51  arno
-% add error message
-%
-% Revision 1.3  2002/08/23 22:16:37  luca
-% NaNs are omitted, changed message
-%
-% Revision 1.2  2002/08/19 23:54:15  arno
-% adding latency range
-%
-% Revision 1.1  2002/08/15 16:30:01  arno
-% Initial revision
-%
-% Revision 1.8  2002/08/12 20:42:47  luca
-% added Log tag, changed popup title, added title for table
-%
-
 function varargout = pop_eventstat( EEG, eventfield, type, latrange, percent );
 
 % the command output is a hidden output that does not have to

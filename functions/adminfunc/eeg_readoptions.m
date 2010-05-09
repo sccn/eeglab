@@ -19,8 +19,6 @@
 %
 % See also: eeg_options(), eeg_editoptions()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) Arnaud Delorme, SCCN, INC, UCSD, 2006-
 %
 % This program is free software; you can redistribute it and/or modify
@@ -37,23 +35,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
-% Revision 1.4  2007/02/24 02:14:10  toby
-% description edit
-%
-% Revision 1.3  2006/01/31 19:04:23  arno
-% allow default structure
-%
-% Revision 1.2  2006/01/31 18:54:56  arno
-% returns structure
-%
-% Revision 1.1  2006/01/31 18:41:49  arno
-% Initial revision
-%
-% read option file
-% ----------------
-function [ header, opt ] = eeg_readoptions( filename, opt_backup );
-    
     if nargin < 1
         help eeg_readoptions;
         return;

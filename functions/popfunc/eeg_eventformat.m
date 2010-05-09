@@ -40,8 +40,6 @@
 %
 % See also: eeglab(), pop_selectevent(), pop_importevent()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) Arnaud Delorme, CNL / Salk Institute, 27 Jan 2002, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -57,14 +55,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.2  2003/07/20 19:34:38  scott
-% typos
-%
-% Revision 1.1  2002/04/05 17:32:13  jorn
-% Initial revision
-%
 
 % 2/06/02 modifed header - sm & ad
 % 2/08/02 add field input - ad

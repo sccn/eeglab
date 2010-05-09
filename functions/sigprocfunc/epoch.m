@@ -52,8 +52,6 @@
 %
 % See also: pop_epoch(), eeglab()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -69,43 +67,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.10  2003/04/26 00:45:21  arno
-% debug last
-%
-% Revision 1.9  2003/04/26 00:40:05  arno
-% testing for inf
-%
-% Revision 1.8  2003/02/23 09:10:05  scott
-% header edit -sm
-%
-% Revision 1.7  2003/01/14 00:34:25  arno
-% typo in header
-%
-% Revision 1.6  2003/01/14 00:28:45  arno
-% adding more checks if 'allevents' is empty
-%
-% Revision 1.5  2002/09/23 23:06:25  arno
-% debugging limits
-%
-% Revision 1.4  2002/09/06 23:04:23  luca
-% debugging latencies when epoch suppressed
-%
-% Revision 1.3  2002/06/28 01:50:11  arno
-% minor editing
-%
-% Revision 1.2  2002/04/20 00:12:53  arno
-% debuging fro 3 dimensions epoching
-%
-% Revision 1.1  2002/04/05 17:39:45  jorn
-% Initial revision
-%
-% 01-25-02 reformated help & license -ad 
-% 02-13-02 introduction of 'key', val arguments -ad
-% 02-13-02 rereferencing of events -ad
-% 03-12-02 add the 3D epoch option -ad
-% 03-27-02 change time limits -ad
 
 function [epochdat, newtime, indexes, alleventout, alllatencyout, reallim] = epoch( data, events, lim, varargin );
 

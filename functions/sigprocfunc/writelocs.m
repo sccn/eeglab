@@ -71,8 +71,6 @@
 %
 % See also: readlocs(), readelp()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) Arnaud Delorme, CNL / Salk Institute, 28 Feb 2002
 %
 % This program is free software; you can redistribute it and/or modify
@@ -88,51 +86,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.14  2007/03/22 23:40:42  toby
-% help2html
-%
-% Revision 1.13  2007/03/22 23:38:10  toby
-% edit for help2html
-%
-% Revision 1.12  2006/01/10 22:35:25  arno
-% adding type for writing
-%
-% Revision 1.11  2005/03/09 18:49:57  arno
-% new format
-%
-% Revision 1.10  2003/05/13 23:18:51  arno
-% default unicoord on
-%
-% Revision 1.9  2003/05/13 23:13:23  arno
-% verbose off for convertlocs
-%
-% Revision 1.8  2003/05/13 22:30:57  arno
-% unicoord
-%
-% Revision 1.7  2003/05/13 22:10:26  arno
-% debuging writing display
-%
-% Revision 1.6  2003/05/13 21:53:50  arno
-% debug header custom
-%
-% Revision 1.5  2003/05/13 21:42:17  arno
-% debugging header writing
-%
-% Revision 1.4  2002/12/29 00:17:33  scott
-% header
-%
-% Revision 1.3  2002/12/27 23:05:18  scott
-% edit header message - needs more details!! -sm
-% .,
-%
-% Revision 1.2  2002/12/24 16:53:58  arno
-% convertelocs -> convertlocs
-%
-% Revision 1.1  2002/12/24 01:25:27  arno
-% Initial revision
-%
 
 function writelocs( chans, filename, varargin ); 
 

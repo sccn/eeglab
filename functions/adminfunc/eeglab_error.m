@@ -8,8 +8,6 @@
 %
 % see also: eeglab()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2006 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -25,20 +23,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.3  2006/02/17 02:46:52  scott
-% edited error msg -sm
-%
-% Revision 1.2  2006/01/31 19:59:42  arno
-% fixing matlab 5 etc ...
-%
-% Revision 1.1  2006/01/31 00:11:31  arno
-% Initial revision
-%
-% Revision 1.1  2006/01/26 21:25:24  arno
-% Initial revision
-%
 
 function eeglab_error;
 

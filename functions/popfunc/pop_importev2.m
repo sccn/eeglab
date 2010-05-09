@@ -14,8 +14,6 @@
 %
 % Author: Arnaud Delorme, SCCN, INC, UCSD, 2007
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2007 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -31,17 +29,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.3  2007/08/23 19:09:26  arno
-% change uppercase to lowercase
-%
-% Revision 1.2  2007/08/23 18:48:01  arno
-% generate error if wrong alignment
-%
-% Revision 1.1  2007/08/23 18:43:14  arno
-% Initial revision
-%
 
 function [EEG, command] = pop_importev2(EEG, filename); 
 command = '';

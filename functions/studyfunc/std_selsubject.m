@@ -26,23 +26,6 @@
 % 
 % See also: std_erpplot(), std_specplot() and std_erspplot()
 
-% $Log: std_selsubject.m,v $
-% Revision 1.5  2009/10/10 01:38:23  arno
-% fix for std_ersp
-%
-% Revision 1.4  2009/10/10 01:31:23  arno
-% fix scalp maps plotting for ERP (single subjects)
-%
-% Revision 1.3  2009/10/07 05:07:19  arno
-% Fix missing conditions/groups
-%
-% Revision 1.2  2008/02/15 16:29:54  arno
-% handling of several groups for subject selection
-%
-% Revision 1.1  2007/01/26 18:08:54  arno
-% Initial revision
-%
-
 function [data] = std_selsubject(data, subject, setinds, allsubjects, optndims);
 
 if nargin < 2

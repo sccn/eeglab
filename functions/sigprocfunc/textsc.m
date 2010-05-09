@@ -25,14 +25,6 @@
 % All Rights Reserved  January 21, 1994
 % LDM031695jlg
 
-% $Log: not supported by cvs2svn $
-% Revision 1.2  2007/01/26 18:07:16  arno
-% *** empty log message ***
-%
-% Revision 1.1  2002/04/05 17:36:45  jorn
-% Initial revision
-%
-
 function H = textsc(x,y,txt);
 
 % Basic error checking

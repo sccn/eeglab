@@ -26,17 +26,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
-% Revision 1.4  2006/09/14 09:30:49  arno
-% typo
-%
-% Revision 1.3  2005/03/11 16:05:52  arno
-% implement .vol
-%
-% Revision 1.2  2005/03/10 22:11:18  arno
-% *** empty log message ***
-%
-
 function newdipfit = dipfit_1_to_2( dipfit );
 
     if isfield( dipfit, 'model')

@@ -96,8 +96,6 @@
 %
 % See also: importevent(), pop_editeventfield(), pop_selectevent()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) Arnaud Delorme, CNL / Salk Institute, 9 Feb 2002, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -113,103 +111,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: pop_importevent.m,v 
-% Revision 1.30  2004/01/31 01:23:24  arn
-% nothin
-
-% Revision 1.29  2004/01/31 01:16:53  arn
-% message chang
-%
-% Revision 1.28  2003/12/12 00:26:55  arno
-% debuging oldevents and align
-%
-% Revision 1.27  2003/12/11 19:42:45  arno
-% debuging auto alignment
-%
-% Revision 1.26  2003/12/11 02:54:10  arno
-% automatic alignment
-%
-% Revision 1.25  2003/11/19 19:28:46  arno
-% nothing
-%
-% Revision 1.24  2003/11/07 02:14:26  arno
-% more detailed message
-%
-% Revision 1.23  2003/11/07 02:10:56  arno
-% remove events with no latencies
-%
-% Revision 1.22  2003/11/07 01:29:25  arno
-% [Anothing
-%
-% Revision 1.21  2003/11/04 01:11:14  arno
-% fixing reading presentation file problem
-%
-% Revision 1.20  2003/11/04 00:10:49  arno
-% g.delim integer OK
-%
-% Revision 1.19  2003/11/03 23:23:37  arno
-% adapting to new history ...
-%
-% Revision 1.18  2003/11/01 03:05:34  arno
-% removing some double brackets
-%
-% Revision 1.17  2003/11/01 02:58:46  arno
-% implementing finputcheck
-%
-% Revision 1.16  2003/06/18 22:24:40  arno
-% ur events
-%
-% Revision 1.15  2003/06/09 16:53:28  arno
-% nothing
-%
-% Revision 1.14  2003/04/10 17:34:53  arno
-% header edit
-%
-% Revision 1.13  2003/01/24 02:14:12  arno
-% debuging 'delim' option
-%
-% Revision 1.12  2003/01/03 02:20:47  scott
-% header edits -sm
-%
-% Revision 1.11  2003/01/03 01:40:58  arno
-% changing exemple
-%
-% Revision 1.10  2002/11/18 18:18:01  arno
-% removing debugging message
-%
-% Revision 1.9  2002/10/10 21:18:09  arno
-% remove text message
-%
-% Revision 1.8  2002/09/04 17:53:45  luca
-% added ;
-%
-% Revision 1.7  2002/08/12 18:33:09  arno
-% quesdlg2
-%
-% Revision 1.6  2002/08/06 21:49:46  arno
-% spelling
-%
-% Revision 1.5  2002/06/28 02:27:32  arno
-% adding ori fields
-%
-% Revision 1.4  2002/04/18 18:25:27  arno
-% typo can not
-%
-% Revision 1.3  2002/04/18 00:56:36  arno
-% inserting warning for data epochs
-%
-% Revision 1.2  2002/04/10 03:25:28  arno
-% added eeg check set consistency
-%
-% Revision 1.1  2002/04/05 17:32:13  jorn
-% Initial revision
-%
-
-%02/13/2001 fix bug if EEG.event is empty -ad
-%03/12/2001 add timeunit option -ad
-%03/18/2001 debug rename option -ad & sm
-%03/18/2001 correct allignment problem -ad & ja
 
 function [EEG, com] = pop_importevent(EEG, varargin);
 

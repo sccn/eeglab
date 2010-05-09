@@ -23,8 +23,6 @@
 %
 % See also: eeglab()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -40,10 +38,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% 01-25-02 reformated help & license -ad 
-% 03-19-02 make the width independent of the figure size -ad 
 
 function slider( handler, horiz, vert, horizmag, vertmag, allowsup);
 

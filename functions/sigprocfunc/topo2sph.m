@@ -26,8 +26,6 @@
 %
 % See also: sph2topo(), cart2topo()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 1999 Scott Makeig, SCCN/INC/UCSD, scott@sccn.ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -43,22 +41,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.4  2002/07/12 17:27:28  arno
-% programming unshrink factor
-%
-% Revision 1.3  2002/06/29 22:55:21  arno
-% type
-% typo
-%
-% Revision 1.2  2002/06/29 01:25:09  arno
-% adding besa compatibility
-% ,
-%
-% Revision 1.1  2002/04/05 17:36:45  jorn
-% Initial revision
-%
 
 % 3-16-00 changed name to topo2sph() for compatibility with cart2topo() -sm
 % 01-25-02 reformated help & license -ad 

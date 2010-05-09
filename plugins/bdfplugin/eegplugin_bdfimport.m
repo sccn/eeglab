@@ -21,8 +21,6 @@
 %
 % See also: pop_ctf_read(), ctf_read(), ctf_readmarkerfile()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2003 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -38,14 +36,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.2  2009/07/01 23:31:42  arno
-% change mmenu
-%
-% Revision 1.1  2009/06/19 05:04:22  arno
-% bdf plugin
-%
 
 function vers = eegplugin_ctfimport(fig, trystrs, catchstrs)
 

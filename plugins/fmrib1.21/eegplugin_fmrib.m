@@ -34,8 +34,6 @@
 %   
 %   Copyright (c) 2006 University of Oxford
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-%
 % Copyright (C) 2006 University of Oxford
 % Author:   Rami K. Niazy, FMRIB Centre
 %           rami@fmrib.ox.ac.uk
@@ -68,10 +66,6 @@
 
 % DEC 23, 2004
 % (c) & Version update
-
-% $Log: eegplugin_fmrib 
-% Initial Launch: 01 OCT 2004
-% EEGLAB plugin file
 
 
 function vers = eegplugin_fmrib(fig,try_strings,catch_strings)

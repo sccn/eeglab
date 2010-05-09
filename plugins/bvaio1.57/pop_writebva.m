@@ -10,8 +10,6 @@
 %
 % Author: Arnaud Delorme, SCCN, INC, UCSD, 2005-
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2005, Arnaud Delorme, SCCN, INC, UCSD, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -27,41 +25,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.6  2005/12/01 19:39:53  arnodelorme
-% double labeling
-%
-% Revision 1.5  2005/12/01 19:20:13  arnodelorme
-% Nothing
-%
-% Revision 1.4  2005/12/01 19:15:33  arnodelorme
-% Nothing
-%
-% Revision 1.3  2005/12/01 18:49:31  arnodelorme
-% Time 0 and stimulus
-%
-% Revision 1.2  2005/11/22 18:59:57  arnodelorme
-% Updating pop_loadbv & pop_writebva
-%
-% Revision 1.1.1.1  2005/11/03 22:57:36  arnodelorme
-% initial import into CVS
-%
-% Revision 1.5  2005/09/27 22:20:57  arno
-% fix event labels and colors (and channel coordinate)
-%
-% Revision 1.4  2005/08/04 20:23:24  arno
-% segmentationtype & marker file error for continous data
-%
-% Revision 1.3  2005/07/22 18:17:46  arno
-% same
-%
-% Revision 1.2  2005/07/22 18:16:11  arno
-% convert type to string
-%
-% Revision 1.1  2005/07/22 18:06:55  arno
-% Initial revision
-%
 
 function com = pop_writebva(EEG, filename); 
 

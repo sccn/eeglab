@@ -47,68 +47,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: std_readerp.m,v $
-% Revision 1.21  2010/03/09 06:19:10  arno
-% Fixed reading single trials for multiple subject history
-%
-% Revision 1.20  2010/03/07 04:03:55  arno
-% Fix extra code
-%
-% Revision 1.19  2010/03/05 01:25:19  arno
-% Fix threshold and interstat plotting
-%
-% Revision 1.18  2010/02/16 08:43:21  arno
-% New single-trial reading/writing
-%
-% Revision 1.17  2006/09/12 18:55:46  arno
-% channel compatibility
-%
-% Revision 1.16  2006/03/29 18:23:36  scott
-% help msg
-%
-% Revision 1.15  2006/03/14 02:27:04  scott
-% help msg - filename
-%
-% Revision 1.14  2006/03/14 01:51:02  scott
-% help msg
-%
-% Revision 1.13  2006/03/13 23:21:27  arno
-% timerange
-%
-% Revision 1.12  2006/03/11 07:30:41  arno
-% time input
-%
-% Revision 1.11  2006/03/11 07:22:22  arno
-% header
-%
-% Revision 1.10  2006/03/11 07:18:43  arno
-% header information
-%
-% Revision 1.9  2006/03/10 16:08:19  arno
-% select time range
-%
-% Revision 1.8  2006/03/10 00:36:34  arno
-% error msg
-%
-% Revision 1.7  2006/03/09 18:53:15  arno
-% reading all ERPs if necessary
-%
-% Revision 1.6  2006/03/09 18:45:40  arno
-% reading all ERP
-%
-% Revision 1.5  2006/03/09 18:24:36  arno
-% load Matlab file now
-%
-% Revision 1.4  2006/03/08 20:31:25  arno
-% rename func
-%
-% Revision 1.3  2006/03/07 22:21:26  arno
-% use fullfile
-%
-% Revision 1.2  2006/03/07 22:09:25  arno
-% fix error message
-%
-
 function [STUDY, datavals, xvals, setinds, allinds] = std_readerp(STUDY, ALLEEG, varargin)
 
 if nargin < 2

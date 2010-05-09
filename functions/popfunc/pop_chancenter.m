@@ -20,8 +20,6 @@
 %
 % See also: chancenter(), spherror(), cart2topo()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2004, Arnaud Delorme, SCCN/INC/UCSD, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -38,30 +36,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
-% Revision 1.7  2005/01/28 00:41:47  arno
-% same
-%
-% Revision 1.6  2005/01/28 00:39:50  arno
-% add warning
-% /
-%
-% Revision 1.5  2005/01/13 23:03:46  arno
-% same
-%
-% Revision 1.4  2005/01/13 23:01:59  arno
-% omit channels
-%
-% Revision 1.3  2004/11/12 21:41:16  arno
-% fixed channel selectio
-%
-% Revision 1.2  2004/03/04 19:30:14  arno
-% email
-%
-% Revision 1.1  2004/02/12 20:23:43  arno
-% Initial revision
-%
- 
 function [ chanlocs, newcenter, com] = pop_chancenter( chanlocs, center, omitchans)
 
 optim = 0;

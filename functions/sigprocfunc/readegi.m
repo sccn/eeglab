@@ -27,8 +27,6 @@
 %
 % See also: readegihdr()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2002 , Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -44,75 +42,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.22  2006/08/04 19:07:01  zhenkun
-% allowing forceversion arg
-%
-% Revision 1.21  2006/08/04 19:06:19  zhenkun
-% added forceversion
-%
-% Revision 1.20  2006/08/04 18:35:54  zhenkun
-% comment edit
-%
-% Revision 1.19  2006/08/03 23:34:57  arno
-% undo changes
-%
-% Revision 1.18  2006/08/03 23:34:36  arno
-% nothing
-%
-% Revision 1.17  2006/02/09 02:10:38  toby
-% corrected line 220 to use desiredFrames instead of desiredSegments.
-% bug and solution from T. O'Keefe
-%
-% Revision 1.16  2005/02/02 20:08:06  arno
-% empty SegCatIndex if not segmented data
-%
-% Revision 1.15  2005/02/02 20:06:37  arno
-% error msg
-%
-% Revision 1.14  2005/02/02 20:05:15  arno
-% returning segment category indices
-%
-% Revision 1.13  2003/06/11 07:39:35  cooper
-% Added 'dataChunks' input argument.
-%
-% Revision 1.12  2002/12/07 00:32:13  arno
-% converting event codes to char
-%
-% Revision 1.11  2002/12/04 00:33:18  cooper
-% Added conversion of A/D units to microvolts.
-%
-% Revision 1.10  2002/12/03 21:50:16  cooper
-% readegi now compatible with EGI Simple Binary
-% datafile versions 2,3,4,5,6, & 7.
-%
-% Revision 1.9  2002/11/26 20:16:00  cooper
-% Added support for version 5 RAW datafiles.
-% Added a check that the total # of data points
-% read is equal to the # specified in the header.
-%
-% Revision 1.8  2002/11/14 19:00:13  scott
-% help msg
-%
-% Revision 1.7  2002/11/14 18:01:20  arno
-% adding messave
-%
-% Revision 1.6  2002/11/14 18:00:23  arno
-% readEGIhr -> readegihdr
-%
-% Revision 1.5  2002/11/14 17:54:09  arno
-% header typo
-%
-% Revision 1.4  2002/11/14 17:49:51  arno
-% new cooper function
-%
-% Revision 1.3  2002/11/13 02:33:56  arno
-% help
-%
-% Revision 1.2  2002/11/13 02:23:09  arno
-% header ...
-%
 
 function  [head, TrialData, EventData, SegmentCatIndex] = readegi(filename, dataChunks,forceversion)
 

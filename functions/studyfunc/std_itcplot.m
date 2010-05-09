@@ -39,23 +39,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: std_itcplot.m,v $
-% Revision 1.29  2007/03/17 21:12:52  arno
-% same
-%
-% Revision 1.28  2007/03/17 21:11:56  arno
-% fix outputs
-%
-% Revision 1.27  2007/02/28 12:04:22  arno
-% output statistics and documentation
-%
-% Revision 1.26  2006/10/03 23:56:40  scott
-% edit help msg -sm
-%
-% Revision 1.25  2006/09/12 18:51:28  arno
-% reprogram from scratch (statistics...), backward compatible
-%
-                            
 function [STUDY, allitc, alltimes, allfreqs, pgroup, pcond, pinter] = std_itcplot(STUDY, ALLEEG, varargin)
 
 if nargin < 2

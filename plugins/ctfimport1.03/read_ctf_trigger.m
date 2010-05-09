@@ -16,23 +16,6 @@ function [backpanel, frontpanel] = read_ctf_trigger(dataset)
 
 % Copyright (C) 2003, Robert Oostenveld
 %
-% $Log: not supported by cvs2svn $
-% Revision 1.1  2005/12/06 06:24:23  psdlw
-% Alternative functions from the FieldTrip package, which is now released under GPL (so I assume these functions can be committed to the sourceforge cvs)
-%
-% Revision 1.4  2003/10/14 12:37:17  roberto
-% made teh trigshift adaptive to sampling frequency
-%
-% Revision 1.3  2003/09/12 09:27:11  roberto
-% added comment to help about how triggers are supposed to behave
-%
-% Revision 1.2  2003/05/21 10:59:52  roberto
-% fixed bugs in front/backpanel
-%
-% Revision 1.1  2003/05/19 14:40:32  roberto
-% new implementation, replaces inline code in framework/preprocessing
-%
-
 [path, file, ext] = fileparts(dataset);
 datafile   = fullfile(dataset, [file '.meg4']);
 headerfile = fullfile(dataset, [file '.res4']);

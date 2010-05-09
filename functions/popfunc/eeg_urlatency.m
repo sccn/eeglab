@@ -17,8 +17,6 @@
 %
 % See also: eeg_eegrej()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2004 Arnaud Delorme, SCCN, INC, UCSD, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -34,23 +32,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.5  2004/06/11 22:50:24  arno
-% debug duration field
-%
-% Revision 1.4  2004/05/06 21:54:10  arno
-% debug last
-%
-% Revision 1.3  2004/05/06 21:39:36  arno
-% test event format (string?)
-%
-% Revision 1.2  2004/04/20 02:08:48  arno
-% debug
-%
-% Revision 1.1  2004/04/20 01:11:39  arno
-% Initial revision
-%
 
 function latout = eeg_urlatency( events, latin );
     

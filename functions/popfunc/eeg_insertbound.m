@@ -29,8 +29,6 @@
 %
 % See also: eeg_eegrej(), pop_mergeset()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2004 Arnaud Delorme, SCCN, INC, UCSD, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -46,114 +44,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.34  2005/11/02 07:16:05  scott
-% fprintf messages corrected -sm
-%
-% Revision 1.33  2005/08/10 01:47:32  scott
-% clarifying latencies in help msg (Arno, please check the example -sm)
-%
-% Revision 1.32  2005/05/24 17:44:41  arno
-% remove cell2mat
-%
-% Revision 1.31  2004/12/08 18:58:24  arno
-% removing boundary event correcly
-%
-% Revision 1.30  2004/11/16 23:33:00  arno
-% same
-%
-% Revision 1.29  2004/11/16 23:31:48  arno
-% debug event insertion when empty event array
-%
-% Revision 1.28  2004/09/03 15:44:29  arno
-% debug duration
-%
-% Revision 1.27  2004/06/11 14:36:20  arno
-% adding Hilit as functions' author
-%
-% Revision 1.26  2004/06/11 01:26:43  arno
-% recomputing event boundaries ...
-%
-% Revision 1.25  2004/06/08 17:29:39  arno
-% removing boundevent input
-%
-% Revision 1.24  2004/06/07 18:53:13  arno
-% resort event in decreasing latency
-%
-% Revision 1.23  2004/06/07 18:44:35  arno
-% changing variable name
-%
-% Revision 1.22  2004/06/04 01:30:39  arno
-% initial boundary event. Exact boundary latency
-%
-% Revision 1.21  2004/06/03 21:24:31  arno
-% same
-%
-% Revision 1.20  2004/06/03 21:22:57  arno
-% recomputing boundevent latency
-%
-% Revision 1.19  2004/06/02 18:21:18  arno
-% debuging finding boundary length
-%
-% Revision 1.18  2004/06/02 17:30:06  arno
-% returning index to old event
-%
-% Revision 1.17  2004/06/02 17:19:45  arno
-% do not remove nested boundary events
-%
-% Revision 1.16  2004/06/01 21:46:18  arno
-% NaN when concatenating datasets
-%
-% Revision 1.15  2004/05/15 00:59:05  arno
-% allow empty event array
-%
-% Revision 1.14  2004/05/14 22:14:05  arno
-% empty fields for boundary events
-%
-% Revision 1.13  2004/05/14 22:10:04  arno
-% header
-%
-% Revision 1.12  2004/05/14 21:29:06  arno
-% only event not urevents
-%
-% Revision 1.11  2004/05/06 21:53:28  arno
-% same
-%
-% Revision 1.10  2004/05/06 21:52:43  arno
-% debuging for mergeset
-%
-% Revision 1.9  2004/05/06 17:42:32  arno
-% add checkevent input
-% .,
-%
-% Revision 1.8  2004/05/05 01:54:40  arno
-% removing debug message
-%
-% Revision 1.7  2004/05/05 01:50:17  arno
-% same
-%
-% Revision 1.6  2004/05/05 01:49:25  arno
-% debug regions input
-%
-% Revision 1.5  2004/05/05 01:43:11  arno
-% don't know
-%
-% Revision 1.4  2004/05/04 23:19:52  arno
-% typo
-%
-% Revision 1.3  2004/05/04 23:05:02  arno
-% debug length
-%
-% Revision 1.2  2004/05/04 19:01:08  arno
-% removing nested urevent boundarie
-%
-% Revision 1.1  2004/04/20 02:09:31  arno
-% Initial revision
-%
-% Revision 1.1  2004/04/20 01:11:39  arno
-% Initial revision
-%
 
 function [eventout,indnew] = eeg_insertbound( eventin, pnts, regions, lengths);
     

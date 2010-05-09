@@ -28,8 +28,6 @@
 %
 
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-%
 % Copyright (C) 2004 University of Oxford
 % Author:   Rami K. Niazy, FMRIB Centre
 %           rami@fmrib.ox.ac.uk

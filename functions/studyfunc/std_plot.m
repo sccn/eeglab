@@ -2,11 +2,6 @@
 %              frequency decompositions and function std_plotcurve() to
 %              plot erp and spectrum.
 
-% $Log: std_plot.m,v $
-% Revision 1.25  2007/05/22 13:59:56  arno
-% outdated function
-%
-
 % Copyright (C) 2006 Arnaud Delorme
 %
 % This program is free software; you can redistribute it and/or modify

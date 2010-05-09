@@ -55,36 +55,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
-% Revision 1.9  2009/07/02 21:01:14  arno
-% changing comments
-%
-% Revision 1.8  2007/06/05 03:49:32  toby
-% Documentation edits, comments on code lines that may need clarification.
-%
-% Revision 1.7  2004/07/27 18:33:09  arno
-% *** empty log message ***
-%
-% Revision 1.6  2003/01/02 16:51:38  scott
-% header edits -sm
-%
-% Revision 1.5  2003/01/02 04:23:12  cooper
-% fixed type
-% typo, not type
-%
-% Revision 1.4  2002/10/18 14:27:16  arno
-% editing thanks to Cooper
-%
-% Revision 1.3  2002/10/02 00:35:56  arno
-% update condstat, debug
-%
-% Revision 1.2  2002/10/01 16:06:16  arno
-% compute statistics now
-%
-% Revision 1.1  2002/09/24 23:28:02  arno
-% Initial revision
-%
-
 function [diffres, accres, res1, res2] = condstat(formula, naccu, alpha, bootside, condboot, varargin);
 
 if nargin < 6

@@ -5,8 +5,6 @@
 %
 % See also: eeglab()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -22,107 +20,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.33  2005/11/02 18:36:09  arno
-% h -> eegh
-%
-% Revision 1.32  2005/01/28 17:51:02  arno
-% fixing eegplot call for component labels
-%
-% Revision 1.31  2004/11/02 23:45:40  arno
-% fixing electrode labels
-%
-% Revision 1.30  2004/07/07 19:08:06  arno
-% adding history for rejected epochs
-%
-% Revision 1.29  2004/03/08 19:24:10  arno
-% edit box
-%
-% Revision 1.28  2004/03/08 19:22:14  arno
-% label -> marked
-%
-% Revision 1.27  2004/03/08 16:44:20  arno
-% scott edit
-%
-% Revision 1.26  2003/12/04 22:31:35  arno
-% modificationS
-%
-% Revision 1.25  2003/07/22 17:25:40  arno
-% event -> events
-%
-% Revision 1.24  2003/07/12 01:25:16  arno
-% now plotting events
-%
-% Revision 1.23  2003/01/10 01:10:34  arno
-% remove default position
-%
-% Revision 1.22  2002/11/15 19:07:25  arno
-% updating default position
-%
-% Revision 1.21  2002/11/15 19:01:25  arno
-% debugging for ICA
-%
-% Revision 1.20  2002/11/15 01:47:47  scott
-% can not -> cannot
-%
-% Revision 1.19  2002/11/14 01:29:41  arno
-% new mechanism
-%
-% Revision 1.18  2002/08/15 15:23:25  arno
-% debug
-%
-% Revision 1.17  2002/08/12 18:55:29  arno
-% warndlg2
-%
-% Revision 1.16  2002/08/08 00:23:22  arno
-% editing
-%
-% Revision 1.15  2002/08/08 00:22:36  arno
-% adding colmodif option
-%
-% Revision 1.14  2002/08/07 23:13:16  arno
-% updating message
-%
-% Revision 1.13  2002/08/05 16:49:53  arno
-% debugging
-%
-% Revision 1.12  2002/07/31 17:12:10  arno
-% [6~[6~[6~debugging
-%
-% Revision 1.11  2002/07/31 16:59:04  arno
-% debugging
-%
-% Revision 1.10  2002/07/31 16:38:50  arno
-% debugging
-%
-% Revision 1.9  2002/07/31 16:30:37  arno
-% special case for manual rejection
-%
-% Revision 1.8  2002/07/31 16:16:31  arno
-% no change
-%
-% Revision 1.7  2002/07/31 01:01:57  arno
-% debugging for frequencies
-%
-% Revision 1.6  2002/07/30 23:39:30  arno
-% implement rject superposition
-%
-% Revision 1.5  2002/07/26 16:50:33  arno
-% checking icacomp
-%
-% Revision 1.4  2002/07/08 22:02:42  arno
-% adding a warning for data epoch labelling
-%
-% Revision 1.3  2002/06/25 01:48:19  arno
-% changing inputaname to EEG
-%
-% Revision 1.2  2002/04/26 21:27:36  arno
-% updating call to eeg_store
-%
-% Revision 1.1  2002/04/05 17:32:13  jorn
-% Initial revision
-%
 
 % 01-25-02 reformated help & license -ad 
 % 03-08-02 include past rejections in eegplot -ad

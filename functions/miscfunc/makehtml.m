@@ -72,62 +72,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
-% Revision 1.18  2007/03/22 01:58:53  toby
-% edit to inform user what file was crashed on.
-%
-% Revision 1.17  2006/03/11 06:50:36  arno
-% output only etc...
-%
-% Revision 1.16  2003/05/23 17:45:20  arno
-% update header
-%
-% Revision 1.15  2003/01/28 19:51:11  arno
-% deleting destination filename
-%
-% Revision 1.14  2002/12/04 17:40:36  arno
-% mainheader option and tags for titles
-%
-% Revision 1.13  2002/11/21 23:06:37  arno
-% indexfunc -> index
-%
-% Revision 1.12  2002/11/15 02:44:32  arno
-% same
-%
-% Revision 1.11  2002/11/15 02:43:54  arno
-% header for web
-%
-% Revision 1.10  2002/11/15 01:46:47  scott
-% can not -> cannot
-%
-% Revision 1.9  2002/09/07 22:51:11  scott
-% help msg -sm & ad
-%
-% Revision 1.8  2002/09/07 22:11:58  scott
-% help msg -scott
-%
-% Revision 1.7  2002/08/17 20:12:55  arno
-% same
-%
-% Revision 1.6  2002/08/17 20:03:52  arno
-% new background color
-%
-% Revision 1.5  2002/08/17 00:42:33  arno
-% new modifs
-%
-% Revision 1.4  2002/08/16 16:29:36  arno
-% new revision
-%
-% Revision 1.3  2002/08/16 15:12:21  arno
-% after crash
-%
-% Revision 1.2  2002/04/06 01:58:16  arno
-% debugging destination of html files
-%
-% Revision 1.1  2002/04/05 17:39:45  jorn
-% Initial revision
-%
-
 function makehtml( directorylist, outputdir, varargin );
 
 if nargin < 2

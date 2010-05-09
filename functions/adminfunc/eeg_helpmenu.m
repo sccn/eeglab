@@ -11,8 +11,6 @@
 %       
 % See also: eeglab()       
        
-%123456789012345678901234567890123456789012345678901234567890123456789012       
-       
 % Copyright (C) 2001 Arnaud Delorme Salk Institute arno@salk.edu     
 %       
 % This program is free software; you can redistribute it and/or modify       
@@ -28,74 +26,6 @@
 % You should have received a copy of the GNU General Public License       
 % along with this program; if not write to the Free Software      
 % Foundation Inc. 59 Temple Place Suite 330 Boston MA  02111-1307  USA  
-       
-% $Log: not supported by cvs2svn $
-% Revision 1.20  2009/10/20 01:47:02  arno
-% menu update
-%
-% Revision 1.20  2009/10/12 03:10:12  dev
-% update of menu function to EEGLAB v7.1.5.17b
-%
-% Revision 1.19  2009/10/07 03:36:32  arno
-% formating
-%
-% Revision 1.18  2007/02/08 02:49:48  toby
-% partial update to EEGLAB 5
-%
-% Revision 1.17  2007/02/06 20:27:30  toby
-% completed undocumented feature of calling help for a specific file.
-%
-% Revision 1.16  2007/02/06 20:04:34  toby
-% nothing
-%
-% Revision 1.15  2003/07/28 15:14:45  arno
-% averef -> reref
-%
-% Revision 1.14  2002/11/15 00:40:08  arno
-% adding readegi menu
-%
-% Revision 1.13  2002/11/12 01:33:18  arno
-% add BDF read file command
-%
-% Revision 1.12  2002/09/09 02:00:02  arno
-% menu has changed
-%
-% Revision 1.11  2002/09/05 01:34:13  arno
-% menu editing
-%
-% Revision 1.10  2002/09/04 23:21:18  arno
-% updating menu help
-%
-% Revision 1.9  2002/08/16 16:27:28  arno
-% new version with HTML menu generation
-%      
-% Revision 1.8  2002/07/29 18:37:55  arno       
-% updating the menus       
-%       
-% Revision 1.7  2002/07/29 17:06:21  arno       
-% adding menus       
-%       
-% Revision 1.6  2002/04/11 03:36:59  arno       
-% change load/save sets menus       
-%       
-% Revision 1.5  2002/04/06 01:57:38  arno       
-% title editing       
-%       
-% Revision 1.4  2002/04/06 01:20:04  arno       
-% more editing title mainly      
-%       
-% Revision 1.3  2002/04/06 01:09:19  arno       
-% increasing font size       
-%       
-% Revision 1.2  2002/04/06 00:38:13  arno       
-% details on fonts size and formating      
-%       
-% Revision 1.1  2002/04/05 17:46:04  jorn       
-% Initial revision       
-%       
-% 01-25-02 reformated help & license -ad       
-% 03-13-02 updated event function calls -ad       
-% 04-01-02 complete remodelling -ad       
        
 function eeg_helpmenu( filename );       
        

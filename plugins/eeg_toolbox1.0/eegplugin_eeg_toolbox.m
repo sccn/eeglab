@@ -19,8 +19,6 @@
 %
 % Author: Arnaud Delorme, SCC, INC, UCSD
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2006 Arnaud Delorme
 %
 % This program is free software; you can redistribute it and/or modify

@@ -20,8 +20,6 @@
 %
 % See also: plottopo()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 10 March 2002 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -37,53 +35,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.15  2004/09/08 15:16:23  scott
-% made ydir 1 = default  -sm
-%
-% Revision 1.14  2004/04/06 17:31:33  arno
-% adding edit box for options
-%
-% Revision 1.13  2003/05/10 02:30:01  arno
-% continuous array
-%
-% Revision 1.12  2003/03/12 03:18:58  arno
-% help button
-%
-% Revision 1.11  2003/02/21 00:33:09  scott
-% edit header
-%
-% Revision 1.10  2002/08/29 18:34:29  arno
-% changing default background
-%
-% Revision 1.9  2002/08/14 01:39:30  scott
-% figure name plottopo()
-%
-% Revision 1.8  2002/08/12 22:27:52  arno
-% change title
-%
-% Revision 1.7  2002/08/12 16:34:05  arno
-% same
-%
-% Revision 1.6  2002/08/12 02:35:29  arno
-% [6~[6~inputdlg2
-%
-% Revision 1.5  2002/08/12 01:39:10  arno
-% color
-%
-% Revision 1.4  2002/08/11 22:18:23  arno
-% color
-%
-% Revision 1.3  2002/04/24 18:56:29  arno
-% adding vert and others
-%
-% Revision 1.2  2002/04/18 15:45:11  scott
-% editted msgs -sm
-%
-% Revision 1.1  2002/04/05 17:32:13  jorn
-% Initial revision
-%
 
 % 01-25-02 reformated help & license -ad 
 % 02-16-02 text interface editing -sm & ad 

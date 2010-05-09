@@ -50,8 +50,6 @@
 %   for a file with 32 electrodes, 700 points per trial and 300 sweeps, the resulting array is 
 %   of 32 collumn and 700*300 rows (300 consecutive blocs of 700 points) 	 	
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -67,50 +65,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.14  2009/07/03 18:01:26  arno
-% typo in header
-%
-% Revision 1.13  2008/11/22 22:36:20  scott
-% editing abord -> abort
-%
-% Revision 1.12  2007/07/27 21:27:42  arno
-% read truncated datasets
-%
-% Revision 1.11  2007/07/27 21:19:27  arno
-% same
-%
-% Revision 1.10  2007/07/27 21:18:22  arno
-% truncated file
-%
-% Revision 1.9  2007/03/06 17:39:50  arno
-% fix comments
-%
-% Revision 1.8  2007/03/05 18:52:23  arno
-% fixed error message
-%
-% Revision 1.7  2004/11/21 01:48:48  arno
-% add "char" for printing
-%
-% Revision 1.6  2003/11/26 18:17:07  scott
-% help msg
-%
-% Revision 1.5  2003/05/14 16:54:34  arno
-% allowing to read 32-bits data files
-%
-% Revision 1.4  2003/02/28 19:47:15  arno
-% resolving ???
-%
-% Revision 1.3  2003/02/28 19:20:39  scott
-% header edits - see ??? -sm
-%
-% Revision 1.2  2003/02/21 17:26:20  arno
-% updating header
-%
-% Revision 1.1  2002/04/05 17:39:45  arno
-% Initial revision
-%
 
 function [signal, accept, typeeeg, rt, response, chan_names, pnts, ...
 	nsweeps, rate, xmin, xmax]=loadeeg( FILENAME, chanlist, ...

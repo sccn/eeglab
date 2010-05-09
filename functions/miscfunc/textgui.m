@@ -26,8 +26,6 @@
 %  % 'function1' which will call the help of this function. 
 %
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -43,24 +41,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.5  2002/08/14 21:20:22  arno
-% debug for windows
-%
-% Revision 1.4  2002/04/06 02:00:08  arno
-% correcting char size for times font
-%
-% Revision 1.3  2002/04/06 01:19:26  arno
-% changing lines increments between title-text
-%
-% Revision 1.2  2002/04/06 00:37:46  arno
-% multiple lines for title
-%
-% Revision 1.1  2002/04/05 17:39:45  jorn
-% Initial revision
-%
-% 04-04-2002 added style option
 
 function tmp = textgui( textmenu, helparray, varargin);
 

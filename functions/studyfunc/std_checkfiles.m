@@ -27,14 +27,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: std_checkfiles.m,v $
-% Revision 1.2  2010/03/21 20:58:44  arno
-% New STUDY file checking functions and processes
-%
-% Revision 1.1  2010/03/05 00:22:05  arno
-% New function
-%
-
 function [boolval npersubj] = std_checkfiles(STUDY, ALLEEG);
 
 if nargin < 2

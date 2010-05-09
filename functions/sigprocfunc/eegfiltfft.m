@@ -44,32 +44,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
-% Revision 1.9  2007/01/26 17:58:05  arno
-% fix important bug (inverted parameters
-%
-% Revision 1.7  2004/03/04 19:30:41  arno
-% email
-%
-% Revision 1.6  2003/12/03 19:32:25  arno
-% removing debug messages
-%
-% Revision 1.5  2003/12/03 19:18:57  arno
-% same
-%
-% Revision 1.4  2003/12/03 19:18:35  arno
-% same
-%
-% Revision 1.3  2003/12/03 19:17:50  arno
-% debuging filter
-%
-% Revision 1.2  2003/12/03 18:51:45  arno
-% unused filtorder
-%
-% Revision 1.1  2003/12/03 18:26:17  arno
-% Initial revision
-%
-
 function smoothdata = eegfiltfft(data, fs, lowcut, highcut, epochframes, filtorder, revfilt);
     
     if nargin < 4

@@ -26,11 +26,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: std_uniformsetinds.m,v $
-% Revision 1.1  2010/03/21 20:58:45  arno
-% New STUDY file checking functions and processes
-%
-
 function uniformchannels = std_uniformsetinds( STUDY );
 
 uniformchannels = 1;

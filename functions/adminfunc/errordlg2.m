@@ -15,8 +15,6 @@
 %
 % See also: inputdlg2(), questdlg2()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) Arnaud Delorme, CNL / Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -32,29 +30,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.4  2002/11/15 02:15:07  arno
-% header typos
-%
-% Revision 1.3  2002/08/28 01:04:34  arno
-% debugging beep
-%
-% Revision 1.2  2002/08/14 16:44:54  arno
-% beep update
-%
-% Revision 1.1  2002/08/12 18:48:22  arno
-% Initial revision
-%
-% Revision 1.3  2002/08/12 18:24:29  arno
-% debug
-%
-% Revision 1.2  2002/08/12 18:02:47  arno
-% debug
-%
-% Revision 1.1  2002/08/12 18:01:34  arno
-% Initial revision
-%
 
 function errordlg2(Prompt, Title);
 

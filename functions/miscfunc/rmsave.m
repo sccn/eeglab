@@ -3,14 +3,6 @@
 % Usage:
 %         >> ave = rmsave(data,frames);
 
-% $Log: not supported by cvs2svn $
-% Revision 1.2  2002/09/03 15:24:59  arno
-% header update
-%
-% Revision 1.1  2002/04/05 17:36:45  jorn
-% Initial revision
-%
-
 % Scott Makeig, CNL/Salk Institute, La Jolla, 9/98
 
 function ave = rmsave(data,frames)

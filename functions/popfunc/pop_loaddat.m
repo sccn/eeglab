@@ -24,8 +24,6 @@
 %
 % See also: loaddat(), eeglab()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -41,44 +39,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.12  2007/02/20 14:19:36  arno
-% fix command line call
-%
-% Revision 1.11  2005/05/24 17:27:22  arno
-% remove cell2mat
-%
-% Revision 1.10  2003/07/24 18:50:59  arno
-% typo
-%
-% Revision 1.9  2003/04/10 17:36:06  arno
-% header
-%
-% Revision 1.8  2002/10/15 17:01:35  arno
-% *** empty log message ***
-%
-% Revision 1.7  2002/08/22 21:11:18  arno
-% same
-%
-% Revision 1.6  2002/08/22 21:08:21  arno
-% debug strvcat
-%
-% Revision 1.5  2002/08/12 02:39:48  arno
-% inputdlg2
-%
-% Revision 1.4  2002/08/06 21:37:28  arno
-% spelling
-%
-% Revision 1.3  2002/07/31 17:25:34  arno
-% typo
-%
-% Revision 1.2  2002/07/24 16:37:04  arno
-% debugging/reprogramming
-%
-% Revision 1.1  2002/04/05 17:32:13  jorn
-% Initial revision
-%
 
 % 01-25-02 reformated help & license -ad 
 % 13/02/02 removed the no latency option -ad

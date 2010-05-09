@@ -2,8 +2,6 @@
 %
 % Author: Arnaud Delorme, SCCN, INC, UCSD, Nov. 2008
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2008 Arnaud Delorme, SCCN, INC, UCSD
 %
 % This program is free software; you can redistribute it and/or modify
@@ -19,17 +17,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.1  2009/01/29 00:26:45  arno
-% Initial revision
-%
-% Revision 1.2  2008/11/04 00:26:56  arno
-% debuging
-%
-% Revision 1.1  2008/11/04 00:18:01  arno
-% Initial revision
-%
 
 function s = end(a, k, n);
 

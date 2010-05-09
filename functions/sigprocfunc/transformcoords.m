@@ -22,8 +22,6 @@
 %
 % Author: Arnaud Delorme, Salk, SCCN, UCSD, CA, March 23, 2004
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2004 Arnaud Delorme
 %
 % This program is free software; you can redistribute it and/or modify

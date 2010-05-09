@@ -42,20 +42,6 @@ function [H] = traditionaldipfit(f);
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
-% Revision 1.3  2007/04/26 20:35:14  toby
-% Documentation edits/clarifications.
-%
-% Revision 1.2  2006/08/01 20:55:28  arno
-% test for legnth of f
-%
-% Revision 1.1  2006/08/01 20:54:52  arno
-% Initial revision
-%
-% Revision 1.2  2004/05/19 09:57:07  roberto
-% added GPL copyright statement, added CVS log item
-%
-
 % compute the homogenous transformation matrix for the translation
 if length(f) == 6, f(7:9) = 1; end;
 

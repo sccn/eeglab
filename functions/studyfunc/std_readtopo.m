@@ -32,8 +32,6 @@
 %
 % Authors: Arnaud Delorme, Hilit Serby, SCCN, INC, UCSD, February, 2005
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) Hilit Serby, SCCN, INC, UCSD, October 11, 2004, hilit@sccn.ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -49,62 +47,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: std_readtopo.m,v $
-% Revision 1.19  2009/10/21 20:30:53  arno
-% Fix reading files under windows
-%
-% Revision 1.18  2009/10/07 03:37:26  arno
-% fix which problem
-%
-% Revision 1.17  2009/09/29 22:08:21  arno
-% better path lookup
-%
-% Revision 1.16  2009/08/10 23:31:13  arno
-% Fix for windows 64 bit
-%
-% Revision 1.15  2008/02/15 16:47:53  arno
-% Added new option to output either for preclusteringor for plotting
-%
-% Revision 1.14  2007/12/09 01:58:23  arno
-% nothing
-%
-% Revision 1.13  2007/12/09 01:46:59  arno
-% allow reading windows files under Linux
-%
-% Revision 1.12  2007/12/09 01:02:22  arno
-% fix reading topo file
-%
-% Revision 1.11  2007/12/09 00:10:40  arno
-% [6~loading the correct file
-%
-% Revision 1.10  2007/11/14 02:42:48  arno
-% fix the file reference thing
-%
-% Revision 1.9  2007/09/11 10:53:25  arno
-% handles now one file per dataset
-%
-% Revision 1.8  2006/03/14 02:39:40  scott
-% help msg
-%
-% Revision 1.7  2006/03/11 07:23:51  arno
-% header
-%
-% Revision 1.6  2006/03/10 00:37:17  arno
-% error msg
-%
-% Revision 1.5  2006/03/09 19:00:42  arno
-% reading Matlab file
-%
-% Revision 1.4  2006/03/09 00:00:54  arno
-%  now saving Matlab file
-%
-% Revision 1.3  2006/03/08 20:32:48  arno
-% rename func
-%
-% Revision 1.2  2006/03/07 22:14:40  arno
-% use fullfile
-%
 
 function [X, yi, xi ] = std_readtopo(ALLEEG, abset, comps, option, mode)
 

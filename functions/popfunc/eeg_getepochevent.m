@@ -64,8 +64,6 @@
 %
 % See also: eeglab(), epoch() 
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 15 Feb 2002 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -81,90 +79,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.31  2008/09/05 23:07:07  arno
-% fix new calling format
-%
-% Revision 1.28  2008/01/10 19:45:24  arno
-% new calling format
-%
-% Revision 1.27  2007/05/10 03:44:10  toby
-% changed character scaling to maximize spread while avoiding sort inaccuracy
-%
-% Revision 1.26  2007/05/08 19:46:26  peter
-% changed scaling of ascii letters to 0 to 100 ms
-%
-% Revision 1.25  2007/05/08 06:45:54  toby
-% made output 'epochval' always numerical, doc edits
-%
-% Revision 1.24  2007/05/03 21:20:50  toby
-% test variable removed
-%
-% Revision 1.23  2007/05/03 20:55:02  toby
-% made strmatch 'exact' for selecting events.
-% this way '38' is not selected when searching for type '3'
-%
-% Revision 1.22  2005/05/24 17:45:37  arno
-% remove cell2mat
-%
-% Revision 1.21  2005/04/20 21:49:04  arno
-% duration field special cas
-%
-% Revision 1.20  2004/11/11 00:07:42  arno
-% can now process strings
-%
-% Revision 1.19  2004/11/10 23:56:45  arno
-% version 1.16
-%
-% Revision 1.16  2004/06/03 18:32:59  arno
-% msg
-%
-% Revision 1.15  2004/06/03 14:53:44  arno
-% remove count
-%
-% Revision 1.14  2004/06/03 14:51:12  arno
-% debug allepochvals
-%
-% Revision 1.13  2004/06/02 18:21:45  arno
-% adding extra output
-%
-% Revision 1.12  2004/06/02 16:49:00  arno
-% allowing to process continuous data
-%
-% Revision 1.11  2004/06/01 21:43:06  arno
-% adding more examples in header
-%
-% Revision 1.10  2003/01/03 20:46:38  scott
-% header edits -sm
-%
-% Revision 1.9  2002/08/15 16:29:35  arno
-% update message
-%
-% Revision 1.8  2002/07/27 00:24:26  arno
-% updating header
-%
-% Revision 1.7  2002/05/03 01:53:54  arno
-% using eeg_point2lat
-%
-% Revision 1.6  2002/04/22 22:05:53  arno
-% debuggig last change
-%
-% Revision 1.5  2002/04/22 22:01:07  arno
-% corrected time limits
-%
-% Revision 1.4  2002/04/22 21:51:49  arno
-% removing error message for latency
-%
-% Revision 1.3  2002/04/18 18:22:27  arno
-% typo can not
-%
-% Revision 1.2  2002/04/10 03:08:57  arno
-% reprogrammed event selection
-%
-% Revision 1.1  2002/04/05 17:32:13  jorn
-% Initial revision
-%
 
 % 02/15/02 modified function according to new event structure -ad
 

@@ -45,8 +45,6 @@
 
 % Copyright : Jean-Francois Cardoso.  cardoso@sig.enst.fr
 
-% $Log: not supported by cvs2svn $
-
 function B =  jadeR(X,m)
 
 verbose	= 1 ;	% Set to 0 for quiet operation

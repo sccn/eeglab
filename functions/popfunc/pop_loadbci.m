@@ -14,8 +14,6 @@
 %
 % See also: eeglab()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2002 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -31,69 +29,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.23  2005/08/23 21:52:03  hilit
-% changed from fields -> filednames() to avoid confusion with the variable name fields
-%
-% Revision 1.22  2005/04/21 22:16:19  arno
-% put channel labels
-%
-% Revision 1.21  2005/04/21 22:13:17  arno
-% matlab import
-%
-% Revision 1.20  2005/03/24 23:10:39  arno
-% only import data
-%
-% Revision 1.19  2004/09/15 23:40:49  arno
-% fixed strmatch
-%
-% Revision 1.18  2004/08/30 23:57:50  arno
-% same
-%
-% Revision 1.17  2004/08/30 23:56:17  arno
-% only positive events
-%
-% Revision 1.16  2004/08/30 22:37:24  arno
-% cdnew revision
-%
-% Revision 1.15  2003/12/16 20:02:02  arno
-% remove folder separator
-%
-% Revision 1.14  2003/09/23 20:34:03  arno
-% DEBUGGED VERSION 1.9
-%
-% Revision 1.13  2003/09/23 20:31:39  arno
-% revert version 1.9
-% /
-%
-% Revision 1.9  2003/04/10 18:05:22  arno
-% default argument
-%
-% Revision 1.8  2002/11/13 17:09:12  scott
-% help msg
-%
-% Revision 1.7  2002/10/15 17:00:49  arno
-% drawnow
-%
-% Revision 1.6  2002/08/12 16:33:37  arno
-% inputdlg2
-%
-% Revision 1.5  2002/07/11 17:18:15  arno
-% updating header
-%
-% Revision 1.4  2002/07/10 23:44:17  arno
-% debugging events .
-%
-% Revision 1.3  2002/07/09 23:30:50  arno
-% selecting interesting events
-%
-% Revision 1.2  2002/07/08 19:28:15  arno
-% changing function filter
-%
-% Revision 1.1  2002/07/08 19:20:53  arno
-% Initial revision
-%
 
 function [EEG, command] = pop_loadbci(filename, srate); 
 

@@ -25,8 +25,6 @@
 %
 % Authors: Hilit Serby, Arnaud Delorme, SCCN, INC, UCSD, October , 2004
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) Hilit Serby, SCCN, INC, UCSD, October 11, 2004, hilit@sccn.ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify

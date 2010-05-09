@@ -32,27 +32,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
-% Revision 1.6  2003/05/15 21:37:03  arno
-% [Adebug last
-%
-% Revision 1.5  2003/05/15 21:30:32  arno
-% adding properties
-%
-% Revision 1.4  2003/04/30 22:57:40  arno
-% debug scale
-%
-% Revision 1.3  2003/04/29 18:32:44  arno
-% debug
-% last
-%
-% Revision 1.2  2003/04/29 18:30:39  arno
-% adding clim
-%
-% Revision 1.1  2003/04/29 18:27:44  arno
-% Initial revision
-%
-
 function imagesclogy(times,freqs,data,clim, xticks, yticks, varargin)
 
   if size(data,1) ~= length(freqs)

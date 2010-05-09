@@ -41,8 +41,6 @@
 %
 % See also: reref(), eeglab()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2002 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -58,114 +56,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.35  2009/06/28 06:33:38  arno
-% Fixing rereferencing futher
-%
-% Revision 1.34  2009/06/28 05:49:56  arno
-% Adding reference and reprogramming pop_chanedit
-%
-% Revision 1.33  2008/04/16 17:52:46  arno
-% Additional entry to exclude reference from rereferencing
-%
-% Revision 1.32  2007/02/16 18:59:24  scott
-% clarified help msg  -sm
-%
-% Revision 1.31  2006/05/04 10:07:07  arno
-% same
-%
-% Revision 1.29  2005/01/24 19:30:37  arno
-% remove field for Keun re-refencing
-% ,.
-%
-% Revision 1.28  2004/05/14 23:58:23  arno
-% operator precedence
-%
-% Revision 1.27  2004/01/30 23:01:52  arno
-% update channel position only if refloc is set
-%
-% Revision 1.26  2003/11/05 16:24:17  arno
-% homogenous -> homogeneous
-%
-% Revision 1.25  2003/10/14 17:03:08  arno
-% vararg2str for optional arguments
-%
-% Revision 1.24  2003/09/08 22:54:12  arno
-% typo for refstate
-%
-% Revision 1.23  2003/07/31 17:10:05  arno
-% conversion to 3-D for the last channel
-%
-% Revision 1.22  2003/07/31 17:03:31  arno
-% empty last channel
-%
-% Revision 1.21  2003/07/30 18:03:59  arno
-% allowing empty channel location
-%
-% Revision 1.20  2003/07/28 17:53:39  arno
-% channel ref index
-%
-% Revision 1.19  2003/07/28 16:46:49  arno
-% remove redundancy
-%
-% Revision 1.18  2003/07/28 16:42:03  arno
-% text with scott
-%
-% Revision 1.17  2003/07/27 01:19:21  arno
-% debuging GUI call
-%
-% Revision 1.16  2003/07/27 01:09:30  arno
-% debuging
-%
-% Revision 1.15  2003/07/27 00:44:32  arno
-% brand new function for rereferencing
-%
-% Revision 1.14  2003/07/25 23:49:54  arno
-% change interface, warning messages ...
-%
-% Revision 1.13  2003/07/25 00:11:56  arno
-% allowing multiple references
-%
-% Revision 1.12  2003/07/25 00:10:51  arno
-% correct typo
-%
-% Revision 1.11  2003/07/02 01:06:00  arno
-% remove debug msg
-%
-% Revision 1.10  2003/07/02 01:05:34  arno
-% debug msg
-%
-% Revision 1.9  2003/06/11 00:06:16  arno
-% header message
-%
-% Revision 1.8  2003/02/17 02:53:22  arno
-% reformating text for new functionality in help2html
-%
-% Revision 1.7  2003/02/16 23:30:20  arno
-% adding GUI info
-%
-% Revision 1.6  2002/11/13 23:13:51  arno
-% gui mutual exclusion problem
-%
-% Revision 1.5  2002/11/13 23:04:40  arno
-% removing extra electrode in average ref
-%
-% Revision 1.4  2002/11/13 20:29:44  arno
-% debugging
-%
-% Revision 1.3  2002/11/13 19:22:23  arno
-% averef field -> ref field
-%
-% Revision 1.2  2002/11/12 23:23:37  arno
-% mode -> method keyword
-%
-% Revision 1.1  2002/11/12 19:08:34  arno
-% Initial revision
-%
-% Revision 1.1  2002/04/05 17:32:13  arno
-% Initial revision
-%
 
 function [EEG, com] = pop_reref( EEG, ref, varargin);
 

@@ -45,8 +45,6 @@
 %
 % See also: dipplot()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 %   "Use dipoles from" - [list box] use dipoles from BESA or from the
 %                DIPFIT toolbox. Command line equivalent: type.
 
@@ -65,126 +63,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.40  2007/08/09 23:15:21  arno
-% error
-%
-% Revision 1.39  2007/01/26 18:19:52  arno
-% CTF implementation
-%
-% Revision 1.38  2006/10/25 23:07:46  arno
-% convert comps to double
-%
-% Revision 1.37  2006/04/13 20:16:10  arno
-% no need for additional MRI input
-%
-% Revision 1.36  2006/03/10 23:31:45  arno
-% use MRI file
-%
-% Revision 1.35  2006/03/10 23:30:15  arno
-% remove dbug message
-%
-% Revision 1.34  2006/01/23 22:37:20  arno
-% remove second MRI option
-%
-% Revision 1.33  2006/01/19 22:22:44  arno
-% same
-%
-% Revision 1.32  2006/01/19 22:21:56  arno
-% debut command line call
-%
-% Revision 1.31  2005/05/24 17:54:36  arno
-% remove cell2mat
-%
-% Revision 1.30  2005/03/22 19:08:20  arno
-% plotting all dipoles
-%
-% Revision 1.29  2005/03/18 17:52:47  arno
-% turning on 'num' for summary mode
-%
-% Revision 1.28  2005/03/18 17:17:08  arno
-% fixing call to use MRI etc...
-%
-% Revision 1.27  2005/03/17 19:18:51  arno
-% fix typo
-%
-% Revision 1.26  2005/03/17 18:07:28  arno
-% beginning to remove BESA
-%
-% Revision 1.25  2005/03/17 16:39:12  arno
-% using coordformat instead of sph2spm
-%
-% Revision 1.24  2005/03/14 20:09:59  arno
-% fix spherical
-%
-% Revision 1.23  2005/03/11 22:18:22  arno
-% adding meshfile
-% .,
-%
-% Revision 1.22  2005/03/04 23:19:57  arno
-% use new dipplot with MNI coordinates
-%
-% Revision 1.20  2004/03/24 01:26:20  arno
-% same
-%
-% Revision 1.19  2004/03/24 01:25:49  arno
-% output only if gui
-%
-% Revision 1.18  2003/11/05 18:50:22  arno
-% fixing normlen problem
-%
-% Revision 1.17  2003/10/31 19:00:41  arno
-% adding more options
-%
-% Revision 1.16  2003/10/29 16:37:44  arno
-% space in command
-%
-% Revision 1.15  2003/10/29 16:36:49  arno
-% typo last
-%
-% Revision 1.14  2003/10/29 16:35:29  arno
-% moving sphere options
-%
-% Revision 1.13  2003/10/29 16:29:53  arno
-% updating command output
-%
-% Revision 1.12  2003/10/29 16:12:19  arno
-% default sphere for dipfit
-%
-% Revision 1.11  2003/08/04 21:19:14  arno
-% command line call bug
-%
-% Revision 1.10  2003/08/04 18:59:03  arno
-% now plot for scanned dipoles
-%
-% Revision 1.9  2003/06/12 23:51:09  arno
-% put normlen by default
-%
-% Revision 1.8  2003/06/12 23:42:12  arno
-% dipfit dipole localization
-%
-% Revision 1.7  2003/05/06 17:13:32  arno
-% debuging passing parameters
-%
-% Revision 1.6  2003/03/14 22:40:24  arno
-% error fif besa head used for dipfit
-%
-% Revision 1.5  2003/03/14 00:53:04  arno
-% debug for dipfit
-%
-% Revision 1.4  2003/03/13 19:51:07  arno
-% updated for release
-%
-% Revision 1.3  2003/03/11 23:35:27  arno
-% typo
-%
-% Revision 1.2  2003/03/11 23:34:07  arno
-% adding doc and options
-%
-% Revision 1.1  2003/02/26 17:07:14  arno
-% Initial revision
-%
 
 function [com] = pop_dipplot( EEG, comps, varargin);
 

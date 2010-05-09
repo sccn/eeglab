@@ -43,14 +43,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: std_movie.m,v $
-% Revision 1.2  2009/01/26 22:42:47  arno
-% comment
-%
-% Revision 1.1  2008/03/30 12:06:37  arno
-% Initial revision
-%
-
 function [STUDY, M] = std_movie(STUDY, ALLEEG, varargin);
 
 if nargin < 2

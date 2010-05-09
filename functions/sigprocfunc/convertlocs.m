@@ -27,8 +27,6 @@
 %
 % See also: readlocs()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) Arnaud Delorme, CNL / Salk Institute, 22 Dec 2002, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -44,71 +42,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.24  2006/01/10 23:07:56  arno
-% fixing meanrad
-%
-% Revision 1.23  2006/01/10 22:52:42  arno
-% same
-%
-% Revision 1.22  2006/01/10 22:50:53  arno
-% not forcing spherical channel coord to 1
-%
-% Revision 1.21  2006/01/10 22:47:38  arno
-% revert version 1.17
-%
-% Revision 1.17  2005/05/24 17:20:30  arno
-% remove cell2mat
-%
-% Revision 1.16  2004/01/29 16:48:15  scott
-% changed verbose default to 'off'
-%
-% Revision 1.15  2004/01/01 19:21:55  scott
-% help msg edit
-%
-% Revision 1.14  2003/12/17 00:44:36  arno
-% allowing channels with empty coordinates
-%
-% Revision 1.13  2003/12/06 02:11:39  arno
-% header
-%
-% Revision 1.12  2003/12/02 17:53:16  arno
-% updating help messages
-%
-% Revision 1.11  2003/05/13 23:48:59  arno
-% debug convert to besa
-%
-% Revision 1.10  2003/05/13 23:40:39  arno
-% messages
-%
-% Revision 1.9  2003/05/13 23:27:05  arno
-% debuging verbose
-%
-% Revision 1.8  2003/05/13 23:19:48  arno
-% debug last
-%
-% Revision 1.7  2003/05/13 23:18:00  arno
-% adding verbose option
-%
-% Revision 1.6  2002/12/27 22:59:47  arno
-% adding warning message
-%
-% Revision 1.5  2002/12/27 22:46:45  scott
-% edit header msg -sm
-%
-% Revision 1.4  2002/12/27 22:20:07  arno
-% same
-%
-% Revision 1.3  2002/12/27 22:18:26  arno
-% debugging besa coords
-%
-% Revision 1.2  2002/12/24 16:53:41  arno
-% convertelocs -> convertlocs
-%
-% Revision 1.1  2002/12/24 01:24:30  arno
-% Initial revision
-%
 
 function chans = convertlocs(chans, command, varargin);
 

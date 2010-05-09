@@ -8,11 +8,6 @@
 %   sds    = number of +/-std. deviations = steepness 
 %            (~0+ -> flat; >>10 -> spike)
 
-% $Log: not supported by cvs2svn $
-% Revision 1.1  2002/04/05 17:36:45  jorn
-% Initial revision
-%
-
 function outvec = gauss(frames,sds)
 
 outvec = [];

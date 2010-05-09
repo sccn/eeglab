@@ -30,8 +30,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
-
 % 04-03-97  made more efficient -sm
 % 05-20-97  debugged variance calculation and made it more efficient -sm
 % 06-07-97  changed order of args to conform to runica -sm

@@ -78,8 +78,6 @@
 %
 % Authors: Arnaud Delorme, SCCN, INC, UCSD, 2006-
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) Arnaud Delorme, SCCN, INC, UCSD, 2006, arno@sccn.ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -95,90 +93,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: std_precomp.m,v $
-% Revision 1.34  2010/02/24 10:52:37  arno
-% Implemented new single trial statistics
-%
-% Revision 1.33  2010/02/16 08:43:21  arno
-% New single-trial reading/writing
-%
-% Revision 1.32  2009/11/24 21:02:45  arno
-% better error messages
-%
-% Revision 1.31  2009/10/21 20:31:07  arno
-% Fix header
-%
-% Revision 1.30  2009/10/20 02:30:23  arno
-% Fix options for component spectrum
-%
-% Revision 1.29  2008/11/13 02:45:52  arno
-% better interpolation
-%
-% Revision 1.28  2008/11/13 02:45:23  arno
-% revert version 1.26
-%
-% Revision 1.26  2008/11/13 02:34:54  arno
-% nothing
-%
-% Revision 1.25  2008/11/12 23:09:25  arno
-% Matlab 6.5 compatibility
-%
-% Revision 1.24  2008/04/19 21:02:25  arno
-% fix problem concerning computation of channel indices
-%
-% Revision 1.23  2008/04/16 18:40:32  arno
-% do not initialize changrp for component
-% computation
-%
-% Revision 1.21  2008/02/15 16:51:36  arno
-% simplify code for merging channel location files
-%
-% Revision 1.20  2007/12/09 00:40:15  arno
-% recompute for topo
-%
-% Revision 1.19  2007/11/22 23:34:55  arno
-% header
-%
-% Revision 1.18  2007/11/22 23:34:03  arno
-% header
-%
-% Revision 1.17  2007/11/21 16:40:53  arno
-% help msg
-%
-% Revision 1.16  2007/10/25 00:59:39  nima
-% spectopo parameters described in help message.
-%
-% Revision 1.15  2007/09/11 10:51:16  arno
-% precompute measures for components
-%
-% Revision 1.14  2007/04/06 22:09:44  arno
-% recompute tag
-%
-% Revision 1.13  2007/04/05 23:17:55  arno
-% guimode
-%
-% Revision 1.12  2007/04/05 23:13:39  arno
-% *** empty log message ***
-%
-% Revision 1.11  2007/02/28 12:05:14  arno
-% option to force recomputation
-%
-% Revision 1.6  2007/01/29 10:50:27  arno
-% fix ERSP options
-%
-% Revision 1.4  2006/11/14 04:12:53  arno
-% [Asame
-%
-% Revision 1.3  2006/11/14 03:59:25  arno
-% debug ERSP check
-%
-% Revision 1.2  2006/11/14 03:53:18  arno
-% Now checking file on disk
-%
-% Revision 1.1  2006/09/12 18:43:54  arno
-% Initial revision
-%
 
 function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
     

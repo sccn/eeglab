@@ -39,8 +39,6 @@
 %
 % See also: eeglab()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) from eeg_eventformat.m, 
 % Arnaud Delorme, CNL / Salk Institute, 12 Feb 2002, arno@salk.edu
 %
@@ -57,17 +55,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.3  2003/07/20 19:32:20  scott
-% typos
-%
-% Revision 1.2  2002/04/21 01:10:35  scott
-% *** empty log message ***
-%
-% Revision 1.1  2002/04/05 17:32:13  jorn
-% Initial revision
-%
 
 % 03/13/02 added field arrays options -ad
 

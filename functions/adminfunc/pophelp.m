@@ -28,50 +28,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
-% Revision 1.13  2009/08/04 04:44:22  arno
-% All functions necessary for compiling EEGLAB code
-%
-% Revision 1.12  2006/10/02 11:33:52  arno
-% Just copy and paste
-% for another program?
-%
-% Revision 1.11  2005/02/03 18:51:34  arno
-% fixing missing character
-%
-% Revision 1.10  2003/03/12 03:12:34  arno
-% special help for pop_functions
-%
-% Revision 1.9  2003/03/12 02:59:32  arno
-% adding pop and eponymous help
-%
-% Revision 1.8  2002/11/15 02:47:39  arno
-% header for web
-%
-% Revision 1.7  2002/10/23 15:05:15  arno
-% isppc -> computer
-%
-% Revision 1.6  2002/10/15 17:15:15  arno
-% windows -> removing last function character
-%
-% Revision 1.5  2002/08/13 15:26:44  arno
-% updating colors
-%
-% Revision 1.4  2002/07/29 15:53:09  arno
-% same
-%
-% Revision 1.3  2002/07/29 15:51:06  arno
-% debugging
-%
-% Revision 1.2  2002/07/29 15:50:15  arno
-% can also read non-matlab files
-%
-% Revision 1.1  2002/04/05 17:39:45  jorn
-% Initial revision
-%
-% 01-25-02 reformatted help & license -ad 
-% 3/19/02 Edited help message (below) -sm 
-
 function pophelp( funct, nonmatlab );
 
 if nargin <1

@@ -13,8 +13,6 @@
 %
 % Authors:  Arnaud Delorme & Hilit Serby, SCCN, INC, UCSD, November 2005
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) Arnaud Delorme, SCCN, INC, UCSD, arno@sccn.ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -30,119 +28,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: std_checkset.m,v $
-% Revision 1.71  2009/11/04 02:28:28  arno
-% now uses std_reset
-%
-% Revision 1.70  2008/03/30 12:04:47  arno
-% text if old version and remove fields allinds and setinds
-%
-% Revision 1.69  2007/11/29 20:13:46  nima
-% msg comment - Arno
-%
-% Revision 1.68  2007/11/02 02:13:25  arno
-% fix the correct session code
-%
-% Revision 1.67  2007/11/01 23:10:06  arno
-% removing version testing
-%
-% Revision 1.66  2007/11/01 23:06:05  arno
-% removing message
-%
-% Revision 1.65  2007/10/18 22:02:51  nima
-% _
-%
-% Revision 1.64  2007/09/11 11:13:57  arno
-% add bug ref
-%
-% Revision 1.63  2007/09/11 10:40:42  arno
-% detect inconsistent time-frequency decomposition
-%
-% Revision 1.62  2007/08/24 00:56:36  arno
-% better error message
-%
-% Revision 1.61  2007/08/23 17:27:49  arno
-% session and group problem
-%
-% Revision 1.60  2007/08/23 17:16:03  arno
-% remove debug message
-%
-% Revision 1.59  2007/08/23 17:15:24  arno
-% better testing for correcting session
-%
-% Revision 1.58  2007/08/23 00:52:34  arno
-% delete STUDY.cluster and changrp
-%
-% Revision 1.57  2007/08/23 00:43:50  arno
-% checking that different group have different session names
-%
-% Revision 1.56  2007/08/22 01:39:52  arno
-% fix special case of negative indices in STUDY
-%
-% Revision 1.55  2007/08/22 01:25:57  arno
-% bettter check for the study
-%
-% Revision 1.54  2007/08/13 21:23:51  arno
-% nothing
-%
-% Revision 1.53  2007/08/13 18:32:46  arno
-% removing channel group if old version
-%
-% Revision 1.52  2007/08/12 02:45:47  arno
-% aiutomatically generate changrp
-%
-% Revision 1.51  2007/08/12 02:15:17  arno
-% still better warning
-%
-% Revision 1.50  2007/08/12 02:12:14  arno
-% better warning
-%
-% Revision 1.49  2007/08/09 21:27:02  arno
-% messag
-%
-% Revision 1.48  2007/08/09 21:09:41  arno
-% typo
-%
-% Revision 1.47  2007/08/09 20:26:04  arno
-% typos
-%
-% Revision 1.46  2007/08/09 16:29:31  arno
-% message when removing measures
-%
-% Revision 1.45  2007/08/09 01:25:54  arno
-% removing all data if old study
-%
-% Revision 1.44  2007/07/31 03:41:57  arno
-% message
-%
-% Revision 1.43  2007/07/30 22:20:38  arno
-% *** empty log message ***
-%
-% Revision 1.42  2007/06/25 07:42:57  toby
-% added warning if NaNs in STUDY.setind
-%
-% Revision 1.41  2007/02/28 12:02:42  arno
-% minor thing
-%
-% Revision 1.39  2006/12/07 22:19:17  arno
-% removing changrp for now
-%
-% Revision 1.38  2006/12/07 22:07:23  arno
-% changrp check
-%
-% Revision 1.37  2006/12/07 20:22:02  arno
-% make changrp by default
-%
-% Revision 1.36  2006/11/10 01:42:32  arno
-% set changrp to empty
-%
-% Revision 1.35  2006/11/08 22:37:02  arno
-% history, test if studywasempty
-%
-% Revision 1.34  2006/10/10 04:12:36  toby
-% load bug fixed, save revision info added
-%
 
 function [STUDY, ALLEEG] = std_checkset(STUDY, ALLEEG, option);
 

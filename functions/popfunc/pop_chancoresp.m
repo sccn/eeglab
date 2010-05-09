@@ -26,8 +26,6 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2005
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2005 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -43,44 +41,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.12  2007/08/07 19:50:53  arno
-% typo in help
-%
-% Revision 1.11  2007/08/07 18:25:07  arno
-% remove duplicate text bug 273
-%
-% Revision 1.10  2007/08/07 18:23:22  arno
-% remove unused variables
-%
-% Revision 1.9  2007/08/07 18:15:49  arno
-% update help and catch error
-%
-% Revision 1.8  2006/10/25 22:02:38  arno
-% undo last changes
-%
-% Revision 1.7  2006/10/25 21:40:03  arno
-% handle duplicate channel name
-%
-% Revision 1.6  2006/03/15 23:07:58  scott
-% edited help msg and gui text
-%
-% Revision 1.5  2006/01/20 23:57:00  arno
-% header
-%
-% Revision 1.4  2006/01/14 00:35:22  arno
-% debugging output
-%
-% Revision 1.3  2006/01/12 23:53:05  arno
-% fix output when no gui
-%
-% Revision 1.2  2006/01/10 00:42:14  arno
-% fixing somthing (cannot remember)
-%
-% Revision 1.1  2005/11/22 00:24:38  arno
-% Initial revision
-%
 
 function [chanlistout1, chanlistout2, thirdout, outfourth] = pop_chancoresp(chans1, chans2, varargin); 
     

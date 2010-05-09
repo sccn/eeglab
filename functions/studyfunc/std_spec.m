@@ -68,8 +68,6 @@
 % Defunct:      0 -> if frequency range is different from saved spectra, ask via a 
 %                    pop-up window whether to keep existing spectra or to overwrite them. 
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) Arnaud Delorme, SCCN, INC, UCSD, October 11, 2004, arno@sccn.ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -85,122 +83,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: std_spec.m,v $
-% Revision 1.45  2010/03/21 20:57:56  arno
-% fix single trial computation for continuous data
-%
-% Revision 1.44  2010/02/25 10:00:41  arno
-% fixed saving channel labels
-%
-% Revision 1.43  2010/02/24 15:19:27  claire
-% compute FFT for continuous datasets
-%
-% Revision 1.42  2010/02/24 10:52:37  arno
-% Implemented new single trial statistics
-%
-% Revision 1.41  2010/02/16 08:43:21  arno
-% New single-trial reading/writing
-%
-% Revision 1.40  2009/10/31 00:37:08  dev
-% fixing boundary event problem for numerical type
-%
-% Revision 1.39  2009/10/20 02:30:41  arno
-% Implement pmtm
-%
-% Revision 1.38  2009/08/04 23:21:25  arno
-% naccu
-%
-% Revision 1.37  2009/07/30 04:42:30  arno
-% Take into account boundaries for spectopo
-%
-% Revision 1.36  2008/04/16 17:55:12  arno
-% interpolation plus removing ICA components
-%
-% Revision 1.35  2007/08/15 23:29:23  arno
-% change EEG.pnts depending on the window time range
-%
-% Revision 1.34  2007/08/13 19:12:57  arno
-% better saving of options
-%
-% Revision 1.33  2007/08/13 18:58:32  arno
-% nothing
-%
-% Revision 1.32  2007/08/13 01:18:45  arno
-% update help message
-%
-% Revision 1.31  2007/02/28 12:04:59  arno
-% force recompute
-%
-% Revision 1.29  2006/11/21 21:59:45  arno
-% computing ICA activity bug
-%
-% Revision 1.28  2006/11/10 00:11:12  arno
-% default specmode is using spectopo
-%
-% Revision 1.27  2006/10/02 11:42:11  arno
-% plotting scalp maps
-%
-% Revision 1.25  2006/03/10 22:40:21  arno
-% saving average spectrum
-%
-% Revision 1.24  2006/03/10 17:04:56  arno
-% only one spectrum version
-%
-% Revision 1.23  2006/03/09 18:07:45  arno
-% remove output argument
-%
-% Revision 1.22  2006/03/09 18:05:45  arno
-% reprogramming function
-%
-% Revision 1.21  2006/03/09 00:48:39  arno
-% do not resave dataset if changing limits
-%
-% Revision 1.20  2006/03/09 00:39:31  arno
-% erase allspec first
-%
-% Revision 1.19  2006/03/09 00:37:35  arno
-% now writing matlab file
-%
-% Revision 1.18  2006/03/08 20:28:13  arno
-% rename func
-%
-% Revision 1.17  2006/03/07 22:31:01  arno
-% typo in test
-%
-% Revision 1.16  2006/03/07 22:28:58  arno
-% fix header
-%
-% Revision 1.15  2006/03/07 03:56:49  scott
-% edited help msg; made accept specified components -sm
-%
-% Revision 1.14  2006/03/06 23:16:31  arno
-% change field for resave
-%
-% Revision 1.13  2006/03/06 23:11:52  arno
-% remove comments
-%
-% Revision 1.12  2006/03/05 15:52:25  arno
-% allowing overwrite == 2
-%
-% Revision 1.11  2006/03/05 00:21:20  scott
-% checking on overwrite options - they look ~  -sm
-%
-% Revision 1.10  2006/03/04 04:11:45  scott
-% edited help and msgs  -sm
-%
-% Revision 1.9  2006/03/03 21:42:55  arno
-% new message; remove GUI
-%
-% Revision 1.8  2006/03/03 21:37:17  arno
-% new message
-%
-% Revision 1.7  2006/03/03 21:32:07  arno
-% same
-%
-% Revision 1.6  2006/03/03 21:29:52  arno
-% update change dir, ICA computatation, read/write
-%
 
 function [X, f, overwrt] = std_spec(EEG, varargin)
 

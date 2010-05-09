@@ -45,8 +45,6 @@
 %
 % See also: loadcnt(), eeglab()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -62,107 +60,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.37  2009/04/21 19:11:19  arno
-% memory mapping
-%
-% Revision 1.32 2009/03/27 18:12:00 rypstat
-% adding large file processing option
-%
-% Revision 1.31  2006/04/27 17:04:30  arno
-% fixing Andreas addition
-%
-% Revision 1.30  2005/10/24 23:33:15  arno
-% fix filename
-%
-% Revision 1.29  2005/05/24 17:28:06  arno
-% remove cell2mat
-%
-% Revision 1.28  2005/05/12 15:51:23  arno
-% deal with keypad etc...
-%
-% Revision 1.27  2004/12/08 18:01:55  arno
-% debug offset
-%
-% Revision 1.26  2004/11/17 00:13:49  arno
-% adding 1 to offset
-%
-% Revision 1.25  2004/09/14 23:31:11  arno
-% nothing
-%
-% Revision 1.24  2004/04/29 17:13:17  arno
-% ignoring keystroke events
-%
-% Revision 1.23  2004/03/17 22:52:29  arno
-% import keystroke event type
-%
-% Revision 1.22  2003/12/17 23:20:49  arno
-% debug last
-%
-% Revision 1.21  2003/12/17 23:19:51  arno
-% importing channel labels
-%
-% Revision 1.20  2003/10/30 19:38:39  arno
-% removing warnings
-%
-% Revision 1.19  2003/08/21 17:38:40  arno
-% nothing
-%
-% Revision 1.18  2003/08/01 21:16:30  arno
-% header info
-%
-% Revision 1.17  2003/07/29 21:26:34  arno
-% new loadcnt version
-%
-% Revision 1.16  2003/07/28 22:07:44  arno
-% no more block factor
-%
-% Revision 1.15  2003/07/25 00:59:26  arno
-% removing blockread option
-%
-% Revision 1.14  2003/06/19 16:14:59  arno
-% makeur
-%
-% Revision 1.13  2003/05/20 01:49:01  arno
-% allowing to import keystrokes
-%
-% Revision 1.12  2003/05/20 00:46:11  arno
-% debug if no events
-%
-% Revision 1.11  2003/05/14 17:16:27  arno
-% putting time range in gui
-%
-% Revision 1.10  2003/04/23 21:29:49  arno
-% removing filepath
-%
-% Revision 1.9  2003/04/10 17:56:52  arno
-% debuging function and history
-%
-% Revision 1.8  2003/04/10 17:35:29  arno
-% header and history
-%
-% Revision 1.7  2003/03/05 19:48:42  arno
-% removing matlab warning
-%
-% Revision 1.6  2002/11/23 21:10:02  arno
-% importing type of event
-%
-% Revision 1.5  2002/10/22 23:57:21  arno
-% change default blockread
-%
-% Revision 1.4  2002/10/15 17:01:13  arno
-% drawnow
-%
-% Revision 1.3  2002/08/12 02:40:59  arno
-% inputdlg2
-%
-% Revision 1.2  2002/08/06 21:33:30  arno
-% spelling
-%
-% Revision 1.1  2002/04/05 17:32:13  jorn
-% Initial revision
-%
 
 % 01-25-02 reformated help & license -ad 
 

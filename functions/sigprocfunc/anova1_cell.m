@@ -37,8 +37,6 @@
 % Reference:
 %   Schaum's outlines in statistics (3rd edition). 1999. Mc Graw-Hill.
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) Arnaud Delorme
 %
 % This program is free software; you can redistribute it and/or modify
@@ -54,20 +52,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.6  2007/08/08 01:17:43  arno
-% same
-%
-% Revision 1.5  2007/08/08 01:14:48  arno
-% fix bug 336, uses anova2_cell instead
-%
-% Revision 1.4  2006/05/05 18:15:18  arno
-% fix last changes
-%
-% Revision 1.1  2005/12/07 17:25:58  arno
-% Initial revision
-%
 
 function [F, df] = anova1_cell(data)
     

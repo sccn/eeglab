@@ -22,11 +22,6 @@
 % but WITHOUT ANY WARRANTY; without even the implied warranty of
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-% $Log: not supported by cvs2svn $
-% Revision 1.2  2002/04/10 22:25:10  arno
-% *** empty log message ***
-%
-
 function h = superline(X, Y, color, thickness, offset, middle);
 
 if nargin < 2

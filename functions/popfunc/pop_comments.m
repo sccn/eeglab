@@ -28,8 +28,6 @@
 %
 % See also: eeglab()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -45,56 +43,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.16  2006/07/10 20:15:39  arno
-% fixing empty comment problem
-%
-% Revision 1.15  2005/11/04 17:56:02  arno
-% fixing closing several windows
-%
-% Revision 1.14  2005/09/27 22:01:28  arno
-% fix multiline text for windows
-%
-% Revision 1.13  2004/05/14 18:24:00  arno
-% fixing double quote problem
-%
-% Revision 1.12  2004/05/14 17:16:18  hilit
-% chnaged the help message
-%
-% Revision 1.11  2003/05/09 22:04:46  arno
-% making the comments incremental
-%
-% Revision 1.10  2003/04/09 23:28:12  arno
-% debuging command line call
-%
-% Revision 1.9  2002/08/17 01:03:34  scott
-% font change, OK -> SAVE
-%
-% Revision 1.8  2002/08/12 01:23:16  arno
-% update colors
-%
-% Revision 1.7  2002/08/12 01:22:20  arno
-% updating colors
-%
-% Revision 1.6  2002/04/10 19:21:28  arno
-% debuging cancel button
-%
-% Revision 1.5  2002/04/10 19:17:12  arno
-% setting title propertie to no interpreter
-%
-% Revision 1.4  2002/04/08 20:52:45  arno
-% removing debug msg
-%
-% Revision 1.3  2002/04/06 02:58:37  arno
-% returning [] when no modification
-%
-% Revision 1.2  2002/04/06 02:49:39  arno
-% reprogrammed the whole function
-%
-% Revision 1.1  2002/04/05 17:32:13  jorn
-% Initial revision
-%
 
 % 01-25-02 reformated help & license -ad 
 % 03-16-02 text interface editing -sm & ad 

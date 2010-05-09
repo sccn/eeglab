@@ -54,41 +54,6 @@
 %                  may use several GB of disk space and that computation 
 %                  of 'trials' statistics requires a lot of RAM.
 
-% $Log: std_stat.m,v $
-% Revision 1.12  2010/03/09 06:14:16  arno
-% fixed default output
-%
-% Revision 1.11  2010/03/05 01:25:19  arno
-% Fix threshold and interstat plotting
-%
-% Revision 1.10  2010/02/09 06:07:27  arno
-% Fixed new title problem and implemented 3-level significance
-%
-% Revision 1.9  2010/01/28 20:46:01  arno
-% fixed computing FDR for Anova interactions
-%
-% Revision 1.8  2009/08/29 04:24:56  arno
-% new statistics
-%
-% Revision 1.6  2009/08/29 00:38:32  arno
-% move all statistics to std_stat
-%
-% Revision 1.5  2009/08/04 23:21:25  arno
-% naccu
-%
-% Revision 1.4  2009/05/31 02:22:10  arno
-% Adding FDR and bootstrap to all STUDY functions
-%
-% Revision 1.3  2007/09/11 10:55:48  arno
-% disable stats if not enough info
-%
-% Revision 1.2  2007/04/30 19:52:22  arno
-% thrshold entry\
-%
-% Revision 1.1  2007/01/26 18:09:02  arno
-% Initial revision
-%
-
 function [pcond, pgroup, pinter] = std_stat(data, varargin)
 
 pgroup = {};

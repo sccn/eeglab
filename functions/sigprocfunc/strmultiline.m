@@ -15,8 +15,6 @@
 %
 % See also: eegfilt(), eegfiltfft(), eeglab()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -32,20 +30,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.4  2006/09/20 12:22:37  arno
-% multiple line fix
-%
-% Revision 1.3  2005/09/27 22:02:04  arno
-% allow processing multiple lines
-%
-% Revision 1.2  2005/03/20 18:39:14  scott
-% help msg
-%
-% Revision 1.1  2005/03/09 19:15:22  arno
-% Initial revision
-%
 
 function strout = strmultiline( strinori, maxlen, delimiter);
 

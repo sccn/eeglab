@@ -29,8 +29,6 @@
 %
 % See also: jointprob(), rejkurt()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2008 Arnaud Delorme, CERCO, UPS/CNRS
 %
 % This program is free software; you can redistribute it and/or modify
@@ -46,23 +44,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.5  2009/11/11 00:28:53  arno
-% New GUI format
-%
-% Revision 1.4  2009/04/08 21:41:19  julie
-% fix norm
-%
-% Revision 1.3  2009/04/08 21:38:09  julie
-% Fix threshold and measure
-%
-% Revision 1.2  2008/02/29 16:10:35  arno
-% show electrode index in front of electrode name
-%
-% Revision 1.1  2008/02/15 16:28:12  arno
-% Initial revision
-%
 
 function [EEG, indelec, measure, com] = pop_rejchan( EEG, varargin);
 

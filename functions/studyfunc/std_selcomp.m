@@ -32,14 +32,6 @@
 % 
 % See also: std_erpplot(), std_specplot() and std_erspplot()
 
-% $Log: std_selcomp.m,v $
-% Revision 1.2  2010/02/06 05:47:53  arno
-% New titles for figures
-%
-% Revision 1.1  2007/01/26 18:08:43  arno
-% Initial revision
-%
-
 function [data, subject, comp_names] = std_selcomp(STUDY, data, clust, setinds, compinds, compsel)
 
 if nargin < 2

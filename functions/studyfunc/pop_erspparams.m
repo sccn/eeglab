@@ -90,60 +90,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: pop_erspparams.m,v $
-% Revision 1.19  2010/03/05 00:18:40  arno
-% fix statmode option
-%
-% Revision 1.18  2010/02/24 10:52:36  arno
-% Implemented new single trial statistics
-%
-% Revision 1.17  2009/11/11 00:28:53  arno
-% New GUI format
-%
-% Revision 1.16  2009/05/31 04:37:38  arno
-% Better GUI for Study plotting options
-%
-% Revision 1.15  2009/05/31 02:22:10  arno
-% Adding FDR and bootstrap to all STUDY functions
-%
-% Revision 1.14  2007/10/17 18:49:48  nima
-% changed default statistics from parametric to permutation. by nima
-%
-% Revision 1.13  2007/10/17 01:13:24  nima
-% accross ->across
-%
-% Revision 1.12  2007/04/30 21:00:03  arno
-% text
-% ,
-%
-% Revision 1.11  2007/04/30 20:45:45  arno
-% better help message
-%
-% Revision 1.10  2007/03/17 21:23:38  arno
-% logical operator precedence
-%
-% Revision 1.9  2007/01/26 18:02:33  arno
-% new topotime and topofreq options
-%
-% Revision 1.8  2006/11/10 01:34:55  arno
-% GUI units
-%
-% Revision 1.7  2006/10/03 21:21:43  scott
-% nothing
-%
-% Revision 1.6  2006/10/03 20:14:21  arno
-% removing ??
-%
-% Revision 1.5  2006/10/03 20:07:02  arno
-% more comments
-%
-% Revision 1.4  2006/10/03 13:57:06  scott
-% worked on help msg. ARNO, SEE MANY ?? -sm
-%
-% Revision 1.3  2006/10/02 11:38:30  arno
-% header documentation
-%
-
 function [ STUDY, com ] = pop_erspparams(STUDY, varargin);
 
 STUDY = default_params(STUDY);

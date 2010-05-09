@@ -55,18 +55,6 @@
 % Authors: Hilit Serby, Scott Makeig & Arnaud Delorme, SCCN/INC/UCSD, 2005-
 %
 % RCS-recorded version number, date, editor and comments
-% $Log: std_clustread.m,v $
-% Revision 1.35  2009/10/20 02:29:01  arno
-% header
-%
-% Revision 1.34  2007/08/06 22:20:38  arno
-% message for deprecated functions
-%
-% Revision 1.33  2007/02/23 04:38:59  toby
-% added line to include RCS comments
-% nothing to reconcile between Arno and Scott's edits
-%
-
 function clustinfo = std_clustread(STUDY,ALLEEG, cluster, infotype, condition);
 
     help std_clustread;

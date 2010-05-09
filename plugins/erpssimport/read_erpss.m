@@ -22,45 +22,6 @@
 % Authors: Jeng-Ren Duann & Arnaud Delorme, CNL/Salk & INC/UCSD, 2002-12-12
 %          with help from Andrey Vankov
 
-% $Log: not supported by cvs2svn $
-% Revision 1.30  2008/10/29 23:10:42  arno
-% Better error message
-%
-% Revision 1.29  2007/08/07 20:01:08  arno
-% unused variables
-%
-% Revision 1.28  2007/08/07 19:48:28  arno
-% fix help (bug 382)
-%
-% Revision 1.27  2006/12/15 20:09:32  toby
-% Reverted to version 1.25. Andre reports 1.26 not working
-%
-% Revision 1.25  2005/05/20 18:39:53  hilit
-% if header is empty not rescaling to uV.
-%
-% Revision 1.24  2005/04/08 23:23:41  arno
-% rescale to microvolt
-%
-% Revision 1.23  2005/03/11 00:07:03  arno
-% message
-%
-% Revision 1.22  2005/03/10 23:59:37  arno
-% message
-%
-% Revision 1.21  2005/03/10 23:47:15  arno
-% edit message
-%
-% Revision 1.20  2003/12/10 17:00:03  arno
-% comment
-%
-% Revision 1.19  2003/11/19 03:05:22  arno
-% debuging calibration
-%
-% Revision 1.18  2003/06/28 00:28:38  arno
-% (implmenting new header info
-% and rescaling to mircouV
-%
-
 function [eeg,ev,header] = read_erpss(filename)
     
     if nargin < 1

@@ -32,8 +32,6 @@
 %
 % See also: std_preclust()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) Hilit Serby, SCCN, INC, UCSD, May 13,2004, hilit@sccn.ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -49,122 +47,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: pop_preclust.m,v $
-% Revision 1.55  2010/02/16 08:43:20  arno
-% New single-trial reading/writing
-%
-% Revision 1.54  2009/11/11 00:28:53  arno
-% New GUI format
-%
-% Revision 1.53  2009/11/04 01:39:30  arno
-% remove the option editor for spectral options
-%
-% Revision 1.52  2009/07/10 00:59:08  arno
-% error if no dataset in STUDY
-%
-% Revision 1.51  2008/02/07 22:08:39  nima
-% Measure Product preclustring added.
-%
-% Revision 1.50  2007/09/11 10:36:52  arno
-% now can process ICA components
-%
-% Revision 1.49  2007/08/09 18:35:22  arno
-% remove unused variable
-%
-% Revision 1.48  2007/08/06 20:20:55  arno
-% roudning problem fix
-%
-% Revision 1.47  2007/04/10 16:24:29  arno
-% matching exact names
-%
-% Revision 1.46  2007/04/07 01:21:27  arno
-% *** empty log message ***
-%
-% Revision 1.45  2006/04/10 05:22:32  toby
-% itc weight bug
-%
-% Revision 1.44  2006/03/29 00:47:59  toby
-% dealing with NaNs in STUDY.setind
-%
-% Revision 1.43  2006/03/23 17:29:40  scott
-% msg text
-%
-% Revision 1.42  2006/03/21 15:42:22  arno
-% new .sets format
-%
-% Revision 1.41  2006/03/12 03:23:03  arno
-% save study
-%
-% Revision 1.40  2006/03/12 02:17:26  arno
-% remove fontsize
-%
-% Revision 1.39  2006/03/11 17:12:41  scott
-% help and text msgs -sm
-%
-% Revision 1.38  2006/03/11 06:57:04  arno
-% header
-%
-% Revision 1.37  2006/03/11 00:18:16  arno
-% add function get_ersptime at the end
-%
-% Revision 1.36  2006/03/10 23:13:00  arno
-% min time and max time for ERSP depend on low freq
-%
-% Revision 1.35  2006/03/10 22:56:24  arno
-% timewindow
-%
-% Revision 1.34  2006/03/08 20:45:26  arno
-% rename func
-%
-% Revision 1.33  2006/03/04 00:40:06  arno
-% edit GUI
-%
-% Revision 1.32  2006/03/04 00:19:37  arno
-% fixing edit boxes
-%
-% Revision 1.31  2006/03/03 23:47:40  arno
-% decoding time-frequency parameters
-%
-% Revision 1.30  2006/03/02 23:18:54  scott
-% editing window msgs  -sm
-%
-% Revision 1.29  2006/02/23 00:19:58  arno
-% remove dipole selection option (now mved to pop_study)
-%
-% Revision 1.28  2006/02/22 23:33:42  arno
-% implementing cluster hierarchy
-%
-% Revision 1.27  2006/02/22 21:21:23  arno
-% update for hierarchic clustering
-%
-% Revision 1.26  2006/02/22 19:57:38  arno
-% second level pca
-%
-% Revision 1.25  2006/02/18 01:00:38  arno
-% eeg_preclust -> std_preclust
-%
-% Revision 1.24  2006/02/18 00:54:37  arno
-% changing default value for ERSP and spectrum so it matches the tutorial one
-%
-% Revision 1.23  2006/02/16 23:11:46  arno
-% ERSP -> ersp
-%
-% Revision 1.22  2006/02/11 00:29:56  arno
-% ERSP and ITC parameters
-%
-% Revision 1.21  2006/02/11 00:17:47  arno
-% fixing ersp parameters
-%
-% Revision 1.20  2006/02/11 00:15:40  arno
-% fixing ERSP
-%
-% Revision 1.19  2006/02/11 00:12:01  arno
-% fixing ERP selection
-%
-% Revision 1.18  2006/02/11 00:08:37  arno
-% numeric conversion
-%
 
 function [STUDY, ALLEEG, com] = pop_preclust(varargin)
 

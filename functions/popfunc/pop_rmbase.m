@@ -28,8 +28,6 @@
 %
 % See also: rmbase(), eeglab()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -45,84 +43,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.24  2007/03/24 02:13:49  arno
-% remove baseline with boundaries
-%
-% Revision 1.23  2007/03/24 02:08:29  arno
-% same
-%
-% Revision 1.22  2007/03/24 02:07:13  arno
-% message
-%
-% Revision 1.21  2007/02/20 14:18:21  arno
-% now can process several datasets
-%
-% Revision 1.20  2005/08/05 16:44:42  arno
-% fixed time range
-%
-% Revision 1.19  2005/05/24 17:26:23  arno
-% remove cell2mat
-%
-% Revision 1.18  2005/03/11 17:53:41  scott
-% help msg
-%
-% Revision 1.17  2005/02/27 03:04:30  scott
-% document options in help
-% .,
-%
-% Revision 1.16  2005/02/27 02:59:22  scott
-% make entries in ms as per documentation
-% added ability to use empty inputs -> use whole epoch for baseline
-%
-% Revision 1.15  2004/12/16 23:21:13  arno
-% header in ms
-%
-% Revision 1.14  2004/12/16 22:59:32  hilit
-% fixing some typo with 'pointrange' and separating the | condition in the if
-% statement
-%
-% Revision 1.13  2004/08/18 16:45:01  arno
-% ms -> s
-%
-% Revision 1.12  2003/07/18 14:50:28  scott
-% commenting, editting help message
-%
-% Revision 1.11  2003/05/12 15:39:51  arno
-% debug command line call
-%
-% Revision 1.10  2003/04/25 18:35:35  arno
-% now point range overwrite time limits
-% /
-%
-% Revision 1.9  2003/02/17 02:56:16  arno
-% reformating text for new functionality in help2html
-%
-% Revision 1.8  2003/02/16 23:53:12  arno
-% typo last
-%
-% Revision 1.7  2003/02/16 23:52:49  arno
-% adding gui info
-%
-% Revision 1.6  2002/11/18 02:47:23  arno
-% adding continuous data baseline subtraction
-%
-% Revision 1.5  2002/10/11 14:48:20  arno
-% recomputing ICA activations
-%
-% Revision 1.4  2002/08/17 20:26:22  scott
-% menu and help msg
-%
-% Revision 1.3  2002/08/13 18:19:13  arno
-% strvcat instead of 10
-%
-% Revision 1.2  2002/08/12 02:29:51  arno
-% inputdlg2
-%
-% Revision 1.1  2002/04/05 17:32:13  jorn
-% Initial revision
-%
 
 % 01-25-02 reformated help & license -ad 
 

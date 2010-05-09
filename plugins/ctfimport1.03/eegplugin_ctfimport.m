@@ -21,8 +21,6 @@
 %
 % See also: pop_ctf_read(), ctf_read(), ctf_readmarkerfile()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2003 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -38,14 +36,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.2  2004/07/28 16:36:46  arnodelorme
-% update eegplugin_ctfimport.m
-%
-% Revision 1.1  2004/04/02 17:18:02  arnodelorme
-% EEGLAB plugin file
-%
 
 function vers = eegplugin_ctfimport(fig, trystrs, catchstrs)
 

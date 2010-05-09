@@ -8,17 +8,6 @@ function [mri, hdr] = read_ctf_mri(filename);
 
 % Copyright (C) 2003 Robert Oostenveld
 %
-% $Log: not supported by cvs2svn $
-% Revision 1.1  2005/12/06 06:24:23  psdlw
-% Alternative functions from the FieldTrip package, which is now released under GPL (so I assume these functions can be committed to the sourceforge cvs)
-%
-% Revision 1.2  2003/07/23 15:02:27  roberto
-% added check on valid input for read_ctf_meg4, other changes unknown
-%
-% Revision 1.1  2003/06/10 08:14:54  roberto
-% new implementation
-%
-
 fid = fopen(filename,'rb', 'ieee-be');
 
 if fid<=0

@@ -38,8 +38,6 @@
 %
 % Authors: Arnaud Delorme, SCCN, INC, UCSD, January, 2005
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) Arnaud Delorme, SCCN, INC, UCSD, October 11, 2004, arno@sccn.ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -55,99 +53,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: std_erp.m,v $
-% Revision 1.38  2010/02/16 08:43:21  arno
-% New single-trial reading/writing
-%
-% Revision 1.37  2010/01/28 20:46:34  arno
-% fixed problem with unique trial epoch (when subject only have one epoch)
-%
-% Revision 1.36  2008/04/16 18:39:51  arno
-% fix computing for components
-%
-% Revision 1.34  2007/11/07 00:27:46  arno
-% timerange option deprecated
-%
-% Revision 1.33  2007/11/07 00:14:22  arno
-% Remove baseline subtraction
-%
-% Revision 1.32  2007/08/13 01:20:08  arno
-% updating help message
-%
-% Revision 1.31  2007/02/28 12:03:28  arno
-% force recomputation
-%
-% Revision 1.26  2006/10/02 11:40:26  arno
-% minor things
-%
-% Revision 1.24  2006/05/13 11:59:58  arno
-% now clustering using RMS
-%
-% Revision 1.23  2006/03/14 03:28:10  scott
-% help msg
-%
-% Revision 1.22  2006/03/11 07:08:03  arno
-% header
-%
-% Revision 1.21  2006/03/10 16:23:43  arno
-% reprogram timerange
-%
-% Revision 1.20  2006/03/10 00:30:21  arno
-% update header
-%
-% Revision 1.19  2006/03/09 18:52:58  arno
-% saving ERP to float file
-%
-% Revision 1.18  2006/03/08 22:24:37  scott
-% help msg  -sm
-%
-% Revision 1.17  2006/03/08 22:05:19  arno
-% remove bebug msg
-%
-% Revision 1.16  2006/03/08 22:04:47  arno
-% move return to the right place
-%
-% Revision 1.15  2006/03/08 22:01:45  arno
-% remve debug message
-%
-% Revision 1.14  2006/03/08 22:01:10  arno
-% do not recompute for plotting
-%
-% Revision 1.13  2006/03/08 21:52:44  arno
-% typo
-%
-% Revision 1.12  2006/03/08 21:51:25  arno
-% fix typo
-%
-% Revision 1.11  2006/03/08 20:29:26  arno
-% rename func
-%
-% Revision 1.10  2006/03/07 22:40:10  arno
-% floatwrite in double
-%
-% Revision 1.9  2006/03/07 03:27:25  scott
-% accepting [] component list -sm
-%
-% Revision 1.8  2006/03/07 03:24:05  scott
-% reworked help msg; clarified filename output; made function accept default comps
-% -sm
-%
-% Revision 1.7  2006/03/06 23:17:09  arno
-% change fields for resave
-%
-% Revision 1.6  2006/03/03 23:34:18  arno
-% recomputing if our of bound
-%
-% Revision 1.5  2006/03/03 22:58:55  arno
-% update call to pop_saveset
-%
-% Revision 1.4  2006/03/03 22:51:25  arno
-% fix same thing
-%
-% Revision 1.3  2006/03/03 22:44:54  arno
-% [6~[6~floatread/flotwrite folder fix; computation of ICA fix
-%
 
 function [X, t] = std_erp(EEG, varargin); %comps, timerange)
 

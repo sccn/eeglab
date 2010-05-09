@@ -20,8 +20,6 @@
 %
 % See also: runica()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) Colin Humphries, CNL / Salk Institute, June 1998
 %
 % This program is free software; you can redistribute it and/or modify
@@ -37,20 +35,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.5  2007/08/07 19:36:49  arno
-% fix maxit (bug 371)
-%
-% Revision 1.4  2007/08/07 19:36:10  arno
-% revert old version
-%
-% Revision 1.2  2003/09/05 00:47:11  arno
-% replace continue by cont for Matlab 6 compatibility
-%
-% Revision 1.1  2002/04/05 17:36:45  jorn
-% Initial revision
-%
 
 % formatted and modified to return V by Scott Makeig, 6/23/98
 % reset maxit default to 5, added ncomps -sm 7/8/98

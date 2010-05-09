@@ -93,20 +93,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
-% Revision 1.4  2003/05/23 15:31:53  arno
-% adding more details for extended option of runica
-%
-% Revision 1.3  2003/01/15 22:08:21  arno
-% typo
-%
-% Revision 1.2  2002/10/23 18:09:54  arno
-% new interupt button
-%
-% Revision 1.1  2002/04/05 17:36:45  jorn
-% Initial revision
-%
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%% Edit history %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %  runica()  - by Scott Makeig with contributions from Tony Bell, Te-Won Lee 

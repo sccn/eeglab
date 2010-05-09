@@ -43,8 +43,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
-
 function [l1,l2,l3,l4] = rsadjust( l3, l4, mu, sigma2, m3);
     
     % swap l3 and l4 for negative skewness

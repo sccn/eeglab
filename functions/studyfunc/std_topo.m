@@ -29,8 +29,6 @@
 %
 % See also  topoplot(), std_erp(), std_ersp(), std_spec(), std_preclust()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) Hilit Serby, SCCN, INC, UCSD, October 11, 2004, hilit@sccn.ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -46,59 +44,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: std_topo.m,v $
-% Revision 1.18  2009/10/20 02:31:28  arno
-% Seting raidus to 0.55 instead of 0.5 for topoplot
-%
-% Revision 1.17  2007/12/09 00:26:39  arno
-% adding the recompute option
-%
-% Revision 1.16  2007/09/11 10:56:12  arno
-% now save one file per subject
-%
-% Revision 1.15  2006/03/10 00:20:39  arno
-% same
-%
-% Revision 1.14  2006/03/10 00:19:49  arno
-% removing reference to etc field
-%
-% Revision 1.13  2006/03/09 19:27:39  arno
-% fix function crash
-%
-% Revision 1.12  2006/03/09 19:21:29  arno
-% header
-%
-% Revision 1.11  2006/03/09 19:21:08  arno
-% header
-%
-% Revision 1.10  2006/03/09 19:20:45  arno
-% saving topographies
-%
-% Revision 1.9  2006/03/09 00:00:52  arno
-% now saving Matlab file
-%
-% Revision 1.8  2006/03/08 20:27:38  arno
-% rename func
-%
-% Revision 1.7  2006/03/07 03:46:43  scott
-% reworked help msg; made function accept specified component list or [] -sm
-%
-% Revision 1.6  2006/03/06 23:45:28  arno
-% adding gradient and laplacian
-%
-% Revision 1.5  2006/03/06 23:17:34  arno
-% fix resave
-%
-% Revision 1.4  2006/03/03 21:22:07  arno
-% remve change folder
-%
-% Revision 1.3  2006/03/03 21:19:16  arno
-% change topo map file name
-%
-% Revision 1.2  2006/03/03 00:41:38  arno
-% now correctly saving data
-%
 
 function [X] = std_topo(EEG, comps, option, varargin)
 

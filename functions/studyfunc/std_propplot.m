@@ -30,8 +30,6 @@
 %
 % Authors:  Arnaud Delorme, Hilit Serby, Scott Makeig, SCCN/INC/UCSD, 2005
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) Arnaud Delorme, SCCN, INC, UCSD, arno@sccn.ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -47,53 +45,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: std_propplot.m,v $
-% Revision 1.18  2010/03/30 19:33:25  arno
-% graphic handle check
-%
-% Revision 1.17  2007/10/19 20:52:07  nima
-% _
-%
-% Revision 1.16  2007/08/14 19:29:33  nima
-% _
-%
-% Revision 1.15  2007/08/13 23:24:29  nima
-% _
-%
-% Revision 1.14  2007/08/10 19:47:32  nima
-% _
-%
-% Revision 1.13  2006/10/03 23:51:53  scott
-% help msg and field updates -sm
-%
-% Revision 1.12  2006/09/12 18:52:37  arno
-% Allow plotting channel properties
-%
-% Revision 1.11  2006/03/23 18:08:43  scott
-% help and msg text
-%
-% Revision 1.10  2006/03/14 02:59:35  scott
-% help msg
-%
-% Revision 1.9  2006/03/12 03:38:34  arno
-% header
-%
-% Revision 1.8  2006/03/09 18:58:25  scott
-% help msg -sm
-%
-% Revision 1.7  2006/03/08 21:03:37  arno
-% rename func
-%
-% Revision 1.6  2006/03/08 20:56:31  arno
-% rename func
-%
-% Revision 1.5  2006/03/07 19:41:41  arno
-% warning text and message
-%
-% Revision 1.4  2006/03/07 19:35:31  arno
-% ploting
-%
 
 function STUDY = std_propplot(STUDY, ALLEEG,  varargin)
 

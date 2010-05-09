@@ -40,8 +40,6 @@
 %
 % Authors:  Hilit Serby & Arnaud Delorme, SCCN, INC, UCSD, October 11, 2004
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) Hilit Serby, SCCN, INC, UCSD, October 11, 2004, hilit@sccn.ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -59,98 +57,6 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % Coding notes: Useful information on functions and global variables used.
-
-% $Log: pop_clust.m,v $
-% Revision 1.40  2009/12/09 23:24:43  dev
-% Fixed Bug 790 (line 375 neural network)
-%
-% Revision 1.39  2009/11/11 00:28:53  arno
-% New GUI format
-%
-% Revision 1.38  2009/07/10 01:48:12  arno
-% remove unused code and add comments
-%
-% Revision 1.37  2009/06/24 22:10:30  arno
-% fixed history
-%
-% Revision 1.36  2009/04/17 15:01:20  julie
-% Remove old clusters when called from commandline
-%
-% Revision 1.35  2007/12/09 01:06:59  arno
-% docuemntation and auto-disable checkbox
-%
-% Revision 1.34  2007/10/25 21:33:14  nima
-% _
-%
-% Revision 1.33  2007/09/11 10:33:38  arno
-% add new free algorithm for kmeans
-%
-% Revision 1.32  2007/08/07 18:29:22  arno
-% fix help from guy (bug 283)
-%
-% Revision 1.31  2007/08/07 18:26:58  arno
-% added help message
-%
-% Revision 1.30  2007/08/06 18:25:51  scott
-% further help msg edits for accuracy  ('kmean' -> 'kmeans', etc).
-%
-% Revision 1.29  2007/08/06 18:11:48  arno
-% update message
-%
-% Revision 1.28  2007/08/06 18:00:26  scott
-% the default value '3' is entered in line 176, I believe...
-%
-% Revision 1.27  2007/08/06 17:35:41  arno
-% update help message according to bug 282
-%
-% Revision 1.26  2007/05/01 21:05:14  arno
-% better help message
-%
-% Revision 1.25  2006/03/21 15:45:36  arno
-% new .sets format; embeding component creation
-%
-% Revision 1.23  2006/03/12 03:20:35  arno
-% study saving
-%
-% Revision 1.22  2006/03/12 02:56:42  arno
-% gui aspect ratio
-%
-% Revision 1.21  2006/03/11 06:05:50  arno
-% header
-%
-% Revision 1.20  2006/03/11 00:27:40  arno
-% header
-%
-% Revision 1.19  2006/03/10 22:53:17  arno
-% typo
-%
-% Revision 1.18  2006/03/10 18:40:04  arno
-% same
-%
-% Revision 1.17  2006/03/10 18:39:13  arno
-% indices removal
-%
-% Revision 1.16  2006/03/08 20:07:36  arno
-% rename
-%
-% Revision 1.15  2006/03/03 00:43:32  scott
-% editing msgs -sm
-%
-% Revision 1.14  2006/02/22 22:44:39  arno
-% now edit all clusters by default
-%
-% Revision 1.13  2006/02/22 22:40:45  arno
-% smarter warning message
-%
-% Revision 1.12  2006/02/22 22:37:41  arno
-% allowing subclustering
-%
-% Revision 1.11  2006/02/22 21:34:13  arno
-% add cluster description to GUI
-%
-% Revision 1.10  2006/02/14 00:13:32  arno
-% adding log
-%
 
 function [STUDY, ALLEEG, command] = pop_clust(STUDY, ALLEEG, varargin)
 

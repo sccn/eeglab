@@ -39,8 +39,6 @@
 %
 % See also: readlocs()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2003 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -56,47 +54,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.13  2007/03/06 02:39:05  toby
-% Caution statement added
-%
-% Revision 1.12  2007/03/06 02:31:28  toby
-% Corrected, updated help message, see Bug 140 reported by Ronny Lindner
-%
-% Revision 1.11  2005/05/24 17:13:02  arno
-% cell2mat -> celltomat
-%
-% Revision 1.10  2005/01/28 00:36:45  arno
-% same
-%
-% Revision 1.9  2005/01/28 00:35:11  arno
-% fixed inconsistency
-%
-% Revision 1.8  2004/11/10 17:39:31  arno
-% change message.m
-%
-% Revision 1.7  2004/11/10 17:31:01  arno
-% debug call to channel select
-%
-% Revision 1.6  2004/11/10 16:52:45  arno
-% change call to chansel
-%
-% Revision 1.5  2003/08/05 18:33:19  arno
-% typo
-%
-% Revision 1.4  2003/08/05 18:20:55  arno
-% more comprehensive GUI
-%
-% Revision 1.3  2003/07/10 18:26:43  arno
-% empty output if cancel
-%
-% Revision 1.2  2003/04/16 01:56:47  arno
-% adding hidden output
-%
-% Revision 1.1  2003/04/16 01:48:32  arno
-% Initial revision
-%
 
 function [chanlocs,options] = forcelocs( chanlocs, varargin)
     

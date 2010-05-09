@@ -37,8 +37,6 @@ function [zact,basesd,maxabsz,maxc,maxabszf] = zica(activations,frames,baseframe
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
-
 % 3-2-98 added frames variable -sm
 % 1-25-01 put revsort subfunction in the core of the zica program -ad
 % 01-25-02 reformated help & license, added link -ad 

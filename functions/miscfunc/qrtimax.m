@@ -30,8 +30,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
-
 % Reference: Jack O. Nehaus and Charles Wrigley (1954) 
 % The Quartimax Method: an analytic approach to orthogonal 
 % simple structure, Br J Stat Psychol, 7:81-91.

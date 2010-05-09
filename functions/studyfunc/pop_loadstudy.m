@@ -17,8 +17,6 @@
 %
 % Authors: Hilit Serby & Arnaud Delorme, SCCN, INC, UCSD, September 2005
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) Hilit Serby, SCCN, INC, UCSD, Spetember 2005, hilit@sccn.ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -36,23 +34,6 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % Coding notes: Useful information on functions and global variables used.
-
-% $Log: pop_loadstudy.m,v $
-% Revision 1.22  2010/03/21 20:58:44  arno
-% New STUDY file checking functions and processes
-%
-% Revision 1.21  2007/12/08 23:38:07  arno
-% updating datasetinfo
-%
-% Revision 1.20  2007/06/21 00:14:33  allen
-% nothing
-%
-% Revision 1.19  2007/04/06 21:19:45  arno
-% warning
-%
-% Revision 1.18  2006/10/10 04:12:33  toby
-% save revision info added
-%
 
 
 function [STUDY, ALLEEG, com] = pop_loadstudy(varargin)

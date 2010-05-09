@@ -37,29 +37,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
-% Revision 1.7  2009/08/05 03:20:42  arno
-% new interpolation function
-%
-% Revision 1.6  2009/07/30 03:32:47  arno
-% fixed interpolating bad channels
-%
-% Revision 1.5  2009/07/02 19:30:33  arno
-% fix problem with empty channel
-%
-% Revision 1.4  2009/07/02 18:23:33  arno
-% fixing interpolation
-%
-% Revision 1.3  2009/04/21 21:48:53  arno
-% make default spherical in eeg_interp
-%
-% Revision 1.2  2008/04/16 17:34:45  arno
-% added spherical and 3-D interpolation
-%
-% Revision 1.1  2006/09/12 18:46:30  arno
-% Initial revision
-%
-
 function EEG = eeg_interp(ORIEEG, bad_elec, method)
 
     if nargin < 2

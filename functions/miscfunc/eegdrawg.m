@@ -18,8 +18,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
-
 % 4-4-97 shortened name to eegdrawq() -sm
 % 4-7-97 allowed data names other than 'data' -ch 
 % 01-25-02 reformated help & license -ad 

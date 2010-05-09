@@ -63,8 +63,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
-
 % 11-17-97 added rejections vector output -sm
 % 01-25-02 reformated help & license, added links -ad 
 

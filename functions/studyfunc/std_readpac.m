@@ -37,20 +37,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: std_readpac.m,v $
-% Revision 1.4  2009/10/19 01:16:55  arno
-% computing and reading PAC data
-%
-% Revision 1.3  2009/07/30 03:13:46  arno
-% fixed recompute
-%
-% Revision 1.2  2009/07/17 21:59:10  arno
-% fixing std_readpac
-%
-% Revision 1.1  2009/07/13 21:10:26  arno
-% still working on std_pac
-%
-
 function [STUDY, clustinfo] = std_readpac(STUDY, ALLEEG, varargin);
 
 if nargin < 2

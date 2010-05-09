@@ -13,8 +13,6 @@
 %
 % See also: floatread(), fopen()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) Sigurd Enghoff, CNL / Salk Institute, La Jolla, 7/1998
 %
 % This program is free software; you can redistribute it and/or modify
@@ -30,35 +28,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.9  2009/01/14 23:59:17  arno
-% better memory mapping implementation
-%
-% Revision 1.8  2008/11/24 21:51:17  arno
-% prevent overwriting memory map file
-%
-% Revision 1.7  2008/11/22 02:59:00  arno
-% use temporary variable
-%
-% Revision 1.6  2008/11/19 23:26:02  arno
-% save as transposed if necessary
-%
-% Revision 1.5  2008/11/17 19:34:55  ywu
-% same
-%
-% Revision 1.4  2008/11/17 19:33:46  ywu
-% same
-%
-% Revision 1.3  2008/11/17 19:30:07  ywu
-% same
-%
-% Revision 1.2  2008/11/17 19:26:34  ywu
-% support for memory map data
-%
-% Revision 1.1  2002/04/05 17:36:45  jorn
-% Initial revision
-%
 
 % 07-08-99  FORMAT argument added -se
 % 02-08-00  new version included in toolbox -sm

@@ -39,8 +39,6 @@
 %
 % Authors: Arnaud Delorme, SCCN, INC, UCSD, May 2010
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) Arnaud Delorme, SCCN, INC, UCSD, 2010, arno@sccn.ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -56,8 +54,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: std_readdatafile.m,v $
 
 % dimensions
 % time x freqs x channel_comps x subjects_trials

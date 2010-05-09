@@ -28,32 +28,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
-% Revision 1.7  2008/04/27 15:48:22  arno
-% remove mean in double precision and save RAM
-%
-% Revision 1.6  2005/09/03 00:13:23  scott
-% rm'ed extra-verbose fprintf repeats
-%
-% Revision 1.5  2005/03/20 18:40:49  scott
-% help msg
-%
-% Revision 1.4  2003/04/25 18:33:22  arno
-% small typo for basevector
-%
-% Revision 1.3  2002/10/13 23:04:24  arno
-% using nan_mean instead of mean
-%
-% Revision 1.2  2002/07/22 21:37:32  luca
-% now accept 3-D data matrix -lf
-% now accept 3-D data matrix -lf.
-%
-% help
-%
-% Revision 1.1  2002/04/05 17:36:45  jorn
-% Initial revision
-%
-
 % 07-30-97 converted to rmbase() -sm
 % 09-30-97 fixed! -sm
 % 05-10-01 caught empty input data -sm

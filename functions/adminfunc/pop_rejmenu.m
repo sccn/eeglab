@@ -12,8 +12,6 @@
 % See also: eeglab(), pop_eegplot(), pop_eegthresh, pop_rejtrend()
 % pop_rejkurt(), pop_jointprob(), pop_rejspec() 
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -29,117 +27,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.36  2005/11/09 23:26:46  arno
-% edit gui for width
-%
-% Revision 1.35  2005/11/02 18:38:51  arno
-% h -> eegh
-%
-% Revision 1.34  2005/03/14 19:15:26  arno
-% same for kurtosis
-%
-% Revision 1.33  2005/03/14 19:14:42  arno
-% change default for improbable data (components)
-%
-% Revision 1.32  2004/03/17 22:58:34  arno
-% debug pop_eegthresh
-%
-% Revision 1.31  2004/03/13 03:00:26  arno
-% change dataset hisotry
-%
-% Revision 1.30  2003/12/24 20:04:36  scott
-% same
-%
-% Revision 1.29  2003/12/24 20:03:57  scott
-% same
-%
-% Revision 1.28  2003/12/24 20:01:08  scott
-% same
-%
-% Revision 1.27  2003/12/24 20:00:03  scott
-% same
-%
-% Revision 1.26  2003/12/24 19:59:11  scott
-% same
-%
-% Revision 1.25  2003/12/24 19:56:31  scott
-% same
-%
-% Revision 1.24  2003/12/24 19:55:29  scott
-% debug same
-%
-% Revision 1.23  2003/12/24 19:53:29  scott
-% fix same
-%
-% Revision 1.22  2003/12/24 19:50:57  scott
-% pop-up text edits
-%
-% Revision 1.21  2003/12/24 16:44:30  scott
-% '(std.)' -> '(std. dev.)'
-%
-% Revision 1.20  2003/12/17 18:18:18  arno
-% debug start time for eeg_thresh
-%
-% Revision 1.19  2003/12/05 00:23:27  arno
-% history
-%
-% Revision 1.18  2002/11/14 22:18:36  arno
-% change default for listbox
-%
-% Revision 1.17  2002/11/13 23:32:19  arno
-% adding update of all rejected method
-%
-% Revision 1.16  2002/11/12 16:27:29  scott
-% added slow warning for spectral rejection
-%
-% Revision 1.15  2002/11/12 16:16:57  scott
-% button text
-%
-% Revision 1.14  2002/08/22 02:11:12  arno
-% text edit
-%
-% Revision 1.13  2002/08/14 18:21:53  arno
-% new supergui arg
-%
-% Revision 1.12  2002/08/14 16:06:58  arno
-% updating size of buttons
-%
-% Revision 1.11  2002/08/14 00:58:51  arno
-% debug some calls
-%
-% Revision 1.10  2002/08/13 19:01:06  arno
-% remove manual size constraint
-%
-% Revision 1.9  2002/08/13 17:31:35  arno
-% new supergui call
-%
-% Revision 1.8  2002/08/12 22:26:28  arno
-% button color and text
-%
-% Revision 1.7  2002/08/07 22:23:00  arno
-% editing spelling
-%
-% Revision 1.6  2002/08/02 14:27:15  arno
-% changing default
-%
-% Revision 1.5  2002/07/31 18:25:56  arno
-% changing default
-%
-% Revision 1.4  2002/07/31 17:07:26  arno
-% debugging
-%
-% Revision 1.3  2002/07/30 23:39:34  arno
-% rejection with lots of colors
-%
-% Revision 1.2  2002/07/26 17:01:17  arno
-% debugging icacomp
-%
-% Revision 1.1  2002/04/05 17:46:04  jorn
-% Initial revision
-%
-% 01-25-02 reformated help & license -ad 
 
 function pop_rejmenu( EEG, icacomp ); 
 

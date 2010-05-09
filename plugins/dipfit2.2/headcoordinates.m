@@ -33,11 +33,6 @@ function [h] = headcoordinates(nas, lpa, rpa, flag);
 
 % Copyright (C) 2003 Robert Oostenveld
 %
-% $Log: not supported by cvs2svn $
-% Revision 1.1  2004/09/27 16:00:04  roboos
-% initial submission
-%
-
 if nargin<4
   flag=0;
 end

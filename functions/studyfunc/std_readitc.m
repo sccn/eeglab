@@ -34,8 +34,6 @@
 %
 % Authors: Arnaud Delorme, SCCN, INC, UCSD, February, 2005
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) Arnaud Delorme, SCCN, INC, UCSD, October 11, 2004, arno@sccn.ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -51,47 +49,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: std_readitc.m,v $
-% Revision 1.14  2007/10/18 20:49:08  nima
-% 'logersp' changed to 'logitc'.
-%
-% Revision 1.13  2007/01/26 18:06:51  arno
-% remove warning
-%
-% Revision 1.12  2006/09/12 18:56:15  arno
-% channel compatibility
-%
-% Revision 1.11  2006/05/03 17:55:54  arno
-% allow to read data channels
-%
-% Revision 1.10  2006/03/14 02:24:41  scott
-% help msg
-%
-% Revision 1.9  2006/03/14 02:11:46  scott
-% help msg
-%
-% Revision 1.8  2006/03/11 07:28:50  arno
-% header info
-%
-% Revision 1.7  2006/03/10 15:49:07  arno
-% fix reading ITC
-%
-% Revision 1.6  2006/03/10 00:39:37  arno
-% error msg
-%
-% Revision 1.5  2006/03/10 00:01:52  arno
-% remove old ITC code
-%
-% Revision 1.4  2006/03/09 23:40:10  arno
-% read new ITC format
-%
-% Revision 1.3  2006/03/08 20:35:03  arno
-% rename func
-%
-% Revision 1.2  2006/03/07 22:17:34  arno
-% use fullfile
-%
 
 function [logitc, logfreqs, timevals, params] = std_readitc(ALLEEG, abset, comp, timewindow, freqrange);
 

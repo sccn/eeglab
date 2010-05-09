@@ -32,8 +32,6 @@
 %
 % See also: iirfilt(), pop_eegfilt(), eegfilt(), eegfiltfft(), eeglab()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2004 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -49,86 +47,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.5  2005/09/30 17:06:06  arno
-% added revfilt etc...
-%
-% Revision 1.4  2005/09/30 17:04:48  arno
-% revision 1.1
-%
-% Revision 1.1  2005/09/30 16:50:28  arno
-% Initial revision
-%
-% Revision 1.23  2003/12/03 18:31:32  arno
-% implementing eegfiltfft
-%
-% Revision 1.22  2003/09/01 18:14:17  arno
-% fixing nargin problem -thanks Petr Janata
-%
-% Revision 1.21  2003/08/06 00:22:05  arno
-% removing debug message
-%
-% Revision 1.20  2003/08/02 21:29:50  arno
-% text
-%
-% Revision 1.19  2003/07/28 17:39:07  arno
-% nothing
-%
-% Revision 1.18  2003/07/22 17:36:44  arno
-% subtract DC for small portion of data
-%
-% Revision 1.17  2003/07/20 19:19:10  scott
-% clarify processing message
-%
-% Revision 1.16  2003/04/24 22:13:51  arno
-% typo
-%
-% Revision 1.15  2003/04/24 22:13:17  arno
-% removing 0 warning
-%
-% Revision 1.14  2003/04/24 22:08:55  arno
-% updating error message
-%
-% Revision 1.13  2003/04/24 22:06:31  arno
-% show message when processing data portion
-%
-% Revision 1.12  2003/04/24 22:00:16  arno
-% debuging boundaries
-%
-% Revision 1.11  2003/02/17 02:43:43  arno
-% reformating text for new functionality in help2html
-%
-% Revision 1.10  2003/02/16 23:10:43  arno
-% adding GUI info
-%
-% Revision 1.9  2003/01/24 04:03:37  scott
-% edits msgs -sm
-%
-% Revision 1.8  2003/01/24 00:23:35  arno
-% debugged revfilt parameter
-%
-% Revision 1.7  2002/11/15 01:45:53  scott
-% can not -> cannot
-%
-% Revision 1.6  2002/10/16 21:42:25  arno
-% default for highcuroff
-%
-% Revision 1.5  2002/08/12 16:25:02  arno
-% inputdlg2
-%
-% Revision 1.4  2002/08/09 01:43:18  arno
-% [6~[6~same
-%
-% Revision 1.3  2002/08/09 01:42:40  arno
-% debugging filter over smal time period
-%
-% Revision 1.2  2002/08/09 00:41:22  arno
-% updating for boundaries
-%
-% Revision 1.1  2002/04/05 17:32:13  jorn
-% Initial revision
-%
 
 % 01-25-02 reformated help & license -ad 
 

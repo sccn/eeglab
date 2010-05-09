@@ -37,26 +37,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
-% Revision 1.6  2007/08/07 21:53:41  arno
-% same
-%
-% Revision 1.5  2007/08/07 21:50:26  arno
-% same
-%
-% Revision 1.4  2007/08/07 21:49:04  arno
-% upgrade for new fieldtrip
-%
-% Revision 1.3  2007/01/26 18:18:08  arno
-% CTF implementation
-%
-% Revision 1.2  2006/01/10 00:46:07  arno
-% nothing
-%
-% Revision 1.1  2005/03/11 00:18:39  arno
-% Initial revision
-%
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [EEGOUT] = dipfit_nonlinear( EEG, varargin )
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

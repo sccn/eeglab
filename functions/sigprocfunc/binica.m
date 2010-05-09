@@ -58,8 +58,6 @@
 
 % Calls binary translation of runica() by Sigurd Enghoff
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2000 Scott Makeig, SCCN/INC/UCSD, scott@sccn.ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -75,90 +73,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.27  2009/10/21 02:44:24  dev
-% replace isstr() with ischar()
-%
-% Revision 1.26  2009/09/27 04:05:59  arno
-% Joe Dien Filenum option to binica
-%
-% Revision 1.25  2007/11/30 04:31:25  arno
-% same
-%
-% Revision 1.24  2007/11/30 04:27:57  arno
-% chaning computation for random binica file
-%
-% Revision 1.23  2007/11/30 04:24:40  arno
-% adding temp input
-%
-% Revision 1.22  2007/08/02 23:43:21  arno
-% same
-%
-% Revision 1.21  2007/08/02 23:41:17  arno
-% fix for MAC
-%
-% Revision 1.20  2007/05/19 01:36:56  toby
-% multiple copies of binica bug, fix courtesy Nima Bigdely
-%
-% Revision 1.19  2006/11/07 02:37:18  arno
-% add third dim compatibility
-%
-% Revision 1.18  2006/05/27 03:21:03  toby
-% bugs
-%
-% Revision 1.17  2006/01/29 18:20:02  scott
-% help msg -sm
-%
-% Revision 1.16  2006/01/14 18:04:35  scott
-% added 'stem' output -sm
-%
-% Revision 1.15  2006/01/14 17:37:11  scott
-% implemented 'weightsin' flag  -sm
-%
-% Revision 1.14  2006/01/03 20:05:26  scott
-% added 'weightsin' argument (not yet tested), reformed help message -sm
-%
-% Revision 1.13  2005/03/14 19:43:45  arno
-% fixing argument passing
-%
-% Revision 1.12  2005/03/13 19:03:45  scott
-% trying to read flag,arg pairs - FAILS!!!
-% Arno/Hilit - PLEASE CHECK LINE 219 and etc. ! -Scott
-%
-% Revision 1.11  2005/03/13 17:14:40  peter
-% comments
-%
-% Revision 1.10  2004/08/19 19:10:41  arno
-% did not change anything
-%
-% Revision 1.9  2004/02/28 00:00:22  arthur
-% edit commandline output text
-%
-% Revision 1.8  2003/10/25 23:52:05  arno
-% remove asking for permission to remove file
-%
-% Revision 1.7  2003/10/07 18:55:03  arno
-% undo changes
-%
-% Revision 1.6  2003/10/07 18:54:30  arno
-% testing
-%
-% Revision 1.5  2002/11/15 01:44:18  arno
-% header for web
-%
-% Revision 1.4  2002/08/05 18:17:06  arno
-% debugging directory finding
-%
-% Revision 1.3  2002/06/25 02:38:49  scott
-% calrified error msgs -sm
-%
-% Revision 1.2  2002/05/01 18:22:36  arno
-% making binica available from everywhere
-%
-% Revision 1.1  2002/04/05 17:36:45  jorn
-% Initial revision
-%
 
 % 08/07/00 Added warning to update icadefs.m -sm
 % 09/08/00 Added tmpint to script, weights and sphere files to avoid

@@ -50,66 +50,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
-% Revision 1.20  2008/04/08 14:59:54  arno
-% fix baseline removal for each epoch
-%
-% Revision 1.19  2007/04/03 03:20:40  toby
-% Bug260, uncalled variables. Courtesy Maxim Duester
-%
-% Revision 1.18  2007/04/03 03:07:06  toby
-% bug 259, courtesy Maxim D
-%
-% Revision 1.17  2007/04/02 19:08:36  toby
-% unused variable commented out.
-%
-% Revision 1.16  2007/04/02 19:01:11  toby
-% Bug 262. Courtesy Maxim Duester
-%
-% Revision 1.15  2007/04/02 18:54:52  toby
-% Bug 261, wrong function name. Courtesy Maxim Duester
-%
-% Revision 1.14  2006/04/12 04:16:00  scott
-% angTimeWarp -> angtimewarp()
-%
-% Revision 1.13  2006/04/12 04:11:00  scott
-% timeWarp -> timewarp()
-%
-% Revision 1.12  2006/04/12 03:30:00  scott
-% help msg
-%
-% Revision 1.11  2006/04/11 19:33:33  toby
-% Jean's update. Needed for new timewarping feature in erpimage()
-%
-% Revision 1.10  2006/01/12 00:36:42  toby
-% Phase coher no longer removes epoch means.
-% Needed so that dB conversion could be done correctly.
-%
-% Revision 1.9  2003/11/30 18:29:18  scott
-% phase() (obsolete) -> angle()
-%
-% Revision 1.8  2003/04/23 00:49:07  arno
-% debug ploting is alpha == nan
-%
-% Revision 1.7  2003/03/16 18:46:48  scott
-% printout edit
-%
-% Revision 1.6  2003/03/16 18:12:11  scott
-% message edit
-%
-% Revision 1.5  2003/03/15 17:23:57  scott
-% print msg
-%
-% Revision 1.4  2003/03/15 15:50:04  scott
-% header
-%
-% Revision 1.3  2002/08/05 17:46:16  arno
-% putting back revision 1.1
-%
-% Revision 1.1  2002/04/05 17:36:45  jorn
-% Initial revision
-%
-
 % 5-7-98 added frames, made input data format one-row -sm
 % 5-8-98 added MIN_AMP, times, PLOT_IT -sm
 % 10-27-98 added cohsig, alpha -sm

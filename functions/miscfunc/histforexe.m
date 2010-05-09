@@ -20,11 +20,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
-% Revision 1.1  2009/08/04 04:44:22  arno
-% All functions necessary for compiling EEGLAB code
-%
-
 function histforexe( funct, fold );
 
 if nargin <1

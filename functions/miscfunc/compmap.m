@@ -45,17 +45,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
-% Revision 1.3  2007/10/17 00:26:43  nima
-% strcmp in line 115 for comparing sstrings.
-%
-% Revision 1.2  2004/09/01 18:30:14  arno
-% fixed problem with Matlab 7
-%
-% Revision 1.1  2002/04/05 17:36:45  jorn
-% Initial revision
-%
-
 % Colin Humphries, CNL / Salk Institute, Aug, 1996
 %    03-97 revised -CH
 % 11-05-97 revised for Matlab 5.0.0.4064; added negative compnnos option

@@ -37,17 +37,6 @@ function [hc] = read_ctf_hc(filename);
 
 % Copyright (C) 2002, Robert Oostenveld
 % 
-% $Log: not supported by cvs2svn $
-% Revision 1.1  2005/12/06 06:24:23  psdlw
-% Alternative functions from the FieldTrip package, which is now released under GPL (so I assume these functions can be committed to the sourceforge cvs)
-%
-% Revision 1.3  2003/03/12 16:15:18  roberto
-% added extra warning for mm units
-%
-% Revision 1.2  2003/03/11 15:24:51  roberto
-% updated help and copyrights
-%
-
 global fb
 
 hc.standard.nas = [0 0 0];

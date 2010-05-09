@@ -34,17 +34,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
-% Revision 1.3  2003/09/18 23:44:18  arno
-% debug runica
-%
-% Revision 1.2  2003/09/17 02:11:55  arno
-% nothing
-%
-% Revision 1.1  2002/04/05 17:36:45  jorn
-% Initial revision
-%
-
 % 2-28-97 added source, shape and exppow parameters, kurtosis -sm
 % 4-03-97 shortened name to testica() -sm
 % 4-14-97 changed call to runica() to use new variable order -sm

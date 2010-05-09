@@ -97,8 +97,6 @@
 %
 % See also: eeglab()
  
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 15 Feb 2002 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -114,114 +112,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.35  2006/04/14 18:15:38  arno
-% nothing
-%
-% Revision 1.34  2006/03/11 05:27:54  arno
-% header
-%
-% Revision 1.33  2004/06/15 17:17:32  arno
-% debug one epoch info
-%
-% Revision 1.32  2004/06/15 16:50:42  arno
-% array transposition
-%
-% Revision 1.31  2004/05/27 21:46:48  arno
-% fixing duration import
-%
-% Revision 1.30  2004/05/21 22:25:14  arno
-% header
-%
-% Revision 1.29  2004/05/21 22:24:55  arno
-% adding duration field
-%
-% Revision 1.28  2004/04/29 21:16:09  arno
-% current -> old
-%
-% Revision 1.27  2004/01/30 19:33:28  arno
-% testing existence of eventdescription
-%
-% Revision 1.26  2003/06/19 16:15:36  arno
-% nothing
-%
-% Revision 1.25  2003/06/19 16:07:11  arno
-% make ur
-%
-% Revision 1.24  2003/04/10 17:31:29  arno
-% header edit
-%
-% Revision 1.23  2003/02/28 17:04:14  arno
-% smarter warning
-%
-% Revision 1.22  2003/02/28 16:57:58  arno
-% test if xmin < 0before adding TLE events
-%
-% Revision 1.21  2003/02/28 15:40:34  scott
-% header edit -sm
-%
-% Revision 1.20  2002/11/15 00:51:21  arno
-% debugging TLE latencies, add more feedback to the user
-%
-% Revision 1.19  2002/10/29 22:57:03  scott
-% text
-%
-% Revision 1.18  2002/10/29 22:55:49  scott
-% text
-%
-% Revision 1.17  2002/10/29 22:54:46  scott
-% text .
-%
-% Revision 1.16  2002/10/29 17:19:18  arno
-% rework box size
-% s
-%
-% Revision 1.15  2002/10/28 23:43:46  scott
-% time-lock event -> TLE ; edited help message and popup strings -sm
-%
-% Revision 1.14  2002/10/28 20:35:12  arno
-% new version, different syntax, different text (added optional type)
-%
-% Revision 1.13  2002/08/22 00:01:40  arno
-% adding error message
-%
-% Revision 1.12  2002/08/06 21:55:36  arno
-% spelling
-%
-% Revision 1.11  2002/05/02 19:31:29  arno
-% debugging strmatch (exact)
-%
-% Revision 1.10  2002/05/02 19:15:39  arno
-% typo
-%
-% Revision 1.9  2002/05/02 19:14:18  arno
-% updating command return
-%
-% Revision 1.8  2002/05/02 19:12:21  arno
-% editing message
-%
-% Revision 1.7  2002/04/26 21:36:07  arno
-% correcting bug for the comments
-%
-% Revision 1.6  2002/04/22 21:42:58  arno
-% corrected returned command
-%
-% Revision 1.5  2002/04/18 18:25:02  arno
-% typo can not2
-%
-% Revision 1.4  2002/04/18 18:24:41  arno
-% typo can not
-%
-% Revision 1.3  2002/04/11 22:42:18  arno
-% debuging empty latency fields input array
-%
-% Revision 1.2  2002/04/11 19:37:51  arno
-% additional warning for file and array with the same name
-%
-% Revision 1.1  2002/04/05 17:32:13  jorn
-% Initial revision
-%
 
 % graphic interface INFOS
 % 03/18/02 debugging variable passing - ad & lf

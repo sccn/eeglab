@@ -48,65 +48,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: std_readspec.m,v $
-% Revision 1.20  2010/02/24 15:20:22  claire
-% typo for error message
-%
-% Revision 1.19  2010/02/16 08:43:21  arno
-% New single-trial reading/writing
-%
-% Revision 1.18  2007/02/05 16:17:13  arno
-% fix crash for old study subtracting average spectrum
-%
-% Revision 1.17  2006/11/23 01:12:50  arno
-% implement mean spectrum subtraction
-%
-% Revision 1.16  2006/11/10 00:08:43  arno
-% reprogram for channel
-%
-% Revision 1.15  2006/10/04 23:39:49  toby
-% Bug fix courtesy Bas de Kruif
-%
-% Revision 1.14  2006/03/28 15:38:13  scott
-% help msg
-%
-% Revision 1.13  2006/03/14 02:32:32  scott
-% help msg
-%
-% Revision 1.12  2006/03/11 07:30:01  arno
-% freqrange input
-%
-% Revision 1.11  2006/03/11 07:25:37  arno
-% header
-%
-% Revision 1.10  2006/03/10 16:33:37  arno
-% selecting frequency range for reading
-%
-% Revision 1.9  2006/03/10 00:37:45  arno
-% error msg
-%
-% Revision 1.8  2006/03/09 18:10:38  arno
-% *** empty log message ***
-%
-% Revision 1.7  2006/03/09 18:10:18  arno
-% do not use etc field any more
-%
-% Revision 1.6  2006/03/09 00:42:09  arno
-% fix reading file
-%
-% Revision 1.5  2006/03/09 00:37:31  arno
-% now writing matlab fileend
-%
-% Revision 1.4  2006/03/09 00:03:57  arno
-% read spectrum form matlab file
-%
-% Revision 1.3  2006/03/08 21:06:37  arno
-% rename func
-%
-% Revision 1.2  2006/03/07 22:21:12  arno
-% use fullfile
-%
-
 function [STUDY, specdata, allfreqs] = std_readspec(STUDY, ALLEEG, varargin)
 
 if nargin < 2
@@ -149,8 +90,6 @@ return;
 %
 % Authors:  Arnaud Delorme, Hilit Serby, SCCN, INC, UCSD, February, 2005
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) Hilit Serby, SCCN, INC, UCSD, October 11, 2004, hilit@sccn.ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -166,14 +105,6 @@ return;
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: std_readspec.m,v $
-% Revision 1.20  2010/02/24 15:20:22  claire
-% typo for error message
-%
-% Revision 1.19  2010/02/16 08:43:21  arno
-% New single-trial reading/writing
-%
 
 function [X, f, singletrialdatapresent] = std_readspecsub(setinfo, chancomp, freqrange, rmsubjmean, singletrial)
 

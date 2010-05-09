@@ -255,24 +255,4 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
-% Revision 1.6  2004/02/17 17:53:52  arno
-% *** empty log message ***
-%
-% Revision 1.5  2002/11/15 03:23:57  arno
-% formating for web
-%
-% Revision 1.4  2002/11/15 03:06:41  arno
-% header for web
-%
-% Revision 1.3  2002/04/30 15:00:04  scott
-% further edits -sm
-%
-% Revision 1.2  2002/04/30 14:56:23  scott
-% rewritten for new timef() format -sm
-%
-% Revision 1.1  2002/04/05 17:36:45  jorn
-% Initial revision
-%
-
 % 01-25-02 reformated help & license -ad 

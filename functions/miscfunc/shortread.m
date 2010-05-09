@@ -38,8 +38,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
-
 % xx-07-98  written by Sigurd Enghoff, Salk Institute
 % 04-26-99  modified by Sigurd Enghoff to handle variable-sized and
 %           multi-dimensional data.

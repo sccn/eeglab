@@ -39,65 +39,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
-% Revision 1.19  2004/11/19 23:28:11  arno
-% same
-%
-% Revision 1.18  2004/11/19 23:27:27  arno
-% better error messsage
-%
-% Revision 1.17  2004/08/31 02:12:56  arno
-% typo
-%
-% Revision 1.16  2004/02/12 23:09:19  scott
-% same
-%
-% Revision 1.15  2004/02/12 23:08:02  scott
-% text output edit
-%
-% Revision 1.14  2004/02/12 22:51:30  scott
-% text output edits
-%
-% Revision 1.13  2003/07/28 17:38:53  arno
-% updating error messages
-%
-% Revision 1.12  2003/07/20 19:17:07  scott
-% added channels-processed info if epochs==1 (continuous data)
-%
-% Revision 1.11  2003/04/11 15:03:46  arno
-% nothing
-%
-% Revision 1.10  2003/03/16 01:00:48  scott
-% header and error msgs -sm
-%
-% Revision 1.9  2003/01/24 03:59:19  scott
-% header edit -sm
-%
-% Revision 1.8  2003/01/24 00:23:33  arno
-% print information about transition bands
-%
-% Revision 1.7  2003/01/23 23:53:25  arno
-% change text
-%
-% Revision 1.6  2003/01/23 23:47:26  arno
-% same
-%
-% Revision 1.5  2003/01/23 23:40:59  arno
-% implementing notch filter
-%
-% Revision 1.4  2002/08/09 14:55:36  arno
-% update transition band
-%
-% Revision 1.3  2002/08/09 02:06:27  arno
-% updating transition
-%
-% Revision 1.2  2002/08/09 02:04:34  arno
-% debugging
-%
-% Revision 1.1  2002/04/05 17:36:45  jorn
-% Initial revision
-%
-
 % 5-08-97 fixed frequency bound computation -sm
 % 10-22-97 added MINFREQ tests -sm
 % 12-05-00 added error() calls -sm

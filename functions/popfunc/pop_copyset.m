@@ -21,8 +21,6 @@
 %
 % See also: eeg_store(), pop_delset(), eeglab() 
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -38,39 +36,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.10  2007/08/07 19:08:06  arno
-% fixed bug 334
-%
-% Revision 1.9  2005/11/04 23:33:04  arno
-% new calling format
-%
-% Revision 1.8  2004/02/21 00:24:08  arno
-% msg
-%
-% Revision 1.7  2002/11/15 02:18:25  scott
-% can not -> cannot
-%
-% Revision 1.6  2002/08/13 23:57:45  arno
-% update error message
-%
-% Revision 1.5  2002/08/13 17:22:39  arno
-% text
-%
-% Revision 1.4  2002/08/12 16:20:06  arno
-% debug
-%
-% Revision 1.3  2002/08/12 16:12:32  arno
-% updating messages
-%
-% Revision 1.2  2002/04/23 22:05:43  arno
-% making the function standalone
-% ,
-%
-% Revision 1.1  2002/04/05 17:32:13  jorn
-% Initial revision
-%
 
 % 01-25-02 reformated help & license -ad 
 

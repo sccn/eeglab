@@ -13,8 +13,6 @@
 %
 % Author: Andreas Widmann, University of Leipzig, 2007
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2007 Andreas Widmann, University of Leipzig, widmann@uni-leipzig.de
 %
 % This program is free software; you can redistribute it and/or modify

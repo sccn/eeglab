@@ -18,8 +18,6 @@
 %
 % See also: timtopo()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -35,54 +33,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.15  2005/03/07 21:16:28  arno
-% check chaninfo
-%
-% Revision 1.14  2005/03/05 02:23:29  arno
-% adding chaninfo
-%
-% Revision 1.13  2003/03/12 06:28:05  scott
-% head edtis
-%
-% Revision 1.12  2003/03/12 03:18:01  arno
-% update help
-%
-% Revision 1.11  2002/11/15 01:41:26  scott
-% Can not -> cannot
-%
-% Revision 1.10  2002/08/17 19:23:19  scott
-% menu item text
-%
-% Revision 1.9  2002/08/14 01:37:55  scott
-% added timtopo() to figure title
-%
-% Revision 1.8  2002/08/12 23:50:38  arno
-% text
-%
-% Revision 1.7  2002/08/12 02:20:31  arno
-% debug
-%
-% Revision 1.6  2002/08/12 02:17:50  arno
-% inputdlg2
-% /
-%
-% Revision 1.5  2002/08/12 01:46:22  arno
-% color
-%
-% Revision 1.4  2002/08/11 22:21:37  arno
-% color
-%
-% Revision 1.3  2002/04/25 17:58:46  arno
-% spelling
-%
-% Revision 1.2  2002/04/25 17:57:16  arno
-% spelling
-%
-% Revision 1.1  2002/04/05 17:32:13  jorn
-% Initial revision
-%
 
 % 01-25-02 reformated help & license -ad 
 % 02-16-02 text interface editing -sm & ad 

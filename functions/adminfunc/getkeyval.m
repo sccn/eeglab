@@ -24,8 +24,6 @@
 %
 % See also: gethelpvar()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2002 arno@salk.edu, Arnaud Delorme, CNL / Salk Institute
 %
 % This program is free software; you can redistribute it and/or modify
@@ -41,32 +39,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.8  2007/08/03 21:45:02  arno
-% fix when input does not have quotes
-%
-% Revision 1.7  2007/03/06 23:26:12  toby
-% bug 145, courtesy Ronny Lindner
-%
-% Revision 1.6  2003/03/12 20:13:34  scott
-% header edits -sm
-%
-% Revision 1.5  2003/03/12 19:21:05  arno
-% handle setial case
-%
-% Revision 1.4  2002/08/21 18:55:23  arno
-% same
-%
-% Revision 1.3  2002/08/21 18:52:07  arno
-% debug
-%
-% Revision 1.2  2002/07/29 23:44:31  arno
-% debugging
-%
-% Revision 1.1  2002/07/29 23:43:44  arno
-% Initial revision
-%
 
 function txt = getkeyval(lastcom, var, mode, default)
     % mode can be present for 0 and 1 if the variable is present

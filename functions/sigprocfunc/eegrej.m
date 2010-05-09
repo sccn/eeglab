@@ -33,8 +33,6 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -50,39 +48,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.9  2004/06/03 21:25:25  arno
-% undo last change
-%
-% Revision 1.8  2004/06/03 21:19:02  arno
-% changing latency of boundevent
-%
-% Revision 1.7  2003/06/11 18:35:45  arno
-% generate specific error
-% for wrong event latencies
-%
-% Revision 1.6  2003/02/27 20:25:30  arno
-% taking the round of regions
-%
-% Revision 1.5  2002/11/15 01:35:22  scott
-% nbpoints -> datlen
-% .,
-%
-% Revision 1.4  2002/08/08 01:16:56  arno
-% adding boundary return
-%
-% Revision 1.3  2002/07/31 16:11:15  arno
-% debugging
-%
-% Revision 1.2  2002/05/21 20:51:29  scott
-% removed ; from evalin() calls -sm
-%
-% Revision 1.1  2002/04/05 17:39:45  jorn
-% Initial revision
-%
-% 01-25-02 reformated help & license -ad 
-% 03-27-02 added event latency recalculation -ad 
 
 function [indata, times, newevents, boundevents] = eegrej( indata, regions, times, eventtimes );
 

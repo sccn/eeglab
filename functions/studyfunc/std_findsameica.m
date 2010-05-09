@@ -10,8 +10,6 @@
 %
 % Authors:  Arnaud Delorme, SCCN, INC, UCSD, July 2009-
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) Arnaud Delorme, SCCN, INC, UCSD, arno@sccn.ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -29,14 +27,6 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % Coding notes: Useful information on functions and global variables used.
-
-% $Log: std_findsameica.m,v $
-% Revision 1.2  2009/10/21 23:43:53  arno
-% Fix find the same ICA for ICA matrices of different size
-%
-% Revision 1.1  2009/07/10 01:50:14  arno
-% adding new functions
-%
 
 function cluster = std_findsameica(ALLEEG);
 

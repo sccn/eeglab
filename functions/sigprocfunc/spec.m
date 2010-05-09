@@ -33,8 +33,6 @@
 %
 % Author: Arnaud Delorme, SCCN, Dec 2, 2003
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2003 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -50,47 +48,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.13  2004/04/28 15:36:26  arno
-% fixing winsize
-%
-% Revision 1.12  2004/02/12 02:08:28  arno
-% do not return power as log
-%
-% Revision 1.11  2003/12/04 23:01:07  arno
-% warnings
-%
-% Revision 1.10  2003/12/04 22:56:43  arno
-% warnings off
-%
-% Revision 1.9  2003/12/03 19:26:43  arno
-% header
-%
-% Revision 1.8  2003/12/03 03:02:00  arno
-% header
-%
-% Revision 1.7  2003/12/03 02:57:04  arno
-% same
-%
-% Revision 1.6  2003/12/03 02:56:37  arno
-% timesout min
-%
-% Revision 1.5  2003/12/03 02:46:55  arno
-% unmatched end
-%
-% Revision 1.4  2003/12/03 02:36:32  arno
-% outputs
-%
-% Revision 1.3  2003/12/03 02:35:01  arno
-% for non power of 2 windows
-%
-% Revision 1.2  2003/12/03 02:19:41  arno
-% optional plotting
-%
-% Revision 1.1  2003/12/03 02:11:04  arno
-% Initial revision
-%
 
 function [power, freqs] = spec(X, nfft, fs, win, overlap);
 

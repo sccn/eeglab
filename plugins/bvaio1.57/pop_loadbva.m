@@ -14,8 +14,6 @@
 %
 % See also: eeglab()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2003 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -31,44 +29,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.1  2005/11/03 22:57:36  arnodelorme
-% Initial revision
-%
-% Revision 1.11  2005/10/27 05:27:07  arno
-% filename
-%
-% Revision 1.10  2005/10/26 02:00:41  arno
-% filename
-%
-% Revision 1.9  2005/03/21 22:44:47  arno
-% making ur events
-%
-% Revision 1.8  2004/03/11 17:41:30  arno
-% remove dbug msg
-%
-% Revision 1.7  2004/03/11 17:41:10  arno
-% dbug msg
-%
-% Revision 1.6  2004/03/11 17:39:38  arno
-% debug channel name
-%
-% Revision 1.5  2004/01/22 16:32:59  arno
-% debuging channel names
-%
-% Revision 1.4  2004/01/22 08:31:01  arno
-% suppressing fields while loading data
-%
-% Revision 1.3  2003/12/17 00:44:23  arno
-% creating empty channels
-%
-% Revision 1.2  2003/12/17 00:17:06  arno
-% remove besa fields
-%
-% Revision 1.1  2003/12/16 23:29:13  arno
-% Initial revision
-%
 
 function [EEG, com] =  pop_loadbva(filename)
     

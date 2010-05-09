@@ -28,14 +28,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: std_checkconsist.m,v $
-% Revision 1.2  2009/08/10 18:35:15  arno
-% fix std_checkconsist
-%
-% Revision 1.1  2009/08/07 21:50:10  arno
-% New funcs
-%
-
 function [boolval npersubj] = std_checkconsist(STUDY, varargin);
 
 if nargin < 3

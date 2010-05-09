@@ -19,8 +19,6 @@
 %
 % See also: pop_prop(), eeglab()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -36,94 +34,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.28  2006/03/29 00:51:48  scott
-% nothing
-%
-% Revision 1.27  2005/11/02 19:56:07  arno
-% history
-%
-% Revision 1.26  2005/03/05 02:33:21  arno
-% chaninfo
-%
-% Revision 1.25  2004/07/09 17:00:24  arno
-% only show electrode if less than 64 channels
-%
-% Revision 1.24  2004/03/18 00:31:45  arno
-% remove skirt
-%
-% Revision 1.23  2004/02/23 15:30:18  scott
-% added 'shrink','skirt' to topoplot call
-%
-% Revision 1.22  2004/02/23 15:28:08  scott
-% turned 'electrodes','off' in topoplots
-%
-% Revision 1.21  2003/07/24 23:17:27  arno
-% removing extra plot
-%
-% Revision 1.20  2003/07/24 18:52:10  arno
-% typo
-% /
-%
-% Revision 1.19  2003/07/21 15:25:31  arno
-% allowing to select component to reject
-%
-% Revision 1.18  2003/05/12 22:29:10  arno
-% verbose off
-% for topoplot
-%
-% Revision 1.17  2003/05/10 17:31:52  arno
-% adding name of dataset to title
-%
-% Revision 1.16  2003/02/11 02:02:16  arno
-% making it compatible for one row
-%
-% Revision 1.15  2003/02/10 23:25:52  arno
-% allowing to plot less than 35 components
-%
-% Revision 1.14  2002/09/04 23:31:22  arno
-% spetial aborting plot feature
-%
-% Revision 1.13  2002/09/04 23:25:40  arno
-% debugging last
-%
-% Revision 1.12  2002/09/04 23:24:34  arno
-% updating pop_compprop -> pop_prop
-%
-% Revision 1.11  2002/08/19 22:05:37  arno
-% removing comment
-%
-% Revision 1.10  2002/08/12 18:35:09  arno
-% questdlg2
-%
-% Revision 1.9  2002/08/12 14:59:30  arno
-% button color
-%
-% Revision 1.8  2002/08/12 01:42:46  arno
-% colors
-%
-% Revision 1.7  2002/08/11 22:19:37  arno
-% *** empty log message ***
-%
-% Revision 1.6  2002/07/26 23:57:37  arno
-% same
-%
-% Revision 1.5  2002/07/26 23:56:27  arno
-% window location
-%
-% Revision 1.4  2002/07/26 14:35:27  arno
-% debugging: if nb comps~=nb chans
-%
-% Revision 1.3  2002/04/26 21:21:08  arno
-% updating eeg_store call
-%
-% Revision 1.2  2002/04/18 18:40:01  arno
-% retrIeve
-%
-% Revision 1.1  2002/04/05 17:32:13  jorn
-% Initial revision
-%
 
 % 01-25-02 reformated help & license -ad 
 

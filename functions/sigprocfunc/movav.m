@@ -30,8 +30,6 @@
 %
 % Author: Scott Makeig, SCCN/INC/UCSD, La Jolla, 10-25-97 
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 10-25-97 Scott Makeig, SCCN/INC/UCSD, scott@sccn.ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -47,92 +45,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.28  2007/09/11 10:33:16  arno
-% && -> &
-%
-% Revision 1.27  2007/03/08 17:22:54  scott
-% removed 'debugit' printing and variable -sm
-%
-% Revision 1.26  2007/03/06 17:50:17  scott
-% documented turning off the fastave feature -sm
-%
-% Revision 1.25  2007/03/06 17:48:25  scott
-% fixed ?????????? computation as suggested by AG  -sm
-%
-% Revision 1.24  2007/03/06 17:17:50  scott
-% fixed AG bugs, disabled 'flag_fastave' (formerly 'fastave') mode
-% (or kept it disabled) -sm
-%
-% Revision 1.23  2007/03/05 15:33:46  scott
-% implemented AG fix is sum(xwin) is near zero -sm
-%
-% Revision 1.22  2007/03/05 15:17:56  scott
-% nelem() -> numel()
-%
-% Revision 1.21  2007/03/05 15:15:51  scott
-% nothing
-%
-% Revision 1.20  2006/11/04 03:04:20  scott
-% help msg calrification
-%
-% Revision 1.19  2006/07/26 03:37:25  toby
-% change to outframes to choose an optimal number, was sometimes losing the last possible.
-%
-% Revision 1.18  2005/11/07 19:25:40  scott
-% turned off debug and verbose flags -sm
-%
-% Revision 1.17  2005/11/07 19:25:14  scott
-% debugged nonorm -sm
-%
-% Revision 1.16  2005/11/07 19:03:58  scott
-% added nonorm option -sm
-%
-% Revision 1.15  2005/05/28 21:09:24  scott
-% fixed 'fastave' bug
-%
-% Revision 1.14  2003/11/18 17:50:49  arno
-% remove nanmean and nansum
-%
-% Revision 1.13  2002/10/21 00:17:23  arno
-% updating default fisrtx and lastx input to allow for 0 latency (before 0=use default)
-%
-% Revision 1.12  2002/05/23 17:33:59  scott
-% adjusting verbose output -sm
-%
-% Revision 1.11  2002/05/23 17:32:42  scott
-% *** empty log message ***
-%
-% Revision 1.10  2002/05/23 17:30:20  scott
-% *** empty log message ***
-%
-% Revision 1.9  2002/05/23 17:29:32  scott
-% *** empty log message ***
-%
-% Revision 1.8  2002/05/23 17:27:56  scott
-% allow []=default args -sm
-%
-% Revision 1.7  2002/05/23 17:24:13  scott
-% *** empty log message ***
-%
-% Revision 1.6  2002/05/23 17:20:59  scott
-% *** empty log message ***
-%
-% Revision 1.5  2002/05/23 17:19:21  scott
-% *** empty log message ***
-%
-% Revision 1.4  2002/05/23 17:18:21  scott
-% adjust default 'xvals' -sm
-%
-% Revision 1.3  2002/05/23 17:06:00  scott
-% *** empty log message ***
-%
-% Revision 1.2  2002/05/23 17:03:41  scott
-% added alternate functions nan_mean() and nan_sum() -sm
-%
-% Revision 1.1  2002/04/05 17:36:45  jorn
-% Initial revision
 
 % 3-20-98 fixed bug in multi-channel windowed averaging -sm
 % 6-10-98 changed mean() and sum() to nanmean() and nansum() -sm

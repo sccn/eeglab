@@ -20,8 +20,6 @@
 % See also: eeglab(), loadeep_avg()
 %
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2003 Maarten-Jan Hoeve, m.hoeve@ieee.org
 %
 % This program is free software; you can redistribute it and/or modify
@@ -37,25 +35,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.3  2005/07/21 10:12:51  mvelde
-% updated information
-%
-% Revision 1.2  2005/06/08 08:16:37  mvelde
-% converted files to unix format
-%
-% Revision 1.1  2004/11/26 13:22:22  jwiskerke
-% Added eeglab to cvs.
-%
-% Revision 1.2  2003/10/24 13:34:41  Maarten-Jan Hoeve
-% Added GNU Licence and updated revision history
-%
-% Revision 1.1.1.2  2003/10/17 09:55:20  mvelde
-% updated: consistent copyrights, arguments/data labels, fixed some typos
-%
-% Advanced Neuro Technology (ANT) BV, The Netherlands, www.ant-neuro.com / info@ant-neuro.com
-%
 
 function [EEG, command]=pop_loadeep_avg(filename); 
 

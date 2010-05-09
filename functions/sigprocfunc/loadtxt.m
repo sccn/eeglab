@@ -34,8 +34,6 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 29 March 2002
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) Arnaud Delorme, CNL / Salk Institute, 29 March 2002
 %
 % This program is free software; you can redistribute it and/or modify
@@ -51,50 +49,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.14  2009/09/27 05:14:37  arno
-% Fixed conversion to numeric
-%
-% Revision 1.13  2007/03/20 02:32:38  arno
-% fixed finputcheck (Andreas)
-%
-% Revision 1.12  2006/10/16 22:11:43  arno
-% typo
-%
-% Revision 1.11  2006/10/16 21:07:49  arno
-% text
-%
-% Revision 1.10  2005/05/24 17:51:16  arno
-% remove cell2mat
-%
-% Revision 1.9  2005/02/14 00:20:57  arno
-% fix delim
-%
-% Revision 1.8  2005/02/04 00:38:50  arno
-% upgrading to use finputcheck
-%
-% Revision 1.7  2004/07/29 21:06:17  arno
-% coma separated file debug
-%
-% Revision 1.6  2004/01/29 01:35:35  arno
-% debug numerical conversion
-%
-% Revision 1.5  2003/11/19 19:28:16  arno
-% now reading empty tabs
-%
-% Revision 1.4  2003/11/07 01:45:32  arno
-% adding nline argument
-%
-% Revision 1.3  2003/01/10 17:28:56  arno
-% debug last
-%
-% Revision 1.2  2003/01/10 17:27:13  arno
-% str2num -> str2double
-%
-% Revision 1.1  2002/04/05 17:39:45  jorn
-% Initial revision
-%
 
 function array = loadtxt( filename, varargin );
 

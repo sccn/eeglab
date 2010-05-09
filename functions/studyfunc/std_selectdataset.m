@@ -32,8 +32,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: std_selectdataset.m,v $
-
 function [datind, dattrialselect] = std_selectdataset(STUDY, ALLEEG, indvar, indvarvals);
 
 if nargin < 3

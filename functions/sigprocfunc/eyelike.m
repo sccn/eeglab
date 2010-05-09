@@ -6,8 +6,6 @@
 %
 % Author: Benjamin Blankertz (blanker@first.gmd.de) 3/2/00
 
-% $Log: not supported by cvs2svn $
-
 function [eyelikeres, S, P]= eyelike(E)
 
 [N, M]= size(E);

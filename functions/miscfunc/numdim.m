@@ -20,8 +20,6 @@
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 23 January 2003
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2002 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -37,30 +35,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.2  2003/02/26 23:02:27  arno
-% numsources -> numdim
-%
-% Revision 1.1  2003/02/26 23:01:10  arno
-% Initial revision
-%
-% Revision 1.5  2003/02/14 16:11:35  scott
-% header
-% ,
-%
-% Revision 1.4  2003/02/14 15:02:18  scott
-% help msg edit
-%
-% Revision 1.3  2003/01/27 15:51:08  arno
-% adding reference
-%
-% Revision 1.2  2003/01/24 18:36:50  arno
-% transpose array
-%
-% Revision 1.1  2003/01/24 18:05:29  arno
-% Initial revision
-%
 
 function lambda = numdim( a )
     

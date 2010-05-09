@@ -39,8 +39,6 @@
 %
 % See also: loadeeg(), eeglab()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -56,69 +54,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.20  2007/08/09 01:10:08  arno
-% remove blank after channels
-%
-% Revision 1.19  2005/10/24 23:33:53  arno
-% fix filename
-%
-% Revision 1.18  2004/09/16 18:21:13  hilit
-% corrected a typo with the filepath delimiter
-%
-% Revision 1.17  2004/03/17 22:30:03  arno
-% debug filepath...
-%
-% Revision 1.16  2003/12/17 23:19:52  arno
-% importing channel labels
-%
-% Revision 1.15  2003/11/18 16:26:53  scott
-% same
-%
-% Revision 1.14  2003/11/18 16:25:55  scott
-% Enter ... -> ...
-%
-% Revision 1.13  2003/05/22 15:43:52  arno
-% header update
-%
-% Revision 1.12  2003/05/14 16:55:49  arno
-% adding format to history
-%
-% Revision 1.11  2003/05/14 16:54:52  arno
-% allowing to read 32-bits data files
-%
-% Revision 1.10  2003/04/10 18:06:18  arno
-% default argument
-%
-% Revision 1.9  2003/04/10 18:02:57  arno
-% change default file name
-%
-% Revision 1.8  2003/04/10 18:01:51  arno
-% file filter
-%
-% Revision 1.7  2003/03/12 00:42:20  arno
-% removing namechan field
-%
-% Revision 1.6  2003/02/23 08:33:04  scott
-% header edits -sm
-%
-% Revision 1.5  2003/02/21 17:31:45  arno
-% update header for GUI
-%
-% Revision 1.4  2003/01/14 00:30:23  arno
-% handling the case where all rts are 0
-%
-% Revision 1.3  2002/08/12 02:38:13  arno
-% [6~[6~inputdlg2
-%
-% Revision 1.2  2002/05/02 19:39:43  arno
-% updating function for new event structure
-% ,
-%
-% Revision 1.1  2002/04/05 17:32:13  jorn
-% Initial revision
-%
 
 % 01-25-02 reformated help & license -ad 
 

@@ -27,8 +27,6 @@
 %
 % Authors: Arnaud Delorme, CERCO/CNSR & SCCN, INC, UCSD, 2009-
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) Arnaud Delorme, SCCN, INC, UCSD, arno@sccn.ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -44,20 +42,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: std_substudy.m,v $
-% Revision 1.5  2009/11/04 02:45:31  arno
-% create sub STUDY
-%
-% Revision 1.4  2009/11/04 02:27:27  arno
-% implement optional rmdat
-%
-% Revision 1.3  2009/11/04 02:15:59  arno
-% fixed comps
-%
-% Revision 1.2  2009/11/04 01:51:54  arno
-% added header and fix input format
-%
 
 function [ STUDY ALLEEG ] = std_substudy(STUDY, ALLEEG, varargin);
 

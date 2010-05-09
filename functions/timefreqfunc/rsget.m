@@ -34,20 +34,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
-% Revision 1.4  2003/07/09 15:37:11  arno
-% increase MaxFNumEval
-%
-% Revision 1.3  2003/07/09 00:48:28  arno
-% going to lower tolerance
-%
-% Revision 1.2  2003/07/08 16:37:06  arno
-% *** empty log message ***
-%
-% Revision 1.1  2003/07/08 15:59:44  arno
-% Initial revision
-%
-
 function p = rsget( l, val);
     
     % plot the curve

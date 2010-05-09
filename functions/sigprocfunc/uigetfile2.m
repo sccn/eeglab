@@ -23,35 +23,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
-% Revision 1.9  2005/03/10 01:35:55  arno
-%  option only to remember folder
-%
-% Revision 1.8  2004/12/10 23:09:32  hilit
-% correcting the chmod option
-%
-% Revision 1.7  2004/12/08 19:40:40  hilit
-% eeglab.cfg is now saved to the /tmp folder only
-%
-% Revision 1.6  2004/12/02 00:26:23  hilit
-% missing a closing end
-%
-% Revision 1.5  2004/12/01 23:18:14  hilit
-% now changed correctly
-%
-% Revision 1.4  2004/12/01 23:15:31  hilit
-% file can be now read from Matlab6 even if created in Matlab 7
-%
-% Revision 1.3  2004/11/29 23:12:43  hilit
-% verifing that everyone have perimissions to eeglab.cfg
-%
-% Revision 1.2  2004/11/23 19:27:14  scott
-% edit help
-%
-% Revision 1.1  2004/09/09 22:56:44  arno
-% Initial revision
-%
-
 function varargout = uigetfile2(varargin);
     
     if nargin < 1

@@ -11,14 +11,6 @@ function [coef] = read_ctf_coef
 
 % Copyright (C) 2003, Robert Oostenveld
 %
-% $Log: not supported by cvs2svn $
-% Revision 1.1  2005/12/06 06:24:20  psdlw
-% Alternative functions from the FieldTrip package, which is now released under GPL (so I assume these functions can be committed to the sourceforge cvs)
-%
-% Revision 1.1  2003/03/24 12:33:02  roberto
-% new implementation
-%
-
 if nargin~=0
   error('this function does not accept input parameters')
 end

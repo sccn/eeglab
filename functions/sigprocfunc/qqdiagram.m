@@ -50,29 +50,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
-% Revision 1.7  2004/10/04 17:02:36  scott
-% add xtick at 1 s.d. to qqdiagram() -sm
-%
-% Revision 1.6  2004/10/02 18:54:57  scott
-% commented out text() calls - gave ??? 'not enough arguments' under 7.0.0 ?? -sm
-%
-% Revision 1.5  2002/11/15 02:52:42  arno
-% header for web
-%
-% Revision 1.4  2002/08/28 00:45:56  luca
-% modified qq-line
-%
-% Revision 1.3  2002/08/22 02:05:17  luca
-% added some ;
-%
-% Revision 1.2  2002/08/22 01:48:39  luca
-% changed label
-%
-% Revision 1.1  2002/08/22 01:01:13  luca
-% Initial revision
-%
-
 function qqdiagram( x , y, pk )
 
 if nargin < 1

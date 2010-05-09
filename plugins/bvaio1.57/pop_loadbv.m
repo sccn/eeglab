@@ -23,8 +23,6 @@
 %
 % Author: Andreas Widmann & Arnaud Delorme, 2004-
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2004 Andreas Widmann, University of Leipzig, widmann@uni-leipzig.de
 %
 % This program is free software; you can redistribute it and/or modify

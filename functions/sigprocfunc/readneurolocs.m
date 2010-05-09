@@ -21,8 +21,6 @@
 %
 % See also: readlocs()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2003 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -38,50 +36,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.14  2006/01/10 23:25:27  arno
-% fix orientation problem for some files
-%
-% Revision 1.13  2005/05/24 17:10:59  arno
-% cell2mat -> celltomat
-%
-% Revision 1.12  2004/02/12 19:44:10  arno
-% reading 3D coordinates
-%
-% Revision 1.11  2003/12/17 23:14:49  arno
-% do not auto-rotate
-%
-% Revision 1.10  2003/12/02 19:15:48  arno
-% pass on paramters to adjustlocs
-%
-% Revision 1.9  2003/12/02 02:34:10  arno
-% now using adjustlocs
-%
-% Revision 1.8  2003/12/01 17:10:17  arno
-% automatic calibration
-%
-% Revision 1.7  2003/12/01 02:31:01  arno
-% correct slight innacuracy when reading file
-%
-% Revision 1.6  2003/08/05 18:24:04  arno
-% header
-%
-% Revision 1.5  2003/07/29 21:25:20  arno
-% debug C3-C4
-%
-% Revision 1.4  2003/07/29 21:05:53  arno
-% handle cell array for channel locations
-%
-% Revision 1.3  2003/06/13 00:53:47  arno
-% debuging
-%
-% Revision 1.2  2003/03/04 20:04:17  arno
-% debuging
-%
-% Revision 1.1  2003/03/04 19:18:35  arno
-% Initial revision
-%
 
 function chanlocs = readneurolocs( filename, varargin)
 

@@ -14,8 +14,6 @@
 %
 % Author: Arnaud Delorme & Hilit Serby, SCCN, INC, UCSD, 2004
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2004 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -31,26 +29,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: std_comppol.m,v $
-% Revision 1.6  2010/02/06 05:47:52  arno
-% New titles for figures
-%
-% Revision 1.5  2007/08/03 23:10:00  arno
-% remove the NaN for computing polarity switching
-%
-% Revision 1.4  2007/03/14 02:19:21  arno
-% fixed comppol
-%
-% Revision 1.3  2006/09/12 18:58:11  arno
-% Debugging
-%
-% Revision 1.2  2006/03/12 04:22:29  arno
-% comppol -> std_comppol
-%
-% Revision 1.1  2004/08/26 23:06:27  arno
-% Initial revision
-%
 
 function [compin, pol] = std_comppol(compin);
 

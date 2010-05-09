@@ -111,8 +111,6 @@
 %
 % See also: pop_editset(), pop_select(), eeglab()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -128,110 +126,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.34  2010/04/06 03:29:52  roy
-% fix typo in help comments
-%
-% Revision 1.33  2009/11/11 00:28:53  arno
-% New GUI format
-%
-% Revision 1.32  2009/05/17 21:52:43  arno
-% fix crash when cancel loading
-%
-% Revision 1.31  2007/11/23 00:11:57  arno
-% default srate
-%
-% Revision 1.30  2007/11/21 16:46:38  arno
-% help msg
-%
-% Revision 1.29  2006/05/23 10:29:08  arno
-% header problem
-%
-% Revision 1.28  2005/11/08 22:16:20  arno
-% editing header
-%
-% Revision 1.27  2005/11/05 03:10:27  toby
-% Revised edition helpmenu outline
-%
-% Revision 1.26  2005/11/04 22:44:50  arno
-% header
-%
-% Revision 1.25  2005/11/04 22:42:00  arno
-% new fields etc...
-%
-% Revision 1.24  2004/03/26 23:21:57  arno
-% window width
-%
-% Revision 1.23  2004/03/02 16:36:53  arno
-% gui text
-%
-% Revision 1.22  2003/05/29 21:46:38  arno
-% simply forwarding data if command line call
-%
-% Revision 1.21  2003/04/29 15:00:47  arno
-% results -> result
-%
-% Revision 1.20  2003/04/21 00:43:56  arno
-% warning for epoch start time > 10
-%
-% Revision 1.19  2003/03/04 20:24:13  arno
-% header typo
-%
-% Revision 1.18  2003/02/25 00:52:56  scott
-% header edit -sm
-%
-% Revision 1.17  2003/02/24 16:26:39  arno
-% resolving ???
-%
-% Revision 1.16  2003/02/22 16:58:02  scott
-% header edits, with ??? -sm
-%
-% Revision 1.15  2003/02/21 22:55:11  arno
-% adding gui info
-%
-% Revision 1.14  2002/12/18 22:25:46  arno
-% Automatic file format detection debug
-%
-% Revision 1.13  2002/12/05 02:26:41  arno
-% adding an additionnal warning for clicking on the selected option
-%
-% Revision 1.12  2002/09/25 23:50:01  arno
-% correcting float-le problem
-%
-% Revision 1.11  2002/09/04 18:30:31  luca
-% same
-%
-% Revision 1.10  2002/09/04 18:30:11  luca
-% same
-%
-% Revision 1.9  2002/09/04 18:28:23  luca
-% 'debug command line big variable passed as text - arno
-%
-% Revision 1.8  2002/09/04 18:24:09  luca
-% debug for command line - arno
-%
-% Revision 1.7  2002/07/31 18:02:26  arno
-% adding more options
-%
-% Revision 1.6  2002/05/02 23:55:22  arno
-% auto file type selection
-%
-% Revision 1.5  2002/04/20 23:53:14  scott
-% editted screen items -sm
-%
-% Revision 1.4  2002/04/18 02:35:24  arno
-% put default Matlab file read
-%
-% Revision 1.3  2002/04/11 22:22:52  arno
-% removing comment
-%
-% Revision 1.2  2002/04/11 21:18:34  arno
-% *** empty log message ***
-%
-% Revision 1.1  2002/04/05 17:32:13  jorn
-% Initial revision
-%
 
 % 01-25-02 reformated help & license -ad 
 % 03-16-02 text interface editing -sm & ad 

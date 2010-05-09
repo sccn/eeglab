@@ -17,11 +17,6 @@
 %          x,y    = 2-D Cartesian coordinates (from pol2cart())
 % 3-D:     x,y,z  = 3-D Cartesian coordinates (normalized, |x,y,z| = 1)
 
-% $Log: not supported by cvs2svn $
-% Revision 1.1  2002/04/05 17:36:45  jorn
-% Initial revision
-%
-
 % Scott Makeig, CNL / Salk Institute, La Jolla CA 3/01
 %  code from topoplot()
 

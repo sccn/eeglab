@@ -7,8 +7,6 @@
 %
 % See also: inputdlg2(), errordlg2(), supergui(), inputgui()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) Arnaud Delorme, CNL / Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -24,59 +22,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.17  2006/02/23 22:32:32  arno
-% fixing initialvalues
-%
-% Revision 1.16  2006/02/23 00:42:57  arno
-% nothing
-%
-% Revision 1.15  2006/02/23 00:40:32  arno
-% multiple selection
-%
-% Revision 1.14  2006/02/23 00:35:02  arno
-% empty value case
-%
-% Revision 1.13  2006/02/23 00:33:52  arno
-% adding value argument
-%
-% Revision 1.12  2006/02/08 23:15:23  arno
-% allowing non-cell array input
-%
-% Revision 1.11  2006/01/10 00:40:28  arno
-% fix multiline
-%
-% Revision 1.10  2004/11/10 17:06:39  arno
-% initval -> initialvalue
-%
-% Revision 1.9  2004/11/10 16:51:25  arno
-% remove dbug message
-%
-% Revision 1.8  2004/11/10 16:48:20  arno
-% nothing
-%
-% Revision 1.7  2004/11/10 16:33:18  arno
-% maximum height
-%
-% Revision 1.6  2004/06/28 15:44:43  arno
-% redrawing figure
-%
-% Revision 1.5  2004/06/16 22:00:20  arno
-% debug for integer
-%
-% Revision 1.4  2002/10/15 17:24:13  arno
-% same
-%
-% Revision 1.3  2002/10/15 16:56:45  arno
-% drawnow for windows
-%
-% Revision 1.2  2002/08/21 18:13:37  arno
-% debug for one element only
-%
-% Revision 1.1  2002/08/17 03:06:48  arno
-% Initial revision
-%
 
 function [vals, okornot, strval] = listdlg2(varargin);
 

@@ -24,8 +24,6 @@
 %
 % See also: plotdata(), eeglab()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -41,84 +39,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.25  2009/11/04 01:37:41  arno
-% remove menu for single trials
-%
-% Revision 1.24  2007/02/05 16:21:26  arno
-% now uses the correct of components
-%
-% Revision 1.23  2006/01/31 20:22:07  arno
-% eeglab options
-% ..
-%
-% Revision 1.22  2005/11/04 02:41:48  toby
-% Fixed a minor bug in default number of channels
-%
-% Revision 1.21  2005/02/07 17:54:33  scott
-% adjust pop-window text
-%
-% Revision 1.20  2005/01/29 01:25:55  scott
-% added ydir and [ymin ymax] inputs; added [ymin ymax] input text box
-%
-% Revision 1.19  2005/01/29 00:46:43  scott
-% nothing
-%
-% Revision 1.18  2005/01/29 00:04:17  scott
-% added text entry for Vertical limits (after fixing this plotdata() option).
-%
-% Revision 1.17  2004/08/30 15:02:19  arno
-% typo
-%
-% Revision 1.16  2004/08/23 15:03:20  arno
-% remove dbug msg
-%
-% Revision 1.15  2004/08/09 15:41:18  arno
-% header modified
-%
-% Revision 1.14  2003/05/10 02:33:10  arno
-% output command simplification
-%
-% Revision 1.13  2003/03/12 03:20:02  arno
-% help button update
-%
-% Revision 1.12  2002/10/16 01:15:07  arno
-% nan_mean
-%
-% Revision 1.11  2002/10/16 01:05:17  arno
-% using nan_mean
-%
-% Revision 1.10  2002/10/16 00:44:13  arno
-% remove nan plot
-%
-% Revision 1.9  2002/10/14 17:17:24  arno
-% handle NaN
-%
-% Revision 1.8  2002/08/17 21:54:36  scott
-% pop labels and help msg
-%
-% Revision 1.7  2002/08/12 21:14:46  arno
-% text
-%
-% Revision 1.6  2002/08/12 02:17:13  arno
-% same
-%
-% Revision 1.5  2002/08/12 02:15:03  arno
-% changing gui
-%
-% Revision 1.4  2002/08/12 01:38:35  arno
-% color
-%
-% Revision 1.3  2002/08/11 22:17:52  arno
-% color
-%
-% Revision 1.2  2002/08/06 21:56:25  arno
-% spelling
-%
-% Revision 1.1  2002/04/05 17:32:13  jorn
-% Initial revision
-%
 
 % 01-25-02 reformated help & license -ad 
 % 03-08-02 add eeglab options -ad

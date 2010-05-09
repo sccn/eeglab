@@ -57,8 +57,6 @@
 %
 % See also: eegthresh(), eeglab(), eegplot(), pop_rejepoch()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -74,92 +72,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.28  2008/04/19 21:07:18  arno
-% fix unknown parameters to eegplot
-%
-% Revision 1.27  2007/11/15 04:11:47  arno
-% error if no signal processing toolbox
-%
-% Revision 1.26  2007/02/06 02:42:19  toby
-% updated for new 'movebutton' feature of eegplot
-%
-% Revision 1.25  2006/01/31 20:16:02  arno
-% options
-%
-% Revision 1.24  2005/08/04 15:37:52  arno
-% remove memory saving option
-%
-% Revision 1.23  2003/12/24 18:56:16  scott
-% help msg and pop-window text edits
-%
-% Revision 1.22  2003/12/17 18:16:35  arno
-% reject
-%
-% Revision 1.21  2003/12/04 23:27:46  arno
-% reject trials
-%
-% Revision 1.20  2003/02/18 22:50:06  arno
-% updating header for GUI
-%
-% Revision 1.19  2003/01/10 01:10:45  arno
-% change default position
-%
-% Revision 1.18  2002/11/15 19:07:24  arno
-% updating default position (eegplot)
-%
-% Revision 1.17  2002/11/15 01:37:17  arno
-% header typo
-%
-% Revision 1.16  2002/11/13 02:06:52  arno
-% debugging command line call
-%
-% Revision 1.15  2002/11/13 01:21:24  arno
-% typo in header
-%
-% Revision 1.14  2002/11/12 23:48:59  luca
-% noew saving output
-%
-% Revision 1.13  2002/08/14 15:26:03  arno
-% debug for few channels
-%
-% Revision 1.12  2002/08/12 21:53:00  arno
-% text
-%
-% Revision 1.11  2002/08/12 02:32:24  arno
-% inputdlg2
-%
-% Revision 1.10  2002/08/07 22:38:42  arno
-% editing header
-%
-% Revision 1.9  2002/07/31 01:02:13  arno
-% debugging
-%
-% Revision 1.8  2002/07/30 23:37:51  arno
-% debugging
-%
-% Revision 1.7  2002/07/30 23:33:47  arno
-% new rejection type
-%
-% Revision 1.6  2002/07/30 15:17:52  arno
-% debug display
-%
-% Revision 1.5  2002/07/30 15:17:16  arno
-% debugging
-%
-% Revision 1.4  2002/07/26 18:09:31  arno
-% debugging
-%
-% Revision 1.3  2002/07/26 18:04:48  arno
-% debugging
-%
-% Revision 1.2  2002/07/26 16:44:35  arno
-% switching icacomp
-%
-% Revision 1.1  2002/04/05 17:32:13  jorn
-% Initial revision
-%
 
 % 01-25-02 reformated help & license -ad 
 % 03-07-02 added srate argument to eegplot call -ad

@@ -21,11 +21,6 @@
 % publication or otherwise, please include an acknowledgement and notify
 % me by email. /Niclas
 
-% $Log: not supported by cvs2svn $
-% Revision 1.1  2002/04/05 17:36:45  jorn
-% Initial revision
-%
-
 function [C,T]=hungarian(A)
 
 [m,n]=size(A);

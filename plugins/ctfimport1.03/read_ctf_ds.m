@@ -25,29 +25,6 @@ function [meg, hdr, hc] = read_ctf_ds(fname, trial)
 % modifications Copyright (C) 2002, Ole Jensen
 % modifications Copyright (C) 2003, Robert Oostenveld
 %
-% $Log: not supported by cvs2svn $
-% Revision 1.1  2005/12/06 06:24:23  psdlw
-% Alternative functions from the FieldTrip package, which is now released under GPL (so I assume these functions can be committed to the sourceforge cvs)
-%
-% Revision 1.6  2003/04/22 08:50:10  roberto
-% fixed bug with array indexing
-%
-% Revision 1.5  2003/04/22 08:43:00  roberto
-% fixed bug for trials that did not start at 1
-%
-% Revision 1.4  2003/03/24 12:34:33  roberto
-% minor changes
-%
-% Revision 1.3  2003/03/14 10:45:12  roberto
-% changed copyright from GPL to "commercial confident" to adhere to NDA
-%
-% Revision 1.2  2003/03/13 14:27:40  roberto
-% moved res4 header part into separate function
-%
-% Revision 1.1  2003/03/12 16:20:47  roberto
-% new implementation based on Ole Jensens code
-%
-
 % construct the filenames for this dataset
 [path, name, ext] = fileparts(fname);
 fnameRes = fullfile(path, [name '.ds' filesep name '.res4']);

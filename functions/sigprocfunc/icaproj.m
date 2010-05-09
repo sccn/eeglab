@@ -19,8 +19,6 @@
 %
 % See also: icavar(), runica()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 11-30-96 Scott Makeig, SCCN/INC/UCSD, scott@sccn.ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -36,8 +34,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
 
 % 11-30-96 Scott Makeig CNL / Salk Institute, La Jolla as icaproject.m
 % 12-24-96 added define for verbose -sm (V1.3)

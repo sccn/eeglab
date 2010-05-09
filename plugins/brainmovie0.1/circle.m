@@ -26,14 +26,6 @@
 % but WITHOUT ANY WARRANTY; without even the implied warranty of
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-% $Log: not supported by cvs2svn $
-% Revision 1.3  2003/04/24 21:19:12  arno
-% abord if radius negative
-%
-% Revision 1.2  2002/04/10 22:22:52  arno
-% test
-%
-
 function [h, h2] = circle( X, Y, radius, colorfill, coloredge, oriangle, endangle, dashed, thickness, segments);
 
 if nargin < 3

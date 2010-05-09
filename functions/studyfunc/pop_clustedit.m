@@ -136,8 +136,6 @@
 %
 % Authors: Arnaud Delorme, Hilit Serby, Scott Makeig, SCCN/INC/UCSD, October 11, 2004
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) Hilit Serby, SCCN, INC, UCSD, October 11, 2004, hilit@sccn.ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -155,41 +153,6 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % Coding notes: Useful information on functions and global variables used.
-
-% $Log: pop_clustedit.m,v $
-% Revision 1.59  2009/11/11 00:28:53  arno
-% New GUI format
-%
-% Revision 1.58  2009/07/10 01:56:33  arno
-% fix ref_ind
-%
-% Revision 1.57  2009/07/10 00:57:54  arno
-% error when no dataet in study
-%
-% Revision 1.56  2007/10/25 21:30:40  nima
-% _
-%
-% Revision 1.55  2007/10/25 19:14:42  nima
-% _
-%
-% Revision 1.54  2007/08/07 19:24:32  arno
-% fix bug 346
-%
-% Revision 1.53  2007/08/07 19:21:42  arno
-% update help message (bug 346)
-%
-% Revision 1.52  2007/08/03 22:57:08  arno
-% fixed dipole plotting and made it consistent with other plotting calls
-%
-% Revision 1.51  2007/07/27 22:08:56  toby
-% nothing
-%
-% Revision 1.50  2007/06/02 02:57:43  toby
-% NaN choke bug
-%
-% Revision 1.49  2007/05/31 22:27:46  toby
-% Auto-log line added
-%
 
 function [STUDY, com] = pop_clustedit(varargin)
 icadefs;

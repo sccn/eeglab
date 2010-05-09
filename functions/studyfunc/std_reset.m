@@ -11,8 +11,6 @@
 %
 % Author: Arnaud Delorme, CERCO/CNRS & SCCN, INC, UCSD, 2009-
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) Arnaud Delorme, arno@sccn.ucsd.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -27,11 +25,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: std_reset.m,v $
-% Revision 1.1  2009/11/04 02:45:16  arno
-% remove all measure info
-%
 
 function STUDY = std_reset(STUDY)
 

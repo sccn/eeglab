@@ -26,8 +26,6 @@
 
 % Without color arg, reads filename for PROJCOLORS from icadefs.m
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 05-01-96 from plotdata() Scott Makeig, SCCN/INC/UCSD,
 % scott@sccn.ucsd.edu
 %
@@ -44,14 +42,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.2  2002/09/05 15:43:05  arno
-% debug for new icadef
-%
-% Revision 1.1  2002/04/05 17:36:45  jorn
-% Initial revision
-%
 
 % 05-25-96 added chanlist, nargin tests, rearranged variable order -sm
 % 07-29-96 debugged, added chanlist channames option -sm

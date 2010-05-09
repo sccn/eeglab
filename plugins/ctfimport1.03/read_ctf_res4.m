@@ -18,24 +18,6 @@ function hdr = read_ctf_res4(fname)
 % modifications Copyright (C) 2002, Ole Jensen
 % modifications Copyright (C) 2003, Robert Oostenveld
 %
-% $Log: not supported by cvs2svn $
-% Revision 1.1  2005/12/06 06:24:23  psdlw
-% Alternative functions from the FieldTrip package, which is now released under GPL (so I assume these functions can be committed to the sourceforge cvs)
-%
-% Revision 1.4  2003/04/01 07:51:53  roberto
-% fixed bug in gradiometer channel labels
-%
-% Revision 1.3  2003/03/28 17:27:27  roberto
-% renamed output gradiometer from gradHC to grad
-%
-% Revision 1.2  2003/03/24 12:34:33  roberto
-% minor changes
-%
-% Revision 1.1  2003/03/13 14:27:09  roberto
-% separated read_ctf_ds into res4-header part and data part
-% restructured the res4 part, using (incorrect) CTF documentation
-%
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % read header information
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

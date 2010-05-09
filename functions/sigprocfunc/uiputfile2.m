@@ -23,20 +23,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
-% Revision 1.4  2005/03/10 01:35:53  arno
-% option only to remember folder
-%
-% Revision 1.3  2004/12/10 23:10:46  hilit
-% correcting the chmod option
-%
-% Revision 1.2  2004/12/08 19:48:58  hilit
-% eeglab.cfg is now saved to the '/tmp' folder
-%
-% Revision 1.1  2004/12/08 19:44:56  arno
-% Initial revision
-%
-
 
 function varargout = uiputfile2(varargin);
     

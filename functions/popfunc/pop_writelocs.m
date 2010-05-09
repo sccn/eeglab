@@ -13,8 +13,6 @@
 %
 % See also: writelocs()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -30,50 +28,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.12  2005/09/27 22:09:03  arno
-% fixing writing locations (removing .ced)
-%
-% Revision 1.11  2005/03/09 18:50:12  arno
-% nothing
-%
-% Revision 1.10  2005/03/09 18:47:47  arno
-% warning message
-%
-% Revision 1.9  2005/03/09 18:45:57  arno
-% make compatible to new format returned by readlocs
-%
-% Revision 1.8  2003/05/13 23:24:20  arno
-% nothing
-%
-% Revision 1.7  2003/05/13 23:21:27  arno
-% debug unicoord
-%
-% Revision 1.6  2003/05/13 23:09:04  arno
-% same
-%
-% Revision 1.5  2003/05/13 22:32:10  arno
-% debuging for pop_chanedit
-%
-% Revision 1.4  2003/05/13 22:27:10  arno
-% debug for pop_chanedit
-%
-% Revision 1.3  2003/05/13 22:10:43  arno
-% debuging
-%
-% Revision 1.2  2003/05/13 21:10:47  arno
-% writing only allow for a subset of file formats
-%
-% Revision 1.1  2002/12/24 01:25:18  arno
-% Initial revision
-%
-% Revision 1.2  2002/11/14 23:35:36  arno
-% header
-%
-% Revision 1.1  2002/11/13 02:34:22  arno
-% Initial revision
-%
 
 function com = pop_writelocs(chans, filename, varargin); 
     

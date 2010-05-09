@@ -19,8 +19,6 @@
 % See also: topoplot(), readlocs(), readelp(), 
 %           polhemus2topo(), pop_chanedit()
         
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
 % the Free Software Foundation; either version 2 of the License, or
@@ -34,32 +32,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.7  2003/12/02 00:32:15  arno
-% axis equal
-%
-% Revision 1.6  2002/10/23 18:39:52  arno
-% debug
-%
-% Revision 1.5  2002/08/15 16:37:01  arno
-% update colo
-%
-% Revision 1.4  2002/05/02 23:24:34  scott
-% removed 'axis off' -sm
-%
-% Revision 1.3  2002/05/02 23:22:14  scott
-% added 'axis off' -sm
-%
-% Revision 1.2  2002/04/27 02:40:13  arno
-% editing header
-%
-% Revision 1.1  2002/04/27 02:37:38  arno
-% Initial revision
-%
-% Revision 1.1  2002/04/05 17:48:29  jorn
-% Initial revision
-%
 
 % 04/01/02 changed header for help2html compatibility -ad
 % 04/01/02 debuging zs -ad

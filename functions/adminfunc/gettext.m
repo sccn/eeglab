@@ -22,8 +22,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
-
 % 01-25-02 reformated help & license -ad 
 
 function out = gettext(label1,label2,label3,label4,label5,label6,label7);

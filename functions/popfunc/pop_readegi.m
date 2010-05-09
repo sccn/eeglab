@@ -16,8 +16,6 @@
 %
 % See also: eeglab(), readegi(), readegihdr()
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
 % Copyright (C) 12 Nov 2002 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -33,71 +31,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-% $Log: not supported by cvs2svn $
-% Revision 1.21  2010/02/06 05:49:34  arno
-% EGI new functions
-%
-% Revision 1.20  2006/08/04 22:30:19  toby
-% forceversion bugfix
-%
-% Revision 1.19  2006/08/04 19:01:17  zhenkun
-% added forceversion argument
-%
-% Revision 1.18  2006/08/04 18:39:40  zhenkun
-% edit comments
-%
-% Revision 1.17  2006/08/04 18:35:12  zhenkun
-% edited comments
-%
-% Revision 1.16  2005/10/27 05:20:16  arno
-% fix reading file name
-%
-% Revision 1.15  2005/10/24 23:36:56  arno
-% fix file name
-%
-% Revision 1.14  2005/02/02 20:22:15  arno
-% now import category names
-%
-% Revision 1.13  2004/12/17 03:13:25  arno
-% attempting to rename event types
-%
-% Revision 1.12  2004/11/10 02:43:06  arno
-% add new pop up gui for epoch file
-%
-% Revision 1.11  2004/11/10 02:10:40  arno
-% reading chunks of data from the command line
-%
-% Revision 1.10  2003/09/22 23:42:19  arno
-% debuging urevent
-%
-% Revision 1.9  2003/07/11 21:44:00  arno
-% removing warning for urevent
-%
-% Revision 1.8  2003/04/10 17:58:36  arno
-% filter for file read
-%
-% Revision 1.7  2002/12/06 03:18:39  arno
-% same
-%
-% Revision 1.6  2002/12/06 03:07:19  arno
-% debuging channel import
-%
-% Revision 1.5  2002/12/06 02:50:05  arno
-% use leading edge
-%
-% Revision 1.4  2002/12/06 02:44:39  arno
-% adding event import
-%
-% Revision 1.3  2002/12/05 02:50:25  arno
-% debugging event reading
-%
-% Revision 1.2  2002/11/14 23:35:36  arno
-% header
-%
-% Revision 1.1  2002/11/13 02:34:22  arno
-% Initial revision
-%
 
 function [EEG, command] = pop_readegi(filename, datachunks, forceversion); 
     

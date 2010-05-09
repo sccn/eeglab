@@ -45,26 +45,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: not supported by cvs2svn $
-% Revision 1.6  2005/03/17 17:43:40  arno
-% nothing
-%
-% Revision 1.5  2005/03/17 02:18:45  arno
-% reject
-%
-% Revision 1.4  2005/03/17 02:17:41  arno
-% fixing history
-%
-% Revision 1.3  2005/03/10 18:17:02  arno
-% no warning backtrace
-%
-% Revision 1.2  2005/03/10 18:02:19  arno
-% add "Done"
-%
-% Revision 1.1  2005/03/10 18:01:59  arno
-% Initial revision
-%
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [EEGOUT, com] = pop_dipfit_gridsearch(EEG, select, xgrid, ygrid, zgrid, reject );
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
