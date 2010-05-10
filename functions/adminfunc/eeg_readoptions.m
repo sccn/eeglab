@@ -35,6 +35,8 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+function [ header, opt ] = eeg_readoptions( filename, opt_backup );
+
     if nargin < 1
         help eeg_readoptions;
         return;
