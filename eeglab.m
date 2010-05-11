@@ -759,7 +759,7 @@ catchstrs.update_study           = e_load_study;
     uimenu( spec_m, 'Label', 'Component cross-coherence'              , 'CallBack', cb_crossf2);
 		
     uimenu( std_m,  'Label', 'Edit study info'                        , 'CallBack', cb_study3);
-    %uimenu( std_m,  'Label', 'Select/Edit study design(s)'            , 'CallBack', cb_studydesign);
+    uimenu( std_m,  'Label', 'Select/Edit study design(s)'            , 'CallBack', cb_studydesign);
     uimenu( std_m,  'Label', 'Precompute channel measures'            , 'CallBack', cb_precomp, 'separator', 'on');
     uimenu( std_m,  'Label', 'Plot channel measures'                  , 'CallBack', cb_chanplot);
     uimenu( std_m,  'Label', 'Precompute component measures'          , 'CallBack', cb_precomp2, 'separator', 'on');
