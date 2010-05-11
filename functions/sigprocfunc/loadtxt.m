@@ -106,8 +106,10 @@ while isempty(inputline) | inputline~=-1
 			         colnb = colnb+1;
 			     end;
 	        case 'on',
+                 tabFirstpos = 1;
 			     while ~isempty(deblank(inputline))
-			         [tmp inputline] = mystrtok(inputline, g.delim);
+                     if tabFirstpos && length(inputline) > 1 && all(inputline(1) ~= g.delim), tabFirstpos = 0; end;
+			         [tmp inputline tabFirstpos] = mystrtok(inputline, g.delim, tabFirstpos);
                      tmp2 = str2double(tmp);
 			         if isnan( tmp2 )  , array{linenb, colnb} = tmp;
                      else                array{linenb, colnb} = tmp2;
@@ -136,11 +138,14 @@ fclose(fid);
 
 % problem strtok do not consider tabulation
 % -----------------------------------------
-function [str, strout] = mystrtok(strin, delim);
-    if delim == 9 % tab
-        if length(strin) > 1 & strin(1) == 9 & strin(2) == 9 
+function [str, strout, tabFirstpos] = mystrtok(strin, delim, tabFirstpos);
+    if length(strin) > 1 && any(strin(1) == delim)
+        if tabFirstpos || any(strin(2) == delim)
             str = '';
             strout = strin(2:end);
+            if all(strin(2) ~= delim)
+                tabFirstpos = 0;
+            end;
         else
             [str, strout] = strtok(strin, delim);
         end;
