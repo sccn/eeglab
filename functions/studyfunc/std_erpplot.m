@@ -216,7 +216,7 @@ if ~isempty(opt.channels)
     [pcond pgroup pinter] = std_stat(erpdata, 'groupstats', opt.groupstats, 'condstats', opt.condstats, 'paired', paired, ...
                                          'statistics', opt.statistics, 'naccu', opt.naccu, 'threshold', opt.threshold, 'mcorrect', opt.mcorrect);
     if (~isempty(pcond) && length(pcond{1}) == 1) || (~isempty(pgroup) && length(pgroup{1}) == 1), pcond = {}; pgroup = {}; pinter = {}; end; % single subject STUDY                                
-    if length(opt.channels) > 5 && ndims(erpdata) < 3, pcond = {}; pgroup = {}; pinter = {}; end; % topo plotting for single subject
+    if length(opt.channels) > 5 && ndims(erpdata{1}) < 3, pcond = {}; pgroup = {}; pinter = {}; end; % topo plotting for single subject
 
     % plot
     % ----
