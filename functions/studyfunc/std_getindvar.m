@@ -43,6 +43,7 @@ end;
 
 factor     = {};
 factorvals = {};
+subjects   = {};
 if nargin < 2, mode = 'both'; end;
 if nargin < 3, scandesign = 0; end;
 countfact = 1;
