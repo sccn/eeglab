@@ -178,12 +178,12 @@ if ischar(chanlocs1)
         dat = get(fid, 'userdata');
         if strcmpi(com, 'fiducials')
             [clist1 clist2] = pop_chancoresp( dat.elec1, dat.elec2, 'autoselect', 'fiducials');
-            try,
+            %try,
                 [ tmp transform ] = align_fiducials(dat.elec1, dat.elec2, dat.elec1.label(clist1), dat.elec2.label(clist2));
                 if ~isempty(transform), dat.transform = transform; end;
-            catch,
-                warndlg2(strvcat('Transformation failed', lasterr));
-            end;
+            %catch,
+            %    warndlg2(strvcat('Transformation failed', lasterr));
+            %end;
         elseif strcmpi(com, 'warp')
             [clist1 clist2] = pop_chancoresp( dat.elec1, dat.elec2, 'autoselect', 'all');
 
@@ -326,11 +326,11 @@ else
                 for index = 1:length(clist2)
                     tmpelec2.label{clist2(index)} = elec1.label{clist1(index)};
                 end;
-                try,
+                %try,
                     [ electransf dat.transform ] = warp_chans(elec1, elec2, tmpelec2.label(clist2), 'traditional');
-                catch,
-                    warndlg2(strvcat('Transformation failed', lasterr));
-                end;
+                %catch,
+                %    warndlg2(strvcat('Transformation failed', lasterr));
+                %end;
             end;
         else
             [ electransf dat.transform ] = warp_chans(elec1, elec2, g.warp, g.warpmethod);
@@ -601,7 +601,7 @@ function [elec1, transf] = align_fiducials(elec1, elec2, fidnames1, fidnames2)
     cfg.template = elec2;
     cfg.method   = 'realignfiducial'; 
     cfg.fiducial = fidnames2;
-    elec3 = electroderealign(cfg);
+    elec3 = ft_electroderealign(cfg);
     transf = homogenous2traditional(elec3.m);
     
     % test difference
@@ -644,7 +644,7 @@ function [elec1, transf] = warp_chans(elec1, elec2, chanlist, warpmethod)
     cfg.method   = warpmethod;
     %cfg.feedback = 'yes';
     cfg.channel  = chanlist;
-    elec3 = electroderealign(cfg);
+    elec3 = ft_electroderealign(cfg);
     [tmp ind1 ] = intersect( lower(elec1.label), lower(chanlist) );
     [tmp ind2 ] = intersect( lower(elec2.label), lower(chanlist) );
     
