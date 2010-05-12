@@ -1,5 +1,0 @@
-0.776471	0.000000	5.074716	standardizer
-0.756863	0.000000	5.108298	log transform + standardizer
-0.756863	0.000000	11.527535	restricted boltzmann machine
-0.745098	0.000000	8.949362	principal component analysis
-0.494118	0.928444	329.705273	t-SNE algorithm

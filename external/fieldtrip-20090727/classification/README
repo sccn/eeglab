@@ -1,9 +1,0 @@
-The classification toolbox is a Matlab toolbox that can be used in conjunction with the FieldTrip toolbox for MEG and EEG analysis. It is being developed at the Intelligent Systems Group at the Institute for Computing and Inforamtion Science and at the Donders Centre for Cognitive Neuroimaging (DCCN).
-
-This software is free but copyrighted software, distributed
-under the terms of the GNU General Public Licence as published by
-the Free Software Foundation (either version 2, or at your option
-any later version). See the file COPYING for more details.
-
-Copyright (C) 2008, Intelligent Systems Group, Donders Centre for Cognitive Neuroimaging, Nijmegen, The Netherlands
-

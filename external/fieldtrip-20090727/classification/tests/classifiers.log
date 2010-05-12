@@ -1,7 +1,0 @@
-0.442308	0.735317	4.101692	random classifier
-0.750000	0.016395	3.054639	ensemble method
-0.846154	0.000144	13.247557	gnb with normal distribution
-0.846154	0.000144	2.561292	gaussian naive bayes
-0.711538	0.054292	2.618802	logistic regression
-0.807692	0.002200	4.213122	gaussian process
-0.692308	0.033895	2.495106	nearest neighbour classifier
