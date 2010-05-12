@@ -131,30 +131,31 @@ else % INEEG is an EEG struct
                 INEEGX{n}.epoch = repmat(struct(),[1,INEEGX{n}.trials]);
             end
         end
-        for n=1:2
-            % purge all event-related epoch fields from each dataset (EEG.epoch.event* fields)
-            % --------------------------------------------------------------------------------
-            fn = fieldnames(INEEGX{n}.epoch);
-            INEEGX{n}.epoch = rmfield(INEEGX{n}.epoch,{fn{strmatch('event',fn)}});
-            % copy remaining field names to the other dataset
-            % -----------------------------------------------
-            for f = fieldnames(INEEGX{n}.epoch)'
-                if ~isfield(INEEGX{3-n}.epoch,f{1})
-                    INEEGX{3-n}.epoch(1).(f{1}) = [];
+        if ~isempty(INEEGX{1}.epoch)
+            for n=1:2
+                % purge all event-related epoch fields from each dataset (EEG.epoch.event* fields)
+                % --------------------------------------------------------------------------------
+                fn = fieldnames(INEEGX{n}.epoch);
+                INEEGX{n}.epoch = rmfield(INEEGX{n}.epoch,{fn{strmatch('event',fn)}});
+                % copy remaining field names to the other dataset
+                % -----------------------------------------------
+                for f = fieldnames(INEEGX{n}.epoch)'
+                    if ~isfield(INEEGX{3-n}.epoch,f{1})
+                        INEEGX{3-n}.epoch(1).(f{1}) = [];
+                    end
                 end
+                % after this, both sets have an epoch field with the appropriate number of items
+                % and possibly some user-defined fields, but no event* fields.
             end
-            % after this, both sets have an epoch field with the appropriate number of items
-            % and possibly some user-defined fields, but no event* fields.
-        end
-
-        % concatenate epochs & write back
-        % -------------------------------
-        INEEGX{1}.epoch(end+1:end+INEEGX{2}.trials) = orderfields(INEEGX{2}.epoch,INEEGX{1}.epoch);
+            % concatenate epochs & write back
+            % -------------------------------
+            INEEGX{1}.epoch(end+1:end+INEEGX{2}.trials) = orderfields(INEEGX{2}.epoch,INEEGX{1}.epoch);
+        end;
+        
         INEEG1 = INEEGX{1};
         INEEG2 = INEEGX{2};
         INEEGX = {};
     end
-
     
     % Concatenate data
     % ----------------
@@ -198,7 +199,7 @@ else % INEEG is an EEG struct
 
     % concatenate events
     % ------------------
-    if isempty(INEEG2.event)
+    if isempty(INEEG2.event) && INEEG2.trials == 1
 
         % boundary event
         % -------------
