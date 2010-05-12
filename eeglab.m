@@ -406,27 +406,17 @@ catchstrs.update_study           = e_load_study;
                 end;
                 if ~isempty(findstr('fieldtrip', lower(dircontent{index})))
                     addpath([p 'external' filesep dircontent{index} filesep 'fileio' ]);
-                    addpath([p 'external' filesep dircontent{index} filesep 'forwinv' ]);
-                    disp(['Adding path to ' eeglabpath 'external' filesep dircontent{index} filesep 'fileio' ]);
-                    disp(['Adding path to ' eeglabpath 'external' filesep dircontent{index} filesep 'forwinv' ]);
+                    addpath([p 'external' filesep dircontent{index} filesep 'forward' ]);
+                    addpath([p 'external' filesep dircontent{index} filesep 'inverse' ]);
+                    addpath([p 'external' filesep dircontent{index} filesep 'public' ]);
+                    addpath([p 'external' filesep dircontent{index} ]);
+                    disp(['Adding path to ' eeglabpath 'external' filesep dircontent{index} ' subfolders' ]);
                 end;
             end;
         end;
 
         % check for older version of Fieldtrip and presence of topoplot
         % -------------------------------------------------------------
-        dircontent  = dir([ p '..' filesep ]);
-        dircontent  = { dircontent.name };
-        ind = strmatch('fieldtrip', lower(dircontent));
-        ind2 = strmatch('biosig', lower(dircontent));
-        if ~isempty(ind)
-            for index = ind
-                if exist([p_parent dircontent{index}]) == 7
-                    disp('   FieldTrip is now in the "external" folder of EEGLAB');
-                    disp([ '   Please delete old folder ' [p_parent dircontent{index}] ]);
-                end;
-            end;
-        end;
         ptopoplot2 = fileparts(which('topoplot'));
         if ~strcmpi(ptopoplot, ptopoplot2),
             %disp('  Warning: duplicate function topoplot.m in Fieldtrip and EEGLAB');
