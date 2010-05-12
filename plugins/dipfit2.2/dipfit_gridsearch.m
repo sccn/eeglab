@@ -102,7 +102,7 @@ end
 
 % for each component scan the whole brain with dipoles using FIELDTRIPs
 % dipolefitting function
-source = dipolefitting(cfg, comp);
+source = ft_dipolefitting(cfg, comp);
 
 % reformat the output dipole sources into EEGLABs data structure
 for i=1:length(cfg.component)

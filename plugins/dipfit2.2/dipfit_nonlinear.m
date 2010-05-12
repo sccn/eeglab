@@ -102,7 +102,20 @@ end
 
 % fit the dipoles to the ICA component(s) of interest using FIELDTRIPs
 % dipolefitting function
-source = dipolefitting(cfg, comp);
+
+currentPath = pwd;
+ptmp = which('ft_prepare_vol_sens');
+ptmp = fileparts(ptmp);
+if isempty(ptmp), error('Path to "forward" folder of Fieldtrip missing'); end;
+cd(fullfile(ptmp, 'private'));
+try,
+    source = ft_dipolefitting(cfg, comp);
+catch,
+    cd(currentPath);
+    lasterr
+    error(lasterr);
+end;
+cd(currentPath);
 
 % reformat the output dipole sources into EEGLABs data structure
 EEG.dipfit.model(cfg.component).posxyz  = source.dip.pos;
