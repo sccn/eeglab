@@ -1379,7 +1379,7 @@ elseif ~isnan( g.baseline(1) ) & any(~isnan( mbase )) & strcmpi(g.scale, 'abs') 
     end;
     
 % ERSP baseline normalized
-elseif ~isnan( g.baseline(1) ) & ~isnan( mbase ) & strcmpi(g.basenorm, 'on')
+elseif ~isnan( g.baseline(1) ) && ~isnan( mbase(1) ) && strcmpi(g.basenorm, 'on')
 
     mstd = std(P(:,baseln),[],2);
     P = (P-repmat(mbase,[1 size(P,2)]))./repmat(mstd,[1 size(P,2)]); % convert to log then back to normal
