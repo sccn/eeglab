@@ -96,7 +96,9 @@ else
         tmpkurt = kurto;
         if normalize == 2,
             tmpkurt = sort(tmpkurt);
-            tmpkurt = tmpkurt(round(length(tmpkurt)*0.1):end-round(length(tmpkurt)*0.1));
+            minind  = max(round(length(tmpkurt)*0.1),1);
+            maxind  = round(length(tmpkurt)-round(length(tmpkurt)*0.1));
+            tmpkurt = tmpkurt(minind:maxind);
         end;
 	    switch ndims( signal )
 	    	case 2,	kurto = (kurto-mean(tmpkurt)) / std(tmpkurt);
