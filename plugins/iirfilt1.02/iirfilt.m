@@ -21,6 +21,7 @@
 %                 or if pass band f < 5 Hz, 0.01 dB}
 %   rs          = ripple amplitude in dB in the stop band {default: 40 dB,
 %                 or if pass band f < 5 Hz, 30 dB}
+%   causal      = ['on'|'off'] use causal filter. Default 'off'.
 %
 % Note: Requires the MATLAB Signal Processing Toolbox.
 %
@@ -47,7 +48,7 @@
 % Currently, with cutoff less then 5 Hz, both HPF and LPF use more 'relaxed' 
 % filter parameters to achieve best results. 
 
-function [smoothdata,filtwts] = iirfilt(data,srate,locutoff,hicutoff,epochframes, trans_bw, revfilt, rp,rs)
+function [smoothdata,filtwts] = iirfilt(data,srate,locutoff,hicutoff,epochframes, trans_bw, revfilt, rp, rs, causal)
 
 if nargin<4
     fprintf('');
@@ -107,13 +108,16 @@ end
 if nargin<7
    revfilt = 0;
 end
-if nargin<8
+if nargin<8 || isempty(rp)
    % Ripple in the passband
    rp=0.0025;;
 end
-if nargin<9
+if nargin<9 || isempty(rs)
    % Ripple in the stopband
    rs=40;
+end
+if nargin<10
+   causal = 'off';
 end
 
 if nargin<5
@@ -193,33 +197,41 @@ end
 
 
 smoothdata = zeros(chans,frames);
-for e = 1:epochs                % filter each epoch, channel 
+for e = 1:epochs                % filter each epoch, channel
     for c=1:chans
         if isstruct(a) & isstruct(b) & revfilt==0            %BPF - filter with LPF and HPF in series
-            smoothdata1(c,(e-1)*epochframes+1:e*epochframes) ...
-        = filtfilt(b.bl,a.al,data(c,(e-1)*epochframes+1:e*epochframes));
-    
-        smoothdata(c,(e-1)*epochframes+1:e*epochframes) ...
-        = filtfilt(b.bh,a.ah,smoothdata1(c,(e-1)*epochframes+1:e*epochframes));
-    
+            
+            if strcmpi(causal, 'on')
+                smoothdata1(c,(e-1)*epochframes+1:e*epochframes) = filter(b.bl,a.al,data(c,(e-1)*epochframes+1:e*epochframes));
+                smoothdata( c,(e-1)*epochframes+1:e*epochframes) = filter(b.bh,a.ah,smoothdata1(c,(e-1)*epochframes+1:e*epochframes));
+            else
+                smoothdata1(c,(e-1)*epochframes+1:e*epochframes) = filtfilt(b.bl,a.al,data(c,(e-1)*epochframes+1:e*epochframes));
+                smoothdata( c,(e-1)*epochframes+1:e*epochframes) = filtfilt(b.bh,a.ah,smoothdata1(c,(e-1)*epochframes+1:e*epochframes));
+            end;
+            
         elseif isstruct(a) & isstruct(b) & revfilt==1         %BRF - filter with LPF and HPF in parallel
-            smoothdata1(c,(e-1)*epochframes+1:e*epochframes) ...
-        = filtfilt(b.bl,a.al,data(c,(e-1)*epochframes+1:e*epochframes));
-    
-        smoothdata2(c,(e-1)*epochframes+1:e*epochframes) ...
-        = filtfilt(b.bh,a.ah,data(c,(e-1)*epochframes+1:e*epochframes));
-    smoothdata=smoothdata1+smoothdata2;               %combine final results
-          else
-      smoothdata(c,(e-1)*epochframes+1:e*epochframes) ...
-        = filtfilt(b,a,data(c,(e-1)*epochframes+1:e*epochframes));
-end;
-      if epochs == 1 
-       if rem(c,20) ~= 0
-         fprintf('.');
-       else 
-         fprintf('%d',c);
-       end
-      end
+            if strcmpi(causal, 'on')
+                smoothdata1(c,(e-1)*epochframes+1:e*epochframes) = filter(b.bl,a.al,data(c,(e-1)*epochframes+1:e*epochframes));
+                smoothdata2(c,(e-1)*epochframes+1:e*epochframes) = filter(b.bh,a.ah,data(c,(e-1)*epochframes+1:e*epochframes));
+            else
+                smoothdata1(c,(e-1)*epochframes+1:e*epochframes) = filtfilt(b.bl,a.al,data(c,(e-1)*epochframes+1:e*epochframes));
+                smoothdata2(c,(e-1)*epochframes+1:e*epochframes) = filtfilt(b.bh,a.ah,data(c,(e-1)*epochframes+1:e*epochframes));
+            end;
+            smoothdata=smoothdata1+smoothdata2;               %combine final results
+        else
+            if strcmpi(causal, 'on')
+                smoothdata(c,(e-1)*epochframes+1:e*epochframes) = filter(b,a,data(c,(e-1)*epochframes+1:e*epochframes));
+            else
+                smoothdata(c,(e-1)*epochframes+1:e*epochframes) = filtfilt(b,a,data(c,(e-1)*epochframes+1:e*epochframes));
+            end;
+        end;
+        if epochs == 1
+            if rem(c,20) ~= 0
+                fprintf('.');
+            else
+                fprintf('%d',c);
+            end
+        end
     end
 end
 fprintf('\n');

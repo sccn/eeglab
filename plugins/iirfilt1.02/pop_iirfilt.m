@@ -50,7 +50,7 @@
 
 % 01-25-02 reformated help & license -ad 
 
-function [EEG, com] = pop_iirfilt( EEG, locutoff, hicutoff, trans_bw, revfilt);
+function [EEG, com] = pop_iirfilt( EEG, locutoff, hicutoff, trans_bw, revfilt, causal);
 
 com = '';
 if nargin < 1
@@ -86,6 +86,7 @@ if nargin < 2
 		 trans_bw = [];
 	else trans_bw    = eval( result{4} );
 	end;
+    causal = 'off';
 else
     if nargin < 3
         hicutoff = 0;
@@ -96,6 +97,9 @@ else
     if nargin < 5
         revfilt = 0;
     end;
+    if nargin < 6
+        causal = 'off';
+    end;
 end;
  
 options = { EEG.srate, locutoff, hicutoff, EEG.pnts };
@@ -105,7 +109,9 @@ else
 	options = { options{:} 0 };
 end;
 if revfilt ~= 0
-	options = { options{:} revfilt };
+	options = { options{:} revfilt [] [] causal };
+else
+	options = { options{:} 0 [] [] causal };
 end;
 
 % warning
