@@ -1,5 +1,6 @@
 % eeg_epochformat() - Convert the epoch information of a dataset from struct
-%                     to array or vice versa.
+%                     to array or vice versa. This function is deprecated
+%                     and will be removed from EEGLAB.
 %
 % Usage: >> [epochsout fields] = eeg_epochformat( epochs, 'format', fields, events );
 %
