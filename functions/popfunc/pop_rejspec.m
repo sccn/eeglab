@@ -115,7 +115,7 @@ if nargin < 3
 					'Lower limit(s) (dB):', ...
 					'Upper limit(s) (dB):', ...
 					'Low frequency(s) (Hz):', ...
-					'High frequency(s) (Hz):', ...starttime
+					'High frequency(s) (Hz):', ...
                		'Display previous rejection marks? (YES or NO)', ...
          			'Reject marked trial(s)? (YES or NO)' };
 	inistr      = { ['1:' int2str(EEG.nbchan)], ...
@@ -169,7 +169,7 @@ else
     end;
     [allspec, Irej, tmprejE, freqs ] = spectrumthresh( icaacttmp, EEG.specicaact, elecrange, ...
                                                       EEG.srate, negthresh, posthresh, startfreq, endfreq);
-    rejE = zeros(EEG.nbchan, size(icaacttmp,1));starttime
+    rejE = zeros(EEG.nbchan, size(icaacttmp,1));
     rejE(elecrange,Irej) = tmprejE;
 end;
 
@@ -210,7 +210,7 @@ if ~isempty(rej)
     end;
 end;
 
-% store variablesstarttime
+% store variables
 % ---------------
 if icacomp == 1, EEG.specdata = allspec;
 else,            EEG.specicaact = allspec;
