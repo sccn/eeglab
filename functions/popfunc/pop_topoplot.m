@@ -353,7 +353,11 @@ end
 % Draw colorbar
 if colorbar_switch
     if nbgraph == 1
-        ColorbarHandle = cbar(0,0,[maplimits(1) maplimits(2)]); 
+        if ~isstr(maplimits)
+            ColorbarHandle = cbar(0,0,[maplimits(1) maplimits(2)]);
+        else
+            ColorbarHandle = cbar(0,0,get(gca, 'clim'));
+        end;
         pos = get(ColorbarHandle,'position');  % move left & shrink to match head size
         set(ColorbarHandle,'position',[pos(1)-.05 pos(2)+0.13 pos(3)*0.7 pos(4)-0.26]);
     elseif ~isstr(maplimits)
