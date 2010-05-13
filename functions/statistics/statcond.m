@@ -44,6 +44,12 @@
 %   'naccu'    = [integer] Number of surrogate data copies to use in 'perm' 
 %                 or 'bootstrap' mode estimation (see above) {default: 200}.
 %   'verbose'  = ['on'|'off'] print info on the command line {default: 'on'}.
+%   'variance' = ['homegenous'|'inhomogenous'] this option is exclusively
+%                for parametric statistics using unpaired t-test. It allows
+%                to compute a more accurate value for the degree of freedom
+%                using the formula for inhomogenous variance (see
+%                ttest2_cell function). Default is 'homegenous'.
+%
 % Outputs:
 %   stats      = F- or T-value array of the same size as input data without 
 %                the last dimension. A T value is returned only when the data 
@@ -134,6 +140,7 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
                                      'mode'       'string'    { 'param' 'perm' 'bootstrap' }  'param';
                                      'paired'     'string'    { 'on' 'off' }      'on'; 
                                      'arraycomp'  'string'    { 'on' 'off' }      'on'; 
+                                     'variance'   'string'    { 'homogenous' 'inhomogenous' }      'homogenous'; 
                                      'returnresamplingarray' 'string'    { 'on' 'off' }      'off'; 
                                      'verbose'    'string'    { 'on' 'off' }      'on' }, 'statcond');
         if isstr(g), error(g); end;
@@ -233,14 +240,11 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
             % paired t-test (very fast)
             % -------------
             tail = 'both';
-            [ori_vals df] = ttest_cell_select(data, g.paired);
+            [ori_vals df] = ttest_cell_select(data, g.paired, g.variance);
             
             if strcmpi(g.mode, 'param')
-                pvals = tcdf(ori_vals, df)*2;
-                tmppvals = reshape(pvals, prod(size(pvals)),1);
-                inds     = find(tmppvals > 1); 
-                tmppvals(inds) = 2-tmppvals(inds);
-                pvals    = reshape(tmppvals, size(pvals));
+                pvals = 2*tcdf(-abs(ori_vals), df);
+                pvals = reshape(pvals, size(pvals));
                 return;
             else
                 if strcmpi(g.arraycomp, 'on')
@@ -464,11 +468,11 @@ function [f df] = anova1_cell_select( res, paired);
 
 % compute t-test
 % -------------------
-function [t df] = ttest_cell_select( res, paired);
+function [t df] = ttest_cell_select( res, paired, homogenous);
     if strcmpi(paired,'on')
         [t df] = ttest_cell( res{1}, res{2});
     else
-        [t df] = ttest2_cell( res{1}, res{2});
+        [t df] = ttest2_cell( res{1}, res{2}, homogenous);
     end;
 
 function val = myndims(a)
