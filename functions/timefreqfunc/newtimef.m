@@ -227,19 +227,22 @@
 %       'vert'      = [times_vector] -> plot vertical dashed lines at specified times
 %                     in ms. {default: none}
 %       'newfig'    = ['on'|'off'] Create new figure for difference plots {'on'}
-%       'outputformat' = ['old'|'new'|'plot'] for compatibility with script that used the 
+%       'outputformat' = ['old'|'plot'] for compatibility with script that used the 
 %                        old output format, set to 'old' (mbase in absolute amplitude (not
-%                        dB) and real itc instead of complex itc). {default: 'new'}
+%                        dB) and real itc instead of complex itc). 'plot' returns
+%                        the plotted result {default: 'plot'}
 % Outputs:
-%            ersp   = (nfreqs,timesout) matrix of log spectral diffs from baseline (in dB)
-%                     NOTE THAT THIS OUTPUT IS ALWAYS IN LOG SCALE BY DEFAULT to ensure 
-%                     backward with higher level functions. Use the 'plot' output format
+%            ersp   = (nfreqs,timesout) matrix of log spectral diffs from baseline
+%                     (in dB log scale or absolute scale). Use the 'plot' output format
 %                     above to output the ERSP as shown on the plot.
 %            itc    = (nfreqs,timesout) matrix of complex inter-trial coherencies.
 %                     itc is complex -- ITC magnitude is abs(itc); ITC phase in radians
 %                     is angle(itc), or in deg phase(itc)*180/pi.
-%          powbase  = baseline power spectrum (in dB) that was removed for each window 
-%                      to compute the ERSP.
+%          powbase  = baseline power spectrum. Note that even, when selecting the 
+%                     the 'trialbase' option, the average power spectrum is
+%                     returned (not trial based). To obtain the baseline of
+%                     each trial, recompute it manually using the tfdata
+%                     output described below.
 %            times  = vector of output times (spectral time window centers) (in ms).
 %            freqs  = vector of frequency bin centers (in Hz).
 %         erspboot  = (nfreqs,2) matrix of [lower upper] ERSP significance.
@@ -265,7 +268,7 @@
 %   -- The marginal panel under the ITC image shows the ERP (which is produced by 
 %      ITC across the data spectral pass band).
 %
-% Authors: Arnaud Delorme, Sigurd Enghoff, Jean Hausser, & Scott Makeig
+% Authors: Arnaud Delorme, Sigurd Enghoff, Jean Hausser, && Scott Makeig
 %          CNL / Salk Institute 1998- | SCCN/INC, UCSD 2002-
 %
 % See also: timefreq(), condstat(), newcrossf(), tftopo()
@@ -329,14 +332,14 @@
 % 10-19-98 avoided division by zero (using MIN_ABS) -sm
 % 10-19-98 improved usage message and commandline info printing -sm
 % 10-19-98 made valid [] values for tvec and g.elocs -sm
-% 04-01-99 added missing freq in freqs and plots, fixed log scaling bug -se & -tpj
+% 04-01-99 added missing freq in freqs and plots, fixed log scaling bug -se && -tpj
 % 06-29-99 fixed frequency indexing for constant-Q -se
 % 08-24-99 reworked to handle NaN input values -sm
 % 12-07-99 adjusted ERPtimes to plot ERP under ITC -sm
 % 12-22-99 debugged ERPtimes, added BASE_BOOT -sm
 % 01-10-00 debugged BASE_BOOT=0 -sm
 % 02-28-00 added NOTE on formula derivation below -sm
-% 03-16-00 added axcopy() feature -sm & tpj
+% 03-16-00 added axcopy() feature -sm && tpj
 % 04-16-00 added multiple marktimes loop -sm
 % 04-20-00 fixed ITC cbar limits when spcified in input -sm
 % 07-29-00 changed frequencies displayed msg -sm
@@ -344,8 +347,8 @@
 % 02-07-01 fixed inconsistency in BASE_BOOT use -sm
 % 08-28-01 matlab 'key' value arguments -ad
 % 08-28-01 multitaper decomposition -ad
-% 01-25-02 reformated help & license -ad
-% 03-08-02 debug & compare to old timef function -ad
+% 01-25-02 reformated help && license -ad
+% 03-08-02 debug && compare to old timef function -ad
 % 03-16-02 timeout automatically adjusted if too high -ad
 % 04-02-02 added 'coher' option -ad
 
@@ -424,16 +427,19 @@ if (nargin < 1)
     return
 end
 
-if isstr(data) & strcmp(data,'details')
+if isstr(data) && strcmp(data,'details')
     more on
     help timefdetails
     more off
     return
 end
 if ~iscell(data)
-    [data, frames] = reshape_data(data, frames);
-    trials = size(data,2);
+    data = reshape_data(data, frames);
+    trials = size(data,ndims(data));
 else
+    if ndims(data) == 3 && size(data,1) == 1
+        error('Cannot process multiple channel component in compare mode');
+    end;
     [data{1}, frames] = reshape_data(data{1}, frames);
     [data{2}, frames] = reshape_data(data{2}, frames);
     trials = size(data{1},2);
@@ -515,7 +521,7 @@ end
     'plotphasesign' 'string'    {'on','off'} 'on'; ...
     'plotphase'     'string'    {'on','off'} 'on'; ... % same as above for backward compatibility
     'pcontour'      'string'    {'on','off'} 'off'; ... 
-    'outputformat'  'string'    {'old','new' 'plot' } 'new'; ...
+    'outputformat'  'string'    {'old','new' 'plot' } 'plot'; ...
     'itcmax'        'real'      []           []; ...
     'erspmax'       'real'      []           []; ...
     'lowmem'        'string'    {'on','off'} 'off'; ...
@@ -551,7 +557,7 @@ if strcmpi(g.basenorm, 'on'), g.scale = 'abs'; end;
 if ~strcmpi(g.itctype , 'phasecoher'), g.type = g.itctype; end;
 
 g.tlimits = tlimits;
-g.frames   = frames;
+g.frames  = frames;
 g.srate   = Fs;
 if isempty(g.cycles)
     g.cycles  = varwin;
@@ -565,12 +571,15 @@ if ~strcmpi(g.plotphase, 'on'), g.plotphasesign = g.plotphase; end;
 % unpack 'timewarp' (and undocumented 'timewarpfr') arguments
 %------------------------------------------------------------
 if isfield(g,'timewarpfr')
-    if iscell(g.timewarpfr) & length(g.timewarpfr) > 3
+    if iscell(g.timewarpfr) && length(g.timewarpfr) > 3
         error('undocumented ''timewarpfr'' cell array may have at most 3 elements');
     end
 end
 
-if isfield(g,'timewarp')
+if isfield(g,'timewarp') && ~isempty(g.timewarp)
+    if ndims(data) == 3
+        error('Cannot perform time warping on 3-D data input');
+    end;
     if ~isempty(g.timewarp) % convert timewarp ms to timewarpfr frames -sm
         fprintf('\n')
         if iscell(g.timewarp)
@@ -616,23 +625,20 @@ if isfield(g,'timewarp')
             end
         end
     end
-
 end
 
 % test argument consistency
 % --------------------------
-
 if g.tlimits(2)-g.tlimits(1) < 30
-    disp('newtimef(): WARNING: Specified time range is very small (< 30 ms)???');
-    disp('                     Epoch time limits should be in msec, not seconds!');
+    verboseprintf(g.verbose, 'newtimef(): WARNING: Specified time range is very small (< 30 ms)???\n');
+    verboseprintf(g.verbose, '                     Epoch time limits should be in msec, not seconds!\n');
 end
-
 
 if (g.winsize > g.frames)
     error('Value of winsize must be smaller than epoch frames.');
 end
 
-if length(g.timesout) == 1 & g.timesout > 0
+if length(g.timesout) == 1 && g.timesout > 0
     if g.timesout > g.frames-g.winsize
         g.timesout = g.frames-g.winsize;
         disp(['Value of timesout must be <= frames-winsize, timeout adjusted to ' int2str(g.timesout) ]);
@@ -771,13 +777,12 @@ if ~isempty(g.mtaper) % multitaper, inspired from a Bijan Pesaran matlab functio
     %nfk = floor([0 g.maxfreq]./g.srate.*nf);
 
     %freqs = linspace( 0, g.maxfreq, diff(nfk)); % this also works in the case of a FFT
-
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % compute frequency by frequency if low memory
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-if strcmpi(g.lowmem, 'on') & length(data) ~= g.frames & isempty(g.nfreqs) & ~iscell(data)
+if strcmpi(g.lowmem, 'on') && length(data) ~= g.frames && isempty(g.nfreqs) && ~iscell(data)
 
     % compute for first 2 trials to get freqsout
     XX = reshape(data, 1, frames, prod(size(data))/g.frames);
@@ -842,7 +847,7 @@ if iscell(data)
             end;
         end;
     end;
-    if iscell(g.title) & length(g.title) >= 2 % Changed that part because providing titles
+    if iscell(g.title) && length(g.title) >= 2 % Changed that part because providing titles
                                               % as cells caused the function to crash (why?) 
                                               % at line 704 (g.tlimits = tlimits) -Jean
         if length(g.title) == 2,
@@ -885,7 +890,7 @@ if iscell(data)
 
     % recompute power baselines 
     % -------------------------
-    if ~isnan( g.baseline(1) ) & ~isnan( mbase1(1) ) & isnan(g.powbase(1)) & strcmpi(g.commonbase, 'on')
+    if ~isnan( g.baseline(1) ) && ~isnan( mbase1(1) ) && isnan(g.powbase(1)) && strcmpi(g.commonbase, 'on')
         disp('Recomputing baseline power: using the grand mean of both conditions ...');
         mbase = (mbase1 + mbase2)/2;
         P1 = P1 + repmat(mbase1(1:size(P1,1))',[1 size(P1,2)]);
@@ -1084,9 +1089,11 @@ if isempty(g.precomputed)
     % -----------------------------------------
     % detrend over epochs (trials) if requested
     % -----------------------------------------
-    data = reshape(data, g.frames, prod(size(data))/g.frames);
     if strcmpi(g.rmerp, 'on')
-        data = data - mean(data,2)*ones(1, length(data(:))/g.frames);
+        if ndims(data) == 2
+             data = data - mean(data,2)*ones(1, length(data(:))/g.frames);
+        else data = data - repmat(mean(data,3), [1 1 trials]);
+        end;
     end;
 
     % ----------------------------------------------------
@@ -1099,7 +1106,7 @@ if isempty(g.precomputed)
 
     [alltfX freqs timesout R] = timefreq(data, g.srate, tmioutopt{:}, ...
         'winsize', g.winsize, 'tlimits', g.tlimits, 'detrend', g.detrend, ...
-        'itctype', g.type, 'wavelet', g.cycles, ...
+        'itctype', g.type, 'wavelet', g.cycles, 'verbose', g.verbose, ...
         'padratio', g.padratio, 'freqs', g.freqs, 'freqscale', g.freqscale, ...
         'nfreqs', g.nfreqs, 'timestretch', {g.timeStretchMarks', g.timeStretchRefs}, timefreqopts{:});
 else
@@ -1134,7 +1141,7 @@ end;
 if size(g.baseline,2) == 2
     baseln = [];
     for index = 1:size(g.baseline,1)
-        tmptime   = find(timesout >= g.baseline(index,1) & timesout <= g.baseline(index,2));
+        tmptime   = find(timesout >= g.baseline(index,1) && timesout <= g.baseline(index,2));
         baseln = union(baseln, tmptime);
     end;
     if length(baseln)==0
@@ -1142,13 +1149,12 @@ if size(g.baseline,2) == 2
     end
 else
     if ~isempty(find(timesout < g.baseline))
-        baseln = find(timesout < g.baseline); % subtract means of pre-0 (centered) windows
-    else
-        baseln = 1:length(timesout); % use all times as baseline
+         baseln = find(timesout < g.baseline); % subtract means of pre-0 (centered) windows
+    else baseln = 1:length(timesout); % use all times as baseline
     end
 end;
 
-if ~isnan(g.alpha) & length(baseln)==0
+if ~isnan(g.alpha) && length(baseln)==0
     verboseprintf(g.verbose, 'timef(): no window centers in baseline (times<%g) - shorten (max) window length.\n', g.baseline)
     return
 end
@@ -1156,17 +1162,29 @@ end
 % -----------------------------------------
 % remove baseline on a trial by trial basis
 % -----------------------------------------
-Pori = mean(P, 3);
-if strcmpi(g.trialbase, 'on') & isnan( g.powbase(1) )
-    mbase = mean(P(:,baseln,:),2);
-    if strcmpi(g.basenorm, 'on')
-        mstd = std(P(:,baseln,:),[],2);
-        P = (P-repmat(mbase,[1 size(P,2) 1]))./repmat(mstd,[1 size(P,2) 1]); % convert to log then back to normal
-    else
-        P = P./repmat(mbase,[1 size(P,2) 1]); 
-        %P = 10 .^ (log10(P) - repmat(log10(mbase),[1 size(P,2) 1])); % same as above
+if ndims(P) == 4
+    Pori = mean(P, 4);
+    if strcmpi(g.trialbase, 'on') && isnan( g.powbase(1) )
+        mbase = mean(P(:,:,baseln,:),3);
+        if strcmpi(g.basenorm, 'on')
+             mstd = std(P(:,:,baseln,:),[],3);
+             P = bsxfun(@rdivide, bsxfun(@minus, P, mbase), mstd);
+        else P = bsxfun(@rdivide, P, mbase);
+        end;
     end;
-end;    
+else
+    Pori = mean(P, 3);
+    if strcmpi(g.trialbase, 'on') && isnan( g.powbase(1) )
+        mbase = mean(P(:,baseln,:),2);
+        if strcmpi(g.basenorm, 'on')
+            mstd = std(P(:,baseln,:),[],2);
+            P = (P-repmat(mbase,[1 size(P,2) 1]))./repmat(mstd,[1 size(P,2) 1]); % convert to log then back to normal
+        else
+            P = P./repmat(mbase,[1 size(P,2) 1]); 
+            %P = 10 .^ (log10(P) - repmat(log10(mbase),[1 size(P,2) 1])); % same as above
+        end;
+    end;
+end;
 if ~isempty(g.precomputed)
     return; % return single trial power
 end;
@@ -1211,7 +1229,7 @@ if ~isnan(g.alpha) | ~isempty(find(~isnan(g.pboot))) | ~isempty(find(~isnan(g.rb
         else
             baselntmp = [];
             for index = 1:size(g.baseboot,1)
-                tmptime   = find(timesout >= g.baseboot(index,1) & timesout <= g.baseboot(index,2));
+                tmptime   = find(timesout >= g.baseboot(index,1) && timesout <= g.baseboot(index,2));
                 if isempty(tmptime),
                     fprintf('Warning: empty baseline interval [%3.2f %3.2f]\n', g.baseboot(index,1), g.baseboot(index,2));
                 end;
@@ -1252,7 +1270,7 @@ if ~isnan(g.alpha) | ~isempty(find(~isnan(g.pboot))) | ~isempty(find(~isnan(g.rb
             else
                 baselntmp = [];
                 for index = 1:size(g.baseboot,1)
-                    tmptime   = find(timesout >= g.baseboot(index,1) & timesout <= g.baseboot(index,2));
+                    tmptime   = find(timesout >= g.baseboot(index,1) && timesout <= g.baseboot(index,2));
                     if isempty(tmptime),
                         fprintf('Warning: empty baseline interval [%3.2f %3.2f]\n', g.baseboot(index,1), g.baseboot(index,2));
                     end;
@@ -1290,7 +1308,9 @@ end
 
 % average the power
 % -----------------
-P    = mean(P, 3);
+if ndims(P) == 4, P = mean(P, 4);
+else              P = mean(P, 3);
+end;
 
 % correction for multiple comparisons
 % -----------------------------------
@@ -1320,92 +1340,84 @@ if ~isnan(g.alpha)
             end;
             maskitc = exactp_itc <= alphafdr;
         else
-            maskitc  = exactp_itc  <= g.alpha;
+            maskitc = exactp_itc  <= g.alpha;
         end
     end;
 end;
 
+% computer baseline values
+% ------------------------
 if isnan(g.powbase(1))
     verboseprintf(g.verbose, 'Computing the mean baseline spectrum\n');
-    mbase    = mean(P(:,baseln),2);
-    mbaseori = mean(Pori(:,baseln),2);
+    if ndims(P) == 3
+         mbase    = mean(P(:,:,baseln),3);
+         mbaseori = mean(Pori(:,:,baseln),3);
+    else mbase    = mean(P(:,baseln),2);
+         mbaseori = mean(Pori(:,baseln),2);
+    end;
 else
     verboseprintf(g.verbose, 'Using the input baseline spectrum\n');
-    mbase    = 10.^(g.powbase/10); 
+    mbase    = g.powbase; 
+    if strcmpi(g.scale, 'log'), mbase = 10.^(mbase/10); end; 
     if size(mbase,1) == 1 % if input was a row vector, flip to be a column
         mbase = mbase';
     end;
-    mbaseori = 10.^(g.powbase/10);
+    mbaseori = mbase;
 end
 baselength = length(baseln);
-
-% standard output 
-% ---------------
-Pout = 10 * log10(P);
-if ~isnan(g.baseline)
-    Pout = Pout - 10*repmat(log10(mbase),[1 length(timesout)]);
-end;
-if ~isempty(Pboot) & isnan(g.pboot)
-     Pbootout = 10 * log10(Pboot);
-     if ~isnan(g.baseline)
-        Pbootout = Pbootout - 10*log10(repmat(mbase,[1 size(Pboot,2)])); % convert to (10log10) dB
-     end;
-else Pbootout = [];
-end;
 
 % ---------------
 % remove baseline
 % ---------------
-% original ERSP baseline removal (log)
-if ~isnan( g.baseline(1) ) & any(~isnan( mbase )) & strcmpi(g.scale, 'log') & strcmpi(g.trialbase, 'off')
+% original ERSP baseline removal
+if ~isnan( g.baseline(1) ) && any(~isnan( mbase )) && strcmpi(g.trialbase, 'off') && strcmpi(g.basenorm, 'off')
     
-    P = Pout;
-    if ~isempty(Pboot) & isnan(g.pboot)
-        Pboot = Pbootout;
-    end;
-    
-% original ERSP baseline removal (log) but abs vizualization
-elseif ~isnan( g.baseline(1) ) & any(~isnan( mbase )) & strcmpi(g.scale, 'abs') & strcmpi(g.trialbase, 'off') & ~strcmpi(g.basenorm, 'on')
-
-    P = 10 * (log10(P) - repmat(log10(mbase),[1 length(timesout)])); % convert to (10log10) dB
-    P = 10.^(P/10);
-    if ~isempty(Pboot) & isnan(g.pboot)
-        Pboot = 10 * (log10(Pboot) - repmat(log10(mbase),[1 size(Pboot,2)])); % convert to (10log10) dB
-        Pboot = 10.^(Pboot/10);
-    end;
-    if isempty(g.erspmax)
-        g.erspmax = [max(max(abs(P)))/2];
-        g.erspmax = [-g.erspmax g.erspmax]+1;
-    end;
-    
+    P = bsxfun(@rdivide, P, mbase);
+    if ~isempty(Pboot)
+         Pboot = bsxfun(@rdivide, Pboot, mbase);
+    end;   
 % ERSP baseline normalized
-elseif ~isnan( g.baseline(1) ) && ~isnan( mbase(1) ) && strcmpi(g.basenorm, 'on')
+elseif ~isnan( g.baseline(1) ) && ~isnan( mbase(1) ) && strcmpi(g.basenorm, 'on') && strcmpi(g.trialbase, 'off')
 
-    mstd = std(P(:,baseln),[],2);
-    P = (P-repmat(mbase,[1 size(P,2)]))./repmat(mstd,[1 size(P,2)]); % convert to log then back to normal
-    if ~isempty(Pboot) & isnan(g.pboot)
-        Pboot = (Pboot-repmat(mbase,[1 size(Pboot,2)]))./repmat(mstd,[1 size(Pboot,2)]); % convert to log then back to normal
+    if ndims(P) == 3, 
+         mstd = std(P(:,:,baseln),[],3);
+    else mstd = std(P(:,baseln),[],2);
     end;
+    P = bsxfun(@rdivide, bsxfun(@minus, P, mbase), mstd);
+    if ~isempty(Pboot) && isnan(g.pboot)
+        Pboot = bsxfun(@rdivide, bsxfun(@minus, Pboot, mbase), mstd);
+    end;
+end;
     
-% ERSP no baseline log
-elseif strcmpi(g.scale, 'log')
-    
+% convert to log if necessary
+% ---------------------------
+if strcmpi(g.scale, 'log')
+    if ~isnan( g.baseline(1) ) && ~isnan( mbase(1) ) && strcmpi(g.trialbase, 'off'), mbase = log10(mbase)*10; end;
     P = 10 * log10(P);
-    if ~isempty(Pboot) & isnan(g.pboot)
+    if ~isempty(Pboot)
         Pboot = 10 * log10(Pboot);
     end;
-        
-elseif strcmpi(g.trialbase, 'on')
-        g.erspmax = [max(max(abs(P)))/2];
-        g.erspmax = [-g.erspmax g.erspmax]+1;
+end;
+
+% auto scalling
+% -------------
+if isempty(g.erspmax)
+    g.erspmax = [max(max(abs(P)))/2];
+    g.erspmax = [-g.erspmax g.erspmax]+1;
 end;
 
 % --------
 % plotting
 % --------
-ERP = mean(data,2);
-mbase = log10(mbase)*10;
-if strcmpi(g.plotersp, 'on') | strcmpi(g.plotitc, 'on')
+if strcmpi(g.plotersp, 'on') || strcmpi(g.plotitc, 'on')
+    if ndims(P) == 3
+        P = squeeze(P(2,:,:,:));
+        R = squeeze(R(2,:,:,:));
+        mbase = squeeze(mbase(2,:));
+        ERP = mean(squeeze(data(1,:,:)),2);
+    else      
+        ERP = mean(data,2);
+    end;
     if strcmpi(g.plottype, 'image')
         plottimef(P, R, Pboot, Rboot, ERP, freqs, timesout, mbase, maskersp, maskitc, g);
     else
@@ -1418,12 +1430,7 @@ end;
 % --------------
 if strcmpi(g.outputformat, 'old')
     R = abs(R); % convert coherence vector to magnitude
-    mbase = 10^(mbase/10);
-end;
-if ~strcmpi(g.outputformat, 'plot')
-    P = Pout;
-    Pboot = Pbootout;
-    mbase = log10(mbaseori)*10;
+    if strcmpi(g.scale, 'log'), mbase = 10^(mbase/10); end;
 end;
 if strcmpi(g.verbose, 'on')
     disp('Note: Add output variables to command line call in history to');
@@ -1489,22 +1496,22 @@ switch lower(g.plotersp)
         set(h(1), 'tag', 'ersp');
 
         PP = P;
-        if strcmpi(g.scale, 'abs') & strcmpi(g.basenorm, 'off')
+        if strcmpi(g.scale, 'abs') && strcmpi(g.basenorm, 'off')
              baseval = 1;
         else baseval = 0;
         end;
         if ~isnan(g.alpha)
-            if strcmpi(g.pcontour, 'off') & ~isempty(maskersp) % zero out nonsignif. power differences
+            if strcmpi(g.pcontour, 'off') && ~isempty(maskersp) % zero out nonsignif. power differences
                 PP(~maskersp) = baseval;
                 %PP = PP .* maskersp;
             elseif isempty(maskersp)
-                if size(PP,1) == size(Pboot,1) & size(PP,2) == size(Pboot,2)
-                    PP(find(PP > Pboot(:,:,1) & (PP < Pboot(:,:,2)))) = baseval;
+                if size(PP,1) == size(Pboot,1) && size(PP,2) == size(Pboot,2)
+                    PP(find(PP > Pboot(:,:,1) && (PP < Pboot(:,:,2)))) = baseval;
                     Pboot = squeeze(mean(Pboot,2));
                     if size(Pboot,2) == 1, Pboot = Pboot'; end;
                 else
                     PP(find((PP > repmat(Pboot(:,1),[1 length(times)])) ...
-                        & (PP < repmat(Pboot(:,2),[1 length(times)])))) = baseval;
+                        && (PP < repmat(Pboot(:,2),[1 length(times)])))) = baseval;
                 end
             end;
         end;
@@ -1520,7 +1527,7 @@ switch lower(g.plotersp)
         elseif length(g.erspmax) == 1
             g.erspmax = [ -g.erspmax g.erspmax];
         end
-        if isnan( g.baseline ) & g.erspmax(1) < 0
+        if isnan( g.baseline ) && g.erspmax(1) < 0
             g.erspmax = [ min(min(P(:,:))) max(max(P(:,:)))];
         end;
 
@@ -1534,7 +1541,7 @@ switch lower(g.plotersp)
         set(gca,'ydir',g.hzdir);  % make frequency ascend or descend
 
         % put contour for multiple comparison masking
-        if ~isempty(maskersp) & strcmpi(g.pcontour, 'on')
+        if ~isempty(maskersp) && strcmpi(g.pcontour, 'on')
             hold on; [tmpc tmph] = contour(times, freqs, maskersp);
             set(tmph, 'linecolor', 'k', 'linewidth', 0.25)
         end;
@@ -1665,12 +1672,12 @@ switch lower(g.plotitc)
             RR = R;
         end;
         if ~isnan(g.alpha)
-            if ~isempty(maskitc) & strcmpi(g.pcontour, 'off')
+            if ~isempty(maskitc) && strcmpi(g.pcontour, 'off')
                 RR = RR .* maskitc;
             elseif isempty(maskitc)
-                if size(RR,1) == size(Rboot,1) & size(RR,2) == size(Rboot,2)
+                if size(RR,1) == size(Rboot,1) && size(RR,2) == size(Rboot,2)
                     tmp = gcf;
-                    if size(Rboot,3) == 2	 RR(find(RR > Rboot(:,:,1) & RR < Rboot(:,:,2))) = 0;
+                    if size(Rboot,3) == 2	 RR(find(RR > Rboot(:,:,1) && RR < Rboot(:,:,2))) = 0;
                     else                   RR(find(RR < Rboot)) = 0;
                     end;
                     Rboot = mean(Rboot(:,:,end),2);
@@ -1699,13 +1706,13 @@ switch lower(g.plotitc)
                 coh_caxis = [-1 1];
             end
             if ~strcmpi(g.freqscale, 'log')
-                if exist('Rsign') & strcmp(g.plotphasesign, 'on')
+                if exist('Rsign') && strcmp(g.plotphasesign, 'on')
                     imagesc(times,freqs,Rsign(:,:).*RR(:,:),coh_caxis); % <---
                 else
                     imagesc(times,freqs,RR(:,:),coh_caxis); % <---
                 end
             else
-                if exist('Rsign') & strcmp(g.plotphasesign, 'on')
+                if exist('Rsign') && strcmp(g.plotphasesign, 'on')
                     imagesclogy(times,freqs,Rsign(:,:).*RR(:,:),coh_caxis); % <---
                 else
                     imagesclogy(times,freqs,RR(:,:),coh_caxis); % <---
@@ -1715,7 +1722,7 @@ switch lower(g.plotitc)
         set(gca,'ydir',g.hzdir);  % make frequency ascend or descend
 
         % plot contour if necessary
-        if ~isempty(maskitc) & strcmpi(g.pcontour, 'on')
+        if ~isempty(maskitc) && strcmpi(g.pcontour, 'on')
             hold on; [tmpc tmph] = contour(times, freqs, maskitc);
             set(tmph, 'linecolor', 'k', 'linewidth', 0.25)
         end;
@@ -1848,7 +1855,7 @@ end; %switch
 %
 %%%%%%%%%%%%%%% plot a topoplot() %%%%%%%%%%%%%%%%%%%%%%%
 %
-if (~isempty(g.topovec)) & strcmpi(g.plotitc, 'on') & strcmpi(g.plotersp, 'on')
+if (~isempty(g.topovec)) && strcmpi(g.plotitc, 'on') && strcmpi(g.plotersp, 'on')
     
     if strcmp(g.plotersp,'off')
         h(12) = axes('Position',[-.207 .95 .2 .14].*s+q); % place the scalp map at top-left
@@ -1866,7 +1873,7 @@ end
 
 if g.plot
     try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
-    if (length(g.title) > 0) & ~iscell(g.title)
+    if (length(g.title) > 0) && ~iscell(g.title)
         axes('Position',pos,'Visible','Off');
         h(13) = text(-.05,1.01,g.title);
         set(h(13),'VerticalAlignment','bottom')
@@ -1918,7 +1925,7 @@ if strcmpi(g.plotersp, 'on')
     for index = 1:length(freqs)
         alllegend{index} = [ num2str(freqs(index)) 'Hz baseline ' num2str(mbase(index)) ' dB' ];
     end;
-    if strcmpi(g.plotmean, 'on') & freqs(1) ~= freqs(end)
+    if strcmpi(g.plotmean, 'on') && freqs(1) ~= freqs(end)
         alllegend = { alllegend{:} [ num2str(freqs(1)) '-' num2str(freqs(end)) ...
             'Hz mean baseline ' num2str(mean(mbase)) ' dB' ] };
     end;
@@ -1946,7 +1953,7 @@ if strcmpi(g.plotitc, 'on')
     for index = 1:length(freqs)
         alllegend{index} = [ num2str(freqs(index)) 'Hz baseline ' num2str(mbase(index)) ' dB' ];
     end;
-    if strcmpi(g.plotmean, 'on') & freqs(1) ~= freqs(end)
+    if strcmpi(g.plotmean, 'on') && freqs(1) ~= freqs(end)
         alllegend = { alllegend{:} [ num2str(freqs(1)) '-' num2str(freqs(end)) ...
             'Hz mean baseline ' num2str(mean(mbase)) ' dB' ] };
     end;
@@ -1972,7 +1979,7 @@ if strcmpi(g.plotitc, 'on') | strcmpi(g.plotersp, 'on')
     end
 
     try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
-    if (length(g.title) > 0) & ~iscell(g.title)
+    if (length(g.title) > 0) && ~iscell(g.title)
         axes('Position',pos,'Visible','Off');
         h(13) = text(-.05,1.01,g.title);
         set(h(13),'VerticalAlignment','bottom')
@@ -2003,11 +2010,11 @@ if ~isempty(regions)
     axes(ax);
     in_a_region = 0;
     for index=1:length(regions)
-        if regions(index) & ~in_a_region
+        if regions(index) && ~in_a_region
             tmpreg(1) = times(index);
             in_a_region = 1;
         end;
-        if ~regions(index) & in_a_region
+        if ~regions(index) && in_a_region
             tmpreg(2) = times(index);
             in_a_region = 0;
             if strcmpi(highlightmode, 'background')
