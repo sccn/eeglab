@@ -251,7 +251,7 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
                     try
                         myfprintf(verb,'...');
                         res = supersurrogate( datavals, datalen, datadims, bootflag, pairflag, g.naccu);
-                        surrogval = ttest_cell_select( res, g.paired);
+                        surrogval = ttest_cell_select( res, g.paired, g.variance);
                     catch,
                         lasterr
                         myfprintf(verb,'\nSuperfast array computation failed because of memory limitation, reverting to standard computation');
@@ -264,9 +264,9 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
                         if mod(index, 10) == 0, myfprintf(verb,'%d ', index); end;
                         if mod(index, 100) == 0, myfprintf(verb,'\n'); end;
                         switch myndims(res{1})
-                         case 1   , surrogval(index)     = ttest_cell_select(res, g.paired);
-                         case 2   , surrogval(:,index)   = ttest_cell_select(res, g.paired);
-                         otherwise, surrogval(:,:,index) = ttest_cell_select(res, g.paired);
+                         case 1   , surrogval(index)     = ttest_cell_select(res, g.paired, g.variance);
+                         case 2   , surrogval(:,index)   = ttest_cell_select(res, g.paired, g.variance);
+                         otherwise, surrogval(:,:,index) = ttest_cell_select(res, g.paired, g.variance);
                         end;
                     end;
                 end;
