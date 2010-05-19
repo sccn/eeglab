@@ -192,10 +192,10 @@ else
         basicstat = sprintf([ '(p<%.' thresh_pres(opt.threshold(1)) 'f)'], opt.threshold(1));
     end;
     if length(opt.threshold) >= 2
-        basicstat = [ basicstat(1:end-1) sprintf([' yellow;p<%.' thresh_pres(opt.threshold(2))  'f orange)'], opt.threshold(2)) ];
+        basicstat = [ basicstat(1:end-1) sprintf([' red;p<%.' thresh_pres(opt.threshold(2))  'f brown)'], opt.threshold(2)) ];
     end;
     if length(opt.threshold) >= 3
-        basicstat = [ basicstat(1:end-1) sprintf([';\np<%.' thresh_pres(opt.threshold(3)) 'f red)' ], opt.threshold(3)) ];  
+        basicstat = [ basicstat(1:end-1) sprintf([';\np<%.' thresh_pres(opt.threshold(3)) 'f black)' ], opt.threshold(3)) ];  
     end;
 end;    
 if ~isempty(opt.statistics), basicstat = [ basicstat ' ' opt.statistics    ]; end;
