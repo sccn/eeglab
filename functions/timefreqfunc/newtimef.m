@@ -1370,7 +1370,7 @@ baselength = length(baseln);
 % remove baseline
 % ---------------
 % original ERSP baseline removal
-if ~isnan( g.baseline(1) ) && any(~isnan( mbase )) && strcmpi(g.trialbase, 'off') && strcmpi(g.basenorm, 'off')
+if ~isnan( g.baseline(1) ) && any(~isnan( mbase(1) )) && strcmpi(g.trialbase, 'off') && strcmpi(g.basenorm, 'off')
     
     P = bsxfun(@rdivide, P, mbase);
     if ~isempty(Pboot)
