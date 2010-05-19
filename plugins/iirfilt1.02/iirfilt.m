@@ -93,12 +93,10 @@ if trans_bw==0
 
     if locutoff < MINFREQ & locutoff > 0
         trans_bw=locutoff/3;
-        rp=0.01;
-        rs=30;
     elseif hicutoff < MINFREQ & hicutoff > 0
         trans_bw=hicutoff/3;
-        rp=0.01;
-        rs=30;
+        %rp=0.01;
+        %rs=30;
     else
         % Default transition bandwidth is 1 Hz
         trans_bw=1;
@@ -110,7 +108,7 @@ if nargin<7
 end
 if nargin<8 || isempty(rp)
    % Ripple in the passband
-   rp=0.0025;;
+   rp=0.0025;
 end
 if nargin<9 || isempty(rs)
    % Ripple in the stopband
