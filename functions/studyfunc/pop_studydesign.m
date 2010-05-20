@@ -147,6 +147,15 @@ if nargin < 3 && ~isstr(STUDY)
         rmfiles = fastif(des(index).deletepreviousfiles, 'on', 'off');
         if index > length(STUDY.design) || ~isequal(STUDY.design(index), tmpdes) || strcmpi(rmfiles, 'on')
             fprintf('Updating/creating STUDY design %d\n', index);
+            
+            % test if file exist and issue warning
+            if ~isempty(dir([ STUDY.design(index).setinfo(1).filebase '.*' ])) &&  strcmpi(rmfiles, 'off')
+                res = questdlg2(strvcat([ 'Precomputed data files exist for design ' int2str(index) '.' ], ' ', ...
+                                       'Modifying this design without deleting the associated files', ...
+                                       'might mean that they will stay on disk and will be unusable'), ...
+                                       'STUDY design warning', 'Abord', 'Continue', 'Continue');
+                if strcmpi(res, 'Abord'), return; end;
+            end;
             [STUDY com] = std_makedesign(STUDY, ALLEEG, index, tmpdes, 'delfiles', rmfiles);
             allcom = [ allcom 10 com ];
         else
@@ -299,10 +308,9 @@ elseif isstr(STUDY)
                 catch,
                     disp('Error while decoding list of parameters');
                     des(val).includevarlist = {};
-                    set(findobj(fig, 'tag', 'edit_selectdattrials'),  'string', '')
+                    set(findobj(fig, 'tag', 'edit_selectdattrials'),  'string', '');
                 end;
             end;
-            tmp = des(val)
             
         case 'selectfact', % select a specific ind. var. (update value listboxes)
             factval = designind;
