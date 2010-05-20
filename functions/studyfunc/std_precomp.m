@@ -280,6 +280,7 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
         [ tmpX tmpt tmpf g.erspparams ] = std_ersp(ALLEEG(1), 'channels', 1, 'type', type, 'recompute', 'on', 'getparams', 'on', 'savetrials', g.savetrials, g.erspparams{:});
         if strcmpi(g.recompute, 'off')
             for index = 1:length(STUDY.design(g.design).setinfo)
+                desset = STUDY.design(g.design).setinfo(index);
                 if strcmpi(computewhat, 'channels')
                      filename = [ desset.filebase '.datersp'];
                 else filename = [ desset.filebase '.icaersp'];
