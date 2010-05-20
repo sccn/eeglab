@@ -406,17 +406,17 @@ catchstrs.update_study           = e_load_study;
                     disp(['Adding path to ' eeglabpath 'external' filesep dircontent{index}]);
                 end;
                 if ~isempty(findstr('fieldtrip', lower(dircontent{index})))
-                    addpath([p 'external' filesep dircontent{index} filesep 'fileio' ]);
-                    addpath([p 'external' filesep dircontent{index} filesep 'forward' ]);
-                    addpath([p 'external' filesep dircontent{index} filesep 'inverse' ]);
-                    addpath([p 'external' filesep dircontent{index} filesep 'public' ]);
-                    addpath([p 'external' filesep dircontent{index} ]);
+                    addpathexist([p 'external' filesep dircontent{index} filesep 'fileio' ]);
+                    addpathexist([p 'external' filesep dircontent{index} filesep 'forward' ]);
+                    addpathexist([p 'external' filesep dircontent{index} filesep 'inverse' ]);
+                    addpathexist([p 'external' filesep dircontent{index} filesep 'public' ]);
+                    addpathexist([p 'external' filesep dircontent{index} ]);
                     disp(['Adding path to ' eeglabpath 'external' filesep dircontent{index} ' subfolders' ]);
                 end;
                 if ~isempty(findstr('biosig', lower(dircontent{index})))
-                    addpath([p 'external' filesep dircontent{index} filesep 't200_FileAccess' ]);
-                    addpath([p 'external' filesep dircontent{index} filesep 't250_ArtifactPreProcessingQualityControl' ]);
-                    addpath([p 'external' filesep dircontent{index} filesep 'doc' ]);
+                    addpathexist([p 'external' filesep dircontent{index} filesep 't200_FileAccess' ]);
+                    addpathexist([p 'external' filesep dircontent{index} filesep 't250_ArtifactPreProcessingQualityControl' ]);
+                    addpathexist([p 'external' filesep dircontent{index} filesep 'doc' ]);
                     
                     biosigflag = 1;
                 end;
@@ -1735,6 +1735,10 @@ function myaddpath(eeglabpath, functionname, pathtoadd);
         addpath(tmpnewpath);
     end;
 
+function addpathexist(p)
+    if exist(p) == 7
+        addpath(p);
+    end;
 
 function val = iseeglabdeployed2;
 %val = 1; return;
