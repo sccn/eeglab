@@ -385,6 +385,7 @@ catchstrs.update_study           = e_load_study;
         disp('ICALAB toolbox detected (algo. added to "run ICA" interface)');
     end;
     
+    biosigflag = 0;
     if iseeglabdeployed2
         biosigflag = 1;
     else
@@ -412,6 +413,13 @@ catchstrs.update_study           = e_load_study;
                     addpath([p 'external' filesep dircontent{index} ]);
                     disp(['Adding path to ' eeglabpath 'external' filesep dircontent{index} ' subfolders' ]);
                 end;
+                if ~isempty(findstr('biosig', lower(dircontent{index})))
+                    addpath([p 'external' filesep dircontent{index} filesep 't200_FileAccess' ]);
+                    addpath([p 'external' filesep dircontent{index} filesep 't250_ArtifactPreProcessingQualityControl' ]);
+                    addpath([p 'external' filesep dircontent{index} filesep 'doc' ]);
+                    
+                    biosigflag = 1;
+                end;
             end;
         end;
 
@@ -422,34 +430,6 @@ catchstrs.update_study           = e_load_study;
             %disp('  Warning: duplicate function topoplot.m in Fieldtrip and EEGLAB');
             %disp('  EEGLAB function will prevail and call the Fieldtrip one when appropriate');
             addpath(ptopoplot);
-        end;
-
-        % BIOSIG plugin (not in plugin folder)
-        % ------------------------------------
-        path_biosig2 = [ p_parent 'biosig' filesep 't200' ];
-        if exist(path_biosig2) == 7
-            disp('   BIOSIG is now in the "external" folder of EEGLAB');
-            disp([ '   Please delete old folder ' path_biosig2(1:end-4) ]);
-        end;
-        dircontent  = dir([ p 'external' filesep ]);
-        dircontent  = { dircontent.name };
-        ind2 = strmatch('biosig', lower(dircontent));
-        biosigflag = 0;
-        if ~isempty(ind2)
-            path_biosig = [ p 'external' filesep dircontent{ind2(end)} ];
-            try,
-                addpath(path_biosig);
-                addpath([ path_biosig filesep 't200' ]);
-                addpath([ path_biosig filesep 't250' ]);
-                % addpath([ p 'external' filesep 'biosig' filesep 't500' ]); % topoplot conflict
-                version = [ path_biosig filesep 'VERSION' ];
-                version = loadtxt(version, 'convert', 'off', 'verbose', 'off');
-                version = [ version{2,3}(1) version{2,3}(2:end) ];
-                biosigflag = 1;
-            catch
-                disp([ 'eeglab: cannot find BIOSIG plugin' ] ); 
-                disp([ '   ' lasterr] );
-            end;
         end;
     end;
     
