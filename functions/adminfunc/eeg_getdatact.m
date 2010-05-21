@@ -13,7 +13,8 @@
 %                 Default is to read all data channels.
 %   'component' - [integer array] read only specific components
 %   'rmcomps'   - [integer array] remove selected components from data
-%                 channels
+%                 channels. This is only to be used with channel data not
+%                 when selecting components.
 %   'trialindices' - [integer array] only read specific trials. Default is
 %                 to read all trials.
 %   'verbose'   - ['on'|'off'] verbose mode. Default is 'on'.
