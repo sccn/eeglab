@@ -180,7 +180,7 @@ if ~isempty(EEG.event)
         else tmpcom = num2str(e(index).type);
         end;
 
-        fprintf(fid2, 'Mk%d=%s,%s,%d,%d,0,0\n', index, num2str(e(index).type), num2str(tmpcom), e(index).latency, tmpdur);
+        fprintf(fid2, 'Mk%d=%s,%s,%d,%d,0,0\n', index, num2str(e(index).type), num2str(tmpcom), round(e(index).latency), tmpdur);
     end;
 end
 fclose(fid1);
