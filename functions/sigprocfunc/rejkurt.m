@@ -98,7 +98,10 @@ else
             tmpkurt = sort(tmpkurt);
             minind  = max(round(length(tmpkurt)*0.1),1);
             maxind  = round(length(tmpkurt)-round(length(tmpkurt)*0.1));
-            tmpkurt = tmpkurt(minind:maxind);
+            if size(tmpkurt,2) == 1
+                 tmpkurt = tmpkurt(minind:maxind);
+            else tmpkurt = tmpkurt(:,minind:maxind);
+            end;
         end;
 	    switch ndims( signal )
 	    	case 2,	kurto = (kurto-mean(tmpkurt)) / std(tmpkurt);
