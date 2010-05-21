@@ -79,7 +79,7 @@ mat = exp(-0.5*(  ((X-meanX)/sigmaX).*((X-meanX)/sigmaX)...
             			/((sigmaX*sigmaY*sigmaZ)^(0.5)*pi); 
 
 if cut > 0
-	maximun = max(max(mat))*cut;
+	maximun = max(mat(:))*cut;
 	I = find(mat < maximun);
 	mat(I) = 0;
 end;
