@@ -98,7 +98,7 @@ if ~isstr(varargin{1}) %intial settings
             {'style' 'text'       'string' 'Remove ICA artifactual components pre-tagged in each dataset' } ...
             {'style' 'checkbox'   'string' [ ' ' 10 ' ' ] 'tag' 'rmica2_on' 'value' 0 'callback' cb_ica2 }  ...
             {'style' 'text'       'string' [ 'Remove artifactual ICA cluster or clusters (hold shift key)' 10 ' ' ] } ...
-            {'style' 'listbox'    'string' { STUDY.cluster.name } 'value' 1 'max' 2 } };
+            {'style' 'listbox'    'string' { STUDY.cluster.name } 'value' 1 'max' 2  'tag' 'rmica2_val'} };
         guiadd2 = {};
         geomadd1 = { [2 3 0.5] geomline geomline [0.33 4 2] }; 
         geomvertadd1 = [ 1 1 1 2 ];
@@ -176,9 +176,9 @@ if ~isstr(varargin{1}) %intial settings
     
     % remove ICA cluster
     % ------------------
-    if isfield(os, 'rmica1_on')
+    if isfield(os, 'rmica2_on')
         if os.rmica2_on == 1 
-            options = { options{:} 'rmclust' str2num(os.rmica2_text) };
+            options = { options{:} 'rmclust' os.rmica2_val };
         end
     end;
     
