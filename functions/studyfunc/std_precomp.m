@@ -37,7 +37,8 @@
 %                                be possible to select another subrange for plotting).
 %                   'freqfac'  = [integer] ntimes to oversample -> frequency resolution {default: 2}
 %                   'nfft'     = [integer] length to zero-pad data to. Overwrites 'freqfac' above.
-%                   'winsize'  = [integer] window size in data points {default: from data}
+%                   'winsize'  = [integer] window size in data points
+%                   {default: from data}
 %                   'overlap'  = [integer] window overlap in data points {default: 0}
 %                   'percent'  = [float 0 to 100] percent of the data to sample for computing the 
 %                                spectra. Values < 100 speed up the computation. {default: 100}.
@@ -339,20 +340,29 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
     % -----------------------------------------------
     function rmcomps = getclustcomps(STUDY, rmclust, settmpind);    
     
-        disp('Warning: dealing with setinds - not made design compatible - in getclustcomps of std_precomp');
-        rmcomps   = [ ];
-        for rmi = 1:length(rmclust)
-            findind   = find(settmpind == STUDY.cluster(rmclust(rmi)).setinds{c,g});
-            rmcomps   = [ rmcomps STUDY.cluster(rmclust(rmi)).allinds{c,g}(findind) ];
+        rmcomps   = cell(1,length(settmpind));
+        for idat = 1:length(settmpind) % scan dataset for which to find component clusters
+            currentdat = settmpind(idat);
+            for rmi = 1:length(rmclust) % scan clusters
+                compinds = STUDY.cluster(rmclust(rmi)).allinds;
+                
+                for ind = 1:length(STUDY.cluster(rmclust(rmi)).setinds(:)) % scan datasets of cluster
+                    setinds  = [STUDY.design(STUDY.currentdesign).setinfo(STUDY.cluster(rmclust(rmi)).setinds{ind}).setindex ];
+                    indmatch = find(setinds == currentdat);
+                    if ~isempty(indmatch)
+                        rmcomps{idat} = union( rmcomps{idat}, compinds{ind}(indmatch));
+                    end;
+                end;
+            end;
         end;
-
+        
     % make option array and channel list (which depend on interp) for any type of measure
     % ----------------------------------------------------------------------
     function [tmpchanlist, opts] = getchansandopts(STUDY, ALLEEG, chanlist, idat, g);
         
         opts = { };
         if ~isempty(g.rmclust)
-            opts = { opts{:} 'rmcomps' getclustcomps(STUDY, g.rmclust, idat(1)) };                
+            opts = { opts{:} 'rmcomps' getclustcomps(STUDY, g.rmclust, idat) };                
         elseif strcmpi(g.rmicacomps, 'on')
             opts = { opts{:} 'rmcomps' find(ALLEEG(idat(1)).reject.gcompreject) };
         end;
