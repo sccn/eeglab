@@ -81,7 +81,7 @@ if fid < 3,
 end
 data=(fread(fid,'float'))';
 status=fclose('all');
-if ~isint(length(data)/nchans) % check length
+if rem(length(data),nchans) == 0 % check length
    fprintf('rmart() - data length not divisible by %d chans.\n',nchans);
     return
 end
