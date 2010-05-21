@@ -123,13 +123,17 @@ for c = 1:nc
         hdl(c,g) = mysubplot(nc+addr, ng+addc, g + (c-1)*(ng+addc), opt.transpose);
         if ~isempty(data{c,g})
             tmpplot = double(mean(data{c,g},3));
-            topoplot( tmpplot, opt.chanlocs, opt.topoplotopt{:});
-            if isempty(opt.caxis)
-                tmpc = [ min(min(tmpplot), tmpc(1)) max(max(tmpplot), tmpc(2)) ];
-            else 
-                caxis(opt.caxis);
+            if ~all(isnan(tmpplot))
+                topoplot( tmpplot, opt.chanlocs, opt.topoplotopt{:});
+                if isempty(opt.caxis)
+                    tmpc = [ min(min(tmpplot), tmpc(1)) max(max(tmpplot), tmpc(2)) ];
+                else 
+                    caxis(opt.caxis);
+                end;
+                title(opt.titles{c,g}); 
+            else
+                axis off;
             end;
-            title(opt.titles{c,g}); 
         else
             axis off;
         end;
