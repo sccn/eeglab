@@ -157,7 +157,7 @@ end;
                         'cycles'        'real'        []      [3 .5];
                         'padratio'      'real'        []      1;
                         'freqs'         'real'        []      [0 EEG.srate/2];
-                        'rmcomps'       'integer'     []      [];
+                        'rmcomps'       'cell'        []      cell(1,length(EEG));
                         'interp'        'struct'      { }     struct([]);
                         'freqscale'     'string'      []      'log';
                         'alpha'         'real'        []      NaN;
@@ -283,7 +283,7 @@ options = {};
 if ~isempty(g.components)
     tmpdata = eeg_getdatact(EEG, 'component', g.indices, 'trialindices', g.trialindices{dat});
 else
-    EEG.data = eeg_getdatact(EEG, 'channel', [1:EEG.nbchan], 'rmcomps', g.rmcomps, 'trialindices', g.trialindices{1});
+    EEG.data = eeg_getdatact(EEG, 'channel', [1:EEG.nbchan], 'rmcomps', g.rmcomps{1}, 'trialindices', g.trialindices{1});
     if ~isempty(g.rmcomps), options = { options{:} 'rmcomps' g.rmcomps }; end;
     if ~isempty(g.interp), 
         EEG = eeg_interp(EEG, g.interp, 'spherical'); 
