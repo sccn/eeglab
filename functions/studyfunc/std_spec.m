@@ -115,7 +115,7 @@ end;
                                       'specmode'   'string'  {'fft' 'psd' 'pmtm' 'pburg'} 'psd';
                                       'recompute'  'string'  { 'on' 'off' } 'off';
                                       'savetrials' 'string'  { 'on' 'off' } 'off';
-                                      'rmcomps'    'integer' []         [];
+                                      'rmcomps'    'cell'    []         cell(1,length(EEG));
                                       'nw'         'float'   []         4;
                                       'fileout'    'string'  []         '';
                                       'burgorder'  'integer' []         20;
@@ -175,7 +175,7 @@ for dat = 1:length(EEG)
     if strcmpi(prefix, 'comp')
         tmpdata = eeg_getdatact(EEG(dat), 'component', [1:size(EEG(dat).icaweights,1)], 'trialindices', g.trialindices{dat} );
     else
-        EEG(dat).data = eeg_getdatact(EEG(dat), 'channel', [1:EEG(dat).nbchan], 'rmcomps', g.rmcomps, 'trialindices', g.trialindices{dat});
+        EEG(dat).data = eeg_getdatact(EEG(dat), 'channel', [1:EEG(dat).nbchan], 'rmcomps', g.rmcomps{dat}, 'trialindices', g.trialindices{dat});
         if ~isempty(g.rmcomps), options = { options{:} 'rmcomps' g.rmcomps }; end;
         if ~isempty(g.interp), 
             TMPEEG = eeg_interp(EEG(dat), g.interp, 'spherical'); 
