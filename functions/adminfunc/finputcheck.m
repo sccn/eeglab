@@ -173,7 +173,7 @@ function g = fieldtest( fieldname, fieldtype, fieldval, tmpval, callfunc );
       else 
           if strcmpi(fieldtype, 'integer')
               if ~isempty(fieldval)
-                  if (isnan(tmpval) && ~any(isnan(fieldval))) ...
+                  if (any(isnan(tmpval(:))) && ~any(isnan(fieldval))) ...
                           && (~ismember(tmpval, fieldval))
                       g = [ callfunc 'error: wrong value for argument ''' fieldname '''' ]; return;
                   end;
