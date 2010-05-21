@@ -40,8 +40,8 @@ textres = '';
 cellres = {};
 if maxdepth == 0, return; end;
 for i = 1:length(foldcontent)
-    if exist(foldcontent(i).name) == 7 && ~ismember(foldcontent(i).name, ignorelist)
-        if ~strcmpi(foldcontent(i).name, '..') & ~strcmpi(foldcontent(i).name, '.')
+    if (exist(foldcontent(i).name) == 7 || strcmpi(foldcontent(i).name, 'functions')) && ~ismember(foldcontent(i).name, ignorelist)
+        if ~strcmpi(foldcontent(i).name, '..') && ~strcmpi(foldcontent(i).name, '.')
             disp(fullfile(foldname, foldcontent(i).name));
             [tmpcellres tmpres] = scanfold(fullfile(foldname, foldcontent(i).name), ignorelist, maxdepth-1);
             textres = [ textres tmpres ];
