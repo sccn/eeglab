@@ -93,7 +93,7 @@ function [g, varargnew] = finputcheck( vararg, fieldlist, callfunc, mode )
 			g = struct(vararg{:});
 		catch
             vararg = removedup(vararg);
-            try,
+            try
                 g = struct(vararg{:});
             catch
                 g = [ callfunc 'error: bad ''key'', ''val'' sequence' ]; return;
@@ -163,24 +163,24 @@ function g = fieldtest( fieldname, fieldtype, fieldval, tmpval, callfunc );
     
     switch fieldtype
      case { 'integer' 'real' 'boolean' 'float' }, 
-      if ~isnumeric(tmpval)
+      if ~isnumeric(tmpval) && ~islogical(tmpval)
           g = [ callfunc 'error: argument ''' fieldname ''' must be numeric' ]; return;
       end;
       if strcmpi(fieldtype, 'boolean')
-          if tmpval ~=0 & tmpval ~= 1
+          if tmpval ~=0 && tmpval ~= 1
               g = [ callfunc 'error: argument ''' fieldname ''' must be 0 or 1' ]; return;
           end;  
       else 
           if strcmpi(fieldtype, 'integer')
               if ~isempty(fieldval)
-                  if (isnan(tmpval) & ~any(isnan(fieldval))) ...
-                          & (~ismember(tmpval, fieldval))
+                  if (isnan(tmpval) && ~any(isnan(fieldval))) ...
+                          && (~ismember(tmpval, fieldval))
                       g = [ callfunc 'error: wrong value for argument ''' fieldname '''' ]; return;
                   end;
               end;
           else % real or float
-              if ~isempty(fieldval)
-                  if tmpval < fieldval(1) | tmpval > fieldval(2)
+              if ~isempty(fieldval) && ~isempty(tmpval)
+                  if tmpval < fieldval(1) || tmpval > fieldval(2)
                       g = [ callfunc 'error: value out of range for argument ''' fieldname '''' ]; return;
                   end;
               end;
