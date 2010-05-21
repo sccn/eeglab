@@ -230,7 +230,15 @@ nf2 = max(1,length(opt.indval2));
 fprintf('Building STUDY design\n');
 for n1 = 1:nf1, [ dats1{n1} dattrials1{n1} ] = std_selectdataset( STUDY, ALLEEG, opt.indvar1, opt.indval1{n1}); end;
 for n2 = 1:nf2, [ dats2{n2} dattrials2{n2} ] = std_selectdataset( STUDY, ALLEEG, opt.indvar2, opt.indval2{n2}); end;
-    
+
+% detect files from old format
+% ----------------------------
+if strcmpi(opt.defaultdesign, 'on')
+    if isempty(dir(fullfile(ALLEEG(1).filepath, '*.dat*'))) || isempty(dir(fullfile(ALLEEG(1).filepath, '*.ica*')))
+        opt.defaultdesign = 'off';
+    end;
+end;
+
 % scan subjects and conditions
 % ----------------------------
 count = 1;
