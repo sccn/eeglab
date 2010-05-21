@@ -56,16 +56,23 @@ comps  = STUDY.cluster(clust).comps(compsel);
 % find component
 % --------------
 for c = 1:length(data(:))
-    for ind = 1:length(compinds{c})
+    rminds = 1:size(data{c},optndims);
+    
+    for ind = length(compinds{c}):-1:1
         setindex = STUDY.design(STUDY.currentdesign).setinfo(setinds{c}(ind)).setindex;
         if compinds{c}(ind) == comps && any(setindex == sets)
-            if optndims == 2
-                 data{c} = data{c}(:,ind);
-            else data{c} = data{c}(:,:,ind);
-            end;
-            comp_names{c,1} = comps;
+            rminds(ind) = [];
         end;
     end;
+        
+    if optndims == 2
+        data{c}(:,rminds) = []; %2-D
+    elseif optndims == 3
+        data{c}(:,:,rminds) = []; %3-D
+    else
+        data{c}(:,:,:,rminds) = []; %3-D
+    end;
+    comp_names{c,1} = comps;
 end;
 % for c = 1:size(data,1)
 %     for ind = 1:length(compinds{1,grpind})
