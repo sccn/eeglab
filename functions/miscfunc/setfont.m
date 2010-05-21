@@ -3,11 +3,11 @@
 % Usage:
 %   >>  newdata = setfont( handle, 'key', 'val');
 %   >>  [newdata chlab] = setfont( handle, 'key' , 'val', ... );
-%   >>  [newdata chlab] = setfont( handle, 'labels', type, 'key' , 'val', ... );
+%   >>  [newdata chlab] = setfont( handle, 'handletype', handletypevalue, 'key' , 'val', ... );
 %
 % Inputs:
-%   handle     - [gcf,gca] figure or plot handle
-%   'labels'   - ['xlabels'|'ylabels'|'titles'|'axis'|'strings'] only apply
+%   handle       - [gcf,gca] figure or plot handle
+%   'handletype' - ['xlabels'|'ylabels'|'titles'|'axis'|'strings'] only apply
 %                formating to selected category. Note that this has to be the 
 %                first optional input.
 %   properties - 'key', 'val' properties for the figure
@@ -40,9 +40,9 @@ function setfont(fig, varargin);
         return;
     end;
     
-    if strcmpi(varargin{1}, 'labels')
+    if strcmpi(varargin{1}, 'handletype')
+        label = varargin{2};
         varargin = varargin(3:end);
-        label = varargin{1};
     else
         label = '';
     end;
