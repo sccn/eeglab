@@ -180,7 +180,7 @@ function g = fieldtest( fieldname, fieldtype, fieldval, tmpval, callfunc );
               end;
           else % real or float
               if ~isempty(fieldval) && ~isempty(tmpval)
-                  if tmpval < fieldval(1) || tmpval > fieldval(2)
+                  if any(tmpval < fieldval(1)) || any(tmpval > fieldval(2))
                       g = [ callfunc 'error: value out of range for argument ''' fieldname '''' ]; return;
                   end;
               end;
