@@ -98,6 +98,8 @@ if ~isfield(STUDY, 'changrp') || isempty(STUDY.changrp)
     end;
 end;
 
+[STUDY ALLEEG] = std_checkset(STUDY, ALLEEG);
+
 % Update the design path
 for inddes = 1:length(STUDY.design)
     for indcell = 1:length(STUDY.design(inddes).setinfo)
@@ -114,7 +116,6 @@ for inddes = 1:length(STUDY.design)
     end;
 end;
 
-[STUDY ALLEEG] = std_checkset(STUDY, ALLEEG);
 std_checkfiles(STUDY, ALLEEG);
 STUDY.saved = 'yes';
 
