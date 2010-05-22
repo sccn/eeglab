@@ -54,7 +54,7 @@ if strcmpi(mode, 'datinfo') || strcmpi(mode, 'both')
     ff = fieldnames(setinfo);
     ff = setdiff(ff, { 'filepath' 'filename' 'subject' 'index' 'ncomps' 'comps' 'trialinfo' });
     for index = 1:length(ff)
-        if isstr(getfield(setinfo, ff{index}))
+        if isstr(getfield(setinfo(1), ff{index}))
             eval( [ 'tmpvals = unique({ setinfo.' ff{index} '});' ] );
             if length(tmpvals) > 1
                 factor{    countfact} = ff{index};
@@ -78,7 +78,7 @@ if strcmpi(mode, 'trialinfo') || strcmpi(mode, 'both')
     if isfield(setinfo, 'trialinfo')
         ff = fieldnames(setinfo(1).trialinfo);
         for index = 1:length(ff)
-            if isstr(getfield(setinfo(1).trialinfo, ff{index}))
+            if isstr(getfield(setinfo(1).trialinfo(1), ff{index}))
                 alltmpvals = {};
                 for ind = 1:length(setinfo)
                     eval( [ 'tmpvals = unique({ setinfo(ind).trialinfo.' ff{index} ' });' ] );
