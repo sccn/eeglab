@@ -124,7 +124,7 @@ end;
 % create STUDY design if it is not present
 % ----------------------------------------
 if ~isfield(STUDY, 'design') || isempty(STUDY.design) || ~isfield(STUDY.design, 'indvar1')
-    ALLEEG = std_maketrialinfo(ALLEEG); 
+    STUDY  = std_maketrialinfo(STUDY, ALLEEG); 
     STUDY  = std_makedesign(STUDY, ALLEEG);
     STUDY  = std_selectdesign(STUDY, ALLEEG,1);
 end;
