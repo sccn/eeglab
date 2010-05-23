@@ -1,4 +1,42 @@
+% std_maketrialinfo() - create trial information structure using the 
+%                       .epoch structure of EEGLAB datasets
+%
+% Usage: 
+%   >> STUDY = pop_studydesign(STUDY, ALLEEG);  
+%
+% Inputs:
+%   STUDY      - EEGLAB STUDY set
+%   ALLEEG     - vector of the EEG datasets included in the STUDY structure 
+%
+% Inputs:
+%   STUDY      - EEGLAB STUDY set updated. The fields which is created or
+%                updated is STUDY.datasetinfo.trialinfo
+%
+% Authors: Arnaud Delorme, SCCN/INC/UCSD, April 2010
+
+% Copyright (C) Arnaud Delorme arno@ucsd.edu
+%
+% This program is free software; you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation; either version 2 of the License, or
+% (at your option) any later version.
+%
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+% You should have received a copy of the GNU General Public License
+% along with this program; if not, write to the Free Software
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
 function STUDY = std_maketrialinfo(STUDY, ALLEEG);
+
+%% test if .epoch field exist in ALLEEG structure
+epochfield = cellfun(@isempty, { ALLEEG.epoch });
+if any(epochfield)
+    fprintf('Warning: some datasets are continuous and trial information cannot be created');
+end;
 
 %% Make trial info
 for index = 1:length(ALLEEG)
