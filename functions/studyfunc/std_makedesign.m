@@ -262,9 +262,10 @@ for n1 = 1:nf1
                     elseif isempty(rmblk(opt.indval2{n2})) txtval = rmblk(opt.indval1{n1});
                     else txtval =  [ rmblk(opt.indval1{n1}) '_' rmblk(opt.indval2{n2}) ];
                     end;
-                    if ~isempty(txtval), txtval = [ '_' txtval ]; end;
+                    if ~isempty(txtval),      txtval = [ '_' txtval ]; end;
+                    if ~isempty(subjects{s}), txtval = [ '_' subjects{s} txtval ]; end;
                     des.setinfo(count).filebase = fullfile(ALLEEG(datsubj(1)).filepath, ...
-                      [ 'design' int2str(designind) '_' subjects{s} txtval ] );
+                      [ 'design' int2str(designind) txtval ] );
                 end;
                 des.setinfo(count).trialindices = intersectcell(dattrialselect(datsubj), dattrials1{n1}(datsubj), dattrials2{n2}(datsubj));
                 count = count+1;
