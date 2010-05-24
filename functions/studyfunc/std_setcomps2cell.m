@@ -63,9 +63,9 @@ for index = 1:length(setinfo)
     ind     = find(datind(1) == sets);
     if ~isempty(ind) && length(datind) > 1
         [ind1 ind2] = find(datind(1) == oldsets);
-        columnica   = oldsets(ind2(1),:);
+        columnica   = oldsets(:,ind2(1));
         if ~all(ismember(datind, columnica));
-            warning(' ***** Some datasets in the STUDY design have uniform ICA distributions');
+            warning(' ***** Some contrast in the STUDY design have non uniform ICA components');
         end;
     end;
         

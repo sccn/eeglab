@@ -36,6 +36,7 @@ function STUDY = std_maketrialinfo(STUDY, ALLEEG);
 epochfield = cellfun(@isempty, { ALLEEG.epoch });
 if any(epochfield)
     fprintf('Warning: some datasets are continuous and trial information cannot be created');
+    return;
 end;
 
 %% Make trial info

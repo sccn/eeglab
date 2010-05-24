@@ -257,8 +257,14 @@ for n1 = 1:nf1
                 des.setinfo(count).subject   = subjects{s};
                 if strcmpi(opt.defaultdesign, 'on')
                      des.setinfo(count).filebase = fullfile(ALLEEG(datsubj(1)).filepath, ALLEEG(datsubj(1)).filename(1:end-4));
-                else des.setinfo(count).filebase = fullfile(ALLEEG(datsubj(1)).filepath, ...
-                      [ 'design' int2str(designind) '_' subjects{s} '_' rmblk(opt.indval1{n1}) '_' rmblk(opt.indval2{n2}) ] );
+                else
+                    if isempty(rmblk(opt.indval1{n1})),    txtval = rmblk(opt.indval2{n2});
+                    elseif isempty(rmblk(opt.indval2{n2})) txtval = rmblk(opt.indval1{n1});
+                    else txtval =  [ rmblk(opt.indval1{n1}) '_' rmblk(opt.indval2{n2}) ];
+                    end;
+                    if ~isempty(txtval), txtval = [ '_' txtval ]; end;
+                    des.setinfo(count).filebase = fullfile(ALLEEG(datsubj(1)).filepath, ...
+                      [ 'design' int2str(designind) '_' subjects{s} txtval ] );
                 end;
                 des.setinfo(count).trialindices = intersectcell(dattrialselect(datsubj), dattrials1{n1}(datsubj), dattrials2{n2}(datsubj));
                 count = count+1;
