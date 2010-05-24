@@ -91,14 +91,15 @@ for k = 1:length(STUDY.datasetinfo)
     STUDY.datasetinfo(k).filepath = ALLEEG(k).filepath;
 end
 
+if ~isfield(STUDY, 'changrp'), STUDY.changrp = []; end;
+[STUDY ALLEEG] = std_checkset(STUDY, ALLEEG);
+
 if ~isfield(STUDY, 'changrp') || isempty(STUDY.changrp)
     if std_uniformfiles(STUDY, ALLEEG) == 0
          STUDY = std_changroup(STUDY, ALLEEG);
     else STUDY = std_changroup(STUDY, ALLEEG, [], 'interp');
     end;
 end;
-
-[STUDY ALLEEG] = std_checkset(STUDY, ALLEEG);
 
 % Update the design path
 for inddes = 1:length(STUDY.design)
