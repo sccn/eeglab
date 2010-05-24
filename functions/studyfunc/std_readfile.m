@@ -153,6 +153,7 @@ parameters    = [];
     
 % read only specific fields
 % -------------------------
+counttrial = 0;
 for fInd = 1:length(opt.dataindices) % usually only one value
 
     fieldsToRead = [ dataType int2str(opt.dataindices(fInd)) fieldExt ]; 
@@ -225,17 +226,18 @@ for fInd = 1:length(opt.dataindices) % usually only one value
         % ----------------------------
         if nDimData == 1,     measureData(:,fInd)     = fieldData;
         else
-            if nDimData == 2
-                if strcmpi(opt.singletrials, 'off'), measureData(:,:,fInd)                      = fieldData;
-                else                                 measureData(:,end+1:end+size(fieldData,2)) = fieldData;
+            if strcmpi(opt.singletrials, 'off')
+                if nDimData == 2, measureData(:,:,fInd) = fieldData;
+                else            measureData(:,:,:,fInd) = fieldData;
                 end;
             else
-                if strcmpi(opt.singletrials, 'off'), measureData(:,:,:,fInd)                      = fieldData;
-                else                                 measureData(:,:,end+1:end+size(fieldData,2)) = fieldData;
+                if nDimData == 2, measureData(:,counttrial+1:counttrial+size(fieldData,2)) = fieldData;
+                else              measureData(:,:,counttrial+1:counttrial+size(fieldData,2)) = fieldData;
                 end;
+                counttrial = counttrial+size(fieldData,2);
             end;
         end;
-    else % the case below is for the rare case where all the channels are read
+    else % the case below is for the rare case where all the channels are read and the end of the array needs to be trimmed
         if nDimData == 1,     measureData(:,1:(fInd-1))     = [];
         elseif nDimData == 2, measureData(:,:,1:(fInd-1))   = [];
         else                  measureData(:,:,:,1:(fInd-1)) = [];
