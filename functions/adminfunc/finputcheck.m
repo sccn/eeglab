@@ -2,7 +2,7 @@
 %
 % Usage: >> result = finputcheck( varargin, fieldlist );
 %        >> [result varargin] = finputcheck( varargin, fieldlist, ... 
-%                                                         callingfunc, mode );
+%                                              callingfunc, mode, verbose );
 % Input:
 %   varargin  - Cell array 'varargin' argument from a function call using 'key', 
 %               'value' argument pairs. See Matlab function 'varargin'
@@ -17,6 +17,8 @@
 %  mode        - ['ignore'|'error'] ignore keywords that are either not specified 
 %                in the fieldlist cell array or generate an error. 
 %                {default: 'error'}.
+%  verbose     - ['verbose', 'quiet'] print information. Default: 'verbose'.
+%
 % Outputs:
 %   result     - If no error, structure with 'key' as fields and 'value' as 
 %                content. If error this output contain the string error.
@@ -60,7 +62,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [g, varargnew] = finputcheck( vararg, fieldlist, callfunc, mode )
+function [g, varargnew] = finputcheck( vararg, fieldlist, callfunc, mode, verbose )
 
 	if nargin < 2
 		help finputcheck;
@@ -73,6 +75,9 @@ function [g, varargnew] = finputcheck( vararg, fieldlist, callfunc, mode )
 	end;
     if nargin < 4
         mode = 'do not ignore';
+    end;
+    if nargin < 5
+        verbose = 'verbose';
     end;
 	NAME = 1;
 	TYPE = 2;
@@ -222,10 +227,16 @@ function cella = removedup(cella)
 %try
     [tmp indices] = unique(cella(1:2:end));
     if length(tmp) ~= length(cella)/2
-        fprintf('Note: duplicate ''key'', ''val'' parameter(s), keeping the last one(s)\n');
+        myfprintf(verbose,'Note: duplicate ''key'', ''val'' parameter(s), keeping the last one(s)\n');
     end;
     cella = cella(sort(union(indices*2-1, indices*2)));
 %catch
     % some elements of cella were not string
 %    error('some ''key'' values are not string.');
 %end;    
+
+function myfprintf(verbose, varargin)
+
+if strcmpi(verbose, 'verbose')
+    fprintf(varargin{:});
+end;
