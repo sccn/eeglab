@@ -140,7 +140,7 @@ fclose(fid);
 % -----------------------------------------
 function [str, strout, tabFirstpos] = mystrtok(strin, delim, tabFirstpos);
     % remove extra spaces at the beginning
-    while any(strin(1) == delim) && (strin(1) ~= 9 || strin(1) ~= ',')
+    while any(strin(1) == delim) && strin(1) ~= 9 && strin(1) ~= ','
          strin = strin(2:end);
     end;
     % for tab and coma, consider empty cells
@@ -148,7 +148,7 @@ function [str, strout, tabFirstpos] = mystrtok(strin, delim, tabFirstpos);
         if tabFirstpos || any(strin(2) == delim)
             str = '';
             strout = strin(2:end);
-            if strin(2) ~= 9 || strin(2) ~= ','
+            if strin(2) ~= 9 && strin(2) ~= ','
                 tabFirstpos = 0;
                 strout = strtrim(strout);
             end;
