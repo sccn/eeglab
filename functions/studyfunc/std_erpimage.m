@@ -1,4 +1,7 @@
-% std_erpimage() - Plot an erpimage using multiple subject data
+% std_erpimage() - This is a legacy function. This function is not
+%                  compatible yet with STUDY design. 
+%
+%                  Plot an erpimage using multiple subject data
 %
 % Usage:
 %   >> std_erpimage( STUDY, ALLEEG, 'key', 'val', ...);
@@ -74,6 +77,8 @@
 
 function [STUDY, allphases, allsortvar, subjamptime, subjamptrial, globalent ] = std_erpimage( STUDY, ALLEEG, varargin);
         
+    error('std_erpimage is a legacy function. This function is not compatible yet with STUDY design scheme');
+
     if nargin < 3
         help std_erpimage;
         return;

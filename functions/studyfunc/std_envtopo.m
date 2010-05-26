@@ -1,4 +1,7 @@
-% std_envtopo() - Creates an envtopo() image for a STUDY set using component cluster
+% std_envtopo() - This is a legacy function. This function is not
+%                 compatible yet with STUDY design. 
+%
+%                 Creates an envtopo() image for a STUDY set using component cluster
 %                 contributions instead of individual components.  Plots the envelope
 %                 of the data epoch grand mean ERP, plus envelopes and average scalp maps
 %                 for specified or largest-contributing clusters for each condition.
@@ -45,6 +48,9 @@
 % See also: envtopo()
 
 function std_envtopo(STUDY, ALLEEG, varargin)
+
+error('std_envtopo is a legacy function. This function is not compatible yet with STUDY design scheme');
+
 icadefs;
 if nargin < 2
     help std_envtopo;
