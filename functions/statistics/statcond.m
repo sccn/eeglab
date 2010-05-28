@@ -367,8 +367,10 @@ function pvals = compute_pvals(surrog, oridat, tail)
         surrog(:,end+1) = oridat;        
     elseif myndims(surrog) == 3
         surrog(:,:,end+1) = oridat;
-    else
+    elseif myndims(surrog) == 4
         surrog(:,:,:,end+1) = oridat;
+    else
+        surrog(:,:,:,:,end+1) = oridat;
     end;
 
     [tmp idx] = sort( surrog, myndims(surrog) );
@@ -408,6 +410,7 @@ function res = supersurrogate(dat, lens, dims, bootstrapflag, pairedflag, naccu)
             case 2, res{i} = reshape(dat(:,indswap(:,lens(i)+1:lens(i+1))), size(dat,1), naccu, lens(i+1)-lens(i));
             case 3, res{i} = reshape(dat(:,:,indswap(:,lens(i)+1:lens(i+1))), size(dat,1), size(dat,2), naccu, lens(i+1)-lens(i));
             case 4, res{i} = reshape(dat(:,:,:,indswap(:,lens(i)+1:lens(i+1))), size(dat,1), size(dat,2), size(dat,3), naccu, lens(i+1)-lens(i));
+            case 5, res{i} = reshape(dat(:,:,:,:,indswap(:,lens(i)+1:lens(i+1))), size(dat,1), size(dat,2), size(dat,3), size(dat,4), naccu, lens(i+1)-lens(i));
         end;
     end;
     res = reshape(res, dims);
@@ -444,6 +447,7 @@ function res = surrogate(dataconcat, lens, dims, bootstrapflag, pairedflag); % f
             case 2, res{i} = dataconcat(:,indswap(lens(i)+1:lens(i+1)));
             case 3, res{i} = dataconcat(:,:,indswap(lens(i)+1:lens(i+1)));
             case 4, res{i} = dataconcat(:,:,:,indswap(lens(i)+1:lens(i+1)));
+            case 4, res{i} = dataconcat(:,:,:,:,indswap(lens(i)+1:lens(i+1)));
         end;
     end;
     res = reshape(res, dims);
