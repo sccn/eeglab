@@ -115,6 +115,7 @@ function ALLEEG = std_loadalleeg(varargin)
             error(txt);
         end;
         
+        EEG = eeg_checkset(EEG);
         if ~option_storedisk
             EEG = eeg_checkset(EEG, 'loaddata');
         elseif ~isstr(EEG.data)
