@@ -9,7 +9,7 @@ vers = 'Measure_Product1.0';
 plotmenu = findobj(fig, 'tag', 'study');
 
 % make a sub-menu under study
-submenu = uimenu( plotmenu, 'Label', 'Measure Product clustering', 'position', 5);
+submenu = uimenu( plotmenu, 'Label', 'Measure Product clustering', 'position', 6);
 
 uimenu( submenu, 'label', 'Build preclustering matrices', 'callback', [ try_strings.no_check '[STUDYTMP ALLEEGTMP LASTCOM]= pop_mpreclust(STUDY, ALLEEG);' catch_strings.update_study]);
 uimenu( submenu, 'label', 'Cluster components', 'callback', [ try_strings.no_check '[STUDYTMP ALLEEGTMP LASTCOM] = pop_mpcluster(STUDY, ALLEEG);' catch_strings.update_study]);

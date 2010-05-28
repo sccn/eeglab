@@ -204,7 +204,7 @@ end;
 
 STUDY.preclust.similarity.IDX = IDX;
 STUDY.preclust.similarity.finalDistances = finalDistances;
-STUDY  = std_createclusters(STUDY,IDX,'Measure Product');
+STUDY  = std_createclust(STUDY,IDX,[],'Measure Product');
 
 
 function icMaxDistance = maxDistanceToICallowed(compDistance, numberOfClusters)
