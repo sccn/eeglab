@@ -6,15 +6,30 @@
 %   STUDY    - STUDY set comprising some or all of the EEG datasets in ALLEEG.
 %   ALLEEG   - vector of EEG datasets included in the STUDY, typically created 
 %              using load_ALLEEG().
+%
 % Optional inputs:
-%   name     - ['string'] name of the new cluster {default: 'Cls #', where 
-%              '#' is the next available cluster number}
+%   'name'     - ['string'] name of the new cluster {default: 'Cls #', where 
+%                '#' is the next available cluster number}
+%   'clusterind' - [integer] cluster for each of the component. Ex: 61 components 
+%                and 2 clusters: 'clusterind' will be a 61x1 vector of 1 and
+%                2 (and 0=outlisers)
+%   'centroid' - centroid for clusters. If 2 clusters, size will be 2 x
+%                width of the preclustering matrix. This is a deprecated 
+%                functionality.
+%   'algorithm' - [cell] algorithm parameters used to obtain the clusters
+%   'parentcluster' - ['on'|'off'] use the parent cluster (cluster 1) to
+%                 perform clustering (this cluster contains all the selected
+%                 components by default). Otherwise, the cluster defined in
+%                 STUDY.etc.preclust.clustlevel is used as parent.
+%   
 % Outputs:
 %   STUDY    - the input STUDY set structure modified with the new cluster.
 %
 % Example: 
-%   >> [STUDY] = std_createclust(STUDY, ALLEEG, 'eye_movements');
-%   % Create a new cluster named 'eye_movements'.
+%   >> [STUDY] = std_createclust(STUDY, ALLEEG, 'name', 'eye_movements', ...
+%                   'clusterind', [0 1 0 1 0 1], 'parentcluster', 'on');
+%   % Create a new cluster named 'eye_movements' with components 2, 4, and
+%   % of 6 the default parent cluster defined in 
 %
 %  See also  pop_clustedit(), std_movecomp()
 %
