@@ -185,6 +185,9 @@ for dat = 1:length(EEG)
         tmpdata = eeg_getdatact(EEG(dat), 'component', [1:size(EEG(dat).icaweights,1)], 'trialindices', g.trialindices{dat} );
     else
         EEG(dat).data = eeg_getdatact(EEG(dat), 'channel', [1:EEG(dat).nbchan], 'rmcomps', g.rmcomps{dat}, 'trialindices', g.trialindices{dat});
+        EEG(dat).trials = size(EEG(dat).data,3);
+        EEG(dat).event  = [];
+        EEG(dat).epoch  = [];
         if ~isempty(g.rmcomps), options = { options{:} 'rmcomps' g.rmcomps }; end;
         if ~isempty(g.interp), 
             TMPEEG = eeg_interp(EEG(dat), g.interp, 'spherical'); 
