@@ -69,7 +69,7 @@ function [dataout,datamean] = rmbase(data,frames,basevector)
 		return
 	end
     
-	reshape_flag=0;
+    oridims = size(data);
 	if ndims(data) == 3,
 		data = reshape(data, size(data,1), size(data,2)*size(data,3));
 	    reshape_flag=1;
@@ -106,9 +106,7 @@ function [dataout,datamean] = rmbase(data,frames,basevector)
         end;
     end;
 
-	if reshape_flag
-      	dataout = reshape(dataout, size(data,1), size(data,2), size(data,3));
-	end
+    dataout = reshape(dataout, oridims);
     
     
 % function out = nan_mean(in)
