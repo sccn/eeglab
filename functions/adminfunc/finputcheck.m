@@ -97,7 +97,7 @@ function [g, varargnew] = finputcheck( vararg, fieldlist, callfunc, mode, verbos
 		try
 			g = struct(vararg{:});
 		catch
-            vararg = removedup(vararg);
+            vararg = removedup(vararg, verbose);
             try
                 g = struct(vararg{:});
             catch
@@ -222,7 +222,7 @@ function g = fieldtest( fieldname, fieldtype, fieldval, tmpval, callfunc );
 
 % remove duplicates in the list of parameters
 % -------------------------------------------
-function cella = removedup(cella)
+function cella = removedup(cella, verbose)
 % make sure if all the values passed to unique() are strings, if not, exist
 %try
     [tmp indices] = unique(cella(1:2:end));
