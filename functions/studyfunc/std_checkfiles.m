@@ -33,6 +33,7 @@ if nargin < 2
     help std_checkconsist;
     return;
 end;
+return;
 
 filetypes = { 'daterp' 'datspec' 'datersp' 'datitc' 'dattimef' ...
               'icaerp' 'icaspec' 'icaersp' 'icaitc' 'icatopo' };
