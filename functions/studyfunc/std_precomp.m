@@ -16,7 +16,8 @@
 %                  the selected measures. Note that the name of the channel is
 %                  not case-sensitive.
 % Optional inputs:
-%  'design'   - [integer] use specific study index design to compute measure.
+%  'design'   - [integer] use specific study index design to compute
+%  measure.
 %  'erp'      - ['on'|'off'] pre-compute ERPs for each dataset.
 %  'spec'     - ['on'|'off'] pre-compute spectrum for each dataset.
 %               Use 'specparams' to set spectrum parameters.
@@ -364,7 +365,10 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
         if ~isempty(g.rmclust)
             opts = { opts{:} 'rmcomps' getclustcomps(STUDY, g.rmclust, idat) };                
         elseif strcmpi(g.rmicacomps, 'on')
-            opts = { opts{:} 'rmcomps' find(ALLEEG(idat(1)).reject.gcompreject) };
+            for ind = 1:length(idat)
+                rmcomps{ind} = find(ALLEEG(idat(1)).reject.gcompreject);
+            end;
+            opts = { opts{:} 'rmcomps' rmcomps };
         end;
         if ~isempty(g.interplocs)
             tmpchanlist = chanlist;
