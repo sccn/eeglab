@@ -27,4 +27,4 @@ x = x - center(1);  % center the points at (0,0,0)
 y = y - center(2);
 z = z - center(3);
 radius = (sqrt(x.^2+y.^2+z.^2)); % distances from the center
-wobble = std(radius)/mean(radius); % test if xyz values are on a sphere
+wobble = std(radius-mean(radius)); % test if xyz values are on a sphere
