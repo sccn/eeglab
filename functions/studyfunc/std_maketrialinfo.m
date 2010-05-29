@@ -52,7 +52,19 @@ for index = 1:length(ALLEEG)
     indtle    = find(eventlat < 0.0005);
     epochs    = [ events(indtle).epoch ];
     if length(epochs) ~= ALLEEG(index).trials
-        error('Not the same number of time-locking events as trials');
+        
+        % special case where there are not the same number of time-locking
+        % event as there are data epochs
+        if length(unique(epochs)) ~= ALLEEG(index).trials
+            error('Not the same number of time-locking events as trials');
+        end;
+        % pick one event per epoch
+        [tmp tmpind] = unique(epochs(end:-1:1)); % reversing the array ensures the first event gets picked
+        tmpind = length(epochs)+1-tmpind;
+        indtle = indtle(tmpind);
+        if length(indtle) ~= ALLEEG(index).trials
+            error('Not the same number of time-locking events as trials');
+        end;
     end;
     commands = {};
     for f = 1:length(ff)
