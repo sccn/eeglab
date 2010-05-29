@@ -95,16 +95,16 @@ return;
 % ---------------------------------
 function changrp = std_chanlookupnew( STUDY, ALLEEG, changrp, interp);
 
-    setinfo       = STUDY.design(STUDY.currentdesign).setinfo;
-    allconditions = STUDY.design(STUDY.currentdesign).condition;
-    allgroups     = STUDY.design(STUDY.currentdesign).group;
+    setinfo       = STUDY.design(STUDY.currentdesign).cell;
+    allconditions = STUDY.design(STUDY.currentdesign).variable(1).value;
+    allgroups     = STUDY.design(STUDY.currentdesign).variable(2).value;
     nc = max(length(allconditions),1);
     ng = max(length(allgroups),    1);
     changrp.allinds = cell( nc, ng );
     changrp.setinds = cell( nc, ng );
     for index = 1:length(setinfo)
-        condind = strmatch( setinfo(index).condition, allconditions, 'exact');
-        grpind  = strmatch( setinfo(index).group    , allgroups    , 'exact');
+        condind = strmatch( setinfo(index).value{1}, allconditions, 'exact');
+        grpind  = strmatch( setinfo(index).value{2}, allgroups    , 'exact');
         
         if isempty(allconditions), condind = 1; end;
         if isempty(allgroups),     grpind  = 1; end;
@@ -112,7 +112,7 @@ function changrp = std_chanlookupnew( STUDY, ALLEEG, changrp, interp);
         % scan all channel labels
         % -----------------------
         if strcmpi(interp, 'off')
-            datind  = setinfo(index).setindex;
+            datind  = setinfo(index).dataset;
             tmplocs = { ALLEEG(datind(1)).chanlocs.labels };
             for indc = 1:length(changrp.channels) % usually just one channel
                 ind = strmatch( changrp.channels{indc}, tmplocs, 'exact');

@@ -74,8 +74,8 @@ TMPSTUDY = STUDY;
 com = '';
 if isempty(varargin)
     
-    enablegroup = fastif(length(STUDY.group)>1, 'on', 'off');
-    enablecond  = fastif(length(STUDY.condition)>1, 'on', 'off');
+    enablecond  = fastif(length(STUDY.design(STUDY.currentdesign).variable(1).value)>1, 'on', 'off');
+    enablegroup = fastif(length(STUDY.design(STUDY.currentdesign).variable(2).value)>1, 'on', 'off');
     plotconditions    = fastif(strcmpi(STUDY.etc.specparams.plotconditions, 'together'), 1, 0);
     plotgroups   = fastif(strcmpi(STUDY.etc.specparams.plotgroups,'together'), 1, 0);
     submean      = fastif(strcmpi(STUDY.etc.specparams.subtractsubjectmean,'on'), 1, 0);

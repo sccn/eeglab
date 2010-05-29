@@ -18,7 +18,7 @@
 % Optional inputs:
 %  'name'     - ['string'] mnemonic design name (ex: 'Targets only') 
 %               {default: 'Design d', where d = designind} 
-%  'indvar1'  - ['string'] - first independent variable or contrast. Must 
+%  'variable1' - ['string'] - first independent variable or contrast. Must 
 %               be a field name in STUDY.datasetinfo or in 
 %               STUDY.datasetinfo.trialinfo. Typical choices include (task 
 %               or other) 'condition', (subject) 'group', (subject) 'session', 
@@ -31,16 +31,16 @@
 %               so many dataset Plot and Tools menu items may not give 
 %               interpretable results and will thus be made unavailable for 
 %               selection {default: 'condition'}
-%  'stat1'    - ['paired'|'unpaired'] the nature of the 'indvar1' contrast. 
+%  'pairing1' - ['paired'|'unpaired'] the nature of the 'variable1' contrast. 
 %               For example, to compare two conditions recorded from the 
-%               same group of 10 subjects, the 'indvar1','condition' design 
+%               same group of 10 subjects, the 'variable1','condition' design 
 %               elements are 'paired' since each dataset for one
 %               condition has a corresponding dataset from the same subject 
 %               in the second condition. If the two conditions were recorded 
-%               from different groups of subjects, the indvar1 'condition' 
+%               from different groups of subjects, the variable1 'condition' 
 %               would be 'unpaired' {default: 'paired'}
-%  'indval1'  - {cell array of 'strings'} - 'indvar1' instances to include 
-%               in the design. For example, if 'indvar1' is 'condition'and 
+%  'values1'   - {cell array of 'strings'} - 'variable1' instances to include 
+%               in the design. For example, if 'variable1' is 'condition'and 
 %               three values for 'condition' (e.g., 'a' , 'b', and 'c')
 %               are listed in STUDY.datasetinfo, then 'indval1', { 'a' 'b' } 
 %               will contrast conditions 'a' and 'b', and datasets for 
@@ -48,13 +48,13 @@
 %               nested '{}'s. For example, to combine conditions 'a' and 
 %               'b' into one condition and contrast it to condition 'c', 
 %               specify  'indval1', { { 'a' 'b' } 'c' } {default: all values 
-%               of 'indvar1' in STUDY.datasetinfo}
-%  'indvar2'  - ['string'] - second independent variable name, if any. Typically, 
+%               of 'variable1' in STUDY.datasetinfo}
+%  'variable2' - ['string'] - second independent variable name, if any. Typically, 
 %               this might refer to ('unpaired') subject group or (typically 
 %               'paired') session number, etc.
-%  'stat2'    - ['paired'|'unpaired'] type of statistics for indvar2 
+%  'pairing2' - ['paired'|'unpaired'] type of statistics for variable2 
 %               (default: 'paired'}
-%  'indval2'  - {cell array of 'strings'} - indvar2 values to include in the 
+%  'values2'  - {cell array of 'strings'} - variable2 values to include in the 
 %               design {default: all}. Here, 'var[12]' must be field names 
 %               in STUDY.datasetinfo or  STUDY.datasetinfo.trialinfo. 
 %  'datselect'  - {cell array} select specific datasets and/or trials: 'datselect',
@@ -64,12 +64,12 @@
 %               select only datasets from conditions 'a' OR 'b' AND only 
 %               subjects in groups 'g1' OR 'g2'. If 'subjselect' is also 
 %               specified, only datasets meeting both criteria are included. 
-%               'indvar1' and 'indvar2' will only consider
+%               'variable1' and 'variable2' will only consider
 %               the values after they have passed through 'datselect' and 
 %               'subjselect'. For instance, if conditions { 'a' 'b' 'c' } 
 %               exist and conditions 'a' is removed by 'datselect', the only 
 %               two conditions that will be considered are 'b' and 'c' 
-%               (which is then equivalent to using 'indvar1vals' to specify
+%               (which is then equivalent to using 'variable1vals' to specify
 %               values for the 'condition' factor. Calls function 
 %               std_selectdataset() {default: select all datasets}
 %  'subjselect' - {cell array} subject codes of specific subjects to include 
@@ -89,16 +89,16 @@
 %  STUDY = std_makedesign(STUDY, ALLEEG); % make default design
 %
 %  % create design with 1 independent variable equal to 'condition'
-%  STUDY = std_makedesign(STUDY, ALLEEG, 2, 'indvar1', 'condition');
+%  STUDY = std_makedesign(STUDY, ALLEEG, 2, 'variable1', 'condition');
 %
 %  % create design with 1 independent variable equal to 'condition'
 %  % but only consider the sub-condition 'stim1' and 'stim2' - of course
 %  % such conditions must be present in the STUDY
-%  STUDY = std_makedesign(STUDY, ALLEEG, 2, 'indvar1', 'condition', ...
-%                    'indval1', { 'stim1' 'stim2' }); 
+%  STUDY = std_makedesign(STUDY, ALLEEG, 2, 'variable1', 'condition', ...
+%                    'values1', { 'stim1' 'stim2' }); 
 %
 %  % create design and only include subject 's1' and 's2'
-%  STUDY = std_makedesign(STUDY, ALLEEG, 2, 'indvar1', 'condition', ...
+%  STUDY = std_makedesign(STUDY, ALLEEG, 2, 'variable1', 'condition', ...
 %                     'subjselect', { 's1' 's2' });
 %
 % Author: Arnaud Delorme, Institute for Neural Computation UCSD, 2010-
@@ -130,41 +130,42 @@ if nargin < 3
 end;
 
 defdes.name = sprintf('STUDY.design %d', designind);
-defdes.condition   = {};
-defdes.group       = {};
-defdes.subject     = {};
-defdes.indvar1     = 'condition';
-defdes.indvar2     = 'group';
-defdes.statvar1    = 'paired';
-defdes.statvar2    = 'paired';
-defdes.includevarlist = {};
+defdes.cases.label = 'subject';
+defdes.cases.value = {};
+defdes.variable(1).label = 'condition';
+defdes.variable(2).label = 'group';
+defdes.variable(1).value = {};
+defdes.variable(2).value = {};
+defdes.variable(1).pairing = 'on';
+defdes.variable(2).pairing = 'off';
+defdes.include = {};
 if ~isempty(varargin) && isstruct(varargin{1})
     defdes = varargin{1};
     varargin(1) = [];
 end;
-opt = finputcheck(varargin,  {'indvar1'       'string'    []     defdes.indvar1;
-                              'indvar2'       'string'    []     defdes.indvar2;
-                              'indval1'       'cell'      []     defdes.condition;
-                              'indval2'       'cell'      []     defdes.group;
-                              'stat1'         'string'    []     defdes.statvar1;
-                              'stat2'         'string'    []     defdes.statvar2;
+opt = finputcheck(varargin,  {'variable1'     'string'    []     defdes.variable(1).label;
+                              'variable2'     'string'    []     defdes.variable(2).label;
+                              'values1'       'cell'      []     defdes.variable(1).value;
+                              'values2'       'cell'      []     defdes.variable(2).value;
+                              'pairing1'      'string'    []     defdes.variable(1).pairing;
+                              'pairing2'      'string'    []     defdes.variable(2).pairing;
                               'name'          'string'    {}     defdes.name;
-                              'datselect'     'cell'      {}     defdes.includevarlist;
-                              'subjselect'    'cell'      {}     defdes.subject;
+                              'datselect'     'cell'      {}     defdes.include;
+                              'subjselect'    'cell'      {}     defdes.cases.value;
                               'delfiles'      'string'    { 'on' 'off' } 'off';
                               'defaultdesign' 'string'    { 'on' 'off' } fastif(nargin < 3, 'on', 'off') }, ...
                               'std_makedesign');
 if isstr(opt), error(opt); end;
-if strcmpi(opt.indvar1, 'none'), opt.indvar1 = ''; end;
-if strcmpi(opt.indvar2, 'none'), opt.indvar2 = ''; end;
-for i = 1:length(opt.indval1), if iscell(opt.indval1{i}), opt.indval1{i} = cell2str(opt.indval1{i}); end; end;
-for i = 1:length(opt.indval2), if iscell(opt.indval2{i}), opt.indval2{i} = cell2str(opt.indval2{i}); end; end;
+if strcmpi(opt.variable1, 'none'), opt.variable1 = ''; end;
+if strcmpi(opt.variable2, 'none'), opt.variable2 = ''; end;
+for i = 1:length(opt.values1), if iscell(opt.values1{i}), opt.values1{i} = cell2str(opt.values1{i}); end; end;
+for i = 1:length(opt.values2), if iscell(opt.values2{i}), opt.values2{i} = cell2str(opt.values2{i}); end; end;
     
 % build command list for history
 % ------------------------------
-listcom = { 'indvar1' opt.indvar1 'indvar2' opt.indvar2 'name' opt.name };
-if ~isempty(opt.indval1), listcom = { listcom{:} 'indvarvals1' opt.indval1 }; end;
-if ~isempty(opt.indval2), listcom = { listcom{:} 'indvarvals2' opt.indval2 }; end;
+listcom = { 'variable1' opt.variable1 'variable2' opt.variable2 'name' opt.name };
+if ~isempty(opt.values1), listcom = { listcom{:} 'values1' opt.values1 }; end;
+if ~isempty(opt.values2), listcom = { listcom{:} 'values2' opt.values2 }; end;
 if ~isempty(opt.subjselect),  listcom = { listcom{:} 'subjselect'  opt.subjselect }; end;
 if ~isempty(opt.datselect),   listcom = { listcom{:} 'dataselect'  opt.datselect }; end;
     
@@ -202,16 +203,16 @@ end;
 
 % get values for each independent variable
 % ----------------------------------------
-m1 = strmatch(opt.indvar1, indvars, 'exact'); if isempty(m1), opt.indvar1 = ''; end;
-m2 = strmatch(opt.indvar2, indvars, 'exact'); if isempty(m2), opt.indvar2 = ''; end;
-if isempty(opt.indval1) && ~isempty(opt.indvar1), opt.indval1 = indvarvals{m1}; end;
-if isempty(opt.indval2) && ~isempty(opt.indvar2), opt.indval2 = indvarvals{m2}; end;
-if isempty(opt.indvar1), opt.indval1 = { '' }; end;
-if isempty(opt.indvar2), opt.indval2 = { '' }; end;
+m1 = strmatch(opt.variable1, indvars, 'exact'); if isempty(m1), opt.variable1 = ''; end;
+m2 = strmatch(opt.variable2, indvars, 'exact'); if isempty(m2), opt.variable2 = ''; end;
+if isempty(opt.values1) && ~isempty(opt.variable1), opt.values1 = indvarvals{m1}; end;
+if isempty(opt.values2) && ~isempty(opt.variable2), opt.values2 = indvarvals{m2}; end;
+if isempty(opt.variable1), opt.values1 = { '' }; end;
+if isempty(opt.variable2), opt.values2 = { '' }; end;
 
 % preselect data
 % --------------
-datselect      = [1:length(STUDY.datasetinfo)];
+datselect = [1:length(STUDY.datasetinfo)];
 if ~isempty(opt.datselect)
     fprintf('Data preselection for STUDY design\n');
     for ind = 1:2:length(opt.datselect)
@@ -225,11 +226,11 @@ datselect = intersect(datselect, strmatchmult(allsubjects, datsubjects));
 % get the dataset and trials for each of the ind. variable
 % --------------------------------------------------------
 ns  = length(allsubjects);
-nf1 = max(1,length(opt.indval1));
-nf2 = max(1,length(opt.indval2));
+nf1 = max(1,length(opt.values1));
+nf2 = max(1,length(opt.values2));
 fprintf('Building STUDY design\n');
-for n1 = 1:nf1, [ dats1{n1} dattrials1{n1} ] = std_selectdataset( STUDY, ALLEEG, opt.indvar1, opt.indval1{n1}); end;
-for n2 = 1:nf2, [ dats2{n2} dattrials2{n2} ] = std_selectdataset( STUDY, ALLEEG, opt.indvar2, opt.indval2{n2}); end;
+for n1 = 1:nf1, [ dats1{n1} dattrials1{n1} ] = std_selectdataset( STUDY, ALLEEG, opt.variable1, opt.values1{n1}); end;
+for n2 = 1:nf2, [ dats2{n2} dattrials2{n2} ] = std_selectdataset( STUDY, ALLEEG, opt.variable2, opt.values2{n2}); end;
 
 % detect files from old format
 % ----------------------------
@@ -251,23 +252,22 @@ for n1 = 1:nf1
             subjects = unique(datsubjects(datasets));
             for s = 1:length(subjects)
                 datsubj = datasets(strmatch(subjects{s}, datsubjects(datasets), 'exact'));
-                des.setinfo(count).setindex  = datsubj;
-                des.setinfo(count).condition = opt.indval1{n1};
-                des.setinfo(count).group     = opt.indval2{n2};
-                des.setinfo(count).subject   = subjects{s};
+                des.cell(count).dataset   = datsubj;
+                des.cell(count).trials    = intersectcell(dattrialselect(datsubj), dattrials1{n1}(datsubj), dattrials2{n2}(datsubj));
+                des.cell(count).value     = { opt.values1{n1} opt.values2{n2} };
+                des.cell(count).case      = subjects{s};
                 if strcmpi(opt.defaultdesign, 'on')
-                     des.setinfo(count).filebase = fullfile(ALLEEG(datsubj(1)).filepath, ALLEEG(datsubj(1)).filename(1:end-4));
+                     des.cell(count).filebase = fullfile(ALLEEG(datsubj(1)).filepath, ALLEEG(datsubj(1)).filename(1:end-4));
                 else
-                    if isempty(rmblk(opt.indval1{n1})),    txtval = rmblk(opt.indval2{n2});
-                    elseif isempty(rmblk(opt.indval2{n2})) txtval = rmblk(opt.indval1{n1});
-                    else txtval =  [ rmblk(opt.indval1{n1}) '_' rmblk(opt.indval2{n2}) ];
+                    if isempty(rmblk(opt.values1{n1})),    txtval = rmblk(opt.values2{n2});
+                    elseif isempty(rmblk(opt.values2{n2})) txtval = rmblk(opt.values1{n1});
+                    else txtval =  [ rmblk(opt.values1{n1}) '_' rmblk(opt.values2{n2}) ];
                     end;
                     if ~isempty(txtval),      txtval = [ '_' txtval ]; end;
                     if ~isempty(subjects{s}), txtval = [ '_' subjects{s} txtval ]; end;
-                    des.setinfo(count).filebase = fullfile(ALLEEG(datsubj(1)).filepath, ...
+                    des.cell(count).filebase = fullfile(ALLEEG(datsubj(1)).filepath, ...
                       [ 'design' int2str(designind) txtval ] );
                 end;
-                des.setinfo(count).trialindices = intersectcell(dattrialselect(datsubj), dattrials1{n1}(datsubj), dattrials2{n2}(datsubj));
                 count = count+1;
             end;
         end;
@@ -281,21 +281,22 @@ if exist('des') ~= 1
     des.name = '';
     disp('Warning: STUDY.design is empty');
 else
-    des.condition = unique( { des.setinfo.condition });
-    des.group     = unique( { des.setinfo.group });
-    des.subject   = unique( { des.setinfo.subject });
-    if isempty(des.group{1})    , des.group     = {}; end;
-    if isempty(des.condition{1}), des.condition = {}; end;
-    des.name      = opt.name;
-    des.indvar1   = opt.indvar1;
-    des.indvar2   = opt.indvar2;
-    des.statvar1  = opt.stat1;
-    des.statvar2  = opt.stat2;
-    des.includevarlist = opt.datselect;
+    %allval1 = unique(cellfun(@(x)x{1}, { des.cell.value }, 'uniformoutput', false));
+    %allval2 = unique(cellfun(@(x)x{2}, { des.cell.value }, 'uniformoutput', false));
+    des.name              = opt.name;
+    des.variable(1).label = opt.variable1;
+    des.variable(2).label = opt.variable2;
+    des.variable(1).pairing = opt.pairing1;
+    des.variable(2).pairing = opt.pairing2;
+    des.variable(1).value   = opt.values1;
+    des.variable(2).value   = opt.values2;
+    des.include             = opt.datselect;
+    des.cases.label = 'subject';
+    des.cases.value = unique( { des.cell.case });
 end;
 
-fieldorder = { 'name' 'indvar1' 'indvar2' 'condition' 'group' 'statvar1' 'statvar2' 'subject' 'includevarlist' 'setinfo' };
-des          = orderfields(des, fieldorder);
+fieldorder = { 'name' 'variable' 'cases' 'include' 'cell' };
+des        = orderfields(des, fieldorder);
 try, 
     STUDY.design = orderfields(STUDY.design, fieldorder);
 catch,

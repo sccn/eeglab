@@ -154,10 +154,10 @@ if strcmpi(datatypestr, 'spec'), datatypestr = 'Spectrum'; end;
 % below this line, all the code should be non-specific to ERP or spectrum
 % =======================================================================
 
-allconditions = STUDY.design(opt.design).condition;
-allgroups     = STUDY.design(opt.design).group;
-paired = { fastif(strcmpi(STUDY.design(opt.design).statvar1, 'paired'), 'on', 'off') ...
-           fastif(strcmpi(STUDY.design(opt.design).statvar2, 'paired'), 'on', 'off') };
+allconditions = STUDY.design(opt.design).variable(1).value;
+allgroups     = STUDY.design(opt.design).variable(2).value;
+paired = { fastif(strcmpi(STUDY.design(opt.design).variable(1).pairing, 'paired'), 'on', 'off') ...
+           fastif(strcmpi(STUDY.design(opt.design).variable(2).pairing, 'paired'), 'on', 'off') };
 
 % for backward compatibility
 % --------------------------

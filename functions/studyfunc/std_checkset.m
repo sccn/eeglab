@@ -123,10 +123,12 @@ end;
 
 % create STUDY design if it is not present
 % ----------------------------------------
-if ~isfield(STUDY, 'design') || isempty(STUDY.design) || ~isfield(STUDY.design, 'indvar1')
+if ~isfield(STUDY, 'design') || isempty(STUDY.design) || ~isfield(STUDY.design, 'name')
     STUDY  = std_maketrialinfo(STUDY, ALLEEG); 
     STUDY  = std_makedesign(STUDY, ALLEEG);
     STUDY  = std_selectdesign(STUDY, ALLEEG,1);
+elseif isfield(STUDY.design, 'indvar1')
+    STUDY  = std_convertdesign(STUDY, ALLEEG);
 end;
 
 % make channel groups

@@ -119,8 +119,8 @@ if isempty(varargin)
     cbline = [0.07 1.1];
     otherline = [ 0.7 .5 0.6 .5];
     geometry = { otherline otherline otherline cbline };
-    enablegroup = fastif(length(STUDY.group)>1,     'on', 'off');
-    enablecond  = fastif(length(STUDY.condition)>1, 'on', 'off');
+    enablecond  = fastif(length(STUDY.design(STUDY.currentdesign).variable(1).value)>1, 'on', 'off');
+    enablegroup = fastif(length(STUDY.design(STUDY.currentdesign).variable(2).value)>1, 'on', 'off');
     
     [STUDY.etc.erspparams res options] = pop_statparams(STUDY.etc.erspparams, 'geometry' , geometry, 'uilist', uilist, ...
                                    'helpcom', 'pophelp(''std_erspparams'')', 'enablegroup', enablegroup, ...

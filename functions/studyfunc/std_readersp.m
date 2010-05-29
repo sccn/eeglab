@@ -74,8 +74,8 @@ STUDY = pop_erspparams(STUDY, 'default');
     'std_readersp', 'ignore');
 if isstr(opt), error(opt); end;
 if ~strcmpi(opt.infotype, 'ersp'), opt.datatype = opt.infotype; end;
-nc = max(length(STUDY.design(opt.design).condition),1);
-ng = max(length(STUDY.design(opt.design).group),1);
+nc = max(length(STUDY.design(opt.design).variable(1).value),1);
+ng = max(length(STUDY.design(opt.design).variable(2).value),1);
 dtype = opt.datatype;
 
 % find channel indices
@@ -130,12 +130,12 @@ for ind = 1:length(finalinds)
         
         % find total nb of trials
         % -----------------------
-        setinfo = STUDY.design(opt.design).setinfo;
+        setinfo = STUDY.design(opt.design).cell;
         if strcmpi(opt.singletrials, 'on')
             tottrials = cell( nc, ng );
-            for index = 1:length(STUDY.design(opt.design).setinfo)
-                condind = strmatch( setinfo(index).condition, STUDY.design(opt.design).condition );
-                grpind  = strmatch( setinfo(index).group    , STUDY.design(opt.design).group     );
+            for index = 1:length(setinfo)
+                condind = strmatch( setinfo(index).value{1}, STUDY.design(opt.design).variable(1).value );
+                grpind  = strmatch( setinfo(index).value{2}, STUDY.design(opt.design).variable(2).value );
                 if isempty(tottrials{condind, grpind}), tottrials{condind, grpind} = ALLEEG(index).trials;
                 else       tottrials{condind, grpind} = tottrials{condind, grpind} + ALLEEG(index).trials;
                 end;
@@ -145,7 +145,7 @@ for ind = 1:length(finalinds)
         % read the data and select channels
         % ---------------------------------
         fprintf('Reading all %s data:', upper(dtype));
-        setinfo = STUDY.design(opt.design).setinfo;        
+        setinfo = STUDY.design(opt.design).cell;        
         %try     % this 'try' is a poor solution the problem of attempting
         % to read specific channel/component data that doesn't exist
         % called below by: allinds{c,g}(indtmp)
@@ -153,7 +153,7 @@ for ind = 1:length(finalinds)
             for c = 1:nc
                 for g = 1:ng
                     if ~isempty(opt.channels)
-                        allsubjects = { STUDY.design(opt.design).setinfo.subject };
+                        allsubjects = { STUDY.design(opt.design).cell.case };
                         if ~isempty(opt.subject), inds = strmatch( opt.subject, allsubjects(setinds{c,g}));
                         else inds = 1:length(allinds{c,g}); end;
                     else
@@ -163,7 +163,7 @@ for ind = 1:length(finalinds)
                     if ~isempty(inds)
                         count{c, g} = 1;
                         for indtmp = 1:length(inds)
-                            setindtmp = STUDY.design(opt.design).setinfo(setinds{c,g}(inds(indtmp))).setindex;
+                            setindtmp = STUDY.design(opt.design).cell(setinds{c,g}(inds(indtmp))).dataset;
                             [ tmpersp tmpparams alltimes allfreqs] = std_readfile(setindtmp, 'measure', 'timef', 'dataindices', allinds{c,g}(inds(indtmp)), 'timelimits', opt.timerange, 'freqlimits', opt.freqrange);
                             indices = [count{c, g}:count{c, g}+size(tmpersp,3)-1];
                             if indtmp == 1
@@ -327,7 +327,7 @@ if ~isempty(opt.channels)
         erspdata{ind} = permute(erspdata{ind}, [1 2 4 3]); % time freqs elec subjects
     end;
     if ~isempty(opt.subject) && strcmpi(opt.singletrials,'off')
-        erspdata = std_selsubject(erspdata, opt.subject, setinds, { STUDY.datasetinfo(:).subject }, 2); 
+        erspdata = std_selsubject(erspdata, opt.subject, setinds, { STUDY.design(opt.design).cell.case }, 2); 
     end;
 else
     if strcmpi(opt.singletrials, 'on')

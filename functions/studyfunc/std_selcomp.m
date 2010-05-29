@@ -59,7 +59,7 @@ for c = 1:length(data(:))
     rminds = 1:size(data{c},optndims);
     
     for ind = length(compinds{c}):-1:1
-        setindex = STUDY.design(STUDY.currentdesign).setinfo(setinds{c}(ind)).setindex;
+        setindex = STUDY.design(STUDY.currentdesign).cell(setinds{c}(ind)).dataset;
         if compinds{c}(ind) == comps && any(setindex == sets)
             rminds(ind) = [];
         end;

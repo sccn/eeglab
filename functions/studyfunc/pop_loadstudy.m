@@ -103,16 +103,16 @@ end;
 
 % Update the design path
 for inddes = 1:length(STUDY.design)
-    for indcell = 1:length(STUDY.design(inddes).setinfo)
-        pathname = STUDY.datasetinfo(STUDY.design(inddes).setinfo(indcell).setindex(1)).filepath;
-        filebase = STUDY.design(inddes).setinfo(indcell).filebase;
+    for indcell = 1:length(STUDY.design(inddes).cell)
+        pathname = STUDY.datasetinfo(STUDY.design(inddes).cell(indcell).dataset(1)).filepath;
+        filebase = STUDY.design(inddes).cell(indcell).filebase;
         tmpinds1 = find(filebase == '/');
         tmpinds2 = find(filebase == '\');
         if ~isempty(tmpinds1)
-             STUDY.design(inddes).setinfo(indcell).filebase = fullfile(pathname, filebase(tmpinds1(end)+1:end));
+             STUDY.design(inddes).cell(indcell).filebase = fullfile(pathname, filebase(tmpinds1(end)+1:end));
         elseif ~isempty(tmpinds2)
-             STUDY.design(inddes).setinfo(indcell).filebase = fullfile(pathname, filebase(tmpinds2(end)+1:end));
-        else STUDY.design(inddes).setinfo(indcell).filebase = fullfile(pathname, filebase );
+             STUDY.design(inddes).cell(indcell).filebase = fullfile(pathname, filebase(tmpinds2(end)+1:end));
+        else STUDY.design(inddes).cell(indcell).filebase = fullfile(pathname, filebase );
         end;
     end;
 end;

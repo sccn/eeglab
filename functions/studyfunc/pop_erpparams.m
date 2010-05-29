@@ -72,8 +72,8 @@ TMPSTUDY = STUDY;
 com = '';
 if isempty(varargin)
     
-    enablecond  = fastif(length(STUDY.design(STUDY.currentdesign).indvar1)>1, 'on', 'off');
-    enablegroup = fastif(length(STUDY.design(STUDY.currentdesign).indvar2)>1, 'on', 'off');
+    enablecond  = fastif(length(STUDY.design(STUDY.currentdesign).variable(1).value)>1, 'on', 'off');
+    enablegroup = fastif(length(STUDY.design(STUDY.currentdesign).variable(2).value)>1, 'on', 'off');
     plotconditions    = fastif(strcmpi(STUDY.etc.erpparams.plotconditions, 'together'), 1, 0);
     plotgroups  = fastif(strcmpi(STUDY.etc.erpparams.plotgroups,'together'), 1, 0);
     vis = fastif(isnan(STUDY.etc.erpparams.topotime), 'off', 'on');

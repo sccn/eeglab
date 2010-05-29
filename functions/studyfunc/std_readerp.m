@@ -74,8 +74,8 @@ STUDY = pop_specparams(STUDY, 'default');
     'subject'       'string'  []             '' }, ...
     'std_readerp', 'ignore');
 if isstr(opt), error(opt); end;
-nc = max(length(STUDY.design(opt.design).condition),1);
-ng = max(length(STUDY.design(opt.design).group),1);
+nc = max(length(STUDY.design(opt.design).variable(1).value),1);
+ng = max(length(STUDY.design(opt.design).variable(2).value),1);
 dtype = opt.datatype;
 
 % find channel indices
@@ -126,8 +126,8 @@ for ind = 1:length(finalinds) % scan channels or components
         % --------------
         alldata  = cell( nc, ng );
         tmpind  = 1; while(isempty(setinds{tmpind})), tmpind = tmpind+1; end;
-        setinfo = STUDY.design(opt.design).setinfo;
-        chanlab = { ALLEEG(setinfo(1).setindex(1)).chanlocs.labels };
+        setinfo = STUDY.design(opt.design).cell;
+        chanlab = { ALLEEG(setinfo(1).dataset(1)).chanlocs.labels };
         [ tmp params xvals] = std_readfile(setinfo(setinds{1,1}(1)), 'dataindices', allinds{1,1}(1), 'measure', dtype, ...
                                            'getparamonly', 'on', 'singletrials', opt.singletrials, 'timelimits', opt.timerange, 'freqlimits', opt.freqrange);
 
@@ -263,7 +263,7 @@ if ~isempty(opt.channels)
     end;
     setinds  = structdat(allinds(1)).setinds;
     if ~isempty(opt.subject) && strcmpi(opt.singletrials,'off')
-        datavals = std_selsubject(datavals, opt.subject, setinds, { STUDY.design(opt.design).setinfo.subject }, 2); 
+        datavals = std_selsubject(datavals, opt.subject, setinds, { STUDY.design(opt.design).cell.case }, 2); 
     end;
 else
     if strcmpi(opt.singletrials, 'on')

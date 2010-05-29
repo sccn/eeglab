@@ -150,13 +150,13 @@ if nargin < 3 && ~isstr(STUDY)
             
             % test if file exist and issue warning
             if length(STUDY.design) >= index && ~isempty(STUDY.design(index)) && ...
-                ~isempty(dir([ STUDY.design(index).setinfo(1).filebase '.*' ])) &&  strcmpi(rmfiles, 'off')
-                if ~isequal(tmpdes.indvar1, STUDY.design(index).indvar1) || ...
-                     ~isequal(tmpdes.indvar2, STUDY.design(index).indvar2) || ...
-                      ~isequal(tmpdes.includevarlist, STUDY.design(index).includevarlist) || ...
-                       ~isequal(tmpdes.condition, STUDY.design(index).condition) || ...
-                        ~isequal(tmpdes.subject, STUDY.design(index).subject) || ...
-                         ~isequal(tmpdes.group, STUDY.design(index).group)
+                ~isempty(dir([ STUDY.design(index).cell(1).filebase '.*' ])) &&  strcmpi(rmfiles, 'off')
+                if ~isequal(tmpdes.variable(1).label, STUDY.design(index).variable(1).label) || ...
+                     ~isequal(tmpdes.variable(2).label, STUDY.design(index).variable(2).label) || ...
+                      ~isequal(tmpdes.include, STUDY.design(index).include) || ...
+                       ~isequal(tmpdes.variable(1).value, STUDY.design(index).variable(1).value) || ...
+                        ~isequal(tmpdes.cases.value, STUDY.design(index).cases.value) || ...
+                         ~isequal(tmpdes.variable(2).value, STUDY.design(index).variable(2).value)
                     res = questdlg2(strvcat([ 'Precomputed data files exist for design ' int2str(index) '.' ], ' ', ...
                                        'Modifying this design without deleting the associated files', ...
                                        'might mean that they will stay on disk and will be unusable'), ...
@@ -254,22 +254,22 @@ elseif isstr(STUDY)
                 set(findobj(fig, 'tag', 'edit_selectdattrials'), 'string', '' );
                 return;
             end;
-            val1 = strmatch(des(val).indvar1, usrdat.factors, 'exact'); if isempty(val1), val1 = 1; end;
-            val2 = strmatch(des(val).indvar2, usrdat.factors, 'exact'); if isempty(val2), val2 = 1; end;
+            val1 = strmatch(des(val).variable(1).label, usrdat.factors, 'exact'); if isempty(val1), val1 = 1; end;
+            val2 = strmatch(des(val).variable(2).label, usrdat.factors, 'exact'); if isempty(val2), val2 = 1; end;
             set(findobj(fig, 'tag', 'lbfact0'), 'string', usrdat.factors, 'value', val1);
             set(findobj(fig, 'tag', 'lbfact1'), 'string', usrdat.factors, 'value', val2);
-            valfact1 = strmatchmult(des(val).condition, usrdat.factorvals{val1});
-            valfact2 = strmatchmult(des(val).group    , usrdat.factorvals{val2});
+            valfact1 = strmatchmult(des(val).variable(1).value, usrdat.factorvals{val1});
+            valfact2 = strmatchmult(des(val).variable(2).value, usrdat.factorvals{val2});
             set(findobj(fig, 'tag', 'lbval0'), 'string', usrdat.factorvals{val1}, 'value', valfact1);
             set(findobj(fig, 'tag', 'lbval1'), 'string', usrdat.factorvals{val2}, 'value', valfact2);
-            valsubj = strmatchmult(des(val).subject    , usrdat.subjects);
+            valsubj = strmatchmult(des(val).cases.value, usrdat.subjects);
             set(findobj(fig, 'tag', 'lbsubj'), 'string', usrdat.subjects, 'value', valsubj);
-            if isempty(des(val).includevarlist), str = ''; else str = vararg2str(des(val).includevarlist); end;
+            if isempty(des(val).include), str = ''; else str = vararg2str(des(val).include); end;
             set(findobj(fig, 'tag', 'chk_del'), 'value', des(val).deletepreviousfiles );
             set(findobj(fig, 'tag', 'edit_selectdattrials'), 'string', str );
             set(findobj(fig, 'tag', 'popupselect'), 'value', 1 );
-            set(findobj(fig, 'tag', 'lbpair0'), 'value', fastif(isequal(des(val).statvar1,'paired'),1,2));
-            set(findobj(fig, 'tag', 'lbpair1'), 'value', fastif(isequal(des(val).statvar2,'paired'),1,2));
+            set(findobj(fig, 'tag', 'lbpair0'), 'value', fastif(isequal(des(val).variable(1).pairing,'paired'),1,2));
+            set(findobj(fig, 'tag', 'lbpair1'), 'value', fastif(isequal(des(val).variable(2).pairing,'paired'),1,2));
             
         case 'updatedesign', % update the study information (whenever the user click on a button)
             val    = get(findobj(fig, 'tag', 'listboxdesign'), 'value');
@@ -284,38 +284,38 @@ elseif isstr(STUDY)
             strs   = get(findobj(fig, 'tag', 'edit_selectdattrials'),  'string');
             valpaired = { 'paired' 'unpaired' };
             
-            if ~strcmpi(des(val).indvar1, usrdat.factors{val1})
-                des(val).indvar1   = usrdat.factors{val1};
-                des(val).condition = usrdat.factorvals{val1}(valf1);
+            if ~strcmpi(des(val).variable(1).label, usrdat.factors{val1})
+                des(val).variable(1).label = usrdat.factors{val1};
+                des(val).variable(1).value = usrdat.factorvals{val1}(valf1);
             end;
-            if ~strcmpi(des(val).indvar2, usrdat.factors{val2})
-                des(val).indvar2   = usrdat.factors{val2};
-                des(val).group     = usrdat.factorvals{val2}(valf2);
+            if ~strcmpi(des(val).variable(2).label, usrdat.factors{val2})
+                des(val).variable(2).label = usrdat.factors{val2};
+                des(val).variable(2).value = usrdat.factorvals{val2}(valf2);
             end;
-            if ~isequal(sort(des(val).condition), sort(usrdat.factorvals{val1}(valf1)))
-                des(val).condition = usrdat.factorvals{val1}(valf1);
+            if ~isequal(sort(des(val).variable(1).value), sort(usrdat.factorvals{val1}(valf1)))
+                des(val).variable(1).value = usrdat.factorvals{val1}(valf1);
             end;
-            if ~isequal(sort(des(val).group), sort(usrdat.factorvals{val2}(valf2)))
-                des(val).group = usrdat.factorvals{val2}(valf2);
+            if ~isequal(sort(des(val).variable(2).value), sort(usrdat.factorvals{val2}(valf2)))
+                des(val).variable(2).value = usrdat.factorvals{val2}(valf2);
             end;
-            if ~isequal(sort(des(val).subject), sort(usrdat.subjects(vals)))
-                des(val).subject = usrdat.subjects(vals);
+            if ~isequal(sort(des(val).cases.value), sort(usrdat.subjects(vals)))
+                des(val).cases.value = usrdat.subjects(vals);
             end;
-            if ~isequal(des(val).statvar1, valpaired{valp1})
-                des(val).statvar1 = valpaired{valp1};
+            if ~isequal(des(val).variable(1).pairing, valpaired{valp1})
+                des(val).variable(1).pairing = valpaired{valp1};
             end;
-            if ~isequal(des(val).statvar2, valpaired{valp2})
-                des(val).statvar2 = valpaired{valp2};
+            if ~isequal(des(val).variable(2).pairing, valpaired{valp2})
+                des(val).variable(2).pairing = valpaired{valp2};
             end;
             if ~isequal(des(val).deletepreviousfiles, valchk)
                 des(val).deletepreviousfiles = 1;
             end;
-            if ~isequal(des(val).includevarlist, strs)
+            if ~isequal(des(val).include, strs)
                 try,
-                    des(val).includevarlist = eval( [ '{' strs '}' ]);
+                    des(val).include = eval( [ '{' strs '}' ]);
                 catch,
                     disp('Error while decoding list of parameters');
-                    des(val).includevarlist = {};
+                    des(val).include = {};
                     set(findobj(fig, 'tag', 'edit_selectdattrials'),  'string', '');
                 end;
             end;

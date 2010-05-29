@@ -40,17 +40,17 @@ comps   = reshape(comps, 1, size(comps,1)*size(comps,2));
 
 % get indices for all groups and conditions
 % -----------------------------------------
-setinfo       = STUDY.design(STUDY.currentdesign).setinfo;
-allconditions = STUDY.design(STUDY.currentdesign).condition;
-allgroups     = STUDY.design(STUDY.currentdesign).group;
+setinfo       = STUDY.design(STUDY.currentdesign).cell;
+allconditions = STUDY.design(STUDY.currentdesign).variable(1).value;
+allgroups     = STUDY.design(STUDY.currentdesign).variable(2).value;
 nc = max(length(allconditions),1);
 ng = max(length(allgroups),    1);
 allinds = cell( nc, ng );
 setinds = cell( nc, ng );
 
 for index = 1:length(setinfo)
-    condind = strmatch( setinfo(index).condition, allconditions, 'exact');
-    grpind  = strmatch( setinfo(index).group    , allgroups    , 'exact');
+    condind = strmatch( setinfo(index).value{1}, allconditions, 'exact');
+    grpind  = strmatch( setinfo(index).value{2}, allgroups    , 'exact');
 
     if isempty(allconditions), condind = 1; end;
     if isempty(allgroups),     grpind  = 1; end;
@@ -59,7 +59,7 @@ for index = 1:length(setinfo)
     % if several datasets check that they all have the same
     % ICA and component index
     % -----------------------
-    datind  = setinfo(index).setindex;
+    datind  = setinfo(index).dataset;
     ind     = find(datind(1) == sets);
     if ~isempty(ind) && length(datind) > 1
         [ind1 ind2] = find(datind(1) == oldsets);

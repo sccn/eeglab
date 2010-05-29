@@ -224,7 +224,7 @@ if ~isstr(varargin{1})
     
     % enable buttons
     % --------------
-    filename = STUDY.design(STUDY.currentdesign).setinfo(1).filebase;
+    filename = STUDY.design(STUDY.currentdesign).cell(1).filebase;
     if exist([filename '.datspec']) , spec_enable = 'on'; else spec_enable  = 'off'; end;
     if exist([filename '.daterp'] )  , erp_enable = 'on'; else  erp_enable  = 'off'; end;
     if exist([filename '.datersp']) , ersp_enable = 'on'; else ersp_enable  = 'off'; end;
@@ -316,7 +316,7 @@ else
             plotting_option = varargin{1};
             plotting_option = [ plotting_option(9:end) 'plot' ];
             if onechan(1) ~= 1  % check that not all onechan in channel are requested
-                 subject = STUDY.design(STUDY.currentdesign).subject{onechan-1};
+                 subject = STUDY.design(STUDY.currentdesign).cases.value{onechan-1};
                  a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''channels'','  vararg2str({changrpstr}) ', ''subject'', ''' subject ''' );' ];
                  eval(a); STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
              else
@@ -371,13 +371,13 @@ else
             % ---------------------
             chanid{1} = 'All subjects';
             if length(changrp) == 1
-                allsubjects = unique({ STUDY.design(STUDY.currentdesign).setinfo([ changrp.setinds{:} ]).subject });
+                allsubjects = unique({ STUDY.design(STUDY.currentdesign).cell([ changrp.setinds{:} ]).case });
                 for l = 1:length(allsubjects)
                     chanid{end+1} = [ allsubjects{l} ' ' changrp.name ];
                 end;
             else
-                for l = 1:length(STUDY.design(STUDY.currentdesign).subject)
-                    chanid{end+1} = [ STUDY.design(STUDY.currentdesign).subject{l} ];
+                for l = 1:length(STUDY.design(STUDY.currentdesign).cases.value)
+                    chanid{end+1} = [ STUDY.design(STUDY.currentdesign).cases.value{l} ];
                 end;
             end;
                 
@@ -397,8 +397,8 @@ else
             % Generate channel list
             % ---------------------
             chanid{1} = 'All subjects';
-            for l = 1:length(STUDY.design(STUDY.currentdesign).subject)
-                chanid{end+1} = [ STUDY.design(STUDY.currentdesign).subject{l} ' All' ];
+            for l = 1:length(STUDY.design(STUDY.currentdesign).cases.value)
+                chanid{end+1} = [ STUDY.design(STUDY.currentdesign).cases.value{l} ' All' ];
             end;
             selected = 1;
             set(findobj('parent', hdl, 'tag', 'chan_onechan'), 'value', selected, 'String', chanid);
