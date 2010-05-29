@@ -145,6 +145,7 @@ g = finputcheck(options, { 'chanlocs'  ''    []          '';
                     'frames'    'integer'               [1 Inf]     size(data,2);
                     'chans'     { 'integer' 'string' }  { [1 Inf] [] }    0;
                     'geom'      'integer'               [1 Inf]     [];
+                    'channames' 'string'                []          '';
                     'limits'    'float'                 []          0;
                     'ylim'      'float'                 []          [];
                     'title'     'string'                []          '';
@@ -273,57 +274,57 @@ end;
     vertcolor = 'k';
     horicolor = vertcolor;
     
+%     %
+%     %%%%%%%%%%%%%%%%%%%% Read the channel names %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%     %
+%     if isempty(g.channames)
+%         if ~isstr(g.chans) 
+%             % g.channames = zeros(MAXPLOTDATACHANS,4);
+%             % for c=1:length(g.chans),
+%             %     g.channames(c,:)= sprintf('%4d',g.chans(c));
+%             % end;
+%             if length(g.chans) > 1 | g.chans(1) ~= 0
+%                 g.channames = num2str(g.chans(:));                   %%CJH
+%             end;
+%         else % isstr(g.chans)
+%             chid = fopen(g.chans,'r');
+%             if chid <3,
+%                 fprintf('plottopo(): cannot open file %s.\n',g.chans);
+%                 return
+%             else
+%                 fprintf('plottopo(): opened file %s.\n',g.chans);
+%             end;
+% 
+%             %%%%%%%
+%             % fid=fopen('fgetl.m');
+%             % while 1
+%             %   line = fgetl(fid);
+%             %   if ~isstr(line), break, end
+%             %     disp(line)
+%             %   end
+%             % end
+%             % fclose(fid);
+%             %%%%%%%                       
+% 
+%             g.channames = fscanf(chid,'%s',[4 MAXPLOTDATACHANS]);
+%             g.channames = g.channames';
+%             [r c] = size(g.channames);
+%             for i=1:r
+%                 for j=1:c
+%                     if g.channames(i,j)=='.',
+%                         g.channames(i,j)=' ';
+%                     end;
+%                 end;
+%             end;
+%         end; % setting g.channames
+%     end;
+%     
     %
-    %%%%%%%%%%%%%%%%%%%% Read the channel names %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%% Plot and label specified channels %%%%%%%%%%%%%%%%%%
     %
-    if ~isstr(g.chans) 
-        % channames = zeros(MAXPLOTDATACHANS,4);
-        % for c=1:length(g.chans),
-        %     channames(c,:)= sprintf('%4d',g.chans(c));
-        % end;
-        if length(g.chans) > 1 | g.chans(1) ~= 0
-            channames = num2str(g.chans(:));                   %%CJH
-        end;
-    else % isstr(g.chans)
-        if ~isstr(g.chans)
-            fprintf('plottopo(): channel file name must be a string.\n');
-            return
-        end
-        chid = fopen(g.chans,'r');
-        if chid <3,
-            fprintf('plottopo(): cannot open file %s.\n',g.chans);
-            return
-        else
-            fprintf('plottopo(): opened file %s.\n',g.chans);
-        end;
-
-        %%%%%%%
-        % fid=fopen('fgetl.m');
-        % while 1
-        %   line = fgetl(fid);
-        %   if ~isstr(line), break, end
-        %     disp(line)
-        %   end
-        % end
-        % fclose(fid);
-        %%%%%%%                       
-
-        channames = fscanf(chid,'%s',[4 MAXPLOTDATACHANS]);
-        channames = channames';
-        [r c] = size(channames);
-        for i=1:r
-            for j=1:c
-                if channames(i,j)=='.',
-                    channames(i,j)=' ';
-                end;
-            end;
-        end;
-    end; % setting channames
-         %
-         %%%%%%%%%%%%%%%%%%%%%%%%% Plot and label specified channels %%%%%%%%%%%%%%%%%%
-         %
     data = data(g.chans,:);
     chans = length(g.chans);
+    
     %
     %%%%%%%%%%%%%%%%%%%%%%%%% Read the color names %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %
@@ -453,14 +454,14 @@ end;
             return
         end
         xvals = 0; yvals = 0;
-        if ~exist('channames') 
+        if isempty(g.channames)
             if isfield(g.chanlocs,'labels') && ~iscellstr({g.chanlocs.labels})
-                channames = strvcat(g.chanlocs.labels);
+                g.channames = strvcat(g.chanlocs.labels);
             else
-                channames = repmat(' ',ht*wd,4);
+                g.channames = repmat(' ',ht*wd,4);
                 for i=1:ht*wd
                     channum = num2str(i);
-                    channames(i,1:length(channum)) = channum;
+                    g.channames(i,1:length(channum)) = channum;
                 end
             end
         end
@@ -471,12 +472,12 @@ end;
         if isstruct(g.chanlocs)
             nonemptychans = cellfun('isempty', { g.chanlocs.theta });
             nonemptychans = find(~nonemptychans);
-            [tmp channames Th Rd] = readlocs(g.chanlocs(nonemptychans));
-            channames = strvcat({ g.chanlocs.labels });
+            [tmp g.channames Th Rd] = readlocs(g.chanlocs(nonemptychans));
+            g.channames = strvcat({ g.chanlocs.labels });
         else
-            [tmp channames Th Rd] = readlocs(g.chanlocs);
-            channames = strvcat(channames);
-            nonemptychans = [1:length(channames)];
+            [tmp g.channames Th Rd] = readlocs(g.chanlocs);
+            g.channames = strvcat(g.channames);
+            nonemptychans = [1:length(g.channames)];
         end;
         Th = pi/180*Th;                 % convert degrees to radians
         Rd = Rd; 
@@ -498,7 +499,7 @@ end;
             xvals(emptychans(index)) = 0.7+0.2*floor((index-1)/totalchans);
             yvals(emptychans(index)) = -0.4+mod(index-1,totalchans)/totalchans;
         end;
-        channames = channames(g.chans,:);
+        g.channames = g.channames(g.chans,:);
         xvals     = xvals(g.chans);
         yvals     = yvals(g.chans);
     end
@@ -568,13 +569,13 @@ end;
                 if ~ISRECT    % print before traces
                     xt = double(xmin-NAME_OFFSET*xdiff);
                     yt = double(yht-NAME_OFFSETY*ydiff); 
-                    str = [channames(c,:)];
+                    str = [g.channames(c,:)];
                     h=text(xt,yt,str);
                     set(h,'HorizontalAlignment','right');      
                     %set(h,'FontSize',CHANFONTSIZE);           % choose font size
                 else % ISRECT
                     xmn = xdiff/2+xmin;
-                    h=text(double(xmn),double(ymax+0.05*ymax),[channames(c,:)]); 
+                    h=text(double(xmn),double(ymax+0.05*ymax),[g.channames(c,:)]); 
                     set(h,'HorizontalAlignment','right');      
                     %set(h,'FontSize',CHANFONTSIZE);            % choose font size
                 end % ISRECT
