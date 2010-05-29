@@ -36,6 +36,11 @@
 %   'specmode'   - ['psd'|'fft'] method to compute spectral 
 %                  decomposition. 'psd' uses the spectopo function. 'fft' 
 %                  uses a simple fft on each trial.
+%   'epochlim'   - [min max] for FFT on continuous data, extract data
+%                  epochs with specific epoch limits in seconds (see also
+%                  'epochrecur' below). Default is [0 1].
+%   'epochrecur' - [float] for FFT on continuous data, set the automatic
+%                  epoch extraction recurence interval (default is 1 second).
 %   'timerange'  - [min max] use data within a specific time range before 
 %                  computing the data spectrum. For instance, for evoked 
 %                  data trials, it is recommended to use the baseline time 
@@ -115,6 +120,8 @@ end;
                                       'specmode'   'string'  {'fft' 'psd' 'pmtm' 'pburg'} 'psd';
                                       'recompute'  'string'  { 'on' 'off' } 'off';
                                       'savetrials' 'string'  { 'on' 'off' } 'off';
+                                      'epochlim'   'real'    []         [0 1];
+                                      'epochrecur' 'real'    []         1;
                                       'rmcomps'    'cell'    []         cell(1,length(EEG));
                                       'nw'         'float'   []         4;
                                       'fileout'    'string'  []         '';
@@ -159,10 +166,12 @@ if exist(filename) & strcmpi(g.recompute, 'off')
     if ~isempty(X), return; end;
 end
 
+oritrials = EEG.trials;
 if ~strcmpi(g.specmode, 'psd')
     if EEG(1).trials == 1, 
         EEG = eeg_checkset(EEG, 'loaddata');
-        EEG = eeg_regepochs(EEG, 1, [0 1]);
+        EEG = eeg_regepochs(EEG, g.epochrecur, g.epochlim);
+        g.trialindices = { [1:EEG.trials] };
         disp('Warning: continuous data, extracting 1-second epochs'); 
     end;
 end;
@@ -193,10 +202,14 @@ for dat = 1:length(EEG)
     end;
 end;
 
-if ~isempty(g.timerange)
-    timebef  = find(EEG.times >= g.timerange(1) & EEG.times < g.timerange(2) );
-    X        = X(:,timebef,:);
-    EEG.pnts = length(timebef);
+if ~isempty(g.timerange) 
+    if oritrials > 1
+        timebef  = find(EEG.times >= g.timerange(1) & EEG.times < g.timerange(2) );
+        X        = X(:,timebef,:);
+        EEG.pnts = length(timebef);
+    else
+        disp('warning: ''timerange'' option cannot be used with continuous data');
+    end;
 end;
 if strcmpi(g.specmode, 'psd')
     if ~isempty(EEG.event) && isfield(EEG.event, 'type') && ischar(EEG(1).event(1).type)
