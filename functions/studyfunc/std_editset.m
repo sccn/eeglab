@@ -101,7 +101,13 @@ allcoms = {};
 if ~isempty(g.commands)
     if iscell(g.commands{1})
         for k = 1:length(g.commands)
-            allcoms = { allcoms{:} g.commands{k}{:} };
+            % put index field first
+            indindex   = strmatch('index', lower(g.commands{k}(1:2:end)));
+            if ~isempty(indindex)
+                 tmpcom = { 'index' g.commands{k}{2*(indindex-1)+1+1} g.commands{k}{:} };
+            else tmpcom = g.commands{k}; 
+            end;
+            allcoms = { allcoms{:} tmpcom{:} };
         end;
     else 
         allcoms = g.commands;
@@ -117,7 +123,7 @@ for k = 1:2:length(g.commands)
        dipselectExists = true;
     end;
 end;
-if strcmp(g.inbrain,'on') & ~dipselectExists
+if strcmp(g.inbrain,'on') && ~dipselectExists
     g.commands{length(g.commands)+1} = 'dipselect';
     g.commands{length(g.commands)+1} = 0.15;
 end;
@@ -143,6 +149,7 @@ end;
 currentind = 1;
 rmlist = [];
 for k = 1:2:length(g.commands)
+    
     switch g.commands{k}
         case 'index'
             currentind = g.commands{k+1};
@@ -223,7 +230,8 @@ for k = 1:2:length(g.commands)
             STUDY.datasetinfo(currentind).session   = ALLEEG(currentind).session;
             STUDY.datasetinfo(currentind).condition = ALLEEG(currentind).condition;
             STUDY.datasetinfo(currentind).group     = ALLEEG(currentind).group;                    
-            STUDY.datasetinfo(currentind).index     = currentind;                    
+            STUDY.datasetinfo(currentind).index     = currentind;    
+        otherwise, error(sprintf('Unknown command %s', g.commands{k}));
     end
 end
 
