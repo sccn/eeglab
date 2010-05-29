@@ -73,6 +73,9 @@ if nargin < 1
 			end;				
 		end;
 	end;	
+    if nargout > 0
+        str = strvcat(ALLCOM);
+    end;
 elseif nargin == 1
 	if isempty( command )
 		return;
