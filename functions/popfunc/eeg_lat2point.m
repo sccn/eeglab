@@ -14,7 +14,6 @@
 % Outputs:
 %   newlat      - converted latency values in points assuming concatenated
 %                 data epochs (see eeglab() event structure)
-%   outbound    - indices of out of boundary latencies (Unimplemented)
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2 Mai 2002
 %
