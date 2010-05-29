@@ -162,8 +162,12 @@ end
 % com = sprintf('pop_plotdata(%s, %d, %s, [1:%d], ''%s'', %d, %d, [%f %f]);', ...
 % inputname(1), typeplot, vararg2str(indices), EEG.trials, plottitle, singletrials,ydir,ymin,ymax);
 % fprintf([com '\n']);
-
-plottopo( sigtmp, 'frames', EEG.pnts, 'limits', [EEG.xmin*1000 EEG.xmax*1000 ymin ymax], 'title', plottitle, 'chans', indices, 'ydir', ydir);
+if ~isempty(EEG.chanlocs)
+    chanlabels = strvcat({ EEG.chanlocs(indices).labels });
+else
+    chanlabels = strvcat(mattocell(indices));
+end;
+plottopo( sigtmp, 'frames', EEG.pnts, 'limits', [EEG.xmin*1000 EEG.xmax*1000 ymin ymax], 'title', plottitle, 'chans', 1:size(sigtmp,1), 'ydir', ydir, 'channames', chanlabels);
 %plotdata(sigtmp, EEG.pnts, [EEG.xmin*1000 EEG.xmax*1000 ymin ymax], plottitle, indices,0,0,ydir);
 
 %
