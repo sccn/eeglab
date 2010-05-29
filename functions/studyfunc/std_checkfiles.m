@@ -30,7 +30,7 @@
 function [boolval npersubj] = std_checkfiles(STUDY, ALLEEG);
 
 if nargin < 2
-    help std_checkconsist;
+    help std_checkfiles;
     return;
 end;
 return;
