@@ -255,7 +255,7 @@ for index = 1:size(arg2(:),1)
 	% add dipole location if present
     % ------------------------------
     dipoleplotted = 0;
-    if plotdip & typeplot == 0
+    if plotdip && typeplot == 0
         if isfield(EEG, 'dipfit') & isfield(EEG.dipfit, 'model')
             if length(EEG.dipfit.model) >= index & ~strcmpi(EEG.dipfit.coordformat, 'CTF')
                 %curpos = EEG.dipfit.model(arg2(index)).posxyz/EEG.dipfit.vol.r(end);
@@ -274,7 +274,7 @@ for index = 1:size(arg2(:),1)
                         try, tmpres = transform * [ curmom(2,:) 1 ]'; curmom(2,:) = tmpres(1:3); catch, end;
                     end;
                     curpos = curpos / 85;
-                    if size(curpos,1) > 1 & length(select) == 2
+                    if size(curpos,1) > 1 && length(select) == 2
                         dipole_index = find(strcmpi('dipole',options),1);
                         if  ~isempty(dipole_index) % if 'dipoles' is already defined in options{:}
                             options{dipole_index+1} = [ curpos(:,1:2) curmom(:,1:3) ];
