@@ -396,7 +396,7 @@ if isstr(filename)
        % --------------
        if isempty(g.skiplines), g.skiplines = 0; end;
        if strcmpi(g.filetype, 'chanedit')
-           array = loadtxt( filename, 'delim', 9, 'skipline', g.skiplines);
+           array = loadtxt( filename, 'delim', 9, 'skipline', g.skiplines, 'blankcell', 'off');
        else
            array = load_file_or_array( filename, g.skiplines);
        end;
@@ -588,7 +588,7 @@ function array = load_file_or_array( varname, skiplines );
        skiplines = 0;
     end;
     if exist( varname ) == 2
-        array = loadtxt(varname,'verbose','off','skipline',skiplines);
+        array = loadtxt(varname,'verbose','off','skipline',skiplines,'blankcell','off');
     else % variable in the global workspace
          % --------------------------
          try, array = evalin('base', varname);

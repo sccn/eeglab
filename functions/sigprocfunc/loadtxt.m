@@ -18,6 +18,7 @@
 %   'delim'    - ascii character for delimiters. {default:[9 32]
 %                i.e space and tab}. It is also possible to enter 
 %                strings, Ex: [9 ' ' ','].
+%   'blankcell' - ['on'|'off'] extract blank cells {default:'on'}
 %   'verbose'  - ['on'|'off'] {default:'on'}
 %   'nlines'   - [integer] number of lines to read {default: all file}
 %
@@ -66,6 +67,7 @@ end;
 g = finputcheck( varargin, { 'convert'   'string'   { 'on' 'off' 'force' }   'on';
                              'skipline'  'integer'  [0 Inf]          0;
                              'verbose'   'string'   { 'on' 'off' }   'on';
+                             'blankcell' 'string'   { 'on' 'off' }   'on';
                              'delim'     { 'integer' 'string' } []               [9 32];
                              'nlines'    'integer'  []               Inf });
 if isstr(g), error(g); end;
@@ -93,37 +95,22 @@ if strcmp(g.verbose, 'on'), fprintf('Reading file (lines): '); end;
 while isempty(inputline) | inputline~=-1
      colnb = 1;
      if ~isempty(inputline)
-	     switch g.convert
-	        case 'off',
-			     while ~isempty(deblank(inputline))
-			         % 07/29/04 Petr Janata added following line to
-			         % mitigate problem of strtok ignoring leading
-			         % delimiters and deblanking residue in the event
-			         % of only space existing between delimiters
-			         inputline = strrep(inputline,[g.delim g.delim],[g.delim ' ' g.delim]);
-                     
-			         [array{linenb, colnb} inputline] = strtok(inputline, g.delim);
-			         colnb = colnb+1;
-			     end;
-	        case 'on',
-                 tabFirstpos = 1;
-			     while ~isempty(deblank(inputline))
-                     if tabFirstpos && length(inputline) > 1 && all(inputline(1) ~= g.delim), tabFirstpos = 0; end;
-			         [tmp inputline tabFirstpos] = mystrtok(inputline, g.delim, tabFirstpos);
+         tabFirstpos = 1;
+         while ~isempty(deblank(inputline))
+             if strcmpi(g.blankcell,'off'), inputline = strtrim(inputline); end;
+             if tabFirstpos && length(inputline) > 1 && all(inputline(1) ~= g.delim), tabFirstpos = 0; end;
+             [tmp inputline tabFirstpos] = mystrtok(inputline, g.delim, tabFirstpos);
+             switch g.convert
+                case 'off', array{linenb, colnb} = tmp;
+                case 'on',  
                      tmp2 = str2double(tmp);
-			         if isnan( tmp2 )  , array{linenb, colnb} = tmp;
+                     if isnan( tmp2 )  , array{linenb, colnb} = tmp;
                      else                array{linenb, colnb} = tmp2;
-			         end;
-			         colnb = colnb+1;
-			     end;
-	        case 'force',
-			     while ~isempty(deblank(inputline))
-			         [tmp inputline] = mystrtok(inputline, g.delim);
-			         array{linenb, colnb} = str2double( tmp );
-			         colnb = colnb+1;
-			     end;
-	        otherwise, error('Unrecognized conversion option');
-	     end;   
+                     end;
+                case 'force', array{linenb, colnb} = str2double(tmp);
+             end;
+             colnb = colnb+1;
+         end;
 	     linenb = linenb +1;
      end;
      inputline = fgetl(fid);
