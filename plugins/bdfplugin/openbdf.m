@@ -200,10 +200,19 @@ for k=1:EDF.NS, idx3(maxspr*(k-1)+(1:maxspr))=bi(k)+ceil((1:maxspr)'/maxspr*EDF.
 EDF.AS.IDX2=idx2;
 %EDF.AS.IDX3=idx3;
 
+%DAT.MX=feval('loadxcm',EDF);
+
+if EDF.NRec == -1   % unknown record size, determine correct NRec
+    fseek(EDF.FILE.FID, 0, 'eof');
+    EDF.FILE.size = ftell(EDF.FILE.FID);
+    if ~isempty(findstr(EDF.VERSION, 'BIOSEMI'))
+        EDF.NRec = floor((EDF.FILE.size - EDF.HeadLen) / EDF.AS.spb / 3);
+    else
+        EDF.NRec = floor((EDF.FILE.size - EDF.HeadLen) / EDF.AS.spb / 2);
+    end;
+end;
 
 DAT.Head=EDF;
 DAT.MX.ReRef=1;
-
-%DAT.MX=feval('loadxcm',EDF);
 
 return;
