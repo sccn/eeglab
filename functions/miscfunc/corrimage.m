@@ -64,7 +64,7 @@
 %                values ('alpha'); output signal (slope or ITC) ('sigout'), 
 %                output signal masked by significance ('sigoutm') or the last
 %                2 option combined ('sigoutm2'). 'no' prevent the function
-%                from plotting. See also pmask. Default is 'sigoutmasked'.
+%                from plotting. In addition, see pmask. Default is 'sigoutmasked'.
 %   'pmask'    - [real] maximum p value to show in plot. Default is 0.00001
 %                (0.001 taking into account multiple comparisons (100)). Enter 
 %                0.9XXX to get the higher tail or a negative value (e.e., -0.001
