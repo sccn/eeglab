@@ -54,7 +54,7 @@
 %             { { 'toolbox', 'toolbox2' } 'Signal processing functions' 'adminfunc/eeg_helpsigproc.m' }}, ...
 %            '/home/www/eeglab/allfunctions', 'mainheader', '/data/common/matlab/indexfunchdr.txt');          
 %
-% See also: help2html()
+% See also: help2html2()
 
 % Copyright (C) Arnaud Delorme, CNL / Salk Institute, 2002
 %
@@ -229,7 +229,7 @@ function makehelphtml( files, fo, title, STYLEHEADER, DEST, mode, options, maino
                     cd(DEST); 
                     try, delete([ DEST filename ]);
                     catch, end;
-                    help2html( filename, [],  'outputtext', filelink, options{:}); cd(tmpdir);
+                    help2html2( filename, [],  'outputtext', filelink, options{:}); cd(tmpdir);
                     
                     if strcmp(mainonly,'off')
                         inputfile = which( filename);
@@ -259,7 +259,7 @@ function makehelphtml( files, fo, title, STYLEHEADER, DEST, mode, options, maino
 	        % Processing file only
             if ~exist(fullfile(DEST, [ files{index}(1:end-1) 'html' ]))
                 fprintf('Processing %s\n', files{index});
-                cd(DEST); com = help2html( files{index}, [], options{:}); cd(tmpdir);
+                cd(DEST); com = help2html2( files{index}, [], options{:}); cd(tmpdir);
                 fprintf( fo, '%s', com);
                 if strcmp(mainonly,'off')
                     inputfile = which( files{index});
@@ -269,7 +269,7 @@ function makehelphtml( files, fo, title, STYLEHEADER, DEST, mode, options, maino
             else
                 fprintf('Skipping %s\n', files{index});
                 cd(DEST); 
-                com = help2html( files{index}, [], options{:}, ...
+                com = help2html2( files{index}, [], options{:}, ...
                                  'outputonly','on');
                 fprintf( fo, '%s', com);
                 cd(tmpdir);
