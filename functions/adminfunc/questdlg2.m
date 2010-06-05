@@ -45,8 +45,13 @@ if Prompt(end) == 10, Prompt(end) = []; end;
 fig = figure('visible', 'off');
 set(gcf, 'name', Title);
 
-geometry = {[1]};
-listui = {{ 'Style', 'text', 'string' Prompt } {} };
+listui = {};
+geometry = {};
+for index = 1:size(Prompt,1)
+    geometry{index} = [1];
+    listui{index} = { 'Style', 'text', 'string' Prompt(index,:) };
+end;
+listui{end+1} = {};
 
 geometry = { geometry{:} 1 ones(1,length(varargin)-1) };
 for index = 1:length(varargin)-1 % ignoring default val
@@ -57,13 +62,15 @@ for index = 1:length(varargin)-1 % ignoring default val
 	end;
 end;
 
-cr = length(find(Prompt == char(10)))+1;
-if cr == 1
-	cr = size(Prompt,1);
-end;
-if cr >= 8, cr = cr-1; end;
-if cr >= 4, cr = cr-1; end;
-[tmp tmp2 allobj] = supergui( 'fig', fig, 'geomhoriz', geometry, 'geomvert', [cr 1 1], 'uilist', listui, ...
+%cr = length(find(Prompt == char(10)))+1;
+%if cr == 1
+%	cr = size(Prompt,1);
+%end;
+%cr = cr^(7/);
+%if cr >= 8, cr = cr-1; end;
+%if cr >= 4, cr = cr-1; end;
+%[tmp tmp2 allobj] = supergui( 'fig', fig, 'geomhoriz', geometry, 'geomvert', [cr 1 1], 'uilist', listui, ...
+[tmp tmp2 allobj] = supergui( 'fig', fig, 'geomhoriz', geometry, 'uilist', listui, ...
     'borders', [0.02 0.015 0.08 0.06], 'spacing', [0 0], 'horizontalalignment', 'left' );
 
 waitfor( fig, 'userdata');

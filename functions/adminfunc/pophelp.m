@@ -38,6 +38,21 @@ if nargin <2
 	nonmatlab = 0;
 end;
 
+text1 = help2html(funct);
+if length(funct) > 4 & strcmpi(funct(1:4), 'pop_')
+	try,
+		text2 = help2html(funct(5:end))
+		text1 = [text1 '<br><pre>___________________________________________________________________' 10 ...
+					   ' ' 10 ...
+                       ' The ''pop'' function above calls the eponymous Matlab function below' 10 ...
+                       ' and could use some of its optional parameters' 10 ...
+					   '___________________________________________________________________</pre><br><br>' text2 ];
+	catch, end;
+end;
+
+web([ 'text://' text1 ]);
+return;
+
 doc1 = readfunc(funct, nonmatlab);
 if length(funct) > 4 & strcmpi(funct(1:4), 'pop_')
 	try,
