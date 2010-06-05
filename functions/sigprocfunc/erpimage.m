@@ -166,7 +166,7 @@
 %   'auxvar'         = [size(nvars,ntrials) matrix] Plot auxiliary variable(s) for each trial
 %                       as separate traces. Else, 'auxvar',{[matrix],{colorstrings}}
 %                       to specify N trace colors.  Ex: colorstrings = {'r','bo-','','k:'}
-%                       (See also: 'vert' and 'timewarp' above). {default: none}
+%                       (see also: 'vert' and 'timewarp' above). {default: none}
 %   'sortvarpercent' = [float vector] Plot percentiles for the sorting variable
 %                       for instance, [0.1 0.5 0.9] plots the 10th percentile, the median
 %                       and the 90th percentile.
@@ -241,7 +241,7 @@
 % Authors: Scott Makeig, Tzyy-Ping Jung & Arnaud Delorme,
 %          CNL/Salk Institute, La Jolla, 3-2-1998 -
 %
-% See also: erpimages(), phasecoher(), rmbase(), cbar(), movav()
+% See also: phasecoher, rmbase, cbar, movav
 
 % Copyright (C) Scott Makeig & Tzyy-Ping Jung, CNL / Salk Institute, La Jolla 3-2-98
 %
