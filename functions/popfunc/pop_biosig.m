@@ -85,7 +85,7 @@ if nargin < 1
     end;
     uilist = { uilist{:} ...
                  { 'style' 'text' 'String' 'Extract event - cannot be unset (set=yes)' } ...
-                 { 'style' 'checkbox' 'string' '' 'value' 1 'enable' 'off' } {} ...
+                 { 'style' 'checkbox' 'string' '' 'value' 1 'enable' 'on' } {} ...
                  { 'style' 'text' 'String' 'Import continuous data (set=yes)' 'value' 1} ...
                  { 'style' 'checkbox' 'string' '' 'value' 0 } {} ...
                  { 'style' 'text' 'String' 'Reference chan(s) indices - required for BIOSEMI' } ...
@@ -103,8 +103,8 @@ if nargin < 1
     if ~isempty(result{2}), options = { options{:} 'blockrange' eval( [ '[' result{2} ']' ] ) }; end;
     if length(result) > 2
         if ~isempty(result{5}), options = { options{:} 'ref'        eval( [ '[' result{5} ']' ] ) }; end;
-        if ~result{3},          options = { options{:} 'rmeventchan' 'off' }; end;
-        if  result{4},          options = { options{:} 'blockepoch'  'off'  }; end;
+        if ~result{3},          options = { options{:} 'importevent' 'off'  }; end;
+        if  result{4},          options = { options{:} 'blockepoch'  'off' }; end;
     end;
 else
     options = varargin;
@@ -116,6 +116,7 @@ g = finputcheck( options, { 'blockrange'  'integer' [0 Inf]    [];
                             'channels'    'integer' [0 Inf]    [];
                             'ref'         'integer' [0 Inf]    [];
                             'rmeventchan' 'string'  { 'on' 'off' } 'on';
+                            'importevent' 'string'  { 'on' 'off' } 'on';
                             'blockepoch'  'string'  { 'on' 'off' } 'off' }, 'pop_biosig');
 if isstr(g), error(g); end;
 
@@ -149,7 +150,7 @@ if ~isempty(newblockrange)
 else interval = [];
 end
     
-EEG = biosig2eeglab(dat, DAT, interval, g.channels);
+EEG = biosig2eeglab(dat, DAT, interval, g.channels, strcmpi(g.importevent, 'on'));
 
 if strcmpi(g.rmeventchan, 'on') & strcmpi(dat.TYPE, 'BDF') & isfield(dat, 'BDF')
     if size(EEG.data,1) >= dat.BDF.Status.Channel, 
