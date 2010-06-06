@@ -22,18 +22,21 @@
 % Inputs:
 %   EEG        - Input dataset. Data may already be epoched; in this case,
 %                extract (shorter) subepochs time locked to epoch events.
-%   typerange  - Cell array of event types to time lock to. See also: 'eventindices'
+%   typerange  - Cell array of event types to time lock to. 'eventindices'
 %                {default {} --> time lock epochs to any type of event}
-%                (Note: An event field called 'type' must be defined in the 'EEG.event' structure.
-%                See also: commandline argument 'eventindices' below).
-%   timelim    - Epoch latency limits [start end] in seconds relative to the time-locking event 
-%                {default: [-1 2]}
+%                (Note: An event field called 'type' must be defined in the 
+%                'EEG.event' structure. The command line argument is
+%                'eventindices' below).
+%   timelim    - Epoch latency limits [start end] in seconds relative to 
+%                the time-locking event {default: [-1 2]}
 %
 % Optional inputs:
-%   'eventindices'- [int indices] Extract data epochs time locked to the indexed event numbers. 
-%   'valuelim' - [min max] or [max]. Lower and upper bound latencies for trial data. 
-%                Else if one positive value is given, use its negative as the lower bound. 
-%                The given values are also considered outliers (min max) {default: none}
+%   'eventindices'- [int indices] Extract data epochs time locked to the 
+%                indexed event numbers. 
+%   'valuelim' - [min max] or [max]. Lower and upper bound latencies for 
+%                trial data. Else if one positive value is given, use its 
+%                negative as the lower bound. The given values are also 
+%                considered outliers (min max) {default: none}
 %   'verbose'  - ['yes'|'no'] {default: 'yes'}
 %   'newname'  - [string] New dataset name {default: "[old_dataset] epochs"}
 %   'epochinfo'- ['yes'|'no'] Propagate event information into the new
@@ -45,7 +48,7 @@
 %
 % Authors: Arnaud Delorme and Hilit Serby, SCCN, INC, UCSD, 2001
 %
-% See also: eeglab(), epoch() 
+% See also: eeglab, epoch
 
 % deprecated
 %   'timeunit' - Time unit ['seconds'|'points'] If 'seconds,' consider events 

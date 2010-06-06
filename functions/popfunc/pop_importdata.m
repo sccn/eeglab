@@ -34,13 +34,13 @@
 %                  can be a string, 'common' indicating an unknow common reference, 
 %                  'averef' indicating average reference, or an array of integer 
 %                  containing the indices of the reference channels.
-%   "Subject code" - [Edit box] subject code. For example, 'S01'. See also command
-%                    line equivalent 'subject'.
-%   "Task Condition" - [Edit box] task condition. For example, 'Targets'. See also
-%                    command line equivalent 'condition'.
+%   "Subject code" - [Edit box] subject code. For example, 'S01'. The command
+%                    line equivalent is 'subject'.
+%   "Task Condition" - [Edit box] task condition. For example, 'Targets'. The
+%                    command line equivalent is 'condition'.
 %   "Session number" - [Edit box] session number (from the same subject). All datasets
 %                   from the same subject and session will be assumed to use the
-%                   same ICA decomposition. See also command line equivalent 'session'.
+%                   same ICA decomposition. The command line equivalent is 'session'.
 %   "Subject group" - [Edit box] subject group. For example 'Patients' or 'Control'.
 %                   Command line equivalent is 'group'.
 %   "About this dataset" - [Edit box] Comments about the dataset. Command line 

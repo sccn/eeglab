@@ -71,7 +71,7 @@
 %                      events whose type will be the same as the name of
 %                      the latency field. (Ex: field RT -> type 'RT' events).
 %   'durationfields'  - {cell array} Field names that contain the duration 
-%                      of an event. See also graphic interface help above.
+%                      of an event. 
 %   'timeunit'       - [float] Optional unit for latencies relative to seconds. 
 %                      Ex: sec -> 1, msec -> 1e-3. Default: Assume latencies 
 %                      are in time points (relative to the time-zero time point 

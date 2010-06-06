@@ -10,7 +10,7 @@
 %               Leave this field blank to import new events. 
 %               Command line equivalent: 'indices'.
 %   "Append events?" - [checkbox] Check this checkbox to clear prior
-%               event information. See also the "Align event latencies ..."
+%               event information. In addition, see the "Align event latencies ..."
 %               edit box. Command line equivalent: 'append'.
 %   "Event file or array" - [edit box] Enter event file name. Use "Browse" 
 %               button to browse for a file. If a file with the given name
@@ -74,8 +74,7 @@
 %  'indices'  - {integer vector] Vector indicating the indices of the events to
 %               modify. 
 %  'align'    - [num] Align the first event latency to the latency of existing 
-%               event number (num), and check latency consistency. See also the 
-%               GUI help above.
+%               event number (num), and check latency consistency.
 %  'optimalign' - ['on'|'off'] Optimize the sampling rate of the new events so 
 %               they best align with old events. Default is 'on'.
 %

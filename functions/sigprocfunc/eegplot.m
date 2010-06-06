@@ -108,7 +108,7 @@
 %    'command'    - ['string'] Matlab command to evaluate when the 'REJECT' button is 
 %                   clicked. The 'REJECT' button is visible only if this parameter is 
 %                   not empty. As explained in the "Output" section below, the variable 
-%                   'TMPREJ' contains the rejected windows (See also: functions 
+%                   'TMPREJ' contains the rejected windows (see the functions 
 %                   eegplot2event() and eegplot2trial()).
 %    'butlabel'   - Reject button label. {default: 'REJECT'}
 %    'winrej'     - [start end R G B e1 e2 e3 ...] Matrix giving data periods to mark 
