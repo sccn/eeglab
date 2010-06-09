@@ -150,6 +150,8 @@ end
 %else                        X = TMP.data;
 %end;
 options = {};
+if ~isempty(g.rmcomps), options = { options{:} 'rmcomps' g.rmcomps }; end;
+if ~isempty(g.interp),  options = { options{:} 'interp' g.interp }; end;
 X       = [];
 for dat = 1:length(EEG)
     if strcmpi(prefix, 'comp')
@@ -159,10 +161,8 @@ for dat = 1:length(EEG)
         EEG(dat).trials = size(EEG(dat).data,3);
         EEG(dat).event  = [];
         EEG(dat).epoch  = [];
-        if ~isempty(g.rmcomps), options = { options{:} 'rmcomps' g.rmcomps }; end;
         if ~isempty(g.interp), 
             TMPEEG = eeg_interp(EEG(dat), g.interp, 'spherical'); 
-            options = { options{:} 'interp' g.interp };
             tmpdata = TMPEEG.data;
         else
             tmpdata = EEG(dat).data;
@@ -207,7 +207,7 @@ elseif strcmpi(g.savetrials, 'off')
 end;
 
 % Save ERPs in file (all components or channels)
-% ----------------------------------
+% ----------------------------------------------
 if isempty(timevals), timevals = linspace(EEG(1).xmin, EEG(1).xmax, EEG(1).pnts)*1000; end; % continuous data
 if strcmpi(prefix, 'comp')
     savetofile( filename, timevals, X, 'comp', 1:size(X,1), options);

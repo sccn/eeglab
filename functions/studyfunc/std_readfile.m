@@ -169,6 +169,7 @@ for fInd = 1:length(opt.dataindices) % usually only one value
     % --------------------------------------------
     if isfield(fileData, 'parameters')
         parameters = removedup(fileData.parameters);
+        for index = 1:length(parameters), if iscell(parameters{index}), parameters{index} = { parameters{index} }; end; end;
         parameters = struct(parameters{:});
     end;
     if isfield(fileData, 'times'),  measureRange1 = fileData.times; end;

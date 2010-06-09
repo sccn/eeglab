@@ -280,6 +280,8 @@ end;
 % end;
 
 options = {};
+if ~isempty(g.rmcomps), options = { options{:} 'rmcomps' g.rmcomps }; end;
+if ~isempty(g.interp),  options = { options{:} 'interp' g.interp }; end;
 if ~isempty(g.components)
     tmpdata = eeg_getdatact(EEG, 'component', g.indices, 'trialindices', g.trialindices{dat});
 else
@@ -288,10 +290,8 @@ else
     EEG.event  = [];
     EEG.epoch  = [];
     
-    if ~isempty(g.rmcomps), options = { options{:} 'rmcomps' g.rmcomps }; end;
     if ~isempty(g.interp), 
         EEG = eeg_interp(EEG, g.interp, 'spherical'); 
-        options = { options{:} 'interp' g.interp };
     end;
     
     % find channel index
