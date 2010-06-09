@@ -822,6 +822,9 @@ else
                     chaninfo.filename = template_models(2).chanfile;
                 end;
                 tmplocs = readlocs( chaninfo.filename, 'defaultelp', 'BESA' );
+                for indexchan = 1:length(chans)
+                    if isempty(chans(indexchan).labels), chans(indexchan).labels = ''; end;
+                end;
                 [tmp ind1 ind2] = intersect(lower({ tmplocs.labels }), lower({ chans.labels }));
                 if ~isempty(tmp)
                     chans = struct('labels', { chans.labels }, 'datachan', { chans.datachan }, 'type', { chans.type });
