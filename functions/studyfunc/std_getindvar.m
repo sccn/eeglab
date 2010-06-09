@@ -81,7 +81,10 @@ if strcmpi(mode, 'trialinfo') || strcmpi(mode, 'both')
             if isstr(getfield(setinfo(1).trialinfo(1), ff{index}))
                 alltmpvals = {};
                 for ind = 1:length(setinfo)
-                    eval( [ 'tmpvals = unique({ setinfo(ind).trialinfo.' ff{index} ' });' ] );
+                    if isfield(setinfo(ind).trialinfo, ff{index})
+                         eval( [ 'tmpvals = unique({ setinfo(ind).trialinfo.' ff{index} ' });' ] );
+                    else tmpvals = {};
+                    end;
                     alltmpvals = { alltmpvals{:} tmpvals{:} };
                 end;
                 alltmpvals = unique(alltmpvals);
