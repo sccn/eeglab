@@ -749,7 +749,10 @@ else
                         'TP9' 'TP7' 'CP5' 'CP3' 'CP1' 'CPz' 'CP2' 'CP4' 'CP6' 'TP8' 'TP10' 'P9' 'P7' 'P5' ...
                         'P3' 'P1' 'Pz' 'P2' 'P4' 'P6' 'P8' 'P10' 'PO9' 'PO7' 'PO3' 'POz' 'PO4' 'PO8' 'PO10' ...
                         'O1' 'Oz' 'O2' 'O9' 'O10' 'CB1' 'CB2' 'Iz' };
-                    [tmp1 ind1 ind2] = intersect( lower(standardchans), lower({ chans.labels }));
+                    for indexchan = 1:length(chans)
+                        if isempty(chans(indexchan).labels), chans(indexchan).labels = ''; end;
+                    end;
+                    [tmp1 ind1 ind2] = intersect( lower(standardchans), {chans.labels});
                     if ~isempty(tmp1) | isfield(chans, 'theta')
 
                         % finding template location files
@@ -821,7 +824,7 @@ else
                 tmplocs = readlocs( chaninfo.filename, 'defaultelp', 'BESA' );
                 [tmp ind1 ind2] = intersect(lower({ tmplocs.labels }), lower({ chans.labels }));
                 if ~isempty(tmp)
-                    chans = struct('labels', { chans.labels }, 'datachan', { chans.datachan });
+                    chans = struct('labels', { chans.labels }, 'datachan', { chans.datachan }, 'type', { chans.type });
                     [ind2 ind3] = sort(ind2);
                     ind1 = ind1(ind3);
                     
