@@ -35,139 +35,95 @@
 %
 % Main files:
 % ---------- 
-% eeglab()        - main graphic interface
-% license.txt     - GNU license
+% <a href="matlab:helpwin eeglab">eeglab</a>        - main graphic interface
+% <a href="matlab:helpwin license.txt">license.txt</a>   - GNU license
 % 
-% Functions added to EEGLAB: 
-% --------------------------------------------------------------------
-% cell2mat()      - cell to matrix, overwrites neural network toolbox function
-% compvar()       - compute component variance
-% convolve()      - smart conv2 (fewer boundary problems)
-% del2map()       - compute a surface Laplacian transform of the data
-% eegplot()       - scrolling multichannel data viewer (with data rejection)
-% eegplot2event() - process data rejection info from eegplot()
-% eegplot2trial() - process eegplot() rejection info
-% eegrej()        - reject portions of continuous eeg data
-% eegthresh()     - simple thresholding method
-% entropy()       - compute component entropy
-% epoch()         - extract epochs from a continuous dataset
-% fastif()        - fast if function
-% gabor2d()       - 2D Gabor matrix
-% gauss2d()       - 2D Gauss matrix
-% getallmenus()   - retrieve all menus of a GUI
-% gradmap()       - compute the gradient of a map
-% h()             - EEGLAB history function
-% help2html()     - help header to HTML file conversion
-% inputgui()      - function to program GUI (replace inputdlg)
-% jointprob()     - joint probability function
-% loadcnt()       - load continous CNT neuroscan file
-% laplac2d()      - generate a Laplacian matrix output
-% loadavg()       - load neuroscan .AVG file (not in EEGLAB, only for ERPs)
-% loaddat()       - load neuroscan .DAT file
-% loadeeg()       - load neuroscan .EEG file
-% loadtxt()       - load text file
-% makehtml()      - generate html pages for directories (uses help2html)
-% mat2cell()      - matrix to cell (local)
-% pophelp()       - format the help header  !!!
-% readedf()       - read binary EEG EDF file
-% readegi()       - read binary EEG EGI file 
-% readegihdr()    - read binary EEG EGI file header
-% rejkurt()       - calculate and reject data based on kurtosis
-% rejtrend()      - reject EEG showing linear trends  !!!
-% reref()         - re-reference data
-% slider()        - graphic slider function
-% supergui()      - allow generation of advanced GUI
-% readlocs()      - read location files .loc, .sph, .xyz, .elp (uses readelp)
-% parsetxt()      - parse a line of text for 
-% readelp()       - read Polhemus .ELP file
-% textgui()       - create a text window with sliders (for help text)
-%
 % GUI Functions calling eponymous processing and plotting functions:
 % ------------------------------------------------------------------
-% pop_eegfilt()   - bandpass filter data (eegfilt())
-% pop_eegplot()   - scrolling multichannel data viewer (eegplot())
-% pop_eegthresh() - simple thresholding method (eegthresh())
-% pop_envtopo()   - plot ERP data and component contributions (envtopo())
-% pop_epoch()     - extract epochs from a continuous dataset (epoch())
-% pop_erpimage()  - plot single epochs as an image (erpimage())
-% pop_jointprob() - reject epochs using joint probability (jointprob())
-% pop_loaddat()   - load Neuroscan .DAT info file (loaddat())
-% pop_loadcnt()   - load Neuroscan .CNT data (lndcnt())
-% pop_loadeeg()   - load Neuroscan .EEG data (loadeeg())
-% pop_loadbva()   - load Brain Vision Analyser matlab files
-% pop_plotdata()  - plot data epochs in rectangular array (plotdata())
-% pop_readegi()   - load binary EGI data file (readegi())
-% pop_rejkurt()   - compute data kurtosis (rejkurt())
-% pop_rejtrend()  - reject EEG epochs showing linear trends  (rejtrend())
-% pop_resample()  - change data sampling rate (resample())
-% pop_rmbase()    - remove epoch baseline (rmbase())
-% pop_runica()    - run infomax ICA decomposition (runica())
-% pop_newtimef()  - event-related time-frequency (newtimef())
-% pop_timtopo()   - plot ERP and scalp maps  (timtopo())
-% pop_topoplot()  - plot scalp maps (topoplot())
-% pop_snapread()  - read Snapmaster .SMA files (snapread())
-% pop_newcrossf() - event-related cross-coherence (newcrossf())
-% pop_spectopo()  - plot all channel spectra and scalp maps (spectopo())
-% pop_plottopo()  - plot a data epoch in a topographic array (plottopo())
-% pop_readedf()   - read .EDF EEG data format (readedf())
-% pop_headplot()  - plot a 3-D data scalp map (headplot())
-% pop_reref()     - re-reference data (reref())
-% pop_signalstat() - plot signal or component statistic (signalstat())
+% <a href="matlab:helpwin pop_eegfilt">pop_eegfilt</a>   - bandpass filter data (eegfilt())
+% <a href="matlab:helpwin pop_eegplot">pop_eegplot</a>   - scrolling multichannel data viewer (eegplot())
+% <a href="matlab:helpwin pop_eegthresh">pop_eegthresh</a> - simple thresholding method (eegthresh())
+% <a href="matlab:helpwin pop_envtopo">pop_envtopo</a>   - plot ERP data and component contributions (envtopo())
+% <a href="matlab:helpwin pop_epoch">pop_epoch</a>     - extract epochs from a continuous dataset (epoch())
+% <a href="matlab:helpwin pop_erpimage">pop_erpimage</a>  - plot single epochs as an image (erpimage())
+% <a href="matlab:helpwin pop_jointprob">pop_jointprob</a> - reject epochs using joint probability (jointprob())
+% <a href="matlab:helpwin pop_loaddat">pop_loaddat</a>   - load Neuroscan .DAT info file (loaddat())
+% <a href="matlab:helpwin pop_loadcnt">pop_loadcnt</a>   - load Neuroscan .CNT data (lndcnt())
+% <a href="matlab:helpwin pop_loadeeg">pop_loadeeg</a>   - load Neuroscan .EEG data (loadeeg())
+% <a href="matlab:helpwin pop_loadbva">pop_loadbva</a>   - load Brain Vision Analyser matlab files
+% <a href="matlab:helpwin pop_plotdata">pop_plotdata</a>  - plot data epochs in rectangular array (plotdata())
+% <a href="matlab:helpwin pop_readegi">pop_readegi</a>   - load binary EGI data file (readegi())
+% <a href="matlab:helpwin pop_rejkurt">pop_rejkurt</a>   - compute data kurtosis (rejkurt())
+% <a href="matlab:helpwin pop_rejtrend">pop_rejtrend</a>  - reject EEG epochs showing linear trends  (rejtrend())
+% <a href="matlab:helpwin pop_resample">pop_resample</a>  - change data sampling rate (resample())
+% <a href="matlab:helpwin pop_rmbase">pop_rmbase</a>    - remove epoch baseline (rmbase())
+% <a href="matlab:helpwin pop_runica">pop_runica</a>    - run infomax ICA decomposition (runica())
+% <a href="matlab:helpwin pop_newtimef">pop_newtimef</a>  - event-related time-frequency (newtimef())
+% <a href="matlab:helpwin pop_timtopo">pop_timtopo</a>   - plot ERP and scalp maps  (timtopo())
+% <a href="matlab:helpwin pop_topoplot">pop_topoplot</a>  - plot scalp maps (topoplot())
+% <a href="matlab:helpwin pop_snapread">pop_snapread</a>  - read Snapmaster .SMA files (snapread())
+% <a href="matlab:helpwin pop_newcrossf">pop_newcrossf</a> - event-related cross-coherence (newcrossf())
+% <a href="matlab:helpwin pop_spectopo">pop_spectopo</a>  - plot all channel spectra and scalp maps (spectopo())
+% <a href="matlab:helpwin pop_plottopo">pop_plottopo</a>  - plot a data epoch in a topographic array (plottopo())
+% <a href="matlab:helpwin pop_readedf">pop_readedf</a>   - read .EDF EEG data format (readedf())
+% <a href="matlab:helpwin pop_headplot">pop_headplot</a>  - plot a 3-D data scalp map (headplot())
+% <a href="matlab:helpwin pop_reref">pop_reref</a>     - re-reference data (reref())
+% <a href="matlab:helpwin pop_signalstat">pop_signalstat</a> - plot signal or component statistic (signalstat())
 %
 % Other GUI functions:
 % -------------------
-% pop_chanevent()      - import events stored in data channel(s)
-% pop_comments()       - edit dataset comment ('about') text
-% pop_compareerps()    - compare two dataset ERPs using plottopo()
-% pop_prop()           - plot channel or component properties (erpimage, spectra, map)
-% pop_copyset()        - copy dataset
-% pop_dispcomp()       - display component scalp maps with reject buttons
-% pop_editeventfield() - edit event fields
-% pop_editeventvals()  - edit event values
-% pop_editset()        - edit dataset information
-% pop_export()         - export data or ica activity to ASCII file
-% pop_expica()         - export ica weights or inverse matrix to ASCII file
-% pop_icathresh()      - choose rejection thresholds (in development)
-% pop_importepoch()    - import epoch info ASCII file
-% pop_importevent()    - import event info ASCII file
-% pop_importpres()     - import Presentation info file
-% pop_importev2()      - import Neuroscan ev2 file
-% pop_loadset()        - load dataset
-% pop_mergeset()       - merge two datasets
-% pop_rejepoch()       - reject pre-identified epochs in a EEG dataset
-% pop_rejspec()        - reject based on spectrum (computes spectrum -% eegthresh)
-% pop_saveh()          - save EEGLAB command history
-% pop_saveset()        - save dataset
-% pop_select()         - select data (epochs, time points, channels ...)
-% pop_selectevent()    - select events
-% pop_subcomp()        - subtract components from data
+% <a href="matlab:helpwin pop_chanevent">pop_chanevent</a>      - import events stored in data channel(s)
+% <a href="matlab:helpwin pop_comments">pop_comments</a>       - edit dataset comment ('about') text
+% <a href="matlab:helpwin pop_compareerps">pop_compareerps</a>    - compare two dataset ERPs using plottopo()
+% <a href="matlab:helpwin pop_prop">pop_prop</a>           - plot channel or component properties (erpimage, spectra, map)
+% <a href="matlab:helpwin pop_copyset">pop_copyset</a>        - copy dataset
+% <a href="matlab:helpwin pop_dispcomp">pop_dispcomp</a>       - display component scalp maps with reject buttons
+% <a href="matlab:helpwin pop_editeventfield">pop_editeventfield</a> - edit event fields
+% <a href="matlab:helpwin pop_editeventvals">pop_editeventvals</a>  - edit event values
+% <a href="matlab:helpwin pop_editset">pop_editset</a>        - edit dataset information
+% <a href="matlab:helpwin pop_export">pop_export</a>         - export data or ica activity to ASCII file
+% <a href="matlab:helpwin pop_expica">pop_expica</a>         - export ica weights or inverse matrix to ASCII file
+% <a href="matlab:helpwin pop_icathresh">pop_icathresh</a>      - choose rejection thresholds (in development)
+% <a href="matlab:helpwin pop_importepoch">pop_importepoch</a>    - import epoch info ASCII file
+% <a href="matlab:helpwin pop_importevent">pop_importevent</a>    - import event info ASCII file
+% <a href="matlab:helpwin pop_importpres">pop_importpres</a>     - import Presentation info file
+% <a href="matlab:helpwin pop_importev2">pop_importev2</a>      - import Neuroscan ev2 file
+% <a href="matlab:helpwin pop_loadset">pop_loadset</a>        - load dataset
+% <a href="matlab:helpwin pop_mergeset">pop_mergeset</a>       - merge two datasets
+% <a href="matlab:helpwin pop_rejepoch">pop_rejepoch</a>       - reject pre-identified epochs in a EEG dataset
+% <a href="matlab:helpwin pop_rejspec">pop_rejspec</a>        - reject based on spectrum (computes spectrum -% eegthresh)
+% <a href="matlab:helpwin pop_saveh">pop_saveh</a>          - save EEGLAB command history
+% <a href="matlab:helpwin pop_saveset">pop_saveset</a>        - save dataset
+% <a href="matlab:helpwin pop_select">pop_select</a>         - select data (epochs, time points, channels ...)
+% <a href="matlab:helpwin pop_selectevent">pop_selectevent</a>    - select events
+% <a href="matlab:helpwin pop_subcomp">pop_subcomp</a>        - subtract components from data
 %
 % Non-GUI functions use for handling the EEG structure:
 % ----------------------------------------------------
-% eeg_checkset()       - check dataset parameter consistency
-% eeg_context()        - return info about events surrounding given events
-% pop_delset()         - delete dataset
-% pop_editoptions()    - edit the option file
-% eeg_emptyset()       - empty dataset
-% eeg_epochformat()    - convert epoch array to structure
-% eeg_eventformat()    - convert event array to structure
-% eeg_getepochevent()  - return event values for a subset of event types
-% eeg_global()         - global variables
-% eeg_multieegplot()   - plot several rejections (using different colors)
-% eeg_options()        - option file
-% eeg_rejsuperpose()   - use by rejmenu to superpose all rejections
-% eeg_rejmacro()       - used by all rejection functions
-% pop_rejmenu()        - rejection menu (with all rejection methods visible)
-% eeg_retrieve()       - retrieve dataset from ALLEEG
-% eeg_store()          - store dataset into ALLEEG
+% <a href="matlab:helpwin eeg_checkset">eeg_checkset</a>       - check dataset parameter consistency
+% <a href="matlab:helpwin eeg_context">eeg_context</a>        - return info about events surrounding given events
+% <a href="matlab:helpwin pop_delset">pop_delset</a>         - delete dataset
+% <a href="matlab:helpwin pop_editoptions">pop_editoptions</a>    - edit the option file
+% <a href="matlab:helpwin eeg_emptyset">eeg_emptyset</a>       - empty dataset
+% <a href="matlab:helpwin eeg_epochformat">eeg_epochformat</a>    - convert epoch array to structure
+% <a href="matlab:helpwin eeg_eventformat">eeg_eventformat</a>    - convert event array to structure
+% <a href="matlab:helpwin eeg_getepochevent">eeg_getepochevent</a>  - return event values for a subset of event types
+% <a href="matlab:helpwin eeg_global">eeg_global</a>         - global variables
+% <a href="matlab:helpwin eeg_multieegplot">eeg_multieegplot</a>   - plot several rejections (using different colors)
+% <a href="matlab:helpwin eeg_options">eeg_options</a>        - option file
+% <a href="matlab:helpwin eeg_rejsuperpose">eeg_rejsuperpose</a>   - use by rejmenu to superpose all rejections
+% <a href="matlab:helpwin eeg_rejmacro">eeg_rejmacro</a>       - used by all rejection functions
+% <a href="matlab:helpwin pop_rejmenu">pop_rejmenu</a>        - rejection menu (with all rejection methods visible)
+% <a href="matlab:helpwin eeg_retrieve">eeg_retrieve</a>       - retrieve dataset from ALLEEG
+% <a href="matlab:helpwin eeg_store">eeg_store</a>          - store dataset into ALLEEG
 %
 % Help functions:
 % --------------
-% eeg_helpadmin()      - help on admin function
-% eeg_helphelp()       - help on help
-% eeg_helpmenu()       - EEG help menus
-% eeg_helppop()        - help on pop_ and eeg_ functions
-% eeg_helpsigproc()    - help on signal processing functions
+% <a href="matlab:helpwin eeg_helpadmin">eeg_helpadmin</a>      - help on admin function
+% <a href="matlab:helpwin eeg_helphelp">eeg_helphelp</a>       - help on help
+% <a href="matlab:helpwin eeg_helpmenu">eeg_helpmenu</a>       - EEG help menus
+% <a href="matlab:helpwin eeg_helppop">eeg_helppop</a>        - help on pop_ and eeg_ functions
+% <a href="matlab:helpwin eeg_helpsigproc">eeg_helpsigproc</a>    - help on
 
 % Copyright (C) 2001 Arnaud Delorme and Scott Makeig, Salk Institute, 
 % arno@salk.edu, smakeig@ucsd.edu.
@@ -600,8 +556,8 @@ catchstrs.update_study           = e_load_study;
     % BIOSIG MENUS
     % ------------
     if biosigflag
-        uimenu( neuro_m, 'Label', 'From Biosemi .BDF file', 'CallBack', cb_biosig, 'Separator', 'on'); 
-        uimenu( neuro_m, 'Label', 'From EDF files', 'CallBack'        , cb_biosig); 
+        uimenu( neuro_m, 'Label', 'From Biosemi BDF file (BIOSIG toolbox)', 'CallBack' , cb_biosig, 'Separator', 'on'); 
+        uimenu( neuro_m, 'Label', 'From EDF/EDF+/GDF files (BIOSIG toolbox)', 'CallBack', cb_biosig); 
     end;
     
     uimenu( epoch_m, 'Label', 'From Matlab array or ASCII file'       , 'CallBack', cb_importepoch);
@@ -792,9 +748,8 @@ catchstrs.update_study           = e_load_study;
         % --------------------------
         p = which('eeglab.m');
         p = p(1:findstr(p,'eeglab.m')-1);
-        dircontent1 = what(p);
-        dircontent  = dir([ p 'plugins' ]);
-        dircontent  = { dircontent1.m{:} dircontent.name };
+        dircontent  = dir(fullfile(p, 'plugins'));
+        dircontent  = { dircontent.name };
 
         % scan plugin folder
         % ------------------
@@ -868,10 +823,10 @@ catchstrs.update_study           = e_load_study;
                                    '''biosig.sourceforge.net/SupportedSystems.html (BIOSIG) for supported file formats)'',' ...
                                    ''' ''));' ];
     if exist('read_event')
-        uimenu( neuro_m, 'Label', 'From other formats using FILE-IO'  , 'CallBack', cb_fileio, 'separator', 'on'); 
+        uimenu( neuro_m, 'Label', 'From other formats using FILE-IO toolbox'  , 'CallBack', cb_fileio, 'separator', 'on'); 
     end;
     if biosigflag
-        uimenu( neuro_m, 'Label', 'From other formats using BIOSIG'   , 'CallBack', cb_biosig); 
+        uimenu( neuro_m, 'Label', 'From other formats using BIOSIG toolbox'   , 'CallBack', cb_biosig); 
     end;
     uimenu( neuro_m, 'Label', 'Troubleshooting, other data formats...', 'CallBack', cb_others);    
     
@@ -888,7 +843,7 @@ catchstrs.update_study           = e_load_study;
     icadefs; % containing PLUGINMENUCOLOR
     if length(fourthsub_m) > 11, set(fourthsub_m(1:end-11), 'foregroundcolor', PLUGINMENUCOLOR); end;
     if length(plotsub_m)   > 17, set(plotsub_m  (1:end-17), 'foregroundcolor', PLUGINMENUCOLOR); end;
-    if length(importsub_m) > 9,  set(importsub_m(1:end-9) , 'foregroundcolor', PLUGINMENUCOLOR); end;
+    if length(importsub_m) > 9,  set(importsub_m(1:end-8) , 'foregroundcolor', PLUGINMENUCOLOR); end;
     if length(epochsub_m ) > 3 , set(epochsub_m (1:end-3 ), 'foregroundcolor', PLUGINMENUCOLOR); end;
     if length(eventsub_m ) > 4 , set(eventsub_m (1:end-4 ), 'foregroundcolor', PLUGINMENUCOLOR); end;
     if length(exportsub_m) > 4 , set(exportsub_m(1:end-4 ), 'foregroundcolor', PLUGINMENUCOLOR); end;
@@ -1747,3 +1702,4 @@ if exist('isdeployed')
 else val = 0;
 end;
 
+function buildhelpmenu;
