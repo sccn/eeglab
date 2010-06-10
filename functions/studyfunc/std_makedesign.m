@@ -235,7 +235,7 @@ for n2 = 1:nf2, [ dats2{n2} dattrials2{n2} ] = std_selectdataset( STUDY, ALLEEG,
 % detect files from old format
 % ----------------------------
 if strcmpi(opt.defaultdesign, 'on')
-    if isempty(dir(fullfile(ALLEEG(1).filepath, '*.dat*'))) || isempty(dir(fullfile(ALLEEG(1).filepath, '*.ica*')))
+    if isempty(dir(fullfile(ALLEEG(1).filepath, '*.dat*'))) && isempty(dir(fullfile(ALLEEG(1).filepath, '*.ica*')))
         opt.defaultdesign = 'off';
     end;
 end;
