@@ -354,7 +354,6 @@
 
 function [P,R,mbase,timesout,freqs,Pboot,Rboot,alltfX,PA] = newtimef( data, frames, tlimits, Fs, varwin, varargin);
 
-
 % Note: Above, PA is output of 'phsamp','on'
 
 % For future 'timewarp' keyword help: 'timewarp' 3rd element {colors} contains a
@@ -369,6 +368,11 @@ function [P,R,mbase,timesout,freqs,Pboot,Rboot,alltfX,PA] = newtimef( data, fram
 %        But here, we consider    Phase(Pyy) = 0 and |Pyy| = 1 -> Pxy = Pxx
 %        Giving, R = |Sum(Pxx)|/Sum(|Pxx|), the inter-trial coherence (ITC)
 %        Also called 'phase-locking factor' by Tallon-Baudry et al. (1996)
+
+if nargin < 1
+    help newtimef;
+    return;
+end;
 
 % Read system (or directory) constants and preferences:
 % ------------------------------------------------------
@@ -575,6 +579,13 @@ if isfield(g,'timewarpfr')
         error('undocumented ''timewarpfr'' cell array may have at most 3 elements');
     end
 end
+
+if isempty(g.nfreqs)
+    verboseprintf(g.verbose, 'Warning: ''nfreqs'' input overwrite ''padratio''\n');
+end;
+if strcmpi(g.basenorm, 'on')
+    verboseprintf(g.verbose, 'Baseline normalization is on (results will be shown as z-scores)\n');
+end;
 
 if isfield(g,'timewarp') && ~isempty(g.timewarp)
     if ndims(data) == 3
