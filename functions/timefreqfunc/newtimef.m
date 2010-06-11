@@ -1152,7 +1152,7 @@ end;
 if size(g.baseline,2) == 2
     baseln = [];
     for index = 1:size(g.baseline,1)
-        tmptime   = find(timesout >= g.baseline(index,1) && timesout <= g.baseline(index,2));
+        tmptime   = find(timesout >= g.baseline(index,1) & timesout <= g.baseline(index,2));
         baseln = union(baseln, tmptime);
     end;
     if length(baseln)==0
