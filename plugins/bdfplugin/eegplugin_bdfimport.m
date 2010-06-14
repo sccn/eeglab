@@ -37,7 +37,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function vers = eegplugin_ctfimport(fig, trystrs, catchstrs)
+function vers = eegplugin_bdfimport(fig, trystrs, catchstrs)
 
     vers = 'bdfimport';
     if nargin < 3
@@ -46,7 +46,7 @@ function vers = eegplugin_ctfimport(fig, trystrs, catchstrs)
     
     % add folder to path
     % ------------------
-    if ~exist('readbdf')
+    if exist('readbdf', 'file')
         p = which('eegplugin_bdfimport.m');
         p = p(1:findstr(p,'eegplugin_bdfimport.m')-1);
         addpath(p);
@@ -62,4 +62,4 @@ function vers = eegplugin_ctfimport(fig, trystrs, catchstrs)
     
     % create menus
     % ------------
-    uimenu( menu, 'label', 'From EDF/BDF file (secondary backup funct.)', 'callback', comcnt, 'separator', 'on' );
+    uimenu( menu, 'label', 'From EDF and BDF files (BDF plugin)', 'callback', comcnt, 'position', 11);
