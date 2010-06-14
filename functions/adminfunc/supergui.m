@@ -212,14 +212,16 @@ for counter = 1:maxcount
         % ---------------
         if strcmpi(currentelem{1}, 'link2lines'), 
             currentelem(1) = []; 
+            hf1 = 3.6/2-0.3;
+            hf2 = 0.7/2-0.3;
             allhandlers(counter) = uicontrol(g.fig, 'unit', 'normalized', 'position', ...
-                                          [posx-width/2 posy+3.6*height/2 width/2 0.005].*s+q, 'style', 'pushbutton', 'string', '');
+                                          [posx-width/2 posy+hf1*height width/2 0.005].*s+q, 'style', 'pushbutton', 'string', '');
             allhandlers(counter) = uicontrol(g.fig, 'unit', 'normalized', 'position', ...
-                                          [posx-width/2 posy+0.7*height/2 width/2 0.005].*s+q, 'style', 'pushbutton', 'string', '');
+                                          [posx-width/2 posy+hf2*height width/2 0.005].*s+q, 'style', 'pushbutton', 'string', '');
             allhandlers(counter) = uicontrol(g.fig, 'unit', 'normalized', 'position', ...
-                                          [posx posy+0.7*height/2 0.005 3/2*height].*s+q, 'style', 'pushbutton', 'string', '');
+                                          [posx posy+hf2*height 0.005 (hf1-hf2+0.1)*height].*s+q, 'style', 'pushbutton', 'string', '');
             allhandlers(counter) = uicontrol(g.fig, 'unit', 'normalized', 'position', ...
-                                          [posx posy+2.1*height/2 width/2 0.005].*s+q, 'style', 'pushbutton', 'string', '');
+                                          [posx posy+(hf1+hf2)/2*height width/2 0.005].*s+q, 'style', 'pushbutton', 'string', '');
             allhandlers(counter) = 0;
         else
             if strcmpi(currentelem{1}, 'width'),
