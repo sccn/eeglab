@@ -141,7 +141,7 @@ for ind = 1:length(finalinds) % scan channels or components
                 datavals = [];
                 return;
             end;
-            allsubjects = { setinfo.subject };
+            allsubjects = { setinfo.case };
             for c = 1:nc
                 for g = 1:ng
                     if ~isempty(opt.channels)
