@@ -30,6 +30,8 @@
 
 function alllocs = eeg_mergelocs(varargin)
 
+persistent warning_shown;
+
 % sort by length
 % --------------
 len = cellfun(@length, varargin);
@@ -45,9 +47,12 @@ for index = 2:length(varargin)
     newlocs = myunion(alllocs, tmplocs);
     
     if length(newlocs) > length(union({ alllocs.labels }, { tmplocs.labels }))
-
-        disp('Warning: different channel montage order for the different datasets');
-
+        
+        if isempty(warning_shown)
+            disp('Warning: different channel montage order for the different datasets');
+            warning_shown = 1;
+        end;
+        
         % trying to preserve order of the longest array
         %----------------------------------------------
         if length(alllocs) < length(tmplocs)
