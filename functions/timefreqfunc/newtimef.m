@@ -1517,12 +1517,12 @@ switch lower(g.plotersp)
                 %PP = PP .* maskersp;
             elseif isempty(maskersp)
                 if size(PP,1) == size(Pboot,1) && size(PP,2) == size(Pboot,2)
-                    PP(find(PP > Pboot(:,:,1) && (PP < Pboot(:,:,2)))) = baseval;
+                    PP(find(PP > Pboot(:,:,1) & (PP < Pboot(:,:,2)))) = baseval;
                     Pboot = squeeze(mean(Pboot,2));
                     if size(Pboot,2) == 1, Pboot = Pboot'; end;
                 else
                     PP(find((PP > repmat(Pboot(:,1),[1 length(times)])) ...
-                        && (PP < repmat(Pboot(:,2),[1 length(times)])))) = baseval;
+                        & (PP < repmat(Pboot(:,2),[1 length(times)])))) = baseval;
                 end
             end;
         end;
@@ -1688,7 +1688,7 @@ switch lower(g.plotitc)
             elseif isempty(maskitc)
                 if size(RR,1) == size(Rboot,1) && size(RR,2) == size(Rboot,2)
                     tmp = gcf;
-                    if size(Rboot,3) == 2	 RR(find(RR > Rboot(:,:,1) && RR < Rboot(:,:,2))) = 0;
+                    if size(Rboot,3) == 2	 RR(find(RR > Rboot(:,:,1) & RR < Rboot(:,:,2))) = 0;
                     else                   RR(find(RR < Rboot)) = 0;
                     end;
                     Rboot = mean(Rboot(:,:,end),2);
