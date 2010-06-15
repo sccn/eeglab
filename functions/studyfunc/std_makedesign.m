@@ -216,7 +216,7 @@ datselect = [1:length(STUDY.datasetinfo)];
 if ~isempty(opt.datselect)
     fprintf('Data preselection for STUDY design\n');
     for ind = 1:2:length(opt.datselect)
-        [ dattmp dattrialstmp ] = std_selectdataset( STUDY, opt.datselect{ind}, opt.datselect{ind+1});
+        [ dattmp dattrialstmp ] = std_selectdataset( STUDY, ALLEEG, opt.datselect{ind}, opt.datselect{ind+1});
         datselect      = intersect(datselect, dattmp);
         dattrialselect = intersectcell(dattrialselect, dattrialstmp);
     end;
