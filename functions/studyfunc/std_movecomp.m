@@ -117,6 +117,15 @@ if ~isempty(STUDY.cluster(old_clus).preclust.preclustdata)
     catch, % this generates an unknown error but I was not able to reproduce it - AD Sept. 26, 2009        
     end;
 end;
+
+% update the component indices
+% ----------------------------
+STUDY.cluster(1).setinds = {};
+STUDY.cluster(1).allinds = {};
+for index = 1:length(STUDY.cluster)
+    STUDY.cluster(index) = std_setcomps2cell(STUDY, index);
+end;
+
 disp('Done.');
 
 % remove cluster information
