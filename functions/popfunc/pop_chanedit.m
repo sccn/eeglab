@@ -591,8 +591,10 @@ else
                 if length( tmpargs ) < 3
                     error('pop_chanedit: not enough arguments to change field value');
                 end;
+                if ~isempty(strmatch( tmpargs{2}, { 'X' 'Y' 'Z' 'theta' 'radius' 'sph_theta' 'sph_phi' 'sph_radius'}))
+                     if ~isnumeric(tmpargs{3}), tmpargs{3} = str2num(tmpargs{3}); end;
+                end;
                 eval([ 'chans(' int2str(tmpargs{1}) ').'  tmpargs{2} '=' reformat(tmpargs{3} ) ';' ]);
-                
             case { 'insert' 'add' 'append' }
                 tmpargs = args{ curfield+1 };
                 allfields = fieldnames(chans);
