@@ -77,7 +77,7 @@ if nargin < 3 % Open GUI input window
     % remove old spline file
     % ----------------------
     if isfield(EEG, 'splinefile') 
-        if ~isempty(EEG.splinefile)
+        if ~isempty(EEG.splinefile) && exist(EEG.splinefile, 'file')
             splfile = dir(EEG.splinefile);
             byteperelec = splfile.bytes/EEG.nbchan;
             if byteperelec/EEG.nbchan < 625, % old head plot file
@@ -92,7 +92,7 @@ if nargin < 3 % Open GUI input window
     compute_file = 0;
     if typeplot == 1 % ********** data plot
         fieldname    = 'splinefile';        
-        if isempty(EEG.splinefile)            
+        if isempty(EEG.splinefile) && exist(EEG.splinefile, 'file')          
             if length(EEG.icachansind) == EEG.nbchan & ~isempty(EEG.icasplinefile)
                 EEG.splinefile = EEG.icasplinefile;
             else
@@ -101,7 +101,7 @@ if nargin < 3 % Open GUI input window
         end;
     else % ************* Component plot       
         fieldname    = 'icasplinefile';
-        if isempty(EEG.icasplinefile)
+        if isempty(EEG.icasplinefile) && exist(EEG.icasplinefile, 'file')
             if length(EEG.icachansind) == EEG.nbchan & ~isempty(EEG.splinefile)
                 EEG.icasplinefile = EEG.splinefile;
             else
