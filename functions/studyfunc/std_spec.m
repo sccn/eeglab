@@ -171,7 +171,7 @@ if ~strcmpi(g.specmode, 'psd')
     if EEG(1).trials == 1, 
         EEG = eeg_checkset(EEG, 'loaddata');
         EEG = eeg_regepochs(EEG, g.epochrecur, g.epochlim);
-        g.trialindices = { [1:EEG.trials] };
+        g.trialindices = { [1:EEG(1).trials] };
         disp('Warning: continuous data, extracting 1-second epochs'); 
     end;
 end;
@@ -260,7 +260,7 @@ elseif strcmpi(g.specmode, 'pburg')
     end;
 else % fft mode
     tmp   = fft(X, g.nfft, 2);
-    f     = linspace(0, EEG.srate/2, size(tmp,2)/2);
+    f     = linspace(0, EEG(1).srate/2, size(tmp,2)/2);
     f     = f(2:end); % remove DC (match the output of PSD)
     tmp   = tmp(:,2:size(tmp,2)/2,:);
     X     = 10*log10(abs(tmp).^2);    
