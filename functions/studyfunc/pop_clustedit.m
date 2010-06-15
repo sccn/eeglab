@@ -320,11 +320,11 @@ if ~isstr(varargin{1})
 
     % enable buttons
     % --------------
-    filename = fullfile( ALLEEG(1).filepath, ALLEEG(1).filename(1:end-3));
-    if exist([filename 'icaspec']) , spec_enable = 'on'; else spec_enable  = 'off'; end;
-    if exist([filename 'icaerp'] )  , erp_enable = 'on'; else erp_enable   = 'off'; end;
-    if exist([filename 'icatopo']), scalp_enable = 'on'; else scalp_enable = 'off'; end;
-    if exist([filename 'icaersp']) , ersp_enable = 'on'; else ersp_enable  = 'off'; end;
+    filename = STUDY.design(STUDY.currentdesign).cell(1).filebase;
+    if exist([filename '.icaspec']) , spec_enable = 'on'; else spec_enable  = 'off'; end;
+    if exist([filename '.icaerp'] )  , erp_enable = 'on'; else erp_enable   = 'off'; end;
+    if exist([filename '.icatopo']), scalp_enable = 'on'; else scalp_enable = 'off'; end;
+    if exist([filename '.icaersp']) , ersp_enable = 'on'; else ersp_enable  = 'off'; end;
     
     if isfield(ALLEEG(1).dipfit, 'model'), dip_enable   = 'on'; else dip_enable   = 'off'; end;
     
@@ -335,11 +335,13 @@ if ~isstr(varargin{1})
     fig_arg{1}{3} = cls;
     fig_arg{2}    = N;
         
+    str_name       = sprintf('STUDY ''%s'' - ''%s'' component clusters', STUDY.name, STUDY.design(STUDY.currentdesign).name);
+    if length(str_name) > 80, str_name = [ str_name(1:80) '...''' ]; end;
     if length(cls) > 1, vallist = 1; else vallist = 2; end;
     geometry = { [4 .1 .1 .1 .1] [1] [1 0.3 1] [1 0.3 1] [1 0.3 1] [1 0.3 1] [1 0.3 1] [1 0.3 1] [1 0.3 1] ...
                  [1 0.3 1] [1 0.3 1] [1] [1 0.3 1] [1 0.3 1] [1 0.3 1] };
     uilist   = { ...
-        {'style' 'text' 'string' ['Study name: ''' STUDY.name ''' (' num2str(clus_comps) ' of ' num2str(all_comps) ' components clustered)' ] ...
+        {'style' 'text' 'string' str_name ...
             'FontWeight' 'Bold' 'HorizontalAlignment' 'center'} {} {} {} {} {} ...
         {'style' 'text'       'string' 'Select cluster to plot' 'FontWeight' 'Bold' } {} ...
         {'style' 'text'       'string' 'Select component(s) to plot      ' 'FontWeight' 'Bold'} ...
@@ -368,7 +370,7 @@ if ~isstr(varargin{1})
         {'style' 'pushbutton' 'string' 'Rename selected cluster' 'Callback' rename_clust } {} ...
         {'style' 'pushbutton' 'string' 'Remove selected outlier comps.' 'Callback' move_outlier} ...
         {'style' 'pushbutton' 'string' 'Merge clusters' 'Callback' merge_clusters 'enable' 'off' } {} ...
-        {'style' 'pushbutton' 'string' 'Auto-reject outlier components' 'Callback' reject_outliers} };
+        {'style' 'pushbutton' 'string' 'Auto-reject outlier components' 'Callback' reject_outliers 'enable' 'off' } };
     
    [out_param userdat] = inputgui( 'geometry' , geometry, 'uilist', uilist, ...
                                    'helpcom', 'pophelp(''pop_clustoutput'')', ...
