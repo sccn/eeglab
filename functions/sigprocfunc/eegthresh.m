@@ -58,11 +58,13 @@ if nargin < 7
 	return;
 end;
 
-if starttime < timerange(1) | starttime > timerange(2)
-	error('starting point out of range, check');
+if starttime < timerange(1)
+	warning('eegthresh: starting point out of range, adjusted');
+    startime = timerange(1);
 end;	
-if endtime < timerange(1) | endtime > timerange(2)
-	error('ending point out of range, check');
+if endtime > timerange(2)
+	warning('eegthresh: ending point out of range, adjusted');
+    endtime = timerange(2);
 end;	
 
 % complete thresholds values if necessary
