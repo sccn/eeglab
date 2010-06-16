@@ -161,8 +161,10 @@ for ind = 1:length(finalinds) % scan channels or components
         else
             for c = 1:nc
                 for g = 1:ng
-                    if strcmpi(dtype, 'erp') alldata{c, g} = std_readfile( setinfo(setinds{c,g}(:)), 'measure', 'erp' , 'dataindices', allinds{c,g}(:), 'timelimits', opt.timerange);
-                    else                     alldata{c, g} = std_readfile( setinfo(setinds{c,g}(:)), 'measure', 'spec', 'dataindices', allinds{c,g}(:), 'freqlimits', opt.freqrange);
+                    if ~isempty(setinds{c,g})
+                        if strcmpi(dtype, 'erp') alldata{c, g} = std_readfile( setinfo(setinds{c,g}(:)), 'measure', 'erp' , 'dataindices', allinds{c,g}(:), 'timelimits', opt.timerange);
+                        else                     alldata{c, g} = std_readfile( setinfo(setinds{c,g}(:)), 'measure', 'spec', 'dataindices', allinds{c,g}(:), 'freqlimits', opt.freqrange);
+                        end;
                     end;
                 end;
             end;
