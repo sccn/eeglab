@@ -45,14 +45,29 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [STUDY, erspdata, alltimes, allfreqs] = std_readersp(STUDY, ALLEEG, varargin)
+function [STUDY, erspdata, alltimes, allfreqs, erspbase] = std_readersp(STUDY, ALLEEG, varargin)
 
 if nargin < 2
     help std_readersp;
     return;
 end
 if ~isstruct(ALLEEG) % old calling format
-    [STUDY, erspdata] = std_readerspsub(STUDY, ALLEEG, varargin{:});
+    dataset = ALLEEG;
+    EEG = STUDY(dataset);
+    comp = varargin{1};
+    if length(varargin) > 1, timelim = varargin{2}; else timelim = []; end;
+    if length(varargin) > 2, freqlim = varargin{3}; else freqlim = []; end;
+    filebase = fullfile(EEG.filepath, EEG.filename(1:end-4));
+    if comp < 0
+        error('Old format function call, channel reading not supported');
+        [ersp params alltimes allfreqs] = std_readfile(filebase, 'channels', -comp, 'timelimits', timelim, 'freqlimits', freqlim);
+    else
+        [ersp     params alltimes allfreqs] = std_readfile(filebase, 'components', comp, 'timelimits', timelim, 'freqlimits', freqlim, 'measure', 'ersp');
+        [erspbase params alltimes allfreqs] = std_readfile(filebase, 'components', comp, 'timelimits', timelim, 'freqlimits', freqlim, 'measure', 'erspbase');
+    end;
+    STUDY = ersp;
+    erspdata = allfreqs;
+    allfreqs = params;
     return;
 end;
 
@@ -246,9 +261,7 @@ for ind = 1:length(finalinds)
                     if strcmpi(opt.singletrials, 'on'), tmpmeanpowbase = repmat(meanpowbase, [1 length(alltimes) tottrials{c,g}]);
                     else                                tmpmeanpowbase = repmat(meanpowbase, [1 length(alltimes) 1]);
                     end;
-                    ersp{c,g} = ersp{c,g}./repmat(abs(erspbasetmp), [1 length(alltimes) 1 1]).*tmpmeanpowbase;
-                    % additive baseline
-                    % ersp{c,g} = ersp{c,g} - repmat(abs(erspbasetmp), [1 length(alltimes) 1 1]) + tmpmeanpowbase;
+                    ersp{c,g} = ersp{c,g} - repmat(abs(erspbasetmp), [1 length(alltimes) 1 1]) + tmpmeanpowbase;
                 end;
                 clear meanpowbase;
             end;
