@@ -47,9 +47,19 @@ set(gcf, 'name', Title);
 
 listui = {};
 geometry = {};
-for index = 1:size(Prompt,1)
-    geometry{index} = [1];
-    listui{index} = { 'Style', 'text', 'string' Prompt(index,:) };
+if ~isempty(find(Prompt == 10))
+    indlines = find(Prompt == 10);
+    if indlines(1) ~= 1, indlines = [ 0 indlines ]; end;
+    if indlines(end) ~= length(Prompt), indlines = [ indlines length(Prompt)+1 ]; end;
+    for index = 1:length(indlines)-1
+        geometry{index} = [1];
+        listui{index} = { 'Style', 'text', 'string' Prompt(indlines(index)+1:indlines(index+1)-1) };
+    end;
+else
+    for index = 1:size(Prompt,1)
+        geometry{index} = [1];
+        listui{index} = { 'Style', 'text', 'string' Prompt(index,:) };
+    end;
 end;
 listui{end+1} = {};
 
