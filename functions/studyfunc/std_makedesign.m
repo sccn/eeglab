@@ -235,7 +235,7 @@ for n2 = 1:nf2, [ dats2{n2} dattrials2{n2} ] = std_selectdataset( STUDY, ALLEEG,
 % detect files from old format
 % ----------------------------
 if strcmpi(opt.defaultdesign, 'off') && designind <= length(STUDY.design)
-    try, newfilename = strcmpi(STUDY.design(designind).cell(1).filebase(1:6), 'design'); catch, newfilename = 0; end;
+    try, newfilename = isempty(findstr('design', STUDY.design(1).cell(1).filebase)); end;
     if ~newfilename && (~isempty(dir(fullfile(ALLEEG(1).filepath, '*.dat*'))) || ~isempty(dir(fullfile(ALLEEG(1).filepath, '*.ica*'))))
         opt.defaultdesign = 'on';
     end;
