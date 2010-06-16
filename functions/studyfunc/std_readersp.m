@@ -197,16 +197,18 @@ for ind = 1:length(finalinds)
         else
             for c = 1:nc
                 for g = 1:ng
-                    options = { 'dataindices', allinds{c,g}(:), 'timelimits', opt.timerange, 'freqlimits', opt.freqrange };
-                    if strcmpi(dtype, 'ersp') 
-                         erspbase{c, g}                             = std_readfile( setinfo(setinds{c,g}(:)), 'measure', 'erspbase', options{:});
-                         [ ersp{c, g} tmpparams alltimes allfreqs ] = std_readfile( setinfo(setinds{c,g}(:)), 'measure', 'ersp'    , options{:});
-                    else [ ersp{c, g} tmpparams alltimes allfreqs ] = std_readfile( setinfo(setinds{c,g}(:)), 'measure', 'itc'     , options{:});
-                         ersp{c, g} = abs(ersp{c, g});
+                    if ~isempty(setinds{c,g})
+                        options = { 'dataindices', allinds{c,g}(:), 'timelimits', opt.timerange, 'freqlimits', opt.freqrange };
+                        if strcmpi(dtype, 'ersp') 
+                             erspbase{c, g}                             = std_readfile( setinfo(setinds{c,g}(:)), 'measure', 'erspbase', options{:});
+                             [ ersp{c, g} tmpparams alltimes allfreqs ] = std_readfile( setinfo(setinds{c,g}(:)), 'measure', 'ersp'    , options{:});
+                        else [ ersp{c, g} tmpparams alltimes allfreqs ] = std_readfile( setinfo(setinds{c,g}(:)), 'measure', 'itc'     , options{:});
+                             ersp{c, g} = abs(ersp{c, g});
+                        end;
+                        fprintf('.');
+                        %ersp{c, g}      = permute(ersp{c, g}           , [3 2 1]);
+                        %erspbase{c, g}  = 10*log(permute(erspbase{c, g}, [3 2 1]));
                     end;
-                    fprintf('.');
-                    %ersp{c, g}      = permute(ersp{c, g}           , [3 2 1]);
-                    %erspbase{c, g}  = 10*log(permute(erspbase{c, g}, [3 2 1]));
                 end;
             end;
         end;
