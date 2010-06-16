@@ -246,7 +246,9 @@ for ind = 1:length(finalinds)
                     if strcmpi(opt.singletrials, 'on'), tmpmeanpowbase = repmat(meanpowbase, [1 length(alltimes) tottrials{c,g}]);
                     else                                tmpmeanpowbase = repmat(meanpowbase, [1 length(alltimes) 1]);
                     end;
-                    ersp{c,g} = ersp{c,g} - repmat(abs(erspbasetmp), [1 length(alltimes) 1 1]) + tmpmeanpowbase;
+                    ersp{c,g} = ersp{c,g}./repmat(abs(erspbasetmp), [1 length(alltimes) 1 1]).*tmpmeanpowbase;
+                    % additive baseline
+                    % ersp{c,g} = ersp{c,g} - repmat(abs(erspbasetmp), [1 length(alltimes) 1 1]) + tmpmeanpowbase;
                 end;
                 clear meanpowbase;
             end;
