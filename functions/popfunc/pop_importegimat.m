@@ -77,21 +77,22 @@ function [EEG com] = pop_importegimat(filename, srate, latpoint0);
     latency = (latpoint0/1000)*EEG.srate+1;
     for index = 1:length(datatypes)
         tindex = 1;
-        while isfield(tmpdata, sprintf('%s_Segment%d', datatypes{index}, tindex))
-            datatrial = getfield(tmpdata, sprintf('%s_Segment%d', datatypes{index}, tindex));
-            if counttrial == 1
-                EEG.pnts = size(datatrial,2);
-                EEG.data = repmat(single(0), [size(datatrial,1), size(datatrial,2), 1000]);
+        for tindex = 1:ceil(length(allfields)/length(datatypes))
+            if isfield(tmpdata, sprintf('%s_Segment%d', datatypes{index}, tindex))
+                datatrial = getfield(tmpdata, sprintf('%s_Segment%d', datatypes{index}, tindex));
+                if counttrial == 1
+                    EEG.pnts = size(datatrial,2);
+                    EEG.data = repmat(single(0), [size(datatrial,1), size(datatrial,2), 1000]);
+                end;
+                EEG.data(:,:,counttrial) = datatrial;
+
+                EEG.event(counttrial).type    = datatypes{index};
+                EEG.event(counttrial).latency = latency;
+                EEG.event(counttrial).epoch   = counttrial;
+
+                counttrial = counttrial+1;
+                latency = latency + EEG.pnts;
             end;
-            EEG.data(:,:,counttrial) = datatrial;
-            
-            EEG.event(counttrial).type    = datatypes{index};
-            EEG.event(counttrial).latency = latency;
-            EEG.event(counttrial).epoch   = counttrial;
-            
-            counttrial = counttrial+1;
-            tindex     = tindex + 1;
-            latency = latency + EEG.pnts;
         end;
     end;
     fprintf('%d trials read\n', counttrial-1);
