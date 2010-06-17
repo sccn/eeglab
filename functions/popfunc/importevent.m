@@ -99,7 +99,7 @@ g = finputcheck( varargin, { 'fields'    'cell'     []         {};
                          'event'     { 'cell' 'real' 'string' }     []    [];
                          'align'     'integer'  []         NaN;
                          'optimalign' 'string'  { 'on' 'off' }         'on';
-                         'delim'     {'integer' 'string'}   []         char([9 32])}, 'importevent');
+                         'delim'     {'integer' 'string'}   []         char([9 32 44])}, 'importevent');
 if isstr(g), error(g); end;
 if ~isempty(g.indices), g.append = 'yes'; end;
 g.delim = char(g.delim);    
@@ -223,7 +223,7 @@ end;
 function array = load_file_or_array( varname, skipline, delim );
     if isstr(varname) & exist(varname) == 2  % mean that it is a filename
                                              % --------------------------
-        array = loadtxt( varname, 'skipline', skipline, 'delim', delim );
+        array = loadtxt( varname, 'skipline', skipline, 'delim', delim, 'uniformdelim', 'on', 'blankcell', 'off' );
         
     else % variable in the global workspace
          % --------------------------
