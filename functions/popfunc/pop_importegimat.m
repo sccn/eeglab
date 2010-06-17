@@ -77,7 +77,7 @@ function [EEG com] = pop_importegimat(filename, srate, latpoint0);
     latency = (latpoint0/1000)*EEG.srate+1;
     for index = 1:length(datatypes)
         tindex = 1;
-        for tindex = 1:ceil(length(allfields)/length(datatypes))
+        for tindex = 1:length(allfields)
             if isfield(tmpdata, sprintf('%s_Segment%d', datatypes{index}, tindex))
                 datatrial = getfield(tmpdata, sprintf('%s_Segment%d', datatypes{index}, tindex));
                 if counttrial == 1
