@@ -223,7 +223,7 @@ end;
 function array = load_file_or_array( varname, skipline, delim );
     if isstr(varname) & exist(varname) == 2  % mean that it is a filename
                                              % --------------------------
-        array = loadtxt( varname, 'skipline', skipline, 'delim', delim, 'uniformdelim', 'on', 'blankcell', 'off' );
+        array = loadtxt( varname, 'skipline', skipline, 'delim', delim, 'blankcell', 'off' );
         
     else % variable in the global workspace
          % --------------------------

@@ -19,7 +19,6 @@
 %                i.e space and tab}. It is also possible to enter 
 %                strings, Ex: [9 ' ' ','].
 %   'blankcell' - ['on'|'off'] extract blank cells {default:'on'}
-%   'uniformdelim' - ['on'|'off'] delimiters are all equivalent {default:'on'}
 %   'verbose'  - ['on'|'off'] {default:'on'}
 %   'nlines'   - [integer] number of lines to read {default: all file}
 %
@@ -73,6 +72,7 @@ g = finputcheck( varargin, { 'convert'   'string'   { 'on' 'off' 'force' }   'on
                              'delim'     { 'integer' 'string' } []               [9 32];
                              'nlines'    'integer'  []               Inf });
 if isstr(g), error(g); end;
+if strcmpi(g.blankcell, 'off'), g.uniformdelim = 'on'; end;
 g.convert = lower(g.convert);
 g.verbose = lower(g.verbose);
 g.delim = char(g.delim);
