@@ -187,6 +187,7 @@ end;
 if ~iseeglabdeployed2
     myaddpath( eeglabpath, 'readeetraklocs.m', [ 'functions' filesep 'sigprocfunc'  ]);
     myaddpath( eeglabpath, 'eeg_checkset.m',   [ 'functions' filesep 'adminfunc'    ]);
+    myaddpath( eeglabpath, 'supergui.m',       [ 'functions' filesep 'guifunc'      ]);
     myaddpath( eeglabpath, 'pop_study.m',      [ 'functions' filesep 'studyfunc'    ]);
     myaddpath( eeglabpath, 'pop_loadbci.m',    [ 'functions' filesep 'popfunc'      ]);
     myaddpath( eeglabpath, 'statcond.m',       [ 'functions' filesep 'statistics'   ]);
