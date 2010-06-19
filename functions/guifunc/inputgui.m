@@ -96,77 +96,84 @@ g = finputcheck(options, { 'geom'     'cell'                []      {}; ...
                            'title'    'string'              []      ''; ...
                            'eval'     'string'              []      ''; ...
                            'userdata' ''                    []      []; ...
+                           'getresult' 'real'               []      []; ...
                            'mode'     ''                    []      'normal'; ...
                            'geomvert' 'real'                []       [] ...
                           }, 'inputgui');
 if isstr(g), error(g); end;
 
-if isstr(g.mode)
-	fig = figure('visible', 'off');
-	set(fig, 'name', g.title);
-	set(fig, 'userdata', g.userdata);
-    if ~iscell( g.geometry )
-        oldgeom = g.geometry;
-        g.geometry = {};
-        for row = 1:length(oldgeom)
-            g.geometry = { g.geometry{:} ones(1, oldgeom(row)) };
+if isempty(g.getresult)
+    if isstr(g.mode)
+        fig = figure('visible', 'off');
+        set(fig, 'name', g.title);
+        set(fig, 'userdata', g.userdata);
+        if ~iscell( g.geometry )
+            oldgeom = g.geometry;
+            g.geometry = {};
+            for row = 1:length(oldgeom)
+                g.geometry = { g.geometry{:} ones(1, oldgeom(row)) };
+            end;
+        end
+        g.geometry = { g.geometry{:} [1] [1 1 1] }; % add button to geometry
+        if ~isempty(g.geom)
+            for ind = 1:length(g.geom)
+                g.geom{ind}{2} = g.geom{ind}{2}+2;
+            end;
+            g.geom = { g.geom{:} ...
+                      {1 g.geom{1}{2} [0 g.geom{1}{2}-2] [1 1] } ... 
+                      {3 g.geom{1}{2} [0 g.geom{1}{2}-1] [1 1] } ... 
+                      {3 g.geom{1}{2} [1 g.geom{1}{2}-1] [1 1] } ...
+                      {3 g.geom{1}{2} [2 g.geom{1}{2}-1] [1 1] } };
         end;
-    end
-	g.geometry = { g.geometry{:} [1] [1 1 1] }; % add button to geometry
-    if ~isempty(g.geom)
-        for ind = 1:length(g.geom)
-            g.geom{ind}{2} = g.geom{ind}{2}+2;
-        end;
-        g.geom = { g.geom{:} ...
-                  {1 g.geom{1}{2} [0 g.geom{1}{2}-2] [1 1] } ... 
-                  {3 g.geom{1}{2} [0 g.geom{1}{2}-1] [1 1] } ... 
-                  {3 g.geom{1}{2} [1 g.geom{1}{2}-1] [1 1] } ...
-                  {3 g.geom{1}{2} [2 g.geom{1}{2}-1] [1 1] } };
-    end;
-	
-	% add the three buttons (CANCEL HELP OK) at the bottom of the GUI
-	% ---------------------------------------------------------------
-	g.uilist = { g.uilist{:}, {} };
-    options = { 'width' 80 'stickto' 'on' };
-	if ~isempty(g.helpcom)
-        if ~iscell(g.helpcom) | isempty(g.geom)
-            g.uilist = { g.uilist{:}, { 'width' 80 'align' 'left' 'Style', 'pushbutton', 'string', 'Help', 'tag', 'help', 'callback', g.helpcom } };
+
+        % add the three buttons (CANCEL HELP OK) at the bottom of the GUI
+        % ---------------------------------------------------------------
+        g.uilist = { g.uilist{:}, {} };
+        options = { 'width' 80 'stickto' 'on' };
+        if ~isempty(g.helpcom)
+            if ~iscell(g.helpcom) | isempty(g.geom)
+                g.uilist = { g.uilist{:}, { 'width' 80 'align' 'left' 'Style', 'pushbutton', 'string', 'Help', 'tag', 'help', 'callback', g.helpcom } };
+            else
+                g.uilist = { g.uilist{:}, { 'width' 80 'align' 'left' 'Style', 'pushbutton', 'string', 'Help gui', 'callback', g.helpcom{1} } };
+                g.uilist = { g.uilist{:}, { 'width' 80 'align' 'left' 'Style', 'pushbutton', 'string', 'More help', 'callback', g.helpcom{2} } };
+                g.geometry{end} = [1 1 1 1];
+            end;
         else
-            g.uilist = { g.uilist{:}, { 'width' 80 'align' 'left' 'Style', 'pushbutton', 'string', 'Help gui', 'callback', g.helpcom{1} } };
-            g.uilist = { g.uilist{:}, { 'width' 80 'align' 'left' 'Style', 'pushbutton', 'string', 'More help', 'callback', g.helpcom{2} } };
-            g.geometry{end} = [1 1 1 1];
+            g.uilist = { g.uilist{:}, {} };
         end;
-	else
-		g.uilist = { g.uilist{:}, {} };
-	end;
-	g.uilist = { g.uilist{:}, { 'width' 80 'align' 'right' 'Style', 'pushbutton', 'string', 'Cancel', 'tag' 'cancel' 'callback', 'close gcbf' } };
-	g.uilist = { g.uilist{:}, { 'width' 80 'align' 'right' 'stickto' 'on' 'Style', 'pushbutton', 'tag', 'ok', 'string', 'OK', 'callback', 'set(gcbo, ''userdata'', ''retuninginputui'');' } };
-    if ~isempty(g.geom)
-		[tmp tmp2 allobj] = supergui( 'fig', fig, 'minwidth', 200, 'geom', g.geom, 'uilist', g.uilist );
-    elseif isempty(g.geomvert)
-		[tmp tmp2 allobj] = supergui( 'fig', fig, 'minwidth', 200, 'geomhoriz', g.geometry, 'uilist', g.uilist );
-	else
-		[tmp tmp2 allobj] = supergui( 'fig', fig, 'minwidth', 200, 'geomhoriz', g.geometry, 'uilist', g.uilist, 'geomvert', [g.geomvert(:)' 1 1] );
-	end;
-else 
-	fig = g.mode;
-	set(findobj('parent', fig, 'tag', 'ok'), 'userdata', []);
-	allobj = findobj('parent',fig);
-	allobj = allobj(end:-1:1);
-end;
-
-% evaluate command before waiting?
-% --------------------------------
-if ~isempty(g.eval), eval(g.eval); end;
-
-% create figure and wait for return
-% ---------------------------------
-if isstr(g.mode) & (strcmpi(g.mode, 'plot') | strcmpi(g.mode, 'return') )
-    if strcmpi(g.mode, 'plot')
-       return; % only plot and returns
+        g.uilist = { g.uilist{:}, { 'width' 80 'align' 'right' 'Style', 'pushbutton', 'string', 'Cancel', 'tag' 'cancel' 'callback', 'close gcbf' } };
+        g.uilist = { g.uilist{:}, { 'width' 80 'align' 'right' 'stickto' 'on' 'Style', 'pushbutton', 'tag', 'ok', 'string', 'OK', 'callback', 'set(gcbo, ''userdata'', ''retuninginputui'');' } };
+        if ~isempty(g.geom)
+            [tmp tmp2 allobj] = supergui( 'fig', fig, 'minwidth', 200, 'geom', g.geom, 'uilist', g.uilist );
+        elseif isempty(g.geomvert)
+            [tmp tmp2 allobj] = supergui( 'fig', fig, 'minwidth', 200, 'geomhoriz', g.geometry, 'uilist', g.uilist );
+        else
+            [tmp tmp2 allobj] = supergui( 'fig', fig, 'minwidth', 200, 'geomhoriz', g.geometry, 'uilist', g.uilist, 'geomvert', [g.geomvert(:)' 1 1] );
+        end;
+    else 
+        fig = g.mode;
+        set(findobj('parent', fig, 'tag', 'ok'), 'userdata', []);
+        allobj = findobj('parent',fig);
+        allobj = allobj(end:-1:1);
     end;
-else 
-	waitfor( findobj('parent', fig, 'tag', 'ok'), 'userdata');
+
+    % evaluate command before waiting?
+    % --------------------------------
+    if ~isempty(g.eval), eval(g.eval); end;
+
+    % create figure and wait for return
+    % ---------------------------------
+    if isstr(g.mode) & (strcmpi(g.mode, 'plot') | strcmpi(g.mode, 'return') )
+        if strcmpi(g.mode, 'plot')
+           return; % only plot and returns
+        end;
+    else 
+        waitfor( findobj('parent', fig, 'tag', 'ok'), 'userdata');
+    end;
+else
+    fig = g.getresult;
+    allobj = findobj('parent',fig);
+    allobj = allobj(end:-1:1);
 end;
 
 result = {};
@@ -198,7 +205,7 @@ if nargout >= 4
 	resstruct = myguihandles(fig);
 end;
 
-if isstr(g.mode) & ( strcmp(g.mode, 'normal') | strcmp(g.mode, 'return') )
+if isempty(g.getresult) && isstr(g.mode) && ( strcmp(g.mode, 'normal') || strcmp(g.mode, 'return') )
 	close(fig);
 end;
 drawnow; % for windows
