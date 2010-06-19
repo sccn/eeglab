@@ -79,7 +79,7 @@ if isfield(g,'eloc_file');
         end
     end
 end
-if ~exist('DataType');
+if ~exist('DataType', 'var');
     DataType=1;
 end
 
