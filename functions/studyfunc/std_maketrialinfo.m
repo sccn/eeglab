@@ -49,32 +49,39 @@ for index = 1:length(ALLEEG)
     
     % process time locking event fields
     % ---------------------------------
-    indtle    = find(eventlat < 0.0005);
+    indtle    = find(eventlat < 0.02);
     epochs    = [ events(indtle).epoch ];
+    extractepoch = true;
     if length(epochs) ~= ALLEEG(index).trials
         
         % special case where there are not the same number of time-locking
         % event as there are data epochs
         if length(unique(epochs)) ~= ALLEEG(index).trials
-            error('Not the same number of time-locking events as trials');
-        end;
-        % pick one event per epoch
-        [tmp tmpind] = unique(epochs(end:-1:1)); % reversing the array ensures the first event gets picked
-        tmpind = length(epochs)+1-tmpind;
-        indtle = indtle(tmpind);
-        if length(indtle) ~= ALLEEG(index).trials
-            error('Not the same number of time-locking events as trials');
+            extractepoch = false;
+            disp('std_maketrialinfo: not the same number of time-locking events as trials, trial info ignored');
+        else
+            % pick one event per epoch
+            [tmp tmpind] = unique(epochs(end:-1:1)); % reversing the array ensures the first event gets picked
+            tmpind = length(epochs)+1-tmpind;
+            indtle = indtle(tmpind);
+            if length(indtle) ~= ALLEEG(index).trials
+                extractepoch = false;
+                disp('std_maketrialinfo: not the same number of time-locking events as trials, trial info ignored');
+            end;
         end;
     end;
-    commands = {};
-    for f = 1:length(ff)
-        eval( [ 'eventvals = {events(indtle).' ff{f} '};' ]);
-        if isnumeric(eventvals{1})
-            eventvals = cellfun(@num2str, eventvals, 'uniformoutput', false);
+    if extractepoch
+        commands = {};
+        for f = 1:length(ff)
+            eval( [ 'eventvals = {events(indtle).' ff{f} '};' ]);
+            if isnumeric(eventvals{1})
+                eventvals = cellfun(@num2str, eventvals, 'uniformoutput', false);
+            end;
+            commands = { commands{:} ff{f} eventvals };
         end;
-        commands = { commands{:} ff{f} eventvals };
+        trialinfo = struct(commands{:});
+        STUDY.datasetinfo(index).trialinfo = trialinfo;
     end;
-    trialinfo = struct(commands{:});
     
 %    % same as above but 10 times slower
 %     for e = 1:length(ALLEEG(index).event)
@@ -86,7 +93,6 @@ for index = 1:length(ALLEEG)
 %             end;
 %         end;
 %     end;
-    STUDY.datasetinfo(index).trialinfo = trialinfo;
 end;
 
     
