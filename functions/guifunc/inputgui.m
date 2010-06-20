@@ -11,7 +11,14 @@
 %             inputgui( 'key1', 'val1', 'key2', 'val2', ... );
 % 
 % Inputs:
-%   'geometry'   - this corresponds to supergui() key-val input 'geomhoriz'
+%   'geom '      - cell array of cell array of integer vector. Each cell
+%                  array defines the coordinate of a given input in the 
+%                  following manner: { nb_row nb_col [x_topcorner y_topcorner]
+%                  [x_bottomcorner y_bottomcorner] };
+%   'geometry'   - cell array describing horizontal geometry. This corresponds 
+%                  to the supergui function input 'geomhoriz'
+%   'geomvert'   - vertical geometry argument, this argument is passed on to
+%                  the supergui function
 %   'uilist'     - list of uicontrol lists describing elements properties
 %                  { { ui1 }, { ui2 }... }, { 'uiX' } being GUI matlab 
 %                  uicontrol arguments such as { 'style', 'radiobutton', 
@@ -24,8 +31,6 @@
 %                  closing window input ('noclose'), only draw the gui ('plot')
 %                  or process an existing window which number is given as 
 %                  input (fignumber). Default is 'normal'.
-%   'geomvert'   - vertical geometry argument, this argument is passed on to
-%                  supergui()
 %   'eval'       - [string] command to evaluate at the end of the creation 
 %                  of the GUI but before waiting for user input. 
 %
@@ -47,6 +52,10 @@
 %
 % Example:
 %   res = inputgui('geometry', { 1 1 }, 'uilist', ...
+%                         { { 'style' 'text' 'string' 'Enter a value' } ...
+%                           { 'style' 'edit' 'string' '' } });
+%
+%   res = inputgui('geom', { {2 1 [0 0] [1 1]} {2 1 [1 0] [1 1]} }, 'uilist', ...
 %                         { { 'style' 'text' 'string' 'Enter a value' } ...
 %                           { 'style' 'edit' 'string' '' } });
 %
