@@ -151,6 +151,7 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
         if ~isfield(g, 'paired'),    g.paired = 'on'; end;
         if ~isfield(g, 'arraycomp'), g.arraycomp = 'on'; end;
         if ~isfield(g, 'verbose'),   g.verbose = 'on'; end;
+        if ~isfield(g, 'variance'),  g.variance = 'homogenous'; end;
         if ~isfield(g, 'returnresamplingarray'),   g.returnresamplingarray = 'off'; end;
     end;
     
