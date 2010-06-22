@@ -22,6 +22,47 @@
 % Authors: Jeng-Ren Duann & Arnaud Delorme, CNL/Salk & INC/UCSD, 2002-12-12
 %          with help from Andrey Vankov
 
+% $Log: read_erpss.m,v $
+% Revision 1.29  2007/08/07 20:01:08  arno
+% unused variables
+%
+% Revision 1.28  2007/08/07 19:48:28  arno
+% fix help (bug 382)
+%
+% Revision 1.27  2006/12/15 20:09:32  toby
+% Reverted to version 1.25. Andre reports 1.26 not working
+%
+% Revision 1.25  2005/05/20 18:39:53  hilit
+% if header is empty not rescaling to uV.
+%
+% Revision 1.24  2005/04/08 23:23:41  arno
+% rescale to microvolt
+%
+% Revision 1.23  2005/03/11 00:07:03  arno
+% message
+%
+% Revision 1.22  2005/03/10 23:59:37  arno
+% message
+%
+% Revision 1.21  2005/03/10 23:47:15  arno
+% edit message
+%
+% Revision 1.20  2003/12/10 17:00:03  arno
+% comment
+%
+% Revision 1.19  2003/11/19 03:05:22  arno
+% debuging calibration
+%
+% Revision 1.18  2003/06/28 00:28:38  arno
+% (implmenting new header info
+% and rescaling to mircouV
+%
+% Revision 1.19  2010/06/22 00:28:38  Christina Karns & Bill Troyer
+% Old version assumed little endian
+% Current version checks endian first 
+% and loads as big endian if needed
+
+
 function [eeg,ev,header] = read_erpss(filename)
     
     if nargin < 1
@@ -32,7 +73,7 @@ function [eeg,ev,header] = read_erpss(filename)
     eeg = [];
     ev = [];
     header = [];
-    tmptag = hex2dec('f0aa55');
+
     
     fp = fopen(filename,'rb','ieee-le');
     if fp == -1,
@@ -41,16 +82,25 @@ function [eeg,ev,header] = read_erpss(filename)
         disp('File opened:');
     end
     
+    %Check for endian-ness
+    atag = fread(fp,1,'uint32')
+    if atag == hex2dec('b0aa55')
+        fprintf('Using Little-Endian byte format');
+        tmptag = hex2dec('f0aa55');
+        endian = 'ieee-le';
+    else 
+        fprintf('Using Big-Endian byte format');
+        tmptag = hex2dec('aa5500f0');
+        fclose(fp);
+        endian = 'ieee-be';
+        fp = fopen(filename,'rb',endian);
+    end
+    
     fseek(fp,4,-1);
     compressed = fread(fp,1,'uint16');
     if compressed, 
         disp('Reading compressed data: if an error occurs while calling the MEX'); 
         disp('function, try recompiling it for your platform "mex decompresserpss.cc"'); 
-        complendian = 0;
-        switch computer
-         case {'MAC2','SUN4','SOL2','SGI','SGI64'}, complendian = 1;
-        end;
-        fprintf('read_erpss: endian of computer set to %s endian (Intel/AMD)\n', fastif(complendian, 'big', 'little'));        
     end;
     fseek(fp,6,-1);
     header.nchans = fread(fp,1,'uint16');
@@ -122,6 +172,7 @@ function [eeg,ev,header] = read_erpss(filename)
                 firstpass = 0;
             end; 
             totalsize = totalsize + block_size;
+            
         %else
         %    fprintf('.');
         end
@@ -134,7 +185,7 @@ function [eeg,ev,header] = read_erpss(filename)
     cnt = 0;
     totalsize = 0;
     fclose(fp);
-    fp = fopen(filename,'rb','ieee-le');
+    fp = fopen(filename,'rb',endian);
     fseek(fp,552,-1);
     temp = fread(fp,1,'uint16');
     if ~isfield(header, 'srate')
@@ -185,7 +236,7 @@ function [eeg,ev,header] = read_erpss(filename)
             if compressed
                 data = uint8(fread(fp,2*block_size_compress,'uchar'));
                 try
-                    data = decompresserpss(data, nchans, block_size, complendian);
+                    data = decompresserpss(data, nchans, block_size, 0); % 0 is little endian, 1 is big endian
                 catch,
                     disp('Error executing the decompresserpss function');
                     disp('Likely this function has not been compiled for your system');
