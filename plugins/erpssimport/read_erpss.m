@@ -83,7 +83,7 @@ function [eeg,ev,header] = read_erpss(filename)
     end
     
     %Check for endian-ness
-    atag = fread(fp,1,'uint32')
+    atag = fread(fp,1,'uint32');
     if atag == hex2dec('b0aa55')
         fprintf('Using Little-Endian byte format');
         tmptag = hex2dec('f0aa55');
