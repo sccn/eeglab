@@ -33,9 +33,9 @@
 %
 % Examples:
 %   % the examples below read all data channels for the selected files
-%   [ersp params times freqs] = std_readdatafiles('s1.datersp');
-%   [erp params times] = std_readdatafiles('s1.daterp');
-%   [erp params times] = std_readdatafiles('s1.daterp', timerange', [-100 500]);
+%   [ersp params times freqs] = std_readfiles('s1.datersp');
+%   [erp params times] = std_readfiles('s1.daterp');
+%   [erp params times] = std_readfiles('s1.daterp', timerange', [-100 500]);
 %
 % Authors: Arnaud Delorme, SCCN, INC, UCSD, May 2010
 

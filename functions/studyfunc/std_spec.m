@@ -159,9 +159,9 @@ if exist(filename) & strcmpi(g.recompute, 'off')
     fprintf('File "%s" found on disk, no need to recompute\n', filename);
     setinfo.filebase = g.fileout;
     if strcmpi(prefix, 'comp')
-        [X, t] = std_readspec(setinfo, g.components, g.timerange);
+        [X tmp f] = std_readfile(setinfo, 'components', g.components, 'freqlimits', g.freqrange, 'measure', 'spec');
     else
-        [X, t] = std_readspec(setinfo, g.channels, g.timerange);
+        [X tmp f] = std_readfile(setinfo, 'components', g.components, 'freqlimits', g.freqrange, 'measure', 'spec');
     end;
     if ~isempty(X), return; end;
 end

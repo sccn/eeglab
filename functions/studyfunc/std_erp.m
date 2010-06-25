@@ -124,11 +124,9 @@ if exist(filename) & strcmpi(g.recompute, 'off')
     fprintf('File "%s" found on disk, no need to recompute\n', filenameshort);
     setinfo.filebase = g.fileout;
     if strcmpi(prefix, 'comp')
-        %[X, t] = std_readerp(EEG, 1, g.components, g.timerange);
-        [X, t] = std_readerp(setinfo, g.components, g.timerange);
+        [X tmp t] = std_readfile(setinfo, 'components', g.components, 'timelimits', g.timerange, 'measure', 'erp');
     else
-        %[X, t] = std_readerp(EEG, 1, g.channels, g.timerange);
-        [X, t] = std_readerp(setinfo, g.channels, g.timerange);
+        [X tmp t] = std_readfile(setinfo, 'channels', g.channels,  'timelimits', g.timerange, 'measure', 'erp');
     end;
     if ~isempty(X), return; end;
     
