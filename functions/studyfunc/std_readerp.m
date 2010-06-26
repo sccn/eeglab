@@ -54,7 +54,7 @@ if nargin < 2
     return;
 end
 if ~isstruct(ALLEEG) % old calling format
-    [STUDY, datavals] = std_readerpsub(STUDY, ALLEEG, varargin{:});
+    [datavals tmp xvals] = std_readfile(setinfo, 'components', g.components, 'timelimits', g.timerange, 'measure', 'erp');
     return;
 end;
 
