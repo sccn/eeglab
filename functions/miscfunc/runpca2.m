@@ -61,7 +61,7 @@ end
 [U,S,V] = svd(data*data'/frames); % U and V should be the same since data*data' is symmetric
 
 sv = sqrt(diag(S));
-if dosym == 0
+if dosym == 1
     pc = pinv(diag(sv(1:K))) * V(:,1:K)' * data;
     A = U(:,1:K) * diag(sv(1:K));
 else
