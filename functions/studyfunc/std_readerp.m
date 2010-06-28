@@ -53,8 +53,21 @@ if nargin < 2
     help std_readerp;
     return;
 end
-if ~isstruct(ALLEEG) % old calling format
-    [datavals tmp xvals] = std_readfile(setinfo, 'components', g.components, 'timelimits', g.timerange, 'measure', 'erp');
+if ~isstruct(ALLEEG) 
+    % old calling format
+    % ------------------
+    EEG = STUDY(ALLEEG);
+    filename   = fullfile(EEG.filepath, EEG.filename(1:end-4));
+    comporchan = varargin{1};
+    options = {'measure', 'erp'};
+    if length(varargin) > 1, options = { options{:} 'timelimits', varargin{2} }; end;
+    if comporchan(1) > 0
+        [datavals tmp xvals] = std_readfile(filename, 'components',comporchan, options{:});
+    else
+       [datavals tmp xvals] = std_readfile(filename, 'channels', comporchan, options{:});
+    end;
+    STUDY    = datavals';
+    datavals = xvals;
     return;
 end;
 

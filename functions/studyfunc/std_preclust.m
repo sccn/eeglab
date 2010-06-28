@@ -255,6 +255,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
              % -------------------------
              case 'erp', 
                   for kk = 1:length(STUDY.cluster)
+                      if ~isfield('centroid', STUDY.cluster(kk)) STUDY.cluster(kk).centroid = []; end;
                       if isfield(STUDY.cluster(kk).centroid, 'erp')
                           STUDY.cluster(kk).centroid = rmfield(STUDY.cluster(kk).centroid, 'erp');
                           STUDY.cluster(kk).centroid = rmfield(STUDY.cluster(kk).centroid, 'erp_times');
@@ -315,6 +316,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
              % -----------------------
              case 'spec', 
                  for kk = 1:length(STUDY.cluster)
+                     if ~isfield('centroid', STUDY.cluster(kk)) STUDY.cluster(kk).centroid = []; end;
                      if isfield(STUDY.cluster(kk).centroid, 'spec')
                          STUDY.cluster(kk).centroid = rmfield(STUDY.cluster(kk).centroid, 'spec');
                          STUDY.cluster(kk).centroid = rmfield(STUDY.cluster(kk).centroid, 'spec_freqs');
@@ -386,6 +388,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
              % --------------------------------
              case  {'ersp', 'itc' }
                 for kk = 1:length(STUDY.cluster)
+                    if ~isfield('centroid', STUDY.cluster(kk)) STUDY.cluster(kk).centroid = []; end;
                     if isfield(STUDY.cluster(kk).centroid, 'ersp')
                         STUDY.cluster(kk).centroid = rmfield(STUDY.cluster(kk).centroid, 'ersp');
                         STUDY.cluster(kk).centroid = rmfield(STUDY.cluster(kk).centroid, 'ersp_freqs');
