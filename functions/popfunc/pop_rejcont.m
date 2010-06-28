@@ -14,8 +14,10 @@ if nargin < 2
     % -------------------------
     if ~isempty(EEG.chanlocs)
         indelec = strmatch( firstelec, { EEG.chanlocs.labels });
-        if isempty(indelec), indelec = EEG.nbchan; end;
-        elecrange = 1:(indelec-1);
+        
+        if isempty(indelec), elecrange = 1:EEG.nbchan;
+        else                 elecrange = 1:(indelec-1);
+        end;
     else
         elecrange = 1:EEG.nbchan;
     end;
