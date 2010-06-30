@@ -225,7 +225,7 @@ for c = 1:ncplot
             % read all data from one condition or group
             % -----------------------------------------
             dimreduced_sizediffers = 0;
-            if ncplot ~= nc & ngplot ~= ng
+            if ncplot ~= nc && ngplot ~= ng
                 for cc = 1:length(data,1)
                     for gg = 1:length(data,2)
                         tmptmpdata = real(data{cc,gg});
@@ -234,8 +234,8 @@ for c = 1:ncplot
                         else                       tmpdata(:,:,gg+((cc-1)*ng))  = tmptmpdata;
                         end;
                     end;
-                    if isempty(opt.condnames{c}) | isempty(opt.groupnames{g}), leg{(cc-1)*ng+gg} = [ opt.condnames{c} opt.groupnames{g} ];
-                    else                                                       leg{(cc-1)*ng+gg} = [ opt.condnames{c} ', ' opt.groupnames{g} ];
+                    if isempty(opt.condnames{c}) || isempty(opt.groupnames{g}), leg{(cc-1)*ng+gg} = [ opt.condnames{c} opt.groupnames{g} ];
+                    else                                                        leg{(cc-1)*ng+gg} = [ opt.condnames{c} ', ' opt.groupnames{g} ];
                     end;
                 end;
             elseif ncplot ~= nc
@@ -274,8 +274,8 @@ for c = 1:ncplot
             plotopt = { allx };
             if ~dimreduced_sizediffers
                 if strcmpi(opt.plottopo, 'on'),
-                    if strcmpi(opt.plotsubjects, 'off') && strcmpi(opt.singlesubject, 'off') tmpdata = squeeze(real(nan_mean(tmpdata,3))); end;
-                elseif strcmpi(opt.plotsubjects, 'off') && strcmpi(opt.singlesubject, 'off') tmpdata = squeeze(real(nan_mean(tmpdata,2))); 
+                    if strcmpi(opt.plotsubjects, 'off') tmpdata = squeeze(real(nan_mean(tmpdata,3))); end;
+                elseif strcmpi(opt.plotsubjects, 'off') tmpdata = squeeze(real(nan_mean(tmpdata,2)));
                 end;
             end;
             tmpdata = squeeze(permute(tmpdata, [2 1 3]));
