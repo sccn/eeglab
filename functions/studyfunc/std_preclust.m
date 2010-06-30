@@ -136,22 +136,22 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
         error('Only one cluster can be sub-clustered. To sub-cluster multiple clusters, first merge them.');
     end
     
-    % the goal of this code below is to find the components in the cluster
-    % of interest for each set of condition 
-    for k = 1:size(STUDY.setind,2)
-        % Find the first entry in STUDY.setind(:,k) that is non-NaN. We only need one since
-        % components are the same across conditions.
-        for ri = 1:size(STUDY.setind,1)
-            if ~isnan(STUDY.setind(ri,k)), break; end
-        end
-        sind = find(STUDY.cluster(cluster_ind).sets(ri,:) == STUDY.setind(ri,k));
-        succompind{k} = STUDY.cluster(cluster_ind).comps(sind);
-    end;
-    for ind = 1:size(STUDY.setind,2)
-        succompind{ind} = succompind{ind}(find(succompind{ind})); % remove zeros 
-                                                                  % (though there should not be any? -Arno)
-        succompind{ind} = sort(succompind{ind}); % sort the components
-    end;
+%     % the goal of this code below is to find the components in the cluster
+%     % of interest for each set of condition 
+%     for k = 1:size(STUDY.setind,2)
+%         % Find the first entry in STUDY.setind(:,k) that is non-NaN. We only need one since
+%         % components are the same across conditions.
+%         for ri = 1:size(STUDY.setind,1)
+%             if ~isnan(STUDY.setind(ri,k)), break; end
+%         end
+%         sind = find(STUDY.cluster(cluster_ind).sets(ri,:) == STUDY.setind(ri,k));
+%         succompind{k} = STUDY.cluster(cluster_ind).comps(sind);
+%     end;
+%     for ind = 1:size(STUDY.setind,2)
+%         succompind{ind} = succompind{ind}(find(succompind{ind})); % remove zeros 
+%                                                                   % (though there should not be any? -Arno)
+%         succompind{ind} = sort(succompind{ind}); % sort the components
+%     end;
     
     % scan all commands to see if file exist
     % --------------------------------------
@@ -242,141 +242,71 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                 
         % scan datasets
         % -------------
-        data = [];
         if strcmpi(strcom, 'scalp'),           scalpmodif = 'none';
         elseif strcmpi(strcom, 'scalpLaplac'), scalpmodif = 'laplacian';
         else                                   scalpmodif = 'gradient';
         end;
         
-        for si = 1:size(STUDY.setind,2)
+        for si = 1:size(STUDY.cluster(cluster_ind).sets,2)
             switch strcom
              
              % select ica component ERPs
              % -------------------------
              case 'erp', 
-                  for kk = 1:length(STUDY.cluster)
-                      if ~isfield('centroid', STUDY.cluster(kk)) STUDY.cluster(kk).centroid = []; end;
-                      if isfield(STUDY.cluster(kk).centroid, 'erp')
-                          STUDY.cluster(kk).centroid = rmfield(STUDY.cluster(kk).centroid, 'erp');
-                          STUDY.cluster(kk).centroid = rmfield(STUDY.cluster(kk).centroid, 'erp_times');
-                      end;
-                  end;
-                  if ~isempty(succompind{si})
-                      for cond = 1 : size(STUDY.setind,1)
-                         if ~isnan(STUDY.setind(cond,si))
-                            idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index;  
-                            if ALLEEG(idat).trials == 1
-                               error('No epochs in dataset: ERP information has no meaning');
-                            end
-                            con_t = []; con_data = [];
-                            [X t] = std_readerp( ALLEEG, idat, succompind{si}, timewindow);
-
-                            X = abs(X); % take the absolute value of the ERP
-                            
-                            STUDY.preclust.erpclusttimes = timewindow;
-                            if cond == 1
-                                con_data = X;
-                                con_t = t;
-                            else % concatenate across conditions
-                                con_t = [con_t; t];
-                                con_data = [con_data X];
-                            end
-                         end
-                     end
-                     if isempty(data)
-                          times = con_t;
-                     else
-                          times = [ times ; con_t];
-                     end
-                     data = [ data; con_data ];
-                     clear X t con_data con_t tmp;
-                 end
-
+                    % read and concatenate all cells for this specific set
+                    % of identical ICA decompositions
+                    STUDY.cluster = checkcentroidfield(STUDY.cluster, 'erp', 'erp_times');
+                    tmpstruct = std_setcomps2cell(STUDY, STUDY.cluster(cluster_ind).sets(:,si), STUDY.cluster(cluster_ind).comps(si));
+                    cellinds  = [ tmpstruct.setinds{:} ];
+                    compinds  = [ tmpstruct.allinds{:} ];
+                    cells = STUDY.design(STUDY.currentdesign).cell(cellinds);
+                    fprintf('Loading ERP for design %d cell(s) [%s] component %d ...\n', STUDY.currentdesign, int2str(cellinds), compinds(1));
+                    X = std_readfile( cells, 'components', compinds, 'timelimits', timewindow, 'measure', 'erp');
+                    X = abs(X(:)'); % take the absolute value of the ERP to avoid polarities issues
+                    
               % select ica scalp maps
               % --------------------------
              case { 'scalp' 'scalpLaplac' 'scalpGrad' }
-
-                 for cond = 1:size(STUDY.setind,1)   % Find first nonNaN index
-                    if ~isnan(STUDY.setind(cond,si)), break; end
-                 end       
-                 idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index;
-                 fprintf('Computing/loading interpolated scalp maps for dataset %d...\n', idat);
-                 if ~isempty(succompind{si})
-                    X = std_readtopo(ALLEEG, idat, succompind{si}, scalpmodif, 'preclust');
-
-                    if abso % absolute values
-                       data = [ data; abs(X) ];
-                    else
-                       data = [ data; X ];
-                    end
-                    clear X tmp;
-                 end
+                 idat  = STUDY.datasetinfo(STUDY.cluster(cluster_ind).sets(:,si)).index;
+                 icomp = STUDY.cluster(cluster_ind).comps(si);
+                 fprintf('Loading interpolated scalp maps for dataset %d component %d...\n', idat, icomp);
+                 X = std_readtopo(ALLEEG, idat, icomp, scalpmodif, 'preclust');
                                      
              % select ica comp spectra
              % -----------------------
              case 'spec', 
-                 for kk = 1:length(STUDY.cluster)
-                     if ~isfield('centroid', STUDY.cluster(kk)) STUDY.cluster(kk).centroid = []; end;
-                     if isfield(STUDY.cluster(kk).centroid, 'spec')
-                         STUDY.cluster(kk).centroid = rmfield(STUDY.cluster(kk).centroid, 'spec');
-                         STUDY.cluster(kk).centroid = rmfield(STUDY.cluster(kk).centroid, 'spec_freqs');
-                     end;
-                 end;
-                 if ~isempty(succompind{si})
-                     for cond = 1 : size(STUDY.setind,1)
-                         if ~isnan(STUDY.setind(cond,si))
-                            idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index; 
-                            con_f = []; con_data = [];
-                            [X, f] = std_readspec(ALLEEG, idat, succompind{si}, freqrange);
-                            STUDY.preclust.specclustfreqs = freqrange;
-                            if cond == 1
-                                con_data = X;
-                                con_f = f;
-                            else % concatenate across conditions
-                                con_f = [con_f; f];
-                                con_data = [con_data X];
-                            end
-                         end
-                     end
-                     if isempty(data)
-                          frequencies = con_f;
-                     else
-                         frequencies = [ frequencies; con_f];
-                     end
-                     con_data = con_data - repmat(mean(con_data,2), [1 size(con_data,2)]);
-                     con_data = con_data - repmat(mean(con_data,1), [size(con_data,1) 1]);
-                     data = [ data; con_data ];
-                     clear f X con_f con_data tmp;  
-                 end               
+                % read and concatenate all cells for this specific set
+                % of identical ICA decompositions
+                STUDY.cluster = checkcentroidfield(STUDY.cluster, 'spec', 'spec_freqs');
+                tmpstruct = std_setcomps2cell(STUDY, STUDY.cluster(cluster_ind).sets(:,si), STUDY.cluster(cluster_ind).comps(si));
+                cellinds  = [ tmpstruct.setinds{:} ];
+                compinds  = [ tmpstruct.allinds{:} ];
+                cells = STUDY.design(STUDY.currentdesign).cell(cellinds);
+                fprintf('Loading spectrum for design %d cell(s) [%s] component %d ...\n', STUDY.currentdesign, int2str(cellinds), compinds(1));
+                X = std_readfile( cells, 'components', compinds, 'freqlimits', freqrange, 'measure', 'spec');
+                if size(X,2) > 1, X = X - repmat(mean(X,2), [1 size(X,2)]); end;
+                X = X - repmat(mean(X,1), [size(X,1) 1]);
+                X = X(:)';
                  
              % select dipole information
              % -------------------------
-             case 'dipoles' % NB: dipoles are identical across conditions (within session)
-                            % (no need to scan across conditions)
-              for cond = 1:size(STUDY.setind,1)  % Scan for first nonNaN index.
-                 if ~isnan(STUDY.setind(cond,si)), break; end
-              end
-              idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index;  
-              count = size(data,1)+1;
+             case 'dipoles' 
+              idat  = STUDY.datasetinfo(STUDY.cluster(cluster_ind).sets(1,si)).index; 
+              icomp = STUDY.cluster(cluster_ind).comps(si); 
               try
-                 for icomp = succompind{si}
                  % select among 3 sub-options
                  % --------------------------
-                 if ~isempty(succompind{si})
-                    ldip = 1;
-                    if size(ALLEEG(idat).dipfit.model(icomp).posxyz,1) == 2 % two dipoles model
-                        if any(ALLEEG(idat).dipfit.model(icomp).posxyz(1,:)) ...
-                            & any(ALLEEG(idat).dipfit.model(icomp).posxyz(2,:)) %both dipoles exist
-                           % find the leftmost dipole
-                           [garb ldip] = max(ALLEEG(idat).dipfit.model(icomp).posxyz(:,2)); 
-                        elseif any(ALLEEG(idat).dipfit.model(icomp).posxyz(2,:)) 
-                           ldip = 2; % the leftmost dipole is the only one that exists
-                        end
-                     end
-                     data(count,:) = ALLEEG(idat).dipfit.model(icomp).posxyz(ldip,:);
-                     count = count+1;
+                ldip = 1;
+                if size(ALLEEG(idat).dipfit.model(icomp).posxyz,1) == 2 % two dipoles model
+                    if any(ALLEEG(idat).dipfit.model(icomp).posxyz(1,:)) ...
+                        && any(ALLEEG(idat).dipfit.model(icomp).posxyz(2,:)) %both dipoles exist
+                       % find the leftmost dipole
+                       [garb ldip] = max(ALLEEG(idat).dipfit.model(icomp).posxyz(:,2)); 
+                    elseif any(ALLEEG(idat).dipfit.model(icomp).posxyz(2,:)) 
+                       ldip = 2; % the leftmost dipole is the only one that exists
+                    end
                  end
-                 end 
+                 X = ALLEEG(idat).dipfit.model(icomp).posxyz(ldip,:);
               catch
                 error([ sprintf('Some dipole information is missing (e.g. component %d of dataset %d)', icomp, idat) 10 ...
                               'Components are not assigned a dipole if residual variance is too high so' 10 ...
@@ -387,76 +317,32 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
              % cluster on ica ersp / itc values
              % --------------------------------
              case  {'ersp', 'itc' }
-                for kk = 1:length(STUDY.cluster)
-                    if ~isfield('centroid', STUDY.cluster(kk)) STUDY.cluster(kk).centroid = []; end;
-                    if isfield(STUDY.cluster(kk).centroid, 'ersp')
-                        STUDY.cluster(kk).centroid = rmfield(STUDY.cluster(kk).centroid, 'ersp');
-                        STUDY.cluster(kk).centroid = rmfield(STUDY.cluster(kk).centroid, 'ersp_freqs');
-                        STUDY.cluster(kk).centroid = rmfield(STUDY.cluster(kk).centroid, 'ersp_times');
-                    end;
-                    if isfield(STUDY.cluster(kk).centroid, 'itc')
-                        STUDY.cluster(kk).centroid = rmfield(STUDY.cluster(kk).centroid, 'itc');
-                        STUDY.cluster(kk).centroid = rmfield(STUDY.cluster(kk).centroid, 'itc_times');
-                    end;
-                end;
-                if ~isempty(succompind{si})
-                    idattot = [];
-                    for cond = 1:size(STUDY.setind,1)
-                        if ~isnan(STUDY.setind(cond,si))
-                            idat = STUDY.datasetinfo(STUDY.setind(cond,si)).index;  
-                            idattot = [idattot idat];
-                        end
-                    end
-                    STUDY.preclust.erspclustfreqs = freqrange;
-                    STUDY.preclust.erspclusttimes = timewindow;
-                    
-                    % prepare ERSP / ITC data for clustering (select requested components, 
-                    % mask and change to a common base if multiple conditions).
-                    % --------------------------------------------------------------------
-                    for k = 1:length(succompind{si})
-                        if strcmpi(strcom, 'ersp')
-                            tmp = std_readersp(ALLEEG, idattot, succompind{si}(k), timewindow, freqrange); 
-                        else
-                            tmp = real(std_readitc( ALLEEG, idattot, succompind{si}(k), timewindow, freqrange)); 
-                        end;
-                        if k == 1
-                            X = zeros(length(succompind{si}), size(tmp,1), size(tmp,2), size(tmp,3)); 
-                        end;
-                        X(k,:,:,:) = tmp;
-                    end;
-                    data = [data; reshape(X, size(X,1), size(X,2)*size(X,3)*size(X,4)) ];
-                    clear tmp X 
-                end
-                
-             % execute custom command
-             % ----------------------
-             otherwise, 
-                 if ~isempty(succompind{si})
-                      if ~any(strcom == 'X'), strcom = [ 'X=' strcom ';' ]; end; 
-                      EEG = ALLEEG(idat);
-                      eval(strcom);
-                      if length(findstr(strcom,'spectopo')) == 1
-                          if isempty(data)
-                              frequencies = f;
-                          else
-                              frequencies = [ frequencies; f];
-                          end    
-                      end
-                      if size(X,1) == 1
-                          data(end+1,:) = X;
-                      else
-                          if size(X,1) > length(succompind{si})
-                              data(end+1:end+length(succompind{si}),:) = X(succompind{si},:);
-                          elseif size(X,1) == length(succompind{si})
-                              data(end+1:end+size(X,1),:) = X;
-                          else
-                              data(end+1:end+size(X,1),:) = X;
-                              disp('Warning: wrong number of components (rows) generated by string command.');
-                          end;
-                      end;
-                  end
+                    % read and concatenate all cells for this specific set
+                    % of identical ICA decompositions
+                    STUDY.cluster = checkcentroidfield(STUDY.cluster, 'ersp', 'ersp_times', 'ersp_freqs', 'itc', 'itc_times', 'itc_freqs');
+                    tmpstruct = std_setcomps2cell(STUDY, STUDY.cluster(cluster_ind).sets(:,si), STUDY.cluster(cluster_ind).comps(si));
+                    cellinds  = [ tmpstruct.setinds{:} ];
+                    compinds  = [ tmpstruct.allinds{:} ];
+                    cells = STUDY.design(STUDY.currentdesign).cell(cellinds);
+                    fprintf('Loading %s for design %d cell(s) [%s] component %d ...\n', upper(strcom), STUDY.currentdesign, int2str(cellinds), compinds(1));
+                    X = std_readfile( cells, 'components', compinds, 'timelimits', timewindow, 'measure', strcom);
             end;
-
+            
+            % copy data in the array
+            % ----------------------
+            if ~isreal(X) X = abs(X); end; % for ITC data
+            X = reshape(X, 1, numel(X));
+            if si == 1, data = zeros(size(STUDY.cluster(cluster_ind).sets,2),length(X)); end;
+            try
+                data(si,:) = X;
+            catch,
+                error(strvcat('This type of pre-clustering requires that all subjects', ...
+                              'be represented for all combination of selected independent', ...
+                              'variables in the current STUDY design. In addition, for each', ...
+                              'different ICA decomposition included in the STUDY (some',...
+                              'datasets may have the same decomposition), at least one', ...
+                              'dataset must be represented.'));
+            end;
             
         end; % end scan datasets
 
@@ -544,10 +430,12 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
         clustdata = clustdata.';
     end
     
-    STUDY.etc.preclust.preclustdata = clustdata;
+    STUDY.etc.preclust.preclustdata   = clustdata;
     STUDY.etc.preclust.preclustparams = varargin;
-    STUDY.etc.preclust.preclustcomps = succompind;
-
+    if isfield(STUDY.etc.preclust, 'preclustcomps')
+        STUDY.etc.preclust = rmfield(STUDY.etc.preclust, 'preclustcomps');
+    end;
+    
     % The preclustering level is equal to the parent cluster that the components belong to.
     if ~isempty(cluster_ind)
         STUDY.etc.preclust.clustlevel = cluster_ind; 
@@ -562,16 +450,26 @@ return
 %        This is a helper function called by eeg_preclust().
 
 function [dsdata, freqs, times] = erspdownsample(data, n, freqs,times,cond)
-    
-len = length(freqs)*length(times); %size of ERSP
-nlen = ceil(length(freqs)/2)*ceil(length(times)/2); %new size of ERSP
-dsdata = zeros(size(data,1),cond*nlen);
-for k = 1:cond
-    tmpdata = data(:,1+(k-1)*len:k*len);
-    for l = 1:size(data,1) % go over components
-        tmpersp = reshape(tmpdata(l,:)',length(freqs),length(times));
-        tmpersp = downsample(tmpersp.', n/2).'; %downsample times
-        tmpersp = downsample(tmpersp, n/2); %downsample freqs
-        dsdata(l,1+(k-1)*nlen:k*nlen)  = tmpersp(:)';
+    len = length(freqs)*length(times); %size of ERSP
+    nlen = ceil(length(freqs)/2)*ceil(length(times)/2); %new size of ERSP
+    dsdata = zeros(size(data,1),cond*nlen);
+    for k = 1:cond
+        tmpdata = data(:,1+(k-1)*len:k*len);
+        for l = 1:size(data,1) % go over components
+            tmpersp = reshape(tmpdata(l,:)',length(freqs),length(times));
+            tmpersp = downsample(tmpersp.', n/2).'; %downsample times
+            tmpersp = downsample(tmpersp, n/2); %downsample freqs
+            dsdata(l,1+(k-1)*nlen:k*nlen)  = tmpersp(:)';
+        end
     end
-end
+
+% the function below checks the precense of the centroid field
+function cluster = checkcentroidfield(cluster, varargin);
+    for kk = 1:length(cluster)
+        if ~isfield('centroid', cluster(kk)), cluster(kk).centroid = []; end;
+        for vi = 1:length(varargin)
+            if isfield(cluster(kk).centroid, varargin{vi})
+                cluster(kk).centroid = rmfield(cluster(kk).centroid, varargin{vi});
+            end;
+        end;
+    end;

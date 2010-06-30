@@ -39,11 +39,13 @@
 
 function STUDY = std_convertoldsetformat(STUDY);
 
-for index = 1:length(STUDY.cluster)
-    [ tmpstruct setinds allinds ] = std_setcomps2cell(STUDY, index);
-    STUDY.cluster(index).setinds = setinds;
-    STUDY.cluster(index).allinds = allinds;
-end;
+error('Function is deprecated');
+
+% for index = 1:length(STUDY.cluster)
+%     [ tmpstruct setinds allinds ] = std_setcomps2cell(STUDY, index);
+%     STUDY.cluster(index).setinds = setinds;
+%     STUDY.cluster(index).allinds = allinds;
+% end;
 %STUDY.cluster = rmfield(STUDY.cluster, 'sets');
 %STUDY.cluster = rmfield(STUDY.cluster, 'comps');
 

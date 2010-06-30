@@ -19,6 +19,9 @@
 %  'subject'   - [string] select a specific subject {default:all}
 %  'component' - [integer] select a specific component in a cluster
 %                 {default:all}
+%  'componentpol' - ['on'|'off'] invert ERP component sign based on
+%                   scalp map match with component scalp map centroid.
+%                   {default:'on'}
 %  'singletrials' - ['on'|'off'] load single trials spectral data (if available)
 %
 % Output:
@@ -83,6 +86,7 @@ STUDY = pop_specparams(STUDY, 'default');
     'datatype'      'string'  { 'erp' 'spec' } 'erp';
     'rmsubjmean'    'string'  { 'on' 'off' } 'off';
     'singletrials'  'string'  { 'on' 'off' } 'off';
+    'componentpol'  'string'  { 'on' 'off' } 'on';
     'component'     'integer' []             [];
     'subject'       'string'  []             '' }, ...
     'std_readerp', 'ignore');
