@@ -158,7 +158,6 @@ else
             STUDY.cluster(k+len).preclust.preclustdata   = STUDY.etc.preclust.preclustdata(tmp,:);
             STUDY.cluster(k+len).preclust.preclustparams = STUDY.etc.preclust.preclustparams;
         end;
-        STUDY.cluster(k+len).preclust.preclustcomps = STUDY.etc.preclust.preclustcomps;
         STUDY.cluster(k+len) = std_setcomps2cell(STUDY, k+len);
 
         %update parents clusters with cluster child indices
