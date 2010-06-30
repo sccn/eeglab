@@ -1,4 +1,14 @@
-% histforexe() - History for exe files
+% helpforexe() - Write help files for exe version
+%
+% Usage:
+%   histtoexe( mfile, folder)
+%
+% Inputs:
+%   mfile  - [cell of string] Matlab files with help message
+%   folder - [string] Output folder
+%
+% Output:
+%   text files name help_"mfile".m
 %
 % Author: Arnaud Delorme, 2006
 %
@@ -20,7 +30,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function histforexe( funct, fold );
+function helpforexe( funct, fold );
 
 if nargin <1
 	help histforexe;
