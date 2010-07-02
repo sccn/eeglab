@@ -268,8 +268,8 @@ elseif isstr(STUDY)
             set(findobj(fig, 'tag', 'chk_del'), 'value', des(val).deletepreviousfiles );
             set(findobj(fig, 'tag', 'edit_selectdattrials'), 'string', str );
             set(findobj(fig, 'tag', 'popupselect'), 'value', 1 );
-            set(findobj(fig, 'tag', 'lbpair0'), 'value', fastif(isequal(des(val).variable(1).pairing,'paired'),1,2));
-            set(findobj(fig, 'tag', 'lbpair1'), 'value', fastif(isequal(des(val).variable(2).pairing,'paired'),1,2));
+            set(findobj(fig, 'tag', 'lbpair0'), 'value', fastif(isequal(des(val).variable(1).pairing,'on'),1,2));
+            set(findobj(fig, 'tag', 'lbpair1'), 'value', fastif(isequal(des(val).variable(2).pairing,'on'),1,2));
             
         case 'updatedesign', % update the study information (whenever the user click on a button)
             val    = get(findobj(fig, 'tag', 'listboxdesign'), 'value');
@@ -282,7 +282,7 @@ elseif isstr(STUDY)
             vals   = get(findobj(fig, 'tag', 'lbsubj'),  'value');
             valchk = get(findobj(fig, 'tag', 'chk_del'), 'value');
             strs   = get(findobj(fig, 'tag', 'edit_selectdattrials'),  'string');
-            valpaired = { 'paired' 'unpaired' };
+            valpaired = { 'on' 'off' };
             
             if ~strcmpi(des(val).variable(1).label, usrdat.factors{val1})
                 des(val).variable(1).label = usrdat.factors{val1};
