@@ -260,7 +260,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                     cellinds  = [ tmpstruct.setinds{:} ];
                     compinds  = [ tmpstruct.allinds{:} ];
                     cells = STUDY.design(STUDY.currentdesign).cell(cellinds);
-                    fprintf('Loading ERP for design %d cell(s) [%s] component %d ...\n', STUDY.currentdesign, int2str(cellinds), compinds(1));
+                    fprintf('Pre-clustering array row %d, adding ERP for design %d cell(s) [%s] component %d ...\n', si, STUDY.currentdesign, int2str(cellinds), compinds(1));
                     X = std_readfile( cells, 'components', compinds, 'timelimits', timewindow, 'measure', 'erp');
                     X = abs(X(:)'); % take the absolute value of the ERP to avoid polarities issues
                     
@@ -269,7 +269,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
              case { 'scalp' 'scalpLaplac' 'scalpGrad' }
                  idat  = STUDY.datasetinfo(STUDY.cluster(cluster_ind).sets(:,si)).index;
                  icomp = STUDY.cluster(cluster_ind).comps(si);
-                 fprintf('Loading interpolated scalp maps for dataset %d component %d...\n', idat, icomp);
+                 fprintf('Pre-clustering array row %d, adding interpolated scalp maps for dataset %d component %d...\n', si, idat, icomp);
                  X = std_readtopo(ALLEEG, idat, icomp, scalpmodif, 'preclust');
                                      
              % select ica comp spectra
@@ -282,7 +282,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                 cellinds  = [ tmpstruct.setinds{:} ];
                 compinds  = [ tmpstruct.allinds{:} ];
                 cells = STUDY.design(STUDY.currentdesign).cell(cellinds);
-                fprintf('Loading spectrum for design %d cell(s) [%s] component %d ...\n', STUDY.currentdesign, int2str(cellinds), compinds(1));
+                fprintf('Pre-clustering array row %d, adding spectrum for design %d cell(s) [%s] component %d ...\n', si, STUDY.currentdesign, int2str(cellinds), compinds(1));
                 X = std_readfile( cells, 'components', compinds, 'freqlimits', freqrange, 'measure', 'spec');
                 if size(X,2) > 1, X = X - repmat(mean(X,2), [1 size(X,2)]); end;
                 X = X - repmat(mean(X,1), [size(X,1) 1]);
@@ -293,6 +293,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
              case 'dipoles' 
               idat  = STUDY.datasetinfo(STUDY.cluster(cluster_ind).sets(1,si)).index; 
               icomp = STUDY.cluster(cluster_ind).comps(si); 
+              fprintf('Pre-clustering array row %d, adding dipole for dataset %d component %d...\n', si, idat, icomp);
               try
                  % select among 3 sub-options
                  % --------------------------
@@ -324,7 +325,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                     cellinds  = [ tmpstruct.setinds{:} ];
                     compinds  = [ tmpstruct.allinds{:} ];
                     cells = STUDY.design(STUDY.currentdesign).cell(cellinds);
-                    fprintf('Loading %s for design %d cell(s) [%s] component %d ...\n', upper(strcom), STUDY.currentdesign, int2str(cellinds), compinds(1));
+                    fprintf('Pre-clustering array row %d, adding %s for design %d cell(s) [%s] component %d ...\n', si, upper(strcom), STUDY.currentdesign, int2str(cellinds), compinds(1));
                     X = std_readfile( cells, 'components', compinds, 'timelimits', timewindow, 'measure', strcom);
             end;
             

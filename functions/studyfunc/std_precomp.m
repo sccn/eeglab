@@ -306,13 +306,13 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
             tmpparams      = fieldnames(g.erspparams); tmpparams = tmpparams';
             tmpparams(2,:) = struct2cell(g.erspparams);
         end;
+        tmpparams = { tmpparams{:} 'recompute' g.recompute };
         for index = 1:length(STUDY.design(g.design).cell)
             desset = STUDY.design(g.design).cell(index);
             if strcmpi(computewhat, 'channels')
                 [tmpchanlist opts] = getchansandopts(STUDY, ALLEEG, chanlist, index, g);
                 std_ersp(ALLEEG(desset.dataset), 'channels', tmpchanlist, 'type', type, 'fileout', desset.filebase, 'trialindices', desset.trials, opts{:}, tmpparams{:});
             else
-                [tmpchanlist opts] = getchansandopts(STUDY, ALLEEG, chanlist, index, g);
                 std_ersp(ALLEEG(desset.dataset), 'components', chanlist{index}, 'type', type, 'fileout', desset.filebase, 'trialindices', desset.trials, tmpparams{:});
             end;
         end;
@@ -370,9 +370,11 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
             end;
             opts = { opts{:} 'rmcomps' rmcomps };
         end;
-        if ~isempty(g.interplocs)
+        if strcmpi(g.interp, 'on')
             tmpchanlist = chanlist;
-            opts = { opts{:} 'interp' g.interplocs };
+            allocs = eeg_mergelocs(ALLEEG.chanlocs);
+            [tmp ind1 ind2] = intersect({allocs.labels}, chanlist);
+            opts = { opts{:} 'interp' allocs(ind1) };
         else
             newchanlist = [];
             chanlocs = { ALLEEG(idat(1)).chanlocs.labels };

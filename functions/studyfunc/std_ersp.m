@@ -283,7 +283,7 @@ options = {};
 if ~isempty(g.rmcomps), options = { options{:} 'rmcomps' g.rmcomps }; end;
 if ~isempty(g.interp),  options = { options{:} 'interp' g.interp }; end;
 if ~isempty(g.components)
-    tmpdata = eeg_getdatact(EEG, 'component', g.indices, 'trialindices', g.trialindices{dat});
+    tmpdata = eeg_getdatact(EEG, 'component', g.indices, 'trialindices', g.trialindices{1});
 else
     EEG.data = eeg_getdatact(EEG, 'channel', [1:EEG.nbchan], 'rmcomps', g.rmcomps{1}, 'trialindices', g.trialindices{1});
     EEG.trials = size(EEG.data,3);
