@@ -1369,6 +1369,10 @@ end
  ylm = get(gca,'ylim');
  set(plotax,'ylim',ylm);                               % copy position and axis limits again
 
+axis equal;
+set(gca, 'xlim', [-0.525 0.525]); set(plotax, 'xlim', [-0.525 0.525]);
+set(gca, 'ylim', [-0.525 0.525]); set(plotax, 'ylim', [-0.525 0.525]);
+ 
 %get(textax,'pos')    % test if equal!
 %get(plotax,'pos')
 %get(textax,'xlim')
