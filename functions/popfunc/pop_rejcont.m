@@ -59,7 +59,9 @@ color     = [ 0 0.9 0];             % color of rejection window
 % compute power spectrum
 % ----------------------
 NEWEEG = EEG;
-NEWEEG.data(opt.elecrange,:) = NEWEEG.data(opt.elecrange,:)-repmat(mean(NEWEEG.data(opt.elecrange,:),1), [length(opt.elecrange) 1]);
+% average reference 
+% NEWEEG.data(opt.elecrange,:) = NEWEEG.data(opt.elecrange,:)-repmat(mean(NEWEEG.data(opt.elecrange,:),1), [length(opt.elecrange) 1]);
+
 [TMPNEWEEG]= eeg_regepochs(NEWEEG, 0.25, [0 opt.epochlength], NaN);
 %[TMPNEWEEG indices] = pop_rejspec(TMPNEWEEG, 1, [1:64], -100, 15, 30, 45, 0, 0);
 %rejepoch = find(indices);
@@ -135,3 +137,4 @@ if nargin < 2
     eegplot(NEWEEG.data(opt.elecrange,:), 'srate', NEWEEG.srate, 'winrej', winrej, 'command', command, 'events', EEG.event);
 end;
 EEG = NEWEEG;
+com = sprintf('EEG = pop_rejcont(EEG, %s);', vararg2str(options));
