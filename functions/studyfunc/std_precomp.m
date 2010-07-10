@@ -289,7 +289,6 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
                 end;
                 [guimode, g.erspparams] = std_filecheck(filename, g.erspparams, guimode, { 'plotitc' 'plotersp' 'plotphase' });
                 if strcmpi(guimode, 'cancel'), return; end;
-
             end;
             if strcmpi(guimode, 'usedisk') | strcmpi(guimode, 'same'), g.recompute = 'off'; 
             else                                                       g.recompute = 'on'; 
@@ -313,7 +312,10 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
                 [tmpchanlist opts] = getchansandopts(STUDY, ALLEEG, chanlist, index, g);
                 std_ersp(ALLEEG(desset.dataset), 'channels', tmpchanlist, 'type', type, 'fileout', desset.filebase, 'trialindices', desset.trials, opts{:}, tmpparams{:});
             else
-                std_ersp(ALLEEG(desset.dataset), 'components', chanlist{index}, 'type', type, 'fileout', desset.filebase, 'trialindices', desset.trials, tmpparams{:});
+                if length(desset.dataset)>1 && ~isequal(chanlist{desset.dataset(1)})
+                    error(['ICA decompositions must be identical if' 10 'several datasets are concatenated to build' 10 'the design, abording' ]);
+                end;
+                std_ersp(ALLEEG(desset.dataset), 'components', chanlist{desset.dataset(1)}, 'type', type, 'fileout', desset.filebase, 'trialindices', desset.trials, tmpparams{:});
             end;
         end;
         if isfield(curstruct, 'erspdata')
