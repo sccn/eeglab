@@ -5,11 +5,11 @@
 %                  EEG.chanlocs. For structure location and file formats,
 %                  see >> help readlocs
 %
-% Usage:    >> newchans = pop_chanedit( EEG, 'key1', value1, ...
-%                        'key2', value2, ... ); % edit dataset containing chanlocs
-%           >> [ newchans options ] = pop_chanedit( chanlocs, 'key1', value1, ...
-%                        'key2', value2, ... ); % edit separate chanlocs
-%                        struct
+% Usage:    >> EEG = pop_chanedit( EEG, 'key1', value1, 'key2', value2, ... ); 
+%           >> [ chanlocs options ] = pop_chanedit( chanlocs, 'key1', value1);
+%           >> [ chanlocs chaninfo options ] = pop_chanedit( chanlocs, chaninfo, ...
+%                        'key1', value1, 'key2', value2, ... );
+%
 % Graphic interface:
 %   "Channel information ('field name')" - [edit boxes] display channel field
 %                   contents for the current channel. Command line equivalent
@@ -110,9 +110,11 @@
 %                   channel location file given as input.
 %
 % Outputs:
-%   newchans      - new EEGLAB channel locations structure or EEG dataset with updated
-%                   channel location structures EEG.chanlocs, EEG.urchanlocs, EEG.chaninfo
-%   options       - structure containing plotting options (equivalent to EEG.chaninfo)
+%   EEG        - new EEGLAB dataset with updated channel location structures 
+%                EEG.chanlocs, EEG.urchanlocs, EEG.chaninfo
+%   chanlocs   - updated channel location structure
+%   chaninfo   - updated chaninfo structure
+%   options    - structure containing plotting options (equivalent to EEG.chaninfo)
 %
 % Ex:    EEG = pop_chanedit(EEG,'load', { 'dummy.elp' 'elp' }, 'delete', [3 4], ...
 %                       'convert', { 'xyz->polar' [] -1 1 }, 'save', 'mychans.loc' )
@@ -207,9 +209,8 @@ if isempty(chans) | ~isnumeric(chans)
                 varargin = varargin(2:end);
             end;
         end;
-    elseif nargin > 1
+    elseif nargin > 1 && ~isempty(orichaninfo) && ~isstr(orichaninfo)
         varargin = { orichaninfo varargin{:} };
-        clear chaninfo;
         chaninfo.shrink        = shrinkorskirt;
         chaninfo.plotrad       = plotrad;
     else
