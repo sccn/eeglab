@@ -55,7 +55,7 @@ data.fsample = EEG.srate;
 if strcmpi(fieldbox, 'chanloc_withfid')
     % insert "no data channels" in channel structure
     % ----------------------------------------------
-    if isfield(EEG.chaninfo, 'nodatchans')
+    if isfield(EEG.chaninfo, 'nodatchans') && ~isempty( EEG.chaninfo.nodatchans )
         chanlen = length(EEG.chanlocs);
         fields = fieldnames( EEG.chaninfo.nodatchans );
         for index = 1:length(EEG.chaninfo.nodatchans)
