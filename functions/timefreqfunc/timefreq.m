@@ -314,7 +314,7 @@ if g.cycles(1) == 0
             tmpX = reshape(data(:,indices), [ size(data,1) size(indices)]);
             tmpX = bsxfun(@minus, tmpX, mean( tmpX, 2)); % avoids repmat - faster than tmpX = tmpX - repmat(mean(tmpX), [size(tmpX,1) 1 1]);
             tmpX = bsxfun(@times, tmpX, g.win');
-            tmpX = fft(tmpX,g.padratio*g.winsize+2,2);
+            tmpX = fft(tmpX,g.padratio*g.winsize,2);
             tmpall = squeeze(tmpX(:,2:g.padratio*g.winsize/2+1,:,:));
         else
             tmpall = repmat(nan,[length(freqs) length(g.timesout) trials]);
@@ -323,7 +323,7 @@ if g.cycles(1) == 0
             tmpX = bsxfun(@times, tmpX, g.win);
             %tmpX = fft(tmpX,2^ceil(log2(g.padratio*g.winsize)));
             %tmpall = tmpX(2:g.padratio*g.winsize/2+1,:,:);
-            tmpX = fft(tmpX,g.padratio*g.winsize+2);
+            tmpX = fft(tmpX,g.padratio*g.winsize);
             tmpall = tmpX(2:g.padratio*g.winsize/2+1,:,:);
         end;
     else % old iterative computation
@@ -345,7 +345,7 @@ if g.cycles(1) == 0
                 end;
 
                 tmpX = g.win .* tmpX(:);
-                tmpX = fft(tmpX,g.padratio*g.winsize+2);
+                tmpX = fft(tmpX,g.padratio*g.winsize);
                 tmpX = tmpX(2:g.padratio*g.winsize/2+1);
                 tmpall(:,index, trial) = tmpX(:);
             end;
