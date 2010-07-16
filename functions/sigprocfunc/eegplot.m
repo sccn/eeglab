@@ -846,8 +846,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
   %             [ 'zoom(gcbf, ''xon'');' commandzoom ]);
   %uimenu('Parent',zm,'Label','Zoom channels', 'callback', ...
   %             [ 'zoom(gcbf, ''yon'');' commandzoom ]);
-  uimenu('Parent',zm,'Label','Zoom on', 'callback', ...
-               [ 'zoom(gcbf, ''on'');' commandzoom ]);
+  uimenu('Parent',zm,'Label','Zoom on', 'callback', commandzoom);
   uimenu('Parent',zm,'Label','Zoom off', 'separator', 'on', 'callback', ...
      ['zoom(gcbf, ''off''); tmpg = get(gcbf, ''userdata'');' ...
      'set(gcbf, ''windowbuttondownfcn'', tmpg.commandselect{1});' ...
@@ -1601,7 +1600,6 @@ else
       % reactivate zoom if 3 arguments
       % ------------------------------
       if exist('p2') == 1
-          zoom on;
           set(gcbf, 'windowbuttondownfcn', [ 'zoom(gcbf,''down''); eegplot(''zoom'', gcbf, 1);' ]);
           set(gcbf, 'windowbuttonmotionfcn', g.commandselect{2});
       end;
