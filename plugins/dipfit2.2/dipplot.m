@@ -657,7 +657,8 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             dipstruct.eleccoord = [ xx yy zz ];          % Coordinates in elec space
             dipstruct.posxyz    = sources(index).posxyz; % Coordinates in spherical space
             outsources(index).eleccoord(dip,:) = [xx yy zz];
-            outsources(index).mnicoord(dip,:) = [xxmri yymri zzmri];
+            outsources(index).mnicoord(dip,:) = [xx    yy    zz];
+            outsources(index).mricoord(dip,:) = [xxmri yymri zzmri];
             outsources(index).talcoord(dip,:) = mni2tal([xx yy zz]')';
             dipstruct.talcoord                = mni2tal([xx yy zz]')';
             
