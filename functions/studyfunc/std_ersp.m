@@ -153,10 +153,10 @@ end;
                         'getparams'     'string'      { 'on' 'off' }      'off';
                         'timewindow'    'real'        []      [];
                         'fileout'       'string'  []         '';
-                        'timelimits'    'real'        []      [EEG.xmin EEG.xmax]*1000;
+                        'timelimits'    'real'        []      [EEG(1).xmin EEG(1).xmax]*1000;
                         'cycles'        'real'        []      [3 .5];
                         'padratio'      'real'        []      1;
-                        'freqs'         'real'        []      [0 EEG.srate/2];
+                        'freqs'         'real'        []      [0 EEG(1).srate/2];
                         'rmcomps'       'cell'        []      cell(1,length(EEG));
                         'interp'        'struct'      { }     struct([]);
                         'freqscale'     'string'      []      'log';
@@ -282,39 +282,34 @@ end;
 options = {};
 if ~isempty(g.rmcomps), options = { options{:} 'rmcomps' g.rmcomps }; end;
 if ~isempty(g.interp),  options = { options{:} 'interp' g.interp }; end;
-if ~isempty(g.components)
-    tmpdata = eeg_getdatact(EEG, 'component', g.indices, 'trialindices', g.trialindices{1});
-else
-    EEG.data = eeg_getdatact(EEG, 'channel', [1:EEG.nbchan], 'rmcomps', g.rmcomps{1}, 'trialindices', g.trialindices{1});
-    EEG.trials = size(EEG.data,3);
-    EEG.event  = [];
-    EEG.epoch  = [];
-    
-    if ~isempty(g.interp), 
-        EEG = eeg_interp(EEG, g.interp, 'spherical'); 
-    end;
-    
-    % find channel index
-    % ------------------
-    if iscell(g.channels)
-        for index = 1:length(g.channels)
-            chanind = strmatch( lower(g.channels{index}), lower({ EEG.chanlocs.labels }), 'exact');
-            if isempty(chanind), error('Channel group not found'); end;
-            chaninds(index) = chanind;
+X       = [];
+for dat = 1:length(EEG)
+    if strcmpi(prefix, 'comp')
+        tmpdata = eeg_getdatact(EEG(dat), 'component', [1:size(EEG(dat).icaweights,1)], 'trialindices', g.trialindices{dat} );
+    else
+        EEG(dat).data = eeg_getdatact(EEG(dat), 'channel', [1:EEG(dat).nbchan], 'rmcomps', g.rmcomps{dat}, 'trialindices', g.trialindices{dat});
+        EEG(dat).trials = size(EEG(dat).data,3);
+        EEG(dat).event  = [];
+        EEG(dat).epoch  = [];
+        if ~isempty(g.interp), 
+            TMPEEG = eeg_interp(EEG(dat), g.interp, 'spherical'); 
+            tmpdata = TMPEEG.data;
+        else
+            tmpdata = EEG(dat).data;
         end;
-        g.indices  = chaninds;
-        g.channels = chaninds;
     end;
-    
-    if ~iscell(g.indices)
-        tmpdata = EEG.data(g.indices,:,:);
+    if isempty(X), X = tmpdata;
+    else
+        if size(X,1) ~= size(tmpdata,1), error('Datasets to be concatenated do not have the same number of channels'); end;
+        if size(X,2) ~= size(tmpdata,2), error('Datasets to be concatenated do not have the same number of time points'); end;
+        X(:,:,end+1:end+size(tmpdata,3)) = tmpdata; % concatenating trials
     end;
 end;
 
 % frame range
 % -----------
 pointrange1 = round(max((g.timelimits(1)/1000-EEG(1).xmin)*EEG(1).srate, 1));
-pointrange2 = round(min(((g.timelimits(2)+1000/EEG.srate)/1000-EEG(1).xmin)*EEG(1).srate, EEG(1).pnts));
+pointrange2 = round(min(((g.timelimits(2)+1000/EEG(1).srate)/1000-EEG(1).xmin)*EEG(1).srate, EEG(1).pnts));
 pointrange = [pointrange1:pointrange2];
 
 % Compute ERSP & ITC
@@ -323,7 +318,7 @@ all_ersp   = [];
 all_trials = [];
 all_itc    = [];
 for k = 1:length(g.indices)  % for each (specified) component
-    if k>size(tmpdata,1), break; end; % happens for components
+    if k>size(X,1), break; end; % happens for components
     if powbaseexist
         tmpparams = parameters;
         tmpparams{end+1} = 'powbase';
@@ -334,7 +329,7 @@ for k = 1:length(g.indices)  % for each (specified) component
     
     % Run timef() to get ERSP
     % ------------------------
-    timefdata  = reshape(tmpdata(k,pointrange,:), 1, length(pointrange)*size(tmpdata,3));
+    timefdata  = reshape(X(k,pointrange,:), 1, length(pointrange)*size(X,3));
     if strcmpi(g.plot, 'on'), figure; end;
     [logersp,logitc,logbase,times,logfreqs,logeboot,logiboot,alltfX] ...
           = newtimef( timefdata, length(pointrange), g.timelimits, EEG(1).srate, tmpparams{2:end});

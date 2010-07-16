@@ -196,9 +196,9 @@ end
 X = reshape(X, [ size(X,1) pnts trials ]);
 if strcmpi(prefix, 'comp')
     if strcmpi(g.savetrials, 'on')
-        X = repmat(sqrt(mean(EEG.icawinv.^2))', [1 EEG.pnts EEG.trials]) .* X;
+        X = repmat(sqrt(mean(EEG(1).icawinv.^2))', [1 EEG(1).pnts size(X,3)]) .* X;
     else
-        X = repmat(sqrt(mean(EEG.icawinv.^2))', [1 EEG.pnts]) .* mean(X,3); % calculate ERP
+        X = repmat(sqrt(mean(EEG(1).icawinv.^2))', [1 EEG(1).pnts]) .* mean(X,3); % calculate ERP
     end;
 elseif strcmpi(g.savetrials, 'off')
     X = mean(X, 3);

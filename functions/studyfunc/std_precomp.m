@@ -195,6 +195,9 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
                 [tmpchanlist opts] = getchansandopts(STUDY, ALLEEG, chanlist, desset.dataset, g);
                 std_erp(ALLEEG(desset.dataset), 'channels', tmpchanlist, opts{:}, addopts{:}, g.erpparams{:});
             else
+                if length(desset.dataset)>1 && ~isequal(chanlist{desset.dataset})
+                    error(['ICA decompositions must be identical if' 10 'several datasets are concatenated to build' 10 'the design, abording' ]);
+                end;
                 std_erp(ALLEEG(desset.dataset), 'components', chanlist{index}, addopts{:}, g.erpparams{:});
             end;
         end;
@@ -216,6 +219,9 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
                 [tmpchanlist opts] = getchansandopts(STUDY, ALLEEG, chanlist, desset.dataset, g);
                 std_spec(ALLEEG(desset.dataset), 'channels', tmpchanlist, opts{:}, addopts{:}, g.specparams{:});
             else
+                if length(desset.dataset)>1 && ~isequal(chanlist{desset.dataset})
+                    error(['ICA decompositions must be identical if' 10 'several datasets are concatenated to build' 10 'the design, abording' ]);
+                end;
                 std_spec(ALLEEG(desset.dataset), 'components', chanlist{index}, addopts{:}, g.specparams{:});
             end;
         end;
@@ -312,7 +318,7 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
                 [tmpchanlist opts] = getchansandopts(STUDY, ALLEEG, chanlist, index, g);
                 std_ersp(ALLEEG(desset.dataset), 'channels', tmpchanlist, 'type', type, 'fileout', desset.filebase, 'trialindices', desset.trials, opts{:}, tmpparams{:});
             else
-                if length(desset.dataset)>1 && ~isequal(chanlist{desset.dataset(1)})
+                if length(desset.dataset)>1 && ~isequal(chanlist{desset.dataset})
                     error(['ICA decompositions must be identical if' 10 'several datasets are concatenated to build' 10 'the design, abording' ]);
                 end;
                 std_ersp(ALLEEG(desset.dataset), 'components', chanlist{desset.dataset(1)}, 'type', type, 'fileout', desset.filebase, 'trialindices', desset.trials, tmpparams{:});
