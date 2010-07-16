@@ -208,7 +208,7 @@ else
     g.trial = g.trial(sort(q));
 end
 
-if ~iscell(g.nochannel) & ~iscell(chanlist)
+if isempty(g.channel) && ~iscell(g.nochannel) && ~iscell(chanlist)
     g.channel = [1:EEG.nbchan];
 end;
 
