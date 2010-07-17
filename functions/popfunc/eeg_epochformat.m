@@ -4,12 +4,17 @@
 % Usage: >> [epochsout fields] = eeg_epochformat( epochs, 'format', fields, events );
 %
 % Input:
-%   epochs - epoch array or structure
-%   format - ['struct'|'array']
+%   epochs - epoch numerical or cell array or epoch structure
+%   format - ['struct'|'array'] convert epoch array to structure and epoch
+%            structure to array.
 %   fields - [optional] cell array of strings containing the names of
 %            the epoch struct fields. If this field is empty, it uses the
 %            following list for the names of the fields { 'var1' 'var2' ... }.
-%   events - cell array of events (size nbepochs)
+%            For structure conversion, this field helps export a given
+%            event type. If this field is left empty, the time locking
+%            event for each epoch is exported.
+%   events - numerical array of event indices associated with each epoch.
+%            For structure conversion, this field is ignored.
 %
 % Outputs:
 %   epochsout - output epoch array or structure
@@ -114,24 +119,63 @@ case 'struct'
 
 case 'array'
     if isstruct(epoch)
-	   epochfield = fieldnames( epoch );
-
-       % remove event index and compute epoch event array
-       % ------------------------------------------------
-       indexevent = strmatch( 'event', epochfield);
-       if ~isempty(indexevent)
-           epochfield = { epochfield{1:indexevent-1} epochfield{indexevent+1:end} };
-           for index=1:length(epoch)
-              epocheventout{index} = epoch(index).event;
-           end;
-           epoch = rmfield(epoch, 'event');   
-       end;     
-
-       tmp = zeros( length(epoch), length( epochfield ));
-	   for index = 1:length( epochfield )
-	        eval([ 'tmp(:, index) = celltomat({ epoch(:).' epochfield{index} '})'';' ]);
-       end;
-       epoch = tmp;
+        
+        % note that the STUDY std_maketrialinfo also gets the epoch info for the
+        % time locking event
+        
+        selectedType = fields;
+        if iscell(fields), selectedType = fields{1}; end;
+  	    fields = fieldnames( epoch );
+        
+        eval( [ 'values = { epoch.' fields{1} ' };' ]);
+        
+        if any(cellfun(@length, values) > 1)
+            if ~isfield(epoch, 'eventlatency')
+                error('eventlatency field not present in data epochs');
+            end;
+            
+            if isempty(selectedType)
+                % find indices of time locking events
+                for index = 1:length(epoch)
+                    epochlat = [ epoch(index).eventlatency{:} ];
+                    epochSubIndex(index) = find( abs(epochlat) < 0.02 );
+                    if isempty(epochSubIndex(index))
+                        error('time locking event missing, cannot convert to array');
+                    end;
+                end;
+            else
+                % find indices of specific event type (if several take the
+                % first one
+                for index = 1:length(epoch)
+                    epochtype = epoch(index).eventtype;
+                    tmpeventind = strmatch( selectedType, epochtype );
+                    if length(tmpeventind) > 1
+                        fprintf('Warning: epoch %d has several events of "type" %s, taking the fist one\n', index, selectedType);
+                    end;
+                    if isempty(tmpeventind)
+                         epochSubIndex(index) = NaN;
+                    else epochSubIndex(index) = tmpeventind(1);
+                    end;
+                end;
+            end;
+        else
+            epochSubIndex = ones(1, length(epoch));
+        end;
+        
+        % copy values to array
+        tmp = cell( length(epoch), length( fields ));
+        for index = 1:length( fields )
+            for trial = 1:length(epoch)
+                tmpval = getfield(epoch, {trial}, fields{index});
+                if isnan(epochSubIndex(trial))
+                     tmp(trial, index) = { NaN };
+                elseif iscell(tmpval)
+                     tmp(trial, index) = tmpval(epochSubIndex(trial));
+                else tmp(trial, index) = { tmpval(epochSubIndex(trial)) };
+                end;
+            end;
+        end;
+        epoch = tmp;
     end;
     otherwise, error('unrecognised format');   
 end;
