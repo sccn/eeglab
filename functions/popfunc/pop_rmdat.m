@@ -47,7 +47,8 @@ function [EEG, com] = pop_rmdat( EEG, events, timelims, invertsel );
 
 if nargin < 1
    help pop_rmdat;
-	return;
+	return;EEG = pop_rmdat( EEG,  {  'animal'  'bug' 'response'     },[-1 1] ,0);
+
 end;	
 com = '';
 
@@ -117,8 +118,7 @@ alltypes =  { EEG.event.type };
 allinds = [];
 for index = 1:length(events)
     inds = strmatch(events{index},alltypes, 'exact');
-    inds = inds';
-    allinds = [allinds inds ];
+    allinds = [allinds(:); inds(:) ]';
 end;
 allinds = sort(allinds);
 if isempty(allinds)
