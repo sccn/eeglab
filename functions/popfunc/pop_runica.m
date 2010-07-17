@@ -206,7 +206,7 @@ end;
 
 % decode input arguments
 % ----------------------
-[ g options ] = finputcheck( options, { 'icatype'        'string'  allalgs   'runica'; ...
+[ g addoptions ] = finputcheck( options, { 'icatype'        'string'  allalgs   'runica'; ...
                             'dataset'        'integer' []        [1:length(ALLEEG)];
                             'options'        'cell'    []        {};
                             'concatenate'    'string'  { 'on' 'off' }   'off';
@@ -214,7 +214,7 @@ end;
                             'chanind'        'integer' []        [];}, ...
                             'pop_runica', 'ignore');
 if isstr(g), error(g); end;
-if isempty(g.options), g.options = options; end;
+if ~isempty(addoptions), g.options = { g.options{:} addoptions{:}}; end;
 
 % select datasets, create new big dataset if necessary
 % ----------------------------------------------------
@@ -461,13 +461,8 @@ else
     ALLEEG = eeg_store(ALLEEG, EEG, g.dataset);
 end;
 
-if nargin < 2 | selectamica
-    if length(ALLEEG) == 1
-        com = sprintf('%s = pop_runica(%s, %s);', inputname(1),inputname(1), ...
-                      vararg2str({ 'icatype' g.icatype 'dataset' g.dataset 'options' g.options }) );
-    else
-        com = sprintf('%s = pop_runica(%s, %s);', inputname(1),inputname(1), vararg2str(options) );
-    end;
+if nargin < 2 || selectamica
+    com = sprintf('%s = pop_runica(%s, %s);', inputname(1), inputname(1),  vararg2str(options) ); %vararg2str({ 'icatype' g.icatype 'dataset' g.dataset 'options' g.options }) );
 end;
 
 return;
