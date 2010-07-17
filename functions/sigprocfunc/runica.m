@@ -784,7 +784,10 @@ if strcmpi(interupt, 'on')
               {'style' 'pushbutton' 'string' 'Interupt' 'callback' 'setappdata(gcf, ''run'', 0);' } );
     set(fig, 'visible', 'on');
     setappdata(gcf, 'run', 1);
-    drawnow;
+    
+    if strcmpi(interupt, 'on')
+        drawnow;
+    end;
 end;
 
 
