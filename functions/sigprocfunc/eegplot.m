@@ -1699,7 +1699,7 @@ else
   case 'topoplot'
     fig = varargin{1};
     g = get(fig,'UserData');
-    if ~isstruct(g.eloc_file) && ~isfield(g.eloc_file, 'theta');
+    if ~isstruct(g.eloc_file) || ~isfield(g.eloc_file, 'theta') || isempty( [ g.elocfile.theta ])
         return;
     end;
     ax1 = findobj('tag','backeeg','parent',fig); 
@@ -1716,7 +1716,7 @@ else
     data = get(ax1,'UserData');
     datapos = max(1, round(tmppos(1)+lowlim));
     datapos = min(datapos, g.frames);
-        
+
     figure; topoplot(data(:,datapos), g.eloc_file);
     if g.trialstag == -1,
          latsec = (datapos-1)/g.srate;
