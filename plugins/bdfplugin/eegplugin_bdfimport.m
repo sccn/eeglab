@@ -62,4 +62,4 @@ function vers = eegplugin_bdfimport(fig, trystrs, catchstrs)
     
     % create menus
     % ------------
-    uimenu( menu, 'label', 'From EDF and BDF files (BDF plugin)', 'callback', comcnt, 'position', 11);
+    uimenu( menu, 'label', 'From Biosemi BDF and EDF files (BDF plugin)', 'callback', comcnt, 'position', 11);
