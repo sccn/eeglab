@@ -16,6 +16,9 @@
 %                 applying threshold. Default is 'off'.
 %   'plothist'  - ['on'|'off'] 'on' plot the histogram of values along 
 %                 with the threshold.
+%   'plotchans'  - ['on'|'off'] 'on' plot the channels scrollplot with
+%                 selected channels for rejection in red. Allow selected
+%                 channels rejection with the 'REJECT' button.
 %   'elec'      - [integer array] only include specific channels.
 %
 % Outputs:
@@ -42,7 +45,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [EEG allrmchan] = pop_rejchanspec(EEG, varargin)
+function [EEG allrmchan com] = pop_rejchanspec(EEG, varargin)
 
 if nargin < 1
     help pop_rejchanspec;
@@ -61,9 +64,13 @@ if nargin < 2
                { 'style' 'text' 'string' 'Compute average reference first (check=on)' } ...
                { 'style' 'checkbox' 'string' '' 'value' 0 } { } ...
                { 'style' 'text' 'string' 'Plot histogram of power values (check=on)' } ...
-               { 'style' 'checkbox' 'string' '' 'value' 0 } { } };
+               { 'style' 'checkbox' 'string' '' 'value' 0 } { } ...               
+               { 'style' 'text' 'string' 'Plot channels scrollplot (check=on)' } ...
+               { 'style' 'checkbox' 'string' '' 'value' 0 } { } ...
+             };
+          
            
-    geom = { [2 1] [2 1] [2 1] [2 1] [2 0.3 0.7] [2 0.3 0.7] };
+    geom = { [2 1] [2 1] [2 1] [2 1] [2 0.3 0.7] [2 0.3 0.7] [2 0.3 0.7] };
     result = inputgui( 'uilist', uilist, 'geometry', geom, 'title', 'Reject channel using spectrum -- pop_rejchanspec()', ...
         'helpcom', 'pophelp(''pop_rejchan'')');
     if isempty(result), return; end;
@@ -78,6 +85,12 @@ if nargin < 2
     if result{6}, 
          options = { options{:} 'plothist', 'on' }; 
     end;
+    % Begin: Added by Romain on 22 July 2010
+    if result{7}, 
+         options = { options{:} 'plotchans', 'on' }; 
+    end;
+    % End: Added by Romain on 22 July 2010
+    
 else
     options = varargin;
 end;
@@ -86,6 +99,7 @@ end;
 % --------------
 opt = finputcheck( options, { 'averef'    'string'    { 'on' 'off' }       'off';
                               'plothist'  'string'    { 'on' 'off' }       'off';
+                              'plotchans'  'string'    { 'on' 'off' }       'on';
                               'elec'      'integer'   []                   [1:EEG.nbchan];
                               'freqlims'  'real'   []                      [35 EEG.srate/2];
                               'absthresh' 'real'   []                      [];
@@ -151,10 +165,28 @@ for index = 1:size(opt.freqlims,1)
 end;
 allrmchan = unique(allrmchan);
 
-EEG = pop_select(EEG, 'nochannel', allrmchan);
+com = sprintf('EEG = pop_rejchan(EEG, %s);', vararg2str(options));
+if strcmpi(opt.plotchans, 'on')   
+    tmpcom = [ 'EEGTMP = pop_select(EEG, ''nochannel'', [' num2str(opt.elec(allrmchan)) ']);' ];
+    tmpcom = [ tmpcom ...
+            'LASTCOM = ' vararg2str(com) ';' ...
+            '[ALLEEG EEG CURRENTSET tmpcom] = pop_newset(ALLEEG, EEGTMP, CURRENTSET);' ...
+            '   if ~isempty(tmpcom),' ... 
+            '     EEG = eegh(LASTCOM, EEG);' ...
+            '     eegh(tmpcom);' ...
+            '     eeglab(''redraw'');' ...
+            '  end; clear EEGTMP tmpcom;' ];
+ 
+    colors = cell(1,length(opt.elec)); colors(:) = { 'k' };
+    colors(allrmchan) = { 'r' }; colors = colors(end:-1:1);
+    fprintf('%d electrodes labeled for rejection\n', length(find(allrmchan)));
+    if ~isempty(EEG.chanlocs), tmplocs = EEG.chanlocs(opt.elec); tmpelec = { EEG.chanlocs(opt.elec).labels }';
+    else                       tmplocs = []; tmpelec = mattocell([1:EEG.nbchan]');
+    end;
+    eegplot(EEG.data(opt.elec,:,:), 'srate', EEG.srate, 'title', 'Scroll component activities -- eegplot()', ...
+        'limits', [EEG.xmin EEG.xmax]*1000, 'color', colors, 'eloc_file', tmplocs, 'command', tmpcom);
+end;
 
 if nargin < 2
     allrmchan = sprintf('EEG = pop_rejchanspec(EEG, %s);', vararg2str(options));
 end;
-
-    
