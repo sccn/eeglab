@@ -57,7 +57,7 @@ if nargin < 1
 	help pop_iirfilt;
 	return;
 end;	
-if isempty(EEG.data)
+if isempty(EEG(1).data)
     disp('pop_iirfilt() error: cannot filter an empty dataset'); return;
 end;    
 if nargin < 2
@@ -119,6 +119,14 @@ end;
 if exist('filtfilt') ~= 2
     disp('Warning: cannot find the signal processing toolbox');
     disp('         a simple fft/inverse fft filter will be used');
+end;
+
+% process multiple datasets
+% -------------------------
+if length(EEG) > 1
+   [ EEG com ] = eeg_eval( 'pop_iirfilt', EEG, 'warning', 'on', 'params', ...
+                           { locutoff, hicutoff, trans_bw, revfilt } );
+   return;
 end;
 
 if EEG.trials == 1 
