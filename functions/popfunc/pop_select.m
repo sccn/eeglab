@@ -292,7 +292,7 @@ if ~isempty( g.notime )
             error('Wrong notime range. Remember that it is not possible to remove a slice of time for data epochs.');
         end;
     end;
-    if max(g.notime(:)) > EEG.xmax | min(g.notime(:)) < EEG.xmin
+    if floor(max(g.notime(:))) > EEG.xmax || min(g.notime(:)) < EEG.xmin
         error('Time/point range out of data limits');
     end;
 end;
