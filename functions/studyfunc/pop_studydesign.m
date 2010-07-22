@@ -128,7 +128,7 @@ if nargin < 3 && ~isstr(STUDY)
 
     for i = 1:length(geometry), geometry{i}{3} = geometry{i}{3}-1; end;            
     streval = [ 'pop_studydesign(''selectdesign'', gcf);' ];    
-    [tmp usrdat tmp2 result] = inputgui('uilist', uilist, 'geom', geometry, 'userdata', usrdat, 'eval', streval);
+    [tmp usrdat tmp2 result] = inputgui('uilist', uilist, 'title', 'Edit STUDY design -- pop_studydesign()', 'geom', geometry, 'userdata', usrdat, 'eval', streval);
     if isempty(tmp), return; end;
     
     % call std_makedesign
