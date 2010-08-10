@@ -66,59 +66,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Log: signalstat.m,v $
-% Revision 1.23  2006/11/15 20:51:22  arno
-% Voltage -> Potential
-%
-% Revision 1.22  2003/12/03 18:49:26  arno
-% msg
-%
-% Revision 1.21  2003/12/03 18:46:46  arno
-% debug if stat toolbox abset
-%
-% Revision 1.20  2003/12/03 18:44:19  arno
-% same
-%
-% Revision 1.19  2003/12/03 18:42:48  arno
-% debug signal proc. toolbox absent
-%
-% Revision 1.18  2002/11/15 01:46:54  arno
-% header for web
-%
-% Revision 1.17  2002/11/11 19:24:05  luca
-% rearranged quantiles printout, 0.000; 1.000; ...
-%
-% Revision 1.16  2002/08/23 22:18:21  luca
-% added topoplot (EEG channel location or component map)
-%
-% Revision 1.15  2002/08/22 06:39:39  luca
-% uses qqdiagram(), quantile()
-% excluded features if stats toolbox not present
-% plots hi & low quantiles in QQ and print trimmed SD
-% changed axis labels, added legend
-%
-% Revision 1.14  2002/08/20 18:33:56  arno
-% normpdf
-%
-% Revision 1.13  2002/08/14 21:09:08  arno
-% debugging
-%
-% Revision 1.12  2002/08/14 21:07:23  luca
-% now checks if Statistics Toolbox is present, since required
-%
-% Revision 1.11  2002/08/13 22:37:44  luca
-% fixed bkg color
-%
-% Revision 1.10  2002/08/13 18:18:14  luca
-% fixed header formatting for help2html
-%
-% Revision 1.9  2002/08/12 20:28:56  luca
-% cosmetics and title variable dlabel2 added
-%
-% Revision 1.8  2002/08/12 20:01:08  luca
-% added the Log tag
-%
-
 function [M,SD,sk,k,med,zlow,zhi,tM,tSD,tndx,ksh] = signalstat( data, plotlab, dlabel, percent, dlabel2, map, chan_locs);
 
 M=[]; SD=[]; sk=[]; k=[]; med=[]; zlow=[]; zhi=[]; tM=[]; tSD=[]; tndx=[]; ksh=[]; 
