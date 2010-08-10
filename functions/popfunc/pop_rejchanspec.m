@@ -99,7 +99,7 @@ end;
 % --------------
 opt = finputcheck( options, { 'averef'    'string'    { 'on' 'off' }       'off';
                               'plothist'  'string'    { 'on' 'off' }       'off';
-                              'plotchans'  'string'    { 'on' 'off' }       'on';
+                              'plotchans'  'string'    { 'on' 'off' }       'off';
                               'elec'      'integer'   []                   [1:EEG.nbchan];
                               'freqlims'  'real'   []                      [35 EEG.srate/2];
                               'absthresh' 'real'   []                      [];
@@ -113,8 +113,8 @@ else NEWEEG = EEG;
 end;
 [tmpspec freqs] = pop_spectopo(NEWEEG, 1, [], 'EEG' , 'percent', 100, 'freqrange',[0 EEG.srate/2], 'plot', 'off');
 
-if length(opt.stdthresh) == 1 && size(opt.freqlims,1) > 1
-    opt.stdthresh = ones(1, size(opt.freqlims,1))*opt.stdthresh;
+if length(opt.stdthresh) >= 1 && size(opt.freqlims,1) > 1
+    opt.stdthresh = ones(length(opt.stdthresh), size(opt.freqlims,1))*opt.stdthresh;  
 end;
 
 allrmchan = [];
@@ -129,7 +129,12 @@ for index = 1:size(opt.freqlims,1)
     else
         m = median(selectedspec);
         s = std( selectedspec);
-        rmchan = find(selectedspec > m+s*opt.stdthresh(index));
+        nbTresh = size(opt.stdthresh);
+        if length(opt.stdthresh) > 1
+            rmchan = find(selectedspec <= m+s*opt.stdthresh(index,1) | selectedspec >= m+s*opt.stdthresh(index,2));
+        else 
+            rmchan = find(selectedspec > m+s*opt.stdthresh(index));
+        end
     end;
     
     % print out results
@@ -156,8 +161,16 @@ for index = 1:size(opt.freqlims,1)
             plot([opt.absthresh(1) opt.absthresh(1)], yl, 'r');
             plot([opt.absthresh(2) opt.absthresh(2)], yl, 'r');
         else
-            threshold =  m+s*opt.stdthresh(index);
-            plot([threshold threshold], yl, 'r');
+            if length(opt.stdthresh) > 1
+                threshold1 =  m+s*opt.stdthresh(index,1);
+                threshold2 =  m+s*opt.stdthresh(index,2);
+                plot([m m], yl, 'g');
+                plot([threshold1 threshold1], yl, 'r');
+                plot([threshold2 threshold2], yl, 'r');
+            else
+                threshold =  m+s*opt.stdthresh(index,1);
+                plot([threshold threshold], yl, 'r');
+            end
         end;
         title(textout);
     end;
@@ -185,6 +198,8 @@ if strcmpi(opt.plotchans, 'on')
     end;
     eegplot(EEG.data(opt.elec,:,:), 'srate', EEG.srate, 'title', 'Scroll component activities -- eegplot()', ...
         'limits', [EEG.xmin EEG.xmax]*1000, 'color', colors, 'eloc_file', tmplocs, 'command', tmpcom);
+else
+    EEG = pop_select(EEG, 'nochannel', opt.elec(allrmchan));
 end;
 
 if nargin < 2
