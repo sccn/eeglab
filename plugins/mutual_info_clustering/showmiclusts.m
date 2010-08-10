@@ -55,6 +55,10 @@
 
 function showclusts(miclusters,plotComponentFunction, showAdditionalFigures ,mapSizeCoeff)
 
+if nargin < 3
+    showAdditionalFigures = true;
+end;
+
 if nargin < 4
     mapSizeCoeff = 1;
 end;
@@ -131,7 +135,7 @@ for i=1:number_of_clusters
             colors(find(IDX==i,1),:) ...
             * silhColor3D(t3d_forcluster(j,4)),sphereSize);
     end;
-end;
+%end;
 
 %
 % Scale 2-D coordinates to figure dimensions ([0 1)
@@ -185,6 +189,8 @@ t2d_for_axes(:,1:2) = relaxedPositions;
 comp_cluster{i} =t2d_for_axes;
 miclusters.cluster{i}.t2d_for_axes = comp_cluster{i};
 
+
+end; %?
 
 hold off;
 axis equal;
