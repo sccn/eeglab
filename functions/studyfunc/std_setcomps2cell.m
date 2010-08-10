@@ -24,8 +24,11 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [ tmpstruct setinds allinds ] = std_setcomps2cell(STUDY, sets, comps)
+function [ tmpstruct setinds allinds ] = std_setcomps2cell(STUDY, sets, comps, generateerror)
 
+if nargin < 4
+    generateerror = 0;
+end;
 if nargin < 3
     tmpstruct = STUDY.cluster(sets);
     sets  = tmpstruct.sets;
@@ -74,3 +77,10 @@ for index = 1:length(setinfo)
 end;
 tmpstruct.allinds = allinds;
 tmpstruct.setinds = setinds;
+
+if generateerror && isempty(setinds{1})
+    error( [ 'Some datasets not included in preclustering' 10 ... 
+             'because of partial STUDY design. You need to' 10 ...
+             'use a STUDY design that includes all datasets.' ]);
+end;
+
