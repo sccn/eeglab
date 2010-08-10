@@ -102,21 +102,25 @@ if length(EEG) > 1
     return;
 end;
 
-if exist('pointrange') ~= 1 & ~isempty(timerange)
+if exist('pointrange') ~= 1 && ~isempty(timerange)
     if (timerange(1) < EEG.xmin*1000) & (timerange(2) > EEG.xmax*1000)
         error('pop_rmbase(): Bad time range');
     end;
     pointrange = round((timerange(1)/1000-EEG.xmin)*EEG.srate+1):round((timerange(2)/1000-EEG.xmin)*EEG.srate);
 end;
 
-if isempty(pointrange)
-    if ~isempty(timerange) & (timerange(1) < EEG.xmin*1000) & (timerange(2) > EEG.xmax*1000)
+if isempty(timerange)
+    timerange = [ EEG(1).xmin*1000 EEG(1).xmax*1000];
+end;
+
+if exist('pointrange') ~= 1 || isempty(pointrange)
+    if ~isempty(timerange) && (timerange(1) < EEG.xmin*1000) & (timerange(2) > EEG.xmax*1000)
         error('pop_rmbase(): Bad time range');
     end;
     pointrange = round((timerange(1)/1000-EEG.xmin)*EEG.srate+1):round((timerange(2)/1000-EEG.xmin)*EEG.srate);
 end;	
 
-if (min(pointrange) < 1) | (max( pointrange ) > EEG.pnts)  
+if ~isempty(pointrange) && ((min(pointrange) < 1) || (max( pointrange ) > EEG.pnts))
    error('pop_rmbase(): Wrong point range');
 end;
 
