@@ -29,11 +29,14 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function finalinds = eeg_chaninds(EEG, channames);
+function finalinds = eeg_chaninds(EEG, channames, errorifnotfound);
 
     if nargin < 2
         help eeg_chaninds;
         return;
+    end;
+    if nargin < 3
+        errorifnotfound = 1;
     end;
     
     if isfield(EEG, 'chanlocs')
@@ -57,7 +60,8 @@ function finalinds = eeg_chaninds(EEG, channames);
         chanind = strmatch( lower(channames{c}), tmpallchans, 'exact');
         if isempty(chanind), 
             chanind = str2double(channames{c});
-            if isempty(chanind) | isnan(chanind)
+            if isnan(chanind), chanind = []; end;
+            if errorifnotfound && isempty(chanind)
                 error(sprintf('Channel %s not found', channames{c})); 
             end;
         end;
