@@ -256,7 +256,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                     % read and concatenate all cells for this specific set
                     % of identical ICA decompositions
                     STUDY.cluster = checkcentroidfield(STUDY.cluster, 'erp', 'erp_times');
-                    tmpstruct = std_setcomps2cell(STUDY, STUDY.cluster(cluster_ind).sets(:,si), STUDY.cluster(cluster_ind).comps(si));
+                    tmpstruct = std_setcomps2cell(STUDY, STUDY.cluster(cluster_ind).sets(:,si), STUDY.cluster(cluster_ind).comps(si), 1);
                     cellinds  = [ tmpstruct.setinds{:} ];
                     compinds  = [ tmpstruct.allinds{:} ];
                     cells = STUDY.design(STUDY.currentdesign).cell(cellinds);
@@ -278,7 +278,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                 % read and concatenate all cells for this specific set
                 % of identical ICA decompositions
                 STUDY.cluster = checkcentroidfield(STUDY.cluster, 'spec', 'spec_freqs');
-                tmpstruct = std_setcomps2cell(STUDY, STUDY.cluster(cluster_ind).sets(:,si), STUDY.cluster(cluster_ind).comps(si));
+                tmpstruct = std_setcomps2cell(STUDY, STUDY.cluster(cluster_ind).sets(:,si), STUDY.cluster(cluster_ind).comps(si), 1);
                 cellinds  = [ tmpstruct.setinds{:} ];
                 compinds  = [ tmpstruct.allinds{:} ];
                 cells = STUDY.design(STUDY.currentdesign).cell(cellinds);
@@ -321,7 +321,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                     % read and concatenate all cells for this specific set
                     % of identical ICA decompositions
                     STUDY.cluster = checkcentroidfield(STUDY.cluster, 'ersp', 'ersp_times', 'ersp_freqs', 'itc', 'itc_times', 'itc_freqs');
-                    tmpstruct = std_setcomps2cell(STUDY, STUDY.cluster(cluster_ind).sets(:,si), STUDY.cluster(cluster_ind).comps(si));
+                    tmpstruct = std_setcomps2cell(STUDY, STUDY.cluster(cluster_ind).sets(:,si), STUDY.cluster(cluster_ind).comps(si), 1);
                     cellinds  = [ tmpstruct.setinds{:} ];
                     compinds  = [ tmpstruct.allinds{:} ];
                     cells = STUDY.design(STUDY.currentdesign).cell(cellinds);
@@ -335,7 +335,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
             X = reshape(X, 1, numel(X));
             if si == 1, data = zeros(size(STUDY.cluster(cluster_ind).sets,2),length(X)); end;
                  data(si,:) = X;
-           try
+            try
                 data(si,:) = X;
             catch,
                 error([ 'This type of pre-clustering requires that all subjects' 10 ...
@@ -345,7 +345,6 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                               'datasets may have the same decomposition), at least one' 10 ...
                               'dataset must be represented.' ]);
             end;
-            
         end; % end scan datasets
 
         % adjust number of PCA values
