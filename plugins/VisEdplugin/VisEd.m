@@ -1,6 +1,5 @@
 function EEG = VisEd(EEG, DataType, ChanIndex, EventType)
 
-
 chans=eval(ChanIndex);
 
 if ~isfield(EEG.chanlocs,'badchan')
@@ -48,6 +47,7 @@ end
 % Create VisEd.event field containing events selected in pop_VisEd.
 
 j=0;
+VisEd.event = [];
 for i=1:length(EEG.event);
     if ~isempty(strmatch(EEG.event(i).type,EventType, 'exact'));
         event=EEG.event(i);
@@ -95,7 +95,7 @@ else
 end
 
 
-command=sprintf('%s','EEG=VisEd_UpdateEvents(EEG, g);');
+command=sprintf('%s','EEG=VisEd_UpdateEvents(EEG, g); EEG.saved = ''no'';');
 
 % Call eegplot with variables set from pop-VisEd and ctrlselectcommand
 % option set to { 'VisEd_ctrldowncom;' 'eegplot(''defmotioncom'', gcbf);' '' }.
