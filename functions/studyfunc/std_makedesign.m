@@ -270,7 +270,7 @@ for n1 = 1:nf1
                     else txtval =  [ rmblk(opt.values1{n1}) '_' rmblk(opt.values2{n2}) ];
                     end;
                     if ~isempty(txtval),      txtval = [ '_' txtval ]; end;
-                    if ~isempty(subjects{s}), txtval = [ '_' subjects{s} txtval ]; end;
+                    if ~isempty(subjects{s}), txtval = [ '_' rmblk(subjects{s}) txtval ]; end;
                     des.cell(count).filebase = fullfile(ALLEEG(datsubj(1)).filepath, ...
                       [ 'design' int2str(designind) txtval ] );
                 end;
@@ -353,7 +353,12 @@ function res = strmatchmult(a, b);
 % -------------
 function res = rmblk(a);
     res = a;
-    res(find(res == ' ')) = [];
+    res(find(res == ' ')) = '_';
+    res(find(res == '\')) = '_';    
+    res(find(res == '/')) = '_';    
+    res(find(res == ':')) = '_';    
+    res(find(res == ';')) = '_';    
+    res(find(res == '"')) = '_';    
     
 function strval = cell2str(vals);
     strval = vals{1};
