@@ -189,7 +189,16 @@ if ~isempty(g.components)
         error('Cannot compute ERSP/ITC for components and channels at the same time');
     end;
 elseif ~isempty(g.channels)
-    g.indices = g.channels;
+    if iscell(g.channels)
+        g.indices = eeg_chaninds(EEG(1), g.channels, 0);
+        for ind = 2:length(EEG)
+            if ~isequal(eeg_chaninds(EEG(ind), g.channels, 0), g.indices)
+                error([ 'Channel information must be consistant when ' 10 'several datasets are merged for a specific design' ]);
+            end;
+        end;
+    else
+        g.indices = g.channels;
+    end;
     prefix = 'chan';
     filenameersp   = [ g.fileout '.datersp'  ];
     filenameitc    = [ g.fileout '.datitc'   ];
@@ -369,9 +378,9 @@ else
 end;
 if ~isempty(g.channels)
     if ~isempty(EEG(1).chanlocs)
-        all_ersp.chanlabels   = { EEG(1).chanlocs(g.channels).labels };
-        all_itc.chanlabels    = { EEG(1).chanlocs(g.channels).labels };
-        all_trials.chanlabels = { EEG(1).chanlocs(g.channels).labels };
+        all_ersp.chanlabels   = { EEG(1).chanlocs(g.indices).labels };
+        all_itc.chanlabels    = { EEG(1).chanlocs(g.indices).labels };
+        all_trials.chanlabels = { EEG(1).chanlocs(g.indices).labels };
     end;
 end;
 
