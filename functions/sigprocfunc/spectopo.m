@@ -188,15 +188,15 @@ if nargin <= 3 | isstr(varargin{1})
 		end;
 	end;
 else
-        if ~isnumeric(data)
-           error('spectopo(): Incorrect call format (see >> help spectopo).')
-        end
-        if ~isnumeric(frames) | round(frames) ~= frames
-           error('spectopo(): Incorrect call format (see >> help spectopo).')
-        end
-        if ~isnumeric(srate)  % 3rd arg must be the sampling rate in Hz
-           error('spectopo(): Incorrect call format (see >> help spectopo).')
-        end
+    if ~isnumeric(data)
+       error('spectopo(): Incorrect call format (see >> help spectopo).')
+    end
+    if ~isnumeric(frames) | round(frames) ~= frames
+       error('spectopo(): Incorrect call format (see >> help spectopo).')
+    end
+    if ~isnumeric(srate)  % 3rd arg must be the sampling rate in Hz
+       error('spectopo(): Incorrect call format (see >> help spectopo).')
+    end
 
 	if nargin > 3,    g.freq = varargin{1};
 	else              g.freq = [];
