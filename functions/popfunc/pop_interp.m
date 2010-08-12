@@ -105,7 +105,7 @@ function [EEG com] = pop_interp(EEG, bad_elec, method)
         end;
         bad_elec = userdata.chans;
         
-        com = sprintf('EEG = pop_interp(EEG, %s, %s);', userdata.chanstr, method);
+        com = sprintf('EEG = pop_interp(EEG, %s, ''%s'');', userdata.chanstr, method);
         if ~isempty(findstr('nodatchans', userdata.chanstr))
             eval( [ userdata.chanstr '=[];' ] );
         end;
