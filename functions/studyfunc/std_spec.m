@@ -181,7 +181,8 @@ end;
 options = {};
 if ~isempty(g.rmcomps), options = { options{:} 'rmcomps' g.rmcomps }; end;
 if ~isempty(g.interp),  options = { options{:} 'interp' g.interp }; end;
-X       = [];
+X          = [];
+boundaries = [];
 for dat = 1:length(EEG)
     if strcmpi(prefix, 'comp')
         tmpdata = eeg_getdatact(EEG(dat), 'component', [1:size(EEG(dat).icaweights,1)], 'trialindices', g.trialindices{dat} );
@@ -197,36 +198,52 @@ for dat = 1:length(EEG)
             tmpdata = EEG(dat).data;
         end;
     end;
-    if isempty(X), X = tmpdata;
+    if all([ EEG.trials ] > 1)
+        if size(X,2) ~= size(tmpdata,2) && size(X,3) ~= 1, error('Datasets to be concatenated do not have the same number of time points'); end;
+        if isempty(X), 
+            X = tmpdata; 
+        else           
+            if size(X,1) ~= size(tmpdata,1), error('Datasets to be concatenated do not have the same number of channels'); end;
+            X(:,:,end+1:end+size(tmpdata,3)) = tmpdata; % concatenating trials
+        end;
     else
-        if size(X,1) ~= size(tmpdata,1), error('Datasets to be concatenated do not have the same number of channels'); end;
-        if size(X,2) ~= size(tmpdata,2), error('Datasets to be concatenated do not have the same number of time points'); end;
-        X(:,:,end+1:end+size(tmpdata,3)) = tmpdata; % concatenating trials
+        % get boundaries for continuous data
+        if ~isempty(EEG(dat).event) && isfield(EEG(dat).event, 'type') && ischar(EEG(dat).event(1).type)
+             tmpbound = strmatch('boundary', lower({ EEG(dat).event.type }));
+             if ~isempty(tmpbound)
+                 boundaries = [boundaries size(X,2) [ EEG(dat).event(tmpbound).latency ]-0.5+size(X,2) ];
+             end;
+        else 
+        end;
+        if isempty(X), 
+            X = tmpdata;
+        else
+            if size(X,1) ~= size(tmpdata,1), error('Datasets to be concatenated do not have the same number of channels'); end;
+            X(:,end+1:end+size(tmpdata,2)) = tmpdata;
+        end;
     end;
 end;
+if ~isempty(boundaries), boundaries = [boundaries size(X,2)]; end;
 
+% get specific time range for epoched and continuous data
 if ~isempty(g.timerange) 
     if oritrials > 1
-        timebef  = find(EEG.times >= g.timerange(1) & EEG.times < g.timerange(2) );
+        timebef  = find(EEG(1).times >= g.timerange(1) & EEG(1).times < g.timerange(2) );
         X        = X(:,timebef,:);
-        EEG.pnts = length(timebef);
+        EEG(1).pnts = length(timebef);
     else
         disp('warning: ''timerange'' option cannot be used with continuous data');
     end;
 end;
+
+% compute spectral decomposition
 if strcmpi(g.specmode, 'psd')
-    if ~isempty(EEG.event) && isfield(EEG.event, 'type') && ischar(EEG(1).event(1).type)
-         boundaries = strmatch('boundary', lower({ EEG(1).event.type }));
-         if ~isempty(boundaries)
-             boundaries = [0 [ EEG.event(boundaries).latency ]-0.5 EEG(1).pnts ];
-         end;
-    else boundaries = [];
-    end;
-    [X, f] = spectopo(X, EEG.pnts, EEG.srate, 'plot', 'off', 'boundaries', boundaries, 'nfft', g.nfft, spec_opt{:});
+    [X, f] = spectopo(X, size(X,2), EEG(1).srate, 'plot', 'off', 'boundaries', boundaries, 'nfft', g.nfft, spec_opt{:});
     if strcmpi(g.savetrials, 'on')
         disp('Cannot save trials using ''psd'' specmode option');
     end;
 elseif strcmpi(g.specmode, 'pmtm')
+    if all([ EEG.trials ] == 1) && ~isempty(boundaries), disp('Warning: multitaper does not take into account boundaries in continuous data'); end;
     fprintf('Computing multitaper:');
     for cind = 1:size(X,1)
         fprintf('.');
@@ -244,6 +261,7 @@ elseif strcmpi(g.specmode, 'pmtm')
         X = mean(X,3);
     end;
 elseif strcmpi(g.specmode, 'pburg')
+    if all([ EEG.trials ] == 1) && ~isempty(boundaries), disp('Warning: pburg does not take into account boundaries in continuous data'); end;
     for cind = 1:size(X,1)
         fprintf('.');
         for tind = 1:size(X,3)
@@ -259,6 +277,7 @@ elseif strcmpi(g.specmode, 'pburg')
         X = mean(X,3);    
     end;
 else % fft mode
+    if all([ EEG.trials ] == 1) && ~isempty(boundaries), disp('Warning: fft does not take into account boundaries in continuous data'); end;
     tmp   = fft(X, g.nfft, 2);
     f     = linspace(0, EEG(1).srate/2, size(tmp,2)/2);
     f     = f(2:end); % remove DC (match the output of PSD)
