@@ -148,6 +148,7 @@ if isfield(EEG.event, 'latency')
             EEG = rmfield(EEG, 'urevent');
         end;
     end;
+    EEG = eeg_checkset(EEG, 'eventconsistency');
 end;
 
 % resample for multiple channels ica
