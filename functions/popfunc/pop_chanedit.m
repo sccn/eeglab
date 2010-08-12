@@ -160,7 +160,7 @@ if nargin < 2
     orichaninfo = [];
 end;
 
-if isempty(chans) | ~isnumeric(chans)
+if isempty(chans) || ~isnumeric(chans)
     % in case an EEG structure was given as input
     % -------------------------------------------
     if isfield(chans, 'chanlocs')
@@ -202,14 +202,14 @@ if isempty(chans) | ~isnumeric(chans)
 
     % dealing with additional parameters
     % ----------------------------------
-    if nargin > 1 & ~isstr(orichaninfo), % nothing
+    if nargin > 1 && ~isstr(orichaninfo), % nothing
         if nargin > 2
             if ~isstr(varargin{1})
                 urchans  = varargin{1};
                 varargin = varargin(2:end);
             end;
         end;
-    elseif nargin > 1 && ~isempty(orichaninfo) && ~isstr(orichaninfo)
+    elseif nargin > 1 && ~isempty(orichaninfo) && isstr(orichaninfo)
         varargin = { orichaninfo varargin{:} };
         chaninfo.shrink        = shrinkorskirt;
         chaninfo.plotrad       = plotrad;
