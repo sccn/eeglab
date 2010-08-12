@@ -56,17 +56,19 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method)
         lab1 = { bad_elec.labels };
         lab2 = { EEG.chanlocs.labels };
         [tmp tmpchan] = setdiff( lab2, lab1);
+        tmpchan = sort(tmpchan);
         if ~isempty(tmpchan)
-            newchanlocs = bad_elec;
+            newchanlocs = [];
             fields = fieldnames(bad_elec);
             for index = 1:length(fields)
                 if isfield(bad_elec, fields{index})
                     for cind = 1:length(tmpchan)
                         fieldval = getfield( EEG.chanlocs, { tmpchan(cind) },  fields{index});
-                        newchanlocs = setfield(newchanlocs, { length(bad_elec)+cind }, fields{index}, fieldval);
+                        newchanlocs = setfield(newchanlocs, { cind }, fields{index}, fieldval);
                     end;
                 end;
             end;
+            newchanlocs(end+1:end+length(bad_elec)) = bad_elec;
             bad_elec = newchanlocs;
         end;
         if length(EEG.chanlocs) == length(bad_elec), return; end;
