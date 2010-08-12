@@ -35,7 +35,7 @@ function STUDY = std_maketrialinfo(STUDY, ALLEEG);
 %% test if .epoch field exist in ALLEEG structure
 epochfield = cellfun(@isempty, { ALLEEG.epoch });
 if any(epochfield)
-    fprintf('Warning: some datasets are continuous and trial information cannot be created');
+    fprintf('Warning: some datasets are continuous and trial information cannot be created\n');
     return;
 end;
 
