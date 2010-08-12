@@ -854,7 +854,7 @@ for c=1:m
          fitted_res=zeros(length(INoise),1);
                   
          if isempty(intersect(exc,c)) & npc~=0
-            Ipca=filtfilt(hpfwts,1,Idata-INoise);
+            Ipca=filtfilt(hpfwts,1,double(Idata-INoise));
             pccount=1;
             skcount=1;
             pick=cumsum(ones(markerl(sec),1)*2+round(rand(markerl(sec),1)));
@@ -1034,15 +1034,15 @@ for c=1:m
     end
     
     if lpf>0
-        cleanEEG=filtfilt(lpfwts,1,cleanEEG);
-        Noise=filtfilt(lpfwts,1,Noise);
+        cleanEEG=filtfilt(lpfwts,1,double(cleanEEG));
+        Noise=filtfilt(lpfwts,1,double(Noise));
     end
     
     if anc_chk==1
         % Adaptive Noise cancellation
         % ---------------------------
         refs=Noise(d1:d2)';
-        tmpd=filtfilt(ANCfwts,1,cleanEEG)';
+        tmpd=filtfilt(ANCfwts,1,double(cleanEEG))';
         d=double(tmpd(d1:d2));
         Alpha=sum(d.*refs)/sum(refs.*refs);
         refs=double(Alpha*refs);

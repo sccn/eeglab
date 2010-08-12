@@ -196,10 +196,10 @@ F350=zeros(ms350,1);
 %-----------------
 fL=round(fs/50);
 b=ones(1,fL)/fL;
-Ecg=filtfilt(b,1,Ecg);
+Ecg=filtfilt(b,1,double(Ecg));
 fL=round(fs/35);
 b=ones(1,fL)/fL;
-Ecg=filtfilt(b,1,Ecg);
+Ecg=filtfilt(b,1,double(Ecg));
 
 %Estimate init R and k
 %-----------------
@@ -219,14 +219,14 @@ f=[0 7/(fs/2) 9/(fs/2) 40/(fs/2) 42/(fs/2) 1];
 a=[0 0 1 1 0 0];
 wts=firls(100,f,a);
 ecgF=Ecg;
-ecgF=filtfilt(wts,1,Ecg);
+ecgF=filtfilt(wts,1,double(Ecg));
 for n=(k+1):(L-k)
     Y(n)=ecgF(n)^2-ecgF(n-k)*ecgF(n+k);
 end
 Y(L)=0;
 fL=round(fs/25);
 b=ones(1,fL)/fL;
-Y=filtfilt(b,1,Y);
+Y=filtfilt(b,1,double(Y));
 Y(find(Y<0))=0;
 
 

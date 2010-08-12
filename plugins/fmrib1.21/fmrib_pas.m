@@ -201,7 +201,7 @@ case 'obs'
             peakcount=pa;
         end
         
-        eegchan=filtfilt(fwts,1,EEG.data(ch,:));
+        eegchan=filtfilt(fwts,1,double(EEG.data(ch,:)));
         pcamat=zeros(pa-1,2*PArange+1);
         dpcamat=pcamat;
         for p=2:pa
