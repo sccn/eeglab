@@ -52,8 +52,16 @@ allinds = cell( nc, ng );
 setinds = cell( nc, ng );
 
 for index = 1:length(setinfo)
-    condind = strmatch( setinfo(index).value{1}, allconditions, 'exact');
-    grpind  = strmatch( setinfo(index).value{2}, allgroups    , 'exact');
+    % get index of independent variables
+    % ----------------------------------
+    if isstr(setinfo(index).value{1})
+         condind = strmatch( setinfo(index).value{1}, allconditions, 'exact');
+    else condind = find( setinfo(index).value{1} == [allconditions{:}]);
+    end;
+    if isstr(setinfo(index).value{2})
+         grpind  = strmatch( setinfo(index).value{2}, allgroups    , 'exact');
+    else grpind  = find( setinfo(index).value{2} == [ allgroups{:} ]);
+    end;
 
     if isempty(allconditions), condind = 1; end;
     if isempty(allgroups),     grpind  = 1; end;
@@ -68,7 +76,7 @@ for index = 1:length(setinfo)
         [ind1 ind2] = find(datind(1) == oldsets);
         columnica   = oldsets(:,ind2(1));
         if ~all(ismember(datind, columnica));
-            warning(' ***** Some contrast in the STUDY design have non uniform ICA components');
+            disp('Warning: ***** the current STUDY design combines datasets with different ICA decompositions');
         end;
     end;
         

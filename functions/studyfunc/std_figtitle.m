@@ -110,10 +110,10 @@ for c1 = 1:length(opt.condnames)
         % conditions
         % ----------
         if ~isempty(opt.condnames{c1})
-            fig_title = [ opt.condnames{c1} ', ' fig_title];
+            fig_title = [ num2str(opt.condnames{c1}) ', ' fig_title];
         end;
         if ~isempty(opt.cond2names{c2})
-            fig_title = [ opt.cond2names{c2} ', ' fig_title];
+            fig_title = [ num2str(opt.cond2names{c2}) ', ' fig_title];
         end;
 
         % channel labels, component name, subject name and datatype
@@ -203,13 +203,13 @@ if ~isempty(opt.mcorrect) && ~strcmpi(opt.mcorrect, 'none'),   basicstat = [ bas
 if strcmpi(opt.condstat, 'on')
     rown = size(all_titles,1)+1;
     for c2 = 1:length(opt.cond2names)
-        all_titles{rown, c2} = [ opt.cond2names{c2} ' ' basicstat ];   
+        all_titles{rown, c2} = [ num2str(opt.cond2names{c2}) ' ' basicstat ];   
     end;
 end;
 if strcmpi(opt.cond2stat, 'on')
     coln = size(all_titles,2)+1;
     for c1 = 1:length(opt.condnames)
-        all_titles{c1, coln} = [ opt.condnames{c1} ' ' basicstat ];   
+        all_titles{c1, coln} = [ num2str(opt.condnames{c1}) ' ' basicstat ];   
     end;
 end;
 if strcmpi(opt.condstat, 'on') && strcmpi(opt.cond2stat, 'on')

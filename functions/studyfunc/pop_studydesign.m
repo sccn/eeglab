@@ -292,13 +292,13 @@ elseif isstr(STUDY)
                 des(val).variable(2).label = usrdat.factors{val2};
                 des(val).variable(2).value = usrdat.factorvals{val2}(valf2);
             end;
-            if ~isequal(sort(des(val).variable(1).value), sort(usrdat.factorvals{val1}(valf1)))
+            if ~isequal(mysort(des(val).variable(1).value), mysort(usrdat.factorvals{val1}(valf1)))
                 des(val).variable(1).value = usrdat.factorvals{val1}(valf1);
             end;
-            if ~isequal(sort(des(val).variable(2).value), sort(usrdat.factorvals{val2}(valf2)))
+            if ~isequal(mysort(des(val).variable(2).value), mysort(usrdat.factorvals{val2}(valf2)))
                 des(val).variable(2).value = usrdat.factorvals{val2}(valf2);
             end;
-            if ~isequal(sort(des(val).cases.value), sort(usrdat.subjects(vals)))
+            if ~isequal(mysort(des(val).cases.value), mysort(usrdat.subjects(vals)))
                 des(val).cases.value = usrdat.subjects(vals);
             end;
             if ~isequal(des(val).variable(1).pairing, valpaired{valp1})
@@ -342,6 +342,10 @@ elseif isstr(STUDY)
             strs    = get(findobj(fig, 'tag', [ 'lbval'  num2str(factval) ]), 'string');
             if length(vals) == 1
                 warndlg2('You need to select several values to combine them');
+                return;
+            end;
+            if ~iscell(usrdat.factorvals{val1})
+                warndlg2('Cannot combine values from numerical variables');
                 return;
             end;
             usrdat.factorvals{val1}{end+1} = usrdat.factorvals{val1}{vals(1)};
@@ -419,6 +423,18 @@ elseif isstr(STUDY)
 end;
 
 function res = strmatchmult(a, b);
-    [tmp ind] = setdiff(b, a);
+    [tmp ind] = mysetdiff(b, a);
     res = setdiff([1:length(b)], ind);
-    
+
+function cellarray = mysort(cellarray)
+    if ~isempty(cellarray) && isstr(cellarray{1})
+        cellarray = sort(cellarray);
+    end;
+
+function [cellout inds ] = mysetdiff(cell1, cell2);
+    if (~isempty(cell1) && isstr(cell1{1})) || (~isempty(cell2) && isstr(cell2{1}))
+         [ cellout inds ] = setdiff(cell1, cell2);
+    else [ cellout inds ] = setdiff([ cell1{:} ], [ cell2{:} ]);
+         cellout = mattocell(cellout);
+    end;
+

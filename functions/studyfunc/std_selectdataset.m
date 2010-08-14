@@ -70,7 +70,11 @@ elseif isfield(STUDY.datasetinfo, indvar) && ~isempty(getfield(STUDY.datasetinfo
     eval( [ 'fieldvals = { STUDY.datasetinfo.' indvar '};' ] );
     datind = [];
     for dat = 1:length(indvarvals)
-        datind = union(datind, strmatch(indvarvals{dat}, fieldvals));
+        if isstr(indvarvals{dat})
+            datind = union(datind, strmatch(indvarvals{dat}, fieldvals));
+        else
+            datind = union(datind, find(indvarvals{dat} == [ fieldvals{:} ]));
+        end;
     end;
 else
     % selection of trials within datasets

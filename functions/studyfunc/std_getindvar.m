@@ -59,10 +59,23 @@ if strcmpi(mode, 'datinfo') || strcmpi(mode, 'both')
             if length(tmpvals) > 1
                 factor{    countfact} = ff{index};
                 factorvals{countfact} = tmpvals;
-                
+
                 % get subject for each factor value
                 for c = 1:length(tmpvals)
                     eval( [ 'datind = strmatch(tmpvals{c}, { setinfo.' ff{index} '}, ''exact'');' ] );
+                    subjects{  countfact}{c} = unique( { setinfo(datind).subject } );
+                end;
+                countfact = countfact + 1;
+            end;
+        else
+            eval( [ 'tmpvals = unique([ setinfo.' ff{index} ']);' ] );
+            if length(tmpvals) > 1
+                factor{    countfact} = ff{index};
+                factorvals{countfact} = mattocell(tmpvals);
+
+                % get subject for each factor value
+                for c = 1:length(tmpvals)
+                    eval( [ 'datind = find(tmpvals(c) == [ setinfo.' ff{index} ']);' ] );
                     subjects{  countfact}{c} = unique( { setinfo(datind).subject } );
                 end;
                 countfact = countfact + 1;
@@ -105,9 +118,17 @@ if scandesign
     for desind = 1:length(STUDY.design)
         pos1 = strmatch(STUDY.design(desind).variable(1).label, factor, 'exact');
         pos2 = strmatch(STUDY.design(desind).variable(2).label, factor, 'exact');
-        if ~isempty(pos1), add1 = setdiff(STUDY.design(desind).variable(1).value, factorvals{pos1}); else add1 = []; end;
-        if ~isempty(pos2), add2 = setdiff(STUDY.design(desind).variable(2).value, factorvals{pos2}); else add2 = []; end;
+        if ~isempty(pos1), add1 = mysetdiff(STUDY.design(desind).variable(1).value, factorvals{pos1}); else add1 = []; end;
+        if ~isempty(pos2), add2 = mysetdiff(STUDY.design(desind).variable(2).value, factorvals{pos2}); else add2 = []; end;
         if ~isempty(add1), factorvals{pos1} = { factorvals{pos1}{:} add1{:} }; end;
         if ~isempty(add2), factorvals{pos2} = { factorvals{pos2}{:} add2{:} }; end;
     end;
 end;
+
+function cellout = mysetdiff(cell1, cell2);
+
+    if isstr(cell1{1})
+         cellout = setdiff(cell1, cell2);
+    else cellout = mattocell(setdiff( [ cell1{:} ], [ cell2{:} ]));
+    end;
+    

@@ -145,8 +145,8 @@ if ~isempty(varargin) && isstruct(varargin{1})
 end;
 opt = finputcheck(varargin,  {'variable1'     'string'    []     defdes.variable(1).label;
                               'variable2'     'string'    []     defdes.variable(2).label;
-                              'values1'       'cell'      []     defdes.variable(1).value;
-                              'values2'       'cell'      []     defdes.variable(2).value;
+                              'values1'       {'real' 'cell' } []     defdes.variable(1).value;
+                              'values2'       {'real' 'cell' } []     defdes.variable(2).value;
                               'pairing1'      'string'    []     defdes.variable(1).pairing;
                               'pairing2'      'string'    []     defdes.variable(2).pairing;
                               'name'          'string'    {}     defdes.name;
@@ -158,8 +158,8 @@ opt = finputcheck(varargin,  {'variable1'     'string'    []     defdes.variable
 if isstr(opt), error(opt); end;
 if strcmpi(opt.variable1, 'none'), opt.variable1 = ''; end;
 if strcmpi(opt.variable2, 'none'), opt.variable2 = ''; end;
-for i = 1:length(opt.values1), if iscell(opt.values1{i}), opt.values1{i} = cell2str(opt.values1{i}); end; end;
-for i = 1:length(opt.values2), if iscell(opt.values2{i}), opt.values2{i} = cell2str(opt.values2{i}); end; end;
+if iscell(opt.values1), for i = 1:length(opt.values1), if iscell(opt.values1{i}), opt.values1{i} = cell2str(opt.values1{i}); end; end; end;
+if iscell(opt.values2), for i = 1:length(opt.values2), if iscell(opt.values2{i}), opt.values2{i} = cell2str(opt.values2{i}); end; end; end;
     
 % build command list for history
 % ------------------------------
@@ -352,6 +352,7 @@ function res = strmatchmult(a, b);
 % remove blanks
 % -------------
 function res = rmblk(a);
+    if ~isstr(a), a = num2str(a); end;
     res = a;
     res(find(res == ' ')) = '_';
     res(find(res == '\')) = '_';    
