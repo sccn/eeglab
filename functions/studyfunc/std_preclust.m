@@ -122,9 +122,11 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
     xmin  = ALLEEG(STUDY.datasetinfo(1).index).xmin;
     for index = 1:length(STUDY.datasetinfo)
         ind = STUDY.datasetinfo(index).index;
-        if pnts  ~= ALLEEG(ind).pnts, error(sprintf('Dataset %d does not have the same number of point as dataset 1', ind)); end;
         if srate ~= ALLEEG(ind).srate, error(sprintf('Dataset %d does not have the same sampling rate as dataset 1', ind)); end;
-        if xmin  ~= ALLEEG(ind).xmin, warning(sprintf('Dataset %d does not have the same time limit as dataset 1', ind)); end;
+        if ~all([ ALLEEG.trials ] == 1)
+            if xmin  ~= ALLEEG(ind).xmin, warning(sprintf('Dataset %d does not have the same time limit as dataset 1', ind)); end;
+            if pnts  ~= ALLEEG(ind).pnts, error(sprintf('Dataset %d does not have the same number of point as dataset 1', ind)); end;
+        end;
     end;
     
     % Get component indices that are part of the cluster 
@@ -155,18 +157,18 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
     
     % scan all commands to see if file exist
     % --------------------------------------
-    for index = 1:length(varargin) % scan commands
-        strcom = varargin{index}{1};
-        if strcmpi(strcom, 'scalp') | strcmpi(strcom, 'scalplaplac') | strcmpi(strcom, 'scalpgrad') 
-            strcom = 'topo';
-        end;
-        if ~strcmpi(strcom, 'dipoles') & ~strcmpi(strcom, 'finaldim')
-            tmpfile = fullfile( ALLEEG(1).filepath, [ ALLEEG(1).filename(1:end-3) 'ica' strcom ]); 
-            if exist(tmpfile) ~= 2
-                error([ 'Could not find "' upper(strcom) '" file, they must be precomputed' ]);
-            end;
-        end;
-    end;
+%     for index = 1:length(varargin) % scan commands
+%         strcom = varargin{index}{1};
+%         if strcmpi(strcom, 'scalp') || strcmpi(strcom, 'scalplaplac') || strcmpi(strcom, 'scalpgrad') 
+%             strcom = 'topo';
+%         end;
+%         if ~strcmpi(strcom, 'dipoles') && ~strcmpi(strcom, 'finaldim')
+%             tmpfile = fullfile( ALLEEG(1).filepath, [ ALLEEG(1).filename(1:end-3) 'ica' strcom ]); 
+%             if exist(tmpfile) ~= 2
+%                 %error([ 'Could not find "' upper(strcom) '" file, they must be precomputed' ]);
+%             end;
+%         end;
+%     end;
             
     % Decode input arguments
     % ----------------------
@@ -247,6 +249,17 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
         else                                   scalpmodif = 'gradient';
         end;
         
+        % check that all datasets are in preclustering for current design
+        % ---------------------------------------------------------------
+        tmpstruct = std_setcomps2cell(STUDY, STUDY.cluster(cluster_ind).sets, STUDY.cluster(cluster_ind).comps);
+        alldatasets = unique( [ tmpstruct.setinds{:} ]);
+        if length(alldatasets) < length(STUDY.datasetinfo)
+            error( [ 'Some datasets not included in preclustering' 10 ... 
+                     'because of partial STUDY design. You need to' 10 ...
+                     'use a STUDY design that includes all datasets.' ]);
+        end;
+            
+        
         for si = 1:size(STUDY.cluster(cluster_ind).sets,2)
             switch strcom
              
@@ -256,7 +269,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                     % read and concatenate all cells for this specific set
                     % of identical ICA decompositions
                     STUDY.cluster = checkcentroidfield(STUDY.cluster, 'erp', 'erp_times');
-                    tmpstruct = std_setcomps2cell(STUDY, STUDY.cluster(cluster_ind).sets(:,si), STUDY.cluster(cluster_ind).comps(si), 1);
+                    tmpstruct = std_setcomps2cell(STUDY, STUDY.cluster(cluster_ind).sets(:,si), STUDY.cluster(cluster_ind).comps(si));
                     cellinds  = [ tmpstruct.setinds{:} ];
                     compinds  = [ tmpstruct.allinds{:} ];
                     cells = STUDY.design(STUDY.currentdesign).cell(cellinds);
@@ -278,7 +291,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                 % read and concatenate all cells for this specific set
                 % of identical ICA decompositions
                 STUDY.cluster = checkcentroidfield(STUDY.cluster, 'spec', 'spec_freqs');
-                tmpstruct = std_setcomps2cell(STUDY, STUDY.cluster(cluster_ind).sets(:,si), STUDY.cluster(cluster_ind).comps(si), 1);
+                tmpstruct = std_setcomps2cell(STUDY, STUDY.cluster(cluster_ind).sets(:,si), STUDY.cluster(cluster_ind).comps(si));
                 cellinds  = [ tmpstruct.setinds{:} ];
                 compinds  = [ tmpstruct.allinds{:} ];
                 cells = STUDY.design(STUDY.currentdesign).cell(cellinds);
@@ -321,7 +334,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                     % read and concatenate all cells for this specific set
                     % of identical ICA decompositions
                     STUDY.cluster = checkcentroidfield(STUDY.cluster, 'ersp', 'ersp_times', 'ersp_freqs', 'itc', 'itc_times', 'itc_freqs');
-                    tmpstruct = std_setcomps2cell(STUDY, STUDY.cluster(cluster_ind).sets(:,si), STUDY.cluster(cluster_ind).comps(si), 1);
+                    tmpstruct = std_setcomps2cell(STUDY, STUDY.cluster(cluster_ind).sets(:,si), STUDY.cluster(cluster_ind).comps(si));
                     cellinds  = [ tmpstruct.setinds{:} ];
                     compinds  = [ tmpstruct.allinds{:} ];
                     cells = STUDY.design(STUDY.currentdesign).cell(cellinds);
