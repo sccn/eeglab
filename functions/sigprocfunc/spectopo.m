@@ -900,7 +900,8 @@ function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_sub
 				end
 				eegspec(c,:) = eegspec(c,:) + tmpspec';
 				specstd(c,:) = specstd(c,:) + tmpspec'.^2;
-			else
+            else
+                g.boundaries = round(g.boundaries);
 				for n=1:length(g.boundaries)-1
                     if g.boundaries(n+1) - g.boundaries(n) >= winlength % ignore segments of less than winlength
                         if usepwelch
