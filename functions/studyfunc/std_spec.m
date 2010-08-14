@@ -218,7 +218,7 @@ for dat = 1:length(EEG)
         if isempty(X), 
             X = tmpdata;
         else
-            if size(X,1) ~= size(tmpdata,1), error('Datasets to be concatenated do not have the same number of channels'); end;
+            if size(X,1) ~= size(tmpdata,1), error('Datasets to be concatenated do not have the same number of channels or components'); end;
             X(:,end+1:end+size(tmpdata,2)) = tmpdata;
         end;
     end;
