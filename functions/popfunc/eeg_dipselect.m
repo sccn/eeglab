@@ -64,7 +64,7 @@ else
          posxyz = cat(1,posxyz,EEG.dipfit.model(c).posxyz(1,:));
      end;
 
-    depth = sourcedepth(posxyz, vol);
+    depth = ft_sourcedepth(posxyz, vol);
 
     brainComponents = compLowResidualvariance(find(depth<=depthThreshold));
 end;
