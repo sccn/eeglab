@@ -74,9 +74,9 @@ for index = 1:length(ALLEEG)
         commands = {};
         for f = 1:length(ff)
             eval( [ 'eventvals = {events(indtle).' ff{f} '};' ]);
-            if isnumeric(eventvals{1})
-                eventvals = cellfun(@num2str, eventvals, 'uniformoutput', false);
-            end;
+            %if isnumeric(eventvals{1})
+            %    eventvals = cellfun(@num2str, eventvals, 'uniformoutput', false);
+            %end;
             commands = { commands{:} ff{f} eventvals };
         end;
         trialinfo = struct(commands{:});
