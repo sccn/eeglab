@@ -28,6 +28,8 @@
 %
 % See also: eeglab(), pop_loadeep(), loadeep(), read_eep_cnt(), pop_loadeep_avg(), loadeep_avg(), read_eep_avr()
 
+%123456789012345678901234567890123456789012345678901234567890123456789012
+
 % Copyright (C) 2005 ANT Software, The Netherlands, eeprobe@ant-neuro.com / info@ant-neuro.com
 %
 % This program is free software; you can redistribute it and/or modify
@@ -44,9 +46,34 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+% $Log: eegplugin_eepimport.m,v $
+% Revision 1.5  2006-09-25 14:25:25  mvelde
+% updated version number
+%
+% Revision 1.4  2006-09-25 14:04:02  mvelde
+% updated for EEGLAB 5.03
+%
+% fix reading data for the new EEGLAB version - Arno August 2006
+%
+% Revision 1.3  2005/07/21 10:11:40  mvelde
+% updated menu structure
+% 
+% Revision 1.2  2005/06/08 08:16:37  mvelde
+% converted files to unix format
+%
+% Revision 1.1  2004/11/26 13:22:22  jwiskerke
+% Added eeglab to cvs.
+%
+% Revision 1.3  2003/10/24 13:24:54  Maarten-Jan Hoeve
+% Added GNU Licence and updated revision history
+%
+%
+% Advanced Neuro Technology (ANT) BV, The Netherlands, www.ant-neuro.com / info@ant-neuro.com
+%
+
 function vers = eegplugin_eepimport(fig, trystrs, catchstrs)
 
-    vers = 'eepimport1.02';
+    vers = 'eepimport1.04';
     
     if nargin < 3
         error('eegplugin_eepimport requires 3 arguments');

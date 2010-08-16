@@ -1,3 +1,33 @@
+  ========================================
+  15 January 2008
+  MATLAB / EEGLAB import / plugin for ANT continuous data, trigger files and averages
+  Version 1.05
+  ========================================
+
+  Update release, fixes a bug in read/write of the sampling rate 
+  (now always translates the "rate" variable to integer sampling frequency)
+  Function write_eep_cnt.m still in beta version (not compatible with EEGLAB)
+  Electrode positions file included ANT_WG_standard_346.ced, defines 
+  the electrode positions for the 10/5 percent system.
+
+  ========================================
+  26 September 2006
+  MATLAB / EEGLAB import / plugin for ANT continuous data, trigger files and averages
+  Version 1.04
+  ========================================
+
+  Update release, including Mac Mex files.
+  Support for new format AVR (also still reads old-style)
+  Support for Export of EEProbe CNT format (currently only in Windows)
+
+  ========================================
+  25 September 2006
+  MATLAB / EEGLAB import / plugin for ANT continuous data, trigger files and averages
+  Version 1.03
+  ========================================
+
+  Preliminary release, including Mac Mex files.
+  Support for new format AVR (also still reads old-style)
 
   ========================================
   21 July 2005
@@ -8,7 +38,7 @@
   Changed version number to the version of the EEGlab plugin for consistency.
   Update plugin menu for EEGlab -> File -> Import data -> From ANT EEProbe ...
   Fixed a bug in pop_loadeep.m, uilist variable, adding a space before the last {}
-  
+
   ========================================
   1 February 2005
   MATLAB / EEGLAB import / plugin for ANT continuous data, trigger files and averages

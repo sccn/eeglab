@@ -31,6 +31,8 @@
 % See also: eeglab(), loadeep()
 %
 
+%123456789012345678901234567890123456789012345678901234567890123456789012
+
 % Copyright (C) 2003 Maarten-Jan Hoeve, m.hoeve@ieee.org
 %
 % This program is free software; you can redistribute it and/or modify
@@ -46,6 +48,31 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+% $Log: pop_loadeep.m,v $
+% Revision 1.5  2006-09-25 14:04:03  mvelde
+% updated for EEGLAB 5.03
+%
+% Revision 1.4  2005/07/21 10:12:51  mvelde
+% updated information
+%
+% Revision 1.3  2005/06/24 13:46:46  mvelde
+% fixed typo in matlab syntax
+%
+% Revision 1.2  2005/06/08 08:16:37  mvelde
+% converted files to unix format
+%
+% Revision 1.1  2004/11/26 13:22:22  jwiskerke
+% Added eeglab to cvs.
+%
+% Revision 1.3  2003/10/24 13:34:41  Maarten-Jan Hoeve
+% Added GNU Licence and updated revision history
+%
+% Revision 1.1.1.2  2003/10/17 09:55:20  mvelde
+% updated: consistent copyrights, arguments/data labels, fixed some typos
+%
+% Advanced Neuro Technology (ANT) BV, The Netherlands, www.ant-neuro.com / info@ant-neuro.com
+%
 
 function [EEG, command]=pop_loadeep(filename, varargin); 
 
@@ -109,7 +136,7 @@ EEG.xmin            = (r.sample1-1)/r.rate;
 EEG.srate           = r.rate;
 EEG.pnts            = r.nsmpl;
 EEG.chanlocs        = r.chanlocs;
-%EEG = eeg_checkset(EEG);
+EEG = eeg_checkset(EEG);
 
 if ~isempty(findstr('triggerfile', lower(options)))
     if strcmp(r.triggerfile,'on')
@@ -124,16 +151,10 @@ if ~isempty(findstr('triggerfile', lower(options)))
         else
             disp(['ERROR Trigger file: ' tfilename ' does not exist !!!!'])
         end
-        
-        % make latencies integer (as they should be)
-        % ------------------------------------------
-        for i=1:length(EEG.event)
-            EEG.event(i).latency = round(EEG.event(i).latency);
-        end;
     end
 end
 
-%EEG = eeg_checkset(EEG);
+EEG = eeg_checkset(EEG);
 
 if length(options) > 2
     command = sprintf('EEG = pop_loadeep(''%s'' %s);',fullFileName, options); 
