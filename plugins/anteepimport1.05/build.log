@@ -1,0 +1,8 @@
+Building COM object and generating VBA code...
+mcc -M -silentsetup -d 'C:/MATLAB7/work/EEGLAB/eeglab4.511/plugins/anteepimport1.02/src'  -B 'cexcel:loadcnt,loadcntclass,1.0'  -bi  -a C:/MATLAB7/work/EEGLAB/eeglab4.511/plugins/anteepimport1.02/loadeep.m
+
+  To get started, select <a href="matlab: doc">MATLAB Help</a> or <a href="matlab: demo matlab">Demos</a> from the Help menu.
+
+The -i switch is no longer supported; the include exported interfaces behavior
+is applied to every compilation.
+
