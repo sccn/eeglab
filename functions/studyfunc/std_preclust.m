@@ -258,7 +258,6 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
                      'because of partial STUDY design. You need to' 10 ...
                      'use a STUDY design that includes all datasets.' ]);
         end;
-            
         
         for si = 1:size(STUDY.cluster(cluster_ind).sets,2)
             switch strcom
