@@ -37,7 +37,7 @@ for index = 2:length(ALLEEG)
     for c = 1:length(cluster)
         if all(size(ALLEEG(cluster{c}(1)).icaweights) == size(ALLEEG(index).icaweights))
             %if isequal(ALLEEG(cluster{c}(1)).icaweights, ALLEEG(index).icaweights) 
-            if sum(sum(abs(ALLEEG(cluster{c}(1)).icaweights-ALLEEG(index).icaweights))) < 1e-6
+            if sum(sum(abs(ALLEEG(cluster{c}(1)).icaweights-ALLEEG(index).icaweights))) < 2e-5
                 cluster{c}(end+1) = index;
                 found = 1;
                 break;
