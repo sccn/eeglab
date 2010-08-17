@@ -1,9 +1,9 @@
 % eeg_checkset()   - check the consistency of the fields of an EEG dataset 
 %                    Also: See EEG dataset structure field descriptions below.
 %
-% Usage: >> [EEGOUT,result] = eeg_checkset(EEG); % perform all checks
+% Usage: >> [EEGOUT,changes] = eeg_checkset(EEG); % perform all checks
 %                                                  except 'makeur'
-%        >> [EEGOUT,result] = eeg_checkset(EEG, 'keyword'); % perform 'keyword' check(s)
+%        >> [EEGOUT,changes] = eeg_checkset(EEG, 'keyword'); % perform 'keyword' check(s)
 %
 % Inputs:
 %       EEG        - EEGLAB dataset structure or (ALLEEG) array of EEG structures
@@ -34,7 +34,8 @@
 %                           rebuild event* subfields of the 'EEG.epoch' structure (can be time consuming).
 % Outputs:
 %       EEGOUT     - output EEGLAB dataset or dataset array
-%       result     - result code:  0 = OK; 1 = error; -1 = warning
+%       changes    - change code: 'no' = no changes; 'yes' = the EEG
+%                    structure was modified
 %
 % ===========================================================
 % The structure of an EEG dataset under EEGLAB (as of v5.03):
@@ -160,7 +161,7 @@
 
 function [EEG, res] = eeg_checkset( EEG, varargin );
 msg = '';
-res = 0; % 0 = OK, 1 = error, -1=warning
+res = 'no';
 com = sprintf('EEG = eeg_checkset( EEG );');
 
 if nargin < 1
@@ -951,6 +952,7 @@ for inddataset = 1:length(ALLEEG)
 
         % reference
         % ---------
+        if ~isfield(EEG, 'ref'), EEG.ref = ''; end;
         if strcmpi(EEG.ref, 'averef')
              ref = 'average';
         else ref = '';
