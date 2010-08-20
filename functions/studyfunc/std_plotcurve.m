@@ -265,7 +265,10 @@ for c = 1:ncplot
                 end;
                 leg = opt.groupnames;
             else tmpdata = real(data{c,g}); 
-                leg = {};;
+                leg = {};
+            end;
+            if ~isempty(leg) && isnumeric(leg{1})
+                for ileg = 1:length(leg), leg{ileg} = num2str(leg{ileg}); end;
             end;
             if ~isempty(opt.filter), tmpdata = myfilt(tmpdata, 1000/(allx(2)-allx(1)), 0, opt.filter); end;
             
