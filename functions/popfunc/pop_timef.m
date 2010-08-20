@@ -183,17 +183,11 @@ if typeproc == 1
 	tmpsig = EEG.data(num,pointrange,:);
 else
 	if ~isempty( EEG.icasphere )
-        eeglab_options; % changed from eeglaboptions 3/30/02 -sm
- 	    if option_computeica  
-    		tmpsig = EEG.icaact(num,pointrange,:);
- 	    else
-            tmpsig = (EEG.icaweights(num,:)*EEG.icasphere)*reshape(EEG.data(:,pointrange,:), EEG.nbchan, EEG.trials*length(pointrange));
-        end;
+        tmpsig = eeg_getdatact(EEG, 'component', num, 'samples', pointrange); 
 	else
 		error('You must run ICA first');
 	end;	
 end;	 
-tmpsig = reshape( tmpsig, length(num), size(tmpsig,2)*size(tmpsig,3));
 
 % outputs
 % -------

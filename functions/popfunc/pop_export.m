@@ -120,7 +120,7 @@ if strcmpi(g.ica, 'on');
 	if option_computeica  
 		x = EEG.icaact;
 	else
-        x = EEG.icaweights*EEG.icasphere*reshape(EEG.data, EEG.nbchan, EEG.trials*EEG.pnts);
+        x = EEG.icaweights*EEG.icasphere*reshape(EEG.data(EEG.icachansind,:,:), length(EEG.icachansind), EEG.trials*EEG.pnts);
         x = reshape(x, size(x,1), EEG.pnts, EEG.trials);
     end;
 else

@@ -610,7 +610,7 @@ else
 		tmpsig = ['EEG.icaact([' int2str(channel) '], :)'];
 	else
 		tmpsig = ['EEG.icaact([' int2str(channel) '], :)'];
-        tmpsig = ['EEG.icaweights([' int2str(channel) '],:)*EEG.icasphere*reshape(EEG.data, EEG.nbchan, EEG.trials*EEG.pnts)'];
+        tmpsig = ['EEG.icaweights([' int2str(channel) '],:)*EEG.icasphere*reshape(EEG.data(EEG.icachansind,:,:), length(EEG.icachansind), EEG.trials*EEG.pnts)'];
     end;
 	if ~isempty(projchan)
 		tmpsig = [ 'mean(EEG.icawinv(' int2str(projchan) ',[' int2str(channel) '])*' tmpsig ',1)' ];

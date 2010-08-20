@@ -121,12 +121,14 @@ if timerange(2) > min([EEG.xmax])*1000, timerange(2) =  min([EEG.xmax])*1000; en
 
 EEG1 = eeg_checkset(EEG(1),'loaddata');
 sigtmp = reshape(EEG1.data, EEG1.nbchan, EEG1.pnts, EEG1.trials);
+if ~isempty(EEG.icachansind), sigtmp = sigtmp(EEG.icachansind,:,:); end;
 if length(EEG) == 2
     EEG2 = eeg_checkset(EEG(2),'loaddata');
     if ~all(EEG1.icaweights(:) == EEG2.icaweights(:))
         error('The ICA decomposition must be the same for the two datasets');
     end;
     sigtmp2 = reshape(EEG2.data, EEG2.nbchan, EEG2.pnts, EEG2.trials);
+    if ~isempty(EEG2.icachansind), sigtmp2 = sigtmp2(EEG2.icachansind,:,:); end;
 end;
 posi = round( (timerange(1)/1000-EEG1.xmin) * EEG1.srate) + 1;
 posf = min(round( (timerange(2)/1000-EEG1.xmin) * EEG1.srate) + 1, EEG1.pnts);

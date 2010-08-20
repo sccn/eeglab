@@ -181,8 +181,8 @@ else
     		tmpsig1 = EEG.icaact(num1,pointrange,:);
     		tmpsig2 = EEG.icaact(num2,pointrange,:);
  	    else
-            tmpsig1 = (EEG.icaweights(num1,:)*EEG.icasphere)*reshape(EEG.data(:,pointrange,:), EEG.nbchan, EEG.trials*length(pointrange));
-            tmpsig2 = (EEG.icaweights(num2,:)*EEG.icasphere)*reshape(EEG.data(:,pointrange,:), EEG.nbchan, EEG.trials*length(pointrange));
+            tmpsig1 = (EEG.icaweights(num1,:)*EEG.icasphere)*reshape(EEG.data(EEG.icachansind,pointrange,:), length(EEG.icachansind), EEG.trials*length(pointrange));
+            tmpsig2 = (EEG.icaweights(num2,:)*EEG.icasphere)*reshape(EEG.data(EEG.icachansind,pointrange,:), length(EEG.icachansind), EEG.trials*length(pointrange));
 		end;
 	else
 		error('You must run ICA first');

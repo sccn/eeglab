@@ -17,6 +17,8 @@
 %                 when selecting components.
 %   'trialindices' - [integer array] only read specific trials. Default is
 %                 to read all trials.
+%   'samples'   - [integer array] only read specific samples. Default is
+%                 to read all samples.
 %   'verbose'   - ['on'|'off'] verbose mode. Default is 'on'.
 %
 % Outputs:
@@ -54,6 +56,7 @@ function data = eeg_getdatact( EEG, varargin);
         'channel'   'integer' {} [1:EEG.nbchan];
         'verbose'   'string'  { 'on' 'off' } 'on';
         'component' 'integer' {} [];        
+        'samples'   'integer' {} [];        
         'trialindices' 'integer' {} [];        
         'rmcomps'   'integer' {} [] }, 'eeg_getdatact');
     
@@ -184,5 +187,7 @@ function data = eeg_getdatact( EEG, varargin);
     if ~isempty(opt.trialindices)
         data = data(:,:,opt.trialindices);
     end;
-    
+    if ~isempty(opt.samples)
+        data = data(:,opt.samples,:);
+    end;
     

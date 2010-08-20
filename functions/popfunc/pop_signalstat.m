@@ -101,7 +101,7 @@ else
  	    if option_computeica  
     		tmpsig = EEG.icaact(cnum,:);
  	    else
-            tmpsig = (EEG.icaweights(cnum,:)*EEG.icasphere)*reshape(EEG.data, EEG.nbchan, EEG.trials*size(EEG.data,2));
+            tmpsig = (EEG.icaweights(cnum,:)*EEG.icasphere)*reshape(EEG.data(EEG.icachansind,:,:), length(EEG.icachansind), EEG.trials*size(EEG.data,2));
         end;
 	%	[M,SD,sk,k,med,zlow,zhi,tM,tSD,tndx,ksh]=signalstat( tmpsig,1,'Component Activity',percent);
 		dlabel='Component Activity';
@@ -135,7 +135,11 @@ if ~isempty(EEG.chanlocs)
     end;
 end;
 if plotloc
-    com = sprintf('%s signalstat( tmpsig, 1, dlabel, percent, dlabel2, map, EEG.chanlocs );', outstr);
+    if typeproc == 1
+        com = sprintf('%s signalstat( tmpsig, 1, dlabel, percent, dlabel2, map, EEG.chanlocs );', outstr);
+    else
+        com = sprintf('%s signalstat( tmpsig, 1, dlabel, percent, dlabel2, map, EEG.chanlocs(EEG.icachansind) );', outstr);
+    end;
 else
     com = sprintf('%s signalstat( tmpsig, 1, dlabel, percent, dlabel2);', outstr);
 end;

@@ -161,7 +161,7 @@ else
  	if option_computeica  
     	icaacttmp = EEG.icaact(elecrange, :, :);
 	else
-        icaacttmp = (EEG.icaweights(elecrange,:)*EEG.icasphere)*reshape(EEG.data, EEG.nbchan, EEG.trials*EEG.pnts);
+        icaacttmp = (EEG.icaweights(elecrange,:)*EEG.icasphere)*reshape(EEG.data(EEG.icachansind,:,:), length(EEG.icachansind), EEG.trials*EEG.pnts);
         icaacttmp = reshape( icaacttmp, length(elecrange), EEG.pnts, EEG.trials);
     end;
 	[Itmp Irej NS Erejtmp] = eegthresh( icaacttmp, EEG.pnts, 1:length(elecrange), negthresh, posthresh, [EEG.xmin EEG.xmax], starttime, endtime);

@@ -159,14 +159,7 @@ if icacomp == 1
 else
     % test if ICA was computed
     % ------------------------
-    eeglab_options; % changed from eeglaboptions 3/30/02 -sm
- 	if option_computeica  
-    	icaacttmp = EEG.icaact(elecrange, :, :);
-	else
-        icaacttmp = (EEG.icaweights*EEG.icasphere)*reshape(EEG.data, ...
-												  EEG.nbchan, EEG.trials*EEG.pnts);
-        icaacttmp = reshape( icaacttmp, size(icaacttmp,1), EEG.pnts, EEG.trials);
-    end;
+    icaacttmp = eeg_getdatact(EEG, 'component', [1:size(EEG.icaweights,1)]);
     [allspec, Irej, tmprejE, freqs ] = spectrumthresh( icaacttmp, EEG.specicaact, elecrange, ...
                                                       EEG.srate, negthresh, posthresh, startfreq, endfreq);
     rejE = zeros(EEG.nbchan, size(icaacttmp,1));
