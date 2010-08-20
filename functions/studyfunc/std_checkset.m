@@ -120,6 +120,9 @@ if isempty(STUDY.cluster)
     modif = 1; 
     [STUDY] = std_createclust(STUDY, ALLEEG, 'parentcluster', 'on');
 end;
+if ~isfield(STUDY, 'changrp')
+    STUDY.changrp = [];
+end;
 
 % create STUDY design if it is not present
 % ----------------------------------------
