@@ -5,8 +5,8 @@
 %         >> EEG = pop_multifit(EEG, comps, 'key', 'val', ...);
 %
 % Inputs:
-%  EEG      - input dataset.
-%  comps    - component to fit
+%  EEG      - input EEGLAB dataset.
+%  comps    - indices component to fit. Empty is all components.
 %
 % Optional inputs:
 %  'dipoles'   - [1|2] use either 1 dipole or 2 dipoles contrain in
@@ -70,7 +70,7 @@ function [EEG, com] = pop_multifit(EEG, comps, varargin);
                    { 'style' 'edit' 'string' '''normlen'' ''on''' } ...
                    { 'style' 'pushbutton' 'string' 'Help' 'callback' 'pophelp(''dipplot'')' } }; 
 
-        results = inputgui( { [1.91 2.8] [1.91 2.8] [3.1 0.4 2] [3.1 0.4 2] [3.1 0.4 2] [2.12 2.2 0.8]}, ...
+        results = inputgui( { [1.91 2.8] [1.91 2.8] [3.1 0.8 1.6] [3.1 0.8 1.6] [3.1 0.8 1.6] [2.12 2.2 0.8]}, ...
                             uilist, 'pophelp(''pop_multifit'')', ...
                             'Fit multiple ICA components -- pop_multifit()');
         if length(results) == 0 return; end;
@@ -92,6 +92,7 @@ function [EEG, com] = pop_multifit(EEG, comps, varargin);
     
     % checking parameters
     % -------------------
+    if isempty(comps), comps = [1:size(EEG.icaweights,1)]; end;
     g = finputcheck(options, { 'settings'  { 'cell' 'struct' }    []        {};                % deprecated
                                'dipoles'   'integer'  [1 2]      1;
                                'threshold' 'float'    [0 100]   40;
@@ -185,7 +186,6 @@ function [EEG, com] = pop_multifit(EEG, comps, varargin);
     
     % set RV to 1 for dipole with higher than 40% residual variance
     % -------------------------------------------------------------
-   
     EEG.dipfit.model  = dipfit_reject(EEG.dipfit.model, g.threshold/100);
 
     % removing dipoles outside the head
