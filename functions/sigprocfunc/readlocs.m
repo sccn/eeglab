@@ -544,9 +544,16 @@ if ~isempty(g.elecind)
 	eloc = eloc(g.elecind);
 end;
 if nargout > 2
-    tmptheta          = { eloc.theta }; % check which channels have (polar) coordinates set
+    if isfield(eloc, 'theta')
+         tmptheta = { eloc.theta }; % check which channels have (polar) coordinates set
+    else tmptheta = cell(1,length(eloc));
+    end;
+    if isfield(eloc, 'theta')
+         tmpx = { eloc.X }; % check which channels have (polar) coordinates set
+    else tmpx = cell(1,length(eloc));
+    end;
+    
     indices           = find(~cellfun('isempty', tmptheta));
-    tmpx              = { eloc.X }; % check which channels have (polar) coordinates set
     indices           = intersect(find(~cellfun('isempty', tmpx)), indices);
     indices           = sort(indices);
     
@@ -555,7 +562,10 @@ if nargout > 2
     theta             = [ tmptheta{:} ];
 end;
 if nargout > 3
-    tmprad            = { eloc.radius };
+    if isfield(eloc, 'theta')
+         tmprad = { eloc.radius }; % check which channels have (polar) coordinates set
+    else tmprad = cell(1,length(eloc));
+    end;
     tmprad(indbad)    = { NaN };
     radius            = [ tmprad{:} ];
 end;
