@@ -115,12 +115,16 @@ h = axes('Units','Normalized', 'Position',[-10 60 40 42].*s+q);
 
 %topoplot( EEG.icawinv(:,chanorcomp), EEG.chanlocs); axis square; 
 
-if typecomp == 1 % plot single channel locations
-	topoplot( chanorcomp, EEG.chanlocs, 'chaninfo', EEG.chaninfo, ...
-             'electrodes','off', 'style', 'blank', 'emarkersize1chan', 12); axis square;
-else             % plot component map
-	topoplot( EEG.icawinv(:,chanorcomp), EEG.chanlocs, 'chaninfo', EEG.chaninfo, ...
-             'shading', 'interp', 'numcontour', 3); axis square;
+if isfield(EEG.chanlocs, 'theta')
+    if typecomp == 1 % plot single channel locations
+        topoplot( chanorcomp, EEG.chanlocs, 'chaninfo', EEG.chaninfo, ...
+                 'electrodes','off', 'style', 'blank', 'emarkersize1chan', 12); axis square;
+    else             % plot component map
+        topoplot( EEG.icawinv(:,chanorcomp), EEG.chanlocs, 'chaninfo', EEG.chaninfo, ...
+                 'shading', 'interp', 'numcontour', 3); axis square;
+    end;
+else
+    axis off;
 end;
 basename = [fastif(typecomp,'Channel ', 'IC') int2str(chanorcomp) ];
 % title([ basename fastif(typecomp, ' location', ' map')], 'fontsize', 14); 
@@ -147,21 +151,12 @@ if EEG.trials > 1
          erpimage( EEG.data(chanorcomp,:)-offset, ones(1,EEG.trials)*10000, EEG.times , ...
                        '', ei_smooth, 1, 'caxis', 2/3, 'cbar','erp','erp_vltg_ticks',erp_limits);   
     else % plot component
-          if option_computeica  
-                  offset = nan_mean(EEG.icaact(chanorcomp,:));
-                  era=nan_mean(squeeze(EEG.icaact(chanorcomp,:,:))')-offset;
-                  era_limits=get_era_limits(era);
-                  erpimage( EEG.icaact(chanorcomp,:)-offset, ones(1,EEG.trials)*10000, EEG.times , ...
+         icaacttmp = eeg_getdatact(EEG, 'component', chanorcomp);
+         offset = nan_mean(icaacttmp(:));
+         era    = nan_mean(squeeze(icaacttmp)')-offset;
+         era_limits=get_era_limits(era);
+         erpimage( icaacttmp-offset, ones(1,EEG.trials)*10000, EEG.times , ...
                        '', ei_smooth, 1, 'caxis', 2/3, 'cbar','erp', 'yerplabel', '','erp_vltg_ticks',era_limits);   
-          else
-                  icaacttmp = (EEG.icaweights(chanorcomp,:) * EEG.icasphere) ...
-                                   * reshape(EEG.data(EEG.icachansind,:,:), length(EEG.icachansind), EEG.trials*EEG.pnts);
-                  offset = nan_mean(icaacttmp);
-                  era=nan_mean(reshape(icaacttmp,EEG.pnts,EEG.trials)')-offset;
-                  era_limits=get_era_limits(era);
-                  erpimage( icaacttmp-offset, ones(1,EEG.trials)*10000, EEG.times, ...
-                       '', ei_smooth, 1, 'caxis', 2/3, 'cbar','erp', 'yerplabel', '','erp_vltg_ticks',era_limits);  
-          end;
     end;
     axes(hhh);
     title(sprintf('%s activity \\fontsize{10}(global offset %3.3f)', basename, offset), 'fontsize', 14);
@@ -190,21 +185,10 @@ else
            erpimage( reshape(EEG.data(chanorcomp,1:erpimageframestot),erpimageframes,ERPIMAGELINES)-offset, ones(1,ERPIMAGELINES)*10000, eegtimes , ...
                          EI_TITLE, ei_smooth, 1, 'caxis', 2/3, 'cbar');  
       else % plot component
-            if option_computeica  
-                offset = nan_mean(EEG.icaact(chanorcomp,:));
-                % Note: we don't need to worry about ERA limits, since ERAs
-                % aren't visualized for continuous data
-                erpimage(reshape(EEG.icaact(chanorcomp,1:erpimageframestot),erpimageframes,ERPIMAGELINES)-offset,ones(1,ERPIMAGELINES)*10000, eegtimes , ...
+         icaacttmp = eeg_getdatact(EEG, 'component', chanorcomp);
+         offset = nan_mean(icaacttmp(:));
+         erpimage(reshape(EEG.icaact(chanorcomp,1:erpimageframestot),erpimageframes,ERPIMAGELINES)-offset,ones(1,ERPIMAGELINES)*10000, eegtimes , ...
                     EI_TITLE, ei_smooth, 1, 'caxis', 2/3, 'cbar','yerplabel', '');
-            else
-                icaacttmp = EEG.icaweights(chanorcomp,:) * EEG.icasphere ...
-                    * EEG.data(EEG.icachansind,1:erpimageframestot);
-                offset = nan_mean(icaacttmp);
-                % Note: we don't need to worry about ERA limits, since ERAs
-                % aren't visualized for continuous data
-                erpimage( icaacttmp-offset, ones(1,ERPIMAGELINES)*10000, eegtimes, ...
-                    EI_TITLE, ei_smooth, 1, 'caxis', 2/3, 'cbar', 'yerplabel', '');
-            end;
       end
     else
             axis off;

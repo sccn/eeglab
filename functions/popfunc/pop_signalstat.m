@@ -97,12 +97,8 @@ if typeproc == 1
 	map = cnum;
 else 
 	if ~isempty( EEG.icasphere )
-        eeglab_options; 
- 	    if option_computeica  
-    		tmpsig = EEG.icaact(cnum,:);
- 	    else
-            tmpsig = (EEG.icaweights(cnum,:)*EEG.icasphere)*reshape(EEG.data(EEG.icachansind,:,:), length(EEG.icachansind), EEG.trials*size(EEG.data,2));
-        end;
+        tmpsig = eeg_getdatact(EEG, 'component', cnum);
+        tmpsig = tmpsig(:,:);
 	%	[M,SD,sk,k,med,zlow,zhi,tM,tSD,tndx,ksh]=signalstat( tmpsig,1,'Component Activity',percent);
 		dlabel='Component Activity';
 		dlabel2=['Component ' num2str(cnum)];

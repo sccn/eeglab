@@ -190,15 +190,8 @@ if icacomp == 1
 	%eeg_multieegplot( EEG.data, [], [], oldrej, oldrejE, 'title', 'Scroll channel activities -- eegplot()', 'srate', ...
 	%	      EEG.srate, 'limits', [EEG.xmin EEG.xmax]*1000 , 'command', command); 
 else
-	eeglab_options; % changed from eeglaboptions 3/30/02 -sm
-	if option_computeica  
-	    tmpdata = EEG.icaact;
-    else
-        %tmpdata = (EEG.icaweights*EEG.icasphere)*reshape(EEG.data, EEG.nbchan, EEG.trials*EEG.pnts);
-        tmpdata = (EEG.icaweights*EEG.icasphere)*reshape(EEG.data(EEG.icachansind,:,:), length(EEG.icachansind), EEG.trials*EEG.pnts); % bug 799
-        tmpdata = reshape( tmpdata, size(tmpdata,1), EEG.pnts, EEG.trials);
-    end;
-    for i=1:length(EEG.icaweights(:,1));
+    tmpdata = eeg_getdatact(EEG, 'component', [1:size(EEG.icaweights,1)]);
+	for i=1:length(EEG.icaweights(:,1));
         chans(i).labels=sprintf('%s%s','comp',num2str(i));
         chans(i).badchan=EEG.reject.gcompreject(i);
     end

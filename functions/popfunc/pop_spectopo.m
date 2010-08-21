@@ -262,8 +262,8 @@ if timerange(1)/1000~=EEG.xmin | timerange(2)/1000~=EEG.xmax
 	fprintf('pop_spectopo(): selecting time range %6.2f ms to %6.2f ms (points %d to %d)\n', ...
 			timerange(1), timerange(2), posi, posf);
 end;
-if isempty(EEG.icachansind), chaninds = 1:EEG.nbchan;
-else                         chaninds = EEG.icachansind;
+if isempty(EEG.icachansind) || dataflag == 1, chaninds = 1:EEG.nbchan;
+else                                          chaninds = EEG.icachansind;
 end;
 if exist('pointrange') == 1, SIGTMP = EEG.data(chaninds,pointrange,:); totsiz = length( pointrange);
 else                         SIGTMP = EEG.data(chaninds,:,:); totsiz = EEG.pnts;

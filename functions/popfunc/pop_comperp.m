@@ -268,15 +268,7 @@ end
 for index = 1:length(datadd)
     TMPEEG = eeg_checkset(ALLEEG(datadd(index)),'loaddata');
     if flag == 1, erp1ind(:,:,index)  = mean(TMPEEG.data,3);
-    elseif isempty(TMPEEG.icaact)
-        tmpica              =  reshape((TMPEEG.icaweights*TMPEEG.icasphere)*TMPEEG.data(TMPEEG.icachansind,:), ...
-                                       size(TMPEEG.icaweights,1), size(TMPEEG.data,2), size(TMPEEG.data,3));
-        erp1ind(:,:,index)  = mean(tmpica,3);
-    else          
-        tmpica              =  reshape((TMPEEG.icaweights*TMPEEG.icasphere)*TMPEEG.data(TMPEEG.icachansind,:), ...
-                                       size(TMPEEG.icaweights,1), size(TMPEEG.data,2), size(TMPEEG.data,3));
-        erp1ind(:,:,index)  = mean(tmpica,3);
-        erp1ind(:,:,index)  = mean(TMPEEG.icaact,3);
+    else          erp1ind(:,:,index)  = mean(eeg_getdatact(TMPEEG, 'component', [1:size(TMPEEG.icaweights,1)]),3);
     end;
     addnames{index} = [ '#' int2str(datadd(index)) ' ' TMPEEG.setname ' (n=' int2str(TMPEEG.trials) ')' ];
     clear TMPEEG;
@@ -295,14 +287,7 @@ if length(datsub) > 0 % dataset to subtract
     for index = 1:length(datsub)
         TMPEEG = eeg_checkset(ALLEEG(datsub(index)),'loaddata');
         if flag == 1, erp2ind(:,:,index)  = mean(TMPEEG.data,3);
-        elseif isempty(TMPEEG.icaact)
-            tmpica              =  reshape((TMPEEG.icaweights*TMPEEG.icasphere)*TMPEEG.data(TMPEEG.icachansind,:), ...
-                                       size(TMPEEG.icaweights,1), size(TMPEEG.data,2), size(TMPEEG.data,3));
-            erp2ind(:,:,index)  = mean(tmpica,3);
-        else          tmpica              =  reshape((TMPEEG.icaweights*TMPEEG.icasphere)*TMPEEG.data(TMPEEG.icachansind,:), ...
-                                                     size(TMPEEG.icaweights,1), size(TMPEEG.data,2), size(TMPEEG.data,3));
-                      erp2ind(:,:,index)  = mean(tmpica,3);
-                      erp2ind(:,:,index)  = mean(TMPEEG.icaact,3);
+        else          erp2ind(:,:,index)  = mean(eeg_getdatact(TMPEEG, 'component', [1:size(TMPEEG.icaweights,1)]),3);
         end;
         subnames{index} = [ '#' int2str(datsub(index)) ' ' TMPEEG.setname '(n=' int2str(TMPEEG.trials) ')' ];
         clear TMPEEG

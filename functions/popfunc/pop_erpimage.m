@@ -605,16 +605,7 @@ if typeplot == 1
 else
     % test if ICA was computed or if one has to compute on line
     % ---------------------------------------------------------
-    eeglab_options; % changed from eeglaboptions 3/30/02 -sm
-	if option_computeica  
-		tmpsig = ['EEG.icaact([' int2str(channel) '], :)'];
-	else
-		tmpsig = ['EEG.icaact([' int2str(channel) '], :)'];
-        tmpsig = ['EEG.icaweights([' int2str(channel) '],:)*EEG.icasphere*reshape(EEG.data(EEG.icachansind,:,:), length(EEG.icachansind), EEG.trials*EEG.pnts)'];
-    end;
-	if ~isempty(projchan)
-		tmpsig = [ 'mean(EEG.icawinv(' int2str(projchan) ',[' int2str(channel) '])*' tmpsig ',1)' ];
-	end;
+    tmpsig = [ 'eeg_getdatact(EEG, ''component'', [' int2str(channel) '])' ];
 end;
 
 % outputs

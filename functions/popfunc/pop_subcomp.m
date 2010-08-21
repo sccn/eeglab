@@ -94,16 +94,8 @@ else
 end;
 
 fprintf('Computing projection ....\n');
-eeglab_options; 
 component_keep = setdiff(1:size(EEG.icaweights,1), components);
-if option_computeica  
-    compproj = EEG.icawinv(:, component_keep)*reshape(EEG.icaact(component_keep,:), length(component_keep), EEG.pnts*EEG.trials);
-    %[ compproj, varegg ] = compvar( EEG.data, EEG.icaact, EEG.icawinv, setdiff(1:size(EEG.icaweights,1), components));
-else
-    compproj = EEG.icawinv(:, component_keep)*EEG.icaweights(component_keep,:)*EEG.icasphere ...
-                 *reshape(EEG.data(EEG.icachansind,:,:), length(EEG.icachansind), EEG.pnts*EEG.trials);
-    %[ compproj, varegg ] = compvar( EEG.data, { EEG.icasphere EEG.icaweights }, EEG.icawinv, setdiff(1:size(EEG.icaweights,1), components));
-end;    
+compproj = EEG.icawinv(:, component_keep)*eeg_getdatact(EEG, 'component', component_keep, 'reshape', '2d');
 compproj = reshape(compproj, size(compproj,1), EEG.pnts, EEG.trials);
 
 %fprintf( 'The ICA projection accounts for %2.2f percent of the data\n', 100*varegg);
