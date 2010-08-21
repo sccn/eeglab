@@ -73,6 +73,13 @@ if ~isstr(varargin{1}) %intial settings
         error('STUDY contains no datasets');
     end
          
+    if any(isnan(STUDY.cluster(1).sets(:)))
+        warndlg2( [ 'pop_preclust error: some datasets do not have ICA pairs.' 10 ...
+                 'Look for NaN values in STUDY.cluster(1).sets which' 10 ...
+                 'indicate missing datasets. FOR CLUSTERING, YOU MAY ONLY' 10 ...
+                 'USE DIPOLE OR SCALP MAP CLUSTERING.' ]);
+    end;
+    
     % cluster text
     % ------------
     % load leaf clusters
