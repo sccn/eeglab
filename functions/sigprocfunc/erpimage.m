@@ -419,8 +419,9 @@ if nargin < 1
     return
 end
 
+data = squeeze(data);
 if nargin < 3 | isempty(times)
-    if size(data,1)==1 | size(data,2)==1
+    if size(data,1)==1 || size(data,2)==1
         fprintf('erpimage(): either input a times vector or make data size = (frames,trials).\n')
         return
     end
