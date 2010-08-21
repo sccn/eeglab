@@ -76,7 +76,7 @@ for index = 1:length(setinfo)
         [ind1 ind2] = find(datind(1) == oldsets);
         columnica   = oldsets(:,ind2(1));
         if ~all(ismember(datind, columnica));
-            disp('Warning: ***** the current STUDY design combines datasets with different ICA decompositions');
+            disp('Warning: ***** change STUDY design as it combines datasets with different ICA decompositions');
         end;
     end;
         
