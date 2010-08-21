@@ -600,37 +600,25 @@ for ind = 1:length(finalinds)
             end;
         case 'dipole',
             fprintf('Reading dipole data...\n');
-            alldips = {};
-            for c = 1:nc
-                for g = 1:ng
-                    for indtmp = 1:length(allinds{c,g})
-                        % check if some fields are missing and create them (as
-                        % empty values)
-
-                        missingFields = ~isfield(ALLEEG(setinds{c,g}(indtmp)).dipfit.model(allinds{c,g}(indtmp)),{'select', 'diffmap', 'sourcepot', 'datapot'});
-
-                        if missingFields(1)
-                            ALLEEG(setinds{c,g}(indtmp)).dipfit.model(allinds{c,g}(indtmp)).select = [];
-                        end;
-
-                        if missingFields(2)
-                            ALLEEG(setinds{c,g}(indtmp)).dipfit.model(allinds{c,g}(indtmp)).diffmap = [];
-                        end;
-
-                        if missingFields(3)
-                            ALLEEG(setinds{c,g}(indtmp)).dipfit.model(allinds{c,g}(indtmp)).sourcepot = [];
-                        end;
-
-                        if missingFields(4)
-                            ALLEEG(setinds{c,g}(indtmp)).dipfit.model(allinds{c,g}(indtmp)).datapot =[];
-                        end;
-
-                        alldips{c, g}(indtmp) = ALLEEG(setinds{c,g}(indtmp)).dipfit.model(allinds{c,g}(indtmp));
-                    end;
-                end;
+%           old format EEGLAB 8.3
+%             alldips = {};
+%             for c = 1:nc
+%                 for g = 1:ng
+%                     for indtmp = 1:size(tmpstruct.sets,2)
+%                         alldips{c, g}(indtmp).posxyz = ALLEEG(tmpstruct.sets(1,indtmp)).dipfit.model(tmpstruct.comps(1,indtmp)).posxyz;
+%                         alldips{c, g}(indtmp).momxyz = ALLEEG(tmpstruct.sets(1,indtmp)).dipfit.model(tmpstruct.comps(1,indtmp)).momxyz;
+%                         alldips{c, g}(indtmp).rv     = ALLEEG(tmpstruct.sets(1,indtmp)).dipfit.model(tmpstruct.comps(1,indtmp)).rv;
+%                     end;
+%                 end;
+%             end;
+%            tmpstruct.dipoles = alldips;
+            alldips = [];
+            for indtmp = 1:size(tmpstruct.sets,2)
+                alldips(indtmp).posxyz = ALLEEG(tmpstruct.sets(1,indtmp)).dipfit.model(tmpstruct.comps(1,indtmp)).posxyz;
+                alldips(indtmp).momxyz = ALLEEG(tmpstruct.sets(1,indtmp)).dipfit.model(tmpstruct.comps(1,indtmp)).momxyz;
+                alldips(indtmp).rv     = ALLEEG(tmpstruct.sets(1,indtmp)).dipfit.model(tmpstruct.comps(1,indtmp)).rv;
             end;
-            
-            tmpstruct.dipoles = alldips;
+            tmpstruct.alldipoles = alldips;
 
         case { 'map' 'scalp' 'topo' }
             % this is currenlty being done by the function std_readtopoclust
@@ -641,7 +629,7 @@ for ind = 1:length(finalinds)
     % copy results to structure
     % -------------------------
     fieldnames = { 'erpdata' 'erptimes' 'specdata' 'specfreqs' 'erspdata' 'erspbase' 'erspfreqs' 'ersptimes' ...
-        'itcfreqs' 'itctimes' 'itcdata' 'erspsubjinds' 'itcsubjinds' 'allinds' 'setinds' 'dipoles' ...
+        'itcfreqs' 'itctimes' 'itcdata' 'erspsubjinds' 'itcsubjinds' 'allinds' 'setinds' 'dipoles' 'alldipoles' ...
         'data' 'datatimes' 'datasortvals' 'datacontinds' };
     for f = 1:length(fieldnames)
         if isfield(tmpstruct, fieldnames{f}),
