@@ -19,6 +19,7 @@
 %                 to read all trials.
 %   'samples'   - [integer array] only read specific samples. Default is
 %                 to read all samples.
+%   'reshape'   - ['2d'|'3d'] reshape data. Default is '3d' when possible.
 %   'verbose'   - ['on'|'off'] verbose mode. Default is 'on'.
 %
 % Outputs:
@@ -55,6 +56,7 @@ function data = eeg_getdatact( EEG, varargin);
     opt = finputcheck(varargin, { ...
         'channel'   'integer' {} [1:EEG.nbchan];
         'verbose'   'string'  { 'on' 'off' } 'on';
+        'reshape'   'string'  { '2d' '3d' }  '3d';
         'component' 'integer' {} [];        
         'samples'   'integer' {} [];        
         'trialindices' 'integer' {} [];        
@@ -179,7 +181,10 @@ function data = eeg_getdatact( EEG, varargin);
     end;
     
     try,
-        data = reshape(data, size(data,1), EEG.pnts, EEG.trials);
+        if  strcmpi(opt.reshape, '3d')
+             data = reshape(data, size(data,1), EEG.pnts, EEG.trials);
+        else data = reshape(data, size(data,1), EEG.pnts*EEG.trials);
+        end;
     catch
         error('The file on disk does not correspond to the dataset information. Close and reopen the STUDY');
     end;
