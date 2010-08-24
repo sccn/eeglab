@@ -165,6 +165,7 @@ if ~isempty(eventchans)
     if strcmpi(delchan, 'on')
         EEG = pop_select(EEG, 'nochannel', size(EEG.data,1));
     end;
+    EEG = eeg_checkset(EEG, 'makeur');
     
     %EEG = pop_chanevent(EEG, eventchans, 'edge', 'leading', 'delchan', delchan);
 end;
