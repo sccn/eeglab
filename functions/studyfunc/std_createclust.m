@@ -148,7 +148,7 @@ else
 
         % find indices
         % ------------
-        tmp = find(opt.clusterind==k); % opt.clusterind contains the cluster index for each component
+        tmp = find(opt.clusterind==k); % opt.clust.erind contains the cluster index for each component
         STUDY.cluster(k+len).sets  = STUDY.cluster(STUDY.etc.preclust.clustlevel).sets(:,tmp);
         STUDY.cluster(k+len).comps = STUDY.cluster(STUDY.etc.preclust.clustlevel).comps(tmp);
         STUDY.cluster(k+len).algorithm = opt.algorithm;
