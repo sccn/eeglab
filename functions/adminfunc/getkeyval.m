@@ -42,7 +42,11 @@
 
 function txt = getkeyval(lastcom, var, mode, default)
     % mode can be present for 0 and 1 if the variable is present
-	if nargin < 4
+	if nargin < 1
+        help getkeyval;
+        return;
+    end;
+    if nargin < 4
 		default = '';
 	end;
 	if isempty(lastcom)
