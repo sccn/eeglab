@@ -14,7 +14,7 @@
 %            event type. If this field is left empty, the time locking
 %            event for each epoch is exported.
 %   events - numerical array of event indices associated with each epoch.
-%            For structure conversion, this field is ignored.
+%            For array conversion, this field is ignored.
 %
 % Outputs:
 %   epochsout - output epoch array or structure
@@ -112,7 +112,11 @@ case 'struct'
 
       if exist('epochevent') == 1
          for index = 1:size(epoch,2)
-            epoch(index).event = epochevent{index};
+             if iscell(epochevent)
+                 epoch(index).event = epochevent{index};
+             else
+                 epoch(index).event = epochevent(index);
+             end;
          end;
       end;
    end
@@ -124,7 +128,7 @@ case 'array'
         % time locking event
         
         selectedType = fields;
-        if iscell(fields), selectedType = fields{1}; end;
+        if iscell(fields) && ~isempty(fields), selectedType = fields{1}; end;
   	    fields = fieldnames( epoch );
         
         eval( [ 'values = { epoch.' fields{1} ' };' ]);
@@ -138,10 +142,11 @@ case 'array'
                 % find indices of time locking events
                 for index = 1:length(epoch)
                     epochlat = [ epoch(index).eventlatency{:} ];
-                    epochSubIndex(index) = find( abs(epochlat) < 0.02 );
-                    if isempty(epochSubIndex(index))
+                    tmpevent = find( abs(epochlat) < 0.02 );
+                    if isempty(tmpevent)
                         error('time locking event missing, cannot convert to array');
                     end;
+                    epochSubIndex(index) = tmpevent;
                 end;
             else
                 % find indices of specific event type (if several take the
