@@ -1129,9 +1129,9 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
        tmph = surface(Xi-delta/2,Yi-delta/2,zeros(size(Zi))-0.1,Zi,...
                'EdgeColor','none','FaceColor',SHADING);                    
     end
+    handle = gca;
     if strcmpi(MASKSURF, 'on')
         set(tmph, 'visible', 'off');
-        handle = tmph;
     end;
     
     warning off;
@@ -1160,9 +1160,9 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
          tmph = surface(Xi-delta/2,Yi-delta/2,zeros(size(Zi)),Zi,'EdgeColor','none',...
                  'FaceColor',SHADING);
       end
+    handle = gca;
     if strcmpi(MASKSURF, 'on')
         set(tmph, 'visible', 'off');
-        handle = tmph;
     end;
   %
   %%%%%%%%%%%%%%%%%% Else fill contours with uniform colors  %%%%%%%%%%%%%%%%%%
