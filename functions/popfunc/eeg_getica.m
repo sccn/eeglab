@@ -41,6 +41,10 @@ function icaact = eeg_getica(EEG, comp)
     icaact = EEG.icaact(comp,:,:);
   else
     disp('Recomputing ICA activations');
+    if isempty(EEG.icachansind)
+        EEG.icachansind = 1:EEG.nbchan;
+        disp('Channels indices are assumed to be in regular order and arranged accordingly');
+    end
     icaact = (EEG.icaweights(comp,:)*EEG.icasphere)*reshape(EEG.data(EEG.icachansind,:,:), length(EEG.icachansind), EEG.trials*EEG.pnts);
     icaact = reshape( icaact, size(icaact,1), EEG.pnts, EEG.trials);
   end;
