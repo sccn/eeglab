@@ -80,6 +80,10 @@ command = '';
 filepath = '';
 EEG=[];
 
+if ~strcmpi(computer, 'PCWIN')
+    error([ 'This plugins only works under Windows' ]);
+end;
+
 if nargin < 1 
 
 	% ask user
