@@ -33,11 +33,6 @@
 %   >> web http://sccn.ucsd.edu/eeglab/tutorial/ % the EEGLAB tutorial
 %   >> help eeg_checkset  % the EEG dataset structure
 %
-% Main files:
-% ---------- 
-% <a href="matlab:helpwin eeglab">eeglab</a>        - main graphic interface
-% <a href="matlab:helpwin license.txt">license.txt</a>   - GNU license
-% 
 % GUI Functions calling eponymous processing and plotting functions:
 % ------------------------------------------------------------------
 % <a href="matlab:helpwin pop_eegfilt">pop_eegfilt</a>   - bandpass filter data (eegfilt())
@@ -701,13 +696,10 @@ catchstrs.update_study           = e_load_study;
         uimenu( help_m, 'Label', 'EEGLAB menus'                           , 'CallBack', 'eeg_helpmenu;','separator','on');
         
         help_1 = uimenu( help_m, 'Label', 'EEGLAB functions');
-        uimenu( help_1, 'Label', 'Toolbox functions'                      , 'CallBack', 'pophelp(''ica'');');
-        uimenu( help_1, 'Label', 'Signal processing functions'            , 'Callback', 'eeg_helpsigproc;');	
+        uimenu( help_1, 'Label', 'Admin functions'                        , 'Callback', 'eeg_helpadmin;');	
         uimenu( help_1, 'Label', 'Interactive pop_ functions'             , 'Callback', 'eeg_helppop;');	
+        uimenu( help_1, 'Label', 'Signal processing functions'            , 'Callback', 'eeg_helpsigproc;');	
 
-        help_2 = uimenu( help_m, 'Label', 'EEGLAB advanced');
-        uimenu( help_2, 'Label', 'Dataset structure'                      , 'CallBack', 'pophelp(''eeg_checkset'');');
-        uimenu( help_2, 'Label', 'Admin functions'                        , 'Callback', 'eeg_helpadmin;');	
         uimenu( help_m, 'Label', 'EEGLAB license'                         , 'CallBack', 'pophelp(''eeglablicense.txt'', 1);');
     else
         uimenu( help_m, 'Label', 'About EEGLAB'                           , 'CallBack', 'abouteeglab;');
