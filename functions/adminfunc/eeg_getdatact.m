@@ -73,7 +73,7 @@ function data = eeg_getdatact( EEG, varargin);
     
     % getting channel or component activation
     % ---------------------------------------
-    filename = fullfile(EEG.filepath, [ EEG.filename(1:end-3) 'icaact' ] );
+    filename = fullfile(EEG.filepath, [ EEG.filename(1:end-4) '.icaact' ] );
     if ~isempty(opt.component) & ~isempty(EEG.icaact)
 
         data = EEG.icaact(opt.component,:,:);
