@@ -95,6 +95,7 @@ if strcmpi(opt.parentcluster, 'on')
     STUDY.cluster = [];
     for index = 1:length(sameica)
         newcomps = STUDY.datasetinfo(sameica{index}(1)).comps;
+        if isempty(newcomps), newcomps = [1:size(ALLEEG(sameica{index}(1)).icaweights,1)]; end;
         comps = [ comps newcomps ];
         sets(length(sameica{index}):-1:1,end+1:end+length(newcomps)) = repmat( sameica{index}', [1 length(newcomps) ] );
     end;
