@@ -114,18 +114,7 @@ if EEG.trials > 1 & singletrials == 0
 	   if isempty(EEG.icasphere)
 	      error('no ICA data for this set, first run ICA');
 	   end;   
-	   eeglab_options; % changed from eeglaboptions 3/30/02 -sm
-	   if option_computeica
-	        if length(indices) ~= size(EEG.icaact)
-	    	   tmpdata = EEG.icaact(indices,:,:);
-	        else
-	    	   tmpdata = EEG.icaact;
-	        end;
-	   else
-	       fprintf('Computing ICA...\n');
-	       tmpdata = (EEG.icaweights(indices,:)*EEG.icasphere)*reshape(EEG.data(:,:,trials), EEG.nbchan, length(trials)*EEG.pnts);
-	       tmpdata = reshape( tmpdata, size(tmpdata,1), EEG.pnts, length(trials));
-	   end;
+       tmpdata = eeg_getdatact(EEG, 'component', indices, 'trialindices', trials);
 	   fprintf('Averaging...\n');
 	   sigtmp = nan_mean(tmpdata,3);
 	end;
@@ -135,8 +124,8 @@ else
 	else
 	   if isempty(EEG.icasphere)
 	      error('no ICA data for this set, first run ICA');
-	   end;   
-	   sigtmp = EEG.icaact(indices,:,trials);
+	   end;  
+       sigtmp = eeg_getdatact(EEG, 'component', indices, 'trialindices', trials);
 	end;
 end;
 figure;

@@ -155,13 +155,7 @@ if icacomp == 1
 else
     % test if ICA was computed or if one has to compute on line
     % ---------------------------------------------------------
-    eeglab_options; % changed from eeglaboptions 3/30/02 -sm
-	if option_computeica  
-        icaacttmp = EEG.icaact(elecrange, :, :);
-	else
-        icaacttmp = EEG.icaweights(elecrange,:)*EEG.icasphere*reshape(EEG.data, EEG.nbchan, EEG.trials*EEG.pnts);
-        icaacttmp = reshape( icaacttmp, length(elecrange), EEG.pnts, EEG.trials);
-    end;
+    icaacttmp = eeg_getdatact(EEG, 'component', elecrange); 
     [rej tmprejE] = rejtrend( icaacttmp, winsize, minslope, minstd);
     rejE = zeros(size(icaacttmp,1), length(rej));
     rejE(elecrange,:) = tmprejE;

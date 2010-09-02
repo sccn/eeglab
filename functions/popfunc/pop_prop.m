@@ -187,7 +187,7 @@ else
       else % plot component
          icaacttmp = eeg_getdatact(EEG, 'component', chanorcomp);
          offset = nan_mean(icaacttmp(:));
-         erpimage(reshape(EEG.icaact(chanorcomp,1:erpimageframestot),erpimageframes,ERPIMAGELINES)-offset,ones(1,ERPIMAGELINES)*10000, eegtimes , ...
+         erpimage(reshape(icaacttmp(:,1:erpimageframestot),erpimageframes,ERPIMAGELINES)-offset,ones(1,ERPIMAGELINES)*10000, eegtimes , ...
                     EI_TITLE, ei_smooth, 1, 'caxis', 2/3, 'cbar','yerplabel', '');
       end
     else
