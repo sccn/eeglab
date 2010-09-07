@@ -109,7 +109,8 @@
 %   'dipcolor'        - [color] dipole color as Matlab code code or [r g b] vector
 %                       {default: 'k' = black}.
 % Outputs:
-%                   h - plot axes handle
+%                   h - handle of the colored surface. If no surface is plotted,
+%                       return "gca", the handle of the current plot.
 %         grid_or_val - [matrix] the interpolated data image (with off-head points = NaN).  
 %                       Else, single interpolated value at the specified 'noplot' arg channel 
 %                       location ([rad theta]), if any.
@@ -1129,9 +1130,9 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
        tmph = surface(Xi-delta/2,Yi-delta/2,zeros(size(Zi))-0.1,Zi,...
                'EdgeColor','none','FaceColor',SHADING);                    
     end
-    handle = gca;
     if strcmpi(MASKSURF, 'on')
         set(tmph, 'visible', 'off');
+        handle = tmph;
     end;
     
     warning off;
@@ -1160,9 +1161,9 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
          tmph = surface(Xi-delta/2,Yi-delta/2,zeros(size(Zi)),Zi,'EdgeColor','none',...
                  'FaceColor',SHADING);
       end
-    handle = gca;
     if strcmpi(MASKSURF, 'on')
         set(tmph, 'visible', 'off');
+        handle = tmph;
     end;
   %
   %%%%%%%%%%%%%%%%%% Else fill contours with uniform colors  %%%%%%%%%%%%%%%%%%
