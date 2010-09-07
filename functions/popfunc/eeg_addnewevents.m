@@ -1,4 +1,3 @@
-function EEG = eeg_addnewevents(EEG, eventLatencyArrays, types, fieldNames, fieldValues);
 % eeg_addnewevents() Add new events to EEG structure. Both EEG.event and
 % EEG.urevent are updated.
 %
@@ -23,6 +22,8 @@ function EEG = eeg_addnewevents(EEG, eventLatencyArrays, types, fieldNames, fiel
 % EEG = eeg_addnewevents(EEG, {[100 200] [300 400 500]}, {'type1' 'type2'}, {'field1' 'field2'}, {[1 2 3 4 5] [6 7 8 9]});
 %
 %  Author: Nima Bigdely Shamlo, SCCN/INC/UCSD, 2008
+function EEG = eeg_addnewevents(EEG, eventLatencyArrays, types, fieldNames, fieldValues);
+
 
 
 if ~isfield(EEG, 'event')

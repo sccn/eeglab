@@ -1,4 +1,3 @@
-function brainComponents = eeg_dipselect(EEG, rvThreshold, selectionType, depthThreshold);
 % eeg_dipselect()  - select componet dipoles from an EEG dataset with
 %                    reisdual variance (rv) less than a selected threshold
 %                    and equivalent dipole location inside the brain volume.
@@ -30,6 +29,8 @@ function brainComponents = eeg_dipselect(EEG, rvThreshold, selectionType, depthT
 % provided by Robert Oostenveld.
 %  
 % See also: sourcedepth()
+function brainComponents = eeg_dipselect(EEG, rvThreshold, selectionType, depthThreshold);
+
 
 if nargin<2
     rvThreshold =  0.15;
