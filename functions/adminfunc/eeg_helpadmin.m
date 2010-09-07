@@ -1,4 +1,4 @@
-% eeg_helpadmin.m() - Help file for EEGLAB
+% eeg_helpadmin() - Help file for EEGLAB
 
 function noname();
 

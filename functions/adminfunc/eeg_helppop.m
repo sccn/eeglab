@@ -1,4 +1,4 @@
-% eeg_helppop.m() - Help file for EEGLAB
+% eeg_helppop() - Help file for EEGLAB
 
 function noname();
 
