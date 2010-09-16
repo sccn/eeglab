@@ -694,7 +694,7 @@ for inddataset = 1:length(ALLEEG)
     % --------------------------------
     % data dimensions -------------------------
     if isnumeric(EEG.data) && ~isempty(EEG.data)
-        if size(EEG.data,1) ~= EEG.nbchan
+        if ~isequal(size(EEG.data,1), EEG.nbchan)
             disp( [ 'eeg_checkset warning: number of columns in data (' int2str(size(EEG.data,1)) ...
                     ') does not match the number of channels (' int2str(EEG.nbchan) '): corrected' ]); 
             res = com;
