@@ -310,7 +310,7 @@ if ~exist(filename)
     allpoints(4,:) = [];
 
     olddir = pwd;
-    tmppath = which('electrodenormalize');
+    tmppath = which('ft_electroderealign');
     tmppath = fullfile(fileparts(tmppath), 'private');
     cd(tmppath);
     [Inside Outside] = find_inside_vol(allpoints', tmp.vol); % from Fieldtrip 
