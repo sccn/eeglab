@@ -44,6 +44,15 @@
 %                  panel. Note: 'plotgroups' and 'plotconditions' arguments 
 %                  cannot both be 'together' {default: 'apart'}
 %  'legend'      - ['on'|'off'] turn plot legend on/off {default: 'off'}
+%  'plotdiff'    - ['on'|'off'] plot difference between two groups
+%                  or conditions plotted together. 
+%  'plotstderr'  - ['on'|'off'|'diff'|'nocurve'|'diffnocurve'] plots in 
+%                  a surface indicating the standard error. 'diff' only 
+%                  does it for the difference (requires 'plotdiff' 'on' 
+%                  above). 'nocurve' does not plot the mean. This functionality
+%                  does not work for all data configuration {default: 'off'}
+%  'filter'      - [real] low pass filter the data at the given frequency
+%                  for display {default: no filtering}
 %  'figure'      - ['on'|'off'] creates a new figure ('on'). The 'off' mode
 %                  plots all of the groups and conditions on the same pannel.
 % 'plotsubjects' - ['on'|'off'] overplot traces for individual components
@@ -81,9 +90,11 @@ opt = finputcheck( varargin, { 'ylim'          'real'   []              [];
                                'groupstats'    'cell'   []              {};
                                'condstats'     'cell'   []              {};
                                'interstats'    'cell'   []              {};
-                               'titles'        'cell'   []              cell(20,20);
+                               'titles'        'cell'   []              {};
                                'figure'        'string' { 'on' 'off' }   'on';
                                'plottopo'      'string' { 'on' 'off' }   'off';
+                               'plotstderr'    'string' { 'on' 'off' 'diff' 'nocurve' }   'off';
+                               'plotdiff'      'string' { 'on' 'off' }   'off';
                                'legend'        'string' { 'on' 'off' }   'off';
                                'datatype'      'string' { 'ersp' 'itc' 'erp' 'spec' }    'erp';
                                'plotgroups'    'string' { 'together' 'apart' }  'apart';
@@ -238,7 +249,7 @@ for c = 1:ncplot
                     else                                                        leg{(cc-1)*ng+gg} = [ opt.condnames{c} ', ' opt.groupnames{g} ];
                     end;
                 end;
-            elseif ncplot ~= nc
+            elseif ncplot ~= nc % plot conditions together
                 for ind = 2:size(data,1), if any(size(data{ind,1}) ~= size(data{1})), dimreduced_sizediffers = 1; end; end;
                 for cc = 1:nc
                     tmptmpdata = real(data{cc,g});
@@ -246,27 +257,46 @@ for c = 1:ncplot
                         tmptmpdata = nan_mean(tmptmpdata,ndims(tmptmpdata));
                     end;
                     if cc == 1, tmpdata = zeros([size(tmptmpdata) nc]); end;
-                    if ndims(tmptmpdata) == 3, tmpdata(:,:,:,cc) = tmptmpdata;
-                    else                       tmpdata(:,:,cc)   = tmptmpdata;
+                    if ndims(tmptmpdata) == 3, tmpdata(:,:,:,cc) = tmptmpdata; 
+                    else                       tmpdata(:,:,cc)   = tmptmpdata; 
                     end;
                 end;
                 leg = opt.condnames;
-            elseif ngplot ~= ng
+            elseif ngplot ~= ng % plot groups together
                 for ind = 2:size(data,2), if any(size(data{1,ind}) ~= size(data{1})), dimreduced_sizediffers = 1; end; end;
                 for gg = 1:ng
                     tmptmpdata = real(data{c,gg});
                     if dimreduced_sizediffers
                         tmptmpdata = nan_mean(tmptmpdata,ndims(tmptmpdata));
                     end;
-                    if gg == 1, tmpdata = zeros([size(tmptmpdata) ng]); end;
-                    if ndims(tmptmpdata) == 3, tmpdata(:,:,:,gg) = tmptmpdata;
-                    else                       tmpdata(:,:,gg)   = tmptmpdata;
+                    if gg == 1, tmpdata = zeros([size(tmptmpdata) nc]); end;
+                    if ndims(tmptmpdata) == 3, tmpdata(:,:,:,gg) = tmptmpdata; 
+                    else                       tmpdata(:,:,gg)   = tmptmpdata; 
                     end;
                 end;
                 leg = opt.groupnames;
             else tmpdata = real(data{c,g}); 
                 leg = {};
             end;
+            
+            % plot difference
+            % ---------------
+            if ~strcmpi(opt.plotdiff, 'off')
+                if ngplot ~= ng || ncplot ~= nc
+                    if size(tmpdata,3) == 2
+                        tmpdata(:,:,end+1) = tmpdata(:,:,2)-tmpdata(:,:,1);
+                        leg{end+1} = [ leg{2} '-' leg{1} ];
+                    elseif size(tmpdata,4) == 2
+                        tmpdata(:,:,:,end+1) = tmpdata(:,:,:,2)-tmpdata(:,:,:,1);
+                        leg{end+1} = [ leg{2} '-' leg{1} ];
+                    else
+                        disp('Cannot plot difference, more than 2 indep. variable values');
+                    end;
+                else
+                    disp('Cannot plot difference, indep. variable value must be plotted together');
+                end;
+            end;
+            
             if ~isempty(leg) && isnumeric(leg{1})
                 for ileg = 1:length(leg), leg{ileg} = num2str(leg{ileg}); end;
             end;
@@ -277,9 +307,10 @@ for c = 1:ncplot
             plotopt = { allx };
             if ~dimreduced_sizediffers
                 if strcmpi(opt.plottopo, 'on'),
-                    if strcmpi(opt.plotsubjects, 'off') tmpdata = squeeze(real(nan_mean(tmpdata,3))); end;
-                elseif strcmpi(opt.plotsubjects, 'off') tmpdata = squeeze(real(nan_mean(tmpdata,2)));
+                    if strcmpi(opt.plotsubjects, 'off') tmpstd = squeeze(real(std(tmpdata,[],3)))/sqrt(size(tmpdata,3)); tmpdata = squeeze(real(nan_mean(tmpdata,3))); end;
+                elseif strcmpi(opt.plotsubjects, 'off') tmpstd = squeeze(real(std(tmpdata,[],2)))/sqrt(size(tmpdata,2)); tmpdata = squeeze(real(nan_mean(tmpdata,2))); 
                 end;
+                tmpstd = squeeze(permute(tmpstd, [2 1 3]));
             end;
             tmpdata = squeeze(permute(tmpdata, [2 1 3]));
             if strcmpi(opt.plottopo, 'on'), highlight = 'background'; else highlight = 'bottom'; end;
@@ -315,9 +346,20 @@ for c = 1:ncplot
                 metaplottopo(tmpdata, 'chanlocs', opt.chanlocs, 'plotfunc', 'plotcurve', ...
                     'plotargs', { plotopt{:} }, 'datapos', [2 3], 'title', opt.titles{c,g});
             elseif iscell(tmpdata)
-                 plotcurve( allx, tmpdata{1}, 'colors', tmpcol, 'maskarray', tmpdata{2}, plotopt{3:end}, 'title', opt.titles{c,g});
+                plotcurve( allx, tmpdata{1}, 'colors', tmpcol, 'maskarray', tmpdata{2}, plotopt{3:end}, 'title', opt.titles{c,g});
             else
-                plotcurve( allx, tmpdata, 'colors', tmpcol, plotopt{2:end}, 'title', opt.titles{c,g});
+                if isempty(findstr(opt.plotstderr, 'nocurve'))
+                    plotcurve( allx, tmpdata, 'colors', tmpcol, plotopt{2:end}, 'title', opt.titles{c,g});
+                end;
+                if ~strcmpi(opt.plotstderr, 'off')
+                    if ~isempty(findstr(opt.plotstderr, 'diff')), begind = 3; else begind = 1; end;
+                    set(gcf, 'renderer', 'OpenGL')
+                    for tmpi = begind:size(tmpdata,1)
+                        hold on; chandle = fillcurves( allx, tmpdata(tmpi,:)-tmpstd(tmpi,:), tmpdata(tmpi,:)+tmpstd(tmpi,:), tmpcol{tmpi}); hold on;
+                        numfaces = size(get(chandle(1), 'Vertices'),1);
+                        set(chandle(1), 'FaceVertexCData', repmat([1 1 1], [numfaces 1]), 'Cdatamapping', 'direct', 'facealpha', 0.3, 'edgecolor', 'none');
+                    end;
+                end;
             end;
         end;
         
