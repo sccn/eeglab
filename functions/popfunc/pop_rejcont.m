@@ -1,4 +1,53 @@
-% function EEG = pop_rejcont(EEG);
+% pop_rejcont() - reject continuous portions of data based on spectrum
+%                 thresholding. First, contiguous data epochs are extracted
+%                 and a standard spectrum thresholding algorithm is
+%                 applied. Regions of contiguous epochs larger than a
+%                 specified size are then labeled as artifactual.
+%
+% Usage:
+%   >> pop_rejcont( INEEG ) % pop-up interative window mode
+%   >> [OUTEEG, selectedregions] = pop_rejchanspec( INEEG, 'key', 'val');
+%
+% Inputs:
+%   INEEG      - input dataset
+%
+% Optional inputs:
+%  'elecrange'   - [integer array] electrode indices {Default: all electrodes} 
+%  'epochlength' - [float] epoch length in seconds {Default: 0.5 s}
+%  'freqlimit'   - [min max] frequency range too consider for thresholding
+%                  Default is [35 128] Hz.
+%  'threshold'   - [float] frequency upper threshold in dB {Default: 10}
+%  'contiguous'  - [integer] number of contiguous epochs necessary to 
+%                  label a region as artifactual {Default: 4}
+%  'addlength'   - [float] once a region of contiguous epochs has been labeled
+%                  as artifact, additional trailing neighboring regions on
+%                  each side may also be added {Default: 0.25}
+%
+% Outputs:
+%   OUTEEG          - output dataset with updated joint probability array
+%   selectedregions - frames indices of rejected electrodes. Array of n x 2
+%                     n being the number of regions and 2 for the beginning
+%                     and end of each region.
+%
+% Author: Arnaud Delorme, CERCO, UPS/CNRS, 209-
+%
+% See also: eegthresh()
+
+% Copyright (C) 2009 Arnaud Delorme, CERCO, UPS/CNRS
+%
+% This program is free software; you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation; either version 2 of the License, or
+% (at your option) any later version.
+%
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+% You should have received a copy of the GNU General Public License
+% along with this program; if not, write to the Free Software
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 function [EEG selectedregions com ] = pop_rejcont(EEG, varargin);
 
