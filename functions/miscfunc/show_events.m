@@ -1,4 +1,3 @@
-function  im = show_events(EEG, varargin)
 % show_events() - Display events in epochs. Events selected by 
 %                 make_timewarp() function can be optionally highlighted.
 %                 Each epoch is visualized as a row in the output image with
@@ -46,6 +45,8 @@ function  im = show_events(EEG, varargin)
 % Version 1.1
 % Author: Nima Bigdely Shamlo, SCCN/INC/UCSD, 2008
 % See also: make_timewarp(), newtimef()
+function  im = show_events(EEG, varargin)
+
 
 %% check inputs
 EEG = change_events_to_string(EEG);
