@@ -1414,7 +1414,7 @@ end;
 % -------------
 if isempty(g.erspmax)
     g.erspmax = [max(max(abs(P)))/2];
-    g.erspmax = [-g.erspmax g.erspmax]+1;
+    %g.erspmax = [-g.erspmax g.erspmax]+1;
 end;
 
 % --------
