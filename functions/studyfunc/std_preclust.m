@@ -261,6 +261,18 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
         end;
         
         for si = 1:size(STUDY.cluster(cluster_ind).sets,2)
+            
+            % test consistency of the .set structure
+            % --------------------------------------
+            if strcmpi(strcom, 'erp') || strcmpi(strcom, 'spec') || strcmpi(strcom, 'ersp') || strcmpi(strcom, 'itc') 
+                if any(isnan(STUDY.cluster(cluster_ind).sets(:)))
+                    error( [ 'std_preclust error: some datasets do not have ICA pairs.' 10 ...
+                               'Look for NaN values in STUDY.cluster(1).sets which' 10 ...
+                               'indicate missing datasets. FOR CLUSTERING, YOU MAY ONLY' 10 ...
+                               'USE DIPOLE OR SCALP MAP CLUSTERING.' ]);
+                end;
+            end;
+            
             switch strcom
              
              % select ica component ERPs
