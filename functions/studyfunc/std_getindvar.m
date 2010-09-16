@@ -107,6 +107,22 @@ if strcmpi(mode, 'trialinfo') || strcmpi(mode, 'both')
                     subjects{  countfact} = {};
                     countfact = countfact + 1;
                 end;
+            else
+                alltmpvals = [];
+                for ind = 1:length(setinfo)
+                    if isfield(setinfo(ind).trialinfo, ff{index})
+                         eval( [ 'tmpvals = unique([ setinfo(ind).trialinfo.' ff{index} ' ]);' ] );
+                    else tmpvals = [];
+                    end;
+                    alltmpvals = [ alltmpvals tmpvals ];
+                end;
+                alltmpvals = unique(alltmpvals);
+                if length(alltmpvals) > 1
+                    factor{    countfact} = ff{index};
+                    factorvals{countfact} = mattocell(tmpvals);
+                    subjects{  countfact} = {};
+                    countfact = countfact + 1;
+                end;
             end;
         end;
     end;
