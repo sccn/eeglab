@@ -242,30 +242,32 @@ for ind = 1:length(finalinds)
         % -----------------------------------------------------
         if strcmpi(opt.subbaseline, 'on') && strcmpi(dtype, 'ersp') && strcmpi(opt.singletrials, 'off')
             disp('Recomputing baseline...');
+            nbase = ng*nc;
             for g = 1:ng        % ng = number of groups
                 for c = 1:nc    % nc = number of components
                     if strcmpi(opt.singletrials, 'on')
-                        if c == 1, meanpowbase = abs(mean(erspbase{c,g}/nc,3));
-                        else       meanpowbase = meanpowbase + abs(mean(erspbase{c,g}/nc,3));
+                        if c == 1 && g == 1, meanpowbase = abs(mean(erspbase{c,g}/nbase,3));
+                        else                 meanpowbase = meanpowbase + abs(mean(erspbase{c,g}/nbase,3));
                         end;
                     else
-                        if c == 1, meanpowbase = abs(erspbase{c,g}/nc);
-                        else       meanpowbase = meanpowbase + abs(erspbase{c,g}/nc);
+                        if c == 1 && g == 1, meanpowbase = abs(erspbase{c,g}/nbase);
+                        else                 meanpowbase = meanpowbase + abs(erspbase{c,g}/nbase);
                         end;
                     end;
                 end;
-                erspbasetmp = reshape(erspbase{c,g}, [size(meanpowbase,1) 1 size(meanpowbase,2)]);
                 meanpowbase = reshape(meanpowbase  , [size(meanpowbase,1) 1 size(meanpowbase,2)]);
-                
-                % subtract average baseline
-                % -------------------------
+            end;
+            
+            % subtract average baseline
+            % -------------------------
+            for g = 1:ng        % ng = number of groups
                 for c = 1:nc
+                    erspbasetmp = reshape(erspbase{c,g}, [size(meanpowbase,1) 1 size(meanpowbase,3)]);
                     if strcmpi(opt.singletrials, 'on'), tmpmeanpowbase = repmat(meanpowbase, [1 length(alltimes) tottrials{c,g}]);
                     else                                tmpmeanpowbase = repmat(meanpowbase, [1 length(alltimes) 1]);
                     end;
                     ersp{c,g} = ersp{c,g} - repmat(abs(erspbasetmp), [1 length(alltimes) 1 1]) + tmpmeanpowbase;
                 end;
-                clear meanpowbase;
             end;
         end;
 
