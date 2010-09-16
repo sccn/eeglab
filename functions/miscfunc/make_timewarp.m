@@ -1,4 +1,3 @@
-function timeWarpStructure = make_timewarp(EEG, eventSequence, varargin)
 % make_timewarp() - Select a subset of epochs containing a given event sequence, and return 
 %                   a matrix of latencies for time warping the selected epochs to a common 
 %                   timebase in newtimef(). Events in the given sequence may be further 
@@ -54,6 +53,8 @@ function timeWarpStructure = make_timewarp(EEG, eventSequence, varargin)
 %
 % Author: Nima Bigdely Shamlo, SCCN/INC/UCSD, 2008
 % See also: show_events(), newtimef()
+
+function timeWarpStructure = make_timewarp(EEG, eventSequence, varargin)
 
 inputKeyValues = finputcheck(varargin, ...
    {'baselineLatency'     'real'    []          0; ...
