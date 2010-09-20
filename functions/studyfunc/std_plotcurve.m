@@ -310,7 +310,9 @@ for c = 1:ncplot
                     if strcmpi(opt.plotsubjects, 'off') tmpstd = squeeze(real(std(tmpdata,[],3)))/sqrt(size(tmpdata,3)); tmpdata = squeeze(real(nan_mean(tmpdata,3))); end;
                 elseif strcmpi(opt.plotsubjects, 'off') tmpstd = squeeze(real(std(tmpdata,[],2)))/sqrt(size(tmpdata,2)); tmpdata = squeeze(real(nan_mean(tmpdata,2))); 
                 end;
-                tmpstd = squeeze(permute(tmpstd, [2 1 3]));
+                if ~strcmpi(opt.plotstderr, 'off')
+                    tmpstd = squeeze(permute(tmpstd, [2 1 3]));
+                end;
             end;
             tmpdata = squeeze(permute(tmpdata, [2 1 3]));
             if strcmpi(opt.plottopo, 'on'), highlight = 'background'; else highlight = 'bottom'; end;
