@@ -12,16 +12,23 @@
 %         srate   = sampling rate
 %
 % Optional inputs:
-%       'cycles'  = [0] Use FFTs and Hanning window tapering.  {default: 0}
+%       'cycles'  = [real] indicates the number of cycles for the 
+%                   time-frequency decomposition {default: 0}
+%                   if 0, use FFTs and Hanning window tapering.  
 %                   or [real positive scalar] Number of cycles in each Morlet
 %                   wavelet, constant across frequencies.
-%                   or [cycles(1) cycles(2)] wavelet cycles increase with frequency
-%                   starting at cycles(1) and, 
+%                   or [cycles cycles(2)] wavelet cycles increase with 
+%                   frequency starting at cycles(1) and, 
 %                   if cycles(2) > 1, increasing to cycles(2) at
 %                   the upper frequency,
-%                   if cycles(2) < 1, increasing by a factor of cycles(2),
+%                   or if cycles(2) = 0, same window size at all
+%                   frequencies (similar to FFT if cycles(1) = 1)
 %                   or if cycles(2) = 1, not increasing (same as giving
-%                   only one value for 'cycles').
+%                   only one value for 'cycles'). This corresponds to pure
+%                   wavelet with the same number of cycles at each frequencies
+%                   if 0 < cycles(2) < 1, linear variation in between pure 
+%                   wavelets (1) and FFT (0). The exact number of cycles
+%                   at the highest frequency is indicated on the command line.
 %       'wavelet' = DEPRECATED, please use 'cycles'. This function does not 
 %                   support multitaper. For multitaper, use timef().
 %       'wletmethod' = ['dftfilt2'|'dftfilt3'] Wavelet method/program to use.
