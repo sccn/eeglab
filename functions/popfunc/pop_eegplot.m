@@ -120,8 +120,11 @@ if EEG.trials > 1
     else			macrorej  = 'EEG.reject.icarejmanual';
         			macrorejE = 'EEG.reject.icarejmanualE';
     end;
-    elecrange = [1:EEG.nbchan];
-	colrej = EEG.reject.rejmanualcol;
+    if icacomp == 1
+         elecrange = [1:EEG.nbchan];
+    else elecrange = [1:size(EEG.icaweights,1)];
+    end;
+    colrej = EEG.reject.rejmanualcol;
 	rej  = eval(macrorej);
 	rejE = eval(macrorejE);
 	
@@ -179,28 +182,12 @@ if EEG.nbchan > 100
 end;
 
 if icacomp == 1
-    %for index = 1:2:length(eegplotoptions)
-    %    if strcmpi(eegplotoptions{index}, 'winlength') eegplotoptions{index+1} = 20; end;
-    %end;
-    %eegplotoptions = { eegplotoptions{:} 'spacing', 100 };
-            
 	eegplot( EEG.data, 'srate', EEG.srate, 'title', 'Scroll channel activities -- eegplot()', ...
 			 'limits', [EEG.xmin EEG.xmax]*1000 , 'command', command, eegplotoptions{:}, varargin{:}); 
-    
-	%eeg_multieegplot( EEG.data, [], [], oldrej, oldrejE, 'title', 'Scroll channel activities -- eegplot()', 'srate', ...
-	%	      EEG.srate, 'limits', [EEG.xmin EEG.xmax]*1000 , 'command', command); 
 else
     tmpdata = eeg_getdatact(EEG, 'component', [1:size(EEG.icaweights,1)]);
-	for i=1:length(EEG.icaweights(:,1));
-        chans(i).labels=sprintf('%s%s','comp',num2str(i));
-        chans(i).badchan=EEG.reject.gcompreject(i);
-    end
-
 	eegplot( tmpdata, 'srate', EEG.srate, 'title', 'Scroll component activities -- eegplot()', ...
 			 'limits', [EEG.xmin EEG.xmax]*1000 , 'command', command, eegplotoptions{:}, varargin{:}); 
-	%eeg_multieegplot( tmpdata, [], [], oldrej, oldrejE, 'title', 'Scroll component activities -- eegplot()', 'srate', ...
-	%	      EEG.srate, 'limits', [EEG.xmin EEG.xmax]*1000 , 'command',
-	%	      command);
 end;
 com = [ com sprintf('pop_eegplot( %s, %d, %d, %d);', inputname(1), icacomp, superpose, reject) ]; 
 return;
