@@ -294,7 +294,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
       end;
    end;
 
-   g.data=data;
+   % g.data=data; % never used and slows down display dramatically - Ozgur 2010
    
    if length(g.srate) > 1
    		disp('Error: srate must be a single number'); return;
