@@ -180,6 +180,7 @@ end;
 % add paths
 % ---------
 if ~iseeglabdeployed2
+    myaddpath( eeglabpath, 'memmapdata.m', 'functions');
     myaddpath( eeglabpath, 'readeetraklocs.m', [ 'functions' filesep 'sigprocfunc'  ]);
     myaddpath( eeglabpath, 'eeg_checkset.m',   [ 'functions' filesep 'adminfunc'    ]);
     myaddpath( eeglabpath, 'supergui.m',       [ 'functions' filesep 'guifunc'      ]);
