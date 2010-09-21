@@ -357,7 +357,7 @@ for c = 1:ncplot
                     if ~isempty(findstr(opt.plotstderr, 'diff')), begind = 3; else begind = 1; end;
                     set(gcf, 'renderer', 'OpenGL')
                     for tmpi = begind:size(tmpdata,1)
-                        hold on; chandle = fillcurves( allx, tmpdata(tmpi,:)-tmpstd(tmpi,:), tmpdata(tmpi,:)+tmpstd(tmpi,:), tmpcol{tmpi}); hold on;
+                        hold on; chandle = fillcurves( allx(:)', tmpdata(tmpi,:)-tmpstd(tmpi,:), tmpdata(tmpi,:)+tmpstd(tmpi,:), tmpcol{tmpi}); hold on;
                         numfaces = size(get(chandle(1), 'Vertices'),1);
                         set(chandle(1), 'FaceVertexCData', repmat([1 1 1], [numfaces 1]), 'Cdatamapping', 'direct', 'facealpha', 0.3, 'edgecolor', 'none');
                     end;
