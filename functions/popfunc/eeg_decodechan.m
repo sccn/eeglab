@@ -6,7 +6,8 @@
 %
 % Inputs:
 %   chanlocs  - channel location structure
-%   chanlist  - list of channels 'cz pz fz' etc or { 'cz' 'pz' 'fz' }
+%   chanlist  - list of channels, numerical indices [1 2 3 ...] or string 
+%               'cz pz fz' or cell array { 'cz' 'pz' 'fz' }
 %
 % Outputs:
 %   chaninds  - integer array with the list of channel indices
@@ -57,19 +58,23 @@ end;
 
 % convert to values
 % -----------------
-chanval  = [];
-if iscell(chanlist)
-    for ind = 1:length(chanlist)
-
-        valtmp = str2double(chanlist{ind});
-        if ~isnan(valtmp)
-             chanval(end+1) = valtmp;
-        else chanval(end+1) = 0;
-        end;
-    end;
-else
+chanval = 0;
+if isnumeric(chanlist)
     chanval = chanlist;
 end;
+% chanval  = [];
+% if iscell(chanlist)
+%     for ind = 1:length(chanlist)
+% 
+%         valtmp = str2double(chanlist{ind});
+%         if ~isnan(valtmp)
+%              chanval(end+1) = valtmp;
+%         else chanval(end+1) = 0;
+%         end;
+%     end;
+% else
+%     chanval = chanlist;
+% end;
 
 % convert to numerical
 % --------------------
