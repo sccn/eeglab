@@ -121,7 +121,7 @@ if timerange(2) > min([EEG.xmax])*1000, timerange(2) =  min([EEG.xmax])*1000; en
 
 EEG1 = eeg_checkset(EEG(1),'loaddata');
 sigtmp = reshape(EEG1.data, EEG1.nbchan, EEG1.pnts, EEG1.trials);
-if ~isempty(EEG.icachansind), sigtmp = sigtmp(EEG.icachansind,:,:); end;
+if ~isempty(EEG1.icachansind), sigtmp = sigtmp(EEG1.icachansind,:,:); end;
 if length(EEG) == 2
     EEG2 = eeg_checkset(EEG(2),'loaddata');
     if ~all(EEG1.icaweights(:) == EEG2.icaweights(:))
