@@ -142,8 +142,8 @@ end;
 
 allconditions = STUDY.design(opt.design).variable(1).value;
 allgroups     = STUDY.design(opt.design).variable(2).value;
-paired = { fastif(strcmpi(STUDY.design(opt.design).variable(1).pairing, 'paired'), 'on', 'off') ...
-           fastif(strcmpi(STUDY.design(opt.design).variable(2).pairing, 'paired'), 'on', 'off') };
+paired = { STUDY.design(opt.design).variable(1).pairing ...
+           STUDY.design(opt.design).variable(2).pairing };
 
 % for backward compatibility
 % --------------------------
