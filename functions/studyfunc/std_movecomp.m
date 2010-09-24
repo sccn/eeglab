@@ -1,4 +1,4 @@
-%  std_movecomp()  - Move ICA component(s) from one cluster to another. 
+% std_movecomp()  - Move ICA component(s) from one cluster to another. 
 %
 % Usage:    
 %       >> [STUDY] = std_movecomp(STUDY, ALLEEG, from_cluster, to_cluster, comps);   

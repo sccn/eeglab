@@ -1,4 +1,4 @@
-%  std_moveoutlier()  - Commandline function, to reassign specified outlier component(s) 
+% std_moveoutlier()  - Commandline function, to reassign specified outlier component(s) 
 %                            from a cluster to its outlier cluster. 
 % Usage:    
 %                   >> STUDY = std_moveoutlier(STUDY, ALLEEG, from_cluster, comps);   

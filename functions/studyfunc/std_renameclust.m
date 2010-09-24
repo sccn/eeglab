@@ -1,4 +1,4 @@
-%  std_renameclust()  - Commandline function, to rename clusters using specified (mnemonic) names. 
+% std_renameclust()  - Commandline function, to rename clusters using specified (mnemonic) names. 
 % Usage:    
 %                   >> [STUDY] = std_renameclust(STUDY, ALLEEG, cluster, new_name);  
 % Inputs:

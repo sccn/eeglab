@@ -1,4 +1,4 @@
-%  std_rejectoutliers()  - Commandline function, to reject outlier component(s) from clusters. 
+% std_rejectoutliers()  - Commandline function, to reject outlier component(s) from clusters. 
 %                            Reassign the outlier component(s) to an outlier cluster specific to each cluster. 
 % Usage:    
 %                   >> [STUDY] = std_rejectoutliers(STUDY, ALLEEG, clusters, th);   
