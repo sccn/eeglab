@@ -3,12 +3,15 @@
 % Usage:
 %   >> EEG = pop_readegi;             % a window pops up
 %   >> EEG = pop_readegi( filename );
-%   >> EEG = pop_readegi( filename, datachunks,forceversion ); 
+%   >> EEG = pop_readegi( filename, datachunks, forceversion, fileloc); 
 %
 % Inputs:
 %   filename       - EGI file name
 %   datachunks     - desired frame numbers (see readegi() help)
 %                    option available from the command line only
+%   forceversion   - [integer] force reading a specfic file version
+%   fileloc        - [string] channel location file name
+%
 % Outputs:
 %   EEG            - EEGLAB data structure
 %
@@ -32,7 +35,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [EEG, command] = pop_readegi(filename, datachunks, forceversion); 
+function [EEG, command] = pop_readegi(filename, datachunks, forceversion, fileloc); 
     
 EEG = [];
 command = '';
@@ -49,18 +52,22 @@ if nargin < 1
 
     fid = fopen(filename, 'rb', 'b');
     if fid == -1, error('Cannot open file'); end
-    if exist('forceversion')
-        head = readegihdr(fid,forceversion); % read EGI file header
-    else
-        head = readegihdr(fid); % read EGI file header
-    end
+    head = readegihdr(fid); % read EGI file header
     fclose(fid);
     if head.segments ~= 0
-        promptstr    = { sprintf('Segment/frame number (default: 1:%d)', head.segments) };
-        inistr       = { '' };
+        fileloc = '';
+        switch head.nchan
+            case { 32 33 }, fileloc = 'GSN-HydroCel-32.sfp';
+            case { 64 65 }, fileloc = 'GSN65v2_0.sfp';
+            case { 128 129 }, fileloc = 'GSN129.sfp';
+            case { 256 257 }, fileloc = 'GSN-HydroCel-257.sfp';
+        end;
+        promptstr    = { sprintf('Segment/frame number (default: 1:%d)', head.segments) 'Channel location file (in eeglab/sample_locs)' };
+        inistr       = { '' fileloc };
         result       = inputdlg2( promptstr, 'Import EGI file -- pop_readegi()', 1,  inistr, 'pop_readegi');
         if length(result) == 0 return; end;
         datachunks   = eval( [ '['  result{1} ']' ] );
+        fileloc      = result{2};
     else
         datachunks   = [];
         disp('Only one segment, cannot read portion of the file');
@@ -70,14 +77,16 @@ end;
 % load data
 % ----------
 EEG = eeg_emptyset;
-if exist('datachunks') && exist('forceversion')
+if exist('datachunks') && exist('forceversion') && ~isempty(forceversion)
     [Head EEG.data Eventdata SegCatIndex] = readegi( filename, datachunks,forceversion);
-elseif exist('forceversion')
+elseif exist('forceversion') && ~isempty(forceversion)
     [Head EEG.data Eventdata SegCatIndex] = readegi( filename,[],forceversion);
 elseif exist('datachunks')
     [Head EEG.data Eventdata SegCatIndex] = readegi( filename, datachunks);
+    forceversion = [];
 else
     [Head EEG.data Eventdata SegCatIndex] = readegi( filename);    
+    forceversion = [];
 end
 if ~isempty(Eventdata) & size(Eventdata,2) == size(EEG.data,2)
     EEG.data(end+1:end+size(Eventdata,1),:) = Eventdata;
@@ -156,10 +165,12 @@ if all(EEG.data(end,1:10) == 0)
     EEG.nbchan        = size(EEG.data,1);
     EEG = eeg_checkset(EEG);
 end;
-EEG = readegilocs(EEG);
+if ~isempty(fileloc)
+    EEG = readegilocs(EEG, fileloc);
+end;
 
 if nargin < 1 
-    command = sprintf('EEG = pop_readegi(''%s'', %s);', filename, vararg2str({datachunks}) ); 
+    command = sprintf('EEG = pop_readegi(''%s'', %s);', filename, vararg2str({datachunks forceversion fileloc }) ); 
 end;
 
 return;
