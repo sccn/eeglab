@@ -1,4 +1,4 @@
-%  metaplottopo() - plot concatenated multichannel data epochs in a topographic or
+% metaplottopo() - plot concatenated multichannel data epochs in a topographic or
 %               rectangular array. Uses a channel location file with the same
 %               format as topoplot(), or else plots data on a rectangular grid.
 %
