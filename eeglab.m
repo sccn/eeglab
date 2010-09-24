@@ -1489,7 +1489,7 @@ elseif (exist('EEG') == 1) & ~isnumeric(EEG) & ~isempty(EEG(1).data)
             set( g.win0, 'String', [strsetnum '(no dataset name)' ] );
         end;
 
-        fullfilename = [ EEG.filepath EEG.filename];
+        fullfilename = fullfile(EEG.filepath, EEG.filename);
         if ~isempty(fullfilename)
             if length(fullfilename) > 26
                 set( g.win1, 'String', sprintf('Filename: ...%s\n', fullfilename(max(1,length(fullfilename)-26):end) ));
