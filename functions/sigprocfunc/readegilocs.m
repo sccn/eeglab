@@ -2,9 +2,13 @@
 %
 % Usage:
 %   >> EEG = readegilocs(EEG);
+%   >> EEG = readegilocs(EEG, fileloc);
 %
 % Inputs:
 %   EEG        - EEGLAB data structure
+%
+% Optional input:
+%   fileloc    - EGI channel location file
 %
 % Outputs:
 %   EEG        - EEGLAB data structure with channel location structure
@@ -29,7 +33,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function EEG = readegilocs(EEG);
+function EEG = readegilocs(EEG, fileloc);
 
 if nargin < 1
     help readegilocs;
@@ -39,22 +43,26 @@ end;
 % importing channel locations
 % ---------------------------
 found = 1;
-switch EEG.nbchan
-    case { 32 33 }, fileloc = 'GSN-HydroCel-32.sfp';
-    case { 64 65 }, fileloc = 'GSN65v2_0.sfp';
-    case { 128 129 }, fileloc = 'GSN129.sfp';
-    case { 256 257 }, fileloc = 'GSN257.sfp';
-    otherwise, found = 0;
+if nargin < 2
+    switch EEG.nbchan
+        case { 32 33 }, fileloc = 'GSN-HydroCel-32.sfp';
+        case { 64 65 }, fileloc = 'GSN65v2_0.sfp';
+        case { 128 129 }, fileloc = 'GSN129.sfp';
+        case { 256 257 }, fileloc = 'GSN-HydroCel-257.sfp';
+        otherwise, found = 0;
+    end;
 end;
 if found
-    if EEG.nbchan == 64 || EEG.nbchan == 65
+    fprintf('EGI channel location automatically detected %s ********* WARNING is this the proper file?\n', fileloc);
+    if EEG.nbchan == 64 || EEG.nbchan == 65 || EEG.nbchan == 256 || EEG.nbchan == 257
         fprintf( [ 'Warning: this function assumes you have a 64-channel system Version 2\n' ...
                    '         if this is not the case, update the channel location with the proper file' ]);
     end;
     % remove the last channel for 33 channels
 
     peeglab = fileparts(which('eeglab.m'));
-    locs = readlocs(fullfile(peeglab, 'sample_locs', fileloc));
+    fileloc = fullfile(peeglab, 'sample_locs', fileloc);
+    locs = readlocs(fileloc);
     locs(1).type = 'FID';
     locs(2).type = 'FID';
     locs(3).type = 'FID';
@@ -66,6 +74,8 @@ if found
         chaninfo.nodatchans = locs([1 2 3]);
         locs([1 2 3]) = [];
     end; % remove reference
-    EEG.chanlocs = locs;
-    EEG.chaninfo = chaninfo;
+    chaninfo.filename = fileloc;
+    EEG.chanlocs   = locs;
+    EEG.urchanlocs = locs;
+    EEG.chaninfo   = chaninfo;
 end;
