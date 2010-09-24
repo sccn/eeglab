@@ -10,7 +10,8 @@
 %   datachunks     - desired frame numbers (see readegi() help)
 %                    option available from the command line only
 %   forceversion   - [integer] force reading a specfic file version
-%   fileloc        - [string] channel location file name
+%   fileloc        - [string] channel location file name. Default is
+%                    'auto' (autodetection)
 %
 % Outputs:
 %   EEG            - EEGLAB data structure
@@ -39,6 +40,7 @@ function [EEG, command] = pop_readegi(filename, datachunks, forceversion, filelo
     
 EEG = [];
 command = '';
+if nargin < 4, fileloc = 'auto'; end;
 disp('Warning: This function can only import continuous files or');
 disp('         epoch files with only one length for data epochs');
 
@@ -166,7 +168,11 @@ if all(EEG.data(end,1:10) == 0)
     EEG = eeg_checkset(EEG);
 end;
 if ~isempty(fileloc)
-    EEG = readegilocs(EEG, fileloc);
+    if strcmpi(fileloc, 'auto')
+        EEG = readegilocs(EEG);
+    else
+        EEG = readegilocs(EEG, fileloc);
+    end;
 end;
 
 if nargin < 1 

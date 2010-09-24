@@ -67,7 +67,12 @@ if found
     locs(2).type = 'FID';
     locs(3).type = 'FID';
     locs(end).type = 'REF';
-    if mod(EEG.nbchan,2) == 0, 
+    if EEG.nbchan == 256 || EEG.nbchan == 257 
+        if EEG.nbchan == 256
+            chaninfo.nodatchans = locs([end]);
+            locs([end]) = [];
+        end;
+    elseif mod(EEG.nbchan,2) == 0, 
         chaninfo.nodatchans = locs([1 2 3 end]);
         locs([1 2 3 end]) = [];
     else
