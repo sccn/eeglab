@@ -1,4 +1,4 @@
-%   std_preclust() - select measures to be included in computation of a preclustering array.
+% std_preclust() - select measures to be included in computation of a preclustering array.
 %                    This array is used by pop_clust() to find component clusters from a
 %                    specified parent cluster.
 %                    Selected measures (dipole location, ERPs, spectra, scalp maps, ERSPs,
