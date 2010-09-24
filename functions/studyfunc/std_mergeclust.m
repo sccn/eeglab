@@ -1,4 +1,4 @@
-%  std_mergeclust()  - Commandline function, to merge several clusters. 
+% std_mergeclust()  - Commandline function, to merge several clusters. 
 % Usage:    
 %                   >> [STUDY] = std_mergeclust(STUDY, ALLEEG, mrg_cls, name);   
 % Inputs:
