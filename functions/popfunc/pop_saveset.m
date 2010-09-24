@@ -19,6 +19,8 @@
 %                and the transposed data in a binary float '.dat' file.
 %                By default the option from the eeg_options.m file is 
 %                used.
+%   'version' - ['6'|'7.3'] save Matlab file as version 6 (default) or
+%               '7.3' (large files).
 %
 % Outputs:
 %   EEG        - saved dataset (after extensive syntax checks)
@@ -88,6 +90,7 @@ end;
 % -----------------------
 g = finputcheck(options,  { 'filename'   'string'   []     '';
                             'filepath'   'string'   []     '';
+                            'version'    'string'   { '6' '7.3' } '6';
                             'check'      'string'   { 'on' 'off' }     'off';
                             'savemode'   'string'   { 'resave' 'onefile' 'twofiles' '' } '' });
 if isstr(g), error(g); end;
@@ -127,7 +130,7 @@ if length(EEG) == 1
 % $$$         end;
 % $$$         g.filename = EEG.filename;
 % $$$         g.filepath = EEG.filepath;
-    elseif strcmpi(g.savemode, 'resave') & ~isfield(EEG, 'datfile') & ~option_savematlab
+    elseif strcmpi(g.savemode, 'resave') & ~isfield(EEG, 'datsave(file') & ~option_savematlab
         disp('Note that your memory options for saving datasets does not correspond')
         disp('to the format of the datasets on disk (ignoring memory options)')
 % $$$         but = questdlg2(strvcat('This dataset does not have yet an associated ''.dat'' file, but since you have', ...
@@ -229,7 +232,10 @@ try,
         end;
     end;
     
-    if str2num(v(1)) > 6, save(fullfile(EEG.filepath, EEG.filename), '-v6', '-mat', 'EEG');
+    if str2num(v(1)) > 6, 
+        if strcmpi(g.version, '6') save(fullfile(EEG.filepath, EEG.filename), '-v6',   '-mat', 'EEG');
+        else                       save(fullfile(EEG.filepath, EEG.filename), '-v7.3', '-mat', 'EEG');
+        end;
     else                  save(fullfile(EEG.filepath, EEG.filename), '-mat', 'EEG');
     end;
     if save_as_dat_file & strcmpi( no_resave_dat, 'no' )
