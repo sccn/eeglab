@@ -31,14 +31,14 @@
 %               so many dataset Plot and Tools menu items may not give 
 %               interpretable results and will thus be made unavailable for 
 %               selection {default: 'condition'}
-%  'pairing1' - ['paired'|'unpaired'] the nature of the 'variable1' contrast. 
+%  'pairing1' - ['on'|'off'] the nature of the 'variable1' contrast. 
 %               For example, to compare two conditions recorded from the 
 %               same group of 10 subjects, the 'variable1','condition' design 
-%               elements are 'paired' since each dataset for one
+%               elements are paired ('on') since each dataset for one
 %               condition has a corresponding dataset from the same subject 
 %               in the second condition. If the two conditions were recorded 
 %               from different groups of subjects, the variable1 'condition' 
-%               would be 'unpaired' {default: 'paired'}
+%               would be unpaired ('off') {default: 'on'}
 %  'values1'   - {cell array of 'strings'} - 'variable1' instances to include 
 %               in the design. For example, if 'variable1' is 'condition'and 
 %               three values for 'condition' (e.g., 'a' , 'b', and 'c')
@@ -52,8 +52,8 @@
 %  'variable2' - ['string'] - second independent variable name, if any. Typically, 
 %               this might refer to ('unpaired') subject group or (typically 
 %               'paired') session number, etc.
-%  'pairing2' - ['paired'|'unpaired'] type of statistics for variable2 
-%               (default: 'paired'}
+%  'pairing2' - ['on'|'off'] type of statistics for variable2 
+%               (default: 'on'}
 %  'values2'  - {cell array of 'strings'} - variable2 values to include in the 
 %               design {default: all}. Here, 'var[12]' must be field names 
 %               in STUDY.datasetinfo or  STUDY.datasetinfo.trialinfo. 
@@ -123,7 +123,8 @@ function [STUDY com] = std_makedesign(STUDY, ALLEEG, designind, varargin)
 
 if nargin < 2
     help std_makedesign;
-    return;
+    return;defdes.variable(1).pairing = 'on';
+defdes.variable(2).pairing = 'off';
 end;
 if nargin < 3 
     designind = 1;
@@ -137,7 +138,7 @@ defdes.variable(2).label = 'group';
 defdes.variable(1).value = {};
 defdes.variable(2).value = {};
 defdes.variable(1).pairing = 'on';
-defdes.variable(2).pairing = 'off';
+defdes.variable(2).pairing = 'on';
 defdes.include = {};
 if ~isempty(varargin) && isstruct(varargin{1})
     defdes = varargin{1};
