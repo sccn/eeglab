@@ -198,7 +198,7 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
                 if length(desset.dataset)>1 && ~isequal(chanlist{desset.dataset})
                     error(['ICA decompositions must be identical if' 10 'several datasets are concatenated to build' 10 'the design, abording' ]);
                 end;
-                std_erp(ALLEEG(desset.dataset), 'components', chanlist{index}, addopts{:}, g.erpparams{:});
+                std_erp(ALLEEG(desset.dataset), 'components', chanlist{desset.dataset(1)}, addopts{:}, g.erpparams{:});
             end;
         end;
         if isfield(curstruct, 'erpdata')
@@ -222,7 +222,7 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
                 if length(desset.dataset)>1 && ~isequal(chanlist{desset.dataset})
                     error(['ICA decompositions must be identical if' 10 'several datasets are concatenated to build' 10 'the design, abording' ]);
                 end;
-                std_spec(ALLEEG(desset.dataset), 'components', chanlist{index}, addopts{:}, g.specparams{:});
+                std_spec(ALLEEG(desset.dataset), 'components', chanlist{desset.dataset(1)}, addopts{:}, g.specparams{:});
             end;
         end;
         if isfield(curstruct, 'specdata')
