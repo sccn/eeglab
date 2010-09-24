@@ -48,7 +48,7 @@ function [EEG com] = pop_interp(EEG, bad_elec, method)
     if nargin < 2
         disp('Warning: interpolation can be done on the fly in studies'); 
         disp('         this function will actually create channels in the dataset'); 
-        disp('Warning: do not interolate channels before running ICA'); 
+        disp('Warning: do not interpolate channels before running ICA'); 
         disp('You may define channel location to interpolate in the channel'); 
         disp('editor and declare such channels as non-data channels'); 
          
