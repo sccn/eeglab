@@ -189,7 +189,7 @@ function [smoothprob3d, mriplanes] = mri3dplot(prob3d, mri, varargin)
                     case 'top' , coord = [  0 0 g.mrislices(index2) 1 ]; 
                     case 'rear', coord = [  0 g.mrislices(index2) 0 1 ]; 
                 end;
-                coord = round( pinv(mri.transform)*[ 0 0 0 1]' )';
+                coord = round( pinv(mri.transform)*coord' )';
                 for i = 1:length(newprob3d)
                     switch g.mriview{index2}
                      case 'side', newprob3d{i}(  coord(1), :, :, :) = 0;
