@@ -240,7 +240,6 @@ end;
 	
 % display buttons
 % ---------------
-
 if ~isnan(winhandle)
 	COLREJ = '[1 0.6 0.6]';
 	COLACC = '[0.75 1 0.75]';
@@ -254,7 +253,11 @@ if ~isnan(winhandle)
 
 	% REJECT button
 	% -------------
-	status = EEG.reject.gcompreject(chanorcomp);
+    if ~isempty(EEG.reject.gcompreject)
+    	status = EEG.reject.gcompreject(chanorcomp);
+    else
+        status = 0;
+    end;
 	hr = uicontrol(gcf, 'Style', 'pushbutton', 'backgroundcolor', eval(fastif(status,COLREJ,COLACC)), ...
 				'string', fastif(status, 'REJECT', 'ACCEPT'), 'Units','Normalized', 'Position', [40 -10 15 6].*s+q, 'userdata', status, 'tag', 'rejstatus');
 	command = [ 'set(gcbo, ''userdata'', ~get(gcbo, ''userdata''));' ...
