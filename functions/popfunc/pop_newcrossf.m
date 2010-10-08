@@ -185,7 +185,7 @@ else
 	if ~isempty( EEG.icasphere )
         eeglab_options; % changed from eeglaboptions 3/30/02 -sm
         tmpsig1 = eeg_getdatact(EEG, 'component', num1, 'samples',pointrange);
-        tmpsig2 = eeg_getdatact(EEG, 'component', num1, 'samples',pointrange);
+        tmpsig2 = eeg_getdatact(EEG, 'component', num2, 'samples',pointrange);
 	else
 		error('You must run ICA first');
 	end;	
