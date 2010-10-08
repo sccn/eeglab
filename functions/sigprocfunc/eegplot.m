@@ -1040,7 +1040,7 @@ else
         switch lower(g.submean) % subtract the mean ?
          case 'on', 
           meandata = mean(g.data2(:,lowlim:highlim)');  
-          if any(isnan(memdata))
+          if any(isnan(meandata))
               meandata = nan_mean(g.data2(:,lowlim:highlim)');
           end;
          otherwise, meandata = zeros(1,g.chans);
