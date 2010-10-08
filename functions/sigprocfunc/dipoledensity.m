@@ -20,9 +20,8 @@
 %              dipoles (default is MNI). See help dipplot for more information.
 %
 % Optional 'key', val input pairs:
-%  'mri'        - [string or struct] mri file (matlab format or file format
-%  read 
-%                 by fcdc_read_mri. See dipplot.m help for more information.
+%  'mri'        - [string or struct] mri file (matlab format or file format read 
+%                 by fcdc_read_mri). See dipplot.m help for more information.
 %  'method'     - ['alldistance'|'distance'|'entropy'|'relentropy'] method for 
 %                            computing density: 
 %                 'alldistance' - {default} take into account the gaussian-weighted 
