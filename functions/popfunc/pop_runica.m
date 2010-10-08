@@ -281,7 +281,7 @@ else
         tmplen = ALLEEG(g.dataset(i)).pnts*ALLEEG(g.dataset(i)).trials;
         TMP = eeg_checkset(ALLEEG(g.dataset(i)), 'loaddata');
         EEG.data(:,cpnts:cpnts+tmplen-1) = reshape(TMP.data, size(TMP.data,1), size(TMP.data,2)*size(TMP.data,3));
-        cpnts = cpnts+1;
+        cpnts = cpnts+tmplen;
     end;
     EEG.icaweights = [];
     EEG.trials = 1;
