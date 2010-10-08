@@ -184,7 +184,7 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
     if strcmpi(g.erp, 'on')
         % check dataset consistency
         % -------------------------
-        if length(unique([ALLEEG.pnts])) > 1
+        if length(unique([ALLEEG([STUDY.design(g.design).cell.dataset]).pnts])) > 1
             error([ 'Cannot compute ERPs because datasets' 10 'do not have the same number of data points' ])
         end;
         
@@ -273,8 +273,8 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
     if strcmpi(g.ersp, 'on') | strcmpi(g.itc, 'on')
         % check dataset consistency
         % -------------------------
-        if length(unique([ALLEEG.pnts])) > 1
-            error([ 'Cannot compute ERPs because datasets' 10 'do not have the same number of data points' ])
+        if length(unique([ALLEEG([STUDY.design(g.design).cell.dataset]).pnts])) > 1
+            error([ 'Cannot compute ERSPs/ITCs because datasets' 10 'do not have the same number of data points' ])
         end;
         
         if strcmpi(g.ersp, 'on') & strcmpi(g.itc, 'on'), type = 'both';
