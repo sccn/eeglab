@@ -28,10 +28,11 @@
 %                    with the EEG.event structure
 %   'chanlocsize'  - check the EEG.chanlocs structure length; show warning if
 %                    necessary.
-%   'chanlocs_homogenous' - check whether EEG contains consistent channel
-%                           information; if not, correct it.
-%   'eventconsistency'    - check whether EEG.event information are consistent; 
-%                           rebuild event* subfields of the 'EEG.epoch' structure (can be time consuming).
+%   'chanlocs_homogeneous' - check whether EEG contains consistent channel
+%                            information; if not, correct it.
+%   'eventconsistency'     - check whether EEG.event information are consistent; 
+%                            rebuild event* subfields of the 'EEG.epoch' structure 
+%                            (can be time consuming).
 % Outputs:
 %       EEGOUT     - output EEGLAB dataset or dataset array
 %       changes    - change code: 'no' = no changes; 'yes' = the EEG
