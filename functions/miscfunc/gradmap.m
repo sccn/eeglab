@@ -84,10 +84,14 @@ for i=1:size(map,2)
 
 	% Draw gradient
 	% -------------
-	if exist('draw');
-		subplot(ceil(sqrt(size(map,2))), ceil(sqrt(size(map,2))), i);
-		contour(imresize(Zi,0.5)); hold on
-		quiver(imresize(FX, 0.5), imresize(FY, 0.5)); hold off
+	if exist('draw')
+        if exist('imresize')
+            subplot(ceil(sqrt(size(map,2))), ceil(sqrt(size(map,2))), i);
+            contour(imresize(Zi,0.5)); hold on
+            quiver(imresize(FX, 0.5), imresize(FY, 0.5)); hold off
+        else
+            disp('Warning: cannot plot because imresize function is missing (image processing toolbox)');
+        end;
 	end;
 end;                                                       
 
