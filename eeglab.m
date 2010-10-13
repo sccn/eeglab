@@ -172,7 +172,7 @@ comp = computer;
 try
     if strcmpi(comp(1:3), 'GLN') | strcmpi(comp(1:3), 'MAC') | strcmpi(comp(1:3), 'SOL')
         fileformat = 'maclinux';
-    elseif strcmpi(com(1:5), 'pcwin')
+    elseif strcmpi(comp(1:5), 'pcwin')
         fileformat = 'pcwin';
     end;
 end;
