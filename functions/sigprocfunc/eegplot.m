@@ -1379,6 +1379,7 @@ else
 	elseif p1 == 2
 		g.spacing= max(0,g.spacing-0.1*orgspacing); % decrease g.spacing(5%)
     end
+    % this section was preventing seing data with very low amplitude
     %if round(g.spacing*100) == 0
     %    maxindex = min(10000, g.frames);  
     %    g.spacing = 0.01*max(max(data(:,1:maxindex),[],2),[],1)-min(min(data(:,1:maxindex),[],2),[],1);  % Set g.spacingto max/min data
