@@ -1379,14 +1379,14 @@ else
 	elseif p1 == 2
 		g.spacing= max(0,g.spacing-0.1*orgspacing); % decrease g.spacing(5%)
     end
-    if round(g.spacing*100) == 0
-        maxindex = min(10000, g.frames);  
-        g.spacing = 0.01*max(max(data(:,1:maxindex),[],2),[],1)-min(min(data(:,1:maxindex),[],2),[],1);  % Set g.spacingto max/min data
-    end;
+    %if round(g.spacing*100) == 0
+    %    maxindex = min(10000, g.frames);  
+    %    g.spacing = 0.01*max(max(data(:,1:maxindex),[],2),[],1)-min(min(data(:,1:maxindex),[],2),[],1);  % Set g.spacingto max/min data
+    %end;
 
     % update edit box
     % ---------------
-    set(ESpacing,'string',num2str(g.spacing,4))  
+    set(ESpacing,'string',num2str(g.spacing))  
     set(gcf, 'userdata', g);
 	 eegplot('drawp', 0);
     set(ax1,'YLim',[0 (g.chans+1)*g.spacing],'YTick',[0:g.spacing:g.chans*g.spacing])
@@ -1397,7 +1397,7 @@ else
     eyeaxes = findobj('tag','eyeaxes','parent',gcf);
     if ~isempty(eyeaxes)
       eyetext = findobj('type','text','parent',eyeaxes,'tag','thescalenum');
-      set(eyetext,'string',num2str(g.spacing,4))
+      set(eyetext,'string',num2str(g.spacing))
     end
     
     return;
