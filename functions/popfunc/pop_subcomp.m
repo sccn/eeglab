@@ -82,7 +82,7 @@ end;
  
 if isempty(components)
 	if ~isempty(EEG.reject.gcompreject)
-      		components = find(EEG.reject.gcompreject == 0);
+      		components = find(EEG.reject.gcompreject == 1);
    	else
         	fprintf('Warning: no components specified, no rejection performed\n');
          	return;
