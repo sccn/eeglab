@@ -117,6 +117,11 @@ for inddes = 1:length(STUDY.design)
     end;
 end;
 
+TMP = STUDY.datasetinfo;
+STUDY = std_maketrialinfo(STUDY, ALLEEG);
+if ~isequal(STUDY.datasetinfo, TMP)
+    disp('STUDY Warning: the trial information collected from datasets has changed');
+end;
 std_checkfiles(STUDY, ALLEEG);
 STUDY.saved = 'yes';
 
