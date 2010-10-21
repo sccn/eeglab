@@ -126,6 +126,14 @@ end;
 
 % create STUDY design if it is not present
 % ----------------------------------------
+if isfield(STUDY.datasetinfo, 'trialinfo')
+    alltrialinfo = { STUDY.datasetinfo.trialinfo };
+    if any(cellfun(@isempty, alltrialinfo)) && any(~cellfun(@isempty, alltrialinfo))
+        disp('Rebuilding trial information structure for STUDY');
+        STUDY  = std_maketrialinfo(STUDY, ALLEEG); % some dataset do not have trialinfo and
+                                                   % some other have it, remake it for everybody
+    end;
+end;
 if ~isfield(STUDY, 'design') || isempty(STUDY.design) || ~isfield(STUDY.design, 'name')
     STUDY  = std_maketrialinfo(STUDY, ALLEEG); 
     STUDY  = std_makedesign(STUDY, ALLEEG);
