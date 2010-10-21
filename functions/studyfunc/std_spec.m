@@ -192,11 +192,9 @@ for dat = 1:length(EEG)
         EEG(dat).event  = [];
         EEG(dat).epoch  = [];
         if ~isempty(g.interp), 
-            TMPEEG = eeg_interp(EEG(dat), g.interp, 'spherical'); 
-            tmpdata = TMPEEG.data;
-        else
-            tmpdata = EEG(dat).data;
+            EEG(dat) = eeg_interp(EEG(dat), g.interp, 'spherical'); 
         end;
+        tmpdata = EEG(dat).data;
     end;
     if all([ EEG.trials ] > 1)
         if size(X,2) ~= size(tmpdata,2) && size(X,3) ~= 1, error('Datasets to be concatenated do not have the same number of time points'); end;
