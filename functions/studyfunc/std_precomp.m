@@ -315,7 +315,7 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
         for index = 1:length(STUDY.design(g.design).cell)
             desset = STUDY.design(g.design).cell(index);
             if strcmpi(computewhat, 'channels')
-                [tmpchanlist opts] = getchansandopts(STUDY, ALLEEG, chanlist, index, g);
+                [tmpchanlist opts] = getchansandopts(STUDY, ALLEEG, chanlist, desset.dataset, g);
                 std_ersp(ALLEEG(desset.dataset), 'channels', tmpchanlist, 'type', type, 'fileout', desset.filebase, 'trialindices', desset.trials, opts{:}, tmpparams{:});
             else
                 if length(desset.dataset)>1 && ~isequal(chanlist{desset.dataset})
