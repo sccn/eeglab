@@ -409,11 +409,16 @@ if ~isempty(g.time) | ~isempty(g.notime)
         
         % erase event-related fields from the epochs
         % ------------------------------------------
-        fn = fieldnames(EEG.epoch);
-        EEG.epoch = rmfield(EEG.epoch,{fn{strmatch('event',fn)}});
+        if ~isempty(EEG.epoch)
+            fn = fieldnames(EEG.epoch);
+            EEG.epoch = rmfield(EEG.epoch,{fn{strmatch('event',fn)}});
+        end;
         
     else
         if isempty(g.notime)
+            if length(g.time) == 2 && EEG.xmin < 0
+                disp('Warning: minimum time unchanged to ensure correct latency of initial boundary event');
+            end;
             g.notime = g.time';
             g.notime = g.notime(:);
             if g.notime(1) ~= 0, g.notime = [EEG.xmin g.notime(:)'];
