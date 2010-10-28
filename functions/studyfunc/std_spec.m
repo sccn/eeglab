@@ -161,7 +161,7 @@ if exist(filename) & strcmpi(g.recompute, 'off')
     if strcmpi(prefix, 'comp')
         [X tmp f] = std_readfile(setinfo, 'components', g.components, 'freqlimits', g.freqrange, 'measure', 'spec');
     else
-        [X tmp f] = std_readfile(setinfo, 'components', g.components, 'freqlimits', g.freqrange, 'measure', 'spec');
+        [X tmp f] = std_readfile(setinfo, 'channels', g.channels, 'freqlimits', g.freqrange, 'measure', 'spec');
     end;
     if ~isempty(X), return; end;
 end
