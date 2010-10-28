@@ -130,7 +130,7 @@ if importevent
             EEG.data(dat.BDF.Status.Channel,:) = [];
         end;
         EEG.nbchan = size(EEG.data,1);
-        if ~isempty(EEG.chanlocs)
+        if ~isempty(EEG.chanlocs) && dat.BDF.Status.Channel <= length(EEG.chanlocs)
             EEG.chanlocs(dat.BDF.Status.Channel,:) = [];
         end;
     elseif isempty(dat.EVENT.POS)
