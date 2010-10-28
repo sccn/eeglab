@@ -43,6 +43,9 @@ end;
 if isstr(chanstr)
     % convert chanstr
     % ---------------
+    chanstr(find(chanstr == ']')) = [];
+    chanstr(find(chanstr == '[')) = [];
+    chanlistnum = [];
     chanstr  = [ ' ' chanstr ' ' ];
     chanlist = {};
     sp = find(chanstr == ' ');
@@ -50,7 +53,15 @@ if isstr(chanstr)
         c = chanstr(sp(i)+1:sp(i+1)-1);
         if ~isempty(c)
             chanlist{end+1} = c;
+            if isnan(str2double(chanlocs(1).labels)) % channel labels are not numerical
+                if ~isnan(str2double(c))
+                    chanlistnum(end+1) = str2double(c);
+                end;
+            end;
         end;
+    end;
+    if length(chanlistnum) == length(chanlist)
+        chanlist = chanlistnum;
     end;
 else
     chanlist = chanstr;
