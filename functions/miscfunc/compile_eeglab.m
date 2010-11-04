@@ -52,9 +52,13 @@ try, movefile( fullfile(path_fieldtrip, '@uint64'), fullfile(path_fieldtrip, 'ui
 try, movefile( fullfile(path_fieldtrip, 'topoplot.m'), fullfile(path_fieldtrip, 'topoplotold.m') ); catch, end;
 path_fieldtrip = path_fieldtrip(length(path_eeglab)+2:end);
 files_fieldtrip         = fullfile(path_fieldtrip, '*.m');
+files_public            = fullfile(path_fieldtrip, 'public', '*.m');
+files_public_private    = fullfile(path_fieldtrip, 'public', 'private', '*.m');
 files_fieldtrip_private = fullfile(path_fieldtrip, 'private', '*.m');
-files_forwinv           = fullfile(path_fieldtrip, 'forwinv', '*.m');
-files_forwinv_private   = fullfile(path_fieldtrip, 'forwinv', 'private', '*.m');
+files_forwinv           = fullfile(path_fieldtrip, 'forward', '*.m');
+files_forwinv_private   = fullfile(path_fieldtrip, 'forward', 'private', '*.m');
+files_inverse           = fullfile(path_fieldtrip, 'inverse', '*.m');
+files_inverse_private   = fullfile(path_fieldtrip, 'inverse', 'private', '*.m');
 
 try
     rmpath('C:\Documents and Settings\delorme\My Documents\eeglab\plugins\editevents_arno');
@@ -62,14 +66,19 @@ catch, end;
 path_biosig = fileparts(which('install'));
 path_biosig = path_biosig(length(path_eeglab)+2:end);
 biosig  = ' sopen.m sclose.m sread.m ';
+[allfiles3 fieldt]  = scanfold('external/fieldtrip-partial');
 % note that the order is important if the two first folders are inverted,
 % it does not work
-fieldt  = [ ' -a ' files_fieldtrip_private ...
-            ' -a ' files_fieldtrip ...
-            ' -a ' files_forwinv ...
-            ' -a ' files_forwinv_private ...
-            ' -a ' files_fileio ...
-            ' -a ' files_fileio_private ];
+
+% fieldt  = [ ' -a ' files_fieldtrip_private ...
+%             ' -a ' files_fieldtrip ...
+%             ' -a ' files_public ...
+%             ' -a ' files_forwinv ...
+%             ' -a ' files_forwinv_private ...
+%             ' -a ' files_inverse ...
+%             ' -a ' files_inverse_private ...
+%             ' -a ' files_fileio ...
+%             ' -a ' files_fileio_private ];
 %fieldt  = [ ' -a external\fieldtrip-20090727\private\*.m -a external\fieldtrip-20090727\*.m  ' ...
 %            ' -a external\fieldtrip-20090727\forwinv\*.m -a external\fieldtrip-20090727\forwinv\private\*.m ' ...
 %            ' -a external\fileio-20090511\*.m -a external\fileio-20090511\private\*.m ' ];
@@ -78,7 +87,10 @@ fieldt  = [ ' -a ' files_fieldtrip_private ...
 % other mex files in file-io private folder
 [allfiles1 plugins]   = scanfold('plugins/');
 [allfiles2 functions] = scanfold('functions/');
-eval([ 'mcc -v -C -m eeglab' biosig plugins functions fieldt ]);
+
+eval([ 'mcc -v -m eeglab' biosig plugins functions fieldt ]);
+%eval([ 'mcc -v -C -m eeglab' biosig plugins functions fieldt ]);
+
 mkdir(fullfile(outputfolder));
 comp = computer;
 if strcmpi(comp(1:2), 'PC')
