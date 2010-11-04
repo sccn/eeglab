@@ -231,7 +231,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
         else
             maxdiplen = 0;
             for ind = 1:length(sourcesori)
-                maxdiplen = max(maxdiplen, max(sourcesori(ind).momxyz(:)));
+                maxdiplen = max(maxdiplen, max(abs(sourcesori(ind).momxyz(:))));
             end;
             if maxdiplen>2000
                 if strcmpi(g.verbose, 'on'),
