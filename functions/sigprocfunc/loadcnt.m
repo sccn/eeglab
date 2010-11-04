@@ -434,8 +434,12 @@ if type == 'cnt'
       if (bReadIntoMemory == true)
           if h.channeloffset <= 1
                 dat=fread(fid, [h.nchannels Inf], r.dataformat);
-                dat=single(dat);
-                r.ldnsamples = size(dat,2);
+                if size(dat,2) < r.ldnsamples
+                    dat=single(dat);
+                    r.ldnsamples = size(dat,2);
+                else
+                    dat=single(dat(:,1:r.ldnsamples));
+                end;
           else
               h.channeloffset = h.channeloffset/2;
               % reading data in blocks
