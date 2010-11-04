@@ -44,7 +44,7 @@ else
     text1 = help2html(funct);
     if length(funct) > 4 & strcmpi(funct(1:4), 'pop_')
         try,
-            text2 = help2html(funct(5:end))
+            text2 = help2html(funct(5:end));
             text1 = [text1 '<br><pre>___________________________________________________________________' 10 ...
                            ' ' 10 ...
                            ' The ''pop'' function above calls the eponymous Matlab function below' 10 ...
@@ -73,7 +73,7 @@ if length(funct) > 4 & strcmpi(funct(1:4), 'pop_')
 	catch, end;
 end;
 
-textgui(doc1);
+textgui(doc1);1000
 h = findobj('parent', gcf, 'style', 'slider');
 try, icadefs; catch, 
 	GUIBUTTONCOLOR = [0.8 0.8 0.8]; 
