@@ -75,7 +75,7 @@ else
     options =  varargin;
 end;
 opt = finputcheck(options, { 'name'             'string'   []  'Cls';
-                             'clusterind'       'integer'  []  [];
+                             'clusterind'       'integer'  []  length(STUDY.cluster)+1;
                              'parentcluster'    'string'   { 'on' 'off' }  'off';
                              'algorithm'        'cell'     []  {};
                              'centroid'         'real'     []  [] }, 'std_createclust');
@@ -144,7 +144,7 @@ else
         % ------------
         if k == 0
              STUDY.cluster(len).name   = [ 'outlier ' num2str(k+nc)];
-        else STUDY.cluster(k+len).name = [ 'Cls ' num2str(k+nc)];
+        else STUDY.cluster(k+len).name = [ opt.name ' ' num2str(k+nc)];
         end
 
         % find indices
