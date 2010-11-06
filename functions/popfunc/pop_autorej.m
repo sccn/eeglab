@@ -9,7 +9,7 @@
 % Optional inputs:
 %   'threshold'  - [float] Threshold limit for detection of extremely large 
 %                  fluctuations (uV) {default: 1000}
-%   'electrodes' - [integer] Do not use these channel indices for detection
+%   'electrodes' - [integer] Use these channel indices for detection
 %                  of improbable data {default: all channels}
 %   'icacomps'   - [integer] Use these component activities (instead of 
 %                  channel data) for detection of improbable data.
@@ -79,7 +79,7 @@ function [EEG, rmep, com ] = pop_autorej(EEG, varargin);
                                   'icacomps'     'real'    []     []; ...
                                   'maxrej'       'real'    []     DEFAULT_MAXREJ; ...
                                   'eegplot'      'string'  { 'on' 'off' }    'off'; ...
-                                  'nogui'        'string'  { 'on' 'off' }    'off'; ...
+                                  'nogui'        'string'  { 'on' 'off' }    'on'; ...
                                   'threshold'    'real'    []     DEFAULT_THRESH }, 'pop_autorej');
     if isstr(opt), error(opt); end;
     
