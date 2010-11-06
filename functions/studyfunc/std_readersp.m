@@ -91,6 +91,9 @@ if isstr(opt), error(opt); end;
 if ~strcmpi(opt.infotype, 'ersp'), opt.datatype = opt.infotype; end;
 nc = max(length(STUDY.design(opt.design).variable(1).value),1);
 ng = max(length(STUDY.design(opt.design).variable(2).value),1);
+paired1 = STUDY.design(opt.design).variable(1).pairing;
+paired2 = STUDY.design(opt.design).variable(2).pairing;
+
 dtype = opt.datatype;
 
 % find channel indices
@@ -146,8 +149,8 @@ for ind = 1:length(finalinds)
         % find total nb of trials
         % -----------------------
         setinfo = STUDY.design(opt.design).cell;
+        tottrials = cell( nc, ng );
         if strcmpi(opt.singletrials, 'on')
-            tottrials = cell( nc, ng );
             for index = 1:length(setinfo)
                 condind = strmatch( setinfo(index).value{1}, STUDY.design(opt.design).variable(1).value );
                 grpind  = strmatch( setinfo(index).value{2}, STUDY.design(opt.design).variable(2).value );
@@ -240,34 +243,26 @@ for ind = 1:length(finalinds)
 
         % compute average baseline across groups and conditions
         % -----------------------------------------------------
-        if strcmpi(opt.subbaseline, 'on') && strcmpi(dtype, 'ersp') && strcmpi(opt.singletrials, 'off')
+        if strcmpi(opt.subbaseline, 'on') && strcmpi(dtype, 'ersp')
             disp('Recomputing baseline...');
-            nbase = ng*nc;
-            for g = 1:ng        % ng = number of groups
-                for c = 1:nc    % nc = number of components
-                    if strcmpi(opt.singletrials, 'on')
-                        if c == 1 && g == 1, meanpowbase = abs(mean(erspbase{c,g}/nbase,3));
-                        else                 meanpowbase = meanpowbase + abs(mean(erspbase{c,g}/nbase,3));
-                        end;
-                    else
-                        if c == 1 && g == 1, meanpowbase = abs(erspbase{c,g}/nbase);
-                        else                 meanpowbase = meanpowbase + abs(erspbase{c,g}/nbase);
-                        end;
-                    end;
+            if strcmpi(paired1, 'on') && strcmpi(paired2, 'on')
+                disp('Removing ERSP baseline for both indep. variables');
+                meanpowbase = computeerspbaseline(erspbase(:), opt.singletrials);
+                ersp        = removeerspbaseline(ersp, erspbase, meanpowbase, tottrials);
+            elseif strcmpi(paired1, 'on')
+                disp('Removing ERSP baseline for first indep. variables (second indep. var. is unpaired)');
+                for g = 1:ng        % ng = number of groups
+                    meanpowbase = computeerspbaseline(erspbase(:,g), opt.singletrials);
+                    ersp(:,g)   = removeerspbaseline(ersp(:,g), erspbase(:,g), meanpowbase, tottrials(:,g));
                 end;
-                meanpowbase = reshape(meanpowbase  , [size(meanpowbase,1) 1 size(meanpowbase,2)]);
-            end;
-            
-            % subtract average baseline
-            % -------------------------
-            for g = 1:ng        % ng = number of groups
-                for c = 1:nc
-                    erspbasetmp = reshape(erspbase{c,g}, [size(meanpowbase,1) 1 size(meanpowbase,3)]);
-                    if strcmpi(opt.singletrials, 'on'), tmpmeanpowbase = repmat(meanpowbase, [1 length(alltimes) tottrials{c,g}]);
-                    else                                tmpmeanpowbase = repmat(meanpowbase, [1 length(alltimes) 1]);
-                    end;
-                    ersp{c,g} = ersp{c,g} - repmat(abs(erspbasetmp), [1 length(alltimes) 1 1]) + tmpmeanpowbase;
+            elseif strcmpi(paired2, 'on')
+                disp('Removing ERSP baseline for second indep. variables (first indep. var. is unpaired)');
+                for c = 1:nc        % ng = number of groups
+                    meanpowbase = computeerspbaseline(erspbase(c,:), opt.singletrials);
+                    ersp(c,:)   = removeerspbaseline(ersp(c,:), erspbase(c,:), meanpowbase, tottrials(c,:));
                 end;
+            else
+                disp('Not removing ERSP baseline (both indep. variables are unpaired');
             end;
         end;
 
@@ -361,3 +356,36 @@ else
         erspdata = std_selcomp(STUDY, erspdata, allinds, setinds, compinds, opt.component);
     end;
 end;
+
+
+% compute ERSP baseline
+% ---------------------
+function meanpowbase = computeerspbaseline(erspbase, singletrials)
+
+    len = length(erspbase(:));
+    for index = 1:len
+        if strcmpi(singletrials, 'on')
+            if index == 1, meanpowbase = abs(mean(erspbase{index}/len,3));
+            else           meanpowbase = meanpowbase + abs(mean(erspbase{index}/len,3));
+            end;
+        else
+            if index == 1, meanpowbase = abs(erspbase{index}/len);
+            else           meanpowbase = meanpowbase + abs(erspbase{index}/len);
+            end;
+        end;
+    end;
+    meanpowbase = reshape(meanpowbase  , [size(meanpowbase,1) 1 size(meanpowbase,2)]);
+
+% remove ERSP baseline
+% ---------------------
+function ersp = removeerspbaseline(ersp, erspbase, meanpowbase, tottrials)
+    for g = 1:size(ersp,2)        % ng = number of groups
+        for c = 1:size(ersp,1)
+            erspbasetmp = reshape(erspbase{c,g}, [size(meanpowbase,1) 1 size(meanpowbase,3)]);
+            if ~isempty(tottrials{c,g}), tmpmeanpowbase = repmat(meanpowbase, [1 size(ersp{c,g},2) tottrials{c,g}]);
+            else                         tmpmeanpowbase = repmat(meanpowbase, [1 size(ersp{c,g},2) 1]);
+            end;
+            ersp{c,g} = ersp{c,g} - repmat(abs(erspbasetmp), [1 size(ersp{c,g},2) 1 1]) + tmpmeanpowbase;
+        end;
+    end;
+   
