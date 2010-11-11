@@ -186,7 +186,7 @@ function data = eeg_getdatact( EEG, varargin);
         else data = reshape(data, size(data,1), EEG.pnts*EEG.trials);
         end;
     catch
-        error('The file on disk does not correspond to the dataset information. Close and reopen the STUDY');
+        error('The file size on disk does not correspond to the dataset information.');
     end;
     
     if ~isempty(opt.trialindices)
