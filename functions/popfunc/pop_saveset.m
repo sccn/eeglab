@@ -299,7 +299,7 @@ end;
 if isnumeric(EEG.data) & v(1) < 7
     EEG.data   = double(reshape(tmpdata, EEG.nbchan,  EEG.pnts, EEG.trials));
 end;
-EEG.saved = 'yes';
+EEG.saved = 'justloaded';
 
 com = sprintf('%s = pop_saveset( %s, %s);', inputname(1), inputname(1), vararg2str(options));
 return;

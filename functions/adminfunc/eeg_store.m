@@ -70,6 +70,7 @@ if length(EEG) > 1
         for index=1:length(TMPEEG)
             EEG = TMPEEG(index);
             tmpsaved      = EEG.saved;
+            if strcmpi(tmpsaved, 'justloaded'), tmpsaved = 'yes'; end;
             [ALLEEG, EEG] = eeg_store(ALLEEG, EEG, storeSetIndex(index), varargin{:});
             ALLEEG(storeSetIndex(index)).saved = tmpsaved;
             TMPEEG(index).saved                = tmpsaved;
@@ -103,11 +104,13 @@ else
     com = '';
 end;
 if nargin > 2, 
-    if storeSetIndex == 0
+    if storeSetIndex == 0 || strcmpi(EEG.saved, 'justloaded')
         EEG.saved = 'yes'; % just loaded
     else 
         EEG.saved = 'no';
     end;
+elseif strcmpi(EEG.saved, 'justloaded')
+    EEG.saved = 'yes';        
 else
     EEG.saved = 'no';        
 end;
