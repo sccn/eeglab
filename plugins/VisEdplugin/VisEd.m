@@ -47,14 +47,17 @@ end
 % Create VisEd.event field containing events selected in pop_VisEd.
 
 j=0;
-VisEd.event = [];
-for i=1:length(EEG.event);
-    if ~isempty(strmatch(EEG.event(i).type,EventType, 'exact'));
-        event=EEG.event(i);
-        event.index=i;
-        event.proc='none';
-        j=j+1;
-        VisEd.event(j)=event;
+if isempty(EventType);
+    VisEd.event = [];
+else
+    for i=1:length(EEG.event);
+        if ~isempty(strmatch(EEG.event(i).type,EventType, 'exact'));
+            event=EEG.event(i);
+            event.index=i;
+            event.proc='none';
+            j=j+1;
+            VisEd.event(j)=event;
+        end
     end
 end
 
