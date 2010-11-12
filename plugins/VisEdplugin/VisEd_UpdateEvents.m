@@ -75,16 +75,16 @@ end
 if isfield(g,'eloc_file');
     if length(g.eloc_file(1).labels)>=4;
         if strmatch(g.eloc_file(1).labels(1:4),'comp');
-            DataType=2;
+            datoric=2;
         end
     end
 end
-if ~exist('DataType', 'var');
-    DataType=1;
+if ~exist('datoric', 'var');
+    datoric=1;
 end
 
 if isfield(g.eloc_file, 'badchan');
-    switch DataType
+    switch datoric
         case 1
             for i=1:length(g.eloc_file);
                 EEG.chanlocs(g.eloc_file(i).index).badchan=g.eloc_file(i).badchan;
