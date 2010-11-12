@@ -8,6 +8,8 @@ g=get(gcbf, 'UserData');
 g.tmppos=tmppos;
 g.nevents=length(EEG.event);
 
+g.datasize=size(EEG.data);
+
 if ~isfield(g.events, 'index');
     for i=1:length(g.events);
         g.events(i).index=i;

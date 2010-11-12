@@ -72,15 +72,15 @@ end;
 
 if nargin < 5
     
-    ProcCell={'New', 'Edit', 'Delete'};
+    ProcCell={'New', 'Delete'};
     
     if ~isfield(g.eventedit, 'SelEventStruct');
         tmp.event(1).index=0;
         tmp.event(1).Dist=0;
         tmp.event(1).type='User';
         tmp.event(1).latency=g.eventedit.PosLat;
-        if ndims(g.data)==3;
-            tmp.event(1).epoch=floor(tmp.event(1).latency/length(g.data(1,1,:)));
+        if length(g.datasize)==3;
+            tmp.event(1).epoch=floor(tmp.event(1).latency/g.datasize(3));
         end
             
         % pop up window

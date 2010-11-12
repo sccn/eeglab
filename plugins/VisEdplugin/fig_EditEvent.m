@@ -21,8 +21,8 @@ switch Proc; %if strcmp(Proc, 'New');
     g.events(length(g.events)).urevent=length(g.events);
     g.events(length(g.events)).proc='new';
     g.events(length(g.events)).index=g.newindex;
-    if ndims(g.data)==3;
-        g.events(length(g.events)).epoch=ceil(Latency/length(g.data(1,1,:)));
+    if length(g.datasize)==3;
+        g.events(length(g.events)).epoch=ceil(Latency/g.datasize(3));
     end
     
     if ~isfield(g, 'eventupdate');
@@ -35,8 +35,8 @@ switch Proc; %if strcmp(Proc, 'New');
     g.eventupdate(updateindex).type=EventType;
     g.eventupdate(updateindex).proc='new';
     g.eventupdate(updateindex).index=g.newindex;
-    if ndims(g.data)==3;
-        g.eventupdate(updateindex).epoch=ceil(Latency/length(g.data(1,:,1)));
+    if length(g.datasize)==3;
+        g.eventupdate(updateindex).epoch=ceil(Latency/g.datasize(3));
     end
 
         
