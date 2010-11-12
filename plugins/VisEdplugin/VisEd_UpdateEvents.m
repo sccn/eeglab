@@ -47,10 +47,14 @@ if exist('clearInd');
 end
 
 %sort events.
-eventorder=[1:length(EEG.event);[EEG.event.latency]]';
-eventorder=sortrows(eventorder,2);
-for i=1:length(EEG.event);
-    TMP.event(i)=EEG.event(eventorder(i,1));
+if ~isempty(EEG.event);
+    eventorder=[1:length(EEG.event);[EEG.event.latency]]';
+    eventorder=sortrows(eventorder,2);
+    for i=1:length(EEG.event);
+        TMP.event(i)=EEG.event(eventorder(i,1));
+    end
+else
+    TMP.event=[];
 end
 
 rmfield(EEG,'event');
@@ -95,6 +99,7 @@ if isfield(g.eloc_file, 'badchan');
             end
     end
 end
+
 
 eeglab redraw
 

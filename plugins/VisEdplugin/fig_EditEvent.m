@@ -190,15 +190,22 @@ if isfield(g, 'eventcolors');
     g=rmfield(g,fields);
 end
 
-for i=1:length(g.events);
-    eventtypeindex=find(strcmp(g.eventtypes,g.events(i).type));
-    g.eventcolors{i}=g.eventtypecolors{eventtypeindex};
-    g.eventstyle{i}=g.eventtypestyle{eventtypeindex};
-    g.eventwidths(i)=g.eventtypewidths(eventtypeindex);
-    g.eventlatencies(i)=g.events(i).latency;
-    g.eventlatencyend(i)=g.events(i).latency+g.eventwidths(i);    
+if isempty(g.events);
+    g.eventcolors=[];
+    g.eventstyle=[];
+    g.eventwidths=[];
+    g.eventlatencies=[];
+    g.eventlatencyend=[];    
+else
+    for i=1:length(g.events);
+        eventtypeindex=find(strcmp(g.eventtypes,g.events(i).type));
+        g.eventcolors{i}=g.eventtypecolors{eventtypeindex};
+        g.eventstyle{i}=g.eventtypestyle{eventtypeindex};
+        g.eventwidths(i)=g.eventtypewidths(eventtypeindex);
+        g.eventlatencies(i)=g.events(i).latency;
+        g.eventlatencyend(i)=g.events(i).latency+g.eventwidths(i);    
+    end
 end
-
 
 g = rmfield(g, 'eventedit');
 
