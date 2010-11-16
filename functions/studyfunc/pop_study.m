@@ -403,12 +403,13 @@ else % internal command
            
             if isempty(res), return; end;
             if res{2} == 1
-                STUDY = std_editset(STUDY, ALLEEG, 'inbrain', 'on', 'commands', {'dipselect' str2num(res{1})/100 'return' });
+                STUDY = std_editset(STUDY, ALLEEG, 'commands', { 'inbrain', 'on', 'dipselect' str2num(res{1})/100 'return' });
+                allcom = { allcom{:} { 'inbrain', 'on', 'dipselect' str2num(res{1})/100 } };
             else
-                STUDY = std_editset(STUDY, ALLEEG, 'inbrain', 'off', 'commands', { 'dipselect' str2num(res{1})/100 'return' });
+                STUDY = std_editset(STUDY, ALLEEG, 'commands', { 'inbrain', 'off','dipselect' str2num(res{1})/100 'return' });
+                allcom = { allcom{:} { 'inbrain', 'off', 'dipselect' str2num(res{1})/100 } };
             end;
                 
-            allcom = { allcom{:} { 'dipselect' str2num(res{1})/100 } };
             datasetinfo   = STUDY.datasetinfo;
             
             userdat{2} = datasetinfo;

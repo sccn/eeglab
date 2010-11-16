@@ -24,12 +24,10 @@
 %   'updatedat' - ['on'|'off'] update 'subject' 'session' 'condition' and/or
 %                'group' fields of STUDY dataset(s).
 %   'savedat'   - ['on'|'off'] re-save datasets
-%
 %   'inbrain'   - ['on'|'off'] select components for clustering from all STUDY 
 %                 datasets with equivalent dipoles located inside the brain volume. 
 %                 Dipoles are selected based on their residual variance and their 
-%                 location. Default r.v value is %15 OR it can be set using 
-%                 'dipselect' command.
+%                 location {default: 'off'}
 %
 % Each of the 'commands' (above) is a cell array composed of any of the following: 
 %   'index'     - [integer] modify dataset index.
@@ -40,7 +38,10 @@
 %   'group'     - [string] dataset group.
 %   'load'      - [filename] load dataset from specified filename 
 %   'dipselect' - [float<1] select components for clustering from all STUDY 
-%                 datasets with dipole model residual var. below this value.             
+%                 datasets with dipole model residual var. below this value. 
+%   'inbrain'   - ['on'|'off'] same as above. This option may also be
+%                 placed in the command list (preceeding the 'dipselect'
+%                 option).
 %
 % Outputs:
 %   STUDY      - a new STUDY set containing some or all of the datasets in ALLEEG, 
@@ -178,6 +179,8 @@ for k = 1:2:length(g.commands)
             STUDY.datasetinfo(1).index = [];
             STUDY.changrp = [];
         case 'return', return;
+        case 'inbrain' 
+            g.inbrain = g.commands{k+1};
         case 'dipselect'
             STUDY = std_checkset(STUDY, ALLEEG);
             rv = g.commands{k+1};
