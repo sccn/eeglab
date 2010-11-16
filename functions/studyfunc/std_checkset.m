@@ -113,6 +113,26 @@ if any(isnan(setind))
 end
 if ~isequal(setind, STUDY.setind), STUDY.setind = setind; modif = 1; end;
 
+% check that dipfit is present in all datasets
+% --------------------------------------------
+for cc = 1:length(sameica)
+    idat = [];
+    for tmpi = 1:length(sameica{cc})
+        if isfield(ALLEEG(sameica{cc}(tmpi)).dipfit, 'model')
+            idat = sameica{cc}(tmpi);
+        end;
+    end;
+    if ~isempty(idat)
+        for tmpi = 1:length(sameica{cc})
+            if ~isfield(ALLEEG(sameica{cc}(tmpi)).dipfit, 'model')
+                ALLEEG(sameica{cc}(tmpi)).dipfit = ALLEEG(idat).dipfit;
+                ALLEEG(sameica{cc}(tmpi)).saved  = 'no';
+                fprintf('Warning: no ICA dipoles for dataset %d, using dipoles from dataset %d (same ICA)\n', sameica{cc}(tmpi), idat);
+            end;
+        end;
+    end;
+end;
+
 % check cluster array
 % -------------------
 if ~isfield(STUDY, 'cluster'), STUDY.cluster = []; modif = 1; end;
