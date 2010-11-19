@@ -84,7 +84,11 @@ else
     dattrials      = cellfun(@(x)(eval(['{ x.' indvar '}'])),  { STUDY.datasetinfo.trialinfo }, 'uniformoutput', false); % do not remove duplicate line (or Matlab crashes)
     dattrialselect = cell(1,length(STUDY.datasetinfo));
     for dat = 1:length(indvarvals)
-        dattrialselecttmp = cellfun(@(x)(strmatch(indvarvals{dat}, x, 'exact')), dattrials, 'uniformoutput', false);
+        if isstr(indvarvals{dat})
+            dattrialselecttmp = cellfun(@(x)(strmatch(indvarvals{dat}, x, 'exact')), dattrials, 'uniformoutput', false);
+        else
+            dattrialselecttmp = cellfun(@(x)(find(indvarvals{dat} == [ x{:} ])), dattrials, 'uniformoutput', false);
+        end;
         for tmpi = 1:length(dattrialselecttmp)
             dattrialselect{tmpi} = union(dattrialselect{tmpi}, dattrialselecttmp{tmpi});
         end;
