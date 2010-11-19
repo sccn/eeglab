@@ -190,10 +190,14 @@ if ~isempty(g.components)
     end;
 elseif ~isempty(g.channels)
     if iscell(g.channels)
-        g.indices = eeg_chaninds(EEG(1), g.channels, 0);
-        for ind = 2:length(EEG)
-            if ~isequal(eeg_chaninds(EEG(ind), g.channels, 0), g.indices)
-                error([ 'Channel information must be consistant when ' 10 'several datasets are merged for a specific design' ]);
+        if ~isempty(g.interp)
+            g.indices = eeg_chaninds(g.interp, g.channels, 0);
+        else
+            g.indices = eeg_chaninds(EEG(1), g.channels, 0);
+            for ind = 2:length(EEG)
+                if ~isequal(eeg_chaninds(EEG(ind), g.channels, 0), g.indices)
+                    error([ 'Channel information must be consistant when ' 10 'several datasets are merged for a specific design' ]);
+                end;
             end;
         end;
     else
@@ -377,7 +381,11 @@ else
     all_ersp.parameters = parameters;
 end;
 if ~isempty(g.channels)
-    if ~isempty(EEG(1).chanlocs)
+    if ~isempty(g.interp)
+        all_ersp.chanlabels   = { g.interp(g.indices).labels };
+        all_itc.chanlabels    = { g.interp(g.indices).labels };
+        all_trials.chanlabels = { g.interp(g.indices).labels };
+    elseif ~isempty(EEG(1).chanlocs)
         all_ersp.chanlabels   = { EEG(1).chanlocs(g.indices).labels };
         all_itc.chanlabels    = { EEG(1).chanlocs(g.indices).labels };
         all_trials.chanlabels = { EEG(1).chanlocs(g.indices).labels };
