@@ -1546,7 +1546,7 @@ switch lower(g.plotersp)
         elseif length(g.erspmax) == 1
             g.erspmax = [ -g.erspmax g.erspmax];
         end
-        if isnan( g.baseline ) && g.erspmax(1) < 0
+        if isnan( g.baseline(1) ) && g.erspmax(1) < 0
             g.erspmax = [ min(min(P(:,:))) max(max(P(:,:)))];
         end;
 
