@@ -308,7 +308,8 @@ end;
 % -------
 warning off;
 try, 
-	if strcmpi(computer, 'MAC') | strcmpi(computer, 'MACI')
+    comp = computer;
+	if length(comp) > 2 && strcmpi(comp(1:3), 'MAC')
         factmulty = factmulty*1.5;
 	elseif ~isunix % windows
         factmulty = factmulty*1.08;
@@ -362,7 +363,8 @@ hh = findobj(allhandlers, 'style', 'edit');
 set(hh, 'BackgroundColor', [1 1 1]); %, 'horizontalalignment', 'right');
 
 hh =findobj(allhandlers, 'parent', g.fig, 'style', 'pushbutton');
-if ~strcmpi(computer, 'MAC') & ~strcmpi(computer, 'MACI') % this puts the wrong background on macs
+comp = computer;
+if length(comp) < 3 || ~strcmpi(comp(1:3), 'MAC') % this puts the wrong background on macs
     set(hh, 'backgroundcolor', GUIPOPBUTTONCOLOR);
     set(hh, 'foregroundcolor', GUITEXTCOLOR);
 end;
