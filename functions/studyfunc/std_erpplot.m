@@ -207,7 +207,9 @@ if ~isempty(opt.channels)
         [tmp ti1] = min(abs(alltimes-opt.topotime(1)));
         [tmp ti2] = min(abs(alltimes-opt.topotime(end)));
         for index = 1:length(erpdata(:))
-            erpdata{index} = mean(erpdata{index}(ti1:ti2,:,:),1);
+            if ~isempty(erpdata{index})
+                erpdata{index} = mean(erpdata{index}(ti1:ti2,:,:),1);
+            end;
         end;
     end;
     

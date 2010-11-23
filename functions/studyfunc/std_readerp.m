@@ -269,20 +269,26 @@ if ~isempty(opt.channels)
              tmpdat = getfield(structdat(allinds(1)), [ dtype 'datatrials' ]);
         else tmpdat = getfield(structdat(allinds(1)), [ dtype 'data' ]);
         end;
-        datavals{ind} = zeros([ size(tmpdat{ind}) length(allinds)]);
-        for chan = 1:length(allinds)
-            if strcmpi(opt.singletrials, 'on')
-                 tmpdat = getfield(structdat(allinds(chan)), [ dtype 'datatrials' ]);
-            else tmpdat = getfield(structdat(allinds(chan)), [ dtype 'data' ]);
+        if ~isempty(tmpdat{ind})
+            datavals{ind} = zeros([ size(tmpdat{ind}) length(allinds)]);
+            for chan = 1:length(allinds)
+                if strcmpi(opt.singletrials, 'on')
+                     tmpdat = getfield(structdat(allinds(chan)), [ dtype 'datatrials' ]);
+                else tmpdat = getfield(structdat(allinds(chan)), [ dtype 'data' ]);
+                end;
+                datavals{ind}(:,:,chan) = tmpdat{ind};
             end;
-            datavals{ind}(:,:,chan) = tmpdat{ind};
-        end;
         
-        datavals{ind} = squeeze(permute(datavals{ind}, [1 3 2])); % time elec subjects
+            datavals{ind} = squeeze(permute(datavals{ind}, [1 3 2])); % time elec subjects
+        end;
     end;
     setinds  = structdat(allinds(1)).setinds;
     if ~isempty(opt.subject) && strcmpi(opt.singletrials,'off')
-        datavals = std_selsubject(datavals, opt.subject, setinds, { STUDY.design(opt.design).cell.case }, 2); 
+        if strcmpi(opt.singletrials, 'on')
+            datavals = std_selsubject(datavals, opt.subject, setinds, { STUDY.design(opt.design).cell.case }, 3); 
+        else
+            datavals = std_selsubject(datavals, opt.subject, setinds, { STUDY.design(opt.design).cell.case }, 2); 
+        end;
     end;
 else
     if strcmpi(opt.singletrials, 'on')
