@@ -292,7 +292,11 @@ options = { options{:} spec_opt{:} 'timerange' g.timerange 'nfft' g.nfft 'specmo
 if strcmpi(prefix, 'comp')
     savetofile( filename, f, X, 'comp', 1:size(X,1), options);
 else
-    savetofile( filename, f, X, 'chan', 1:size(X,1), options, { EEG.chanlocs.labels });
+    if ~isempty(g.interp)
+        savetofile( filename, f, X, 'chan', 1:size(X,1), options, { g.interp.labels });
+    else
+        savetofile( filename, f, X, 'chan', 1:size(X,1), options, { EEG(1).chanlocs.labels });
+    end;
 end;
 return;
 
