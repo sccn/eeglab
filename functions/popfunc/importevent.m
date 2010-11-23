@@ -112,6 +112,7 @@ if ~isempty(g.event)
         if size(event,2) > size(event,1), event = event'; end;
     end;
 end;
+g.event = event;
 
 % determine latency for old event alignment
 % -----------------------------------------
@@ -189,11 +190,11 @@ for curfield = tmpfields'
                       end;      
 					  % generate ori fields
 					  % -------------------
-					  offset = length(event)-size(tmparray,2);
-					  for index = 1:size(tmparray,2)
-						  event(index+offset).init_index = index;
-						  event(index+offset).init_time  = event(index+offset).latency*g.timeunit;
-					  end;
+                      offset = length(event)-size(tmparray,1);
+                      for index = 1:size(tmparray,1)
+                          event(index+offset).init_index = index;
+                          event(index+offset).init_time  = event(index+offset).latency*g.timeunit;
+                      end;
                       event = recomputelatency( event, g.indices, srate, g.timeunit, ...
                                                     g.align, g.oldevents, g.optimalign);
             end;
@@ -211,7 +212,7 @@ if isfield(event, 'latency')
         res = cellfun('isempty', { event.latency });
         res = find(res);
         if ~isempty(res)
-            fprintf( 'importevent warning: %d/%d have invalid latencies and were removed\n', ...
+            fprintf( 'importevent warning: %d/%d event(s) have invalid latencies and were removed\n', ...
                      length(res), length(event));
             event( res ) = [];
         end;
