@@ -44,7 +44,7 @@ end;
 data = [];
 
 % add the objects that are common to all fieldboxes
-data.label = { EEG.chanlocs(1:EEG.nbchan).labels };
+data.label = { EEG.chanlocs(EEG.icachansind).labels };
 data.fsample = EEG.srate;
 
 % get the electrode positions from the EEG structure: in principle, the number of 
@@ -122,7 +122,7 @@ switch fieldbox
       data.label{comp} = sprintf('ica_%03d', comp);
     end
     % get the spatial distribution and electrode positions
-    data.topolabel = { EEG.chanlocs(1:EEG.nbchan).labels };
+    data.topolabel = { EEG.chanlocs(EEG.icachansind).labels };
     data.topo      = EEG.icawinv;
     
   case { 'chanloc' 'chanloc_withfid' }
