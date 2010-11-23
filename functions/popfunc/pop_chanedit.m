@@ -214,8 +214,8 @@ if isempty(chans) || ~isnumeric(chans)
         chaninfo.shrink        = shrinkorskirt;
         chaninfo.plotrad       = plotrad;
     else
-        chaninfo.shrink  = [];
-        chaninfo.plotrad = [];
+        if ~isfield(chaninfo, 'shrink'),  chaninfo.shrink  = []; end;
+        if ~isfield(chaninfo, 'plotrad'), chaninfo.plotrad = []; end;
     end;
 
     nosevals       = { '+X' '-X' '+Y' '-Y' };
