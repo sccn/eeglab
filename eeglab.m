@@ -1320,6 +1320,7 @@ if study_selected
     set( findobj('parent', tool_m, 'type', 'uimenu'), 'enable', 'off');
     set( findobj('parent', file_m, 'type', 'uimenu'), 'enable', 'off');
     set( findobj('parent', tool_m, 'type', 'uimenu', 'label', 'Run ICA')        , 'enable', 'on');
+    set( findobj('parent', tool_m, 'type', 'uimenu', 'label', 'SIFT')           , 'enable', 'on');
     set( findobj('parent', tool_m, 'type', 'uimenu', 'label', 'Filter the data'), 'enable', 'on');
     set( findobj('parent', tool_m, 'type', 'uimenu', 'label', 'Remove baseline'), 'enable', 'on');
     set( findobj('parent', tool_m, 'type', 'uimenu', 'label', 'Change sampling rate'), 'enable', 'on');
@@ -1438,6 +1439,7 @@ elseif (exist('EEG') == 1) & ~isnumeric(EEG) & ~isempty(EEG(1).data)
         set( findobj('parent', tool_m, 'type', 'uimenu'), 'enable', 'off');
         set( findobj('parent', file_m, 'type', 'uimenu'), 'enable', 'off');
         set( findobj('parent', tool_m, 'type', 'uimenu', 'label', 'Run ICA')        , 'enable', 'on');
+        set( findobj('parent', tool_m, 'type', 'uimenu', 'label', 'SIFT')           , 'enable', 'on');
         set( findobj('parent', tool_m, 'type', 'uimenu', 'label', 'Filter the data'), 'enable', 'on');
         set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Import data'             ), 'enable', 'on');
         set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Load existing dataset'   ), 'enable', 'on');
