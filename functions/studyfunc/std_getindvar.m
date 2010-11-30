@@ -143,8 +143,13 @@ end;
 
 function cellout = mysetdiff(cell1, cell2);
 
-    if isstr(cell1{1})
+    if isstr(cell1{1}) && isstr(cell2{1})
          cellout = setdiff(cell1, cell2);
-    else cellout = mattocell(setdiff( [ cell1{:} ], [ cell2{:} ]));
+    elseif ~isstr(cell1{1}) && ~isstr(cell2{1})
+        cellout = mattocell(setdiff( [ cell1{:} ], [ cell2{:} ]));
+    elseif isstr(cell1{1}) && ~isstr(cell2{1})
+         cellout = setdiff(cell1, cellfun(@(x)(num2str(x)),cell2, 'uniformoutput', false));
+    elseif ~isstr(cell1{1}) && isstr(cell2{1})
+         cellout = setdiff(cellfun(@(x)(num2str(x)),cell1, 'uniformoutput', false), cell2);
     end;
     
