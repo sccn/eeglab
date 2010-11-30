@@ -162,6 +162,27 @@ elseif isfield(STUDY.design, 'indvar1')
     STUDY  = std_convertdesign(STUDY, ALLEEG);
 end;
 
+% scan design to fix old paring format
+% ------------------------------------
+for design = 1:length(STUDY.design)
+    for var = 1:length(STUDY.design(design).variable)
+        if isstr(STUDY.design(design).variable(1).pairing)
+            if strcmpi(STUDY.design(design).variable(1).pairing, 'paired')
+                STUDY.design(design).variable(1).pairing = 'on';
+            elseif strcmpi(STUDY.design(design).variable(1).pairing, 'unpaired')
+                STUDY.design(design).variable(1).pairing = 'off';
+            end;
+        end;
+        if isstr(STUDY.design(design).variable(2).pairing)
+            if strcmpi(STUDY.design(design).variable(2).pairing, 'paired')
+                STUDY.design(design).variable(2).pairing = 'on';
+            elseif strcmpi(STUDY.design(design).variable(2).pairing, 'unpaired')
+                STUDY.design(design).variable(2).pairing = 'off';
+            end;
+        end;
+    end;
+end;
+
 % make channel groups
 % -------------------
 if ~isfield(STUDY, 'changrp') || isempty(STUDY.changrp)
