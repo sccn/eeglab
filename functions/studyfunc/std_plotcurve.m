@@ -500,5 +500,5 @@ function hdl = mysubplot(nr,nc,ind,subplottype);
 function tmpdata2 = myfilt(tmpdata, srate, lowpass, highpass)
 
     tmpdata2 = reshape(tmpdata, size(tmpdata,1), size(tmpdata,2)*size(tmpdata,3)*size(tmpdata,4));
-    tmpdata2 = eegfiltfft(tmpdata2',srate, lowpass, highpass)';
+    tmpdata2 = iirfilt(tmpdata2',srate, lowpass, highpass)';
     tmpdata2 = reshape(tmpdata2, size(tmpdata,1), size(tmpdata,2), size(tmpdata,3), size(tmpdata,4));
