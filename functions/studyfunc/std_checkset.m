@@ -183,6 +183,15 @@ for design = 1:length(STUDY.design)
     end;
 end;
 
+% check that ICA is present and if it is update STUDY.datasetinfo
+allcompsSTUDY  = { STUDY.datasetinfo.comps };
+allcompsALLEEG = { ALLEEG.icaweights };
+if all(cellfun(@isempty, allcompsSTUDY)) && any(cellfun(@isempty, allcompsALLEEG))
+    for index = 1:length(STUDY.datasetinfo)
+        STUDY.datasetinfo(index).comps = [1:size(ALLEEG.icaweights,1)];
+    end;
+end;
+
 % make channel groups
 % -------------------
 if ~isfield(STUDY, 'changrp') || isempty(STUDY.changrp)
