@@ -11,7 +11,8 @@
 %                 subsequently recorded or nominally identified (e.g., 'Cz') sets of 
 %                 channel head locations to the reference locations. 
 %                 Both channel locations and/or fiducial (non-electrode) 
-%                 locations can then be used by coregister() to linearly align 
+%                 locations can then be used by coregister() to linearly
+%                 align 
 %                 or nonlinearly warp a given or measured montage to the reference 
 %                 locations. In its (default) manual mode, coregister() produces 
 %                 an interactive gui showing the imported and reference channel 
@@ -389,7 +390,8 @@ if 1
     cbresizez = [ header 'dattmp.transform(9) = str2num(get(gcbo, ''string''));' footer ];
     cb_ok     = 'set(gcbo, ''userdata'', ''ok'')';
     cb_warp   = 'coregister(''warp'', gcbf);';
-    cb_fid    = 'coregister(''fiducials'', gcbf);';
+    %cb_fid    = 'coregister(''fiducials'', gcbf);';
+    cb_fid    = 'warndlg2([ ''Because of recent changes in Fieldtrip re-aligning'' 10 ''functions, re-align fiducials is no longer working.'' 10 ''Download and use EEGLAB 6.03 instead to align montages'' 10 ''and copy the content of the Coregister edit box'' 10 ''to the DIPFIT setting of this version.'']);';
     
     opt = { 'unit', 'normalized', 'position' };
     h = uicontrol( opt{:}, [0    .15  1  .02], 'style', 'text', 'string', '');
@@ -602,7 +604,8 @@ function [elec1, transf] = align_fiducials(elec1, elec2, fidnames1, fidnames2)
     cfg          = [];
     cfg.elec     = elec1;
     cfg.template = elec2;
-    cfg.method   = 'realignfiducial'; 
+    cfg.method   = 'fiducial';
+    cfg.warp     = 'globalrescale';
     cfg.fiducial = fidnames2;
     elec3 = ft_electroderealign(cfg);
     transf = homogenous2traditional(elec3.m);
@@ -644,7 +647,8 @@ function [elec1, transf] = warp_chans(elec1, elec2, chanlist, warpmethod)
     cfg          = [];
     cfg.elec     = elec1;
     cfg.template = elec2;
-    cfg.method   = warpmethod;
+    cfg.method   = 'template';
+    cfg.warp     = warpmethod;
     %cfg.feedback = 'yes';
     cfg.channel  = chanlist;
     elec3 = ft_electroderealign(cfg);
