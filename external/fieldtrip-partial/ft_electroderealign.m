@@ -163,7 +163,10 @@ if usetemplate
     end
   end
   for i=1:Ntemplate
-    template(i) = ft_convert_units(template(i), elec.unit); % ensure that the units are consistent with the electrodes
+      tmp = ft_convert_units(template(i), elec.unit); % ensure that the units are consistent with the electrodes
+      template(i).label = tmp.label; 
+      template(i).pnt   = tmp.pnt; 
+      template(i).unit  = tmp.unit;       
   end
 elseif useheadshape
   % get the surface describing the head shape
