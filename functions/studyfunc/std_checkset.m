@@ -133,6 +133,34 @@ for cc = 1:length(sameica)
     end;
 end;
 
+% put in fake channels if channel labels are missing
+% --------------------------------------------------
+chanlabels = { ALLEEG.chanlocs };
+if any(cellfun(@isempty, chanlabels))
+    if any(~cellfun(@isempty, chanlabels))
+        disp('********************************************************************');
+        disp(' IMPORTANT WARNING: SOME DATASETS DO NOT HAVE CHANNEL LABELS AND ');
+        disp(' SOME OTHERs HAVE CHANNEL LABELS. GENERATING CHANNEL LABELS FOR ');
+        disp(' THE FORMER DATASETS (THIS SHOULD PROBABLY BE FIXED BY THE USER)');
+        disp('********************************************************************');
+    end;
+    disp('Generating channel labels for all datasets...');
+    for currentind = 1:length(ALLEEG)
+        for ind = 1:ALLEEG(currentind).nbchan
+            ALLEEG(currentind).chanlocs(ind).labels = int2str(ind);
+        end;
+    end;
+    ALLEEG(currentind).saved = 'no';
+end;
+
+if length( unique( [ ALLEEG.srate ] )) > 1
+    disp('********************************************************************');
+    disp(' IMPORTANT WARNING: SOME DATASETS DO NOT HAVE THE SAME SAMPLING ');
+    disp(' RATE AND THIS WILL MAKE MOST SOME STUDY FUNCTION CRASH. THIS');
+    disp(' SHOULD PROBABLY BE FIXED BY THE USER).');
+    disp('********************************************************************');
+end;
+
 % check cluster array
 % -------------------
 if ~isfield(STUDY, 'cluster'), STUDY.cluster = []; modif = 1; end;
@@ -186,9 +214,9 @@ end;
 % check that ICA is present and if it is update STUDY.datasetinfo
 allcompsSTUDY  = { STUDY.datasetinfo.comps };
 allcompsALLEEG = { ALLEEG.icaweights };
-if all(cellfun(@isempty, allcompsSTUDY)) && any(cellfun(@isempty, allcompsALLEEG))
+if all(cellfun(@isempty, allcompsSTUDY)) && ~all(cellfun(@isempty, allcompsALLEEG))
     for index = 1:length(STUDY.datasetinfo)
-        STUDY.datasetinfo(index).comps = [1:size(ALLEEG.icaweights,1)];
+        STUDY.datasetinfo(index).comps = [1:size(ALLEEG(index).icaweights,1)];
     end;
 end;
 
