@@ -277,9 +277,9 @@ elseif strcmpi(g.specmode, 'pburg')
 else % fft mode
     if all([ EEG.trials ] == 1) && ~isempty(boundaries), disp('Warning: fft does not take into account boundaries in continuous data'); end;
     tmp   = fft(X, g.nfft, 2);
-    f     = linspace(0, EEG(1).srate/2, size(tmp,2)/2);
+    f     = linspace(0, EEG(1).srate/2, floor(size(tmp,2)/2));
     f     = f(2:end); % remove DC (match the output of PSD)
-    tmp   = tmp(:,2:size(tmp,2)/2,:);
+    tmp   = tmp(:,2:floor(size(tmp,2)/2),:);
     X     = 10*log10(abs(tmp).^2);    
     if strcmpi(g.savetrials, 'off')
         X = mean(X,3);  
