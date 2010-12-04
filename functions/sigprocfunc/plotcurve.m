@@ -246,7 +246,7 @@ function plotcurve( times, R, varargin);
     title(g.title)
     if ~isempty(g.legend)
         hh = legend(g.legend);
-        set(hh, 'unit', 'pixels')      
+        set(hh, 'unit', 'pixels', 'interpreter', 'none')      
     end;
     if isempty(g.maskarray)
        xlabel(g.xlabel);
