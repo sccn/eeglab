@@ -32,45 +32,53 @@ function alllocs = eeg_mergelocs(varargin)
 
 persistent warning_shown;
 
-% sort by length
-% --------------
-len = cellfun(@length, varargin);
-[tmp so] = sort(len, 2, 'descend');
-varargin = varargin(so);
+try
+    % sort by length
+    % --------------
+    len = cellfun(@length, varargin);
+    [tmp so] = sort(len, 2, 'descend');
+    varargin = varargin(so);
 
-alllocs = varargin{1};
-for index = 2:length(varargin)
-    
-    % fuse while preserving order (assumes the same channel order)
-    % ------------------------------------------------------------
-    tmplocs = varargin{index};
-    newlocs = myunion(alllocs, tmplocs);
-    
-    if length(newlocs) > length(union({ alllocs.labels }, { tmplocs.labels }))
-        
-        if isempty(warning_shown)
-            disp('Warning: different channel montage order for the different datasets');
-            warning_shown = 1;
-        end;
-        
-        % trying to preserve order of the longest array
-        %----------------------------------------------
-        if length(alllocs) < length(tmplocs)
-            tmp     = alllocs;
-            alllocs = tmplocs;
-            tmplocs = tmp;
-        end;
-        allchans = { alllocs.labels tmplocs.labels };
-        [uniquechan ord1 ord2 ]  = unique( allchans );
-        
-        [tmp rminds] = intersect( uniquechan, { alllocs.labels });
-        ord1(rminds) = [];
-        tmplocsind = ord1-length(alllocs);
-        
-        newlocs = [ alllocs tmplocs(tmplocsind) ];
+    alllocs = varargin{1};
+    for index = 2:length(varargin)
 
+        % fuse while preserving order (assumes the same channel order)
+        % ------------------------------------------------------------
+        tmplocs = varargin{index};
+        newlocs = myunion(alllocs, tmplocs);
+
+        if length(newlocs) > length(union({ alllocs.labels }, { tmplocs.labels }))
+
+            if isempty(warning_shown)
+                disp('Warning: different channel montage order for the different datasets');
+                warning_shown = 1;
+            end;
+
+            % trying to preserve order of the longest array
+            %----------------------------------------------
+            if length(alllocs) < length(tmplocs)
+                tmp     = alllocs;
+                alllocs = tmplocs;
+                tmplocs = tmp;
+            end;
+            allchans = { alllocs.labels tmplocs.labels };
+            [uniquechan ord1 ord2 ]  = unique( allchans );
+
+            [tmp rminds] = intersect( uniquechan, { alllocs.labels });
+            ord1(rminds) = [];
+            tmplocsind = ord1-length(alllocs);
+
+            newlocs = [ alllocs tmplocs(tmplocsind) ];
+
+        end;
+        alllocs = newlocs;
     end;
-    alllocs = newlocs;
+catch,
+    % temporary fix for dissimilar structures
+    % should check channel structure consistency instead
+    % using checkchan function
+    disp('Channel merging warning: dissimilar fields in the two structures');
+    alllocs = eeg_mergelocs_diffstruct(varargin{:});
 end;
 
 % union of two channel location structure
