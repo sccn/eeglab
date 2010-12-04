@@ -11,6 +11,7 @@
 % Usage:
 %     >> EEGout = eeg_regepochs(EEG); % use defaults
 %     >> EEGout = eeg_regepochs(EEG, recurrence_interval, epochlimits); 
+%     >> EEGout = eeg_regepochs(EEG, recurrence_interval, epochlimits, rmbase); 
 %
 % Required input:
 %     EEG                 - EEG continuous data structure (EEG.trials = 1)

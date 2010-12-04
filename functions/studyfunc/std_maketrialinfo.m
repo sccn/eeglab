@@ -2,7 +2,7 @@
 %                       .epoch structure of EEGLAB datasets
 %
 % Usage: 
-%   >> STUDY = pop_studydesign(STUDY, ALLEEG);  
+%   >> STUDY = std_maketrialinfo(STUDY, ALLEEG);  
 %
 % Inputs:
 %   STUDY      - EEGLAB STUDY set
