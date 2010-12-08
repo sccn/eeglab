@@ -182,6 +182,7 @@ if plotSubsets
     fpos = get(gcf,'position');
     figure('position',[fpos(1)+FIG_OFFSET,fpos(2)-FIG_OFFSET,fpos(3),fpos(4)]);
     scatter3(pos(1,:), pos(2,:), pos(3,:),100,idx,'fill');
+    axis equal;
     %legend(legendTitle); it does not work propr
     th=title('Channel Subsets');
     %set(th,'fontsize',14)
