@@ -256,8 +256,13 @@ for c = 1:ncplot
                     if dimreduced_sizediffers
                         tmptmpdata = nan_mean(tmptmpdata,ndims(tmptmpdata));
                     end;
-                    if cc == 1, tmpdata = zeros([size(tmptmpdata) nc]); end;
-                    if ndims(tmptmpdata) == 3, tmpdata(:,:,:,cc) = tmptmpdata; 
+                    if cc == 1,
+                        if ndims(tmptmpdata) == 2 && strcmpi(opt.plottopo, 'on') % topographic plot of single subject
+                             tmpdata = zeros([size(tmptmpdata) 1 nc]); 
+                        else tmpdata = zeros([size(tmptmpdata) nc]); 
+                        end;
+                    end;
+                    if ndims(tmptmpdata) == 4, tmpdata(:,:,:,cc) = tmptmpdata; 
                     else                       tmpdata(:,:,cc)   = tmptmpdata; 
                     end;
                 end;
@@ -269,9 +274,14 @@ for c = 1:ncplot
                     if dimreduced_sizediffers
                         tmptmpdata = nan_mean(tmptmpdata,ndims(tmptmpdata));
                     end;
-                    if gg == 1, tmpdata = zeros([size(tmptmpdata) nc]); end;
-                    if ndims(tmptmpdata) == 3, tmpdata(:,:,:,gg) = tmptmpdata; 
-                    else                       tmpdata(:,:,gg)   = tmptmpdata; 
+                    if gg == 1,
+                        if ndims(tmptmpdata) == 2 && strcmpi(opt.plottopo, 'on') % topographic plot of single subject
+                             tmpdata = zeros([size(tmptmpdata) 1 ng]); 
+                        else tmpdata = zeros([size(tmptmpdata) ng]); 
+                        end;
+                    end;
+                    if ndims(tmpdata) == 4, tmpdata(:,:,:,gg) = tmptmpdata; 
+                    else                    tmpdata(:,:,gg)   = tmptmpdata; 
                     end;
                 end;
                 leg = opt.groupnames;
