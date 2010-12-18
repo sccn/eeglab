@@ -56,7 +56,7 @@ if nargin < 3 && ~isstr(STUDY)
         if ~isempty(usrdat.factsubj{ind1})
             if any(cellfun(@length, usrdat.factsubj{ind1}) ~= length(usrdat.subjects))
                 for ind2 = 1:length(usrdat.factorvals{ind1})
-                    popupselectsubj{end+1} = [ usrdat.factors{ind1} ' - ' usrdat.factorvals{ind1}{ind2} ];
+                    popupselectsubj{end+1} = [ num2str(usrdat.factors{ind1}) ' - ' num2str(usrdat.factorvals{ind1}{ind2}) ];
                 end;
             end;
         end;
@@ -260,8 +260,8 @@ elseif isstr(STUDY)
             set(findobj(fig, 'tag', 'lbfact1'), 'string', usrdat.factors, 'value', val2);
             valfact1 = strmatchmult(des(val).variable(1).value, usrdat.factorvals{val1});
             valfact2 = strmatchmult(des(val).variable(2).value, usrdat.factorvals{val2});
-            set(findobj(fig, 'tag', 'lbval0'), 'string', usrdat.factorvals{val1}, 'value', valfact1);
-            set(findobj(fig, 'tag', 'lbval1'), 'string', usrdat.factorvals{val2}, 'value', valfact2);
+            set(findobj(fig, 'tag', 'lbval0'), 'string', encodevals(usrdat.factorvals{val1}), 'value', valfact1);
+            set(findobj(fig, 'tag', 'lbval1'), 'string', encodevals(usrdat.factorvals{val2}), 'value', valfact2);
             valsubj = strmatchmult(des(val).cases.value, usrdat.subjects);
             set(findobj(fig, 'tag', 'lbsubj'), 'string', usrdat.subjects, 'value', valsubj);
             if isempty(des(val).include), str = ''; else str = vararg2str(des(val).include); end;
@@ -331,7 +331,7 @@ elseif isstr(STUDY)
                 set(findobj(fig, 'tag', [ 'lbfact' num2str(factval) ]), 'value', val1);
             end;
             valfact = [1:length(usrdat.factorvals{val1})];
-            set(findobj(fig, 'tag', ['lbval' num2str(factval) ]), 'string', usrdat.factorvals{val1}, 'value', valfact);
+            set(findobj(fig, 'tag', ['lbval' num2str(factval) ]), 'string', encodevals(usrdat.factorvals{val1}), 'value', valfact);
             pop_studydesign('updatedesign', fig);
             return;
             
@@ -349,10 +349,12 @@ elseif isstr(STUDY)
                 return;
             end;
             usrdat.factorvals{val1}{end+1} = usrdat.factorvals{val1}{vals(1)};
-            for ind = 2:length(vals)
-                usrdat.factorvals{val1}{end} = [ usrdat.factorvals{val1}{end} ' - ' usrdat.factorvals{val1}{vals(ind)} ];
+            if isstr(usrdat.factorvals{val1}{1})
+                usrdat.factorvals{val1}{end} = usrdat.factorvals{val1}(vals);
+            else
+                usrdat.factorvals{val1}{end} = [ usrdat.factorvals{val1}{vals} ];
             end;
-            set(findobj(fig, 'tag', ['lbval' num2str(factval) ]), 'string', usrdat.factorvals{val1});
+            set(findobj(fig, 'tag', ['lbval' num2str(factval) ]), 'string', encodevals(usrdat.factorvals{val1}));
             
         case 'selectsubj', % select specific subjects
             val = get(findobj(fig, 'tag', 'popupselect'), 'value');
@@ -392,7 +394,7 @@ elseif isstr(STUDY)
                        { 'style' 'text'    'string' 'Select data based on variable', 'fontweight' 'bold' } ...
                        { 'style' 'listbox' 'string' usrdat.factors  'tag' 'lbfact2' 'callback' cb_sel 'value' 1 } ...
                        { 'style' 'text'    'string' 'Select data based on value(s)' 'fontweight' 'bold' } ...
-                       { 'style' 'listbox' 'string' usrdat.factorvals{1} 'tag' 'lbval2' 'min' 0 'max' 2} };
+                       { 'style' 'listbox' 'string' encodevals(usrdat.factorvals{1}) 'tag' 'lbval2' 'min' 0 'max' 2} };
             cb_renamehelp = [ 'set(findobj(gcf, ''tag'', ''help''), ''string'', ''Add'');' ...
                               'set(findobj(gcf, ''tag'', ''cancel''), ''string'', ''Erase'', ''callback'', ''set(findobj(''''tag'''', ''''edit_selectdattrials''''), ''''string'''', '''''''');'');' ...
                               'set(findobj(gcf, ''tag'', ''ok''), ''string'', ''Close'');' ];
@@ -405,7 +407,7 @@ elseif isstr(STUDY)
         case 'selectdatatrialssel', % select in the GUI above
             val1  = get(findobj(fig, 'tag', 'lbfact2'), 'value');
             valfact = [1:length(usrdat.factorvals{val1})];
-            set(findobj(fig, 'tag', 'lbval2'), 'string', usrdat.factorvals{val1}, 'value', valfact);
+            set(findobj(fig, 'tag', 'lbval2'), 'string', encodevals(usrdat.factorvals{val1}), 'value', valfact);
             return;
             
         case 'selectdatatrialsadd', % Add button in the GUI above
@@ -423,10 +425,17 @@ elseif isstr(STUDY)
 end;
 
 function res = strmatchmult(a, b);
-    [tmp ind] = mysetdiff(b, a);
-    res = setdiff([1:length(b)], ind);
+    if isempty(b), res = []; return; end;
+    res = zeros(1,length(a));
+    for index = 1:length(a)
+        res(index) = std_indvarmatch(a{index}, b);
+    end;
+    %[tmp ind] = mysetdiff(b, a);
+    %res = setdiff([1:length(b)], ind);
 
 function cellarray = mysort(cellarray)
+    return; % was crashing for combinations of selection
+            % also there is no reason the order should be different
     if ~isempty(cellarray) && isstr(cellarray{1})
         cellarray = sort(cellarray);
     end;
@@ -438,3 +447,30 @@ function [cellout inds ] = mysetdiff(cell1, cell2);
          cellout = mattocell(cellout);
     end;
 
+% encode string an numerical values for list boxes
+function cellout = encodevals(cellin)
+    if isempty(cellin) 
+        cellout = {};
+    elseif isstr(cellin{1})
+        for index = 1:length(cellin)
+            if isstr(cellin{index})
+                cellout{index} = cellin{index};
+            else
+                cellout{index} =  cellin{index}{1};
+                for indcell = 2:length(cellin{index})
+                    cellout{index} = [ cellout{index} ' & ' cellin{index}{indcell} ];
+                end;
+            end;
+        end;
+    else
+        for index = 1:length(cellin)
+            if length(cellin{index}) == 1
+                cellout{index} = num2str(cellin{index});
+            else
+                cellout{index} =  num2str(cellin{index}(1));
+                for indcell = 2:length(cellin{index})
+                    cellout{index} = [ cellout{index} ' & ' num2str(cellin{index}(indcell)) ];
+                end;
+            end;
+        end;
+    end;

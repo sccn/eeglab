@@ -105,15 +105,8 @@ function changrp = std_chanlookupnew( STUDY, ALLEEG, changrp, interp);
     for index = 1:length(setinfo)
         % get index of independent variables
         % ----------------------------------
-        if isstr(setinfo(index).value{1})
-             condind = strmatch( setinfo(index).value{1}, allconditions, 'exact');
-        else condind = find( setinfo(index).value{1} == [allconditions{:}]);
-        end;
-        if isstr(setinfo(index).value{2})
-             grpind  = strmatch( setinfo(index).value{2}, allgroups    , 'exact');
-        else grpind  = find( setinfo(index).value{2} == [ allgroups{:} ]);
-        end;
-        
+        condind = std_indvarmatch( setinfo(index).value{1}, allconditions);
+        grpind  = std_indvarmatch( setinfo(index).value{2}, allgroups    );
         if isempty(allconditions), condind = 1; end;
         if isempty(allgroups),     grpind  = 1; end;
 
@@ -137,5 +130,3 @@ function changrp = std_chanlookupnew( STUDY, ALLEEG, changrp, interp);
             changrp.setinds{ condind, grpind } = [ changrp.setinds{ condind, grpind } index ];
         end;
     end;
-    
-    return; 

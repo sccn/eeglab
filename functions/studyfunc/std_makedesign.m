@@ -159,8 +159,8 @@ opt = finputcheck(varargin,  {'variable1'     'string'    []     defdes.variable
 if isstr(opt), error(opt); end;
 if strcmpi(opt.variable1, 'none'), opt.variable1 = ''; end;
 if strcmpi(opt.variable2, 'none'), opt.variable2 = ''; end;
-if iscell(opt.values1), for i = 1:length(opt.values1), if iscell(opt.values1{i}), opt.values1{i} = cell2str(opt.values1{i}); end; end; end;
-if iscell(opt.values2), for i = 1:length(opt.values2), if iscell(opt.values2{i}), opt.values2{i} = cell2str(opt.values2{i}); end; end; end;
+%if iscell(opt.values1), for i = 1:length(opt.values1), if iscell(opt.values1{i}), opt.values1{i} = cell2str(opt.values1{i}); end; end; end;
+%if iscell(opt.values2), for i = 1:length(opt.values2), if iscell(opt.values2{i}), opt.values2{i} = cell2str(opt.values2{i}); end; end; end;
     
 % build command list for history
 % ------------------------------
@@ -353,6 +353,7 @@ function res = strmatchmult(a, b);
 % remove blanks
 % -------------
 function res = rmblk(a);
+    if iscell(a), a = cell2str(a); end;
     if ~isstr(a), a = num2str(a); end;
     res = a;
     res(find(res == ' ')) = '_';

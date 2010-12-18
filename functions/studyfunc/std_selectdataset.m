@@ -70,11 +70,7 @@ elseif isfield(STUDY.datasetinfo, indvar) && ~isempty(getfield(STUDY.datasetinfo
     eval( [ 'fieldvals = { STUDY.datasetinfo.' indvar '};' ] );
     datind = [];
     for dat = 1:length(indvarvals)
-        if isstr(indvarvals{dat})
-            datind = union(datind, strmatch(indvarvals{dat}, fieldvals));
-        else
-            datind = union(datind, find(indvarvals{dat} == [ fieldvals{:} ]));
-        end;
+        datind = union(datind, std_indvarmatch(indvarvals{dat}, fieldvals));
     end;
 else
     % selection of trials within datasets
@@ -84,13 +80,8 @@ else
     dattrials      = cellfun(@(x)(eval(['{ x.' indvar '}'])),  { STUDY.datasetinfo.trialinfo }, 'uniformoutput', false); % do not remove duplicate line (or Matlab crashes)
     dattrialselect = cell(1,length(STUDY.datasetinfo));
     for dat = 1:length(indvarvals)
-        if isstr(indvarvals{dat})
-            dattrialselecttmp = cellfun(@(x)(strmatch(indvarvals{dat}, x, 'exact')), dattrials, 'uniformoutput', false);
-        else
-            dattrialselecttmp = cellfun(@(x)(find(indvarvals{dat} == [ x{:} ])), dattrials, 'uniformoutput', false);
-        end;
-        for tmpi = 1:length(dattrialselecttmp)
-            dattrialselect{tmpi} = union(dattrialselect{tmpi}, dattrialselecttmp{tmpi});
+        for tmpi = 1:length(dattrials)
+            dattrialselect{tmpi} = union(dattrialselect{tmpi}, std_indvarmatch(indvarvals{dat}, dattrials{tmpi}));
         end;
     end;
     datind = find(~cellfun(@isempty, dattrialselect));            

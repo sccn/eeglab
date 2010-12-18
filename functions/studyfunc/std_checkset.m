@@ -186,8 +186,33 @@ if ~isfield(STUDY, 'design') || isempty(STUDY.design) || ~isfield(STUDY.design, 
     STUDY  = std_maketrialinfo(STUDY, ALLEEG); 
     STUDY  = std_makedesign(STUDY, ALLEEG);
     STUDY  = std_selectdesign(STUDY, ALLEEG,1);
-elseif isfield(STUDY.design, 'indvar1')
-    STUDY  = std_convertdesign(STUDY, ALLEEG);
+else
+    if isfield(STUDY.design, 'indvar1')
+        STUDY  = std_convertdesign(STUDY, ALLEEG);
+    end;
+    
+    % convert combined independent variable values
+    % between dash to cell array of strings
+    % -------------------------------------
+    for inddes = 1:length(STUDY.design)
+        for indvar = 1:length(STUDY.design(inddes).variable)
+            for indval = 1:length(STUDY.design(inddes).variable(indvar).value)
+                STUDY.design(inddes).variable(indvar).value{indval} = convertindvarval(STUDY.design(inddes).variable(indvar).value{indval});
+            end;
+        end;
+        for indcell = 1:length(STUDY.design(inddes).cell)
+            for indval = 1:length(STUDY.design(inddes).cell(indcell).value)
+                STUDY.design(inddes).cell(indcell).value{indval} = convertindvarval(STUDY.design(inddes).cell(indcell).value{indval});
+            end;
+        end;
+        for indinclude = 1:length(STUDY.design(inddes).include)
+            if iscell(STUDY.design(inddes).include{indinclude})
+                for indval = 1:length(STUDY.design(inddes).include{indinclude})
+                    STUDY.design(inddes).include{indinclude}{indval} = convertindvarval(STUDY.design(inddes).include{indinclude}{indval});
+                end;
+            end;
+        end;
+    end;
 end;
 
 % scan design to fix old paring format
@@ -239,3 +264,18 @@ if modif;
     eegh(command);
     STUDY.history =  sprintf('%s\n%s',  STUDY.history, command);
 end;
+
+% convert combined independent variables
+% --------------------------------------
+function val = convertindvarval(val);
+    if isstr(val)
+        inddash = findstr(' - ', val);
+        if isempty(inddash), return; end;
+        inddash = [ -2 inddash length(val)+1];
+        for ind = 1:length(inddash)-1
+            newval{ind} = val(inddash(ind)+3:inddash(ind+1)-1);
+        end;
+        val = newval;
+    end;
+
+

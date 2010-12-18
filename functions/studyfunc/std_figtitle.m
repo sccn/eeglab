@@ -110,10 +110,10 @@ for c1 = 1:length(opt.condnames)
         % conditions
         % ----------
         if ~isempty(opt.condnames{c1})
-            fig_title = [ num2str(opt.condnames{c1}) ', ' fig_title];
+            fig_title = [ value2str(opt.condnames{c1}) ', ' fig_title];
         end;
         if ~isempty(opt.cond2names{c2})
-            fig_title = [ num2str(opt.cond2names{c2}) ', ' fig_title];
+            fig_title = [ value2str(opt.cond2names{c2}) ', ' fig_title];
         end;
 
         % channel labels, component name, subject name and datatype
@@ -225,4 +225,33 @@ function pres = thresh_pres(thresh_pres);
         pres = -round(log10(thresh_pres))+1;
     end;
     pres = num2str(pres);
+
+% convert 
+% -------
+function str = value2str(value)
+    
+    if isstr(value)
+        str = value;
+    elseif isnumeric(value)
+        if length(value) == 1
+            str = num2str(value);
+        else
+            str = num2str(value(1));
+            if length(value) <= 5
+                for ind = 2:length(value)
+                    str = [ str ' & ' num2str(value(ind)) ];
+                end;
+            else
+                str = [ str ' & ' num2str(value(2)) ' & ...' ];
+            end;
+        end;
+    else % cell array
+        str = value{1};
+        for ind = 2:length(value)
+            str = [ str ' & ' value{ind} ];
+        end;
+    end;
+    
+            
+
 
