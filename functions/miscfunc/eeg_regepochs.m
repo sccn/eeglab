@@ -1,42 +1,42 @@
 % eeg_regepochs() - Convert a continuous dataset into consecutive epochs of 
 %                   a specified regular length by adding dummy events of type 
-%                   'X' and epoching the data around these events.
-%                   The mean of each epoch (or if min epochlimits arg < 0,
-%                   the mean of the pre-0 baseline) is removed from each 
-%                   epoch. May be used to split up continuous data for
+%                   and epoch the data around these events. Alternatively
+%                   only insert events for extracting these epochs.
+%                   May be used to split up continuous data for
 %                   artifact rejection followed by ICA decomposition.
 %                   The computed EEG.icaweights and EEG.icasphere matrices
 %                   may then be exported to the continuous dataset and/or 
 %                   to its epoched descendents.
 % Usage:
 %     >> EEGout = eeg_regepochs(EEG); % use defaults
-%     >> EEGout = eeg_regepochs(EEG, recurrence_interval, epochlimits); 
-%     >> EEGout = eeg_regepochs(EEG, recurrence_interval, epochlimits, rmbase); 
+%     >> EEGout = eeg_regepochs(EEG, 'key', val, ...); 
 %
 % Required input:
 %     EEG                 - EEG continuous data structure (EEG.trials = 1)
 %
 % Optional inputs:
-%     recurrence_interval - [in s] the regular recurrence interval of the dummay
-%                           'X' events used as time-locking events for the 
-%                           consecutive epochs {default: 1 s}
-%     epochlimits         - [minsec maxsec] latencies relative to the time-locking
-%                           events to use as epoch boundaries. Stated epoch length 
-%                           will be reduced by one data point to avoid overlaps 
-%                           {default: [0 recurrence_interval]}
-%     rmbase              - [NaN|latency] remove baseline. NaN does not remove
-%                           baseline. 0 remove the pre-0 baseline. To
-%                           remove the full epoch baseline, enter a value
-%                           larger than the upper epoch limit. Default is
-%                           0.
+%     'recurrence' - [in s] the regular recurrence interval of the dummy
+%                    events used as time-locking events for the 
+%                    consecutive epochs {default: 1 s}
+%     'limits'     - [minsec maxsec] latencies relative to the time-locking
+%                    events to use as epoch boundaries. Stated epoch length 
+%                    will be reduced by one data point to avoid overlaps 
+%                    {default: [0 recurrence_interval]}
+%     'rmbase'     - [NaN|latency] remove baseline. NaN does not remove
+%                    baseline. 0 remove the pre-0 baseline. To
+%                    remove the full epoch baseline, enter a value
+%                    larger than the upper epoch limit. Default is 0.
+%     'eventtype'  - [string] name for the event type. Default is 'X'
+%     'extractepochs' - ['on'|'off'] extract data epochs ('on') or simply
+%                    insert events ('off'). Default is 'on'.
 %
 % Outputs:
 %     EEGout              - the input EEG structure separated into consecutive 
 %                           epochs.
 %
 % See also: pop_editeventvals(), pop_epoch(), rmbase();
-
-% Authors: Hilit Serby & Scott Makeig, SCCN/INC/UCSD, Sep 02, 2005
+%
+% Authors: Hilit Serby, Arnaud Delorme & Scott Makeig, SCCN/INC/UCSD, Sep 02, 2005
 
 % Copyright (C) Hilit Serby, SCCN, INC, UCSD, Sep 02, 2005, hilit@sccn.ucsd.edu
 %
@@ -54,7 +54,12 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function EEG = eeg_regepochs(EEG, recur, epochlimits, rmbase)
+function EEG = eeg_regepochs(EEG, varargin)
+
+if nargin < 1
+    help eeg_regepochs;
+    return;
+end;
 
 % test input variables
 % --------------------
@@ -64,35 +69,41 @@ elseif EEG.trials > 1
    error('input dataset must be continuous data (1 epoch)');
 end
 
-if nargin < 2
-  recur = 1;
-end
+if nargin > 1 && ~isstr(varargin{1})
+    if nargin >= 2, options = { 'recurrence' varargin{1} }; end;
+    if nargin >= 3, options = { 'limits'     varargin{2} }; end;
+    if nargin >= 4, options = { 'rmbase'     varargin{3} }; end;
+else
+    options = varargin;
+end;
+g = finputcheck(varargin, { 'recurrence'    'real'  []  1;
+                            'limits'        'real'  []  [0 1];
+                            'rmbase'        'real'  []  0;
+                            'eventtype'     'string' {} 'X';
+                            'extractepochs' 'string' { 'on' 'off' } 'on' }, 'eeg_regepochs');
+if isstr(g), error(g); end;
 
-if nargin < 4
-  rmbase = 0;
-end
-
-if recur < 0 | recur > EEG.xmax
+if g.recurrence < 0 | g.recurrence > EEG.xmax
   error('recurrence_interval out of bounds');
 end
 
 if nargin < 3
-  epochlimits = [0 recur];
+  g.limits = [0 g.recurrence];
 end
 
-if length(epochlimits) ~= 2 | epochlimits(2) <= epochlimits(1) 
-   error('epochlimits must be a 2-vector [minsec maxsec]')
+if length(g.limits) ~= 2 | g.limits(2) <= g.limits(1) 
+   error('epoch limits must be a 2-vector [minsec maxsec]')
 end
 
 % calculate number of events to add
 % ---------------------------------
 bg = 0;        % beginning of data
 en = EEG.xmax; % end of data in sec
-nu = floor(EEG.xmax/recur); % number of type 'X' events to add and epoch on
+nu = floor(EEG.xmax/g.recurrence); % number of type 'X' events to add and epoch on
 
 % bg = EEG.event(1).latency/EEG.srate;   % time in sec of first event
 % en = EEG.event(end).latency/EEG.srate; % time in sec of last event
-% nu = length((bg+recur):recur:(en-recur)); % number of 'X' events, one every 'recur' sec
+% nu = length((bg+g.recurrence):g.recurrence:(en-g.recurrence)); % number of 'X' events, one every 'g.recurrence' sec
 
 if nu < 1
   error('specified recurrence_interval too long')
@@ -100,13 +111,13 @@ end
 
 % print info on commandline
 % -------------------------
-eplength = epochlimits(2)-epochlimits(1);
+eplength = g.limits(2)-g.limits(1);
 fprintf('The input dataset will be split into %d epochs of %g s\n',nu,eplength);
-fprintf('Epochs will overlap by %2.0f%%.\n',(eplength-recur)/eplength*100);
+fprintf('Epochs will overlap by %2.0f%%.\n',(eplength-g.recurrence)/eplength*100);
 
 % insert events and urevents at the end of the current (ur)event tables
 % ---------------------------------------------------------------------
-fprintf('Inserting %d type ''X'' events: ',nu);
+fprintf('Inserting %d type ''%s'' events: ', nu, g.eventtype);
 nevents = length(EEG.event);
 % convert all event types to strings
 for k = 1:nevents
@@ -124,11 +135,11 @@ for k = 1:nu
      fprintf('\n');
    end
 
-   EEG.event(nevents+k).type = 'X';
-   EEG.event(nevents+k).latency = recur*(k-1)*EEG.srate+1;
+   EEG.event(nevents+k).type = g.eventtype;
+   EEG.event(nevents+k).latency = g.recurrence*(k-1)*EEG.srate+1;
 
-   EEG.urevent(nurevents+k).type = 'X';
-   EEG.urevent(nurevents+k).latency = recur*(k-1)*EEG.srate+1;
+   EEG.urevent(nurevents+k).type = g.eventtype;
+   EEG.urevent(nurevents+k).latency = g.recurrence*(k-1)*EEG.srate+1;
    EEG.event(nevents+k).urevent = nurevents+k;
 end
 fprintf('\n');
@@ -140,15 +151,16 @@ EEG = pop_editeventvals( EEG, 'sort', {'latency' 0});
 
 % split the dataset into epochs
 % ------------------------------
-fprintf('Splitting the data into %d %2.2f-s epochs\n',nu,eplength); 
-setname = sprintf('%s - %g-s epochs', EEG.setname, recur);
-EEG = pop_epoch( EEG, { 'X' }, epochlimits, 'newname', ...
-                                  setname, 'epochinfo', 'yes');
-                              
-% baseline zero the epochs
-% ------------------------
-if ~isnan(rmbase)
-    fprintf('Removing the pre %3.2f second baseline mean of each epoch.\n', rmbase);
-    EEG = pop_rmbase( EEG, [epochlimits(1) rmbase]);
-end
+if strcmpi(g.extractepochs, 'on')
+    fprintf('Splitting the data into %d %2.2f-s epochs\n',nu,eplength); 
+    setname = sprintf('%s - %g-s epochs', EEG.setname, g.recurrence);
+    EEG = pop_epoch( EEG, { g.eventtype }, g.limits, 'newname', ...
+                                      setname, 'epochinfo', 'yes');
+    % baseline zero the epochs
+    % ------------------------
+    if ~isnan(g.rmbase)
+        fprintf('Removing the pre %3.2f second baseline mean of each epoch.\n', g.rmbase);
+        EEG = pop_rmbase( EEG, [g.limits(1) g.rmbase]);
+    end
+end;                              
 
