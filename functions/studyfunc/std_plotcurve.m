@@ -262,8 +262,8 @@ for c = 1:ncplot
                         else tmpdata = zeros([size(tmptmpdata) nc]); 
                         end;
                     end;
-                    if ndims(tmptmpdata) == 4, tmpdata(:,:,:,cc) = tmptmpdata; 
-                    else                       tmpdata(:,:,cc)   = tmptmpdata; 
+                    if ndims(tmpdata) == 4, tmpdata(:,:,:,cc) = tmptmpdata; 
+                    else                    tmpdata(:,:,cc)   = tmptmpdata; 
                     end;
                 end;
                 leg = opt.condnames;
