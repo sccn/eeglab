@@ -101,9 +101,9 @@ function [norm] = ft_electroderealign(cfg)
 %    You should have received a copy of the GNU General Public License
 %    along with FieldTrip. If not, see <http://www.gnu.org/licenses/>.
 %
-% $Id: ft_electroderealign.m 1768 2010-09-24 09:11:13Z sashae $
+% $Id: ft_electroderealign.m 2439 2010-12-15 16:33:34Z johzum $
 
-fieldtripdefs
+ft_defaults
 
 % this is used for feedback of the lower-level functions
 global fb
@@ -116,9 +116,9 @@ if ~isfield(cfg, 'headshape'),     cfg.headshape = [];        end % for triangul
 if ~isfield(cfg, 'template'),      cfg.template = [];         end % for electrodes or fiducials, always with labels
 if ~isfield(cfg, 'warp'),          cfg.warp = 'rigidbody';    end
 
-cfg = checkconfig(cfg, 'renamed', {'realignfiducials', 'fiducial'});
-cfg = checkconfig(cfg, 'renamed', {'realignfiducial',  'fiducial'});
-cfg = checkconfig(cfg, 'forbidden', 'outline');
+cfg = ft_checkconfig(cfg, 'renamedval', {'method', 'realignfiducials', 'fiducial'});
+cfg = ft_checkconfig(cfg, 'renamedval', {'method', 'realignfiducial',  'fiducial'});
+cfg = ft_checkconfig(cfg, 'forbidden', 'outline');
 
 if isfield(cfg, 'headshape') && isa(cfg.headshape, 'config')
   % convert the nested config-object back into a normal structure
@@ -162,12 +162,13 @@ if usetemplate
       template(i) = ft_read_sens(cfg.template{i});
     end
   end
+
+  clear tmp
   for i=1:Ntemplate
-      tmp = ft_convert_units(template(i), elec.unit); % ensure that the units are consistent with the electrodes
-      template(i).label = tmp.label; 
-      template(i).pnt   = tmp.pnt; 
-      template(i).unit  = tmp.unit;       
+    tmp(i) = ft_convert_units(template(i), elec.unit); % ensure that the units are consistent with the electrodes
   end
+  template = tmp;
+  
 elseif useheadshape
   % get the surface describing the head shape
   if isstruct(cfg.headshape) && isfield(cfg.headshape, 'pnt')
@@ -483,17 +484,13 @@ if isfield(orig, 'label')
 end
 
 % add version information to the configuration
-try
-  % get the full name of the function
-  cfg.version.name = mfilename('fullpath');
-catch
-  % required for compatibility with Matlab versions prior to release 13 (6.5)
-  [st, i] = dbstack;
-  cfg.version.name = st(i);
-end
-cfg.version.id = '$Id: ft_electroderealign.m 1768 2010-09-24 09:11:13Z sashae $';
+cfg.version.name = mfilename('fullpath');
+cfg.version.id = '$Id: ft_electroderealign.m 2439 2010-12-15 16:33:34Z johzum $';
 
-% remember the configuration
+% add information about the Matlab version used to the configuration
+cfg.version.matlab = version();
+
+% remember the exact configuration details in the output
 norm.cfg = cfg;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

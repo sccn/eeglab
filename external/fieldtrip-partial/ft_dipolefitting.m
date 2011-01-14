@@ -140,10 +140,10 @@ function [source] = ft_dipolefitting(cfg, data)
 %    You should have received a copy of the GNU General Public License
 %    along with FieldTrip. If not, see <http://www.gnu.org/licenses/>.
 %
-% $Id: ft_dipolefitting.m 1258 2010-06-22 08:33:48Z timeng $
+% $Id: ft_dipolefitting.m 2574 2011-01-13 10:27:38Z roboos $
 
-fieldtripdefs
-cfg = checkconfig(cfg, 'trackconfig', 'on');
+ft_defaults
+cfg = ft_checkconfig(cfg, 'trackconfig', 'on');
 
 % set the defaults
 if ~isfield(cfg, 'channel'),     cfg.channel = 'all';        end
@@ -169,10 +169,10 @@ if ~isempty(cfg.inputfile)
 end
 
 % check if the input data is valid for this function
-data = checkdata(data, 'datatype', {'timelock', 'freq', 'comp'}, 'feedback', 'yes');
+data = ft_checkdata(data, 'datatype', {'timelock', 'freq', 'comp'}, 'feedback', 'yes');
 
 % put the low-level options pertaining to the dipole grid (used for initial scanning) in their own field
-cfg = checkconfig(cfg, 'createsubcfg',  {'grid'});
+cfg = ft_checkconfig(cfg, 'createsubcfg',  {'grid'});
 
 % the default for this depends on the data type
 if ~isfield(cfg, 'model'),
@@ -321,12 +321,28 @@ if strcmp(cfg.gridsearch, 'yes')
   else
     error('dipole scanning is only possible for a single dipole or a symmetric dipole pair');
   end
-  
-  % construct the grid on which the scanning will be done
-  [grid, cfg] = prepare_dipole_grid(cfg, vol, sens);
-  progress('init', cfg.feedback, 'scanning grid');
+
+  % construct the dipole grid on which the gridsearch will be done
+  tmpcfg = [];
+  tmpcfg.vol  = vol;
+  tmpcfg.grad = sens; % this can be electrodes or gradiometers
+  % copy all options that are potentially used in ft_prepare_sourcemodel
+  try, tmpcfg.grid        = cfg.grid;         end
+  try, tmpcfg.mri         = cfg.mri;          end
+  try, tmpcfg.headshape   = cfg.headshape;    end
+  try, tmpcfg.tightgrid   = cfg.tightgrid;    end
+  try, tmpcfg.symmetry    = cfg.symmetry;     end
+  try, tmpcfg.smooth      = cfg.smooth;       end
+  try, tmpcfg.threshold   = cfg.threshold;    end
+  try, tmpcfg.spheremesh  = cfg.spheremesh;   end
+  try, tmpcfg.inwardshift = cfg.inwardshift;  end
+  try, tmpcfg.mriunits    = cfg.mriunits;     end
+  try, tmpcfg.sourceunits = cfg.sourceunits;  end
+  [grid, tmpcfg] = ft_prepare_sourcemodel(tmpcfg);
+
+  ft_progress('init', cfg.feedback, 'scanning grid');
   for i=1:length(grid.inside)
-    progress(i/length(grid.inside), 'scanning grid location %d/%d\n', i, length(grid.inside));
+    ft_progress(i/length(grid.inside), 'scanning grid location %d/%d\n', i, length(grid.inside));
     indx = grid.inside(i);
     if isfield(grid, 'leadfield')
       % reuse the previously computed leadfield
@@ -348,7 +364,7 @@ if strcmp(cfg.gridsearch, 'yes')
         error('unsupported cfg.model');
     end % switch model
   end % looping over the grid
-  progress('close');
+  ft_progress('close');
   
   switch cfg.model
     case 'regional'
@@ -409,7 +425,7 @@ end % switch model
 
 if isfield(cfg, 'dipfit')
   % convert the structure with the additional low-level options into key-value pairs
-  optarg = cfg2keyval(getfield(cfg, 'dipfit'));
+  optarg = ft_cfg2keyval(getfield(cfg, 'dipfit'));
 else
   % no additional low-level options were specified
   optarg = {};
@@ -560,18 +576,14 @@ end
 cfg.outputfile;
 
 % get the output cfg
-cfg = checkconfig(cfg, 'trackconfig', 'off', 'checksize', 'yes');
+cfg = ft_checkconfig(cfg, 'trackconfig', 'off', 'checksize', 'yes');
 
 % add the version details of this function call to the configuration
-try
-  % get the full name of the function
-  cfg.version.name = mfilename('fullpath');
-catch
-  % required for compatibility with Matlab versions prior to release 13 (6.5)
-  [st, i] = dbstack;
-  cfg.version.name = st(i);
-end
-cfg.version.id = '$Id: ft_dipolefitting.m 1258 2010-06-22 08:33:48Z timeng $';
+cfg.version.name = mfilename('fullpath');
+cfg.version.id = '$Id: ft_dipolefitting.m 2574 2011-01-13 10:27:38Z roboos $';
+
+% add information about the Matlab version used to the configuration
+cfg.version.matlab = version();
 
 % remember the configuration details of the input data
 try, cfg.previous = data.cfg; end

@@ -11,7 +11,7 @@ function [channel] = ft_channelselection(channel, datachannel)
 % labels. Channels that are not present in the raw datafile are
 % automatically removed from the channel list.
 %
-% E.g.
+% E.g. the input 'channel' can be:
 %  'all'     is replaced by all channels in the datafile
 %  'gui'     a graphical user interface will pop up to select the channels
 %  'C*'      is replaced by all channels that match the wildcard, e.g. C1, C2, C3, ...
@@ -64,9 +64,9 @@ function [channel] = ft_channelselection(channel, datachannel)
 %    You should have received a copy of the GNU General Public License
 %    along with FieldTrip. If not, see <http://www.gnu.org/licenses/>.
 %
-% $Id: ft_channelselection.m 1315 2010-06-30 19:13:57Z roboos $
+% $Id: ft_channelselection.m 2439 2010-12-15 16:33:34Z johzum $
 
-fieldtripdefs
+ft_defaults
 
 if length(datachannel)~=length(unique(datachannel))
   error('data with non-unique channel names is not supported');
