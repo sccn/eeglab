@@ -51,8 +51,6 @@
 %                  does it for the difference (requires 'plotdiff' 'on' 
 %                  above). 'nocurve' does not plot the mean. This functionality
 %                  does not work for all data configuration {default: 'off'}
-%  'filter'      - [real] low pass filter the data at the given frequency
-%                  for display {default: no filtering}
 %  'figure'      - ['on'|'off'] creates a new figure ('on'). The 'off' mode
 %                  plots all of the groups and conditions on the same pannel.
 % 'plotsubjects' - ['on'|'off'] overplot traces for individual components
@@ -320,9 +318,7 @@ for c = 1:ncplot
                     if strcmpi(opt.plotsubjects, 'off') tmpstd = squeeze(real(std(tmpdata,[],3)))/sqrt(size(tmpdata,3)); tmpdata = squeeze(real(nan_mean(tmpdata,3))); end;
                 elseif strcmpi(opt.plotsubjects, 'off') tmpstd = squeeze(real(std(tmpdata,[],2)))/sqrt(size(tmpdata,2)); tmpdata = squeeze(real(nan_mean(tmpdata,2))); 
                 end;
-                if ~strcmpi(opt.plotstderr, 'off')
-                    tmpstd = squeeze(permute(tmpstd, [2 1 3]));
-                end;
+                tmpstd = squeeze(permute(tmpstd, [2 1 3]));
             end;
             tmpdata = squeeze(permute(tmpdata, [2 1 3]));
             if strcmpi(opt.plottopo, 'on'), highlight = 'background'; else highlight = 'bottom'; end;
@@ -363,17 +359,13 @@ for c = 1:ncplot
                 if isempty(findstr(opt.plotstderr, 'nocurve'))
                     plotcurve( allx, tmpdata, 'colors', tmpcol, plotopt{2:end}, 'title', opt.titles{c,g});
                 end;
-                if ~strcmpi(opt.plotstderr, 'off') 
-                    if dimreduced_sizediffers
-                        disp('Cannot plot standard error if the number of subject differs between the two conditions');
-                    else
-                        if ~isempty(findstr(opt.plotstderr, 'diff')), begind = 3; else begind = 1; end;
-                        set(gcf, 'renderer', 'OpenGL')
-                        for tmpi = begind:size(tmpdata,1)
-                            hold on; chandle = fillcurves( allx(:)', tmpdata(tmpi,:)-tmpstd(tmpi,:), tmpdata(tmpi,:)+tmpstd(tmpi,:), tmpcol{tmpi}); hold on;
-                            numfaces = size(get(chandle(1), 'Vertices'),1);
-                            set(chandle(1), 'FaceVertexCData', repmat([1 1 1], [numfaces 1]), 'Cdatamapping', 'direct', 'facealpha', 0.3, 'edgecolor', 'none');
-                        end;
+                if ~strcmpi(opt.plotstderr, 'off')
+                    if ~isempty(findstr(opt.plotstderr, 'diff')), begind = 3; else begind = 1; end;
+                    set(gcf, 'renderer', 'OpenGL')
+                    for tmpi = begind:size(tmpdata,1)
+                        hold on; chandle = fillcurves( allx, tmpdata(tmpi,:)-tmpstd(tmpi,:), tmpdata(tmpi,:)+tmpstd(tmpi,:), tmpcol{tmpi}); hold on;
+                        numfaces = size(get(chandle(1), 'Vertices'),1);
+                        set(chandle(1), 'FaceVertexCData', repmat([1 1 1], [numfaces 1]), 'Cdatamapping', 'direct', 'facealpha', 0.3, 'edgecolor', 'none');
                     end;
                 end;
             end;
@@ -514,5 +506,5 @@ function hdl = mysubplot(nr,nc,ind,subplottype);
 function tmpdata2 = myfilt(tmpdata, srate, lowpass, highpass)
 
     tmpdata2 = reshape(tmpdata, size(tmpdata,1), size(tmpdata,2)*size(tmpdata,3)*size(tmpdata,4));
-    tmpdata2 = iirfilt(tmpdata2',srate, lowpass, highpass)';
+    tmpdata2 = eegfiltfft(tmpdata2',srate, lowpass, highpass)';
     tmpdata2 = reshape(tmpdata2, size(tmpdata,1), size(tmpdata,2), size(tmpdata,3), size(tmpdata,4));

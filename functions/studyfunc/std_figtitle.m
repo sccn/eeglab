@@ -51,13 +51,14 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function all_titles = std_figtitle(varargin)
+function [all_titles alllegends ] = std_figtitle(varargin)
 
 if nargin < 1
     help std_figtitle;
     return;
 end;
 
+alllegends = {};
 opt = finputcheck( varargin, { 'chanlabels'  {'cell' 'string'}   []     {};
                                'condnames'   {'cell' 'string'}   []     '';
                                'cond2names'  {'cell' 'string'}   []     '';
@@ -83,43 +84,55 @@ nc2ori = length(opt.cond2names);
 if ~isempty(opt.vals) && ~isempty(opt.vals{1}) && ~isnan(opt.vals{1}(1)), opt.condgroup = 'off'; opt.cond2group = 'off'; end;
 if strcmpi(opt.plotmode, 'condensed'), opt.condgroup = 'on';  opt.cond2group = 'on';  end;
 if strcmpi(opt.plotsubjects, 'on'),    opt.condgroup = 'off'; opt.cond2group = 'off'; end;
-if strcmpi(opt.condgroup,  'on') || strcmpi(opt.condgroup,  'together'), opt.condnames  = ''; end;
-if strcmpi(opt.cond2group, 'on') || strcmpi(opt.cond2group, 'together'), opt.cond2names = ''; end;
+if strcmpi(opt.plotsubjects, 'on')
+    opt.condgroup  = 'apart';
+    opt.cond2group = 'apart';
+end;
+if strcmpi(opt.condgroup,  'on'), opt.condgroup =  'together'; end;
+if strcmpi(opt.cond2group, 'on'), opt.cond2group = 'together'; end;
+    
+if strcmpi(opt.condgroup,  'together') &&  strcmpi(opt.cond2stat, 'on'),  opt.condgroup  = 'apart'; end;
+if strcmpi(opt.cond2group, 'together') &&  strcmpi(opt.condstat , 'on') , opt.cond2group = 'apart'; end;
+if ~( strcmpi(opt.condgroup,  'together') && strcmpi(opt.cond2group, 'together') )
+    if strcmpi(opt.condgroup,  'together'), alllegends = opt.condnames ; opt.condnames  = ''; end;
+    if strcmpi(opt.cond2group, 'together'), alllegends = opt.cond2names; opt.cond2names = ''; end;
+end;
 if ~iscell(opt.valsunit),   opt.valsunit   = { opt.valsunit }; end;
 if ~iscell(opt.chanlabels), opt.chanlabels = { opt.chanlabels }; end;
 if ~iscell(opt.condnames),  opt.condnames  = { opt.condnames }; end;
 if ~iscell(opt.cond2names), opt.cond2names = { opt.cond2names }; end;
 if isempty(opt.condnames),  opt.condnames{1}  = ''; end;
 if isempty(opt.cond2names), opt.cond2names{1} = ''; end;
-
+    
 for c1 = 1:length(opt.condnames)
     for c2 = 1:length(opt.cond2names)
 
         % value (ms or Hz)
         % ----------------
-        fig_title = '';
+        fig_title1 = '';
         for i = 1:length(opt.vals)
             if ~isempty(opt.vals{i}) && ~isnan(opt.vals{i}(1)) 
-                if opt.vals{i}(1) == opt.vals{i}(end), fig_title = [ num2str(opt.vals{i}(1)) '' opt.valsunit{i} fig_title];
-                else                                   fig_title = [ num2str(opt.vals{i}(1)) '-' num2str(opt.vals{i}(2)) '' opt.valsunit{i} fig_title ];
+                if opt.vals{i}(1) == opt.vals{i}(end), fig_title1 = [ num2str(opt.vals{i}(1)) '' opt.valsunit{i} fig_title];
+                else                                   fig_title1 = [ num2str(opt.vals{i}(1)) '-' num2str(opt.vals{i}(2)) '' opt.valsunit{i} fig_title1 ];
                 end;
-                if length(opt.vals) > i, fig_title = [ ' & ' fig_title ]; end;
+                if length(opt.vals) > i, fig_title1 = [ ' & ' fig_title1 ]; end;
             end;
         end;
 
         % conditions
         % ----------
         if ~isempty(opt.condnames{c1})
-            fig_title = [ value2str(opt.condnames{c1}) ', ' fig_title];
+            fig_title1 = [ value2str(opt.condnames{c1}) ', ' fig_title1];
         end;
         if ~isempty(opt.cond2names{c2})
-            fig_title = [ value2str(opt.cond2names{c2}) ', ' fig_title];
+            fig_title1 = [ value2str(opt.cond2names{c2}) ', ' fig_title1];
         end;
 
         % channel labels, component name, subject name and datatype
         % ---------------------------------------------------------
+        fig_title2 = '';
         if length( opt.chanlabels ) == 1 && ~isempty( opt.chanlabels{1} )
-            fig_title = [ opt.chanlabels{1} ', ' fig_title ];
+            fig_title2 = [ opt.chanlabels{1} ', ' fig_title2 ];
         end;    
         
         % cluster and component name
@@ -134,23 +147,23 @@ for c1 = 1:length(opt.condnames)
             end;
             if ~isempty( opt.subject )
                 if ~isempty( compstr )
-                     fig_title = [ opt.subject '/' compstr ', ' fig_title ];
-                else fig_title = [ opt.subject ', ' fig_title ];
+                     fig_title2 = [ opt.subject '/' compstr ', ' fig_title2 ];
+                else fig_title2 = [ opt.subject ', ' fig_title2 ];
                 end;
             elseif ~isempty( compstr )
-                fig_title = [ compstr ', ' fig_title ];
+                fig_title2 = [ compstr ', ' fig_title2 ];
             end;
             
             if ~isempty( opt.datatype )
-                 fig_title = [ opt.clustname ' ' opt.datatype ', ' fig_title ];
-            else fig_title = [ opt.clustname ', ' fig_title ];
+                 fig_title2 = [ opt.clustname ' ' opt.datatype ', ' fig_title2 ];
+            else fig_title2 = [ opt.clustname ', ' fig_title2 ];
             end;
             
         else
             if ~isempty( opt.compnames )
                 if iscell( opt.compnames )
-                else fig_title = [ 'C' num2str(opt.compnames{c1,c2}) ', ' fig_title ];
-                     fig_title = [ opt.compnames        ', ' fig_title ];
+                else fig_title2 = [ 'C' num2str(opt.compnames{c1,c2}) ', ' fig_title2 ];
+                     fig_title2 = [ opt.compnames        ', ' fig_title2 ];
                 end;
             end;
             
@@ -158,29 +171,35 @@ for c1 = 1:length(opt.condnames)
             % ---------------------
             if ~isempty( opt.subject )
                 if ~isempty( opt.datatype )
-                     fig_title = [ opt.subject ' ' opt.datatype ', ' fig_title ];
-                else fig_title = [ opt.subject ', ' fig_title ];
+                     fig_title2 = [ opt.subject ' ' opt.datatype ', ' fig_title2 ];
+                else fig_title2 = [ opt.subject ', ' fig_title2 ];
                 end;
             elseif ~isempty( opt.datatype )
-                fig_title = [ opt.datatype ' - ' fig_title ];
+                fig_title2 = [ opt.datatype ' - ' fig_title2 ];
             end;
         end;    
         
+        if strcmpi(opt.cond2group, 'together') && strcmpi(opt.condgroup, 'together')
+            fig_title = fig_title2;
+            if ~isempty(fig_title1) && strcmpi(fig_title1(end-1:end), ', '), fig_title1(end-1:end) = []; end;
+            if ~isempty(fig_title1) && strcmpi(fig_title1(end-1:end), '- '), fig_title1(end-1:end) = []; end;
+            alllegends{c1, c2} = fig_title1;
+        else
+            fig_title = [ fig_title2 fig_title1 ];
+        end;
         if ~isempty(fig_title) && strcmpi(fig_title(end-1:end), ', '), fig_title(end-1:end) = []; end;
         if ~isempty(fig_title) && strcmpi(fig_title(end-1:end), '- '), fig_title(end-1:end) = []; end;
+        all_titles{c1,c2}  = fig_title;
         
-        all_titles{c1, c2} = fig_title;
     end;
 end;
+if ~isempty(alllegends)
+    alllegends = alllegends';
+    alllegends = alllegends(:)';
 
-% copy titles in other cells if both grouping are on (condensed mode)
-% -------------------------------------------------------------------
-if strcmpi(opt.cond2group, 'together') && strcmpi(opt.condgroup, 'together')
-    for c1 = 1:ncori
-        for c2 = 1:nc2ori
-            all_titles{c1,c2} = all_titles{1};
-        end;
-    end;
+    % convert legends to string if necessary
+    % --------------------------------------
+    for ileg = 1:length(alllegends), alllegends{ileg} = num2str(alllegends{ileg}); end;
 end;
 
 % statistic titles
