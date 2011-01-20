@@ -106,7 +106,7 @@ if isempty(varargin)
     
     % decode inputs
     % -------------
-    if res.plotgroups & res.plotconditions, warndlg2('Both conditions and group cannot be plotted on the same panel'); return; end;
+    %if res.plotgroups & res.plotconditions, warndlg2('Both conditions and group cannot be plotted on the same panel'); return; end;
     if res.submean   , res.submean    = 'on'; else res.submean    = 'off'; end;
     if res.plotgroups, res.plotgroups = 'together'; else res.plotgroups = 'apart'; end;
     if res.plotconditions , res.plotconditions  = 'together'; else res.plotconditions  = 'apart'; end;
