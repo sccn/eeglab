@@ -124,5 +124,6 @@ if ~isequal(STUDY.datasetinfo, TMP)
 end;
 std_checkfiles(STUDY, ALLEEG);
 STUDY.saved = 'yes';
+STUDY = std_selectdesign(STUDY, ALLEEG, STUDY.currentdesign);
 
 com = sprintf('[STUDY ALLEEG] = pop_loadstudy(''filename'', ''%s'', ''filepath'', ''%s'');', STUDY.filename, STUDY.filepath);
