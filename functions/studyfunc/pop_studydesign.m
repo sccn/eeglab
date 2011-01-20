@@ -428,7 +428,8 @@ function res = strmatchmult(a, b);
     if isempty(b), res = []; return; end;
     res = zeros(1,length(a));
     for index = 1:length(a)
-        res(index) = std_indvarmatch(a{index}, b);
+        tmpi = std_indvarmatch(a{index}, b);
+        res(index) = tmpi(1); % in case there is a duplicate
     end;
     %[tmp ind] = mysetdiff(b, a);
     %res = setdiff([1:length(b)], ind);
