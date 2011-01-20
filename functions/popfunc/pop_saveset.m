@@ -264,7 +264,7 @@ try,
     end;
     
 catch,
-    error('Pop_saveset: save error, out of space or file permission problem');
+    rethrow(lasterror);
 end;
 
 % try to delete old .fdt or .dat files
