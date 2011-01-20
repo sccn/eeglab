@@ -52,6 +52,7 @@ function corrmap_plot_v2(CORRMAP,CORRMAP_temp,comp,chan,rep,m,in,fin,plot_ics,me
 %%%%%%%%%%% fixed parameters for plots %%%%%%%%%%%%%%%%%%
 
 %default values for "boxes" - PLOT max 35 ICs per window
+topoplotopts = { };
 min=0.04;
 space=0.02;
 wid=0.12;
@@ -127,7 +128,7 @@ for v=in:fin;
 
             axes('position',[x(k)  y(l)  wid  leng])
 
-            topoplot(comp{CORRMAP.corr.sets{v}(i)}(:,CORRMAP.corr.ics{v}(i)), chan,'shrink','on');
+            topoplot(comp{CORRMAP.corr.sets{v}(i)}(:,CORRMAP.corr.ics{v}(i)), chan,topoplotopts{:});
 
             h3=annotation('textbox',[x(k)  y(l) 0.02  0.02]);
 
@@ -138,10 +139,9 @@ for v=in:fin;
             end
 
             set(h3,'FitHeightToText','on')
-            set(h3,'String',['r = ', num2str(CORRMAP.corr.abs_values{v}(i),'%11.4g \n'),'set = ',num2str(CORRMAP.corr.sets{v}(i),'%11.4g'),'; IC = ',num2str(CORRMAP.corr.ics{v}(i),'%11.4g')])
+            set(h3,'String',['r=', num2str(CORRMAP.corr.abs_values{v}(i),'%11.3g'),', set ',num2str(CORRMAP.datasetindices(CORRMAP.corr.sets{v}(i)),'%11.4g'),' IC ',num2str(CORRMAP.corr.ics{v}(i),'%11.4g')])
             set(h3,'FontSize',sz)
             set(h3,'FontUnits','normalized')
-            set(h3,'FontWeight','bold')
             set(h3,'LineStyle','none')
             hold on
 
@@ -172,11 +172,11 @@ for v=in:fin;
 
             %template map
             axes('position',[x(2)+0.04 0.72  wid*1.8  wid*1.8])
-            topoplot(comp{CORRMAP.template.index}(:,CORRMAP.template.ic), chan,'shrink','on');
+            topoplot(comp{CORRMAP.template.index}(:,CORRMAP.template.ic), chan,topoplotopts{:});
 
             %average map
             axes('position',[x(3)+0.06 0.72  wid*1.8  wid*1.8])
-            topoplot(reshape(mediaplot(tt,v,:),length(chan),1), chan,'shrink','on' );
+            topoplot(reshape(mediaplot(tt,v,:),length(chan),1), chan,topoplotopts{:});
 
 
             %info template plot
@@ -187,7 +187,7 @@ for v=in:fin;
             set(h2,'FontUnits','normalized')
             set(h2,'LineStyle','none')
             set(h2,'HorizontalAlignment','center')
-            set(h2,'String',['set = ',num2str(CORRMAP.template.index,'%11.4g'),'; IC = ',num2str(CORRMAP.template.ic)],'Interpreter','none')
+            set(h2,'String',['set ',num2str(CORRMAP.datasetindices(CORRMAP.template.index),'%11.4g'),' IC ',num2str(CORRMAP.template.ic)],'Interpreter','none')
 
             %info average plot
             h2=annotation('textbox',[x(3)+0.06 0.70 0.05 0.05]);
@@ -236,7 +236,7 @@ for v=in:fin;
 
             %only plots average map
             axes('position',[x(2)+0.04 0.72  wid*1.8  wid*1.8])
-            topoplot(reshape(mediaplot(tt,v,:),length(chan),1), chan,'shrink','on' );
+            topoplot(reshape(mediaplot(tt,v,:),length(chan),1), chan,topoplotopts{:});
             %info template plot
             h2=annotation('textbox',[x(2)+0.06 0.70 0.05 0.05]);
             set(h2,'Color','k')
@@ -341,7 +341,7 @@ for v=in:fin;
         fline=fline-gap;
 
         h3=annotation('textbox',[start fline gap gap]);
-        set(h3,'String',['Template: ',CORRMAP.template.setname,'; Set ',num2str(CORRMAP.template.index),'; IC ',num2str(CORRMAP.template.ic),';'],'Interpreter','none') %fixed by initial parameters
+        set(h3,'String',['Template: ',CORRMAP.template.setname,'; Set ',num2str(CORRMAP.datasetindices(CORRMAP.template.index)),'; IC ',num2str(CORRMAP.template.ic),';'],'Interpreter','none') %fixed by initial parameters
         set(h3,'LineStyle','none')
         set(h3,'FontSize',sz)
         set(h3,'FontUnits','normalized')

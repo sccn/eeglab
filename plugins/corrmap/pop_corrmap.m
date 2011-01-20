@@ -51,21 +51,19 @@ if nargin < 2
 end;
 
 if nargin < 3
-    promptstr    = { 'Template Dataset (Select one):', ...
+    promptstr    = { 'Cluster name (default: not stored):' ...
+        'Template Dataset (Select one):', ...
         'Template IC (Select one):', ...
         'Correlation threshold (default: auto):',...
-        'Number of ICs (default: 2):',...
+        'Number of ICs per dataset (default: 2):',...
         'Create EEG.badcomps (default: not stored):',...
-        'Plot Title (default: no title):',...
-        'Cluster name (default: not stored):'};
+        };
 
-    inistr       = { 1, ...
+    inistr       = { '', 1, ...
         1,...
         'auto',...
         2,...
-        'no',...
-        '',...
-        ''};
+        'no'};
     
     result = inputdlg2( promptstr, 'Correlation between IC maps -- pop_corrmap()', 1, inistr, 'pop_corrmap');
 
@@ -74,78 +72,37 @@ if nargin < 3
     else
         chanlocs=eeg_mergelocs(ALLEEG.chanlocs);
         chanlocsName = ALLEEG(1).chaninfo.filename; % Added by Romain 18 Aug. 2010
-        n_tmp   = eval(  result{1} );
-        index    = eval( result{2} );
-        th=result{3};
-        ics=eval( result{4} );
-        badcomps=result{5};
-        title=result{6};
-        clname=result{7};
-  
-        [CORRMAP,STUDY,ALLEEG] = corrmap(STUDY,ALLEEG,n_tmp,index,'chanlocs',chanlocs,'th',th,'ics',ics,'title',title,'clname',clname,'badcomps',badcomps);
+        clname=result{1};
+        n_tmp   = eval(  result{2} );
+        index    = eval( result{3} );
+        th=result{4};
+        ics=eval( result{5} );
+        badcomps=result{6};
+        title=result{1};
+        if ~isempty(title), title = [ 'Cluster ' title ]; end;
+        resetclusters = 'off';
+        
+       if ~isempty(clname)
+            sameicas  = std_findsameica(ALLEEG);
+            datinds   = cellfun(@(x)(x(1)), sameicas);
+            totalicas = 0;
+            for datind = datinds, totalicas = totalicas + size(ALLEEG(datind).icaweights,1); end;
+            
+            if totalicas ~= length(STUDY.cluster(1).comps)
+               ButtonName = questdlg2([ 'The CORRMAP plugin use by default all ICA' 10 'components (even if you have selected' 10 'them by residual variance). When creating' 10 ...
+                                        'the new cluster, you may filter components' 10 'by residual variance or reinitialize the' 10 'cluster structure so the new cluster is' 10 ...
+                                        'identical to the cluster shown by CORRMAP'], '', 'Cancel', 'Filter','Reinit','Filter');
+               if strcmpi(ButtonName, 'Cancel'), return; end;
+               if strcmpi(ButtonName, 'Reinit'), resetclusters = 'on'; end;
+            end;
+       end;
+       
+        [CORRMAP,STUDY,ALLEEG] = corrmap(STUDY,ALLEEG,n_tmp,index,'chanlocs',chanlocs,'th',th,'ics',ics,'title',title,'clname',clname,'badcomps',badcomps, 'resetclusters', resetclusters);
         % com = sprintf('pop_corrmap(STUDY,ALLEEG,%g,%g,''chanlocs'',''%s'',''th'',''%s'',''ics'',%g,''title'',''%s'',''clname'',''%s'',''badcomps'',''%s'');', n_tmp,index,chanlocs,th,ics,title,clname,badcomps);
-        com = sprintf('pop_corrmap(STUDY,ALLEEG,%g, %g,''chanlocs'',''%s'',''th'',''%s'',''ics'',%g,''title'',''%s'',''clname'',''%s'',''badcomps'',''%s'');', n_tmp,index,chanlocsName,th,ics,title,clname,badcomps);
+        com = sprintf('pop_corrmap(STUDY,ALLEEG,%g, %g,''chanlocs'','''',''th'',''%s'',''ics'',%g,''title'',''%s'',''clname'',''%s'',''badcomps'',''%s'', ''resetclusters'',''%s'');', n_tmp,index,th,ics,title,clname,badcomps,resetclusters);
     end
 
 else
-    % % % decode input parameters
-
-    g = finputcheck(varargin, { 'chanlocs'  'string' [] '';...
-        'th'     'string'    []     'auto' ;...
-        'ics'    'integer'  [1 2 3]    2 ;....
-        'title'   'string'  []     '';...
-        'clname'  'string'  []    '';...
-        'badcomps' 'string' {'yes','no'} 'no'});
-
- 
-    if isstr(g), error(g); end;
-
-    if ~isempty(g.chanlocs)
-
-        chanlocs = g.chanlocs;
-
-    else
-        chanlocs='';
-    end
-
-    if ~isempty(g.th)
-
-        th = g.th;
-
-    else
-        th='auto';
-    end
-
-    if ~isempty(g.ics)
-        if g.ics>3
-        fprintf('Error "number of ICs": Maximum number allowed is 3.\n');
-        fprintf('see >> help corrmap. \n');
-        return
-    else
-        ics = g.ics;
-    end
-    else
-        ics=2;
-    end
-
-    if ~isempty(g.title)
-        title=g.title;
-    else
-        title='';
-    end
-
-    if ~isempty(g.clname)
-        clname=g.clname;
-    else
-        clname='';
-    end
-
-    if ~isempty(g.badcomps)
-        badcomps=g.badcomps;
-    else
-        badcomps='no';
-    end
-
-    [CORRMAP,STUDY,ALLEEG] = corrmap(STUDY,ALLEEG,n_tmp,index,'chanlocs',chanlocs,'th',th,'ics',ics,'title','','clname','','badcomps',badcomps);
+    [CORRMAP,STUDY,ALLEEG] = corrmap(STUDY,ALLEEG,n_tmp,index,varargin{:});
 end
 
