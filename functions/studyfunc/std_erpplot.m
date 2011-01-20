@@ -176,13 +176,20 @@ if ~isnan(opt.topotime) & length(opt.channels) < 5
 end;
 
 plotcurveopt = {};
-if length(opt.clusters) > 1 || length(opt.channels) > 1
+if length(opt.clusters) > 1
     plotcurveopt = { 'figure' 'off' }; 
     opt.plotconditions = 'together';
     opt.plotgroups     = 'together';
     opt.condstats  = 'off'; 
     opt.groupstats = 'off';
 end;
+% if length(opt.channels) > 1 && strcmpi(opt.plotconditions, 'together') && strcmpi(opt.plotgroups, 'together')
+%     plotcurveopt = { 'figure' 'off' }; 
+%     opt.plotconditions = 'together';
+%     opt.plotgroups     = 'together';
+%     opt.condstats  = 'off'; 
+%     opt.groupstats = 'off';
+% end;
 plotcurveopt = { plotcurveopt{:} ...
    'ylim',           opt.ylim, ...
    'threshold',      opt.threshold, ...
@@ -194,69 +201,54 @@ plotcurveopt = { plotcurveopt{:} ...
 % channel plotting
 % ----------------
 if ~isempty(opt.channels)
-    % plot channel
-    % --------------
-    if length(opt.channels) > 1, figure('color', 'w'); end;
-    nc = ceil(sqrt(length(opt.channels)));
-    nr = ceil(length(opt.channels)/nc);
-    comp_names = {};
-    
-    % channel indices (for topomap, have to be transposed)
-    chaninds = 1:length(opt.channels);
-    if ~isempty(opt.topotime) && all(~isnan(opt.topotime))
-        chaninds = chaninds';
-    end;
-    
-    for index = chaninds
-        
-        if length(opt.channels) > 1, subplot(nr,nc,index); end;
-        if strcmpi(opt.datatype, 'erp')
-            [STUDY erpdata alltimes] = std_readerp(STUDY, ALLEEG, 'channels', opt.channels(index), 'timerange', opt.timerange, ...
-                    'subject', opt.subject, 'singletrials', opt.singletrials, 'design', opt.design);
-        else
-            [STUDY erpdata alltimes] = std_readspec(STUDY, ALLEEG, 'channels', opt.channels(index), 'freqrange', opt.freqrange, ...
-                'rmsubjmean', opt.subtractsubjectmean, 'subject', opt.subject, 'singletrials', opt.singletrials, 'design', opt.design);
-        end;
-        if isempty(erpdata), return; end;
 
-        % select specific time    
-        % --------------------
-        if ~isempty(opt.topotime) & ~isnan(opt.topotime)
-            [tmp ti1] = min(abs(alltimes-opt.topotime(1)));
-            [tmp ti2] = min(abs(alltimes-opt.topotime(end)));
-            for condind = 1:length(erpdata(:))
-                if ~isempty(erpdata{condind})
-                    erpdata{condind} = mean(erpdata{condind}(ti1:ti2,:,:),1);
-                end;
+    chaninds = 1:length(opt.channels);
+
+    if strcmpi(opt.datatype, 'erp')
+        [STUDY erpdata alltimes] = std_readerp(STUDY, ALLEEG, 'channels', opt.channels(chaninds), 'timerange', opt.timerange, ...
+                'subject', opt.subject, 'singletrials', opt.singletrials, 'design', opt.design);
+    else
+        [STUDY erpdata alltimes] = std_readspec(STUDY, ALLEEG, 'channels', opt.channels(chaninds), 'freqrange', opt.freqrange, ...
+            'rmsubjmean', opt.subtractsubjectmean, 'subject', opt.subject, 'singletrials', opt.singletrials, 'design', opt.design);
+    end;
+    if isempty(erpdata), return; end;
+
+    % select specific time    
+    % --------------------
+    if ~isempty(opt.topotime) & ~isnan(opt.topotime)
+        [tmp ti1] = min(abs(alltimes-opt.topotime(1)));
+        [tmp ti2] = min(abs(alltimes-opt.topotime(end)));
+        for condind = 1:length(erpdata(:))
+            if ~isempty(erpdata{condind})
+                erpdata{condind} = mean(erpdata{condind}(ti1:ti2,:,:),1);
             end;
         end;
-
-        % compute statistics
-        % ------------------
-        [pcond pgroup pinter] = std_stat(erpdata, 'groupstats', opt.groupstats, 'condstats', opt.condstats, 'paired', paired, ...
-                                             'statistics', opt.statistics, 'naccu', opt.naccu, 'threshold', opt.threshold, 'mcorrect', opt.mcorrect);
-        if (~isempty(pcond) && length(pcond{1}) == 1) || (~isempty(pgroup) && length(pgroup{1}) == 1), pcond = {}; pgroup = {}; pinter = {}; end; % single subject STUDY                                
-        if length(opt.channels) > 5 && ndims(erpdata{1}) < 3, pcond = {}; pgroup = {}; pinter = {}; end; % topo plotting for single subject
-
-        % plot
-        % ----
-        locs = eeg_mergelocs(ALLEEG.chanlocs);
-        locs = locs(std_chaninds(STUDY, opt.channels(index)));
-        [alltitles alllegends ] = std_figtitle('threshold', opt.threshold, 'mcorrect', opt.mcorrect, 'condstat', opt.condstats, 'cond2stat', opt.groupstats, ...
-                                 'statistics', opt.statistics, 'condnames', allconditions, 'plotsubjects', opt.plotsubjects, 'cond2names', allgroups, 'chanlabels', { locs.labels }, ...
-                                 'subject', opt.subject, 'valsunit', opt.unitx, 'vals', opt.topotime, 'datatype', datatypestr, 'cond2group', opt.plotgroups, 'condgroup', opt.plotconditions);
-
-        if ~isempty(opt.topotime) && all(~isnan(opt.topotime))
-            std_chantopo(erpdata, 'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, 'caxis', opt.caxis, ...
-                                          'chanlocs', locs, 'threshold', opt.threshold, 'titles', alltitles);
-        else
-            if index < length(opt.channels), alllegends = {}; end;
-            std_plotcurve(alltimes, erpdata, 'groupstats', pgroup, 'legend', alllegends, 'condstats', pcond, 'interstats', pinter, ...
-                'chanlocs', locs, 'titles', alltitles, 'plotsubjects', opt.plotsubjects, ...
-                'condnames', allconditions, 'groupnames', allgroups, 'plottopo', fastif(length(opt.channels) > 5, 'on', 'off'), plotcurveopt{:});
-        end;
     end;
-    
+
+    % compute statistics
+    % ------------------
+    [pcond pgroup pinter] = std_stat(erpdata, 'groupstats', opt.groupstats, 'condstats', opt.condstats, 'paired', paired, ...
+                                         'statistics', opt.statistics, 'naccu', opt.naccu, 'threshold', opt.threshold, 'mcorrect', opt.mcorrect);
+    if (~isempty(pcond) && length(pcond{1}) == 1) || (~isempty(pgroup) && length(pgroup{1}) == 1), pcond = {}; pgroup = {}; pinter = {}; end; % single subject STUDY                                
+    if length(opt.channels) > 5 && ndims(erpdata{1}) < 3, pcond = {}; pgroup = {}; pinter = {}; end; % topo plotting for single subject
+
+    % plot
+    % ----
+    locs = eeg_mergelocs(ALLEEG.chanlocs);
+    locs = locs(std_chaninds(STUDY, opt.channels(chaninds)));
+    [alltitles alllegends ] = std_figtitle('threshold', opt.threshold, 'mcorrect', opt.mcorrect, 'condstat', opt.condstats, 'cond2stat', opt.groupstats, ...
+                             'statistics', opt.statistics, 'condnames', allconditions, 'plotsubjects', opt.plotsubjects, 'cond2names', allgroups, 'chanlabels', { locs.labels }, ...
+                             'subject', opt.subject, 'valsunit', opt.unitx, 'vals', opt.topotime, 'datatype', datatypestr, 'cond2group', opt.plotgroups, 'condgroup', opt.plotconditions);
+
+    if ~isempty(opt.topotime) && all(~isnan(opt.topotime))
+        std_chantopo(erpdata, 'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, 'caxis', opt.caxis, ...
+                                      'chanlocs', locs, 'threshold', opt.threshold, 'titles', alltitles);
+    else
+        std_plotcurve(alltimes, erpdata, 'groupstats', pgroup, 'legend', alllegends, 'condstats', pcond, 'interstats', pinter, ...
+            'chanlocs', locs, 'titles', alltitles, 'plotsubjects', opt.plotsubjects, ...
+            'condnames', allconditions, 'groupnames', allgroups, 'plottopo', fastif(length(opt.channels) > 1, 'on', 'off'), plotcurveopt{:});
+    end;
+
     set(gcf,'name',['Channel ' datatypestr ]);
     axcopy(gca);
 else 
@@ -292,7 +284,7 @@ else
                                  'statistics', opt.statistics, 'condnames', allconditions, 'cond2names', allgroups, 'clustname', STUDY.cluster(opt.clusters(index)).name, 'compnames', comp_names, ...
                                  'subject', opt.subject, 'valsunit', opt.unitx, 'vals', opt.topotime, 'datatype', datatypestr, 'cond2group', opt.plotgroups, 'condgroup', opt.plotconditions);
         
-        if index == length(opt.clusters), alllegends = {}; end;
+        if length(opt.clusters) > 1 && index < length(opt.clusters), alllegends = {}; end;
         std_plotcurve(alltimes, erpdata, 'condnames', allconditions, 'legend', alllegends, 'groupnames', allgroups, ...
                                           'titles', alltitles, 'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, ...
                                           'chanlocs', ALLEEG(1).chanlocs, 'plotsubjects', opt.plotsubjects, plotcurveopt{:});
