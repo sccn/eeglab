@@ -1,7 +1,7 @@
 % std_createclust()  - dreate a new empty cluster.  After creation, components 
 %                      may be (re)assigned to it using std_movecomp().
 % Usage:
-%                    >> [STUDY] = std_createclust(STUDY, ALLEEG, name);
+%                    >> [STUDY] = std_createclust(STUDY, ALLEEG, 'key', val);
 % Inputs:
 %   STUDY    - STUDY set comprising some or all of the EEG datasets in ALLEEG.
 %   ALLEEG   - vector of EEG datasets included in the STUDY, typically created 
@@ -78,6 +78,7 @@ opt = finputcheck(options, { 'name'             'string'   []  'Cls';
                              'clusterind'       'integer'  []  length(STUDY.cluster)+1;
                              'parentcluster'    'string'   { 'on' 'off' }  'off';
                              'algorithm'        'cell'     []  {};
+                             'ignore0'          'string'   { 'on' 'off' }  'off';
                              'centroid'         'real'     []  [] }, 'std_createclust');
 if isstr(opt), error(opt); end;
 
@@ -114,7 +115,7 @@ else
     % Find the next available cluster index
     % -------------------------------------
     clusters = [];
-    cls = length(unique(opt.clusterind));
+    cls = min(max(opt.clusterind), length(unique(opt.clusterind)));
     nc  = 0; % index of last cluster 
     for k =  1:length(STUDY.cluster)
         ti = strfind(STUDY.cluster(k).name, ' ');
@@ -128,7 +129,7 @@ else
     end
     len = length(STUDY.cluster);
 
-    if ~isempty(find(opt.clusterind==0)) %outliers exist
+    if ~isempty(find(opt.clusterind==0)) && strcmpi(opt.ignore0, 'off') %outliers exist
         firstind = 0;
         nc  = nc + 1;
         len = len + 1;
@@ -155,9 +156,12 @@ else
         STUDY.cluster(k+len).algorithm = opt.algorithm;
         STUDY.cluster(k+len).parent{end+1} = STUDY.cluster(STUDY.etc.preclust.clustlevel).name;
         STUDY.cluster(k+len).child = [];
-        if ~isempty(STUDY.etc.preclust.preclustdata)
-            STUDY.cluster(k+len).preclust.preclustdata   = STUDY.etc.preclust.preclustdata(tmp,:);
-            STUDY.cluster(k+len).preclust.preclustparams = STUDY.etc.preclust.preclustparams;
+        if isfield(STUDY.etc, 'preclust')
+            if ~isempty(STUDY.etc.preclust.preclustdata) && all(tmp <= size(STUDY.etc.preclust.preclustdata,1))
+                 STUDY.cluster(k+len).preclust.preclustdata   = STUDY.etc.preclust.preclustdata(tmp,:);
+                 STUDY.cluster(k+len).preclust.preclustparams = STUDY.etc.preclust.preclustparams;
+            else STUDY.cluster(k+len).preclust.preclustdata   = [];
+            end;
         end;
         STUDY.cluster(k+len) = std_setcomps2cell(STUDY, k+len);
 
