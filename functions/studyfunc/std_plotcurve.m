@@ -115,24 +115,58 @@ if strcmpi(opt.plotconditions, 'together') &&  ~isempty(opt.groupstats), opt.plo
 if strcmpi(opt.plotgroups,     'together') &&  ~isempty(opt.condstats) , opt.plotgroups     = 'apart'; end;
 if isstr(opt.legend), opt.legend = {}; end;
 if isempty(opt.titles), opt.titles = cell(10,10); opt.titles(:) = { '' }; end;
-
-% remove empty entries
-datapresent = ~cellfun(@isempty, data);
-if size(data,1) > 1, for c = size(data,1):-1:1, if sum(datapresent(c,:)) == 0, data(c,:) = []; if ~strcmpi(opt.plotconditions, 'together') opt.titles(c,:) = []; end; if ~isempty(opt.groupstats), opt.groupstats(c) = []; end; end; end; end;
-if size(data,2) > 1, for g = size(data,2):-1:1, if sum(datapresent(:,g)) == 0, data(:,g) = []; if ~strcmpi(opt.plotgroups    , 'together') opt.titles(:,g) = []; end; if ~isempty(opt.condstats ), opt.condstats( g) = []; end; end; end; end;
-
-% if not the same number of subjects
-% ----------------------------------
-if strcmpi(opt.plotconditions, 'together') || strcmpi(opt.plotgroups, 'together')
-    allsizes = cellfun('size', data, ndims(data{1}));
-    if length(unique(allsizes(:,1))) > 1
-        %warndlg2('Cannot group conditions in plot when one subject is missing');
-        %return;
-    end;
+if length(data(:)) == length(opt.legend(:)), 
+    opt.legend = reshape(opt.legend, size(data))'; 
+    opt.legend(cellfun(@isempty, data)) = []; 
+    opt.legend = (opt.legend)';
 end;
 
+% plot
+% ----
+% if strcmpi(opt.figure, 'on'), 
+% else
+%     % all groups and conditions in the same figureopt.chanlocs
+%     ncol = size(tmpdata,3);
+%     if ncol == 1, ncol = size(tmpdata,1); end;
+%     tmpcol = col(colcount:colcount+ncol-1);
+%     colcount = mod(colcount+ncol-1, length(col))+1;
+%     %if strcmpi(opt.plotgroups, 'together') && isempty(tmpdata{1})
+% 
+% end;
+%  
+
+% color matrix
+% -----------------------
+onecol  = { 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b' };
+manycol = { 'b' 'g' 'm' 'c' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' ...
+                   'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' };
+if strcmpi(opt.plotgroups, 'together') || strcmpi(opt.plotconditions, 'together') || strcmpi(opt.figure, 'off')
+     col = manycol;
+else col = onecol;
+end;
+nonemptycell = find(~cellfun(@isempty, data));
+maxdim = max(length(data(:)), size(data{nonemptycell(1)}, ndims(data{nonemptycell(1)})));
+tmpcol = col;
+if strcmpi(opt.plotsubjects, 'off')
+    coldata = col(mod([0:maxdim-1], length(col))+1);
+    coldata = reshape(coldata(1:length(data(:))), size(data));
+else
+    coldata = cell(size(data));
+end;
+
+% remove empty entries
+% --------------------
+datapresent = ~cellfun(@isempty, data);
+if size(data,1) > 1, for c = size(data,1):-1:1, if sum(datapresent(c,:)) == 0, data(c,:) = []; coldata(c,:) = []; if ~strcmpi(opt.plotconditions, 'together') opt.titles(c,:) = []; end; if ~isempty(opt.groupstats), opt.groupstats(c) = []; end; end; end; end;
+if size(data,2) > 1, for g = size(data,2):-1:1, if sum(datapresent(:,g)) == 0, data(:,g) = []; coldata(:,g) = []; if ~strcmpi(opt.plotgroups    , 'together') opt.titles(:,g) = []; end; if ~isempty(opt.condstats ), opt.condstats( g) = []; end; end; end; end;
+if strcmpi(opt.plotsubjects, 'off'), tmpcol = coldata'; tmpcol = tmpcol(:)'; end;
+
+% number of columns and rows to plot
+% ----------------------------------
 nc = size(data,1);
 ng = size(data,2);
+if strcmpi(opt.plotgroups, 'together'),      ngplot = 1; else ngplot = ng; end;
+if strcmpi(opt.plotconditions,  'together'), ncplot = 1; else ncplot = nc; end;     
 if nc >= ng, opt.subplot = 'transpose';
 else         opt.subplot = 'normal';
 end;
@@ -178,19 +212,6 @@ else
     if ~isempty(pinter), pinterplot = -log10(pinter); end;
     maxplot = 3;
     warning on;
-end;
-
-% plotting all conditions
-% -----------------------
-onecol  = { 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b' };
-manycol = { 'r' 'g' 'b' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' ...
-                   'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' };
-if strcmpi(opt.plotgroups, 'together'),      ngplot = 1; else ngplot = ng; end;
-if strcmpi(opt.plotconditions,  'together'), ncplot = 1; else ncplot = nc; end;     
-if strcmpi(opt.plotgroups, 'together') || strcmpi(opt.plotconditions, 'together') || strcmpi(opt.figure, 'off')
-     col = manycol;
-else
-     col = onecol;
 end;
 
 % labels
@@ -323,20 +344,25 @@ for c = 1:ncplot
             else
                 plotopt = { plotopt{:} 'plotmean' 'off' };
             end;
-            plotopt = { plotopt{:} 'ylim' opt.ylim 'legend' opt.legend };
-            plotopt = { plotopt{:}  'xlabel' xlab 'ylabel' ylab };
-            
-            % plot
-            % ----
-            if strcmpi(opt.figure, 'on'), 
-                tmpcol = col; 
-            else
-                % all groups and conditions in the same figureopt.chanlocs
-                ncol = size(tmpdata,3);
-                if ncol == 1, ncol = size(tmpdata,1); end;
-                tmpcol = col(colcount:colcount+ncol-1);
-                colcount = mod(colcount+ncol-1, length(col))+1; 
+            plotopt = { plotopt{:} 'ylim' opt.ylim 'xlabel' xlab 'ylabel' ylab };
+            if ncplot ~= nc || ngplot ~= ng
+                plotopt = { plotopt{:} 'legend' opt.legend };
             end;
+            
+%             % plot
+%             % ----
+%             if strcmpi(opt.figure, 'on'), 
+%                 tmpcol = col; 
+%             else
+%                 % all groups and conditions in the same figureopt.chanlocs
+%                 ncol = size(tmpdata,3);
+%                 if ncol == 1, ncol = size(tmpdata,1); end;
+%                 tmpcol = col(colcount:colcount+ncol-1);
+%                 colcount = mod(colcount+ncol-1, length(col))+1;
+%                 %if strcmpi(opt.plotgroups, 'together') && isempty(tmpdata{1})
+%                     
+%             end;
+%             
             if strcmpi(opt.plottopo, 'on') && length(opt.chanlocs) > 1
                 metaplottopo(tmpdata, 'chanlocs', opt.chanlocs, 'plotfunc', 'plotcurve', ...
                     'plotargs', { plotopt{:} }, 'datapos', [2 3], 'title', opt.titles{c,g});
