@@ -19,8 +19,9 @@
 %                 not been well characterized. {default: binica(), if
 %                 found, else runica()}
 %   'dataset'   - [integer array] dataset index or indices.
-%   'chanind'   - [integer array] subset of channel indices for running
-%                 the ICA decomposition.
+%   'chanind'   - [integer array or cell array] subset of channel indices 
+%                 for running the ICA decomposition. Alternatively, you may
+%                 also enter channel types here in a cell array.
 %   'concatenate' - ['on'|'off'] 'on' concatenate all input datasets 
 %                 (assuming there are several). 'off' run ICA independently
 %                 on each dataset. Default is 'on'.
@@ -189,7 +190,7 @@ if nargin < 2 | selectamica
     options = { 'icatype' allalgs{result{1}} 'dataset' [1:length(ALLEEG)] 'options' eval( [ '{' result{2} '}' ]) };
     if ~isempty(result{3})
         if ~isempty(str2num(result{3})), options = { options{:} 'chanind' str2num(result{3}) };
-        else                             options = { options{:} 'chanind' eeg_chantype(ALLEEG(1).chanlocs, parsetxt(result{3})) }; 
+        else                             options = { options{:} 'chanind' parsetxt(result{3}) }; 
         end;
     end;
     if length(result) > 3
@@ -211,7 +212,7 @@ end;
                             'options'        'cell'    []        {};
                             'concatenate'    'string'  { 'on' 'off' }   'off';
                             'concatcond'     'string'  { 'on' 'off' }   'off';
-                            'chanind'        'integer' []        [];}, ...
+                            'chanind'        { 'cell' 'integer' } { [] [] }        [];}, ...
                             'pop_runica', 'ignore');
 if isstr(g), error(g); end;
 if ~isempty(addoptions), g.options = { g.options{:} addoptions{:}}; end;
@@ -313,6 +314,9 @@ EEG.icaact     = [];
 % -------------------
 if isempty(g.chanind)
     g.chanind = 1:EEG.nbchan;
+end;
+if iscell(g.chanind)
+    g.chanind = eeg_chantype(EEG.chanlocs, g.chanind);
 end;
 EEG.icachansind = g.chanind;
 
