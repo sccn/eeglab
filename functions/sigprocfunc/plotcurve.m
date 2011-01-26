@@ -142,7 +142,7 @@ function plotcurve( times, R, varargin);
           %topoplot(g.plottopo(index,:), g.chanlocs, 'maplimits', 'minmax');
           topoplot(g.plottopo(index,:), g.chanlocs);
           if ~isempty(g.plottopotitle)
-              title(g.plottopotitle{index});
+              title(g.plottopotitle{index}, 'interpreter', 'none');
           end;
       end;
       
@@ -233,25 +233,25 @@ function plotcurve( times, R, varargin);
   % title and legend
   % ----------------
   if strcmpi(g.plotmode, 'topo') % plot in scalp array
-    NAME_OFFSETX = 0.1;
-    NAME_OFFSETY = 0.2;
-    xx = xlim; xmin = xx(1); xdiff = xx(2)-xx(1); xpos = double(xmin+NAME_OFFSETX*xdiff);
-    yy = ylim; ymax = yy(2); ydiff = yy(2)-yy(1); ypos = double(ymax-NAME_OFFSETY*ydiff);
-    t=text(xpos, ypos,g.title); 
-    axis off;
-    line([0 0], [yl(1) yl(2)], 'linewidth', 1, 'color', 'k');
-    line([xl(1) xl(2)], [0 0], 'linewidth', 1, 'color', 'k');
-    set(ax, 'userdata', { g.xlabel g.ylabel g.legend });
+      NAME_OFFSETX = 0.1;
+      NAME_OFFSETY = 0.2;
+      xx = xlim; xmin = xx(1); xdiff = xx(2)-xx(1); xpos = double(xmin+NAME_OFFSETX*xdiff);
+      yy = ylim; ymax = yy(2); ydiff = yy(2)-yy(1); ypos = double(ymax-NAME_OFFSETY*ydiff);
+      t=text(xpos, ypos,g.title);
+      axis off;
+      line([0 0], [yl(1) yl(2)], 'linewidth', 1, 'color', 'k');
+      line([xl(1) xl(2)], [0 0], 'linewidth', 1, 'color', 'k');
+      set(ax, 'userdata', { g.xlabel g.ylabel g.legend });
   else
-    title(g.title)
-    if ~isempty(g.legend)
-        hh = legend(g.legend);
-        set(hh, 'unit', 'pixels', 'interpreter', 'none')      
-    end;
-    if isempty(g.maskarray)
-       xlabel(g.xlabel);
-    end;
-    ylabel(g.ylabel)
+      title(g.title, 'interpreter', 'none')
+      if ~isempty(g.legend)
+          hh = legend(g.legend(:));
+          set(hh, 'unit', 'pixels', 'interpreter', 'none')
+      end;
+      if isempty(g.maskarray)
+          xlabel(g.xlabel);
+      end;
+      ylabel(g.ylabel)
   end;
   
 % -----------------
