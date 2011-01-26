@@ -114,17 +114,18 @@ if strcmpi(opt.parentcluster, 'on')
 else
     % Find the next available cluster index
     % -------------------------------------
-    clusters = [];
     cls = min(max(opt.clusterind), length(unique(opt.clusterind)));
-    nc  = 0; % index of last cluster 
+    nc  = 0; % index of last cluster
     for k =  1:length(STUDY.cluster)
         ti = strfind(STUDY.cluster(k).name, ' ');
         tmp = STUDY.cluster(k).name(ti(end) + 1:end);
         nc = max(nc,str2num(tmp));
         % check if there is a cluster of Notclust components
-        if strcmp(STUDY.cluster(k).parent,STUDY.cluster(STUDY.etc.preclust.clustlevel).name) 
-            STUDY.cluster(k).preclust.preclustparams = STUDY.etc.preclust.preclustparams;
-            clusters = [clusters k];
+        if isfield(STUDY.etc, 'preclust') && isfield(STUDY.etc.preclust, 'preclustparams')
+            if ~isempty(STUDY.cluster(k).parent)
+                strcmp(STUDY.cluster(k).parent,STUDY.cluster(STUDY.etc.preclust.clustlevel).name) 
+                STUDY.cluster(k).preclust.preclustparams = STUDY.etc.preclust.preclustparams;
+            end;
         end
     end
     len = length(STUDY.cluster);
@@ -136,6 +137,16 @@ else
     else
         firstind = 1;
     end
+
+    % create clustlevel if it does not exist
+    % --------------------------------------
+    if ~isfield(STUDY.etc, 'preclust')
+        STUDY.etc.preclust.clustlevel = 1;
+        STUDY.etc.preclust.preclustdata = [];
+    elseif ~isfield(STUDY.etc.preclust, 'clustlevel')
+        STUDY.etc.preclust.clustlevel = 1;
+        STUDY.etc.preclust.preclustdata = [];
+    end;
     
     % create all clusters
     % -------------------
@@ -156,12 +167,10 @@ else
         STUDY.cluster(k+len).algorithm = opt.algorithm;
         STUDY.cluster(k+len).parent{end+1} = STUDY.cluster(STUDY.etc.preclust.clustlevel).name;
         STUDY.cluster(k+len).child = [];
-        if isfield(STUDY.etc, 'preclust')
-            if ~isempty(STUDY.etc.preclust.preclustdata) && all(tmp <= size(STUDY.etc.preclust.preclustdata,1))
-                 STUDY.cluster(k+len).preclust.preclustdata   = STUDY.etc.preclust.preclustdata(tmp,:);
-                 STUDY.cluster(k+len).preclust.preclustparams = STUDY.etc.preclust.preclustparams;
-            else STUDY.cluster(k+len).preclust.preclustdata   = [];
-            end;
+        if ~isempty(STUDY.etc.preclust.preclustdata) && all(tmp <= size(STUDY.etc.preclust.preclustdata,1))
+             STUDY.cluster(k+len).preclust.preclustdata   = STUDY.etc.preclust.preclustdata(tmp,:);
+             STUDY.cluster(k+len).preclust.preclustparams = STUDY.etc.preclust.preclustparams;
+        else STUDY.cluster(k+len).preclust.preclustdata   = [];
         end;
         STUDY.cluster(k+len) = std_setcomps2cell(STUDY, k+len);
 
