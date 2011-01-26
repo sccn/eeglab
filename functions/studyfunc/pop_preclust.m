@@ -79,6 +79,13 @@ if ~isstr(varargin{1}) %intial settings
                  'indicate missing datasets. FOR CLUSTERING, YOU MAY ONLY' 10 ...
                  'USE DIPOLE OR SCALP MAP CLUSTERING.' ]);
     end;
+    if length(STUDY.design(STUDY.currentdesign).cases.value) ~= length(STUDY.subject)
+        warndlg2( [ 'pop_preclust error: some subjects have been excluded.' 10 ...
+                 'All subjects must be included for clustering. You will' 10 ...
+                 'then be able to select a different design (and keep the' 10 ...
+                 'clustered components) if you wish to exclude a subject.' ]);
+        return;
+    end
     
     % cluster text
     % ------------
