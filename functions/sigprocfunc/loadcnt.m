@@ -573,7 +573,7 @@ end
 %%%% to change offest in bytes to points 
 if ~isempty(ev2)
     if r.sample1 ~= 0
-        fprintf(2,'Warning: events imported with a time shift might be innacurate (bug 661)\n');
+        fprintf(2,'Warning: events imported with a time shift might be innacurate\n');
     end;
     ev2p=ev2; 
     ioff=900+(h.nchannels*75); %% initial offset : header + electordes desc 
