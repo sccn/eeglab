@@ -70,13 +70,14 @@ elseif EEG.trials > 1
 end
 
 if nargin > 1 && ~isstr(varargin{1})
-    if nargin >= 2, options = { 'recurrence' varargin{1} }; end;
-    if nargin >= 3, options = { 'limits'     varargin{2} }; end;
-    if nargin >= 4, options = { 'rmbase'     varargin{3} }; end;
+    options = {};
+    if nargin >= 2, options = { options{:} 'recurrence' varargin{1} }; end;
+    if nargin >= 3, options = { options{:} 'limits'     varargin{2} }; end;
+    if nargin >= 4, options = { options{:} 'rmbase'     varargin{3} }; end;
 else
     options = varargin;
 end;
-g = finputcheck(varargin, { 'recurrence'    'real'  []  1;
+g = finputcheck(options, { 'recurrence'    'real'  []  1;
                             'limits'        'real'  []  [0 1];
                             'rmbase'        'real'  []  0;
                             'eventtype'     'string' {} 'X';
