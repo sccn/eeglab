@@ -223,7 +223,7 @@ Ievent = sort(Ievent);
 alllatencies = tmpeventlatency(Ievent);
 
 if isempty(alllatencies)
-   error('pop_epoch(): empty event range'); return;
+   error('pop_epoch(): empty epoch range (no epochs were found).'); return;
 end;
 fprintf('pop_epoch():%d epochs selected\n', length(alllatencies));
 
