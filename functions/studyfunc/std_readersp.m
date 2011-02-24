@@ -1,9 +1,9 @@
-% std_readersp() - load spectrum measures for data channels or 
+% std_readersp() - load ERSP measures for data channels or 
 %                  for all components of a specified cluster.
 %                  Called by plotting functions
 %                  std_envtopo(), std_erpplot(), std_erspplot(), ...
 % Usage:
-%         >> [STUDY, specdata, allfreqs, setinds, cinds] = ...
+%         >> [STUDY, erspdata, times, freqs] = ...
 %                   std_readersp(STUDY, ALLEEG, varargin);
 % Inputs:
 %       STUDY - studyset structure containing some or all files in ALLEEG
@@ -23,9 +23,9 @@
 %  STUDY    - updated studyset structure
 %  erspdata - [cell array] ERSP data (the cell array size is 
 %             condition x groups)
+%  times    - [float array] array of time points
 %  freqs    - [float array] array of frequencies
-%  setinds  - [cell array] datasets indices
-%  cinds    - [cell array] channel or component indices
+%  erspbase - [cell array] baseline values
 %
 % Author: Arnaud Delorme, CERCO, 2006-
 
