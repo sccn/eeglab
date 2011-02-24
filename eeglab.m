@@ -359,10 +359,9 @@ catchstrs.update_study           = e_load_study;
                     disp(['Adding path to ' eeglabpath 'external' filesep dircontent{index}]);
                 end;
                 if ~isempty(findstr('fieldtrip', lower(dircontent{index})))
-                    addpathexist([p 'external' filesep dircontent{index} filesep 'fileio' ]);
                     addpathexist([p 'external' filesep dircontent{index} filesep 'forward' ]);
                     addpathexist([p 'external' filesep dircontent{index} filesep 'inverse' ]);
-                    addpathexist([p 'external' filesep dircontent{index} filesep 'public' ]);
+                    addpathexist([p 'external' filesep dircontent{index} filesep 'utilities' ]);
                     addpathexist([p 'external' filesep dircontent{index} ]);
                     disp(['Adding path to ' eeglabpath 'external' filesep dircontent{index} ' subfolders' ]);
                 end;
@@ -816,7 +815,7 @@ catchstrs.update_study           = e_load_study;
                                    '''(see www2.ru.nl/fcdonders/fieldtrip/doku.php?id=fieldtrip:dataformat (FILEIO) and'',' ...
                                    '''biosig.sourceforge.net/SupportedSystems.html (BIOSIG) for supported file formats)'',' ...
                                    ''' ''));' ];
-    if exist('read_event')
+    if exist('ft_chantype')
         uimenu( neuro_m, 'Label', 'From other formats using FILE-IO toolbox'  , 'CallBack', cb_fileio, 'separator', 'on'); 
     end;
     if biosigflag
