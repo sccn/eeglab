@@ -1,0 +1,448 @@
+function [vol, sens] = ft_prepare_vol_sens(vol, sens, varargin)
+
+% FT_PREPARE_VOL_SENS does some bookkeeping to ensure that the volume
+% conductor model and the sensor array are ready for subsequent forward
+% leadfield computations. It takes care of some pre-computations that can
+% be done efficiently prior to the leadfield calculations.
+%
+% Use as
+%   [vol, sens] = ft_prepare_vol_sens(vol, sens, ...)
+% with input arguments
+%   sens   structure with gradiometer or electrode definition
+%   vol    structure with volume conductor definition
+%
+% The vol structure represents a volume conductor model, its contents
+% depend on the type of model. The sens structure represents a sensor
+% array, i.e. EEG electrodes or MEG gradiometers.
+%
+% Additional options should be specified in key-value pairs and can be
+%   'channel'    cell-array with strings (default = 'all')
+%   'order'      number, for single shell "Nolte" model (default = 10)
+%
+% The detailled behaviour of this function depends on whether the input
+% consists of EEG or MEG and furthermoree depends on the type of volume
+% conductor model:
+% - in case of EEG single and concentric sphere models, the electrodes are
+%   projected onto the skin surface.
+% - in case of EEG boundary element models, the electrodes are projected on
+%   the surface and a blilinear interpoaltion matrix from vertices to
+%   electrodes is computed.
+% - in case of MEG and a multispheres model, a local sphere is determined
+%   for each coil in the gradiometer definition.
+%  - in case of MEG with a singleshell Nolte model, the volume conduction
+%    model is initialized
+% In any case channel selection and reordering will be done. The channel
+% order returned by this function corresponds to the order in the 'channel'
+% option, or if not specified, to the order in the input sensor array.
+%
+% See also FT_READ_VOL, FT_READ_SENS, FT_TRANSFORM_VOL, FT_TRANSFORM_SENS, FT_COMPUTE_LEADFIELD
+
+% Copyright (C) 2004-2009, Robert Oostenveld
+%
+% This file is part of FieldTrip, see http://www.ru.nl/neuroimaging/fieldtrip
+% for the documentation and details.
+%
+%    FieldTrip is free software: you can redistribute it and/or modify
+%    it under the terms of the GNU General Public License as published by
+%    the Free Software Foundation, either version 3 of the License, or
+%    (at your option) any later version.
+%
+%    FieldTrip is distributed in the hope that it will be useful,
+%    but WITHOUT ANY WARRANTY; without even the implied warranty of
+%    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%    GNU General Public License for more details.
+%
+%    You should have received a copy of the GNU General Public License
+%    along with FieldTrip. If not, see <http://www.gnu.org/licenses/>.
+%
+% $Id: ft_prepare_vol_sens.m 2833 2011-02-06 20:19:54Z crimic $
+
+% get the options
+% fileformat = keyval('fileformat',  varargin);
+channel = keyval('channel',  varargin);  % cell-array with channel labels
+order   = keyval('order',    varargin);  % order of expansion for Nolte method; 10 should be enough for real applications; in simulations it makes sense to go higher
+
+% set the defaults
+if isempty(channel),  channel = sens.label;   end
+if isempty(order),    order = 10;             end
+
+% determine whether the input contains EEG or MEG sensors
+iseeg = ft_senstype(sens, 'eeg');
+ismeg = ft_senstype(sens, 'meg');
+
+% determine the skin compartment
+if ~isfield(vol, 'skin_surface')
+  if isfield(vol, 'bnd')
+    vol.skin_surface   = find_outermost_boundary(vol.bnd);
+  elseif isfield(vol, 'r') && length(vol.r)<=4
+    [dum, vol.skin_surface] = max(vol.r);
+  end
+end
+
+% determine the inner_skull_surface compartment
+if ~isfield(vol, 'inner_skull_surface')
+  if isfield(vol, 'bnd')
+    vol.inner_skull_surface  = find_innermost_boundary(vol.bnd);
+  elseif isfield(vol, 'r') && length(vol.r)<=4
+    [dum, vol.inner_skull_surface] = min(vol.r);
+  end
+end
+
+% otherwise the voltype assignment to an empty struct below won't work
+if isempty(vol)
+  vol = [];
+end
+
+% this makes them easier to recognise
+sens.type = ft_senstype(sens);
+vol.type  = ft_voltype(vol);
+
+
+if isfield(vol, 'unit') && isfield(sens, 'unit') && ~strcmp(vol.unit, sens.unit)
+  error('inconsistency in the units of the volume conductor and the sensor array');
+end
+
+if ismeg && iseeg
+  % this is something that could be implemented relatively easily
+  error('simultaneous EEG and MEG not yet supported');
+
+elseif ~ismeg && ~iseeg
+  error('the input does not look like EEG, nor like MEG');
+
+elseif ismeg
+  
+  % keep a copy of the original sensor array, this is needed for the MEG multisphere model
+  sens_orig = sens;
+  
+  % always ensure that there is a linear transfer matrix for combining the coils into gradiometers
+  if ~isfield(sens, 'tra');
+    Nchans = length(sens.label);
+    Ncoils = size(sens.pnt,1);
+    if Nchans~=Ncoils
+      error('inconsistent number of channels and coils');
+    end
+    sens.tra = sparse(eye(Nchans, Ncoils));
+  end
+
+  % select the desired channels from the gradiometer array
+  % order them according to the users specification
+  [selchan, selsens] = match_str(channel, sens.label);
+
+  % first only modify the linear combination of coils into channels
+  sens.label = sens.label(selsens);
+  sens.tra   = sens.tra(selsens,:);
+  % subsequently remove the coils that do not contribute to any sensor output
+  selcoil  = find(sum(sens.tra,1)~=0);
+  sens.pnt = sens.pnt(selcoil,:);
+  sens.ori = sens.ori(selcoil,:);
+  sens.tra = sens.tra(:,selcoil);
+
+  switch ft_voltype(vol)
+    case 'infinite'
+      % nothing to do
+
+    case 'singlesphere'
+      % nothing to do
+
+    case 'concentric'
+      % nothing to do
+
+    case 'neuromag'
+      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+      % if the forward model is computed using the external Neuromag toolbox,
+      % we have to add a selection of the channels so that the channels
+      % in the forward model correspond with those in the data.
+      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+      [selchan, selsens] = match_str(channel, sens.label);
+      vol.chansel = selsens;
+
+    case 'multisphere'
+      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+      % If the volume conduction model consists of multiple spheres then we
+      % have to match the channels in the gradiometer array and the volume
+      % conduction model.
+      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+      % use the original sensor array instead of the one with a subset of
+      % channels, because we need the complete mapping of coils to channels 
+      sens = sens_orig;
+      
+      % remove the coils that do not contribute to any channel output
+      % since these do not have a corresponding sphere
+      selcoil  = find(sum(sens.tra,1)~=0);
+      sens.pnt = sens.pnt(selcoil,:);
+      sens.ori = sens.ori(selcoil,:);
+      sens.tra = sens.tra(:,selcoil);
+
+      % the initial multisphere volume conductor has a local sphere per
+      % channel, whereas it should have a local sphere for each coil
+      if size(vol.r,1)==size(sens.pnt,1) && ~isfield(vol, 'label')
+        % it appears that each coil already has a sphere, which suggests
+        % that the volume conductor already has been prepared to match the
+        % sensor array
+        return
+      elseif size(vol.r,1)==size(sens.pnt,1) && isfield(vol, 'label')
+        if ~isequal(vol.label(:), sens.label(:))
+          % if only the order is different, it would be possible to reorder them
+          error('the coils in the volume conduction model do not correspond to the sensor array');
+        else
+          % the coil-specific spheres in the volume conductor should not have a label
+          % because the label is already specified for the coils in the
+          % sensor array
+          vol = rmfield(vol, 'label');
+        end
+        return
+      end
+
+      % the CTF way of representing the headmodel is one-sphere-per-channel
+      % whereas the FieldTrip way of doing the forward computation is one-sphere-per-coil
+      Nchans   = size(sens.tra,1);
+      Ncoils   = size(sens.tra,2);
+      Nspheres = size(vol.label);
+      
+      if isfield(vol, 'orig')
+        % these are present in a CTF *.hdm file
+        singlesphere.o(1,1) = vol.orig.MEG_Sphere.ORIGIN_X;
+        singlesphere.o(1,2) = vol.orig.MEG_Sphere.ORIGIN_Y;
+        singlesphere.o(1,3) = vol.orig.MEG_Sphere.ORIGIN_Z;
+        singlesphere.r      = vol.orig.MEG_Sphere.RADIUS;
+        % ensure consistent units
+        singlesphere = ft_convert_units(singlesphere, vol.unit);
+        % determine the channels that do not have a corresponding sphere
+        % and use the globally fitted single sphere for those
+        missing = setdiff(sens.label, vol.label);
+        if ~isempty(missing)
+          warning('using the global fitted single sphere for %d channels that do not have a local sphere', length(missing));
+        end
+        for i=1:length(missing)
+          vol.label(end+1) = missing(i);
+          vol.r(end+1,:)   = singlesphere.r;
+          vol.o(end+1,:)   = singlesphere.o;
+        end
+      end
+
+      multisphere = [];
+      % for each coil in the MEG helmet, determine the corresponding channel and from that the corresponding local sphere 
+      for i=1:Ncoils
+        coilindex = find(sens.tra(:,i)~=0); % to which channel does this coil belong
+        if length(coilindex)>1
+          % this indicates that there are multiple channels to which this coil contributes,
+          % which happens if the sensor array represents a synthetic higher-order gradient.
+          [dum, coilindex] = max(abs(sens.tra(:,i)));
+        end
+
+        coillabel = sens.label{coilindex};                    % what is the label of this channel
+        chanindex = strmatch(coillabel, vol.label, 'exact');  % what is the index of this channel in the list of local spheres
+        multisphere.r(i,:) = vol.r(chanindex);
+        multisphere.o(i,:) = vol.o(chanindex,:);
+      end
+      vol = multisphere;
+      
+      % finally do the selection of channels and coils
+      % order them according to the users specification
+      [selchan, selsens] = match_str(channel, sens.label);
+      
+      % first only modify the linear combination of coils into channels
+      sens.label = sens.label(selsens);
+      sens.tra   = sens.tra(selsens,:);
+      % subsequently remove the coils that do not contribute to any sensor output
+      selcoil  = find(sum(sens.tra,1)~=0);
+      sens.pnt = sens.pnt(selcoil,:);
+      sens.ori = sens.ori(selcoil,:);
+      sens.tra = sens.tra(:,selcoil);
+      % make the same selection of coils in the multisphere model
+      vol.r = vol.r(selcoil);
+      vol.o = vol.o(selcoil,:);
+
+    case 'nolte'
+      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+      % if the forward model is computed using the code from Guido Nolte, we
+      % have to initialize the volume model using the gradiometer coil
+      % locations
+      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+      % compute the surface normals for each vertex point
+      if ~isfield(vol.bnd, 'nrm')
+        fprintf('computing surface normals\n');
+        vol.bnd.nrm = normals(vol.bnd.pnt, vol.bnd.tri);
+      end
+
+      % estimate center and radius
+      [center,radius] = fitsphere(vol.bnd.pnt);
+
+      % initialize the forward calculation (only if gradiometer coils are available)
+      if size(sens.pnt,1)>0
+        vol.forwpar = meg_ini([vol.bnd.pnt vol.bnd.nrm], center', order, [sens.pnt sens.ori]);
+      end
+
+    case 'openmeeg'
+        % nothing ?
+        
+    otherwise
+      error('unsupported volume conductor model for MEG');
+  end
+
+elseif iseeg
+  % select the desired channels from the electrode array
+  % order them according to the users specification
+  if ~isfield(sens, 'tra')
+     Nchans    = length(sens.label);
+     Ncontacts = length(sens.label);
+  else
+     Nchans    = size(sens.tra,1);
+     Ncontacts = size(sens.tra,2);
+  end;
+   
+  % In case of Nchans~=Ncontacts it is difficult to determine 
+  % how to deal with contacts positions (keep the original positions)
+  if Nchans == Ncontacts
+    [selchan, selsens] = match_str(channel, sens.label);
+    sens.label = sens.label(selsens);
+    sens.pnt = sens.pnt(selsens,:);
+  else
+    warning('A sub-selection of channels will not be taken into account')
+  end
+  
+  % create a 2D projection and triangulation
+  try 
+    sens.prj   = elproj(sens.pnt);
+    sens.tri   = delaunay(sens.prj(:,1), sens.prj(:,2));
+  catch
+    warning('2D projection not done')
+  end
+  
+  switch ft_voltype(vol)
+    case 'infinite'
+      % nothing to do
+
+    case 'halfspace'
+      pnt    = sens.pnt;
+      if ft_voltype(vol,'halfspace')
+        d = dist(pnt);
+        % scan the electrodes and reposition the ones which are in the
+        % wrong halfspace (projected on the plane)
+        for i=1:size(pnt,1)
+          P = pnt(i,:);
+          is_in_empty = acos(dot(vol.ori,(P-vol.pnt)./norm(P-vol.pnt))) < pi/2;
+          if is_in_empty
+            d = dist(P); 
+            dPplane = -dot(vol.ori, vol.pnt-P, 2);
+            if dPplane>median(d(:))
+              error('Some electrodes are too distant from the plane: consider repositioning them')
+            else
+              % project point on plane
+              Ppr  = [0 0 0];
+              line = [P vol.ori];
+              % get indices of line and plane which are parallel
+              par = abs(dot(vol.ori, line(:,4:6), 2))<1e-14;
+              % difference between origins of plane and line
+              dp = vol.pnt - line(:, 1:3);
+              % Divide only for non parallel vectors (DL)
+              t = dot(vol.ori(~par,:), dp(~par,:), 2)./dot(vol.ori(~par,:), line(~par,4:6), 2);
+              % compute coord of intersection point
+              Ppr(~par, :) = line(~par,1:3) + repmat(t,1,3).*line(~par,4:6);
+              pnt(i,:) = Ppr;
+            end
+          end
+        end
+        sens.pnt = pnt;
+      else
+        error('Wrong volume type')
+      end
+      
+    case {'singlesphere', 'concentric'}
+      % ensure that the electrodes ly on the skin surface
+      radius = max(vol.r);
+      pnt    = sens.pnt;
+      if isfield(vol, 'o')
+        % shift the the centre of the sphere to the origin
+        pnt(:,1) = pnt(:,1) - vol.o(1);
+        pnt(:,2) = pnt(:,2) - vol.o(2);
+        pnt(:,3) = pnt(:,3) - vol.o(3);
+      end
+      distance = sqrt(sum(pnt.^2,2)); % to the center of the sphere
+      if any((abs(distance-radius)/radius)>0.005)
+        warning('electrodes do not lie on skin surface -> using radial projection')
+      end
+      pnt = pnt * radius ./ [distance distance distance];
+      if isfield(vol, 'o')
+        % shift the center back to the original location
+        pnt(:,1) = pnt(:,1) + vol.o(1);
+        pnt(:,2) = pnt(:,2) + vol.o(2);
+        pnt(:,3) = pnt(:,3) + vol.o(3);
+      end
+      sens.pnt = pnt;
+
+    case {'bem', 'dipoli', 'asa', 'avo', 'bemcp', 'openmeeg'}
+      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+      % do postprocessing of volume and electrodes in case of BEM model
+      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+      % project the electrodes on the skin and determine the bilinear interpolation matrix
+      if ~isfield(vol, 'tra')
+        % determine boundary corresponding with skin and inner_skull_surface
+        if ~isfield(vol, 'skin_surface')
+          vol.skin_surface = find_outermost_boundary(vol.bnd);
+          fprintf('determining skin compartment (%d)\n', vol.skin_surface);
+        end
+        if ~isfield(vol, 'source')
+          vol.source = find_innermost_boundary(vol.bnd);
+          fprintf('determining source compartment (%d)\n', vol.source);
+        end
+        if size(vol.mat,1)~=size(vol.mat,2) && size(vol.mat,1)==length(sens.pnt)
+          fprintf('electrode transfer and system matrix were already combined\n');
+        else
+          fprintf('projecting electrodes on skin surface\n');
+          % compute linear interpolation from triangle vertices towards electrodes
+          [el, prj] = project_elec(sens.pnt, vol.bnd(vol.skin_surface).pnt, vol.bnd(vol.skin_surface).tri);
+          tra       = transfer_elec(vol.bnd(vol.skin_surface).pnt, vol.bnd(vol.skin_surface).tri, el);
+          
+          % replace the original electrode positions by the projected positions
+          sens.pnt = prj;
+
+          if size(vol.mat,1)==size(vol.bnd(vol.skin_surface).pnt,1)
+            % construct the transfer from only the skin vertices towards electrodes
+            interp = tra;
+          else
+            % construct the transfer from all vertices (also inner_skull_surface/outer_skull_surface) towards electrodes
+            interp = [];
+            for i=1:length(vol.bnd)
+              if i==vol.skin_surface
+                interp = [interp, tra];
+              else
+                interp = [interp, zeros(size(el,1), size(vol.bnd(i).pnt,1))];
+              end
+            end
+          end
+
+          % incorporate the linear interpolation matrix and the system matrix into one matrix
+          % this speeds up the subsequent repeated leadfield computations
+          fprintf('combining electrode transfer and system matrix\n');
+          if strcmp(ft_voltype(vol), 'openmeeg')
+            nb_points_external_surface = size(vol.bnd(vol.skin_surface).pnt,1);
+            vol.mat = vol.mat((end-nb_points_external_surface+1):end,:);            
+            vol.mat = interp(:,1:nb_points_external_surface) * vol.mat;
+          else
+            % convert to sparse matrix to speed up the subsequent multiplication
+            interp  = sparse(interp);
+            vol.mat = interp * vol.mat;
+            % ensure that the model potential will be average referenced
+            avg = mean(vol.mat, 1);
+            vol.mat = vol.mat - repmat(avg, size(vol.mat,1), 1);
+          end
+        end
+      end
+      
+    otherwise
+      error('unsupported volume conductor model for EEG');
+  end
+
+  % FIXME this needs carefull thought to ensure that the average referencing which is now done here and there, and that the linear interpolation in case of BEM are all dealt with consistently
+  % % always ensure that there is a linear transfer matrix for
+  % % rereferencing the EEG potential
+  % if ~isfield(sens, 'tra');
+  %   sens.tra = sparse(eye(length(sens.label)));
+  % end
+
+end % if iseeg or ismeg
+

@@ -1,0 +1,62 @@
+function [shape] = ft_transform_headshape(transform, shape)
+
+% FT_TRANSFORM_HEADSHAPE applies a homogenous coordinate transformation to a
+% structure with headshape and fiducial information.
+%
+% Use as
+%   shape = ft_transform_headshape(transform, shape)
+%
+% See also FT_READ_HEADSHAPE
+
+% Copyright (C) 2008, Robert Oostenveld
+%
+% This file is part of FieldTrip, see http://www.ru.nl/neuroimaging/fieldtrip
+% for the documentation and details.
+%
+%    FieldTrip is free software: you can redistribute it and/or modify
+%    it under the terms of the GNU General Public License as published by
+%    the Free Software Foundation, either version 3 of the License, or
+%    (at your option) any later version.
+%
+%    FieldTrip is distributed in the hope that it will be useful,
+%    but WITHOUT ANY WARRANTY; without even the implied warranty of
+%    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%    GNU General Public License for more details.
+%
+%    You should have received a copy of the GNU General Public License
+%    along with FieldTrip. If not, see <http://www.gnu.org/licenses/>.
+%
+% $Id: ft_transform_headshape.m 946 2010-04-21 17:51:16Z roboos $
+
+if any(transform(4,:) ~= [0 0 0 1])
+  error('invalid transformation matrix');
+end
+
+if isfield(shape, 'pnt') && ~isempty(shape.pnt)
+  % this also works if the structure describes electrode or gradiometer positions instead of a headshape
+  shape.pnt = apply(transform, shape.pnt);
+end
+
+if isfield(shape, 'ori')
+  % gradiometer coil orientations should only be rotated and not translated
+  rotation = eye(4);
+  rotation(1:3,1:3) = transform(1:3,1:3);
+  if abs(det(rotation)-1)>10*eps
+    error('only a rigid body transformation without rescaling is allowed for MEG sensors');
+  end
+  % apply the rotation to the coil orientations
+  shape.ori = apply(rotation, sens.ori);
+end
+
+if isfield(shape, 'fid') && isfield(shape.fid, 'pnt')
+  % apply the same transformation on the fiducials
+  shape.fid.pnt = apply(transform, shape.fid.pnt);
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SUBFUNCTION that applies the homogenous transformation
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function [new] = apply(transform, old)
+old(:,4) = 1;
+new = old * transform';
+new = new(:,1:3);
