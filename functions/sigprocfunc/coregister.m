@@ -11,8 +11,7 @@
 %                 subsequently recorded or nominally identified (e.g., 'Cz') sets of 
 %                 channel head locations to the reference locations. 
 %                 Both channel locations and/or fiducial (non-electrode) 
-%                 locations can then be used by coregister() to linearly
-%                 align 
+%                 locations can then be used by coregister() to linearly align 
 %                 or nonlinearly warp a given or measured montage to the reference 
 %                 locations. In its (default) manual mode, coregister() produces 
 %                 an interactive gui showing the imported and reference channel 
@@ -121,7 +120,7 @@
 %       automatic coregistration.
 %
 % Author: Arnaud Delorme, SCCN/INC/UCSD, 2005-06
-        
+
 % Copyright (C) Arnaud Delorme, SCCN, INC, UCSD, 2005, arno@salk.edu
 %
 % This program is free software; you can redistribute it and/or modify
@@ -179,17 +178,14 @@ if ischar(chanlocs1)
         dat = get(fid, 'userdata');
         if strcmpi(com, 'fiducials')
             [clist1 clist2] = pop_chancoresp( dat.elec1, dat.elec2, 'autoselect', 'fiducials');
-            if isempty(clist1) || isempty(clist2), return; end;
-            
-            %try,
+            try,
                 [ tmp transform ] = align_fiducials(dat.elec1, dat.elec2, dat.elec1.label(clist1), dat.elec2.label(clist2));
                 if ~isempty(transform), dat.transform = transform; end;
-            %catch,
-            %    warndlg2(strvcat('Transformation failed', lasterr));
-            %end;
+            catch,
+                warndlg2(strvcat('Transformation failed', lasterr));
+            end;
         elseif strcmpi(com, 'warp')
             [clist1 clist2] = pop_chancoresp( dat.elec1, dat.elec2, 'autoselect', 'all');
-            if isempty(clist1) || isempty(clist2), return; end;
 
             % copy electrode names
             if ~isempty(clist1)
@@ -245,8 +241,7 @@ if ~isempty(g.mesh)
             if isfield(g.mesh, 'vol')
                 if isfield(g.mesh.vol, 'r')
                     [X Y Z] = sphere(50);
-                    dat.meshpnt = ...
-        { X*max(g.mesh.vol.r) Y*max(g.mesh.vol.r) Z*max(g.mesh.vol.r) };
+                    dat.meshpnt = { X*max(g.mesh.vol.r) Y*max(g.mesh.vol.r) Z*max(g.mesh.vol.r) };
                     dat.meshtri = [];
                 else
                     dat.meshpnt = g.mesh.vol.bnd(1).pnt;
@@ -330,11 +325,11 @@ else
                 for index = 1:length(clist2)
                     tmpelec2.label{clist2(index)} = elec1.label{clist1(index)};
                 end;
-                %try,
+                try,
                     [ electransf dat.transform ] = warp_chans(elec1, elec2, tmpelec2.label(clist2), 'traditional');
-                %catch,
-                %    warndlg2(strvcat('Transformation failed', lasterr));
-                %end;
+                catch,
+                    warndlg2(strvcat('Transformation failed', lasterr));
+                end;
             end;
         else
             [ electransf dat.transform ] = warp_chans(elec1, elec2, g.warp, g.warpmethod);
@@ -390,8 +385,7 @@ if 1
     cbresizez = [ header 'dattmp.transform(9) = str2num(get(gcbo, ''string''));' footer ];
     cb_ok     = 'set(gcbo, ''userdata'', ''ok'')';
     cb_warp   = 'coregister(''warp'', gcbf);';
-    %cb_fid    = 'coregister(''fiducials'', gcbf);';
-    cb_fid    = 'warndlg2([ ''Because of recent changes in Fieldtrip re-aligning'' 10 ''functions, re-align fiducials is no longer working.'' 10 ''Download and use EEGLAB 6.03 instead to align montages'' 10 ''and copy the content of the Coregister edit box'' 10 ''to the DIPFIT setting of this version.'']);';
+    cb_fid    = 'coregister(''fiducials'', gcbf);';
     
     opt = { 'unit', 'normalized', 'position' };
     h = uicontrol( opt{:}, [0    .15  1  .02], 'style', 'text', 'string', '');
@@ -604,10 +598,9 @@ function [elec1, transf] = align_fiducials(elec1, elec2, fidnames1, fidnames2)
     cfg          = [];
     cfg.elec     = elec1;
     cfg.template = elec2;
-    cfg.method   = 'fiducial';
-    cfg.warp     = 'globalrescale';
+    cfg.method   = 'realignfiducial'; 
     cfg.fiducial = fidnames2;
-    elec3 = ft_electroderealign(cfg);
+    elec3 = electroderealign(cfg);
     transf = homogenous2traditional(elec3.m);
     
     % test difference
@@ -647,11 +640,10 @@ function [elec1, transf] = warp_chans(elec1, elec2, chanlist, warpmethod)
     cfg          = [];
     cfg.elec     = elec1;
     cfg.template = elec2;
-    cfg.method   = 'template';
-    cfg.warp     = warpmethod;
+    cfg.method   = warpmethod;
     %cfg.feedback = 'yes';
     cfg.channel  = chanlist;
-    elec3 = ft_electroderealign(cfg);
+    elec3 = electroderealign(cfg);
     [tmp ind1 ] = intersect( lower(elec1.label), lower(chanlist) );
     [tmp ind2 ] = intersect( lower(elec2.label), lower(chanlist) );
     
