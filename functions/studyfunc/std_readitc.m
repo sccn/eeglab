@@ -1,38 +1,30 @@
-% std_readitc() - returns the log-frequency inter-trial coherence (ITC) for a 
-%                 specified ICA component. The component ITCs for the dataset 
-%                 are assumed to have been saved in a Matlab file, 
-%                 [dataset_)name].icaitc, in the same directory as the dataset.
-%                 If no such file exists, use std_ersp() to create it, else 
-%                 the pre-clustering functions that call it: pop_preclust, 
-%                 std_preclust().  The input variables used to compute the
-%                 ITC are returnsd: frequency_range, time_range, resolution, 
-%                 probability_threshold, and wavelet type (FFT | wavelet 
-%                 cycles). See timef() for details. 
-% Usage:    
-%   >> [logitc, logfreqs, times] = std_readitc(ALLEEG, setindx, component, ...
-%                                                       time_range, freq_range);  
+% std_readitc()  - load ITC measures for data channels or 
+%                  for all components of a specified cluster.
+% Usage:
+%         >> [STUDY, itcdata, times, freqs] = ...
+%                   std_readitc(STUDY, ALLEEG, varargin);
 % Inputs:
-%   ALLEEG     - EEG dataset vector (can also be an EEG set). 
-%                Must contain the dataset of interest (see 'setindx' below).
-%   setindx    -  [integer] index of the EEG dataset in ALLEEG for which 
-%                 to return the log-frequency ITC.
-%   component  - [integer] component index in the selected EEG dataset for 
-%                which to return the ITC. 
-%   time_range - [min max in ms] ITC time window 
-%   freq_range - [min max in Hz] ITC frequency range 
+%       STUDY - studyset structure containing some or all files in ALLEEG
+%      ALLEEG - vector of loaded EEG datasets
 %
-% Outputs:
-%   logitc     - the equal log-spaced frequency ITC for the requested ICA 
-%                component in the specified dataset. Its dimensions are 
-%                (equal log-spaced) frequencies by times. 
-%   logfreqs   - vector of ITC (log-spaced) frequencies, in Hz
-%   times      - vector of ITC times (latencies), in ms.
-%   params     - full structure of ITC parameters saved
+% Optional inputs:
+%  'channels'  - [cell] list of channels to import {default: all}
+%  'clusters'  - [integer] list of clusters to import {[]|default: all but
+%                the parent cluster (1) and any 'NotClust' clusters}
+%  'freqrange' - [min max] frequency range {default: whole measure range}
+%  'subject'    - [string] select a specific subject {default:all}
+%  'component'  - [integer] select a specific component in a cluster
+%                 {default:all}
+%  'singletrials' - ['on'|'off'] load single trials data (if available)
 %
-%  See also  std_ersp(), std_readersp(), pop_preclust(), eeg_preclust(), 
-%               eeg_createdata()
+% Output:
+%  STUDY    - updated studyset structure
+%  itcdata  - [cell array] ITC data (the cell array size is 
+%             condition x groups)
+%  times    - [float array] array of time points
+%  freqs    - [float array] array of frequencies
 %
-% Authors: Arnaud Delorme, SCCN, INC, UCSD, February, 2005
+% Author: Arnaud Delorme, CERCO, 2006-
 
 % Copyright (C) Arnaud Delorme, SCCN, INC, UCSD, October 11, 2004, arno@sccn.ucsd.edu
 %
@@ -50,7 +42,10 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [logitc, logfreqs, timevals, params] = std_readitc(ALLEEG, abset, comp, timewindow, freqrange);
+function [STUDY, erspdata, alltimes, allfreqs, erspbase] = std_readersp(STUDY, ALLEEG, varargin);
+
+[STUDY, erspdata, alltimes, allfreqs] = std_readersp(STUDY, ALLEEG, 'infotype','itc', varargin{:});
+return;
 
 if nargin < 4
     timewindow = [];
