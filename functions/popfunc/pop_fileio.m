@@ -50,7 +50,7 @@ if nargin < 1
     % open file to get infos
     % ----------------------
     disp('Reading data file header...');
-    dat = read_header(filename);
+    dat = ft_read_header(filename);
     uilist   = { { 'style' 'text' 'String' 'Channel list (defaut all):' } ...
                  { 'style' 'edit' 'string' '' } ...
                  { 'style' 'text' 'String' [ 'Data range (in sample points) (default all [1 ' int2str(dat.nSamples) '])' ] } ...
@@ -111,7 +111,7 @@ end
 % --------------
 disp('Reading events...');
 try
-    event = read_event(filename);
+    event = ft_read_event(filename);
 catch, disp(lasterr); event = []; end;
 if ~isempty(event)
     subsample = 0;
