@@ -181,25 +181,6 @@ if isempty(chans) || ~isnumeric(chans)
         chaninfo      = orichaninfo;
     end;
 
-    % insert "no data channels" in channel structure
-    % ----------------------------------------------
-    nbchan = length(chans);
-    [chans chaninfo] = insertchans(chans, chaninfo, nchansori);
-    
-    allfields = { 'labels' 'theta' 'radius' 'X' 'Y' 'Z' 'sph_theta' 'sph_phi' 'sph_radius' 'type' 'ref' 'urchan' 'datachan' };
-
-    if isfield(chans, 'shrink')
-        icadefs;
-        if SHRINKWARNING
-            warndlg2( [ 'You are currently shrinking channel locations for display.' 10 ...
-                'A new option (more anatomically correct) is to plot channels' 10 ...
-                'outside head limits so the shrink option has been disabled.' 10 ...
-                '(Edit the icadefs file to disable this message)' ], 'Shrink factor warning');
-        end;
-        chans = rmfield(chans, 'shink');
-    end;
-    [chans shrinkorskirt plotrad] = checkchans(chans, allfields);
-
     % dealing with additional parameters
     % ----------------------------------
     if nargin > 1 && ~isstr(orichaninfo), % nothing
@@ -211,17 +192,27 @@ if isempty(chans) || ~isnumeric(chans)
         end;
     elseif nargin > 1 && ~isempty(orichaninfo) && isstr(orichaninfo)
         varargin = { orichaninfo varargin{:} };
-        chaninfo.shrink        = shrinkorskirt;
-        chaninfo.plotrad       = plotrad;
-    else
-        if ~isfield(chaninfo, 'shrink'),  chaninfo.shrink  = []; end;
-        if ~isfield(chaninfo, 'plotrad'), chaninfo.plotrad = []; end;
+        if isequal(orichaninfo, chaninfo)
+            chaninfo    = [];
+        end;
+        orichaninfo = [];
+    end;
+    
+    % insert "no data channels" in channel structure
+    % ----------------------------------------------
+    nbchan = length(chans);
+    [tmp chaninfo chans] = eeg_checkchanlocs(chans, chaninfo);
+
+    if isfield(chaninfo, 'shrink') && ~isempty(chaninfo.shrink)
+        icadefs;
+        if SHRINKWARNING
+            warndlg2( [ 'You are currently shrinking channel locations for display.' 10 ...
+                'A new option (more anatomically correct) is to plot channels' 10 ...
+                'outside head limits so the shrink option has been disabled.' 10 ...
+                '(Edit the icadefs file to disable this message)' ], 'Shrink factor warning');
+        end;
     end;
 
-    nosevals       = { '+X' '-X' '+Y' '-Y' };
-    if ~isfield(chaninfo, 'plotrad'), chaninfo.plotrad = []; end;
-    if ~isfield(chaninfo, 'shrink'),  chaninfo.shrink = [];  end;
-    if ~isfield(chaninfo, 'nosedir'), chaninfo.nosedir = nosevals{1}; end;
     oldchaninfo = chaninfo;
 end;
 
@@ -276,6 +267,7 @@ if nargin < 3
 
     % create text and edit for each field
     % -----------------------------------
+    allfields = { 'labels' 'theta' 'radius' 'X' 'Y' 'Z' 'sph_theta' 'sph_phi' 'sph_radius' 'type' 'ref' 'urchan' 'datachan' };
     for index = 1:length(allfields)-1
         cbfield = [ 'valnumtmp   = str2num(get(findobj(gcbf, ''tag'', ''chaneditnumval''), ''string''));' ...
                     'pop_chanedit(gcbf, [], ''changefield'', { valnumtmp ''' allfields{index} ''' get(gcbo, ''string'') });' ...
@@ -392,7 +384,7 @@ else
     for curfield = 1:2:length(args)
         switch lower(args{curfield})
             case 'return'
-                [tmpchans tmpfid] = getnodatchan(chans);
+                [tmpchans] = eeg_checkchanlocs(chans);
                 if nchansori ~= 0 & nchansori ~= length(tmpchans)
                     if ~popask(strvcat(['The number of data channels (' int2str(length(tmpchans)) ') not including fiducials does not'], ...
                             ['correspond to the initial number of channels (' int2str(nchansori) '), so for consistency purposes'], ...
@@ -665,11 +657,13 @@ else
                 if ~isempty(tmpargs),
                     if isstr(tmpargs)
                         [chans] = readlocs(tmpargs);
-                        chaninfo = [];
+                        [tmp tmp2 chans]  = eeg_checkchanlocs(chans);
+                        chaninfo          = [];
                         chaninfo.filename = tmpargs;
                     else
                         [chans] = readlocs(tmpargs{:});
-                        chaninfo = [];
+                        [tmp tmp2 chans]  = eeg_checkchanlocs(chans);
+                        chaninfo          = [];
                         chaninfo.filename = tmpargs{1};
                     end;
                     
@@ -824,7 +818,7 @@ else
                     dipfitdefs;
                     chaninfo.filename = template_models(2).chanfile;
                 end;
-                tmplocs = readlocs( chaninfo.filename, 'defaultelp', 'BESA' );
+                tmplocs = readlocs( chaninfo.filename, 'defaultelp', 'BESA' );                
                 for indexchan = 1:length(chans)
                     if isempty(chans(indexchan).labels), chans(indexchan).labels = ''; end;
                 end;
@@ -904,18 +898,7 @@ if ~isempty(fig)
         end;
     end;
 else
-    % command line call or OK in figure
-    % ---------------------------------
-    if isfield(chans, 'sph_phi_besa'  ), chans = rmfield(chans, 'sph_phi_besa'); end;
-    if isfield(chans, 'sph_theta_besa'), chans = rmfield(chans, 'sph_theta_besa'); end;
-
-    % move no data channels to info structure
-    % ---------------------------------------
-    [chans chaninfo.nodatchans] = getnodatchan(chans);
-    if isfield(chans, 'datachan'), chans = rmfield(chans, 'datachan'); end;
-    if ~isfield(chaninfo, 'nodatchans'), chaninfo.nodatchans = []; end;
-    if ~isempty(chaninfo.nodatchans), chaninfo.nodatchans = rmfield(chaninfo.nodatchans, 'datachan'); end;
-
+    [chans chaninfo] = eeg_checkchanlocs(chans);
     if dataset_input,
          if nchansori == length(chans)
              for index = 1:length(EEG)
@@ -956,101 +939,4 @@ ButtonName=questdlg2( text, ...
 switch lower(ButtonName),
     case 'cancel', num = 0;
     case 'yes',    num = 1;
-end;
-
-% shrink and skirt factors
-% ------------------------
-function [chans, shrinkorskirt, plotrad]= checkchans(chans, fields);
-
-shrinkorskirt = [];
-plotrad  = [];
-if isfield(chans, 'plotrad'),
-    plotrad = chans(1).plotrad;
-    chans = rmfield(chans, 'plotrad');
-    if isstr(plotrad) & ~isempty(str2num(plotrad)), plotrad = str2num(plotrad); end;
-end;
-if isfield(chans, 'shrink')
-    shrinkorskirt = 1;
-    if ~isstr(chans(1).shrink)
-        plotrad = 0.5/(1-chans(1).shrink); % convert old values
-    end;
-    chans = rmfield(chans, 'shrink');
-end;
-
-for index = 1:length(fields)
-    if ~isfield(chans, fields{index})
-        if ~strcmpi(fields{index}, 'datachan')
-            chans = setfield(chans, {1}, fields{index}, []);
-        elseif ~strcmpi(fields{index}, 'type')
-            for indchan = 1:length(chans)
-                chans = setfield(chans, {indchan}, num2str(fields{index}), indchan);
-            end;
-        else
-            for indchan = 1:length(chans)
-                chans = setfield(chans, {indchan}, fields{index}, indchan);
-            end;
-        end;
-    else
-        if strcmpi(fields{index}, 'ref')
-            for indval = 1:length(chans)
-                tmpval = getfield(chans, {indval}, fields{index} );
-                if isempty( tmpval ) & ~isstr( tmpval )
-                    chans = setfield(chans, {indval}, fields{index}, '');
-                end;
-            end;
-        end;
-    end;
-end;
-if exist('orderfields') == 2
-    try,
-        chans = orderfields(chans, fields);
-    catch, end;
-end;
-
-% separate data channels from non-data channels
-% ---------------------------------------------
-function [chans, fids] = getnodatchan(chans)
-if isfield(chans, 'datachan')
-    for ind = 1:length(chans)
-        if isempty(chans(ind).datachan)
-            chans(ind).datachan = 0;
-        end;
-    end;
-    alldatchans = [ chans.datachan ];
-    fids  = chans(find(alldatchans == 0));
-    chans = chans(find(alldatchans));
-else
-    fids = [];
-end;
-
-% fuse data channels and non-data channels
-% ----------------------------------------
-function [chans, chaninfo] = insertchans(chans, chaninfo, nchans)
-if nargin < 3, nchans = length(chans); end;
-for ind = 1:length(chans)
-    chans(ind).datachan = 1;
-end;
-if length(chans) > nchans & nchans ~= 0 % reference at the end of the structure
-    chans(end).datachan = 0;
-end;
-if isfield(chaninfo, 'nodatchans')
-    if ~isempty(chaninfo.nodatchans)
-        chanlen = length(chans);
-        for index = 1:length(chaninfo.nodatchans)
-            fields = fieldnames( chaninfo.nodatchans );
-            ind = chanlen+index;
-            for f = 1:length( fields )
-                chans = setfield(chans, { ind }, fields{f}, getfield( chaninfo.nodatchans, { index },  fields{f}));
-            end;
-            chans(ind).datachan = 0;
-        end;
-        disp('Non-data channels have been added to the end of the channel structure');
-        chaninfo = rmfield(chaninfo, 'nodatchans');
-        
-        % put these channels first
-        % ------------------------
-        % tmp = chans(chanlen+1:end);
-        % chans(length(tmp)+1:end) = chans(1:end-length(tmp));
-        % chans(1:length(tmp)) = tmp;
-    end;
 end;
