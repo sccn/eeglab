@@ -58,7 +58,7 @@ end
 % get the volume conduction model
 if isfield(cfg, 'hdmfile')
   fprintf('reading headmodel from file ''%s''\n', cfg.hdmfile);
-  vol = read_vol(cfg.hdmfile);
+  vol = ft_read_vol(cfg.hdmfile);
 elseif isfield(cfg, 'vol')
   fprintf('using headmodel specified in the configuration\n');
   vol = cfg.vol;
