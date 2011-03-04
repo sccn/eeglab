@@ -22,7 +22,7 @@
 %                  trials {default: 'off' if called from the command line, 
 %                  'on' if called from the gui}
 %   'nogui'      - ['on'|'off'] Do not pop up a gui window to ask for 
-%                  input parameters {default: 'on'}
+%                  input parameters {default: 'off'}
 %
 % Outputs:
 %   EEG          - EEGLAB data structure
@@ -79,7 +79,7 @@ function [EEG, rmep, com ] = pop_autorej(EEG, varargin);
                                   'icacomps'     'real'    []     []; ...
                                   'maxrej'       'real'    []     DEFAULT_MAXREJ; ...
                                   'eegplot'      'string'  { 'on' 'off' }    'off'; ...
-                                  'nogui'        'string'  { 'on' 'off' }    'on'; ...
+                                  'nogui'        'string'  { 'on' 'off' }    'off'; ...
                                   'threshold'    'real'    []     DEFAULT_THRESH }, 'pop_autorej');
     if isstr(opt), error(opt); end;
     
