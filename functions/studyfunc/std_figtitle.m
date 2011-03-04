@@ -112,7 +112,7 @@ for c1 = 1:length(opt.condnames)
         fig_title1 = '';
         for i = 1:length(opt.vals)
             if ~isempty(opt.vals{i}) && ~isnan(opt.vals{i}(1)) 
-                if opt.vals{i}(1) == opt.vals{i}(end), fig_title1 = [ num2str(opt.vals{i}(1)) '' opt.valsunit{i} fig_title];
+                if opt.vals{i}(1) == opt.vals{i}(end), fig_title1 = [ num2str(opt.vals{i}(1)) '' opt.valsunit{i} fig_title1];
                 else                                   fig_title1 = [ num2str(opt.vals{i}(1)) '-' num2str(opt.vals{i}(2)) '' opt.valsunit{i} fig_title1 ];
                 end;
                 if length(opt.vals) > i, fig_title1 = [ ' & ' fig_title1 ]; end;
