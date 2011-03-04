@@ -944,6 +944,7 @@ for inddataset = 1:length(ALLEEG)
         EEG.icaact = [];
     end;
 
+    % -------------
     % check chanlocs
     % -------------
     if ~isfield(EEG, 'chaninfo')
@@ -951,7 +952,7 @@ for inddataset = 1:length(ALLEEG)
     end;
     if ~isempty( EEG.chanlocs )
 
-        % reference
+        % reference (use EEG structure)
         % ---------
         if ~isfield(EEG, 'ref'), EEG.ref = ''; end;
         if strcmpi(EEG.ref, 'averef')
@@ -969,6 +970,8 @@ for inddataset = 1:length(ALLEEG)
             end;
         end;
 
+        % consistency between EEG structure and chanlocs structure
+        % --------------------------------------------------------
         if ~isstruct( EEG.chanlocs)
             if exist( EEG.chanlocs ) ~= 2
                 disp( [ 'eeg_checkset warning: channel file does not exist or is not in Matlab path: filename removed from EEG struct' ]); 
@@ -995,54 +998,8 @@ for inddataset = 1:length(ALLEEG)
                 res = com;
             end;
         end;
-        if isstruct( EEG.chanlocs)
-            if ~ischar(EEG.chanlocs(1).labels)
-                for index = 1:length(EEG.chanlocs)
-                    if ~ischar(EEG.chanlocs(index).labels)
-                        EEG.chanlocs(index).labels = [ 'E' int2str(EEG.chanlocs(index).labels) ];
-                    end;
-                end;
-            end;
-            if isfield(EEG.chanlocs, 'shrink') & isempty(EEG.chanlocs(end).shrink)
-                for index = 1:length(EEG.chanlocs)
-                    EEG.chanlocs(index).shrink = EEG.chanlocs(1).shrink;
-                end;
-            end;
-        end;
-        if isfield( EEG.chanlocs, 'plotrad')
-            EEG.chaninfo.plotrad = EEG.chanlocs(1).plotrad;
-            EEG.chanlocs = rmfield( EEG.chanlocs, 'plotrad');
-        end;
-        if isfield( EEG.chanlocs, 'shrink')
-            EEG.chaninfo.shrink = EEG.chanlocs(1).shrink;
-            EEG.chanlocs = rmfield( EEG.chanlocs, 'shrink');
-        end;
 
-        if isfield(EEG.chanlocs, 'datachan'), EEG.chanlocs = rmfield(EEG.chanlocs, 'datachan'); end;
-        try
-            EEG.chanlocs = orderfields(EEG.chanlocs, { 'labels' 'theta' 'radius' 'X' 'Y' 'Z' 'sph_theta' 'sph_phi' 'sph_radius' 'type' 'urchan' 'ref' });
-        catch, end;
-        if isfield( EEG.chaninfo, 'nodatchan')
-            if ~isfield( EEG.chaninfo.nodatchan, 'ref')
-                EEG.chaninfo.nodatchan(1).ref = '';
-            end;
-            for tmpind = 1:length(EEG.chaninfo.nodatchan)
-                if ~ischar(EEG.chaninfo.nodatchan(tmpind).ref)
-                    EEG.chaninfo.nodatchan(tmpind).ref = '';
-                end;
-            end;
-            if isfield(EEG.chaninfo.nodatchan, 'datachan'), EEG.chaninfo.nodatchan = rmfield(EEG.chaninfo.nodatchan, 'datachan'); end;
-        end;
-
-        % check if duplicate channel label
-        % --------------------------------
-        if isfield(EEG.chanlocs, 'labels')
-            if length( { EEG.chanlocs.labels } ) > length( unique({ EEG.chanlocs.labels } ) )
-                disp('Warning: some channels have the same label');
-            end;
-        end;
-
-        % force Nosedir to +X
+        % force Nosedir to +X (done here because of DIPFIT)
         % -------------------
         if isfield(EEG.chaninfo, 'nosedir')
             if strcmpi(EEG.chaninfo.nosedir, '+x')
@@ -1081,7 +1038,10 @@ for inddataset = 1:length(ALLEEG)
             end;
             EEG.chaninfo.nosedir = '+X';
         end;
-
+        
+        % general checking of channels
+        % ----------------------------
+        EEG = eeg_checkchanlocs(EEG);
     end;
     EEG.chaninfo.icachansind = EEG.icachansind; % just a copy for programming convinience
 
