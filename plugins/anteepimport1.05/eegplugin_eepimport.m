@@ -1,5 +1,5 @@
 % eegplugin_eepimport() - EEGLAB plugin for importing ANT EEProbe data files.
-%                         With this menu it is possible to import and export a continuous CNT file (*.cnt) or 
+%                         With this menu it is possible to import and export a continuous CNT file (*.cnt) or
 %                         an averaged file (*.avr), linked with an event file (*.trg).
 %
 % Usage:
@@ -10,10 +10,10 @@
 %   menu       - [float]  EEGLAB menu handle
 %   trystrs    - [struct] "try" strings for menu callbacks. See notes on EEGLab plugins.
 %                (http://www.sccn.ucsd.edu/eeglab/contrib.html)
-%   catchstrs  - [struct] "catch" strings for menu callbacks. See notes on EEGLab plugins. 
-%                (http://www.sccn.ucsd.edu/eeglab/contrib.html)   
+%   catchstrs  - [struct] "catch" strings for menu callbacks. See notes on EEGLab plugins.
+%                (http://www.sccn.ucsd.edu/eeglab/contrib.html)
 %
-% 
+%
 % Notes:
 %   This plugins consist of the following Matlab files:
 %   pop_loadeep.m           pop_loadeep_avg.m
@@ -22,7 +22,7 @@
 %   read_eep_cnt.mexglx     read_eep_avr.mexglx
 %   read_eep_cnt.dll        read_eep_avr.dll
 %
-% Authors: 
+% Authors:
 % Maarten-Jan Hoeve, ANT, The Netherlands / www.ant-software.nl, 3 October 2003
 % Maarten van de Velde, ANT, The Netherlands / www.ant-neuro.com, 21 July 2005
 %
@@ -47,6 +47,9 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 % $Log: eegplugin_eepimport.m,v $
+% Revision 1.6  2006-09-25 14:25:25  mvelde
+% updated version number
+%
 % Revision 1.5  2006-09-25 14:25:25  mvelde
 % updated version number
 %
@@ -57,7 +60,7 @@
 %
 % Revision 1.3  2005/07/21 10:11:40  mvelde
 % updated menu structure
-% 
+%
 % Revision 1.2  2005/06/08 08:16:37  mvelde
 % converted files to unix format
 %
@@ -73,12 +76,12 @@
 
 function vers = eegplugin_eepimport(fig, trystrs, catchstrs)
 
-    vers = 'eepimport1.04';
-    
+    vers = 'eepimport1.06';
+
     if nargin < 3
         error('eegplugin_eepimport requires 3 arguments');
     end;
-  
+
     % add folder to path
     % ------------------
     if ~exist('pop_loadeep')
@@ -86,7 +89,7 @@ function vers = eegplugin_eepimport(fig, trystrs, catchstrs)
         p = p(1:findstr(p,'eegplugin_eepimport.m')-1);
         addpath( p );
     end;
-    
+
     % find import data menu
     % ---------------------
     menu = findobj(fig, 'tag', 'import data');
@@ -95,8 +98,8 @@ function vers = eegplugin_eepimport(fig, trystrs, catchstrs)
     % --------------
     comcnt = [ trystrs.no_check '[EEG LASTCOM] = pop_loadeep;' catchstrs.new_non_empty ];
     comavr = [ trystrs.no_check '[EEG LASTCOM] = pop_loadeep_avg;' catchstrs.new_non_empty ];
-    
-  
+
+
     uimenu( menu, 'label', 'From ANT EEProbe .CNT file', 'callback', comcnt, 'separator', 'on' );
     uimenu( menu, 'label', 'From ANT EEProbe .AVR file' , 'callback', comavr );
 

@@ -1,13 +1,33 @@
   ========================================
+  September 2010
+  MATLAB / EEGLAB import / plugin for ANT continuous data, trigger files and averages
+  Version 1.07
+  ========================================
+
+  Update release adds support for 64-bit versions of Windows.
+  For the latest version of our source-code, visit our project page here:
+  http://sourceforge.net/projects/libeep/
+
+  ========================================
+  20 June 2008
+  MATLAB / EEGLAB import / plugin for ANT continuous data, trigger files and averages
+  Version 1.06
+  ========================================
+
+  Update release, fixed reading of triggers for epoch selection
+  Deleted read_eep_trg.dll, restored default read_eep_trg.m
+  (for general platform independency)
+
+  ========================================
   15 January 2008
   MATLAB / EEGLAB import / plugin for ANT continuous data, trigger files and averages
   Version 1.05
   ========================================
 
-  Update release, fixes a bug in read/write of the sampling rate 
+  Update release, fixes a bug in read/write of the sampling rate
   (now always translates the "rate" variable to integer sampling frequency)
   Function write_eep_cnt.m still in beta version (not compatible with EEGLAB)
-  Electrode positions file included ANT_WG_standard_346.ced, defines 
+  Electrode positions file included ANT_WG_standard_346.ced, defines
   the electrode positions for the 10/5 percent system.
 
   ========================================

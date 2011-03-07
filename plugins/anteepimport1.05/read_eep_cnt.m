@@ -1,4 +1,4 @@
-function [eeg] = read_eep_cnt(fn);
+function [eeg] = read_eep_cnt(fn, varargin);
 
 % READ_EEP_CNT reads continuous EEG data from an EEProbe *.cnt file
 % and returns a structure containing the header and data information.

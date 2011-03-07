@@ -67,3 +67,23 @@ function [trg] = read_eep_trg(fn);
 % ANT Software BV, The Netherlands, www.ant-software.nl / info@ant-software.nl
 %
 
+trg = [];
+
+fid = fopen(fn, 'rb');
+if fid<0
+   return
+end
+
+header = fgetl(fid);
+while ~feof(fid)
+  tmp = fscanf(fid, '%f %d %s', 3);
+  if ~isempty(tmp)
+    new.time   = tmp(1)*1000;			% in ms
+    new.offset = tmp(2)+1;			% offset 1
+    new.code   = char(tmp(3:end));		% string
+    new.type   = str2double(new.code);		% numeric
+    trg = [trg; new];
+  end
+end
+
+fclose(fid);  
