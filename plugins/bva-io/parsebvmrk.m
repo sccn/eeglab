@@ -28,13 +28,14 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Id: parsebvmrk.m 53 2010-05-22 21:57:38Z arnodelorme $
+% $Id: parsebvmrk.m 37 2007-06-26 12:56:17Z andreaswidmann $
 
 function EVENT = parsebvmrk(MRK)
 
-for idx = 1:length(MRK.markerinfos)
+for idx = 1:size(MRK.markerinfos, 1)
     [mrkType mrkDesc EVENT(idx).latency EVENT(idx).duration  EVENT(idx).channel EVENT(idx).bvtime] = ...
-        strread(MRK.markerinfos{idx}, '%s%s%f%d%d%d', 'delimiter', ',');
+        strread(MRK.markerinfos{idx, 1}, '%s%s%f%d%d%d', 'delimiter', ',');
+    EVENT(idx).bvmknum = MRK.markerinfos{idx, 2};
 
     if strcmpi(mrkType, 'New Segment') || strcmpi(mrkType, 'DC Correction')
         EVENT(idx).type = 'boundary';

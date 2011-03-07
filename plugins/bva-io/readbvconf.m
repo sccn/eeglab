@@ -29,7 +29,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Id: readbvconf.m 53 2010-05-22 21:57:38Z arnodelorme $
+% $Id: readbvconf.m 44 2009-11-12 02:00:56Z arnodelorme $
 
 function CONF = readbvconf(pathname, filename)
 
@@ -70,10 +70,18 @@ for iSection = 1:length(sectionArray) - 1
                 splitArray = strfind(raw{line}, '=');
                 CONF.(fieldName).(lower(raw{line}(1:splitArray(1) - 1))) = raw{line}(splitArray(1) + 1:end);
             end
-        case {'channelinfos' 'coordinates' 'markerinfos'}
+        case {'channelinfos' 'coordinates'}
             for line = sectionArray(iSection) + 1:sectionArray(iSection + 1) - 1
                 splitArray = strfind(raw{line}, '=');
                 CONF.(fieldName)(str2double(raw{line}(3:splitArray(1) - 1))) = {raw{line}(splitArray(1) + 1:end)};
+            end
+        case {'markerinfos'} % Allow discontinuity for markers (but not channelinfos and coordinates!)
+            for line = sectionArray(iSection) + 1:sectionArray(iSection + 1) - 1
+                splitArray = strfind(raw{line}, '=');
+                CONF.(fieldName)(line - sectionArray(iSection), :) = {raw{line}(splitArray(1) + 1:end) str2double(raw{line}(3:splitArray(1) - 1))};
+            end
+            if ~all(1:size(CONF.(fieldName), 1) == [CONF.(fieldName){:, 2}])
+                warning('Marker number discontinuity.')
             end
         case 'comment'
             CONF.(fieldName) = raw(sectionArray(iSection) + 1:sectionArray(iSection + 1) - 1);
