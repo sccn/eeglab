@@ -135,12 +135,19 @@ if ~isempty(EEG.event)
     % make event cell array
     % ---------------------
     for index = 1:EEG.trials
-        EEG.event(end  ).latency = (index-1)*EEG.pnts+1;
         EEG.event(end+1).type    = 'New Segment';
+        EEG.event(end  ).latency = (index-1)*EEG.pnts+1;
     end;
     [tmp latorder ] = sort( [ EEG.event.latency ] );
     EEG.event = EEG.event(latorder);
-    
+
+    % Recode boundary events
+    bndArray = find(strcmp('boundary', {EEG.event.comment})); % Find boundary events
+    isDupArray = ismember([EEG.event(bndArray).latency], [EEG.event(strcmp('New Segment', {EEG.event.type})).latency]); % Find already existing New Segment events with identical latency
+    [EEG.event(bndArray(~isDupArray)).type] = deal('New Segment'); % Recode boundary event type
+    [EEG.event(bndArray(~isDupArray)).comment] = deal(''); % Recode boundary event comment
+    EEG.event(bndArray(isDupArray)) = []; % Remove duplicate New Segment events 
+
     % rename latency events
     % ---------------------
     time0ind = [];
