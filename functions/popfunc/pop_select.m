@@ -173,6 +173,19 @@ else
     args = varargin;
 end;
 
+%----------------------------AMICA---------------------------------
+if isfield(EEG.etc,'amica') && isfield(EEG.etc.amica,'prob_added')
+    for index = 1:2:length(args)
+       if strcmpi(args{index}, 'channel')
+           args{index+1} = [ args{index+1} EEG.nbchan-(0:2*EEG.etc.amica.num_models-1)];
+           
+       end;
+       
+       
+    end;
+end;
+%--------------------------------------------------------------------
+        
 % process multiple datasets
 % -------------------------
 if length(EEG) > 1
@@ -339,6 +352,35 @@ if length(g.channel) ~= EEG.nbchan
 	fprintf('Removing %d channel(s)...\n', EEG.nbchan - length(g.channel));
 end;
 
+% For AMICA probabilities...
+%-----------------------------------------------------
+if isfield(EEG.etc, 'amica') && ~isempty(EEG.etc.amica) && isfield(EEG.etc.amica, 'v_smooth') && ~isempty(EEG.etc.amica.v_smooth) && ~isfield(EEG.etc.amica,'prob_added')
+    if isfield(EEG.etc.amica, 'num_models') && ~isempty(EEG.etc.amica.num_models)
+        if size(EEG.data,2) == size(EEG.etc.amica.v_smooth,2) && size(EEG.data,3) == size(EEG.etc.amica.v_smooth,3) && size(EEG.etc.amica.v_smooth,1) == EEG.etc.amica.num_models
+            
+            EEG = eeg_formatamica(EEG);
+            
+            %-------------------------------------------
+            
+            [EEG com] = pop_select(EEG,args{:});
+            
+            %-------------------------------------------
+            
+            EEG = eeg_reformatamica(EEG);
+            
+            return;
+        else
+            disp('AMICA probabilities not compatible with size of data, probabilities cannot be rejected')
+            
+            disp('Resuming rejection...')
+        end
+    end
+    
+end
+% ------------------------------------------------------
+
+
+
 % recompute latency and epoch number for events
 % ---------------------------------------------
 if length(g.trial) ~= EEG.trials & ~isempty(EEG.event)
@@ -358,7 +400,7 @@ if length(g.trial) ~= EEG.trials & ~isempty(EEG.event)
 					EEG.event(indexevent).epoch = newindex;
 				end;                
 			end;
-			diffevent = setdiff([1:length(EEG.event)], keepevent);
+            diffevent = setdiff([1:length(EEG.event)], keepevent);
 			if ~isempty(diffevent)
 				disp(['Pop_select: removing ' int2str(length(diffevent)) ' unreferenced events']);
 				EEG.event(diffevent) = [];
@@ -366,6 +408,7 @@ if length(g.trial) ~= EEG.trials & ~isempty(EEG.event)
 		end;
     end;        
 end;
+
 
 % performing removal
 % ------------------
@@ -409,16 +452,11 @@ if ~isempty(g.time) | ~isempty(g.notime)
         
         % erase event-related fields from the epochs
         % ------------------------------------------
-        if ~isempty(EEG.epoch)
-            fn = fieldnames(EEG.epoch);
-            EEG.epoch = rmfield(EEG.epoch,{fn{strmatch('event',fn)}});
-        end;
+        fn = fieldnames(EEG.epoch);
+        EEG.epoch = rmfield(EEG.epoch,{fn{strmatch('event',fn)}});
         
     else
         if isempty(g.notime)
-            if length(g.time) == 2 && EEG.xmin < 0
-                disp('Warning: minimum time unchanged to ensure correct latency of initial boundary event');
-            end;
             g.notime = g.time';
             g.notime = g.notime(:);
             if g.notime(1) ~= 0, g.notime = [EEG.xmin g.notime(:)'];
@@ -445,9 +483,13 @@ if ~isempty(g.time) | ~isempty(g.notime)
     end
 end;
 
+
+
 % performing removal
 % ------------------
+
 EEG.data      = EEG.data(g.channel, :, g.trial);
+
 if ~isempty(EEG.icaact), EEG.icaact = EEG.icaact(:,:,g.trial); end;
 EEG.trials    = length(g.trial);
 EEG.pnts      = size(EEG.data,2);

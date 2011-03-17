@@ -41,12 +41,43 @@ com = '';
 if nargin < 2
 	help eeg_eegrej;
 	return;
-end;	
+end;
+if nargin<3
+    probadded = [];
+end
 if isempty(regions)
 	return;
 end;
 
-if isfield(EEG.event, 'latency'), 
+
+% For AMICA probabilities...Temporarily add model probabilities as channels
+%-----------------------------------------------------
+if isfield(EEG.etc, 'amica') && ~isempty(EEG.etc.amica) && isfield(EEG.etc.amica, 'v_smooth') && ~isempty(EEG.etc.amica.v_smooth) && ~isfield(EEG.etc.amica,'prob_added')
+    if isfield(EEG.etc.amica, 'num_models') && ~isempty(EEG.etc.amica.num_models)
+        if size(EEG.data,2) == size(EEG.etc.amica.v_smooth,2) && size(EEG.data,3) == size(EEG.etc.amica.v_smooth,3) && size(EEG.etc.amica.v_smooth,1) == EEG.etc.amica.num_models
+            
+            EEG = eeg_formatamica(EEG);
+            %-------------------------------------------
+            
+            [EEG com] = eeg_eegrej(EEG,regions);
+            
+            %-------------------------------------------
+            
+            EEG = eeg_reformatamica(EEG);
+            return;
+        else
+            disp('AMICA probabilities not compatible with size of data, probabilities cannot be epoched')
+            disp('Load AMICA components before extracting epochs')
+            disp('Resuming rejection...')
+        end
+    end
+    
+end
+% ------------------------------------------------------
+
+
+
+if isfield(EEG.event, 'latency'),
    	 tmpalllatencies = [ EEG.event.latency ];
 else tmpalllatencies = []; 
 end;
@@ -60,6 +91,7 @@ if size(regions,2) > 2, regions = regions(:, 3:4); end;
 oldEEGpnts = EEG.pnts;
 EEG.pnts   = size(EEG.data,2);
 EEG.xmax   = EEG.xmax+EEG.xmin;
+
 
 % add boundary events
 % -------------------
