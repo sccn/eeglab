@@ -76,6 +76,12 @@
 %                  NOTE: This button's label can be redefined from the command line
 %                  (see 'butlabel' below). If no processing command is specified
 %                  for the 'command' parameter (below), this button does not appear.
+%    "Stack/Spread" - [button] "Stack" collapses all channels/activations onto the
+%                  middle axis of the plot. "Spread" undoes the operation.
+%    "Norm/Denorm" - [button] "Norm" normalizes each channel separately such that all
+%                  channels have the same standard deviation without changing original 
+%                  data/activations under EEG structure. "Denorm" undoes the operation.  
+%                 
 % Required command line input:
 %    data        - Input data matrix, either continuous 2-D (channels,timepoints) or 
 %                  epoched 3-D (channels,timepoints,epochs). If the data is preceded 
@@ -277,7 +283,11 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
    try, g.mocap;		    catch, g.mocap		= 'off'; end; % nima
    try, g.selectcommand;     catch, g.selectcommand     = { defdowncom defmotioncom defupcom }; end;
    try, g.ctrlselectcommand; catch, g.ctrlselectcommand = { defctrldowncom defctrlmotioncom defctrlupcom }; end;
-  
+   try, g.datastd;          catch, g.datastd = []; end; %ozgur
+   try, g.normed;            catch, g.normed = 0; end; %ozgur
+   try,g.envelope;          catch, g.envelope = 0; end;%ozgur
+   
+   
    if strcmpi(g.ploteventdur, 'on'), g.ploteventdur = 1; else g.ploteventdur = 0; end;
    if ndims(data) > 2
    		g.trialstag = size(	data, 2);
@@ -289,7 +299,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
       case {'spacing', 'srate' 'eloc_file' 'winlength' 'position' 'title' ...
                'trialstag'  'winrej' 'command' 'tag' 'xgrid' 'ygrid' 'color' 'colmodif'...
                'freqlimits' 'submean' 'children' 'limits' 'dispchans' 'wincolor' ...
-               'ploteventdur' 'butlabel' 'scale' 'events' 'data2' 'plotdata2' 'mocap' 'selectcommand' 'ctrlselectcommand'},;
+               'ploteventdur' 'butlabel' 'scale' 'events' 'data2' 'plotdata2' 'mocap' 'selectcommand' 'ctrlselectcommand' 'datastd' 'normed' 'envelope'},;
       otherwise, error(['eegplot: unrecognized option: ''' gfields{index} '''' ]);
       end;
    end;
@@ -464,6 +474,8 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
   posbut(13,:) = [-0.15   0.02    0.07    0.05 ]; % cancel
   posbut(17,:) = [-0.06    0.02    0.09    0.05 ]; % events types
   posbut(20,:) = [-0.17   0.15     0.015    0.8 ]; % slider
+  posbut(21,:) = [0.738    0.87    0.06      0.048];%normalize
+  posbut(22,:) = [0.738    0.93    0.06      0.048];%stack channels(same offset)
   posbut(:,1) = posbut(:,1)+0.2;
 
 % Five move buttons: << < text > >> 
@@ -588,6 +600,38 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
 	'string','-',...
 	'FontSize',8,...
 	'Callback','eegplot(''draws'',2)');
+
+  cb_normalize = ['g = get(gcbf,''userdata'');if g.normed, disp(''Denormalizing...''); else, disp(''Normalizing...''); end;'...
+    'ax1 = findobj(''tag'',''eegaxis'',''parent'',gcbf);' ...
+    'data = get(ax1,''UserData'');' ...
+    'if isempty(g.datastd), g.datastd = std(reshape(data,size(data,1),size(data,2)*size(data,3))'');end;'...
+    'if g.normed, for i = 1:size(data,1), data(i,:,:) = data(i,:,:)*g.datastd(i);set(gcbo,''string'', ''Norm'');set(findobj(''tag'',''ESpacing'',''parent'',gcbf),''string'',num2str(g.oldspacing));end;' ...
+    'else, for i = 1:size(data,1), data(i,:,:) = data(i,:,:)/g.datastd(i);end;set(gcbo,''string'', ''Denorm'');g.oldspacing = g.spacing;set(findobj(''tag'',''ESpacing'',''parent'',gcbf),''string'',''5'');end;' ...
+    'g.normed = 1 - g.normed;' ...
+    'eegplot(''draws'',0);'...
+    'set(gcbf,''userdata'',g);set(ax1,''UserData'',data);clear ax1 g data;' ...
+    'eegplot(''drawp'',0);' ...
+    'disp(''Done.'')'];
+% Button for Normalizing data
+u(21) = uicontrol('Parent',figh, ...
+    'Units', 'normalized', ...
+    'Position',posbut(21,:), ...
+    'Tag','Norm',...
+    'string','Norm', 'callback', cb_normalize);
+
+cb_envelope = ['g = get(gcbf,''userdata'');'...
+    'g.envelope = ~g.envelope;' ...
+    'set(gcbf,''userdata'',g);'...
+    'set(gcbo,''string'',fastif(g.envelope,''Spread'',''Stack''));' ...
+    'eegplot(''drawp'',0);clear g;'];
+
+% Button to plot envelope of data
+u(22) = uicontrol('Parent',figh, ...
+    'Units', 'normalized', ...
+    'Position',posbut(22,:), ...
+    'Tag','Envelope',...
+    'string','Stack', 'callback', cb_envelope);
+
 
   if isempty(g.command) tmpcom = 'fprintf(''Rejections saved in variable TMPREJ\n'');';   
   else tmpcom = g.command;
@@ -1040,7 +1084,7 @@ else
         switch lower(g.submean) % subtract the mean ?
          case 'on', 
           meandata = mean(g.data2(:,lowlim:highlim)');  
-          if any(isnan(meandata))
+          if any(isnan(memdata))
               meandata = nan_mean(g.data2(:,lowlim:highlim)');
           end;
          otherwise, meandata = zeros(1,g.chans);
@@ -1059,7 +1103,11 @@ else
         axes(ax1)
         cla
     end;
-     
+    
+    oldspacing = g.spacing;
+    if g.envelope
+        g.spacing = 0;
+    end
     % plot data
     % ---------
     axes(ax1)
@@ -1078,9 +1126,9 @@ else
                    isfield(g.eloc_file, 'badchan') & ...
                    g.eloc_file(g.chans-i+1).badchan;
             tmpcolor = [ .85 .85 .85 ];
-            plot(data(g.chans-i+1,lowlim:highlim) -meandata(g.chans-i+1)+i*g.spacing, ...
+            plot(data(g.chans-i+1,lowlim:highlim) -meandata(g.chans-i+1)+i*g.spacing + (g.dispchans+1)*(oldspacing-g.spacing)/2 +g.elecoffset*(oldspacing-g.spacing), ...
                 'color', tmpcolor, 'clipping','on')
-            plot(1,mean(data(g.chans-i+1,lowlim:highlim) -meandata(g.chans-i+1)+i*g.spacing,2),'<r','MarkerFaceColor','r','MarkerSize',6);
+            plot(1,mean(data(g.chans-i+1,lowlim:highlim) -meandata(g.chans-i+1)+i*g.spacing + (g.dispchans+1)*(oldspacing-g.spacing)/2 +g.elecoffset*(oldspacing-g.spacing),2),'<r','MarkerFaceColor','r','MarkerSize',6);
         end
                
     end
@@ -1098,7 +1146,7 @@ else
                    ~g.eloc_file(g.chans-i+1).badchan) | ...
                    (~isfield(g, 'eloc_file')) | ...
                    (~isfield(g.eloc_file, 'badchan'));
-               plot(data(g.chans-i+1,lowlim:highlim) -meandata(g.chans-i+1)+i*g.spacing, ...
+               plot(data(g.chans-i+1,lowlim:highlim) -meandata(g.chans-i+1)+i*g.spacing + (g.dispchans+1)*(oldspacing-g.spacing)/2 +g.elecoffset*(oldspacing-g.spacing), ...
                    'color', tmpcolor, 'clipping','on')
         end
                
@@ -1117,13 +1165,13 @@ else
    				for i = 1:g.chans
    					if g.winrej(tpmi,g.chans-i+1+5)
    						plot(abscmin+1:abscmax+1,data(g.chans-i+1,abscmin+lowlim:abscmax+lowlim) ...
-   							-meandata(g.chans-i+1)+i*g.spacing, 'color','r','clipping','on')
+   							-meandata(g.chans-i+1)+i*g.spacing + (g.dispchans+1)*(oldspacing-g.spacing)/2 +g.elecoffset*(oldspacing-g.spacing), 'color','r','clipping','on')
 					end;
     			end
   			end;	
     	end;
     end;		
-    
+    g.spacing = oldspacing;
     set(ax1, 'Xlim',[1 g.winlength*multiplier+1],...
 		     'XTick',[1:multiplier*DEFAULT_GRID_SPACING:g.winlength*multiplier+1]);
     set(ax1, 'XTickLabel', num2str((g.time:DEFAULT_GRID_SPACING:g.time+g.winlength)'))
@@ -1379,15 +1427,14 @@ else
 	elseif p1 == 2
 		g.spacing= max(0,g.spacing-0.1*orgspacing); % decrease g.spacing(5%)
     end
-    % this section was preventing seing data with very low amplitude
-    %if round(g.spacing*100) == 0
-    %    maxindex = min(10000, g.frames);  
-    %    g.spacing = 0.01*max(max(data(:,1:maxindex),[],2),[],1)-min(min(data(:,1:maxindex),[],2),[],1);  % Set g.spacingto max/min data
-    %end;
+    if round(g.spacing*100) == 0
+        maxindex = min(10000, g.frames);  
+        g.spacing = 0.01*max(max(data(:,1:maxindex),[],2),[],1)-min(min(data(:,1:maxindex),[],2),[],1);  % Set g.spacingto max/min data
+    end;
 
     % update edit box
     % ---------------
-    set(ESpacing,'string',num2str(g.spacing))  
+    set(ESpacing,'string',num2str(g.spacing,4))  
     set(gcf, 'userdata', g);
 	 eegplot('drawp', 0);
     set(ax1,'YLim',[0 (g.chans+1)*g.spacing],'YTick',[0:g.spacing:g.chans*g.spacing])
@@ -1398,7 +1445,7 @@ else
     eyeaxes = findobj('tag','eyeaxes','parent',gcf);
     if ~isempty(eyeaxes)
       eyetext = findobj('type','text','parent',eyeaxes,'tag','thescalenum');
-      set(eyetext,'string',num2str(g.spacing))
+      set(eyetext,'string',num2str(g.spacing,4))
     end
     
     return;
