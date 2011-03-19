@@ -225,8 +225,12 @@ for cluster_counter = 1:number_of_clusters
     h = axes('position',[0 0 1 1],'Visible','off');
     [XI,YI] = meshgrid(0:0.005:1,0:0.005:1);
     if length(find(IDX==cluster_counter))>1
+        try
         ZI = griddata(comp_cluster{cluster_counter}(:,1),comp_cluster{cluster_counter}(:,2),...
             silh(find(IDX==cluster_counter)),XI,YI,'v4');
+        catch
+            ZI = ones(size(XI,1),size(XI,2)) * silh(find(IDX==cluster_counter, 1));
+        end;
     else
         ZI = ones(size(XI,1),size(XI,2)) * silh(find(IDX==cluster_counter));
     end;
@@ -339,26 +343,28 @@ desatcolor = hsv2rgb(hsv);
 
 % push overlapping ICs apart
 function coord = relaxCoordinates(coord, radius)
-
-counter = 1;
-while counter ==1 | (length(find((displacementLengths(:)>1e-9))>0) && counter < 5000)
-    distances = squareform(pdist(coord));
-    displacementLengths = 0.01 * (radius - distances) / radius;
-    displacementLengths(displacementLengths<0) = 0;
-    displacementLengths = displacementLengths - diag(diag(displacementLengths));
-
-    xs = repmat(coord(:,1),1,size(coord,1));
-    ys = repmat(coord(:,2),1,size(coord,1));
-    xDifferences = xs - xs';
-    yDifferences = ys - ys';
-
-    xChanges = xDifferences .* displacementLengths;
-    yChanges = yDifferences .* displacementLengths;
-
-
-    for i=1:size(coord,1)
-        coord(i,1) = coord(i,1) + sum(xChanges(i,:));
-        coord(i,2) = coord(i,2) + sum(yChanges(i,:));
+% if there is more than one point
+if size(coord, 1) > 1
+    counter = 1;
+    while counter ==1 | (length(find((displacementLengths(:)>1e-9))>0) && counter < 5000)
+        distances = squareform(pdist(coord));
+        displacementLengths = 0.01 * (radius - distances) / radius;
+        displacementLengths(displacementLengths<0) = 0;
+        displacementLengths = displacementLengths - diag(diag(displacementLengths));
+        
+        xs = repmat(coord(:,1),1,size(coord,1));
+        ys = repmat(coord(:,2),1,size(coord,1));
+        xDifferences = xs - xs';
+        yDifferences = ys - ys';
+        
+        xChanges = xDifferences .* displacementLengths;
+        yChanges = yDifferences .* displacementLengths;
+        
+        
+        for i=1:size(coord,1)
+            coord(i,1) = coord(i,1) + sum(xChanges(i,:));
+            coord(i,2) = coord(i,2) + sum(yChanges(i,:));
+        end;
+        counter = counter + 1;
     end;
-    counter = counter + 1;
 end;
