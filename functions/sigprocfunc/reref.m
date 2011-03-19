@@ -140,17 +140,20 @@ data = reshape(data, dim1, dim2*dim3);
 % add it as blank data channel at the end
 % ----------------------------------------
 if ~isempty(g.refloc) == 1
-    data(end+1,:) = 0;
     if ~isempty(g.elocs)
         if iscell(g.refloc)
+            data(end+1,:) = 0;
             g.elocs(end+1).labels = g.refloc{1};
             g.elocs(end  ).theta  = g.refloc{2};
             g.elocs(end  ).radius = g.refloc{3};
         else
-            g.elocs(end+1).labels = g.refloc.labels;
-            fieldloc = fieldnames(g.refloc);
-            for ind = 1:length(fieldloc)
-                g.elocs(end) = setfield(g.elocs(end), fieldloc{ind}, getfield(g.refloc, fieldloc{ind}));
+            data(end+length(g.refloc),:) = 0;
+            for iLocs = 1:length(g.refloc)
+                g.elocs(end+1).labels = g.refloc(iLocs).labels;
+                fieldloc = fieldnames(g.refloc);
+                for ind = 1:length(fieldloc)
+                    g.elocs(end) = setfield(g.elocs(end), fieldloc{ind}, getfield(g.refloc(iLocs), fieldloc{ind}));
+                end;
             end;
         end;
     end;
@@ -170,16 +173,28 @@ end;
 
 % generate rereferencing matrix
 % -----------------------------
-if ~isempty(ref) % not average reference   
-    refmatrix = eye(nchansin); % begin with identity matrix
-    for index = 1:length(ref)
-        refmatrix(:,ref(index)) = refmatrix(:,ref(index))-1/length(ref);
+if 0 % alternate code - should work exactly the same
+    if isempty(ref)
+        ref=chansin; % average reference
+    end % if 
+    chansout=chansin; 
+    data(chansout,:)=data(chansout,:)-ones(nchansin,1)*mean(data(ref,:),1); 
+else
+    if ~isempty(ref) % not average reference   
+        refmatrix = eye(nchansin); % begin with identity matrix
+        tmpref = ref;
+        for index = 1:length(g.exclude)
+            tmpref(find(g.exclude(index) < tmpref)) = tmpref(find(g.exclude(index) < tmpref))-1;
+        end;
+        for index = 1:length(tmpref)
+            refmatrix(:,tmpref(index)) = refmatrix(:,tmpref(index))-1/length(tmpref);
+        end;
+    else % compute average reference
+        refmatrix = eye(nchansin)-ones(nchansin)*1/nchansin;
     end;
-else % compute average reference
-    refmatrix = eye(nchansin)-ones(nchansin)*1/nchansin;
+    chansout = chansin;
+    data(chansout,:) = refmatrix*data(chansin,:);
 end;
-chansout = chansin;
-data(chansout,:) = refmatrix*data(chansin,:);
 
 % change reference in elocs structure
 % -----------------------------------
@@ -190,7 +205,11 @@ if ~isempty(g.elocs)
         end;
     else
         reftxt = { g.elocs(ref).labels };
-        if length(reftxt) == 1, reftxt = reftxt{1}; end;
+        if length(reftxt) == 1, reftxt = reftxt{1}; 
+        else
+            reftxt = cellfun(@(x)([x ' ']), reftxt, 'uniformoutput', false);
+            reftxt = [ reftxt{:} ];
+        end;
         for ind = chansin
             g.elocs(ind).ref = reftxt;
         end;
