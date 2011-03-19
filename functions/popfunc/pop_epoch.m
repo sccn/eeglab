@@ -223,13 +223,11 @@ Ievent = sort(Ievent);
 alllatencies = tmpeventlatency(Ievent);
 
 if isempty(alllatencies)
-   error('pop_epoch(): empty event range'); return;
+   error('pop_epoch(): empty epoch range (no epochs were found).'); return;
 end;
 fprintf('pop_epoch():%d epochs selected\n', length(alllatencies));
 
-
-
-
+% ----------------------------------------------------
 % For AMICA probabilities...Temporarily add model probabilities as channels
 %-----------------------------------------------------
 if isfield(EEG.etc, 'amica') && ~isempty(EEG.etc.amica) && isfield(EEG.etc.amica, 'v_smooth') && ~isempty(EEG.etc.amica.v_smooth) && ~isfield(EEG.etc.amica,'prob_added')
@@ -250,9 +248,6 @@ if isfield(EEG.etc, 'amica') && ~isempty(EEG.etc.amica) && isfield(EEG.etc.amica
     end
 end
 % ----------------------------------------------------
-
-
-
 
 % select event time format and epoch
 % ----------------------------------
