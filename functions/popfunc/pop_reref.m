@@ -148,7 +148,11 @@ if nargin < 2
     if ~isempty(restag.refloc),
          try
              tmpallchans = lower({ EEG.chaninfo.nodatchans.labels });
-             chanind = strmatch( lower(restag.refloc), tmpallchans, 'exact');
+             allelecs = parsetxt(lower(restag.refloc));
+             chanind  = [];
+             for iElec = 1:length(allelecs)
+                 chanind = [chanind strmatch( allelecs{iElec}, tmpallchans, 'exact') ];
+             end;
              options = { options{:} 'refloc' EEG.chaninfo.nodatchans(chanind) }; 
          catch, disp('Error with old reference: ignoring it');
          end;
@@ -201,8 +205,11 @@ if ~isempty(refchan)
     end;
 end;
 if ~isempty(g.refloc)
-    tmpind = strmatch( g.refloc.labels, { EEG.chaninfo.nodatchans.labels });
-     EEG.chaninfo.nodatchans(tmpind) = [];
+    allinds = [];
+    for iElec = 1:length(g.refloc)
+         allinds = [allinds strmatch( g.refloc(iElec).labels, { EEG.chaninfo.nodatchans.labels }) ];
+    end;
+    EEG.chaninfo.nodatchans(allinds) = [];
 end;
     
 % legacy EEG.ref field
@@ -261,7 +268,7 @@ if ~isempty(EEG.icaweights)
         
         % add new channel if necessary
         if ~isempty(g.refloc)
-            icachansind = [ icachansind size(EEG.data,1) ];
+            icachansind = [ icachansind [1:length(g.refloc)]+size(EEG.data,1)-1 ];
         end;
         
         EEG.icachansind = icachansind;
