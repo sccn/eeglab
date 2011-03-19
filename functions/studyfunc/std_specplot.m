@@ -112,6 +112,7 @@ opt = finputcheck( varargin, { 'topofreq'    'real'    [] STUDY.etc.specparams.t
                                'threshold'   'real'    [] STUDY.etc.specparams.threshold;
                                'mcorrect'    'string'  [] STUDY.etc.specparams.mcorrect;
                                'naccu'       'integer' [] STUDY.etc.specparams.naccu;
+                               'plotstderr'  'string'  []              'off';
                                'channels'    'cell'    []              {};
                                'clusters'    'integer' []              [];
                                'mode'        'string'  []              ''; % for backward compatibility
@@ -183,7 +184,7 @@ if ~isempty(opt.channels)
                                       'chanlocs', locs, 'threshold', opt.threshold, 'titles', alltitles);
     else
         std_plotcurve(allfreqs, specdata, 'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, ...
-            'chanlocs', locs, 'titles', alltitles, 'plotsubjects', opt.plotsubjects, 'unitx', 'Hz', ...
+            'chanlocs', locs, 'titles', alltitles, 'plotsubjects', opt.plotsubjects, 'unitx', 'Hz', 'plotstderr', opt.plotstderr, ...
             'condnames', STUDY.condition, 'groupnames', STUDY.group, 'plottopo', fastif(length(allinds) > 5, 'on', 'off'), plotcurveopt{:});
     end;
     set(gcf,'name','Channel Spectra');
@@ -222,7 +223,7 @@ else
                                  'statistics', opt.statistics, 'condnames', STUDY.condition, 'cond2names', STUDY.group, 'clustname', STUDY.cluster(opt.clusters(index)).name, 'compnames', comp_names, ...
                                  'subject', opt.subject, 'datatype', 'spectrum', 'cond2group', opt.plotgroups, 'condgroup', opt.plotconditions);
         
-        std_plotcurve(allfreqs, specdata, 'condnames', STUDY.condition, 'legend', opt.legend, 'groupnames', STUDY.group,  ...
+        std_plotcurve(allfreqs, specdata, 'condnames', STUDY.condition, 'legend', opt.legend, 'groupnames', STUDY.group, 'plotstderr', opt.plotstderr, ...
                                           'titles', alltitles, 'unitx', 'Hz',  'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, ...
                                           'chanlocs', ALLEEG(1).chanlocs, 'plotsubjects', opt.plotsubjects, plotcurveopt{:});
     end;

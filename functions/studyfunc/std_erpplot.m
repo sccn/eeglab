@@ -133,6 +133,7 @@ opt = finputcheck( varargin, { 'topotime'    'real'    [] params.topotime;
                                'naccu'       'integer' [] params.naccu;
                                'singletrials' 'string' { 'on' 'off' }  params.singletrials;
                                'design'      'integer' []              STUDY.currentdesign;
+                               'plotstderr'  'string'  []              'off';
                                'channels'    'cell'    []              {};
                                'clusters'    'integer' []              [];
                                'datatype'    'string'  { 'erp' 'spec' } 'erp';      
@@ -245,7 +246,7 @@ if ~isempty(opt.channels)
                                       'chanlocs', locs, 'threshold', opt.threshold, 'titles', alltitles);
     else
         std_plotcurve(alltimes, erpdata, 'groupstats', pgroup, 'legend', alllegends, 'condstats', pcond, 'interstats', pinter, ...
-            'chanlocs', locs, 'titles', alltitles, 'plotsubjects', opt.plotsubjects, ...
+            'chanlocs', locs, 'titles', alltitles, 'plotsubjects', opt.plotsubjects, 'plotstderr', opt.plotstderr, ...
             'condnames', allconditions, 'groupnames', allgroups, 'plottopo', fastif(length(opt.channels) > 1, 'on', 'off'), plotcurveopt{:});
     end;
 
@@ -285,7 +286,7 @@ else
                                  'subject', opt.subject, 'valsunit', opt.unitx, 'vals', opt.topotime, 'datatype', datatypestr, 'cond2group', opt.plotgroups, 'condgroup', opt.plotconditions);
         
         if length(opt.clusters) > 1 && index < length(opt.clusters), alllegends = {}; end;
-        std_plotcurve(alltimes, erpdata, 'condnames', allconditions, 'legend', alllegends, 'groupnames', allgroups, ...
+        std_plotcurve(alltimes, erpdata, 'condnames', allconditions, 'legend', alllegends, 'groupnames', allgroups, 'plotstderr', opt.plotstderr, ...
                                           'titles', alltitles, 'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, ...
                                           'chanlocs', ALLEEG(1).chanlocs, 'plotsubjects', opt.plotsubjects, plotcurveopt{:});
     end;
