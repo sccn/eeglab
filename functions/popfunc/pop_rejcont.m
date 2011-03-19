@@ -6,7 +6,7 @@
 %
 % Usage:
 %   >> pop_rejcont( INEEG ) % pop-up interative window mode
-%   >> [OUTEEG, selectedregions] = pop_rejchanspec( INEEG, 'key', 'val');
+%   >> [OUTEEG, selectedregions] = pop_rejcont( INEEG, 'key', 'val');
 %
 % Inputs:
 %   INEEG      - input dataset
@@ -22,6 +22,8 @@
 %  'addlength'   - [float] once a region of contiguous epochs has been labeled
 %                  as artifact, additional trailing neighboring regions on
 %                  each side may also be added {Default: 0.25}
+%  'eegplot'     - ['on'|'off'] plot rejected portions of data in a eegplot
+%                  window. Default is 'off'.
 %
 % Outputs:
 %   OUTEEG          - output dataset with updated joint probability array
@@ -29,7 +31,7 @@
 %                     n being the number of regions and 2 for the beginning
 %                     and end of each region.
 %
-% Author: Arnaud Delorme, CERCO, UPS/CNRS, 209-
+% Author: Arnaud Delorme, CERCO, UPS/CNRS, 2009-
 %
 % See also: eegthresh()
 
@@ -71,7 +73,7 @@ if nargin < 2
         elecrange = 1:EEG.nbchan;
     end;
     elecrange = deblank(vararg2str(elecrange));
-    elecrange = elecrange(2:end-1);
+    %elecrange = elecrange(2:end-1);
     
     promptstr = { 'Channel range' ...
                   'Frequency range (Hz)' ...
@@ -80,7 +82,7 @@ if nargin < 2
                   'Minimum number of contiguous epochs' ...
                   'Add trails before and after regions (s)' ...
                   };
-    initstr = { elecrange '35 128' '10' '0.5' '4' '0.25' };
+    initstr = { elecrange '20 40' '10' '0.5' '4' '0.25' };
     result = inputdlg2(promptstr, 'Reject portions of continuous data - pop_rejcont', 1, initstr);
     if length( result ) == 0 return; end;
     
@@ -96,9 +98,10 @@ end;
 
 opt = finputcheck(options, { 'threshold'   'real'   []    10;
                              'elecrange'   'real'   []    [1:EEG.nbchan];
-                             'freqlimit'   'real'   []    [35 128];
+                             'freqlimit'   'real'   []    [20 40];
                              'contiguous'  'real'   []    4;
                              'addlength'   'real'   []    0.25;
+                             'eegplot'     'string' { 'on' 'off' } 'off';
                              'epochlength' 'real'   []    0.5 }, 'pop_rejcont');
      
 %EEG.event = [];
@@ -127,7 +130,8 @@ specdata = tmpspec;
 % apply threshold to average of all electrodes
 % --------------------------------------------
 %[I1 Irej NS Erej] = eegthresh( mean(specdata(opt.elecrange, :, :), 1), size(specdata,2), 1:length(opt.elecrange), -100, 15, [freqs(1) freqs(end)], 30, 45);
-[I1 rejepoch NS Erej] = eegthresh( mean(specdata(opt.elecrange, :, :), 1), size(specdata,2), 1, -100, opt.threshold, [freqs(1) freqs(end)], opt.freqlimit(1), opt.freqlimit(2));
+if length(opt.threshold) == 1, opt.threshold = [ -100 opt.threshold ]; end;
+[I1 rejepoch NS Erej] = eegthresh( mean(specdata(opt.elecrange, :, :), 1), size(specdata,2), 1, opt.threshold(1), opt.threshold(2), [freqs(1) freqs(end)], opt.freqlimit(1), opt.freqlimit(2));
 fprintf('%d regions selected for rejection\n', length(rejepoch));
 
 % build the winrej array for eegplot
@@ -182,8 +186,10 @@ end;
 % -----------
 selectedregions = winrej(:,1:2);
 command = 'EEG = pop_select(EEG, ''nopoint'', TMPREJ(:,1:2)); [ALLEEG EEG CURRENTSET LASTCOM] = pop_newset(ALLEEG, EEG, CURRENTSET, ''study'', ~isempty(STUDY)+0); eeglab redraw';
-if nargin < 2
+if nargin < 2 || strcmpi(opt.eegplot, 'on')
     eegplot(NEWEEG.data(opt.elecrange,:), 'srate', NEWEEG.srate, 'winrej', winrej, 'command', command, 'events', EEG.event);
+else
+    NEWEEG = pop_select(EEG, 'nopoint', round(selectedregions));
 end;
 EEG = NEWEEG;
 com = sprintf('EEG = pop_rejcont(EEG, %s);', vararg2str(options));
