@@ -61,6 +61,10 @@ if nargin < 1
     return;
 end;
 
+if length(EEG) > 1
+    EEG = pop_mergeset(EEG, [1:length(EEG)]);
+end;
+
 % test input variables
 % --------------------
 if ~isstruct(EEG) | ~isfield(EEG,'event')
