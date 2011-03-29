@@ -1265,7 +1265,7 @@ for fcell = fieldnames(EEG)'
 end
 
 try
-    ALLEEGNEW = orderfields(EEG, fieldorder);
+    ALLEEGNEW = orderfields(ALLEEGNEW, fieldorder);
     EEG = ALLEEGNEW;
 catch
     disp('Couldn''t order data set fields properly.');
