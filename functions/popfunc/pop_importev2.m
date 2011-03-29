@@ -57,11 +57,13 @@ fclose(fid);
 
 % load datas
 % ----------
-try, oldeventlats = [ EEG.event.latency ]; catch, end;
+tmpevent = EEG.event;
+try, oldeventlats = [ tmpevent.latency ]; catch, end;
 EEG = pop_importevent(EEG, 'fields', { 'num' 'type' 'response' 'acc' 'RT' 'latency'}, ...
                       'skipline', skipline, 'timeunit', 1E-3, 'align', NaN, 'append', 'no', 'event', filename );
 
-neweventlats = [ EEG.event.latency ];
+tmpevent = EEG.event;
+neweventlats = [ tmpevent.latency ];
 if ~exist('oldeventlats'), oldeventlats = neweventlats; end;
 len = min(min(length(oldeventlats), length(neweventlats)), 10);
 if mean(oldeventlats(1:len) - neweventlats(1:len)) > 1

@@ -93,21 +93,22 @@ if nargin < 2
                   'if get(gcbo, ''value''),' cb_setref ...
                   'else,'                    cb_setave ...
                   'end;' ];
-    cb_chansel1 = '[tmp tmpval] = pop_chansel({EEG(1).chanlocs.labels}, ''withindex'', ''on''); set(findobj(gcbf, ''tag'', ''reref''   ), ''string'',tmpval); clear tmp tmpval';
-    cb_chansel2 = '[tmp tmpval] = pop_chansel({EEG(1).chanlocs.labels}, ''withindex'', ''on''); set(findobj(gcbf, ''tag'', ''exclude'' ), ''string'',tmpval); clear tmp tmpval';
+    cb_chansel1 = 'tmpchanlocs = EEG(1).chanlocs; [tmp tmpval] = pop_chansel({tmpchanlocs.labels}, ''withindex'', ''on''); set(findobj(gcbf, ''tag'', ''reref''   ), ''string'',tmpval); clear tmpchanlocs tmp tmpval';
+    cb_chansel2 = 'tmpchanlocs = EEG(1).chanlocs; [tmp tmpval] = pop_chansel({tmpchanlocs.labels}, ''withindex'', ''on''); set(findobj(gcbf, ''tag'', ''exclude'' ), ''string'',tmpval); clear tmpchanlocs tmp tmpval';
     cb_chansel3 = [ 'if ~isfield(EEG(1).chaninfo, ''nodatchans''), ' ...
                     '   warndlg2(''There are no Reference channel defined, add it using the channel location editor'');' ...
                     'elseif isempty(EEG(1).chaninfo.nodatchans),' ...
                     '   warndlg2(''There are no Reference channel defined, add it using the channel location editor'');' ...
                     'else,' ...
-                    '   [tmp tmpval] = pop_chansel({EEG(1).chaninfo.nodatchans.labels}, ''withindex'', ''on''); set(findobj(gcbf, ''tag'', ''refloc''  ), ''string'',tmpval); clear tmp tmpval;' ...
+                    '   tmpchanlocs = EEG(1).chanlocs; [tmp tmpval] = pop_chansel({tmpchaninfo.nodatchans.labels}, ''withindex'', ''on''); set(findobj(gcbf, ''tag'', ''refloc''  ), ''string'',tmpval); clear tmpchanlocs tmp tmpval;' ...
                     'end;' ];
     if isempty(EEG.chanlocs), cb_chansel1 = ''; cb_chansel2 = ''; cb_chansel3 = ''; end;
     
     % find current reference (= reference most used)
     % ----------------------------------------------
     if isfield(EEG(1).chanlocs, 'ref')
-        [curref tmp allinds] = unique( { EEG(1).chanlocs.ref });
+        tmpchanlocs = EEG(1).chanlocs;
+        [curref tmp allinds] = unique( { tmpchanlocs.ref });
         maxind = 1;
         for ind = unique(allinds)
             if length(find(allinds == ind)) > length(find(allinds == maxind))
@@ -147,7 +148,8 @@ if nargin < 2
     options = {};
     if ~isempty(restag.refloc),
          try
-             tmpallchans = lower({ EEG.chaninfo.nodatchans.labels });
+             tmpchaninfo = EEG.chaninfo;
+             tmpallchans = lower({ tmpchaninfo.nodatchans.labels });
              allelecs = parsetxt(lower(restag.refloc));
              chanind  = [];
              for iElec = 1:length(allelecs)
@@ -206,8 +208,9 @@ if ~isempty(refchan)
 end;
 if ~isempty(g.refloc)
     allinds = [];
+    tmpchaninfo = EEG.chaninfo;
     for iElec = 1:length(g.refloc)
-         allinds = [allinds strmatch( g.refloc(iElec).labels, { EEG.chaninfo.nodatchans.labels }) ];
+         allinds = [allinds strmatch( g.refloc(iElec).labels, { tmpchaninfo.nodatchans.labels }) ];
     end;
     EEG.chaninfo.nodatchans(allinds) = [];
 end;

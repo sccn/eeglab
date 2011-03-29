@@ -57,7 +57,8 @@ end;
 
 warning('off', 'MATLAB:intConvertNonIntVal');
 if ~isempty(EEG.chanlocs)
-    writeeeg(filename, EEG.data, EEG.srate, 'label', { EEG.chanlocs.labels }, 'EVENT', EEG.event, options{:});
+    tmpchanlocs = EEG.chanlocs;
+    writeeeg(filename, EEG.data, EEG.srate, 'label', { tmpchanlocs.labels }, 'EVENT', EEG.event, options{:});
 else
     writeeeg(filename, EEG.data, EEG.srate, 'EVENT', EEG.event, options{:});
 end;

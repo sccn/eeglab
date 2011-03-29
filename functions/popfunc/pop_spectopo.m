@@ -272,15 +272,16 @@ end;
 % add boundaries if continuous data
 % ----------------------------------
 if EEG.trials == 1 & ~isempty(EEG.event) & isfield(EEG.event, 'type') & isstr(EEG.event(1).type)
-	boundaries = strmatch('boundary', {EEG.event.type});
+	tmpevent = EEG.event;
+    boundaries = strmatch('boundary', {tmpevent.type});
 	if ~isempty(boundaries)
 		if exist('pointrange')
-			boundaries = [ EEG.event(boundaries).latency ] - 0.5-pointrange(1)+1;
+			boundaries = [ tmpevent(boundaries).latency ] - 0.5-pointrange(1)+1;
 			boundaries(find(boundaries>=pointrange(end)-pointrange(1))) = [];
 			boundaries(find(boundaries<1)) = [];
 			boundaries = [0 boundaries pointrange(end)-pointrange(1)];
 		else
-			boundaries = [0 [ EEG.event(boundaries).latency ]-0.5 EEG.pnts ];
+			boundaries = [0 [ tmpevent(boundaries).latency ]-0.5 EEG.pnts ];
 		end;
 		spectopooptions = [ spectopooptions ',''boundaries'',[' int2str(round(boundaries)) ']']; 
 	end;		

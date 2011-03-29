@@ -94,7 +94,8 @@ for index = 1:n
 		EEG.event(end).response = response(index);
 	end
 end;
-tmp = [ EEG.event.latency ];
+tmpevent = EEG.event;
+tmp = [ tmpevent.latency ];
 [tmp indexsort] = sort(tmp);
 EEG.event = EEG.event(indexsort);
 EEG = eeg_checkset(EEG, 'eventconsistency');

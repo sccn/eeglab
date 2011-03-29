@@ -200,8 +200,9 @@ all_pac.parameters = tmpparams;
 
 if ~isempty(g.channels1)
     if ~isempty(EEG(1).chanlocs)
-        all_pac.chanlabels1   = { EEG(1).chanlocs(g.indices1).labels };
-        all_pac.chanlabels2   = { EEG(1).chanlocs(g.indices2).labels };
+        tmpchanlocs = EEG(1).chanlocs;
+        all_pac.chanlabels1   = { tmpchanlocs(g.indices1).labels };
+        all_pac.chanlabels2   = { tmpchanlocs(g.indices2).labels };
     end;
 end;
 

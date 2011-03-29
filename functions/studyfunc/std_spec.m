@@ -207,9 +207,10 @@ for dat = 1:length(EEG)
     else
         % get boundaries for continuous data
         if ~isempty(EEG(dat).event) && isfield(EEG(dat).event, 'type') && ischar(EEG(dat).event(1).type)
-             tmpbound = strmatch('boundary', lower({ EEG(dat).event.type }));
+             tmpevent = EEG(dat).event;
+             tmpbound = strmatch('boundary', lower({ tmpevent.type }));
              if ~isempty(tmpbound)
-                 boundaries = [boundaries size(X,2) [ EEG(dat).event(tmpbound).latency ]-0.5+size(X,2) ];
+                 boundaries = [boundaries size(X,2) [ tmpevent(tmpbound).latency ]-0.5+size(X,2) ];
              end;
         else 
         end;
@@ -295,7 +296,8 @@ else
     if ~isempty(g.interp)
         savetofile( filename, f, X, 'chan', 1:size(X,1), options, { g.interp.labels });
     else
-        savetofile( filename, f, X, 'chan', 1:size(X,1), options, { EEG(1).chanlocs.labels });
+        tmpchanlocs = EEG(1).chanlocs;
+        savetofile( filename, f, X, 'chan', 1:size(X,1), options, { tmpchanlocs.labels });
     end;
 end;
 return;

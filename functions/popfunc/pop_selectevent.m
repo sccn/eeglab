@@ -150,16 +150,17 @@ if nargin<2
             commandtype = [ 'if ~isfield(EEG.event, ''type'')' ...
                            '   errordlg2(''No type field'');' ...
                            'else' ...
+                           '   tmpevent = EEG.event;' ...
                            '   if isnumeric(EEG.event(1).type),' ...
-                           '        [tmps,tmpstr] = pop_chansel(unique([ EEG.event.type ]));' ...
+                           '        [tmps,tmpstr] = pop_chansel(unique([ tmpevent.type ]));' ...
                            '   else,' ...
-                           '        [tmps,tmpstr] = pop_chansel(unique({ EEG.event.type }));' ...
+                           '        [tmps,tmpstr] = pop_chansel(unique({ tmpevent.type }));' ...
                            '   end;' ...
                            '   if ~isempty(tmps)' ...
                            '       set(findobj(''parent'', gcbf, ''tag'', ''type''), ''string'', tmpstr);' ...
                            '   end;' ...
                            'end;' ...
-                           'clear tmps tmpv tmpstr tmpfieldnames;' ];
+                           'clear tmps tmpv tmpevent tmpstr tmpfieldnames;' ];
             middletxt  = { { 'Style', 'edit', 'string', '' 'tag' 'type' } { 'Style', 'pushbutton', 'string', '...' 'callback' commandtype } };
             middlegeom = [ 0.95 0.35 ];
         else
@@ -320,7 +321,7 @@ for index = 1:length(allfields)
     % ----------------------------
     if ~isempty( tmpvar )
         if  iscell( tmpvar ) % strings
-            eval( [ 'tmpvarvalue = {EEG.event(:).' allfields{index} '};'] );
+            eval( [ 'tmpevent = EEG.event; tmpvarvalue = {tmpevent(:).' allfields{index} '};'] );
             Ieventtmp = [];
             for index2 = 1:length( tmpvar )
                 tmpindex = strmatch( tmpvar{index2}, tmpvarvalue, 'exact');
@@ -331,12 +332,14 @@ for index = 1:length(allfields)
             end;
             Ievent = intersect( Ievent, Ieventtmp );
         elseif isstr( tmpvar ) % real range
-            eval( [ 'tmpvarvalue = [ EEG.event(:).' allfields{index} ' ];'] );
+            tmpevent = EEG.event;
+            eval( [ 'tmpvarvalue = [ tmpevent(:).' allfields{index} ' ];'] );
             min = eval(tmpvar(1:findstr(tmpvar, '<=')-1));
             max = eval(tmpvar(findstr(tmpvar, '<=')+2:end));
 			if strcmp(allfields{index}, 'latency')
 				if EEG.trials > 1
-					tmpvarvalue = eeg_point2lat(tmpvarvalue, {EEG.event.epoch}, EEG.srate, ...
+                    tmpevent = EEG.event;
+					tmpvarvalue = eeg_point2lat(tmpvarvalue, {tmpevent.epoch}, EEG.srate, ...
 											[EEG.xmin EEG.xmax]*1000, 1E-3);
 				else
 					tmpvarvalue = eeg_point2lat(tmpvarvalue, ones(1,length(EEG.event)), EEG.srate, ...
@@ -356,7 +359,7 @@ for index = 1:length(allfields)
 				fprintf(['pop_selectevent warning: latencies are continuous values\n' ...
 						 'so you may use the ''a<=b'' notation to select these values\n']);
 			end;
-            eval( [ 'tmpvarvalue = [ EEG.event(:).' allfields{index} ' ];'] );
+            eval( [ 'tmpevent = EEG.event; tmpvarvalue = [ tmpevent(:).' allfields{index} ' ];'] );
             Ieventtmp = [];
             for index2 = 1:length( tmpvar )
                 Ieventtmp = unique( [ Ieventtmp find(tmpvarvalue == tmpvar(index2)) ] );
@@ -379,7 +382,7 @@ for index = 1:length(allfields)
 	end;
     if ~isempty( tmpvar )
         if  iscell( tmpvar )
-            eval( [ 'tmpvarvalue = {EEG.event(:).' allfields{index} '};'] );
+            eval( [ 'tmpevent = EEG.event; tmpvarvalue = {tmpevent(:).' allfields{index} '};'] );
             Ieventtmp = [];
             for index2 = 1:length( tmpvar )
                 tmpindex = strmatch( tmpvar{index2}, tmpvarvalue, 'exact');
@@ -390,12 +393,14 @@ for index = 1:length(allfields)
             end;
             Ieventrem = union( Ieventrem, Ieventtmp );
          elseif isstr( tmpvar )
-            eval( [ 'tmpvarvalue = [ EEG.event(:).' allfields{index} ' ];'] );
+            tmpevent = EEG.event;
+            eval( [ 'tmpvarvalue = [ tmpevent(:).' allfields{index} ' ];'] );
             min = eval(tmpvar(1:findstr(tmpvar, '<=')-1));
             max = eval(tmpvar(findstr(tmpvar, '<=')+2:end));
 			if strcmp(allfields{index}, 'latency')
 				if EEG.trials > 1
-					tmpvarvalue = eeg_point2lat(tmpvarvalue, {EEG.event.epoch}, EEG.srate, ...
+                    tmpevent = EEG.event;
+					tmpvarvalue = eeg_point2lat(tmpvarvalue, {tmpevent.epoch}, EEG.srate, ...
 											[EEG.xmin EEG.xmax]*1000, 1E-3);
 				else
 					tmpvarvalue = eeg_point2lat(tmpvarvalue, ones(1,length(EEG.event)), EEG.srate, ...
@@ -415,7 +420,8 @@ for index = 1:length(allfields)
 				fprintf(['pop_selectevent warning: latencies are continuous values\n' ...
 						 'so you may use the ''a<=b'' notation to select these values\n']);
 			end;
-            eval( [ 'tmpvarvalue = [ EEG.event(:).' allfields{index} ' ];'] );
+            tmpevent = EEG.event;
+            eval( [ 'tmpvarvalue = [ tmpevent(:).' allfields{index} ' ];'] );
             Ieventtmp = [];
             for index2 = 1:length( tmpvar )
                 Ieventtmp = unique( [ Ieventtmp find( tmpvarvalue ==tmpvar(index2)) ] );
@@ -434,7 +440,8 @@ end;
 if isfield(EEG.event, 'type')
     if isstr(EEG.event(1).type) & EEG.trials == 1 
         Ieventrem = setdiff([1:length(EEG.event)], Ievent );
-        boundaryindex = strmatch('boundary', { EEG.event(Ieventrem).type });
+        tmpevent  = EEG.event;
+        boundaryindex = strmatch('boundary', { tmpevent(Ieventrem).type });
         if ~isempty(boundaryindex)
             boundaryindex = Ieventrem(boundaryindex);
             Ievent = [ Ievent boundaryindex ];

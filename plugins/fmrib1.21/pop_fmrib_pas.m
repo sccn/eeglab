@@ -102,7 +102,8 @@ end
 %Launch user input GUI for 1 input or assign user inputs
 %--------------------------------------------------------
 if nargin==1
-    etypes=unique({EEG.event.type});
+    tmpevent = EEG.event;
+    etypes=unique({tmpevent.type});
 	guifig=guipas(etypes);
 else
     p.opstatus=1;

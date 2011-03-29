@@ -60,7 +60,8 @@ end;
                                'moviemode'   'string'  { 'ersptime' 'erp' 'spec' } 'spec' }, 'std_movie', 'ignore');
 
 if isstr(opt), error(opt); end;
-if isempty(opt.channels), opt.channels = { ALLEEG(1).chanlocs.labels }; end;
+tmpchanlocs =  ALLEEG(1).chanlocs;
+if isempty(opt.channels), opt.channels = { tmpchanlocs.labels }; end;
 if ~strcmpi(opt.moviemode, 'spec'), error('Only spec has been implemented so far'); end;
 
 % read data once

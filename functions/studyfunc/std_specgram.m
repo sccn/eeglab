@@ -133,8 +133,9 @@ if ~isempty(opt.channels)
     prefix = 'chan';
     opt.indices = opt.channels;
     if iscell(opt.channels)
+        tmpchanlocs = EEG(1).chanlocs;
         for index = 1:length(opt.channels)
-            chanind = strmatch( lower(opt.channels{index}), lower({ EEG.chanlocs.labels }), 'exact');
+            chanind = strmatch( lower(opt.channels{index}), lower({ tmpchanlocs.labels }), 'exact');
             if isempty(chanind), error('Channel group not found'); end;
             chaninds(index) = chanind;
         end;
@@ -275,7 +276,8 @@ if strcmpi(prefix, 'comp')
     savetofile( filename, t, f, erspinterp, 'comp', opt.indices, options, [], opt.interp);
     [erspinterp, t, f] = std_readspecgram(EEG, 1, opt.components, opt.timerange, opt.freqrange);
 else
-    savetofile( filename, t, f, erspinterp, 'chan', opt.indices, options, { EEG.chanlocs.labels }, opt.interp);
+    tmpchanlocs = EEG(1).chanlocs;
+    savetofile( filename, t, f, erspinterp, 'chan', opt.indices, options, { tmpchanlocs.labels }, opt.interp);
     [erspinterp, t, f] = std_readspecgram(EEG, 1, -opt.channels, opt.timerange, opt.freqrange);
 end;
 return;
@@ -291,9 +293,10 @@ function urlat = eeg_makeurarray(EEG, urpnts);
     
     % get boundary events latency and duration
     % ----------------------------------------
-    bounds    = strmatch('boundary', { EEG.event.type });
-    alldurs   = [ EEG.event(bounds).duration ];
-    alllats   = [ EEG.event(bounds).latency  ];
+    tmpevent  = EEG.event;
+    bounds    = strmatch('boundary', { tmpevent.type });
+    alldurs   = [ tmpevent(bounds).duration ];
+    alllats   = [ tmpevent(bounds).latency  ];
     if length(alldurs) >= 1
         if alldurs(1) <= 1
             alllats(1) = [];
@@ -344,8 +347,9 @@ function pntslat = eeg_urpnts(EEG);
         pntslat = EEG.pnts;
         return;
     end;
-    bounds = strmatch('boundary', { EEG.event.type });
-    alldurs = [ EEG.event(bounds).duration ];
+    tmpevent = EEG.event;
+    bounds = strmatch('boundary', { tmpevent.type });
+    alldurs = [ tmpevent(bounds).duration ];
     if length(alldurs) > 0
         if alldurs(1) <= 1, alldurs(1) = [];
         end;
@@ -359,7 +363,8 @@ function pntslat = eeg_urlatency(EEG, pntslat);
     if isempty(EEG.event), return; end;
     if ~isstr(EEG.event(1).type), return; end;
     
-    bounds = strmatch('boundary', { EEG.event.type })
+    tmpevent = EEG.event;
+    bounds = strmatch('boundary', { tmpevent.type })
     for i=1:length(bounds)
         if EEG.event(bounds(i)).duration > 1
             pntslat = pntslat + EEG.event(bounds(i)).duration;

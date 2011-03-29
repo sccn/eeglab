@@ -159,7 +159,8 @@ if nargin < 2 | selectamica
     % channel types
     % -------------
     if isfield(ALLEEG(1).chanlocs, 'type'), 
-        alltypes = { ALLEEG(1).chanlocs.type };
+        tmpchanlocs = ALLEEG(1).chanlocs;
+        alltypes = { tmpchanlocs.type };
         indempty = cellfun('isempty', alltypes);
         alltypes(indempty) = '';
         try, 
@@ -174,7 +175,8 @@ if nargin < 2 | selectamica
     % channel labels
     % --------------
     if ~isempty(ALLEEG(1).chanlocs)
-        alllabels = { ALLEEG(1).chanlocs.labels };
+        tmpchanlocs = ALLEEG(1).chanlocs;        
+        alllabels = { tmpchanlocs.labels };
     else
         for index = 1:ALLEEG(1).nbchan
             alllabels{index} = int2str(index);
@@ -300,9 +302,12 @@ if ~isempty(EEG.icaweights)
         EEG.etc.oldicasphere = {};
         EEG.etc.oldicachansind = {};
     end;
-    EEG.etc.oldicaweights = { EEG.icaweights  EEG.etc.oldicaweights{:} };
-    EEG.etc.oldicasphere  = { EEG.icasphere   EEG.etc.oldicasphere{:}  };
-    EEG.etc.oldicachansind  = { EEG.icachansind EEG.etc.oldicachansind{:}  };
+    tmpoldicaweights  = EEG.etc.oldicaweights;
+    tmpoldicasphere   = EEG.etc.oldicasphere;
+    tmpoldicachansind = EEG.etc.oldicachansind;
+    EEG.etc.oldicaweights = { EEG.icaweights    tmpoldicaweights{:} };
+    EEG.etc.oldicasphere  = { EEG.icasphere     tmpoldicasphere{:}  };
+    EEG.etc.oldicachansind  = { EEG.icachansind tmpoldicachansind{:}  };
     fprintf('               Decomposition saved as entry %d.\n',length(EEG.etc.oldicaweights));
 end
 EEG.icaweights = [];

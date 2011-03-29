@@ -386,9 +386,10 @@ if ~isempty(g.channels)
         all_itc.chanlabels    = { g.interp(g.indices).labels };
         all_trials.chanlabels = { g.interp(g.indices).labels };
     elseif ~isempty(EEG(1).chanlocs)
-        all_ersp.chanlabels   = { EEG(1).chanlocs(g.indices).labels };
-        all_itc.chanlabels    = { EEG(1).chanlocs(g.indices).labels };
-        all_trials.chanlabels = { EEG(1).chanlocs(g.indices).labels };
+        tmpchanlocs = EEG(1).chanlocs;
+        all_ersp.chanlabels   = { tmpchanlocs(g.indices).labels };
+        all_itc.chanlabels    = { tmpchanlocs(g.indices).labels };
+        all_trials.chanlabels = { tmpchanlocs(g.indices).labels };
     end;
 end;
 

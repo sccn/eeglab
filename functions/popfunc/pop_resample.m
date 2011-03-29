@@ -86,10 +86,11 @@ oldpnts   = EEG.pnts;
 % resample for multiple channels
 % -------------------------
 if isfield(EEG, 'event') & isfield(EEG.event, 'type') & isstr(EEG.event(1).type)
-    bounds = strmatch('boundary', { EEG.event.type });
+    tmpevent = EEG.event;
+    bounds = strmatch('boundary', { tmpevent.type });
     if ~isempty(bounds),
         disp('Data break detected and taken into account for resampling');
-        bounds = [ EEG.event(bounds).latency ];
+        bounds = [ tmpevent(bounds).latency ];
         if bounds(1) < 0, bounds(1) = []; end; % remove initial boundary if any
     end;
     bounds = [1 round(bounds-0.5)+1 size(EEG.data,2)+1];

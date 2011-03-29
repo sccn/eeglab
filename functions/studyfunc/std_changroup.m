@@ -59,7 +59,7 @@ if nargin >= 3
     end;
 end;
 if ~inputloc
-    alllocs = eeg_mergelocs(ALLEEG(:).chanlocs);
+    alllocs = eeg_mergelocs(ALLEEG.chanlocs);
 end;
 
 % create group for each electrode
@@ -114,7 +114,8 @@ function changrp = std_chanlookupnew( STUDY, ALLEEG, changrp, interp);
         % -----------------------
         if strcmpi(interp, 'off')
             datind  = setinfo(index).dataset;
-            tmplocs = { ALLEEG(datind(1)).chanlocs.labels };
+            tmpchanlocs = ALLEEG(datind(1)).chanlocs;
+            tmplocs = { tmpchanlocs.labels };
             for indc = 1:length(changrp.channels) % usually just one channel
                 ind = strmatch( changrp.channels{indc}, tmplocs, 'exact');
                 if length(ind) > 1, error([ 'Duplicate channel label ''' tmplocs{ind(1)} ''' for dataset ' int2str(datind) ]); end;

@@ -131,10 +131,11 @@ fprintf('pop_rmbase(): Removing baseline...\n');
 if EEG.trials == 1 & ~isempty(EEG.event) ...
                      & isfield(EEG.event, 'type') ...
                         & isstr(EEG.event(1).type)
-	boundaries = strmatch('boundary', {EEG.event.type});
+    tmpevent = EEG.event;
+	boundaries = strmatch('boundary', {tmpevent.type});
 	if ~isempty(boundaries) % this is crashing
         fprintf('Pop_rmbase(): finding continuous data discontinuities\n');
-        boundaries = round([ EEG.event(boundaries).latency ] -0.5-pointrange(1)+1);
+        boundaries = round([ tmpevent(boundaries).latency ] -0.5-pointrange(1)+1);
         boundaries(find(boundaries>=pointrange(end)-pointrange(1))) = [];
         boundaries(find(boundaries<1)) = [];
         boundaries = [0 boundaries pointrange(end)-pointrange(1)];

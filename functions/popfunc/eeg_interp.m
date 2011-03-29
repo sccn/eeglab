@@ -54,7 +54,8 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method)
         % add missing channels in interpolation structure
         % -----------------------------------------------
         lab1 = { bad_elec.labels };
-        lab2 = { EEG.chanlocs.labels };
+        tmpchanlocs = EEG.chanlocs;
+        lab2 = { tmpchanlocs.labels };
         [tmp tmpchan] = setdiff( lab2, lab1);
         tmpchan = sort(tmpchan);
         if ~isempty(tmpchan)
@@ -74,7 +75,8 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method)
         if length(EEG.chanlocs) == length(bad_elec), return; end;
         
         lab1 = { bad_elec.labels };
-        lab2 = { EEG.chanlocs.labels };
+        tmpchanlocs = EEG.chanlocs;
+        lab2 = { tmpchanlocs.labels };
         [tmp badchans] = setdiff( lab1, lab2);
         fprintf('Interpolating %d channels...\n', length(badchans));
         if length(badchans) == 0, return; end;
@@ -134,7 +136,8 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method)
     % find non-empty good channels
     % ----------------------------
     origoodchans = goodchans;
-    nonemptychans = find(~cellfun('isempty', { EEG.chanlocs.theta }));
+    chanlocs     = EEG.chanlocs;
+    nonemptychans = find(~cellfun('isempty', { chanlocs.theta }));
     [tmp indgood ] = intersect(goodchans, nonemptychans);
     goodchans = goodchans( sort(indgood) );
     datachans = getdatachans(goodchans,badchans);
@@ -146,16 +149,18 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method)
     if strcmpi(method, 'spherical')
         % get theta, rad of electrodes
         % ----------------------------
-        xelec = [ EEG.chanlocs(goodchans).X ];
-        yelec = [ EEG.chanlocs(goodchans).Y ];
-        zelec = [ EEG.chanlocs(goodchans).Z ];
+        tmpgoodlocs = EEG.chanlocs(goodchans);
+        xelec = [ tmpgoodlocs.X ];
+        yelec = [ tmpgoodlocs.Y ];
+        zelec = [ tmpgoodlocs.Z ];
         rad = sqrt(xelec.^2+yelec.^2+zelec.^2);
         xelec = xelec./rad;
         yelec = yelec./rad;
         zelec = zelec./rad;
-        xbad = [ EEG.chanlocs(badchans).X ];
-        ybad = [ EEG.chanlocs(badchans).Y ];
-        zbad = [ EEG.chanlocs(badchans).Z ];
+        tmpbadlocs = EEG.chanlocs(badchans);
+        xbad = [ tmpbadlocs.X ];
+        ybad = [ tmpbadlocs.Y ];
+        zbad = [ tmpbadlocs.Z ];
         rad = sqrt(xbad.^2+ybad.^2+zbad.^2);
         xbad = xbad./rad;
         ybad = ybad./rad;
@@ -172,8 +177,10 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method)
     elseif strcmpi(method, 'spacetime') % 3D interpolation, works but x10 times slower
         disp('Warning: if processing epoch data, epoch boundary are ignored...');
         disp('3-D interpolation, this can take a long (long) time...');
-        [xbad ,ybad]  = pol2cart([EEG.chanlocs( badchans).theta],[EEG.chanlocs( badchans).radius]);
-        [xgood,ygood] = pol2cart([EEG.chanlocs(goodchans).theta],[EEG.chanlocs(goodchans).radius]);
+        tmpgoodlocs = EEG.chanlocs(goodchans);
+        tmpbadlocs = EEG.chanlocs(badchans);
+        [xbad ,ybad]  = pol2cart([tmpbadlocs.theta],[tmpbadlocs.radius]);
+        [xgood,ygood] = pol2cart([tmpgoodlocs.theta],[tmpgoodlocs.radius]);
         pnts = size(EEG.data,2)*size(EEG.data,3);
         zgood = [1:pnts];
         zgood = repmat(zgood, [length(xgood) 1]);    
@@ -191,8 +198,9 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method)
     else 
         % get theta, rad of electrodes
         % ----------------------------
-        [xbad ,ybad]  = pol2cart([EEG.chanlocs( badchans).theta],[EEG.chanlocs( badchans).radius]);
-        [xgood,ygood] = pol2cart([EEG.chanlocs(goodchans).theta],[EEG.chanlocs(goodchans).radius]);
+        tmpchanlocs = EEG.chanlocs;
+        [xbad ,ybad]  = pol2cart([tmpchanlocs( badchans).theta],[tmpchanlocs( badchans).radius]);
+        [xgood,ygood] = pol2cart([tmpchanlocs(goodchans).theta],[tmpchanlocs(goodchans).radius]);
 
         fprintf('Points (/%d):', size(EEG.data,2)*size(EEG.data,3));
         badchansdata = zeros(length(badchans), size(EEG.data,2)*size(EEG.data,3));

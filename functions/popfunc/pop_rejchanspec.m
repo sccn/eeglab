@@ -193,7 +193,8 @@ if strcmpi(opt.plotchans, 'on')
     colors = cell(1,length(opt.elec)); colors(:) = { 'k' };
     colors(allrmchan) = { 'r' }; colors = colors(end:-1:1);
     fprintf('%d electrodes labeled for rejection\n', length(find(allrmchan)));
-    if ~isempty(EEG.chanlocs), tmplocs = EEG.chanlocs(opt.elec); tmpelec = { EEG.chanlocs(opt.elec).labels }';
+    tmpchanlocs = EEG.chanlocs;
+    if ~isempty(EEG.chanlocs), tmplocs = EEG.chanlocs(opt.elec); tmpelec = { tmpchanlocs(opt.elec).labels }';
     else                       tmplocs = []; tmpelec = mattocell([1:EEG.nbchan]');
     end;
     eegplot(EEG.data(opt.elec,:,:), 'srate', EEG.srate, 'title', 'Scroll component activities -- eegplot()', ...

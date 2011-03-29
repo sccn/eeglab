@@ -61,7 +61,7 @@ end;
 
 % union of all channel structures
 % -------------------------------
-alllocs = eeg_mergelocs(ALLEEG(:).chanlocs);
+alllocs = eeg_mergelocs(ALLEEG.chanlocs);
 
 % check electrode names to interpolate
 % ------------------------------------

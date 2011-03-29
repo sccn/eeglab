@@ -138,15 +138,21 @@ if ~isempty(EEG.event)
         EEG.event(end+1).type    = 'New Segment';
         EEG.event(end  ).latency = (index-1)*EEG.pnts+1;
     end;
-    [tmp latorder ] = sort( [ EEG.event.latency ] );
+    tmpevent = EEG.event;
+    [tmp latorder ] = sort( [ tmpevent.latency ] );
     EEG.event = EEG.event(latorder);
 
     % Recode boundary events
-    bndArray = find(strcmp('boundary', {EEG.event.comment})); % Find boundary events
-    isDupArray = ismember([EEG.event(bndArray).latency], [EEG.event(strcmp('New Segment', {EEG.event.type})).latency]); % Find already existing New Segment events with identical latency
-    [EEG.event(bndArray(~isDupArray)).type] = deal('New Segment'); % Recode boundary event type
-    [EEG.event(bndArray(~isDupArray)).comment] = deal(''); % Recode boundary event comment
-    EEG.event(bndArray(isDupArray)) = []; % Remove duplicate New Segment events 
+    % ----------------------
+    bndArray = find(strcmp('boundary', {tmpevent.comment})); % Find boundary events
+    isDupArray = ismember([tmpevent(bndArray).latency], [tmpevent(strcmp('New Segment', {tmpevent.type})).latency]); % Find already existing New Segment events with identical latency
+    notduplist  = bndArray(~isDupArray);
+    duplist     = bndArray(isDupArray);
+    for index = 1:length(notduplist)
+        EEG.event(notduplist(index)).type    = 'New Segment'; % Recode boundary event type
+        EEG.event(notduplist(index)).comment = '';            % Recode boundary event comment
+    end;
+    EEG.event(duplist) = []; % Remove duplicate New Segment events 
 
     % rename latency events
     % ---------------------

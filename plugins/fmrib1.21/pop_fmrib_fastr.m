@@ -183,7 +183,8 @@ end
 %Launch user input GUI and read settings
 %--------------------------------------
 if nargin==1
-    etypes=unique({EEG.event.type});
+    tmpevent = EEG.event;
+    etypes=unique({tmpevent.type});
     guifig=guifastr(etypes);
     p=guidata(guifig);
 else

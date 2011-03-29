@@ -400,9 +400,10 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
       % fields. Requires further investigation.
  
       if ~isempty(field2)
+          tmpevent = EEG.event;
           if ~isstr(getfield( EEG.event(1), field2 ))
-               eval(['tmparray = [ EEG.event.' field2 ' ];']);
-          else eval(['tmparray = { EEG.event.' field2 ' };']);
+               eval(['tmparray = [ tmpevent.' field2 ' ];']);
+          else eval(['tmparray = { tmpevent.' field2 ' };']);
           end
           % Commented out 11/18/2005, Toby
           % These lines were incorrectly sorting the event.latency field in
@@ -420,9 +421,10 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
       else
           events = EEG.event;
       end;  
+      tmpevent = EEG.event;      
       if ~isstr(getfield( EEG.event(1), field1 ))
-           eval(['tmparray = [ EEG.event.' field1 ' ];']);
-      else eval(['tmparray = { EEG.event.' field1 ' };']);
+           eval(['tmparray = [ tmpevent.' field1 ' ];']);
+      else eval(['tmparray = { tmpevent.' field1 ' };']);
       end;
       % Commented out 11/18/2005, Toby
       %if strcmp( field1, 'latency') & EEG.trials > 1

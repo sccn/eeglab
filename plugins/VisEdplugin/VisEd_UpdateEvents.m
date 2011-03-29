@@ -48,7 +48,8 @@ end
 
 %sort events.
 if ~isempty(EEG.event);
-    eventorder=[1:length(EEG.event);[EEG.event.latency]]';
+    tmpevent  = EEG.event;
+    eventorder=[1:length(EEG.event);[tmpevent.latency]]';
     eventorder=sortrows(eventorder,2);
     for i=1:length(EEG.event);
         TMP.event(i)=EEG.event(eventorder(i,1));

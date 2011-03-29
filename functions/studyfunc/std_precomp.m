@@ -149,10 +149,10 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
         end;
     end;
     if isempty(chanlist)
-        alllocs = eeg_mergelocs(ALLEEG(:).chanlocs);
+        alllocs = eeg_mergelocs(ALLEEG.chanlocs);
         chanlist = { alllocs.labels };
     elseif ~isnumeric(chanlist{1})
-        alllocs = eeg_mergelocs(ALLEEG(:).chanlocs);
+        alllocs = eeg_mergelocs(ALLEEG.chanlocs);
         [tmp c1 c2] = intersect( lower({ alllocs.labels }), lower(chanlist));
         [tmp c2] = sort(c2);
         alllocs = alllocs(c1(c2));
@@ -385,10 +385,12 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
             opts = { opts{:} 'interp' allocs(ind1) };
         else
             newchanlist = [];
-            chanlocs = { ALLEEG(idat(1)).chanlocs.labels };
+            tmpchanlocs = ALLEEG(idat(1)).chanlocs;
+            chanlocs = { tmpchanlocs.labels };
             for i=1:length(chanlist)
                 newchanlist = [ newchanlist strmatch(chanlist(i), chanlocs, 'exact') ];
             end;
-            tmpchanlist = { ALLEEG(idat(1)).chanlocs(newchanlist).labels };
+            tmpchanlocs =  ALLEEG(idat(1)).chanlocs;
+            tmpchanlist = { tmpchanlocs(newchanlist).labels };
         end;
         

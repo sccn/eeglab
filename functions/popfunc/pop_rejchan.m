@@ -124,7 +124,8 @@ if nargin < 2
             '     eegh(tmpcom);' ...
             '     eeglab(''redraw'');' ...
             '  end; clear EEGTMP tmpcom;' ];
-    if ~isempty(EEG.chanlocs), tmplocs = EEG.chanlocs(opt.elec); tmpelec = { EEG.chanlocs(opt.elec).labels }';
+    tmpchanlocs = EEG.chanlocs;
+    if ~isempty(EEG.chanlocs), tmplocs = EEG.chanlocs(opt.elec); tmpelec = { tmpchanlocs(opt.elec).labels }';
     else                       tmplocs = []; tmpelec = mattocell([1:EEG.nbchan]');
     end;
     eegplot(EEG.data(opt.elec,:,:), 'srate', EEG.srate, 'title', 'Scroll component activities -- eegplot()', ...

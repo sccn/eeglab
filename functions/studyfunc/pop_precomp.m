@@ -140,11 +140,12 @@ if ~isstr(varargin{1}) %intial settings
     allchans  = { };
     keepindex = 0;
     for index = 1:length(ALLEEG)
-        tmpchans = { ALLEEG(index).chanlocs.labels };
-        allchans = unique({ allchans{:} ALLEEG(index).chanlocs.labels });
+        tmpchanlocs = ALLEEG(index).chanlocs;
+        tmpchans = { tmpchanlocs.labels };
+        allchans = unique({ allchans{:} tmpchanlocs.labels });
         if length(allchans) == length(tmpchans), keepindex = index; end;
     end;
-    if keepindex, allchans = { ALLEEG(keepindex).chanlocs.labels }; end;
+    if keepindex, tmpchanlocs = ALLEEG(keepindex).chanlocs; allchans = { tmpchanlocs.labels }; end;
     
     chanlist = {};
     firsttimeersp = 1;

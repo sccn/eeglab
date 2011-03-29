@@ -57,7 +57,8 @@ if iscell(comp)
     % find channel indices list
     % -------------------------
     chanind  = [];
-    chanlabs = lower({ ALLEEG(abset).chanlocs.labels });
+    tmpchanlocs = ALLEEG(abset).chanlocs;
+    chanlabs = lower({ tmpchanlocs.labels });
     for index = 1:length(comp)
         tmp = strmatch(lower(comp{index}), chanlabs, 'exact');
         if isempty(tmp)

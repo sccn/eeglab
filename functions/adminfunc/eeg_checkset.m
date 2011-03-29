@@ -198,9 +198,11 @@ if length(EEG) > 1
                 chanlen    = unique( [ EEG.nbchan ] );
                 anyempty    = unique( cellfun( 'isempty', { EEG.chanlocs }) );
                 if length(chanlen) == 1 & all(anyempty == 0)
-                    channame1 = { EEG(1).chanlocs.labels };
+                    tmpchanlocs = EEG(1).chanlocs;
+                    channame1 = { tmpchanlocs.labels };
                     for i = 2:length(EEG)
-                        channame2 = { EEG(i).chanlocs.labels };
+                        tmpchanlocs = EEG(i).chanlocs;
+                        channame2 = { tmpchanlocs.labels };
                         if length(intersect(channame1, channame2)) ~= length(channame1), res = 'no'; end;
                     end;
                 else res = 'no';
@@ -276,22 +278,22 @@ for inddataset = 1:length(ALLEEG)
                         return;
                     end;
                 case 'chanloc',
-                    if isempty(EEG.chanlocs) | ~isfield(EEG.chanlocs, 'theta') | ...
-                            all(cellfun('isempty', { EEG.chanlocs.theta }))
+                    tmplocs = EEG.chanlocs;
+                    if isempty(tmplocs) || ~isfield(tmplocs, 'theta') || all(cellfun('isempty', { tmplocs.theta }))
                         errordlg2( strvcat('Cannot process dataset without channel location information.', ...
                             'Enter the filename via "Edit > Edit dataset info".', ...
                             'For file format, enter ''>> help readlocs'' from the command line.'), 'Error');
                         return;
                     end;
                 case 'chanlocs_homogeneous',
-                    if isempty(EEG.chanlocs) | ~isfield(EEG.chanlocs, 'theta') | ...
-                            all(cellfun('isempty', { EEG.chanlocs.theta }))
+                    tmplocs = EEG.chanlocs;
+	                if isempty(tmplocs) || ~isfield(tmplocs, 'theta') || all(cellfun('isempty', { tmplocs.theta }))
                         errordlg2( strvcat('Cannot process without a channel location information.', ...
                             'Enter the filename via "Edit > Edit dataset info".', ...
                             'For file format, enter ''>> help readlocs'' from the command line.'), 'Error');
                         return;
                     end;
-                    if ~isfield(EEG.chanlocs, 'X') | isempty(EEG.chanlocs(1).X)
+                    if ~isfield(EEG.chanlocs, 'X') || isempty(EEG.chanlocs(1).X)
                         EEG.chanlocs = convertlocs(EEG.chanlocs, 'topo2all');
                         res = [ inputname(1) ' = eeg_checkset('  inputname(1) ', ''chanlocs_homogeneous'' ); ' ];
                     end;
@@ -348,7 +350,7 @@ for inddataset = 1:length(ALLEEG)
                             end;
                         end;
                         
-                        try, alllatencies = [ EEG.event.latency ];
+                        try, tmpevent = EEG.event; alllatencies = [ tmpevent.latency ];
                         catch, error('Checkset: error empty latency entry for new events added by user');
                         end;
                         I1 = find(alllatencies < 0.5);
@@ -364,26 +366,27 @@ for inddataset = 1:length(ALLEEG)
                     % save information for non latency fields updates
                     % -----------------------------------------------
                     difffield = [];
-                    if ~isempty(EEG.event) & isfield(EEG.event, 'epoch')
+                    if ~isempty(EEG.event) && isfield(EEG.event, 'epoch')
                         % remove fields with empty epochs
                         % -------------------------------
                         removeevent = [];
-                        try, allepochs = [ EEG.event.epoch ];
+                        try, tmpevent = EEG.event; allepochs = [ tmpevent.epoch ];
                             removeevent = find( allepochs < 1 | allepochs > EEG.trials);
                             if ~isempty(removeevent)
                                 disp([ 'eeg_checkset warning: ' int2str(length(removeevent)) ' event had invalid epoch numbers and were removed']);
                             end;
                         catch,
                             for indexevent = 1:length(EEG.event)
-                                if isempty( EEG.event(indexevent).epoch ) | ~isnumeric(EEG.event(indexevent).epoch) ...
-                                        | EEG.event(indexevent).epoch < 1 | EEG.event(indexevent).epoch > EEG.trials
+                                if isempty( EEG.event(indexevent).epoch ) || ~isnumeric(EEG.event(indexevent).epoch) ...
+                                        | EEG.event(indexevent).epoch < 1 || EEG.event(indexevent).epoch > EEG.trials
                                     removeevent = [removeevent indexevent];
                                     disp([ 'eeg_checkset warning: event ' int2str(indexevent) ' has an invalid epoch number: removed']);
                                 end;
                             end;
                         end;
                         EEG.event(removeevent) = [];
-                        allepochs = [ EEG.event.epoch ];
+                        tmpevent  = EEG.event;
+                        allepochs = [ tmpevent.epoch ];
                         
                         % uniformize fields content for the different epochs
                         % --------------------------------------------------
@@ -392,7 +395,8 @@ for inddataset = 1:length(ALLEEG)
                         difffield = fieldnames(EEG.event);
                         difffield = difffield(~(strcmp(difffield,'latency')|strcmp(difffield,'epoch')|strcmp(difffield,'type')));
                         for index = 1:length(difffield)
-                            allvalues = { EEG.event.(difffield{index}) };
+                            tmpevent  = EEG.event;
+                            allvalues = { tmpevent.(difffield{index}) };
                             try
                             	valempt = cellfun('isempty', allvalues);
                             catch
@@ -434,7 +438,8 @@ for inddataset = 1:length(ALLEEG)
                     fnames = fieldnames(EEG.event);
                     for fidx = 1:length(fnames)
                         fname = fnames{fidx};
-                        allvalues = { EEG.event.(fname) };
+                        tmpevent  = EEG.event;
+                        allvalues = { tmpevent.(fname) };
                         try
                             % find indices of numeric values among values of this event property
                             valreal = ~cellfun('isclass', allvalues, 'char');
@@ -479,8 +484,9 @@ for inddataset = 1:length(ALLEEG)
                     % check duration field, replace empty by 0
                     % ----------------------------------------
                     if isfield(EEG.event, 'duration')
-                        try,   valempt = cellfun('isempty'  , { EEG.event.duration });
-                        catch, valempt = mycellfun('isempty', { EEG.event.duration });
+                        tmpevent = EEG.event;
+                        try,   valempt = cellfun('isempty'  , { tmpevent.duration });
+                        catch, valempt = mycellfun('isempty', { tmpevent.duration });
                         end;
                         if any(valempt),
                             for index = find(valempt)
@@ -553,16 +559,17 @@ for inddataset = 1:length(ALLEEG)
                             % -------------------------------------------
                             eventfields = fieldnames(EEG.event)';
                             eventfields = eventfields(~strcmp(eventfields,'epoch'));
+                            tmpevent    = EEG.event;
                             for k = 1:length(eventfields)
                                 fname = eventfields{k};
                                 switch fname
                                     case 'latency'
-                                        sourcedata = round(eeg_point2lat([EEG.event.(fname)],[EEG.event.epoch],EEG.srate, [EEG.xmin EEG.xmax]*1000, 1E-3) * 10^8 )/10^8;
+                                        sourcedata = round(eeg_point2lat([tmpevent.(fname)],[tmpevent.epoch],EEG.srate, [EEG.xmin EEG.xmax]*1000, 1E-3) * 10^8 )/10^8;
                                         sourcedata = num2cell(sourcedata);
                                     case 'duration'
-                                        sourcedata = num2cell([EEG.event.(fname)]/EEG.srate*1000);
+                                        sourcedata = num2cell([tmpevent.(fname)]/EEG.srate*1000);
                                     otherwise
-                                        sourcedata = {EEG.event.(fname)};
+                                        sourcedata = {tmpevent.(fname)};
                                 end
                                 if maxlen == 1
                                     destdata = cell(1,length(epochevent));
@@ -1199,7 +1206,11 @@ for inddataset = 1:length(ALLEEG)
     % store in new structure
     % ----------------------
     if isstruct(EEG)
-        ALLEEGNEW(inddataset) = EEG;
+        if ~exist('ALLEEGNEW')
+            ALLEEGNEW = EEG;
+        else
+            ALLEEGNEW(inddataset) = EEG;
+        end;
     end;
 end;
 
@@ -1262,6 +1273,10 @@ end;
 
 if exist('ALLEEGNEW','var')
     EEG = ALLEEGNEW;
+end;
+
+if ~isa(EEG, 'eegobj') && option_eegobject
+    EEG = eegobj(EEG);
 end;
 
 return;

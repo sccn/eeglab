@@ -131,13 +131,14 @@ end;
 
 if EEG.trials == 1 
 	if ~isempty(EEG.event) & isfield(EEG.event, 'type') & isstr(EEG.event(1).type)
-		boundaries = strmatch('boundary', {EEG.event.type});
+        tmpevent = EEG.event;    
+		boundaries = strmatch('boundary', {tmpevent.type});
 		if isempty(boundaries)
             EEG.data = iirfilt( EEG.data, options{:}); 
 		else
 			options{4} = 0;
 			disp('pop_iirfilt:finding continuous data boundaries');
-			tmplat = cell2mat({EEG.event.latency});
+			tmplat = cell2mat({tmpevent.latency});
             boundaries = tmplat(boundaries);
             boundaries = [0 round(boundaries-0.5) EEG.pnts];
             try, warning off MATLAB:divideByZero

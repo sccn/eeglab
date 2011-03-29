@@ -189,8 +189,9 @@ if nargin<2
                  fastif(isunix,{ 'Style', 'text', 'string', '(Click on field name to select it!)' },{ })};
     geometry = { geometry{:} [1 1 1 0.7 0.72] [1] [1 1.2 0.6 1 2] };
 
+    descriptions = EEG.eventdescription;
     [results userdat ]= inputgui( geometry, uilist, 'pophelp(''pop_editeventfield'');', ...
-                                  'Edit event field(s) -- pop_editeventfield()', { EEG.eventdescription{:} '' } );
+                                  'Edit event field(s) -- pop_editeventfield()', { descriptions{:} '' } );
     if length(results) == 0, return; end;
 
     % decode top inputs
@@ -345,10 +346,11 @@ for curfield = tmpfields'
                               if isfield(EEG, 'urevent')
                                   disp('pop-editeventfield(): updating urevent structure');
                                   try
+                                      tmpevent = EEG.event;
                                       for indtmp = g.indices(:)'
                                           if ~isempty(EEG.event(indtmp).urevent)
                                               tmpval      = getfield (EEG.event, {indtmp}, curfield{1});
-                                              EEG.urevent = setfield (EEG.urevent, {EEG.event(indtmp).urevent}, ...
+                                              EEG.urevent = setfield (EEG.urevent, { tmpevent(indtmp).urevent }, ...
                                                                                    curfield{1}, tmpval);
                                           end;
                                       end;

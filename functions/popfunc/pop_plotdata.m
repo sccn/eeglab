@@ -152,7 +152,8 @@ end
 % inputname(1), typeplot, vararg2str(indices), EEG.trials, plottitle, singletrials,ydir,ymin,ymax);
 % fprintf([com '\n']);
 if ~isempty(EEG.chanlocs) && typeplot == 1
-    chanlabels = strvcat({ EEG.chanlocs(indices).labels });
+    tmpchanlocs = EEG.chanlocs;
+    chanlabels = strvcat({ tmpchanlocs(indices).labels });
 else
     chanlabels = num2str(indices(:));
 end;

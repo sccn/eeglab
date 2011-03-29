@@ -33,7 +33,8 @@ function finalinds = std_chaninds(STUDY, channames);
     finalinds   = [];
     if isfield(STUDY, 'chanlocs')
         EEG = STUDY;
-        tmpallchans = lower({ EEG.chanlocs.labels });
+        tmpchanlocs = EEG.chanlocs;
+        tmpallchans = lower({ tmpchanlocs.labels });
     else
         tmpallchans = lower({ STUDY.changrp.name });
     end;

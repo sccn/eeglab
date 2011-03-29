@@ -58,7 +58,8 @@ if ~isfield(cfg, 'nonlinear')
   cfg.nonlinear  = 'yes';
 end
 % add some additional settings from EEGLAB to the configuration
-cfg.channel    = { EEG.chanlocs(EEG.dipfit.chansel).labels };
+tmpchanlocs    = EEG.chanlocs;
+cfg.channel    = { tmpchanlocs(EEG.dipfit.chansel).labels };
 if isfield(EEG.dipfit, 'vol')
     cfg.vol        = EEG.dipfit.vol;
 elseif isfield(EEG.dipfit, 'hdmfile')

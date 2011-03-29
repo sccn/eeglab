@@ -64,7 +64,8 @@ if nargin < 2
     % take all scalp electrodes
     % -------------------------
     if ~isempty(EEG.chanlocs)
-        indelec = strmatch( firstelec, { EEG.chanlocs.labels });
+        tmpchanlocs = EEG.chanlocs;
+        indelec = strmatch( firstelec, { tmpchanlocs.labels });
         
         if isempty(indelec), elecrange = 1:EEG.nbchan;
         else                 elecrange = 1:(indelec-1);
@@ -140,7 +141,8 @@ winrej   = [];
 if ~isempty(find(cellfun(@isempty, { TMPNEWEEG.event.epoch }) == 1))
     error('Some events are not associated with any epoch');
 end;
-allepoch = [ TMPNEWEEG.event.epoch ];
+tmpevent = TMPNEWEEG.event;
+allepoch = [ tmpevent.epoch ];
 for index = 1:length(rejepoch)
     eventepoch = find( rejepoch(index) == allepoch );
     if strcmpi(TMPNEWEEG.event(eventepoch(1)).type, 'X')

@@ -54,7 +54,7 @@ function [EEG, com] = pop_multifit(EEG, comps, varargin);
     if ncomps == 0, error('you must run ICA first'); end;
 
     if nargin<2
-        cb_chans = 'set(findobj(gcbf, ''tag'', ''chans''), ''string'', int2str(pop_chansel({EEG.chanlocs.labels})));';
+        cb_chans = 'tmplocs = EEG.chanlocs; set(findobj(gcbf, ''tag'', ''chans''), ''string'', int2str(pop_chansel({tmplocs.labels}))); clear tmplocs;';
         
         uilist = { { 'style' 'text' 'string' 'Component indices' } ...
                    { 'style' 'edit' 'string' [ '1:' int2str(ncomps) ] } ... 

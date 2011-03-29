@@ -137,7 +137,7 @@ if nargin < 2
          { 'Style', 'edit', 'string', '', 'tag', 'chans' }, ...
          { }, { 'Style', 'checkbox', 'string', '    ' }, ...
          { 'style' 'pushbutton' 'string'  '...', 'enable' fastif(isempty(EEG.chanlocs), 'off', 'on') ...
-           'callback' '[tmp tmpval] = pop_chansel({EEG(1).chanlocs.labels}, ''withindex'', ''on''); set(findobj(gcbf, ''tag'', ''chans''), ''string'',tmpval); clear tmp tmpval' }, ...
+           'callback' 'tmpchanlocs = EEG(1).chanlocs; [tmp tmpval] = pop_chansel({tmpchanlocs.labels}, ''withindex'', ''on''); set(findobj(gcbf, ''tag'', ''chans''), ''string'',tmpval); clear tmp tmpchanlocs tmpval' }, ...
            { }, { }, { 'Style', 'pushbutton', 'string', 'Scroll dataset', 'enable', fastif(length(EEG)>1, 'off', 'on'), 'callback', ...
                           'eegplot(EEG.data, ''srate'', EEG.srate, ''winlength'', 5, ''limits'', [EEG.xmin EEG.xmax]*1000, ''position'', [100 300 800 500], ''xgrid'', ''off'', ''eloc_file'', EEG.chanlocs);' } {}};
    results = inputgui( geometry, uilist, 'pophelp(''pop_select'');', 'Select data -- pop_select()' );
@@ -194,7 +194,7 @@ if length(EEG) > 1
 end;
 
 if isempty(EEG.chanlocs), chanlist = [1:EEG.nbchan];
-else                      chanlist = { EEG.chanlocs.labels };
+else                      chanlocs = EEG.chanlocs; chanlist = { chanlocs.labels };
 end;
 g = finputcheck(args, { 'time'    'real'      []         []; ...
                         'notime'  'real'      []         []; ...
@@ -335,8 +335,9 @@ if ~isempty(g.trialcond)
         if ~isfield( EEG.epoch, ttfields{index} )
             error([ ttfields{index} 'is not a field of EEG.epoch' ]);
         end;    
-	    eval( [ 'Itriallow  = find( [ EEG.epoch(:).' ttfields{index} ' ] >= tt.' ttfields{index} '(1) );' ] );
-	    eval( [ 'Itrialhigh = find( [ EEG.epoch(:).' ttfields{index} ' ] <= tt.' ttfields{index} '(end) );' ] );
+        tmpepoch = EEG.epoch;
+	    eval( [ 'Itriallow  = find( [ tmpepoch(:).' ttfields{index} ' ] >= tt.' ttfields{index} '(1) );' ] );
+	    eval( [ 'Itrialhigh = find( [ tmpepoch(:).' ttfields{index} ' ] <= tt.' ttfields{index} '(end) );' ] );
 	    Itrialtmp = intersect(Itriallow, Itrialhigh);
 	    g.trial = intersect( g.trial(:)', Itrialtmp(:)');
    end;	   
@@ -416,7 +417,8 @@ if ~isempty(g.time) | ~isempty(g.notime)
     if EEG.trials > 1
         % select new time window
         % ----------------------    
-        try,   tmpeventlatency = [ EEG.event.latency ];
+        try,   tmpevent = EEG.event;
+               tmpeventlatency = [ tmpevent.latency ];
         catch, tmpeventlatency = [];
         end;
         alllatencies = 1-(EEG.xmin*EEG.srate); % time 0 point
@@ -487,13 +489,9 @@ if ~isempty(g.time) | ~isempty(g.notime)
     end
 end;
 
-
-
 % performing removal
 % ------------------
-
 EEG.data      = EEG.data(g.channel, :, g.trial);
-
 if ~isempty(EEG.icaact), EEG.icaact = EEG.icaact(:,:,g.trial); end;
 EEG.trials    = length(g.trial);
 EEG.pnts      = size(EEG.data,2);

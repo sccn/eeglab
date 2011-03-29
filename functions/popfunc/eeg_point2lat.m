@@ -16,11 +16,12 @@
 %   newlat      - converted latency values (in 'timeunit' units) for each epoch
 %
 % Example:
-%   eeg_point2lat( [ EEG.event.latency ], [], EEG.srate);
+%   tmpevent = EEG.event;
+%   eeg_point2lat( [ tmpevent.latency ], [], EEG.srate);
 %   % returns the latency of all events in second for a continuous
 %   % dataset EEG
 %
-%   eeg_point2lat( [ EEG.event.latency ], [ EEG.event.epoch ], 
+%   eeg_point2lat( [ tmpevent.latency ], [ tmpevent.epoch ], 
 %                 EEG.srate, [EEG.xmin EEG.xmax]*1000, 1E-3);
 %   % returns the latency of all events in millisecond for a dataset
 %   % containing data epochs.

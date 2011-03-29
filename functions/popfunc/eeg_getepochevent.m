@@ -155,12 +155,13 @@ end;
 % -------------
 if ~isempty(opt.type)
 	Ieventtmp = [];
+    tmpevent  = EEG.event;
 	for indextype=1:length(opt.type)
 		typeval = opt.type{indextype};
 		if isstr(typeval)
-			Ieventtmp = [Ieventtmp strmatch(typeval, { EEG.event.type }, 'exact')' ];
+			Ieventtmp = [Ieventtmp strmatch(typeval, { tmpevent.type }, 'exact')' ];
 		else
-			Ieventtmp = [Ieventtmp find(typeval == [ EEG.event.type ] ) ];
+			Ieventtmp = [Ieventtmp find(typeval == [ tmpevent.type ] ) ];
 		end;
 	end;
 else

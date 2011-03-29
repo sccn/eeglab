@@ -295,19 +295,22 @@ if isfield(hdr.commoninfos, 'markerfile')
         EEG.event = parsebvmrk(MRK);
 
         % Correct event latencies by first sample offset
-        latency = num2cell([EEG.event(:).latency] - srange(1) + 1);
-        [EEG.event(:).latency] = deal(latency{:});
+        tmpevent = EEG.event;
+        for index = 1:length(EEG.event)
+            tmpevent(index).latency = tmpevent(index).latency - srange(1) + 1;
+        end;
+        EEG.event = tmpevent;
 
         % Remove unreferenced events
-        EEG.event = EEG.event([EEG.event.latency] >= 1 & [EEG.event.latency] <= EEG.pnts);
+        EEG.event = EEG.event([tmpevent.latency] >= 1 & [tmpevent.latency] <= EEG.pnts);
 
         % Copy event structure to urevent structure
         EEG.urevent = rmfield(EEG.event, 'urevent');
 
         % find if boundaries at homogenous intervals
         % ------------------------------------------
-        boundaries = strmatch('boundary', {EEG.event.type});
-        boundlats = unique([EEG.event(boundaries).latency]);
+        boundaries = strmatch('boundary', {tmpevent.type});
+        boundlats = unique([tmpevent(boundaries).latency]);
         if (isfield(hdr.commoninfos, 'segmentationtype') && (strcmpi(hdr.commoninfos.segmentationtype, 'markerbased') || strcmpi(hdr.commoninfos.segmentationtype, 'fixtime'))) && length(boundaries) > 1 && length(unique(diff([boundlats EEG.pnts + 1]))) == 1
             EEG.trials = length(boundlats);
             EEG.pnts   = EEG.pnts / EEG.trials;
@@ -315,16 +318,19 @@ if isfield(hdr.commoninfos, 'markerfile')
 
             % adding epoch field
             % ------------------
+            tmpevent  = EEG.event;
             for index = 1:length(EEG.event)
-                EEG.event(index).epoch = ceil(EEG.event(index).latency / EEG.pnts);
+                EEG.event(index).epoch = ceil(tmpevent(index).latency / EEG.pnts);
             end
 
             % finding minimum time
             % --------------------
-            tles = strmatch('time 0', lower({EEG.event.code}))';
+            tles = strmatch('time 0', lower({tmpevent.code}))';
             if ~isempty(tles)
-                [EEG.event(tles).type] = deal('TLE');
-                EEG.xmin = -(EEG.event(tles(1)).latency - 1) / EEG.srate;
+                for iTLE = tles(:)'
+                    EEG.event(iTLE).type ='TLE';
+                end
+                EEG.xmin = -(tmpevent(tles(1)).latency - 1) / EEG.srate;
             end
         end
     end

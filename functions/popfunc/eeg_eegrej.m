@@ -78,7 +78,8 @@ end
 
 
 if isfield(EEG.event, 'latency'),
-   	 tmpalllatencies = [ EEG.event.latency ];
+   	 tmpevent = EEG.event;
+     tmpalllatencies = [ tmpevent.latency ];
 else tmpalllatencies = []; 
 end;
 

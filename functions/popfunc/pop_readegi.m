@@ -116,7 +116,8 @@ if ~isempty(Eventdata)
     % renaming event codes
     % --------------------
     try,
-        alltypes = { EEG.event.type };
+        tmpevent = EEG.event;
+        alltypes = { tmpevent.type };
         if isstr(alltypes{1})
             indepoc = strmatch('epoc', lower(alltypes), 'exact');
             indtim  = strmatch('tim0', lower(alltypes), 'exact');

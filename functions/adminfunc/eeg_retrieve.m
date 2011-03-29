@@ -47,7 +47,8 @@ end;
 
     try,   % check whether recent changes to this dataset have been saved or not
            %--------------------------------------------------------------------
-           tmpsaved = { ALLEEG(CURRENTSET).saved };
+           tmpsaved = { ALLEEG.saved };
+           tmpsaved = tmpsaved(CURRENTSET);
     catch, tmpsaved = 'no';
     end;
 

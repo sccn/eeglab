@@ -144,7 +144,8 @@ for ind = 1:length(finalinds) % scan channels or components
         alldata  = cell( nc, ng );
         tmpind  = 1; while(isempty(setinds{tmpind})), tmpind = tmpind+1; end;
         setinfo = STUDY.design(opt.design).cell;
-        chanlab = { ALLEEG(setinfo(1).dataset(1)).chanlocs.labels };
+        tmpchanlocs = ALLEEG(setinfo(1).dataset(1)).chanlocs;
+        chanlab = { tmpchanlocs.labels };
         nonemptyindex = ~cellfun(@isempty, allinds);
         nonemptyindex = find(nonemptyindex(:));
         [ tmp params xvals] = std_readfile(setinfo(setinds{nonemptyindex(1)}(1)), 'dataindices', allinds{nonemptyindex(1)}(1), 'measure', dtype, ...

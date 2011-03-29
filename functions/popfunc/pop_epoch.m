@@ -118,16 +118,17 @@ if nargin < 3
    cbevent = ['if ~isfield(EEG.event, ''type'')' ...
 				   '   errordlg2(''No type field'');' ...
 				   'else' ...
+                   '   tmpevent = EEG.event;' ...
                    '   if isnumeric(EEG.event(1).type),' ...
-				   '        [tmps,tmpstr] = pop_chansel(unique([ EEG.event.type ]));' ...
+				   '        [tmps,tmpstr] = pop_chansel(unique([ tmpevent.type ]));' ...
 				   '   else,' ...
-                   '        [tmps,tmpstr] = pop_chansel(unique({ EEG.event.type }));' ...
+                   '        [tmps,tmpstr] = pop_chansel(unique({ tmpevent.type }));' ...
                    '   end;' ...
 				   '   if ~isempty(tmps)' ...
 				   '       set(findobj(''parent'', gcbf, ''tag'', ''events''), ''string'', tmpstr);' ...
 				   '   end;' ...
 				   'end;' ...
-				   'clear tmps tmpv tmpstr tmpfieldnames;' ];
+				   'clear tmps tmpevent tmpv tmpstr tmpfieldnames;' ];
    
    geometry = { [2 1 0.5] [2 1 0.5] [2 1.5] [2 1 0.5] };
    uilist = { { 'style' 'text'       'string' 'Time-locking event type(s) ([]=all)' } ...
@@ -186,7 +187,8 @@ try, if isempty(g.valuelim), g.valuelim = [-Inf Inf]; end; catch, g.valuelim = [
 
 % transform string events into a int array of column indices
 % ----------------------------------------------------------
-tmpeventlatency = [ EEG.event(:).latency ];
+tmpevent = EEG.event;
+tmpeventlatency = [ tmpevent(:).latency ];
 [tmpeventlatency Itmp] = sort(tmpeventlatency);
 EEG.event = EEG.event(Itmp);  % sort by ascending time 
 Ievent = g.eventindices;
@@ -195,7 +197,8 @@ if ~isempty( events )
     % select the events for epoching
     % ------------------------------
     Ieventtmp = [];
-    tmpeventtype  = { EEG.event.type };
+    tmpevent = EEG.event;
+    tmpeventtype  = { tmpevent.type };
     if iscell(events)
 		if isstr(EEG.event(1).type)
 			for index2 = 1:length( events )
@@ -314,11 +317,12 @@ EEG = eeg_checkset(EEG, 'eventconsistency');
 % -------------------------
 disp('pop_epoch(): checking epochs for data discontinuity');
 if ~isempty(EEG.event) & isstr(EEG.event(1).type)
-	boundaryindex = strmatch('boundary', { EEG.event.type });
+    tmpevent = EEG.event;
+	boundaryindex = strmatch('boundary', { tmpevent.type });
 	if ~isempty(boundaryindex)
 		indexepoch = [];
 		for tmpindex = boundaryindex
-			indexepoch = [indexepoch EEG.event(tmpindex).epoch ];
+			indexepoch = [indexepoch tmpevent(tmpindex).epoch ];
 		end;
 		EEG = pop_select(EEG, 'notrial', indexepoch);
 	end;

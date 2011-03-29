@@ -212,7 +212,8 @@ else
     if ~isempty(g.interp)
         savetofile( filename, timevals, X, 'chan', 1:size(X,1), options, { g.interp.labels });
     else
-        savetofile( filename, timevals, X, 'chan', 1:size(X,1), options, { EEG(1).chanlocs.labels });
+        tmpchanlocs = EEG(1).chanlocs;
+        savetofile( filename, timevals, X, 'chan', 1:size(X,1), options, { tmpchanlocs.labels });
     end;
     %[X,t] = std_readerp( EEG, 1, g.channels, g.timerange);
 end;
