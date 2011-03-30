@@ -64,6 +64,7 @@ if isfield(EEG.etc, 'amica') && ~isempty(EEG.etc.amica) && isfield(EEG.etc.amica
             %-------------------------------------------
             
             EEG = eeg_reformatamica(EEG);
+            EEG = eeg_checkamica(EEG);
             return;
         else
             disp('AMICA probabilities not compatible with size of data, probabilities cannot be epoched')
