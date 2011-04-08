@@ -230,7 +230,7 @@ else % INEEG is an EEG struct
         % concatenate urevents
         % --------------------
         if isfield(INEEG2, 'urevent')
-            if ~isempty(INEEG2.urevent)
+            if ~isempty(INEEG2.urevent) && isfield(INEEG1.urevent, 'latency')
 
                 % insert boundary event
                 % ---------------------
@@ -254,6 +254,8 @@ else % INEEG is an EEG struct
                     end
                 end
             else
+                INEEG1.urevent = [];
+                INEEG2.urevent = [];
                 fprintf('Warning: second dataset has empty urevent structure.\n');
             end
         end;
