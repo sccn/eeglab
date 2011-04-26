@@ -66,8 +66,6 @@
 %   'nochannel'   - vector of channel indices to exclude from the new
 %                   dataset. Can also be a cell array of channel names.
 %   'newname'     - name for the new dataset (OUTEEG)
-%   'sort'        - automatically sort the specified trial range and channel range 
-%                   (0|1, default: 1)
 %
 % Outputs:
 %   OUTEEG        - new EEG dataset structure
@@ -491,7 +489,9 @@ end;
 
 % performing removal
 % ------------------
-EEG.data      = EEG.data(g.channel, :, g.trial);
+if ~isequal(g.channel,1:size(EEG.data,1)) || ~isequal(g.trial,1:size(EEG.data,3))
+    EEG.data  = EEG.data(g.channel, :, g.trial);
+end
 if ~isempty(EEG.icaact), EEG.icaact = EEG.icaact(:,:,g.trial); end;
 EEG.trials    = length(g.trial);
 EEG.pnts      = size(EEG.data,2);
@@ -542,10 +542,10 @@ else
 end;
 
 if ~isempty(EEG.icasphere)
-   EEG.icasphere = EEG.icasphere(:,icachans);
+    EEG.icasphere = EEG.icasphere(:,icachans);
 end;
 if ~isempty(EEG.icawinv)
-   EEG.icawinv = EEG.icawinv(icachans,:);
+    EEG.icawinv = EEG.icawinv(icachans,:);
 end;
 if ~isempty(EEG.specicaact)
     if length(g.point) == EEG.pnts
@@ -553,21 +553,21 @@ if ~isempty(EEG.specicaact)
     else
         EEG.specicaact = [];
         fprintf('Warning: spectral ICA data were removed because of the change in the numner of points\n');
-    end;	
+    end;
 end;
 
-EEG = rmfield( EEG, 'reject');
+EEG = rmfield( EEG, {'reject','stats'});
 EEG.reject.rejmanual = [];
-
 % for stats, can adapt remove the selected trials and electrodes
 % in the future to gain time -----------------------------------  
-EEG = rmfield( EEG, 'stats');
 EEG.stats.jp = [];
 EEG = eeg_checkset(EEG, 'eventconsistency');
 
 % generate command
 % ----------------
+if nargout > 1
 com = sprintf('EEG = pop_select( %s,%s);', inputname(1), vararg2str(args));
+end
 
 return;
 
