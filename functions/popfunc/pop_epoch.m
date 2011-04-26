@@ -326,6 +326,8 @@ if ~isempty(EEG.event) & isstr(EEG.event(1).type)
 			indexepoch = [indexepoch tmpevent(tmpindex).epoch ];
 		end;
 		EEG = pop_select(EEG, 'notrial', indexepoch);
+        % update the "indices of accepted events", too
+        indices = indices(setdiff(1:length(indices),indexepoch));
 	end;
 end;
 
