@@ -107,8 +107,7 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
             tmpargs = varargin{ indfield+1 };
             newvararg = { newvararg{:} com };
             
-            if strcmpi(com, 'add') | strcmpi(com, 'insert') | strcmpi(com, 'append')
-                
+            if any(strcmpi({'add','insert','append'},com))
                 evtind     = tmpargs{1};
                 fields     = fieldnames(EEG.event);
                 emptycells = cell(1,length(fields)-1);
@@ -401,9 +400,9 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
  
       if ~isempty(field2)
           tmpevent = EEG.event;
-          if ~isstr(getfield( EEG.event(1), field2 ))
-               eval(['tmparray = [ tmpevent.' field2 ' ];']);
-          else eval(['tmparray = { tmpevent.' field2 ' };']);
+          if ~ischar(EEG.event(1).(field2))
+              tmparray = [ tmpevent.(field2) ];              
+          else tmparray = { tmpevent.(field2) };
           end
           % Commented out 11/18/2005, Toby
           % These lines were incorrectly sorting the event.latency field in
@@ -421,11 +420,11 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
       else
           events = EEG.event;
       end;  
-      tmpevent = EEG.event;      
-      if ~isstr(getfield( EEG.event(1), field1 ))
-           eval(['tmparray = [ tmpevent.' field1 ' ];']);
-      else eval(['tmparray = { tmpevent.' field1 ' };']);
-      end;
+      tmpevent = EEG.event;
+      if ~ischar(EEG.event(1).(field1))
+          tmparray = [ tmpevent.(field1) ];
+      else tmparray = { tmpevent.(field1) };
+      end
       % Commented out 11/18/2005, Toby
       %if strcmp( field1, 'latency') & EEG.trials > 1
       %    tmparray = eeg_point2lat(tmparray, {events.epoch}, EEG.srate, [EEG.xmin EEG.xmax], 1);
@@ -454,7 +453,7 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
         set(gcf, 'userdata', userdata);
         pop_editeventvals('goto', shift);              
     else
-        if ~exist('noeventcheck')
+        if ~exist('noeventcheck','var')
             EEG = eeg_checkset(EEG, 'eventconsistency');
             EEG = eeg_checkset(EEG, 'checkur');
         end;
