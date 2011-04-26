@@ -1,17 +1,22 @@
-% pop_rejchanspec() - reject artifacts channels in an EEG dataset using joint 
-%                  probability of the recorded electrode.
+% pop_rejchanspec() - reject artifacts channels in an EEG dataset using 
+%                  channel spectrum. The average spectrum for all selected
+%                  is computed and a threshold is applied.
 %
 % Usage:
 %   >> pop_rejchanspec( INEEG ) % pop-up interative window mode
 %   >> [OUTEEG, indelec] = pop_rejchanspec( INEEG, 'key', 'val');
 %
 % Inputs:
-%   INEEG      - input dataset
+%   INEEG       - input EEGLAB dataset
 %
 % Optional inputs:
 %   'freqlims'  - [min max] frequency limits. May also be an array where
-%                 each row defines a different set of limits.
-%   'stdthresh' - [max] positive threshold in terms of standard deviation
+%                 each row defines a different set of limits. Default is 
+%                 35 to the Niquist frequency of the data.
+%   'stdthresh' - [max] positive threshold in terms of standard deviation.
+%                 Default is 5.
+%   'absthresh' - [max] positive threshold in terms of spectrum units
+%                 (overides the option above).
 %   'averef'    - ['on'|'off'] 'on' computes average reference before
 %                 applying threshold. Default is 'off'.
 %   'plothist'  - ['on'|'off'] 'on' plot the histogram of values along 
@@ -19,15 +24,22 @@
 %   'plotchans'  - ['on'|'off'] 'on' plot the channels scrollplot with
 %                 selected channels for rejection in red. Allow selected
 %                 channels rejection with the 'REJECT' button.
-%   'elec'      - [integer array] only include specific channels.
+%   'elec'      - [integer array] only include specific channels. Default
+%                 is to use all channels.
+%   'specdata'  - [fload array] use this array containing the precomputed 
+%                 spectrum instead of computing the spectrum. Default is
+%                 empty.
+%   'specfreqs' - [fload array] frequency array for precomputed spectrum
+%                 above.
+%   'verbose'   - ['on'|'off'] display information. Default is 'off'.
 %
 % Outputs:
 %   OUTEEG    - output dataset with updated joint probability array
 %   indelec   - indices of rejected electrodes
+%   specdata  - data spectrum for the selected channels
+%   specfreqs - frequency array for spectrum above
 %
 % Author: Arnaud Delorme, CERCO, UPS/CNRS, 2008-
-%
-% See also: jointprob(), rejkurt()
 
 % Copyright (C) 2008 Arnaud Delorme, CERCO, UPS/CNRS
 %
