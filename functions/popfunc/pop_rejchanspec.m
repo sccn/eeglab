@@ -45,13 +45,16 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [EEG allrmchan com] = pop_rejchanspec(EEG, varargin)
+function [EEG allrmchan specdata specfreqs com] = pop_rejchanspec(EEG, varargin)
 
 if nargin < 1
     help pop_rejchanspec;
     return;
 end;
-    
+allrmchan = [];
+specdata  = [];
+specfreqs = [];
+com       = '';
 if nargin < 2
     uilist = { { 'style' 'text' 'string' 'Electrode (number(s); Ex: 2 4 5)' } ...
                { 'style' 'edit' 'string' ['1:' int2str(EEG.nbchan)] } ...
@@ -99,9 +102,12 @@ end;
 % --------------
 opt = finputcheck( options, { 'averef'    'string'    { 'on' 'off' }       'off';
                               'plothist'  'string'    { 'on' 'off' }       'off';
-                              'plotchans'  'string'    { 'on' 'off' }       'off';
+                              'plotchans' 'string'    { 'on' 'off' }       'off';
+                              'verbose'   'string'    { 'on' 'off' }       'off';
                               'elec'      'integer'   []                   [1:EEG.nbchan];
                               'freqlims'  'real'   []                      [35 EEG.srate/2];
+                              'specdata'  'real'   []                      [];
+                              'specfreqs' 'real'   []                      [];
                               'absthresh' 'real'   []                      [];
                               'stdthresh' 'real'   []                      5 }, 'pop_rejchanspec');
 if isstr(opt), error(opt); end;
@@ -111,9 +117,22 @@ if strcmpi(opt.averef, 'on')
      NEWEEG = pop_reref(EEG, [], 'exclude', setdiff([1:EEG.nbchan], opt.elec));
 else NEWEEG = EEG;
 end;
-[tmpspec freqs] = pop_spectopo(NEWEEG, 1, [], 'EEG' , 'percent', 100, 'freqrange',[0 EEG.srate/2], 'plot', 'off');
+if isempty(opt.specdata)
+    [tmpspecdata specfreqs] = pop_spectopo(NEWEEG, 1, [], 'EEG' , 'percent', 100, 'freqrange',[0 EEG.srate/2], 'plot', 'off');
+    % add back 0 channels
+    if any(EEG.data(:,1) == 0)
+        goodchan  = find(EEG.data(:,1) ~= 0);
+        specdata  = zeros(length(opt.elec), size(tmpspecdata,2));
+        specdata(goodchan,:) = tmpspecdata;
+    else
+        specdata = tmpspecdata;
+    end;
+else
+    specdata  = opt.specdata;
+    specfreqs = opt.specfreqs;
+end;
 
-if length(opt.stdthresh) >= 1 && size(opt.freqlims,1) > 1
+if size(opt.stdthresh,1) == 1 && size(opt.freqlims,1) > 1
     opt.stdthresh = ones(length(opt.stdthresh), size(opt.freqlims,1))*opt.stdthresh;  
 end;
 
@@ -121,9 +140,9 @@ allrmchan = [];
 for index = 1:size(opt.freqlims,1)
     % select frequencies, compute median and std then reject channels
     % ---------------------------------------------------------------
-    [tmp fbeg] = min(abs(freqs - opt.freqlims(index,1)));
-    [tmp fend] = min(abs(freqs - opt.freqlims(index,2)));
-    selectedspec = mean(tmpspec(opt.elec, fbeg:fend), 2);
+    [tmp fbeg] = min(abs(specfreqs - opt.freqlims(index,1)));
+    [tmp fend] = min(abs(specfreqs - opt.freqlims(index,2)));
+    selectedspec = mean(specdata(opt.elec, fbeg:fend), 2);
     if ~isempty(opt.absthresh)
         rmchan = find(selectedspec <= opt.absthresh(1) | selectedspec >= opt.absthresh(2));
     else
@@ -144,10 +163,12 @@ for index = 1:size(opt.freqlims,1)
     else textout = sprintf('Range %2.1f-%2.1f Hz: channels %s removed\n', opt.freqlims(index,1), opt.freqlims(index,2), int2str(opt.elec(rmchan')));
     end;
     fprintf(textout);
-    for inde = 1:length(opt.elec)
-        if ismember(inde, rmchan)
-             fprintf('Elec %s power: %1.2f *\n', EEG.chanlocs(opt.elec(inde)).labels, selectedspec(inde));
-        else fprintf('Elec %s power: %1.2f\n', EEG.chanlocs(opt.elec(inde)).labels  , selectedspec(inde));
+    if strcmpi(opt.verbose, 'on')
+        for inde = 1:length(opt.elec)
+            if ismember(inde, rmchan)
+                 fprintf('Elec %s power: %1.2f *\n', EEG.chanlocs(opt.elec(inde)).labels, selectedspec(inde));
+            else fprintf('Elec %s power: %1.2f\n', EEG.chanlocs(opt.elec(inde)).labels  , selectedspec(inde));
+            end;
         end;
     end;
     allrmchan = [ allrmchan rmchan' ];    
