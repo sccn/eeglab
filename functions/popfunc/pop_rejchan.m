@@ -19,6 +19,8 @@
 %   'norm'     - ['on'|'off'] normalize measure above (using trimmed 
 %                normalization as described in the function jointprob()
 %                and rejkurt(). Default is 'off'.
+%   'precomp'  - [float array] use this array instead of computing the 'prob' 
+%                or 'kurt' measures.
 %
 % Outputs:
 %   OUTEEG    - output dataset with updated joint probability array
@@ -88,6 +90,7 @@ end;
 
 opt = finputcheck( options, { 'norm'    'string'    { 'on' 'off' }       'off';
                               'measure' 'string'    { 'prob' 'kurt' }    'kurt';
+                              'precomp' 'real'      []                   [];
                               'elec'    'integer'   []                   [1:EEG.nbchan];
                               'threshold' 'real'   []                    400 }, 'pop_rejchan');
 if isstr(opt), error(opt); end;
@@ -101,10 +104,10 @@ else
 end;
 if strcmpi(opt.measure, 'prob')
     fprintf('Computing probability for channels...\n');
-    [ measure indelec ] = jointprob( reshape(EEG.data(opt.elec,:,:), length(opt.elec), size(EEG.data,2)*size(EEG.data,3)), opt.threshold, [], normval);
+    [ measure indelec ] = jointprob( reshape(EEG.data(opt.elec,:,:), length(opt.elec), size(EEG.data,2)*size(EEG.data,3)), opt.threshold, opt.precomp, normval);
 else
     fprintf('Computing kurtosis for channels...\n');
-    [ measure indelec ] = rejkurt( reshape(EEG.data(opt.elec,:,:), length(opt.elec), size(EEG.data,2)*size(EEG.data,3)), opt.threshold, [], normval);
+    [ measure indelec ] = rejkurt( reshape(EEG.data(opt.elec,:,:), length(opt.elec), size(EEG.data,2)*size(EEG.data,3)), opt.threshold, opt.precomp, normval);
 end;
 colors = cell(1,length(opt.elec)); colors(:) = { 'k' };
 colors(find(indelec)) = { 'r' }; colors = colors(end:-1:1);
