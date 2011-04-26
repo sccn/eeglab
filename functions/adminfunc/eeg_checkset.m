@@ -999,7 +999,7 @@ for inddataset = 1:length(ALLEEG)
             end;
         end;
         if isstruct( EEG.chanlocs)
-            if length( EEG.chanlocs) ~= EEG.nbchan & length( EEG.chanlocs) ~= EEG.nbchan+1
+            if length( EEG.chanlocs) ~= EEG.nbchan && length( EEG.chanlocs) ~= EEG.nbchan+1 && ~isempty(EEG.data)
                 disp( [ 'eeg_checkset warning: number of channels different in data and channel file/struct: channel file/struct removed' ]);
                 EEG.chanlocs = [];
                 res = com;
