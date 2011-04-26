@@ -77,8 +77,9 @@
 % 03-07-02 added srate argument to eegplot call -ad
 % 03-08-02 reworked spectrum to save space & add eeglab options -ad
 
-function [EEG, I1, com] = pop_rejspec( EEG, icacomp, elecrange, negthresh, posthresh, ...
-   						startfreq, endfreq, superpose, reject, topcommand);
+function [EEG, I1, com] = pop_rejspec( EEG, icacomp, varargin);
+    %elecrange, negthresh, posthresh, ...
+   	%startfreq, endfreq, superpose, reject);
 
 I1 = [];
 com = '';
@@ -106,6 +107,7 @@ end;
 if exist('reject') ~= 1
     reject = 1;
 end;
+
 if nargin < 3
 
 	% which set to save
@@ -130,48 +132,65 @@ if nargin < 3
 											   'Reject by data spectra -- pop_rejspec()'), 1,  inistr, 'pop_rejspec');
 	size_result  = size( result );
 	if size_result(1) == 0 return; end;
-	elecrange    = result{1};
-	negthresh    = result{2};
-	posthresh    = result{3};
-	startfreq    = result{4};
-	endfreq      = result{5};
+    options = {};
+    options = { options{:} 'elecrange' eval( [ '[' result{1} ']' ]  ) };
+    thresholdsLow  = eval( [ '[' result{2} ']' ]  );
+    thresholdsHigh = eval( [ '[' result{3} ']' ]  );
+    options = { options{:} 'threshold' [thresholdsLow(:) thresholdsHigh(:) ] };
+    freqLimitsLow   = eval( [ '[' result{4} ']' ]  );
+    freqLimitsHigh  = eval( [ '[' result{5} ']' ]  );
+    options = { options{:} 'freqlimits' [freqLimitsLow(:) freqLimitsHigh(:) ] };
+    
 	switch lower(result{6}), case 'yes', superpose=1; otherwise, superpose=0; end;
 	switch lower(result{7}), case 'yes', reject=1; otherwise, reject=0; end;
+    options = { options{:} 'eegplotplotallrej' superpose };
+    options = { options{:} 'eegplotreject'     reject };
+else
+    if isnumeric(varargin{3})
+        options = {};
+        if nargin > 2, options = { options{:} 'elecrange'   varargin{1} }; end;
+        if nargin > 3, options = { options{:} 'threshold'   [ varargin{2}; varargin{3}]' }; end;
+        if nargin > 5, options = { options{:} 'freqlimits'  [ varargin{4}; varargin{5}]' }; end;
+        if nargin > 7, options = { options{:} 'eegplotplotallrej' varargin{6}  }; end;
+        if nargin > 8, options = { options{:} 'eegplotreject'     varargin{7}  }; end;
+        if nargin > 9, options = { options{:} 'eegplotcom'        varargin{8}  }; end;
+    else
+        options = varargin;
+    end;
 end;
 
-if isstr(elecrange) % convert arguments if they are in text format 
-	calldisp = 1;
-	elecrange = eval( [ '[' elecrange ']' ]  );
-	negthresh = eval( [ '[' negthresh ']' ]  );
-	posthresh = eval( [ '[' posthresh ']' ]  );
-	startfreq = eval( [ '[' startfreq ']' ]  );
-	endfreq   = eval( [ '[' endfreq ']' ]  );
-else
-	calldisp = 0;
-end;
+opt = finputcheck( options, { 'elecrange'     'integer'  []    [1:EEG.nbchan];
+                              'threshold'     'real'     []    [-30 30];
+                              'freqlimits'    'real'     []    [15 30];
+                              'specdata'      'real'     []    EEG.specdata;
+                              'eegplotcom'    'string'   []    '';
+                              'method'        'string'   { 'fft' 'multitaper' }    'multitaper';
+                              'eegplotreject' 'integer'  []    0;
+                              'eegplotplotallrej' 'integer'  []    0 }, 'pop_rejspec');
+if isstr(opt), error(opt); end;
 
 sizewin = 2^nextpow2(EEG.pnts);
 if icacomp == 1
-    [allspec, Irej, tmprejE, freqs ] = spectrumthresh( EEG.data, EEG.specdata, ...
-							elecrange, EEG.srate, negthresh, posthresh, startfreq, endfreq);
+    [allspec, Irej, tmprejE, freqs ] = spectrumthresh( EEG.data, opt.specdata, ...
+							opt.elecrange, EEG.srate, opt.threshold(:,1)', opt.threshold(:,2)', opt.freqlimits(:,1)', opt.freqlimits(:,2)', opt.method);
     rejE = zeros(EEG.nbchan, EEG.trials);
-    rejE(elecrange,Irej) = tmprejE;
+    rejE(opt.elecrange,Irej) = tmprejE;
 else
     % test if ICA was computed
     % ------------------------
     icaacttmp = eeg_getdatact(EEG, 'component', [1:size(EEG.icaweights,1)]);
-    [allspec, Irej, tmprejE, freqs ] = spectrumthresh( icaacttmp, EEG.specicaact, elecrange, ...
-                                                      EEG.srate, negthresh, posthresh, startfreq, endfreq);
+    [allspec, Irej, tmprejE, freqs ] = spectrumthresh( icaacttmp, EEG.specicaact, ...
+                            opt.elecrange, EEG.srate, opt.threshold(:,1)', opt.threshold(:,2)', opt.freqlimits(:,1)', opt.freqlimits(:,2)', opt.method);
     rejE = zeros(EEG.nbchan, size(icaacttmp,1));
-    rejE(elecrange,Irej) = tmprejE;
+    rejE(opt.elecrange,Irej) = tmprejE;
 end;
 
-fprintf('%d channel selected\n', size(elecrange(:), 1));
+fprintf('%d channel selected\n', size(opt.elecrange(:), 1));
 fprintf('%d/%d trials marked for rejection\n', length(Irej), EEG.trials);
 rej = zeros( 1, EEG.trials);
 rej(Irej) = 1;
 
-if calldisp
+if nargin < 3
 	nbpnts = size(allspec,2);
     if icacomp == 1 macrorej  = 'EEG.reject.rejfreq';
         			macrorejE = 'EEG.reject.rejfreqE';
@@ -179,12 +198,18 @@ if calldisp
         			macrorejE = 'EEG.reject.icarejfreqE';
     end;
 	colrej = EEG.reject.rejfreqcol;
+    
+    elecrange  = opt.elecrange;
+    superpose  = opt.eegplotplotallrej;
+    reject     = opt.eegplotreject;
+    topcommand = opt.eegplotcom;
 	eeg_rejmacro; % script macro for generating command and old rejection arrays
+    
 	if icacomp == 1
-		eegplot(EEG.data(elecrange,:,:), 'winlength', 5, 'position', [100 550 800 500], ...
+		eegplot(EEG.data(opt.elecrange,:,:), 'winlength', 5, 'position', [100 550 800 500], ...
 			'limits', [EEG.xmin EEG.xmax]*1000, 'xgrid', 'off', 'tag', 'childEEG' );
 	else
-		eegplot(icaacttmp(elecrange,:,:), 'winlength', 5, 'position', [100 550 800 500], 'limits', ...
+		eegplot(icaacttmp(opt.elecrange,:,:), 'winlength', 5, 'position', [100 550 800 500], 'limits', ...
 				[EEG.xmin EEG.xmax]*1000 , 'xgrid', 'off', 'tag', 'childEEG' );
 	end;	
 	eegplot( allspec(elecrange,:,:), 'srate', EEG.srate, 'freqlimits', [1 EEG.srate/2], 'command', ...
@@ -210,7 +235,8 @@ else,            EEG.specicaact = allspec;
 end;
     
 com = [com sprintf('%s = pop_rejspec( %s, %s);', inputname(1), ...
-   inputname(1), vararg2str({icacomp, elecrange,  negthresh, posthresh, startfreq, endfreq, superpose, reject })) ]; 
+   inputname(1), vararg2str({icacomp, 'elecrange', opt.elecrange, 'threshold', opt.threshold, 'freqlimits', opt.freqlimits, ...
+     'eegplotcom', opt.eegplotcom, 'eegplotplotallrej' opt.eegplotplotallrej 'eegplotreject' opt.eegplotreject })) ]; 
 if nargin < 3 & nargout == 2
 	I1 = com;
 end;
@@ -219,28 +245,41 @@ return;
 
 % compute spectrum and reject artifacts
 % -------------------------------------
-function [specdata, Irej, Erej, freqs ] = spectrumthresh( data, specdata, elecrange, srate, negthresh, posthresh, startfreq, endfreq);
+function [specdata, Irej, Erej, freqs ] = spectrumthresh( data, specdata, elecrange, srate, negthresh, posthresh, startfreq, endfreq, method);
+
 	% compute the fft if necessary - old version
-	%freqs = EEG.srate*[1, sizewin]/sizewin/2;
-	%EEG.specdata = fft( EEG.data-repmat(mean(EEG.data,2), [1 EEG.pnts 1]), sizewin, 2);
-	%EEG.specdata = EEG.specdata( :, 2:sizewin/2+1, :);
-	%EEG.specdata = 20*log2(abs( EEG.specdata ).^2);
+    if isempty(specdata)
+        if strcmpi(method, 'fft')
+            sizewin = size(data,2);
+            freqs = srate*[1, sizewin]/sizewin/2;
+            specdata = fft( data-repmat(mean(data,2), [1 size(data,2) 1]), sizewin, 2);
+            specdata = specdata( :, 2:sizewin/2+1, :);
+            specdata = 10*log10(abs( specdata ).^2);
+            specdata  = specdata - repmat( mean(specdata,3), [1 1 size(data,3)]);
+        else
+            [tmp freqs] = pmtm( data(1,:,1), [],[],srate); % just to get the frequencies 	
 
-	[tmp freqs] = pmtm( data(1,:,1), [],[],srate); % just to get the frequencies 	
+            fprintf('Computing spectrum (using slepian tapers; done only once):\n');
 
-	fprintf('Computing spectrum (using slepian tapers; done only once):\n');
-	if isempty(specdata)
-		for index = 1:size(data,1)
-			fprintf('%d ', index);    
-			for indextrials = 1:size(data,3)
-				[ tmpspec(index,:,indextrials) freqs] = pmtm( data(index,:,indextrials) , [],[],srate);
-			end;
-		end;
-		tmpspec  = 10*log(tmpspec);
-		tmpspec  = tmpspec - repmat( mean(tmpspec,3), [1 1 size(data,3)]);
-		specdata = tmpspec;
-	end;
-	
+            for index = 1:size(data,1)
+                fprintf('%d ', index);    
+                for indextrials = 1:size(data,3)
+                    [ tmpspec(index,:,indextrials) freqs] = pmtm( data(index,:,indextrials) , [],[],srate);
+                end;
+            end;
+            tmpspec  = 10*log(tmpspec);
+            tmpspec  = tmpspec - repmat( mean(tmpspec,3), [1 1 size(data,3)]);
+            specdata = tmpspec;
+        end;
+    else
+        if strcmpi(method, 'fft')
+            sizewin = size(data,2);
+            freqs = srate*[1, sizewin]/sizewin/2;
+        else
+            [tmp freqs] = pmtm( data(1,:,1), [],[],srate); % just to get the frequencies 	
+        end;
+    end;
+    
 	% perform the rejection
 	% ---------------------	
 	[I1 Irej NS Erej] = eegthresh( specdata(elecrange, :, :), size(specdata,2), 1:length(elecrange), negthresh, posthresh, ...
