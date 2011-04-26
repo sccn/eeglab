@@ -72,7 +72,7 @@ function vers = eegplugin_dipfit(fig, trystrs, catchstrs)
                     'if isempty(EEG.dipfit), error(''Run the dipole setting first''); end;'  ];
     check_dipfitnocheck = [ trystrs.no_check 'if ~isfield(EEG, ''dipfit''), error(''Run the dipole setting first''); end; ' ];
     check_chans = [ '[EEG tmpres] = eeg_checkset(EEG, ''chanlocs_homogeneous'');' ...
-                       'if ~isempty(tmpres), h(tmpres), end; clear tmpres;' ];
+                       'if ~isempty(tmpres), eegh(tmpres), end; clear tmpres;' ];
     
     % menu callback commands
     % ----------------------
