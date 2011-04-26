@@ -24,8 +24,8 @@
 
 % load local file
 % ---------------
-try,
-    clear eeg_options;
+try,    
+    %clear eeg_options; % note: we instead clear this function handle in pop_editoptions()
     
     if iseeglabdeployed
         com1 = readtxtfile(fullfile(eeglabexefolder, 'eeg_optionsbackup.txt'));

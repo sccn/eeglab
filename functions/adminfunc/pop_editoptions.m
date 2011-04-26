@@ -273,6 +273,8 @@ for index = 1:length(opt)
     end;
 end;
 fclose(fid);    
+% clear it from the MATLAB function cache
+clear(fullfile(filepath,filename));
 
 % generate the output text command
 % --------------------------------
