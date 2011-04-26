@@ -14,6 +14,7 @@
 % Optional inputs:
 %  'elecrange'   - [integer array] electrode indices {Default: all electrodes} 
 %  'epochlength' - [float] epoch length in seconds {Default: 0.5 s}
+%  'overlap'     - [float] epoch overlap in seconds {Default: 0.25 s}
 %  'freqlimit'   - [min max] frequency range too consider for thresholding
 %                  Default is [35 128] Hz.
 %  'threshold'   - [float] frequency upper threshold in dB {Default: 10}
@@ -24,12 +25,22 @@
 %                  each side may also be added {Default: 0.25}
 %  'eegplot'     - ['on'|'off'] plot rejected portions of data in a eegplot
 %                  window. Default is 'off'.
+%  'onlyreturnselection'  - ['on'|'off'] this option when set to 'on' only
+%                  return the selected regions and does not remove them 
+%                  from the datasets. This allow to perform quick
+%                  optimization of the rejected portions of data.
+%  'precompstruct' - [struct] structure containing precomputed spectrum (see
+%                  Outputs) to be used instead of computing the spectrum.
+%  'verbose'       - ['on'|'off'] display information. Default is 'off'.
 %
 % Outputs:
 %   OUTEEG          - output dataset with updated joint probability array
 %   selectedregions - frames indices of rejected electrodes. Array of n x 2
 %                     n being the number of regions and 2 for the beginning
 %                     and end of each region.
+%   precompstruct   - structure containing precomputed data. This structure
+%                     contains the spectrum, the frequencies and the EEGLAB
+%                     dataset used as input with epochs extracted.
 %
 % Author: Arnaud Delorme, CERCO, UPS/CNRS, 2009-
 %
@@ -105,7 +116,7 @@ opt = finputcheck(options, { 'threshold'     { 'real' 'cell' }  []    10;
                              'addlength'     'real'   []    0.25;
                              'precompstruct' 'struct' []    struct([]);
                              'eegplot'       'string' { 'on' 'off' } 'off';
-                             'limitsonly'    'string' { 'on' 'off' } 'off';
+                             'onlyreturnselection' 'string' { 'on' 'off' } 'off';
                              'verbose'       'string' { 'on' 'off' } 'on';
                              'overlap'       'real'   []    0.25;
                              'epochlength'   'real'   []    0.5 }, 'pop_rejcont');
@@ -224,7 +235,7 @@ end;
 % -----------
 if ~isempty(winrej) 
     selectedregions = winrej(:,1:2);
-    if strcmpi(opt.limitsonly, 'off')
+    if strcmpi(opt.onlyreturnselection, 'off')
         % merge with initial regions
         if ~isempty(opt.rejectori)
             winrej(:,3) = 1; % color
