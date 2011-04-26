@@ -424,7 +424,9 @@ for inddataset = 1:length(ALLEEG)
                                 % uniformize content for all epochs
                                 % ---------------------------------
                                 indexevent = find(valempt);
-                                [EEG.event(indexevent).(difffield{index})] = arraytmpinfo{allepochs(indexevent)};
+                                tmpevent   = EEG.event;
+                                [tmpevent(indexevent).(difffield{index})] = arraytmpinfo{allepochs(indexevent)};
+                                EEG.event  = tmpevent;
                                 if any(valempt)
                                     fprintf(['eeg_checkset: found empty values for field ''' difffield{index} '''\n']);
                                     fprintf(['              filling with values of other events in the same epochs\n']);
@@ -545,14 +547,17 @@ for inddataset = 1:length(ALLEEG)
                             
                             % set event field
                             % ---------------
-                            eventepoch = [EEG.event.epoch];
+                            tmpevent   = EEG.event;
+                            eventepoch = [tmpevent.epoch];
                             epochevent = cell(1,EEG.trials);
                             destdata = epochevent;
                             EEG.epoch(length(epochevent)).event = [];
                             for k=1:length(epochevent)
                                 epochevent{k} = find(eventepoch==k);
                             end
-                            [EEG.epoch.event] = epochevent{:};
+                            tmpepoch = EEG.epoch;
+                            [tmpepoch.event] = epochevent{:};
+                            EEG.epoch = tmpepoch;
                             maxlen = max(cellfun(@length,epochevent));
                             
                             % copy event information into the epoch array
@@ -579,7 +584,9 @@ for inddataset = 1:length(ALLEEG)
                                         destdata{l} = sourcedata(epochevent{l});
                                     end
                                 end
-                                [EEG.epoch.(['event' fname])] = destdata{:};
+                                tmpepoch = EEG.epoch;
+                                [tmpepoch.(['event' fname])] = destdata{:};
+                                EEG.epoch = tmpepoch;
                             end
                         end;
                     catch, 
