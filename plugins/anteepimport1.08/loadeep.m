@@ -110,6 +110,9 @@ else
     s1=((r.time1 * r.rate)+1);
     r.sample1=s1;
 end
+if r.sample1 > 1
+    fprintf('WARNING: event are not imported correctly when selecting a data portion\n');
+end;
 
 if r.sample2
     s2=r.sample2;
