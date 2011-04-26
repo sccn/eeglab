@@ -535,7 +535,21 @@ if isstr(filename)
    end;
 else
     if isstruct(filename)
-        eloc = filename;
+        % detect Fieldtrip structure and convert it
+        % -----------------------------------------
+        if isfield(filename, 'pnt')
+            neweloc = [];
+            for index = 1:length(filename.label)
+                neweloc(index).labels = filename.label{index};
+                neweloc(index).X      = filename.pnt(index,1);
+                neweloc(index).Y      = filename.pnt(index,2);
+                neweloc(index).Z      = filename.pnt(index,3);
+            end;
+            eloc = neweloc;
+            eloc = convertlocs(eloc, 'cart2all');
+        else
+            eloc = filename;
+        end;
     else
         disp('readlocs(): input variable must be a string or a structure');
     end;        
@@ -569,6 +583,7 @@ if nargout > 3
     tmprad(indbad)    = { NaN };
     radius            = [ tmprad{:} ];
 end;
+
 %tmpnum = find(~cellfun('isclass', { eloc.labels }, 'char'));
 %disp('Converting channel labels to string');
 for index = 1:length(eloc)
