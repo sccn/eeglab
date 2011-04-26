@@ -79,7 +79,7 @@ newevents = [];
 if exist('eventtimes') == 1 
     if ~isempty(eventtimes)
         try
-            rmevent = find( reject(round(eventtimes)) == 1);
+            rmevent = find( reject(min(length(reject),max(1,round(eventtimes)))) == 1); % cko: sometimes, events may have latencies < 0.5 or >= length(reject)+0.5 (e.g. after resampling)
 	    catch, error('Latency event out of bound'); end;
         eventtimes(rmevent) = NaN;
 	    newevents = eventtimes;
