@@ -50,7 +50,7 @@ try
         if length(newlocs) > length(union({ alllocs.labels }, { tmplocs.labels }))
 
             if isempty(warning_shown)
-                disp('Warning: different channel montage order for the different datasets');
+                disp('Warning: different channel montage or electrode order for the different datasets');
                 warning_shown = 1;
             end;
 
