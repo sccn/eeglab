@@ -59,11 +59,11 @@ if nargin < 7
 end;
 
 if starttime < timerange(1)
-	warning('eegthresh: starting point out of range, adjusted');
+	disp('eegthresh: starting point out of range, adjusted');
     startime = timerange(1);
 end;	
 if endtime > timerange(2)
-	warning('eegthresh: ending point out of range, adjusted');
+	disp('eegthresh: ending point out of range, adjusted');
     endtime = timerange(2);
 end;	
 
@@ -97,7 +97,7 @@ allelec = zeros(1, sweeps);
 for indexe = 1:size(electrodes(:),1)
 	% transform the time range
 	% ------------------------
-	framelowlimit  = floor((starttime(indexe)-timerange(1))/(timerange(2)-timerange(1))*(pnts-1))+1;	
+	framelowlimit  = max(1,floor((starttime(indexe)-timerange(1))/(timerange(2)-timerange(1))*(pnts-1))+1);	
 	framehighlimit = floor((endtime(indexe)  -timerange(1))/(timerange(2)-timerange(1))*(pnts-1))+1;
 
 	% remove outliers
