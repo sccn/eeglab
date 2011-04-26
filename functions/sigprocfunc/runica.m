@@ -243,7 +243,7 @@ wts_passed = 0;                      % flag weights passed as argument
             fprintf(...
       'runica(): weights value must be a weight matrix or sphere')
             return
-         else
+        elseif ~isempty(Value)
            weights = Value;
            wts_passed =1;
          end
@@ -251,37 +251,39 @@ wts_passed = 0;                      % flag weights passed as argument
          if isstr(Value)
             fprintf('runica(): ncomps value must be an integer')
             return
-         end
-         if ncomps < urchans & ncomps ~= Value
-            fprintf('runica(): Use either PCA or ICA dimension reduction');
-            return
-         end
-         fprintf('*****************************************************************************************');
-         fprintf('************** WARNING: NCOMPS OPTION OFTEN DOES NOT RETURN ACCURATE RESULTS ************');
-         fprintf('************** WARNING: IF YOU FIND THE PROBLEM, PLEASE LET US KNOW          ************');
-         fprintf('*****************************************************************************************');
-         ncomps = Value;
-         if ~ncomps,
-            ncomps = chans;
-         end
-      elseif strcmp(Keyword,'pca') 
-         if ncomps < urchans & ncomps ~= Value
-            fprintf('runica(): Use either PCA or ICA dimension reduction');
-            return
-         end
-         if isstr(Value)
-            fprintf(...
-'runica(): pca value should be the number of principal components to retain')
-            return
-         end
-         pcaflag = 'on';
-         ncomps = Value;
-         if ncomps > chans | ncomps < 1,
-            fprintf('runica(): pca value must be in range [1,%d]\n',chans)
-            return
-         end
-         chans = ncomps;
-       elseif strcmp(Keyword,'interupt') 
+        elseif ~isempty(Value)
+           if ncomps < urchans & ncomps ~= Value
+               fprintf('runica(): Use either PCA or ICA dimension reduction');
+               return
+            end
+            fprintf('*****************************************************************************************');
+            fprintf('************** WARNING: NCOMPS OPTION OFTEN DOES NOT RETURN ACCURATE RESULTS ************');
+            fprintf('************** WARNING: IF YOU FIND THE PROBLEM, PLEASE LET US KNOW          ************');
+            fprintf('*****************************************************************************************');
+            ncomps = Value;
+            if ~ncomps,
+               ncomps = chans;
+            end
+        end
+    elseif strcmp(Keyword,'pca')
+        if Value ~= 0
+           if ncomps < urchans & ncomps ~= Value
+              fprintf('runica(): Use either PCA or ICA dimension reduction');
+              return
+           end
+           if isstr(Value)
+              fprintf('runica(): pca value should be the number of principal components to retain')
+              return
+           end
+           pcaflag = 'on';
+           ncomps = Value;
+           if ncomps > chans | ncomps < 1,
+              fprintf('runica(): pca value must be in range [1,%d]\n',chans)
+              return
+           end
+           chans = ncomps;
+        end
+    elseif strcmp(Keyword,'interupt')
          if ~isstr(Value)
            fprintf('runica(): interupt value must be on or off')
            return
@@ -309,7 +311,7 @@ wts_passed = 0;                      % flag weights passed as argument
          if isstr(Value)
             fprintf('runica(): lrate value must be a number')
             return
-         end
+        elseif ~isempty(Value)
          lrate = Value;
          if lrate>MAX_LRATE | lrate <0,
            fprintf('runica(): lrate value is out of bounds'); 
@@ -317,23 +319,26 @@ wts_passed = 0;                      % flag weights passed as argument
          end
          if ~lrate,
             lrate = DEFAULT_LRATE;
+            end
          end
       elseif strcmp(Keyword,'block') | strcmp(Keyword,'blocksize')
          if isstr(Value)
             fprintf('runica(): block size value must be a number')
             return
-         end
-         block = floor(Value);
-         if ~block,
-           block = DEFAULT_BLOCK; 
+         elseif ~isempty(Value)
+            block = floor(Value);
+            if ~block,
+               block = DEFAULT_BLOCK;
+            end
          end
       elseif strcmp(Keyword,'stop') | strcmp(Keyword,'nochange') ...
                     | strcmp(Keyword,'stopping')
          if isstr(Value)
             fprintf('runica(): stop wchange value must be a number')
             return
+         elseif ~isempty(Value)
+            nochange = Value;
          end
-         nochange = Value;
       elseif strcmp(Keyword,'logfile')
          if ~isstr(Value)
             fprintf('runica(): logfile value must be a string')
@@ -344,48 +349,52 @@ wts_passed = 0;                      % flag weights passed as argument
          if isstr(Value)
             fprintf('runica(): maxsteps value must be an integer')
             return
-         end
-         maxsteps = Value;
-         if ~maxsteps,
-            maxsteps   = DEFAULT_MAXSTEPS;
-         end
-         if maxsteps < 0
-            fprintf('runica(): maxsteps value (%d) must be a positive integer',maxsteps)
-            return
-         end
+         elseif ~isempty(Value)
+            maxsteps = Value;
+            if ~maxsteps,
+               maxsteps   = DEFAULT_MAXSTEPS;
+            end
+            if maxsteps < 0
+               fprintf('runica(): maxsteps value (%d) must be a positive integer',maxsteps)
+               return
+            end
+        end
       elseif strcmp(Keyword,'anneal') | strcmp(Keyword,'annealstep')
          if isstr(Value)
             fprintf('runica(): anneal step value (%2.4f) must be a number (0,1)',Value)
             return
-         end
-         annealstep = Value;
-         if annealstep <=0 | annealstep > 1,
-            fprintf('runica(): anneal step value (%2.4f) must be (0,1]',annealstep)
-            return
+         elseif ~isempty(Value)
+            annealstep = Value;
+            if annealstep <=0 | annealstep > 1,
+               fprintf('runica(): anneal step value (%2.4f) must be (0,1]',annealstep)
+               return
+            end
          end
       elseif strcmp(Keyword,'annealdeg') | strcmp(Keyword,'degrees')
          if isstr(Value)
             fprintf('runica(): annealdeg value must be a number')
             return
-         end
-         annealdeg = Value;
-         if ~annealdeg,
-             annealdeg = DEFAULT_ANNEALDEG;
-         elseif annealdeg > 180 | annealdeg < 0
-          fprintf('runica(): annealdeg (%3.1f) is out of bounds [0,180]',...
-                annealdeg);
-          return
+         elseif ~isempty(Value)
+            annealdeg = Value;
+            if ~annealdeg,
+                annealdeg = DEFAULT_ANNEALDEG;
+            elseif annealdeg > 180 | annealdeg < 0
+                fprintf('runica(): annealdeg (%3.1f) is out of bounds [0,180]',...
+                      annealdeg);
+                return
                                               
+            end
          end
       elseif strcmp(Keyword,'momentum')
          if isstr(Value)
             fprintf('runica(): momentum value must be a number')
             return
-         end
-         momentum = Value;
-         if momentum > 1.0 | momentum < 0
-          fprintf('runica(): momentum value is out of bounds [0,1]')
-          return
+         elseif ~isempty(Value)
+            momentum = Value;
+            if momentum > 1.0 | momentum < 0
+             fprintf('runica(): momentum value is out of bounds [0,1]')
+             return
+            end
          end
       elseif strcmp(Keyword,'sphering') | strcmp(Keyword,'sphereing') ...
                 | strcmp(Keyword,'sphere')
@@ -404,7 +413,7 @@ wts_passed = 0;                      % flag weights passed as argument
          if ~isstr(Value)
            fprintf('runica(): bias value must be on or off')
            return
-         else 
+        elseif ~isempty(Value)
            Value = lower(Value);
            if strcmp(Value,'on') 
               biasflag = 1;
