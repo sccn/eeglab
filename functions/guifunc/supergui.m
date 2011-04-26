@@ -96,6 +96,8 @@ if nargin < 2
 	return;
 end;
 
+warning off MATLAB:hg:uicontrol:ParameterValuesMustBeValid
+
 % decoding input and backward compatibility
 % -----------------------------------------
 if isstr(varargin{1})
@@ -182,7 +184,11 @@ end;
 
 % get axis coordinates
 % --------------------
-set(g.fig, 'menubar', 'none', 'numbertitle', 'off');		
+try 
+    set(g.fig, 'menubar', 'none', 'numbertitle', 'off');
+catch
+end
+    
 pos = [0 0 1 1]; % plot relative to current axes
 q = [pos(1) pos(2) 0 0];
 s = [pos(3) pos(4) pos(3) pos(4)]; % allow to use normalized position [0 100] for x and y
@@ -356,7 +362,10 @@ hh = findobj(allhandlers, 'parent', g.fig, 'style', 'text');
 %set(hh, 'BackgroundColor', get(g.fig, 'color'), 'horizontalalignment', 'left');
 set(hh, 'Backgroundcolor', GUIBACKCOLOR);
 set(hh, 'foregroundcolor', GUITEXTCOLOR);
+try
 set(g.fig, 'color',GUIBACKCOLOR );
+catch
+end
 set(hh, 'horizontalalignment', g.horizontalalignment);
 
 hh = findobj(allhandlers, 'style', 'edit');
