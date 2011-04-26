@@ -166,8 +166,11 @@
 %               The last columns of the file may contain any other defined fields (gain,
 %               calib, type, custom).
 %
-% Author: Arnaud Delorme, Salk Institute, 8 Dec 2002 (expanded from the previous EEG/ICA 
-%         toolbox function)
+%    Fieldtrip structure: 
+%               If a Fieltrip structure is given as input, an EEGLAB
+%               chanlocs structure is returned
+%
+% Author: Arnaud Delorme, Salk Institute, 8 Dec 2002
 %
 % See also: readelp(), writelocs(), topo2sph(), sph2topo(), sph2cart()
 
