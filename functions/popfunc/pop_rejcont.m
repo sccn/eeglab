@@ -139,7 +139,19 @@ if isempty(opt.precompstruct)
     % average reference 
     % NEWEEG.data(opt.elecrange,:) = NEWEEG.data(opt.elecrange,:)-repmat(mean(NEWEEG.data(opt.elecrange,:),1), [length(opt.elecrange) 1]);
 
-    [TMPNEWEEG]= eeg_regepochs(NEWEEG, opt.overlap, [0 opt.epochlength], NaN);
+    % only keep boundary events
+    % -------------------------
+    tmpevent = NEWEEG.event;
+    if ~isempty(tmpevent)
+        if isnumeric( tmpevent(1).type )
+            NEWEEG.event = [];
+        else
+            boundEvent = strmatch('boundary', { tmpevent.type }, 'exact');
+            NEWEEG.event = NEWEEG.event(boundEvent);
+        end;
+    end;
+
+    [TMPNEWEEG] = eeg_regepochs(NEWEEG, opt.overlap, [0 opt.epochlength], NaN);
     %[TMPNEWEEG indices] = pop_rejspec(TMPNEWEEG, 1, [1:64], -100, 15, 30, 45, 0, 0);
     %rejepoch = find(indices);
     tmp   = fft(TMPNEWEEG.data, [], 2);
