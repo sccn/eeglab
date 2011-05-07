@@ -1,3 +1,4 @@
 function this = rmfield(this, vals);
 
-    eval( [ 'this.EEG.' vals '=[];' ] );
+    this.EEG = rmfield(this.EEG, vals);
+    
