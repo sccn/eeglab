@@ -16,3 +16,5 @@ option_computeica    = 1 ;  % If set, precompute ICA activations. This requires 
 option_scaleicarms   = 1 ;  % If set, scale ICA component activities to RMS (Root Mean Square) in microvolt (recommended).
 % Folder options
 option_rememberfolder = 1 ;  % If set, when browsing to open a new dataset assume the folder/directory of previous dataset.
+% EEGLAB chat option
+option_chat = 1 ;  % If set, enable EEGLAB chat (you will need to restart EEGLAB after changing that option).
