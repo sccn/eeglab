@@ -36,7 +36,7 @@ try,
     else
         eeg_optionsbackup;
         if ispc
-             homefolder = evalc('!echo %USERPROFILE%');
+             homefolder = deblank(evalc('!echo %USERPROFILE%'));
         else homefolder = '~';
         end;
         
