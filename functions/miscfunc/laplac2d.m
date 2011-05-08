@@ -20,6 +20,8 @@
 %       research. For a more rigorous validated approach use the freely 
 %       available Current Source Density Matlab toolbox.
 %
+% See also: eeg_laplac()
+%
 % Author: Arnaud Delorme, CNL, Salk Institute, 2001
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
