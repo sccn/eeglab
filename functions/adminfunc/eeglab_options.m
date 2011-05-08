@@ -24,6 +24,7 @@
 
 % load local file
 % ---------------
+homefolder = '';
 try,    
     %clear eeg_options; % note: we instead clear this function handle in pop_editoptions()
     
@@ -34,37 +35,29 @@ try,
         eval( com2 );
     else
         eeg_optionsbackup;
-        W_MAIN = findobj('tag', 'EEGLAB');
-        if ~isempty(W_MAIN)
-            tmpuserdata = get(W_MAIN, 'userdata');
-            tmp_opt_path = tmpuserdata{3}; % this contain the default path to the option file
-            tmpp = pwd;
-            
-            tmpp = fileparts(which('eeg_options.m'));
-            curpathconflict = 0;
-            if ~strcmpi(tmpp, tmp_opt_path)
-                if ~isempty(findstr(tmp_opt_path, path)), rmpath(tmp_opt_path); end;
-                if strcmpi(pwd, tmpp)
-                    curpathconflict = 1;
-                    fprintf('Warning: conflicting eeg_options.m file in current path (ignored)\n');
-                else
-                    fprintf('Warning: adding path for eeg_options.m, %s\n', tmp_opt_path);
-                end;
-                addpath(tmp_opt_path);
-                clear functions;
-            end;
-            if curpathconflict
-                cd(tmp_opt_path);
-                eeg_options;
-                cd(tmpp);
-            else
-                eeg_options;
-            end;
-        else
-            eeg_options;
+        if ispc
+             homefolder = evalc('!echo %USERPROFILE%');
+        else homefolder = '~';
         end;
+        
+        option_file = fullfile(homefolder, 'eeg_options.m');
+        oldp = pwd;
+        if ~isempty(dir(option_file))
+            tmpp1 = fileparts(which('eeg_options.m'));
+            tmpp2 = fileparts(which('eeglab.m'));
+            if strcmpi(tmpp1, pwd) && strcmpi(tmpp1, tmpp2)
+                % go to parent folder to avoid calling default eeg_option
+                % file
+                oldp = pwd;
+                cd ..;
+            end;
+            if strcmpi(tmpp1, tmpp2)
+                addpath(homefolder);
+            end;
+        end;
+        eeg_options; % default one with EEGLAB
+        cd(oldp);
     end;
-    
     option_savematlab = ~option_savetwofiles;
     
 catch 
