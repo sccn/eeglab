@@ -88,13 +88,11 @@ if iseeglabdeployed
     filename = fullfile(eeglabexefolder,'eeg_options.txt');
     eegoptionbackup = fullfile(eeglabexefolder,'eeg_optionsbackup.txt');
 else
-    W_MAIN = findobj('tag', 'EEGLAB');
-    if ~isempty(W_MAIN)
-        filename = get(W_MAIN, 'userdata');
-        filename = fullfile(filename{3}, 'eeg_options.m'); % this contain the default path to the option file
-    else
-        filename = which('eeg_options.m');
+    if ispc
+         homefolder = evalc('!echo %USERPROFILE%');
+    else homefolder = '~';
     end;
+    filename = fullfile(homefolder, 'eeg_options.m');
     eegoptionbackup = which('eeg_optionsbackup.m');
 end;
 fid = fopen( filename, 'r+');
