@@ -729,10 +729,10 @@ catchstrs.update_study           = e_load_study;
                       'eegplugin_4dneuroimaging' };
         for indf = 1:length(funcname)
             try 
-                eval( [ 'vers =' funcname{indf} '(gcf, trystrs, catchstrs);' ]);
+                vers = feval(funcname{indf}, gcf, trystrs, catchstrs);
                 disp(['EEGLAB: adding "' vers '" plugin' ]);  
             catch
-                eval( [ funcname{indf} '(gcf, trystrs, catchstrs)' ]);
+                feval(funcname{indf}, gcf, trystrs, catchstrs);
                 disp(['EEGLAB: adding plugin function "' funcname{indf} '"' ]);   
             end;
         end;
