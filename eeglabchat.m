@@ -188,10 +188,10 @@ if ~iseeglabdeployed2
     myaddpath( eeglabpath, 'timefreq.m',       [ 'functions' filesep 'timefreqfunc'     ]);
     myaddpath( eeglabpath, 'icademo.m',        [ 'functions' filesep 'miscfunc'         ]);
     myaddpath( eeglabpath, 'eeglab1020.ced',   [ 'functions' filesep 'resources'        ]);
-    myaddpath( eeglabpath, 'startpane.m',      [ 'functions' filesep 'javachatdemo_0_1' ]);
+    myaddpath( eeglabpath, 'startpane.m',      [ 'functions' filesep 'javachatfunc' ]);
     myaddpath( eeglabpath, 'eegplugin_dipfit', 'plugins');
 end;
-    
+
 eeglab_options; 
 
 if nargin == 1 &  strcmp(onearg, 'redraw')
@@ -723,10 +723,10 @@ if iseeglabdeployed2
                   'eegplugin_4dneuroimaging' };
     for indf = 1:length(funcname)
         try 
-            eval( [ 'vers =' funcname{indf} '(gcf, trystrs, catchstrs);' ]);
+            vers = feval(funcname{indf}, gcf, trystrs, catchstrs);
             disp(['EEGLAB: adding "' vers '" plugin' ]);  
         catch
-            eval( [ funcname{indf} '(gcf, trystrs, catchstrs)' ]);
+            feval(funcname{indf}, gcf, trystrs, catchstrs);
             disp(['EEGLAB: adding plugin function "' funcname{indf} '"' ]);   
         end;
     end;
@@ -908,19 +908,25 @@ W_MAIN = figure('Units','points', ...
 eeglab_options;
 if option_chat == 1
     disp('Starting chat...');
-    javaaddpath Chat_with_pane.jar
-    import client.EEGLABChat;
-    import client.VisualToolbar;
-    import java.awt.*;
-    import javax.swing.*;
+    tmpp = fileparts(which('startpane.m'));
+    if isempty(tmpp)
+        disp('Cannot start chat');
+        tb = [];
+    else
+        javaaddpath(fullfile(tmpp, 'Chat_with_pane.jar'));
+        eval('import client.EEGLABChat;');
+        eval('import client.VisualToolbar;');
+        eval('import java.awt.*;');
+        eval('import javax.swing.*;');
 
-    tb = VisualToolbar();
-    F = W_MAIN;
-    tb.setPreferredSize(Dimension(0, 75));
+        tb = VisualToolbar();
+        F = W_MAIN;
+        tb.setPreferredSize(Dimension(0, 75));
 
-    javacomponent(tb,'South',F);
+        javacomponent(tb,'South',F);
 
-    refresh(F);
+        refresh(F);
+    end;
 else
     tb = [];
 end;
