@@ -254,13 +254,17 @@ else % INEEG is an EEG struct
                 newlen    = length(INEEG2.urevent);
                 INEEG2event = INEEG2.event;
                 % update urevent index in INEEG2.event
-                [INEEG2.event.urevent] = celldeal(num2cell([INEEG2event.urevent]+orilen));
+                tmpevents = INEEG2.event;
+                [tmpevents.urevent] = celldeal(num2cell([INEEG2event.urevent]+orilen));
+                INEEG2.event = tmpevents;
                 % reserve space and append INEEG2.urevent
                 INEEG1.urevent(orilen+newlen).latency = [];
                 INEEG2urevent = INEEG2.urevent;
+                tmpevents = INEEG1.urevent;
                 for f = fieldnames(INEEG2urevent)'
-                    [INEEG1.urevent((orilen+1):(orilen+newlen)).(f{1})] = INEEG2urevent.(f{1}); 
+                    [tmpevents((orilen+1):(orilen+newlen)).(f{1})] = INEEG2urevent.(f{1}); 
                 end
+                INEEG1.urevent = tmpevents;
             else
                 INEEG1.urevent = [];
                 INEEG2.urevent = [];
@@ -300,12 +304,15 @@ else % INEEG is an EEG struct
         INEEG2event = INEEG2.event;
         if isfield(INEEG1.event,'latency') && isfield(INEEG2.event,'latency')
             % update latency
-            [INEEG1.event(orilen + (1:newlen)).latency] = celldeal(num2cell([INEEG2event.latency] + INEEG1pnts*INEEG1trials));
+            tmpevents = INEEG1.event;
+            [tmpevents(orilen + (1:newlen)).latency] = celldeal(num2cell([INEEG2event.latency] + INEEG1pnts*INEEG1trials));
+            INEEG1.event = tmpevents;
         end
         if isfield(INEEG1.event,'epoch') && isfield(INEEG2.event,'epoch')
-            INEEG
             % update epoch index
-            [INEEG1.event(orilen + (1:newlen)).epoch] = celldeal(num2cell([INEEG2event.epoch]+INEEG1trials));
+            tmpevents = INEEG1.event;
+            [tmpevents(orilen + (1:newlen)).epoch] = celldeal(num2cell([INEEG2event.epoch]+INEEG1trials));
+            INEEG1.event = tmpevents;
         end
 
         % add discontinuity event if continuous
