@@ -102,7 +102,7 @@ if	fid == -1
     filename = 'eeg_options.m';
     fid = fopen( fullfile(filepath, filename), 'w');
     if fid == -1
-        error([ 'Cannot write into HOME folder: ' homefolder );
+        error([ 'Cannot write into HOME folder: ' homefolder ]);
     end;
     fclose(fid);
     delete(fullfile(filepath, filename));
