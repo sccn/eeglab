@@ -103,8 +103,6 @@
 %                     Note that for obtaining 'log' spaced freqs using FFT,
 %                     closest correspondant frequencies in the 'linear' space
 %                     are returned.
-%       'lowmem'    = ['on'|'off'] compute frequency by frequency to save
-%                     memory. {default: 'off'}
 %       'verbose'   = ['on'|'off'] print text {'on'}
 %       'subitc'    = ['on'|'off'] subtract stimulus locked Inter-Trial Coherence
 %                     (ITC) from x and y. This computes an 'intrinsic' coherence
@@ -801,8 +799,14 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % compute frequency by frequency if low memory
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-if strcmpi(g.lowmem, 'on') && length(data) ~= g.frames && isempty(g.nfreqs) && ~iscell(data)
-
+if strcmpi(g.lowmem, 'on') && numel(data) ~= g.frames && isempty(g.nfreqs) && ~iscell(data)
+    disp('Lowmem is a deprecated option that is not functional any more');
+    return;
+    
+    % NOTE: the code below is functional but the graphical output is
+    % different when the 'lowmem' option is used compared to when it is not
+    % used - AD, 29 April 2011
+    
     % compute for first 2 trials to get freqsout
     XX = reshape(data, 1, frames, prod(size(data))/g.frames);
     [P,R,mbase,timesout,freqsout] = newtimef(XX(1,:,1), frames, tlimits, Fs, varwin, 'plotitc', 'off', 'plotamp', 'off',varargin{:}, 'lowmem', 'off');
@@ -810,11 +814,18 @@ if strcmpi(g.lowmem, 'on') && length(data) ~= g.frames && isempty(g.nfreqs) && ~
     % scan all frequencies
     for index = 1:length(freqsout)
         if nargout < 8
-            [P(index,:),R(index,:),mbase(index),timesout,tmpfreqs(index),Pboot(index,:),Rboot(index,:)] = ...
+            [P(index,:),R(index,:),mbase(index),timesout,tmpfreqs(index),Pboottmp,Rboottmp] = ...
                 newtimef(data, frames, tlimits, Fs, varwin, ...
                           'freqs', [freqsout(index) freqsout(index)], 'nfreqs', 1, ...
-                             'plotamp', 'off', 'plotphasesign', 'off',varargin{:}, ...
+                             'plotamp', 'off', 'plotitc', 'off', 'plotphasesign', 'off',varargin{:}, ...
                                   'lowmem', 'off', 'timesout', timesout);
+            if ~isempty(Pboottmp)
+                Pboot(index,:) = Pboottmp;
+                Rboot(index,:) = Rboottmp;
+            else
+                Pboot = [];
+                Rboot = [];
+            end;
         else
             [P(index,:),R(index,:),mbase(index),timesout,tmpfreqs(index),Pboot(index,:),Rboot(index,:), ...
                 alltfX(index,:,:)] = ...
@@ -1145,11 +1156,12 @@ else
 end;
 
 if g.cycles(1) == 0
-    alltfX = 2*0.375*alltfX/g.winsize; % TF and MC (12/11/2006): normalization, divide by g.winsize
+    alltfX = 2/0.375*alltfX/g.winsize; % TF and MC (12/11/2006): normalization, divide by g.winsize
     P  = alltfX.*conj(alltfX); % power    
     % TF and MC (12/14/2006): multiply by 2 account for negative frequencies,
     % and ounteract the reduction by a factor 0.375 that occurs as a result of 
     % cosine (Hann) tapering. Refer to Bug 446
+    % Modified again 04/29/2011 due to comment in bug 1032
 else 
     P  = alltfX.*conj(alltfX); % power for wavelets
 end;
