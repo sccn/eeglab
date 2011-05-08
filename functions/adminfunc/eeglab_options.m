@@ -44,7 +44,7 @@ try,
         oldp = pwd;
         if ~isempty(dir(option_file))
             tmpp1 = fileparts(which('eeg_options.m'));
-            tmpp2 = fileparts(which('eeglab.m'));
+            tmpp2 = fileparts(which('eeglab_options.m'));
             if strcmpi(tmpp1, pwd) && strcmpi(tmpp1, tmpp2)
                 % go to parent folder to avoid calling default eeg_option
                 % file

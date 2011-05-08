@@ -98,46 +98,18 @@ end;
 fid = fopen( filename, 'r+');
 storelocal = 0;
 if	fid == -1
-	if exist(filename) == 2 
-        if length(filename) > 20
-             tmpdispname =  [ '...' filename(end-20:end) ];
-        else tmpdispname = filename;
-        end;
-		if ~popask(['Cannot modify read-only file ''' tmpdispname '''' 10 ...
-                'Do you want to store the option file somewhere else ?' 10 ...
-                'Store the path in a path accessible at startup so EEGLAB' 10 ...
-                'can reuse it' ]);
-			return;
-		else 
-%             warndlg2(strvcat('Warning: you must store the file in a FOLDER always accessible', ...
-%                              'from Matlab (i.e. a folder in the Matlab path) and not necessarily in', ...
-%                              'the local folder. Otherwise, every time you restart EEGLAB, the default', ...
-%                              'EEGLAB options will apply (the path you choose will be added temporarily', ...
-%                              'for this session). Select a folder in the next pop-up file window.'), 'Warning');
-            try
-                filepath = uigetdir('', 'Pick a Directory');
-            catch,
-                [tmp filepath] = uigetdir('*.m', 'Pick a folder', 'eeg_options');
-            end;
-		end;
-        if filepath(1) == 0, return; end;
-        
-        % see if the folder can be written into
-        % -------------------------------------
-        filename = 'eeg_options.m';
-        fid = fopen( fullfile(filepath, filename), 'w');
-        if fid == -1
-            error('Cannot write into this folder');
-        end;
-        fclose(fid);
-        delete(fullfile(filepath, filename));
-        
-        % read variables values and description
-        % --------------------------------------
-        [ header opt ] = eeg_readoptions( eegoptionbackup ); 
-	else
-		error('File not found');
-	end;
+    filepath = homefolder;
+    filename = 'eeg_options.m';
+    fid = fopen( fullfile(filepath, filename), 'w');
+    if fid == -1
+        error([ 'Cannot write into HOME folder: ' homefolder );
+    end;
+    fclose(fid);
+    delete(fullfile(filepath, filename));
+
+    % read variables values and description
+    % --------------------------------------
+    [ header opt ] = eeg_readoptions( eegoptionbackup ); 
 else 
     [filepath filename ext] = fileparts(filename);
     filename  = [ filename ext ];
