@@ -161,28 +161,28 @@ frame = size(X,2);
 g = finputcheck(varargin, ...
                 { 'alpha'         'real'     [0 0.2]                  [];
                   'baseboot'      'float'    []                       0;
-                  'boottype'      'string'   {'times' 'trials' 'timestrials'}  'timestrials';
-                  'detrend'       'string'   {'on' 'off'}              'off';
+                  'boottype'      'string'   {'times','trials','timestrials'}  'timestrials';
+                  'detrend'       'string'   {'on','off'}              'off';
                   'freqs'         'real'     [0 Inf]                  [0 srate/2];
                   'freqs2'        'real'     [0 Inf]                  [];
-                  'freqscale'     'string'   { 'linear' 'log' }       'linear';
-                  'itctype'       'string'   {'phasecoher' 'phasecoher2' 'coher'}  'phasecoher';
+                  'freqscale'     'string'   { 'linear','log' }       'linear';
+                  'itctype'       'string'   {'phasecoher','phasecoher2','coher'}  'phasecoher';
                   'nfreqs'        'integer'  [0 Inf]                  [];
-                  'lowmem'        'string'   {'on' 'off'}              'off';
-                  'mode'          'string'   { 'amp_amp' 'amp_phase' 'phase_phase' } 'amp_phase';
-                  'method'        'string'   { 'mod' 'corrsin' 'corrcos' }         'mod';
+                  'lowmem'        'string'   {'on','off'}              'off';
+                  'mode'          'string'   { 'amp_amp','amp_phase','phase_phase' } 'amp_phase';
+                  'method'        'string'   { 'mod','corrsin','corrcos' }         'mod';
                   'naccu'         'integer'  [1 Inf]                   250;
-                  'newfig'        'string'   {'on' 'off'}              'on';
+                  'newfig'        'string'   {'on','off'}              'on';
                   'padratio'      'integer'  [1 Inf]                   2;
-                  'rmerp'         'string'   {'on' 'off'}              'off';
+                  'rmerp'         'string'   {'on','off'}              'off';
                   'rboot'         'real'     []                        [];
-                  'subitc'        'string'   {'on' 'off'}              'off';
+                  'subitc'        'string'   {'on','off'}              'off';
                   'subwin'        'real'     []                        []; ...
                   'timesout'      'real'     []                        []; ...
                   'ntimesout'     'integer'  []                        200; ...
                   'tlimits'       'real'     []                        [0 frame/srate];
                   'title'         'string'   []                        '';
-                  'vert'          { 'real' 'cell' }  []                [];
+                  'vert'          { 'real','cell' }  []                [];
                   'wavelet'       'real'     [0 Inf]                   0;
                   'wavelet2'      'real'     [0 Inf]                   [];
                   'winsize'       'integer'  [0 Inf]                   max(pow2(nextpow2(frame)-3),4) }, 'crossfreq');

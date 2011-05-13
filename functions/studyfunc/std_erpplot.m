@@ -131,19 +131,19 @@ opt = finputcheck( varargin, { 'topotime'    'real'    [] params.topotime;
                                'subtractsubjectmean' 'string' [] params.subtractsubjectmean;
                                'threshold'   'real'    [] params.threshold;
                                'naccu'       'integer' [] params.naccu;
-                               'singletrials' 'string' { 'on' 'off' }  params.singletrials;
+                               'singletrials' 'string' { 'on','off' }  params.singletrials;
                                'design'      'integer' []              STUDY.currentdesign;
                                'plotstderr'  'string'  []              'off';
                                'channels'    'cell'    []              {};
                                'clusters'    'integer' []              [];
-                               'datatype'    'string'  { 'erp' 'spec' } 'erp';      
+                               'datatype'    'string'  { 'erp','spec' } 'erp';      
                                'mode'        'string'  []              ''; % for backward compatibility
-                               'comps'       { 'string' 'integer' } [] []; % for backward compatibility
-                               'plotmode'    'string' { 'normal' 'condensed' }  'normal';
-                               'unitx'       'string' { 'ms' 'Hz' }    'ms';
-                               'plotsubjects' 'string' { 'on' 'off' }  'off';
+                               'comps'       { 'string','integer' } [] []; % for backward compatibility
+                               'plotmode'    'string' { 'normal','condensed' }  'normal';
+                               'unitx'       'string' { 'ms','Hz' }    'ms';
+                               'plotsubjects' 'string' { 'on','off' }  'off';
                                'subject'     'string'  []              '';
-                               'statmode'    'string'  { 'subjects' 'common' 'trials' } 'subjects'}, 'std_erpplot');
+                               'statmode'    'string'  { 'subjects','common','trials' } 'subjects'}, 'std_erpplot');
 if isstr(opt), error(opt); end;
 if isstr(opt.comps), opt.comps = []; opt.plotsubjects = 'on'; end;
 if ~isempty(opt.topofreq),  opt.topotime  = opt.topofreq; end;

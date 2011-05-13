@@ -162,12 +162,12 @@ if nargin < 2
 else
     options = varargin;
 end;
-listcheck = { 'edge'      'string'     { 'both' 'leading' 'trailing'}     'both';
+listcheck = { 'edge'      'string'     { 'both';'leading';'trailing'}     'both';
               'edgelen'   'integer'    [1 Inf]                            1;
-              'delchan'   'string'     { 'on' 'off' }                     'on';
+              'delchan'   'string'     { 'on';'off' }                     'on';
               'oper'      'string'     []                                 '';
-              'delevent'  'string'     { 'on' 'off' }                     'on';
-              'duration'  'string'     { 'on' 'off' }                     'off';
+              'delevent'  'string'     { 'on';'off' }                     'on';
+              'duration'  'string'     { 'on';'off' }                     'off';
               'typename'  'string'     []                                 [ 'chan' int2str(chan) ];
               'nbtype'    'integer'    [1 NaN]                             NaN };
 g = finputcheck( options, listcheck, 'pop_chanedit');

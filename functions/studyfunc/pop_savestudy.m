@@ -76,7 +76,7 @@ end
 % -------------------
 g = finputcheck(options,  { 'filename'   'string'   []     STUDY.filename;
                             'filepath'   'string'   []     STUDY.filepath;
-                            'savemode'   'string'   { 'standard' 'resave' } 'standard' });
+                            'savemode'   'string'   { 'standard','resave' } 'standard' });
 if isstr(g), error(g); end;
 
 % resave mode

@@ -56,9 +56,9 @@ function [chanlist,chanliststr, allchanstr] = pop_chansel(chans, varargin);
     chanliststr = {};
     allchanstr  = '';
     
-    g = finputcheck(varargin, { 'withindex'     {  'integer' 'string' } { [] {'on' 'off'} }   'off';
-                                'select'        { 'cell' 'string' 'integer' } [] [];
-                                'selectionmode' 'string' { 'single' 'multiple' } 'multiple'});
+    g = finputcheck(varargin, { 'withindex'     {  'integer';'string' } { [] {'on' 'off'} }   'off';
+                                'select'        { 'cell';'string';'integer' } [] [];
+                                'selectionmode' 'string' { 'single';'multiple' } 'multiple'});
     if isstr(g), error(g); end;
     if ~isstr(g.withindex), chan_indices = g.withindex; g.withindex = 'on';
     else                    chan_indices = 1:length(chans);

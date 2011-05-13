@@ -80,11 +80,11 @@ function chanlocs = adjustlocs( chanlocs, varargin)
                                  'scale'      'cell'  []   {};
                                  'center'     'cell'  []   {};
                                  'rotate'     'cell'  []   {};
-                                 'autoscale'  'string'  { 'on' 'off' }    'off';
-                                 'autocenter' 'string'  { 'on' 'off' }    'on';
-                                 'autorotate' 'string'  { 'on' 'off' }    'on';
-                                 'uniform'    'string'  { 'on' 'off' }    'on';
-                                 'coordinates' 'string'  { 'pol' 'sph' 'cart' } 'sph' });
+                                 'autoscale'  'string'  { 'on','off' }    'off';
+                                 'autocenter' 'string'  { 'on','off' }    'on';
+                                 'autorotate' 'string'  { 'on','off' }    'on';
+                                 'uniform'    'string'  { 'on','off' }    'on';
+                                 'coordinates' 'string' { 'pol','sph','cart' } 'sph' });
     if ischar(g), error(g); end;
     
     names = { chanlocs.labels };

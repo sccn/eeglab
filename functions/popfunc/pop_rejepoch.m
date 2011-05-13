@@ -52,8 +52,10 @@ end;
 if nargin < 3
    confirm = 1;
 end;
-   
-if all(ismember(sort(unique(tmprej)), [0 1])) & any(~tmprej)
+
+uniquerej = double(sort(unique(tmprej)));
+if length(tmprej) > 0 && length(uniquerej) <= 2 && ...
+    ismember(uniquerej(1), [0 1]) && ismember(uniquerej(end), [0 1]) && any(~tmprej)
     format0_1 = 1;
     fprintf('%d/%d trials rejected\n', sum(tmprej), EEG.trials);
 else 

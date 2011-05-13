@@ -66,7 +66,7 @@ if nargin < 3
     option = 'none';
 end;
 
-g = finputcheck( varargin, { 'recompute'   'string'   { 'on' 'off' }   'off' }, 'std_topo');
+g = finputcheck( varargin, { 'recompute'   'string'   { 'on','off' }   'off' }, 'std_topo');
 if isstr(g), error(g); end;
 
 % figure; toporeplot(grid,'style', 'both','plotrad', 0.5, 'intrad', 0.5, 'xsurface' ,Xi, 'ysurface',Yi );

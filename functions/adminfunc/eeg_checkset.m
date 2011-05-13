@@ -1267,7 +1267,7 @@ fieldorder = { 'setname' ...
 for fcell = fieldnames(EEG)'
     fname = fcell{1};
     if ~any(strcmp(fieldorder,fname))
-        fieldorder = [fieldorder fname];
+        fieldorder{end+1} = fname;
     end
 end
 

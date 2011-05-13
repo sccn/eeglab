@@ -65,10 +65,10 @@ function [ ori_vals, df, pvals, surrogval ] = statcondfieldtrip( data, varargin 
     end;
     
     [g cfgparams] = finputcheck( varargin, { 'naccu'    'integer'   [1 Inf]             200;
-                                             'mode'     'string'    { 'param' 'perm' 'bootstrap' }  'param';
+                                             'mode'     'string'    { 'param','perm','bootstrap' }  'param';
                                              'chanlocs' 'struct'    { }   struct([]);
-                                             'method'   'string'    { 'montecarlo' 'analytic' 'stat' 'glm' } 'analytic';
-                                             'paired'   'string'    { 'on' 'off' }      'on' }, 'statcond', 'ignore');
+                                             'method'   'string'    { 'montecarlo','analytic','stat','glm' } 'analytic';
+                                             'paired'   'string'    { 'on','off' }      'on' }, 'statcond', 'ignore');
     if isstr(g), error(g); end;    
     
     if size(data,2) == 1, data  = transpose(data); end; % cell array transpose

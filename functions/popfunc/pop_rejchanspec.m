@@ -112,10 +112,10 @@ end;
 
 % decode options
 % --------------
-opt = finputcheck( options, { 'averef'    'string'    { 'on' 'off' }       'off';
-                              'plothist'  'string'    { 'on' 'off' }       'off';
-                              'plotchans' 'string'    { 'on' 'off' }       'off';
-                              'verbose'   'string'    { 'on' 'off' }       'off';
+opt = finputcheck( options, { 'averef'    'string'    { 'on';'off' }       'off';
+                              'plothist'  'string'    { 'on';'off' }       'off';
+                              'plotchans' 'string'    { 'on';'off' }       'off';
+                              'verbose'   'string'    { 'on';'off' }       'off';
                               'elec'      'integer'   []                   [1:EEG.nbchan];
                               'freqlims'  'real'   []                      [35 EEG.srate/2];
                               'specdata'  'real'   []                      [];

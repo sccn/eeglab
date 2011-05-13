@@ -53,11 +53,11 @@ function [handles] = plotsphere(pos, rad, varargin);
         return;
     end;
     
-    g = finputcheck(varargin, { 'color'    { 'real' 'string' } []         [1 0 0];
+    g = finputcheck(varargin, { 'color'    { 'real','string' } []         [1 0 0];
                                 'nvert'    'integer'           [2 Inf]    15;
                                 'proj'     'real'              []         [];
                                 'colormap' 'real'              []         jet(64);
-                                'projcol'  { 'real' 'string' } []         [0 0 0] }, 'plotsphere');
+                                'projcol'  { 'real','string' } []         [0 0 0] }, 'plotsphere');
     if isstr(g), error(g); end;
     
     % decode color if necessary

@@ -90,9 +90,9 @@ end;
 % -----------------------
 g = finputcheck(options,  { 'filename'   'string'   []     '';
                             'filepath'   'string'   []     '';
-                            'version'    'string'   { '6' '7.3' } '6';
-                            'check'      'string'   { 'on' 'off' }     'off';
-                            'savemode'   'string'   { 'resave' 'onefile' 'twofiles' '' } '' });
+                            'version'    'string'   { '6','7.3' } '6';
+                            'check'      'string'   { 'on','off' }     'off';
+                            'savemode'   'string'   { 'resave','onefile','twofiles','' } '' });
 if isstr(g), error(g); end;
 
 % current filename without the .set

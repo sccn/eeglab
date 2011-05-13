@@ -108,7 +108,7 @@ CURRENTSET = OLDSET;
 com = sprintf('[ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, %s); ', vararg2str( { OLDSET varargin{:} } ));
 
 [g varargin] = finputcheck(varargin, { ...
-                    'gui'           'string'     { 'on' 'off' }   'on'; % []=none; can be multiple numbers
+                    'gui'           'string'     { 'on';'off' }   'on'; % []=none; can be multiple numbers
                     'retrieve'      'integer'    []               []; % []=none; can be multiple numbers
                     'study'         'integer'    [0 1]            0;  % important because change behavior for modified datasets
                     }, 'pop_newset', 'ignore');
@@ -332,9 +332,10 @@ elseif length(varargin) == 0 & length(EEG) == 1 & strcmpi(g.gui, 'on') % if seve
                            '   ''dataset or study can be kept in memory. This will also affect the'',' ...
                            '   ''dataset at this position in the study.''));' ...
                            'end;' ];
-            uilist = { uilist{:} ...
-                 { 'Style', 'checkbox'  , 'string', '', 'callback', cb_loadold 'tag' 'cb_loadold' } ...
-                 { 'Style', 'text',       'string', 'Reload copy from disk (will be done after optional saving above)' } {} {} };
+            uilist{end+1} = { 'Style', 'checkbox'  , 'string', '', 'callback', cb_loadold 'tag' 'cb_loadold' };
+            uilist{end+1} = { 'Style', 'text',       'string', 'Reload copy from disk (will be done after optional saving above)' };
+            uilist{end+1} = {};
+            uilist{end+1} = {};
              geometry = { geometry{:} [0.12 1.6 0.2 0.2] };
         end;
     end;

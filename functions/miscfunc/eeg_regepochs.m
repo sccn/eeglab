@@ -85,7 +85,7 @@ g = finputcheck(options, { 'recurrence'    'real'  []  1;
                             'limits'        'real'  []  [0 1];
                             'rmbase'        'real'  []  0;
                             'eventtype'     'string' {} 'X';
-                            'extractepochs' 'string' { 'on' 'off' } 'on' }, 'eeg_regepochs');
+                            'extractepochs' 'string' { 'on','off' } 'on' }, 'eeg_regepochs');
 if isstr(g), error(g); end;
 
 if g.recurrence < 0 | g.recurrence > EEG.xmax

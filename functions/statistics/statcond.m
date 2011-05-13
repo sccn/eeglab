@@ -137,12 +137,12 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
     
     if exist('finputcheck')
         g = finputcheck( varargin, { 'naccu'      'integer'   [1 Inf]             200;
-                                     'mode'       'string'    { 'param' 'perm' 'bootstrap' }  'param';
-                                     'paired'     'string'    { 'on' 'off' }      'on'; 
-                                     'arraycomp'  'string'    { 'on' 'off' }      'on'; 
-                                     'variance'   'string'    { 'homogenous' 'inhomogenous' }      'homogenous'; 
-                                     'returnresamplingarray' 'string'    { 'on' 'off' }      'off'; 
-                                     'verbose'    'string'    { 'on' 'off' }      'on' }, 'statcond');
+                                     'mode'       'string'    { 'param','perm','bootstrap' }  'param';
+                                     'paired'     'string'    { 'on','off' }      'on'; 
+                                     'arraycomp'  'string'    { 'on','off' }      'on'; 
+                                     'variance'   'string'    { 'homogenous','inhomogenous' }      'homogenous'; 
+                                     'returnresamplingarray' 'string'    { 'on','off' }      'off'; 
+                                     'verbose'    'string'    { 'on','off' }      'on' }, 'statcond');
         if isstr(g), error(g); end;
     else
         g = struct(varargin{:});

@@ -64,12 +64,12 @@ else
     g = [];
 end;
 
-g = finputcheck( varargin, { 'convert'   'string'   { 'on' 'off' 'force' }   'on';
+g = finputcheck( varargin, { 'convert'   'string'   { 'on';'off';'force' }   'on';
                              'skipline'  'integer'  [0 Inf]          0;
-                             'verbose'   'string'   { 'on' 'off' }   'on';
-                             'uniformdelim' 'string'   { 'on' 'off' }   'off';                             
-                             'blankcell' 'string'   { 'on' 'off' }   'on';
-                             'delim'     { 'integer' 'string' } []               [9 32];
+                             'verbose'   'string'   { 'on';'off' }   'on';
+                             'uniformdelim' 'string'   { 'on';'off' }   'off';                             
+                             'blankcell' 'string'   { 'on';'off' }   'on';
+                             'delim'     { 'integer';'string' } []               [9 32];
                              'nlines'    'integer'  []               Inf });
 if isstr(g), error(g); end;
 if strcmpi(g.blankcell, 'off'), g.uniformdelim = 'on'; end;

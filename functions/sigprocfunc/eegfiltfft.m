@@ -95,9 +95,9 @@ function smoothdata = eegfiltfft(data, fs, lowcut, highcut, epochframes, filtord
                     X((end+1)/2:end)=0;
                 end;
             else
-                X(1:idxl)=0;
-                X(end-idxl:end)=0;
-                X(idxh:end)=0;
+                X(1:idxl)=complex(0);
+                X(end-idxl:end)=complex(0);
+                X(idxh:end)=complex(0);
             end;                
             smoothdata(c,(e-1)*epochframes+1:e*epochframes) = 2*real(ifft(X));
             if epochs == 1 

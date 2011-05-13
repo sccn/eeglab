@@ -96,13 +96,13 @@ opt = finputcheck( varargin, { 'titles'         'cell'   []              cell(20
                                'threshold'      'real'   []              NaN;
                                'unitx'          'string' []              'ms'; % just for titles
                                'chanlocs'       'struct' []              struct('labels', {});
-                               'freqscale'      'string' { 'log' 'linear' 'auto' }  'auto';
+                               'freqscale'      'string' { 'log','linear','auto' }  'auto';
                                'groupstats'     'cell'   []              {};
                                'condstats'      'cell'   []              {};
                                'interstats'     'cell'   []              {};                               
-                               'maskdata'       'string' { 'on' 'off' }   'off';
-                               'datatype'       'string' { 'ersp' 'itc' }    'ersp';
-                               'plotmode'       'string' { 'normal' 'condensed' }  'normal' }, 'std_plottf');
+                               'maskdata'       'string' { 'on','off' }   'off';
+                               'datatype'       'string' { 'ersp','itc' }    'ersp';
+                               'plotmode'       'string' { 'normal','condensed' }  'normal' }, 'std_plottf');
 if isstr(opt), error(opt); end;
 if all(all(cellfun('size', data, 3)==1))               opt.singlesubject = 'on'; end;
 
@@ -180,12 +180,10 @@ if ~isnan(opt.threshold) && ( ~isempty(opt.groupstats) || ~isempty(opt.condstats
     pinterplot = pinter;
     maxplot = 1;
 else
-    warning off;
     for ind = 1:length(opt.condstats),  pcondplot{ind}  = -log10(opt.condstats{ind}); end;
     for ind = 1:length(opt.groupstats), pgroupplot{ind} = -log10(opt.groupstats{ind}); end;
     if ~isempty(pinter), pinterplot = -log10(pinter); end;
     maxplot = 3;
-    warning on;
 end;
 
 % -------------------------------

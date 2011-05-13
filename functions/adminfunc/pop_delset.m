@@ -66,7 +66,7 @@ A = fieldnames( ALLSET );
 A(:,2) = cell(size(A));
 A = A';
 for i = set_in
-   try
+    try
    		ALLSET(i) = struct(A{:});
 		%ALLSET = setfield(ALLSET, {set_in}, A{:}, cell(size(A)));
 	catch

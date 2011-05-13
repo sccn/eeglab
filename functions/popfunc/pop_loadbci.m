@@ -124,17 +124,23 @@ function [EEG, command] = pop_loadbci(filename, srate);
     end;
     for index = 1:length(allfields)
         geom   = { geom{:} [1.3 0.3 0.3 0.3 1] };
-        uilist = { uilist{:} { 'style' 'text' 'string' allfields{index} } };
+        uilist{end+1} = { 'style' 'text' 'string' allfields{index} };
         if ~isempty(findstr( lower(allfields{index}), 'time'))
-            uilist = { uilist{:} { 'style' 'checkbox' 'value' 0 } { } { } { } };
+            uilist{end+1} = { 'style' 'checkbox' 'value' 0 };
+            uilist{end+1} = { };
+            uilist{end+1} = { };
+            uilist{end+1} = { };
         else
-            uilist = { uilist{:} { 'style' 'checkbox' } { } { } ...
-                       { 'style' 'listbox' 'string' strvcat(latencyfields) } };
+            uilist{end+1} = { 'style' 'checkbox' };
+            uilist{end+1} = { };
+            uilist{end+1} = { };
+            uilist{end+1} = { 'style' 'listbox' 'string' strvcat(latencyfields) };
         end;
     end;
     geom   = { geom{:} [1] [0.08 1] };
-    uilist = { uilist{:} { } { 'style' 'checkbox' 'value' 0 } ...
-               { 'style' 'text' 'string' 'Attempt to adjust event latencies using sourcetime?' } };
+    uilist{end+1} = { };
+    uilist{end+1} = { 'style' 'checkbox' 'value' 0 };
+    uilist{end+1} = { 'style' 'text' 'string' 'Attempt to adjust event latencies using sourcetime?' };
     
     result = inputgui( geom, uilist, 'pophelp(''pop_loadbci'')', 'Import BCI2000 data files - pop_loadbci()');
     if isempty(result), return; end;
@@ -145,14 +151,14 @@ function [EEG, command] = pop_loadbci(filename, srate);
     count = 1;
     for index = 1:length(allfields)
         if ~isempty(findstr( lower(allfields{index}), 'time')) 
-            if result{count}, listimport =  { listimport{:} 'event' { allfields{index} } }; end;
+            if result{count}, listimport{end+1} = 'event'; listimport{end+1} = { allfields{index} }; end;
             count = count+1;
         else 
             if result{count}
                 if result{count+1} ~= 1
-                    listimport =  { listimport{:} 'event' { allfields{index}  allfields{result{count+1}-1} } };
+                    listimport{end+1} = 'event'; listimport{end+1} = { allfields{index}  allfields{result{count+1}-1} };
                 else
-                    listimport =  { listimport{:} 'event' { allfields{index} } };
+                    listimport{end+1} = 'event'; listimport{end+1} = { allfields{index} };
                 end;
             end;
             count = count+2;                

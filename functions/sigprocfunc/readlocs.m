@@ -301,8 +301,8 @@ end;
 
 g = finputcheck( varargin, ...
    { 'filetype'	   'string'  {}                 '';
-     'importmode'  'string'  { 'eeglab' 'native' } 'eeglab';
-     'defaultelp'  'string'  { 'besa'   'polhemus' } 'polhemus';
+     'importmode'  'string'  { 'eeglab','native' } 'eeglab';
+     'defaultelp'  'string'  { 'besa','polhemus' } 'polhemus';
      'skiplines'   'integer' [0 Inf] 			[];
      'elecind'     'integer' [1 Inf]	    	[];
      'format'	   'cell'	 []					{} }, 'readlocs');

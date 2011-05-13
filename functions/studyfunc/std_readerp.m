@@ -77,16 +77,16 @@ end;
 STUDY = pop_erpparams(STUDY, 'default');
 STUDY = pop_specparams(STUDY, 'default');
 [opt moreopts] = finputcheck( varargin, { ...
-    'type'          { 'string' 'cell' } { [] [] } '';
+    'type'          { 'string','cell' } { [] [] } '';
     'design'        'integer' []             STUDY.currentdesign;
     'channels'      'cell'    []             {};
     'clusters'      'integer' []             [];
     'timerange'     'real'    []             STUDY.etc.erpparams.timerange;
     'freqrange'     'real'    []             STUDY.etc.specparams.freqrange;
-    'datatype'      'string'  { 'erp' 'spec' } 'erp';
-    'rmsubjmean'    'string'  { 'on' 'off' } 'off';
-    'singletrials'  'string'  { 'on' 'off' } 'off';
-    'componentpol'  'string'  { 'on' 'off' } 'on';
+    'datatype'      'string'  { 'erp','spec' } 'erp';
+    'rmsubjmean'    'string'  { 'on','off' } 'off';
+    'singletrials'  'string'  { 'on','off' } 'off';
+    'componentpol'  'string'  { 'on','off' } 'on';
     'component'     'integer' []             [];
     'subject'       'string'  []             '' }, ...
     'std_readerp', 'ignore');

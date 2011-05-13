@@ -38,9 +38,7 @@ if cycles == 0 %FFT option
     winsize =pow2(nextpow2(winsize));
     %winsize =2^round(log2(winsize)); 
 else %wavelet
-    warning off;
     t = cycles(1)/lowfreq; %time window in sec
-    warning on;
     winsize  = round(t*srate); %time window in points
 end
 

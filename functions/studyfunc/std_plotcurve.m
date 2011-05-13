@@ -82,22 +82,22 @@ opt = finputcheck( varargin, { 'ylim'          'real'   []              [];
                                'threshold'     'real'   []              NaN;
                                'unitx'         'string' []              'ms';
                                'chanlocs'      'struct' []              struct('labels', {});
-                               'plotsubjects'  'string' { 'on' 'off' }  'off';
+                               'plotsubjects'  'string' { 'on','off' }  'off';
                                'condnames'     'cell'   []              {}; % just for legends
                                'groupnames'    'cell'   []              {}; % just for legends
                                'groupstats'    'cell'   []              {};
                                'condstats'     'cell'   []              {};
                                'interstats'    'cell'   []              {};
                                'titles'        'cell'   []              {};
-                               'figure'        'string' { 'on' 'off' }   'on';
-                               'plottopo'      'string' { 'on' 'off' }   'off';
-                               'plotstderr'    'string' { 'on' 'off' 'diff' 'nocurve' }   'off';
-                               'plotdiff'      'string' { 'on' 'off' }   'off';
-                               'legend'        { 'string' 'cell' } { { 'on' 'off' } {} }  'off';
-                               'datatype'      'string' { 'ersp' 'itc' 'erp' 'spec' }    'erp';
-                               'plotgroups'    'string' { 'together' 'apart' }  'apart';
-                               'plotmode'      'string' { 'test' 'condensed' }  'test'; % deprecated
-                               'plotconditions'    'string' { 'together' 'apart' }  'apart' }, 'std_plotcurve');
+                               'figure'        'string' { 'on','off' }   'on';
+                               'plottopo'      'string' { 'on','off' }   'off';
+                               'plotstderr'    'string' { 'on','off','diff','nocurve' }   'off';
+                               'plotdiff'      'string' { 'on','off' }   'off';
+                               'legend'        { 'string','cell' } { { 'on','off' } {} }  'off';
+                               'datatype'      'string' { 'ersp','itc','erp','spec' }    'erp';
+                               'plotgroups'    'string' { 'together','apart' }  'apart';
+                               'plotmode'      'string' { 'test','condensed' }  'test'; % deprecated
+                               'plotconditions'    'string' { 'together','apart' }  'apart' }, 'std_plotcurve');
 
 % opt.figure =  'off'; % test by nima
 if isstr(opt), error(opt); end;
@@ -206,12 +206,10 @@ if ~isnan(opt.threshold) && ( ~isempty(opt.groupstats) || ~isempty(opt.condstats
     pinterplot = pinter;
     maxplot = 1;
 else
-    warning off;
     for ind = 1:length(opt.condstats),  pcondplot{ind}  = -log10(opt.condstats{ind}); end;
     for ind = 1:length(opt.groupstats), pgroupplot{ind} = -log10(opt.groupstats{ind}); end;
     if ~isempty(pinter), pinterplot = -log10(pinter); end;
     maxplot = 3;
-    warning on;
 end;
 
 % labels

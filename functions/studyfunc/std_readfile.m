@@ -67,10 +67,10 @@ end;
 
 opt = finputcheck(varargin, { 'dataindices'      'integer'  []    [];
                               'components'       'integer'  []    [];
-                              'getparamonly'     'string'   { 'on' 'off' }  'off';
-                              'singletrials'     'string'   { 'on' 'off' }  'off';
+                              'getparamonly'     'string'   { 'on','off' }  'off';
+                              'singletrials'     'string'   { 'on','off' }  'off';
                               'channels'         'cell'     []    {};
-                              'measure'          'string'   { 'ersp' 'erspboot' 'erspbase' 'itc' 'itcboot' 'spec' 'erp' 'timef' }  'erp';
+                              'measure'          'string'   { 'ersp','erspboot','erspbase','itc','itcboot','spec','erp','timef' }  'erp';
                               'timelimits'       'real'     []    [];
                               'freqlimits'       'real'     []    [] }, 'std_readdatafile');
 if isstr(opt), error(opt); end;

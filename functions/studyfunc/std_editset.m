@@ -78,17 +78,17 @@ end;
 
 % decode input parameters
 % -----------------------
-g = finputcheck(varargin, { 'updatedat' 'string'  { 'on' 'off' }  'off';
+g = finputcheck(varargin, { 'updatedat' 'string'  { 'on','off' }  'off';
                             'name'      'string'  { }             '';
                             'task'      'string'  { }             '';
                             'notes'     'string'  { }             '';
                             'filename'  'string'  { }             '';
                             'filepath'  'string'  { }             '';
-                            'resave'    'string'  { 'on' 'off' 'info' }  'off';
-                            'savedat'   'string'  { 'on' 'off' }  'off';
-                            'addchannellabels' 'string'  { 'on' 'off' }  'off';
-                            'rmclust'   'string'  { 'on' 'off' }  'on';
-                            'inbrain'   'string'  { 'on' 'off' }  'off';
+                            'resave'    'string'  { 'on','off','info' }  'off';
+                            'savedat'   'string'  { 'on','off' }  'off';
+                            'addchannellabels' 'string'  { 'on','off' }  'off';
+                            'rmclust'   'string'  { 'on','off' }  'on';
+                            'inbrain'   'string'  { 'on','off' }  'off';
                             'commands'  'cell'    {}              {} }, 'std_editset');
 if isstr(g), error(g); end;
 

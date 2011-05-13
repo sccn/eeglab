@@ -123,15 +123,15 @@ tfdataori = mean(tfdata,4); % for topoplot
 % test inputs
 % -----------
 % 'key' 'val' sequence
-fieldlist = { 'chanlocs'      { 'string' 'struct' }       []       '' ;
+fieldlist = { 'chanlocs'      { 'string','struct' }       []       '' ;
               'limits'        'real'     []                        [nan nan nan nan nan nan];
-              'logfreq'       'string'   {'on' 'off' 'native'}     'off';
-              'cbar'          'string'   {'on' 'off' }             'on';
-              'mode'          'string'   { 'ave' 'rms' }           'rms';
+              'logfreq'       'string'   {'on','off','native'}     'off';
+              'cbar'          'string'   {'on','off' }             'on';
+              'mode'          'string'   { 'ave','rms' }           'rms';
               'title'         'string'   []                        '';
-              'verbose'       'string'   {'on' 'off' }             'on';
-              'axcopy'        'string'   {'on' 'off' }             'on';
-              'cmode'         'string'   {'common' 'separate' }    'common';
+              'verbose'       'string'   {'on','off' }             'on';
+              'axcopy'        'string'   {'on','off' }             'on';
+              'cmode'         'string'   {'common','separate' }    'common';
               'selchans'      'integer'  [1 nchans]                [1:nchans];
               'shiftimgs'     'real'     []                        [] ;
               'plotscalponly' 'real'     []                        [] ;
@@ -141,7 +141,7 @@ fieldlist = { 'chanlocs'      { 'string' 'struct' }       []       '' ;
               'smooth'        'real'     [0 Inf]                   1;
               'timefreqs'     'real'     []                        [];
               'vert'          'real'     [times(1) times(end)]     [min(max(0, times(1)), times(end))];
-              'denseLogTicks' 'string'   {'on' 'off'}               'off'              
+              'denseLogTicks' 'string'   {'on','off'}               'off'              
               };
 
 [g varargin] = finputcheck( varargin, fieldlist, 'tftopo', 'ignore');

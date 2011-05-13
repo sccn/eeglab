@@ -90,9 +90,6 @@ end;
 if nargin < 2
    icacomp = 1;
 end;  
-if ~exist('pmtm')
-    error('The signal processing toolbox needs to be installed');
-end;
 
 if icacomp == 0
 	if isempty( EEG.icasphere )
@@ -164,7 +161,7 @@ opt = finputcheck( options, { 'elecrange'     'integer'  []    [1:EEG.nbchan];
                               'freqlimits'    'real'     []    [15 30];
                               'specdata'      'real'     []    EEG.specdata;
                               'eegplotcom'    'string'   []    '';
-                              'method'        'string'   { 'fft' 'multitaper' }    'multitaper';
+                              'method'        'string'   { 'fft';'multitaper' }    'multitaper';
                               'eegplotreject' 'integer'  []    0;
                               'eegplotplotallrej' 'integer'  []    0 }, 'pop_rejspec');
 if isstr(opt), error(opt); end;
@@ -257,6 +254,9 @@ function [specdata, Irej, Erej, freqs ] = spectrumthresh( data, specdata, elecra
             specdata = 10*log10(abs( specdata ).^2);
             specdata  = specdata - repmat( mean(specdata,3), [1 1 size(data,3)]);
         else
+            if ~exist('pmtm')
+                error('The signal processing toolbox needs to be installed');
+            end;
             [tmp freqs] = pmtm( data(1,:,1), [],[],srate); % just to get the frequencies 	
 
             fprintf('Computing spectrum (using slepian tapers; done only once):\n');

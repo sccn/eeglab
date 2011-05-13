@@ -200,13 +200,18 @@ g = finputcheck(args, { 'time'    'real'      []         []; ...
                         'notrial' 'integer'   []         []; ...
                         'point'   'integer'   []         []; ...
                         'nopoint' 'integer'   []         []; ...
-                        'channel'   { 'integer' 'cell' }  []  chanlist;
-                        'nochannel' { 'integer' 'cell' }   []  [];
+                        'channel'   { 'integer','cell' }  []  chanlist;
+                        'nochannel' { 'integer','cell' }   []  [];
                         'trialcond'   'integer'   []         []; ...
                         'notrialcond' 'integer'   []         []; ...
-                        'sorttrial'   'string'    { 'on' 'off' } 'on' }, 'pop_select');
+                        'sort'        'integer'   []         []; ...
+                        'sorttrial'   'string'    { 'on','off' } 'on' }, 'pop_select');
 if isstr(g), error(g); end;
-
+if ~isempty(g.sort)
+    if g.sort, g.sorttrial = 'on';
+    else       g.sorttrial = 'off';
+    end;
+end;
 if strcmpi(g.sorttrial, 'on')
     g.trial = sort(setdiff( g.trial, g.notrial ));
 else
@@ -232,7 +237,10 @@ if iscell(g.channel) && ~iscell(g.nochannel) && ~isempty(EEG.chanlocs)
 end;
 
 if strcmpi(g.sorttrial, 'on')
-    g.channel = sort(setdiff( lower(g.channel), lower(g.nochannel) ));
+    if iscell(g.channel)
+         g.channel = sort(setdiff( lower(g.channel), lower(g.nochannel) ));
+    else g.channel = sort(setdiff( g.channel, g.nochannel ));
+    end;
 else
     g.channel(ismember(lower(g.channel),lower(g.nochannel))) = [];
     % still warn about & remove duplicate channels (may be removed in the future)
@@ -258,14 +266,16 @@ if ~isempty(EEG.chanlocs)
     end
 end;
 
-if ~isempty(g.time) & (g.time(1) < EEG.xmin*1000) & (g.time(2) > EEG.xmax*1000)
+if ~isempty(g.time) && (g.time(1) < EEG.xmin*1000) && (g.time(2) > EEG.xmax*1000)
    error('Wrong time range');
 end;
-if min(g.trial) < 1 | max( g.trial ) > EEG.trials  
+if min(g.trial) < 1 || max( g.trial ) > EEG.trials  
    error('Wrong trial range');
 end;
-if min(g.channel) < 1 | max( g.channel ) > EEG.nbchan  
-   error('Wrong channel range');
+if ~isempty(g.channel)
+    if min(double(g.channel)) < 1 || max(double(g.channel)) > EEG.nbchan  
+        error('Wrong channel range');
+    end;
 end;
 
 if size(g.point,2) > 2, 

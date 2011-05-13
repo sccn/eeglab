@@ -103,12 +103,12 @@ end;
 % test inputs
 % -----------
 g = finputcheck(options, { ...
-    'ica'       'string'    { 'on' 'off' }     'off';
-    'time'      'string'    { 'on' 'off' }     'on';
+    'ica'       'string'    { 'on';'off' }     'off';
+    'time'      'string'    { 'on';'off' }     'on';
     'timeunit'  'float'     [0 Inf]            1E-3;
-    'elec'      'string'    { 'on' 'off' }     'on';
-    'transpose' 'string'    { 'on' 'off' }     'off';
-    'erp'       'string'    { 'on' 'off' }     'off';
+    'elec'      'string'    { 'on';'off' }     'on';
+    'transpose' 'string'    { 'on';'off' }     'off';
+    'erp'       'string'    { 'on';'off' }     'off';
     'precision' 'integer'   [0 Inf]            4;
     'expr'      'string'    []                 '' }, 'pop_export');
 if isstr(g), error(g); end;

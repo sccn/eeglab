@@ -111,7 +111,7 @@ if nargin < 3
 end
 
 [opt moreopts] = finputcheck( varargin, { ...
-    'type'       { 'string' 'cell' } { [] [] } '';
+    'type'       { 'string','cell' } { [] [] } '';
     'timewin'    'real'    []        [-Inf Inf];
     'fieldname'  'string'  []        'latency';
     'condition'  'cell'    []       {};
@@ -120,12 +120,12 @@ end
     'rmclust'    'integer' []       [];
     'freqrange'  'real'    []       [];
     'timerange'  'real'    []       [];
-    'statmode'   'string'  { 'subjects' 'individual' 'common' 'trials' }       'individual';
-    'rmicacomps'   'string'  { 'on' 'off' }       'off';
-    'subbaseline'  'string'  { 'on' 'off' }       'off';
-    'rmsubjmean'   'string'  { 'on' 'off' }       'off';
-    'singletrials' 'string'  { 'on' 'off' }       'on';
-    'infotype'   'string'  { 'erp' 'spec' 'ersp' 'itc' 'map' 'topo' 'dipole' 'scalp' 'data' 'event' '' } '' }, ...
+    'statmode'   'string'  { 'subjects','individual','common','trials' }       'individual';
+    'rmicacomps'   'string'  { 'on','off' }       'off';
+    'subbaseline'  'string'  { 'on','off' }       'off';
+    'rmsubjmean'   'string'  { 'on','off' }       'off';
+    'singletrials' 'string'  { 'on','off' }       'on';
+    'infotype'   'string'  { 'erp','spec','ersp','itc','map','topo','dipole','scalp','data','event','' } '' }, ...
     'std_readdata', 'ignore');
 if isstr(opt), error(opt); end;
 if isempty(opt.infotype), disp('No measure selected, returning ERPs'); opt.infotype = 'erp'; end;

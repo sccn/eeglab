@@ -69,9 +69,7 @@ end
 if ~isempty(filename)
     STUDYfile = fullfile(filepath,filename);
     try 
-        warning off;
         load('-mat', STUDYfile);
-        warning on;
     catch
         error(['pop_loadstudy(): STUDY set file ''STUDYfile'' not loaded -- check filename and path']);
     end

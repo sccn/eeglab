@@ -53,7 +53,7 @@ end;
 if nargin < 2
    command = 'auto';
 end;
-if nargin == 4 & strcmpi(varargin{2}, 'on')
+if nargin == 4 && strcmpi(varargin{2}, 'on')
     verbose = 1;
 else
     verbose = 0; % off
@@ -62,19 +62,19 @@ end;
 % test if value exists for default
 % --------------------------------
 if strcmp(command, 'auto')
-    if isfield(chans, 'X') & ~isempty(chans(1).X)
+    if isfield(chans, 'X') && ~isempty(chans(1).X)
         command = 'cart2all';
         if verbose
             disp('Make all coordinate frames uniform using Cartesian coords');
         end;
     else
-        if isfield(chans, 'sph_theta') & ~isempty(chans(1).sph_theta)
+        if isfield(chans, 'sph_theta') && ~isempty(chans(1).sph_theta)
             command = 'sph2all';
             if verbose
                 disp('Make all coordinate frames uniform using spherical coords');
             end;
         else
-            if isfield(chans, 'sph_theta_besa') & ~isempty(chans(1).sph_theta_besa)
+            if isfield(chans, 'sph_theta_besa') && ~isempty(chans(1).sph_theta_besa)
                 command = 'sphbesa2all';
                 if verbose
                     disp('Make all coordinate frames uniform using BESA spherical coords');
@@ -153,7 +153,7 @@ case 'sph2topo',
  for index = 1:length(indices)
      chans(indices(index)).theta  = angle(index);
      chans(indices(index)).radius = radius(index);
-     if ~isfield(chans, 'sph_radius') | isempty(chans(indices(index)).sph_radius)
+     if ~isfield(chans, 'sph_radius') || isempty(chans(indices(index)).sph_radius)
          chans(indices(index)).sph_radius = 1;
      end;
  end;

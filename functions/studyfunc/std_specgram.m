@@ -103,13 +103,13 @@ if nargin < 1
 end;
 
 [opt moreopts] = finputcheck(varargin, { 'components' 'integer' []             [];
-                                         'channels'   { 'cell' 'integer' }  { [] [] }     {}
-                                         'recompute'  'string'  { 'on' 'off' } 'off';
+                                         'channels'   { 'cell','integer' }  { [] [] }     {}
+                                         'recompute'  'string'  { 'on','off' } 'off';
                                          'winsize'    'integer' []             3; % 3 seconds
                                          'rmcomps'    'integer' []             [];
                                          'interp'     'struct'  { }            struct([]);
                                          'overlap'    'integer' []             0;  
-                                         'plot'       'string'  { 'off' 'on' } 'off';
+                                         'plot'       'string'  { 'off','on' } 'off';
                                          'freqrange'  'real'    []             [];
                                          'timerange'  'real'    []             [];
                                          'filter'     'real'    []             []}, ...    % 11 points
@@ -208,11 +208,9 @@ options   = { 0 'winsize', opt.winsize, 'baseline', [0 Inf], 'timesout', wincent
 %cycles    = linspace(3,8,100);
 %options   = { [3 0.8] 'winsize', opt.winsize, 'baseline', [0 Inf], 'timesout', wincenter, ...
 %              'freqs' freqs 'cycles' cycles 'plotersp', 'off', 'plotitc', 'off' };
-warning off;
 for ic = 1:length(opt.indices)
     [ersp(:,:,ic) itc powebase t f] = newtimef(X(opt.indices(ic), :), EEG.pnts, [EEG.xmin EEG.xmax]*1000, EEG.srate, options{:}, moreopts{:});
 end;
-warning on;
 
 % interpolate and smooth in time
 % ------------------------------

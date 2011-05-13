@@ -63,7 +63,7 @@ end;
 rejE   = zeros( chans, trials);
 
 x = linspace( 1/pointrange, 1, pointrange );
-waitbarhandle = waitbar(0,'rejtrend.m Please wait...');
+%waitbarhandle = waitbar(0,'rejtrend.m Please wait...');
 for c = 1:chans
 	for t = 1:trials 
 		for w = 1:step:(pnts-pointrange+1)
@@ -86,9 +86,9 @@ for c = 1:chans
             end
         end
     end
-    waitbar(c/chans);
+    %waitbar(c/chans);
 end
-close(waitbarhandle);			
+%close(waitbarhandle);			
 rej = max( rejE, [], 1);
 
 return;

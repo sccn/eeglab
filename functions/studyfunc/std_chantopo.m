@@ -63,8 +63,8 @@ opt = finputcheck( varargin, { 'ylim'        'real'   []              [];
                                'condstats'   'cell'   []              {};
                                'interstats'  'cell'   []              {};
                                'topoplotopt' 'cell'   []              { 'style', 'both', 'shading', 'interp' };
-                               'binarypval'  'string' { 'on' 'off' }  'on';
-                               'datatype'    'string' { 'ersp' 'itc' 'erp' 'spec' }    'erp';
+                               'binarypval'  'string' { 'on','off' }  'on';
+                               'datatype'    'string' { 'ersp','itc','erp','spec' }    'erp';
                                'caxis'       'real'   []              [] }, 'std_chantopo', 'ignore'); %, 'ignore');
 if isstr(opt), error(opt); end;
 if ~isempty(opt.ylim), opt.caxis = opt.ylim; end;
@@ -97,12 +97,10 @@ if ~isnan(opt.threshold(1)) && ( ~isempty(opt.groupstats) || ~isempty(opt.condst
     pinterplot = pinter;
     maxplot = 1;
 else
-    warning off;
     for ind = 1:length(opt.condstats),  pcondplot{ind}  = -log10(opt.condstats{ind}); end;
     for ind = 1:length(opt.groupstats), pgroupplot{ind} = -log10(opt.groupstats{ind}); end;
     if ~isempty(pinter), pinterplot = -log10(pinter); end;
     maxplot = 3;
-    warning on;
 end;
 
 % adjust figure size

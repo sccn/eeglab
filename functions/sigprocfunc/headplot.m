@@ -176,12 +176,12 @@ if isstr(values)
     eloc_file = arg1;
     spline_file = varargin{1};
         
-    g = finputcheck(varargin(2:end), { 'orilocs'      'string'  { 'on' 'off' }             'off';
-                                       'plotmeshonly' 'string'  { 'head' 'off' 'sphere' }  'off';
+    g = finputcheck(varargin(2:end), { 'orilocs'      'string'  { 'on','off' }             'off';
+                                       'plotmeshonly' 'string'  { 'head','off','sphere' }  'off';
                                        'meshfile'     'string'  []                         DEFAULT_MESH;
                                        'chaninfo'     'struct'  []                         struct([]);
                                        'plotchans'    'integer' []                         [];
-                                       'ica'          'string'  { 'on' 'off' }             'off';
+                                       'ica'          'string'  { 'on','off' }             'off';
                                        'transform'    'real'    []                         DEFAULT_TRANSFORM;
                                        'comment'      'string'  []                         '' });
     if isstr(g), 
@@ -450,17 +450,17 @@ else
    
    g = finputcheck( varargin, { ...
        'cbar'       'real'   [0 Inf]         []; % Colorbar value must be 0 or axis handle.'
-       'lighting'   'string' { 'on' 'off' }  'on';
-       'verbose'    'string' { 'on' 'off' }  'on';
-       'maplimits'  { 'string' 'real' }  []  'absmax'; 
+       'lighting'   'string' { 'on','off' }  'on';
+       'verbose'    'string' { 'on','off' }  'on';
+       'maplimits'  { 'string','real' }  []  'absmax'; 
        'title'      'string' []              '';
        'lights'     'real'   []              DEFAULT_LIGHTS;
        'view'       'real'   []              [143 18];
        'colormap'   'real'   []              jet(64);
        'transform'  'real'   []              [];
        'meshfile'   'string' []              DEFAULT_MESH;
-       'electrodes' 'string' { 'on' 'off' }  'on';            
-       'orilocs'    { 'string' 'struct' } [] '';            
+       'electrodes' 'string' { 'on','off' }  'on';            
+       'orilocs'    { 'string','struct' } [] '';            
        'labels'     'integer' [0 1 2]        0 }, 'headplot');
    if isstr(g) error(g); end;
 

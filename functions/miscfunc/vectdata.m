@@ -60,9 +60,9 @@ end;
 g = finputcheck( varargin, { 'timesout'   'real'  []           [];
                              'average'    'real'  []           [];
                              'gauss'      'real'  []           [];
-                             'border'     'string' { 'on' 'off' } 'off';
-                             'avgtype'    'string' { 'const' 'gauss' } 'const';
-                             'method'     'string' { 'linear' 'cubic' 'nearest' 'v4' } 'linear'});
+                             'border'     'string' { 'on','off' } 'off';
+                             'avgtype'    'string' { 'const','gauss' } 'const';
+                             'method'     'string' { 'linear','cubic','nearest','v4' } 'linear'});
 if isstr(g), error(g); end;
 
 if size(array,2) == 1

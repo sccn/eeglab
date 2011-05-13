@@ -111,10 +111,10 @@ formatskip = [ chanformat(indformat).skipline ];
 
 g = finputcheck( varargin, ...
                  { 'filetype'	  'string'	 listtype 			'loc';
-                   'header'       'string'   { 'on' 'off' } 	'off';
+                   'header'       'string'   { 'on','off' } 	'off';
                    'customheader' 'string'   [] 					'';
                    'elecind'      'integer'  [1 Inf]				[];
-                   'unicoord'     'string'   { 'on' 'off' } 	'on'; 
+                   'unicoord'     'string'   { 'on','off' } 	'on'; 
                    'format'		  'cell'	 []					{} }, 'writelocs');
 if isstr(g), error(g); end;  
 

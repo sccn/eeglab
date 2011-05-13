@@ -102,7 +102,7 @@ dx(find(dx==0)) = 1;
 dy(find(dy==0)) = 1;
 corrs = x*y'./sqrt(dx'*dy);
 
-if nargin > 4 & ~isempty(weighting) & norm(weighting) > 0,
+if nargin > 4 && ~isempty(weighting) && norm(weighting) > 0,
   if any(size(corrs) ~= size(weighting))
     fprintf('matcorr(): weighting matrix size must match that of corrs\n.')
     return

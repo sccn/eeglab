@@ -149,10 +149,10 @@ if nargin < 2 | selectamica
     if length(ALLEEG) > 1
         cb1 = 'set(findobj(''parent'', gcbf, ''tag'', ''concat2''), ''value'', 0);';
         cb2 = 'set(findobj(''parent'', gcbf, ''tag'', ''concat1''), ''value'', 0);';
-        promptstr = { promptstr{:} ...
-                     { 'style' 'text'       'string' 'Concatenate all datasets (check=yes; uncheck=run ICA on each dataset)?' } ...
-                     { 'style' 'checkbox'   'string' '' 'value' 0 'tag' 'concat1' 'callback' cb1 } ...
-                     { 'style' 'text'       'string' 'Concatenate datasets for the same subject and session (check=yes)?' } ...
+        promptstr = { promptstr{:}, ...
+                     { 'style' 'text'       'string' 'Concatenate all datasets (check=yes; uncheck=run ICA on each dataset)?' }, ...
+                     { 'style' 'checkbox'   'string' '' 'value' 0 'tag' 'concat1' 'callback' cb1 }, ...
+                     { 'style' 'text'       'string' 'Concatenate datasets for the same subject and session (check=yes)?' }, ...
                      { 'style' 'checkbox'   'string' '' 'value' 1 'tag' 'concat2' 'callback' cb2 } };
         geometry = { geometry{:} [ 2 0.2 ] [ 2 0.2 ]};
     end;                 
@@ -212,9 +212,9 @@ end;
 [ g addoptions ] = finputcheck( options, { 'icatype'        'string'  allalgs   'runica'; ...
                             'dataset'        'integer' []        [1:length(ALLEEG)];
                             'options'        'cell'    []        {};
-                            'concatenate'    'string'  { 'on' 'off' }   'off';
-                            'concatcond'     'string'  { 'on' 'off' }   'off';
-                            'chanind'        { 'cell' 'integer' } { [] [] }        [];}, ...
+                            'concatenate'    'string'  { 'on','off' }   'off';
+                            'concatcond'     'string'  { 'on','off' }   'off';
+                            'chanind'        { 'cell','integer' } { [] [] }        [];}, ...
                             'pop_runica', 'ignore');
 if isstr(g), error(g); end;
 if ~isempty(addoptions), g.options = { g.options{:} addoptions{:}}; end;
@@ -358,11 +358,12 @@ end;
 switch lower(g.icatype)
     case 'runica' 
         tmprank = getrank(tmpdata(:,1:min(3000, size(tmpdata,2))));
+        try, if ismatlab, g.options = {  g.options{:}, 'interupt', 'on' }; end; catch, end; 
         if tmprank == size(tmpdata,1) | pca_opt
-            [EEG.icaweights,EEG.icasphere] = runica( tmpdata, 'lrate', 0.001, 'interupt', 'on', g.options{:} );
+            [EEG.icaweights,EEG.icasphere] = runica( tmpdata, 'lrate', 0.001,  g.options{:} );
         else 
             disp(['Data rank (' int2str(tmprank) ') is smaller than the number of channels (' int2str(size(tmpdata,1)) ').']);
-            [EEG.icaweights,EEG.icasphere] = runica( tmpdata, 'lrate', 0.001, 'interupt', 'on', 'pca', tmprank, g.options{:} );
+            [EEG.icaweights,EEG.icasphere] = runica( tmpdata, 'lrate', 0.001, 'pca', tmprank, g.options{:} );
         end;
      case 'binica'
         icadefs;

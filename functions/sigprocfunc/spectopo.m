@@ -153,19 +153,19 @@ if nargin <= 3 | isstr(varargin{1})
                   'freqdata'      'real'     []                        [] ;
 				  'chanlocs'      ''         []                        [] ;
 				  'freqrange'     'real'     [0 srate/2]               [] ;
-				  'memory'        'string'   {'low' 'high'}           'high' ;
-				  'plot'          'string'   {'on' 'off'}             'on' ;
-				  'plotmean'      'string'   {'on' 'off'}             'off' ;
+				  'memory'        'string'   {'low','high'}           'high' ;
+				  'plot'          'string'   {'on','off'}             'on' ;
+				  'plotmean'      'string'   {'on','off'}             'off' ;
 				  'title'         'string'   []                       '';
 				  'limits'        'real'     []                       [nan nan nan nan nan nan];
 				  'freqfac'       'integer'  []                        FREQFAC;
 				  'percent'       'real'     [0 100]                  100 ;
-				  'reref'         'string'   { 'averef' 'off' 'no' }  'off' ;
+				  'reref'         'string'   { 'averef','off','no' }  'off' ;
 				  'boundaries'    'integer'  []                       [] ;
 				  'nfft'          'integer'  [1 Inf]                  [] ;
 				  'winsize'       'integer'  [1 Inf]                  [] ;
 				  'overlap'       'integer'  [1 Inf]                  0 ;
-				  'icamode'       'string'   { 'normal' 'sub' }        'normal' ;
+				  'icamode'       'string'   { 'normal','sub' }        'normal' ;
 				  'weights'       'real'     []                       [] ;
 				  'mapnorm'       'real'     []                       [] ;
 				  'plotchan'      'integer'  [1:size(data,1)]         [] ;
@@ -174,7 +174,7 @@ if nargin <= 3 | isstr(varargin{1})
 				  'icacomps'      'integer'  []                       [] ;
 				  'icachansind'   'integer'  []                       [1:size(data,1)] ; % deprecated
 				  'icamaps'       'integer'  []                       [] ;
-                  'rmdc'           'string'   {'on' 'off'}          'off';
+                  'rmdc'           'string'   {'on','off'}          'off';
 				  'mapchans'      'integer'  [1:size(data,1)]         [] 
                   'mapframes'     'integer'  [1:size(data,2)]         []};
 	
@@ -316,8 +316,12 @@ else
             % spec = sqrt( g.mapnorm(1)^4 + g.mapnorm(1)^4 + ... )*power(compact)
         end;
 
-        tmpc = find(eegspecdB(:,1)); 			% > 0 power chans
-        zchans = int2str(find(eegspecdB(:,1) == 0)); 	% 0-power chans
+        tmpc = find(eegspecdB(:,1)); 			     % > 0 power chans
+        tmpindices = find(eegspecdB(:,1) == 0);
+        if ~isempty(tmpindices)
+             zchans = int2str(tmpindices); % 0-power chans
+        else zchans = [];
+        end;
         if length(tmpc) ~= size(eegspecdB,1)
             fprintf('\nWarning: channels [%s] have 0 values, so will be omitted from the display', ...
                        zchans);
@@ -329,7 +333,6 @@ else
         end;
         eegspecdB = 10*log10(eegspecdB);
         specstd   = 10*log10(specstd);
-        warning on backtrace
         fprintf('\n');
     else
         % compute data spectrum

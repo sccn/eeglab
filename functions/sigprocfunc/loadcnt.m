@@ -370,9 +370,9 @@ if type == 'cnt'
           data_block = 4000000 ;
           max_rows =  data_block / h.nchannels ;
 
-          warning off ;
+          %warning off ;
           max_written = h.nchannels * uint32(max_rows) ;
-          warning on ;
+          %warning on ;
 
           % This while look tracks the remaining samples.  The 
           % data is processed in chunks rather than put into 

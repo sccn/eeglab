@@ -50,9 +50,9 @@ end
     'clusters1'  'integer' []       [];
     'channels2'  'cell'    []       {};
     'clusters2'  'integer' []       [];
-    'onepersubj' 'string' { 'on' 'off' } 'off';
-    'forceread'  'string' { 'on' 'off' } 'off';
-    'recompute'  'string' { 'on' 'off' } 'off';
+    'onepersubj' 'string' { 'on','off' } 'off';
+    'forceread'  'string' { 'on','off' } 'off';
+    'recompute'  'string' { 'on','off' } 'off';
     'freqrange'  'real'    []       [];
     'timerange'  'real'    []       [] }, ...
     'std_readpac', 'ignore');

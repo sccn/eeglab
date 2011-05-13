@@ -57,7 +57,7 @@ end;
                                'freqslim'    'real'    [] [];
                                'limitbeg'    'real'    [] [];
                                'limitend'    'real'    [] [];
-                               'moviemode'   'string'  { 'ersptime' 'erp' 'spec' } 'spec' }, 'std_movie', 'ignore');
+                               'moviemode'   'string'  { 'ersptime','erp','spec' } 'spec' }, 'std_movie', 'ignore');
 
 if isstr(opt), error(opt); end;
 tmpchanlocs =  ALLEEG(1).chanlocs;

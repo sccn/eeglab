@@ -88,8 +88,8 @@ else
     options = varargin;
 end;
 
-opt = finputcheck( options, { 'norm'    'string'    { 'on' 'off' }       'off';
-                              'measure' 'string'    { 'prob' 'kurt' }    'kurt';
+opt = finputcheck( options, { 'norm'    'string'    { 'on';'off' }       'off';
+                              'measure' 'string'    { 'prob';'kurt' }    'kurt';
                               'precomp' 'real'      []                   [];
                               'elec'    'integer'   []                   [1:EEG.nbchan];
                               'threshold' 'real'   []                    400 }, 'pop_rejchan');

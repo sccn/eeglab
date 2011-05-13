@@ -116,12 +116,12 @@ opt = finputcheck( varargin, { 'topofreq'    'real'    [] STUDY.etc.specparams.t
                                'channels'    'cell'    []              {};
                                'clusters'    'integer' []              [];
                                'mode'        'string'  []              ''; % for backward compatibility
-                               'comps'       { 'string' 'integer' } [] []; % for backward compatibility
-                               'plotmode'    'string' { 'normal' 'condensed' }  'normal';
-                               'plotsubjects' 'string' { 'on' 'off' }  'off';
-                               'singletrials' 'string' { 'on' 'off' }  'off';
+                               'comps'       { 'string','integer' } [] []; % for backward compatibility
+                               'plotmode'    'string' { 'normal','condensed' }  'normal';
+                               'plotsubjects' 'string' { 'on','off' }  'off';
+                               'singletrials' 'string' { 'on','off' }  'off';
                                'subject'     'string' []              '';
-                               'statmode'    'string' { 'individual' 'common' 'trials' } 'individual'}, 'std_specplot');
+                               'statmode'    'string' { 'individual','common','trials' } 'individual'}, 'std_specplot');
 
 if isstr(opt), error(opt); end;
 if isstr(opt.comps), opt.comps = []; opt.plotsubjects = 'on'; end; % comps all

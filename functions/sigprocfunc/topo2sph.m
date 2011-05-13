@@ -54,7 +54,7 @@ if nargin < 1
     help topo2sph;
     return;
 end;
-if nargin > 1 & ~isstr(eloc_angles)
+if nargin > 1 && ~isstr(eloc_angles)
 	if nargin > 2
 		unshrink = method;
 	end;

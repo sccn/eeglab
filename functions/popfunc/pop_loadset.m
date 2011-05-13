@@ -75,11 +75,11 @@ end;
 % decode input parameters
 % -----------------------
 g = finputcheck( options, ...
-                 { 'filename'   { 'string' 'cell' } []   '';
-                   'filepath'   'string' []   '';
-                   'check'      'string' { 'on' 'off' }   'on';
-                   'loadmode'   { 'string' 'integer' } { { 'info' 'all' } [] }  'all';
-                   'eeg'        'struct' []   struct('data',{}) }, 'pop_loadset');
+                 { 'filename'   { 'string';'cell' }    []   '';
+                   'filepath'   'string'               []   '';
+                   'check'      'string'               { 'on';'off' }   'on';
+                   'loadmode'   { 'string';'integer' } { { 'info' 'all' } [] }  'all';
+                   'eeg'        'struct'               []   struct('data',{}) }, 'pop_loadset');
 if isstr(g), error(g); end;
 if isstr(g.filename), g.filename = { g.filename }; end;
 
@@ -104,7 +104,7 @@ else
         filename = fullfile(g.filepath, g.filename{ifile});
         fprintf('pop_loadset(): loading file %s ...\n', filename);
         %try
-        TMPVAR = load(filename, '-mat');
+        TMPVAR = load('-mat', filename);
         %catch,
         %    error([ filename ': file is protected or does not exist' ]);
         %end;

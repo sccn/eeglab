@@ -111,12 +111,12 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
                 evtind     = tmpargs{1};
                 fields     = fieldnames(EEG.event);
                 emptycells = cell(1,length(fields)-1);
-                newvararg  = { newvararg{:} { evtind emptycells{:} } };
+                newvararg  = { newvararg{:}, { evtind emptycells{:} } };
                 if strcmpi(com, 'append'), evtind = evtind+1; end;
                 
                 for ind = 2:length( tmpargs )
                     if ~strcmpi(fields{ind-1}, 'urevent')
-                        newvararg = { newvararg{:} 'changefield' { evtind fields{ind-1} tmpargs{ind} } };
+                        newvararg = { newvararg{:},'changefield',{ evtind fields{ind-1} tmpargs{ind} } };
                     end;
                 end;
             else
@@ -283,7 +283,7 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
 
           % update history
           % --------------
-          oldcom = { oldcom{:} 'changefield' { valnum field editval }};
+          oldcom = { oldcom{:},'changefield',{ valnum field editval }};
       
       else % command line case
           
@@ -380,7 +380,7 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
           
           % update history
           % --------------
-          oldcom = { oldcom{:} 'sort' { field1 dir1 field2 dir2 } };
+          oldcom = { oldcom{:},'sort',{ field1 dir1 field2 dir2 } };
 
       else % command line
           field1 = tmparg{1};

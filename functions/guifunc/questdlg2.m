@@ -65,7 +65,7 @@ listui{end+1} = {};
 
 geometry = { geometry{:} 1 ones(1,length(varargin)-1) };
 for index = 1:length(varargin)-1 % ignoring default val
-	listui = {listui{:} { 'width' 80 'align' 'center' 'Style', 'pushbutton', 'string', varargin{index}, 'callback', ['set(gcbf, ''userdata'', ''' varargin{index} ''');'] }  };
+	listui = {listui{:} { 'width',80,'align','center','Style', 'pushbutton', 'string', varargin{index}, 'callback', ['set(gcbf, ''userdata'', ''' varargin{index} ''');'] }  };
 	if strcmp(varargin{index}, varargin{end})
 		listui{end}{end+1} = 'fontweight';
 		listui{end}{end+1} = 'bold';

@@ -264,12 +264,12 @@ end;
 % ---------------------------------
 fieldlist = { 'event'         'integer'     []                                       [1:length(EEG.event)] ;
 			  'omitevent'     'integer'     []                                       [] ;
-			  'deleteepochs'  'string'      { 'yes' 'no' 'on' 'off' }                'on' ;
-			  'invertepochs'  'string'      { 'on' 'off' }                           'off' ;
-			  'deleteevents'  'string'      { 'yes' 'no' 'on' 'off' }                'off';
+			  'deleteepochs'  'string'      { 'yes','no','on','off' }                'on' ;
+			  'invertepochs'  'string'      { 'on','off' }                           'off' ;
+			  'deleteevents'  'string'      { 'yes','no','on','off' }                'off';
 			  'renametype'    'string'      []                                       '';
 			  'oldtypefield'  'string'      []                                       '';
-			  'select'        'string'      { 'normal' 'inverse' 'remove' 'keep' }   'normal' };
+			  'select'        'string'      { 'normal','inverse','remove','keep' }   'normal' };
 for index = 1:length(allfields) 
 	fieldlist{end+1, 1} = allfields{index};
 	fieldlist{end  , 2} = '';

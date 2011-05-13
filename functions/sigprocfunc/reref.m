@@ -108,12 +108,12 @@ g = finputcheck(varargin, { 'icaweight'   'real'    []          [];
                             'icaweights'  'real'    []          [];
                             'icasphere'   'real'    []          [];
                             'icachansind' 'integer'    []       [];
-                            'method'     'string'  { 'standard' 'withref' }  'standard';
-                            'refstate'   { 'string' 'integer' } { { 'common' 'averef' } [1 size(data,1)] }     'common'; % ot used but kept for backward compatib.
+                            'method'     'string'  { 'standard','withref' }  'standard';
+                            'refstate'   { 'string','integer' } { { 'common','averef' } [1 size(data,1)] }     'common'; % ot used but kept for backward compatib.
                             'exclude'    'integer' [1 size(data,1)]          [];
-                            'refloc'     { 'cell' 'struct' }  { [] [] }   {};
-                            'keepref'    'string'  {'on' 'off' }             'off';
-                            'elocs'      {'integer' 'struct'}  []            [] });
+                            'refloc'     { 'cell','struct' }  { [] [] }   {};
+                            'keepref'    'string'  {'on','off' }             'off';
+                            'elocs'      {'integer','struct'}  []            [] });
 if isstr(g), error(g); end;
 if ~isempty(g.icaweight)
     g.icaweights = g.icaweight;

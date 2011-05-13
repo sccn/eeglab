@@ -73,18 +73,18 @@ end;
 
 STUDY = pop_erspparams(STUDY, 'default');
 [opt moreopts] = finputcheck( varargin, { ...
-    'type'          { 'string' 'cell' } { [] [] } '';
+    'type'          { 'string','cell' } { [] [] } '';
     'design'        'integer' []             STUDY.currentdesign;    
     'channels'      'cell'    []             {};
     'clusters'      'integer' []             [];
     'freqrange'     'real'    []             STUDY.etc.erspparams.freqrange;
     'timerange'     'real'    []             STUDY.etc.erspparams.timerange;
-    'rmsubjmean'    'string'  { 'on' 'off' } 'off';
-    'singletrials'  'string'  { 'on' 'off' } 'off';
-    'subbaseline'   'string'  { 'on' 'off' }  STUDY.etc.erspparams.subbaseline;
+    'rmsubjmean'    'string'  { 'on','off' } 'off';
+    'singletrials'  'string'  { 'on','off' } 'off';
+    'subbaseline'   'string'  { 'on','off' }  STUDY.etc.erspparams.subbaseline;
     'component'     'integer' []               [];
-    'infotype'      'string'  { 'ersp' 'itc' } 'ersp'; ...
-    'datatype'      'string'  { 'ersp' 'itc' } 'ersp'; ...
+    'infotype'      'string'  { 'ersp','itc' } 'ersp'; ...
+    'datatype'      'string'  { 'ersp','itc' } 'ersp'; ...
     'subject'       'string'  []               '' }, ...
     'std_readersp', 'ignore');
 if isstr(opt), error(opt); end;

@@ -64,6 +64,8 @@ default_frames = 10000;
 % default sources = channels
 default_exppow = -0.05;
 default_shape = 1.2;
+plotflag = 1;
+try, plotflag = ismatlab; catch, end;
 
 if nargin<2
   help testica
@@ -118,7 +120,7 @@ super=randn(sources,frames).*(exppowers'*ones(1,frames));
 super=sign(super).*abs(super.^shape); % make super-Gaussian if shape > 1
 % fprintf('Size of super = %d,%d\n',size(super,1),size(super,2));
 
-if frames > 40
+if frames > 40 && plotflag
   figure
   pos = get(gcf,'position');
   off = [40 -40 0 0]; % succeeding figure screen position offsets
@@ -137,7 +139,7 @@ else
   fprintf('Not plotting source amplitude histogram: data length too small.\n')
 end 
 
-if nargout == 0
+if nargout == 0 && plotflag
   input('Hit enter to view source strengths: ');
   fprintf('\n')
   if frames <= 40
@@ -228,6 +230,7 @@ if nargout == 0
    fprintf('\nView the results:\n');
    fprintf('Use mouse to rotate the image.\n');
 end
+if ~plotflag, return; end;
 figure('Position',pos+2*off);
 set(gcf,'Color',BACKCOLOR);
 surf(testresult);  % plot the resulting ~identity matrix

@@ -50,12 +50,12 @@ function alllocs = myunion(locs1, locs2)
            alllocs(count3) = locs1(count1);
            count1 = count1 + 1;
            count3 = count3 + 1;
-       elseif strcmpi(labs1(count1), labs2(count2))
+       elseif strcmpi(labs1{count1}, labs2{count2})
            alllocs(count3) = locs1(count1);
            count1 = count1 + 1;
            count2 = count2 + 1;
            count3 = count3 + 1;
-       elseif isempty(strmatch(labs1(count1), labs2))
+       elseif isempty(strmatch(labs1{count1}, labs2))
            alllocs(count3) = locs1(count1);
            count1 = count1 + 1;
            count3 = count3 + 1;

@@ -66,12 +66,12 @@ function [chanlistout1, chanlistout2, thirdout, outfourth] = pop_chancoresp(chan
        return;
     end;
     
-    g = finputcheck(varargin, { 'autoselect'     'string'  {'none' 'fiducials' 'all'}   'all';
+    g = finputcheck(varargin, { 'autoselect'     'string'  {'none';'fiducials';'all'}   'all';
                                 'chanlist1'      'integer' [1 Inf] []; 
                                 'chanlist2'      'integer' [1 Inf] []; 
                                 'chaninfo1'      ''        []      []; 
                                 'chaninfo2'      ''        []      []; 
-                                'gui'            'string'  { 'on' 'off' }  'on' } );
+                                'gui'            'string'  { 'on';'off' }  'on' } );
     if isstr(g), error(g); end;
     g.chanstruct1 = chans1;
     g.chanstruct2 = chans2;

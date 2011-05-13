@@ -57,9 +57,8 @@ if nargin < 1
                  { 'style' 'edit' 'string' '' }  };
     geom = { [3 1] [3 1] };
     if dat.nTrials > 1
-        uilist   = { uilist{:} ...
-                 { 'style' 'text' 'String' [ 'Trial range (default all [1 ' int2str(dat.nTrials) '])' ] } ...
-                 { 'style' 'edit' 'string' '' } };
+        uilist{end+1} = { 'style' 'text' 'String' [ 'Trial range (default all [1 ' int2str(dat.nTrials) '])' ] };
+        uilist{end+1} = { 'style' 'edit' 'string' '' };
         geom = { geom{:} [3 1] };
     end;
     result = inputgui( geom, uilist, 'pophelp(''pop_biosig'')', ...

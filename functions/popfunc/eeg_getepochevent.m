@@ -105,7 +105,7 @@ if oldformat
 else
     options = varargin; 
 end;
-opt = finputcheck(options, { 'type'       { 'string' 'cell' } { [] [] } '';
+opt = finputcheck(options, { 'type'       { 'string';'cell' } { [] [] } '';
                              'timewin'    'real'              []        [-Inf Inf];
                              'fieldname'  'string'            []        'latency' }, ...
                   'eeg_getepochevent');

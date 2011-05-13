@@ -59,23 +59,23 @@ if nargin < 1
 end;
 
 alllegends = {};
-opt = finputcheck( varargin, { 'chanlabels'  {'cell' 'string'}   []     {};
-                               'condnames'   {'cell' 'string'}   []     '';
-                               'cond2names'  {'cell' 'string'}   []     '';
-                               'condstat'    'string'            {'on' 'off'}     'off';
-                               'cond2stat'   'string'            {'on' 'off'}     'off';
-                               'condgroup'   'string'            {'on' 'off' 'together' 'apart'}     'off';
-                               'cond2group'  'string'            {'on' 'off' 'together' 'apart'}     'off';
-                               'plotmode'    'string'            {'normal' 'condensed'}              'normal';
-                               'plotsubjects' 'string'           {'on' 'off'}                        'off';
+opt = finputcheck( varargin, { 'chanlabels'  {'cell','string'}   []     {};
+                               'condnames'   {'cell','string'}   []     '';
+                               'cond2names'  {'cell','string'}   []     '';
+                               'condstat'    'string'            {'on','off'}     'off';
+                               'cond2stat'   'string'            {'on','off'}     'off';
+                               'condgroup'   'string'            {'on','off','together','apart'}     'off';
+                               'cond2group'  'string'            {'on','off','together','apart'}     'off';
+                               'plotmode'    'string'            {'normal','condensed'}              'normal';
+                               'plotsubjects' 'string'           {'on','off'}                        'off';
                                'threshold'   'real'              []     NaN;
                                'statistics'  'string'            []     '';
                                'mcorrect'    'string'            []     '';
                                'datatype'    'string'            []     '';
                                'clustname'   'string'            []     '';
-                               'compnames'   {'cell' 'string'}   []     {};
-                               'vals'        {'cell' 'real'}     []     {}; % just for titles
-                               'valsunit'    {'cell' 'string'}   []     {}; % just for titles
+                               'compnames'   {'cell','string'}   []     {};
+                               'vals'        {'cell','real'}     []     {}; % just for titles
+                               'valsunit'    {'cell','string'}   []     {}; % just for titles
                                'subject'     'string'            []              '' }, 'std_figtitle'); %, 'ignore');
 if isstr(opt), error(opt); end;
 if ~iscell(opt.vals),       opt.vals       = { opt.vals }; end;

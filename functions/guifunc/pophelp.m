@@ -57,6 +57,7 @@ if exist('help22html')
         web([ 'text://' text1 ]);
     end;
 else
+    if isempty(funct), return; end;
     doc1 = readfunc(funct, nonmatlab);
     if length(funct) > 4 & strcmpi(funct(1:4), 'pop_')
         try,

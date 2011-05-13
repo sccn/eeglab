@@ -120,15 +120,15 @@ STUDY = pop_erspparams(STUDY, 'default');
                                'threshold'   'real'    [] STUDY.etc.erspparams.threshold;
                                'naccu'       'integer' [] STUDY.etc.erspparams.naccu;
                                'mcorrect'    'string'  [] STUDY.etc.erspparams.mcorrect;
-                               'singletrials' 'string' { 'on' 'off' }  STUDY.etc.erspparams.singletrials;
+                               'singletrials' 'string' { 'on','off' }  STUDY.etc.erspparams.singletrials;
                                'channels'    'cell'    []              {};
                                'clusters'    'integer' []              [];
-                               'datatype'    'string'  { 'itc' 'ersp' 'pac' } 'ersp';
+                               'datatype'    'string'  { 'itc','ersp','pac' } 'ersp';
                                'mode'        'string'  []              '';
                                'plottf'      'real'    []              [];
                                'comps'       {'integer','string'}  []              []; % for backward compatibility
-                               'plotsubjects' 'string' { 'on' 'off' }  'off';
-                               'plotmode'    'string' { 'normal' 'condensed' 'none' }  'normal';
+                               'plotsubjects' 'string' { 'on','off' }  'off';
+                               'plotmode'    'string' { 'normal','condensed','none' }  'normal';
                                'subject'     'string'  []              '' }, ...
                                   'std_erspstatplot', 'ignore');
 if isstr(opt), error(opt); end;

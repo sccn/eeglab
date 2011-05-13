@@ -32,7 +32,7 @@
 %   11/11/03 - initialize dists to NaN for error return.
 
 function dists = eucl(crds1,crds2)
-  if (~nargin) help eucl; return; end;
+  if nargin == 0, help eucl; return; end;
   dists = NaN;
 
   if (nargin < 2)                     % If only crds1 provided,

@@ -63,7 +63,10 @@ x = x - center(1);  % center the data
 y = y - center(2);
 z = z - center(3);
 radius = (sqrt(x.^2+y.^2+z.^2));   % assume xyz values are on a sphere
-wobble = std(radius);              % test if xyz values are on a sphere
+if ~isempty(radius)
+     wobble = std(radius);              % test if xyz values are on a sphere
+else wobble = [];
+end;
 fprintf('Radius values: %g (mean) +/- %g (std)\n',mean(radius),wobble);
 newcenter = center;
 

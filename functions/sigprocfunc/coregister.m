@@ -211,14 +211,14 @@ end;
 % defaultmesh = 'D:\matlab\eeglab\plugins\dipfit2.0\standard_BEM\standard_vol.mat';
 defaultmesh = 'standard_vol.mat';
 g = finputcheck(varargin, { 'alignfid'   'cell'  {}      {};
-                            'warp'       { 'string' 'cell' }  { {} {} }      {};
+                            'warp'       { 'string','cell' }  { {} {} }      {};
                             'warpmethod' 'string'  {'rigidbody', 'globalrescale', 'traditional', 'nonlin1', 'nonlin2', 'nonlin3', 'nonlin4', 'nonlin5'} 'traditional';
                             'chaninfo1'  'struct' {}    struct('no', {}); % default empty structure
                             'chaninfo2'  'struct' {}     struct('no', {}); 
                             'transform'  'real'   []      [];
-                            'manual'     'string' { 'on' 'off' } 'on'; % -> pop up window
-                            'autoscale'  'string' { 'on' 'off' } 'on';
-                            'helpmsg'    'string' { 'on' 'off' } 'off';
+                            'manual'     'string' { 'on','off' } 'on'; % -> pop up window
+                            'autoscale'  'string' { 'on','off' } 'on';
+                            'helpmsg'    'string' { 'on','off' } 'off';
                             'mesh'       ''      []   defaultmesh });
 if ischar(g), error(g); end;
 

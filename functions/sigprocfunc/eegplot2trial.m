@@ -51,7 +51,7 @@ end;
 % --------------------------------------
 TMPREJINIT(:,3:5) = round(TMPREJINIT(:,3:5)*100)/100;
 TMPREJ = [];
-if exist('color') == 1 & ~isempty(color) 
+if exist('color') == 1 && ~isempty(color) 
 	color    = round(color*100)/100;
 	for index = 1:size(color,1)
    		tmpcol1 = TMPREJINIT(:,3) + 255*TMPREJINIT(:,4) + 255*255*TMPREJINIT(:,5);

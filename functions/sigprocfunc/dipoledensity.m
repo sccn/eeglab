@@ -111,19 +111,19 @@ if nargin < 1
 end
 
 g = finputcheck(varargin, { 'subjind'     'integer'  []               [];
-                            'method' 'string' { 'relentropy' 'entropy' 'distance' 'alldistance' } 'alldistance';
+                            'method' 'string' { 'relentropy','entropy','distance','alldistance' } 'alldistance';
                             'methodparam' 'real'     []               20; 
-                            'weight'      { 'real' 'cell' }  []               [];
+                            'weight'      { 'real','cell' }  []               [];
                             'smooth'      'real'     []               0;
                             'nsessions'   'integer'  []               1;
                             'subsample'   'integer'  []               2;
                             'plotargs'    'cell'     []               {};
-                            'plot'        'string'  { 'on' 'off' }    fastif(nargout == 0, 'on', 'off');
-                            'dipplot'     'string'  { 'on' 'off' }   'off';
-                            'coordformat' 'string'  { 'mni' 'spherical' }   'mni';
-                            'normalization' 'string'  { 'on' 'off' } 'on';
+                            'plot'        'string'  { 'on','off' }    fastif(nargout == 0, 'on', 'off');
+                            'dipplot'     'string'  { 'on','off' }   'off';
+                            'coordformat' 'string'  { 'mni','spherical' }   'mni';
+                            'normalization' 'string'  { 'on','off' } 'on';
                             'volmesh_fname' 'string'  []  'volmesh_local.mat';
-                            'mri'         { 'struct' 'string' } [] ''});
+                            'mri'         { 'struct','string' } [] ''});
 if isstr(g), error(g); end;
 if ~strcmpi(g.method, 'alldistance') & isempty(g.subjind)
     error('Subject indices are required for this method');

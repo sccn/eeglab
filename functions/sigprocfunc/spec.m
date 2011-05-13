@@ -88,12 +88,9 @@ padratio = pow2(nextpow2(nfft/win));
 timesout = floor(length(X)/(win-overlap));
 if timesout <= 1, timesout = 2; end;
 
-warning off;
 [ersp itc mbase times freqs] = timef(X(:)', length(X), [0 length(X)]/fs*1000, fs, ...
                                         0, 'padratio', padratio, 'timesout', timesout, 'winsize', win, 'maxfreq', fs/2, ...
                                         'plotersp', 'off', 'plotitc', 'off', 'baseline', NaN, 'verbose', 'off');
-warning on;
-
 
 ersp = 10.^(ersp/10); % back to amplitude
 power = mean(ersp,2)*2.7/win; % this formula is a best approximation (I couldn't find the actual one)

@@ -146,16 +146,16 @@ if ~isempty(varargin) && isstruct(varargin{1})
 end;
 opt = finputcheck(varargin,  {'variable1'     'string'    []     defdes.variable(1).label;
                               'variable2'     'string'    []     defdes.variable(2).label;
-                              'values1'       {'real' 'cell' } []     defdes.variable(1).value;
-                              'values2'       {'real' 'cell' } []     defdes.variable(2).value;
+                              'values1'       {'real','cell' } []     defdes.variable(1).value;
+                              'values2'       {'real','cell' } []     defdes.variable(2).value;
                               'pairing1'      'string'    []     defdes.variable(1).pairing;
                               'pairing2'      'string'    []     defdes.variable(2).pairing;
                               'name'          'string'    {}     defdes.name;
                               'datselect'     'cell'      {}     defdes.include;
                               'dataselect'    'cell'      {}     {};
                               'subjselect'    'cell'      {}     defdes.cases.value;
-                              'delfiles'      'string'    { 'on' 'off' } 'off';
-                              'defaultdesign' 'string'    { 'on' 'off' } fastif(nargin < 3, 'on', 'off') }, ...
+                              'delfiles'      'string'    { 'on','off' } 'off';
+                              'defaultdesign' 'string'    { 'on','off' } fastif(nargin < 3, 'on', 'off') }, ...
                               'std_makedesign');
 if isstr(opt), error(opt); end;
 if ~isempty(opt.dataselect), opt.datselect = opt.dataselect; end;

@@ -53,7 +53,7 @@ end
 opt = finputcheck(varargin, { 'condition' 'cell' {}      {};
                               'dataset'   'integer' {}   [];
                               'group'     'cell' {}      {};
-                              'rmdat'     'string' { 'on' 'off' }      'on';
+                              'rmdat'     'string' { 'on','off' }      'on';
                               'subject'   'cell' {}      {} }, 'std_substudy');
 if isstr(opt), return; end;
 

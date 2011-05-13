@@ -73,7 +73,6 @@ end;
 for k = 1:length(comps)
 
     if length(comps) < 3
-        warning off;
         try
             topo = load( '-mat', filename, ...
                          [ 'comp' int2str(comps(k)) '_grid'], ...
@@ -82,7 +81,6 @@ for k = 1:length(comps)
         catch
             error( [ 'Cannot read file ''' filename '''' ]);
         end;
-        warning on;
     elseif k == 1
         try
             topo = load( '-mat', filename);

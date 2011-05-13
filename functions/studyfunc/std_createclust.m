@@ -76,9 +76,9 @@ else
 end;
 opt = finputcheck(options, { 'name'             'string'   []  'Cls';
                              'clusterind'       'integer'  []  length(STUDY.cluster)+1;
-                             'parentcluster'    'string'   { 'on' 'off' }  'off';
+                             'parentcluster'    'string'   { 'on','off' }  'off';
                              'algorithm'        'cell'     []  {};
-                             'ignore0'          'string'   { 'on' 'off' }  'off';
+                             'ignore0'          'string'   { 'on','off' }  'off';
                              'centroid'         'real'     []  [] }, 'std_createclust');
 if isstr(opt), error(opt); end;
 

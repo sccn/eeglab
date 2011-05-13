@@ -108,16 +108,16 @@ else
     options = varargin;
 end;
 
-opt = finputcheck(options, { 'threshold'     { 'real' 'cell' }  []    10;
-                             'freqlimit'     { 'real' 'cell' }  []    [35 128];
+opt = finputcheck(options, { 'threshold'     { 'real';'cell' }  []    10;
+                             'freqlimit'     { 'real';'cell' }  []    [35 128];
                              'elecrange'     'real'   []    [1:EEG.nbchan];
                              'rejectori'     'real'   []    [];
                              'contiguous'    'real'   []    4;
                              'addlength'     'real'   []    0.25;
                              'precompstruct' 'struct' []    struct([]);
-                             'eegplot'       'string' { 'on' 'off' } 'off';
-                             'onlyreturnselection' 'string' { 'on' 'off' } 'off';
-                             'verbose'       'string' { 'on' 'off' } 'on';
+                             'eegplot'       'string' { 'on';'off' } 'off';
+                             'onlyreturnselection' 'string' { 'on';'off' } 'off';
+                             'verbose'       'string' { 'on';'off' } 'on';
                              'overlap'       'real'   []    0.25;
                              'epochlength'   'real'   []    0.5 }, 'pop_rejcont');
 if isstr(opt), error(opt); end;

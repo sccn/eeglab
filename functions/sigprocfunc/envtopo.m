@@ -195,14 +195,14 @@ if nargin <= 2 | isstr(varargin{1})
 				  'compnums'      'integer'  []                       []; 
 				  'compsplot'     'integer'  []                       7; 
 				  'subcomps'      'integer'  []                       0; 
-				  'envmode'       'string'   {'avg' 'rms'}            'avg'; 
-				  'dispmaps'      'string'   {'on' 'off'}             'on'; 
-				  'pvaf'          'string'   {'mp' 'mv' 'on' 'rp' 'rv' 'pv' 'pvaf' 'pp' 'off' ''} ''; 
-				  'sortvar'       'string'   {'mp' 'mv' 'rp' 'rv' 'pv' 'pvaf' 'pp'} 'mp';  
-				  'actscale'      'string'   {'on' 'off'}             'off'; 
+				  'envmode'       'string'   {'avg','rms'}            'avg'; 
+				  'dispmaps'      'string'   {'on','off'}             'on'; 
+				  'pvaf'          'string'   {'mp','mv','on','rp','rv','pv','pvaf','pp','off',''} ''; 
+				  'sortvar'       'string'   {'mp','mv','rp','rv','pv','pvaf','pp'} 'mp';  
+				  'actscale'      'string'   {'on','off'}             'off'; 
 				  'limcontrib'    'real'     []                       0;  
 				  'topoarg'    'real'     []                       0;  
-				  'sumenv'        'string'    {'on' 'off' 'fill'}     'fill'};
+				  'sumenv'        'string'    {'on','off','fill'}     'fill'};
 
 	% Note: Above, previous 'pvaf' arguments 'on' -> 'pv', 'off' -> 'rv'
 	%       for backwards compatibility 11/2004 -sm

@@ -60,12 +60,18 @@ if nargin > 2
 	Xi = timearray(:)';   % make a row vector
 	Yi = ones(1,length(timearray));
 
-    warning off;
-	[tmp1,tmp2,Zi] = griddata(Y, X, maxdata, Yi, Xi, 'invdist');   % interpolate data
-	maxdata = Zi;
-	[tmp1,tmp2,Zi] = griddata(Y, X, mindata, Yi, Xi, 'invdist');   % interpolate data
-	mindata = Zi;
-    warning on;
+    try
+        [tmp1,tmp2,Zi] = griddata(Y, X, maxdata, Yi, Xi, 'invdist');   % interpolate data
+        maxdata = Zi;
+        [tmp1,tmp2,Zi] = griddata(Y, X, mindata, Yi, Xi, 'invdist');   % interpolate data
+        mindata = Zi;
+    catch
+        disp('Warning, "v4" interpolation failed, using linear interpolation instead (probably running Octave)');
+        [tmp1,tmp2,Zi] = griddata(Y, X, maxdata, Yi, Xi, 'linear');   % interpolate data
+        maxdata = Zi;
+        [tmp1,tmp2,Zi] = griddata(Y, X, mindata, Yi, Xi, 'linear');   % interpolate data
+        mindata = Zi;
+    end
 end;	
 
 envdata = [maxdata;mindata];

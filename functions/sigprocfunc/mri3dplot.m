@@ -83,9 +83,8 @@ function [smoothprob3d, mriplanes] = mri3dplot(prob3d, mri, varargin)
     translucency    = 0.5;    % default alpha value
     mri_lim         = 85;     % +/- axis limits of MNI head image
     
-    g = finputcheck( varargin, { 'mriview'   { 'string' 'cell' }  { { 'sagital' 'axial' 'coronal' ...
-                                                          'top' 'side' 'rear' } {} }   'top';
-                        'mixmode'   'string'   { 'add' 'overwrite' 'min' }     'add';
+    g = finputcheck( varargin, { 'mriview'   { 'string','cell' }  { { 'sagital','axial','coronal','top','side','rear' } {} }   'top';
+                        'mixmode'   'string'   { 'add','overwrite','min' }     'add';
                         'mrislices' 'float'    []                        [];
                         'view'      'float'    []                        [];
                         'geom'      'float'    []                        [];
@@ -93,10 +92,10 @@ function [smoothprob3d, mriplanes] = mri3dplot(prob3d, mri, varargin)
                         'cmax'      'float'    []                        [];
                         'mixfact'   'float'    []                        0.5;
                         'cmin'      'float'    []                        0;
-                        'plotintersect' 'string'   { 'on' 'off' }            'on';
-                        'cbar'      'string'   { 'on' 'off' }            'on';
-                        'subplot'   'string'   { 'on' 'off' }            'off';
-                        'rotate'    'integer'  { 0 90 180 270 }          90;
+                        'plotintersect' 'string'   { 'on','off' }            'on';
+                        'cbar'      'string'   { 'on','off' }            'on';
+                        'subplot'   'string'   { 'on','off' }            'off';
+                        'rotate'    'integer'  { 0,90,180,270 }          90;
                         'kernel'    'float'    []                        0; 
                         'addrow'    'integer'  []                        0;
                         'fighandle' 'integer'  []                        []});

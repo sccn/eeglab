@@ -28,7 +28,7 @@
 %   10/15/02 - corrected documentation.
 
 function [M,stderr,V,grpids] = means(X,grps)
-  if (~nargin) help means; return; end;
+  if nargin == 0, help means; return; end;
 
   if (nargin < 2) grps = []; end;
 

@@ -55,8 +55,8 @@ function data = eeg_getdatact( EEG, varargin);
     
     opt = finputcheck(varargin, { ...
         'channel'   'integer' {} [1:EEG.nbchan];
-        'verbose'   'string'  { 'on' 'off' } 'on';
-        'reshape'   'string'  { '2d' '3d' }  '3d';
+        'verbose'   'string'  { 'on','off' } 'on';
+        'reshape'   'string'  { '2d','3d' }  '3d';
         'component' 'integer' {} [];        
         'samples'   'integer' {} [];        
         'trialindices' 'integer' {} [];        

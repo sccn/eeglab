@@ -77,8 +77,8 @@ if length(varargin) == 0 || strcmpi(varargin{1}, 'default')
 end;
 
 [opt ignore] = finputcheck(varargin, { 'uilist'   'cell'    []    {};
-                                       'enablegroup'   'string' { 'on' 'off' }  'on';
-                                       'enablecond'    'string' { 'on' 'off' }  'off';
+                                       'enablegroup'   'string' { 'on','off' }  'on';
+                                       'enablecond'    'string' { 'on','off' }  'off';
                                        'geometry' 'cell'    []    {} }, 'pop_params', 'ignore');
 if isstr(opt), error(opt); end;
 

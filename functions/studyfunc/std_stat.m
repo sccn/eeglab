@@ -78,12 +78,12 @@ if nargin > 1
     end;
 end;
 opt = finputcheck( varargin, { 'threshold'   'real'    []               NaN;
-                               'mcorrect'    'string'  { 'none' 'fdr' } 'none';
+                               'mcorrect'    'string'  { 'none','fdr' } 'none';
                                'naccu'       'integer' []               [];
-                               'groupstats'  'string'  { 'on' 'off' }   'off';
-                               'paired'      'cell'    { 'on' 'off' }   { 'on' 'on' };
-                               'condstats'   'string'  { 'on' 'off' }   'off';
-                               'statistics'  'string'  { 'param' 'perm' 'bootstrap' }       'param' }, ...
+                               'groupstats'  'string'  { 'on','off' }   'off';
+                               'paired'      'cell'    { 'on','off' }   { 'on','on' };
+                               'condstats'   'string'  { 'on','off' }   'off';
+                               'statistics'  'string'  { 'param','perm','bootstrap' }       'param' }, ...
                                'std_stat', 'ignore');
 
 if isstr(opt), error(opt); end;

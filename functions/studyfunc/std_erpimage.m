@@ -1,8 +1,6 @@
 % std_erpimage() - This is a legacy function. This function is not
 %                  compatible yet with STUDY design. 
-%
 %                  Plot an erpimage using multiple subject data
-%
 % Usage:
 %   >> std_erpimage( STUDY, ALLEEG, 'key', 'val', ...);
 % Inputs:
@@ -88,7 +86,7 @@ function [STUDY, allphases, allsortvar, subjamptime, subjamptrial, globalent ] =
 
     [ opt moreparams ] = finputcheck( varargin, { ...
         'erpimageopt' 'cell'    [] STUDY.etc.erpimparams.erpimageopt;
-        'sorttype'    { 'string' 'cell' } [] STUDY.etc.erpimparams.sorttype;
+        'sorttype'    { 'string','cell' } [] STUDY.etc.erpimparams.sorttype;
         'sortwin'     'real'    [] STUDY.etc.erpimparams.sortwin;
         'sortfield'   'string'  [] STUDY.etc.erpimparams.sortfield;
         'statistics'  'string'  [] STUDY.etc.erpimparams.statistics;
@@ -101,8 +99,8 @@ function [STUDY, allphases, allsortvar, subjamptime, subjamptrial, globalent ] =
         'clusters'    'integer' []              [];
         'mode'        'string'  []              '';
         'comps'       {'integer','string'}  []              []; % for backward compatibility
-        'plotsubjects' 'string' { 'on' 'off' }  'off';
-        'normalize'    'string' { 'on' 'off' }  'off';
+        'plotsubjects' 'string' { 'on','off' }  'off';
+        'normalize'    'string' { 'on','off' }  'off';
         'subject'     'string'  []              '' }, ...
                                       'std_erpimage', 'ignore');
     if isstr(opt), error(opt); end;
