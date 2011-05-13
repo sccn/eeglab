@@ -1269,7 +1269,7 @@ else
                 h = patch([g.winrej(tpmi,1)-lowlim g.winrej(tpmi,2)-lowlim ...
                            g.winrej(tpmi,2)-lowlim g.winrej(tpmi,1)-lowlim], ...
                           [0 0 1 1], tmpcols);  
-                set(h, 'EdgeColor', get(h, 'facecolor')) 
+                set(h, 'EdgeColor', get(h, 'facecolor'), 'facealpha', 0.5) 
 			end;
 		end;
 	end;
