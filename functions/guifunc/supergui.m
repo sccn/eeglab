@@ -113,7 +113,7 @@ g = finputcheck(options, { 'geomhoriz' 'cell'   []      {};
                            'title'     'string' []      '';
                            'userdata'  ''       []      [];
                            'geomvert'  'real'   []      [];
-                           'horizontalalignment'  'string'   { 'left' 'right' 'center' } 'left';
+                           'horizontalalignment'  'string'   { 'left','right','center' } 'left';
                            'minwidth'  'real'   []      10;
                            'borders'   'real'   []      [0.05 0.04 0.07 0.06];
                            'spacing'   'real'   []      [0.02 0.01];
@@ -248,6 +248,15 @@ for counter = 1:maxcount
             if strcmpi(currentelem{1}, 'vertshift'), currentelem(1) = []; addvert = -height/2; 
             else                                                          addvert = 0;   
             end;
+            
+            % position adjustment depending on GUI type
+            if isstr(currentelem{2}) && strcmpi(currentelem{2}, 'popupmenu')
+                posy = posy-height/10;
+            end;
+            if isstr(currentelem{2}) && strcmpi(currentelem{2}, 'text')
+                posy = posy+height/5;
+            end;
+                
             allhandlers(counter) = uicontrol(g.fig, 'unit', 'normalized', 'position', ...
                                           [posx posy+addvert width height].*s+q, currentelem{:});
 
