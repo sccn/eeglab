@@ -10,7 +10,12 @@ function this = subsasgn(this,index,c)
             this(index.subs{1}) = [];
         else
             allfields = fieldnames( c );
-            this(index.subs{1}) = eeg_emptyset;
+
+            % create empty structure
+            tmpfields = allfields;
+            tmpfields(:,2) = cell(size(tmpfields));
+            tmpfields = tmpfields';
+            this(index.subs{1}) = struct(tmpfields{:});
             
             % dealing with input structure
             if isa(c, 'eegobj')
