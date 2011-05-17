@@ -420,6 +420,7 @@ cb_savesetas   = [ check   '[EEG LASTCOM] = pop_saveset(EEG);'                  
 cb_delset      = [ nocheck '[ALLEEG LASTCOM] = pop_delset(ALLEEG, -CURRENTSET);'         e_hist_nh 'eeglab redraw;' ];
 cb_study1      = [ nocheck 'pop_stdwarn; [STUDYTMP ALLEEGTMP LASTCOM] = pop_study([], ALLEEG         , ''gui'', ''on'');' e_load_study]; 
 cb_study2      = [ nocheck 'pop_stdwarn; [STUDYTMP ALLEEGTMP LASTCOM] = pop_study([], isempty(ALLEEG), ''gui'', ''on'');' e_load_study]; 
+cb_studyerp    = [ nocheck 'pop_stdwarn; [STUDYTMP ALLEEGTMP LASTCOM] = pop_studyerp;' e_load_study]; 
 cb_loadstudy   = [ nocheck 'pop_stdwarn; [STUDYTMP ALLEEGTMP LASTCOM] = pop_loadstudy;'                                   e_load_study]; 
 cb_savestudy1  = [ check   '[STUDYTMP ALLEEGTMP LASTCOM] = pop_savestudy(STUDY, EEG, ''savemode'', ''resave'');'      e_load_study];
 cb_savestudy2  = [ check   '[STUDYTMP ALLEEGTMP LASTCOM] = pop_savestudy(STUDY, EEG);'                                e_load_study];
@@ -583,6 +584,7 @@ if ismatlab
     std2_m = uimenu( file_m, 'Label', 'Create study'                  , 'Separator', 'on'); 
     uimenu( std2_m,  'Label', 'Using all loaded datasets'             , 'Callback', cb_study1); 
     uimenu( std2_m,  'Label', 'Browse for datasets'                   , 'Callback', cb_study2); 
+    uimenu( std2_m,  'Label', 'Simplified grand average ERP interface', 'Callback', cb_studyerp); 
 
     uimenu( file_m, 'Label', 'Load existing study'                    , 'CallBack', cb_loadstudy,'Separator', 'on' ); 
     uimenu( file_m, 'Label', 'Save current study'                     , 'CallBack', cb_savestudy1);
