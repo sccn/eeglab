@@ -210,7 +210,7 @@ elseif strcmpi(mode, 'gui') % GUI mode
                       '   guiind = findobj(''parent'', gcbf, ''tag'', ''set' int2str(index) ''');' ...
                       '   set( guiind,''string'', [inputpath inputname]);' ...
                           loadset ...
-                      'end;'];
+                      'end; clear inputname inputpath;'];
         numstr = int2str(index);
         guispec = { guispec{:}, ...
         {'style' 'text'       'string' numstr  'tag' [ 'num'   int2str(index) ] 'userdata' index }, ...
@@ -399,7 +399,7 @@ else % internal command
             
             res = inputdlg2_with_checkbox( { strvcat('Enter maximum residual (topo map - dipole proj.) var. (in %)', ...
                                        'NOTE: This will delete any existing component clusters!') }, ...
-                             'pop_study():  Pre-select components', 1, { '15' },'pop_study' );
+                                       'pop_study():  Pre-select components', 1, { '15' },'pop_study' );
            
             if isempty(res), return; end;
             if res{2} == 1
@@ -414,7 +414,9 @@ else % internal command
             
             userdat{2} = datasetinfo;
             userdat{4} = allcom;
-            set(hdl, 'userdata', userdat);            
+            set(hdl, 'userdata', userdat);   
+            set(findobj(hdl, 'tag', 'delclust'), 'value', 1);
+            pop_study('delclust', hdl);
             pop_study('redraw', hdl);
 
         case 'component'
