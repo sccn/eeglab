@@ -34,6 +34,13 @@
 %   'badcomps'  - [string] storing clustered ICs in each dataset in a field called EEG.badcomps. {default:'no'}
 %                 'yes' - EEG.badcomps are created
 %                 'no'  - EEG.badcomps are not stored
+%   'plot'      - ['on'|'off'] plot results
+%   'resetcluster' - ['on'|'off'] reset the parent cluster to include all
+%                 components. If this is not performed only component which
+%                 where preselected by residual variace are included in the
+%                 final clusters (although ALL components are always used
+%                 during the calculation phase).
+%
 % Outputs:
 % CORRMAP - structure that contains information about template,input
 %           parameters,correlation values and clustered ICs.
@@ -126,14 +133,15 @@ if index>tot_ics
 end
 
 %%%%%%%%%%%%%% BLOCK 2 - decoding input parameters %%%%%%%%%%%%
-g = finputcheck(varargin, { 'chanlocs' { 'string' 'struct' } {[] []} '';...
-    'th'     'string'    []     'auto' ;...
-    'ics'    'integer'  [1 2 3]    2 ;....
-    'pl'     'string'   {'none','2nd', 'both'}     '2nd';...
-    'resetclusters'     'string'   {'on' 'off'}    'off';...
-    'title'  'string'   []    '';...
-    'clname' 'string'   []    '';...
-    'badcomps' 'string' {'yes', 'no'} 'no'});
+g = finputcheck(varargin, { 'chanlocs' { 'string','struct' } {[] []} '';...
+                            'th'     'string'    []     'auto' ;...
+                            'ics'    'integer'  [1 2 3]    2 ;...
+                            'pl'     'string'   {'none','2nd', 'both'}     '2nd';...
+                            'resetclusters'     'string'   {'on','off'}    'off';...
+                            'plot'              'string'   {'on','off'}    'on';...
+                            'title'  'string'   []    '';...
+                            'clname' 'string'   []    '';...
+                            'badcomps' 'string' {'yes', 'no'} 'no'});
 
 if isstr(g), error(g); end;
 opt = g;
@@ -358,8 +366,15 @@ for a=1:leng % first loop: only runs more than once in auto mode
             for j=1:size(comp{i},2)%loop for all ICs
                 if i==n_tmp && j==index && m==1
                     res(j)=0; %eliminating template
-                else
+                elseif exist('corr') == 2 && license('checkout', 'statistics_toolbox')
                     res(j)=corr(tmp,comp{i}(:,j));
+                else
+                    tmpmat = corrcoef(tmp,comp{i}(:,j));
+                    if length(tmpmat) == 1
+                        res(j)=tmpmat; % Octave
+                    else
+                        res(j)=tmpmat(2);
+                    end;
                 end
             end %closes "j" loop
             
@@ -506,9 +521,12 @@ for a=1:leng % first loop: only runs more than once in auto mode
     end %closes "m" loop
     
     %correlation between average maps
-    cofcor=corrcoef(mediaplot(a,1,:),mediaplot(a,2,:));
-    dif_corr=abs(cofcor(2,1));
-    
+    cofcor=corrcoef(squeeze(mediaplot(a,1,:)),squeeze(mediaplot(a,2,:)));
+    if length(cofcor) == 1
+        dif_corr=abs(cofcor);
+    else
+        dif_corr=abs(cofcor(2,1));
+    end;
     %%%%%OUTPUT info - storing in CORRMAP structure
     CORRMAP_temp.clust.similarity(a)=dif_corr;
     
@@ -583,15 +601,17 @@ CORRMAP.output.sets{2}= CORRMAP.corr.sets{2}(1:CORRMAP.clust.ics(2));
 CORRMAP.output.ics{1}= CORRMAP.corr.ics{1}(1:CORRMAP.clust.ics(1));
 CORRMAP.output.ics{2}= CORRMAP.corr.ics{2}(1:CORRMAP.clust.ics(2));
 
-%%%% checking Matlab version to use correct plotting options
-vers=version; %7.3.0.267 (R2006b)or 7.5.0.342 (R2007b)
-kvers1=strfind(vers, '7.3.');
 
-if ~isempty(kvers1)
-    corrmap_plot_v1(CORRMAP,CORRMAP_temp,comp,chan,rep,m,in,fin,plot_ics, mediaplot,tt(1),flg);
-else
-    corrmap_plot_v2(CORRMAP,CORRMAP_temp,comp,chan,rep,m,in,fin,plot_ics, mediaplot,tt(1),flg);
-end
+if strcmpi(opt.plot, 'on')
+    %%%% checking Matlab version to use correct plotting options
+    vers=version; %7.3.0.267 (R2006b)or 7.5.0.342 (R2007b)
+    kvers1=strfind(vers, '7.3.');
+    if ~isempty(kvers1)
+        corrmap_plot_v1(CORRMAP,CORRMAP_temp,comp,chan,rep,m,in,fin,plot_ics, mediaplot,tt(1),flg);
+    else
+        corrmap_plot_v2(CORRMAP,CORRMAP_temp,comp,chan,rep,m,in,fin,plot_ics, mediaplot,tt(1),flg);
+    end
+end;
 
 %%% BLOCK 8 - saving EEG:badcomps %%%%%
 
@@ -662,3 +682,14 @@ toc
 
 % Warning: Divide by zero.
 %   (Type "warning off MATLAB:divideByZero" to suppress this warning.)
+
+% replacement function for the corr function
+function corrmat = replacement_corr(a, b);
+
+corrmat = zeros(size(a,2), size(b,2));
+for inda = 1:size(a,2)
+    for indb = 1:size(b,2)
+        tmpmat = corrcoef(a(:,inda), b(:,indb));
+        corrmat(inda, indb) = tmpmat(2);
+    end;
+end;
