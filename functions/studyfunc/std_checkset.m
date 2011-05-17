@@ -163,13 +163,16 @@ end;
 
 % check cluster array
 % -------------------
+rebuild_design = 0;
 if ~isfield(STUDY, 'cluster'), STUDY.cluster = []; modif = 1; end;
+if ~isfield(STUDY, 'changrp'), STUDY.changrp = []; modif = 1; end;
+if isempty(STUDY.changrp) && isempty(STUDY.cluster)
+    rebuild_design = 1;
+end;
+
 if isempty(STUDY.cluster)
     modif = 1; 
     [STUDY] = std_createclust(STUDY, ALLEEG, 'parentcluster', 'on');
-end;
-if ~isfield(STUDY, 'changrp')
-    STUDY.changrp = [];
 end;
 
 % create STUDY design if it is not present
@@ -186,6 +189,7 @@ if ~isfield(STUDY, 'design') || isempty(STUDY.design) || ~isfield(STUDY.design, 
     STUDY  = std_maketrialinfo(STUDY, ALLEEG); 
     STUDY  = std_makedesign(STUDY, ALLEEG);
     STUDY  = std_selectdesign(STUDY, ALLEEG,1);
+    rebuild_design = 0;
 else
     if isfield(STUDY.design, 'indvar1')
         STUDY  = std_convertdesign(STUDY, ALLEEG);
@@ -213,6 +217,10 @@ else
             end;
         end;
     end;
+end;
+
+if rebuild_design % in case datasets have been added or removed
+    STUDY = std_rebuilddesign(STUDY, ALLEEG);
 end;
 
 % scan design to fix old paring format
