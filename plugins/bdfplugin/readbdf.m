@@ -63,10 +63,20 @@ for nrec=1:length(Records),
 
     if ~isempty(findstr(EDF.VERSION, 'BIOSEMI'))
         fseek(EDF.FILE.FID,(EDF.HeadLen+NREC*EDF.AS.spb*3),'bof');
-        [s, count]=fread(EDF.FILE.FID,EDF.AS.spb,'bit24');
+        try
+            [s, count]=fread(EDF.FILE.FID,EDF.AS.spb,'bit24');
+        catch, % octave below
+            [s,count] = fread(EDF.FILE.FID,3*EDF.AS.spb,'uint8');
+            s = reshape(2.^[0,8,16]*reshape(s(:),3,count/3),[EDF.AS.spb]);
+            count = count/3;
+        end;
     else
         fseek(EDF.FILE.FID,(EDF.HeadLen+NREC*EDF.AS.spb*2),'bof');
-        [s, count]=fread(EDF.FILE.FID,EDF.AS.spb,'bit16');
+        try
+            [s, count]=fread(EDF.FILE.FID,EDF.AS.spb,'bit16');
+        catch,
+            [s, count]=fread(EDF.FILE.FID,EDF.AS.spb,'int16');
+        end;
     end;
     
     try, 
