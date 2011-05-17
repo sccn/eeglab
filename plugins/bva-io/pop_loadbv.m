@@ -106,7 +106,15 @@ if any(chans < 1) || any(chans > hdr.commoninfos.numberofchannels)
 end
 if isfield(hdr, 'channelinfos')
     for chan = 1:length(chans)
-        [EEG.chanlocs(chan).labels, chanlocs(chan).ref, chanlocs(chan).scale, chanlocs(chan).unit] = strread(hdr.channelinfos{chans(chan)}, '%s%s%s%s', 1, 'delimiter', ',');
+        if ismatlab,
+            [EEG.chanlocs(chan).labels, chanlocs(chan).ref, chanlocs(chan).scale, chanlocs(chan).unit] = strread(hdr.channelinfos{chans(chan)}, '%s%s%s%s', 1, 'delimiter', ',');
+        else,
+            str  = hdr.channelinfos{chans(chan)};
+            [EEG.chanlocs(chan).labels str] = strtok(str, ',');
+            [chanlocs(chan).ref        str] = strtok(str, ',');
+            [chanlocs(chan).scale      str] = strtok(str, ',');
+            [chanlocs(chan).unit       str] = strtok(str, ',');
+        end;
         EEG.chanlocs(chan).labels = char(EEG.chanlocs(chan).labels);
         chanlocs(chan).scale = str2double(char(chanlocs(chan).scale));
 %             chanlocs(chan).unit = native2unicode(double(char(chanlocs(chan).scale)), 'UTF-8');
@@ -124,7 +132,14 @@ if isfield(hdr, 'coordinates')
     onenon0channel = 0;
     for chan = 1:length(chans)
         if ~isempty(hdr.coordinates{chans(chan)})
-            [EEG.chanlocs(chan).sph_radius, theta, phi] = strread(hdr.coordinates{chans(chan)}, '%f%f%f', 'delimiter', ',');
+            if ismatlab,
+                [EEG.chanlocs(chan).sph_radius, theta, phi] = strread(hdr.coordinates{chans(chan)}, '%f%f%f', 'delimiter', ',');
+            else
+                str  = hdr.coordinates{chans(chan)};
+                [EEG.chanlocs(chan).sph_radius str] = strtok(str, ','); EEG.chanlocs(chan).sph_radius = str2num(EEG.chanlocs(chan).sph_radius);
+                [theta                         str] = strtok(str, ','); theta = str2num(theta);
+                [phi                           str] = strtok(str, ','); phi   = str2num(phi);
+            end;
             if EEG.chanlocs(chan).sph_radius == 0 && theta == 0 && phi == 0
                 EEG.chanlocs(chan).sph_radius = [];
                 EEG.chanlocs(chan).sph_theta = [];
@@ -147,7 +162,7 @@ end
 % Open data file and find the number of data points
 % -------------------------------------------------
 disp('pop_loadbv(): reading EEG data');
-[IN, message] = fopen(fullfile(path, hdr.commoninfos.datafile));
+[IN, message] = fopen(fullfile(path, hdr.commoninfos.datafile), 'r');
 if IN == -1
     [IN, message] = fopen(fullfile(path, lower(hdr.commoninfos.datafile)));
     if IN == -1
@@ -309,6 +324,7 @@ if isfield(hdr.commoninfos, 'markerfile')
 
         % find if boundaries at homogenous intervals
         % ------------------------------------------
+        tmpevent = EEG.event;
         boundaries = strmatch('boundary', {tmpevent.type});
         boundlats = unique([tmpevent(boundaries).latency]);
         if (isfield(hdr.commoninfos, 'segmentationtype') && (strcmpi(hdr.commoninfos.segmentationtype, 'markerbased') || strcmpi(hdr.commoninfos.segmentationtype, 'fixtime'))) && length(boundaries) > 1 && length(unique(diff([boundlats EEG.pnts + 1]))) == 1

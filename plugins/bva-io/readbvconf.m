@@ -38,7 +38,7 @@ if nargin < 2
 end
 
 % Open and read file
-[IN, message] = fopen(fullfile(pathname, filename));
+[IN, message] = fopen(fullfile(pathname, filename), 'r');
 if IN == -1
     [IN, message] = fopen(fullfile(pathname, lower(filename)));
     if IN == -1
@@ -60,7 +60,9 @@ sectionArray = [strmatch('[', raw)' length(raw) + 1];
 for iSection = 1:length(sectionArray) - 1
 
     % Convert section name
-    fieldName = lower(char(strread(raw{sectionArray(iSection)}, '[%s', 'delimiter', ']')));
+    tmpstr    = deblank(raw{sectionArray(iSection)});
+    fieldName = lower(tmpstr(2:end-1));
+    %fieldName = lower(char(strread(tmpstr(2:end), '[%s', 'delimiter', ']')));
     fieldName(isspace(fieldName) == true) = [];
 
     % Fill structure with parameter value pairs
@@ -85,5 +87,7 @@ for iSection = 1:length(sectionArray) - 1
             end
         case 'comment'
             CONF.(fieldName) = raw(sectionArray(iSection) + 1:sectionArray(iSection + 1) - 1);
+        otherwise
+            fprintf('Unrecognized entry: %s\n', fieldName);
     end
 end
