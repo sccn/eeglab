@@ -252,8 +252,8 @@ if ~isstr(varargin{1}) %intial settings
         return; 
     end;
     [STUDY ALLEEG] = std_precomp(options{:});
-    com = sprintf('%s\n[STUDY ALLEEG] = std_precomp(STUDY, ALLEEG, %s);', ...
-                  STUDY.history, vararg2str(options(3:end)));
+    com = sprintf('[STUDY ALLEEG] = std_precomp(STUDY, ALLEEG, %s);', vararg2str(options(3:end)));
+    STUDY.history =  sprintf('%s\n%s',  STUDY.history, com);            
     
 else
     hdl = varargin{2}; %figure handle
