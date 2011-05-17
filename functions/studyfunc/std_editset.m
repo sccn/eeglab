@@ -167,12 +167,20 @@ for k = 1:2:length(g.commands)
         case 'session' 
             STUDY.datasetinfo(currentind).session = g.commands{k+1};
         case 'remove'
-            ALLEEG(end+2)            = ALLEEG(end);
-            ALLEEG(g.commands{k+1})  = ALLEEG(end-1); % empty dataset
-            ALLEEG(end-1:end)        = [];
-            STUDY.datasetinfo(end+2)           = STUDY.datasetinfo(end);
-            STUDY.datasetinfo(g.commands{k+1}) = STUDY.datasetinfo(end-1);
-            STUDY.datasetinfo(end-1:end)       = [];
+            % create empty structure
+            allfields = fieldnames(ALLEEG);
+            tmpfields = allfields;
+            tmpfields(:,2) = cell(size(tmpfields));
+            tmpfields = tmpfields';
+            ALLEEG(g.commands{k+1}) = struct(tmpfields{:});
+
+            % create empty structure
+            allfields = fieldnames(STUDY.datasetinfo);
+            tmpfields = allfields;
+            tmpfields(:,2) = cell(size(tmpfields));
+            tmpfields = tmpfields';
+            STUDY.datasetinfo(g.commands{k+1}) = struct(tmpfields{:});
+            
             if isfield(STUDY.datasetinfo, 'index')
                 STUDY.datasetinfo = rmfield(STUDY.datasetinfo, 'index');
             end;
@@ -277,7 +285,24 @@ end;
 % remove empty datasets (cannot be done above because some empty datasets
 % might not have been removed)
 % ---------------------
-[ ALLEEG STUDY.datasetinfo ] = removeempty(ALLEEG, STUDY.datasetinfo);
+rmindex = [];
+for index = 1:length(STUDY.datasetinfo)
+    if isempty(STUDY.datasetinfo(index).subject) && isempty(ALLEEG(index).nbchan)
+        rmindex = [ rmindex index ];
+    end;
+end;
+STUDY.datasetinfo(rmindex) = [];
+ALLEEG(rmindex)            = [];
+for index = 1:length(STUDY.datasetinfo)
+    STUDY.datasetinfo(index).index = index;
+end;
+
+% remove empty ALLEEG structures
+% ------------------------------
+while length(ALLEEG) > length(STUDY.datasetinfo)
+   ALLEEG(end) = [];
+end;
+%[ ALLEEG STUDY.datasetinfo ] = remove_empty(ALLEEG, STUDY.datasetinfo);
 
 % save datasets if necessary
 % --------------------------
@@ -301,7 +326,13 @@ end;
 
 % save study if necessary
 % -----------------------
-STUDY.changrp = [];
+if ~isempty(g.commands)
+    STUDY.changrp = [];
+    STUDY.cluster = [];
+%    if ~isempty(STUDY.design)
+%        [STUDY] = std_createclust(STUDY, ALLEEG, 'parentcluster', 'on');
+%    end;
+end;
 [STUDY ALLEEG] = std_checkset(STUDY, ALLEEG);
 if ~isempty(g.filename),
     [STUDY.filepath STUDY.filename ext] = fileparts(fullfile( g.filepath, g.filename ));
@@ -315,11 +346,11 @@ end;
 % ---------------------
 % remove empty elements
 % ---------------------
-function [ALLEEG, datasetinfo] = removeempty(ALLEEG, datasetinfo);
+function [ALLEEG, datasetinfo] = remove_empty(ALLEEG, datasetinfo);
 
     rmindex = [];
     for index = 1:length(datasetinfo)
-        if isempty(datasetinfo(index).subject) & isempty(ALLEEG(index).nbchan)
+        if isempty(datasetinfo(index).subject) && isempty(ALLEEG(index).nbchan)
             rmindex = [ rmindex index ];
         end;
     end;

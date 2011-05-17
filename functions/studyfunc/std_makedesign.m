@@ -13,6 +13,8 @@
 %   >> [STUDY] = std_makedesign(STUDY, ALLEEG, designind, 'key', 'val' ...);   
 %
 % Inputs:
+%   STUDY      - EEGLAB STUDY set
+%   ALLEEG     - vector of the EEG datasets included in the STUDY structure 
 %   designind   - [integer > 0] index (number) of the new STUDY design {default: 1}
 %
 % Optional inputs:
@@ -123,8 +125,7 @@ function [STUDY com] = std_makedesign(STUDY, ALLEEG, designind, varargin)
 
 if nargin < 2
     help std_makedesign;
-    return;defdes.variable(1).pairing = 'on';
-defdes.variable(2).pairing = 'off';
+    return;
 end;
 if nargin < 3 
     designind = 1;

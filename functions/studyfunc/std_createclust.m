@@ -123,7 +123,7 @@ else
         % check if there is a cluster of Notclust components
         if isfield(STUDY.etc, 'preclust') && isfield(STUDY.etc.preclust, 'preclustparams')
             if ~isempty(STUDY.cluster(k).parent)
-                strcmp(STUDY.cluster(k).parent,STUDY.cluster(STUDY.etc.preclust.clustlevel).name) 
+                %strcmp(STUDY.cluster(k).parent,STUDY.cluster(STUDY.etc.preclust.clustlevel).name) 
                 STUDY.cluster(k).preclust.preclustparams = STUDY.etc.preclust.preclustparams;
             end;
         end
