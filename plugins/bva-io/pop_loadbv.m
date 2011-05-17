@@ -106,9 +106,9 @@ if any(chans < 1) || any(chans > hdr.commoninfos.numberofchannels)
 end
 if isfield(hdr, 'channelinfos')
     for chan = 1:length(chans)
-        if ismatlab,
+        try
             [EEG.chanlocs(chan).labels, chanlocs(chan).ref, chanlocs(chan).scale, chanlocs(chan).unit] = strread(hdr.channelinfos{chans(chan)}, '%s%s%s%s', 1, 'delimiter', ',');
-        else,
+        catch % Octave compatible code below
             str  = hdr.channelinfos{chans(chan)};
             [EEG.chanlocs(chan).labels str] = strtok(str, ',');
             [chanlocs(chan).ref        str] = strtok(str, ',');
