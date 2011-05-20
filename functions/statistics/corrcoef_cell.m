@@ -65,25 +65,31 @@ if nd == 1
     cvb = bb'*bb/(10-1);
 
     c = cv/sqrt(cva*cvb);
-elseif nd == 2
-    aa = a-repmat(mean(a,2),[1 size(a,2)]);
-    bb = b-repmat(mean(b,2),[1 size(a,2)]);
+elseif nd == 2 % ND=2, 3, and 4 could be replaced with a single line
+    aa = bsxfun(@minus, a, mean(a,2));
+    bb = bsxfun(@minus, b, mean(b,2));
+    %aa = a-repmat(mean(a,2),[1 size(a,2)]);
+    %bb = b-repmat(mean(b,2),[1 size(a,2)]);
     cv  = sum(aa.*bb,2);
     cva = sum(aa.*aa,2);
     cvb = sum(bb.*bb,2);
 
     c = cv./sqrt(cva.*cvb);
 elseif nd == 3
-    aa = a-repmat(mean(a,3),[1 1 size(a,3)]);
-    bb = b-repmat(mean(b,3),[1 1 size(a,3)]);
+    aa = bsxfun(@minus, a, mean(a,3));
+    bb = bsxfun(@minus, b, mean(b,3));
+    %aa = a-repmat(mean(a,3),[1 1 size(a,3)]);
+    %bb = b-repmat(mean(b,3),[1 1 size(a,3)]);
     cv  = sum(aa.*bb,3);
     cva = sum(aa.*aa,3);
     cvb = sum(bb.*bb,3);
 
     c = cv./sqrt(cva.*cvb);
 elseif nd == 4
-    aa = a-repmat(mean(a,4),[1 1 1 size(a,4)]);
-    bb = b-repmat(mean(b,4),[1 1 1 size(a,4)]);
+    aa = bsxfun(@minus, a, mean(a,4));
+    bb = bsxfun(@minus, b, mean(b,4));
+    %aa = a-repmat(mean(a,4),[1 1 1 size(a,4)]);
+    %bb = b-repmat(mean(b,4),[1 1 1 size(a,4)]);
     cv  = sum(aa.*bb,4);
     cva = sum(aa.*aa,4);
     cvb = sum(bb.*bb,4);
