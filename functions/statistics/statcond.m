@@ -244,7 +244,7 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
             [ori_vals df] = ttest_cell_select(data, g.paired, g.variance);
             
             if strcmpi(g.mode, 'param')
-                pvals = 2*tcdf(-abs(ori_vals), df);
+                pvals = 2*mytcdf(-abs(ori_vals), df);
                 pvals = reshape(pvals, size(pvals));
                 return;
             else
@@ -497,4 +497,26 @@ function myfprintf(verb, varargin)
     if verb
         fprintf(varargin{:});
     end;
-      
+
+% function to replace tcdf
+function p = mytcdf(x,v)
+
+if length(v) == 1,
+    v = repmat(v, size(x));
+end;
+
+x2 = x.^2;
+inds1 = (v < x2);
+inds2 = (v >= x2);
+if any(inds1(:)), p(inds1) = betainc(v(inds1) ./ (v(inds1) + x2(inds1)), v(inds1)/2, 0.5, 'lower') / 2; end;
+if any(inds2(:)), p(inds2) = betainc(x2(inds2) ./ (v(inds2) + x2(inds2)), 0.5, v(inds2)/2, 'upper') / 2; end;
+inds = (x > 0); p(inds) = 1 - p(inds);
+
+inds = (v > 1e7);
+if any(inds(:)), p(inds) = normcum(x(inds)); end;
+
+p(x == 0) = 0.5;
+p = reshape(p, size(x));
+
+function [p] = normcum(z)
+p = 0.5 * erfc(-z ./ sqrt(2));
