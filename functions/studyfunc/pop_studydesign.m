@@ -348,11 +348,19 @@ elseif isstr(STUDY)
                 warndlg2('Cannot combine values from numerical variables');
                 return;
             end;
-            usrdat.factorvals{val1}{end+1} = usrdat.factorvals{val1}{vals(1)};
-            if isstr(usrdat.factorvals{val1}{1})
-                usrdat.factorvals{val1}{end} = usrdat.factorvals{val1}(vals);
+            % combine values for string and integers
+            if isstr(usrdat.factorvals{val1}{1}) || iscell(usrdat.factorvals{val1}{1})
+                tmpcell = {};
+                for indCell = 1:length(vals)
+                    if iscell(usrdat.factorvals{val1}{indCell})
+                        tmpcell = { tmpcell{:} usrdat.factorvals{val1}{indCell}{:} };
+                    else
+                        tmpcell = { tmpcell{:} usrdat.factorvals{val1}{indCell} };
+                    end;
+                end;
+                usrdat.factorvals{val1}{end+1} = unique(tmpcell);
             else
-                usrdat.factorvals{val1}{end} = [ usrdat.factorvals{val1}{vals} ];
+                usrdat.factorvals{val1}{end+1} = unique([ usrdat.factorvals{val1}{vals} ]);
             end;
             set(findobj(fig, 'tag', ['lbval' num2str(factval) ]), 'string', encodevals(usrdat.factorvals{val1}));
             
