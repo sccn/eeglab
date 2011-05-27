@@ -182,6 +182,7 @@ end;
 
 % add paths
 % ---------
+eeglab_options;
 if ~iseeglabdeployed2
     myaddpath( eeglabpath, 'memmapdata.m', 'functions');
     myaddpath( eeglabpath, 'readeetraklocs.m', [ 'functions' filesep 'sigprocfunc'      ]);
@@ -194,17 +195,36 @@ if ~iseeglabdeployed2
     myaddpath( eeglabpath, 'icademo.m',        [ 'functions' filesep 'miscfunc'         ]);
     myaddpath( eeglabpath, 'eeglab1020.ced',   [ 'functions' filesep 'resources'        ]);
     myaddpath( eeglabpath, 'startpane.m',      [ 'functions' filesep 'javachatfunc' ]);
+    
+    % add path if toolboxes are missing
+    % ---------------------------------
+    tmppath = path;
+    signalpath = fullfile(eeglabpath, 'functions', 'octavefunc', 'signal');
+    optimpath  = fullfile(eeglabpath, 'functions', 'octavefunc', 'optim');
+    if ~license('test','signal_toolbox') || option_donotusetoolboxes
+        warning('off', 'MATLAB:dispatcher:nameConflict');
+        addpath( signalpath );
+    else
+        if ~isempty(findstr( signalpath, tmppath)) rmpath( signalpath ); end;
+    end;
+    if ~license('test','optim_toolbox') || option_donotusetoolboxes
+        warning('off', 'MATLAB:dispatcher:nameConflict');
+        addpath( optimpath );
+    else
+        if ~isempty(findstr( optimpath, tmppath)) rmpath( optimpath ); end;
+    end;
+    
+    % add path for Octave
+    % -------------------
     if ~ismatlab
         myaddpath( eeglabpath, 'isoctave.m',   [ 'functions' filesep 'octavefunc' ]);
     else
         if exist('isoctave.m', 'file')
-            rmpath(fullfile(eeglabpath, [ 'functions' filesep 'octavefunc' ]));
+            rmpath(fullfile(eeglabpath, 'functions', 'octavefunc'));
         end;
     end;
     myaddpath( eeglabpath, 'eegplugin_dipfit', 'plugins');
 end;
-
-eeglab_options; 
 
 if nargin == 1 && strcmp(onearg, 'redraw')
     if evalin('base', 'exist(''EEG'')', '0') == 1
@@ -584,7 +604,7 @@ if ismatlab
     std2_m = uimenu( file_m, 'Label', 'Create study'                  , 'Separator', 'on'); 
     uimenu( std2_m,  'Label', 'Using all loaded datasets'             , 'Callback', cb_study1); 
     uimenu( std2_m,  'Label', 'Browse for datasets'                   , 'Callback', cb_study2); 
-    uimenu( std2_m,  'Label', 'Simplified grand average ERP interface', 'Callback', cb_studyerp); 
+    uimenu( std2_m,  'Label', 'Simple ERP STUDY'                      , 'Callback', cb_studyerp); 
 
     uimenu( file_m, 'Label', 'Load existing study'                    , 'CallBack', cb_loadstudy,'Separator', 'on' ); 
     uimenu( file_m, 'Label', 'Save current study'                     , 'CallBack', cb_savestudy1);
@@ -927,31 +947,36 @@ W_MAIN = figure('Units','points', ...
 % java chat
 eeglab_options;
 if option_chat == 1
-    disp('Starting chat...');
-    tmpp = fileparts(which('startpane.m'));
-    if isempty(tmpp) || ~ismatlab
-        disp('Cannot start chat');
-        tb = [];
+    if is_sccn
+        disp('Starting chat...');
+        tmpp = fileparts(which('startpane.m'));
+        if isempty(tmpp) || ~ismatlab
+            disp('Cannot start chat');
+            tb = [];
+        else
+            disp(' ----------------------------------- ');
+            disp('| EEGLAB chat 0.9                   |');
+            disp('| The chat currently only works     |'); 
+            disp('| at the University of CA San Diego |');
+            disp(' ----------------------------------- ');
+
+            javaaddpath(fullfile(tmpp, 'Chat_with_pane.jar'));
+            eval('import client.eeglab;');
+            eval('import client.VisualToolbar;');
+            eval('import java.awt.*;');
+            eval('import javax.swing.*;');
+
+            tb = VisualToolbar();
+            F = W_MAIN;
+            tb.setPreferredSize(Dimension(0, 75));
+
+            javacomponent(tb,'South',F);
+
+            refresh(F);
+        end;
     else
-        disp(' ----------------------------------- ');
-        disp('| EEGLAB chat 0.9                   |');
-        disp('| The chat currently only works     |'); 
-        disp('| at the University of CA San Diego |');
-        disp(' ----------------------------------- ');
-        
-        javaaddpath(fullfile(tmpp, 'Chat_with_pane.jar'));
-        eval('import client.eeglab;');
-        eval('import client.VisualToolbar;');
-        eval('import java.awt.*;');
-        eval('import javax.swing.*;');
-
-        tb = VisualToolbar();
-        F = W_MAIN;
-        tb.setPreferredSize(Dimension(0, 75));
-
-        javacomponent(tb,'South',F);
-
-        refresh(F);
+        disp('CANNOT START CHAT - CURRENTLY ONLY AVAILABLE AT THE UNIVERSITY OF CALIFORNIA SD');
+        tb = [];
     end;
 else
     tb = [];

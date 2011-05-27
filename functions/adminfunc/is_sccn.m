@@ -5,7 +5,10 @@ function bool = is_sccn;
     
     bool = 0;
     domnane = ' ';
-    eval([ 'if isunix, [tmp domname] = unix(''hostname -d'');' ...
-           'end;' ...
-           'bool = strcmpi(domname(1:end-1), ''sccn.ucsd.edu'');' ], '');
+    try 
+        eval([ 'if isunix, [tmp domname] = unix(''hostname -d'');' ...
+               'end;' ...
+               'bool = strcmpi(domname(1:end-1), ''ucsd.edu'');' ], '');
+    catch,
+    end;
     
