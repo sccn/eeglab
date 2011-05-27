@@ -52,9 +52,9 @@ if nargin<4
     return
 end
 
-if ~exist('firls')
-   error('*** eegfilt() requires the signal processing toolbox. ***');
-end
+%if ~exist('firls')
+%   error('*** eegfilt() requires the signal processing toolbox. ***');
+%end
 
 [chans frames] = size(data);
 if chans > 1 & frames == 1,
