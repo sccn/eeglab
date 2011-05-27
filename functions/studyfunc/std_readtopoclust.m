@@ -71,9 +71,7 @@ for clust = 1:length(clsind) %go over all requested clusters
             abset = STUDY.cluster(clsind(clust)).sets(cond,k);
             if ~isnan(comp) & ~isnan(abset)
                 [grid yi xi] = std_readtopo(ALLEEG, abset, comp);
-                if ~isfield(centroid{clust}, 'topotmp')
-                    centroid{clust}.topotmp = zeros([ size(grid(1:4:end),2) numitems ]);
-                elseif isempty(centroid{clust}.topotmp)
+                if ~isfield(centroid{clust}, 'topotmp') || isempty(centroid{clust}.topotmp)
                     centroid{clust}.topotmp = zeros([ size(grid(1:4:end),2) numitems ]);
                 end;
                 centroid{clust}.topotmp(:,k) = grid(1:4:end); % for inversion
