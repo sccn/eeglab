@@ -76,7 +76,11 @@ if  wobble/mean(radius) > 0.01 & optim==1
 	fprintf('Optimizing center position...\n');
 	kk=0;
 	while wobble/mean(radius) > 0.01 & kk<5
-		newcenter = fminsearch('spherror',center,options,x,y,z);
+        try
+    		newcenter = fminsearch('spherror',center,options,x,y,z);
+        catch
+    		newcenter = fminsearch('spherror',center,[], [], x,y,z);
+        end;
 		nx = x - newcenter(1);  % re-center the data
 		ny = y - newcenter(2);
 		nz = z - newcenter(3);
