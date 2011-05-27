@@ -84,7 +84,7 @@ if ~isempty(opt.channels) || (~isempty(opt.dataindices) && opt.dataindices(1) < 
 else                                                                                 dataType = 'comp';
 end;
 [tmp1 tmp2 currentFileExt] = fileparts(fileBaseName{1});
-if ~isempty(currentFileExt)
+if length(currentFileExt) > 3 && (strcmpi(currentFileExt(2:4), 'dat') || strcmpi(currentFileExt(2:4), 'ica'))
     opt.measure = currentFileExt(5:end);
     if strcmpi(currentFileExt(2:4), 'dat'), dataType = 'chan';
     else                                    dataType = 'comp';
