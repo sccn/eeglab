@@ -290,7 +290,11 @@ function event = recomputelatency( event, indices, srate, timeunit, align, oldev
             oldlat = oldlat-oldlat(1);
         end;
         
-        newfactor = fminsearch('eventalign',1,[],newlat, oldlat);
+        try
+            newfactor = fminsearch('eventalign',1,[],newlat, oldlat);
+        catch 
+            newfactor = fminsearch('eventalign',1,[],[],newlat, oldlat); % Octave
+        end;
         fprintf('Best sampling rate ratio found is %1.7f. Below latencies after adjustment\n', newfactor);
         if newfactor > 1.01 | newfactor < 0.99
             disp('Difference is more than 1%, something is wrong; ignoring ratio');
