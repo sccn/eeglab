@@ -469,6 +469,8 @@ for curfield = tmpfields'
     end;
 end;
 
+EEGOUT = eeg_checkset(EEGOUT);
+
 % generate the output command
 % ---------------------------
 if nargout > 1
