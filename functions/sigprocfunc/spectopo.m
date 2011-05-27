@@ -861,15 +861,10 @@ function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_sub
 	else
         fftlength = g.nfft;
     end;
-    if exist('pwelch') == 2 % & license('test','Signal_Toolbox'), 
-       usepwelch = 1; 
-    else 
-       usepwelch=0; 
-    end;
-    if ~usepwelch
-        fprintf('\n\nSignal processing toolbox (SPT) absent: spectrum computed using spec() function\n');
-        disp('Note: spec() emulates psd() not pwelch() so results scale will differ if SPT present');
-        disp('NOTE: function spec() may return INACCURATE results in filtered regions');
+    usepwelch = 1; 
+    if ~license('checkout','Signal_Toolbox'), 
+        fprintf('\nSignal processing toolbox (SPT) absent: spectrum computed using the pwelch()\n');
+        fprintf('function from Octave which is suposedly 100%% compatible with the Matlab pwelch function\n');
     end;
     fprintf(' (window length %d; fft length: %d; overlap %d):\n', winlength, fftlength, g.overlap);	
         
