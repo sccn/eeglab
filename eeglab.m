@@ -961,7 +961,7 @@ if option_chat == 1
             disp(' ----------------------------------- ');
 
             javaaddpath(fullfile(tmpp, 'Chat_with_pane.jar'));
-            eval('import client.eeglab;');
+            eval('import client.EEGLABchat.*;');
             eval('import client.VisualToolbar;');
             eval('import java.awt.*;');
             eval('import javax.swing.*;');
