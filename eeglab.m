@@ -968,13 +968,17 @@ if option_chat == 1
             eval('import java.awt.*;');
             eval('import javax.swing.*;');
 
-            tb = VisualToolbar();
-            F = W_MAIN;
-            tb.setPreferredSize(Dimension(0, 75));
+            try
+                tb = VisualToolbar();
+                F = W_MAIN;
+                tb.setPreferredSize(Dimension(0, 75));
 
-            javacomponent(tb,'South',F);
+                javacomponent(tb,'South',F);
 
-            refresh(F);
+                refresh(F);
+            catch,
+                tb = [];
+            end;
         end;
     else
         disp('CANNOT START CHAT - CURRENTLY ONLY AVAILABLE AT THE UNIVERSITY OF CALIFORNIA SD');
