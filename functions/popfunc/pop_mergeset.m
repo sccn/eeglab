@@ -259,7 +259,8 @@ else % INEEG is an EEG struct
                 INEEG2event = INEEG2.event;
                 % update urevent index in INEEG2.event
                 tmpevents = INEEG2.event;
-                [tmpevents.urevent] = celldeal(num2cell([INEEG2event.urevent]+orilen));
+                nonemptymask = ~cellfun('isempty',{tmpevents.urevent});
+                [tmpevents(nonemptymask).urevent] = celldeal(num2cell([INEEG2event.urevent]+orilen));
                 INEEG2.event = tmpevents;
                 % reserve space and append INEEG2.urevent
                 INEEG1.urevent(orilen+newlen).latency = [];
