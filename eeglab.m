@@ -182,11 +182,11 @@ end;
 
 % add paths
 % ---------
-eeglab_options;
 if ~iseeglabdeployed2
+    myaddpath( eeglabpath, 'eeg_checkset.m',   [ 'functions' filesep 'adminfunc'        ]);
+    eeglab_options;
     myaddpath( eeglabpath, 'memmapdata.m', 'functions');
     myaddpath( eeglabpath, 'readeetraklocs.m', [ 'functions' filesep 'sigprocfunc'      ]);
-    myaddpath( eeglabpath, 'eeg_checkset.m',   [ 'functions' filesep 'adminfunc'        ]);
     myaddpath( eeglabpath, 'supergui.m',       [ 'functions' filesep 'guifunc'          ]);
     myaddpath( eeglabpath, 'pop_study.m',      [ 'functions' filesep 'studyfunc'        ]);
     myaddpath( eeglabpath, 'pop_loadbci.m',    [ 'functions' filesep 'popfunc'          ]);
@@ -224,6 +224,8 @@ if ~iseeglabdeployed2
         end;
     end;
     myaddpath( eeglabpath, 'eegplugin_dipfit', 'plugins');
+else
+    eeglab_options;
 end;
 
 if nargin == 1 && strcmp(onearg, 'redraw')
