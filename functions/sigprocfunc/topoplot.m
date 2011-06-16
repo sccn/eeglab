@@ -957,8 +957,8 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
       [Xi,Yi,Zi] = griddata(inty,intx,intValues,yi',xi,'invdist'); % interpolate data
       [Xi,Yi,ZiC] = griddata(inty,intx,intContourVals,yi',xi,'invdist'); % interpolate data
   catch,
-      [Xi,Yi,Zi] = griddata(inty,intx,intValues',yi,xi); % interpolate data (Octave)
-      [Xi,Yi,ZiC] = griddata(inty,intx,intContourVals',yi,xi); % interpolate data
+      [Xi,Yi,Zi] = griddata(inty,intx,intValues',yi,xi'); % interpolate data (Octave)
+      [Xi,Yi,ZiC] = griddata(inty,intx,intContourVals',yi,xi'); % interpolate data
   end;
   %
   %%%%%%%%%%%%%%%%%%%%%%% Mask out data outside the head %%%%%%%%%%%%%%%%%%%%%
