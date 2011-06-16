@@ -90,7 +90,7 @@ dataopts = {};
 if ~isempty(g.channels), dataopts = { dataopts{:} 'chanindx', g.channels }; end;
 if ~isempty(g.samples ), dataopts = { dataopts{:} 'begsample', g.samples(1), 'endsample', g.samples(2)}; end;
 if ~isempty(g.trials  ), dataopts = { dataopts{:} 'begtrial', g.trials(1), 'endtrial', g.trials(2)}; end;
-alldata = ft_read_data(filename, 'header', dat, options{:});
+alldata = ft_read_data(filename, 'header', dat, dataopts{:});
 
 % convert to seconds for sread
 % ----------------------------
