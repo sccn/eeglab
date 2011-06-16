@@ -1049,6 +1049,12 @@ for inddataset = 1:length(ALLEEG)
         % general checking of channels
         % ----------------------------
         EEG = eeg_checkchanlocs(EEG);
+        if EEG.nbchan ~= length(EEG.chanlocs)
+            EEG.chanlocs = [];
+            EEG.chaninfo = [];
+            disp('Warning: the size of the channel location structure does not match with');
+            disp('         number of channels. Channel information have been removed.');
+        end;
     end;
     EEG.chaninfo.icachansind = EEG.icachansind; % just a copy for programming convinience
     
