@@ -42,19 +42,14 @@ try,
         
         option_file = fullfile(homefolder, 'eeg_options.m');
         oldp = pwd;
-        if ~isempty(dir(option_file))
-            tmpp1 = fileparts(which('eeg_options.m'));
-            tmpp2 = fileparts(which('eeglab_options.m'));
-            if strcmpi(tmpp1, pwd) && strcmpi(tmpp1, tmpp2)
-                % go to parent folder to avoid calling default eeg_option
-                % file
-                oldp = pwd;
-                cd ..;
+        try
+            if ~isempty(dir(option_file))
+                cd(homefolder);
+            else
+                tmpp2 = fileparts(which('eeglab_options.m'));
+                cd(tmpp2);
             end;
-            if strcmpi(tmpp1, tmpp2)
-                addpath(homefolder);
-            end;
-        end;
+        catch, end;
         eeg_options; % default one with EEGLAB
         cd(oldp);
     end;
