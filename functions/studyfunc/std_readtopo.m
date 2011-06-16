@@ -63,11 +63,19 @@ filename = correctfile(fullfile( ALLEEG(abset).filepath,[ ALLEEG(abset).filename
 tmpfile  = which(filename);
 if ~isempty(tmpfile), filename = tmpfile; end;
 
-while getfield(dir(filename), 'bytes') < 1000
+% 061411, 2:51pm
+% Modified by Joaquin
+% while getfield(dir(filename), 'bytes') < 1000
+i = 1;
+while getfield(dir(filename), 'bytes') < 1500
     topo = load( '-mat', filename);
     filename = correctfile(topo.file);
     tmpfile  = which(filename);
     if ~isempty(tmpfile), filename = tmpfile; end;
+    if(i>100) 
+        error('too many attempts to find valid icatopo');
+    end
+    i = i+1;
 end;
 
 for k = 1:length(comps)
