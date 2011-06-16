@@ -1808,8 +1808,11 @@ else
         100*n_ties/length(sortvar),37,n_ties,length(sortvar));
     fprintf('Distribution of number ties per unique value of sortvar:\n');
     if exist('prctile')
-        fprintf('Min: %d, 25th ptile: %d, Median: %d, 75th ptile: %d, Max: %d\n',min(tie_dist),round(prctile(tie_dist,25)), ...
-            round(median(tie_dist)),round(prctile(tie_dist,75)),max(tie_dist));
+        try
+            fprintf('Min: %d, 25th ptile: %d, Median: %d, 75th ptile: %d, Max: %d\n',min(tie_dist),round(prctile(tie_dist,25)), ...
+                round(median(tie_dist)),round(prctile(tie_dist,75)),max(tie_dist));
+        catch
+        end;
     end;
     if replace_ties==YES,
         fprintf('Trials with tied sorting values will be replaced by their mean.\n');
