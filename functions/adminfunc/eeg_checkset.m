@@ -1213,7 +1213,7 @@ for inddataset = 1:length(ALLEEG)
     % store in new structure
     % ----------------------
     if isstruct(EEG)
-        if ~exist('ALLEEGNEW')
+        if ~exist('ALLEEGNEW','var')
             ALLEEGNEW = EEG;
         else
             ALLEEGNEW(inddataset) = EEG;

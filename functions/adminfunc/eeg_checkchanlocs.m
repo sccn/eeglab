@@ -182,10 +182,11 @@ end;
 % ----------------------------------------
 function [chans, chaninfo] = insertchans(chans, chaninfo, nchans)
 if nargin < 3, nchans = length(chans); end;
-for ind = 1:length(chans)
-    chans(ind).datachan = 1;
-    if isfield(chans(ind), 'type') && isstr(chans(ind).type) && (strcmpi(chans(ind).type, 'FID') || strcmpi(chans(ind).type, 'IGNORE')), chans(ind).datachan = 0; end;
-end;
+[chans.datachan] = deal(1);
+if isfield(chans,'type')
+    mask = strcmpi({chans.type},'FID') | strcmpi({chans.type},'IGNORE');
+    [chans(mask).datachan] = deal(0);
+end
 if length(chans) > nchans & nchans ~= 0 % reference at the end of the structure
     chans(end).datachan = 0;
 end;
