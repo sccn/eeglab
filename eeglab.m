@@ -207,8 +207,7 @@ if ~iseeglabdeployed2
     else
         if ~isempty(findstr( signalpath, tmppath)) rmpath( signalpath ); end;
     end;
-    if ~license('test','optim_toolbox') || option_donotusetoolboxes
-        warning('off', 'MATLAB:dispatcher:nameConflict');
+    if ~license('test','optim_toolbox') && ~ismatlab
         addpath( optimpath );
     else
         if ~isempty(findstr( optimpath, tmppath)) rmpath( optimpath ); end;
