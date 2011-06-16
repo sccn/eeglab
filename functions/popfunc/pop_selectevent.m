@@ -43,7 +43,7 @@
 %   EEGOUT - EEG dataset with the selected events only
 %   event_indices - indexes of the selected events
 %
-%   Ex:  [EEGTARGETS,target_indices] = getevent(EEG,'type',[1 6 11 16 21]);
+%   Ex:  [EEGTARGETS,target_indices] = pop_selectevent(EEG,'type',[1 6 11 16 21]);
 %
 %        % Returns ONLY THOSE epochs containing any of the 5 specified
 %          types of target events.
