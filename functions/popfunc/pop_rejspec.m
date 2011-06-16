@@ -2,7 +2,7 @@
 %                 thresholding of frequencies in the data.
 % Usage:
 %   >>  pop_rejspec(INEEG, typerej); % pop-up interactive windo mode
-%   >> [OUTEEG, Indexes] = pop_rejspec( INEEG, typerej, elec_comp, ...
+%   >> [OUTEEG, Indices] = pop_rejspec( INEEG, typerej, elec_comp, ...
 %         lowthresh, upthresh, startfreq, endfreq, superpose, reject);
 %
 % Pop-up window options:
@@ -48,7 +48,7 @@
 %
 % Outputs:
 %   OUTEEG     - output dataset with updated spectrograms
-%   Indexes    - index of rejected sweeps
+%   Indices    - index of rejected trials
 %   Note: When eegplot() is called, modifications are applied to the current 
 %   dataset at the end of the call to eegplot() (e.g., when the user presses 
 %   the 'Reject' button).
@@ -77,12 +77,12 @@
 % 03-07-02 added srate argument to eegplot call -ad
 % 03-08-02 reworked spectrum to save space & add eeglab options -ad
 
-function [EEG, I1, com] = pop_rejspec( EEG, icacomp, varargin);
+function [EEG, Irej, com] = pop_rejspec( EEG, icacomp, varargin);
     %elecrange, negthresh, posthresh, ...
    	%startfreq, endfreq, superpose, reject);
 
-I1 = [];
-com = '';
+Irej = [];
+com  = '';
 if nargin < 1
    help pop_rejspec;
    return;
@@ -223,6 +223,7 @@ if ~isempty(rej)
     if reject
         EEG = pop_rejepoch(EEG, rej, 0);
     end;
+    Irej = find(rej);
 end;
 
 % store variables
@@ -234,9 +235,6 @@ end;
 com = [com sprintf('%s = pop_rejspec( %s, %s);', inputname(1), ...
    inputname(1), vararg2str({icacomp, 'elecrange', opt.elecrange, 'threshold', opt.threshold, 'freqlimits', opt.freqlimits, ...
      'eegplotcom', opt.eegplotcom, 'eegplotplotallrej' opt.eegplotplotallrej 'eegplotreject' opt.eegplotreject })) ]; 
-if nargin < 3 & nargout == 2
-	I1 = com;
-end;
 
 return;
 
