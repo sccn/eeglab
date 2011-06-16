@@ -38,11 +38,20 @@ YDIR  = 1;                  % positive potential up = 1; negative up = -1
 HZDIR = 'up';               % ascending freqs = 'up'; descending = 'down' 
                             % (e.g., timef/newtimef frequency direction)
 
+% font size
+GUI_FONTSIZE  = 10; % graphic interface font size
+AXES_FONTSIZE = 10; % Axis labels and legend font size
+TEXT_FONTSIZE = 10; % Miscellaneous font sizes
+
 % the eeg_options.m file also countains additional options
 
 % ----------------------------------------------------------------------
 % ------------------------ END OF DEFINITIONS --------------------------
 % ----------------------------------------------------------------------
+
+set(0,'defaultaxesfontsize',AXES_FONTSIZE);
+set(0,'defaulttextfontsize',TEXT_FONTSIZE);
+set(0,'DefaultUicontrolFontSize',GUI_FONTSIZE);
 
 TUTORIAL_URL = 'http://sccn.ucsd.edu/wiki/EEGLAB'; % online version
 DEFAULT_SRATE = 256.0175;      % default local sampling rate (rarely used)
