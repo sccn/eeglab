@@ -71,7 +71,6 @@ if nargin < 3
       
     else
         chanlocs=eeg_mergelocs(ALLEEG.chanlocs);
-        chanlocsName = ALLEEG(1).chaninfo.filename; % Added by Romain 18 Aug. 2010
         clname=result{1};
         n_tmp   = eval(  result{2} );
         index    = eval( result{3} );
