@@ -488,7 +488,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
         % format axis (BESA or MRI)
         axis equal;
         set(gca, 'cameraviewanglemode', 'manual'); % disable change size
-        camzoom(2^2);
+        camzoom(1.2^2);
         if strcmpi(g.coordformat, 'CTF'), g.view(2:3) = -g.view(2:3); end;
         view(g.view);
         %set(gca, 'cameratarget',   dat.zeroloc); % disable change size
