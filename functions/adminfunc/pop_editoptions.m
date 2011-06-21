@@ -89,7 +89,7 @@ if iseeglabdeployed
     eegoptionbackup = fullfile(eeglabexefolder,'eeg_optionsbackup.txt');
 else
     if ispc
-         homefolder = evalc('!echo %USERPROFILE%');
+         homefolder = deblank(evalc('!echo %USERPROFILE%'));
     else homefolder = '~';
     end;
     filename = fullfile(homefolder, 'eeg_options.m');
