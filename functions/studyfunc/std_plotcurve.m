@@ -16,7 +16,11 @@
 %           By default, parametric statistics are computed across subjects 
 %           in the three groups. (group,condition) ERP averages are plotted. 
 %           See below and >> help statcond 
-%           for more information about the statistical computations.
+%           for more information about the statistical computations. For 
+%           plotting multiple channels, use the second dimension. For
+%           example data = { [800x64x12] [800x64x12] } for 12 subjects, 
+%           64 channels and 800 data points. The 'chanlocs' option must be
+%           used as well to specify channel positions.
 %
 % Optional display parameters:
 %  'datatype'    - ['erp'|'spec'] data type {default: 'erp'}
