@@ -180,6 +180,10 @@ timevals = EEG(1).times;
 if ~isempty(g.timerange)
     disp('Warning: the ''timerange'' option is deprecated and has no effect');
 end;
+if isempty(X),
+    savetofile( filename, timevals, X, prefix, 1:size(X,1), options);
+    return;
+end;
 if ~isempty(g.rmbase)
     disp('Removing baseline...');
     options = { options{:} 'rmbase' g.rmbase };
