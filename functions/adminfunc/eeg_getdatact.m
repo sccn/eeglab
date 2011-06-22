@@ -59,7 +59,7 @@ function data = eeg_getdatact( EEG, varargin);
         'reshape'   'string'  { '2d','3d' }  '3d';
         'component' 'integer' {} [];        
         'samples'   'integer' {} [];        
-        'trialindices' 'integer' {} [];        
+        'trialindices' 'integer' {} [1:EEG.trials];        
         'rmcomps'   'integer' {} [] }, 'eeg_getdatact');
     
     if isstr(opt), error(opt); end;
@@ -189,7 +189,7 @@ function data = eeg_getdatact( EEG, varargin);
         error('The file size on disk does not correspond to the dataset information.');
     end;
     
-    if ~isempty(opt.trialindices)
+    if length(opt.trialindices) ~= EEG.trials
         data = data(:,:,opt.trialindices);
     end;
     if ~isempty(opt.samples)
