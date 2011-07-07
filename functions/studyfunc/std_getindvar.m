@@ -91,37 +91,53 @@ if strcmpi(mode, 'trialinfo') || strcmpi(mode, 'both')
     if isfield(setinfo, 'trialinfo')
         ff = fieldnames(setinfo(1).trialinfo);
         for index = 1:length(ff)
-            if isstr(getfield(setinfo(1).trialinfo(1), ff{index}))
-                alltmpvals = {};
-                for ind = 1:length(setinfo)
-                    if isfield(setinfo(ind).trialinfo, ff{index})
-                         eval( [ 'tmpvals = unique({ setinfo(ind).trialinfo.' ff{index} ' });' ] );
-                    else tmpvals = {};
-                    end;
-                    alltmpvals = { alltmpvals{:} tmpvals{:} };
-                end;
-                alltmpvals = unique(alltmpvals);
-                if length(alltmpvals) > 1
-                    factor{    countfact} = ff{index};
-                    factorvals{countfact} = alltmpvals;
-                    subjects{  countfact} = {};
-                    countfact = countfact + 1;
-                end;
+            % check if any of the datasets are using string for event type
+            allFieldsPresent = cellfun(@(x)(isfield(x, ff{index})), { setinfo.trialinfo });
+            if ~all(allFieldsPresent)
+                disp('Warning: dataset have non-uniform event structures, some event info was ignored');
             else
-                alltmpvals = [];
-                for ind = 1:length(setinfo)
-                    if isfield(setinfo(ind).trialinfo, ff{index})
-                         eval( [ 'tmpvals = unique([ setinfo(ind).trialinfo.' ff{index} ' ]);' ] );
-                    else tmpvals = [];
+                allFirstVal = cellfun(@(x)(getfield(x, ff{index})), { setinfo.trialinfo }, 'uniformoutput', false);
+                if any(cellfun(@isstr, allFirstVal))
+                    alltmpvals = {};
+                    for ind = 1:length(setinfo)
+                        if isfield(setinfo(ind).trialinfo, ff{index})
+                            eval( [ 'tmpTrialVals = { setinfo(ind).trialinfo.' ff{index} ' };' ] );
+                            if isnumeric(tmpTrialVals{1})
+                                % convert to string if necessary
+                                tmpTrialVals = cellfun(@num2str, tmpTrialVals, 'uniformoutput', false);
+                            end;
+                            tmpvals = unique(tmpTrialVals);
+                        else tmpvals = {};
+                        end;
+                        if isempty(alltmpvals)
+                            alltmpvals = tmpvals;
+                        else
+                            alltmpvals = { alltmpvals{:} tmpvals{:} };
+                        end;
                     end;
-                    alltmpvals = [ alltmpvals tmpvals ];
-                end;
-                alltmpvals = unique(alltmpvals);
-                if length(alltmpvals) > 1
-                    factor{    countfact} = ff{index};
-                    factorvals{countfact} = mattocell(tmpvals);
-                    subjects{  countfact} = {};
-                    countfact = countfact + 1;
+                    alltmpvals = unique(alltmpvals);
+                    if length(alltmpvals) > 1
+                        factor{    countfact} = ff{index};
+                        factorvals{countfact} = alltmpvals;
+                        subjects{  countfact} = {};
+                        countfact = countfact + 1;
+                    end;
+                else
+                    alltmpvals = [];
+                    for ind = 1:length(setinfo)
+                        if isfield(setinfo(ind).trialinfo, ff{index})
+                            eval( [ 'tmpvals = unique([ setinfo(ind).trialinfo.' ff{index} ' ]);' ] );
+                        else tmpvals = [];
+                        end;
+                        alltmpvals = [ alltmpvals tmpvals ];
+                    end;
+                    alltmpvals = unique(alltmpvals);
+                    if length(alltmpvals) > 1
+                        factor{    countfact} = ff{index};
+                        factorvals{countfact} = mattocell(tmpvals);
+                        subjects{  countfact} = {};
+                        countfact = countfact + 1;
+                    end;
                 end;
             end;
         end;
