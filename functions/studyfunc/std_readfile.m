@@ -254,14 +254,18 @@ end;
 % ---------------------------------------------
 if ~isempty(measureRange1) && ~erspFreqOnly
     [measureRange1 indBegin indEnd] = indicesselect(measureRange1, opt.timelimits);
-    if strcmpi(opt.measure, 'erp')
-         measureData = measureData(indBegin:indEnd,:,:);
-    else measureData = measureData(:,indBegin:indEnd,:);
+    if ~isempty(measureData)
+        if strcmpi(opt.measure, 'erp')
+             measureData = measureData(indBegin:indEnd,:,:);
+        else measureData = measureData(:,indBegin:indEnd,:);
+        end;
     end;
 end;
 if ~isempty(measureRange2)
     [measureRange2 indBegin indEnd] = indicesselect(measureRange2, opt.freqlimits);
-    measureData = measureData(indBegin:indEnd,:,:);
+    if ~isempty(measureData)
+        measureData = measureData(indBegin:indEnd,:,:);
+    end;
     if strcmpi(opt.measure, 'spec'), measureRange1 = measureRange2; end;
 end;
 
