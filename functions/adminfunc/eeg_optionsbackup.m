@@ -10,7 +10,7 @@ option_saveica       = 0 ;  % If set, write ICA activations to disk. This speeds
 % Memory options 
 option_single        = 1 ;  % If set, use single precision under Matlab 7.x. This saves RAM but can lead to rare numerical imprecisions. 
 option_memmapdata    = 0 ;  % If set, use memory mapped array under Matlab 7.x. This may slow down some computation. 
-option_eegobject     = 0 ;  % If set, use the EEGLAB EEG object instead of the standard EEG structure (experimental). 
+option_eegobject     = 0 ;  % If set, use the EEGLAB EEG object instead of the standard EEG structure (beta). 
 % ICA options 
 option_computeica    = 1 ;  % If set, precompute ICA activations. This requires more RAM but allows faster plotting of component activations. 
 option_scaleicarms   = 1 ;  % If set, scale ICA component activities to RMS (Root Mean Square) in microvolt (recommended).
