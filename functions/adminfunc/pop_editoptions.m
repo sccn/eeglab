@@ -88,21 +88,25 @@ if iseeglabdeployed
     filename = fullfile(eeglabexefolder,'eeg_options.txt');
     eegoptionbackup = fullfile(eeglabexefolder,'eeg_optionsbackup.txt');
 else
-    if ispc
+    % folder for eeg_options file (also update the eeglab_options)
+    if ~isempty(EEGOPTION_PATH)
+         homefolder = EEGOPTION_PATH;
+    elseif ispc
+         if ~exist('evalc'), eval('evalc = @(x)(eval(x));'); end;
          homefolder = deblank(evalc('!echo %USERPROFILE%'));
     else homefolder = '~';
     end;
     filename = fullfile(homefolder, 'eeg_options.m');
     eegoptionbackup = which('eeg_optionsbackup.m');
 end;
-fid = fopen( filename, 'r+');
+fid = fopen( filename, 'r+'); % existing file
 storelocal = 0;
 if	fid == -1
     filepath = homefolder;
     filename = 'eeg_options.m';
-    fid = fopen( fullfile(filepath, filename), 'w');
+    fid = fopen( fullfile(filepath, filename), 'w'); % new file possible?
     if fid == -1
-        error([ 'Cannot write into HOME folder: ' homefolder ]);
+        error([ 'Cannot write into HOME folder: ' homefolder 10 'You may specify another folder for the eeg_option.m' 10 'file by editing the icadefs.m file' ]);
     end;
     fclose(fid);
     delete(fullfile(filepath, filename));

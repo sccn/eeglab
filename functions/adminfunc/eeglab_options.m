@@ -35,7 +35,13 @@ try,
         eval( com2 );
     else
         eeg_optionsbackup;
-        if ispc
+        icadefs;
+        
+        % folder for eeg_options file (also update the pop_editoptions)
+        if ~isempty(EEGOPTION_PATH)
+             homefolder = EEGOPTION_PATH;
+        elseif ispc
+             if ~exist('evalc'), eval('evalc = @(x)(eval(x));'); end;
              homefolder = deblank(evalc('!echo %USERPROFILE%'));
         else homefolder = '~';
         end;
