@@ -81,7 +81,7 @@ end;
 % set variable
 % ------------
 EEG.data = reshape(EEG.data, EEG.nbchan, EEG.pnts, EEG.trials);
-oldpnts   = EEG.pnts;
+oldpnts  = EEG.pnts;
 
 % resample for multiple channels
 % -------------------------
@@ -91,14 +91,18 @@ if isfield(EEG, 'event') & isfield(EEG.event, 'type') & isstr(EEG.event(1).type)
     if ~isempty(bounds),
         disp('Data break detected and taken into account for resampling');
         bounds = [ tmpevent(bounds).latency ];
-        if bounds(1) < 0, bounds(1) = []; end; % remove initial boundary if any
+        if bounds(1) < 0,                         bounds(1  ) = []; end; % remove initial boundary if any
+        if round(bounds(end)-0.5+1) >= size(EEG.data,2), bounds(end) = []; end; % remove final boundary if any
     end;
     bounds = [1 round(bounds-0.5)+1 size(EEG.data,2)+1];
     bounds(find(bounds(2:end)-bounds(1:end-1)==0))=[]; % remove doublet boundary if any
 else 
     bounds = [1 size(EEG.data,2)+1]; % [1:size(EEG.data,2):size(EEG.data,2)*size(EEG.data,3)+1];
 end;
-if exist('resample') == 2
+eeglab_options;
+if option_donotusetoolboxes
+    usesigproc = 0;
+elseif exist('resample') == 2
      usesigproc = 1;
 else usesigproc = 0;
     disp('Signal Processing Toolbox absent: using custom interpolation instead of resample() function.');
@@ -169,6 +173,11 @@ return;
 % -----------------------------------
 function tmpeeglab = myresample(data, pnts, new_pnts, usesigproc);
     
+    if length(data) < 2
+        tmpeeglab = data;
+        return;
+    end;
+    %if size(data,2) == 1, data = data'; end;
     if usesigproc
         % padding to avoid artifacts at the beginning and at the end
         % Andreas Widmann May 5, 2011

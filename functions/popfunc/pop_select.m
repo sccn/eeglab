@@ -566,7 +566,8 @@ if ~isempty(EEG.specicaact)
     end;
 end;
 
-EEG = rmfield( EEG, {'reject','stats'});
+EEG.reject = [];
+EEG.stats  = [];
 EEG.reject.rejmanual = [];
 % for stats, can adapt remove the selected trials and electrodes
 % in the future to gain time -----------------------------------  
