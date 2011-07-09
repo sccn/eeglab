@@ -9,15 +9,28 @@ function this = subsasgn(this,index,c)
         if isempty(c) % suppression
             this(index.subs{1}) = [];
         else
-            allfields = fieldnames( c );
-
-            % create empty structure
-            tmpfields = allfields;
-            tmpfields(:,2) = cell(size(tmpfields));
-            tmpfields = tmpfields';
-            this(index.subs{1}) = struct(tmpfields{:});
+            % create empty structures if necessary
+            % not optimized for speed but compatible Octave 3.4 and Matlab
+            allfieldsori = fieldnames( this );
+            allSetIndices = [ [(length(this)+1):(min(index.subs{1})-1)] index.subs{1} ];
+            this(max(index.subs{1})) = this(1);
+            for j = 1:length(allfieldsori)
+                for i = allSetIndices
+                    this(i).EEG.(allfieldsori{j}) = [];
+                end;
+            end;
             
-            % dealing with input structure
+            % create empty structure, replaces the code above but
+            % only compatible under Matlab
+            %allfieldsori = fieldnames( this );
+            %tmpfields = allfieldsori;
+            %tmpfields(:,2) = cell(size(tmpfields));
+            %tmpfields = tmpfields';
+            %tmp = struct(tmpfields{:})
+            %this(index.subs{1}) = tmp;
+            
+            % dealing with input object and making it a compatible
+            % structure 
             if isa(c, 'eegobj')
                 c2 = struct(c);
                 c  = c2(1).EEG;
@@ -27,6 +40,7 @@ function this = subsasgn(this,index,c)
                 end;
             end;
             
+            allfields = fieldnames( c );
             for i=1:length( allfields )
                 for j = 1:length(index.subs{1})
                     this(index.subs{1}(j)).EEG.(allfields{i}) = c(min(j, length(c))).(allfields{i});
