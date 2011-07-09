@@ -181,14 +181,14 @@ for c1 = 1:length(opt.condnames)
         
         if strcmpi(opt.cond2group, 'together') && strcmpi(opt.condgroup, 'together')
             fig_title = fig_title2;
-            if ~isempty(fig_title1) && strcmpi(fig_title1(end-1:end), ', '), fig_title1(end-1:end) = []; end;
-            if ~isempty(fig_title1) && strcmpi(fig_title1(end-1:end), '- '), fig_title1(end-1:end) = []; end;
+            if ~isempty(fig_title1) && length(fig_title1) > 1 && strcmpi(fig_title1(end-1:end), ', '), fig_title1(end-1:end) = []; end;
+            if ~isempty(fig_title1) && length(fig_title1) > 1 && strcmpi(fig_title1(end-1:end), '- '), fig_title1(end-1:end) = []; end;
             alllegends{c1, c2} = fig_title1;
         else
             fig_title = [ fig_title2 fig_title1 ];
         end;
-        if ~isempty(fig_title) && strcmpi(fig_title(end-1:end), ', '), fig_title(end-1:end) = []; end;
-        if ~isempty(fig_title) && strcmpi(fig_title(end-1:end), '- '), fig_title(end-1:end) = []; end;
+        if ~isempty(fig_title) && length(fig_title) > 1 && strcmpi(fig_title(end-1:end), ', '), fig_title(end-1:end) = []; end;
+        if ~isempty(fig_title) && length(fig_title) > 1 && strcmpi(fig_title(end-1:end), '- '), fig_title(end-1:end) = []; end;
         all_titles{c1,c2}  = fig_title;
         
     end;
