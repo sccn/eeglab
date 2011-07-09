@@ -363,29 +363,35 @@ end;
 function meanpowbase = computeerspbaseline(erspbase, singletrials)
 
     len = length(erspbase(:));
+    count = 0;
     for index = 1:len
-        if strcmpi(singletrials, 'on')
-            if index == 1, meanpowbase = abs(mean(erspbase{index}/len,3));
-            else           meanpowbase = meanpowbase + abs(mean(erspbase{index}/len,3));
+        if ~isempty(erspbase{index})
+            if strcmpi(singletrials, 'on')
+                if index == 1, meanpowbase = abs(mean(erspbase{index},3));
+                else           meanpowbase = meanpowbase + abs(mean(erspbase{index},3));
+                end;
+            else
+                if index == 1, meanpowbase = abs(erspbase{index});
+                else           meanpowbase = meanpowbase + abs(erspbase{index});
+                end;
             end;
-        else
-            if index == 1, meanpowbase = abs(erspbase{index}/len);
-            else           meanpowbase = meanpowbase + abs(erspbase{index}/len);
-            end;
+            count = count+1;
         end;
     end;
-    meanpowbase = reshape(meanpowbase  , [size(meanpowbase,1) 1 size(meanpowbase,2)]);
+    meanpowbase = reshape(meanpowbase  , [size(meanpowbase,1) 1 size(meanpowbase,2)])/count;
 
 % remove ERSP baseline
 % ---------------------
 function ersp = removeerspbaseline(ersp, erspbase, meanpowbase, tottrials)
     for g = 1:size(ersp,2)        % ng = number of groups
         for c = 1:size(ersp,1)
-            erspbasetmp = reshape(erspbase{c,g}, [size(meanpowbase,1) 1 size(meanpowbase,3)]);
-            if ~isempty(tottrials{c,g}), tmpmeanpowbase = repmat(meanpowbase, [1 size(ersp{c,g},2) tottrials{c,g}]);
-            else                         tmpmeanpowbase = repmat(meanpowbase, [1 size(ersp{c,g},2) 1]);
+            if ~isempty(erspbase{c,g}) && ~isempty(ersp{c,g})
+                erspbasetmp = reshape(erspbase{c,g}, [size(meanpowbase,1) 1 size(meanpowbase,3)]);
+                if ~isempty(tottrials{c,g}), tmpmeanpowbase = repmat(meanpowbase, [1 size(ersp{c,g},2) tottrials{c,g}]);
+                else                         tmpmeanpowbase = repmat(meanpowbase, [1 size(ersp{c,g},2) 1]);
+                end;
+                ersp{c,g} = ersp{c,g} - repmat(abs(erspbasetmp), [1 size(ersp{c,g},2) 1 1]) + tmpmeanpowbase;
             end;
-            ersp{c,g} = ersp{c,g} - repmat(abs(erspbasetmp), [1 size(ersp{c,g},2) 1 1]) + tmpmeanpowbase;
         end;
     end;
    
