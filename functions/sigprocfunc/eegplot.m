@@ -1747,7 +1747,7 @@ else
   case 'topoplot'
     fig = varargin{1};
     g = get(fig,'UserData');
-    if ~isstruct(g.eloc_file) || ~isfield(g.eloc_file, 'theta') || isempty( [ g.elocfile.theta ])
+    if ~isstruct(g.eloc_file) || ~isfield(g.eloc_file, 'theta') || isempty( [ g.eloc_file.theta ])
         return;
     end;
     ax1 = findobj('tag','backeeg','parent',fig); 
