@@ -51,6 +51,10 @@ end;
 % ------------------
 if isstr(filename)
     locs  = loadtxt( filename );
+    if size(locs,2) > 4 % new format
+        chanlocs = readlocs('128.DAT', 'filetype', 'custom', 'format', { 'labels' 'ignore' '-Y' 'X' 'Z' });
+        return;
+    end;
 end;
 
 if ~isstr(filename) | locs{1,1}(1) == ';' | size(locs,2) < 5
