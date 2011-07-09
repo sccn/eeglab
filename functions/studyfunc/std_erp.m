@@ -180,30 +180,28 @@ timevals = EEG(1).times;
 if ~isempty(g.timerange)
     disp('Warning: the ''timerange'' option is deprecated and has no effect');
 end;
-if isempty(X),
-    savetofile( filename, timevals, X, prefix, 1:size(X,1), options);
-    return;
-end;
-if ~isempty(g.rmbase)
-    disp('Removing baseline...');
-    options = { options{:} 'rmbase' g.rmbase };
-    [tmp timebeg] = min(abs(timevals - g.rmbase(1)));
-    [tmp timeend] = min(abs(timevals - g.rmbase(2)));
-    if ~isempty(timebeg)
-        X = rmbase(X,pnts, [timebeg:timeend]);
-    else
-        X = rmbase(X,pnts);
+if ~isempty(X)
+    if ~isempty(g.rmbase)
+        disp('Removing baseline...');
+        options = { options{:} 'rmbase' g.rmbase };
+        [tmp timebeg] = min(abs(timevals - g.rmbase(1)));
+        [tmp timeend] = min(abs(timevals - g.rmbase(2)));
+        if ~isempty(timebeg)
+            X = rmbase(X,pnts, [timebeg:timeend]);
+        else
+            X = rmbase(X,pnts);
+        end
     end
-end
-X = reshape(X, [ size(X,1) pnts trials ]);
-if strcmpi(prefix, 'comp')
-    if strcmpi(g.savetrials, 'on')
-        X = repmat(sqrt(mean(EEG(1).icawinv.^2))', [1 EEG(1).pnts size(X,3)]) .* X;
-    else
-        X = repmat(sqrt(mean(EEG(1).icawinv.^2))', [1 EEG(1).pnts]) .* mean(X,3); % calculate ERP
+    X = reshape(X, [ size(X,1) pnts trials ]);
+    if strcmpi(prefix, 'comp')
+        if strcmpi(g.savetrials, 'on')
+            X = repmat(sqrt(mean(EEG(1).icawinv.^2))', [1 EEG(1).pnts size(X,3)]) .* X;
+        else
+            X = repmat(sqrt(mean(EEG(1).icawinv.^2))', [1 EEG(1).pnts]) .* mean(X,3); % calculate ERP
+        end;
+    elseif strcmpi(g.savetrials, 'off')
+        X = mean(X, 3);
     end;
-elseif strcmpi(g.savetrials, 'off')
-    X = mean(X, 3);
 end;
 
 % Save ERPs in file (all components or channels)
