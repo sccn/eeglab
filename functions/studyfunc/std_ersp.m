@@ -344,10 +344,23 @@ for k = 1:length(g.indices)  % for each (specified) component
     % ------------------------
     timefdata  = reshape(X(k,pointrange,:), 1, length(pointrange)*size(X,3));
     if strcmpi(g.plot, 'on'), figure; end;
+    flagEmpty = 0;
+    if isempty(timefdata)
+        flagEmpty = 1;
+        timefdata = rand(1,length(pointrange));
+    end;
     [logersp,logitc,logbase,times,logfreqs,logeboot,logiboot,alltfX] ...
           = newtimef( timefdata, length(pointrange), g.timelimits, EEG(1).srate, tmpparams{2:end});
     %figure; newtimef( TMP.data(32,:), EEG.pnts, [EEG.xmin EEG.xmax]*1000, EEG.srate, cycles, 'freqs', freqs);
     %figure; newtimef( timefdata, length(pointrange), g.timelimits, EEG.srate, cycles, 'freqs', freqs);
+    if flagEmpty
+        logersp = [];
+        logitc  = [];
+        logbase = [];
+        logeboot = [];
+        logiboot = [];
+        alltfX   = [];
+    end;
     if strcmpi(g.plot, 'on'), return; end;
 
     all_ersp = setfield( all_ersp, [ prefix int2str(g.indices(k)) '_ersp'     ], single(logersp ));
