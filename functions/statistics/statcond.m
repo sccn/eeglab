@@ -48,7 +48,7 @@
 %                for parametric statistics using unpaired t-test. It allows
 %                to compute a more accurate value for the degree of freedom
 %                using the formula for inhomogenous variance (see
-%                ttest2_cell function). Default is 'homegenous'.
+%                ttest2_cell function). Default is 'inhomegenous'.
 %
 % Outputs:
 %   stats      = F- or T-value array of the same size as input data without 
@@ -140,7 +140,7 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
                                      'mode'       'string'    { 'param','perm','bootstrap' }  'param';
                                      'paired'     'string'    { 'on','off' }      'on'; 
                                      'arraycomp'  'string'    { 'on','off' }      'on'; 
-                                     'variance'   'string'    { 'homogenous','inhomogenous' }      'homogenous'; 
+                                     'variance'   'string'    { 'homogenous','inhomogenous' }      'inhomogenous'; 
                                      'returnresamplingarray' 'string'    { 'on','off' }      'off'; 
                                      'verbose'    'string'    { 'on','off' }      'on' }, 'statcond');
         if isstr(g), error(g); end;
