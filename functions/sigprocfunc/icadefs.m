@@ -29,8 +29,10 @@
 % ------ EEGLAB DEFINITION - YOU MAY CHANGE THE TEXT BELOW -------------
 % ----------------------------------------------------------------------
 
-% INSERT location of ica executable for binica.m below
-ICABINARY = '/data/common/matlab/eeglab/functions/resources/ica_linux'; 
+EEGOPTION_PATH = ''; % if empty, the home folder of the current user is used
+                     % Note that this may create problems under Windows
+                     % when unicode characters are part of the user name
+                     % In this case, enter the path name manually here.
 
 YDIR  = 1;                  % positive potential up = 1; negative up = -1 
                             % for most ERP plots
@@ -49,9 +51,17 @@ TEXT_FONTSIZE = 10; % Miscellaneous font sizes
 % ------------------------ END OF DEFINITIONS --------------------------
 % ----------------------------------------------------------------------
 
-set(0,'defaultaxesfontsize',AXES_FONTSIZE);
-set(0,'defaulttextfontsize',TEXT_FONTSIZE);
-set(0,'DefaultUicontrolFontSize',GUI_FONTSIZE);
+% INSERT location of ica executable (LINUX ONLY) for binica.m below
+eeglab_p = fileparts(which('eeglab'));
+ICABINARY = fullfile(eeglab_p, 'functions', 'resources', 'ica_linux'); 
+
+try
+    set(0,'defaultaxesfontsize',AXES_FONTSIZE);
+    set(0,'defaulttextfontsize',TEXT_FONTSIZE);
+    set(0,'DefaultUicontrolFontSize',GUI_FONTSIZE);
+catch
+    % most likely Octave here
+end;
 
 TUTORIAL_URL = 'http://sccn.ucsd.edu/wiki/EEGLAB'; % online version
 DEFAULT_SRATE = 256.0175;      % default local sampling rate (rarely used)
