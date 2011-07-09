@@ -128,8 +128,8 @@ if ~isstr(varargin{1}) %intial settings
 	{'style' 'text'       'string' 'ITCs' 'horizontalalignment' 'center' }, {'link2lines' 'style'  'text'   'string' '' } {} {} {}, ...
     guiadd2{:}, ...
     {}, ...
-    {'style' 'checkbox'   'string' 'Save single-trial measures for single-trial statistics - requires disk space' 'tag' 'savetrials_on' 'value' 0 } {}, ...
-    {'style' 'checkbox'   'string' 'Recompute even if present on disk' 'tag' 'recomp_on' 'value' 0 } {}, ...
+    {'style' 'checkbox'   'string' 'Save single-trial measures for single-trial statistics (beta) - requires disk space' 'tag' 'savetrials_on' 'value' 0 } {}, ...
+    {'style' 'checkbox'   'string' 'Overwrite files on disk' 'tag' 'recomp_on' 'value' 1 } {}, ...
     };
   
 	%{'style' 'checkbox'   'string' '' 'tag' 'precomp_PCA'  'Callback' precomp_PCA 'value' 0} ...
@@ -167,6 +167,7 @@ if ~isstr(varargin{1}) %intial settings
     if ~isfield(os, 'interpolate_on'), os.interpolate_on = 0; end;
     if ~isfield(os, 'scalp_on'),    os.scalp_on = 0; end;
     if ~isfield(os, 'compallersp'), os.compallersp = 0; end;
+    warnflag = 0;
     
     % rm_ica option is on
     % -------------------
@@ -215,6 +216,7 @@ if ~isstr(varargin{1}) %intial settings
         if ~isempty(os.erp_base)
             options = { options{:} 'rmbase' str2num(os.erp_base) };
         end
+        warnflag = checkFilePresent(STUDY, 'erp', comps, warnflag, os.recomp_on);
     end
     
     % SCALP option is on
@@ -228,6 +230,7 @@ if ~isstr(varargin{1}) %intial settings
     if os.spectra_on== 1 
         tmpparams = eval( [ '{' os.spec_params '}' ] );
         options = { options{:} 'spec' 'on' 'specparams' tmpparams };
+        warnflag = checkFilePresent(STUDY, 'spec', comps, warnflag, os.recomp_on);
     end
     
     % ERSP option is on
@@ -235,6 +238,7 @@ if ~isstr(varargin{1}) %intial settings
     if os.ersp_on  == 1 
         tmpparams = eval( [ '{' os.ersp_params '}' ] );
         options = { options{:} 'ersp' 'on' 'erspparams' tmpparams };
+        warnflag = checkFilePresent(STUDY, 'ersp', comps, warnflag, os.recomp_on);
     end
     
     % ITC option is on 
@@ -243,6 +247,7 @@ if ~isstr(varargin{1}) %intial settings
         tmpparams = eval( [ '{' os.ersp_params '}' ] );
         options = { options{:} 'itc' 'on' };
         if os.ersp_on  == 0, options = { options{:} 'erspparams' tmpparams }; end;
+        warnflag = checkFilePresent(STUDY, 'itc', comps, warnflag, os.recomp_on);
     end       
         
     % evaluate command
@@ -372,3 +377,28 @@ else
     end;
 end
 STUDY.saved = 'no';
+
+% check if file is present
+% ------------------------
+function warnflag = checkFilePresent(STUDY, datatype, comps, warnflag, recompute);
+    
+    if ~recompute, return; end;
+    if warnflag, return; end; % warning has already been issued
+    
+    if comps
+         dataFilename = [ STUDY.design(STUDY.currentdesign).cell(1).filebase '.ica' datatype ];
+    else dataFilename = [ STUDY.design(STUDY.currentdesign).cell(1).filebase '.dat' datatype ];
+    end;
+    if exist(dataFilename)
+        textmsg = [ 'WARNING: SOME DATAFILES ALREADY EXIST, OVERWRITE THEM?' 10 ...
+                    '(if you have another STUDY using the same datasets, it might overwrite its' 10 ...
+                    'precomputed data files. Instead, use a single STUDY and create multiple designs).' ];
+        res = questdlg2(textmsg, 'Precomputed datafiles already present on disk', 'No', 'Yes', 'Yes');
+        if strcmpi(res, 'No')
+            error('User aborded precomputing measures');
+        end;
+    end;
+    warnflag = 1;
+    
+       
+
