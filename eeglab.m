@@ -184,7 +184,6 @@ end;
 % ---------
 if ~iseeglabdeployed2
     myaddpath( eeglabpath, 'eeg_checkset.m',   [ 'functions' filesep 'adminfunc'        ]);
-    eeglab_options;
     myaddpath( eeglabpath, 'memmapdata.m', 'functions');
     myaddpath( eeglabpath, 'readeetraklocs.m', [ 'functions' filesep 'sigprocfunc'      ]);
     myaddpath( eeglabpath, 'supergui.m',       [ 'functions' filesep 'guifunc'          ]);
@@ -195,6 +194,7 @@ if ~iseeglabdeployed2
     myaddpath( eeglabpath, 'icademo.m',        [ 'functions' filesep 'miscfunc'         ]);
     myaddpath( eeglabpath, 'eeglab1020.ced',   [ 'functions' filesep 'resources'        ]);
     myaddpath( eeglabpath, 'startpane.m',      [ 'functions' filesep 'javachatfunc' ]);
+    eeglab_options;
     
     % add path if toolboxes are missing
     % ---------------------------------
@@ -213,15 +213,6 @@ if ~iseeglabdeployed2
         if ~isempty(findstr( optimpath, tmppath)) rmpath( optimpath ); end;
     end;
     
-    % add path for Octave
-    % -------------------
-    if ~ismatlab
-        myaddpath( eeglabpath, 'isoctave.m',   [ 'functions' filesep 'octavefunc' ]);
-    else
-        if exist('isoctave.m', 'file')
-            rmpath(fullfile(eeglabpath, 'functions', 'octavefunc'));
-        end;
-    end;
     myaddpath( eeglabpath, 'eegplugin_dipfit', 'plugins');
 else
     eeglab_options;
@@ -573,7 +564,7 @@ if ismatlab
     uimenu( neuro_m, 'Label', 'From ASCII/float file or Matlab array', 'CallBack', cb_importdata);
     uimenu( neuro_m, 'Label', 'From Netstation binary simple file'   , 'CallBack', cb_readegi,    'Separator', 'on'); 
     uimenu( neuro_m, 'Label', 'From Multiple seg. Netstation files'  , 'CallBack', cb_readsegegi); 
-    uimenu( neuro_m, 'Label', 'From Netstation Epoch Matlab files'   , 'CallBack', cb_readegiepo); 
+    uimenu( neuro_m, 'Label', 'From Netstation Matlab files'         , 'CallBack', cb_readegiepo); 
     uimenu( neuro_m, 'Label', 'From BCI2000 ASCII file'              , 'CallBack', cb_loadbci,    'Separator', 'on'); 
     uimenu( neuro_m, 'Label', 'From Snapmaster .SMA file'            , 'CallBack', cb_snapread,   'Separator', 'on'); 
     uimenu( neuro_m, 'Label', 'From Neuroscan .CNT file'             , 'CallBack', cb_loadcnt,    'Separator', 'on'); 
