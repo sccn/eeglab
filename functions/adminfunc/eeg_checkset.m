@@ -337,8 +337,32 @@ for inddataset = 1:length(ALLEEG)
                     [EEG res] = eeg_checkset(EEG);
                     if isempty(EEG.event), return; end;
                     
+                    % check boundary events
+                    % ---------------------
+                    tmpevent = EEG.event;
+                    if isfield(tmpevent, 'type') && ~isnumeric(tmpevent(1).type)
+                        boundsInd = strmatch('boundary', { tmpevent.type });
+                        if ~isempty(boundsInd),
+                            bounds = [ tmpevent(boundsInd).latency ];
+                            % remove last event if necessary
+                            if round(bounds(end)-0.5+1) >= size(EEG.data,2), EEG.event(boundsInd(end)) = []; bounds(end) = []; end; % remove final boundary if any
+                            % The first boundary below need to be kept for
+                            % urevent latency calculation
+                            % if bounds(1) < 0, EEG.event(bounds(1))   = []; end; % remove initial boundary if any
+                            indDoublet = find(bounds(2:end)-bounds(1:end-1)==0);
+                            if ~isempty(indDoublet)
+                                disp('Warning: duplicate boundary event removed');
+                                for indBound = 1:length(indDoublet)
+                                    EEG.event(boundsInd(indDoublet+1)).duration = EEG.event(boundsInd(indDoublet+1)).duration+EEG.event(boundsInd(indDoublet)).duration;
+                                end;
+                                EEG.event(boundsInd(indDoublet)) = [];
+                            end;
+                        end;
+                    end;
+                    
                     % remove the events which latency are out of boundary
                     % ---------------------------------------------------
+                    if isempty(EEG.event), return; end;
                     if isfield(EEG.event, 'latency')
                         if ischar(EEG.event(1).type)
                             if strcmpi(EEG.event(1).type, 'boundary') & isfield(EEG.event, 'duration')
@@ -755,7 +779,8 @@ for inddataset = 1:length(ALLEEG)
         end;
     end;
     
-    % parameters consistency -------------------------
+    % parameters consistency 
+    % -------------------------
     if round(EEG.srate*(EEG.xmax-EEG.xmin)+1) ~= EEG.pnts
         fprintf( 'eeg_checkset note: upper time limit (xmax) adjusted so (xmax-xmin)*srate+1 = number of frames\n');
         if EEG.srate == 0
@@ -1077,7 +1102,7 @@ for inddataset = 1:length(ALLEEG)
             EEG.ref = EEG.nbchan+1;
         end;
     end;
-    
+        
     % DIPFIT structure
     % ----------------
     if ~isfield(EEG,'dipfit') || isempty(EEG.dipfit)
