@@ -78,7 +78,11 @@ EEG.trials   = nepoch;
 EEG.pnts     = size(EEG.data,2)/nepoch;
 
 if isfield(dat, 'Label') & ~isempty(dat.Label)
-    EEG.chanlocs = struct('labels', cellstr(char(dat.Label)));
+    if isstr(dat.Label)
+        EEG.chanlocs = struct('labels', cellstr(char(dat.Label)));
+    else
+        EEG.chanlocs = struct('labels', dat.Label(1:min(length(dat.Label), size(EEG.data,1))));
+    end;
     if ~isempty(channels)
         EEG.chanlocs = EEG.chanlocs(channels);
     end;
