@@ -267,8 +267,8 @@ for c = 1:ncplot
                             if cc == 1 && gg == 1, tmpdata = NaN*zeros([size(tmptmpdata,1) size(tmptmpdata,2) maxdim length(data(:))]); end;
                             tmpdata(:,:,1:size(tmptmpdata,3),gg+((cc-1)*ng)) = tmptmpdata;
                         else
-                            if cc == 1 && gg == 1, tmpdata = NaN*zeros([size(tmptmpdata,1) maxdim length(data(:))]); end;
-                            tmpdata(:,1:size(tmptmpdata,2),gg+((cc-1)*ng))   = tmptmpdata;
+                            if cc == 1 && gg == 1, tmpdata = NaN*zeros([size(tmptmpdata,1) 1 maxdim length(data(:))]); end;
+                            tmpdata(:,1,1:size(tmptmpdata,2),gg+((cc-1)*ng)) = tmptmpdata;
                         end;
                     end;
                 end;
@@ -279,9 +279,10 @@ for c = 1:ncplot
                     if dimreduced_sizediffers
                         tmptmpdata = nan_mean(tmptmpdata,ndims(tmptmpdata));
                     end;
-                    if cc == 1, tmpdata = zeros([size(tmptmpdata) nc]); end;
+                    if cc == 1 && ndims(tmptmpdata) == 3, tmpdata = zeros([size(tmptmpdata) nc]); end;
+                    if cc == 1 && ndims(tmptmpdata) == 2, tmpdata = zeros([size(tmptmpdata,1) 1 size(tmptmpdata,2) nc]); end;
                     if ndims(tmptmpdata) == 3, tmpdata(:,:,:,cc) = tmptmpdata; 
-                    else                       tmpdata(:,:,cc)   = tmptmpdata; 
+                    else                       tmpdata(:,1,:,cc) = tmptmpdata; 
                     end;
                 end;
             elseif ngplot ~= ng % plot groups together
@@ -291,12 +292,18 @@ for c = 1:ncplot
                     if dimreduced_sizediffers
                         tmptmpdata = nan_mean(tmptmpdata,ndims(tmptmpdata));
                     end;
-                    if gg == 1, tmpdata = zeros([size(tmptmpdata) nc]); end;
+                    if gg == 1 && ndims(tmptmpdata) == 3, tmpdata = zeros([size(tmptmpdata) ng]); end;
+                    if gg == 1 && ndims(tmptmpdata) == 2, tmpdata = zeros([size(tmptmpdata,1) 1 size(tmptmpdata,2) ng]); end;
                     if ndims(tmptmpdata) == 3, tmpdata(:,:,:,gg) = tmptmpdata; 
-                    else                       tmpdata(:,:,gg)   = tmptmpdata; 
+                    else                       tmpdata(:,1,:,gg) = tmptmpdata; 
                     end;
                 end;
-            else tmpdata = real(data{c,g}); 
+            else
+                if strcmpi(opt.plottopo, 'on')
+                    tmpdata = real(data{c,g});
+                else
+                    tmpdata = reshape(real(data{c,g}), [size(data{c,g},1) 1 size(data{c,g},2)]); % 1 channel only
+                end;
                 % nothing
             end;
             
@@ -323,11 +330,11 @@ for c = 1:ncplot
             % plotting options
             % ----------------
             plotopt = { allx };
-            if ~dimreduced_sizediffers
-                if strcmpi(opt.plottopo, 'on'),
-                    if strcmpi(opt.plotsubjects, 'off') tmpstd = squeeze(real(std(tmpdata,[],3)))/sqrt(size(tmpdata,3)); tmpstd = squeeze(permute(tmpstd, [2 1 3])); tmpdata = squeeze(real(nan_mean(tmpdata,3))); end;
-                elseif strcmpi(opt.plotsubjects, 'off') tmpstd = squeeze(real(std(tmpdata,[],2)))/sqrt(size(tmpdata,2)); tmpstd = squeeze(permute(tmpstd, [2 1 3])); tmpdata = squeeze(real(nan_mean(tmpdata,2))); 
-                end;
+            % -------------------------------------------------------------
+            % tmpdata is of size "points x channels x subject x conditions"
+            % -------------------------------------------------------------
+            if ~dimreduced_sizediffers && strcmpi(opt.plotsubjects, 'off')
+                tmpstd = squeeze(real(std(tmpdata,[],3)))/sqrt(size(tmpdata,3)); tmpstd = squeeze(permute(tmpstd, [2 1 3])); tmpdata = squeeze(real(nan_mean(tmpdata,3)));
             end;
             tmpdata = squeeze(permute(tmpdata, [2 1 3]));
             if strcmpi(opt.plottopo, 'on'), highlight = 'background'; else highlight = 'bottom'; end;
