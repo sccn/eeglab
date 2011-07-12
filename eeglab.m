@@ -196,6 +196,12 @@ if ~iseeglabdeployed2
     myaddpath( eeglabpath, 'startpane.m',      [ 'functions' filesep 'javachatfunc' ]);
     eeglab_options;
     
+    % remove path to to fmrlab if neceecessary
+    path_runica = fileparts(which('runica'));
+    if length(path_runica) > 6 && strcmpi(path_runica(end-5:end), 'fmrlab')
+        rmpath(path_runica);
+    end;
+
     % add path if toolboxes are missing
     % ---------------------------------
     tmppath = path;
