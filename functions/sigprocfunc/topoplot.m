@@ -466,7 +466,7 @@ if nargs > 2
 	      ECOLOR = Value{2};
           end
           if length(Value) > 2
-	      EMARKERSIZE2 = Value{3};
+	      EMARKERSIZE = Value{3};
           end
           if length(Value) > 3
 	      EMARKERLINEWIDTH = Value{4};
