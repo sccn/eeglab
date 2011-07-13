@@ -223,6 +223,7 @@ if ~isempty(addoptions), g.options = { g.options{:} addoptions{:}}; end;
 % ----------------------------------------------------
 if length(g.dataset) == 1
     EEG = ALLEEG(g.dataset);
+    EEG = eeg_checkset(EEG, 'loaddata');
 elseif length(ALLEEG) > 1 & ~strcmpi(g.concatenate, 'on') & ~strcmpi(g.concatcond, 'on')
     [ ALLEEG com ] = eeg_eval( 'pop_runica', ALLEEG, 'warning', 'off', 'params', ...
            { 'icatype' g.icatype 'options' g.options 'chanind' g.chanind } );
@@ -241,12 +242,13 @@ elseif length(ALLEEG) > 1 & strcmpi(g.concatcond, 'on')
         if ~alltags(index)
             allinds = strmatch(allsubjects{index}, allsubjects, 'exact');
             rmind = [];
-            for tmpi = 2:length(allinds)
-                if ~isequal(allsessions(allinds(1)), allsessions(allinds(tmpi))), rmind = [rmind tmpi];
-                elseif ~isequal(allgroups(allinds(1)), allgroups(allinds(tmpi))), rmind = [rmind tmpi]; 
+            % if we have different sessions they will not be concatenated
+            for tmpi = setdiff(allinds,index)'
+                if ~isequal(allsessions(index), allsessions(tmpi)), rmind = [rmind tmpi];
+                %elseif ~isequal(allgroups(index), allgroups(tmpi)), rmind = [rmind tmpi]; 
                 end;
             end;
-            allinds(rmind) = [];
+            allinds = setdiff(allinds, rmind);
             fprintf('Found %d datasets for subject ''%s''\n', length(allinds), allsubjects{index});
             dats = { dats{:} allinds };
             alltags(allinds) = 1;
