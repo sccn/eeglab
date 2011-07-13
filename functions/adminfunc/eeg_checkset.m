@@ -341,7 +341,9 @@ for inddataset = 1:length(ALLEEG)
                     % ---------------------
                     tmpevent = EEG.event;
                     if isfield(tmpevent, 'type') && ~isnumeric(tmpevent(1).type)
-                        boundsInd = strmatch('boundary', { tmpevent.type });
+                        allEventTypes = { tmpevent.type };
+                        allEventTypes = cellfun(@num2str, allEventTypes, 'uniformoutput', false);
+                        boundsInd = strmatch('boundary', allEventTypes);
                         if ~isempty(boundsInd),
                             bounds = [ tmpevent(boundsInd).latency ];
                             % remove last event if necessary
