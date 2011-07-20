@@ -10,7 +10,7 @@
 %                merging, outlier rejection, and cluster renaming. Components can also be 
 %                moved from one cluster to another or to the outlier cluster. 
 % Usage:    
-%                >> STUDY = pop_clustedit(STUDY, ALLEEG, clusters);   
+%                >> STUDY = pop_clustedit(STUDY, ALLEEG, clusters, addui, addgeom);   
 % Inputs:
 %   ALLEEG     - Top-level EEGLAB vector of loaded EEG structures for the dataset(s) 
 %                in the STUDY. ALLEEG for a STUDY set is typically loaded using 
@@ -24,6 +24,9 @@
 %                either originate from the same clustering (same pre_clustering() and 
 %                subsequent pop_clust() execution), or they must all be leaf clusters 
 %                (i.e., clusters with no child clusters) {default: all leaf clusters}.
+%   addui      - [cell array] additional uicontrols entries for the graphic interface.
+%   addgeom    - [cell array] additional geometry for the additional uicontrol entries.
+%
 % Outputs:
 %   STUDY      - The input STUDY set structure modified according to specified user edits,
 %                if any. Plotted cluster measure means (maps, ERSPs, etc.) are added to 
@@ -172,7 +175,7 @@ if ~isstr(varargin{1})
     STUDY.history = '';
     ALLEEG = varargin{2};
     clus_comps = 0; % the number of clustered components
-    if nargin > 2 % load specific clusters
+    if nargin > 2 && ~isempty(varargin{3}) % load specific clusters
         cls = varargin{3}; %cluster numbers
         N = length(cls); %number of clusters
         
@@ -341,6 +344,7 @@ if ~isstr(varargin{1})
     if length(cls) > 1, vallist = 1; else vallist = 2; end;
     geometry = { [4 .1 .1 .1 .1] [1] [1 0.3 1] [1 0.3 1] [1 0.3 1] [1 0.3 1] [1 0.3 1] [1 0.3 1] [1 0.3 1] ...
                  [1 0.3 1] [1 0.3 1] [1] [1 0.3 1] [1 0.3 1] [1 0.3 1] };
+    geomvert = [ 1 .5 1 3 1 1 1 1 1 1 1 1 1 1 1];
     uilist   = { ...
         {'style' 'text' 'string' str_name ...
             'FontWeight' 'Bold' 'HorizontalAlignment' 'center'} {} {} {} {} {} ...
@@ -372,11 +376,24 @@ if ~isstr(varargin{1})
         {'style' 'pushbutton' 'string' 'Remove selected outlier comps.' 'Callback' move_outlier} ...
         {'style' 'pushbutton' 'string' 'Merge clusters' 'Callback' merge_clusters 'enable' 'off' } {} ...
         {'style' 'pushbutton' 'string' 'Auto-reject outlier components' 'Callback' reject_outliers 'enable' 'off' } };
-    
+   
+   % additional UI given on the command line
+   % ---------------------------------------
+   if nargin > 3
+       addui = varargin{4};
+       if nargin > 4
+            addgeom = varargin{5};
+       else addgeom = mat2cell(ones(1,length(addui)));
+       end;
+       uilist = { uilist{:}, addui{:} };
+       geometry = { geometry{:} addgeom{:} };
+       geomvert = [ geomvert ones(1,length(addgeom)) ];
+   end;
+   
    [out_param userdat] = inputgui( 'geometry' , geometry, 'uilist', uilist, ...
                                    'helpcom', 'pophelp(''pop_clustoutput'')', ...
                                    'title', 'View and edit current component clusters -- pop_clustedit()' , 'userdata', fig_arg, ...
-                                   'geomvert', [ 1 .5 1 3 1 1 1 1 1 1 1 1 1 1 1], 'eval', show_clust );
+                                   'geomvert', geomvert, 'eval', show_clust );
 	
    if ~isempty(userdat)
        ALLEEG = userdat{1}{1};
