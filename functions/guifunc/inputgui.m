@@ -11,7 +11,7 @@
 %             inputgui( 'key1', 'val1', 'key2', 'val2', ... );
 % 
 % Inputs:
-%   'geom '      - cell array of cell array of integer vector. Each cell
+%   'geom'       - cell array of cell array of integer vector. Each cell
 %                  array defines the coordinate of a given input in the 
 %                  following manner: { nb_row nb_col [x_topcorner y_topcorner]
 %                  [x_bottomcorner y_bottomcorner] };
@@ -33,6 +33,7 @@
 %                  input (fignumber). Default is 'normal'.
 %   'eval'       - [string] command to evaluate at the end of the creation 
 %                  of the GUI but before waiting for user input. 
+%   'screenpos'  - see supergui.m help message.
 %
 % Output:
 %   outparam   - list of outputs. The function scans all lines and
@@ -106,6 +107,7 @@ g = finputcheck(options, { 'geom'     'cell'                []      {}; ...
                            'eval'     'string'              []      ''; ...
                            'userdata' ''                    []      []; ...
                            'getresult' 'real'               []      []; ...
+                           'screenpos' ''                   []      []; ...
                            'mode'     ''                    []      'normal'; ...
                            'geomvert' 'real'                []       [] ...
                           }, 'inputgui');
@@ -153,11 +155,11 @@ if isempty(g.getresult)
         g.uilist = { g.uilist{:}, { 'width' 80 'align' 'right' 'Style', 'pushbutton', 'string', 'Cancel', 'tag' 'cancel' 'callback', 'close gcbf' } };
         g.uilist = { g.uilist{:}, { 'width' 80 'align' 'right' 'stickto' 'on' 'Style', 'pushbutton', 'tag', 'ok', 'string', 'OK', 'callback', 'set(gcbo, ''userdata'', ''retuninginputui'');' } };
         if ~isempty(g.geom)
-            [tmp tmp2 allobj] = supergui( 'fig', fig, 'minwidth', 200, 'geom', g.geom, 'uilist', g.uilist );
+            [tmp tmp2 allobj] = supergui( 'fig', fig, 'minwidth', 200, 'geom', g.geom, 'uilist', g.uilist, 'screenpos', g.screenpos );
         elseif isempty(g.geomvert)
-            [tmp tmp2 allobj] = supergui( 'fig', fig, 'minwidth', 200, 'geomhoriz', g.geometry, 'uilist', g.uilist );
+            [tmp tmp2 allobj] = supergui( 'fig', fig, 'minwidth', 200, 'geomhoriz', g.geometry, 'uilist', g.uilist, 'screenpos', g.screenpos );
         else
-            [tmp tmp2 allobj] = supergui( 'fig', fig, 'minwidth', 200, 'geomhoriz', g.geometry, 'uilist', g.uilist, 'geomvert', [g.geomvert(:)' 1 1] );
+            [tmp tmp2 allobj] = supergui( 'fig', fig, 'minwidth', 200, 'geomhoriz', g.geometry, 'uilist', g.uilist, 'screenpos', g.screenpos, 'geomvert', [g.geomvert(:)' 1 1] );
         end;
     else 
         fig = g.mode;

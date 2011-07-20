@@ -48,6 +48,9 @@
 %                spacing values are fixed. Proportional means that they
 %                depend on the number of element in a line.
 %   'minwidth' - [integer] minimal width in pixels. Default is none.
+%   'screenpos' - [x y] position of the right top corner of the graphic
+%                interface. 'center' may also be used to center the GUI on
+%                the screen.
 %
 % Hint:
 %    use 'print -mfile filemane' to save a matlab file of the figure.
@@ -113,6 +116,7 @@ g = finputcheck(options, { 'geomhoriz' 'cell'   []      {};
                            'title'     'string' []      '';
                            'userdata'  ''       []      [];
                            'geomvert'  'real'   []      [];
+                           'screenpos' { 'real' 'string' } [] [];
                            'horizontalalignment'  'string'   { 'left','right','center' } 'left';
                            'minwidth'  'real'   []      10;
                            'borders'   'real'   []      [0.05 0.04 0.07 0.06];
@@ -399,6 +403,20 @@ hh =findobj(allhandlers, 'parent', g.fig, 'style', 'radio');
 set(hh, 'foregroundcolor', GUITEXTCOLOR);
 set(hh, 'backgroundcolor', GUIPOPBUTTONCOLOR);
 set(g.fig, 'visible', 'on');
+
+% screen position
+% ---------------
+if ~isempty(g.screenpos)
+    pos = get(g.fig, 'position');
+    if isnumeric(g.screenpos)
+        set(g.fig, 'position', [ g.screenpos pos(3) pos(4)]);
+    else
+        screenSize = get(0, 'screensize');
+        pos(1) = (screenSize(3)-pos(3))/2;
+        pos(2) = (screenSize(4)-pos(4))/2+pos(4);
+        set(g.fig, 'position', pos);
+    end;
+end;    
 
 % set userdata and title
 % ----------------------
