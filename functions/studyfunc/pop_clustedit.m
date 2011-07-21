@@ -24,8 +24,8 @@
 %                either originate from the same clustering (same pre_clustering() and 
 %                subsequent pop_clust() execution), or they must all be leaf clusters 
 %                (i.e., clusters with no child clusters) {default: all leaf clusters}.
-%   addui      - [cell array] additional uicontrols entries for the graphic interface.
-%   addgeom    - [cell array] additional geometry for the additional uicontrol entries.
+%   addui      - [struct] additional uicontrols entries for the graphic
+%                interface. Must contains the fiels "uilist", "geometry".
 %
 % Outputs:
 %   STUDY      - The input STUDY set structure modified according to specified user edits,
@@ -381,13 +381,15 @@ if ~isstr(varargin{1})
    % ---------------------------------------
    if nargin > 3
        addui = varargin{4};
-       if nargin > 4
-            addgeom = varargin{5};
-       else addgeom = mat2cell(ones(1,length(addui)));
+       if ~isfield(addui, 'uilist')
+           error('Additional GUI definition (argument 4) requires the field "uilist"');
        end;
-       uilist = { uilist{:}, addui{:} };
-       geometry = { geometry{:} addgeom{:} };
-       geomvert = [ geomvert ones(1,length(addgeom)) ];
+       if ~isfield(addui, 'geometry')
+           addui.geometry = mat2cell(ones(1,length(addui.uilist)));
+       end;
+       uilist = { uilist{:}, addui.uilist{:} };
+       geometry = { geometry{:} addui.geometry{:} };
+       geomvert = [ geomvert ones(1,length(addui.geometry)) ];
    end;
    
    [out_param userdat] = inputgui( 'geometry' , geometry, 'uilist', uilist, ...
