@@ -3,8 +3,11 @@
 % Usage:
 %         >> inds = std_chaninds(STUDY,  channames);
 %         >> inds = std_chaninds(EEG, channames);
+%         >> inds = std_chaninds(chanlocs, channames);
 % Inputs:
-%         STUDY - studyset structure containing a changrp substructure.
+%         STUDY    - studyset structure containing a changrp substructure.
+%         EEG      - EEG structure containing channel location structure
+%         chanlocs - channel location structure
 %     channames - [cell] channel names
 %
 % Outputs:
@@ -28,16 +31,19 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function finalinds = std_chaninds(STUDY, channames);
+function finalinds = std_chaninds(instruct, channames);
 
     finalinds   = [];
-    if isfield(STUDY, 'chanlocs')
-        EEG = STUDY;
+    if isfield(instruct, 'chanlocs')
+        EEG = instruct;
         tmpchanlocs = EEG.chanlocs;
         tmpallchans = lower({ tmpchanlocs.labels });
+    elseif isfield(instruct, 'filename')
+        tmpallchans = lower({ instruct.changrp.name });
     else
-        tmpallchans = lower({ STUDY.changrp.name });
+        tmpallchans = instruct;
     end;
+    if ~iscell(channames), channames = { channames }; end;
     
     if isempty(channames), finalinds = [1:length(tmpallchans)]; return; end;
     for c = 1:length(channames)
