@@ -11,7 +11,7 @@
 %                selected input measure (measure input).
 %
 % Optional inputs:
-%   'channels'   - [cell or integet] channel labels - for instance 
+%   'channels'   - [cell or integer] channel labels - for instance 
 %                  { 'cz' 'pz' } - or indices - for instance [1 2 3]
 %                  of channels to load from the data file.
 %   'components' - [integer] component index in the selected EEG dataset for which 
@@ -115,22 +115,24 @@ end;
 if ~isempty(opt.channels) && isnumeric(opt.channels)
     opt.dataindices = opt.channels;
 elseif ~isempty(opt.channels)
-    if length(fileBaseName) > 1, error('Cannot read channel labels when reading more than 1 input file'); end;
-    filename = [ fileBaseName{1} fileExt ];
-    try, 
-        warning('off', 'MATLAB:load:variableNotFound');
-        fileData = load( '-mat', filename, 'labels', 'chanlabels' );
-        warning('on', 'MATLAB:load:variableNotFound');
-    catch, fileData = [];
-    end;
-    if ~isempty(fileData)
-        if isfield(fileData, 'labels'), chan.chanlocs = struct('labels',     fileData.labels);
-        else                            chan.chanlocs = struct('labels', fileData.chanlabels);
+    %if length(fileBaseName) > 1, error('Cannot read channel labels when reading more than 1 input file'); end;
+    for iFile = 1:length(fileBaseName)
+        filename = [ fileBaseName{iFile} fileExt ];
+        try, 
+            warning('off', 'MATLAB:load:variableNotFound');
+            fileData = load( '-mat', filename, 'labels', 'chanlabels' );
+            warning('on', 'MATLAB:load:variableNotFound');
+        catch, fileData = [];
         end;
-        opt.dataindices = std_chaninds(chan, opt.channels);
-    else
-        warning('Cannot use file to lookup channel names, the file needs to be recomputed')
-        return;
+        if ~isempty(fileData)
+            if isfield(fileData, 'labels'), chan.chanlocs = struct('labels',     fileData.labels);
+            else                            chan.chanlocs = struct('labels', fileData.chanlabels);
+            end;
+            opt.dataindices(iFile) = std_chaninds(chan, opt.channels{iFile});
+        else
+            warning('Cannot use file to lookup channel names, the file needs to be recomputed')
+            return;
+        end;
     end;
 elseif ~isempty(opt.components)
      opt.dataindices = opt.components;
