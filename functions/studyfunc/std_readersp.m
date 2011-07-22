@@ -99,6 +99,7 @@ dtype = opt.datatype;
 % find channel indices
 % --------------------
 if ~isempty(opt.channels)
+     allChangrp = lower({ STUDY.changrp.name });
      finalinds = std_chaninds(STUDY, opt.channels);
 else finalinds = opt.clusters;
 end;
@@ -111,7 +112,6 @@ for ind = 1:length(finalinds)
         tmpstruct = STUDY.changrp(finalinds(ind));
         allinds       = tmpstruct.allinds;
         setinds       = tmpstruct.setinds;
-        for i=1:length(allinds(:)), allinds{i} = -allinds{i}; end; % invert sign for reading
     else
         tmpstruct = STUDY.cluster(finalinds(ind));
         allinds       = tmpstruct.allinds;
@@ -167,6 +167,9 @@ for ind = 1:length(finalinds)
         %try     % this 'try' is a poor solution the problem of attempting
         % to read specific channel/component data that doesn't exist
         % called below by: allinds{c,g}(indtmp)
+        if strcmpi(dtype, 'erp'), opts = { 'timelimits', opt.timerange };
+        else                      opts = { 'freqlimits', opt.freqrange };
+        end;
         if strcmpi(opt.singletrials, 'on')
             for c = 1:nc
                 for g = 1:ng
@@ -182,7 +185,10 @@ for ind = 1:length(finalinds)
                         count{c, g} = 1;
                         for indtmp = 1:length(inds)
                             setindtmp = STUDY.design(opt.design).cell(setinds{c,g}(inds(indtmp))).dataset;
-                            [ tmpersp tmpparams alltimes allfreqs] = std_readfile(setindtmp, 'measure', 'timef', 'dataindices', allinds{c,g}(inds(indtmp)), 'timelimits', opt.timerange, 'freqlimits', opt.freqrange);
+                            tmpopts = { 'measure', 'timef' 'timelimits', opt.timerange, 'freqlimits', opt.freqrange };
+                            if ~isempty(opt.channels), [ tmpersp tmpparams alltimes allfreqs] = std_readfile(setindtmp, 'channels', allChangrp(allinds{c,g}(inds(indtmp))), tmpopts{:});
+                            else                       [ tmpersp tmpparams alltimes allfreqs] = std_readfile(setindtmp, 'components',          allinds{c,g}(inds(indtmp)),  tmpopts{:});
+                            end;
                             indices = [count{c, g}:count{c, g}+size(tmpersp,3)-1];
                             if indtmp == 1
                                  ersp{c, g} = permute(tmpersp, [2 1 3]);
@@ -201,11 +207,13 @@ for ind = 1:length(finalinds)
             for c = 1:nc
                 for g = 1:ng
                     if ~isempty(setinds{c,g})
-                        options = { 'dataindices', allinds{c,g}(:), 'timelimits', opt.timerange, 'freqlimits', opt.freqrange };
+                        if ~isempty(opt.channels), opts = { 'channels',  allChangrp(allinds{c,g}(:)), 'timelimits', opt.timerange, 'freqlimits', opt.freqrange };
+                        else                       opts = { 'components',           allinds{c,g}(:) , 'timelimits', opt.timerange, 'freqlimits', opt.freqrange };
+                        end;
                         if strcmpi(dtype, 'ersp') 
-                             erspbase{c, g}                             = std_readfile( setinfo(setinds{c,g}(:)), 'measure', 'erspbase', options{:});
-                             [ ersp{c, g} tmpparams alltimes allfreqs ] = std_readfile( setinfo(setinds{c,g}(:)), 'measure', 'ersp'    , options{:});
-                        else [ ersp{c, g} tmpparams alltimes allfreqs ] = std_readfile( setinfo(setinds{c,g}(:)), 'measure', 'itc'     , options{:});
+                             erspbase{c, g}                             = std_readfile( setinfo(setinds{c,g}(:)), 'measure', 'erspbase', opts{:});
+                             [ ersp{c, g} tmpparams alltimes allfreqs ] = std_readfile( setinfo(setinds{c,g}(:)), 'measure', 'ersp'    , opts{:});
+                        else [ ersp{c, g} tmpparams alltimes allfreqs ] = std_readfile( setinfo(setinds{c,g}(:)), 'measure', 'itc'     , opts{:});
                              ersp{c, g} = abs(ersp{c, g});
                         end;
                         fprintf('.');

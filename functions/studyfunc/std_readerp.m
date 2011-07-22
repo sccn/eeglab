@@ -98,6 +98,7 @@ dtype = opt.datatype;
 % find channel indices
 % --------------------
 if ~isempty(opt.channels)
+     allChangrp = lower({ STUDY.changrp.name });
      finalinds = std_chaninds(STUDY, opt.channels);
 else finalinds = opt.clusters;
 end;
@@ -110,7 +111,6 @@ for ind = 1:length(finalinds) % scan channels or components
         tmpstruct = STUDY.changrp(finalinds(ind));
         allinds       = tmpstruct.allinds;
         setinds       = tmpstruct.setinds;
-        for i=1:length(allinds(:)), allinds{i} = -allinds{i}; end; % invert sign for reading
     else
         tmpstruct = STUDY.cluster(finalinds(ind));
         allinds       = tmpstruct.allinds;
@@ -148,12 +148,17 @@ for ind = 1:length(finalinds) % scan channels or components
         chanlab = { tmpchanlocs.labels };
         nonemptyindex = ~cellfun(@isempty, allinds);
         nonemptyindex = find(nonemptyindex(:));
-        [ tmp params xvals] = std_readfile(setinfo(setinds{nonemptyindex(1)}(1)), 'dataindices', allinds{nonemptyindex(1)}(1), 'measure', dtype, ...
-                                           'getparamonly', 'on', 'singletrials', opt.singletrials, 'timelimits', opt.timerange, 'freqlimits', opt.freqrange);
-
+        optGetparams = { 'measure', dtype, 'getparamonly', 'on', 'singletrials', opt.singletrials, 'timelimits', opt.timerange, 'freqlimits', opt.freqrange };
+        if ~isempty(opt.channels), [ tmp params xvals] = std_readfile(setinfo(setinds{nonemptyindex(1)}(1)), optGetparams{:}, 'channels'  , allChangrp(allinds{nonemptyindex(1)}(1)));
+        else                       [ tmp params xvals] = std_readfile(setinfo(setinds{nonemptyindex(1)}(1)), optGetparams{:}, 'components', allinds{nonemptyindex(1)}(1));
+        end;
+        
         % read the data and select channels
         % ---------------------------------
         fprintf([ 'Reading ' dtype ' data...' ]);
+        if strcmpi(dtype, 'erp'), opts = { 'timelimits', opt.timerange };
+        else                      opts = { 'freqlimits', opt.freqrange };
+        end;
         if strcmpi(opt.singletrials, 'on')
             if strcmpi(params.singletrials, 'off')
                 fprintf('\n');
@@ -162,6 +167,7 @@ for ind = 1:length(finalinds) % scan channels or components
                 return;
             end;
             allsubjects = { setinfo.case };
+            opts        = { opts{:} 'singletrials' 'on' };
             for c = 1:nc
                 for g = 1:ng
                     if ~isempty(opt.channels)
@@ -172,8 +178,8 @@ for ind = 1:length(finalinds) % scan channels or components
                         else inds = 1:length(allinds{c,g}); end;
                     end;
                     if ~isempty(inds)
-                        if strcmpi(dtype, 'erp') alldata{c, g} = squeeze(std_readfile(setinfo(setinds{c,g}(:)), 'measure', 'erp' , 'dataindices', allinds{c,g}(:), 'timelimits', opt.timerange, 'singletrials', 'on'));
-                        else                     alldata{c, g} = squeeze(std_readfile(setinfo(setinds{c,g}(:)), 'measure', 'spec', 'dataindices', allinds{c,g}(:), 'freqlimits', opt.freqrange, 'singletrials', 'on'));
+                        if ~isempty(opt.channels), alldata{c, g} = std_readfile( setinfo(setinds{c,g}(:)), 'measure', dtype, opts{:}, 'channels'  , allChangrp(allinds{c,g}(:)));
+                        else                       alldata{c, g} = std_readfile( setinfo(setinds{c,g}(:)), 'measure', dtype, opts{:}, 'components', allinds{c,g}(:));
                         end;
                     end;
                 end;
@@ -182,8 +188,8 @@ for ind = 1:length(finalinds) % scan channels or components
             for c = 1:nc
                 for g = 1:ng
                     if ~isempty(setinds{c,g})
-                        if strcmpi(dtype, 'erp') alldata{c, g} = std_readfile( setinfo(setinds{c,g}(:)), 'measure', 'erp' , 'dataindices', allinds{c,g}(:), 'timelimits', opt.timerange);
-                        else                     alldata{c, g} = std_readfile( setinfo(setinds{c,g}(:)), 'measure', 'spec', 'dataindices', allinds{c,g}(:), 'freqlimits', opt.freqrange);
+                        if ~isempty(opt.channels), alldata{c, g} = std_readfile( setinfo(setinds{c,g}(:)), 'measure', dtype, opts{:}, 'channels'  , allChangrp(allinds{c,g}(:)));
+                        else                       alldata{c, g} = std_readfile( setinfo(setinds{c,g}(:)), 'measure', dtype, opts{:}, 'components', allinds{c,g}(:));
                         end;
                     end;
                 end;
