@@ -385,8 +385,10 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
         if strcmpi(g.interp, 'on')
             tmpchanlist = chanlist;
             allocs = eeg_mergelocs(ALLEEG.chanlocs);
-            [tmp ind1 ind2] = intersect({allocs.labels}, chanlist);
-            opts = { opts{:} 'interp' allocs(ind1) };
+            [tmp1 tmp2 neworder] = intersect( {allocs.labels}, chanlist);
+            [tmp1 ordertmp2] = sort(tmp2);
+            neworder = neworder(ordertmp2);
+            opts = { opts{:} 'interp' allocs(neworder) };
         else
             newchanlist = [];
             tmpchanlocs = ALLEEG(idat(1)).chanlocs;
