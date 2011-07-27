@@ -42,6 +42,10 @@ if nargin < 1
 	help vararg2str;
 	return;
 end;
+if isempty(allargs)
+    strout = '';
+    return;
+end;
 
 % default arguments
 % -----------------
