@@ -12,6 +12,8 @@
 %   'channel'   - [integer array] read only specific channels.
 %                 Default is to read all data channels.
 %   'component' - [integer array] read only specific components
+%   'projchan'  - [integer or cell array] channel(s) onto which the component
+%                 should be projected.
 %   'rmcomps'   - [integer array] remove selected components from data
 %                 channels. This is only to be used with channel data not
 %                 when selecting components.
@@ -57,6 +59,7 @@ function data = eeg_getdatact( EEG, varargin);
         'channel'   'integer' {} [1:EEG.nbchan];
         'verbose'   'string'  { 'on','off' } 'on';
         'reshape'   'string'  { '2d','3d' }  '3d';
+        'projchan'  {'integer' 'cell' } { {} {} } [];        
         'component' 'integer' {} [];        
         'samples'   'integer' {} [];        
         'trialindices' 'integer' {} [1:EEG.trials];        
@@ -178,6 +181,25 @@ function data = eeg_getdatact( EEG, varargin);
         %if strcmpi(EEG.subject, 'julien') & strcmpi(EEG.condition, 'oddball') & strcmpi(EEG.group, 'after')
         %    jjjjf
         %end;
+    end;
+    
+    % projecting components on data channels
+    % --------------------------------------
+    if ~isempty(opt.projchan)
+        if iscell(opt.projchan)
+            opt.projchan = std_chaninds(EEG, opt.projchan);
+        end;
+        
+        finalChanInds = [];
+        for iChan = 1:length(opt.projchan)
+            tmpInd = find(EEG.icachansind == opt.projchan(iChan));
+            if isempty(tmpInd)
+                error(sprintf('Warning: can not backproject component on channel %d (not used for ICA)\n', opt.projchan(iChan)));
+            end;
+            finalChanInds = [ finalChanInds tmpInd ];
+        end;
+        
+        data = EEG.icawinv(finalChanInds, opt.component)*data(:,:);
     end;
     
     try,
