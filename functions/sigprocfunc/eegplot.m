@@ -378,6 +378,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
   if g.spacing == 0
     maxindex = min(1000, g.frames);  
 	stds = std(data(:,1:maxindex),[],2);
+    g.datastd = stds;
 	stds = sort(stds);
 	if length(stds) > 2
 		stds = mean(stds(2:end-1)); 
@@ -604,7 +605,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
   cb_normalize = ['g = get(gcbf,''userdata'');if g.normed, disp(''Denormalizing...''); else, disp(''Normalizing...''); end;'...
     'ax1 = findobj(''tag'',''eegaxis'',''parent'',gcbf);' ...
     'data = get(ax1,''UserData'');' ...
-    'if isempty(g.datastd), g.datastd = std(reshape(data,size(data,1),size(data,2)*size(data,3))'');end;'...
+    'if isempty(g.datastd), g.datastd = std(data(:,1:min(1000,g.frames),[],2));end;'...
     'if g.normed, for i = 1:size(data,1), data(i,:,:) = data(i,:,:)*g.datastd(i);set(gcbo,''string'', ''Norm'');set(findobj(''tag'',''ESpacing'',''parent'',gcbf),''string'',num2str(g.oldspacing));end;' ...
     'else, for i = 1:size(data,1), data(i,:,:) = data(i,:,:)/g.datastd(i);end;set(gcbo,''string'', ''Denorm'');g.oldspacing = g.spacing;set(findobj(''tag'',''ESpacing'',''parent'',gcbf),''string'',''5'');end;' ...
     'g.normed = 1 - g.normed;' ...
@@ -1269,7 +1270,7 @@ else
                 h = patch([g.winrej(tpmi,1)-lowlim g.winrej(tpmi,2)-lowlim ...
                            g.winrej(tpmi,2)-lowlim g.winrej(tpmi,1)-lowlim], ...
                           [0 0 1 1], tmpcols);  
-                set(h, 'EdgeColor', get(h, 'facecolor'), 'facealpha', 0.5) 
+                set(h, 'EdgeColor', get(h, 'facecolor')) 
 			end;
 		end;
 	end;
@@ -1735,11 +1736,18 @@ else
         tmpelec = min(max(double(tmpelec), 1),g.chans);
         labls = get(ax1, 'YtickLabel');
         hh = findobj('tag','Eelec','parent',fig);  % put electrode in the box
-        set(hh, 'string', labls(tmpelec+1,:));
+        if ~g.envelope
+            set(hh, 'string', labls(tmpelec+1,:));
+        else
+            set(hh, 'string', ' ');
+        end
         hh = findobj('tag','Evalue','parent',fig);
-        eegplotdata = get(ax1, 'userdata');
-        set(hh, 'string', num2str(eegplotdata(g.chans+1-tmpelec, min(g.frames,max(1,double(round(tmppos(1)+lowlim)))))));  % put value in the box
-        
+        if ~g.envelope
+            eegplotdata = get(ax1, 'userdata');
+            set(hh, 'string', num2str(eegplotdata(g.chans+1-tmpelec, min(g.frames,max(1,double(round(tmppos(1)+lowlim)))))));  % put value in the box
+        else
+            set(hh,'string',' ');
+        end
     end;
          
   % add topoplot
