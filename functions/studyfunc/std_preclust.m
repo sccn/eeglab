@@ -120,12 +120,13 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
     pnts  = ALLEEG(STUDY.datasetinfo(1).index).pnts;
     srate = ALLEEG(STUDY.datasetinfo(1).index).srate;
     xmin  = ALLEEG(STUDY.datasetinfo(1).index).xmin;
+    xmax  = ALLEEG(STUDY.datasetinfo(1).index).xmax;
     for index = 1:length(STUDY.datasetinfo)
         ind = STUDY.datasetinfo(index).index;
         if srate ~= ALLEEG(ind).srate, error(sprintf('Dataset %d does not have the same sampling rate as dataset 1', ind)); end;
         if ~all([ ALLEEG.trials ] == 1)
             if abs(xmin-ALLEEG(ind).xmin) > 1e-7, warning(sprintf('Dataset %d does not have the same time limit as dataset 1', ind)); end;
-            if abs(xmin-ALLEEG(ind).xmax) > 1e-7, warning(sprintf('Dataset %d does not have the same time limit as dataset 1', ind)); end;
+            if abs(xmax-ALLEEG(ind).xmax) > 1e-7, warning(sprintf('Dataset %d does not have the same time limit as dataset 1', ind)); end;
             if pnts ~= ALLEEG(ind).pnts, error(sprintf('Dataset %d does not have the same number of point as dataset 1', ind)); end;
         end;
     end;
