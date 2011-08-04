@@ -51,7 +51,7 @@ function finalinds = std_chaninds(instruct, channames);
             chanind = channames(c);
         else
             chanind = strmatch( lower(channames{c}), tmpallchans, 'exact');
-            if isempty(chanind), error(sprintf([ 'Channel "%s" and maybe others was not' 10 'found in pre-computed data file' ], channames{c})); end;
+            if isempty(chanind), warning(sprintf([ 'Channel "%s" and maybe others was not' 10 'found in pre-computed data file' ], channames{c})); end;
         end;
         finalinds   = [ finalinds chanind ];
     end;
