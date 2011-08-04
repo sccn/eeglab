@@ -342,7 +342,7 @@ for k = 1:length(g.indices)  % for each (specified) component
     
     % Run timef() to get ERSP
     % ------------------------
-    timefdata  = reshape(X(k,pointrange,:), 1, length(pointrange)*size(X,3));
+    timefdata  = reshape(X(g.indices(k),pointrange,:), 1, length(pointrange)*size(X,3));
     if strcmpi(g.plot, 'on'), figure; end;
     flagEmpty = 0;
     if isempty(timefdata)
@@ -376,17 +376,27 @@ end
 
 % Save ERSP into file
 % -------------------
+for index = 1:length(EEG)
+    filenames{index} = fullfile(EEG(index).filepath, EEG(index).filename);
+end;
+if length(filenames) == 1, filenames = filenames{1}; end;
 all_ersp.freqs      = logfreqs;
 all_ersp.times      = times;
 all_ersp.datatype   = 'ERSP';
+all_ersp.datafile   = filenames;
+all_ersp.trialindices = g.trialindices;
 all_itc.freqs       = logfreqs;
 all_itc.times       = times;
 all_itc.parameters  = parameters;
 all_itc.datatype    = 'ITC';
+all_itc.datafile    = filenames;
+all_itc.trialindices = g.trialindices;
 all_trials.freqs    = logfreqs;
 all_trials.times    = times;
 all_trials.parameters = { options{:} parameters{:} };
 all_trials.datatype   = 'TIMEF';
+all_trials.datafile   = filenames;
+all_trials.trialindices = g.trialindices;
 
 if powbaseexist
     all_ersp.parameters = { parameters{:}, 'baseline', g.powbase };
