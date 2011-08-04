@@ -156,7 +156,7 @@ opt = finputcheck(varargin,  {'variable1'     'string'    []     defdes.variable
                               'dataselect'    'cell'      {}     {};
                               'subjselect'    'cell'      {}     defdes.cases.value;
                               'delfiles'      'string'    { 'on','off' } 'off';
-                              'defaultdesign' 'string'    { 'on','off' } fastif(nargin < 3, 'on', 'off') }, ...
+                              'defaultdesign' 'string'    { 'on','off','forceoff'} fastif(nargin < 3, 'on', 'off') }, ...
                               'std_makedesign');
 if isstr(opt), error(opt); end;
 if ~isempty(opt.dataselect), opt.datselect = opt.dataselect; end;
@@ -238,24 +238,28 @@ for n2 = 1:nf2, [ dats2{n2} dattrials2{n2} ] = std_selectdataset( STUDY, ALLEEG,
 
 % detect files from old format
 % ----------------------------
-if strcmpi(opt.defaultdesign, 'off') && designind == 1
-    if ~isfield(STUDY.design, 'cell') || ~isfield(STUDY.design(1).cell, 'filebase')
-         opt.defaultdesign = 'on';
-    else
-         newfilename = ~isempty(findstr('design', STUDY.design(1).cell(1).filebase));
-         if newfilename && isempty(dir(fullfile(STUDY.design(1).cell(1).filebase, '*.dat*')))
-            opt.defaultdesign = 'on';
-         elseif ~newfilename
-            opt.defaultdesign = 'on';
-         end;
+if ~strcmpi(opt.defaultdesign, 'forceoff')
+    if strcmpi(opt.defaultdesign, 'off') && designind == 1
+        if ~isfield(STUDY.design, 'cell') || ~isfield(STUDY.design(1).cell, 'filebase')
+             opt.defaultdesign = 'on';
+        else
+             newfilename = ~isempty(findstr('design', STUDY.design(1).cell(1).filebase));
+             if newfilename && isempty(dir(fullfile(STUDY.design(1).cell(1).filebase, '*.dat*')))
+                opt.defaultdesign = 'on';
+             elseif ~newfilename
+                opt.defaultdesign = 'on';
+             end;
+        end;
     end;
-end;
-if strcmpi(opt.defaultdesign, 'on')
-    if isempty(dir(fullfile(ALLEEG(1).filepath, '*.dat*'))) && isempty(dir(fullfile(ALLEEG(1).filepath, '*.ica*')))
-        opt.defaultdesign = 'off';
+    if strcmpi(opt.defaultdesign, 'on')
+        if isempty(dir(fullfile(ALLEEG(1).filepath, '*.dat*'))) && isempty(dir(fullfile(ALLEEG(1).filepath, '*.ica*')))
+            opt.defaultdesign = 'off';
+        end;
     end;
+else
+    opt.defaultdesign = 'off';
 end;
-
+    
 % scan subjects and conditions
 % ----------------------------
 count = 1;
@@ -288,6 +292,18 @@ for n1 = 1:nf1
             end;
         end;
     end;
+end;
+
+% check for duplicate entries in filebase
+% ---------------------------------------
+if length( { des.cell.filebase } ) > length(unique({ des.cell.filebase }))
+    if ~isempty(findstr('design_', des.cell(1).filebase))
+        error('There is a problem with your STUDY, contact EEGLAB support');
+    else
+        disp('Duplicate entry detected in Design, reinitializing design');
+        [STUDY com] = std_makedesign(STUDY, ALLEEG, designind, varargin{:}, 'defaultdesign', 'forceoff');
+        return;
+    end
 end;
 
 % create other fields for the design

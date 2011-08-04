@@ -169,7 +169,12 @@ if ~isfield(STUDY, 'changrp'), STUDY.changrp = []; modif = 1; end;
 if isempty(STUDY.changrp) && isempty(STUDY.cluster)
     rebuild_design = 1;
 end;
-
+if isfield(STUDY.cluster, 'sets'),
+    if max(STUDY.cluster(1).sets(:)) > length(STUDY.datasetinfo)
+        disp('Warning: Some datasets had been removed from the STUDY, clusters have been reinitialized');
+        STUDY.cluster = [];
+    end;
+end;
 if isempty(STUDY.cluster)
     modif = 1; 
     [STUDY] = std_createclust(STUDY, ALLEEG, 'parentcluster', 'on');
@@ -215,6 +220,17 @@ else
                     STUDY.design(inddes).include{indinclude}{indval} = convertindvarval(STUDY.design(inddes).include{indinclude}{indval});
                 end;
             end;
+        end;
+        
+        % check for duplicate entries in filebase
+        % ---------------------------------------
+        if length( { STUDY.design(inddes).cell.filebase } ) > length(unique({ STUDY.design(inddes).cell.filebase }))
+            if ~isempty(findstr('design_', STUDY.design(inddes).cell(1).filebase))
+                error('There is a problem with your STUDY, contact EEGLAB support');
+            else
+                fprintf('Duplicate entry detected in Design %d, reinitializing design\n', inddes);
+                [STUDY com] = std_makedesign(STUDY, ALLEEG, inddes, STUDY.design(inddes), 'defaultdesign', 'forceoff');
+            end
         end;
     end;
 end;
