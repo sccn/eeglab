@@ -32,6 +32,8 @@
 %                  (threshold case only). 'fdr' uses false discovery rate.
 %                  See the fdr function for more information. Defaut is
 %                  'none'.
+%   'filter'     - [real] low pass filter the ERP curves at a given 
+%                  frequency threshold. Default is no filtering.
 % Plot options:
 %   'timerange'  - [min max] ERP plotting latency range in ms. 
 %                  {default: the whole epoch}
