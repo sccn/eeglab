@@ -77,6 +77,9 @@ if isstr(opt), error(opt); end;
 if isstruct(fileBaseName), fileBaseName = { fileBaseName.filebase }; 
 else                       fileBaseName = { fileBaseName };
 end;
+if ~isempty(opt.channels) && length(opt.channels) < length(fileBaseName)
+    opt.channels(2:length(fileBaseName)) = opt.channels(1);
+end;
 
 % get file extension
 % ------------------
