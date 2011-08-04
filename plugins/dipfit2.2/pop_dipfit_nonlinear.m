@@ -249,7 +249,7 @@ elseif nargin>=3
       current = get(findobj(parent, 'tag', 'component'), 'string');
       EEG.dipfit.current = str2num(current);
       if ~isempty( EEG.dipfit.current )
-        pop_dipplot(EEG, 'DIPFIT',  EEG.dipfit.current, 'normlen', 'on', 'mri', EEG.dipfit.mrifile);
+        pop_dipplot(EEG, 'DIPFIT',  EEG.dipfit.current, 'normlen', 'on', 'projlines', 'on', 'mri', EEG.dipfit.mrifile);
       end;
       
     case 'dialog_checkinput'

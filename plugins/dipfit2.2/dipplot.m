@@ -562,22 +562,31 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             end;
         end;
         
+        % dipole length
+        % -------------
+        multfactor = 1;
+        if strcmpi(g.normlen, 'on')
+            if nbdip == 1
+                len    = sqrt(sum(sources(index).momxyz(1,:).^2));
+            else
+                len1   = sqrt(sum(sources(index).momxyz(1,:).^2));
+                len2   = sqrt(sum(sources(index).momxyz(2,:).^2));
+                len    = mean([len1 len2]);
+            end;
+            if strcmpi(g.coordformat, 'CTF'), len = len*10; end;
+            if len ~= 0, multfactor = 15/len; end;
+        else
+            if strcmpi(g.coordformat, 'spherical')
+                 multfactor = 100;
+            else multfactor = 1.5;
+            end;            
+        end;
+        
         for dip = 1:nbdip
         
-            multfactor = 1;
             x = sources(index).posxyz(dip,1);
             y = sources(index).posxyz(dip,2);
             z = sources(index).posxyz(dip,3);
-            if strcmpi(g.normlen, 'on')
-                len    = sqrt(sum(sources(index).momxyz(dip,:).^2));
-                if strcmpi(g.coordformat, 'CTF'), len = len*10; end;
-                if len ~= 0, multfactor = 15/len; end;
-            else
-                if strcmpi(g.coordformat, 'spherical')
-                     multfactor = 100;
-                else multfactor = 1.5;
-                end;            
-            end;
             
             xo = sources(index).momxyz(dip,1)*g.dipolelength*multfactor;
             yo = sources(index).momxyz(dip,2)*g.dipolelength*multfactor;
