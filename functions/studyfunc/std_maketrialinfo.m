@@ -41,7 +41,8 @@ end;
 
 %% Make trial info
 for index = 1:length(ALLEEG)
-    eventlat = abs(eeg_point2lat( [ ALLEEG(index).event.latency ], [ ALLEEG(index).event.epoch ], ALLEEG(index).srate, [ALLEEG(index).xmin ALLEEG(index).xmax]));
+    tmpevent = ALLEEG(index).event;
+    eventlat = abs(eeg_point2lat( [ tmpevent.latency ], [ tmpevent.epoch ], ALLEEG(index).srate, [ALLEEG(index).xmin ALLEEG(index).xmax]));
     events   = ALLEEG(index).event;
     ff = fieldnames(events);
     ff = setdiff(ff, { 'latency' 'urevent' 'epoch' });
