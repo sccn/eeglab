@@ -225,7 +225,7 @@ for c = 1:nc
                 end;
             end;
 
-            tftopo( tmpplot', timevals, freqs, 'title', opt.titles{c,g}, options{:}); 
+            tftopo( tmpplot, timevals, freqs, 'title', opt.titles{c,g}, options{:}); 
                 
             if isempty(opt.caxis) && ~isempty(tmpc)
                 warning off;
@@ -246,7 +246,7 @@ for c = 1:nc
         % -------------------------
         if g == ng && ng > 1 && ~isempty(opt.groupstats) && ~isinf(pgroupplot{c}(1)) && ~statmask
             hdl(c,g+1) = mysubplot(nc+addr, ng+addc, g + 1 + (c-1)*(ng+addc), opt.transpose);
-            tftopo( pgroupplot{c}', timevals, freqs, 'title', opt.titles{c,g+1}, options{:});
+            tftopo( pgroupplot{c}, timevals, freqs, 'title', opt.titles{c,g+1}, options{:});
             caxis([-maxplot maxplot]);
         end;
     end;
@@ -257,7 +257,7 @@ for g = 1:ng
     % -----------------------------
     if ~isempty(opt.condstats) && ~isinf(pcondplot{g}(1)) && ~statmask && nc > 1
         hdl(nc+1,g) = mysubplot(nc+addr, ng+addc, g + c*(ng+addc), opt.transpose);
-        tftopo( pcondplot{g}', timevals, freqs, 'title', opt.titles{nc+1,g}, options{:});
+        tftopo( pcondplot{g}, timevals, freqs, 'title', opt.titles{nc+1,g}, options{:});
         caxis([-maxplot maxplot]);
     end;
 end;
@@ -280,7 +280,7 @@ end;
 % ---------------------------------------
 if ~isempty(opt.groupstats) && ~isempty(opt.condstats) && ng > 1 && nc > 1
     hdl(nc+1,ng+1) = mysubplot(nc+addr, ng+addc, g + 1 + c*(ng+addr), opt.transpose);
-    tftopo( pinterplot',  timevals, freqs, 'title', opt.titles{nc+1,ng+1}, options{:});
+    tftopo( pinterplot,  timevals, freqs, 'title', opt.titles{nc+1,ng+1}, options{:});
     caxis([-maxplot maxplot]);
     ylabel('');
 end;    
