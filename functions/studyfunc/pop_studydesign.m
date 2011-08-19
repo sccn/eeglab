@@ -351,7 +351,7 @@ elseif isstr(STUDY)
             % combine values for string and integers
             if isstr(usrdat.factorvals{val1}{1}) || iscell(usrdat.factorvals{val1}{1})
                 tmpcell = {};
-                for indCell = 1:length(vals)
+                for indCell = vals(:)'
                     if iscell(usrdat.factorvals{val1}{indCell})
                         tmpcell = { tmpcell{:} usrdat.factorvals{val1}{indCell}{:} };
                     else
