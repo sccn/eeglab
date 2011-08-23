@@ -33,8 +33,12 @@
 % 08-07-00 made ydir normal -sm
 % 01-25-02 reformated help & license -ad 
 
-function [lgfreqs,datout] = logimagesc(times,freqs,data,varargin)
+function [lgfreqs,datout, h, yt, yl] = logimagesc(times,freqs,data,varargin)
 
+  if nargin < 1
+      help logimagesc;
+      return
+  end;
   if size(data,1) ~= length(freqs)
       fprintf('logfreq(): data matrix must have %d rows!\n',length(freqs));
       datout = data;
@@ -56,7 +60,7 @@ function [lgfreqs,datout] = logimagesc(times,freqs,data,varargin)
   lfreqs = lfreqs(:);
   [mesht meshf] = meshgrid(times,lfreqs);
   try
-      datout = griddata(mesht,meshf,data,times,lgfreqs);
+      datout = griddata(mesht,meshf,double(data),times,lgfreqs);
   catch
       fprintf('error in logimagesc.m calling griddata.m, trying v4 method.');
       datout = griddata(mesht,meshf,data,times,lgfreqs,'v4');
@@ -77,7 +81,7 @@ function [lgfreqs,datout] = logimagesc(times,freqs,data,varargin)
       yt=get(gca,'ytick');
       yl=get(gca,'yticklabel');
       
-      imagesc(times,lgfreqs,datout); % plot the image
+      h=imagesc(times,lgfreqs,datout); % plot the image
       set(gca,'ydir','normal')
 
       i = 0; yt = [];
