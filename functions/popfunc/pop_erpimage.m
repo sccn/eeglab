@@ -375,12 +375,14 @@ if popup
 	channel   	 = eval( [ '[' res.chan ']' ]);
 	titleplot    = res.title;
 	if isfield(res, 'projchan'), 
-        if strcmpi(res.projchan(1),'''')
-             projchan = eval( [ '{' res.projchan '}' ]);
-        else projchan = parsetxt( res.projchan);
-        end;
-        if ~isempty(projchan) && ~isempty(str2num(projchan{1}))
-            projchan = cellfun(@str2num, projchan);
+        if ~isempty(res.projchan)
+            if strcmpi(res.projchan(1),'''')
+                 projchan = eval( [ '{' res.projchan '}' ]);
+            else projchan = parsetxt( res.projchan);
+            end;
+            if ~isempty(projchan) && ~isempty(str2num(projchan{1}))
+                projchan = cellfun(@str2num, projchan);
+            end;
         end;
     else, 
         projchan = []; 
