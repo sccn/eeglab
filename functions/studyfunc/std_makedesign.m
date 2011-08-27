@@ -141,6 +141,7 @@ defdes.variable(2).value = {};
 defdes.variable(1).pairing = 'on';
 defdes.variable(2).pairing = 'on';
 defdes.include = {};
+orivarargin = varargin;
 if ~isempty(varargin) && isstruct(varargin{1})
     defdes = varargin{1};
     varargin(1) = [];
@@ -300,8 +301,8 @@ if length( { des.cell.filebase } ) > length(unique({ des.cell.filebase }))
     if ~isempty(findstr('design_', des.cell(1).filebase))
         error('There is a problem with your STUDY, contact EEGLAB support');
     else
-        disp('Duplicate entry detected in Design, reinitializing design');
-        [STUDY com] = std_makedesign(STUDY, ALLEEG, designind, varargin{:}, 'defaultdesign', 'forceoff');
+        disp('Duplicate entry detected in new design, reinitializing design with new file names');
+        [STUDY com] = std_makedesign(STUDY, ALLEEG, designind, orivarargin{:}, 'defaultdesign', 'forceoff');
         return;
     end
 end;
