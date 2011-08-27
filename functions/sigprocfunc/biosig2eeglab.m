@@ -142,6 +142,8 @@ if importevent
         %Modifieded by Andrey (Aug.5,2008) to detect all non-zero codes: 
         if length(unique(EEG.data(end, 1:100))) > 20
             disp('Warning: event extraction failure, the last channel contains data');
+        elseif length(unique(EEG.data(end, :))) > 5000
+            disp('Warning: event extraction failure, the last channel contains data');
         else
             thiscode = 0;
             for p = 1:size(EEG.data,2)*size(EEG.data,3)-1
