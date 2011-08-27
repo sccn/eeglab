@@ -115,6 +115,47 @@ for inddes = 1:length(STUDY.design)
     end;
 end;
 
+% check for corrupted ERSP ICA data files
+% A corrupted file is present if
+% - components have been selected
+% - .icaersp or .icaitc files are present
+% - the .trialindices field is missing from these files
+try
+    %% check for corrupted ERSP ICA data files
+    ncomps1 = cellfun(@length, { STUDY.datasetinfo.comps });
+    ncomps2 = cellfun(@(x)(size(x,1)), { ALLEEG.icaweights });
+    if any(~isempty(ncomps1))
+        if any(ncomps1 ~= ncomps2)
+            warningshown = 0;
+
+            for des = 1:length(STUDY.design)
+                for iCell = 1:length(STUDY.design(des).cell)
+                    if ~warningshown
+                        if exist( [ STUDY.design(des).cell(iCell).filebase '.icaersp' ] )
+                            tmp = load('-mat', [ STUDY.design(des).cell(iCell).filebase '.icaersp' ], 'trialindices');
+                            if ~isfield(tmp, 'trialindices')
+                                warningshown = 1;
+                                warndlg( [ 'Warning: ICA ERSP or ITC data files corrupted in STUDY design ' int2str(des) 10 ...
+                                             '(and maybe other designs). These files must be recomputed.' ], 'Important EEGLAB warning', 'nonmodal');
+                            end;
+                        end;
+                        if warningshown == 0 && exist( [ STUDY.design(des).cell(iCell).filebase '.icaitc' ] )
+                            tmp = load('-mat', [ STUDY.design(des).cell(iCell).filebase '.icaersp' ], 'trialindices');
+                            if ~isfield(tmp, 'trialindices')
+                                warningshown = 1;
+                                warndlg( [ 'Warning: ICA ERSP or ITC data files corrupted in STUDY design ' int2str(des) 10 ...
+                                             '(and maybe other designs). These files must be recomputed.' ], 'Important EEGLAB warning', 'modal');
+                            end;
+                        end;
+                    end;
+                end;
+            end;
+        end;
+    end;
+catch, 
+    disp('Warning: failed to test STUDY file version');
+end;
+
 TMP = STUDY.datasetinfo;
 STUDY = std_maketrialinfo(STUDY, ALLEEG);
 if ~isequal(STUDY.datasetinfo, TMP)
