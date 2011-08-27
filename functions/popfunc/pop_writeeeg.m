@@ -35,6 +35,13 @@ function [command] = pop_writeeeg(EEG, filename, varargin);
 command = '';
 
 if nargin < 2
+    if EEG.trials > 1
+        res = questdlg2( [ 'This dataset contains data epochs.' 10 'Do you want to export the concatenated' 10 'data epochs?' ], '', 'No', 'Yes', 'Yes');
+        if strcmpi(res, 'No')
+            return;
+        end;
+    end;
+    
 	% ask user
 	[filename, filepath] = uiputfile('*.*', 'Enter a file name -- pop_writeeeg()'); 
 	if filename == 0 return; end;
@@ -58,9 +65,9 @@ end;
 warning('off', 'MATLAB:intConvertNonIntVal');
 if ~isempty(EEG.chanlocs)
     tmpchanlocs = EEG.chanlocs;
-    writeeeg(filename, EEG.data, EEG.srate, 'label', { tmpchanlocs.labels }, 'EVENT', EEG.event, options{:});
+    writeeeg(filename, EEG.data(:,:), EEG.srate, 'label', { tmpchanlocs.labels }, 'EVENT', EEG.event, options{:});
 else
-    writeeeg(filename, EEG.data, EEG.srate, 'EVENT', EEG.event, options{:});
+    writeeeg(filename, EEG.data(:,:), EEG.srate, 'EVENT', EEG.event, options{:});
 end;
 warning('on', 'MATLAB:intConvertNonIntVal');
 
