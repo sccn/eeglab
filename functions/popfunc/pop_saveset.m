@@ -254,6 +254,10 @@ try,
         delete(icafile);
     end;
     if option_saveica & ~isempty(EEG.icaweights)
+        if ~exist('tmpdata')
+            TMP = eeg_checkset(EEG, 'loaddata');
+            tmpdata = TMP.data;
+        end;
         if isempty(tmpica)
              tmpica2 = (EEG.icaweights*EEG.icasphere)*tmpdata(EEG.icachansind,:);
         else tmpica2 = tmpica;
