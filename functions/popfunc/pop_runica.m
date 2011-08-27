@@ -342,6 +342,7 @@ end;
 % compute ICA on a definite set
 % -----------------------------
 tmpdata = reshape( EEG.data(g.chanind,:,:), length(g.chanind), EEG.pnts*EEG.trials);
+tmprank = getrank(tmpdata(:,1:min(3000, size(tmpdata,2))));
 tmpdata = tmpdata - repmat(mean(tmpdata,2), [1 size(tmpdata,2)]); % zero mean 
 if ~strcmpi(lower(g.icatype), 'binica')
     try
@@ -359,13 +360,29 @@ if ~strcmpi(lower(g.icatype), 'binica')
 end;
 switch lower(g.icatype)
     case 'runica' 
-        tmprank = getrank(tmpdata(:,1:min(3000, size(tmpdata,2))));
         try, if ismatlab, g.options = {  g.options{:}, 'interupt', 'on' }; end; catch, end; 
         if tmprank == size(tmpdata,1) | pca_opt
             [EEG.icaweights,EEG.icasphere] = runica( tmpdata, 'lrate', 0.001,  g.options{:} );
         else 
+            if nargin < 2
+                uilist = { { 'style' 'text' 'string' [ 'EEGLAB has detected that the rank of your data matrix' 10 ...
+                                                       'is lower the number of input data channels. This might' 10 ...
+                                                       'be because you are including a reference channel or' 10 ...
+                                                       'because you are running a second ICA decomposition.' 10 ...
+                                                       sprintf('The proposed dimension for ICA is %d (out of %d channels).', tmprank, size(tmpdata,1)) 10 ...
+                                                       'Rank computation may be innacurate so you may edit this' 10 ...
+                                                       'number below. If you do not understand, simply press OK.' ] } { } ...
+                           { 'style' 'text' 'string' 'Proposed rank:' } ...
+                           { 'style' 'edit' 'string' num2str(tmprank) } };
+                if isempty(res), return; end;
+                res = inputgui('uilist', uilist, 'geometry', { [1] [1] [1 1] }, 'geomvert', [6 1 1]);
+                tmprank = str2num(res{1});
+                g.options = { g.options 'pca' tmprank };
+            else
+                g.options = { g.options 'pca' tmprank }; % automatic for STUDY (batch processing)
+            end;
             disp(['Data rank (' int2str(tmprank) ') is smaller than the number of channels (' int2str(size(tmpdata,1)) ').']);
-            [EEG.icaweights,EEG.icasphere] = runica( tmpdata, 'lrate', 0.001, 'pca', tmprank, g.options{:} );
+            [EEG.icaweights,EEG.icasphere] = runica( tmpdata, 'lrate', 0.001, g.options{:} );
         end;
      case 'binica'
         icadefs;
@@ -474,7 +491,7 @@ else
 end;
 
 if nargin < 2 || selectamica
-    com = sprintf('%s = pop_runica(%s, %s);', inputname(1), inputname(1),  vararg2str(options) ); %vararg2str({ 'icatype' g.icatype 'dataset' g.dataset 'options' g.options }) );
+    com = sprintf('%s = pop_runica(%s, %s);', inputname(1), inputname(1),  vararg2str(g.options) ); %vararg2str({ 'icatype' g.icatype 'dataset' g.dataset 'options' g.options }) );
 end;
 
 return;
