@@ -958,7 +958,7 @@ if option_chat == 1
             disp('| at the University of CA San Diego |');
             disp(' ----------------------------------- ');
 
-            javaaddpath(fullfile(tmpp, 'Chat_with_pane.jar'));
+            javaaddpath(fullfile(tmpp, 'Chat_with_pane_2_0.jar'));
             eval('import client.EEGLABchat.*;');
             eval('import client.VisualToolbar;');
             eval('import java.awt.*;');
@@ -970,6 +970,10 @@ if option_chat == 1
                 tb.setPreferredSize(Dimension(0, 75));
 
                 javacomponent(tb,'South',F);
+                javaclose = ['userdat = get(gcbf, ''userdata'');' ...
+                             ' tb = userdat{3};' ...
+                             'clear userdat; delete(gcbf); tb.close; clear tb' ];
+                set(gcf, 'CloseRequestFcn',javaclose);
 
                 refresh(F);
             catch,
