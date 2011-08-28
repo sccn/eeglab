@@ -56,7 +56,10 @@ if nargin < 3 && ~isstr(STUDY)
         if ~isempty(usrdat.factsubj{ind1})
             if any(cellfun(@length, usrdat.factsubj{ind1}) ~= length(usrdat.subjects))
                 for ind2 = 1:length(usrdat.factorvals{ind1})
-                    popupselectsubj{end+1} = [ num2str(usrdat.factors{ind1}) ' - ' num2str(usrdat.factorvals{ind1}{ind2}) ];
+                    if ~iscell(usrdat.factorvals{ind1}{ind2}) % not a combined value
+                        tmpval = encodevals(usrdat.factorvals{ind1}(ind2))
+                        popupselectsubj{end+1} = [ num2str(usrdat.factors{ind1}) ' - ' tmpval{1} ];
+                    end;
                 end;
             end;
         end;
@@ -460,7 +463,9 @@ function [cellout inds ] = mysetdiff(cell1, cell2);
 function cellout = encodevals(cellin)
     if isempty(cellin) 
         cellout = {};
-    elseif isstr(cellin{1})
+    elseif ~iscell(cellin)
+        cellout = { num2str(cellin) };
+    elseif ischar(cellin{1}) || iscell(cellin{1})
         for index = 1:length(cellin)
             if isstr(cellin{index})
                 cellout{index} = cellin{index};
