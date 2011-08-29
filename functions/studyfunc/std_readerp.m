@@ -221,18 +221,25 @@ for ind = 1:length(finalinds) % scan channels or components
         if strcmpi(dtype, 'spec') && strcmpi(opt.rmsubjmean, 'on') && ~isempty(opt.channels) && strcmpi(opt.singletrials, 'off')
             disp('Removing mean spectrum accross subjects');
             for indtmp = 1:length(allinds{c,g}) % scan subjects
-               meanspec =zeros(size( alldata{1, 1}(:,indtmp) ));
-               for c = 1:nc
+                nonemptycell = find(~cellfun(@isempty, alldata(:)));
+                meanspec = zeros(size( alldata{nonemptycell(1)}(:,indtmp) ));
+                totcell = 0;
+                for c = 1:nc
                     for g = 1:ng
-                        meanspec = meanspec + alldata{c, g}(:,indtmp)/(nc*ng);
+                        if ~isempty(alldata{c, g})
+                            meanspec = meanspec + alldata{c, g}(:,indtmp);
+                            totcell = totcell+1;
+                        end;
                     end;
-               end;
-               for c = 1:nc
+                end;
+                for c = 1:nc
                     for g = 1:ng
-                        alldata{c, g}(:,indtmp) = alldata{c, g}(:,indtmp) - meanspec; % subtractive model
-                        % alldata{c, g}(:,indtmp) = alldata{c, g}(:,indtmp)./meanspec; % divisive model
+                        if ~isempty(alldata{c, g})
+                            alldata{c, g}(:,indtmp) = alldata{c, g}(:,indtmp) - meanspec/totcell; % subtractive model
+                            % alldata{c, g}(:,indtmp) = alldata{c, g}(:,indtmp)./meanspec; % divisive model
+                        end;
                     end;
-               end;
+                end;
             end;
         end;
         
