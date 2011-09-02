@@ -375,11 +375,11 @@ function meanpowbase = computeerspbaseline(erspbase, singletrials)
     for index = 1:len
         if ~isempty(erspbase{index})
             if strcmpi(singletrials, 'on')
-                if index == 1, meanpowbase = abs(mean(erspbase{index},3));
+                if count == 0, meanpowbase = abs(mean(erspbase{index},3));
                 else           meanpowbase = meanpowbase + abs(mean(erspbase{index},3));
                 end;
             else
-                if index == 1, meanpowbase = abs(erspbase{index});
+                if count == 0, meanpowbase = abs(erspbase{index});
                 else           meanpowbase = meanpowbase + abs(erspbase{index});
                 end;
             end;
