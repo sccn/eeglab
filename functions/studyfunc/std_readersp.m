@@ -391,14 +391,21 @@ function meanpowbase = computeerspbaseline(erspbase, singletrials)
 % remove ERSP baseline
 % ---------------------
 function ersp = removeerspbaseline(ersp, erspbase, meanpowbase, tottrials)
+    convert2log = 0;
     for g = 1:size(ersp,2)        % ng = number of groups
         for c = 1:size(ersp,1)
             if ~isempty(erspbase{c,g}) && ~isempty(ersp{c,g})
                 erspbasetmp = reshape(erspbase{c,g}, [size(meanpowbase,1) 1 size(meanpowbase,3)]);
+                if any(erspbasetmp(:) > 1000)
+                    convert2log = 1;
+                end;
                 if ~isempty(tottrials{c,g}), tmpmeanpowbase = repmat(meanpowbase, [1 size(ersp{c,g},2) tottrials{c,g}]);
                 else                         tmpmeanpowbase = repmat(meanpowbase, [1 size(ersp{c,g},2) 1]);
                 end;
-                ersp{c,g} = ersp{c,g} - repmat(abs(erspbasetmp), [1 size(ersp{c,g},2) 1 1]) + tmpmeanpowbase;
+                if convert2log
+                     ersp{c,g} = ersp{c,g} - repmat(10*log10(erspbasetmp), [1 size(ersp{c,g},2) 1 1]) + 10*log10(tmpmeanpowbase);
+                else ersp{c,g} = ersp{c,g} - repmat(abs(erspbasetmp), [1 size(ersp{c,g},2) 1 1]) + tmpmeanpowbase;
+                end;
             end;
         end;
     end;
