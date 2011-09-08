@@ -187,6 +187,7 @@ end;
 % ------------------
 if ng > 1 && ~isempty(opt.groupstats), addc = 1; else addc = 0; end;
 if nc > 1 && ~isempty(opt.condstats ), addr = 1; else addr = 0; end;
+if length(opt.threshold) > 1, opt.threshold = opt.threshold(1); end;
 if strcmpi(opt.singlesubject, 'off') ...
         && ( ~isempty(opt.condstats) || ~isempty(opt.groupstats) ) % only for curves
     plottag = 0;

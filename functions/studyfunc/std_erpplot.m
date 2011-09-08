@@ -228,6 +228,9 @@ if ~isempty(opt.channels)
 
     % compute statistics
     % ------------------
+    if (isempty(opt.topotime) || any(isnan(opt.topotime))) && length(opt.threshold) > 1
+        opt.threshold = opt.threshold(1);
+    end;
     [pcond pgroup pinter] = std_stat(erpdata, 'groupstats', opt.groupstats, 'condstats', opt.condstats, 'paired', paired, ...
                                          'statistics', opt.statistics, 'naccu', opt.naccu, 'threshold', opt.threshold, 'mcorrect', opt.mcorrect);
     if (~isempty(pcond) && length(pcond{1}) == 1) || (~isempty(pgroup) && length(pgroup{1}) == 1), pcond = {}; pgroup = {}; pinter = {}; end; % single subject STUDY                                
