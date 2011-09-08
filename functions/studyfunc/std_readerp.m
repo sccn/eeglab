@@ -178,8 +178,8 @@ for ind = 1:length(finalinds) % scan channels or components
                         else inds = 1:length(allinds{c,g}); end;
                     end;
                     if ~isempty(inds)
-                        if ~isempty(opt.channels), alldata{c, g} = std_readfile( setinfo(setinds{c,g}(:)), 'measure', dtype, opts{:}, 'channels'  , opt.channels);
-                        else                       alldata{c, g} = std_readfile( setinfo(setinds{c,g}(:)), 'measure', dtype, opts{:}, 'components', allinds{c,g}(:));
+                        if ~isempty(opt.channels), alldata{c, g} = std_readfile( setinfo(setinds{c,g}(:)), 'measure', dtype, opts{:}, 'channels'  , opt.channels(ind));
+                        else                       alldata{c, g} = std_readfile( setinfo(setinds{c,g}(:)), 'measure', dtype, opts{:}, 'components', allinds{c,g}(ind));
                         end;
                     end;
                 end;
@@ -188,8 +188,8 @@ for ind = 1:length(finalinds) % scan channels or components
             for c = 1:nc
                 for g = 1:ng
                     if ~isempty(setinds{c,g})
-                        if ~isempty(opt.channels), alldata{c, g} = std_readfile( setinfo(setinds{c,g}(:)), 'measure', dtype, opts{:}, 'channels'  , opt.channels);
-                        else                       alldata{c, g} = std_readfile( setinfo(setinds{c,g}(:)), 'measure', dtype, opts{:}, 'components', allinds{c,g}(:));
+                        if ~isempty(opt.channels), alldata{c, g} = std_readfile( setinfo(setinds{c,g}(:)), 'measure', dtype, opts{:}, 'channels'  , opt.channels(ind));
+                        else                       alldata{c, g} = std_readfile( setinfo(setinds{c,g}(:)), 'measure', dtype, opts{:}, 'components', allinds{c,g}(ind));
                         end;
                     end;
                 end;
