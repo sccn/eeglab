@@ -534,13 +534,19 @@ inds1 = (v < x2);
 inds2 = (v >= x2);
 if any(inds1(:)), p(inds1) = betainc(v(inds1) ./ (v(inds1) + x2(inds1)), v(inds1)/2, 0.5, 'lower') / 2; end;
 if any(inds2(:)), p(inds2) = betainc(x2(inds2) ./ (v(inds2) + x2(inds2)), 0.5, v(inds2)/2, 'upper') / 2; end;
-inds = (x > 0); p(inds) = 1 - p(inds);
+inds = (x > 0); 
+if any(inds)
+    p(inds) = 1 - p(inds);
+end;
 
 inds = (v > 1e7);
 if any(inds(:)), p(inds) = normcum(x(inds)); end;
 
 p(x == 0) = 0.5;
-p = reshape(p, size(x));
-
+if isempty(p)
+    p = ones(size(x));
+else
+    p = reshape(p, size(x));
+end;
 function [p] = normcum(z)
 p = 0.5 * erfc(-z ./ sqrt(2));
