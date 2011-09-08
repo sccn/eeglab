@@ -370,24 +370,31 @@ end;
 % ---------------------
 function meanpowbase = computeerspbaseline(erspbase, singletrials)
 
-    len = length(erspbase(:));
-    count = 0;
-    for index = 1:len
-        if ~isempty(erspbase{index})
-            if strcmpi(singletrials, 'on')
-                if count == 0, meanpowbase = abs(mean(erspbase{index},3));
-                else           meanpowbase = meanpowbase + abs(mean(erspbase{index},3));
+    try
+        len = length(erspbase(:));
+        count = 0;
+        for index = 1:len
+            if ~isempty(erspbase{index})
+                if strcmpi(singletrials, 'on')
+                    if count == 0, meanpowbase = abs(mean(erspbase{index},3));
+                    else           meanpowbase = meanpowbase + abs(mean(erspbase{index},3));
+                    end;
+                else
+                    if count == 0, meanpowbase = abs(erspbase{index});
+                    else           meanpowbase = meanpowbase + abs(erspbase{index});
+                    end;
                 end;
-            else
-                if count == 0, meanpowbase = abs(erspbase{index});
-                else           meanpowbase = meanpowbase + abs(erspbase{index});
-                end;
+                count = count+1;
             end;
-            count = count+1;
         end;
+        meanpowbase = reshape(meanpowbase  , [size(meanpowbase,1) 1 size(meanpowbase,2)])/count;
+    catch,
+        error([ 'Problem while subtracting common ERSP baseline.' 10 ...
+                'Common baseline subtraction is performed based on' 10 ...
+                'pairing settings in your design. Most likelly, one' 10 ...
+                'independent variable should not have its data paired.' ]);
     end;
-    meanpowbase = reshape(meanpowbase  , [size(meanpowbase,1) 1 size(meanpowbase,2)])/count;
-
+        
 % remove ERSP baseline
 % ---------------------
 function ersp = removeerspbaseline(ersp, erspbase, meanpowbase, tottrials)
