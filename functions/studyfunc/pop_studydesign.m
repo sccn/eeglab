@@ -57,7 +57,7 @@ if nargin < 3 && ~isstr(STUDY)
             if any(cellfun(@length, usrdat.factsubj{ind1}) ~= length(usrdat.subjects))
                 for ind2 = 1:length(usrdat.factorvals{ind1})
                     if ~iscell(usrdat.factorvals{ind1}{ind2}) % not a combined value
-                        tmpval = encodevals(usrdat.factorvals{ind1}(ind2))
+                        tmpval = encodevals(usrdat.factorvals{ind1}(ind2));
                         popupselectsubj{end+1} = [ num2str(usrdat.factors{ind1}) ' - ' tmpval{1} ];
                     end;
                 end;
