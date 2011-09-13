@@ -337,7 +337,7 @@ for c = 1:ncplot
             if ~dimreduced_sizediffers && strcmpi(opt.plotsubjects, 'off')
                 tmpstd = squeeze(real(std(tmpdata,[],3)))/sqrt(size(tmpdata,3)); tmpstd = squeeze(permute(tmpstd, [2 1 3])); tmpdata = squeeze(real(nan_mean(tmpdata,3)));
             end;
-            tmpdata = squeeze(permute(tmpdata, [2 1 3]));
+            tmpdata = squeeze(permute(tmpdata, [2 1 3 4]));
             if strcmpi(opt.plottopo, 'on'), highlight = 'background'; else highlight = 'bottom'; end;
             if strcmpi(opt.plotgroups, 'together') &&  isempty(opt.condstats) && ...
                              ~isnan(opt.threshold) && ~isempty(opt.groupstats)
