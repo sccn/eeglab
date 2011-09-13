@@ -199,7 +199,9 @@ if ~isempty(alllegends)
 
     % convert legends to string if necessary
     % --------------------------------------
-    for ileg = 1:length(alllegends), alllegends{ileg} = num2str(alllegends{ileg}); end;
+    for ileg = 1:length(alllegends), 
+        alllegends{ileg} = value2str(alllegends{ileg}); 
+    end;
 end;
 
 % statistic titles
