@@ -298,8 +298,6 @@ end;
 % create other fields for the design
 % ----------------------------------
 if exist('des') ~= 1
-    des = defdes;
-    des.name = '';
     error( [ 'One of your design is empty. This could be because the datasets/subjects/trials' 10 ...
              'you have selected do not contain any of the selected independent variables values.' 10 ...
              'Check your data and datasets carefully for any missing information.' ]);
