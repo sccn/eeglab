@@ -12,7 +12,8 @@
 %                choosen independent variable
 % Output:
 %   datind       - [integer array] indices of selected dataset
-%   dattrialsind - [cell] trial indices for each dataset
+%   dattrialsind - [cell] trial indices for each dataset (not only the
+%                  datasets selected above).
 %
 % Author: Arnaud Delorme, CERCO, 2010-
 
@@ -84,5 +85,5 @@ else
             dattrialselect{tmpi} = union(dattrialselect{tmpi}, std_indvarmatch(indvarvals{dat}, dattrials{tmpi}));
         end;
     end;
-    datind = find(~cellfun(@isempty, dattrialselect));            
+    datind = find(~cellfun(@isempty, dattrialselect));
 end;
