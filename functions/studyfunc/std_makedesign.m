@@ -295,25 +295,27 @@ for n1 = 1:nf1
     end;
 end;
 
-% check for duplicate entries in filebase
-% ---------------------------------------
-if length( { des.cell.filebase } ) > length(unique({ des.cell.filebase }))
-    if ~isempty(findstr('design_', des.cell(1).filebase))
-        error('There is a problem with your STUDY, contact EEGLAB support');
-    else
-        disp('Duplicate entry detected in new design, reinitializing design with new file names');
-        [STUDY com] = std_makedesign(STUDY, ALLEEG, designind, orivarargin{:}, 'defaultdesign', 'forceoff');
-        return;
-    end
-end;
-
 % create other fields for the design
 % ----------------------------------
 if exist('des') ~= 1
     des = defdes;
     des.name = '';
-    disp('Warning: STUDY.design is empty');
-else
+    error( [ 'One of your design is empty. This could be because the datasets/subjects/trials' 10 ...
+             'you have selected do not contain any of the selected independent variables values.' 10 ...
+             'Check your data and datasets carefully for any missing information.' ]);
+else    
+    % check for duplicate entries in filebase
+    % ---------------------------------------
+    if length( { des.cell.filebase } ) > length(unique({ des.cell.filebase }))
+        if ~isempty(findstr('design_', des.cell(1).filebase))
+            error('There is a problem with your STUDY, contact EEGLAB support');
+        else
+            disp('Duplicate entry detected in new design, reinitializing design with new file names');
+            [STUDY com] = std_makedesign(STUDY, ALLEEG, designind, orivarargin{:}, 'defaultdesign', 'forceoff');
+            return;
+        end
+    end;
+
     %allval1 = unique(cellfun(@(x)x{1}, { des.cell.value }, 'uniformoutput', false));
     %allval2 = unique(cellfun(@(x)x{2}, { des.cell.value }, 'uniformoutput', false));
     des.name              = opt.name;
