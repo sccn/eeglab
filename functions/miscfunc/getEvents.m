@@ -112,7 +112,10 @@ if dispTable || ~isempty(exportFile)  % Display overview or export to CSV file?
     finalTable = [titleTable; eventsTable];  % Add title in first row
     
     if dispTable
-        disp(finalTable);  end
+        format('shortG');
+        disp(finalTable);
+        format;
+    end
     
     if ~isempty(exportFile)
         fid = fopen(exportFile, 'w');
@@ -138,3 +141,13 @@ if dispTable || ~isempty(exportFile)  % Display overview or export to CSV file?
         fclose(fid);
     end
 end
+
+% Borrowed functions from Tim Mullen's SIFT toolbox; maybe we should include
+% them in EEGLAB...
+
+function b = iscellnumeric(C)
+% Return 1 if all elements of cell array are numeric
+%
+% Tim Mullen, 2011, SCCN/INC, UCSD
+
+b = all(cellfun(@(x) isnumeric(x),C));
