@@ -429,7 +429,8 @@ cb_importpres  = [ check        '[EEG LASTCOM]= pop_importpres(EEG);'     e_stor
 cb_importev2   = [ check        '[EEG LASTCOM]= pop_importev2(EEG);'      e_store ]; 
 cb_export      = [ check        'LASTCOM = pop_export(EEG);'              e_histdone ];
 cb_expica1     = [ check        'LASTCOM = pop_expica(EEG, ''weights'');' e_histdone ]; 
-cb_expica2     = [ check        'LASTCOM = pop_expica(EEG, ''inv'');'     e_histdone ]; 
+cb_expica2     = [ check        'LASTCOM = pop_expica(EEG, ''inv'');'     e_histdone ];
+cb_expevents   = [ check        'LASTCOM = pop_expevents(EEG);'           e_histdone ];
 cb_expdata     = [ check        'LASTCOM = pop_writeeeg(EEG);'            e_histdone ]; 
 
 cb_loadset     = [ nocheck '[EEG LASTCOM] = pop_loadset;'                                e_newset];
@@ -591,7 +592,8 @@ if ismatlab
     uimenu( event_m, 'Label', 'From Neuroscan .ev2 file'              , 'CallBack', cb_importev2); 
     uimenu( exportm, 'Label', 'Data and ICA activity to text file'    , 'CallBack', cb_export);
     uimenu( exportm, 'Label', 'Weight matrix to text file'            , 'CallBack', cb_expica1); 
-    uimenu( exportm, 'Label', 'Inverse weight matrix to text file'    , 'CallBack', cb_expica2); 
+    uimenu( exportm, 'Label', 'Inverse weight matrix to text file'    , 'CallBack', cb_expica2);
+    uimenu( exportm, 'Label', 'Events to text file'                   , 'CallBack', cb_expevents);
     uimenu( exportm, 'Label', 'Data to EDF/BDF/GDF file'              , 'CallBack', cb_expdata, 'separator', 'on'); 
 
     uimenu( file_m, 'Label', 'Load existing dataset'                  , 'CallBack', cb_loadset, 'Separator', 'on'); 
