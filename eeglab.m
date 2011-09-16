@@ -958,7 +958,7 @@ if option_chat == 1
             disp('| at the University of CA San Diego |');
             disp(' ----------------------------------- ');
 
-            javaaddpath(fullfile(tmpp, 'Chat_with_pane_2_0.jar'));
+            javaaddpath(fullfile(tmpp, 'Chat_with_pane.jar'));
             eval('import client.EEGLABchat.*;');
             eval('import client.VisualToolbar;');
             eval('import java.awt.*;');
