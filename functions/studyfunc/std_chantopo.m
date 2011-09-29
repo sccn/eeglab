@@ -128,7 +128,7 @@ for c = 1:nc
                 else 
                     caxis(opt.caxis);
                 end;
-                title(opt.titles{c,g}); 
+                title(opt.titles{c,g}, 'interpreter', 'none'); 
             else
                 axis off;
             end;
