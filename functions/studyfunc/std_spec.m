@@ -35,7 +35,9 @@
 %                  {default|[] -> none}
 %   'specmode'   - ['psd'|'fft'] method to compute spectral 
 %                  decomposition. 'psd' uses the spectopo function. 'fft' 
-%                  uses a simple fft on each trial.
+%                  uses a simple fft on each trial. For continuous data
+%                  data trials are extracted automatically (see 'epochlim'
+%                  and 'epochrecur' below).
 %   'epochlim'   - [min max] for FFT on continuous data, extract data
 %                  epochs with specific epoch limits in seconds (see also
 %                  'epochrecur' below). Default is [0 1].
