@@ -29,7 +29,7 @@
 %
 % Outputs:
 %   M,SD        - mean and standard deviation
-%   sk,k        - skewness and kurtosis
+%   sk,k        - skewness and excess kurtosis
 %   med         - median
 %   zlow,zhi    - low and high 'percent/2'-Percentile ('percent/2'/100-Quantile)
 %   tM,tSD      - trimmed mean and SD, removing data<zlow and data>zhigh
@@ -152,11 +152,11 @@ SD=std(data);        % standard deviation
 if istats
 	sk=skewness(data,0); % skewness (third central moment divided by
                          % the cube of the standard deviation)
-    k=kurtosis(data,0);  % kurtosis (fourth central  moment divided by 
+    k=kurtosis(data,0)-3;  % kurtosis (fourth central  moment divided by 
                          % fourth power of the standard deviation)
 else
 	sk=NaN;
-	k=kurt(data);
+	k=kurt(data)-3;
 end
 
 % Checks on skewness and kurtosis
@@ -408,12 +408,12 @@ if plotlab
   text(0.4,0.7,[num2str((100-percent/2)/100,'%1.3f') '-quantile:  ' num2str(zhi,3)] ,'Color',verchi2,...
 	   'FontName','Courier','FontSize',12,'FontWeight','demi')
   
-  text(0.4,0.3,['Kurtosis: ' num2str(k, 3) ' (0 if Gaussian)'] ,'Color',verchi1,...
+  text(0.4,0.3,['Excess kurtosis: ' num2str(k, 3) ' (near 0 if Gaussian)'] ,'Color',verchi1,...
 				'FontName','Courier','FontSize',12,'FontWeight','demi')
   text(0.4,0.2,klab,'Color',verchi2,'FontName','Courier','FontSize',12,'FontWeight','demi')
  
   if istats
-	  text(0.4,0.5,['Skewness: ' num2str(sk,3) ' (0 if Gaussian)'] ,'Color',verchi1,...
+	  text(0.4,0.5,['Skewness: ' num2str(sk,3) ' (near 0 if Gaussian)'] ,'Color',verchi1,...
 		   			'FontName','Courier','FontSize',12,'FontWeight','demi')
 	  text(0.4,0.4,sklab,'Color',verchi2,'FontName','Courier','FontSize',12,'FontWeight','demi')
       text(0.4,0.1,kstestlab,'Color',kscol,'FontName','Courier','FontSize',12,'FontWeight','demi')
