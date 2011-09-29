@@ -374,8 +374,8 @@ switch lower(g.icatype)
                                                        'number below. If you do not understand, simply press OK.' ] } { } ...
                            { 'style' 'text' 'string' 'Proposed rank:' } ...
                            { 'style' 'edit' 'string' num2str(tmprank) } };
-                if isempty(res), return; end;
                 res = inputgui('uilist', uilist, 'geometry', { [1] [1] [1 1] }, 'geomvert', [6 1 1]);
+                if isempty(res), return; end;
                 tmprank = str2num(res{1});
                 g.options = { g.options 'pca' tmprank };
             else
