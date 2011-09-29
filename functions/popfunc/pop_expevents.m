@@ -64,6 +64,6 @@ if nargin < 3
 if ~(strcmp(unit, 'samples') || strcmp(unit, 'seconds'))
     error('Unit must be either ''samples'' or ''seconds''.');  end
 
-getEvents(EEG, 'dispTable', false, 'exportFile', filename, 'unit', unit);
+eeg_eventtable(EEG, 'dispTable', false, 'exportFile', filename, 'unit', unit);
 
 com = sprintf('pop_expevents(%s, ''%s'', ''%s'');', inputname(1), filename, unit); 
