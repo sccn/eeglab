@@ -55,9 +55,7 @@ if ~isstr(varargin{1}) %intial settings
     % callbacks
     % ---------
     erspparams_str = [ '''cycles'', [3 0.5], ''nfreqs'', 100' ];
-    if ALLEEG(1).trials > 1,  specparams_str = '''specmode'', ''fft''';
-    else                      specparams_str = '';
-    end;
+    specparams_str = '''specmode'', ''fft''';
     set_ersp       = ['pop_precomp(''setersp'',gcf);']; 
     test_ersp      = ['pop_precomp(''testersp'',gcf);']; 
     set_itc        = ['pop_precomp(''setitc'',gcf);']; 
