@@ -1,18 +1,16 @@
-function events = getEvents(EEG, varargin)
-% getEvents() - returns all events contained in the EEG structure (and
-%               optionally exports them to a CSV file)
+function events = eeg_eventtable(EEG, varargin)
+% eeg_eventtable() - returns all events contained in the EEG structure (and
+%                    optionally exports them to a CSV file)
 %
 % Usage:
-%   >> events = getEvents(EEG);
-%   >> events = getEvents(fileName);
-%   >> EEG = pop_loadBCI2000(fileName, events);
+%   >> events = eeg_eventtable(EEG);
 %
 % Inputs:
-%   EEG - EEG structure
+%   EEG          - EEG structure
 %
 % Optional inputs:
-%   'unit'       - Unit of latencies, can be either 'samples' (default) or
-%                  'seconds'
+%   'unit'       - Unit of events containing time samples, can be either
+%                  'samples' (default) or 'seconds'
 %   'dispTable'  - Display an overview of all events if set to true (default);
 %                  do not display if set to false
 %   'exportFile' - Exports events as a CSV file (using tabs as delimiters); set
@@ -24,19 +22,17 @@ function events = getEvents(EEG, varargin)
 %
 % Examples:
 %   Get all events contained in the EEG structure and display an overview:
-%     >> events = getEvents(EEG);
+%     >> events = eeg_eventtable(EEG);
 %
 %   In addition to displaying an overview, export into a CSV file:
-%     >> events = getEvents(EEG, 'exportFile', 'test.csv');
-%
-%   Export to CSV file and do not display an overview:
-%     >> events = getEvents(EEG, 'dispTable', false, 'exportFile', 'test.csv');
+%     >> events = eeg_eventtable(EEG, 'exportFile', 'test.csv');
 
 % Copyright by Clemens Brunner <clbrunner@ucsd.edu>
-% Revision: 0.10
-% Date: 09/16/2011
+% Revision: 0.11
+% Date: 09/28/2011
 
 % Revision history:
+%   0.11: Changed function name and updated documentation
 %   0.10: Initial version
 
 % This program is free software; you can redistribute it and/or modify it under
