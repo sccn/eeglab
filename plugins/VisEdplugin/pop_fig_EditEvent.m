@@ -113,8 +113,8 @@ if nargin < 5
             ...8
             {'Style', 'edit', 'string', {g.eloc_file(g.eventedit.ChanIndex).labels} ,'tag', 'ChanLabelEdit'}, ...
             }, ...
-            'pophelp(''pop_fig_EditEvent'');', 'event edit -- pop_fig_EditEvent()' ...
-            ); ...
+            'pophelp(''pop_fig_EditEvent'');', 'event edit -- pop_fig_EditEvent()', [], 'return'); 
+        %close;
         if isempty(results);return;end
     
         if results{1}==1;
@@ -134,7 +134,7 @@ if nargin < 5
             if iscell(ChanLabelStr);
                 g.eventedit.ChanLabelCell=ChanLabelStr;
             else
-                g.eventedit.ChanLabelCell=eval(['{' ChanLabelStr(2:length(ChanLabelStr)) '}']);
+                g.eventedit.ChanLabelCell=eval(['{' ChanLabelStr '}']);
             end
             for i=1:length(g.eventedit.ChanLabelCell);
                 g.eventedit.ChanIndex=strmatch(g.eventedit.ChanLabelCell{i},{g.eloc_file.labels},'exact');
