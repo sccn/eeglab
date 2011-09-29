@@ -165,15 +165,16 @@ end;
 % -----------
 if ~isempty(g.ref)
     disp('Re-referencing...');
-    EEG.data = EEG.data - repmat(mean(EEG.data(g.ref,:),1), [size(EEG.data,1) 1]);
-    if length(g.ref) == size(EEG.data,1)
-        EEG.ref  = 'averef';
-    end;
-    if length(g.ref) == 1
-        disp([ 'Warning: channel ' int2str(g.ref) ' is now zeroed (but still present in the data)' ]);
-    else
-        disp([ 'Warning: data matrix rank has decreased through re-referencing' ]);
-    end;
+    EEG = pop_reref(EEG, g.ref);
+%     EEG.data = EEG.data - repmat(mean(EEG.data(g.ref,:),1), [size(EEG.data,1) 1]);
+%     if length(g.ref) == size(EEG.data,1)
+%         EEG.ref  = 'averef';
+%     end;
+%     if length(g.ref) == 1
+%         disp([ 'Warning: channel ' int2str(g.ref) ' is now zeroed (but still present in the data)' ]);
+%     else
+%         disp([ 'Warning: data matrix rank has decreased through re-referencing' ]);
+%     end;
 end;
 
 % convert data to single if necessary
