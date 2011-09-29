@@ -28,9 +28,15 @@
 %                 datasets with equivalent dipoles located inside the brain volume. 
 %                 Dipoles are selected based on their residual variance and their 
 %                 location {default: 'off'}
+%   'resave'    - ['on'|'off'] save or resave STUDY {default: 'off'}
 %
 % Each of the 'commands' (above) is a cell array composed of any of the following: 
-%   'index'     - [integer] modify dataset index.
+%   'index'     - [integer] modify/add dataset index. Note that if a
+%                 dataset is added and that this leaves some indices not 
+%                 populated, the dataset is automatically set to the last
+%                 empty index. For instance creating a STUDY with a single
+%                 dataset at index 10 will result with a STUDY with a
+%                 single dataset at index 1.
 %   'remove'    - [integer] remove dataset index.
 %   'subject'   - [string] subject code.
 %   'condition' - [string] dataset condition. 
