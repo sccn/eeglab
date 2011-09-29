@@ -18,7 +18,8 @@
 %                If non-zero, this parameter is used to back-propagate
 %                the color of the rejection button.
 %   spectopo_options - [cell array] optional cell arry of options for 
-%                the spectopo() function.
+%                the spectopo() function. 
+%                For example { 'freqrange' [2 50] }
 % 
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
