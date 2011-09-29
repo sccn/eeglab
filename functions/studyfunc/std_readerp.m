@@ -129,11 +129,17 @@ for ind = 1:length(finalinds) % scan channels or components
             dataread = 1;
         end;
     else
-        if isfield(tmpstruct, [ dtype 'datatrials' ]) && ~isempty(getfield(tmpstruct, [ dtype 'datatrials' ])) && eqtf
-            if ~isempty(opt.channels) && strcmpi(getfield(tmpstruct, [ dtype 'trialinfo' ]), opt.subject)
-                dataread = 1; 
+        if isfield(tmpstruct, [ dtype 'datatrials' ]) && eqtf
+            tmpdat = getfield(tmpstruct, [ dtype 'datatrials' ]);
+            range  = fastif( strcmpi(dtype, 'erp'), 'erptimes', 'specfreqs');
+            if ~isempty(opt.channels) && ~isempty(tmpdat) && strcmpi(getfield(tmpstruct, [ dtype 'trialinfo' ]), opt.subject)
+                if size(tmpdat{1},2) == length(getfield(tmpstruct, range))
+                    dataread = 1; 
+                end;
             elseif isempty(opt.channels) && isequal(getfield(tmpstruct, [ dtype 'trialinfo' ]), opt.component) 
-                dataread = 1; 
+                if size(tmpdat{1},2) == length(getfield(tmpstruct, range))
+                    dataread = 1; 
+                end;
             end;
         end;
     end;
@@ -166,31 +172,13 @@ for ind = 1:length(finalinds) % scan channels or components
                 datavals = [];
                 return;
             end;
-            allsubjects = { setinfo.case };
             opts        = { opts{:} 'singletrials' 'on' };
-            for c = 1:nc
-                for g = 1:ng
-                    if ~isempty(opt.channels)
-                        if ~isempty(opt.subject) inds = strmatch( opt.subject, allsubjects(setinds{c,g}));
-                        else inds = 1:length(allinds{c,g}); end;
-                    else
-                        if ~isempty(opt.component) inds = find( allinds{c,g} == STUDY.cluster(finalinds(ind)).comps(opt.component));
-                        else inds = 1:length(allinds{c,g}); end;
-                    end;
-                    if ~isempty(inds)
-                        if ~isempty(opt.channels), alldata{c, g} = std_readfile( setinfo(setinds{c,g}(:)), 'measure', dtype, opts{:}, 'channels'  , opt.channels(ind));
-                        else                       alldata{c, g} = std_readfile( setinfo(setinds{c,g}(:)), 'measure', dtype, opts{:}, 'components', allinds{c,g});
-                        end;
-                    end;
-                end;
-            end;
-        else
-            for c = 1:nc
-                for g = 1:ng
-                    if ~isempty(setinds{c,g})
-                        if ~isempty(opt.channels), alldata{c, g} = std_readfile( setinfo(setinds{c,g}(:)), 'measure', dtype, opts{:}, 'channels'  , opt.channels(ind));
-                        else                       alldata{c, g} = std_readfile( setinfo(setinds{c,g}(:)), 'measure', dtype, opts{:}, 'components', allinds{c,g});
-                        end;
+        end;
+        for c = 1:nc
+            for g = 1:ng
+                if ~isempty(setinds{c,g})
+                    if ~isempty(opt.channels), alldata{c, g} = std_readfile( setinfo(setinds{c,g}(:)), 'measure', dtype, opts{:}, 'channels'  , opt.channels(ind));
+                    else                       alldata{c, g} = std_readfile( setinfo(setinds{c,g}(:)), 'measure', dtype, opts{:}, 'components', allinds{c,g});
                     end;
                 end;
             end;
