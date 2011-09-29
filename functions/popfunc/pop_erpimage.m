@@ -383,6 +383,8 @@ if popup
             if ~isempty(projchan) && ~isempty(str2num(projchan{1}))
                 projchan = cellfun(@str2num, projchan);
             end;
+        else
+            projchan = []; 
         end;
     else, 
         projchan = []; 
@@ -395,7 +397,7 @@ if popup
         catch, error('Additional options ("More options") requires ''key'', ''val'' arguments');
         end;
 	end;
-	if ~typeplot & isempty(projchan)
+	if ~typeplot && isempty(projchan)
         opt.yerplabel = '';
     else
         opt.yerplabel = '\muV' ;
@@ -633,7 +635,7 @@ if isempty(titleplot)
     else
         titleplot = [ 'Comp. ' int2str(channel) ];
         if ~isempty(projchan),
-            tmpstr = vararg2str(projchan);
+            tmpstr = vararg2str({projchan});
             tmpstr(find(tmpstr == '''')) = '"';
             titleplot = [ titleplot ' -> Chan. ' tmpstr ];
         end;
@@ -658,7 +660,7 @@ if isempty( options )
 end;
 
 % varargout{1} = sprintf('figure; pop_erpimage(%s,%d,%d,''%s'',%d,%d,{%s},[%s],''%s'',''%s''%s);', inputname(1), typeplot, channel, titleplot, smooth, decimate, typetxt, int2str(sortingwin), sortingeventfield, renorm, options);
-popcom = sprintf('figure; pop_erpimage(%s,%d, [%s],%s,''%s'',%d,%d,{%s},[%s],''%s'' %s);', inputname(1), typeplot, int2str(channel), vararg2str(projchan), titleplot, smooth, decimate, typetxt, int2str(sortingwin), sortingeventfield, options);
+popcom = sprintf('figure; pop_erpimage(%s,%d, [%s],%s,''%s'',%d,%d,{%s},[%s],''%s'' %s);', inputname(1), typeplot, int2str(channel), vararg2str({projchan}), titleplot, smooth, decimate, typetxt, int2str(sortingwin), sortingeventfield, options);
 
 com = sprintf('%s erpimage( %s, %s, linspace(EEG.xmin*1000, EEG.xmax*1000, EEG.pnts), ''%s'', %d, %d %s);', outstr, tmpsig, events, titleplot, smooth, decimate, options);
 disp('Command executed by pop_erpimage:');
