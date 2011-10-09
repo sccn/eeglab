@@ -18,7 +18,8 @@
 %                will be saved.  
 %   'addchannellabels' - ['on'|'off'] add channel labels ('1', '2', '3', ...)
 %                to all datasets of a STUDY to ensure that all STUDY functions
-%                will work {default: 'off'}
+%                will work {default: 'off' unless no dataset has channel
+%                locations and then it is automatically set to on}
 %   'notes'    - [string] notes about the experiment, the datasets, the STUDY, 
 %                or anything else to store with the STUDY itself {default: ''}. 
 %   'updatedat' - ['on'|'off'] update 'subject' 'session' 'condition' and/or
@@ -101,6 +102,18 @@ if isstr(g), error(g); end;
 if ~isempty(g.name),  STUDY.name  = g.name; end
 if ~isempty(g.task),  STUDY.task  = g.task; end
 if ~isempty(g.notes), STUDY.notes = g.notes; end
+
+% default addchannellabels
+% ------------------------
+allchanlocs = { ALLEEG.chanlocs };
+if all(cellfun( @isempty, allchanlocs))
+    g.addchannellabels = 'on';
+else
+    if any(cellfun( @isempty, allchanlocs))
+        error( [ 'Some datasets have channel locations and some other don''t' 10 ...
+                 'the STUDY is not homogenous and cannot be created.' ]);
+    end;
+end;
 
 % make one cell array with commands
 % ---------------------------------
