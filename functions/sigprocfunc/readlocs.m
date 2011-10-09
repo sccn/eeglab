@@ -307,6 +307,7 @@ g = finputcheck( varargin, ...
      'elecind'     'integer' [1 Inf]	    	[];
      'format'	   'cell'	 []					{} }, 'readlocs');
 if isstr(g), error(g); end;  
+if ~isempty(g.format), g.filetype = 'custom'; end;
 
 if isstr(filename)
    
