@@ -105,13 +105,15 @@ if ~isempty(g.notes), STUDY.notes = g.notes; end
 
 % default addchannellabels
 % ------------------------
-allchanlocs = { ALLEEG.chanlocs };
-if all(cellfun( @isempty, allchanlocs))
-    g.addchannellabels = 'on';
-else
-    if any(cellfun( @isempty, allchanlocs))
-        error( [ 'Some datasets have channel locations and some other don''t' 10 ...
-                 'the STUDY is not homogenous and cannot be created.' ]);
+if ~isempty(ALLEEG)
+    allchanlocs = { ALLEEG.chanlocs };
+    if all(cellfun( @isempty, allchanlocs))
+        g.addchannellabels = 'on';
+    else
+        if any(cellfun( @isempty, allchanlocs))
+            error( [ 'Some datasets have channel locations and some other don''t' 10 ...
+                     'the STUDY is not homogenous and cannot be created.' ]);
+        end;
     end;
 end;
 
