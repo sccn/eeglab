@@ -126,20 +126,6 @@ if length(data(:)) == length(opt.legend(:)),
     opt.legend = (opt.legend)';
 end;
 
-% plot
-% ----
-% if strcmpi(opt.figure, 'on'), 
-% else
-%     % all groups and conditions in the same figureopt.chanlocs
-%     ncol = size(tmpdata,3);
-%     if ncol == 1, ncol = size(tmpdata,1); end;
-%     tmpcol = col(colcount:colcount+ncol-1);
-%     colcount = mod(colcount+ncol-1, length(col))+1;
-%     %if strcmpi(opt.plotgroups, 'together') && isempty(tmpdata{1})
-% 
-% end;
-%  
-
 % color matrix
 % -----------------------
 onecol  = { 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b' };
@@ -203,9 +189,10 @@ if strcmpi(opt.singlesubject, 'off') ...
 end;
 
 % resize data to match points x channels x subjects
+% or                   points x    1   x components
 % -------------------------------------------------
 for index = 1:length(data(:))
-    if length(opt.chanlocs) ~= size(data{index},2) && length(opt.chanlocs) == 1
+    if length(opt.chanlocs) ~= size(data{index},2) && (length(opt.chanlocs) == 1 || isempty(opt.chanlocs))
         data{index} = reshape(data{index}, [ size(data{index},1) 1 size(data{index},2) ]);
     end;
 end;
@@ -328,8 +315,9 @@ for c = 1:ncplot
             plotopt = { allx };
             % -------------------------------------------------------------
             % tmpdata is of size "points x channels x subject x conditions"
+            % or                 "points x   1   x components x conditions"
             % -------------------------------------------------------------
-            if ~dimreduced_sizediffers && strcmpi(opt.plotsubjects, 'off')
+            if ~dimreduced_sizediffers && strcmpi(opt.plotsubjects, 'off') % average accross subjects
                 tmpstd = squeeze(real(std(tmpdata,[],3)))/sqrt(size(tmpdata,3)); tmpstd = squeeze(permute(tmpstd, [2 1 3])); tmpdata = squeeze(real(nan_mean(tmpdata,3)));
             end;
             tmpdata = squeeze(permute(tmpdata, [2 1 3 4]));
@@ -357,20 +345,6 @@ for c = 1:ncplot
                 plotopt = { plotopt{:} 'legend' opt.legend };
             end;
             
-%             % plot
-%             % ----
-%             if strcmpi(opt.figure, 'on'), 
-%                 tmpcol = col; 
-%             else
-%                 % all groups and conditions in the same figureopt.chanlocs
-%                 ncol = size(tmpdata,3);
-%                 if ncol == 1, ncol = size(tmpdata,1); end;
-%                 tmpcol = col(colcount:colcount+ncol-1);
-%                 colcount = mod(colcount+ncol-1, length(col))+1;
-%                 %if strcmpi(opt.plotgroups, 'together') && isempty(tmpdata{1})
-%                     
-%             end;
-%             
             if strcmpi(opt.plottopo, 'on') && length(opt.chanlocs) > 1
                 metaplottopo(tmpdata, 'chanlocs', opt.chanlocs, 'plotfunc', 'plotcurve', ...
                     'plotargs', { plotopt{:} }, 'datapos', [2 3], 'title', opt.titles{c,g});
@@ -378,8 +352,6 @@ for c = 1:ncplot
                 plotcurve( allx, tmpdata{1}, 'colors', tmpcol, 'maskarray', tmpdata{2}, plotopt{3:end}, 'title', opt.titles{c,g});
             else
                 if isempty(findstr(opt.plotstderr, 'nocurve'))
-                    % the line below is averaging components of a cluster and putting conditions in the first dimension for  plotting
-                    if strcmpi(opt.plotsubjects, 'off') && isempty(opt.chanlocs), tmpdata = squeeze(mean(tmpdata, 1))'; end;
                     plotcurve( allx, tmpdata, 'colors', tmpcol, plotopt{2:end}, 'title', opt.titles{c,g});
                 end;
                 if ~strcmpi(opt.plotstderr, 'off') 
