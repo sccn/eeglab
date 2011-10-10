@@ -324,54 +324,36 @@ else
             try,
                 spec_params = eval([ '{' get(findobj('parent', hdl, 'tag', 'spec_params'), 'string') '}' ]); 
 
-                EEG = eeg_checkset(ALLEEG(1), 'loaddata');
-                data = EEG.data(1,:,1:max(EEG.trials,10));
-                figure; spectopo( data, EEG.pnts, EEG.srate, spec_params{:});
+                TMPEEG = eeg_checkset(ALLEEG(1), 'loaddata');
+                [ X f ] = std_spec(TMPEEG, 'channels', { TMPEEG.chanlocs(1).labels }, 'trialindices', { [1:min(20,TMPEEG.trials)] }, 'recompute', 'on', 'savefile', 'off', spec_params{:});
+                figure; plot(f, X); 
+                xlabel('Frequencies (Hz)');
+                ylabel('Power');
+                xlim([min(f) max(f)]);
                 tmplim = ylim;
-                text( EEG.srate/4, mean(tmplim), strvcat('This is a test plot performed on', ...
-                                                         'the first 10 trials of the first', ...
-                                                         'dataset to determine if you like', ...
-                                                         'the frequency resolution.', ...
+                text( TMPEEG.srate/4, mean(tmplim)+(max(tmplim)-min(tmplim))/3, ...
+                                                 strvcat('This is a test plot performed on', ...
+                                                         'the first 20 trials of the first', ...
+                                                         'dataset (1 line per channel).', ...
                                                          'Frequency range may be adjusted', ...
                                                          'after computation'));
             catch, warndlg2('Error while calling function, check parameters'); end;
 
         case 'testersp'
-            %try,
                 ersp_params = eval([ '{' get(findobj('parent', hdl, 'tag', 'ersp_params'), 'string') '}' ]); 
                 tmpstruct = struct(ersp_params{:});
-                [ tmpX tmpt tmpf ersp_params ] = std_ersp(ALLEEG(1), 'channels', 1, 'type', 'ersp', 'recompute', 'on', 'getparams', 'on', ersp_params{:});
-
-                set_itc  = get(findobj('parent', hdl, 'tag', 'itc_on'), 'value'); 
-                set_ersp = get(findobj('parent', hdl, 'tag', 'ersp_on'), 'value'); 
-                opt = {};
-                for ind = length(ersp_params)-1:-2:1, 
-                    if strcmpi(ersp_params{ind}, 'plotitc'),  ersp_params(ind:ind+1) = []; end;
-                    if strcmpi(ersp_params{ind}, 'plotersp'), ersp_params(ind:ind+1) = []; end;
-                end;
-                if ~set_itc,  opt = { opt{:} 'plotitc',  'off' }; end;
-                if ~set_ersp, opt = { opt{:} 'plotersp', 'off' }; end;
-
-                EEG = eeg_checkset(ALLEEG(1), 'loaddata');
-                data = EEG.data(1,:,1:min(EEG.trials,10));
-                %f1   = fieldnames( ersp_params);
-                %f2   = struct2cell(ersp_params);
-                %ersp_params = {f1{:}; f2{:} }; ersp_params = ersp_params(:)';
-                
+                [ tmpX tmpt tmpf ersp_params ] = std_ersp(ALLEEG(1), 'channels', 1, 'trialindices', { [1:min(20,ALLEEG(1).trials)] }, 'type', 'ersp', 'recompute', 'on', 'savefile', 'off', ersp_params{:});
                 figure; pos = get(gcf, 'position'); pos(3)=pos(3)*2; set(gcf, 'position', pos);
-                subplot(1,2,1); newtimef( data, EEG.pnts, [ EEG.xmin EEG.xmax ]*1000, EEG.srate, tmpstruct.cycles, opt{:}, ersp_params{:});
+                subplot(1,2,1); 
+                tftopo(tmpX, tmpt, tmpf);
                 subplot(1,2,2); 
-                text( 0.2, 0.8, strvcat('This is a test plot performed on', ...
-                                                         'the first 10 trials of the first', ...
-                                                         'dataset to determine if you like', ...
-                                                         'the time and frequency resolution.', ...
-                                                         ' ', ...
-                                                         'Time and frequency range may also be', ...
-                                                         'adjusted after computation.'));
-                axis off;
-            %catch, warndlg2(strvcat('Error while calling function, check parameters', lasterr)); 
-            %end;
-                                                 
+                text( 0.2, 0.8, strvcat( 'This is a test plot performed on', ...
+                                         'the first 20 trials of the first', ...
+                                         'dataset (ERSP only).', ...
+                                         ' ', ...
+                                         'Time and frequency range may also be', ...
+                                         'adjusted after computation.'));
+                axis off;                                                 
     end;
 end
 STUDY.saved = 'no';

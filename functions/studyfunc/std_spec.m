@@ -122,6 +122,7 @@ end;
                                       'specmode'   'string'  {'fft','psd','pmtm','pburg'} 'psd';
                                       'recompute'  'string'  { 'on','off' } 'off';
                                       'savetrials' 'string'  { 'on','off' } 'off';
+                                      'savefile'   'string'  { 'on','off' } 'on';
                                       'epochlim'   'real'    []         [0 1];
                                       'epochrecur' 'real'    []         1;
                                       'rmcomps'    'cell'    []         cell(1,length(EEG));
@@ -241,7 +242,7 @@ end;
 if strcmpi(g.specmode, 'psd')
     [X, f] = spectopo(X, size(X,2), EEG(1).srate, 'plot', 'off', 'boundaries', boundaries, 'nfft', g.nfft, spec_opt{:});
     if strcmpi(g.savetrials, 'on')
-        disp('Cannot save trials using ''psd'' specmode option');
+        disp('WARNING: Cannot save trials using ''psd'' specmode option');
     end;
 elseif strcmpi(g.specmode, 'pmtm')
     if all([ EEG.trials ] == 1) && ~isempty(boundaries), disp('Warning: multitaper does not take into account boundaries in continuous data'); end;
@@ -291,15 +292,17 @@ end;
 
 % Save SPECs in file (all components or channels)
 % ----------------------------------
-options = { options{:} spec_opt{:} 'timerange' g.timerange 'nfft' g.nfft 'specmode' g.specmode };
-if strcmpi(prefix, 'comp')
-    savetofile( filename, f, X, 'comp', 1:size(X,1), options);
-else
-    if ~isempty(g.interp)
-        savetofile( filename, f, X, 'chan', 1:size(X,1), options, { g.interp.labels });
+if strcmpi(g.savefile, 'on')
+    options = { options{:} spec_opt{:} 'timerange' g.timerange 'nfft' g.nfft 'specmode' g.specmode };
+    if strcmpi(prefix, 'comp')
+        savetofile( filename, f, X, 'comp', 1:size(X,1), options);
     else
-        tmpchanlocs = EEG(1).chanlocs;
-        savetofile( filename, f, X, 'chan', 1:size(X,1), options, { tmpchanlocs.labels });
+        if ~isempty(g.interp)
+            savetofile( filename, f, X, 'chan', 1:size(X,1), options, { g.interp.labels });
+        else
+            tmpchanlocs = EEG(1).chanlocs;
+            savetofile( filename, f, X, 'chan', 1:size(X,1), options, { tmpchanlocs.labels });
+        end;
     end;
 end;
 return;

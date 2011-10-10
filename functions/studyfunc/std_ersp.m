@@ -118,7 +118,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [X, times, freqs, parameters] = std_ersp(EEG, varargin)
+function [X, times, logfreqs, parameters] = std_ersp(EEG, varargin)
 
 if nargin < 1
     help std_ersp;
@@ -151,6 +151,7 @@ end;
                         'plot'          'string'      { 'on','off' }      'off';
                         'recompute'     'string'      { 'on','off' }      'off';
                         'getparams'     'string'      { 'on','off' }      'off';
+                        'savefile'      'string'      { 'on','off' }      'on';
                         'timewindow'    'real'        []      [];
                         'fileout'       'string'      []      '';
                         'timelimits'    'real'        []      [EEG(1).xmin EEG(1).xmax]*1000;
@@ -260,7 +261,7 @@ end
 % return parameters
 % -----------------
 if strcmpi(g.getparams, 'on')
-    X = []; times = []; freqs = [];
+    X = []; times = []; logfreqs = [];
     if strcmpi(g.savetrials, 'on')
         parameters = { parameters{:} 'savetrials', g.savetrials };
     end;
@@ -373,6 +374,7 @@ for k = 1:length(g.indices)  % for each (specified) component
         all_trials = setfield( all_trials, [ prefix int2str(g.indices(k)) '_timef'     ], single( alltfX ));
     end;
 end
+X = logersp;
 
 % Save ERSP into file
 % -------------------
@@ -416,13 +418,15 @@ if ~isempty(g.channels)
     end;
 end;
 
-if strcmpi(g.type, 'both') | strcmpi(g.type, 'ersp') | strcmpi(g.type, 'ersp&itc')
-    std_savedat( filenameersp, all_ersp);
-end;
-if strcmpi(g.type, 'both') | strcmpi(g.type, 'itc') | strcmpi(g.type, 'ersp&itc')
-    std_savedat( filenameitc , all_itc );
-end;
-if strcmpi(g.savetrials, 'on')
-    std_savedat( filenametrials , all_trials );
+if strcmpi(g.savefile, 'on')
+    if strcmpi(g.type, 'both') | strcmpi(g.type, 'ersp') | strcmpi(g.type, 'ersp&itc')
+        std_savedat( filenameersp, all_ersp);
+    end;
+    if strcmpi(g.type, 'both') | strcmpi(g.type, 'itc') | strcmpi(g.type, 'ersp&itc')
+        std_savedat( filenameitc , all_itc );
+    end;
+    if strcmpi(g.savetrials, 'on')
+        std_savedat( filenametrials , all_trials );
+    end;
 end;
 
