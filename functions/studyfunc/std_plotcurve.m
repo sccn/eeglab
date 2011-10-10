@@ -106,6 +106,7 @@ opt = finputcheck( varargin, { 'ylim'          'real'   []              [];
 % opt.figure =  'off'; % test by nima
 if isstr(opt), error(opt); end;
 opt.singlesubject = 'off';
+if length(opt.chanlocs) > 1, opt.plottopo = 'on'; end;
 if strcmpi(opt.plottopo, 'on') && size(data{1},3) == 1, opt.singlesubject = 'on'; end;
 %if size(data{1},2) == 1,                              opt.singlesubject = 'on'; end;
 if all(all(cellfun('size', data, 2)==1))               opt.singlesubject = 'on'; end;
@@ -201,6 +202,14 @@ if strcmpi(opt.singlesubject, 'off') ...
     end;
 end;
 
+% resize data to match points x channels x subjects
+% -------------------------------------------------
+for index = 1:length(data(:))
+    if length(opt.chanlocs) ~= size(data{index},2) && length(opt.chanlocs) == 1
+        data{index} = reshape(data{index}, [ size(data{index},1) 1 size(data{index},2) ]);
+    end;
+end;
+
 % compute significance mask
 % --------------------------
 if ~isempty(opt.interstats), pinter = opt.interstats{3}; end;
@@ -264,13 +273,8 @@ for c = 1:ncplot
                 for cc = 1:size(data,1)
                     for gg = 1:size(data,2)
                         tmptmpdata = real(data{cc,gg});
-                        if ndims(tmptmpdata) == 3, 
-                            if cc == 1 && gg == 1, tmpdata = NaN*zeros([size(tmptmpdata,1) size(tmptmpdata,2) maxdim length(data(:))]); end;
-                            tmpdata(:,:,1:size(tmptmpdata,3),gg+((cc-1)*ng)) = tmptmpdata;
-                        else
-                            if cc == 1 && gg == 1, tmpdata = NaN*zeros([size(tmptmpdata,1) 1 maxdim length(data(:))]); end;
-                            tmpdata(:,1,1:size(tmptmpdata,2),gg+((cc-1)*ng)) = tmptmpdata;
-                        end;
+                        if cc == 1 && gg == 1, tmpdata = NaN*zeros([size(tmptmpdata,1) size(tmptmpdata,2) maxdim length(data(:))]); end;
+                        tmpdata(:,:,1:size(tmptmpdata,3),gg+((cc-1)*ng)) = tmptmpdata;
                     end;
                 end;
             elseif ncplot ~= nc % plot conditions together
@@ -278,13 +282,11 @@ for c = 1:ncplot
                 for cc = 1:nc
                     tmptmpdata = real(data{cc,g});
                     if dimreduced_sizediffers
-                        tmptmpdata = nan_mean(tmptmpdata,ndims(tmptmpdata));
+                        tmptmpdata = nan_mean(tmptmpdata,ndims(tmptmpdata)); % average across last dim
                     end;
-                    if cc == 1 && ndims(tmptmpdata) == 3, tmpdata = zeros([size(tmptmpdata) nc]); end;
-                    if cc == 1 && ndims(tmptmpdata) == 2, tmpdata = zeros([size(tmptmpdata,1) 1 size(tmptmpdata,2) nc]); end;
-                    if ndims(tmptmpdata) == 3, tmpdata(:,:,:,cc) = tmptmpdata; 
-                    else                       tmpdata(:,1,:,cc) = tmptmpdata; 
-                    end;
+                    if cc == 1 && ndims(tmptmpdata) == 3, tmpdata = zeros([size(tmptmpdata)   nc]); end;
+                    if cc == 1 && ndims(tmptmpdata) == 2, tmpdata = zeros([size(tmptmpdata) 1 nc]); end;
+                    tmpdata(:,:,:,cc) = tmptmpdata;
                 end;
             elseif ngplot ~= ng % plot groups together
                 for ind = 2:size(data,2), if any(size(data{1,ind}) ~= size(data{1})), dimreduced_sizediffers = 1; end; end;
@@ -293,19 +295,12 @@ for c = 1:ncplot
                     if dimreduced_sizediffers
                         tmptmpdata = nan_mean(tmptmpdata,ndims(tmptmpdata));
                     end;
-                    if gg == 1 && ndims(tmptmpdata) == 3, tmpdata = zeros([size(tmptmpdata) ng]); end;
-                    if gg == 1 && ndims(tmptmpdata) == 2, tmpdata = zeros([size(tmptmpdata,1) 1 size(tmptmpdata,2) ng]); end;
-                    if ndims(tmptmpdata) == 3, tmpdata(:,:,:,gg) = tmptmpdata; 
-                    else                       tmpdata(:,1,:,gg) = tmptmpdata; 
-                    end;
+                    if gg == 1 && ndims(tmptmpdata) == 3, tmpdata = zeros([size(tmptmpdata)   ng]); end;
+                    if gg == 1 && ndims(tmptmpdata) == 2, tmpdata = zeros([size(tmptmpdata) 1 ng]); end;
+                    tmpdata(:,:,:,gg) = tmptmpdata;
                 end;
             else
-                if strcmpi(opt.plottopo, 'on')
-                    tmpdata = real(data{c,g});
-                else
-                    tmpdata = reshape(real(data{c,g}), [size(data{c,g},1) 1 size(data{c,g},2)]); % 1 channel only
-                end;
-                % nothing
+                tmpdata = real(data{c,g});
             end;
             
             % plot difference
@@ -338,6 +333,9 @@ for c = 1:ncplot
                 tmpstd = squeeze(real(std(tmpdata,[],3)))/sqrt(size(tmpdata,3)); tmpstd = squeeze(permute(tmpstd, [2 1 3])); tmpdata = squeeze(real(nan_mean(tmpdata,3)));
             end;
             tmpdata = squeeze(permute(tmpdata, [2 1 3 4]));
+            % -----------------------------------------------------------------
+            % tmpdata is now of size "channels x points x subject x conditions"
+            % -----------------------------------------------------------------
             if strcmpi(opt.plottopo, 'on'), highlight = 'background'; else highlight = 'bottom'; end;
             if strcmpi(opt.plotgroups, 'together') &&  isempty(opt.condstats) && ...
                              ~isnan(opt.threshold) && ~isempty(opt.groupstats)
@@ -380,6 +378,8 @@ for c = 1:ncplot
                 plotcurve( allx, tmpdata{1}, 'colors', tmpcol, 'maskarray', tmpdata{2}, plotopt{3:end}, 'title', opt.titles{c,g});
             else
                 if isempty(findstr(opt.plotstderr, 'nocurve'))
+                    % the line below is averaging components of a cluster and putting conditions in the first dimension for  plotting
+                    if strcmpi(opt.plotsubjects, 'off') && isempty(opt.chanlocs), tmpdata = squeeze(mean(tmpdata, 1))'; end;
                     plotcurve( allx, tmpdata, 'colors', tmpcol, plotopt{2:end}, 'title', opt.titles{c,g});
                 end;
                 if ~strcmpi(opt.plotstderr, 'off') 

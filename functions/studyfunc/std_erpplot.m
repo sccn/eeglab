@@ -250,7 +250,7 @@ if ~isempty(opt.channels)
     else
         std_plotcurve(alltimes, erpdata, 'groupstats', pgroup, 'legend', alllegends, 'condstats', pcond, 'interstats', pinter, ...
             'chanlocs', locs, 'titles', alltitles, 'plotsubjects', opt.plotsubjects, 'plotstderr', opt.plotstderr, ...
-            'condnames', allconditions, 'groupnames', allgroups, 'plottopo', fastif(length(opt.channels) > 1, 'on', 'off'), plotcurveopt{:});
+            'condnames', allconditions, 'groupnames', allgroups, plotcurveopt{:});
     end;
 
     set(gcf,'name',['Channel ' datatypestr ]);
@@ -291,7 +291,7 @@ else
         if length(opt.clusters) > 1 && index < length(opt.clusters), alllegends = {}; end;
         std_plotcurve(alltimes, erpdata, 'condnames', allconditions, 'legend', alllegends, 'groupnames', allgroups, 'plotstderr', opt.plotstderr, ...
                                           'titles', alltitles, 'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, ...
-                                          'chanlocs', ALLEEG(1).chanlocs, 'plotsubjects', opt.plotsubjects, plotcurveopt{:});
+                                          'plotsubjects', opt.plotsubjects, plotcurveopt{:});
     end;
     
     set(gcf,'name', ['Component ' datatypestr ] );
