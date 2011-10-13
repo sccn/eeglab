@@ -16,6 +16,8 @@ function events = eeg_eventtable(EEG, varargin)
 %   'exportFile' - Exports events as a CSV file (using tabs as delimiters); set
 %                  this parameter to the file name you wish to export the events
 %                  to (string); default: no file is exported
+%   'indexCol'   - Adds a column with the event indices as the first row; note 
+%                  that this is not an event field; default: true
 %
 % Outputs:
 %   events       - event structure (cell array)
@@ -28,10 +30,11 @@ function events = eeg_eventtable(EEG, varargin)
 %     >> events = eeg_eventtable(EEG, 'exportFile', 'test.csv');
 
 % Copyright by Clemens Brunner <clbrunner@ucsd.edu>
-% Revision: 0.11
-% Date: 09/28/2011
+% Revision: 0.15
+% Date: 10/13/2011
 
 % Revision history:
+%   0.15: Added option to add/remove index column
 %   0.11: Changed function name and updated documentation
 %   0.10: Initial version
 
@@ -52,6 +55,7 @@ function events = eeg_eventtable(EEG, varargin)
 unit = 'samples';  % Unit of latencies is 'samples'
 dispTable = true;  % Display the event table
 exportFile = [];  % Export events to text file
+indexCol = true;  % Add an index column as first column
 
 if ~isempty(varargin)  % Are there optional parameters available?
     k = 1;
@@ -64,6 +68,9 @@ if ~isempty(varargin)  % Are there optional parameters available?
             k = k + 2;
         elseif strcmp(varargin{k}, 'exportFile')
             exportFile = varargin{k + 1};
+            k = k + 2;
+        elseif strcmp(varargin{k}, 'indexCol')
+            indexCol = varargin{k + 1};
             k = k + 2;
         else  % Ignore unknown parameters
             k = k + 2;
@@ -99,12 +106,19 @@ if dispTable || ~isempty(exportFile)  % Display overview or export to CSV file?
         nr{l} = l;  end
     
     eventsTable = [];
-    titleTable{1} = 'number';
+    if indexCol  % Add index column
+        titleTable{1} = 'number';
+        titleOffset = 1;
+    else  % Do not add index column
+        titleOffset = 0;
+    end
     for k = 1:nFields
         eventsTable = [eventsTable, events{k}.values];
-        titleTable{k + 1} = events{k}.name;
+        titleTable{k + titleOffset} = events{k}.name;
     end
-    eventsTable = [nr, eventsTable];  % Add event numbers in first column
+    if indexCol
+        eventsTable = [nr, eventsTable];  % Add event numbers in first column
+    end
     finalTable = [titleTable; eventsTable];  % Add title in first row
     
     if dispTable
