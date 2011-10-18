@@ -189,10 +189,22 @@ if nargin >= 2 | isstr(EEG) % interpreting command from GUI or command line
       if gui
           shift     = tmparg; % shift is for adding before or after the event
 
-          % update commands
-          % ---------------
+          % add epoch number if data epoch
+          % ------------------------------
           tmpcell    = cell(1,1+length(fieldnames(EEG.event))); 
           tmpcell{1} = valnum;
+          if EEG.trials > 1
+              indepoch = strmatch('epoch', fieldnames(EEG.event), 'exact');
+              if valnum > 1, tmpprevval = valnum-1;
+              else           tmpprevval = valnum+1;
+              end;
+              if tmpprevval <= length(EEG.event)
+                  tmpcell{indepoch+1} = EEG.event(tmpprevval).epoch;
+              end;
+          end;
+          
+          % update commands
+          % ---------------
           if shift
               oldcom     = { oldcom{:} 'append', tmpcell };
           else
