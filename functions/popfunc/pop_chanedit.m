@@ -761,9 +761,11 @@ else
                         try
                             EEG = eeg_emptyset; % for dipfitdefs
                             dipfitdefs;
-                            userdatatmp = { template_models(1).chanfile template_models(2).chanfile };
+                            tmpp = which('eeglab.m');
+                            tmpp = fullfile(fileparts(tmpp), 'functions', 'resources', 'Standard-10-5-Cap385_witheog.elp');
+                            userdatatmp = { template_models(1).chanfile template_models(2).chanfile  tmpp };
                             clear EEG;
-                        catch, userdatatmp = { 'Standard-10-5-Cap385.sfp' 'Standard-10-5-Cap385.sfp' };
+                        catch, userdatatmp = { 'Standard-10-5-Cap385.sfp' 'Standard-10-5-Cap385.sfp' 'Standard-10-5-Cap385_witheog.elp' };
                         end;
 
                         % other commands for help/load
@@ -792,7 +794,7 @@ else
                         end;
                         uilist = { { 'style' 'text' 'string' textcomment } ...
                             { 'style' 'popupmenu'  'string' [ 'use BESA file for 4-shell dipfit spherical model' ...
-                            '|use MNI coordinate file for BEM dipfit model' ] ...
+                            '|use MNI coordinate file for BEM dipfit model|Use spherical file with eye channels' ] ...
                             'callback' setmodel } ...
                             { } ...
                             { 'style' 'edit'       'string' userdatatmp{1} 'tag' 'elec' } ...
@@ -884,7 +886,9 @@ if ~isempty(fig)
             if strcmpi(allfields{index}, 'datachan') 
                 set(obj, 'value', getfield(chans(currentpos), allfields{index}));
             else
-                set(obj, 'string', num2str(getfield(chans(currentpos), allfields{index})));
+                tmpval = getfield(chans(currentpos), allfields{index});
+                if isstr(tmpval) && strcmpi(tmpval, '[]'), tmpval = ''; end;
+                set(obj, 'string', num2str(tmpval));
             end;
         end;
     else
