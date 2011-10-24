@@ -40,6 +40,12 @@ if nargin < 2
     return;
 end;
 
+if isempty(chanlocs) && isstr(chanstr)
+    chaninds = str2num(chanstr);
+    chanlist = chaninds;
+    return;
+end;
+    
 if isstr(chanstr)
     % convert chanstr
     % ---------------
