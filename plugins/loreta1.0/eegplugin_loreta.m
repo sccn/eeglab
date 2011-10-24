@@ -73,6 +73,6 @@ function vers = eegplugin_loreta(fig, trystrs, catchstrs)
     % ------------
     submenu = uimenu( menu, 'Label', 'Locate dipoles using LORETA');
     uimenu( submenu, 'Label', 'Export components to LORETA'     , 'CallBack', comexport);
-    uimenu( submenu, 'Label', 'Import dipoles from LORETA'      , 'CallBack', '', 'enable', 'off');
-    uimenu( submenu, 'Label', 'Plot dipoles on LORETA head'     , 'CallBack', '', 'enable', 'off');
+    %uimenu( submenu, 'Label', 'Import dipoles from LORETA'      , 'CallBack', '', 'enable', 'off');
+    %uimenu( submenu, 'Label', 'Plot dipoles on LORETA head'     , 'CallBack', '', 'enable', 'off');
  
