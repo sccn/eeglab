@@ -145,7 +145,7 @@ if isfield(EEG.event, 'latency')
     end;
     if isfield(EEG, 'urevent') & isfield(EEG.urevent, 'latency')
         try,
-            for index1 = 1:length(EEG.event)
+            for index1 = 1:length(EEG.urevent)
                 EEG.urevent(index1).latency = EEG.urevent(index1).latency * EEG.pnts /oldpnts;
             end;
         catch, 
