@@ -247,6 +247,7 @@ for fInd = 1:length(opt.dataindices) % usually only one value
         error( sprintf([ 'Field "%s" not found in file %s' 10 'Try recomputing measure.' ], fieldsToRead, [ fileBaseName{fInd} fileExt ]));
     else
         % the case below is for the rare case where all the channels are read and the end of the array needs to be trimmed
+        error('There is a problem with your data, please enter a bug report and upload your data at http://sccn.ucsd.edu/eeglab/bugzilla');
         if nDimData == 1,     measureData(:,1:(fInd-1))     = [];
         elseif nDimData == 2, measureData(:,:,1:(fInd-1))   = [];
         else                  measureData(:,:,:,1:(fInd-1)) = [];
