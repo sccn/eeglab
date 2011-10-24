@@ -179,6 +179,12 @@ if isempty(STUDY.cluster)
     modif = 1; 
     [STUDY] = std_createclust(STUDY, ALLEEG, 'parentcluster', 'on');
 end;
+if length(STUDY.cluster(1).child) == length(STUDY.cluster)-1 && length(STUDY.cluster) > 1
+    newchild = { STUDY.cluster(2:end).name };
+    if ~isequal(STUDY.cluster(1).child, newchild)
+        STUDY.cluster(1).child = newchild;
+    end;
+end;
 
 % create STUDY design if it is not present
 % ----------------------------------------
