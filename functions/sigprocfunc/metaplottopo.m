@@ -255,8 +255,8 @@ Axes = [];
 fprintf('Plotting all channel...');
 for c=1:length(g.chans), %%%%%%%% for each data channel %%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    xcenter = xvals(c);
-    ycenter = yvals(c);
+    xcenter = xvals(c); if isnan(xcenter), xcenter = 0.5; end; 
+    ycenter = yvals(c); if isnan(ycenter), ycenter = 0.5; end;
     Axes = [Axes axes('Units','Normal','Position', ...
         [xcenter-axwidth/2 ycenter-axheight/2 axwidth axheight])];
     hold on;
