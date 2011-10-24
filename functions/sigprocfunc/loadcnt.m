@@ -7,8 +7,10 @@
 %   filename - name of the file with extension
 %
 % Optional inputs:
-%  't1'         - start at time t1, default 0
-%  'sample1'    - start at sample1, default 0, overrides t1
+%  't1'         - start at time t1, default 0. Warning, events latency
+%                 might be innacurate (this is an open issue).
+%  'sample1'    - start at sample1, default 0, overrides t1. Warning, 
+%                 events latency might be innacurate.
 %  'lddur'      - duration of segment to load, default = whole file
 %  'ldnsamples' - number of samples to load, default = whole file, 
 %                 overrides lddur
