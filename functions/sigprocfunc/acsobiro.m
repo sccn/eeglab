@@ -41,22 +41,21 @@
 
 function [H,S,D]=acsobiro(X,n,p),
 
+if nargin<1 || nargin > 3
+    help acsobiro
+    return;
+end;
+
 [m,N,ntrials]=size(X);
-if nargin<1 | nargin > 3
-
-  help acsobiro
-
-elseif nargin==1,
-
- DEFAULT_LAGS = 100;
- n=m; % source detection (hum...)
- p=min(DEFAULT_LAGS,ceil(N/3)); % number of time delayed correlation matrices to be diagonalized 
-                                % Note: For noisy data, use at least p=100.
+if nargin==1,
+    DEFAULT_LAGS = 100;
+    n=m; % source detection (hum...)
+    p=min(DEFAULT_LAGS,ceil(N/3)); % number of time delayed correlation matrices to be diagonalized
+    % Note: For noisy data, use at least p=100.
 elseif nargin==2,
-
- p=min(DEFAULT_LAGS,ceil(N/3)); % number of correlation matrices to be diagonalized
-
-end; 
+    DEFAULT_LAGS = 100;
+    p=min(DEFAULT_LAGS,ceil(N/3)); % number of correlation matrices to be diagonalized
+end;
 
 X(:,:)=X(:,:)-(mean(X(:,:)')'*ones(1,N*ntrials));        % Remove data means 
 
