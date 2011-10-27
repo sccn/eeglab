@@ -233,6 +233,7 @@
 %       'vert'      = [times_vector] -> plot vertical dashed lines at specified times
 %                     in ms. {default: none}
 %       'newfig'    = ['on'|'off'] Create new figure for difference plots {'on'}
+%       'caption'   = Caption of the figure {none}
 %       'outputformat' = ['old'|'plot'] for compatibility with script that used the 
 %                        old output format, set to 'old' (mbase in absolute amplitude (not
 %                        dB) and real itc instead of complex itc). 'plot' returns
@@ -556,6 +557,7 @@ end
     'timeStretchMarks'  'real'  []           []; ...
     'timeStretchRefs'   'real'  []           []; ...
     'timeStretchPlot'   'real'  []           []; ...
+    'caption'       'string'    []           []; ...
     'trialbase'     'string'    {'on','off'} 'off'; 
     'hzdir'         'string'    {'up','down','normal','reverse'}   HZDIR; ...
     'ydir'          'string'    {'up','down','normal','reverse'}   YDIR; ...
@@ -1468,6 +1470,12 @@ if strcmpi(g.verbose, 'on')
     disp('      retrieve results and use the tftopo function to replot them');
 end;
 mbase = mbase';
+
+if ~isempty(g.caption)
+    h = textsc(g.caption, 'title');
+    set(h, 'FontWeight', 'bold');
+end
+
 return;
 
 % -----------------

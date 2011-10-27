@@ -157,10 +157,10 @@ if popup
         if ~isfield(EEG, 'chaninfo'), EEG.chaninfo = []; end;
         if typeproc == 1
             options = [options ', ''topovec'', ' int2str(num) ...
-                        ', ''elocs'', EEG.chanlocs, ''chaninfo'', EEG.chaninfo' ];
+                        ', ''elocs'', EEG.chanlocs, ''chaninfo'', EEG.chaninfo, ''caption'', EEG.chaninfo(num).labels' ];
         else
             options = [options ', ''topovec'', EEG.icawinv(:,' int2str(num) ...
-                       '), ''elocs'', EEG.chanlocs, ''chaninfo'', EEG.chaninfo' ];
+                       '), ''elocs'', EEG.chanlocs, ''chaninfo'', EEG.chaninfo, ''caption'', [''IC '', num2str(num)]' ];
       end;
     end;
     
