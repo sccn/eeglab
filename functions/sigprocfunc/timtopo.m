@@ -315,7 +315,7 @@ set(axdata,'Ygrid','on')
 axes(axdata)
 axcolor = get(gcf,'Color');
 set(axdata,'Color',BACKCOLOR);
-pl=plot(x,data(g.plotchans,:));    % plot the data
+pl=plot(x,data(g.plotchans,:)');    % plot the data
 if length(g.plotchans)==1
   set(pl,'color','k');
   set(pl,'linewidth',2);
