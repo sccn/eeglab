@@ -151,11 +151,11 @@ for ind = 1:length(finalinds)
         setinfo = STUDY.design(opt.design).cell;
         tottrials = cell( nc, ng );
         if strcmpi(opt.singletrials, 'on')
-            for index = 1:length(setinfo)
-                condind = strmatch( setinfo(index).value{1}, STUDY.design(opt.design).variable(1).value );
-                grpind  = strmatch( setinfo(index).value{2}, STUDY.design(opt.design).variable(2).value );
-                if isempty(tottrials{condind, grpind}), tottrials{condind, grpind} = ALLEEG(index).trials;
-                else       tottrials{condind, grpind} = tottrials{condind, grpind} + ALLEEG(index).trials;
+            for indSet = 1:length(setinfo)
+                condind = std_indvarmatch( setinfo(indSet).value{1}, STUDY.design(opt.design).variable(1).value );
+                grpind  = std_indvarmatch( setinfo(indSet).value{2}, STUDY.design(opt.design).variable(2).value );
+                if isempty(tottrials{condind, grpind}), tottrials{condind, grpind} = sum(cellfun(@length, setinfo(indSet).trials));
+                else       tottrials{condind, grpind} = tottrials{condind, grpind} + sum(cellfun(@length, setinfo(indSet).trials));
                 end;
             end;
         end;
