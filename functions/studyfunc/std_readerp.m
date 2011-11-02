@@ -93,6 +93,9 @@ STUDY = pop_specparams(STUDY, 'default');
 if isstr(opt), error(opt); end;
 nc = max(length(STUDY.design(opt.design).variable(1).value),1);
 ng = max(length(STUDY.design(opt.design).variable(2).value),1);
+paired1 = STUDY.design(opt.design).variable(1).pairing;
+paired2 = STUDY.design(opt.design).variable(2).pairing;
+
 dtype = opt.datatype;
 
 % find channel indices
@@ -144,7 +147,21 @@ for ind = 1:length(finalinds) % scan channels or components
         end;
     end;
     
-    if ~dataread        
+    if ~dataread
+        % find total nb of trials
+        % -----------------------
+        setinfo = STUDY.design(opt.design).cell;
+        tottrials = cell( nc, ng );
+        if strcmpi(opt.singletrials, 'on')
+            for indSet = 1:length(setinfo)
+                condind = std_indvarmatch( setinfo(indSet).value{1}, STUDY.design(opt.design).variable(1).value );
+                grpind  = std_indvarmatch( setinfo(indSet).value{2}, STUDY.design(opt.design).variable(2).value );
+                if isempty(tottrials{condind, grpind}), tottrials{condind, grpind} = sum(cellfun(@length, setinfo(indSet).trials));
+                else       tottrials{condind, grpind} = tottrials{condind, grpind} + sum(cellfun(@length, setinfo(indSet).trials));
+                end;
+            end;
+        end;
+        
         % reserve arrays
         % --------------
         alldata  = cell( nc, ng );
@@ -206,28 +223,26 @@ for ind = 1:length(finalinds) % scan channels or components
         end;
 
         % remove mean of each subject across groups and conditions
-        if strcmpi(dtype, 'spec') && strcmpi(opt.rmsubjmean, 'on') && ~isempty(opt.channels) && strcmpi(opt.singletrials, 'off')
-            disp('Removing mean spectrum accross subjects');
-            for indtmp = 1:length(allinds{c,g}) % scan subjects
-                nonemptycell = find(~cellfun(@isempty, alldata(:)));
-                meanspec = zeros(size( alldata{nonemptycell(1)}(:,indtmp) ));
-                totcell = 0;
-                for c = 1:nc
-                    for g = 1:ng
-                        if ~isempty(alldata{c, g})
-                            meanspec = meanspec + alldata{c, g}(:,indtmp);
-                            totcell = totcell+1;
-                        end;
-                    end;
+        if strcmpi(dtype, 'spec') && strcmpi(opt.rmsubjmean, 'on') && ~isempty(opt.channels)
+            disp('Removing subject''s average spectrum based on pairing settings');
+            if strcmpi(paired1, 'on') && strcmpi(paired2, 'on') && (nc > 1 || ng > 1)
+                disp('Removing average spectrum for both indep. variables');
+                meanpowbase = computemeanspectrum(alldata(:), opt.singletrials);
+                alldata     = removemeanspectrum(alldata, meanpowbase, tottrials);
+            elseif strcmpi(paired1, 'on') && ng > 1
+                disp('Removing average spectrum for first indep. variables (second indep. var. is unpaired)');
+                for g = 1:ng        % ng = number of groups
+                    meanpowbase  = computemeanspectrum(alldata(:,g), opt.singletrials);
+                    alldata(:,g) = removemeanspectrum(alldata(:,g), meanpowbase, tottrials(:,g));
                 end;
-                for c = 1:nc
-                    for g = 1:ng
-                        if ~isempty(alldata{c, g})
-                            alldata{c, g}(:,indtmp) = alldata{c, g}(:,indtmp) - meanspec/totcell; % subtractive model
-                            % alldata{c, g}(:,indtmp) = alldata{c, g}(:,indtmp)./meanspec; % divisive model
-                        end;
-                    end;
+            elseif strcmpi(paired2, 'on') && nc > 1
+                disp('Removing average spectrum for second indep. variables (first indep. var. is unpaired)');
+                for c = 1:nc        % ng = number of groups
+                    meanpowbase  = computemeanspectrum(alldata(c,:), opt.singletrials);
+                    alldata(c,:) = removemeanspectrum(alldata(c,:), meanpowbase, tottrials(c,:));
                 end;
+            else
+                disp('Not removing average spectrum baseline (both indep. variables are unpaired');
             end;
         end;
         
@@ -308,3 +323,47 @@ else
         datavals = std_selcomp(STUDY, datavals, allinds, setinds, compinds, opt.component);
     end;
 end;
+
+% compute mean spectrum 
+% ---------------------
+function meanpowbase = computemeanspectrum(spectrum, singletrials)
+
+    try
+        len = length(spectrum(:));
+        count = 0;
+        for index = 1:len
+            if ~isempty(spectrum{index})
+                if strcmpi(singletrials, 'on')
+                    if count == 0, meanpowbase = mean(spectrum{index},2);
+                    else           meanpowbase = meanpowbase + mean(spectrum{index},2);
+                    end;
+                else
+                    if count == 0, meanpowbase = spectrum{index};
+                    else           meanpowbase = meanpowbase + spectrum{index};
+                    end;
+                end;
+                count = count+1;
+            end;
+        end;
+        meanpowbase = meanpowbase/count;
+    catch,
+        error([ 'Problem while subtracting mean spectrum.' 10 ...
+                'Common spectrum subtraction is performed based on' 10 ...
+                'pairing settings in your design. Most likelly, one' 10 ...
+                'independent variable should not have its data paired.' ]);
+    end;
+        
+% remove mean spectrum 
+% --------------------
+function spectrum = removemeanspectrum(spectrum, meanpowbase, tottrials)
+    for g = 1:size(spectrum,2)        % ng = number of groups
+        for c = 1:size(spectrum,1)
+            if ~isempty(spectrum{c,g}) && ~isempty(spectrum{c,g})
+                if ~isempty(tottrials{c,g}), tmpmeanpowbase = repmat(meanpowbase, [1 tottrials{c,g}]);
+                else                         tmpmeanpowbase = meanpowbase;
+                end;
+                spectrum{c,g} = spectrum{c,g} - tmpmeanpowbase;
+            end;
+        end;
+    end;
+
