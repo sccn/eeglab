@@ -377,9 +377,9 @@ switch lower(g.icatype)
                 res = inputgui('uilist', uilist, 'geometry', { [1] [1] [1 1] }, 'geomvert', [6 1 1]);
                 if isempty(res), return; end;
                 tmprank = str2num(res{1});
-                g.options = { g.options 'pca' tmprank };
+                g.options = [g.options  { 'pca' tmprank }];
             else
-                g.options = { g.options 'pca' tmprank }; % automatic for STUDY (batch processing)
+                g.options = [g.options  {'pca' tmprank }]; % automatic for STUDY (batch processing)
             end;
             disp(['Data rank (' int2str(tmprank) ') is smaller than the number of channels (' int2str(size(tmpdata,1)) ').']);
             [EEG.icaweights,EEG.icasphere] = runica( tmpdata, 'lrate', 0.001, g.options{:} );
