@@ -160,13 +160,17 @@ end;
                         'freqs'         'real'        []      [0 EEG(1).srate/2];
                         'rmcomps'       'cell'        []      cell(1,length(EEG));
                         'interp'        'struct'      { }     struct([]);
-                        'freqscale'     'string'      []      'log';
+                        'freqscale'     'string'      []     'log';
                         'alpha'         'real'        []      NaN;
                         'type'          'string'      { 'ersp','itc','both','ersp&itc' }  'both'}, 'std_ersp', 'ignore');
 if isstr(g), error(g); end;
 if isempty(g.trialindices), g.trialindices = cell(length(EEG)); end;
 if ~iscell(g.trialindices), g.trialindices = { g.trialindices }; end;
-    
+if strcmpi(g.freqscale, 'linear')
+    error([ 'It is currently not possible to plot ERSP in linear frequency' 10 ...
+            'scale in STUDY. We are working on fixing this issue.' ]);
+end;
+
 % checking input parameters
 % -------------------------
 if isempty(g.components) & isempty(g.channels)
