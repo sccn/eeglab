@@ -352,7 +352,7 @@ for c = 1:ncplot
                 plotcurve( allx, tmpdata{1}, 'colors', tmpcol, 'maskarray', tmpdata{2}, plotopt{3:end}, 'title', opt.titles{c,g});
             else
                 if isempty(findstr(opt.plotstderr, 'nocurve'))
-                    plotcurve( allx, tmpdata, 'colors', tmpcol, plotopt{2:end}, 'title', opt.titles{c,g});
+                    plotcurve( allx, tmpdata, 'colors', tmpcol, plotopt{2:end}, 'traceinfo', 'on', 'title', opt.titles{c,g});
                 end;
                 if ~strcmpi(opt.plotstderr, 'off') 
                     if ~dimreduced_sizediffers

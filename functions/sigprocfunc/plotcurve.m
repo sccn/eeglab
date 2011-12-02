@@ -31,6 +31,8 @@
 %  'plottopo'  = [min max] plot topography within the time limits defined
 %                in this function. If several lines are given as input, one
 %                scalp map is plot for each line.
+%  'traceinfo' = [string|cell array] information shown on the command line
+%                when the user click on a specific trace. Default none.
 %
 % Authors: Arnaud Delorme, 2004, Bhaktivedanta Institute
 
@@ -61,6 +63,7 @@ function plotcurve( times, R, varargin);
                              'highlightmode' 'string'  { 'background','bottom' } 'background';
                              'plotmean'      'string'  { 'on','off' }            'off';
                              'plotindiv'     'string'  { 'on','off' }            'on';
+                             'traceinfo'   { 'string' 'cell' } { { } {} }        'off';
                              'logpval'       'string'  { 'on','off' }            'off';
                              'title'         'string'  []                        '';
                              'xlabel'        'string'  []                        '';
@@ -155,6 +158,18 @@ function plotcurve( times, R, varargin);
       elseif ~isempty(g.colors),
            tmp = plot(times,R(ind,:), 'k'); 
            set(tmp, 'color', g.colors{mod(ind-1, length(g.colors))+1}); 
+           
+           if ~isempty(g.traceinfo)
+               if isstr(g.traceinfo) && strcmpi(g.traceinfo, 'on')
+                   set(tmp, 'ButtonDownFcn', [ 'disp(''Trace ' int2str(ind) ''');' ]);
+               elseif iscell(g.traceinfo)
+                   try
+                       set(tmp, 'ButtonDownFcn', g.traceinfo{ind});
+                   catch,
+                       error('Trace info cell array does not contain the same number of element as trace in the graph')
+                   end;
+               end;
+           end;
            
            % change the line style when number of plots exceed number of colors in g.colors
            lineStyles = {'-', '--',':','-.'};
