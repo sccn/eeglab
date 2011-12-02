@@ -1,11 +1,14 @@
 % hist2() - draw superimposed histograms
 %
 % Usage:
-%   >> hist2(data1, data2);
+%   >> hist2(data1, data2, bins);
 %
 % Inputs:
 %   data1   - data to plot first process
 %   data2   - data to plot second process
+%
+% Optional inputs:
+%   bins    - vector of bin center
 %
 % Author: Arnaud Delorme (SCCN, UCSD)
 
@@ -30,6 +33,14 @@
 % ---------------
 function hist2(data1, data2, bins);
 
+if nargin < 1
+    help hist2;
+    return;
+end;
+if nargin < 3
+    bins = linspace(min(min(data1), min(data2)), max(max(data1), max(data2)), 100);
+end;
+
 hist(data1, bins);
 hold on; hist(data2, bins);
 %figure; hist( [ measure{:,5} ], 20);
@@ -40,3 +51,11 @@ set(c(1), 'FaceVertexCData', repmat([1 0 0], [numfaces 1]), 'Cdatamapping', 'dir
 numfaces = size(get(c(2), 'Vertices'),1);
 set(c(2), 'FaceVertexCData', repmat([0 0 1], [numfaces 1]), 'Cdatamapping', 'direct', 'facealpha', 0.5, 'edgecolor', 'none');
 ylabel('Number of values');
+xlim([bins(1) bins(end)]);
+
+yl = ylim;
+xl = xlim;
+line([xl(1) xl(1)]+(xl(2)-xl(1))/2000, yl, 'color', 'k');
+line(xl, [yl(1) yl(1)]+(yl(2)-yl(1))/2000, 'color', 'k');
+
+
