@@ -215,8 +215,8 @@ DEFAULT_NOUI_PLOT_COLOR = 'k';    % EEG line color for noui option
                                   %   0 - 1st color in AxesColorOrder
 SPACING_EYE = 'on';               % g.spacingI on/off
 SPACING_UNITS_STRING = '';        % '\muV' for microvolt optional units for g.spacingI Ex. uV
-MAXEVENTSTRING = 10;
-DEFAULT_AXES_POSITION = [0.0964286 0.15 0.842 0.75-(MAXEVENTSTRING-5)/100];
+%MAXEVENTSTRING = 10;
+%DEFAULT_AXES_POSITION = [0.0964286 0.15 0.842 0.75-(MAXEVENTSTRING-5)/100];
                                   % dimensions of main EEG axes
 ORIGINAL_POSITION = [50 50 800 500];
                                   
@@ -285,8 +285,8 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
    try, g.ctrlselectcommand; catch, g.ctrlselectcommand = { defctrldowncom defctrlmotioncom defctrlupcom }; end;
    try, g.datastd;          catch, g.datastd = []; end; %ozgur
    try, g.normed;            catch, g.normed = 0; end; %ozgur
-   try,g.envelope;          catch, g.envelope = 0; end;%ozgur
-   
+   try, g.envelope;          catch, g.envelope = 0; end;%ozgur
+   try, g.maxeventstring;    catch, g.maxeventstring = 10; end; % JavierLC   
    
    if strcmpi(g.ploteventdur, 'on'), g.ploteventdur = 1; else g.ploteventdur = 0; end;
    if ndims(data) > 2
@@ -299,7 +299,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
       case {'spacing', 'srate' 'eloc_file' 'winlength' 'position' 'title' ...
                'trialstag'  'winrej' 'command' 'tag' 'xgrid' 'ygrid' 'color' 'colmodif'...
                'freqlimits' 'submean' 'children' 'limits' 'dispchans' 'wincolor' ...
-               'ploteventdur' 'butlabel' 'scale' 'events' 'data2' 'plotdata2' 'mocap' 'selectcommand' 'ctrlselectcommand' 'datastd' 'normed' 'envelope'},;
+               'maxeventstring' 'ploteventdur' 'butlabel' 'scale' 'events' 'data2' 'plotdata2' 'mocap' 'selectcommand' 'ctrlselectcommand' 'datastd' 'normed' 'envelope'},;
       otherwise, error(['eegplot: unrecognized option: ''' gfields{index} '''' ]);
       end;
    end;
@@ -362,6 +362,14 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
    if strcmpi(g.submean, 'on')
        g.submean = 'nan';
    end;
+   if g.maxeventstring>20 % JavierLC
+        disp('Error: maxeventstring must be equal or lesser than 20'); return;
+   end;
+
+   % max event string;  JavierLC
+   % ---------------------------------
+   MAXEVENTSTRING = g.maxeventstring;
+   DEFAULT_AXES_POSITION = [0.0964286 0.15 0.842 0.75-(MAXEVENTSTRING-5)/100];
    
    % convert color to modify into array of float
    % -------------------------------------------
@@ -605,7 +613,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
   cb_normalize = ['g = get(gcbf,''userdata'');if g.normed, disp(''Denormalizing...''); else, disp(''Normalizing...''); end;'...
     'ax1 = findobj(''tag'',''eegaxis'',''parent'',gcbf);' ...
     'data = get(ax1,''UserData'');' ...
-    'if isempty(g.datastd), g.datastd = std(data(:,1:min(1000,g.frames),[],2));end;'...
+    'if isempty(g.datastd), g.datastd = std(data(:,1:min(1000,g.frames),[],2)); end;'...
     'if g.normed, for i = 1:size(data,1), data(i,:,:) = data(i,:,:)*g.datastd(i);set(gcbo,''string'', ''Norm'');set(findobj(''tag'',''ESpacing'',''parent'',gcbf),''string'',num2str(g.oldspacing));end;' ...
     'else, for i = 1:size(data,1), data(i,:,:) = data(i,:,:)/g.datastd(i);end;set(gcbo,''string'', ''Denorm'');g.oldspacing = g.spacing;set(findobj(''tag'',''ESpacing'',''parent'',gcbf),''string'',''5'');end;' ...
     'g.normed = 1 - g.normed;' ...
@@ -908,10 +916,14 @@ u(22) = uicontrol('Parent',figh, ...
   comnoevent   = [ 'tmpg = get(gcbf, ''userdata'');' ...
                   'tmpg.plotevent = ''off'';' ...                  
                   'set(gcbf, ''userdata'', tmpg); clear tmpg; eegplot(''drawp'', 0);'];
+  comeventmaxstring   = [ 'tmpg = get(gcbf, ''userdata'');' ...
+                'tmpg.plotevent = ''on'';' ...
+                'set(gcbf, ''userdata'', tmpg); clear tmpg; eegplot(''emaxstring'');']; % JavierLC      
   comeventleg  = [ 'eegplot(''drawlegend'', gcbf);'];
     
   uimenu('Parent',zm,'Label','Events on'    , 'callback', complotevent, 'enable', fastif(isempty(g.events), 'off', 'on'));
   uimenu('Parent',zm,'Label','Events off'   , 'callback', comnoevent  , 'enable', fastif(isempty(g.events), 'off', 'on'));
+  uimenu('Parent',zm,'Label','Events'' string length'   , 'callback', comeventmaxstring, 'enable', fastif(isempty(g.events), 'off', 'on')); % JavierLC
   uimenu('Parent',zm,'Label','Events'' legend', 'callback', comeventleg , 'enable', fastif(isempty(g.events), 'off', 'on'));
   
 
@@ -1289,6 +1301,16 @@ else
     % ------------------
     if strcmpi(g.plotevent, 'on')
         
+        % JavierLC ###############################
+        MAXEVENTSTRING = g.maxeventstring;
+        if MAXEVENTSTRING<0
+              MAXEVENTSTRING = 0;
+        elseif MAXEVENTSTRING>75
+              MAXEVENTSTRING=75;
+        end
+        AXES_POSITION = [0.0964286 0.15 0.842 0.75-(MAXEVENTSTRING-5)/100];
+        % JavierLC ###############################
+        
         % find event to plot
         % ------------------
         event2plot    = find ( g.eventlatencies >=lowlim & g.eventlatencies <= highlim );
@@ -1333,6 +1355,9 @@ else
                 end;
             end;
          end;
+    else % JavierLC
+        MAXEVENTSTRING = 10; % default
+        AXES_POSITION = [0.0964286 0.15 0.842 0.75-(MAXEVENTSTRING-5)/100];
     end;
 
     if g.trialstag(1) ~= -1
@@ -1400,6 +1425,8 @@ else
 		axes(ax1);
     	set(ax1,'XTickLabel', num2str((g.time:DEFAULT_GRID_SPACING:g.time+g.winlength)'),...
 		'XTick',[1:multiplier*DEFAULT_GRID_SPACING:g.winlength*multiplier+1])
+    set(ax1, 'Position', AXES_POSITION) % JavierLC
+    set(ax0, 'Position', AXES_POSITION) % JavierLC
     end;
     		
     % ordinates: even if all elec are plotted, some may be hidden
@@ -1482,6 +1509,17 @@ else
    eegplot('scaleeye', [], fig);
    return;
    
+   case 'emaxstring'  % change events' string length  ;  JavierLC
+      % get dialog box
+      % -------------------------------------
+      g = get(gcf,'UserData');
+      result = inputdlg2({ 'Max events'' string length:' } , 'Change events'' string length to display', 1,  { num2str(g.maxeventstring) });
+      if size(result,1) == 0 return; end;                  
+      g.maxeventstring = eval(result{1});
+      set(gcf, 'UserData', g);
+      eegplot('drawb');
+      return;
+      
   case 'loadelect' % load channels
 	[inputname,inputpath] = uigetfile('*','Channel locations file');
 	if inputname == 0 return; end;
