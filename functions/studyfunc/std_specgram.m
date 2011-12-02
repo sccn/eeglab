@@ -8,13 +8,13 @@
 %
 % Optional inputs:
 %   'components' - [numeric vector] components of the EEG structure for which 
-%                  activation ERPs will be computed. Note that because 
+%                  activation spectogram will be computed. Note that because 
 %                  computation of component spectra is relatively fast, all 
 %                  components spectra are computed and saved. Only selected 
 %                  component are returned by the function to Matlab
 %                  {default|[] -> all}
 %   'channels'   - [cell array] channels of the EEG structure for which 
-%                  activation spectrum will be computed. Note that because 
+%                  activation spectogram will be computed. Note that because 
 %                  computation of spectrum is relatively fast, all channels 
 %                  spectrum are computed and saved. Only selected channels 
 %                  are returned by the function to Matlab
@@ -32,11 +32,9 @@
 %   freqs     - a vector of frequencies at which the spectra have been computed. 
 %
 % Files output or overwritten for ICA: 
-%               [dataset_filename].icaspec,   % raw spectrum of ICA components
-%               [dataset_filename].icaspecm   % spectrum with the mean baseline removed
+%               [dataset_filename].icaspecgram,
 % Files output or overwritten for data: 
-%               [dataset_filename].datspec, 
-%               [dataset_filename].datspecm
+%               [dataset_filename].datspecgram, 
 % 
 % See also  spectopo(), std_erp(), std_ersp(), std_map(), std_preclust()
 %
