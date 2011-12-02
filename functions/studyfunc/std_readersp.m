@@ -147,6 +147,7 @@ for ind = 1:length(finalinds)
         erspinds = cell( nc, ng );
         
         % find total nb of trials
+        % THIS CODE IS NOT NECESSARY ANY MORE (SEE BUG 1170)
         % -----------------------
         setinfo = STUDY.design(opt.design).cell;
         tottrials = cell( nc, ng );
