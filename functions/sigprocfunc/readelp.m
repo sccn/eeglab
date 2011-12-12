@@ -47,54 +47,63 @@ fid = fopen(filename, 'r');
 if fid == -1
   disp('Cannot open file'); return;
 end;
-for index=1:8	fgetl(fid); end;
 
-% scan file
-% ---------
 index = 1;
-tmpstr = fgetl(fid);
-noteof = 1;
 countfid  = 1;
 fidlabels = { 'Nz' 'LPA' 'RPA' };
-while noteof
-    if ~isempty(deblank(tmpstr))
-        if ~((tmpstr(1) == '/') & (tmpstr(2) == '/'))
+
+needToReadNumbers = 0;
+tmpstr = fgetl(fid);
+
+while 1
+    if needToReadNumbers==1 % Has sparsed $N.
+        if (~isempty(str2num(tmpstr)))
+            tmp = sscanf(tmpstr, '%f');
             
-            if tmpstr(1) == '%'
-                if tmpstr(2) == 'F' % fiducial
-                    tmp = sscanf(tmpstr(3:end), '%f');
+            eloc(index).X  = tmp(1); x(index) = tmp(1);
+            eloc(index).Y  = tmp(2); y(index) = tmp(2);
+            eloc(index).Z  = tmp(3); z(index) = tmp(3);
+            eloc(index).type = 'EEG';
+            
+            index = index + 1;
+            needToReadNumbers = 0;
+        end;
+    elseif tmpstr(1) == '%'
+        if tmpstr(2) == 'F' % fiducial
+            tmp = sscanf(tmpstr(3:end), '%f');
                     
-                    eloc(index).labels = fidlabels{countfid};
-                    eloc(index).X  = tmp(1); x(index) = tmp(1);
-                    eloc(index).Y  = tmp(2); y(index) = tmp(2);
-                    eloc(index).Z  = tmp(3); z(index) = tmp(3);
-                    eloc(index).type = 'FID';
-                    index     = index    + 1;
-                    countfid  = countfid + 1;
+            eloc(index).labels = fidlabels{countfid};
+            eloc(index).X  = tmp(1); x(index) = tmp(1);
+            eloc(index).Y  = tmp(2); y(index) = tmp(2);
+            eloc(index).Z  = tmp(3); z(index) = tmp(3);
+            eloc(index).type = 'FID';
+            
+            index     = index    + 1;
+            countfid  = countfid + 1;
                     
-                elseif tmpstr(2) == 'N' % regular channel
-                    
-                    eloc(index).labels =  strtok( tmpstr(3:end) );
-                    tmpstr = fgetl(fid);
-                    tmp = sscanf(tmpstr, '%f');
-                    if isempty(tmpstr)
-                        tmpstr = fgetl(fid);
-                        tmp = sscanf(tmpstr, '%f');
-                    end;
-                    
-                    eloc(index).X  = tmp(1); x(index) = tmp(1);
-                    eloc(index).Y  = tmp(2); y(index) = tmp(2);
-                    eloc(index).Z  = tmp(3); z(index) = tmp(3);
-                    eloc(index).type = 'EEG';
-                    index = index + 1;
-                end;
+        elseif tmpstr(2) == 'N' % regular channel
+            nm = strtok(tmpstr(3:end));
+            if ~(strcmp(nm, 'Name') | strcmp(nm, 'Status'))
+                eloc(index).labels = nm;
+                needToReadNumbers = 1;
             end;
         end;
     end;
+
+    % Get the next line
     tmpstr = fgetl(fid);
+    while isempty(tmpstr)
+        tmpstr = fgetl(fid);
+        if ~isstr(tmpstr) & tmpstr == -1
+            break;
+        end; 
+    end;
+    
     if ~isstr(tmpstr) & tmpstr == -1
-        noteof = 0;
+        break;
     end;  
 end;  
 
 names = { eloc.labels };
+
+fclose(fid);    % close the file
