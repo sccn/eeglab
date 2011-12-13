@@ -27,6 +27,17 @@
 %                 on each dataset. Default is 'on'.
 %   'key','val' - ICA algorithm options (see ICA routine help messages).
 % 
+% Adding a new algorithm:
+% Add the algorithm to the list of algorithms line 366 to 466, for example
+%
+%    case 'myalgo', [EEG.icaweights] = myalgo( tmpdata, g.options{:} );
+%
+% where "myalgo" is the name of your algorithm (and Matlab function). 
+% tmpdata is the 2-D array containing the EEG data (channels x points) and
+% g.options{} contains custom options for your algorithm (there is no
+% predetermined format for these options). The output EEG.icaweights is the
+% mixing matrix (or inverse of the unmixing matrix).
+%
 % Note:
 % 1) Infomax (runica, binica) is the ICA algorithm we use most. It is based 
 %    on Tony Bell's infomax algorithm as implemented for automated use by 
