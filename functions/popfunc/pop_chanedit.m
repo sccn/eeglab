@@ -902,13 +902,14 @@ if ~isempty(fig)
         end;
     end;
 else
-    [chans chaninfo] = eeg_checkchanlocs(chans);
+    [chans chaninfo] = eeg_checkchanlocs(chans, chaninfo);
     if dataset_input,
          if nchansori == length(chans)
              for index = 1:length(EEG)
                  EEG(index).chanlocs = chans;
                  EEG(index).chaninfo = chaninfo;
              end;
+             EEG = eeg_checkset(EEG); % for channel orientation
          else
              disp('Wrong channel structure size, changes ignored');
          end;
