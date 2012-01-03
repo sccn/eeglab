@@ -1390,12 +1390,15 @@ else
 		nbdiv = 20/g.winlength; % approximative number of divisions
 		divpossible = [ 100000./[1 2 4 5] 10000./[1 2 4 5] 1000./[1 2 4 5] 100./[1 2 4 5 10 20]]; % possible increments
 		[tmp indexdiv] = min(abs(nbdiv*divpossible-(g.limits(2)-g.limits(1)))); % closest possible increment
-
 		incrementpoint = divpossible(indexdiv)/1000*g.srate;
+        
+        % tag zero below is an offset used to be sure that 0 is included
+        % in the absicia of the data epochs
         if g.limits(2) < 0, tagzerooffset  = (g.limits(2)-g.limits(1))/1000*g.srate+1; 
         else                tagzerooffset  = -g.limits(1)/1000*g.srate; 
         end;
-
+        if tagzerooffset < 0, tagzerooffset = 0; end;
+        
 		for i=1:length(alltag)-1
 			if ~isempty(tagpos) & tagpos(end)-alltag(i)<2*incrementpoint/3
 				tagpos  = tagpos(1:end-1);
@@ -1411,6 +1414,7 @@ else
 				tagpos  = [ tagpos [tmptagpos(end:-1:2) alltag(i)+tagzerooffset:incrementpoint:(alltag(i+1)-1)]];
 			end;
 		end;
+        
         % find corresponding epochs
         % -------------------------
         tagtext = eeg_point2lat(tagpos, floor((tagpos)/g.trialstag)+1, g.srate, g.limits, 1E-3);
