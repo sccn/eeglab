@@ -132,7 +132,7 @@ if strcmpi(mode, 'trialinfo') || strcmpi(mode, 'both')
                 alltmpvals = unique(alltmpvals);
                 if length(alltmpvals) > 1
                     factor{    countfact} = ff{index};
-                    factorvals{countfact} = mattocell(tmpvals);
+                    factorvals{countfact} = mattocell(alltmpvals);
                     subjects{  countfact} = {};
                     countfact = countfact + 1;
                 end;
