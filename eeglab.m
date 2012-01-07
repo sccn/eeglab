@@ -967,7 +967,7 @@ if option_chat == 1
             eval('import javax.swing.*;');
 
             try
-                tb = VisualToolbar();
+                tb = VisualToolbar('137.110.244.26');
                 F = W_MAIN;
                 tb.setPreferredSize(Dimension(0, 75));
 
