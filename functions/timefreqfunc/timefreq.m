@@ -511,7 +511,7 @@ if ~isempty(g.timestretch) && length(g.timestretch{1}) > 0
         % So mytmpall is almost equal to r.*exp(i*theta)
         % whos marksPos refsPos
 
-        M = timeWarp(marksPos, refsPos);
+        M = timewarp(marksPos, refsPos);
         
         TSr = transpose(M*r');
         TStheta = zeros(size(theta,1), size(theta,2));
