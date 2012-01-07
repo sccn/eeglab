@@ -39,6 +39,8 @@ if nargin < 1
 end;
 if nargin < 3
     bins = linspace(min(min(data1), min(data2)), max(max(data1), max(data2)), 100);
+elseif length(bins) == 1
+    bins = linspace(min(min(data1), min(data2)), max(max(data1), max(data2)), bins);
 end;
 
 hist(data1, bins);
