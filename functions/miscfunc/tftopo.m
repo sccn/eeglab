@@ -46,7 +46,9 @@
 %                'native' means that the input is already in log frequencies 
 %  'vert'      = [times vector] (in msec) plot vertical dashed lines at specified times 
 %                {default: 0}
-%  'shiftimgs' = [response_times_vector] - shift time/frequency images from several 
+%  'ylabel'    = [string] label for the ordinate axis. Default is
+%                "Frequency (Hz)"
+%  'shiftimgs' = [response_times_vector] shift time/frequency images from several 
 %                subjects by each subject's response time {default: no shift} 
 %  'title'     = [quoted_string] plot title (default: provided_string). 
 %  'cbar'      = ['on'|'off'] plot color bar {default: 'on'}
@@ -54,11 +56,12 @@
 %                topoplot {default: 'common'}
 %  'plotscalponly' = [x,y] location (e.g. msec,hz). Plot one scalp map only; no
 %                time-frequency image.
+%  'events'    = [real array] plot event latencies. The number of event
+%                must be the same as the number of "frequecies".
 %  'verbose'   = ['on'|'off'] comment on operations on command line {default: 'on'}.
 %  'axcopy'  = ['on'|'off'] creates a copy of the figure axis and its graphic objects in a new pop-up window 
 %                    using the left mouse button {default: 'on'}.. 
 %  'denseLogTicks' = ['on'|'off'] creates denser labels on log freuqncy axis {default: 'off'} 
-%
 %
 % Notes:
 %  1) Additional topoplot() optional arguments can be used.
@@ -133,13 +136,15 @@ fieldlist = { 'chanlocs'      { 'string','struct' }       []       '' ;
               'axcopy'        'string'   {'on','off' }             'on';
               'cmode'         'string'   {'common','separate' }    'common';
               'selchans'      'integer'  [1 nchans]                [1:nchans];
-              'shiftimgs'     'real'     []                        [] ;
-              'plotscalponly' 'real'     []                        [] ;
+              'shiftimgs'     'real'     []                        [];
+              'plotscalponly' 'real'     []                        [];
+              'events'        'real'     []                        [];
               'showchan'      'integer'  [0 nchans]                0 ;
               'signifs'       'real'     []                        [];
               'sigthresh'     'integer'  [1 Inf]                   [1 1];
               'smooth'        'real'     [0 Inf]                   1;
               'timefreqs'     'real'     []                        [];
+              'ylabel'        'string'   {}                        'Frequency (Hz)';
               'vert'          'real'     [times(1) times(end)]     [min(max(0, times(1)), times(end))];
               'denseLogTicks' 'string'   {'on','off'}               'off'              
               };
@@ -476,7 +481,7 @@ else
   set(tl,'fontsize',12);
 end
 
-yl=ylabel(['Frequency (Hz)']);
+yl=ylabel(g.ylabel);
 set(yl,'fontsize',12);
 
 set(gca,'fontsize',12)
@@ -486,6 +491,15 @@ for indtime = g.vert
     tmpy = ylim;
     plot([indtime indtime],tmpy,[LINECOLOR ':'],'linewidth',ZEROLINEWIDTH);
 end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Plot topoplot maps at specified timefreqs points
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if ~isempty(g.events)
+    tmpy = ylim;
+    yvals = linspace(tmpy(1), tmpy(2), length(g.events));
+    plot(g.events, yvals, 'k', 'linewidth', 2);
+end;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Plot topoplot maps at specified timefreqs points
