@@ -516,7 +516,7 @@ cb_spectopo1   = [ check         'LASTCOM = pop_spectopo(EEG, 1);'        e_hist
 cb_prop1       = [ checkplot     'LASTCOM = pop_prop(EEG,1);'             e_hist];
 cb_erpimage1   = [ checkepoch    'LASTCOM = pop_erpimage(EEG, 1, eegh(''find'',''pop_erpimage(EEG,1''));' e_hist];
 cb_timtopo     = [ checkplot     'LASTCOM = pop_timtopo(EEG);'            e_hist];
-cb_plottopo    = [ checkplot     'LASTCOM = pop_plottopo(EEG);'           e_hist];
+cb_plottopo    = [ check         'LASTCOM = pop_plottopo(EEG);'           e_hist];
 cb_topoplot1   = [ checkplot     'LASTCOM = pop_topoplot(EEG, 1);'        e_hist];
 cb_headplot1   = [ checkplot     '[EEG LASTCOM] = pop_headplot(EEG, 1);'  e_store];
 cb_comperp1    = [ checkepoch    'LASTCOM = pop_comperp(ALLEEG);'         e_hist];
@@ -548,25 +548,52 @@ cb_precomp2    = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_precomp(STUDY, AL
 cb_preclust    = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_preclust(STUDY, ALLEEG);'                e_load_study];
 cb_clust       = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_clust(STUDY, ALLEEG);'                   e_load_study];
 cb_clustedit   = [ nocheck 'ALLEEGTMP = ALLEEG; [STUDYTMP LASTCOM] = pop_clustedit(STUDY, ALLEEG);'     e_load_study];
+% 
+% % add STUDY plugin menus
+% if exist('eegplugin_stderpimage')
+%     structure.uilist = { { } ...
+%         {'style' 'pushbutton' 'string' 'Plot ERPimage'    'Callback' 'stderpimageplugin_plot(''onecomp'', gcf);' } { }  ...
+%         {'style' 'pushbutton' 'string' 'Plot ERPimage(s)' 'Callback' 'stderpimageplugin_plot(''oneclust'', gcf);' } };
+%     structure.geometry = { [1] [1 0.3 1] };
+%     arg = vararg2str( { structure } );
+%     cb_clustedit   = [ nocheck 'ALLEEGTMP = ALLEEG; [STUDYTMP LASTCOM] = pop_clustedit(STUDY, ALLEEG, [], ' arg ');'     e_load_study];
+% end;
 
 % menu definition
 % --------------- 
 if ismatlab
+    % defaults
+    % --------
+    % startup:on
+    % study:off
+    % chanloc:off
+    % epoch:on
+    % continuous:on
+    
+    on          = 'study:on';
+    onnostudy   = '';
+    ondata      = 'startup:off';
+    onepoch     = 'startup:off;continuous:off';
+    ondatastudy = 'startup:off;study:on';
+    onchannel   = 'startup:off;chanloc:on';
+    onepochchan = 'startup:off;continuous:off;chanloc:on';
+    onstudy     = 'startup:off;epoch:off;continuous:off;study:on';
+    
     W_MAIN = findobj('tag', 'EEGLAB');
     EEGUSERDAT = get(W_MAIN, 'userdata');
     set(W_MAIN, 'MenuBar', 'none');
-    file_m  = uimenu( W_MAIN, 'Label', 'File');
-    neuro_m = uimenu( file_m, 'Label', 'Import data', 'tag', 'import data'); 
-    epoch_m = uimenu( file_m, 'Label', 'Import epoch info', 'tag', 'import epoch'); 
-    event_m = uimenu( file_m, 'Label', 'Import event info', 'tag', 'import event'); 
-    exportm = uimenu( file_m, 'Label', 'Export', 'tag', 'export'); 
-    edit_m  = uimenu( W_MAIN, 'Label', 'Edit');
-    tools_m = uimenu( W_MAIN, 'Label', 'Tools', 'tag', 'tools');
-    plot_m  = uimenu( W_MAIN, 'Label', 'Plot', 'tag', 'plot');
-    loc_m   = uimenu( plot_m, 'Label', 'Channel locations'   );
-    std_m   = uimenu( W_MAIN, 'Label', 'Study', 'tag', 'study');
-    set_m   = uimenu( W_MAIN, 'Label', 'Datasets');
-    help_m  = uimenu( W_MAIN, 'Label', 'Help');
+    file_m  = uimenu( W_MAIN, 'Label', 'File'                                    , 'userdata', on);
+    neuro_m = uimenu( file_m, 'Label', 'Import data'      , 'tag', 'import data' , 'userdata', onnostudy); 
+    epoch_m = uimenu( file_m, 'Label', 'Import epoch info', 'tag', 'import epoch', 'userdata', onepoch); 
+    event_m = uimenu( file_m, 'Label', 'Import event info', 'tag', 'import event', 'userdata', ondata); 
+    exportm = uimenu( file_m, 'Label', 'Export'           , 'tag', 'export'      , 'userdata', ondata); 
+    edit_m  = uimenu( W_MAIN, 'Label', 'Edit'                                    , 'userdata', ondata);
+    tools_m = uimenu( W_MAIN, 'Label', 'Tools',             'tag', 'tools'       , 'userdata', ondatastudy);
+    plot_m  = uimenu( W_MAIN, 'Label', 'Plot',              'tag', 'plot'        , 'userdata', ondata);
+    loc_m   = uimenu( plot_m, 'Label', 'Channel locations'                       , 'userdata', onchannel);
+    std_m   = uimenu( W_MAIN, 'Label', 'Study', 'tag', 'study'                   , 'userdata', onstudy);
+    set_m   = uimenu( W_MAIN, 'Label', 'Datasets'                                , 'userdata', ondatastudy);
+    help_m  = uimenu( W_MAIN, 'Label', 'Help'                                    , 'userdata', on);
 
     uimenu( neuro_m, 'Label', 'From ASCII/float file or Matlab array', 'CallBack', cb_importdata);
     uimenu( neuro_m, 'Label', 'From Netstation binary simple file'   , 'CallBack', cb_readegi,    'Separator', 'on'); 
@@ -596,57 +623,57 @@ if ismatlab
     uimenu( exportm, 'Label', 'Events to text file'                   , 'CallBack', cb_expevents);
     uimenu( exportm, 'Label', 'Data to EDF/BDF/GDF file'              , 'CallBack', cb_expdata, 'separator', 'on'); 
 
-    uimenu( file_m, 'Label', 'Load existing dataset'                  , 'CallBack', cb_loadset, 'Separator', 'on'); 
-    uimenu( file_m, 'Label', 'Save current dataset(s)'                , 'CallBack', cb_saveset);
-    uimenu( file_m, 'Label', 'Save current dataset as'                , 'CallBack', cb_savesetas);
-    uimenu( file_m, 'Label', 'Clear dataset(s)'                       , 'CallBack', cb_delset);
+    uimenu( file_m, 'Label', 'Load existing dataset'                  , 'userdata', onnostudy,   'CallBack', cb_loadset, 'Separator', 'on'); 
+    uimenu( file_m, 'Label', 'Save current dataset(s)'                , 'userdata', ondatastudy, 'CallBack', cb_saveset);
+    uimenu( file_m, 'Label', 'Save current dataset as'                , 'userdata', ondata,      'CallBack', cb_savesetas);
+    uimenu( file_m, 'Label', 'Clear dataset(s)'                       , 'userdata', ondata,      'CallBack', cb_delset);
 
-    std2_m = uimenu( file_m, 'Label', 'Create study'                  , 'Separator', 'on'); 
-    uimenu( std2_m,  'Label', 'Using all loaded datasets'             , 'Callback', cb_study1); 
-    uimenu( std2_m,  'Label', 'Browse for datasets'                   , 'Callback', cb_study2); 
-    uimenu( std2_m,  'Label', 'Simple ERP STUDY'                      , 'Callback', cb_studyerp); 
+    std2_m = uimenu( file_m, 'Label', 'Create study'                  , 'userdata', on     , 'Separator', 'on'); 
+    uimenu( std2_m,  'Label', 'Using all loaded datasets'             , 'userdata', ondata , 'Callback', cb_study1); 
+    uimenu( std2_m,  'Label', 'Browse for datasets'                   , 'userdata', on     , 'Callback', cb_study2); 
+    uimenu( std2_m,  'Label', 'Simple ERP STUDY'                      , 'userdata', on     , 'Callback', cb_studyerp); 
 
-    uimenu( file_m, 'Label', 'Load existing study'                    , 'CallBack', cb_loadstudy,'Separator', 'on' ); 
-    uimenu( file_m, 'Label', 'Save current study'                     , 'CallBack', cb_savestudy1);
-    uimenu( file_m, 'Label', 'Save current study as'                  , 'CallBack', cb_savestudy2);
-    uimenu( file_m, 'Label', 'Clear study'                            , 'CallBack', cb_clearstudy);
-    uimenu( file_m, 'Label', 'Memory and other options'               , 'CallBack', cb_editoptions, 'Separator', 'on');
+    uimenu( file_m, 'Label', 'Load existing study'                    , 'userdata', on     , 'CallBack', cb_loadstudy,'Separator', 'on' ); 
+    uimenu( file_m, 'Label', 'Save current study'                     , 'userdata', onstudy, 'CallBack', cb_savestudy1);
+    uimenu( file_m, 'Label', 'Save current study as'                  , 'userdata', onstudy, 'CallBack', cb_savestudy2);
+    uimenu( file_m, 'Label', 'Clear study'                            , 'userdata', ondatastudy, 'CallBack', cb_clearstudy);
+    uimenu( file_m, 'Label', 'Memory and other options'               , 'userdata', on     , 'CallBack', cb_editoptions, 'Separator', 'on');
 
-    hist_m = uimenu( file_m, 'Label', 'History scripts'               , 'Separator', 'on');
-    uimenu( hist_m, 'Label', 'Save dataset history script'            , 'CallBack', cb_saveh1);
-    uimenu( hist_m, 'Label', 'Save session history script'            , 'CallBack', cb_saveh2);    
-    uimenu( hist_m, 'Label', 'Run script'                             , 'CallBack', cb_runsc);    
+    hist_m = uimenu( file_m, 'Label', 'History scripts'               , 'userdata', on     , 'Separator', 'on');
+    uimenu( hist_m, 'Label', 'Save dataset history script'            , 'userdata', ondata     , 'CallBack', cb_saveh1);
+    uimenu( hist_m, 'Label', 'Save session history script'            , 'userdata', ondatastudy, 'CallBack', cb_saveh2);    
+    uimenu( hist_m, 'Label', 'Run script'                             , 'userdata', on         , 'CallBack', cb_runsc);    
 
-    uimenu( file_m, 'Label', 'Quit'                                   , 'CallBack', cb_quit, 'Separator', 'on');
+    uimenu( file_m, 'Label', 'Quit'                                   , 'userdata', on     , 'CallBack', cb_quit, 'Separator', 'on');
 
-    uimenu( edit_m, 'Label', 'Dataset info'                           , 'CallBack', cb_editset);
-    uimenu( edit_m, 'Label', 'Event fields'                           , 'CallBack', cb_editeventf);
-    uimenu( edit_m, 'Label', 'Event values'                           , 'CallBack', cb_editeventv);
-    uimenu( edit_m, 'Label', 'About this dataset'                     , 'CallBack', cb_comments);
-    uimenu( edit_m, 'Label', 'Channel locations'                      , 'CallBack', cb_chanedit);
-    uimenu( edit_m, 'Label', 'Select data'                            , 'CallBack', cb_select, 'Separator', 'on');
-    uimenu( edit_m, 'Label', 'Select data using events'               , 'CallBack', cb_rmdat);
-    uimenu( edit_m, 'Label', 'Select epochs or events'                , 'CallBack', cb_selectevent);
-    uimenu( edit_m, 'Label', 'Copy current dataset'                   , 'CallBack', cb_copyset, 'Separator', 'on');
-    uimenu( edit_m, 'Label', 'Append datasets'                        , 'CallBack', cb_mergeset);
-    uimenu( edit_m, 'Label', 'Delete dataset(s)'                      , 'CallBack', cb_delset);
+    uimenu( edit_m, 'Label', 'Dataset info'                           , 'userdata', ondata, 'CallBack', cb_editset);
+    uimenu( edit_m, 'Label', 'Event fields'                           , 'userdata', ondata, 'CallBack', cb_editeventf);
+    uimenu( edit_m, 'Label', 'Event values'                           , 'userdata', ondata, 'CallBack', cb_editeventv);
+    uimenu( edit_m, 'Label', 'About this dataset'                     , 'userdata', ondata, 'CallBack', cb_comments);
+    uimenu( edit_m, 'Label', 'Channel locations'                      , 'userdata', ondata, 'CallBack', cb_chanedit);
+    uimenu( edit_m, 'Label', 'Select data'                            , 'userdata', ondata, 'CallBack', cb_select, 'Separator', 'on');
+    uimenu( edit_m, 'Label', 'Select data using events'               , 'userdata', ondata, 'CallBack', cb_rmdat);
+    uimenu( edit_m, 'Label', 'Select epochs or events'                , 'userdata', ondata, 'CallBack', cb_selectevent);
+    uimenu( edit_m, 'Label', 'Copy current dataset'                   , 'userdata', ondata, 'CallBack', cb_copyset, 'Separator', 'on');
+    uimenu( edit_m, 'Label', 'Append datasets'                        , 'userdata', ondata, 'CallBack', cb_mergeset);
+    uimenu( edit_m, 'Label', 'Delete dataset(s)'                      , 'userdata', ondata, 'CallBack', cb_delset);
 
-    uimenu( tools_m, 'Label', 'Change sampling rate'                  , 'CallBack', cb_resample);
+    uimenu( tools_m, 'Label', 'Change sampling rate'                  , 'userdata', ondatastudy, 'CallBack', cb_resample);
 
-    filter_m = uimenu( tools_m, 'Label', 'Filter the data'              , 'tag', 'filter');
-    uimenu( filter_m, 'Label', 'Basic FIR filter'   , 'CallBack', cb_eegfilt);
+    filter_m = uimenu( tools_m, 'Label', 'Filter the data'            , 'userdata', ondatastudy, 'tag', 'filter');
+    uimenu( filter_m, 'Label', 'Basic FIR filter'                     , 'userdata', ondatastudy, 'CallBack', cb_eegfilt);
 
-    uimenu( tools_m, 'Label', 'Re-reference'                          , 'CallBack', cb_reref);
-    uimenu( tools_m, 'Label', 'Interpolate electrodes'                , 'CallBack', cb_interp);
-    uimenu( tools_m, 'Label', 'Reject continuous data by eye'         , 'CallBack', cb_eegplot);
-    uimenu( tools_m, 'Label', 'Extract epochs'                        , 'CallBack', cb_epoch, 'Separator', 'on');
-    uimenu( tools_m, 'Label', 'Remove baseline'                       , 'CallBack', cb_rmbase);
-    uimenu( tools_m, 'Label', 'Run ICA'                               , 'CallBack', cb_runica, 'foregroundcolor', 'b', 'Separator', 'on');
-    uimenu( tools_m, 'Label', 'Remove components'                     , 'CallBack', cb_subcomp);
-    uimenu( tools_m, 'Label', 'Automatic channel rejection'           , 'CallBack', cb_chanrej, 'Separator', 'on');
-    uimenu( tools_m, 'Label', 'Automatic epoch rejection'             , 'CallBack', cb_autorej);
-    rej_m1 = uimenu( tools_m, 'Label', 'Reject data epochs');
-    rej_m2 = uimenu( tools_m, 'Label', 'Reject data using ICA');
+    uimenu( tools_m, 'Label', 'Re-reference'                          , 'userdata', ondata, 'CallBack', cb_reref);
+    uimenu( tools_m, 'Label', 'Interpolate electrodes'                , 'userdata', ondata, 'CallBack', cb_interp);
+    uimenu( tools_m, 'Label', 'Reject continuous data by eye'         , 'userdata', ondata, 'CallBack', cb_eegplot);
+    uimenu( tools_m, 'Label', 'Extract epochs'                        , 'userdata', ondata, 'CallBack', cb_epoch, 'Separator', 'on');
+    uimenu( tools_m, 'Label', 'Remove baseline'                       , 'userdata', ondatastudy, 'CallBack', cb_rmbase);
+    uimenu( tools_m, 'Label', 'Run ICA'                               , 'userdata', ondatastudy, 'CallBack', cb_runica, 'foregroundcolor', 'b', 'Separator', 'on');
+    uimenu( tools_m, 'Label', 'Remove components'                     , 'userdata', ondata, 'CallBack', cb_subcomp);
+    uimenu( tools_m, 'Label', 'Automatic channel rejection'           , 'userdata', ondata, 'CallBack', cb_chanrej, 'Separator', 'on');
+    uimenu( tools_m, 'Label', 'Automatic epoch rejection'             , 'userdata', onepoch, 'CallBack', cb_autorej);
+    rej_m1 = uimenu( tools_m, 'Label', 'Reject data epochs'           , 'userdata', onepoch);
+    rej_m2 = uimenu( tools_m, 'Label', 'Reject data using ICA'        , 'userdata', onepoch);
 
     uimenu( rej_m1, 'Label', 'Reject data (all methods)'              , 'CallBack', cb_rejmenu1);
     uimenu( rej_m1, 'Label', 'Reject by inspection'                   , 'CallBack', cb_eegplotrej1);
@@ -668,76 +695,76 @@ if ismatlab
     uimenu( rej_m2, 'Label', 'Export marks to data reject'            , 'CallBack', cb_rejsup3, 'separator', 'on');
     uimenu( rej_m2, 'Label', 'Reject marked epochs'                   , 'CallBack', cb_rejsup4, 'separator', 'on', 'foregroundcolor', 'b');
 
-    uimenu( loc_m,  'Label', 'By name'                                , 'CallBack', cb_topoblank1);
-    uimenu( loc_m,  'Label', 'By number'                              , 'CallBack', cb_topoblank2);
-    uimenu( plot_m, 'Label', 'Channel data (scroll)'                  , 'CallBack', cb_eegplot1, 'Separator', 'on');
-    uimenu( plot_m, 'Label', 'Channel spectra and maps'               , 'CallBack', cb_spectopo1);
-    uimenu( plot_m, 'Label', 'Channel properties'                     , 'CallBack', cb_prop1);
-    uimenu( plot_m, 'Label', 'Channel ERP image'                      , 'CallBack', cb_erpimage1);
+    uimenu( loc_m,  'Label', 'By name'                                , 'userdata', onchannel, 'CallBack', cb_topoblank1);
+    uimenu( loc_m,  'Label', 'By number'                              , 'userdata', onchannel, 'CallBack', cb_topoblank2);
+    uimenu( plot_m, 'Label', 'Channel data (scroll)'                  , 'userdata', ondata , 'CallBack', cb_eegplot1, 'Separator', 'on');
+    uimenu( plot_m, 'Label', 'Channel spectra and maps'               , 'userdata', ondata , 'CallBack', cb_spectopo1);
+    uimenu( plot_m, 'Label', 'Channel properties'                     , 'userdata', ondata , 'CallBack', cb_prop1);
+    uimenu( plot_m, 'Label', 'Channel ERP image'                      , 'userdata', onepoch, 'CallBack', cb_erpimage1);
 
-    ERP_m = uimenu( plot_m, 'Label', 'Channel ERPs');
+    ERP_m = uimenu( plot_m, 'Label', 'Channel ERPs'                   , 'userdata', onepoch);
     uimenu( ERP_m,  'Label', 'With scalp maps'                        , 'CallBack', cb_timtopo);
     uimenu( ERP_m,  'Label', 'In scalp/rect. array'                   , 'CallBack', cb_plottopo);
 
-    topo_m = uimenu( plot_m, 'Label', 'ERP map series');
+    topo_m = uimenu( plot_m, 'Label', 'ERP map series'                , 'userdata', onepochchan);
     uimenu( topo_m, 'Label', 'In 2-D'                                 , 'CallBack', cb_topoplot1);
     uimenu( topo_m, 'Label', 'In 3-D'                                 , 'CallBack', cb_headplot1);
-    uimenu( plot_m, 'Label', 'Sum/Compare ERPs'                       , 'CallBack', cb_comperp1);
+    uimenu( plot_m, 'Label', 'Sum/Compare ERPs'                       , 'userdata', onepoch, 'CallBack', cb_comperp1);
 
-    uimenu( plot_m, 'Label', 'Component activations (scroll)'         , 'CallBack', cb_eegplot2,'Separator', 'on');
-    uimenu( plot_m, 'Label', 'Component spectra and maps'             , 'CallBack', cb_spectopo2);
+    uimenu( plot_m, 'Label', 'Component activations (scroll)'         , 'userdata', ondata , 'CallBack', cb_eegplot2,'Separator', 'on');
+    uimenu( plot_m, 'Label', 'Component spectra and maps'             , 'userdata', ondata , 'CallBack', cb_spectopo2);
 
-    tica_m = uimenu( plot_m, 'Label', 'Component maps');
+    tica_m = uimenu( plot_m, 'Label', 'Component maps'                , 'userdata', onchannel);
     uimenu( tica_m, 'Label', 'In 2-D'                                 , 'CallBack', cb_topoplot2);
     uimenu( tica_m, 'Label', 'In 3-D'                                 , 'CallBack', cb_headplot2);
-    uimenu( plot_m, 'Label', 'Component properties'                   , 'CallBack', cb_prop2);
-    uimenu( plot_m, 'Label', 'Component ERP image'                    , 'CallBack', cb_erpimage2);
+    uimenu( plot_m, 'Label', 'Component properties'                   , 'userdata', ondata , 'CallBack', cb_prop2);
+    uimenu( plot_m, 'Label', 'Component ERP image'                    , 'userdata', onepoch, 'CallBack', cb_erpimage2);
 
-    ERPC_m = uimenu( plot_m, 'Label', 'Component ERPs');
+    ERPC_m = uimenu( plot_m, 'Label', 'Component ERPs'                , 'userdata', onepoch);
     uimenu( ERPC_m, 'Label', 'With component maps'                    , 'CallBack', cb_envtopo1);
     uimenu( ERPC_m, 'Label', 'With comp. maps (compare)'              , 'CallBack', cb_envtopo2);
     uimenu( ERPC_m, 'Label', 'In rectangular array'                   , 'CallBack', cb_plotdata2);
-    uimenu( plot_m, 'Label', 'Sum/Compare comp. ERPs'                 , 'CallBack', cb_comperp2);
+    uimenu( plot_m, 'Label', 'Sum/Compare comp. ERPs'                 , 'userdata', onepoch, 'CallBack', cb_comperp2);
 
-    stat_m = uimenu( plot_m, 'Label', 'Data statistics', 'Separator', 'on');
+    stat_m = uimenu( plot_m, 'Label', 'Data statistics', 'Separator', 'on', 'userdata', ondata );
     uimenu( stat_m, 'Label', 'Channel statistics'                     , 'CallBack', cb_signalstat1);
     uimenu( stat_m, 'Label', 'Component statistics'                   , 'CallBack', cb_signalstat2);
     uimenu( stat_m, 'Label', 'Event statistics'                       , 'CallBack', cb_eventstat);
 
-    spec_m = uimenu( plot_m, 'Label', 'Time-frequency transforms', 'Separator', 'on');
+    spec_m = uimenu( plot_m, 'Label', 'Time-frequency transforms', 'Separator', 'on', 'userdata', ondata);
     uimenu( spec_m, 'Label', 'Channel time-frequency'                 , 'CallBack', cb_timef1);
     uimenu( spec_m, 'Label', 'Channel cross-coherence'                , 'CallBack', cb_crossf1);
     uimenu( spec_m, 'Label', 'Component time-frequency'               , 'CallBack', cb_timef2,'Separator', 'on');     
     uimenu( spec_m, 'Label', 'Component cross-coherence'              , 'CallBack', cb_crossf2);
 
-    uimenu( std_m,  'Label', 'Edit study info'                        , 'CallBack', cb_study3);
-    uimenu( std_m,  'Label', 'Select/Edit study design(s)'            , 'CallBack', cb_studydesign);
-    uimenu( std_m,  'Label', 'Precompute channel measures'            , 'CallBack', cb_precomp, 'separator', 'on');
-    uimenu( std_m,  'Label', 'Plot channel measures'                  , 'CallBack', cb_chanplot);
-    uimenu( std_m,  'Label', 'Precompute component measures'          , 'CallBack', cb_precomp2, 'separator', 'on');
-    clust_m = uimenu( std_m, 'Label', 'PCA clustering (original)');
-    uimenu( clust_m,  'Label', 'Build preclustering array'            , 'CallBack', cb_preclust);
-    uimenu( clust_m,  'Label', 'Cluster components'                   , 'CallBack', cb_clust);
-    uimenu( std_m,  'Label', 'Edit/plot clusters'                     , 'CallBack', cb_clustedit);
+    uimenu( std_m,  'Label', 'Edit study info'                        , 'userdata', onstudy, 'CallBack', cb_study3);
+    uimenu( std_m,  'Label', 'Select/Edit study design(s)'            , 'userdata', onstudy, 'CallBack', cb_studydesign);
+    uimenu( std_m,  'Label', 'Precompute channel measures'            , 'userdata', onstudy, 'CallBack', cb_precomp, 'separator', 'on');
+    uimenu( std_m,  'Label', 'Plot channel measures'                  , 'userdata', onstudy, 'CallBack', cb_chanplot);
+    uimenu( std_m,  'Label', 'Precompute component measures'          , 'userdata', onstudy, 'CallBack', cb_precomp2, 'separator', 'on');
+    clust_m = uimenu( std_m, 'Label', 'PCA clustering (original)'     , 'userdata', onstudy);
+    uimenu( clust_m,  'Label', 'Build preclustering array'            , 'userdata', onstudy, 'CallBack', cb_preclust);
+    uimenu( clust_m,  'Label', 'Cluster components'                   , 'userdata', onstudy, 'CallBack', cb_clust);
+    uimenu( std_m,  'Label', 'Edit/plot clusters'                     , 'userdata', onstudy, 'CallBack', cb_clustedit);
 
     if ~iseeglabdeployed2
-        uimenu( help_m, 'Label', 'About EEGLAB'                           , 'CallBack', 'pophelp(''eeglab'');');
-        uimenu( help_m, 'Label', 'About EEGLAB help'                      , 'CallBack', 'pophelp(''eeg_helphelp'');');
-        uimenu( help_m, 'Label', 'EEGLAB menus'                           , 'CallBack', 'eeg_helpmenu;','separator','on');
+        uimenu( help_m, 'Label', 'About EEGLAB'                           , 'userdata', on, 'CallBack', 'pophelp(''eeglab'');');
+        uimenu( help_m, 'Label', 'About EEGLAB help'                      , 'userdata', on, 'CallBack', 'pophelp(''eeg_helphelp'');');
+        uimenu( help_m, 'Label', 'EEGLAB menus'                           , 'userdata', on, 'CallBack', 'eeg_helpmenu;','separator','on');
 
         help_1 = uimenu( help_m, 'Label', 'EEGLAB functions');
-        uimenu( help_1, 'Label', 'Admin functions'                        , 'Callback', 'eeg_helpadmin;');	
-        uimenu( help_1, 'Label', 'Interactive pop_ functions'             , 'Callback', 'eeg_helppop;');	
-        uimenu( help_1, 'Label', 'Signal processing functions'            , 'Callback', 'eeg_helpsigproc;');	
+        uimenu( help_1, 'Label', 'Admin functions'                        , 'userdata', on, 'Callback', 'eeg_helpadmin;');	
+        uimenu( help_1, 'Label', 'Interactive pop_ functions'             , 'userdata', on, 'Callback', 'eeg_helppop;');	
+        uimenu( help_1, 'Label', 'Signal processing functions'            , 'userdata', on, 'Callback', 'eeg_helpsigproc;');	
 
-        uimenu( help_m, 'Label', 'EEGLAB license'                         , 'CallBack', 'pophelp(''eeglablicense.txt'', 1);');
+        uimenu( help_m, 'Label', 'EEGLAB license'                         , 'userdata', on, 'CallBack', 'pophelp(''eeglablicense.txt'', 1);');
     else
-        uimenu( help_m, 'Label', 'About EEGLAB'                           , 'CallBack', 'abouteeglab;');
-        uimenu( help_m, 'Label', 'EEGLAB license'                         , 'CallBack', 'pophelp(''eeglablicense.txt'', 1);');
+        uimenu( help_m, 'Label', 'About EEGLAB'                           , 'userdata', on, 'CallBack', 'abouteeglab;');
+        uimenu( help_m, 'Label', 'EEGLAB license'                         , 'userdata', on, 'CallBack', 'pophelp(''eeglablicense.txt'', 1);');
     end;
 
-    uimenu( help_m, 'Label', 'Web tutorial'                               , 'CallBack', 'tutorial;', 'Separator', 'on');
-    uimenu( help_m, 'Label', 'Email the EEGLAB team'                      , 'CallBack', 'web(''mailto:eeglab@sccn.ucsd.edu'');');
+    uimenu( help_m, 'Label', 'Web tutorial'                               , 'userdata', on, 'CallBack', 'tutorial;', 'Separator', 'on');
+    uimenu( help_m, 'Label', 'Email the EEGLAB team'                      , 'userdata', on, 'CallBack', 'web(''mailto:eeglab@sccn.ucsd.edu'');');
 end;
 
 if iseeglabdeployed2
@@ -927,7 +954,7 @@ if strcmpi(onearg, 'remote')
 	'color', COLOR, ...
 	'Tag','EEGLAB', ...
 	'Userdata', {[] []});
-	'resize', 'off', ...
+	%'resize', 'off', ...
     return;
 end;
 
@@ -1142,7 +1169,7 @@ while( index <= MAX_SET)
             tag = [ 'More (' int2str(index/30) ') ->' ];
             tmp_m = findobj('label', tag);
             if isempty(tmp_m)
-                 set_m = uimenu( set_m, 'Label', tag, 'Enable', 'on'); 
+                 set_m = uimenu( set_m, 'Label', tag, 'userdata', 'study:on'); 
             else set_m = tmp_m;
             end;	
         end;
@@ -1159,7 +1186,7 @@ while( index <= MAX_SET)
                             'eeglab(''redraw'');' ];
             
        		menutitle   = sprintf('Dataset %d:%s', index, ALLEEG(index).setname);
-			set( EEGMENU(index), 'Label', menutitle);
+			set( EEGMENU(index), 'Label', menutitle, 'userdata', 'study:on');
 			set( EEGMENU(index), 'CallBack', cb_retrieve );
 			set( EEGMENU(index), 'Enable', 'on' );
             if any(index == CURRENTSET), set( EEGMENU(index), 'checked', 'on' ); end;
@@ -1184,7 +1211,7 @@ if index ~= 0
     if MAX_SET == length(EEGMENU), EEGMENU(end+1) = uimenu( set_m, 'Label', '------', 'Enable', 'on'); end;
     
     set(EEGMENU(end), 'enable', 'on', 'Label', 'Select multiple datasets', ...
-                      'callback', cb_select, 'separator', 'on');
+                      'callback', cb_select, 'separator', 'on', 'userdata', 'study:on');
 end;
 
 % STUDY consistency
@@ -1195,7 +1222,7 @@ if exist('STUDY') & exist('CURRENTSTUDY')
     % if study present, check study consistency with loaded datasets
     % --------------------------------------------------------------
     if ~isempty(STUDY)
-        if length(ALLEEG) > length(STUDY.datasetinfo) | any(cellfun('isempty', {ALLEEG.data}))
+        if length(ALLEEG) > length(STUDY.datasetinfo) || ~isfield(ALLEEG, 'data') || any(cellfun('isempty', {ALLEEG.data}))
             if strcmpi(STUDY.saved, 'no')
                 res = questdlg2( strvcat('The study is not compatible with the datasets present in memory', ...
                                          'It is self consistent but EEGLAB is not be able to process it.', ...
@@ -1233,7 +1260,7 @@ if exist_study
                   'eeglab(''redraw'');' ];
     tmp_m = findobj('label', 'Select the study set');
     delete(tmp_m); % in case it is not at the end
-    tmp_m = uimenu( set_m, 'Label', 'Select the study set', 'Enable', 'on');
+    tmp_m = uimenu( set_m, 'Label', 'Select the study set', 'Enable', 'on', 'userdata', 'study:on');
     set(tmp_m, 'enable', 'on', 'callback', cb_select, 'separator', 'on');        
 else 
     delete( findobj('label', 'Select the study set') );
@@ -1302,7 +1329,10 @@ if exist('STUDY') & exist('CURRENTSTUDY')
     if CURRENTSTUDY == 1, study_selected = 1; end;
 end;
 
+menustatus = {};
 if study_selected
+    menustatus = { menustatus{:} 'study' };
+    
     hh = findobj('parent', gcf, 'userdata', 'fullline'); set(hh, 'visible', 'off');
     hh = findobj('parent', gcf, 'userdata', 'datinfo');  set(hh, 'visible', 'on');
 
@@ -1398,52 +1428,15 @@ if study_selected
     set( g.val11, 'String', studystatus);
     set( g.val12, 'String', num2str(round(sum( [ totsize.bytes] )/1E6*10)/10));        
     
-    % disable menus
-    % -------------
-    file_m  = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'File');  set(file_m, 'enable', 'on');
-    edit_m  = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Edit');  set(edit_m, 'enable', 'on');
-    tool_m  = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Tools'); set(tool_m, 'enable', 'on');
-    plot_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Plot');   set(plot_m, 'enable', 'off');
-    hist_m  = findobj('parent', file_m, 'type', 'uimenu', 'label', 'Save history');
-    data_m  = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Datasets');  set(data_m, 'enable', 'on');
-    std_m   = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Study'); set(std_m , 'enable', 'on');
-    set( edit_m, 'enable', 'off');
-    set( findobj('parent', tool_m, 'type', 'uimenu'), 'enable', 'off');
-    set( findobj('parent', file_m, 'type', 'uimenu'), 'enable', 'off');
-    set( findobj('parent', tool_m, 'type', 'uimenu', 'label', 'Run ICA')        , 'enable', 'on');
-    set( findobj('parent', tool_m, 'type', 'uimenu', 'label', 'SIFT')           , 'enable', 'on');
-    set( findobj('parent', tool_m, 'type', 'uimenu', 'label', 'Filter the data'), 'enable', 'on');
-    set( findobj('parent', tool_m, 'type', 'uimenu', 'label', 'Remove baseline'), 'enable', 'on');
-    set( findobj('parent', tool_m, 'type', 'uimenu', 'label', 'Change sampling rate'), 'enable', 'on');
-    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Save current dataset(s)' ), 'enable', 'on');
-    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Load existing study'     ), 'enable', 'on');
-    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Save current study'      ), 'enable', 'on');
-    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Save current study as'   ), 'enable', 'on');
-    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Clear study'             ), 'enable', 'on');
-    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Save history'            ), 'enable', 'on');
-    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Memory and other options'), 'enable', 'on');
-    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Quit'                    ), 'enable', 'on');
-    set( findobj('parent', std_m , 'type', 'uimenu', 'label', 'Plot channel measures'), 'enable', 'off');
-    if isfield(STUDY, 'changrp')
-        if ~isempty(STUDY.changrp)
-            set( findobj('parent', std_m, 'type', 'uimenu', 'label', 'Plot channel measures'), 'enable', 'on');
-        end;
-    end;
-    
-    % enable specific menus
-    % ---------------------
-    %if strcmpi(chanconsist, 'yes')
-    %    set( edit_m, 'enable', 'on');
-    %    set( findobj('parent', edit_m, 'type', 'uimenu'), 'enable', 'off');
-    %    set( findobj('parent', edit_m, 'type', 'uimenu', 'label', 'Select data'      ), 'enable', 'on');
-    %end;
-    
-elseif (exist('EEG') == 1) & ~isnumeric(EEG) & ~isempty(EEG(1).data)        
+elseif (exist('EEG') == 1) & ~isnumeric(EEG) & ~isempty(EEG(1).data) 
+
     hh = findobj('parent', gcf, 'userdata', 'fullline'); set(hh, 'visible', 'off');
     hh = findobj('parent', gcf, 'userdata', 'datinfo');  set(hh, 'visible', 'on');
     
     if length(EEG) > 1 % several datasets
 
+        menustatus = { menustatus{:} 'multiple_datasets' };
+        
         % head string
         % -----------
         strsetnum = 'Datasets ';
@@ -1517,43 +1510,9 @@ elseif (exist('EEG') == 1) & ~isnumeric(EEG) & ~isempty(EEG(1).data)
         set( g.val11, 'String', icaconsist);
         set( g.val12, 'String', num2str(round(totsize.bytes/1E6*10)/10));        
         
-        % disable menus
-        % -------------
-        file_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'File');  set(file_m, 'enable', 'on');
-        edit_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Edit');  set(edit_m, 'enable', 'on');
-        tool_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Tools'); set(tool_m, 'enable', 'on');
-        plot_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Plot');  set(plot_m, 'enable', 'off');
-        std_m  = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Study'); set(std_m , 'enable', 'off');
-        dat_m  = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Datasets'); set(dat_m, 'enable', 'on');
-        hist_m = findobj('parent', file_m, 'type', 'uimenu', 'label', 'Save history');
-        set( edit_m, 'enable', 'off');
-        set( findobj('parent', tool_m, 'type', 'uimenu'), 'enable', 'off');
-        set( findobj('parent', file_m, 'type', 'uimenu'), 'enable', 'off');
-        set( findobj('parent', tool_m, 'type', 'uimenu', 'label', 'Run ICA')        , 'enable', 'on');
-        set( findobj('parent', tool_m, 'type', 'uimenu', 'label', 'SIFT')           , 'enable', 'on');
-        set( findobj('parent', tool_m, 'type', 'uimenu', 'label', 'Filter the data'), 'enable', 'on');
-        set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Import data'             ), 'enable', 'on');
-        set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Load existing dataset'   ), 'enable', 'on');
-        set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Save current dataset(s)' ), 'enable', 'on');
-        set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Clear dataset(s)'        ), 'enable', 'on');
-        set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Load existing study'     ), 'enable', 'on');
-        set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Save history'            ), 'enable', 'on');
-        set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Memory and other options'), 'enable', 'on');
-        set( findobj('parent', hist_m, 'type', 'uimenu', 'label', 'Dataset history'         ), 'enable', 'off');
-        set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Quit'                    ), 'enable', 'on');
-
-        % enable specific menus
-        % ---------------------
-        %if strcmpi(chanconsist, 'yes')
-        %    set( edit_m, 'enable', 'on');
-        %    set( findobj('parent', edit_m, 'type', 'uimenu'), 'enable', 'off');
-        %    set( findobj('parent', edit_m, 'type', 'uimenu', 'label', 'Channel locations'), 'enable', 'on');
-        %    set( findobj('parent', edit_m, 'type', 'uimenu', 'label', 'Select data'      ), 'enable', 'on');
-        %    set( findobj('parent', edit_m, 'type', 'uimenu', 'label', 'Append datasets'  ), 'enable', 'on');
-        %    set( findobj('parent', edit_m, 'type', 'uimenu', 'label', 'Delete dataset(s)'), 'enable', 'on');
-        %end;
+    else % one continous dataset selected
         
-    else % one dataset selected
+        menustatus = { menustatus{:} 'continuous_dataset' };
         
         % text
         % ----
@@ -1637,64 +1596,22 @@ elseif (exist('EEG') == 1) & ~isnumeric(EEG) & ~isempty(EEG(1).data)
         else
             set( g.val12, 'String', [ num2str(round(tmp.bytes/1E6*10)/10) ' (memory mapped)' ]);
         end;
-        
-        % enable menus
-        % ------------
-        file_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'File');  set(file_m, 'enable', 'on');
-        edit_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Edit');  set(edit_m, 'enable', 'on');
-        tool_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Tools'); set(tool_m, 'enable', 'on');
-        tools_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Plot');  set(tools_m, 'enable', 'on');
-        std_m  = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Study'); set(std_m , 'enable', 'off');
-        ica_m  = findobj('parent', tool_m, 'type', 'uimenu', 'Label', 'Reject data using ICA');
-        stat_m = findobj('parent', tools_m, 'type', 'uimenu', 'Label', 'Data statistics');
-        erp_m  = findobj('parent', tools_m, 'type', 'uimenu', 'Label', 'Channel ERPs');
-        erpi_m = findobj('parent', tools_m, 'type', 'uimenu', 'Label', 'Component ERPs');
-        hist_m = findobj('parent', file_m, 'type', 'uimenu', 'label', 'Save history');
-        data_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Datasets');  set(data_m, 'enable', 'on');
-        std2_m = findobj('parent', file_m, 'type', 'uimenu', 'label', 'Create study');
-        set( findobj('parent', file_m, 'type', 'uimenu'), 'enable', 'on');
-        set( findobj('parent', edit_m, 'type', 'uimenu'), 'enable', 'on');
-        set( findobj('parent', tools_m, 'type', 'uimenu'), 'enable', 'on');
-        set( findobj('parent', tool_m, 'type', 'uimenu'), 'enable', 'on');
-        set( findobj('parent', ica_m , 'type', 'uimenu'), 'enable', 'on');
-        set( findobj('parent', stat_m, 'type', 'uimenu'), 'enable', 'on');
-        set( findobj('parent', erp_m , 'type', 'uimenu'), 'enable', 'on');
-        set( findobj('parent', erpi_m, 'type', 'uimenu'), 'enable', 'on');
-        set( findobj('parent', hist_m, 'type', 'uimenu'), 'enable', 'on');
-        set( findobj('parent', std2_m, 'type', 'uimenu'), 'enable', 'on');
-        
-        % continuous data
-        % ---------------
-        if EEG.trials == 1, 
-            set( findobj('parent', file_m, 'type', 'uimenu', 'Label', 'Import epoch info' ), 'enable', 'off'); 
-            set( findobj('parent', tool_m, 'type', 'uimenu', 'Label', 'Reject data epochs'), 'enable', 'off'); 
-            set( findobj('parent', tool_m, 'type', 'uimenu', 'Label', 'Automatic epoch rejection'), 'enable', 'off'); 
-            set( findobj('parent', ica_m , 'type', 'uimenu'), 'enable', 'off'); 
-            set( findobj('parent', ica_m , 'type', 'uimenu', 'label', 'Reject components by map' ), 'enable', 'on'); 
-            set( findobj('parent', tools_m, 'type', 'uimenu', 'Label', 'Channel ERP image'), 'enable', 'off'); 
-            set( findobj('parent', tools_m, 'type', 'uimenu', 'Label', 'Channel ERPs')          , 'enable', 'off'); 
-            set( findobj('parent', tools_m, 'type', 'uimenu', 'Label', 'ERP map series')        , 'enable', 'off'); 
-            set( findobj('parent', tools_m, 'type', 'uimenu', 'Label', 'Sum/Compare ERPs')      , 'enable', 'off'); 
-            set( findobj('parent', tools_m, 'type', 'uimenu', 'Label', 'Component ERP image')   , 'enable', 'off'); 
-            set( findobj('parent', tools_m, 'type', 'uimenu', 'Label', 'Component ERPs')        , 'enable', 'off'); 
-            set( findobj('parent', tools_m, 'type', 'uimenu', 'Label', 'Sum/Compare comp. ERPs'), 'enable', 'off'); 
-            set( findobj('parent', stat_m, 'type', 'uimenu', 'Label', 'Event statistics'), 'enable', 'off'); 
-        end;        
-        
-        % no channel locations
-        % --------------------
+
+        if EEG.trials > 1
+            menustatus = { menustatus{:} 'epoched_dataset' };
+        else
+            menustatus = { menustatus{:} 'continuous_dataset' };
+        end
         if ~isfield(EEG.chanlocs, 'theta')
-            set( findobj('parent', erp_m , 'type', 'uimenu', 'Label', 'With scalp maps')          , 'enable', 'off'); 
-            set( findobj('parent', erp_m , 'type', 'uimenu', 'Label', 'In scalp array')           , 'enable', 'off'); 
-            set( findobj('parent', tools_m, 'type', 'uimenu', 'Label', 'Channel locations')        , 'enable', 'off'); 
-            set( findobj('parent', tools_m, 'type', 'uimenu', 'Label', 'ERP map series')           , 'enable', 'off'); 
-            set( findobj('parent', tools_m, 'type', 'uimenu', 'Label', 'Component maps')           , 'enable', 'off');
-            set( findobj('parent', erpi_m, 'type', 'uimenu', 'Label', 'With component maps')      , 'enable', 'off'); 
-            set( findobj('parent', erpi_m, 'type', 'uimenu', 'Label', 'With comp. maps (compare)'), 'enable', 'off'); 
+            menustatus = { menustatus{:} 'chanloc_absent' };
         end;
-           
+        if isempty(EEG.icaweights)
+            menustatus = { menustatus{:} 'ica_absent' };
+        end;
     end;
 else
+    menustatus = { menustatus{:} 'startup' };
+    
 	hh = findobj('parent', gcf, 'userdata', 'fullline'); set(hh, 'visible', 'on');
 	hh = findobj('parent', gcf, 'userdata', 'datinfo');  set(hh, 'visible', 'off');
 	set( g.win0, 'String', 'No current dataset');
@@ -1711,23 +1628,54 @@ else
 	set( g.mainwin11,'String', '- Epoch data: "Tools > Extract epochs"');
 	set( g.mainwin12,'String', '- Remove baseline: "Tools > Remove baseline"');
 	set( g.mainwin13,'String', '- Run ICA:    "Tools > Run ICA"');
+end;
+
+% enable selected menu items
+% --------------------------
+allmenus = findobj( W_MAIN, 'type', 'uimenu');
+allstrs  = get(allmenus, 'userdata');
+if any(strcmp(menustatus, 'startup'))
     
-    % disable menus
-    % -------------
-    file_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'File');  set(file_m   , 'enable', 'on');
-    set( findobj('parent', file_m, 'type', 'uimenu'), 'enable', 'off');
-    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Import data')             , 'enable', 'on');
-    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Load existing dataset'   ), 'enable', 'on');
-    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Load existing study'     ), 'enable', 'on');
-    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Memory and other options'), 'enable', 'on');
-    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Quit')                    , 'enable', 'on');
-    set( findobj('parent', file_m, 'type', 'uimenu', 'label', 'Create study'    )        , 'enable', 'on');
-    set( findobj('type', 'uimenu', 'label', 'Using all loaded datasets'), 'enable', 'off');
-    edit_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Edit');      set(edit_m, 'enable', 'off');
-    tool_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Tools');     set(tool_m, 'enable', 'off');
-    tools_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Plot');      set(tools_m, 'enable', 'off');
-    data_m = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Datasets');  set(data_m, 'enable', 'off');
-    std_m  = findobj('parent', W_MAIN, 'type', 'uimenu', 'label', 'Study');     set(std_m , 'enable', 'off');
+    set(allmenus, 'enable', 'on');  
+    indmatch = cellfun(@(x)(~isempty(findstr(num2str(x), 'startup:off'))), allstrs);  
+    set(allmenus(indmatch), 'enable', 'off');
+    
+elseif any(strcmp(menustatus, 'study'))
+    
+    indmatch = cellfun(@(x)(~isempty(findstr(num2str(x), 'study:on'))), allstrs);            
+    set(allmenus          , 'enable', 'off');  
+    set(allmenus(indmatch), 'enable', 'on');
+    
+elseif any(strcmp(menustatus, 'multiple_datasets'))
+    
+    indmatch = cellfun(@(x)(~isempty(findstr(num2str(x), 'study:on'))), allstrs);            
+    set(allmenus          , 'enable', 'off');  
+    set(allmenus(indmatch), 'enable', 'on');        
+    set(findobj('parent', W_MAIN, 'label', 'Study'), 'enable', 'off');
+    
+elseif any(strcmp(menustatus, 'epoched_dataset'))
+
+    set(allmenus, 'enable', 'on');  
+    indmatch = cellfun(@(x)(~isempty(findstr(num2str(x), 'epoch:off'))), allstrs);  
+    set(allmenus(indmatch), 'enable', 'off');
+    
+elseif any(strcmp(menustatus, 'continuous_dataset'))
+    
+    set(allmenus, 'enable', 'on');  
+    indmatch = cellfun(@(x)(~isempty(findstr(num2str(x), 'continuous:off'))), allstrs);  
+    set(allmenus(indmatch), 'enable', 'off');
+    
+end;
+if any(strcmp(menustatus, 'chanloc_absent'))
+    
+    indmatch = cellfun(@(x)(~isempty(findstr(num2str(x), 'chanloc:on'))), allstrs);  
+    set(allmenus(indmatch), 'enable', 'off');
+    
+end;
+if any(strcmp(menustatus, 'ica_absent'))
+    
+    indmatch = cellfun(@(x)(~isempty(findstr(num2str(x), 'ica:on'))), allstrs);  
+    set(allmenus(indmatch), 'enable', 'off');
     
 end;
 
