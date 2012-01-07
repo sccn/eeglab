@@ -86,6 +86,14 @@ else
                'title' plottitle 'chans' channels varargin{:}};
     addoptions = {};
 end;
+% adapt frames to time limit.
+if any(strcmp(addoptions,'limits'))
+    addoptions{end+1} = 'frames';
+    ilimits = find(strcmp(addoptions,'limits'))+1;
+    timelims = addoptions{ilimits}(1:2);
+    addoptions{end+1} = round(diff(timelims/1000)*EEG.srate);
+end
+
 try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
 	
 if exist('plottitle') ~= 1
