@@ -132,12 +132,7 @@ for v=in:fin;
 
             h3=annotation('textbox',[x(k)  y(l) 0.02  0.02]);
 
-            if rep{m}(CORRMAP.corr.sets{v}(i))>1
-                set(h3,'Color',[col(CORRMAP.corr.sets{v}(i)+1) col(CORRMAP.corr.sets{v}(i)+2) col(CORRMAP.corr.sets{v}(i)+3)])
-            else
-                set(h3,'Color','k')
-            end
-
+            set(h3,'Color','k')
             set(h3,'FitHeightToText','on')
             set(h3,'String',['r=', num2str(CORRMAP.corr.abs_values{v}(i),'%11.3g'),', set ',num2str(CORRMAP.datasetindices(CORRMAP.corr.sets{v}(i)),'%11.4g'),' IC ',num2str(CORRMAP.corr.ics{v}(i),'%11.4g')])
             set(h3,'FontSize',sz)
