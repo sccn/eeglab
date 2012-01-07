@@ -3,8 +3,6 @@
 % Usage:
 %       >> epochval = eeg_getepochevent( EEG );
 %       >> epochval = eeg_getepochevent( EEG, 'key', 'val');
-%       >> epochval = eeg_getepochevent( EEG, type, timewin, ...
-%                                                 fieldname); % old format
 %
 % Inputs:
 %   EEG       - Input dataset
@@ -20,6 +18,8 @@
 %               Default field is 'EEG.event.latency' in milliseconds
 %               (though internally this information is stored in 
 %               real frames).
+%   'trials'    - [integer array] return values only for selected trials.
+%
 % Outputs:
 %   epochval    - A value of the selected field for each epoch. This is
 %                 NaN if no selected event occurred during the epoch. If
@@ -89,6 +89,27 @@ if nargin < 2
     return;
 end;
 
+% process more than one EEG dataset (for STUDY purposes)
+% ------------------------------------------------------
+if length(EEG) > 1
+    % the trial input may be a cell array; it has to be 
+    % extracted before calling the function on each dataset
+    trials  = cell(1,length(EEG));
+    for iArg = length(varargin)-1:-2:1
+        if strcmpi(varargin{iArg}, 'trials')
+            trials = varargin{iArg+1};
+            varargin(iArg:iArg+1) = [];
+        end;
+    end;
+    
+    epochval = [];
+    for dat = 1:length(EEG)
+        tmpepochval = eeg_getepochevent(EEG, 'trials', trials{dat}, varargin);
+    end;
+    epochval = [ epochval tmpepochval ];
+    return;
+end;
+
 % deal with old input format
 % -------------------------
 options = {};
@@ -107,9 +128,10 @@ else
 end;
 opt = finputcheck(options, { 'type'       { 'string';'cell' } { [] [] } '';
                              'timewin'    'real'              []        [-Inf Inf];
-                             'fieldname'  'string'            []        'latency' }, ...
-                  'eeg_getepochevent');
+                             'fieldname'  'string'            []        'latency';
+                             'trials'     { 'real';'cell' }   []        [] }, 'eeg_getepochevent');
 if isstr(opt), error(opt); end;
+if iscell(opt.trials) && ~isempty(opt.trials), opt.trials = opt.trials{1}; end;
 
 if isempty(opt.timewin)
     opt.timewin = [-Inf Inf];
@@ -254,6 +276,12 @@ if isnumeric(epochval{1})
     catch 
     end
 end
+
+% select specific trials
+if ~isempty(opt.trials)
+    epochval = epochval(opt.trials);
+    allepochval = allepochval(opt.trials);
+end;
 
 %% SUBFUNCTION ASCII2NUM
 % Maps ascii characters ['0','9'] to [1, 10], ['a','z'] to [11, 36]
