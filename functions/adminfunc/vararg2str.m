@@ -145,7 +145,7 @@ return;
 % ------------------------
 function str = struct2str( structure )
 	if isempty( structure )
-		str = '[]'; return;
+		str = 'struct([])'; return;
 	end;
 	str = '';
 	allfields = fieldnames( structure );
