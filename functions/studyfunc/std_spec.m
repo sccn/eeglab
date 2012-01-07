@@ -22,22 +22,44 @@
 %
 % Optional inputs:
 %   'components' - [numeric vector] components of the EEG structure for which 
-%                  activation ERPs will be computed. Note that because 
-%                  computation of component spectra is relatively fast, all 
-%                  components spectra are computed and saved. Only selected 
-%                  component are returned by the function to Matlab
+%                  activation spectrum will be computed. Note that because 
+%                  computation of ERP is so fast, all components spectrum are
+%                  computed and saved. Only selected component 
+%                  are returned by the function to Matlab
 %                  {default|[] -> all}
 %   'channels'   - [cell array] channels of the EEG structure for which 
 %                  activation spectrum will be computed. Note that because 
-%                  computation of spectrum is relatively fast, all channels 
-%                  spectrum are computed and saved. Only selected channels 
+%                  computation of ERP is so fast, all channels spectrum are
+%                  computed and saved. Only selected channels 
 %                  are returned by the function to Matlab
 %                  {default|[] -> none}
-%   'specmode'   - ['psd'|'fft'] method to compute spectral 
+%   'recompute'  - ['on'|'off'] force recomputing ERP file even if it is 
+%                  already on disk.
+%   'trialindices' - [cell array] indices of trials for each dataset.
+%                  Default is all trials.
+%   'recompute'  - ['on'|'off'] force recomputing data file even if it is 
+%                  already on disk.
+%   'rmcomps'    - [integer array] remove artifactual components (this entry
+%                  is ignored when plotting components). This entry contains 
+%                  the indices of the components to be removed. Default is none.
+%   'interp'     - [struct] channel location structure containing electrode
+%                  to interpolate ((this entry is ignored when plotting 
+%                  components). Default is no interpolation.
+%   'fileout'    - [string] name of the file to save on disk. The default
+%                  is the same name (with a different extension) as the 
+%                  dataset given as input.
+%  'savetrials'  - ['on'|'off'] save single-trials ERSP. Requires a lot of disk
+%                  space (dataset space on disk times 10) but allow for refined
+%                  single-trial statistics.
+%
+% spectrum specific optional inputs:
+%   'specmode'   - ['psd'|'fft'|'pburg'|'pmtm'] method to compute spectral 
 %                  decomposition. 'psd' uses the spectopo function. 'fft' 
 %                  uses a simple fft on each trial. For continuous data
 %                  data trials are extracted automatically (see 'epochlim'
-%                  and 'epochrecur' below).
+%                  and 'epochrecur' below). Two experimental modes are 
+%                  'pmtm' and 'pbug' which use multitaper and the Burg 
+%                  method to compute spectrum respectively.
 %   'epochlim'   - [min max] for FFT on continuous data, extract data
 %                  epochs with specific epoch limits in seconds (see also
 %                  'epochrecur' below). Default is [0 1].
@@ -46,15 +68,19 @@
 %   'timerange'  - [min max] use data within a specific time range before 
 %                  computing the data spectrum. For instance, for evoked 
 %                  data trials, it is recommended to use the baseline time 
-%                  period. 
+%                  period.
 %   'freqrange'  - [minhz maxhz] frequency range (in Hz) within which to 
-%                  return the spectrum {default|[]: [0 sample rate/2]}. 
-%   'recompute'  - ['on'|'off'] force recomputing ERP file even if it is 
-%                  already on disk.
+%                  return the spectrum {default|[]: [0 sample rate/2]}.
+%                  Note that this does not affect the spectrum computed on
+%                  disk, only the data returned by this function as output.
+%   'nw'         - [integer] number of tapers for the 'pmtm' spectral
+%                  method. Default is 4.
+%   'burgorder'  - [integet] order for the Burg spectral method.
 %
 % Other optional spectral parameters:
-%   All optional parameters to the spectopo function may be provided to this function
-%   as well.
+%   All optional parameters to the spectopo function may be provided to this 
+%   function as well (requires the 'specmode' option above to be set to
+%   'psd').
 %
 % Outputs:
 %   spec      - the mean spectra (in dB) of the requested ICA components in the selected 
@@ -63,10 +89,8 @@
 %
 % Files output or overwritten for ICA: 
 %               [dataset_filename].icaspec,   % raw spectrum of ICA components
-%               [dataset_filename].icaspecm   % spectrum with the mean baseline removed
 % Files output or overwritten for data: 
 %               [dataset_filename].datspec, 
-%               [dataset_filename].datspecm
 % 
 % See also  spectopo(), std_erp(), std_ersp(), std_map(), std_preclust()
 %

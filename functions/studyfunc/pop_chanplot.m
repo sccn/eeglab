@@ -266,10 +266,25 @@ if ~isstr(varargin{1})
         {'style' 'pushbutton' 'string' 'Plot channel properties' 'Callback' plot_chan_sum} {} ... 
         {'style' 'pushbutton' 'string' 'Plot channel properties (soon)' 'Callback' plot_onechan_sum 'enable' 'off'} };
     
-   [out_param userdat] = inputgui( 'geometry' , geometry, 'uilist', uilist, ...
-                                   'helpcom', 'pophelp(''pop_chanplot'')', ...
-                                   'title', 'View and edit current channels -- pop_chanplot()' , 'userdata', fig_arg, ...
-                                   'geomvert', [ 1 0.5 1 5 1 1 1 1 1], 'eval', show_chan );
+    % additional UI given on the command line
+    % ---------------------------------------
+    geomvert = [ 1 0.5 1 5 1 1 1 1 1];
+    if nargin > 2
+        addui = varargin{3};
+        if ~isfield(addui, 'uilist')
+            error('Additional GUI definition (argument 4) requires the field "uilist"');
+        end;
+        if ~isfield(addui, 'geometry')
+            addui.geometry = mat2cell(ones(1,length(addui.uilist)));
+        end;
+        uilist = { uilist{:}, addui.uilist{:} };
+        geometry = { geometry{:} addui.geometry{:} };
+        geomvert = [ geomvert ones(1,length(addui.geometry)) ];
+    end;
+    [out_param userdat] = inputgui( 'geometry' , geometry, 'uilist', uilist, ...
+        'helpcom', 'pophelp(''pop_chanplot'')', ...
+        'title', 'View and edit current channels -- pop_chanplot()' , 'userdata', fig_arg, ...
+        'geomvert', geomvert, 'eval', show_chan );
 	
    if ~isempty(userdat)
        ALLEEG = userdat{1}{1};
@@ -306,6 +321,7 @@ else
 
         case {'plotchantopo', 'plotchanersp','plotchanitc','plotchanspec', 'plotchanerp','plotchandip'}
             changrpstr    = allchans(changrp);
+            
             %if length(changrp) > 1
             %    subject = STUDY.subject{onechan-1};
             %else
@@ -313,6 +329,7 @@ else
             %    allsubjects   = unique({ STUDY.datasetinfo([ changrpstruct.setinds{:} ]).subject });
             %    subject = allsubjects{onechan-1};
             %end;
+            
             plotting_option = varargin{1};
             plotting_option = [ plotting_option(9:end) 'plot' ];
             if onechan(1) ~= 1  % check that not all onechan in channel are requested

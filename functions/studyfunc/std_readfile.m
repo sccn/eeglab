@@ -19,7 +19,7 @@
 %   'timelimits' - [min max] ERSP time (latency in ms) range of interest
 %   'freqlimits' - [min max] ERSP frequency range (in Hz) of interest
 %   'measure'    - ['erp'|'spec'|'ersp'|'itc'|'timef'|'erspbase'|'erspboot'
-%                  'itcboot'] data measure to read. If a full file name
+%                  'itcboot'|'erpim'] data measure to read. If a full file name
 %                  is provided, the data measure is selected automatically.
 %   'getparamsonly' - ['on'|'off'] only read file parameters not data.
 %
@@ -58,22 +58,26 @@
 % dimensions
 % time x freqs x channel_comps x subjects_trials
 
-function [measureData, parameters, measureRange1, measureRange2] = std_readfile(fileBaseName, varargin);
+function [measureData, parameters, measureRange1, measureRange2, events] = std_readfile(fileBaseName, varargin);
 
 if nargin < 1
     help std_readfile;
     return;
 end;
 
-opt = finputcheck(varargin, { 'dataindices'      'integer'  []    [];
-                              'components'       'integer'  []    [];
+opt = finputcheck(varargin, { 'components'       'integer'  []    [];
                               'getparamonly'     'string'   { 'on','off' }  'off';
                               'singletrials'     'string'   { 'on','off' }  'off';
+                              'concatenate'      'string'   { 'on','off' }  'off'; % ERPimage only
                               'channels'         'cell'     []    {};
-                              'measure'          'string'   { 'ersp','erspboot','erspbase','itc','itcboot','spec','erp','timef' }  'erp';
-                              'timelimits'       'real'     []    [];
-                              'freqlimits'       'real'     []    [] }, 'std_readdatafile');
+                              'measure'          'string'   { 'erpim','ersp','erspboot','erspbase','itc','itcboot','spec','erp','timef' }  'erp';
+                              'timelimits'       'real'     []    []; % ERPimage, ERP, ERSP, ITC
+                              'triallimits'      'real'     []    []; % ERPimage only
+                              'freqlimits'       'real'     []    []; % SPEC, ERSP, ITC
+                              'dataindices'      'integer'  []    [] }, 'std_readdatafile');
 if isstr(opt), error(opt); end;
+if ~isempty(opt.triallimits), opt.freqlimits = opt.triallimits; end;
+if strcmpi(opt.concatenate, 'on'), opt.singletrials = 'on'; end;
 if isstruct(fileBaseName), fileBaseName = { fileBaseName.filebase }; 
 else                       fileBaseName = { fileBaseName };
 end;
@@ -103,6 +107,7 @@ end;
 % ------------------
 erspFreqOnly = 0;
 switch opt.measure
+    case 'erpim'   , fieldExt = '';
     case 'erp'     , fieldExt = '';
     case 'spec'    , fieldExt = '';
     case 'ersp'    , fieldExt = '_ersp';
@@ -147,7 +152,7 @@ end;
 if strcmpi(opt.getparamonly, 'on'), opt.dataindices = 1; end;
 if length(fileBaseName   ) == 1, fileBaseName(   1:length(opt.dataindices)) = fileBaseName;    end;
 if length(opt.dataindices) == 1, opt.dataindices(1:length(fileBaseName   )) = opt.dataindices; end;
-if length(opt.dataindices) ~= length(fileBaseName), error('Number of files and number of indices must be the same'); end;
+if length(opt.dataindices) ~= length(fileBaseName) && ~isempty(opt.dataindices), error('Number of files and number of indices must be the same'); end;
 
 % scan datasets
 % -------------
@@ -155,6 +160,7 @@ measureRange1 = [];
 measureRange2 = [];
 measureData   = [];
 parameters    = [];
+events        = {};
     
 % read only specific fields
 % -------------------------
@@ -164,7 +170,7 @@ for fInd = 1:length(opt.dataindices) % usually only one value
     fieldsToRead = [ dataType int2str(opt.dataindices(fInd)) fieldExt ]; 
     try,
         warning('off', 'MATLAB:load:variableNotFound');
-        fileData = load( '-mat', [ fileBaseName{fInd} fileExt ], 'parameters', 'freqs', 'times', fieldsToRead );
+        fileData = load( '-mat', [ fileBaseName{fInd} fileExt ], 'parameters', 'freqs', 'times', 'events', fieldsToRead );
         warning('on', 'MATLAB:load:variableNotFound');
     catch
         error( [ 'Cannot read file ''' fileBaseName{fInd} fileExt '''' ]);
@@ -179,6 +185,7 @@ for fInd = 1:length(opt.dataindices) % usually only one value
     end;
     if isfield(fileData, 'times'),  measureRange1 = fileData.times; end;
     if isfield(fileData, 'freqs'),  measureRange2 = fileData.freqs; end;
+    if isfield(fileData, 'events'), events{fInd}  = fileData.events; end;
 
     % if the function is only called to get parameters
     % ------------------------------------------------
@@ -208,6 +215,7 @@ for fInd = 1:length(opt.dataindices) % usually only one value
     % -------------------------------
     if isfield(fileData, fieldsToRead)
         fieldData = getfield(fileData, fieldsToRead);
+        if isstr(fieldData), eval( [ 'fieldData = ' fieldData ] ); end;
         
         % average single trials if necessary
         % ----------------------------------
@@ -256,16 +264,26 @@ for fInd = 1:length(opt.dataindices) % usually only one value
     end;
 end;
 
+% special ERP image
+% -----------------
+if ~isempty(events)
+    len    = length(events{1});
+    events = [ events{:} ];
+    if strcmpi(opt.singletrials, 'off') events = reshape(events, len, length(events)/len); end;
+end;
+    
 % select plotting or clustering time/freq range
 % ---------------------------------------------
 if ~isempty(measureRange1) && ~erspFreqOnly
     [measureRange1 indBegin indEnd] = indicesselect(measureRange1, opt.timelimits);
     if ~isempty(measureData)
         if strcmpi(opt.measure, 'erp')
-             measureData = measureData(indBegin:indEnd,:,:);
         else measureData = measureData(:,indBegin:indEnd,:);
         end;
     end;
+end;
+if isempty(measureRange2) && size(measureData,1) > 1 && size(measureData,2) > 1 % for ERPimage
+    measureRange2 = [1:size(measureData,1)];
 end;
 if ~isempty(measureRange2)
     [measureRange2 indBegin indEnd] = indicesselect(measureRange2, opt.freqlimits);

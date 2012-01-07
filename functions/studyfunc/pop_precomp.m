@@ -54,14 +54,17 @@ if ~isstr(varargin{1}) %intial settings
          
     % callbacks
     % ---------
-    erspparams_str = [ '''cycles'', [3 0.5], ''nfreqs'', 100' ];
-    specparams_str = '''specmode'', ''fft''';
+    erspparams_str     = [ '''cycles'', [3 0.5], ''nfreqs'', 100' ];
+    specparams_str     = '''specmode'', ''fft''';
+    erpimageparams_str = '''nlines'', 10,''smoothing'', 10';
     set_ersp       = ['pop_precomp(''setersp'',gcf);']; 
     test_ersp      = ['pop_precomp(''testersp'',gcf);']; 
     set_itc        = ['pop_precomp(''setitc'',gcf);']; 
     set_spec       = ['pop_precomp(''setspec'',gcf);']; 
     set_erp        = ['pop_precomp(''seterp'',gcf);']; 
+    set_erpimage   = ['pop_precomp(''seterpimage'',gcf);']; 
     test_spec      = ['pop_precomp(''testspec'',gcf);']; 
+    test_erpimage  = ['pop_precomp(''testerpimage'',gcf);']; 
     chanlist       = ['pop_precomp(''chanlist'',gcf);']; 
     chanlist       = 'warndlg2([ ''You need to compute measures on all data channels.'' 10 ''This functionality is under construction.'']);';
     chaneditbox    = ['pop_precomp(''chaneditbox'',gcf);']; 
@@ -117,6 +120,11 @@ if ~isstr(varargin{1}) %intial settings
     {'style' 'text'       'string' 'Spectopo parameters' 'tag' 'spec_push' 'enable' 'off'}...
     {'style' 'edit'       'string' specparams_str 'tag' 'spec_params' 'enable' 'off' }, ...
     {'style' 'pushbutton' 'string' 'Test' 'tag' 'spec_test' 'enable' 'off' 'callback' test_spec}...
+    {'style' 'checkbox'   'string' '' 'tag' 'erpimage_on' 'value' 0 'Callback' set_erpimage }, ...
+	{'style' 'text'       'string' 'ERP-image' }, {}, ...
+    {'style' 'text'       'string' 'ERP-image parameters' 'tag' 'erpimage_push' 'enable' 'off'}...
+    {'style' 'edit'       'string' erpimageparams_str 'tag' 'erpimage_params' 'enable' 'off' }, ...
+    {'style' 'pushbutton' 'string' 'Test' 'tag' 'erpimage_test' 'enable' 'off' 'callback' test_erpimage}...
     {'style' 'checkbox'   'string' '' 'tag' 'ersp_on' 'value' 0 'Callback' set_ersp } , ...
 	{'style' 'text'       'string' 'ERSPs' 'horizontalalignment' 'center' }, {}, ...
     {'vertshift' 'style'  'text'       'string' 'Time/freq. parameters' 'tag' 'ersp_push' 'value' 1 'enable' 'off'}, ...
@@ -148,9 +156,10 @@ if ~isstr(varargin{1}) %intial settings
     chanlist = {};
     firsttimeersp = 1;
     fig_arg = { ALLEEG STUDY allchans chanlist firsttimeersp };
-    geomline = [0.45 1 0.8 2 3 0.78 ];
-    geometry = { [1] [1] geomadd1{:}  [1] [1] [0.40 1.5 0.3 2 2 0.65 ] [0.40 1.5 0.3 2 2 0.65 ] geomline geomline geomadd2{:} 1 [1 0.1] [1 0.1] };
-    geomvert = [ 1 0.5 geomvertadd1 0.5 1 1 1 1 1 1 fastif(length(geomadd2) == 1,1,[]) 1 1];
+    geomline1 = [0.40 1.3 0.1 2 2.4 0.65 ];
+    geomline2 = [0.40 0.9 0.5 2 2.4 0.65 ];
+    geometry = { [1] [1] geomadd1{:}  [1] [1] geomline1 geomline1 geomline1 geomline2 geomline2 geomadd2{:} 1 [1 0.1] [1 0.1] };
+    geomvert = [ 1 0.5 geomvertadd1 0.5 1 1 1 1 1 1 1 fastif(length(geomadd2) == 1,1,[]) 1 1];
 	[precomp_param, userdat2, strhalt, os] = inputgui( 'geometry', geometry, 'uilist', gui_spec, 'geomvert', geomvert, ...
                                                       'helpcom', ' pophelp(''std_precomp'')', ...
                                                       'title', 'Select and compute component measures for later clustering -- pop_precomp()', ...
@@ -212,7 +221,7 @@ if ~isstr(varargin{1}) %intial settings
     if os.erp_on == 1 
         options = { options{:} 'erp' 'on' };
         if ~isempty(os.erp_base)
-            options = { options{:} 'rmbase' str2num(os.erp_base) };
+            options = { options{:} 'erpparams' { 'rmbase' str2num(os.erp_base) } };
         end
         warnflag = checkFilePresent(STUDY, 'erp', comps, warnflag, os.recomp_on);
     end
@@ -229,6 +238,14 @@ if ~isstr(varargin{1}) %intial settings
         tmpparams = eval( [ '{' os.spec_params '}' ] );
         options = { options{:} 'spec' 'on' 'specparams' tmpparams };
         warnflag = checkFilePresent(STUDY, 'spec', comps, warnflag, os.recomp_on);
+    end
+    
+    % ERPimage option is on
+    % --------------------
+    if os.erpimage_on== 1 
+        tmpparams = eval( [ '{' os.erpimage_params '}' ] );
+        options = { options{:} 'erpim' 'on' 'erpimparams' tmpparams };
+        warnflag = checkFilePresent(STUDY, 'erpim', comps, warnflag, os.recomp_on);
     end
     
     % ERSP option is on
@@ -310,6 +327,17 @@ else
                  set(findobj('parent', hdl,'tag', 'spec_params'), 'enable', 'off');
                  set(findobj('parent', hdl,'tag', 'spec_test'),   'enable', 'off');
             end
+            
+        case 'seterpimage'
+            set_spec = get(findobj('parent', hdl, 'tag', 'erpimage_on'), 'value'); 
+            if set_spec
+                 set(findobj('parent', hdl,'tag', 'erpimage_push'),   'enable', 'on');
+                 set(findobj('parent', hdl,'tag', 'erpimage_params'), 'enable', 'on');
+                 set(findobj('parent', hdl,'tag', 'erpimage_test'),   'enable', 'on');
+            else set(findobj('parent', hdl,'tag', 'erpimage_push'),   'enable', 'off');
+                 set(findobj('parent', hdl,'tag', 'erpimage_params'), 'enable', 'off');
+                 set(findobj('parent', hdl,'tag', 'erpimage_test'),   'enable', 'off');
+            end
 
         case 'seterp'
             set_erp = get(findobj('parent', hdl, 'tag', 'erp_on'), 'value'); 
@@ -337,9 +365,12 @@ else
                                                          'dataset (1 line per channel).', ...
                                                          'Frequency range may be adjusted', ...
                                                          'after computation'));
+                icadefs;
+                set(gcf, 'color', BACKCOLOR);
             catch, warndlg2('Error while calling function, check parameters'); end;
 
         case 'testersp'
+            try,
                 ersp_params = eval([ '{' get(findobj('parent', hdl, 'tag', 'ersp_params'), 'string') '}' ]); 
                 tmpstruct = struct(ersp_params{:});
                 [ tmpX tmpt tmpf ersp_params ] = std_ersp(ALLEEG(1), 'channels', 1, 'trialindices', { [1:min(20,ALLEEG(1).trials)] }, 'type', 'ersp', 'recompute', 'on', 'savefile', 'off', ersp_params{:});
@@ -351,9 +382,33 @@ else
                                          'the first 20 trials of the first', ...
                                          'dataset (ERSP only).', ...
                                          ' ', ...
-                                         'Time and frequency range may also be', ...
-                                         'adjusted after computation.'));
+                                         'Time and frequency range may be', ...
+                                         'adjusted after computation.'), 'fontsize', 18);
                 axis off;                                                 
+                icadefs;
+                set(gcf, 'color', BACKCOLOR);    
+            catch, warndlg2('Error while calling function, check parameters'); end;
+                
+        case 'testerpimage'
+            try,
+                erpimage_params = eval([ '{' get(findobj('parent', hdl, 'tag', 'erpimage_params'), 'string') '}' ]); 
+                tmpstruct = struct(erpimage_params{:});
+                erpimstruct = std_erpimage(ALLEEG(1), 'channels', 1, 'recompute', 'on', 'savefile', 'off', erpimage_params{:});
+                figure; pos = get(gcf, 'position'); pos(3)=pos(3)*2; set(gcf, 'position', pos);
+                subplot(1,2,1); 
+                tftopo(erpimstruct.chan1, erpimstruct.times, 1:size(erpimstruct.chan1,1));
+                subplot(1,2,2); 
+                text( 0.2, 0.8, strvcat( 'This is a test plot performed on', ...
+                                         'the first channel of the first', ...
+                                         'dataset.', ...
+                                         ' ', ...
+                                         'Time and trial range may be', ...
+                                         'adjusted after computation.'), 'fontsize', 18);
+                axis off;  
+                icadefs;
+                set(gcf, 'color', BACKCOLOR);
+            catch, warndlg2('Error while calling function, check parameters'); end;
+                
     end;
 end
 STUDY.saved = 'no';

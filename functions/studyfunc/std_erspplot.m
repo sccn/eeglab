@@ -100,30 +100,63 @@ if nargin < 2
     return;
 end;
 
-STUDY = pop_erspparams(STUDY, 'default');
+% find datatype and default options
+% ---------------------------------
+dtype = 'ersp';
+for ind = 1:2:length(varargin)
+    if strcmpi(varargin{ind}, 'datatype')
+        dtype = varargin{ind+1}; 
+    end;
+end;
+if strcmpi(dtype, 'erpim')
+     STUDY  = pop_erpimparams(STUDY, 'default');
+     params = STUDY.etc.erpimparams;
+else STUDY  = pop_erspparams( STUDY, 'default');
+     params = STUDY.etc.erspparams;
+end;
+fields     = { 'freqrange'     [];
+               'topofreq'      [];
+               'topotrial'    [];
+               'singletrials'  'off' 
+               'trialrange'    [] 
+               'concatenate'   'off';
+               'ersplim'       [] 
+               'itclim'        [] 
+               'subbaseline'   'off' };
+for ind=1:size(fields,1)
+    if ~isfield(params, fields{ind,1}), 
+        params = setfield(params, fields{ind,1}, fields{ind,2}); 
+    end;
+end;
 
+% decode input parameters
+% -----------------------
 [ opt moreparams ] = finputcheck( varargin, { ...
-                               'design'      'integer' []              STUDY.currentdesign;
-                               'topotime'    'real'    [] STUDY.etc.erspparams.topotime;
-                               'topofreq'    'real'    [] STUDY.etc.erspparams.topofreq;
                                'maskdata'    'string'  [] 'off';
-                               'timerange'   'real'    [] STUDY.etc.erspparams.timerange;
-                               'freqrange'   'real'    [] STUDY.etc.erspparams.freqrange;
-                               'ersplim'     'real'    [] STUDY.etc.erspparams.ersplim;
-                               'caxis'       'real'    [] STUDY.etc.erspparams.ersplim;
-                               'itclim'      'real'    [] STUDY.etc.erspparams.itclim;
-                               'statistics'  'string'  [] STUDY.etc.erspparams.statistics;
-                               'groupstats'  'string'  [] STUDY.etc.erspparams.groupstats;
-                               'condstats'   'string'  [] STUDY.etc.erspparams.condstats;
-                               'subbaseline' 'string'  [] STUDY.etc.erspparams.subbaseline;
+                               'design'      'integer' [] STUDY.currentdesign;
+                               'topotime'    'real'    [] params.topotime;
+                               'topofreq'    'real'    [] params.topofreq;
+                               'topotrial'  'real'    [] params.topotrial;
+                               'timerange'   'real'    [] params.timerange;
+                               'freqrange'   'real'    [] params.freqrange;
+                               'trialrange'  'real'    [] params.trialrange;
+                               'ersplim'     'real'    [] params.ersplim;
+                               'caxis'       'real'    [] params.ersplim;
+                               'itclim'      'real'    [] params.itclim;
+                               'colorlimits' 'real'    [] params.colorlimits; % ERPimage
+                               'statistics'  'string'  [] params.statistics;
+                               'groupstats'  'string'  [] params.groupstats;
+                               'condstats'   'string'  [] params.condstats;
+                               'subbaseline' 'string'  [] params.subbaseline;
                                'statmode'    'string'  [] ''; % deprecated
-                               'threshold'   'real'    [] STUDY.etc.erspparams.threshold;
-                               'naccu'       'integer' [] STUDY.etc.erspparams.naccu;
-                               'mcorrect'    'string'  [] STUDY.etc.erspparams.mcorrect;
-                               'singletrials' 'string' { 'on','off' }  STUDY.etc.erspparams.singletrials;
+                               'threshold'   'real'    [] params.threshold;
+                               'naccu'       'integer' [] params.naccu;
+                               'mcorrect'    'string'  [] params.mcorrect;
+                               'singletrials' 'string' { 'on','off' }  params.singletrials;
+                               'concatenate'  'string' { 'on','off' }  params.concatenate;
                                'channels'    'cell'    []              {};
                                'clusters'    'integer' []              [];
-                               'datatype'    'string'  { 'itc','ersp','pac' } 'ersp';
+                               'datatype'    'string'  { 'itc','ersp','pac' 'erpim' } 'ersp';
                                'mode'        'string'  []              '';
                                'plottf'      'real'    []              [];
                                'comps'       {'integer','string'}  []              []; % for backward compatibility
@@ -142,11 +175,18 @@ end;
 
 allconditions = STUDY.design(opt.design).variable(1).value;
 allgroups     = STUDY.design(opt.design).variable(2).value;
-paired = { STUDY.design(opt.design).variable(1).pairing ...
-           STUDY.design(opt.design).variable(2).pairing };
+paired        = { STUDY.design(opt.design).variable(1).pairing ...
+                  STUDY.design(opt.design).variable(2).pairing };
 
 % for backward compatibility
 % --------------------------
+if strcmpi(opt.datatype, 'erpim'), 
+    opt.topofreq = opt.topotrial; 
+    opt.caxis = opt.colorlimits; 
+    valunit = 'trials'; 
+else
+    valunit = 'Hz';
+end;
 if isempty(opt.plottf) & ~isempty(opt.topofreq) & ~isempty(opt.topotime) & ~isnan(opt.topofreq) & ~isnan(opt.topotime)
      opt.plottf = [ opt.topofreq(1) opt.topofreq(end) opt.topotime(1) opt.topotime(end) ];
 end;
@@ -177,8 +217,8 @@ end;
 % ---------------------
 if ~isempty(opt.channels)
 
-    [STUDY allersp alltimes allfreqs] = std_readersp(STUDY, ALLEEG, 'channels', opt.channels, 'infotype', opt.datatype, 'subject', opt.subject, ...
-        'singletrials', opt.singletrials, 'subbaseline', opt.subbaseline, 'timerange', opt.timerange, 'freqrange', opt.freqrange, 'design', opt.design);
+    [STUDY allersp alltimes allfreqs tmp events] = std_readersp(STUDY, ALLEEG, 'channels', opt.channels, 'infotype', opt.datatype, 'subject', opt.subject, ...
+        'singletrials', opt.singletrials, 'subbaseline', opt.subbaseline, 'timerange', opt.timerange, 'freqrange', opt.freqrange, 'design', opt.design, 'concatenate', opt.concatenate);
     
     % select specific time and freq
     % -----------------------------
@@ -218,7 +258,7 @@ if ~isempty(opt.channels)
         if ~isempty(opt.plottf)
             alltitles = std_figtitle('threshold', opt.threshold, 'mcorrect', opt.mcorrect, 'condstat', opt.condstats, 'cond2stat', opt.groupstats, ...
                                      'statistics', opt.statistics, 'condnames', allconditions, 'cond2names', allgroups, 'chanlabels', { locs.labels }, ...
-                                     'subject', opt.subject, 'valsunit', { 'Hz' 'ms' }, 'vals', opt.plottf, 'datatype', upper(opt.datatype));
+                                     'subject', opt.subject, 'valsunit', { valunit 'ms' }, 'vals', opt.plottf, 'datatype', upper(opt.datatype));
             std_chantopo(allersp, 'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, 'caxis', opt.caxis, ...
                                           'chanlocs', locs, 'threshold', opt.threshold, 'titles', alltitles);
         else
@@ -238,7 +278,7 @@ if ~isempty(opt.channels)
                                          'subject', opt.subject, 'datatype', upper(opt.datatype), 'plotmode', opt.plotmode);
                 std_plottf(alltimes, allfreqs, tmpersp, 'datatype', opt.datatype, 'titles', alltitles, ...
                                            'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, 'plotmode', ...
-                                           opt.plotmode, 'chanlocs', ALLEEG(1).chanlocs, plottfopt{:});
+                                           opt.plotmode, 'chanlocs', ALLEEG(1).chanlocs, 'events', events, plottfopt{:});
             end;
         end;
     end;
@@ -281,8 +321,8 @@ else
                 allersp{index} = mean(mean(allersp{index}(ti1:ti2,fi1:fi2,:,:),1),2);
                 allersp{index} = reshape(allersp{index}, [1 size(allersp{index},3) size(allersp{index},4) ]);
             end;
-            if opt.plottf(1) == opt.plottf(2), titlestr = [ num2str(opt.plottf(1)) ' Hz'];
-            else                               titlestr = [ num2str(opt.plottf(1)) '-' num2str(opt.plottf(2)) ' Hz'];
+            if opt.plottf(1) == opt.plottf(2), titlestr = [ num2str(opt.plottf(1)) ' ' valunit ];
+            else                               titlestr = [ num2str(opt.plottf(1)) '-' num2str(opt.plottf(2)) ' ' valunit ];
             end;
             if opt.plottf(3) == opt.plottf(4), titlestr = [ ', ' num2str(opt.plottf(3)) ' ms'];
             else                               titlestr = [ ', ' num2str(opt.plottf(3)) '-' num2str(opt.plottf(4)) ' ms'];

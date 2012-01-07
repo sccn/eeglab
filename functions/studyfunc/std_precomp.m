@@ -1,7 +1,7 @@
-% std_precomp() - Precompute measures (ERP, spectrum, ERSP, ITC) for channels in a study. 
-%                 If channels are interpolated before computing the measures, the updated 
-%                 EEG datasets are also saved to disk. Called by pop_precomp(). Follow with 
-%                 pop_plotstudy(). See Example below.
+% std_precomp() - Precompute measures (ERP, spectrum, ERSP, ITC) for channels in a  
+%                 study. If channels are interpolated before computing the measures,
+%                 the updated EEG datasets are also saved to disk. Called by 
+%                 pop_precomp(). Follow with pop_plotstudy(). See Example below.
 % Usage:    
 % >> [ALLEEG,STUDY] = std_precomp(STUDY, ALLEEG, chanorcomp, 'key', 'val', ...);
 %
@@ -16,8 +16,7 @@
 %                  the selected measures. Note that the name of the channel is
 %                  not case-sensitive.
 % Optional inputs:
-%  'design'   - [integer] use specific study index design to compute
-%  measure.
+%  'design'   - [integer] use specific study index design to compute measure.
 %  'erp'      - ['on'|'off'] pre-compute ERPs for each dataset.
 %  'spec'     - ['on'|'off'] pre-compute spectrum for each dataset.
 %               Use 'specparams' to set spectrum parameters.
@@ -28,50 +27,37 @@
 %  'scalp'    - ['on'|'off'] pre-compute scalp maps for components.
 %  'allcomps' - ['on'|'off'] compute ERSP/ITC for all components ('off'
 %               only use pre-selected components in the pop_study interface).
-%  'specparams' - [cell array] Parameters for the spectopo function are given as 
-%              optional arguments:
-%                   'freqrange' = [min max] frequency range to calculate. Changes x-axis limits {default: 
-%                                1 Hz for the min and Nyquist (srate/2) for the max. If specified 
-%                                power distribution maps are plotted, the highest mapped frequency 
-%                                determines the max freq}. Note that it is better here to compute
-%                                spectrum over a wide range of frequencies (it will then
-%                                be possible to select another subrange for plotting).
-%                   'freqfac'  = [integer] ntimes to oversample -> frequency resolution {default: 2}
-%                   'nfft'     = [integer] length to zero-pad data to. Overwrites 'freqfac' above.
-%                   'winsize'  = [integer] window size in data points
-%                   {default: from data}
-%                   'overlap'  = [integer] window overlap in data points {default: 0}
-%                   'percent'  = [float 0 to 100] percent of the data to sample for computing the 
-%                                spectra. Values < 100 speed up the computation. {default: 100}.
-%                   'mapnorm'  = [float vector] If 'data' contain the activity of an independant 
-%                                component, this parameter should contain its scalp map. In this case
-%                                the spectrum amplitude will be scaled to component RMS scalp power.
-%                                Useful for comparing component strengths {default: none}
-%                   'rmdc'     = ['on'|'off'] 'on' -> remove DC {default: 'off'}  
-%
-%              Note that it is advised to compute spectrum 
-%              over all frequencies since plotting function can always reduce
-%              the range of plotted frequencies.
-%  'erspparams' - [cell array] Optional arguments are 'cycles', 'freqrange',
-%              'padratio', 'winsize', 'alpha' (see newtimef()). Note that it 
-%              is adivised to select the largest frequency range and time window
-%              as plotting function are capable of plotting subranges of
-%              these. An important optional parameter that is
-%                    'savetrials' = ['on'|'off'] save single-trials ERSP.
-%                                   Requires a lot of disk space (dataset
-%                                   space on disk times 10) but allow for
-%                                   refined single-trial statistics.
-%  'recompute' - ['on'|'off'] force recomputing ERP file even if it is 
-%                already on disk.
-%
+%  'erpparams'   - [cell array] Parameters for the std_spec function. See 
+%                  std_spec for more information.
+%  'specparams'  - [cell array] Parameters for the std_spec function. See 
+%                  std_spec for more information.
+%  'erspparams'  - [cell array] Optional arguments for the std_ersp function.
+%  'erpimparams' - [cell array] Optional argument for std_erpimage. See
+%                  std_erpimage for the list of arguments.
+%  'recompute'   - ['on'|'off'] force recomputing ERP file even if it is 
+%                  already on disk.
+%  'rmicacomps'  - ['on'|'off'] remove ICA components pre-selected in each
+%                  dataset (EEGLAB menu item, "Tools > Reject data using ICA 
+%                  > Reject components by map). This option is ignored when 
+%                  precomputing measures for ICA clusters. Default is 'off'.
+%  'rmclust'     - [integer array] remove selected ICA component clusters.
+%                  For example, ICA component clusters containing
+%                  artifacts. This option is ignored when precomputing
+%                  measures for ICA clusters.
+%  'savetrials'  - ['on'|'off'] save single-trials ERSP. Requires a lot of disk
+%                  space (dataset space on disk times 10) but allow for refined
+%                  single-trial statistics.
 % Outputs:
-%   ALLEEG       - the input ALLEEG vector of EEG dataset structures, modified by adding preprocessing 
-%                  data as pointers to Matlab files that hold the pre-clustering component measures.
-%   STUDY        - the input STUDY set with pre-clustering data added, for use by pop_clust() 
+%   ALLEEG       - the input ALLEEG vector of EEG dataset structures, modified  
+%                  by adding preprocessing data as pointers to Matlab files that 
+%                  hold the pre-clustering component measures.
+%   STUDY        - the input STUDY set with pre-clustering data added,
+%                  for use by pop_clust()
 %
 % Example:
-%   >> [ALLEEG STUDY] = std_precomp(STUDY, ALLEEG, { 'cz' 'oz' }, 'interpolate', 'on', 'erp', 'on', ...
-%          'spec', 'on', 'ersp', 'on', 'erspparams', { 'cycles' [ 3 0.5 ], 'alpha', 0.01, 'padratio' 1 });
+%   >> [STUDY ALLEEG] = std_precomp(STUDY, ALLEEG, { 'cz' 'oz' }, 'interpo', ...
+%               'on', 'erp', 'on', 'spec', 'on', 'ersp', 'on', 'erspparams', ...
+%               { 'cycles' [ 3 0.5 ], 'alpha', 0.01, 'padratio' 1 });
 %                          
 %           % This prepares, channels 'cz' and 'oz' in the STUDY datasets.
 %           % If a data channel is missing in one dataset, it will be
@@ -116,6 +102,7 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
                                 'ersp'        'string'  { 'on','off' }     'off';
                                 'recompute'   'string'  { 'on','off' }     'off';
                                 'spec'        'string'  { 'on','off' }     'off';
+                                'erpim'       'string'  { 'on','off' }     'off';
                                 'scalp'       'string'  { 'on','off' }     'off';
                                 'allcomps'    'string'  { 'on','off' }     'off';
                                 'itc'         'string'  { 'on','off' }     'off';
@@ -123,9 +110,10 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
                                 'rmicacomps'  'string'  { 'on','off' }     'off';
                                 'design'      'integer' []                 STUDY.currentdesign;
                                 'rmclust'     'integer' []                 [];
-                                'rmbase'      'integer' []                 [];
+                                'rmbase'      'integer' []                 []; % deprecated, for backward compatibility purposes, not documented
                                 'specparams'        'cell'    {}                 {};
                                 'erpparams'         'cell'    {}                 {};
+                                'erpimparams'       'cell'    {}                 {};
                                 'erspparams'        'cell'    {}                 {}}, 'std_precomp');
     if isstr(g), error(g); end;
     if ~isempty(g.rmbase), g.erpparams = { g.erpparams{:} 'rmbase' g.rmbase }; end;
@@ -233,6 +221,64 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
         end;
     end;
 
+    % compute spectrum
+    % ----------------
+    if strcmpi(g.erpim, 'on')
+        % check dataset consistency
+        % -------------------------
+        allPnts = [ALLEEG([STUDY.design(g.design).cell.dataset]).pnts];
+        if iscell(allPnts), allPnts = [ allPnts{:} ]; end;
+        if length(unique(allPnts)) > 1
+            error([ 'Cannot compute ERSPs/ITCs because datasets' 10 'do not have the same number of data points' ])
+        end;
+        
+        % check consistency with parameters on disk
+        % -----------------------------------------
+        guimode = 'guion';
+        tmpparams = {};
+        tmpparams = g.erpimparams;
+        if strcmpi(g.recompute, 'off')
+            for index = 1:length(STUDY.design(g.design).cell)
+                desset = STUDY.design(g.design).cell(index);
+                if strcmpi(computewhat, 'channels')
+                    filename = [ desset.filebase '.daterpim'];
+                else filename = [ desset.filebase '.icaerpim'];
+                end;
+                [guimode, g.erpimparams] = std_filecheck(filename, g.erpimparams, guimode, { 'fileout' 'recompute', 'channels', 'components', 'trialindices'});
+                if strcmpi(guimode, 'cancel'), return; end;
+            end;
+            if strcmpi(guimode, 'usedisk') | strcmpi(guimode, 'same'), g.recompute = 'off';
+            else                                                       g.recompute = 'on';
+            end;
+            if ~isempty(g.erpimparams) && isstruct(g.erpimparams)
+                tmpparams      = fieldnames(g.erpimparams); tmpparams = tmpparams';
+                tmpparams(2,:) = struct2cell(g.erpimparams);
+            end;
+        end;
+        
+        % compute ERPimages
+        % -----------------
+        for index = 1:length(STUDY.design(g.design).cell)
+            desset = STUDY.design(g.design).cell(index);
+            addopts = { 'recompute', g.recompute, 'fileout', desset.filebase, 'trialindices', desset.trials };
+            if strcmpi(computewhat, 'channels')
+                [tmpchanlist opts] = getchansandopts(STUDY, ALLEEG, chanlist, desset.dataset, g);
+                std_erpimage(ALLEEG(desset.dataset), 'channels', tmpchanlist, opts{:}, addopts{:}, tmpparams{:});
+            else
+                if length(desset.dataset)>1 && ~isequal(chanlist{desset.dataset})
+                    error(['ICA decompositions must be identical if' 10 'several datasets are concatenated to build' 10 'the design, abording' ]);
+                end;
+                std_erpimage(ALLEEG(desset.dataset), 'components', chanlist{desset.dataset(1)}, addopts{:}, tmpparams{:});
+            end;
+        end;
+        if isfield(curstruct, 'erpimdata')
+            curstruct = rmfield(curstruct, 'erpimdata');
+            curstruct = rmfield(curstruct, 'erpimtimes');
+            curstruct = rmfield(curstruct, 'erpimtrials');
+            curstruct = rmfield(curstruct, 'erpimevents');
+        end;
+    end;
+    
     % compute component scalp maps
     % ----------------------------
     if strcmpi(g.scalp, 'on')

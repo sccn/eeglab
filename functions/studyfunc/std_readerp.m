@@ -11,18 +11,21 @@
 %
 % Optional inputs:
 %  'design'    - [integer] read files from a specific STUDY design. Default
-%                is empty (no design)
-%  'channels'  - [cell] list of channels to import {default: all}
+%                is empty (use current design in STUDY.currentdesign).
+%  'channels'  - [cell] list of channels to import {default: none}
 %  'clusters'  - [integer] list of clusters to import {[]|default: all but
 %                the parent cluster (1) and any 'NotClust' clusters}
-%  'timerange' - [min max] time range {default: whole measure range}
+%  'singletrials' - ['on'|'off'] load single trials spectral data (if 
+%                available). Default is 'off'.
 %  'subject'   - [string] select a specific subject {default:all}
 %  'component' - [integer] select a specific component in a cluster
 %                 {default:all}
+%
+% ERP specific optional inputs:
+%  'timerange' - [min max] time range {default: whole measure range}
 %  'componentpol' - ['on'|'off'] invert ERP component sign based on
 %                   scalp map match with component scalp map centroid.
 %                   {default:'on'}
-%  'singletrials' - ['on'|'off'] load single trials spectral data (if available)
 %
 % Output:
 %  STUDY    - updated studyset structure
@@ -31,6 +34,10 @@
 %  times    - [float array] array of time values
 %  setinds  - [cell array] datasets indices
 %  cinds    - [cell array] channel or component indices
+%
+% Example:
+%  std_precomp(STUDY, ALLEEG, { ALLEEG(1).chanlocs.labels }, 'erp', 'on');
+%  [erp times] = std_readerp(STUDY, ALLEEG, 'channels', { ALLEEG(1).chanlocs(1).labels });
 %
 % Author: Arnaud Delorme, CERCO, 2006-
 
@@ -77,7 +84,6 @@ end;
 STUDY = pop_erpparams(STUDY, 'default');
 STUDY = pop_specparams(STUDY, 'default');
 [opt moreopts] = finputcheck( varargin, { ...
-    'type'          { 'string','cell' } { [] [] } '';
     'design'        'integer' []             STUDY.currentdesign;
     'channels'      'cell'    []             {};
     'clusters'      'integer' []             [];

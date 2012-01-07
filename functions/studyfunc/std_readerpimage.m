@@ -1,8 +1,7 @@
-% std_readitc()  - load ITC measures for data channels or 
-%                  for all components of a specified cluster.
+% std_readerpimage()  - load ERPimage measures for data channels or 
+%                       for all components of a specified cluster.
 % Usage:
-%         >> [STUDY, itcdata, times, freqs] = ...
-%                   std_readitc(STUDY, ALLEEG, varargin);
+%   >> [STUDY, erpimagedata, times, trials, events] = std_readerpimage(STUDY, ALLEEG, varargin);
 %
 % Note: this function is a helper function that contains a call to the 
 % std_readersp function that reads all 2-D data matrices for EEGLAB STUDY.
@@ -26,6 +25,6 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [STUDY, erspdata, alltimes, allfreqs, erspbase] = std_readersp(STUDY, ALLEEG, varargin);
+function [STUDY, erspdata, alltimes, allfreqs, events] = std_readerpimage(STUDY, ALLEEG, varargin);
 
-[STUDY, erspdata, alltimes, allfreqs] = std_readersp(STUDY, ALLEEG, 'infotype','itc', varargin{:});
+[STUDY, erspdata, alltimes, allfreqs, erspbase, events] = std_readersp(STUDY, ALLEEG, 'infotype','erpim', varargin{:});

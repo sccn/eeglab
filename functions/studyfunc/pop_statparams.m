@@ -77,8 +77,9 @@ if length(varargin) == 0 || strcmpi(varargin{1}, 'default')
 end;
 
 [opt ignore] = finputcheck(varargin, { 'uilist'   'cell'    []    {};
-                                       'enablegroup'   'string' { 'on','off' }  'on';
-                                       'enablecond'    'string' { 'on','off' }  'off';
+                                       'enablegroup'        'string' { 'on','off' }  'on';
+                                       'enablecond'         'string' { 'on','off' }  'off';
+                                       'enablesingletrials' 'string' { 'on','off' }  'on';
                                        'geometry' 'cell'    []    {} }, 'pop_params', 'ignore');
 if isstr(opt), error(opt); end;
 
@@ -113,7 +114,7 @@ opt.uilist = { opt.uilist{:} ...
         {'style' 'edit'        'string' threshstr 'tag' 'threshold' } ...
         {} {'style' 'checkbox' 'string' 'Compute first variable statistics' 'value' condstats  'enable' opt.enablecond  'tag' 'condstats' } ...
         {} {'style' 'checkbox' 'string' 'Compute second  variable statistics' 'value' groupstats 'enable' opt.enablegroup 'tag' 'groupstats' } ...
-        {} {'style' 'checkbox' 'string' 'Use single trials (when available)' 'value' statmode 'tag' 'singletrials' } ...
+        {} {'style' 'checkbox' 'string' 'Use single trials (when available)' 'value' statmode 'tag' 'singletrials' 'enable' opt.enablesingletrials } ...
         {} {'style' 'checkbox' 'string' 'Use False Discovery Rate to correct for multiple comparisons' 'value' mcorrect 'tag' 'mcorrect' } };
 
 if statval == 3,

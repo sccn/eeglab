@@ -6,7 +6,8 @@
 % Usage:    
 %            >> [erp, times] = std_erp(EEG, 'key', 'val', ...);
 % Inputs:
-%   EEG          - a loaded epoched EEG dataset structure. 
+%   EEG          - a loaded epoched EEG dataset structure. May be an array
+%                  of such structure containing several datasets.
 %
 % Optional inputs:
 %   'components' - [numeric vector] components of the EEG structure for which 
@@ -23,6 +24,27 @@
 %                  {default|[] -> none}
 %   'recompute'  - ['on'|'off'] force recomputing ERP file even if it is 
 %                  already on disk.
+%   'trialindices' - [cell array] indices of trials for each dataset.
+%                  Default is all trials.
+%   'recompute'  - ['on'|'off'] force recomputing data file even if it is 
+%                  already on disk.
+%   'rmcomps'    - [integer array] remove artifactual components (this entry
+%                  is ignored when plotting components). This entry contains 
+%                  the indices of the components to be removed. Default is none.
+%   'interp'     - [struct] channel location structure containing electrode
+%                  to interpolate ((this entry is ignored when plotting 
+%                  components). Default is no interpolation.
+%   'fileout'    - [string] name of the file to save on disk. The default
+%                  is the same name (with a different extension) as the 
+%                  dataset given as input.
+%  'savetrials'  - ['on'|'off'] save single-trials ERSP. Requires a lot of disk
+%                  space (dataset space on disk times 10) but allow for refined
+%                  single-trial statistics.
+%
+% ERP specific options:
+%   'rmbase'     - [min max] remove baseline. This option does not affect
+%                  the original datasets.
+%
 % Outputs:
 %   erp          - ERP for the requested ICA components in the selected 
 %                  latency window. ERPs are scaled by the RMS over of the
@@ -86,8 +108,8 @@ g = finputcheck(options, { 'components' 'integer' []         [];
                            'fileout'    'string'  []         '';
                            'savetrials' 'string'  { 'on','off' } 'off';
                            'interp'     'struct'  { }        struct([]);
-                           'recompute'  'string'  { 'on','off' } 'off';
-                           'timerange'  'real'    []         [] }, 'std_erp');
+                           'timerange'  'real'    []         [];        % the timerange option is deprecated and has no effect
+                           'recompute'  'string'  { 'on','off' } 'off' }, 'std_erp');
 if isstr(g), error(g); end;
 if isempty(g.trialindices), g.trialindices = cell(length(EEG)); end;
 if ~iscell(g.trialindices), g.trialindices = { g.trialindices }; end;
@@ -99,8 +121,6 @@ end
 if isempty(g.components)
     g.components = 1:numc;
 end
-
-EEG_etc = [];
 
 % % THIS SECTION WOULD NEED TO TEST THAT THE PARAMETERS ON DISK ARE CONSISTENT
 %

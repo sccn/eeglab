@@ -97,11 +97,12 @@ opt = finputcheck( varargin, { 'titles'         'cell'   []              cell(20
                                'unitx'          'string' []              'ms'; % just for titles
                                'chanlocs'       'struct' []              struct('labels', {});
                                'freqscale'      'string' { 'log','linear','auto' }  'auto';
+                               'events'         'cell'   []              {};
                                'groupstats'     'cell'   []              {};
                                'condstats'      'cell'   []              {};
                                'interstats'     'cell'   []              {};                               
                                'maskdata'       'string' { 'on','off' }   'off';
-                               'datatype'       'string' { 'ersp','itc' }    'ersp';
+                               'datatype'       'string' { 'ersp','itc' 'erpim' }    'ersp';
                                'plotmode'       'string' { 'normal','condensed' }  'normal' }, 'std_plottf');
 if isstr(opt), error(opt); end;
 if all(all(cellfun('size', data, 3)==1))               opt.singlesubject = 'on'; end;
@@ -201,7 +202,8 @@ end;
 options = { 'chanlocs', opt.chanlocs, 'electrodes', 'off', 'cbar', 'off', ...
             'cmode', 'separate', opt.tftopoopt{:} };
 if strcmpi(opt.freqscale, 'log'), options = { options{:} 'logfreq', 'native' }; end;
-
+if strcmpi(opt.datatype, 'erpim'), options = { options{:} 'ylabel' 'Trials' }; end;
+        
 % adjust figure size
 % ------------------
 fig = figure('color', 'w');
@@ -224,8 +226,11 @@ for c = 1:nc
                 else                        tmpplot(find(pgroupplot{c}(:) == 0)) = 0;
                 end;
             end;
-
-            tftopo( tmpplot, timevals, freqs, 'title', opt.titles{c,g}, options{:}); 
+            if ~isempty(opt.events)
+                 tmpevents = mean(opt.events{c,g},2);
+            else tmpevents = [];
+            end;
+            tftopo( tmpplot, timevals, freqs, 'events', tmpevents, 'title', opt.titles{c,g}, options{:}); 
                 
             if isempty(opt.caxis) && ~isempty(tmpc)
                 warning off;
@@ -316,7 +321,10 @@ function cbar_standard(datatype, ng);
     if strcmpi(datatype, 'itc')
          cbar(tmp, 0, tmpc, 10); ylim([0.5 1]);
          title('ITC');
-    else cbar(tmp, 0, tmpc, 5);title('dB');
+    elseif strcmpi(datatype, 'erpim')
+        cbar(tmp, 0, tmpc, 5);
+    else
+        cbar(tmp, 0, tmpc, 5);title('dB');
     end;
     
 

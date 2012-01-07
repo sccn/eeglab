@@ -4,7 +4,7 @@
 %                    statistics. Settings are stored within the STUDY 
 %                    structure (STUDY.etc.erspparams) which is used
 %                    whenever plotting is performed by the function
-%                    std_specplot().
+%                    std_erspplot().
 % Usage:    
 %   >> STUDY = pop_erspparams(STUDY, 'key', 'val', ...);   
 %
