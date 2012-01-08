@@ -47,7 +47,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function data = eeg_getdatact( EEG, varargin);
+function [data boundaries] = eeg_getdatact( EEG, varargin);
 
 data = [];
 if nargin < 1
@@ -75,16 +75,31 @@ if iscell(EEG) || (~isstr(EEG) && length(EEG) > 1)
     % concatenate datasets
     % --------------------
     data = [];
+    boundaries = [];
     for dat = 1:length(EEG)
         if iscell(EEG)
-             tmpdata = eeg_getdatact(EEG{dat}, 'trialindices', trials{dat}, 'rmcomps', rmcomps{dat}, varargin{:} );
-        else tmpdata = eeg_getdatact(EEG(dat), 'trialindices', trials{dat}, 'rmcomps', rmcomps{dat}, varargin{:} );
+             [tmpdata datboundaries] = eeg_getdatact(EEG{dat}, 'trialindices', trials{dat}, 'rmcomps', rmcomps{dat}, varargin{:} );
+        else [tmpdata datboundaries] = eeg_getdatact(EEG(dat), 'trialindices', trials{dat}, 'rmcomps', rmcomps{dat}, varargin{:} );
         end;
-        if isempty(data), data = tmpdata;
+        if isempty(data), 
+            data       = tmpdata;
+            boundaries = datboundaries;
         else
-            if size(data,1) ~= size(tmpdata,1), error('Datasets to be concatenated do not have the same number of channels'); end;
-            if size(data,2) ~= size(tmpdata,2), error('Datasets to be concatenated do not have the same number of time points'); end;
-            data(:,:,end+1:end+size(tmpdata,3)) = tmpdata; % concatenating trials
+            if all([ EEG.trials ] == 1) % continuous data
+                if size(data,1) ~= size(tmpdata,1), error('Datasets to be concatenated do not have the same number of channels'); end;
+
+                % adding boundaries
+                if ~isempty(datboundaries)
+                    boundaries = [boundaries datboundaries size(data,2)];
+                else
+                    boundaries = [boundaries size(data,2)];
+                end;
+                data(:,end+1:end+size(tmpdata,2)) = tmpdata; % concatenating trials
+            else
+                if size(data,1) ~= size(tmpdata,1), error('Datasets to be concatenated do not have the same number of channels'); end;
+                if size(data,2) ~= size(tmpdata,2), error('Datasets to be concatenated do not have the same number of time points'); end;
+                data(:,:,end+1:end+size(tmpdata,3)) = tmpdata; % concatenating trials
+            end;
         end;
     end;
     return;
@@ -260,15 +275,31 @@ if ~isempty(opt.projchan)
     data = EEG.icawinv(finalChanInds, opt.component)*data(:,:);
 end;
 
+% get data boundaries if continuous data
+% --------------------------------------
+boundaries = [];
+if EEG.trials == 1 && ~isempty(EEG.event)
+    if ~isempty(opt.samples)
+        disp('WARNING: eeg_getdatact.m, boundaries are not accurate when selecting data samples');
+    end;
+    tmpevent = EEG.event;
+    tmpbound = strmatch('boundary', lower({ tmpevent.type }));
+    if ~isempty(tmpbound)
+        boundaries = [tmpevent(tmpbound).latency ]-0.5;
+    end;
+end;
+
 try,
     if  strcmpi(opt.reshape, '3d')
-        data = reshape(data, size(data,1), EEG.pnts, EEG.trials);
+         data = reshape(data, size(data,1), EEG.pnts, EEG.trials);
     else data = reshape(data, size(data,1), EEG.pnts*EEG.trials);
     end;
 catch
     error('The file size on disk does not correspond to the dataset information.');
 end;
 
+% select trials
+% -------------
 if length(opt.trialindices) ~= EEG.trials
     data = data(:,:,opt.trialindices);
 end;
