@@ -116,12 +116,13 @@ else STUDY  = pop_erspparams( STUDY, 'default');
 end;
 fields     = { 'freqrange'     [];
                'topofreq'      [];
-               'topotrial'    [];
+               'topotrial'     [];
                'singletrials'  'off' 
                'trialrange'    [] 
                'concatenate'   'off';
-               'ersplim'       [] 
-               'itclim'        [] 
+               'colorlimits'   [];
+               'ersplim'       [];
+               'itclim'        [];
                'subbaseline'   'off' };
 for ind=1:size(fields,1)
     if ~isfield(params, fields{ind,1}), 
