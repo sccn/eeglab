@@ -204,52 +204,15 @@ if ~strcmpi(g.specmode, 'psd')
 end;
  
 % No SPEC information found
-% ------------------------
+% -------------------------
 options = {};
 if ~isempty(g.rmcomps), options = { options{:} 'rmcomps' g.rmcomps }; end;
 if ~isempty(g.interp),  options = { options{:} 'interp' g.interp }; end;
-X          = [];
-boundaries = [];
-for dat = 1:length(EEG)
-    if strcmpi(prefix, 'comp')
-        tmpdata = eeg_getdatact(EEG(dat), 'component', [1:size(EEG(dat).icaweights,1)], 'trialindices', g.trialindices{dat} );
-    else
-        EEG(dat).data = eeg_getdatact(EEG(dat), 'channel', [1:EEG(dat).nbchan], 'rmcomps', g.rmcomps{dat}, 'trialindices', g.trialindices{dat});
-        EEG(dat).trials = size(EEG(dat).data,3);
-        EEG(dat).event  = [];
-        EEG(dat).epoch  = [];
-        if ~isempty(g.interp), 
-            EEG(dat) = eeg_interp(EEG(dat), g.interp, 'spherical'); 
-        end;
-        tmpdata = EEG(dat).data;
-    end;
-    if all([ EEG.trials ] > 1)
-        if size(X,2) ~= size(tmpdata,2) && size(X,3) ~= 1, error('Datasets to be concatenated do not have the same number of time points'); end;
-        if isempty(X), 
-            X = tmpdata; 
-        else           
-            if size(X,1) ~= size(tmpdata,1), error('Datasets to be concatenated do not have the same number of channels'); end;
-            X(:,:,end+1:end+size(tmpdata,3)) = tmpdata; % concatenating trials
-        end;
-    else
-        % get boundaries for continuous data
-        if ~isempty(EEG(dat).event) && isfield(EEG(dat).event, 'type') && ischar(EEG(dat).event(1).type)
-             tmpevent = EEG(dat).event;
-             tmpbound = strmatch('boundary', lower({ tmpevent.type }));
-             if ~isempty(tmpbound)
-                 boundaries = [boundaries size(X,2) [ tmpevent(tmpbound).latency ]-0.5+size(X,2) ];
-             end;
-        else 
-        end;
-        if isempty(X), 
-            X = tmpdata;
-        else
-            if size(X,1) ~= size(tmpdata,1), error('Datasets to be concatenated do not have the same number of channels or components'); end;
-            X(:,end+1:end+size(tmpdata,2)) = tmpdata;
-        end;
-    end;
+if isempty(g.channels)
+     [X boundaries]  = eeg_getdatact(EEG, 'component', [1:size(EEG(1).icaweights,1)], 'trialindices', g.trialindices );
+else [X boundaries]  = eeg_getdatact(EEG, 'channel'  , [1:EEG(1).nbchan], 'trialindices', g.trialindices, 'rmcomps', g.rmcomps, 'interp', g.interp);
 end;
-if ~isempty(boundaries), boundaries = [boundaries size(X,2)]; end;
+if ~isempty(boundaries) && boundaries(end) ~= size(X,2), boundaries = [boundaries size(X,2)]; end;
 
 % get specific time range for epoched and continuous data
 if ~isempty(g.timerange) 

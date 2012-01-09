@@ -316,28 +316,9 @@ end;
 options = {};
 if ~isempty(g.rmcomps), options = { options{:} 'rmcomps' g.rmcomps }; end;
 if ~isempty(g.interp),  options = { options{:} 'interp' g.interp }; end;
-X       = [];
-for dat = 1:length(EEG)
-    if strcmpi(prefix, 'comp')
-        tmpdata = eeg_getdatact(EEG(dat), 'component', [1:size(EEG(dat).icaweights,1)], 'trialindices', g.trialindices{dat} );
-    else
-        EEG(dat).data = eeg_getdatact(EEG(dat), 'channel', [1:EEG(dat).nbchan], 'rmcomps', g.rmcomps{dat}, 'trialindices', g.trialindices{dat});
-        EEG(dat).trials = size(EEG(dat).data,3);
-        EEG(dat).event  = [];
-        EEG(dat).epoch  = [];
-        if ~isempty(g.interp), 
-            TMPEEG = eeg_interp(EEG(dat), g.interp, 'spherical'); 
-            tmpdata = TMPEEG.data;
-        else
-            tmpdata = EEG(dat).data;
-        end;
-    end;
-    if isempty(X), X = tmpdata;
-    else
-        if size(X,1) ~= size(tmpdata,1), error('Datasets to be concatenated do not have the same number of channels'); end;
-        if size(X,2) ~= size(tmpdata,2), error('Datasets to be concatenated do not have the same number of time points'); end;
-        X(:,:,end+1:end+size(tmpdata,3)) = tmpdata; % concatenating trials
-    end;
+if isempty(g.channels)
+     X = eeg_getdatact(EEG, 'component', g.indices, 'trialindices', g.trialindices );
+else X = eeg_getdatact(EEG, 'channel'  , g.indices, 'trialindices', g.trialindices, 'rmcomps', g.rmcomps, 'interp', g.interp);
 end;
 
 % frame range
@@ -363,7 +344,7 @@ for k = 1:length(g.indices)  % for each (specified) component
     
     % Run timef() to get ERSP
     % ------------------------
-    timefdata  = reshape(X(g.indices(k),pointrange,:), 1, length(pointrange)*size(X,3));
+    timefdata  = reshape(X(k,pointrange,:), 1, length(pointrange)*size(X,3));
     if strcmpi(g.plot, 'on'), figure; end;
     flagEmpty = 0;
     if isempty(timefdata)
