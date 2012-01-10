@@ -278,6 +278,7 @@ if ~isempty(measureRange1) && ~erspFreqOnly
     [measureRange1 indBegin indEnd] = indicesselect(measureRange1, opt.timelimits);
     if ~isempty(measureData)
         if strcmpi(opt.measure, 'erp')
+             measureData = measureData(indBegin:indEnd,:,:);
         else measureData = measureData(:,indBegin:indEnd,:);
         end;
     end;
