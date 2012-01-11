@@ -142,7 +142,7 @@ end;
                                'freqrange'   'real'    [] params.freqrange;
                                'trialrange'  'real'    [] params.trialrange;
                                'ersplim'     'real'    [] params.ersplim;
-                               'caxis'       'real'    [] params.ersplim;
+                               'caxis'       'real'    [] [];
                                'itclim'      'real'    [] params.itclim;
                                'colorlimits' 'real'    [] params.colorlimits; % ERPimage
                                'statistics'  'string'  [] params.statistics;
