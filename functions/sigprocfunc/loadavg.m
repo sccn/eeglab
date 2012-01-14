@@ -1,15 +1,19 @@
 % loadavg() - loading eeg average data file from Neuroscan into
-%             matlab. 
-%
+%             matlab.
 % Usage:
 %  >> [signal, variance, chan_names, ...
 %               pnts, rate, xmin, xmax] = loadavg( filename );
+% Input:
+%      filename   -  input Neuroscan .avg file   
 %
-% Inputs:
-%      filename   -  input Neuroscan .avg file      
-%      signal	  -  output signal	
-%      variance   -  variance of the signal 
-%      chan_names -  array that represent the name of the electrodes
+% Output:
+%      signal	  - output signal	
+%      variance   - variance of the signal 
+%      chan_names - array that represent the name of the electrodes
+%      pnts       - number of data points
+%      srate      - sampling rate
+%      xmin       - ERP onset time
+%      xmax       - ERP final time
 %
 % Example: 
 %  % load data into the array named 'signal'
@@ -17,7 +21,7 @@
 %  % plot the signal for the first electrode
 %  plot( signal(1,:) );	  		
 %
-% See also: eeglab()
+% Author: Arnaud Delorme, Salk Institute, 2001
 
 % Copyright (C) 2001 Arnaud Delorme, Salk Institute, arno@salk.edu
 %
@@ -64,14 +68,15 @@ if fid<0
 	return;
 end;
 
-S_nsweeps_offset 		= 364; % sweep accept (total sweeps 362)
-S_pnts_offset 			= 368;
-S_nchans_offset 		= 370;
-S_variance_offset 		= 375;
-S_rate_offset 			= 376;
-S_xmin_offset 			= 505;
-S_xmax_offset 			= 509;
-packed_sizeof_SETUP 		= 900;
+S_nsweeps_offset_total    = 362;
+S_nsweeps_offset_accepted = 364;
+S_pnts_offset 			  = 368;
+S_nchans_offset 		  = 370;
+S_variance_offset 		  = 375;
+S_rate_offset 		  	  = 376;
+S_xmin_offset 			  = 505;
+S_xmax_offset 			  = 509;
+packed_sizeof_SETUP       = 900;
 
 % read general part of the erp header and set variables
 % -----------------------------------------------------
@@ -89,7 +94,10 @@ packed_sizeof_SETUP 		= 900;
 
 % read # of channels, # of samples, variance flag, and real time bounds
 % ---------------------------------------------------------------------
-fseek(fid, S_nsweeps_offset, 'bof');  	nsweeps = fread(fid, 1, 'ushort');
+fseek(fid, S_nsweeps_offset_accepted, 'bof');  	nsweeps = fread(fid, 1, 'ushort');
+if nsweeps == 0
+    fseek(fid, S_nsweeps_offset_total, 'bof');  	nsweeps = fread(fid, 1, 'ushort');
+end;
 fseek(fid, S_pnts_offset, 'bof');  		pnts = fread(fid, 1, 'ushort');
 fseek(fid, S_nchans_offset, 'bof');	  	chan = fread(fid, 1, 'ushort');
 fseek(fid, S_variance_offset, 'bof');  	variance_flag = fread(fid, 1, 'uchar');
@@ -104,6 +112,7 @@ fprintf('sampling rate (Hz)         : %f\n', rate);
 fprintf('xmin (s)                   : %f\n', xmin);
 fprintf('xmax (s)                   : %f\n', xmax);
 fprintf('number of trials (s)       : %d\n', nsweeps);
+if nsweeps == 0, nsweeps = 1; end;
 
 % read electrode configuration
 % ----------------------------
