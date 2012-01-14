@@ -167,10 +167,12 @@ end
 
 if ~isstr(varargin{1})
     STUDY  = varargin{1};
-    STUDY.etc.erpparams.topotime  = NaN; % [] for channels and NaN for components
-    STUDY.etc.specparams.topofreq = NaN; % NaN -> GUI disabled
-    STUDY.etc.erspparams.topotime = NaN;
-    STUDY.etc.erspparams.topofreq = NaN;
+    STUDY.etc.erpparams.topotime    = NaN; % [] for channels and NaN for components
+    STUDY.etc.specparams.topofreq   = NaN; % NaN -> GUI disabled
+    STUDY.etc.erspparams.topotime   = NaN;
+    STUDY.etc.erspparams.topofreq   = NaN;
+    STUDY.etc.erpimparams.topotime  = NaN;
+    STUDY.etc.erpimparams.topotrial = NaN;
     oldhistory = STUDY.history;
     STUDY.history = '';
     ALLEEG = varargin{2};
@@ -294,6 +296,8 @@ if ~isstr(varargin{1})
     plot_comp_ersps = ['pop_clustedit(''plotcompersp'',gcf); '];
     plot_clus_itcs  = ['pop_clustedit(''itcplot'',gcf); '];
     plot_comp_itcs  = ['pop_clustedit(''plotcompitc'',gcf); '];
+    plot_clus_erpim = ['pop_clustedit(''erpimageplot'',gcf); '];
+    plot_comp_erpim = ['pop_clustedit(''plotcomperpimage'',gcf); '];
     plot_clus_spectra = ['pop_clustedit(''specplot'',gcf); '];
     plot_comp_spectra = ['pop_clustedit(''plotcompspec'',gcf); '];
     plot_clus_erp = ['pop_clustedit(''erpplot'',gcf); '];
@@ -311,8 +315,9 @@ if ~isstr(varargin{1})
     erp_opt        = ['pop_clustedit(''erp_opt'',gcf);'];
     spec_opt       = ['pop_clustedit(''spec_opt'',gcf);'];
     ersp_opt       = ['pop_clustedit(''ersp_opt'',gcf);'];
-    saveSTUDY     = [ 'set(findobj(''parent'', gcbf, ''userdata'', ''save''), ''enable'', fastif(get(gcbo, ''value'')==1, ''on'', ''off''));' ];
-    browsesave    = [ '[filename, filepath] = uiputfile2(''*.study'', ''Save STUDY with .study extension -- pop_clust()''); ' ... 
+    erpim_opt      = ['pop_clustedit(''erpim_opt'',gcf);'];
+    saveSTUDY      = [ 'set(findobj(''parent'', gcbf, ''userdata'', ''save''), ''enable'', fastif(get(gcbo, ''value'')==1, ''on'', ''off''));' ];
+    browsesave     = [ '[filename, filepath] = uiputfile2(''*.study'', ''Save STUDY with .study extension -- pop_clust()''); ' ... 
                       'set(findobj(''parent'', gcbf, ''tag'', ''studyfile''), ''string'', [filepath filename]);' ];
     
     % Create default ERSP / ITC time/freq. paramters 
@@ -324,9 +329,10 @@ if ~isstr(varargin{1})
     % enable buttons
     % --------------
     filename = STUDY.design(STUDY.currentdesign).cell(1).filebase;
-    if exist([filename '.icaspec']) , spec_enable = 'on'; else spec_enable  = 'off'; end;
-    if exist([filename '.icaerp'] )  , erp_enable = 'on'; else erp_enable   = 'off'; end;
-    if exist([filename '.icaersp']) , ersp_enable = 'on'; else ersp_enable  = 'off'; end;
+    if exist([filename '.icaspec']) ,   spec_enable = 'on'; else spec_enable  = 'off'; end;
+    if exist([filename '.icaerp'] )  ,   erp_enable = 'on'; else erp_enable   = 'off'; end;
+    if exist([filename '.icaerpim'] ), erpim_enable = 'on'; else erpim_enable = 'off'; end;
+    if exist([filename '.icaersp']) ,   ersp_enable = 'on'; else ersp_enable  = 'off'; end;
     filename = fullfile( ALLEEG(1).filepath, ALLEEG(1).filename(1:end-4));
     if exist([filename '.icatopo']), scalp_enable = 'on'; else scalp_enable = 'off'; end;
     
@@ -342,9 +348,9 @@ if ~isstr(varargin{1})
     str_name       = sprintf('STUDY ''%s'' - ''%s'' component clusters', STUDY.name, STUDY.design(STUDY.currentdesign).name);
     if length(str_name) > 80, str_name = [ str_name(1:80) '...''' ]; end;
     if length(cls) > 1, vallist = 1; else vallist = 2; end;
-    geometry = { [4 .1 .1 .1 .1] [1] [1 0.3 1] [1 0.3 1] [1 0.3 1] [1 0.3 1] [1 0.3 1] [1 0.3 1] [1 0.3 1] ...
+    geometry = { [4 .1 .1 .1 .1] [1] [1 0.3 1] [1 0.3 1] [1 0.3 1] [1 0.3 1] [1 0.3 1] [1 0.3 1] [1 0.3 1] [1 0.3 1] ...
                  [1 0.3 1] [1 0.3 1] [1] [1 0.3 1] [1 0.3 1] [1 0.3 1] };
-    geomvert = [ 1 .5 1 3 1 1 1 1 1 1 1 1 1 1 1];
+    geomvert = [ 1 .5 1 3 1 1 1 1 1 1 1 1 1 1 1 1];
     uilist   = { ...
         {'style' 'text' 'string' str_name ...
             'FontWeight' 'Bold' 'HorizontalAlignment' 'center'} {} {} {} {} {} ...
@@ -362,11 +368,14 @@ if ~isstr(varargin{1})
         {'style' 'pushbutton' 'enable'  spec_enable 'string' 'Plot spectra' 'Callback' plot_clus_spectra} ...
         {'style' 'pushbutton' 'enable'  spec_enable 'string' 'Params' 'Callback' spec_opt } ...
         {'style' 'pushbutton' 'enable'  spec_enable 'string' 'Plot spectra' 'Callback' plot_comp_spectra} ...
+        {'style' 'pushbutton' 'enable' erpim_enable 'string' 'Plot ERPimage' 'Callback' plot_clus_erpim} ...
+        {'style' 'pushbutton' 'enable' erpim_enable 'string' 'Params' 'Callback' erpim_opt } ...
+        {'style' 'pushbutton' 'enable' erpim_enable 'string' 'Plot ERPimage(s)' 'Callback' plot_comp_erpim} ...
         {'style' 'pushbutton' 'enable'  ersp_enable 'string' 'Plot ERSPs' 'Callback' plot_clus_ersps} ...
-        {'vertshift' 'style' 'pushbutton' 'enable'  ersp_enable 'string' 'Params' 'Callback' ersp_opt }  ...
-        {'style' 'pushbutton' 'enable'  ersp_enable 'string' 'Plot ERSP(s)' 'Callback' plot_comp_ersps}...
-        {'style' 'pushbutton' 'enable'  ersp_enable 'string' 'Plot ITCs' 'Callback' plot_clus_itcs} { }  ...
-        {'style' 'pushbutton' 'enable'  ersp_enable 'string' 'Plot ITC(s)' 'Callback' plot_comp_itcs}...
+        {'vertshift' 'style' 'pushbutton' 'enable'  ersp_enable 'string' 'Params' 'Callback' ersp_opt } ...
+        {'style' 'pushbutton' 'enable'  ersp_enable 'string' 'Plot ERSP(s)' 'Callback' plot_comp_ersps} ...
+        {'style' 'pushbutton' 'enable'  ersp_enable 'string' 'Plot ITCs' 'Callback' plot_clus_itcs} { } ...
+        {'style' 'pushbutton' 'enable'  ersp_enable 'string' 'Plot ITC(s)' 'Callback' plot_comp_itcs} ...
         {'style' 'pushbutton' 'string' 'Plot cluster properties' 'Callback' plot_clus_sum 'enable' 'off'} {} ... 
         {'style' 'pushbutton' 'string' 'Plot component properties' 'Callback' plot_comp_sum 'enable' 'off'} ... % nima, was off
         {} ...
@@ -423,7 +432,7 @@ else
     
     switch  varargin{1}
         
-        case {'plotcomptopo', 'plotcompersp','plotcompitc','plotcompspec', 'plotcomperp', 'plotcompdip'}
+        case {'plotcomptopo', 'plotcompersp','plotcompitc','plotcompspec', 'plotcomperp', 'plotcompdip', 'plotcomperpimage'}
             plotting_option = varargin{1};
             plotting_option = [ plotting_option(9:end) 'plot' ];
             if (clus ~= 1 ) %specific cluster
@@ -461,7 +470,7 @@ else
             userdat{1}{2} = STUDY;
             set(hdl, 'userdat',userdat); 
             
-        case {'topoplot', 'erspplot', 'itcplot', 'specplot', 'erpplot', 'dipplot' }
+        case {'topoplot', 'erspplot', 'itcplot', 'specplot', 'erpplot', 'dipplot', 'erpimageplot' }
             plotting_option = varargin{1};
             plotting_option = [ plotting_option(1:end-4) 'plot' ];
             if (clus ~= 1 ) % specific cluster option
@@ -495,6 +504,14 @@ else
 
         case 'spec_opt' % save the list of selected channels
             [STUDY com] = pop_specparams(STUDY);
+            if ~isempty(com)
+                STUDY.history =  sprintf('%s\n%s',  STUDY.history, com);
+            end;
+            userdat{1}{2} = STUDY;
+            set(hdl, 'userdat',userdat); %update information (STUDY)     
+         
+        case 'erpim_opt' % save the list of selected channels
+            [STUDY com] = pop_erpimparams(STUDY);
             if ~isempty(com)
                 STUDY.history =  sprintf('%s\n%s',  STUDY.history, com);
             end;

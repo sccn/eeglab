@@ -151,10 +151,12 @@ if ~isstr(varargin{1})
         error('pop_chanplot(): You must provide ALLEEG and STUDY structures');
     end
     STUDY  = varargin{1};
-    STUDY.etc.erpparams.topotime  = []; % [] for channels and NaN for components
-    STUDY.etc.specparams.topofreq = []; % NaN -> GUI disabled
-    STUDY.etc.erspparams.topotime = [];
-    STUDY.etc.erspparams.topofreq = [];
+    STUDY.etc.erpparams.topotime    = []; % [] for channels and NaN for components
+    STUDY.etc.specparams.topofreq   = []; % NaN -> GUI disabled
+    STUDY.etc.erspparams.topotime   = [];
+    STUDY.etc.erspparams.topofreq   = [];
+    STUDY.etc.erpimparams.topotime  = [];
+    STUDY.etc.erpimparams.topotrial = [];
     
     % test path
     % ---------
@@ -190,6 +192,8 @@ if ~isstr(varargin{1})
     plot_onechan_ersps = ['pop_chanplot(''plotchanersp'',gcf); '];
     plot_chan_itcs     = ['pop_chanplot(''itcplot'',gcf); '];
     plot_onechan_itcs  = ['pop_chanplot(''plotchanitc'',gcf); '];
+    plot_chan_erpim    = ['pop_chanplot(''erpimageplot'',gcf); '];
+    plot_onechan_erpim = ['pop_chanplot(''plotchanerpimage'',gcf); '];
     plot_chan_spectra  = ['pop_chanplot(''specplot'',gcf); '];
     plot_onechan_spectra = ['pop_chanplot(''plotchanspec'',gcf); '];
     plot_chan_erp      = ['pop_chanplot(''erpplot'',gcf); '];
@@ -206,6 +210,7 @@ if ~isstr(varargin{1})
     merge_channels     = ['pop_chanplot(''mergechannels'',gcf);'];
     erp_opt            = ['pop_chanplot(''erp_opt'',gcf);'];
     spec_opt           = ['pop_chanplot(''spec_opt'',gcf);'];
+    erpim_opt          = ['pop_chanplot(''erpim_opt'',gcf);'];
     ersp_opt           = ['pop_chanplot(''ersp_opt'',gcf);'];
     create_group       = ['pop_chanplot(''create_group'',gcf);'];
     edit_group         = ['pop_chanplot(''edit_group'',gcf);'];
@@ -225,10 +230,11 @@ if ~isstr(varargin{1})
     % enable buttons
     % --------------
     filename = STUDY.design(STUDY.currentdesign).cell(1).filebase;
-    if exist([filename '.datspec']) , spec_enable = 'on'; else spec_enable  = 'off'; end;
-    if exist([filename '.daterp'] )  , erp_enable = 'on'; else  erp_enable  = 'off'; end;
-    if exist([filename '.datersp']) , ersp_enable = 'on'; else ersp_enable  = 'off'; end;
-    if exist([filename '.datitc'])  ,  itc_enable = 'on'; else  itc_enable  = 'off'; end;
+    if exist([filename '.datspec']) , spec_enable = 'on'; else  spec_enable  = 'off'; end;
+    if exist([filename '.daterp'] )  , erp_enable = 'on'; else   erp_enable  = 'off'; end;
+    if exist([filename '.datersp']) , ersp_enable = 'on'; else  ersp_enable  = 'off'; end;
+    if exist([filename '.datitc'])  ,  itc_enable = 'on'; else   itc_enable  = 'off'; end;
+    if exist([filename '.daterpim']),erpim_enable = 'on'; else erpim_enable  = 'off'; end;
     
     if isfield(ALLEEG(1).dipfit, 'model'), dip_enable   = 'on'; else dip_enable   = 'off'; end;
     
@@ -240,7 +246,7 @@ if ~isstr(varargin{1})
     fig_arg{1}{4} = { STUDY.changrp.name };
     fig_arg{2}    = length(STUDY.changrp);
         
-    geometry = { [4] [1] [0.7 0.3 0.3 0.1 0.9] [1 0.3 1] [1 0.3 1] [1 0.3 1] [1 0.3 1] ...
+    geometry = { [4] [1] [0.7 0.3 0.3 0.1 0.9] [1 0.3 1] [1 0.3 1] [1 0.3 1] [1 0.3 1] [1 0.3 1] ...
                  [1 0.3 1] [1 0.3 1] };
     str_name       = sprintf('STUDY name ''%s'' - ''%s''', STUDY.name, STUDY.design(STUDY.currentdesign).name);
     if length(str_name) > 80, str_name = [ str_name(1:80) '...''' ]; end;
@@ -251,24 +257,27 @@ if ~isstr(varargin{1})
         {'style' 'pushbutton' 'string' 'Sel. all' 'callback' sel_all_chans } {} {} ...
         {'style' 'text'       'string' 'Select subject(s) to plot' 'FontWeight' 'Bold'} ...
         {'style' 'listbox'    'string' show_options 'value' 1 'max' 2 'tag' 'chan_list' 'Callback' show_chan } {} ...
-        {'style' 'listbox'    'string' '' 'tag' 'chan_onechan' 'max' 2 'min' 1 'callback'    show_onechan } ... 
-        {'style' 'pushbutton' 'enable'   erp_enable 'string' 'Plot ERPs' 'Callback' plot_chan_erp} ...
-        {'style' 'pushbutton' 'enable'   erp_enable 'string' 'Params' 'Callback' erp_opt }  ...
-        {'style' 'pushbutton' 'enable'   erp_enable 'string' 'Plot ERP(s)' 'Callback' plot_onechan_erp} ...
-        {'style' 'pushbutton' 'enable'  spec_enable 'string' 'Plot spectra' 'Callback' plot_chan_spectra} ...
-        {'style' 'pushbutton' 'enable'  spec_enable 'string' 'Params' 'Callback' spec_opt }  ...
-        {'style' 'pushbutton' 'enable'  spec_enable 'string' 'Plot spectra' 'Callback' plot_onechan_spectra} ...
-        {'style' 'pushbutton' 'enable'  ersp_enable 'string' 'Plot ERSPs' 'Callback' plot_chan_ersps} ...
+        {'style' 'listbox'    'string' '' 'tag' 'chan_onechan' 'max' 2 'min' 1 'callback'  show_onechan } ... 
+        {'style' 'pushbutton' 'enable'   erp_enable 'string' 'Plot ERPs'        'Callback' plot_chan_erp} ...
+        {'style' 'pushbutton' 'enable'   erp_enable 'string' 'Params'           'Callback' erp_opt }  ...
+        {'style' 'pushbutton' 'enable'   erp_enable 'string' 'Plot ERP(s)'      'Callback' plot_onechan_erp} ...
+        {'style' 'pushbutton' 'enable'  spec_enable 'string' 'Plot spectra'     'Callback' plot_chan_spectra} ...
+        {'style' 'pushbutton' 'enable'  spec_enable 'string' 'Params'           'Callback' spec_opt }  ...
+        {'style' 'pushbutton' 'enable'  spec_enable 'string' 'Plot spectra'     'Callback' plot_onechan_spectra} ...
+        {'style' 'pushbutton' 'enable' erpim_enable 'string' 'Plot ERPimage'    'Callback' plot_chan_erpim } ...
+        {'style' 'pushbutton' 'enable' erpim_enable 'string' 'Params'           'Callback' erpim_opt } ... 
+        {'style' 'pushbutton' 'enable' erpim_enable 'string' 'Plot ERPimage(s)' 'Callback' plot_onechan_erpim } ...        
+        {'style' 'pushbutton' 'enable'  ersp_enable 'string' 'Plot ERSPs'       'Callback' plot_chan_ersps} ...
         {'vertshift' 'style' 'pushbutton' 'enable'  ersp_enable 'string' 'Params' 'Callback' ersp_opt }  ...
-        {'style' 'pushbutton' 'enable'  ersp_enable 'string' 'Plot ERSP(s)' 'Callback' plot_onechan_ersps}...
-        {'style' 'pushbutton' 'enable'   itc_enable 'string' 'Plot ITCs' 'Callback' plot_chan_itcs} { }  ...
-        {'style' 'pushbutton' 'enable'   itc_enable 'string' 'Plot ITC(s)' 'Callback' plot_onechan_itcs}...
+        {'style' 'pushbutton' 'enable'  ersp_enable 'string' 'Plot ERSP(s)'     'Callback' plot_onechan_ersps}...
+        {'style' 'pushbutton' 'enable'   itc_enable 'string' 'Plot ITCs'        'Callback' plot_chan_itcs} { }  ...
+        {'style' 'pushbutton' 'enable'   itc_enable 'string' 'Plot ITC(s)'      'Callback' plot_onechan_itcs}...
         {'style' 'pushbutton' 'string' 'Plot channel properties' 'Callback' plot_chan_sum} {} ... 
         {'style' 'pushbutton' 'string' 'Plot channel properties (soon)' 'Callback' plot_onechan_sum 'enable' 'off'} };
     
     % additional UI given on the command line
     % ---------------------------------------
-    geomvert = [ 1 0.5 1 5 1 1 1 1 1];
+    geomvert = [ 1 0.5 1 5 1 1 1 1 1 1];
     if nargin > 2
         addui = varargin{3};
         if ~isfield(addui, 'uilist')
@@ -309,7 +318,7 @@ else
    
     switch  varargin{1}
         
-        case {'topoplot', 'erspplot','itcplot','specplot', 'erpplot'}
+        case {'topoplot', 'erspplot','itcplot','specplot', 'erpplot', 'erpimageplot' }
             changrpstr = allchans(changrp);
             plotting_option = varargin{1};
             plotting_option = [ plotting_option(1:end-4) 'plot' ];
@@ -319,7 +328,7 @@ else
             userdat{1}{2} = STUDY;
             set(hdl, 'userdat',userdat); 
 
-        case {'plotchantopo', 'plotchanersp','plotchanitc','plotchanspec', 'plotchanerp','plotchandip'}
+        case {'plotchanersp','plotchanitc','plotchanspec', 'plotchanerp','plotchanerpimage' }
             changrpstr    = allchans(changrp);
             
             %if length(changrp) > 1
@@ -361,6 +370,14 @@ else
          
         case 'ersp_opt' % save the list of selected channels
             [STUDY com] = pop_erspparams(STUDY);
+            if ~isempty(com)
+                STUDY.history =  sprintf('%s\n%s',  STUDY.history, com);
+            end;
+            userdat{1}{2} = STUDY;
+            set(hdl, 'userdat',userdat); %update information (STUDY)     
+            
+        case 'erpim_opt' % save the list of selected channels
+            [STUDY com] = pop_erpimparams(STUDY);
             if ~isempty(com)
                 STUDY.history =  sprintf('%s\n%s',  STUDY.history, com);
             end;
