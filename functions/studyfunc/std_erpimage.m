@@ -174,7 +174,7 @@ if strcmpi(opt.concatenate, 'off')
     for index = 1:size(X,1)
         [tmpX tmpevents] = erpimage(squeeze(X(index,:,:)), events, EEG(1).times, '', opt.smoothing, nlines, 'noplot', 'on', opt.erpimageopt{:}, moreopts{:});
         allerpimage = setfield(allerpimage, 'events', tmpevents);
-        allerpimage = setfield(allerpimage, [ prefix int2str(index) ], tmpX');
+        allerpimage = setfield(allerpimage, [ prefix int2str(opt.indices(index)) ], tmpX');
     end;
 else
     % generate dynamic loading commands
@@ -188,7 +188,7 @@ else
              com = sprintf('squeeze(eeg_getdatact(%s))'';', vararg2str( { filenames 'channel'  , opt.indices(index), 'rmcomps', opt.rmcomps, 'trialindices', opt.trialindices, 'interp', opt.interp } ));
         else com = sprintf('squeeze(eeg_getdatact(%s))'';', vararg2str( { filenames 'component', opt.indices(index), 'trialindices', opt.trialindices } ));
         end;
-        allerpimage = setfield(allerpimage, [ prefix int2str(index) ], com);
+        allerpimage = setfield(allerpimage, [ prefix int2str(opt.indices(index)) ], com);
     end;
     if ~isempty(opt.sorttype)
          events = eeg_getepochevent(EEG, 'type', opt.sorttype, 'timewin', opt.sortwin, 'fieldname', opt.sortfield, 'trials', opt.trialindices);
