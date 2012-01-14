@@ -427,3 +427,4 @@ while isempty(s) | s ~= -1
    end
   end
 end 
+fclose(fid);
