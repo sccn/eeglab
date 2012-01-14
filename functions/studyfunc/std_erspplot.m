@@ -137,7 +137,7 @@ end;
                                'design'      'integer' [] STUDY.currentdesign;
                                'topotime'    'real'    [] params.topotime;
                                'topofreq'    'real'    [] params.topofreq;
-                               'topotrial'  'real'    [] params.topotrial;
+                               'topotrial'  'real'     [] params.topotrial;
                                'timerange'   'real'    [] params.timerange;
                                'freqrange'   'real'    [] params.freqrange;
                                'trialrange'  'real'    [] params.trialrange;
@@ -169,8 +169,8 @@ if isstr(opt), error(opt); end;
 if isempty(opt.caxis), 
     if strcmpi(opt.datatype, 'ersp')
          opt.caxis = opt.ersplim;
-    elseif strcmpi(opt.datatype, 'itc')
-        opt.caxis = [-opt.itclim opt.itclim];
+    elseif strcmpi(opt.datatype, 'itc') && ~isempty(opt.itclim)
+        opt.caxis = [-opt.itclim(end) opt.itclim(end)];
     end;
 end;
 
