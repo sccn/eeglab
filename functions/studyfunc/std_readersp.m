@@ -219,17 +219,17 @@ for ind = 1:length(finalinds)
             % find total nb of trials
             % THIS CODE IS NOT NECESSARY ANY MORE (SEE BUG 1170)
             % -----------------------
-            setinfo = STUDY.design(opt.design).cell;
-            tottrials = cell( nc, ng );
-            if strcmpi(opt.singletrials, 'on')
-                for indSet = 1:length(setinfo)
-                    condind = std_indvarmatch( setinfo(indSet).value{1}, STUDY.design(opt.design).variable(1).value );
-                    grpind  = std_indvarmatch( setinfo(indSet).value{2}, STUDY.design(opt.design).variable(2).value );
-                    if isempty(tottrials{condind, grpind}), tottrials{condind, grpind} = sum(cellfun(@length, setinfo(indSet).trials));
-                    else       tottrials{condind, grpind} = tottrials{condind, grpind} + sum(cellfun(@length, setinfo(indSet).trials));
-                    end;
-                end;
-            end;
+            %setinfo = STUDY.design(opt.design).cell;
+            %tottrials = cell( nc, ng );
+            %if strcmpi(opt.singletrials, 'on')
+            %    for indSet = 1:length(setinfo)
+            %        condind = std_indvarmatch( setinfo(indSet).value{1}, STUDY.design(opt.design).variable(1).value );
+            %        grpind  = std_indvarmatch( setinfo(indSet).value{2}, STUDY.design(opt.design).variable(2).value );
+            %        if isempty(tottrials{condind, grpind}), tottrials{condind, grpind} = sum(cellfun(@length, setinfo(indSet).trials));
+            %        else       tottrials{condind, grpind} = tottrials{condind, grpind} + sum(cellfun(@length, setinfo(indSet).trials));
+            %        end;
+            %    end;
+            %end;
             
             % read the data and select channels
             % ---------------------------------
@@ -249,7 +249,7 @@ for ind = 1:length(finalinds)
                         if ~isempty(inds)
                             count{c, g} = 1;
                             for indtmp = 1:length(inds)
-                                setindtmp = STUDY.design(opt.design).cell(setinds{c,g}(inds(indtmp))).dataset;
+                                setindtmp = STUDY.design(opt.design).cell(setinds{c,g}(inds(indtmp)));
                                 tmpopts = { 'measure', 'timef' 'timelimits', opt.timerange, 'freqlimits', opt.freqrange };
                                 if ~isempty(opt.channels), [ tmpersp tmpparams alltimes allfreqs] = std_readfile(setindtmp, 'channels', allChangrp(allinds{c,g}(inds(indtmp))), tmpopts{:});
                                 else                       [ tmpersp tmpparams alltimes allfreqs] = std_readfile(setindtmp, 'components',          allinds{c,g}(inds(indtmp)),  tmpopts{:});
@@ -261,8 +261,8 @@ for ind = 1:length(finalinds)
                                 end;
                                 erspinds{c, g}(1:2,indtmp) = [ count{c, g} count{c, g}+size(tmpersp,3)-1 ];
                                 count{c, g} = count{c, g}+size(tmpersp,3);
-                                if size(tmpersp,3) ~= ALLEEG(setindtmp).trials
-                                    %error( sprintf('Wrong number of trials in datafile for dataset %d\n', setinds{c,g}(inds(indtmp))));
+                                if size(tmpersp,3) ~= sum(cellfun(@length, setindtmp.trials))
+                                    error( sprintf('Wrong number of trials in datafile for design index %d\n', setinds{c,g}(inds(indtmp))));
                                 end;
                             end;
                         end;
@@ -294,6 +294,8 @@ for ind = 1:length(finalinds)
             % (since only the timef have been loaded)
             % ---------------------------------------
             if strcmpi(opt.singletrials, 'on')
+                tmpparams2      = fieldnames(tmpparams); tmpparams2 = tmpparams2';
+                tmpparams2(2,:) = struct2cell(tmpparams);
                 precomp.times = alltimes;
                 precomp.freqs = allfreqs;
                 precomp.recompute = dtype;
@@ -303,10 +305,10 @@ for ind = 1:length(finalinds)
                             precomp.tfdata = permute(ersp{c,g}, [2 1 3]);
                             if strcmpi(dtype, 'itc')
                                 [tmp ersp{c,g}] = newtimef(zeros(ALLEEG(1).pnts,2), ALLEEG(1).pnts, [ALLEEG(1).xmin ALLEEG(1).xmax]*1000, ...
-                                    ALLEEG(1).srate, tmpparams{:}, 'precomputed', precomp, 'verbose', 'off');
+                                    ALLEEG(1).srate, [], tmpparams2{:}, 'precomputed', precomp, 'verbose', 'off');
                             elseif strcmpi(dtype, 'ersp')
-                                ersp{c,g} = newtimef(zeros(ALLEEG(1).pnts,2), ALLEEG(1).pnts, [ALLEEG(1).xmin ALLEEG(1).xmax]*1000, ...
-                                    ALLEEG(1).srate, tmpparams{:}, 'precomputed', precomp, 'verbose', 'off');
+                                [ersp{c,g} tmp] = newtimef(zeros(ALLEEG(1).pnts,2), ALLEEG(1).pnts, [ALLEEG(1).xmin ALLEEG(1).xmax]*1000, ...
+                                    ALLEEG(1).srate, [], tmpparams2{:}, 'precomputed', precomp, 'verbose', 'off');
                             end;
                             ersp{c,g} = permute(ersp{c,g}, [2 1 3]);
                         end;
@@ -317,25 +319,29 @@ for ind = 1:length(finalinds)
             % compute average baseline across groups and conditions
             % -----------------------------------------------------
             if strcmpi(opt.subbaseline, 'on') && strcmpi(dtype, 'ersp')
-                disp('Recomputing baseline...');
-                if strcmpi(paired1, 'on') && strcmpi(paired2, 'on')
-                    disp('Removing ERSP baseline for both indep. variables');
-                    meanpowbase = computeerspbaseline(erspbase(:), opt.singletrials);
-                    ersp        = removeerspbaseline(ersp, erspbase, meanpowbase, tottrials);
-                elseif strcmpi(paired1, 'on')
-                    disp('Removing ERSP baseline for first indep. variables (second indep. var. is unpaired)');
-                    for g = 1:ng        % ng = number of groups
-                        meanpowbase = computeerspbaseline(erspbase(:,g), opt.singletrials);
-                        ersp(:,g)   = removeerspbaseline(ersp(:,g), erspbase(:,g), meanpowbase, tottrials(:,g));
-                    end;
-                elseif strcmpi(paired2, 'on')
-                    disp('Removing ERSP baseline for second indep. variables (first indep. var. is unpaired)');
-                    for c = 1:nc        % ng = number of groups
-                        meanpowbase = computeerspbaseline(erspbase(c,:), opt.singletrials);
-                        ersp(c,:)   = removeerspbaseline(ersp(c,:), erspbase(c,:), meanpowbase, tottrials(c,:));
-                    end;
+                if strcmpi(opt.singletrials, 'on')
+                    disp('WARNING: no ERSP baseline may not be subtracted when using single trials');
                 else
-                    disp('Not removing ERSP baseline (both indep. variables are unpaired');
+                    disp('Recomputing baseline...');
+                    if strcmpi(paired1, 'on') && strcmpi(paired2, 'on')
+                        disp('Removing ERSP baseline for both indep. variables');
+                        meanpowbase = computeerspbaseline(erspbase(:), opt.singletrials);
+                        ersp        = removeerspbaseline(ersp, erspbase, meanpowbase);
+                    elseif strcmpi(paired1, 'on')
+                        disp('Removing ERSP baseline for first indep. variables (second indep. var. is unpaired)');
+                        for g = 1:ng        % ng = number of groups
+                            meanpowbase = computeerspbaseline(erspbase(:,g), opt.singletrials);
+                            ersp(:,g)   = removeerspbaseline(ersp(:,g), erspbase(:,g), meanpowbase);
+                        end;
+                    elseif strcmpi(paired2, 'on')
+                        disp('Removing ERSP baseline for second indep. variables (first indep. var. is unpaired)');
+                        for c = 1:nc        % ng = number of groups
+                            meanpowbase = computeerspbaseline(erspbase(c,:), opt.singletrials);
+                            ersp(c,:)   = removeerspbaseline(ersp(c,:), erspbase(c,:), meanpowbase);
+                        end;
+                    else
+                        disp('Not removing ERSP baseline (both indep. variables are unpaired');
+                    end;
                 end;
             end;
         end;
@@ -376,14 +382,14 @@ for ind = 1:length(finalinds)
         
         % copy results to structure
         % -------------------------
-        fieldnames = { [ dtype 'data'     ] [ dtype 'events' ] [ dtype ordinate ] [ dtype 'datatrials' ] ...
-                       [ dtype 'subjinds' ] [ dtype 'base'   ] [ dtype 'times'  ] [ dtype 'trialinfo'  ]  'allinds' 'setinds' };
-        for f = 1:length(fieldnames)
-            if isfield(tmpstruct, fieldnames{f}),
-                tmpdata = getfield(tmpstruct, fieldnames{f});
+        fields = { [ dtype 'data'     ] [ dtype 'events' ] [ dtype ordinate ] [ dtype 'datatrials' ] ...
+                   [ dtype 'subjinds' ] [ dtype 'base'   ] [ dtype 'times'  ] [ dtype 'trialinfo'  ]  'allinds' 'setinds' };
+        for f = 1:length(fields)
+            if isfield(tmpstruct, fields{f}),
+                tmpdata = getfield(tmpstruct, fields{f});
                 if ~isempty(opt.channels)
-                     STUDY.changrp = setfield(STUDY.changrp, { finalinds(ind) }, fieldnames{f}, tmpdata);
-                else STUDY.cluster = setfield(STUDY.cluster, { finalinds(ind) }, fieldnames{f}, tmpdata);
+                     STUDY.changrp = setfield(STUDY.changrp, { finalinds(ind) }, fields{f}, tmpdata);
+                else STUDY.cluster = setfield(STUDY.cluster, { finalinds(ind) }, fields{f}, tmpdata);
                 end;
             end;
         end;
@@ -472,7 +478,7 @@ function meanpowbase = computeerspbaseline(erspbase, singletrials)
         
 % remove ERSP baseline
 % ---------------------
-function ersp = removeerspbaseline(ersp, erspbase, meanpowbase, tottrials)
+function ersp = removeerspbaseline(ersp, erspbase, meanpowbase)
     convert2log = 0;
     for g = 1:size(ersp,2)        % ng = number of groups
         for c = 1:size(ersp,1)
@@ -481,9 +487,7 @@ function ersp = removeerspbaseline(ersp, erspbase, meanpowbase, tottrials)
                 if any(erspbasetmp(:) > 1000)
                     convert2log = 1;
                 end;
-                if ~isempty(tottrials{c,g}), tmpmeanpowbase = repmat(meanpowbase, [1 size(ersp{c,g},2) tottrials{c,g}]);
-                else                         tmpmeanpowbase = repmat(meanpowbase, [1 size(ersp{c,g},2) 1]);
-                end;
+                tmpmeanpowbase = repmat(meanpowbase, [1 size(ersp{c,g},2) 1]);
                 if convert2log
                      ersp{c,g} = ersp{c,g} - repmat(10*log10(erspbasetmp), [1 size(ersp{c,g},2) 1 1]) + 10*log10(tmpmeanpowbase);
                 else ersp{c,g} = ersp{c,g} - repmat(abs(erspbasetmp), [1 size(ersp{c,g},2) 1 1]) + tmpmeanpowbase;
