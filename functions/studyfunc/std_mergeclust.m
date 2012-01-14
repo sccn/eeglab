@@ -82,5 +82,6 @@ STUDY.cluster(end).comps = comps; % Update merge cluster with the merged compone
 for k = 1:length(mrg_cls) % update the merge cluster as a child for the parent clusters
     STUDY.cluster(mrg_cls(k)).child{end + 1} = STUDY.cluster(end).name;
 end
+STUDY = std_selectdesign(STUDY, ALLEEG, STUDY.currentdesign);
 
 
