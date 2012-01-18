@@ -278,7 +278,7 @@ end;
 % get data boundaries if continuous data
 % --------------------------------------
 boundaries = [];
-if EEG.trials == 1 && ~isempty(EEG.event)
+if nargout > 1 && EEG.trials == 1 && ~isempty(EEG.event) && isfield(EEG.event, 'type') && isstr(EEG.event(1).type)
     if ~isempty(opt.samples)
         disp('WARNING: eeg_getdatact.m, boundaries are not accurate when selecting data samples');
     end;
