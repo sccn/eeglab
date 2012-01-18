@@ -104,4 +104,5 @@ if nnz(checkerp) ~= length(checkerp)
 end
 
 % run std_evntopo
-eval(['std_envtopo4(STUDY, ALLEEG,' options ');']);
+eval(['std_envtopo(STUDY, ALLEEG,' options ');']);
+disp('No history for STUDY envtopo');

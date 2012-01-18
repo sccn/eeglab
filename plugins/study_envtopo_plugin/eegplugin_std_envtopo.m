@@ -1,4 +1,4 @@
-% eegplugin_std_envtopo() - std_envtopo plugin for updated std_envtopo 
+% eegplugin_std_envtopo() - std_envtopo plugin for updated std_envtopo
 %
 % Usage:
 %   >> eegplugin_std_envtopo(fig, try_strings, catch_strings);
@@ -10,16 +10,16 @@
 %
 % Notes:
 %   To create a new plugin, simply create a file beginning with "eegplugin_"
-%   and place it in your eeglab folder. It will then be automatically 
+%   and place it in your eeglab folder. It will then be automatically
 %   detected by eeglab. See also this source code internal comments.
-%   For eeglab to return errors and add the function's results to 
-%   the eeglab history, menu callback must be nested into "try" and 
-%   a "catch" strings. For more information on how to create eeglab 
+%   For eeglab to return errors and add the function's results to
+%   the eeglab history, menu callback must be nested into "try" and
+%   a "catch" strings. For more information on how to create eeglab
 %   plugins, see http://www.sccn.ucsd.edu/eeglab/contrib.html
 %
-% Author: Makoto Miyakoshi, JSPS/SCCN, INC, UCSD
+% Author: Makoto Miyakoshi & Arnaud Delorme, JSPS/SCCN, INC, UCSD
 %
-% See also: pop_std_envtopo, std_envtopo2_8, envtopo, pop_envtopo
+% See also: pop_std_envtopo, std_envtopo, envtopo, pop_envtopo
 
 %123456789012345678901234567890123456789012345678901234567890123456789012
 
@@ -45,15 +45,28 @@
 % 12/23/2011 ver 1.1 by Makoto. Renamed the function.
 % 08/01/2011 ver 1.0 by Makoto. Created.
 
-function eegplugin_std_evntopo( fig, try_strings, catch_strings);
- 
-% create menu
-studymenu = findobj(fig, 'tag', 'study');
+function vers = eegplugin_std_evntopo( fig, trystrs, catchstrs);
 
-% build command for menu callback
-cmd = [ 'addui.uilist = {{} {} {''style'' ''pushbutton'' ''string'' ''envtopo (read CAUTION!)'' ''Callback'' ''pop_std_envtopo(STUDY, ALLEEG);''} { } };' ]; 
-cmd = [ cmd 'addui.geometry = {1 [1 1 1] };' ];
-cmd = [ cmd '[STUDY com] = pop_clustedit(STUDY, ALLEEG, [], addui);' ];
 
-% run cmd when the button is pushed
-uimenu( studymenu, 'label', 'std_envtopo plugin', 'callback', cmd);
+vers = 'STUDY envtopo 0.9';
+if nargin < 3
+    error('eegplugin_std_evntopo requires 3 arguments');
+end;
+
+% add folder to path
+% ------------------
+if exist('std_envtopo', 'file')
+    p = which('eegplugin_std_evntopo.m');
+    p = p(1:findstr(p,'eegplugin_std_evntopo.m')-1);
+    addpath(p);
+end;
+
+% add menu to clustedit
+% ---------------------
+menu = findobj(fig, 'Label', 'Edit/plot clusters');
+structure.uilist = { { } ...
+    {'style' 'pushbutton' 'string' 'Plot Envtopo plugin (beta)' 'Callback' 'args = { STUDY ALLEEG}; pop_std_envtopo(args{:}); clear tmpargs;' } { } { } };
+structure.geometry = { [1] [1 0.3 1] };
+arg = vararg2str( { structure } );
+cb_clustedit   = [ trystrs.no_check 'ALLEEGTMP = ALLEEG; [STUDYTMP LASTCOM] = pop_clustedit(STUDY, ALLEEG, [], ' arg ');' catchstrs.update_study];
+set(menu, 'callback', cb_clustedit);
