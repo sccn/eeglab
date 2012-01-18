@@ -185,11 +185,12 @@ else
     allerpimage.times = EEG(1).times;
     for index = 1:length(opt.indices)
         if ~isempty(opt.channels)
-             com = sprintf('squeeze(eeg_getdatact(%s))'';', vararg2str( { filenames 'channel'  , opt.indices(index), 'rmcomps', opt.rmcomps, 'trialindices', opt.trialindices, 'interp', opt.interp } ));
-        else com = sprintf('squeeze(eeg_getdatact(%s))'';', vararg2str( { filenames 'component', opt.indices(index), 'trialindices', opt.trialindices } ));
+             com = sprintf('squeeze(eeg_getdatact(%s, ''interp'', chanlocsforinterp));', vararg2str( { filenames 'channel'  , opt.indices(index), 'rmcomps', opt.rmcomps, 'trialindices', opt.trialindices } ));
+        else com = sprintf('squeeze(eeg_getdatact(%s));', vararg2str( { filenames 'component', opt.indices(index), 'trialindices', opt.trialindices } ));
         end;
         allerpimage = setfield(allerpimage, [ prefix int2str(opt.indices(index)) ], com);
     end;
+    allerpimage = setfield(allerpimage, 'chanlocsforinterp', opt.interp);
     if ~isempty(opt.sorttype)
          events = eeg_getepochevent(EEG, 'type', opt.sorttype, 'timewin', opt.sortwin, 'fieldname', opt.sortfield, 'trials', opt.trialindices);
          %geteventcom = sprintf('eeg_getepochevent(%s);', vararg2str( { filenames 'type', opt.sorttype, 'timewin', opt.sortwin, 'fieldname', opt.sortfield } ));
