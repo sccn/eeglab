@@ -170,7 +170,7 @@ for fInd = 1:length(opt.dataindices) % usually only one value
     fieldsToRead = [ dataType int2str(opt.dataindices(fInd)) fieldExt ]; 
     try,
         warning('off', 'MATLAB:load:variableNotFound');
-        fileData = load( '-mat', [ fileBaseName{fInd} fileExt ], 'parameters', 'freqs', 'times', 'events', fieldsToRead );
+        fileData = load( '-mat', [ fileBaseName{fInd} fileExt ], 'parameters', 'freqs', 'times', 'events', 'chanlocsforinterp', fieldsToRead );
         warning('on', 'MATLAB:load:variableNotFound');
     catch
         error( [ 'Cannot read file ''' fileBaseName{fInd} fileExt '''' ]);
@@ -178,6 +178,7 @@ for fInd = 1:length(opt.dataindices) % usually only one value
 
     % get output for parameters and measure ranges
     % --------------------------------------------
+    if isfield(fileData, 'chanlocsforinterp'), chanlocsforinterp = fileData.chanlocsforinterp; end;
     if isfield(fileData, 'parameters')
         parameters = removedup(fileData.parameters);
         for index = 1:length(parameters), if iscell(parameters{index}), parameters{index} = { parameters{index} }; end; end;
@@ -277,7 +278,7 @@ end;
 if ~isempty(measureRange1) && ~erspFreqOnly
     [measureRange1 indBegin indEnd] = indicesselect(measureRange1, opt.timelimits);
     if ~isempty(measureData)
-        if strcmpi(opt.measure, 'erp')
+        if strcmpi(opt.measure, 'erp') || ( strcmpi(opt.measure, 'erpim') && strcmpi(opt.singletrials, 'on') )
              measureData = measureData(indBegin:indEnd,:,:);
         else measureData = measureData(:,indBegin:indEnd,:);
         end;
