@@ -142,8 +142,21 @@ else
     if strcmpi(varargin{1}, 'default')
         STUDY = default_params(STUDY);
     else
+        options   = {};
+        allfields = { 'sorttype' 'sortwin' 'sortfield' 'statistics' 'groupstats' 'condstats' 'statmode' ...
+                      'threshold' 'mcorrect' 'naccu' 'rmcomps' 'interp' 'timerange' 'trialrange' 'topotime' ...
+                      'topotrial' 'colorlimits' 'concatenate' 'nlines' 'smoothing' };
         for index = 1:2:length(varargin)
-            STUDY.etc.erpimparams = setfield(STUDY.etc.erpimparams, varargin{index}, varargin{index+1});
+            if ~isempty(strmatch(varargin{index}, allfields, 'exact'))
+                STUDY.etc.erpimparams = setfield(STUDY.etc.erpimparams, varargin{index}, varargin{index+1});
+            else
+                inderpimopt = strmatch(varargin{index}, STUDY.etc.erpimparams.erpimageopt(1:2:end), 'exact');
+                if ~isempty(inderpimopt)
+                    STUDY.etc.erpimparams.erpimageopt{inderpimopt+1} = varargin{index+1};
+                else
+                    STUDY.etc.erpimparams.erpimageopt = { STUDY.etc.erpimparams.erpimageopt{:} varargin{index}, varargin{index+1} };
+                end;
+            end;
         end;
     end;
 end;
