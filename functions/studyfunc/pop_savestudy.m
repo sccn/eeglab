@@ -79,6 +79,22 @@ g = finputcheck(options,  { 'filename'   'string'   []     STUDY.filename;
                             'savemode'   'string'   { 'standard','resave' } 'standard' });
 if isstr(g), error(g); end;
 
+% fields to remove
+% ----------------
+fields = { 'erptimes'  'erpdata' ...
+           'specfreqs' 'specdata'  ...
+           'erspdata'  'ersptimes' 'erspfreqs' 'erspdatatrials' 'erspsubjinds' 'erspbase'    'ersptrialinfo' ...
+           'itcdata'   'itcfreqs' 'itctimes' ...
+           'erpimdata' 'erpimevents' 'erpimtrials' 'erpimtimes' };
+for fInd = 1:length(fields)
+    if isfield(STUDY.changrp, fields{fInd})
+        STUDY.changrp = rmfield(STUDY.changrp, fields{fInd});
+    end;
+    if isfield(STUDY.changrp, fields{fInd})
+        STUDY.cluster = rmfield(STUDY.cluster, fields{fInd});
+    end;
+end;    
+
 % resave mode
 % -----------
 STUDY.saved = 'yes';
