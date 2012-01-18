@@ -256,6 +256,10 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
             end;
         end;
         
+        % set parameters in ERPimage parameters
+        % -------------------------------------
+        STUDY = pop_erpimparams(STUDY, g.erpimparams{:}); % a little trashy as the function pop_erpimparams does not check the fields
+        
         % compute ERPimages
         % -----------------
         for index = 1:length(STUDY.design(g.design).cell)
