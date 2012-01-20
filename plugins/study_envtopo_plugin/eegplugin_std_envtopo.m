@@ -65,7 +65,7 @@ end;
 % ---------------------
 menu = findobj(fig, 'Label', 'Edit/plot clusters');
 structure.uilist = { { } ...
-    {'style' 'pushbutton' 'string' 'Plot Envtopo plugin (beta)' 'Callback' 'args = { STUDY ALLEEG}; pop_std_envtopo(args{:}); clear tmpargs;' } { } { } };
+    {'style' 'pushbutton' 'string' 'Plot Envtopo plugin (beta)' 'Callback' 'args = { STUDY ALLEEG}; [STUDY LASTCOM] = pop_std_envtopo(args{:}); clear tmpargs;' } { } { } };
 structure.geometry = { [1] [1 0.3 1] };
 arg = vararg2str( { structure } );
 cb_clustedit   = [ trystrs.no_check 'ALLEEGTMP = ALLEEG; [STUDYTMP LASTCOM] = pop_clustedit(STUDY, ALLEEG, [], ' arg ');' catchstrs.update_study];

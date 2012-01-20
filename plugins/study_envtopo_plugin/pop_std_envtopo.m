@@ -46,9 +46,15 @@
 % 10/06/2011 ver 1.1 by Makoto. Line 77 'design', STUDY.currentdesign.
 % 08/01/2011 ver 1.0 by Makoto. Created. 
 
-function STUDY = pop_std_envtopo(STUDY, ALLEEG);
+function [STUDY com] = pop_std_envtopo(STUDY, ALLEEG);
 
- result = inputgui('title', 'Plot envtopo', 'geom', ...
+com = '';
+if nargin < 2
+    help pop_std_envtopo;
+    return;
+end;
+
+result = inputgui('title', 'Plot envtopo', 'geom', ...
                     { {2 12 [0 0] [1 1]} {2 12 [1 0] [1 1]} ...
                       {2 12 [0 1] [1 1]} {2 12 [1 1] [1 1]} ...
                       {2 12 [0 2] [1 1]} {2 12 [1 2] [1 1]} ...
