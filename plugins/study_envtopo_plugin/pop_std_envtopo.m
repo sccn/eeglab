@@ -99,24 +99,14 @@ else
     arguments = varargin;
 end;
 
-% check if STUDY.cluster.erpdata (cell array) is present
-checkerp = 0;
-for n = 2:length(STUDY.cluster)
-    if isfield(STUDY.cluster(1,2), 'erpdata');
-        if ~isempty(STUDY.cluster(1,2).erpdata);
-            checkerp(n-1,1) = 1;
-        else
-            checkerp(n-1,1) = 0;
-        end
-    end
-end
+if length(STUDY.cluster) == 1
+    errordlg2('Cannot plot envtopo with the parent cluster only');
+end;
 
-if nnz(checkerp) ~= length(checkerp)
-    for n = 2:length(STUDY.cluster)
-        [STUDY, datavals, xvals, setinds, allinds] = std_readerp(STUDY, ALLEEG, 'design', STUDY.currentdesign, 'clusters', n, 'singletrials', 'off');
-    end
+for n = 2:length(STUDY.cluster)
+    [STUDY, datavals, xvals, setinds, allinds] = std_readerp(STUDY, ALLEEG, 'design', STUDY.currentdesign, 'clusters', n, 'singletrials', 'off');
 end
 
 % run std_evntopo
-STUDY = std_envtopo(STUDY, ALLEEG, arguments{:});
+std_envtopo(STUDY, ALLEEG, arguments{:});
 com = ['std_envtopo(STUDY, ALLEEG,' options ');'];
