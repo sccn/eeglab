@@ -293,7 +293,7 @@ if size(data,2)*size(data,3) ~= EEG.pnts*EEG.trials
     disp('WARNING: The file size on disk does not correspond to the dataset, file has been truncated');
 end;
 try,
-    if EEG.trials == 1, EEG.pnts = size(EEG.data,2); end;
+    if EEG.trials == 1, EEG.pnts = size(data,2); end;
     if  strcmpi(opt.reshape, '3d')
          data = reshape(data, size(data,1), EEG.pnts, EEG.trials);
     else data = reshape(data, size(data,1), EEG.pnts*EEG.trials);
