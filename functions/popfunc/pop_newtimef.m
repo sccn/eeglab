@@ -156,8 +156,9 @@ if popup
     if isfield(EEG.chanlocs, 'theta')
         if ~isfield(EEG, 'chaninfo'), EEG.chaninfo = []; end;
         if typeproc == 1
+            if isempty(EEG.chanlocs), caption = [ 'Channel ' int2str(num) ]; else caption = EEG.chanlocs(num).labels; end;
             options = [options ', ''topovec'', ' int2str(num) ...
-                        ', ''elocs'', EEG.chanlocs, ''chaninfo'', EEG.chaninfo, ''caption'', EEG.chaninfo(num).labels' ];
+                        ', ''elocs'', EEG.chanlocs, ''chaninfo'', EEG.chaninfo, ''caption'', ''' caption '''' ];
         else
             options = [options ', ''topovec'', EEG.icawinv(:,' int2str(num) ...
                        '), ''elocs'', EEG.chanlocs, ''chaninfo'', EEG.chaninfo, ''caption'', [''IC '', num2str(num)]' ];
