@@ -46,6 +46,7 @@
 %   'plot'     = ['on'|'off'] 'off' -> disable plotting {default: 'on'}
 %   'rmdc'     = ['on'|'off'] 'on' -> remove DC {default: 'off'}  
 %   'plotmean' = ['on'|'off'] 'on' -> plot the mean channel spectrum {default: 'off'}  
+%   'plotchans' = [integer array] plot only specific channels {default: all}
 %
 % Optionally plot component contributions:
 %   'weights'  = ICA unmixing matrix. Here, 'freq' (above) must be a single frequency.
@@ -56,7 +57,8 @@
 %   'plotchan' = [integer] channel at which to compute independent conmponent
 %                contributions at the selected frequency ('freq'). If 0, plot RMS 
 %                power at all channels. {defatul|[] -> channel with highest power 
-%                at specified 'freq' (above)). 
+%                at specified 'freq' (above)). Do not confuse with
+%                'plotchans' which select channels for plotting.
 %   'mapchans' = [int vector] channels to plot in topoplots {default: all}
 %   'mapframes'= [int vector] frames to plot {default: all}
 %   'nicamaps' = [integer] number of ICA component maps to plot {default: 4}.
@@ -169,6 +171,7 @@ if nargin <= 3 | isstr(varargin{1})
 				  'weights'       'real'     []                       [] ;
 				  'mapnorm'       'real'     []                       [] ;
 				  'plotchan'      'integer'  [1:size(data,1)]         [] ;
+				  'plotchans'     'integer'  [1:size(data,1)]         [] ;
 				  'nicamaps'      'integer'  []                       4 ;
 				  'icawinv'       'real'     []                       [] ;
 				  'icacomps'      'integer'  []                       [] ;
@@ -227,6 +230,12 @@ if g.percent > 1
 end;
 if ~isempty(g.freq) & isempty(g.chanlocs)
 	error('spectopo(): needs channel location information');
+end;
+if isempty(g.weights) && ~isempty(g.plotchans)
+    data = data(g.plotchans,:);
+    if ~isempty(g.chanlocs)
+        g.chanlocs = g.chanlocs(g.plotchans);
+    end;
 end;
 
 if strcmpi(g.rmdc, 'on')
