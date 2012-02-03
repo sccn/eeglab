@@ -74,20 +74,26 @@ if nargin < 1
 
 	% popup window parameters
 	% -----------------------
-	promptstr    = { 'Data precision in bits (16 or 32 for Neuroscan v4.3):', ...
+	promptstr    = { 'Data precision in bits (16 / 32 bit or Auto for NS v4.3):', ...
                      'Trial range subset:', ...
 					 'Type range subset:', ...
 					 'Electrodes subset:', ...
 					 'Response range subset:'};
-	inistr       = { '16' '' '' '' '' };
+	inistr       = { 'Auto' '' '' '' '' };
 	pop_title    = sprintf('Load an EEG dataset');
 	result       = inputdlg2( promptstr, pop_title, 1,  inistr, 'pop_loadeeg');
 	if size( result,1 ) == 0 return; end;
 
 	% decode parameters
 	% -----------------
-    precision = eval(result{1});
-    if precision == 16, datformat = 'short'; else datformat = 'int32'; end;
+    precision = lower(strtrim(result{1}));
+    if strcmpi(precision, '16')
+        datformat = 'short';
+    elseif strcmpi(precision, '32')
+        datformat = 'int32';
+    elseif (strcmpi(precision, '0') || strcmpi(precision, 'auto'))
+        datformat = 'auto'
+    end;
 	range_sweeps    = eval( [ '[' result{2} ']' ] );
 	range_typeeeg   = eval( [ '[' result{3}  ']' ] );
 	range_chan      = eval( [ '[' result{4}  ']' ] );
@@ -98,7 +104,7 @@ else
     end;
 end;
 
-if exist('datformat') ~= 1, datformat = 'short'; end;
+if exist('datformat') ~= 1, datformat = 'auto'; end;
 if exist('range_chan') ~= 1   | isempty(range_chan)      , range_chan     = 'all'; end;
 if exist('range_sweeps') ~= 1 | isempty(range_sweeps)    , range_sweeps     = 'all'; end;
 if exist('range_typeeeg') ~= 1 | isempty(range_typeeeg)   , range_typeeeg     = 'all'; end;

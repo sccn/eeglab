@@ -19,8 +19,8 @@
 %                  reaction times in this range {default: import all}
 %   responsetype - [integer array] Only import trials with selected 
 %                  response type values {default: import all}
-%   format       - ['short'|'int32'] data format. Neuroscan v4.3+ assume 32-bit data
-%                  while older versions assume 16-bit. {default: 'short' = 16-bit}
+%   format       - ['short'|'int32'|'auto'] data format. Neuroscan v4.3+ assume 32-bit data
+%                  while older versions assume 16-bit. {default: 'auto' = Determine}
 %
 % Outputs:
 %   signal       - Output signal of size (trials, points)	
@@ -80,10 +80,10 @@ if nargin<4 typerange='all'; end;
 if nargin<5 acceptype='all'; end;
 if nargin<6 rtrange  ='all'; end;
 if nargin<7 responsetype='all'; end;
-if nargin<8 format='short'; end;
+if nargin<8 format='auto'; end;
 format = lower(format);
 
-if ~strcmpi(format, 'short') && ~strcmpi(format, 'int32'), error('loadeeg: format error'); end;
+if ~strcmpi(format, 'short') && ~strcmpi(format, 'int32') && ~strcmpi(format, 'auto'), error('loadeeg: format error'); end;
 
 % open file for reading
 % ---------------------
@@ -91,6 +91,22 @@ fid=fopen(FILENAME,'r','ieee-le');
 if fid<0
 	fprintf('Error LOADEEG: File %s not found\n', FILENAME);  
 	return;
+end;
+
+% determine the actual file format if auto is requested
+%------------------------------------------------------
+if strcmpi(format, 'auto')
+    format = 'short';
+    fseek(fid,12,'bof');
+    nextfile = fread(fid,1,'long');
+    if (nextfile > 0)
+        fseek(fid,nextfile+52,'bof');
+        is32bit = fread(fid,1,'char');       
+        if (is32bit == 1)
+            format = 'int32'
+        end;
+    end;
+    frewind(fid);
 end;
 
 % read general part of the erp header and set variables

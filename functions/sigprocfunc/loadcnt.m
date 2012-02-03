@@ -71,7 +71,7 @@ try, r.lddur;      catch, r.lddur=[]; end
 try, r.ldnsamples; catch, r.ldnsamples=[]; end
 try, r.scale;      catch, r.scale='on'; end
 try, r.blockread;  catch, r.blockread = []; end
-try, r.dataformat; catch, r.dataformat = 'int16'; end
+try, r.dataformat; catch, r.dataformat = 'auto'; end
 try, r.memmapfile; catch, r.memmapfile = ''; end
 
 
@@ -310,6 +310,17 @@ end
 % finding if 32-bits of 16-bits file
 % ----------------------------------
 begdata = ftell(fid);
+if strcmpi(r.dataformat, 'auto')
+    r.dataformat = 'int16';
+    if (h.nextfile > 0)
+        fseek(fid,h.nextfile+52,'bof');
+        is32bit = fread(fid,1,'char');       
+        if (is32bit == 1)
+            r.dataformat = 'int32'
+        end;
+        fseek(fid,begdata,'bof');
+    end;
+end;
 enddata = h.eventtablepos;   % after data
 if strcmpi(r.dataformat, 'int16')
      nums    = (enddata-begdata)/h.nchannels/2;
