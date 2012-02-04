@@ -1,4 +1,4 @@
-% std_envtopo4() - Creates an envtopo() image for a STUDY set using component cluster
+% std_envtopo() - Creates an envtopo() image for a STUDY set using component cluster
 %                 contributions instead of individual components.  Plots the envelope
 %                 of the data epoch grand mean ERP, plus envelopes and average scalp maps
 %                 for specified or largest-contributing clusters for each condition.
@@ -73,6 +73,7 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1.07  USA
 %
 % History
+% 01/24/2012 ver 4.3 by Makoto. Output added for the function.
 % 01/17/2012 ver 4.2 by Makoto. Improved diff option; now mutually exclusive with normal plot. Diff title improved too. 
 % 01/06/2012 ver 4.1 by Makoto. Time range options fixed. STUDY.design selection fixed. Wrong labels fixed. (Thanks to Agatha Lenartowicz!) 'sortvar' and 'topotype' implemented in the main function. Help edited.
 % 12/30/2011 ver 4.0 by Makoto. Main function 100% redesigned. Full support for Study.design.
@@ -84,7 +85,7 @@
 % 10/08/2011 ver 2.0 by Makoto. Multiple groups supported (but one group one time using option). Result topos are now retrieved from the stored ones in STUDY 
 % 08/01/2011 ver 1.0 by Makoto. Updated the original script to read data from memory.
 
-function std_envtopo4(STUDY, ALLEEG, varargin);
+function STUDY = std_envtopo(STUDY, ALLEEG, varargin);
 
 % if there is < 2 arguments, show help
 if nargin < 2

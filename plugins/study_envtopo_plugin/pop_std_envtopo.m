@@ -40,6 +40,7 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 %
 % History
+% 01/24/2012 ver 1.8 by Makoto. Anti-crash for the cancel bottun. eegh support being attempted
 % 01/17/2012 ver 1.7 by Makoto. Input box for 'diff' added.
 % 01/13/2012 ver 1.6 by Makoto. Limitation for reduced groups added.
 % 01/12/2012 ver 1.5 by Makoto. Limitation is changed to CAUTION.
@@ -84,6 +85,10 @@ if nargin < 3
         { 'style' 'text' 'string' '++++++++++++++++  ''Params'' for ERP MUST be set back otherwise the result will be inaccurate. Group MUST be in the'}...
         { 'style' 'text' 'string' '++++ CAUTION!!! ++++  second variable in design. DO NOT exclude any group in the design interface. ' }...
         { 'style' 'text' 'string' '++++++++++++++++  DO NOT change the name ''outlier 2''. Clusters MUST NOT be empty.'}});
+    
+    % if canceled, escape
+    if isempty(result), return, end
+    
     % prepare optional inputs for std_envtopo
     options = '';
     if ~isempty( result{1} ), options = [ options '''timerange'',[' result{1} '],' ]; end;
