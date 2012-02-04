@@ -1010,7 +1010,7 @@ if option_chat == 1
             end;
         end;
     else
-        disp('CANNOT START CHAT - CURRENTLY ONLY AVAILABLE AT THE UNIVERSITY OF CALIFORNIA SD');
+        disp('cannot start chat');
         tb = [];
     end;
 else
