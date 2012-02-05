@@ -146,7 +146,7 @@ opt = finputcheck( varargin, { 'topotime'    'real'    [] params.topotime;
                                'statmode'    'string'  { 'subjects','common','trials' } 'subjects'}, 'std_erpplot');
 if isstr(opt), error(opt); end;
 if isstr(opt.comps), opt.comps = []; opt.plotsubjects = 'on'; end;
-if ~isempty(opt.topofreq),  opt.topotime  = opt.topofreq; end;
+if ~isempty(opt.topofreq) && strcmpi(opt.datatype, 'spec'),  opt.topotime  = opt.topofreq; end;
 if ~isempty(opt.freqrange), opt.timerange = opt.freqrange; end;
 datatypestr = upper(opt.datatype);
 if strcmpi(datatypestr, 'spec'), datatypestr = 'Spectrum'; end;
