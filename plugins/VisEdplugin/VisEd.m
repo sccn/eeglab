@@ -1,4 +1,10 @@
-function EEG = VisEd(EEG, DataType, ChanIndex, EventType)
+function EEG = VisEd(EEG, DataType, ChanIndex, EventType,varargin)
+
+%COLLECT AND SET g STRUDCTURE FROM VARARGIN KEY/VAL PAIRS...
+g = struct(varargin{:});
+
+try g.quick_evtmk; catch, g.quick_evtmk = ''; end; 
+try g.quick_evtrm; catch, g.quick_evtrm = 'off'; end; 
 
 chans=eval(ChanIndex);
 
@@ -109,11 +115,9 @@ eegplot(data, ...
               'winrej', rejeegplot, ...
               'butlabel', 'Update EEG structure', ...
               'command', command, ...
-              'ctrlselectcommand',{ 'VisEd_ctrldowncom;' 'eegplot(''defmotioncom'', gcbf);' '' });
+              'ctrlselectcommand',{ ['VisEd_ctrldowncom(EEG,''', g.quick_evtmk, ''',''', g.quick_evtrm ''');'] 'eegplot(''defmotioncom'', gcbf);' '' });
               % 'extselectcommand',{ 'VisEd_extdowncom;' 'eegplot(''defmotioncom'', gcbf);' '' } ...
         
-
-return
 
 
     

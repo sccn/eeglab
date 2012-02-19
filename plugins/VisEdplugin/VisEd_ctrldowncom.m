@@ -1,3 +1,4 @@
+function VisEd_ctrldowncom(EEG,quick_evtmk,quick_evtrm)
 
 ax1 = findobj('tag','backeeg','parent',gcbf);
 tmppos = get(ax1, 'currentpoint');
@@ -6,6 +7,10 @@ tmppos = get(ax1, 'currentpoint');
 % Store "UserData" and "temppos" variables to "g" structures.             
 g=get(gcbf, 'UserData');
 g.tmppos=tmppos;
+
+g.quick_evtmk=quick_evtmk;
+g.quick_evtrm=quick_evtrm;
+
 g.nevents=length(EEG.event);
 
 g.datasize=size(EEG.data);

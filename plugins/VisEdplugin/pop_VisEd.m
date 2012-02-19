@@ -3,9 +3,19 @@
 % Usage: 
 %   >>  EEG = pop_VisEd( EEG, ChanIndex, EventType);
 %
+% Inputs:
 %   ChanIndex   - EEG channels to display in eegplot figure window while editing events and identifying bad channels.
 %   EventType   - Event types to display in eegplot figure window while editing events and identifying bad channels.
-%    
+% 
+% Optional Inputs:
+%   quick_evtmk - When quick_evtmk is a string the crtl click command
+%       bypasses the pop_fig_EditEvent GUI and simply adds a new event. The
+%       string entered for the quick_evtmk input is used as the new event type
+%       string. Default quick_evtmk = ''.
+%   quick_evtrm - When quick_evtrm = 'on' the ctrl click command (when
+%       selecting an existing event) removes the event without initiating the
+%       pop_fig_EditEvent GUI. Default quick_evtrm = 'off'.
+%
 % Outputs:
 %   EEG  - output dataset
 %
@@ -32,6 +42,10 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+% Edit log:
+%
+% 2012 02 19; Optional inputs quick_evtmk and quick_evtrm added.
 
 function [EEG,com]=pop_VisEd(EEG, ChanIndex, EventType)
 
@@ -83,7 +97,7 @@ if nargin < 3
     else eventlist = '';
     end;
     results=inputgui( ...
-    {[1] [1] [4 4 1] [4 4 1] [4 4 1] [1]}, ...
+    {[1] [1] [4 4 1] [4 4 1] [4 4 1] [1] [1] [1] [1]}, ...
     {...
         ... %1
         {'Style', 'text', 'string', 'Enter visual editing parameters.', 'FontWeight', 'bold'}, ...
@@ -121,6 +135,12 @@ if nargin < 3
                   'set(findobj(gcbf, ''tag'', ''PatIDEventTypeEdit''), ''string'', vararg2str(EventTypeCell))']}, ...
         ... %6
         {}, ...
+        ... %7
+        {'Style', 'text', 'string', 'Optional input key/val pairs:.'}, ...
+        ... %8
+        {'Style', 'edit'}, ...
+        ... %9
+        {}, ...
      }, ...
      'pophelp(''pop_VisEd'');', 'Select visual editing parameters -- pop_VisEd()' ...
      );
@@ -130,17 +150,23 @@ if nargin < 3
      DataType=results{1};
      ChanIndex=results{2};
      EventType=results{3};
+     Options=results{4};
 end
 
 
 % return command
 % -------------------------
-com=sprintf('EEG = pop_VisEd( %s, %d, %s, {%s});', inputname(1), DataType, vararg2str(ChanIndex), EventType);
+if isempty(Options);
+    com=sprintf('EEG = pop_VisEd( %s, %d, %s, {%s});', inputname(1), DataType, vararg2str(ChanIndex), EventType);
+else
+    com=sprintf('EEG = pop_VisEd( %s, %d, %s, {%s}, %s);', inputname(1), DataType, vararg2str(ChanIndex), EventType, Options);
+end
 
 % call command
 % ------------
-exec=sprintf('EEG = VisEd( %s, %d, %s, {%s});', inputname(1), DataType, vararg2str(ChanIndex), EventType);
+if isempty(Options);
+    exec=sprintf('EEG = VisEd( %s, %d, %s, {%s});', inputname(1), DataType, vararg2str(ChanIndex), EventType);
+else
+    exec=sprintf('EEG = VisEd( %s, %d, %s, {%s}, %s);', inputname(1), DataType, vararg2str(ChanIndex), EventType, Options);
+end
 eval(exec);
-
-
-return;
