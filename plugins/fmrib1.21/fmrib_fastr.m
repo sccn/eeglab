@@ -145,8 +145,9 @@
 
 
 
-function EEG=fmrib_fastr(EEG,lpf,L,Window,Trigs,strig,anc_chk,tc_chk,...
-   Volumes,Slices,varargin)
+function EEG=fmrib_fastr(EEG,lpf,L,Window,Trigs,strig,anc_chk,tc_chk,Volumes,Slices,varargin)
+
+EEG.data = double(EEG.data);
 
 tic;
 % Check Input & Intialize Params
