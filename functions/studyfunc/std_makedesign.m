@@ -81,7 +81,13 @@
 %  'rmfiles'  - ['on'|'off'] remove from the STUDY all data measure files 
 %               NOT included in this design. Selecting this option will 
 %               remove all the old measure files associated with the previous 
-%               definition of this design. {default: 'off'}           
+%               definition of this design. {default: 'off'}  
+%  'delfiles' - ['on'|'off'|'limited'] delete data files
+%               associated with the design specified as parameter. 'on'
+%               delete all data files related to the design. 'limited'
+%               deletes all data files contained in the design. 'limited'
+%               will not delete data files from other STUDY using the same
+%               files. Default is 'off'.
 %
 % Output:
 %      STUDY - The input STUDY with a new design added and designated 
@@ -156,7 +162,7 @@ opt = finputcheck(varargin,  {'variable1'     'string'    []     defdes.variable
                               'datselect'     'cell'      {}     defdes.include;
                               'dataselect'    'cell'      {}     {};
                               'subjselect'    'cell'      {}     defdes.cases.value;
-                              'delfiles'      'string'    { 'on','off' } 'off';
+                              'delfiles'      'string'    { 'on','off', 'limited' } 'off';
                               'defaultdesign' 'string'    { 'on','off','forceoff'} fastif(nargin < 3, 'on', 'off') }, ...
                               'std_makedesign');
 if isstr(opt), error(opt); end;
@@ -186,12 +192,23 @@ end;
 % delete design files
 % ---------------------
 if strcmpi(opt.delfiles, 'on')
-    fprintf('Deleting all files for STUDY design %d\n', designind);
+    fprintf('Deleting all files pertaining to design %d\n', designind);
     for index = 1:length(ALLEEG)
         files = fullfile(ALLEEG(index).filepath, sprintf('design%d*.*', designind));
         files = dir(files);
         for indf = 1:length(files)
             delete(fullfile(ALLEEG(index).filepath, files(indf).name));
+        end;
+    end;
+elseif strcmpi(opt.delfiles, 'limited')
+    fprintf('Deleting all files for STUDY design %d\n', designind);
+    for index = 1:length(STUDY.design(designind).cell)
+        filedir = [ STUDY.design(designind).cell(index).filebase '.*' ];
+        filepath = fileparts(filedir);
+        files = dir(filedir);
+        for indf = 1:length(files)
+            %disp(fullfile(filepath, files(indf).name));
+            delete(fullfile(filepath, files(indf).name));
         end;
     end;
 end;

@@ -147,7 +147,7 @@ if nargin < 3 && ~isstr(STUDY)
     end;
     for index = 1:length(des)
         tmpdes  = rmfield(des(index), 'deletepreviousfiles');
-        rmfiles = fastif(des(index).deletepreviousfiles, 'on', 'off');
+        rmfiles = fastif(des(index).deletepreviousfiles, 'limited', 'off');
         if index > length(STUDY.design) || ~isequal(STUDY.design(index), tmpdes) || strcmpi(rmfiles, 'on')
             fprintf('Updating/creating STUDY design %d\n', index);
             
