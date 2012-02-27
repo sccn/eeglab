@@ -1353,10 +1353,10 @@ if ~isempty(flt)
     end
     s=size(data);
     for trial=1:s(2),
-        data(:,trial)=filtfilt(B,A,data(:,trial));
+        data(:,trial)=filtfilt(B,A,double(data(:,trial)));
     end
     if isempty(baseline)
-        fprintf('Note, you might want to re-baseline the data using the erpiamge ''baseline'' option.\n\n');
+        fprintf('Note, you might want to re-baseline the data using the erpimage ''baseline'' option.\n\n');
     end
 end
 
