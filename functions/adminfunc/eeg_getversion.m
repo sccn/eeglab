@@ -2,9 +2,12 @@
 %
 % Usage:
 %     >> vers = eeg_getversion;
+%     >> [vers vnum] = eeg_getversion;
 %
 % Outputs:
-%         vers = [string] EEGLAB version number
+%    vers = [string] EEGLAB version number
+%    vnum = [float] numerical value for the version. For example 11.3.2.4b
+%           is converted to 11.324
 %
 % Authors: Arnaud Delorme, SCCN/INC/UCSD, 2010
 
@@ -23,7 +26,7 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 
-function vers = eeg_getversion;
+function [vers versnum] = eeg_getversion;
 
 vers = '';
 filepath = fileparts(which('eeglab.m'));
@@ -36,3 +39,9 @@ fgetl(fid);
 versionline = fgetl(fid);
 vers = versionline(11:end);
 fclose(fid);
+
+tmpvers = vers;
+if isempty(str2num(tmpvers(end))), tmpvers(end) = []; end;
+indsDot = find(tmpvers == '.' );
+tmpvers(indsDot(2:end)) = [];
+versnum = str2num(tmpvers);
