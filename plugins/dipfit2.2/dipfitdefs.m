@@ -89,14 +89,39 @@ try,
     template_models(2).coord_transform(2).keywords  = { 'gsn' 'sfp' '12' };
     template_models(2).coord_transform(3).transform = [ 0 -15 0 0.08 0 -1.571 102 93 100 ];
     template_models(2).coord_transform(3).keywords  = { 'egi' 'elp' };
+    
+    template_models(3).name     = 'Spherical Four-Shell (custom conductances - see DIPFIT wiki)';
+    template_models(3).hdmfile  = fullfile(folder, 'standard_BESA', 'standard_SCCN.mat');
+    template_models(3).mrifile  = fullfile(folder, 'standard_BESA', 'avg152t1.mat');
+    template_models(3).chanfile = fullfile(folder, 'standard_BESA', 'standard-10-5-cap385.elp');
+    template_models(3).coordformat = 'spherical';
+    template_models(3).coord_transform(1).transform = [ ];
+    template_models(3).coord_transform(1).keywords  = { 'standard-10-5-cap385' };
+    template_models(3).coord_transform(2).transform = [ 0 0 0 0 0 0 8 11 10 ];
+    template_models(3).coord_transform(2).keywords  = { 'gsn' 'sfp' '12' };
+    template_models(3).coord_transform(3).transform = [ 0 0 0 0 0.02 0 85 85 85 ];
+    template_models(3).coord_transform(3).keywords  = { 'egi' 'elp' };
+    
+    template_models(4).name     = 'Boundary Element Model (custom conductances - see DIPFIT wiki)';
+    template_models(4).hdmfile  = fullfile(folder, 'standard_BEM', 'standard_vol_SCCN.mat' );
+    template_models(4).mrifile  = fullfile(folder, 'standard_BEM', 'standard_mri.mat' );
+    template_models(4).chanfile = fullfile(folder, 'standard_BEM', 'elec', 'standard_1005.elc' );
+    template_models(4).coordformat = 'MNI';
+    template_models(4).coord_transform(1).transform = [ 0 0 0 0 0 -pi/2  1 1 1];
+    template_models(4).coord_transform(1).keywords  = { 'standard_1005' };
+    template_models(4).coord_transform(2).transform = [ 0 -15 4 0.05 0 -1.571 10.2 12 12.2 ];
+    template_models(4).coord_transform(2).keywords  = { 'gsn' 'sfp' '12' };
+    template_models(4).coord_transform(3).transform = [ 0 -15 0 0.08 0 -1.571 102 93 100 ];
+    template_models(4).coord_transform(3).keywords  = { 'egi' 'elp' };
+    
 catch,
     disp('Warning: problem when setting paths for dipole localization');
 end;
 
-template_models(3).name        = 'CTF MEG';
-template_models(3).coordformat = 'CTF';
-template_models(4).name        = 'Custom model files';
-template_models(4).coordformat = 'MNI'; % custom model
+template_models(5).name        = 'CTF MEG';
+template_models(5).coordformat = 'CTF';
+template_models(6).name        = 'Custom model files';
+template_models(6).coordformat = 'MNI'; % custom model
 
 % constrain electrode to sphere
 % -----------------------------
