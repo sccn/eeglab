@@ -26,11 +26,13 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 
-function [vers versnum] = eeg_getversion;
+function [vers versnum releaseDate] = eeg_getversion;
 
 vers = '';
 filepath = fileparts(which('eeglab.m'));
 filename = dir(fullfile(filepath, 'Contents.m'));
+
+releaseDate = filename.date;
 
 if isempty(filename), return; end;
 
