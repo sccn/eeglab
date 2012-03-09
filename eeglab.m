@@ -748,6 +748,7 @@ if ismatlab
     uimenu( std_m,  'Label', 'Edit/plot clusters'                     , 'userdata', onstudy, 'CallBack', cb_clustedit);
 
     if ~iseeglabdeployed2
+        newerVersionMenu = uimenu( help_m, 'Label', 'Upgrade to the Latest Version'          , 'userdata', on, 'ForegroundColor', [0.6 0 0]);
         uimenu( help_m, 'Label', 'About EEGLAB'                           , 'userdata', on, 'CallBack', 'pophelp(''eeglab'');');
         uimenu( help_m, 'Label', 'About EEGLAB help'                      , 'userdata', on, 'CallBack', 'pophelp(''eeg_helphelp'');');
         uimenu( help_m, 'Label', 'EEGLAB menus'                           , 'userdata', on, 'CallBack', 'eeg_helpmenu;','separator','on');
@@ -910,13 +911,53 @@ if nargout < 1
     clear ALLEEG;
 end;
 
+
+%% automatic updater
+try
+    [dummy eeglabVersionNumber currentReleaseDateString] = eeg_getversion;
+    eeglabUpdater = up.updater(eeglabVersionNumber, 'http://sccn.ucsd.edu/~nima/toolbox/eeglab/latest_version.php', 'EEGLAB', currentReleaseDateString);
+    
+    % create a new GUI item (e.g. under Help)
+    %newerVersionMenu = uimenu(help_m, 'Label', 'Upgrade to the Latest Version', 'visible', 'off', 'userdata', 'startup:on;study:on');
+    eeglabUpdater.menuItemHandle = newerVersionMenu;
+    
+    % set the callback to bring up the updater GUI
+    icadefs; % for getting background color
+    eeglabFolder = fileparts(which('eeglab.m'));
+    eeglabUpdater.menuItemCallback = {@command_on_update_menu_click, eeglabUpdater, eeglabFolder, true, BACKEEGLABCOLOR};
+
+    % place it in the base workspace.
+    assignin('base', 'eeglabUpdater', eeglabUpdater);
+    
+    eeglabUpdater.checkForNewVersion({'eeglab_event' 'setup'});
+    
+    if eeglabUpdater.newerVersionIsAvailable
+        fprintf('\nA newer version (%s, %d days newer) of EEGLAB is available to download at: \n%s\n\n', num2str(eeglabUpdater.latestVersionNumber), eeglabUpdater.daysCurrentVersionIsOlder, eeglabUpdater.downloadUrl);
+        
+        % make the Help menu item dark red
+        set(help_m, 'foregroundColor', [0.6, 0 0]);
+    else
+        fprintf('You are using the latest version of EEGLAB.\n');
+    end;    
+    
+catch
+    fprintf('Updater could not be initialized.\n');
+end;
+
+
 % REMOVED MENUS
 	%uimenu( tools_m, 'Label', 'Automatic comp. reject',  'enable', 'off', 'CallBack', '[EEG LASTCOM] = pop_rejcomp(EEG); eegh(LASTCOM); if ~isempty(LASTCOM), eeg_store(CURRENTSET); end;');
 	%uimenu( tools_m, 'Label', 'Reject (synthesis)' , 'Separator', 'on', 'CallBack', '[EEG LASTCOM] = pop_rejall(EEG); eegh(LASTCOM); if ~isempty(LASTCOM), eeg_store; end; eeglab(''redraw'');');
 
+     function command_on_update_menu_click(callerHandle, tmp, eeglabUpdater, installDirectory, goOneFolderLevelIn, backGroundColor)
+         postInstallCallbackString = 'clear all function functions; eeglab';
+         eeglabUpdater.launchGui(installDirectory, goOneFolderLevelIn, backGroundColor, postInstallCallbackString);
+    
+%     
 % --------------------
 % draw the main figure
 % --------------------
+
 function tb = eeg_mainfig(onearg);
 
 icadefs;
