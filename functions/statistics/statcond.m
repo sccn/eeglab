@@ -158,7 +158,7 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
     else
         g = struct(varargin{:});
         if ~isfield(g, 'naccu'),     g.naccu = 200; end;
-        if ~isfield(g, 'mode'),      g.naccu = 'param'; end;
+        if ~isfield(g, 'mode'),      g.mode  = 'param'; end;
         if ~isfield(g, 'paired'),    g.paired = 'on'; end;
         if ~isfield(g, 'surrog'),    g.surrog = []; end;
         if ~isfield(g, 'orivals'),   g.orivals = []; end;
