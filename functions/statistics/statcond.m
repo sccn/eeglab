@@ -69,8 +69,8 @@
 %                dimension filled with a number ('naccu') of surrogate data sets.
 %
 % Important note: When a two-way ANOVA is performed, outputs are cell arrays
-%                 with three elements: output(1) = column effects; 
-%                 output(2) = row effects; output(3) = interactions
+%                 with three elements: output(1) = row effects; 
+%                 output(2) = column effects; output(3) = interactions
 %                 between rows and columns.
 % Examples:
 %      >> a = { rand(1,10) rand(1,10)+0.5 }; % pseudo 'paired' data vectors
@@ -95,8 +95,8 @@
 %         %                                    ten (3,4) data matrices
 %         [F df pvals] = statcond(a);  % perform a paired 2-way ANOVA 
 %         % Output:
-%           pvals{1} % a (3,4) matrix of p-values; effects across columns
-%           pvals{2} % a (3,4) matrix of p-values; effects across rows 
+%           pvals{1} % a (3,4) matrix of p-values; effects across rows
+%           pvals{2} % a (3,4) matrix of p-values; effects across colums 
 %           pvals{3} % a (3,4) matrix of p-values; interaction effects
 %                                      % across rows and columns
 %
