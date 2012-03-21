@@ -51,7 +51,7 @@
 
 % 01-25-02 reformated help & license -ad 
 
-function [EEG, com] = pop_eegfilt( EEG, locutoff, hicutoff, filtorder, revfilt, usefft, plotfreqz)
+function [EEG, com] = pop_eegfilt( EEG, locutoff, hicutoff, filtorder, revfilt, usefft, plotfreqz, firtype)
 
 com = '';
 if nargin < 1
@@ -64,14 +64,12 @@ end;
 
 % warning
 % -------
-if nargin < 6, usefft = 0; end;
 if exist('filtfilt') ~= 2
     disp('Warning: cannot find the signal processing toolbox');
     disp('         a simple fft/inverse fft filter will be used');
     usefft = 1;
 end;
 
-plotfreqz = 0;
 if nargin < 2
     % which set to save
     % -----------------
@@ -83,10 +81,10 @@ if nargin < 2
         { 'style' 'text' 'string' 'FIR Filter order (default is automatic)' } ...
         { 'style' 'edit' 'string' '' } ...
         { 'style' 'checkbox' 'string' 'Notch filter the data instead of pass band' } ...
-        { 'style' 'checkbox' 'string' 'Use (sharper) FFT linear filter instead of FIR filtering' 'value' usefft } ...
+        { 'style' 'checkbox' 'string' 'Use (sharper) FFT linear filter instead of FIR filtering' 'value' 0 } ...
         { 'style' 'text' 'string' '(Use the option above if you do not have the Signal Processing Toolbox)' } ...
-        { 'style' 'checkbox' 'string' 'Plot frequency response' 'value' 1} ...
-        { 'style' 'checkbox' 'string' 'Use fir1 filter design method' 'value' 1}};
+        { 'style' 'checkbox' 'string' 'Plot frequency response' 'value' 0} ...
+        { 'style' 'checkbox' 'string' 'Use fir1 (check, recommended) or firls (uncheck, legacy)' 'value' 1}};
     geometry = { [3 1] [3 1] [3 1] 1 1 1 1 1 };
     
     result = inputgui( 'geometry', geometry, 'uilist', uilist, 'title', 'Filter the data -- pop_eegfilt()', ...
@@ -109,7 +107,11 @@ if nargin < 2
             error('Need both lower and higher edge for notch filter');
         end;
     end;
-    if result{5}, usefft = 1; end;
+    if result{5}
+        usefft = 1;
+    else
+        usefft = 0;
+    end;
     plotfreqz = result{6};
     if locutoff == 0 & hicutoff == 0 return; end;
     if result{7}
@@ -126,6 +128,9 @@ else
     end;
     if nargin < 5
         revfilt = 0;
+    end;
+    if nargin < 6
+        usefft = 0;
     end;
     if nargin < 7
         plotfreqz = 0;
@@ -223,6 +228,6 @@ if ~usefft & plotfreqz & exist('b') == 1
     freqz(b, 1, [], EEG.srate);
 end
 
-com = sprintf( '%s = pop_eegfilt( %s, %s, %s, [%s], [%s]);', inputname(1), inputname(1), ...
-    num2str( locutoff), num2str( hicutoff), num2str( filtorder ), num2str( revfilt ) );
-return;
+com = sprintf( '%s = pop_eegfilt( %s, %s, %s, [%s], [%s], %s, %s, ''%s'');', inputname(1), inputname(1), ...
+    num2str( locutoff), num2str( hicutoff), num2str( filtorder ), num2str( revfilt ), num2str(usefft), num2str(plotfreqz), firtype);
+return
