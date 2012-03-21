@@ -845,6 +845,18 @@ for inddataset = 1:length(ALLEEG)
     % deal with epoch arrays
     % ----------------------
     if ~isfield(EEG, 'epoch'), EEG.epoch = []; res = com; end;
+
+    % check if only one epoch
+    % -----------------------
+    if EEG.trials == 1
+        if isfield(EEG.event, 'epoch')
+            EEG.event = rmfield(EEG.event, 'epoch'); res = com;
+        end;
+        if ~isempty(EEG.epoch)
+            EEG.epoch = []; res = com;
+        end;
+    end;
+
     if ~isfield(EEG, 'epochdescription'), EEG.epochdescription = {}; res = com; end;
     if ~isempty(EEG.epoch)
         if isstruct(EEG.epoch),  l = length( EEG.epoch);

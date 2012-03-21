@@ -596,6 +596,15 @@ if ~isempty(EEG.specicaact)
     end;
 end;
 
+% check if only one epoch
+% -----------------------
+if EEG.trials == 1
+    if isfield(EEG.event, 'epoch')
+        EEG.event = rmfield(EEG.event, 'epoch');
+    end;
+    EEG.epoch = [];
+end;
+
 EEG.reject = [];
 EEG.stats  = [];
 EEG.reject.rejmanual = [];
