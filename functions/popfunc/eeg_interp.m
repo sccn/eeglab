@@ -131,6 +131,7 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method)
         oldelocs  = EEG.chanlocs;
         EEG       = pop_select(EEG, 'nochannel', badchans);
         EEG.chanlocs = oldelocs;
+        disp('Interpolating missing channels...');
     end;
 
     % find non-empty good channels
@@ -214,7 +215,8 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method)
             %        [EEG.chanlocs( badchans(c)).radius EEG.chanlocs( badchans(c)).theta]);
             %end;
             tmpdata = reshape(EEG.data, size(EEG.data,1), size(EEG.data,2)*size(EEG.data,3) );
-            [Xi,Yi,badchansdata(:,t)] = griddata(ygood, xgood , tmpdata(datachans,t)',...
+            if strcmpi(method, 'invdist'), method = 'v4'; end;
+            [Xi,Yi,badchansdata(:,t)] = griddata(ygood, xgood , double(tmpdata(datachans,t)'),...
                                                     ybad, xbad, method); % interpolate data                                            
         end
         fprintf('\n');
