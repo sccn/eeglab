@@ -92,7 +92,7 @@ end;
 % Compute gradient(s)
 % -------------------
 for m=1:size(map,2) 
-   	[Xi,Yi,Zi] = griddata(y,x,map(:,m),yi',xi, 'invdist'); % interpolate data
+   	[Xi,Yi,Zi] = griddata(y,x,map(:,m),yi',xi, 'v4'); % interpolate data
    	[FX,FY] = gradient(Zi);
 	positions = horizidx + (vertidx-1)*GRID_SCALE;
 

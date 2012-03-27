@@ -87,7 +87,7 @@ end;
 % ----------------
 sumLaplac2D = zeros(GRID_SCALE, GRID_SCALE);
 for i=1:size(map,2) 
-   	[Xi,Yi,Zi] = griddata(y,x,map(:,i),yi',xi, 'invdist');   % interpolate data
+   	[Xi,Yi,Zi] = griddata(y,x,map(:,i),yi',xi, 'v4');   % interpolate data
    	laplac2D = del2(Zi);
 	positions = horizidx + (vertidx-1)*GRID_SCALE;
 
