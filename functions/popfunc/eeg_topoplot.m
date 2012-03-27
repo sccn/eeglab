@@ -177,7 +177,7 @@ else
 	
 	% linear interpolation and removal of values outside circle
 	% ---------------------------------------------------------
-    a = griddata(x, y, newvalues, -ay, ax, 'invdist');
+    a = griddata(x, y, newvalues, -ay, ax, 'v4');
 	aradius = sqrt(ax.^2 + ay.^2);
 	indoutcircle = find(aradius(:) > g.headrad+0.01);
 	a(indoutcircle) = NaN;
