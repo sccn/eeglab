@@ -105,7 +105,10 @@
 % 'plotamps' = ['on'|'off'] Image amplitudes at each trial and latency instead of potential
 %              values. Note: Currently requires 'coher' (below) with alpha signif.
 %              Use 'cycles' (below) > (default) 3 for better frequency specificity,
-%              {default: plot potential, not amplitudes}
+%              {default: plot potential, not amplitudes}. The average power
+%              (in log space) before time 0 is automatically removed. Note that the 
+%              'baseline' parameter has no effect on 'plotamps'. Instead use
+%              change "basedB" in the 'limits' parameter.
 %
 % Specify plot parameters:
 %   'limits'         = [lotime hitime minerp maxerp lodB hidB locoher hicoher basedB]
@@ -198,7 +201,8 @@
 %                        Useful in conjunction with 'filt' option to re-basline trials after they have been
 %                        filtered. Not necessary if data have already been baselined and erpimage
 %                        processing does not affect baseline amplitude {default: no further baselining
-%                        of data}
+%                        of data}. Note that the baseline when using plotamp is automatically
+%                        removed unless you set the "basedB" in 'limits' to 0.
 % 'filt'              = [low_boundary high_boundary] a two element vector indicating the frequency
 %                        cut-offs for a 3rd order Butterworth filter that will be applied to each
 %                        trial of data.  If low_boundary=0, the filter is a low pass filter.  If
