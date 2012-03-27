@@ -61,9 +61,9 @@ if nargin > 2
 	Yi = ones(1,length(timearray));
 
     try
-        [tmp1,tmp2,Zi] = griddata(Y, X, maxdata, Yi, Xi, 'invdist');   % interpolate data
+        [tmp1,tmp2,Zi] = griddata(Y, X, maxdata, Yi, Xi, 'v4');   % interpolate data
         maxdata = Zi;
-        [tmp1,tmp2,Zi] = griddata(Y, X, mindata, Yi, Xi, 'invdist');   % interpolate data
+        [tmp1,tmp2,Zi] = griddata(Y, X, mindata, Yi, Xi, 'v4');   % interpolate data
         mindata = Zi;
     catch
         disp('Warning, "v4" interpolation failed, using linear interpolation instead (probably running Octave)');
