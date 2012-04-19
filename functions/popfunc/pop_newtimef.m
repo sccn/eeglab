@@ -9,6 +9,66 @@
 %   >> pop_newtimef(EEG, typeproc, num, tlimits,cycles,
 %                        'key1',value1,'key2',value2, ... );   
 %     
+% Graphical interface:
+%   "Channel/component number" - [edit box] this is the index of the data 
+%              channel or the index of the component for which to plot the
+%              time-frequency decomposition.
+%   "Sub-epoch time limits" - [edit box] sub epochs may be extracted (note that
+%              this function aims at plotting data epochs not continuous data).
+%              You may select the new epoch limits in this edit box.
+%   "Use n time points" - [muliple choice list] this is the number of time
+%              points to use for the time-frequency decomposition. The more
+%              time points, the longer the time-frequency decomposition
+%              takes to compute.
+%   "Frequency limits" - [edit box] these are the lower and upper
+%              frequency limit of the time-frequency decomposition. Instead
+%              of limits, you may also enter a sequence of frequencies. For
+%              example to compute the time-frequency decomposition at all
+%              frequency between 5 and 50 hertz with 1 Hz increment, enter "1:50"
+%   "Log spaced" - [checkbox] you may check this box to compute log-spaced
+%              frequencies. Note that this is only relevant if you specify
+%              frequency limits (in case you specify actual frequencies,
+%              this parameter is ignored).
+%   "Use divisive baseline" - [muliple choice list] there are two types of
+%              baseline correction, additive (the baseline is subtracted)
+%              or divisive (the data is divided by the baseline values).
+%              The choice is yours. There is also the option to perform 
+%              baseline correction in single trials. See the 'trialbase' "full"
+%              option in the newtimef.m documentation for more information.
+%   "No baseline" - [checkbox] check this box to compute the raw time-frequency
+%              decomposition with no baseline removal.
+%   "Wavelet cycles" - [edit box] specify the number of cycle at the lowest 
+%              and highest frequency. Instead of specifying the number of cycle 
+%              at the highest frequency, you may also specify a wavelet
+%              "factor" (see newtimef help message). In addition, it is
+%              possible to specify actual wavelet cycles for each frequency
+%              by entering a sequence of numbers.
+%   "Use FFT" - [checkbox] check this checkbox to use FFT instead of
+%              wavelet decomposition.
+%   "ERSP color limits" - [edit box] set the upper and lower limit for the
+%              ERSP image. 
+%   "see log power" - [checkbox] the log power values (in dB) are plotted. 
+%              Uncheck this box to plot the absolute power values.
+%   "ITC color limits" - [edit box] set the upper and lower limit for the
+%              ITC image. 
+%   "plot ITC phase" - [checkbox] check this box plot plot (overlayed on
+%              the ITC amplitude) the polarity of the ITC complex value.
+%   "Bootstrap significance level" - [edit box] use this edit box to enter
+%              the p-value threshold for masking both the ERSP and the ITC
+%              image for significance (masked values appear as light green)
+%   "FDR correct" - [checkbox] this correct the p-value for multiple comparisons
+%              (accross all time and frequencies) using the False Discovery
+%              Rate method. See the fdr.m function for more details.
+%   "Optional newtimef arguments" - [edit box] addition argument for the
+%              newtimef function may be entered here in the 'key', value
+%              format.
+%   "Plot Event Related Spectral Power" - [checkbox] plot the ERSP image
+%              showing event related spectral stimulus induced changes
+%   "Plot Inter Trial Coherence" - [checkbox] plot the ITC image.
+%   "Plot Curve at each frequency" - [checkbox] instead of plotting images,
+%              it is also possible to display curves at each frequency.
+%              This functionality is beta and might not work in all cases.
+% 
 % Inputs:            
 %   INEEG    - input EEG dataset
 %   typeproc - type of processing. 1 process the raw
@@ -80,8 +140,8 @@ end;
 if popup
 	[txt vars] = gethelpvar('newtimef.m');
 	
-    g = [1 0.3 0.6 0.34];
-	geometry = { g g g g g g g g [1.025 1.27] [1] [1.2 1 1.2]};
+    g = [1 0.3 0.6 0.4];
+	geometry = { g g g g g g g g [0.975 1.27] [1] [1.2 1 1.2]};
     uilist = { ...
                { 'Style', 'text', 'string', fastif(typeproc, 'Channel number', 'Component number'), 'fontweight', 'bold'  } ...
 			   { 'Style', 'edit', 'string', getkeyval(lastcom,3,[],'1') 'tag' 'chan'} {} {} ...
@@ -97,13 +157,13 @@ if popup
 			   ...
 			   { 'Style', 'text', 'string', 'Baseline limits [min max] (msec) (0->pre-stim.)', 'fontweight', 'bold' } ...
 			   { 'Style', 'edit', 'string', '0' 'tag' 'baseline' } ...
-			   { 'Style', 'popupmenu',  'string', 'Use divisive baseline|Use standard deviation' 'tag' 'basenorm' } ...
+			   { 'Style', 'popupmenu',  'string', 'Use divisive baseline (DIV)|Use standard deviation (STD)|Use single trial DIV baseline|Use single trial STD baseline' 'tag' 'basenorm' } ...
                { 'Style', 'checkbox', 'string' 'No baseline' 'tag' 'nobase' } ...
                ...
                { 'Style', 'text', 'string', 'Wavelet cycles [min max/fact] or sequence', 'fontweight', 'bold' } ...
                { 'Style', 'edit', 'string', getkeyval(lastcom,5,[],'3 0.5') 'tag' 'cycle' } ...
-               { 'Style', 'popupmenu', 'string', 'Use limits|Use actual seq.' 'tag' 'ncycles' } ...
                { 'Style', 'checkbox', 'string' 'Use FFT' 'value' 0 'tag' 'fft' } ...
+               { } ...
 			   ...
 			   { 'Style', 'text', 'string', 'ERSP color limits [max] (min=-max)', 'fontweight', 'bold' } ...
                { 'Style', 'edit', 'string', '' 'tag' 'erspmax'} ...
@@ -178,7 +238,6 @@ if popup
 	if result.freqscale,             options = [ options ', ''freqscale'', ''log''' ];    end;
 	if ~result.plotphase,            options = [ options ', ''plotphase'', ''off''' ];    end;
 	if ~result.scale,                options = [ options ', ''scale'', ''abs''' ];        end;
-    if result.basenorm == 2,         options = [ options ', ''basenorm'', ''on''' ];      end;
     if result.ntimesout == 1,        options = [ options ', ''ntimesout'', 50' ];         end;
     if result.ntimesout == 2,        options = [ options ', ''ntimesout'', 100' ];        end;
     if result.ntimesout == 3,        options = [ options ', ''ntimesout'', 150' ];        end;
@@ -188,6 +247,9 @@ if popup
     if result.nfreqs == 2,           options = [ options ', ''padratio'', 2' ];           end;    
     if result.nfreqs == 3,           options = [ options ', ''padratio'', 4' ];           end;
     if result.nfreqs == 4,           options = [ options ', ''nfreqs'', ' int2str(length(freqs)) ]; end;
+    if result.basenorm == 2,         options = [ options ', ''basenorm'', ''on''' ];      end;
+    if result.basenorm == 4,         options = [ options ', ''basenorm'', ''on''' ];      end;
+    if result.basenorm >= 3,         options = [ options ', ''trialbase'', ''full''' ];      end;
     
     % add title
     % ---------
