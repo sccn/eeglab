@@ -136,7 +136,10 @@
 %                     trial normalization (or simple division based on the
 %                     'basenorm' input over the full trial length before
 %                     performing standard baseline removal. It has been
-%                     shown to be less sensitive to noisy trials.
+%                     shown to be less sensitive to noisy trials in Grandchamp R, 
+%                     Delorme A. (2011) Single-trial normalization for event-related 
+%                     spectral decomposition reduces sensitivity to noisy trials. 
+%                     Front Psychol. 2:236.
 %
 %    Optional time warping parameter: 
 %       'timewarp'  = [eventms matrix] Time-warp amplitude and phase time-
