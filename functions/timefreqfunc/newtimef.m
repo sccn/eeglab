@@ -130,9 +130,13 @@
 %       'basenorm'  = ['on'|'off'] 'on' normalize baseline in the power spectral
 %                     average instead of 'off' dividing by the average power across 
 %                     trials at each frequency (gain model). Default: 'off'.
-%       'trialbase' = ['on'|'off'] perform baseline (normalization or division 
+%       'trialbase' = ['on'|'off'|'full'] perform baseline (normalization or division 
 %                     above in single trial instead of the trial average. Default
-%                     if 'off'. 
+%                     if 'off'. 'full' is an option that perform single
+%                     trial normalization (or simple division based on the
+%                     'basenorm' input over the full trial length before
+%                     performing standard baseline removal. It has been
+%                     shown to be less sensitive to noisy trials.
 %
 %    Optional time warping parameter: 
 %       'timewarp'  = [eventms matrix] Time-warp amplitude and phase time-
@@ -557,8 +561,8 @@ end
     'timeStretchMarks'  'real'  []           []; ...
     'timeStretchRefs'   'real'  []           []; ...
     'timeStretchPlot'   'real'  []           []; ...
+    'trialbase'     'string'    {'on','off','full'} 'off'; 
     'caption'       'string'    []           ''; ...
-    'trialbase'     'string'    {'on','off'} 'off'; 
     'hzdir'         'string'    {'up','down','normal','reverse'}   HZDIR; ...
     'ydir'          'string'    {'up','down','normal','reverse'}   YDIR; ...
     'cycleinc'      'string'   {'linear','log'}        'linear'
@@ -811,13 +815,13 @@ if strcmpi(g.lowmem, 'on') && numel(data) ~= g.frames && isempty(g.nfreqs) && ~i
     
     % compute for first 2 trials to get freqsout
     XX = reshape(data, 1, frames, prod(size(data))/g.frames);
-    [P,R,mbase,timesout,freqsout] = newtimef(XX(1,:,1), frames, tlimits, Fs, varwin, 'plotitc', 'off', 'plotamp', 'off',varargin{:}, 'lowmem', 'off');
+    [P,R,mbase,timesout,freqsout] = newtimef(XX(1,:,1), frames, tlimits, Fs, g.cycles, 'plotitc', 'off', 'plotamp', 'off',varargin{:}, 'lowmem', 'off');
 
     % scan all frequencies
     for index = 1:length(freqsout)
         if nargout < 8
             [P(index,:),R(index,:),mbase(index),timesout,tmpfreqs(index),Pboottmp,Rboottmp] = ...
-                newtimef(data, frames, tlimits, Fs, varwin, ...
+                newtimef(data, frames, tlimits, Fs, g.cycles, ...
                           'freqs', [freqsout(index) freqsout(index)], 'nfreqs', 1, ...
                              'plotamp', 'off', 'plotitc', 'off', 'plotphasesign', 'off',varargin{:}, ...
                                   'lowmem', 'off', 'timesout', timesout);
@@ -831,7 +835,7 @@ if strcmpi(g.lowmem, 'on') && numel(data) ~= g.frames && isempty(g.nfreqs) && ~i
         else
             [P(index,:),R(index,:),mbase(index),timesout,tmpfreqs(index),Pboot(index,:),Rboot(index,:), ...
                 alltfX(index,:,:)] = ...
-                newtimef(data, frames, tlimits, Fs, varwin, ...
+                newtimef(data, frames, tlimits, Fs, g.cycles, ...
                             'freqs', [freqsout(index) freqsout(index)], 'nfreqs', 1, ...
                                   'plotamp', 'off', 'plotphasesign', 'off',varargin{:}, ...
                                           'lowmem', 'off', 'timesout', timesout);
@@ -900,20 +904,20 @@ if iscell(data)
 
     if ~isempty(g.timeStretchMarks)
         [P1,R1,mbase1,timesout,freqs,Pboot1,Rboot1,alltfX1] = ...
-        newtimef( data{1}, frames, tlimits, Fs, varwin, 'plotitc', 'off', ...
+        newtimef( data{1}, frames, tlimits, Fs, g.cycles, 'plotitc', 'off', ...
           'plotersp', 'off', vararginori{:}, 'lowmem', 'off', ...
             'timeStretchMarks', g.timeStretchMarks(:,1:cond_1_epochs), ... 
               'timeStretchRefs', g.timeStretchRefs);
     else
         [P1,R1,mbase1,timesout,freqs,Pboot1,Rboot1,alltfX1] = ...
-        newtimef( data{1}, frames, tlimits, Fs, varwin, 'plotitc', 'off', ...
+        newtimef( data{1}, frames, tlimits, Fs, g.cycles, 'plotitc', 'off', ...
           'plotersp', 'off', vararginori{:}, 'lowmem', 'off');
     end
 
     verboseprintf(g.verbose,'\nRunning newtimef() on Condition 2 **********************\n\n');
 
     [P2,R2,mbase2,timesout,freqs,Pboot2,Rboot2,alltfX2] = ...
-        newtimef( data{2}, frames, tlimits, Fs, varwin, 'plotitc', 'off', ...
+        newtimef( data{2}, frames, tlimits, Fs, g.cycles, 'plotitc', 'off', ...
           'plotersp', 'off', vararginori{:}, 'lowmem', 'off', ...
             'timeStretchMarks', g.timeStretchMarks(:,cond_1_epochs+1:end), ... 
               'timeStretchRefs', g.timeStretchRefs);
@@ -1195,22 +1199,23 @@ end
 % -----------------------------------------
 % remove baseline on a trial by trial basis
 % -----------------------------------------
+if strcmpi(g.trialbase, 'on'), tmpbase = baseln;
+else                           tmpbase = 1:size(P,2); % full baseline
+end;
 if ndims(P) == 4
-    Pori = mean(P, 4);
-    if strcmpi(g.trialbase, 'on') && isnan( g.powbase(1) )
-        mbase = mean(P(:,:,baseln,:),3);
+    if ~strcmpi(g.trialbase, 'off') && isnan( g.powbase(1) )
+        mbase = mean(P(:,:,tmpbase,:),3);
         if strcmpi(g.basenorm, 'on')
-             mstd = std(P(:,:,baseln,:),[],3);
+             mstd = std(P(:,:,tmpbase,:),[],3);
              P = bsxfun(@rdivide, bsxfun(@minus, P, mbase), mstd);
         else P = bsxfun(@rdivide, P, mbase);
         end;
     end;
 else
-    Pori = mean(P, 3);
-    if strcmpi(g.trialbase, 'on') && isnan( g.powbase(1) )
-        mbase = mean(P(:,baseln,:),2);
+    if ~strcmpi(g.trialbase, 'off') && isnan( g.powbase(1) )
+        mbase = mean(P(:,tmpbase,:),2);
         if strcmpi(g.basenorm, 'on')
-            mstd = std(P(:,baseln,:),[],2);
+            mstd = std(P(:,tmpbase,:),[],2);
             P = (P-repmat(mbase,[1 size(P,2) 1]))./repmat(mstd,[1 size(P,2) 1]); % convert to log then back to normal
         else
             P = P./repmat(mbase,[1 size(P,2) 1]); 
@@ -1220,6 +1225,47 @@ else
 end;
 if ~isempty(g.precomputed)
     return; % return single trial power
+end;
+
+% -----------------------
+% compute baseline values
+% -----------------------
+if isnan(g.powbase(1))
+
+    verboseprintf(g.verbose, 'Computing the mean baseline spectrum\n');
+    if ndims(P) == 4
+        if ndims(P) > 3, Pori  = mean(P, 4); else Pori = P; end; 
+        mbase = mean(Pori(:,:,baseln),3);
+    else
+        if ndims(P) > 2, Pori  = mean(P, 3); else Pori = P; end; 
+        mbase = mean(Pori(:,baseln),2);
+    end;
+else
+    verboseprintf(g.verbose, 'Using the input baseline spectrum\n');
+    mbase    = g.powbase; 
+    if strcmpi(g.scale, 'log'), mbase = 10.^(mbase/10); end; 
+    if size(mbase,1) == 1 % if input was a row vector, flip to be a column
+        mbase = mbase';
+    end;
+end
+baselength = length(baseln);
+
+% -------------------------
+% remove baseline (average)
+% -------------------------
+% original ERSP baseline removal
+if ~strcmpi(g.trialbase, 'on')
+    if ~isnan( g.baseline(1) ) && any(~isnan( mbase(1) )) && strcmpi(g.basenorm, 'off')
+        P = bsxfun(@rdivide, P, mbase); % use single trials
+    % ERSP baseline normalized
+    elseif ~isnan( g.baseline(1) ) && ~isnan( mbase(1) ) && strcmpi(g.basenorm, 'on')
+
+        if ndims(Pori) == 3, 
+             mstd = std(Pori(:,:,baseln),[],3);
+        else mstd = std(Pori(:,baseln),[],2);
+        end;
+        P = bsxfun(@rdivide, bsxfun(@minus, P, mbase), mstd);
+    end;
 end;
 
 % ----------------
@@ -1279,12 +1325,25 @@ if ~isnan(g.alpha) | ~isempty(find(~isnan(g.pboot))) | ~isempty(find(~isnan(g.rb
         
         % power significance
         % ------------------
-        formula = 'mean(arg1,3);';
-        [ Pboot Pboottrialstmp Pboottrials] = bootstat(P, formula, 'boottype', 'shuffle', ...
-            'label', 'ERSP', 'bootside', 'both', 'naccu', g.naccu, ...
-            'basevect', baselntmp, 'alpha', g.alpha, 'dimaccu', 2 );
-        clear Pboottrialstmp;
-        
+        if strcmpi(g.boottype, 'shuffle')
+            formula = 'mean(arg1,3);';
+            [ Pboot Pboottrialstmp Pboottrials] = bootstat(P, formula, 'boottype', 'shuffle', ...
+                'label', 'ERSP', 'bootside', 'both', 'naccu', g.naccu, ...
+                'basevect', baselntmp, 'alpha', g.alpha, 'dimaccu', 2 );
+            clear Pboottrialstmp;
+        else
+            center = 0;
+            if strcmpi(g.basenorm, 'off'), center = 1; end;
+            
+            % bootstrap signs
+            Pboottmp    = P;
+            Pboottrials = zeros([ size(P,1) size(P,2) g.naccu ]);
+            for index = 1:g.naccu
+                Pboottmp = (Pboottmp-center).*(ceil(rand(size(Pboottmp))*2-1)*2-1)+center;
+                Pboottrials(:,:,index) = mean(Pboottmp,3);
+            end;
+            Pboot = [];
+        end;
         if size(Pboot,2) == 1, Pboot = Pboot'; end;
     end;
     
@@ -1341,8 +1400,9 @@ end
 
 % average the power
 % -----------------
-if ndims(P) == 4, P = mean(P, 4);
-else              P = mean(P, 3);
+PA = P;
+if ndims(P) == 4,     P = mean(P, 4);
+elseif ndims(P) == 3, P = mean(P, 3);
 end;
 
 % correction for multiple comparisons
@@ -1351,7 +1411,8 @@ maskersp = [];
 maskitc  = []; 
 if ~isnan(g.alpha)
     if isempty(find(~isnan(g.pboot))) % if ERSP lims not provided
-        exactp_ersp = compute_pvals(P, Pboottrials');
+        if ndims(Pboottrials) < 3, Pboottrials = Pboottrials'; end;
+        exactp_ersp = compute_pvals(P, Pboottrials);
         if strcmpi(g.mcorrect, 'fdr')
             alphafdr = fdr(exactp_ersp, g.alpha);
             if alphafdr ~= 0
@@ -1378,50 +1439,6 @@ if ~isnan(g.alpha)
     end;
 end;
 
-% computer baseline values
-% ------------------------
-if isnan(g.powbase(1))
-    verboseprintf(g.verbose, 'Computing the mean baseline spectrum\n');
-    if ndims(P) == 3
-         mbase    = mean(P(:,:,baseln),3);
-         mbaseori = mean(Pori(:,:,baseln),3);
-    else mbase    = mean(P(:,baseln),2);
-         mbaseori = mean(Pori(:,baseln),2);
-    end;
-else
-    verboseprintf(g.verbose, 'Using the input baseline spectrum\n');
-    mbase    = g.powbase; 
-    if strcmpi(g.scale, 'log'), mbase = 10.^(mbase/10); end; 
-    if size(mbase,1) == 1 % if input was a row vector, flip to be a column
-        mbase = mbase';
-    end;
-    mbaseori = mbase;
-end
-baselength = length(baseln);
-
-% ---------------
-% remove baseline
-% ---------------
-% original ERSP baseline removal
-if ~isnan( g.baseline(1) ) && any(~isnan( mbase(1) )) && strcmpi(g.trialbase, 'off') && strcmpi(g.basenorm, 'off')
-    
-    P = bsxfun(@rdivide, P, mbase);
-    if ~isempty(Pboot)
-         Pboot = bsxfun(@rdivide, Pboot, mbase);
-    end;   
-% ERSP baseline normalized
-elseif ~isnan( g.baseline(1) ) && ~isnan( mbase(1) ) && strcmpi(g.basenorm, 'on') && strcmpi(g.trialbase, 'off')
-
-    if ndims(P) == 3, 
-         mstd = std(P(:,:,baseln),[],3);
-    else mstd = std(P(:,baseln),[],2);
-    end;
-    P = bsxfun(@rdivide, bsxfun(@minus, P, mbase), mstd);
-    if ~isempty(Pboot) && isnan(g.pboot)
-        Pboot = bsxfun(@rdivide, bsxfun(@minus, Pboot, mbase), mstd);
-    end;
-end;
-    
 % convert to log if necessary
 % ---------------------------
 if strcmpi(g.scale, 'log')
@@ -1431,11 +1448,21 @@ if strcmpi(g.scale, 'log')
         Pboot = 10 * log10(Pboot);
     end;
 end;
+if isempty(Pboot) && exist('maskersp')
+    Pboot = maskersp;
+end;
 
 % auto scalling
 % -------------
 if isempty(g.erspmax)
-    g.erspmax = [max(max(abs(P)))/2];
+    g.erspmax = [max(max(abs(P)))]/2;
+    if strcmpi(g.scale, 'abs') && strcmpi(g.basenorm, 'off') % % of baseline
+        g.erspmax = [max(max(abs(P)))];
+        if g.erspmax > 1
+             g.erspmax = [1-(g.erspmax-1) g.erspmax];
+        else g.erspmax = [g.erspmax 1+(1-g.erspmax)];
+     	end;
+    end;
     %g.erspmax = [-g.erspmax g.erspmax]+1;
 end;
 
@@ -1649,7 +1676,7 @@ switch lower(g.plotersp)
             % plot curves
             if ~strcmpi(g.freqscale, 'log')
                 plot(freqs,E,'LineWidth',g.linewidth); hold on;
-                if ~isnan(g.alpha)
+                if ~isnan(g.alpha) && size(Pboot,2) == 2
                     try
                         plot(freqs,Pboot(:,:)'+[E;E], 'g', 'LineWidth',g.linewidth)
                         plot(freqs,Pboot(:,:)'+[E;E], 'k:','LineWidth',g.linewidth)
