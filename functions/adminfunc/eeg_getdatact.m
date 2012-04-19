@@ -244,6 +244,7 @@ else
         %end;
     end;
     
+    oldnbchan = EEG.nbchan;
     if ~isempty(opt.interp)
         EEG.data   = data;
         EEG.event  = [];
@@ -252,7 +253,7 @@ else
         data = EEG.data;
     end;
 
-    if ~isequal(opt.channel, [1:EEG.nbchan]) || isempty(opt.interp)
+    if ~isequal(opt.channel, [1:oldnbchan]) || isempty(opt.interp)
         data = data(opt.channel,:,:);
     end;
 end;
