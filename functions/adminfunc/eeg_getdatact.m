@@ -245,14 +245,16 @@ else
     end;
     
     if ~isempty(opt.interp)
-        EEG.data        = data;
+        EEG.data   = data;
         EEG.event  = [];
         EEG.epoch  = [];
         EEG = eeg_interp(EEG, opt.interp, 'spherical');
         data = EEG.data;
     end;
 
-    data = data(opt.channel,:,:);
+    if ~isequal(opt.channel, [1:EEG.nbchan]) || isempty(opt.interp)
+        data = data(opt.channel,:,:);
+    end;
 end;
 
 
