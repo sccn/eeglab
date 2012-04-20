@@ -403,7 +403,8 @@ elseif iseeg
           p3((3*i - 2) : (3 * i), 1:3) = [pos(i,:); pos(i,:); pos(i,:)];
           p3((3*i - 2) : (3 * i), 4:6) = [1 0 0; 0 1 0; 0 0 1];
         end
-        lf = metufem('pot', p3');
+        lf = metufem('pot', p3','interp');
+        %lf = metufem('pot',p3');
 
       case 'metubem'
         session = vol.session;
