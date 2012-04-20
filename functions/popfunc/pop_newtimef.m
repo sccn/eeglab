@@ -1,11 +1,11 @@
 % pop_newtimef() - Returns estimates and plots of event-related (log) spectral
-%           perturbation (ERSP) and inter-trial coherence (ITC) changes 
-%           timelocked to a set of input events in one data channel. 
+%           perturbation (ERSP) and inter-trial coherence (ITC) phenomena 
+%           timelocked to a set of single-channel input epochs 
 %
 % Usage:
-%   >> pop_newtimef(EEG, typeplot); % pop_up window
+%   >> pop_newtimef(EEG, typeplot);          % pop_up window
 %   >> pop_newtimef(EEG, typeplot, lastcom); % pop_up window
-%   >> pop_newtimef(EEG, typeplot, channel); % do not pop-up
+%   >> pop_newtimef(EEG, typeplot, channel); % do not pop-up window
 %   >> pop_newtimef(EEG, typeproc, num, tlimits,cycles,
 %                        'key1',value1,'key2',value2, ... );   
 %     
@@ -71,30 +71,31 @@
 % 
 % Inputs:            
 %   INEEG    - input EEG dataset
-%   typeproc - type of processing. 1 process the raw
-%              data and 0 the ICA components
+%   typeproc - type of processing: 1 process the raw channel data 
+%                                  0 process the ICA component data
 %   num      - component or channel number
-%   tlimits  - [mintime maxtime] (ms) sub-epoch time limits
-%   cycles   -  >0 -> Number of cycles in each analysis wavelet 
-%               0 -> Use FFTs (with constant window length)
+%   tlimits  - [mintime maxtime] (ms) sub-epoch time limits to plot
+%   cycles   -  > 0 --> Number of cycles in each analysis wavelet 
+%               = 0 --> Use FFTs (with constant window length 
+%                       at all frequencies)
 %
 % Optional inputs:
 %    See the newtimef() function.
 %    
-% Outputs: same as newtimef(), no outputs are returned when a
+% Outputs: Same as newtimef(); no outputs are returned when a
 %          window pops-up to ask for additional arguments
 %
-% Getting the ERSP and ITC output values:
-% Simply look up the history using the eegh function (type eegh).
-% Then copy and paste the pop_newtimef command call and manually add output
-% (see the newtimef function for a list of outputs). For instance
-% [ersp itc powbase times frequencies] = pop_newtimef( EEG, ....);
+% Saving the ERSP and ITC output values:
+%    Simply look up the history using the eegh function (type eegh).
+%    Then copy and paste the pop_newtimef() command and add output args.
+%    See the newtimef() function for a list of outputs. For instance,
+% >> [ersp itc powbase times frequencies] = pop_newtimef( EEG, ....);
 %
-% Author: Arnaud Delorme, CNL / Salk Institute, 2001
+% Author: Arnaud Delorme, CNL / Salk Institute, 2001 
 %
 % See also: newtimef(), eeglab() 
 
-% Copyright (C) 2002 arno@salk.edu, Arnaud Delorme, CNL / Salk Institute
+% Copyright (C) 2002 University of California San Diego
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
