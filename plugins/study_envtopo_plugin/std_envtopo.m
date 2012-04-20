@@ -73,10 +73,13 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1.07  USA
 %
 % History
+% 02/28/2012 ver 5.0 by Makoto. Values are now normalized by the number of subjects participating to the cluster. Group difference is better addressed when performing subtraction across groups. A group ratio is output too.
+% 02/24/2012 ver 4.5 by Makoto. New color schema to improve color readability & shared line colors across multiple plots
+% 02/22/2012 ver 4.4 by Makoto. Now plot title can accept numbers
 % 01/24/2012 ver 4.3 by Makoto. Output added for the function.
 % 01/17/2012 ver 4.2 by Makoto. Improved diff option; now mutually exclusive with normal plot. Diff title improved too. 
 % 01/06/2012 ver 4.1 by Makoto. Time range options fixed. STUDY.design selection fixed. Wrong labels fixed. (Thanks to Agatha Lenartowicz!) 'sortvar' and 'topotype' implemented in the main function. Help edited.
-% 12/30/2011 ver 4.0 by Makoto. Main function 100% redesigned. Full support for Study.design.
+% 12/30/2011 ver 4.0 by Makoto. Main function 100% redesigned. Full support for Study design.
 % 12/26/2011 ver 3.2 by Makoto. Formats corrected.
 % 12/25/2011 ver 3.1 by Makoto. Bug fixed about choosing wrong clusters under some conditions. 
 % 10/12/2011 ver 3.0 by Makoto. Completed the alpha version. 
@@ -195,9 +198,37 @@ for cls = 1:length(arglist.clust_grandERP) % For all clusters for grandERP
 end
 clear cls columnwise erp rowwise topo topoerpconv
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Normalization by dividing with the number of subjects %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+setinds = {STUDY.cluster.setinds};
+for n = 1:length(setinds)
+    for row = 1:size(setinds{1,1}, 1)
+        for column = 1:size(setinds{1,1}, 2)
+            nsubject{1,n}(row,column) = length(unique(setinds{1,n}{row,column}));
+        end
+    end
+    nsubject_group{1,n} = nsubject{1,n}(1,:);
+end
+arglist.normalize_cluster = nsubject_group;
+
+for n = 1:size(topoerpconv_pile, 3) % for the number of clusters
+        str = sprintf('In %s, ', arglist.clustlabels{1,n});
+    for m = 1:size(setinds{1,1}, 2) % for the number of groups
+        topoerpconv_pile(:,:,n,:,m) = topoerpconv_pile(:,:,n,:,m)./arglist.normalize_cluster{1,arglist.clust_grandERP(n)}(1,m);
+        str = [str sprintf('%d %s ', arglist.normalize_cluster{1,arglist.clust_grandERP(n)}(1,m), num2str(STUDY.group{1,m}))];
+    end
+    if length(STUDY.group) > 1
+        disp(str)
+    end
+end
+clear column n row setinds nsubject* str
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Apply new baseline (if specified) %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
+
 if isfield(arglist, 'baselinelimits')
     topoerpconv_pile = topoerpconv_pile - repmat(mean(topoerpconv_pile(:, arglist.baselinelimits,:,:,:), 2), [1, size(topoerpconv_pile, 2), 1,1,1]);
     fprintf('\nNew baseline applied.\n')
@@ -239,11 +270,13 @@ clear tmpmin tmpmax datarange
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%   
 
 if isempty(arglist.diff)
+    % Create an dummy color log to share line colors for the same clusters across plots
+    colorlog = zeros(1,2);
     for columnwise = 1:size(topoerpconv_pile, 4) % For all conditions
         for rowwise = 1:size(topoerpconv_pile, 5) % For all groups
             figure; set(gcf,'Color', [0.93 0.96 1]); orient landscape;
-            arglist.title = [STUDY.design(STUDY.currentdesign).variable(1,1).label ' ' STUDY.design(STUDY.currentdesign).variable(1,1).value{1, columnwise} ' ' STUDY.design(STUDY.currentdesign).variable(1,2).label ' ' STUDY.design(STUDY.currentdesign).variable(1,2).value{1, rowwise}];
-            envtopo_plot(STUDY, ALLEEG, squeeze(outermostenv(:,arglist.timepoints,1,columnwise,rowwise)), squeeze(topoerpconv_pile(:,arglist.timepoints,:,columnwise,rowwise)), arglist);
+            arglist.title = [num2str(STUDY.design(STUDY.currentdesign).variable(1,1).label) ' ' num2str(STUDY.design(STUDY.currentdesign).variable(1,1).value{1, columnwise}) ' ' num2str(STUDY.design(STUDY.currentdesign).variable(1,2).label) ' ' num2str(STUDY.design(STUDY.currentdesign).variable(1,2).value{1, rowwise})];
+            colorlog = envtopo_plot(STUDY, ALLEEG, squeeze(outermostenv(:,arglist.timepoints,1,columnwise,rowwise)), squeeze(topoerpconv_pile(:,arglist.timepoints,:,columnwise,rowwise)), colorlog, arglist);
         end
     end
 end
@@ -256,11 +289,11 @@ clear columnwise rowwise
 if ~isempty(arglist.diff)
     % First, plot title is determined
     if     length(STUDY.condition) == 1 && arglist.diff(1) == 1 && arglist.diff(3) == 1 % Group only if no condition
-        arglist.title = [STUDY.design(STUDY.currentdesign).variable(1,2).label ' ' STUDY.design(STUDY.currentdesign).variable(1,2).value{1, arglist.diff(1,2)} ' minus ' STUDY.design(STUDY.currentdesign).variable(1,2).label ' ' STUDY.design(STUDY.currentdesign).variable(1,2).value{1, arglist.diff(1,4)}];
+        arglist.title = [num2str(STUDY.design(STUDY.currentdesign).variable(1,2).label) ' ' num2str(STUDY.design(STUDY.currentdesign).variable(1,2).value{1, arglist.diff(1,2)}) ' minus ' num2str(STUDY.design(STUDY.currentdesign).variable(1,2).label) ' ' num2str(STUDY.design(STUDY.currentdesign).variable(1,2).value{1, arglist.diff(1,4)})];
     elseif     length(STUDY.group) == 1 && arglist.diff(2) == 1 && arglist.diff(4) == 1 % Condition only if no group
-        arglist.title = [STUDY.design(STUDY.currentdesign).variable(1,1).label ' ' STUDY.design(STUDY.currentdesign).variable(1,1).value{1, arglist.diff(1,1)} ' minus ' STUDY.design(STUDY.currentdesign).variable(1,1).label ' ' STUDY.design(STUDY.currentdesign).variable(1,1).value{1, arglist.diff(1,3)}];
+        arglist.title = [num2str(STUDY.design(STUDY.currentdesign).variable(1,1).label) ' ' num2str(STUDY.design(STUDY.currentdesign).variable(1,1).value{1, arglist.diff(1,1)}) ' minus ' num2str(STUDY.design(STUDY.currentdesign).variable(1,1).label) ' ' num2str(STUDY.design(STUDY.currentdesign).variable(1,1).value{1, arglist.diff(1,3)})];
     else   % if both condition and group
-        arglist.title = [STUDY.design(STUDY.currentdesign).variable(1,1).label ' ' STUDY.design(STUDY.currentdesign).variable(1,1).value{1, arglist.diff(1,1)} ' ' STUDY.design(STUDY.currentdesign).variable(1,2).label ' ' STUDY.design(STUDY.currentdesign).variable(1,2).value{1, arglist.diff(1,2)} ' minus ' STUDY.design(STUDY.currentdesign).variable(1,1).label ' ' STUDY.design(STUDY.currentdesign).variable(1,1).value{1, arglist.diff(1,3)} ' ' STUDY.design(STUDY.currentdesign).variable(1,2).label ' ' STUDY.design(STUDY.currentdesign).variable(1,1).value{1, arglist.diff(1,4)}];
+        arglist.title = [num2str(STUDY.design(STUDY.currentdesign).variable(1,1).label) ' ' num2str(STUDY.design(STUDY.currentdesign).variable(1,1).value{1, arglist.diff(1,1)}) ' ' num2str(STUDY.design(STUDY.currentdesign).variable(1,2).label) ' ' num2str(STUDY.design(STUDY.currentdesign).variable(1,2).value{1, arglist.diff(1,2)}) ' minus ' num2str(STUDY.design(STUDY.currentdesign).variable(1,1).label) ' ' num2str(STUDY.design(STUDY.currentdesign).variable(1,1).value{1, arglist.diff(1,3)}) ' ' num2str(STUDY.design(STUDY.currentdesign).variable(1,2).label) ' ' num2str(STUDY.design(STUDY.currentdesign).variable(1,1).value{1, arglist.diff(1,4)})];
     end
     % Calculation and plotting
     figure; set(gcf,'Color', [0.93 0.96 1]); orient landscape;
@@ -362,7 +395,7 @@ set(2, 'UserData', userdat);
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [compvarorder,compvars,compframes,comptimes,compsplotted,pvaf] = envtopo_plot(STUDY, ALLEEG, grandERP,projERP,varargin)
+function [colorlog] = envtopo_plot(STUDY, ALLEEG, grandERP,projERP, colorlog, varargin)
 
 % data format conversion for compatibility
 g = varargin{1,1}; clear varargin
@@ -495,45 +528,31 @@ else
 end;
 
 %
-%%%%%%%%%%%%%%%%%%%%% Read line color information %%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%% Line color information %%%%%%%%%%%%%%%%%%%%%
 %
-ENVCOLORS = strvcat('w..','r..','g..','b..','m..','c..','r..','g..','b..','m..','c..','r..','g..','b..','m..','c..','r..','g..','b..','m..','c..','r..','g..','b..','m..','c..','r..','g..','b..','m..','c..','r..','g..','b..','m..','c..','r..','g..','b..','m..','c..','r..','g..','b..','m..','c..','r..','g..','b..','m..','c..','r..','g..','b..','m..','c..','r..','g..','b..','m..','c..','r..','g..','b..');
+% 16 colors names officially supported by W3C specification for HTML
+colors{1,1}  = [1 1 1];            % White
+colors{2,1}  = [1 1 0];            % Yellow
+colors{3,1}  = [1 0 1];            % Fuchsia
+colors{4,1}  = [1 0 0];            % Red
+colors{5,1}  = [0.75  0.75  0.75]; % Silver
+colors{6,1}  = [0.5 0.5 0.5];      % Gray
+colors{7,1}  = [0.5 0.5 0];        % Olive
+colors{8,1}  = [0.5 0 0.5];        % Purple
+colors{9,1}  = [0.5 0 0];          % Maroon
+colors{10,1} = [0 1 1];            % Aqua
+colors{11,1} = [0 1 0];            % Lime
+colors{12,1} = [0 0.5 0.5];        % Teal
+colors{13,1} = [0 0.5 0];          % Green
+colors{14,1} = [0 0 1];            % Blue
+colors{15,1} = [0 0 0.5];          % Navy
+colors{16,1} = [0 0 0];            % Black
 
-if isempty(g.colorfile)
-    g.colorfile = ENVCOLORS; % use default color order above
-elseif ~isstr(g.colorfile)
-    error('Color file name must be a string.');
-end
-if strcmpi(g.colorfile,'bold')
-    all_bold = 1;
-    g.colorfile = ENVCOLORS; % default colors
-end
-if exist(g.colorfile) == 2  % if an existing file
-    cid = fopen(g.colorfile,'r');
-    if cid <3,
-        error('cannot open color file');
-    else
-        colors = fscanf(cid,'%s',[3 MAXENVPLOTCHANS]);
-        colors = colors';
-    end;
-else
-    colors = g.colorfile;
-end
-[r c] = size(colors);
-for i=1:r
-    for j=1:c
-        if colors(i,j)=='.',
-            if j==1
-                error('Color file should have color letter in 1st column.');
-            elseif j==2
-                colors(i,j)='-';
-            elseif j>2
-                colors(i,j)=' ';
-            end;
-        end;
-    end;
-end;
-colors(1,1) = 'k'; % make sure 1st color (for data envelope) is black
+% Silver is twice brighter because used for background
+colors{5,1} = [0.875 0.875 0.875];
+
+% Choosing and sorting 12 colors for line plot, namely Red, Blue, Green, Fuchsia, Lime, Aqua, Maroon, Olive, Purple, Teal, Navy, and Gray
+linecolors = colors([4 13 14 3 11 10 9 7 8 12 15 6]);
 
 %
 %%%%%%%%%%%%%%%% Check other input variables %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -812,7 +831,6 @@ end
 %
 %%%%%%%%%%%%%%%%% Plot the envelope of the summed selected components %%%%%%%%%%%%%%%%%
 %
-mapcolors = 1:ntopos+1;
 
 if strcmpi(g.sumenv,'on')  | strcmpi(g.sumenv,'fill')
     sumenv = envelope(sumproj, g.envmode);
@@ -824,26 +842,26 @@ if strcmpi(g.sumenv,'on')  | strcmpi(g.sumenv,'fill')
         %
         mins = matsel(sumenv,frames,0,2,0);
         p=fill([times times(frames:-1:1)],...
-            [matsel(sumenv,frames,0,1,0) mins(frames:-1:1)],FILLCOLOR);
-        set(p,'EdgeColor',FILLCOLOR);
+            [matsel(sumenv,frames,0,1,0) mins(frames:-1:1)], colors{5,1});
+        set(p,'EdgeColor',colors{5,1});
         hold on
         %
         % Overplot the data envelope so it is not covered by the fill()'d component
         %
-        p=plot(times,matsel(envdata,frames,0,1,1),colors(mapcolors(1),1));% plot the max
+        p=plot(times,matsel(envdata,frames,0,1,1),'Color', colors{16,1});% plot the max
         set(p,'LineWidth',2);                % component order (if BOLD_COLORS==0)
-        p=plot(times,matsel(envdata,frames,0,2,1),colors(mapcolors(1),1));% plot the min
+        p=plot(times,matsel(envdata,frames,0,2,1),'Color', colors{16,1});% plot the min
         set(p,'LineWidth',2);                % component order (if BOLD_COLORS==0)
 
     else % if no 'fill'
         tmp = matsel(sumenv,frames,0,2,0);
         p=plot(times,tmp);% plot the min
         hold on
-        set(p,'color',FILLCOLOR);
+        set(p,'Color', colors{5,1});
         set(p,'linewidth',2);
         p=plot(times,matsel(sumenv,frames,0,1,0));% plot the max
         set(p,'linewidth',2);
-        set(p,'color',FILLCOLOR);
+        set(p,'Color', colors{5,1});
     end
 end
 if strcmpi(g.sortvar,'pvaf')| strcmpi(g.sortvar,'pv')
@@ -861,93 +879,101 @@ end
 %
 % %%%%%%%%%%%%%%%%%%%%%%%% Plot the computed component envelopes %%%%%%%%%%%%%%%%%%
 %
-%envx = [1;compx+1]; % this depends on the orientation of compx, this is a
-%column vector
 envx = [1,compx+1];
-
+hold on
 for c = 1:ntopos+1
-    curenv = matsel(envdata,frames,0,1,envx(c));
-    if ~ylimset & max(curenv) > ymax, ymax = max(curenv); end
-    p=plot(times,curenv,colors(mapcolors(c),1));% plot the max
-    set(gca,'FontSize',12,'FontWeight','Bold')
-    if c==1                                % Note: use colors in original
-        set(p,'LineWidth',2);              %       component order (if BOLD_COLORS==0)
-    else
-        set(p,'LineWidth',1);
-    end
-    if all_bold > 0
-        set(p,'LineStyle','-','LineWidth',3);
-    elseif mapcolors(c)>15                            % thin/dot 16th-> comp. envs.
-        set(p,'LineStyle',':','LineWidth',1);
-    elseif mapcolors(c)>10                            %
-        set(p,'LineStyle',':','LineWidth',2);
-    elseif mapcolors(c)>6                             % dot 6th-> comp. envs.
-        set(p,'LineStyle',':','LineWidth',3);
-    elseif mapcolors(c)>1
-        set(p,'LineStyle',colors(mapcolors(c),2),'LineWidth',1);
-        if colors(mapcolors(c),2) == ':'
-            set(l1,'LineWidth',2);  % embolden dotted env lines
+    for envside = [1 2]
+        if envside == 1 % maximum envelope
+            curenv = matsel(envdata,frames,0,1,envx(c));
+            if ~ylimset & max(curenv) > ymax
+                ymax = max(curenv);
+            end
+        else           % minimum envelope
+            curenv = matsel(envdata,frames,0,2,envx(c));
+            if ~ylimset & min(curenv) < ymin
+                ymin = min(curenv);
+            end
         end
-    end
-    hold on
-    curenv = matsel(envdata,frames,0,2,envx(c));
-    if ~ylimset & min(curenv) < ymin, ymin = min(curenv); end
-    p=plot(times,curenv,colors(mapcolors(c),1));% plot the min
+        p=plot(times,curenv);
 
-    if c==1
-        set(p,'LineWidth',2);
-    else
-        set(p,'LineWidth',1);
-    end
-    if all_bold > 0
-        set(p,'LineStyle','-','LineWidth',3);
-    elseif mapcolors(c)>15                            % thin/dot 11th-> comp. envs.
-        set(p,'LineStyle',':','LineWidth',1);
-    elseif mapcolors(c)>10
-        set(p,'LineStyle',':','LineWidth',2);
-    elseif mapcolors(c)>6                             % dot 6th-> comp. envs.
-        set(p,'LineStyle',':','LineWidth',3);
-    elseif mapcolors(c)>1
-        set(p,'LineStyle',colors(mapcolors(c),2),'LineWidth',1);
-        if colors(mapcolors(c),2) == ':'
-            set(l1,'LineWidth',2);  % embolden dotted env lines
-        end
-    end
-    if c==1 & ~isempty(g.vert)
-        for v=1:length(g.vert)
-            vl=plot([g.vert(v) g.vert(v)], [-1e10 1e10],'k--'); % plot specified vertical lines
-            if any(g.limcontrib ~= 0) & v>= length(g.vert)-1;
-                set(vl,'linewidth',LIMCONTRIBWEIGHT);
-                set(vl,'linestyle',':');
+        % First, the outermost envelope
+        if c == 1
+            set(p, 'Color', colors{16,1},'LineWidth',2, 'LineStyle', '-');
+        % After the second, each cluster
+        elseif isempty(intersect(colorlog(:,1), envx(c)))
+            if colorlog(1,1) == 0 && colorlog(1,2) == 0 % initial state
+                colorlog(1,:) = [envx(c) 1];
             else
-                set(vl,'linewidth',VERTWEIGHT);
-                set(vl,'linestyle','--');
+                colorlog(end+1,:) = [envx(c) size(colorlog,1)+1];
+            end
+
+            if     colorlog(end,2) < 13
+                set(p, 'Color' ,linecolors{colorlog(end,2)},   'LineWidth',1, 'LineStyle', '-');
+            elseif colorlog(end,2) < 25
+                set(p, 'Color' ,linecolors{colorlog(end,2)-12},'LineWidth',3, 'LineStyle', ':');
+            elseif colorlog(end,2) < 37
+                set(p, 'Color' ,linecolors{colorlog(end,2)-24},'LineWidth',1, 'LineStyle', '--');
+            elseif colorlog(end,2) < 49
+                set(p, 'Color' ,linecolors{colorlog(end,2)-36},'LineWidth',2, 'LineStyle', '-.');
+            elseif colorlog(end,2) < 61
+                set(p, 'Color' ,linecolors{colorlog(end,2)-48},'LineWidth',2, 'LineStyle', '-');
+            else   % this is for cluster numbers more than 60 
+                set(p, 'Color', colors{16,1},                  'LineWidth',1, 'LineStyle', ':');
+            end
+        else
+            [d, IA, IB] = intersect(colorlog(:,1), envx(c));
+            if     IA < 13
+                set(p, 'Color' ,linecolors{IA},   'LineWidth',1, 'LineStyle', '-');
+            elseif IA < 25
+                set(p, 'Color' ,linecolors{IA-12},'LineWidth',3, 'LineStyle', ':');
+            elseif IA < 37
+                set(p, 'Color' ,linecolors{IA-24},'LineWidth',1, 'LineStyle', '--');
+            elseif IA < 49
+                set(p, 'Color' ,linecolors{IA-36},'LineWidth',2, 'LineStyle', '-.');
+            elseif IA < 61
+                set(p, 'Color' ,linecolors{IA-48},'LineWidth',2, 'LineStyle', '-');
+            else   % this is for cluster numbers more than 60 
+                set(p, 'Color', colors{16,1}   ,'LineWidth',1, 'LineStyle', ':');
             end
         end
     end
-    if g.limits(1) <= 0 & g.limits(2) >= 0    % plot vertical line at time zero
-        vl=plot([0 0], [-1e10 1e10],'k');
-        set(vl,'linewidth',2);
-    end
+end
+set(gca,'FontSize',12,'FontWeight','Bold')
 
-    %
-    % plot the n-th component filled
-    %
-    if g.fillcomp(1)>0 & find(g.fillcomp==c-1)
-        fprintf('filling the envelope of component %d\n',c-1);
-        mins = matsel(envdata,frames,0,2,envx(c));
-        p=fill([times times(frames:-1:1)],...
-            [matsel(envdata,frames,0,1,envx(c)) mins(frames:-1:1)],...
-            colors(mapcolors(c),1));
-        %
-        % Overplot the data envlope again so it is not covered by the fill()'d component
-        %
-        p=plot(times,matsel(envdata,frames,0,1,1),colors(mapcolors(1),1));% plot the max
-        set(p,'LineWidth',2);                % component order (if BOLD_COLORS==0)
-        p=plot(times,matsel(envdata,frames,0,2,1),colors(mapcolors(1),1));% plot the min
-        set(p,'LineWidth',2);                % component order (if BOLD_COLORS==0)
+% plot vertical line at time zero
+if g.limits(1) <= 0 & g.limits(2) >= 0
+    vl=plot([0 0], [-1e10 1e10],'k');
+    set(vl,'linewidth',2);
+end
+
+% if specified by option, plot specified vertical lines
+if c==1 & ~isempty(g.vert)
+    for v=1:length(g.vert)
+        vl=plot([g.vert(v) g.vert(v)], [-1e10 1e10],'k--');
+        if any(g.limcontrib ~= 0) & v>= length(g.vert)-1;
+            set(vl,'linewidth',LIMCONTRIBWEIGHT);
+            set(vl,'linestyle',':');
+        else
+            set(vl,'linewidth',VERTWEIGHT);
+            set(vl,'linestyle','--');
+        end
     end
-end  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+end
+
+% if specified by option, plot the n-th component filled
+if g.fillcomp(1)>0 & find(g.fillcomp==c-1)
+    fprintf('filling the envelope of component %d\n',c-1);
+    mins = matsel(envdata,frames,0,2,envx(c));
+    p=fill([times times(frames:-1:1)],...
+        [matsel(envdata,frames,0,1,envx(c)) mins(frames:-1:1)],...
+        colors(mapcolors(c),1));
+    % Overplot the data envlope again so it is not covered by the fill()'d component
+    p=plot(times,matsel(envdata,frames,0,1,1),colors(mapcolors(1),1));% plot the max
+    set(p,'LineWidth',2);                % component order (if BOLD_COLORS==0)
+    p=plot(times,matsel(envdata,frames,0,2,1),colors(mapcolors(1),1));% plot the min
+    set(p,'LineWidth',2);                % component order (if BOLD_COLORS==0)
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %
 %%%%%%%%%%%%%%%%%%%%%%% Extend y limits by 5% %%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -994,8 +1020,7 @@ pwidth  = pmax-pmin;
 height = ymax-ymin;
 
 if strcmpi(g.dispmaps, 'on')
-    for t=1:ntopos % draw oblique lines from max env vals (or plot top)
-        % to map bases, in left to right order
+    for t=1:ntopos % draw oblique lines from max env vals (or plot top) to map bases, in left to right order
         %
         %%%%%%%%%%%%%%%%%%% draw oblique lines %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %
@@ -1013,46 +1038,60 @@ if strcmpi(g.dispmaps, 'on')
         if (data_y > pos(2)+0.6*pos(4))
             data_y = pos(2)+0.6*pos(4);
         end
-        l1 = plot([(plottimes(t)-pmin)/pwidth  ...
-            topoleft + 1/pos(3)*(t-1)*1.2*topowidth + (topowidth*0.6)],...
-            [data_y 0.68], ...
-            colors(linestyles(t)+1)); % 0.68 is bottom of topo maps
-        if all_bold > 0
-            set(l1,'LineStyle','-','LineWidth',3);
-        elseif linestyles(t)>15                        % thin/dot 11th-> comp. envs.
-            set(l1,'LineStyle',':','LineWidth',1);
-        elseif linestyles(t)>10
-            set(l1,'LineStyle',':','LineWidth',2);
-        elseif linestyles(t)>5                     % dot 6th-> comp. envs.
-            set(l1,'LineStyle',':','LineWidth',3);
-        elseif linestyles(t)>1
-            set(l1,'LineStyle',colors(linestyles(t)+1,2),'LineWidth',1);
-            if colors(linestyles(t)+1,2) == ':'
-                set(l1,'LineStyle',colors(linestyles(t)+1,2),'LineWidth',2);
-            end
+        
+        % plot the oblique line
+        l1 = plot([(plottimes(t)-pmin)/pwidth topoleft + 1/pos(3)*(t-1)*1.2*topowidth + (topowidth*0.6)], [data_y 0.68]); % 0.68 is bottom of topo maps
+        
+        % match cluster number and color using colorlog
+        [d IA IB] = intersect(colorlog(:,1), compx(t)+1);
+        if     IA < 13
+            set(l1, 'Color' ,linecolors{IA},'LineWidth',1, 'LineStyle', '-');
+        elseif IA < 25
+            set(l1, 'Color' ,linecolors{IA-12},'LineWidth',3, 'LineStyle', ':');
+        elseif IA < 37
+            set(l1, 'Color' ,linecolors{IA-24},'LineWidth',1, 'LineStyle', '--');
+        elseif IA < 49
+            set(l1, 'Color' ,linecolors{IA-36},'LineWidth',2, 'LineStyle', '-.');
+        elseif IA < 61
+            set(l1, 'Color' ,linecolors{IA-48},'LineWidth',2, 'LineStyle', '-');
+        else   % this is for cluster numbers more than 60 
+            set(l1, 'Color', colors{16,1}   ,'LineWidth',1, 'LineStyle', ':');
         end
+        
         hold on
         %
         %%%%%%%%%%%%%%%%%%%% add specified vertical lines %%%%%%%%%%%%%%%%%%%%%%%%%
         %
         if g.voffsets(t) > 0
-            l2 = plot([(plottimes(t)-xmin)/width  ...
-                (plottimes(t)-xmin)/width],...
-                [0.6*(maxenv-ymin)/height ...
-                0.6*(g.voffsets(t)+maxenv-ymin)/height],...
-                colors(linestyles(t)+1));
-            if all_bold > 0
-                set(l2,'LineStyle','-','LineWidth',3);
-            elseif linestyles(t)>15                      % thin/dot 11th-> comp. envs.
-                set(l2,'LineStyle',':','LineWidth',1);
-            elseif linestyles(t)>10
-                set(l2,'LineStyle',':','LineWidth',2);
-            elseif linestyles(t)>5                   % dot 6th-> comp. envs.
-                set(l2,'LineStyle',':','LineWidth',3);
+            l2 = plot([(plottimes(t)-xmin)/width (plottimes(t)-xmin)/width],[0.6*(maxenv-ymin)/height 0.6*(g.voffsets(t)+maxenv-ymin)/height]);
+            if isempty(intersect(colorlog(:,1), compx(t)+1))
+                if     t > 60
+                    set(l2, 'Color', colors{16,1}         ,'LineWidth',1, 'LineStyle', ':');
+                elseif t > 48
+                    set(l2, 'Color' ,linecolors{mod(t,12)},'LineWidth',2, 'LineStyle', '-');
+                elseif t > 36
+                    set(l2, 'Color' ,linecolors{mod(t,12)},'LineWidth',2, 'LineStyle', '-.');
+                elseif t > 24
+                    set(l2, 'Color' ,linecolors{mod(t,12)},'LineWidth',1, 'LineStyle', '--');
+                elseif t > 12
+                    set(l2, 'Color' ,linecolors{mod(t,12)},'LineWidth',3, 'LineStyle', ':');
+                elseif t > 0
+                    set(l2, 'Color' ,linecolors{mod(t,12)} ,'LineWidth',1, 'LineStyle', '-');
+                end
             else
-                set(l1,'LineStyle',colors(linestyles(t)+1,2),'LineWidth',1);
-                if colors(linestyles(t)+1,2) == ':'
-                    set(l1,'LineWidth',2);
+                d = intersect(colorlog(:,1), compx(t)+1);
+                if     d > 60
+                    set(l2, 'Color' ,linecolors{colorlog(IA, 2)},'LineWidth',1, 'LineStyle', ':');
+                elseif d > 48
+                    set(l2, 'Color' ,linecolors{colorlog(IA, 2)},'LineWidth',2, 'LineStyle', '-');
+                elseif d > 36
+                    set(l2, 'Color' ,linecolors{colorlog(IA, 2)},'LineWidth',2, 'LineStyle', '-.');
+                elseif d > 24
+                    set(l2, 'Color' ,linecolors{colorlog(IA, 2)},'LineWidth',1, 'LineStyle', '--');
+                elseif d > 12
+                    set(l2, 'Color' ,linecolors{colorlog(IA, 2)},'LineWidth',3, 'LineStyle', ':');
+                elseif d > 0
+                    set(l2, 'Color' ,linecolors{colorlog(IA, 2)},'LineWidth',1, 'LineStyle', '-');
                 end
             end
         end
