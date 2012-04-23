@@ -616,6 +616,7 @@ if ismatlab
     uimenu( event_m, 'Label', 'From Matlab array or ASCII file'       , 'CallBack', cb_importevent);
     uimenu( event_m, 'Label', 'From data channel'                     , 'CallBack', cb_chanevent); 
     uimenu( event_m, 'Label', 'From Presentation .LOG file'           , 'CallBack', cb_importpres); 
+    uimenu( event_m, 'Label', 'From E-Prime ASCII (text) file'        , 'CallBack', cb_importevent);
     uimenu( event_m, 'Label', 'From Neuroscan .ev2 file'              , 'CallBack', cb_importev2); 
     uimenu( exportm, 'Label', 'Data and ICA activity to text file'    , 'CallBack', cb_export);
     uimenu( exportm, 'Label', 'Weight matrix to text file'            , 'CallBack', cb_expica1); 
