@@ -5,6 +5,7 @@
 %               4-D data matrices speeds processing.
 % Usage:
 %          >> [stats, df, pvals, surrog] = statcond( data, 'key','val'... );
+%
 % Inputs:
 %   data       = one-or two-dimensional cell array of data matrices. 
 %                   For nonparametric, permutation-based testing, the 
@@ -72,6 +73,7 @@
 %                 with three elements: output(1) = row effects; 
 %                 output(2) = column effects; output(3) = interactions
 %                 between rows and columns.
+%
 % Examples:
 %      >> a = { rand(1,10) rand(1,10)+0.5 }; % pseudo 'paired' data vectors
 %         [t df pvals] = statcond(a);        % perform paired t-test
@@ -101,7 +103,7 @@
 %                                      % across rows and columns
 %
 % Author: Arnaud Delorme, SCCN/INC/UCSD, La Jolla, 2005-
-%         With rhanks to Robert Oostenveld for fruitful discussions 
+%         With thanks to Robert Oostenveld for fruitful discussions 
 %         and advice on this function.
 %
 % See also: anova1_cell(), anova2_cell(), anova2rm_cell, fcdf()
@@ -181,6 +183,15 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
          tmpsize   = size(data{1});
          surrogval = zeros([ tmpsize(1:end-1) g.naccu ], 'single');
     else surrogval = [];
+    end;
+    
+    % check for NaNs or Inf
+    % ---------------------
+    for iDat = 1:length(data(:))
+        if any(isnan(reshape(data{iDat}, prod(size(data{iDat})),1))) || ...
+                any(isinf(reshape(data{iDat}, prod(size(data{iDat})),1)))
+            error('Statcond: One of the input array contains NaNs or Infinite values');
+        end;
     end;
         
     % bootstrap flag
