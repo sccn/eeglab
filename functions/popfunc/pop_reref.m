@@ -71,6 +71,7 @@ end;
 % gui inputs
 % ----------
 orichanlocs = EEG.chanlocs;
+orinbchan   = EEG.nbchan;
 if nargin < 2
     
     % find initial reference
@@ -249,21 +250,28 @@ if ~isempty(EEG.icaweights)
             error('Cannot re-reference ICA decomposition without channel locations')
         end;
         
-        [EEG.icawinv newchanlocs] = reref(EEG.icawinv, ref, optionscall{:});
+        newICAchaninds = zeros(orinbchan, size(EEG.icawinv,2));
+        newICAchaninds(EEG.icachansind,:) = EEG.icawinv;
+        
+        [newICAchaninds newchanlocs] = reref(newICAchaninds, ref, optionscall{:});
         
         % convert channel indices in icachanlocs (uses channel labels)
         % ------------------------------------------------------------
         icachansind = EEG.icachansind;
+        rminds      = [1:size(newICAchaninds,1)];
         for i=length(icachansind):-1:1
             oldLabel    = orichanlocs(icachansind(i)).labels;
             newLabelPos = strmatch(oldLabel, { newchanlocs.labels }, 'exact');
             
             if ~isempty( newLabelPos )
                 icachansind(i) = newLabelPos;
+                rminds(find(icachansind(i) == rminds)) = [];
             else
                 icachansind(i) = [];
             end;
         end;
+        newICAchaninds(rminds,:) = [];
+        EEG.icawinv = newICAchaninds;
         
         EEG.icachansind = icachansind;
         if length(EEG.icachansind) ~= size(EEG.icawinv,1)
