@@ -70,6 +70,7 @@ end;
 
 % gui inputs
 % ----------
+orichanlocs = EEG.chanlocs;
 if nargin < 2
     
     % find initial reference
@@ -244,40 +245,29 @@ if ~isempty(EEG.icaweights)
         EEG.icasphere  = [];
     else
         fprintf('Re-referencing ICA matrix\n');
-        EEG.icawinv = reref(EEG.icawinv, ref, optionscall{:});
-        
-        % get output channel indices
-        % --------------------------
-        chansout = 1:nchans;
-        if ~isempty(ref) & strcmpi(g.keepref,'off')
-            ref = sort(ref);
-            for ind = length(ref):-1:1
-                chansout(ref(ind)+1:end) = chansout(ref(ind)+1:end)-1;
-                chansout(ref(ind)) = [];
-            end;
+        if isempty(orichanlocs)
+            error('Cannot re-reference ICA decomposition without channel locations')
         end;
         
-        % convert channel indices in icachanlocs
-        % --------------------------------------
+        [EEG.icawinv newchanlocs] = reref(EEG.icawinv, ref, optionscall{:});
+        
+        % convert channel indices in icachanlocs (uses channel labels)
+        % ------------------------------------------------------------
         icachansind = EEG.icachansind;
         for i=length(icachansind):-1:1
-            indchan = find( icachansind(i) == chansout );
-            if ~isempty( indchan )
-                icachansind(i) = indchan;
+            oldLabel    = orichanlocs(icachansind(i)).labels;
+            newLabelPos = strmatch(oldLabel, { newchanlocs.labels }, 'exact');
+            
+            if ~isempty( newLabelPos )
+                icachansind(i) = newLabelPos;
             else
                 icachansind(i) = [];
             end;
         end;
         
-        % add new channel if necessary
-        if ~isempty(g.refloc)
-            icachansind = [ icachansind [1:length(g.refloc)]+size(EEG.data,1)-1 ];
-        end;
-        
         EEG.icachansind = icachansind;
         if length(EEG.icachansind) ~= size(EEG.icawinv,1)
             warning('Wrong channel indices, removing ICA decomposition');
-            dsafdsf
             EEG.icaweights = [];
             EEG.icasphere  = [];
         else
