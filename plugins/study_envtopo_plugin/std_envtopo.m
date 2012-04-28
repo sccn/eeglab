@@ -36,7 +36,7 @@
 %                   Must be provided with 4 numbers. If no condition/group, 1.
 %  'timerange'   = data epoch start and end input latencies (in ms)
 %                   {default: from 'limits' if any}
-%  'limits'      = [minuV maxuV]. {default: use data uV limits}
+%  'amplimits'      = [minuV maxuV]. {default: use data uV limits}
 %  'limcontrib'  = [minms maxms]  time range (in ms) in which to rank cluster contributions
 %                   (boundaries = thin dotted lines) {default|[]|[0 0] -> plotting limits}
 %  'vert'        = vector of times (in ms) at which to plot vertical dashed lines
@@ -48,6 +48,7 @@
 %  'topotype'    = ['inst'|'ave'] If 'inst', show the instantaneous map at the specific timepoint specified by the line.
 %                   If 'ave', show that of the mean which is the same as the
 %                   stored topomap. {default: 'inst'}
+%  'fillclust'    = [integer] fill the numbered component envelope with red. {default|[]|0 -> no fill}
 %
 % Author: Makoto Miyakoshi, Hilit Serby, Arnold Delorme, Scott Makeig
 % The original version of this script was written by Hilit Serby and redesigned by Makoto Miyakoshi.
@@ -73,6 +74,7 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1.07  USA
 %
 % History
+% 04/24/2012 ver 5.1 by Makoto. Revived 'amplimit' 'fillclust' options, and vertical doted lines for limcontrib range. Default changed into 'pvaf' from 'rv'. 
 % 02/28/2012 ver 5.0 by Makoto. Values are now normalized by the number of subjects participating to the cluster. Group difference is better addressed when performing subtraction across groups. A group ratio is output too.
 % 02/24/2012 ver 4.5 by Makoto. New color schema to improve color readability & shared line colors across multiple plots
 % 02/22/2012 ver 4.4 by Makoto. Now plot title can accept numbers
@@ -104,17 +106,18 @@ end
 % run finputcheck
 arglist = finputcheck(varargin, ...
              {'clustnums'     'integer'  [-length(STUDY.cluster):length(STUDY.cluster)  ]     [];...
-              'conditions'    'integer'  [1:length(STUDY.condition)] [1:length(STUDY.condition)];...
+              'conditions'    'integer'  [1:length(STUDY.design.variable(1,1).value)] [1:length(STUDY.design.variable(1,1).value)];...
               'clust_exclude' 'integer'  [1:length(STUDY.cluster)]                            [];...
               'onlyclus'      'string'   {'on', 'off'}                                        [];...
               'baseline'      'real'     []                                                   [];...
               'diff'          'integer'  []                                                   [];...
               'timerange'     'real'     []               [STUDY.cluster(1,2).erptimes([1 end])];...
-              'limits'        'real'     []                                                   [];...
+              'amplimits'     'real'     []                                                   [];...
               'limcontrib'    'real'     []                                                   [];...
               'vert'          'real'     []                                                   [];...
-              'sortvar'       'string'   {'pvaf', 'rv'}                                     'rv';...
-              'topotype'      'string'   {'inst', 'ave'}                                  'inst'});
+              'sortvar'       'string'   {'pvaf', 'rv'}                                   'pvaf';...
+              'topotype'      'string'   {'inst', 'ave'}                                  'inst';...
+              'fillclust'      'integer'  []                                                   []});
           
 if isstr(arglist)
     error(arglist);
@@ -251,27 +254,14 @@ if arglist.clustnums > 0;
     arglist.clustlabels = tmp{1,1}; clear tmp dummy indx
 end
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%   Determine amplitude limits if not specified    %%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
-
-if isempty(arglist.limits)
-    tmpmin = min(min(min(min(outermostenv))));
-    tmpmax = max(max(max(max(outermostenv))));
-    datarange = tmpmax-tmpmin;
-    tmpmin = tmpmin-0.05*datarange;
-    tmpmax = tmpmax+0.05*datarange;
-    arglist.limits = [tmpmin tmpmax]; % store min and max of all conditions
-end
-clear tmpmin tmpmax datarange
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%   Plot envtopo for each condition & group    %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%   
 
+% Create an dummy color log to share line colors for the same clusters across plots
+colorlog = zeros(1,2);
+
 if isempty(arglist.diff)
-    % Create an dummy color log to share line colors for the same clusters across plots
-    colorlog = zeros(1,2);
     for columnwise = 1:size(topoerpconv_pile, 4) % For all conditions
         for rowwise = 1:size(topoerpconv_pile, 5) % For all groups
             figure; set(gcf,'Color', [0.93 0.96 1]); orient landscape;
@@ -288,18 +278,18 @@ clear columnwise rowwise
 
 if ~isempty(arglist.diff)
     % First, plot title is determined
-    if     length(STUDY.condition) == 1 && arglist.diff(1) == 1 && arglist.diff(3) == 1 % Group only if no condition
+    if     length(STUDY.design.variable(1,1).value) == 1 && arglist.diff(1) == 1 && arglist.diff(3) == 1 % Group only if no condition
         arglist.title = [num2str(STUDY.design(STUDY.currentdesign).variable(1,2).label) ' ' num2str(STUDY.design(STUDY.currentdesign).variable(1,2).value{1, arglist.diff(1,2)}) ' minus ' num2str(STUDY.design(STUDY.currentdesign).variable(1,2).label) ' ' num2str(STUDY.design(STUDY.currentdesign).variable(1,2).value{1, arglist.diff(1,4)})];
     elseif     length(STUDY.group) == 1 && arglist.diff(2) == 1 && arglist.diff(4) == 1 % Condition only if no group
         arglist.title = [num2str(STUDY.design(STUDY.currentdesign).variable(1,1).label) ' ' num2str(STUDY.design(STUDY.currentdesign).variable(1,1).value{1, arglist.diff(1,1)}) ' minus ' num2str(STUDY.design(STUDY.currentdesign).variable(1,1).label) ' ' num2str(STUDY.design(STUDY.currentdesign).variable(1,1).value{1, arglist.diff(1,3)})];
     else   % if both condition and group
-        arglist.title = [num2str(STUDY.design(STUDY.currentdesign).variable(1,1).label) ' ' num2str(STUDY.design(STUDY.currentdesign).variable(1,1).value{1, arglist.diff(1,1)}) ' ' num2str(STUDY.design(STUDY.currentdesign).variable(1,2).label) ' ' num2str(STUDY.design(STUDY.currentdesign).variable(1,2).value{1, arglist.diff(1,2)}) ' minus ' num2str(STUDY.design(STUDY.currentdesign).variable(1,1).label) ' ' num2str(STUDY.design(STUDY.currentdesign).variable(1,1).value{1, arglist.diff(1,3)}) ' ' num2str(STUDY.design(STUDY.currentdesign).variable(1,2).label) ' ' num2str(STUDY.design(STUDY.currentdesign).variable(1,1).value{1, arglist.diff(1,4)})];
+        arglist.title = [num2str(STUDY.design(STUDY.currentdesign).variable(1,1).label) ' ' num2str(STUDY.design(STUDY.currentdesign).variable(1,1).value{1, arglist.diff(1,1)}) ' ' num2str(STUDY.design(STUDY.currentdesign).variable(1,2).label) ' ' num2str(STUDY.design(STUDY.currentdesign).variable(1,2).value{1, arglist.diff(1,2)}) ' minus ' num2str(STUDY.design(STUDY.currentdesign).variable(1,1).label) ' ' num2str(STUDY.design(STUDY.currentdesign).variable(1,1).value{1, arglist.diff(1,3)}) ' ' num2str(STUDY.design(STUDY.currentdesign).variable(1,2).label) ' ' num2str(STUDY.design(STUDY.currentdesign).variable(1,2).value{1, arglist.diff(1,4)})];
     end
     % Calculation and plotting
     figure; set(gcf,'Color', [0.93 0.96 1]); orient landscape;
     outermostenv = outermostenv(:,:,:,arglist.diff(1,1),arglist.diff(1,2)) - outermostenv(:,:,:,arglist.diff(1,3),arglist.diff(1,4));
     topoerpconv_pile = topoerpconv_pile(:,:,:,arglist.diff(1,1),arglist.diff(1,2)) - topoerpconv_pile(:,:,:,arglist.diff(1,3),arglist.diff(1,4));
-    envtopo_plot(STUDY, ALLEEG, squeeze(outermostenv(:,arglist.timepoints,:,:,:)), squeeze(topoerpconv_pile(:,arglist.timepoints,:,:,:)), arglist);
+    envtopo_plot(STUDY, ALLEEG, squeeze(outermostenv(:,arglist.timepoints,:,:,:)), squeeze(topoerpconv_pile(:,arglist.timepoints,:,:,:)), colorlog, arglist);
 end
 
 % Pass the current STUDY to the base workspece (this is tricky...)
@@ -325,10 +315,7 @@ set(2, 'UserData', userdat);
 %                  Else if int < 0, the number of largest contributing clusters to plot
 %                  {default|[] -> 7}
 %  'timerange' = start and end input data latencies (in ms) {default: from 'limits' if any}
-%  'limits'    = 0 or [minms maxms] or [minms maxms minuV maxuV]. Specify start/end plot
-%                  (x) limits (in ms) and min/max y-axis limits (in uV). If 0, or if both
-%                  minmx & maxms == 0 -> use latencies from 'timerange' (else 0:frames-1).
-%                  If both minuV and maxuV == 0 -> use data uV limits {default: 0}
+%  'amplimits'    = [minuV maxuV].
 %  'limcontrib' = [minms maxms]  time range (in ms) in which to rank component contribution
 %                  (boundaries shown with thin dotted lines) {default|[]|[0 0] -> plotting limits}
 %  'title'      = [string] plot title {default|[] -> none}
@@ -340,8 +327,6 @@ set(2, 'UserData', userdat);
 %                  per line, (. = blank). First color should be "w.." (white)
 %                  Else, 'bold' -> plot default colors in thick lines.
 %                  {default|[] -> standard Matlab color order}
-%  'fillcomp'   = int_vector>0 -> fill the numbered component envelope(s) with
-%                  solid color. Ex: [1] or [1 5] {default|[]|0 -> no fill}
 %  'vert'       = vector of times (in ms) at which to plot vertical dashed lines {default|[] -> none}
 %  'icawinv'    = [float array] inverse weight matrix. By default computed by inverting
 %                  the weight matrix (but if some components have been removed, then
@@ -422,7 +407,6 @@ xmin = 0; xmax = 0;
 g.envmode     = 'avg';
 g.dispmaps    = 'on';
 g.voffsets    = [];
-g.fillcomp    = 0;
 g.colorfile   = '';
 g.colors      = '';
 g.xlabel      = 'on';
@@ -453,53 +437,21 @@ axcolor = get(uraxes,'Color');
 delete(gca)
 
 %
-%%% Convert g.timerange, g.limits and g.limcontrib to sec from ms %%%%
+%%% Convert g.timerange and g.limcontrib to sec from ms %%%%
 %
 g.timerange = g.timerange/1000;   % the time range of the input data
-%g.limits(1) = g.limits(1)/1000;   % the time range to plot
-%if length(g.limits) == 1   % make g.limits at least of length 2
-%    g.limits(1) = 0; g.limits(2) = 0;
-%else
-%    g.limits(2) = g.limits(2)/1000;  %
-%end;
 g.limcontrib = g.limcontrib/1000; % the time range in which to select largest components
+
 
 %
 %%%%%%%%%%%% Collect time range information %%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-if length(g.limits) > 2 % if g.limits wrong length
-    fprintf('envtopo: limits should be 0, or [miny maxy].\n');
-elseif length(g.limits == 2) % ymin ymax only
-    g.limits(3) = g.limits(1); g.limits(4) = g.limits(2); % vestigial confusion
-end
 
-xunitframes = 0; % flag plotting if xmin & xmax are in frames instead of sec
-if ~isempty(g.timerange)   % if 'timerange' given
-    %if g.limits(1)==0 & g.limits(2)==0
-            g.limits(1) = g.timerange(1); % 
-            g.limits(2) = g.timerange(2); % 
-            xmin = g.timerange(1); % (xmin, xmax) are data limits in sec
-            xmax = g.timerange(2);
-    %end
-else % if no 'timerange' given
-    %if g.limits(1)==0 & g.limits(2)==0 % if no time limits as well,
-        fprintf('\nNOTE: No time limits given: using 0 to %d frames\n',frames-1);
-        g.limits(1) = 0;
-        g.limits(2) = frames-1;
-        xunitframes     = 1; % mark as frames instead of sec
-        xmin = g.limits(1); % (xmin, xmax) are data limits in sec
-        xmax = g.limits(2);
-    %end
-end
-
-pmin = g.limits(1); % plot min and max sec
-if pmin < xmin
-    pmin = xmin;     % don't allow plotting beyond the data limits
-end
-pmax = g.limits(2);
-if pmax > xmax
-    pmax = xmax;
-end
+xunitframes = 0;
+xmin = g.timerange(1);
+xmax = g.timerange(2);
+pmin = xmin;
+pmax = xmax;
 
 dt = (xmax-xmin)/(frames-1);  % sampling interval in sec
 times=xmin*ones(1,frames)+dt*(0:frames-1); % time points in sec
@@ -587,13 +539,6 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%% Process components %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 ncomps = length(g.clustnums);
-limitset = 0;
-if isempty(g.limits)
-    g.limits = 0;
-end
-if length(g.limits)>1
-    limitset = 1;
-end
 
 %
 %%%%%%%%%%%%%%% Compute plotframes and envdata %%%%%%%%%%%%%%%%%%%%%
@@ -796,9 +741,6 @@ delete(newaxes) %XXX
 axe = axes('Position',[pos(1) pos(2) pos(3) 0.6*pos(4)],...
     'FontSize',16,'FontWeight','Bold');
 
-if isempty(g.limits)
-    g.limits = get(axe,'Ylim');
-end
 set(axe,'GridLineStyle',':')
 set(axe,'Xgrid','off')
 set(axe,'Ygrid','on')
@@ -806,36 +748,20 @@ axes(axe)
 set(axe,'Color',axcolor);
 
 %
-%%%%%%%%%%%% Collect y-axis range information %%%%%%%%%%%%%%%%%%%%%%%%
-%
-ylimset = 0; % flag whether hard limits have been set by the user
-ymin = min(min(grandERP(:,pframes))); % begin by setting limits from plotted data
-ymax = max(max(grandERP(:,pframes)));
-if length(g.limits) == 2
-    if g.limits(1)~=0 | g.limits(2)~=0 % collect plotting limits from 'limits'
-        ymin = g.limits(1);
-        ymax = g.limits(2);
-        ylimset = 1;
-    end
-else
-    ttymin = min(min(sumproj));
-    ttymax = max(max(sumproj));
-    if ttymin < ymin
-        ymin = ttymin;
-    end;
-    if ttymax > ymax
-        ymax = ttymax;
-    end;    
-end
-
-%
 %%%%%%%%%%%%%%%%% Plot the envelope of the summed selected components %%%%%%%%%%%%%%%%%
 %
 
+if isempty(g.amplimits)
+    envx = [1,compx+1];
+    ymin = min(matsel(envdata,frames,0,1,envx(1)));
+    ymax = max(matsel(envdata,frames,0,2,envx(1)));
+else
+    ymin = g.amplimits(1);
+    ymax = g.amplimits(2);
+end
+
 if strcmpi(g.sumenv,'on')  | strcmpi(g.sumenv,'fill')
     sumenv = envelope(sumproj, g.envmode);
-    if ~ylimset & max(sumenv) > ymax, ymax = max(curenv); end
-    if ~ylimset & min(sumenv) < ymin, ymin = min(curenv); end
     if strcmpi(g.sumenv,'fill')
         %
         % Plot the summed projection filled
@@ -864,17 +790,6 @@ if strcmpi(g.sumenv,'on')  | strcmpi(g.sumenv,'fill')
         set(p,'Color', colors{5,1});
     end
 end
-if strcmpi(g.sortvar,'pvaf')| strcmpi(g.sortvar,'pv')
-    t = text(double(xmin+0.1*(xmax-xmin)), ...
-        double(ymin+0.1*(ymax-ymin)), ...
-        ['pvaf ' num2str(sumpvaf,'%4.2f') '%']);
-    set(t,'fontsize',12,'fontweight','bold')
-elseif strcmpi(g.sortvar,'rv') 
-    t = text(double(xmin+0.1*(xmax-xmin)), ...
-        double(ymin+0.1*(ymax-ymin)), ...
-        ['rv ' num2str(sumpvaf,'%4.2f') '%']);
-    set(t,'fontsize',12,'fontweight','bold')
-end
 
 %
 % %%%%%%%%%%%%%%%%%%%%%%%% Plot the computed component envelopes %%%%%%%%%%%%%%%%%%
@@ -885,12 +800,12 @@ for c = 1:ntopos+1
     for envside = [1 2]
         if envside == 1 % maximum envelope
             curenv = matsel(envdata,frames,0,1,envx(c));
-            if ~ylimset & max(curenv) > ymax
+            if max(curenv) > ymax
                 ymax = max(curenv);
             end
         else           % minimum envelope
             curenv = matsel(envdata,frames,0,2,envx(c));
-            if ~ylimset & min(curenv) < ymin
+            if min(curenv) < ymin
                 ymin = min(curenv);
             end
         end
@@ -940,14 +855,37 @@ for c = 1:ntopos+1
 end
 set(gca,'FontSize',12,'FontWeight','Bold')
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% fill specified component %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+if ~isempty(g.fillclust)
+    if ismember(g.fillclust, g.clust_grandERP(compx))
+        [dummy c] = ismember(g.fillclust, g.clust_grandERP(compx));
+        fprintf('filling the envelope of component %d\n',g.fillclust);
+        mins = matsel(envdata,frames,0,2,compx(c)+1);
+        p=fill([times times(frames:-1:1)],...
+        [matsel(envdata,frames,0,1,compx(c)+1) mins(frames:-1:1)],[1 0 0]);
+        % Overplot the data envlope again so it is not covered by the filled component
+        p=plot(times,matsel(envdata,frames,0,1,1), 'k', 'LineWidth',2);% plot the max
+        p=plot(times,matsel(envdata,frames,0,2,1), 'k', 'LineWidth',2);% plot the min
+    else
+        fprintf('cluster %d is not on the list for plotting\n',g.fillclust);
+    end
+end
+clear clustlist clustn c dummy
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Add vertical lines %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%  
+
 % plot vertical line at time zero
-if g.limits(1) <= 0 & g.limits(2) >= 0
+if g.timerange(1) <= 0 & g.timerange(2) >= 0
     vl=plot([0 0], [-1e10 1e10],'k');
     set(vl,'linewidth',2);
 end
 
 % if specified by option, plot specified vertical lines
-if c==1 & ~isempty(g.vert)
+if ~isempty(g.vert)
     for v=1:length(g.vert)
         vl=plot([g.vert(v) g.vert(v)], [-1e10 1e10],'k--');
         if any(g.limcontrib ~= 0) & v>= length(g.vert)-1;
@@ -960,30 +898,40 @@ if c==1 & ~isempty(g.vert)
     end
 end
 
-% if specified by option, plot the n-th component filled
-if g.fillcomp(1)>0 & find(g.fillcomp==c-1)
-    fprintf('filling the envelope of component %d\n',c-1);
-    mins = matsel(envdata,frames,0,2,envx(c));
-    p=fill([times times(frames:-1:1)],...
-        [matsel(envdata,frames,0,1,envx(c)) mins(frames:-1:1)],...
-        colors(mapcolors(c),1));
-    % Overplot the data envlope again so it is not covered by the fill()'d component
-    p=plot(times,matsel(envdata,frames,0,1,1),colors(mapcolors(1),1));% plot the max
-    set(p,'LineWidth',2);                % component order (if BOLD_COLORS==0)
-    p=plot(times,matsel(envdata,frames,0,2,1),colors(mapcolors(1),1));% plot the min
-    set(p,'LineWidth',2);                % component order (if BOLD_COLORS==0)
-end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %
 %%%%%%%%%%%%%%%%%%%%%%% Extend y limits by 5% %%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-if ~ylimset
-    datarange = ymax-ymin;
-    ymin = ymin-0.05*datarange;
-    ymax = ymax+0.05*datarange;
-end
+
+datarange = ymax-ymin;
+ymin = ymin-0.05*datarange;
+ymax = ymax+0.05*datarange;
+    
 axis([pmin pmax ymin ymax]);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Show pvaf/pv/rv/fillclust %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+if strcmpi(g.sortvar,'pvaf')| strcmpi(g.sortvar,'pv')
+    t = text(double(xmin+0.05*(xmax-xmin)), ...
+        double(ymin+0.12*(ymax-ymin)), ...
+        ['pvaf ' num2str(sumpvaf,'%4.2f') '%']);
+    set(t,'fontsize',13,'fontweight','bold')
+elseif strcmpi(g.sortvar,'rv') 
+    t = text(double(xmin+0.05*(xmax-xmin)), ...
+        double(ymin+0.12*(ymax-ymin)), ...
+        ['rv ' num2str(sumpvaf,'%4.2f') '%']);
+    set(t,'fontsize',13,'fontweight','bold')
+end
+
+if ~isempty(g.fillclust) & ismember(g.fillclust-1, envx)
+    t = text(double(xmin+0.05*(xmax-xmin)), ...
+        double(ymin+0.04*(ymax-ymin)), ...
+        ['cluster ' num2str(g.fillclust) ' filled with red']);
+    set(t,'fontsize',12,'fontweight','bold')
+end
 
 %
 %%%%%%%%%%%%%%%%%%%%%% Label axes %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
