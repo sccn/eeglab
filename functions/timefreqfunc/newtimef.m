@@ -1,12 +1,12 @@
 % newtimef() - Return estimates and plots of mean event-related (log) spectral
-%           perturbation (ERSP) and inter-trial coherence (ITC) events
-%           across event-related trials (epochs) of a single input time series.
+%           perturbation (ERSP) and inter-trial coherence (ITC) events across
+%           event-related trials (epochs) of a single input channel time series.
 %
 %         * Also can compute and statistically compare transforms for two time
-%           series. Use to compare ERSP and ITC means in two conditions.
+%           series. Use this to compare ERSP and ITC means in two conditions.
 %
-%         * Uses either fixed-window, zero-padded FFTs (fastest), wavelet
-%           0-padded DFTs. FFT uses Hanning tapers; wavelets use similar Morlet
+%         * Uses either fixed-window, zero-padded FFTs (fastest), or wavelet
+%           0-padded DFTs. FFT uses Hanning tapers; wavelets use (similar) Morlet
 %           tapers.
 %
 %         * For the wavelet and FFT methods, output frequency spacing
@@ -16,7 +16,7 @@
 %         * If 'alpha' is given (see below), permutation statistics are computed
 %           (from a distribution of 'naccu' surrogate data trials) and
 %           non-significant features of the output plots are zeroed out
-%           (and plotted in green).
+%           and plotted in green.
 %
 %         * Given a 'topovec' topo vector and 'elocs' electrode location file,
 %           the figure also shows a topoplot() view of the specified scalp map.
@@ -34,41 +34,41 @@
 %                       EEG.pnts, [EEG.xmin EEG.xmax]*1000, EEG.srate, cycles);
 % NOTE:
 %        >> timef details  % presents more detailed argument information
-%                          % Note: timef() also computes multitaper transforms
+%                          % Note: version timef() also computes multitaper transforms
 %
 % Required inputs:    Value                                 {default}
 %       data        = Single-channel data vector (1,frames*ntrials), else 
 %                     2-D array (frames,trials) or 3-D array (1,frames,trials).
-%                     To compare two conditions (data1 and data2), in place of 
+%                     To compare two conditions (data1 versus data2), in place of 
 %                     a single data matrix enter a cell array {data1 data2}
-%       frames      = Frames per trial. Ignored if data is 2-D or 3-D.  {750}
-%       tlimits     = [mintime maxtime] (ms). Epoch time limits default is 
-%                     [-1000 2000]. Note that this is the time limit of the 
-%                     data itself NOT A SUB-WINDOW TO EXTRACT FROM EXISTING
-%                     EPOCHS as this is the case in pop_newtimef.
-%       srate       = data sampling rate (Hz)  {default: from icadefs.m or 250}
-%       'cycles'  = [real] indicates the number of cycles for the 
-%                   time-frequency decomposition {default: 0}
-%                   if 0, use FFTs and Hanning window tapering.  
-%                   or [real positive scalar] Number of cycles in each Morlet
-%                   wavelet, constant across frequencies.
-%                   or [cycles cycles(2)] wavelet cycles increase with 
-%                   frequency starting at cycles(1) and, 
-%                   if cycles(2) > 1, increasing to cycles(2) at
-%                   the upper frequency,
-%                   or if cycles(2) = 0, same window size at all
-%                   frequencies (similar to FFT if cycles(1) = 1)
-%                   or if cycles(2) = 1, not increasing (same as giving
-%                   only one value for 'cycles'). This corresponds to pure
-%                   wavelet with the same number of cycles at each frequencies
-%                   if 0 < cycles(2) < 1, linear variation in between pure 
-%                   wavelets (1) and FFT (0). The exact number of cycles
-%                   at the highest frequency is indicated on the command line.
+%       frames      = Frames per trial. Ignored if data are 2-D or 3-D.  {750}
+%       tlimits     = [mintime maxtime] (ms).  Note that these are the time limits 
+%                     of the data epochs themselves, NOT A SUB-WINDOW TO EXTRACT 
+%                     FROM THE EPOCHS as is the case for pop_newtimef(). {[-1000 2000]}
+%       srate       = data sampling rate (Hz)  {default: read from icadefs.m or 250}
+%       'cycles'    = [real] indicates the number of cycles for the time-frequency 
+%                        decomposition {default: 0}
+%                     If 0, use FFTs and Hanning window tapering.  
+%                     If [real positive scalar], the number of cycles in each Morlet 
+%                        wavelet, held constant across frequencies.
+%                     If [cycles cycles(2)] wavelet cycles increase with 
+%                        frequency beginning at cycles(1) and, if cycles(2) > 1, 
+%                        increasing to cycles(2) at the upper frequency,
+%                      If cycles(2) = 0, use same window size for all frequencies 
+%                        (similar to FFT when cycles(1) = 1)
+%                      If cycles(2) = 1, cycles do not increase (same as giving
+%                         only one value for 'cycles'). This corresponds to a pure
+%                         wavelet decomposition, same number of cycles at each frequency.
+%                      If 0 < cycles(2) < 1, cycles increase linearly with frequency:
+%                         from 0 --> FFT (same window width at all frequencies) 
+%                         to 1 --> wavelet (same number of cycles at all frequencies).
+%                     The exact number of cycles in the highest frequency window is 
+%                     indicated in the command line output. Typical value: 'cycles', [3 0.5]
 %
 %    Optional inter-trial coherence (ITC) Type:
 %       'itctype'   = ['coher'|'phasecoher'|'phasecoher2'] Compute either linear
-%                     coherence ('coher') or phase coherence ('phasecoher'),
-%                     first called 'phase-locking factor' {default: 'phasecoher'}
+%                     coherence ('coher') or phase coherence ('phasecoher').
+%                     Originall called 'phase-locking factor' {default: 'phasecoher'}
 %
 %    Optional detrending:
 %       'detrend'   = ['on'|'off'], Linearly detrend each data epoch   {'off'}
@@ -76,14 +76,14 @@
 %
 %    Optional FFT/DFT parameters:
 %       'winsize'   = If cycles==0: data subwindow length (fastest, 2^n<frames);
-%                     If cycles >0: *longest* window length to use. This
-%                      determines the lowest output frequency. Note that this
-%                     parameter is overwritten if the minimum frequency requires
+%                     If cycles >0: The *longest* window length to use. This
+%                     determines the lowest output frequency. Note: this parameter 
+%                     is overwritten when the minimum frequency requires
 %                     a longer time window {default: ~frames/8}
 %       'timesout'  = Number of output times (int<frames-winframes). Enter a
 %                     negative value [-S] to subsample original times by S.
 %                     Enter an array to obtain spectral decomposition at
-%                     specific times (Note: algorithm finds the closest time
+%                     specific times (Note: The algorithm finds the closest time
 %                     point in data; this could give a slightly unevenly spaced
 %                     time array                                    {default: 200}
 %       'padratio'  = FFT-length/winframes (2^k)                    {default: 2}
@@ -110,26 +110,26 @@
 %                     to experimental events. See notes.    {default: 'off'}
 %       'wletmethod' = ['dftfilt'|'dftfilt2'|'dftfilt3'] Wavelet type to use.
 %                     'dftfilt2' -> Morlet-variant wavelets, or Hanning DFT.
-%                     'dftfilt3' -> Morlet wavelets.
-%                     See the timefreq function for more detials {default: 'dftfilt3'}
-%       'cycleinc'    ['linear'|'log'] increase mode if [min max] cycles is
-%                     provided in 'cycle' parameter. Applies only to 
+%                     'dftfilt3' -> Morlet wavelets.  See the timefreq() function 
+%                     for more detials {default: 'dftfilt3'}
+%       'cycleinc'    ['linear'|'log'] mode of cycles increase when [min max] cycles 
+%                     are provided in 'cycle' parameter. Applies only to 
 %                     'wletmethod','dftfilt'  {default: 'linear'}
 %       
 %   Optional baseline parameters:
-%       'baseline'  = Spectral baseline end-time (in ms). NaN imply that no
-%                     baseline is used. A range [min max] may also be entered
+%       'baseline'  = Spectral baseline end-time (in ms). NaN --> no baseline is used. 
+%                     A [min max] range may also be entered
 %                     You may also enter one row per region for baseline
 %                     e.g. [0 100; 300 400] considers the window 0 to 100 ms and
-%                     300 to 400 ms {default: 0 -> all negative time values}. 
-%                     This parameter is valid to define all baseline types below.
-%                     Once more "NaN" prevents baseline subtraction.
+%                     300 to 400 ms This parameter validly defines all baseline types 
+%                     below. Again, [NaN] Prevent baseline subtraction.
+%                     {default: 0 -> all negative time values}. 
 %       'powbase'   = Baseline spectrum to log-subtract {default|NaN -> from data}
 %       'commonbase' = ['on'|'off'] use common baseline when comparing two 
-%                     conditions (default is 'on').
+%                     conditions {default: 'on'}.
 %       'basenorm'  = ['on'|'off'] 'on' normalize baseline in the power spectral
-%                     average instead of 'off' dividing by the average power across 
-%                     trials at each frequency (gain model). Default: 'off'.
+%                     average; else 'off', divide by the average power across 
+%                     trials at each frequency (gain model). {default: 'off'}
 %       'trialbase' = ['on'|'off'|'full'] perform baseline (normalization or division 
 %                     above in single trial instead of the trial average. Default
 %                     if 'off'. 'full' is an option that perform single
@@ -146,54 +146,53 @@
 %                     courses(following time/freq transform but before 
 %                     smoothing across trials). 'eventms' is a matrix 
 %                     of size (all_trials,epoch_events) whose columns
-%                     specify the epoch latencies (in ms) at which the
-%                     same series of successive events occur in each 
+%                     specify the epoch times (latencies) (in ms) at which 
+%                     the same series of successive events occur in each 
 %                     trial. If two data conditions, eventms should be 
-%                     [eventms1;eventms2] = all trials stacked vertically.
-%      'timewarpms' = [warpms] optional vector of event latencies (in ms) 
+%                     [eventms1;eventms2] --> all trials stacked vertically.
+%      'timewarpms' = [warpms] optional vector of event times (latencies) (in ms) 
 %                     to which the series of events should be warped.
 %                     (Note: Epoch start and end should not be declared
 %                     as eventms or warpms}. If 'warpms' is absent or [], 
 %                     the median of each 'eventms' column will be used;
-%                     If two datasets, the grand medians of the two.
+%                     If two datasets, the grand medians of the two are used.
 %     'timewarpidx' = [plotidx] is an vector of indices telling which of 
-%                     the time-warped 'eventms' columns (above) to plot with 
+%                     the time-warped 'eventms' columns (above) to show with 
 %                     vertical lines. If undefined, all columns are plotted. 
 %                     Overwrites the 'vert' argument (below) if any.
 %
 %    Optional permutation parameters:
 %       'alpha'     = If non-0, compute two-tailed permutation significance 
 %                      probability level. Show non-signif. output values 
-%                      as green.                                     {0}
+%                      as green.                              {default: 0}
 %       'mcorrect'  = ['none'|'fdr'] correction for multiple comparison
 %                     'fdr' uses false detection rate (see function fdr()).
-%                     Default is 'none'. Not available for condition 
-%                     comparisons.
+%                     Not available for condition comparisons. {default:'none'} 
 %       'pcontour'  = ['on'|'off'] draw contour around significant regions
-%                     instead of masking them. Default is 'off'. Not 
-%                     available for condition comparisons.
+%                     instead of masking them. Not available for condition 
+%                     comparisons. {default:'off'} 
 %       'naccu'     = Number of permutation replications to accumulate {200}
 %       'baseboot'  = permutation baseline subtract (1 -> use 'baseline';
-%                                                  0 -> use whole trial
-%                                          [min max] -> use time range) {1}
-%                     You may also enter one row per region for baseline
+%                                                    0 -> use whole trial
+%                                            [min max] -> use time range) 
+%                     You may also enter one row per region for baseline,
 %                     e.g. [0 100; 300 400] considers the window 0 to 100 ms 
-%                     and 300 to 400 ms.
+%                     and 300 to 400 ms. {default: 1}
 %       'boottype'  = ['shuffle'|'rand'|'randall'] 'shuffle' -> shuffle times 
 %                     and trials; 'rand' -> invert polarity of spectral data 
 %                     (for ERSP) or randomize phase (for ITC); 'randall' -> 
 %                     compute significances by accumulating random-polarity 
 %                     inversions for each time/frequency point (slow!). Note
-%                     that in previous revision of this function, we use to 
-%                     call this method bootstrap while it is really permutation
-%                     per say {'shuffle'}
-%       'condboot'  = ['abs'|'angle'|'complex'] for comparing 2 conditions,
-%                     either subtract ITC absolute vales ('abs'), angles
-%                     ('angles') or complex values ('complex').   {'abs'}
-%       'pboot'     = permutation power limits (e.g., from newtimef()) {from data}
+%                     that in the previous revision of this function, this
+%                     method was called 'bootstrap' though it is actually 
+%                     permutation {default: 'shuffle'}
+%       'condboot'  = ['abs'|'angle'|'complex'] to compare two conditions,
+%                     either subtract ITC absolute values ('abs'), angles
+%                     ('angles'), or complex values ('complex'). {default: 'abs'}
+%       'pboot'     = permutation power limits (e.g., from newtimef()) {def: from data}
 %       'rboot'     = permutation ITC limits (e.g., from newtimef()). 
-%                     Note: Both pboot and rboot must be provided to avoid 
-%                     recomputing the surrogate data!           {from data}
+%                     Note: Both 'pboot' and 'rboot' must be provided to avoid 
+%                     recomputing the surrogate data! {default: from data}
 %
 %    Optional Scalp Map:
 %       'topovec'   = Scalp topography (map) to plot              {none}
@@ -209,22 +208,22 @@
 %
 %     Optional Plotting Parameters:
 %       'scale'     = ['log'|'abs'] visualize power in log scale (dB) or absolute
-%                     scale. Default is 'log'.
-%       'plottype'  = ['image'|'curve'] plot time frequency images or
-%                     curves (one curve per frequency). {default: 'image'}
+%                     scale. {default: 'log'}
+%       'plottype'  = ['image'|'curve'] plot time/frequency images or traces
+%                     (curves, one curve per frequency). {default: 'image'}
 %       'plotmean'  = ['on'|'off'] For 'curve' plots only. Average all
 %                     frequencies given as input. {default: 'on'}
 %       'highlightmode'  = ['background'|'bottom'] For 'curve' plots only,
 %                     display significant time regions either in the plot background
-%                     or underneath the curve.
+%                     or under the curve.
 %       'plotersp'  = ['on'|'off'] Plot power spectral perturbations    {'on'}
-%       'plotitc'   = ['on'|'off'] Plot inter trial coherence           {'on'}
+%       'plotitc'   = ['on'|'off'] Plot inter-trial coherence           {'on'}
 %       'plotphasesign' = ['on'|'off'] Plot phase sign in the inter trial coherence {'on'}
 %       'plotphaseonly' = ['on'|'off'] Plot ITC phase instead of ITC amplitude {'off'}
 %       'erspmax'   = [real] set the ERSP max. For the color scale (min= -max) {auto}
 %       'itcmax'    = [real] set the ITC image maximum for the color scale {auto}
 %       'hzdir'     = ['up' or 'normal'|'down' or 'reverse'] Direction of
-%                     the frequency axes {as in icadefs.m, or 'up'}
+%                     the frequency axes {default: as in icadefs.m, or 'up'}
 %       'ydir'      = ['up' or 'normal'|'down' or 'reverse'] Direction of
 %                     the ERP axis plotted below the ITC {as in icadefs.m, or 'up'}
 %       'erplim'    = [min max] ERP limits for ITC (below ITC image)       {auto}
@@ -282,7 +281,7 @@
 %   -- The marginal panel under the ITC image shows the ERP (which is produced by 
 %      ITC across the data spectral pass band).
 %
-% Authors: Arnaud Delorme, Sigurd Enghoff, Jean Hausser, && Scott Makeig
+% Authors: Arnaud Delorme, Jean Hausser from timef() by Sigurd Enghoff, Scott Makeig
 %          CNL / Salk Institute 1998- | SCCN/INC, UCSD 2002-
 %
 % See also: timefreq(), condstat(), newcrossf(), tftopo()
@@ -323,8 +322,9 @@
 %                     (in StretchRefs) should be overplotted on the ERSP and ITC.
 %
 %
-% Copyright (C) 1998- Arnaud Delorme, Scott Makeig
-% first built as timef.m at CNL / Salk Institute 8/1/98-8/28/01 by
+% Copyright (C) University of California San Diego, La Jolla, CA
+%
+% First built as timef.m at CNL / Salk Institute 8/1/98-8/28/01 by
 % Sigurd Enghoff and Scott Makeig, edited by Arnaud Delorme
 % SCCN/INC/UCSD/ reprogrammed as newtimef -Arnaud Delorme 2002-
 % SCCN/INC/UCSD/ added time warping capabilities -Jean Hausser 2005
