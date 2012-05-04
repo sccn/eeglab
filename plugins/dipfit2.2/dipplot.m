@@ -84,6 +84,9 @@
 %               pair of dipole).
 %  'holdon'   - ['on'|'off'] create a new dipplot figure or plot dipoles within an
 %               an existing figure. Default is 'off'.
+%  'camera'   - ['auto'|'set'] camera position. 'auto' is the default and 
+%               an option using camera zoom. 'set' is a fixed view that
+%               does not depend on the content being plotted.
 %
 % Outputs:
 %   sources   - EEG.source structure with two extra fiels 'mnicoord' and 'talcoord'
@@ -177,6 +180,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
     %                             key        type       range             default
     g = finputcheck( varargin, { 'color'     ''         []                  [];
                                  'axistight' 'string'   { 'on' 'off' }     'off';
+                                 'camera'    'string'   { 'auto' 'set' }   'auto';
                                  'coordformat' 'string' { 'MNI' 'spherical' 'CTF' 'auto' } 'auto';
                                  'drawedges' 'string'   { 'on' 'off' }     'off';
                                  'mesh'      'string'   { 'on' 'off' }     'off';
@@ -959,6 +963,18 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
         box off;
         axis equal;
         axis off;
+    end;
+
+    % set camera positon
+    if strcmpi(g.camera, 'set')
+        set(gca, 'CameraPosition', [2546.94 -894.981 689.613], ...
+                 'CameraPositionMode', 'manual', ...
+                 'CameraTarget', [0 -18 18], ...
+                 'CameraTargetMode', 'manual', ...
+                 'CameraUpVector', [0 0 1], ...
+                 'CameraUpVectorMode', 'manual', ...
+                 'CameraViewAngle', [3.8815], ...
+                 'CameraViewAngleMode', 'manual');
     end;
     
 return;
