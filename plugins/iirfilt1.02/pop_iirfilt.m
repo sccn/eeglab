@@ -1,7 +1,8 @@
 % pop_iirfilt() - interactively filter EEG dataset data using iirfilt()
 %
 % Usage:
-%   >> EEGOUT = pop_iirfilt( EEG, locutoff, hicutoff, trans_bw);
+%   >> EEGOUT = pop_iirfilt( EEG, locutoff, hicutoff);
+%   >> EEGOUT = pop_iirfilt( EEG, locutoff, hicutoff, trans_bw, revfilt, causal);
 %
 % Graphical interface:
 %   "Lower edge ..." - [edit box] Lower edge of the frequency pass band (Hz) 
@@ -23,6 +24,7 @@
 %   trans_bw  - length of the filter in points {default 3*fix(srate/locutoff)}
 %   revfilt   - [0|1] Reverse filter polarity (from bandpass to notch filter).
 %                     Default is 0 (bandpass).
+%   causal    - [0|1] use causal filter.
 %
 % Outputs:
 %   EEGOUT   - output dataset
@@ -61,32 +63,42 @@ if isempty(EEG(1).data)
     disp('pop_iirfilt() error: cannot filter an empty dataset'); return;
 end;    
 if nargin < 2
-	% which set to save
-	% -----------------
-   	promptstr = { 'Highpass: low edge of the frequency pass band (Hz) (0 -> lowpass)', ...
-   				  'Lowpass: high edge of the frequency pass band (Hz) (0 -> highpass)', ...
-   				  strvcat('Notch filter the data. Give the notch range, i.e. [45 55] for 50 Hz)', ...
-                  '(this option overwrites the low and high edge limits given above)'), ...
-                  'Transition BW filter (default: see >> help pop_iirfilt)' };
-	inistr       = { '0', '0', '', '' };
-   	result       = inputdlg2( promptstr, 'Filter the data -- pop_iirfilt()', 1,  inistr, 'pop_iirfilt');
-	if size(result, 1) == 0 return; end;
-	locutoff   	 = eval( result{1} );
-	hicutoff 	 = eval( result{2} );
-	if isempty( result{3} )
-		 revfilt = 0;
-	else 
-        revfilt    = eval( [ '[' result{3} ']' ] );
-        locutoff = revfilt(1);
-        hicutoff = revfilt(2);
+    % which set to save
+    % -----------------
+    uilist = { ...
+        { 'style' 'text' 'string' 'Lower edge of the frequency pass band (Hz)' } ...
+        { 'style' 'edit' 'string' '' } ...
+        { 'style' 'text' 'string' 'Higher edge of the frequency pass band (Hz)' } ...
+        { 'style' 'edit' 'string' '' } ...
+        { 'style' 'text' 'string' 'Transition BW filter (default is automatic)' } ...
+        { 'style' 'edit' 'string' '' } ...
+        { 'style' 'checkbox' 'string' 'Notch filter the data instead of pass band' } ...
+        { 'style' 'checkbox' 'string' 'Use causal filter (useful when performing causal analysis)' 'value' 0} ...
+        { 'style' 'checkbox' 'string' 'Plot the filter frequency response' 'value' 0} };
+    geometry = { [3 1] [3 1] [3 1] 1 1 1 };
+    
+    result = inputgui( 'geometry', geometry, 'uilist', uilist, 'title', 'Filter the data -- pop_iirfilt()', ...
+        'helpcom', 'pophelp(''pop_iirfilt'')');
+    
+    if isempty(result), return; end;
+    if isempty(result{1}), result{1} = '0'; end;
+    if isempty(result{2}), result{2} = '0'; end;
+    
+    locutoff   	 = eval( result{1} );
+    hicutoff 	 = eval( result{2} );
+    if isempty( result{3} )
+         trans_bw = [];
+    else trans_bw = eval( result{3} );
+    end;
+    revfilt = 0;
+    if result{4},
         revfilt = 1;
-	end;
-	if locutoff == 0 & hicutoff == 0 return; end;
-	if isempty( result{4} )
-		 trans_bw = [];
-	else trans_bw    = eval( result{4} );
-	end;
-    causal = 'off';
+    end;
+    if result{5}
+         causal = 1;
+    else causal = 0;
+    end;
+    plotfreqz = result{6};
 else
     if nargin < 3
         hicutoff = 0;
@@ -98,8 +110,9 @@ else
         revfilt = 0;
     end;
     if nargin < 6
-        causal = 'off';
+        causal = 0;
     end;
+    plotfreqz = 0;
 end;
  
 options = { EEG.srate, locutoff, hicutoff, EEG.pnts };
@@ -111,7 +124,7 @@ end;
 if revfilt ~= 0
 	options = { options{:} revfilt [] [] causal };
 else
-	options = { options{:} 0 [] [] causal };
+	options = { options{:} 0       [] [] causal };
 end;
 
 % warning
@@ -134,7 +147,7 @@ if EEG.trials == 1
         tmpevent = EEG.event;    
 		boundaries = strmatch('boundary', {tmpevent.type});
 		if isempty(boundaries)
-            EEG.data = iirfilt( EEG.data, options{:}); 
+            [EEG.data b a] = iirfilt( EEG.data, options{:}); 
 		else
 			options{4} = 0;
 			disp('pop_iirfilt:finding continuous data boundaries');
@@ -146,7 +159,7 @@ if EEG.trials == 1
 			for n=1:length(boundaries)-1
 				try
                     fprintf('Processing continuous data (%d:%d)\n',boundaries(n),boundaries(n+1)); 
-                    EEG.data(:,boundaries(n)+1:boundaries(n+1)) = ...
+                    [ EEG.data(:,boundaries(n)+1:boundaries(n+1)) b a] = ...
                         iirfilt(EEG.data(:,boundaries(n)+1:boundaries(n+1)), options{:});
 				catch
 					fprintf('\nFilter error: continuous data portion too narrow (DC removed if highpass only)\n');
@@ -161,15 +174,19 @@ if EEG.trials == 1
             catch, end;
 		end
 	else
-        EEG.data = iirfilt( EEG.data, options{:});
+        [EEG.data b a] = iirfilt( EEG.data, options{:});
 	end;
 else
     EEG.data = reshape(EEG.data, EEG.nbchan, EEG.pnts*EEG.trials);
-    EEG.data = iirfilt( EEG.data, options{:});
+    [EEG.data b a] = iirfilt( EEG.data, options{:});
 	% Note: reshape does not reserve new memory while EEG.data(:,:) does
 end;	
 
+if plotfreqz && exist('b') == 1 && exist('a') == 1 && (~isequal(a,0) || ~isequal(b,0))
+    freqz(b, a, [], EEG.srate);
+elseif plotfreqz
+    disp('Cannot plot frequency response of band pass or notch filter');
+end
 
-com = sprintf( '%s = pop_iirfilt( %s, %s, %s, [%s], [%s]);', inputname(1), inputname(1), ...
-			num2str( locutoff), num2str( hicutoff), num2str( trans_bw ), num2str( revfilt ) );
-return;
+com = sprintf( '%s = pop_iirfilt( %s, %s, %s, %d, %d, %d);', inputname(1), inputname(1), ...
+			num2str( locutoff), num2str( hicutoff), trans_bw, revfilt, causal );

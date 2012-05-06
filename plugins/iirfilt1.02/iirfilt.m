@@ -48,7 +48,7 @@
 % Currently, with cutoff less then 5 Hz, both HPF and LPF use more 'relaxed' 
 % filter parameters to achieve best results. 
 
-function [smoothdata,filtwts] = iirfilt(data,srate,locutoff,hicutoff,epochframes, trans_bw, revfilt, rp, rs, causal)
+function [smoothdata,b,a] = iirfilt(data,srate,locutoff,hicutoff,epochframes, trans_bw, revfilt, rp, rs, causal)
 
 if nargin<4
     fprintf('');
@@ -56,6 +56,8 @@ if nargin<4
     return
 end
 
+a = 0;
+b = 0;
 data = double(data);
 
 if exist('ellipord') ~= 2 | exist('ellip') ~= 2
@@ -195,6 +197,7 @@ end
 
 
 smoothdata = zeros(chans,frames);
+lastwarn('');
 for e = 1:epochs                % filter each epoch, channel
     for c=1:chans
         if isstruct(a) & isstruct(b) & revfilt==0            %BPF - filter with LPF and HPF in series
@@ -233,7 +236,14 @@ for e = 1:epochs                % filter each epoch, channel
     end
 end
 fprintf('\n');
-
+[LASTMSG, LASTID] = lastwarn;
+if ~isempty(LASTMSG)
+    disp('Warning: the warning message (for example "matrix close to singular")');
+    disp('         indicates that some of your data segment are too small to be');
+    disp('         filtered or that you low edge frequency is too low.');
+    disp('         Check the data by looking at it (raw data and data spectrum).');
+    disp('         If necessary, reload data and modify the filter');
+end;
 
 %% To test my filter: draws Frequency response
 % N=10001; n=1:N;
