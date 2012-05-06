@@ -23,8 +23,9 @@
 %   filtorder - length of the filter in points {default 3*fix(srate/locutoff)}
 %   revfilt   - [0|1] Reverse filter polarity (from bandpass to notch filter). 
 %                     Default is 0 (bandpass).
-%   usefft    - [0|1] 1 use FFT filtering instead of FIR. Default is 0.
+%   usefft    - [0|1] 1 uses FFT filtering instead of FIR. Default is 0.
 %   firtype   - ['firls'|'fir1'] filter design method, default is 'firls'
+%   causal    - [0|1] 1 uses causal filtering. Default is 0.
 %
 % Outputs:
 %   EEGOUT   - output dataset
@@ -51,7 +52,7 @@
 
 % 01-25-02 reformated help & license -ad 
 
-function [EEG, com] = pop_eegfilt( EEG, locutoff, hicutoff, filtorder, revfilt, usefft, plotfreqz, firtype)
+function [EEG, com] = pop_eegfilt( EEG, locutoff, hicutoff, filtorder, revfilt, usefft, plotfreqz, firtype, causal)
 
 com = '';
 if nargin < 1
@@ -83,9 +84,10 @@ if nargin < 2
         { 'style' 'checkbox' 'string' 'Notch filter the data instead of pass band' } ...
         { 'style' 'checkbox' 'string' 'Use (sharper) FFT linear filter instead of FIR filtering' 'value' 0 } ...
         { 'style' 'text' 'string' '(Use the option above if you do not have the Signal Processing Toolbox)' } ...
-        { 'style' 'checkbox' 'string' 'Plot frequency response' 'value' 0} ...
+        { 'style' 'checkbox' 'string' 'Use causal filter (useful when performing causal analysis)' 'value' 0} ...
+        { 'style' 'checkbox' 'string' 'Plot the filter frequency response' 'value' 0} ...
         { 'style' 'checkbox' 'string' 'Use fir1 (check, recommended) or firls (uncheck, legacy)' 'value' 1}};
-    geometry = { [3 1] [3 1] [3 1] 1 1 1 1 1 };
+    geometry = { [3 1] [3 1] [3 1] 1 1 1 1 1 1 };
     
     result = inputgui( 'geometry', geometry, 'uilist', uilist, 'title', 'Filter the data -- pop_eegfilt()', ...
         'helpcom', 'pophelp(''pop_eegfilt'')');
@@ -108,13 +110,16 @@ if nargin < 2
         end;
     end;
     if result{5}
-        usefft = 1;
-    else
-        usefft = 0;
+         usefft = 1;
+    else usefft = 0;
     end;
-    plotfreqz = result{6};
+    if result{6}
+         causal = 1;
+    else causal = 0;
+    end;
+    plotfreqz = result{7};
     if locutoff == 0 & hicutoff == 0 return; end;
-    if result{7}
+    if result{8}
         firtype = 'fir1';
     else
         firtype = 'firls';
@@ -138,9 +143,12 @@ else
     if nargin < 8
         firtype = 'firls';
     end
+    if nargin < 8
+        causal = 0;
+    end
 end;
 
-if locutoff & hicutoff
+if locutoff && hicutoff
     disp('WARNING: BANDPASS FILTERS SOMETIMES DO NOT WORK (MATLAB BUG)')
     disp('WARNING: PLOT SPECTRUM AFTER FILTERING TO ASSESS FILTER EFFICIENCY')
     disp('WARNING: IF FILTER FAILS, LOWPASS DATA THEN HIGHPASS DATA')
@@ -161,7 +169,7 @@ else
     options = { options{:} 0 };
 end;
 
-options = {options{:} revfilt firtype};
+options = {options{:} revfilt firtype causal};
 
 if EEG.trials == 1
     if ~isempty(EEG.event) & isfield(EEG.event, 'type') & isstr(EEG.event(1).type)
@@ -228,6 +236,6 @@ if ~usefft & plotfreqz & exist('b') == 1
     freqz(b, 1, [], EEG.srate);
 end
 
-com = sprintf( '%s = pop_eegfilt( %s, %s, %s, [%s], [%s], %s, %s, ''%s'');', inputname(1), inputname(1), ...
-    num2str( locutoff), num2str( hicutoff), num2str( filtorder ), num2str( revfilt ), num2str(usefft), num2str(plotfreqz), firtype);
+com = sprintf( '%s = pop_eegfilt( %s, %s, %s, [%s], [%s], %s, %s, ''%s'', %d);', inputname(1), inputname(1), ...
+    num2str( locutoff), num2str( hicutoff), num2str( filtorder ), num2str( revfilt ), num2str(usefft), num2str(plotfreqz), firtype, causal);
 return

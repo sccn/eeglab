@@ -5,7 +5,7 @@
 % Usage:
 %  >> [smoothdata] = eegfilt(data,srate,locutoff,hicutoff);
 %  >> [smoothdata,filtwts] = eegfilt(data,srate,locutoff,hicutoff, ...
-%                                    epochframes,filtorder,revfilt,firtype);
+%                                    epochframes,filtorder,revfilt,firtype,causal);
 % Inputs:
 %   data        = (channels,frames*epochs) data to filter
 %   srate       = data sampling rate (Hz)
@@ -13,8 +13,9 @@
 %   hicutoff    = high-edge frequency in pass band (Hz) {0 -> highpass}
 %   epochframes = frames per epoch (filter each epoch separately {def/0: data is 1 epoch}
 %   filtorder   = length of the filter in points {default 3*fix(srate/locutoff)}
-%   revfilt     = [0|1] reverse filter (i.e. bandpass filter to notch filter). {0}
+%   revfilt     = [0|1] reverse filter (i.e. bandpass filter to notch filter). {default 0}
 %   firtype     = 'firls'|'fir1' {'firls'}
+%   causal      = [0|1] use causal filter if set to 1 (default 0)
 %
 % Outputs:
 %    smoothdata = smoothed data
@@ -46,7 +47,7 @@
 % 01-25-02 reformated help & license, added links -ad
 % 03-20-12 added firtype option -cb
 
-function [smoothdata,filtwts] = eegfilt(data,srate,locutoff,hicutoff,epochframes,filtorder,revfilt,firtype)
+function [smoothdata,filtwts] = eegfilt(data,srate,locutoff,hicutoff,epochframes,filtorder,revfilt,firtype,causal)
 
 if nargin<4
     fprintf('');
@@ -94,6 +95,9 @@ if nargin<7
 end
 if nargin<8
     firtype = 'firls';
+end
+if nargin<9
+    causal = 0;
 end
 
 if strcmp(firtype, 'firls')
@@ -186,11 +190,15 @@ smoothdata = zeros(chans,frames);
 for e = 1:epochs                % filter each epoch, channel
     for c=1:chans
         try
-            smoothdata(c,(e-1)*epochframes+1:e*epochframes) ...
-                = filtfilt(filtwts,1,data(c,(e-1)*epochframes+1:e*epochframes));
+            if causal
+                 smoothdata(c,(e-1)*epochframes+1:e*epochframes) = filter(  filtwts,1,data(c,(e-1)*epochframes+1:e*epochframes));
+            else smoothdata(c,(e-1)*epochframes+1:e*epochframes) = filtfilt(filtwts,1,data(c,(e-1)*epochframes+1:e*epochframes));
+            end;
         catch,
-            smoothdata(c,(e-1)*epochframes+1:e*epochframes) ...
-                = filtfilt(filtwts,1,double(data(c,(e-1)*epochframes+1:e*epochframes)));
+            if causal
+                 smoothdata(c,(e-1)*epochframes+1:e*epochframes) = filter(  filtwts,1,double(data(c,(e-1)*epochframes+1:e*epochframes)));
+            else smoothdata(c,(e-1)*epochframes+1:e*epochframes) = filtfilt(filtwts,1,double(data(c,(e-1)*epochframes+1:e*epochframes)));
+            end;
         end;
         if epochs == 1
             if rem(c,20) ~= 0, fprintf('.');
