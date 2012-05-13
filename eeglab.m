@@ -583,18 +583,19 @@ if ismatlab
     W_MAIN = findobj('tag', 'EEGLAB');
     EEGUSERDAT = get(W_MAIN, 'userdata');
     set(W_MAIN, 'MenuBar', 'none');
-    file_m  = uimenu( W_MAIN, 'Label', 'File'                                    , 'userdata', on);
-    neuro_m = uimenu( file_m, 'Label', 'Import data'      , 'tag', 'import data' , 'userdata', onnostudy); 
-    epoch_m = uimenu( file_m, 'Label', 'Import epoch info', 'tag', 'import epoch', 'userdata', onepoch); 
-    event_m = uimenu( file_m, 'Label', 'Import event info', 'tag', 'import event', 'userdata', ondata); 
-    exportm = uimenu( file_m, 'Label', 'Export'           , 'tag', 'export'      , 'userdata', ondata); 
-    edit_m  = uimenu( W_MAIN, 'Label', 'Edit'                                    , 'userdata', ondata);
-    tools_m = uimenu( W_MAIN, 'Label', 'Tools',             'tag', 'tools'       , 'userdata', ondatastudy);
-    plot_m  = uimenu( W_MAIN, 'Label', 'Plot',              'tag', 'plot'        , 'userdata', ondata);
-    loc_m   = uimenu( plot_m, 'Label', 'Channel locations'                       , 'userdata', onchannel);
-    std_m   = uimenu( W_MAIN, 'Label', 'Study', 'tag', 'study'                   , 'userdata', onstudy);
-    set_m   = uimenu( W_MAIN, 'Label', 'Datasets'                                , 'userdata', ondatastudy);
-    help_m  = uimenu( W_MAIN, 'Label', 'Help'                                    , 'userdata', on);
+    file_m   = uimenu( W_MAIN,   'Label', 'File'                                    , 'userdata', on);
+    import_m = uimenu( file_m,   'Label', 'Import data'                             , 'userdata', onnostudy); 
+    neuro_m  = uimenu( import_m, 'Label', 'Using EEGLAB functions and plugins'      , 'tag', 'import data' , 'userdata', onnostudy); 
+    epoch_m  = uimenu( file_m,   'Label', 'Import epoch info', 'tag', 'import epoch', 'userdata', onepoch); 
+    event_m  = uimenu( file_m,   'Label', 'Import event info', 'tag', 'import event', 'userdata', ondata); 
+    exportm  = uimenu( file_m,   'Label', 'Export'           , 'tag', 'export'      , 'userdata', ondata); 
+    edit_m   = uimenu( W_MAIN,   'Label', 'Edit'                                    , 'userdata', ondata);
+    tools_m  = uimenu( W_MAIN,   'Label', 'Tools',             'tag', 'tools'       , 'userdata', ondatastudy);
+    plot_m   = uimenu( W_MAIN,   'Label', 'Plot',              'tag', 'plot'        , 'userdata', ondata);
+    loc_m    = uimenu( plot_m,   'Label', 'Channel locations'                       , 'userdata', onchannel);
+    std_m    = uimenu( W_MAIN,   'Label', 'Study', 'tag', 'study'                   , 'userdata', onstudy);
+    set_m    = uimenu( W_MAIN,   'Label', 'Datasets'                                , 'userdata', ondatastudy);
+    help_m   = uimenu( W_MAIN,   'Label', 'Help'                                    , 'userdata', on);
 
     uimenu( neuro_m, 'Label', 'From ASCII/float file or Matlab array' , 'CallBack', cb_importdata);
     uimenu( neuro_m, 'Label', 'From Netstation folder (FILE-IO toolbox)', 'CallBack', cb_fileio2,    'Separator', 'on'); 
@@ -871,8 +872,8 @@ end; % iseeglabdeployed2
 if ~ismatlab, return; end;
 % add other import ...
 % --------------------
-cb_others = [ 'warndlg2(strvcat(''Several EEGLAB plugins (not included by default) are available to import cogniscan,'',' ...
-                               '''micromed, and TDT formats. To download plugins go to www.sccn.ucsd.edu/eeglab/plugins/.'',' ...
+cb_others = [ 'warndlg2(strvcat(''Several EEGLAB plugins (not included by default) are available to import specific'',' ...
+                               '''data formats. To download plugins go to www.sccn.ucsd.edu/eeglab/plugins/.'',' ...
                                '''  '',' ...
                                '''The FILEIO and BIOSIG toolboxes interface also allow to import in EEGLAB a wide variety'',' ...
                                '''of EEG/MEG data file formats -- including those imported using EEGLAB native menus'',' ...
@@ -880,12 +881,12 @@ cb_others = [ 'warndlg2(strvcat(''Several EEGLAB plugins (not included by defaul
                                '''biosig.sourceforge.net/SupportedSystems.html (BIOSIG) for supported file formats).'',' ...
                                ''' ''));' ];
 if exist('ft_chantype')
-    uimenu( neuro_m, 'Label', 'From these and other formats using FILE-IO toolbox'  , 'CallBack', cb_fileio, 'separator', 'on'); 
+    uimenu( import_m, 'Label', 'Using FILE-IO toolbox interface', 'CallBack', cb_fileio, 'separator', 'on'); 
 end;
 if biosigflag
-    uimenu( neuro_m, 'Label', 'From these and other formats using BIOSIG toolbox'   , 'CallBack', cb_biosig); 
+    uimenu( import_m, 'Label', 'Using BIOSIG toolbox interface' , 'CallBack', cb_biosig); 
 end;
-uimenu( neuro_m, 'Label', 'Troubleshooting data formats...', 'CallBack', cb_others);    
+uimenu( import_m, 'Label', 'Troubleshooting data formats...', 'CallBack', cb_others);    
 
 % changing plugin menu color
 % --------------------------
@@ -900,7 +901,7 @@ filter_m    = findobj('parent', filter_m);
 icadefs; % containing PLUGINMENUCOLOR
 if length(fourthsub_m) > 11, set(fourthsub_m(1:end-11), 'foregroundcolor', PLUGINMENUCOLOR); end;
 if length(plotsub_m)   > 17, set(plotsub_m  (1:end-17), 'foregroundcolor', PLUGINMENUCOLOR); end;
-if length(importsub_m) > 9,  set(importsub_m(1:end-8) , 'foregroundcolor', PLUGINMENUCOLOR); end;
+if length(importsub_m) > 9,  set(importsub_m(1:end-9) , 'foregroundcolor', PLUGINMENUCOLOR); end;
 if length(epochsub_m ) > 3 , set(epochsub_m (1:end-3 ), 'foregroundcolor', PLUGINMENUCOLOR); end;
 if length(eventsub_m ) > 4 , set(eventsub_m (1:end-4 ), 'foregroundcolor', PLUGINMENUCOLOR); end;
 if length(exportsub_m) > 4 , set(exportsub_m(1:end-4 ), 'foregroundcolor', PLUGINMENUCOLOR); end;
