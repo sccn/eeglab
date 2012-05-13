@@ -71,6 +71,9 @@ if nargin < 1
     % ----------------------
     disp('Reading data file header...');
     dat = sopen(filename);
+    if ~isfield(dat, 'NRec')
+        error('Unsuported data format');
+    end;
     
     % special BIOSEMI
     % ---------------
