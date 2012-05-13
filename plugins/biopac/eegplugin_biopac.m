@@ -62,4 +62,4 @@ function vers = eegplugin_biopac(fig, trystrs, catchstrs)
     
     % create menus
     % ------------
-    uimenu( menu, 'label', 'From BIOPAC MATLAB files', 'callback', comcnt, 'position', 11, 'separator', 'on');
+    uimenu( menu, 'label', 'From BIOPAC MATLAB files', 'callback', comcnt, 'separator', 'on');
