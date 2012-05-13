@@ -42,8 +42,8 @@ function h = fillcurves(X, Y1, Y2, color);
     if nargin < 4
         color = 'r';
     end;
-    X1 = X;
-    X2 = X;
+    X1 = X(:)';
+    X2 = X(:)';
     
     % remove NaNs
     tmpnan1 = find(isnan(Y1));
