@@ -50,4 +50,4 @@ function vers = eegplugin_procom(fig, trystrs, catchstrs)
     
     % create menus
     % ------------
-    uimenu( menu, 'label', 'From Procom Infinity Text File', 'callback', comcnt, 'position', 11);
+    uimenu( menu, 'label', 'From Procom Infinity Text File', 'callback', comcnt, 'separator', 'on');
