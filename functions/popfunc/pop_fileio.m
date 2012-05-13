@@ -61,8 +61,7 @@ if nargin < 1
         uilist{end+1} = { 'style' 'edit' 'string' '' };
         geom = { geom{:} [3 1] };
     end;
-    result = inputgui( geom, uilist, 'pophelp(''pop_biosig'')', ...
-                                 'Load data using BIOSIG -- pop_biosig()');
+    result = inputgui( geom, uilist, 'pophelp(''pop_fileio'')', 'Load data using FILE-IO -- pop_fileio()');
     if length(result) == 0 return; end;
 
     options = {};
