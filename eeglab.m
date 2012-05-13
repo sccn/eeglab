@@ -420,6 +420,7 @@ cb_loadcnt     = [ nocheck '[EEG LASTCOM] = pop_loadcnt;'      e_newset ];
 cb_loadeeg     = [ nocheck '[EEG LASTCOM] = pop_loadeeg;'      e_newset ]; 
 cb_biosig      = [ nocheck '[EEG LASTCOM] = pop_biosig; '      e_newset ]; 
 cb_fileio      = [ nocheck '[EEG LASTCOM] = pop_fileio; '      e_newset ]; 
+cb_fileio2     = [ nocheck '[EEG LASTCOM] = pop_fileiodir;'   e_newset ]; 
 
 cb_importepoch = [ checkepoch   '[EEG LASTCOM] = pop_importepoch(EEG);'   e_store ];
 cb_loaddat     = [ checkepoch   '[EEG LASTCOM]= pop_loaddat(EEG);'        e_store ]; 
@@ -595,14 +596,15 @@ if ismatlab
     set_m   = uimenu( W_MAIN, 'Label', 'Datasets'                                , 'userdata', ondatastudy);
     help_m  = uimenu( W_MAIN, 'Label', 'Help'                                    , 'userdata', on);
 
-    uimenu( neuro_m, 'Label', 'From ASCII/float file or Matlab array', 'CallBack', cb_importdata);
-    uimenu( neuro_m, 'Label', 'From Netstation binary simple file'   , 'CallBack', cb_readegi,    'Separator', 'on'); 
-    uimenu( neuro_m, 'Label', 'From Multiple seg. Netstation files'  , 'CallBack', cb_readsegegi); 
-    uimenu( neuro_m, 'Label', 'From Netstation Matlab files'         , 'CallBack', cb_readegiepo); 
-    uimenu( neuro_m, 'Label', 'From BCI2000 ASCII file'              , 'CallBack', cb_loadbci,    'Separator', 'on'); 
-    uimenu( neuro_m, 'Label', 'From Snapmaster .SMA file'            , 'CallBack', cb_snapread,   'Separator', 'on'); 
-    uimenu( neuro_m, 'Label', 'From Neuroscan .CNT file'             , 'CallBack', cb_loadcnt,    'Separator', 'on'); 
-    uimenu( neuro_m, 'Label', 'From Neuroscan .EEG file'             , 'CallBack', cb_loadeeg); 
+    uimenu( neuro_m, 'Label', 'From ASCII/float file or Matlab array' , 'CallBack', cb_importdata);
+    uimenu( neuro_m, 'Label', 'From Netstation folder (FILE-IO toolbox)', 'CallBack', cb_fileio2,    'Separator', 'on'); 
+    uimenu( neuro_m, 'Label', 'From Netstation binary simple file'    , 'CallBack', cb_readegi); 
+    uimenu( neuro_m, 'Label', 'From Multiple seg. Netstation files'   , 'CallBack', cb_readsegegi); 
+    uimenu( neuro_m, 'Label', 'From Netstation Matlab files'          , 'CallBack', cb_readegiepo); 
+    uimenu( neuro_m, 'Label', 'From BCI2000 ASCII file'               , 'CallBack', cb_loadbci,    'Separator', 'on'); 
+    uimenu( neuro_m, 'Label', 'From Snapmaster .SMA file'             , 'CallBack', cb_snapread,   'Separator', 'on'); 
+    uimenu( neuro_m, 'Label', 'From Neuroscan .CNT file'              , 'CallBack', cb_loadcnt,    'Separator', 'on'); 
+    uimenu( neuro_m, 'Label', 'From Neuroscan .EEG file'              , 'CallBack', cb_loadeeg); 
 
     % BIOSIG MENUS
     % ------------
@@ -870,20 +872,20 @@ if ~ismatlab, return; end;
 % add other import ...
 % --------------------
 cb_others = [ 'warndlg2(strvcat(''Several EEGLAB plugins (not included by default) are available to import cogniscan,'',' ...
-                               ''' micromed, and TDT formats. To download plugins go to www.sccn.ucsd.edu/eeglab/plugins/.'',' ...
+                               '''micromed, and TDT formats. To download plugins go to www.sccn.ucsd.edu/eeglab/plugins/.'',' ...
                                '''  '',' ...
-                               '''The FILEIO and BIOSIG toolboxes interface (included at the end of the import data'',' ...
-                               '''menu) also allow to import in EEGLAB a wide variety of EEG/MEG data file formats'',' ...
+                               '''The FILEIO and BIOSIG toolboxes interface also allow to import in EEGLAB a wide variety'',' ...
+                               '''of EEG/MEG data file formats -- including those imported using EEGLAB native menus'',' ...
                                '''(see www2.ru.nl/fcdonders/fieldtrip/doku.php?id=fieldtrip:dataformat (FILEIO) and'',' ...
-                               '''biosig.sourceforge.net/SupportedSystems.html (BIOSIG) for supported file formats)'',' ...
+                               '''biosig.sourceforge.net/SupportedSystems.html (BIOSIG) for supported file formats).'',' ...
                                ''' ''));' ];
 if exist('ft_chantype')
-    uimenu( neuro_m, 'Label', 'From other formats using FILE-IO toolbox'  , 'CallBack', cb_fileio, 'separator', 'on'); 
+    uimenu( neuro_m, 'Label', 'From these and other formats using FILE-IO toolbox'  , 'CallBack', cb_fileio, 'separator', 'on'); 
 end;
 if biosigflag
-    uimenu( neuro_m, 'Label', 'From other formats using BIOSIG toolbox'   , 'CallBack', cb_biosig); 
+    uimenu( neuro_m, 'Label', 'From these and other formats using BIOSIG toolbox'   , 'CallBack', cb_biosig); 
 end;
-uimenu( neuro_m, 'Label', 'Troubleshooting, other data formats...', 'CallBack', cb_others);    
+uimenu( neuro_m, 'Label', 'Troubleshooting data formats...', 'CallBack', cb_others);    
 
 % changing plugin menu color
 % --------------------------
