@@ -188,5 +188,5 @@ elseif plotfreqz
     disp('Cannot plot frequency response of band pass or notch filter');
 end
 
-com = sprintf( '%s = pop_iirfilt( %s, %s, %s, %d, %d, %d);', inputname(1), inputname(1), ...
-			num2str( locutoff), num2str( hicutoff), trans_bw, revfilt, causal );
+com = sprintf( '%s = pop_iirfilt( %s, %s, %s, [%s], %s, %s);', inputname(1), inputname(1), ...
+			num2str( locutoff), num2str( hicutoff), num2str( trans_bw), num2str( revfilt), num2str( causal) );
