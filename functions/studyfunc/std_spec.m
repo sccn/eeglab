@@ -266,6 +266,9 @@ elseif strcmpi(g.specmode, 'pburg')
         X = mean(X,3);    
     end;
 else % fft mode
+    if oritrials == 1
+        X = bsxfun(@times, X, hamming(size(X,2))');
+    end;
     if all([ EEG.trials ] == 1) && ~isempty(boundaries), disp('Warning: fft does not take into account boundaries in continuous data'); end;
     tmp   = fft(X, g.nfft, 2);
     f     = linspace(0, EEG(1).srate/2, floor(size(tmp,2)/2));
