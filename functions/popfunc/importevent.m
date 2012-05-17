@@ -328,8 +328,10 @@ function event = recomputelatency( event, indices, srate, timeunit, align, oldev
     else
         % must add one (because first sample point has latency 0
         % ------------------------------------------------------
-        for index = indices
-            event(index).latency = round((event(index).latency+1)*1000*newfactor)/1000;
+        if ~isnan(timeunit)
+            for index = indices
+                event(index).latency = round((event(index).latency+1)*1000*newfactor)/1000;
+            end;
         end;
     end;        
 
