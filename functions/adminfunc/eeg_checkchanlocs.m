@@ -34,6 +34,9 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+% Hey Arno -- this is a quick fix to make an analysis work for Makoto
+% I think the old version had a bug...
+
 function [chans, chaninfo, chanedit]= eeg_checkchanlocs(chans, chaninfo);
 
 if nargin < 1 
@@ -54,10 +57,12 @@ if isfield(chans, 'data')
 end;
 
 if ~isfield(chans, 'datachan')
-    chanedit = insertchans(chans, chaninfo);
+    [chanedit,dummy,complicated] = insertchans(chans, chaninfo);
 else
     chanedit = chans;
+    complicated = true;
 end;
+
 nosevals       = { '+X' '-X' '+Y' '-Y' };
 if ~isfield(chaninfo, 'plotrad'), chaninfo.plotrad = []; end;
 if ~isfield(chaninfo, 'shrink'),  chaninfo.shrink = [];  end;
@@ -81,13 +86,14 @@ if isfield(chanedit, 'shrink') && ~isempty(chanedit(1).shrink)
     chaninfo.plotrad = plotrad;
 end;
 
-% set non-existant fields to []
+% set non-existent fields to []
 % -----------------------------
 fields    = { 'labels' 'theta' 'radius' 'X'   'Y'   'Z'   'sph_theta' 'sph_phi' 'sph_radius' 'type' 'ref' 'urchan' };
 fieldtype = { 'str'    'num'   'num'    'num' 'num' 'num' 'num'       'num'     'num'        'str'  'str' 'num'    };
+check_newfields = true; %length(fieldnames(chanedit)) < length(fields);
 if ~isempty(chanedit)
     for index = 1:length(fields)
-        if ~isfield(chanedit, fields{index})
+        if check_newfields && ~isfield(chanedit, fields{index})
             % new field
             % ---------
             if strcmpi(fieldtype{index}, 'num')
@@ -100,23 +106,26 @@ if ~isempty(chanedit)
         else
             % existing fields
             % ---------------
-            eval([ 'allvals = { chanedit.' fields{index} '};' ] );
+            allvals = {chanedit.(fields{index})};
             if strcmpi(fieldtype{index}, 'num')
-                numok = cellfun(@isnumeric, allvals);
-                if any(numok == 0)
-                    for indConvert = find(numok == 0)
-                        chanedit = setfield(chanedit, {indConvert}, fields{index}, []);
+                if ~all(cellfun('isclass',allvals,'double'))
+                    numok = cellfun(@isnumeric, allvals);
+                    if any(numok == 0)
+                        for indConvert = find(numok == 0)
+                            chanedit = setfield(chanedit, {indConvert}, fields{index}, []);
+                        end;
                     end;
-                end;
+                end
             else
-                strok = cellfun(@isstr, allvals);
+                strok = cellfun('isclass', allvals,'char');
                 if strcmpi(fields{index}, 'labels'), prefix = 'E'; else prefix = ''; end;
                 if any(strok == 0)
                     for indConvert = find(strok == 0)
                         try
                               strval   = [ prefix num2str(getfield(chanedit, {indConvert}, fields{index})) ];
                               chanedit = setfield(chanedit, {indConvert}, fields{index}, strval);
-                        catch chanedit = setfield(chanedit, {indConvert}, fields{index}, '');
+                        catch
+                            chanedit = setfield(chanedit, {indConvert}, fields{index}, '');
                         end;
                     end;
                 end;
@@ -124,18 +133,19 @@ if ~isempty(chanedit)
         end;
     end;
 end;
-if exist('orderfields') == 2
-    try,
+if ~isequal(fieldnames(chanedit)',fields)
+    try
         chanedit = orderfields(chanedit, fields);
     catch, end;
-end;
+end
 
 % check if duplicate channel label
 % --------------------------------
 if isfield(chanedit, 'labels')
-    if length( { chanedit.labels } ) > length( unique({ chanedit.labels } ) )
-        disp('Warning: some channels have the same label');
-    end;
+    tmp = sort({chanedit.labels});
+    if any(strcmp(tmp(1:end-1),tmp(2:end)))
+        disp('Warning: some channels have the same label'); 
+    end
 end;
 
 % remove fields
@@ -145,13 +155,18 @@ if isfield(chanedit, 'sph_theta_besa'), chanedit = rmfield(chanedit, 'sph_theta_
 
 % reconstruct the chans structure
 % -------------------------------
-[chans chaninfo.nodatchans] = getnodatchan( chanedit );
-if ~isfield(chaninfo, 'nodatchans'), chaninfo.nodatchans = []; end;
-if isempty(chanedit)
-    for iField = 1:length(fields)
-        chanedit = setfield(chanedit, fields{iField}, []);
+if complicated
+    [chans chaninfo.nodatchans] = getnodatchan( chanedit );
+    if ~isfield(chaninfo, 'nodatchans'), chaninfo.nodatchans = []; end;
+    if isempty(chanedit)
+        for iField = 1:length(fields)
+            chanedit = setfield(chanedit, fields{iField}, []);
+        end;
     end;
-end;
+else
+    chans = rmfield(chanedit,'datachan');
+    chaninfo.nodatchans = [];
+end
 
 if processingEEGstruct
     tmpEEG.chanlocs = chans;
@@ -163,16 +178,11 @@ end;
 % separate data channels from non-data channels
 % ---------------------------------------------
 function [chans, fids] = getnodatchan(chans)
-if isfield(chans, 'datachan')
-    for ind = 1:length(chans)
-        if isempty(chans(ind).datachan)
-            chans(ind).datachan = 0;
-        end;
-    end;
-    alldatchans = [ chans.datachan ];
-    chans = rmfield(chans, 'datachan');
-    fids  = chans(find(alldatchans == 0));
-    chans = chans(find(alldatchans));
+if isfield(chans,'datachan')
+    [chans(cellfun('isempty',{chans.datachan})).datachan] = deal(0);
+    fids = [chans.datachan] == 0;
+    chans = rmfield(chans(~fids),'datachan');
+    fids = find(fids);    
 else
     fids = [];
 end;
@@ -180,18 +190,24 @@ end;
 % ----------------------------------------
 % fuse data channels and non-data channels
 % ----------------------------------------
-function [chans, chaninfo] = insertchans(chans, chaninfo, nchans)
+function [chans, chaninfo,complicated] = insertchans(chans, chaninfo, nchans)
 if nargin < 3, nchans = length(chans); end;
 [chans.datachan] = deal(1);
+complicated = false;        % whether we need complicated treatment of datachans & co further down the road.....
+
 if isfield(chans,'type')
     mask = strcmpi({chans.type},'FID') | strcmpi({chans.type},'IGNORE');
-    [chans(mask).datachan] = deal(0);
+    if any(mask)
+        [chans(mask).datachan] = deal(0);
+        complicated = true;
+    end
 end
 if length(chans) > nchans & nchans ~= 0 % reference at the end of the structure
     chans(end).datachan = 0;
+    complicated = true;
 end;
 if isfield(chaninfo, 'nodatchans')
-    if ~isempty(chaninfo.nodatchans)
+    if ~isempty(chaninfo.nodatchans) && isstruct(chaninfo.nodatchans)
         chanlen = length(chans);
         for index = 1:length(chaninfo.nodatchans)
             fields = fieldnames( chaninfo.nodatchans );
@@ -200,6 +216,7 @@ if isfield(chaninfo, 'nodatchans')
                 chans = setfield(chans, { ind }, fields{f}, getfield( chaninfo.nodatchans, { index },  fields{f}));
             end;
             chans(ind).datachan = 0;
+            complicated = true;
         end;
         chaninfo = rmfield(chaninfo, 'nodatchans');
         
