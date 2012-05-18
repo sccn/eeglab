@@ -174,7 +174,7 @@ end
 % -------------
 if isempty(datadd), error('First edit box (datasets to add) can not be empty'); end;
 g = finputcheck( options, ... 
-                 { 'chans'    'integer'  [1:ALLEEG(datadd(1)).nbchan] 0;
+                 { 'chans'    'integer'  []               [1:ALLEEG(datadd(1)).nbchan];
                    'title'    'string'   []               '';
                    'alpha'    'float'    []               [];
                    'geom'     'string'  {'scalp';'array'} fastif(flag, 'scalp', 'array');
