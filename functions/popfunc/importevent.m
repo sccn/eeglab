@@ -7,8 +7,8 @@
 % Input:
 %   event     - [ 'filename'|array ] Filename of a text file, or name of
 %               Matlab array in the global workspace containing an
-%               array of events in the folowing format: The first column
-%               is the type of the event, the second the latency. 
+%               array of events in the folowing format: The first column of
+%               the cell array is the type of the event, the second the latency. 
 %               The others are user-defined. The function can read 
 %               either numeric or text entries in ascii files.
 %   oldevent  - Old event structure. Used for aligning new events with old
@@ -157,6 +157,7 @@ for curfield = tmpfields'
         case 'event', % load an ascii file
             switch g.append 
                 case { '''no''' 'no' } % ''no'' for backward compatibility
+                      if isstr(g.event) && ~exist(g.event), g.event = evalin('caller', g.event); end;
                       event = load_file_or_array( g.event, g.skipline, g.delim );
                       allfields = g.fields(1:min(length(g.fields), size(event,2)));
                       event = eeg_eventformat(event, 'struct', allfields);
@@ -173,6 +174,7 @@ for curfield = tmpfields'
                 case { '''yes''' 'yes' }
                       % match existing fields
                       % ---------------------
+                      if isstr(g.event) && ~exist(g.event), g.event = evalin('caller', g.event); end;
                       tmparray = load_file_or_array( g.event, g.skipline, g.delim );
                       if isempty(g.indices) g.indices = [1:size(tmparray,1)] + length(event); end;
                       if length(g.indices) ~= size(tmparray,1)
@@ -226,13 +228,9 @@ function array = load_file_or_array( varname, skipline, delim );
                                              % --------------------------
         array = loadtxt( varname, 'skipline', skipline, 'delim', delim, 'blankcell', 'off' );
         
-    else % variable in the global workspace
-         % --------------------------
-         if isstr(varname)
-             array = evalin('base', varname);
-             if ~iscell(array)
-                 array = mattocell(array, ones(1, size(array,1)), ones(1, size(array,2)));
-             end;    
+    else 
+         if ~iscell(varname)
+             array = mattocell(varname, ones(1, size(array,1)), ones(1, size(array,2)));
          else
              array = varname;
          end;
