@@ -348,6 +348,10 @@ if isfield(hdr.commoninfos, 'markerfile')
                 end
                 EEG.xmin = -(tmpevent(tles(1)).latency - 1) / EEG.srate;
             end
+        else
+            for index = 1:length(boundaries)
+                EEG.event(index).duration = NaN;
+            end;
         end
     end
 end
