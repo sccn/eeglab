@@ -474,6 +474,19 @@ while sec<=sections
     sec=sec+1;
 end
 
+% test prcorr2
+try
+    prcorr2(rand(1,100), rand(1,100))
+catch,
+    tmpfile = which('prcorr2');
+    [tmppath tmpfilenoext] = fileparts(tmpfile);
+    tmpfilenoext = fullfile(tmppath,tmpfilenoext);
+    delete(tmpfile);
+    disp( [ 'Removing file ' tmpfile ]);
+    disp( [ 'Try recompiling the mex file by typing' ]);
+    disp( [ 'mex ' tmpfilenoext '.c' ]);
+end;
+
 %----------------
 SCount=1;
 sections=length(secl);
