@@ -408,7 +408,7 @@ return;
 function event = recomputelatency( event, indices, srate, timeunit);
     if ~isfield(event, 'latency'), return; end;
     for index = indices
-        event(index).latency = round(event(index).latency*srate*timeunit);
+        event(index).latency = event(index).latency*srate*timeunit+1;
     end;
          
 % create new field names
