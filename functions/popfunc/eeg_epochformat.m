@@ -176,7 +176,9 @@ case 'array'
                      tmp(trial, index) = { NaN };
                 elseif iscell(tmpval)
                      tmp(trial, index) = tmpval(epochSubIndex(trial));
-                else tmp(trial, index) = { tmpval(epochSubIndex(trial)) };
+                elseif ~ischar(tmpval)
+                     tmp(trial, index) = { tmpval(epochSubIndex(trial)) };
+                else tmp(trial, index) = { tmpval };
                 end;
             end;
         end;
