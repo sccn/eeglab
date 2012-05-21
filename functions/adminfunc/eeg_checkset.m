@@ -272,7 +272,7 @@ for inddataset = 1:length(ALLEEG)
                     end;
                 case 'event',
                     if isempty(EEG.event)
-                        errordlg2(strvcat('Cannot process if no events. Add events.', ...
+                        errordlg2(strvcat('Requires events. You need to dd events first.', ...
                             'Use "Edit > event fields" to create event fields.', ...
                             'Or use "File > Import event info" or "File > Import epoch info"'), 'Error');
                         return;
@@ -280,17 +280,17 @@ for inddataset = 1:length(ALLEEG)
                 case 'chanloc',
                     tmplocs = EEG.chanlocs;
                     if isempty(tmplocs) || ~isfield(tmplocs, 'theta') || all(cellfun('isempty', { tmplocs.theta }))
-                        errordlg2( strvcat('Cannot process dataset without channel location information.', ...
-                            'Enter the filename via "Edit > Edit dataset info".', ...
-                            'For file format, enter ''>> help readlocs'' from the command line.'), 'Error');
+                        errordlg2( strvcat('This functionality requires channel location information.', ...
+                            'Enter the channel file name via "Edit > Edit dataset info".', ...
+                            'For channel file format, see ''>> help readlocs'' from the command line.'), 'Error');
                         return;
                     end;
                 case 'chanlocs_homogeneous',
                     tmplocs = EEG.chanlocs;
 	                if isempty(tmplocs) || ~isfield(tmplocs, 'theta') || all(cellfun('isempty', { tmplocs.theta }))
-                        errordlg2( strvcat('Cannot process without a channel location information.', ...
-                            'Enter the filename via "Edit > Edit dataset info".', ...
-                            'For file format, enter ''>> help readlocs'' from the command line.'), 'Error');
+                        errordlg2( strvcat('This functionality requires channel location information.', ...
+                            'Enter the channel file name via "Edit > Edit dataset info".', ...
+                            'For channel file format, see ''>> help readlocs'' from the command line.'), 'Error');
                         return;
                     end;
                     if ~isfield(EEG.chanlocs, 'X') || isempty(EEG.chanlocs(1).X)
@@ -340,7 +340,7 @@ for inddataset = 1:length(ALLEEG)
                     % remove the events which latency are out of boundary
                     % ---------------------------------------------------
                     if isfield(EEG.event, 'latency')
-                        if ischar(EEG.event(1).type)
+                        if isfield(EEG.event, 'type') && ischar(EEG.event(1).type)
                             if strcmpi(EEG.event(1).type, 'boundary') & isfield(EEG.event, 'duration')
                                 if EEG.event(1).duration < 1
                                     EEG.event(1) = [];
