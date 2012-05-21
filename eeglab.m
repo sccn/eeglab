@@ -598,7 +598,7 @@ if ismatlab
     help_m   = uimenu( W_MAIN,   'Label', 'Help'                                    , 'userdata', on);
 
     uimenu( neuro_m, 'Label', 'From ASCII/float file or Matlab array' , 'CallBack', cb_importdata);
-    uimenu( neuro_m, 'Label', 'From Netstation folder (FILE-IO toolbox)', 'CallBack', cb_fileio2,    'Separator', 'on'); 
+    uimenu( neuro_m, 'Label', 'From Netstation .mff (FILE-IO toolbox)', 'CallBack', cb_fileio2,    'Separator', 'on'); 
     uimenu( neuro_m, 'Label', 'From Netstation binary simple file'    , 'CallBack', cb_readegi); 
     uimenu( neuro_m, 'Label', 'From Multiple seg. Netstation files'   , 'CallBack', cb_readsegegi); 
     uimenu( neuro_m, 'Label', 'From Netstation Matlab files'          , 'CallBack', cb_readegiepo); 
@@ -881,10 +881,10 @@ cb_others = [ 'warndlg2(strvcat(''Several EEGLAB plugins (not included by defaul
                                '''biosig.sourceforge.net/SupportedSystems.html (BIOSIG) for supported file formats).'',' ...
                                ''' ''));' ];
 if exist('ft_chantype')
-    uimenu( import_m, 'Label', 'Using FILE-IO toolbox interface', 'CallBack', cb_fileio, 'separator', 'on'); 
+    uimenu( import_m, 'Label', 'Using the FILE-IO interface', 'CallBack', cb_fileio, 'separator', 'on'); 
 end;
 if biosigflag
-    uimenu( import_m, 'Label', 'Using BIOSIG toolbox interface' , 'CallBack', cb_biosig); 
+    uimenu( import_m, 'Label', 'Using the BIOSIG interface' , 'CallBack', cb_biosig); 
 end;
 uimenu( import_m, 'Label', 'Troubleshooting data formats...', 'CallBack', cb_others);    
 
