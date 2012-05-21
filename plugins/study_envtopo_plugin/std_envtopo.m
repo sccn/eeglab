@@ -74,6 +74,7 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1.07  USA
 %
 % History
+% 04/29/2012 ver 5.2 by Makoto. A bug fixed. STUDY.design(STUDY.currentdesign)
 % 04/24/2012 ver 5.1 by Makoto. Revived 'amplimit' 'fillclust' options, and vertical doted lines for limcontrib range. Default changed into 'pvaf' from 'rv'. 
 % 02/28/2012 ver 5.0 by Makoto. Values are now normalized by the number of subjects participating to the cluster. Group difference is better addressed when performing subtraction across groups. A group ratio is output too.
 % 02/24/2012 ver 4.5 by Makoto. New color schema to improve color readability & shared line colors across multiple plots
@@ -106,12 +107,12 @@ end
 % run finputcheck
 arglist = finputcheck(varargin, ...
              {'clustnums'     'integer'  [-length(STUDY.cluster):length(STUDY.cluster)  ]     [];...
-              'conditions'    'integer'  [1:length(STUDY.design.variable(1,1).value)] [1:length(STUDY.design.variable(1,1).value)];...
+              'conditions'    'integer'  [1:length(STUDY.design(STUDY.currentdesign).variable(1,1).value)] [1:length(STUDY.design(STUDY.currentdesign).variable(1,1).value)];...
               'clust_exclude' 'integer'  [1:length(STUDY.cluster)]                            [];...
               'onlyclus'      'string'   {'on', 'off'}                                        [];...
               'baseline'      'real'     []                                                   [];...
               'diff'          'integer'  []                                                   [];...
-              'timerange'     'real'     []               [STUDY.cluster(1,2).erptimes([1 end])];...
+              'timerange'     'real'     []               [ALLEEG(1,1).times([1 end])];...
               'amplimits'     'real'     []                                                   [];...
               'limcontrib'    'real'     []                                                   [];...
               'vert'          'real'     []                                                   [];...
@@ -278,7 +279,7 @@ clear columnwise rowwise
 
 if ~isempty(arglist.diff)
     % First, plot title is determined
-    if     length(STUDY.design.variable(1,1).value) == 1 && arglist.diff(1) == 1 && arglist.diff(3) == 1 % Group only if no condition
+    if     length(STUDY.design(STUDY.currentdesign).variable(1,1).value) == 1 && arglist.diff(1) == 1 && arglist.diff(3) == 1 % Group only if no condition
         arglist.title = [num2str(STUDY.design(STUDY.currentdesign).variable(1,2).label) ' ' num2str(STUDY.design(STUDY.currentdesign).variable(1,2).value{1, arglist.diff(1,2)}) ' minus ' num2str(STUDY.design(STUDY.currentdesign).variable(1,2).label) ' ' num2str(STUDY.design(STUDY.currentdesign).variable(1,2).value{1, arglist.diff(1,4)})];
     elseif     length(STUDY.group) == 1 && arglist.diff(2) == 1 && arglist.diff(4) == 1 % Condition only if no group
         arglist.title = [num2str(STUDY.design(STUDY.currentdesign).variable(1,1).label) ' ' num2str(STUDY.design(STUDY.currentdesign).variable(1,1).value{1, arglist.diff(1,1)}) ' minus ' num2str(STUDY.design(STUDY.currentdesign).variable(1,1).label) ' ' num2str(STUDY.design(STUDY.currentdesign).variable(1,1).value{1, arglist.diff(1,3)})];
@@ -413,9 +414,16 @@ g.xlabel      = 'on';
 g.ylabel      = 'on';
 g.actscale    = 'off';
 g.topoarg     = 0;
-g.gridind     = find(~isnan(STUDY.cluster(1,2).topoall{1,1}));
 g.sumenv      = 'fill';
 
+% empty cluster crashes the code, so 
+for n = 2:length(STUDY.cluster)
+    if ~isempty(STUDY.cluster(1,n).topoall)
+        g.gridind = find(~isnan(STUDY.cluster(1,n).topoall{1,1}));
+        break
+    end
+end
+clear n
 %
 % Check input flags and arguments
 %
@@ -1219,58 +1227,59 @@ clear sets1 sets2
 
 % loop for all clusters
 for cls = 2:length(STUDY.cluster) 
+    if ~isempty(STUDY.cluster(1,cls).topoall) % this is for empty cluster 04/29/12 makoto
+        % pick up set indices from the nth cluster
+        ncomps = STUDY.cluster(1,cls).sets(1,:);
 
-    % pick up set indices from the nth cluster
-    ncomps = STUDY.cluster(1,cls).sets(1,:);
-
-    for columnwise = 1:size(STUDY.cluster(1,cls).setinds, 1)
-        for rowwise = 1:size(STUDY.cluster(1,cls).setinds, 2)
-            for nsets = 1:length(STUDY.cluster(1,cls).setinds{columnwise,rowwise})
-                sets_grouped{columnwise, rowwise}(1, nsets) = STUDY.design(1,STUDY.currentdesign).cell(1, STUDY.cluster(1,cls).setinds{columnwise, rowwise}(1, nsets)).dataset;
+        for columnwise = 1:size(STUDY.cluster(1,cls).setinds, 1)
+            for rowwise = 1:size(STUDY.cluster(1,cls).setinds, 2)
+                for nsets = 1:length(STUDY.cluster(1,cls).setinds{columnwise,rowwise})
+                    sets_grouped{columnwise, rowwise}(1, nsets) = STUDY.design(1,STUDY.currentdesign).cell(1, STUDY.cluster(1,cls).setinds{columnwise, rowwise}(1, nsets)).dataset;
+                end
             end
         end
-    end
-    
-    % rotate if variable_group == 1;
-    if variable_group == 1
-        sets_grouped = sets_grouped';
-    end
-    
-    sets_grouped_mat = cell2mat(sets_grouped);
 
-    % reverse reference: from setinds to sets_divided_mat
-    [a revref_group] = sort(sets_grouped_mat, 2);
-    revref_group = revref_group(1,:);
-
-    % create topoall_reordered
-    for n = 1:size(STUDY.cluster(1,cls).sets, 2)
-        topoall_reordered{1,n} = STUDY.cluster(1,cls).topoall{1,revref_group(n)};
-    end
-
-    % build topoall_group
-    if variable_group == 1;
-        ngroup = size(STUDY.cluster(1,cls).setinds, 1);
-        for n = 1:ngroup
-            ntopos(n) = length(STUDY.cluster(1,cls).setinds{n,1});
+        % rotate if variable_group == 1;
+        if variable_group == 1
+            sets_grouped = sets_grouped';
         end
-    else
-        ngroup = size(STUDY.cluster(1,cls).setinds, 2);
-        for n = 1:ngroup
-            ntopos(n) = length(STUDY.cluster(1,cls).setinds{1,n});
-        end
-    end
 
-    n = 0;
-    while n < ngroup
-        n = n+1;
-        if n == 1;
-            topoall_group{1, n} = topoall_reordered(1:ntopos(n));
+        sets_grouped_mat = cell2mat(sets_grouped);
+
+        % reverse reference: from setinds to sets_divided_mat
+        [a revref_group] = sort(sets_grouped_mat, 2);
+        revref_group = revref_group(1,:);
+
+        % create topoall_reordered
+        for n = 1:size(STUDY.cluster(1,cls).sets, 2)
+            topoall_reordered{1,n} = STUDY.cluster(1,cls).topoall{1,revref_group(n)};
+        end
+
+        % build topoall_group
+        if variable_group == 1;
+            ngroup = size(STUDY.cluster(1,cls).setinds, 1);
+            for n = 1:ngroup
+                ntopos(n) = length(STUDY.cluster(1,cls).setinds{n,1});
+            end
         else
-            topoall_group{1, n} = topoall_reordered(ntopos(n-1)+1: ntopos(n-1)+ntopos(n));
+            ngroup = size(STUDY.cluster(1,cls).setinds, 2);
+            for n = 1:ngroup
+                ntopos(n) = length(STUDY.cluster(1,cls).setinds{1,n});
+            end
         end
+
+        n = 0;
+        while n < ngroup
+            n = n+1;
+            if n == 1;
+                topoall_group{1, n} = topoall_reordered(1:ntopos(n));
+            else
+                topoall_group{1, n} = topoall_reordered(ntopos(n-1)+1: ntopos(n-1)+ntopos(n));
+            end
+        end
+
+        % locate the topoall_group to each of STUDY.cluster
+        STUDY.cluster(1,cls).topoall_group = topoall_group;
+        clear ncomps ntopos sets_* topoall_*
     end
-    
-    % locate the topoall_group to each of STUDY.cluster
-    STUDY.cluster(1,cls).topoall_group = topoall_group;
-    clear ncomps ntopos sets_* topoall_*
 end
