@@ -137,7 +137,9 @@ if nargin<2
              };
     geometry = { [1.05 1.05 2 0.8] };
 
-    listboxtext = 'No field selected';  
+    listboxtext = { 'No field selected' };
+    txt_warn = 'warndlg2(strvcat(''Warning: deleting/renaming this field might cause EEGLAB'', ''to be unstable. Some functionalities will also be lost.''));';
+    cb_warn2 = [ 'strtmp = get(gcbo, ''string''); if ~isempty(strmatch(strtmp(get(gcbo, ''value'')), { ''latency'' ''type''}, ''exact'')),' txt_warn 'end;' ];
     for index = 1:length(allfields) 
         geometry = { geometry{:} [1 1 1 0.7 0.2 0.32 0.2] };
         description = '';
@@ -147,6 +149,10 @@ if nargin<2
             tmplines = find(description == 10);
             if ~isempty(tmplines), description = description(1:tmplines(1)-1); end;
         catch, end;
+        if strcmp(allfields{index}, 'latency') || strcmp(allfields{index}, 'type')
+             cb_warn  = { 'callback' [ 'if get(gcbo, ''value''),' txt_warn 'end;' ] };
+        else cb_warn = { };
+        end;
         if strcmp(allfields{index}, 'latency')
             tmpfield = [ allfields{index} '(s)' ];
         elseif strcmp(allfields{index}, 'duration')
@@ -164,8 +170,8 @@ if nargin<2
                          'set(gcf, ''userdata'', tmpuserdata); clear tmpuserdata;' ] }, ...
                      { 'Style', 'edit', 'string', '', 'horizontalalignment', 'left', 'tag',  allfields{index} }, ...
                      { 'Style', 'pushbutton', 'string', 'Browse', 'callback', ['tagtest = ''' allfields{index} ''';' commandload ] }, ...
-                     { }, { 'Style', 'checkbox', 'string', '    ', 'visible', fastif(strcmp(allfields{index}, 'epoch'),'off', 'on')}, { } };
-        listboxtext = [ listboxtext '|' allfields{index} ]; 
+                     { }, { 'Style', 'checkbox', 'string', '    ', cb_warn{:} }, { } };
+        listboxtext = { listboxtext{:}  allfields{index} }; 
     end;
     index = length(allfields) + 1;
     uilist   = { uilist{:}, ...
@@ -181,7 +187,7 @@ if nargin<2
                  { 'Style', 'text', 'string', '-> add field'} ...
                  { } ...
                  { 'Style', 'text', 'string', 'Rename field', 'fontweight', 'bold' }, ...
-                 { 'Style', 'popupmenu', 'string', listboxtext }, ...
+                 { 'Style', 'popupmenu', 'string', listboxtext 'callback' cb_warn2 }, ...
                  { 'Style', 'text', 'string', 'as', 'fontweight', 'bold' }, ...
                  { 'Style', 'edit', 'string', '' } ...
                  fastif(isunix,{ 'Style', 'text', 'string', '(Click on field name to select it!)' },{ })};
