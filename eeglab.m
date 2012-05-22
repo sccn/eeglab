@@ -940,6 +940,8 @@ try
         
         % make the Help menu item dark red
         set(help_m, 'foregroundColor', [0.6, 0 0]);
+    elseif isempty(eeglabUpdater.lastTimeChecked)
+        fprintf('Could not check for the latest EEGLAB version (internet may be disconnected).\n');
     else
         fprintf('You are using the latest version of EEGLAB.\n');
     end;    
