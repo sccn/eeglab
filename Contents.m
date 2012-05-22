@@ -1,5 +1,5 @@
 % EEGLAB Toolbox to process EEG data
-% Version 11.0.1.1b
+% Version 11.0.2.1b
 %
 % eeglab() - Matlab graphic user interface environment for 
 %   electrophysiological data analysis incorporating the ICA/EEG toolbox 
