@@ -1856,6 +1856,7 @@ if decfactor > sqrt(ntrials) % if large, output this many trials
         decfactor = length(n)/decfactor;
     end;
 end
+if ~isreal(decfactor), decfactor = imag(decfactor); end;
 
 %
 %% %%%%%%%%%%%%%%%% Smooth data using moving average %%%%%%%%%%%%%%%%%%%%%%%%%%%
