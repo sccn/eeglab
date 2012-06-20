@@ -26,10 +26,11 @@ for ind = 1:length(tmpl)
     allkeywordstrue = 1;
     if isempty(tmpl(ind).keywords), allkeywordstrue = 0; end;
     for k = 1:length(tmpl(ind).keywords)
-        if isempty(findstr(chanfile, tmpl(ind).keywords{k})), allkeywordstrue = 0; end;
+        if isempty(findstr(lower(chanfile), lower(tmpl(ind).keywords{k}))), allkeywordstrue = 0; end;
     end;
     if allkeywordstrue,
         transform = tmpl(ind).transform;
+        break;
     end;
 end;
 
