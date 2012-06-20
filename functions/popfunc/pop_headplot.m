@@ -98,6 +98,8 @@ if nargin < 3 % Open GUI input window
             else
                 compute_file = 1;
             end;
+        else
+            compute_file = 1;
         end;
     else % ************* Component plot       
         fieldname    = 'icasplinefile';
@@ -107,6 +109,8 @@ if nargin < 3 % Open GUI input window
             else
                 compute_file = 1;
             end;
+        else
+            compute_file = 1;
         end;
     end;
             
@@ -124,11 +128,14 @@ if nargin < 3 % Open GUI input window
  	% graphic interface
 	% -----------------
     template(1).keywords  = { 'standard-10-5-cap385' };
-    template(1).transform = [ -0.31937  -5.96928 13.1812 0.0509311 0.0172127 -1.55007  1.08221  1.00037  0.923518 ];
+    template(1).transform = [ -0.355789     -6.33688      12.3705    0.0533239    0.0187461     -1.55264      1.06367     0.987721     0.932694 ];
+    %template(1).transform = [ -0.31937  -5.96928 13.1812 0.0509311 0.0172127 -1.55007  1.08221  1.00037  0.923518 ];
     template(2).keywords  = { 'standard_1005' };
-    template(2).transform = [ -0.732155 7.58141 11.8939 -0.0249659 0.0148571 0.0227427 0.932423 0.918943 0.793166 ];
-    template(3).keywords  = { 'gsn' 'sfp' '12' };
-    template(3).transform = [ 0 -9 -9 -0.12 0 -1.6 9.7 10.7 11.5 ];
+    template(2).transform = [ -1.13598      7.75226      11.4527   -0.0271167    0.0155306     -1.54547     0.912338     0.931611     0.806978 ];
+%        -0.732155 7.58141 11.8939 -0.0249659 0.0148571 0.0227427 0.932423 0.918943 0.793166 ];
+    template(3).keywords  = { 'gsn' 'sfp' };
+    %template(3).transform = [ 0 -9 -9 -0.12 0 -1.6 9.7 10.7 11.5 ];
+    template(3).transform = [ 0.664455     -3.39403     -14.2521  -0.00241453     0.015519     -1.55584           11      10.1455           12];
     template(4).keywords  = { 'egi' 'elp' };
     template(4).transform =  [ 0.0773 -5.3235 -14.72 -0.1187 -0.0023 -1.5940 92.4 92.5 110.9 ];
     
