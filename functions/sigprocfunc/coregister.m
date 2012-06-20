@@ -194,7 +194,7 @@ if ischar(chanlocs1)
                     tmpelec2.label{clist2(index)} = dat.elec1.label{clist1(index)};
                 end;
                 %try,
-                    [ tmp dat.transform ] = warp_chans(dat.elec1, dat.elec2, tmpelec2.label(clist2), 'traditional');
+                    [ tmp dat.transform ] = warp_chans(dat.elec1, tmpelec2, tmpelec2.label(clist2), 'traditional');
                 %catch,
                 %    warndlg2(strvcat('Transformation failed', lasterr));
                 %end;
@@ -326,7 +326,7 @@ else
                     tmpelec2.label{clist2(index)} = elec1.label{clist1(index)};
                 end;
                 try,
-                    [ electransf dat.transform ] = warp_chans(elec1, elec2, tmpelec2.label(clist2), 'traditional');
+                    [ electransf dat.transform ] = warp_chans(elec1, tmpelec2, tmpelec2.label(clist2), 'traditional');
                 catch,
                     warndlg2(strvcat('Transformation failed', lasterr));
                 end;
@@ -527,7 +527,7 @@ function plotelec(elec, elecshow, color, tag);
     
     % make bigger if fiducial
     % ------------------------
-    fidlist = { 'nz' 'lpa' 'rpa' 'nazion' 'left' 'right' 'nasion' };
+    fidlist = { 'nz' 'lpa' 'rpa' 'nazion' 'left' 'right' 'nasion' 'fidnz' 'fidt9' 'fidt10'};
     [tmp fids ] = intersect(lower(elec.label(elecshow)), fidlist);
     nonfids     = setdiff(1:length(elec.label(elecshow)), fids);
     h1 = plot3(X1(nonfids),Y1(nonfids),Z1(nonfids), 'o', 'color', color); hold on;
