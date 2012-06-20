@@ -100,12 +100,12 @@ function [chanlistout1, chanlistout2, thirdout, outfourth] = pop_chancoresp(chan
         if strcmpi(g.autoselect, 'fiducials')
             % find fiducials in both channel location strustures
             % --------------------------------------------------
-            naz1 = strmatch('nz', lower( chanstr1 ), 'exact'); if isempty(naz1), naz1 = strmatch('nasion', lower( chanstr1 ), 'exact'); end;
-            naz2 = strmatch('nz', lower( chanstr2 ), 'exact'); if isempty(naz2), naz2 = strmatch('nasion', lower( chanstr2 ), 'exact'); end;
-            lpa1 = strmatch('lpa', lower( chanstr1 ), 'exact'); if isempty(lpa1), lpa1 = strmatch('left',  lower( chanstr1 ), 'exact'); end;
-            lpa2 = strmatch('lpa', lower( chanstr2 ), 'exact'); if isempty(lpa2), lpa2 = strmatch('left',  lower( chanstr2 ), 'exact'); end;
-            rpa1 = strmatch('rpa', lower( chanstr1 ), 'exact'); if isempty(rpa1), rpa1 = strmatch('right', lower( chanstr1 ), 'exact'); end;
-            rpa2 = strmatch('rpa', lower( chanstr2 ), 'exact'); if isempty(rpa2), rpa2 = strmatch('right', lower( chanstr2 ), 'exact'); end;
+            naz1 = strmatch('nz', lower( chanstr1 ), 'exact'); if isempty(naz1), naz1 = strmatch('nasion', lower( chanstr1 ), 'exact'); end; if isempty(naz1), naz1 = strmatch('fidnz', lower( chanstr1 ), 'exact'); end;
+            naz2 = strmatch('nz', lower( chanstr2 ), 'exact'); if isempty(naz2), naz2 = strmatch('nasion', lower( chanstr2 ), 'exact'); end; if isempty(naz2), naz2 = strmatch('fidnz', lower( chanstr2 ), 'exact'); end;
+            lpa1 = strmatch('lpa', lower( chanstr1 ), 'exact'); if isempty(lpa1), lpa1 = strmatch('left',  lower( chanstr1 ), 'exact'); end; if isempty(lpa1), lpa1 = strmatch('fidt10', lower( chanstr1 ), 'exact'); end;
+            lpa2 = strmatch('lpa', lower( chanstr2 ), 'exact'); if isempty(lpa2), lpa2 = strmatch('left',  lower( chanstr2 ), 'exact'); end; if isempty(lpa2), lpa2 = strmatch('fidt10', lower( chanstr2 ), 'exact'); end;
+            rpa1 = strmatch('rpa', lower( chanstr1 ), 'exact'); if isempty(rpa1), rpa1 = strmatch('right', lower( chanstr1 ), 'exact'); end; if isempty(rpa1), rpa1 = strmatch('fidt9', lower( chanstr1 ), 'exact'); end;
+            rpa2 = strmatch('rpa', lower( chanstr2 ), 'exact'); if isempty(rpa2), rpa2 = strmatch('right', lower( chanstr2 ), 'exact'); end; if isempty(rpa2), rpa2 = strmatch('fidt9', lower( chanstr2 ), 'exact'); end;
             g.chanlist1 = [ naz1 lpa1 rpa1 ];
             g.chanlist2 = [ naz2 lpa2 rpa2 ];
             if length(g.chanlist1) ~= length(g.chanlist2) | length(g.chanlist1) == 0
