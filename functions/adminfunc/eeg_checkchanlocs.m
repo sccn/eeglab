@@ -177,12 +177,12 @@ end;
 % ---------------------------------------------
 % separate data channels from non-data channels
 % ---------------------------------------------
-function [chans, fids] = getnodatchan(chans)
+function [chans, fidsval] = getnodatchan(chans)
 if isfield(chans,'datachan')
     [chans(cellfun('isempty',{chans.datachan})).datachan] = deal(0);
     fids = [chans.datachan] == 0;
+    fidsval = chans(fids);    
     chans = rmfield(chans(~fids),'datachan');
-    fids = find(fids);    
 else
     fids = [];
 end;
