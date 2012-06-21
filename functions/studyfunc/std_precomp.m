@@ -27,8 +27,8 @@
 %  'scalp'    - ['on'|'off'] pre-compute scalp maps for components.
 %  'allcomps' - ['on'|'off'] compute ERSP/ITC for all components ('off'
 %               only use pre-selected components in the pop_study interface).
-%  'erpparams'   - [cell array] Parameters for the std_spec function. See 
-%                  std_spec for more information.
+%  'erpparams'   - [cell array] Parameters for the std_erp function. See 
+%                  std_erp for more information.
 %  'specparams'  - [cell array] Parameters for the std_spec function. See 
 %                  std_spec for more information.
 %  'erspparams'  - [cell array] Optional arguments for the std_ersp function.
