@@ -161,7 +161,7 @@ if ~isstr(varargin{1})
     % test path
     % ---------
     pathwarn = 'off';
-    if ~strcmpi(pwd, STUDY.filepath)
+    if ~strcmpi(pwd, STUDY.filepath) && ~strcmpi(pwd, STUDY.filepath(1:end-1))
         if length(STUDY.datasetinfo(1).filepath) < 1
             pathwarn = 'on';
         elseif STUDY.datasetinfo(1).filepath(1) == '.'
