@@ -1057,7 +1057,6 @@ if option_chat == 1
             end;
         end;
     else
-        disp('cannot start chat');
         tb = [];
     end;
 else
