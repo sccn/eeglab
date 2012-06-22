@@ -132,15 +132,11 @@ elseif ~isempty(opt.channels)
             warning('on', 'MATLAB:load:variableNotFound');
         catch, fileData = [];
         end;
-        if ~isempty(fileData)
-            if isfield(fileData, 'labels'), chan.chanlocs = struct('labels',     fileData.labels);
-            else                            chan.chanlocs = struct('labels', fileData.chanlabels);
-            end;
-            opt.dataindices(iFile) = std_chaninds(chan, opt.channels{iFile});
-        else
-            warning('Cannot use file to lookup channel names, the file needs to be recomputed')
-            return;
+        if isfield(fileData, 'labels'),        chan.chanlocs = struct('labels', fileData.labels);
+        elseif isfield(fileData, 'chanlabels') chan.chanlocs = struct('labels', fileData.chanlabels);
+        else error('Cannot use file to lookup channel names, the file needs to be recomputed');
         end;
+        opt.dataindices(iFile) = std_chaninds(chan, opt.channels{iFile});
     end;
 elseif ~isempty(opt.components)
      opt.dataindices = opt.components;
