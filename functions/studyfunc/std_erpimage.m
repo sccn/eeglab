@@ -167,10 +167,32 @@ if strcmpi(opt.concatenate, 'off')
     end;
     firstx = 1;
     xwidth = opt.smoothing;
-    xadv   = lastx/finallines;
+    %xadv   = lastx/finallines;
     nout   = finallines; %floor(((lastx-firstx+xadv+1)-xwidth)/xadv);
-    nlines = ceil(lastx/((lastx-firstx+1-xwidth)/(nout-1)));
+    nlines = (lastx-xwidth)/(nout-0.5)*i; % make it imaginary
+    %nlines = ceil(lastx/((lastx-firstx+1-xwidth)/(nout-1)));
 
+
+    if 0
+        % testing conversion back and forth
+        % ---------------------------------
+        for lastx = 20:300
+            for xwidth = 1:19
+                for nlines = (xwidth+1):100
+                    
+                    nout = floor(((lastx+nlines)-xwidth)/nlines);
+                    realnlines = (lastx-xwidth)/(nout-0.5);
+                    noutreal = floor(((lastx+realnlines)-xwidth)/realnlines);
+                    
+                    if nout ~= noutreal
+                        error('Wrong conversion 2');
+                    end;
+                    
+                end;
+            end;
+        end;
+    end;
+    
     for index = 1:size(X,1)
         [tmpX tmpevents] = erpimage(squeeze(X(index,:,:)), events, EEG(1).times, '', opt.smoothing, nlines, 'noplot', 'on', opt.erpimageopt{:}, moreopts{:});
         allerpimage = setfield(allerpimage, 'events', tmpevents);
