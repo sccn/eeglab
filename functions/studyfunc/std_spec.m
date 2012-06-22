@@ -69,6 +69,9 @@
 %                  computing the data spectrum. For instance, for evoked 
 %                  data trials, it is recommended to use the baseline time 
 %                  period.
+%   'continuous' - ['on'|'off'] force epoch data to be treated as
+%                  continuous so small data epochs can be extracted for the
+%                  'fft' specmode option. Default is 'off'.
 %   'freqrange'  - [minhz maxhz] frequency range (in Hz) within which to 
 %                  return the spectrum {default|[]: [0 sample rate/2]}.
 %                  Note that this does not affect the spectrum computed on
@@ -146,8 +149,10 @@ end;
                                       'specmode'   'string'  {'fft','psd','pmtm','pburg'} 'psd';
                                       'recompute'  'string'  { 'on','off' } 'off';
                                       'savetrials' 'string'  { 'on','off' } 'off';
+                                      'continuous' 'string'  { 'on','off' } 'off';
                                       'savefile'   'string'  { 'on','off' } 'on';
                                       'epochlim'   'real'    []         [0 1];
+                                      'trialindices' { 'integer','cell' } []         [];
                                       'epochrecur' 'real'    []         0.5;
                                       'rmcomps'    'cell'    []         cell(1,length(EEG));
                                       'nw'         'float'   []         4;
@@ -193,16 +198,6 @@ if exist(filename) & strcmpi(g.recompute, 'off')
     if ~isempty(X), return; end;
 end
 
-oritrials = EEG.trials;
-if ~strcmpi(g.specmode, 'psd')
-    if EEG(1).trials == 1, 
-        EEG = eeg_checkset(EEG, 'loaddata');
-        EEG = eeg_regepochs(EEG, g.epochrecur, g.epochlim);
-        g.trialindices = { [1:EEG(1).trials] };
-        disp('Warning: continuous data, extracting 1-second epochs'); 
-    end;
-end;
- 
 % No SPEC information found
 % -------------------------
 options = {};
@@ -214,6 +209,23 @@ else [X boundaries]  = eeg_getdatact(EEG, 'channel'  , [1:EEG(1).nbchan], 'trial
 end;
 if ~isempty(boundaries) && boundaries(end) ~= size(X,2), boundaries = [boundaries size(X,2)]; end;
 
+% extract epochs if necessary
+% ---------------------------
+oritrials = EEG.trials;
+if ~strcmpi(g.specmode, 'psd')
+    if EEG(1).trials == 1 || strcmpi(g.continuous, 'on')
+        EEG.data = X;
+        EEG.trials = size(EEG.data,3);
+        if EEG(1).trials > 1
+            EEG = eeg_epoch2continuous(EEG);
+        end;
+        EEG = eeg_regepochs(EEG, g.epochrecur, g.epochlim);
+        g.trialindices = { [1:EEG(1).trials] };
+        disp('Warning: continuous data, extracting 1-second epochs'); 
+        X = EEG.data;
+    end;
+end;
+ 
 % get specific time range for epoched and continuous data
 if ~isempty(g.timerange) 
     if oritrials > 1
@@ -266,7 +278,7 @@ elseif strcmpi(g.specmode, 'pburg')
         X = mean(X,3);    
     end;
 else % fft mode
-    if oritrials == 1
+    if oritrials == 1 || strcmpi(g.continuous, 'on')
         X = bsxfun(@times, X, hamming(size(X,2))');
     end;
     if all([ EEG.trials ] == 1) && ~isempty(boundaries), disp('Warning: fft does not take into account boundaries in continuous data'); end;
@@ -282,37 +294,47 @@ end;
 
 % Save SPECs in file (all components or channels)
 % ----------------------------------
+fileNames = computeFullFileName( { EEG.filepath }, { EEG.filename });
 if strcmpi(g.savefile, 'on')
     options = { options{:} spec_opt{:} 'timerange' g.timerange 'nfft' g.nfft 'specmode' g.specmode };
     if strcmpi(prefix, 'comp')
-        savetofile( filename, f, X, 'comp', 1:size(X,1), options);
+        savetofile( filename, f, X, 'comp', 1:size(X,1), options, {}, fileNames, g.trialindices);
     else
         if ~isempty(g.interp)
-            savetofile( filename, f, X, 'chan', 1:size(X,1), options, { g.interp.labels });
+            savetofile( filename, f, X, 'chan', 1:size(X,1), options, { g.interp.labels }, fileNames, g.trialindices);
         else
             tmpchanlocs = EEG(1).chanlocs;
-            savetofile( filename, f, X, 'chan', 1:size(X,1), options, { tmpchanlocs.labels });
+            savetofile( filename, f, X, 'chan', 1:size(X,1), options, { tmpchanlocs.labels }, fileNames, g.trialindices);
         end;
     end;
 end;
 return;
 
+% compute full file names
+% -----------------------
+function res = computeFullFileName(filePaths, fileNames);
+for index = 1:length(fileNames)
+    res{index} = fullfile(filePaths{index}, fileNames{index});
+end;
+
 % -------------------------------------
 % saving SPEC information to Matlab file
 % -------------------------------------
-function savetofile(filename, f, X, prefix, comps, params, labels);
+function savetofile(filename, f, X, prefix, comps, params, labels, dataFiles, dataTrials);
     
     disp([ 'Saving SPECTRAL file ''' filename '''' ]);
     allspec = [];
     for k = 1:length(comps)
         allspec = setfield( allspec, [ prefix int2str(comps(k)) ], squeeze(X(k,:,:)));
     end;
-    if nargin > 6
+    if nargin > 6 && ~isempty(labels)
         allspec.labels = labels;
     end;
     allspec.freqs      = f;
     allspec.parameters = params;
     allspec.datatype   = 'SPECTRUM';
+    allspec.datafiles   = dataFiles;
+    allspec.datatrials  = dataTrials;
     allspec.average_spec = mean(X,1);
     std_savedat(filename, allspec);
 
