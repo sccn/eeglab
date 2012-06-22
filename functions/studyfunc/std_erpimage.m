@@ -223,6 +223,8 @@ end;
 allerpimage.times       = EEG(1).times;
 allerpimage.parameters  = varargin;
 allerpimage.datatype    = 'ERPIMAGE';
+allerpimage.datafiles   = computeFullFileName( { EEG.filepath }, { EEG.filename });
+allerpimage.datatrials  = opt.trialindices;
 
 % Save ERPimages in file (all components or channels)
 % ----------------------------------------------
@@ -234,4 +236,11 @@ if strcmpi(opt.savefile, 'on')
         allerpimage.labels = opt.channels;
         std_savedat(filename, allerpimage);
     end;
+end;
+
+% compute full file names
+% -----------------------
+function res = computeFullFileName(filePaths, fileNames);
+for index = 1:length(fileNames)
+    res{index} = fullfile(filePaths{index}, fileNames{index});
 end;

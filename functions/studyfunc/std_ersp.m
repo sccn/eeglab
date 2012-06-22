@@ -379,27 +379,25 @@ X = logersp;
 
 % Save ERSP into file
 % -------------------
-for index = 1:length(EEG)
-    filenames{index} = fullfile(EEG(index).filepath, EEG(index).filename);
-end;
-if length(filenames) == 1, filenames = filenames{1}; end;
 all_ersp.freqs      = logfreqs;
 all_ersp.times      = times;
 all_ersp.datatype   = 'ERSP';
-all_ersp.datafile   = filenames;
-all_ersp.trialindices = g.trialindices;
+all_ersp.datafiles  = computeFullFileName( { EEG.filepath }, { EEG.filename });
+all_ersp.datatrials = g.trialindices;
+
 all_itc.freqs       = logfreqs;
 all_itc.times       = times;
 all_itc.parameters  = parameters;
 all_itc.datatype    = 'ITC';
-all_itc.datafile    = filenames;
-all_itc.trialindices = g.trialindices;
-all_trials.freqs    = logfreqs;
-all_trials.times    = times;
+all_itc.datafiles    = computeFullFileName( { EEG.filepath }, { EEG.filename });
+all_itc.datatrials   = g.trialindices;
+
+all_trials.freqs     = logfreqs;
+all_trials.times     = times;
 all_trials.parameters = { options{:} parameters{:} };
 all_trials.datatype   = 'TIMEF';
-all_trials.datafile   = filenames;
-all_trials.trialindices = g.trialindices;
+all_trials.datafiles  = computeFullFileName( { EEG.filepath }, { EEG.filename });
+all_trials.datatrials = g.trialindices;
 
 if powbaseexist
     all_ersp.parameters = { parameters{:}, 'baseline', g.powbase };
@@ -429,5 +427,12 @@ if strcmpi(g.savefile, 'on')
     if strcmpi(g.savetrials, 'on')
         std_savedat( filenametrials , all_trials );
     end;
+end;
+
+% compute full file names
+% -----------------------
+function res = computeFullFileName(filePaths, fileNames);
+for index = 1:length(fileNames)
+    res{index} = fullfile(filePaths{index}, fileNames{index});
 end;
 
