@@ -25,6 +25,12 @@
 %              of limits, you may also enter a sequence of frequencies. For
 %              example to compute the time-frequency decomposition at all
 %              frequency between 5 and 50 hertz with 1 Hz increment, enter "1:50"
+%   "Use limits, padding n" - [muliple choice list] "using limits" means
+%              to use the upper and lower limits in "Frequency limits" with
+%              a specific padding ratio (padratio argument of newtimef).
+%              The last option "use actual frequencies" forces newtimef to
+%              ignore the padratio argument and use the vector of frequencies  
+%              given as input in the "Frequency limits" edit box.
 %   "Log spaced" - [checkbox] you may check this box to compute log-spaced
 %              frequencies. Note that this is only relevant if you specify
 %              frequency limits (in case you specify actual frequencies,
