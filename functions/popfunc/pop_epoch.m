@@ -31,7 +31,7 @@
 %                the time-locking event {default: [-1 2]}
 %
 % Optional inputs:
-%   'eventindices'- [int indices] Extract data epochs time locked to the 
+%   'eventindices'- [integer vector] Extract data epochs time locked to the 
 %                indexed event numbers. 
 %   'valuelim' - [min max] or [max]. Lower and upper bound latencies for 
 %                trial data. Else if one positive value is given, use its 
