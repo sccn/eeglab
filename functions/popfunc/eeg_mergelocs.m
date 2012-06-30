@@ -9,6 +9,7 @@
 %
 % Output: 
 %     mergedlocs - merged channel location structure
+%     warning    - [0|1] dissimilar structures found (0=false, 1=true)
 %
 % Author: Arnaud Delorme, August 2006
 
@@ -28,9 +29,10 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function alllocs = eeg_mergelocs(varargin)
+function [alllocs warn] = eeg_mergelocs(varargin)
 
 persistent warning_shown;
+warn = 0;
 
 try
     % sort by length
@@ -49,6 +51,7 @@ try
 
         if length(newlocs) > length(union({ alllocs.labels }, { tmplocs.labels }))
 
+            warn = 1;
             if isempty(warning_shown)
                 disp('Warning: different channel montage or electrode order for the different datasets');
                 warning_shown = 1;
@@ -78,7 +81,7 @@ catch,
     % should check channel structure consistency instead
     % using checkchan function
     disp('Channel merging warning: dissimilar fields in the two structures');
-    alllocs = eeg_mergelocs_diffstruct(varargin{:});
+    [alllocs warn ] = eeg_mergelocs_diffstruct(varargin{:});
 end;
 
 % union of two channel location structure
@@ -93,7 +96,7 @@ function alllocs = myunion(locs1, locs2)
    count2 = 1;
    count3 = 1;
    alllocs = locs1; alllocs(:) = [];
-   while count1 <= length(locs1) | count2 <= length(locs2)
+   while count1 <= length(locs1) || count2 <= length(locs2)
        
        if count1 > length(locs1)
            alllocs(count3) = locs2(count2);
