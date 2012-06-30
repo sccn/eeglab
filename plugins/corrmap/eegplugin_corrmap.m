@@ -40,5 +40,5 @@ function vers=eegplugin_corrmap( fig, try_strings, catch_strings);
     end
     
 std = findobj(fig, 'tag', 'study');
-uimenu(std, 'label', 'Correlation between IC maps', 'callback', ...
-    [try_strings.check_ica '[CORRMAP STUDY ALLEEG LASTCOM]= pop_corrmap(STUDY,ALLEEG);' catch_strings.add_to_hist ]);
+uimenu(std, 'label', 'Cluster components by correlation (CORRMAP)', 'callback', ...
+    [try_strings.check_ica '[CORRMAP STUDY ALLEEG LASTCOM]= pop_corrmap(STUDY,ALLEEG);' catch_strings.add_to_hist ], 'userdata', 'startup:off;study:on');

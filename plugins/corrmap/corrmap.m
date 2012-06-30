@@ -621,6 +621,7 @@ if strcmp(badcomps,'yes')
     %storing EEG.badcomps
     for i=1:length(CORRMAP.output.sets{2})
         a=CORRMAP.output.sets{2}(i);
+        if ~isfield(SELEEG, 'badcomp'), SELEEG(a).badcomps = []; end;
         if isempty(SELEEG(a).badcomps) % EEG.badcomponents is empty
             SELEEG(a).badcomps(i)=CORRMAP.output.ics{2}(i);
         else
