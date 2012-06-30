@@ -38,7 +38,7 @@ if nargin <2
 	nonmatlab = 0;
 end;
 
-if exist('help22html')
+if exist('help2html')
     if length(funct) > 3 && strcmpi(funct(end-3:end), '.txt')
         web(funct);
     else
