@@ -43,3 +43,4 @@ global ALLCOM;		% all commands (history)
 global LASTCOM;		% last command
 global STUDY;
 global CURRENTSTUDY;
+global PLUGINLIST;
