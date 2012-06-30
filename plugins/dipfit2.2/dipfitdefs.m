@@ -73,10 +73,12 @@ try,
     template_models(1).coordformat = 'spherical';
     template_models(1).coord_transform(1).transform = [ ];
     template_models(1).coord_transform(1).keywords  = { 'standard-10-5-cap385' };
-    template_models(1).coord_transform(2).transform = [ 0 0 0 0 0 0 8 11 10 ];
-    template_models(1).coord_transform(2).keywords  = { 'gsn' 'sfp' '12' };
-    template_models(1).coord_transform(3).transform = [ 0 0 0 0 0.02 0 85 85 85 ];
-    template_models(1).coord_transform(3).keywords  = { 'egi' 'elp' };
+    template_models(1).coord_transform(2).transform = [ 13.4299     0.746361    -0.654923  0.000878113   -0.0818352    0.0023747     0.852832     0.941595      0.85887];
+    template_models(1).coord_transform(2).keywords  = { 'standard_1005' };
+    template_models(1).coord_transform(3).transform = [ -0.254232 0 -8.4081  0 0.00272526  0  8.59463     -10.9643      10.4963 ];
+    template_models(1).coord_transform(3).keywords  = { 'gsn' 'sfp' };
+    template_models(1).coord_transform(4).transform = [ 0 0 0 0 0.02 0 85 85 85 ];
+    template_models(1).coord_transform(4).keywords  = { 'egi' 'elp' };
 
     template_models(2).name     = 'Boundary Element Model (MNI)';
     template_models(2).hdmfile  = fullfile(folder, 'standard_BEM', 'standard_vol.mat' );
@@ -85,10 +87,12 @@ try,
     template_models(2).coordformat = 'MNI';
     template_models(2).coord_transform(1).transform = [ 0 0 0 0 0 -pi/2  1 1 1];
     template_models(2).coord_transform(1).keywords  = { 'standard_1005' };
-    template_models(2).coord_transform(2).transform = [ 0 -15 4 0.05 0 -1.571 10.2 12 12.2 ];
-    template_models(2).coord_transform(2).keywords  = { 'gsn' 'sfp' '12' };
-    template_models(2).coord_transform(3).transform = [ 0 -15 0 0.08 0 -1.571 102 93 100 ];
-    template_models(2).coord_transform(3).keywords  = { 'egi' 'elp' };
+    template_models(2).coord_transform(2).transform = [ 0.832146  -15.6287 2.41142 0.0812144 0.000937391 -1.5732 1.17419 1.06011 1.14846];
+    template_models(2).coord_transform(2).keywords  = { 'standard-10-5-cap385' };
+    template_models(2).coord_transform(3).transform = [ 0.0547605 -17.3653 -8.13178 0.0755019 0.00318357 -1.56963 11.7138 12.7933 12.213 ];
+    template_models(2).coord_transform(3).keywords  = { 'gsn' 'sfp' };
+    template_models(2).coord_transform(4).transform = [ 0 -15 0 0.08 0 -1.571 102 93 100 ];
+    template_models(2).coord_transform(4).keywords  = { 'egi' 'elp' };
     
     template_models(3).name     = 'Spherical Four-Shell (custom conductances - see DIPFIT wiki)';
     template_models(3).hdmfile  = fullfile(folder, 'standard_BESA', 'standard_SCCN.mat');
@@ -97,10 +101,12 @@ try,
     template_models(3).coordformat = 'spherical';
     template_models(3).coord_transform(1).transform = [ ];
     template_models(3).coord_transform(1).keywords  = { 'standard-10-5-cap385' };
-    template_models(3).coord_transform(2).transform = [ 0 0 0 0 0 0 8 11 10 ];
-    template_models(3).coord_transform(2).keywords  = { 'gsn' 'sfp' '12' };
-    template_models(3).coord_transform(3).transform = [ 0 0 0 0 0.02 0 85 85 85 ];
-    template_models(3).coord_transform(3).keywords  = { 'egi' 'elp' };
+    template_models(3).coord_transform(2).transform = [ 13.4299     0.746361    -0.654923  0.000878113   -0.0818352    0.0023747     0.852832     0.941595      0.85887];
+    template_models(3).coord_transform(2).keywords  = { 'standard_1005' };
+    template_models(3).coord_transform(3).transform = [ -0.254232 0 -8.4081  0 0.00272526  0  8.59463     -10.9643      10.4963 ];
+    template_models(3).coord_transform(3).keywords  = { 'gsn' 'sfp' };
+    template_models(3).coord_transform(4).transform = [ 0 0 0 0 0.02 0 85 85 85 ];
+    template_models(3).coord_transform(4).keywords  = { 'egi' 'elp' };
     
     template_models(4).name     = 'Boundary Element Model (custom conductances - see DIPFIT wiki)';
     template_models(4).hdmfile  = fullfile(folder, 'standard_BEM', 'standard_vol_SCCN.mat' );
@@ -109,10 +115,12 @@ try,
     template_models(4).coordformat = 'MNI';
     template_models(4).coord_transform(1).transform = [ 0 0 0 0 0 -pi/2  1 1 1];
     template_models(4).coord_transform(1).keywords  = { 'standard_1005' };
-    template_models(4).coord_transform(2).transform = [ 0 -15 4 0.05 0 -1.571 10.2 12 12.2 ];
-    template_models(4).coord_transform(2).keywords  = { 'gsn' 'sfp' '12' };
-    template_models(4).coord_transform(3).transform = [ 0 -15 0 0.08 0 -1.571 102 93 100 ];
-    template_models(4).coord_transform(3).keywords  = { 'egi' 'elp' };
+    template_models(4).coord_transform(2).transform = [ 0.832146  -15.6287 2.41142 0.0812144 0.000937391 -1.5732 1.17419 1.06011 1.14846];
+    template_models(4).coord_transform(2).keywords  = { 'standard-10-5-cap385' };
+    template_models(4).coord_transform(3).transform = [ 0.0547605 -17.3653 -8.13178 0.0755019 0.00318357 -1.56963 11.7138 12.7933 12.213 ];
+    template_models(4).coord_transform(3).keywords  = { 'gsn' 'sfp' };
+    template_models(4).coord_transform(4).transform = [ 0 -15 0 0.08 0 -1.571 102 93 100 ];
+    template_models(4).coord_transform(4).keywords  = { 'egi' 'elp' };
     
 catch,
     disp('Warning: problem when setting paths for dipole localization');
