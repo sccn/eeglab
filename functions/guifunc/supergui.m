@@ -302,7 +302,7 @@ for counter = 1:maxcount
             if strcmp(style, 'pushbutton')
                 tmptext = get(allhandlers(counter), 'string');
                 if length(tmptext) > 1
-                    if upper(tmptext(1)) ~= tmptext(1) | lower(tmptext(2)) ~= tmptext(2)
+                    if upper(tmptext(1)) ~= tmptext(1) || lower(tmptext(2)) ~= tmptext(2) && ~strcmpi(tmptext, 'STAT')
                         tmptext = lower(tmptext);
                         try, tmptext(1) = upper(tmptext(1)); catch, end;
                     end;
