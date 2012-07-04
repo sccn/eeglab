@@ -28,7 +28,7 @@ function [pnt, ori, lab] = channelposition(sens, varargin)
 %    You should have received a copy of the GNU General Public License
 %    along with FieldTrip. If not, see <http://www.gnu.org/licenses/>.
 %
-% $Id: channelposition.m 4716 2011-11-10 15:50:05Z roboos $
+% $Id: channelposition.m 5974 2012-06-07 19:19:37Z jansch $
 
 % FIXME varargin is not documented
 
@@ -62,7 +62,7 @@ switch ft_senstype(sens)
     sens.tra = sens.tra(:,used);
     
     % compute distances from the center of the helmet
-    center = mean(sens.pnt(sel,:));
+    center = mean(sens.pnt);
     dist   = sqrt(sum((sens.pnt - repmat(center, size(sens.pnt, 1), 1)).^2, 2));
     
     % put the corresponding distances instead of non-zero tra entries
@@ -70,7 +70,11 @@ switch ft_senstype(sens)
     maxval = min(maxval, ones(size(maxval))); %a value > 1 sometimes leads to problems; this is an empirical fix
     dist = (abs(sens.tra)>0.7.*maxval).*repmat(dist', size(sens.tra, 1), 1);
     
-    % put nans instead of the zero entries
+    % for the occasional case where there are nans: -> 0's will be
+    % converted to inf anyhow
+    dist(isnan(dist)) = 0;
+    
+    % put infs instead of the zero entries
     dist(~dist) = inf;
     
     % use the matrix to find coils with minimal distance to the center,
@@ -132,7 +136,7 @@ switch ft_senstype(sens)
       refori = zeros(nchan,3); % FIXME not sure whether this will work
       for i=1:nchan
         weight = abs(sens.tra(i,:));
-        weight = weight ./ norm(weight);
+        weight = weight ./ sum(weight);
         refpnt(i,:) = weight * sens.pnt;
         refori(i,:) = weight * sens.ori;
       end
@@ -251,7 +255,7 @@ switch ft_senstype(sens)
       ori = zeros(nchan,3); % FIXME not sure whether this will work
       for i=1:nchan
         weight = abs(sens.tra(i,:));
-        weight = weight ./ norm(weight);
+        weight = weight ./ sum(weight);
         pnt(i,:) = weight * sens.pnt;
         ori(i,:) = weight * sens.ori;
       end

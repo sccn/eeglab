@@ -32,7 +32,7 @@ function [dipout] = beamformer_sam(dip, sens, vol, dat, all_cov, varargin)
 % Copyright (C) 2005-2009, Arjan Hillebrand
 % Copyright (C) 2005-2009, Gareth Barnes
 %
-% $Id: beamformer_sam.m 4702 2011-11-10 09:23:27Z borreu $
+% $Id: beamformer_sam.m 5724 2012-05-01 21:13:35Z roboos $
 
 if mod(nargin-5,2)
   % the first 5 arguments are fixed, the other arguments should come in pairs
@@ -113,7 +113,7 @@ inv_cov = pinv(all_cov + lambda * eye(size(all_cov)));
 noise_cov = noise * eye(size(all_cov));
 
 % start the scanning with the proper metric
-progress('init', feedback, 'scanning grid');
+ft_progress('init', feedback, 'scanning grid');
 
 % the angles are the same for all dipole locations
 all_angles = 0:pi/72:pi;
@@ -232,10 +232,10 @@ for diplop=1:size(dip.pos,1)
     dipout.mom{diplop} = SAMweights * dat;
   end
 
-  progress(diplop/size(dip.pos,1), 'scanning grid %d/%d\n', diplop, size(dip.pos,1));
+  ft_progress(diplop/size(dip.pos,1), 'scanning grid %d/%d\n', diplop, size(dip.pos,1));
 end % for each dipole position
 
-progress('close');
+ft_progress('close');
 
 % wrap it all up, prepare the complete output
 dipout.inside   = dip.originside;

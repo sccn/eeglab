@@ -41,7 +41,7 @@ function [data] = ft_determine_coordsys(data, varargin)
 %    You should have received a copy of the GNU General Public License
 %    along with FieldTrip. If not, see <http://www.gnu.org/licenses/>.
 %
-% $Id: ft_determine_coordsys.m 5080 2011-12-22 20:16:27Z jansch $
+% $Id: ft_determine_coordsys.m 5682 2012-04-20 11:15:33Z jansch $
 
 dointeractive = ft_getopt(varargin, 'interactive', 'yes');
 axisscale     = ft_getopt(varargin, 'axisscale', 1); % this is used to scale the axmax and rbol
@@ -168,7 +168,8 @@ switch dtype
     diagonal_head = norm(range(corner_head));
     diagonal_vox  = norm(range(corner_vox));
     resolution    = diagonal_head/diagonal_vox; % this is in units of "data.unit"
-
+    
+    clear ft_plot_slice
     ft_plot_ortho(funparam, 'transform', data.transform, 'resolution', resolution, 'style', 'intersect');
     axis vis3d
     view([110 36]);

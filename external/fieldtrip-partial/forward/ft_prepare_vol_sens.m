@@ -55,7 +55,7 @@ function [vol, sens] = ft_prepare_vol_sens(vol, sens, varargin)
 %    You should have received a copy of the GNU General Public License
 %    along with FieldTrip. If not, see <http://www.gnu.org/licenses/>.
 %
-% $Id: ft_prepare_vol_sens.m 5353 2012-02-29 23:44:21Z crimic $
+% $Id: ft_prepare_vol_sens.m 5468 2012-03-15 11:49:05Z crimic $
 
 % get the optional input arguments
 % fileformat = ft_getopt(varargin, 'fileformat');
@@ -297,7 +297,7 @@ elseif iseeg
     sens.tra     = sens.tra(selsens,:);
     % subsequently remove the electrodes that do not contribute to any channel output
     selelec      = any(sens.tra~=0,1);
-    sens.elecpos = sens.coilpos(selelec,:);
+    sens.elecpos = sens.elecpos(selelec,:);
     sens.tra     = sens.tra(:,selelec);
   else
     % the electrodes and channels are identical

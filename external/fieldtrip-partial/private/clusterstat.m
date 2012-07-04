@@ -34,7 +34,7 @@ function [stat, cfg] = clusterstat(cfg, statrnd, statobs, varargin)
 %    You should have received a copy of the GNU General Public License
 %    along with FieldTrip. If not, see <http://www.gnu.org/licenses/>.
 %
-% $Id: clusterstat.m 5263 2012-02-08 14:00:53Z eelspa $
+% $Id: clusterstat.m 5650 2012-04-18 14:00:33Z roevdmei $
 
 % set the defaults
 if ~isfield(cfg,'orderedstats'),   cfg.orderedstats = 'no';    end
@@ -47,7 +47,7 @@ if ~isfield(cfg,'minnbchan'),      cfg.minnbchan=0;            end
 % get issource from varargin, to determine source-data-specific options and allow the proper usage of cfg.neighbours
 % (cfg.neighbours was previously used in determining wheter source-data was source data or not) set to zero by default
 % note, this may cause problems when functions call clusterstat without giving issource, as issource was previously
-% set in clusterstat.m but has now been transfered to the function that calls clusterstat.m (but only implemented in statistics_montecarlo)
+% set in clusterstat.m but has now been transfered to the function that calls clusterstat.m (but only implemented in ft_statistics_montecarlo)
 issource = ft_getopt(varargin, 'issource', false);
 
 if cfg.tail~=cfg.clustertail

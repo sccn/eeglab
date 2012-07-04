@@ -15,7 +15,7 @@ function [varargout] = ft_selectdata(varargin)
 % or as
 %  [data] = ft_selectdata_new(cfg, data, ...)
 %
-% See also FT_SELCTDATA_OLD, FT_SELECTDATA_NEW
+% See also FT_SELECTDATA_OLD, FT_SELECTDATA_NEW
 
 % Copyright (C) 2009-2011, Jan-Mathijs Schoffelen, Robert Oostenveld
 %
@@ -35,9 +35,9 @@ function [varargout] = ft_selectdata(varargin)
 %    You should have received a copy of the GNU General Public License
 %    along with FieldTrip. If not, see <http://www.gnu.org/licenses/>.
 %
-% $Id: ft_selectdata.m 5139 2012-01-13 10:47:44Z roboos $
+% $Id: ft_selectdata.m 6124 2012-06-25 09:41:41Z jorhor $
 
-if nargin==1 || (nargin>2 && ischar(varargin{end-1}))
+if nargin==1 || (nargin>2 && ischar(varargin{end-1})) || (isstruct(varargin{1}) && ~ft_datatype(varargin{1}, 'unknown'))
   % this is the OLD calling style, like this
   %   data = ft_selectdata(data, 'key1', value1, 'key2', value2, ...)
   % or with multiple input data structures like this

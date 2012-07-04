@@ -25,7 +25,7 @@ function [pindx, pval] = peakdetect3(dat, threshold, mindist)
 %    You should have received a copy of the GNU General Public License
 %    along with FieldTrip. If not, see <http://www.gnu.org/licenses/>.
 %
-% $Id: peakdetect3.m 952 2010-04-21 18:29:51Z roboos $
+% $Id: peakdetect3.m 5886 2012-06-05 11:01:28Z roboos $
 
 % threshold the data
 tr = dat>threshold;

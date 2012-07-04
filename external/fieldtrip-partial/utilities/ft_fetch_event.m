@@ -26,7 +26,7 @@ function [event]=ft_fetch_event(data)
 %    You should have received a copy of the GNU General Public License
 %    along with FieldTrip. If not, see <http://www.gnu.org/licenses/>.
 %
-% $Id: ft_fetch_event.m 3774 2011-07-05 09:20:57Z eelspa $
+% $Id: ft_fetch_event.m 5522 2012-03-23 08:52:01Z roboos $
 
 % check whether input is data
 data = ft_checkdata(data, 'datatype', 'raw');
@@ -34,6 +34,10 @@ data = ft_checkdata(data, 'datatype', 'raw');
 % locate the event structure
 if (isfield(data, 'cfg'))
   event = ft_findcfg(data.cfg, 'event');
+  if ~isstruct(event)
+    % this happens if the cfg has been cleaned up with checksize in ft_checkconfig, it can then be 'empty - removed by ft_checkconfig'
+    event = [];
+  end
 else
   event = [];
 end

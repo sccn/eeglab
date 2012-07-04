@@ -36,7 +36,7 @@ function varargout = interp_gridded(transform, val, pnt, varargin)
 %    You should have received a copy of the GNU General Public License
 %    along with FieldTrip. If not, see <http://www.gnu.org/licenses/>.
 %
-% $Id: interp_gridded.m 4439 2011-10-12 10:17:09Z roboos $
+% $Id: interp_gridded.m 5602 2012-04-10 12:44:05Z jansch $
 
 if nargin<3
   error('Not enough input arguments.');
@@ -85,14 +85,14 @@ if isempty(distmat)
       dpossq  = sum(pos.^2,2); % squared distance to origin
       maxnpnt = double(npnt*ceil(4/3*pi*(sphereradius/max(dimres))^3)); % initial estimate of nonzero entries
       distmat = spalloc(npnt, npos, maxnpnt);
-      progress('init', 'textbar', 'computing distance matrix');
+      ft_progress('init', 'textbar', 'computing distance matrix');
       for j = 1:npnt
-        progress(j/npnt);
+        ft_progress(j/npnt);
         d   = sqrt(dpntsq(j) + dpossq - 2 * pos * pnt(j,:)');
         sel = find(d<sphereradius);
         distmat(j, sel) = single(d(sel)) + eps('single');
       end
-      progress('close');
+      ft_progress('close');
 
     otherwise
       error('unsupported projection method');

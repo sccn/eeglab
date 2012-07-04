@@ -62,10 +62,10 @@ function [cfg, varargout] = prepare_resampled_data(cfg, varargin);
 %    You should have received a copy of the GNU General Public License
 %    along with FieldTrip. If not, see <http://www.gnu.org/licenses/>.
 %
-% $Id: prepare_resampled_data.m 952 2010-04-21 18:29:51Z roboos $
+% $Id: prepare_resampled_data.m 5927 2012-06-06 18:58:05Z borreu $
 
 % for backward compatibility with misspelled configuration option
-if isfield(cfg, 'jacknife'), cfg.jackknife = cfg.jacknife; cfg = rmfield(cfg, 'jacknife'); end
+ft_checkconfig(cfg, 'renamed', {'jacknife', 'jackknife'});
 
 % set the defaults
 if ~isfield(cfg, 'jackknife'),        cfg.jackknife        = 'no';  end

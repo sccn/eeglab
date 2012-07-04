@@ -83,7 +83,7 @@ function [dat, label, time, cfg] = preproc(dat, label, time, cfg, begpadding, en
 
 % TODO implement decimation and/or resampling
 
-% Copyright (C) 2004-2009, Robert Oostenveld
+% Copyright (C) 2004-2012, Robert Oostenveld
 %
 % This file is part of FieldTrip, see http://www.ru.nl/neuroimaging/fieldtrip
 % for the documentation and details.
@@ -101,13 +101,10 @@ function [dat, label, time, cfg] = preproc(dat, label, time, cfg, begpadding, en
 %    You should have received a copy of the GNU General Public License
 %    along with FieldTrip. If not, see <http://www.gnu.org/licenses/>.
 %
-% $Id: preproc.m 5377 2012-03-02 14:13:09Z roevdmei $
+% $Id: preproc.m 5928 2012-06-06 18:58:06Z borreu $
 
 % compute fsample
 fsample = 1./mean(diff(time));
-
-% compute offset, which is used later on to compute the full time-axis for padded data
-offset = time2offset(time,fsample);
 
 if nargin<5 || isempty(begpadding)
   begpadding = 0;
@@ -142,8 +139,9 @@ end
 % demean, and blcwindow into baselinewindow. to avoid having to create an
 % svn external for ft_checkconfig in fieldtrip/private, do the check
 % manually
-if isfield(cfg, 'blc'),       cfg.demean         = cfg.blc;       cfg = rmfield(cfg, 'blc'); end
-if isfield(cfg, 'blcwindow'), cfg.baselinewindow = cfg.blcwindow; cfg = rmfield(cfg, 'blcwindow'); end
+ft_checkconfig(cfg, 'renamed', {'blc', 'demean'});
+ft_checkconfig(cfg, 'renamed', {'blcwindow', 'baselinewindow'});
+
 % set the defaults for the rereferencing options
 if ~isfield(cfg, 'reref'),        cfg.reref = 'no';             end
 if ~isfield(cfg, 'refchannel'),   cfg.refchannel = {};          end
@@ -262,40 +260,30 @@ if ~isempty(cfg.denoise),
   tmpdat   = ft_preproc_denoise(dat(datlabel,:), dat(reflabel,:), hflag);
   dat(datlabel,:) = tmpdat;
 end
+
+% The filtering should in principle be done prior to the demeaning to
+% ensure that the resulting mean over the baseline window will be
+% guaranteed to be zero (even if there are filter artifacts). 
+% However, the filtering benefits from the data being pulled towards zero,
+% causing less edge artifacts. That is why we start by removing the slow
+% drift, then filter, and then repeat the demean/detrend/polyremove.
 if strcmp(cfg.polyremoval, 'yes')
-  nsamples     = size(dat,2);
-  % the begin and endsample of the polyremoval period correspond to the complete data minus padding
+  nsamples  = size(dat,2);
   begsample = 1        + begpadding;
   endsample = nsamples - endpadding;
-  dat = ft_preproc_polyremoval(dat, cfg.polyorder, begsample, endsample);
-end
-if strcmp(cfg.detrend, 'yes')
-  nsamples     = size(dat,2);
-  % the begin and endsample of the detrend period correspond to the complete data minus padding
+  dat = ft_preproc_polyremoval(dat, cfg.polyorder, begsample, endsample); % this will also demean and detrend
+elseif strcmp(cfg.detrend, 'yes')
+  nsamples  = size(dat,2);
   begsample = 1        + begpadding;
   endsample = nsamples - endpadding;
-  dat = ft_preproc_detrend(dat, begsample, endsample);
+  dat = ft_preproc_polyremoval(dat, 1, begsample, endsample); % this will also demean
+elseif strcmp(cfg.demean, 'yes')
+  nsamples  = size(dat,2);
+  begsample = 1        + begpadding;
+  endsample = nsamples - endpadding;
+  dat = ft_preproc_polyremoval(dat, 0, begsample, endsample);
 end
-if strcmp(cfg.demean, 'yes') || nargout>2
-  % determine the complete time axis for the baseline correction
-  % but only construct it when really needed, since it takes up a large amount of memory
-  % the time axis should include the filter padding
-  nsamples = size(dat,2);
-  time = (offset - begpadding + (0:(nsamples-1)))/fsample;
-end
-if strcmp(cfg.demean, 'yes')
-  if ischar(cfg.baselinewindow) && strcmp(cfg.baselinewindow, 'all')
-    % the begin and endsample of the baseline period correspond to the complete data minus padding
-    begsample = 1        + begpadding;
-    endsample = nsamples - endpadding;
-    dat       = ft_preproc_baselinecorrect(dat, begsample, endsample);
-  else
-    % determine the begin and endsample of the baseline period and baseline correct for it
-    begsample = nearest(time, cfg.baselinewindow(1));
-    endsample = nearest(time, cfg.baselinewindow(2));
-    dat       = ft_preproc_baselinecorrect(dat, begsample, endsample);
-  end
-end
+
 if strcmp(cfg.medianfilter, 'yes'), dat = ft_preproc_medianfilter(dat, cfg.medianfiltord); end
 if strcmp(cfg.lpfilter, 'yes'),     dat = ft_preproc_lowpassfilter(dat, fsample, cfg.lpfreq, cfg.lpfiltord, cfg.lpfilttype, cfg.lpfiltdir); end
 if strcmp(cfg.hpfilter, 'yes'),     dat = ft_preproc_highpassfilter(dat, fsample, cfg.hpfreq, cfg.hpfiltord, cfg.hpfilttype, cfg.hpfiltdir); end
@@ -307,29 +295,23 @@ if strcmp(cfg.bsfilter, 'yes')
   end
 end
 if strcmp(cfg.polyremoval, 'yes')
-  nsamples     = size(dat,2);
   % the begin and endsample of the polyremoval period correspond to the complete data minus padding
+  nsamples  = size(dat,2);
   begsample = 1        + begpadding;
   endsample = nsamples - endpadding;
   dat = ft_preproc_polyremoval(dat, cfg.polyorder, begsample, endsample);
 end
 if strcmp(cfg.detrend, 'yes')
-  nsamples     = size(dat,2);
   % the begin and endsample of the detrend period correspond to the complete data minus padding
+  nsamples  = size(dat,2);
   begsample = 1        + begpadding;
   endsample = nsamples - endpadding;
   dat = ft_preproc_detrend(dat, begsample, endsample);
 end
-if strcmp(cfg.demean, 'yes') || nargout>2
-  % determine the complete time axis for the baseline correction
-  % but only construct it when really needed, since it takes up a large amount of memory
-  % the time axis should include the filter padding
-  nsamples = size(dat,2);
-  time = (offset - begpadding + (0:(nsamples-1)))/fsample;
-end
 if strcmp(cfg.demean, 'yes')
   if ischar(cfg.baselinewindow) && strcmp(cfg.baselinewindow, 'all')
     % the begin and endsample of the baseline period correspond to the complete data minus padding
+    nsamples  = size(dat,2);
     begsample = 1        + begpadding;
     endsample = nsamples - endpadding;
     dat       = ft_preproc_baselinecorrect(dat, begsample, endsample);

@@ -1,31 +1,41 @@
-function output = mergeconfig(input, default)
+function input = mergeconfig(input, default)
 
-% MERGECONFIG
-
-% Copyright (C) 2009, Robert Oostenveld
+% MERGECONFIG merges the fields of a default structure into an input
+% configuration structure
 %
-% $Id: mergeconfig.m 4702 2011-11-10 09:23:27Z borreu $
+% Use as
+%   output = mergeconfig(input, default)
 
-% FIXME also deal with configuration objects
-if ~isstruct(input)
-  input = struct([]);
+% Copyright (C) 2009-2012, Robert Oostenveld
+%
+% $Id: mergeconfig.m 5730 2012-05-02 21:24:22Z roboos $
+
+if isempty(input) && ~isstruct(input)
+  % ensure that it is an empty struct, not an empty double
+  input = struct;
 end
 
-% FIXME also deal with configuration objects
-if ~isstruct(default)
-  default = struct([]);
+if isempty(default) && ~isstruct(default)
+  % ensure that it is an empty struct, not an empty double
+  default = struct;
 end
 
-fni = fieldnames(input);
-fnd = fieldnames(default);
-fnd = setdiff(fnd, fni);
-
-for i=1:length(fnd)
-  output.(fnd{i}) = default.(fnd{i});
-end
-
-for i=1:length(fni)
-  output.(fni{i}) = input.(fni{i});
-end
-
-
+% merge the input with the fields from default
+fieldsused = fieldnames(default);
+for i=1:length(fieldsused)
+  fn = fieldsused{i};
+  
+  if     ~isfield(input, fn) && ~isstruct(default.(fn))
+    % simply copy the value over
+    input.(fn) = default.(fn);
+  elseif ~isfield(input, fn) &&  isstruct(default.(fn))
+    % simply copy the substructure over
+    input.(fn) = default.(fn);
+  elseif  isfield(input, fn) && ~isstruct(default.(fn))
+    % do not copy it over, keep the original value
+  elseif  isfield(input, fn) &&  isstruct(default.(fn))
+    % merge the two substructures
+    input.(fn) = mergeconfig(input.(fn), default.(fn));
+  end
+  
+end % for all fields

@@ -38,7 +38,7 @@ function [indx] = nearest(array, val, insideflag, toleranceflag)
 %    You should have received a copy of the GNU General Public License
 %    along with FieldTrip. If not, see <http://www.gnu.org/licenses/>.
 %
-% $Id: nearest.m 5130 2012-01-11 16:46:49Z roboos $
+% $Id: nearest.m 5901 2012-06-05 12:27:46Z craric $
 
 mbreal(array);
 mbreal(val);
@@ -102,8 +102,8 @@ elseif val<minarray
   [dum, indx] = min(array);
   
 else
-  % return the first occurence of the nearest number
-  [dum, indx] = min(abs(array(:) - val));
+  % return the first occurence of the nearest number and implements a threshold to correct for errors due to numerical precision 
+  [dum, indx] = min(round(10^6.*(abs(array(:) - val)))./10^6); 
   
 end
 

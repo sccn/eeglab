@@ -8,7 +8,7 @@ function [filename, headerfile, datafile] = dataset2files(filename, format)
 
 % Copyright (C) 2007-2011, Robert Oostenveld
 %
-% $Id: dataset2files.m 4702 2011-11-10 09:23:27Z borreu $
+% $Id: dataset2files.m 5751 2012-05-08 14:04:36Z borreu $
 
 if isempty(format)
   format = ft_filetype(filename);
@@ -105,11 +105,21 @@ switch format
     datafile   = fullfile(path, [file '.bin']);
   case 'fcdc_buffer_offline'
     [path, file, ext] = fileparts(filename);
-    headerfile = fullfile(path, [file '/header']);
+    headerfile = fullfile(path, 'header');
+    datafile   = fullfile(path, 'samples');
   case {'tdt_tsq' 'tdt_tev'}
     [path, file, ext] = fileparts(filename);
     headerfile = fullfile(path, [file '.tsq']);
     datafile   = fullfile(path, [file '.tev']);
+  case 'egi_mff'
+    if ~isdir(filename);
+      [path, file, ext] = fileparts(filename);
+      headerfile = path;
+      datafile   = path;
+    else
+      headerfile = filename;
+      datafile   = filename;
+    end
   otherwise
     % convert filename into filenames, assume that the header and data are the same
     datafile   = filename;

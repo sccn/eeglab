@@ -31,7 +31,7 @@ function [type, dimord] = ft_datatype(data, desired)
 %    You should have received a copy of the GNU General Public License
 %    along with FieldTrip. If not, see <http://www.gnu.org/licenses/>.
 %
-% $Id: ft_datatype.m 5304 2012-02-22 14:00:24Z arjsto $
+% $Id: ft_datatype.m 5866 2012-06-04 07:39:03Z roboos $
 
 % determine the type of input data, this can be raw, freq, timelock, comp, spike, source, volume, dip
 israw      =  isfield(data, 'label') && isfield(data, 'time') && isa(data.time, 'cell') && isfield(data, 'trial') && isa(data.trial, 'cell') && ~isfield(data,'trialtime');
@@ -57,6 +57,9 @@ if iscomp
 elseif isfreqmvar
   % freqmvar should conditionally go before freq, otherwise the returned ft_datatype will be freq in the case of frequency mvar data
   type = 'freqmvar';
+elseif isdip
+  % dip should conditionally go before timelock, otherwise the ft_datatype will be timelock
+  type = 'dip';
 elseif ismvar
   type = 'mvar';
 elseif israw
@@ -71,8 +74,6 @@ elseif isvolume
   type = 'volume';
 elseif issource
   type = 'source';
-elseif isdip
-  type = 'dip';
 elseif ischan
   % this results from avgovertime/avgoverfreq after timelockstatistics or freqstatistics
   type = 'chan';

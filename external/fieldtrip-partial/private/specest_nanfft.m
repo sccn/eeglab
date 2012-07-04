@@ -37,7 +37,7 @@ function [spectrum] = specest_nanfft(dat, time, varargin)
 %    You should have received a copy of the GNU General Public License
 %    along with FieldTrip. If not, see <http://www.gnu.org/licenses/>.
 %
-% $Id: specest_nanfft.m 5019 2011-12-12 17:29:53Z roevdmei $
+% $Id: specest_nanfft.m 6082 2012-06-17 10:24:54Z marvin $
 
 % get the optional arguments
 basis     = ft_getopt(varargin, 'basis');
@@ -180,7 +180,7 @@ switch datatype
     % use recursion to compute the nanfft for each channel
     y = zeros(size(dat));
     for k=1:nchan
-      y(k,:) = specest_nanfft(dat(k,:), 'basis', basis);
+      y(k,:) = specest_nanfft(dat(k,:), time, 'basis', basis);
     end
 
   otherwise

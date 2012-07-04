@@ -33,7 +33,7 @@ function [status] = ft_hastoolbox(toolbox, autoadd, silent)
 %    You should have received a copy of the GNU General Public License
 %    along with FieldTrip. If not, see <http://www.gnu.org/licenses/>.
 %
-% $Id: ft_hastoolbox.m 5363 2012-03-01 14:01:59Z crimic $
+% $Id: ft_hastoolbox.m 5894 2012-06-05 11:43:45Z roboos $
 
 % this function is called many times in FieldTrip and associated toolboxes
 % use efficient handling if the same toolbox has been investigated before
@@ -77,7 +77,7 @@ url = {
   '4D-VERSION' 'contact Christian Wienbruch'
   'SIGNAL'     'see http://www.mathworks.com/products/signal'
   'OPTIM'      'see http://www.mathworks.com/products/optim'
-  'IMAGE'      'see http://www.mathworks.com/products/image'
+  'IMAGE'      'see http://www.mathworks.com/products/image'  % Mathworks refers to this as IMAGES
   'SPLINES'    'see http://www.mathworks.com/products/splines'
   'DISTCOMP'   'see http://www.mathworks.nl/products/parallel-computing/'
   'COMPILER'   'see http://www.mathworks.com/products/compiler'
@@ -113,6 +113,8 @@ url = {
   'BCT'        'see http://www.brain-connectivity-toolbox.net/'
   'MYSQL'      'see http://www.mathworks.com/matlabcentral/fileexchange/8663-mysql-database-connector'
   'ISO2MESH'   'see http://iso2mesh.sourceforge.net/cgi-bin/index.cgi?Home or contact Qianqian Fang'
+  'DATAHASH'   'see http://www.mathworks.com/matlabcentral/fileexchange/31272'
+  'SPIKE'      'see http://www.ru.nl/neuroimaging/fieldtrip'
   };
 
 if nargin<2
@@ -266,7 +268,16 @@ switch toolbox
     status = exist('clustering_coef_bd', 'file') && exist('edge_betweenness_wei', 'file');
   case 'MYSQL'
     status = exist(['mysql.' mexext], 'file'); % this only consists of a single mex file
-    
+  case 'ISO2MESH'
+    status = exist('vol2surf.m', 'file') && exist('qmeshcut.m', 'file');
+  case 'QSUB'
+    status = exist('qsubfeval.m', 'file') && exist('qsubcellfun.m', 'file');
+  case 'ENGINE'
+    status = exist('enginefeval.m', 'file') && exist('enginecellfun.m', 'file');
+  case 'DATAHASH'
+    status = exist('DataHash.m', 'file');
+  case 'SPIKE'
+    status = exist('ft_spiketriggeredaverage.m', 'file') && exist('ft_spiketriggeredspectrum.m', 'file');
     % the following are not proper toolboxes, but only subdirectories in the fieldtrip toolbox
     % these are added in ft_defaults and are specified with unix-style forward slashes
   case 'COMPAT'
@@ -293,8 +304,6 @@ switch toolbox
     status = ~isempty(regexp(unixpath(path), 'fieldtrip/template/neighbours', 'once'));
   case 'TEMPLATE/SOURCEMODEL'
     status = ~isempty(regexp(unixpath(path), 'fieldtrip/template/sourcemodel', 'once')); 
-  case 'ISO2MESH'
-    status = exist('vol2surf.m', 'file') && exist('qmeshcut.m', 'file');
   otherwise
     if ~silent, warning('cannot determine whether the %s toolbox is present', toolbox); end
     status = 0;
@@ -314,6 +323,18 @@ if autoadd>0 && ~status
   
   % for external fieldtrip modules
   prefix = fullfile(fileparts(which('ft_defaults')), 'external');
+  if ~status
+    status = myaddpath(fullfile(prefix, lower(toolbox)), silent);
+    licensefile = [lower(toolbox) '_license'];
+    if status && exist(licensefile, 'file')
+      % this will execute openmeeg_license and mne_license
+      % which display the license on screen for three seconds
+      feval(licensefile);
+    end
+  end
+  
+  % for contributed fieldtrip extensions
+  prefix = fullfile(fileparts(which('ft_defaults')), 'contrib');
   if ~status
     status = myaddpath(fullfile(prefix, lower(toolbox)), silent);
     licensefile = [lower(toolbox) '_license'];
@@ -387,17 +408,6 @@ elseif exist(toolbox, 'dir')
 else
   status = 0;
 end
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% helper function
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function out = fixname(toolbox)
-% FIXME this fails in case the toolbox directory name would start with a digit, e.g. "99luftballons"
-out = lower(toolbox);
-out(out=='-') = '_'; % fix dashes
-out(out==' ') = '_'; % fix spaces
-out(out=='/') = '_'; % fix forward slashes
-out(out=='\') = '_'; % fix backward slashes
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % helper function

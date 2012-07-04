@@ -101,9 +101,9 @@ function [norm] = ft_electroderealign(cfg)
 %    You should have received a copy of the GNU General Public License
 %    along with FieldTrip. If not, see <http://www.gnu.org/licenses/>.
 %
-% $Id: ft_electroderealign.m 5174 2012-01-25 11:42:24Z jorhor $
+% $Id: ft_electroderealign.m 5835 2012-06-01 07:12:19Z roboos $
 
-revision = '$Id: ft_electroderealign.m 5174 2012-01-25 11:42:24Z jorhor $';
+revision = '$Id: ft_electroderealign.m 5835 2012-06-01 07:12:19Z roboos $';
 
 % do the general setup of the function
 ft_defaults
@@ -113,9 +113,6 @@ ft_preamble trackconfig
 
 % text output
 disp('Close the figure to output new sensor positions');
-
-% this is used for feedback of the lower-level functions
-global fb
 
 % set the defaults
 if ~isfield(cfg, 'channel'),       cfg.channel = 'all';       end
@@ -134,13 +131,6 @@ cfg = ft_checkconfig(cfg, 'renamedval',{'warp', 'homogenous', 'rigidbody'});
 if isfield(cfg, 'headshape') && isa(cfg.headshape, 'config')
   % convert the nested config-object back into a normal structure
   cfg.headshape = struct(cfg.headshape);
-end
-
-if strcmp(cfg.feedback, 'yes')
-  % use the global fb field to tell the warping toolbox to print feedback
-  fb = 1;
-else
-  fb = 0;
 end
 
 % get the electrode definition that should be warped

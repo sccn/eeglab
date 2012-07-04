@@ -83,7 +83,7 @@ function [type] = ft_senstype(input, desired)
 %    You should have received a copy of the GNU General Public License
 %    along with FieldTrip. If not, see <http://www.gnu.org/licenses/>.
 %
-% $Id: ft_senstype.m 5079 2011-12-22 17:04:06Z roboos $
+% $Id: ft_senstype.m 5779 2012-05-15 09:14:33Z crimic $
 
 % these are for remembering the type on subsequent calls with the same input arguments
 persistent previous_argin previous_argout
@@ -120,13 +120,15 @@ if isequal(current_argin, previous_argin)
 end
 
 % FIXME the detection of the type of input structure should perhaps be done using the datatype function
-isdata   = isa(input, 'struct') && isfield(input, 'hdr');
-isheader = isa(input, 'struct') && isfield(input, 'label') && isfield(input, 'Fs');
-isgrad   = isa(input, 'struct') && isfield(input, 'label') && isfield(input, 'pnt')  &&  isfield(input, 'ori'); % old style
+isdata   = isa(input, 'struct')  && isfield(input, 'hdr');
+isheader = isa(input, 'struct')  && isfield(input, 'label') && isfield(input, 'Fs');
+isgrad   = isa(input, 'struct')  && isfield(input, 'label') && isfield(input, 'pnt')  &&  isfield(input, 'ori'); % old style
 isgrad   = (isa(input, 'struct') && isfield(input, 'label') && isfield(input, 'coilpos')) || isgrad; % new style 
-iselec   = isa(input, 'struct') && isfield(input, 'label') && isfield(input, 'pnt')  && ~isfield(input, 'ori'); % old style
+iselec   = isa(input, 'struct')  && isfield(input, 'label') && isfield(input, 'pnt')  && ~isfield(input, 'ori'); % old style
 iselec   = (isa(input, 'struct') && isfield(input, 'label') && isfield(input, 'elecpos')) || iselec; % new style 
-islabel  = isa(input, 'cell')   && ~isempty(input) && isa(input{1}, 'char');
+islabel  = isa(input, 'cell')    && ~isempty(input) && isa(input{1}, 'char');
+isfreq   = isa(input, 'struct')  && (isfield(input, 'fourierspctrm') || isfield(input, 'powspctrm'));
+haslabel = isa(input, 'struct')  && isfield(input, 'label');
 
 if ~isdata && ~isheader
   % timelock or freq structures don't have the header structure
@@ -135,41 +137,45 @@ if ~isdata && ~isheader
   isdata = isa(input, 'struct') && (isfield(input, 'grad') || isfield(input, 'elec'));
 end
 
+if ~(isdata || isheader || isgrad || iselec || islabel || haslabel) && isfield(input, 'hdr')
+  input    = input.hdr;
+  isheader = true;
+end
+
 % the input may be a data structure which then contains a grad/elec structure, a header or only the labels
 if isdata
   % preferably look at the data and not the header for the grad, because it might be re-balanced and/or planar
   if isfield(input, 'grad')
-    sens = input.grad;
+    sens   = input.grad;
     isgrad = true;
   elseif isfield(input, 'elec')
-    sens = input.elec;
+    sens   = input.elec;
     iselec = true;
-  elseif isfield(input, 'hdr')
-    input = input.hdr;
-    isheader = true;
   elseif issubfield(input, 'hdr.grad')
-    sens = input.hdr.grad;
+    sens   = input.hdr.grad;
     isgrad = true;
   elseif issubfield(input, 'hdr.elec')
-    sens = input.hdr.elec;
+    sens   = input.hdr.elec;
     iselec = true;
   elseif issubfield(input, 'hdr.label')
     sens.label = input.hdr.label;
-    islabel = true;
+    islabel    = true;
   elseif isfield(input, 'label')
     sens.label = input.label;
-    islabel = true;
+    islabel    = true;
   end
+elseif isfreq
+  type = 'unknown';
 elseif isheader
   if isfield(input, 'grad')
-    sens = input.grad;
+    sens   = input.grad;
     isgrad = true;
   elseif isfield(input, 'elec')
     sens   = input.elec;
     iselec = true;
   elseif isfield(input, 'label')
     sens.label = input.label;
-    islabel = true;
+    islabel    = true;
   end
 elseif isgrad
   sens = input;
@@ -177,6 +183,11 @@ elseif iselec
   sens = input;
 elseif islabel
   sens.label = input;
+elseif haslabel
+  % it does not resemble anything that we had expected at this location, but it does have channel labels
+  % the channel labels can be used to determine the type of sensor array
+  sens.label = input.label;
+  islabel    = true;
 else
   sens = [];
 end
@@ -184,6 +195,10 @@ end
 if isfield(input, 'type')
   % preferably the structure specifies its own type
   type = input.type;
+  
+elseif isfield(input, 'nChans') && input.nChans==1 && isfield(input, 'label') && ~isempty(regexp(input.label{1}, '^csc', 'once'))
+  % this is a single channel header that was read from a Neuralynx file, might be fcdc_matbin or neuralynx_nsc
+  type = 'neuralynx';
   
 elseif issubfield(input, 'orig.FileHeader') &&  issubfield(input, 'orig.VarHeader')
   % this is a complete header that was read from a Plexon *.nex file using read_plexon_nex

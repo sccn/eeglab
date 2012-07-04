@@ -57,9 +57,10 @@ function [result, M] = warp_optim(input, target, method)
 %    You should have received a copy of the GNU General Public License
 %    along with FieldTrip. If not, see <http://www.gnu.org/licenses/>.
 %
-% $Id: warp_optim.m 3509 2011-05-11 09:49:10Z roboos $
+% $Id: warp_optim.m 5835 2012-06-01 07:12:19Z roboos $
 
-global fb;
+% this can be used for printing detailled user feedback
+fb = false;
 
 if nargin<3
   method='traditional';
@@ -171,7 +172,7 @@ end
 if level>=7
   % do a fourth order nonlinear transformation,
   if fb; disp('4th order nonlinear...'); end
-  e4i = [e3f zeros(3,10)];
+  e4i = [e3f zeros(3,15)];
   e4f = optimfun(warp_error, e4i, options, pos1, pos2);
   if fb; fprintf('distance = %f\n', warp_error(e4f, pos1, pos2, 'nonlinear')); end
 end
@@ -179,7 +180,7 @@ end
 if level>=8
   % do a fifth order nonlinear transformation,
   if fb; disp('5th order nonlinear...'); end
-  e5i = [e4f zeros(3,10)];
+  e5i = [e4f zeros(3,21)];
   e5f = optimfun(warp_error, e5i, options, pos1, pos2);
   if fb; fprintf('distance = %f\n', warp_error(e5f, pos1, pos2, 'nonlinear')); end
 end

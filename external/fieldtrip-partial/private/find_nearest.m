@@ -25,12 +25,10 @@ function [nearest, distance] = find_nearest(pnt1, pnt2, npart, gridflag)
 %    You should have received a copy of the GNU General Public License
 %    along with FieldTrip. If not, see <http://www.gnu.org/licenses/>.
 %
-% $Id: find_nearest.m 2952 2011-02-25 11:05:36Z jansch $
+% $Id: find_nearest.m 5835 2012-06-01 07:12:19Z roboos $
 
-global fb;
-if isempty(fb)
-  fb = 0;
-end
+% this can be used for printing detailled user feedback
+fb = false;
 
 if nargin<4
   gridflag = 0;
@@ -84,7 +82,9 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [nearest, distance] = find_nearest_partition(pnt1, pnt2, npart)
 
-global fb;
+% this can be used for printing detailled user feedback
+fb = false;
+
 if isempty(fb)
   fb = 0;
 end

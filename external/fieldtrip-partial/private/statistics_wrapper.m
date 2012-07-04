@@ -5,20 +5,20 @@ function [stat, cfg] = statistics_wrapper(cfg, varargin)
 % matrix.
 %
 % The specific configuration options for selecting timelock, frequency
-% of source data are described in TIMELOCKSTATISTICS, FREQSTATISTICS and
-% SOURCESTATISTICS, respectively.
+% of source data are described in FT_TIMELOCKSTATISTICS, FT_FREQSTATISTICS and
+% FT_SOURCESTATISTICS, respectively.
 %
 % After selecting the data, control is passed on to a data-independent
 % statistical subfunction that computes test statistics plus their associated
 % significance probabilities and critical values under some null-hypothesis. The statistical
-% subfunction that is called is STATISTICS_xxx, where cfg.method='xxx'. At
+% subfunction that is called is FT_STATISTICS_xxx, where cfg.method='xxx'. At
 % this moment, we have implemented two statistical subfunctions:
-% STATISTICS_ANALYTIC, which calculates analytic significance probabilities and critical
-% values (exact or asymptotic), and STATISTICS_MONTECARLO, which calculates
+% FT_STATISTICS_ANALYTIC, which calculates analytic significance probabilities and critical
+% values (exact or asymptotic), and FT_STATISTICS_MONTECARLO, which calculates
 % Monte-Carlo approximations of the significance probabilities and critical values.
 %
 % The specific configuration options for the statistical test are
-% described in STATISTICS_xxx.
+% described in FT_STATISTICS_xxx.
 
 % This function depends on PREPARE_TIMEFREQ_DATA which has the following options:
 % cfg.avgoverchan
@@ -51,7 +51,7 @@ function [stat, cfg] = statistics_wrapper(cfg, varargin)
 %    You should have received a copy of the GNU General Public License
 %    along with FieldTrip. If not, see <http://www.gnu.org/licenses/>.
 %
-% $Id: statistics_wrapper.m 5376 2012-03-02 14:11:24Z jansch $
+% $Id: statistics_wrapper.m 5664 2012-04-19 11:35:55Z jansch $
 
 % check if the input cfg is valid for this function
 cfg = ft_checkconfig(cfg, 'renamed',     {'approach',   'method'});
@@ -260,8 +260,8 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % determine the function handle to the intermediate-level statistics function
-if exist(['statistics_' cfg.method])
-  statmethod = str2func(['statistics_' cfg.method]);
+if exist(['ft_statistics_' cfg.method])
+  statmethod = str2func(['ft_statistics_' cfg.method]);
 else
   error(sprintf('could not find the corresponding function for cfg.method="%s"\n', cfg.method));
 end
@@ -284,7 +284,7 @@ design=cfg.design;
 cfg=rmfield(cfg,'design'); % to not confuse lower level functions with both cfg.design and design input
 
 % perform the statistical test 
-if strcmp(func2str(statmethod),'statistics_montecarlo') % because statistics_montecarlo (or to be precise, clusterstat) requires to know whether it is getting source data, 
+if strcmp(func2str(statmethod),'ft_statistics_montecarlo') % because ft_statistics_montecarlo (or to be precise, clusterstat) requires to know whether it is getting source data, 
                                                         % the following (ugly) work around is necessary                                             
   if num>1
     [stat, cfg] = statmethod(cfg, dat, design, 'issource',issource);
@@ -326,6 +326,8 @@ if issource
     try stat.outside   = varargin{1}.outside;    end
     try stat.pos       = varargin{1}.pos;        end
     try stat.transform = varargin{1}.transform;  end
+    try stat.freq      = varargin{1}.freq;       end
+    try stat.time      = varargin{1}.time;       end
   else
     stat.inside  = 1:length(roilabel);
     stat.outside = [];
@@ -343,10 +345,54 @@ if issource
         tmp(varargin{1}.inside)  = tmp;
         tmp(varargin{1}.outside) = nan;
       end
+      extradim = 1;
+    elseif isfield(varargin{1}, 'inside') && isfield(varargin{1}, 'freq') && isfield(varargin{1}, 'time') && numel(tmp)==length(varargin{1}.inside)*length(varargin{1}.freq)*length(varargin{1}.time)
+      % the statistic is a higher dimensional matrix (here as a function of freq) computed only on the
+      % inside voxels
+      newtmp = zeros(length(varargin{1}.inside)+length(varargin{1}.outside), length(varargin{1}.freq), length(varargin{1}.time));
+      if islogical(tmp)
+        newtmp(varargin{1}.inside, :, :)  = reshape(tmp, length(varargin{1}.inside), length(varargin{1}.freq), []);
+        newtmp(varargin{1}.outside, :, :) = false;
+      else
+        newtmp(varargin{1}.inside, :, :)  = reshape(tmp, length(varargin{1}.inside), length(varargin{1}.freq), []);
+        newtmp(varargin{1}.outside, :, :) = nan;
+      end
+      tmp = newtmp; clear newtmp;
+      extradim = length(varargin{1}.freq);
+    elseif isfield(varargin{1}, 'inside') && isfield(varargin{1}, 'freq') && numel(tmp)==length(varargin{1}.inside)*length(varargin{1}.freq)
+      % the statistic is a higher dimensional matrix (here as a function of freq) computed only on the
+      % inside voxels
+      newtmp = zeros(length(varargin{1}.inside)+length(varargin{1}.outside), length(varargin{1}.freq));
+      if islogical(tmp)
+        newtmp(varargin{1}.inside, :)  = reshape(tmp, length(varargin{1}.inside), []);
+        newtmp(varargin{1}.outside, :) = false;
+      else
+        newtmp(varargin{1}.inside, :)  = reshape(tmp, length(varargin{1}.inside), []);
+        newtmp(varargin{1}.outside, :) = nan;
+      end
+      tmp = newtmp; clear newtmp;
+      extradim = length(varargin{1}.freq);
+    elseif isfield(varargin{1}, 'inside') && isfield(varargin{1}, 'time') && numel(tmp)==length(varargin{1}.inside)*length(varargin{1}.time)
+      % the statistic is a higher dimensional matrix (here as a function of time) computed only on the
+      % inside voxels
+      newtmp = zeros(length(varargin{1}.inside)+length(varargin{1}.outside), length(varargin{1}.time));
+      if islogical(tmp)
+        newtmp(varargin{1}.inside, :)  = reshape(tmp, length(varargin{1}.inside), []);
+        newtmp(varargin{1}.outside, :) = false;
+      else
+        newtmp(varargin{1}.inside, :)  = reshape(tmp, length(varargin{1}.inside), []);
+        newtmp(varargin{1}.outside, :) = nan;
+      end
+      tmp = newtmp; clear newtmp;
+      extradim = length(varargin{1}.time);
+    else
+      extradim = 1;
     end
     if numel(tmp)==prod(varargin{1}.dim)
       % reshape the statistical volumes into the original format
       stat = setsubfield(stat, statfield{i}, reshape(tmp, varargin{1}.dim));
+    else
+      stat = setsubfield(stat, statfield{i}, tmp);
     end
   end
 else
@@ -568,7 +614,7 @@ end
 % remember the dimension of the source data
 cfg.dim = dim;
 % remember which voxels are inside the brain
-cfg.inside = find(inside(:));
+cfg.inside = inside(:);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % SUBFUNCTION for creating a design matrix

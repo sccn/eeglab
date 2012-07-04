@@ -30,7 +30,7 @@ function [source] = ft_source2sparse(source);
 %    You should have received a copy of the GNU General Public License
 %    along with FieldTrip. If not, see <http://www.gnu.org/licenses/>.
 %
-% $Id: ft_source2sparse.m 2865 2011-02-12 19:24:57Z roboos $
+% $Id: ft_source2sparse.m 5521 2012-03-22 20:30:13Z jansch $
 
 ft_defaults
 
@@ -63,10 +63,10 @@ if strcmp(stype, 'old'),
   % original code
   % first do the non-trial fields
   [param]    = parameterselection('all', source);
-  trlparam   = strmatch('trial', param);
-  sel        = setdiff(1:length(param), trlparam);
-  param      = param(sel);
-  
+  %trlparam   = find(strcmp('trial', param));
+  %sel        = setdiff(1:length(param), trlparam);
+  %param      = param(sel);
+  param      = setdiff(param, {'trial' 'pos'});
   for j = 1:length(param)
     dat    = getsubfield(source, param{j});
     source = setsubfield(source, param{j}, dat(inside));
@@ -157,7 +157,7 @@ catch
   [st, i] = dbstack;
   cfg.version.name = st(i);
 end
-cfg.version.id = '$Id: ft_source2sparse.m 2865 2011-02-12 19:24:57Z roboos $';
+cfg.version.id = '$Id: ft_source2sparse.m 5521 2012-03-22 20:30:13Z jansch $';
 % remember the configuration details of the input data
 try, cfg.previous = source.cfg; end
 % remember the exact configuration details in the output 

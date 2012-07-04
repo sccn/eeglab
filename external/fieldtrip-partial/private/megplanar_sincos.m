@@ -21,13 +21,13 @@ function montage = megplanar_sincos(cfg, grad)
 %    You should have received a copy of the GNU General Public License
 %    along with FieldTrip. If not, see <http://www.gnu.org/licenses/>.
 %
-% $Id: megplanar_sincos.m 4287 2011-09-23 12:17:38Z jansch $
+% $Id: megplanar_sincos.m 5752 2012-05-08 15:34:30Z jorhor $
 
 neighbsel = cfg.neighbsel;
 distance = cfg.distance;
 
 lab   = grad.label;
-tmp   = ft_channelselection('MEG', lab);
+tmp   = ft_channelselection(cfg.channel, lab);
 sel   = match_str(lab, tmp);
 pnt   = grad.chanpos(sel,:);
 ori   = grad.chanori(sel,:);

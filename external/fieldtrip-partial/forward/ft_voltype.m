@@ -41,7 +41,7 @@ function [type] = ft_voltype(vol, desired)
 %    You should have received a copy of the GNU General Public License
 %    along with FieldTrip. If not, see <http://www.gnu.org/licenses/>.
 %
-% $Id: ft_voltype.m 5346 2012-02-29 17:13:12Z crimic $
+% $Id: ft_voltype.m 5589 2012-04-04 10:50:34Z roboos $
 
 % these are for remembering the type on subsequent calls with the same input arguments
 persistent previous_argin previous_argout
@@ -115,7 +115,7 @@ end % detemine the correspondence to the desired type
 
 % remember the current input and output arguments, so that they can be
 % reused on a subsequent call in case the same input argument is given
-current_argout = {type};
+current_argout  = {type};
 previous_argin  = current_argin;
 previous_argout = current_argout;
 

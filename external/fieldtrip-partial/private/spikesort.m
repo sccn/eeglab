@@ -46,13 +46,10 @@ function [numA, numB, indA, indB] = spikesort(numA, numB, varargin);
 %    You should have received a copy of the GNU General Public License
 %    along with FieldTrip. If not, see <http://www.gnu.org/licenses/>.
 %
-% $Id: spikesort.m 4439 2011-10-12 10:17:09Z roboos $
+% $Id: spikesort.m 5835 2012-06-01 07:12:19Z roboos $
 
-% use global flag for debugging
-global fb
-if isempty(fb)
-  fb = 0;
-end
+% this can be used for printing detailled user feedback
+fb = false;
 
 % get the options
 presort = ft_getopt(varargin, 'presort');

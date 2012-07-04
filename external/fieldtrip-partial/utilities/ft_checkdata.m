@@ -22,7 +22,7 @@ function [data] = ft_checkdata(data, varargin)
 %   ismeg              = yes, no
 %   hastrials          = yes, no
 %   hasunits           = yes, no
-%   hassampleinfo      = yes, no, ifmakessense
+%   hassampleinfo      = yes, no, ifmakessense (only applies to raw data)
 %   hascumtapcnt       = yes, no (only applies to freq data)
 %   hasdim             = yes, no
 %   hasdof             = yes, no
@@ -51,7 +51,7 @@ function [data] = ft_checkdata(data, varargin)
 %    You should have received a copy of the GNU General Public License
 %    along with FieldTrip. If not, see <http://www.gnu.org/licenses/>.
 %
-% $Id: ft_checkdata.m 5274 2012-02-10 13:01:03Z jorhor $
+% $Id: ft_checkdata.m 5942 2012-06-07 06:30:40Z marvin $
 
 % in case of an error this function could use dbstack for more detailled
 % user feedback
@@ -172,7 +172,7 @@ if issource && isvolume
 end
 
 % the ft_datatype_XXX functions ensures the consistency of the XXX datatype
-% and provides a detailled description of the dataformat and its history
+% and provides a detailed description of the dataformat and its history
 if     israw
   data = ft_datatype_raw(data, 'hassampleinfo', hassampleinfo);
 elseif isfreq
@@ -232,62 +232,74 @@ if ~isempty(dtype)
     for iCell = 1:length(dtype)
       if isequal(dtype(iCell), {'source'}) && isvolume
         data = volume2source(data);
+        data = ft_datatype_source(data);
         isvolume = 0;
         issource = 1;
         okflag = 1;
       elseif isequal(dtype(iCell), {'volume'}) && issource
         data = source2volume(data);
+        data = ft_datatype_volume(data);
         isvolume = 1;
         issource = 0;
         okflag = 1;
       elseif isequal(dtype(iCell), {'raw'}) && issource
         data = data2raw(data);
+        data = ft_datatype_raw(data, 'hassampleinfo', hassampleinfo);
         issource = 0;
         israw = 1;
         okflag = 1;
       elseif isequal(dtype(iCell), {'raw'}) && istimelock
         data = timelock2raw(data);
+        data = ft_datatype_raw(data, 'hassampleinfo', hassampleinfo);
         istimelock = 0;
         israw = 1;
         okflag = 1;
       elseif isequal(dtype(iCell), {'timelock'}) && israw
         data = raw2timelock(data);
+        data = ft_datatype_timelock(data);
         israw = 0;
         istimelock = 1;
         okflag = 1;
       elseif isequal(dtype(iCell), {'raw'}) && isfreq
         data = freq2raw(data);
+        data = ft_datatype_raw(data, 'hassampleinfo', hassampleinfo);
         isfreq = 0;
         israw = 1;
         okflag = 1;
       elseif isequal(dtype(iCell), {'raw'}) && iscomp
         data = comp2raw(data);
+        data = ft_datatype_raw(data, 'hassampleinfo', hassampleinfo);
         iscomp = 0;
         israw = 1;
         okflag = 1;
       elseif isequal(dtype(iCell), {'timelock'}) && iscomp
         data = comp2raw(data);
         data = raw2timelock(data);
+        data = ft_datatype_timelock(data);
         iscomp = 0;
         istimelock = 1;
         okflag = 1;
       elseif isequal(dtype(iCell), {'timelock'}) && ischan
         data = chan2timelock(data);
+        data = ft_datatype_timelock(data);
         ischan = 0;
         istimelock = 1;
         okflag = 1;
       elseif isequal(dtype(iCell), {'freq'}) && ischan
         data = chan2freq(data);
+        data = ft_datatype_freq(data);
         ischan = 0;
         isfreq = 1;
         okflag = 1;
       elseif isequal(dtype(iCell), {'spike'}) && israw
         data = raw2spike(data);
+        data = ft_datatype_spike(data);
         israw = 0;
         isspike = 1;
         okflag = 1;
       elseif isequal(dtype(iCell), {'raw'}) && isspike
         data = spike2raw(data,fsample);
+        data = ft_datatype_raw(data, 'hassampleinfo', hassampleinfo);
         isspike = 0;
         israw   = 1;
         okflag  = 1;                
@@ -557,7 +569,7 @@ if issource || isvolume,
   end
   
   % these fields should not be reshaped
-  exclude = {'cfg' 'fwhm' 'leadfield' 'q' 'rough'};
+  exclude = {'cfg' 'fwhm' 'leadfield' 'q' 'rough' 'pos'};
   if ~strcmp(inside, 'logical')
     % also exclude the inside/outside from being reshaped
     exclude = cat(2, exclude, {'inside' 'outside'});
@@ -574,13 +586,17 @@ if issource || isvolume,
       tmp1 = getfield(data, sub1);
       for j=1:numel(tmp1)
         tmp2 = getfield(tmp1(j), sub2);
-        tmp2 = reshape(tmp2, dim);
+        if prod(dim)==numel(tmp2)
+          tmp2 = reshape(tmp2, dim);
+        end
         tmp1(j) = setfield(tmp1(j), sub2, tmp2);
       end
       data = setfield(data, sub1, tmp1);
     else
       tmp  = getfield(data, param{i});
-      tmp  = reshape(tmp, dim);
+      if prod(dim)==numel(tmp)
+        tmp  = reshape(tmp, dim);
+      end
       data = setfield(data, param{i}, tmp);
     end
   end
@@ -598,10 +614,6 @@ if isequal(hastrials, 'yes')
   if ~okflag
     error('This function requires data with a ''trial'' field');
   end % if okflag
-end
-
-if isequal(hassampleinfo, 'yes') || isequal(hassampleinfo, 'ifmakessense')
-  data = fixsampleinfo(data);
 end
 
 if isequal(hasdim, 'yes') && ~isfield(data, 'dim')
@@ -1650,29 +1662,47 @@ else
   
   begtime = cellfun(@min,data.time);
   endtime = cellfun(@max,data.time);
-  
+  % this part is just about the number of samples, not about the time-axis
   for i = 1:ntrial
-    mint    = min(eps, begtime(i));
-    maxt    = max(eps, endtime(i));
-    time = data.time{i};
+    time = data.time{i};    
+    mint    = min([ 0, begtime(i)]);    
+    maxt    = max([-max(abs(2*endtime)) * eps, endtime(i)]);
+    
     % extrapolate so that we get near 0
-    time =  interp1(time, time, mint:mean(diff(time)):maxt, 'linear', 'extrap');
-    ix(i) = sum(time<0); % number of samples pre-zero
-    iy(i) = sum(time>=0); % number of samples post-zer
+    if (mint==0)
+       tmptime =  -1*(fliplr(-maxt:mean(diff(time)):-mint));
+    else
+       tmptime =  mint:mean(diff(time)):maxt;
+     end
+    
+    ix(i) = sum(tmptime<0); % number of samples pre-zero
+    iy(i) = sum(tmptime>=0); % number of samples post-zero
+    
+    % account for strictly positive or negative time-axes by removing those
+    % elements that are near 0 but should not be in the time-axis
+    if ix(i)==0
+      ix(i) = 1-nearest(tmptime, begtime(i));
+    end
+    if iy(i)==0
+      iy(i) = nearest(tmptime, endtime(i))-length(tmptime);
+    end
   end  
   
   [mx,ix2] = max(ix);
   [my,iy2] = max(iy);
-  nsmp = mx+my; 
-
-  tmptime = linspace(min(begtime), max(endtime), nsmp);
+  nsmp = mx+my;
+  
+  % create temporary time-axis
+  time = linspace(min(begtime),  max(endtime), nsmp);
+  % remove any time-points before 0 iff not needed - see bug 1477
+  time(nearest(time, max(endtime))+1:end) = [];
   
   % concatenate all trials
-  tmptrial = zeros(ntrial, nchan, length(tmptime)) + nan;
+  tmptrial = zeros(ntrial, nchan, length(time)) + nan;
   
   for i=1:ntrial
-    begsmp(i) = nearest(tmptime, data.time{i}(1));
-    endsmp(i) = nearest(tmptime, data.time{i}(end));
+    begsmp(i) = nearest(time, data.time{i}(1));
+    endsmp(i) = nearest(time, data.time{i}(end));
     tmptrial(i,:,begsmp(i):endsmp(i)) = data.trial{i};
   end   
 
@@ -1688,7 +1718,7 @@ else
   % data.var     = reshape(nanvar (tmptrial, [], 1), nchan, length(tmptime))
   % data.dof     = reshape(sum(~isnan(tmptrial), 1), nchan, length(tmptime));
   data.trial   = tmptrial;
-  data.time    = tmptime;
+  data.time    = time;
   data.dimord = 'rpt_chan_time';
 end
 
@@ -1768,15 +1798,10 @@ function [spike] = raw2spike(data)
 % Copyright (C) 2010, Martin Vinck
 
 fprintf('converting raw data into spike data\n');
-% try to do the conversion
-nTrials 	= length(data.trial);
-s = 0;
-for iTrial = 1:nTrials
-  r = round(data.trial{iTrial})./data.trial{iTrial};
-  s = s + double(all((isnan(r) | r==1),2) & all(data.trial{iTrial}>=0,2));
-end
-spikesel = find(s==nTrials);
-nUnits   = length(spikesel);
+nTrials 	   = length(data.trial);
+[spikelabel] = detectspikechan(data);
+spikesel     = match_str(data.label, spikelabel);
+nUnits       = length(spikesel);
 if nUnits==0, error('cannot convert raw data to spike format since the raw data structure does not contain spike channels'), end
 
 trialTimes  = zeros(nTrials,2);
@@ -1798,55 +1823,54 @@ for iUnit = 1:nUnits
   
   spike.label{iUnit}     = data.label{unitIndx};
   spike.waveform{iUnit}  = [];
-  spike.time{iUnit}      = spikeTimes;
-  spike.trial{iUnit}     = trialInds;
+  spike.time{iUnit}      = spikeTimes(:)';
+  spike.trial{iUnit}     = trialInds(:)';
   
   if iUnit==1, spike.trialtime             = trialTimes; end
 end
 
-%%%%%%%%%% SUB FUNCTION %%%%%%%%%%
-function [spikeTimes spikeIndx] = getspiketimes(data,trial,unit)
+% sub function for detection channels
+function [spikelabel, eeglabel] = detectspikechan(data)
 
-% GETSPIKETIMES extracts the spike times and spike samples from a continuous fieldtrip
-% DATA structure in a selected trial for a selected unit.
-%
-% Inputs:
-%   DATA is a contiuous fieldtrip data structure
-%
-%   TRIAL is a natural number indicating which trial is selected
-%   UNIT  is a natural number indicating which channel is selected
-%
-% Outputs:
-%   SPIKETIMES contains the spike times, sampled at frequency data.fsample;
-%   SPIKEINDX  contains the samples in data.trial{trial}(unit,:) at which we find the
-%   spikes.
+maxRate = 2000; % default on what we still consider a neuronal signal: this firing rate should never be exceeded
+
+% autodetect the spike channels
+ntrial = length(data.trial);
+nchans  = length(data.label);
+spikechan = zeros(nchans,1);
+for i=1:ntrial
+  for j=1:nchans
+    hasAllInts    = all(isnan(data.trial{i}(j,:)) | data.trial{i}(j,:) == round(data.trial{i}(j,:)));
+    hasAllPosInts = all(isnan(data.trial{i}(j,:)) | data.trial{i}(j,:)>=0);
+    fr            = nansum(data.trial{i}(j,:)) ./ (data.time{i}(end)-data.time{i}(1));    
+    spikechan(j) = spikechan(j) + double(hasAllInts & hasAllPosInts & fr<=maxRate);
+  end
+end
+spikechan = (spikechan==ntrial);
+
+spikelabel = data.label(spikechan);
+eeglabel   = data.label(~spikechan);
+
+
+%%%%%%%%%% SUB FUNCTION %%%%%%%%%%
+function [spikeTimes] = getspiketimes(data,trial,unit)
 
 spikeIndx       = logical(data.trial{trial}(unit,:));
 spikeCount      = data.trial{trial}(unit,spikeIndx);
 spikeTimes      = data.time{trial}(spikeIndx);
+if isempty(spikeTimes), return; end
 multiSpikes     = find(spikeCount>1);
 
-% preallocate the additional times that we get from the double spikes
-nMultiSpikes = sum(spikeCount(multiSpikes));
-[addTimes,addSamples] = deal(zeros(nMultiSpikes,1));
-
-binWidth            = 1/data.fsample; % the width of each bin
-halfBinWidth        = binWidth/2;
-
 % get the additional samples and spike times, we need only loop through the bins
-n = 1;
+[addSamples, addTimes]   = deal([]);
 for iBin = multiSpikes(:)' % looping over row vector
-  nSpikesInBin = spikeCount(iBin);
-  addTimes(n : n+nSpikesInBin-1)   = ones(1,nSpikesInBin)*spikeTimes(iBin);
-  addSamples(n : n+nSpikesInBin-1) = ones(1,nSpikesInBin)*spikeIndx(iBin);
-  n = n + nSpikesInBin;
+  addTimes     = [addTimes ones(1,spikeCount(iBin))*spikeTimes(iBin)];
+  addSamples   = [addSamples ones(1,spikeCount(iBin))*spikeIndx(iBin)];
 end
 
 % before adding these times, first remove the old ones
 spikeTimes(multiSpikes) = [];
-spikeIndx(multiSpikes)  = [];
 spikeTimes              = sort([spikeTimes(:); addTimes(:)]);
-spikeIndx               = sort([spikeIndx(:) ; addSamples(:)]);
 
 
 function [data] = spike2raw(spike,fsample)
@@ -1874,116 +1898,37 @@ data.trial(1:nTrials) = {[]};
 data.time(1:nTrials)  = {[]};
 for iTrial = 1:nTrials
   
-  timeAx   = spike.trialtime(iTrial,1):(1/fsample):spike.trialtime(iTrial,2);
+  % make bins: note that the spike.time is already within spike.trialtime
+  x = [spike.trialtime(iTrial,1):(1/fsample):spike.trialtime(iTrial,2)];
+  timeBins   = [x x(end)+1/fsample] - (0.5/fsample); 
+  time       = (spike.trialtime(iTrial,1):(1/fsample):spike.trialtime(iTrial,2));
   
   % convert to continuous
-  trialData = zeros(nUnits,length(timeAx));
+  trialData = zeros(nUnits,length(time));
   for iUnit = 1:nUnits
     
     % get the timestamps and only select those timestamps that are in the trial
     ts       = spike.time{iUnit};
     hasTrial = spike.trial{iUnit}==iTrial;
     ts       = ts(hasTrial);
-    
-    % get all the samples at once without using loops
-    sample   = nearest_nd(timeAx,ts); 
-    
-    % because we have duplicates, simply get our vector by using histc trick
-    [N] = histc(sample,1:length(timeAx));
-    
+   
+    [N] = histc(ts,timeBins); 
+    N(end) = [];
+        
     % store it in a matrix
     trialData(iUnit,:) = N;
   end
   
   data.trial{iTrial} = trialData;
-  data.time{iTrial} = timeAx;
+  data.time{iTrial}  = time;
   
 end
 
 % create the associated labels and other aspects of data such as the header
 data.label = spike.label;
+data.fsample = fsample;
 if isfield(spike,'hdr'), data.hdr = spike.hdr; end
 if isfield(spike,'cfg'), data.cfg = spike.cfg; end
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% SUBFUNCTION
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [indx] = nearest_nd(x,y)
-
-% NEAREST return the index of an n-d matrix to an n-d matrix.
-%
-% [indx] = nearest_nd(x, y)
-%
-% Inputs:
-%   X can be a n-d matrix of any size (scalar, vector, n-d matrix).
-%   Y can be an n-d matrix of any size (scalar, vector, n-d matrix).
-%
-% If Y is larger than any X, we return the last index that the maximum value of X occurred.
-% Otherwise, we return the first occurence of the nearest X.
-%
-% If Y contains NaNs, we return a NaN for every NaN in Y.
-%
-% Outputs:
-%   INDX is a vector of size Y and contains the indices of the values in X that are
-%   closest to the respective value of Y. INDX is a linear index, such that x(INDX) gives
-%   the nearest values of X to Y. To convert INDX to subscripts, see IND2SUB.
-%
-
-% Copyright, Martin Vinck, 2009.
-
-% store the sizes of x and y, this is used to reshape INDX later on
-szY = size(y);
-
-% vectorize both x and y
-x = x(:);
-y = y(:);
-
-% from now on we can treat X and Y as vectors
-nY = length(y);
-nX = length(x);
-hasNan = isnan(y); % indices with nans in y, indx(hasNaN) will be set to NaN later.
-
-if nX==1,
-  indx = ones(1,nY);  % only one x value, so nearest is always only element
-else
-  if nY==1 % in this case only one y value, so use the old NEAREST code
-    if y>max(x)
-      % return the last occurence of the nearest number
-      [dum, indx] = max(flipud(x));
-      indx = nX + 1 - indx;
-    else
-      % return the first occurence of the nearest number
-      [mindist, indx] = min(abs(x(:) - y));
-    end
-  else
-    if any(y>max(x))
-      % for these return the last occurence of every number as in NEAREST
-      indx = zeros(1,nY);
-      i = y>max(x);
-      [dum,indx] = max(flipud(x));
-      indx(i)       = nX + 1 - indx;
-      % for the rest return the first occurence of every number
-      x = x(:);
-      y = y(~i)';
-      xRep = x(:,ones(1,length(y)));
-      yRep = y(ones(nX,1),:);
-      [mindist,indx(~i)] = min(abs(xRep-yRep));
-    else
-      x = x(:);
-      y = y';
-      xRep = x(:,ones(1,nY));
-      yRep = y(ones(nX,1),:);
-      [mindist,indx] = min(abs(xRep-yRep));
-    end
-  end
-end
-% return a NaN in INDX for a NaN in Y
-indx(hasNan) = NaN;
-
-% reshape the indx back to the y format
-if (sum(szY>1)>1 || length(szY)>2) % in this case we are dealing with a matrix
-  indx = reshape(indx,[szY]);
-end
 
 
 

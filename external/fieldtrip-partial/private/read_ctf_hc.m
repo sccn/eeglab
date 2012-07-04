@@ -50,9 +50,10 @@ function [hc] = read_ctf_hc(filename);
 %    You should have received a copy of the GNU General Public License
 %    along with FieldTrip. If not, see <http://www.gnu.org/licenses/>.
 %
-% $Id: read_ctf_hc.m 4443 2011-10-12 13:11:14Z arjsto $
+% $Id: read_ctf_hc.m 5835 2012-06-01 07:12:19Z roboos $
 
-global fb
+% this can be used for printing detailled user feedback
+fb = false;
 
 hc.standard.nas = [0 0 0];
 hc.standard.lpa = [0 0 0];

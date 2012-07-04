@@ -20,9 +20,11 @@
 %    You should have received a copy of the GNU General Public License
 %    along with FieldTrip. If not, see <http://www.gnu.org/licenses/>.
 %
-% $Id: ft_preamble_distribute.m 5119 2012-01-11 08:57:35Z jansch $
+% $Id: ft_preamble_distribute.m 5917 2012-06-06 13:10:28Z roboos $
 
-return; %JM added this because of unexpected behavior in FT-functions with optional input arguments (that are not defined
+% FIXME this fails if the calling function (e.g. ft_preprocessing)
+% is called with only a cfg and not with a second data argument, see
+% http://bugzilla.fcdonders.nl/show_bug.cgi?id=1250
 
 % determine the name of the calling FieldTrip function
 s = dbstack;
@@ -30,26 +32,30 @@ fname = s(3).name;
 clear s
 
 % determine the input and output arguments to the calling FieldTrip function
-[inarg, outarg] = funargname(fname);
+[arginname, argoutname] = funargname(fname);
 fname   = str2func(fname);
-argin   = cell(size(inarg));  % this will be filled further down
-argout  = cell(size(outarg)); % this will be filled further down
+arginval   = cell(size(arginname));  % this will be filled further down
+argoutval  = cell(size(argoutname)); % this will be filled further down
+
+% it might be that some input arguments are optional
+arginname = arginname(1:nargin);
+arginval  = arginval(1:nargin);
 
 % gather the input arguments
-for i=1:length(inarg)
-  eval(sprintf('argin{%d} = %s;', i, inarg{i}));
+for i=1:length(arginname)
+  eval(sprintf('arginval{%d} = %s;', i, arginname{i}));
 end
 clear i
 
-if strcmp(inarg(end), 'varargin')
+if strcmp(arginname(end), 'varargin')
   % the variable list of input arguments should not be passed as a single cell-array
-  argin = cat(2, argin(1), argin{2});
+  arginval = cat(2, arginval(1), arginval{2});
 end
 
-for i=1:length(argin)
+for i=1:length(arginval)
   % if one of the input arguments is being evaluated in the background,
   % then keep the subsequent processing also in the background
-  if isa(argin{i}, 'background')
+  if isa(arginval{i}, 'background')
     cfg.distribute = 'background';
   end
 end
@@ -61,14 +67,14 @@ if isfield(cfg, 'distribute') && ~isempty(cfg.distribute)
   cfg = rmfield(cfg, 'distribute');
   
   % gather the input arguments for a second time, needed because the cfg has changed
-  for i=1:length(inarg)
-    eval(sprintf('argin{%d} = %s;', i, inarg{i}));
+  for i=1:length(arginname)
+    eval(sprintf('arginval{%d} = %s;', i, arginname{i}));
   end
   clear i
 
-  if strcmp(inarg(end), 'varargin')
+  if strcmp(arginname(end), 'vararginval')
     % the variable list of input arguments should not be passed as a single cell-array
-    argin = cat(2, argin(1), argin{2});
+    arginval = cat(2, arginval(1), arginval{2});
   end
 
   % get the options from the cfg as key-value pairs
@@ -78,12 +84,17 @@ if isfield(cfg, 'distribute') && ~isempty(cfg.distribute)
 
   switch distribute
     
+      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    case 'local'
+      % submit the job for background evaluation
+      [argoutval{:}] = feval(fname, arginval{:});
+      
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     case 'peer'
       % submit the job for remote execution
-      jobid = peerfeval(fname, argin{:}, options{:});
+      jobid = peerfeval(fname, arginval{:}, options{:});
       % collect the output arguments
-      [argout{:}] = peerget(jobid, 'timeout', inf);
+      [argoutval{:}] = peerget(jobid, 'timeout', inf);
       
       % clean the local variables
       clear jobid
@@ -91,9 +102,9 @@ if isfield(cfg, 'distribute') && ~isempty(cfg.distribute)
       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     case 'qsub'
       % submit the job for remote execution
-      jobid = qsubfeval(fname, argin{:}, options{:});
+      jobid = qsubfeval(fname, arginval{:}, options{:});
       % collect the output arguments
-      [argout{:}] = qsubget(jobid, 'timeout', inf);
+      [argoutval{:}] = qsubget(jobid, 'timeout', inf);
       
       % clean the local variables
       clear jobid
@@ -101,16 +112,16 @@ if isfield(cfg, 'distribute') && ~isempty(cfg.distribute)
       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     case 'distcomp'
       % each input arg should be a cell-array
-      for i=1:length(argin)
-        argin{i} = {argin{i}};
+      for i=1:length(arginval)
+        arginval{i} = {arginval{i}};
       end
       
       % submit the job for execution using the MATLAB distributed computing toolbox
       % and optionally MATLAB distributed computing engines
-      jobid = dfevalasync(fname, length(argout), argin{:}, options{:});
+      jobid = dfevalasync(fname, length(argoutval), arginval{:}, options{:});
       % collect the output arguments
       waitForState(jobid);
-      [argout{:}] = getAllOutputArguments(jobid);
+      [argoutval{:}] = getAllOutputArguments(jobid);
       
       % clean the local variables
       clear jobid
@@ -118,8 +129,8 @@ if isfield(cfg, 'distribute') && ~isempty(cfg.distribute)
       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     case 'background'
       % submit the job for background evaluation
-      [argout{:}] = background(fname, argin{:}, options{:});
-      
+      [argoutval{:}] = background(fname, arginval{:}, options{:});
+
       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     otherwise
       error('unsupported method "%s" for distributed computing', distribute);
@@ -127,8 +138,8 @@ if isfield(cfg, 'distribute') && ~isempty(cfg.distribute)
   end % switch
   
   % reassign the output arguments
-  for i=1:length(outarg)
-    eval(sprintf('%s = argout{%d};', outarg{i}, i));
+  for i=1:length(argoutname)
+    eval(sprintf('%s = argoutval{%d};', argoutname{i}, i));
   end
   clear i
   
@@ -140,4 +151,4 @@ if isfield(cfg, 'distribute') && ~isempty(cfg.distribute)
   
 end % if distribute
 
-clear inarg outarg argin argout
+clear arginname argoutname arginval argoutval

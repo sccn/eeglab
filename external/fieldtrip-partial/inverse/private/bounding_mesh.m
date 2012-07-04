@@ -30,12 +30,10 @@ function [inside] = bounding_mesh(pos, pnt, tri);
 %    You should have received a copy of the GNU General Public License
 %    along with FieldTrip. If not, see <http://www.gnu.org/licenses/>.
 %
-% $Id: bounding_mesh.m 4624 2011-10-29 10:10:49Z roboos $
+% $Id: bounding_mesh.m 5835 2012-06-01 07:12:19Z roboos $
 
-global fb;
-if isempty(fb)
-  fb = 0;
-end
+% this can be used for printing detailled user feedback
+fb = false;
 
 npos = size(pos, 1);
 npnt = size(pnt, 1);
