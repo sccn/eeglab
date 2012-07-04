@@ -105,6 +105,7 @@ g = finputcheck(options, { 'geom'     'cell'                []      {}; ...
                            'helpcom'  { 'string','cell' }   { [] [] }      ''; ...
                            'title'    'string'              []      ''; ...
                            'eval'     'string'              []      ''; ...
+                           'skipline' 'string'              { 'on' 'off' } 'on'; ...
                            'userdata' ''                    []      []; ...
                            'getresult' 'real'               []      []; ...
                            'screenpos' ''                   []      []; ...
@@ -125,7 +126,10 @@ if isempty(g.getresult)
                 g.geometry = { g.geometry{:} ones(1, oldgeom(row)) };
             end;
         end
-        g.geometry = { g.geometry{:} [1] [1 1 1] }; % add button to geometry
+        if strcmpi(g.skipline, 'on')
+             g.geometry = { g.geometry{:} [1] [1 1 1] }; % add button to geometry
+        else g.geometry = { g.geometry{:} [1 1 1] }; % add button to geometry
+        end;
         if ~isempty(g.geom)
             for ind = 1:length(g.geom)
                 g.geom{ind}{2} = g.geom{ind}{2}+2;
@@ -139,7 +143,7 @@ if isempty(g.getresult)
 
         % add the three buttons (CANCEL HELP OK) at the bottom of the GUI
         % ---------------------------------------------------------------
-        g.uilist = { g.uilist{:}, {} };
+        if strcmpi(g.skipline, 'on'),  g.uilist = { g.uilist{:}, {} }; end;
         options = { 'width' 80 'stickto' 'on' };
         if ~isempty(g.helpcom)
             if ~iscell(g.helpcom) | isempty(g.geom)
@@ -159,7 +163,8 @@ if isempty(g.getresult)
         elseif isempty(g.geomvert)
             [tmp tmp2 allobj] = supergui( 'fig', fig, 'minwidth', 200, 'geomhoriz', g.geometry, 'uilist', g.uilist, 'screenpos', g.screenpos );
         else
-            [tmp tmp2 allobj] = supergui( 'fig', fig, 'minwidth', 200, 'geomhoriz', g.geometry, 'uilist', g.uilist, 'screenpos', g.screenpos, 'geomvert', [g.geomvert(:)' 1 1] );
+            if strcmpi(g.skipline, 'on'),  g.geomvert = [g.geomvert(:)' 1]; end;
+            [tmp tmp2 allobj] = supergui( 'fig', fig, 'minwidth', 200, 'geomhoriz', g.geometry, 'uilist', g.uilist, 'screenpos', g.screenpos, 'geomvert', [g.geomvert(:)' 1] );
         end;
     else 
         fig = g.mode;
