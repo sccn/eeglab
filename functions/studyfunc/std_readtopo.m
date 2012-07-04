@@ -69,7 +69,7 @@ if ~isempty(tmpfile), filename = tmpfile; end;
 i = 1;
 while getfield(dir(filename), 'bytes') < 1500
     topo = load( '-mat', filename);
-    filename = correctfile(topo.file);
+    filename = correctfile(topo.file, ALLEEG(abset).filepath);
     tmpfile  = which(filename);
     if ~isempty(tmpfile), filename = tmpfile; end;
     if(i>100) 
@@ -123,7 +123,7 @@ X = squeeze(X);
 
 return;
 
-function filename = correctfile(filename)
+function filename = correctfile(filename, datasetpath)
     comp = computer;
     if filename(2) == ':' & ~strcmpi(comp(1:2), 'PC') 
         filename = [filesep filename(4:end) ];
@@ -139,7 +139,10 @@ function filename = correctfile(filename)
             if exist(fullfile(tmpp1, [ tmpf ext ]))
                 filename = fullfile(tmpp1, [ tmpf ext ]);
             else
-                error([ 'Cannot load file ''' [ tmpf ext ] '''' ]);
+                filename = fullfile(datasetpath, [ tmpf ext ]);
+                if ~exist(filename)
+                    error([ 'Cannot load file ''' [ tmpf ext ] '''' ]);
+                end;
             end;
         end;
     end;        
