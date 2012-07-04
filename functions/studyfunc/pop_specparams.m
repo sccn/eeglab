@@ -6,33 +6,10 @@
 % Inputs:
 %   STUDY        - EEGLAB STUDY set
 %
-% Statistics options:
-%   'groupstats' - ['on'|'off'] Compute (or not) statistics across subject 
-%                  groups {default: 'off'}
-%   'condstats'  - ['on'|'off'] Compute (or not) statistics across data.
-%                  conditions {default: 'off'}
+% Plot options:
 %   'topofreq'   - [real] Plot Spectrum scalp maps at one specific freq. (Hz).
 %                  A frequency range [min max] may also be defined (the 
 %                  spectrum is then averaged over the interval) {default: []}
-%   'statistics' - ['param'|'perm'|'bootstrap'] Type of statistics to compute
-%                  'param' for parametric (t-test/anova); 'perm' for 
-%                  permutation-based and 'bootstrap' for bootstrap 
-%                  {default: 'param'}
-%   'naccu'      - [integer] Number of surrogate averages to accumulate for
-%                  surrogate statistics. For example, to test whether 
-%                  use 'naccu' >= 200; for p < 0.001, use >= 2000. When 
-%                  threshold (below) is not NaN and 'naccu' is too low, 
-%                  'naccu' will be automatically updated (for now, from
-%                  the command line only).
-%   'threshold'  - [NaN|0.0x] Significance threshold. NaN will plot the 
-%                  p-value themselves on a different figure. When possible, 
-%                  significant latency regions are shown below the data.
-%                  {default: NaN}
-%   'mcorrect'   - ['fdr'|'none'] correction for multiple comparisons
-%                  (threshold case only). 'fdr' uses false discovery rate.
-%                  See the fdr function for more information. Defaut is
-%                  'none'.
-% Plot options:
 %   'freqrange'  - [min max] spectral frequency range (in Hz) to plot. 
 %                  {default: whole frequency range} .
 %   'ylim'       - [mindB maxdB] spectral plotting limits in dB 
@@ -45,6 +22,9 @@
 %                  on different figures. Note: keywords 'plotgroups' and 
 %                  'plotconditions' cannot both be set to 'together'. 
 %                  {default: 'apart'}
+%   'subtractsubjectmean' - ['on'|'off'] subtract individual subject mean
+%                  from each spectrum before plotting and computing
+%                  statistics. Default is 'off'.
 %
 % See also: std_specplot()
 %
@@ -69,7 +49,6 @@
 function [ STUDY, com ] = pop_specparams(STUDY, varargin);
 
 STUDY = default_params(STUDY);
-STUDY.etc.specparams = pop_statparams(STUDY.etc.specparams, 'default');
 TMPSTUDY = STUDY;
 com = '';
 if isempty(varargin)
@@ -82,6 +61,7 @@ if isempty(varargin)
     vis = fastif(isnan(STUDY.etc.specparams.topofreq), 'off', 'on');
     
     uilist = { ...
+        {'style' 'text'       'string' 'Spectrum plotting options' 'fontweight' 'bold' 'tag', 'spec' } ...
         {'style' 'text'       'string' 'Frequency [low_Hz high_Hz]'} ...
         {'style' 'edit'       'string' num2str(STUDY.etc.specparams.freqrange) 'tag' 'freqrange' } ...
         {'style' 'text'       'string' 'Plot limits [low high]'} ...
@@ -92,16 +72,13 @@ if isempty(varargin)
         {} {'style' 'checkbox'   'string' 'Subtract individual subject mean spectrum' 'value' submean 'tag' 'submean' } ...
         {} {'style' 'checkbox'   'string' 'Plot first variable on the same panel' 'value' plotconditions 'enable' enablecond  'tag' 'plotconditions' } ...
         {} {'style' 'checkbox'   'string' 'Plot second variable on the same panel' 'value' plotgroups 'enable' enablegroup 'tag' 'plotgroups' } };
-
+    evalstr = 'set(findobj(gcf, ''tag'', ''spec''), ''fontsize'', 12);';
     cbline = [0.07 1.1];
     otherline = [ 0.7 .5 0.6 .5];
-    geometry = { otherline otherline cbline cbline cbline };
+    geometry = { 1 otherline otherline cbline cbline cbline };
     
-    [STUDY.etc.specparams res options] = pop_statparams(STUDY.etc.specparams, 'geometry' , geometry, 'uilist', uilist, ...
-                                   'helpcom', 'pophelp(''std_specparams'')', 'enablegroup', enablegroup, ...
-                                   'enablecond', enablecond, ...
-                                   'title', 'Set spectrum plotting parameters -- pop_specparams()');
-
+    [out_param userdat tmp res] = inputgui( 'geometry' , geometry, 'uilist', uilist, 'skipline', 'off', ...
+                                            'title', 'Set spectrum plotting parameters -- pop_specparams()', 'eval', evalstr);
     if isempty(res), return; end;
     
     % decode inputs
@@ -116,6 +93,7 @@ if isempty(varargin)
     
     % build command call
     % ------------------
+    options = {};
     if ~strcmpi( res.plotgroups, STUDY.etc.specparams.plotgroups), options = { options{:} 'plotgroups' res.plotgroups }; end;
     if ~strcmpi( res.plotconditions , STUDY.etc.specparams.plotconditions ), options = { options{:} 'plotconditions'  res.plotconditions  }; end;
     if ~strcmpi( res.submean   , STUDY.etc.specparams.subtractsubjectmean ), options = { options{:} 'subtractsubjectmean'  res.submean  }; end;
@@ -132,7 +110,9 @@ else
         STUDY = default_params(STUDY);
     else
         for index = 1:2:length(varargin)
-            STUDY.etc.specparams = setfield(STUDY.etc.specparams, varargin{index}, varargin{index+1});
+            if ~isempty(strmatch(varargin{index}, fieldnames(STUDY.etc.specparams), 'exact'))
+                STUDY.etc.specparams = setfield(STUDY.etc.specparams, varargin{index}, varargin{index+1});
+            end;
         end;
     end;
 end;

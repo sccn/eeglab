@@ -10,51 +10,7 @@
 % Inputs:
 %   STUDY        - EEGLAB STUDY set
 %
-% Statistics options:
-%  'groupstats'   - ['on'|'off'] Compute statistics across subject 
-%                  groups {default: 'off'}
-%  'condstats'    - ['on'|'off'] Compute statistics across data 
-%                  conditions {default: 'off'}
-%  'statistics'  - ['param'|'perm'|'bootstrap'] Type of statistics to compute
-%                  'param' for parametric (t-test/anova); 'perm' for 
-%                  permutation-based and 'bootstrap' for bootstrap 
-%                  {default: 'param'}
-%  'statmode'    - ['subjects'|'trials'] 'subjects' {default}
-%                  -> statistics are computed across condition mean 
-%                  erpims|ITCs of the single subjects. 
-%                  'trials' -> single-trial 'erpim' transforms 
-%                  for all subjects are pooled.  This requires that 
-%                  they were saved to disk using std_erpim() option 
-%                  'savetrials', 'on'. Note, however, that the 
-%                  single-trial erpims may occupy several GB of disk 
-%                  space, and that computation of statistics may 
-%                  require a large amount of RAM.
-%  'naccu'       - [integer] Number of surrogate data averages to use in
-%                  surrogate statistics. For instance, if p<0.01, 
-%                  use naccu>200. For p<0.001, naccu>2000. If a 'threshold'
-%                  (not NaN) is set below and 'naccu' is too low, it will
-%                  be automatically increased. (This keyword is currently
-%                  only modifiable from the command line, not from the gui). 
-%  'threshold'   - [NaN|alpha] Significance threshold (0<alpha<<1). Value 
-%                  NaN will plot p-values for each time and/or frequency
-%                  on a different axis. If alpha is used, significant time
-%                  and/or frequency regions will be indicated either on
-%                  a separate axis or (whenever possible) along with the
-%                  data {default: NaN}
-%   'mcorrect'   - ['fdr'|'none'] correction for multiple comparisons
-%                  (threshold case only). 'fdr' uses false discovery rate.
-%                  See the fdr function for more information. Defaut is
-%                  'none'.
-%  'subbaseline' - ['on'|'off'] subtract the same baseline across conditions 
-%                  for erpim (not ITC). When datasets with different conditions
-%                  are recorded simultaneously, a common baseline spectrum 
-%                  should be used. Note that this also affects the 
-%                  results of statistics {default: 'on'}
-%  'maskdata'    - ['on'|'off'] when threshold is not NaN, and 'groupstats'
-%                  or 'condstats' (above) are 'off', masks the data 
-%                  for significance.
-%
-% erpim/ITC image plotting options:
+% Erpimage plotting options:
 %  'timerange'   - [min max] erpim/ITC plotting latency range in ms. 
 %                  {default: the whole output latency range}.
 %  'trialrange'  - [min max] erpim/ITC plotting frequency range in ms. 
@@ -86,13 +42,13 @@
 function [ STUDY, com ] = pop_erpimparams(STUDY, varargin);
 
 STUDY = default_params(STUDY);
-STUDY.etc.erpimparams = pop_statparams(STUDY.etc.erpimparams, 'default');
 TMPSTUDY = STUDY;
 com = '';
 if isempty(varargin)
     
     vis = fastif(isnan(STUDY.etc.erpimparams.topotime), 'off', 'on');
     uilist = { ...
+        {'style' 'text'       'string' 'ERPimage plotting options' 'fontweight' 'bold' 'tag', 'erpim' } ...
         {'style' 'text'       'string' 'Time range in ms [Low High]'} ...
         {'style' 'edit'       'string' num2str(STUDY.etc.erpimparams.timerange) 'tag' 'timerange' } ...
         {'style' 'text'       'string' 'Plot scalp map at time [ms]' 'visible' vis} ...
@@ -105,18 +61,15 @@ if isempty(varargin)
         {'style' 'edit'       'string' num2str(STUDY.etc.erpimparams.colorlimits) 'tag' 'colorlimits' } ...
         {'style' 'text'       'string' '' } ...
         {'style' 'text'       'string' '' } };
-    
+    evalstr = 'set(findobj(gcf, ''tag'', ''erpim''), ''fontsize'', 12);';
     cbline = [0.07 1.1];
     otherline = [ 0.7 .5 0.6 .5];
-    geometry = { otherline otherline otherline };
+    geometry = { 1 otherline otherline otherline };
     enablecond  = fastif(length(STUDY.design(STUDY.currentdesign).variable(1).value)>1, 'on', 'off');
     enablegroup = fastif(length(STUDY.design(STUDY.currentdesign).variable(2).value)>1, 'on', 'off');
     
-    [STUDY.etc.erpimparams res options] = pop_statparams(STUDY.etc.erpimparams, 'geometry' , geometry, 'uilist', uilist, ...
-                                   'helpcom', 'pophelp(''pop_erpimparams'')', 'enablegroup', enablegroup, ...
-                                   'enablecond', enablecond, 'enablesingletrials', 'off', ...
-                                   'title', 'Set ERP-image plotting parameters -- pop_erpimparams()');
-                               
+    [out_param userdat tmp res] = inputgui( 'geometry' , geometry, 'uilist', uilist, ...
+                                            'title', 'Set Erpimage plotting parameters -- pop_erpimparams()', 'eval', evalstr);
     if isempty(res), return; end;
     
     % decode input
@@ -124,11 +77,12 @@ if isempty(varargin)
     res.topotime    = str2num( res.topotime );
     res.topotrial   = str2num( res.topotrial );
     res.timerange   = str2num( res.timerange );
-    res.freqrange   = str2num( res.trialrange );
+    res.trialrange  = str2num( res.trialrange );
     res.colorlimits = str2num( res.colorlimits );
     
     % build command call
     % ------------------
+    options = {};
     if ~isequal(res.topotime  ,  STUDY.etc.erpimparams.topotime),    options = { options{:} 'topotime'    res.topotime    }; end;
     if ~isequal(res.topotrial,   STUDY.etc.erpimparams.topotrial),   options = { options{:} 'topotrial'   res.topotrial   }; end;
     if ~isequal(res.timerange ,  STUDY.etc.erpimparams.timerange),   options = { options{:} 'timerange'   res.timerange   }; end;
@@ -142,10 +96,7 @@ else
     if strcmpi(varargin{1}, 'default')
         STUDY = default_params(STUDY);
     else
-        options   = {};
-        allfields = { 'sorttype' 'sortwin' 'sortfield' 'statistics' 'groupstats' 'condstats' 'statmode' ...
-                      'threshold' 'mcorrect' 'naccu' 'rmcomps' 'interp' 'timerange' 'trialrange' 'topotime' ...
-                      'topotrial' 'colorlimits' 'concatenate' 'nlines' 'smoothing' };
+        allfields = fieldnames(STUDY.etc.erpimparams);
         for index = 1:2:length(varargin)
             if ~isempty(strmatch(varargin{index}, allfields, 'exact'))
                 STUDY.etc.erpimparams = setfield(STUDY.etc.erpimparams, varargin{index}, varargin{index+1});
@@ -189,13 +140,6 @@ function STUDY = default_params(STUDY)
     if ~isfield(STUDY.etc.erpimparams, 'sorttype'   ),  STUDY.etc.erpimparams.sorttype    = ''; end;
     if ~isfield(STUDY.etc.erpimparams, 'sortwin'    ),  STUDY.etc.erpimparams.sortwin     = []; end;
     if ~isfield(STUDY.etc.erpimparams, 'sortfield'  ),  STUDY.etc.erpimparams.sortfield   = 'latency'; end;
-    if ~isfield(STUDY.etc.erpimparams, 'statistics' ),  STUDY.etc.erpimparams.statistics  = 'param'; end;
-    if ~isfield(STUDY.etc.erpimparams, 'groupstats' ),  STUDY.etc.erpimparams.groupstats  = 'off'; end;
-    if ~isfield(STUDY.etc.erpimparams, 'condstats'  ),  STUDY.etc.erpimparams.condstats   = 'off'; end;
-    if ~isfield(STUDY.etc.erpimparams, 'statmode'   ),  STUDY.etc.erpimparams.statmode    = 'param'; end;
-    if ~isfield(STUDY.etc.erpimparams, 'threshold'  ),  STUDY.etc.erpimparams.threshold   = NaN; end;
-    if ~isfield(STUDY.etc.erpimparams, 'mcorrect') ,    STUDY.etc.erpimparams.mcorrect    = 'none'; end;
-    if ~isfield(STUDY.etc.erpimparams, 'naccu') ,       STUDY.etc.erpimparams.naccu       = []; end;
 
     if ~isfield(STUDY.etc.erpimparams, 'rmcomps'    ),  STUDY.etc.erpimparams.rmcomps     = []; end;
     if ~isfield(STUDY.etc.erpimparams, 'interp'     ),  STUDY.etc.erpimparams.interp      = []; end;

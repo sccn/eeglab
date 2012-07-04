@@ -11,50 +11,6 @@
 % Inputs:
 %   STUDY        - EEGLAB STUDY set
 %
-% Statistics options:
-%  'groupstats'   - ['on'|'off'] Compute statistics across subject 
-%                  groups {default: 'off'}
-%  'condstats'    - ['on'|'off'] Compute statistics across data 
-%                  conditions {default: 'off'}
-%  'statistics'  - ['param'|'perm'|'bootstrap'] Type of statistics to compute
-%                  'param' for parametric (t-test/anova); 'perm' for 
-%                  permutation-based and 'bootstrap' for bootstrap 
-%                  {default: 'param'}
-%  'statmode'    - ['subjects'|'trials'] 'subjects' {default}
-%                  -> statistics are computed across condition mean 
-%                  ERSPs|ITCs of the single subjects. 
-%                  'trials' -> single-trial 'ERSP' transforms 
-%                  for all subjects are pooled.  This requires that 
-%                  they were saved to disk using std_ersp() option 
-%                  'savetrials', 'on'. Note, however, that the 
-%                  single-trial ERSPs may occupy several GB of disk 
-%                  space, and that computation of statistics may 
-%                  require a large amount of RAM.
-%  'naccu'       - [integer] Number of surrogate data averages to use in
-%                  surrogate statistics. For instance, if p<0.01, 
-%                  use naccu>200. For p<0.001, naccu>2000. If a 'threshold'
-%                  (not NaN) is set below and 'naccu' is too low, it will
-%                  be automatically increased. (This keyword is currently
-%                  only modifiable from the command line, not from the gui). 
-%  'threshold'   - [NaN|alpha] Significance threshold (0<alpha<<1). Value 
-%                  NaN will plot p-values for each time and/or frequency
-%                  on a different axis. If alpha is used, significant time
-%                  and/or frequency regions will be indicated either on
-%                  a separate axis or (whenever possible) along with the
-%                  data {default: NaN}
-%   'mcorrect'   - ['fdr'|'none'] correction for multiple comparisons
-%                  (threshold case only). 'fdr' uses false discovery rate.
-%                  See the fdr function for more information. Defaut is
-%                  'none'.
-%  'subbaseline' - ['on'|'off'] subtract the same baseline across conditions 
-%                  for ERSP (not ITC). When datasets with different conditions
-%                  are recorded simultaneously, a common baseline spectrum 
-%                  should be used. Note that this also affects the 
-%                  results of statistics {default: 'on'}
-%  'maskdata'    - ['on'|'off'] when threshold is not NaN, and 'groupstats'
-%                  or 'condstats' (above) are 'off', masks the data 
-%                  for significance.
-%
 % ERSP/ITC image plotting options:
 %  'timerange'   - [min max] ERSP/ITC plotting latency range in ms. 
 %                  {default: the whole output latency range}.
@@ -69,6 +25,14 @@
 %                  given time range. Requires 'topofreq' below to be set.
 %  'topofreqs'   - [float] plot scalp map at specific frequencies. As above
 %                  a frequency range may also be provided.
+%  'subbaseline' - ['on'|'off'] subtract the same baseline across conditions 
+%                  for ERSP (not ITC). When datasets with different conditions
+%                  are recorded simultaneously, a common baseline spectrum 
+%                  should be used. Note that this also affects the 
+%                  results of statistics {default: 'on'}
+%  'maskdata'    - ['on'|'off'] when threshold is not NaN, and 'groupstats'
+%                  or 'condstats' (above) are 'off', masks the data 
+%                  for significance.
 %
 % See also: std_erspplot(), std_itcplot()
 %
@@ -93,7 +57,6 @@
 function [ STUDY, com ] = pop_erspparams(STUDY, varargin);
 
 STUDY = default_params(STUDY);
-STUDY.etc.erspparams = pop_statparams(STUDY.etc.erspparams, 'default');
 TMPSTUDY = STUDY;
 com = '';
 if isempty(varargin)
@@ -102,6 +65,7 @@ if isempty(varargin)
     vis = fastif(isnan(STUDY.etc.erspparams.topotime), 'off', 'on');
     
     uilist = { ...
+        {'style' 'text'       'string' 'ERSP/ITC plotting options' 'fontweight' 'bold' 'tag', 'ersp' } ...
         {'style' 'text'       'string' 'Time range in ms [Low High]'} ...
         {'style' 'edit'       'string' num2str(STUDY.etc.erspparams.timerange) 'tag' 'timerange' } ...
         {'style' 'text'       'string' 'Plot scalp map at time [ms]' 'visible' vis} ...
@@ -115,18 +79,15 @@ if isempty(varargin)
         {'style' 'text'       'string' 'ITC limit (0-1) [High]'} ...
         {'style' 'edit'       'string' num2str(STUDY.etc.erspparams.itclim) 'tag' 'itclim' } ...
         {} {'style' 'checkbox'   'string' 'Compute common ERSP baseline (assumes additive baseline)' 'value' subbaseline 'tag' 'subbaseline' }  };
-    
+    evalstr = 'set(findobj(gcf, ''tag'', ''ersp''), ''fontsize'', 12);';
     cbline = [0.07 1.1];
     otherline = [ 0.7 .5 0.6 .5];
-    geometry = { otherline otherline otherline cbline };
+    geometry = { 1 otherline otherline otherline cbline };
     enablecond  = fastif(length(STUDY.design(STUDY.currentdesign).variable(1).value)>1, 'on', 'off');
     enablegroup = fastif(length(STUDY.design(STUDY.currentdesign).variable(2).value)>1, 'on', 'off');
     
-    [STUDY.etc.erspparams res options] = pop_statparams(STUDY.etc.erspparams, 'geometry' , geometry, 'uilist', uilist, ...
-                                   'helpcom', 'pophelp(''std_erspparams'')', 'enablegroup', enablegroup, ...
-                                   'enablecond', enablecond, ...
-                                   'title', 'Set ERSP|ITC plotting parameters -- pop_erspparams()');
-                               
+    [out_param userdat tmp res] = inputgui( 'geometry' , geometry, 'uilist', uilist, 'skipline', 'off', ...
+                                            'title', 'Set ERSP/ITC plotting parameters -- pop_erspparams()', 'eval', evalstr);
     if isempty(res), return; end;
     
     % decode input
@@ -141,6 +102,7 @@ if isempty(varargin)
     
     % build command call
     % ------------------
+    options = {};
     if ~strcmpi( res.subbaseline , STUDY.etc.erspparams.subbaseline ), options = { options{:} 'subbaseline' res.subbaseline }; end;
     if ~isequal(res.topotime , STUDY.etc.erspparams.topotime),  options = { options{:} 'topotime'   res.topotime  }; end;
     if ~isequal(res.topofreq , STUDY.etc.erspparams.topofreq),  options = { options{:} 'topofreq'   res.topofreq  }; end;
@@ -157,7 +119,9 @@ else
         STUDY = default_params(STUDY);
     else
         for index = 1:2:length(varargin)
-            STUDY.etc.erspparams = setfield(STUDY.etc.erspparams, varargin{index}, varargin{index+1});
+            if ~isempty(strmatch(varargin{index}, fieldnames(STUDY.etc.erspparams), 'exact'))
+                STUDY.etc.erspparams = setfield(STUDY.etc.erspparams, varargin{index}, varargin{index+1});
+            end;
         end;
     end;
 end;
@@ -203,5 +167,6 @@ function STUDY = default_params(STUDY)
     if ~isfield(STUDY.etc.erspparams, 'freqrange'),    STUDY.etc.erspparams.freqrange = []; end;
     if ~isfield(STUDY.etc.erspparams, 'ersplim' ),     STUDY.etc.erspparams.ersplim   = []; end;
     if ~isfield(STUDY.etc.erspparams, 'itclim' ),      STUDY.etc.erspparams.itclim    = []; end;
+    if ~isfield(STUDY.etc.erspparams, 'maskdata' ),    STUDY.etc.erspparams.maskdata  = 'off'; end; %deprecated
     if ~isfield(STUDY.etc.erspparams, 'subbaseline' ),  STUDY.etc.erspparams.subbaseline = 'off'; end;
 

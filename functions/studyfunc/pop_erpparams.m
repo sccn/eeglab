@@ -6,35 +6,12 @@
 % Inputs:
 %   STUDY        - EEGLAB STUDY set
 %
-% Statistics options:
-%   'groupstats  - ['on'|'off'] Compute (or not) statistics across groups.
-%                  {default: 'off'}
-%   'condstats'  - ['on'|'off'] Compute (or not) statistics across groups.
-%                  {default: 'off'}
+% Input:
 %   'topotime'   - [real] Plot ERP scalp maps at one specific latency (ms).
 %                   A latency range [min max] may also be defined (the 
 %                   ERP is then averaged over the interval) {default: []}
-%   'statistics' - ['param'|'perm'|'bootstrap'] Type of statistics to compute
-%                  'param' for parametric (t-test/anova); 'perm' for 
-%                  permutation-based and 'bootstrap' for bootstrap 
-%                  {default: 'param'}
-%   'naccu'      - [integer] Number of surrogate averages to accumulate for
-%                  surrogate statistics. For example, to test whether 
-%                  p<0.01, use >=200. For p<0.001, use 'naccu' >=2000. 
-%                  If a threshold (not NaN) is set below, and 'naccu' is 
-%                  too low, it will be automatically reset. (This option 
-%                  is now available only from the command line).
-%   'threshold'  - [NaN|float<<1] Significance probability threshold. 
-%                  NaN -> plot the p-values themselves on a different axis. 
-%                  When possible, the significant time regions are indicated 
-%                  below the data.
-%   'mcorrect'   - ['fdr'|'none'] correction for multiple comparisons
-%                  (threshold case only). 'fdr' uses false discovery rate.
-%                  See the fdr function for more information. Defaut is
-%                  'none'.
 %   'filter'     - [real] low pass filter the ERP curves at a given 
 %                  frequency threshold. Default is no filtering.
-% Plot options:
 %   'timerange'  - [min max] ERP plotting latency range in ms. 
 %                  {default: the whole epoch}
 %   'ylim'       - [min max] ERP limits in microvolts {default: from data}
@@ -69,7 +46,6 @@
 function [ STUDY, com ] = pop_erpparams(STUDY, varargin);
 
 STUDY = default_params(STUDY);
-STUDY.etc.erpparams = pop_statparams(STUDY.etc.erpparams, 'default');
 TMPSTUDY = STUDY;
 com = '';
 if isempty(varargin)
@@ -81,6 +57,7 @@ if isempty(varargin)
     vis = fastif(isnan(STUDY.etc.erpparams.topotime), 'off', 'on');
     
     uilist = { ...
+        {'style' 'text'       'string' 'ERP plotting options' 'fontweight' 'bold' 'tag', 'erp' } ...
         {'style' 'text'       'string' 'Time range in ms [low high]'} ...
         {'style' 'edit'       'string' num2str(STUDY.etc.erpparams.timerange) 'tag' 'timerange' } ...
         {'style' 'text'       'string' 'Plot limits in uV [low high]'} ...
@@ -91,16 +68,13 @@ if isempty(varargin)
         {'style' 'edit'       'string' num2str(STUDY.etc.erpparams.filter) 'tag' 'filter' } ...
         {} {'style' 'checkbox'   'string' 'Plot first variable on the same panel' 'value' plotconditions 'enable' enablecond  'tag' 'plotconditions' } ...
         {} {'style' 'checkbox'   'string' 'Plot second variable on the same panel' 'value' plotgroups 'enable' enablegroup 'tag' 'plotgroups' } };
-    
+    evalstr = 'set(findobj(gcf, ''tag'', ''erp''), ''fontsize'', 12);';
     cbline = [0.07 1.1];
     otherline = [ 0.7 .5 0.6 .5];
-    geometry = { otherline otherline cbline cbline };
+    geometry = { 1 otherline otherline cbline cbline };
     
-    [STUDY.etc.erpparams res options] = pop_statparams(STUDY.etc.erpparams, 'geometry' , geometry, 'uilist', uilist, ...
-                                   'helpcom', 'pophelp(''std_erpparams'')', 'enablegroup', enablegroup, ...
-                                   'enablecond', enablecond, ...
-                                   'title', 'Set ERP plotting parameters -- pop_erpparams()');
-                               
+    [out_param userdat tmp res] = inputgui( 'geometry' , geometry, 'uilist', uilist, 'skipline', 'off', ...
+                                            'title', 'Set ERP plotting parameters -- pop_erpparams()', 'eval', evalstr);
     if isempty(res), return; end;
     
     % decode inputs
@@ -115,6 +89,7 @@ if isempty(varargin)
     
     % build command call
     % ------------------
+    options = {};
     if ~strcmpi( char(res.filter), char(STUDY.etc.erpparams.filter)), options = { options{:} 'filter' res.filter }; end;
     if ~strcmpi( res.plotgroups, STUDY.etc.erpparams.plotgroups), options = { options{:} 'plotgroups' res.plotgroups }; end;
     if ~strcmpi( res.plotconditions , STUDY.etc.erpparams.plotconditions ), options = { options{:} 'plotconditions'  res.plotconditions  }; end;
@@ -134,7 +109,9 @@ else
         STUDY = default_params(STUDY);
     else
         for index = 1:2:length(varargin)
-            STUDY.etc.erpparams = setfield(STUDY.etc.erpparams, varargin{index}, varargin{index+1});
+            if ~isempty(strmatch(varargin{index}, fieldnames(STUDY.etc.erpparams), 'exact'))
+                STUDY.etc.erpparams = setfield(STUDY.etc.erpparams, varargin{index}, varargin{index+1});
+            end;
         end;
     end;
 end;
@@ -158,10 +135,10 @@ end;
 
 function STUDY = default_params(STUDY)
     if ~isfield(STUDY.etc, 'erpparams'), STUDY.etc.erpparams = []; end;
-    if ~isfield(STUDY.etc.erpparams, 'topotime'),    STUDY.etc.erpparams.topotime = []; end;
-    if ~isfield(STUDY.etc.erpparams, 'filter'),     STUDY.etc.erpparams.filter = []; end;
-    if ~isfield(STUDY.etc.erpparams, 'timerange'),  STUDY.etc.erpparams.timerange = []; end;
-    if ~isfield(STUDY.etc.erpparams, 'ylim'     ),  STUDY.etc.erpparams.ylim      = []; end;
-    if ~isfield(STUDY.etc.erpparams, 'plotgroups') , STUDY.etc.erpparams.plotgroups = 'apart'; end;
+    if ~isfield(STUDY.etc.erpparams, 'topotime'),         STUDY.etc.erpparams.topotime = []; end;
+    if ~isfield(STUDY.etc.erpparams, 'filter'),           STUDY.etc.erpparams.filter = []; end;
+    if ~isfield(STUDY.etc.erpparams, 'timerange'),        STUDY.etc.erpparams.timerange = []; end;
+    if ~isfield(STUDY.etc.erpparams, 'ylim'     ),        STUDY.etc.erpparams.ylim      = []; end;
+    if ~isfield(STUDY.etc.erpparams, 'plotgroups') ,      STUDY.etc.erpparams.plotgroups = 'apart'; end;
     if ~isfield(STUDY.etc.erpparams, 'plotconditions') ,  STUDY.etc.erpparams.plotconditions  = 'apart'; end;
 
