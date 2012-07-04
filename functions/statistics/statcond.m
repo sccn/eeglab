@@ -40,13 +40,15 @@
 %                For two independent variables, this input is a cell array,
 %                for example { 'on' 'off' } indicating that the first
 %                independent variable is paired and the second is not.
-%   'mode'     = ['perm'|'bootstrap'|'param'] mode for computing the p-values:
-%                 'param' = parametric testing (standard ANOVA or t-test); 
-%                 'perm' = non-parametric testing using surrogate data
+%   'method'   = ['perm'|'bootstrap'|'param'] method for computing the p-values:
+%                 'param' or 'parametric' = parametric testing (standard ANOVA
+%                                           or t-test); 
+%                 'perm' or 'permutation' = non-parametric testing using 
+%                                           surrogate data
 %                 'bootstrap' = non-parametric bootstrap 
 %                  made by permuting the input data {default: 'param'}
 %   'naccu'    = [integer] Number of surrogate data copies to use in 'perm' 
-%                 or 'bootstrap' mode estimation (see above) {default: 200}.
+%                 or 'bootstrap' method estimation (see above) {default: 200}.
 %   'verbose'  = ['on'|'off'] print info on the command line {default: 'on'}.
 %   'variance' = ['homegenous'|'inhomogenous'] this option is exclusively
 %                for parametric statistics using unpaired t-test. It allows
@@ -58,6 +60,10 @@
 %   'tail'     = ['one'|'two'] run one-tailed (F-test) or two tailed
 %                (T-test). This option is only relevant when using the
 %                'surrog' input. Otherwise it is ignored.
+%
+% Legacy parameters:
+%   'threshold' - now 'alpha'
+%   'mode'      - now 'method'
 %
 % Outputs:
 %   stats      = F- or T-value array of the same size as input data without 
@@ -81,7 +87,7 @@
 %              5.2807e-04 % standard t-test probability value
 %         % Note: for different rand() outputs, results will differ.
 %
-%         [t df pvals surog] = statcond(a, 'mode', 'perm', 'naccu', 2000); 
+%         [t df pvals surog] = statcond(a, 'method', 'perm', 'naccu', 2000); 
 %           pvals =
 %              0.0065 % nonparametric t-test using 2000 permuted data sets
 %
@@ -118,7 +124,7 @@
 % compare significance levels
 % --------------------------
 % a = { rand(1,10) rand(1,10) }; 
-% [F df pval] = statcond(a, 'mode', 'perm', 'naccu', 200); pval
+% [F df pval] = statcond(a, 'method', 'perm', 'naccu', 200); pval
 % [h p t stat] = ttest( a{1}(1,:), a{2}(1,:)); p
 
 % Copyright (C) Arnaud Delorme
@@ -147,7 +153,8 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
     
     if exist('finputcheck')
         g = finputcheck( varargin, { 'naccu'      'integer'   [1 Inf]             200;
-                                     'mode'       'string'    { 'param','perm','bootstrap' }  'param';
+                                     'method'     'string'    { 'param','parametric','perm','permutation','bootstrap' }  'param';
+                                     'mode'       'string'    { }                 '';
                                      'paired'     'string'    { 'on','off' }      'on'; 
                                      'surrog'     { 'real' 'cell' }      []       []; 
                                      'stats'      { 'real' 'cell' }      []       []; 
@@ -160,7 +167,7 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
     else
         g = struct(varargin{:});
         if ~isfield(g, 'naccu'),     g.naccu = 200; end;
-        if ~isfield(g, 'mode'),      g.mode  = 'param'; end;
+        if ~isfield(g, 'method'),    g.method  = 'param'; end;
         if ~isfield(g, 'paired'),    g.paired = 'on'; end;
         if ~isfield(g, 'surrog'),    g.surrog = []; end;
         if ~isfield(g, 'orivals'),   g.orivals = []; end;
@@ -169,17 +176,20 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
         if ~isfield(g, 'variance'),  g.variance = 'homogenous'; end;
         if ~isfield(g, 'returnresamplingarray'),   g.returnresamplingarray = 'off'; end;
     end;
+    if ~isempty(g.mode), g.method = g.mode; end;
     
+    if strcmpi(g.method, 'parametric'), g.method = 'param'; end;
+    if strcmpi(g.method, 'permutation'), g.method = 'perm'; end;
     if strcmpi(g.verbose, 'on'), verb = 1; else verb = 0; end;
-    if strcmp(g.mode, 'param' ) & exist('fcdf') ~= 2
+    if strcmp(g.method, 'param' ) & exist('fcdf') ~= 2
       myfprintf(verb,['statcond(): parametric testing requires fcdf() \n' ...
                '            from the Matlab StatsticaL Toolbox.\n' ...
                '            Running nonparametric permutation tests\n.']);
-      g.mode = 'perm';
+      g.method = 'perm';
     end
     if size(data,2) == 1, data  = transpose(data); end; % cell array transpose
     
-    if ~strcmpi(g.mode, 'param') && isempty(g.surrog)
+    if ~strcmpi(g.method, 'param') && isempty(g.surrog)
          tmpsize   = size(data{1});
          surrogval = zeros([ tmpsize(1:end-1) g.naccu ], 'single');
     else surrogval = [];
@@ -196,7 +206,7 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
         
     % bootstrap flag
     % --------------
-    if strcmpi(g.mode, 'bootstrap'), bootflag = 1;
+    if strcmpi(g.method, 'bootstrap'), bootflag = 1;
     else                             bootflag = 0;
     end;
     
@@ -253,7 +263,7 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
             else myfprintf(verb,'Using unpaired t-test\n');
             end;
         end;
-        if ~strcmpi(g.mode, 'param')
+        if ~strcmpi(g.method, 'param')
             if bootflag, myfprintf(verb,'Bootstraps (of %d):', g.naccu);
             else         myfprintf(verb,'Permutations (of %d):', g.naccu);
             end;
@@ -273,7 +283,7 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
                 tail = 'both';
                 [ori_vals df] = ttest_cell_select(data, g.paired, g.variance);
 
-                if strcmpi(g.mode, 'param')
+                if strcmpi(g.method, 'param')
                     pvals = 2*mytcdf(-abs(ori_vals), df);
                     pvals = reshape(pvals, size(pvals));
                     return;
@@ -307,7 +317,7 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
                 % -------------
                 tail = 'one';
                 [ori_vals df] = anova1_cell_select( data, g.paired );
-                if strcmpi(g.mode, 'param')
+                if strcmpi(g.method, 'param')
                     pvals = 1-fcdf(ori_vals, df(1), df(2)); return;
                 else
                     if strcmpi(g.arraycomp, 'on')
@@ -340,7 +350,7 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
             % ----------------------------------
             tail = 'one';
             [ ori_vals{1} ori_vals{2} ori_vals{3} df{1} df{2} df{3} ] = anova2_cell_select( data, g.paired );
-            if strcmpi(g.mode, 'param')
+            if strcmpi(g.method, 'param')
                 pvals{1} = 1-fcdf(ori_vals{1}, df{1}(1), df{1}(2));
                 pvals{2} = 1-fcdf(ori_vals{2}, df{2}(1), df{2}(2));
                 pvals{3} = 1-fcdf(ori_vals{3}, df{3}(1), df{3}(2));
