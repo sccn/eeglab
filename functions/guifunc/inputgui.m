@@ -34,6 +34,8 @@
 %   'eval'       - [string] command to evaluate at the end of the creation 
 %                  of the GUI but before waiting for user input. 
 %   'screenpos'  - see supergui.m help message.
+%   'skipline'   - ['on'|'off'] skip a row before the "OK" and "Cancel"
+%                  button. Default is 'on'.
 %
 % Output:
 %   outparam   - list of outputs. The function scans all lines and
