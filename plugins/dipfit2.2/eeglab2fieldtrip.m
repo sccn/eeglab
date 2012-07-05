@@ -98,7 +98,6 @@ switch fieldbox
   case 'preprocessing'
     for index = 1:EEG.trials
       data.trial{index}  = EEG.data(:,:,index);
-      data.offset(index) = EEG.xmin*EEG.srate+1;                   % should be checked in FIELDTRIP
       data.time{index}   = linspace(EEG.xmin, EEG.xmax, EEG.pnts); % should be checked in FIELDTRIP
     end;
     data.label   = { tmpchanlocs(1:EEG.nbchan).labels };
@@ -118,7 +117,6 @@ switch fieldbox
           data.trial{index}  = EEG.icaact(:,:,index);
       catch
       end;
-      data.offset(index) = EEG.xmin*EEG.srate+1;                   % should be checked in FIELDTRIP
       data.time{index}   = linspace(EEG.xmin, EEG.xmax, EEG.pnts); % should be checked in FIELDTRIP
     end;
     for comp = 1:size(EEG.icawinv,2)
