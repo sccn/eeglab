@@ -38,10 +38,8 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function vers = eegplugin_ascinstep(fig, trystrs, catchstrs)
+function eegplugin_ascinstep(fig, trystrs, catchstrs)
 
-    vers = 'eepimport1.02';
-    
     if nargin < 3
         error('eegplugin_ascinstep requires 3 arguments');
     end;
