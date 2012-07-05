@@ -18,5 +18,6 @@ option_scaleicarms   = 1 ;  % If set, scale ICA component activities to RMS (Roo
 option_rememberfolder = 1 ;  % If set, when browsing to open a new dataset assume the folder/directory of previous dataset.
 % Toolbox options
 option_donotusetoolboxes = 0 ;  % If set, do not use Matlab additional toolboxes functions even if they are present.
-% EEGLAB chat option
+% EEGLAB connectivity and support
+option_checkversion = 1 ;  % If set, check for new version of EEGLAB at startup.
 option_chat = 1 ;  % If set, enable EEGLAB chat - currently UCSD only - restart EEGLAB after changing that option.

@@ -36,7 +36,7 @@ releaseDate = filename.date;
 
 if isempty(filename), return; end;
 
-fid = fopen(filename.name, 'r');
+fid = fopen(fullfile(filepath, filename.name), 'r');
 fgetl(fid);
 versionline = fgetl(fid);
 vers = versionline(11:end);
