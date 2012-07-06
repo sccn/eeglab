@@ -51,13 +51,9 @@ end;
 % ------------------
 if isstr(filename)
     locs  = loadtxt( filename );
-    if size(locs,2) > 4 % new format
-        chanlocs = readlocs('128.DAT', 'filetype', 'custom', 'format', { 'labels' 'ignore' '-Y' 'X' 'Z' });
-        return;
-    end;
 end;
 
-if ~isstr(filename) | locs{1,1}(1) == ';' | size(locs,2) < 5
+if ~isstr(filename) || locs{1,1}(1) == ';' || size(locs,2) < 5
     if ~isstr(filename)
         names = filename{1};
         x     = filename{2};
@@ -121,10 +117,14 @@ if ~isstr(filename) | locs{1,1}(1) == ';' | size(locs,2) < 5
     chanlocs = adjustlocs(chanlocs, 'autoscale', 'on', 'autorotate', 'off', varargin{:});
 
 else % 5 rows, xyz positions
-    for index = 1:size(locs,1)
-        locs{index,3} = - locs{index,3};
+    try
+        for index = 1:size(locs,1)
+            locs{index,3} = - locs{index,3};
+        end;
+        chanlocs = struct('labels', locs(:,1), 'type', locs(:,2), 'X', locs(:,4), 'Y', locs(:,3), 'Z', locs(:,5));
+        chanlocs = convertlocs( chanlocs, 'cart2all');
+    catch
+        chanlocs = readlocs(filename, 'filetype', 'custom', 'format', { 'labels' 'ignore' '-Y' 'X' 'Z' });
     end;
-    chanlocs = struct('labels', locs(:,1), 'type', locs(:,2), 'X', locs(:,4), 'Y', locs(:,3), 'Z', locs(:,5));
-    chanlocs = convertlocs( chanlocs, 'cart2all');
 end;
     
