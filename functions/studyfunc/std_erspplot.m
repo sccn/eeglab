@@ -184,7 +184,7 @@ if strcmpi(opt.datatype, 'erpim'),
 else
     valunit = 'Hz';
 end;
-if isempty(opt.plottf) && ~isempty(params.topofreq) && ~isempty(params.topotime) && ~isnan(params.topofreq) && ~isnan(paramsopt.topotime)
+if isempty(opt.plottf) && ~isempty(params.topofreq) && ~isempty(params.topotime) && ~isnan(params.topofreq) && ~isnan(params.topotime)
      params.plottf = [ params.topofreq(1) params.topofreq(end) params.topotime(1) params.topotime(end) ];
 else params.plottf = opt.plottf;
 end;
