@@ -209,7 +209,7 @@ for index=1:length(allobj)
    try,
       objstyle = get(allobj( index ), 'style');
       switch lower( objstyle )
-      case { 'listbox', 'checkbox', 'radiobutton' 'popupmenu' }
+      case { 'listbox', 'checkbox', 'radiobutton' 'popupmenu' 'radio' }
          result{counter} = get( allobj( index ), 'value');
          counter = counter+1;
       case 'edit' 
@@ -238,7 +238,7 @@ function g = myguihandles(fig)
 			try, 
 				switch get(h(index), 'style')
 				 case 'edit', g = setfield(g, get(h(index), 'tag'), get(h(index), 'string'));
-				 case { 'value' 'radio' 'checkbox' 'listbox' 'popupmenu' }, ...
+				 case { 'value' 'radio' 'checkbox' 'listbox' 'popupmenu' 'radiobutton'  }, ...
 					  g = setfield(g, get(h(index), 'tag'), get(h(index), 'value'));
 				end;
 			catch, end;
