@@ -116,7 +116,7 @@ stats = statstruct.etc.statistics;
     
 % potentially missing fields
 % --------------------------
-fields     = { 'filter' 'subtractsubjectmean' 'timerange' 'freqrange' 'topotime' 'topofreq' };
+fields     = { 'filter' 'subtractsubjectmean' 'timerange' 'freqrange' 'topotime' 'topofreq' 'averagechan'};
 defaultval = { [] 'off' [] [] [] [] };
 for ind=1:length(fields)
     if ~isfield(params, fields{ind}), 
@@ -215,6 +215,11 @@ if ~isempty(opt.channels)
         [STUDY erpdata alltimes] = std_readspec(STUDY, ALLEEG, 'channels', opt.channels(chaninds), 'freqrange', params.freqrange, ...
             'rmsubjmean', params.subtractsubjectmean, 'subject', opt.subject, 'singletrials', stats.singletrials, 'design', opt.design);
     end;
+    if strcmpi(params.averagechan, 'on') && length(chaninds) > 1
+        for index = 1:length(erpdata(:))
+            erpdata{index} = squeeze(mean(erpdata{index},2));
+        end;
+    end;
     if isempty(erpdata), return; end;
 
     % select specific time    
@@ -245,6 +250,13 @@ if ~isempty(opt.channels)
     % ----
     locs = eeg_mergelocs(ALLEEG.chanlocs);
     locs = locs(std_chaninds(STUDY, opt.channels(chaninds)));
+    if strcmpi(params.averagechan, 'on') && length(chaninds) > 1
+        chanlabels = { locs.labels };
+        chanlabels(2,:) = {','};
+        chanlabels(2,end) = {''};
+        locs(1).labels = [ chanlabels{:} ];
+        locs(2:end) = [];
+    end;
     [alltitles alllegends ] = std_figtitle('threshold', alpha, 'mcorrect', mcorrect, 'condstat', stats.condstats, 'cond2stat', stats.groupstats, ...
                              'statistics', method, 'condnames', allconditions, 'plotsubjects', opt.plotsubjects, 'cond2names', allgroups, 'chanlabels', { locs.labels }, ...
                              'subject', opt.subject, 'valsunit', opt.unitx, 'vals', params.topotime, 'datatype', datatypestr, 'cond2group', params.plotgroups, 'condgroup', params.plotconditions);
