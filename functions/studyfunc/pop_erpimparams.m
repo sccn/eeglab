@@ -63,7 +63,7 @@ if isempty(varargin)
         {'style' 'text'       'string' '' } };
     evalstr = 'set(findobj(gcf, ''tag'', ''erpim''), ''fontsize'', 12);';
     cbline = [0.07 1.1];
-    otherline = [ 0.7 .5 0.6 .5];
+    otherline = [ 0.6 .4 0.6 .4];
     geometry = { 1 otherline otherline otherline };
     enablecond  = fastif(length(STUDY.design(STUDY.currentdesign).variable(1).value)>1, 'on', 'off');
     enablegroup = fastif(length(STUDY.design(STUDY.currentdesign).variable(2).value)>1, 'on', 'off');
