@@ -23,6 +23,9 @@
 %                  on different axes. Note: Keywords 'plotgroups' and 
 %                  'plotconditions' may not both be set to 'together'. 
 %                  {default: 'together'}
+%   'averagechan' - ['on'|'off'] average data channels when several are
+%                  selected.
+%
 % See also: std_erpplot()
 %
 % Authors: Arnaud Delorme, CERCO, CNRS, 2006-
@@ -54,27 +57,50 @@ if isempty(varargin)
     enablegroup = fastif(length(STUDY.design(STUDY.currentdesign).variable(2).value)>1, 'on', 'off');
     plotconditions    = fastif(strcmpi(STUDY.etc.erpparams.plotconditions, 'together'), 1, 0);
     plotgroups  = fastif(strcmpi(STUDY.etc.erpparams.plotgroups,'together'), 1, 0);
-    vis = fastif(isnan(STUDY.etc.erpparams.topotime), 'off', 'on');
-    
+    radio_averagechan  = fastif(strcmpi(STUDY.etc.erpparams.averagechan,'on'), 1, 0);
+    radio_scalptopo    = fastif(isempty(STUDY.etc.erpparams.topotime), 0, 1);
+    if radio_scalptopo, radio_averagechan = 0; end;
+    if radio_scalptopo+radio_averagechan == 0, radio_scalparray = 1; else radio_scalparray = 0; end;
+        
+    cb_radio = [ 'set(findobj(gcbf, ''userdata'', ''radio''), ''value'', 0);' ...
+                 'set(gcbo, ''value'', 1);' ...
+                 'set(findobj(gcbf, ''tag'', ''topotime''), ''string'', '''');' ];
+    cb_edit  = [ 'set(findobj(gcbf, ''userdata'', ''radio''), ''value'', 0);' ...
+                 'set(findobj(gcbf, ''tag'', ''scalptopotext''), ''value'', 1);' ];    
     uilist = { ...
-        {'style' 'text'       'string' 'ERP plotting options' 'fontweight' 'bold' 'tag', 'erp' } ...
-        {'style' 'text'       'string' 'Time range in ms [low high]'} ...
+        {'style' 'text'       'string' 'ERP plotting options' 'fontweight' 'bold' 'fontsize', 12} ...
+        {} {'style' 'text'       'string' 'Frequency [low_Hz high_Hz]' } ...
         {'style' 'edit'       'string' num2str(STUDY.etc.erpparams.timerange) 'tag' 'timerange' } ...
-        {'style' 'text'       'string' 'Plot limits in uV [low high]'} ...
+        {} {'style' 'text'       'string' 'Plot limits [low high]'} ...
         {'style' 'edit'       'string' num2str(STUDY.etc.erpparams.ylim) 'tag' 'ylim' } ...
-        {'style' 'text'       'string' 'Plot scalp map at latency [ms]' 'enable' vis } ...
-        {'style' 'edit'       'string' num2str(STUDY.etc.erpparams.topotime) 'tag' 'topotime' 'enable' vis } ...
-        {'style' 'text'       'string' 'Display filter in Hz [high]' } ...
+        {} {'style' 'text'       'string' 'Display filter in Hz [high]' } ...
         {'style' 'edit'       'string' num2str(STUDY.etc.erpparams.filter) 'tag' 'filter' } ...
+        {} ...
+        {'style' 'text'       'string' 'ERP plotting format' 'fontweight' 'bold' 'fontsize', 12} ...
         {} {'style' 'checkbox'   'string' 'Plot first variable on the same panel' 'value' plotconditions 'enable' enablecond  'tag' 'plotconditions' } ...
-        {} {'style' 'checkbox'   'string' 'Plot second variable on the same panel' 'value' plotgroups 'enable' enablegroup 'tag' 'plotgroups' } };
-    evalstr = 'set(findobj(gcf, ''tag'', ''erp''), ''fontsize'', 12);';
+        {} {'style' 'checkbox'   'string' 'Plot second variable on the same panel' 'value' plotgroups 'enable' enablegroup 'tag' 'plotgroups' } ...
+        {} ...
+        {'style' 'text'       'string' 'Multiple channel selection' 'fontweight' 'bold' 'tag', 'spec' 'fontsize', 12} ...
+        {} {'style' 'radio'   'string' 'Plot channels in scalp array'    'value' radio_scalparray 'tag' 'scalparray'       'userdata' 'radio' 'callback' cb_radio} { } ...
+        {} {'style' 'radio'   'string'  'Plot topography at time (ms)' 'value' radio_scalptopo  'tag' 'scalptopotext' 'userdata' 'radio' 'callback' cb_radio} ...
+           {'style' 'edit'    'string' num2str(STUDY.etc.erpparams.topotime) 'tag' 'topotime' 'callback' cb_edit } ...
+        {} {'style' 'radio'   'string' 'Average selected channels' 'value' radio_averagechan 'tag' 'averagechan' 'userdata' 'radio' 'callback' cb_radio} { } };
     cbline = [0.07 1.1];
-    otherline = [ 0.7 .5 0.6 .5];
-    geometry = { 1 otherline otherline cbline cbline };
+    otherline = [ 0.07 0.6 .3];
+    chanline  = [ 0.07 0.8 0.3];
+    geometry = { 1 otherline otherline otherline 1 1 cbline cbline 1 1 chanline chanline chanline };
+    geomvert = [1.2 1 1 1 0.5 1.2 1 1 0.5 1.2 1 1 1 ];
     
-    [out_param userdat tmp res] = inputgui( 'geometry' , geometry, 'uilist', uilist, 'skipline', 'off', ...
-                                            'title', 'Set ERP plotting parameters -- pop_erpparams()', 'eval', evalstr);
+    % component plotting
+    % ------------------
+    if isnan(STUDY.etc.erpparams.topotime)
+        geometry(end-4:end) = []; 
+        geomvert(end-4:end) = []; 
+        uilist(end-10:end) = [];
+    end;
+    
+    [out_param userdat tmp res] = inputgui( 'geometry' , geometry, 'uilist', uilist, 'geomvert', geomvert, ...
+                                            'title', 'ERP plotting options -- pop_erpparams()');
     if isempty(res), return; end;
     
     % decode inputs
@@ -82,10 +108,15 @@ if isempty(varargin)
     %if res.plotgroups & res.plotconditions, warndlg2('Both conditions and group cannot be plotted on the same panel'); return; end;
     if res.plotgroups, res.plotgroups = 'together'; else res.plotgroups = 'apart'; end;
     if res.plotconditions , res.plotconditions  = 'together'; else res.plotconditions  = 'apart'; end;
-    res.topotime  = str2num( res.topotime );
+    if ~isfield(res, 'topotime'), res.topotime = STUDY.etc.erpparams.topotime;
+    else res.topotime  = str2num( res.topotime );
+    end;
     res.timerange = str2num( res.timerange );
     res.ylim      = str2num( res.ylim );
     res.filter    = str2num( res.filter );
+    if ~isfield(res, 'averagechan'), res.averagechan = STUDY.etc.erpparams.averagechan;
+    elseif res.averagechan, res.averagechan = 'on'; else res.averagechan = 'off';
+    end;
     
     % build command call
     % ------------------
@@ -93,8 +124,9 @@ if isempty(varargin)
     if ~strcmpi( char(res.filter), char(STUDY.etc.erpparams.filter)), options = { options{:} 'filter' res.filter }; end;
     if ~strcmpi( res.plotgroups, STUDY.etc.erpparams.plotgroups), options = { options{:} 'plotgroups' res.plotgroups }; end;
     if ~strcmpi( res.plotconditions , STUDY.etc.erpparams.plotconditions ), options = { options{:} 'plotconditions'  res.plotconditions  }; end;
-    if ~isequal(res.ylim     , STUDY.etc.erpparams.ylim),      options = { options{:} 'ylim' res.ylim       }; end;
-    if ~isequal(res.timerange, STUDY.etc.erpparams.timerange), options = { options{:} 'timerange' res.timerange }; end;
+    if ~isequal(res.ylim       , STUDY.etc.erpparams.ylim),      options = { options{:} 'ylim' res.ylim       }; end;
+    if ~isequal(res.timerange  , STUDY.etc.erpparams.timerange)  , options = { options{:} 'timerange' res.timerange }; end;
+    if ~isequal(res.averagechan, STUDY.etc.erpparams.averagechan), options = { options{:} 'averagechan' res.averagechan }; end;
     if (all(isnan(res.topotime)) & all(~isnan(STUDY.etc.erpparams.topotime))) | ...
             (all(~isnan(res.topotime)) & all(isnan(STUDY.etc.erpparams.topotime))) | ...
                 (all(~isnan(res.topotime)) & ~isequal(res.topotime, STUDY.etc.erpparams.topotime))
@@ -141,4 +173,5 @@ function STUDY = default_params(STUDY)
     if ~isfield(STUDY.etc.erpparams, 'ylim'     ),        STUDY.etc.erpparams.ylim      = []; end;
     if ~isfield(STUDY.etc.erpparams, 'plotgroups') ,      STUDY.etc.erpparams.plotgroups = 'apart'; end;
     if ~isfield(STUDY.etc.erpparams, 'plotconditions') ,  STUDY.etc.erpparams.plotconditions  = 'apart'; end;
+    if ~isfield(STUDY.etc.erpparams, 'averagechan') ,     STUDY.etc.erpparams.averagechan  = 'off'; end;
 
