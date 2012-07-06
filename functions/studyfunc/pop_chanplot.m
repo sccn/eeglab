@@ -247,8 +247,8 @@ if ~isstr(varargin{1})
     fig_arg{1}{4} = { STUDY.changrp.name };
     fig_arg{2}    = length(STUDY.changrp);
         
-    geometry = { [4] [1] [0.7 0.3 0.3 0.1 0.9] [1 0.3 1] [1 0.3 1] [1 0.3 1] [1 0.3 1] [1 0.3 1] ...
-                 [1 0.3 1] [1 0.3 1] };
+    std_line = [0.9 0.35 0.9];
+    geometry = { [4] [1] [0.6 0.35 0.1 0.1 0.9] std_line std_line std_line std_line std_line std_line std_line };
     str_name       = sprintf('STUDY name ''%s'' - ''%s''', STUDY.name, STUDY.design(STUDY.currentdesign).name);
     if length(str_name) > 80, str_name = [ str_name(1:80) '...''' ]; end;
              
@@ -275,7 +275,8 @@ if ~isstr(varargin{1})
         {'style' 'pushbutton' 'enable'   itc_enable 'string' 'Plot ITCs'        'Callback' plot_chan_itcs} { }  ...
         {'style' 'pushbutton' 'enable'   itc_enable 'string' 'Plot ITC(s)'      'Callback' plot_onechan_itcs}...
         {'style' 'pushbutton' 'string' 'Plot channel properties' 'Callback' plot_chan_sum} {} ... 
-        {'style' 'pushbutton' 'string' 'Plot channel properties (soon)' 'Callback' plot_onechan_sum 'enable' 'off'} };
+        {} };
+    %{'style' 'pushbutton' 'string' 'Plot channel properties (soon)' 'Callback' plot_onechan_sum 'enable' 'off'}
     
     % additional UI given on the command line
     % ---------------------------------------
