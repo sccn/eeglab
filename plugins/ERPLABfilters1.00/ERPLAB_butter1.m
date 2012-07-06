@@ -89,7 +89,7 @@ smoothdata = zeros(numchan,frames);
 hflt = waitbar(0,'Filtering...');
 disp('Filtering input data...')
 for i = 1:numchan
-    smoothdata(i,:) = filtfilt(b,a, data(i,:)); % change to filtfilt for non-causal
+    smoothdata(i,:) = filtfilt(b,a, double(data(i,:))); % change to filtfilt for non-causal
     waitbar(i/numchan)
 end
 close(hflt)

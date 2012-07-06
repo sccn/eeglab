@@ -49,16 +49,15 @@ end
 
 
 uilist = { ...
-    { 'style' 'text' 'string' ' Window   (in sec)' } ...
+    { 'style' 'text' 'string' ' Window length (s) - see help' } ...
     { 'style' 'edit' 'string' '' }};
 
-geometry = { [1 1] };
+geometry = { [1 0.35] };
 
 result = inputgui( 'geometry', geometry, 'uilist', uilist, 'title', 'Detrend the data -- pop_ERPLAB_polydetrend()', ...
     'helpcom', 'pophelp(''pop_ERPLAB_polydetrend'')');
 
-if isempty(result)
-    disp('what happened with you?')
+if isempty(result) || isempty(result{1})
     return
 end
 
@@ -72,7 +71,7 @@ fprintf('\r Using %g windows of %g sec for a recording of %g min aprox.\n', numw
 
 
 if numwin < orderpoly
-    fprintf('***ERPLAB polydetrend Warning***  for %s', EEG.)
+    fprintf('***ERPLAB polydetrend Warning***  for %s', EEG.setname)
     fprintf(...
     '\r The number of estimated windows ( numwin = %g ) is lesser than the order of yhe polynomial (n = %g)our data.\n',...
     numwin, orderpoly)

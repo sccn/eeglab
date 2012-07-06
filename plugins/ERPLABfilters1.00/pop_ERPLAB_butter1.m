@@ -51,13 +51,11 @@ if nargin < 2   %*******  Dic 7, 2007
 
     uilist = { ...
         { 'style' 'text' 'string' 'High Pass Cutoff (Hz)' } ...
-        { 'style' 'edit' 'string' '' } ...
-        { 'style' 'text' 'string' 'Low Pass Cutoff (Hz)' } ...
-        { 'style' 'edit' 'string' '' } ...
-        { 'style' 'text' 'string' 'FIR Filter order' } ...
+        { 'style' 'edit' 'string' '0.05' } ...
+        { 'style' 'text' 'string' 'FIR Filter order (default is 5)' } ...
         { 'style' 'edit' 'string' '' }};
 
-    geometry = { [3 1] [3 1] [3 1] };
+    geometry = { [3 1] [3 1] };
 
     result = inputgui( 'geometry', geometry, 'uilist', uilist, 'title', 'Filter the data -- pop_ERPLAB_butter1()', ...
         'helpcom', 'pophelp(''pop_ERPLAB_butter1'')');
@@ -70,17 +68,13 @@ if nargin < 2   %*******  Dic 7, 2007
         result{1} = '0';
     end
 
-    if isempty(result{2})
-        result{2} = '0';
-    end
-
     locutoff = eval( result{1} );
-    hicutoff = eval( result{2} );
+    hicutoff = 0;
 
-    if isempty( result{3} )
+    if isempty( result{2} )
         filterorder = 5;
     else
-        filterorder = eval( result{3} );
+        filterorder = eval( result{2} );
     end
 
 

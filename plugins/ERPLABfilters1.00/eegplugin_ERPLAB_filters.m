@@ -40,7 +40,7 @@ function vers = eegplugin_ERPLAB_filters(fig, trystrs, catchstrs)
 
     % create menus if necessary
     % -------------------------
-    uimenu( menu, 'Label', 'ERPLAB Butterworth Digital Filter', 'CallBack', combutter1, 'Separator', 'on');
-    uimenu( menu, 'Label', 'ERPLAB Polinomial Detrending', 'CallBack', compolydet, 'Separator', 'on');
+    uimenu( menu, 'Label', 'ERPLAB Butterworth Filter', 'CallBack', combutter1, 'Separator', 'on');
+    uimenu( menu, 'Label', 'ERPLAB Polynomial Detrending', 'CallBack', compolydet);
     %     uimenu( menu, 'Label', 'Parks-McClellan (equiripple) FIR filter', 'CallBack', comfirpm);
 %     uimenu( menu, 'Label', 'Moving average FIR filter', 'CallBack', comfirma);
