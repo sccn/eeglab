@@ -25,6 +25,8 @@
 %   'subtractsubjectmean' - ['on'|'off'] subtract individual subject mean
 %                  from each spectrum before plotting and computing
 %                  statistics. Default is 'off'.
+%   'averagechan' - ['on'|'off'] average data channels when several are
+%                  selected.
 %
 % See also: std_specplot()
 %
@@ -58,27 +60,50 @@ if isempty(varargin)
     plotconditions    = fastif(strcmpi(STUDY.etc.specparams.plotconditions, 'together'), 1, 0);
     plotgroups   = fastif(strcmpi(STUDY.etc.specparams.plotgroups,'together'), 1, 0);
     submean      = fastif(strcmpi(STUDY.etc.specparams.subtractsubjectmean,'on'), 1, 0);
-    vis = fastif(isnan(STUDY.etc.specparams.topofreq), 'off', 'on');
+    radio_averagechan  = fastif(strcmpi(STUDY.etc.specparams.averagechan,'on'), 1, 0);
+    radio_scalptopo    = fastif(isempty(STUDY.etc.specparams.topofreq), 0, 1);
+    if radio_scalptopo, radio_averagechan = 0; end;
+    if radio_scalptopo+radio_averagechan == 0, radio_scalparray = 1; else radio_scalparray = 0; end;
+        
+    cb_radio = [ 'set(findobj(gcbf, ''userdata'', ''radio''), ''value'', 0);' ...
+                 'set(gcbo, ''value'', 1);' ...
+                 'set(findobj(gcbf, ''tag'', ''topofreq''), ''string'', '''');' ];
+    cb_edit  = [ 'set(findobj(gcbf, ''userdata'', ''radio''), ''value'', 0);' ...
+                 'set(findobj(gcbf, ''tag'', ''scalptopotext''), ''value'', 1);' ];
     
     uilist = { ...
-        {'style' 'text'       'string' 'Spectrum plotting options' 'fontweight' 'bold' 'tag', 'spec' } ...
-        {'style' 'text'       'string' 'Frequency [low_Hz high_Hz]'} ...
+        {'style' 'text'       'string' 'Spectrum plotting options' 'fontweight' 'bold' 'fontsize', 12} ...
+        {} {'style' 'text'       'string' 'Frequency [low_Hz high_Hz]' } ...
         {'style' 'edit'       'string' num2str(STUDY.etc.specparams.freqrange) 'tag' 'freqrange' } ...
-        {'style' 'text'       'string' 'Plot limits [low high]'} ...
+        {} {'style' 'text'       'string' 'Plot limits [low high]'} ...
         {'style' 'edit'       'string' num2str(STUDY.etc.specparams.ylim) 'tag' 'ylim' } ...
-        {'style' 'text'       'string' 'Plot scalp map at freq. [Hz]' 'enable' vis } ...
-        {'style' 'edit'       'string' num2str(STUDY.etc.specparams.topofreq) 'tag' 'topofreq' 'enable' vis } ...
-        {} {} ...
         {} {'style' 'checkbox'   'string' 'Subtract individual subject mean spectrum' 'value' submean 'tag' 'submean' } ...
+        {} ...
+        {'style' 'text'       'string' 'Spectrum plotting format' 'fontweight' 'bold' 'fontsize', 12} ...
         {} {'style' 'checkbox'   'string' 'Plot first variable on the same panel' 'value' plotconditions 'enable' enablecond  'tag' 'plotconditions' } ...
-        {} {'style' 'checkbox'   'string' 'Plot second variable on the same panel' 'value' plotgroups 'enable' enablegroup 'tag' 'plotgroups' } };
-    evalstr = 'set(findobj(gcf, ''tag'', ''spec''), ''fontsize'', 12);';
+        {} {'style' 'checkbox'   'string' 'Plot second variable on the same panel' 'value' plotgroups 'enable' enablegroup 'tag' 'plotgroups' } ...
+        {} ...
+        {'style' 'text'       'string' 'Multiple channel selection' 'fontweight' 'bold' 'fontsize', 12} ...
+        {} {'style' 'radio'   'string' 'Plot channels in scalp array'    'value' radio_scalparray 'tag' 'scalparray'       'userdata' 'radio' 'callback' cb_radio} { } ...
+        {} {'style' 'radio'   'string'  'Plot topography at freq. (Hz)' 'value' radio_scalptopo  'tag' 'scalptopotext' 'userdata' 'radio' 'callback' cb_radio} ...
+           {'style' 'edit'    'string' num2str(STUDY.etc.specparams.topofreq) 'tag' 'topofreq' 'callback' cb_edit } ...
+        {} {'style' 'radio'   'string' 'Average selected channels' 'value' radio_averagechan 'tag' 'averagechan' 'userdata' 'radio' 'callback' cb_radio} { } };
     cbline = [0.07 1.1];
-    otherline = [ 0.7 .5 0.6 .5];
-    geometry = { 1 otherline otherline cbline cbline cbline };
+    otherline = [ 0.07 0.6 .3];
+    chanline  = [ 0.07 0.8 0.3];
+    geometry = { 1 otherline otherline cbline 1 1 cbline cbline 1 1 chanline chanline chanline };
+    geomvert = [1.2 1 1 1 0.5 1.2 1 1 0.5 1.2 1 1 1 ];
     
-    [out_param userdat tmp res] = inputgui( 'geometry' , geometry, 'uilist', uilist, 'skipline', 'off', ...
-                                            'title', 'Set spectrum plotting parameters -- pop_specparams()', 'eval', evalstr);
+    % component plotting
+    % ------------------
+    if isnan(STUDY.etc.specparams.topofreq)
+        geometry(end-4:end) = []; 
+        geomvert(end-4:end) = []; 
+        uilist(end-10:end) = [];
+    end;
+    
+    [out_param userdat tmp res] = inputgui( 'geometry' , geometry, 'uilist', uilist, 'geomvert', geomvert, ...
+                                            'title', 'Spectrum plotting options -- pop_specparams()');
     if isempty(res), return; end;
     
     % decode inputs
@@ -87,7 +112,12 @@ if isempty(varargin)
     if res.submean   , res.submean    = 'on'; else res.submean    = 'off'; end;
     if res.plotgroups, res.plotgroups = 'together'; else res.plotgroups = 'apart'; end;
     if res.plotconditions , res.plotconditions  = 'together'; else res.plotconditions  = 'apart'; end;
-    res.topofreq  = str2num( res.topofreq );
+    if ~isfield(res, 'topofreq'), res.topofreq = STUDY.etc.specparams.topofreq;
+    else res.topofreq  = str2num( res.topofreq );
+    end;
+    if ~isfield(res, 'averagechan'), res.averagechan = STUDY.etc.specparams.averagechan;
+    elseif res.averagechan, res.averagechan = 'on'; else res.averagechan = 'off';
+    end;
     res.freqrange = str2num( res.freqrange );
     res.ylim      = str2num( res.ylim );
     
@@ -97,9 +127,10 @@ if isempty(varargin)
     if ~strcmpi( res.plotgroups, STUDY.etc.specparams.plotgroups), options = { options{:} 'plotgroups' res.plotgroups }; end;
     if ~strcmpi( res.plotconditions , STUDY.etc.specparams.plotconditions ), options = { options{:} 'plotconditions'  res.plotconditions  }; end;
     if ~strcmpi( res.submean   , STUDY.etc.specparams.subtractsubjectmean ), options = { options{:} 'subtractsubjectmean'  res.submean  }; end;
-    if ~isequal(res.topofreq, STUDY.etc.specparams.topofreq),   options = { options{:} 'topofreq' res.topofreq }; end;
-    if ~isequal(res.ylim, STUDY.etc.specparams.ylim),           options = { options{:} 'ylim' res.ylim      }; end;
-    if ~isequal(res.freqrange, STUDY.etc.specparams.freqrange), options = { options{:} 'freqrange' res.freqrange }; end;
+    if ~isequal(res.topofreq, STUDY.etc.specparams.topofreq),       options = { options{:} 'topofreq' res.topofreq }; end;
+    if ~isequal(res.ylim, STUDY.etc.specparams.ylim),               options = { options{:} 'ylim' res.ylim      }; end;
+    if ~isequal(res.freqrange, STUDY.etc.specparams.freqrange),     options = { options{:} 'freqrange' res.freqrange }; end;
+    if ~isequal(res.averagechan, STUDY.etc.specparams.averagechan), options = { options{:} 'averagechan' res.averagechan }; end;
     if ~isempty(options)
         STUDY = pop_specparams(STUDY, options{:});
         com = sprintf('STUDY = pop_specparams(STUDY, %s);', vararg2str( options ));
@@ -143,3 +174,4 @@ function STUDY = default_params(STUDY)
     if ~isfield(STUDY.etc.specparams, 'subtractsubjectmean' ), STUDY.etc.specparams.subtractsubjectmean  = 'off'; end;
     if ~isfield(STUDY.etc.specparams, 'plotgroups'), STUDY.etc.specparams.plotgroups = 'apart'; end;
     if ~isfield(STUDY.etc.specparams, 'plotconditions'),  STUDY.etc.specparams.plotconditions  = 'apart'; end;
+    if ~isfield(STUDY.etc.specparams, 'averagechan') ,    STUDY.etc.specparams.averagechan  = 'off'; end;
