@@ -247,8 +247,8 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
                 [guimode, g.erpimparams] = std_filecheck(filename, g.erpimparams, guimode, { 'fileout' 'recompute', 'channels', 'components', 'trialindices'});
                 if strcmpi(guimode, 'cancel'), return; end;
             end;
-            if strcmpi(guimode, 'usedisk') | strcmpi(guimode, 'same'), g.recompute = 'off';
-            else                                                       g.recompute = 'on';
+            if strcmpi(guimode, 'usedisk') || strcmpi(guimode, 'same'), g.recompute = 'off';
+            else                                                        g.recompute = 'on';
             end;
             if ~isempty(g.erpimparams) && isstruct(g.erpimparams)
                 tmpparams      = fieldnames(g.erpimparams); tmpparams = tmpparams';
@@ -285,7 +285,7 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
     
     % compute component scalp maps
     % ----------------------------
-    if strcmpi(g.scalp, 'on')
+    if strcmpi(g.scalp, 'on') && ~strcmpi(computewhat, 'channels')
         for index = 1:length(STUDY.datasetinfo)
             
             % find duplicate
@@ -322,7 +322,7 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
     
     % compute ERSP and ITC
     % --------------------
-    if strcmpi(g.ersp, 'on') | strcmpi(g.itc, 'on')
+    if strcmpi(g.ersp, 'on') || strcmpi(g.itc, 'on')
         % check dataset consistency
         % -------------------------
         allPnts = [ALLEEG([STUDY.design(g.design).cell.dataset]).pnts];
@@ -350,8 +350,8 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
                 [guimode, g.erspparams] = std_filecheck(filename, g.erspparams, guimode, { 'plotitc' 'plotersp' 'plotphase' });
                 if strcmpi(guimode, 'cancel'), return; end;
             end;
-            if strcmpi(guimode, 'usedisk') | strcmpi(guimode, 'same'), g.recompute = 'off'; 
-            else                                                       g.recompute = 'on'; 
+            if strcmpi(guimode, 'usedisk') || strcmpi(guimode, 'same'), g.recompute = 'off'; 
+            else                                                        g.recompute = 'on'; 
             end;
         end;
         
