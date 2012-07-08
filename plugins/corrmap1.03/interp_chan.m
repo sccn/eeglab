@@ -88,7 +88,7 @@ for i=1:length(comp)
             end
 
             aaa = griddata(y_orig,x_orig,ALLEEG(i).icawinv(:,j),...
-                ygood(ALLEEG(i).badchannels),xgood(ALLEEG(i).badchannels),'invdist'); % interpolate data
+                ygood(ALLEEG(i).badchannels),xgood(ALLEEG(i).badchannels),'v4'); % interpolate data
 
             clear x_comp
             clear y_comp
