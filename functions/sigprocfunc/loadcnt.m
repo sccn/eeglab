@@ -323,8 +323,8 @@ if strcmpi(r.dataformat, 'auto')
 end;
 enddata = h.eventtablepos;   % after data
 if strcmpi(r.dataformat, 'int16')
-     nums    = (enddata-begdata)/h.nchannels/2;
-else nums    = (enddata-begdata)/h.nchannels/4;
+     nums    = floor((enddata-begdata)/h.nchannels/2); % floor due to bug 1254
+else nums    = floor((enddata-begdata)/h.nchannels/4);
 end;
 
 % number of sample to read
