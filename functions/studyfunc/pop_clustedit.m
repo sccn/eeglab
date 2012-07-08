@@ -65,16 +65,16 @@
 %                If "All # cluster centroids" option is selected, all cluster scalp map
 %                means are plotted in the same figure. If applied to components, displays
 %                the scalp maps of the specified cluster components in separate figures.
-%                Uses the command line functions std_plotmap() and std_plotcompmap().
+%                Uses the command line functions std_topoplot().
 %  "Plot ERSPs" - [button] Displays the cluster component ERSPs. 
 %                If applied to a cluster, component ERSPs are plotted in one figure  
 %                (per condition) with the cluster mean ERSP. If "All # cluster centroids" 
 %                option is selected, plots all average ERSPs of the clusters in one figure 
 %                per condition. If applied to components, display the ERSP images of specified 
 %                cluster components in separate figures, using one figure for all conditions.
-%                Uses the command line functions std_plotersp() and std_plotcompersp().
+%                Uses the command line functions std_erspplot().
 %  "Plot ITCs" - [button] Same as  "Plot ERSPs" but with ITC.
-%                Uses the command line functions std_plotitc() and std_plotcompitc().
+%                Uses the command line functions std_itcplot().
 %  "Plot dipoles" - [button] Displays the dipoles of the cluster components.
 %                If applied to a cluster, plots the cluster component dipoles (in blue) 
 %                plus the average cluster dipole (in red). If "All # cluster centroids" option 
@@ -82,7 +82,7 @@
 %                a separate subplot. If applied to components, displays the ERSP images of the
 %                specified cluster. For specific components displays components dipole (in blue) 
 %                plus the average cluster dipole (in Red) in separate figures. 
-%                Uses the command line functions std_dipplot() and std_plotcompdip().
+%                Uses the command line functions std_dipplot().
 %  "Plot spectra" - [button] Displays the cluster component spectra.   
 %                If applied to a cluster, displays component spectra plus the average cluster 
 %                spectrum in bold. For a specific cluster, displays the cluster component 
@@ -92,9 +92,11 @@
 %                conditions (if any) plotted in different colors.  
 %                If applied to components, displays the spectrum of specified cluster 
 %                components in separate figures using one figure for all conditions.  
-%                Uses the command line functions std_plotspec() and std_plotcompspec().
+%                Uses the command line functions std_specplot().
 %  "Plot ERPs" - [button] Same as "Plot spectra" but for ERPs.
-%                Uses the command line functions std_ploterp() and std_plotcomperp().
+%                Uses the command line functions std_erpplot().
+%  "Plot ERPimage" - [button] Same as "Plot ERP" but for ERPimave.
+%                Uses the command line functions std_erpimplot().
 %  "Create new cluster" - [button] Creates a new empty cluster.
 %                Opens a popup window in which a name for the new cluster can be entered.
 %                If no name is given the default name is 'Cls #', where '#' is the next

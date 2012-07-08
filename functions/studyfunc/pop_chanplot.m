@@ -23,20 +23,10 @@
 %                on the optional input variable 'channels'. Selecting (clicking on) a 
 %                channel from the list will display the selected channel channels in the 
 %                "Select channel(s) to plot" list box. Use the plotting buttons below 
-%                to plot selected measures of the selected channel. Additional editing 
-%                options (renaming the channel, rejecting outliers, moving channels to 
-%                another channel) are also available. The option 'All N channel centroids' 
-%                at the top of the list displays all the channels in the list except the 
-%                'Notchannel', 'Outlier' and 'Parentchannel' channels. Selecting this option 
-%                will plot the channel centroids (i.e. ERP, ERSP, ...) in a single figure.
+%                to plot selected measures of the selected channel.
 %  "Select channel(s) to plot" - [list box] Displays the ICA channels of the currently 
 %                selected channel (in the "Select channel to plot" list box). Each channel 
-%                has the format: 'subject name, channel index'. Multiple channels can be 
-%                selected from the list. Use the plotting buttons below to plot different 
-%                measures of the selected channels on different figures. Selecting the 
-%                "all subjects" option is  equivalent to using the channel plotting buttons. 
-%                Additional editing options are reassigning the selected channels to 
-%                another channel or moving them to the outlier channel.
+%                has the format: 'subject name, channel index'.
 %  "Plot channel properties" - [button] Displays in one figure all the mean channel measures
 %                (e.g., dipole locations, scalp maps, spectra, etc.) that were calculated
 %                and saved in the EEG datsets. If there is more than one condition, the ERP 
@@ -44,30 +34,15 @@
 %                and ITC plots will show only the first condition; clicking on the subplot 
 %                will open a new figure with the different conditions displayed together. 
 %                Uses the command line function std_propplot().
-%  "Plot scalp maps"  - [button] Displays the scalp maps of channel channels.
-%                If applied to a channel, scalp maps of the channel channels
-%                are plotted along with the channel mean scalp map in one figure. 
-%                If "All # channel centroids" option is selected, all channel scalp map
-%                means are plotted in the same figure. If applied to channels, displays
-%                the scalp maps of the specified channel channels in separate figures.
-%                Uses the command line functions std_plotmap() and std_plotchanmap().
 %  "Plot ERSPs" - [button] Displays the channel channel ERSPs. 
 %                If applied to a channel, channel ERSPs are plotted in one figure  
 %                (per condition) with the channel mean ERSP. If "All # channel centroids" 
 %                option is selected, plots all average ERSPs of the channels in one figure 
 %                per condition. If applied to channels, display the ERSP images of specified 
 %                channel channels in separate figures, using one figure for all conditions.
-%                Uses the command line functions std_plotersp() and std_plotchannelsp().
+%                Uses the command line functions std_erspplot().
 %  "Plot ITCs" - [button] Same as  "Plot ERSPs" but with ITC.
-%                Uses the command line functions std_plotitc() and std_plotchanitc().
-%  "Plot dipoles" - [button] Displays the dipoles of the channel channels.
-%                If applied to a channel, plots the channel channel dipoles (in blue) 
-%                plus the average channel dipole (in red). If "All # channel centroids" option 
-%                is selected, all channel plots are displayed in one figure each channel in 
-%                a separate subplot. If applied to channels, displays the ERSP images of the
-%                specified channel. For specific channels displays channels dipole (in blue) 
-%                plus the average channel dipole (in Red) in separate figures. 
-%                Uses the command line functions std_dipplot() and std_plotchandip().
+%                Uses the command line functions std_itcplot().
 %  "Plot spectra" - [button] Displays the channel channel spectra.   
 %                If applied to a channel, displays channel spectra plus the average channel 
 %                spectrum in bold. For a specific channel, displays the channel channel 
@@ -77,52 +52,13 @@
 %                conditions (if any) plotted in different colors.  
 %                If applied to channels, displays the spectrum of specified channel 
 %                channels in separate figures using one figure for all conditions.  
-%                Uses the command line functions std_plotspec() and std_plotonechanpec().
+%                Uses the command line functions std_specplot().
 %  "Plot ERPs" - [button] Same as "Plot spectra" but for ERPs.
-%                Uses the command line functions std_ploterp() and std_plotchannelp().
-%  "Create new channel" - [button] Creates a new empty channel.
-%                Opens a popup window in which a name for the new channel can be entered.
-%                If no name is given the default name is 'Cls #', where '#' is the next
-%                available channel number. For changes to take place, press the popup 
-%                window 'OK' button, else press the 'Cancel' button. After the empty 
-%                channel is created, channels can be moved into it using, 
-%                'Reassign selected channel(s)' (see below). Uses the command line 
-%                function std_createchant().
-%  "Rename selected channel" - [button] Renames a channel using the selected (mnemonic) name. 
-%                Opens a popup window in which a new name for the selected channel can be 
-%                entered. For changes to take place, press the popup window 'OK' button, 
-%                else press the 'Cancel' button. Uses the command line function std_renamechant().
-%  "Reject outlier channels" - [button] rejects outlier channels to an outlier channel.
-%                Opens a popup window to specify the outlier threshold. Move outlier 
-%                channels that are more than x standard deviations devs from the 
-%                channel centroid to an outlier channel. For changes to take place, 
-%                press the popup window 'OK' button, else press the 'Cancel' button. 
-%                Uses the command line function std_rejectoutliers().
-%  "Merge channels" - [button] Merges several channels into one channel.
-%                Opens a popup window in which the channels to merge may be specified 
-%                An optional name can be given to the merged channel. If no name is given, 
-%                the default name is 'Cls #', where '#' is the next available channel number.   
-%                For changes to take place, press the popup window 'OK' button, else press
-%                the 'Cancel' button. Uses the command line function std_mergechant().
-%  "Remove selected outlier channel(s)" - [button] Moves selected channel(s) to the 
-%                outlier channel. The channels that will be moved are the ones selected 
-%                in the "Select channel(s) to plot" list box. Opens a popup window in which 
-%                a list of the selected channel(s) is presented. For changes to take place,
-%                press the popup window 'OK' button, else press the 'Cancel' button. 
-%                Uses the command line function std_moveoutlier().
-%  "Reassign selected channel(s)" - [button] Moves selected channel(s) from one channel 
-%                to another. The channels that will reassign are the ones selected in the
-%                "Select channel(s) to plot" list box. Opens a popup window in which 
-%                a list of possible channels to which to move the selected channel(s) is 
-%                presented. For changes to take place, press the popup window 'OK' button, 
-%                else press the 'Cancel' button. Uses the command line function std_movecomp().
-%  "Save STUDY set to disk" - [check box] Saves the STUDY set structure modified according 
-%                to specified user edits to the disk. If no file name is entered will
-%                overwrite the current STUDY set file. 
+%                Uses the command line functions std_erpplot().
+%  "Plot ERPimage" - [button] Same as "Plot ERP" but for ERPimave.
+%                Uses the command line functions std_erpimplot().
 %
-% See also:  pop_prechant(), pop_chant().         
-%
-% Authors: Arnaud Delorme, Hilit Serby, Scott Makeig, SCCN/INC/UCSD, October 11, 2004
+% Authors: Arnaud Delorme, Scott Makeig, SCCN/INC/UCSD, October 11, 2004
 
 % Copyright (C) Arnaud Delorme, SCCN, INC, UCSD, October 11, 2004, arno@sccn.ucsd.edu
 %
