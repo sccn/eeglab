@@ -52,7 +52,8 @@ function command = pop_eeglab2loreta(EEG, varargin);
                     'clear filepath;' ];
     cb_plotcomps = [ 'compinds = str2num(get(findobj(gcbf, ''tag'', ''compind''), ''string''));' ...
                      'pop_topoplot(EEG, 0, compinds);' ];
-    
+    cb_erp = 'set(findobj(gcbf, ''tag'', ''compind''), ''enable'', fastif(isempty(get(gcbo, ''string'')), ''on'', ''off''));';
+                 
     listui = { { 'style' 'text'       'string' 'Ouput folder' } ...
                { 'style' 'edit'       'string' '' 'tag' 'folder' } ...
                { 'style' 'pushbutton' 'string' 'Browse' 'callback' commandload } ...
@@ -62,10 +63,14 @@ function command = pop_eeglab2loreta(EEG, varargin);
                { 'style' 'text'       'string' 'Omit channel indices' } ...
                { 'style' 'edit'       'string' '' } ...
                { } ...
-               { 'style' 'text'       'string' 'Export component indices' } ...
+               { 'style' 'text'       'string' 'Export ICA component indices' } ...
                { 'style' 'edit'       'string' [ '1:' num2str(size(EEG.icawinv,2)) ] 'tag', 'compind' } ...
-               { 'style' 'pushbutton' 'string' 'Plot topo.' 'callback' cb_plotcomps } };
-    geom = { [1 1 0.5] [0.8 0.25 1] [1 1 0.5] [1 1 0.5] };
+               { 'style' 'pushbutton' 'string' 'Plot topo.' 'callback' cb_plotcomps } ...
+               { 'style' 'text'       'string' 'or export ERP time range [min max] (ms)' } ...
+               { 'style' 'edit'       'string' '' 'tag', 'erp' 'callback' cb_erp } ...
+               {  } ...
+               };
+    geom = { [1 0.5 0.5] [1 0.5 0.5] [1 0.5 0.5] [1 0.5 0.5] [1 0.5 0.5] };
     results = inputgui('geometry', geom, 'uilist', listui, 'helpcom', 'pophelp(''pop_eeglab2loreta'')', ...
         'title', 'Export EEG info to LORETA');
     if isempty(results), return; end;
@@ -80,11 +85,20 @@ function command = pop_eeglab2loreta(EEG, varargin);
     if ~isempty(results{3})
         options = { options{:} 'excludechan' eval( [ '[' results{3} ']' ] ) };
     end;
-    compnums = eval( [ '[' results{4} ']' ] );
+    
+    % export erp
+    % ----------
+    if ~isempty(results{5})
+        timerange = eval( [ '[' results{5} ']' ] );
+        [tmp minind1] = min(abs(EEG.times-timerange(1)));
+        [tmp minind2] = min(abs(EEG.times-timerange(2)));
+        eeglab2loreta(EEG.chanlocs, mean(EEG.data(:, minind1:minind2, :), 3), 'exporterp', 'on', options{:});
+        return;
+    end;
+        
+    % export comps
+    % ------------
+    if ~isempty(results{4})
+        compnums = eval( [ '[' results{4} ']' ] );
+    end;
     eeglab2loreta(EEG.chanlocs, EEG.icawinv, 'compnum', compnums, options{:});
-
-% output folder
-    % labels only export
-    % only export subset of channels
-    % component numbers
-

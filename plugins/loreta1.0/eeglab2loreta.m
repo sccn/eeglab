@@ -1,15 +1,17 @@
 % eeglab2loreta() - export chanlocs EEGLAB channel structure
-%                        to Tailarach coordinates that can be read using
-%                        the LORETA software.
+%                   to Tailarach coordinates that can be read using
+%                   the LORETA software.
 % Usage:
-%   eeglab2loreta( chanlocs, comps, 'key', 'val', ... );
+%   eeglab2loreta( chanlocs, data, 'key', 'val', ... );
 %
 % Inputs:
 %   chanlocs       - EEGLAB channel location structure using MNI
 %                    coordinates (if not use parameter 'transform').
-%   icawinv        - ICA inverse matrix or subject of ICA inverse matrix
+%   data           - [chan x time] or ICA inverse matrix (EEG.icawinv)
 %                    containing component to export. Enter an empty array
-%                    to export only the channel location file.
+%                    to export only the channel location file. Note that
+%                    exporting [ chan x time ] requires to set the 'exporterp'
+%                    flag.
 %
 % Optional parameter:
 %   'fileloc'      - [string] file name for channel locations. Extension 
@@ -17,7 +19,9 @@
 %                    labels only) will be added automatically. Default is
 %                    'loreta_chanlocs'.
 %   'filecomp'     - [string] base file name for components. Default is
-%                    'compX.txt' (X representing the component number).
+%                    'comp' so files are written as 'compX.txt' (X representing 
+%                    the component number) or 'erp.txt' when exporting ERP.
+%   'exporterp'    - ['on'|'off'] export ERP instead of 
 %   'compnum'      - [integer array] only export these components.
 %   'labelonly'    - ['on'|'off'] only export channel labels and have LORETA
 %                    lookup talairach position for them. Default: 'off'.
@@ -67,6 +71,7 @@ function eeglab2loreta( chanlocs, winv, varargin );
                                  'compnum'   'integer'    [1 Inf] [];
                                  'transform' 'real'       []      [];
                                  'labelonly' 'string'     { 'on' 'off' } 'off';
+                                 'exporterp' 'string'     { 'on' 'off' } 'off';
                                  'excludechan' 'integer'  [1 Inf] [];
                                  'lowchanlim'  'float'    []      NaN });
     if isstr(g), error(g); end;
@@ -129,12 +134,20 @@ function eeglab2loreta( chanlocs, winv, varargin );
     % export components
     % -----------------
     if ~isempty(winv)
-        if isempty(g.compnum), g.compnum = [1:size(winv,2)]; end;
-            
-        for i=g.compnum(:)'
-            toLORETA = winv(:,i)'; 
-            toLORETA(2:10,:)  = ones(9,1)*toLORETA(1,:);
-            filename = sprintf( [ g.filecomp '%d.txt' ], i);
+        if strcmpi(g.exporterp, 'off')
+            if isempty(g.compnum), g.compnum = [1:size(winv,2)]; end;
+
+            for i=g.compnum(:)'
+                toLORETA = winv(:,i)'; 
+                toLORETA(2:10,:)  = ones(9,1)*toLORETA(1,:);
+                filename = sprintf( [ g.filecomp '%d.txt' ], i);
+                save('-ascii', filename, 'toLORETA');
+            end;
+        else
+            if strcmpi(g.filecomp, 'comp'), g.filecomp = 'erp'; end;
+            toLORETA = double(winv)';
+            filename = g.filecomp;
+            if ~strcmpi(g.filecomp(end-2:end), 'txt'), filename = [ filename '.txt' ]; end;
             save('-ascii', filename, 'toLORETA');
         end;
     end;
