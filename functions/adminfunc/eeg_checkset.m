@@ -487,7 +487,7 @@ for inddataset = 1:length(ALLEEG)
                             if ~isempty(indDoublet)
                                 disp('Warning: duplicate boundary event removed');
                                 for indBound = 1:length(indDoublet)
-                                    EEG.event(boundsInd(indDoublet+1)).duration = EEG.event(boundsInd(indDoublet+1)).duration+EEG.event(boundsInd(indDoublet)).duration;
+                                    EEG.event(boundsInd(indDoublet(indBound)+1)).duration = EEG.event(boundsInd(indDoublet(indBound)+1)).duration+EEG.event(boundsInd(indDoublet(indBound))).duration;
                                 end;
                                 EEG.event(boundsInd(indDoublet)) = [];
                             end;
