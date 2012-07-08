@@ -100,7 +100,7 @@ if nargin < 1  % No input arguments specified, show GUI
     
     events = temp{1};
     clear('temp');
-
+    
 else  % Input arguments specified
     if iscell(fileName)  % Multiple file names in a cell array
         files = cell2struct(fileName, 'name', 1);
@@ -163,9 +163,16 @@ EEG.nbchan = size(signal, 2);
 EEG.pnts = size(signal, 1);
 EEG.trials = 1;
 EEG.data = signal';
-for k = 1:EEG.nbchan  % Assign channel labels
-    EEG.chanlocs(k).labels = parms.ChannelNames.Value{k}; end
-EEG = eeg_checkset(EEG);
+if ~isempty(parms.ChannelNames.Value)
+    for k = 1:EEG.nbchan  % Assign channel labels
+        EEG.chanlocs(k).labels = parms.ChannelNames.Value{k}; end
+    EEG = eeg_checkset(EEG);
+else
+    for k = 1:EEG.nbchan  % Use channel numbers as labels
+        EEG.chanlocs(k).labels = num2str(k);
+    end
+    EEG = eeg_checkset(EEG);
+end
 
 evCount = 1;
 for k = 1:length(stateNames)
@@ -224,12 +231,12 @@ if isstruct(data)
             end
         end
     end
-
+    
 else
     
     lat = find(diff(data) > 0) + 1;
     pos = data(lat);
-
+    
     % TODO: Check calculation of duration, right now it just checks if the value
     % goes back to 0. However, we should probably take the time where it is
     % constant as its duration.
