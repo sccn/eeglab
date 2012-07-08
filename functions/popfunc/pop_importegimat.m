@@ -66,13 +66,16 @@ function [EEG com] = pop_importegimat(filename, srate, latpoint0);
     EEG = eeg_emptyset;
     fprintf('Reading EGI Matlab file %s\n', filename);
     tmpdata = load('-mat', filename);
-    
     if isfield(tmpdata, 'samplingRate') % continuous file
-        fields = fieldnames(tmpdata);
+        srate = tmpdata.samplingRate;
+    end;
+
+    fields = fieldnames(tmpdata);
+    if all(cellfun(@(x)isempty(findstr(x, 'Segment')), fields))
+        EEG.srate = srate;
         EEG = eeg_emptyset;
         indData = strmatch('Session', fields);
         EEG.data = tmpdata.(fields{indData(1)});
-        EEG.srate = tmpdata.samplingRate;
         EEG = eeg_checkset(EEG);
         EEG = readegilocs(EEG);
         
