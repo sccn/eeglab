@@ -69,9 +69,14 @@ if nargin < 2
         components = [];
         promptstr    = { ['Component(s) to remove from data:'] };
     end;
-    promptstr    = { ['Component(s) to remove from data:'] 'Component(s) to retain (overwrites "Component(s) to remove")' };
-	inistr       = { int2str(components) '' };
-	result       = inputdlg2( promptstr, 'Remove components from data -- pop_subcomp()', 1,  inistr, 'pop_subcomp');
+    uilist    = { { 'style' 'text' 'string' ['Component(s) to remove from data:'] } ...
+                  { 'style' 'edit' 'string' int2str(components) } ...
+                  { 'style' 'text' 'string' 'Component(s) to retain (overwrites "Component(s) to remove")' } ...
+                  { 'style' 'edit' 'string' int2str(components) } ...
+                  };
+    geom = { [2 0.7] [2 0.7] };
+	result       = inputgui( 'uilist', uilist, 'geometry', geom, 'helpcom', 'pophelp(''pop_subcomp'')', ...
+                                     'title', 'Remove components from data -- pop_subcomp()');
 	if length(result) == 0 return; end;
 	components   = eval( [ '[' result{1} ']' ] );
     if ~isempty(result{2}), 
@@ -88,7 +93,7 @@ if isempty(components)
          	return;
    	end;
 else
-    if (max(components) > EEG.nbchan) | min(components) < 1
+    if (max(components) > size(EEG.icaweights,1)) || min(components) < 1
         error('Component index out of range');
     end;
 end;
