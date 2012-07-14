@@ -4,18 +4,22 @@
 %          >> std_chantopo( data, 'key', 'val', ...)
 % Inputs:
 %  data  -  [cell array] mean data for each subject group and/or data
-%           condition. For example, to plot mean ERPs from a STUDY 
-%           for epochs of 800 frames in two conditions from three groups 
-%           of 12 subjects:
+%           condition. These arrays are usually returned by function
+%           std_erspplot and std_erpplot. For example
 %
-%           >> data = { [800x12] [800x12] [800x12];... % 3 groups, cond 1
-%                       [800x12] [800x12] [800x12] };  % 3 groups, cond 2
-%           >> std_chantopo(erp_ms,data);
+%           >> data = { [1x64x12] [1x64x12 }; % 2 groups of 12 subjects, 64 channels
+%           >> std_chantopo(data, 'chanlocs', 'chanlocfile.txt');
 %
-%           By default, parametric statistics are computed across subjects 
-%           in the three groups. (group,condition) ERP averages are plotted. 
-%           See below and >> help statcond 
-%           for more information about the statistical computations.
+% Scalp map plotting option (mandatory):
+%  'chanlocs'    - [struct] channel location structure
+%
+% Other scalp map plotting options:
+%  'chanlocs'    - [struct] channel location structure
+%  'topoplotopt' - [cell] topoplot options. Default is { 'style', 'both', 
+%                  'shading', 'interp' }. See topoplot help for details.
+%  'ylim'        - [min max] ordinate limits for ERP and spectrum plots
+%                  {default: all available data}
+%  'caxis'       - [min max] same as above
 %
 % Optional display parameters:
 %  'datatype'    - ['erp'|'spec'] data type {default: 'erp'}
@@ -32,14 +36,6 @@
 %                  {default: NaN}
 %  'binarypval'  - ['on'|'off'] if a threshold is set, show only significant
 %                  channels as red dots. Default is 'off'.
-%
-% Curve plotting options:
-% 'ylim'         - [min max] ordinate limits for ERP and spectrum plots
-%                  {default: all available data}
-% 'caxis'        - [min max] same as above
-%
-% Scalp map plotting options:
-%  'chanlocs'    - [struct] channel location structure
 %
 % Author: Arnaud Delorme, CERCO, CNRS, 2006-
 %
