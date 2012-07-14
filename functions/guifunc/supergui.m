@@ -186,6 +186,17 @@ if isempty(g.geom)
     g.spacing(2)   = g.spacing(2)/sumvert*10;
 end;
 
+% disp new geometry
+% -----------------
+if 0
+    fprintf('{ ...\n');
+    for index = 1:length(g.geom)
+        fprintf('{ %g %g [%g %g] [%g %g] } ...\n', g.geom{index}{1}, g.geom{index}{2}, ...
+            g.geom{index}{3}(1), g.geom{index}{3}(2), g.geom{index}{4}(1), g.geom{index}{3}(2));
+    end;
+    fprintf('};\n');
+end;
+
 % get axis coordinates
 % --------------------
 try 
@@ -252,6 +263,9 @@ for counter = 1:maxcount
             if strcmpi(currentelem{1}, 'vertshift'), currentelem(1) = []; addvert = -height/2; 
             else                                                          addvert = 0;   
             end;
+            if strcmpi(currentelem{1}, 'vertexpand'), heightfactor = currentelem{2}; addvert = -(heightfactor-1)*height; currentelem(1:2) = []; 
+            else                                      heightfactor = 1;   
+            end;
             
             % position adjustment depending on GUI type
             if isstr(currentelem{2}) && strcmpi(currentelem{2}, 'popupmenu')
@@ -262,7 +276,7 @@ for counter = 1:maxcount
             end;
                 
             allhandlers(counter) = uicontrol(g.fig, 'unit', 'normalized', 'position', ...
-                                          [posx posy+addvert width height].*s+q, currentelem{:});
+                                          [posx posy+addvert width height*heightfactor].*s+q, currentelem{:});
 
             % this simply compute a factor so that all uicontrol will be visible
             % ------------------------------------------------------------------
@@ -302,7 +316,7 @@ for counter = 1:maxcount
             if strcmp(style, 'pushbutton')
                 tmptext = get(allhandlers(counter), 'string');
                 if length(tmptext) > 1
-                    if upper(tmptext(1)) ~= tmptext(1) || lower(tmptext(2)) ~= tmptext(2) && ~strcmpi(tmptext, 'STAT')
+                    if upper(tmptext(1)) ~= tmptext(1) || lower(tmptext(2)) ~= tmptext(2) && ~strcmpi(tmptext, 'STATS')
                         tmptext = lower(tmptext);
                         try, tmptext(1) = upper(tmptext(1)); catch, end;
                     end;
