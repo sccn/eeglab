@@ -53,38 +53,47 @@ end;
 
 [opt addopts] = finputcheck( varargin, {  'force'  'string'  { 'on','off' }   'off' }, 'std_stat', 'ignore');
 
-if strcmpi(STUDY.etc.statistics.fieldtrip.mcorrect, 'cluster') && strcmpi(STUDY.etc.statistics.mode, 'fieldtrip') && ...
-        ~isempty(STUDY.etc.statistics.fieldtrip.channelneighbor) && isempty(addopts)
-
-    disp('Using stored channel neighbour structure');
-    neighbors = STUDY.etc.statistics.fieldtrip.channelneighbor;
-
-elseif strcmpi(STUDY.etc.statistics.fieldtrip.mcorrect, 'cluster') || strcmpi(opt.force, 'on')
-
-    EEG = eeg_emptyset;
-    EEG.chanlocs = eeg_mergelocs(ALLEEG.chanlocs);
-    if isempty(EEG.chanlocs)
-        disp('std_prepare_neighbors: cannot prepare channel neighbour structure because of empty channel structures');
-        return;
-    end;
-    EEG.nbchan   = length(EEG.chanlocs);
-    EEG.data     = zeros(EEG.nbchan,100,1);
-    EEG = eeg_checkset(EEG);
-    tmpcfg = eeglab2fieldtrip(EEG, 'preprocessing', 'none');
+if strcmpi(opt.force, 'on') || (strcmpi(STUDY.etc.statistics.fieldtrip.mcorrect, 'cluster') && ...
+        strcmpi(STUDY.etc.statistics.mode, 'fieldtrip') && (strcmpi(STUDY.etc.statistics.groupstats, 'on') || strcmpi(STUDY.etc.statistics.condstats, 'on')))
     
-    % call the function that find channel neighbors
-    % ---------------------------------------------
-    addparams = eval( [ '{' STUDY.etc.statistics.fieldtrip.channelneighborparam '}' ]);
-    for index = 1:2:length(addparams)
-        tmpcfg = setfield(tmpcfg, addparams{index}, addparams{index+1});
+    if ~isempty(STUDY.etc.statistics.fieldtrip.channelneighbor) && isempty(addopts)
+        
+        disp('Using stored channel neighbour structure');
+        neighbors = STUDY.etc.statistics.fieldtrip.channelneighbor;
+        
+    else
+        
+        EEG = eeg_emptyset;
+        EEG.chanlocs = eeg_mergelocs(ALLEEG.chanlocs);
+        if isempty(EEG.chanlocs)
+            disp('std_prepare_neighbors: cannot prepare channel neighbour structure because of empty channel structures');
+            return;
+        end;
+        EEG.nbchan   = length(EEG.chanlocs);
+        EEG.data     = zeros(EEG.nbchan,100,1);
+        EEG.trials   = 1;
+        EEG.pnts     = 100;
+        EEG.xmin     = 0;
+        EEG.srate    = 1;
+        EEG.xmax     = 99;
+        EEG = eeg_checkset(EEG);
+        tmpcfg = eeglab2fieldtrip(EEG, 'preprocessing', 'none');
+        
+        % call the function that find channel neighbors
+        % ---------------------------------------------
+        addparams = eval( [ '{' STUDY.etc.statistics.fieldtrip.channelneighborparam '}' ]);
+        for index = 1:2:length(addparams)
+            tmpcfg = setfield(tmpcfg, addparams{index}, addparams{index+1});
+        end;
+        for index = 1:2:length(addopts)
+            tmpcfg = setfield(tmpcfg, addopts{index}, addopts{index+1});
+        end;
+        warning off;
+        cfg.neighbors = ft_prepare_neighbours(tmpcfg, tmpcfg);
+        warning on;
+        neighbors = cfg.neighbors;
+        STUDY.etc.statistics.fieldtrip.channelneighbor = neighbors;
+        
     end;
-    for index = 1:2:length(addopts)
-        tmpcfg = setfield(tmpcfg, addopts{index}, addopts{index+1});
-    end;
-    warning off;
-    cfg.neighbors = ft_prepare_neighbours(tmpcfg, tmpcfg);
-    warning on;
-    neighbors = cfg.neighbors;
-    STUDY.etc.statistics.fieldtrip.channelneighbor = neighbors;
     
 end;
