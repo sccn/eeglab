@@ -119,7 +119,10 @@ end;
 chanlocs_present = 0;
 if ~isempty(EEG.chanlocs)
     if isfield(EEG.chanlocs, 'theta')
-        chanlocs_present = 1;
+        tmpchanlocs = EEG.chanlocs;
+        if any(~cellfun(@isempty, { tmpchanlocs.theta }))
+            chanlocs_present = 1;
+        end;
     end;
 end;
 

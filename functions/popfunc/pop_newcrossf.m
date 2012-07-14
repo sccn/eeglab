@@ -121,7 +121,7 @@ if popup
 	
     % add topoplot
     % ------------
-	if isfield(EEG.chanlocs, 'theta')
+	if isfield(EEG.chanlocs, 'theta') && ~isempty(EEG.chanlocs(num1).theta) && ~isempty(EEG.chanlocs(num2).theta)
         if ~isfield(EEG, 'chaninfo'), EEG.chaninfo = []; end;
 		if typeproc == 1
 			options = [options ', ''topovec'', [' int2str([num1 num2]) ...

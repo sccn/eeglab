@@ -220,7 +220,7 @@ if popup
     % add topoplot
     % ------------
     options = [];
-    if isfield(EEG.chanlocs, 'theta')
+    if isfield(EEG.chanlocs, 'theta') && ~isempty(EEG.chanlocs(num).theta)
         if ~isfield(EEG, 'chaninfo'), EEG.chaninfo = []; end;
         if typeproc == 1
             if isempty(EEG.chanlocs), caption = [ 'Channel ' int2str(num) ]; else caption = EEG.chanlocs(num).labels; end;
