@@ -150,7 +150,7 @@ if ~isempty(g.refloc) == 1
             data(end+length(g.refloc),:) = 0;
             for iLocs = 1:length(g.refloc)
                 g.elocs(end+1).labels = g.refloc(iLocs).labels;
-                fieldloc = fieldnames(g.refloc);
+                fieldloc = fieldnames(g.elocs);
                 for ind = 1:length(fieldloc)
                     g.elocs(end) = setfield(g.elocs(end), fieldloc{ind}, getfield(g.refloc(iLocs), fieldloc{ind}));
                 end;
