@@ -12,7 +12,10 @@
 %   'blockrange' - [min max] integer range of data blocks to import, in seconds.
 %                  Entering [0 3] will import the first three blocks of data.
 %                  Default is empty -> import all data blocks. 
-%   'ref'        - [integer] channel index or index(s) for the reference.
+%  'importevent' - ['on'|'off'] import events. Default if 'on'.
+%  'importannot' - ['on'|'off'] import annotations (EDF+ only). Default if 'on'
+%  'blockepoch'  - ['on'|'off'] force importing continuous data. Default is 'on'
+%  'ref'         - [integer] channel index or index(s) for the reference.
 %                  Reference channels are not removed from the data,
 %                  allowing easy re-referencing. If more than one
 %                  channel, data are referenced to the average of the
@@ -21,7 +24,7 @@
 %                  if no reference is used!. If you do not know which
 %                  channel to use, pick one and then re-reference after 
 %                  the channel locations are read in. {default: none}
-%   'rmeventchan' - ['on'|'off'] remove event channel after event 
+%  'rmeventchan' - ['on'|'off'] remove event channel after event 
 %                  extraction. Default is 'on'.
 %
 % Outputs:
@@ -87,11 +90,13 @@ if nargin < 1
                  { 'style' 'edit' 'string' '' } ...
                  { 'style' 'text' 'String' 'Extract event' } ...
                  { 'style' 'checkbox' 'string' '' 'value' 1 'enable' 'on' } {} ...
-                 { 'style' 'text' 'String' 'Import continuous data (set=yes)' 'value' 1} ...
+                 { 'style' 'text' 'String' 'Import anotations (EDF+ only)' } ...
+                 { 'style' 'checkbox' 'string' '' 'value' 1 'enable' 'on' } {} ...
+                 { 'style' 'text' 'String' 'Force importing continuous data' 'value' 1} ...
                  { 'style' 'checkbox' 'string' '' 'value' 0 } {} ...
                  { 'style' 'text' 'String' 'Reference chan(s) indices - required for BIOSEMI' } ...
                  { 'style' 'edit' 'string' '' } };
-    geom = { [3 1] [3 1] [3 0.35 0.5] [3 0.35 0.5] [3 1] };
+    geom = { [3 1] [3 1] [3 0.35 0.5] [3 0.35 0.5] [3 0.35 0.5] [3 1] };
 
     result = inputgui( geom, uilist, 'pophelp(''pop_biosig'')', ...
                                  'Load data using BIOSIG -- pop_biosig()');
@@ -103,9 +108,10 @@ if nargin < 1
     if ~isempty(result{1}), options = { options{:} 'channels'   eval( [ '[' result{1} ']' ] ) }; end;
     if ~isempty(result{2}), options = { options{:} 'blockrange' eval( [ '[' result{2} ']' ] ) }; end;
     if length(result) > 2
-        if ~isempty(result{5}), options = { options{:} 'ref'        eval( [ '[' result{5} ']' ] ) }; end;
+        if ~isempty(result{6}), options = { options{:} 'ref'        eval( [ '[' result{6} ']' ] ) }; end;
         if ~result{3},          options = { options{:} 'importevent' 'off'  }; end;
-        if  result{4},          options = { options{:} 'blockepoch'  'off' }; end;
+        if ~result{4},          options = { options{:} 'importannot' 'off'  }; end;
+        if  result{5},          options = { options{:} 'blockepoch'  'off' }; end;
     end;
 else
     options = varargin;
@@ -118,6 +124,7 @@ g = finputcheck( options, { 'blockrange'  'integer' [0 Inf]    [];
                             'ref'         'integer' [0 Inf]    [];
                             'rmeventchan' 'string'  { 'on';'off' } 'on';
                             'importevent' 'string'  { 'on';'off' } 'on';
+                            'importannot' 'string'  { 'on';'off' } 'on';
                             'blockepoch'  'string'  { 'on';'off' } 'off' }, 'pop_biosig');
 if isstr(g), error(g); end;
 
@@ -178,6 +185,21 @@ if ~isempty(g.ref)
 %     else
 %         disp([ 'Warning: data matrix rank has decreased through re-referencing' ]);
 %     end;
+end;
+
+% test if annotation channel is present
+% -------------------------------------
+if isfield(dat, 'EDFplus') && strcmpi(g.importannot, 'on')
+    tmpfields = fieldnames(dat.EDFplus);
+    for ind = 1:length(tmpfields)
+        tmpdat = getfield(dat.EDFplus, tmpfields{ind});
+        if length(tmpdat) == EEG.pnts
+            EEG.data(end+1,:) = tmpdat;
+            if ~isempty(EEG.chanlocs)
+                EEG.chanlocs(end+1).labels = tmpfields{ind};
+            end;
+        end;
+    end;
 end;
 
 % convert data to single if necessary
