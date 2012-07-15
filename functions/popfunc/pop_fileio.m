@@ -41,11 +41,19 @@ command = '';
 
 if nargin < 1
 	% ask user
-	[filename, filepath] = uigetfile('*.*', 'Choose a file or header file -- pop_fileio()'); 
-    drawnow;
-    
-	if filename == 0 return; end;
-	filename = [filepath filename];
+    ButtonName = questdlg2('Do you want to import a file or a folder?', ...
+                           'FILE-IO import', ...
+                           'Folder', 'File', 'File');
+    if strcmpi(ButtonName, 'file')
+        [filename, filepath] = uigetfile('*.*', 'Choose a file or header file -- pop_fileio()'); 
+        drawnow;
+        if filename(1) == 0 return; end;
+        filename = fullfile(filepath, filename);
+    else
+        filename = uigetfile('*.*', 'Choose a folder -- pop_fileio()'); 
+        drawnow;
+        if filename(1) == 0 return; end;
+    end;
     
     % open file to get infos
     % ----------------------
