@@ -195,6 +195,7 @@ if isfield(dat, 'EDFplus') && strcmpi(g.importannot, 'on')
         tmpdat = getfield(dat.EDFplus, tmpfields{ind});
         if length(tmpdat) == EEG.pnts
             EEG.data(end+1,:) = tmpdat;
+            EEG.nbchan        = EEG.nbchan+1;
             if ~isempty(EEG.chanlocs)
                 EEG.chanlocs(end+1).labels = tmpfields{ind};
             end;
