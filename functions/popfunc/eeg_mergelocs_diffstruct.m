@@ -125,7 +125,7 @@ function loc3 = concatlocs(loc1, loc2);
     fields1 = fieldnames(loc1);
     fields2 = fieldnames(loc2);
     if isequal(fields1, fields2)
-        loc3 = [ loc1 loc2 ];
+        loc3 = [ loc1; loc2 ];
     else
         loc3 = loc1;
         for index = 1:length(loc2)
