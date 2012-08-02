@@ -168,8 +168,9 @@ else
     hh = axes('Units','Normalized', 'Position',[45 62 48 38].*s+q);
     ERPIMAGELINES = 200; % show 200-line erpimage
     while size(EEG.data,2) < ERPIMAGELINES*EEG.srate
-       ERPIMAGELINES = round(0.9 * ERPIMAGELINES);
+       ERPIMAGELINES = 0.9 * ERPIMAGELINES;
     end
+    ERPIMAGELINES = round(ERPIMAGELINES);
     if ERPIMAGELINES > 2   % give up if data too small
         if ERPIMAGELINES < 10
             ei_smooth = 1;
