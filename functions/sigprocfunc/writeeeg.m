@@ -70,12 +70,11 @@
 function HDR = writeeeg(filename, x, srate, varargin)
 
 % decode structures
-% -----------------
 HDR = [];
 for i=1:2:length( varargin )
     str = varargin{i};
     val = varargin{i+1};
-    ind = findstr('.', str);
+    ind = strfind(str, '.');
     if length(ind) == 2
         HDR = setfield(HDR, varargin{i}(1:ind(1)-1), {1}, varargin{i}(ind(1)+1:ind(2)-1), ...
                                                      {1}, varargin{i}(ind(2)+1:end), val);
@@ -87,6 +86,7 @@ for i=1:2:length( varargin )
 end;
 
 HDR.FileName = filename;
+HDR.FLAG.UCAL = 0;
 
 % select file format 
 if ~isfield(HDR, 'EVENT'),                     HDR.EVENT = []; end;
@@ -134,7 +134,7 @@ if ~isfield(HDR,'Label')
     end;
     HDR.Label = chans;
 end;
-if iscell(HDR.Label), HDR.Label = strvcat(HDR.Label{:}); end;
+if iscell(HDR.Label), HDR.Label = char(HDR.Label{:}); end;
 
 if ~isempty(HDR.EVENT) 
     if ~isfield(HDR.EVENT, 'TYP')
@@ -154,7 +154,7 @@ if ~isempty(HDR.EVENT)
             if isfield(HDR.EVENT, 'type')
                 ind = str2num(HDR.EVENT(i).type);
                 if isempty(ind)
-                    ind = strmatch(HDR.EVENT(i).type, alltypes, 'exact');
+                    ind = strcmp(HDR.EVENT(i).type, alltypes);
                 end;
                 EVENT.TYP(i) = ind;
             end;
@@ -187,7 +187,7 @@ elseif ~strcmpi(HDR.TYPE, 'GDF') % GDF can save events
     disp('Recreating event channel');
     x(end+1,:) = 0;
     x(end,round(HDR.EVENT.POS')) = HDR.EVENT.TYP';
-    HDR.Label = strvcat(HDR.Label, 'Status');
+    HDR.Label = char(HDR.Label, 'Status');
     HDR.EVENT.POS = [];
 end;
 
@@ -201,49 +201,31 @@ end;
 if ~isfield(HDR,'PhysDim')
     HDR.PhysDim = cell(1,HDR.NS);
     HDR.PhysDim(:) = { 'uV' };
-    % HDR.PhysDim = {'uV';'mV';'%';'-';'-';'°C'};
 end;
 
 % Duration of one block in seconds
 HDR.SampleRate = srate;
 HDR.Dur = HDR.SPR/HDR.SampleRate;
 
-% Samples within 1 block
-%HDR.AS.SPR = [1000;100;200;100;20;1];	% samples per block;
-%HDR.AS.SampleRate = [1000;100;200;100;20;0];	% samplerate of each channel
+% define datatypes and scaling factors
+HDR.PhysMax = max(x, [], 2);
+HDR.PhysMin = min(x, [], 2);
+if strcmp(HDR.TYPE, 'GDF')
+    HDR.GDFTYP = 16*ones(1,HDR.NS);  % float32
+    HDR.DigMax  = ones(HDR.NS,1)*100;  % FIXME: What are the correct values for float32?
+    HDR.DigMin  = zeros(HDR.NS,1);
+else
+    HDR.GDFTYP = 3*ones(1,HDR.NS);  % int16
+    HDR.DigMin  = repmat(-2^15, size(HDR.PhysMin));
+    HDR.DigMax  = repmat(2^15-1, size(HDR.PhysMax));
+end
 
-
-% define datatypes (GDF only, see GDFDATATYPE.M for more details)
-HDR.GDFTYP = 3*ones(1,HDR.NS);
-
-% define scaling factors 
-HDR.PhysMax = ones(HDR.NS,1)*100;
-HDR.PhysMin = zeros(HDR.NS,1);
-HDR.DigMax  = ones(HDR.NS,1)*100;
-HDR.DigMin  = zeros(HDR.NS,1);
 HDR.Filter.Lowpass  = zeros(1,HDR.NS)*NaN;
 HDR.Filter.Highpass = zeros(1,HDR.NS)*NaN;
 HDR.Filter.Notch    = zeros(1,HDR.NS)*NaN;
 
-%HDR.NRec = 100;
 HDR.VERSION = 2.11; 
-%HDR.SIE.RAW = 0; % [default] channel data mode, one column is one channel 
-%HDR.SIE.RAW = 1; % switch to raw data mode, i.e. one column for one
-%EDF-record
-    
-    
+
 HDR = sopen(HDR,'w');
 HDR = swrite(HDR, x');
 HDR = sclose(HDR);
-return;
-
-%
-[s0,HDR0] = sload(HDR.FileName);	% test file 
-
-HDR0=sopen(HDR0.FileName,'r');
-[s0,HDR0]=sread(HDR0);
-HDR0=sclose(HDR0); 
-
-%plot(s0-x)
-
-
