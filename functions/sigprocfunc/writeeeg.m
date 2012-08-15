@@ -154,7 +154,7 @@ if ~isempty(HDR.EVENT)
             if isfield(HDR.EVENT, 'type')
                 ind = str2num(HDR.EVENT(i).type);
                 if isempty(ind)
-                    ind = strcmp(HDR.EVENT(i).type, alltypes);
+                    ind = strmatch(HDR.EVENT(i).type, alltypes, 'exact');
                 end;
                 EVENT.TYP(i) = ind;
             end;
