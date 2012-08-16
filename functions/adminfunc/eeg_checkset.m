@@ -1199,8 +1199,6 @@ for inddataset = 1:length(ALLEEG)
     % ---------
     if (EEG.trials > 1)
         EEG.times = linspace(EEG.xmin*1000, EEG.xmax*1000, EEG.pnts);
-    else
-        EEG.times = [];
     end;
     
     if ~isfield(EEG, 'history')    EEG.history    = ''; res = com; end;
