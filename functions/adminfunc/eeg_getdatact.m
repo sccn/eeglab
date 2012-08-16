@@ -119,8 +119,8 @@ opt = finputcheck(varargin, { ...
     'component' 'integer' {} [];
     'samples'   'integer' {} [];
     'interp'    'struct'  { }        struct([]);
-    'trialindices' {'integer' 'cell'} { {} {} } [];
-    'rmcomps'      {'integer' 'cell'} { {} {} } [] }, 'eeg_getdatact');
+    'trialindices' {'integer','cell'} { {} {} } [];
+    'rmcomps'      {'integer','cell'} { {} {} } [] }, 'eeg_getdatact');
 
 if isstr(opt), error(opt); end;
 channelNotDefined = 0;
