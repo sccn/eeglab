@@ -198,7 +198,8 @@ else
         eeglab_options;
         if length(opt.channel) == EEG.nbchan && option_memmapdata
             fclose(fid);
-            data = mmo(filename, [EEG.nbchan EEG.pnts EEG.trials], false);
+            %data = mmo(filename, [EEG.nbchan EEG.pnts EEG.trials], false);
+            data = memmapdata(filename, [EEG.nbchan EEG.pnts EEG.trials]);
         else
             if datformat
                 if length(opt.channel) == EEG.nbchan || ~isempty(opt.interp)
