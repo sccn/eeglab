@@ -115,7 +115,7 @@ opt = finputcheck(varargin, { ...
     'channel'   'integer' {} [];
     'verbose'   'string'  { 'on','off' } 'on';
     'reshape'   'string'  { '2d','3d' }  '3d';
-    'projchan'  {'integer' 'cell' } { {} {} } [];
+    'projchan'  {'integer','cell' } { {} {} } [];
     'component' 'integer' {} [];
     'samples'   'integer' {} [];
     'interp'    'struct'  { }        struct([]);
