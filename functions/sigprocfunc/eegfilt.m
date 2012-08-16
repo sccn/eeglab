@@ -126,11 +126,8 @@ epochs = fix(frames/epochframes);
 if epochs*epochframes ~= frames,
     error('epochframes does not divide frames.\n');
 end
-% make the filter order even
-if mod(filtorder,2) == 1
-    filtorder = filtorder+1;
-    fprintf('Filter order made even for Octave compatibility (%d -> %d)', filtorder-1, filtorder);
-end;if filtorder*3 > epochframes,   % Matlab filtfilt() restriction
+
+if filtorder*3 > epochframes,   % Matlab filtfilt() restriction
     fprintf('eegfilt(): filter order is %d. ',filtorder);
     error('epochframes must be at least 3 times the filtorder.');
 end
