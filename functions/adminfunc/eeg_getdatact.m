@@ -112,7 +112,7 @@ if isstr(EEG)
 end;
 
 opt = finputcheck(varargin, { ...
-    'channel'   'integer' {} [1:EEG.nbchan];
+    'channel'   'integer' {} [];
     'verbose'   'string'  { 'on','off' } 'on';
     'reshape'   'string'  { '2d','3d' }  '3d';
     'projchan'  {'integer' 'cell' } { {} {} } [];
@@ -123,6 +123,8 @@ opt = finputcheck(varargin, { ...
     'rmcomps'      {'integer' 'cell'} { {} {} } [] }, 'eeg_getdatact');
 
 if isstr(opt), error(opt); end;
+channelNotDefined = 0;
+if isempty(opt.channel), opt.channel = [1:EEG.nbchan]; channelNotDefined = 1; end;
 if isempty(opt.trialindices), opt.trialindices = [1:EEG.trials]; end;
 if iscell( opt.trialindices), opt.trialindices = opt.trialindices{1}; end;
 if iscell(opt.rmcomps     ), opt.rmcomps      = opt.rmcomps{1};      end;
@@ -194,9 +196,9 @@ else
         % reading data file
         % -----------------
         eeglab_options;
-        if length(opt.channel) == EEG.nbchan & option_memmapdata
+        if length(opt.channel) == EEG.nbchan && option_memmapdata
             fclose(fid);
-            data = memmapdata(filename, [EEG.nbchan EEG.pnts EEG.trials]);
+            data = mmo(filename, [EEG.nbchan EEG.pnts EEG.trials], false);
         else
             if datformat
                 if length(opt.channel) == EEG.nbchan || ~isempty(opt.interp)
@@ -244,16 +246,16 @@ else
         %end;
     end;
     
-    oldnbchan = EEG.nbchan;
     if ~isempty(opt.interp)
         EEG.data   = data;
         EEG.event  = [];
         EEG.epoch  = [];
         EEG = eeg_interp(EEG, opt.interp, 'spherical');
         data = EEG.data;
+        if channelNotDefined, opt.channel = [1:EEG.nbchan]; end;
     end;
 
-    if ~isequal(opt.channel, [1:oldnbchan]) || isempty(opt.interp)
+    if ~isequal(opt.channel, [1:EEG.nbchan])
         data = data(opt.channel,:,:);
     end;
 end;
