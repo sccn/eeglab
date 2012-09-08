@@ -124,8 +124,8 @@ end;
 % deal with 3-D inputs
 % --------------------
 if ndims(X) == 3 || ndims(Y) == 3, error('Cannot process 3-D input'); end;
-if size(X,1) == 1, X = X'; end;
-if size(Y,1) == 1, X = X'; end;
+if size(X,1) > 1, X = X'; end;
+if size(Y,1) > 1, Y = Y'; end;
 if size(X,1) ~= 1 || size(Y,1) ~= 1, error('Cannot only process vector input'); end;
 frame = size(X,2);
 pvals = [];
