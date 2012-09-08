@@ -77,18 +77,26 @@
 % Author: Arnaud Delorme and Makoto Miyakoshi, SCCN/INC, UCSD 2012-
 %
 % References:
+% Methods used here are introduced and compared in:
+% Penny, Duzel, Miller, Ojemann. (20089). Testing for Nested Oscilations.
+% J Neuro Methods. 174:50-61
 %
-% Modulation index is defined in High Gamma Power Is Phase-Locked to Theta 
-% Oscillations in Human Neocortex (2006) Science, 313, 1626
+% Modulation Index is defined in:
+% Canolty, Edwards, Dalal, Soltani, Nagarajan, Kirsch, et al. (2006). Modulation index is defined in High Gamma Power Is Phase-Locked to Theta 
+% Oscillations in Human Neocortex. Science. 313:1626-8.
 %
-% PLV (Phase locking value) is defined in 
+% PLV (Phase locking value) is defined in:
+% Lachaux, Rodriguez, Martiniere, Varela. (1999). Measuring phase synchrony
+% in brain signal. Hum Brain Mapp. 8:194-208.
 %
-% corr (correlation) method is defined in
+% corr (correlation) method is defined in:
+% Brunce, Eckhorn. (2004). Task-related coupling from high- to
+% low-frequency signals among visual cortical areas in human subdural
+% recordings. Int J Psychophysiol. 51:97-116.
 %
 % glm (general linear model) is defined in 
-%
-% For additional information, see also
-% Testing for Nested Oscilations (2008) J Neuro Methods 174(1):50-61
+% Penny, Duzel, Miller, Ojemann. (20089). Testing for Nested Oscilations.
+% J Neuro Methods. 174:50-61
 
 % Copyright (C) 2012 Arnaud Delorme, UCSD
 %
