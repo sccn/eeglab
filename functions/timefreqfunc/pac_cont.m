@@ -126,8 +126,8 @@ end;
 if ndims(X) == 3 || ndims(Y) == 3, error('Cannot process 3-D input'); end;
 if size(X,1) == 1, X = X'; end;
 if size(Y,1) == 1, X = X'; end;
-if size(X,2) ~= 1 || size(Y,2) ~= 1, error('Cannot only process vector input'); end;
-frame = size(X,1);
+if size(X,1) ~= 1 || size(Y,1) ~= 1, error('Cannot only process vector input'); end;
+frame = size(X,2);
 pvals = [];
 
 g = finputcheck(varargin, ...
@@ -143,7 +143,7 @@ g = finputcheck(varargin, ...
     'newfig'        'string'   {'on','off'}              'on';
     'statlim'       'string'   {'surrogate','parametric'}  'parametric';
     'timesout'      'real'     []                        []; ...
-    'filterfunc'    'string'   { 'eegfilt' 'iirfilt' 'eegfiltfft' }   'iirfilt'; ...
+    'filterfunc'    'string'   { 'eegfilt' 'iirfilt' 'eegfiltfft' }   'eegfiltfft'; ...
     'filterphase'   ''         {}                        [];
     'filteramp'     ''         {}                        [];
     'ntimesout'     'integer'  []                        200; ...
@@ -162,6 +162,11 @@ if ~isempty(g.filteramp)
      x_freqamp   = feval(g.filteramp, Y(:)');
 else x_freqamp   = feval(g.filterfunc, Y(:)', srate, g.freqamp(  1), g.freqamp( end));
 end;
+z_phasedata = hilbert(x_freqphase);
+z_ampdata   = hilbert(x_freqamp);
+phase       = angle(z_phasedata);
+amplitude   = abs(  z_ampdata);
+z           = amplitude.*exp(i*phase); % this is the pac measure
 
 % get time windows
 % ----------------
@@ -177,49 +182,41 @@ if ~isempty(g.alpha)
 end;
 fprintf('Computing PAC:\n');
 for iWin = 1:length(indexout)
-    x_phasedata = x_freqphase(indexout(iWin)+[-g.winsize/2+1:g.winsize/2]);
-    x_ampdata   = x_freqamp(  indexout(iWin)+[-g.winsize/2+1:g.winsize/2]);
-    numpoints=length(x_phasedata);
+    x_phaseEpoch = x_freqphase(indexout(iWin)+[-g.winsize/2+1:g.winsize/2]);
+    x_ampEpoch   = x_freqamp(  indexout(iWin)+[-g.winsize/2+1:g.winsize/2]);
+    z_phaseEpoch = z_phasedata(indexout(iWin)+[-g.winsize/2+1:g.winsize/2]);
+    z_ampEpoch   = z_ampdata(  indexout(iWin)+[-g.winsize/2+1:g.winsize/2]);
+    z_epoch      = z(          indexout(iWin)+[-g.winsize/2+1:g.winsize/2]);
+    
+    numpoints=length(x_phaseEpoch);
     if rem(iWin,10) == 0,  verboseprintf(g.verbose, ' %d',iWin); end
     if rem(iWin,120) == 0, verboseprintf(g.verbose, '\n'); end
     
     % Choose method
     % -------------
     if strcmpi(g.method, 'modulation')
-        % method implemented in Canolty et al., 2006, High Gamma Power Is
-        % Phase-Locked to Theta Oscillations in Human Neocortex, Science, 313, 1626
-
-        z_phasedata = hilbert(x_phasedata);
-        z_ampdata   = hilbert(x_ampdata);
         
         % Modulation index
-        phase     = angle(z_phasedata);
-        amplitude = abs(  z_ampdata);
+        m_raw(iWin) = abs(sum(z_epoch))/numpoints;
         
-        z = amplitude.*exp(i*phase); % this is the pac measure
-        m_raw(iWin) = abs(sum(z))/numpoints;
     elseif strcmpi(g.method, 'plv')
+        
         if iWin == 145
             %dsfsd; 
         end;
-        z_phasedata = hilbert(x_phasedata);
-        z_ampdata   = hilbert(x_ampdata);
-        
-        % Modulation index
-        phase     = angle(z_phasedata);
-        amplitude = abs(  z_ampdata);
         
         %amplitude_filt = sgolayfilt(amplitude, 3, 101);
         if ~isempty(g.filterphase)
-             amplitude_filt = feval(g.filterphase, amplitude);
-        else amplitude_filt = feval(g.filterfunc, amplitude, srate, g.freqphase(1), g.freqphase(end));
+             amplitude_filt = feval(g.filterphase, z_ampEpoch);
+        else amplitude_filt = feval(g.filterfunc , z_ampEpoch, srate, g.freqphase(1), g.freqphase(end));
         end;
         z_amplitude_filt = hilbert(amplitude_filt);
         
         phase_amp_modulation = angle(z_amplitude_filt);
-        m_raw(iWin) = abs(sum(exp(i*(phase - phase_amp_modulation)))/numpoints);
+        m_raw(iWin) = abs(sum(exp(i*(x_phaseEpoch - phase_amp_modulation)))/numpoints);
+        
     elseif strcmpi(g.method, 'corr')
-        z_ampdata   = hilbert(x_ampdata);
+        
         if iWin == inf %145
             figure; plot(abs(z_ampdata))
             hold on; plot(x_phasedata/10000000000, 'r')
@@ -227,15 +224,17 @@ for iWin = 1:length(indexout)
             hold on; plot(x, 'g');
             dsfsd;
         end;
-        [r_ESC pval_corr] = corrcoef(x_phasedata, abs(z_ampdata));
+        [r_ESC pval_corr] = corrcoef(x_phaseEpoch, abs(z_ampEpoch));
         m_raw(iWin)   = r_ESC(1,2);
         pvals(iWin)   = pval_corr(1,2);
+        
     elseif strcmpi(g.method, 'glm')
-        z_ampdata     = hilbert(x_ampdata);
-        [b dev stats] = glmfit(x_phasedata', abs(z_ampdata)', 'normal');
+        
+        [b dev stats] = glmfit(x_phaseEpoch', abs(z_ampEpoch)', 'normal');
         GLM_beta      = stats.beta(2,1);
         pvals(iWin)   = stats.p(2,1);
         m_raw(iWin)   = b(1);
+        
     end;
     
     %% compute statistics (instantaneous)
