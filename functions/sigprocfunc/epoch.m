@@ -101,7 +101,11 @@ reallim(2) = round(lim(2)*g.srate-1); % compute offset
 fprintf('Epoching...\n');
 newdatalength = reallim(2)-reallim(1)+1;
 
-epochdat = zeros( size(data,1), newdatalength, length(events) );
+eeglab_options;
+if option_memmapdata == 1
+     epochdat = mmo([], [size(data,1), newdatalength, length(events)]);
+else epochdat = zeros( size(data,1), newdatalength, length(events) );
+end;
 g.allevents =  g.allevents(:)';
 datawidth  = size(data,2)*size(data,3);
 dataframes = size(data,2);
@@ -113,10 +117,10 @@ for index = 1:length(events)
 	posinit = pos0+reallim(1); % compute offset
 	posend  = pos0+reallim(2); % compute offset
    
-   if floor((posinit-1)/dataframes) == floor((posend-1)/dataframes) & posinit >= 1 & posend <= datawidth % test if within boundaries
+   if floor((posinit-1)/dataframes) == floor((posend-1)/dataframes) && posinit >= 1 && posend <= datawidth % test if within boundaries
       epochdat(:,:,index) = data(:,posinit:posend);
-      if ~isinf(g.valuelim(1)) | ~isinf(g.valuelim(2))
-          if (max(epochdat(:,:,index)) > g.valuelim(1)) & ...
+      if ~isinf(g.valuelim(1)) || ~isinf(g.valuelim(2))
+          if (max(epochdat(:,:,index)) > g.valuelim(1)) && ...
                   (max(epochdat(:,:,index)) < g.valuelim(2))
               indexes(index) = 1;
           else
@@ -142,8 +146,9 @@ end;
 newtime(1) = reallim(1)/g.srate;
 newtime(2) = reallim(2)/g.srate;
 
-indexes = find(indexes == 1);
-epochdat = epochdat(:,:,indexes);
+epochdat(:,:,find(indexes == 0)) = [];
+%indexes = find(indexes == 1);
+%epochdat = epochdat(:,:,indexes);
 if ~isempty(alleventout)
     alleventout = alleventout(indexes);
     alllatencyout= alllatencyout(indexes);
