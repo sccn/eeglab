@@ -205,42 +205,55 @@ strhalt = get(findobj('parent', fig, 'tag', 'ok'), 'userdata');
 % output parameters
 % -----------------
 counter = 1;
+resstruct = [];
 for index=1:length(allobj)
-   try,
-      objstyle = get(allobj( index ), 'style');
-      switch lower( objstyle )
-      case { 'listbox', 'checkbox', 'radiobutton' 'popupmenu' 'radio' }
-         result{counter} = get( allobj( index ), 'value');
-         counter = counter+1;
-      case 'edit' 
-         result{counter} = get( allobj( index ), 'string');
-         counter = counter+1;
-      end;
-   catch, end;
+    if isnumeric(allobj), currentobj = allobj(index);
+    else                  currentobj = allobj{index};
+    end;
+    if isnumeric(currentobj)
+        try,
+          objstyle = get(currentobj, 'style');
+          switch lower( objstyle )
+          case { 'listbox', 'checkbox', 'radiobutton' 'popupmenu' 'radio' }
+             result{counter} = get( currentobj, 'value');
+             if ~isempty(get(currentobj, 'tag')), resstruct = setfield(resstruct, get(currentobj, 'tag'), result{counter}); end;
+             counter = counter+1;
+          case 'edit' 
+             result{counter} = get( currentobj, 'string');
+             if ~isempty(get(currentobj, 'tag')), resstruct = setfield(resstruct, get(currentobj, 'tag'), result{counter}); end;
+             counter = counter+1;
+          end;
+        catch, end;
+    else
+        ps              = currentobj.GetPropertySpecification;
+        result{counter} = arg_tovals(ps,false);
+        count = 1;
+        while isfield(resstruct, ['propgrid' int2str(count)])
+            count = count + 1;
+        end;    
+        resstruct = setfield(resstruct, ['propgrid' int2str(count)], arg_tovals(ps,false));
+    end;
 end;   
 userdat = get(fig, 'userdata');
-if nargout >= 4
-	resstruct = myguihandles(fig);
-end;
+% if nargout >= 4
+% 	resstruct = myguihandles(fig, g);
+% end;
 
 if isempty(g.getresult) && isstr(g.mode) && ( strcmp(g.mode, 'normal') || strcmp(g.mode, 'return') )
 	close(fig);
 end;
 drawnow; % for windows
 
-% function for gui res
+% function for gui res (deprecated)
 % --------------------
-function g = myguihandles(fig)
-	g = [];
-	h = findobj('parent', fig);
-	for index = 1:length(h)
-		if ~isempty(get(h(index), 'tag'))
-			try, 
-				switch get(h(index), 'style')
-				 case 'edit', g = setfield(g, get(h(index), 'tag'), get(h(index), 'string'));
-				 case { 'value' 'radio' 'checkbox' 'listbox' 'popupmenu' 'radiobutton'  }, ...
-					  g = setfield(g, get(h(index), 'tag'), get(h(index), 'value'));
-				end;
-			catch, end;
-		end;
-	end;
+% function g = myguihandles(fig, g)
+% 	h = findobj('parent', fig);
+%         if ~isempty(get(h(index), 'tag'))
+% 			try, 
+% 				switch get(h(index), 'style')
+% 				 case 'edit', g = setfield(g, get(h(index), 'tag'), get(h(index), 'string'));
+% 				 case { 'value' 'radio' 'checkbox' 'listbox' 'popupmenu' 'radiobutton'  }, ...
+% 					  g = setfield(g, get(h(index), 'tag'), get(h(index), 'value'));
+%                 end;
+% 			catch, end; 
+% 		end;
