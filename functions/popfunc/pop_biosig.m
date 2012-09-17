@@ -23,9 +23,12 @@
 %                  are recorded reference-free, but LOSE 40 dB of SNR 
 %                  if no reference is used!. If you do not know which
 %                  channel to use, pick one and then re-reference after 
-%                  the channel locations are read in. {default: none}
+%                  the channel locations are read in. {default: none}.
+%                  For more information see http://www.biosemi.com/faq/cms&drl.htm
 %  'rmeventchan' - ['on'|'off'] remove event channel after event 
 %                  extraction. Default is 'on'.
+%  'memorymapped' - ['on'|'off'] import memory mapped file (useful if 
+%                  encountering memory errors). Default is 'off'.
 %
 % Outputs:
 %   OUTEEG   - EEGLAB data structure
@@ -73,16 +76,18 @@ if nargin < 1
     % open file to get infos
     % ----------------------
     disp('Reading data file header...');
-    dat = sopen(filename);
+    dat = sopen(filename, 'r', [], 'OVERFLOWDETECTION:OFF');
     if ~isfield(dat, 'NRec')
         error('Unsuported data format');
     end;
     
     % special BIOSEMI
     % ---------------
+    eeglab_options;
     if strcmpi(dat.TYPE, 'BDF')
-        disp('We highly recommend that you choose a reference channel IF these are Biosemi data');
-        disp('(e.g., a mastoid or other channel). Otherwise the data will lose 40 dB of SNR!');
+        disp(upper('We highly recommend that you choose a reference channel IF these are Biosemi data'));
+        disp(upper('(e.g., a mastoid or other channel). Otherwise the data will lose 40 dB of SNR!'));
+        disp('For more information, see <a href="http://www.biosemi.com/faq/cms&drl.htm">http://www.biosemi.com/faq/cms&drl.htm</a>');
     end;
     uilist = { { 'style' 'text' 'String' 'Channel list (defaut all):' } ...
                  { 'style' 'edit' 'string' '' } ...
@@ -95,8 +100,9 @@ if nargin < 1
                  { 'style' 'text' 'String' 'Force importing continuous data' 'value' 1} ...
                  { 'style' 'checkbox' 'string' '' 'value' 0 } {} ...
                  { 'style' 'text' 'String' 'Reference chan(s) indices - required for BIOSEMI' } ...
-                 { 'style' 'edit' 'string' '' } };
-    geom = { [3 1] [3 1] [3 0.35 0.5] [3 0.35 0.5] [3 0.35 0.5] [3 1] };
+                 { 'style' 'edit' 'string' '' } ...
+                  { 'style' 'checkbox' 'String' 'Import as memory mapped file (use if out of memory error)' 'value' option_memmapdata } };
+    geom = { [3 1] [3 1] [3 0.35 0.5] [3 0.35 0.5] [3 0.35 0.5] [3 1] [1] };
 
     result = inputgui( geom, uilist, 'pophelp(''pop_biosig'')', ...
                                  'Load data using BIOSIG -- pop_biosig()');
@@ -109,9 +115,10 @@ if nargin < 1
     if ~isempty(result{2}), options = { options{:} 'blockrange' eval( [ '[' result{2} ']' ] ) }; end;
     if length(result) > 2
         if ~isempty(result{6}), options = { options{:} 'ref'        eval( [ '[' result{6} ']' ] ) }; end;
-        if ~result{3},          options = { options{:} 'importevent' 'off'  }; end;
-        if ~result{4},          options = { options{:} 'importannot' 'off'  }; end;
-        if  result{5},          options = { options{:} 'blockepoch'  'off' }; end;
+        if ~result{3},          options = { options{:} 'importevent'  'off'  }; end;
+        if ~result{4},          options = { options{:} 'importannot'  'off'  }; end;
+        if  result{5},          options = { options{:} 'blockepoch'   'off' }; end;
+        if  result{6},          options = { options{:} 'memorymapped' 'on' }; end;
     end;
 else
     options = varargin;
@@ -119,44 +126,24 @@ end;
 
 % decode imput parameters
 % -----------------------
-g = finputcheck( options, { 'blockrange'  'integer' [0 Inf]    [];
-                            'channels'    'integer' [0 Inf]    [];
-                            'ref'         'integer' [0 Inf]    [];
-                            'rmeventchan' 'string'  { 'on';'off' } 'on';
-                            'importevent' 'string'  { 'on';'off' } 'on';
-                            'importannot' 'string'  { 'on';'off' } 'on';
-                            'blockepoch'  'string'  { 'on';'off' } 'off' }, 'pop_biosig');
+g = finputcheck( options, { 'blockrange'   'integer' [0 Inf]    [];
+                            'channels'     'integer' [0 Inf]    [];
+                            'ref'          'integer' [0 Inf]    [];
+                            'rmeventchan'  'string'  { 'on';'off' } 'on';
+                            'importevent'  'string'  { 'on';'off' } 'on';
+                            'importannot'  'string'  { 'on';'off' } 'on';
+                            'memorymapped' 'string'  { 'on';'off' } 'off';
+                            'blockepoch'   'string'  { 'on';'off' } 'off' }, 'pop_biosig');
 if isstr(g), error(g); end;
 
 % import data
 % -----------
 EEG = eeg_emptyset;
-if ~isempty(g.channels)
-     dat = sopen(filename, 'r', g.channels,'OVERFLOWDETECTION:OFF');
-else dat = sopen(filename, 'r', 0,'OVERFLOWDETECTION:OFF');
-end
-fprintf('Reading data in %s format...\n', dat.TYPE);
-
-if ~isempty(g.blockrange)
-    newblockrange    = g.blockrange;
-    newblockrange(2) = min(newblockrange(2), dat.NRec);
-    newblockrange    = newblockrange*dat.Dur;    
-    DAT=sread(dat, newblockrange(2)-newblockrange(1), newblockrange(1));
-else 
-    DAT=sread(dat, Inf);% this isn't transposed in original!!!!!!!!
-    newblockrange    = [];
-end
-sclose(dat);
+[dat DAT interval] = readfile(filename, g.channels, g.blockrange, g.memorymapped);
 
 if strcmpi(g.blockepoch, 'off')
     dat.NRec = 1;
 end;
-
-if ~isempty(newblockrange)
-    interval(1) = newblockrange(1) * dat.SampleRate(1) + 1;
-    interval(2) = newblockrange(2) * dat.SampleRate(1);
-else interval = [];
-end
     
 EEG = biosig2eeglab(dat, DAT, interval, g.channels, strcmpi(g.importevent, 'on'));
 
@@ -215,3 +202,49 @@ if isempty(options)
 else
     command = sprintf('EEG = pop_biosig(''%s'', %s);', filename, vararg2str(options)); 
 end;    
+
+% ---------
+% read data
+% ---------
+function [dat DAT interval] = readfile(filename, channels, blockrange, memmapdata);
+
+if isempty(channels), channels = 0; end;
+dat = sopen(filename, 'r', channels,'OVERFLOWDETECTION:OFF');
+
+if strcmpi(memmapdata, 'off')
+    fprintf('Reading data in %s format...\n', dat.TYPE);
+
+    if ~isempty(blockrange)
+        newblockrange    = blockrange;
+        newblockrange(2) = min(newblockrange(2), dat.NRec);
+        newblockrange    = newblockrange*dat.Dur;    
+        DAT=sread(dat, newblockrange(2)-newblockrange(1), newblockrange(1));
+    else 
+        DAT=sread(dat, Inf);% this isn't transposed in original!!!!!!!!
+        newblockrange    = [];
+    end
+    sclose(dat);
+else
+    fprintf('Reading data in %s format (file will be mapped to memory so this may take a while)...\n', dat.TYPE);
+    inc = ceil(250000/(dat.NS*dat.SPR)); % 1Mb block
+    
+    if isempty(blockrange), blockrange = [0 dat.NRec]; end;
+    blockrange(2) = min(blockrange(2), dat.NRec);
+    allblocks = [blockrange(1):inc:blockrange(end)];
+    count = 1;
+    for bind = 1:length(allblocks)-1
+        TMPDAT=sread(dat, (allblocks(bind+1)-allblocks(bind))*dat.Dur, allblocks(bind)*dat.Dur);
+        if bind == 1
+            DAT = mmo([], [size(TMPDAT,2) (allblocks(end)-allblocks(1))*dat.SPR]);
+        end;
+        DAT(:,count:count+length(TMPDAT)-1) = TMPDAT';
+        count = count+length(TMPDAT);
+    end;
+    sclose(dat);
+end;
+
+if ~isempty(blockrange)
+     interval(1) = blockrange(1) * dat.SampleRate(1) + 1;
+     interval(2) = blockrange(2) * dat.SampleRate(1);
+else interval = [];
+end
