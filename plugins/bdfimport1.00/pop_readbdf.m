@@ -87,8 +87,9 @@ if nargin < 1
     
 	if filename == 0 return; end;
 	filename = [filepath filename];
-    disp('We highly recommend that you choose a reference channel IF these are Biosemi data');
-    disp('(e.g., a mastoid or other channel). Otherwise the data will lose 40 dB of SNR!');
+    disp(upper('We highly recommend that you choose a reference channel IF these are Biosemi data'));
+    disp(upper('(e.g., a mastoid or other channel). Otherwise the data will lose 40 dB of SNR!'));
+    disp('For more information, see <a href="http://www.biosemi.com/faq/cms&drl.htm">http://www.biosemi.com/faq/cms&drl.htm</a>');
     
     dat = openbdf(filename);
     promptstr    = { [ 'Data block range to read (default all [1 ' int2str(dat.Head.NRec) '])' ]
