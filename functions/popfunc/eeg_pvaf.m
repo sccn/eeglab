@@ -5,8 +5,8 @@
 %              non-orthogonal independent components may not add to 100%, and individual component 
 %              pvaf could be < 0%.
 % Usage:
-%              >> [pv] = eeg_pvaf(EEG,comps);
-%              >> [pvaf,pvafs,vars] = eeg_pvaf(EEG,comps,artcomps,omitchans,fraction,'plot');
+%              >> [pv] = eeg_pvaf(EEG,comps);s
+%              >> [pvaf,pvafs,vars] = eeg_pvaf(EEG, comps,'key', val);
 % Inputs:
 %    EEG       - EEGLAB dataset. Must have icaweights, icasphere, icawinv, icaact.
 %    comps     - vector of component indices to sum {default|[] -> progressive mode}
