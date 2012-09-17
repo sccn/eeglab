@@ -128,16 +128,16 @@ fprintf('pop_rmbase(): Removing baseline...\n');
 %
 % Respect excised data boundaries if continuous data
 % ---------------------------------------------------
-if EEG.trials == 1 & ~isempty(EEG.event) ...
-                     & isfield(EEG.event, 'type') ...
-                        & isstr(EEG.event(1).type)
+if EEG.trials == 1 && ~isempty(EEG.event) ...
+                     && isfield(EEG.event, 'type') ...
+                        && isstr(EEG.event(1).type)
     tmpevent = EEG.event;
 	boundaries = strmatch('boundary', {tmpevent.type});
 	if ~isempty(boundaries) % this is crashing
         fprintf('Pop_rmbase(): finding continuous data discontinuities\n');
         boundaries = round([ tmpevent(boundaries).latency ] -0.5-pointrange(1)+1);
-        boundaries(find(boundaries>=pointrange(end)-pointrange(1))) = [];
-        boundaries(find(boundaries<1)) = [];
+        boundaries(boundaries>=pointrange(end)-pointrange(1)) = [];
+        boundaries(boundaries<1) = [];
         boundaries = [0 boundaries pointrange(end)-pointrange(1)];
         for index=1:length(boundaries)-1
             tmprange = [boundaries(index)+1:boundaries(index+1)];
@@ -145,10 +145,14 @@ if EEG.trials == 1 & ~isempty(EEG.event) ...
                                                [1:length(tmprange)]);
         end;
     else
-        EEG.data = rmbase( EEG.data(:,:), EEG.pnts, pointrange );    
+        EEG.data = rmbase( EEG.data, EEG.pnts, pointrange );    
     end;		
-else 
-    EEG.data = rmbase( EEG.data(:,:), EEG.pnts, pointrange );
+else
+    for indc = 1:EEG.nbchan
+        tmpmean  = mean(double(EEG.data(indc,pointrange,:)),2);
+        EEG.data(indc,:,:) = EEG.data(indc,:,:) - repmat(tmpmean, [1 EEG.pnts 1]);
+    end;
+%    EEG.data = rmbase( reshape(EEG.data, EEG.nbchan, EEG.pnts*EEG.trials), EEG.pnts, pointrange );
 end;
 
 EEG.data = reshape( EEG.data, EEG.nbchan, EEG.pnts, EEG.trials);
