@@ -674,7 +674,7 @@ if length(timeindices) < length(unique(timeindices))
     verboseprintf(verbose, 'Warning: duplicate times, reduce the number of output times\n');
 end;
 if length(unique(timeindices(2:end)-timeindices(1:end-1))) > 1
-    verboseprintf(verbose, 'Finding closest points for time variable');
+    verboseprintf(verbose, 'Finding closest points for time variable\n');
     verboseprintf(verbose, 'Time values for time/freq decomposition is not perfectly uniformly distributed\n');
 else
     verboseprintf(verbose, 'Distribution of data point for time/freq decomposition is perfectly uniform\n');
