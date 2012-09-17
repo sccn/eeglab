@@ -176,8 +176,8 @@
 %                     see 'baseline' parameter.
 %       timesout    = Vector of output latencies (window centers) (ms).
 %       freqsout    = Vector of frequency bin centers (Hz).
-%       cohboot     = Matrix (nfreqs,2) of [lower;upper] coher signif. limits
-%                     if 'boottype' is 'trials',  (nfreqs,timesout, 2)
+%       cohboot     = Matrix (nfreqs) of upper coher signif. limits
+%                     if 'boottype' is 'trials',  (nfreqs,timesout)
 %       cohangle    = (nfreqs,timesout) matrix of coherence angles in radian
 %       allcoher    = single trial coherence
 %       alltfX      = single trial spectral decomposition of X
