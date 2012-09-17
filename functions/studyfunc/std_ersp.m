@@ -22,7 +22,9 @@
 %   EEG          - a loaded epoched EEG dataset structure. May be an array
 %                  of such structure containing several datasets.
 %
-% Optional inputs:
+% Other inputs:
+%   'trialindices' - [cell array] indices of trials for each dataset.
+%                  Default is EMPTY (no trials). NEEDS TO BE SET.
 %   'components' - [numeric vector] components of the EEG structure for which 
 %                  activation spectrum will be computed. Note that because 
 %                  computation of ERP is so fast, all components spectrum are
@@ -37,8 +39,6 @@
 %                  {default|[] -> none}
 %   'recompute'  - ['on'|'off'] force recomputing ERP file even if it is 
 %                  already on disk.
-%   'trialindices' - [cell array] indices of trials for each dataset.
-%                  Default is all trials.
 %   'recompute'  - ['on'|'off'] force recomputing data file even if it is 
 %                  already on disk.
 %   'rmcomps'    - [integer array] remove artifactual components (this entry
@@ -91,7 +91,9 @@
 %
 % Outputs:
 %   X         - the masked log ERSP/ITC of the requested ICA components/channels 
-%               in the selected frequency and time range. 
+%               in the selected frequency and time range. Note that for
+%               optimization reasons, this parameter is now empty or 0. X
+%               thus must be read from the datafile saved on disk.
 %   times     - vector of time points for which the ERSPs/ITCs were computed. 
 %   logfreqs  - vector of (equally log spaced) frequencies (in Hz) at which the 
 %               log ERSP/ITC was evaluated. 
@@ -142,6 +144,7 @@ if nargin < 1
     return;
 end;
 
+X = [];
 options = {};
 if length(varargin) > 1 
     if ~isstr(varargin{1})
