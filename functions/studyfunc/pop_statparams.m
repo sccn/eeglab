@@ -84,14 +84,16 @@
 function [STUDY, com] = pop_statparams(STUDY, varargin);
 
 com = '';
-if ~isfield(STUDY.etc, 'statistics') STUDY.etc.statistics = default_stats([]);
-else                                 STUDY.etc.statistics = default_stats(STUDY.etc.statistics);
-end;
-if length(varargin) == 1 && strcmpi(varargin{1}, 'default')
-    return;
+if isfield(STUDY, 'etc')
+    if ~isfield(STUDY.etc, 'statistics') STUDY.etc.statistics = default_stats([]);
+    else                                 STUDY.etc.statistics = default_stats(STUDY.etc.statistics);
+    end;
+    if length(varargin) == 1 && strcmpi(varargin{1}, 'default')
+        return;
+    end;
 end;
 
-if isempty(varargin)
+if isempty(varargin) && ~isempty(STUDY)
     opt.enablecond  = fastif(length(STUDY.design(STUDY.currentdesign).variable(1).value)>1, 'on', 'off');
     opt.enablegroup = fastif(length(STUDY.design(STUDY.currentdesign).variable(2).value)>1, 'on', 'off');
     opt.enablesingletrials = 'on';
@@ -270,8 +272,15 @@ if isempty(varargin)
 else
     % interpret parameters
     % --------------------
-    if strcmpi(varargin{1}, 'default')
-        STUDY = default_params(STUDY);
+    if isfield(STUDY, 'etc')
+         paramstruct = STUDY.etc.statistics; isstudy = true;
+    else paramstruct = STUDY;
+         if isempty(paramstruct), paramstruct = default_stats([]); end;
+         isstudy = false;
+    end;
+    
+    if isempty(varargin) || strcmpi(varargin{1}, 'default')
+        paramstruct = default_stats(paramstruct);
     else
         for index = 1:2:length(varargin)
             v = varargin{index};
@@ -279,19 +288,24 @@ else
             if strcmpi(v, 'threshold' ), v = 'alpha';  end; % backward compatibility
             
             if strcmpi(v, 'alpha') || strcmpi(v, 'method') || strcmpi(v, 'naccu') || strcmpi(v, 'mcorrect') 
-                STUDY.etc.statistics = setfield(STUDY.etc.statistics, 'eeglab', v, varargin{index+1});
+                paramstruct = setfield(paramstruct, 'eeglab', v, varargin{index+1});
             elseif ~isempty(findstr('fieldtrip', v))
                 v2 = v(10:end);
-                STUDY.etc.statistics = setfield(STUDY.etc.statistics, 'fieldtrip', v2, varargin{index+1});
+                paramstruct = setfield(paramstruct, 'fieldtrip', v2, varargin{index+1});
                 if strcmpi(v2, 'channelneighborparam')
-                    STUDY.etc.statistics.fieldtrip.channelneighbor = []; % reset neighbor matrix if parameter change
+                    paramstruct.fieldtrip.channelneighbor = []; % reset neighbor matrix if parameter change
                 end;
             else
-                if ~isempty(strmatch(v, fieldnames(STUDY.etc.statistics), 'exact'))
-                    STUDY.etc.statistics = setfield(STUDY.etc.statistics, v, varargin{index+1});
+                if (~isempty(paramstruct) && ~isempty(strmatch(v, fieldnames(paramstruct), 'exact'))) || ~isstudy
+                    paramstruct = setfield(paramstruct, v, varargin{index+1});
                 end;
             end;
         end;
+    end;
+    
+    if isfield(STUDY, 'etc')
+         STUDY.etc.statistics = paramstruct; 
+    else STUDY = paramstruct;
     end;
 end;
 
