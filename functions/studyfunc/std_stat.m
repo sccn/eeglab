@@ -99,14 +99,18 @@ end;
 
 % decode inputs
 % -------------
-if isstruct(varargin{1})
+if ~isempty(varargin) && isstruct(varargin{1})
     opt   = varargin{1};
+    varargin(1) = [];
 else
-    statstruct.etc = STUDY.etc;
-    statstruct     = pop_statparams(statstruct, varargin{:});
-    opt            = statstruct.etc.statistics;
+    opt = [];
+end;
+if ~isempty(varargin) ||isempty(opt);
+    opt = pop_statparams(opt, varargin{:});
 end;
 
+
+if ~isfield(opt, 'paired'), opt.paired = { 'off' 'off' }; end;
 if ~isnan(opt.eeglab.alpha(1)) && isempty(opt.eeglab.naccu), opt.eeglab.naccu = 1/opt.eeglab.alpha(end)*2; end;
 if any(any(cellfun('size', data, 2)==1)), opt.groupstats = 'off'; opt.condstats = 'off'; end;
 if strcmpi(opt.eeglab.mcorrect, 'fdr'), opt.eeglab.naccu = opt.eeglab.naccu*20; end;
@@ -180,12 +184,18 @@ else
         params = { params{:} 'neighbours' opt.fieldtrip.channelneighbor };
     end;
     params = { params{:} 'method', opt.fieldtrip.method, 'naccu', opt.fieldtrip.naccu 'mcorrect' opt.fieldtrip.mcorrect 'alpha' opt.fieldtrip.alpha 'numrandomization' opt.fieldtrip.naccu };
-        
+    if ~isnan(opt.fieldtrip.alpha), params = { params{:} 'structoutput' 'on' }; end;
+    
     if strcmpi(opt.condstats, 'on') && nc > 1
         for g = 1:ng
             [F df pval] = statcondfieldtrip(data(:,g), 'paired', opt.paired{1}, params{:});
-            pcond{g} = squeeze(pval);
-            statscond{g} = squeeze(F);
+            if isstruct(F)
+                pcond{g} = squeeze(F.mask);
+                statscond{g} = squeeze(F.stat);
+            else
+                pcond{g} = squeeze(pval);
+                statscond{g} = squeeze(F);
+            end;
         end;
     else
         pcond = {};
@@ -193,8 +203,13 @@ else
     if strcmpi(opt.groupstats, 'on') && ng > 1
         for c = 1:nc
             [F df pval] = statcondfieldtrip(data(c,:), 'paired', opt.paired{2}, params{:});
-            pgroup{c} = squeeze(pval);
-            statsgroup{c} = squeeze(F);
+            if isstruct(F)
+                pgroup{c} = squeeze(F.mask);
+                statsgroup{c} = squeeze(F.stat);
+            else
+                pgroup{c} = squeeze(pval);
+                statsgroup{c} = squeeze(F);
+            end;
         end;
     else
         pgroup = {};
@@ -203,8 +218,13 @@ else
         opt.paired = sort(opt.paired); % put 'off' first if present
         [F df pval] = statcondfieldtrip(data, 'paired', opt.paired{1}, params{:});
         for index = 1:length(pval)
-            pinter{index} = squeeze(pval{index});
-            statsinter{index} = squeeze(F{index});
+            if isstruct(F)
+                pinter{index} = squeeze(F.mask{index});
+                statsinter{index} = squeeze(F.stat{index});
+            else
+                pinter{index} = squeeze(pval{index});
+                statsinter{index} = squeeze(F{index});
+            end;
         end;
     else
         pinter = {};
