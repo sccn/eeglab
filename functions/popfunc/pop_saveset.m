@@ -200,7 +200,7 @@ end;
 tmpica       = EEG.icaact;
 EEG.icaact   = [];
 if ~isstr(EEG.data)
-    if ~strcmpi(class(EEG.data), 'memmapdata') & ~strcmpi(class(EEG.data), 'single')
+    if ~strcmpi(class(EEG.data), 'memmapdata') && ~strcmpi(class(EEG.data), 'mmo') && ~strcmpi(class(EEG.data), 'single')
         tmpdata       = single(reshape(EEG.data, EEG.nbchan,  EEG.pnts*EEG.trials));
     else 
         tmpdata = EEG.data;
@@ -216,7 +216,7 @@ try,
     if save_as_dat_file
         if ~isstr(EEG.data)
             EEG.data = EEG.datfile;
-            floatwrite( tmpdata, fullfile(EEG.filepath, EEG.data), 'ieee-le');
+            tmpdata = floatwrite( tmpdata, fullfile(EEG.filepath, EEG.data), 'ieee-le');
         end;
     else
         if isfield(EEG, 'datfile')
