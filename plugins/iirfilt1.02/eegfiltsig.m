@@ -23,6 +23,13 @@
 %   'rippledb'    = [float] max ripple in the pass band in dB. Default 2.
 %   'stopdb'      = [float] minimum attenuation in the stop band. Default 20.
 %
+% Note:
+% The current implementation of the IIR filters in eegfiltsig uses the filter 
+% coefficients [b,a] syntax. From what is detailed on the Matlab documentation, 
+% this can  lead to roundoff errors and unstable filters, and it might be why 
+% one gets NaN values sometimes. Using the zero-pole-gain [z,p,k] syntax and 
+% the zp2sos function may help solving the issue.
+%
 % Outputs:
 %    smoothdata = smoothed data
 %
@@ -124,6 +131,9 @@ freqz(b,a,2000,256);
 fprintf('Filtering:');
 for index = 1:size(data,1)
     fprintf('.');
-    data(index,:) = filtfilt(b, a, data(index,:));
+    if isa(data, 'single')
+         data(index,:) = single(filtfilt(b, a, double(data(index,:))));
+    else data(index,:) = filtfilt(b, a, data(index,:));
+    end;
 end;
 fprintf('\n');
