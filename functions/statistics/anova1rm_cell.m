@@ -51,47 +51,28 @@ function [fA dfApair] = anova1rm_cell(data)
 % -----------------------------
 a = length(data);
 nd = myndims( data{1} );
+sz = size( data{1} );
 n  = size( data{1} ,nd);
+AS = zeros([ sz(1:nd-1) a n ], 'single');
+sq = zeros([ sz(1:nd-1) 1], 'single');
 
 % only for paired stats
 % ---------------------
-if nd == 1
-    AS = zeros(a,n,'single');
-    sq = single(0);
-    for ind1 = 1:a
-        AS(ind1,:)    = AS(ind1,:) + data{ind1}';
-        sq            = sq + sum(data{ind1}.^2);
+for ind1 = 1:a
+    switch nd
+        case 1, AS(ind1,:)             = AS(ind1,:)             + reshape(data{ind1},[sz(1:nd-1) 1 n]);
+        case 2, AS(:,ind1,:)           = AS(:,ind1,:)           + reshape(data{ind1},[sz(1:nd-1) 1 n]);
+        case 3, AS(:,:,ind1,:)         = AS(:,:,ind1,:)         + reshape(data{ind1},[sz(1:nd-1) 1 n]);
+        case 4, AS(:,:,:,ind1,:)       = AS(:,:,:,ind1,:)       + reshape(data{ind1},[sz(1:nd-1) 1 n]);
+        case 5, AS(:,:,:,:,ind1,:)     = AS(:,:,:,:,ind1,:)     + reshape(data{ind1},[sz(1:nd-1) 1 n]);
+        case 6, AS(:,:,:,:,:,ind1,:)   = AS(:,:,:,:,:,ind1,:)   + reshape(data{ind1},[sz(1:nd-1) 1 n]);
+        case 7, AS(:,:,:,:,:,:,ind1,:) = AS(:,:,:,:,:,:,ind1,:) + reshape(data{ind1},[sz(1:nd-1) 1 n]);
+        otherwise     error('Dimension not supported');
     end;
-    dimA = 2;
-    dimB = 1;
-elseif nd == 2
-    AS = zeros(size(data{1},1),a,n,'single');
-    sq = zeros(size(data{1},1),1,'single');
-    for ind1 = 1:a
-        AS(:,ind1,:)    = AS(:,ind1,:) + reshape(data{ind1},size(data{1},1),1,n);
-        sq              = sq + sum(data{ind1}.^2,nd);
-    end;
-    dimA = 3;
-    dimB = 2;
-elseif nd == 3
-    AS = zeros(size(data{1},1),size(data{1},2),a,n,'single');
-    sq = zeros(size(data{1},1),size(data{1},2),'single');
-    for ind1 = 1:a
-        AS(:,:,ind1,:)    = AS(:,:,ind1,:) + reshape(data{ind1},size(data{1},1),size(data{1},2),1,n);
-        sq                = sq + sum(data{ind1}.^2,nd);
-    end;
-    dimA = 4;
-    dimB = 3;
-elseif nd == 4
-    AS = zeros(size(data{1},1),size(data{1},2),size(data{1},3),a,n,'single');
-    sq = zeros(size(data{1},1),size(data{1},2),size(data{1},3),'single');
-    for ind1 = 1:a
-        AS(:,:,:,ind1,:)    = AS(:,:,:,ind1,:) + reshape(data{ind1},size(data{1},1),size(data{1},2),size(data{1},3),1,n);
-        sq                = sq + sum(data{ind1}.^2,nd);
-    end;
-    dimA = 5;
-    dimB = 4;
+    sq = sq + sum(data{ind1}.^2,nd);
 end;
+dimA = nd+1;
+dimB = nd;
 
 A = sum(AS,dimA); % sum across columns, so result is 1xs row vector
 S = sum(AS,dimB); % sum across columns, so result is 1xs row vector
