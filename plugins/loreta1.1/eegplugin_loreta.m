@@ -55,17 +55,13 @@ function vers = eegplugin_loreta(fig, trystrs, catchstrs)
     % 'tools'        -> tools menu
     % 'plot'         -> plot menu
     
-    % command to check that the '.source' is present in the EEG structure 
-    % -------------------------------------------------------------------
-    check_loreta = trystrs.no_check;
-    
     % menu callback commands
     % ----------------------
     catchstrs.store_and_hist = [ ...
                         '[ALLEEG EEG] = eeg_store(ALLEEG, EEG, CURRENTSET); ' ...
                         'catch, errordlg2(lasterr, ''EEGLAB error''); LASTCOM= ''''; clear EEGTMP; end;' ...
                         'h(LASTCOM); disp(''Done.''); eeglab(''redraw'');' ];
-    comexport = [ trystrs.check_ica 'pop_eeglab2loreta(EEG);' catchstrs.add_to_hist ]; 
+    comexport = [ trystrs.check_data 'pop_eeglab2loreta(EEG);' catchstrs.add_to_hist ]; 
     %comimport = [ trystrs.check_ica 'EEG = loretaimport(EEG);' catchstrs.store_and_hist ];
     %complot1  = [ check_loreta 'pop_dipplot(EEG);' catchstrs.add_to_hist ];
     
