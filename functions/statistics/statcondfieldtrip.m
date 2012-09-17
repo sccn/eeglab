@@ -22,6 +22,11 @@
 %   'neighbours' = Fieldtrip channel neighbour structure to perfom statistics
 %                and cluster correction for multiple comparisons accross 
 %                channels.
+%   'alpha'    = [float] p-value threshold value. Allow returning
+%                confidence intervals and mask (requires structoutput below).
+%   'structoutput' = ['on'|'off'] return an output structure instead of 
+%                the regular output. Allow to output mask and confidence
+%                intervals.
 %
 % Fieldtrip options:
 %   Any option to the freqanalysis, the statistics_montecarlo, the
@@ -75,6 +80,7 @@ function [ ori_vals, df, pvals ] = statcondfieldtrip( data, varargin );
                                              'chandim'    'integer'   []             0;
                                              'alpha'      'real'      []             NaN;
                                              'neighbours' 'struct'    { }            struct([]);
+                                             'structoutput' 'string'  { 'on','off' }      'off';
 %                                             'method'    'string'    {  } 'analytic'; % 'montecarlo','analytic','stat','glm'
                                              'paired'     'string'    { 'on','off' }      'on' }, 'statcond', 'ignore');
     if isstr(g), error(g); end;    
@@ -211,17 +217,6 @@ function [ ori_vals, df, pvals ] = statcondfieldtrip( data, varargin );
             
         end;
         
-        ori_vals  = stat.stat;
-        if alphaset
-             pvals  = stat.mask;
-        else pvals  = stat.prob;
-        end;
-        
-        if size(ori_vals,1) ~= size(data{1},1) && size(ori_vals,1) == 1
-            ori_vals = reshape(ori_vals, size(ori_vals,2), size(ori_vals,3), size(ori_vals,4));
-            pvals    = reshape(pvals   , size(pvals   ,2), size(pvals   ,3), size(pvals   ,4));
-        end;
-        
     else
         if strcmpi(g.paired, 'on')
             
@@ -239,8 +234,6 @@ function [ ori_vals, df, pvals ] = statcondfieldtrip( data, varargin );
                  df = stat.df;
             else df = [];
             end;
-            pvals           = stat.prob;
-            return;
             
         else
             
@@ -264,17 +257,38 @@ function [ ori_vals, df, pvals ] = statcondfieldtrip( data, varargin );
             stat            = ft_freqstatistics(cfg, newdata{:});
             ori_vals        = stat.stat;
             df              = stat.df;
-            pvals           = stat.prob;
-            return;
             
         end;
     end;
     
-    % restore dimensions if necessary
-    % -------------------------------
-    if ndim(1) == 1
-         pvals    = reshape(pvals, [1 size(pvals)]);
-         ori_vals = reshape(ori_vals, [1 size(ori_vals)]);
+    ori_vals  = stat.stat;
+    pvals     = stat.prob;
+    
+    if size(ori_vals,1) ~= size(data{1},1) && size(ori_vals,1) == 1
+        ori_vals = reshape(ori_vals, size(ori_vals,2), size(ori_vals,3), size(ori_vals,4));
+        pvals    = reshape(pvals   , size(pvals   ,2), size(pvals   ,3), size(pvals   ,4));
+        if isfield(stat, 'mask')
+            stat.mask = reshape(stat.mask   , size(stat.mask   ,2), size(stat.mask   ,3), size(stat.mask   ,4));
+        end;
+    end;
+    
+    if strcmpi(g.structoutput, 'on')
+        outputstruct.mask = stat.mask;
+        outputstruct.pval = pvals;
+        if length(data(:)) == 2
+             outputstruct.t = ori_vals;
+        else outputstruct.f = ori_vals;
+        end;
+        outputstruct.stat   = ori_vals;
+%         outputstruct.method = g.method;
+%         outputstruct.pval   = pvals;
+%         outputstruct.df     = df;
+%         outputstruct.surrog = surrogval;
+%         if length(data(:)) == 2
+%              outputstruct.t = ori_vals;
+%         else outputstruct.f = ori_vals;
+%         end;
+        ori_vals = outputstruct;
     end;
     
 function val = myndims(a)
