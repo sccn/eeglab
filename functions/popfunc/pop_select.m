@@ -214,6 +214,7 @@ if ~isempty(g.sort)
 end;
 if strcmpi(g.sorttrial, 'on')
     g.trial = sort(setdiff( g.trial, g.notrial ));
+    if isempty(g.trial), error('Error: dataset is empty'); end;
 else
     g.trial(ismember(g.trial,g.notrial)) = [];
     % still warn about & remove duplicate trials (may be removed in the future)
@@ -530,7 +531,16 @@ end;
 % performing removal
 % ------------------
 if ~isequal(g.channel,1:size(EEG.data,1)) || ~isequal(g.trial,1:size(EEG.data,3))
-    EEG.data  = EEG.data(g.channel, :, g.trial);
+    %EEG.data  = EEG.data(g.channel, :, g.trial);
+    % this code belows is prefered for memory mapped files
+    diff1 = setdiff([1:size(EEG.data,1)], g.channel);
+    diff2 = setdiff([1:size(EEG.data,3)], g.trial);
+    if ~isempty(diff1)
+         EEG.data(diff1, :, :) = [];
+    end;
+    if ~isempty(diff2)
+         EEG.data(:, :, diff2) = [];
+    end;
 end
 if ~isempty(EEG.icaact), EEG.icaact = EEG.icaact(:,:,g.trial); end;
 EEG.trials    = length(g.trial);
