@@ -55,7 +55,9 @@ end;
 
 % import data
 % -----------
-DAT = DAT';
+if abs(dat.NS - size(DAT,1)) > 1
+    DAT = DAT';
+end;
 EEG = eeg_emptyset;
 
 % convert to seconds for sread
