@@ -47,6 +47,7 @@ if nargin < 4
 end;   
 
 data = reshape(data, size(data,1), size(data,2)*size(data,3));
+act  = reshape(act , size(act ,1), size(act ,2)*size( act,3));
 squaredata  = sum(sum(data.^2));             % compute the grand sum-squared data
 
 if iscell(act)
@@ -55,7 +56,7 @@ if iscell(act)
     act = (weight(compnums,:)*sphere)*data;
 end;
 
-compproj   = winv(:,compnums)*act-data;      % difference between data and back-projection
+compproj   = winv(:,compnums)*act(compnums,:)-data;      % difference between data and back-projection
 squarecomp = sum(sum(compproj.^2));          % the summed-square difference
 varegg     = 100*(1- squarecomp/squaredata); % compute pvaf of components in data
 compproj   = compproj+data;                  % restore back-projected data
