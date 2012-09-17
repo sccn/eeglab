@@ -33,7 +33,7 @@
 % 02-08-00  new version included in toolbox -sm
 % 01-25-02 reformated help & license, added links -ad 
 
-function floatwrite(A, fname, fform, transp)
+function A = floatwrite(A, fname, fform, transp)
 
 if ~exist('fform')
 	fform = 'native';
@@ -43,8 +43,10 @@ if nargin < 4
 end;
 
 if strcmpi(transp,'normal')
-    if strcmpi(class(A), 'memmapdata')
-        
+    if strcmpi(class(A), 'mmo')
+        A = changefile(A, fname);
+        return;
+    elseif strcmpi(class(A), 'memmapdata')
         % check file to overwrite
         % -----------------------
         [fpath1 fname1 ext1] = fileparts(fname);
