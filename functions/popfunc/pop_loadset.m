@@ -44,7 +44,7 @@
 
 % 01-25-02 reformated help & license -ad 
 
-function [EEG, command] = pop_loadset( inputname, inputpath, varargin);
+function [EEG, command] = pop_loadset( inputname, inputpath, varargin)
 
 command = '';
 EEG  = [];
@@ -94,7 +94,7 @@ else
     ALLEEGLOC = [];
     for ifile = 1:length(g.filename)
         
-        if ifile > 1 & option_storedisk
+        if ifile > 1 && option_storedisk
             warndlg2(strvcat('You may only load a single dataset','when selecting the "Store at most one', 'dataset in memory" option'));
             break;
         end;
@@ -125,10 +125,10 @@ else
 
             % account for name changes etc...
             % -------------------------------
-            if isstr(EEG.data) & ~strcmpi(EEG.data, 'EEGDATA')
+            if isstr(EEG.data) && ~strcmpi(EEG.data, 'EEGDATA')
 
                 [tmp EEG.data ext] = fileparts( EEG.data ); EEG.data = [ EEG.data ext];
-                if ~isempty(tmp) & ~strcmpi(tmp, EEG.filepath)
+                if ~isempty(tmp) && ~strcmpi(tmp, EEG.filepath)
                     disp('Warning: updating folder name for .dat|.fdt file');
                 end;
                 if ~strcmp(EEG.filename(1:end-3), EEG.data(1:end-3))
@@ -141,7 +141,7 @@ else
 
             % copy data to output variable if necessary (deprecated)
             % -----------------------------------------
-            if ~strcmpi(g.loadmode, 'info') & isfield(TMPVAR, 'EEGDATA')
+            if ~strcmpi(g.loadmode, 'info') && isfield(TMPVAR, 'EEGDATA')
                 EEG.data = TMPVAR.EEGDATA;
             end;
 
@@ -163,7 +163,7 @@ else
                 EEG(index).filepath = '';        
                 if isstr(EEG(index).data), 
                     EEG(index).filepath = g.filepath; 
-                    if length(g.filename{ifile}) > 4 & ~strcmp(g.filename{ifile}(1:end-4), EEG(index).data(1:end-4)) & strcmpi(g.filename{ifile}(end-3:end), 'sets')
+                    if length(g.filename{ifile}) > 4 && ~strcmp(g.filename{ifile}(1:end-4), EEG(index).data(1:end-4)) && strcmpi(g.filename{ifile}(end-3:end), 'sets')
                         disp('Warning: the name of the dataset has changed on disk, updating .dat data file to the new name');
                         EEG(index).data = [ g.filename{ifile}(1:end-4) 'fdt' int2str(index) ];
                     end;
@@ -333,7 +333,7 @@ function EEG = checkoldformat(EEG)
 		
 		% modify the eegtype to match the new one
 		
-		try, 
+		try
 			if EEG.trials > 1
 				EEG.events  = [ EEG.rt(:) EEG.eegtype(:) EEG.eegresp(:) ];
 			end;
@@ -346,12 +346,12 @@ function EEG = checkoldformat(EEG)
 	if ~isfield(EEG, 'icaact'), EEG.icaact = []; end;
 	if ~isfield(EEG, 'chanlocs'), EEG.chanlocs = []; end;
 	
-	if isfield(EEG, 'events') & ~isfield(EEG, 'event')
-		try, 
+	if isfield(EEG, 'events') && ~isfield(EEG, 'event')
+		try
 			if EEG.trials > 1
 				EEG.events  = [ EEG.rt(:) ];
 				
-				EEG = eeg_checkset(EEG);;
+				EEG = eeg_checkset(EEG);
 				EEG = pop_importepoch(EEG, EEG.events, { 'rt'}, {'rt'}, 1E-3);
 			end;
 			if isfield(EEG, 'trialsval')
