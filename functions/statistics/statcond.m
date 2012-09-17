@@ -1,8 +1,7 @@
 % statcond()  - compare two or more data conditions statistically using 
 %               standard parametric or nonparametric permutation-based ANOVA 
 %               (1-way or 2-way) or t-test methods. Parametric testing uses 
-%               fcdf() from the Matlab Statistical Toolbox. Use of up to 
-%               4-D data matrices speeds processing.
+%               fcdf() from the Matlab Statistical Toolbox.
 % Usage:
 %          >> [stats, df, pvals, surrog] = statcond( data, 'key','val'... );
 %
@@ -60,6 +59,11 @@
 %   'tail'     = ['one'|'two'] run one-tailed (F-test) or two tailed
 %                (T-test). This option is only relevant when using the
 %                'surrog' input. Otherwise it is ignored.
+%   'alpha'    = [float] p-value threshold value. Allow returning
+%                confidence intervals and mask (requires structoutput below).
+%   'structoutput' = ['on'|'off'] return an output structure instead of 
+%                the regular output. Allow to output mask and confidence
+%                intervals.
 %
 % Legacy parameters:
 %   'threshold' - now 'alpha'
@@ -158,9 +162,11 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
                                      'paired'     'string'    { 'on','off' }      'on'; 
                                      'surrog'     { 'real','cell' }      []       []; 
                                      'stats'      { 'real','cell' }      []       []; 
+                                     'structoutput' 'string'  { 'on','off' }      'off'; 
                                      'arraycomp'  'string'    { 'on','off' }      'on'; 
-                                     'tail'       'string'    { 'one','both' }    'both'; 
-                                     'variance'   'string'    { 'homogenous','inhomogenous' }      'inhomogenous'; 
+                                     'alpha'      'real'      []                  NaN;
+                                     'tail'       'string'    { 'one','both','upper','lower'}    'both'; 
+                                     'variance'   'string'    { 'homogenous','inhomogenous' }    'inhomogenous'; 
                                      'returnresamplingarray' 'string'    { 'on','off' }      'off'; 
                                      'verbose'    'string'    { 'on','off' }      'on' }, 'statcond');
         if isstr(g), error(g); end;
@@ -174,6 +180,7 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
         if ~isfield(g, 'arraycomp'), g.arraycomp = 'on'; end;
         if ~isfield(g, 'verbose'),   g.verbose = 'on'; end;
         if ~isfield(g, 'variance'),  g.variance = 'homogenous'; end;
+        if ~isfield(g, 'structoutput'), g.structoutput = 'on'; end;
         if ~isfield(g, 'returnresamplingarray'),   g.returnresamplingarray = 'off'; end;
     end;
     if ~isempty(g.mode), g.method = g.mode; end;
@@ -188,6 +195,14 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
       g.method = 'perm';
     end
     if size(data,2) == 1, data  = transpose(data); end; % cell array transpose
+
+    % reshape matrices
+    % ----------------
+    nd = size(data{1});
+    nd = nd(1:end-1);
+    for index = 1:prod(size(data))
+        data{index} = reshape(data{index}, [prod(nd) size(data{index},myndims(data{index}))]);
+    end;    
     
     if ~strcmpi(g.method, 'param') && isempty(g.surrog)
          tmpsize   = size(data{1});
@@ -207,14 +222,10 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
     % bootstrap flag
     % --------------
     if strcmpi(g.method, 'bootstrap'), bootflag = 1;
-    else                             bootflag = 0;
+    else                               bootflag = 0;
     end;
     
     if isempty(g.surrog)
-        % concatenate all data arrays
-        % ---------------------------
-        [ datavals datalen datadims ] = concatdata( data );
-
         % test if data can be paired
         % --------------------------
         if length(unique(cellfun('size', data, ndims(data{1}) ))) > 1
@@ -228,10 +239,11 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
         % return resampling array
         % -----------------------
         if strcmpi(g.returnresamplingarray, 'on')
+            [ datavals datalen datadims ] = concatdata( data );
             if strcmpi(g.arraycomp, 'on')
-                ori_vals = supersurrogate( datavals, datalen, datadims, bootflag, pairflag, g.naccu);
+                ori_vals = surrogdistrib( data, 'method', g.method, 'pairing', g.paired, 'naccu', g.naccu);
             else
-                ori_vals = surrogate( datavals, datalen, datadims, bootflag, pairflag);
+                ori_vals = surrogdistrib( data, 'method', g.method, 'pairing', g.paired);
             end;
             return;
         end;
@@ -268,11 +280,9 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
             else         myfprintf(verb,'Permutations (of %d):', g.naccu);
             end;
         end;
-
-    else
-        tail = g.tail;
     end;
     
+    tail = g.tail;
     if isempty(g.surrog)
         if size(data,1) == 1, % only one row
 
@@ -280,34 +290,32 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
 
                 % paired t-test (very fast)
                 % -------------
-                tail = 'both';
                 [ori_vals df] = ttest_cell_select(data, g.paired, g.variance);
 
                 if strcmpi(g.method, 'param')
                     pvals = 2*mytcdf(-abs(ori_vals), df);
                     pvals = reshape(pvals, size(pvals));
-                    return;
                 else
                     if strcmpi(g.arraycomp, 'on')
                         try
                             myfprintf(verb,'...');
-                            res = supersurrogate( datavals, datalen, datadims, bootflag, pairflag, g.naccu);
+                            res = surrogdistrib( data, 'method', g.method, 'pairing', g.paired, 'naccu', g.naccu);
                             surrogval = ttest_cell_select( res, g.paired, g.variance);
                         catch,
-                            lasterr
-                            myfprintf(verb,'\nSuperfast array computation failed because of memory limitation, reverting to standard computation');
-                            g.arraycomp = 'off';
+                           lasterr
+                           myfprintf(verb,'\nSuperfast array computation failed because of memory limitation, reverting to standard computation');
+                           g.arraycomp = 'off';
                         end;
                     end;
                     if strcmpi(g.arraycomp, 'off')
+                        [res precomp] = surrogdistrib( data, 'method', g.method, 'pairing', g.paired);
                         for index = 1:g.naccu
-                            res = surrogate( datavals, datalen, datadims, bootflag, pairflag);
+                            res = surrogdistrib( {}, 'precomp', precomp);
                             if mod(index, 10) == 0, myfprintf(verb,'%d ', index); end;
                             if mod(index, 100) == 0, myfprintf(verb,'\n'); end;
-                            switch myndims(res{1})
-                             case 1   , surrogval(index)     = ttest_cell_select(res, g.paired, g.variance);
-                             case 2   , surrogval(:,index)   = ttest_cell_select(res, g.paired, g.variance);
-                             otherwise, surrogval(:,:,index) = ttest_cell_select(res, g.paired, g.variance);
+                            if myndims(res{1}) == 1
+                                 surrogval(index)     = ttest_cell_select(res, g.paired, g.variance);
+                            else surrogval(:,index)   = ttest_cell_select(res, g.paired, g.variance);
                             end;
                         end;
                     end;
@@ -318,12 +326,12 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
                 tail = 'one';
                 [ori_vals df] = anova1_cell_select( data, g.paired );
                 if strcmpi(g.method, 'param')
-                    pvals = 1-fcdf(ori_vals, df(1), df(2)); return;
+                    pvals = 1-fcdf(ori_vals, df(1), df(2));
                 else
                     if strcmpi(g.arraycomp, 'on')
                         try
                             myfprintf(verb,'...');                        
-                            res = supersurrogate( datavals, datalen, datadims, bootflag, pairflag, g.naccu);
+                            res = surrogdistrib( data, 'method', g.method, 'pairing', g.paired, 'naccu', g.naccu);
                             surrogval = anova1_cell( res );
                         catch,
                             myfprintf(verb,'\nSuperfast array computation failed because of memory limitation, reverting to standard computing');
@@ -331,15 +339,15 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
                         end;
                     end;
                     if strcmpi(g.arraycomp, 'off')
+                        [res precomp] = surrogdistrib( data, 'method', g.method, 'pairing', g.paired);
                         for index = 1:g.naccu
                             if mod(index, 10) == 0, myfprintf(verb,'%d ', index); end;
                             if mod(index, 100) == 0, myfprintf(verb,'\n'); end;
 
-                            res = surrogate( datavals, datalen, datadims, bootflag, pairflag);                    
-                            switch myndims(data{1})
-                             case 1   , surrogval(index)     = anova1_cell_select( res, g.paired );
-                             case 2   , surrogval(:,index)   = anova1_cell_select( res, g.paired );
-                             otherwise, surrogval(:,:,index) = anova1_cell_select( res, g.paired );
+                            res = surrogdistrib( {}, 'precomp', precomp);
+                            if myndims(data{1}) == 1
+                            	 surrogval(index)     = anova1_cell_select( res, g.paired );
+                            else surrogval(:,index)   = anova1_cell_select( res, g.paired );
                             end;
                         end;
                     end;
@@ -354,14 +362,13 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
                 pvals{1} = 1-fcdf(ori_vals{1}, df{1}(1), df{1}(2));
                 pvals{2} = 1-fcdf(ori_vals{2}, df{2}(1), df{2}(2));
                 pvals{3} = 1-fcdf(ori_vals{3}, df{3}(1), df{3}(2));
-                return;
             else
                 surrogval = { surrogval surrogval surrogval };
                 dataori   = data;
                 if strcmpi(g.arraycomp, 'on')
                     try
                         myfprintf(verb,'...');
-                        res = supersurrogate( datavals, datalen, datadims, bootflag, pairflag, g.naccu);
+                        res = surrogdistrib( data, 'method', g.method, 'pairing', g.paired, 'naccu', g.naccu);
                         [ surrogval{1} surrogval{2} surrogval{3} ] = anova2_cell_select( res, g.paired );
                     catch,
                         myfprintf(verb,'\nSuperfast array computation failed because of memory limitation, reverting to standard computing');
@@ -369,15 +376,15 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
                     end;
                 end;
                 if strcmpi(g.arraycomp, 'off')
+                    [res precomp] = surrogdistrib( data, 'method', g.method, 'pairing', g.paired);
                     for index = 1:g.naccu
                         if mod(index, 10) == 0, myfprintf(verb,'%d ', index); end;
                         if mod(index, 100) == 0, myfprintf(verb,'\n'); end;
 
-                        res = surrogate( datavals, datalen, datadims, bootflag, pairflag);                    
-                        switch myndims(data{1})
-                         case 1   , [ surrogval{1}(index)     surrogval{2}(index)     surrogval{3}(index)     ] = anova2_cell_select( res, g.paired );
-                         case 2   , [ surrogval{1}(:,index)   surrogval{2}(:,index)   surrogval{3}(:,index)   ] = anova2_cell_select( res, g.paired );
-                         otherwise, [ surrogval{1}(:,:,index) surrogval{2}(:,:,index) surrogval{3}(:,:,index) ] = anova2_cell_select( res, g.paired );
+                        res = surrogdistrib( {}, 'precomp', precomp);
+                        if myndims(data{1}) == 1
+                         	 [ surrogval{1}(index)     surrogval{2}(index)     surrogval{3}(index)     ] = anova2_cell_select( res, g.paired );
+                        else [ surrogval{1}(:,index)   surrogval{2}(:,index)   surrogval{3}(:,index)   ] = anova2_cell_select( res, g.paired );
                         end;
                     end;
                 end;
@@ -392,112 +399,51 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
     
     % compute p-values
     % ----------------
-    if iscell( surrogval )
-        pvals{1} = compute_pvals(surrogval{1}, ori_vals{1}, tail);
-        pvals{2} = compute_pvals(surrogval{2}, ori_vals{2}, tail);
-        pvals{3} = compute_pvals(surrogval{3}, ori_vals{3}, tail);
-    else
-        pvals = compute_pvals(surrogval, ori_vals, tail);
-    end;
-    try, warning('on', 'MATLAB:divideByZero'); catch, end;
-    
-% compute p-values
-% ----------------
-function pvals = compute_pvals(surrog, oridat, tail)
-    
-    surrog        = sort(surrog, myndims(surrog)); % sort last dimension
-    
-    if myndims(surrog) == 1    
-        surrog(end+1) = oridat;        
-    elseif myndims(surrog) == 2
-        surrog(:,end+1) = oridat;        
-    elseif myndims(surrog) == 3
-        surrog(:,:,end+1) = oridat;
-    elseif myndims(surrog) == 4
-        surrog(:,:,:,end+1) = oridat;
-    else
-        surrog(:,:,:,:,end+1) = oridat;
-    end;
-
-    [tmp idx] = sort( surrog, myndims(surrog) );
-    [tmp mx]  = max( idx,[], myndims(surrog));        
-                
-    len = size(surrog,  myndims(surrog) );
-    pvals = 1-(mx-0.5)/len;
-    if strcmpi(tail, 'both')
-        pvals = min(pvals, 1-pvals);
-        pvals = 2*pvals;
-    end;    
-   
-function res = supersurrogate(dat, lens, dims, bootstrapflag, pairedflag, naccu); % for increased speed only shuffle half the indices
-
-    % recompute indices in set and target cell indices
-    % ------------------------------------------------
-    ncond = length(lens)-1;
-    nsubj = lens(2);
-    if bootstrapflag
-        if pairedflag
-             indswap  = mod( repmat([1:lens(end)],[naccu 1]) + ceil(rand(naccu,lens(end))*length(lens))*lens(2)-1, lens(end) )+1;
-        else indswap  = ceil(rand(naccu,lens(end))*lens(end));
-        end;
-    else
-        if pairedflag
-            [tmp idx] = sort(rand(naccu,nsubj,ncond),3);
-            indswap   = ((idx)-1)*nsubj + repmat( repmat([1:nsubj], [naccu 1 1]),[1 1 ncond]);
-            indswap   = reshape(indswap, [naccu lens(end)]);
+    if ~strcmpi(g.method, 'param')
+        if iscell( surrogval )
+            pvals{1} = stat_surrogate_pvals(surrogval{1}, ori_vals{1}, tail);
+            pvals{2} = stat_surrogate_pvals(surrogval{2}, ori_vals{2}, tail);
+            pvals{3} = stat_surrogate_pvals(surrogval{3}, ori_vals{3}, tail);
         else
-            [tmp indswap] = sort(rand(naccu, lens(end)),2);
+            pvals = stat_surrogate_pvals(surrogval, ori_vals, tail);
         end;
+        try, warning('on', 'MATLAB:divideByZero'); catch, end;
     end;
 
-    for i = 1:length(lens)-1
-        switch myndims(dat)
-            case 1, res{i} = reshape(dat(indswap(:,lens(i)+1:lens(i+1))), naccu, lens(i+1)-lens(i));
-            case 2, res{i} = reshape(dat(:,indswap(:,lens(i)+1:lens(i+1))), size(dat,1), naccu, lens(i+1)-lens(i));
-            case 3, res{i} = reshape(dat(:,:,indswap(:,lens(i)+1:lens(i+1))), size(dat,1), size(dat,2), naccu, lens(i+1)-lens(i));
-            case 4, res{i} = reshape(dat(:,:,:,indswap(:,lens(i)+1:lens(i+1))), size(dat,1), size(dat,2), size(dat,3), naccu, lens(i+1)-lens(i));
-            case 5, res{i} = reshape(dat(:,:,:,:,indswap(:,lens(i)+1:lens(i+1))), size(dat,1), size(dat,2), size(dat,3), size(dat,4), naccu, lens(i+1)-lens(i));
+    [ ori_vals, pvals ] = reshape_results( nd, ori_vals, pvals);
+    [ surrogval ]       = reshape_results( [nd g.naccu], surrogval);
+    
+    % confidence intervals
+    % --------------------
+    if ~isnan(g.alpha)
+        outputstruct.ci = stat_surrogate_ci(surrogval, g.alpha, tail);
+        if strcmpi(g.structoutput, 'off')
+            disp('Warning: returning confidence interval requires an output structure');
+        end;
+        if iscell(pvals)
+            for ind = 1:length(pvals)
+                outputstruct.mask{ind} = pvals{ind} < g.alpha;
+            end;
+        else
+            outputstruct.mask = pvals < g.alpha;
         end;
     end;
-    res = reshape(res, dims);
-
-function res = surrogate(dataconcat, lens, dims, bootstrapflag, pairedflag); % for increased speed only shuffle half the indices
+    
+    % create a structure for outputing values
+    % ---------------------------------------
+    if strcmpi(g.structoutput, 'on')
+        outputstruct.method = g.method;
+        outputstruct.pval   = pvals;
+        outputstruct.df     = df;
+        outputstruct.surrog = surrogval;
+        if length(data(:)) == 2
+             outputstruct.t = ori_vals;
+        else outputstruct.f = ori_vals;
+        end;
+        outputstruct.stat   = ori_vals;
+        ori_vals = outputstruct;
+    end;
        
-    % recompute indices in set and target cell indices
-    % ------------------------------------------------
-    if bootstrapflag
-        if pairedflag
-             indswap  = mod( [1:lens(end)]+ ceil(rand(1,lens(end))*length(lens))*lens(2)-1, lens(end) )+1;
-        else indswap  = ceil(rand(1,lens(end))*lens(end));
-        end;
-    else
-        if pairedflag
-            indswap  = [1:lens(end)];
-            indswap  = reshape(indswap, [lens(2) length(lens)-1]);
-            for i = 1:size(indswap,1) % shuffle each row
-                [tmp idx] = sort(rand(1,size(indswap,2)));
-                indswap(i,:) = indswap(i,idx);
-            end;    
-            indswap  = reshape(indswap, [1 lens(2)*(length(lens)-1)]);
-        else
-            oriindices = [1:lens(end)]; % just shuffle indices
-            [tmp idx] = sort(rand(1,length(oriindices)));
-            indswap   = oriindices(idx);
-        end;
-    end;
-    
-    res = {};
-    for i = 1:length(lens)-1
-        switch myndims(dataconcat)
-            case 1, res{i} = dataconcat(indswap(lens(i)+1:lens(i+1)));
-            case 2, res{i} = dataconcat(:,indswap(lens(i)+1:lens(i+1)));
-            case 3, res{i} = dataconcat(:,:,indswap(lens(i)+1:lens(i+1)));
-            case 4, res{i} = dataconcat(:,:,:,indswap(lens(i)+1:lens(i+1)));
-            case 4, res{i} = dataconcat(:,:,:,:,indswap(lens(i)+1:lens(i+1)));
-        end;
-    end;
-    res = reshape(res, dims);
-    
 % compute ANOVA 2-way
 % -------------------
 function [f1 f2 f3 df1 df2 df3] = anova2_cell_select( res, paired);
@@ -525,6 +471,8 @@ function [t df] = ttest_cell_select( res, paired, homogenous);
         [t df] = ttest2_cell( res{1}, res{2}, homogenous);
     end;
 
+% function to compute the number of dimensions
+% --------------------------------------------
 function val = myndims(a)
     if ndims(a) > 2
         val = ndims(a);
@@ -538,12 +486,15 @@ function val = myndims(a)
         end;
     end; 
 
+% function for verbose messages
+% -----------------------------
 function myfprintf(verb, varargin)
     if verb
         fprintf(varargin{:});
     end;
 
 % function to replace tcdf
+% ------------------------
 function p = mytcdf(x,v)
 
 if length(v) == 1,
@@ -571,3 +522,22 @@ else
 end;
 function [p] = normcum(z)
 p = 0.5 * erfc(-z ./ sqrt(2));
+
+% reshape results
+% ---------------
+function varargout = reshape_results(nd, varargin)
+    if length(varargin) > 1
+        for index = 1:length(varargin)
+            varargout{index} = reshape_results(nd, varargin{index});
+        end;
+    elseif iscell(varargin{1})
+        for index = 1:length(varargin{1})
+            varargout{1}{index} = reshape_results(nd, varargin{1}{index});
+        end;
+    else
+        if ~isempty(varargin{1})
+            if length(nd) == 1, nd = [ nd 1 ]; end;
+            varargout{1} = reshape(varargin{1}, nd);
+        else varargout{1} = [];
+        end;
+    end;    
