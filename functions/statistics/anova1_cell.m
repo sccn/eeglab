@@ -84,7 +84,7 @@ function [F, df] = anova1_cell(data)
     elseif nd == 2  
 
         for i = 1:length(data)
-            n( :,i) = ones(size(data{i},1),1) * size(data{i},2, 'single');
+            n( :,i) = ones(size(data{i},1) * size(data{i},2), 'single');
             m( :,i) = mymean(  data{i},2);
             sd(:,i) = mystd(   data{i},[],2);
         end;
@@ -93,16 +93,16 @@ function [F, df] = anova1_cell(data)
     elseif nd == 3        
         
         for i = 1:length(data)
-            n( :,:,i) = ones(size(data{i},1),size(data{i},2)) * size(data{i},3, 'single');
+            n( :,:,i) = ones(size(data{i},1),size(data{i},2) * size(data{i},3), 'single');
             m( :,:,i) = mymean(  data{i},3);
             sd(:,:,i) = mystd(   data{i},[],3);
         end;
         nt = sum(n(1,1,:));
         
-    else
+    elseif nd == 4
 
         for i = 1:length(data)
-            n( :,:,:,i) = ones(size(data{i},1),size(data{i},2), size(data{i},3)) * size(data{i},4, 'single');
+            n( :,:,:,i) = ones(size(data{i},1),size(data{i},2), size(data{i},3) * size(data{i},4), 'single');
             m( :,:,:,i) = mymean(  data{i},4);
             sd(:,:,:,i) = mystd(   data{i},[],4);
         end;
