@@ -71,7 +71,8 @@ if iscell(EEG) || (~isstr(EEG) && length(EEG) > 1)
             varargin(iArg:iArg+1) = [];
         end;
     end;
-    
+    if isnumeric(rmcomps), rmtmp = rmcomps; rmcomps = cell(1,length(EEG)); rmcomps(:) = { rmtmp }; end;
+        
     % concatenate datasets
     % --------------------
     data = [];
@@ -200,8 +201,8 @@ else
         eeglab_options;
         if length(opt.channel) == EEG.nbchan && option_memmapdata
             fclose(fid);
-            %data = mmo(filename, [EEG.nbchan EEG.pnts EEG.trials], false);
-            data = memmapdata(filename, [EEG.nbchan EEG.pnts EEG.trials]);
+            data = mmo(filename, [EEG.nbchan EEG.pnts EEG.trials], false);
+            %data = memmapdata(filename, [EEG.nbchan EEG.pnts EEG.trials]);
         else
             if datformat
                 if length(opt.channel) == EEG.nbchan || ~isempty(opt.interp)
