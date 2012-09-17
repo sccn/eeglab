@@ -126,8 +126,8 @@ if isstr(indata)
   evalin('base', 'clear numberrow indextmp endtmp fid');  
   evalin('base', 'delete(''tmpeegrej.fdt'')');  
 else
-  elecIndices = find(reject == 0);
-  indata = indata(:,elecIndices);
+  timeIndices = find(reject == 1);
+  indata(:,timeIndices) = [];
 end;
 times = times * length(find(reject ==0)) / length(reject);
 
