@@ -17,6 +17,7 @@
 %                  not case-sensitive.
 % Optional inputs:
 %  'design'   - [integer] use specific study index design to compute measure.
+%  'cell'     - [integer] compute measure only for a give data file.
 %  'erp'      - ['on'|'off'] pre-compute ERPs for each dataset.
 %  'spec'     - ['on'|'off'] pre-compute spectrum for each dataset.
 %               Use 'specparams' to set spectrum parameters.
@@ -108,6 +109,7 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
                                 'itc'         'string'  { 'on','off' }     'off';
                                 'savetrials'  'string'  { 'on','off' }     'off';
                                 'rmicacomps'  'string'  { 'on','off' }     'off';
+                                'cell'        'integer' []                 [];
                                 'design'      'integer' []                 STUDY.currentdesign;
                                 'rmclust'     'integer' []                 [];
                                 'rmbase'      'integer' []                 []; % deprecated, for backward compatibility purposes, not documented
@@ -179,7 +181,10 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
         end;
         
         for index = 1:length(STUDY.design(g.design).cell)
-            desset = STUDY.design(g.design).cell(index);
+            if ~isempty(g.cell)
+                 desset = STUDY.design(g.design).cell(g.cell);
+            else desset = STUDY.design(g.design).cell(index);
+            end;
             addopts = { 'savetrials', g.savetrials, 'recompute', g.recompute, 'fileout', desset.filebase, 'trialindices', desset.trials };
             if strcmpi(computewhat, 'channels')
                 [tmpchanlist opts] = getchansandopts(STUDY, ALLEEG, chanlist, desset.dataset, g);
@@ -190,6 +195,7 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
                 end;
                 std_erp(ALLEEG(desset.dataset), 'components', chanlist{desset.dataset(1)}, addopts{:}, g.erpparams{:});
             end;
+            if ~isempty(g.cell), break; end;
         end;
         if isfield(curstruct, 'erpdata')
             curstruct = rmfield(curstruct, 'erpdata');
@@ -203,7 +209,10 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
         % check dataset consistency
         % -------------------------
         for index = 1:length(STUDY.design(g.design).cell)
-            desset = STUDY.design(g.design).cell(index);
+            if ~isempty(g.cell)
+                 desset = STUDY.design(g.design).cell(g.cell);
+            else desset = STUDY.design(g.design).cell(index);
+            end;
             addopts = { 'savetrials', g.savetrials, 'recompute', g.recompute, 'fileout', desset.filebase, 'trialindices', desset.trials };
             if strcmpi(computewhat, 'channels')
                 [tmpchanlist opts] = getchansandopts(STUDY, ALLEEG, chanlist, desset.dataset, g);
@@ -214,6 +223,7 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
                 end;
                 std_spec(ALLEEG(desset.dataset), 'components', chanlist{desset.dataset(1)}, addopts{:}, g.specparams{:});
             end;
+            if ~isempty(g.cell), break; end;
         end;
         if isfield(curstruct, 'specdata')
             curstruct = rmfield(curstruct, 'specdata');
@@ -241,7 +251,7 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
             for index = 1:length(STUDY.design(g.design).cell)
                 desset = STUDY.design(g.design).cell(index);
                 if strcmpi(computewhat, 'channels')
-                    filename = [ desset.filebase '.daterpim'];
+                     filename = [ desset.filebase '.daterpim'];
                 else filename = [ desset.filebase '.icaerpim'];
                 end;
                 [guimode, g.erpimparams] = std_filecheck(filename, g.erpimparams, guimode, { 'fileout' 'recompute', 'channels', 'components', 'trialindices'});
@@ -263,7 +273,10 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
         % compute ERPimages
         % -----------------
         for index = 1:length(STUDY.design(g.design).cell)
-            desset = STUDY.design(g.design).cell(index);
+            if ~isempty(g.cell)
+                 desset = STUDY.design(g.design).cell(g.cell);
+            else desset = STUDY.design(g.design).cell(index);
+            end;
             addopts = { 'recompute', g.recompute, 'fileout', desset.filebase, 'trialindices', desset.trials };
             if strcmpi(computewhat, 'channels')
                 [tmpchanlist opts] = getchansandopts(STUDY, ALLEEG, chanlist, desset.dataset, g);
@@ -274,6 +287,7 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
                 end;
                 std_erpimage(ALLEEG(desset.dataset), 'components', chanlist{desset.dataset(1)}, addopts{:}, tmpparams{:});
             end;
+            if ~isempty(g.cell), break; end;
         end;
         if isfield(curstruct, 'erpimdata')
             curstruct = rmfield(curstruct, 'erpimdata');
@@ -367,7 +381,10 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
         end;
         tmpparams = { tmpparams{:} 'recompute' g.recompute };
         for index = 1:length(STUDY.design(g.design).cell)
-            desset = STUDY.design(g.design).cell(index);
+            if ~isempty(g.cell)
+                 desset = STUDY.design(g.design).cell(g.cell);
+            else desset = STUDY.design(g.design).cell(index);
+            end;
             if strcmpi(computewhat, 'channels')
                 [tmpchanlist opts] = getchansandopts(STUDY, ALLEEG, chanlist, desset.dataset, g);
                 std_ersp(ALLEEG(desset.dataset), 'channels', tmpchanlist, 'type', type, 'fileout', desset.filebase, 'trialindices', desset.trials, opts{:}, tmpparams{:});
@@ -377,6 +394,7 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
                 end;
                 std_ersp(ALLEEG(desset.dataset), 'components', chanlist{desset.dataset(1)}, 'type', type, 'fileout', desset.filebase, 'trialindices', desset.trials, tmpparams{:});
             end;
+            if ~isempty(g.cell), break; end;
         end;
         if isfield(curstruct, 'erspdata')
             curstruct = rmfield(curstruct, 'erspdata');
