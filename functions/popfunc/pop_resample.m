@@ -110,6 +110,7 @@ else usesigproc = 0;
 end;
 
 fprintf('resampling data %3.4f Hz\n', EEG.srate*p/q);
+eeglab_options;
 for index1 = 1:size(EEG.data,1)
     fprintf('%d ', index1);	
     sigtmp = reshape(EEG.data(index1,:, :), oldpnts, EEG.trials);
@@ -124,7 +125,10 @@ for index1 = 1:size(EEG.data,1)
         if size(tmpres,1) == 1, EEG.pnts  = size(tmpres,2);
         else                    EEG.pnts  = size(tmpres,1);
         end;
-        tmpeeglab = zeros(EEG.nbchan, EEG.pnts, EEG.trials);
+        if option_memmapdata == 1
+             tmpeeglab = mmo([], [EEG.nbchan, EEG.pnts, EEG.trials]);
+        else tmpeeglab = zeros(EEG.nbchan, EEG.pnts, EEG.trials);
+        end;
     else
         for ind = 1:length(bounds)-1
             tmpres(indices(ind):indices(ind+1)-1,:) = myresample( double( sigtmp(bounds(ind):bounds(ind+1)-1,:) ), p, q, usesigproc );
