@@ -23,7 +23,7 @@
 %  'topotime'    - [float] plot scalp map at specific time. A time range may
 %                  also be provide and the ERSP will be averaged over the
 %                  given time range. Requires 'topofreq' below to be set.
-%  'topofreqs'   - [float] plot scalp map at specific frequencies. As above
+%  'topofreq'    - [float] plot scalp map at specific frequencies. As above
 %                  a frequency range may also be provided.
 %  'subbaseline' - ['on'|'off'] subtract the same baseline across conditions 
 %                  for ERSP (not ITC). When datasets with different conditions
