@@ -171,6 +171,7 @@ elseif hicutoff > 0 & locutoff> 0 & revfilt==0               %  bandpass filter
     [bh,ah]=ellip(N,rp,rs,wn,'high');
     %help fvtool
     %b=conv(bh,bl);a=conv(ah,al);
+    clear a b;
     b.bl=bl;b.bh=bh; a.al=al;a.ah=ah;
     
 elseif hicutoff > 0 & locutoff> 0 & revfilt==1               %  bandreject filter
@@ -189,6 +190,7 @@ elseif hicutoff > 0 & locutoff> 0 & revfilt==1               %  bandreject filte
     [N,wn] = ellipord(wp,ws,rp,rs);
     fprintf('HPF has cutoff of %1.1f Hz, transition bandwidth of %1.1f Hz and its order is %1.1f\n',hicutoff, trans_bw,N);
     [bh,ah]=ellip(N,rp,rs,wn,'high');
+    clear a b;
     b.bl=bl;b.bh=bh; a.al=al;a.ah=ah;
     
 else       
