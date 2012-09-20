@@ -149,6 +149,6 @@ classdef mmo
     end
     
     methods (Static)
-        function str  = getnewfilename; str = sprintf('memapdata_%.9d%.9d.fdt', round(rand(1)*10^9), round(rand(1)*10^9)); end;
+        function str  = getnewfilename; str = fullfile(gettempfolder(true), sprintf('memapdata_%.9d%.9d.fdt', round(rand(1)*10^9), round(rand(1)*10^9))); end;
     end
 end
