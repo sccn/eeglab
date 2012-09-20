@@ -103,7 +103,7 @@ if isempty(varargin) && ~isempty(STUDY)
     paramstruct         = STUDY.etc.statistics;
     eeglabStatvalues    = { 'param' 'perm' 'bootstrap' };
     fieldtripStatvalues = { 'analytic' 'montecarlo' };
-    mCorrectList        = { 'no' 'benferoni' 'holms' 'fdr' 'max' 'cluster' };
+    mCorrectList        = { 'no' 'bonferoni' 'holms' 'fdr' 'max' 'cluster' };
     condstats   = fastif(strcmpi(paramstruct.condstats, 'on'), 1, 0);
     groupstats  = fastif(strcmpi(paramstruct.groupstats,'on'), 1, 0);
     statmode    = fastif(strcmpi(paramstruct.singletrials,'on'), 1, 0);
@@ -330,4 +330,4 @@ if ~isfield(paramstruct.fieldtrip, 'mcorrect'),   paramstruct.fieldtrip.mcorrect
 if ~isfield(paramstruct.fieldtrip, 'clusterparam'),   paramstruct.fieldtrip.clusterparam = '''clusterstatistic'',''maxsum'''; end;
 if ~isfield(paramstruct.fieldtrip, 'channelneighbor'),   paramstruct.fieldtrip.channelneighbor = []; end;
 if ~isfield(paramstruct.fieldtrip, 'channelneighborparam'),   paramstruct.fieldtrip.channelneighborparam = '''method'',''triangulation'''; end;
-
+if strcmpi(paramstruct.eeglab.mcorrect, 'benferoni'), paramstruct.eeglab.mcorrect = 'bonferoni'; end;
