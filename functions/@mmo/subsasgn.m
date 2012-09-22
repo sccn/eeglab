@@ -44,6 +44,16 @@ if obj.transposed, ss = transposeindices(obj, ss); end;
 % ---------------------
 ncopies = checkworkspace(obj);
 if ncopies < 2
+    if isempty(inputname(1))
+        vers = version;
+        if ~isempty(findstr('R2012b', vers)) || ~isempty(findstr('R2012a', vers)) || ~isempty(findstr('R2011b', vers)) 
+            % the problem with Matlab 2012a/2011b is that if the object called is
+            % in a field of a structure (empty inputname), the evaluation
+            % in the caller of the object variable is empty in 2012a. A bug
+            % repport has been submitted to Matlab - Arno
+            ncopies = ncopies + 1;
+        end;
+    end;
     s = evalin('caller', 'whos');
     for index = 1:length(s)
         if strcmpi(s(index).class, 'struct') || strcmpi(s(index).class, 'cell')
@@ -116,7 +126,6 @@ if isempty(val)
         inc = ceil(250000/prod(alllen(1:end-1))); % 1Mb block
         for index = 1:inc:length(ss2.subs{end})
             ss3.subs{end} = ss2.subs{end}(index:min(index+inc, length(ss2.subs{end})));
-            dsfsd
             tmpdata = subsref(tmpMMO.Data.x, ss3);
             fwrite(fid, tmpdata, 'float');
         end;
