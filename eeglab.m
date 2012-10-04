@@ -242,13 +242,17 @@ if ~iseeglabdeployed2
         warning('off', 'MATLAB:dispatcher:nameConflict');
         addpath( signalpath );
     else
+        warning('off', 'MATLAB:rmpath:DirNotFound');
         if ~isempty(findstr( signalpath, tmppath)) rmpath( signalpath ); end;
         if ~isempty(findstr( optimpath, path)),       rmpath(optimpath); end;
+        warning('on', 'MATLAB:rmpath:DirNotFound');
     end;
     if ~license('test','optim_toolbox') && ~ismatlab
         addpath( optimpath );
     else
+        warning('off', 'MATLAB:rmpath:DirNotFound');
         if ~isempty(findstr( optimpath, tmppath)) rmpath( optimpath ); end;
+        warning('on', 'MATLAB:rmpath:DirNotFound');
     end;
     
     myaddpath( eeglabpath, 'eegplugin_dipfit', 'plugins');
