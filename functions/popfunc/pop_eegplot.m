@@ -73,7 +73,7 @@
 % 03-07-02 added srate argument to eegplot call -ad
 % 03-27-02 added event latency recalculation for continuous data -ad
 
-function [com] = pop_eegplot( EEG, icacomp, superpose, reject, topcommand, varargin);
+function com = pop_eegplot( EEG, icacomp, superpose, reject, varargin)
 
 com = '';
 if nargin < 1
@@ -149,7 +149,7 @@ else % case of a single trial (continuous data)
          %      'EEG = eeg_checkset(EEG);' ];
     eeglab_options; % changed from eeglaboptions 3/30/02 -sm
     if reject == 0, command = [];
-    else, 
+    else
         command = ...
             [  '[EEGTMP LASTCOM] = eeg_eegrej(EEG,eegplot2event(TMPREJ, -1));' ...
                'if ~isempty(LASTCOM),' ... 
