@@ -258,7 +258,7 @@ if ~isempty(winrej)
             end;
         end;
         
-        command = 'EEG = pop_select(EEG, ''nopoint'', TMPREJ(:,1:2)); [ALLEEG EEG CURRENTSET LASTCOM] = pop_newset(ALLEEG, EEG, CURRENTSET, ''study'', ~isempty(STUDY)+0); eeglab redraw';
+        command = '[EEG LASTCOM] = pop_select(EEG, ''nopoint'', TMPREJ(:,1:2)); eegh(LASTCOM); [ALLEEG EEG CURRENTSET LASTCOM] = pop_newset(ALLEEG, EEG, CURRENTSET, ''study'', ~isempty(STUDY)+0); eegh(LASTCOM); eeglab redraw';
         if nargin < 2 || strcmpi(opt.eegplot, 'on')
             eegplot(NEWEEG.data(opt.elecrange,:), 'srate', NEWEEG.srate, 'winrej', winrej, 'command', command, 'events', EEG.event, 'winlength', 50);
             disp('Green is overlap');
