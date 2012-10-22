@@ -132,19 +132,21 @@ try
                 for iCell = 1:length(STUDY.design(des).cell)
                     if ~warningshown
                         if exist( [ STUDY.design(des).cell(iCell).filebase '.icaersp' ] )
+                            warning('off', 'MATLAB:load:variableNotFound');
                             tmp = load('-mat', [ STUDY.design(des).cell(iCell).filebase '.icaersp' ], 'trialindices');
+                            warning('on', 'MATLAB:load:variableNotFound');
                             if ~isfield(tmp, 'trialindices')
                                 warningshown = 1;
-                                warndlg( [ 'Warning: ICA ERSP or ITC data files corrupted in STUDY design ' int2str(des) 10 ...
-                                             '(and maybe other designs). These files must be recomputed.' ], 'Important EEGLAB warning', 'nonmodal');
+                                warndlg( [ 'Warning: ICA ERSP or ITC data files computed with old version of EEGLAB for design ' int2str(des) 10 ...
+                                             '(and maybe other designs). These files may be corrupted and must be recomputed.' ], 'Important EEGLAB warning', 'nonmodal');
                             end;
                         end;
                         if warningshown == 0 && exist( [ STUDY.design(des).cell(iCell).filebase '.icaitc' ] )
                             tmp = load('-mat', [ STUDY.design(des).cell(iCell).filebase '.icaersp' ], 'trialindices');
                             if ~isfield(tmp, 'trialindices')
                                 warningshown = 1;
-                                warndlg( [ 'Warning: ICA ERSP or ITC data files corrupted in STUDY design ' int2str(des) 10 ...
-                                             '(and maybe other designs). These files must be recomputed.' ], 'Important EEGLAB warning', 'modal');
+                                warndlg( [ 'Warning: ICA ERSP or ITC data files computed with old version of EEGLAB for design ' int2str(des) 10 ...
+                                             '(and maybe other designs). These files may be corrupted and must be recomputed.' ], 'Important EEGLAB warning', 'modal');
                             end;
                         end;
                     end;
