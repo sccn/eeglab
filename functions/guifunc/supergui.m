@@ -99,6 +99,15 @@ if nargin < 2
 	return;
 end;
 
+% get version and
+% set additional parameters
+% -------------------------
+[v vv] = version;
+if datenum(vv) > 734907
+     addParamFont = { 'fontsize' 12 };
+else addParamFont = { };
+end;
+
 warning off MATLAB:hg:uicontrol:ParameterValuesMustBeValid
 
 % decoding input and backward compatibility
@@ -281,7 +290,7 @@ for counter = 1:maxcount
                 allhandlers{counter} = arg_guipanel(panel, currentelem{:});
             else
                 allhandlers{counter} = uicontrol(g.fig, 'unit', 'normalized', 'position', ...
-                    [posx posy+addvert width height*heightfactor].*s+q, currentelem{:});
+                    [posx posy+addvert width height*heightfactor].*s+q, currentelem{:}, addParamFont{:});
                 
                 % this simply compute a factor so that all uicontrol will be visible
                 % ------------------------------------------------------------------
