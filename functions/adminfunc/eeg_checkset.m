@@ -548,7 +548,7 @@ for inddataset = 1:length(ALLEEG)
                             end;
                             if ~isequal(TMPEEG.event, EEG.event)
                                 EEG = TMPEEG;
-                                disp('Event resorted by increasing latencies. Some event indices have changed.');
+                                disp('Event resorted by increasing latencies.');
                             end;
                         catch,
                             disp('eeg_checkset: problem when attempting to resort event latencies.');
