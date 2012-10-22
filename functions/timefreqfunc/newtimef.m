@@ -30,7 +30,7 @@
 %
 % Example to compare two condition (channel 1 EEG versus ALLEEG(2)):
 %        >> [ersp,itc,powbase,times,freqs,erspboot,itcboot] = ...
-%                  newtimef({EEG.data(1,:,:) ALLEEG(2).data(1,:,:)}, ,,,
+%                  newtimef({EEG.data(1,:,:) ALLEEG(2).data(1,:,:)},
 %                       EEG.pnts, [EEG.xmin EEG.xmax]*1000, EEG.srate, cycles);
 % NOTE:
 %        >> timef details  % presents more detailed argument information

@@ -171,7 +171,9 @@
 %       'titlefont' = Title font size                              {8}
 %
 % Outputs: 
-%       coh         = Matrix (nfreqs,timesout) of coherence magnitudes 
+%       coh         = Matrix (nfreqs,timesout) of coherence magnitudes. Not
+%                     that for continuous data, the function is returning the
+%                     cross-spectrum.
 %       mcoh        = Vector of mean baseline coherence at each frequency
 %                     see 'baseline' parameter.
 %       timesout    = Vector of output latencies (window centers) (ms).
