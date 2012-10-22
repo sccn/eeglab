@@ -253,8 +253,8 @@ try
         end
     end
     % ----------------------------------------------------
-catch errorVar
-    warnmsg = strcat(errorVar,'your dataset contains amica information, but the amica plugin is not installed.  Continuing and ignoring amica information.');
+catch
+    warnmsg = strcat('your dataset contains amica information, but the amica plugin is not installed.  Continuing and ignoring amica information.');
     warning(warnmsg)
 end
 
