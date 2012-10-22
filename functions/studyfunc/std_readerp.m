@@ -294,9 +294,10 @@ if ~isempty(opt.channels)
         end;
     end;
     setinds  = structdat(allinds(1)).setinds;
-    if ~isempty(opt.subject) && strcmpi(opt.singletrials,'off')
+    if ~isempty(opt.subject)
         if strcmpi(opt.singletrials, 'on')
-            datavals = std_selsubject(datavals, opt.subject, setinds, { STUDY.design(opt.design).cell.case }, 3); 
+            warndlg2('Warning: when single trial option is set (statistics), subject cannot be selected');
+            datavals = {};
         else
             datavals = std_selsubject(datavals, opt.subject, setinds, { STUDY.design(opt.design).cell.case }, 2); 
         end;
