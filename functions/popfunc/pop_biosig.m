@@ -216,8 +216,7 @@ if strcmpi(memmapdata, 'off')
 
     if ~isempty(blockrange)
         newblockrange    = blockrange;
-        newblockrange(2) = min(newblockrange(2), dat.NRec);
-        newblockrange    = newblockrange*dat.Dur;    
+%         newblockrange    = newblockrange*dat.Dur;    
         DAT=sread(dat, newblockrange(2)-newblockrange(1), newblockrange(1));
     else 
         DAT=sread(dat, Inf);% this isn't transposed in original!!!!!!!!
