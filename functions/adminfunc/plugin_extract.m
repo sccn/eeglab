@@ -10,28 +10,32 @@ global PLUGINLIST;
 %    error([ '"unzip" could not be found. Instal unzip and make sure' 10 'it is accessible under Matlab by adding the program to' 10 'the path and typing "!unzip"' ]);
 %end;
 
-try
-    disp('Retreiving URL with plugins...');
-    if strcmpi(type, 'import')
-        [tmp status] = urlread('http://sccn.ucsd.edu/wiki/Plugin_list_import');
-    else
-        [tmp status] = urlread('http://sccn.ucsd.edu/wiki/Plugin_list_process');
+if 0
+    try
+        disp('Retreiving URL with plugins...');
+        if strcmpi(type, 'import')
+            [tmp status] = urlread('http://sccn.ucsd.edu/wiki/Plugin_list_import');
+        else
+            [tmp status] = urlread('http://sccn.ucsd.edu/wiki/Plugin_list_process');
+        end;
+    catch,
+        error('Cannot connect to the Internet to retrieve plugin list');
     end;
-catch,
-    error('Cannot connect to the Internet to retrieve plugin list');
-end;
-if status == 0
-    error('Cannot connect to the Internet to retrieve plugin list');
-end;    
+    if status == 0
+        error('Cannot connect to the Internet to retrieve plugin list');
+    end;
     
-% parse the web page
-% ------------------
-try
-    plugin = parseTable(tmp);
-catch
-    disp('PLUGIN PAGE PARSING ERROR, USING BACKUP PLUGIN LIST');
-    [tmp status] = urlread('http://sccn.ucsd.edu/wiki/Plugin_backup_list');
-    plugin = parseTable(tmp);
+    % parse the web page
+    % ------------------
+    try
+        plugin = parseTable(tmp);
+    catch
+        disp('PLUGIN PAGE PARSING ERROR, USING BACKUP PLUGIN LIST');
+        [tmp status] = urlread('http://sccn.ucsd.edu/wiki/Plugin_backup_list');
+        plugin = parseTable(tmp);
+    end;
+else
+    plugin = [];
 end;
 
 % find correspondance with plugin list
@@ -57,8 +61,38 @@ end;
 
 % put all the installed plugins first
 % -----------------------------------
-[tmp reorder] = sort([plugin.installed], 'descend');
-plugin = plugin(reorder);
+if ~isempty(plugin)
+    [tmp reorder] = sort([plugin.installed], 'descend');
+    plugin = plugin(reorder);
+else
+    plugin(1).currentversion  = PLUGINLIST(1).version;
+    plugin(1).foldername      = PLUGINLIST(1).foldername;
+    plugin(1).installed       = 1;
+    plugin(1).installorupdate = 1;
+    plugin(1).description     = 'test';
+    plugin(1).webdoc          = 'test';
+    plugin(1).name            = 'test';
+    plugin(1).version         = '1';
+end;
+
+% Not installed
+% *************
+% Do not install
+% Download and install
+
+% Installed
+% *********
+% Keep the plugin
+% Update plugin (it new version available)
+% Remove permanently
+% Deactivate (reversible)
+
+% Installed and deactivated
+% *************************
+% Keep deactivated
+% Reactivate plygin
+% Update plugin and reactivate (it new version available)
+% Remove permanently
 
 % name
 % description
@@ -67,40 +101,128 @@ plugin = plugin(reorder);
 % ignore
 % update available
 %% create GUI
-uilist =  { { 'style' 'text' 'string' 'I' 'tag' 'install' } ...
-            { 'style' 'text' 'string' 'I' 'tag' 'problemo' } ...
-            { 'style' 'text' 'string' 'I' 'tag' 'ignore' } ...
-            { 'style' 'text' 'string' 'Plugin' 'fontweight' 'bold' } ...
-            { 'style' 'text' 'string' 'Vers.' 'tag' 'versheader' 'fontweight' 'bold' } ...
-            { 'style' 'text' 'string' 'Vers.' 'tag' 'verweb'     'fontweight' 'bold' } ...
-            { 'style' 'text' 'string' 'Description' 'fontweight' 'bold' } {}};
-lineGeom = [ 0.25 0.25 0.4 0.8 0.4 0.4 3 0.35 ];
-geom = { lineGeom };
-geomvert = [2];
-maxchar = 60;
-for iRow = 1:length(plugin)
-    % text for description
-    description = plugin(iRow).description;
-    if length(description) > maxchar+2
-         description = [ description(1:min(maxchar,length(description))) '...' ];
-    end;
-    
-    enableWebDoc = fastif(isempty(plugin(iRow).webdoc), 'off', 'on');
 
-    userdata = '';
-    if plugin(iRow).installed && plugin(iRow).installorupdate, userdata = 'colortored'; end;
-    uilist = { uilist{:}, ...
-              { 'style' 'checkbox' 'string' '' 'value' plugin(iRow).installed 'enable' 'off' }, ...
-              { 'style' 'checkbox' 'string' '' 'enable' fastif(plugin(iRow).installed, 'on', 'off') }, ...
-              { 'style' 'checkbox' 'string' '' 'enable' fastif(plugin(iRow).installorupdate, 'on', 'off') }, ...}, ...
-              { 'style' 'text' 'string' plugin(iRow).name }, ...
-              { 'style' 'text' 'string' plugin(iRow).currentversion 'tag' 'currentversion' }, ...
-              { 'style' 'text' 'string' plugin(iRow).version 'tag' 'latestversion' 'userdata' userdata }, ...
-              { 'style' 'text' 'string' description }, ...
-              { 'style' 'pushbutton' 'string' 'Doc' 'enable' enableWebDoc 'callback' [ 'web(''' plugin(iRow).webdoc ''');' ] } };              
-    geom = { geom{:}, lineGeom };
-    geomvert = [ geomvert 1];
+% ------------------
+% plugins to install
+% ------------------
+maxchar = 60;
+uilist =  { {} { 'style' 'text' 'string' 'Plutings available for install on the internet' 'fontweight' 'bold' 'fontsize' 14 } };
+uilist =  { uilist{:} { 'style' 'text' 'string' 'I' 'tag' 'install' } { } { } ...
+            { 'style' 'text' 'string' 'Plugin' 'fontweight' 'bold' } ...
+            { 'style' 'text' 'string' 'Version'    'tag' 'verweb'     'fontweight' 'bold' } ...
+            { 'style' 'text' 'string' 'Description' 'fontweight' 'bold' } {}};
+lineGeom = [ 0.25 0.25 0.4 0.8 0.8 3 0.35 ];
+geom = { [1 5.5] lineGeom };
+geomvert = [1 1];
+for iRow = 1:length(plugin)
+    if ~plugin(iRow).installed 
+        % text for description
+        description = plugin(iRow).description;
+        if length(description) > maxchar+2
+             description = [ description(1:min(maxchar,length(description))) '...' ];
+        end;
+
+        enableWebDoc = fastif(isempty(plugin(iRow).webdoc), 'off', 'on');
+
+        userdata = '';
+        if plugin(iRow).installed && plugin(iRow).installorupdate, userdata = 'colortored'; end;
+        uilist = { uilist{:}, ...
+                  { 'style' 'checkbox' 'string' '' 'value' plugin(iRow).installed 'enable' 'off' }, ...
+                  { 'style' 'checkbox' 'string' '' 'enable' fastif(plugin(iRow).installed, 'on', 'off') }, ...
+                  { 'style' 'checkbox' 'string' '' 'enable' fastif(plugin(iRow).installorupdate, 'on', 'off') }, ...}, ...
+                  { 'style' 'text' 'string' plugin(iRow).name }, ...
+                  { 'style' 'text' 'string' plugin(iRow).version 'tag' 'latestversion' 'userdata' userdata }, ...
+                  { 'style' 'text' 'string' description }, ...
+                  { 'style' 'pushbutton' 'string' 'Doc' 'enable' enableWebDoc 'callback' [ 'web(''' plugin(iRow).webdoc ''');' ] } };              
+        geom = { geom{:}, lineGeom };
+        geomvert = [ geomvert 1];
+    end;
 end;
+
+% ----------------
+% installd plugins
+% ----------------
+uilist =  { uilist{:} {} {} { 'style' 'text' 'string' 'Installed plutings' 'fontweight' 'bold' 'fontsize' 14 } };
+uilist =  { uilist{:} { 'style' 'text' 'string' 'I' 'tag' 'update' } ...
+            { 'style' 'text' 'string' 'I' 'tag' 'deactivate' } ...
+            { 'style' 'text' 'string' 'I' 'tag' 'remove1' } ...
+            { 'style' 'text' 'string' 'Plugin' 'fontweight' 'bold' } ...
+            { 'style' 'text' 'string' 'Version' 'tag' 'verweb'     'fontweight' 'bold' } ...
+            { 'style' 'text' 'string' 'Description' 'fontweight' 'bold' } {}};
+
+geom = { geom{:} 1 [1 5.5] lineGeom };
+geomvert = [geomvert 1 1 1];
+for iRow = 1:length(plugin)
+    if plugin(iRow).installed 
+        % text for description
+        description = plugin(iRow).description;
+        if length(description) > maxchar+2
+             description = [ description(1:min(maxchar,length(description))) '...' ];
+        end;
+
+        enableWebDoc = fastif(isempty(plugin(iRow).webdoc), 'off', 'on');
+
+        userdata = '';
+        if plugin(iRow).installorupdate, 
+            textnew = [ 'New version ' plugin(iRow).version ' available. Click update to install.' ];
+            userdata = 'colortored'; 
+        else
+            textnew = description;
+        end;
+        uilist = { uilist{:}, ...
+                  { 'style' 'checkbox' 'string' '' 'value' plugin(iRow).installed 'enable' 'off' }, ...
+                  { 'style' 'checkbox' 'string' '' 'enable' fastif(plugin(iRow).installed, 'on', 'off') }, ...
+                  { 'style' 'checkbox' 'string' '' 'enable' fastif(plugin(iRow).installorupdate, 'on', 'off') }, ...}, ...
+                  { 'style' 'text' 'string' plugin(iRow).name }, ...
+                  { 'style' 'text' 'string' plugin(iRow).currentversion 'tag' 'latestversion'}, ...
+                  { 'style' 'text' 'string' textnew 'userdata' userdata }, ...
+                  { 'style' 'pushbutton' 'string' 'Doc' 'enable' enableWebDoc 'callback' [ 'web(''' plugin(iRow).webdoc ''');' ] } };              
+        geom = { geom{:}, lineGeom };
+        geomvert = [ geomvert 1];
+    end;
+end;
+
+% -------------------
+% deactivated plugins
+% -------------------
+uilist =  { uilist{:} {} {} { 'style' 'text' 'string' 'Temporarilly deactivated plutings' 'fontweight' 'bold' 'fontsize' 14 } };
+uilist =  { uilist{:} ...
+            { 'style' 'text' 'string' 'I' 'tag' 'reactivate1' } ...
+            { 'style' 'text' 'string' 'I' 'tag' 'reactivate2' } ...
+            { 'style' 'text' 'string' 'I' 'tag' 'remove2' } ...
+            { 'style' 'text' 'string' 'Plugin' 'fontweight' 'bold' } ...
+            { 'style' 'text' 'string' 'Version' 'tag' 'verweb'     'fontweight' 'bold' } ...
+            { 'style' 'text' 'string' 'Description' 'fontweight' 'bold' } {}};
+
+geom = { geom{:} 1 [1 5.5] lineGeom };
+geomvert = [geomvert 1 1 1];
+for iRow = 1:length(plugin)
+    if plugin(iRow).installed 
+        % text for description
+        description = plugin(iRow).description;
+        if length(description) > maxchar+2
+             description = [ description(1:min(maxchar,length(description))) '...' ];
+        end;
+        enableWebDoc = fastif(isempty(plugin(iRow).webdoc), 'off', 'on');
+
+        if plugin(iRow).installorupdate, 
+            textnew = [ 'New version ' plugin(iRow).version ' available. Click reinstall to download and install.' ];
+        else
+            textnew = description;
+        end;
+        uilist = { uilist{:}, ...
+                  { 'style' 'checkbox' 'string' '' 'value' plugin(iRow).installed 'enable' 'off' }, ...
+                  { 'style' 'checkbox' 'string' '' 'enable' fastif(plugin(iRow).installed, 'on', 'off') }, ...
+                  { 'style' 'checkbox' 'string' '' 'enable' fastif(plugin(iRow).installorupdate, 'on', 'off') }, ...}, ...
+                  { 'style' 'text' 'string' plugin(iRow).name }, ...
+                  { 'style' 'text' 'string' plugin(iRow).currentversion 'tag' 'latestversion'}, ...
+                  { 'style' 'text' 'string' textnew }, ...
+                  { 'style' 'pushbutton' 'string' 'Doc' 'enable' enableWebDoc 'callback' [ 'web(''' plugin(iRow).webdoc ''');' ] } };              
+        geom = { geom{:}, lineGeom };
+        geomvert = [ geomvert 1];
+    end;
+end;
+
 
 % evalStr = [ 'tmpobj = findobj(gcf, ''tag'', ''version'');' ...
 %             'set(tmpobj, ''Foregroundcolor'', [1 0 0]);' ...
@@ -113,13 +235,17 @@ end;
 %             'xlim([0 10]);' ...
 %             'set(tmp, ''rotation'', 90, ''fontweight'', ''bold'');' ];
 
-evalStr = [ 'tmpobj = findobj(gcf, ''userdata'', ''colortored'');' ...
+%            'putverticaltext(gcf, ''install''        , ''Install'');' ...
+%             'putverticaltext(gcf, ''ignore'',  { ''Install or'' ''Update'' });' ...
+evalStr = [ 'putverticaltext(gcf, ''remove1''        , ''Remove'');' ...
+            'putverticaltext(gcf, ''remove2''        , ''Remove'');' ...
+            'putverticaltext(gcf, ''update''         , ''Update'');' ...
+            'putverticaltext(gcf, ''deactivate''     , ''Deactivate'');' ...
+            'putverticaltext(gcf, ''install''        , ''Install'');' ...
+            'putverticaltext(gcf, ''reactivate1''    , ''Install new'');' ...
+            'putverticaltext(gcf, ''reactivate2''    , ''Reactivate'');' ...
+            'tmpobj = findobj(gcf, ''userdata'', ''colortored'');' ...
             'set(tmpobj, ''Foregroundcolor'', [1 0 0]);' ...
-            'putverticaltext(gcf, ''versheader''     , {''Installed'' ''version'' });' ...
-            'putverticaltext(gcf, ''verweb''         , {''Latest''    ''version'' });' ...
-            'putverticaltext(gcf, ''problemo''     , ''Remove'');' ...
-            'putverticaltext(gcf, ''install'', ''Installed'');' ...
-            'putverticaltext(gcf, ''ignore'',  { ''Install or'' ''Update'' });' ...
             ];
 
 res = inputgui('uilist', uilist, 'geometry', geom, 'geomvert', geomvert, 'eval', evalStr);
