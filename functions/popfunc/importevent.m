@@ -230,7 +230,7 @@ function array = load_file_or_array( varname, skipline, delim );
         
     else 
          if ~iscell(varname)
-             array = mattocell(varname, ones(1, size(array,1)), ones(1, size(array,2)));
+             array = mattocell(varname);
          else
              array = varname;
          end;
