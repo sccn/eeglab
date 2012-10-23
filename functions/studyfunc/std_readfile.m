@@ -166,7 +166,7 @@ for fInd = 1:length(opt.dataindices) % usually only one value
     fieldsToRead = [ dataType int2str(opt.dataindices(fInd)) fieldExt ]; 
     try,
         warning('off', 'MATLAB:load:variableNotFound');
-        fileData = load( '-mat', [ fileBaseName{fInd} fileExt ], 'parameters', 'freqs', 'times', 'events', 'chanlocsforinterp', fieldsToRead );
+        fileData = load( '-mat', [ fileBaseName{fInd} fileExt ], 'parameters', 'freqs', 'datatype', 'times', 'events', 'chanlocsforinterp', fieldsToRead );
         warning('on', 'MATLAB:load:variableNotFound');
     catch
         error( [ 'Cannot read file ''' fileBaseName{fInd} fileExt '''' ]);
@@ -217,6 +217,13 @@ for fInd = 1:length(opt.dataindices) % usually only one value
         % average single trials if necessary
         % ----------------------------------
         if strcmpi(opt.measure, 'erp') || strcmpi(opt.measure, 'spec')
+            if strcmpi(opt.measure, 'spec') && isfield(fileData, 'datatype') && strcmpi(fileData.datatype, 'SPECTRUM')
+                fieldData = 10.^(fieldData/10); % convert power back to non-log value
+                                                % note that for SPECTRUMABS
+                                                % datatype, the data is not converted
+                disp('Warning: grand average spectrum curve have changed as they are now averaged')
+                disp('         before taking the log. The log representation is now only used for display')
+            end;
             if strcmpi(opt.singletrials, 'off') && size(fieldData,1) > 1 && size(fieldData,2) > 1
                 fieldData = mean(fieldData,2);
             end;
