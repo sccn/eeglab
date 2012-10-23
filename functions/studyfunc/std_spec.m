@@ -239,9 +239,14 @@ end;
 
 % compute spectral decomposition
 if strcmpi(g.specmode, 'psd')
-    [X, f] = spectopo(X, size(X,2), EEG(1).srate, 'plot', 'off', 'boundaries', boundaries, 'nfft', g.nfft, spec_opt{:});
     if strcmpi(g.savetrials, 'on')
-        disp('WARNING: Cannot save trials using ''psd'' specmode option');
+        for iTrial = 1:size(X,3)
+            [XX(:,:,iTrial), f] = spectopo(X(:,:,iTrial), size(X,2), EEG(1).srate, 'plot', 'off', 'boundaries', boundaries, 'nfft', g.nfft, spec_opt{:});
+        end;
+        X = 10.^(XX/10);
+    else
+        [X, f] = spectopo(X, size(X,2), EEG(1).srate, 'plot', 'off', 'boundaries', boundaries, 'nfft', g.nfft, spec_opt{:});
+        X = 10.^(X/10);
     end;
 elseif strcmpi(g.specmode, 'pmtm')
     if all([ EEG.trials ] == 1) && ~isempty(boundaries), disp('Warning: multitaper does not take into account boundaries in continuous data'); end;
@@ -257,7 +262,7 @@ elseif strcmpi(g.specmode, 'pmtm')
         end;
     end;
     fprintf('\n');
-    X     = 10*log10(X2);  
+    %X     = 10*log10(X2);  
     if strcmpi(g.savetrials, 'off')
         X = mean(X,3);
     end;
@@ -286,7 +291,8 @@ else % fft mode
     f     = linspace(0, EEG(1).srate/2, floor(size(tmp,2)/2));
     f     = f(2:end); % remove DC (match the output of PSD)
     tmp   = tmp(:,2:floor(size(tmp,2)/2),:);
-    X     = 10*log10(abs(tmp).^2);    
+    X     = tmp.*conj(tmp);
+    %X     = 10*log10(abs(tmp).^2); % take the log then average PSD
     if strcmpi(g.savetrials, 'off')
         X = mean(X,3);  
     end;
@@ -332,7 +338,7 @@ function savetofile(filename, f, X, prefix, comps, params, labels, dataFiles, da
     end;
     allspec.freqs      = f;
     allspec.parameters = params;
-    allspec.datatype   = 'SPECTRUM';
+    allspec.datatype   = 'SPECTRUMABS';
     allspec.datafiles   = dataFiles;
     allspec.datatrials  = dataTrials;
     allspec.average_spec = mean(X,1);
