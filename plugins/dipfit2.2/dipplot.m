@@ -274,10 +274,10 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
             g.mri = load('-mat', g.mri);
             g.mri = g.mri.mri;
         catch,
-            disp('Failed to read Matlab file. Attempt to read MRI file using function read_fcdc_mri');
+            disp('Failed to read Matlab file. Attempt to read MRI file using function ft_read_mri');
             try,
                 warning off;
-                g.mri = read_fcdc_mri(g.mri);
+                g.mri = ft_read_mri(g.mri);
                 %g.mri.anatomy(find(g.mri.anatomy > 255)) = 255;
                 %g.mri.anatomy = uint8(g.mri.anatomy);
                 g.mri.anatomy = round(gammacorrection( g.mri.anatomy, 0.8));
@@ -288,7 +288,7 @@ function [outsources, XX, YY, ZZ, XO, YO, ZO] = dipplot( sourcesori, varargin )
                 % misplaced
                 warning on;
             catch,
-                error('Cannot load file using read_fcdc_mri');
+                error('Cannot load file using ft_read_mri');
             end;
         end;
     end;
