@@ -116,7 +116,6 @@ if strcmpi(opt.plotsubjects, 'on')
     opt.plotgroups      = 'apart';
     opt.plotconditions  = 'apart';
 end;
-if strcmpi(opt.datatype, 'spec') || strcmpi(opt.unitx, 'HZ'), opt.log = 'on'; else opt.log = 'off'; end;
 if strcmpi(opt.plotconditions, 'together') &&  ~isempty(opt.groupstats), opt.plotconditions = 'apart'; end;
 if strcmpi(opt.plotgroups,     'together') &&  ~isempty(opt.condstats) , opt.plotgroups     = 'apart'; end;
 if isstr(opt.legend), opt.legend = {}; end;
@@ -346,12 +345,6 @@ for c = 1:ncplot
                 plotopt = { plotopt{:} 'legend' opt.legend };
             end;
             
-            if strcmpi(opt.log, 'on')
-                tmpdata = 10*log10(tmpdata);
-                if exist('tmpstd', 'var')
-                    tmpstd = 10*log10(tmpstd);
-                end;
-            end;
             if strcmpi(opt.plottopo, 'on') && length(opt.chanlocs) > 1
                 metaplottopo(tmpdata, 'chanlocs', opt.chanlocs, 'plotfunc', 'plotcurve', ...
                     'plotargs', { plotopt{:} }, 'datapos', [2 3], 'title', opt.titles{c,g});
