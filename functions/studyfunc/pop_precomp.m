@@ -173,7 +173,7 @@ if ~isstr(varargin{1}) %intial settings
     end
     if ~isfield(os, 'interpolate_on'), os.interpolate_on = 0; end;
     if ~isfield(os, 'scalp_on'),    os.scalp_on = 0; end;
-    if ~isfield(os, 'compallersp'), os.compallersp = 0; end;
+    if ~isfield(os, 'compallersp'), os.compallersp = 1; end;
     warnflag = 0;
     
     % rm_ica option is on
