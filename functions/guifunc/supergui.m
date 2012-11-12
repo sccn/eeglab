@@ -40,17 +40,19 @@
 %   'title'    - optional figure title
 %   'userdata' - optional userdata input for the figure
 %   'inseth'   - horizontal space between elements. Default is 2% 
-%                of window size.
+%               of window size.
 %   'insetv'   - vertical space between elements. Default is 2% 
-%                of window height.
+%               of window height.
 %   'spacing'  - [horiz vert] spacing in normalized units. Default 
 %   'spacingtype' - ['absolute'|'proportional'] abolute means that the 
-%                spacing values are fixed. Proportional means that they
-%                depend on the number of element in a line.
+%               spacing values are fixed. Proportional means that they
+%               depend on the number of element in a line.
 %   'minwidth' - [integer] minimal width in pixels. Default is none.
 %   'screenpos' - [x y] position of the right top corner of the graphic
-%                interface. 'center' may also be used to center the GUI on
-%                the screen.
+%               interface. 'center' may also be used to center the GUI on
+%               the screen.
+%   'adjustbuttonwidth' - ['on'|'off'] adjust button width in the GUI.
+%               Default is 'off'.
 %
 % Hint:
 %    use 'print -mfile filemane' to save a matlab file of the figure.
@@ -124,6 +126,7 @@ g = finputcheck(options, { 'geomhoriz' 'cell'   []      {};
                            'uilist'    'cell'   []      {};
                            'title'     'string' []      '';
                            'userdata'  ''       []      [];
+                           'adjustbuttonwidth' 'string' {} { 'on' 'off' };
                            'geomvert'  'real'   []      [];
                            'screenpos' { 'real' 'string' } [] [];
                            'horizontalalignment'  'string'   { 'left','right','center' } 'left';
@@ -317,10 +320,11 @@ for counter = 1:maxcount
                 set( allhandlers{counter}, 'units', 'normalized');			
             end;
 
-            if ~strcmp(style, 'edit') & ~strcmp(style, 'pushbutton')
+            if ~strcmp(style, 'edit') && (~strcmp(style, 'pushbutton') || strcmpi(g.adjustbuttonwidth, 'on'))
                 %tmp = curext(3)/curpos(3);
                 %if tmp > 3*factmultx && factmultx > 0, adsfasd; end;
                 factmultx = max(factmultx, curext(3)/curpos(3));
+                if strcmp(style, 'pushbutton'), factmultx = factmultx*1.1; end;
             end;
             if  ~strcmp(style, 'listbox')
                 factmulty = max(factmulty, curext(4)/curpos(4));
