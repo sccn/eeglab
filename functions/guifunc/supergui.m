@@ -126,7 +126,7 @@ g = finputcheck(options, { 'geomhoriz' 'cell'   []      {};
                            'uilist'    'cell'   []      {};
                            'title'     'string' []      '';
                            'userdata'  ''       []      [];
-                           'adjustbuttonwidth' 'string' {} { 'on' 'off' };
+                           'adjustbuttonwidth' 'string' { 'on' 'off' } 'off';
                            'geomvert'  'real'   []      [];
                            'screenpos' { 'real' 'string' } [] [];
                            'horizontalalignment'  'string'   { 'left','right','center' } 'left';
