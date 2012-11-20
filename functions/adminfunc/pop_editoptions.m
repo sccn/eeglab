@@ -159,7 +159,7 @@ if nargin < 2
                            'warndlg2(strvcat(''This option may only be modified when at most one dataset is stored in memory.''));' ];
             
         elseif strcmpi(opt(index).varname, 'option_memmapdata')
-            cb_nomodif = [ 'if get(gcbo, ''value''), warndlg2(strvcat(''Matlab memory is unstable, use at your own risk'')); end;' ];
+            cb_nomodif = [ 'if get(gcbo, ''value''), warndlg2(strvcat(''Matlab memory is beta, use at your own risk'')); end;' ];
             
         else
             cb_nomodif = '';
