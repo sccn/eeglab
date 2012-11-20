@@ -151,17 +151,19 @@ end;
 % -----------------------------
 if icacomp == 1
 	fprintf('Computing joint probability for channels...\n');
+    tmpdata = eeg_getdatact(EEG);
     if isempty(EEG.stats.jpE)
-		[ EEG.stats.jpE rejE ] = jointprob( EEG.data, locthresh, EEG.stats.jpE, 1); 
+		[ EEG.stats.jpE rejE ] = jointprob( tmpdata, locthresh, EEG.stats.jpE, 1); 
 	end;
-	[ tmp rejEtmp ] = jointprob( EEG.data(elecrange,:,:), locthresh, EEG.stats.jpE(elecrange,:), 1); 
+	[ tmp rejEtmp ] = jointprob( tmpdata(elecrange,:,:), locthresh, EEG.stats.jpE(elecrange,:), 1); 
     rejE    = zeros(EEG.nbchan, size(rejEtmp,2));
 	rejE(elecrange,:) = rejEtmp;
 	
 	fprintf('Computing all-channel probability...\n');
-	tmpdata = permute(EEG.data, [3 1 2]);
-	tmpdata = reshape(tmpdata, size(tmpdata,1), size(tmpdata,2)*size(tmpdata,3));
-	[ EEG.stats.jp rej ] = jointprob( tmpdata, globthresh, EEG.stats.jp, 1); 
+	tmpdata2 = permute(tmpdata, [3 1 2]);
+	tmpdata2 = reshape(tmpdata2, size(tmpdata2,1), size(tmpdata2,2)*size(tmpdata2,3));
+	[ EEG.stats.jp rej ] = jointprob( tmpdata2, globthresh, EEG.stats.jp, 1); 
+    clear tmpdata2;
 else
   tmpdata = eeg_getica(EEG);
 	fprintf('Computing joint probability for components...\n');
@@ -192,7 +194,7 @@ if calldisp
 		eeg_rejmacro; % script macro for generating command and old rejection arrays
 
 	    if icacomp == 1
-	        eegplot( EEG.data(elecrange,:,:), 'srate', ...
+	        eegplot( tmpdata(elecrange,:,:), 'srate', ...
 		      EEG.srate, 'limits', [EEG.xmin EEG.xmax]*1000 , 'command', command, eegplotoptions{:}); 
 	    else
 	        eegplot( tmpdata(elecrange,:,:), 'srate', ...
@@ -201,7 +203,7 @@ if calldisp
     else % REJECTRIALS -------------------------
 	  	if icacomp	== 1 
 			[ rej, rejE, n, locthresh, globthresh] = ... 
-				rejstatepoch( EEG.data(elecrange,:,:), EEG.stats.jpE(elecrange,:), 'global', 'on', 'rejglob', EEG.stats.jp, ...
+				rejstatepoch( tmpdata(elecrange,:,:), EEG.stats.jpE(elecrange,:), 'global', 'on', 'rejglob', EEG.stats.jp, ...
 						'threshold', locthresh, 'thresholdg', globthresh, 'normalize', 'off'  );
 		else 
 			[ rej, rejE, n, locthresh, globthresh] = ... 
