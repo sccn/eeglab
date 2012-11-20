@@ -16,11 +16,11 @@ function res = ctranspose(obj,useconj);
     res.dimensions = [ obj.dimensions(2) obj.dimensions(1) ];
     res.dataFile = newFileName;
     tmpMMO1 = memmapfile(obj.dataFile, 'writable', obj.writable, 'format', { 'single' obj.dimensions 'x' });
-    tmpMMO2 = memmapfile(res.dataFile, 'writable', res.writable, 'format', { 'single' res.dimensions 'x' });
+    tmpMMO2 = memmapfile(res.dataFile, 'writable',         true, 'format', { 'single' res.dimensions 'x' });
     
     % copy the data
     % -------------
-    if length(obj.dimensions) == 1 || obj.dimensions(1) < obj.dimensions(2)
+    if length(obj.dimensions) == 1 || obj.dimensions(1) > obj.dimensions(2)
         for index = 1:size(obj,2)
             s.type = '()';
             s.subs = { ':' index };
