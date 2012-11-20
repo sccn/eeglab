@@ -165,7 +165,7 @@ if icacomp == 1
 	[ EEG.stats.jp rej ] = jointprob( tmpdata2, globthresh, EEG.stats.jp, 1); 
     clear tmpdata2;
 else
-  tmpdata = eeg_getica(EEG);
+    tmpdata = eeg_getica(EEG);
 	fprintf('Computing joint probability for components...\n');
     if isempty(EEG.stats.icajpE)
 		[ EEG.stats.icajpE rejE ] = jointprob( tmpdata, locthresh, EEG.stats.icajpE, 1); 

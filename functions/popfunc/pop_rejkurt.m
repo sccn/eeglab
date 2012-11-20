@@ -150,17 +150,18 @@ end;
 % -----------------------------
 if icacomp == 1
 	fprintf('Computing kurtosis for channels...\n');
+    tmpdata = eeg_getdatact(EEG);
     if isempty(EEG.stats.kurtE )
-		[ EEG.stats.kurtE rejE ] = rejkurt( EEG.data, locthresh, EEG.stats.kurtE, 1); 
+		[ EEG.stats.kurtE rejE ] = rejkurt( tmpdata, locthresh, EEG.stats.kurtE, 1); 
 	end;
-	[ tmp rejEtmp ] = rejkurt( EEG.data(elecrange, :,:), locthresh, EEG.stats.kurtE(elecrange, :), 1); 
+	[ tmp rejEtmp ] = rejkurt( tmpdata(elecrange, :,:), locthresh, EEG.stats.kurtE(elecrange, :), 1); 
     rejE    = zeros(EEG.nbchan, size(rejEtmp,2));
 	rejE(elecrange,:) = rejEtmp;
 	
 	fprintf('Computing all-channel kurtosis...\n');
-	tmpdata = permute(EEG.data, [3 1 2]);
-	tmpdata = reshape(tmpdata, size(tmpdata,1), size(tmpdata,2)*size(tmpdata,3));
-	[ EEG.stats.kurt rej ] = rejkurt( tmpdata, globthresh, EEG.stats.kurt, 1); 
+	tmpdata2 = permute(tmpdata, [3 1 2]);
+	tmpdata2 = reshape(tmpdata2, size(tmpdata2,1), size(tmpdata2,2)*size(tmpdata2,3));
+	[ EEG.stats.kurt rej ] = rejkurt( tmpdata2, globthresh, EEG.stats.kurt, 1); 
 else
 	fprintf('Computing joint probability for components...\n');
     % test if ICA was computed
@@ -193,7 +194,7 @@ if calldisp
 		eeg_rejmacro; % script macro for generating command and old rejection arrays
 
 	    if icacomp == 1
-	        eegplot( EEG.data(elecrange,:,:), 'srate', ...
+	        eegplot( tmpdata(elecrange,:,:), 'srate', ...
 		      EEG.srate, 'limits', [EEG.xmin EEG.xmax]*1000 , 'command', command, eegplotoptions{:}); 
 	    else
 	        eegplot( icaacttmp(elecrange,:,:), 'srate', ...
@@ -202,7 +203,7 @@ if calldisp
     else % REJECTRIALS -------------------------
 	  	if icacomp	== 1 
 			[ rej, rejE, n, locthresh, globthresh] = ... 
-				rejstatepoch( EEG.data, EEG.stats.kurtE(elecrange,:), 'global', 'on', 'rejglob', EEG.stats.kurt, ...
+				rejstatepoch( tmpdata, EEG.stats.kurtE(elecrange,:), 'global', 'on', 'rejglob', EEG.stats.kurt, ...
 						'threshold', locthresh, 'thresholdg', globthresh, 'normalize', 'off'  );
 		else 
 			[ rej, rejE, n, locthresh, globthresh] = ... 
