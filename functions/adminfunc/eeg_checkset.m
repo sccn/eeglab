@@ -1197,7 +1197,9 @@ for inddataset = 1:length(ALLEEG)
     
     % EEG.times (only for epoched datasets)
     % ---------
-    EEG.times = linspace(EEG.xmin*1000, EEG.xmax*1000, EEG.pnts);
+    if ~isfield(EEG, 'times') || isempty(EEG.times)
+        EEG.times = linspace(EEG.xmin*1000, EEG.xmax*1000, EEG.pnts);
+    end;
     
     if ~isfield(EEG, 'history')    EEG.history    = ''; res = com; end;
     if ~isfield(EEG, 'splinefile') EEG.splinefile = ''; res = com; end;
