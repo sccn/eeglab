@@ -168,7 +168,8 @@ fprintf('resampling finished\n');
 
 EEG.setname = [EEG.setname ' resampled'];
 EEG.pnts    = size(EEG.data,2);
-EEG.xmax = EEG.xmin + (EEG.pnts-1)/EEG.srate; % cko: recompute xmax, since we may have removed a few of the trailing samples
+EEG.xmax    = EEG.xmin + (EEG.pnts-1)/EEG.srate; % cko: recompute xmax, since we may have removed a few of the trailing samples
+EEG.times   = linspace(EEG.xmin*1000, EEG.xmax*1000, EEG.pnts);
 
 command = sprintf('EEG = pop_resample( %s, %d);', inputname(1), freq);
 return;
