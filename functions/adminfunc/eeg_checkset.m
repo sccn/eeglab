@@ -1197,9 +1197,7 @@ for inddataset = 1:length(ALLEEG)
     
     % EEG.times (only for epoched datasets)
     % ---------
-    if (EEG.trials > 1)
-        EEG.times = linspace(EEG.xmin*1000, EEG.xmax*1000, EEG.pnts);
-    end;
+    EEG.times = linspace(EEG.xmin*1000, EEG.xmax*1000, EEG.pnts);
     
     if ~isfield(EEG, 'history')    EEG.history    = ''; res = com; end;
     if ~isfield(EEG, 'splinefile') EEG.splinefile = ''; res = com; end;
@@ -1236,8 +1234,8 @@ for inddataset = 1:length(ALLEEG)
             EEG.reject = setfield(EEG.reject, elecfield, zeros(nbchan, length(getfield(EEG.reject, name)))); res = com;
         end;
     end;
-    if ~isfield(EEG.reject, 'rejglobal')        EEG.reject.rejglobal = []; res = com; end;
-    if ~isfield(EEG.reject, 'rejglobalE')        EEG.reject.rejglobalE = []; res = com; end;
+    if ~isfield(EEG.reject, 'rejglobal')        EEG.reject.rejglobal  = []; res = com; end;
+    if ~isfield(EEG.reject, 'rejglobalE')       EEG.reject.rejglobalE = []; res = com; end;
     
     % default colors for rejection
     % ----------------------------
