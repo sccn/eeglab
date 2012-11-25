@@ -1197,7 +1197,7 @@ for inddataset = 1:length(ALLEEG)
     
     % EEG.times (only for epoched datasets)
     % ---------
-    if ~isfield(EEG, 'times') || isempty(EEG.times)
+    if ~isfield(EEG, 'times') || isempty(EEG.times) || length(EEG.times) ~= EEG.pnts
         EEG.times = linspace(EEG.xmin*1000, EEG.xmax*1000, EEG.pnts);
     end;
     
