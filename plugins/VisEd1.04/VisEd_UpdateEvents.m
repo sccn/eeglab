@@ -4,8 +4,9 @@ if isfield(g, 'eventupdate');
     for i=1:length(g.eventupdate);
         if strcmp(g.eventupdate(i).proc, 'new');
             eventindex=length(EEG.event)+1;
-            EEG.event(eventindex).latency=g.eventupdate(i).latency;
-            EEG.event(eventindex).type=g.eventupdate(i).type;
+            EEG.event(eventindex).latency = g.eventupdate(i).latency;
+            EEG.event(eventindex).type    = g.eventupdate(i).type;
+            EEG.event(eventindex).chan    = g.eventupdate(i).chan;
             if ndims(EEG.data)==3;
                 EEG.event(eventindex).epoch=g.eventupdate(i).epoch;
             end
@@ -102,7 +103,7 @@ if isfield(g.eloc_file, 'badchan');
 end
 
 
-eeglab redraw
+%eeglab redraw
 
 clear EEGTMP tmpcom;
 

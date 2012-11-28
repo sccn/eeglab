@@ -1,6 +1,6 @@
 % pop_fig_EditEvent() - Set parameters for editing events from the eegplot figure window.
 %
-% Usage: 
+% Usage:
 %   >>  g = pop_fig_EditEvent(data, g, Latency, EventType, EventIndex, Proc);
 %
 % Inputs:
@@ -20,10 +20,10 @@
 % the string in the "Event tupe" edit box will be the "type" of the new
 % event (note that while the "Event editing procedure" popup menu is
 % present in this UI it is only populated by "New"). If the "Toggle bad
-% channel status" check box is selected the bad channel status of the 
-% channel identified by the label in the "Channel selection" popup menu 
+% channel status" check box is selected the bad channel status of the
+% channel identified by the label in the "Channel selection" popup menu
 % will alternate (this alternation affects the EEG.chanlocs.badchan field
-% by setting it to 0 or 1). 
+% by setting it to 0 or 1).
 %
 % If there are events close to the time point of the button press the user
 % is given the option of selecting among existing events (within +/-20
@@ -36,7 +36,7 @@
 
 %
 % See also:
-%   EEGLAB, eegplot, VisEd 
+%   EEGLAB, eegplot, VisEd
 
 % Copyright (C) <2008>  <James Desjardins> Brock University
 %
@@ -60,16 +60,16 @@ function [g,com]=pop_fig_EditEvent(g, Latency, EventType, EventIndex, Proc)
 % the command output is a hidden output that does not have to
 % be described in the header
 com = ''; % this initialization ensure that the function will return something
-          % if the user press the cancel button            
-          % display help if not enough arguments
+% if the user press the cancel button
+% display help if not enough arguments
 % ------------------------------------
 
 if nargin < 1
-	help pop_sig_EditEvent;
-	return;
-end;	
+    help pop_sig_EditEvent;
+    return;
+end;
 
-
+EventChan = '';
 if nargin < 5
     
     ProcCell={'New', 'Delete'};
@@ -86,7 +86,7 @@ if nargin < 5
         if ~isempty(g.quick_evtmk);
             results = {1 g.quick_evtmk 1 0 {''}};
         else
-        
+            
             % pop up window
             % -------------
             
@@ -110,17 +110,17 @@ if nargin < 5
                 {'Style', 'checkbox', 'tag', 'MarkBadChanCheck', 'string', 'Toggle bad channel status:', 'value', 0, ...
                 'callback', 'set(findobj(''tag'', ''EditEventCheck''), ''value'', 0);' }, ...
                 ...7
-                {'Style', 'text', 'string', 'Channels selection:'}, ...
+                {'Style', 'text', 'string', 'Channels selection:' }, ...
                 {'Style', 'pushbutton', 'string', '...', 'tag', 'ChanLabelButton',...
-                'callback', ['[ChanLabelIndex,ChanLabelStr,ChanLabelCell]=pop_chansel({g.eloc_file.labels});' ...
-                'set(findobj(gcbf, ''tag'', ''ChanLabelEdit''), ''string'', vararg2str(ChanLabelCell))']}, ...
+                'callback', ['tmpchan = get(gcbf, ''userdata''); [ChanLabelIndex,ChanLabelStr,ChanLabelCell]=pop_chansel({tmpchan.labels});' ...
+                'set(findobj(gcbf, ''tag'', ''ChanLabelEdit''), ''string'', vararg2str(ChanLabelCell)); clear tmpchan ChanLabelIndex,ChanLabelStr,ChanLabelCell;']}, ...
                 ...8
                 {'Style', 'edit', 'string', {g.eloc_file(g.eventedit.ChanIndex).labels} ,'tag', 'ChanLabelEdit'}, ...
                 }, ...
-                'pophelp(''pop_fig_EditEvent'');', 'event edit -- pop_fig_EditEvent()');%, [], 'return');
+                'pophelp(''pop_fig_EditEvent'');', 'event edit -- pop_fig_EditEvent()', g.eloc_file);%, [], 'return');
             %close;
             if isempty(results);return;end
-    
+            
         end
         
         if results{1}==1;
@@ -130,17 +130,23 @@ if nargin < 5
             EventType  = results{2};
             EventIndex = 0;
         end
-        if results{4}==1;
+        
+        % get channel string
+        ChanLabelStr=results{5};
+        if iscell(ChanLabelStr);
+            g.eventedit.ChanLabelCell=ChanLabelStr;
+            EventChan = ChanLabelStr{1};
+        else
+            EventChan = ChanLabelStr;
+            g.eventedit.ChanLabelCell=eval(['{' ChanLabelStr '}']);
+        end
+        
+        % toggle bad channel
+        if results{4}==1
             if ~isfield(g.eloc_file, 'badchan');
                 for i=1:length(g.eloc_file);
                     g.eloc_file(i).badchan=0;
                 end
-            end
-            ChanLabelStr=results{5};
-            if iscell(ChanLabelStr);
-                g.eventedit.ChanLabelCell=ChanLabelStr;
-            else
-                g.eventedit.ChanLabelCell=eval(['{' ChanLabelStr '}']);
             end
             for i=1:length(g.eventedit.ChanLabelCell);
                 g.eventedit.ChanIndex=strmatch(g.eventedit.ChanLabelCell{i},{g.eloc_file.labels},'exact');
@@ -163,12 +169,12 @@ if nargin < 5
         end
         tmpSort=sortrows(tmpInd,1);
         clear tmpInd
-
+        
         for i=1:length(tmpSort(:,1));
             tmp.event(i)=g.eventedit.SelEventStruct(tmpSort(i,2));
         end
         clear tmpSort
-
+        
         if strcmp(g.quick_evtrm,'on');
             results = {'' 2 1};
             Proc       = ProcCell{results{2}};
@@ -182,8 +188,8 @@ if nargin < 5
                 EventIndex = tmp.event(results{3}).index;
             end
         else
-
-        
+            
+            
             % pop up window
             % -------------
             if nargin < 5
@@ -210,9 +216,9 @@ if nargin < 5
                     {}, ...
                     }, ...
                     'pophelp(''pop_fig_EditEvent'');', 'event edit -- pop_fig_EditEvent()' ...
-                    ); ...
-                    if isempty(results);return;end
+                    );
                 
+                if isempty(results);return;end
                 Proc       = ProcCell{results{2}};
                 
                 if strcmp(Proc,'New');
@@ -227,8 +233,8 @@ if nargin < 5
             end
         end
     end
-
-
+    
+    
 end
 
 
@@ -239,6 +245,6 @@ com = sprintf('g = pop_fig_EditEvent(%s, %s, %s, %s, %s);', inputname(1), vararg
 
 % call function "FFTStandard" on raw data.
 % ---------------------------------------------------
-g=fig_EditEvent(g, Latency, EventType, EventIndex, Proc);
+g=fig_EditEvent(g, Latency, EventType, EventIndex, EventChan, Proc);
 
 return;

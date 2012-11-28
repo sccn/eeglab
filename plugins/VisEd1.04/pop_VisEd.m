@@ -4,15 +4,17 @@
 %   >>  EEG = pop_VisEd( EEG, ChanIndex, EventType);
 %
 % Inputs:
-%   ChanIndex   - EEG channels to display in eegplot figure window while editing events and identifying bad channels.
-%   EventType   - Event types to display in eegplot figure window while editing events and identifying bad channels.
+%   ChanIndex   - [integer] EEG channels to display in eegplot figure window 
+%                 while editing events and identifying bad channels.
+%   EventType   - [string or cell array] Event types to display in eegplot 
+%                 figure window while editing events and identifying bad channels.
 % 
 % Optional Inputs:
-%   quick_evtmk - When quick_evtmk is a string the crtl click command
+%   'quick_evtmk' - [string] When quick_evtmk is a string the crtl click command
 %       bypasses the pop_fig_EditEvent GUI and simply adds a new event. The
 %       string entered for the quick_evtmk input is used as the new event type
 %       string. Default quick_evtmk = ''.
-%   quick_evtrm - When quick_evtrm = 'on' the ctrl click command (when
+%   'quick_evtrm' - ['on'|'off'] When quick_evtrm = 'on' the ctrl click command (when
 %       selecting an existing event) removes the event without initiating the
 %       pop_fig_EditEvent GUI. Default quick_evtrm = 'off'.
 %
@@ -21,11 +23,6 @@
 %
 % UI for selecting EEG channels and event types to be displayed in eegplot
 % figure window while editing events and identifying bad channels.
-%
-% Calls function EEG=VisEd(EEG,ChanIndex,EventType);
-%
-% See also:
-%   EEGLAB 
 
 % Copyright (C) <2008>  <James Desjardins> Brock University
 %
@@ -47,7 +44,7 @@
 %
 % 2012 02 19; Optional inputs quick_evtmk and quick_evtrm added.
 
-function [EEG,com]=pop_VisEd(EEG, ChanIndex, EventType)
+function [EEG,com]=pop_VisEd(EEG, ChanIndex, EventType, varargin)
 
 
 % the command output is a hidden output that does not have to
@@ -97,7 +94,7 @@ if nargin < 3
     else eventlist = '';
     end;
     results=inputgui( ...
-    {[1] [1] [4 4 1] [4 4 1] [4 4 1] [1] [1] [1] [1]}, ...
+    {[1] [1] [4 2 1] [4 2 1] [4 2 1] [1] [4 2 1] [4 2 1] }, ...
     {...
         ... %1
         {'Style', 'text', 'string', 'Enter visual editing parameters.', 'FontWeight', 'bold'}, ...
@@ -136,26 +133,39 @@ if nargin < 3
         ... %6
         {}, ...
         ... %7
-        {'Style', 'text', 'string', 'Optional input key/val pairs:.'}, ...
+        {'Style', 'checkbox'    , 'string', 'Use single click to remove event'}, { } {} ...
         ... %8
-        {'Style', 'edit'}, ...
-        ... %9
-        {}, ...
+        {'Style', 'checkbox'    , 'string', 'Use single click to add event of type'}, {'Style', 'edit', 'string', '', 'tag', 'PatIDEventTypeEdit2'} ...
+        {'Style', 'pushbutton', 'string', '...', ... 
+                  'callback', ['tmpevent = EEG.event; [EventTypeIndex,EventTypeStr,EventTypeCell]=pop_chansel(unique({tmpevent.type})); clear tmpevent;' ...
+                  'set(findobj(gcbf, ''tag'', ''PatIDEventTypeEdit2''), ''string'', vararg2str(EventTypeCell))']}, ...
      }, ...
      'pophelp(''pop_VisEd'');', 'Select visual editing parameters -- pop_VisEd()' ...
      );
+%        {'Style', 'checkbox', 'string', 'Use single add event remove event'}, ...
  
      if isempty(results);return;end
      
      DataType=results{1};
      ChanIndex=results{2};
      EventType=results{3};
-     Options=results{4};
+     Options = {};
+     if results{4} == 1
+         Options = { Options{:} 'quick_evtrm' 'on' };
+     end;
+     if results{5} == 1
+         Options = { Options{:} 'quick_evtmk' results{6}(2:end-1) };
+     end;
+     Options = vararg2str(Options);
+else
+    ChanIndex = num2str(ChanIndex);
+    DataType = 1;
+    if isstr(EventType), EventType = [ '''' EventType '''' ]; else EventType = vararg2str(EventType); end;
+    Options = vararg2str(varargin);
 end
 
-
 % return command
-% -------------------------
+% --------------
 if isempty(Options);
     com=sprintf('EEG = pop_VisEd( %s, %d, %s, {%s});', inputname(1), DataType, vararg2str(ChanIndex), EventType);
 else

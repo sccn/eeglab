@@ -44,4 +44,4 @@ VisEd_cmd='[EEG,LASTCOM] = pop_VisEd(EEG);';
 
 % add "Visual edit" submenu to the "Edit" menu.
 %--------------------------------------------------------------------
-uimenu(editmenu, 'label', 'Visually edit events and identify bad channels', 'callback', VisEd_cmd, 'separator', 'on');
+uimenu(editmenu, 'label', 'Edit events & mark bad channels', 'callback', VisEd_cmd, 'userdata', 'startup:off;epoch:off', 'separator', 'on');
