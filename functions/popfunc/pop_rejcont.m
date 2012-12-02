@@ -32,6 +32,9 @@
 %  'precompstruct' - [struct] structure containing precomputed spectrum (see
 %                  Outputs) to be used instead of computing the spectrum.
 %  'verbose'       - ['on'|'off'] display information. Default is 'off'.
+%  'taper'         - ['none'|'hamming'] taper to use before FFT. Default is
+%                    'none' for backward compatibility but 'hamming' is
+%                    recommended.
 %
 % Outputs:
 %   OUTEEG          - output dataset with updated joint probability array
@@ -44,6 +47,10 @@
 %
 % Author: Arnaud Delorme, CERCO, UPS/CNRS, 2009-
 %
+% Example:
+% EEG = pop_rejcont(EEG, 'elecrange',[1:32] ,'freqlimit',[20 40] ,'threshold',...
+%    10,'epochlength',0.5,'contiguous',4,'addlength',0.25, 'taper', 'hamming');
+% 
 % See also: eegthresh()
 
 % Copyright (C) 2009 Arnaud Delorme, CERCO, UPS/CNRS
