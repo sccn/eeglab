@@ -44,5 +44,8 @@ end;
 
 EEG.pnts   = size(EEG.data,2);
 EEG.trials = 1;
+if ~isempty(EEG.event) && isfield(EEG.event, 'epoch')
+    EEG.event = rmfield(EEG.event, 'epoch');
+end;
 
 EEG = eeg_checkset(EEG);
