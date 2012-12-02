@@ -155,7 +155,7 @@ if isempty(opt.precompstruct)
     %[TMPNEWEEG indices] = pop_rejspec(TMPNEWEEG, 1, [1:64], -100, 15, 30, 45, 0, 0);
     %rejepoch = find(indices);
     
-    tmp   = fft(bsxfun(@times, TMPNEWEEG.data, hanning(size(TMPNEWEEG.data,2))'), [], 2);
+    tmp   = fft(bsxfun(@times, TMPNEWEEG.data, hamming(size(TMPNEWEEG.data,2))'), [], 2);
     freqs = linspace(0, TMPNEWEEG.srate/2, size(tmp,2)/2);
     freqspectrum = freqs(2:end); % remove DC (match the output of PSD)
     tmp   = tmp(:,2:size(tmp,2)/2,:);
