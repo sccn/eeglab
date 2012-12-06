@@ -58,7 +58,7 @@
 % dimensions
 % time x freqs x channel_comps x subjects_trials
 
-function [measureData, parameters, measureRange1, measureRange2, events] = std_readfile(fileBaseName, varargin);
+function [measureData, parameters, measureRange1, measureRange2, events, setinfoTrialIndices] = std_readfile(fileBaseName, varargin);
 
 if nargin < 1
     help std_readfile;
@@ -70,6 +70,7 @@ opt = finputcheck(varargin, { 'components'       'integer'  []    [];
                               'singletrials'     'string'   { 'on','off' }  'off';
                               'concatenate'      'string'   { 'on','off' }  'off'; % ERPimage only
                               'channels'         'cell'     []    {};
+                              'setinfoinds'      'integer'  []    [];
                               'measure'          'string'   { 'erpim','ersp','erspboot','erspbase','itc','itcboot','spec','erp','timef' }  'erp';
                               'timelimits'       'real'     []    []; % ERPimage, ERP, ERSP, ITC
                               'triallimits'      'real'     []    []; % ERPimage only
@@ -101,6 +102,10 @@ else
     if strcmpi(dataType, 'chan'), fileExt = [ '.dat' opt.measure ];
     else                          fileExt = [ '.ica' opt.measure ];
     end;
+end;
+if nargin > 5 && strcmpi(opt.singletrials, 'on')
+     indFlag = true;
+else indFlag = false;
 end;
 
 % get fields to read
@@ -152,12 +157,13 @@ if length(opt.dataindices) ~= length(fileBaseName) && ~isempty(opt.dataindices),
 
 % scan datasets
 % -------------
-measureRange1 = [];
-measureRange2 = [];
-measureData   = [];
-parameters    = [];
-events        = {};
-    
+measureRange1  = [];
+measureRange2  = [];
+measureData    = [];
+parameters     = [];
+events         = {};
+setinfoTrialIndices = [];
+
 % read only specific fields
 % -------------------------
 counttrial = 0;
@@ -230,6 +236,10 @@ for fInd = 1:length(opt.dataindices) % usually only one value
             if strcmpi(opt.singletrials, 'off'), measureData = zeros([ sizeFD length(opt.dataindices) ], 'single');
             else                                 measureData = zeros([ sizeFD ], 'single');
             end;
+            if indFlag,
+                setinfoTrialIndices = zeros(1, size(measureData,ndims(measureData)), 'int16'); 
+                if length(opt.setinfoinds) ~= length(opt.dataindices) error('For single trial output, the "setinfoinds" parameter must be set'); end;
+            end;
             nDimData = length(sizeFD);
         end;
         
@@ -242,9 +252,10 @@ for fInd = 1:length(opt.dataindices) % usually only one value
                 else            measureData(:,:,:,fInd) = fieldData;
                 end;
             else
-                if nDimData == 2, measureData(:,counttrial+1:counttrial+size(fieldData,2)) = fieldData;
+                if nDimData == 2, measureData(:,counttrial+1:counttrial+size(fieldData,2))   = fieldData; 
                 else              measureData(:,:,counttrial+1:counttrial+size(fieldData,2)) = fieldData;
                 end;
+                setinfoTrialIndices(counttrial+1:counttrial+size(fieldData,2)) = opt.setinfoinds(fInd);
                 counttrial = counttrial+size(fieldData,2);
             end;
         end;
