@@ -40,16 +40,36 @@ end;
 
 % plot specific subject
 % ---------------------
-for c = 1:size(data,1)
-    for g = 1:size(data,2)
-        for l=length(setinds{c,g}):-1:1
-            if ~strcmpi(subject, allsubjects{setinds{c,g}(l)})
-                if optndims == 2
-                    data{c,g}(:,l) = []; %2-D
-                elseif optndims == 3
-                    data{c,g}(:,:,l) = []; %3-D
-                else
-                    data{c,g}(:,:,:,l) = []; %3-D
+if size(setinds{1},1) > 1 && size(setinds{1},2) > 1 % single trials
+    % possible subject indices
+    selectInds = strmatch(subject, allsubjects);
+    for c = 1:size(data,1)
+        for g = 1:size(data,2)
+            selectCol = [];
+            for ind = 1:length(selectInds)
+                selectCol = [ selectCol find(setinds{c,g}  == selectInds') ];
+            end;
+            if optndims == 2
+                data{c,g} = data{c,g}(:,selectCol); %2-D
+            elseif optndims == 3
+                data{c,g} = data{c,g}(:,:,selectCol); %3-D
+            else
+                data{c,g} = data{c,g}(:,:,:,selectCol); %4-D
+            end;
+        end;
+    end;
+else
+    for c = 1:size(data,1)
+        for g = 1:size(data,2)
+            for l=length(setinds{c,g}):-1:1
+                if ~strcmpi(subject, allsubjects{setinds{c,g}(l)})
+                    if optndims == 2
+                        data{c,g}(:,l) = []; %2-D
+                    elseif optndims == 3
+                        data{c,g}(:,:,l) = []; %3-D
+                    else
+                        data{c,g}(:,:,:,l) = []; %4-D
+                    end;
                 end;
             end;
         end;
