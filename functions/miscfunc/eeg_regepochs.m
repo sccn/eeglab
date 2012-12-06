@@ -22,7 +22,7 @@
 %                    events to use as epoch boundaries. Stated epoch length 
 %                    will be reduced by one data point to avoid overlaps 
 %                    {default: [0 recurrence_interval]}
-%     'rmbase'     - [NaN|latency] remove baseline. NaN does not remove
+%     'rmbase'     - [NaN|latency] remove baseline (s). NaN does not remove
 %                    baseline. 0 remove the pre-0 baseline. To
 %                    remove the full epoch baseline, enter a value
 %                    larger than the upper epoch limit. Default is 0.
@@ -163,9 +163,9 @@ if strcmpi(g.extractepochs, 'on')
                                       setname, 'epochinfo', 'yes');
     % baseline zero the epochs
     % ------------------------
-    if ~isnan(g.rmbase)
+    if ~isnan(g.rmbase) && g.limits(1) < g.rmbase
         fprintf('Removing the pre %3.2f second baseline mean of each epoch.\n', g.rmbase);
-        EEG = pop_rmbase( EEG, [g.limits(1) g.rmbase]);
+        EEG = pop_rmbase( EEG, [g.limits(1) g.rmbase]*1000);
     end
 end;                              
 
