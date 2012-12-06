@@ -170,7 +170,7 @@ else % case of a single trial (continuous data)
             if strcmpi(res, 'Cancel'), return; end;
         end;
     end; 
-    eegplotoptions = { 'winlength', 5, 'events', EEG.event };
+    eegplotoptions = { 'events', EEG.event };
     if ~isempty(EEG.chanlocs) & icacomp
         eegplotoptions = { eegplotoptions{:}  'eloc_file', EEG.chanlocs };
     end;
