@@ -25,7 +25,7 @@
 %
 % Usage with single dataset:
 %        >> [ersp,itc,powbase,times,freqs,erspboot,itcboot] = ...
-%                  newtimef(data, frames, tlimits, srate, cycles,...
+%                  newtimef(data, frames, epochlim, srate, cycles,...
 %                       'key1',value1, 'key2',value2, ... );
 %
 % Example to compare two condition (channel 1 EEG versus ALLEEG(2)):
@@ -42,7 +42,7 @@
 %                     To compare two conditions (data1 versus data2), in place of 
 %                     a single data matrix enter a cell array {data1 data2}
 %       frames      = Frames per trial. Ignored if data are 2-D or 3-D.  {750}
-%       tlimits     = [mintime maxtime] (ms).  Note that these are the time limits 
+%       epochlim    = [mintime maxtime] (ms).  Note that these are the time limits 
 %                     of the data epochs themselves, NOT A SUB-WINDOW TO EXTRACT 
 %                     FROM THE EPOCHS as is the case for pop_newtimef(). {[-1000 2000]}
 %       srate       = data sampling rate (Hz)  {default: read from icadefs.m or 250}
