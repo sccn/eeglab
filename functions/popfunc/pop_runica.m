@@ -270,9 +270,9 @@ elseif length(ALLEEG) > 1 & strcmpi(g.concatcond, 'on')
         ALLEEG(dats{index}) = pop_runica(ALLEEG(dats{index}), 'icatype', g.icatype, ...
             'options', g.options, 'chanind', g.chanind, 'concatenate', 'on');
         for idat = 1:length(dats{index})
-            ALLEEG(dats{index}(idat)).saved = 'off';
+            ALLEEG(dats{index}(idat)).saved = 'no';
             pop_saveset(ALLEEG(dats{index}(idat)), 'savemode', 'resave');
-            ALLEEG(dats{index}(idat)).saved = 'on';
+            ALLEEG(dats{index}(idat)).saved = 'yes';
         end;
     end;
     com = sprintf('%s = pop_runica(%s, %s);', inputname(1),inputname(1), ...
@@ -302,6 +302,7 @@ else
     EEG.icaweights = [];
     EEG.trials = 1;
     EEG.pnts   = size(EEG.data,2);
+    EEG.saved  = 'no';
 end;    
 
 % Store and then remove current EEG ICA weights and sphere
