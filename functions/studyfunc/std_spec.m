@@ -214,15 +214,22 @@ if ~isempty(boundaries) && boundaries(end) ~= size(X,2), boundaries = [boundarie
 oritrials = EEG.trials;
 if ~strcmpi(g.specmode, 'psd')
     if EEG(1).trials == 1 || strcmpi(g.continuous, 'on')
-        EEG.data = X;
-        EEG.trials = size(EEG.data,3);
-        if EEG(1).trials > 1
-            EEG = eeg_epoch2continuous(EEG);
+        TMP = EEG(1);
+        TMP.data = X;
+        TMP.trials = size(TMP.data,3);
+        TMP.pnts   = size(TMP.data,2);
+        TMP.event  = [];
+        for index = 1:length(boundaries)
+            TMP.event(index).type = 'boundary';
+            TMP.event(index).latency = boundaries(index);
         end;
-        EEG = eeg_regepochs(EEG, g.epochrecur, g.epochlim);
-        g.trialindices = { [1:EEG(1).trials] };
+        TMP = eeg_checkset(TMP);
+        if TMP.trials > 1
+            TMP = eeg_epoch2continuous(TMP);
+        end;
+        TMP = eeg_regepochs(TMP, g.epochrecur, g.epochlim);
         disp('Warning: continuous data, extracting 1-second epochs'); 
-        X = EEG.data;
+        X = TMP.data;
     end;
 end;
  
