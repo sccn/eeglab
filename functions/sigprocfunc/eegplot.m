@@ -1042,7 +1042,9 @@ u(22) = uicontrol('Parent',figh, ...
       % ------------------------------
       g.eventlatencies  = [ g.events.latency ]+1;
       if isfield(g.events, 'duration')
-           g.eventlatencyend   = g.eventlatencies + [ g.events.duration ]+1;
+           durations = { g.events.duration };
+           durations(cellfun(@isempty, durations)) = { NaN };
+           g.eventlatencyend   = g.eventlatencies + [durations{:}]+1;
       else g.eventlatencyend   = [];
       end;
       g.plotevent       = 'on';
