@@ -294,8 +294,11 @@ for n1 = 1:nf1
                 des.cell(count).trials    = intersectcell(dattrialselect(datsubj), dattrials1{n1}(datsubj), dattrials2{n2}(datsubj));
                 des.cell(count).value     = { opt.values1{n1} opt.values2{n2} };
                 des.cell(count).case      = subjects{s};
-                if strcmpi(opt.defaultdesign, 'on')
-                     des.cell(count).filebase = fullfile(ALLEEG(datsubj(1)).filepath, ALLEEG(datsubj(1)).filename(1:end-4));
+                defaultFile = fullfile(ALLEEG(datsubj(1)).filepath, ALLEEG(datsubj(1)).filename(1:end-4));
+                dirres1 = dir( [ defaultFile '.dat*' ] );
+                dirres2 = dir( [ defaultFile '.ica*' ] );
+                if strcmpi(opt.defaultdesign, 'on') && (~isempty(dirres1) || ~isempty(dirres2))
+                     des.cell(count).filebase = defaultFile;
                 else
                     if isempty(rmblk(opt.values1{n1})),    txtval = rmblk(opt.values2{n2});
                     elseif isempty(rmblk(opt.values2{n2})) txtval = rmblk(opt.values1{n1});
