@@ -82,6 +82,8 @@
 %               NOT included in this design. Selecting this option will 
 %               remove all the old measure files associated with the previous 
 %               definition of this design. {default: 'off'}  
+%  'filepath' - [string] file path for saving precomputed files. Default is
+%               empty meaning it is in the same folder as the data.
 %  'delfiles' - ['on'|'off'|'limited'] delete data files
 %               associated with the design specified as parameter. 'on'
 %               delete all data files related to the design. 'limited'
@@ -146,12 +148,14 @@ defdes.variable(1).value = {};
 defdes.variable(2).value = {};
 defdes.variable(1).pairing = 'on';
 defdes.variable(2).pairing = 'on';
+defdes.filepath = '';
 defdes.include = {};
 orivarargin = varargin;
 if ~isempty(varargin) && isstruct(varargin{1})
     defdes = varargin{1};
     varargin(1) = [];
 end;
+if isempty(defdes.filepath), defdes.filepath = ''; end;
 opt = finputcheck(varargin,  {'variable1'     'string'    []     defdes.variable(1).label;
                               'variable2'     'string'    []     defdes.variable(2).label;
                               'values1'       {'real','cell' } []     defdes.variable(1).value;
@@ -159,6 +163,7 @@ opt = finputcheck(varargin,  {'variable1'     'string'    []     defdes.variable
                               'pairing1'      'string'    []     defdes.variable(1).pairing;
                               'pairing2'      'string'    []     defdes.variable(2).pairing;
                               'name'          'string'    {}     defdes.name;
+                              'filepath'      'string'    {}     defdes.filepath;
                               'datselect'     'cell'      {}     defdes.include;
                               'dataselect'    'cell'      {}     {};
                               'subjselect'    'cell'      {}     defdes.cases.value;
@@ -256,7 +261,7 @@ for n2 = 1:nf2, [ dats2{n2} dattrials2{n2} ] = std_selectdataset( STUDY, ALLEEG,
 
 % detect files from old format
 % ----------------------------
-if ~strcmpi(opt.defaultdesign, 'forceoff')
+if ~strcmpi(opt.defaultdesign, 'forceoff') && isempty(opt.filepath)
     if strcmpi(opt.defaultdesign, 'off') && designind == 1
         if ~isfield(STUDY.design, 'cell') || ~isfield(STUDY.design(1).cell, 'filebase')
              opt.defaultdesign = 'on';
@@ -297,7 +302,7 @@ for n1 = 1:nf1
                 defaultFile = fullfile(ALLEEG(datsubj(1)).filepath, ALLEEG(datsubj(1)).filename(1:end-4));
                 dirres1 = dir( [ defaultFile '.dat*' ] );
                 dirres2 = dir( [ defaultFile '.ica*' ] );
-                if strcmpi(opt.defaultdesign, 'on') && (~isempty(dirres1) || ~isempty(dirres2))
+                if strcmpi(opt.defaultdesign, 'on') && (~isempty(dirres1) || ~isempty(dirres2)) && isempty(opt.filepath)
                      des.cell(count).filebase = defaultFile;
                 else
                     if isempty(rmblk(opt.values1{n1})),    txtval = rmblk(opt.values2{n2});
@@ -306,8 +311,8 @@ for n1 = 1:nf1
                     end;
                     if ~isempty(txtval),      txtval = [ '_' txtval ]; end;
                     if ~isempty(subjects{s}), txtval = [ '_' rmblk(subjects{s}) txtval ]; end;
-                    des.cell(count).filebase = fullfile(ALLEEG(datsubj(1)).filepath, ...
-                      [ 'design' int2str(designind) txtval ] );
+                    if isempty(opt.filepath), tmpfilepath = ALLEEG(datsubj(1)).filepath; else tmpfilepath = opt.filepath; end;
+                    des.cell(count).filebase = fullfile(tmpfilepath, [ 'design' int2str(designind) txtval ] );
                 end;
                 count = count+1;
             end;
@@ -337,6 +342,7 @@ else
     %allval1 = unique(cellfun(@(x)x{1}, { des.cell.value }, 'uniformoutput', false));
     %allval2 = unique(cellfun(@(x)x{2}, { des.cell.value }, 'uniformoutput', false));
     des.name              = opt.name;
+    des.filepath          = opt.filepath;
     des.variable(1).label = opt.variable1;
     des.variable(2).label = opt.variable2;
     des.variable(1).pairing = opt.pairing1;
@@ -348,7 +354,7 @@ else
     des.cases.value = unique( { des.cell.case });
 end;
 
-fieldorder = { 'name' 'variable' 'cases' 'include' 'cell' };
+fieldorder = { 'name' 'filepath' 'variable' 'cases' 'include' 'cell' };
 des        = orderfields(des, fieldorder);
 try, 
     STUDY.design = orderfields(STUDY.design, fieldorder);
