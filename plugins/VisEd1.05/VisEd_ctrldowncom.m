@@ -65,14 +65,14 @@ clear tmpChanIndex
 
 % Check for event selection (if events already exist in dataset).
 if ~isempty(EEG.event);
-
-    % Check for event selection (within +/-20 points of button press).
+    pntdist=ceil((g.winlength*g.srate)*0.001);
+    % Check for event selection.
     if isfield(g.eventedit, 'SelEventStruct');
         g=rmfield(g.eventedit,'SelEventStruct');
     end
     j=0;
     for i=1:length(g.events);
-        if abs(g.events(i).latency-g.eventedit.PosLat)<20;
+        if abs(g.events(i).latency-g.eventedit.PosLat)<pntdist;
             j=j+1;
             g.eventedit.SelEventStruct(j).index=i;
             g.eventedit.SelEventStruct(j).dist=abs(g.events(i).latency-round(g.tmppos(1,1)+g.eventedit.WinStartPnt));
