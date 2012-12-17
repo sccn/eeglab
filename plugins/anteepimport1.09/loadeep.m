@@ -114,7 +114,7 @@ if r.sample1 > 1
     fprintf('WARNING: event are not imported correctly when selecting a data portion\n');
 end;
 
-if r.sample2
+if ~isempty(r.sample2)
     s2=r.sample2;
 else
     if r.time2
