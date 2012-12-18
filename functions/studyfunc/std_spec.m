@@ -220,6 +220,11 @@ if ~strcmpi(g.specmode, 'psd')
     if EEG(1).trials == 1 || strcmpi(g.continuous, 'on')
         TMP = EEG(1);
         TMP.data = X;
+        TMP.icaweights = [];
+        TMP.icasphere  = [];
+        TMP.icawinv    = [];
+        TMP.icaact     = [];
+        TMP.icachansind = [];
         TMP.trials = size(TMP.data,3);
         TMP.pnts   = size(TMP.data,2);
         TMP.event  = [];
@@ -318,6 +323,7 @@ else % fft mode
     X     = tmp.*conj(tmp);
     if strcmpi(g.logtrials, 'on'),  X = 10*log10(X); end;
     if strcmpi(g.savetrials, 'off'), X = mean(X,3); end;
+    if strcmpi(g.logtrials, 'off'),  X = 10*log10(X); end;
 end;
 
 % Save SPECs in file (all components or channels)
