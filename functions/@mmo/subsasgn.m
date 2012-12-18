@@ -163,6 +163,7 @@ else
             end;
         end;
     else
+        if length(newdim1) == 3 && newdim1(3) == 1, newdim1(end) = []; end;
         if length(ss(1).subs) == 2 && length(newdim1) == 3
             if ~isstr(ss(1).subs{2}) && max(ss(1).subs{2}) > prod(newdim1(2:end))
                 error('Attempt to grow array along ambiguous dimension.');
@@ -195,8 +196,8 @@ else
         tmpdata2 = zeros((dim2(2) - dim1(2))*dim2(1), 1, 'single');
         tmpdata3 = zeros((dim2(3) - dim1(3))*prod(dim2(1:2)), 1, 'single');
         
-        % write new data
-        % --------------
+        % copy new data (copy first array)
+        % -------------
         for index3 = 1:dim1(3)
             if dim1(1) == dim2(1) && dim1(2) == dim2(2)
                 fwrite(fid, tmpMMO.Data.x(:,:,index3), 'float');
@@ -240,8 +241,32 @@ else
         if obj.debug, disp('using same copy'); end;
     end;
     
+    % copy new data
     tmpMMO = memmapfile(obj.dataFile, 'writable', obj.writable, 'format', { 'single' obj.dimensions 'x' });
-    tmpMMO.Data.x = builtin('subsasgn', tmpMMO.Data.x, ss, val);
+    if ~isa(val, 'mmo')
+        tmpMMO.Data.x = builtin('subsasgn', tmpMMO.Data.x, ss, val);
+    else
+        % copy memory mapped array
+        if ndims(val) == 2 && (size(val,1) == 1 || size(val,2) == 1)
+            % vector direct copy
+            ss2.type = '()';
+            ss2.subs = { ':' ':' ':' };
+            tmpMMO.Data.x = builtin('subsasgn', tmpMMO.Data.x, ss, subsref(val,ss2));
+        else
+            ss2.type = '()';
+            ss2.subs = { ':' ':' ':' };
+            ss3 = ss;
+            % array, copy each channel
+            for index1 = 1:size(val,1)
+                ss2(1).subs{1} = index1;
+                if isstr(ss(1).subs{1}) ss3(1).subs{1} = index1;
+                else                    ss3(1).subs{1} = ss(1).subs{1}(index1);
+                end;
+                tmpMMO.Data.x = builtin('subsasgn', tmpMMO.Data.x, ss3, subsref(val,ss2));
+            end;
+        end;
+    end;
+        
     obj = updateWorkspace(obj);
     
 end;
