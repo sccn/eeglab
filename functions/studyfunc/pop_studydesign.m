@@ -445,6 +445,7 @@ elseif isstr(STUDY)
             end;
             if res(1) == 0, return; end;
             set(findobj(fig, 'tag', 'edit_storedir'), 'string', res);
+            pop_studydesign('updatedesign', fig);
             return;
             
         case 'selectdatatrialsadd', % Add button in the GUI above
