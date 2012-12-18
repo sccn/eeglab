@@ -179,11 +179,13 @@ if strcmpi(opt.variable2, 'none'), opt.variable2 = ''; end;
     
 % build command list for history
 % ------------------------------
-listcom = { 'variable1' opt.variable1 'variable2' opt.variable2 'name' opt.name };
+listcom = { 'variable1' opt.variable1 'variable2' opt.variable2 'name' opt.name 'pairing1' opt.pairing1 'pairing2' opt.pairing2 'delfiles' opt.delfiles 'defaultdesign' opt.defaultdesign };
 if ~isempty(opt.values1), listcom = { listcom{:} 'values1' opt.values1 }; end;
 if ~isempty(opt.values2), listcom = { listcom{:} 'values2' opt.values2 }; end;
 if ~isempty(opt.subjselect),  listcom = { listcom{:} 'subjselect'  opt.subjselect }; end;
-if ~isempty(opt.datselect),   listcom = { listcom{:} 'dataselect'  opt.datselect }; end;
+if ~isempty(opt.datselect),   listcom = { listcom{:} 'datselect'  opt.datselect }; end;
+if ~isempty(opt.filepath),    listcom = { listcom{:} 'filepath'  opt.filepath }; end;
+if ~isempty(opt.datselect),   listcom = { listcom{:} 'datselect'  opt.datselect }; end;
     
 % select specific subjects
 % ------------------------
