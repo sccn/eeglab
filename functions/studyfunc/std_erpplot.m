@@ -40,6 +40,8 @@
 %                the subject(s) to plot. Else by default, plot all components 
 %                in the cluster.
 %   'plotsubjects' - ['on'|'off'] When 'on', plot ERP of all subjects.
+%   'noplot'   - ['on'|'off'] When 'on', only return output values. Default
+%                is 'off'.
 %
 % Other optional inputs:
 %   'key','val' - All optional inputs to pop_erpparams() are also accepted here
@@ -142,6 +144,7 @@ options = myrmfield( options, { 'threshold' 'statistics' } ); % for backward com
                                'plotmode'    'string' { 'normal','condensed' }  'normal';
                                'unitx'       'string' { 'ms','Hz' }    'ms';
                                'plotsubjects' 'string' { 'on','off' }  'off';
+                               'noplot'      'string' { 'on','off' }  'off';
                                'subject'     'string'  []              '' }, 'std_erpplot');
 if isstr(opt), error(opt); end;
 
@@ -245,7 +248,8 @@ if ~isempty(opt.channels)
     [pcond pgroup pinter] = std_stat(erpdata, stats);
     if (~isempty(pcond) && length(pcond{1}) == 1) || (~isempty(pgroup) && length(pgroup{1}) == 1), pcond = {}; pgroup = {}; pinter = {}; end; % single subject STUDY                                
     if length(opt.channels) > 5 && ndims(erpdata{1}) < 3, pcond = {}; pgroup = {}; pinter = {}; end; % topo plotting for single subject
-
+    if strcmpi(opt.noplot, 'on') return; end;
+    
     % plot
     % ----
     locs = eeg_mergelocs(ALLEEG.chanlocs);
@@ -300,6 +304,7 @@ else
         end;
         stats.paired = paired;
         [pcond pgroup pinter] = std_stat(erpdata, stats);
+        if strcmpi(opt.noplot, 'on'), return; end;
             
         [alltitles alllegends ] = std_figtitle('threshold', alpha, 'plotsubjects', opt.plotsubjects, 'mcorrect', mcorrect, 'condstat', stats.condstats, 'cond2stat', stats.groupstats, ...
                                  'statistics', method, 'condnames', allconditions, 'cond2names', allgroups, 'clustname', STUDY.cluster(opt.clusters(index)).name, 'compnames', comp_names, ...
