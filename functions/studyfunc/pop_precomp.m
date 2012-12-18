@@ -55,7 +55,7 @@ if ~isstr(varargin{1}) %intial settings
     % callbacks
     % ---------
     erspparams_str     = [ '''cycles'', [3 0.5], ''nfreqs'', 100' ];
-    specparams_str     = '''specmode'', ''fft''';
+    specparams_str     = '''specmode'', ''fft'', ''logtrials'', ''off''';
     erpimageparams_str = '''nlines'', 10,''smoothing'', 10';
     set_ersp       = ['pop_precomp(''setersp'',gcf);']; 
     test_ersp      = ['pop_precomp(''testersp'',gcf);']; 
