@@ -125,6 +125,8 @@ if isempty(varargin) && ~isempty(STUDY)
     cb_help_neighbor = 'pophelp(''ft_prepare_neighbours'');';
     cb_help_cluster  = 'pophelp(''ft_statistics_montecarlo'');';
     cb_textSyntax    = 'try, eval( [ ''{'' get(gcbo, ''string'') ''};'' ]); catch, warndlg2(''Syntax error''); end;';
+    if strcmpi(opt.enablecond , 'off') && condstats  == 1, condstats  = 0; end;
+    if strcmpi(opt.enablegroup, 'off') && groupstats == 1, groupstats = 0; end;
     
     % callback for randomization selection
     % ------------------------------------
@@ -257,12 +259,14 @@ if isempty(varargin) && ~isempty(STUDY)
     if ~strcmpi( res.eeglabmcorrect    , paramstruct.eeglab.mcorrect),     options = { options{:} 'mcorrect' res.eeglabmcorrect }; end;
     if ~isequal( res.fieldtripnaccu    , paramstruct.fieldtrip.naccu),     options = { options{:} 'fieldtripnaccu' res.fieldtripnaccu }; end;
     if ~strcmpi( res.statfieldtrip     , paramstruct.fieldtrip.method),    options = { options{:} 'fieldtripmethod' res.statfieldtrip }; end;
-    if ~isequal( res.fieldtripalpha    , paramstruct.fieldtrip.alpha),     options = { options{:} 'fieldtripalpha' res.fieldtripalpha }; end;
     if ~strcmpi( res.fieldtripmcorrect , paramstruct.fieldtrip.mcorrect),  options = { options{:} 'fieldtripmcorrect' res.fieldtripmcorrect }; end;
     if ~strcmpi( res.clusterstat       , paramstruct.fieldtrip.clusterparam),  options = { options{:} 'fieldtripclusterparam' res.clusterstat }; end;
     if ~strcmpi( res.clusterchan       , paramstruct.fieldtrip.channelneighborparam),  options = { options{:} 'fieldtripchannelneighborparam' res.clusterchan }; end;
-    if ~(isnan(res.eeglabalpha) && isnan(paramstruct.eeglab.alpha)) && ~isequal(res.eeglabalpha, paramstruct.eeglab.alpha) % threshold
+    if ~(isnan(res.eeglabalpha(1)) && isnan(paramstruct.eeglab.alpha(1))) && ~isequal(res.eeglabalpha, paramstruct.eeglab.alpha) % threshold
         options = { options{:} 'alpha' res.eeglabalpha };
+    end;
+    if ~(isnan(res.fieldtripalpha(1)) && isnan(paramstruct.fieldtrip.alpha(1))) && ~isequal(res.fieldtripalpha, paramstruct.fieldtrip.alpha) % threshold
+        options = { options{:} 'fieldtripalpha' res.fieldtripalpha };
     end;
     
     if ~isempty(options)
