@@ -1,4 +1,4 @@
-function obj2 = unitaryopp(f, obj1);
+function obj2 = unitaryopp(f, obj1, varargin);
 
     % make new memory mapped data file (blank)
     % ----------------------------------------
@@ -10,7 +10,7 @@ function obj2 = unitaryopp(f, obj1);
     ss.subs(1:length(obj1.dimensions)-1) = { ':' };
     for index = 1:obj1.dimensions(end)
         ss.subs{length(obj1.dimensions)} = index;
-        tmpdata = f(subsref(data.Data.x, ss));
+        tmpdata = f(subsref(data.Data.x, ss), varargin{:});
         fwrite(fid, tmpdata, 'float');
     end;
     fclose(fid);    
