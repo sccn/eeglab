@@ -63,14 +63,20 @@ end;
 if nargin < 2 & EEG(1).trials > 1
 	% popup window parameters
 	% -----------------------
-    promptstr    = {'Baseline latency range (min_ms max_ms) ([] = whole epoch):',...
-         		   strvcat('Else, baseline points vector (ex:1:56) ([] = whole epoch):', ...
-                           '(overwritten by latency range above).') };
-	inistr     = { [num2str(EEG(1).xmin*1000) ' 0'], '' }; % latency range in ms
-	result       = inputdlg2( promptstr, 'Epoch baseline removal -- pop_rmbase()', ...
-                                  1,  inistr, 'pop_rmbase');
-	size_result  = size( result );
-	if size_result(1) == 0 return; end;
+    defaultbase = [num2str(EEG(1).xmin*1000) ' 0'];
+    if EEG(1).xmin*1000 >= 0
+        defaultbase = '[ ]';
+    end;
+    uilist = { { 'style' 'text' 'string' 'Baseline latency range ([min max] in ms) ([ ] = whole epoch):' } ...
+               { 'style' 'edit' 'string'  defaultbase } ...
+               { 'style' 'text' 'string' 'Or remove baseline points vector (ex:1:56):' } ...
+               { 'style' 'edit' 'string' '' } ...
+               { 'style' 'text' 'string' 'Note: press Cancel if you do not want to remove the baseline' } ...
+               };
+    uigeom = { [3 1] [3 1] [1] };
+    [result usrdat] = inputgui( 'uilist', uilist, 'geometry', uigeom, 'title', 'Baseline removal - pop_rmbase()', 'helpcom', 'pophelp(''pop_rmbase'');'); 
+    if isempty(result), return; end;
+    if ~isempty(usrdat) && isnan(usrdat), return; end;
 
 	% decode parameters
 	% -----------------
