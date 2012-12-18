@@ -225,7 +225,7 @@ elseif strcmpi(mode, 'gui') % GUI mode
     end;
     
     if strcmpi(info, 'from_STUDY_different_from_ALLEEG')
-        text1    = 'Dataset info (condition, group, ...) differs from study info. [set] = Overwrite dataset info.';
+        text1    = 'Dataset info (condition, group, ...) differs from study info. [set] = Overwrite dataset info for each dataset on disk.';
         value_cb = 0;
     else
         text1    = 'Update dataset info - datasets stored on disk will be overwritten (unset = Keep study info separate).';
