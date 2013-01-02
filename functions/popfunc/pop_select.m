@@ -596,11 +596,10 @@ else
     icachans = 1:size(EEG.icasphere,2);
 end;
 
-if ~isempty(EEG.icasphere)
-    EEG.icasphere = EEG.icasphere(:,icachans);
-end;
 if ~isempty(EEG.icawinv)
     EEG.icawinv = EEG.icawinv(icachans,:);
+    EEG.icaweights = pinv(EEG.icawinv);
+    EEG.icasphere  = eye(size(EEG.icaweights,2));
 end;
 if ~isempty(EEG.specicaact)
     if length(g.point) == EEG.pnts
