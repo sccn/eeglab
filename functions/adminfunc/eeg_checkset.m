@@ -1186,7 +1186,7 @@ for inddataset = 1:length(ALLEEG)
     % ------------
     if isfield(EEG.event, 'type')
         tmpevent = EEG.event(1:min(length(EEG.event), 10));
-        if any(cellfun(@isnumeric, { tmpevent.type }));
+        if any(~cellfun(@isnumeric, { tmpevent.type }));
             disp('Warning: converting all event types to strings');
             for ind = 1:length(EEG.event)
                 EEG.event(ind).type = num2str(EEG.event(ind).type);
