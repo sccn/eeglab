@@ -489,8 +489,8 @@ cb_savestudy2  = [ check   '[STUDYTMP ALLEEGTMP LASTCOM] = pop_savestudy(STUDY, 
 cb_clearstudy  =           'LASTCOM = ''STUDY = []; CURRENTSTUDY = 0; ALLEEG = []; EEG=[]; CURRENTSET=[];''; eval(LASTCOM); eegh( LASTCOM ); eeglab redraw;';
 cb_editoptions = [ nocheck 'if isfield(ALLEEG, ''nbchan''), LASTCOM = pop_editoptions(length([ ALLEEG.nbchan ]) >1);' ...
                            'else                            LASTCOM = pop_editoptions(0); end;'                  e_storeall_nh];
-cb_plugin1     = [ 'if plugin_extract(''import'') , close(findobj(''tag'', ''EEGLAB'')); eeglab redraw; end;' ];
-cb_plugin2     = [ 'if plugin_extract(''process''), close(findobj(''tag'', ''EEGLAB'')); eeglab redraw; end;' ];
+cb_plugin1     = [ nocheck 'if plugin_extract(''import'') , close(findobj(''tag'', ''EEGLAB'')); eeglab redraw; end;' e_hist_nh ];
+cb_plugin2     = [ nocheck 'if plugin_extract(''process''), close(findobj(''tag'', ''EEGLAB'')); eeglab redraw; end;' e_hist_nh ];
 
 cb_saveh1      = [ nocheck 'LASTCOM = pop_saveh(EEG.history);' e_hist_nh];
 cb_saveh2      = [ nocheck 'LASTCOM = pop_saveh(ALLCOM);'      e_hist_nh];
@@ -526,6 +526,7 @@ cb_subcomp     = [ checkica   '[EEG LASTCOM] = pop_subcomp(EEG);'  e_newset];
 %cb_chanrej     = [ check      'pop_rejchan(EEG); LASTCOM = '''';'  e_hist];
 cb_chanrej     = [ check      '[EEG tmp1 tmp2 LASTCOM] = pop_rejchan(EEG); clear tmp1 tmp2;'  e_hist];
 cb_autorej     = [ check      '[EEG tmpp LASTCOM] = pop_autorej(EEG); clear tmpp;'  e_hist];
+cb_rejcont     = [ check      '[EEG tmp1 tmp2 LASTCOM] = pop_rejcont(EEG); clear tmp1 tmp2;'  e_hist];
 
 cb_rejmenu1    = [ check      'pop_rejmenu(EEG, 1); LASTCOM = '''';'    e_hist];
 cb_eegplotrej1 = [ check      '[LASTCOM] = pop_eegplot(EEG, 1);'        e_hist];
@@ -692,9 +693,9 @@ if ismatlab
     uimenu( hist_m, 'Label', 'Save session history script'            , 'userdata', ondatastudy, 'CallBack', cb_saveh2);    
     uimenu( hist_m, 'Label', 'Run script'                             , 'userdata', on         , 'CallBack', cb_runsc);    
 
-    %plugin_m = uimenu( file_m,   'Label', 'Manage plugins'            , 'userdata', on); 
-    %uimenu( plugin_m, 'Label', 'Manage data import plugins'           , 'userdata', on         , 'CallBack', cb_plugin1);    
-    %uimenu( plugin_m, 'Label', 'Manage data processing plugins'       , 'userdata', on         , 'CallBack', cb_plugin2);    
+ %   plugin_m = uimenu( file_m,   'Label', 'Manage plugins'            , 'userdata', on); 
+ %   uimenu( plugin_m, 'Label', 'Manage data import plugins'           , 'userdata', on         , 'CallBack', cb_plugin1);    
+ %   uimenu( plugin_m, 'Label', 'Manage data processing plugins'       , 'userdata', on         , 'CallBack', cb_plugin2);    
     
     uimenu( file_m, 'Label', 'Quit'                                   , 'userdata', on     , 'CallBack', cb_quit, 'Separator', 'on');
 
@@ -723,6 +724,7 @@ if ismatlab
     uimenu( tools_m, 'Label', 'Run ICA'                               , 'userdata', ondatastudy, 'CallBack', cb_runica, 'foregroundcolor', 'b', 'Separator', 'on');
     uimenu( tools_m, 'Label', 'Remove components'                     , 'userdata', ondata, 'CallBack', cb_subcomp);
     uimenu( tools_m, 'Label', 'Automatic channel rejection'           , 'userdata', ondata, 'CallBack', cb_chanrej, 'Separator', 'on');
+    uimenu( tools_m, 'Label', 'Automatic continuous rejection'        , 'userdata', ondata, 'CallBack', cb_rejcont);
     uimenu( tools_m, 'Label', 'Automatic epoch rejection'             , 'userdata', onepoch, 'CallBack', cb_autorej);
     rej_m1 = uimenu( tools_m, 'Label', 'Reject data epochs'           , 'userdata', onepoch);
     rej_m2 = uimenu( tools_m, 'Label', 'Reject data using ICA'        , 'userdata', ondata );
@@ -1771,6 +1773,9 @@ else
 	set( g.mainwin12,'String', '- Remove baseline: "Tools > Remove baseline"');
 	set( g.mainwin13,'String', '- Run ICA:    "Tools > Run ICA"');
 end;
+if exist('ALLERP') == 1 && ~isempty(ALLERP)
+    menustatus = { menustatus{:} 'erp_dataset' };
+end;
 
 % enable selected menu items
 % --------------------------
@@ -1795,6 +1800,12 @@ elseif any(strcmp(menustatus, 'multiple_datasets'))
     set(allmenus(indmatch), 'enable', 'on');        
     set(findobj('parent', W_MAIN, 'label', 'Study'), 'enable', 'off');
     
+elseif any(strcmp(menustatus, 'erp_dataset'))
+    
+    set(allmenus, 'enable', 'on');  
+    indmatch = cellfun(@(x)(~isempty(findstr(num2str(x), 'erpset:on'))), allstrs);  
+    set(allmenus(indmatch), 'enable', 'off');
+    
 elseif any(strcmp(menustatus, 'epoched_dataset'))
 
     set(allmenus, 'enable', 'on');  
@@ -1806,6 +1817,7 @@ elseif any(strcmp(menustatus, 'continuous_dataset'))
     set(allmenus, 'enable', 'on');  
     indmatch = cellfun(@(x)(~isempty(findstr(num2str(x), 'continuous:off'))), allstrs);  
     set(allmenus(indmatch), 'enable', 'off');
+
     
 end;
 if any(strcmp(menustatus, 'chanloc_absent'))
@@ -1814,6 +1826,7 @@ if any(strcmp(menustatus, 'chanloc_absent'))
     set(allmenus(indmatch), 'enable', 'off');
     
 end;
+
 if any(strcmp(menustatus, 'ica_absent'))
     
     indmatch = cellfun(@(x)(~isempty(findstr(num2str(x), 'ica:on'))), allstrs);  
