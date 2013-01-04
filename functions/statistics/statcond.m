@@ -31,7 +31,7 @@
 %                paired, a two-way repeated measure ANOVA is performed. 
 %                NOTE THAT IF THE DATA is unpaired, EEGLAB will use a 
 %                balanced 1 or 2 way ANOVA and parametric results might not 
-%                be meaningful (bootstrap and permutation should be fine).
+%                be meaningful (bootstrap and permstatcondutation should be fine).
 %
 % Optional inputs:
 %   'paired'   = ['on'|'off'] pair the data array {default: 'on' unless 
