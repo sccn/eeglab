@@ -114,7 +114,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [m_raw pvals] = pac_cont(X, Y, srate, varargin);
+function [m_raw pvals indexout] = pac_cont(X, Y, srate, varargin);
 
 if nargin < 1
     help pac_cont;
@@ -141,6 +141,7 @@ g = finputcheck(varargin, ...
     'naccu'         'integer'  [1 Inf]                   250;
     'instantstat'   'string'   {'on','off'}              'off';
     'newfig'        'string'   {'on','off'}              'on';
+    'nofig'         'string'   {'on','off'}              'off';
     'statlim'       'string'   {'surrogate','parametric'}  'parametric';
     'timesout'      'real'     []                        []; ...
     'filterfunc'    'string'   { 'eegfilt' 'iirfilt' 'eegfiltfft' }   'eegfiltfft'; ...
@@ -314,6 +315,9 @@ end;
 
 %% plot results
 % -------------
+if strcmpi(g.nofig, 'on')
+    return
+end;
 if strcmpi(g.newfig, 'on')
     figure;
 end;
