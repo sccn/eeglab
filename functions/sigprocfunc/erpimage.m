@@ -9,7 +9,7 @@
 %              of events with varying latencies that occur in each trial. Click on
 %              individual figures parts to examine them separately and zoom (using axcopy()).
 % Usage:
-%            >> figure; erpimage(data,[],times); % image trials in input order
+%            >> figure; erpimage(data,[],times); % image trials as colored lines in input order
 %
 %            >> figure; [outdata,outvar,outtrials,limits,axhndls, ...
 %                        erp,amps,cohers,cohsig,ampsig,outamps,...
@@ -102,13 +102,13 @@
 %  'showwin'     = ['on'|'off'] Show sorting window behind ERP trace. {default: 'off'}
 %
 % Plot time-varying spectral amplitude instead of potential:
-% 'plotamps' = ['on'|'off'] Image amplitudes at each trial and latency instead of potential
-%              values. Note: Currently requires 'coher' (below) with alpha signif.
-%              Use 'cycles' (below) > (default) 3 for better frequency specificity,
-%              {default: plot potential, not amplitudes}. The average power
-%              (in log space) before time 0 is automatically removed. Note that the 
-%              'baseline' parameter has no effect on 'plotamps'. Instead use
-%              change "basedB" in the 'limits' parameter.
+% 'plotamps'     = ['on'|'off'] Image amplitudes at each trial and latency instead of 
+%                  potential values. Note: Currently requires 'coher' (below) with alpha signif.
+%                  Use 'cycles' (see below) > (its default) 3 for better frequency specificity,
+%                  {default: plot potential, not amplitudes, with no minimum}. The average power
+%                  (in log space) before time 0 is automatically removed. Note that the 
+%                  'baseline' parameter has no effect on 'plotamps'. Instead use
+%                  change "basedB" in the 'limits' parameter.
 %
 % Specify plot parameters:
 %   'limits'         = [lotime hitime minerp maxerp lodB hidB locoher hicoher basedB]
@@ -164,6 +164,8 @@
 %                       eloc_info (EEG.chaninfo), if empty ([]) or absent, implies the 'X' direction
 %                       points towards the nose and all channels are plotted {default: no scalp map}
 %   'spec'           = [loHz,hiHz] Plot the mean data spectrum at upper right of image.
+%   'specaxis'       = ['log'|'lin] Use 'lin' for linear spectrum frequency scaling, 
+%                       else 'log' for log scaling {default: 'log'}
 %   'horz'           = [epochs_vector] Plot horizontal lines at specified epoch numbers.
 %   'vert'           = [times_vector] Plot vertical dashed lines at specified latencies
 %   'auxvar'         = [size(nvars,ntrials) matrix] Plot auxiliary variable(s) for each trial
@@ -201,7 +203,7 @@
 %                        Useful in conjunction with 'filt' option to re-basline trials after they have been
 %                        filtered. Not necessary if data have already been baselined and erpimage
 %                        processing does not affect baseline amplitude {default: no further baselining
-%                        of data}. Note that the baseline when using plotamp is automatically
+%                        of data}. Note that the baseline when using 'plotamps' is automatically
 %                        removed unless you set the "basedB" in 'limits' to 0.
 % 'filt'              = [low_boundary high_boundary] a two element vector indicating the frequency
 %                        cut-offs for a 3rd order Butterworth filter that will be applied to each
@@ -350,6 +352,8 @@ Allampsflag=NO;     % don't image the amplitudes by default
 Allcohersflag=NO;   % don't image the coherence amplitudes by default
 Topoflag  = NO;     % don't plot a topoplot in upper left
 Specflag  = NO;     % don't plot a spectrum in upper right
+SpecAxisflag = NO;  % don't change the default spectrum axis type from default
+SpecAxis = 'log';   % default log frequency spectrum axis (if Specflag)
 Erpflag   = NO;     % don't show erp average by default
 Erpstdflag= NO;
 Erpalphaflag= NO;
@@ -424,7 +428,7 @@ end
 data = squeeze(data);
 if nargin < 3 | isempty(times)
     if size(data,1)==1 || size(data,2)==1
-        fprintf('erpimage(): either input a times vector or make data size = (frames,trials).\n')
+        fprintf('\nerpimage(): either input a times vector or make data size = (frames,trials).\n')
         return
     end
     times = 1:size(data,1);
@@ -480,7 +484,7 @@ else
 end
 if length(times) ~= frames
     fprintf(...
-        'erpimage(): length(data)(%d) ~= length(sortvar)(%d) * length(times)(%d).\n\n',...
+        '\nerpimage(): length(data)(%d) ~= length(sortvar)(%d) * length(times)(%d).\n\n',...
         framestot,              length(sortvar),   length(times));
     return
 end
@@ -520,7 +524,7 @@ if nargin > 6
             timeStretchMarks = round(1+(timeStretchMarks-times(1))*srate/1000); % convert from ms to frames -sm
             [smc smr] = find(diff(timeStretchMarks') < 0);
             if ~isempty(smr)
-                fprintf('erpimage(): Timewarp event latencies not in ascending order in trial %d.\n',smr)
+                fprintf('\nerpimage(): Timewarp event latencies not in ascending order in trial %d.\n',smr)
                 return
             end
             
@@ -560,7 +564,7 @@ if nargin > 6
                 Cohsigflag = YES;
                 alpha  = Arg(3);
                 if alpha < 0 || alpha > 0.1
-                    fprintf('erpimage(): alpha value %g out of bounds.\n',alpha);
+                    fprintf('\nerpimage(): alpha value %g out of bounds.\n',alpha);
                     return
                 end
             end
@@ -579,14 +583,23 @@ if nargin > 6
             end;
             Topoflag = NO;
         elseif Specflag == YES;
-            if length(Arg) ~= 2
-                help erpimage
-                fprintf('\nerpimage(): spec arg must be a list of length 2.\n');
+            if length(Arg) ~= 2 
+                error('\nerpimage(): ''spec'' flag argument must be a numeric array of length 2.\n');
                 return
             end
             lospecHz = Arg(1);
             hispecHz = Arg(2);
             Specflag = NO;
+        elseif SpecAxisflag == YES;
+            SpecAxis = Arg;
+            if ~strcmpi(SpecAxis,'lin') && ~strcmpi(SpecAxis,'log')
+              error('\nerpimage(): spectrum axis type must be ''lin'' or ''log''.\n');
+              return
+            end
+            if strcmpi(SpecAxis,'lin')
+               SpecAxis = 'linear';   % convert to MATLAB Xscale keyword
+            end
+            SpecAxisflag = NO;
         elseif Renormflag == YES
             renorm = Arg;
             Renormflag = NO;
@@ -669,7 +682,7 @@ if nargin > 6
                 auxvar = Arg{1};
                 auxcolors = Arg{2};
             elseif isa(Arg,'cell')==YES
-                fprintf('erpimage(): auxvars argument must be a matrix or length-2 cell array.\n');
+                fprintf('\nerpimage(): auxvars argument must be a matrix or length-2 cell array.\n');
                 return
             else
                 auxvar = Arg; % no auxcolors specified
@@ -677,7 +690,7 @@ if nargin > 6
             [xr,xc] = size(auxvar);
             lns = length(sortvar);
             if xr ~= lns && xc ~= lns
-                error('auxvar columns different from the number of epochs in data');
+                error('\nerpimage(): auxvar columns different from the number of epochs in data');
             elseif xr == lns && xc ~= lns
                 auxvar = auxvar';   % exchange rows/cols
             end
@@ -701,33 +714,33 @@ if nargin > 6
         elseif Allcohersflag == YES
             data2=Arg;
             if size(data2) ~= size(data)
-                fprintf('erpimage(): allcohers data matrix must be the same size as data.\n');
+                fprintf('\nerpimage(): allcohers data matrix must be the same size as data.\n');
                 return
             end
             Allcohersflag = NO;
         elseif Phaseflag == YES
             n = length(Arg);
             if n > 5
-                error('erpimage(): Too many arguments for keyword ''phasesort''');
+                error('\nerpimage(): Too many arguments for keyword ''phasesort''');
             end
             phargs = Arg;
             
             if phargs(3) < 0
-                error('erpimage(): Invalid negative frequency argument for keyword ''phasesort''');
+                error('\nerpimage(): Invalid negative frequency argument for keyword ''phasesort''');
             end
             if n>=4
                 if phargs(4) < 0
-                    error('erpimage(): Invalid negative argument for keyword ''phasesort''');
+                    error('\nerpimage(): Invalid negative argument for keyword ''phasesort''');
                 end
             end
             if min(phargs(1)) < times(1) | max(phargs(1)) > times(end)
-                error('erpimage(): time for phase sorting filter out of bound.');
+                error('\nerpimage(): time for phase sorting filter out of bound.');
             end
             if phargs(2) >= 100 | phargs(2) < -100
-                error('%-argument for keyword ''phasesort'' must be (-100;100)');
+                error('\nerpimage(): %-argument for keyword ''phasesort'' must be (-100;100)');
             end
             if length(phargs) >= 4 & phargs(3) > phargs(4)
-                error('erpimage(): Phase sorting frequency range must be increasing.');
+                error('\nerpimage(): Phase sorting frequency range must be increasing.');
             end
             if length(phargs) == 5
                 topphase = phargs(5);
@@ -737,48 +750,48 @@ if nargin > 6
             n = length(Arg);
             sortwinarg = Arg;
             if n > 2
-                error('erpimage(): Too many arguments for keyword ''sortwin''');
+                error('\nerpimage(): Too many arguments for keyword ''sortwin''');
             end
             if min(sortwinarg(1)) < times(1) | max(sortwinarg(1)) > times(end)
-                error('erpimage(): start time for value sorting out of bounds.');
+                error('\nerpimage(): start time for value sorting out of bounds.');
             end
             if n > 1
                 if min(sortwinarg(2)) < times(1) | max(sortwinarg(2)) > times(end)
-                    error('erpimage(): end time for value sorting out of bounds.');
+                    error('\nerpimage(): end time for value sorting out of bounds.');
                 end
             end
             if n > 1 & sortwinarg(1) > sortwinarg(2)
-                error('erpimage(): Value sorting time range must be increasing.');
+                error('\nerpimage(): Value sorting time range must be increasing.');
             end
             Sortwinflag = NO;
         elseif Ampflag == YES % 'ampsort',[center_time,prcnt_reject,minfreq,maxfreq]
             n = length(Arg);
             if n > 4
-                error('erpimage(): Too many arguments for keyword ''ampsort''');
+                error('\nerpimage(): Too many arguments for keyword ''ampsort''');
             end
             ampargs = Arg;
             
             % if ampargs(3) < 0
-            %    error('erpimage(): Invalid negative argument for keyword ''ampsort''');
+            %    error('\nerpimage(): Invalid negative argument for keyword ''ampsort''');
             % end
             if n>=4
                 if ampargs(4) < 0
-                    error('erpimage(): Invalid negative argument for keyword ''ampsort''');
+                    error('\nerpimage(): Invalid negative argument for keyword ''ampsort''');
                 end
             end
             
             if ~isinf(ampargs(1))
                 if min(ampargs(1)) < times(1) | max(ampargs(1)) > times(end)
-                    error('erpimage(): time for amplitude sorting filter out of bounds.');
+                    error('\nerpimage(): time for amplitude sorting filter out of bounds.');
                 end
             end
             
             if ampargs(2) >= 100 | ampargs(2) < -100
-                error('percentile argument for keyword ''ampsort'' must be (-100;100)');
+                error('\nerpimage(): percentile argument for keyword ''ampsort'' must be (-100;100)');
             end
             
             if length(ampargs) == 4 & abs(ampargs(3)) > abs(ampargs(4))
-                error('erpimage(): Amplitude sorting frequency range must be increasing.');
+                error('\nerpimage(): Amplitude sorting frequency range must be increasing.');
             end
             Ampflag = NO;
             
@@ -786,23 +799,23 @@ if nargin > 6
             % Usage: 'valsort',[mintime,maxtime,direction]
             n = length(Arg);
             if n > 3
-                error('erpimage(): Too many arguments for keyword ''valsort''');
+                error('\nerpimage(): Too many arguments for keyword ''valsort''');
             end
             valargs = Arg;
             
             if min(valargs(1)) < times(1) | max(valargs(1)) > times(end)
-                error('erpimage(): start time for value sorting out of bounds.');
+                error('\nerpimage(): start time for value sorting out of bounds.');
             end
             if n > 1
                 if min(valargs(2)) < times(1) | max(valargs(2)) > times(end)
-                    error('erpimage(): end time for value sorting out of bounds.');
+                    error('\nerpimage(): end time for value sorting out of bounds.');
                 end
             end
             if n > 1 & valargs(1) > valargs(2)
-                error('erpimage(): Value sorting time range must be increasing.');
+                error('\nerpimage(): Value sorting time range must be increasing.');
             end
             if n==3 & (~isnumeric(valargs(3)) | valargs(3)==0)
-                error('erpimage(): Value sorting direction must be +1 or -1.');
+                error('\nerpimage(): Value sorting direction must be +1 or -1.');
             end
             Valflag = NO;
         elseif plotmodeflag == YES
@@ -812,7 +825,7 @@ if nargin > 6
         elseif Erpalphaflag == YES
             erpalpha = Arg(1);
             if erpalpha < MIN_ERPALPHA | erpalpha > MAX_ERPALPHA
-                fprintf('erpimage(): erpalpha value is out of bounds [%g, %g]\n',...
+                fprintf('\nerpimage(): erpalpha value is out of bounds [%g, %g]\n',...
                     MIN_ERPALPHA,MAX_ERPALPHA);
                 return
             end
@@ -826,10 +839,10 @@ if nargin > 6
                 Arg = eval(['arg' int2str(a-6)]);
                 if strcmpi(Arg, 'Gaussian'), mvavg_type='gaussian';
                 elseif strcmpi(Arg, 'Boxcar'), mvavg_type='boxcar';
-                else error('Invalid value for optional argument ''avg_type''.');
+                else error('\nerpimage(): Invalid value for optional argument ''avg_type''.');
                 end;
             else
-                error('Optional argument ''avg_type'' needs to be assigned a value.');
+                error('\nerpimage(): Optional argument ''avg_type'' needs to be assigned a value.');
             end
         elseif strcmp(Arg,'nosort')
             Nosort = YES;
@@ -863,20 +876,20 @@ if nargin > 6
                     replace_ties = YES;
                 elseif strcmpi(temp,'off') replace_ties = NO;
                 else
-                    error('Argument ''replace_ties'' needs to be followed by the string ''on'' or ''off''.');
+                    error('\nerpimage(): Argument ''replace_ties'' needs to be followed by the string ''on'' or ''off''.');
                 end
             else
-                error('Argument ''replace_ties'' needs to be followed by the string ''on'' or ''off''.');
+                error('\nerpimage(): Argument ''replace_ties'' needs to be followed by the string ''on'' or ''off''.');
             end
         elseif strcmpi(Arg,'sortvar_limits')
             if a < nargin,
                 a = a+1;
                 sortvar_limits = eval(['arg' int2str(a-6)]);
                 if ischar(sortvar_limits) || length(sortvar_limits)~=2
-                    error('Argument ''sortvar_limits'' needs to be followed by a two element vector.');
+                    error('\nerpimage(): Argument ''sortvar_limits'' needs to be followed by a two element vector.');
                 end
             else
-                error('Argument ''sortvar_limits'' needs to be followed by a two element vector.');
+                error('\nerpimage(): Argument ''sortvar_limits'' needs to be followed by a two element vector.');
             end
         elseif strcmpi(Arg,'erp')
             Erpflag = YES;
@@ -953,6 +966,8 @@ if nargin > 6
             Topoflag = YES;
         elseif strcmp(Arg,'spec') | strcmp(Arg,'spectrum')
             Specflag = YES;
+        elseif strcmp(Arg,'Specaxis') || strcmp(Arg,'specaxis') || strcmp(Arg,'SpecAxis')
+            SpecAxisflag = YES;
         elseif strcmpi(Arg,'erpalpha')
             Erpalphaflag = YES;
         elseif strcmp(Arg,'align')
@@ -982,42 +997,42 @@ if nargin > 6
                 a = a+1;
                 baseline = eval(['arg' int2str(a-6)]);
             else
-                error('Argument ''baseline'' needs to be followed by a two element vector.');
+                error('\nerpimage(): Argument ''baseline'' needs to be followed by a two element vector.');
             end
         elseif strcmpi(Arg,'filt')
             if a < nargin,
                 a = a+1;
                 flt = eval(['arg' int2str(a-6)]);
             else
-                error('Argument ''filt'' needs to be followed by a two element vector.');
+                error('\nerpimage(): Argument ''filt'' needs to be followed by a two element vector.');
             end
         elseif strcmpi(Arg,'erp_vltg_ticks')
             if a < nargin,
                 a = a+1;
                 erp_vltg_ticks=eval(['arg' int2str(a-6)]);
             else
-                error('Argument ''erp_vltg_ticks'' needs to be followed by a vector.');
+                error('\nerpimage(): Argument ''erp_vltg_ticks'' needs to be followed by a vector.');
             end
         elseif strcmpi(Arg,'img_trialax_label')
             if a < nargin,
                 a = a+1;
                 img_ylab = eval(['arg' int2str(a-6)]);
             else
-                error('Argument ''img_trialax_label'' needs to be followed by a string.');
+                error('\nerpimage(): Argument ''img_trialax_label'' needs to be followed by a string.');
             end;
         elseif strcmpi(Arg,'img_trialax_ticks')
             if a < nargin,
                 a = a+1;
                 img_ytick_lab = eval(['arg' int2str(a-6)]);
             else
-                error('Argument ''img_trialax_ticks'' needs to be followed by a vector of values at which tick marks will appear.');
+                error('\nerpimage(): Argument ''img_trialax_ticks'' needs to be followed by a vector of values at which tick marks will appear.');
             end;
         elseif strcmpi(Arg,'cbar_title')
             if a < nargin,
                 a = a+1;
                 cbar_title = eval(['arg' int2str(a-6)]);
             else
-                error('Argument ''cbar_title'' needs to be followed by a string.');
+                error('\nerpimage(): Argument ''cbar_title'' needs to be followed by a string.');
             end;
         elseif strcmp(Arg,'vert') ||  strcmp(Arg,'verttimes')
             Vertflag = YES;
@@ -1084,7 +1099,7 @@ end
 if ~isempty(auxvar)
     % whos auxvar
     if size(auxvar,1) ~= ntrials & size(auxvar,2) ~= ntrials
-        fprintf('erpimage(): auxvar size should be (N,ntrials), e.g., (N,%d)\n',...
+        fprintf('\nerpimage(): auxvar size should be (N,ntrials), e.g., (N,%d)\n',...
             ntrials);
         return
     end
@@ -1092,20 +1107,20 @@ if ~isempty(auxvar)
         auxvar = auxvar';
     end
     if size(auxvar,2) ~= ntrials
-        fprintf('erpimage(): auxvar size should be (N,ntrials), e.g., (N,%d)\n',...
+        fprintf('\nerpimage(): auxvar size should be (N,ntrials), e.g., (N,%d)\n',...
             ntrials);
         return
     end
     if exist('auxcolors')==YES % if specified
         if isa(auxcolors,'cell')==NO % if auxcolors is not a cell array
             fprintf(...
-                'erpimage(): auxcolors argument to auxvar flag must be a cell array.\n');
+                '\nerpimage(): auxcolors argument to auxvar flag must be a cell array.\n');
             return
         end
     end
 elseif exist('timeStretchRef') & ~isempty(timeStretchRef)
     if ~isnan(aligntime)
-        fprintf(['erpimage(): options "align" and ' ...
+        fprintf(['\nerpimage(): options "align" and ' ...
             '"timewarp" are not compatiable.\n']);
         return;
     end
@@ -1157,7 +1172,7 @@ end
 if exist('phargs')
     if phargs(3) > srate/2
         fprintf(...
-            'erpimage(): Phase-sorting frequency (%g Hz) must be less than Nyquist rate (%g Hz).',...
+            '\nerpimage(): Phase-sorting frequency (%g Hz) must be less than Nyquist rate (%g Hz).',...
             phargs(3),srate/2);
     end
     
@@ -1177,7 +1192,7 @@ end
 if exist('ampargs')
     if abs(ampargs(3)) > srate/2
         fprintf(...
-            'erpimage(): amplitude-sorting frequency (%g Hz) must be less than Nyquist rate (%g Hz).',...
+            '\nerpimage(): amplitude-sorting frequency (%g Hz) must be less than Nyquist rate (%g Hz).',...
             abs(ampargs(3)),srate/2);
     end
     
@@ -1269,7 +1284,7 @@ if any(isnan(sortvar))
         end;
     end;
     ntrials = size(data,2);
-    if ntrials <= 1, close(gcf); error('Too few trials'); end;
+    if ntrials <= 1, close(gcf); error('\nerpimage(): Too few trials'); end;
 end;
 
 %% Create moving average window %%
@@ -1320,19 +1335,19 @@ end
 if ~isempty(flt)
     %error check
     if length(flt)~=2,
-        error('''filt'' parameter argument should be a two element vector.');
+        error('\nerpimage(): ''filt'' parameter argument should be a two element vector.');
     elseif max(flt)>(srate/2),
-        error('''filt'' parameters need to be less than or equal to sampling rate/2 (i.e., %f).',srate/2);
+        error('\nerpimage(): ''filt'' parameters need to be less than or equal to sampling rate/2 (i.e., %f).',srate/2);
     elseif (flt(2)==(srate/2)) && (flt(1)==0),
-        error('If second element of ''filt'' parameter is srate/2, then the first element must be greater than 0.');
+        error('\nerpimage(): If second element of ''filt'' parameter is srate/2, then the first element must be greater than 0.');
     elseif abs(flt(2))<=abs(flt(1)),
-        error('Second element of ''filt'' parameters must be greater than first in absolute value.');
+        error('\nerpimage(): Second element of ''filt'' parameters must be greater than first in absolute value.');
     elseif (flt(1)<0) || (flt(2)<0),
         if (flt(1)>=0) || (flt(2)>=0),
-            error('BOTH parameters of ''filt'' need to be greater than or equal to zero OR need to be negative.');
+            error('\nerpimage(): BOTH parameters of ''filt'' need to be greater than or equal to zero OR need to be negative.');
         end
         if min(flt)<=(-srate/2),
-            error('''filt'' parameters need to be greater than sampling rate/2 (i.e., -%f) when creating a stop band.',srate/2);
+            error('\nerpimage(): ''filt'' parameters need to be greater than sampling rate/2 (i.e., -%f) when creating a stop band.',srate/2);
         end
     end
     
@@ -1368,11 +1383,11 @@ end
 if ~isempty(baseline),
     %check argument values for errors
     if baseline(2)<baseline(1),
-        error('First element of ''baseline'' argument needs to be less than or equal to second argument.');
+        error('\nerpimage(): First element of ''baseline'' argument needs to be less than or equal to second argument.');
     elseif baseline(2)<times(1),
-        error('Second element of ''baseline'' argument needs to be greater than or equal to epoch start time %.1f.',times(1));
+        error('\nerpimage(): Second element of ''baseline'' argument needs to be greater than or equal to epoch start time %.1f.',times(1));
     elseif baseline(1)>times(end),
-        error('First element of ''baseline'' argument needs to be less than or equal to epoch end time %.1f.',times(end));
+        error('\nerpimage(): First element of ''baseline'' argument needs to be less than or equal to epoch end time %.1f.',times(end));
     end
     
     %convert msec into time points
@@ -1400,14 +1415,14 @@ end
 %
 switch lower(renorm)
     case 'yes',
-        disp('erpimage warning: *** sorting variable renormalized ***');
+        disp('\nerpimage warning: *** sorting variable renormalized ***');
         sortvar = (sortvar-min(sortvar)) / (max(sortvar) - min(sortvar)) * ...
             0.5 * (max(times) - min(times)) + min(times) + 0.4*(max(times) - min(times));
     case 'no',;
     otherwise,
         if ~isempty(renorm)
             locx = findstr('x', lower(renorm));
-            if length(locx) ~= 1, error('erpimage: unrecognized renormalizing formula'); end;
+            if length(locx) ~= 1, error('\nerpimage: unrecognized renormalizing formula'); end;
             eval( [ 'sortvar =' renorm(1:locx-1) 'sortvar' renorm(locx+1:end) ';'] );
         end;
 end;
@@ -2067,7 +2082,7 @@ elseif Allampsflag %%%%%%%%%%%%%%%% Plot allamps instead of data %%%%%%%%%%%%%%
         [amps,cohers,cohsig,ampsig,allamps] = ...
             phasecoher(urdata,length(times),srate,coherfreq,cycles,0, ...
             [], [], timeStretchRef, timeStretchMarks);
-        % need to receive cohsig and ampsig to get allamps <---
+        % Note: need to receive cohsig and ampsig to get allamps <---
         ampsig = signifs([1 2]); % assume these already in dB
         cohsig = signifs(3);
         
@@ -2077,14 +2092,14 @@ elseif Allampsflag %%%%%%%%%%%%%%%% Plot allamps instead of data %%%%%%%%%%%%%%
             phasecoher(urdata,length(times),srate,coherfreq, ...
             cycles, alpha, [], [], ...
             timeStretchRef, timeStretchMarks');
-        % need to receive cohsig and ampsig to get allamps
+        % Note: need to receive cohsig and ampsig to get allamps
         fprintf('Coherence significance level: %g\n',cohsig);
         
     else % no plotting of significance
         [amps,cohers,cohsig,ampsig,allamps] = ...
             phasecoher(urdata,length(times),srate,coherfreq, ...
             cycles,0,[], [], timeStretchRef, timeStretchMarks);
-        % need to receive cohsig and ampsig to get allamps
+        % Note: need to receive cohsig and ampsig to get allamps
     end
     
     % fprintf('#1 Size of allamps = [%d %d]\n',size(allamps,1),size(allamps,2));
@@ -2092,15 +2107,13 @@ elseif Allampsflag %%%%%%%%%%%%%%%% Plot allamps instead of data %%%%%%%%%%%%%%
     base = find(times<=DEFAULT_BASELINE_END);
     if length(base)<2
         base = 1:floor(length(times)/4); % default first quarter-epoch
-        fprintf('Using %g to %g ms as amplitude baseline.\n',...
-            times(1),times(base(end)));
     end
-    
+    fprintf('Using %g to %g ms as amplitude baseline.\n',...
+        times(1),times(base(end)));
     
     % fprintf('#2 Size of allamps = [%d %d]\n',size(allamps,1),size(allamps,2));
     
-    fprintf('Subtracting the mean baseline log amplitude \n');
-    
+    % fprintf('Subtracting the mean baseline log amplitude \n');
     %fprintf('Subtracting the mean baseline log amplitude %g\n',baseall);
     % allamps = allamps./baseall;
     % fprintf('#3 Size of allamps = [%d %d]\n',size(allamps,1),size(allamps,2));
@@ -2270,7 +2283,7 @@ elseif exist('data2') %%%%%% Plot allcohers instead of data %%%%%%%%%%%%%%%%%%%
         %    crosscoher(urdata,data2,length(times),srate,coherfreq,cycles,0);
     end
     if ~exist('allcohers')
-        fprintf('erpimage(): allcohers not returned....\n')
+        fprintf('\nerpimage(): allcohers not returned....\n')
         return
     end
     allamps = allcohers; % output variable
@@ -2976,7 +2989,7 @@ if Erpflag == YES & strcmpi(NoShow, 'no')
     set(t,'HorizontalAlignment','center','FontSize',LABELFONT)
     
     if ~exist('YDIR')
-        error('Default YDIR not read from ''icadefs.m''');
+        error('\nerpimage(): Default YDIR not read from ''icadefs.m''');
     end
     if YDIR == 1
         set(ax2,'ydir','normal')
@@ -3368,7 +3381,7 @@ end
 %% %%%%%%%%%%%%% Plot a spectrum %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 SPECFONT = 10;
-if (~isempty(lospecHz)) & strcmpi(NoShow, 'no')
+if (~isempty(lospecHz)) && strcmpi(NoShow, 'no')
     h(13)=axes('Position',...
         [gcapos(1)+0.82*gcapos(3) ...
         gcapos(2)+0.96*gcapos(4),...
@@ -3406,6 +3419,7 @@ if (~isempty(lospecHz)) & strcmpi(NoShow, 'no')
     axis([lospecHz hispecHz mingfs-1 maxgfs+1]);
     set(h(13),'Box','off','color',BACKCOLOR);
     set(h(13),'Fontsize',SPECFONT);
+    set(h(13),'Xscale',SpecAxis); % added 'log' or 'linear' freq axis scaling -SM 5/31/12
     l=ylabel('dB');
     set(l,'Fontsize',SPECFONT);
     if ~isnan(coherfreq)
@@ -3607,10 +3621,10 @@ amp = abs(resp);
 function prctl = prctle(data,pc); % return percentile of a distribution
 [prows pcols] = size(pc);
 if prows ~= 1 & pcols ~= 1
-    error('pc must be a scalar or a vector.');
+    error('\nerpimage(): pc must be a scalar or a vector.');
 end
 if any(pc > 100) | any(pc < 0)
-    error('pc must be between 0 and 100');
+    error('\nerpimage(): pc must be between 0 and 100');
 end
 [i,j] = size(data);
 sortdata = sort(data);
