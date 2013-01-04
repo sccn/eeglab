@@ -9,18 +9,37 @@
 %                >> std_envtopo(STUDY, ALLEEG, 'key1', 'val1', ...);
 %
 % Inputs:
+%
 %   STUDY        = an EEGLAB STUDY structure containing EEG structures
+%
 %   ALLEEG       = the ALLEEG data structure; can also be an EEG dataset structure.
 %
 % Optional inputs:
+%
+%  'amplimits'   = [minuV maxuV]. {default: use data uV limits}
+%
+%  'baseline'    = [minms maxms] - a new baseline to remove from the grand
+%                   and cluster ERPs.
+%
 %  'clustnums'   = [integer array] vector of cluster numbers to plot.  Else if
 %                   int < 0, the number of largest contributing clusters to plot
 %                   {default|[] -> 7}
+%
 %  'conditions'  = [integer array] vector of condition indices to plot
-%  'subclus'     = [integer array] vector of cluster numbers to omit when  computing
-%                    the ERP envelope of the data (e.g., artifact
-%                    clusters). By default, these clusters are excluded from
-%                   the grandERP envelope. See the next option 'onlyclus'.
+%
+%  'diff'        = [condition1 group 1 condition 2 group 2] Perform subtractiono
+%                   between conbination of condition/group. Ex. 'diff', [1 1 2 1]
+%                   performs condition1_group1 minus condition2_group1.
+%                   Must be provided with 4 numbers. If no condition/group, 1.
+%
+%  'fillclust'   = [integer] fill the numbered cluster envelope with red. {default|[]|0 -> no fill}
+%
+%  'fillcolor'   = [a b c] where a, b, c are =>0 and =<1. to create a color
+%                   to fill the summed selected clusters. {dafault [0.875 0.875 0.875]} 
+%
+%  'limcontrib'  = [minms maxms]  time range (in ms) in which to rank cluster contributions
+%                   (boundaries = thin dotted lines) {default|[]|[0 0] -> plotting limits}
+%
 %  'onlyclus'    = [ 'on' | 'off'] dataset components to include in the grand ERP.
 %                  'on' will include only the components that were part of the
 %                   clustering. For example, if components were rejected from
@@ -28,27 +47,40 @@
 %                   don't include their data in the grand ERP.
 %                  'off' will include all components in the datasets except
 %                   those in the subtructed ('subclus') clusters {default 'on'}.
-%  'baseline'    = [minms maxms] - a new baseline to remove from the grand
-%                   and cluster ERPs.
-%  'diff'        = [condition1 group 1 condition 2 group 2] Perform subtractiono
-%                   between conbination of condition/group. Ex. 'diff', [1 1 2 1]
-%                   performs condition1_group1 minus condition2_group1.
-%                   Must be provided with 4 numbers. If no condition/group, 1.
+%
+%  'sortvar'     = ['maxp'|'pvaf'|'ppaf'|'rltp'|'area']
+%                  'maxp', maximum power
+%                    maxp(comp) = max(sum(cluster(:,selectedtimewindow)^2));
+%                  'pvaf', sort components by percent variance accounted for (eeg_pvaf())
+%                    pvaf(comp) = 100-100*mean(var(data - back_proj))/mean(var(data));
+%                  'ppaf', sort components by percent power accounted for (ppaf) 
+%                    ppaf(comp) = 100-100*Mean((data - back_proj).^2)/Mean(data.^2);
+%                  'rltp', sort components by relative power 
+%                    rltp(comp) = 100*Mean(back_proj.^2)/Mean(data.^2);
+%                  'area', sort components by enveloped area ratio
+%                    area(comp) = 100*(area of envelope by a selected cluster)/(area of outermost envelope)
+%
+%  'sortvarnorm' = ['on'|'off'] is normalizes sortvar so that the sum of sortvar is 100%  
+%
+%  'subclus'     = [integer array] vector of cluster numbers to omit when  computing
+%                    the ERP envelope of the data (e.g., artifact
+%                    clusters). By default, these clusters are excluded from
+%                   the grandERP envelope. See the next option 'onlyclus'.
+%
+%  'sumenvfill'  = ['selective'|'all'|'off'] fill or not the envelope of the
+%                    summed selected cluster. 'select' fills only limcontrib
+%                    time range. 'all' fills all timerange. 'off' does not fill.
+%                    See also 'fillcolor' so choose a filling color. {default: 'select'}
+%
 %  'timerange'   = data epoch start and end input latencies (in ms)
 %                   {default: from 'limits' if any}
-%  'amplimits'      = [minuV maxuV]. {default: use data uV limits}
-%  'limcontrib'  = [minms maxms]  time range (in ms) in which to rank cluster contributions
-%                   (boundaries = thin dotted lines) {default|[]|[0 0] -> plotting limits}
-%  'vert'        = vector of times (in ms) at which to plot vertical dashed lines
-%                   {default|[] -> none}
-%  'sortvar'     = ['pvaf'|'rv'] if 'pvaf', sort by percent variance accounted for.
-%                   If 'rv', sort by relative variance.
-%                   pvaf(component) = 100-100*variance(data-cluster))/variance(data)
-%                   rv(component)   = 100*variance(component)/variance(data) {default: 'rv'}
+%
 %  'topotype'    = ['inst'|'ave'] If 'inst', show the instantaneous map at the specific timepoint specified by the line.
 %                   If 'ave', show that of the mean which is the same as the
 %                   stored topomap. {default: 'inst'}
-%  'fillclust'    = [integer] fill the numbered component envelope with red. {default|[]|0 -> no fill}
+%
+%  'vert'        = vector of times (in ms) at which to plot vertical dashed lines
+%                   {default|[] -> none}
 %
 % Author: Makoto Miyakoshi, Hilit Serby, Arnold Delorme, Scott Makeig
 % The original version of this script was written by Hilit Serby and redesigned by Makoto Miyakoshi.
@@ -74,7 +106,8 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1.07  USA
 %
 % History
-% 04/29/2012 ver 5.2 by Makoto. A bug fixed. STUDY.design(STUDY.currentdesign)
+% 10/10/2012 ver 5.3 by Makoto. 'sortvar' 'sortvarnorm' 'fillcolor' 'sumenvfill' added.
+% 04/29/2012 ver 5.2 by Makoto. Bug fixed. STUDY.design(STUDY.currentdesign)
 % 04/24/2012 ver 5.1 by Makoto. Revived 'amplimit' 'fillclust' options, and vertical doted lines for limcontrib range. Default changed into 'pvaf' from 'rv'. 
 % 02/28/2012 ver 5.0 by Makoto. Values are now normalized by the number of subjects participating to the cluster. Group difference is better addressed when performing subtraction across groups. A group ratio is output too.
 % 02/24/2012 ver 4.5 by Makoto. New color schema to improve color readability & shared line colors across multiple plots
@@ -84,7 +117,7 @@
 % 01/06/2012 ver 4.1 by Makoto. Time range options fixed. STUDY.design selection fixed. Wrong labels fixed. (Thanks to Agatha Lenartowicz!) 'sortvar' and 'topotype' implemented in the main function. Help edited.
 % 12/30/2011 ver 4.0 by Makoto. Main function 100% redesigned. Full support for Study design.
 % 12/26/2011 ver 3.2 by Makoto. Formats corrected.
-% 12/25/2011 ver 3.1 by Makoto. Bug fixed about choosing wrong clusters under some conditions. 
+% 12/25/2011 ver 3.1 by Makoto. Bug fixed about choosing wrong clusters under certain conditions. 
 % 10/12/2011 ver 3.0 by Makoto. Completed the alpha version. 
 % 10/11/2011 ver 2.2 by Makoto. Time range, group with no entry fixed
 % 10/10/2011 ver 2.1 by Makoto. Two types of scalp topos can be presented.
@@ -116,9 +149,12 @@ arglist = finputcheck(varargin, ...
               'amplimits'     'real'     []                                                   [];...
               'limcontrib'    'real'     []                                                   [];...
               'vert'          'real'     []                                                   [];...
-              'sortvar'       'string'   {'pvaf', 'rv'}                                   'pvaf';...
+              'sortvar'       'string'   {'maxp', 'pvaf', 'ppaf', 'rltp', 'area'}         'pvaf';...
+              'sortvarnorm'   'string'   {'on', 'off'}                                     'off';...
+              'sumenvfill'    'string'   {'selective', 'all', 'off'}                 'selective';...
               'topotype'      'string'   {'inst', 'ave'}                                  'inst';...
-              'fillclust'      'integer'  []                                                   []});
+              'fillcolor'     'real'     []                                [0.875  0.875  0.875];...
+              'fillclust'     'integer'  []                                                   []});
           
 if isstr(arglist)
     error(arglist);
@@ -298,89 +334,14 @@ userdat = get(2, 'UserData');
 userdat{1}{2} = STUDY;
 set(2, 'UserData', userdat);
 
+
+
+
+
+%
 % envtopo_plot() - Plot the envelope of a data epoch, plus envelopes and scalp maps of specified
 %             or largest-contributing components. If a 3-D input matrix, operates on the
 %             mean of the data epochs. Click on individual axes to examine them in detail.
-% Usage:
-%             >> envtopo_plot(grandenvERP,projERP);
-%             >> [compvarorder,compvars,compframes,comptimes,compsplotted,pvaf] ...
-%                                           = envtopo(grandERP,projERP, 'key1', val1, ...);
-% Inputs:
-%  grandERP     = The grand average ERP (chans, frames),
-%                              (see std_granderp() and std_envtopo() for details).
-%  projERP      = A cell array of the projected ERPs of the desired components, each cell size is (chans,frames),
-%                              (see std_granderp() and std_envtopo() for details).
-%
-% Optional inputs:
-%  'clustnums'  = [integer array] vector of clusters numbers to plot {default|0 -> all}
-%                  Else if int < 0, the number of largest contributing clusters to plot
-%                  {default|[] -> 7}
-%  'timerange' = start and end input data latencies (in ms) {default: from 'limits' if any}
-%  'amplimits'    = [minuV maxuV].
-%  'limcontrib' = [minms maxms]  time range (in ms) in which to rank component contribution
-%                  (boundaries shown with thin dotted lines) {default|[]|[0 0] -> plotting limits}
-%  'title'      = [string] plot title {default|[] -> none}
-%  'plotchans'  = [integer array] data channels to use in computing contributions and envelopes,
-%                  and also for making scalp topo plots {default|[] -> all}
-%  'voffsets'   = [float array] vertical line extentions above the data max to disentangle
-%                  plot lines (left->right heads, values in y-axis units) {def|[] -> none}
-%  'colors'     = [string] filename of file containing colors for envelopes, 3 chars
-%                  per line, (. = blank). First color should be "w.." (white)
-%                  Else, 'bold' -> plot default colors in thick lines.
-%                  {default|[] -> standard Matlab color order}
-%  'vert'       = vector of times (in ms) at which to plot vertical dashed lines {default|[] -> none}
-%  'icawinv'    = [float array] inverse weight matrix. By default computed by inverting
-%                  the weight matrix (but if some components have been removed, then
-%                  weight's pseudo-inverse matrix does not represent component's maps).
-%  'icaact'     = [float array] component activations. By default these are computed
-%                  from the input weight matrix.
-%  'envmode'    = ['avg'|'rms'] compute the average envelope or the root mean square
-%                  envelope {default: 'avg'}
-%  'subcomps'   = [integer vector] indices of components to remove from data before
-%                  plotting. {default: none}
-%  'clustlabels'   = [cell array of strings] the size of the clusters number, to label
-%                  the clusters with labels. {default: none}
-%  'sumenv'     = ['on'|'off'|'fill'] 'fill' -> show the filled envelope of the summed projections
-%                  of the selected components; 'on' -> show the envelope only {default: 'fill'}
-%  'actscale'   = ['on'|'off'] scale component scalp maps by maximum component activity in the
-%                  designated (limcontrib) interval. 'off' -> scale scalp maps individually using
-%                  +/-max(abs(map value)) {default: 'off'}
-%  'dispmaps'   = ['on'|'off'] display component numbers and scalp maps {default: 'on'}
-%  'topoplotkey','val' = any optional arguments for topoplot.
-%
-% Outputs:
-%  compvarorder = component numbers in decreasing order of max variance in data
-%  compvars     = component max variances
-%  compframes   = frames of max variance
-%  comptimes    = times of max variance
-%  compsplotted = components plotted
-%  mv|pvaf|rv   = max variance, percent variance accounted for, or relative variance (see 'sortvar')
-%
-% Notes:
-%  To label maps with other than component numbers, put four-char strings into a local (pwd) file
-%  named 'envtopo.labels' (using . = space) in time-order of their projection maxima
-%
-% Authors: Scott Makeig & Arnaud Delorme, SCCN/INC/UCSD, La Jolla, 3/1998
-%          Edited for std_envtopo by Makoto Miyakoshi.
-%
-% See also: timtopo()
-
-% Copyright (C) 3-10-98 from timtopo.m Scott Makeig, SCCN/INC/UCSD, scott@sccn.ucsd.edu
-%
-% This program is free software; you can redistribute it and/or modify
-% it under the terms of the GNU General Public License as published by
-% the Free Software Foundation; either version 2 of the License, or
-% (at your option) any later version.
-%
-% This program is distributed in the hope that it will be useful,
-% but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-% GNU General Public License for more details.
-%
-% You should have received a copy of the GNU General Public License
-% along with this program; if not, write to the Free Software
-% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
 function [colorlog] = envtopo_plot(STUDY, ALLEEG, grandERP,projERP, colorlog, varargin)
 
 % data format conversion for compatibility
@@ -414,7 +375,6 @@ g.xlabel      = 'on';
 g.ylabel      = 'on';
 g.actscale    = 'off';
 g.topoarg     = 0;
-g.sumenv      = 'fill';
 
 % empty cluster crashes the code, so 
 for n = 2:length(STUDY.cluster)
@@ -617,30 +577,62 @@ fprintf('\n');
 %%%%%%%%%%%%%%% Compute component selection criterion %%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 
-% compute pvaf
 if ~xunitframes
     fprintf('  in the interval %3.0f ms to %3.0f ms.\n',1000*times(limframe1),1000*times(limframe2));
 end
 
-vardat = var(reshape(grandERP(:,limframe1:limframe2),1,nvals)); % find full data variance in interval
+% sort components by maximum mean back-projected power 
+% in the 'limcontrib' time range: mp(comp) = max(Mean(back_proj.^2));
+% where back_proj = comp_map * comp_activation(t) for t in 'limcontrib'
+
+%
+%%%%%% Calculate sortvar, used to sort the components %%%%%%%%%%%
+%
 for c = 1:length(projERP)
-    % now calculate the pvaf over the whole time period for printing
-    if strcmpi(g.sortvar, 'pvaf') | strcmpi(g.sortvar,'pv')
-        diffdat = grandERP(:,limframe1:limframe2)-projERP{c}(:,limframe1:limframe2);
-        diffdat = reshape(diffdat,1,nvals);
-        pvaf(c) = 100-100*(var(diffdat)/vardat); %var of diff div by var of full data
-        ot   = 'pvaf';
-    elseif strcmpi(g.sortvar, 'rv')% var(clust)/var(data)
-        pvaf(c) = 100*(var(reshape(projERP{c}(:,limframe1:limframe2),1,nvals))/vardat);
-        ot   = 'rv';
-    end;
+    if     strcmpi(g.sortvar,'maxp')  % Maximum Power of backproj
+        sortvar(c) = max(mean(projERP{c}(:,limframe1:limframe2).*projERP{c}(:,limframe1:limframe2)));
+        fprintf('%s maximum mean power of back-projection: %g\n',g.clustlabels{c},sortvar(c));
+
+    elseif strcmpi(g.sortvar,'pvaf')   % Percent Variance
+        vardat = var(reshape(grandERP(:,limframe1:limframe2),1,nvals));
+        difdat = grandERP(:,limframe1:limframe2)-projERP{c}(:,limframe1:limframe2);
+        difdat = reshape(difdat,1,nvals);
+        sortvar(c) = 100-100*(var(difdat)/vardat); %var of diff div by var of full data
+        fprintf('%s percent variance accounted for(pvaf): %2.2f%%\n',g.clustlabels{c},sortvar(c));
+        
+    elseif strcmpi(g.sortvar,'ppaf')    % Percent Power
+        powdat = mean(mean(grandERP(:,limframe1:limframe2).^2));
+        sortvar(c) = 100-100*mean(mean((grandERP(:,limframe1:limframe2)...
+                    -projERP{c}(:,limframe1:limframe2)).^2))/powdat;
+        fprintf('%s percent power accounted for(ppaf): %2.2f%%\n',g.clustlabels{c},sortvar(c));
+
+    elseif strcmpi(g.sortvar,'rltp')    % Relative Power
+        powdat = mean(mean(grandERP(:,limframe1:limframe2).^2));
+        sortvar(c) = 100*mean(mean((projERP{c}(:,limframe1:limframe2)).^2))/powdat;
+        fprintf('%s relative power of back-projection: %2.2f%%\n',g.clustlabels{c},sortvar(c));
+        
+    elseif strcmpi(g.sortvar,'area')    % Enveloped Area ratio
+        outermostenv      = envelope(grandERP(:,limframe1:limframe2), g.envmode);
+        outermostenv_area = sum(abs(outermostenv(1,:)))+sum(abs(outermostenv(2,:)));
+        tmp_projERP       = envelope(projERP{c}(:,limframe1:limframe2), g.envmode);
+        tmp_projERP_area  = sum(abs(tmp_projERP(1,:)))+sum(abs(tmp_projERP(2,:)));
+        sortvar(c)        = 100*tmp_projERP_area/outermostenv_area;
+        fprintf('%s enveloped area ratio : %2.2f%%\n',g.clustlabels{c},sortvar(c));
+    end
+end
+
+%%%%%% Normalize the sortvar to 100 if requested %%%%%%
+if strmatch(g.sortvarnorm, 'on')
+    sortvar = sortvar*1/sum(sortvar)*100;
+    fprintf('\n')
+    fprintf('sortvarnorm is on: sortvar is normalized to 100%% in the plot \n');
 end
 
 %
 %%%%%%%%%%%%%%%%%%%%%%%%% Sort by max variance in data %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-[pvaf,compx] = sort(pvaf);  % sort clustnums on max pvaf
-pvaf = pvaf(ncomps:-1:1);  % reverse order of sort (max:min)       
+[sortvar,compx] = sort(sortvar);  % sort clustnums on max sortvar
+sortvar = sortvar(ncomps:-1:1);  % reverse order of sort (max:min)       
 compx        = compx(ncomps:-1:1);    % reverse order of sort
 compvarorder = g.clustnums(compx);    % actual cluster numbers (output var)
 plotframes   = plotframes(compx);     % plotted comps have these max frames
@@ -656,7 +648,7 @@ end;
 %%%%%%%%%%%%%%%%%%%%%%%% Reduce to ntopos %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 compx = compx(1:ntopos);
-pvaf = pvaf(1:ntopos);
+sortvar = sortvar(1:ntopos);
 compvars = compvars(1:ntopos);% max variances
 maxproj    = maxproj(:,1:ntopos);
 compsplotted = compvarorder(1:ntopos);% (output var)
@@ -669,7 +661,7 @@ maxproj    = maxproj(:,ifx);          % maps in plotting order
 if ~isempty(g.clustlabels) 
    complabels = complabels(ifx);     % actual component numbers (output var)
 end;
-pvaf = pvaf(ifx);
+sortvar = sortvar(ifx);
 vlen = length(g.voffsets); % extend voffsets if necessary
 while vlen< ntopos
     g.voffsets = [g.voffsets g.voffsets(vlen)]; % repeat last offset given
@@ -705,36 +697,12 @@ for t=1:ntopos
 end
 fprintf('\n');
 
-if strcmpi(g.sortvar,'on') | strcmpi(g.sortvar,'pvaf')
-    fprintf('    Component pvaf in interval:  ');
-    for t=1:ntopos
-        fprintf('%s ',num2str(pvaf(t)));
-    end
-    fprintf('\n');
+fprintf('    Component sortvar in interval:  ');
+for t=1:ntopos
+    fprintf('%s ',num2str(sortvar(t)));
 end
+fprintf('\n');
 
-sumproj = zeros(size(projERP{1}));
-for n = 1:ntopos
-    sumproj = sumproj + projERP{compx(n)}; % add up all cluster projections
-end
-
-totlimdat = grandERP(:,limframe1:limframe2);
-sumlimdat = sumproj(:,limframe1:limframe2);
-diffdat = totlimdat - sumlimdat; 
-diffdat = reshape(diffdat,1,nvals);
-
-if strcmpi(g.sortvar,'pvaf')   | strcmpi(g.sortvar,'pv')
-    sumpvaf = 100-100*(var(diffdat)/vardat); 
-    %sumpvaf = 100-100*(var(reshape(totlimdat-sumlimdat,1,nvals))/vardat); 
-    ot   = 'pvaf';
-elseif strcmpi(g.sortvar, 'rv')
-    sumpvaf = 100*(var(reshape(sumlimdat,1,nvals))/vardat); 
-    ot   = 'rv';
-end;
-
-if ~xunitframes
-    fprintf('    Summed component %s in interval [%s %s] ms: %4.2f%%\n',ot, int2str(1000*times(limframe1)),int2str(1000*times(limframe2)), sumpvaf);
-end
 %
 %%%%%%%%%%%%%%%%%%%%% Plot the data envelopes %%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -759,6 +727,44 @@ set(axe,'Color',axcolor);
 %%%%%%%%%%%%%%%%% Plot the envelope of the summed selected components %%%%%%%%%%%%%%%%%
 %
 
+sumproj = zeros(size(projERP{1}));
+for n = 1:ntopos
+    sumproj = sumproj + projERP{compx(n)}; % add up all cluster projections
+end
+
+% calculate summed sortvar of selected clusters
+if     strcmpi(g.sortvar,'maxp')  % Maximum Power of backproj
+    selectclusvar = max(mean(sumproj(:,limframe1:limframe2).*sumproj(:,limframe1:limframe2)));
+
+elseif strcmpi(g.sortvar,'pvaf')   % Percent Variance
+    vardat = var(reshape(grandERP(:,limframe1:limframe2),1,nvals));
+    difdat = grandERP(:,limframe1:limframe2)-sumproj(:,limframe1:limframe2);
+    difdat = reshape(difdat,1,nvals);
+    selectclusvar = 100-100*(var(difdat)/vardat); %var of diff div by var of full data
+
+elseif strcmpi(g.sortvar,'ppaf')    % Percent Power
+    powdat = mean(mean(grandERP(:,limframe1:limframe2).^2));
+    selectclusvar = 100-100*mean(mean((grandERP(:,limframe1:limframe2)...
+                -sumproj(:,limframe1:limframe2)).^2))/powdat;
+
+elseif strcmpi(g.sortvar,'rltp')    % Relative Power
+    powdat = mean(mean(grandERP(:,limframe1:limframe2).^2));
+    selectclusvar = 100*mean(mean((sumproj(:,limframe1:limframe2)).^2))/powdat;
+
+elseif strcmpi(g.sortvar,'area')    % Enveloped Area ratio
+    outermostenv      = envelope(grandERP(:,limframe1:limframe2), g.envmode);
+    outermostenv_area = sum(abs(outermostenv(1,:)))+sum(abs(outermostenv(2,:)));
+    tmp_projERP       = envelope(sumproj(:,limframe1:limframe2), g.envmode);
+    tmp_projERP_area  = sum(abs(tmp_projERP(1,:)))+sum(abs(tmp_projERP(2,:)));
+    selectclusvar        = 100*tmp_projERP_area/outermostenv_area;
+end
+
+fprintf('Summed cluster sortvar in interval [%s %s] ms: %4.2f%',...
+    int2str(1000*times(limframe1)),int2str(1000*times(limframe2)), selectclusvar);
+fprintf('\n')
+
+
+
 if isempty(g.amplimits)
     envx = [1,compx+1];
     ymin = min(matsel(envdata,frames,0,1,envx(1)));
@@ -768,35 +774,44 @@ else
     ymax = g.amplimits(2);
 end
 
-if strcmpi(g.sumenv,'on')  | strcmpi(g.sumenv,'fill')
-    sumenv = envelope(sumproj, g.envmode);
-    if strcmpi(g.sumenv,'fill')
-        %
-        % Plot the summed projection filled
-        %
-        mins = matsel(sumenv,frames,0,2,0);
-        p=fill([times times(frames:-1:1)],...
-            [matsel(sumenv,frames,0,1,0) mins(frames:-1:1)], colors{5,1});
-        set(p,'EdgeColor',colors{5,1});
-        hold on
-        %
-        % Overplot the data envelope so it is not covered by the fill()'d component
-        %
-        p=plot(times,matsel(envdata,frames,0,1,1),'Color', colors{16,1});% plot the max
-        set(p,'LineWidth',2);                % component order (if BOLD_COLORS==0)
-        p=plot(times,matsel(envdata,frames,0,2,1),'Color', colors{16,1});% plot the min
-        set(p,'LineWidth',2);                % component order (if BOLD_COLORS==0)
+%
+% Plot the summed projection filled
+%
+sumenv = envelope(sumproj, g.envmode);
+if     strcmpi(g.sumenvfill,'selective')
+    filltimes = times(limframe1:limframe2);
+    mins = matsel(sumenv,frames,0,2,0);
+    p=fill([filltimes filltimes(end:-1:1)],...
+         [matsel(sumenv,frames,limframe1:limframe2,1,0) mins(limframe2:-1:limframe1)], g.fillcolor);
+    set(p,'EdgeColor', g.fillcolor);
+    hold on
+    % redraw outlines
+    p=plot(times,matsel(envdata,frames,0,1,1),'Color', colors{16,1});% plot the max
+    set(p,'LineWidth',2);
+    p=plot(times,matsel(envdata,frames,0,2,1),'Color', colors{16,1});% plot the min
+    set(p,'LineWidth',2);
+    
+elseif strcmpi(g.sumenvfill,'all')
+    mins = matsel(sumenv,frames,0,2,0);
+    p=fill([times times(frames:-1:1)],...
+        [matsel(sumenv,frames,0,1,0) mins(frames:-1:1)], g.fillcolor);
+    set(p,'EdgeColor', g.fillcolor);
+    hold on
+    % redraw outlines
+    p=plot(times,matsel(envdata,frames,0,1,1),'Color', colors{16,1});% plot the max
+    set(p,'LineWidth',2);
+    p=plot(times,matsel(envdata,frames,0,2,1),'Color', colors{16,1});% plot the min
+    set(p,'LineWidth',2);
 
-    else % if no 'fill'
-        tmp = matsel(sumenv,frames,0,2,0);
-        p=plot(times,tmp);% plot the min
-        hold on
-        set(p,'Color', colors{5,1});
-        set(p,'linewidth',2);
-        p=plot(times,matsel(sumenv,frames,0,1,0));% plot the max
-        set(p,'linewidth',2);
-        set(p,'Color', colors{5,1});
-    end
+else % if no 'fill'
+    tmp = matsel(sumenv,frames,0,2,0);
+    p=plot(times,tmp);% plot the min
+    hold on
+    set(p,'Color', colors{5,1});
+    set(p,'linewidth',2);
+    p=plot(times,matsel(sumenv,frames,0,1,0));% plot the max
+    set(p,'linewidth',2);
+    set(p,'Color', colors{5,1});
 end
 
 %
@@ -918,26 +933,18 @@ ymax = ymax+0.05*datarange;
     
 axis([pmin pmax ymin ymax]);
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% Show pvaf/pv/rv/fillclust %%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Show sortvar and fillclust %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-if strcmpi(g.sortvar,'pvaf')| strcmpi(g.sortvar,'pv')
-    t = text(double(xmin+0.05*(xmax-xmin)), ...
-        double(ymin+0.12*(ymax-ymin)), ...
-        ['pvaf ' num2str(sumpvaf,'%4.2f') '%']);
-    set(t,'fontsize',13,'fontweight','bold')
-elseif strcmpi(g.sortvar,'rv') 
-    t = text(double(xmin+0.05*(xmax-xmin)), ...
-        double(ymin+0.12*(ymax-ymin)), ...
-        ['rv ' num2str(sumpvaf,'%4.2f') '%']);
-    set(t,'fontsize',13,'fontweight','bold')
-end
+t = text(double(xmin+0.05*(xmax-xmin)), double(ymin+0.12*(ymax-ymin)), ...
+    [g.sortvar ' ' num2str(selectclusvar,'%4.2f') '%']);
+set(t,'fontsize',13,'fontweight','bold')
 
 if ~isempty(g.fillclust) & ismember(g.fillclust-1, envx)
     t = text(double(xmin+0.05*(xmax-xmin)), ...
         double(ymin+0.04*(ymax-ymin)), ...
-        ['cluster ' num2str(g.fillclust) ' filled with red']);
+        ['cluster ' num2str(g.fillclust) ' filled with a color']);
     set(t,'fontsize',12,'fontweight','bold')
 end
 
@@ -1132,11 +1139,9 @@ if strcmpi(g.dispmaps, 'on')
         end
         text(0.00,0.80,complabel,'FontSize',14,...
             'FontWeight','Bold','HorizontalAlignment','Center');
-        if strcmpi(g.sortvar, 'pvaf') | strcmpi(g.sortvar, 'pv')
-            text(-0.6, -0.6, ['pvaf: ' sprintf('%6.2f', pvaf(t)) ] );
-        elseif strcmpi(g.sortvar, 'rv')
-            text(-0.4, -0.7, ['rv: ' sprintf('%6.2f', pvaf(t)) ] );
-        end;
+        
+        text(-0.6, -0.6, [g.sortvar ': ' sprintf('%6.2f', sortvar(t)) ] );
+        
         % axt = axes('Units','Normalized','Position',[0 0 1 1],...
         axt = axes('Position',[0 0 1 1],...
             'Visible','Off','Fontsize',16);
@@ -1174,6 +1179,10 @@ axcopy(gcf, 'if ~isempty(get(gca, ''''userdata'''')), eval(get(gca, ''''userdata
 
 return %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
+
+
+
 function envdata = envelope(data, envmode)  % also in release as env()
 if nargin < 2
     envmode = 'avg';
@@ -1201,6 +1210,10 @@ else
 end;
 
 return %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
 
 function [STUDY, ALLEEG] = group_topo_now(STUDY, ALLEEG);
 % this function is to separate topoall into number of groups
