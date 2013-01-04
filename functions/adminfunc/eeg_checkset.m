@@ -1064,8 +1064,8 @@ for inddataset = 1:length(ALLEEG)
         if isfield(EEG.chaninfo, 'nosedir')
             if strcmpi(EEG.chaninfo.nosedir, '+x')
                 rotate = 0;
-            else
-                disp('EEG checkset: rotating channels and seting noze direction to default +X.');
+            elseif all(isfield(EEG.chanlocs,{'X','Y','theta','sph_theta'}))
+                disp('EEG checkset note for expert users: Noze direction now set to default +X in EEG.chanlocs and EEG.dipfit.');
                 if strcmpi(EEG.chaninfo.nosedir, '+y')
                     rotate = 270;
                 elseif strcmpi(EEG.chaninfo.nosedir, '-x')
