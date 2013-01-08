@@ -52,6 +52,7 @@ end;
 if nargin < 3
    confirm = 1;
 end;
+if islogical(tmprej), tmprej = tmprej+0; end;
 
 uniquerej = double(sort(unique(tmprej)));
 if length(tmprej) > 0 && length(uniquerej) <= 2 && ...
