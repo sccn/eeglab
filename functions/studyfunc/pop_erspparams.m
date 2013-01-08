@@ -131,30 +131,14 @@ end;
 if ~isequal(STUDY.etc.erspparams.timerange, TMPSTUDY.etc.erspparams.timerange) | ... 
     ~isequal(STUDY.etc.erspparams.freqrange, TMPSTUDY.etc.erspparams.freqrange) | ... 
     ~isequal(STUDY.etc.erspparams.subbaseline, TMPSTUDY.etc.erspparams.subbaseline)
-    if isfield(STUDY.cluster, 'erspdata')
-        for index = 1:length(STUDY.cluster)
-            STUDY.cluster(index).topotime  = [];
-            STUDY.cluster(index).topofreq  = [];
-            STUDY.cluster(index).erspdata  = [];
-            STUDY.cluster(index).erspbase  = [];
-            STUDY.cluster(index).ersptimes = [];
-            STUDY.cluster(index).erspfreqs = [];
-            STUDY.cluster(index).itcdata  = [];
-            STUDY.cluster(index).itctimes = [];
-            STUDY.cluster(index).itcfreqs = [];
+    rmfields = { 'erspdata' 'ersptimes' 'erspfreqs' 'erspbase' 'erspdatatrials' 'ersptimes' 'erspfreqs' 'erspsubjinds' 'ersptrialinfo' ...
+                 'itcdata'  'itctimes'  'itcfreqs'             'itcdatatrials'  'itctimes'  'itcfreqs'  'itcsubjinds'  'itctrialinfo' };
+    for iField = 1:length(rmfields)
+        if isfield(STUDY.cluster, rmfields{iField})
+            STUDY.cluster = rmfield(STUDY.cluster, rmfields{iField});
         end;
-    end;
-    if isfield(STUDY.changrp, 'erspdata')
-        for index = 1:length(STUDY.changrp)
-            STUDY.changrp(index).topotime  = [];
-            STUDY.changrp(index).topofreq  = [];
-            STUDY.changrp(index).erspdata  = [];
-            STUDY.changrp(index).erspbase  = [];
-            STUDY.changrp(index).ersptimes = [];
-            STUDY.changrp(index).erspfreqs = [];
-            STUDY.changrp(index).itcdata  = [];
-            STUDY.changrp(index).itctimes = [];
-            STUDY.changrp(index).itcfreqs = [];
+        if isfield(STUDY.changrp, rmfields{iField})
+            STUDY.changrp = rmfield(STUDY.changrp, rmfields{iField});
         end;
     end;
 end;
