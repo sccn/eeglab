@@ -1773,6 +1773,8 @@ else
 	set( g.mainwin12,'String', '- Remove baseline: "Tools > Remove baseline"');
 	set( g.mainwin13,'String', '- Run ICA:    "Tools > Run ICA"');
 end;
+
+% ERPLAB 
 if exist('ALLERP') == 1 && ~isempty(ALLERP)
     menustatus = { menustatus{:} 'erp_dataset' };
 end;
@@ -1799,19 +1801,16 @@ elseif any(strcmp(menustatus, 'multiple_datasets'))
     set(allmenus          , 'enable', 'off');  
     set(allmenus(indmatch), 'enable', 'on');        
     set(findobj('parent', W_MAIN, 'label', 'Study'), 'enable', 'off');
-    
-elseif any(strcmp(menustatus, 'erp_dataset'))
-    
-    set(allmenus, 'enable', 'on');  
-    indmatch = cellfun(@(x)(~isempty(findstr(num2str(x), 'erpset:on'))), allstrs);  
-    set(allmenus(indmatch), 'enable', 'off');
-    
+
+% --------------------------------
+% Javier Lopez-Calderon for ERPLAB
 elseif any(strcmp(menustatus, 'epoched_dataset'))
 
     set(allmenus, 'enable', 'on');  
     indmatch = cellfun(@(x)(~isempty(findstr(num2str(x), 'epoch:off'))), allstrs);  
     set(allmenus(indmatch), 'enable', 'off');
-    
+% end, Javier Lopez-Calderon for ERPLAB
+% --------------------------------    
 elseif any(strcmp(menustatus, 'continuous_dataset'))
     
     set(allmenus, 'enable', 'on');  
@@ -1826,13 +1825,22 @@ if any(strcmp(menustatus, 'chanloc_absent'))
     set(allmenus(indmatch), 'enable', 'off');
     
 end;
-
 if any(strcmp(menustatus, 'ica_absent'))
     
     indmatch = cellfun(@(x)(~isempty(findstr(num2str(x), 'ica:on'))), allstrs);  
     set(allmenus(indmatch), 'enable', 'off');
     
 end;
+
+% --------------------------------
+% Javier Lopez-Calderon for ERPLAB
+if any(strcmp(menustatus, 'erp_dataset'))    
+    indmatch = cellfun(@(x)(~isempty(findstr(num2str(x), 'erpset:on'))), allstrs);  
+    set(allmenus(indmatch), 'enable', 'on');
+end
+% end, Javier Lopez-Calderon for ERPLAB
+% --------------------------------
+
 
 % adjust title extent
 % -------------------
