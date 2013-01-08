@@ -317,7 +317,7 @@ else
             [tmp ti1] = min(abs(alltimes-params.plottf(3)));
             [tmp ti2] = min(abs(alltimes-params.plottf(4)));
             for index = 1:length(allersp(:))
-                allersp{index} = mean(mean(allersp{index}(ti1:ti2,fi1:fi2,:,:),1),2);
+                allersp{index} = mean(mean(allersp{index}(fi1:fi2,ti1:ti2,:,:),1),2);
                 allersp{index} = reshape(allersp{index}, [1 size(allersp{index},3) size(allersp{index},4) ]);
             end;
         end
