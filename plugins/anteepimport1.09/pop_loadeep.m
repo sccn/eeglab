@@ -156,7 +156,7 @@ if ~isempty(findstr('triggerfile', lower(options)))
             j = 1;
             for i = 1:length(trg)
                 % adjust latency (#samples) for srate and offset 'timer(1)'
-                trg_latency = ( (trg(i).time) - EEG.xmin ) * EEG.srate + 1;
+                trg_latency = ( (trg(i).time)/1000 - EEG.xmin ) * EEG.srate + 1;
                 if trg_latency >= 0.5 && trg_latency < EEG.pnts*EEG.trials
                     EEG.event(j).type = trg(i).code;
                     EEG.event(j).latency = trg_latency; %trg(i).offset+1;
