@@ -337,18 +337,18 @@ for inddataset = 1:length(ALLEEG)
                     [EEG res] = eeg_checkset(EEG);
                     if isempty(EEG.event), return; end;
                     
-                    % convert type to numeric if necessary
-                    % ------------------------------------
-%                     if isfield(EEG.event, 'type') 
-%                         tmpevent = EEG.event;
-%                         num = cellfun(@isnumeric, {tmpevent.type});
-%                         if any(cellfun(@isnumeric, {tmpevent.type}))
-%                             disp('Warning: converting all event types to strings');
-%                             for ind = 1:length(EEG.event)
-%                                 EEG.event(ind).type = num2str(EEG.event(ind).type);
-%                             end;
-%                         end;
-%                     end;
+                    % check events (slow)
+                    % ------------
+                    if isfield(EEG.event, 'type')
+                        tmpevent = EEG.event;
+                        if ~all(cellfun(@ischar, { tmpevent.type })) && ~all(cellfun(@isnumeric, { tmpevent.type }))
+                            disp('Warning: converting all event types to strings');
+                            for ind = 1:length(EEG.event)
+                                EEG.event(ind).type = num2str(EEG.event(ind).type);
+                            end;
+                            EEG = eeg_checkset(EEG, 'eventconsistency');
+                        end;
+                    end;
                     
                     % remove the events which latency are out of boundary
                     % ---------------------------------------------------
@@ -1185,7 +1185,7 @@ for inddataset = 1:length(ALLEEG)
     % check events (fast)
     % ------------
     if isfield(EEG.event, 'type')
-        tmpevent = EEG.event(1:min(length(EEG.event), 10));
+        tmpevent = EEG.event(1:min(length(EEG.event), 100));
         if ~all(cellfun(@ischar, { tmpevent.type })) && ~all(cellfun(@isnumeric, { tmpevent.type }))
             disp('Warning: converting all event types to strings');
             for ind = 1:length(EEG.event)
