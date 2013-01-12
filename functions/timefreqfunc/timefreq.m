@@ -527,6 +527,12 @@ if ~isempty(g.timestretch) && length(g.timestretch{1}) > 0
     end
 end
 %time-warp ends
+zerovals = tmpall == 0;
+if any(reshape(zerovals, 1, prod(size(zerovals))))
+    tmpall(zerovals) = Inf;
+    minval = min(tmpall(:)); % remove bug
+    tmpall(zerovals) = minval;
+end;
 
 % compute and subtract ITC
 % ------------------------
