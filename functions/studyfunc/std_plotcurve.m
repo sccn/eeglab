@@ -129,8 +129,9 @@ end;
 % color matrix
 % -----------------------
 onecol  = { 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b' 'b' };
-manycol = { 'b' 'g' 'm' 'c' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' ...
+manycol = { 'b' 'g' 'm' 'c' 'r' 'k' 'y' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' ...
                    'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' 'r' 'b' 'g' 'c' 'm' };
+modifier = { '-' '--' '-.' ':' '-' '--' '-.' ':' '-' '--' '-.' ':'  };
 if strcmpi(opt.plotgroups, 'together') || strcmpi(opt.plotconditions, 'together') || strcmpi(opt.figure, 'off')
      col = manycol;
 else col = onecol;
@@ -139,8 +140,26 @@ nonemptycell = find(~cellfun(@isempty, data));
 maxdim = max(length(data(:)), size(data{nonemptycell(1)}, ndims(data{nonemptycell(1)})));
 tmpcol = col;
 if strcmpi(opt.plotsubjects, 'off')
-    coldata = col(mod([0:maxdim-1], length(col))+1);
-    coldata = reshape(coldata(1:length(data(:))), size(data));
+    
+    % both group and conditions together
+    if strcmpi(opt.plotconditions, 'together') && strcmpi(opt.plotgroups, 'together')
+        dim1 = max(size(data));
+        dim2 = min(size(data));
+        coldata = col([1:dim1]);
+        for iRow = 2:dim2
+            coldata(iRow,:) = coldata(1,:);
+            for iCol = 1:dim1
+                coldata{iRow,iCol} = [ coldata{iRow,iCol} modifier{iRow} ];
+            end;
+        end;
+        if size(coldata,1) ~= size(data,1), coldata = coldata'; end;
+    else
+        coldata = manycol;
+    end;
+       
+    %coldata = col(mod([0:maxdim-1], length(col))+1);
+    %coldata = col(mod([0:maxdim-1], length(col))+1);
+    %coldata = reshape(coldata(1:length(data(:))), size(data));
 else
     coldata = cell(size(data));
 end;
