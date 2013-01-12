@@ -218,6 +218,11 @@ for fInd = 1:length(opt.dataindices) % usually only one value
     % -------------------------------
     if isfield(fileData, fieldsToRead)
         fieldData = getfield(fileData, fieldsToRead);
+        if isempty(fieldData)
+            tmpSize = size(fieldData); 
+            tmpSize(tmpSize == 0) = 1;
+            fieldData = ones(tmpSize)*NaN;
+        end;
         if isstr(fieldData), eval( [ 'fieldData = ' fieldData ] ); end;
         
         % average single trials if necessary
@@ -233,6 +238,7 @@ for fInd = 1:length(opt.dataindices) % usually only one value
         if fInd == 1
             sizeFD = size(fieldData);
             if length(sizeFD) == 2 && (sizeFD(1) == 1 || sizeFD(2) == 1), sizeFD = sizeFD(1)*sizeFD(2); end;
+            if length(sizeFD) == 2 && (sizeFD(1) == 0 || sizeFD(2) == 0), sizeFD = max(sizeFD(1)); end;
             if strcmpi(opt.singletrials, 'off'), measureData = zeros([ sizeFD length(opt.dataindices) ], 'single');
             else                                 measureData = zeros([ sizeFD ], 'single');
             end;
@@ -262,8 +268,11 @@ for fInd = 1:length(opt.dataindices) % usually only one value
     elseif ~isempty(findstr('comp', fieldsToRead))
         error( sprintf([ 'Field "%s" not found in file %s' 10 'Try recomputing measure.' ], fieldsToRead, [ fileBaseName{fInd} fileExt ]));
     else
+        error(['Problem loading data, most likely your design has' 10 ...
+                      'conditions with no trials or missing channels' 10 ...
+                      'If you think this is a bug, report it on Bugzilla for EEGLAB' ]);
         % the case below is for the rare case where all the channels are read and the end of the array needs to be trimmed
-        error('There is a problem with your data, please enter a bug report and upload your data at http://sccn.ucsd.edu/eeglab/bugzilla');
+        % error('There is a problem with your data, please enter a bug report and upload your data at http://sccn.ucsd.edu/eeglab/bugzilla');
         if nDimData == 1,     measureData(:,1:(fInd-1))     = [];
         elseif nDimData == 2, measureData(:,:,1:(fInd-1))   = [];
         else                  measureData(:,:,:,1:(fInd-1)) = [];
