@@ -151,18 +151,15 @@ end;
 % scan clusters and channels to remove erpdata info if timerange has changed
 % ----------------------------------------------------------
 if ~isequal(STUDY.etc.erpparams.timerange, TMPSTUDY.etc.erpparams.timerange)
-    if isfield(STUDY.cluster, 'erpdata')
-        for index = 1:length(STUDY.cluster)
-            STUDY.cluster(index).erpdata  = [];
-            STUDY.cluster(index).erptimes = [];
+    rmfields = { 'erpdata' 'erptimes' };
+    for iField = 1:length(rmfields)
+        if isfield(STUDY.cluster, rmfields{iField})
+            STUDY.cluster = rmfield(STUDY.cluster, rmfields{iField});
         end;
-    end;
-    if isfield(STUDY.changrp, 'erpdata')
-        for index = 1:length(STUDY.changrp)
-            STUDY.changrp(index).erpdata  = [];
-            STUDY.changrp(index).erptimes = [];
+        if isfield(STUDY.changrp, rmfields{iField})
+            STUDY.changrp = rmfield(STUDY.changrp, rmfields{iField});
         end;
-    end;
+    end;   
 end;
 
 function STUDY = default_params(STUDY)
