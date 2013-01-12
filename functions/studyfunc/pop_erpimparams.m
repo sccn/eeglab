@@ -116,22 +116,15 @@ end;
 % ---------------------------------------------------------------------------------
 if ~isequal(STUDY.etc.erpimparams.timerange, TMPSTUDY.etc.erpimparams.timerange) | ... 
     ~isequal(STUDY.etc.erpimparams.trialrange, TMPSTUDY.etc.erpimparams.trialrange)
-    if isfield(STUDY.cluster, 'erpimdata')
-        for index = 1:length(STUDY.cluster)
-            STUDY.cluster(index).erpimdata   = [];
-            STUDY.cluster(index).erpimtimes  = [];
-            STUDY.cluster(index).erpimtrials = [];
-            STUDY.cluster(index).erpimevents = [];
+    rmfields = { 'erpimdata' 'erpimtimes' 'erpimtrials' 'erpimevents' };
+    for iField = 1:length(rmfields)
+        if isfield(STUDY.cluster, rmfields{iField})
+            STUDY.cluster = rmfield(STUDY.cluster, rmfields{iField});
         end;
-    end;
-    if isfield(STUDY.changrp, 'erpimdata')
-        for index = 1:length(STUDY.changrp)
-            STUDY.changrp(index).erpimdata   = [];
-            STUDY.changrp(index).erpimtimes  = [];
-            STUDY.changrp(index).erpimtrials = [];
-            STUDY.changrp(index).erpimevents = [];
+        if isfield(STUDY.changrp, rmfields{iField})
+            STUDY.changrp = rmfield(STUDY.changrp, rmfields{iField});
         end;
-    end;
+    end;   
 end;
 
 function STUDY = default_params(STUDY)
