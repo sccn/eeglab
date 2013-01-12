@@ -152,18 +152,15 @@ end;
 % ----------------------------------------------------------
 if ~isequal(STUDY.etc.specparams.freqrange, TMPSTUDY.etc.specparams.freqrange) | ...
     ~isequal(STUDY.etc.specparams.subtractsubjectmean, TMPSTUDY.etc.specparams.subtractsubjectmean)
-    if isfield(STUDY.cluster, 'specdata')
-        for index = 1:length(STUDY.cluster)
-            STUDY.cluster(index).specdata  = [];
-            STUDY.cluster(index).specfreqs = [];
+    rmfields = { 'specdata' 'specfreqs' };
+    for iField = 1:length(rmfields)
+        if isfield(STUDY.cluster, rmfields{iField})
+            STUDY.cluster = rmfield(STUDY.cluster, rmfields{iField});
         end;
-    end;
-    if isfield(STUDY.changrp, 'specdata')
-        for index = 1:length(STUDY.changrp)
-            STUDY.changrp(index).specdata  = [];
-            STUDY.changrp(index).specfreqs = [];
+        if isfield(STUDY.changrp, rmfields{iField})
+            STUDY.changrp = rmfield(STUDY.changrp, rmfields{iField});
         end;
-    end;
+    end;   
 end;
 
 function STUDY = default_params(STUDY)
