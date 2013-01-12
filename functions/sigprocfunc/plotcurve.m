@@ -157,7 +157,9 @@ function plotcurve( times, R, varargin);
            plot(times,R(ind,:), 'k', 'linewidth', 2);
       elseif ~isempty(g.colors),
            tmp = plot(times,R(ind,:), 'k'); 
-           set(tmp, 'color', g.colors{mod(ind-1, length(g.colors))+1}); 
+           tmpcol = g.colors{mod(ind-1, length(g.colors))+1};
+           if length(tmpcol) > 1, tmpstyle = tmpcol(2:end); tmpcol = tmpcol(1); else tmpstyle = '-'; end;
+           set(tmp, 'color', tmpcol, 'linestyle', tmpstyle); 
            
            if ~isempty(g.traceinfo)
                if isstr(g.traceinfo) && strcmpi(g.traceinfo, 'on')
@@ -172,8 +174,8 @@ function plotcurve( times, R, varargin);
            end;
            
            % change the line style when number of plots exceed number of colors in g.colors
-           lineStyles = {'-', '--',':','-.'};
-           set(tmp,'LineStyle',lineStyles{min(ceil(ind/length(g.colors)),length(lineStyles))});
+           %lineStyles = {'-', '--',':','-.'};
+           %set(tmp,'LineStyle',lineStyles{min(ceil(ind/length(g.colors)),length(lineStyles))});
           
            hold on;
       else plot(times,R(ind,:));
