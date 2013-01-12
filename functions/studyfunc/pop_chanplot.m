@@ -255,247 +255,251 @@ else
     changrp = get(findobj('parent', hdl, 'tag', 'chan_list')   , 'value');
     onechan = get(findobj('parent', hdl, 'tag', 'chan_onechan'), 'value');
    
-    switch  varargin{1}
-        
-        case {'topoplot', 'erspplot','itcplot','specplot', 'erpplot', 'erpimageplot' }
-            changrpstr = allchans(changrp);
-            plotting_option = varargin{1};
-            plotting_option = [ plotting_option(1:end-4) 'plot' ];
-            a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''channels'','  vararg2str({changrpstr}) ');' ];
-             % update Study history
-            eval(a); STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
-            userdat{1}{2} = STUDY;
-            set(hdl, 'userdat',userdat); 
+    try
+        switch  varargin{1}
 
-        case {'plotchanersp','plotchanitc','plotchanspec', 'plotchanerp','plotchanerpimage' }
-            changrpstr    = allchans(changrp);
-            
-            %if length(changrp) > 1
-            %    subject = STUDY.subject{onechan-1};
-            %else
-            %    changrpstruct = STUDY.changrp(changrp);
-            %    allsubjects   = unique({ STUDY.datasetinfo([ changrpstruct.setinds{:} ]).subject });
-            %    subject = allsubjects{onechan-1};
-            %end;
-            
-            plotting_option = varargin{1};
-            plotting_option = [ plotting_option(9:end) 'plot' ];
-            if onechan(1) ~= 1  % check that not all onechan in channel are requested
-                 subject = STUDY.design(STUDY.currentdesign).cases.value{onechan-1};
-                 a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''channels'','  vararg2str({changrpstr}) ', ''subject'', ''' subject ''' );' ];
-                 eval(a); STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
-             else
-                a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''channels'','  vararg2str({changrpstr}) ', ''plotsubjects'', ''on'' );' ];
-                eval(a); STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);
-             end;
-            userdat{1}{2} = STUDY;
-            set(hdl, 'userdat',userdat); 
-            
-        case 'stat_opt' % save the list of selected channels
-            [STUDY com] = pop_statparams(STUDY);
-            if ~isempty(com)
-                STUDY.history =  sprintf('%s\n%s',  STUDY.history, com);
-            end;
-            userdat{1}{2} = STUDY;
-            set(hdl, 'userdat',userdat); %update information (STUDY)
-            
-        case 'erp_opt' % save the list of selected channels
-            [STUDY com] = pop_erpparams(STUDY);
-            if ~isempty(com)
-                STUDY.history =  sprintf('%s\n%s',  STUDY.history, com);
-            end;
-            userdat{1}{2} = STUDY;
-            set(hdl, 'userdat',userdat); %update information (STUDY)     
-
-        case 'spec_opt' % save the list of selected channels
-            [STUDY com] = pop_specparams(STUDY);
-            if ~isempty(com)
-                STUDY.history =  sprintf('%s\n%s',  STUDY.history, com);
-            end;
-            userdat{1}{2} = STUDY;
-            set(hdl, 'userdat',userdat); %update information (STUDY)     
-         
-        case 'ersp_opt' % save the list of selected channels
-            [STUDY com] = pop_erspparams(STUDY);
-            if ~isempty(com)
-                STUDY.history =  sprintf('%s\n%s',  STUDY.history, com);
-            end;
-            userdat{1}{2} = STUDY;
-            set(hdl, 'userdat',userdat); %update information (STUDY)     
-            
-        case 'erpim_opt' % save the list of selected channels
-            [STUDY com] = pop_erpimparams(STUDY);
-            if ~isempty(com)
-                STUDY.history =  sprintf('%s\n%s',  STUDY.history, com);
-            end;
-            userdat{1}{2} = STUDY;
-            set(hdl, 'userdat',userdat); %update information (STUDY)     
-            
-        case 'showchanlist' % save the list of selected channels
-            if length(changrp) == 1
-                STUDY.changrp(changrp).selected = onechan;
-            end;
-            userdat{1}{2} = STUDY;
-            set(hdl, 'userdat',userdat); %update information (STUDY)     
-               
-       case 'showchan'
-            cind     = get(findobj('parent', hdl, 'tag', 'chan_list')   , 'value');
-            changrp  = STUDY.changrp(cind);
-            
-            % Find datasets availaible
-            % ------------------------
-            %setind = STUDY.setind .* (changrp.chaninds > 0); % set to 0 the cell not
-            %%                                       % containing any electrode
-            %allchansets = unique( setind(find(setind(:))) );
-            
-            % Generate channel list
-            % ---------------------
-            chanid{1} = 'All subjects';
-            if length(changrp) == 1
-                allsubjects = unique({ STUDY.design(STUDY.currentdesign).cell([ changrp.setinds{:} ]).case });
-                for l = 1:length(allsubjects)
-                    chanid{end+1} = [ allsubjects{l} ' ' changrp.name ];
-                end;
-            else
-                for l = 1:length(STUDY.design(STUDY.currentdesign).cases.value)
-                    chanid{end+1} = [ STUDY.design(STUDY.currentdesign).cases.value{l} ];
-                end;
-            end;
-                
-            selected = 1;
-            if isfield(changrp, 'selected') & length(cind) == 1
-                if ~isempty(STUDY.changrp(cind).selected)
-                    selected = min(STUDY.changrp(cind).selected, 1+length(chanid));
-                    STUDY.changrp(cind).selected = selected;
-                end;
-            end;
-
-            set(findobj('parent', hdl, 'tag', 'chan_onechan'), 'value', selected, 'String', chanid);
-        
-        case 'sel_all_chans'
-            set(findobj('parent', hdl, 'tag', 'chan_list'), 'value', [1:length(STUDY.changrp)]);
-            
-            % Generate channel list
-            % ---------------------
-            chanid{1} = 'All subjects';
-            for l = 1:length(STUDY.design(STUDY.currentdesign).cases.value)
-                chanid{end+1} = [ STUDY.design(STUDY.currentdesign).cases.value{l} ' All' ];
-            end;
-            selected = 1;
-            set(findobj('parent', hdl, 'tag', 'chan_onechan'), 'value', selected, 'String', chanid);
-
-        case 'plotsum'
-            changrpstr = allchans(changrp);
-            [STUDY] = std_propplot(STUDY, ALLEEG, allchans(changrp));
-            a = ['STUDY = std_propplot(STUDY, ALLEEG, ' vararg2str({ allchans(changrp) }) ' );'  ];
-            STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
-            userdat{1}{2} = STUDY;
-            set(hdl, 'userdat',userdat);    
-                       
-        case 'create_group'
-            channames = { STUDY.changrp(changrp).name };
-            for i=1:length(channames), channames{i} = [ ' ' channames{i} ]; end;
-            channamestr = strcat(channames{:});
-            res = inputdlg2({ 'Name of channel group', 'Channels to group' }, 'Create channel group', 1, { '' channamestr(2:end) });
-            if isempty(res), return; end;
-            STUDY.changrp(end+1).name = res{1};
-            allchans(end+1)         = { res{1} };
-            chanlabels = parsetxt(res{2});
-            if length(chanlabels) == 1
-                warndlg2('Cannot create a channel group with a single channel');
-                return;
-            end;
-            STUDY.changrp(end).channels = chanlabels;
-            tmp = std_chanlookup( STUDY, ALLEEG, STUDY.changrp(end));
-            STUDY.changrp(end).chaninds = tmp.chaninds;
-            userdat{1}{2} = STUDY;
-            userdat{1}{4} = allchans;
-            set(hdl, 'userdat',userdat);    
-            
-            % list of channel groups
-            % ----------------------
-            tmpobj  = findobj('parent', hdl, 'tag', 'chan_list');
-            tmptext = get(tmpobj, 'string');
-            tmptext{end+1} = [ 'All ' STUDY.changrp(end).name ];
-            set(tmpobj, 'string', tmptext, 'value', length(tmptext));
-
-        case 'edit_group'
-            if length(changrp) > 1, return; end;
-            if length(STUDY.changrp(changrp).channels) < 2, return; end;
-            channames = STUDY.changrp(changrp).channels;
-            for i=1:length(channames), channames{i} = [ ' ' channames{i} ]; end;
-            channamestr = strcat(channames{:});
-            res = inputdlg2({ 'Name of channel group', 'Channels to group' }, 'Create channel group', ...
-                            1, { STUDY.changrp(changrp).name channamestr(2:end) });
-            if isempty(res), return; end;
-            STUDY.changrp(end+1).name = '';
-            STUDY.changrp(changrp)    = STUDY.changrp(end);
-            STUDY.changrp(end)        = [];
-            STUDY.changrp(changrp).name = res{1};
-            allchans(changrp)         = { res{1} };
-            chanlabels = parsetxt(res{2});
-            STUDY.changrp(changrp).channels = chanlabels;
-            tmp = std_chanlookup( STUDY, ALLEEG, STUDY.changrp(end));
-            STUDY.changrp(changrp).chaninds = tmp.chaninds;
-            userdat{1}{2} = STUDY;
-            userdat{1}{4} = allchans;
-            set(hdl, 'userdat',userdat);    
-            
-            % list of channel groups
-            % ----------------------
-            show_options = {};
-            for index = 1:length(STUDY.changrp)
-                show_options{end+1} = [ 'All ' STUDY.changrp(index).name ];
-            end;
-            tmpobj  = findobj('parent', hdl, 'tag', 'chan_list');
-            set(tmpobj, 'string', show_options, 'value', changrp);
-            
-        case 'delete_group'
-            if length(changrp) > 1, return; end;
-            if length(STUDY.changrp(changrp).channels) < 2, return; end;
-            STUDY.changrp(changrp)    = [];
-            
-            % list of channel groups
-            % ----------------------
-            show_options = {};
-            for index = 1:length(STUDY.changrp)
-                show_options{end+1} = [ 'All ' STUDY.changrp(index).name ];
-            end;
-            tmpobj  = findobj('parent', hdl, 'tag', 'chan_list');
-            set(tmpobj, 'string', show_options, 'value', changrp-1);
-            
-        case 'renamechan'
-            STUDY.saved = 'no';
-            chan_name_list = get(findobj('parent', hdl, 'tag', 'chan_list'), 'String');
-            chan_num = get(findobj('parent', hdl, 'tag', 'chan_list'), 'Value') -1;
-            if chan_num == 0  % 'all subjects' option 
-                return;
-            end
-            % Don't rename 'Notchan' and 'Outliers'  channels.
-            if strncmpi('Notchan',STUDY.channel(cls(chan_num)).name,8) | strncmpi('Outliers',STUDY.channel(cls(chan_num)).name,8) | ...
-                    strncmpi('Parentchannel',STUDY.channel(cls(chan_num)).name,13)
-                warndlg2('The Parentchannel, Outliers, and Notchan channels cannot be renamed');
-                return;
-			end
-            old_name = STUDY.channel(cls(chan_num)).name;
-            rename_param  = inputgui( { [1] [1] [1]}, ...
-                { {'style' 'text' 'string' ['Rename ' old_name] 'FontWeight' 'Bold'} {'style' 'edit' 'string' '' 'tag' 'chan_rename' } {} }, ...
-            '', 'Rename channel - from pop_chanplot()' );
-            if ~isempty(rename_param) %if not canceled
-                new_name = rename_param{1};
-                STUDY = std_renamechan(STUDY, ALLEEG, cls(chan_num), new_name);
-                % update Study history
-                a = ['STUDY = std_renamechan(STUDY, ALLEEG, ' num2str(cls(chan_num)) ', ' STUDY.channel(cls(chan_num)).name  ');'];
-                STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
-                
-                new_name = [ STUDY.channel(cls(chan_num)).name ' (' num2str(length(STUDY.channel(cls(chan_num)).onechan))  ' ICs)'];
-                chan_name_list{chan_num+1} = renamechan( chan_name_list{chan_num+1}, new_name);
-                set(findobj('parent', hdl, 'tag', 'chan_list'), 'String', chan_name_list);
-                set(findobj('parent', hdl, 'tag', 'chan_rename'), 'String', '');
+            case {'topoplot', 'erspplot','itcplot','specplot', 'erpplot', 'erpimageplot' }
+                changrpstr = allchans(changrp);
+                plotting_option = varargin{1};
+                plotting_option = [ plotting_option(1:end-4) 'plot' ];
+                a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''channels'','  vararg2str({changrpstr}) ');' ];
+                 % update Study history
+                eval(a); STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
                 userdat{1}{2} = STUDY;
-                set(hdl, 'userdat',userdat); %update STUDY
-            end            
-    end
+                set(hdl, 'userdat',userdat); 
+
+            case {'plotchanersp','plotchanitc','plotchanspec', 'plotchanerp','plotchanerpimage' }
+                changrpstr    = allchans(changrp);
+
+                %if length(changrp) > 1
+                %    subject = STUDY.subject{onechan-1};
+                %else
+                %    changrpstruct = STUDY.changrp(changrp);
+                %    allsubjects   = unique({ STUDY.datasetinfo([ changrpstruct.setinds{:} ]).subject });
+                %    subject = allsubjects{onechan-1};
+                %end;
+
+                plotting_option = varargin{1};
+                plotting_option = [ plotting_option(9:end) 'plot' ];
+                if onechan(1) ~= 1  % check that not all onechan in channel are requested
+                     subject = STUDY.design(STUDY.currentdesign).cases.value{onechan-1};
+                     a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''channels'','  vararg2str({changrpstr}) ', ''subject'', ''' subject ''' );' ];
+                     eval(a); STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
+                 else
+                    a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''channels'','  vararg2str({changrpstr}) ', ''plotsubjects'', ''on'' );' ];
+                    eval(a); STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);
+                 end;
+                userdat{1}{2} = STUDY;
+                set(hdl, 'userdat',userdat); 
+
+            case 'stat_opt' % save the list of selected channels
+                [STUDY com] = pop_statparams(STUDY);
+                if ~isempty(com)
+                    STUDY.history =  sprintf('%s\n%s',  STUDY.history, com);
+                end;
+                userdat{1}{2} = STUDY;
+                set(hdl, 'userdat',userdat); %update information (STUDY)
+
+            case 'erp_opt' % save the list of selected channels
+                [STUDY com] = pop_erpparams(STUDY);
+                if ~isempty(com)
+                    STUDY.history =  sprintf('%s\n%s',  STUDY.history, com);
+                end;
+                userdat{1}{2} = STUDY;
+                set(hdl, 'userdat',userdat); %update information (STUDY)     
+
+            case 'spec_opt' % save the list of selected channels
+                [STUDY com] = pop_specparams(STUDY);
+                if ~isempty(com)
+                    STUDY.history =  sprintf('%s\n%s',  STUDY.history, com);
+                end;
+                userdat{1}{2} = STUDY;
+                set(hdl, 'userdat',userdat); %update information (STUDY)     
+
+            case 'ersp_opt' % save the list of selected channels
+                [STUDY com] = pop_erspparams(STUDY);
+                if ~isempty(com)
+                    STUDY.history =  sprintf('%s\n%s',  STUDY.history, com);
+                end;
+                userdat{1}{2} = STUDY;
+                set(hdl, 'userdat',userdat); %update information (STUDY)     
+
+            case 'erpim_opt' % save the list of selected channels
+                [STUDY com] = pop_erpimparams(STUDY);
+                if ~isempty(com)
+                    STUDY.history =  sprintf('%s\n%s',  STUDY.history, com);
+                end;
+                userdat{1}{2} = STUDY;
+                set(hdl, 'userdat',userdat); %update information (STUDY)     
+
+            case 'showchanlist' % save the list of selected channels
+                if length(changrp) == 1
+                    STUDY.changrp(changrp).selected = onechan;
+                end;
+                userdat{1}{2} = STUDY;
+                set(hdl, 'userdat',userdat); %update information (STUDY)     
+
+           case 'showchan'
+                cind     = get(findobj('parent', hdl, 'tag', 'chan_list')   , 'value');
+                changrp  = STUDY.changrp(cind);
+
+                % Find datasets availaible
+                % ------------------------
+                %setind = STUDY.setind .* (changrp.chaninds > 0); % set to 0 the cell not
+                %%                                       % containing any electrode
+                %allchansets = unique( setind(find(setind(:))) );
+
+                % Generate channel list
+                % ---------------------
+                chanid{1} = 'All subjects';
+                if length(changrp) == 1
+                    allsubjects = unique({ STUDY.design(STUDY.currentdesign).cell([ changrp.setinds{:} ]).case });
+                    for l = 1:length(allsubjects)
+                        chanid{end+1} = [ allsubjects{l} ' ' changrp.name ];
+                    end;
+                else
+                    for l = 1:length(STUDY.design(STUDY.currentdesign).cases.value)
+                        chanid{end+1} = [ STUDY.design(STUDY.currentdesign).cases.value{l} ];
+                    end;
+                end;
+
+                selected = 1;
+                if isfield(changrp, 'selected') & length(cind) == 1
+                    if ~isempty(STUDY.changrp(cind).selected)
+                        selected = min(STUDY.changrp(cind).selected, 1+length(chanid));
+                        STUDY.changrp(cind).selected = selected;
+                    end;
+                end;
+
+                set(findobj('parent', hdl, 'tag', 'chan_onechan'), 'value', selected, 'String', chanid);
+
+            case 'sel_all_chans'
+                set(findobj('parent', hdl, 'tag', 'chan_list'), 'value', [1:length(STUDY.changrp)]);
+
+                % Generate channel list
+                % ---------------------
+                chanid{1} = 'All subjects';
+                for l = 1:length(STUDY.design(STUDY.currentdesign).cases.value)
+                    chanid{end+1} = [ STUDY.design(STUDY.currentdesign).cases.value{l} ' All' ];
+                end;
+                selected = 1;
+                set(findobj('parent', hdl, 'tag', 'chan_onechan'), 'value', selected, 'String', chanid);
+
+            case 'plotsum'
+                changrpstr = allchans(changrp);
+                [STUDY] = std_propplot(STUDY, ALLEEG, allchans(changrp));
+                a = ['STUDY = std_propplot(STUDY, ALLEEG, ' vararg2str({ allchans(changrp) }) ' );'  ];
+                STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
+                userdat{1}{2} = STUDY;
+                set(hdl, 'userdat',userdat);    
+
+            case 'create_group'
+                channames = { STUDY.changrp(changrp).name };
+                for i=1:length(channames), channames{i} = [ ' ' channames{i} ]; end;
+                channamestr = strcat(channames{:});
+                res = inputdlg2({ 'Name of channel group', 'Channels to group' }, 'Create channel group', 1, { '' channamestr(2:end) });
+                if isempty(res), return; end;
+                STUDY.changrp(end+1).name = res{1};
+                allchans(end+1)         = { res{1} };
+                chanlabels = parsetxt(res{2});
+                if length(chanlabels) == 1
+                    warndlg2('Cannot create a channel group with a single channel');
+                    return;
+                end;
+                STUDY.changrp(end).channels = chanlabels;
+                tmp = std_chanlookup( STUDY, ALLEEG, STUDY.changrp(end));
+                STUDY.changrp(end).chaninds = tmp.chaninds;
+                userdat{1}{2} = STUDY;
+                userdat{1}{4} = allchans;
+                set(hdl, 'userdat',userdat);    
+
+                % list of channel groups
+                % ----------------------
+                tmpobj  = findobj('parent', hdl, 'tag', 'chan_list');
+                tmptext = get(tmpobj, 'string');
+                tmptext{end+1} = [ 'All ' STUDY.changrp(end).name ];
+                set(tmpobj, 'string', tmptext, 'value', length(tmptext));
+
+            case 'edit_group'
+                if length(changrp) > 1, return; end;
+                if length(STUDY.changrp(changrp).channels) < 2, return; end;
+                channames = STUDY.changrp(changrp).channels;
+                for i=1:length(channames), channames{i} = [ ' ' channames{i} ]; end;
+                channamestr = strcat(channames{:});
+                res = inputdlg2({ 'Name of channel group', 'Channels to group' }, 'Create channel group', ...
+                                1, { STUDY.changrp(changrp).name channamestr(2:end) });
+                if isempty(res), return; end;
+                STUDY.changrp(end+1).name = '';
+                STUDY.changrp(changrp)    = STUDY.changrp(end);
+                STUDY.changrp(end)        = [];
+                STUDY.changrp(changrp).name = res{1};
+                allchans(changrp)         = { res{1} };
+                chanlabels = parsetxt(res{2});
+                STUDY.changrp(changrp).channels = chanlabels;
+                tmp = std_chanlookup( STUDY, ALLEEG, STUDY.changrp(end));
+                STUDY.changrp(changrp).chaninds = tmp.chaninds;
+                userdat{1}{2} = STUDY;
+                userdat{1}{4} = allchans;
+                set(hdl, 'userdat',userdat);    
+
+                % list of channel groups
+                % ----------------------
+                show_options = {};
+                for index = 1:length(STUDY.changrp)
+                    show_options{end+1} = [ 'All ' STUDY.changrp(index).name ];
+                end;
+                tmpobj  = findobj('parent', hdl, 'tag', 'chan_list');
+                set(tmpobj, 'string', show_options, 'value', changrp);
+
+            case 'delete_group'
+                if length(changrp) > 1, return; end;
+                if length(STUDY.changrp(changrp).channels) < 2, return; end;
+                STUDY.changrp(changrp)    = [];
+
+                % list of channel groups
+                % ----------------------
+                show_options = {};
+                for index = 1:length(STUDY.changrp)
+                    show_options{end+1} = [ 'All ' STUDY.changrp(index).name ];
+                end;
+                tmpobj  = findobj('parent', hdl, 'tag', 'chan_list');
+                set(tmpobj, 'string', show_options, 'value', changrp-1);
+
+            case 'renamechan'
+                STUDY.saved = 'no';
+                chan_name_list = get(findobj('parent', hdl, 'tag', 'chan_list'), 'String');
+                chan_num = get(findobj('parent', hdl, 'tag', 'chan_list'), 'Value') -1;
+                if chan_num == 0  % 'all subjects' option 
+                    return;
+                end
+                % Don't rename 'Notchan' and 'Outliers'  channels.
+                if strncmpi('Notchan',STUDY.channel(cls(chan_num)).name,8) | strncmpi('Outliers',STUDY.channel(cls(chan_num)).name,8) | ...
+                        strncmpi('Parentchannel',STUDY.channel(cls(chan_num)).name,13)
+                    warndlg2('The Parentchannel, Outliers, and Notchan channels cannot be renamed');
+                    return;
+                end
+                old_name = STUDY.channel(cls(chan_num)).name;
+                rename_param  = inputgui( { [1] [1] [1]}, ...
+                    { {'style' 'text' 'string' ['Rename ' old_name] 'FontWeight' 'Bold'} {'style' 'edit' 'string' '' 'tag' 'chan_rename' } {} }, ...
+                '', 'Rename channel - from pop_chanplot()' );
+                if ~isempty(rename_param) %if not canceled
+                    new_name = rename_param{1};
+                    STUDY = std_renamechan(STUDY, ALLEEG, cls(chan_num), new_name);
+                    % update Study history
+                    a = ['STUDY = std_renamechan(STUDY, ALLEEG, ' num2str(cls(chan_num)) ', ' STUDY.channel(cls(chan_num)).name  ');'];
+                    STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
+
+                    new_name = [ STUDY.channel(cls(chan_num)).name ' (' num2str(length(STUDY.channel(cls(chan_num)).onechan))  ' ICs)'];
+                    chan_name_list{chan_num+1} = renamechan( chan_name_list{chan_num+1}, new_name);
+                    set(findobj('parent', hdl, 'tag', 'chan_list'), 'String', chan_name_list);
+                    set(findobj('parent', hdl, 'tag', 'chan_rename'), 'String', '');
+                    userdat{1}{2} = STUDY;
+                    set(hdl, 'userdat',userdat); %update STUDY
+                end            
+        end
+    catch
+        eeglab_error;
+    end;
 end
 
 function newname = renamechan(oldname, newname);
