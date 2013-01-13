@@ -331,7 +331,7 @@ function [newdata, design1, design2, design3] = makefieldtripdata(data, chandim,
             end;
             
           case 4,
-            newdata{i}.powspctrm = permute(data{i}, [4 1 2 3]);
+            newdata{i}.powspctrm = permute(data{i}, [4 3 1 2]); % changed Jan 12, 2012, see email on eeglablist of the same day
         end;
         
         newdata{i}.label     = cell(1,size(newdata{i}.powspctrm,2));
