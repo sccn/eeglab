@@ -41,7 +41,7 @@
 %   'sorttype'   - Sorting event type(s) ([int vector]; []=all). See Notes below.
 %                  Either a string or an integer.
 %   'sortwin'    - Sorting event window [start, end] in seconds ([]=whole epoch)
-%   'sortfield'  - Sorting field name. {default: none}. See Notes below.
+%   'sortfield'  - Sorting field name. {default: latency}.
 %   'erpimageopt'  - erpimage() options, separated by commas (Ex: 'erp', 'cbar').
 %                  {Default: none}. For further details see >> erpimage help
 % Outputs:
@@ -92,7 +92,7 @@ allerpimage = [];
     'smoothing'     ''            []                    10;
     'sorttype'       ''           {}                    '';
     'sortwin'        ''           {}                    [];
-    'sortfield'      ''           {}                    '';
+    'sortfield'      ''           {}                    'latency';
     'concatenate'   'string'      { 'on','off' }        'off';
     'erpimageopt'   'cell'        {}                    {}}, ...
     'std_erpimage', 'ignore');
@@ -159,6 +159,9 @@ if strcmpi(opt.concatenate, 'off')
     % reverse engeeneering the number of lines for ERPimage
     finallines = opt.nlines;
     if ~isempty(events)
+         if all(isnan(events))
+             error('Cannot sort trials for one of the dataset');
+         end;
          lastx  = sum(~isnan(events));
     else lastx  = size(X,3);
     end;
@@ -171,7 +174,6 @@ if strcmpi(opt.concatenate, 'off')
     nout   = finallines; %floor(((lastx-firstx+xadv+1)-xwidth)/xadv);
     nlines = (lastx-xwidth)/(nout-0.5)*i; % make it imaginary
     %nlines = ceil(lastx/((lastx-firstx+1-xwidth)/(nout-1)));
-
 
     if 0
         % testing conversion back and forth
@@ -195,6 +197,7 @@ if strcmpi(opt.concatenate, 'off')
     
     for index = 1:size(X,1)
         [tmpX tmpevents] = erpimage(squeeze(X(index,:,:)), events, EEG(1).times, '', opt.smoothing, nlines, 'noplot', 'on', opt.erpimageopt{:}, moreopts{:});
+        if isempty(events), tmpevents = []; end;
         allerpimage = setfield(allerpimage, 'events', tmpevents);
         allerpimage = setfield(allerpimage, [ prefix int2str(opt.indices(index)) ], tmpX');
     end;
