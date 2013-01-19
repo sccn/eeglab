@@ -1,7 +1,7 @@
 % std_stat() - compute statistics for ERP/spectral traces or ERSP/ITC images
 %              of a component or channel cluster in a STUDY.
 % Usage:
-%          >> std_stat( data, 'key', 'val', ...)
+%          >> [pcond, pgroup, pinter, statscond, statsgroup, statsinter] = std_stat( data, 'key', 'val', ...)
 % Inputs:
 %  data  -  [cell array] mean data for each subject group and/or data
 %           condition. For example, to compute mean ERPs statistics from a
@@ -49,7 +49,6 @@
 %  'fieldtripchannelneighbor' - Fieldtrip channel neighbour structure for 
 %                               cluster correction method, see function
 %                               std_prepare_neighbors for more information.
-
 % Legacy parameters:
 %   'threshold'  - now 'alpha'
 %   'statistics' - now 'method'  
