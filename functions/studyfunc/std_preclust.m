@@ -256,7 +256,7 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
         tmpstruct = std_setcomps2cell(STUDY, STUDY.cluster(cluster_ind).sets, STUDY.cluster(cluster_ind).comps);
         alldatasets = unique(STUDY.cluster(cluster_ind).sets(:));
         
-        if length(alldatasets) < length(STUDY.datasetinfo)
+        if length(alldatasets) < length(STUDY.datasetinfo) && cluster_ind == 1
             error( [ 'Some datasets not included in preclustering' 10 ... 
                      'because of partial STUDY design. You need to' 10 ...
                      'use a STUDY design that includes all datasets.' ]);
