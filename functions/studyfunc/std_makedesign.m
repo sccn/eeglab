@@ -315,6 +315,7 @@ for n1 = 1:nf1
                     if ~isempty(subjects{s}), txtval = [ '_' rmblk(subjects{s}) txtval ]; end;
                     if isempty(opt.filepath), tmpfilepath = ALLEEG(datsubj(1)).filepath; else tmpfilepath = opt.filepath; end;
                     des.cell(count).filebase = fullfile(tmpfilepath, [ 'design' int2str(designind) txtval ] );
+                    des.cell(count).filebase = checkfilelength(des.cell(count).filebase);
                 end;
                 count = count+1;
             end;
@@ -422,3 +423,9 @@ function strval = cell2str(vals);
     for ind = 2:length(vals)
         strval = [ strval ' - ' vals{ind} ];
     end;
+
+function tmpfile = checkfilelength(tmpfile);
+    if length(tmpfile) > 120,
+        tmpfile = tmpfile(1:120);
+    end;
+
