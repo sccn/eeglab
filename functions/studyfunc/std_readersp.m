@@ -195,7 +195,7 @@ for ind = 1:length(finalinds)
             for c = 1:nc
                 for g = 1:ng
                     if ~isempty(setinds{c,g})
-                        if ~isempty(opt.channels), opts = { 'channels',    allChangrp(ind), 'timelimits', opt.timerange, 'triallimits', opt.trialrange, 'concatenate', opt.concatenate };
+                        if ~isempty(opt.channels), opts = { 'channels',    allChangrp(allinds{c,g}(:)), 'timelimits', opt.timerange, 'triallimits', opt.trialrange, 'concatenate', opt.concatenate };
                         else                       opts = { 'components',  allinds{c,g}(:), 'timelimits', opt.timerange, 'triallimits', opt.trialrange, 'concatenate', opt.concatenate };
                         end;
                         [erpim{c, g} tmpparams alltimes alltrials events{c,g}] = std_readfile( setinfo(setinds{c,g}(:)), 'measure', 'erpim', opts{:});
