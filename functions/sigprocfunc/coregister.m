@@ -253,6 +253,9 @@ if ~isempty(g.mesh)
             elseif isfield(g.mesh, 'TRI1')
                 dat.meshpnt = g.mesh.POS;
                 dat.meshtri = g.mesh.TRI1;
+            elseif isfield(g.mesh, 'vertices')
+                dat.meshpnt = g.mesh.vertices;
+                dat.meshtri = g.mesh.faces;
             else
                 error('Unknown Matlab mesh file');
             end;
