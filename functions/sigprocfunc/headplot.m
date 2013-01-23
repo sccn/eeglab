@@ -178,18 +178,14 @@ if isstr(values)
         
     g = finputcheck(varargin(2:end), { 'orilocs'      'string'  { 'on','off' }             'off';
                                        'plotmeshonly' 'string'  { 'head','off','sphere' }  'off';
-                                       'meshfile'     'string'  []                         DEFAULT_MESH;
+                                       'meshfile'     { 'string' 'struct' } []             DEFAULT_MESH;
                                        'chaninfo'     'struct'  []                         struct([]);
                                        'plotchans'    'integer' []                         [];
                                        'ica'          'string'  { 'on','off' }             'off';
                                        'transform'    'real'    []                         DEFAULT_TRANSFORM;
                                        'comment'      'string'  []                         '' });
     if isstr(g), 
-        fprintf(g);
-        clear g; 
-        g.comment   = varargin{2}; 
-        g.orilocs   = 'off';
-        g.meshfile  = DEFAULT_MESH;
+        error(g);
     end;
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -229,6 +225,8 @@ if isstr(values)
     Xeori = [ eloc_file(indices).X ]';
     Yeori = [ eloc_file(indices).Y ]';
     Zeori = [ eloc_file(indices).Z ]';
+    
+    [newPOS POS TRI1 TRI2 NORM index1 center] = getMeshData(g.meshfile);
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % rotate channel coordinates if necessary
@@ -292,26 +290,6 @@ if isstr(values)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Open mesh file - contains POS and index1
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    if ~exist(g.meshfile)
-       error(sprintf('headplot(): mesh file "%s" not found\n',g.meshfile));
-    end
-    try, load(g.meshfile,'-mat');
-    catch,
-        POS  = load('mheadnewpos.txt', '-ascii');
-        TRI1 = load('mheadnewtri1.txt', '-ascii'); % upper head
-        %try, TRI2 = load('mheadnewtri2.txt', '-ascii'); catch, end; % lower head
-        %index1 = load('mheadnewindex1.txt', '-ascii');
-        center = load('mheadnewcenter.txt', '-ascii');
-    end;
-    if exist('index1') ~= 1, index1 = sort(unique(TRI1(:))); end;
-    if exist('TRI2')   ~= 1, TRI2 = []; end;
-    if exist('NORM')   ~= 1, NORM = []; end;
-    if exist('TRI1')   ~= 1, error('Variable ''TRI1'' not defined in mesh file'); end;
-    if exist('POS')    ~= 1, error('Variable ''POS'' not defined in mesh file'); end;
-    if exist('center') ~= 1, center = [0 0 0]; disp('Using [0 0 0] for center of head mesh'); end;
-    
-    fprintf('Loaded mesh file %s\n',g.meshfile);
-    newPOS = POS(index1,:);
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Project head vertices onto unit sphere
@@ -456,9 +434,9 @@ else
        'title'      'string' []              '';
        'lights'     'real'   []              DEFAULT_LIGHTS;
        'view'       'real'   []              [143 18];
-       'colormap'   'real'   []              jet(64);
+       'colormap'   'real'   []              jet(256);
        'transform'  'real'   []              [];
-       'meshfile'   'string' []              DEFAULT_MESH;
+       'meshfile'   {'string' 'struct' } []  DEFAULT_MESH;
        'electrodes' 'string' { 'on','off' }  'on';            
        'orilocs'    { 'string','struct' } [] '';            
        'labels'     'integer' [0 1 2]        0 }, 'headplot');
@@ -502,26 +480,11 @@ else
       end;
   end;
   
+  % --------------
   % load mesh file
   % --------------
-  if ~exist(g.meshfile)
-      error(sprintf('headplot(): mesh file "%s" not found\n',g.meshfile));
-  end
-  try, load(g.meshfile,'-mat');
-  catch,
-      POS  = load('mheadnewpos.txt', '-ascii');
-      TRI1 = load('mheadnewtri1.txt', '-ascii'); % upper head
-      % TRI2 = load('mheadnewtri2.txt', '-ascii'); % lower head
-      % index1 = load('mheadnewindex1.txt', '-ascii');
-      center = load('mheadnewcenter.txt', '-ascii');
-  end;
-  if exist('index1') ~= 1, index1 = sort(unique(TRI1(:))); end;
-  if exist('TRI2')   ~= 1, TRI2 = []; end;
-  if exist('NORM')   ~= 1, NORM = []; end;
-  if exist('TRI1')   ~= 1, error('Variable ''TRI1'' not defined in mesh file'); end;
-  if exist('POS')    ~= 1, error('Variable ''POS'' not defined in mesh file'); end;
-  if exist('center') ~= 1, center = [0 0 0]; disp('Using [0 0 0] for center of head mesh'); end;
-
+  [newPOS POS TRI1 TRI2 NORM index1 center] = getMeshData(g.meshfile);
+  
   %%%%%%%%%%%%%%%%%%%%%%%%%%
   % Perform interpolation
   %%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -779,4 +742,52 @@ function plotelec(newElect, ElectrodeNames, HeadCenter, opt);
             end
         end
     end;
+    
+% get mesh information
+% --------------------
+function [newPOS POS TRI1 TRI2 NORM index1 center] = getMeshData(meshfile);
+        
+if isstruct(meshfile)
+    if isfield(meshfile, 'vol')
+        if isfield(meshfile.vol, 'r')
+            [X Y Z] = sphere(50);
+            POS  = { X*max(meshfile.vol.r) Y*max(meshfile.vol.r) Z*max(meshfile.vol.r) };
+            TRI1 = [];
+        else
+            POS  = meshfile.vol.bnd(1).pnt;
+            TRI1 = meshfile.vol.bnd(1).tri;
+        end;
+    elseif isfield(meshfile, 'bnd')
+        POS  = meshfile.bnd(1).pnt;
+        TRI1 = meshfile.bnd(1).tri;
+    elseif isfield(meshfile, 'TRI1')
+        POS  = meshfile.POS;
+        TRI1 = meshfile.TRI1;
+    elseif isfield(meshfile, 'vertices')
+        POS  = meshfile.vertices;
+        TRI1 = meshfile.faces;
+    else
+        error('Unknown Matlab mesh file');
+    end;
+else
+    if ~exist(meshfile)
+        error(sprintf('headplot(): mesh file "%s" not found\n',meshfile));
+    end
+    try, load(meshfile,'-mat');
+    catch,
+        POS  = load('mheadnewpos.txt', '-ascii');
+        TRI1 = load('mheadnewtri1.txt', '-ascii'); % upper head
+        %try, TRI2 = load('mheadnewtri2.txt', '-ascii'); catch, end; % lower head
+        %index1 = load('mheadnewindex1.txt', '-ascii');
+        center = load('mheadnewcenter.txt', '-ascii');
+    end;
+    fprintf('Loaded mesh file %s\n',meshfile);
+end;
+if exist('index1') ~= 1, index1 = sort(unique(TRI1(:))); end;
+if exist('TRI2')   ~= 1, TRI2 = []; end;
+if exist('NORM')   ~= 1, NORM = []; end;
+if exist('TRI1')   ~= 1, error('Variable ''TRI1'' not defined in mesh file'); end;
+if exist('POS')    ~= 1, error('Variable ''POS'' not defined in mesh file'); end;
+if exist('center') ~= 1, center = [0 0 0]; disp('Using [0 0 0] for center of head mesh'); end;
+newPOS = POS(index1,:);
 
