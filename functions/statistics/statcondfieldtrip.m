@@ -331,7 +331,7 @@ function [newdata, design1, design2, design3] = makefieldtripdata(data, chandim,
             end;
             
           case 4,
-            newdata{i}.powspctrm = permute(data{i}, [4 3 1 2]); % changed Jan 12, 2012, see email on eeglablist of the same day
+            newdata{i}.powspctrm = permute(data{i}, [4 1 2 3]);
         end;
         
         newdata{i}.label     = cell(1,size(newdata{i}.powspctrm,2));
@@ -351,7 +351,9 @@ function [newdata, design1, design2, design3] = makefieldtripdata(data, chandim,
             newdata{i}.freq      = 1;
             newdata{i}.time      = 1;
         end;
-
+        if isempty(chanlocs) && size(newdata{i}.powspctrm,2) ~= 1
+            newdata{i}.dimord    = 'rpt_freq_time';
+        end;
     end;
     
     design1 = [];
@@ -366,3 +368,4 @@ function [newdata, design1, design2, design3] = makefieldtripdata(data, chandim,
             design3 = [ design3 [1:nrepeat] ];
         end;
     end;
+        
