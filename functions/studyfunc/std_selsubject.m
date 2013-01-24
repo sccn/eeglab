@@ -42,7 +42,7 @@ end;
 % ---------------------
 if size(setinds{1},1) > 1 && size(setinds{1},2) > 1 % single trials
     % possible subject indices
-    selectInds = strmatch(subject, allsubjects);
+    selectInds = strmatch(lower(subject), lower(allsubjects));
     for c = 1:size(data,1)
         for g = 1:size(data,2)
             selectCol = [];
@@ -61,7 +61,7 @@ if size(setinds{1},1) > 1 && size(setinds{1},2) > 1 % single trials
 else
     for c = 1:size(data,1)
         for g = 1:size(data,2)
-            subjectind = strmatch(subject, allsubjects);
+            subjectind = strmatch(lower(subject), lower(allsubjects));
             l = zeros(size(setinds{c,g}));
             for iSubj = 1:length(subjectind), l = l | setinds{c,g} == subjectind(iSubj); end;
             if optndims == 2
