@@ -262,9 +262,11 @@ if strcmpi(g.specmode, 'psd')
     if strcmpi(g.savetrials, 'on') || strcmpi(g.logtrials, 'on')
         for iTrial = 1:size(X,3)
             [XX(:,:,iTrial), f] = spectopo(X(:,:,iTrial), size(X,2), EEG(1).srate, 'plot', 'off', 'boundaries', boundaries, 'nfft', g.nfft, spec_opt{:});
+            if iTrial == 1, XX(:,:,size(X,3)) = 0; end;
         end;
         if strcmpi(g.logtrials, 'off')
-            X = 10.^(XX/10);
+             X = 10.^(XX/10);
+        else X = XX;
         end;
         if strcmpi(g.savetrials, 'off')
             X = mean(X,3);
