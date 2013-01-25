@@ -62,13 +62,21 @@ if isempty(EEG)  , error('Cannot save empty datasets'); end;
 % empty filename (resave file)
 emptyfilename = 0;
 if nargin > 1
-    if isempty(varargin{1}) & isempty(EEG.filename), emptyfilename = 1; end;
+    if isempty(varargin{1}) && isempty(EEG.filename), emptyfilename = 1; end;
+    if strcmpi(varargin{1},'savemode') 
+        if length(EEG) == 1
+            if isempty(EEG(1).filename), varargin{2} = ''; emptyfilename = 1; end;
+        else
+            if any(cellfun(@isempty, { EEG.filename }))
+                error('Cannot resave files who have not been saved previously');
+            end;
+        end;
+    end;
 end;
 
-if nargin < 2 | emptyfilename
+if nargin < 2 || emptyfilename
     if length(EEG) >1, error('For reasons of consistency, this function  does not save multiple datasets any more'); end;
-    % pop up window to ask for file type
-    % ----------------------------------
+    % pop up window to ask for file
     [filename, filepath] = uiputfile2('*.set', 'Save dataset with .set extension -- pop_saveset()'); 
     if ~isstr(filename), return; end;
     drawnow;
