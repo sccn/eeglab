@@ -86,6 +86,9 @@ function [ ori_vals, df, pvals ] = statcondfieldtrip( data, varargin );
     if isstr(g), error(g); end;    
     if ~isempty(g.mode), g.method = g.mode; end;
     if strcmpi(g.method, 'parametric'), g.method = 'param'; end;
+    if ~isempty(g.neighbours) && isempty(g.chanlocs)
+        g.chanlocs = struct('labels', { g.neighbours(:).label });
+    end;
     if size(data,2) == 1, data  = transpose(data); end; % cell array transpose
     alphaset = fastif(isnan(g.alpha) || isempty(g.alpha), 0, 1);
     
@@ -155,6 +158,7 @@ function [ ori_vals, df, pvals ] = statcondfieldtrip( data, varargin );
         cfg.numrandomization = 200;
         if ~strcmpi(cfg.mcorrect, 'no'), cfg.numrandomization = cfg.numrandomization*20; end;
     end;
+    cfg.correcttail = 'alpha';
     
     if size(data,1) == 1, % only one row
         
