@@ -93,12 +93,16 @@ for k = 1:length(comps)
         try
             topo = load( '-mat', filename);
         catch
-            error( [ 'Cannot read file ''' filename '''' ]);
+            error([ 'Missing scalp topography file - also necessary for ERP polarity' 10 'Try recomputing scalp topographies for components' ]);
         end;
     end;
     
-    tmp =  getfield(topo, [ 'comp' int2str(comps(k)) '_grid' ]);
-    
+    try,
+        tmp =  getfield(topo, [ 'comp' int2str(comps(k)) '_grid' ]);
+    catch,
+        error([ 'Empty scalp topography file - also necessary for ERP polarity' 10 'Try recomputing scalp topographies for components' ]);
+    end;
+        
     if strcmpi(option, 'gradient')
         [tmpx, tmpy]  = gradient(tmp); % Gradient
         tmp        = tmpx;
