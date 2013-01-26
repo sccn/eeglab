@@ -266,6 +266,15 @@ for design = 1:length(STUDY.design)
     end;
 end;
 
+% add filepath field if absent
+for ind = 1:length(STUDY.design)
+    if ~isfield(STUDY.design, 'filepath') || (isnumeric(STUDY.design(ind).filepath) && isempty(STUDY.design(ind).filepath))
+        STUDY.design(ind).filepath = '';
+        STUDY.saved = 'no';
+        modif = 1;
+    end;
+end;
+
 % check that ICA is present and if it is update STUDY.datasetinfo
 allcompsSTUDY  = { STUDY.datasetinfo.comps };
 allcompsALLEEG = { ALLEEG.icaweights };
