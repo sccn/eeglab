@@ -5,6 +5,7 @@
 % Usage:
 %   [ struct setinds allinds ] = std_setcomps2cell(STUDY, clustind);
 %   [ struct setinds allinds ] = std_setcomps2cell(STUDY, sets, comps);
+%   [ struct setinds allinds measurecell] = std_setcomps2cell(STUDY, sets, comps, measure);
 %
 % Author: Arnaud Delorme, CERCO/CNRS, UCSD, 2009-
 
@@ -24,10 +25,14 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [ tmpstruct setinds allinds ] = std_setcomps2cell(STUDY, sets, comps, generateerror)
+function [ tmpstruct setinds allinds measurecell] = std_setcomps2cell(STUDY, sets, comps, measure, generateerror)
 
-if nargin < 4
+if nargin < 5
     generateerror = 0;
+end;
+if nargin == 4 && length(measure) == 1
+    generateerror = measure;
+    measure       = [];
 end;
 if nargin < 3
     tmpstruct = STUDY.cluster(sets);
@@ -36,10 +41,15 @@ if nargin < 3
 else
     tmpstruct     = [];
 end;
-comps   = repmat(comps, [size(sets,1) 1]);
+if nargin < 4 || isempty(measure)
+    measure = comps;
+end;
+measure = repmat(measure, [size(sets,1) 1]);
+comps   = repmat(comps  , [size(sets,1) 1]);
 oldsets = sets;
 sets    = reshape(sets , 1, size(sets ,1)*size(sets ,2));
-comps   = reshape(comps, 1, size(comps,1)*size(comps,2));
+measure = reshape(measure, 1, size(measure,1)*size(measure,2));
+comps   = reshape(comps  , 1, size(comps  ,1)*size(comps  ,2));
 
 % get indices for all groups and conditions
 % -----------------------------------------
@@ -48,8 +58,9 @@ allconditions = STUDY.design(STUDY.currentdesign).variable(1).value;
 allgroups     = STUDY.design(STUDY.currentdesign).variable(2).value;
 nc = max(length(allconditions),1);
 ng = max(length(allgroups),    1);
-allinds = cell( nc, ng );
-setinds = cell( nc, ng );
+allinds     = cell( nc, ng );
+setinds     = cell( nc, ng );
+measurecell = cell( nc, ng );
 
 for index = 1:length(setinfo)
     % get index of independent variables
@@ -73,8 +84,9 @@ for index = 1:length(setinfo)
         end;
     end;
         
-    allinds{ condind, grpind } = [ allinds{ condind, grpind } comps(ind) ];
-    setinds{ condind, grpind } = [ setinds{ condind, grpind } repmat(index, [1 length(ind)]) ];
+    measurecell{ condind, grpind } = [ measurecell{ condind, grpind } measure(ind) ];
+    allinds{     condind, grpind } = [ allinds{     condind, grpind } comps(  ind) ];
+    setinds{     condind, grpind } = [ setinds{     condind, grpind } repmat(index, [1 length(ind)]) ];
 end;
 tmpstruct.allinds = allinds;
 tmpstruct.setinds = setinds;
