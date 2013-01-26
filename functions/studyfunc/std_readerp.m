@@ -213,10 +213,11 @@ for ind = 1:length(finalinds) % scan channels or components
             else
                 STUDY = std_readtopoclust(STUDY, ALLEEG, finalinds(ind));
                 if isfield(STUDY.cluster, 'topopol') && ~isempty(STUDY.cluster(finalinds(ind)).topopol)
+                    [ tmpstruct tmp1 tmp2 topopolcell] = std_setcomps2cell(STUDY, STUDY.cluster(finalinds(ind)).sets, STUDY.cluster(finalinds(ind)).comps, STUDY.cluster(finalinds(ind)).topopol);
                     disp('Inverting ERP component polarities based on scalp map polarities');
                     for index = 1:length(alldata(:))
                         for comps = 1:size(alldata{index},2)
-                            alldata{index}(:,comps) = alldata{index}(:,comps)*STUDY.cluster(finalinds(ind)).topopol(comps);
+                            alldata{index}(:,comps) = alldata{index}(:,comps)*topopolcell{index}(comps);
                         end;
                     end;
                 else
