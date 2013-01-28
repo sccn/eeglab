@@ -442,11 +442,16 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
     function [tmpchanlist, opts] = getchansandopts(STUDY, ALLEEG, chanlist, idat, g);
         
         opts = { };
-        if ~isempty(g.rmclust)
-            opts = { opts{:} 'rmcomps' getclustcomps(STUDY, g.rmclust, idat) };                
-        elseif strcmpi(g.rmicacomps, 'on')
-            for ind = 1:length(idat)
-                rmcomps{ind} = find(ALLEEG(idat(1)).reject.gcompreject);
+
+        if ~isempty(g.rmclust) || strcmpi(g.rmicacomps, 'on')
+            rmcomps = cell(1,length(idat));
+            if ~isempty(g.rmclust)
+                rmcomps = getclustcomps(STUDY, g.rmclust, idat);
+            end;
+            if strcmpi(g.rmicacomps, 'on')
+                for ind = 1:length(idat)
+                    rmcomps{ind} = union(rmcomps{ind}, find(ALLEEG(idat(1)).reject.gcompreject));
+                end;
             end;
             opts = { opts{:} 'rmcomps' rmcomps };
         end;
