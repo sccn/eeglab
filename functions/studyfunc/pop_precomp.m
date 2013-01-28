@@ -69,12 +69,10 @@ if ~isstr(varargin{1}) %intial settings
     chanlist       = 'warndlg2([ ''You need to compute measures on all data channels.'' 10 ''This functionality is under construction.'']);';
     chaneditbox    = ['pop_precomp(''chaneditbox'',gcf);']; 
     warninterp     = ''; %['warndlg2(''EEGLAB will crash when plotting a given channel if it is missing in one dataset'');' ];
-    cb_ica1        = [ 'if get(gcbo, ''value''), set(findobj(gcbf, ''tag'', ''rmica2_on''), ''value'', 0); end;' ];
-    cb_ica2        = [ 'if get(gcbo, ''value''), set(findobj(gcbf, ''tag'', ''rmica1_on''), ''value'', 0); end;' ];
-    %cb_ica1        = [ 'get(gcbo, ''value''), findobj(gcbf, ''tag'', ''rmica1_on''),' ];
-    %cb_ica2        = [ 'get(gcbo, ''value''), findobj(gcbf, ''tag'', ''rmica2_on''),' ];
+    cb_ica1        = ''; %[ 'if get(gcbo, ''value''), set(findobj(gcbf, ''tag'', ''rmica2_on''), ''value'', 0); end;' ];
+    cb_ica2        = ''; %[ 'if get(gcbo, ''value''), set(findobj(gcbf, ''tag'', ''rmica1_on''), ''value'', 0); end;' ];
     
-    geomline = [0.33 6];
+    geomline = [0.35 6];
     if comps == true
         str_name       = sprintf('Pre-compute component measures for STUDY ''%s'' - ''%s''', ...
                          STUDY.name, STUDY.design(STUDY.currentdesign).name);
@@ -102,7 +100,7 @@ if ~isstr(varargin{1}) %intial settings
             {'style' 'text'       'string' [ 'Remove artifactual ICA cluster or clusters (hold shift key)' 10 ' ' ] } ...
             {'style' 'listbox'    'string' { STUDY.cluster.name } 'value' 1 'max' 2  'tag' 'rmica2_val'} };
         guiadd2 = {};
-        geomadd1 = { [2 3 0.5] geomline geomline [0.33 4 2] }; 
+        geomadd1 = { [2 3 0.5] geomline geomline [0.35 4 2] }; 
         geomvertadd1 = [ 1 1 1 2 ];
         geomadd2 = { };
     end;
