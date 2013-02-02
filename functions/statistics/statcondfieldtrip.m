@@ -194,6 +194,7 @@ function [ ori_vals, df, pvals ] = statcondfieldtrip( data, varargin );
             % one-way ANOVA (paired) this is equivalent to unpaired t-test
             % -------------
             cfg.tail        = 1;
+            cfg.correcttail = 'no';
             cfg.statistic   = 'depsamplesF';
             [newdata design1 design2 design3] = makefieldtripdata(data, g.chandim, g.chanlocs);
             cfg.design      = [ design1; design3 ];
@@ -208,6 +209,7 @@ function [ ori_vals, df, pvals ] = statcondfieldtrip( data, varargin );
             % one-way ANOVA (unpaired) 
             % -------------
             cfg.tail        = 1;
+            cfg.correcttail = 'no';
             cfg.statistic   = 'indepsamplesF';
             [newdata design1] = makefieldtripdata(data, g.chandim, g.chanlocs);
             cfg.design      = [ design1 ];
@@ -226,6 +228,8 @@ function [ ori_vals, df, pvals ] = statcondfieldtrip( data, varargin );
             
             % two-way ANOVA (paired) 
             % -------------
+            cfg.tail        = 1;
+            cfg.correcttail = 'no';
             cfg.statistic   = 'anovan';
             [newdata design1 design2 design3] = makefieldtripdata(data, g.chandim, g.chanlocs);
             cfg.design      = [ design1; design2; design3 ];
@@ -243,6 +247,8 @@ function [ ori_vals, df, pvals ] = statcondfieldtrip( data, varargin );
             
             % two-way ANOVA (unpaired)
             % -------------
+            cfg.tail        = 1;
+            cfg.correcttail = 'no';
             cfg.statistic   = 'anovan';
             cfg.clustercritval = 4.5416; % 95 percentile of n =10000; a = { rand(n,10) rand(n,10); rand(n,10) rand(n,10) }; [F df p ] = statcondfieldtrip(a, 'paired', 'off');
             [newdata design1 design2] = makefieldtripdata(data, g.chandim, g.chanlocs);
