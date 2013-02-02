@@ -34,6 +34,11 @@ end
 
 % Check to see if AXES already exist
 ch = get(gcf,'Children');
+if ~isempty(ch)
+    ind = cellfun(@(x)isequal('axes', x), get(ch, 'type'));
+    if any(ind), ch = gca; end;
+end;
+
 ax = findobj(gcf,'Type','axes','Tag','TEXTSC');
 if isempty(ax)
   ax = axes('Units','Normal','Position',[0 0 1 1], ...
@@ -57,7 +62,7 @@ h = text(x,y,txt,'VerticalAlignment','Middle', ...
 
 % Make the original AXES current
 if ~isempty(ch)
-  set(gcf,'CurrentAxes',min(ch))
+  set(gcf,'CurrentAxes',gca);
 end
 
 % Check for output
