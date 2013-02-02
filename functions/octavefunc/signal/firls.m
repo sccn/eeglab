@@ -37,40 +37,43 @@
 % http://cnx.org/content/m10577
 
 function coef = firls(N, frequencies, pass, weight, str);
+if ismatlab
+    p = fileparts(which('firls'));
+    error( [ 'Octave functions should not run on Matlab' 10 'remove path to ' p ]);
+end;
 
-
-  if nargin<3 | nargin>6
+if nargin<3 | nargin>6
     usage('');
-  end
-  if nargin==3
+end
+if nargin==3
     weight = ones(1, length(pass)/2);
     str = [];
-  end
-  if nargin==4
+end
+if nargin==4
     if ischar(weight)
-      str = weight;
-      weight = ones(size(pass));
+        str = weight;
+        weight = ones(size(pass));
     else
-      str = [];
+        str = [];
     end
-  end
-  if length(frequencies) ~= length(pass)
+end
+if length(frequencies) ~= length(pass)
     error('F and A must have equal lengths.');
-  end
-  if 2 * length(weight) ~= length(pass)
+end
+if 2 * length(weight) ~= length(pass)
     error('W must contain one weight per band.');
-  end
+end
 
-  if ischar(str)
+if ischar(str)
     error('This feature is implemented yet');
-  else
-
+else
+    
     M = N/2;
     w = kron(weight(:), [-1; 1]);
     omega = frequencies * pi;
     i1 = 1:2:length(omega);
     i2 = 2:2:length(omega);
-
+    
     % Generate the matrix Q
     % As illustrated in the above-cited reference, the matrix can be
     % expressed as the sum of a Hankel and Toeplitz matrix. A factor of
@@ -80,7 +83,7 @@ function coef = firls(N, frequencies, pass, weight, str);
     cos_ints = [omega; sin((1:N)' * omega)];
     q = [1, 1./(1:N)]' .* (cos_ints * w);
     Q = toeplitz(q(1:M+1)) + hankel(q(1:M+1), q(M+1:end));
-
+    
     % The vector b is derived from solving the integral:
     %
     %           _ w
@@ -101,17 +104,17 @@ function coef = firls(N, frequencies, pass, weight, str);
     % -                             n
     %
     cos_ints2 = [omega(i1).^2 - omega(i2).^2; ...
-		 cos((1:M)' * omega(i2)) - cos((1:M)' * omega(i1))] ./ ...
-                 ([2, 1:M]' * (omega(i2) - omega(i1)));
+        cos((1:M)' * omega(i2)) - cos((1:M)' * omega(i1))] ./ ...
+        ([2, 1:M]' * (omega(i2) - omega(i1)));
     d = [-weight .* pass(i1); weight .* pass(i2)];
     d = d(:);
     b = [1, 1./(1:M)]' .* ((kron(cos_ints2, [1, 1]) + cos_ints(1:M+1,:)) * d);
-
+    
     % Having computed the components Q and b of the  matrix equation,
     % solve for the filter coefficients.
     a = Q \ b;
     coef = [ a(end:-1:2); 2 * a(1); a(2:end) ];
     warning on MATLAB:colon:nonIntegerIndex
-
-  end
+    
+end
 

@@ -266,6 +266,12 @@
 
 
 function [varargout] = pwelch(x,varargin)
+
+if ismatlab
+    p = fileparts(which('pwelch'));
+    error( [ 'Octave functions should not run on Matlab' 10 'remove path to ' p ]);
+end;
+
   %%
   %% COMPATIBILITY LEVEL
   %% Argument positions and defaults depend on compatibility level selected
