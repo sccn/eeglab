@@ -59,6 +59,8 @@
 %   'tail'     = ['one'|'two'] run one-tailed (F-test) or two tailed
 %                (T-test). This option is only relevant when using the
 %                'surrog' input. Otherwise it is ignored.
+%   'forceanova' = ['on'|'off'] force the use of ANOVA calculation even
+%                for 2x1 designs. Default is 'off'.
 %   'alpha'    = [float] p-value threshold value. Allow returning
 %                confidence intervals and mask (requires structoutput below).
 %   'structoutput' = ['on'|'off'] return an output structure instead of 
@@ -163,6 +165,7 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
                                      'surrog'     { 'real','cell' }      []       []; 
                                      'stats'      { 'real','cell' }      []       []; 
                                      'structoutput' 'string'  { 'on','off' }      'off'; 
+                                     'forceanova'   'string'  { 'on','off' }      'off'; 
                                      'arraycomp'  'string'    { 'on','off' }      'on'; 
                                      'alpha'      'real'      []                  NaN;
                                      'tail'       'string'    { 'one','both','upper','lower'}    'both'; 
@@ -286,7 +289,7 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
     if isempty(g.surrog)
         if size(data,1) == 1, % only one row
 
-            if size(data,2) == 2
+            if size(data,2) == 2 && strcmpi(g.forceanova, 'off')
 
                 % paired t-test (very fast)
                 % -------------
