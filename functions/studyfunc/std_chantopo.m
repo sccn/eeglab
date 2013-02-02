@@ -25,6 +25,9 @@
 %  'datatype'    - ['erp'|'spec'] data type {default: 'erp'}
 %  'titles'      - [cell array of string] titles for each of the subplots. 
 %                  { default: none}
+%  'subplotpos'  - [addr addc posr posc] perform ploting in existing figure.
+%                  Add "addr" rows, "addc" columns and plot the scalp
+%                  topographies starting at position (posr,posc).
 %
 % Statistics options:
 %  'groupstats'  - [cell] One p-value array per group {default: {}}
@@ -51,17 +54,18 @@ if nargin < 2
     return;
 end;
 
-opt = finputcheck( varargin, { 'ylim'        'real'   []              [];
-                               'titles'      'cell'   []              cell(20,20);
-                               'threshold'   'real'   []              NaN;
-                               'chanlocs'    'struct' []              struct('labels', {});
-                               'groupstats'  'cell'   []              {};
-                               'condstats'   'cell'   []              {};
-                               'interstats'  'cell'   []              {};
-                               'topoplotopt' 'cell'   []              { 'style', 'both', 'shading', 'interp' };
-                               'binarypval'  'string' { 'on','off' }  'on';
-                               'datatype'    'string' { 'ersp','itc','erp','spec' }    'erp';
-                               'caxis'       'real'   []              [] }, 'std_chantopo', 'ignore'); %, 'ignore');
+opt = finputcheck( varargin, { 'ylim'        'real'    []              [];
+                               'titles'      'cell'    []              cell(20,20);
+                               'threshold'   'real'    []              NaN;
+                               'chanlocs'    'struct'  []              struct('labels', {});
+                               'groupstats'  'cell'    []              {};
+                               'condstats'   'cell'    []              {};
+                               'interstats'  'cell'    []              {};
+                               'subplotpos'  'integer' []              [];
+                               'topoplotopt' 'cell'    []              { 'style', 'both' };
+                               'binarypval'  'string'  { 'on','off' }  'on';
+                               'datatype'    'string'  { 'ersp','itc','erp','spec' }    'erp';
+                               'caxis'       'real'    []              [] }, 'std_chantopo', 'ignore'); %, 'ignore');
 if isstr(opt), error(opt); end;
 if ~isempty(opt.ylim), opt.caxis = opt.ylim; end;
 if isnan(opt.threshold), opt.binarypval = 'off'; end;
@@ -82,6 +86,15 @@ end;
 % ------------------
 if ng > 1 & ~isempty(opt.groupstats), addc = 1; else addc = 0; end;
 if nc > 1 & ~isempty(opt.condstats ), addr = 1; else addr = 0; end;
+if ~isempty(opt.subplotpos), 
+     if strcmpi(opt.transpose, 'on'), opt.subplotpos = opt.subplotpos([2 1 4 3]); end;
+     addr = opt.subplotpos(1);
+     addc = opt.subplotpos(2);
+     posr = opt.subplotpos(4);
+     posc = opt.subplotpos(3);
+else posr = 0;
+     posc = 0;
+end;
 
 % compute significance mask
 % -------------------------
@@ -101,20 +114,22 @@ end;
 
 % adjust figure size
 % ------------------
-fig = figure('color', 'w');
-pos = get(fig, 'position');
-set(fig, 'position', [ pos(1)+15 pos(2)+15 pos(3)/2.5*(nc+addr), pos(4)/2*(ng+addc) ]);
-pos = get(fig, 'position');
-if strcmpi(opt.transpose, 'off'), set(gcf, 'position', [ pos(1) pos(2) pos(4) pos(3)]);
-else                              set(gcf, 'position', pos);
-end;
+if isempty(opt.subplotpos)
+    fig = figure('color', 'w');
+    pos = get(fig, 'position');
+    set(fig, 'position', [ pos(1)+15 pos(2)+15 pos(3)/2.5*(nc+addr), pos(4)/2*(ng+addc) ]);
+    pos = get(fig, 'position');
+    if strcmpi(opt.transpose, 'off'), set(gcf, 'position', [ pos(1) pos(2) pos(4) pos(3)]);
+    else                              set(gcf, 'position', pos);
+    end;
+end
 
 % topoplot
 % --------
 tmpc = [inf -inf];
 for c = 1:nc
     for g = 1:ng
-        hdl(c,g) = mysubplot(nc+addr, ng+addc, g + (c-1)*(ng+addc), opt.transpose);
+        hdl(c,g) = mysubplot(nc+addr, ng+addc, g + posr + (c-1+posc)*(ng+addc), opt.transpose);
         if ~isempty(data{c,g})
             tmpplot = double(mean(data{c,g},3));
             if ~all(isnan(tmpplot))
@@ -135,7 +150,7 @@ for c = 1:nc
         % statistics accross groups
         % -------------------------
         if g == ng & ng > 1 & ~isempty(opt.groupstats)
-            hdl(c,g+1) = mysubplot(nc+addr, ng+addc, g + 1 + (c-1)*(ng+addc), opt.transpose);
+            hdl(c,g+1) = mysubplot(nc+addr, ng+addc, g + posr + 1 + (c-1+posc)*(ng+addc), opt.transpose);
             topoplot( pgroupplot{c}, opt.chanlocs, opt.ptopoopt{:});
             title(opt.titles{c,g+1}); 
             caxis([-maxplot maxplot]);
@@ -158,7 +173,7 @@ for g = 1:ng
     % statistics accross conditions
     % -----------------------------
     if ~isempty(opt.condstats) && nc > 1
-        hdl(nc+1,g) = mysubplot(nc+addr, ng+addc, g + c*(ng+addc), opt.transpose);
+        hdl(nc+1,g) = mysubplot(nc+addr, ng+addc, g + posr + (c+posc)*(ng+addc), opt.transpose);
         topoplot( pcondplot{g}, opt.chanlocs, opt.ptopoopt{:});
         title(opt.titles{nc+1,g}); 
         caxis([-maxplot maxplot]);
@@ -168,7 +183,7 @@ end;
 % statistics accross group and conditions
 % ---------------------------------------
 if ~isempty(opt.condstats) && ~isempty(opt.groupstats) && ng > 1 && nc > 1
-    hdl(nc+1,ng+1) = mysubplot(nc+addr, ng+addc, g + 1 + c*(ng+addr), opt.transpose);
+    hdl(nc+1,ng+1) = mysubplot(nc+addr, ng+addc, g + posr + 1 + (c+posc)*(ng+addc), opt.transpose);
     topoplot( pinterplot, opt.chanlocs, opt.ptopoopt{:});
     title(opt.titles{nc+1,ng+1}); 
     caxis([-maxplot maxplot]);
