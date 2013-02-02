@@ -79,11 +79,16 @@ nepoch              = dat.NRec;
 EEG.trials   = nepoch;
 EEG.pnts     = size(EEG.data,2)/nepoch;
 
+if isfield(dat,'T0')
+    EEG.etc.T0 = dat.T0; % added sjo
+end
+
 if isfield(dat, 'Label') & ~isempty(dat.Label)
     if isstr(dat.Label)
         EEG.chanlocs = struct('labels', cellstr(char(dat.Label)));
     else
-        EEG.chanlocs = struct('labels', dat.Label(1:min(length(dat.Label), size(EEG.data,1))));
+        % EEG.chanlocs = struct('labels', dat.Label(1:min(length(dat.Label), size(EEG.data,1))));
+        EEG.chanlocs = struct('labels', dat.Label); % sjo added 120907 to avoid error below
     end;
     if ~isempty(channels)
         EEG.chanlocs = EEG.chanlocs(channels);
@@ -129,6 +134,11 @@ EEG.event = [];
 %    lastout = codeout;
 %    codeout = nextcode;
 %end;
+
+% if strcmp(dat.TYPE,'EDF') % sjo added 120907
+%     disp('filetype EDF does not support events');
+%     importevent = 0;
+% end
 
 if importevent
     if isfield(dat, 'BDF')
