@@ -183,55 +183,52 @@ else
         params = { params{:} 'neighbours' opt.fieldtrip.channelneighbor };
     end;
     params = { params{:} 'method', opt.fieldtrip.method, 'naccu', opt.fieldtrip.naccu 'mcorrect' opt.fieldtrip.mcorrect 'alpha' opt.fieldtrip.alpha 'numrandomization' opt.fieldtrip.naccu };
-    if ~isnan(opt.fieldtrip.alpha), params = { params{:} 'structoutput' 'on' }; end;
+    params = { params{:} 'structoutput' 'on' }; % before if ~isnan(opt.fieldtrip.alpha), end;
     
     if strcmpi(opt.condstats, 'on') && nc > 1
         for g = 1:ng
-            [F df pval] = statcondfieldtrip(data(:,g), 'paired', opt.paired{1}, params{:});
-            if isstruct(F)
-                pcond{g} = squeeze(F.mask);
-                statscond{g} = squeeze(F.stat);
-            else
-                pcond{g} = squeeze(pval);
-                statscond{g} = squeeze(F);
-            end;
+            [F df pval]  = statcondfieldtrip(data(:,g), 'paired', opt.paired{1}, params{:});
+            pcond{g}     = applymask( F, opt.fieldtrip);
+            statscond{g} = squeeze(F.stat);
         end;
     else
         pcond = {};
     end;
     if strcmpi(opt.groupstats, 'on') && ng > 1
         for c = 1:nc
-            [F df pval] = statcondfieldtrip(data(c,:), 'paired', opt.paired{2}, params{:});
-            if isstruct(F)
-                pgroup{c} = squeeze(F.mask);
-                statsgroup{c} = squeeze(F.stat);
-            else
-                pgroup{c} = squeeze(pval);
-                statsgroup{c} = squeeze(F);
-            end;
+            [F df pval]   = statcondfieldtrip(data(c,:), 'paired', opt.paired{2}, params{:});
+            pgroup{c}     = applymask( F, opt.fieldtrip);
+            statsgroup{c} = squeeze(F.stat);
         end;
     else
         pgroup = {};
     end;
     if ( strcmpi(opt.groupstats, 'on') && strcmpi(opt.condstats, 'on') ) & ng > 1 & nc > 1
-        opt.paired = sort(opt.paired); % put 'off' first if present
+        opt.paired  = sort(opt.paired); % put 'off' first if present
         [F df pval] = statcondfieldtrip(data, 'paired', opt.paired{1}, params{:});
         for index = 1:length(pval)
-            if isstruct(F)
-                pinter{index} = squeeze(F.mask{index});
-                statsinter{index} = squeeze(F.stat{index});
-            else
-                pinter{index} = squeeze(pval{index});
-                statsinter{index} = squeeze(F{index});
-            end;
+            pinter{index}     = applymask(F{inter}, opt.fieldtrip);
+            statsinter{index} = squeeze(F.stat{index});
         end;
     else
         pinter = {};
     end;
 end;
 
-% apply stat threshold to data
-% ----------------------------
+% apply mask for fieldtrip data
+% -----------------------------
+function p = applymask(F, fieldtrip)
+
+if ~isnan(fieldtrip.alpha), p = squeeze(F.mask);
+else
+    p = squeeze(F.pval);
+    if ~strcmpi(fieldtrip.mcorrect, 'none')
+        p(~F.mask) = 1;
+    end;
+end;
+
+% apply stat threshold to data for EEGLAB stats
+% ---------------------------------------------
 function newdata = applythreshold(data, threshold)
 
 threshold = sort(threshold);
