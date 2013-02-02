@@ -82,30 +82,12 @@
 %  'vert'        = vector of times (in ms) at which to plot vertical dashed lines
 %                   {default|[] -> none}
 %
-% Author: Makoto Miyakoshi, Hilit Serby, Arnold Delorme, Scott Makeig
-% The original version of this script was written by Hilit Serby and redesigned by Makoto Miyakoshi.
-%
 % See also: eegplugin_std_envtopo, pop_std_envtopo, std_envtopo, envtopo
 
-%123456789012345678901234567890123456789012345678901234567890123456789012
-
-% Copyright (C) 2011, Makoto Miyakoshi, Hilit Serby, Arnold Delorme, Scott Makeig
-%
-% This program is free software; you can redistribute it and/or modify
-% it under the terms of the GNU General Public License as published by
-% the Free Software Foundation; either version 2 of the License, or
-% (at your option) any later version.
-%
-% This program is distributed in the hope that it will be useful,
-% but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-% GNU General Public License for more details.
-%
-% You should have received a copy of the GNU General Public License
-% along with this program; if not, write to the Free Software
-% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1.07  USA
-%
-% History
+% Author: Makoto Miyakoshi, Hilit Serby, Arnold Delorme, Scott Makeig
+% History:
+% 01/30/2013 ver 6.1 by Makoto. group_topo_now related bug fixed.
+% 01/28/2013 ver 6.0 by Makoto. Combined groups supported. group_topo_now simplified.
 % 10/10/2012 ver 5.3 by Makoto. 'sortvar' 'sortvarnorm' 'fillcolor' 'sumenvfill' added.
 % 04/29/2012 ver 5.2 by Makoto. Bug fixed. STUDY.design(STUDY.currentdesign)
 % 04/24/2012 ver 5.1 by Makoto. Revived 'amplimit' 'fillclust' options, and vertical doted lines for limcontrib range. Default changed into 'pvaf' from 'rv'. 
@@ -123,6 +105,22 @@
 % 10/10/2011 ver 2.1 by Makoto. Two types of scalp topos can be presented.
 % 10/08/2011 ver 2.0 by Makoto. Multiple groups supported (but one group one time using option). Result topos are now retrieved from the stored ones in STUDY 
 % 08/01/2011 ver 1.0 by Makoto. Updated the original script to read data from memory.
+
+% Copyright (C) 2011, Makoto Miyakoshi, Hilit Serby, Arnold Delorme, Scott Makeig
+%
+% This program is free software; you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation; either version 2 of the License, or
+% (at your option) any later version.
+%
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+% You should have received a copy of the GNU General Public License
+% along with this program; if not, write to the Free Software
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1.07  USA
 
 function STUDY = std_envtopo(STUDY, ALLEEG, varargin);
 
@@ -202,15 +200,22 @@ arglist.clustlabels = {STUDY.cluster(1,arglist.clust_grandERP).name};
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%   Separate topos into groups     %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 if length(STUDY.group) > 1
-    [STUDY, ALLEEG] = group_topo_now(STUDY, ALLEEG);
+    if isfield(STUDY.cluster, 'topoall_group')
+        for n = 2:length(STUDY.cluster)
+            if isempty(STUDY.cluster(n).topoall_group)
+                [STUDY, ALLEEG] = group_topo_now(STUDY, ALLEEG);
+                break
+            end
+        end
+    else
+        [STUDY, ALLEEG] = group_topo_now(STUDY, ALLEEG);
+    end
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%   Convolve scalp topo with ERP   %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%       
-
 for cls = 1:length(arglist.clust_grandERP) % For all clusters for grandERP
     for columnwise = 1:size(STUDY.cluster(1,arglist.clust_grandERP(cls)).erpdata, 1) % For the first variable
         for rowwise = 1:size(STUDY.cluster(1,arglist.clust_grandERP(cls)).erpdata, 2) % For the second variable
@@ -241,7 +246,6 @@ clear cls columnwise erp rowwise topo topoerpconv
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Normalization by dividing with the number of subjects %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 setinds = {STUDY.cluster.setinds};
 for n = 1:length(setinds)
     for row = 1:size(setinds{1,1}, 1)
@@ -268,7 +272,6 @@ clear column n row setinds nsubject* str
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Apply new baseline (if specified) %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
-
 if isfield(arglist, 'baselinelimits')
     topoerpconv_pile = topoerpconv_pile - repmat(mean(topoerpconv_pile(:, arglist.baselinelimits,:,:,:), 2), [1, size(topoerpconv_pile, 2), 1,1,1]);
     fprintf('\nNew baseline applied.\n')
@@ -277,13 +280,11 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Calculate outermost envelope for each conditions %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
-
 outermostenv = sum(topoerpconv_pile, 3);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Select clusters (if specified) %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 if arglist.clustnums > 0;
     [dummy indx] = intersect(arglist.clust_grandERP, arglist.clustnums);
     topoerpconv_pile = topoerpconv_pile(:,:,indx,:,:);
@@ -294,7 +295,6 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%   Plot envtopo for each condition & group    %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%   
-
 % Create an dummy color log to share line colors for the same clusters across plots
 colorlog = zeros(1,2);
 
@@ -302,26 +302,44 @@ if isempty(arglist.diff)
     for columnwise = 1:size(topoerpconv_pile, 4) % For all conditions
         for rowwise = 1:size(topoerpconv_pile, 5) % For all groups
             figure; set(gcf,'Color', [0.93 0.96 1]); orient landscape;
-            arglist.title = [num2str(STUDY.design(STUDY.currentdesign).variable(1,1).label) ' ' num2str(STUDY.design(STUDY.currentdesign).variable(1,1).value{1, columnwise}) ' ' num2str(STUDY.design(STUDY.currentdesign).variable(1,2).label) ' ' num2str(STUDY.design(STUDY.currentdesign).variable(1,2).value{1, rowwise})];
+            % Check if conditions/group combined
+            tmpCond  = STUDY.design(STUDY.currentdesign).variable(1,1).value{1, columnwise};
+            tmpGroup = STUDY.design(STUDY.currentdesign).variable(1,2).value{1, rowwise};
+            if iscell(tmpCond);  tmpCond  = cell2mat(tmpCond);  end
+            if iscell(tmpGroup); tmpGroup = cell2mat(tmpGroup); end
+            arglist.title = [num2str(STUDY.design(STUDY.currentdesign).variable(1,1).label) ' ' num2str(tmpCond) ' ' num2str(STUDY.design(STUDY.currentdesign).variable(1,2).label) ' ' num2str(tmpGroup)];
             colorlog = envtopo_plot(STUDY, ALLEEG, squeeze(outermostenv(:,arglist.timepoints,1,columnwise,rowwise)), squeeze(topoerpconv_pile(:,arglist.timepoints,:,columnwise,rowwise)), colorlog, arglist);
         end
     end
 end
-clear columnwise rowwise
+clear columnwise rowwise tmpCond tmpGroup
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%   Else, plot difference envtopo    %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
-
 if ~isempty(arglist.diff)
+    
     % First, plot title is determined
-    if     length(STUDY.design(STUDY.currentdesign).variable(1,1).value) == 1 && arglist.diff(1) == 1 && arglist.diff(3) == 1 % Group only if no condition
-        arglist.title = [num2str(STUDY.design(STUDY.currentdesign).variable(1,2).label) ' ' num2str(STUDY.design(STUDY.currentdesign).variable(1,2).value{1, arglist.diff(1,2)}) ' minus ' num2str(STUDY.design(STUDY.currentdesign).variable(1,2).label) ' ' num2str(STUDY.design(STUDY.currentdesign).variable(1,2).value{1, arglist.diff(1,4)})];
-    elseif     length(STUDY.group) == 1 && arglist.diff(2) == 1 && arglist.diff(4) == 1 % Condition only if no group
-        arglist.title = [num2str(STUDY.design(STUDY.currentdesign).variable(1,1).label) ' ' num2str(STUDY.design(STUDY.currentdesign).variable(1,1).value{1, arglist.diff(1,1)}) ' minus ' num2str(STUDY.design(STUDY.currentdesign).variable(1,1).label) ' ' num2str(STUDY.design(STUDY.currentdesign).variable(1,1).value{1, arglist.diff(1,3)})];
-    else   % if both condition and group
-        arglist.title = [num2str(STUDY.design(STUDY.currentdesign).variable(1,1).label) ' ' num2str(STUDY.design(STUDY.currentdesign).variable(1,1).value{1, arglist.diff(1,1)}) ' ' num2str(STUDY.design(STUDY.currentdesign).variable(1,2).label) ' ' num2str(STUDY.design(STUDY.currentdesign).variable(1,2).value{1, arglist.diff(1,2)}) ' minus ' num2str(STUDY.design(STUDY.currentdesign).variable(1,1).label) ' ' num2str(STUDY.design(STUDY.currentdesign).variable(1,1).value{1, arglist.diff(1,3)}) ' ' num2str(STUDY.design(STUDY.currentdesign).variable(1,2).label) ' ' num2str(STUDY.design(STUDY.currentdesign).variable(1,2).value{1, arglist.diff(1,4)})];
+    tmpCond1  = STUDY.design(STUDY.currentdesign).variable(1,1).value{1, arglist.diff(1,1)};
+    tmpCond2  = STUDY.design(STUDY.currentdesign).variable(1,1).value{1, arglist.diff(1,3)};
+    tmpGroup1 = STUDY.design(STUDY.currentdesign).variable(1,2).value{1, arglist.diff(1,2)};
+    tmpGroup2 = STUDY.design(STUDY.currentdesign).variable(1,2).value{1, arglist.diff(1,4)};
+    if iscell(tmpCond1);  tmpCond1  = cell2mat(tmpCond1);  end
+    if iscell(tmpCond2);  tmpCond2  = cell2mat(tmpCond2);  end        
+    if iscell(tmpGroup1); tmpGroup1 = cell2mat(tmpGroup1); end
+    if iscell(tmpGroup2); tmpGroup2 = cell2mat(tmpGroup2); end
+    
+    % Group only
+    if     length(STUDY.design(STUDY.currentdesign).variable(1,1).value) == 1 && arglist.diff(1) == 1 && arglist.diff(3) == 1
+        arglist.title = [num2str(STUDY.design(STUDY.currentdesign).variable(1,2).label) ' ' num2str(tmpGroup1) ' minus ' num2str(STUDY.design(STUDY.currentdesign).variable(1,2).label) ' ' num2str(tmpGroup2)];
+    % Condition only
+    elseif length(STUDY.group) == 1 && arglist.diff(2) == 1 && arglist.diff(4) == 1 % Condition only if no group
+        arglist.title = [num2str(STUDY.design(STUDY.currentdesign).variable(1,1).label) ' ' num2str(tmpCond1)  ' minus ' num2str(STUDY.design(STUDY.currentdesign).variable(1,1).label) ' ' num2str(tmpCond2)];
+    % if both condition and group
+    else   
+        arglist.title = [num2str(STUDY.design(STUDY.currentdesign).variable(1,1).label) ' ' num2str(tmpCond1) ' ' num2str(STUDY.design(STUDY.currentdesign).variable(1,2).label) ' ' num2str(tmpGroup1) ' minus ' num2str(STUDY.design(STUDY.currentdesign).variable(1,1).label) ' ' num2str(tmpCond2) ' ' num2str(STUDY.design(STUDY.currentdesign).variable(1,2).label) ' ' num2str(tmpGroup2)];
     end
+    
     % Calculation and plotting
     figure; set(gcf,'Color', [0.93 0.96 1]); orient landscape;
     outermostenv = outermostenv(:,:,:,arglist.diff(1,1),arglist.diff(1,2)) - outermostenv(:,:,:,arglist.diff(1,3),arglist.diff(1,4));
@@ -1213,86 +1231,16 @@ return %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 
-
-
-function [STUDY, ALLEEG] = group_topo_now(STUDY, ALLEEG);
-% this function is to separate topoall into number of groups
-% written by Makoto Miyakoshi
-
-% Is group the first or second variable?
-if strcmp(STUDY.design(STUDY.currentdesign).variable(1,1).label, 'group')
-    variable_group = 1;
-else
-    variable_group = 2;
-end
-
-% Obtain forward-reference; from STUDY.design(STUDY.currentdesign).cell to sets
-% This is also an experiment to extract values from cell without using for_loop.
-sets1 = cell2mat({STUDY.design(1,STUDY.currentdesign).cell.dataset}');
-sets2 = strcat(STUDY.design(1,STUDY.currentdesign).cell.value);
-sets2 = (sets2{1, variable_group})';
-sets2 = str2num(sets2);
-sets = cat(2, sets1, sets2); % column 1 for dataset numbers, column 2 for group numbers
-clear sets1 sets2
-
-% It seems that if values contained by cells embedded in cells, it is hard to avoid
-% using for_loop (thus it is desireble to avoid such data structure).
-
-% loop for all clusters
-for cls = 2:length(STUDY.cluster) 
-    if ~isempty(STUDY.cluster(1,cls).topoall) % this is for empty cluster 04/29/12 makoto
-        % pick up set indices from the nth cluster
-        ncomps = STUDY.cluster(1,cls).sets(1,:);
-
-        for columnwise = 1:size(STUDY.cluster(1,cls).setinds, 1)
-            for rowwise = 1:size(STUDY.cluster(1,cls).setinds, 2)
-                for nsets = 1:length(STUDY.cluster(1,cls).setinds{columnwise,rowwise})
-                    sets_grouped{columnwise, rowwise}(1, nsets) = STUDY.design(1,STUDY.currentdesign).cell(1, STUDY.cluster(1,cls).setinds{columnwise, rowwise}(1, nsets)).dataset;
-                end
-            end
+function [STUDY, ALLEEG] = group_topo_now(STUDY, ALLEEG)
+disp('Loading and separating topographs (only once)...')
+var2Len = size(STUDY.design(STUDY.currentdesign).variable(2).value, 2);
+for cls = 2:length(STUDY.cluster)
+    for var2 = 1:var2Len
+        for icLen = 1:length(STUDY.cluster(1,cls).setinds{1,var2})
+            tmpAllinds = STUDY.cluster(1,cls).allinds{1,var2}(icLen);
+            tmpSetinds = STUDY.cluster(1,cls).setinds{1,var2}(icLen);
+            tmpDataset = STUDY.design(STUDY.currentdesign).cell(tmpSetinds).dataset;
+            STUDY.cluster(1,cls).topoall_group{1,var2}{1,icLen} = std_readtopo(ALLEEG, tmpDataset, tmpAllinds);
         end
-
-        % rotate if variable_group == 1;
-        if variable_group == 1
-            sets_grouped = sets_grouped';
-        end
-
-        sets_grouped_mat = cell2mat(sets_grouped);
-
-        % reverse reference: from setinds to sets_divided_mat
-        [a revref_group] = sort(sets_grouped_mat, 2);
-        revref_group = revref_group(1,:);
-
-        % create topoall_reordered
-        for n = 1:size(STUDY.cluster(1,cls).sets, 2)
-            topoall_reordered{1,n} = STUDY.cluster(1,cls).topoall{1,revref_group(n)};
-        end
-
-        % build topoall_group
-        if variable_group == 1;
-            ngroup = size(STUDY.cluster(1,cls).setinds, 1);
-            for n = 1:ngroup
-                ntopos(n) = length(STUDY.cluster(1,cls).setinds{n,1});
-            end
-        else
-            ngroup = size(STUDY.cluster(1,cls).setinds, 2);
-            for n = 1:ngroup
-                ntopos(n) = length(STUDY.cluster(1,cls).setinds{1,n});
-            end
-        end
-
-        n = 0;
-        while n < ngroup
-            n = n+1;
-            if n == 1;
-                topoall_group{1, n} = topoall_reordered(1:ntopos(n));
-            else
-                topoall_group{1, n} = topoall_reordered(ntopos(n-1)+1: ntopos(n-1)+ntopos(n));
-            end
-        end
-
-        % locate the topoall_group to each of STUDY.cluster
-        STUDY.cluster(1,cls).topoall_group = topoall_group;
-        clear ncomps ntopos sets_* topoall_*
     end
 end

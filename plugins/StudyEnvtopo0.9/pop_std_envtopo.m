@@ -40,6 +40,7 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 %
 % History
+% 01/30/2013 ver 2.0 by Makoto. STUDY = std_envtopo()
 % 04/25/2012 ver 1.9 by Makoto. Description of how to apply low-pass filter added. History function disabled being unable to solve a bug.
 % 01/24/2012 ver 1.8 by Makoto. Anti-crash for the cancel bottun. eegh support being attempted
 % 01/17/2012 ver 1.7 by Makoto. Input box for 'diff' added.
@@ -109,10 +110,11 @@ if length(STUDY.cluster) == 1
     errordlg2('Cannot plot envtopo with the parent cluster only');
 end;
 
+% if no icaerp loaded, load them  
 for n = 2:length(STUDY.cluster)
     [STUDY, datavals, xvals, setinds, allinds] = std_readerp(STUDY, ALLEEG, 'design', STUDY.currentdesign, 'clusters', n, 'singletrials', 'off');
 end
 
 % run std_evntopo
-std_envtopo(STUDY, ALLEEG, arguments{:});
+STUDY = std_envtopo(STUDY, ALLEEG, arguments{:});
 % com = ['std_envtopo(STUDY, ALLEEG,' options ');'];
