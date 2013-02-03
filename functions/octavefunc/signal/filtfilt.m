@@ -49,8 +49,12 @@
 
 function y = filtfilt(b, a, x)
 if ismatlab
-    p = fileparts(which('filtfilt'));
-    error( [ 'Octave functions should not run on Matlab' 10 'remove path to ' p ]);
+    if license('test','signal_toolbox')
+        p = fileparts(which('filtfilt'));
+        error( [ 'Octave functions should not run on Matlab' 10 'remove path to ' p ]);
+    else
+        warning('Signal processing toolbox is absent, using replacement functions');
+    end;
 end;
 
 if (nargin ~= 3)

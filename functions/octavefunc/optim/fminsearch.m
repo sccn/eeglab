@@ -23,8 +23,12 @@
 
 function [x fval] = fminsearch(funfun, X0, options, grad, varargin)
     if ismatlab
-        p = fileparts(which('fmins'));
-        error( [ 'Octave functions should not run on Matlab' 10 'remove path to ' p ]);
+        if license('test','optim_toolbox')
+            p = fileparts(which('fmins'));
+            error( [ 'Octave functions should not run on Matlab' 10 'remove path to ' p ]);
+        else
+            warning('Optimization toolbox is absent, using replacement functions');
+        end;
     end;
 	if (nargin == 0); usage('[x fval] = fminsearch(funfun, X0, options, grad, varargin)'); end
 	if (nargin < 3); options=[]; end
@@ -32,4 +36,3 @@ function [x fval] = fminsearch(funfun, X0, options, grad, varargin)
 	if (nargin < 5); varargin={}; end
 	x = fmins(funfun, X0, options, grad, varargin{:});
 	fval = feval(funfun, x, varargin{:});
-endfunction;

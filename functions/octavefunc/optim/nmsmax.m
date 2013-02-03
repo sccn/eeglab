@@ -42,6 +42,13 @@ function [x, fmax, nf] = nmsmax(fun, x, stopit, savit, varargin)
 % C. T. Kelley, Iterative Methods for Optimization, Society for Industrial
 %    and Applied Mathematics, Philadelphia, PA, 1999.
 
+if ismatlab
+    if license('test','optim_toolbox')
+        p = fileparts(which('fmins'));
+        error( [ 'Octave functions should not run on Matlab' 10 'remove path to ' p ]);
+    end;
+end;
+
 x0 = x(:);  % Work with column vector internally.
 n = length(x0);
 
