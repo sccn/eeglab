@@ -185,10 +185,6 @@ end;
 if isstr(g), error(g); end;
 if isempty(g.trialindices), g.trialindices = cell(length(EEG)); end;
 if ~iscell(g.trialindices), g.trialindices = { g.trialindices }; end;
-if strcmpi(g.freqscale, 'linear')
-    error([ 'It is currently not possible to plot ERSP in linear frequency' 10 ...
-            'scale in STUDY. We are working on fixing this issue.' ]);
-end;
 
 % checking input parameters
 % -------------------------
