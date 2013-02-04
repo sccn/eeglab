@@ -54,7 +54,7 @@ if ~isstr(varargin{1}) %intial settings
          
     % callbacks
     % ---------
-    erspparams_str     = [ '''cycles'', [3 0.8], ''nfreqs'', 100, ''freqscale'', ''log''' ];
+    erspparams_str     = [ '''cycles'', [3 0.8], ''nfreqs'', 100, ''ntimesout'', 200' ];
     specparams_str     = '''specmode'', ''fft'', ''logtrials'', ''off''';
     erpimageparams_str = '''nlines'', 10,''smoothing'', 10';
     set_ersp       = ['pop_precomp(''setersp'',gcf);']; 
@@ -372,19 +372,7 @@ else
                 ersp_params = eval([ '{' get(findobj('parent', hdl, 'tag', 'ersp_params'), 'string') '}' ]); 
                 tmpstruct = struct(ersp_params{:});
                 [ tmpX tmpt tmpf ersp_params ] = std_ersp(ALLEEG(1), 'channels', 1, 'trialindices', { [1:min(20,ALLEEG(1).trials)] }, 'type', 'ersp', 'recompute', 'on', 'savefile', 'off', ersp_params{:});
-                figure; pos = get(gcf, 'position'); pos(3)=pos(3)*2; set(gcf, 'position', pos);
-                subplot(1,2,1); 
-                tftopo(tmpX, tmpt, tmpf);
-                subplot(1,2,2); 
-                text( 0.2, 0.8, strvcat( 'This is a test plot performed on', ...
-                                         'the first 20 trials of the first', ...
-                                         'dataset (ERSP only).', ...
-                                         ' ', ...
-                                         'Time and frequency range may be', ...
-                                         'adjusted after computation.'), 'fontsize', 18);
-                axis off;                                                 
-                icadefs;
-                set(gcf, 'color', BACKCOLOR);    
+                std_plottf(tmpt, tmpf, { tmpX });
             catch, warndlg2('Error while calling function, check parameters'); end;
                 
         case 'testerpimage'
