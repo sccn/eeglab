@@ -45,8 +45,10 @@
 %                  'condensed' -> plot statistics under the curves 
 %                  (when possible); 'normal' -> plot them in separate 
 %                  axes {default: 'normal'}
-%  'freqscale'   - ['log'|'linear'|'auto'] frequency plotting scale.
-%                  {default: 'auto'}
+%  'freqscale'   - ['log'|'linear'|'auto'] frequency plotting scale. This
+%                  will only change the ordinate not interpolate the data.
+%                  If you change this option blindly, your frequency scale
+%                  might be innacurate {default: 'auto'}
 %  'ylim'        - [min max] ordinate limits for ERP and spectrum plots
 %                  {default: all available data}
 %
@@ -87,7 +89,7 @@ if nargin < 2
     return;
 end;
 
-opt = finputcheck( varargin, { 'titles'         'cell'   []              cell(20,20);
+opt = finputcheck( varargin, { 'titles'         'cell'   []              cellfun(@num2str, cell(20,20), 'uniformoutput', false);
                                'caxis'          'real'   []              [];
                                'ersplim'        'real'   []              []; % same as above
                                'itclim'         'real'   []              []; % same as above
