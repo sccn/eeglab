@@ -294,7 +294,7 @@ else
     
     for index = 1:length(opt.clusters)
 
-        [STUDY allersp alltimes allfreqs] = std_readersp(STUDY, ALLEEG, 'clusters', opt.clusters(index), 'infotype', opt.datatype, ...
+        [STUDY allersp alltimes allfreqs tmp events] = std_readersp(STUDY, ALLEEG, 'clusters', opt.clusters(index), 'infotype', opt.datatype, ...
             'component', opt.comps, 'singletrials', stats.singletrials, 'subbaseline', params.subbaseline, 'timerange', params.timerange, 'freqrange', params.freqrange, 'design', opt.design, 'concatenate', params.concatenate);
         if length(opt.clusters) > 1, try, subplot(nr,nc,index, 'align'); catch, subplot(nr,nc,index); end; end;
 
@@ -335,7 +335,7 @@ else
             std_plottf(alltimes, allfreqs, allersp, 'datatype', opt.datatype, ...
                                            'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, 'plotmode', ...
                                            opt.plotmode, 'titles', alltitles, ...
-                                          'chanlocs', ALLEEG(1).chanlocs, plottfopt{:});
+                                          'events', events, 'chanlocs', ALLEEG(1).chanlocs, plottfopt{:});
         end;
     end;
 end;
