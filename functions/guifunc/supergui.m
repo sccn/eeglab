@@ -104,8 +104,10 @@ end;
 % get version and
 % set additional parameters
 % -------------------------
-[v vv] = version;
-if datenum(vv) > 734907
+v = version;
+indDot  = find(v == '.');
+versnum = str2num(v(1:indDot(2)-1));
+if versnum >= 7.14
      addParamFont = { 'fontsize' 12 };
 else addParamFont = { };
 end;
