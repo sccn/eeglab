@@ -1893,7 +1893,10 @@ function rmpathifpresent(newpath);
     else
         newpath = [ newpath ':' ];
     end;
-    p = matlabpath;
+    if ismatlab
+         p = matlabpath;
+    else p = path;
+    end;
     ind = strfind(p, newpath);
     if ~isempty(ind)
         rmpath(newpath);
@@ -1909,7 +1912,10 @@ function addpathifnotinlist(newpath);
     else
         newpathtest = [ newpath ':' ];
     end;
-    p = matlabpath;
+    if ismatlab
+         p = matlabpath;
+    else p = path;
+    end;
     ind = strfind(p, newpathtest);
     if isempty(ind)
         if exist(newpath) == 7
