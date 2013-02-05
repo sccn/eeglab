@@ -108,7 +108,8 @@
 %                  {default: plot potential, not amplitudes, with no minimum}. The average power
 %                  (in log space) before time 0 is automatically removed. Note that the 
 %                  'baseline' parameter has no effect on 'plotamps'. Instead use
-%                  change "basedB" in the 'limits' parameter.
+%                  change "baselinedb" or "basedB" in the 'limits' parameter. By default
+%                  the baseline is removed before time 0.
 %
 % Specify plot parameters:
 %   'limits'         = [lotime hitime minerp maxerp lodB hidB locoher hicoher basedB]
@@ -203,8 +204,10 @@
 %                        Useful in conjunction with 'filt' option to re-basline trials after they have been
 %                        filtered. Not necessary if data have already been baselined and erpimage
 %                        processing does not affect baseline amplitude {default: no further baselining
-%                        of data}. Note that the baseline when using 'plotamps' is automatically
-%                        removed unless you set the "basedB" in 'limits' to 0.
+%                        of data}.
+% 'baselinedb'        = [low_boundary high_boundary] a time window (in msec) whose mean amplitude in
+%                        each trial will be removed from each trial (e.g., [-100 0]). Use basedB in limits
+%                        to remove a fixed value. Default is time before 0.
 % 'filt'              = [low_boundary high_boundary] a two element vector indicating the frequency
 %                        cut-offs for a 3rd order Butterworth filter that will be applied to each
 %                        trial of data.  If low_boundary=0, the filter is a low pass filter.  If
@@ -338,7 +341,8 @@ cbar_title = []; % title to add above ERPimage color bar (e.g., '\muV') -DG
 img_ylab = 'Trials'; % make the ERPimage y-axis in units of the sorting variable -DG
 img_ytick_lab = []; % the values at which tick marks will appear on the trial axis of the ERPimage (the y-axis by default).
 %Note, this is in units of the sorting variable if img_ylab~='Trials', otherwise it is in units of trials -DG
-baseline = []; %time window of each trial whose mean amp will be used to baseline the trial -DG
+baseline   = []; %time window of each trial whose mean amp will be used to baseline the trial -DG
+baselinedb = []; %time window of each trial whose mean power will be used to baseline the trial
 flt=[]; %frequency domain filter parameters -DG
 sortvar_limits=[]; %plotting limits for sorting variable/trials; limits only affect visualization, not smoothing -DG
 replace_ties = NO; %if YES, trials with the exact same value of a sorting variable will be replaced by their average -DG
@@ -998,6 +1002,14 @@ if nargin > 6
                 baseline = eval(['arg' int2str(a-6)]);
             else
                 error('\nerpimage(): Argument ''baseline'' needs to be followed by a two element vector.');
+            end
+        elseif strcmpi(Arg,'baselinedb')
+            if a < nargin,
+                a = a+1;
+                baselinedb = eval(['arg' int2str(a-6)]);
+                if length(baselinedb) ~ 2, error('''baselinedb'' need to be a 2 argument vector'); end;
+            else
+                error('\nerpimage(): Argument ''baselinedb'' needs to be followed by a two element vector.');
             end
         elseif strcmpi(Arg,'filt')
             if a < nargin,
@@ -3037,7 +3049,10 @@ if ~isnan(coherfreq)
         amps = 20*log10(amps); % convert to dB
         
         if isnan(baseamp) % if baseamp not specified in 'limits'
-            base = find(times<=DEFAULT_BASELINE_END); % use default baseline end point (ms)
+            if isempty(baselinedb)
+                baselinedb = [times(1) DEFAULT_BASELINE_END];
+            end;
+            base = find(times >= baselinedb(1) && times<=baselinedb(end)); % use default baseline end point (ms)
             if length(base)<2
                 base = 1:floor(length(times)/4); % default first quarter-epoch
                 fprintf('Using %g to %g ms as amplitude baseline.\n',...
