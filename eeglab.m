@@ -1969,4 +1969,15 @@ function [name vers] = parsepluginname(dirName);
         vers = dirName(ind+1:end);
         vers(find(vers == '_')) = '.';
     end;
+
+% required here because path not added yet
+% to the admin folder
+function res = ismatlab;
+
+v = version;
+if v(1) > '4'
+    res = 1;
+else
+    res = 0;
+end;
     
