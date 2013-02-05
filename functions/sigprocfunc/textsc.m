@@ -62,7 +62,7 @@ h = text(x,y,txt,'VerticalAlignment','Middle', ...
 
 % Make the original AXES current
 if ~isempty(ch)
-  set(gcf,'CurrentAxes',gca);
+  set(gcf,'CurrentAxes',ch);
 end
 
 % Check for output
