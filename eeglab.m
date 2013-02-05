@@ -1905,14 +1905,14 @@ function addpathifnotinlist(newpath);
 
     comp = computer;
     if strcmpi(comp(1:2), 'PC')
-        newpath = [ newpath ';' ];
+        newpathtest = [ newpath ';' ];
     else
-        newpath = [ newpath ':' ];
+        newpathtest = [ newpath ':' ];
     end;
     p = matlabpath;
-    ind = strfind(p, newpath);
+    ind = strfind(p, newpathtest);
     if isempty(ind)
-        if exist(p) == 7
+        if exist(newpath) == 7
             addpath(newpath);
         end;
     end;
