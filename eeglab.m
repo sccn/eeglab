@@ -157,24 +157,27 @@ end;
 % --------------------------------------
 eeglabpath = which('eeglab.m');
 eeglabpath = eeglabpath(1:end-length('eeglab.m'));
-eeglabpath2 = '';
-if strcmpi(eeglabpath, pwd) || strcmpi(eeglabpath(1:end-1), pwd) 
-    cd('functions');
-    warning('off', 'MATLAB:rmpath:DirNotFound');
-    rmpath(eeglabpath);
-    warning('on', 'MATLAB:rmpath:DirNotFound');
-    eeglabpath2 = which('eeglab.m');
-    cd('..');
-else
-    try, rmpath(eeglabpath); catch, end;
-    eeglabpath2 = which('eeglab.m');
-end;
-if ~isempty(eeglabpath2)
-    eeglabpath2 = eeglabpath2(1:end-length('eeglab.m'));
-    disp('******************************************************');
-    warning('There are at least two versions of EEGLAB in your path');
-    warning(sprintf('One is at %s', eeglabpath));
-    warning(sprintf('The other one is at %s', eeglabpath2));
+if nargin < 1
+    eeglabpath2 = '';
+    if strcmpi(eeglabpath, pwd) || strcmpi(eeglabpath(1:end-1), pwd) 
+        cd('functions');
+        warning('off', 'MATLAB:rmpath:DirNotFound');
+        rmpath(eeglabpath);
+        warning('on', 'MATLAB:rmpath:DirNotFound');
+        eeglabpath2 = which('eeglab.m');
+        cd('..');
+    else
+        try, rmpath(eeglabpath); catch, end;
+        eeglabpath2 = which('eeglab.m');
+    end;
+    if ~isempty(eeglabpath2)
+        eeglabpath2 = eeglabpath2(1:end-length('eeglab.m'));
+        disp('******************************************************');
+        warning('There are at least two versions of EEGLAB in your path');
+        warning(sprintf('One is at %s', eeglabpath));
+        warning(sprintf('The other one is at %s', eeglabpath2));
+    end;
+    addpath(eeglabpath);
 end;
 
 % add the paths
@@ -193,7 +196,7 @@ end;
 % test for local SCCN copy
 % ------------------------
 if ~iseeglabdeployed2
-    addpath(eeglabpath);
+    addpathifnotinlist(eeglabpath);
     if exist( fullfile( eeglabpath, 'functions', 'adminfunc') ) ~= 7
         warning('EEGLAB subfolders not found');
     end;
@@ -215,7 +218,8 @@ end;
 % ---------
 if ~iseeglabdeployed2
     myaddpath( eeglabpath, 'eeg_checkset.m',   [ 'functions' filesep 'adminfunc'        ]);
-    myaddpath( eeglabpath, 'mmo.m', 'functions');
+    myaddpath( eeglabpath, 'eeg_checkset.m',   [ 'functions' filesep 'adminfunc'        ]);
+    myaddpath( eeglabpath, ['@mmo' filesep 'mmo.m'], 'functions');
     myaddpath( eeglabpath, 'readeetraklocs.m', [ 'functions' filesep 'sigprocfunc'      ]);
     myaddpath( eeglabpath, 'supergui.m',       [ 'functions' filesep 'guifunc'          ]);
     myaddpath( eeglabpath, 'pop_study.m',      [ 'functions' filesep 'studyfunc'        ]);
@@ -235,27 +239,32 @@ if ~iseeglabdeployed2
 
     % add path if toolboxes are missing
     % ---------------------------------
-    tmppath = path;
     signalpath = fullfile(eeglabpath, 'functions', 'octavefunc', 'signal');
     optimpath  = fullfile(eeglabpath, 'functions', 'octavefunc', 'optim');
-    if ~license('test','signal_toolbox') || option_donotusetoolboxes
+    if option_donotusetoolboxes
+        p1 = fileparts(which('fminsearch'));
+        p2 = fileparts(which('filtfilt'));
+        if ~isempty(p1), rmpath(p1); end;
+        if ~isempty(p2), rmpath(p2); end;
+    end;
+    if ~license('test','signal_toolbox')
         warning('off', 'MATLAB:dispatcher:nameConflict');
         addpath( signalpath );
     else
         warning('off', 'MATLAB:rmpath:DirNotFound');
-        if ~isempty(findstr( signalpath, tmppath)) rmpath( signalpath ); end;
-        if ~isempty(findstr( optimpath, path)),       rmpath(optimpath); end;
+        rmpathifpresent( signalpath );
+        rmpathifpresent(optimpath);
         warning('on', 'MATLAB:rmpath:DirNotFound');
     end;
     if ~license('test','optim_toolbox') && ~ismatlab
         addpath( optimpath );
     else
         warning('off', 'MATLAB:rmpath:DirNotFound');
-        if ~isempty(findstr( optimpath, tmppath)) rmpath( optimpath ); end;
+        rmpathifpresent( optimpath );
         warning('on', 'MATLAB:rmpath:DirNotFound');
     end;
     
-    myaddpath( eeglabpath, 'eegplugin_dipfit', 'plugins');
+    myaddpath( eeglabpath, 'eegplugin_dipfit.m', [ 'plugins' filesep 'dipfit2.2' ]);
 else
     eeglab_options;
 end;
@@ -420,20 +429,20 @@ else
     for index = 1:length(dircontent)
         if dircontent{index}(1) ~= '.'
             if exist([p 'external' filesep dircontent{index}]) == 7
-                addpath([p 'external' filesep dircontent{index}]);
+                addpathifnotinlist([p 'external' filesep dircontent{index}]);
                 disp(['Adding path to eeglab' filesep 'external' filesep dircontent{index}]);
             end;
             if ~isempty(findstr('fieldtrip', lower(dircontent{index})))
-                addpathexist([p 'external' filesep dircontent{index} filesep 'forward' ]);
-                addpathexist([p 'external' filesep dircontent{index} filesep 'inverse' ]);
-                addpathexist([p 'external' filesep dircontent{index} filesep 'utilities' ]);
-                addpathexist([p 'external' filesep dircontent{index} ]);
+                addpathifnotinlist([p 'external' filesep dircontent{index} filesep 'forward' ]);
+                addpathifnotinlist([p 'external' filesep dircontent{index} filesep 'inverse' ]);
+                addpathifnotinlist([p 'external' filesep dircontent{index} filesep 'utilities' ]);
+                addpathifnotinlist([p 'external' filesep dircontent{index} ]);
                 disp(['Adding path to eeglab' filesep 'external' filesep dircontent{index} ' subfolders' ]);
             end;
             if ~isempty(findstr('biosig', lower(dircontent{index})))
-                addpathexist([p 'external' filesep dircontent{index} filesep 't200_FileAccess' ]);
-                addpathexist([p 'external' filesep dircontent{index} filesep 't250_ArtifactPreProcessingQualityControl' ]);
-                addpathexist([p 'external' filesep dircontent{index} filesep 'doc' ]);
+                addpathifnotinlist([p 'external' filesep dircontent{index} filesep 't200_FileAccess' ]);
+                addpathifnotinlist([p 'external' filesep dircontent{index} filesep 't250_ArtifactPreProcessingQualityControl' ]);
+                addpathifnotinlist([p 'external' filesep dircontent{index} filesep 'doc' ]);
 
                 biosigflag = 1;
             end;
@@ -709,7 +718,7 @@ if ismatlab
     uimenu( edit_m, 'Label', 'Select epochs or events'                , 'userdata', ondata, 'CallBack', cb_selectevent);
     uimenu( edit_m, 'Label', 'Copy current dataset'                   , 'userdata', ondata, 'CallBack', cb_copyset, 'Separator', 'on');
     uimenu( edit_m, 'Label', 'Append datasets'                        , 'userdata', ondata, 'CallBack', cb_mergeset);
-    uimenu( edit_m, 'Label', 'Delete dataset(s)'                      , 'userdata', ondata, 'CallBack', cb_delset);
+    uimenu( edit_m, 'Label', 'Delete dataset(s) from memory'          , 'userdata', ondata, 'CallBack', cb_delset);
 
     uimenu( tools_m, 'Label', 'Change sampling rate'                  , 'userdata', ondatastudy, 'CallBack', cb_resample);
 
@@ -870,33 +879,40 @@ else
         funcname = '';
         if exist([p 'plugins' filesep dircontent{index}]) == 7
             if ~strcmpi(dircontent{index}, '.') & ~strcmpi(dircontent{index}, '..')
-                addpath([ p 'plugins' filesep dircontent{index} ]);
-                tmpdir = dir([ p 'plugins' filesep dircontent{index}]);
-                for tmpind = 1:length(tmpdir)
-                    % find plugin function in subfolder
-                    % ---------------------------------
-                    if ~isempty(findstr(tmpdir(tmpind).name, 'eegplugin')) & tmpdir(tmpind).name(end) == 'm'
-                        funcname = tmpdir(tmpind).name(1:end-2);
-                        tmpind = length(tmpdir);
-                        [ pluginlist(plugincount).plugin pluginlist(plugincount).version ] = parsepluginname(dircontent{index});
-                    end;
+                newpath = [ 'plugins' filesep dircontent{index} ];
+                tmpdir = dir([ p 'plugins' filesep dircontent{index} filesep 'eegplugin*.m' ]);
+                
+                if ~isempty(tmpdir)
+                    myaddpath(eeglabpath, tmpdir(1).name, newpath);
+                    funcname = tmpdir(1).name(1:end-2);
+                    [ pluginlist(plugincount).plugin pluginlist(plugincount).version ] = parsepluginname(dircontent{index});
+                end;
+                
+%                 for tmpind = 1:length(tmpdir)
+%                     % find plugin function in subfolder
+%                     % ---------------------------------
+%                     if ~isempty(findstr(tmpdir(tmpind).name, 'eegplugin')) & tmpdir(tmpind).name(end) == 'm'
+%                         funcname = tmpdir(tmpind).name(1:end-2);
+%                         tmpind = length(tmpdir);
+%                         [ pluginlist(plugincount).plugin pluginlist(plugincount).version ] = parsepluginname(dircontent{index});
+%                     end;
 
                     % special case of eeglab subfolder (for BIOSIG)
                     % --------------------------------
-                    if strcmpi(tmpdir(tmpind).name, 'eeglab')
-                        addpath([ p 'plugins' filesep dircontent{index} filesep 'eeglab' ],'-end');
-                        tmpdir2 = dir([ p 'plugins' filesep dircontent{index} filesep 'eeglab' ]);
-                        for tmpind2 = 1:length(tmpdir2)
-                            if ~isempty(findstr(tmpdir2(tmpind2).name, 'eegplugin')) ...
-                                    & tmpdir2(tmpind2).name(end) == 'm'
-                                funcname = tmpdir2(tmpind2).name(1:end-2);
-                                tmpind2  = length(tmpdir2);
-                                tmpind   = length(tmpdir);
-                                [ pluginlist(plugincount).plugin pluginlist(plugincount).version ] = parsepluginname(dircontent{index});
-                            end;
-                        end;
-                    end;    
-                end;
+%                     if strcmpi(tmpdir(tmpind).name, 'eeglab')
+%                         addpath([ p 'plugins' filesep dircontent{index} filesep 'eeglab' ],'-end');
+%                         tmpdir2 = dir([ p 'plugins' filesep dircontent{index} filesep 'eeglab' ]);
+%                         for tmpind2 = 1:length(tmpdir2)
+%                             if ~isempty(findstr(tmpdir2(tmpind2).name, 'eegplugin')) ...
+%                                     & tmpdir2(tmpind2).name(end) == 'm'
+%                                 funcname = tmpdir2(tmpind2).name(1:end-2);
+%                                 tmpind2  = length(tmpdir2);
+%                                 tmpind   = length(tmpdir);
+%                                 [ pluginlist(plugincount).plugin pluginlist(plugincount).version ] = parsepluginname(dircontent{index});
+%                             end;
+%                         end;
+%                     end;    
+%                end;
             end;
         else 
             if ~isempty(findstr(dircontent{index}, 'eegplugin')) & dircontent{index}(end) == 'm'
@@ -912,7 +928,8 @@ else
             vers2  = '';
             status = 'ok';
             try,
-                eval( [ 'vers2 =' funcname '(gcf, trystrs, catchstrs);' ]);
+                %eval( [ 'vers2 =' funcname '(gcf, trystrs, catchstrs);' ]);
+                vers2 = feval(funcname, gcf, trystrs, catchstrs);
             catch
                 try,
                     eval( [ funcname '(gcf, trystrs, catchstrs)' ]);
@@ -938,6 +955,7 @@ else
             plugincount = plugincount+1;
         end;
     end;
+    global PLUGINLIST;
     PLUGINLIST = pluginlist;
 end; % iseeglabdeployed2
 
@@ -1867,6 +1885,38 @@ function g = myguihandles(fig)
 		end;
 	end;
 
+    
+function rmpathifpresent(newpath);  
+    comp = computer;
+    if strcmpi(comp(1:2), 'PC')
+        newpath = [ newpath ';' ];
+    else
+        newpath = [ newpath ':' ];
+    end;
+    p = matlabpath;
+    ind = strfind(p, newpath);
+    if ~isempty(ind)
+        rmpath(newpath);
+    end;
+        
+% add path only if it is not already in the list
+% ----------------------------------------------
+function addpathifnotinlist(newpath);  
+
+    comp = computer;
+    if strcmpi(comp(1:2), 'PC')
+        newpath = [ newpath ';' ];
+    else
+        newpath = [ newpath ':' ];
+    end;
+    p = matlabpath;
+    ind = strfind(p, newpath);
+    if isempty(ind)
+        if exist(p) == 7
+            addpath(newpath);
+        end;
+    end;
+    
 % find a function path and add path if not present
 % ------------------------------------------------
 function myaddpath(eeglabpath, functionname, pathtoadd);
@@ -1885,12 +1935,7 @@ function myaddpath(eeglabpath, functionname, pathtoadd);
         end;
     else
         %disp([ 'Adding new path ' tmpnewpath ]);
-        addpath(tmpnewpath);
-    end;
-
-function addpathexist(p)
-    if exist(p) == 7
-        addpath(p);
+        addpathifnotinlist(tmpnewpath);
     end;
 
 function val = iseeglabdeployed2;
