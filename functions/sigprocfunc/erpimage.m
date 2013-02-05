@@ -207,7 +207,8 @@
 %                        of data}.
 % 'baselinedb'        = [low_boundary high_boundary] a time window (in msec) whose mean amplitude in
 %                        each trial will be removed from each trial (e.g., [-100 0]). Use basedB in limits
-%                        to remove a fixed value. Default is time before 0.
+%                        to remove a fixed value. Default is time before 0. If you do not want to use a 
+%                        baseline for amplitude plotting, enter a NaN value.
 % 'filt'              = [low_boundary high_boundary] a two element vector indicating the frequency
 %                        cut-offs for a 3rd order Butterworth filter that will be applied to each
 %                        trial of data.  If low_boundary=0, the filter is a low pass filter.  If
@@ -1007,7 +1008,7 @@ if nargin > 6
             if a < nargin,
                 a = a+1;
                 baselinedb = eval(['arg' int2str(a-6)]);
-                if length(baselinedb) ~ 2, error('''baselinedb'' need to be a 2 argument vector'); end;
+                if length(baselinedb) > 2, error('''baselinedb'' need to be a 2 argument vector'); end;
             else
                 error('\nerpimage(): Argument ''baselinedb'' needs to be followed by a two element vector.');
             end
@@ -3049,18 +3050,21 @@ if ~isnan(coherfreq)
         amps = 20*log10(amps); % convert to dB
         
         if isnan(baseamp) % if baseamp not specified in 'limits'
-            if isempty(baselinedb)
-                baselinedb = [times(1) DEFAULT_BASELINE_END];
+            if ~isempty(baselinedb) && isnan(baselinedb(1))
+                disp('Not removing amplitude baseline');
+            else
+                if isempty(baselinedb)
+                    baselinedb = [times(1) DEFAULT_BASELINE_END];
+                end;
+                base = find(times >= baselinedb(1) && times<=baselinedb(end)); % use default baseline end point (ms)
+                if length(base)<2
+                    base = 1:floor(length(times)/4); % default first quarter-epoch
+                    fprintf('Using %g to %g ms as amplitude baseline.\n',...
+                        times(1),times(base(end)));
+                end
+                [amps,baseamp] = rmbase(amps,length(times),base); % remove dB baseline
+                fprintf('Removed baseline amplitude of %d dB for plotting.\n',baseamp);
             end;
-            base = find(times >= baselinedb(1) && times<=baselinedb(end)); % use default baseline end point (ms)
-            if length(base)<2
-                base = 1:floor(length(times)/4); % default first quarter-epoch
-                fprintf('Using %g to %g ms as amplitude baseline.\n',...
-                    times(1),times(base(end)));
-            end
-            [amps,baseamp] = rmbase(amps,length(times),base); % remove dB baseline
-            fprintf('Removed baseline amplitude of %d dB for plotting.\n',baseamp);
-            
         else % if 'basedB' specified in 'limits' (in dB)
             fprintf('Removing specified baseline amplitude of %d dB for plotting.\n',...
                 baseamp);
