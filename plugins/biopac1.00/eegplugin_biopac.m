@@ -43,15 +43,7 @@ function vers = eegplugin_biopac(fig, trystrs, catchstrs)
     if nargin < 3
         error('eegplugin_biopac requires 3 arguments');
     end;
-    
-    % add folder to path
-    % ------------------
-    if exist('readbdf', 'file')
-        p = which('eegplugin_biopac.m');
-        p = p(1:findstr(p,'eegplugin_biopac.m')-1);
-        addpath(p);
-    end;
-    
+       
     % find import data menu
     % ---------------------
     menu = findobj(fig, 'tag', 'import data');

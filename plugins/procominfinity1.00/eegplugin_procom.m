@@ -32,14 +32,6 @@ function vers = eegplugin_procom(fig, trystrs, catchstrs)
         error('eegplugin_procom requires 3 arguments');
     end;
     
-    % add folder to path
-    % ------------------
-    if exist('pop_importpi', 'file')
-        p = which('eegplugin_procom.m');
-        p = p(1:findstr(p,'eegplugin_procom.m')-1);
-        addpath(p);
-    end;
-    
     % find import data menu
     % ---------------------
     menu = findobj(fig, 'tag', 'import data');

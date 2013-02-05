@@ -53,14 +53,6 @@ if nargin < 3
     error('eegplugin_std_evntopo requires 3 arguments');
 end;
 
-% add folder to path
-% ------------------
-if exist('std_envtopo', 'file')
-    p = which('eegplugin_std_evntopo.m');
-    p = p(1:findstr(p,'eegplugin_std_evntopo.m')-1);
-    addpath(p);
-end;
-
 % add menu to clustedit
 % ---------------------
 menu = findobj(fig, 'Label', 'Edit/plot clusters');

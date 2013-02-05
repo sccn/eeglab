@@ -44,14 +44,6 @@ function vers = eegplugin_bdfimport(fig, trystrs, catchstrs)
         error('eegplugin_bdfimport requires 3 arguments');
     end;
     
-    % add folder to path
-    % ------------------
-    if exist('readbdf', 'file')
-        p = which('eegplugin_bdfimport.m');
-        p = p(1:findstr(p,'eegplugin_bdfimport.m')-1);
-        addpath(p);
-    end;
-    
     % find import data menu
     % ---------------------
     menu = findobj(fig, 'tag', 'import data');
