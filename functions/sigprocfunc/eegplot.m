@@ -1015,6 +1015,7 @@ u(22) = uicontrol('Parent',figh, ...
   set(figh, 'windowbuttondownfcn',   g.commandselect{1});
   set(figh, 'windowbuttonmotionfcn', g.commandselect{2});
   set(figh, 'windowbuttonupfcn',     g.commandselect{3});
+  set(figh, 'WindowKeyPressFcn',     @eegplot_readkey);
   set(figh, 'interruptible', 'off');
   set(figh, 'busyaction', 'cancel');
   
@@ -1945,7 +1946,7 @@ else
     set(fig,'UserData', g);
     eegplot('drawp', 0);
     if strcmp(g.mocap,'on'), show_mocap_for_eegplot(g.winrej); g.winrej = g.winrej(end,:); end; % nima
-            
+         
   % push button: create/remove window
   % ---------------------------------
   case 'defdowncom'
