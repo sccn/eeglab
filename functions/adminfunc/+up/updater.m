@@ -12,6 +12,7 @@ classdef updater < handle
         downloadUrl
         releaseNotes      % text about the release.
         releaseNotesUrl   % The URL in which more information about the release is provided.
+        newMajorRevision
         xmlFileUrl
         lastTimeChecked % a date vector returned by clock().
         menuItemHandle = nan; % handle to the menu item that becomes visible if a new version is available.
@@ -53,6 +54,7 @@ classdef updater < handle
             docRootNode.setAttribute('downloadUrl', downloadUrl);
             docRootNode.setAttribute('releaseNotes', releaseNotes);
             docRootNode.setAttribute('releaseNotesUrl', releaseNotesUrl);
+            docRootNode.setAttribute('newMajorRevision', releaseNotesUrl);
             
             xmlwrite(xmlFileName, docNode);
         end
@@ -129,6 +131,7 @@ classdef updater < handle
                 obj.releaseNotes = char(docRootNode.getAttribute('releaseNotes'));
                 obj.releaseNotesUrl = char(docRootNode.getAttribute('releaseNotesUrl'));
                 obj.downloadUrl = char(docRootNode.getAttribute('downloadUrl'));
+                obj.newMajorRevision = char(docRootNode.getAttribute('newMajorRevision'));
                 
                 obj.lastTimeChecked = clock;
                 
