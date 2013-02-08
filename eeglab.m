@@ -1030,6 +1030,11 @@ try
         if strcmpi(eeglabVersionNumber, 'dev')
             return;
         end;
+        addtext = '';
+        if ~isempty(eeglabUpdater.newMajorRevision)
+            fprintf('\nA new major revision of EEGLAB (%s) is now <a href="http://sccn.ucsd.edu/eeglab/">available</a>.\n\n', eeglabUpdater.newMajorRevision);
+            addtext = 'also ';
+        end;
         if eeglabUpdater.newerVersionIsAvailable
             eeglabv = num2str(eeglabUpdater.latestVersionNumber);
             posperiod = find(eeglabv == '.');
@@ -1037,18 +1042,27 @@ try
             if length(eeglabv(posperiod+1:end)) < 2, eeglabv = [ eeglabv '0' ]; end;
             if length(eeglabv(posperiod+1:end)) < 3, eeglabv = [ eeglabv '0' ]; end;
             eeglabv = [ eeglabv(1:posperiod+1) '.' eeglabv(posperiod+2) '.' eeglabv(posperiod+3) ];
-            fprintf( ['\nA newer version of EEGLAB (%s) is available <a href="%s">here</a>\n' ...
-                      'See <a href="%s">Release notes</a> for more informations\n' ...
-                      'You may disable this message using the Option menu\n' ], ...
+            
+            stateWarning = warning('backtrace');
+            warning('backtrace', 'off');
+            warning( ['\nA newer version of EEGLAB (%s) is ' addtext 'available <a href="%s">here</a>\n' ...
+                'Newer version often fix critical bugs\n' ...
+                'See <a href="%s">Release notes</a> for more informations\n' ...
+                'You may disable this message using the Option menu\n' ], ...
                 eeglabv, eeglabUpdater.downloadUrl, ...
                 [ 'http://sccn.ucsd.edu/wiki/EEGLAB_revision_history_version_11#EEGLAB_version_' eeglabv '_beta' ]);
+            warning('backtrace', stateWarning.state);
 
             % make the Help menu item dark red
             set(help_m, 'foregroundColor', [0.6, 0 0]);
         elseif isempty(eeglabUpdater.lastTimeChecked)
             fprintf('Could not check for the latest EEGLAB version (internet may be disconnected).\n');
         else
-            fprintf('You are using the latest version of EEGLAB.\n');
+            if isempty(addtext)
+                fprintf('You are using the latest version of EEGLAB.\n');
+            else
+                fprintf('You are using the latest version of EEGLAB %d.\n', floor(eeglabVersionNumber));
+            end;
         end;    
     else
         eeglabtimers = timerfind('name', 'eeglabupdater');
