@@ -464,9 +464,9 @@ switch lower(g.icatype)
          case 'jadeop',   EEG.icaweights = jadeop( tmpdata, g.options{:} );
          case 'jade_td_p',EEG.icaweights = jade_td_p( tmpdata, g.options{:} );
          case 'evd24',    EEG.icaweights = evd24( tmpdata, g.options{:} );
-         case 'sobi',     EEG.icawinv = sobi( EEG.data, g.options{:} );
+         case 'sobi',     EEG.icawinv    = sobi( tmpdata, g.options{:} );
          case 'ng_ol',    [tmp EEG.icaweights] = ng_ol( tmpdata, g.options{:} );
-         case 'acsobiro', EEG.icawinv = acsobiro( EEG.data, g.options{:} );
+         case 'acsobiro', EEG.icawinv   = acsobiro( tmpdata, g.options{:} );
          case 'acrsobibpf', EEG.icawinv = acrsobibpf( tmpdata, g.options{:} );
         end;
         clear tmp;
