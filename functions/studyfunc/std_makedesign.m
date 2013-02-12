@@ -210,7 +210,16 @@ if strcmpi(opt.delfiles, 'on')
 elseif strcmpi(opt.delfiles, 'limited')
     fprintf('Deleting all files for STUDY design %d\n', designind);
     for index = 1:length(STUDY.design(designind).cell)
-        filedir = [ STUDY.design(designind).cell(index).filebase '.*' ];
+        filedir = [ STUDY.design(designind).cell(index).filebase '.dat*' ];
+        filepath = fileparts(filedir);
+        files = dir(filedir);
+        for indf = 1:length(files)
+            %disp(fullfile(filepath, files(indf).name));
+            delete(fullfile(filepath, files(indf).name));
+        end;
+    end;
+    for index = 1:length(STUDY.design(designind).cell)
+        filedir = [ STUDY.design(designind).cell(index).filebase '.ica*' ];
         filepath = fileparts(filedir);
         files = dir(filedir);
         for indf = 1:length(files)
