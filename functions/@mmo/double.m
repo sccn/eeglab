@@ -1,3 +1,3 @@
-function res = double(a);
+function a = double(a);
 
-res = double(a.data.data.x);
+return;
