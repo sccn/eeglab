@@ -492,7 +492,7 @@ cb_delset      = [ nocheck '[ALLEEG LASTCOM] = pop_delset(ALLEEG, -CURRENTSET);'
 cb_study1      = [ nocheck 'pop_stdwarn; [STUDYTMP ALLEEGTMP LASTCOM] = pop_study([], ALLEEG         , ''gui'', ''on'');' e_load_study]; 
 cb_study2      = [ nocheck 'pop_stdwarn; [STUDYTMP ALLEEGTMP LASTCOM] = pop_study([], isempty(ALLEEG), ''gui'', ''on'');' e_load_study]; 
 cb_studyerp    = [ nocheck 'pop_stdwarn; [STUDYTMP ALLEEGTMP LASTCOM] = pop_studyerp;' e_load_study]; 
-cb_loadstudy   = [ nocheck 'pop_stdwarn; [STUDYTMP ALLEEGTMP LASTCOM] = pop_loadstudy;'                                   e_load_study]; 
+cb_loadstudy   = [ nocheck 'pop_stdwarn; [STUDYTMP ALLEEGTMP LASTCOM] = pop_loadstudy; if ~isempty(LASTCOM), STUDYTMP = std_renamestudyfiles(STUDYTMP, ALLEEGTMP); end;' e_load_study]; 
 cb_savestudy1  = [ check   '[STUDYTMP ALLEEGTMP LASTCOM] = pop_savestudy(STUDY, EEG, ''savemode'', ''resave'');'      e_load_study];
 cb_savestudy2  = [ check   '[STUDYTMP ALLEEGTMP LASTCOM] = pop_savestudy(STUDY, EEG);'                                e_load_study];
 cb_clearstudy  =           'LASTCOM = ''STUDY = []; CURRENTSTUDY = 0; ALLEEG = []; EEG=[]; CURRENTSET=[];''; eval(LASTCOM); eegh( LASTCOM ); eeglab redraw;';
@@ -1006,7 +1006,7 @@ if nargout < 1
 end;
 
 %% automatic updater
-try
+%try
     [dummy eeglabVersionNumber currentReleaseDateString] = eeg_getversion;
     if isempty(eeglabVersionNumber)
         eeglabVersionNumber = 'dev';
@@ -1030,10 +1030,10 @@ try
         if strcmpi(eeglabVersionNumber, 'dev')
             return;
         end;
-        addtext = '';
+        newMajorRevision = 0;
         if ~isempty(eeglabUpdater.newMajorRevision)
-            fprintf('\nA new major revision of EEGLAB (%s) is now <a href="http://sccn.ucsd.edu/eeglab/">available</a>.\n\n', eeglabUpdater.newMajorRevision);
-            addtext = 'also ';
+            fprintf('\nA new major version of EEGLAB (EEGLAB%s - beta) is now <a href="http://sccn.ucsd.edu/eeglab/">available</a>.\n', eeglabUpdater.newMajorRevision);
+            newMajorRevision = 1;
         end;
         if eeglabUpdater.newerVersionIsAvailable
             eeglabv = num2str(eeglabUpdater.latestVersionNumber);
@@ -1045,12 +1045,20 @@ try
             
             stateWarning = warning('backtrace');
             warning('backtrace', 'off');
-            warning( ['\nA newer version of EEGLAB (%s) is ' addtext 'available <a href="%s">here</a>\n' ...
-                'Newer version often fix critical bugs\n' ...
-                'See <a href="%s">Release notes</a> for more informations\n' ...
-                'You may disable this message using the Option menu\n' ], ...
-                eeglabv, eeglabUpdater.downloadUrl, ...
-                [ 'http://sccn.ucsd.edu/wiki/EEGLAB_revision_history_version_11#EEGLAB_version_' eeglabv '_beta' ]);
+            if newMajorRevision
+                fprintf('\n');
+                warning( sprintf(['\nA critical revision of EEGLAB%d (%s) is also available <a href="%s">here</a>\n' ...
+                    'See <a href="%s">Release notes</a> for more informations\n' ...
+                    'You may disable this message using the Option menu\n' ], ...
+                    floor(eeglabVersionNumber), eeglabv, eeglabUpdater.downloadUrl, ...
+                    [ 'http://sccn.ucsd.edu/wiki/EEGLAB_revision_history_version_11#EEGLAB_version_' eeglabv '_beta' ]));
+            else
+                warning( sprintf(['\nA newer version of EEGLAB (%s) is available <a href="%s">here</a>\n' ...
+                    'See <a href="%s">Release notes</a> for more informations\n' ...
+                    'You may disable this message using the Option menu\n' ], ...
+                    eeglabv, eeglabUpdater.downloadUrl, ...
+                    [ 'http://sccn.ucsd.edu/wiki/EEGLAB_revision_history_version_11#EEGLAB_version_' eeglabv '_beta' ]));
+            end;
             warning('backtrace', stateWarning.state);
 
             % make the Help menu item dark red
@@ -1058,10 +1066,10 @@ try
         elseif isempty(eeglabUpdater.lastTimeChecked)
             fprintf('Could not check for the latest EEGLAB version (internet may be disconnected).\n');
         else
-            if isempty(addtext)
+            if ~newMajorRevision
                 fprintf('You are using the latest version of EEGLAB.\n');
             else
-                fprintf('You are using the latest version of EEGLAB %d.\n', floor(eeglabVersionNumber));
+                fprintf('You are currently using the latest revision of EEGLAB%d (no critical update available).\n', floor(eeglabVersionNumber));
             end;
         end;    
     else
@@ -1070,12 +1078,12 @@ try
         delete(eeglabtimers);
         start(timer('TimerFcn','try, eeglabUpdater.checkForNewVersion({''eeglab_event'' ''setup''}); catch, end; clear eeglabUpdater;', 'name', 'eeglabupdater', 'StartDelay', 20.0));
     end;
-catch
-    if option_checkversion
-        fprintf('Updater could not be initialized.\n');
-    end;
-end;
-
+% catch
+%     if option_checkversion
+%         fprintf('Updater could not be initialized.\n');
+%     end;
+% end;
+% 
 
 % REMOVED MENUS
 	%uimenu( tools_m, 'Label', 'Automatic comp. reject',  'enable', 'off', 'CallBack', '[EEG LASTCOM] = pop_rejcomp(EEG); eegh(LASTCOM); if ~isempty(LASTCOM), eeg_store(CURRENTSET); end;');
