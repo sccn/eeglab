@@ -94,10 +94,11 @@ else
     ALLEEGLOC = [];
     for ifile = 1:length(g.filename)
         
-        if ifile > 1 && option_storedisk
-            warndlg2(strvcat('You may only load a single dataset','when selecting the "Store at most one', 'dataset in memory" option'));
-            break;
-        end;
+         if ifile > 1 && option_storedisk
+              g.loadmode = 'last';
+%             warndlg2(strvcat('You may only load a single dataset','when selecting the "Store at most one', 'dataset in memory" option'));
+%             break;
+         end;
         
         % read file
         % ---------
@@ -142,10 +143,12 @@ else
             % copy data to output variable if necessary (deprecated)
             % -----------------------------------------
             if ~strcmpi(g.loadmode, 'info') && isfield(TMPVAR, 'EEGDATA')
-                EEG.data = TMPVAR.EEGDATA;
+                if ~option_storedisk || ifile == length(g.filename)
+                    EEG.data = TMPVAR.EEGDATA;
+                end;
             end;
 
-        elseif isfield(TMPVAR, 'ALLEEG')
+        elseif isfield(TMPVAR, 'ALLEEG') % old format
 
             eeg_optionsbackup;
             eeg_options;
@@ -179,6 +182,7 @@ else
         
         %ALLEEGLOC = pop_newset(ALLEEGLOC, EEG, 1);
         ALLEEGLOC = eeg_store(ALLEEGLOC, EEG, 0, 'verbose', 'off');
+                
     end;
     EEG = ALLEEGLOC;
 end;
@@ -191,6 +195,8 @@ end;
 if isstr(g.loadmode)
     if strcmpi(g.loadmode, 'all')
         EEG = eeg_checkset(EEG, 'loaddata');
+    elseif strcmpi(g.loadmode, 'last')
+        EEG(end) = eeg_checkset(EEG(end), 'loaddata');
     end;
 else
     % load/select specific channel
@@ -366,4 +372,3 @@ function EEG = checkoldformat(EEG)
 			disp(['Warning: field ' rmfields{index} ' is deprecated']);
 		end;
 	end;
-	
