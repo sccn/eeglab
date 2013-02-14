@@ -131,8 +131,9 @@ if length(EEG) > 1
     % ***************************************************
         if strcmpi(EEG(1).saved, 'justloaded')
             for ieeg = 1:length(EEG)
-                [ALLEEG TMP CURRENTSET] = eeg_store(ALLEEG, EEG(ieeg), 0);
+                [ALLEEG TMP OLDSET] = pop_newset(ALLEEG, EEG(ieeg), OLDSET);
             end;
+            CURRENTSET = OLDSET;
             EEG = TMP;
         else
             [ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG);
