@@ -120,6 +120,7 @@ end;
 statstruct.etc = STUDY.etc; 
 statstruct = pop_statparams(statstruct, varargin{:});
 stats = statstruct.etc.statistics;
+stats.fieldtrip.channelneighbor = struct([]); % asumes one channel or 1 component
     
 % potentially missing fields
 % --------------------------
@@ -236,6 +237,11 @@ if ~isempty(opt.channels)
             allersp{index} = mean(mean(allersp{index}(fi1:fi2,ti1:ti2,:,:),1),2);
             allersp{index} = reshape(allersp{index}, [1 size(allersp{index},3) size(allersp{index},4) ]);
         end;
+        
+        % prepare channel neighbor matrix for Fieldtrip
+        statstruct = std_prepare_neighbors(statstruct, ALLEEG);
+        stats.fieldtrip.channelneighbor = statstruct.etc.statistics.fieldtrip.channelneighbor;
+        
         params.plottf = { params.plottf(1:2) params.plottf(3:4) };
         [pcond pgroup pinter] = std_stat(allersp, stats);
         if (~isempty(pcond) && length(pcond{1}) == 1) || (~isempty(pgroup) && length(pgroup{1}) == 1), pcond = {}; pgroup = {}; pinter = {}; end; % single subject STUDY                                
@@ -248,8 +254,8 @@ if ~isempty(opt.channels)
         end; % single subject STUDY                                
     end
     
-    % plot specific component
-    % -----------------------
+    % plot specific channel(s)
+    % ------------------------
     if ~strcmpi(opt.plotmode, 'none')
         locs = eeg_mergelocs(ALLEEG.chanlocs);
         locs = locs(std_chaninds(STUDY, opt.channels));
