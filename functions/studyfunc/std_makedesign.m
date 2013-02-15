@@ -168,6 +168,7 @@ opt = finputcheck(varargin,  {'variable1'     'string'    []     defdes.variable
                               'dataselect'    'cell'      {}     {};
                               'subjselect'    'cell'      {}     defdes.cases.value;
                               'delfiles'      'string'    { 'on','off', 'limited' } 'off';
+                              'verbose'       'string'    { 'on','off' } 'on';
                               'defaultdesign' 'string'    { 'on','off','forceoff'} fastif(nargin < 3, 'on', 'off') }, ...
                               'std_makedesign');
 if isstr(opt), error(opt); end;
@@ -199,16 +200,16 @@ end;
 % delete design files
 % ---------------------
 if strcmpi(opt.delfiles, 'on')
-    fprintf('Deleting all files pertaining to design %d\n', designind);
+    myfprintf(opt.verbose, 'Deleting all files pertaining to design %d\n', designind);
     for index = 1:length(ALLEEG)
-        files = fullfile(ALLEEG(index).filepath, sprintf('design%d*.*', designind));
+        files = fullfile(ALLEEG(index).filepath, sprintf(opt.verbose, 'design%d*.*', designind));
         files = dir(files);
         for indf = 1:length(files)
             delete(fullfile(ALLEEG(index).filepath, files(indf).name));
         end;
     end;
 elseif strcmpi(opt.delfiles, 'limited')
-    fprintf('Deleting all files for STUDY design %d\n', designind);
+    myfprintf(opt.verbose, 'Deleting all files for STUDY design %d\n', designind);
     for index = 1:length(STUDY.design(designind).cell)
         filedir = [ STUDY.design(designind).cell(index).filebase '.dat*' ];
         filepath = fileparts(filedir);
@@ -252,7 +253,7 @@ if isempty(opt.variable2), opt.values2 = { '' }; end;
 % --------------
 datselect = [1:length(STUDY.datasetinfo)];
 if ~isempty(opt.datselect)
-    fprintf('Data preselection for STUDY design\n');
+    myfprintf(opt.verbose, 'Data preselection for STUDY design\n');
     for ind = 1:2:length(opt.datselect)
         [ dattmp dattrialstmp ] = std_selectdataset( STUDY, ALLEEG, opt.datselect{ind}, opt.datselect{ind+1});
         datselect      = intersect(datselect, dattmp);
@@ -266,9 +267,9 @@ datselect = intersect(datselect, strmatchmult(allsubjects, datsubjects));
 ns  = length(allsubjects);
 nf1 = max(1,length(opt.values1));
 nf2 = max(1,length(opt.values2));
-fprintf('Building STUDY design\n');
-for n1 = 1:nf1, [ dats1{n1} dattrials1{n1} ] = std_selectdataset( STUDY, ALLEEG, opt.variable1, opt.values1{n1}); end;
-for n2 = 1:nf2, [ dats2{n2} dattrials2{n2} ] = std_selectdataset( STUDY, ALLEEG, opt.variable2, opt.values2{n2}); end;
+myfprintf(opt.verbose, 'Building STUDY design\n');
+for n1 = 1:nf1, [ dats1{n1} dattrials1{n1} ] = std_selectdataset( STUDY, ALLEEG, opt.variable1, opt.values1{n1}, fastif(strcmpi(opt.verbose, 'on'), 'verbose', 'silent')); end;
+for n2 = 1:nf2, [ dats2{n2} dattrials2{n2} ] = std_selectdataset( STUDY, ALLEEG, opt.variable2, opt.values2{n2}, fastif(strcmpi(opt.verbose, 'on'), 'verbose', 'silent')); end;
 
 % detect files from old format
 % ----------------------------
@@ -438,3 +439,5 @@ function tmpfile = checkfilelength(tmpfile);
         tmpfile = tmpfile(1:120);
     end;
 
+function myfprintf(verbose, varargin);
+    if strcmpi(verbose, 'on'), printf(varargin{:}); end;
