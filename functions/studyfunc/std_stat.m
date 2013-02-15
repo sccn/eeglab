@@ -108,7 +108,6 @@ if ~isempty(varargin) ||isempty(opt);
     opt = pop_statparams(opt, varargin{:});
 end;
 
-
 if ~isfield(opt, 'paired'), opt.paired = { 'off' 'off' }; end;
 if ~isnan(opt.eeglab.alpha(1)) && isempty(opt.eeglab.naccu), opt.eeglab.naccu = 1/opt.eeglab.alpha(end)*2; end;
 if any(any(cellfun('size', data, 2)==1)), opt.groupstats = 'off'; opt.condstats = 'off'; end;
@@ -180,7 +179,7 @@ else
     if strcmpi(opt.fieldtrip.mcorrect, 'cluster')
         params = eval( [ '{' opt.fieldtrip.clusterparam '}' ]);
         if isempty(opt.fieldtrip.channelneighbor), opt.fieldtrip.channelneighbor = struct([]); end;
-        params = { params{:} 'neighbours' opt.fieldtrip.channelneighbor };
+        params = { params{:} 'neighbours' opt.fieldtrip.channelneighbor }; % channelneighbor is empty if only one channel selected
     end;
     params = { params{:} 'method', opt.fieldtrip.method, 'naccu', opt.fieldtrip.naccu 'mcorrect' opt.fieldtrip.mcorrect 'alpha' opt.fieldtrip.alpha 'numrandomization' opt.fieldtrip.naccu };
     params = { params{:} 'structoutput' 'on' }; % before if ~isnan(opt.fieldtrip.alpha), end;
