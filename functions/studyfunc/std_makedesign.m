@@ -440,4 +440,4 @@ function tmpfile = checkfilelength(tmpfile);
     end;
 
 function myfprintf(verbose, varargin);
-    if strcmpi(verbose, 'on'), printf(varargin{:}); end;
+    if strcmpi(verbose, 'on'), fprintf(varargin{:}); end;
