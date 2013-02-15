@@ -115,6 +115,7 @@ eval( [ 'tmp = pop_' dtype 'params(STUDY, varargin{:});' ...
 statstruct.etc = STUDY.etc; 
 statstruct = pop_statparams(statstruct, varargin{:});
 stats = statstruct.etc.statistics;
+stats.fieldtrip.channelneighbor = struct([]); % asumes one channel or 1 component
     
 % potentially missing fields
 % --------------------------
@@ -162,6 +163,7 @@ allconditions = STUDY.design(opt.design).variable(1).value;
 allgroups     = STUDY.design(opt.design).variable(2).value;
 paired = { STUDY.design(opt.design).variable(1).pairing ...
            STUDY.design(opt.design).variable(2).pairing };
+stats.paired = paired;
 
 % for backward compatibility
 % --------------------------
@@ -170,7 +172,7 @@ if strcmpi(stats.singletrials, 'off') && ((~isempty(opt.subject) || ~isempty(opt
     if strcmpi(stats.condstats, 'on') || strcmpi(stats.groupstats, 'on')
         stats.groupstats = 'off';
         stats.condstats   = 'off'; 
-        disp('No statistics for single subject/component'); 
+        disp('No statistics for single subject/component, to get statistics compute single-trial measures'); 
     end;
 end;
 
@@ -242,16 +244,18 @@ if ~isempty(opt.channels)
     if (isempty(params.topotime) || any(isnan(params.topotime))) && length(alpha) > 1
         alpha = alpha(1);
     end;
-    statstruct = std_prepare_neighbors(statstruct, ALLEEG);
-    stats = statstruct.etc.statistics;
-    stats.paired = paired;
+    if ~isempty(params.topotime) && all(~isnan(params.topotime))
+         statstruct = std_prepare_neighbors(statstruct, ALLEEG);
+         stats.fieldtrip.channelneighbor = statstruct.etc.statistics.fieldtrip.channelneighbor;
+    end;
     [pcond pgroup pinter] = std_stat(erpdata, stats);
     if (~isempty(pcond) && length(pcond{1}) == 1) || (~isempty(pgroup) && length(pgroup{1}) == 1), pcond = {}; pgroup = {}; pinter = {}; end; % single subject STUDY                                
     if length(opt.channels) > 5 && ndims(erpdata{1}) < 3, pcond = {}; pgroup = {}; pinter = {}; end; % topo plotting for single subject
     if strcmpi(opt.noplot, 'on') return; end;
     
-    % plot
-    % ----
+    % get titles (not included in std_erspplot because it is not possible
+    % to merge channels for that function
+    % -----------------------------------
     locs = eeg_mergelocs(ALLEEG.chanlocs);
     locs = locs(std_chaninds(STUDY, opt.channels(chaninds)));
     if strcmpi(params.averagechan, 'on') && length(chaninds) > 1
@@ -265,6 +269,8 @@ if ~isempty(opt.channels)
                              'statistics', method, 'condnames', allconditions, 'plotsubjects', opt.plotsubjects, 'cond2names', allgroups, 'chanlabels', { locs.labels }, ...
                              'subject', opt.subject, 'valsunit', opt.unitx, 'vals', params.topotime, 'datatype', datatypestr, 'cond2group', params.plotgroups, 'condgroup', params.plotconditions);
 
+    % plot
+    % ----
     if ~isempty(params.topotime) && all(~isnan(params.topotime))
         std_chantopo(erpdata, 'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, 'caxis', params.ylim, ...
                                       'chanlocs', locs, 'threshold', alpha, 'titles', alltitles);
