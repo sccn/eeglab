@@ -3056,7 +3056,7 @@ if ~isnan(coherfreq)
                 if isempty(baselinedb)
                     baselinedb = [times(1) DEFAULT_BASELINE_END];
                 end;
-                base = find(times >= baselinedb(1) && times<=baselinedb(end)); % use default baseline end point (ms)
+                base = find(times >= baselinedb(1) & times<=baselinedb(end)); % use default baseline end point (ms)
                 if length(base)<2
                     base = 1:floor(length(times)/4); % default first quarter-epoch
                     fprintf('Using %g to %g ms as amplitude baseline.\n',...
