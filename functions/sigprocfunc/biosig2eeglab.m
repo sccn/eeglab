@@ -93,6 +93,7 @@ if isfield(dat, 'Label') & ~isempty(dat.Label)
     if ~isempty(channels)
         EEG.chanlocs = EEG.chanlocs(channels);
     end;
+    if length(EEG.chanlocs) > EEG.nbchan, EEG.chanlocs = EEG.chanlocs(1:EEG.nbchan); end;
 end
 EEG = eeg_checkset(EEG);
 
