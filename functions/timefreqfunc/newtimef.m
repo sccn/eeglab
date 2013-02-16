@@ -1513,6 +1513,16 @@ return;
 % plotting function
 % -----------------
 function g = plottimef(P, R, Pboot, Rboot, ERP, freqs, times, mbase, maskersp, maskitc, g);
+
+persistent showwarning;
+
+if isempty(showwarning)
+    warning( [ 'Some versions of Matlab crash on this function. If this is' 10 ...
+               'the case, simply comment the code line 1655-1673 in newtimef.m' 10 ...
+               'which aims at "ploting marginal ERSP mean below ERSP image"' ]);
+    showwarning = 1;
+end;    
+
 %
 % compute ERP
 %
