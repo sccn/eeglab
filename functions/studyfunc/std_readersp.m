@@ -79,6 +79,7 @@ if nargin < 2
     help std_readersp;
     return;
 end
+events = {};
 if ~isstruct(ALLEEG) % old calling format
     dataset = ALLEEG;
     EEG = STUDY(dataset);
