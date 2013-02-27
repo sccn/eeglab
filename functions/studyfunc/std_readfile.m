@@ -286,7 +286,7 @@ end;
 if ~isempty(events)
     len    = length(events{1});
     events = [ events{:} ];
-    if strcmpi(opt.singletrials, 'off') events = reshape(events, len, length(events)/len); end;
+    if strcmpi(opt.singletrials, 'off') && ~isempty(events), events = reshape(events, len, length(events)/len); end;
 end;
     
 % select plotting or clustering time/freq range
