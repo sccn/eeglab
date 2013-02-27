@@ -1,4 +1,4 @@
-% DPRIME  --  Signal-detection theory sensitivity measure.
+% DPRIME  - Signal-detection theory sensitivity measure.
 %
 %  d = dprime(pHit,pFA)
 %  [d,beta] = dprime(pHit,pFA)
