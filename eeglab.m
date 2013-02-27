@@ -814,7 +814,7 @@ if ismatlab
         newerVersionMenu = uimenu( help_m, 'Label', 'Upgrade to the Latest Version'          , 'userdata', on, 'ForegroundColor', [0.6 0 0]);
         uimenu( help_m, 'Label', 'About EEGLAB'                           , 'userdata', on, 'CallBack', 'pophelp(''eeglab'');');
         uimenu( help_m, 'Label', 'About EEGLAB help'                      , 'userdata', on, 'CallBack', 'pophelp(''eeg_helphelp'');');
-        uimenu( help_m, 'Label', 'EEGLAB menus'                           , 'userdata', on, 'CallBack', 'eeg_helpmenu;','separator','on');
+        uimenu( help_m, 'Label', 'EEGLAB menus'                           , 'userdata', on, 'CallBack', 'pophelp(''eeg_helpmenu'');','separator','on');
 
         help_1 = uimenu( help_m, 'Label', 'EEGLAB functions', 'userdata', on);
         uimenu( help_1, 'Label', 'Admin functions'                           , 'userdata', on, 'Callback', 'pophelp(''eeg_helpadmin'');');	
