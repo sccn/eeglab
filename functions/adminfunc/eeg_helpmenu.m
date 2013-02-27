@@ -1,283 +1,204 @@
-% eeg_helpmenu() - Call the help file for EEGLAB menus       
-%       
-% Usage:
-%   To call a menu of eeglab functions
-%       >> eeg_helpmenu;
-%   To open a help window with the specific called file.
-%   Equivalent to calling >> pophelp( 'filename' );
-%        >> eeg_helpmenu( 'filename' );
-%       
-% Author: Arnaud Delorme CNL / Salk Institute 2001     
-%       
-% See also: eeglab()       
-       
-% Copyright (C) 2001 Arnaud Delorme Salk Institute arno@salk.edu     
-%       
-% This program is free software; you can redistribute it and/or modify       
-% it under the terms of the GNU General Public License as published by       
-% the Free Software Foundation; either version 2 of the License or      
-% (at your option) any later version.       
-%       
-% This program is distributed in the hope that it will be useful       
-% but WITHOUT ANY WARRANTY; without even the implied warranty of       
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the       
-% GNU General Public License for more details.       
-%       
-% You should have received a copy of the GNU General Public License       
-% along with this program; if not write to the Free Software      
-% Foundation Inc. 59 Temple Place Suite 330 Boston MA  02111-1307  USA  
-       
-function eeg_helpmenu( filename );       
-       
-allmenus = { ...       
-'File' ''      ...
-'   Import data' ''  ...    
-'      From ASCII/float file or Matlab array' 'pop_importdata'     ... %       Import Matlab data array      
-'      From continuous or seg. EGI .RAW file' 'pop_readegi'        ... %       Read continuous or seg. .EGI or .RAW datafile      
-'      From Multiple seg. EGI .RAW files'     'pop_readsegegi'     ... %       Read multiple seg. .EGI or .RAW datafile
-'      From BCI2000 ASCII file'               'pop_loadbci'        ... %       Read .BCI datafile (Snapmaster)      
-'      From Snapmaster .SMA file'             'pop_snapread'       ... %       Read .SMA datafile (Snapmaster)      
-'      From Neuroscan .CNT file'              'pop_loadcnt'        ... %       Read .CNT datafile (Neuroscan continuous)      
-'      From Neuroscan .EEG file'              'pop_loadeeg'        ... %       Read .EEG datafile (Neuroscan epochs)      
-'      From Biosemi .BDF file'                'pop_biosig'         ... %       Read .BDF datafile
-'      From .EDF file'                        'pop_biosig'         ... %       Read .EDF datafile
-'      From ANT EEProbe .CNT file'            'pop_loadeep'        ... %       Read .CNT datafile (ANT EEProbe)
-'      From ANT EEProbe .AVR file'            'pop_loadeep_avg'    ... %       Read .AVR datafile (ANT EEProbe)
-'      From .BDF file (backup function)'      'pop_readbdf'        ... %       Read .BDF datafile
-'      From Brain Vis. Rec. .VHDR file'       'pop_loadbv'         ... %       Read .VHDR datafile (Brain Vision Rec.)
-'      From Brain Vis. Anal. Matlab file'     'pop_loadbva'        ... %       Read Matlab datafile (Brain Vision Analysis)
-'      From CTF Folder (MEG)'                 'ctf_folder'         ... %       Import MEG datafiles from chosen CTF folder.
-'      From ERPSS .RAW or .RDF file'          'pop_read_erpss'     ...
-'      From INStep .ASC file'                 'pop_loadascinstep'  ... %       Read .ASC datafile (INStep)
-'      From 4D .M4D pdf file'                 'pop_read4d'         ... %       Read .M4D datafile (4D pdf)
-'      From other formats using FILEIO'       'pop_fileio'         ... %       Import data using FILEIO
-'      From other formats using BIOSIG'       'pop_biosig'         ...
-'   Import epoch info' ''      ...
-'      From Matlab array or ASCII file'       'pop_importepoch'    ... %       Import Matlab array or ASCII file 
-'      From Neuroscan .DAT file'              'pop_loaddat'        ... %       Import .DAT info file (Neuroscan epochs)      
-'   Import event info' ''      ...
-'      From  Matlab array or ASCII file'      'pop_importevent'    ... %       Import Matlab array or ASCII file      
-'      From data channel'                     'pop_chanevent'      ... %       Import events from channels      
-'      From Presentation .LOG file'           'pop_importpres'     ... %       Import .LOG event file (Presentation)  
-'      From Neuroscan .EV2 file'              'pop_importev2'      ... %       Import .EV2 even file (Neuroscan)
-'   Export ' '' ...
-'      Data and ICA to text file'             'pop_export'         ... %       Export Data and ICA to text file
-'      Weight matrix to text file'            'pop_expica'         ... %       Export weight matrix to text file
-'      Inverse weight matrix to text file'    'pop_expica'         ... %       Export inverse weight matrix to text file
-'      Data to EDF/BDF/GDF file'              'pop_writeeeg'       ... %       Export Data to EDF/BDF/GDF data formats
-'      Write Brain Vis. exchange format file' '            '       ... 
-'   Load existing dataset'                    'pop_loadset'        ... %       Load dataset      
-'   Save current dataset'                     'pop_saveset'        ... %       Save dataset      
-'   Save datasets'                            'pop_saveset'        ... %       Save dataset      
-'   Clear dataset(s)'                         'pop_delset'         ... %       Clear dataset(s)      
-'   Create Study ' '' ...
-'      Using all loaded datasets'             'pop_study'          ... %       Create study using currently loaded datasets
-'      Browse for datasets'                   'pop_study'          ... %       Find datasets to use in Study
-'   Load existing study'                      'pop_loadstudy'      ... %       Load study      
-'   Save current study'                       'pop_savestudy'      ... %       Save study      
-'   Save current study as'                    'pop_savestudy'      ... %       Save current study as      
-'   Clear study'                              'pop_delset'         ... %       Clear study      
-'   Maximize memory'                          'pop_editoptions'    ... %       Maximize memory     
-'   History Scripts' '' ...
-'      Save dataset history script'           'pop_saveh'          ... %       Save current dataset history
-'      Save session history script'           'pop_saveh'          ... %       Save current session history
-'      Run Script'                            'pop_runscript'      ... %       Run History script     
-'   Quit' ''      ...
-'Edit' ''      ...
-'   Dataset info'                             'pop_editset'        ... %       Edit dataset info      
-'   Event fields'                             'pop_editeventfield' ... %       Edit event fields      
-'   Event values'                             'pop_editeventvals'  ... %       Edit event values      
-'   About this dataset'                       'pop_comments'       ... %       About this dataset      
-'   Channel locations'                        'pop_chanedit'       ... %       Edit channels      
-'   Select data'                              'pop_select'         ... %       Select data      
-'   Select data using events'                 'pop_rmdat'          ... %       Select data using events
-'   Select epochs or events'                  'pop_selectevent'    ... %       Select epochs or events      
-'   Copy current dataset'                     'pop_copyset'        ... %       Copy current dataset      
-'   Append datasets'                          'pop_mergeset'       ... %       Append another dataset      
-'   Delete dataset(s)'                        'pop_delset'         ... %       Delete dataset(s)      
-'Tools' ''      ...
-'   Change sampling rate'                     'pop_resample'       ... %       Change sampling rate      
-'   Filter the data' '' ...
-'      Basic FIR filter'                      'pop_eegfilt'        ... %       Filter the data      
-'      Short IIR filter'                      'pop_iirfilt'        ... %       Short IIR filter
-'      ERPLAB Butterworth Digital Filter'     'pop_ERPLAB_butter1' ... %       ERPLAB Butterworth filter
-'      ERPLAB Polynomial Detrending'          'pop_ERPLAB_polydetrend' ... % Polynomial detrending
-'   Re-referencing'                           'pop_reref'          ... %       Average reference      
-'   Interpolate electrodes'                   'pop_interp'         ...
-'   Reject continuous data by eye'            'pop_eegplot'        ... %       Reject continuous data      
-'   Extract epochs'                           'pop_epoch'          ... %       Extract epochs      
-'   Remove baseline'                          'pop_rmbase'         ... %       Remove baseline
-'   Run ICA'                                  'pop_runica'         ... %       Run ICA      
-'   Remove components'                        'pop_subcomp'        ... %       Remove components 
-'   Automatic channel rejection'              'pop_rejchan'        ... %       Reject channels
-'   Automatic epoch rejection'                'pop_autorej'        ... %       Reject epochs
-'   Reject data epochs' ''  ...    
-'      Reject data (all methods)'             'pop_rejmenu'        ... %       Reject data (all methods)      
-'      Reject by inspection'                  'pop_eegplot'        ... %       Reject by inspection      
-'      Reject extreme values'                 'pop_eegthresh'      ... %       Reject extreme values      
-'      Reject by linear trend/variance'       'pop_rejtrend'       ... %       Reject by linear trend/variance     
-'      Reject by probability'                 'pop_jointprob'      ... %       Reject by probability      
-'      Reject by kurtosis'                    'pop_rejkurt'        ... %       Reject by kurtosis      
-'      Reject by spectra'                     'pop_rejspec'        ... %       Reject by spectra      
-'      Reject marked epochs'                  'pop_rejepoch'       ... %       Reject labeled epochs      
-'   Reject using ICA' '' ...     
-'      Reject components by map'              'pop_selectcomps'    ... %       Reject components by map      
-'      Reject data (all methods)'             'pop_rejmenu'        ... %       Reject data (all methods)      
-'      Reject by inspection'                  'pop_eegplot'        ... %       Reject by inspection      
-'      Reject extreme values'                 'pop_eegthresh'      ... %       Reject extreme values      
-'      Reject by linear trend/variance'       'pop_rejtrend'       ... %       Reject by linear trend/variance      
-'      Reject by probability'                 'pop_jointprob'      ... %       Reject by probability      
-'      Reject by kurtosis'                    'pop_rejkurt'        ... %       Reject by kurtosis      
-'      Reject by spectra'                     'pop_rejspec'        ... %       Reject by spectra      
-'      Reject marked epochs'                  'pop_rejepoch'       ... %       Reject labeled epochs      
-'   Run AMICA'  ''  ...
-'      Run AMICA in parallel'                 'pop_runica'         ... %       Run AMICA in parallel (plugin)
-'      Run AMICA locally'                     'pop_runica'         ... %       Run AMICA locally (plugin)
-'      Load AMICA component'                  'pop_loadmodout'     ... %       Load AMICA component (plugin)
-'   Run CICA'                                 ''                   ...
-'   Locate dipoles using DIPFIT 2.x' '' ...
-'      Head model and settings'               'pop_dipfit_settings'... %       DIPFIT Plugin settings
-'      Coarse fit (grid scan)'                ''                   ...
-'      Fine fit (iterative)'                  'pop_dipfit_nonlinear'... %      Fine fit (iterative)
-'      Autofit (coarse fit, fine fit & plot)' ''                   ... 
-'      Plot component dipoles'                ''                   ...
-'   Peak detection using EEG toolbox'         ''                   ...
-'   FMRIB Tools' '' ...
-'      FASTR: Remove FMRI gradient artifacts' 'pop_fmrib_fastr'    ... %       Remove FMRI gradient artifacts
-'      Detect QRS events'                     'pop_fmrib_qrsdetect'... %       Detect QRS events
-'      Remove pulse artifacts'                'pop_fmrib_pas'      ... %       Remove pulse artifacts
-'   BEM4 SCCN beta'  '' ...
-'      Forward Problem Solution'              'pop_forward problem_solution' ... % Not currently working
-'   Locate dipoles using LORETA' '' ...
-'      Export components to LORETA'           ''                   ...
-'      Import dipoles from LORETA'            ''                   ...
-'      Plot dipoles on LORETA head'           ''                   ...
-'Plot' ''      ...
-'   Channel locations' '' ...     
-'      By name'                               'topoplot'           ... %       Electrodes      
-'      By number'                             'topoplot'           ... %       Numbers      
-'   Channel data (scroll)'                    'pop_eegplot'        ... %       Scroll EEG data      
-'   Channel spectra and maps'                 'pop_spectopo'       ... %       Channel spectra and maps      
-'   Channel properties'                       'pop_prop'           ... %       Component properties      
-'   Channel ERP image'                        'pop_erpimage'       ... %       Channel ERP image      
-'   Channel ERPs' ''      ...
-'      With scalp maps'                       'pop_timtopo'        ... %       ERP and scalp maps      
-'      In scalp array'                        'pop_plottopo'       ... %       ERP in scalp array      
-'      In rect. array'                        'pop_plotdata'       ... %       ERP in rect. array      
-'   ERP maps' ''      ...
-'      As 2-D scalp maps'                     'pop_topoplot'       ... %       ERP scalp maps      
-'      As 3-D head plots'                     'pop_headplot'       ... %       ERP head plots      
-'   Sum/Compare ERPs'                         'pop_comperp'        ... %       Compare ERPs      
-'   Component activations (scroll)'           'pop_eegplot'        ... %       Scroll component activations      
-'   Component spectra and maps'               'pop_spectopo'       ... %       Channel spectra and maps with components      
-'   Component maps' ''      ...
-'      As 2-D scalp maps'                     'pop_topoplot'       ... %       Component scalp maps      
-'      As 3-D head plots'                     'pop_headplot'       ... %       Component head plots      
-'   Component properties'                     'pop_prop'           ... %       Component properties      
-'   Component ERP image'                      'pop_erpimage'       ... %       Component ERP image      
-'   Component ERPs' ''      ...
-'      With component maps'                   'pop_envtopo'        ... %       Largest ERP components      
-'      With comp. maps (compare)'             'pop_envtopo'        ... %       Largest ERP components
-'      In rectangular array'                  'pop_plotdata'       ... %       Comp. ERP time courses  
-'   Sum/Compare comp. ERPs'                   'pop_comperp'        ... %       Compare ERPs 
-'   Data statistics' ''      ...
-'      Channel statistics'                    'pop_signalstat'     ...
-'      Component statistics'                  'pop_signalstat'     ...
-'      Event statistics'                      'pop_eventstat'      ...
-'   Time-frequency transforms' ''  ...
-'      Channel time-frequency'                'pop_timef'          ... %       Channel time-frequency      
-'      Channel cross-coherence'               'pop_crossf'         ... %       Channel cross-coherence      
-'      Component time-frequency'              'pop_timef'          ... %       Component time-frequency EEGLAB'));     
-'      Component cross-coherence'             'pop_crossf'         ... %       Component cross-coherence  
-'   Cluster dataset ICs'                      'pop_miclust'        ... %       Cluster ICs
-'Study' ''     ...
-'   Edit study info'                          'pop_study'          ...  
-'   Precompute channel measures'              'pop_precomp'        ...
-'   Plot channel measures'                    'pop_chanplot'       ... 
-'   Precompute component measures'            'pop_precomp'        ... 
-'   Build preclustering array'                'pop_preclust'       ... 
-'   Cluster components'                       'pop_clust'          ... 
-'   Edit/plot clusters'                       'pop_clustedit'      ... 
-'Datasets' ''   ...
-'   Current/Active Datasets (listed as selectable items)' ''       ... 
-'   Select multiple datasets'                  ''                  ...
-'   Select the study set'                      ''                  ... %      Only selectable if study is loaded
-'Help' ''    ...
-'   About EEGLAB'                              'eeglab'            ...
-'   About EEGLAB Help'                         'eeg_helphelp'      ... 
-'   EEGLAB menus'                              'eeg_helpmenu'      ... 
-'   EEGLAB functions'                          ''                  ...
-'       Toolbox functions'                     ''                  ...
-'       Signal processing functions'           'eeg_helpsigproc'   ... 
-'       Interactive pop_functions'             'eeg_helppop'       ...
-'   EEGLAB advanced'                           ''                  ...
-'       Dataset structure'                     'eeg_checkset'      ...
-'       Admin functions'                       'eeg_helpadmin'     ... 
-'   Web tutorial'                              ''                  ...
-'   Email EEGLAB'                              ''                  ...
-                           
-};       
-
-text  = allmenus( 1:2:length(allmenus));
-command = allmenus( 2:2:length(allmenus));
-
-for index = 1:length(command)
-	if ~isempty(command{index})
-		command{index} = [ 'pophelp(''' command{index} ''');' ];
-	end;
-end;
-
-textgui( text, command,'fontsize', 15, 'fontname', 'times', 'linesperpage', 18, 'title',strvcat( 'Interactive (pop_) functions', '(Click on blue text for help)'));
-try 
-	icadefs; set(gcf, 'COLOR', BACKCOLOR);
-	h = findobj('parent', gcf, 'style', 'slider');
-	set(h, 'backgroundcolor', GUIBACKCOLOR);
-catch, end;
-
-if nargin > 0
-	close(gcf);
-    pophelp(filename);
-	%command = allmenus( 2:2:length(allmenus));
-	%for index = 1:length(text)
-	%	if isempty(allmenus{index*2})
-	%		tmpparam{index} = {  '' allmenus{(index-1)*2+1} };
-	%	else
-	%		tmpparam{index} = {  [ allmenus{index*2} '.m' ] allmenus{(index-1)*2+1} };
-	%	end;
-	%end;
- 	%makehtml( tmpparam, '/home/www/eeglab/allfunctions', 'outputfile', 'tempmenu.html', 'mainonly', 'on');
-    %}
-end;
-
-return;
-
-
-% $$$ [textmenu nblines l] = getallmenus(findobj('tag', 1) ~= 32 )
-% $$$ fontsize{ index } = fontsize{ index }+1;
-% $$$ fontweight{ index } ='bold';
-% $$$ 
-% $$$ fontsize(1:length( textmenu )) = { 15 }; 6) ~= 32 fontweight{ index } ='bold'; end;     
-% $$$ fontweight(1:length( textmenu )) = { 'normal' }; :));      
-% $$$ for index = 1:length( textmenu )       
-% $$$ if textmenu(index       
-% $$$ if textmenu(index       
-% $$$ a = deblank(textmenu(index       
-% $$$ if index > length( commands )       
-% $$$ commands = { commands{:} [] }; 1:length(a)) = a;      
-% $$$ end;       
-% $$$ if ~isempty(commands{index})       
-% $$$ a = [ a ' -- ' commands{index} '()'];       
-% $$$ textmenu(index       
-% $$$ commands{index} = [ ''pophelp(''' commands{index} ''');' ]; ...      
-% $$$ end; click on blue text below)'  ' ...    
-% $$$ end; :));      
-% $$$        
-% $$$ textmenu = strvcat('Functions called through the EEGLAB menu'       
-% $$$ (For help message       
-% $$$ textmenu(1:end-1 :) commands ...    
-% $$$ fontsize   = { 16 15 15 fontsize{:} }; fontsize fontweight' fontweight fontname' times' linesperpage' 17 );
-% $$$ fontweight = { 'bold' 'normal' 'normal' fontweight{:} };       
-% $$$ commands   = { '' ' ' '' commands{:} };       
-% $$$ textgui(textmenu(1:end-1       
-% $$$ fontsize'       
-% $$$ return;       
+% EEGLAB menus:
+% File
+%       Import data
+%             Using EEGLAB functions and plugins
+%                   From ASCII/float file or Matlab array - <a href="matlab:helpwin pop_importdata">pop_importdata</a>
+%                   From Netstation binary simple file - <a href="matlab:helpwin pop_readegi">pop_readegi</a>
+%                   From Netstation .MFF file - <a href="matlab:helpwin pop_readegimff">pop_readegimff</a>
+%                   From Multiple seg. Netstation files - <a href="matlab:helpwin pop_readsegegi">pop_readsegegi</a>
+%                   From Netstation Matlab files - <a href="matlab:helpwin pop_importegimat">pop_importegimat</a>
+%                   From BCI2000 ASCII file - <a href="matlab:helpwin pop_loadbci">pop_loadbci</a>
+%                   From Snapmaster .SMA file - <a href="matlab:helpwin pop_snapread">pop_snapread</a>
+%                   From Neuroscan .CNT file - <a href="matlab:helpwin pop_loadcnt">pop_loadcnt</a>
+%                   From Neuroscan .EEG file - <a href="matlab:helpwin pop_loadeeg">pop_loadeeg</a>
+%                   From Biosemi BDF file (BIOSIG toolbox) - <a href="matlab:helpwin pop_biosig">pop_biosig</a>
+%                   From EDF/EDF+/GDF files (BIOSIG toolbox) - <a href="matlab:helpwin pop_biosig">pop_biosig</a>
+%                   From Biosemi BDF and EDF files (BDF plugin) - <a href="matlab:helpwin pop_readbdf">pop_readbdf</a>
+%                   From BrainRT .SIG file - <a href="matlab:helpwin pop_readbrainrt">pop_readbrainrt</a>
+%                   Import EKG file and adjust latencies - <a href="matlab:helpwin pop_importekgtxtfile">pop_importekgtxtfile</a>
+%                   From ANT EEProbe .CNT file - <a href="matlab:helpwin pop_loadeep">pop_loadeep</a>
+%                   From ANT EEProbe .AVR file - <a href="matlab:helpwin pop_loadeep_avg">pop_loadeep_avg</a>
+%                   From BCI2000 .DAT file - <a href="matlab:helpwin pop_loadBCI2000">pop_loadBCI2000</a>
+%                   From BIOPAC MATLAB files - <a href="matlab:helpwin pop_biopac">pop_biopac</a>
+%                   From Brain Vis. Rec. .vhdr file - <a href="matlab:helpwin pop_loadbv">pop_loadbv</a>
+%                   From Brain Vis. Anal. Matlab file - <a href="matlab:helpwin pop_loadbva">pop_loadbva</a>
+%                   From CTF folder (MEG) - <a href="matlab:helpwin pop_ctf_read">pop_ctf_read</a>
+%                   From ERPSS .RAW or .RDF file - <a href="matlab:helpwin pop_read_erpss">pop_read_erpss</a>
+%                   From INStep .ASC file - <a href="matlab:helpwin pop_loadascinstep">pop_loadascinstep</a>
+%                   From 4D .m4d pdf file - <a href="matlab:helpwin pop_read4d">pop_read4d</a>
+%                   From nihonkohden data files - <a href="matlab:helpwin pop_nihonkohden">pop_nihonkohden</a>
+%                   From Procom Infinity Text File - <a href="matlab:helpwin pop_importpi">pop_importpi</a>
+%             Using the FILE-IO interface - <a href="matlab:helpwin pop_fileio">pop_fileio</a>
+%             Using the BIOSIG interface - <a href="matlab:helpwin pop_biosig">pop_biosig</a>
+%             Troubleshooting data formats...
+%       Import epoch info
+%             From Matlab array or ASCII file - <a href="matlab:helpwin pop_importepoch">pop_importepoch</a>
+%             From Neuroscan .DAT file - <a href="matlab:helpwin pop_loaddat">pop_loaddat</a>
+%       Import event info
+%             From Matlab array or ASCII file - <a href="matlab:helpwin pop_importevent">pop_importevent</a>
+%             From data channel - <a href="matlab:helpwin pop_chanevent">pop_chanevent</a>
+%             From Presentation .LOG file - <a href="matlab:helpwin pop_importpres">pop_importpres</a>
+%             From E-Prime ASCII (text) file - <a href="matlab:helpwin pop_importevent">pop_importevent</a>
+%             From Neuroscan .ev2 file - <a href="matlab:helpwin pop_importev2">pop_importev2</a>
+%       Export
+%             Data and ICA activity to text file - <a href="matlab:helpwin pop_export">pop_export</a>
+%             Weight matrix to text file - <a href="matlab:helpwin pop_expica">pop_expica</a>
+%             Inverse weight matrix to text file - <a href="matlab:helpwin pop_expica">pop_expica</a>
+%             Events to text file - <a href="matlab:helpwin pop_expevents">pop_expevents</a>
+%             Data to EDF/BDF/GDF file - <a href="matlab:helpwin pop_writeeeg">pop_writeeeg</a>
+%             Write Brain Vis. exchange format file - <a href="matlab:helpwin pop_writebva">pop_writebva</a>
+%       Load existing dataset - <a href="matlab:helpwin pop_loadset">pop_loadset</a>
+%       Save current dataset(s) - <a href="matlab:helpwin pop_saveset">pop_saveset</a>
+%       Save current dataset as - <a href="matlab:helpwin pop_saveset">pop_saveset</a>
+%       Clear dataset(s) - <a href="matlab:helpwin pop_delset">pop_delset</a>
+%       Create study
+%             Using all loaded datasets - <a href="matlab:helpwin pop_study">pop_study</a>
+%             Browse for datasets - <a href="matlab:helpwin pop_study">pop_study</a>
+%             Simple ERP STUDY - <a href="matlab:helpwin pop_studyerp">pop_studyerp</a>
+%       Load existing study - <a href="matlab:helpwin pop_loadstudy">pop_loadstudy</a>
+%       Save current study - <a href="matlab:helpwin pop_savestudy">pop_savestudy</a>
+%       Save current study as - <a href="matlab:helpwin pop_savestudy">pop_savestudy</a>
+%       Clear study
+%       Memory and other options - <a href="matlab:helpwin pop_editoptions">pop_editoptions</a>
+%       History scripts
+%             Save dataset history script - <a href="matlab:helpwin pop_saveh">pop_saveh</a>
+%             Save session history script - <a href="matlab:helpwin pop_saveh">pop_saveh</a>
+%             Run script - <a href="matlab:helpwin pop_runscript">pop_runscript</a>
+%       Quit - <a href="matlab:helpwin pop_saveh">pop_saveh</a>
+% Edit
+%       Dataset info - <a href="matlab:helpwin pop_editset">pop_editset</a>
+%       Event fields - <a href="matlab:helpwin pop_editeventfield">pop_editeventfield</a>
+%       Event values - <a href="matlab:helpwin pop_editeventvals">pop_editeventvals</a>
+%       About this dataset - <a href="matlab:helpwin pop_comments">pop_comments</a>
+%       Channel locations - <a href="matlab:helpwin pop_chanedit">pop_chanedit</a>
+%       Select data - <a href="matlab:helpwin pop_select">pop_select</a>
+%       Select data using events - <a href="matlab:helpwin pop_rmdat">pop_rmdat</a>
+%       Select epochs or events - <a href="matlab:helpwin pop_selectevent">pop_selectevent</a>
+%       Copy current dataset - <a href="matlab:helpwin pop_copyset">pop_copyset</a>
+%       Append datasets - <a href="matlab:helpwin pop_mergeset">pop_mergeset</a>
+%       Delete dataset(s) from memory - <a href="matlab:helpwin pop_delset">pop_delset</a>
+%       Edit events & mark bad channels - <a href="matlab:helpwin pop_VisEd">pop_VisEd</a>
+% Tools
+%       Change sampling rate - <a href="matlab:helpwin pop_resample">pop_resample</a>
+%       Filter the data
+%             Basic FIR filter (new) - <a href="matlab:helpwin pop_eegfiltnew">pop_eegfiltnew</a>
+%             Windowed sinc FIR filter - <a href="matlab:helpwin pop_firws">pop_firws</a>
+%             Parks-McClellan (equiripple) FIR filter - <a href="matlab:helpwin pop_firpm">pop_firpm</a>
+%             Moving average FIR filter - <a href="matlab:helpwin pop_firma">pop_firma</a>
+%             Basic FIR filter (legacy) - <a href="matlab:helpwin pop_eegfilt">pop_eegfilt</a>
+%             Basic FIR filter (new) - <a href="matlab:helpwin pop_eegfiltnew">pop_eegfiltnew</a>
+%             Windowed sinc FIR filter - <a href="matlab:helpwin pop_firws">pop_firws</a>
+%             Parks-McClellan (equiripple) FIR filter - <a href="matlab:helpwin pop_firpm">pop_firpm</a>
+%             Moving average FIR filter - <a href="matlab:helpwin pop_firma">pop_firma</a>
+%             Short non-linear IIR filter - <a href="matlab:helpwin pop_iirfilt">pop_iirfilt</a>
+%       Re-reference - <a href="matlab:helpwin pop_reref">pop_reref</a>
+%       Interpolate electrodes - <a href="matlab:helpwin pop_interp">pop_interp</a>
+%       Reject continuous data by eye - <a href="matlab:helpwin pop_eegplot">pop_eegplot</a>
+%       Extract epochs - <a href="matlab:helpwin pop_epoch">pop_epoch</a>
+%       Remove baseline - <a href="matlab:helpwin pop_rmbase">pop_rmbase</a>
+%       Run ICA - <a href="matlab:helpwin pop_runica">pop_runica</a>
+%       Remove components - <a href="matlab:helpwin pop_subcomp">pop_subcomp</a>
+%       Automatic channel rejection - <a href="matlab:helpwin pop_rejchan">pop_rejchan</a>
+%       Automatic continuous rejection - <a href="matlab:helpwin pop_rejcont">pop_rejcont</a>
+%       Automatic epoch rejection - <a href="matlab:helpwin pop_autorej">pop_autorej</a>
+%       Reject data epochs
+%             Reject data (all methods) - <a href="matlab:helpwin pop_rejmenu">pop_rejmenu</a>
+%             Reject by inspection - <a href="matlab:helpwin pop_eegplot">pop_eegplot</a>
+%             Reject extreme values - <a href="matlab:helpwin pop_eegthresh">pop_eegthresh</a>
+%             Reject by linear trend/variance - <a href="matlab:helpwin pop_rejtrend">pop_rejtrend</a>
+%             Reject by probability - <a href="matlab:helpwin pop_jointprob">pop_jointprob</a>
+%             Reject by kurtosis - <a href="matlab:helpwin pop_rejkurt">pop_rejkurt</a>
+%             Reject by spectra - <a href="matlab:helpwin pop_rejspec">pop_rejspec</a>
+%             Export marks to ICA reject - <a href="matlab:helpwin eeg_checkset">eeg_checkset</a>
+%             Reject marked epochs - <a href="matlab:helpwin pop_rejepoch">pop_rejepoch</a>
+%       Reject data using ICA
+%             Reject components by map - <a href="matlab:helpwin pop_selectcomps">pop_selectcomps</a>
+%             Reject data (all methods) - <a href="matlab:helpwin pop_rejmenu">pop_rejmenu</a>
+%             Reject by inspection - <a href="matlab:helpwin pop_eegplot">pop_eegplot</a>
+%             Reject extreme values - <a href="matlab:helpwin pop_eegthresh">pop_eegthresh</a>
+%             Reject by linear trend/variance - <a href="matlab:helpwin pop_rejtrend">pop_rejtrend</a>
+%             Reject by probability - <a href="matlab:helpwin pop_jointprob">pop_jointprob</a>
+%             Reject by kurtosis - <a href="matlab:helpwin pop_rejkurt">pop_rejkurt</a>
+%             Reject by spectra - <a href="matlab:helpwin pop_rejspec">pop_rejspec</a>
+%             Export marks to data reject - <a href="matlab:helpwin eeg_checkset">eeg_checkset</a>
+%             Reject marked epochs - <a href="matlab:helpwin pop_rejepoch">pop_rejepoch</a>
+%       Locate dipoles using DIPFIT 2.x
+%             Head model and settings - <a href="matlab:helpwin pop_dipfit_settings">pop_dipfit_settings</a>
+%             Coarse fit (grid scan) - <a href="matlab:helpwin pop_dipfit_gridsearch">pop_dipfit_gridsearch</a>
+%             Fine fit (iterative) - <a href="matlab:helpwin pop_dipfit_nonlinear">pop_dipfit_nonlinear</a>
+%             Autofit (coarse fit, fine fit & plot) - <a href="matlab:helpwin pop_multifit">pop_multifit</a>
+%             Plot component dipoles - <a href="matlab:helpwin pop_dipplot">pop_dipplot</a>
+%       Peak detection using EEG toolbox
+%       FMRIB Tools
+%             FASTR: Remove FMRI gradient artifacts - <a href="matlab:helpwin pop_fmrib_fastr">pop_fmrib_fastr</a>
+%             Detect QRS events - <a href="matlab:helpwin pop_fmrib_qrsdetect">pop_fmrib_qrsdetect</a>
+%             Remove pulse artifacts - <a href="matlab:helpwin pop_fmrib_pas">pop_fmrib_pas</a>
+%       Locate dipoles using LORETA
+%             Export components to LORETA - <a href="matlab:helpwin pop_eeglab2loreta">pop_eeglab2loreta</a>
+% Plot
+%       Channel locations
+%             By name - <a href="matlab:helpwin topoplot">topoplot</a>
+%             By number - <a href="matlab:helpwin topoplot">topoplot</a>
+%       Channel data (scroll) - <a href="matlab:helpwin pop_eegplot">pop_eegplot</a>
+%       Channel spectra and maps - <a href="matlab:helpwin pop_spectopo">pop_spectopo</a>
+%       Channel properties - <a href="matlab:helpwin pop_prop">pop_prop</a>
+%       Channel ERP image - <a href="matlab:helpwin pop_erpimage">pop_erpimage</a>
+%       Channel ERPs
+%             With scalp maps - <a href="matlab:helpwin pop_timtopo">pop_timtopo</a>
+%             In scalp/rect. array - <a href="matlab:helpwin pop_plottopo">pop_plottopo</a>
+%       ERP map series
+%             In 2-D - <a href="matlab:helpwin pop_topoplot">pop_topoplot</a>
+%             In 3-D - <a href="matlab:helpwin pop_headplot">pop_headplot</a>
+%       Sum/Compare ERPs - <a href="matlab:helpwin pop_comperp">pop_comperp</a>
+%       Component activations (scroll) - <a href="matlab:helpwin pop_eegplot">pop_eegplot</a>
+%       Component spectra and maps - <a href="matlab:helpwin pop_spectopo">pop_spectopo</a>
+%       Component maps
+%             In 2-D - <a href="matlab:helpwin pop_topoplot">pop_topoplot</a>
+%             In 3-D - <a href="matlab:helpwin pop_headplot">pop_headplot</a>
+%       Component properties - <a href="matlab:helpwin pop_prop">pop_prop</a>
+%       Component ERP image - <a href="matlab:helpwin pop_erpimage">pop_erpimage</a>
+%       Component ERPs
+%             With component maps - <a href="matlab:helpwin pop_envtopo">pop_envtopo</a>
+%             With comp. maps (compare) - <a href="matlab:helpwin pop_envtopo">pop_envtopo</a>
+%             In rectangular array - <a href="matlab:helpwin pop_plotdata">pop_plotdata</a>
+%       Sum/Compare comp. ERPs - <a href="matlab:helpwin pop_comperp">pop_comperp</a>
+%       Data statistics
+%             Channel statistics - <a href="matlab:helpwin pop_signalstat">pop_signalstat</a>
+%             Component statistics - <a href="matlab:helpwin pop_signalstat">pop_signalstat</a>
+%             Event statistics - <a href="matlab:helpwin pop_eventstat">pop_eventstat</a>
+%       Time-frequency transforms
+%             Channel time-frequency - <a href="matlab:helpwin pop_newtimef">pop_newtimef</a>
+%             Channel cross-coherence - <a href="matlab:helpwin pop_newcrossf">pop_newcrossf</a>
+%             Component time-frequency - <a href="matlab:helpwin pop_newtimef">pop_newtimef</a>
+%             Component cross-coherence - <a href="matlab:helpwin pop_newcrossf">pop_newcrossf</a>
+%       Cluster dataset ICs - <a href="matlab:helpwin pop_miclust">pop_miclust</a>
+% Study
+%       Edit study info - <a href="matlab:helpwin pop_study">pop_study</a>
+%       Select/Edit study design(s) - <a href="matlab:helpwin pop_studydesign">pop_studydesign</a>
+%       Precompute channel measures - <a href="matlab:helpwin pop_precomp">pop_precomp</a>
+%       Plot channel measures - <a href="matlab:helpwin pop_chanplot">pop_chanplot</a>
+%       Precompute component measures - <a href="matlab:helpwin pop_precomp">pop_precomp</a>
+%       PCA clustering (original)
+%             Build preclustering array - <a href="matlab:helpwin pop_preclust">pop_preclust</a>
+%             Cluster components - <a href="matlab:helpwin pop_clust">pop_clust</a>
+%       Edit/plot clusters - <a href="matlab:helpwin pop_clustedit">pop_clustedit</a>
+%       Cluster components by correlation (CORRMAP) - <a href="matlab:helpwin pop_corrmap">pop_corrmap</a>
+% Datasets
+%       Select multiple datasets - <a href="matlab:helpwin pop_chansel">pop_chansel</a>
+% Help
+%       Upgrade to the Latest Version
+%       About EEGLAB
+%       About EEGLAB help - <a href="matlab:helpwin eeg_helphelp">eeg_helphelp</a>
+%       EEGLAB menus - <a href="matlab:helpwin eeg_helpmenu">eeg_helpmenu</a>
+%       EEGLAB functions
+%             Admin functions - <a href="matlab:helpwin eeg_helpadmin">eeg_helpadmin</a>
+%             Interactive pop_ functions - <a href="matlab:helpwin eeg_helppop">eeg_helppop</a>
+%             Signal processing functions - <a href="matlab:helpwin eeg_helpsigproc">eeg_helpsigproc</a>
+%             Group processing (STUDY) functions - <a href="matlab:helpwin eeg_helpstudy">eeg_helpstudy</a>
+%             Time-frequency functions - <a href="matlab:helpwin eeg_helptimefreq">eeg_helptimefreq</a>
+%             Statistics functions - <a href="matlab:helpwin eeg_helpstatistics">eeg_helpstatistics</a>
+%             Graphic interface builder functions - <a href="matlab:helpwin eeg_helpgui">eeg_helpgui</a>
+%             Misceleanous functions (command line only) - <a href="matlab:helpwin eeg_helpmisc">eeg_helpmisc</a>
+%       EEGLAB license
+%       Web tutorial
+%       Email the EEGLAB team
