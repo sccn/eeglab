@@ -816,10 +816,15 @@ if ismatlab
         uimenu( help_m, 'Label', 'About EEGLAB help'                      , 'userdata', on, 'CallBack', 'pophelp(''eeg_helphelp'');');
         uimenu( help_m, 'Label', 'EEGLAB menus'                           , 'userdata', on, 'CallBack', 'eeg_helpmenu;','separator','on');
 
-        help_1 = uimenu( help_m, 'Label', 'EEGLAB functions');
-        uimenu( help_1, 'Label', 'Admin functions'                        , 'userdata', on, 'Callback', 'eeg_helpadmin;');	
-        uimenu( help_1, 'Label', 'Interactive pop_ functions'             , 'userdata', on, 'Callback', 'eeg_helppop;');	
-        uimenu( help_1, 'Label', 'Signal processing functions'            , 'userdata', on, 'Callback', 'eeg_helpsigproc;');	
+        help_1 = uimenu( help_m, 'Label', 'EEGLAB functions', 'userdata', on);
+        uimenu( help_1, 'Label', 'Admin functions'                           , 'userdata', on, 'Callback', 'pophelp(''eeg_helpadmin'');');	
+        uimenu( help_1, 'Label', 'Interactive pop_ functions'                , 'userdata', on, 'Callback', 'pophelp(''eeg_helppop'');');	
+        uimenu( help_1, 'Label', 'Signal processing functions'               , 'userdata', on, 'Callback', 'pophelp(''eeg_helpsigproc'');');	
+        uimenu( help_1, 'Label', 'Group processing (STUDY) functions'        , 'userdata', on, 'Callback', 'pophelp(''eeg_helpstudy'');');	
+        uimenu( help_1, 'Label', 'Time-frequency functions'                  , 'userdata', on, 'Callback', 'pophelp(''eeg_helptimefreq'');');	
+        uimenu( help_1, 'Label', 'Statistics functions'                      , 'userdata', on, 'Callback', 'pophelp(''eeg_helpstatistics'');');	
+        uimenu( help_1, 'Label', 'Graphic interface builder functions'       , 'userdata', on, 'Callback', 'pophelp(''eeg_helpgui'');');	
+        uimenu( help_1, 'Label', 'Misceleanous functions (command line only)', 'userdata', on, 'Callback', 'pophelp(''eeg_helpmisc'');');	
 
         uimenu( help_m, 'Label', 'EEGLAB license'                         , 'userdata', on, 'CallBack', 'pophelp(''eeglablicense.txt'', 1);');
     else
