@@ -45,7 +45,7 @@ allCell1 = {  STUDY.design(1).cell.filebase };
 allCell2 = { STUDY2.design(1).cell.filebase };
 
 fileExtensions = { 'daterp' 'datspec' 'datersp' 'daterpim' 'dattimef' 'datitc' 'daterpim' ...
-    'daterp' 'datspec' 'datersp' 'daterpim' 'dattimef' 'datitc' 'daterpim' };
+                   'icaerp' 'icaspec' 'icaersp' 'icaerpim' 'icatimef' 'icaitc' 'icaerpim' };
 
 if ~isequal(allCell1, allCell2)
     res = questdlg2(['Old STUDY design data files have been detected.' 10 ...
