@@ -132,8 +132,9 @@ end;
 if isempty(opt.specdata)
     [tmpspecdata specfreqs] = pop_spectopo(NEWEEG, 1, [], 'EEG' , 'percent', 100, 'freqrange',[0 EEG.srate/2], 'plot', 'off');
     % add back 0 channels
-    if any(EEG.data(:,1) == 0)
-        goodchan  = find(EEG.data(:,1) ~= 0);
+    devStd = std(EEG.data(:,:), [], 2);
+    if any(devStd == 0)
+        goodchan  = find(devStd ~= 0);
         specdata  = zeros(length(opt.elec), size(tmpspecdata,2));
         specdata(goodchan,:) = tmpspecdata;
     else
