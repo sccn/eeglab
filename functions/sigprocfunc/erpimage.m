@@ -330,7 +330,7 @@ alpha     = 0;      % default alpha level for coherence significance
 MIN_ERPALPHA = 0.001; % significance bounds for ERP
 MAX_ERPALPHA = 0.1;
 
-NoShow    = NO;     % show sortvar by default
+NoShowVar = NO;     % show sortvar by default
 Nosort    = NO;     % sort on sortvar by default
 Caxflag   = NO;     % use default caxis by default
 
@@ -442,7 +442,7 @@ end
 
 if nargin < 2 | isempty(sortvar)
     sortvar = 1:size(data,2);
-    NoShow = 1; % don't plot the dummy sortvar
+    NoShowVar = 1; % don't plot the dummy sortvar
 end
 
 framestot = size(data,1)*size(data,2);
@@ -610,6 +610,7 @@ if nargin > 6
             Renormflag = NO;
         elseif NoShowflag == YES
             NoShow = Arg;
+            if strcmpi(NoShow, 'off'), NoShow = 'no'; end;
             NoShowflag = NO;
         elseif Alignflag == YES
             aligntime = Arg;
@@ -1085,9 +1086,6 @@ if exist('img_ylab','var') || exist('img_ytick_lab','var'),
         img_ytick_lab=[];
     end
 end
-
-
-if strcmpi(NoShow, 'off'), NoShow = 'no'; end;
 
 if   Caxflag == YES ...
         |Coherflag == YES ...
@@ -2685,7 +2683,7 @@ end;
 %
 if strcmpi(NoShow, 'no')
     
-    if NoShow == YES
+    if NoShowVar == YES
         fprintf('Not overplotting sorted sortvar on data.\n');
         
     elseif isnan(aligntime) % plot sortvar on un-aligned data
