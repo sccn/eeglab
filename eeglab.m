@@ -817,14 +817,14 @@ if ismatlab
         uimenu( help_m, 'Label', 'EEGLAB menus'                           , 'userdata', on, 'CallBack', 'pophelp(''eeg_helpmenu'');','separator','on');
 
         help_1 = uimenu( help_m, 'Label', 'EEGLAB functions', 'userdata', on);
-        uimenu( help_1, 'Label', 'Admin functions'                           , 'userdata', on, 'Callback', 'pophelp(''eeg_helpadmin'');');	
+        uimenu( help_1, 'Label', 'Admin. functions'                          , 'userdata', on, 'Callback', 'pophelp(''eeg_helpadmin'');');	
         uimenu( help_1, 'Label', 'Interactive pop_ functions'                , 'userdata', on, 'Callback', 'pophelp(''eeg_helppop'');');	
         uimenu( help_1, 'Label', 'Signal processing functions'               , 'userdata', on, 'Callback', 'pophelp(''eeg_helpsigproc'');');	
-        uimenu( help_1, 'Label', 'Group processing (STUDY) functions'        , 'userdata', on, 'Callback', 'pophelp(''eeg_helpstudy'');');	
+        uimenu( help_1, 'Label', 'Group data (STUDY) functions'              , 'userdata', on, 'Callback', 'pophelp(''eeg_helpstudy'');');	
         uimenu( help_1, 'Label', 'Time-frequency functions'                  , 'userdata', on, 'Callback', 'pophelp(''eeg_helptimefreq'');');	
-        uimenu( help_1, 'Label', 'Statistics functions'                      , 'userdata', on, 'Callback', 'pophelp(''eeg_helpstatistics'');');	
+        uimenu( help_1, 'Label', 'Statistical functions'                     , 'userdata', on, 'Callback', 'pophelp(''eeg_helpstatistics'');');	
         uimenu( help_1, 'Label', 'Graphic interface builder functions'       , 'userdata', on, 'Callback', 'pophelp(''eeg_helpgui'');');	
-        uimenu( help_1, 'Label', 'Misceleanous functions (command line only)', 'userdata', on, 'Callback', 'pophelp(''eeg_helpmisc'');');	
+        uimenu( help_1, 'Label', 'Misc. command line functions'              , 'userdata', on, 'Callback', 'pophelp(''eeg_helpmisc'');');	
 
         uimenu( help_m, 'Label', 'EEGLAB license'                         , 'userdata', on, 'CallBack', 'pophelp(''eeglablicense.txt'', 1);');
     else
@@ -832,7 +832,7 @@ if ismatlab
         uimenu( help_m, 'Label', 'EEGLAB license'                         , 'userdata', on, 'CallBack', 'pophelp(''eeglablicense.txt'', 1);');
     end;
 
-    uimenu( help_m, 'Label', 'Web tutorial'                               , 'userdata', on, 'CallBack', 'tutorial;', 'Separator', 'on');
+    uimenu( help_m, 'Label', 'EEGLAB tutorial'                               , 'userdata', on, 'CallBack', 'tutorial;', 'Separator', 'on');
     uimenu( help_m, 'Label', 'Email the EEGLAB team'                      , 'userdata', on, 'CallBack', 'web(''mailto:eeglab@sccn.ucsd.edu'');');
 end;
 
