@@ -345,11 +345,11 @@ elseif isstr(STUDY)
             val   = get(findobj(fig, 'tag', 'listboxdesign'), 'value');
             val1  = get(findobj(fig, 'tag', [ 'lbfact' num2str(factval) ]), 'value');
             val2  = get(findobj(fig, 'tag', [ 'lbfact' num2str(~factval) ]), 'value');
-            if val1 == val2 && val1 ~= 1
-                warndlg2('Cannot select twice the same independent variable');
-                val1 = 1;
-                set(findobj(fig, 'tag', [ 'lbfact' num2str(factval) ]), 'value', val1);
-            end;
+%             if val1 == val2 && val1 ~= 1
+%                 warndlg2('Cannot select twice the same independent variable');
+%                 val1 = 1;
+%                 set(findobj(fig, 'tag', [ 'lbfact' num2str(factval) ]), 'value', val1);
+%             end;
             valfact = [1:length(usrdat.factorvals{val1})];
             set(findobj(fig, 'tag', ['lbval' num2str(factval) ]), 'string', encodevals(usrdat.factorvals{val1}), 'value', valfact);
             pop_studydesign('updatedesign', fig);
@@ -435,7 +435,12 @@ elseif isstr(STUDY)
         case 'selectdatatrialssel', % select in the GUI above
             val1  = get(findobj(fig, 'tag', 'lbfact2'), 'value');
             valfact = [1:length(usrdat.factorvals{val1})];
-            set(findobj(fig, 'tag', 'lbval2'), 'string', encodevals(usrdat.factorvals{val1}), 'value', valfact);
+            tmpval = get(findobj(fig, 'tag', 'lbval2'), 'value');
+            if max(tmpval) > max(valfact)
+                set(findobj(fig, 'tag', 'lbval2'), 'value', valfact, 'string', encodevals(usrdat.factorvals{val1}));
+            else
+                set(findobj(fig, 'tag', 'lbval2'), 'string', encodevals(usrdat.factorvals{val1}), 'value', valfact);
+            end;
             return;
 
         case 'selectfolder',
