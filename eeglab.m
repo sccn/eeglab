@@ -1079,8 +1079,10 @@ end;
         end;    
     else
         eeglabtimers = timerfind('name', 'eeglabupdater');
-        stop(eeglabtimers);
-        delete(eeglabtimers);
+        if ~isempty(eeglabtimers)
+            stop(eeglabtimers);
+            delete(eeglabtimers);
+        end;
         start(timer('TimerFcn','try, eeglabUpdater.checkForNewVersion({''eeglab_event'' ''setup''}); catch, end; clear eeglabUpdater;', 'name', 'eeglabupdater', 'StartDelay', 20.0));
     end;
 % catch
