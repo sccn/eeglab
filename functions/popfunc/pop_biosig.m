@@ -114,11 +114,11 @@ if nargin < 1
     if ~isempty(result{1}), options = { options{:} 'channels'   eval( [ '[' result{1} ']' ] ) }; end;
     if ~isempty(result{2}), options = { options{:} 'blockrange' eval( [ '[' result{2} ']' ] ) }; end;
     if length(result) > 2
-        if ~isempty(result{6}), options = { options{:} 'ref'        eval( [ '[' result{6} ']' ] ) }; end;
         if ~result{3},          options = { options{:} 'importevent'  'off'  }; end;
         if ~result{4},          options = { options{:} 'importannot'  'off'  }; end;
         if  result{5},          options = { options{:} 'blockepoch'   'off' }; end;
-        if  result{6},          options = { options{:} 'memorymapped' 'on' }; end;
+        if ~isempty(result{6}), options = { options{:} 'ref'        eval( [ '[' result{6} ']' ] ) }; end;
+        if  result{7},          options = { options{:} 'memorymapped' 'on' }; end;
     end;
 else
     options = varargin;
@@ -162,7 +162,9 @@ end;
 % -----------
 if ~isempty(g.ref)
     disp('Re-referencing...');
-    EEG = pop_reref(EEG, g.ref);
+    refoptions = {};
+    if length(g.ref) > 1, refoptions = { 'keepref' 'on' }; end;
+    EEG = pop_reref(EEG, g.ref, refoptions{:});
 %     EEG.data = EEG.data - repmat(mean(EEG.data(g.ref,:),1), [size(EEG.data,1) 1]);
 %     if length(g.ref) == size(EEG.data,1)
 %         EEG.ref  = 'averef';
