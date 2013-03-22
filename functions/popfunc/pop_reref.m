@@ -27,9 +27,9 @@
 %   ref         - reference: []            = convert to average reference
 %                            [int vector]  = new reference electrode number(s)
 % Optional inputs:
-%   'exclude'   - [integer array] List of channels to exclude.
-%   'keepref'   - ['on'|'off'] keep the reference channel.
-%   'refloc'    - [structure] Previous reference channel structure.
+%   'exclude'   - [integer array] List of channels to exclude. Default: none.
+%   'keepref'   - ['on'|'off'] keep the reference channel. Default: 'off'.
+%   'refloc'    - [structure] Previous reference channel structure. Default: none.
 %
 % Outputs:
 %   EEGOUT      - re-referenced output dataset
