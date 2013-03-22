@@ -428,23 +428,20 @@ else
     dircontent  = { dircontent.name };
     for index = 1:length(dircontent)
         if dircontent{index}(1) ~= '.'
-            if exist([p 'external' filesep dircontent{index}]) == 7
+            if ~isempty(findstr('fieldtrip', lower(dircontent{index})))
+                aadpathifnotexist( [ p 'external' filesep dircontent{index} filesep 'utilities' ], 'ft_checkconfig.m');
+                aadpathifnotexist( [ p 'external' filesep dircontent{index} filesep 'forward'   ], 'ft_apply_montage.m');
+                aadpathifnotexist( [ p 'external' filesep dircontent{index} filesep 'inverse'   ], 'dipole_fit.m');
+                aadpathifnotexist( [ p 'external' filesep dircontent{index} ], 'ft_dipolefitting.m' );
+                disp(['Adding path to eeglab' filesep 'external' filesep dircontent{index} ' subfolders (when Fieltrip absent)' ]);
+            elseif ~isempty(findstr('biosig', lower(dircontent{index})))
+                aadpathifnotexist( [ p 'external' filesep dircontent{index} filesep 't200_FileAccess' ], 'sopen.m');
+                aadpathifnotexist( [ p 'external' filesep dircontent{index} filesep 't250_ArtifactPreProcessingQualityControl' ], 'regress_eog.m' );
+                aadpathifnotexist( [ p 'external' filesep dircontent{index} filesep 'doc' ], 'DecimalFactors.txt');
+                biosigflag = 1;
+            elseif exist([p 'external' filesep dircontent{index}]) == 7
                 addpathifnotinlist([p 'external' filesep dircontent{index}]);
                 disp(['Adding path to eeglab' filesep 'external' filesep dircontent{index}]);
-            end;
-            if ~isempty(findstr('fieldtrip', lower(dircontent{index})))
-                addpathifnotinlist([p 'external' filesep dircontent{index} filesep 'forward' ]);
-                addpathifnotinlist([p 'external' filesep dircontent{index} filesep 'inverse' ]);
-                addpathifnotinlist([p 'external' filesep dircontent{index} filesep 'utilities' ]);
-                addpathifnotinlist([p 'external' filesep dircontent{index} ]);
-                disp(['Adding path to eeglab' filesep 'external' filesep dircontent{index} ' subfolders' ]);
-            end;
-            if ~isempty(findstr('biosig', lower(dircontent{index})))
-                addpathifnotinlist([p 'external' filesep dircontent{index} filesep 't200_FileAccess' ]);
-                addpathifnotinlist([p 'external' filesep dircontent{index} filesep 't250_ArtifactPreProcessingQualityControl' ]);
-                addpathifnotinlist([p 'external' filesep dircontent{index} filesep 'doc' ]);
-
-                biosigflag = 1;
             end;
         end;
     end;
@@ -1955,6 +1952,12 @@ function addpathifnotinlist(newpath);
         if exist(newpath) == 7
             addpath(newpath);
         end;
+    end;
+
+function aadpathifnotexist(newpath, functionname);
+    tmpp = which(functionname);
+    if isempty(tmpp)
+        addpath(newpath);
     end;
     
 % find a function path and add path if not present
