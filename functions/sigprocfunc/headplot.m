@@ -178,7 +178,7 @@ if isstr(values)
         
     g = finputcheck(varargin(2:end), { 'orilocs'      'string'  { 'on','off' }             'off';
                                        'plotmeshonly' 'string'  { 'head','off','sphere' }  'off';
-                                       'meshfile'     { 'string' 'struct' } []             DEFAULT_MESH;
+                                       'meshfile'     { 'string','struct' } []             DEFAULT_MESH;
                                        'chaninfo'     'struct'  []                         struct([]);
                                        'plotchans'    'integer' []                         [];
                                        'ica'          'string'  { 'on','off' }             'off';
@@ -433,10 +433,10 @@ else
        'maplimits'  { 'string','real' }  []  'absmax'; 
        'title'      'string' []              '';
        'lights'     'real'   []              DEFAULT_LIGHTS;
-       'view'       'real'   []              [143 18];
+       'view'       { 'string','real' }   [] [143 18];
        'colormap'   'real'   []              jet(256);
        'transform'  'real'   []              [];
-       'meshfile'   {'string' 'struct' } []  DEFAULT_MESH;
+       'meshfile'   {'string','struct' } []  DEFAULT_MESH;
        'electrodes' 'string' { 'on','off' }  'on';            
        'orilocs'    { 'string','struct' } [] '';            
        'labels'     'integer' [0 1 2]        0 }, 'headplot');
