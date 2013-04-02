@@ -3,8 +3,7 @@
 %              of the component of the cluster and then average them. See 
 %              eeg_pvaf for more information. This function uses the
 % Usage:
-%              >> [pvaf] = std_pvaf(STUDY, ALLEEG, cluster, 'key', 'val');
-%              >> [pvaf,pvafs,vars] = eeg_pvaf(EEG,comps,artcomps,omitchans,fraction,'plot');
+%              >> [pvaf pvafs] = std_pvaf(STUDY, ALLEEG, cluster, 'key', 'val');
 % Inputs:
 %    EEG       - EEGLAB dataset. Must have icaweights, icasphere, icawinv, icaact.
 %    comps     - vector of component indices to sum {default|[] -> progressive mode}
@@ -12,7 +11,7 @@
 %                [1:size(EEG.icaweights,2)] (all components); here, the plot shows pvaf.
 %
 % Optional inputs: 
-%   'design'   - [integer] selected design. Default is the current design.
+%   'design'     - [integer] selected design. Default is the current design.
 %   'rmcomps'    - [integer array] remove artifactual components (this entry
 %                  is ignored when plotting components). This entry contains 
 %                  the indices of the components to be removed. Default is none.
