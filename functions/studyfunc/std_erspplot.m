@@ -239,7 +239,7 @@ if ~isempty(opt.channels)
         end;
         
         % prepare channel neighbor matrix for Fieldtrip
-        statstruct = std_prepare_neighbors(statstruct, ALLEEG);
+        statstruct = std_prepare_neighbors(statstruct, ALLEEG, 'channels', opt.channels);
         stats.fieldtrip.channelneighbor = statstruct.etc.statistics.fieldtrip.channelneighbor;
         
         params.plottf = { params.plottf(1:2) params.plottf(3:4) };

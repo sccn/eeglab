@@ -133,7 +133,7 @@ options = mystruct(varargin);
 options = myrmfield( options, myfieldnames(params));
 options = myrmfield( options, myfieldnames(stats));
 options = myrmfield( options, { 'threshold' 'statistics' } ); % for backward compatibility
-[opt ] = finputcheck( options, ...
+opt = finputcheck( options, ...
                              { 'design'      'integer' []              STUDY.currentdesign;
                                'plotstderr'  'string'  []              'off';
                                'channels'    'cell'    []              {};
@@ -245,7 +245,7 @@ if ~isempty(opt.channels)
         alpha = alpha(1);
     end;
     if ~isempty(params.topotime) && all(~isnan(params.topotime))
-         statstruct = std_prepare_neighbors(statstruct, ALLEEG);
+         statstruct = std_prepare_neighbors(statstruct, ALLEEG, 'channels', opt.channels);
          stats.fieldtrip.channelneighbor = statstruct.etc.statistics.fieldtrip.channelneighbor;
     end;
     [pcond pgroup pinter] = std_stat(erpdata, stats);
