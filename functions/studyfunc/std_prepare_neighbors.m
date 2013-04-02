@@ -14,6 +14,7 @@
 % Optional inputs:
 %   'force'        - ['on'|'off'] force generating the structure irrespective
 %                    of the statistics options selected. Default is 'off'.
+%   'channels'     - [cell] list of channels to include in the matrix
 %   'method'       - [string] method for preparing. See ft_prepare_neighbors
 %   'neighbordist' - [float] max distance. See ft_prepare_neighbors
 %
@@ -51,24 +52,32 @@ if nargin < 2
     return;
 end;
 
-[opt addopts] = finputcheck( varargin, {  'force'  'string'  { 'on','off' }   'off' }, 'std_stat', 'ignore');
+[opt addopts] = finputcheck( varargin, {  'force'    'string'  { 'on','off' }   'off';
+                                          'channels' 'cell'    {}               {} }, 'std_stat', 'ignore');
 
 if strcmpi(opt.force, 'on') || (strcmpi(STUDY.etc.statistics.fieldtrip.mcorrect, 'cluster') && ...
         strcmpi(STUDY.etc.statistics.mode, 'fieldtrip') && (strcmpi(STUDY.etc.statistics.groupstats, 'on') || strcmpi(STUDY.etc.statistics.condstats, 'on')))
     
-    if ~isempty(STUDY.etc.statistics.fieldtrip.channelneighbor) && isempty(addopts)
+    EEG = eeg_emptyset;
+    EEG.chanlocs = eeg_mergelocs(ALLEEG.chanlocs);
+    if isempty(EEG.chanlocs)
+        disp('std_prepare_neighbors: cannot prepare channel neighbour structure because of empty channel structures');
+        return;
+    end;
+    
+    if ~isempty(STUDY.etc.statistics.fieldtrip.channelneighbor) && isempty(addopts) && ...
+        length(STUDY.etc.statistics.fieldtrip.channelneighbor) == length(EEG.chanlocs)
         
         disp('Using stored channel neighbour structure');
         neighbors = STUDY.etc.statistics.fieldtrip.channelneighbor;
         
     else
-        
-        EEG = eeg_emptyset;
-        EEG.chanlocs = eeg_mergelocs(ALLEEG.chanlocs);
-        if isempty(EEG.chanlocs)
-            disp('std_prepare_neighbors: cannot prepare channel neighbour structure because of empty channel structures');
-            return;
+
+        if ~isempty(opt.channels)
+            indChans = eeg_chaninds(EEG, opt.channels);
+            EEG.chanlocs = EEG.chanlocs(indChans);
         end;
+        
         EEG.nbchan   = length(EEG.chanlocs);
         EEG.data     = zeros(EEG.nbchan,100,1);
         EEG.trials   = 1;
@@ -92,8 +101,8 @@ if strcmpi(opt.force, 'on') || (strcmpi(STUDY.etc.statistics.fieldtrip.mcorrect,
         cfg.neighbors = ft_prepare_neighbours(tmpcfg, tmpcfg);
         warning on;
         neighbors = cfg.neighbors;
-        STUDY.etc.statistics.fieldtrip.channelneighbor = neighbors;
         
     end;
-    
+
+    STUDY.etc.statistics.fieldtrip.channelneighbor = neighbors;
 end;
