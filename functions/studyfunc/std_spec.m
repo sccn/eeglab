@@ -228,6 +228,7 @@ if ~strcmpi(g.specmode, 'psd')
         TMP.trials = size(TMP.data,3);
         TMP.pnts   = size(TMP.data,2);
         TMP.event  = [];
+        TMP.epoch  = [];
         for index = 1:length(boundaries)
             TMP.event(index).type = 'boundary';
             TMP.event(index).latency = boundaries(index);
