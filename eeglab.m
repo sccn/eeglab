@@ -158,6 +158,17 @@ end;
 eeglabpath = which('eeglab.m');
 eeglabpath = eeglabpath(1:end-length('eeglab.m'));
 if nargin < 1
+    % warning for Matlab 2013a
+    v = version;
+    indp = find(v == '.');
+    v = str2num(v(1:indp(2)-1));
+    if v >= 8.1
+        warndlg2( [ 'You are using Matlab 2013b or later which is not fully' 10 ...
+                    'compatible with this version of EEGLAB. There is a' 10 ...
+                    'possibility (say 20% chance) that datasets and STUDY will' 10 ...
+                    'be corrupted if you are using this version of Matlab.' ]);
+    end;
+    
     eeglabpath2 = '';
     if strcmpi(eeglabpath, pwd) || strcmpi(eeglabpath(1:end-1), pwd) 
         cd('functions');
