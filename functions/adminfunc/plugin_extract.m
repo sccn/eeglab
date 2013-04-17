@@ -10,7 +10,7 @@ global PLUGINLIST;
 %    error([ '"unzip" could not be found. Instal unzip and make sure' 10 'it is accessible under Matlab by adding the program to' 10 'the path and typing "!unzip"' ]);
 %end;
 
-if 0
+if 1
     try
         disp('Retreiving URL with plugins...');
         if strcmpi(type, 'import')
