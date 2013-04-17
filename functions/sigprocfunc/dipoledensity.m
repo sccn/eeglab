@@ -58,6 +58,9 @@
 %                 five to 20 minutes). By default this function save the volume file 
 %                 mesh into a file named volmesh_local.mat in the current
 %                 folder.
+% 'norm2JointProb' - ['on'|'off'] Use joint probability (i.e. sum of all
+%                    voxel values == 1) instead of number of dipoles/cm^3.
+%                    Should be used for group comparison. (default 'off')
 %
 % Outputs:
 %  dens3d       - [3-D num array] density in dipoles per cubic centimeter. If output
@@ -82,6 +85,7 @@
 %           EEGLAB: dipplot(), mri3dplot(), Fieldtrip: find_inside_vol() 
 %
 % Author: Arnaud Delorme & Scott Makeig, SCCN, INC, UCSD
+% 02/19/2013 'norm2JointProb' added by Makoto.
 
 % Copyright (C) Arnaud Delorme & Scott Makeig, SCCN/INC/UCSD, 2003-
 %
@@ -123,7 +127,8 @@ g = finputcheck(varargin, { 'subjind'     'integer'  []               [];
                             'coordformat' 'string'  { 'mni','spherical' }   'mni';
                             'normalization' 'string'  { 'on','off' } 'on';
                             'volmesh_fname' 'string'  []  'volmesh_local.mat';
-                            'mri'         { 'struct','string' } [] ''});
+                            'mri'         { 'struct','string' } [] '';
+                            'norm2JointProb' 'string'  { 'on','off' } 'off'});
 if isstr(g), error(g); end;
 if ~strcmpi(g.method, 'alldistance') & isempty(g.subjind)
     error('Subject indices are required for this method');
@@ -428,10 +433,15 @@ if strcmpi(g.method, 'alldistance') && strcmpi(g.normalization,'on')
             fprintf('It is highly recommended to turn normaliziation off by using ''normalization'' key to ''off''.\n');
         end;
         totval = sum(prob3d{i}(:));  % total values in the head
-        totdip = size(allx,2);   % number of dipoles
-        voxvol;                  % volume o af a voxel in mm^3
-        prob3d{i} = prob3d{i}/totval*totdip/voxvol*1000; % time 1000 to get cubic centimeters
-        prob3d{i} = prob3d{i}/g.nsessions;
+        switch g.norm2JointProb
+            case 'off'
+                totdip = size(allx,2);   % number of dipoles
+                voxvol;                  % volume of a voxel in mm^3
+                prob3d{i} = prob3d{i}/totval*totdip/voxvol*1000; % time 1000 to get cubic centimeters
+                prob3d{i} = prob3d{i}/g.nsessions;
+            case 'on'
+                prob3d{i} = prob3d{i}/totval;
+        end
     end;
 end;
 
