@@ -17,9 +17,9 @@ end;
 
 if v >= 7.14
     [C,IA,IB] = unique(A,varargin{:},'legacy');
-    if warningFlag
-        [C2,IA2,IB2] = unique(A,varargin{:});
-        if warningFlag && (~isequal(C, C2) || ~isequal(IA, IA2) || ~isequal(IB, IB2))
+    if errorFlag
+        [C2,IA2] = unique(A,varargin{:});
+        if ~isequal(C, C2) || ~isequal(IA, IA2) || ~isequal(IB, IB2)
             warning('backward compatibility issue with call to unique function');
         end;
     end;

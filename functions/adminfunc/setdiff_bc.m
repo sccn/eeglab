@@ -17,9 +17,9 @@ end;
 
 if v >= 7.14
     [C,IA] = setdiff(A,B,varargin{:},'legacy');
-    if warningFlag
+    if errorFlag
         [C2,IA2] = setdiff(A,B,varargin{:});
-        if warningFlag && (~isequal(C, C2) || ~isequal(IA, IA2))
+        if (~isequal(C, C2) || ~isequal(IA, IA2))
             warning('backward compatibility issue with call to setdiff function');
         end;
     end;
