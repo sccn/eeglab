@@ -52,10 +52,10 @@ setinfo = STUDY.datasetinfo;
 if strcmpi(mode, 'datinfo') || strcmpi(mode, 'both')
     % get trial info
     ff = fieldnames(setinfo);
-    ff = setdiff(ff, { 'filepath' 'filename' 'subject' 'index' 'ncomps' 'comps' 'trialinfo' });
+    ff = setdiff_bc(ff, { 'filepath' 'filename' 'subject' 'index' 'ncomps' 'comps' 'trialinfo' });
     for index = 1:length(ff)
         if isstr(getfield(setinfo(1), ff{index}))
-            eval( [ 'tmpvals = unique({ setinfo.' ff{index} '});' ] );
+            eval( [ 'tmpvals = unique_bc({ setinfo.' ff{index} '});' ] );
             if length(tmpvals) > 1
                 factor{    countfact} = ff{index};
                 factorvals{countfact} = tmpvals;
@@ -63,12 +63,12 @@ if strcmpi(mode, 'datinfo') || strcmpi(mode, 'both')
                 % get subject for each factor value
                 for c = 1:length(tmpvals)
                     eval( [ 'datind = strmatch(tmpvals{c}, { setinfo.' ff{index} '}, ''exact'');' ] );
-                    subjects{  countfact}{c} = unique( { setinfo(datind).subject } );
+                    subjects{  countfact}{c} = unique_bc( { setinfo(datind).subject } );
                 end;
                 countfact = countfact + 1;
             end;
         else
-            eval( [ 'tmpvals = unique([ setinfo.' ff{index} ']);' ] );
+            eval( [ 'tmpvals = unique_bc([ setinfo.' ff{index} ']);' ] );
             if length(tmpvals) > 1
                 factor{    countfact} = ff{index};
                 factorvals{countfact} = mattocell(tmpvals);
@@ -76,7 +76,7 @@ if strcmpi(mode, 'datinfo') || strcmpi(mode, 'both')
                 % get subject for each factor value
                 for c = 1:length(tmpvals)
                     eval( [ 'datind = find(tmpvals(c) == [ setinfo.' ff{index} ']);' ] );
-                    subjects{  countfact}{c} = unique( { setinfo(datind).subject } );
+                    subjects{  countfact}{c} = unique_bc( { setinfo(datind).subject } );
                 end;
                 countfact = countfact + 1;
             end;
@@ -104,7 +104,7 @@ if strcmpi(mode, 'trialinfo') || strcmpi(mode, 'both')
                             % convert to string if necessary
                             tmpTrialVals = cellfun(@num2str, tmpTrialVals, 'uniformoutput', false);
                         end;
-                        tmpvals = unique(tmpTrialVals);
+                        tmpvals = unique_bc(tmpTrialVals);
                     else tmpvals = {};
                     end;
                     if isempty(alltmpvals)
@@ -113,7 +113,7 @@ if strcmpi(mode, 'trialinfo') || strcmpi(mode, 'both')
                         alltmpvals = { alltmpvals{:} tmpvals{:} };
                     end;
                 end;
-                alltmpvals = unique(alltmpvals);
+                alltmpvals = unique_bc(alltmpvals);
                 if length(alltmpvals) > 1
                     factor{    countfact} = ff{index};
                     factorvals{countfact} = alltmpvals;
@@ -124,12 +124,12 @@ if strcmpi(mode, 'trialinfo') || strcmpi(mode, 'both')
                 alltmpvals = [];
                 for ind = 1:length(setinfo)
                     if isfield(setinfo(ind).trialinfo, ff{index})
-                        eval( [ 'tmpvals = unique([ setinfo(ind).trialinfo.' ff{index} ' ]);' ] );
+                        eval( [ 'tmpvals = unique_bc([ setinfo(ind).trialinfo.' ff{index} ' ]);' ] );
                     else tmpvals = [];
                     end;
                     alltmpvals = [ alltmpvals tmpvals ];
                 end;
-                alltmpvals = unique(alltmpvals);
+                alltmpvals = unique_bc(alltmpvals);
                 if length(alltmpvals) > 1
                     factor{    countfact} = ff{index};
                     factorvals{countfact} = mattocell(alltmpvals);
@@ -163,12 +163,12 @@ function cellout = mysetdiff(cell1, cell2);
     cellout = cell1(indcell);
 
 %     if isstr(cell1{1}) && isstr(cell2{1})
-%          cellout = setdiff(cell1, cell2);
+%          cellout = setdiff_bc(cell1, cell2);
 %     elseif ~isstr(cell1{1}) && ~isstr(cell2{1})
 %         cellout = mattocell(setdiff( [ cell1{:} ], [ cell2{:} ]));
 %     elseif isstr(cell1{1}) && ~isstr(cell2{1})
-%          cellout = setdiff(cell1, cellfun(@(x)(num2str(x)),cell2, 'uniformoutput', false));
+%          cellout = setdiff_bc(cell1, cellfun(@(x)(num2str(x)),cell2, 'uniformoutput', false));
 %     elseif ~isstr(cell1{1}) && isstr(cell2{1})
-%          cellout = setdiff(cellfun(@(x)(num2str(x)),cell1, 'uniformoutput', false), cell2);
+%          cellout = setdiff_bc(cellfun(@(x)(num2str(x)),cell1, 'uniformoutput', false), cell2);
 %     end;
     

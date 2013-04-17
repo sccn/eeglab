@@ -313,9 +313,9 @@ function stats = rm_anova2(Y,S,F1,F2,FACTNAMES)
 
 stats = cell(4,5);
 
-F1_lvls = unique(F1);
-F2_lvls = unique(F2);
-Subjs = unique(S);
+F1_lvls = unique_bc(F1);
+F2_lvls = unique_bc(F2);
+Subjs = unique_bc(S);
 
 a = length(F1_lvls); % # of levels in factor 1
 b = length(F2_lvls); % # of levels in factor 2

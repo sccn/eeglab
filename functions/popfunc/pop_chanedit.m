@@ -749,7 +749,7 @@ else
                     for indexchan = 1:length(chans)
                         if isempty(chans(indexchan).labels), chans(indexchan).labels = ''; end;
                     end;
-                    [tmp1 ind1 ind2] = intersect( lower(standardchans), {chans.labels});
+                    [tmp1 ind1 ind2] = intersect_bc( lower(standardchans), {chans.labels});
                     if ~isempty(tmp1) | isfield(chans, 'theta')
 
                         % finding template location files
@@ -824,7 +824,7 @@ else
                 for indexchan = 1:length(chans)
                     if isempty(chans(indexchan).labels), chans(indexchan).labels = ''; end;
                 end;
-                [tmp ind1 ind2] = intersect(lower({ tmplocs.labels }), lower({ chans.labels }));
+                [tmp ind1 ind2] = intersect_bc(lower({ tmplocs.labels }), lower({ chans.labels }));
                 if ~isempty(tmp)
                     chans = struct('labels', { chans.labels }, 'datachan', { chans.datachan }, 'type', { chans.type });
                     [ind2 ind3] = sort(ind2);
@@ -840,7 +840,7 @@ else
                         chans(ind2(index)).sph_phi    = tmplocs(ind1(index)).sph_phi;
                         chans(ind2(index)).sph_radius = tmplocs(ind1(index)).sph_radius;
                     end;
-                    tmpdiff = setdiff([1:length(chans)], ind2);
+                    tmpdiff = setdiff_bc([1:length(chans)], ind2);
                     if ~isempty(tmpdiff)
                         fprintf('Channel lookup: no location for ');
                         for index = 1:(length(tmpdiff)-1)

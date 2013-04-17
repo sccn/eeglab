@@ -76,7 +76,7 @@ elseif isfield(STUDY.datasetinfo, indvar) && ~isempty(getfield(STUDY.datasetinfo
     eval( [ 'fieldvals = { STUDY.datasetinfo.' indvar '};' ] );
     datind = [];
     for dat = 1:length(indvarvals)
-        datind = union(datind, std_indvarmatch(indvarvals{dat}, fieldvals));
+        datind = union_bc(datind, std_indvarmatch(indvarvals{dat}, fieldvals));
     end;
 else
     % selection of trials within datasets
@@ -87,7 +87,7 @@ else
     dattrialselect = cell(1,length(STUDY.datasetinfo));
     for dat = 1:length(indvarvals)
         for tmpi = 1:length(dattrials)
-            dattrialselect{tmpi} = union(dattrialselect{tmpi}, std_indvarmatch(indvarvals{dat}, dattrials{tmpi}));
+            dattrialselect{tmpi} = union_bc(dattrialselect{tmpi}, std_indvarmatch(indvarvals{dat}, dattrials{tmpi}));
         end;
     end;
     datind = find(~cellfun(@isempty, dattrialselect));

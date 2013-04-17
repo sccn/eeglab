@@ -148,7 +148,7 @@ if ~isempty(HDR.EVENT)
             for index = 1:length(HDR.EVENT)
                 HDR.EVENT(index).type = num2str(HDR.EVENT(index).type);
             end;
-            alltypes = unique( { HDR.EVENT.type } );
+            alltypes = unique_bc( { HDR.EVENT.type } );
         end;
         for i = 1:length(HDR.EVENT)
             if isfield(HDR.EVENT, 'type')

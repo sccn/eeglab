@@ -183,7 +183,7 @@ function [smoothprob3d, mriplanes] = mri3dplot(prob3d, mri, varargin)
         % ----------------------------------------
         newprob3d = newprob3dori;
         if strcmpi(g.plotintersect, 'on')
-            for index2 = setdiff(1:length( g.mrislices ), index)
+            for index2 = setdiff_bc(1:length( g.mrislices ), index)
                 switch g.mriview{index2}
                     case 'side', coord = [  g.mrislices(index2) 0 0 1 ]; 
                     case 'top' , coord = [  0 0 g.mrislices(index2) 1 ]; 

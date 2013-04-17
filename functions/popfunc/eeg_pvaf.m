@@ -82,7 +82,7 @@ end
 numchans = EEG.nbchan;
 chans = 1:numchans;
 if ~isempty(g.chans)
-    g.omitchans = setdiff([1:EEG.nbchan], g.chans);
+    g.omitchans = setdiff_bc([1:EEG.nbchan], g.chans);
 end;
 if ~isempty(g.omitchans)
  if max(g.omitchans)>numchans
@@ -145,7 +145,7 @@ if progressive
 end
 
 if ~isempty(g.artcomps)
-   [a b c] = intersect(g.artcomps,comps);
+   [a b c] = intersect_bc(g.artcomps,comps);
    if ~isempty(a)
       if ~progressive
         if length(a)>1

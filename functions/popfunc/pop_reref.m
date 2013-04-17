@@ -110,9 +110,9 @@ if nargin < 2
     % ----------------------------------------------
     if isfield(EEG(1).chanlocs, 'ref')
         tmpchanlocs = EEG(1).chanlocs;
-        [curref tmp allinds] = unique( { tmpchanlocs.ref });
+        [curref tmp allinds] = unique_bc( { tmpchanlocs.ref });
         maxind = 1;
-        for ind = unique(allinds)
+        for ind = unique_bc(allinds)
             if length(find(allinds == ind)) > length(find(allinds == maxind))
                 maxind = ind;
             end;

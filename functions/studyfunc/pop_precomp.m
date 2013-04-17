@@ -146,7 +146,7 @@ if ~isstr(varargin{1}) %intial settings
     for index = 1:length(ALLEEG)
         tmpchanlocs = ALLEEG(index).chanlocs;
         tmpchans = { tmpchanlocs.labels };
-        allchans = unique({ allchans{:} tmpchanlocs.labels });
+        allchans = unique_bc({ allchans{:} tmpchanlocs.labels });
         if length(allchans) == length(tmpchans), keepindex = index; end;
     end;
     if keepindex, tmpchanlocs = ALLEEG(keepindex).chanlocs; allchans = { tmpchanlocs.labels }; end;

@@ -48,7 +48,7 @@ for index = 1:length(STUDY.cluster(clusterind).comps)
     [tmp maxelec] = max( abs(ALLEEG(set).icawinv(:, comp)) );
     indelec = ALLEEG(set).icachansind(maxelec);
     maxallelec{index} = ALLEEG(set).chanlocs(indelec).labels;
-    allelec = unique(maxallelec);
+    allelec = unique_bc(maxallelec);
 
     fprintf('The electrode with the max weight for component %d of dataset %d is "%s"\n', comp, set, maxallelec{index});
 end;

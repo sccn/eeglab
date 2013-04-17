@@ -223,7 +223,7 @@ function [Irej, Erej] = thresh( data, elecrange, timerange, negthresh, posthresh
 	   tmpica = (tmpica-mean(tmpica,2)*ones(1,size(tmpica,2)))./ (std(tmpica,0,2)*ones(1,size(tmpica,2)));
 	   [I1 Itmprej NS Etmprej] = eegthresh( tmpica, size(data,2), 1, negthresh, posthresh, ...
 						timerange, starttime, endtime);
- 	   Irej = union(Irej, Itmprej);
+ 	   Irej = union_bc(Irej, Itmprej);
  	   Erej(elecrange(index),Itmprej) = Etmprej;
 	end;
 

@@ -124,13 +124,13 @@ else
    end
 end
 
-[types i j] = unique(alltypes);
+[types i j] = unique_bc(alltypes);
 
 istypes = 1:length(types);
 notistypes = [];
 if ~isempty(typelist)
-  notistypes = ismember(typelist,types);
-  istypes = ismember(types,typelist(find(notistypes==1))); % types in typelist?
+  notistypes = ismember_bc(typelist,types);
+  istypes = ismember_bc(types,typelist(find(notistypes==1))); % types in typelist?
   notistypes = typelist(find(notistypes==0));
 end
 

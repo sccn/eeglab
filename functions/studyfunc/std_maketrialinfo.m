@@ -45,7 +45,7 @@ for index = 1:length(ALLEEG)
     eventlat = abs(eeg_point2lat( [ tmpevent.latency ], [ tmpevent.epoch ], ALLEEG(index).srate, [ALLEEG(index).xmin ALLEEG(index).xmax]));
     events   = ALLEEG(index).event;
     ff = fieldnames(events);
-    ff = setdiff(ff, { 'latency' 'urevent' 'epoch' });
+    ff = setdiff_bc(ff, { 'latency' 'urevent' 'epoch' });
     trialinfo = [];
     
     % process time locking event fields
@@ -62,7 +62,7 @@ for index = 1:length(ALLEEG)
             disp('std_maketrialinfo: not the same number of time-locking events as trials, trial info ignored');
         else
             % pick one event per epoch
-            [tmp tmpind] = unique(epochs(end:-1:1)); % reversing the array ensures the first event gets picked
+            [tmp tmpind] = unique_bc(epochs(end:-1:1)); % reversing the array ensures the first event gets picked
             tmpind = length(epochs)+1-tmpind;
             indtle = indtle(tmpind);
             if length(indtle) ~= ALLEEG(index).trials

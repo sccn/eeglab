@@ -63,9 +63,9 @@ for index = 2:length(varargin)
             tmplocs = tmp;
         end;
         allchans = { alllocs.labels tmplocs.labels };
-        [uniquechan ord1 ord2 ]  = unique( allchans );
+        [uniquechan ord1 ord2 ]  = unique_bc( allchans );
         
-        [tmp rminds] = intersect( uniquechan, { alllocs.labels });
+        [tmp rminds] = intersect_bc( uniquechan, { alllocs.labels });
         ord1(rminds) = [];
         tmplocsind = ord1-length(alllocs);
         

@@ -143,7 +143,7 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
         chanlist = { alllocs.labels };
     elseif ~isnumeric(chanlist{1})
         alllocs = eeg_mergelocs(ALLEEG.chanlocs);
-        [tmp c1 c2] = intersect( lower({ alllocs.labels }), lower(chanlist));
+        [tmp c1 c2] = intersect_bc( lower({ alllocs.labels }), lower(chanlist));
         [tmp c2] = sort(c2);
         alllocs = alllocs(c1(c2));
     end;
@@ -431,7 +431,7 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
                     setinds  = [STUDY.design(STUDY.currentdesign).cell(STUDY.cluster(rmclust(rmi)).setinds{ind}).dataset ];
                     indmatch = find(setinds == currentdat);
                     if ~isempty(indmatch)
-                        rmcomps{idat} = union( rmcomps{idat}, compinds{ind}(indmatch));
+                        rmcomps{idat} = union_bc( rmcomps{idat}, compinds{ind}(indmatch));
                     end;
                 end;
             end;
@@ -450,7 +450,7 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
             end;
             if strcmpi(g.rmicacomps, 'on')
                 for ind = 1:length(idat)
-                    rmcomps{ind} = union(rmcomps{ind}, find(ALLEEG(idat(1)).reject.gcompreject));
+                    rmcomps{ind} = union_bc(rmcomps{ind}, find(ALLEEG(idat(1)).reject.gcompreject));
                 end;
             end;
             opts = { opts{:} 'rmcomps' rmcomps };
@@ -458,7 +458,7 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
         if strcmpi(g.interp, 'on')
             tmpchanlist = chanlist;
             allocs = eeg_mergelocs(ALLEEG.chanlocs);
-            [tmp1 tmp2 neworder] = intersect( {allocs.labels}, chanlist);
+            [tmp1 tmp2 neworder] = intersect_bc( {allocs.labels}, chanlist);
             [tmp1 ordertmp2] = sort(tmp2);
             neworder = neworder(ordertmp2);
             opts = { opts{:} 'interp' allocs(neworder) };

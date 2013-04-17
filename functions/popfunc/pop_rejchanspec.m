@@ -210,7 +210,7 @@ for index = 1:size(opt.freqlims,1)
     end;
     
 end;
-allrmchan = unique(allrmchan);
+allrmchan = unique_bc(allrmchan);
 
 com = sprintf('EEG = pop_rejchan(EEG, %s);', vararg2str(options));
 if strcmpi(opt.plotchans, 'on')   

@@ -1049,8 +1049,8 @@ u(22) = uicontrol('Parent',figh, ...
       
   if ~isempty(g.events)
       if isstr(g.events(1).type)
-           [g.eventtypes tmpind indexcolor] = unique({g.events.type}); % indexcolor countinas the event type
-      else [g.eventtypes tmpind indexcolor] = unique([ g.events.type ]);
+           [g.eventtypes tmpind indexcolor] = unique_bc({g.events.type}); % indexcolor countinas the event type
+      else [g.eventtypes tmpind indexcolor] = unique_bc([ g.events.type ]);
       end;
       g.eventcolors     = { 'r', [0 0.8 0], 'm', 'c', 'k', 'b', [0 0.8 0] };  
       g.eventstyle      = { '-' '-' '-'  '-'  '-' '-' '-' '--' '--' '--'  '--' '--' '--' '--'};
@@ -1366,7 +1366,7 @@ else
             event2plot1 = find ( g.winrej(:,1) >= lowlim & g.winrej(:,1) <= highlim );
             event2plot2 = find ( g.winrej(:,2) >= lowlim & g.winrej(:,2) <= highlim );
             event2plot3 = find ( g.winrej(:,1) <  lowlim & g.winrej(:,2) >  highlim );
-            event2plot  = union(union(event2plot1, event2plot2), event2plot3);
+            event2plot  = union_bc(union(event2plot1, event2plot2), event2plot3);
       
 			for tpmi = event2plot(:)'
                 if size(g.winrej,2) > 2
@@ -1411,7 +1411,7 @@ else
         if ~isempty(g.eventlatencyend)            
             event2plot2 = find ( g.eventlatencyend >= lowlim & g.eventlatencyend <= highlim );
             event2plot3 = find ( g.eventlatencies  <  lowlim & g.eventlatencyend >  highlim );
-            event2plot  = union(union(event2plot, event2plot2), event2plot3);
+            event2plot  = union_bc(union(event2plot, event2plot2), event2plot3);
         end;
         for index = 1:length(event2plot)
             % draw latency line

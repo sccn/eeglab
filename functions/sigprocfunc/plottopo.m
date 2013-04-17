@@ -493,7 +493,7 @@ end;
         % find position for other channels
         % --------------------------------
         totalchans = length(g.chanlocs);
-        emptychans = setdiff(1:totalchans, nonemptychans);
+        emptychans = setdiff_bc(1:totalchans, nonemptychans);
         totalchans = floor(sqrt(totalchans))+1;
         for index = 1:length(emptychans)
             xvals(emptychans(index)) = 0.7+0.2*floor((index-1)/totalchans);

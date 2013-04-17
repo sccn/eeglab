@@ -1282,7 +1282,7 @@ if ismatlab
 
     titleh   = findobj('parent', gcf, 'tag', 'win0');
     alltexth = findobj('parent', gcf, 'style', 'text');
-    alltexth = setdiff(alltexth, titleh);
+    alltexth = setdiff_bc(alltexth, titleh);
 
     set(gcf, 'Position',[200 100 (WINMINX+WINMAXX+2*BORDERINT+2*BORDEREXT) (WINY+2*BORDERINT+2*BORDEREXT) ]);
     set(titleh, 'fontsize', 14, 'fontweight', 'bold');
@@ -1546,7 +1546,7 @@ if study_selected
     
     % dataset type
     % ------------
-    datasettype = unique( [ EEG.trials ] );
+    datasettype = unique_bc( [ EEG.trials ] );
     if datasettype(1) == 1 & length(datasettype) == 1, datasettype = 'continuous';
     elseif datasettype(1) == 1,                        datasettype = 'epoched and continuous';
     else                                               datasettype = 'epoched';
@@ -1554,9 +1554,9 @@ if study_selected
     
     % number of channels and channel locations
     % ----------------------------------------
-    chanlen    = unique( [ EEG.nbchan ] );
+    chanlen    = unique_bc( [ EEG.nbchan ] );
     chanlenstr = vararg2str( mattocell(chanlen) );
-    anyempty    = unique( cellfun( 'isempty', { EEG.chanlocs }) );
+    anyempty    = unique_bc( cellfun( 'isempty', { EEG.chanlocs }) );
     if length(anyempty) == 2,   chanlocs = 'mixed, yes and no';
     elseif anyempty == 0,       chanlocs = 'yes';
     else                        chanlocs = 'no';
@@ -1564,7 +1564,7 @@ if study_selected
 
     % ica weights
     % -----------
-    anyempty    = unique( cellfun( 'isempty', { EEG.icaweights }) );
+    anyempty    = unique_bc( cellfun( 'isempty', { EEG.icaweights }) );
     if length(anyempty) == 2,   studystatus = 'Missing ICA dec.';
     elseif anyempty == 0,       studystatus = 'Ready to precluster';
     else                        studystatus = 'Missing ICA dec.';
@@ -1652,7 +1652,7 @@ elseif (exist('EEG') == 1) & ~isnumeric(EEG) & ~isempty(EEG(1).data)
         
         % dataset type
         % ------------
-        datasettype = unique( [ EEG.trials ] );
+        datasettype = unique_bc( [ EEG.trials ] );
         if datasettype(1) == 1 & length(datasettype) == 1, datasettype = 'continuous';
         elseif datasettype(1) == 1,                        datasettype = 'epoched and continuous';
         else                                               datasettype = 'epoched';
@@ -1660,9 +1660,9 @@ elseif (exist('EEG') == 1) & ~isnumeric(EEG) & ~isempty(EEG(1).data)
         
         % number of channels and channel locations
         % ----------------------------------------
-        chanlen    = unique( [ EEG.nbchan ] );
+        chanlen    = unique_bc( [ EEG.nbchan ] );
         chanlenstr = vararg2str( mattocell(chanlen) );
-        anyempty    = unique( cellfun( 'isempty', { EEG.chanlocs }) );
+        anyempty    = unique_bc( cellfun( 'isempty', { EEG.chanlocs }) );
         if length(anyempty) == 2,   chanlocs = 'mixed, yes and no';
         elseif anyempty == 0,       chanlocs = 'yes';
         else                        chanlocs = 'no';
@@ -1670,7 +1670,7 @@ elseif (exist('EEG') == 1) & ~isnumeric(EEG) & ~isempty(EEG(1).data)
 
         % ica weights
         % -----------
-        anyempty    = unique( cellfun( 'isempty', { EEG.icaweights }) );
+        anyempty    = unique_bc( cellfun( 'isempty', { EEG.icaweights }) );
         if length(anyempty) == 2,   icaweights = 'mixed, yes and no';
         elseif anyempty == 0,       icaweights = 'yes';
         else                        icaweights = 'no';
@@ -1771,9 +1771,9 @@ elseif (exist('EEG') == 1) & ~isnumeric(EEG) & ~isempty(EEG(1).data)
 
         % reference
         if isfield(EEG(1).chanlocs, 'ref')
-            [curref tmp allinds] = unique( { EEG(1).chanlocs.ref });
+            [curref tmp allinds] = unique_bc( { EEG(1).chanlocs.ref });
             maxind = 1;
-            for ind = unique(allinds)
+            for ind = unique_bc(allinds)
                 if length(find(allinds == ind)) > length(find(allinds == maxind))
                     maxind = ind;
                 end;

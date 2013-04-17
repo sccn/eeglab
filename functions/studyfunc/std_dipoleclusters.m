@@ -100,7 +100,7 @@ end;
     % extract IC cluster and data path info from STUDY structure
     clear clustcps fullpaths gdcomps
     x = cell(1,length(unique({STUDY.datasetinfo.subject})));
-    subjs = unique({STUDY.datasetinfo.subject});
+    subjs = unique_bc({STUDY.datasetinfo.subject});
     origlist = cell(1,length(unique({STUDY.datasetinfo.subject})));
     sets = cell(1,length(unique({STUDY.datasetinfo.subject})));
     for clust = 1:length(STUDY.cluster)
@@ -111,7 +111,7 @@ end;
             subjidx = strmatch(STUDY.datasetinfo(currset).subject,subjs);
             clustcps{clust}{subjidx}(end+1) = currcomp;
             origlist{subjidx} = [origlist{subjidx} currcomp];
-            [origlist{subjidx} idx] = unique(origlist{subjidx});
+            [origlist{subjidx} idx] = unique_bc(origlist{subjidx});
             sets{subjidx} = currset;
         end;    
     end;

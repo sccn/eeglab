@@ -83,11 +83,11 @@ for index = 1:length(STUDY.datasetinfo)
 
    % build electrode location structure for interpolation
    % ----------------------------------------------------
-   [tmp tmp2 id1] = intersect({tmplocs.labels}, {alllocs.labels});
+   [tmp tmp2 id1] = intersect_bc({tmplocs.labels}, {alllocs.labels});
    if isempty(chans)
        interplocs = alllocs;
    elseif iscell(chans)
-       [tmp tmp2 id2] = intersect( chans, {alllocs.labels});
+       [tmp tmp2 id2] = intersect_bc( chans, {alllocs.labels});
        interplocs = alllocs(union(id1, id2));
    else
        interplocs = chans;
@@ -151,7 +151,7 @@ function checkchans(STUDY, ALLEEG)
     for index = 1:length(STUDY.datasetinfo)
        tmpind  = STUDY.datasetinfo(index).index;
        tmplocs = ALLEEG(tmpind).chanlocs;
-       [tmp id1 id2] = intersect({tmplocs.labels}, {alllocs.labels});
+       [tmp id1 id2] = intersect_bc({tmplocs.labels}, {alllocs.labels});
        for ind = 1:length(id1)
            if tmplocs(id1(ind)).theta ~= alllocs(id2(ind)).theta
 

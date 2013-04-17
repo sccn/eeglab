@@ -87,7 +87,7 @@ function [EEG com] = pop_importegimat(filename, srate, latpoint0);
         for index = 1:length(allfields)
             allfields{index} = allfields{index}(1:findstr(allfields{index}, 'Segment')-2);
         end;
-        datatypes = unique(allfields);
+        datatypes = unique_bc(allfields);
         datatypes(cellfun(@isempty, datatypes)) = [];
 
         % read all data

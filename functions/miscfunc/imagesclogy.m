@@ -77,7 +77,7 @@ function imagesclogy(times,freqs,data,clim, xticks, yticks, varargin)
       divs = yticks;
   else 
       divs = linspace(log(freqs(1)), log(freqs(end)), 10);
-      divs = ceil(exp(divs)); divs = unique(divs); % ceil is critical here, round might misalign
+      divs = ceil(exp(divs)); divs = unique_bc(divs); % ceil is critical here, round might misalign
                                                % out-of border label with within border ticks
   end;
   set(gca, 'ytickmode', 'manual');

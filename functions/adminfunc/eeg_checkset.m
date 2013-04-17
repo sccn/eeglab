@@ -182,21 +182,21 @@ if length(EEG) > 1
             case 'epochconsist', % test epoch consistency
                 % ----------------------
                 res = 'no';
-                datasettype = unique( [ EEG.trials ] );
+                datasettype = unique_bc( [ EEG.trials ] );
                 if datasettype(1) == 1 & length(datasettype) == 1, return; % continuous data
                 elseif datasettype(1) == 1,                        return; % continuous and epoch data
                 end;
                 
-                allpnts = unique( [ EEG.pnts ] );
-                allxmin = unique( [ EEG.xmin ] );
+                allpnts = unique_bc( [ EEG.pnts ] );
+                allxmin = unique_bc( [ EEG.xmin ] );
                 if length(allpnts) == 1 & length(allxmin) == 1, res = 'yes'; end;
                 return;
                 
             case 'chanconsist'  % test channel number and name consistency
                 % ----------------------------------------
                 res = 'yes';
-                chanlen    = unique( [ EEG.nbchan ] );
-                anyempty    = unique( cellfun( 'isempty', { EEG.chanlocs }) );
+                chanlen    = unique_bc( [ EEG.nbchan ] );
+                anyempty    = unique_bc( cellfun( 'isempty', { EEG.chanlocs }) );
                 if length(chanlen) == 1 & all(anyempty == 0)
                     tmpchanlocs = EEG(1).chanlocs;
                     channame1 = { tmpchanlocs.labels };
@@ -212,7 +212,7 @@ if length(EEG) > 1
             case 'icaconsist'  % test ICA decomposition consistency
                 % ----------------------------------
                 res = 'yes';
-                anyempty    = unique( cellfun( 'isempty', { EEG.icaweights }) );
+                anyempty    = unique_bc( cellfun( 'isempty', { EEG.icaweights }) );
                 if length(anyempty) == 1 & anyempty(1) == 0
                     ica1 = EEG(1).icawinv;
                     for i = 2:length(EEG)

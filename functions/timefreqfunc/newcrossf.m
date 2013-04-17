@@ -353,7 +353,7 @@ for index=1:length(varargin)
 	if iscell(varargin{index}), varargin{index} = { varargin{index} }; end;
 end;
 if ~isempty(varargin)
-    [tmp indices] = unique(varargin(1:2:end)); % keep the first one
+    [tmp indices] = unique_bc(varargin(1:2:end)); % keep the first one
     varargin = varargin(sort(union(indices*2-1, indices*2))); % these 2 line remove duplicate arguments    
     try, g = struct(varargin{:}); 
     catch, error('Argument error in the {''param'', value} sequence'); end; 
@@ -828,7 +828,7 @@ if size(g.baseline,2) == 2
     baseln = [];
     for index = 1:size(g.baseline,1)
         tmptime   = find(timesout >= g.baseline(index,1) & timesout <= g.baseline(index,2));
-        baseln = union(baseln, tmptime);
+        baseln = union_bc(baseln, tmptime);
     end;
     if length(baseln)==0
         error('No point found in baseline');
@@ -885,7 +885,7 @@ else
             baselntmp = [];
             for index = 1:size(g.baseboot,1)
                 tmptime   = find(timesout >= g.baseboot(index,1) & timesout <= g.baseboot(index,2));
-                baselntmp = union(baselntmp, tmptime);
+                baselntmp = union_bc(baselntmp, tmptime);
             end;
         end;
         if prod(size(g.baseboot)) > 2
@@ -1135,7 +1135,7 @@ case 'on'
        set(h(11),'View',[90 90])
        divs = linspace(log(freqs(1)), log(freqs(end)), 10);
        set(gca, 'xtickmode', 'manual');
-       divs = ceil(exp(divs)); divs = unique(divs); % ceil is critical here, round might misalign
+       divs = ceil(exp(divs)); divs = unique_bc(divs); % ceil is critical here, round might misalign
                                                     % out-of border label with within border ticks
        set(gca, 'xtick', divs);       
    end;       

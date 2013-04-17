@@ -230,7 +230,7 @@ function g = fieldtest( fieldname, fieldtype, fieldval, tmpval, callfunc );
 function cella = removedup(cella, verbose)
 % make sure if all the values passed to unique() are strings, if not, exist
 %try
-    [tmp indices] = unique(cella(1:2:end));
+    [tmp indices] = unique_bc(cella(1:2:end));
     if length(tmp) ~= length(cella)/2
         myfprintf(verbose,'Note: duplicate ''key'', ''val'' parameter(s), keeping the last one(s)\n');
     end;

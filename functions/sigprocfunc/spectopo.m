@@ -566,7 +566,7 @@ if ~isempty(g.weights)
             pl2(index)=plot(freqs(1:maxfreqidx),compeegspecdB(g.icamaps(f),1:maxfreqidx)', ...
                             'color', colr, 'ButtonDownFcn', command); hold on;
         end
-        othercomps = setdiff(1:size(compeegspecdB,1), g.icamaps);
+        othercomps = setdiff_bc(1:size(compeegspecdB,1), g.icamaps);
         if ~isempty(othercomps)
             for index = 1:length(othercomps)
                 tmpcol  = allcolors{mod(index, length(allcolors))+1};

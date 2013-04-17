@@ -162,7 +162,7 @@ end;
 
 % exclude some channels
 % ---------------------
-chansin   = setdiff([1:dim1], g.exclude);
+chansin   = setdiff_bc([1:dim1], g.exclude);
 nchansin  = length(chansin);
 
 % return mean data

@@ -65,22 +65,22 @@ if ~isfield(STUDY.datasetinfo, 'index') & ~isempty(STUDY.datasetinfo), STUDY.dat
 
 % all summary fields
 % ------------------
-try, subject = unique({ STUDY.datasetinfo.subject });
+try, subject = unique_bc({ STUDY.datasetinfo.subject });
 catch, 
      subject = ''; 
      disp('Important warning: some datasets do not have subject codes; some functions may crash!');
 end;
-try, group = unique({ STUDY.datasetinfo.group });
+try, group = unique_bc({ STUDY.datasetinfo.group });
 catch, 
      group = {}; 
      % disp('Important warning: some datasets do not have group codes; some functions may crash!');
 end;
-try, condition = unique({ STUDY.datasetinfo.condition });
+try, condition = unique_bc({ STUDY.datasetinfo.condition });
 catch, 
      condition = {}; 
      disp('Important warning: some datasets do not have condition codes; some functions may crash!');
 end;
-try, session = unique([STUDY.datasetinfo.session]);
+try, session = unique_bc([STUDY.datasetinfo.session]);
 catch, 
      session = ''; 
      % disp('Important warning: some datasets do not have session numbers; some functions may crash!');

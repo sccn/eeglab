@@ -88,7 +88,7 @@ if isempty(val)
     for index = 1:length(ss(1).subs)
         if ~isstr(ss(1).subs{index}) % can only be ":"
             nonSingleton(end+1) = index;
-            ss2(1).subs{index} = setdiff([1:newdim1(index)], ss(1).subs{index}); % invert selection
+            ss2(1).subs{index} = setdiff_bc([1:newdim1(index)], ss(1).subs{index}); % invert selection
         end;
     end;
     if length(nonSingleton) > 1, error('A null assignment can have only one non-colon index'); end;
@@ -101,7 +101,7 @@ if isempty(val)
         newdim2 = [ prod(newdim2)-length(ss(1).subs{1}) ];
         if ~(newdim1(1) > 1 && all(newdim1(2:end) == 1)), newdim2 = [1 newdim2]; 
         else                                              newdim2 = [newdim2 1]; end;
-        newindices = setdiff([1:prod(newdim1)], ss(1).subs{1});
+        newindices = setdiff_bc([1:prod(newdim1)], ss(1).subs{1});
         for index = newindices
             fwrite(fid, tmpMMO.Data.x(index), 'float');
         end;
@@ -111,7 +111,7 @@ if isempty(val)
             newdim2(length(ss(1).subs)) = prod(newdim2(length(ss(1).subs):end));
             newdim2(length(ss(1).subs)+1:end) = [];
             if nonSingleton == length(ss(1).subs)
-                ss2(1).subs{end} = setdiff([1:newdim2(end)], ss(1).subs{end});
+                ss2(1).subs{end} = setdiff_bc([1:newdim2(end)], ss(1).subs{end});
             end;
         end;
         newdim2(nonSingleton) = newdim2(nonSingleton)-length(ss(1).subs{nonSingleton});

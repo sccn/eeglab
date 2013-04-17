@@ -195,10 +195,10 @@ for sweep = 1:nsweeps
 
 	% store the sweep or reject the sweep
 	% -----------------------------------
-	if trialtagI trialtag = 1;        else trialtag = ismember(sweep, TrialList); end;
+	if trialtagI trialtag = 1;        else trialtag = ismember_bc(sweep, TrialList); end;
 	if acceptagI acceptag = 1;        else acceptag =  ismember(s_accept, acceptype); end;
 	if typetagI  typetag  = 1; 	  else typetag  =  ismember(s_type, typerange); end;
-	if responsetagI responsetag  = 1; else responsetag  = ismember(s_response, responsetype); end;
+	if responsetagI responsetag  = 1; else responsetag  = ismember_bc(s_response, responsetype); end;
 	if rttagI       rttag  = 1; 	  else rttag  =  ismember(s_rt, rtrange); end;
 
 	if typetag

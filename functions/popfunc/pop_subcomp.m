@@ -81,7 +81,7 @@ if nargin < 2
 	components   = eval( [ '[' result{1} ']' ] );
     if ~isempty(result{2}), 
         components   = eval( [ '[' result{2} ']' ] );
-        components  = setdiff([1:size(EEG.icaweights,1)], components);
+        components  = setdiff_bc([1:size(EEG.icaweights,1)], components);
     end;
 end;
  
@@ -99,7 +99,7 @@ else
 end;
 
 fprintf('Computing projection ....\n');
-component_keep = setdiff(1:size(EEG.icaweights,1), components);
+component_keep = setdiff_bc(1:size(EEG.icaweights,1), components);
 compproj = EEG.icawinv(:, component_keep)*eeg_getdatact(EEG, 'component', component_keep, 'reshape', '2d');
 compproj = reshape(compproj, size(compproj,1), EEG.pnts, EEG.trials);
 
@@ -136,7 +136,7 @@ end;
 EEG.data(EEG.icachansind,:,:) = compproj;
 EEG.setname = [ EEG.setname ' pruned with ICA'];
 EEG.icaact  = [];
-goodinds    = setdiff(1:size(EEG.icaweights,1), components);
+goodinds    = setdiff_bc(1:size(EEG.icaweights,1), components);
 EEG.icawinv     = EEG.icawinv(:,goodinds);
 EEG.icaweights  = EEG.icaweights(goodinds,:);
 EEG.specicaact  = [];

@@ -277,7 +277,7 @@ voxvol = sum((point1(1:3)-point2(1:3)).^2)*g.subsample^3; % in mm
 
 % compute global subject entropy if necessary
 % -------------------------------------------
-vals   = unique(g.subjind); % the unique subject indices
+vals   = unique_bc(g.subjind); % the unique subject indices
 if strcmpi(g.method, 'relentropy') | strcmpi(g.method, 'entropy') %%%%% entropy %%%%%%%
     newind = zeros(size(g.subjind));
     for index = 1:length(vals) % foreach subject in the cluster

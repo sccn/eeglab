@@ -897,7 +897,7 @@ else
                         % update the cluster list with the new cluster
                         %
                         clus_names([optionalcls(reassign_param{1})]) = [];
-                        cls = setdiff(cls, std_mrg); % remove from the GUI clusters list the merged clusters
+                        cls = setdiff_bc(cls, std_mrg); % remove from the GUI clusters list the merged clusters
                         cls(end+1) = length(STUDY.cluster); % update the GUI clusters list with the new cluster
                         N  = length(cls);
                         %

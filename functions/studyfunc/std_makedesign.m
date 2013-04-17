@@ -194,7 +194,7 @@ datsubjects = { STUDY.datasetinfo.subject };
 if ~isempty(opt.subjselect)
     allsubjects = opt.subjselect;
 else
-    allsubjects = unique( datsubjects );
+    allsubjects = unique_bc( datsubjects );
 end;
     
 % delete design files
@@ -256,11 +256,11 @@ if ~isempty(opt.datselect)
     myfprintf(opt.verbose, 'Data preselection for STUDY design\n');
     for ind = 1:2:length(opt.datselect)
         [ dattmp dattrialstmp ] = std_selectdataset( STUDY, ALLEEG, opt.datselect{ind}, opt.datselect{ind+1});
-        datselect      = intersect(datselect, dattmp);
+        datselect      = intersect_bc(datselect, dattmp);
         dattrialselect = intersectcell(dattrialselect, dattrialstmp);
     end;
 end;
-datselect = intersect(datselect, strmatchmult(allsubjects, datsubjects));
+datselect = intersect_bc(datselect, strmatchmult(allsubjects, datsubjects));
 
 % get the dataset and trials for each of the ind. variable
 % --------------------------------------------------------
@@ -302,9 +302,9 @@ for n1 = 1:nf1
     for n2 = 1:nf2
         % create design for this set of conditions and subject
         % ----------------------------------------------------
-        datasets = intersect(intersect(dats1{n1}, dats2{n2}), datselect);
+        datasets = intersect_bc(intersect(dats1{n1}, dats2{n2}), datselect);
         if ~isempty(datasets)
-            subjects = unique(datsubjects(datasets));
+            subjects = unique_bc(datsubjects(datasets));
             for s = 1:length(subjects)
                 datsubj = datasets(strmatch(subjects{s}, datsubjects(datasets), 'exact'));
                 des.cell(count).dataset   = datsubj;
@@ -352,8 +352,8 @@ else
         end
     end;
 
-    %allval1 = unique(cellfun(@(x)x{1}, { des.cell.value }, 'uniformoutput', false));
-    %allval2 = unique(cellfun(@(x)x{2}, { des.cell.value }, 'uniformoutput', false));
+    %allval1 = unique_bc(cellfun(@(x)x{1}, { des.cell.value }, 'uniformoutput', false));
+    %allval2 = unique_bc(cellfun(@(x)x{2}, { des.cell.value }, 'uniformoutput', false));
     des.name              = opt.name;
     des.filepath          = opt.filepath;
     des.variable(1).label = opt.variable1;
@@ -364,7 +364,7 @@ else
     des.variable(2).value   = opt.values2;
     des.include             = opt.datselect;
     des.cases.label = 'subject';
-    des.cases.value = unique( { des.cell.case });
+    des.cases.value = unique_bc( { des.cell.case });
 end;
 
 fieldorder = { 'name' 'filepath' 'variable' 'cases' 'include' 'cell' };
@@ -403,7 +403,7 @@ if nargin > 2
     res = intersectcell(a, intersectcell(b, c));
 else
     for index = 1:length(a)
-        res{index} = intersect(a{index}, b{index});
+        res{index} = intersect_bc(a{index}, b{index});
     end;
 end;
 

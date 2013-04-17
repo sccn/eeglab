@@ -97,7 +97,7 @@ if isempty(val)
     for index = 1:length(subs)
         if ~isstr(subs{index}) % can only be ":"
             nonSingleton(end+1) = index;
-            subs2 = setdiff([1:newdim1(index)], subs{index}); % invert selection
+            subs2 = setdiff_bc([1:newdim1(index)], subs{index}); % invert selection
         end;
     end;
     if length(nonSingleton) > 1, error('A null assignment can have only one non-colon index'); end;
@@ -108,7 +108,7 @@ if isempty(val)
     if length(ss(1).subs) == 1
         fid = fopen(newFileName, 'w');
         newdim2 = prod(newdim2)-length(ss(1).subs{1});
-        newindices = setdiff([1:prod(newdim1)], ss(1).subs{1});
+        newindices = setdiff_bc([1:prod(newdim1)], ss(1).subs{1});
         for index = newindices
             fwrite(fid, tmpMMO.Data.x(index), 'float');
         end;

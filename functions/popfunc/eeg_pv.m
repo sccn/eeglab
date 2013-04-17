@@ -128,7 +128,7 @@ if progressive
 end
 
 if ~isempty(artcomps)
-   [a b c] = intersect(artcomps,comps);
+   [a b c] = intersect_bc(artcomps,comps);
    if ~isempty(a)
       if ~progressive
         if length(a)>1

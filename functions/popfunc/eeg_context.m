@@ -58,7 +58,7 @@
 %    %
 % >> trts      = find(trgs(:,4)==2);   % targets followed by an 'rt' (before any 'square')
 % >> pos3      = find(trgfld = 3);     % targets with 'position'=3 (numeric field value).
-% >> selevents = intersect(trts,pos3); % target events by both criteria
+% >> selevents = intersect_bc(trts,pos3); % target events by both criteria
 % >> selepochs = trgs(selevents,3);    % epoch numbers centered on the selected target events
 %
 % Author: Scott Makeig, SCCN, Institute for Neural Computation, UCSD, March 27, 2004

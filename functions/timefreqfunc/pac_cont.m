@@ -401,7 +401,7 @@ end;
 % --------------------------
 timeindices = round(eeg_lat2point(timevals, 1, srate, tlimits, 1E-3));
 if length(timeindices) < length(unique(timeindices))
-    timeindices = unique(timeindices)
+    timeindices = unique_bc(timeindices)
     verboseprintf(verbose, 'Warning: duplicate times, reduce the number of output times\n');
 end;
 if length(unique(timeindices(2:end)-timeindices(1:end-1))) > 1

@@ -316,7 +316,7 @@ function event = recomputelatency( event, indices, srate, timeunit, align, oldev
         else
             latfirstevent = event(-align.val+1).latency;
         end;
-        for index = setdiff(indices, 1)
+        for index = setdiff_bc(indices, 1)
             event(index).latency = round(event(index).latency-latfirstevent)*newfactor+latfirstevent;
         end;
         if ~isempty(oldevents)

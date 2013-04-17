@@ -78,9 +78,9 @@ function [ res, params2 ] = std_filecheck(filename, params2, guiflag, ignorefiel
     % --------------------------------
     params1 = orderfields(params1);
     params2 = orderfields(params2);
-    fields1 = fieldnames( params1 ); fields1 = setdiff( fields1, ignorefields);
-    fields2 = fieldnames( params2 ); fields2 = setdiff( fields2, ignorefields);
-    allfields = union(fields1, fields2);
+    fields1 = fieldnames( params1 ); fields1 = setdiff_bc( fields1, ignorefields);
+    fields2 = fieldnames( params2 ); fields2 = setdiff_bc( fields2, ignorefields);
+    allfields = union_bc(fields1, fields2);
     
     % make fields the same
     % --------------------

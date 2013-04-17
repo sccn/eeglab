@@ -218,7 +218,7 @@ if strcmpi(g.sorttrial, 'on')
 else
     g.trial(ismember(g.trial,g.notrial)) = [];
     % still warn about & remove duplicate trials (may be removed in the future)
-    [p,q] = unique(g.trial);
+    [p,q] = unique_bc(g.trial);
     if length(p) ~= length(g.trial)
         disp('Warning: trial selection contained duplicated elements, which were removed.'); 
     end    
@@ -245,7 +245,7 @@ if strcmpi(g.sorttrial, 'on')
 else
     g.channel(ismember(lower(g.channel),lower(g.nochannel))) = [];
     % still warn about & remove duplicate channels (may be removed in the future)
-    [p,q] = unique(g.channel);
+    [p,q] = unique_bc(g.channel);
     if length(p) ~= length(g.channel)
         disp('Warning: channel selection contained duplicated elements, which were removed.'); 
     end    
@@ -261,7 +261,7 @@ if ~isempty(EEG.chanlocs)
             % translate channel names into indices
             [inds,names] = eeg_decodechan(EEG.chanlocs, g.channel);
             % and sort the indices back into the original order of channel names
-            [tmp,I] = ismember(lower(g.channel),lower(names)); 
+            [tmp,I] = ismember_bc(lower(g.channel),lower(names)); 
             g.channel = inds(I);
         end
     end
@@ -347,8 +347,8 @@ if ~isempty(g.trialcond)
         tmpepoch = EEG.epoch;
 	    eval( [ 'Itriallow  = find( [ tmpepoch(:).' ttfields{index} ' ] >= tt.' ttfields{index} '(1) );' ] );
 	    eval( [ 'Itrialhigh = find( [ tmpepoch(:).' ttfields{index} ' ] <= tt.' ttfields{index} '(end) );' ] );
-	    Itrialtmp = intersect(Itriallow, Itrialhigh);
-	    g.trial = intersect( g.trial(:)', Itrialtmp(:)');
+	    Itrialtmp = intersect_bc(Itriallow, Itrialhigh);
+	    g.trial = intersect_bc( g.trial(:)', Itrialtmp(:)');
    end;	   
 end;
 
@@ -445,7 +445,7 @@ if length(g.trial) ~= EEG.trials & ~isempty(EEG.event)
                     EEG.event(indexevent).epoch = newindex;
                 end;
             end;
-            diffevent = setdiff([1:length(EEG.event)], keepevent);
+            diffevent = setdiff_bc([1:length(EEG.event)], keepevent);
             if ~isempty(diffevent)
                 disp(['Pop_select: removing ' int2str(length(diffevent)) ' unreferenced events']);
                 EEG.event(diffevent) = [];
@@ -538,8 +538,8 @@ end;
 if ~isequal(g.channel,1:size(EEG.data,1)) || ~isequal(g.trial,1:size(EEG.data,3))
     %EEG.data  = EEG.data(g.channel, :, g.trial);
     % this code belows is prefered for memory mapped files
-    diff1 = setdiff([1:size(EEG.data,1)], g.channel);
-    diff2 = setdiff([1:size(EEG.data,3)], g.trial);
+    diff1 = setdiff_bc([1:size(EEG.data,1)], g.channel);
+    diff2 = setdiff_bc([1:size(EEG.data,3)], g.trial);
     if ~isempty(diff1)
          EEG.data(diff1, :, :) = [];
     end;
@@ -570,7 +570,7 @@ end;
 % ------------
 if ~isempty(EEG.icachansind)
     
-    rmchans = setdiff( EEG.icachansind, g.channel ); % channels to remove
+    rmchans = setdiff_bc( EEG.icachansind, g.channel ); % channels to remove
     
     % channel sub-indices
     % -------------------
@@ -651,7 +651,7 @@ if ~isempty(EEG.event)
     for index = 1:length( g.trial )
         currentevents = find( EEG.event(:,2) == g.trial(index));
         Indexes = [ Indexes ones(1, length(currentevents))*index ];
-        Ievent  = union( Ievent, currentevents );
+        Ievent  = union_bc( Ievent, currentevents );
     end;
     EEG.event = EEG.event( Ievent,: );
     EEG.event(:,2) = Indexes(:);

@@ -252,10 +252,10 @@ if strcmpi(opt.plot, 'on')
     figure; imagesc(t, log(f), erspinterp);
     ft = str2num(get(gca,'yticklabel'));
     ft = exp(1).^ft;
-    ft = unique(round(ft));
+    ft = unique_bc(round(ft));
     ftick = get(gca,'ytick');
     ftick = exp(1).^ftick;
-    ftick = unique(round(ftick));
+    ftick = unique_bc(round(ftick));
     ftick = log(ftick);
     set(gca,'ytick',ftick);
     set(gca,'yticklabel', num2str(ft));

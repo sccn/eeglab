@@ -655,7 +655,7 @@ if ~strcmpi(STYLE,'grid')                     % if not plot grid only
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% channels to plot %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 if ~isempty(plotchans)
-    plotchans = intersect(plotchans, indices);
+    plotchans = intersect_bc(plotchans, indices);
 end;
 if ~isempty(Values) & ~strcmpi( STYLE, 'blank') & isempty(plotchans)
     plotchans = indices;
@@ -670,7 +670,7 @@ end
 
 if CHOOSECHANTYPE, 
     newplotchans = eeg_chantype(loc_file,chantype); 
-    plotchans = intersect(newplotchans, plotchans);
+    plotchans = intersect_bc(newplotchans, plotchans);
 end
 
 %
@@ -686,7 +686,7 @@ if isfield(CHANINFO, 'icachansind') & ~isempty(Values) & length(Values) ~= lengt
         % and ICA components also use a subject of channel
         % we must find the new indices for these channels
         
-        plotchans = intersect(CHANINFO.icachansind, plotchans);
+        plotchans = intersect_bc(CHANINFO.icachansind, plotchans);
         tmpvals   = zeros(1, length(tmpeloc));
         tmpvals(CHANINFO.icachansind) = Values;
         Values    = tmpvals;
@@ -712,8 +712,8 @@ end;
 %%%%%%%%%%%%%%%%%%% remove infinite and NaN values %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 
 if length(Values) > 1
-    inds          = union(find(isnan(Values)), find(isinf(Values))); % NaN and Inf values
-    plotchans     = setdiff(plotchans, inds);
+    inds          = union_bc(find(isnan(Values)), find(isinf(Values))); % NaN and Inf values
+    plotchans     = setdiff_bc(plotchans, inds);
 end;
 if strcmp(plotgrid,'on')
     plotchans = setxor(plotchans,gchans);   % remove grid chans from head plotchans   
@@ -865,7 +865,7 @@ if ~isempty(EMARKER2CHANS)
        error('emarker2 not defined for style ''blank'' - use marking channel numbers in place of data');
     else % mark1chans and mark2chans are subsets of pltchans for markers 1 and 2
        [tmp1 mark1chans tmp2] = setxor(pltchans,EMARKER2CHANS);
-       [tmp3 tmp4 mark2chans] = intersect(EMARKER2CHANS,pltchans);
+       [tmp3 tmp4 mark2chans] = intersect_bc(EMARKER2CHANS,pltchans);
     end
 end
 

@@ -167,7 +167,7 @@ end;
 
 
 function color = eventColorBasedOnTypeAndAcceptance(eventColors, eventNumber, epochNumber, eventLatency,timeWarp)
-accepted = ismember(epochNumber, timeWarp.epochs);
+accepted = ismember_bc(epochNumber, timeWarp.epochs);
 if ~isempty(timeWarp.latencies)
     matchedEpoch = find(timeWarp.epochs ==  epochNumber);
     accepted = accepted && ~isempty(find(timeWarp.latencies(matchedEpoch,:) == eventLatency, 1));

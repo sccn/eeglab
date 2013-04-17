@@ -84,7 +84,7 @@ end;
 if ~isempty(opt.dataset)
     tagdel = [ tagdel setdiff([1:length(ALLEEG)], opt.dataset) ];
 end;
-tagdel = unique(tagdel);
+tagdel = unique_bc(tagdel);
 
 % find new dataset indices
 % ------------------------

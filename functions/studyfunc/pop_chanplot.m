@@ -275,7 +275,7 @@ else
                 %    subject = STUDY.subject{onechan-1};
                 %else
                 %    changrpstruct = STUDY.changrp(changrp);
-                %    allsubjects   = unique({ STUDY.datasetinfo([ changrpstruct.setinds{:} ]).subject });
+                %    allsubjects   = unique_bc({ STUDY.datasetinfo([ changrpstruct.setinds{:} ]).subject });
                 %    subject = allsubjects{onechan-1};
                 %end;
 
@@ -347,13 +347,13 @@ else
                 % ------------------------
                 %setind = STUDY.setind .* (changrp.chaninds > 0); % set to 0 the cell not
                 %%                                       % containing any electrode
-                %allchansets = unique( setind(find(setind(:))) );
+                %allchansets = unique_bc( setind(find(setind(:))) );
 
                 % Generate channel list
                 % ---------------------
                 chanid{1} = 'All subjects';
                 if length(changrp) == 1
-                    allsubjects = unique({ STUDY.design(STUDY.currentdesign).cell([ changrp.setinds{:} ]).case });
+                    allsubjects = unique_bc({ STUDY.design(STUDY.currentdesign).cell([ changrp.setinds{:} ]).case });
                     for l = 1:length(allsubjects)
                         chanid{end+1} = [ allsubjects{l} ' ' changrp.name ];
                     end;

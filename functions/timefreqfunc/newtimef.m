@@ -491,7 +491,7 @@ end
 % build a structure for keyword arguments
 % --------------------------------------
 if ~isempty(varargin)
-    [tmp indices] = unique(varargin(1:2:end));
+    [tmp indices] = unique_bc(varargin(1:2:end));
     varargin = varargin(sort(union(indices*2-1, indices*2))); % these 2 lines remove duplicate arguments
     try, g = struct(varargin{:});
     catch, error('Argument error in the {''param'', value} sequence'); end;
@@ -1183,7 +1183,7 @@ if size(g.baseline,2) == 2
     baseln = [];
     for index = 1:size(g.baseline,1)
         tmptime   = find(timesout >= g.baseline(index,1) & timesout <= g.baseline(index,2));
-        baseln = union(baseln, tmptime);
+        baseln = union_bc(baseln, tmptime);
     end;
     if length(baseln)==0
         error('No point found in baseline');
@@ -1316,7 +1316,7 @@ if ~isnan(g.alpha) | ~isempty(find(~isnan(g.pboot))) | ~isempty(find(~isnan(g.rb
                 if isempty(tmptime),
                     fprintf('Warning: empty baseline interval [%3.2f %3.2f]\n', g.baseboot(index,1), g.baseboot(index,2));
                 end;
-                baselntmp = union(baselntmp, tmptime);
+                baselntmp = union_bc(baselntmp, tmptime);
             end;
         end;
         if prod(size(g.baseboot)) > 2
@@ -1370,7 +1370,7 @@ if ~isnan(g.alpha) | ~isempty(find(~isnan(g.pboot))) | ~isempty(find(~isnan(g.rb
                     if isempty(tmptime),
                         fprintf('Warning: empty baseline interval [%3.2f %3.2f]\n', g.baseboot(index,1), g.baseboot(index,2));
                     end;
-                    baselntmp = union(baselntmp, tmptime);
+                    baselntmp = union_bc(baselntmp, tmptime);
                 end;
             end;
             if prod(size(g.baseboot)) > 2
@@ -1718,7 +1718,7 @@ switch lower(g.plotersp)
                 set(h(5),'View',[90 90])
                 divs = linspace(log(freqs(1)), log(freqs(end)), 10);
                 set(gca, 'xtickmode', 'manual');
-                divs = ceil(exp(divs)); divs = unique(divs); % ceil is critical here, round might misalign
+                divs = ceil(exp(divs)); divs = unique_bc(divs); % ceil is critical here, round might misalign
                 set(gca, 'xtick', divs);
             end;
             set(h(5),'TickLength',[0.020 0.025]);
@@ -1911,7 +1911,7 @@ switch lower(g.plotitc)
             ylim(g.itcavglim)
             divs = linspace(log(freqs(1)), log(freqs(end)), 10);
             set(gca, 'xtickmode', 'manual');
-            divs = ceil(exp(divs)); divs = unique(divs); % ceil is critical here, round might misalign
+            divs = ceil(exp(divs)); divs = unique_bc(divs); % ceil is critical here, round might misalign
             set(gca, 'xtick', divs);
          end;
 

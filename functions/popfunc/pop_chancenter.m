@@ -84,7 +84,7 @@ end;
 
 % remove channels
 % ---------------
-c = setdiff([1:length(chanlocs)], union(omitchans, find(cellfun('isempty', { chanlocs.theta }))));
+c = setdiff_bc([1:length(chanlocs)], union(omitchans, find(cellfun('isempty', { chanlocs.theta }))));
 
 % optimize center
 % ---------------

@@ -197,8 +197,8 @@ function [inds1 inds2] = getsubjcomps(STUDY, subj, setlist1, setlist2, complist1
     inds1 = [];
     inds2 = [];
     datasets = strmatch(STUDY.subject{subj}, { STUDY.datasetinfo.subject } ); % all datasets of subject
-    [tmp1] = intersect(setlist1, datasets);
-    [tmp2] = intersect(setlist2, datasets);
+    [tmp1] = intersect_bc(setlist1, datasets);
+    [tmp2] = intersect_bc(setlist2, datasets);
     if length(tmp1) > 1, error('This function does not support sessions for subjects'); end;
     if length(tmp2) > 1, error('This function does not support sessions for subjects'); end;
     if tmp1 ~= tmp2, error('Different datasets while it should be the same'); end;

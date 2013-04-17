@@ -111,7 +111,7 @@ if isempty(acceptableEpochs)
 else
     timeWarp = cell2mat(timeWarp(acceptableEpochs));
    
-    rejectedEpochesBasedOnLateny = union(rejectEventsBasedOnAbsoluteLatency(timeWarp), rejectEventsBasedOnRelativeLatency(timeWarp));
+    rejectedEpochesBasedOnLateny = union_bc(rejectEventsBasedOnAbsoluteLatency(timeWarp), rejectEventsBasedOnRelativeLatency(timeWarp));
     timeWarp(:,rejectedEpochesBasedOnLateny) = [];
     acceptableEpochs(rejectedEpochesBasedOnLateny) = [];
     
@@ -135,7 +135,7 @@ timeWarpStructure.eventSequence = eventSequence;
         for eventNumber = 1:size(timeWarpDiff, 1)
             rejectedBasedOnLateny = [rejectedBasedOnLateny find(abs(timeWarpDiff(eventNumber, :)-  mean(timeWarpDiff(eventNumber, :))) > maxSTDForRelative * std(timeWarpDiff(eventNumber, :)))];
         end;
-        rejectedEpochesBasedOnLateny = unique(rejectedBasedOnLateny);
+        rejectedEpochesBasedOnLateny = unique_bc(rejectedBasedOnLateny);
     end
 
     function rejectedBasedOnLateny =  rejectEventsBasedOnAbsoluteLatency(timeWarp)
@@ -145,7 +145,7 @@ timeWarpStructure.eventSequence = eventSequence;
         for eventNumber = 1:size(timeWarp, 1)
             rejectedBasedOnLateny = [rejectedBasedOnLateny find(abs(timeWarp(eventNumber, :)-  mean(timeWarp(eventNumber, :))) >  maxSTDForAbsolute* std(timeWarp(eventNumber, :)))];
         end;
-        rejectedEpochesBasedOnLateny = unique(rejectedBasedOnLateny);
+        rejectedEpochesBasedOnLateny = unique_bc(rejectedBasedOnLateny);
     end
 
     function [firstLatency resultEventNumbers] = eventsOfCertainTypeAfterCertainLatencyInEpoch(epoch, certainEventType, certainLatency, certainCondition)

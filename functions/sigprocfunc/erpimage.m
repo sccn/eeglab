@@ -1811,7 +1811,7 @@ else
     if ~isempty(auxvar)
         auxvar = auxvar(:,sortidx);
     end
-    uni_svar=unique(sortvar);
+    uni_svar=unique_bc(sortvar);
     n_ties=0;
     tie_dist=zeros(1,length(uni_svar));
     loop_ct=0;
@@ -2403,7 +2403,7 @@ if ~isempty(sortvar_limits)
         axis([v(1:2) img_mn img_mx]);
         id1=find(sortvar>=sortvar_limits(1));
         id2=find(sortvar<=sortvar_limits(2));
-        id=intersect(id1,id2);
+        id=intersect_bc(id1,id2);
         fprintf('%d epochs fall within sortvar limits.\n',length(id));
         urdata=urdata(:,id);
         if ~isempty(tsurdata),
@@ -2441,7 +2441,7 @@ if strcmpi(NoShow, 'no')
             in_range=find((img_ytick_lab>=mn) & (img_ytick_lab<=mx));
             img_ytick_lab=img_ytick_lab(in_range);
         else
-            img_ytick_lab=unique(img_ytick_lab); %make sure it is sorted
+            img_ytick_lab=unique_bc(img_ytick_lab); %make sure it is sorted
             in_range=find((img_ytick_lab>=mn) & (img_ytick_lab<=mx));
             if length(img_ytick_lab)~=length(in_range),
                 fprintf('\n***Warning***\n');

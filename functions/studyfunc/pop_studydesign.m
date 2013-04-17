@@ -378,9 +378,9 @@ elseif isstr(STUDY)
                         tmpcell = { tmpcell{:} usrdat.factorvals{val1}{indCell} };
                     end;
                 end;
-                usrdat.factorvals{val1}{end+1} = unique(tmpcell);
+                usrdat.factorvals{val1}{end+1} = unique_bc(tmpcell);
             else
-                usrdat.factorvals{val1}{end+1} = unique([ usrdat.factorvals{val1}{vals} ]);
+                usrdat.factorvals{val1}{end+1} = unique_bc([ usrdat.factorvals{val1}{vals} ]);
             end;
             set(findobj(fig, 'tag', ['lbval' num2str(factval) ]), 'string', encodevals(usrdat.factorvals{val1}));
             
@@ -400,7 +400,7 @@ elseif isstr(STUDY)
             % select subjects
             eval( [ 'allsetvals = { datinfo.' factor '};' ]);
             indset = strmatch(factorval, allsetvals, 'exact');
-            subjects = unique( { datinfo(indset).subject } );
+            subjects = unique_bc( { datinfo(indset).subject } );
             
             % change the subject listbox
             val     = get(findobj(fig, 'tag', 'popupselect'), 'value');
@@ -475,7 +475,7 @@ function res = strmatchmult(a, b);
         res(index) = tmpi(1); % in case there is a duplicate
     end;
     %[tmp ind] = mysetdiff(b, a);
-    %res = setdiff([1:length(b)], ind);
+    %res = setdiff_bc([1:length(b)], ind);
 
 function cellarray = mysort(cellarray)
     return; % was crashing for combinations of selection
@@ -486,8 +486,8 @@ function cellarray = mysort(cellarray)
 
 function [cellout inds ] = mysetdiff(cell1, cell2);
     if (~isempty(cell1) && isstr(cell1{1})) || (~isempty(cell2) && isstr(cell2{1}))
-         [ cellout inds ] = setdiff(cell1, cell2);
-    else [ cellout inds ] = setdiff([ cell1{:} ], [ cell2{:} ]);
+         [ cellout inds ] = setdiff_bc(cell1, cell2);
+    else [ cellout inds ] = setdiff_bc([ cell1{:} ], [ cell2{:} ]);
          cellout = mattocell(cellout);
     end;
 

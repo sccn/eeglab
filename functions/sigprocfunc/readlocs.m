@@ -572,10 +572,10 @@ if nargout > 2
     end;
     
     indices           = find(~cellfun('isempty', tmptheta));
-    indices           = intersect(find(~cellfun('isempty', tmpx)), indices);
+    indices           = intersect_bc(find(~cellfun('isempty', tmpx)), indices);
     indices           = sort(indices);
     
-    indbad            = setdiff(1:length(eloc), indices);
+    indbad            = setdiff_bc(1:length(eloc), indices);
     tmptheta(indbad)  = { NaN };
     theta             = [ tmptheta{:} ];
 end;

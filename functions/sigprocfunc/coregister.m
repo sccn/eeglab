@@ -531,8 +531,8 @@ function plotelec(elec, elecshow, color, tag);
     % make bigger if fiducial
     % ------------------------
     fidlist = { 'nz' 'lpa' 'rpa' 'nazion' 'left' 'right' 'nasion' 'fidnz' 'fidt9' 'fidt10'};
-    [tmp fids ] = intersect(lower(elec.label(elecshow)), fidlist);
-    nonfids     = setdiff(1:length(elec.label(elecshow)), fids);
+    [tmp fids ] = intersect_bc(lower(elec.label(elecshow)), fidlist);
+    nonfids     = setdiff_bc(1:length(elec.label(elecshow)), fids);
     h1 = plot3(X1(nonfids),Y1(nonfids),Z1(nonfids), 'o', 'color', color); hold on;
     set(h1, 'tag', tag, 'marker', '.', 'markersize', 20);
     if ~isempty(fids)
@@ -646,8 +646,8 @@ function [elec1, transf] = warp_chans(elec1, elec2, chanlist, warpmethod)
     %cfg.feedback = 'yes';
     cfg.channel  = chanlist;
     elec3 = electroderealign(cfg);
-    [tmp ind1 ] = intersect( lower(elec1.label), lower(chanlist) );
-    [tmp ind2 ] = intersect( lower(elec2.label), lower(chanlist) );
+    [tmp ind1 ] = intersect_bc( lower(elec1.label), lower(chanlist) );
+    [tmp ind2 ] = intersect_bc( lower(elec2.label), lower(chanlist) );
     
     transf = elec3.m;
     transf(4:6) = transf(4:6)/180*pi;
@@ -666,7 +666,7 @@ function [elec1, transf] = warp_chans(elec1, elec2, chanlist, warpmethod)
 % --------------------------------------------
 function transf = checktransf(transf, elec1, elec2)
     
-    [tmp ind1 ind2] = intersect( elec1.label, elec2.label );
+    [tmp ind1 ind2] = intersect_bc( elec1.label, elec2.label );
     
     transfmat = traditionaldipfit(transf);
     tmppnt = transfmat*[ elec1.pnt ones(size(elec1.pnt,1),1) ]';

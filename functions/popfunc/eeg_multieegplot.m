@@ -79,7 +79,7 @@ if ndims(data) > 2 % --------------- considering epoched EEG data
 
    		% remove duplicates
    		% -----------------
-		%[tmp I] = unique( rejeegplot(:,1) );
+		%[tmp I] = unique_bc( rejeegplot(:,1) );
 		%rejeegplot = rejeegplot(I,:);
    end;
 else % ---------------------------------------- considering continuous EEG

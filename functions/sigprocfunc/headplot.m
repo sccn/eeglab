@@ -198,13 +198,13 @@ if isstr(values)
     % ----------------
     if isempty(g.plotchans), g.plotchans = [1:length(eloc_file)]; end;
     if ~isfield(g.chaninfo, 'nosedir'),     g.chaninfo(1).nosedir     = '+x'; end;
-    indices = intersect(g.plotchans, indices);
+    indices = intersect_bc(g.plotchans, indices);
     
     % if ICA select subset of channels if necessary
     % ---------------------------------------------
     if ~isfield(g.chaninfo, 'icachansind'), g.chaninfo(1).icachansind = 1:length(eloc_file); end;
     if strcmpi(g.ica, 'on'), 
-        rmchans2 = setdiff( g.chaninfo.icachansind, indices ); % channels to remove (non-plotted) 
+        rmchans2 = setdiff_bc( g.chaninfo.icachansind, indices ); % channels to remove (non-plotted) 
         newinds = 1:length(g.chaninfo.icachansind);     
         allrm = [];       
         % remove non-plotted channels from indices

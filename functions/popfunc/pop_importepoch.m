@@ -244,11 +244,11 @@ if ~iscell(fieldlist)
     otherfieldlist = { fieldlist };
     fieldlist = { fieldlist };
 end;
-otherfieldlist = setdiff( fieldlist, g.latencyfields);
-otherfieldlist = setdiff( otherfieldlist, g.typefield);
+otherfieldlist = setdiff_bc( fieldlist, g.latencyfields);
+otherfieldlist = setdiff_bc( otherfieldlist, g.typefield);
 for index = 1:length(g.durationfields)
     if isstr(g.durationfields{index})
-        otherfieldlist = setdiff( otherfieldlist, g.durationfields{index});
+        otherfieldlist = setdiff_bc( otherfieldlist, g.durationfields{index});
     end;
 end;
 if size(values,1) ~= EEG.trials

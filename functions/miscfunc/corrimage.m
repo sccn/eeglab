@@ -392,7 +392,7 @@ if ~strcmp('plot', 'no')
         sigouttmp(indices) = 0;
     elseif g.pmask < 0 % both sides, i.e. 0.01
         sigouttmp = sigoutplot;
-        indices = intersect(find( alpha(:) > -g.pmask), find( alpha(:) < 1+g.pmask));
+        indices = intersect_bc(find( alpha(:) > -g.pmask), find( alpha(:) < 1+g.pmask));
         sigouttmp(indices) = 0;
     else
         sigouttmp = sigoutplot;

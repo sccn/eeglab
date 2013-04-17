@@ -216,7 +216,7 @@ for iReject = 1:length(opt.threshold)
     freqLim   = opt.freqlimit{iReject};
     if length(threshold) == 1, threshold = [ -100 threshold ]; end;
     [I1 tmpRejEpoch NS Erej] = eegthresh( meanspectrum, size(meanspectrum,2), 1, threshold(1), threshold(2), [freqspectrum(1) freqspectrum(end)], freqLim(1), freqLim(2));
-    rejepoch = union(rejepoch, tmpRejEpoch);
+    rejepoch = union_bc(rejepoch, tmpRejEpoch);
     if strcmpi(opt.verbose, 'on')
         fprintf('%d regions selected for rejection, threshold %3.2f-%3.2f dB, frequency limits %3.1f-%3.1f\n', length(tmpRejEpoch), threshold(1), threshold(2), freqLim(1), freqLim(2));
     end;

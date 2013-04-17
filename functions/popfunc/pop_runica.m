@@ -175,7 +175,7 @@ if nargin < 2 | selectamica
         indempty = cellfun('isempty', alltypes);
         alltypes(indempty) = '';
         try, 
-            alltypes = unique(alltypes);
+            alltypes = unique_bc(alltypes);
         catch, 
             alltypes = '';
         end;
@@ -254,12 +254,12 @@ elseif length(ALLEEG) > 1 & strcmpi(g.concatcond, 'on')
             allinds = strmatch(allsubjects{index}, allsubjects, 'exact');
             rmind = [];
             % if we have different sessions they will not be concatenated
-            for tmpi = setdiff(allinds,index)'
+            for tmpi = setdiff_bc(allinds,index)'
                 if ~isequal(allsessions(index), allsessions(tmpi)), rmind = [rmind tmpi];
                 %elseif ~isequal(allgroups(index), allgroups(tmpi)), rmind = [rmind tmpi]; 
                 end;
             end;
-            allinds = setdiff(allinds, rmind);
+            allinds = setdiff_bc(allinds, rmind);
             fprintf('Found %d datasets for subject ''%s''\n', length(allinds), allsubjects{index});
             dats = { dats{:} allinds };
             alltags(allinds) = 1;

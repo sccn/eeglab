@@ -56,7 +56,7 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method)
         lab1 = { bad_elec.labels };
         tmpchanlocs = EEG.chanlocs;
         lab2 = { tmpchanlocs.labels };
-        [tmp tmpchan] = setdiff( lab2, lab1);
+        [tmp tmpchan] = setdiff_bc( lab2, lab1);
         tmpchan = sort(tmpchan);
         if ~isempty(tmpchan)
             newchanlocs = [];
@@ -77,14 +77,14 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method)
         lab1 = { bad_elec.labels };
         tmpchanlocs = EEG.chanlocs;
         lab2 = { tmpchanlocs.labels };
-        [tmp badchans] = setdiff( lab1, lab2);
+        [tmp badchans] = setdiff_bc( lab1, lab2);
         fprintf('Interpolating %d channels...\n', length(badchans));
         if length(badchans) == 0, return; end;
         goodchans      = sort(setdiff(1:length(bad_elec), badchans));
        
         % re-order good channels
         % ----------------------
-        [tmp1 tmp2 neworder] = intersect( lab1, lab2 );
+        [tmp1 tmp2 neworder] = intersect_bc( lab1, lab2 );
         [tmp1 ordertmp2] = sort(tmp2);
         neworder = neworder(ordertmp2);
         EEG.data = EEG.data(neworder, :, :);
@@ -127,7 +127,7 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method)
 
     else
         badchans  = bad_elec;
-        goodchans = setdiff(1:EEG.nbchan, badchans);
+        goodchans = setdiff_bc(1:EEG.nbchan, badchans);
         oldelocs  = EEG.chanlocs;
         EEG       = pop_select(EEG, 'nochannel', badchans);
         EEG.chanlocs = oldelocs;
@@ -139,10 +139,10 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method)
     origoodchans = goodchans;
     chanlocs     = EEG.chanlocs;
     nonemptychans = find(~cellfun('isempty', { chanlocs.theta }));
-    [tmp indgood ] = intersect(goodchans, nonemptychans);
+    [tmp indgood ] = intersect_bc(goodchans, nonemptychans);
     goodchans = goodchans( sort(indgood) );
     datachans = getdatachans(goodchans,badchans);
-    badchans  = intersect(badchans, nonemptychans);
+    badchans  = intersect_bc(badchans, nonemptychans);
     if isempty(badchans), return; end;
     
     % scan data points

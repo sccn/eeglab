@@ -134,7 +134,7 @@ else  % exist('IS_CHAR')   %%%%%%%%%%%% string values histogram %%%%%%%%%%%%%%%%
          vals(v) = {' '};
      end
    end
-   outbins = unique(vals);
+   outbins = unique_bc(vals);
    histNs = zeros(length(outbins)-1,1);
    for k=1:length(outbins)
      histNs(k) = sum(ismember(vals,outbins{k}));

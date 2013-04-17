@@ -77,11 +77,11 @@ function a = myintersect(a,b);
     
     for index = 1:length(a)
         if isstr(a{index})
-            a(index) = intersect(a(index), b);
+            a(index) = intersect_bc(a(index), b);
         elseif iscell(a{index})
-            a{index} = intersect(a{index}, b);
+            a{index} = intersect_bc(a{index}, b);
         elseif isnumeric(a{index})
-            a{index} = intersect(a{index}, [ b{:} ]);
+            a{index} = intersect_bc(a{index}, [ b{:} ]);
         end;
     end;
         
