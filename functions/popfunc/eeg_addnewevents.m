@@ -184,7 +184,9 @@ for i=1:length(order)
     %end;
 end;
 
-EEG.urevent = rmfield(EEG.urevent,'urevent'); % remove urevent field
+if isfield(EEG.urevent,'urevent')
+    EEG.urevent = rmfield(EEG.urevent,'urevent'); % remove urevent field
+end;
 
 % turn empty event durations into 0
 for i=1:length(EEG.event)
