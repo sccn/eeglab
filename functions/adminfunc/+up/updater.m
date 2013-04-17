@@ -120,8 +120,13 @@ classdef updater < handle
                 fclose(fileId);
                 
                 % read as xml into a doc
-                docNode = xmlread(temporaryFileName);
-                docRootNode = docNode.getDocumentElement;
+                try
+                    docNode = xmlread(temporaryFileName);
+                    docRootNode = docNode.getDocumentElement;
+                catch
+                    successfullRead = false;
+                    return;
+                end;
                 
                 % delete temporary file afterwards
                 delete(temporaryFileName);
