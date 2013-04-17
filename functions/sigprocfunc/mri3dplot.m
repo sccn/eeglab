@@ -55,6 +55,7 @@
 % See also: plotmri()
 
 % Copyright (C) Arnaud Delorme, sccn, INC, UCSD, 2003-
+% 03/29/2013 Makoto. Line 370 added to avoid negative matrix indices.
 %
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -366,6 +367,7 @@ function [newprob3d maxdens] = prepare_dens(prob3d, g, col);
     
     prob3d    = round((prob3d-g.cmin)/(g.cmax - g.cmin)*(ncolors-1))+1; % project desnity image into the color space: [1:ncolors]
     prob3d( find(prob3d > ncolors) ) = ncolors;
+    prob3d( find(prob3d < 1))        = 1; % added by Makoto
     newprob3d = zeros(size(prob3d,1), size(prob3d,2), size(prob3d,3), 3);
 
     outOfBrainMask = find(isnan(prob3d)); % place NaNs in a mask, NaNs are assumed for points outside the brain
