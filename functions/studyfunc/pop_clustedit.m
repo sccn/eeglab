@@ -314,6 +314,7 @@ if ~isstr(varargin{1})
     create_clus   = ['pop_clustedit(''createclust'',gcf);'];
     reject_outliers = ['pop_clustedit(''rejectoutliers'',gcf);'];
     merge_clusters = ['pop_clustedit(''mergeclusters'',gcf);'];
+    dip_opt        = ['pop_clustedit(''dip_opt'',gcf);'];
     erp_opt        = ['pop_clustedit(''erp_opt'',gcf);'];
     spec_opt       = ['pop_clustedit(''spec_opt'',gcf);'];
     ersp_opt       = ['pop_clustedit(''ersp_opt'',gcf);'];
@@ -365,7 +366,8 @@ if ~isstr(varargin{1})
         {'style' 'listbox'    'string' '' 'tag' 'clust_comp' 'max' 2 'min' 1 'callback'    show_comps } ... 
         {'style' 'pushbutton' 'enable' scalp_enable 'string' 'Plot scalp maps' 'Callback' plot_clus_maps} {} ...
         {'style' 'pushbutton' 'enable' scalp_enable 'string' 'Plot scalp map(s)' 'Callback' plot_comp_maps}...
-        {'style' 'pushbutton' 'enable'   dip_enable 'string' 'Plot dipoles' 'Callback' plot_clus_dip} {}  ...
+        {'style' 'pushbutton' 'enable'   dip_enable 'string' 'Plot dipoles' 'Callback' plot_clus_dip}  ...
+        {'style' 'pushbutton' 'enable'   erp_enable 'string' 'Params' 'Callback' dip_opt }  ...
         {'style' 'pushbutton' 'enable'   dip_enable 'string' 'Plot dipole(s)' 'Callback' plot_comp_dip}...
         {'style' 'pushbutton' 'enable'   erp_enable 'string' 'Plot ERPs' 'Callback' plot_clus_erp} ...
         {'style' 'pushbutton' 'enable'   erp_enable 'string' 'Params' 'Callback' erp_opt }  ...
@@ -499,6 +501,14 @@ else
                 end
                 userdat{1}{2} = STUDY;
                 set(hdl, 'userdat',userdat); 
+
+            case 'dip_opt' % save the list of selected chaners
+                [STUDY com] = pop_dipparams(STUDY);
+                if ~isempty(com)
+                    STUDY.history =  sprintf('%s\n%s',  STUDY.history, com);
+                end;
+                userdat{1}{2} = STUDY;
+                set(hdl, 'userdat',userdat); %update information (STUDY)     
 
             case 'erp_opt' % save the list of selected chaners
                 [STUDY com] = pop_erpparams(STUDY);
