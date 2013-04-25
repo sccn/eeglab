@@ -42,11 +42,11 @@ if exist('help2html')
     if length(funct) > 3 && strcmpi(funct(end-3:end), '.txt')
         web(funct);
     else
+        pathHelpHTML = fileparts(which('help2html'));
+        if ~isempty(findstr('NFT', pathHelpHTML)), rmpath(pathHelpHTML); end;
         text1 = help2html(funct);
         if length(funct) > 4 & strcmpi(funct(1:4), 'pop_')
             try,
-                pathHelpHTML = fileparts(which('help2html'));
-                if ~isempty(findstr('NFT', pathHelpHTML)), rmpath(pathHelpHTML); end;
                 text2 = help2html(funct(5:end));
                 text1 = [text1 '<br><pre>___________________________________________________________________' 10 ...
                                ' ' 10 ...
