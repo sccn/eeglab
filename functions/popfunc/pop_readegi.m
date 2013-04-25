@@ -162,6 +162,13 @@ EEG = eeg_checkset(EEG, 'eventconsistency');
 
 % importing channel locations
 % ---------------------------
+if nargin < 1 
+    warndlg2( [ 'EEGLAB will now import a default location file' 10 ...
+                'for your data. Note that this might not correspond' 10 ...
+                'to your montage as EGI has different versions of caps.' 10 ...
+                'Check your montage in the channel editor and import' 10 ...
+                'the correct location file if necessary.' ]);
+end;
 if all(EEG.data(end,1:10) == 0)
     disp('Deleting empty data reference channel (reference channel location is retained)');
     EEG.data(end,:)   = [];
