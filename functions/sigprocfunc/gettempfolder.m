@@ -30,8 +30,10 @@ if nargin < 1
 end;
 
 tmp_fld = getenv('TEMP');
-if isempty(tmp_fld) & isunix
-    if exist('/tmp') == 7
+if isempty(tmp_fld) && isunix
+    if is_sccn && exist('/var/tmp')
+        tmp_fld = '/var/tmp';
+    elseif exist('/tmp') == 7
         tmp_fld = '/tmp';
     else
         try
