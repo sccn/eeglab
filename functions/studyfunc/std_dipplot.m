@@ -67,7 +67,10 @@ function STUDY = std_dipplot(STUDY, ALLEEG, varargin)
 cls = []; % plot all clusters in STUDY
 figureon = 1; % plot on a new figure
 mode = 'apart';
-opt_dipplot = {'projlines','off', 'normlen', 'on', 'pointout', 'on', 'verbose', 'off', 'dipolelength', 0,'spheres','on'};
+
+STUDY = pop_dipparams(STUDY, 'default');
+opt_dipplot = {'projlines',STUDY.etc.dipparams.projlines, 'axistight', STUDY.etc.dipparams.axistight, 'projimg', STUDY.etc.dipparams.projimg, 'normlen', 'on', 'pointout', 'on', 'verbose', 'off', 'dipolelength', 0,'spheres','on'};
+
 %, 'spheres', 'on'
 groupval = 'off';
 for k = 3:2:nargin
@@ -87,7 +90,7 @@ for k = 3:2:nargin
             end
             if length(cls) == 1, mode = 'apart'; else mode = 'together'; end;
         case 'comps'
-            STUDY = std_plotcompdip(STUDY, ALLEEG,  cls, varargin{k-1});
+            STUDY = std_plotcompdip(STUDY, ALLEEG,  cls, varargin{k-1}, opt_dipplot{:});
             return;
         case 'plotsubjects', % do nothing
         case 'mode', mode = varargin{k-1};
@@ -97,9 +100,6 @@ for k = 3:2:nargin
                 opt_dipplot{end + 1} = 'gui';
                 opt_dipplot{end + 1} = 'off';
                 figureon = 0;
-            else
-                opt_dipplot{end + 1} = 'projimg';
-                opt_dipplot{end + 1} = 'on';
             end
     end
 end
@@ -197,7 +197,7 @@ if strcmpi(mode, 'apart')  % case each cluster on a separate figure
                set(fig_h,'Name', [STUDY.cluster(cls(clus)).name ' - ' num2str(length(unique(STUDY.cluster(cls(clus)).sets(1,:)))) ...
                        ' sets - ' num2str(length(STUDY.cluster(cls(clus)).comps)) ' components (' num2str(ndip) ' dipoles)' ],'NumberTitle','off');
            else
-               dipplot(cluster_dip_models, options{:},'view', [0.5 -0.5 0.5],'spheres', 'on', 'projlines', 'on');
+               dipplot(cluster_dip_models, options{:},'view', [0.5 -0.5 0.5]);
                for gind = 1:length(options) % remove the 'gui' 'off' option
                    if isstr(options{gind}) 
                        if strfind(options{gind}, 'gui')
@@ -351,7 +351,7 @@ end % finished case of 'all' clusters
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function STUDY = std_plotcompdip(STUDY, ALLEEG, cls, varargin)
+function STUDY = std_plotcompdip(STUDY, ALLEEG, cls, comp_ind, varargin)
 if ~exist('cls')
     error('std_plotcompdip: you must provide a cluster number as an input.');
 end
@@ -362,8 +362,6 @@ if nargin == 3 % no components indices were given
     % Default plot all components of the cluster
     [STUDY] = std_dipplot(STUDY, ALLEEG, 'clusters', cls);
     return
-else
-    comp_ind = varargin{1}; 
 end
 
 for ci = 1:length(comp_ind)
@@ -398,11 +396,11 @@ for ci = 1:length(comp_ind)
         end
         dipplot(cluster_dip_models, 'sphere', max_r, 'mri', ALLEEG(abset).dipfit.mrifile,'coordformat', ALLEEG(abset).dipfit.coordformat , ...
            'normlen' ,'on', 'pointout' ,'on','color', {'b', 'r'}, 'dipnames', {comp_to_disp [ STUDY.cluster(cls).name ' mean' ] },...
-            'spheres', 'on', 'verbose', 'off', 'projlines', 'on');
+            'spheres', 'on', 'verbose', 'off', varargin{:});
     else
        dipplot(cluster_dip_models, 'meshdata', ALLEEG(abset).dipfit.hdmfile, 'mri', ALLEEG(abset).dipfit.mrifile,'coordformat', ALLEEG(abset).dipfit.coordformat , ...
           'normlen' ,'on', 'pointout' ,'on','color', {'b', 'r'}, 'dipnames', {comp_to_disp [STUDY.cluster(cls).name ' mean']}, ...
-          'spheres', 'on', 'verbose', 'off', 'projlines', 'on');
+          'spheres', 'on', 'verbose', 'off', varargin{:});
     end
     fig_h = gcf;
     set(fig_h,'Name', [subject ' / ' 'IC' num2str(comp) ', ' STUDY.cluster(cls).name],'NumberTitle','off');
