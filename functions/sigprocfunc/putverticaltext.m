@@ -1,4 +1,4 @@
-function putverticaltext(fig, tag, str);
+function uisettxt(fig, tag, str, varargin);
 
 alltmpobj = findobj(fig, 'tag', tag);
 for tmpobj = alltmpobj'
@@ -12,7 +12,7 @@ for tmpobj = alltmpobj'
     for index = 1:length(str)
         tmp = text(index, 0, str{index});
         maxX = index+1;
-        set(tmp, 'rotation', 90, 'fontweight', 'bold', 'tag', tag);
+        set(tmp, 'tag', tag, varargin{:});
     end;
     xlim([0 maxX]);
 end;
