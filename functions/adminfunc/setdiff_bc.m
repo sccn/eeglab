@@ -24,5 +24,5 @@ if v >= 7.14
         end;
     end;
 else
-    [C,IA,IB] = setdiff(A,B,varargin{:});
+    [C,IA] = setdiff(A,B,varargin{:});
 end;
