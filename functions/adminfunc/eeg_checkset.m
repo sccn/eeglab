@@ -367,8 +367,11 @@ for inddataset = 1:length(ALLEEG)
                         catch, error('Checkset: error empty latency entry for new events added by user');
                         end;
                         I1 = find(alllatencies < 0.5);
-                        I2 = find(alllatencies > EEG.pnts*EEG.trials+0.5); % The addition of 0.5 was included
-                        % for symmetry with the above line, which most likely has something to do with rounding
+                        I2 = find(alllatencies > EEG.pnts*EEG.trials+1); % The addition of 1 was included
+                        % because, if data epochs are extracted from -1 to
+                        % time 0, this allow to include the last event in
+                        % the last epoch (otherwise all epochs have an
+                        % event except the last one
                         if (length(I1) + length(I2)) > 0
                             fprintf('eeg_checkset warning: %d/%d events had out-of-bounds latencies and were removed\n', ...
                                 length(I1) + length(I2), length(EEG.event));
