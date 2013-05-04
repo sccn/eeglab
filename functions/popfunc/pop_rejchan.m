@@ -21,6 +21,10 @@
 %                and rejkurt(). Default is 'off'.
 %   'precomp'  - [float array] use this array instead of computing the 'prob' 
 %                or 'kurt' measures.
+%   'freqrange' - [min max] frequency range for spectrum computation.
+%                Default is 1 to sampling rate divided by 2. The average
+%                of the log spectral power is computed over the frequency 
+%                range of interest.
 %
 % Outputs:
 %   OUTEEG    - output dataset with updated joint probability array
