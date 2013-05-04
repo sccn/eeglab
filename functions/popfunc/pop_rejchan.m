@@ -14,8 +14,8 @@
 %                consideration for rejection
 %   'threshold' - [max] absolute thresold or activity probability 
 %                 limit(s) (in std. dev.) if norm is 'on'.
-%   'measure'  - ['prob'|'kurt'] compute probability 'prob' or kurtosis 'kurt'
-%                for each channel. Default is 'kurt'.
+%   'measure'  - ['prob'|'kurt'|'spec'] compute probability 'prob', kurtosis 'kurt'
+%                or spectrum 'spec' for each channel. Default is 'kurt'.
 %   'norm'     - ['on'|'off'] normalize measure above (using trimmed 
 %                normalization as described in the function jointprob()
 %                and rejkurt(). Default is 'off'.
@@ -61,15 +61,27 @@ if nargin < 2
 
 	% which set to save
 	% -----------------
+    cb_select = [ 'if get(gcbo, ''value'') == 3,' ...
+                  '   set(findobj(gcbf, ''tag'', ''spec''), ''enable'', ''on'');' ...
+                  'else,' ...
+                  '   set(findobj(gcbf, ''tag'', ''spec''), ''enable'', ''off'');' ...
+                  'end;' ];
+    cb_norm = [ 'if get(gcbo, ''value''),' ...
+                  '   set(findobj(gcbf, ''tag'', ''normlab''), ''string'', ''Z-score threshold [max] or [min max]'');' ...
+                  'else,' ...
+                  '   set(findobj(gcbf, ''tag'', ''normlab''), ''string'', ''Absolute threshold [max] or [min max]'');' ...
+                  'end;' ];
     uilist = { { 'style' 'text' 'string' 'Electrode (number(s); Ex: 2 4 5)' } ...
                { 'style' 'edit' 'string' ['1:' int2str(EEG.nbchan)] } ...
                { 'style' 'text' 'string' 'Measure to use' } ...
-               { 'style' 'popupmenu' 'string' 'Probability|Kurtosis' 'value' 2 } ...
+               { 'style' 'popupmenu' 'string' 'Probability|Kurtosis|Spectrum' 'value' 2 'callback' cb_select } ...
                { 'style' 'text' 'string' 'Normalize measure (check=on)' } ...
-               { 'style' 'checkbox' 'string' '' 'value' 1 } { } ...
-               { 'style' 'text' 'string' 'Threshold limits [max]' } ...
-               { 'style' 'edit' 'string' '5' } };
-    geom = { [2 1.3] [2 1.3] [2 0.4 0.9] [2 1.3] };
+               { 'style' 'checkbox' 'string' '' 'value' 1 'callback' cb_norm } { } ...
+               { 'style' 'text' 'string' 'Z-score threshold [max] or [min max]' 'tag' 'normlab' } ...
+               { 'style' 'edit' 'string' '5' } ...
+               { 'style' 'text' 'string' 'Spectrum freq. range' 'enable' 'off' 'tag' 'spec' } ...
+               { 'style' 'edit' 'string' '1 8'  'enable' 'off' 'tag' 'spec' } };
+    geom = { [2 1.3] [2 1.3] [2 0.4 0.9] [2 1.3] [2 1.3] };
     result = inputgui( 'uilist', uilist, 'geometry', geom, 'title', 'Reject channel -- pop_rejchan()', ...
         'helpcom', 'pophelp(''pop_rejchan'')');
     if isempty(result), return; end;
@@ -80,19 +92,21 @@ if nargin < 2
     else options = { options{:} 'norm', 'off' }; 
     end;
     
-    if result{2} == 1, options = { options{:} 'measure', 'prob' };
-    else               options = { options{:} 'measure', 'kurt' }; 
+    if result{2} == 1,     options = { options{:} 'measure', 'prob' };
+    elseif result{2} == 2, options = { options{:} 'measure', 'kurt' }; 
+    else                   options = { options{:} 'measure', 'spec' }; 
     end;
 
 else
     options = varargin;
 end;
 
-opt = finputcheck( options, { 'norm'    'string'    { 'on';'off' }       'off';
-                              'measure' 'string'    { 'prob';'kurt' }    'kurt';
-                              'precomp' 'real'      []                   [];
-                              'elec'    'integer'   []                   [1:EEG.nbchan];
-                              'threshold' 'real'   []                    400 }, 'pop_rejchan');
+opt = finputcheck( options, { 'norm'      'string'    { 'on';'off' }       'off';
+                              'measure'   'string'    { 'prob';'kurt';'spec' }    'kurt';
+                              'precomp'   'real'      []                   [];
+                              'freqrange' 'real'      []                   [1 EEG.srate/2];
+                              'elec'      'integer'   []                   [1:EEG.nbchan];
+                              'threshold' 'real'   []                      400 }, 'pop_rejchan');
 if isstr(opt), error(opt); end;
 
 % compute the joint probability
@@ -105,15 +119,73 @@ end;
 if strcmpi(opt.measure, 'prob')
     fprintf('Computing probability for channels...\n');
     [ measure indelec ] = jointprob( reshape(EEG.data(opt.elec,:,:), length(opt.elec), size(EEG.data,2)*size(EEG.data,3)), opt.threshold, opt.precomp, normval);
-else
+elseif strcmpi(opt.measure, 'kurt')
     fprintf('Computing kurtosis for channels...\n');
     [ measure indelec ] = rejkurt( reshape(EEG.data(opt.elec,:,:), length(opt.elec), size(EEG.data,2)*size(EEG.data,3)), opt.threshold, opt.precomp, normval);
+else
+    fprintf('Computing spectrum for channels...\n');
+    measure = pop_spectopo(EEG, 1, [0  EEG.xmax*EEG.srate], 'EEG' , 'freqrange', opt.freqrange, 'plot','off');
+
+    % consider that data below 20 db has been filtered and remove it
+    indFiltered = find(mean(measure) < -20);
+    if ~isempty(indFiltered), measure = measure(:,1:indFiltered-10); disp('Removing spectrum data below -20dB (most likelly filtered out)'); end;
+    meanSpec = mean(measure);
+    stdSpec  = std( measure);
+    
+%     for indChan = 1:size(measure,1)
+%         if any(measure(indChan,:) > meanSpec+stdSpec*opt.threshold), indelec(indChan) = 1; end;
+%     end;
+    if strcmpi(opt.norm, 'on')
+        measure1  = max(bsxfun(@rdivide, bsxfun(@minus, measure, meanSpec), stdSpec),[],2);
+        if length(opt.threshold) > 1
+            measure2 = min(bsxfun(@rdivide, bsxfun(@minus, measure, meanSpec), stdSpec),[],2);
+            indelec = measure2 < opt.threshold(1) | measure1 > opt.threshold(end);
+            disp('Selecting minimum and maximum normalized power over the frequency range');
+        else
+            indelec = measure1 > opt.threshold(1);
+            disp('Selecting maximum normalized power over the frequency range');
+        end;
+    else
+        measure1 = max(measure,[],2);
+        if length(opt.threshold) > 1
+            measure2 = min(measure,[],2);
+            indelec = measure2 < opt.threshold(1) | measure1 > opt.threshold(end);
+            disp('Selecting minimum and maximum power over the frequency range');
+        else
+            indelec = measure > opt.threshold(1);
+            disp('Selecting maximum power over the frequency range');
+        end;
+    end;
+    measure = measure1;
 end;
 colors = cell(1,length(opt.elec)); colors(:) = { 'k' };
 colors(find(indelec)) = { 'r' }; colors = colors(end:-1:1);
 fprintf('%d electrodes labeled for rejection\n', length(find(indelec)));
 
+% output variables
 indelec = find(indelec)';
+tmpchanlocs = EEG.chanlocs;
+if ~isempty(EEG.chanlocs), tmplocs = EEG.chanlocs(opt.elec); tmpelec = { tmpchanlocs(opt.elec).labels }';
+else                       tmplocs = []; tmpelec = mattocell([1:EEG.nbchan]');
+end;
+if exist('measure2', 'var')
+     fprintf('#\tElec.\t[min]\t[max]\n');
+     tmpelec(:,3) = mattocell(measure2);
+     tmpelec(:,4) = mattocell(measure);
+else fprintf('#\tElec.\tMeasure\n');
+     tmpelec(:,3) = mattocell(measure);
+end;
+tmpelec(:,2) = tmpelec(:,1);
+tmpelec(:,1) = mattocell([1:length(measure)]');
+for index = 1:size(tmpelec,1)
+    if exist('measure2', 'var')
+         fprintf('%d\t%s\t%3.2f\t%3.2f', tmpelec{index,1}, tmpelec{index,2}, tmpelec{index,3}, tmpelec{index,4});
+    else fprintf('%d\t%s\t%3.2f'       , tmpelec{index,1}, tmpelec{index,2}, tmpelec{index,3});
+    end;
+    if any(indelec == index), fprintf('\t*Bad*\n');
+    else                      fprintf('\n');
+    end;
+end;
 if isempty(indelec), return; end;
 
 com = sprintf('EEG = pop_rejchan(EEG, %s);', vararg2str(options));
@@ -127,16 +199,8 @@ if nargin < 2
             '     eegh(tmpcom);' ...
             '     eeglab(''redraw'');' ...
             '  end; clear EEGTMP tmpcom;' ];
-    tmpchanlocs = EEG.chanlocs;
-    if ~isempty(EEG.chanlocs), tmplocs = EEG.chanlocs(opt.elec); tmpelec = { tmpchanlocs(opt.elec).labels }';
-    else                       tmplocs = []; tmpelec = mattocell([1:EEG.nbchan]');
-    end;
     eegplot(EEG.data(opt.elec,:,:), 'srate', EEG.srate, 'title', 'Scroll component activities -- eegplot()', ...
 			 'limits', [EEG.xmin EEG.xmax]*1000, 'color', colors, 'eloc_file', tmplocs, 'command', tmpcom);
-    
-    tmpelec(:,3) = mattocell(measure);
-    tmpelec(:,2) = tmpelec(:,1);
-    tmpelec(:,1) = mattocell([1:length(measure)]')
 else
     EEG = pop_select(EEG, 'nochannel', opt.elec(indelec));
 end;
