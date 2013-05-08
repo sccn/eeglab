@@ -747,41 +747,43 @@ function plotelec(newElect, ElectrodeNames, HeadCenter, opt);
 % --------------------
 function [newPOS POS TRI1 TRI2 NORM index1 center] = getMeshData(meshfile);
         
-if isstruct(meshfile)
-    if isfield(meshfile, 'vol')
-        if isfield(meshfile.vol, 'r')
-            [X Y Z] = sphere(50);
-            POS  = { X*max(meshfile.vol.r) Y*max(meshfile.vol.r) Z*max(meshfile.vol.r) };
-            TRI1 = [];
-        else
-            POS  = meshfile.vol.bnd(1).pnt;
-            TRI1 = meshfile.vol.bnd(1).tri;
-        end;
-    elseif isfield(meshfile, 'bnd')
-        POS  = meshfile.bnd(1).pnt;
-        TRI1 = meshfile.bnd(1).tri;
-    elseif isfield(meshfile, 'TRI1')
-        POS  = meshfile.POS;
-        TRI1 = meshfile.TRI1;
-    elseif isfield(meshfile, 'vertices')
-        POS  = meshfile.vertices;
-        TRI1 = meshfile.faces;
-    else
-        error('Unknown Matlab mesh file');
-    end;
-else
+if ~isstruct(meshfile)
     if ~exist(meshfile)
         error(sprintf('headplot(): mesh file "%s" not found\n',meshfile));
     end
-    try, load(meshfile,'-mat');
+    fprintf('Loaded mesh file %s\n',meshfile);
+    try
+        meshfile = load(meshfile,'-mat');
     catch,
-        POS  = load('mheadnewpos.txt', '-ascii');
-        TRI1 = load('mheadnewtri1.txt', '-ascii'); % upper head
+        meshfile = [];
+        meshfile.POS  = load('mheadnewpos.txt', '-ascii');
+        meshfile.TRI1 = load('mheadnewtri1.txt', '-ascii'); % upper head
         %try, TRI2 = load('mheadnewtri2.txt', '-ascii'); catch, end; % lower head
         %index1 = load('mheadnewindex1.txt', '-ascii');
-        center = load('mheadnewcenter.txt', '-ascii');
+        meshfile.center = load('mheadnewcenter.txt', '-ascii');
     end;
-    fprintf('Loaded mesh file %s\n',meshfile);
+end;        
+        
+if isfield(meshfile, 'vol')
+    if isfield(meshfile.vol, 'r')
+        [X Y Z] = sphere(50);
+        POS  = { X*max(meshfile.vol.r) Y*max(meshfile.vol.r) Z*max(meshfile.vol.r) };
+        TRI1 = [];
+    else
+        POS  = meshfile.vol.bnd(1).pnt;
+        TRI1 = meshfile.vol.bnd(1).tri;
+    end;
+elseif isfield(meshfile, 'bnd')
+    POS  = meshfile.bnd(1).pnt;
+    TRI1 = meshfile.bnd(1).tri;
+elseif isfield(meshfile, 'TRI1')
+    POS  = meshfile.POS;
+    TRI1 = meshfile.TRI1;
+elseif isfield(meshfile, 'vertices')
+    POS  = meshfile.vertices;
+    TRI1 = meshfile.faces;
+else
+    error('Unknown Matlab mesh file');
 end;
 if exist('index1') ~= 1, index1 = sort(unique(TRI1(:))); end;
 if exist('TRI2')   ~= 1, TRI2 = []; end;
