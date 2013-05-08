@@ -809,7 +809,7 @@ step=0;
 laststep=0;
 blockno = 1;  % running block counter for kurtosis interrupts
 
-%rand('state',sum(100*clock));  % set the random number generator state to
+rand('state',sum(100*clock));  % set the random number generator state to
                                % a position dependent on the system clock
 % interupt figure
 % --------------- 
