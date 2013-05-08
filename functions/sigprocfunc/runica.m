@@ -243,7 +243,7 @@ wts_passed = 0;                      % flag weights passed as argument
             fprintf(...
       'runica(): weights value must be a weight matrix or sphere')
             return
-        elseif ~isempty(Value)
+         else
            weights = Value;
            wts_passed =1;
          end
@@ -251,39 +251,37 @@ wts_passed = 0;                      % flag weights passed as argument
          if isstr(Value)
             fprintf('runica(): ncomps value must be an integer')
             return
-        elseif ~isempty(Value)
-           if ncomps < urchans & ncomps ~= Value
-               fprintf('runica(): Use either PCA or ICA dimension reduction');
-               return
-            end
-            fprintf('*****************************************************************************************');
-            fprintf('************** WARNING: NCOMPS OPTION OFTEN DOES NOT RETURN ACCURATE RESULTS ************');
-            fprintf('************** WARNING: IF YOU FIND THE PROBLEM, PLEASE LET US KNOW          ************');
-            fprintf('*****************************************************************************************');
-            ncomps = Value;
-            if ~ncomps,
-               ncomps = chans;
-            end
-        end
-    elseif strcmp(Keyword,'pca')
-        if Value ~= 0
-           if ncomps < urchans & ncomps ~= Value
-              fprintf('runica(): Use either PCA or ICA dimension reduction');
-              return
-           end
-           if isstr(Value)
-              fprintf('runica(): pca value should be the number of principal components to retain')
-              return
-           end
-           pcaflag = 'on';
-           ncomps = Value;
-           if ncomps > chans | ncomps < 1,
-              fprintf('runica(): pca value must be in range [1,%d]\n',chans)
-              return
-           end
-           chans = ncomps;
-        end
-    elseif strcmp(Keyword,'interupt')
+         end
+         if ncomps < urchans & ncomps ~= Value
+            fprintf('runica(): Use either PCA or ICA dimension reduction');
+            return
+         end
+         fprintf('*****************************************************************************************');
+         fprintf('************** WARNING: NCOMPS OPTION OFTEN DOES NOT RETURN ACCURATE RESULTS ************');
+         fprintf('************** WARNING: IF YOU FIND THE PROBLEM, PLEASE LET US KNOW          ************');
+         fprintf('*****************************************************************************************');
+         ncomps = Value;
+         if ~ncomps,
+            ncomps = chans;
+         end
+      elseif strcmp(Keyword,'pca') 
+         if ncomps < urchans & ncomps ~= Value
+            fprintf('runica(): Use either PCA or ICA dimension reduction');
+            return
+         end
+         if isstr(Value)
+            fprintf(...
+'runica(): pca value should be the number of principal components to retain')
+            return
+         end
+         pcaflag = 'on';
+         ncomps = Value;
+         if ncomps > chans | ncomps < 1,
+            fprintf('runica(): pca value must be in range [1,%d]\n',chans)
+            return
+         end
+         chans = ncomps;
+       elseif strcmp(Keyword,'interupt') 
          if ~isstr(Value)
            fprintf('runica(): interupt value must be on or off')
            return
@@ -311,7 +309,7 @@ wts_passed = 0;                      % flag weights passed as argument
          if isstr(Value)
             fprintf('runica(): lrate value must be a number')
             return
-        elseif ~isempty(Value)
+         end
          lrate = Value;
          if lrate>MAX_LRATE | lrate <0,
            fprintf('runica(): lrate value is out of bounds'); 
@@ -319,26 +317,23 @@ wts_passed = 0;                      % flag weights passed as argument
          end
          if ~lrate,
             lrate = DEFAULT_LRATE;
-            end
          end
       elseif strcmp(Keyword,'block') | strcmp(Keyword,'blocksize')
          if isstr(Value)
             fprintf('runica(): block size value must be a number')
             return
-         elseif ~isempty(Value)
-            block = floor(Value);
-            if ~block,
-               block = DEFAULT_BLOCK;
-            end
+         end
+         block = floor(Value);
+         if ~block,
+           block = DEFAULT_BLOCK; 
          end
       elseif strcmp(Keyword,'stop') | strcmp(Keyword,'nochange') ...
                     | strcmp(Keyword,'stopping')
          if isstr(Value)
             fprintf('runica(): stop wchange value must be a number')
             return
-         elseif ~isempty(Value)
-            nochange = Value;
          end
+         nochange = Value;
       elseif strcmp(Keyword,'logfile')
          if ~isstr(Value)
             fprintf('runica(): logfile value must be a string')
@@ -349,52 +344,48 @@ wts_passed = 0;                      % flag weights passed as argument
          if isstr(Value)
             fprintf('runica(): maxsteps value must be an integer')
             return
-         elseif ~isempty(Value)
-            maxsteps = Value;
-            if ~maxsteps,
-               maxsteps   = DEFAULT_MAXSTEPS;
-            end
-            if maxsteps < 0
-               fprintf('runica(): maxsteps value (%d) must be a positive integer',maxsteps)
-               return
-            end
-        end
+         end
+         maxsteps = Value;
+         if ~maxsteps,
+            maxsteps   = DEFAULT_MAXSTEPS;
+         end
+         if maxsteps < 0
+            fprintf('runica(): maxsteps value (%d) must be a positive integer',maxsteps)
+            return
+         end
       elseif strcmp(Keyword,'anneal') | strcmp(Keyword,'annealstep')
          if isstr(Value)
             fprintf('runica(): anneal step value (%2.4f) must be a number (0,1)',Value)
             return
-         elseif ~isempty(Value)
-            annealstep = Value;
-            if annealstep <=0 | annealstep > 1,
-               fprintf('runica(): anneal step value (%2.4f) must be (0,1]',annealstep)
-               return
-            end
+         end
+         annealstep = Value;
+         if annealstep <=0 | annealstep > 1,
+            fprintf('runica(): anneal step value (%2.4f) must be (0,1]',annealstep)
+            return
          end
       elseif strcmp(Keyword,'annealdeg') | strcmp(Keyword,'degrees')
          if isstr(Value)
             fprintf('runica(): annealdeg value must be a number')
             return
-         elseif ~isempty(Value)
-            annealdeg = Value;
-            if ~annealdeg,
-                annealdeg = DEFAULT_ANNEALDEG;
-            elseif annealdeg > 180 | annealdeg < 0
-                fprintf('runica(): annealdeg (%3.1f) is out of bounds [0,180]',...
-                      annealdeg);
-                return
+         end
+         annealdeg = Value;
+         if ~annealdeg,
+             annealdeg = DEFAULT_ANNEALDEG;
+         elseif annealdeg > 180 | annealdeg < 0
+          fprintf('runica(): annealdeg (%3.1f) is out of bounds [0,180]',...
+                annealdeg);
+          return
                                               
-            end
          end
       elseif strcmp(Keyword,'momentum')
          if isstr(Value)
             fprintf('runica(): momentum value must be a number')
             return
-         elseif ~isempty(Value)
-            momentum = Value;
-            if momentum > 1.0 | momentum < 0
-             fprintf('runica(): momentum value is out of bounds [0,1]')
-             return
-            end
+         end
+         momentum = Value;
+         if momentum > 1.0 | momentum < 0
+          fprintf('runica(): momentum value is out of bounds [0,1]')
+          return
          end
       elseif strcmp(Keyword,'sphering') | strcmp(Keyword,'sphereing') ...
                 | strcmp(Keyword,'sphere')
@@ -413,7 +404,7 @@ wts_passed = 0;                      % flag weights passed as argument
          if ~isstr(Value)
            fprintf('runica(): bias value must be on or off')
            return
-        elseif ~isempty(Value)
+         else 
            Value = lower(Value);
            if strcmp(Value,'on') 
               biasflag = 1;
@@ -639,8 +630,18 @@ end
 %%%%%%%%%%%%%%%%% Remove overall row means of data %%%%%%%%%%%%%%%%%%%%%%%
 %
 icaprintf(verb,fid,'Removing mean of each channel ...\n');
-rowmeans = mean(data');
-data = data - rowmeans'*ones(1,frames);      % subtract row means
+
+%BLGBLGBLG replaced
+% rowmeans = mean(data');
+% data = data - rowmeans'*ones(1,frames);      % subtract row means
+%BLGBLGBLG replacement starts
+rowmeans = mean(data,2)'; %BLG
+% data = data - rowmeans'*ones(1,frames);      % subtract row means
+for iii=1:size(data,1) %avoids memory errors BLG
+    data(iii,:)=data(iii,:)-rowmeans(iii);
+end
+%BLGBLGBLG replacement ends
+
 icaprintf(verb,fid,'Final training data range: %g to %g\n', min(min(data)),max(max(data)));
 
 %
@@ -648,8 +649,33 @@ icaprintf(verb,fid,'Final training data range: %g to %g\n', min(min(data)),max(m
 %
 if strcmp(pcaflag,'on')
     icaprintf(verb,fid,'Reducing the data to %d principal dimensions...\n',ncomps);
-    [eigenvectors,eigenvalues,data] = pcsquash(data,ncomps);
+    
+    %BLGBLGBLG replaced
+    %[eigenvectors,eigenvalues,data] = pcsquash(data,ncomps);
     % make data its projection onto the ncomps-dim principal subspace
+    %BLGBLGBLG replacement starts
+    %[eigenvectors,eigenvalues,data] = pcsquash(data,ncomps);
+    % no need to re-subtract row-means, it was done a few lines above!
+    PCdat2 = data';                    % transpose data
+    [PCn,PCp]=size(PCdat2);                  % now p chans,n time points
+    PCdat2=PCdat2/PCn;
+    PCout=data*PCdat2;
+    clear PCdat2;
+    
+    [PCV,PCD] = eig(PCout);                  % get eigenvectors/eigenvalues
+    [PCeigenval,PCindex] = sort(diag(PCD));
+    PCindex=rot90(rot90(PCindex));
+    PCEigenValues=rot90(rot90(PCeigenval))';
+    PCEigenVectors=PCV(:,PCindex);
+    %PCCompressed = PCEigenVectors(:,1:ncomps)'*data;
+    data = PCEigenVectors(:,1:ncomps)'*data;
+    
+    eigenvectors=PCEigenVectors;
+    eigenvalues=PCEigenValues; %#ok<NASGU>
+    
+    clear PCn PCp PCout PCV PCD PCeigenval PCindex PCEigenValues PCEigenVectors
+    %BLGBLGBLG replacement ends
+    
 end
 
 %
@@ -783,7 +809,7 @@ step=0;
 laststep=0;
 blockno = 1;  % running block counter for kurtosis interrupts
 
-rand('state',sum(100*clock));  % set the random number generator state to
+%rand('state',sum(100*clock));  % set the random number generator state to
                                % a position dependent on the system clock
 % interupt figure
 % --------------- 
