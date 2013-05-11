@@ -1318,7 +1318,11 @@ headx = [[rx(:)' rx(1) ]*(hin+hwidth)  [rx(:)' rx(1)]*hin];
 heady = [[ry(:)' ry(1) ]*(hin+hwidth)  [ry(:)' ry(1)]*hin];
 
 if ~isstr(HEADCOLOR) | ~strcmpi(HEADCOLOR,'none')
-   ringh= patch(headx,heady,ones(size(headx)),HEADCOLOR,'edgecolor',HEADCOLOR); hold on
+   %ringh= patch(headx,heady,ones(size(headx)),HEADCOLOR,'edgecolor',HEADCOLOR,'linewidth', HLINEWIDTH); hold on
+   headx = [rx(:)' rx(1)]*hin;
+   heady = [ry(:)' ry(1)]*hin;
+   ringh= plot(headx,heady);
+   set(ringh, 'color',HEADCOLOR,'linewidth', HLINEWIDTH); hold on
 end
 
 % rx = sin(circ); rX = rx(end:-1:1);
