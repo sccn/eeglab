@@ -37,6 +37,8 @@
 %                the subject(s) to plot. Else by default, plot all components 
 %                in the cluster.
 %   'plotsubjects' - ['on'|'off'] When 'on', plot ERSP of all subjects.
+%   'noplot'   - ['on'|'off'] When 'on', only return output values. Default
+%                is 'off'.
 %
 % Other optional inputs:
 %   'plotmode'  - ['normal'|'condensed'|'none'] 'normal'  -> plot in a new figure; 
@@ -158,10 +160,12 @@ options = myrmfield( options, { 'threshold' 'statistics' } ); % for backward com
                                'mode'        'string'  []              ''; % for backward compatibility (now used for statistics)
                                'comps'       {'integer','string'}  []              []; % for backward compatibility
                                'plotsubjects' 'string' { 'on','off' }  'off';
-                               'plotmode'    'string' { 'normal','condensed','none' }  'normal';
+                               'noplot'      'string'  { 'on','off' }  'off';
+                               'plotmode'    'string'  { 'normal','condensed','none' }  'normal';
                                'subject'     'string'  []              '' }, ...
                                   'std_erspstatplot', 'ignore');
 if isstr(opt), error(opt); end;
+if strcmpi(opt.noplot, 'on'), opt.plotmode = 'none'; end;
 if isempty(opt.caxis), 
     if strcmpi(opt.datatype, 'ersp')
          opt.caxis = params.ersplim;
