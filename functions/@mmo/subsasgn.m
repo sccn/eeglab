@@ -48,7 +48,7 @@ if ncopies < 2
         vers = version;
         indp = find(vers == '.');
         vers = str2num(vers(1:indp(2)-1));
-        if v >= 7.13 
+        if vers >= 7.13 
             % the problem with Matlab 2012a/2011b is that if the object called is
             % in a field of a structure (empty inputname), the evaluation
             % in the caller of the object variable is empty in 2012a. A bug
