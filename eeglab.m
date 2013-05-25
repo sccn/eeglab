@@ -495,8 +495,9 @@ cb_savestudy2  = [ check   '[STUDYTMP ALLEEGTMP LASTCOM] = pop_savestudy(STUDY, 
 cb_clearstudy  =           'LASTCOM = ''STUDY = []; CURRENTSTUDY = 0; ALLEEG = []; EEG=[]; CURRENTSET=[];''; eval(LASTCOM); eegh( LASTCOM ); eeglab redraw;';
 cb_editoptions = [ nocheck 'if isfield(ALLEEG, ''nbchan''), LASTCOM = pop_editoptions(length([ ALLEEG.nbchan ]) >1);' ...
                            'else                            LASTCOM = pop_editoptions(0); end;'                  e_storeall_nh];
-cb_plugin1     = [ nocheck 'if plugin_extract(''import'') , close(findobj(''tag'', ''EEGLAB'')); eeglab redraw; end;' e_hist_nh ];
-cb_plugin2     = [ nocheck 'if plugin_extract(''process''), close(findobj(''tag'', ''EEGLAB'')); eeglab redraw; end;' e_hist_nh ];
+cb_plugin1     = [ nocheck 'if plugin_extract(''import'', PLUGINLIST) , close(findobj(''tag'', ''EEGLAB'')); eeglab redraw; end;' e_hist_nh ];
+cb_plugin2     = [ nocheck 'if plugin_extract(''process'', PLUGINLIST), close(findobj(''tag'', ''EEGLAB'')); eeglab redraw; end;' e_hist_nh ];
+cb_plugin3     = [ nocheck 'if plugin_managedeactivated(PLUGINLIST), close(findobj(''tag'', ''EEGLAB'')); eeglab redraw; end;' e_hist_nh ];
 
 cb_saveh1      = [ nocheck 'LASTCOM = pop_saveh(EEG.history);' e_hist_nh];
 cb_saveh2      = [ nocheck 'LASTCOM = pop_saveh(ALLCOM);'      e_hist_nh];
@@ -699,9 +700,10 @@ if ismatlab
     uimenu( hist_m, 'Label', 'Save session history script'            , 'userdata', ondatastudy, 'CallBack', cb_saveh2);    
     uimenu( hist_m, 'Label', 'Run script'                             , 'userdata', on         , 'CallBack', cb_runsc);    
 
- %   plugin_m = uimenu( file_m,   'Label', 'Manage plugins'            , 'userdata', on); 
- %   uimenu( plugin_m, 'Label', 'Manage data import plugins'           , 'userdata', on         , 'CallBack', cb_plugin1);    
- %   uimenu( plugin_m, 'Label', 'Manage data processing plugins'       , 'userdata', on         , 'CallBack', cb_plugin2);    
+%     plugin_m = uimenu( file_m,   'Label', 'Manage plugins'            , 'userdata', on); 
+%     uimenu( plugin_m, 'Label', 'Manage data import plugins'           , 'userdata', on         , 'CallBack', cb_plugin1);    
+%     uimenu( plugin_m, 'Label', 'Manage data processing plugins'       , 'userdata', on         , 'CallBack', cb_plugin2);    
+%     uimenu( plugin_m, 'Label', 'Manage deactivated plugins'           , 'userdata', on         , 'CallBack', cb_plugin3);    
     
     uimenu( file_m, 'Label', 'Quit'                                   , 'userdata', on     , 'CallBack', cb_quit, 'Separator', 'on');
 
@@ -864,16 +866,45 @@ else
     pluginlist  = [];
     plugincount = 1;
     
-    % looking for eeglab plugins
-    % --------------------------
     p = which('eeglab.m');
     p = p(1:findstr(p,'eeglab.m')-1);
     if strcmpi(p, './') || strcmpi(p, '.\'), p = [ pwd filesep ]; end;
-    dircontent  = dir(fullfile(p, 'plugins'));
+    
+    % scan deactivated plugin folder
+    % ------------------------------
+    dircontent  = dir(fullfile(p, 'deactivatedplugins'));
     dircontent  = { dircontent.name };
-
+    for index = 1:length(dircontent)
+        funcname = '';
+        if exist([p 'deactivatedplugins' filesep dircontent{index}]) == 7
+            if ~strcmpi(dircontent{index}, '.') & ~strcmpi(dircontent{index}, '..')
+                tmpdir = dir([ p 'deactivatedplugins' filesep dircontent{index} filesep 'eegplugin*.m' ]);
+                if ~isempty(tmpdir)
+                    funcname = tmpdir(1).name(1:end-2);
+                    [ pluginlist(plugincount).plugin pluginlist(plugincount).version ] = parsepluginname(dircontent{index});
+                end;
+            end;
+        else 
+            if ~isempty(findstr(dircontent{index}, 'eegplugin')) & dircontent{index}(end) == 'm'
+                funcname = dircontent{index}(1:end-2); % remove .m
+                [ pluginlist(plugincount).plugin pluginlist(plugincount).version ] = parsepluginname(dircontent{index}(10:end-2));
+            end;
+        end;
+        if ~isempty(funcname)
+            pluginlist(plugincount).funcname   = funcname(10:end);
+            pluginlist(plugincount).foldername = dircontent{index};
+            if length(pluginlist(plugincount).funcname) > 1 && pluginlist(plugincount).funcname(1) == '_'
+                pluginlist(plugincount).funcname(1) = [];
+            end; 
+            pluginlist(plugincount).status = 'deactivated';
+            plugincount = plugincount+1;
+        end;
+    end;
+    
     % scan plugin folder
     % ------------------
+    dircontent  = dir(fullfile(p, 'plugins'));
+    dircontent  = { dircontent.name };
     for index = 1:length(dircontent)
 
         % find function
@@ -964,14 +995,7 @@ end; % iseeglabdeployed2
 if ~ismatlab, return; end;
 % add other import ...
 % --------------------
-cb_others = [ 'warndlg2(strvcat(''Several EEGLAB plugins (not included by default) are available to import specific'',' ...
-                               '''data formats. To download plugins go to http://sccn.ucsd.edu/wiki/EEGLAB_Plugins'',' ...
-                               '''  '',' ...
-                               '''The FILEIO and BIOSIG toolboxes interface also allow to import in EEGLAB a wide variety'',' ...
-                               '''of EEG/MEG data file formats -- including those imported using EEGLAB native menus'',' ...
-                               '''(see www2.ru.nl/fcdonders/fieldtrip/doku.php?id=fieldtrip:dataformat (FILEIO) and'',' ...
-                               '''biosig.sourceforge.net/SupportedSystems.html (BIOSIG) for supported file formats).'',' ...
-                               ''' ''));' ];
+cb_others = [ 'pophelp(''troubleshooting_data_formats'');' ];
 if exist('ft_chantype')
     uimenu( import_m, 'Label', 'Using the FILE-IO interface', 'CallBack', cb_fileio, 'separator', 'on'); 
 end;
