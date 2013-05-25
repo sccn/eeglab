@@ -93,6 +93,10 @@
 %   'gridscale'       - [int > 32] size (nrows) of interpolated scalp map data matrix {default: 67}
 %   'colormap'        -  (n,3) any size colormap {default: existing colormap}
 %   'circgrid'        - [int > 100] number of elements (angles) in head and border circles {201}
+%   'emarkercolor'    - cell array of colors for 'blank' option.
+%   'plotdisk'        - ['on'|'off'] plot disk instead of dots for electrodefor 'blank' option. Size of disk
+%                       is controled by input values at each electrode. If an imaginary value is provided, 
+%                       plot partial circle with red for the real value and blue for the imaginary one.
 %
 % Dipole plotting options:
 %   'dipole'          - [xi yi xe ye ze] plot dipole on the top of the scalp map
@@ -236,7 +240,7 @@ EMARKER2COLOR = 'r';     % mark subset of electrode locations with small disks
 EMARKERSIZE2 = 10;      % default selected channel location marker size
 EMARKER2LINEWIDTH = 1;
 EFSIZE = get(0,'DefaultAxesFontSize'); % use current default fontsize for electrode labels
-HLINEWIDTH = 1.7;         % default linewidth for head, nose, ears
+HLINEWIDTH = 2;         % default linewidth for head, nose, ears
 BLANKINGRINGWIDTH = .035;% width of the blanking ring 
 HEADRINGWIDTH    = .007;% width of the cartoon head ring
 SHADING = 'flat';       % default 'shading': flat|interp
@@ -250,9 +254,14 @@ VERBOSE = 'off';
 MASKSURF = 'off';
 CONVHULL = 'off';       % dont mask outside the electrodes convex hull
 DRAWAXIS = 'off';
+PLOTDISK = 'off';
 CHOOSECHANTYPE = 0;
 ContourVals = Values;
 PMASKFLAG   = 0;
+COLORARRAY  = { [1 0 0] [0.5 0 0] [0 0 0] };
+%COLORARRAY2 = { [1 0 0] [0.5 0 0] [0 0 0] };
+gb = [0 0];
+COLORARRAY2 = { [gb 0] [gb 1/4] [gb 2/4] [gb 3/4] [gb 1] };
 
 %%%%%% Dipole defaults %%%%%%%%%%%%
 DIPOLE  = [];           
@@ -363,11 +372,18 @@ if nargs > 2
                     error('Colormap must be a n x 3 matrix')
                 end
                 colormap(Value)
+            case 'plotdisk'
+                PLOTDISK = lower(Value);
+                if ~strcmp(PLOTDISK,'on') & ~strcmp(PLOTDISK,'off')
+                    error('Value of ''plotdisk'' must be ''on'' or ''off''.');
+                end
             case 'intsquare'
                 INTSQUARE = lower(Value);
                 if ~strcmp(INTSQUARE,'on') & ~strcmp(INTSQUARE,'off')
                     error('Value of ''intsquare'' must be ''on'' or ''off''.');
                 end
+            case 'emarkercolors'
+                COLORARRAY = Value;
             case {'interplimits','headlimits'}
                 if ~isstr(Value)
                     error('''interplimits'' value must be a string')
@@ -1505,15 +1521,22 @@ end
 try,
     if strcmpi(STYLE,'blank') % if mark-selected-channel-locations mode
         for kk = 1:length(1:length(x))
-            if Values(kk) == 3
-                hp2 = plot3(y(kk),x(kk),ELECTRODE_HEIGHT,EMARKER,'Color', [0 0 0], 'markersize', EMARKERSIZE1CHAN);
-            elseif Values(kk) == 2
-                hp2 = plot3(y(kk),x(kk),ELECTRODE_HEIGHT,EMARKER,'Color', [0.5 0 0], 'markersize', EMARKERSIZE1CHAN);
-            elseif Values(kk) == 1
-                hp2 = plot3(y(kk),x(kk),ELECTRODE_HEIGHT,EMARKER,'Color', [1 0 0], 'markersize', EMARKERSIZE1CHAN);
-            elseif strcmpi(ELECTRODES,'on')
-                hp2 = plot3(y(kk),x(kk),ELECTRODE_HEIGHT,EMARKER,'Color', ECOLOR, 'markersize', EMARKERSIZE);
-            end
+            if abs(Values(kk))
+                if PLOTDISK
+                    angleRatio = real(Values(kk))/(real(Values(kk))+imag(Values(kk)))*360;
+                    radius     = real(Values(kk))+imag(Values(kk));
+                    allradius  = [0.02 0.03 0.037 0.044 0.05];
+                    radius     = allradius(radius);
+                    hp2 = disk(y(kk),x(kk),radius, [1 0 0], 0 , angleRatio, 16);
+                    if angleRatio ~= 360
+                        hp2 = disk(y(kk),x(kk),radius, [0 0 1], angleRatio, 360, 16);
+                    end;
+                else
+                    tmpcolor = COLORARRAY{max(1,min(Values(kk), length(COLORARRAY)))};
+                    hp2 = plot3(y(kk),x(kk),ELECTRODE_HEIGHT,EMARKER,'Color', tmpcolor, 'markersize', EMARKERSIZE1CHAN);
+                    hp2 = disk(y(kk),x(kk),0.04, tmpcolor, 0, 360, 10);
+                end;
+            end;
         end
     end
 catch, end;
@@ -1614,3 +1637,17 @@ end;
 hold off
 axis off
 return
+
+%
+%%%%%%%%%%%%% Draw circle %%%%%%%%%%%%%%%%%%%%%%%%
+%
+function h2 = disk(X, Y, radius, colorfill, oriangle, endangle, segments)
+	A = linspace(oriangle/180*pi, endangle/180*pi, segments-1);
+    if endangle-oriangle == 360
+     	 A  = linspace(oriangle/180*pi, endangle/180*pi, segments);
+         h2 = patch( [X   + cos(A)*radius(1)], [Y   + sin(A)*radius(end)], zeros(1,segments)+3, colorfill);
+    else A  = linspace(oriangle/180*pi, endangle/180*pi, segments-1);
+         h2 = patch( [X X + cos(A)*radius(1)], [Y Y + sin(A)*radius(end)], zeros(1,segments)+3, colorfill);
+    end;
+    set(h2, 'FaceColor', colorfill);
+	set(h2, 'EdgeColor', 'none'); 
