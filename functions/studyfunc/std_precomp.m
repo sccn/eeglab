@@ -37,10 +37,12 @@
 %                  std_erpimage for the list of arguments.
 %  'recompute'   - ['on'|'off'] force recomputing ERP file even if it is 
 %                  already on disk.
-%  'rmicacomps'  - ['on'|'off'] remove ICA components pre-selected in each
-%                  dataset (EEGLAB menu item, "Tools > Reject data using ICA 
+%  'rmicacomps'  - ['on'|'off'|'processica'] remove ICA components pre-selected in 
+%                  each dataset (EEGLAB menu item, "Tools > Reject data using ICA 
 %                  > Reject components by map). This option is ignored when 
 %                  precomputing measures for ICA clusters. Default is 'off'.
+%                  'processica' forces to process ICA components instead of
+%                  removing them.
 %  'rmclust'     - [integer array] remove selected ICA component clusters.
 %                  For example, ICA component clusters containing
 %                  artifacts. This option is ignored when precomputing
@@ -108,7 +110,7 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
                                 'allcomps'    'string'  { 'on','off' }     'off';
                                 'itc'         'string'  { 'on','off' }     'off';
                                 'savetrials'  'string'  { 'on','off' }     'off';
-                                'rmicacomps'  'string'  { 'on','off' }     'off';
+                                'rmicacomps'  'string'  { 'on','off','processica' }     'off';
                                 'cell'        'integer' []                 [];
                                 'design'      'integer' []                 STUDY.currentdesign;
                                 'rmclust'     'integer' []                 [];
@@ -443,7 +445,7 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
         
         opts = { };
 
-        if ~isempty(g.rmclust) || strcmpi(g.rmicacomps, 'on')
+        if ~isempty(g.rmclust) || strcmpi(g.rmicacomps, 'on') || strcmpi(g.rmicacomps, 'processica')
             rmcomps = cell(1,length(idat));
             if ~isempty(g.rmclust)
                 rmcomps = getclustcomps(STUDY, g.rmclust, idat);
@@ -451,6 +453,10 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
             if strcmpi(g.rmicacomps, 'on')
                 for ind = 1:length(idat)
                     rmcomps{ind} = union_bc(rmcomps{ind}, find(ALLEEG(idat(1)).reject.gcompreject));
+                end;
+            elseif strcmpi(g.rmicacomps, 'processica')
+                for ind = 1:length(idat)
+                    rmcomps{ind} = union_bc(rmcomps{ind}, find(~ALLEEG(idat(1)).reject.gcompreject));
                 end;
             end;
             opts = { opts{:} 'rmcomps' rmcomps };
