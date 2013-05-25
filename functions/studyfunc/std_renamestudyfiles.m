@@ -61,7 +61,7 @@ if ~isequal(allCell1, allCell2)
             % scan file extensions
             for iExt = 1:length(fileExtensions)
                 files = dir( [ allCell1{iCell} '.' fileExtensions{iExt} ]);
-                if ~isempty(files)
+                if ~isempty(files) && ~strcmpi(allCell1{iCell}, allCell2{iCell})
                     movefile( [ allCell1{iCell} '.' fileExtensions{iExt} ], ...
                         [ allCell2{iCell} '.' fileExtensions{iExt} ]);
                     disp([ 'Moving ' [ allCell1{iCell} '.' fileExtensions{iExt} ] ' to ' [ allCell2{iCell} '.' fileExtensions{iExt} ] ]);
