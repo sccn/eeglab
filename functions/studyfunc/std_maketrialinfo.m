@@ -39,6 +39,34 @@ if any(epochfield)
     return;
 end;
 
+%% check if conversion of event is necessary
+ff = {};
+flagConvert = true;
+for index = 1:length(ALLEEG), ff = union(ff, fieldnames(ALLEEG(index).event)); end;
+for iField = 1:length(ff)
+    
+    fieldChar = zeros(1,length(ALLEEG))*NaN;
+    for index = 1:length(ALLEEG)
+        if isfield(ALLEEG(index).event, ff{iField}) 
+            if ischar(ALLEEG(index).event(1).(ff{iField}))
+                 fieldChar(index) = 1;
+            else fieldChar(index) = 0;
+            end;
+        end;
+    end;
+    if ~all(fieldChar(~isnan(fieldChar)) == 1) && ~all(fieldChar(~isnan(fieldChar)) == 0)
+        % need conversion to char
+        for index = 1:length(ALLEEG)
+            if fieldChar(index) == 0
+                if flagConvert, disp('Warning: converting some event fields to strings - this may be slow'); flagConvert = false; end;
+                for iEvent = 1:length(ALLEEG(index).event)
+                    ALLEEG(index).event(iEvent).(ff{iField}) = num2str(ALLEEG(index).event(iEvent).(ff{iField}));
+                end;
+            end;
+        end;
+    end
+end;
+                
 %% Make trial info
 for index = 1:length(ALLEEG)
     tmpevent = ALLEEG(index).event;
