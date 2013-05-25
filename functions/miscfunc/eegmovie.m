@@ -2,22 +2,47 @@
 %              Uses scripts eegplotold() and topoplot().
 %              Use seemovie() to display the movie.
 % Usage:
+% >> [Movie,Colormap] = eegmovie(data,srate,elec_locs, 'key', val, ...);
 %
+% Or legacy call
 % >> [Movie,Colormap] = eegmovie(data,srate,elec_locs,title,movieframes,minmax,startsec,...);
 %
 % Inputs:
+%   data        = (chans,frames) EEG data set to plot
+%   srate       = sampling rate in Hz
+%   elec_locs   = electrode locations structure or file
+%
+% Optional inputs:
+%   'mode'        = ['2D'|'3D'] plot in 2D using topoplot or in 3D using
+%                   headplot. Default is 2D.
+%   'headplotopt' = [cell] optional inputs for headplot. Default is none.
+%   'topoplotopt' = [cell] optional inputs for topoplot. Default is none.
+%   'title'       = plot title. Default is none.
+%   'movieframes' = vector of frames indices to animate. Default is all.
+%   'minmax'      = [blue_lower_bound, red_upper_bound]. Default is 
+%                   +/-abs max of data.
+%   'startsec'    = starting time in seconds. Default is 0.
+%   'timecourse'  = ['on'|'off'] show time course for all electrodes. Default is 'on'.
+%   'framenum'    = ['on'|'off'] show frame number. Default is 'on'.
+%   'time'        = ['on'|'off'] show time in ms. Default is 'off'.
+%   'vert'        = [float] plot vertical lines at given latencies. Default is none.
+%   'camerapath'  = [az_start az_step el_start el_step] {default [-127 0 30 0]}
+%                   Setting all four non-0 creates a spiral camera path
+%                   Subsequent rows [movieframe az_step 0 el_step] adapt step 
+%                   sizes allowing starts/stops, panning back and forth, etc.
+%
+% Legacy inputs:
 %   data        = (chans,frames) EEG data set to plot
 %   srate       = sampling rate in Hz {0 -> 256 Hz}
 %   elec_locs   = ascii file of electrode locations {0 -> 'chan_file'}
 %   title       = 'plot title' {0 -> none}
 %   movieframes = vector of frames to animate {0 -> all}
-%   minmax      = [blue_lower_bound, red_upper_bound] 
+%   minmax      = [blue_lower_bound, red_upper_bound]
 %                 {0 -> +/-abs max of data}
 %  startsec     = starting time in seconds {0 -> 0.0}
 %  additional options from topoplot are allowed
-%  
 %
-% Author: Colin Humphries & Scott Makeig, CNL, Salk Institute, La Jolla, 3/97
+% Author: Arnaud Delorme, Colin Humphries & Scott Makeig, CNL, Salk Institute, La Jolla, 3/97
 %
 % See also: seemovie(), eegplotold(), topoplot()
 
@@ -47,7 +72,8 @@
 % 01/24/02 updated eegplot to eegplotold -ad
 % 01-25-02 reformated help & license, added links -ad 
 
-function [Movie, Colormap] = eegmovie(data,srate,eloc_locs,titl,movieframes,minmax,startsec,varargin)
+function [Movie, Colormap] = eegmovie(data,srate,eloc_locs,varargin);
+%titl,movieframes,minmax,startsec,varargin)
 
 if nargin<1
 	help eegmovie
@@ -56,36 +82,7 @@ end
 
 clf
 [chans,frames] = size(data);
-
 icadefs;   % read DEFAULT_SRATE;
-
-if nargin<7
-   startsec = 0;
-end
-if nargin<6
-   minmax = 0;
-end
-if minmax ==0,
-	datamin = min(min(data));
-	datamax = max(max(data));
-    absmax  = max([abs(datamin), abs(datamax)]);
-    fudge   = 0.05*(datamax-datamin); % allow for slight extrapolation
-    datamin = -absmax-fudge;
-    datamax =  absmax+fudge;
-    minmax = [datamin datamax];
-end
-if nargin <5
-	movieframes = 0;
-end
-if movieframes == 0
-	movieframes = 1:frames;
-end
-if nargin <4
-	titl = '';
-end
-if titl == 0
-	titl = '';
-end
 if nargin <2
 	srate = 0;
 end
@@ -93,72 +90,195 @@ if nargin <3
 	eloc_locs = 0;
 end
 
-if movieframes(1) < 1 | movieframes(length(movieframes))>frames
+if nargin > 2 && ~ischar(varargin{3}) || nargin == 2 && ~ischar(varargin{2})
+    % legacy mode
+    options = {};
+    if nargin>=8, options = { options{:} 'topoplotopt' varargin(5:end) }; end
+    if nargin>=7, options = { options{:} 'startsec'    varargin{4} }; end
+    if nargin>=6, options = { options{:} 'minmax'      varargin{3} }; end
+    if nargin>=5, options = { options{:} 'movieframes' varargin{2} }; end
+    if nargin>=4, options = { options{:} 'title'       varargin{1} }; end
+else
+    options = varargin;
+end;
+
+opt = finputcheck(options, { 'startsec'    'real'    {}    0;
+                             'minmax'      'real'    {}    0;
+                             'movieframes' 'integer' {}    0;
+                             'title'       'string'  {}    '';
+                             'vert'        'real'    {}    [];
+                             'mode'        'string'  { '2D' '3D'  }    '2D';
+                             'timecourse'  'string'  { 'on' 'off' }    'on';
+                             'framenum'    'string'  { 'on' 'off' }    'on';
+                             'camerapath'  'real'    []                0;
+                             'time'        'string'  { 'on' 'off' }    'off';
+                             'topoplotopt' 'cell'    {}    {};
+                             'headplotopt' 'cell'    {}    {} }, 'eegmovie');
+if opt.minmax ==0,
+	datamin = min(min(data));
+	datamax = max(max(data));
+    absmax  = max([abs(datamin), abs(datamax)]);
+    fudge   = 0.05*(datamax-datamin); % allow for slight extrapolation
+    datamin = -absmax-fudge;
+    datamax =  absmax+fudge;
+    opt.minmax = [datamin datamax];
+end
+
+if opt.movieframes == 0
+	opt.movieframes = 1:frames;
+end
+if opt.movieframes(1) < 1 || opt.movieframes(length(opt.movieframes))>frames
 	fprintf('eegmovie(): specified movieframes not in data!\n');
 	return
 end
-
 if srate ==0,
 	srate = DEFAULT_SRATE;
 end
+if strcmpi(opt.time, 'on'), opt.framenum = 'off'; end;
 
-mframes = length(movieframes);
+mframes = length(opt.movieframes);
 fprintf('Making a movie of %d frames\n',mframes)
 Movie    = moviein(mframes,gcf);
 
 %%%%%%%%%%%%%%%%%%%%% eegplot() of data %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-axeegplot = axes('Units','Normalized','Position',[.75 .05 .2 .9]);
+if strcmpi(opt.timecourse, 'on')
+    axeegplot = axes('Units','Normalized','Position',[.75 .05 .2 .9]);
+    
+    % >> eegplotold('noui',data,srate,spacing,eloc_file,startsec,color)
+    if isstruct(eloc_locs)
+        fid = fopen('tmp_file.loc', 'w');
+        adddots = '...';
+        for iChan = 1:length(eloc_locs)
+            fprintf(fid, '0 0 0 %s\n', [ eloc_locs(iChan).labels adddots(length(eloc_locs(iChan).labels):end) ]);
+        end;
+        fclose(fid);
+        eegplotold('noui',-data,srate,0,'tmp_file.loc',opt.startsec,'r');
+    else
+        eegplotold('noui',-data,srate,0,eloc_locs,opt.startsec,'r');
+    end;
+    
+    % set(axeegplot,'XTick',[])                %%CJH
+    % plot negative up
+    limits = get(axeegplot,'Ylim');          % list channel numbers only
+    set(axeegplot,'GridLineStyle',':')
+    set(axeegplot,'Xgrid','off')
+    set(axeegplot,'Ygrid','on')
+    
+    for ind = 1:length(opt.vert)
+       frameind = (opt.vert(ind)-opt.startsec)*srate+1;
+       line([frameind frameind],limits,'color','k'); % draw vertical line at map timepoint
+       set(axeegplot,'Xtick',frameind,'XtickLabel',num2str(opt.vert(ind),'%4.3f'));
+    end;
+end;
 
-% >> eegplotold('noui',data,srate,spacing,eloc_file,startsec,color)
-if isstruct(eloc_locs)
-    eegplotold('noui',-data,srate,0,[],startsec,'r');
-else
-    eegplotold('noui',-data,srate,0,eloc_locs,startsec,'r');
-end;    
-% set(axeegplot,'XTick',[])                %%CJH
-                                         % plot negative up
-limits = get(axeegplot,'Ylim');          % list channel numbers only
-set(axeegplot,'GridLineStyle',':')
-set(axeegplot,'Xgrid','off')
-set(axeegplot,'Ygrid','on')
+%%%%%%%%%%%%%%%%%%%%% topoplot/headplot axis %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 axcolor = get(gcf,'Color');
-
-%%%%%%%%%%%%%%%%%%%%% topoplot() maps %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 axtopoplot = axes('Units','Normalized','Position',[0 .1 .72 .8],'Color',axcolor);
 TPAXCOLOR  = get(axtopoplot,'Color');    %%CJH
 Colormap   = [jet(64);TPAXCOLOR];        %%CJH
-
 fprintf('Warning: do not resize plot window during movie creation ...\n   ');
+h = textsc(opt.title, 'title'); set(h,'FontSize',16)
+
+%%%%%%%%%%%%%%%%%%%%% headplot setup %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+if strcmpi(opt.mode, '3d')
+    headplot('setup',eloc_locs, 'tmp.spl', opt.headplotopt{:});
+    
+    if isequal(opt.camerapath, 0)
+        opt.camerapath = [-127 0 30 0];
+        fprintf('Using default view [-127 0 30 0].');
+    end;
+    if size(opt.camerapath,2)~=4
+        error('Camerapath parameter must have exact 4 columns');
+    end
+
+    newpan = length(opt.movieframes)+1;
+    posrow = 2;
+    if size(opt.camerapath,1) > 1
+        newpan = opt.camerapath(posrow,1); % pick up next frame to change camerapos step values
+    end
+    
+    azimuth   = opt.camerapath(1,1); % initial camerapath variables
+    az_step   = opt.camerapath(1,2);
+    elevation = opt.camerapath(1,3);
+    el_step   = opt.camerapath(1,4);
+    
+end;
 
 %%%%%%%%%%%%%%%%%%%%%%%%% "Roll'em!" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-for f = 1:length(movieframes)                      % make the movie, frame by frame
-   i=movieframes(f);
-   fprintf('%d ',f);
+for f = 1:length(opt.movieframes)                      % make the movie, frame by frame
+   indFrame = opt.movieframes(f);
 
-   axes(axeegplot)
-   x1 = startsec+(i-1)/srate;
-   l1 = line([i i],limits,'color','b'); % draw vertical line at map timepoint
-   timetext = num2str(x1,3);   % Note: Matlab4 doesn't take '%4.3f'
-   set(axeegplot,'Xtick',i,'XtickLabel',num2str(x1,'%4.3f'));
-
+   % show time course
+   if strcmpi(opt.timecourse, 'on')
+       axes(axeegplot)
+       x1 = opt.startsec+(indFrame-1)/srate;
+       l1 = line([indFrame indFrame],limits,'color','b'); % draw vertical line at map timepoint
+       set(axeegplot,'Xtick',indFrame,'XtickLabel',num2str(x1,'%4.3f'));
+   end;
+   
+   % plot headplot or topoplot
    axes(axtopoplot)
    cla
    set(axtopoplot,'Color',axcolor);
-   topoplot(data(:,i),eloc_locs,'style','both','maplimits',minmax, varargin{:}); 
-					                     % use channel locations file
-   txt = [ int2str(f)];  
-   text(-0.5,-0.5,txt,'FontSize',14);    % show frame number
-   title(titl,'FontSize',16)
+   if strcmpi(opt.mode, '2d')
+       topoplot(data(:,indFrame),eloc_locs,'maplimits',opt.minmax, opt.topoplotopt{:}); 
+   else
+       headplot(data(:,indFrame),'tmp.spl','view',[azimuth elevation], opt.headplotopt{:});
+       
+       % adapt camerapath step sizes
+       if indFrame == newpan   
+           az_step = opt.camerapath(posrow,2);
+           el_step = opt.camerapath(posrow,4);
+           posrow = posrow+1;
+           if size(opt.camerapath,1)>=posrow
+               newpan = opt.camerapath(posrow,1);
+           else
+               newpan = length(opt.movieframes)+1;
+           end
+       end
+       
+       % update camera position
+       azimuth = azimuth+az_step;     
+       elevation = elevation+el_step;
+       if elevation>=90
+           fprintf('headplot(): warning -- elevation out of range!\n');
+           elevation = 89.99;
+       end
+       if elevation<=-90
+           fprintf('headplot(): warning -- elevation out of range!\n');
+           elevation = -89.99;
+       end
+       
+       set(axtopoplot,'Units','pixels',...
+           'CameraViewAngleMode','manual',...
+           'YTickMode','manual','ZTickMode','manual',...
+           'PlotBoxAspectRatioMode','manual',...
+           'DataAspectRatioMode','manual');    % keep camera distance constant
+       
+   end;
+                                         
+   % show frame number
+   if strcmpi(opt.framenum, 'on') 
+       txt = [ int2str(f)]; 
+       text(-0.5,-0.5,txt,'FontSize',14);    
+   elseif strcmpi(opt.time, 'on') 
+       txt = sprintf('%3.3f s', opt.startsec+(indFrame-1)/srate); 
+       text(-0.5,-0.5,txt,'FontSize',14);    
+   end;
 
    Movie(:,f) = getframe(gcf);
    drawnow
-   delete(l1)
-
-   if rem(i,8) == 0
-     fprintf('\n'); % print newlines 
-   end
+   if strcmpi(opt.timecourse, 'on')
+       delete(l1)
+   end;
+   
+   % print advancement
+   fprintf('.',f);
+   if rem(indFrame,10) == 0, fprintf('%d',f); end;
+   if rem(indFrame,50) == 0, fprintf('\n'); end
 end
 fprintf('\nDone\n');
