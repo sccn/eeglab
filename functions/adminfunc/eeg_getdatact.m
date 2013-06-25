@@ -139,6 +139,20 @@ if strcmpi(EEG.data, 'in set file')
     EEG = pop_loadset('filename', EEG.filename, 'filepath', EEG.filepath);
 end;
 
+% get data boundaries if continuous data
+% --------------------------------------
+boundaries = [];
+if nargout > 1 && EEG.trials == 1 && ~isempty(EEG.event) && isfield(EEG.event, 'type') && isstr(EEG.event(1).type)
+    if ~isempty(opt.samples)
+        disp('WARNING: eeg_getdatact.m, boundaries are not accurate when selecting data samples');
+    end;
+    tmpevent = EEG.event;
+    tmpbound = strmatch('boundary', lower({ tmpevent.type }));
+    if ~isempty(tmpbound)
+        boundaries = [tmpevent(tmpbound).latency ]-0.5;
+    end;
+end;
+
 % getting channel or component activation
 % ---------------------------------------
 filename = fullfile(EEG.filepath, [ EEG.filename(1:end-4) '.icaact' ] );
@@ -282,20 +296,6 @@ if ~isempty(opt.projchan)
     end;
     
     data = EEG.icawinv(finalChanInds, opt.component)*data(:,:);
-end;
-
-% get data boundaries if continuous data
-% --------------------------------------
-boundaries = [];
-if nargout > 1 && EEG.trials == 1 && ~isempty(EEG.event) && isfield(EEG.event, 'type') && isstr(EEG.event(1).type)
-    if ~isempty(opt.samples)
-        disp('WARNING: eeg_getdatact.m, boundaries are not accurate when selecting data samples');
-    end;
-    tmpevent = EEG.event;
-    tmpbound = strmatch('boundary', lower({ tmpevent.type }));
-    if ~isempty(tmpbound)
-        boundaries = [tmpevent(tmpbound).latency ]-0.5;
-    end;
 end;
 
 if size(data,2)*size(data,3) ~= EEG.pnts*EEG.trials
