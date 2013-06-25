@@ -220,6 +220,10 @@ function g = fieldtest( fieldname, fieldtype, fieldval, tmpval, callfunc );
           g = [ callfunc 'error: argument ''' fieldname ''' must be a structure' ]; return;
       end;
       
+     case 'function_handle'
+      if ~isa(tmpval, 'function_handle')
+          g = [ callfunc 'error: argument ''' fieldname ''' must be a function handle' ]; return;
+      end;
       
      case '';
      otherwise, error([ 'finputcheck error: unrecognized type ''' fieldname '''' ]);
