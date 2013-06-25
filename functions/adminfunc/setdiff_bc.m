@@ -7,6 +7,7 @@ errorFlag = error_bc;
 v = version;
 indp = find(v == '.');
 v = str2num(v(1:indp(2)-1));
+if v > 7.19, v = floor(v) + rem(v,1)/10; end;
 
 if nargin > 2
     ind = strmatch('legacy', varargin);
