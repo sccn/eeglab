@@ -112,7 +112,7 @@ if nargin < 1
     % Conditional pass if ~isempty(result{7}), options = ... 
     % [options ', ''memmapfile''', result{7} ] ; end ;
     % Always pass the memmapfile paramter? 
-    options = [ options ', ''memmapfile'', ', 'result{7}' ] ;
+    options = [ options ', ''memmapfile'', ''', result{7} '''' ] ;
 else
 	options = vararg2str(varargin);
 end;
