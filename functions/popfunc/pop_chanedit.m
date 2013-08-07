@@ -707,15 +707,19 @@ else
                 if isempty(tmpargs), return; end;
                 fid = fopen(tmpargs, 'w');
                 if fid ==-1, error('Cannot open file'); end;
+                
                 allfields = fieldnames(chans);
+                fields = { 'labels' 'theta' 'radius' 'X' 'Y' 'Z' 'sph_theta' 'sph_phi' 'sph_radius' 'type' };
+                tmpdiff = setdiff(fields, allfields);
+                if ~isempty(tmpdiff), error(sprintf('Field "%s" missing in channel location structure', tmpdiff{1})); end;
                 fprintf(fid, 'Number\t');
-                for field = 1:length(allfields)
-                    fprintf(fid, '%s\t', allfields{field});
+                for field = 1:length(fields)
+                    fprintf(fid, '%s\t', fields{field});
                 end;
                 fprintf(fid, '\n');
                 for index=1:length(chans)
                     fprintf(fid, '%d\t',  index);
-                    for field = 1:length(allfields)
+                    for field = 1:length(fields)
                         tmpval = getfield(chans, {index}, allfields{field});
                         if isstr(tmpval)
                             fprintf(fid, '%s\t',  tmpval);
