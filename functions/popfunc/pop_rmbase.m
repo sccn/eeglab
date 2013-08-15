@@ -123,7 +123,8 @@ if exist('pointrange') ~= 1 || isempty(pointrange)
     if ~isempty(timerange) && (timerange(1) < EEG.xmin*1000) & (timerange(2) > EEG.xmax*1000)
         error('pop_rmbase(): Bad time range');
     end;
-    pointrange = round((timerange(1)/1000-EEG.xmin)*EEG.srate+1):round((timerange(2)/1000-EEG.xmin)*EEG.srate);
+    pointrange = round((timerange(1)/1000-EEG.xmin)*EEG.srate+1):ceil((timerange(2)/1000-EEG.xmin)*EEG.srate);
+    if pointrange(end) > EEG.pnts, pointrange(end) = EEG.pnts; end;
 end;	
 
 if ~isempty(pointrange) && ((min(pointrange) < 1) || (max( pointrange ) > EEG.pnts))
@@ -144,11 +145,15 @@ if EEG.trials == 1 && ~isempty(EEG.event) ...
         boundaries = round([ tmpevent(boundaries).latency ] -0.5-pointrange(1)+1);
         boundaries(boundaries>=pointrange(end)-pointrange(1)) = [];
         boundaries(boundaries<1) = [];
-        boundaries = [0 boundaries pointrange(end)-pointrange(1)];
+        boundaries = [0 boundaries pointrange(end)-pointrange(1)+1];
         for index=1:length(boundaries)-1
             tmprange = [boundaries(index)+1:boundaries(index+1)];
-            EEG.data(:,tmprange) = rmbase( EEG.data(:,tmprange), length(tmprange), ...
-                                               [1:length(tmprange)]);
+            if length(tmprange) > 1
+                EEG.data(:,tmprange) = rmbase( EEG.data(:,tmprange), length(tmprange), ...
+                                                   [1:length(tmprange)]);
+            elseif length(tmprange) == 1
+                EEG.data(:,tmprange) = 0;
+            end;
         end;
     else
         EEG.data = rmbase( EEG.data, EEG.pnts, pointrange );    
