@@ -41,9 +41,28 @@ HZDIR = 'up';               % ascending freqs = 'up'; descending = 'down'
                             % (e.g., timef/newtimef frequency direction)
 
 % font size
-GUI_FONTSIZE  = 10; % graphic interface font size
-AXES_FONTSIZE = 10; % Axis labels and legend font size
-TEXT_FONTSIZE = 10; % Miscellaneous font sizes
+tmpComputer   = computer;
+tmpScreenSize = get(0, 'ScreenSize');
+retinaDisplay = false;
+if tmpScreenSize(3) == 1440 && ( tmpScreenSize(3) == 878 || tmpScreenSize(3) == 900 )
+    retinaDisplay = true;
+end;
+    
+% retinaDisplay = false; % uncoment this line if not retina display
+if retinaDisplay && strcmpi(tmpComputer(1:3), 'MAC')
+    W_MAIN = findobj('tag', 'EEGLAB');
+    if isempty(W_MAIN)
+        disp('Mac OSX retina display detected. If this is not the case uncoment line 50 of icadefs.m');
+    end;
+    GUI_FONTSIZE  = 18; % graphic interface font size
+    AXES_FONTSIZE = 18; % Axis labels and legend font size
+    TEXT_FONTSIZE = 18; % Miscellaneous font sizes
+else
+    GUI_FONTSIZE  = 10; % graphic interface font size
+    AXES_FONTSIZE = 10; % Axis labels and legend font size
+    TEXT_FONTSIZE = 10; % Miscellaneous font sizes
+end;
+clear retinaDisplay tmpScreenSize tmpComputer;
 
 % the eeg_options.m file also countains additional options
 
