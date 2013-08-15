@@ -32,7 +32,7 @@
 %                  is ignored when plotting components). This entry contains 
 %                  the indices of the components to be removed. Default is none.
 %   'interp'     - [struct] channel location structure containing electrode
-%                  to interpolate ((this entry is ignored when plotting 
+%                  to interpolate (this entry is ignored when plotting 
 %                  components). Default is no interpolation.
 %   'fileout'    - [string] name of the file to save on disk. The default
 %                  is the same name (with a different extension) as the 
