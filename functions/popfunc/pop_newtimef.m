@@ -257,7 +257,7 @@ if popup
     if result.basenorm == 2,         options = [ options ', ''basenorm'', ''on''' ];      end;
     if result.basenorm == 4,         options = [ options ', ''basenorm'', ''on''' ];      end;
     if result.basenorm >= 3,         options = [ options ', ''trialbase'', ''full''' ];      end;
-    
+
     % add title
     % ---------
 	if isempty( findstr(  '''title''', result.options))
@@ -267,6 +267,13 @@ if popup
             chanlabel = int2str(num);
         end;
 	end;
+    
+    % compute default winsize
+    % -----------------------
+    if EEG.xmin < 0 && isempty(findstr( '''winsize''', result.options)) && isempty( result.freqs )
+        fprintf('Computing window size in pop_newtimef based on half of the length of the baseline period');
+        options = [ options ', ''winsize'', ' int2str(-EEG.xmin*EEG.srate) ];
+    end;
     
 	figure; try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
 else
