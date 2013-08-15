@@ -123,7 +123,7 @@ end
 % -------------------------------
 eeglab_options;
 if length(EEG) == 1
-    if strcmpi(g.savemode, 'resave') & isfield(EEG, 'datfile') & option_savematlab
+    if strcmpi(g.savemode, 'resave') && isfield(EEG, 'datfile') && ~option_savetwofiles
         disp('Note that your memory options for saving datasets does not correspond')
         disp('to the format of the datasets on disk (ignoring memory options)')
 % $$$         but = questdlg2(strvcat('This dataset has an associated ''.dat'' file, but since you have', ...
@@ -138,7 +138,7 @@ if length(EEG) == 1
 % $$$         end;
 % $$$         g.filename = EEG.filename;
 % $$$         g.filepath = EEG.filepath;
-    elseif strcmpi(g.savemode, 'resave') & ~isfield(EEG, 'datsave(file') & ~option_savematlab
+    elseif strcmpi(g.savemode, 'resave') && ~isfield(EEG, 'datfile') && option_savetwofiles
         disp('Note that your memory options for saving datasets does not correspond')
         disp('to the format of the datasets on disk (ignoring memory options)')
 % $$$         but = questdlg2(strvcat('This dataset does not have yet an associated ''.dat'' file, but since you have', ...
