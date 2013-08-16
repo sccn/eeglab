@@ -50,15 +50,31 @@
 %  'savetrials'  - ['on'|'off'] save single-trials ERSP. Requires a lot of disk
 %                  space (dataset space on disk times 10) but allow for refined
 %                  single-trial statistics.
+%  'customfunc'  - [function_handle] execute a specific function on each
+%                  EEGLAB dataset of the selected STUDY design. Optional
+%                  arguments are 'the same as those passed on to std_erp
+%                  (except for 'rmbase'). Example is 
+%                  @(X,varargin)(shiftdim(squeeze(mean(X,3)),-1))
+%                  This will compute the ERP for the STUDY design. X is the
+%                  data from each design. Note that the first dimension needs 
+%                  to be 1 (the reason for
+%                  shiftdim above) because this dimension is for subjects.
+%                  so the array above has size 1 x channels x data. Anonymous 
+%                  and non-anonymous functions may be used. The output is 
+%                  returned in CustomRes.
+%  'customparams' - [cell array] Parameters for the custom function above.
+% 
 % Outputs:
 %   ALLEEG       - the input ALLEEG vector of EEG dataset structures, modified  
 %                  by adding preprocessing data as pointers to Matlab files that 
 %                  hold the pre-clustering component measures.
 %   STUDY        - the input STUDY set with pre-clustering data added,
 %                  for use by pop_clust()
+%   CustomRes    - cell array of custom results (one cell for each pair of
+%                  independent variables as defined in the STUDY design).
 %
 % Example:
-%   >> [STUDY ALLEEG] = std_precomp(STUDY, ALLEEG, { 'cz' 'oz' }, 'interpo', ...
+%   >> [STUDY ALLEEG CustomRes] = std_precomp(STUDY, ALLEEG, { 'cz' 'oz' }, 'interp', ...
 %               'on', 'erp', 'on', 'spec', 'on', 'ersp', 'on', 'erspparams', ...
 %               { 'cycles' [ 3 0.5 ], 'alpha', 0.01, 'padratio' 1 });
 %                          
@@ -66,6 +82,12 @@
 %           % If a data channel is missing in one dataset, it will be
 %           % interpolated (see eeg_interp()). The ERP, spectrum, ERSP, and 
 %           % ITC for each dataset is then computed. 
+%
+% Example of custom call:
+%   The function below computes the standard deviation of the EEG data for
+%   each channel.
+%   >> [STUDY ALLEEG customres] = std_precomp(STUDY, ALLEEG, 'channels', ...
+%               'customfunc', @(EEG,varargin)(std(EEG.data(:,:),[],2)));
 %
 % Authors: Arnaud Delorme, SCCN, INC, UCSD, 2006-
 
@@ -85,7 +107,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
+function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
     
     if nargin < 2
         help std_precomp;
@@ -110,6 +132,7 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
                                 'allcomps'    'string'  { 'on','off' }     'off';
                                 'itc'         'string'  { 'on','off' }     'off';
                                 'savetrials'  'string'  { 'on','off' }     'off';
+                                'customfunc'  {'function_handle' 'integer' } { { } {} }     [];
                                 'rmicacomps'  'string'  { 'on','off','processica' }     'off';
                                 'cell'        'integer' []                 [];
                                 'design'      'integer' []                 STUDY.currentdesign;
@@ -117,6 +140,7 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
                                 'rmbase'      'integer' []                 []; % deprecated, for backward compatibility purposes, not documented
                                 'specparams'        'cell'    {}                 {};
                                 'erpparams'         'cell'    {}                 {};
+                                'customparams'      'cell'    {}                 {};
                                 'erpimparams'       'cell'    {}                 {};
                                 'erspparams'        'cell'    {}                 {}}, 'std_precomp');
     if isstr(g), error(g); end;
@@ -171,6 +195,42 @@ function [ STUDY, ALLEEG ] = std_precomp(STUDY, ALLEEG, chanlist, varargin)
     else curstruct = STUDY.cluster;
     end;
     
+    % compute custom measure
+    % ----------------------
+    if ~isempty(g.customfunc)
+        nc = max(length(STUDY.design(g.design).variable(1).value),1);
+        ng = max(length(STUDY.design(g.design).variable(2).value),1);
+        allinds = curstruct(1).allinds; % same for all channels and components (see std_selectdesign)
+        setinds = curstruct(1).setinds; % same for all channels and components (see std_selectdesign)
+        
+        for cInd = 1:nc
+            for gInd = 1:ng
+                if ~isempty(setinds{cInd,gInd})
+                    desset = STUDY.design(g.design).cell(setinds{cInd,gInd}(:));
+                    for iDes = 1:length(desset)
+                        addopts = { 'savetrials', g.savetrials, 'recompute', g.recompute, 'fileout', desset(iDes).filebase };
+                        
+                        TMPEEG = ALLEEG(desset(iDes).dataset);
+                        if strcmpi(computewhat, 'channels')
+                            [tmpchanlist opts] = getchansandopts(STUDY, ALLEEG(desset(iDes).dataset), chanlist, [desset(iDes).dataset], g);
+                             X = eeg_getdatact(TMPEEG, 'channel'  , [1:TMPEEG(1).nbchan],             'trialindices', desset(iDes).trials, opts{:});
+                        else X = eeg_getdatact(TMPEEG, 'component', [1:size(TMPEEG(1).icaweights,1)], 'trialindices', desset(iDes).trials );
+                        end;
+                        if strcmpi(computewhat, 'channels')
+                            resTmp(iDes,:,:)   = feval(g.customfunc, X, 'channels', tmpchanlist, opts{:}, addopts{:}, g.customparams{:});
+                            %customRes{cInd,gInd} = feval(g.customfunc, ALLEEG(desset.dataset), 'channels', tmpchanlist, opts{:}, addopts{:}, g.erpparams{:});
+                        else
+                            resTmp(iDes,:,:)   = feval(g.customfunc, X, 'components', chanlist{desset(iDes).dataset(1)}, addopts{:}, g.customparams{:});
+                            %customRes{cInd,gInd} = feval(g.customfunc, ALLEEG(desset.dataset), 'components', chanlist{desset.dataset(1)}, addopts{:}, g.erpparams{:});
+                        end;
+                    end;
+                    customRes{cInd,gInd} = resTmp;
+                    clear resTmp;
+                end;
+            end;
+        end;
+    end;
+
     % compute ERPs
     % ------------
     if strcmpi(g.erp, 'on')
