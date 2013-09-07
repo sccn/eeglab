@@ -50,19 +50,8 @@
 %  'savetrials'  - ['on'|'off'] save single-trials ERSP. Requires a lot of disk
 %                  space (dataset space on disk times 10) but allow for refined
 %                  single-trial statistics.
-%  'customfunc'  - [function_handle] execute a specific function on each
-%                  EEGLAB dataset of the selected STUDY design. Optional
-%                  arguments are 'the same as those passed on to std_erp
-%                  (except for 'rmbase'). Example is 
-%                  @(X,varargin)(shiftdim(squeeze(mean(X,3)),-1))
-%                  This will compute the ERP for the STUDY design. X is the
-%                  data from each design. Note that the first dimension needs 
-%                  to be 1 (the reason for
-%                  shiftdim above) because this dimension is for subjects.
-%                  so the array above has size 1 x channels x data. Anonymous 
-%                  and non-anonymous functions may be used. The output is 
-%                  returned in CustomRes.
-%  'customparams' - [cell array] Parameters for the custom function above.
+%  'customfunc'  - [function_handle] this function has been disabled. See
+%                  EEGLAB 13.
 % 
 % Outputs:
 %   ALLEEG       - the input ALLEEG vector of EEG dataset structures, modified  
@@ -82,12 +71,6 @@
 %           % If a data channel is missing in one dataset, it will be
 %           % interpolated (see eeg_interp()). The ERP, spectrum, ERSP, and 
 %           % ITC for each dataset is then computed. 
-%
-% Example of custom call:
-%   The function below computes the standard deviation of the EEG data for
-%   each channel.
-%   >> [STUDY ALLEEG customres] = std_precomp(STUDY, ALLEEG, 'channels', ...
-%               'customfunc', @(EEG,varargin)(std(EEG.data(:,:),[],2)));
 %
 % Authors: Arnaud Delorme, SCCN, INC, UCSD, 2006-
 
@@ -145,7 +128,8 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
                                 'erspparams'        'cell'    {}                 {}}, 'std_precomp');
     if isstr(g), error(g); end;
     if ~isempty(g.rmbase), g.erpparams = { g.erpparams{:} 'rmbase' g.rmbase }; end;
-    
+    if ~isempty(g.customfunc) error('Custom function disable - use EEGLAB 13'); end;
+        
     % union of all channel structures
     % -------------------------------
     computewhat = 'channels';
