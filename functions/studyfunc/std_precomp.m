@@ -51,18 +51,27 @@
 %                  space (dataset space on disk times 10) but allow for refined
 %                  single-trial statistics.
 %  'customfunc'  - [function_handle] execute a specific function on each
-%                  EEGLAB dataset of the selected STUDY design. Optional
-%                  arguments are 'the same as those passed on to std_erp
-%                  (except for 'rmbase'). Example is 
-%                  @(X,varargin)(shiftdim(squeeze(mean(X,3)),-1))
-%                  This will compute the ERP for the STUDY design. X is the
-%                  data from each design. Note that the first dimension needs 
-%                  to be 1 (the reason for
-%                  shiftdim above) because this dimension is for subjects.
-%                  so the array above has size 1 x channels x data. Anonymous 
-%                  and non-anonymous functions may be used. The output is 
-%                  returned in CustomRes.
+%                  EEGLAB dataset of the selected STUDY design. The fist 
+%                  argument to the function is an EEGLAB dataset. Example is 
+%                  @(EEG)mean(EEG.data,3)
+%                  This will compute the ERP for the STUDY design. EEG is the
+%                  EEGLAB dataset corresponding to each cell design. It
+%                  corresponds to a dataset computed dynamically based on
+%                  the design selection. If 'rmclust', 'rmicacomps' or 'interp'
+%                  are being used, the channel data is affected
+%                  accordingly. Anonymous and non-anonymous functions may be 
+%                  used. The output is returned in CustomRes or saved on
+%                  disk. The output of the custom function may be an numerical 
+%                  array or a structure.
 %  'customparams' - [cell array] Parameters for the custom function above.
+%  'customfileext' - [string] file extension for saving custom data. Use
+%                    function to read custom data. If left empty, the
+%                    result is returned in the customRes output. Note that
+%                    if the custom function does not return a structure,
+%                    the data is automatically saved in a variable named
+%                    'data'.
+%  'customclusters' - [integer array] load only specific clusters. This is
+%                    used with SIFT. chanorcomp 3rd input must be 'components'.
 % 
 % Outputs:
 %   ALLEEG       - the input ALLEEG vector of EEG dataset structures, modified  
@@ -70,11 +79,11 @@
 %                  hold the pre-clustering component measures.
 %   STUDY        - the input STUDY set with pre-clustering data added,
 %                  for use by pop_clust()
-%   CustomRes    - cell array of custom results (one cell for each pair of
+%   customRes    - cell array of custom results (one cell for each pair of
 %                  independent variables as defined in the STUDY design).
 %
 % Example:
-%   >> [STUDY ALLEEG CustomRes] = std_precomp(STUDY, ALLEEG, { 'cz' 'oz' }, 'interp', ...
+%   >> [STUDY ALLEEG customRes] = std_precomp(STUDY, ALLEEG, { 'cz' 'oz' }, 'interp', ...
 %               'on', 'erp', 'on', 'spec', 'on', 'ersp', 'on', 'erspparams', ...
 %               { 'cycles' [ 3 0.5 ], 'alpha', 0.01, 'padratio' 1 });
 %                          
@@ -84,10 +93,15 @@
 %           % ITC for each dataset is then computed. 
 %
 % Example of custom call:
-%   The function below computes the standard deviation of the EEG data for
-%   each channel.
-%   >> [STUDY ALLEEG customres] = std_precomp(STUDY, ALLEEG, 'channels', ...
-%               'customfunc', @(EEG,varargin)(std(EEG.data(:,:),[],2)));
+%   The function below computes the ERP of the EEG data for each channel and plots it.
+%   >> [STUDY ALLEEG customres] = std_precomp(STUDY, ALLEEG, 'channels', 'customfunc', @(EEG,varargin)(mean(EEG.data,3)));
+%   >> std_plotcurve([1:size(customres{1})], customres, 'chanlocs', ALLEEG(1).chanlocs); % plot data
+%
+%   The function below uses a data file to store the information then read
+%   the data and eventyally plot it
+%   >> [STUDY ALLEEG customres] = std_precomp(STUDY, ALLEEG, 'channels', 'customfunc', @(EEG,varargin)(mean(EEG.data,3)), 'customfileext', 'tmperp');
+%   >> erpdata = std_readcustom(STUDY, ALLEEG, 'tmperp');
+%   >> std_plotcurve([1:size(erpdata{1})], erpdata, 'chanlocs', ALLEEG(1).chanlocs); % plot data
 %
 % Authors: Arnaud Delorme, SCCN, INC, UCSD, 2006-
 
@@ -117,6 +131,7 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
     if nargin == 2
         chanlist = 'channels'; % default to clustering the whole STUDY 
     end   
+    customRes = [];
     Ncond = length(STUDY.condition);
     if Ncond == 0
         Ncond = 1;
@@ -132,7 +147,6 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
                                 'allcomps'    'string'  { 'on','off' }     'off';
                                 'itc'         'string'  { 'on','off' }     'off';
                                 'savetrials'  'string'  { 'on','off' }     'off';
-                                'customfunc'  {'function_handle' 'integer' } { { } {} }     [];
                                 'rmicacomps'  'string'  { 'on','off','processica' }     'off';
                                 'cell'        'integer' []                 [];
                                 'design'      'integer' []                 STUDY.currentdesign;
@@ -140,7 +154,10 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
                                 'rmbase'      'integer' []                 []; % deprecated, for backward compatibility purposes, not documented
                                 'specparams'        'cell'    {}                 {};
                                 'erpparams'         'cell'    {}                 {};
+                                'customfunc'  {'function_handle' 'integer' } { { } {} }     [];
                                 'customparams'      'cell'    {}                 {};
+                                'customfileext'     'string'  []                 '';
+                                'customclusters'    'integer' []                 [];
                                 'erpimparams'       'cell'    {}                 {};
                                 'erspparams'        'cell'    {}                 {}}, 'std_precomp');
     if isstr(g), error(g); end;
@@ -208,23 +225,30 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
                 if ~isempty(setinds{cInd,gInd})
                     desset = STUDY.design(g.design).cell(setinds{cInd,gInd}(:));
                     for iDes = 1:length(desset)
-                        addopts = { 'savetrials', g.savetrials, 'recompute', g.recompute, 'fileout', desset(iDes).filebase };
-                        
-                        TMPEEG = ALLEEG(desset(iDes).dataset);
                         if strcmpi(computewhat, 'channels')
-                            [tmpchanlist opts] = getchansandopts(STUDY, ALLEEG(desset(iDes).dataset), chanlist, [desset(iDes).dataset], g);
-                             X = eeg_getdatact(TMPEEG, 'channel'  , [1:TMPEEG(1).nbchan],             'trialindices', desset(iDes).trials, opts{:});
-                        else X = eeg_getdatact(TMPEEG, 'component', [1:size(TMPEEG(1).icaweights,1)], 'trialindices', desset(iDes).trials );
+                             [tmpchanlist opts] = getchansandopts(STUDY, ALLEEG, chanlist, desset(iDes).dataset, g);
+                             TMPEEG = std_getdataset(STUDY, ALLEEG, 'design', g.design, 'cell', desset(iDes).dataset, opts{:}); % trial indices included in cell selection
+                        else TMPEEG = std_getdataset(STUDY, ALLEEG, 'design', g.design, 'cell', desset(iDes).dataset, 'clusters', g.customclusters);
                         end;
-                        if strcmpi(computewhat, 'channels')
-                            resTmp(iDes,:,:)   = feval(g.customfunc, X, 'channels', tmpchanlist, opts{:}, addopts{:}, g.customparams{:});
-                            %customRes{cInd,gInd} = feval(g.customfunc, ALLEEG(desset.dataset), 'channels', tmpchanlist, opts{:}, addopts{:}, g.erpparams{:});
+                        addopts = { 'savetrials', g.savetrials, 'recompute', g.recompute }; % not currently used
+                        
+                        tmpData = feval(g.customfunc, TMPEEG, g.customparams{:});
+                        if isempty(g.customfileext)
+                            resTmp(iDes,:,:) = tmpData;
                         else
-                            resTmp(iDes,:,:)   = feval(g.customfunc, X, 'components', chanlist{desset(iDes).dataset(1)}, addopts{:}, g.customparams{:});
-                            %customRes{cInd,gInd} = feval(g.customfunc, ALLEEG(desset.dataset), 'components', chanlist{desset.dataset(1)}, addopts{:}, g.erpparams{:});
+                            fileName = [ desset(iDes).filebase '.' g.customfileext ];
+                            clear data;
+                            data.data = tmpData;
+                            data.datafile   = computeFullFileName( { ALLEEG(desset(iDes).dataset).filepath }, { ALLEEG(desset(iDes).dataset).filename });
+                            data.datatrials = desset(iDes).trials;
+                            data.datatype = upper(g.customfileext);
+                            if ~isempty(g.customparams) data.parameters = g.customparams; end;
+                            std_savedat(fileName, data);
                         end;
                     end;
-                    customRes{cInd,gInd} = resTmp;
+                    if isempty(g.customfileext)
+                        customRes{cInd,gInd} = resTmp;
+                    end;
                     clear resTmp;
                 end;
             end;
@@ -539,3 +563,9 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
             tmpchanlist = { tmpchanlocs(newchanlist).labels };
         end;
         
+    % compute full file names
+    % -----------------------
+    function res = computeFullFileName(filePaths, fileNames);
+        for index = 1:length(fileNames)
+            res{index} = fullfile(filePaths{index}, fileNames{index});
+        end;
