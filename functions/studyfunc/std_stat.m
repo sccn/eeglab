@@ -156,8 +156,8 @@ if strcmpi(opt.mode, 'eeglab')
     end;
     
     if ~isempty(opt.groupstats) || ~isempty(opt.condstats)
-        if strcmpi(opt.eeglab.mcorrect, 'fdr'),
-            disp('Applying FDR correction for multiple comparisons');
+        if ~strcmpi(opt.eeglab.mcorrect, 'none'),
+            disp([ 'Applying ' upper(opt.eeglab.mcorrect) ' correction for multiple comparisons' ]);
             for ind = 1:length(pcond),  pcond{ind}  = mcorrect( pcond{ind} , opt.eeglab.mcorrect ); end;
             for ind = 1:length(pgroup), pgroup{ind} = mcorrect( pgroup{ind}, opt.eeglab.mcorrect ); end;
             if ~isempty(pinter),
