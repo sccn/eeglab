@@ -83,7 +83,7 @@ function [ returndata ] = std_readcustom(STUDY, ALLEEG, fileext, varargin)
             end;
             
             desset = STUDY.design(g.design).cell(cellInds);
-            clear EEGTMP;
+            clear EEGTMP data;
             for iDes = 1:length(desset)
                 
                 % load data on disk
@@ -104,6 +104,7 @@ function [ returndata ] = std_readcustom(STUDY, ALLEEG, fileext, varargin)
                     data(iDes) = tmpData;
                 end;
             end;
+            data = shiftdim(data,1);
             if ~isempty(g.eegfield)
                 returndata{cInd,gInd} = EEGTMP;
             else
