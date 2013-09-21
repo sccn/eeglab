@@ -26,11 +26,15 @@
 %
 % Optional Setup-mode Inputs:
 %
-%   'meshfile'    - ['string'] Matlab files containing at least two variables:
+%   'meshfile'    - ['string'] Matlab files containing a mesh. The mesh may
+%                   be of different formats. It may be a Dipfit mesh as
+%                   defined in the file standard_vol.mat. It may contain 
+%                   a structure with the fields 'vertices' and 'faces' or it
+%                   it may contain a structure with at least two fields:
 %                      POS    - 3-D positions of vertices: 
 %                               x=left-right; y=back-front; z=up-down
 %                      TRI1   - faces on which the scalp map should be computed
-%                     plus possible optional variables:
+%                   plus possible optional fields are:
 %                     center (optional) - 3-D center of head mesh
 %                     TRI2   (optional) - faces in skin color
 %                     NORM   (optional) - normal for each vertex (better shading)
