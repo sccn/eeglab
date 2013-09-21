@@ -115,6 +115,7 @@ function newregions = combineregions(regions)
 newregions = regions;
 for index = size(regions,1):-1:2
     if regions(index-1,2) >= regions(index,1)
+        disp('Warning: overlapping regions detected and fixed in eeg_eegrej');
         newregions(index-1,:) = [regions(index-1,1) regions(index,2) ];
         newregions(index,:)   = [];
     end;
