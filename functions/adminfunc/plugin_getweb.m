@@ -46,6 +46,9 @@ for iRow = 1:length(plugin)
         plugin(iRow).installorupdate = 1;
         plugin(iRow).status          = 'notinstalled';
     else
+        if length(indMatch) > 1
+            disp([ 'Warning: duplicate plugin ' plugin(iRow).name ' instaled' ]); 
+        end;
         plugin(iRow).currentversion = pluginOri(indMatch).currentversion;
         plugin(iRow).foldername     = pluginOri(indMatch).foldername;
         plugin(iRow).status         = pluginOri(indMatch).status;
@@ -55,7 +58,7 @@ for iRow = 1:length(plugin)
         else
             plugin(iRow).installorupdate = 1;
         end;
-        allMatch = [ allMatch indMatch ];
+        allMatch = [ allMatch indMatch(:)' ];
     end;
 end;
 
