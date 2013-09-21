@@ -90,13 +90,13 @@ end;
 % handle regions from eegplot
 % ---------------------------
 if size(regions,2) > 2, regions = regions(:, 3:4); end;
+regions = combineregions(regions);
 
 [EEG.data EEG.xmax tmpalllatencies boundevents] = eegrej( EEG.data, ...
 												  regions, EEG.xmax-EEG.xmin, tmpalllatencies);
 oldEEGpnts = EEG.pnts;
 EEG.pnts   = size(EEG.data,2);
 EEG.xmax   = EEG.xmax+EEG.xmin;
-
 
 % add boundary events
 % -------------------
@@ -106,4 +106,16 @@ if ~isempty(boundevents) % boundevent latencies will be recomputed in the functi
 end;
 
 com = sprintf('%s = eeg_eegrej( %s, %s);', inputname(1), inputname(1), vararg2str({ regions })); 
-return;
+
+% combine regions if necessary
+% it should not be necessary but a 
+% bug in eegplot makes that it sometimes is
+% ----------------------------
+function newregions = combineregions(regions)
+newregions = regions;
+for index = size(regions,1):-1:2
+    if regions(index-1,2) >= regions(index,1)
+        newregions(index-1,:) = [regions(index-1,1) regions(index,2) ];
+        newregions(index,:)   = [];
+    end;
+end;
