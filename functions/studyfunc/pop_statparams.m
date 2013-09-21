@@ -103,7 +103,7 @@ if isempty(varargin) && ~isempty(STUDY)
     paramstruct         = STUDY.etc.statistics;
     eeglabStatvalues    = { 'param' 'perm' 'bootstrap' };
     fieldtripStatvalues = { 'analytic' 'montecarlo' };
-    mCorrectList        = { 'no' 'bonferoni' 'holms' 'fdr' 'max' 'cluster' };
+    mCorrectList        = { 'none' 'bonferoni' 'holms' 'fdr' 'max' 'cluster' };
     condstats   = fastif(strcmpi(paramstruct.condstats, 'on'), 1, 0);
     groupstats  = fastif(strcmpi(paramstruct.groupstats,'on'), 1, 0);
     statmode    = fastif(strcmpi(paramstruct.singletrials,'on'), 1, 0);
