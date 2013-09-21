@@ -219,6 +219,10 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
         ng = max(length(STUDY.design(g.design).variable(2).value),1);
         allinds = curstruct(1).allinds; % same for all channels and components (see std_selectdesign)
         setinds = curstruct(1).setinds; % same for all channels and components (see std_selectdesign)
+        if ~isempty(g.customclusters)
+            allinds = curstruct(g.customclusters).allinds; % same for all channels and components (see std_selectdesign)
+            setinds = curstruct(g.customclusters).setinds; % same for all channels and components (see std_selectdesign)
+        end;
         
         for cInd = 1:nc
             for gInd = 1:ng
@@ -227,14 +231,14 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
                     for iDes = 1:length(desset)
                         if strcmpi(computewhat, 'channels')
                              [tmpchanlist opts] = getchansandopts(STUDY, ALLEEG, chanlist, desset(iDes).dataset, g);
-                             TMPEEG = std_getdataset(STUDY, ALLEEG, 'design', g.design, 'cell', desset(iDes).dataset, opts{:}); % trial indices included in cell selection
-                        else TMPEEG = std_getdataset(STUDY, ALLEEG, 'design', g.design, 'cell', desset(iDes).dataset, 'clusters', g.customclusters);
+                             TMPEEG = std_getdataset(STUDY, ALLEEG, 'design', g.design, 'cell', setinds{cInd,gInd}(iDes), opts{:}); % trial indices included in cell selection
+                        else TMPEEG = std_getdataset(STUDY, ALLEEG, 'design', g.design, 'cell', setinds{cInd,gInd}(iDes), 'cluster', g.customclusters);
                         end;
                         addopts = { 'savetrials', g.savetrials, 'recompute', g.recompute }; % not currently used
                         
                         tmpData = feval(g.customfunc, TMPEEG, g.customparams{:});
                         if isempty(g.customfileext)
-                            resTmp(iDes,:,:) = tmpData;
+                            resTmp(:,:,iDes) = tmpData;
                         else
                             fileName = [ desset(iDes).filebase '.' g.customfileext ];
                             clear data;
