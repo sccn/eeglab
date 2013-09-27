@@ -1,6 +1,6 @@
 % eegplot2event() - convert EEGPLOT rejections into events
-%                   compatible with EEGLAB format for continuous
-%                   datasets.
+%                   compatible with the eeg_eegrej function for rejecting 
+%                   continuous portions of datasets.
 %
 % Usage:
 %   >> [events] = eegplot2event( eegplotrej, type, colorin, colorout );
@@ -13,7 +13,11 @@
 %   colorout   - do not extract rejection of specified colors.
 %
 % Outputs:
-%   events     - array of events in the EEGLAB format.
+%   events     - array of events compatible with the eeg_eegrej function 
+%                for rejecting continuous portions of datasets.
+%
+% Example:
+% NEWEEG = eeg_eegrej(EEG,eegplot2event(TMPREJ, -1));
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 2001
 %
@@ -35,7 +39,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function events = eegplot2trial( TMPREJ, type, color, colorout );
+function events = eegplot2event( TMPREJ, type, color, colorout )
 
 if nargin < 1
    help eegplot2event;
