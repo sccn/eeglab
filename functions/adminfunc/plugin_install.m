@@ -16,7 +16,7 @@ function result = plugin_install(zipfilelink, name, version);
     try
         urlwrite( zipfilelink, fullfile(generalPluginPath, zipfile));
     catch,
-        warndlg2( [ 'Could download ' zipfile ' in plugin folder.' 10 'Host site might be unavailable or you do not have' 10 'permission to write in the EEGLAB plugin folder' ]);
+        warndlg2( [ 'Could not download ' zipfile ' in plugin folder.' 10 'Host site might be unavailable or you do not have' 10 'permission to write in the EEGLAB plugin folder' ]);
         result = -1;
         return;
     end;
