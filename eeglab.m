@@ -497,7 +497,6 @@ cb_editoptions = [ nocheck 'if isfield(ALLEEG, ''nbchan''), LASTCOM = pop_editop
                            'else                            LASTCOM = pop_editoptions(0); end;'                  e_storeall_nh];
 cb_plugin1     = [ nocheck 'if plugin_extract(''import'', PLUGINLIST) , close(findobj(''tag'', ''EEGLAB'')); eeglab redraw; end;' e_hist_nh ];
 cb_plugin2     = [ nocheck 'if plugin_extract(''process'', PLUGINLIST), close(findobj(''tag'', ''EEGLAB'')); eeglab redraw; end;' e_hist_nh ];
-cb_plugin3     = [ nocheck 'if plugin_managedeactivated(PLUGINLIST), close(findobj(''tag'', ''EEGLAB'')); eeglab redraw; end;' e_hist_nh ];
 
 cb_saveh1      = [ nocheck 'LASTCOM = pop_saveh(EEG.history);' e_hist_nh];
 cb_saveh2      = [ nocheck 'LASTCOM = pop_saveh(ALLCOM);'      e_hist_nh];
@@ -700,10 +699,9 @@ if ismatlab
     uimenu( hist_m, 'Label', 'Save session history script'            , 'userdata', ondatastudy, 'CallBack', cb_saveh2);    
     uimenu( hist_m, 'Label', 'Run script'                             , 'userdata', on         , 'CallBack', cb_runsc);    
 
-%     plugin_m = uimenu( file_m,   'Label', 'Manage plugins'            , 'userdata', on); 
-%     uimenu( plugin_m, 'Label', 'Manage data import plugins'           , 'userdata', on         , 'CallBack', cb_plugin1);    
-%     uimenu( plugin_m, 'Label', 'Manage data processing plugins'       , 'userdata', on         , 'CallBack', cb_plugin2);    
-%     uimenu( plugin_m, 'Label', 'Manage deactivated plugins'           , 'userdata', on         , 'CallBack', cb_plugin3);    
+    plugin_m = uimenu( file_m,   'Label', 'Manage plugins'            , 'userdata', on); 
+    uimenu( plugin_m, 'Label', 'Manage data import plugins'           , 'userdata', on         , 'CallBack', cb_plugin1);    
+    uimenu( plugin_m, 'Label', 'Manage data processing plugins'       , 'userdata', on         , 'CallBack', cb_plugin2);    
     
     uimenu( file_m, 'Label', 'Quit'                                   , 'userdata', on     , 'CallBack', cb_quit, 'Separator', 'on');
 
