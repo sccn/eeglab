@@ -94,9 +94,12 @@ end;
 % ===================
 function plugin = parseTable(tmp);
 
+plugin = [];
+if isempty(tmp), return; end;
+
 % get table content
 % -----------------
-tableBeg = findstr('Plugin name', tmp);
+tableBeg = findstr('Plug-in name', tmp);
 tableEnd = findstr('</table>', tmp(tableBeg:end));
 tableContent = tmp(tableBeg:tableBeg+tableEnd-2);
 endFirstLine = findstr('</tr>', tableContent);
