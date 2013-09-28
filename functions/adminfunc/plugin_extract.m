@@ -33,13 +33,14 @@ callback = [ 'tmptag = get(gcbo, ''tag'');' ...
 % plugins to install
 % ------------------
 maxchar = 60;
+geom    = {};
+lineGeom = [ 0.28 0.28 0.95 0.8 3 0.35 ];
 if newInstallFlag
-    uilist =  { {} { 'style' 'text' 'string' '             Plutings available for install on the internet' 'fontweight' 'bold' 'fontsize' 18 'tag' 'title' } };
+    uilist =  { {} { 'style' 'text' 'string' 'Plutings available for install on the internet' 'fontweight' 'bold' 'fontsize' 18 'tag' 'title' } };
     uilist =  { uilist{:} { 'style' 'text' 'string' 'I' 'tag' 'install' } { } ...
         { 'style' 'text' 'string' 'Plugin' 'fontweight' 'bold' } ...
         { 'style' 'text' 'string' 'Version'    'tag' 'verweb'     'fontweight' 'bold' } ...
         { 'style' 'text' 'string' 'Description' 'fontweight' 'bold' } {}};
-    lineGeom = [ 0.28 0.28 0.95 0.8 3 0.35 ];
     geom = { [1 5.5] lineGeom };
     geomvert = [1 1];
     for iRow = 1:length(plugin)
@@ -72,7 +73,7 @@ end;
 % installed plugins
 % -----------------
 if installedFlag
-    uilist =  { uilist{:} {} {} { 'style' 'text' 'string' '                                            Installed plutings' 'fontweight' 'bold' 'fontsize' 18 'tag' 'title' } };
+    uilist =  { uilist{:} {} {} { 'style' 'text' 'string' 'Installed plutings' 'fontweight' 'bold' 'fontsize' 18 'tag' 'title' } };
     uilist =  { uilist{:} { 'style' 'text' 'string' 'I' 'tag' 'update' } ...
         { 'style' 'text' 'string' 'I' 'tag' 'deactivate' } ...
         { 'style' 'text' 'string' 'Plugin' 'fontweight' 'bold' } ...
@@ -119,7 +120,7 @@ end;
 %geomvert = [geomvert 0.5 1];
 %uilist = { uilist{:} {} { 'style' 'text' 'string' 'To manage deactivated plugins, use menu item File > Manage plugins > Manage deactivated plugins' } };              
 if deactivatedFlag
-    uilist =  { uilist{:} {} {} { 'style' 'text' 'string' '             List of deactivated plugins                                 ' 'fontweight' 'bold' 'fontsize' 18 'tag' 'title' } };
+    uilist =  { uilist{:} {} {} { 'style' 'text' 'string' 'List of deactivated plugins                                 ' 'fontweight' 'bold' 'fontsize' 18 'tag' 'title' } };
     uilist =  { uilist{:} ...
         { 'style' 'text' 'string' 'I' 'tag' 'reactivate' } ...
         { 'style' 'text' 'string' 'I' 'tag' 'remove1' } ...
