@@ -176,7 +176,7 @@ variance = variance';
 fclose(fid);
 return;
 
-function [signal,chan_names,variance, pnts, rate, xmin, xmax]=loadavg_bcl(FILENAME,chanNameList)
+function [signal, variance, chan_names, pnts, rate, xmin, xmax]=loadavg_bcl(FILENAME,chanNameList)
 	%writed by allen zhang based on EEGLAB's loadavg.m
 	%2009-11-25
 	% NENU,CHANGCHUN,CHINA 
@@ -305,7 +305,3 @@ function [signal,chan_names,variance, pnts, rate, xmin, xmax]=loadavg_bcl(FILENA
 		rethrow(errorLOAD);
 	end
 	return;
-
-
-
-
