@@ -96,7 +96,7 @@ if ischar(g), error(g); end;
 %Set Defaults
 if isempty(g.title), g.title = ''; end;
 if isempty(g.voffsets) || g.voffsets == 0, g.voffsets = zeros(1,MAX_TOPOS); end;
-if isempty(g.plotchans) || g.plotchans == 0, g.plotchans = 1:chans; end;
+if isempty(g.plotchans) || isequal(g.plotchans,0), g.plotchans = 1:chans; end;
 plottimes_set=1;   % flag variable
 if isempty(g.plottimes) || any(isnan(g.plottimes)), plottimes_set = 0;end;
 limitset = 0; %flag variable
