@@ -258,6 +258,41 @@ catch
     warning(warnmsg)
 end
 
+% change boundaries in rare cases when limits do not include time-locking events
+% ------------------------------------------------------------------------------
+if lim(1) > 0 && ischar(EEG.event(1).type)
+   % go through all onset latencies
+   for Z1 = length(alllatencies):-1:1
+      % if there is any event in between trigger and epoch onset which are boundary events
+      selEvt = find([EEG.event.latency] > alllatencies(Z1) & [EEG.event.latency] < alllatencies(Z1) + lim(1) * EEG.srate);
+      selEvt = selEvt(strcmp({EEG.event(selEvt).type}, 'boundary'));
+      if any(selEvt)
+          if sum([EEG.event(selEvt).duration]) > lim(1) * EEG.srate
+              alllatencies(Z1) = [];
+          else
+              % correct the latencies by the duration of the data that were cutout
+              alllatencies(Z1) = alllatencies(Z1) - sum([EEG.event(selEvt).duration]);
+          end;
+      end
+   end
+end
+if lim(2) < 0 && ischar(EEG.event(1).type)
+   % go through all onset latencies
+   for Z1 = length(alllatencies):-1:1
+      % if there is any event in between trigger and epoch onset which are boundary events
+      selEvt = find([EEG.event.latency] < alllatencies(Z1) & [EEG.event.latency] > alllatencies(Z1) + lim(2) * EEG.srate);
+      selEvt = selEvt(strcmp({EEG.event(selEvt).type}, 'boundary'));
+      if any(selEvt)
+          if sum([EEG.event(selEvt).duration]) > -lim(2) * EEG.srate
+              alllatencies(Z1) = [];
+          else
+              % correct the latencies by the duration of the data that were cutout
+              alllatencies(Z1) = alllatencies(Z1) + sum([EEG.event(selEvt).duration]);
+          end;
+      end
+   end
+end
+
 % select event time format and epoch
 % ----------------------------------
 switch lower( g.timeunit )
