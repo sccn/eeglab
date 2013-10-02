@@ -231,19 +231,16 @@ end
 
 if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
 
-   %try
+   try
        options = varargin;
        for index = 1:length(options)
            if iscell(options{index}) & ~iscell(options{index}{1}), options{index} = { options{index} }; end;
        end;
        if ~isempty( varargin ), g=struct(options{:}); 
        else g= []; end;
-   %catch
-   %		disp('eegplot() error: calling convention {''key'', value, ... } error'); return;
-   %end;	
-
-   
-   
+   catch
+       disp('eegplot() error: calling convention {''key'', value, ... } error'); return;
+   end;	
 
   % push button: create/remove window
   % ---------------------------------
@@ -1244,7 +1241,7 @@ else
     for i = 1:g.chans
         if strcmpi(g.plotdata2, 'on')
              tmpcolor = [ 1 0 0 ];
-        else tmpcolor = g.color{mod(i-1,length(g.color))+1};
+        else tmpcolor = g.color{mod(g.chans-i,length(g.color))+1};
         end;
         
 %        keyboard;  
