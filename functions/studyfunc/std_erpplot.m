@@ -18,6 +18,17 @@
 %   STUDY      - EEGLAB STUDY set comprising some or all of the EEG datasets in ALLEEG.
 %   ALLEEG     - global EEGLAB vector of EEG structures for the datasets included 
 %                in the STUDY. A STUDY set ALLEEG is typically created by load_ALLEEG().  
+% Optional inputs for channel plotting:
+%   'channels' - [numeric vector]  specific channel group to plot. By
+%                default, the grand mean channel ERP is plotted (using the 
+%                same format as for the cluster component means described
+%                above). Default is to plot all channels.
+%   'subject'  - [numeric vector]  In 'changrp' mode (above), index of 
+%                the subject(s) to plot. Else by default, plot all components 
+%                in the cluster.
+%   'plotsubjects' - ['on'|'off'] When 'on', plot ERP of all subjects.
+%   'noplot'   - ['on'|'off'] When 'on', only return output values. Default
+%                is 'off'.
 %
 % Optional inputs for component plotting:
 %   'clusters' - [numeric vector|'all'] indices of clusters to plot.
@@ -31,17 +42,6 @@
 %                if the 'comps' option (below) is used. {default: 'all'}
 %   'comps'    - [numeric vector|'all'] indices of the cluster components to plot.
 %                Note that 'comps', 'all' is equivalent to 'plotsubjects', 'on'.
-%
-% Optional inputs for channel plotting:
-%   'channels' - [numeric vector]  specific channel group to plot. By
-%                default, the grand mean channel ERP is plotted (using the 
-%                same format as for the cluster component means described above)
-%   'subject'  - [numeric vector]  In 'changrp' mode (above), index of 
-%                the subject(s) to plot. Else by default, plot all components 
-%                in the cluster.
-%   'plotsubjects' - ['on'|'off'] When 'on', plot ERP of all subjects.
-%   'noplot'   - ['on'|'off'] When 'on', only return output values. Default
-%                is 'off'.
 %
 % Other optional inputs:
 %   'key','val' - All optional inputs to pop_erpparams() are also accepted here
@@ -113,6 +113,8 @@ end;
 eval( [ 'tmp = pop_' dtype 'params(STUDY, varargin{:});' ...
         'params = tmp.etc.' dtype 'params; clear tmp;' ] );
 statstruct.etc = STUDY.etc; 
+statstruct.design = STUDY.design; %added by behnam
+statstruct.currentdesign = STUDY.currentdesign; %added by behnam
 statstruct = pop_statparams(statstruct, varargin{:});
 stats = statstruct.etc.statistics;
 stats.fieldtrip.channelneighbor = struct([]); % asumes one channel or 1 component
@@ -129,7 +131,12 @@ end;
 
 % decode parameters
 % -----------------
-options = mystruct(varargin);
+if isempty(varargin)
+    tmplocs = eeg_mergelocs(ALLEEG.chanlocs);
+    options.channels = { tmplocs.labels };
+else
+    options = mystruct(varargin);
+end;
 options = myrmfield( options, myfieldnames(params));
 options = myrmfield( options, myfieldnames(stats));
 options = myrmfield( options, { 'threshold' 'statistics' } ); % for backward compatibility
