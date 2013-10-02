@@ -20,7 +20,8 @@
 % Authors: Scott Makeig & Luca Finelli, CNL/Salk Institute-SCCN, August 21, 2002
 %
 % Note: this function overload the function from the statistics toolbox. In
-%       case the statistic toolbox is present.
+%       case the statistic toolbox is present, the function from the
+%       statistics toolbox is being called instead.
 %
 % See also: 
 %   pop_sample(), eeglab() 
