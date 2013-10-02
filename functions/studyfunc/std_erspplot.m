@@ -16,6 +16,19 @@
 %   ALLEEG   - global vector of EEG structures for the datasets included 
 %              in the STUDY. ALLEEG for a STUDY set is typically created 
 %              using load_ALLEEG().  
+%   either 'channels' or 'cluster' inputs are also mandatory.
+%
+% Optional inputs for channel plotting:
+%   'channels' - [numeric vector]  specific channel group to plot. By
+%                default, the grand mean channel ERSP is plotted (using the 
+%                same format as for the cluster component means described above)
+%   'subject'  - [numeric vector]  In 'changrp' mode (above), index of 
+%                the subject(s) to plot. Else by default, plot all components 
+%                in the cluster.
+%   'plotsubjects' - ['on'|'off'] When 'on', plot ERSP of all subjects.
+%   'noplot'   - ['on'|'off'] When 'on', only return output values. Default
+%                is 'off'.
+%
 % Optional inputs:
 %   'clusters' - [numeric vector|'all'] indices of clusters to plot.
 %                If no component indices ('comps' below) are given, the average 
@@ -28,17 +41,6 @@
 %                if the 'comps' option (below) is used. {default: 'all'}
 %   'comps'    - [numeric vector|'all'] indices of the cluster components to plot.
 %                Note that 'comps', 'all' is equivalent to 'plotsubjects', 'on'.
-%
-% Optional inputs for channel plotting:
-%   'channels' - [numeric vector]  specific channel group to plot. By
-%                default, the grand mean channel ERSP is plotted (using the 
-%                same format as for the cluster component means described above)
-%   'subject'  - [numeric vector]  In 'changrp' mode (above), index of 
-%                the subject(s) to plot. Else by default, plot all components 
-%                in the cluster.
-%   'plotsubjects' - ['on'|'off'] When 'on', plot ERSP of all subjects.
-%   'noplot'   - ['on'|'off'] When 'on', only return output values. Default
-%                is 'off'.
 %
 % Other optional inputs:
 %   'plotmode'  - ['normal'|'condensed'|'none'] 'normal'  -> plot in a new figure; 
@@ -120,6 +122,8 @@ end;
 % get parameters
 % --------------
 statstruct.etc = STUDY.etc; 
+statstruct.design = STUDY.design; %added by behnam
+statstruct.currentdesign = STUDY.currentdesign; %added by behnam
 statstruct = pop_statparams(statstruct, varargin{:});
 stats = statstruct.etc.statistics;
 stats.fieldtrip.channelneighbor = struct([]); % asumes one channel or 1 component
@@ -223,7 +227,7 @@ end;
 % ---------------------
 if ~isempty(opt.channels)
 
-    [STUDY allersp alltimes allfreqs tmp events] = std_readersp(STUDY, ALLEEG, 'channels', opt.channels, 'infotype', opt.datatype, 'subject', opt.subject, ...
+    [STUDY allersp alltimes allfreqs tmp events unitPower] = std_readersp(STUDY, ALLEEG, 'channels', opt.channels, 'infotype', opt.datatype, 'subject', opt.subject, ...
         'singletrials', stats.singletrials, 'subbaseline', params.subbaseline, 'timerange', params.timerange, 'freqrange', params.freqrange, 'design', opt.design, 'concatenate', params.concatenate);
     
     % select specific time and freq
@@ -287,7 +291,7 @@ if ~isempty(opt.channels)
                                          'subject', opt.subject, 'datatype', upper(opt.datatype), 'plotmode', opt.plotmode);
                 std_plottf(alltimes, allfreqs, tmpersp, 'datatype', opt.datatype, 'titles', alltitles, ...
                                            'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, 'plotmode', ...
-                                           opt.plotmode, 'chanlocs', ALLEEG(1).chanlocs, 'events', events, plottfopt{:});
+                                           opt.plotmode, 'unitcolor', unitPower, 'chanlocs', ALLEEG(1).chanlocs, 'events', events, plottfopt{:});
             end;
         end;
     end;
@@ -304,7 +308,7 @@ else
     
     for index = 1:length(opt.clusters)
 
-        [STUDY allersp alltimes allfreqs tmp events] = std_readersp(STUDY, ALLEEG, 'clusters', opt.clusters(index), 'infotype', opt.datatype, ...
+        [STUDY allersp alltimes allfreqs tmp events unitPower] = std_readersp(STUDY, ALLEEG, 'clusters', opt.clusters(index), 'infotype', opt.datatype, ...
             'component', opt.comps, 'singletrials', stats.singletrials, 'subbaseline', params.subbaseline, 'timerange', params.timerange, 'freqrange', params.freqrange, 'design', opt.design, 'concatenate', params.concatenate);
         if length(opt.clusters) > 1, try, subplot(nr,nc,index, 'align'); catch, subplot(nr,nc,index); end; end;
 
@@ -345,7 +349,7 @@ else
             std_plottf(alltimes, allfreqs, allersp, 'datatype', opt.datatype, ...
                                            'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, 'plotmode', ...
                                            opt.plotmode, 'titles', alltitles, ...
-                                          'events', events, 'chanlocs', ALLEEG(1).chanlocs, plottfopt{:});
+                                          'events', events, 'unitcolor', unitPower, 'chanlocs', ALLEEG(1).chanlocs, plottfopt{:});
         end;
     end;
 end;
