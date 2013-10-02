@@ -97,6 +97,7 @@ opt = finputcheck( varargin, { 'titles'         'cell'   []              cellfun
                                'tftopoopt'      'cell'   []              {};
                                'threshold'      'real'   []              NaN;
                                'unitx'          'string' []              'ms'; % just for titles
+                               'unitcolor'      'string' {}              'dB';
                                'chanlocs'       'struct' []              struct('labels', {});
                                'freqscale'      'string' { 'log','linear','auto' }  'auto';
                                'events'         'cell'   []              {};
@@ -163,7 +164,7 @@ if strcmpi(opt.plotmode, 'condensed')
         caxis( currentHangle, opt.caxis )
     end
     colorbarHandle = cbar;
-    title(colorbarHandle,'dB');
+    title(colorbarHandle,opt.unitcolor);
     axes(currentHangle); 
     return; 
 end;
@@ -295,7 +296,7 @@ end;
 % color bars
 % ----------
 axes(hdl(nc,ng)); 
-cbar_standard(opt.datatype, ng); 
+cbar_standard(opt.datatype, ng, opt.unitcolor); 
 if isnan(opt.threshold) && (nc ~= size(hdl,1) || ng ~= size(hdl,2))
     ind = find(hdl(end:-1:1));
     axes(hdl(end-ind(1)+1));
@@ -314,7 +315,7 @@ function hdl = mysubplot(nr,nc,ind,transp);
 
 % colorbar for ERSP and scalp plot
 % --------------------------------
-function cbar_standard(datatype, ng);
+function cbar_standard(datatype, ng, unitcolor);
     pos = get(gca, 'position');
     tmpc = caxis;
     fact = fastif(ng == 1, 40, 20);
@@ -326,7 +327,8 @@ function cbar_standard(datatype, ng);
     elseif strcmpi(datatype, 'erpim')
         cbar(tmp, 0, tmpc, 5);
     else
-        cbar(tmp, 0, tmpc, 5);title('dB');
+        cbar(tmp, 0, tmpc, 5);
+        title(unitcolor);
     end;
     
 
