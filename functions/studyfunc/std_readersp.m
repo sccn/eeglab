@@ -73,13 +73,14 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [STUDY, erspdata, alltimes, allfreqs, erspbase, events] = std_readersp(STUDY, ALLEEG, varargin)
+function [STUDY, erspdata, alltimes, allfreqs, erspbase, events, unitPower] = std_readersp(STUDY, ALLEEG, varargin)
 
 if nargin < 2
     help std_readersp;
     return;
 end
 events = {};
+unitPower = 'dB';
 if ~isstruct(ALLEEG) % old calling format
     dataset = ALLEEG;
     EEG = STUDY(dataset);
@@ -394,6 +395,29 @@ for ind = 1:length(finalinds)
                 end;
             end;
         end;
+    end;
+end;
+
+% output unit
+% -----------
+if ~isfield(tmpparams, 'baseline'), tmpparams.baseline = 0;     end;
+if ~isfield(tmpparams, 'scale'   ), tmpparams.scale    = 'log'; end;
+if ~isfield(tmpparams, 'basenorm'), tmpparams.basenorm = 'off'; end;
+if strcmpi(tmpparams.scale, 'log')
+    if strcmpi(tmpparams.basenorm, 'on')
+        unitPower = '10*log(std.)'; % impossible
+    elseif isnan(tmpparams.baseline)
+        unitPower = '10*log10(\muV^{2}/Hz)';
+    else
+        unitPower = 'dB';
+    end;
+else
+    if strcmpi(tmpparams.basenorm, 'on')
+        unitPower = 'std.';
+    elseif isnan(tmpparams.baseline)
+        unitPower = '\muV^{2}/Hz';
+    else
+        unitPower = '% of baseline';
     end;
 end;
 
