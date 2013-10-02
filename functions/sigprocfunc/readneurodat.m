@@ -69,3 +69,11 @@ function [chanlocs, labels, theta, phi] = readneurodat(filename);
         chanlocs(index).labels = num2str(chanlocs(index).labels);
     end;
     theta = theta/pi*180;
+    fprintf('Note: .dat file contain polar 2-D coordinates. EEGLAB will use these coordinates\n');
+    fprintf('      to recreated 3-D coordinates.\n');
+    fprintf('\n');
+    fprintf('Warning: if the channels are clustered in the middle or oddly spaced removed\n');
+    fprintf('         the peripheral channels and then used the optimize head function\n');
+    fprintf('         in the Channel Locations GUI. It seems that sometimes the peripherals\n');
+    fprintf('         are throwing off the spacing.\n');
+    
