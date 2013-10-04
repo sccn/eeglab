@@ -185,7 +185,7 @@ if nargin < 1
    return;
 end;
 
-if typeplot == 0 & isempty(EEG.icasphere)
+if typeplot == 0 && isempty(EEG.icasphere)
    error('no ICA data for this set, first run ICA');
 end;   
 if EEG.trials == 1
@@ -560,7 +560,7 @@ try, icadefs; set(gcf, 'color', BACKCOLOR,'Name',' erpimage()'); catch, end;
 
 % testing inputs
 % --------------
-if typeplot == 0 & length(channel) > 1 & isempty(projchan)
+if typeplot == 0 && length(channel) > 1 && isempty(projchan)
 	error('A channel must be selected to plot (the sum of) several component projections');
 end;
 
