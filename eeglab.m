@@ -155,7 +155,7 @@ end;
     
 % check for duplicate versions of EEGLAB
 % --------------------------------------
-eeglabpath = which('eeglab.m');
+eeglabpath = mywhich('eeglab.m');
 eeglabpath = eeglabpath(1:end-length('eeglab.m'));
 if nargin < 1
     eeglabpath2 = '';
@@ -164,11 +164,11 @@ if nargin < 1
         warning('off', 'MATLAB:rmpath:DirNotFound');
         rmpath(eeglabpath);
         warning('on', 'MATLAB:rmpath:DirNotFound');
-        eeglabpath2 = which('eeglab.m');
+        eeglabpath2 = mywhich('eeglab.m');
         cd('..');
     else
         try, rmpath(eeglabpath); catch, end;
-        eeglabpath2 = which('eeglab.m');
+        eeglabpath2 = mywhich('eeglab.m');
     end;
     if ~isempty(eeglabpath2)
         eeglabpath2 = eeglabpath2(1:end-length('eeglab.m'));
@@ -186,7 +186,7 @@ if strcmpi(eeglabpath, './') || strcmpi(eeglabpath, '.\'), eeglabpath = [ pwd fi
 
 % solve BIOSIG problem
 % --------------------
-pathtmp = which('wilcoxon_test');
+pathtmp = mywhich('wilcoxon_test');
 if ~isempty(pathtmp)
     try,
         rmpath(pathtmp(1:end-15));
@@ -232,7 +232,7 @@ if ~iseeglabdeployed2
     eeglab_options;
     
     % remove path to to fmrlab if neceecessary
-    path_runica = fileparts(which('runica'));
+    path_runica = fileparts(mywhich('runica'));
     if length(path_runica) > 6 && strcmpi(path_runica(end-5:end), 'fmrlab')
         rmpath(path_runica);
     end;
@@ -242,8 +242,8 @@ if ~iseeglabdeployed2
     signalpath = fullfile(eeglabpath, 'functions', 'octavefunc', 'signal');
     optimpath  = fullfile(eeglabpath, 'functions', 'octavefunc', 'optim');
     if option_donotusetoolboxes
-        p1 = fileparts(which('fminsearch'));
-        p2 = fileparts(which('filtfilt'));
+        p1 = fileparts(mywhich('fminsearch'));
+        p2 = fileparts(mywhich('filtfilt'));
         if ~isempty(p1), rmpath(p1); end;
         if ~isempty(p2), rmpath(p2); end;
     end;
@@ -406,7 +406,7 @@ catchstrs.update_study           = e_load_study;
 % create eeglab figure
 % --------------------
 javaobj = eeg_mainfig(onearg);
-ptopoplot = fileparts(which('cbar'));
+ptopoplot = fileparts(mywhich('cbar'));
 
 % detecting icalab
 % ----------------
@@ -421,7 +421,7 @@ else
     % adding all folders in external
     % ------------------------------
     disp(['Adding path to all EEGLAB functions']);
-    p = which('eeglab.m');
+    p = mywhich('eeglab.m');
     p = p(1:findstr(p,'eeglab.m')-1);
     if strcmpi(p, './') || strcmpi(p, '.\'), p = [ pwd filesep ]; end;
     dircontent  = dir([ p 'external' ]);
@@ -449,7 +449,7 @@ else
     % check for older version of Fieldtrip and presence of topoplot
     % -------------------------------------------------------------
     if ismatlab
-        ptopoplot2 = fileparts(which('topoplot'));
+        ptopoplot2 = fileparts(mywhich('topoplot'));
         if ~strcmpi(ptopoplot, ptopoplot2),
             %disp('  Warning: duplicate function topoplot.m in Fieldtrip and EEGLAB');
             %disp('  EEGLAB function will prevail and call the Fieldtrip one when appropriate');
@@ -864,7 +864,7 @@ else
     pluginlist  = [];
     plugincount = 1;
     
-    p = which('eeglab.m');
+    p = mywhich('eeglab.m');
     p = p(1:findstr(p,'eeglab.m')-1);
     if strcmpi(p, './') || strcmpi(p, '.\'), p = [ pwd filesep ]; end;
     
@@ -1043,7 +1043,7 @@ end;
     
     % set the callback to bring up the updater GUI
     icadefs; % for getting background color
-    eeglabFolder = fileparts(which('eeglab.m'));
+    eeglabFolder = fileparts(mywhich('eeglab.m'));
     eeglabUpdater.menuItemCallback = {@command_on_update_menu_click, eeglabUpdater, eeglabFolder, true, BACKEEGLABCOLOR};
 
     % place it in the base workspace.
@@ -1192,7 +1192,7 @@ eeglab_options;
 if option_chat == 1
     if is_sccn
         disp('Starting chat...');
-        tmpp = fileparts(which('startpane.m'));
+        tmpp = fileparts(mywhich('startpane.m'));
         if isempty(tmpp) || ~ismatlab
             disp('Cannot start chat');
             tb = [];
@@ -1977,7 +1977,8 @@ function addpathifnotinlist(newpath);
     end;
 
 function aadpathifnotexist(newpath, functionname);
-    tmpp = which(functionname);
+    tmpp = mywhich(functionname);
+        
     if isempty(tmpp)
         addpath(newpath);
     end;
@@ -1986,7 +1987,7 @@ function aadpathifnotexist(newpath, functionname);
 % ------------------------------------------------
 function myaddpath(eeglabpath, functionname, pathtoadd);
 
-    tmpp = which(functionname);
+    tmpp = mywhich(functionname);
     tmpnewpath = [ eeglabpath pathtoadd ];
     if ~isempty(tmpp)
         tmpp = tmpp(1:end-length(functionname));
@@ -2038,5 +2039,12 @@ if v(1) > '4'
     res = 1;
 else
     res = 0;
+end;
+    
+function res = mywhich(varargin);
+try
+    res = which(varargin{:});
+catch
+    fprintf('Warning: permission error accesssing %s\n', varargin{1});
 end;
     
