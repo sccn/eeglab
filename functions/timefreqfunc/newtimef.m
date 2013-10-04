@@ -1186,7 +1186,10 @@ if size(g.baseline,2) == 2
         baseln = union_bc(baseln, tmptime);
     end;
     if length(baseln)==0
-        error('No point found in baseline');
+        error( [ 'There are no sample points found in the default baseline.' 10 ...
+                 'This may happen even though data time limits overlap with' 10 ...
+                 'the baseline period (because of the time-freq. window width).' 10 ... 
+                 'Either disable the baseline, change the baseline limits.' ] );
     end
 else
     if ~isempty(find(timesout < g.baseline))
