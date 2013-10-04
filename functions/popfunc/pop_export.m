@@ -19,7 +19,9 @@
 %   'erp'          - ['on'|'off'] export ERP instead of raw data. Default 'off'.
 %   'expr'         - [string] evaluate epxression on data. The expression must 
 %                    contain a variable 'x' representing the 2-D or 3-D data.
-%   'precision'    - [float] number of significant digits in output. Default 4. 
+%   'precision'    - [float] number of significant digits in output. Default 7.
+%                    Default of 7 should allow to reach about 23 to 24 bits
+%                    of precision and should be enough for EEG.
 % 
 % Outputs:
 %   com            - The expresion that execute this function. i.e. 'pop_export(MyEEG, 'ExpEEG.mat')'
@@ -94,7 +96,7 @@ if nargin < 2
    if ~result{5}, options = { options{:} 'elec' 'off' }; end;
    if ~result{6}, options = { options{:} 'time' 'off' }; end;
    if ~strcmpi(result{7}, '1E-3'), options = { options{:} 'timeunit' eval(result{7}) }; end;
-   if ~strcmpi(result{8}, '4'),    options = { options{:} 'precision' eval(result{8}) }; end;
+   if ~strcmpi(result{8}, '7'),    options = { options{:} 'precision' eval(result{8}) }; end;
    if ~isempty(result{9}), options = { options{:} 'expr' result{9} }; end;
 else
     options = varargin;
@@ -109,7 +111,7 @@ g = finputcheck(options, { ...
     'elec'      'string'    { 'on';'off' }     'on';
     'transpose' 'string'    { 'on';'off' }     'off';
     'erp'       'string'    { 'on';'off' }     'off';
-    'precision' 'integer'   [0 Inf]            4;
+    'precision' 'integer'   [0 Inf]            7;
     'expr'      'string'    []                 '' }, 'pop_export');
 if isstr(g), error(g); end;
 
