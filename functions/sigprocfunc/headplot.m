@@ -26,8 +26,8 @@
 %
 % Optional Setup-mode Inputs:
 %
-%   'meshfile'    - ['string'] Matlab files containing a mesh. The mesh may
-%                   be of different formats. It may be a Dipfit mesh as
+%   'meshfile'    - ['string' or structure] Matlab files containing a mesh. The 
+%                   mesh may be of different formats. It may be a Dipfit mesh as
 %                   defined in the file standard_vol.mat. It may contain 
 %                   a structure with the fields 'vertices' and 'faces' or it
 %                   it may contain a structure with at least two fields:
