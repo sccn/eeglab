@@ -429,6 +429,7 @@ else % wavelet
         % apply filters
         % -------------
         verboseprintf(g.verbose, 'Processing time point (of %d):',length(g.timesout));
+        tmpall = zeros(length(g.win), length(g.indexout), size(data,2));
         for index = 1:length(g.indexout)
             if rem(index,10) == 0,  verboseprintf(g.verbose, ' %d',index); end
             if rem(index,120) == 0, verboseprintf(g.verbose, '\n'); end
