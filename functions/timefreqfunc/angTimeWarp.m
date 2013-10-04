@@ -1,27 +1,25 @@
-% angTimeWarp() - Given two event marker vectors, angTimeWarp computes a
-%                 warping of the input angular time-serie so that its
-%                 evLatencies match newLatencies. Values of the warped
+% angtimewarp() - Given two event marker vectors, computes a
+%                 warping of the input angular time series so that its
+%                 evlatencies match newlatencies. Values of the warped
 %                 timeserie that falls between two frames in the original
-%                 timeserie will be linear interpolated under the
+%                 timeserie will be linearly interpolated under the
 %                 assumption that phase change is minimal between two
 %                 successive time points.
-%
 % Usage:
-%   >> warpAngs = angTimeWarp(evLatency, newLatency, angData)
+%   >> warpAngs = angtimewarp(evlatency, newlatency, angData)
 %
 % Necessary inputs:
-%   evLatency  - [vector] time markers on the original time-series, in
-%                frames unit. Markers have to be ordered by increasing
-%                frame latency. If you want to warp the entire
-%                time-series, make sure frame 1 and the last frame are in
-%                that vector.
-%   newLatency - [vector] wished time marker latencies. The original
-%                time-serie will be warped so that its time markers (see
-%                evLatency) match the ones in newLatency. newLatency
-%                frames have to be sorted by ascending latencies in frame
-%                unit. Both vectors have to be the same length.
-%   angData    - [vector] original angular time-serie. Angles should be
-%                between -pi and pi.
+%   evlatency  - [vector] time markers on the original time-series, in
+%                frames. Markers must be ordered by increasing
+%                latency. If you want to warp the entire time series, 
+%                make sure frame 1 and the last frame are in the vector.
+%   newlatency - [vector] desired time marker latencies. The original
+%                time series will be warped so that its time markers (see
+%                evlatency) match the ones in newlatency. newlatency
+%                frames must be sorted by ascending latencies in frames.
+%                Both vectors have to be the same length.
+%   angData    - [vector] original angular time series (in radians). 
+%                Angles should be between -pi and pi.
 %   
 % Optional outputs:
 %   warpAngs   - [vector] warped angular time-course, with values between
@@ -29,31 +27,30 @@
 %
 % Example:
 %   >> angs = 2*pi*rand(1,10)-pi;
-%   >> warpangs = angTimeWarp([1 5 10], [1 6 9], angs)
+%   >> warpangs = angtimewarp([1 5 10], [1 6 10], angs)
 %
 % Authors: Jean Hausser, SCCN/INC/UCSD, 2006
 %
 % See also: timeWarp(), phasecoher(), erpimage(), newtimef()
 %
 
-
-function angdataw=angTimeWarp(evLatency, newLatency, angdata)
+function angdataw=angtimewarp(evLatency, newLatency, angdata)
   
   if min(sort(evLatency) == evLatency) == 0
-    error('evLatency should be sorted');
+    error('evlatency should be sorted');
     return;
   end
   if min(sort(newLatency) == newLatency) == 0
-    error('newLatency should be sorted');
+    error('newlatency should be sorted');
     return;
   end
   if length(evLatency) ~= length(newLatency)
-    error('evLatency and newLatency must have the same length.');
+    error('evlatency and newlatency must have the same length.');
     return;
   end
   if length(evLatency) < 2 | length(newLatency) < 2
-    error(['There should be at least two events in evLatency and ' ...
-          'newLatency, that is "begin" and "end"' ]);
+    error(['There should be at least two events in evlatency and ' ...
+          'newlatency, that is "begin" and "end"' ]);
     return;
   end
   if evLatency(1) ~= 1
