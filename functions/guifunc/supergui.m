@@ -6,7 +6,7 @@
 %              intend to put text button and descriptions.
 %
 % Usage:
-%   >> [handlers, width, height ] = ...
+%   >> [handles, height, allhandles ] = ...
 %             supergui( 'key1', 'val1', 'key2', 'val2', ... );
 % 
 % Inputs:
@@ -58,10 +58,10 @@
 %    use 'print -mfile filemane' to save a matlab file of the figure.
 %
 % Output:
-%    handlers  - all the handler of the elements (in the same order as the
+%    handles  - all the handles of the elements (in the same order as the
 %                uilist input).
-%    height    - adviced widht for the figure (so the text look nice).   
-%    height    - adviced height for the figure (so the text look nice).   
+%    height    - adviced height for the figure (so the text look nice).
+%    allhandles - all the handles in object format
 %
 % Example:
 %    figure;   
