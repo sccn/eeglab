@@ -91,14 +91,15 @@ if isfield(EEG, 'event') & isfield(EEG.event, 'type') & isstr(EEG.event(1).type)
     if ~isempty(bounds),
         disp('Data break detected and taken into account for resampling');
         bounds = [ tmpevent(bounds).latency ];
-        if bounds(1) < 0,                         bounds(1  ) = []; end; % remove initial boundary if any
-        if round(bounds(end)-0.5+1) >= size(EEG.data,2), bounds(end) = []; end; % remove final boundary if any
+        bounds(bounds <= 0 | bounds > size(EEG.data,2)) = []; % Remove out of range boundaries
+        bounds(mod(bounds, 1) ~= 0) = round(bounds(mod(bounds, 1) ~= 0) + 0.5); % Round non-integer boundary latencies
     end;
-    bounds = [1 round(bounds-0.5)+1 size(EEG.data,2)+1];
-    bounds(find(bounds(2:end)-bounds(1:end-1)==0))=[]; % remove doublet boundary if any
+    bounds = [1 bounds size(EEG.data, 2) + 1]; % Add initial and final boundary event
+    bounds = unique(bounds); % Sort (!) and remove doublets
 else 
-    bounds = [1 size(EEG.data,2)+1]; % [1:size(EEG.data,2):size(EEG.data,2)*size(EEG.data,3)+1];
+    bounds = [1 size(EEG.data,2) + 1]; % [1:size(EEG.data,2):size(EEG.data,2)*size(EEG.data,3)+1];
 end;
+
 eeglab_options;
 if option_donotusetoolboxes
     usesigproc = 0;
@@ -144,15 +145,42 @@ EEG.data = tmpeeglab;
 % -----------------------------
 if isfield(EEG.event, 'latency')
     fprintf('resampling event latencies...\n');
-    for index1 = 1:length(EEG.event)
-        EEG.event(index1).latency = EEG.event(index1).latency * EEG.pnts /oldpnts;
-    end;
+
+    for iEvt = 1:length(EEG.event)
+
+        % From >> help resample: Y is P/Q times the length of X (or the
+        % ceiling of this if P/Q is not an integer).
+        % That is, recomputing event latency by pnts / oldpnts will give
+        % inaccurate results in case of multiple segments and rounded segment
+        % length. Error is accumulated and can lead to several samples offset.
+        % Blocker for boundary events.
+        % Old version EEG.event(index1).latency = EEG.event(index1).latency * EEG.pnts /oldpnts;
+
+        % Recompute event latencies relative to segment onset
+        if strcmpi(EEG.event(iEvt).type, 'boundary') && mod(EEG.event(iEvt).latency, 1) == 0.5 % Workaround to keep EEGLAB style boundary events at -0.5 latency relative to DC event; actually incorrect
+            iBnd = sum(EEG.event(iEvt).latency + 0.5 >= bounds);
+            EEG.event(iEvt).latency = indices(iBnd) - 0.5;
+        else
+            iBnd = sum(EEG.event(iEvt).latency >= bounds);
+            EEG.event(iEvt).latency = (EEG.event(iEvt).latency - bounds(iBnd)) * p / q + indices(iBnd);
+        end
+        
+    end
+
     if isfield(EEG, 'urevent') & isfield(EEG.urevent, 'latency')
-        try,
-            for index1 = 1:length(EEG.urevent)
-                EEG.urevent(index1).latency = EEG.urevent(index1).latency * EEG.pnts /oldpnts;
+        try
+            for iUrevt = 1:length(EEG.urevent)
+                % Recompute urevent latencies relative to segment onset
+                if strcmpi(EEG.urevent(iUrevt).type, 'boundary') && mod(EEG.urevent(iUrevt).latency, 1) == 0.5 % Workaround to keep EEGLAB style boundary events at -0.5 latency relative to DC event; actually incorrect
+                    iBnd = sum(EEG.urevent(iUrevt).latency + 0.5 >= bounds);
+                    EEG.urevent(iUrevt).latency = indices(iBnd) - 0.5;
+                else
+                    iBnd = sum(EEG.urevent(iUrevt).latency >= bounds);
+                    EEG.urevent(iUrevt).latency = (EEG.urevent(iUrevt).latency - bounds(iBnd)) * p / q + indices(iBnd);
+                end
+
             end;
-        catch, 
+        catch
             disp('pop_resample warning: ''urevent'' problem, reinitializing urevents');
             EEG = rmfield(EEG, 'urevent');
         end;
