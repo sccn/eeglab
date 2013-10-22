@@ -204,7 +204,7 @@ if nargin < 2
             '     eeglab(''redraw'');' ...
             '  end; clear EEGTMP tmpcom;' ];
     eegplot(EEG.data(opt.elec,:,:), 'srate', EEG.srate, 'title', 'Scroll component activities -- eegplot()', ...
-			 'limits', [EEG.xmin EEG.xmax]*1000, 'color', colors, 'eloc_file', tmplocs, 'command', tmpcom);
+			 'limits', [EEG.xmin EEG.xmax]*1000, 'color', colors(end:-1:1), 'eloc_file', tmplocs, 'command', tmpcom);
 else
     EEG = pop_select(EEG, 'nochannel', opt.elec(indelec));
 end;
