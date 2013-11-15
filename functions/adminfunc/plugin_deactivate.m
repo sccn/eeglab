@@ -20,5 +20,6 @@ function plugin_deactivate(foldername);
 
     disp([ 'Moving plugin ' foldername ' to deactivatedplugins folder' ]);
     fulldeactivatedpluginfolder = fullfile(fileparts(which('eeglab.m')), 'deactivatedplugins');
+    if ~exist(fulldeactivatedpluginfolder), mkdir(fulldeactivatedpluginfolder); end;
     movefile(fullpluginfolder, fulldeactivatedpluginfolder);
     
