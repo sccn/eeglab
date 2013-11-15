@@ -73,7 +73,7 @@ end;
 % installed plugins
 % -----------------
 if installedFlag
-    uilist =  { uilist{:} {} {} { 'style' 'text' 'string' 'Installed plutings' 'fontweight' 'bold' 'fontsize' 18 'tag' 'title' } };
+    uilist =  { uilist{:} {} {} { 'style' 'text' 'string' 'Installed plugins' 'fontweight' 'bold' 'fontsize' 18 'tag' 'title' } };
     uilist =  { uilist{:} { 'style' 'text' 'string' 'I' 'tag' 'update' } ...
         { 'style' 'text' 'string' 'I' 'tag' 'deactivate' } ...
         { 'style' 'text' 'string' 'Plugin' 'fontweight' 'bold' } ...
@@ -188,19 +188,20 @@ for iRow = 1:length(plugin)
                 res = questdlg2([ 'Plugin ' plugin(iRow).foldername ' has been reactivated but' 10 'a new version is available. Do you want to install it?' ], 'Warning', 'No', 'Yes', 'Yes');
                 if strcmpi(res, 'yes')
                     plugin_deactivate(plugin(iRow).foldername);
-                    plugin_remove(plugin(iRow).foldername);
                     plugin_install(plugin(iRow).zip, plugin(iRow).name, plugin(iRow).version);
+                    plugin_remove(plugin(iRow).foldername);
                 end;
             end;
         else
-            if plugin(iRow).installed && res == 1
+            if plugin(iRow).installed
                 fprintf('Updating plugin %s\n', plugin(iRow).name);
                 plugin_deactivate(plugin(iRow).foldername);
+                plugin_install(plugin(iRow).zip, plugin(iRow).name, plugin(iRow).version);
                 plugin_remove(plugin(iRow).foldername);
             else
                 fprintf('Installing plugin %s\n', plugin(iRow).name);
+                plugin_install(plugin(iRow).zip, plugin(iRow).name, plugin(iRow).version);
             end;
-            plugin_install(plugin(iRow).zip, plugin(iRow).name, plugin(iRow).version);
         end;
     elseif plugin(iRow).remove
         if ~firstPlugin, disp('---------------------------------'); end; firstPlugin = 0; 
