@@ -1,4 +1,4 @@
-% eeg_interp() - interpolate data channels
+    % eeg_interp() - interpolate data channels
 %
 % Usage: EEGOUT = eeg_interp(EEG, badchans, method);
 %
@@ -46,9 +46,16 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method)
     EEG = ORIEEG;
     
     if nargin < 3
+        disp('Using spherical interpolation');
         method = 'spherical';
     end;
 
+    % check channel structure
+    tmplocs = ORIEEG.chanlocs;
+    if isempty(tmplocs) || isempty([tmplocs.X])
+        error('Interpolation require channel location');
+    end;
+    
     if isstruct(bad_elec)
         
         % add missing channels in interpolation structure
