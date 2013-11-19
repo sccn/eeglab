@@ -32,35 +32,43 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [EEG com] = pop_importegimat(filename, srate, latpoint0);
+function [EEG com] = pop_importegimat(filename, srate, latpoint0, dataField);
 
     EEG = [];
     com = '';
     if nargin < 3, latpoint0 = 0; end;
     if nargin < 4, lookupchanfile = 0; end;
+    if nargin < 5, dataField = 'Session'; end;
     if nargin < 1 
         % ask user
         [filename, filepath] = uigetfile('*.mat', 'Choose a Matlab file from Netstation -- pop_importegimat()'); 
         if filename == 0 return; end;
         filename = fullfile(filepath, filename);
         tmpdata = load('-mat', filename);
+        fieldValues = fieldnames(tmpdata);
+        sessionPos = strmatch('Session', fieldValues);
+        posFieldData = 1; 
+        if ~isempty(sessionPos), posFieldData = sessionPos; end;
         
-        if ~isfield(tmpdata, 'samplingRate')
-            % epoch data files only
-            promptstr    = { { 'style' 'text'       'string' 'Sampling rate (Hz)' } ...
-                             { 'style' 'edit'       'string' '250' } ...
-                             { 'style' 'text'       'string' 'Sample latency for stimulus (ms)' } ...
-                             { 'style' 'edit'       'string' '0' } };
-            geometry = { [2 1] [2 1] };
-            result       = inputgui( 'geometry', geometry, 'uilist', promptstr, ...
-                                     'helpcom', 'pophelp(''pop_importegimat'')', ...
-                                     'title', 'Import a Matlab file from Netstation -- pop_runica()');
+        if ~isfield(tmpdata, 'samplingRate'), srate = 250; else srate = tmpdata.samplingRate; end;
+        % epoch data files only
+        promptstr    = { { 'style' 'text'       'string' 'Sampling rate (Hz)' } ...
+                         { 'style' 'edit'       'string'  int2str(srate) } ...
+                         { 'style' 'text'       'string' 'Sample latency for stimulus (ms)' } ...
+                         { 'style' 'edit'       'string' '0' } ...
+                         { 'style' 'text'       'string' 'Field containing data' } ...
+                         { 'style' 'popupmenu'  'string' fieldValues 'value' posFieldData } ...
+                         };
+        geometry = { [1 1] [1 1] [1 1] };
+        result       = inputgui( 'geometry', geometry, 'uilist', promptstr, ...
+                                 'helpcom', 'pophelp(''pop_importegimat'')', ...
+                                 'title', 'Import a Matlab file from Netstation -- pop_runica()');
 
-            if length(result) == 0 return; end;        
-            srate = str2num(result{1});
-            latpoint0 = str2num(result{2});
-            if isempty(latpoint0), latpoint0 = 0; end;
-        end;
+        if length(result) == 0 return; end;        
+        srate = str2num(result{1});
+        latpoint0 = str2num(result{2});
+        dataField = fieldValues{result{3}};
+        if isempty(latpoint0), latpoint0 = 0; end;
     end;
    
     EEG = eeg_emptyset;
@@ -70,12 +78,11 @@ function [EEG com] = pop_importegimat(filename, srate, latpoint0);
         srate = tmpdata.samplingRate;
     end;
 
-    fields = fieldnames(tmpdata);
-    if all(cellfun(@(x)isempty(findstr(x, 'Segment')), fields))
+    fieldValues = fieldnames(tmpdata);
+    if all(cellfun(@(x)isempty(findstr(x, 'Segment')), fieldValues))
         EEG.srate = srate;
-        EEG = eeg_emptyset;
-        indData = strmatch('Session', fields);
-        EEG.data = tmpdata.(fields{indData(1)});
+        indData = strmatch(dataField, fieldValues);
+        EEG.data = tmpdata.(fieldValues{indData(1)});
         EEG = eeg_checkset(EEG);
         EEG = readegilocs(EEG);
         
