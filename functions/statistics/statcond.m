@@ -198,7 +198,8 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
       g.method = 'perm';
     end
     if size(data,2) == 1, data  = transpose(data); end; % cell array transpose
-
+    g.naccu = round(g.naccu);
+    
     % reshape matrices
     % ----------------
     nd = size(data{1});
