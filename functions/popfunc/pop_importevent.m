@@ -179,7 +179,13 @@ if nargin<2
 	    args = {};
 	    if ~isempty( results{1} ), args = { args{:}, 'indices', eval( [ '[' results{1} ']' ]) }; end;
 	    if results{2} == 0 & ~isempty(EEG.event), args = { args{:}, 'append', 'no' }; end;
-	    if ~isempty( results{3} ), args = { args{:}, 'event', results{3} }; end; 
+	    if ~isempty( results{3} ), 
+            if isstr( results{3} ) && ~exist(results{3})
+                args = { args{:}, 'event', evalin('base', results{3}) }; 
+            else
+                args = { args{:}, 'event', results{3} }; 
+            end;
+        end;
 	    if ~isempty( results{4} ), args = { args{:}, 'fields', parsetxt(results{4}) }; end;
         
 	    % handle skipline 
