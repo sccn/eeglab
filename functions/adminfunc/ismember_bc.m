@@ -25,5 +25,5 @@ if v >= 7.14
         end;
     end;
 else
-    [C,IA,IB] = ismember(A,B,varargin{:});
+    [C,IA] = ismember(A,B,varargin{:});
 end;
