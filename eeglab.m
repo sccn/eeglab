@@ -1148,7 +1148,10 @@ if strcmpi(comp(1:3), 'GLN') || strcmpi(comp(1:3), 'MAC')
     FONTSIZE        = 8;
     % Magnify figure under MATLAB 2012a
     vers = version;
-    if ~isempty(findstr('739', vers))
+    dotPos = find(vers == '.');
+    vernum = str2num(vers(1:dotPos(1)-1));
+    subvernum = str2num(vers(dotPos(1)+1:dotPos(2)-1));
+    if vernum > 7 || (vernum >= 7 && subvernum >= 14)
         FONTSIZE = FONTSIZE+2;
         WINMAXX  = WINMAXX*1.3;
         WINY     = WINY*1.3;
