@@ -172,10 +172,13 @@ if nargin < 1
     end;
     if ~isempty(eeglabpath2)
         eeglabpath2 = eeglabpath2(1:end-length('eeglab.m'));
+        tmpWarning = warning('backtrace'); 
+        warning backtrace off;
         disp('******************************************************');
         warning('There are at least two versions of EEGLAB in your path');
         warning(sprintf('One is at %s', eeglabpath));
         warning(sprintf('The other one is at %s', eeglabpath2));
+        warning(tmpWarning); 
     end;
     addpath(eeglabpath);
 end;
