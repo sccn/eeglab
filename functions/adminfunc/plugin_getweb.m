@@ -10,13 +10,24 @@ if isfield(pluginOri, 'plugin'), pluginOri = plugin_convert(pluginOri); end;
 try
     disp( [ 'Retreiving URL with ' type ' plugins...' ] );
     if strcmpi(type, 'import')
-        [tmp status] = urlread('http://sccn.ucsd.edu/wiki/Plugin_list_import');
+        [tmp status] = plugin_urlread('http://sccn.ucsd.edu/wiki/Plugin_list_import');
     else
-        [tmp status] = urlread('http://sccn.ucsd.edu/wiki/Plugin_list_process');
+        [tmp status] = plugin_urlread('http://sccn.ucsd.edu/wiki/Plugin_list_process');
     end;
 catch,
     error('Cannot connect to the Internet to retrieve plugin list');
 end;
+
+% retreiving download statistics
+try
+    disp( [ 'Retreiving download statistics...' ] );
+    [stats status] = plugin_urlread('http://sccn.ucsd.edu/eeglab/plugin_uploader/plugin_getcountall.php');
+    stats = textscan(stats, '%s%d');
+catch,
+    stats = {};
+    disp('Cannot connect to the Internet to retrieve statistics for plugins');
+end;
+
 if status == 0
     error('Cannot connect to the Internet to retrieve plugin list');
 end;
@@ -26,9 +37,7 @@ end;
 try
     plugin = parseTable(tmp);
 catch
-    disp('PLUGIN PAGE PARSING ERROR, USING BACKUP PLUGIN LIST');
-    [tmp status] = urlread('http://sccn.ucsd.edu/wiki/Plugin_backup_list');
-    plugin = parseTable(tmp);
+    error('Cannot parse plugin list - please contact eeglab@sccn.ucsd.edu');
 end;
 
 % find correspondance with plugin list
@@ -39,6 +48,10 @@ else currentNames = {};
 end;
 allMatch = [];
 for iRow = 1:length(plugin)
+    % fix links
+    if isfield(plugin, 'zip'), plugin(iRow).zip = strrep(plugin(iRow).zip, '&amp;', '&'); end;
+        
+    % match with existiting plugins
     indMatch = strmatch(lower(plugin(iRow).name), currentNames, 'exact');
     if isempty(indMatch)
         plugin(iRow).currentversion  = '-';
@@ -60,6 +73,16 @@ for iRow = 1:length(plugin)
         end;
         allMatch = [ allMatch indMatch(:)' ];
     end;
+    
+    % get number of downloads
+    if ~isempty(stats)
+        indMatch = strmatch(plugin(iRow).name, stats{1}, 'exact');
+        if ~isempty(indMatch)
+             plugin(iRow).downloads = stats{2}(indMatch(1));
+        else plugin(iRow).downloads = 0;
+        end;
+    else plugin(iRow).downloads = 0;
+    end;
 end;
 
 % put all the installed plugins first
@@ -77,7 +100,7 @@ if ~isempty(plugin)
 %     plugin(1).name            = 'test';
 end;
 
-if strcmpi(mode, 'merge')
+if strcmpi(mode, 'merge') && ~isempty(pluginOri)
     indices = setdiff([1:length(pluginOri)], allMatch);
     fields  = fieldnames(pluginOri);
     lenPlugin = length(plugin);
@@ -129,7 +152,8 @@ for iRow = 1:size(table,1)
     % get link
     [plugin(iRow).name plugin(iRow).webdoc] = parsehttplink(table{iRow,1});
     plugin(iRow).version = table{iRow,2};
-    plugin(iRow).description = deblank(table{iRow,3});
+    tmp = deblank(table{iRow,3}(end:-1:1));
+    plugin(iRow).description = deblank(tmp(end:-1:1));
     [tmp plugin(iRow).zip] = parsehttplink(table{iRow,4});
     
 end;
