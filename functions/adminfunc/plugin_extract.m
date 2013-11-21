@@ -17,7 +17,7 @@ installedFlag   = false;
 deactivatedFlag = false;
 for iPlugin = length(plugin):-1:1
     if ~plugin(iPlugin).installed, newInstallFlag = true; end;
-    if plugin(iPlugin).installed,  installedFlag  = true; end;
+    if plugin(iPlugin).installed && ~strcmpi(plugin(iPlugin).status, 'deactivated'),  installedFlag  = true; end;
     if strcmpi(plugin(iPlugin).status, 'deactivated'), deactivatedFlag = true; end;
 end;
 
