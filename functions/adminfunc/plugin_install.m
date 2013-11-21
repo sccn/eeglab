@@ -10,11 +10,13 @@ function result = plugin_install(zipfilelink, name, version);
 
     % download plugin
     % ---------------
-    disp([ 'Downloading ' zipfilelink ]);
     [tmp zipfile ext] = fileparts(zipfilelink);
     zipfile = [ zipfile ext ];
+    equalPos = find(zipfile == '=');
+    if ~isempty(equalPos) zipfile  = zipfile(equalPos(end)+1:end); end;
+    disp([ 'Downloading ' zipfile ]);
     try
-        urlwrite( zipfilelink, fullfile(generalPluginPath, zipfile));
+        plugin_urlwrite( zipfilelink, fullfile(generalPluginPath, zipfile));
     catch,
         warndlg2( [ 'Could not download ' zipfile ' in plugin folder.' 10 'Host site might be unavailable or you do not have' 10 'permission to write in the EEGLAB plugin folder' ]);
         result = -1;
