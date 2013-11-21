@@ -106,7 +106,7 @@ classdef updater < handle
             nameValuePairs = [{'currentVersionNumber' num2str(obj.currentVersionNumber) 'matlabVersion' version 'OS' osType} nameValuePairs];
             
             try
-                [xmlString successfullRead] = urlread([obj.xmlFileUrl], 'get', nameValuePairs);
+                [xmlString successfullRead] = plugin_urlread([obj.xmlFileUrl], 'get', nameValuePairs);
             catch
                 successfullRead = false;
             end;
