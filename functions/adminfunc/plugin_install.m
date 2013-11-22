@@ -4,7 +4,7 @@ function result = plugin_install(zipfilelink, name, version);
 
     % get plugin path
     % ---------------
-    version(find(version == '.'))  = '_';
+    %version(find(version == '.'))  = '_';
     generalPluginPath = fullfile(fileparts(which('eeglab.m')), 'plugins');
     newPluginPath     = fullfile(generalPluginPath, [ name version ]);
 
