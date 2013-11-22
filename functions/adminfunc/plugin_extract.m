@@ -1,7 +1,9 @@
-function restartEeglabFlag = plugin_extract(type, pluginlist);
+function restartEeglabFlag = plugin_extract(type, pluginlist, page)
 
+if nargin < 3, page = 1; end;
 % type may be 'import' or 'process'
 restartEeglabFlag = false;
+pluginsPerPage    = 15;
 
 % check the presence of unzip
 %str = evalc('!unzip');
@@ -9,7 +11,23 @@ restartEeglabFlag = false;
 %    error([ '"unzip" could not be found. Instal unzip and make sure' 10 'it is accessible under Matlab by adding the program to' 10 'the path and typing "!unzip"' ]);
 %end;
 
-plugin = plugin_getweb(type, pluginlist, 'newlist');
+if ~isstruct(type)
+    plugin = plugin_getweb(type, pluginlist, 'newlist');
+    % sort plugins by download score
+    [tmp scoreOrder] = sort([ plugin.downloads ], 2, 'descend');
+    plugin = plugin(scoreOrder);
+else
+    plugin    = type;
+end;
+
+% select page
+allPlugins = plugin;
+numPlugin  = length(plugin);
+moreThanOnePage = 0;
+if numPlugin > pluginsPerPage
+    plugin = plugin(pluginsPerPage*(page-1)+1:min(length(plugin),pluginsPerPage*page));
+    moreThanOnePage = 1;
+end;
 
 % find which menu to show
 newInstallFlag  = false;
@@ -28,10 +46,6 @@ pluginIndices = [];
 callback = [ 'tmptag = get(gcbo, ''tag'');' ...
              'if tmptag(3) == ''1'', tmptag(3) = ''2''; else tmptag(3) = ''1''; end;' ...
              'if get(gcbo, ''value''), set(findobj(gcbf, ''tag'', tmptag), ''value'', 0); end; clear tmptag;' ];
-
-% sort plugins by download score
-[tmp scoreOrder] = sort([ plugin.downloads ], 2, 'descend');
-plugin = plugin(scoreOrder);         
 
 % ------------------
 % plugins to install
@@ -67,7 +81,7 @@ if newInstallFlag
                 { 'style' 'text' 'string' plugin(iRow).version 'tag' 'latestversion' 'userdata' userdata }, ...
                 { 'style' 'text' 'string' int2str(plugin(iRow).downloads) }, ...
                 { 'style' 'text' 'string' description }, ...
-                { 'style' 'pushbutton' 'string' 'Doc' 'enable' enableWebDoc 'callback' [ 'web(''' plugin(iRow).webdoc ''');' ] } };
+                { 'style' 'pushbutton' 'string' 'Doc' 'enable' enableWebDoc 'callback' myweb(plugin(iRow).webdoc) } };
             geom = { geom{:}, lineGeom };
             geomvert = [ geomvert 1];
             pluginIndices = [ pluginIndices iRow ];
@@ -113,7 +127,7 @@ if installedFlag
                 { 'style' 'text' 'string' plugin(iRow).currentversion 'tag' 'latestversion'}, ...
                 { 'style' 'text' 'string' int2str(plugin(iRow).downloads) }, ...
                 { 'style' 'text' 'string' textnew 'userdata' userdata }, ...
-                { 'style' 'pushbutton' 'string' 'Doc' 'enable' enableWebDoc 'callback' [ 'web(''' plugin(iRow).webdoc ''');' ] } };
+                { 'style' 'pushbutton' 'string' 'Doc' 'enable' enableWebDoc 'callback' myweb(plugin(iRow).webdoc) } };
             geom = { geom{:}, lineGeom };
             geomvert = [ geomvert 1];
             pluginIndices = [ pluginIndices iRow ];
@@ -155,7 +169,7 @@ if deactivatedFlag
                 { 'style' 'text' 'string' plugin(iRow).version 'tag' 'latestversion' }, ...
                 { 'style' 'text' 'string' int2str(plugin(iRow).downloads) }, ...                
                 { 'style' 'text' 'string' description }, ...
-                { 'style' 'pushbutton' 'string' 'Doc' 'enable' enableWebDoc 'callback' [ 'web(''' plugin(iRow).webdoc ''');' ] } };
+                { 'style' 'pushbutton' 'string' 'Doc' 'enable' enableWebDoc 'callback' myweb(plugin(iRow).webdoc) } };
             geom = { geom{:}, lineGeom };
             geomvert = [ geomvert 1];
             pluginIndices = [ pluginIndices iRow ];
@@ -171,9 +185,32 @@ evalStr = [ 'uisettxt(gcf, ''update''         , ''Update''     , ''rotation'', 9
             'set(findobj(gcf, ''tag'', ''title''), ''fontsize'', 16);' ...
             'tmpobj = findobj(gcf, ''userdata'', ''colortored'');' ...
             'set(tmpobj, ''Foregroundcolor'', [1 0 0]);' ...
+            'tmppos = get(gcf, ''position'');' ...
+            'set(gcf, ''position'', [tmppos(1:2) 800 tmppos(4)]);' ...
+            'clear tmpobj tmppos;' ...
             ];
         
-res = inputgui('uilist', uilist, 'geometry', geom, 'geomvert', geomvert, 'eval', evalStr);
+if 1
+    % version with button
+    if page == 1,                       enablePpage = 'off'; else enablePpage = 'on'; end;
+    if page*pluginsPerPage > numPlugin, enableNpage = 'off'; else enableNpage = 'on'; end;
+    callBackPpage = [ 'tmpobj = get(gcbf, ''userdata''); close gcbf; restartEeglabFlag = plugin_extract(tmpobj, [], ' int2str(page-1) '); clear tmpobj;' ];
+    callBackNpage = [ 'tmpobj = get(gcbf, ''userdata''); close gcbf; restartEeglabFlag = plugin_extract(tmpobj, [], ' int2str(page+1) '); clear tmpobj;' ];
+    
+    uilist = { uilist{:}, {} { 'width' 80 'align' 'left'  'Style', 'pushbutton', 'string', '< Prev. page', 'tag' 'ppage' 'callback', callBackPpage 'enable' enablePpage } };
+    uilist = { uilist{:},    { 'width' 80 'align' 'left'  'stickto' 'on', 'Style', 'pushbutton', 'string', 'Next page >', 'tag' 'npage' 'callback', callBackNpage 'enable' enableNpage } };
+    uilist = { uilist{:},    { 'width' 80 'align' 'right' 'Style', 'pushbutton', 'string', 'Cancel', 'tag' 'cancel' 'callback', 'close gcbf' } };
+    uilist = { uilist{:},    { 'width' 80 'align' 'right' 'stickto' 'on' 'Style', 'pushbutton', 'tag', 'ok', 'string', 'OK', 'callback', 'set(gcbo, ''userdata'', ''retuninginputui'');' } };
+    geom     = { geom{:} [1] [1 1 1 1] };
+    geomvert = [ geomvert 1 1];    
+    res = inputgui('uilist', uilist, 'geometry', geom, 'geomvert', geomvert, 'eval', evalStr, 'addbuttons', 'off', 'skipline', 'off', 'userdata', allPlugins);
+    
+    try, restartEeglabFlag = evalin('base', 'restartEeglabFlag;'); catch, end;
+    evalin('base', 'clear restartEeglabFlag;');
+else
+    % no buttons
+    res = inputgui('uilist', uilist, 'geometry', geom, 'geomvert', geomvert, 'eval', evalStr);
+end;
 if isempty(res), return; end;
 
 % decode inputs
@@ -227,4 +264,11 @@ for iRow = 1:length(plugin)
     end;
 end;
 
+function str = myweb(url);
 
+    %if isempty(strfind(url, 'wiki'))
+    %     str = [ 'web(''' url ''');' ];
+    %else
+        str = [ 'web(''' url ''', ''-browser'');' ];
+    %end;
+    
