@@ -108,6 +108,7 @@ g = finputcheck(options, { 'geom'     'cell'                []      {}; ...
                            'title'    'string'              []      ''; ...
                            'eval'     'string'              []      ''; ...
                            'skipline' 'string'              { 'on' 'off' } 'on'; ...
+                           'addbuttons' 'string'            { 'on' 'off' } 'on'; ...
                            'userdata' ''                    []      []; ...
                            'getresult' 'real'               []      []; ...
                            'screenpos' ''                   []      []; ...
@@ -128,10 +129,8 @@ if isempty(g.getresult)
                 g.geometry = { g.geometry{:} ones(1, oldgeom(row)) };
             end;
         end
-        if strcmpi(g.skipline, 'on')
-             g.geometry = { g.geometry{:} [1] [1 1 1] }; % add button to geometry
-        else g.geometry = { g.geometry{:} [1 1 1] }; % add button to geometry
-        end;
+        if strcmpi(g.skipline, 'on'),   g.geometry = { g.geometry{:} [1] }; end; 
+        if strcmpi(g.addbuttons, 'on'), g.geometry = { g.geometry{:} [1 1 1] }; end;  % add button to geometry
         if ~isempty(g.geom)
             for ind = 1:length(g.geom)
                 g.geom{ind}{2} = g.geom{ind}{2}+2;
@@ -147,26 +146,29 @@ if isempty(g.getresult)
         % ---------------------------------------------------------------
         if strcmpi(g.skipline, 'on'),  g.uilist = { g.uilist{:}, {} }; end;
         options = { 'width' 80 'stickto' 'on' };
-        if ~isempty(g.helpcom)
-            if ~iscell(g.helpcom) | isempty(g.geom)
-                g.uilist = { g.uilist{:}, { 'width' 80 'align' 'left' 'Style', 'pushbutton', 'string', 'Help', 'tag', 'help', 'callback', g.helpcom } };
+        if strcmpi(g.addbuttons, 'on')
+            if ~isempty(g.helpcom)
+                if ~iscell(g.helpcom) | isempty(g.geom)
+                    g.uilist = { g.uilist{:}, { 'width' 80 'align' 'left' 'Style', 'pushbutton', 'string', 'Help', 'tag', 'help', 'callback', g.helpcom } };
+                else
+                    g.uilist = { g.uilist{:}, { 'width' 80 'align' 'left' 'Style', 'pushbutton', 'string', 'Help gui', 'callback', g.helpcom{1} } };
+                    g.uilist = { g.uilist{:}, { 'width' 80 'align' 'left' 'Style', 'pushbutton', 'string', 'More help', 'callback', g.helpcom{2} } };
+                    g.geometry{end} = [1 1 1 1];
+                end;
             else
-                g.uilist = { g.uilist{:}, { 'width' 80 'align' 'left' 'Style', 'pushbutton', 'string', 'Help gui', 'callback', g.helpcom{1} } };
-                g.uilist = { g.uilist{:}, { 'width' 80 'align' 'left' 'Style', 'pushbutton', 'string', 'More help', 'callback', g.helpcom{2} } };
-                g.geometry{end} = [1 1 1 1];
+                g.uilist = { g.uilist{:}, {} };
             end;
-        else
-            g.uilist = { g.uilist{:}, {} };
+            g.uilist = { g.uilist{:}, { 'width' 80 'align' 'right' 'Style', 'pushbutton', 'string', 'Cancel', 'tag' 'cancel' 'callback', 'close gcbf' } };
+            g.uilist = { g.uilist{:}, { 'width' 80 'align' 'right' 'stickto' 'on' 'Style', 'pushbutton', 'tag', 'ok', 'string', 'OK', 'callback', 'set(gcbo, ''userdata'', ''retuninginputui'');' } };
         end;
-        g.uilist = { g.uilist{:}, { 'width' 80 'align' 'right' 'Style', 'pushbutton', 'string', 'Cancel', 'tag' 'cancel' 'callback', 'close gcbf' } };
-        g.uilist = { g.uilist{:}, { 'width' 80 'align' 'right' 'stickto' 'on' 'Style', 'pushbutton', 'tag', 'ok', 'string', 'OK', 'callback', 'set(gcbo, ''userdata'', ''retuninginputui'');' } };
         if ~isempty(g.geom)
             [tmp tmp2 allobj] = supergui( 'fig', fig, 'minwidth', 200, 'geom', g.geom, 'uilist', g.uilist, 'screenpos', g.screenpos );
         elseif isempty(g.geomvert)
             [tmp tmp2 allobj] = supergui( 'fig', fig, 'minwidth', 200, 'geomhoriz', g.geometry, 'uilist', g.uilist, 'screenpos', g.screenpos );
         else
             if strcmpi(g.skipline, 'on'),  g.geomvert = [g.geomvert(:)' 1]; end;
-            [tmp tmp2 allobj] = supergui( 'fig', fig, 'minwidth', 200, 'geomhoriz', g.geometry, 'uilist', g.uilist, 'screenpos', g.screenpos, 'geomvert', [g.geomvert(:)' 1] );
+            if strcmpi(g.addbuttons, 'on'),g.geomvert = [g.geomvert(:)' 1]; end;
+            [tmp tmp2 allobj] = supergui( 'fig', fig, 'minwidth', 200, 'geomhoriz', g.geometry, 'uilist', g.uilist, 'screenpos', g.screenpos, 'geomvert', g.geomvert(:)' );
         end;
     else 
         fig = g.mode;
