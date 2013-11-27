@@ -54,7 +54,7 @@ maxchar = 60;
 geom    = {};
 lineGeom = [ 0.28 0.28 0.95 0.6 0.6 3 0.35 ];
 if newInstallFlag
-    uilist =  { {} { 'style' 'text' 'string' 'Plugins available for install on the internet' 'fontweight' 'bold' 'fontsize' 18 'tag' 'title' } };
+    uilist =  { {} { 'style' 'text' 'string' 'Extensions available for install on the internet' 'fontweight' 'bold' 'fontsize' 18 'tag' 'title' } };
     uilist =  { uilist{:} { 'style' 'text' 'string' 'I' 'tag' 'install' } { } ...
         { 'style' 'text' 'string' 'Plugin' 'fontweight' 'bold' } ...
         { 'style' 'text' 'string' 'Vers.'     'tag' 'verweb'     'fontweight' 'bold' } ...
@@ -93,7 +93,7 @@ end;
 % installed plugins
 % -----------------
 if installedFlag
-    uilist =  { uilist{:} {} {} { 'style' 'text' 'string' 'Installed plugins' 'fontweight' 'bold' 'fontsize' 18 'tag' 'title' } };
+    uilist =  { uilist{:} {} {} { 'style' 'text' 'string' 'Installed extensions' 'fontweight' 'bold' 'fontsize' 18 'tag' 'title' } };
     uilist =  { uilist{:} { 'style' 'text' 'string' 'I' 'tag' 'update' } ...
         { 'style' 'text' 'string' 'I' 'tag' 'deactivate' } ...
         { 'style' 'text' 'string' 'Plugin' 'fontweight' 'bold' } ...
@@ -115,7 +115,7 @@ if installedFlag
             
             userdata = '';
             if plugin(iRow).installorupdate,
-                textnew = [ 'New version ' plugin(iRow).version ' available. Click update to install.' ];
+                textnew = [ 'Click update to install version ' plugin(iRow).version ' now available on the web' ];
                 userdata = 'colortored';
             else
                 textnew = description;
@@ -142,7 +142,7 @@ end;
 %geomvert = [geomvert 0.5 1];
 %uilist = { uilist{:} {} { 'style' 'text' 'string' 'To manage deactivated plugins, use menu item File > Manage plugins > Manage deactivated plugins' } };              
 if deactivatedFlag
-    uilist =  { uilist{:} {} {} { 'style' 'text' 'string' 'List of deactivated plugins                                 ' 'fontweight' 'bold' 'fontsize' 18 'tag' 'title' } };
+    uilist =  { uilist{:} {} {} { 'style' 'text' 'string' 'List of deactivated extensions                         ' 'fontweight' 'bold' 'fontsize' 18 'tag' 'title' } };
     uilist =  { uilist{:} ...
         { 'style' 'text' 'string' 'I' 'tag' 'reactivate' } ...
         { 'style' 'text' 'string' 'I' 'tag' 'remove1' } ...
@@ -229,10 +229,10 @@ for iRow = 1:length(plugin)
         if ~firstPlugin, disp('---------------------------------'); end; firstPlugin = 0;
         
         if strcmpi(plugin(iRow).status, 'deactivated')
-            fprintf('Reactivating plugin %s\n', plugin(iRow).name);
+            fprintf('Reactivating extension %s\n', plugin(iRow).name);
             plugin_reactivate(plugin(iRow).foldername);
             if plugin(iRow).installorupdate
-                res = questdlg2([ 'Plugin ' plugin(iRow).foldername ' has been reactivated but' 10 'a new version is available. Do you want to install it?' ], 'Warning', 'No', 'Yes', 'Yes');
+                res = questdlg2([ 'Extension ' plugin(iRow).foldername ' has been reactivated but' 10 'a new version is available. Do you want to install it?' ], 'Warning', 'No', 'Yes', 'Yes');
                 if strcmpi(res, 'yes')
                     plugin_deactivate(plugin(iRow).foldername);
                     plugin_install(plugin(iRow).zip, plugin(iRow).name, plugin(iRow).version);
@@ -241,12 +241,12 @@ for iRow = 1:length(plugin)
             end;
         else
             if plugin(iRow).installed
-                fprintf('Updating plugin %s\n', plugin(iRow).name);
+                fprintf('Updating extension %s\n', plugin(iRow).name);
                 plugin_deactivate(plugin(iRow).foldername);
                 plugin_install(plugin(iRow).zip, plugin(iRow).name, plugin(iRow).version);
                 plugin_remove(plugin(iRow).foldername);
             else
-                fprintf('Installing plugin %s\n', plugin(iRow).name);
+                fprintf('Installing extension %s\n', plugin(iRow).name);
                 plugin_install(plugin(iRow).zip, plugin(iRow).name, plugin(iRow).version);
             end;
         end;
@@ -255,10 +255,10 @@ for iRow = 1:length(plugin)
         restartEeglabFlag = true;
         
         if strcmpi(plugin(iRow).status, 'deactivated')
-            fprintf('Removing plugin %s\n', plugin(iRow).name);
+            fprintf('Removing extension %s\n', plugin(iRow).name);
             plugin_remove(plugin(iRow).foldername);
         else
-            fprintf('Deactivating plugin %s\n', plugin(iRow).name);
+            fprintf('Deactivating extension %s\n', plugin(iRow).name);
             plugin_deactivate(plugin(iRow).foldername);
         end;
     end;
