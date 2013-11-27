@@ -982,7 +982,7 @@ else
             if strcmpi(status, 'ok')
                 if isempty(vers), vers = pluginlist(plugincount).versionfunc; end;
                 if isempty(vers), vers = '?'; end;
-                fprintf('EEGLAB: adding "%s" plugin version %s (see >> help %s)\n', ...
+                fprintf('EEGLAB: adding "%s" v%s (see >> help %s)\n', ...
                     pluginlist(plugincount).plugin, vers, funcname);
             end;
             pluginlist(plugincount).status       = status;
