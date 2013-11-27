@@ -22,7 +22,7 @@ function result = plugin_install(zipfilelink, name, version);
         if pluginSize > 500000 && depth > 1
              res = questdlg2( [ 'Extension ' name ' size is ' pluginSizeStr 'MB. Are you sure' 10 ...
                                 'you want to download this extension?' ], 'Warning', 'No', 'Yes', 'Yes');
-             if strcmpi(res, 'no'), fprintf([ 'Skipping' name ' extension instalation' ]); result = -1; return; end;               
+             if strcmpi(res, 'no'), fprintf([ 'Skipping ' name ' extension instalation\n' ]); result = -1; return; end;               
         end;
     catch,
         warndlg2( [ 'Could not download ' zipfile ' in plugin folder.' 10 'Host site might be unavailable or you do not have' 10 'permission to write in the EEGLAB plugin folder' ]);
