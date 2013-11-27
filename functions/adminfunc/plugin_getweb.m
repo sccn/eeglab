@@ -8,14 +8,14 @@ if nargin < 3, mode = 'merge'; end; % 'merge' or 'newlist'
 if isfield(pluginOri, 'plugin'), pluginOri = plugin_convert(pluginOri); end;
 
 try
-    disp( [ 'Retreiving URL with ' type ' plugins...' ] );
+    disp( [ 'Retreiving URL with ' type ' extensions...' ] );
     if strcmpi(type, 'import')
         [tmp status] = plugin_urlread('http://sccn.ucsd.edu/wiki/Plugin_list_import');
     else
         [tmp status] = plugin_urlread('http://sccn.ucsd.edu/wiki/Plugin_list_process');
     end;
 catch,
-    error('Cannot connect to the Internet to retrieve plugin list');
+    error('Cannot connect to the Internet to retrieve extension list');
 end;
 
 % retreiving download statistics
@@ -25,11 +25,11 @@ try
     stats = textscan(stats, '%s%d');
 catch,
     stats = {};
-    disp('Cannot connect to the Internet to retrieve statistics for plugins');
+    disp('Cannot connect to the Internet to retrieve statistics for extensions');
 end;
 
 if status == 0
-    error('Cannot connect to the Internet to retrieve plugin list');
+    error('Cannot connect to the Internet to retrieve extension list');
 end;
 
 % parse the web page
@@ -37,8 +37,24 @@ end;
 try
     plugin = parseTable(tmp);
 catch
-    error('Cannot parse plugin list - please contact eeglab@sccn.ucsd.edu');
+    error('Cannot parse extension list - please contact eeglab@sccn.ucsd.edu');
 end;
+
+% remove some potential future plugins that would interfere with this
+% EEGLAB version
+% --------------
+rmInd = [];
+for iRow = 1:length(plugin)
+    if ~isempty(findstr(lower(plugin(iRow).name), 'biosig')), rmInd = [ rmInd iRow ]; end;
+    if ~isempty(findstr(lower(plugin(iRow).name), 'fileio')), rmInd = [ rmInd iRow ]; end;
+    if ~isempty(findstr(lower(plugin(iRow).name), 'file-io')), rmInd = [ rmInd iRow ]; end;
+    if ~isempty(findstr(lower(plugin(iRow).name), 'bioelectromagnetism')), rmInd = [ rmInd iRow ]; end;
+    if ~isempty(findstr(lower(plugin(iRow).name), 'eegtoolbox')), rmInd = [ rmInd iRow ]; end;
+    if ~isempty(findstr(lower(plugin(iRow).name), 'fieldtrip')),  rmInd = [ rmInd iRow ]; end;
+    if ~isempty(findstr(lower(plugin(iRow).name), 'eeg_toolbox')), rmInd = [ rmInd iRow ]; end;
+    if ~isempty(findstr(lower(plugin(iRow).name), 'eeg-toolbox')), rmInd = [ rmInd iRow ]; end;
+end;
+plugin(rmInd) = [];
 
 % find correspondance with plugin list
 % ------------------------------------
@@ -60,7 +76,7 @@ for iRow = 1:length(plugin)
         plugin(iRow).status          = 'notinstalled';
     else
         if length(indMatch) > 1
-            disp([ 'Warning: duplicate plugin ' plugin(iRow).name ' instaled' ]); 
+            disp([ 'Warning: duplicate extension ' plugin(iRow).name ' instaled' ]); 
         end;
         plugin(iRow).currentversion = pluginOri(indMatch).currentversion;
         plugin(iRow).foldername     = pluginOri(indMatch).foldername;
