@@ -173,6 +173,8 @@ if strcmpi(opt.mode, 'eeglab')
         end;
     end;
 else
+    if ~exist('ft_freqstatistics'), error('Install Fieldtrip-lite to use Fieldtrip statistics'); end;
+
     % Fieldtrip statistics
     % --------------------
     params = {};
