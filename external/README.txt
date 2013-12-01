@@ -1,14 +1,7 @@
-This folder contains modules external to EEGLAB
+This folder use to contain modules external to EEGLAB
+Now all external modules are treated as EEGLAB extensions
+and this folder is not longer needed.
 
-It contains part of the Fieltrip toolbox
-for source localization, part of the BIOSIG
-toolbox for importing different data formats
-and part of the bioelectromagnetism toolbox
-for performing ERP peak detection.
+This folder will be removed in subsequent EEGLAB releases.
 
-You may replace the folder with the full
-version of each of the toolbox if you
-want to use the other functionalities of these
-toolboxes from the command line.
-
-A. Delorme - May 12, 2010
+A. Delorme - Nov 30, 2013
