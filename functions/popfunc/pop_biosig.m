@@ -59,6 +59,8 @@ function [EEG, command, dat] = pop_biosig(filename, varargin);
 EEG = [];
 command = '';
 
+if ~plugin_askinstall('Biosig', 'sopen'), return; end;
+    
 if nargin < 1
 	% ask user
 	[filename, filepath] = uigetfile('*.*', 'Choose a data file -- pop_biosig()'); %%% this is incorrect in original version!!!!!!!!!!!!!!
