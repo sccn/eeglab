@@ -291,16 +291,7 @@ if nargin < 2, loc_file = []; end;
 if isstruct(Values) | ~isstruct(loc_file), fieldtrip == 1; end;
 if isstr(loc_file), if exist(loc_file) ~= 2, fieldtrip == 1; end; end;
 if fieldtrip
-    disp('Calling topoplot from Fieldtrip');
-    dir1 = which('topoplot');           dir1 = fileparts(dir1);
-    dir2 = which('electrodenormalize'); dir2 = fileparts(dir2);
-    addpath(dir2);
-    try,
-        topoplot(Values, loc_file, varargin{:});
-    catch, 
-    end;
-    addpath(dir1);
-    return;
+    error('Wrong calling format, are you trying to use the topoplot Fieldtrip function?');
 end;
 
 nargs = nargin;
