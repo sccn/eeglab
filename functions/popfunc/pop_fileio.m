@@ -41,6 +41,8 @@ function [EEG, command] = pop_fileio(filename, varargin);
 EEG = [];
 command = '';
 
+if ~plugin_askinstall('Fileio', 'ft_read_data'), return; end;
+
 if nargin < 1
 	% ask user
     ButtonName = questdlg2('Do you want to import a file or a folder?', ...
