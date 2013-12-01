@@ -409,7 +409,6 @@ catchstrs.update_study           = e_load_study;
 % create eeglab figure
 % --------------------
 javaobj = eeg_mainfig(onearg);
-ptopoplot = fileparts(mywhich('cbar'));
 
 % detecting icalab
 % ----------------
@@ -417,41 +416,11 @@ if exist('icalab')
     disp('ICALAB toolbox detected (algo. added to "run ICA" interface)');
 end;
 
-biosigflag = 0;
-if iseeglabdeployed2
-    biosigflag = 1;
-else
-    % adding all folders in external
-    % ------------------------------
-    disp(['Adding path to all EEGLAB functions']);
-    p = mywhich('eeglab.m');
-    p = p(1:findstr(p,'eeglab.m')-1);
-    if strcmpi(p, './') || strcmpi(p, '.\'), p = [ pwd filesep ]; end;
-    dircontent  = dir([ p 'external' ]);
-    dircontent  = { dircontent.name };
-    for index = 1:length(dircontent)
-        if dircontent{index}(1) ~= '.'
-            if ~isempty(findstr('fieldtrip', lower(dircontent{index})))
-                aadpathifnotexist( [ p 'external' filesep dircontent{index} filesep 'utilities' ], 'ft_checkconfig.m');
-                aadpathifnotexist( [ p 'external' filesep dircontent{index} filesep 'forward'   ], 'ft_apply_montage.m');
-                aadpathifnotexist( [ p 'external' filesep dircontent{index} filesep 'inverse'   ], 'dipole_fit.m');
-                aadpathifnotexist( [ p 'external' filesep dircontent{index} ], 'ft_dipolefitting.m' );
-                disp(['Adding path to eeglab' filesep 'external' filesep dircontent{index} ' subfolders (when Fieltrip absent)' ]);
-            elseif ~isempty(findstr('biosig', lower(dircontent{index})))
-                aadpathifnotexist( [ p 'external' filesep dircontent{index} filesep 't200_FileAccess' ], 'sopen.m');
-                aadpathifnotexist( [ p 'external' filesep dircontent{index} filesep 't250_ArtifactPreProcessingQualityControl' ], 'regress_eog.m' );
-                aadpathifnotexist( [ p 'external' filesep dircontent{index} filesep 'doc' ], 'DecimalFactors.txt');
-                biosigflag = 1;
-            elseif exist([p 'external' filesep dircontent{index}]) == 7
-                addpathifnotinlist([p 'external' filesep dircontent{index}]);
-                disp(['Adding path to eeglab' filesep 'external' filesep dircontent{index}]);
-            end;
-        end;
-    end;
-
+if ~iseeglabdeployed2
     % check for older version of Fieldtrip and presence of topoplot
     % -------------------------------------------------------------
     if ismatlab
+        ptopoplot  = fileparts(mywhich('cbar'));
         ptopoplot2 = fileparts(mywhich('topoplot'));
         if ~strcmpi(ptopoplot, ptopoplot2),
             %disp('  Warning: duplicate function topoplot.m in Fieldtrip and EEGLAB');
@@ -663,10 +632,8 @@ if ismatlab
 
     % BIOSIG MENUS
     % ------------
-    if biosigflag
-        uimenu( neuro_m, 'Label', 'From Biosemi BDF file (BIOSIG toolbox)', 'CallBack' , cb_biosig, 'Separator', 'on'); 
-        uimenu( neuro_m, 'Label', 'From EDF/EDF+/GDF files (BIOSIG toolbox)', 'CallBack', cb_biosig); 
-    end;
+    uimenu( neuro_m, 'Label', 'From Biosemi BDF file (BIOSIG toolbox)', 'CallBack' , cb_biosig, 'Separator', 'on'); 
+    uimenu( neuro_m, 'Label', 'From EDF/EDF+/GDF files (BIOSIG toolbox)', 'CallBack', cb_biosig); 
 
     uimenu( epoch_m, 'Label', 'From Matlab array or ASCII file'       , 'CallBack', cb_importepoch);
     uimenu( epoch_m, 'Label', 'From Neuroscan .DAT file'              , 'CallBack', cb_loaddat); 
@@ -694,7 +661,7 @@ if ismatlab
     uimenu( file_m, 'Label', 'Load existing study'                    , 'userdata', on     , 'CallBack', cb_loadstudy,'Separator', 'on' ); 
     uimenu( file_m, 'Label', 'Save current study'                     , 'userdata', onstudy, 'CallBack', cb_savestudy1);
     uimenu( file_m, 'Label', 'Save current study as'                  , 'userdata', onstudy, 'CallBack', cb_savestudy2);
-    uimenu( file_m, 'Label', 'Clear study'                            , 'userdata', ondatastudy, 'CallBack', cb_clearstudy);
+    uimenu( file_m, 'Label', 'Clear study / Clear all'                , 'userdata', ondatastudy, 'CallBack', cb_clearstudy);
     uimenu( file_m, 'Label', 'Memory and other options'               , 'userdata', on     , 'CallBack', cb_editoptions, 'Separator', 'on');
 
     hist_m = uimenu( file_m, 'Label', 'History scripts'               , 'userdata', on     , 'Separator', 'on');
@@ -877,23 +844,29 @@ else
     dircontent  = { dircontent.name };
     for index = 1:length(dircontent)
         funcname = '';
+        pluginVersion = '';
         if exist([p 'deactivatedplugins' filesep dircontent{index}]) == 7
             if ~strcmpi(dircontent{index}, '.') & ~strcmpi(dircontent{index}, '..')
                 tmpdir = dir([ p 'deactivatedplugins' filesep dircontent{index} filesep 'eegplugin*.m' ]);
+                [ pluginName pluginVersion ] = parsepluginname(dircontent{index});
                 if ~isempty(tmpdir)
                     funcname = tmpdir(1).name(1:end-2);
-                    [ pluginlist(plugincount).plugin pluginlist(plugincount).version ] = parsepluginname(dircontent{index});
                 end;
             end;
         else 
-            if ~isempty(findstr(dircontent{index}, 'eegplugin')) & dircontent{index}(end) == 'm'
+            if ~isempty(findstr(dircontent{index}, 'eegplugin')) && dircontent{index}(end) == 'm'
                 funcname = dircontent{index}(1:end-2); % remove .m
-                [ pluginlist(plugincount).plugin pluginlist(plugincount).version ] = parsepluginname(dircontent{index}(10:end-2));
+                [ pluginName pluginVersion ] = parsepluginname(dircontent{index}(10:end-2));
             end;
         end;
-        if ~isempty(funcname)
-            pluginlist(plugincount).funcname   = funcname(10:end);
+        if ~isempty(pluginVersion)
+            pluginlist(plugincount).plugin     = pluginName;
+            pluginlist(plugincount).version    = pluginVersion;
             pluginlist(plugincount).foldername = dircontent{index};
+            if ~isempty(funcname)
+                 pluginlist(plugincount).funcname   = funcname(10:end);
+            else pluginlist(plugincount).funcname   = '';
+            end
             if length(pluginlist(plugincount).funcname) > 1 && pluginlist(plugincount).funcname(1) == '_'
                 pluginlist(plugincount).funcname(1) = [];
             end; 
@@ -911,82 +884,89 @@ else
         % find function
         % -------------
         funcname = '';
+        pluginVersion = [];
         if exist([p 'plugins' filesep dircontent{index}]) == 7
             if ~strcmpi(dircontent{index}, '.') & ~strcmpi(dircontent{index}, '..')
                 newpath = [ 'plugins' filesep dircontent{index} ];
                 tmpdir = dir([ p 'plugins' filesep dircontent{index} filesep 'eegplugin*.m' ]);
                 
+                addpathifnotinlist(fullfile(eeglabpath, newpath));
+                [ pluginName pluginVersion ] = parsepluginname(dircontent{index});
                 if ~isempty(tmpdir)
-                    myaddpath(eeglabpath, tmpdir(1).name, newpath);
+                    %myaddpath(eeglabpath, tmpdir(1).name, newpath);
                     funcname = tmpdir(1).name(1:end-2);
-                    [ pluginlist(plugincount).plugin pluginlist(plugincount).version ] = parsepluginname(dircontent{index});
                 end;
                 
-%                 for tmpind = 1:length(tmpdir)
-%                     % find plugin function in subfolder
-%                     % ---------------------------------
-%                     if ~isempty(findstr(tmpdir(tmpind).name, 'eegplugin')) & tmpdir(tmpind).name(end) == 'm'
-%                         funcname = tmpdir(tmpind).name(1:end-2);
-%                         tmpind = length(tmpdir);
-%                         [ pluginlist(plugincount).plugin pluginlist(plugincount).version ] = parsepluginname(dircontent{index});
-%                     end;
-
-                    % special case of eeglab subfolder (for BIOSIG)
-                    % --------------------------------
-%                     if strcmpi(tmpdir(tmpind).name, 'eeglab')
-%                         addpath([ p 'plugins' filesep dircontent{index} filesep 'eeglab' ],'-end');
-%                         tmpdir2 = dir([ p 'plugins' filesep dircontent{index} filesep 'eeglab' ]);
-%                         for tmpind2 = 1:length(tmpdir2)
-%                             if ~isempty(findstr(tmpdir2(tmpind2).name, 'eegplugin')) ...
-%                                     & tmpdir2(tmpind2).name(end) == 'm'
-%                                 funcname = tmpdir2(tmpind2).name(1:end-2);
-%                                 tmpind2  = length(tmpdir2);
-%                                 tmpind   = length(tmpdir);
-%                                 [ pluginlist(plugincount).plugin pluginlist(plugincount).version ] = parsepluginname(dircontent{index});
-%                             end;
-%                         end;
-%                     end;    
-%                end;
+                % special case of subfolder for BIOSIG
+                % ------------------------------------
+                if ~isempty(findstr(lower(dircontent{index}), 'fieldtrip'))
+                    addpathifnotexist( fullfile(eeglabpath, newpath, 'compat'), 'electrodenormalize' );
+                    ptopoplot  = fileparts(mywhich('cbar'));
+                    ptopoplot2 = fileparts(mywhich('topoplot'));
+                    if ~isequal(ptopoplot, ptopoplot2)
+                        addpath(ptopoplot);
+                    end;
+                end;
+                    
+                % special case of subfolder for BIOSIG
+                % ------------------------------------
+                if ~isempty(findstr(lower(dircontent{index}), 'biosig'))
+                    addpathifnotexist( fullfile(eeglabpath, newpath, 'biosig', 't200_FileAccess'), 'sopen.m');
+                    addpathifnotexist( fullfile(eeglabpath, newpath, 'biosig', 't250_ArtifactPreProcessingQualityControl'), 'regress_eog.m' );
+                    addpathifnotexist( fullfile(eeglabpath, newpath, 'biosig', 'doc'), 'DecimalFactors.txt');
+                    disp('EEGLAB: adding "Biosig"; not all Biosig folder were added to the path');
+                end;
+                    
             end;
         else 
-            if ~isempty(findstr(dircontent{index}, 'eegplugin')) & dircontent{index}(end) == 'm'
+            if ~isempty(findstr(dircontent{index}, 'eegplugin')) && dircontent{index}(end) == 'm'
                 funcname = dircontent{index}(1:end-2); % remove .m
-                [ pluginlist(plugincount).plugin pluginlist(plugincount).version ] = parsepluginname(dircontent{index}(10:end-2));
+                [ pluginName pluginVersion ] = parsepluginname(dircontent{index}(10:end-2));
             end;
         end;
 
         % execute function
         % ----------------
-        if ~isempty(funcname)
-            vers   = pluginlist(plugincount).version; % version
-            vers2  = '';
-            status = 'ok';
-            try,
-                %eval( [ 'vers2 =' funcname '(gcf, trystrs, catchstrs);' ]);
-                vers2 = feval(funcname, gcf, trystrs, catchstrs);
-            catch
+        if ~isempty(pluginVersion)
+            if isempty(funcname)
+                pluginlist(plugincount).plugin     = pluginName;
+                pluginlist(plugincount).version    = pluginVersion;
+                pluginlist(plugincount).foldername = dircontent{index};
+                pluginlist(plugincount).status     = status;
+                plugincount = plugincount+1;
+            else
+                pluginlist(plugincount).plugin     = pluginName;
+                pluginlist(plugincount).version    = pluginVersion;
+                vers   = pluginlist(plugincount).version; % version
+                vers2  = '';
+                status = 'ok';
                 try,
-                    eval( [ funcname '(gcf, trystrs, catchstrs)' ]);
+                    %eval( [ 'vers2 =' funcname '(gcf, trystrs, catchstrs);' ]);
+                    vers2 = feval(funcname, gcf, trystrs, catchstrs);
                 catch
-                    disp([ 'EEGLAB: error while adding plugin "' funcname '"' ] ); 
-                    disp([ '   ' lasterr] );
-                    status = 'error';
+                    try,
+                        eval( [ funcname '(gcf, trystrs, catchstrs)' ]);
+                    catch
+                        disp([ 'EEGLAB: error while adding plugin "' funcname '"' ] ); 
+                        disp([ '   ' lasterr] );
+                        status = 'error';
+                    end;
                 end;
+                pluginlist(plugincount).funcname   = funcname(10:end);
+                pluginlist(plugincount).foldername = dircontent{index};
+                [tmp pluginlist(plugincount).versionfunc] = parsepluginname(vers2);
+                if length(pluginlist(plugincount).funcname) > 1 && pluginlist(plugincount).funcname(1) == '_'
+                    pluginlist(plugincount).funcname(1) = [];
+                end; 
+                if strcmpi(status, 'ok')
+                    if isempty(vers), vers = pluginlist(plugincount).versionfunc; end;
+                    if isempty(vers), vers = '?'; end;
+                    fprintf('EEGLAB: adding "%s" v%s (see >> help %s)\n', ...
+                        pluginlist(plugincount).plugin, vers, funcname);
+                end;
+                pluginlist(plugincount).status       = status;
+                plugincount = plugincount+1;
             end;
-            pluginlist(plugincount).funcname   = funcname(10:end);
-            pluginlist(plugincount).foldername = dircontent{index};
-            [tmp pluginlist(plugincount).versionfunc] = parsepluginname(vers2);
-            if length(pluginlist(plugincount).funcname) > 1 && pluginlist(plugincount).funcname(1) == '_'
-                pluginlist(plugincount).funcname(1) = [];
-            end; 
-            if strcmpi(status, 'ok')
-                if isempty(vers), vers = pluginlist(plugincount).versionfunc; end;
-                if isempty(vers), vers = '?'; end;
-                fprintf('EEGLAB: adding "%s" v%s (see >> help %s)\n', ...
-                    pluginlist(plugincount).plugin, vers, funcname);
-            end;
-            pluginlist(plugincount).status       = status;
-            plugincount = plugincount+1;
         end;
     end;
     global PLUGINLIST;
@@ -997,12 +977,8 @@ if ~ismatlab, return; end;
 % add other import ...
 % --------------------
 cb_others = [ 'pophelp(''troubleshooting_data_formats'');' ];
-if exist('ft_chantype')
-    uimenu( import_m, 'Label', 'Using the FILE-IO interface', 'CallBack', cb_fileio, 'separator', 'on'); 
-end;
-if biosigflag
-    uimenu( import_m, 'Label', 'Using the BIOSIG interface' , 'CallBack', cb_biosig); 
-end;
+uimenu( import_m, 'Label', 'Using the FILE-IO interface', 'CallBack', cb_fileio, 'separator', 'on'); 
+uimenu( import_m, 'Label', 'Using the BIOSIG interface' , 'CallBack', cb_biosig); 
 uimenu( import_m, 'Label', 'Troubleshooting data formats...', 'CallBack', cb_others);    
 
 % changing plugin menu color
@@ -1033,7 +1009,7 @@ if nargout < 1
 end;
 
 %% automatic updater
-%try
+try
     [dummy eeglabVersionNumber currentReleaseDateString] = eeg_getversion;
     if isempty(eeglabVersionNumber)
         eeglabVersionNumber = 'dev';
@@ -1112,12 +1088,11 @@ end;
             start(timer('TimerFcn','try, eeglabUpdater.checkForNewVersion({''eeglab_event'' ''setup''}); catch, end; clear eeglabUpdater;', 'name', 'eeglabupdater', 'StartDelay', 20.0));
         end;
     end;
-% catch
-%     if option_checkversion
-%         fprintf('Updater could not be initialized.\n');
-%     end;
-% end;
-% 
+catch
+    if option_checkversion
+        fprintf('Updater could not be initialized.\n');
+    end;
+end;
 
 % REMOVED MENUS
 	%uimenu( tools_m, 'Label', 'Automatic comp. reject',  'enable', 'off', 'CallBack', '[EEG LASTCOM] = pop_rejcomp(EEG); eegh(LASTCOM); if ~isempty(LASTCOM), eeg_store(CURRENTSET); end;');
@@ -1982,7 +1957,7 @@ function addpathifnotinlist(newpath);
         end;
     end;
 
-function aadpathifnotexist(newpath, functionname);
+function addpathifnotexist(newpath, functionname);
     tmpp = mywhich(functionname);
         
     if isempty(tmpp)
