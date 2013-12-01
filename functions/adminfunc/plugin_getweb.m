@@ -22,7 +22,7 @@ end;
 try
     disp( [ 'Retreiving download statistics...' ] );
     [stats status] = plugin_urlread('http://sccn.ucsd.edu/eeglab/plugin_uploader/plugin_getcountall.php');
-    stats = textscan(stats, '%s%d');
+    stats = textscan(stats, '%s%d%s%s');
 catch,
     stats = {};
     disp('Cannot connect to the Internet to retrieve statistics for extensions');
@@ -40,22 +40,6 @@ catch
     error('Cannot parse extension list - please contact eeglab@sccn.ucsd.edu');
 end;
 
-% remove some potential future plugins that would interfere with this
-% EEGLAB version
-% --------------
-rmInd = [];
-for iRow = 1:length(plugin)
-    if ~isempty(findstr(lower(plugin(iRow).name), 'biosig')), rmInd = [ rmInd iRow ]; end;
-    if ~isempty(findstr(lower(plugin(iRow).name), 'fileio')), rmInd = [ rmInd iRow ]; end;
-    if ~isempty(findstr(lower(plugin(iRow).name), 'file-io')), rmInd = [ rmInd iRow ]; end;
-    if ~isempty(findstr(lower(plugin(iRow).name), 'bioelectromagnetism')), rmInd = [ rmInd iRow ]; end;
-    if ~isempty(findstr(lower(plugin(iRow).name), 'eegtoolbox')), rmInd = [ rmInd iRow ]; end;
-    if ~isempty(findstr(lower(plugin(iRow).name), 'fieldtrip')),  rmInd = [ rmInd iRow ]; end;
-    if ~isempty(findstr(lower(plugin(iRow).name), 'eeg_toolbox')), rmInd = [ rmInd iRow ]; end;
-    if ~isempty(findstr(lower(plugin(iRow).name), 'eeg-toolbox')), rmInd = [ rmInd iRow ]; end;
-end;
-plugin(rmInd) = [];
-
 % find correspondance with plugin list
 % ------------------------------------
 if ~isempty(pluginOri)
@@ -67,6 +51,20 @@ for iRow = 1:length(plugin)
     % fix links
     if isfield(plugin, 'zip'), plugin(iRow).zip = strrep(plugin(iRow).zip, '&amp;', '&'); end;
         
+    % get number of downloads
+    if ~isempty(stats)
+        indMatch = strmatch(plugin(iRow).name, stats{1}, 'exact');
+        if ~isempty(indMatch)
+             plugin(iRow).downloads = stats{2}(indMatch(1));
+             if length(stats) > 2 && ~isempty(stats{3}{indMatch(1)})
+                 plugin(iRow).version   = stats{3}{indMatch(1)};
+                 plugin(iRow).zip       = stats{4}{indMatch(1)};
+             end;
+        else plugin(iRow).downloads = 0;
+        end;
+    else plugin(iRow).downloads = 0;
+    end;
+    
     % match with existiting plugins
     indMatch = strmatch(lower(plugin(iRow).name), currentNames, 'exact');
     if isempty(indMatch)
@@ -90,15 +88,6 @@ for iRow = 1:length(plugin)
         allMatch = [ allMatch indMatch(:)' ];
     end;
     
-    % get number of downloads
-    if ~isempty(stats)
-        indMatch = strmatch(plugin(iRow).name, stats{1}, 'exact');
-        if ~isempty(indMatch)
-             plugin(iRow).downloads = stats{2}(indMatch(1));
-        else plugin(iRow).downloads = 0;
-        end;
-    else plugin(iRow).downloads = 0;
-    end;
 end;
 
 % put all the installed plugins first
