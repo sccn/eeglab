@@ -1,6 +1,6 @@
 function result = plugin_install(zipfilelink, name, version, forceInstall);
 
-    if nargin < 3, forceInstall = false; end;
+    if nargin < 4, forceInstall = false; end;
     result = 1;
 
     % get plugin path
