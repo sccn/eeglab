@@ -1,5 +1,6 @@
-function result = plugin_install(zipfilelink, name, version);
+function result = plugin_install(zipfilelink, name, version, forceInstall);
 
+    if nargin < 3, forceInstall = false; end;
     result = 1;
 
     % get plugin path
@@ -19,7 +20,7 @@ function result = plugin_install(zipfilelink, name, version);
     try
         pluginSize = plugin_urlsize(zipfilelink);
         pluginSizeStr = num2str(round(pluginSize/100000)/10);
-        if pluginSize > 500000 && depth > 1
+        if pluginSize > 500000 && depth > 1 && ~forceInstall
              res = questdlg2( [ 'Extension ' name ' size is ' pluginSizeStr 'MB. Are you sure' 10 ...
                                 'you want to download this extension?' ], 'Warning', 'No', 'Yes', 'Yes');
              if strcmpi(res, 'no'), fprintf([ 'Skipping ' name ' extension instalation\n' ]); result = -1; return; end;               
@@ -45,7 +46,12 @@ function result = plugin_install(zipfilelink, name, version);
     if ~exist(newPluginPath)
         mkdir(newPluginPath);
     else
-        warndlg2( [ 'Extension folder already exist ' newPluginPath 10 'Remove it manually before installing extension' ]);
+        msg = [ 'Extension folder already exist ' newPluginPath 10 'Remove it manually before installing extension' ];
+        if ~forceInstall
+            warndlg2(msg);
+        else
+            disp(msg);
+        end;
         result = -1;
         return;
     end;
