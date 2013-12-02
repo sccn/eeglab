@@ -46,15 +46,6 @@ function vers = eegplugin_dipfit(fig, trystrs, catchstrs)
         error('eegplugin_dipfit requires 3 arguments');
     end;
     
-    % add dipfit folder to path
-    % -----------------------
-    if ~exist('ft_dipolefitting')
-        p = which('eegplugin_dipfit');
-        disp('Fieldtrip functions for dipole localization not found, removing Dipfit2');
-        p = p(1:findstr(p,'eegplugin_dipfit.m')-1);
-        rmpath(p);
-    end;
-
     % find tools menu
     % ---------------
     menu = findobj(fig, 'tag', 'tools'); 
