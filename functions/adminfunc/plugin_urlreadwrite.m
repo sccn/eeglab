@@ -44,15 +44,8 @@ catch exception %#ok
     return
 end
 
-% Get the proxy information using the MATLAB proxy API.
-proxy = com.mathworks.webproxy.WebproxyFactory.findProxyForURL(url); 
-
 % Open a connection to the URL.
-if isempty(proxy)
-    urlConnection = url.openConnection;
-else
-    urlConnection = url.openConnection(proxy);
-end
+urlConnection = url.openConnection;
 
 % build up the MATLAB User Agent
 mlUserAgent = ['MATLAB R' version('-release') ' '  version('-description')];
