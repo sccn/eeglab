@@ -55,6 +55,8 @@ function [EEGOUT, com] = pop_dipfit_nonlinear( EEG, subfunction, parent, dipnum 
 % - dipfit_position
 % - dipfit_moment
 
+if ~plugin_askinstall('Fieldtrip-lite', 'ft_sourceanalysis'), return; end;
+
 if nargin<1
   help pop_dipfit_nonlinear;
   return
