@@ -1,10 +1,16 @@
 function installRes = plugin_askinstall(pluginName, pluginFunc)
 
-if ~exist(pluginFunc)
+if nargin < 2 || ~exist(pluginFunc)
+    
+    db = dbstack;
+    if length(db) > 2 && ~strcmpi(db(end).name, 'checkouteeglab.m');
+        error([ 'Cannot find ' pluginName ' extension, use EEGLAB Extension Manager to install it' ]);
+    end;
+    
     installRes = 0;
     
     % check is deactivated
-    try, PLUGINLIST = evalin('base', 'PLUGINLIST'); catch, end;
+    try, PLUGINLIST = evalin('base', 'PLUGINLIST'); catch, PLUGINLIST = []; end;
     if ~isempty(PLUGINLIST) && isfield(PLUGINLIST, 'plugin')
         indPlugin = strmatch(lower(pluginName), lower({ PLUGINLIST.plugin }), 'exact');
         if ~isempty(indPlugin) && strcmpi(PLUGINLIST(indPlugin(1)).status, 'deactivated')
