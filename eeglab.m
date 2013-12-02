@@ -927,7 +927,7 @@ else
 
         % execute function
         % ----------------
-        if ~isempty(pluginVersion)
+        if ~isempty(pluginVersion) || ~isempty(funcname)
             if isempty(funcname)
                 pluginlist(plugincount).plugin     = pluginName;
                 pluginlist(plugincount).version    = pluginVersion;
