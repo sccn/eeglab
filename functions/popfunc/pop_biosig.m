@@ -25,6 +25,11 @@
 %                  channel to use, pick one and then re-reference after 
 %                  the channel locations are read in. {default: none}.
 %                  For more information see http://www.biosemi.com/faq/cms&drl.htm
+%  'refoptions'  - [Cell] Option for the pop_reref function. Default is to 
+%                  remove the reference channel if there is one of them and to 
+%                  keep it if there are several of them from the graphic
+%                  interface. From the command line default option is to 
+%                  keep the reference channel.
 %  'rmeventchan' - ['on'|'off'] remove event channel after event 
 %                  extraction. Default is 'on'.
 %  'memorymapped' - ['on'|'off'] import memory mapped file (useful if 
@@ -122,6 +127,9 @@ if nargin < 1
         if ~isempty(result{6}), options = { options{:} 'ref'        eval( [ '[' result{6} ']' ] ) }; end;
         if  result{7},          options = { options{:} 'memorymapped' 'on' }; end;
     end;
+    if length(eval( [ '[' result{6} ']' ] )) > 1
+        options = { options{:} 'refoptions' { 'keepref' 'off' } };
+    end;
 else
     options = varargin;
 end;
@@ -131,6 +139,7 @@ end;
 g = finputcheck( options, { 'blockrange'   'integer' [0 Inf]    [];
                             'channels'     'integer' [0 Inf]    [];
                             'ref'          'integer' [0 Inf]    [];
+                            'refoptions'   'cell'    {}             { 'keepref' 'on' };
                             'rmeventchan'  'string'  { 'on';'off' } 'on';
                             'importevent'  'string'  { 'on';'off' } 'on';
                             'importannot'  'string'  { 'on';'off' } 'on';
@@ -164,9 +173,7 @@ end;
 % -----------
 if ~isempty(g.ref)
     disp('Re-referencing...');
-    refoptions = {};
-    if length(g.ref) > 1, refoptions = { 'keepref' 'on' }; end;
-    EEG = pop_reref(EEG, g.ref, refoptions{:});
+    EEG = pop_reref(EEG, g.ref, g.refoptions{:});
 %     EEG.data = EEG.data - repmat(mean(EEG.data(g.ref,:),1), [size(EEG.data,1) 1]);
 %     if length(g.ref) == size(EEG.data,1)
 %         EEG.ref  = 'averef';
