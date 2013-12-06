@@ -171,6 +171,7 @@ if nargin < 1
         eeglabpath2 = mywhich('eeglab.m');
     end;
     if ~isempty(eeglabpath2)
+        evalin('base', 'clear classes updater;');
         eeglabpath2 = eeglabpath2(1:end-length('eeglab.m'));
         tmpWarning = warning('backtrace'); 
         warning backtrace off;
@@ -932,7 +933,7 @@ else
                 pluginlist(plugincount).plugin     = pluginName;
                 pluginlist(plugincount).version    = pluginVersion;
                 pluginlist(plugincount).foldername = dircontent{index};
-                pluginlist(plugincount).status     = status;
+                pluginlist(plugincount).status     = 'ok';
                 plugincount = plugincount+1;
             else
                 pluginlist(plugincount).plugin     = pluginName;
