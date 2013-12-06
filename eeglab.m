@@ -901,7 +901,8 @@ else
                 % special case of subfolder for BIOSIG
                 % ------------------------------------
                 if ~isempty(findstr(lower(dircontent{index}), 'fieldtrip'))
-                    addpathifnotexist( fullfile(eeglabpath, newpath, 'compat'), 'electrodenormalize' );
+                    addpathifnotexist( fullfile(eeglabpath, newpath, 'compat') , 'electrodenormalize' );
+                    addpathifnotexist( fullfile(eeglabpath, newpath, 'forward'), 'ft_sourcedepth.m');
                     ptopoplot  = fileparts(mywhich('cbar'));
                     ptopoplot2 = fileparts(mywhich('topoplot'));
                     if ~isequal(ptopoplot, ptopoplot2)
