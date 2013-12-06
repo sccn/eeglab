@@ -915,7 +915,6 @@ else
                     addpathifnotexist( fullfile(eeglabpath, newpath, 'biosig', 't200_FileAccess'), 'sopen.m');
                     addpathifnotexist( fullfile(eeglabpath, newpath, 'biosig', 't250_ArtifactPreProcessingQualityControl'), 'regress_eog.m' );
                     addpathifnotexist( fullfile(eeglabpath, newpath, 'biosig', 'doc'), 'DecimalFactors.txt');
-                    disp('EEGLAB: adding "Biosig"; not all Biosig folder were added to the path');
                 end;
                     
             end;
@@ -930,6 +929,7 @@ else
         % ----------------
         if ~isempty(pluginVersion) || ~isempty(funcname)
             if isempty(funcname)
+                disp([ 'EEGLAB: adding "' pluginName '" to the path; subfolders (if any) might be missing from the path' ]);
                 pluginlist(plugincount).plugin     = pluginName;
                 pluginlist(plugincount).version    = pluginVersion;
                 pluginlist(plugincount).foldername = dircontent{index};
