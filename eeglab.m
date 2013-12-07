@@ -903,6 +903,7 @@ else
                 if ~isempty(findstr(lower(dircontent{index}), 'fieldtrip'))
                     addpathifnotexist( fullfile(eeglabpath, newpath, 'compat') , 'electrodenormalize' );
                     addpathifnotexist( fullfile(eeglabpath, newpath, 'forward'), 'ft_sourcedepth.m');
+                    addpathifnotexist( fullfile(eeglabpath, newpath, 'utilities'), 'ft_datatype.m');
                     ptopoplot  = fileparts(mywhich('cbar'));
                     ptopoplot2 = fileparts(mywhich('topoplot'));
                     if ~isequal(ptopoplot, ptopoplot2)
