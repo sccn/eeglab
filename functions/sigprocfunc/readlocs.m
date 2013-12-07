@@ -125,11 +125,11 @@
 %               (theta): 0 is toward right ear; 90 is toward nose, -90 toward occiput. 
 %               Angles are in degrees.  If labels are absent or weights are given in 
 %               a last column, readlocs() adjusts for this. Default labels are E1, E2, ...
-%               Fields:   label      phi  theta   
-%               Sample:   Fp1        -92   -72    
-%                         Fp2         92    72   
-%                         C3         -46    0  
-%                         C4          46    0 
+%               Fields:   Type  label      phi  theta   
+%               Sample:   EEG   Fp1        -92   -72    
+%                         EEG   Fp2         92    72   
+%                         EEG   C3         -46    0  
+%                         EEG   C4          46    0 
 %                           ...
 %   '.xyz': 
 %               Matlab/EEGLAB Cartesian coordinates. Here. x is towards the nose, 
