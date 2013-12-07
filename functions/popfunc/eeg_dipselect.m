@@ -29,6 +29,7 @@
 % provided by Robert Oostenveld.
 %  
 % See also: sourcedepth()
+
 function brainComponents = eeg_dipselect(EEG, rvThreshold, selectionType, depthThreshold);
 
 
@@ -53,6 +54,14 @@ for ic = 1:length(EEG.dipfit.model)
    residualvariance(1,ic) =EEG.dipfit.model(ic).rv;
 end;
 compLowResidualvariance = find(residualvariance <rvThreshold);
+
+if ~exist('ft_sourcedepth')
+    selectionType = 'rv';
+    tmpWarning = warning('backtrace');
+    warning backtrace off;
+    warning('You need to install the Fieldtrip extension to be able to select "in brain" dipoles');
+    warning(tmpWarning);
+end;
 
 if isempty(compLowResidualvariance) || ( (nargin>=3) && strcmp(selectionType, 'rv')) % if only rv is requested (not in-brain)
     brainComponents = compLowResidualvariance;
