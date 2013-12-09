@@ -1,50 +1,48 @@
 % pop_rejspec() - rejection of artifact in a dataset using 
 %                 thresholding of frequencies in the data.
 % Usage:
-%   >>  pop_rejspec(INEEG, typerej); % pop-up interactive windo mode
-%   >> [OUTEEG, Indices] = pop_rejspec( INEEG, typerej, elec_comp, ...
-%         lowthresh, upthresh, startfreq, endfreq, superpose, reject);
+%   >>  pop_rejspec(INEEG, typerej); % pop-up interactive window mode
+%   >> [OUTEEG, Indices] = pop_rejspec( INEEG, typerej, 'key', val, ...);
 %
 % Pop-up window options:
 %   "Electrode|Component" - [edit box] electrode or component number(s) to 
-%                 take into consideration for rejection. Sets the 'elec_comp'
+%                 take into consideration for rejection. Sets the 'elecrange'
 %                 parameter in the command line call (see below).
 %   "Lower limits(s)" - [edit box] lower threshold limits(s) (in dB). 
-%                 Sets the command line parameter 'lowthresh'. If more than
+%                 Sets the command line parameter 'threshold'. If more than
 %                 one, apply to each electrode|component individually. If
 %                 fewer than number of electrodes|components, apply the
 %                 last values to all remaining electrodes|components.
 %   "Upper limits(s)" - [edit box] upper threshold limit(s) in dB. 
-%                 Sets the command line parameter 'upthresh'.
+%                 Sets the command line parameter 'threshold'.
 %   "Low frequency(s)" - [edit box] low-frequency limit(s) in Hz. 
-%                 Sets the command line parameter 'startfreq'.
+%                 Sets the command line parameter 'freqlimits'.
 %   "High frequency(s)" - [edit box] high-frequency limit(s) in Hz. 
-%                 Sets the command line parameter 'endfreq'.
+%                 Sets the command line parameter 'freqlimits'.
 %   "Display previous rejection marks?" - [edit box] either YES or NO. 
-%                  Sets the command line input option 'superpose'.
+%                  Sets the command line input option 'eegplotplotallrej'.
 %   "Reject marked trials?" - [edit box] either YES or NO. Sets the
-%                 command line input option 'reject'.
+%                 command line input option 'eegplotreject'.
 %
 % Command line inputs:
 %   INEEG      - input dataset
 %   typerej    - [1|0] data to reject on (0 = component activations; 1 = 
-%              electrode data). {Default is 1}. 
-%   elec_comp  - [e1 e2 ...] electrode|component number(s) to take into 
-%              consideration during rejection
-%   lowthresh  - lower threshold limit(s) in dB. Can be an array if 
-%              several electrodes|components. If fewer values than number 
-%              of electrodes|components, the last value is used for the 
-%              remaining electrodes|components.
-%   upthresh  - upper threshold limit(s) in dB (same syntax as lowthresh)
-%   startfreq  - low frequency limit(s) in Hz (same syntax  as lowthresh)
-%   endfreq    - high frequency limit(s) in Hz (same syntax  as lowthresh).
-%              Options 'startfreq' and 'endfreq' define the frequncy range 
-%              used during rejection.
-%   superpose  - [0|1] 0 = Do not superpose rejection marks on previous
-%              marks stored in the dataset. 1 = Show both previous and
-%              current marks using different colors. {Default: 0}.
-%   reject     - [0|1] 0 = Do not reject marked trials (but store the 
-%              marks. 1 = Reject marked trials. {Default: 1}.
+%                electrode data). {Default is 1}. 
+%
+% Optional arguments.
+%   'elecrange'     - [e1 e2 ...] array of indices of electrode|component 
+%                     number(s) to take into consideration during rejection.
+%   'threshold'     - [lower upper] threshold limit(s) in dB.
+%   'freqlimits'    - [lower upper] frequency limit(s) in Hz.
+%   'method'        - ['fft'|'multitaper'] method to compute spectrum.
+%   'specdata'      - [array] precomputed spectral data.
+%   'eegplotcom'    - [string] EEGPLOT command to execute when pressing the
+%                     reject button (see 'command' input of EEGPLOT).
+%   'eegplotreject' - [0|1] 0 = Do not reject marked trials (but store the 
+%                     marks. 1 = Reject marked trials. {Default: 1}.
+%   'eegplotplotallrej' - [0|1] 0 = Do not superpose rejection marks on previous
+%                     marks stored in the dataset. 1 = Show both previous and
+%                     current marks using different colors. {Default: 0}.
 %
 % Outputs:
 %   OUTEEG     - output dataset with updated spectrograms
@@ -53,7 +51,7 @@
 %   dataset at the end of the call to eegplot() (e.g., when the user presses 
 %   the 'Reject' button).
 %
-% Author: Arnaud Delorme, CNL / Salk Institute, 2001
+% Author: Arnaud Delorme, CNL / Salk Institute, 2001-
 %
 % See also: eegthresh(), eeglab(), eegplot(), pop_rejepoch()
 
@@ -101,9 +99,6 @@ if icacomp == 0
     	end % switch
 	end;
 end;	
-if exist('reject') ~= 1
-    reject = 1;
-end;
 
 if nargin < 3
 
@@ -225,7 +220,7 @@ if ~isempty(rej)
 		EEG.reject.icarejfreq = rej;
 		EEG.reject.icarejfreqE = rejE;
 	end;
-    if reject
+    if opt.eegplotreject
         EEG = pop_rejepoch(EEG, rej, 0);
     end;
     Irej = find(rej);
