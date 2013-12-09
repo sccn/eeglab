@@ -183,7 +183,7 @@ else
     if ~isempty(ref) % not average reference   
         refmatrix = eye(nchansin); % begin with identity matrix
         tmpref = ref;
-        for index = 1:length(g.exclude)
+        for index = length(g.exclude):-1:1
             tmpref(find(g.exclude(index) < tmpref)) = tmpref(find(g.exclude(index) < tmpref))-1;
         end;
         for index = 1:length(tmpref)
