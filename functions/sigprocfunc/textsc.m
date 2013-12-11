@@ -35,7 +35,11 @@ end
 % Check to see if AXES already exist
 ch = get(gcf,'Children');
 if ~isempty(ch)
-    ind = cellfun(@(x)isequal('axes', x), get(ch, 'type'));
+    try
+        ind = cellfun(@(x)isequal('axes', x), get(ch, 'type'));
+    catch
+        ind = cellfun(@(x)isequal('axes', x), {get(ch, 'type')}); % fix Joe Dien bug 1538
+    end;
     if any(ind), ch = gca; end;
 end;
 
