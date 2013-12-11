@@ -128,7 +128,10 @@ function loc3 = concatlocs(loc1, loc2);
         % the try, catch clause is necessary 
         % below seems to be a Matlab bug
         try, loc3 = [ loc1; loc2 ];
-        catch loc3 = [ loc1 loc2 ];
+        catch
+            try loc3 = [ loc1 loc2 ];
+            catch, loc3 = [ loc1(:)' loc2(:)' ];
+            end;
         end;
     else
         loc3 = loc1;
