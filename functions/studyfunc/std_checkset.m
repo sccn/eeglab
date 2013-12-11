@@ -1,15 +1,15 @@
 % std_checkset() - check STUDY set consistency
 %
-% Usage: >> [STUDY, ALLEEG] = std_checkset(STUDY, ALLEEG);  
+% Usage: >> [STUDY, ALLEEG] = std_checkset(STUDY, ALLEEG);
 %
 % Input:
 %   STUDY      - EEGLAB STUDY set
-%   ALLEEG     - vector of EEG datasets included in the STUDY structure 
+%   ALLEEG     - vector of EEG datasets included in the STUDY structure
 %
 % Output:
-%   STUDY      - a new STUDY set containing some or all of the datasets in ALLEEG, 
-%                plus additional information from the optional inputs above. 
-%   ALLEEG     - an EEGLAB vector of EEG sets included in the STUDY structure 
+%   STUDY      - a new STUDY set containing some or all of the datasets in ALLEEG,
+%                plus additional information from the optional inputs above.
+%   ALLEEG     - an EEGLAB vector of EEG sets included in the STUDY structure
 %
 % Authors:  Arnaud Delorme & Hilit Serby, SCCN, INC, UCSD, November 2005
 
@@ -29,13 +29,14 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [STUDY, ALLEEG] = std_checkset(STUDY, ALLEEG, option);
+function [STUDY, ALLEEG, command] = std_checkset(STUDY, ALLEEG, option);
 
 if nargin < 2
     help std_checkset;
     return;
 end;
-    
+command  = '';
+
 studywasempty = 0;
 if isempty(STUDY), studywasempty = 1; end;
 
@@ -66,31 +67,31 @@ if ~isfield(STUDY.datasetinfo, 'index') & ~isempty(STUDY.datasetinfo), STUDY.dat
 % all summary fields
 % ------------------
 try, subject = unique_bc({ STUDY.datasetinfo.subject });
-catch, 
-     subject = ''; 
-     disp('Important warning: some datasets do not have subject codes; some functions may crash!');
+catch,
+    subject = '';
+    disp('Important warning: some datasets do not have subject codes; some functions may crash!');
 end;
 try, group = unique_bc({ STUDY.datasetinfo.group });
-catch, 
-     group = {}; 
-     % disp('Important warning: some datasets do not have group codes; some functions may crash!');
+catch,
+    group = {};
+    % disp('Important warning: some datasets do not have group codes; some functions may crash!');
 end;
 try, condition = unique_bc({ STUDY.datasetinfo.condition });
-catch, 
-     condition = {}; 
-     disp('Important warning: some datasets do not have condition codes; some functions may crash!');
+catch,
+    condition = {};
+    disp('Important warning: some datasets do not have condition codes; some functions may crash!');
 end;
 try, session = unique_bc([STUDY.datasetinfo.session]);
-catch, 
-     session = ''; 
-     % disp('Important warning: some datasets do not have session numbers; some functions may crash!');
+catch,
+    session = '';
+    % disp('Important warning: some datasets do not have session numbers; some functions may crash!');
 end;
-if ~isequal(STUDY.subject,   subject  ), STUDY.subject   = subject;   modif = 1; end;  
-if ~isequal(STUDY.group,     group    ), STUDY.group     = group;     modif = 1; end;  
-if ~isequal(STUDY.condition, condition), STUDY.condition = condition; modif = 1; end;  
-if ~isequal(STUDY.session,   session  ), STUDY.session   = session;   modif = 1; end;  
+if ~isequal(STUDY.subject,   subject  ), STUDY.subject   = subject;   modif = 1; end;
+if ~isequal(STUDY.group,     group    ), STUDY.group     = group;     modif = 1; end;
+if ~isequal(STUDY.condition, condition), STUDY.condition = condition; modif = 1; end;
+if ~isequal(STUDY.session,   session  ), STUDY.session   = session;   modif = 1; end;
 
-% check dataset info consistency 
+% check dataset info consistency
 % ------------------------------
 for k = 1:length(STUDY.datasetinfo)
     if ~strcmpi(STUDY.datasetinfo(k).filename, ALLEEG(k).filename)
@@ -141,7 +142,7 @@ if any(cellfun(@isempty, chanlabels))
         disp('********************************************************************');
         disp(' IMPORTANT WARNING: SOME DATASETS DO NOT HAVE CHANNEL LABELS AND ');
         disp(' SOME OTHERs HAVE CHANNEL LABELS. GENERATING CHANNEL LABELS FOR ');
-        disp(' THE FORMER DATASETS (THIS SHOULD PROBABLY BE FIXED BY THE USER)');
+        disp(' THE FORMER DATASETS (THIS SHOULD PROBABLY BE FIXED BY THE USER).');
         disp('********************************************************************');
     end;
     disp('Generating channel labels for all datasets...');
@@ -156,8 +157,8 @@ end;
 if length( unique( [ ALLEEG.srate ] )) > 1
     disp('********************************************************************');
     disp(' IMPORTANT WARNING: SOME DATASETS DO NOT HAVE THE SAME SAMPLING ');
-    disp(' RATE AND THIS WILL MAKE MOST SOME STUDY FUNCTION CRASH. THIS');
-    disp(' SHOULD PROBABLY BE FIXED BY THE USER).');
+    disp(' RATE AND THIS WILL MAKE MOST OF THE STUDY FUNCTIONS CRASH. THIS');
+    disp(' SHOULD PROBABLY BE FIXED BY THE USER.');
     disp('********************************************************************');
 end;
 
@@ -175,146 +176,152 @@ if isfield(STUDY.cluster, 'sets'),
         STUDY.cluster = [];
     end;
 end;
-if isempty(STUDY.cluster)
-    modif = 1; 
-    [STUDY] = std_createclust(STUDY, ALLEEG, 'parentcluster', 'on');
-end;
-if length(STUDY.cluster(1).child) == length(STUDY.cluster)-1 && length(STUDY.cluster) > 1
-    newchild = { STUDY.cluster(2:end).name };
-    if ~isequal(STUDY.cluster(1).child, newchild)
-        STUDY.cluster(1).child = newchild;
+if ~studywasempty
+    if isempty(STUDY.cluster)
+        modif = 1;
+        [STUDY] = std_createclust(STUDY, ALLEEG, 'parentcluster', 'on');
+    end;
+    if length(STUDY.cluster(1).child) == length(STUDY.cluster)-1 && length(STUDY.cluster) > 1
+        newchild = { STUDY.cluster(2:end).name };
+        if ~isequal(STUDY.cluster(1).child, newchild)
+            STUDY.cluster(1).child = newchild;
+        end;
     end;
 end;
 
 % create STUDY design if it is not present
 % ----------------------------------------
-if isfield(STUDY.datasetinfo, 'trialinfo')
-    alltrialinfo = { STUDY.datasetinfo.trialinfo };
-    if any(cellfun(@isempty, alltrialinfo)) && any(~cellfun(@isempty, alltrialinfo))
-        disp('Rebuilding trial information structure for STUDY');
-        STUDY  = std_maketrialinfo(STUDY, ALLEEG); % some dataset do not have trialinfo and
-                                                   % some other have it, remake it for everybody
+if ~studywasempty
+    if isfield(STUDY.datasetinfo, 'trialinfo')
+        alltrialinfo = { STUDY.datasetinfo.trialinfo };
+        if any(cellfun(@isempty, alltrialinfo)) && any(~cellfun(@isempty, alltrialinfo))
+            disp('Rebuilding trial information structure for STUDY');
+            STUDY  = std_maketrialinfo(STUDY, ALLEEG); % some dataset do not have trialinfo and
+            % some other have it, remake it for everybody
+        end;
     end;
-end;
-if ~isfield(STUDY, 'design') || isempty(STUDY.design) || ~isfield(STUDY.design, 'name')
-    STUDY  = std_maketrialinfo(STUDY, ALLEEG); 
-    STUDY  = std_makedesign(STUDY, ALLEEG);
-    STUDY  = std_selectdesign(STUDY, ALLEEG,1);
-    rebuild_design = 0;
-else
-    if isfield(STUDY.design, 'indvar1')
-        STUDY  = std_convertdesign(STUDY, ALLEEG);
+    if ~isfield(STUDY, 'design') || isempty(STUDY.design) || ~isfield(STUDY.design, 'name')
+        STUDY  = std_maketrialinfo(STUDY, ALLEEG);
+        STUDY  = std_makedesign(STUDY, ALLEEG);
+        STUDY  = std_selectdesign(STUDY, ALLEEG,1);
+        rebuild_design = 0;
+    else
+        if isfield(STUDY.design, 'indvar1')
+            STUDY  = std_convertdesign(STUDY, ALLEEG);
+        end;
+        
+        % convert combined independent variable values
+        % between dash to cell array of strings
+        % -------------------------------------
+        for inddes = 1:length(STUDY.design)
+            for indvar = 1:length(STUDY.design(inddes).variable)
+                for indval = 1:length(STUDY.design(inddes).variable(indvar).value)
+                    STUDY.design(inddes).variable(indvar).value{indval} = convertindvarval(STUDY.design(inddes).variable(indvar).value{indval});
+                end;
+            end;
+            for indcell = 1:length(STUDY.design(inddes).cell)
+                for indval = 1:length(STUDY.design(inddes).cell(indcell).value)
+                    STUDY.design(inddes).cell(indcell).value{indval} = convertindvarval(STUDY.design(inddes).cell(indcell).value{indval});
+                end;
+            end;
+            for indinclude = 1:length(STUDY.design(inddes).include)
+                if iscell(STUDY.design(inddes).include{indinclude})
+                    for indval = 1:length(STUDY.design(inddes).include{indinclude})
+                        STUDY.design(inddes).include{indinclude}{indval} = convertindvarval(STUDY.design(inddes).include{indinclude}{indval});
+                    end;
+                end;
+            end;
+            
+            % check for duplicate entries in filebase
+            % ---------------------------------------
+            if length( { STUDY.design(inddes).cell.filebase } ) > length(unique({ STUDY.design(inddes).cell.filebase }))
+                if ~isempty(findstr('design_', STUDY.design(inddes).cell(1).filebase))
+                    error('There is a problem with your STUDY, contact EEGLAB support');
+                else
+                    fprintf('Duplicate entry detected in Design %d, reinitializing design\n', inddes);
+                    [STUDY com] = std_makedesign(STUDY, ALLEEG, inddes, STUDY.design(inddes), 'defaultdesign', 'forceoff');
+                end
+            end;
+        end;
     end;
     
-    % convert combined independent variable values
-    % between dash to cell array of strings
-    % -------------------------------------
-    for inddes = 1:length(STUDY.design)
-        for indvar = 1:length(STUDY.design(inddes).variable)
-            for indval = 1:length(STUDY.design(inddes).variable(indvar).value)
-                STUDY.design(inddes).variable(indvar).value{indval} = convertindvarval(STUDY.design(inddes).variable(indvar).value{indval});
+    if rebuild_design % in case datasets have been added or removed
+        STUDY = std_rebuilddesign(STUDY, ALLEEG);
+    end;
+    
+    % scan design to fix old paring format
+    % ------------------------------------
+    for design = 1:length(STUDY.design)
+        for var = 1:length(STUDY.design(design).variable)
+            if isstr(STUDY.design(design).variable(1).pairing)
+                if strcmpi(STUDY.design(design).variable(1).pairing, 'paired')
+                    STUDY.design(design).variable(1).pairing = 'on';
+                elseif strcmpi(STUDY.design(design).variable(1).pairing, 'unpaired')
+                    STUDY.design(design).variable(1).pairing = 'off';
+                end;
             end;
-        end;
-        for indcell = 1:length(STUDY.design(inddes).cell)
-            for indval = 1:length(STUDY.design(inddes).cell(indcell).value)
-                STUDY.design(inddes).cell(indcell).value{indval} = convertindvarval(STUDY.design(inddes).cell(indcell).value{indval});
-            end;
-        end;
-        for indinclude = 1:length(STUDY.design(inddes).include)
-            if iscell(STUDY.design(inddes).include{indinclude})
-                for indval = 1:length(STUDY.design(inddes).include{indinclude})
-                    STUDY.design(inddes).include{indinclude}{indval} = convertindvarval(STUDY.design(inddes).include{indinclude}{indval});
+            if isstr(STUDY.design(design).variable(2).pairing)
+                if strcmpi(STUDY.design(design).variable(2).pairing, 'paired')
+                    STUDY.design(design).variable(2).pairing = 'on';
+                elseif strcmpi(STUDY.design(design).variable(2).pairing, 'unpaired')
+                    STUDY.design(design).variable(2).pairing = 'off';
                 end;
             end;
         end;
-        
-        % check for duplicate entries in filebase
-        % ---------------------------------------
-        if length( { STUDY.design(inddes).cell.filebase } ) > length(unique({ STUDY.design(inddes).cell.filebase }))
-            if ~isempty(findstr('design_', STUDY.design(inddes).cell(1).filebase))
-                error('There is a problem with your STUDY, contact EEGLAB support');
-            else
-                fprintf('Duplicate entry detected in Design %d, reinitializing design\n', inddes);
-                [STUDY com] = std_makedesign(STUDY, ALLEEG, inddes, STUDY.design(inddes), 'defaultdesign', 'forceoff');
-            end
+    end;
+    
+    % add filepath field if absent
+    for ind = 1:length(STUDY.design)
+        if ~isfield(STUDY.design, 'filepath') || (isnumeric(STUDY.design(ind).filepath) && isempty(STUDY.design(ind).filepath))
+            STUDY.design(ind).filepath = '';
+            STUDY.saved = 'no';
+            modif = 1;
         end;
     end;
-end;
-
-if rebuild_design % in case datasets have been added or removed
-    STUDY = std_rebuilddesign(STUDY, ALLEEG);
-end;
-
-% scan design to fix old paring format
-% ------------------------------------
-for design = 1:length(STUDY.design)
-    for var = 1:length(STUDY.design(design).variable)
-        if isstr(STUDY.design(design).variable(1).pairing)
-            if strcmpi(STUDY.design(design).variable(1).pairing, 'paired')
-                STUDY.design(design).variable(1).pairing = 'on';
-            elseif strcmpi(STUDY.design(design).variable(1).pairing, 'unpaired')
-                STUDY.design(design).variable(1).pairing = 'off';
-            end;
-        end;
-        if isstr(STUDY.design(design).variable(2).pairing)
-            if strcmpi(STUDY.design(design).variable(2).pairing, 'paired')
-                STUDY.design(design).variable(2).pairing = 'on';
-            elseif strcmpi(STUDY.design(design).variable(2).pairing, 'unpaired')
-                STUDY.design(design).variable(2).pairing = 'off';
-            end;
+    
+    % check that ICA is present and if it is update STUDY.datasetinfo
+    allcompsSTUDY  = { STUDY.datasetinfo.comps };
+    allcompsALLEEG = { ALLEEG.icaweights };
+    if all(cellfun(@isempty, allcompsSTUDY)) && ~all(cellfun(@isempty, allcompsALLEEG))
+        for index = 1:length(STUDY.datasetinfo)
+            STUDY.datasetinfo(index).comps = [1:size(ALLEEG(index).icaweights,1)];
         end;
     end;
-end;
-
-% add filepath field if absent
-for ind = 1:length(STUDY.design)
-    if ~isfield(STUDY.design, 'filepath') || (isnumeric(STUDY.design(ind).filepath) && isempty(STUDY.design(ind).filepath))
-        STUDY.design(ind).filepath = '';
-        STUDY.saved = 'no';
+    
+    % make channel groups
+    % -------------------
+    if ~isfield(STUDY, 'changrp') || isempty(STUDY.changrp)
+        STUDY = std_changroup(STUDY, ALLEEG);
         modif = 1;
     end;
 end;
 
-% check that ICA is present and if it is update STUDY.datasetinfo
-allcompsSTUDY  = { STUDY.datasetinfo.comps };
-allcompsALLEEG = { ALLEEG.icaweights };
-if all(cellfun(@isempty, allcompsSTUDY)) && ~all(cellfun(@isempty, allcompsALLEEG))
-    for index = 1:length(STUDY.datasetinfo)
-        STUDY.datasetinfo(index).comps = [1:size(ALLEEG(index).icaweights,1)];
-    end;
-end;
-
-% make channel groups
-% -------------------
-if ~isfield(STUDY, 'changrp') || isempty(STUDY.changrp)
-    STUDY = std_changroup(STUDY, ALLEEG);
-    modif = 1;
-end;
 
 % determine if there has been any change
 % --------------------------------------
 if modif;
     STUDY.saved = 'no';
-    if studywasempty
-        command = '[STUDY, ALLEEG] = std_checkset([], ALLEEG);';
-    else
-        command = '[STUDY, ALLEEG] = std_checkset(STUDY, ALLEEG);';
+    command = '[STUDY ALLEEG] = std_checkset(STUDY, ALLEEG);';
+    addToHistory = true;
+    if length(STUDY.history) >= length(command) && strcmpi(STUDY.history(end-length(command)+1:end), command)
+        addToHistory = false;
     end;
-    eegh(command);
-    STUDY.history =  sprintf('%s\n%s',  STUDY.history, command);
+    if addToHistory
+        STUDY.history =  sprintf('%s\n%s',  STUDY.history, command);
+    end;
 end;
 
 % convert combined independent variables
 % --------------------------------------
 function val = convertindvarval(val);
-    if isstr(val)
-        inddash = findstr(' - ', val);
-        if isempty(inddash), return; end;
-        inddash = [ -2 inddash length(val)+1];
-        for ind = 1:length(inddash)-1
-            newval{ind} = val(inddash(ind)+3:inddash(ind+1)-1);
-        end;
-        val = newval;
+if isstr(val)
+    inddash = findstr(' - ', val);
+    if isempty(inddash), return; end;
+    inddash = [ -2 inddash length(val)+1];
+    for ind = 1:length(inddash)-1
+        newval{ind} = val(inddash(ind)+3:inddash(ind+1)-1);
     end;
+    val = newval;
+end;
 
 
