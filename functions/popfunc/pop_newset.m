@@ -492,10 +492,9 @@ for ind = 1:2:length(args)
 	 case { 'save' 'savenew' }, [filepath filename ext] = fileparts( args{ind+1} );
                         EEG = pop_saveset(EEG, [ filename ext ], filepath);
 	 case 'saveold',    [filepath filename ext] = fileparts( args{ind+1} );
-                        EEG = pop_saveset(ALLEEG(OLDSET), [ filename ext ], filepath);
-                        [ALLEEG EEG] = eeg_store(ALLEEG, EEG, OLDSET);
+                        TMPEEG = pop_saveset(ALLEEG(OLDSET), [ filename ext ], filepath);
+                        [ALLEEG] = eeg_store(ALLEEG, TMPEEG, OLDSET);
                         ALLEEG(OLDSET).saved = 'yes';
-                        EEG.saved            = 'yes';
 	 case 'overwrite' , if strcmpi(args{ind+1}, 'on') | strcmpi(args{ind+1}, 'yes')
                             overWflag = 1; % so it can be done at the end
                         end;
@@ -542,7 +541,7 @@ else
             [ALLEEG, EEG] = eeg_store( ALLEEG, EEG, OLDSET);
         end;
     else
-        if strcmpi(EEG.saved, 'yes')
+        if strcmpi(EEG.saved, 'yes') || strcmpi(EEG.saved, 'justloaded')
             [ALLEEG, EEG, CURRENTSET] = eeg_store( ALLEEG, EEG, 0); % 0 means that it is saved on disk
         else
             [ALLEEG, EEG, CURRENTSET] = eeg_store( ALLEEG, EEG);
