@@ -147,12 +147,34 @@ end;
 % check Matlab version
 % --------------------
 vers = version;
-if num2str(vers(1)) < 7
-    disp('Your Matlab version is too old to run EEGLAB');
-    disp('You must upgrade to at least Matlab version 7');
+if str2num(vers(1)) < 7
+    tmpWarning = warning('backtrace');
+    warning backtrace off;
+    warning('You are using a Matlab version older than 7.0');
+    warning('This Matlab version is too old to run the current EEGLAB');
+    warning('Download EEGLAB 4.3b at http://sccn.ucsd.edu/eeglab/eeglab4.5b.teaching.zip');
+    warning('This version of EEGLAB is compatible with all Matlab version down to Matlab 5.3');
+    warning(tmpWarning);
     return;
 end;
-    
+
+% check Matlab version
+% --------------------
+vers = version;
+indp = find(vers == '.');
+if str2num(vers(indp(1)+1)) > 1, vers = [ vers(1:indp(1)) '0' vers(indp(1)+1:end) ]; end;
+indp = find(vers == '.');
+vers = str2num(vers(1:indp(2)-1));
+if vers < 7.06
+    tmpWarning = warning('backtrace');
+    warning backtrace off;
+    warning('You are using a Matlab version older than 7.6 (2008a)');
+    warning('Some of the EEGLAB functions might not be functional');
+    warning('Download EEGLAB 4.3b at http://sccn.ucsd.edu/eeglab/eeglab4.5b.teaching.zip');
+    warning('This version of EEGLAB is compatible with all Matlab version down to Matlab 5.3');
+    warning(tmpWarning);
+end; 
+
 % check for duplicate versions of EEGLAB
 % --------------------------------------
 eeglabpath = mywhich('eeglab.m');
@@ -312,7 +334,7 @@ if nargin == 1
             if nargout < 1, clear ALLEEG; end; % do not return output var
 			return;
 		else
-			eegh('[ALLEEG EEG CURRENTSET ALLCOM] = eeglab(''redraw'');');
+			eegh('eeglab(''redraw'');');
 		end;
 	elseif strcmp(onearg, 'rebuild')
         if ~ismatlab,return; end;
@@ -320,9 +342,6 @@ if nargin == 1
         close(W_MAIN);
         eeglab;
         return;
-	elseif strcmp(onearg, 'besa');
-		disp('Besa option deprecated. Download the BESA plugin to add the BESA menu.');
-        eegh('[ALLEEG EEG CURRENTSET ALLCOM] = eeglab;');
 	else
         eegh('[ALLEEG EEG CURRENTSET ALLCOM] = eeglab(''rebuild'');');
 	end;
@@ -1337,7 +1356,7 @@ if length(EEGUSERDAT) > 2
 else tb = [];
 end;
 if ~isempty(tb) && ~isstr(tb)
-    tb.RefreshToolbar();
+    eval('tb.RefreshToolbar();');
 end;
 if exist('CURRENTSET') ~= 1, CURRENTSET = 0; end;
 if isempty(ALLEEG), ALLEEG = []; end;
@@ -1841,20 +1860,20 @@ allstrs  = get(allmenus, 'userdata');
 if any(strcmp(menustatus, 'startup'))
     
     set(allmenus, 'enable', 'on');  
-    indmatch = cellfun(@(x)(~isempty(findstr(num2str(x), 'startup:off'))), allstrs);  
-    set(allmenus(indmatch), 'enable', 'off');
+    eval('indmatchvar = cellfun(@(x)(~isempty(findstr(num2str(x), ''startup:off''))), allstrs);');  
+    set(allmenus(indmatchvar), 'enable', 'off');
     
 elseif any(strcmp(menustatus, 'study'))
     
-    indmatch = cellfun(@(x)(~isempty(findstr(num2str(x), 'study:on'))), allstrs);            
-    set(allmenus          , 'enable', 'off');  
-    set(allmenus(indmatch), 'enable', 'on');
+    eval('indmatchvar = cellfun(@(x)(~isempty(findstr(num2str(x), ''study:on''))), allstrs);');            
+    set(allmenus             , 'enable', 'off');  
+    set(allmenus(indmatchvar), 'enable', 'on');
     
 elseif any(strcmp(menustatus, 'multiple_datasets'))
     
-    indmatch = cellfun(@(x)(~isempty(findstr(num2str(x), 'study:on'))), allstrs);            
-    set(allmenus          , 'enable', 'off');  
-    set(allmenus(indmatch), 'enable', 'on');        
+    eval('indmatchvar = cellfun(@(x)(~isempty(findstr(num2str(x), ''study:on''))), allstrs);');            
+    set(allmenus             , 'enable', 'off');  
+    set(allmenus(indmatchvar), 'enable', 'on');        
     set(findobj('parent', W_MAIN, 'label', 'Study'), 'enable', 'off');
 
 % --------------------------------
@@ -1862,36 +1881,36 @@ elseif any(strcmp(menustatus, 'multiple_datasets'))
 elseif any(strcmp(menustatus, 'epoched_dataset'))
 
     set(allmenus, 'enable', 'on');  
-    indmatch = cellfun(@(x)(~isempty(findstr(num2str(x), 'epoch:off'))), allstrs);  
-    set(allmenus(indmatch), 'enable', 'off');
+    eval('indmatchvar = cellfun(@(x)(~isempty(findstr(num2str(x), ''epoch:off''))), allstrs);');  
+    set(allmenus(indmatchvar), 'enable', 'off');
 % end, Javier Lopez-Calderon for ERPLAB
 % --------------------------------    
 elseif any(strcmp(menustatus, 'continuous_dataset'))
     
     set(allmenus, 'enable', 'on');  
-    indmatch = cellfun(@(x)(~isempty(findstr(num2str(x), 'continuous:off'))), allstrs);  
-    set(allmenus(indmatch), 'enable', 'off');
+    eval('indmatchvar = cellfun(@(x)(~isempty(findstr(num2str(x), ''continuous:off''))), allstrs);');  
+    set(allmenus(indmatchvar), 'enable', 'off');
 
     
 end;
 if any(strcmp(menustatus, 'chanloc_absent'))
     
-    indmatch = cellfun(@(x)(~isempty(findstr(num2str(x), 'chanloc:on'))), allstrs);  
-    set(allmenus(indmatch), 'enable', 'off');
+    eval('indmatchvar = cellfun(@(x)(~isempty(findstr(num2str(x), ''chanloc:on''))), allstrs);');  
+    set(allmenus(indmatchvar), 'enable', 'off');
     
 end;
 if any(strcmp(menustatus, 'ica_absent'))
     
-    indmatch = cellfun(@(x)(~isempty(findstr(num2str(x), 'ica:on'))), allstrs);  
-    set(allmenus(indmatch), 'enable', 'off');
+    eval('indmatchvar = cellfun(@(x)(~isempty(findstr(num2str(x), ''ica:on''))), allstrs);');  
+    set(allmenus(indmatchvar), 'enable', 'off');
     
 end;
 
 % --------------------------------
 % Javier Lopez-Calderon for ERPLAB
 if any(strcmp(menustatus, 'erp_dataset'))    
-    indmatch = cellfun(@(x)(~isempty(findstr(num2str(x), 'erpset:on'))), allstrs);  
-    set(allmenus(indmatch), 'enable', 'on');
+    eval('indmatchvar = cellfun(@(x)(~isempty(findstr(num2str(x), ''erpset:on''))), allstrs);');  
+    set(allmenus(indmatchvar), 'enable', 'on');
 end
 % end, Javier Lopez-Calderon for ERPLAB
 % --------------------------------
@@ -1999,7 +2018,7 @@ function buildhelpmenu;
     
 % parse plugin function name
 % --------------------------
-function [name vers] = parsepluginname(dirName);
+function [name, vers] = parsepluginname(dirName);
     ind = find( dirName >= '0' & dirName <= '9' );
     if isempty(ind)
         name = dirName;
