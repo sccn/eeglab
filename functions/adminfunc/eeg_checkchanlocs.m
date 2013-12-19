@@ -148,6 +148,21 @@ if isfield(chanedit, 'labels')
     end
 end;
 
+% check for empty channel label
+% -----------------------------
+if isfield(chanedit, 'labels')
+    indEmpty = find(cellfun(@isempty, {chanedit.labels}));
+    if ~isempty(indEmpty)
+        tmpWarning = warning('backtrace'); 
+        warning backtrace off;
+        warning('channel labels should not be empty, creating unique labels');
+        warning(tmpWarning); 
+        for index = indEmpty
+            chanedit(index).labels = sprintf('E%d', index);
+        end;
+    end;
+end;
+
 % remove fields
 % -------------
 if isfield(chanedit, 'sph_phi_besa'  ), chanedit = rmfield(chanedit, 'sph_phi_besa'); end;
