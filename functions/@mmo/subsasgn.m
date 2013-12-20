@@ -47,6 +47,8 @@ if ncopies < 2
     if isempty(inputname(1))
         vers = version;
         indp = find(vers == '.');
+        if str2num(vers(indp(1)+1)) > 1, vers = [ vers(1:indp(1)) '0' vers(indp(1)+1:end) ]; end;
+        indp = find(vers == '.');
         vers = str2num(vers(1:indp(2)-1));
         if vers >= 7.13 
             % the problem with Matlab 2012a/2011b is that if the object called is
