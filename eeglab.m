@@ -268,12 +268,16 @@ if ~iseeglabdeployed2
     signalpath = fullfile(eeglabpath, 'functions', 'octavefunc', 'signal');
     optimpath  = fullfile(eeglabpath, 'functions', 'octavefunc', 'optim');
     if option_donotusetoolboxes
-        p1 = fileparts(mywhich('fminsearch'));
+        p1 = fileparts(mywhich('ttest'));
         p2 = fileparts(mywhich('filtfilt'));
+        p3 = fileparts(mywhich('optimtool'));
+        p4 = fileparts(mywhich('gray2ind'));
         if ~isempty(p1), rmpath(p1); end;
         if ~isempty(p2), rmpath(p2); end;
+        if ~isempty(p3), rmpath(p3); end;
+        if ~isempty(p4), rmpath(p4); end;
     end;
-    if ~license('test','signal_toolbox')
+    if ~license('test','signal_toolbox') || exist('pwelch') ~= 2
         warning('off', 'MATLAB:dispatcher:nameConflict');
         addpath( signalpath );
     else
@@ -917,8 +921,8 @@ else
                     funcname = tmpdir(1).name(1:end-2);
                 end;
                 
-                % special case of subfolder for BIOSIG
-                % ------------------------------------
+                % special case of subfolder for Fieldtrip
+                % ---------------------------------------
                 if ~isempty(findstr(lower(dircontent{index}), 'fieldtrip'))
                     addpathifnotexist( fullfile(eeglabpath, newpath, 'compat') , 'electrodenormalize' );
                     addpathifnotexist( fullfile(eeglabpath, newpath, 'forward'), 'ft_sourcedepth.m');
