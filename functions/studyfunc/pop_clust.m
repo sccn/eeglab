@@ -76,6 +76,14 @@ if isempty(STUDY.etc.preclust)
     error('No pre-clustering information, pre-cluster first!');
 end;
 
+% check that the path to the stat toolbox comes first (conflict
+% with Fieldtrip)
+kmeansPath = fileparts(which('kmeans'));
+if ~isempty(kmeansPath)
+    rmpath(kmeansPath);
+    addpath(kmeansPath);
+end;
+        
 if isempty(varargin) %GUI call
     
     % remove clusters below clustering level (done also after GUI)
@@ -163,14 +171,6 @@ if isempty(varargin) %GUI call
         if ~isempty(findstr(clus_alg, 'Neural ')), clus_alg = 'neural network'; end;
         
         disp('Clustering ...');
-        
-        % check that the path to the stat toolbox comes first (conflict
-        % with Fieldtrip)
-        kmeansPath = fileparts(which('kmeans'));
-        if ~isempty(kmeansPath)
-            rmpath(kmeansPath);
-            addpath(kmeansPath);
-        end;
         
         switch clus_alg
             case { 'kmeans' 'kmeanscluster' }
