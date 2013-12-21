@@ -95,7 +95,7 @@ if ~exist('OCTAVE_VERSION')
     end;
 end;
 if lowscreendepth    
-    fprintf('icadefs(): Setting display parameters for mono or 8-bit color\n');
+    %fprintf('icadefs(): Setting display parameters for mono or 8-bit color\n');
     BACKCOLOR           = [1 1 1];    % Background figure color 
     BACKEEGLABCOLOR     = [1 1 1];    % EEGLAB main window background
     GUIBUTTONCOLOR      = [1 1 1];    % Buttons colors in figures
