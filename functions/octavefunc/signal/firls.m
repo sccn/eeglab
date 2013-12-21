@@ -37,14 +37,8 @@
 % http://cnx.org/content/m10577
 
 function coef = firls(N, frequencies, pass, weight, str);
-if ismatlab
-    if license('test','signal_toolbox')
-        p = fileparts(which('firls'));
-        error( [ 'Octave functions should not run on Matlab' 10 'remove path to ' p ]);
-    else
-        warning('Signal processing toolbox is absent, using replacement functions');
-    end;
-end;
+
+checkfunctionmatlab('firls', 'signal_toolbox')
 
 if nargin<3 | nargin>6
     usage('');

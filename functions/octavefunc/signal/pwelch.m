@@ -267,14 +267,7 @@
 
 function [varargout] = pwelch(x,varargin)
 
-if ismatlab
-    if license('test','signal_toolbox')
-        p = fileparts(which('pwelch'));
-        error( [ 'Octave functions should not run on Matlab' 10 'remove path to ' p ]);
-    else
-        warning('Signal processing toolbox is absent, using replacement functions');
-    end;
-end;
+checkfunctionmatlab('pwelch', 'signal_toolbox')
 
   %
   % COMPATIBILITY LEVEL
