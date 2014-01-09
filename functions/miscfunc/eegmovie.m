@@ -90,7 +90,7 @@ if nargin <3
 	eloc_locs = 0;
 end
 
-if nargin > 2 && ~ischar(varargin{3}) || nargin == 2 && ~ischar(varargin{2})
+if nargin > 5 && ~ischar(varargin{3}) || nargin == 4 && ~ischar(varargin{2})
     % legacy mode
     options = {};
     if nargin>=8, options = { options{:} 'topoplotopt' varargin(5:end) }; end
@@ -114,6 +114,7 @@ opt = finputcheck(options, { 'startsec'    'real'    {}    0;
                              'time'        'string'  { 'on' 'off' }    'off';
                              'topoplotopt' 'cell'    {}    {};
                              'headplotopt' 'cell'    {}    {} }, 'eegmovie');
+if isstr(opt), error(opt); end;
 if opt.minmax ==0,
 	datamin = min(min(data));
 	datamax = max(max(data));
