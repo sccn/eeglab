@@ -254,28 +254,28 @@ try,
     
     % save ICA activities
     % -------------------
-    icafile = fullfile(EEG.filepath, [EEG.filename(1:end-4) '.icafdt' ]);
-    if isempty(EEG.icaweights) & exist(icafile)
-        disp('ICA activation file found on disk, but no more ICA activities. Deleting file.');
-        delete(icafile);
-    end;
-    if ~option_saveica & exist(icafile)
-        disp('Options indicate not to save ICA activations. Deleting ICA activation file.');
-        delete(icafile);
-    end;
-    if option_saveica & ~isempty(EEG.icaweights)
-        if ~exist('tmpdata')
-            TMP = eeg_checkset(EEG, 'loaddata');
-            tmpdata = TMP.data;
-        end;
-        if isempty(tmpica)
-             tmpica2 = (EEG.icaweights*EEG.icasphere)*tmpdata(EEG.icachansind,:);
-        else tmpica2 = tmpica;
-        end;
-        tmpica2 = reshape(tmpica2, size(tmpica2,1), size(tmpica2,2)*size(tmpica2,3));
-        floatwrite( tmpica2, icafile, 'ieee-le');
-        clear tmpica2;
-    end;
+%     icafile = fullfile(EEG.filepath, [EEG.filename(1:end-4) '.icafdt' ]);
+%     if isempty(EEG.icaweights) & exist(icafile)
+%         disp('ICA activation file found on disk, but no more ICA activities. Deleting file.');
+%         delete(icafile);
+%     end;
+%     if ~option_saveica & exist(icafile)
+%         disp('Options indicate not to save ICA activations. Deleting ICA activation file.');
+%         delete(icafile);
+%     end;
+%     if option_saveica & ~isempty(EEG.icaweights)
+%         if ~exist('tmpdata')
+%             TMP = eeg_checkset(EEG, 'loaddata');
+%             tmpdata = TMP.data;
+%         end;
+%         if isempty(tmpica)
+%              tmpica2 = (EEG.icaweights*EEG.icasphere)*tmpdata(EEG.icachansind,:);
+%         else tmpica2 = tmpica;
+%         end;
+%         tmpica2 = reshape(tmpica2, size(tmpica2,1), size(tmpica2,2)*size(tmpica2,3));
+%         floatwrite( tmpica2, icafile, 'ieee-le');
+%         clear tmpica2;
+%     end;
     
 catch,
     rethrow(lasterror);
