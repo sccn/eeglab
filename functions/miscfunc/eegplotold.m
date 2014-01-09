@@ -954,6 +954,9 @@ else
     if spacing == 0
       spacing = max(max(data')-min(data'));
     end
+    if spacing == 0
+        spacing = 1;
+    end;
     if Fs == 0
       Fs = DEFAULT_SAMPLE_RATE;
     end
