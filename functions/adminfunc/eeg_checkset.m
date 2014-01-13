@@ -502,7 +502,9 @@ for inddataset = 1:length(ALLEEG)
                         if ~isempty(boundsInd),
                             bounds = [ tmpevent(boundsInd).latency ];
                             % remove last event if necessary
-                            if round(bounds(end)-0.5+1) >= size(EEG.data,2), EEG.event(boundsInd(end)) = []; bounds(end) = []; end; % remove final boundary if any
+                            if EEG.trials==1;%this if block added by James Desjardins (Jan 13th, 2014)
+                                if round(bounds(end)-0.5+1) >= size(EEG.data,2), EEG.event(boundsInd(end)) = []; bounds(end) = []; end; % remove final boundary if any
+                            end
                             % The first boundary below need to be kept for
                             % urevent latency calculation
                             % if bounds(1) < 0, EEG.event(bounds(1))   = []; end; % remove initial boundary if any
