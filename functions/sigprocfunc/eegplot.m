@@ -1145,14 +1145,16 @@ else
     data = get(ax1,'UserData');
     ESpacing = findobj('tag','ESpacing','parent',figh);   % ui handle
     EPosition = findobj('tag','EPosition','parent',figh); % ui handle
-    if g.trialstag(1) == -1
-        g.time    = str2num(get(EPosition,'string'));  
-    else 
-        g.time    = str2num(get(EPosition,'string'));
-        g.time    = g.time - 1;
-    end; 
-    g.spacing = str2num(get(ESpacing,'string'));
-        
+    if ~isempty(EPosition) && ~isempty(ESpacing)
+        if g.trialstag(1) == -1
+            g.time    = str2num(get(EPosition,'string'));
+        else
+            g.time    = str2num(get(EPosition,'string'));
+            g.time    = g.time - 1;
+        end;
+        g.spacing = str2num(get(ESpacing,'string'));
+    end;
+    
     if p1 == 1
       g.time = g.time-g.winlength;     % << subtract one window length
     elseif p1 == 2               
