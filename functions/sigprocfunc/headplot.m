@@ -786,6 +786,8 @@ elseif isfield(meshfile, 'bnd')
 elseif isfield(meshfile, 'TRI1')
     POS  = meshfile.POS;
     TRI1 = meshfile.TRI1;
+    try TRI2   = meshfile.TRI2;   end  % NEW
+    try center = meshfile.center; end  % NEW
 elseif isfield(meshfile, 'vertices')
     POS  = meshfile.vertices;
     TRI1 = meshfile.faces;
