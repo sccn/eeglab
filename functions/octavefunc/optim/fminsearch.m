@@ -21,18 +21,29 @@
 % @seealso{fmin,fmins,nmsmax}
 % @end deftypefn
 
-function [x fval] = fminsearch(funfun, X0, options, grad, varargin)
+function varargout = fminsearch(funfun, X0, varargin)
     if ismatlab
-        if license('test','optim_toolbox')
-            p = fileparts(which('fmins'));
-            error( [ 'Octave functions should not run on Matlab' 10 'remove path to ' p ]);
+        p1 = fileparts(which('fminsearch'));
+        rmpath(p1);
+        p2 = fileparts(which('fminsearch'));
+        if ~isequal(p1, p2)
+            disp( [ 'Some Octave functions should not run on Matlab' 10 'removing path to Octave fminsearch and using Matlab fminsearch' ]);
+            switch nargout
+                case 1, varargout{1} = fminsearch(funfun, X0, varargin{:});
+                case 2, [varargout{1} varargout{2}] = fminsearch(funfun, X0, varargin{:});
+                case 3, [varargout{1} varargout{2} varargout{3}] = fminsearch(funfun, X0, varargin{:});
+                case 4, [varargout{1} varargout{2} varargout{3} varargout{4}]= fminsearch(funfun, X0, varargin{:});
+            end;
         else
-            warning('Optimization toolbox is absent, using replacement functions');
+            disp( [ 'Octave functions should not run on Matlab' 10 'remove path ' p1 ]);
         end;
+        return;
     end;
 	if (nargin == 0); usage('[x fval] = fminsearch(funfun, X0, options, grad, varargin)'); end
+    if length(varargin) > 0, options = varargin{1}; varargin(1) = []; end;
+    if length(varargin) > 0, grad = varargin{1}; varargin(1) = []; end;
 	if (nargin < 3); options=[]; end
 	if (nargin < 4); grad=[]; end
 	if (nargin < 5); varargin={}; end
-	x = fmins(funfun, X0, options, grad, varargin{:});
-	fval = feval(funfun, x, varargin{:});
+	varargout{1} = fmins(funfun, X0, options, grad, varargin{:});
+	varargout{2} = feval(funfun, x, varargin{:});
