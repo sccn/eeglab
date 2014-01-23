@@ -49,7 +49,7 @@ rejglobal  = zeros( 1, EEG.trials);
 if typerej == 0
     rejglobalE = zeros( EEG.nbchan, EEG.trials);
 else
-    rejglobalE = zeros( length(EEG.icachansind), EEG.trials);
+    rejglobalE = zeros( size(EEG.icaweights,1), EEG.trials);
 end
 
 if typerej == 0 | Rothertype

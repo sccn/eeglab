@@ -178,7 +178,7 @@ else
     icaacttmp = eeg_getdatact(EEG, 'component', [1:size(EEG.icaweights,1)]);
     [allspec, Irej, tmprejE, freqs ] = spectrumthresh( icaacttmp, EEG.specicaact, ...
                             opt.elecrange, EEG.srate, opt.threshold(:,1)', opt.threshold(:,2)', opt.freqlimits(:,1)', opt.freqlimits(:,2)', opt.method);
-    rejE = zeros(length(EEG.icachansind), size(icaacttmp,1));
+    rejE = zeros(size(EEG.icaweights,1), size(icaacttmp,1));
     rejE(opt.elecrange,Irej) = tmprejE;
 end;
 
