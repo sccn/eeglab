@@ -104,7 +104,7 @@ else
                 if ~isequal(varargin{index}, 'datatype') && ~isequal(varargin{index}, 'channels')
                     inderpimopt = strmatch(varargin{index}, STUDY.etc.erpimparams.erpimageopt(1:2:end), 'exact');
                     if ~isempty(inderpimopt)
-                        STUDY.etc.erpimparams.erpimageopt{inderpimopt+1} = varargin{index+1};
+                        STUDY.etc.erpimparams.erpimageopt{2*inderpimopt+1} = varargin{index+1};
                     else
                         STUDY.etc.erpimparams.erpimageopt = { STUDY.etc.erpimparams.erpimageopt{:} varargin{index}, varargin{index+1} };
                     end;
