@@ -428,6 +428,9 @@ end;
 
 % return structure
 % ----------------
+if nargout <2
+    return
+end
 allinds   = finalinds;
 if ~isempty(opt.channels)
     structdat = STUDY.changrp;
