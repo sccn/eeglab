@@ -84,6 +84,7 @@ tmprejelec   = [];
 tmpsig 	    = zeros(1,sweeps);
 if ~isempty(TMPREJ)
     nbchan = size(TMPREJ,2)-5;
+    TMPREJ = sortrows(TMPREJ,1);
     TMPREJ(find(TMPREJ(:,1) == 1),1) = 0;
 	tmpsig = TMPREJ(:,1)''/pnts+1;
 	I = find(tmpsig == round(tmpsig));
