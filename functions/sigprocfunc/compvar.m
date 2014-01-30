@@ -46,6 +46,10 @@ if nargin < 4
    return;
 end;   
 
+if iscell(act) && length(act) == 1
+    act = act{1};
+end;
+
 data = reshape(data, size(data,1), size(data,2)*size(data,3));
 act  = reshape(act , size(act ,1), size(act ,2)*size( act,3));
 squaredata  = sum(sum(data.^2));             % compute the grand sum-squared data
