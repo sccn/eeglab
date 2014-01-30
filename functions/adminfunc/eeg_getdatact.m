@@ -274,7 +274,7 @@ else
     end;
 
     if ~isequal(opt.channel, [1:EEG.nbchan])
-        data = data(opt.channel,:,:);
+        data = data(intersect(opt.channel,[1:EEG.nbchan]),:,:);
     end;
 end;
 
