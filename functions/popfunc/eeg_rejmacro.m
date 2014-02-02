@@ -48,7 +48,7 @@ if ~exist('nbpnts') nbpnts = EEG.pnts; end;
 if icacomp
     nChan = EEG.nbchan;
 else
-    nChan = length(EEG.icachansind);
+    nChan = size(EEG.icaweights,1);
 end
 if superpose == 2
     com2 = ['if ~isempty(TMPREJ), ' ...
