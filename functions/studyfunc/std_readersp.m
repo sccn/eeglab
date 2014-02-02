@@ -189,6 +189,9 @@ for ind = 1:length(finalinds)
         
         if strcmpi(dtype, 'erpim') % ERP images
             
+            if strcmpi(opt.singletrials, 'on')
+                error( [ 'Single trial loading option not supported with STUDY ERP-image' 10 '(there is no such thing as a single-trial ERPimage)' ]);
+            end;
             % read the data and select channels
             % ---------------------------------
             setinfo = STUDY.design(opt.design).cell;
