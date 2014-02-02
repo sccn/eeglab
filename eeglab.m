@@ -306,6 +306,15 @@ if nargin == 1 && strcmp(onearg, 'redraw')
 end;
 eeg_global;
 
+% remove empty datasets in ALLEEG
+while ~isempty(ALLEEG) && isempty(ALLEEG(end).data)
+    ALLEEG(end) = [];
+end;
+if ~isempty(ALLEEG) && max(CURRENTSET) > length(ALLEEG)
+    CURRENTSET = 1;
+    EEG        = eeg_retrieve(ALLEEG, CURRENTSET);
+end;
+
 % for the history function
 % ------------------------
 comtmp = 'warning off MATLAB:mir_warning_variable_used_as_function';
