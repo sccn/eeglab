@@ -133,6 +133,7 @@ for c = 1:nc
         if ~isempty(data{c,g})
             tmpplot = double(mean(data{c,g},3));
             if ~all(isnan(tmpplot))
+                if ~isreal(tmpplot), error('This function cannot plot complex values'); end;
                 topoplot( tmpplot, opt.chanlocs, opt.topoplotopt{:});
                 if isempty(opt.caxis)
                     tmpc = [ min(min(tmpplot), tmpc(1)) max(max(tmpplot), tmpc(2)) ];
