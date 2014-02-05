@@ -381,7 +381,7 @@ if type == 'cnt'
           % samples.  This equates to 16MB and 32MB of memory for
           % 16 and 32 bit files, respectively.
           data_block = 4000000 ;
-          max_rows =  data_block / h.nchannels ;
+          max_rows =  floor(data_block / h.nchannels);
 
           %warning off ;
           max_written = h.nchannels * uint32(max_rows) ;
