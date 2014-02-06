@@ -99,6 +99,7 @@ g = finputcheck(varargin, { 'updatedat' 'string'  { 'on','off' }  'off';
                             'commands'  'cell'    {}              {} }, 'std_editset');
 if isstr(g), error(g); end;
 
+if isempty(STUDY), STUDY.history = 'STUDY = [];'; end;
 if ~isempty(g.name),  STUDY.name  = g.name; end
 if ~isempty(g.task),  STUDY.task  = g.task; end
 if ~isempty(g.notes), STUDY.notes = g.notes; end

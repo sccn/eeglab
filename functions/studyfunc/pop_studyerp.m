@@ -172,19 +172,15 @@ if exist([ STUDY.design(STUDY.currentdesign).cell(1).filebase '.daterp' ])
         error('User aborded precomputing ERPs');
     end;    
 end;    
-if ~isfield(STUDY, 'history'), STUDY.history = ''; end;
-STUDY.history = sprintf('%s\n%s', STUDY.history, com1);
 
 % call std_precomp for ERP (channels)
 % -----------------------------------
 com2 = '[STUDY ALLEEG] = std_precomp(STUDY, ALLEEG, ''channels'', ''interpolate'', ''on'', ''recompute'',''on'',''erp'',''on'');';
-STUDY.history = sprintf('%s\n%s', STUDY.history, com2);
 [STUDY ALLEEG] = std_precomp(STUDY, ALLEEG, 'channels','interp', 'on', 'recompute','on','erp','on');
 
 % call std_erpplot to plot ERPs (channels)
 % ----------------------------------------
 com3 = 'tmpchanlocs = ALLEEG(1).chanlocs; STUDY = std_erpplot(STUDY, ALLEEG, ''channels'', { tmpchanlocs.labels }, ''plotconditions'', ''together'');';
-STUDY.history = sprintf('%s\n%s', STUDY.history, com3);
 tmpchanlocs = ALLEEG(1).chanlocs;
 STUDY = std_erpplot(STUDY, ALLEEG, 'channels', { tmpchanlocs.labels }, 'plotconditions', 'together');
 pos = get(gcf, 'position');

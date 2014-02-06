@@ -319,7 +319,6 @@ if ~isstr(varargin{1}) %intial settings
     
     [STUDY ALLEEG] = std_preclust(options{:});
     com = sprintf('[STUDY ALLEEG] = std_preclust(STUDY, ALLEEG, %s);', vararg2str(options(3:end)));
-    STUDY.history =  sprintf('%s\n%s',  STUDY.history, com);    
     
     % save updated STUDY to the disk
     % ------------------------------

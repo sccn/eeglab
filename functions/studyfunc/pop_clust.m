@@ -205,11 +205,9 @@ if isempty(varargin) %GUI call
             if ~isempty(clust_param{6})
                 [filepath filename ext] = fileparts(clust_param{6});
                 command = sprintf('%s%s%s%s%s%s', command, '''filename'', ''', [filename ext], ', ''filepath'', ''', filepath, ''');' );
-                STUDY.history =  sprintf('%s\n%s',  STUDY.history, command);
                 STUDY = pop_savestudy(STUDY, ALLEEG, 'filename', [filename ext], 'filepath', filepath);
               else
                 command(end:end+1) = ');';
-                STUDY.history =  sprintf('%s\n%s',  STUDY.history, command); 
                 if (~isempty(STUDY.filename)) & (~isempty(STUDY.filepath))
                     STUDY = pop_savestudy(STUDY, ALLEEG, 'filename', STUDY.filename, 'filepath', STUDY.filepath);
                 else
@@ -218,7 +216,6 @@ if isempty(varargin) %GUI call
            end
        else
            command(end:end+1) = ');';
-           STUDY.history =  sprintf('%s\n%s',  STUDY.history, command);            
        end
            
        [STUDY com] = pop_clustedit(STUDY, ALLEEG); 

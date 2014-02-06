@@ -98,6 +98,7 @@ if isempty(STUDY)
     STUDY.notes    = '';
     STUDY.filename = '';
     STUDY.cluster  = [];
+    STUDY.history = 'STUDY = [];';
 else
     newstudy       = 0;
 end;
@@ -321,8 +322,6 @@ elseif strcmpi(mode, 'gui') % GUI mode
     % run command and create history
     % ------------------------------
     com = sprintf( '[STUDY ALLEEG] = std_editset( STUDY, ALLEEG, %s );\n[STUDY ALLEEG] = std_checkset(STUDY, ALLEEG);', vararg2str(options) );
-    if ~isfield(STUDY, 'history'), STUDY.history = ''; end;
-    STUDY.history = sprintf('%s\n%s', STUDY.history, com);
     [STUDY ALLEEG] = std_editset(STUDY, ALLEEG, options{:});
     
 else % internal command
