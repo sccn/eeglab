@@ -81,6 +81,7 @@ elseif nargin == 1
 		return;
 	end;
 	if isstr( command )
+        if ~isempty(ALLCOM) && isequal(ALLCOM{1}, command), return; end;
 		if isempty(ALLCOM)
 			ALLCOM = { command };
 		else	
@@ -118,6 +119,7 @@ else % nargin == 2
         end;
     else
         % warning also some code present in eeg_store and pop_newset
+        if ~isempty(ALLCOM) && isequal(ALLCOM{1}, command), return; end;
         eegh(command); % add to history
         if ~isempty(command)
             if length(str) == 1
@@ -130,3 +132,5 @@ else % nargin == 2
         end;
     end;
 end;
+
+
