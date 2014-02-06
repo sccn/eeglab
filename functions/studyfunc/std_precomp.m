@@ -3,7 +3,7 @@
 %                 the updated EEG datasets are also saved to disk. Called by 
 %                 pop_precomp(). Follow with pop_plotstudy(). See Example below.
 % Usage:    
-% >> [ALLEEG,STUDY] = std_precomp(STUDY, ALLEEG, chanorcomp, 'key', 'val', ...);
+% >> [STUDY ALLEEG] = std_precomp(STUDY, ALLEEG, chanorcomp, 'key', 'val', ...);
 %
 % Required inputs:
 %   STUDY        - an EEGLAB STUDY set of loaded EEG structures
