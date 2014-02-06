@@ -274,8 +274,10 @@ elseif isstr(STUDY)
             set(findobj(fig, 'tag', 'lbfact1'), 'string', usrdat.factors, 'value', val2);
             valfact1 = strmatchmult(des(val).variable(1).value, usrdat.factorvals{val1});
             valfact2 = strmatchmult(des(val).variable(2).value, usrdat.factorvals{val2});
-            set(findobj(fig, 'tag', 'lbval0'), 'string', encodevals(usrdat.factorvals{val1}), 'value', valfact1);
-            set(findobj(fig, 'tag', 'lbval1'), 'string', encodevals(usrdat.factorvals{val2}), 'value', valfact2);
+            if isempty(valfact1), listboxtop1 = 1; else listboxtop1 = valfact1(1); end;
+            if isempty(valfact2), listboxtop2 = 1; else listboxtop2 = valfact2(1); end;
+            set(findobj(fig, 'tag', 'lbval0'), 'string', encodevals(usrdat.factorvals{val1}), 'value', valfact1, 'listboxtop', listboxtop1);
+            set(findobj(fig, 'tag', 'lbval1'), 'string', encodevals(usrdat.factorvals{val2}), 'value', valfact2, 'listboxtop', listboxtop2);
             valsubj = strmatchmult(des(val).cases.value, usrdat.subjects);
             set(findobj(fig, 'tag', 'lbsubj'), 'string', usrdat.subjects, 'value', valsubj);
             if isempty(des(val).include), str = ''; else str = vararg2str(des(val).include); end;
@@ -351,7 +353,7 @@ elseif isstr(STUDY)
 %                 set(findobj(fig, 'tag', [ 'lbfact' num2str(factval) ]), 'value', val1);
 %             end;
             valfact = [1:length(usrdat.factorvals{val1})];
-            set(findobj(fig, 'tag', ['lbval' num2str(factval) ]), 'string', encodevals(usrdat.factorvals{val1}), 'value', valfact);
+            set(findobj(fig, 'tag', ['lbval' num2str(factval) ]), 'string', encodevals(usrdat.factorvals{val1}), 'value', valfact, 'listboxtop', 1);
             pop_studydesign('updatedesign', fig);
             return;
             
