@@ -37,8 +37,8 @@ if nargin < 2
 end;
 command  = '';
 
+if isempty(STUDY), return; end;
 studywasempty = 0;
-if isempty(STUDY), studywasempty = 1; end;
 
 modif = 0;
 if ~isfield(STUDY, 'name'),  STUDY.name  = ''; modif = 1; end;
@@ -303,6 +303,7 @@ if modif;
     STUDY.saved = 'no';
     command = '[STUDY ALLEEG] = std_checkset(STUDY, ALLEEG);';
     addToHistory = true;
+    % check duplicate
     if length(STUDY.history) >= length(command) && strcmpi(STUDY.history(end-length(command)+1:end), command)
         addToHistory = false;
     end;
