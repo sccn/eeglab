@@ -175,8 +175,7 @@ if ~isstr(varargin{1})
     STUDY.etc.erspparams.topofreq   = NaN;
     STUDY.etc.erpimparams.topotime  = NaN;
     STUDY.etc.erpimparams.topotrial = NaN;
-    oldhistory = STUDY.history;
-    STUDY.history = '';
+    STUDY.tmphist = '';
     ALLEEG = varargin{2};
     clus_comps = 0; % the number of clustered components
     if nargin > 2 && ~isempty(varargin{3}) % load specific clusters
@@ -420,8 +419,8 @@ if ~isstr(varargin{1})
    
    % history
    % -------
-   com = STUDY.history;
-   STUDY.history =  sprintf('%s%s', oldhistory, com);              
+   com = STUDY.tmphist;
+   STUDY = rmfield(STUDY, 'tmphist');
  
 else
     hdl = varargin{2};  %figure handle
@@ -447,10 +446,10 @@ else
                     if comp_ind(1) ~= 1  % check that not all comps in cluster are requested
                         subject = STUDY.datasetinfo( STUDY.cluster(cls(clus-1)).sets(1,comp_ind-1)).subject;
                         a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''clusters'','  num2str(cls(clus-1)) ', ''comps'', ' num2str(comp_ind-1) ' );' ];
-                        eval(a); STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
+                        eval(a); STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, a);  
                      else
                         a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''clusters'','  num2str(cls(clus-1)) ', ''plotsubjects'', ''on'' );' ];
-                        eval(a); STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
+                        eval(a); STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, a);  
                     end
                 else
                    comp_list = get(findobj('parent', hdl, 'tag', 'clust_comp'), 'String');
@@ -466,7 +465,7 @@ else
                                    cind = comp_ind(ci) - num_comps; % component index in the cluster
                                    subject = STUDY.datasetinfo( STUDY.cluster(cls(k)).sets(1,cind)).subject;
                                    a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''clusters'','  num2str(cls(k)) ', ''comps'',' num2str(cind) ' );' ];
-                                   eval(a); STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
+                                   eval(a); STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, a);  
                                    break;
                                else
                                    num_comps = num_comps + length(STUDY.cluster(cls(k)).comps);
@@ -484,7 +483,7 @@ else
                 if (clus ~= 1 ) % specific cluster option
                     if ~isempty(STUDY.cluster(cls(clus-1)).comps)
                         a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''clusters'','  num2str(cls(clus-1)) ');' ];
-                        eval(a); STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
+                        eval(a); STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, a);  
                     end
                 else % all clusters
                     % All clusters does not include 'Notclust' 'ParentCluster' and 'Outliers' clusters. 
@@ -497,7 +496,7 @@ else
                     end
                     a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''clusters'',['  num2str(tmpcls) ']);' ];
                     %if strcmpi(plotting_option, 'dipplot'), a = [a(1:end-2) ',''mode'', ''together'');' ]; end;
-                    eval(a); STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
+                    eval(a); STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, a);  
                 end
                 userdat{1}{2} = STUDY;
                 set(hdl, 'userdat',userdat); 
@@ -505,7 +504,7 @@ else
             case 'dip_opt' % save the list of selected chaners
                 [STUDY com] = pop_dipparams(STUDY);
                 if ~isempty(com)
-                    STUDY.history =  sprintf('%s\n%s',  STUDY.history, com);
+                    STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, com);
                 end;
                 userdat{1}{2} = STUDY;
                 set(hdl, 'userdat',userdat); %update information (STUDY)     
@@ -513,7 +512,7 @@ else
             case 'erp_opt' % save the list of selected chaners
                 [STUDY com] = pop_erpparams(STUDY);
                 if ~isempty(com)
-                    STUDY.history =  sprintf('%s\n%s',  STUDY.history, com);
+                    STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, com);
                 end;
                 userdat{1}{2} = STUDY;
                 set(hdl, 'userdat',userdat); %update information (STUDY)     
@@ -521,7 +520,7 @@ else
             case 'stat_opt' % save the list of selected chaners
                 [STUDY com] = pop_statparams(STUDY);
                 if ~isempty(com)
-                    STUDY.history =  sprintf('%s\n%s',  STUDY.history, com);
+                    STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, com);
                 end;
                 userdat{1}{2} = STUDY;
                 set(hdl, 'userdat',userdat); %update information (STUDY)     
@@ -529,7 +528,7 @@ else
             case 'spec_opt' % save the list of selected channels
                 [STUDY com] = pop_specparams(STUDY);
                 if ~isempty(com)
-                    STUDY.history =  sprintf('%s\n%s',  STUDY.history, com);
+                    STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, com);
                 end;
                 userdat{1}{2} = STUDY;
                 set(hdl, 'userdat',userdat); %update information (STUDY)     
@@ -537,7 +536,7 @@ else
             case 'erpim_opt' % save the list of selected channels
                 [STUDY com] = pop_erpimparams(STUDY);
                 if ~isempty(com)
-                    STUDY.history =  sprintf('%s\n%s',  STUDY.history, com);
+                    STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, com);
                 end;
                 userdat{1}{2} = STUDY;
                 set(hdl, 'userdat',userdat); %update information (STUDY)     
@@ -545,7 +544,7 @@ else
             case 'ersp_opt' % save the list of selected channels
                 [STUDY com] = pop_erspparams(STUDY);
                 if ~isempty(com)
-                    STUDY.history =  sprintf('%s\n%s',  STUDY.history, com);
+                    STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, com);
                 end;
                 userdat{1}{2} = STUDY;
                 set(hdl, 'userdat',userdat); %update information (STUDY)     
@@ -608,7 +607,7 @@ else
                     [STUDY] = std_propplot(STUDY, ALLEEG, 'cluster', cls(clus-1));
                     % update Study history
                     a = ['STUDY = std_propplot(STUDY, ALLEEG, ''cluster'', '  num2str(cls(clus-1)) ' );'  ];
-                    STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
+                    STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, a);  
                 else % all clusters
                     % All clusters does not include 'Notclust' and 'Outliers' clusters. 
                     tmpcls = [];
@@ -621,7 +620,7 @@ else
                     [STUDY] = std_propplot(STUDY, ALLEEG, 'cluster', tmpcls);
                     % update Study history
                     a = ['STUDY = std_propplot(STUDY, ALLEEG, ''cluster'', ['  num2str(tmpcls) '] );'  ];
-                    STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
+                    STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, a);  
                 end
                userdat{1}{2} = STUDY;
                set(hdl, 'userdat',userdat);    
@@ -653,7 +652,7 @@ else
                     STUDY = std_renameclust(STUDY, ALLEEG, cls(clus_num), new_name);
                     % update Study history
                     a = ['STUDY = std_renameclust(STUDY, ALLEEG, ' num2str(cls(clus_num)) ', ' STUDY.cluster(cls(clus_num)).name  ');'];
-                    STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
+                    STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, a);  
 
                     new_name = [ STUDY.cluster(cls(clus_num)).name ' (' num2str(length(STUDY.cluster(cls(clus_num)).comps))  ' ICs)'];
                     clus_name_list{clus_num+1} = renameclust( clus_name_list{clus_num+1}, new_name);
@@ -699,7 +698,7 @@ else
                     STUDY = std_movecomp(STUDY, ALLEEG,  cls(old_clus), optionalcls(new_clus), comp_ind - 1);                
                     % update Study history
                     a = ['STUDY = std_movecomp(STUDY, ALLEEG, ' num2str(cls(old_clus)) ', ' num2str(optionalcls(new_clus)) ', [' num2str(comp_ind - 1) ']);'];
-                    STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);
+                    STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, a);
                     newind = find(cls == optionalcls(new_clus));
 
                     % update GUI
@@ -761,7 +760,7 @@ else
                     set(findobj('parent', hdl, 'tag', 'clus_list'), 'String', clus_name_list);
                     % update Study history
                     a = ['STUDY = std_moveoutlier(STUDY, ALLEEG, ' num2str(cls(old_clus)) ', [' num2str(comp_ind - 1) ']);'];
-                    STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);
+                    STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, a);
                     userdat{1}{2} = STUDY;
                     set(hdl, 'userdat',userdat); 
                     pop_clustedit('showclust',hdl);    
@@ -800,7 +799,7 @@ else
                     [STUDY] = std_rejectoutliers(STUDY, ALLEEG, clusters, str2num(ostd));  
                     % update Study history
                     a = ['STUDY = std_rejectoutliers(STUDY, ALLEEG, [ ' num2str(clusters) ' ], ' ostd ');'];
-                    STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);
+                    STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, a);
                     clus_name_list = get(findobj('parent', hdl, 'tag', 'clus_list'), 'String');
                     for k = 1:length(clusters)
                         outlier_clust = std_findoutlierclust(STUDY,clusters(k)); %find the outlier cluster for this cluster
@@ -849,7 +848,7 @@ else
                     else
                         a = ['STUDY = std_createclust(STUDY, ALLEEG, ''name'', ' clus_name ');'];
                     end                
-                    STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
+                    STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, a);  
                     userdat{1}{2} = STUDY;
                     userdat{2} = userdat{2} + 1; % update N, the number of cluster options in edit window 
                     cls(end +1) = length(STUDY.cluster); % update the GUI clusters list with the new cluster
@@ -892,7 +891,7 @@ else
                       else
                           a = ['STUDY = std_mergeclust(STUDY, ALLEEG, [' num2str(std_mrg) '], ' name ');'];
                       end                  
-                      STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);
+                      STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, a);
                       userdat{1}{2} = STUDY;
                       %
                       % Replace the merged clusters with the one new merged cluster 

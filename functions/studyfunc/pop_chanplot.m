@@ -109,8 +109,7 @@ if ~isstr(varargin{1})
                          'no longer available; Cancel, and go back to your STUDY folder'), 'warning');
     end;
         
-    oldhistory = STUDY.history;
-    STUDY.history = '';
+    STUDY.tmphist = '';
     ALLEEG = varargin{2};
     if ~isfield(STUDY, 'changrp')
         STUDY = std_changroup(STUDY, ALLEEG);
@@ -241,8 +240,8 @@ if ~isstr(varargin{1})
 
    % history
    % -------
-   com = STUDY.history;
-   STUDY.history =  sprintf('%s%s', oldhistory, com);              
+   com = STUDY.tmphist;
+   STUDY = rmfield(STUDY, 'tmphist');
    
 else
     hdl = varargin{2};  %figure handle
@@ -264,7 +263,7 @@ else
                 plotting_option = [ plotting_option(1:end-4) 'plot' ];
                 a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''channels'','  vararg2str({changrpstr}) ');' ];
                  % update Study history
-                eval(a); STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
+                eval(a); STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, a);  
                 userdat{1}{2} = STUDY;
                 set(hdl, 'userdat',userdat); 
 
@@ -284,10 +283,10 @@ else
                 if onechan(1) ~= 1  % check that not all onechan in channel are requested
                      subject = STUDY.design(STUDY.currentdesign).cases.value{onechan-1};
                      a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''channels'','  vararg2str({changrpstr}) ', ''subject'', ''' subject ''' );' ];
-                     eval(a); STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
+                     eval(a); STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, a);  
                  else
                     a = ['STUDY = std_' plotting_option '(STUDY,ALLEEG,''channels'','  vararg2str({changrpstr}) ', ''plotsubjects'', ''on'' );' ];
-                    eval(a); STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);
+                    eval(a); STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, a);
                  end;
                 userdat{1}{2} = STUDY;
                 set(hdl, 'userdat',userdat); 
@@ -295,7 +294,7 @@ else
             case 'stat_opt' % save the list of selected channels
                 [STUDY com] = pop_statparams(STUDY);
                 if ~isempty(com)
-                    STUDY.history =  sprintf('%s\n%s',  STUDY.history, com);
+                    STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, com);
                 end;
                 userdat{1}{2} = STUDY;
                 set(hdl, 'userdat',userdat); %update information (STUDY)
@@ -303,7 +302,7 @@ else
             case 'erp_opt' % save the list of selected channels
                 [STUDY com] = pop_erpparams(STUDY);
                 if ~isempty(com)
-                    STUDY.history =  sprintf('%s\n%s',  STUDY.history, com);
+                    STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, com);
                 end;
                 userdat{1}{2} = STUDY;
                 set(hdl, 'userdat',userdat); %update information (STUDY)     
@@ -311,7 +310,7 @@ else
             case 'spec_opt' % save the list of selected channels
                 [STUDY com] = pop_specparams(STUDY);
                 if ~isempty(com)
-                    STUDY.history =  sprintf('%s\n%s',  STUDY.history, com);
+                    STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, com);
                 end;
                 userdat{1}{2} = STUDY;
                 set(hdl, 'userdat',userdat); %update information (STUDY)     
@@ -319,7 +318,7 @@ else
             case 'ersp_opt' % save the list of selected channels
                 [STUDY com] = pop_erspparams(STUDY);
                 if ~isempty(com)
-                    STUDY.history =  sprintf('%s\n%s',  STUDY.history, com);
+                    STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, com);
                 end;
                 userdat{1}{2} = STUDY;
                 set(hdl, 'userdat',userdat); %update information (STUDY)     
@@ -327,7 +326,7 @@ else
             case 'erpim_opt' % save the list of selected channels
                 [STUDY com] = pop_erpimparams(STUDY);
                 if ~isempty(com)
-                    STUDY.history =  sprintf('%s\n%s',  STUDY.history, com);
+                    STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, com);
                 end;
                 userdat{1}{2} = STUDY;
                 set(hdl, 'userdat',userdat); %update information (STUDY)     
@@ -389,7 +388,7 @@ else
                 changrpstr = allchans(changrp);
                 [STUDY] = std_propplot(STUDY, ALLEEG, allchans(changrp));
                 a = ['STUDY = std_propplot(STUDY, ALLEEG, ' vararg2str({ allchans(changrp) }) ' );'  ];
-                STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
+                STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, a);  
                 userdat{1}{2} = STUDY;
                 set(hdl, 'userdat',userdat);    
 
@@ -487,7 +486,7 @@ else
                     STUDY = std_renamechan(STUDY, ALLEEG, cls(chan_num), new_name);
                     % update Study history
                     a = ['STUDY = std_renamechan(STUDY, ALLEEG, ' num2str(cls(chan_num)) ', ' STUDY.channel(cls(chan_num)).name  ');'];
-                    STUDY.history =  sprintf('%s\n%s',  STUDY.history, a);  
+                    STUDY.tmphist =  sprintf('%s\n%s',  STUDY.tmphist, a);  
 
                     new_name = [ STUDY.channel(cls(chan_num)).name ' (' num2str(length(STUDY.channel(cls(chan_num)).onechan))  ' ICs)'];
                     chan_name_list{chan_num+1} = renamechan( chan_name_list{chan_num+1}, new_name);
