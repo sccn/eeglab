@@ -239,6 +239,36 @@ function [smoothprob3d, mriplanes] = mri3dplot(prob3d, mri, varargin)
             densplot{i} = rotatemat( densplot{i}, g.rotate );
         end;
   
+        if isa(mriplot, 'uint8')
+            % check if densplot is in uint8
+            % if not - transform to uint8
+            for dlen = 1:length(densplot)
+                if ~isa(densplot{dlen}, 'uint8')
+                    % check if multiply by 255 (when double
+                    % with values ranging from 0 - 1) and
+                    % then transform to uint8
+                    checkval = densplot{dlen} >= 0 & densplot{dlen} <= 1;
+                    checkval = sum(checkval(:)) == numel(densplot{dlen});
+                    if checkval
+                        densplot{dlen} = uint8(densplot{dlen} * 255); %#ok<AGROW>
+                        continue
+                    end
+                    
+                    % check if it's ok to transform
+                    % straight to int8
+                    checkval = densplot{dlen} >= 0 & densplot{dlen} <= 255;
+                    checkval = sum(checkval(:)) == numel(densplot);
+                    testint = isequal(densplot{dlen}, round(densplot{dlen}));
+                    
+                    if checkval && testint
+                        densplot{dlen} = uint8(densplot{dlen}); %#ok<AGROW>
+                    end
+                    
+                end
+            end
+            clear dlen checkval testint
+        end;
+        
         if length(densplot) == 1
             densplot = densplot{1};
             if strcmpi(g.mixmode, 'add')
