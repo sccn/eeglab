@@ -179,7 +179,11 @@ else
     error('You must provide a non-0 low or high cut-off frequency');
 end
 if revfilt
-    m = ~m;
+    if strcmp(firtype, 'fir1')
+        error('Cannot reverse filter using ''fir1'' option');
+    else
+        m = ~m;
+    end;
 end;
 
 if strcmp(firtype, 'firls')
