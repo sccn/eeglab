@@ -110,6 +110,16 @@ if ~isempty(g.event)
     event = g.event;
     if ~isstr(event)
         if size(event,2) > size(event,1), event = event'; end;
+        if iscell(event)
+            eventStr = cellfun(@ischar, event);
+            eventNum = cellfun(@isnumeric, event);
+            if all(eventStr(1,:)) && ~all(eventStr(:,1))
+                event = event';
+            end;
+            if all(eventNum(1,:)) && ~all(eventNum(:,1))
+                event = event';
+            end;
+        end;
     end;
 end;
 g.event = event;
