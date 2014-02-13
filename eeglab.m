@@ -294,8 +294,6 @@ if ~iseeglabdeployed2
         rmpathifpresent( optimpath );
         warning('on', 'MATLAB:rmpath:DirNotFound');
     end;
-    
-    myaddpath( eeglabpath, 'eegplugin_dipfit.m', [ 'plugins' filesep 'dipfit2.2' ]);
 else
     eeglab_options;
 end;
@@ -1264,7 +1262,7 @@ if ismatlab
         'Position',[BORDEREXT   BORDEREXT  (WINMINX+WINMAXX+2*BORDERINT)  (WINY)], ...
         'Style','frame', ...
        'Tag','Frame1');
-
+    set(H_MAIN(1), 'unit', 'normalized');
     geometry = { [1] [1] [1] [1 1] [1 1] [1 1] [1 1] [1 1] [1 1] [1 1] [1 1] [1 1] [1 1] [1 1] [1] };
     listui = { { 'style', 'text', 'string', 'Parameters of the current set', 'tag', 'win0' } { } ...
                { 'style', 'text', 'tag', 'win1', 'string', ' ', 'userdata', 'datinfo' } ...
