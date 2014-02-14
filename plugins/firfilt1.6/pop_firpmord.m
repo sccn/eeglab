@@ -19,7 +19,9 @@
 %   wtstop    - scalar stopband weight
 %
 % Note:
-%   Requires the signal processing toolbox.
+%   Requires the signal processing toolbox. Convert passband ripple from
+%   dev to peak-to-peak dB: rp = 20 * log10((1 + dev) / (1 - dev)).
+%   Convert stopband attenuation from dev to dB: rs = 20 * log10(dev).
 %
 % Author: Andreas Widmann, University of Leipzig, 2005
 %
