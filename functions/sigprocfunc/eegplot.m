@@ -236,7 +236,10 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
        for index = 1:length(options)
            if iscell(options{index}) & ~iscell(options{index}{1}), options{index} = { options{index} }; end;
        end;
-       if ~isempty( varargin ), g=struct(options{:}); 
+       if ~isempty( varargin ), 
+           for i = 1:2:numel(options)
+               g.(options{i}) = options{i+1};
+           end
        else g= []; end;
    catch
        disp('eegplot() error: calling convention {''key'', value, ... } error'); return;
@@ -371,9 +374,9 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
    % convert color to modify into array of float
    % -------------------------------------------
    for index = 1:length(g.colmodif)
-	   tmpcolmodif(index) = g.colmodif{index}(1) ...
-                              + g.colmodif{index}(2)*10 ...
-                              + g.colmodif{index}(3)*100;
+	   tmpcolmodif{index} = g.colmodif{index}{1} ...
+                              + g.colmodif{index}{2}*10 ...
+                              + g.colmodif{index}{3}*100;
    end;
    g.colmodif = tmpcolmodif;
    
