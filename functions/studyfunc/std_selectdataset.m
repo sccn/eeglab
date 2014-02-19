@@ -73,10 +73,10 @@ elseif isfield(STUDY.datasetinfo, indvar) && ~isempty(getfield(STUDY.datasetinfo
     % regular selection of dataset in datasetinfo
     % -------------------------------------------
     if strcmpi(verboseFlag, 'verbose'), fprintf('   Selecting datasets with field ''%s'' equal to %s\n', indvar, vararg2str(indvarvals)); end;
-    eval( [ 'fieldvals = { STUDY.datasetinfo.' indvar '};' ] );
+    eval( [ 'myfieldvals = { STUDY.datasetinfo.' indvar '};' ] );
     datind = [];
     for dat = 1:length(indvarvals)
-        datind = union_bc(datind, std_indvarmatch(indvarvals{dat}, fieldvals));
+        datind = union_bc(datind, std_indvarmatch(indvarvals{dat}, myfieldvals));
     end;
 else
     % selection of trials within datasets
