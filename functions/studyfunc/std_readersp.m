@@ -404,8 +404,8 @@ end;
 % output unit
 % -----------
 if exist('tmpparams') ~= 1
-    if ~isempty(opt.channels), [tmpersp tmpparams] = std_readfile(STUDY.design(opt.design).cell(1), 'channels', {STUDY.changrp(1).name});
-    else                       [tmpersp tmpparams] = std_readfile(STUDY.design(opt.design).cell(1), 'components', STUDY.cluster(finalinds(end)).allinds{1,1}(1));
+    if ~isempty(opt.channels), [tmpersp tmpparams] = std_readfile(STUDY.design(opt.design).cell(1), 'channels', {STUDY.changrp(1).name}, 'measure', opt.datatype);
+    else                       [tmpersp tmpparams] = std_readfile(STUDY.design(opt.design).cell(1), 'components', STUDY.cluster(finalinds(end)).allinds{1,1}(1), 'measure', opt.datatype);
     end;
 end;
 if ~isfield(tmpparams, 'baseline'), tmpparams.baseline = 0;     end;
