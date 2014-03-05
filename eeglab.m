@@ -147,7 +147,7 @@ end;
 % check Matlab version
 % --------------------
 vers = version;
-if str2num(vers(1)) < 7
+if str2num(vers(1)) < 7 && str2num(vers(1)) >= 5
     tmpWarning = warning('backtrace');
     warning backtrace off;
     warning('You are using a Matlab version older than 7.0');
@@ -536,7 +536,7 @@ cb_runica      = [ check      '[EEG LASTCOM] = pop_runica(EEG);'   e_store];
 cb_subcomp     = [ checkica   '[EEG LASTCOM] = pop_subcomp(EEG);'  e_newset];
 %cb_chanrej     = [ check      'pop_rejchan(EEG); LASTCOM = '''';'  e_hist];
 cb_chanrej     = [ check      '[EEG tmp1 tmp2 LASTCOM] = pop_rejchan(EEG); clear tmp1 tmp2;'  e_hist];
-cb_autorej     = [ check      '[EEG tmpp LASTCOM] = pop_autorej(EEG); clear tmpp;'  e_hist];
+cb_autorej     = [ checkepoch '[EEG tmpp LASTCOM] = pop_autorej(EEG); clear tmpp;'  e_hist];
 cb_rejcont     = [ check      '[EEG tmp1 tmp2 LASTCOM] = pop_rejcont(EEG); clear tmp1 tmp2;'  e_hist];
 
 cb_rejmenu1    = [ check      'pop_rejmenu(EEG, 1); LASTCOM = '''';'    e_hist];
