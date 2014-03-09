@@ -4,7 +4,7 @@
 %   >> [EEG, rmepochs] = pop_autorej( EEG, 'key', 'val');
 %
 % Inputs:
-%   EEG       - input EEG structure
+%   EEG       - input EEG structure where epochs have been extracted.
 %
 % Optional inputs:
 %   'threshold'  - [float] Threshold limit for detection of extremely large 
@@ -73,6 +73,10 @@ function [EEG, rmep, com ] = pop_autorej(EEG, varargin);
     end;
     rmep = [];
     com = '';
+    
+    if EEG.trials == 1
+        error('This function requires data epochs');
+    end;
     
     opt = finputcheck(varargin, { 'startprob'    'real'    []     DEFAULT_STARTPROB; ...
                                   'electrodes'   'real'    []     [1:EEG.nbchan]; ...
