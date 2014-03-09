@@ -18,7 +18,8 @@
 %                    data = columns. Default 'off'.
 %   'erp'          - ['on'|'off'] export ERP instead of raw data. Default 'off'.
 %   'expr'         - [string] evaluate epxression on data. The expression must 
-%                    contain a variable 'x' representing the 2-D or 3-D data.
+%                    contain a variable 'x' representing the 2-D or 3-D
+%                    data. For example "x = 2*x" to multiply the data by 2.
 %   'precision'    - [float] number of significant digits in output. Default 7.
 %                    Default of 7 should allow to reach about 23 to 24 bits
 %                    of precision and should be enough for EEG.
