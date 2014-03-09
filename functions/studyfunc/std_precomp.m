@@ -3,7 +3,7 @@
 %                 the updated EEG datasets are also saved to disk. Called by 
 %                 pop_precomp(). Follow with pop_plotstudy(). See Example below.
 % Usage:    
-% >> [STUDY ALLEEG] = std_precomp(STUDY, ALLEEG, chanorcomp, 'key', 'val', ...);
+% >> [STUDY ALLEEG customRes] = std_precomp(STUDY, ALLEEG, chanorcomp, 'key', 'val', ...);
 %
 % Required inputs:
 %   STUDY        - an EEGLAB STUDY set of loaded EEG structures
@@ -81,6 +81,9 @@
 %                  for use by pop_clust()
 %   customRes    - cell array of custom results (one cell for each pair of
 %                  independent variables as defined in the STUDY design).
+%                  If a custom file extension is specified, this variable
+%                  is empty as the function assumes that the result is too
+%                  large to hold in memory.
 %
 % Example:
 %   >> [STUDY ALLEEG customRes] = std_precomp(STUDY, ALLEEG, { 'cz' 'oz' }, 'interp', ...
