@@ -405,7 +405,10 @@ try, g.chaninfo;   catch, g.chaninfo = []; end;
 
 if isfield(g, 'detret'), g.detrend = g.detret; end;
 if isfield(g, 'detrep'), g.rmerp   = g.detrep; end;
-
+if ~isnan(g.alpha) && ndims(X) == 2 && (size(X,1) == 1 || size(X,2) == 1)
+    error('Cannot compute significance for continuous data');
+end;
+    
 allfields = fieldnames(g);
 for index = 1:length(allfields)
 	switch allfields{index}
