@@ -62,7 +62,7 @@ function [EEG com] = pop_importegimat(filename, srate, latpoint0, dataField);
         geometry = { [1 1] [1 1] [1 1] };
         result       = inputgui( 'geometry', geometry, 'uilist', promptstr, ...
                                  'helpcom', 'pophelp(''pop_importegimat'')', ...
-                                 'title', 'Import a Matlab file from Netstation -- pop_runica()');
+                                 'title', 'Import a Matlab file from Netstation -- pop_importegimat()');
 
         if length(result) == 0 return; end;        
         srate = str2num(result{1});
