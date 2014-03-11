@@ -147,6 +147,11 @@ end;
 % check Matlab version
 % --------------------
 vers = version;
+tmpv = which('version');
+if ~isempty(findstr(lower(tmpv), 'biosig'))
+    [tmpp tmp] = fileparts(tmpv);
+    rmpath(tmpp);
+end;
 if str2num(vers(1)) < 7 && str2num(vers(1)) >= 5
     tmpWarning = warning('backtrace');
     warning backtrace off;
