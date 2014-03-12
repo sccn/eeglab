@@ -19,10 +19,10 @@
 %                  Default is [35 128] Hz.
 %  'threshold'   - [float] frequency upper threshold in dB {Default: 10}
 %  'contiguous'  - [integer] number of contiguous epochs necessary to 
-%                  label a region as artifactual {Default: 4}
+%                  label a region as artifactual {Default: 4 }
 %  'addlength'   - [float] once a region of contiguous epochs has been labeled
 %                  as artifact, additional trailing neighboring regions on
-%                  each side may also be added {Default: 0.25}
+%                  each side may also be added {Default: 0.25 s}
 %  'eegplot'     - ['on'|'off'] plot rejected portions of data in a eegplot
 %                  window. Default is 'off'.
 %  'onlyreturnselection'  - ['on'|'off'] this option when set to 'on' only
@@ -270,8 +270,8 @@ end;
 % add time before and after each region
 % -------------------------------------
 for index = 1:size(winrej,1)
-    winrej(index,1) = max(1,         winrej(index,1)-opt.addlength);
-    winrej(index,2) = min(EEG.pnts,  winrej(index,2)+opt.addlength);
+    winrej(index,1) = max(1,         winrej(index,1)-opt.addlength*EEG.srate);
+    winrej(index,2) = min(EEG.pnts,  winrej(index,2)+opt.addlength*EEG.srate);
 end;
 
 % plot result
