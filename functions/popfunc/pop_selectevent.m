@@ -333,7 +333,10 @@ for index = 1:length(allfields)
             Ievent = intersect_bc( Ievent, Ieventtmp );
         elseif isstr( tmpvar ) % real range
             tmpevent = EEG.event;
-            eval( [ 'tmpvarvalue = [ tmpevent(:).' allfields{index} ' ];'] );
+            % ======== JRI BUGFIX 3/6/14            
+            %eval( [ 'tmpvarvalue = [ tmpevent(:).' allfields{index} ' ];'] ); 
+            tmpvarvalue = safeConcatenate(EEG.event, allfields{index});  
+            
             min = eval(tmpvar(1:findstr(tmpvar, '<=')-1));
             max = eval(tmpvar(findstr(tmpvar, '<=')+2:end));
 			if strcmp(allfields{index}, 'latency')
@@ -359,7 +362,10 @@ for index = 1:length(allfields)
 				fprintf(['pop_selectevent warning: latencies are continuous values\n' ...
 						 'so you may use the ''a<=b'' notation to select these values\n']);
 			end;
-            eval( [ 'tmpevent = EEG.event; tmpvarvalue = [ tmpevent(:).' allfields{index} ' ];'] );
+            % ======== JRI BUGFIX 3/6/14
+            %eval( [ 'tmpevent = EEG.event; tmpvarvalue = [ tmpevent(:).' allfields{index} ' ];'] );
+            tmpvarvalue = safeConcatenate(EEG.event, allfields{index});            
+            
             Ieventtmp = [];
             for index2 = 1:length( tmpvar )
                 Ieventtmp = unique_bc( [ Ieventtmp find(tmpvarvalue == tmpvar(index2)) ] );
@@ -394,7 +400,10 @@ for index = 1:length(allfields)
             Ieventrem = union_bc( Ieventrem, Ieventtmp );
          elseif isstr( tmpvar )
             tmpevent = EEG.event;
-            eval( [ 'tmpvarvalue = [ tmpevent(:).' allfields{index} ' ];'] );
+             % ======== JRI BUGFIX 3/6/14
+            %eval( [ 'tmpvarvalue = [ tmpevent(:).' allfields{index} ' ];'] );
+            tmpvarvalue = safeConcatenate(EEG.event, allfields{index});
+            
             min = eval(tmpvar(1:findstr(tmpvar, '<=')-1));
             max = eval(tmpvar(findstr(tmpvar, '<=')+2:end));
 			if strcmp(allfields{index}, 'latency')
@@ -421,7 +430,10 @@ for index = 1:length(allfields)
 						 'so you may use the ''a<=b'' notation to select these values\n']);
 			end;
             tmpevent = EEG.event;
-            eval( [ 'tmpvarvalue = [ tmpevent(:).' allfields{index} ' ];'] );
+            % ======== JRI BUGFIX 3/6/14
+            %eval( [ 'tmpvarvalue = [ tmpevent(:).' allfields{index} ' ];'] );
+            tmpvarvalue = safeConcatenate(EEG.event, allfields{index});
+            
             Ieventtmp = [];
             for index2 = 1:length( tmpvar )
                 Ieventtmp = unique_bc( [ Ieventtmp find( tmpvarvalue ==tmpvar(index2)) ] );
@@ -532,3 +544,23 @@ function  chopedtext = choptext( tmptext )
     chopedtext = [ chopedtext ''' 10 ''' tmptext];
     chopedtext = chopedtext(7:end);
 return;
+
+% ======== JRI BUGFIX 3/6/14
+% safely concatenate a numeric field that may contain empty values, replacing them with nans
+% ---------------------------------------------------------
+function tmpvarvalue = safeConcatenate(S, fieldname)
+try
+  tmpvarvalue = {S.(fieldname)};
+  tmpvarvalue = cellfun(@(x) fastif(isempty(x),nan,x), tmpvarvalue);
+catch
+  %keep this style for backwards compatibility?
+  eval( [ 'tmpvarvalue = {S(:).' fieldname ' };'] );
+  for itmp = 1:length(tmpvarvalue),
+    if isempty(tmpvarvalue{itmp}),
+      tmpvarvalue{itmp} = nan;
+    end
+  end
+  tmpvarvalue = cell2mat(tmpvarvalue);
+end
+% ======== JRI BUGFIX 3/6/14
+
