@@ -26,6 +26,10 @@
 %                 the memmapfile_name must be .fdt.  The memmapfile
 %                 functions process files based on their suffix, and an
 %                 error will occur if you use a different suffix.
+%   'precision':    string describing data precision during loading
+%                   process. ['single' | 'double']. If this field is
+%                   ommitted, program will attempt to check eeglab_options.
+%                   If that doesn't work, then it will default to 'single'
 %
 % Outputs:
 %  cnt          - structure with the continuous data and other informations
@@ -74,6 +78,22 @@ try, r.blockread;  catch, r.blockread = []; end
 try, r.dataformat; catch, r.dataformat = 'auto'; end
 try, r.memmapfile; catch, r.memmapfile = ''; end
 
+%% DATA PRECISION CHECK
+if ~isfield(r, 'precision') || isempty(r.precision)
+    
+    % Try loading eeglab defaults. Otherwise, go with single precision.
+    try
+        eeglab_options;
+        if option_single==1
+            r.precision='single';
+        else
+            r.precision='double';
+        end % if option_single
+    catch
+        r.precision='single';
+    end % try catch
+    
+end % ~isfield(...
 
 sizeEvent1 = 8  ; %%% 8  bytes for Event1  
 sizeEvent2 = 19 ; %%% 19 bytes for Event2 
@@ -85,7 +105,7 @@ if nargin ==1
 end     
 
 fid = fopen(filename,'r', 'l');
-disp(['Loading file ' filename ' ...'])
+% disp(['Loading file ' filename ' ...'])
 
 h.rev               = fread(fid,12,'char');
 h.nextfile          = fread(fid,1,'long');
@@ -311,16 +331,57 @@ end
 % ----------------------------------
 begdata = ftell(fid);
 if strcmpi(r.dataformat, 'auto')
-    r.dataformat = 'int16';
-    if (h.nextfile > 0)
-        fseek(fid,h.nextfile+52,'bof');
-        is32bit = fread(fid,1,'char');       
-        if (is32bit == 1)
-            r.dataformat = 'int32';
-        end;
-        fseek(fid,begdata,'bof');
-    end;
-end;
+
+    % Chris Bishop 14/01/15
+    %   Auto detection relies on a single byte of data that is not written
+    %   with writecnt.m. Consequently, a CNT file read in using loadcnt and
+    %   written using writecnt cannot automatically detect data precision.
+    %   However, we can use other, more robust information to achieve this.
+    %
+    % 14/02/19 CWB: 
+    %   Actually, this information may not be reliable for some file types
+    %   (e.g., those supplied by Arno D. for testing purposes). A try catch
+    %   is probably the safest bet with an additional safeguard. 
+    
+    % If two bytes (16 bit) or 4 bytes (32 bit). If we can't tell, throw an
+    % error. 
+    try
+        % This approach relies on sensible headers. CWB has used this on
+        % many 32-bit datasets from SCAN 4.5, but earlier versions and
+        % testing 16-bit testing materials seem to have non-sensicle
+        % headers. So this won't work every time. 
+        
+        % DataPointsPerChannel
+        dppc=(h.eventtablepos-begdata)./h.nchannels;
+        
+        if dppc/2==h.numsamples
+            r.dataformat='int16';
+        elseif dppc/4==h.numsamples
+            r.dataformat='int32';
+        else
+            error('loadcnt:AutoDetectionFailure', 'loadcnt failed to automatically detect data precision');
+        end % if dppc./2 ...
+    catch
+        % original code commented out by CWB
+        r.dataformat = 'int16';
+        if (h.nextfile > 0)
+            
+            % Grab informative byte that tells us if this is 32 or 16 bit
+            % data. Note, however, that this is *not* available in files
+            % generated from writecnt.m. Thus, the try statement above is
+            % necessary. 
+            fseek(fid,h.nextfile+52,'bof');
+            is32bit = fread(fid,1,'char');       
+            
+            if (is32bit == 1)
+                r.dataformat = 'int32';
+            end;
+            
+            fseek(fid,begdata,'bof');       
+        end; % if (h.nextfile)>0
+    end % try/catch
+end; % if strcmpi ...
+
 enddata = h.eventtablepos;   % after data
 if strcmpi(r.dataformat, 'int16')
      nums    = floor((enddata-begdata)/h.nchannels/2); % floor due to bug 1254
@@ -345,6 +406,21 @@ if isempty(r.ldnsamples)
      end;
 end;
 
+%% CWB SAMPLE NUMBER CHECK
+%    Verifies that the number of samples we'll load later does not exceed
+%    the total number of available data samples. CWB ran across this error
+%    when he accidentally entered a total sample number larger than the
+%    total number of available data points. 
+%
+%   This throws a shoe with 16-bit data.
+if r.ldnsamples-r.sample1 > h.numsamples-r.sample1 && strcmpi(r.dataformat, 'int32')
+    tldnsamples=r.ldnsamples; 
+    r.ldnsamples=h.numsamples-r.sample1; 
+    warning('loadcnt:SampleError', ['User requested ' num2str(tldnsamples) ' loaded beginning at sample ' num2str(r.sample1) '.\n' ...
+        'Too few samples in data (' num2str(h.numsamples-r.sample1) '). Loaded samples adjusted to ' num2str(r.ldnsamples) '.']);        
+    clear tldnsamples; 
+end % r.ldnsamples-r.sample1 ...
+
 % channel offset
 % --------------
 if ~isempty(r.blockread)
@@ -355,7 +431,7 @@ if h.channeloffset > 1
             h.channeloffset);
 end;
 
-disp('Reading data .....')
+% disp('Reading data .....')
 if type == 'cnt' 
   
       % while (ftell(fid) +1 < h.eventtablepos)
@@ -381,7 +457,8 @@ if type == 'cnt'
           % samples.  This equates to 16MB and 32MB of memory for
           % 16 and 32 bit files, respectively.
           data_block = 4000000 ;
-          max_rows =  floor(data_block / h.nchannels);
+%           max_rows =  data_block / h.nchannels ;
+          max_rows=floor(data_block / h.nchannels ); % bug 1539
 
           %warning off ;
           max_written = h.nchannels * uint32(max_rows) ;
@@ -446,14 +523,35 @@ if type == 'cnt'
       % original code.
       if (bReadIntoMemory == true)
           if h.channeloffset <= 1
-                dat=fread(fid, [h.nchannels Inf], r.dataformat);
-                if size(dat,2) < r.ldnsamples
+                %% CWB:
+                %   EEGLAB first loads the whole file and then truncates
+                %   based on a few criteria. However, this does not work
+                %   well with large datasets that simply CANNOT be loaded
+                %   into memory. Modifying this section to just load in the
+                %   appropriate section of data.
+                
+                dat=fread(fid, [h.nchannels r.ldnsamples], r.dataformat);  
+                
+                %% CONVERT TO PROPER DATA PRECISION
+                %   Change to single precision if necessary. Or double if
+                %   the data type is not already a double. 
+                if strcmpi(r.precision, 'single')
                     dat=single(dat);
-                    r.ldnsamples = size(dat,2);
-                else
-                    dat=single(dat(:,1:r.ldnsamples));
-                end;
-          else
+                elseif strcmpi(r.precision, 'double') && ~isa(dat, 'double')
+                    dat=double(dat); 
+                end % if strcmpi
+                
+                % original code
+                %   CWB commented this out. 
+%                 dat=fread(fid, [h.nchannels Inf], r.dataformat);
+%                 if size(dat,2) < r.ldnsamples
+%                     dat=single(dat);
+%                     r.ldnsamples = size(dat,2);
+%                 else
+%                     dat=single(dat(:,1:r.ldnsamples));
+%                 end;
+          else           
+              warning('CWB has not tested this section of code, so use with caution'); 
               h.channeloffset = h.channeloffset/2;
               % reading data in blocks
               dat = zeros( h.nchannels, r.ldnsamples, 'single');
@@ -469,7 +567,7 @@ if type == 'cnt'
           
           % ftell(fid)
           if strcmpi(r.scale, 'on')
-            disp('Scaling data .....')
+%             disp('Scaling data .....')
             %%% scaling to microvolts
             for i=1:h.nchannels
                 bas=e(i).baseline;sen=e(i).senstivity;cal=e(i).calib;
@@ -482,7 +580,7 @@ if type == 'cnt'
       ET_offset = (double(h.prevfile) * (2^32)) + double(h.eventtablepos);    % prevfile contains high order bits of event table offset, eventtablepos contains the low order bits
       fseek(fid, ET_offset, 'bof'); 
 
-      disp('Reading Event Table...')
+%       disp('Reading Event Table...')
       eT.teeg   = fread(fid,1,'uchar');
       eT.size   = fread(fid,1,'ulong');
       eT.offset = fread(fid,1,'ulong');
@@ -560,7 +658,22 @@ if type == 'cnt'
           ev2 = [];
       end     
 
-      
+%% AT h.nextfile here.
+%   There's additional information at the end of this that needs to be
+%   written to file using writecnt in order to figure out what the
+%   precision is (32 or 16 bit) when reading in the file again.
+%
+%   With modified auto precision detection above, this is no longer
+%   necessary. 
+% f.junk=fread(fid);
+% f.junk=f.junk(1:end-1); % exclude the tag
+
+%% SAVE DATAFORMAT
+%   Potentially useful when writing data later, otherwise things have to be
+%   hardcoded.
+f.dataformat=r.dataformat;
+
+%% GET ENDTAG
 fseek(fid, -1, 'eof');
 t = fread(fid,'char');
 
@@ -586,7 +699,8 @@ end
 %%%% to change offest in bytes to points 
 if ~isempty(ev2)
     if r.sample1 ~= 0
-        fprintf(2,'Warning: events imported with a time shift might be innacurate\n');
+        warning('Events imported with a time shift might be innacurate'); 
+%         fprintf(2,'Warning: events imported with a time shift might be innacurate\n');
     end;
     ev2p=ev2; 
     ioff=900+(h.nchannels*75); %% initial offset : header + electordes desc 
