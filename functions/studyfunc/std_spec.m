@@ -54,7 +54,8 @@
 %
 % spectrum specific optional inputs:
 %   'specmode'   - ['psd'|'fft'|'pburg'|'pmtm'] method to compute spectral 
-%                  decomposition. 'psd' uses the spectopo function. 'fft' 
+%                  decomposition. 'psd' uses the spectopo function (optional
+%                  parameters to this function may be given as input). 'fft' 
 %                  uses a simple fft on each trial. For continuous data
 %                  data trials are extracted automatically (see 'epochlim'
 %                  and 'epochrecur' below). Two experimental modes are 
