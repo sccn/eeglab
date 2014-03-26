@@ -231,7 +231,11 @@ function EEG = eeg_interp(ORIEEG, bad_elec, method)
     
     tmpdata               = zeros(length(bad_elec), EEG.pnts, EEG.trials);
     tmpdata(origoodchans, :,:) = EEG.data;
-    tmpdata(badchans , :) = badchansdata;
+    %if input data are epoched reshape badchansdata for Octave compatibility...
+    if length(size(tmpdata))==3
+        badchansdata = reshape(badchansdata,length(badchans),size(tmpdata,2),size(tmpdata,3));
+    end
+    tmpdata(badchans,:,:) = badchansdata;
     EEG.data = tmpdata;
     EEG.nbchan = size(EEG.data,1);
     EEG = eeg_checkset(EEG);
