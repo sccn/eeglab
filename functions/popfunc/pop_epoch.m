@@ -364,7 +364,11 @@ if ~isempty(EEG.event) & isstr(EEG.event(1).type)
 	if ~isempty(boundaryindex)
 		indexepoch = [];
 		for tmpindex = boundaryindex
-			indexepoch = [indexepoch tmpevent(tmpindex).epoch ];
+            if isfield(tmpevent, 'epoch')
+    			indexepoch = [indexepoch tmpevent(tmpindex).epoch ];
+            else 
+                indexepoch = 1; % only one epoch
+            end;
 		end;
 		EEG = pop_select(EEG, 'notrial', indexepoch);
         % update the "indices of accepted events", too
