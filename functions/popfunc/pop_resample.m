@@ -236,7 +236,8 @@ function tmpeeglab = myresample(data, pnts, new_pnts, usesigproc);
     
     % anti-alias filter
     % -----------------
-    data         = eegfiltfft(data', 256, 0, 128*pnts/new_pnts);
+    data         = eegfiltfft(data', 256, 0, 128*pnts/new_pnts); % Downsample from 256 to 128 times the ratio of freq. 
+                                                                 % Code was verified by Andreas Widdman March  2014
     
     % spline interpolation
     % --------------------
