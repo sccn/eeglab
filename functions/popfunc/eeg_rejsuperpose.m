@@ -118,7 +118,9 @@ return;
 
 % subfunction rejecting an array ------ 
 function dest = rejarray( dest, ori)
-	if ~isempty(ori)
+    if isempty(dest)
+        dest = ori;
+    elseif ~isempty(ori)
 		dest = dest | ori;
 	end;
 return;
