@@ -9,5 +9,8 @@ function plugin_reactivate(foldername);
 
     disp([ 'Moving plugin ' foldername ' to plugins folder' ]);
     fulldeactivatedpluginfolder = fullfile(fileparts(which('eeglab.m')), 'plugins');
-    movefile(fullpluginfolder, fulldeactivatedpluginfolder);
-    
+    try
+        movefile(fullpluginfolder, fulldeactivatedpluginfolder);
+    catch
+        eeglab_error;
+    end;

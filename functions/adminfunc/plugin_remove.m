@@ -8,5 +8,8 @@ function plugin_remove(foldername);
     end;
 
     disp([ 'Removing plugin folder ' foldername ]);
-    rmdir(fullpluginfolder, 's');
-    
+    try
+        rmdir(fullpluginfolder, 's');
+    catch
+        eeglab_error;
+    end;
