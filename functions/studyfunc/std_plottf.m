@@ -156,7 +156,7 @@ if strcmpi(opt.plotmode, 'condensed')
     meanplot = meanplot/count;
     options = { 'chanlocs', opt.chanlocs, 'electrodes', 'off', 'cbar', 'on', ...
             'cmode', 'separate', opt.tftopoopt{:} };       
-        
+    if strcmpi(opt.datatype, 'erpim'), options = { options{:} 'ylabel' 'Trials' }; end;
     if strcmpi(opt.freqscale, 'log'), options = { options{:} 'logfreq', 'native' }; end;
     tftopo( meanplot', timevals, freqs, 'title', opt.titles{1}, options{:}); 
     currentHangle = gca;
