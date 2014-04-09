@@ -1112,6 +1112,7 @@ try
                 set(help_m, 'foregroundColor', [0.6, 0 0]);
             elseif isempty(eeglabUpdater.lastTimeChecked)
                 fprintf('Could not check for the latest EEGLAB version (internet may be disconnected).\n');
+                fprintf('To prevent long startup time, disable checking for new EEGLAB version (FIle > Memory and other options).\n');
             else
                 if ~newMajorRevision
                     fprintf('You are using the latest version of EEGLAB.\n');
@@ -1125,7 +1126,10 @@ try
                 stop(eeglabtimers);
                 delete(eeglabtimers);
             end;
-            start(timer('TimerFcn','try, eeglabUpdater.checkForNewVersion({''eeglab_event'' ''setup''}); catch, end; clear eeglabUpdater;', 'name', 'eeglabupdater', 'StartDelay', 20.0));
+            % This is disabled because it cause Matlab to hang in case
+            % there is no connection or the connection is available but not
+            % usable
+            % start(timer('TimerFcn','try, eeglabUpdater.checkForNewVersion({''eeglab_event'' ''setup''}); catch, end; clear eeglabUpdater;', 'name', 'eeglabupdater', 'StartDelay', 20.0));
         end;
     end;
 catch
