@@ -381,7 +381,7 @@ else
                 erpimstruct = std_erpimage(ALLEEG(1), 'channels', 1, 'recompute', 'on', 'savefile', 'off', erpimage_params{:});
                 figure; pos = get(gcf, 'position'); pos(3)=pos(3)*2; set(gcf, 'position', pos);
                 subplot(1,2,1); 
-                tftopo(erpimstruct.chan1, erpimstruct.times, 1:size(erpimstruct.chan1,1));
+                tftopo(erpimstruct.chan1, erpimstruct.times, 1:size(erpimstruct.chan1,1), 'ylabel', 'Trials');
                 subplot(1,2,2); 
                 text( 0.2, 0.8, strvcat( 'This is a test plot performed on', ...
                                          'the first channel of the first', ...
