@@ -816,7 +816,7 @@ if ismatlab
     uimenu( std_m,  'Label', 'Edit/plot clusters'                     , 'userdata', onstudy, 'CallBack', cb_clustedit);
 
     if ~iseeglabdeployed2
-        newerVersionMenu = uimenu( help_m, 'Label', 'Upgrade to the Latest Version'          , 'userdata', on, 'ForegroundColor', [0.6 0 0]);
+        %newerVersionMenu = uimenu( help_m, 'Label', 'Upgrade to the Latest Version'          , 'userdata', on, 'ForegroundColor', [0.6 0 0]);
         uimenu( help_m, 'Label', 'About EEGLAB'                           , 'userdata', on, 'CallBack', 'pophelp(''eeglab'');');
         uimenu( help_m, 'Label', 'About EEGLAB help'                      , 'userdata', on, 'CallBack', 'pophelp(''eeg_helphelp'');');
         uimenu( help_m, 'Label', 'EEGLAB menus'                           , 'userdata', on, 'CallBack', 'pophelp(''eeg_helpmenu'');','separator','on');
@@ -1058,12 +1058,12 @@ try
         
     % create a new GUI item (e.g. under Help)
     %newerVersionMenu = uimenu(help_m, 'Label', 'Upgrade to the Latest Version', 'visible', 'off', 'userdata', 'startup:on;study:on');
-    eeglabUpdater.menuItemHandle = newerVersionMenu;
     
     % set the callback to bring up the updater GUI
     icadefs; % for getting background color
     eeglabFolder = fileparts(mywhich('eeglab.m'));
-    eeglabUpdater.menuItemCallback = {@command_on_update_menu_click, eeglabUpdater, eeglabFolder, true, BACKEEGLABCOLOR};
+    %eeglabUpdater.menuItemHandle = []; %newerVersionMenu;
+    %eeglabUpdater.menuItemCallback = {@command_on_update_menu_click, eeglabUpdater, eeglabFolder, true, BACKEEGLABCOLOR};
 
     % place it in the base workspace.
     assignin('base', 'eeglabUpdater', eeglabUpdater);
@@ -1087,21 +1087,21 @@ try
                 posperiod = find(eeglabv == '.');
                 if isempty(posperiod), posperiod = length(eeglabv)+1; eeglabv = [ eeglabv '.0' ]; end;
                 if length(eeglabv(posperiod+1:end)) < 2, eeglabv = [ eeglabv '0' ]; end;
-                if length(eeglabv(posperiod+1:end)) < 3, eeglabv = [ eeglabv '0' ]; end;
-                eeglabv = [ eeglabv(1:posperiod+1) '.' eeglabv(posperiod+2) '.' eeglabv(posperiod+3) ];
+                %if length(eeglabv(posperiod+1:end)) < 3, eeglabv = [ eeglabv '0' ]; end;
+                eeglabv = [ eeglabv(1:posperiod+1) '.' eeglabv(posperiod+2) ]; %'.' eeglabv(posperiod+3) ];
 
                 stateWarning = warning('backtrace');
                 warning('backtrace', 'off');
                 if newMajorRevision
                     fprintf('\n');
                     warning( sprintf(['\nA critical revision of EEGLAB%d (%s) is also available <a href="%s">here</a>\n' ...
-                        'See <a href="%s">Release notes</a> for more informations\n' ...
+                        'See <a href="matlab: web(''%s'', ''-browser'')">Release notes</a> for more informations\n' ...
                         'You may disable this message using the Option menu\n' ], ...
                         floor(eeglabVersionNumber), eeglabv, eeglabUpdater.downloadUrl, ...
                         [ 'http://sccn.ucsd.edu/wiki/EEGLAB_revision_history_version_13' ]));
                 else
                     warning( sprintf(['\nA newer version of EEGLAB (%s) is available <a href="%s">here</a>\n' ...
-                        'See <a href="%s">Release notes</a> for more informations\n' ...
+                        'See <a href="matlab: web(''%s'', ''-browser'')">Release notes</a> for more informations\n' ...
                         'You may disable this message using the Option menu\n' ], ...
                         eeglabv, eeglabUpdater.downloadUrl, ...
                         [ 'http://sccn.ucsd.edu/wiki/EEGLAB_revision_history_version_13' ]));
