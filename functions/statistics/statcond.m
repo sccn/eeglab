@@ -182,6 +182,7 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
         if ~isfield(g, 'orivals'),   g.orivals = []; end;
         if ~isfield(g, 'arraycomp'), g.arraycomp = 'on'; end;
         if ~isfield(g, 'verbose'),   g.verbose = 'on'; end;
+        if ~isfield(g, 'tail'),      g.tail = 'both'; end;
         if ~isfield(g, 'variance'),  g.variance = 'homogenous'; end;
         if ~isfield(g, 'structoutput'), g.structoutput = 'on'; end;
         if ~isfield(g, 'returnresamplingarray'),   g.returnresamplingarray = 'off'; end;
@@ -191,8 +192,8 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
     if strcmpi(g.method, 'parametric'), g.method = 'param'; end;
     if strcmpi(g.method, 'permutation'), g.method = 'perm'; end;
     if strcmpi(g.verbose, 'on'), verb = 1; else verb = 0; end;
-    if strcmp(g.method, 'param' ) & exist('fcdf') ~= 2
-      myfprintf(verb,['statcond(): parametric testing requires fcdf() \n' ...
+    if strcmp(g.method, 'param' ) && exist('fcdf') ~= 2
+      myfprintf('on',['statcond(): parametric testing requires fcdf() \n' ...
                '            from the Matlab StatsticaL Toolbox.\n' ...
                '            Running nonparametric permutation tests\n.']);
       g.method = 'perm';
