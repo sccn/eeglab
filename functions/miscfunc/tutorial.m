@@ -34,6 +34,6 @@ icadefs % load icadefs.m globals including TUTDIR
 %else
 %   fprintf('ICA Matlab Toolbox Tutorial not found in the toolbox directory.\n');
    fprintf('Opening the toolbox www site ...\n\n');
-   web(TUTORIAL_URL);
+   web(TUTORIAL_URL, '-browser');
 %end
 
