@@ -233,9 +233,6 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
 
    try
        options = varargin;
-       for index = 1:length(options)
-           if iscell(options{index}) & ~iscell(options{index}{1}), options{index} = { options{index} }; end;
-       end;
        if ~isempty( varargin ), 
            for i = 1:2:numel(options)
                g.(options{i}) = options{i+1};
@@ -267,7 +264,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
    try, g.xgrid;		    catch, g.xgrid		= 'off'; end;
    try, g.ygrid;		    catch, g.ygrid		= 'off'; end;
    try, g.color;		    catch, g.color		= 'off'; end;
-   try, g.submean;			catch, g.submean	= 'on'; end;
+   try, g.submean;			catch, g.submean	= 'off'; end;
    try, g.children;			catch, g.children	= 0; end;
    try, g.limits;		    catch, g.limits	    = [0 1000*(size(data,2)-1)/g.srate]; end;
    try, g.freqlimits;	    catch, g.freqlimits	= []; end;
@@ -358,9 +355,6 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
    end;
    if ~iscell(g.colmodif)
    		g.colmodif = { g.colmodif };
-   end;
-   if strcmpi(g.submean, 'on')
-       g.submean = 'nan';
    end;
    if g.maxeventstring>20 % JavierLC
         disp('Error: maxeventstring must be equal or lesser than 20'); return;
