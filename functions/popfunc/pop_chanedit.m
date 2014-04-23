@@ -720,7 +720,7 @@ else
                 for index=1:length(chans)
                     fprintf(fid, '%d\t',  index);
                     for field = 1:length(fields)
-                        tmpval = getfield(chans, {index}, allfields{field});
+                        tmpval = getfield(chans, {index}, fields{field});
                         if isstr(tmpval)
                             fprintf(fid, '%s\t',  tmpval);
                         else
