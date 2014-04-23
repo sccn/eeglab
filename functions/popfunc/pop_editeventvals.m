@@ -15,10 +15,10 @@
 %                   field in event num. (Ex: {34 'latency' 320.4})
 %   'changeevent' - {num value1 value2 value3 ...} Change the values of
 %                   all fields in event num.
-%   'add','append' - {num value1 value2 value3 ...} Insert event after
-%                   event num, and assign value to structure fields.
-%   'insert'       - {num value1 value2 value3 ...} Insert event before
-%                   event num, and assign value to structure fields.
+%   'add','append','insert' - {num value1 value2 value3 ...} Insert event
+%                   before or at event num, and assign value to structure 
+%                   fields. Note that the latency field must be in second 
+%                   and will be converted to data sample.
 %   'delete'      - vector of indices of events to delete
 %
 % Outputs:
