@@ -18,7 +18,9 @@
 %   'add','append','insert' - {num value1 value2 value3 ...} Insert event
 %                   before or at event num, and assign value to structure 
 %                   fields. Note that the latency field must be in second 
-%                   and will be converted to data sample.
+%                   and will be converted to data sample. Note also that 
+%                   the index of the event is often irrelevant, as events
+%                   will be automatically resorted by latencies.
 %   'delete'      - vector of indices of events to delete
 %
 % Outputs:
