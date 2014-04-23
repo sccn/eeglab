@@ -209,6 +209,10 @@ if ~isempty(g.signifs)
         end;
     end
 end;
+if length(g.selchans) ~= nchans, 
+     selchans_opt = { 'plotchans' g.selchans };
+else selchans_opt = { };
+end;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % process time/freq data points
@@ -271,12 +275,12 @@ end;
 if ~isempty(g.plotscalponly)
     [tmp fi] = min(abs(freqs-g.plotscalponly(2)));
     [tmp ti] = min(abs(times-g.plotscalponly(1)));
-    scalpmap = squeeze(tfdataori(fi, ti, g.selchans));   
+    scalpmap = squeeze(tfdataori(fi, ti, :));   
 
     if ~isempty(varargin)
-        topoplot(scalpmap,g.chanlocs,'electrodes','on', varargin{:}); 
+        topoplot(scalpmap,g.chanlocs,'electrodes','on', selchans_opt{:}, varargin{:}); 
     else
-        topoplot(scalpmap,g.chanlocs,'electrodes','on'); 
+        topoplot(scalpmap,g.chanlocs,'electrodes','on', selchans_opt{:}); 
     end;
     % 'interlimits','electrodes')
     axis square;
@@ -539,15 +543,15 @@ if ~isempty(g.timefreqs)
         % Plot scalp map using topoplot()
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         axes(topoaxes(n));
-        scalpmap = squeeze(mean(mean(tfdataori(freqidx{n},timeidx{n},g.selchans),1),2));   
+        scalpmap = squeeze(mean(mean(tfdataori(freqidx{n},timeidx{n},:),1),2));   
 
         %topoplot(scalpmap,g.chanlocs,'maplimits',[g.limits(5) g.limits(6)],...
         %            'electrodes','on');
 
         if ~isempty(varargin)
-            topoplot(scalpmap,g.chanlocs,'electrodes','on', varargin{:}); 
+            topoplot(scalpmap,g.chanlocs,'electrodes','on', selchans_opt{:}, varargin{:}); 
         else
-            topoplot(scalpmap,g.chanlocs,'electrodes','on'); 
+            topoplot(scalpmap,g.chanlocs,'electrodes','on', selchans_opt{:}); 
         end;
         % 'interlimits','electrodes')
         axis square;
