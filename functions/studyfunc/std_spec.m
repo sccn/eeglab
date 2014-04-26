@@ -60,7 +60,8 @@
 %                  data trials are extracted automatically (see 'epochlim'
 %                  and 'epochrecur' below). Two experimental modes are 
 %                  'pmtm' and 'pbug' which use multitaper and the Burg 
-%                  method to compute spectrum respectively.
+%                  method to compute spectrum respectively. NOTE THAT SOME
+%                  OF THESE OPTIONS REQUIRE THE SIGNAL PROCESSING TOOLBOX.
 %   'epochlim'   - [min max] for FFT on continuous data, extract data
 %                  epochs with specific epoch limits in seconds (see also
 %                  'epochrecur' below). Default is [0 1].
