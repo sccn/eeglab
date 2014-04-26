@@ -102,7 +102,7 @@ if length(g.chans) == 1 & g.chans(1) ~= 0, error('can not plot a single ERP'); e
 %%%%%%%%%%%%%%% Substitute defaults for missing parameters %%%%%%%%%%%%%%%%
 %
 
-if isempty(g.chanlocs) & isempty(g.geom)
+if (isempty(g.chanlocs) || ~isfield(g.chanlocs, 'theta')) && isempty(g.geom)
     n = ceil(sqrt(length(g.chans)));
     g.geom = [n n];
 end
@@ -160,7 +160,7 @@ axis('off')
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%% Read chan_locs %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-if isempty(g.chanlocs) % plot in a rectangular grid
+if isempty(g.chanlocs) || ~isfield(g.chanlocs, 'theta') % plot in a rectangular grid
     ISRECT = 1;
     ht = g.geom(1);
     wd = g.geom(2);
@@ -201,7 +201,7 @@ if isempty(g.chanlocs) % plot in a rectangular grid
 else % read chan_locs file
     % read the channel location file
     % ------------------------------
-    if isstruct(g.chanlocs)
+    if isstruct(g.chanlocs) 
         nonemptychans = cellfun('isempty', { g.chanlocs.theta });
         nonemptychans = find(~nonemptychans);
         [tmp channames Th Rd] = readlocs(g.chanlocs(nonemptychans));
