@@ -343,6 +343,9 @@ else
             error('There is a problem with your STUDY, contact EEGLAB support');
         else
             disp('Duplicate entry detected in new design, reinitializing design with new file names');
+            if length(dbstack) > 10
+                error('There is probably an issue with the folder names - move the files and try again');
+            end;
             [STUDY com] = std_makedesign(STUDY, ALLEEG, designind, orivarargin{:}, 'defaultdesign', 'forceoff');
             return;
         end
