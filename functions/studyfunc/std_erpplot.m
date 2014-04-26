@@ -29,6 +29,7 @@
 %   'plotsubjects' - ['on'|'off'] When 'on', plot ERP of all subjects.
 %   'noplot'   - ['on'|'off'] When 'on', only return output values. Default
 %                is 'off'.
+%   'topoplotopt' - [cell array] options for topoplot plotting.
 %
 % Optional inputs for component plotting:
 %   'clusters' - [numeric vector|'all'] indices of clusters to plot.
@@ -149,10 +150,11 @@ opt = finputcheck( options, ...
                                'mode'        'string'  []              ''; % for backward compatibility (now used for statistics)
                                'comps'       { 'string','integer' } [] []; % for backward compatibility
                                'statmode'    'string'  { 'subjects','common','trials' } 'subjects'; % ignored
-                               'plotmode'    'string' { 'normal','condensed' }  'normal';
-                               'unitx'       'string' { 'ms','Hz' }    'ms';
+                               'plotmode'    'string'  { 'normal','condensed' }  'normal';
+                               'unitx'       'string'  { 'ms','Hz' }    'ms';
                                'plotsubjects' 'string' { 'on','off' }  'off';
-                               'noplot'      'string' { 'on','off' }  'off';
+                               'noplot'      'string'  { 'on','off' }  'off';
+                               'topoplotopt' 'cell'    {}              { 'style' 'both' };
                                'subject'     'string'  []              '' }, 'std_erpplot');
 if isstr(opt), error(opt); end;
 
@@ -280,7 +282,7 @@ if ~isempty(opt.channels)
     % ----
     if ~isempty(params.topotime) && all(~isnan(params.topotime))
         std_chantopo(erpdata, 'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, 'caxis', params.ylim, ...
-                                      'chanlocs', locs, 'threshold', alpha, 'titles', alltitles);
+                                      'chanlocs', locs, 'threshold', alpha, 'titles', alltitles, 'topoplotopt', opt.topoplotopt{:});
     else
         std_plotcurve(alltimes, erpdata, 'groupstats', pgroup, 'legend', alllegends, 'condstats', pcond, 'interstats', pinter, ...
             'chanlocs', locs, 'titles', alltitles, 'plotsubjects', opt.plotsubjects, 'plotstderr', opt.plotstderr, ...
