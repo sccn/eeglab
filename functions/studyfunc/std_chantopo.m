@@ -62,7 +62,7 @@ opt = finputcheck( varargin, { 'ylim'        'real'    []              [];
                                'condstats'   'cell'    []              {};
                                'interstats'  'cell'    []              {};
                                'subplotpos'  'integer' []              [];
-                               'topoplotopt' 'cell'    []              { { 'style', 'both' } };
+                               'topoplotopt' 'cell'    []              { 'style', 'both' };
                                'binarypval'  'string'  { 'on','off' }  'on';
                                'datatype'    'string'  { 'ersp','itc','erp','spec' }    'erp';
                                'caxis'       'real'    []              [] }, 'std_chantopo', 'ignore'); %, 'ignore');
