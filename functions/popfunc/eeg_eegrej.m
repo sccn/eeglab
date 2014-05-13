@@ -49,6 +49,8 @@ if isempty(regions)
 	return;
 end;
 
+regions = sortrows(regions,3); % Arno and Ramon on 5/13/2014 for bug 1605
+
 try
     % For AMICA probabilities...Temporarily add model probabilities as channels
     %-----------------------------------------------------
