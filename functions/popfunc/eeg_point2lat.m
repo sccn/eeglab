@@ -17,7 +17,7 @@
 %
 % Example:
 %   tmpevent = EEG.event;
-%   eeg_point2lat( [ tmpevent.latency ], [], EEG.srate);
+%   eeg_point2lat( [ tmpevent.latency ], [], EEG.srate, [EEG.xmin EEG.xmax]);
 %   % returns the latency of all events in second for a continuous
 %   % dataset EEG
 %
