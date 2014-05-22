@@ -224,7 +224,7 @@ if plottimes_set == 1
 
   g.plottimes = sort(g.plottimes); % put map latencies in ascending order, 
                                % else map lines would cross.
-  xshift = [x(2:frames) xmax];
+  xshift = [x(2:frames) xmax+1]; % 5/22/2014 Ramon: '+1' was added to avoid errors when time== max(x) in line 231
   plotframes = ones(size(g.plottimes));
   for t = 1:ntopos
     time = g.plottimes(t);
