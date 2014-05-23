@@ -75,7 +75,8 @@ if ~isempty(filename)
     end
     [filepath filename ext] = fileparts(STUDYfile);
     STUDY.filename = [filename ext];
-    STUDY.filepath = filepath;
+    STUDY.etc.oldfilepath = STUDY.filepath;
+    STUDY.filepath        = filepath;
 else
     error(['pop_loadstudy(): No STUDY set file provided.']);
 end
