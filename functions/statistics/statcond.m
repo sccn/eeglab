@@ -337,7 +337,7 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
                         try
                             myfprintf(verb,'...');                        
                             res = surrogdistrib( data, 'method', g.method, 'pairing', g.paired, 'naccu', g.naccu);
-                            surrogval = anova1_cell( res );
+                            surrogval = anova1_cell_select( res, g.paired );
                         catch,
                             myfprintf(verb,'\nSuperfast array computation failed because of memory limitation, reverting to standard computing');
                             g.arraycomp = 'off';
