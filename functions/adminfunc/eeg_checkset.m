@@ -272,9 +272,8 @@ for inddataset = 1:length(ALLEEG)
                     end;
                 case 'event',
                     if isempty(EEG.event)
-                        errordlg2(strvcat('Requires events. You need to dd events first.', ...
-                            'Use "Edit > event fields" to create event fields.', ...
-                            'Or use "File > Import event info" or "File > Import epoch info"'), 'Error');
+                        errordlg2(strvcat('Requires events. You need to add events first.', ...
+                            'Use "File > Import event info" or "File > Import epoch info"'), 'Error');
                         return;
                     end;
                 case 'chanloc',
