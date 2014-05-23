@@ -137,9 +137,7 @@ if ~isnan(g.align.val)
         error('Setevent: pre-existing events do not have a latency field for re-alignment');
     end;    
     switch g.append
-        % What is the reasoning behind this warning? It seems misleading. TobyF
-        % 3/28/2007
-        case {'yes' '''yes'''}, disp('Setevent warning: using align, events should not be appended but erased');
+        case {'yes' '''yes'''}, disp('Setevent warning: cannot align and append events at the same time; disabling event alignment');
     end;
     if g.align.val < 0
         g.align.event = oldevent(1).latency;
