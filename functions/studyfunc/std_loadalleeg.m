@@ -48,6 +48,8 @@ function ALLEEG = std_loadalleeg(varargin)
         return;
     end;
 
+    genpath = '';
+    oldgenpath = '';
     if isstruct(varargin{1})
         datasets = {varargin{1}.datasetinfo.filename};
         try,
@@ -57,8 +59,10 @@ function ALLEEG = std_loadalleeg(varargin)
             paths(:) = { '' };
         end;
         genpath = varargin{1}.filepath;
+        if isfield(varargin{1}.etc, 'oldfilepath')
+            oldgenpath = varargin{1}.etc.oldfilepath;
+        end;
     else
-        genpath = '';
         paths = varargin{1};
         if nargin > 1
             datasets = varargin{2};
@@ -88,7 +92,24 @@ function ALLEEG = std_loadalleeg(varargin)
         [sub2 sub1] = fileparts(char(paths{dset}));
         [sub3 sub2] = fileparts(sub2);
         
-        if exist(fullfile(char(paths{dset}), datasets{dset})) == 2
+        % priority is given to relative path of the STUDY if STUDY has moved
+        if ~isequal(genpath, oldgenpath)
+            disp('Warning: STUDY moved since last saved, trying to load data files using relative path');
+            if  ~isempty(strfind(char(paths{dset}), oldgenpath))
+                relativePath = char(paths{dset}(length(oldgenpath)+1:end));
+                relativePath = fullfile(genpath, relativePath);
+            else
+                disp('Important warning: relative path cannot calculated, make sure the correct data files are loaded');
+                relativePath = char(paths{dset});
+            end;                
+        else
+            relativePath = char(paths{dset});
+        end;
+        
+        % load data files
+        if exist(fullfile(relativePath, datasets{dset})) == 2
+            EEG = pop_loadset('filename', datasets{dset}, 'filepath', relativePath, 'loadmode', 'info', 'check', 'off');
+        elseif exist(fullfile(char(paths{dset}), datasets{dset})) == 2
             EEG = pop_loadset('filename', datasets{dset}, 'filepath', char(paths{dset}), 'loadmode', 'info', 'check', 'off');
         elseif exist( fullfile(genpath, datasets{dset})) == 2    
             [tmpp tmpf ext] = fileparts(fullfile(genpath, datasets{dset}));
