@@ -320,7 +320,7 @@ if isstr(filename)
    g.filetype = lower(g.filetype);
    if isempty(g.filetype)
        switch lower(fileextension),
-        case {'loc' 'locs' }, g.filetype = 'loc';
+        case {'loc' 'locs' 'eloc'}, g.filetype = 'loc'; % 5/27/2014 Ramon: 'eloc' option introduced.
         case 'xyz', g.filetype = 'xyz'; 
           fprintf( [ 'WARNING: Matlab Cartesian coord. file extension (".xyz") detected.\n' ... 
                   'If importing EGI Cartesian coords, force type "sfp" instead.\n'] );
