@@ -45,30 +45,37 @@ allCell1 = {  STUDY.design(1).cell.filebase };
 allCell2 = { STUDY2.design(1).cell.filebase };
 
 fileExtensions = { 'daterp' 'datspec' 'datersp' 'daterpim' 'dattimef' 'datitc' 'daterpim' ...
-                   'icaerp' 'icaspec' 'icaersp' 'icaerpim' 'icatimef' 'icaitc' 'icaerpim' };
+    'icaerp' 'icaspec' 'icaersp' 'icaerpim' 'icatimef' 'icaitc' 'icaerpim' };
 
 if ~isequal(allCell1, allCell2)
-    res = questdlg2(['Old STUDY design data files have been detected.' 10 ...
-        'EEGLAB wants to rename these files to improve consistency' 10 ...
-        'and stability. No dataset will be renamed, only preprocessed' 10 ...
-        'STUDY data files.' ], 'Rename STUDY data files', 'Cancel', ...
-        'Rename', 'Rename');
     
-    if strcmpi(res, 'rename')
-        STUDY = pop_savestudy(STUDY, ALLEEG, 'savemode', 'resave');
-        for iCell = 1:length(allCell1)
-            
-            % scan file extensions
-            for iExt = 1:length(fileExtensions)
-                files = dir( [ allCell1{iCell} '.' fileExtensions{iExt} ]);
-                if ~isempty(files) && ~strcmpi(allCell1{iCell}, allCell2{iCell})
-                    movefile( [ allCell1{iCell} '.' fileExtensions{iExt} ], ...
-                        [ allCell2{iCell} '.' fileExtensions{iExt} ]);
-                    disp([ 'Moving ' [ allCell1{iCell} '.' fileExtensions{iExt} ] ' to ' [ allCell2{iCell} '.' fileExtensions{iExt} ] ]);
+    thereIsAFileNotDesign = false;
+    for index = 1:length(allCell1), if length(allCell1{index}) < 6 || all(allCell1{index}(1:6) == 'design'), thereIsAFileNotDesign = true; end; end;
+    for index = 1:length(allCell1), if length(allCell1{index}) < 6 || all(allCell1{index}(1:6) == 'design'), thereIsAFileNotDesign = true; end; end;
+    
+    if thereIsAFileNotDesign
+        res = questdlg2(['Old STUDY design data files have been detected.' 10 ...
+            'EEGLAB wants to rename these files to improve consistency' 10 ...
+            'and stability. No dataset will be renamed, only preprocessed' 10 ...
+            'STUDY data files.' ], 'Rename STUDY data files', 'Cancel', ...
+            'Rename', 'Rename');
+        
+        if strcmpi(res, 'rename')
+            STUDY = pop_savestudy(STUDY, ALLEEG, 'savemode', 'resave');
+            for iCell = 1:length(allCell1)
+                
+                % scan file extensions
+                for iExt = 1:length(fileExtensions)
+                    files = dir( [ allCell1{iCell} '.' fileExtensions{iExt} ]);
+                    if ~isempty(files) && ~strcmpi(allCell1{iCell}, allCell2{iCell})
+                        movefile( [ allCell1{iCell} '.' fileExtensions{iExt} ], ...
+                            [ allCell2{iCell} '.' fileExtensions{iExt} ]);
+                        disp([ 'Moving ' [ allCell1{iCell} '.' fileExtensions{iExt} ] ' to ' [ allCell2{iCell} '.' fileExtensions{iExt} ] ]);
+                    end;
                 end;
             end;
+            STUDY = STUDY2;
+            STUDY = pop_savestudy(STUDY, ALLEEG, 'savemode', 'resave');
         end;
-        STUDY = STUDY2;
-        STUDY = pop_savestudy(STUDY, ALLEEG, 'savemode', 'resave');
     end;
 end;
