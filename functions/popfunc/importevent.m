@@ -39,6 +39,9 @@
 %               A negative value can also be used; then event number (-num) 
 %               is aligned to the first pre-existing event.  Default is 0. 
 %               (NaN-> no alignment).
+%  'optimmeas' - ['median'|'mean'] Uses either the median of the mean
+%               distance to align events. Default is 'mean'. Median is
+%               preferable if events are missing in the event file.
 %  'optimalign' - ['on'|'off'] Optimize the sampling rate of the new events so 
 %               they best align with old events. Default is 'on'.
 %
@@ -99,6 +102,7 @@ g = finputcheck( varargin, { 'fields'    'cell'     []         {};
                          'event'     { 'cell';'real';'string' }     []    [];
                          'align'     'integer'  []         NaN;
                          'optimalign' 'string'  { 'on';'off' }         'on';
+                         'optimmeas'  'string'  { 'median';'mean' }         'mean';
                          'delim'     {'integer';'string'}   []         char([9 32 44])}, 'importevent');
 if isstr(g), error(g); end;
 if ~isempty(g.indices), g.append = 'yes'; end;
@@ -297,9 +301,9 @@ function event = recomputelatency( event, indices, srate, timeunit, align, oldev
         end;
         
         try
-            newfactor = fminsearch('eventalign',1,[],newlat, oldlat);
+            newfactor = fminsearch('eventalign',1,[],newlat, oldlat, g.optimmeas);
         catch 
-            newfactor = fminsearch('eventalign',1,[],[],newlat, oldlat); % Octave
+            newfactor = fminsearch('eventalign',1,[],[],newlat, oldlat, g.optimmeas); % Octave
         end;
         fprintf('Best sampling rate ratio found is %1.7f. Below latencies after adjustment\n', newfactor);
         if newfactor > 1.01 | newfactor < 0.99
