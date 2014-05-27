@@ -179,7 +179,7 @@ else
         end
       erpimageframes = floor(size(EEG.data,2)/ERPIMAGELINES);
       erpimageframestot = erpimageframes*ERPIMAGELINES;
-      eegtimes = linspace(0, erpimageframes-1, EEG.srate/1000);
+      eegtimes = linspace(0, erpimageframes-1, length(erpimageframes)); % 05/27/2014 Ramon: length(erpimageframes) by EEG.srate/1000  in eegtimes = linspace(0, erpimageframes-1, EEG.srate/1000);
       if typecomp == 1 % plot channel
            offset = nan_mean(EEG.data(chanorcomp,:));
            % Note: we don't need to worry about ERP limits, since ERPs
