@@ -19,9 +19,13 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function mindiff = eventalign(factor, a, b)
-    
+function mindiff = eventalign(factor, a, b, measure)
+
        diffarray = abs(factor*a-b)';
        [allmins poss] = min(diffarray);
-       mindiff = mean(allmins);
        
+       if strcmpi(measure, 'mean')
+           mindiff = mean(allmins);
+       else
+           mindiff = median(allmins);
+       end;
