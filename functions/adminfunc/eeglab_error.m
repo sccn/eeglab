@@ -30,18 +30,28 @@ function eeglab_error;
     % ----------------
     tmplasterr = lasterr;
     [iseeglaberror tmplasterr header] = testeeglaberror(tmplasterr);
+    ft_error = false;
     if iseeglaberror
         errordlg2(tmplasterr, header);
     else
         try
             tmp = lasterror;
+            if length(tmp.stack(1).name) && all(tmp.stack(1).name(1:3) == 'ft_')
+                ft_error = true;
+            end;
             tmperr = [ 'EEGLAB error in function ' tmp.stack(1).name '() at line ' int2str(tmp.stack(1).line) ':' 10 10 lasterr ];
         catch % Matlab 5 and when the stack is empty
             tmperr = [ 'EEGLAB error:' 10 10 tmplasterr ];
         end;
-        tmperr = [ tmperr 10 10 'If you think this is a bug, please submit a detailed' 10 ...
-                                'description of how to reproduce the problem (and upload' 10 ...
-                                'a small dataset) at http://sccn.ucsd.edu/eeglab/bugzilla' ];
+        if ~ft_error
+            tmperr = [ tmperr 10 10 'If you think this is a bug, please submit a detailed' 10 ...
+                'description of how to reproduce the problem (and upload' 10 ...
+                'a small dataset) at http://sccn.ucsd.edu/eeglab/bugzilla' ];
+        else
+            tmperr = [ tmperr 10 10 'This is a problem with FIELDTRIP. The Fieldtrip version you downloaded' 10 ...
+                'is corrupted. Please manually replace Fieldtrip with an earlier version' 10 ...
+                'and/or email the Fieldtrip developpers so they can fix the issue.' ];
+        end;
         errordlg2(tmperr, header);
     end;
     
