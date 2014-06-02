@@ -2,8 +2,10 @@
 %
 % Usage: 
 %        >> clusters = std_findsameica(ALLEEG);
+%        >> clusters = std_findsameica(ALLEEG,icathreshold);
 % Inputs:
-%   ALLEEG  - a vector of loaded EEG dataset structures of all sets in the STUDY set.
+%   ALLEEG           - a vector of loaded EEG dataset structures of all sets in the STUDY set.
+%   icathreshold     - Threshold to compare icaweights
 %
 % Outputs:
 %   cluster - cell array of groups of datasets
@@ -28,8 +30,15 @@
 
 % Coding notes: Useful information on functions and global variables used.
 
-function cluster = std_findsameica(ALLEEG);
+function cluster = std_findsameica(ALLEEG, varargin);
 
+% 6/2/2014 Ramon : Allow ica threshold as input.
+if nargin == 1
+    icathreshold = 2e-5;
+elseif nargin == 2;
+    icathreshold = varargin{1};
+end
+    
 cluster = { [1] };
 for index = 2:length(ALLEEG)
     
@@ -37,7 +46,7 @@ for index = 2:length(ALLEEG)
     for c = 1:length(cluster)
         if all(size(ALLEEG(cluster{c}(1)).icaweights) == size(ALLEEG(index).icaweights))
             %if isequal(ALLEEG(cluster{c}(1)).icaweights, ALLEEG(index).icaweights) 
-            if sum(sum(abs(ALLEEG(cluster{c}(1)).icaweights-ALLEEG(index).icaweights))) < 2e-5
+            if sum(sum(abs(ALLEEG(cluster{c}(1)).icaweights-ALLEEG(index).icaweights))) < icathreshold
                 cluster{c}(end+1) = index;
                 found = 1;
                 break;
