@@ -86,6 +86,7 @@ function [ ori_vals, df, pvals ] = statcondfieldtrip( data, varargin );
     if isstr(g), error(g); end;    
     if ~isempty(g.mode), g.method = g.mode; end;
     if strcmpi(g.method, 'parametric'), g.method = 'param'; end;
+    if strcmpi(g.method, 'permutation'), g.method = 'montecarlo'; end;
     if ~isempty(g.neighbours) && isempty(g.chanlocs)
         g.chanlocs = struct('labels', { g.neighbours(:).label });
     end;
@@ -130,12 +131,13 @@ function [ ori_vals, df, pvals ] = statcondfieldtrip( data, varargin );
         cfg.neighbours = g.neighbours;
     end;
     if isfield(cfg, 'mcorrect')
-        cfg.correctm = cfg.mcorrect;
+         cfg.correctm = cfg.mcorrect;
+    else cfg.mcorrect = [];
     end;
     cfg.feedback    = 'no';
     cfg.ivar        = 1;
     cfg.alpha       = fastif(alphaset, g.alpha, 0.05);
-    if ~isempty(g.naccu), cfg.numrandomization = g.naccu; end;
+    cfg.numrandomization = g.naccu; 
     
     % test if data can be paired
     % --------------------------
