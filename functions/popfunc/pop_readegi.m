@@ -3,7 +3,7 @@
 % Usage:
 %   >> EEG = pop_readegi;             % a window pops up
 %   >> EEG = pop_readegi( filename );
-%   >> EEG = pop_readegi( filename, datachunks, forceversion, fileloc); 
+%   >> EEG = pop_readegi( filename, datachunks, forceversion, fileloc);
 %
 % Inputs:
 %   filename       - EGI file name
@@ -36,22 +36,22 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [EEG, command] = pop_readegi(filename, datachunks, forceversion, fileloc); 
-    
+function [EEG, command] = pop_readegi(filename, datachunks, forceversion, fileloc);
+
 EEG = [];
 command = '';
 if nargin < 4, fileloc = 'auto'; end;
 disp('Warning: This function can only import continuous files or');
 disp('         epoch files with only one length for data epochs');
 
-if nargin < 1 
-	% ask user
-	[filename, filepath] = uigetfile('*.RAW;*.raw', ...
-						'Choose an EGI RAW file -- pop_readegi()'); 
+if nargin < 1
+    % ask user
+    [filename, filepath] = uigetfile('*.RAW;*.raw', ...
+        'Choose an EGI RAW file -- pop_readegi()');
     drawnow;
-	if filename == 0 return; end;
-	filename = [filepath filename];
-
+    if filename == 0 return; end;
+    filename = [filepath filename];
+    
     fid = fopen(filename, 'rb', 'b');
     if fid == -1, error('Cannot open file'); end
     head = readegihdr(fid); % read EGI file header
@@ -87,7 +87,7 @@ elseif exist('datachunks')
     [Head EEG.data Eventdata SegCatIndex] = readegi( filename, datachunks);
     forceversion = [];
 else
-    [Head EEG.data Eventdata SegCatIndex] = readegi( filename);    
+    [Head EEG.data Eventdata SegCatIndex] = readegi( filename);
     forceversion = [];
 end
 if ~isempty(Eventdata) & size(Eventdata,2) == size(EEG.data,2)
@@ -99,7 +99,7 @@ EEG.nbchan          = size(EEG.data,1);
 EEG.srate           = Head.samp_rate;
 EEG.trials          = Head.segments;
 EEG.pnts            = Head.segsamps;
-EEG.xmin            = 0; 
+EEG.xmin            = 0;
 
 % importing the events
 % --------------------
@@ -108,11 +108,11 @@ if ~isempty(Eventdata)
     orinbchans = EEG.nbchan;
     for index = size(Eventdata,1):-1:1
         EEG = pop_chanevent( EEG, orinbchans-size(Eventdata,1)+index, 'edge', 'leading', ...
-                             'delevent', 'off', 'typename', Head.eventcode(index,:), ...
-                             'nbtype', 1, 'delchan', 'on');
-         Head.eventcode(end,:) = [];
+            'delevent', 'off', 'typename', Head.eventcode(index,:), ...
+            'nbtype', 1, 'delchan', 'on');
+        Head.eventcode(end,:) = [];
     end;
-
+    
     % renaming event codes
     % --------------------
     try,
@@ -121,7 +121,7 @@ if ~isempty(Eventdata)
         if isstr(alltypes{1})
             indepoc = strmatch('epoc', lower(alltypes), 'exact');
             indtim  = strmatch('tim0', lower(alltypes), 'exact');
-        
+            
             % if epoc but no tim0 then epoc represent pauses in recording
             if isempty(indtim) & ~isempty(indepoc)
                 for index = indepoc
@@ -136,25 +136,30 @@ if ~isempty(Eventdata)
                 else
                     disp('Warning: data epochs detected but wrong data size');
                 end;
-            end; 
+            end;
         end;
-     catch, disp('Warning: event renaming failed'); end;
+    catch, disp('Warning: event renaming failed'); end;
 end;
 
 % adding segment category indices
 % -------------------------------
-if ~isempty(SegCatIndex) & EEG.trials > 1
-    if ~isempty(EEG.event)
-        for index = 1:length(EEG.event)
-            EEG.event(index).category = Head.catname{SegCatIndex(EEG.event(index).epoch)};
+if ~isempty(SegCatIndex) && EEG.trials > 1
+    try
+        if ~isempty(EEG.event)
+            for index = 1:length(EEG.event)
+                EEG.event(index).category = Head.catname{SegCatIndex(EEG.event(index).epoch)};
+            end;
+        else % create time-locking events
+            for trial = 1:EEG.trials
+                EEG.event(trial).epoch    = trial;
+                EEG.event(trial).type     = 'TLE';
+                EEG.event(trial).latency  = -EEG.xmin*EEG.srate+1+(trial-1)*EEG.pnts;
+                EEG.event(trial).category = Head.catname{SegCatIndex(trial)};
+            end;
         end;
-    else % create time-locking events
-        for trial = 1:EEG.trials
-            EEG.event(trial).epoch    = trial; 
-            EEG.event(trial).type     = 'TLE';
-            EEG.event(trial).latency  = -EEG.xmin*EEG.srate+1+(trial-1)*EEG.pnts;
-            EEG.event(trial).category = Head.catname{SegCatIndex(trial)};
-        end;
+    catch,
+        disp('Warning: error while importing trial categories');
+        EEG.event = rmfield(EEG.event, 'category');
     end;
 end;
 EEG = eeg_checkset(EEG, 'makeur');
@@ -162,12 +167,12 @@ EEG = eeg_checkset(EEG, 'eventconsistency');
 
 % importing channel locations
 % ---------------------------
-if nargin < 1 
+if nargin < 1
     warndlg2( [ 'EEGLAB will now import a default electrode location file' 10 ...
-                'for your data. Note that this might not correspond' 10 ...
-                'to your montage as EGI has different versions of caps.' 10 ...
-                'Check your montage in the channel editor and import' 10 ...
-                'the correct location file if necessary.' ]);
+        'for your data. Note that this might not correspond' 10 ...
+        'to your montage as EGI has different versions of caps.' 10 ...
+        'Check your montage in the channel editor and import' 10 ...
+        'the correct location file if necessary.' ]);
 end;
 if all(EEG.data(end,1:10) == 0)
     disp('Deleting empty data reference channel (reference channel location is retained)');
@@ -183,8 +188,8 @@ if ~isempty(fileloc)
     end;
 end;
 
-if nargin < 1 
-    command = sprintf('EEG = pop_readegi(''%s'', %s);', filename, vararg2str({datachunks forceversion fileloc }) ); 
+if nargin < 1
+    command = sprintf('EEG = pop_readegi(''%s'', %s);', filename, vararg2str({datachunks forceversion fileloc }) );
 end;
 
 return;
