@@ -50,6 +50,7 @@
 %
 % Note: By default, if several optional inputs are given, the function
 %       performs their conjunction (&).
+%       Boundary events are keeped by default??. (6/12/2014 Ramon)
 %
 % Author: Arnaud Delorme, CNL / Salk Institute, 27 Jan 2002-
 %
@@ -324,7 +325,9 @@ for index = 1:length(allfields)
             eval( [ 'tmpevent = EEG.event; tmpvarvalue = {tmpevent(:).' allfields{index} '};'] );
             Ieventtmp = [];
             for index2 = 1:length( tmpvar )
-                tmpindex = strmatch( tmpvar{index2}, tmpvarvalue, 'exact');
+                tmpindex = transpose(find(strncmp(tmpvar{index2}, tmpvarvalue, length(tmpvar{index2})))); %Ramon: for bug 1318. Also for compatibility(strmatch will be deleted in next versions of MATLAB)
+                %tmpindex = strmatch( tmpvar{index2}, tmpvarvalue, 'exact');
+
                 if isempty( tmpindex ),
                     fprintf('Warning: ''%s'' field value ''%s'' not found\n', allfields{index}, tmpvar{index2});
                 end;
