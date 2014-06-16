@@ -298,7 +298,14 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
                 [ori_vals df] = ttest_cell_select(data, g.paired, g.variance);
 
                 if strcmpi(g.method, 'param')
-                    pvals = 2*mytcdf(-abs(ori_vals), df);
+                    
+                    % Check if exist tcd.m file from the Statistics Toolbox (Bug 1352 )
+                    if exist('tcdf','file') == 2  & license('test', 'Statistics_Toolbox')
+                        pvals = 2*tcdf(-abs(ori_vals), df);
+                    else
+                        pvals = 2*mytcdf(-abs(ori_vals), df);
+                    end
+                    
                     pvals = reshape(pvals, size(pvals));
                 else
                     if strcmpi(g.arraycomp, 'on')
