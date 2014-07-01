@@ -1197,7 +1197,11 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
   %
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Set color axis  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %
-  caxis([amin amax]); % set coloraxis
+%   caxis([amin amax]); % set coloraxis
+
+% 7/30/2014 Ramon: +-5% for the color limits were added
+cax_sgn = sign([amin amax]);                                                  % getting sign
+caxis([amin+cax_sgn(1)*(0.05*abs(amin)) amax+cax_sgn(2)*(0.05*abs(amax))]);   % Adding 5% to the color limits
 
 else % if STYLE 'blank'
 %
