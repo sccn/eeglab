@@ -418,6 +418,9 @@ else
     
 end;
 
-    
+% 7/31/2014 Ramon: crossfcohall sometimes does not exist depending on choice of input options
+if ~exist('crossfcohall', 'var')
+    crossfcohall = [];
+end    
 
 
