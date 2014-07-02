@@ -24,7 +24,9 @@
 %   revfilt   - [0|1] Reverse filter polarity (from bandpass to notch filter). 
 %                     Default is 0 (bandpass).
 %   usefft    - [0|1] 1 uses FFT filtering instead of FIR. Default is 0.
+%   plotfreqz - [0|1] plot frequency response of filter. Default is 0.
 %   firtype   - ['firls'|'fir1'] filter design method, default is 'firls'
+%               from the command line
 %   causal    - [0|1] 1 uses causal filtering. Default is 0.
 %
 % Outputs:
