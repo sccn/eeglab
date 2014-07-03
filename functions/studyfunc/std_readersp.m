@@ -16,6 +16,8 @@
 %                the parent cluster (1) and any 'NotClust' clusters}
 %  'singletrials' - ['on'|'off'] load single trials spectral data (if 
 %                available). Default is 'off'.
+%  'forceread' - ['on'|'off'] Force rereading data from disk.
+%                Default is 'off'.
 %  'subject'   - [string] select a specific subject {default:all}
 %  'component' - [integer] select a specific component in a cluster
 %                 {default:all}
@@ -111,6 +113,7 @@ STUDY = pop_erpimparams(STUDY, 'default');
     'freqrange'     'real'    []             STUDY.etc.erspparams.freqrange;
     'timerange'     'real'    []             NaN;
     'singletrials'  'string'  { 'on','off' } 'off';
+    'forceread'     'string'  { 'on','off' } 'off';
     'concatenate'   'string'  { 'on','off' } STUDY.etc.erpimparams.concatenate;
     'subbaseline'   'string'  { 'on','off' } STUDY.etc.erspparams.subbaseline;
     'component'     'integer' []             [];
@@ -185,7 +188,9 @@ for ind = 1:length(finalinds)
         end;
     end;
     
-    if ~dataread
+    if dataread && strcmpi(opt.forceread, 'off')
+        disp('Using pre-loaded data. To force rereading data from disk use the ''forceread'' flag');
+    else
         
         if strcmpi(dtype, 'erpim') % ERP images
             
