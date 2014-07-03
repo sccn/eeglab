@@ -1315,7 +1315,7 @@ if ~isnan(g.alpha) | ~isempty(find(~isnan(g.pboot))) | ~isempty(find(~isnan(g.rb
         else
             baselntmp = [];
             for index = 1:size(g.baseboot,1)
-                tmptime   = find(timesout >= g.baseboot(index,1) && timesout <= g.baseboot(index,2));
+                tmptime   = find(timesout >= g.baseboot(index,1) & timesout <= g.baseboot(index,2));
                 if isempty(tmptime),
                     fprintf('Warning: empty baseline interval [%3.2f %3.2f]\n', g.baseboot(index,1), g.baseboot(index,2));
                 end;
