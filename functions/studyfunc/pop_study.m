@@ -575,6 +575,7 @@ function allcom = simplifycom(allcom);
 function bool = test_wrong_parameters(hdl)
     userdat     = get(hdl, 'userdata');    
     datasetinfo = userdat{2};
+    datastrinfo = userdat{1};
 
     bool = 0;
     for index = 1:length(datasetinfo)
@@ -592,6 +593,8 @@ function bool = test_wrong_parameters(hdl)
     allcondition = all(~cellfun('isempty', { datasetinfo(nonempty).condition }));
     anygroup     = any(~cellfun('isempty', { datasetinfo(nonempty).group }));
     allgroup     = all(~cellfun('isempty', { datasetinfo(nonempty).group }));
+    anydipfit    = any(~cellfun('isempty', { datastrinfo(nonempty).dipfit}));
+    alldipfit    = all(~cellfun('isempty', { datastrinfo(nonempty).dipfit}));
 
     if anygroup & ~allgroup
          bool = 1; warndlg2('If one dataset has a group label, they must all have one', 'Error');
@@ -602,7 +605,9 @@ function bool = test_wrong_parameters(hdl)
     if anysession & ~allsession
          bool = 1; warndlg2('If one dataset has a session index, they must all have one', 'Error');
     end;
-    
+    if anydipfit & ~alldipfit
+         bool = 1; warndlg2('Dipole''s data across datasets is not uniform');
+    end;    
 function strbut = formatbut(complist)
     if isempty(complist)
         strbut = 'All comp.';
