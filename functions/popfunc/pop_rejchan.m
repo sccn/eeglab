@@ -170,7 +170,7 @@ fprintf('%d electrodes labeled for rejection\n', length(find(indelec)));
 indelec = find(indelec)';
 tmpchanlocs = EEG.chanlocs;
 if ~isempty(EEG.chanlocs), tmplocs = EEG.chanlocs(opt.elec); tmpelec = { tmpchanlocs(opt.elec).labels }';
-else                       tmplocs = []; tmpelec = mattocell([1:EEG.nbchan]');
+else                       tmplocs = []; tmpelec = mattocell([opt.elec]'); % tmpelec = mattocell([1:EEG.nbchan]');%Ramon on 8/7/2014
 end;
 if exist('measure2', 'var')
      fprintf('#\tElec.\t[min]\t[max]\n');
@@ -184,7 +184,10 @@ tmpelec(:,1) = mattocell([1:length(measure)]');
 for index = 1:size(tmpelec,1)
     if exist('measure2', 'var')
          fprintf('%d\t%s\t%3.2f\t%3.2f', tmpelec{index,1}, tmpelec{index,2}, tmpelec{index,3}, tmpelec{index,4});
-    else fprintf('%d\t%s\t%3.2f'       , tmpelec{index,1}, tmpelec{index,2}, tmpelec{index,3});
+    elseif  ~isempty(EEG.chanlocs)
+        fprintf('%d\t%s\t%3.2f'       , tmpelec{index,1}, tmpelec{index,2}, tmpelec{index,3});
+    else % Ramon on 8/7/2014
+        fprintf('%d\t%d\t%3.2f'       , tmpelec{index,1}, tmpelec{index,2}, tmpelec{index,3});
     end;
     if any(indelec == index), fprintf('\t*Bad*\n');
     else                      fprintf('\n');
