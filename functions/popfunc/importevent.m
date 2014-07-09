@@ -210,7 +210,7 @@ for curfield = tmpfields'
                           event(index+offset).init_time  = event(index+offset).latency*g.timeunit;
                       end;
                       event = recomputelatency( event, g.indices, srate, g.timeunit, ...
-                                                    g.align, g.oldevents, g.optimalign);
+                                                    g.align, g.oldevents, g.optimalign, g.optimmeas);
             end;
       end;
 end;
