@@ -49,6 +49,13 @@ if isempty(regions)
 	return;
 end;
 
+% Ramon on 5/29/2014 for bug 1619
+if size(regions,2) > 2
+    regions = sortrows(regions,3);
+else
+    regions = sortrows(regions,1);
+end;
+
 try
     % For AMICA probabilities...Temporarily add model probabilities as channels
     %-----------------------------------------------------
