@@ -3,7 +3,7 @@
 %
 % Usage:
 %   >> pop_rejchan( INEEG ) % pop-up interative window mode
-%   >> [OUTEEG, locthresh, globthresh, nrej] = ...
+%   >> [EEG, indelec, measure, com] = ...
 %		= pop_rejchan( INEEG, 'key', 'val');
 %
 % Inputs:
@@ -30,6 +30,7 @@
 %   OUTEEG    - output dataset with updated joint probability array
 %   indelec   - indices of rejected electrodes
 %   measure   - measure value for each electrode
+%   com       - executed command
 %
 % Author: Arnaud Delorme, CERCO, UPS/CNRS, 2008-
 %
