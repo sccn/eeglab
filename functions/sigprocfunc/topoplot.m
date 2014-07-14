@@ -113,8 +113,10 @@
 %   'dipcolor'        - [color] dipole color as Matlab code code or [r g b] vector
 %                       {default: 'k' = black}.
 % Outputs:
-%                   h - handle of the colored surface. If no surface is plotted,
-%                       return "gca", the handle of the current plot.
+%              handle - handle of the colored surface.If
+%                       contour only is plotted, then is the handle of
+%                       the countourgroup. (If no surface or contour is plotted,
+%                       return "gca", the handle of the current plot)
 %         grid_or_val - [matrix] the interpolated data image (with off-head points = NaN).  
 %                       Else, single interpolated value at the specified 'noplot' arg channel 
 %                       location ([rad theta]), if any.
@@ -1129,12 +1131,12 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
     %
     handle=imagesc(Xi,Yi,gridcolors); % plot grid with explicit colors
     axis square
-
   %
   %%%%%%%%%%%%%%%%%%%%%%%% Plot map contours only %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %
   elseif strcmp(STYLE,'contour')                     % plot surface contours only
     [cls chs] = contour(Xi,Yi,ZiC,CONTOURNUM,'k'); 
+    handle = chs;                                   % handle to a contourgroup object
     % for h=chs, set(h,'color',CCOLOR); end
   %
   %%%%%%%%%%%%%%%%%%%%%%%% Else plot map and contours %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1164,6 +1166,7 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
             set(subh(indsubh), 'FaceVertexCData', ones(numfaces,3), 'Cdatamapping', 'direct', 'facealpha', 0.5, 'linewidth', 2);
         end;
     end;
+    handle = tmph;                                   % surface handle
     for h=chs, set(h,'color',CCOLOR); end
     warning on;
   %
@@ -1182,11 +1185,14 @@ if ~strcmpi(STYLE,'blank') % if draw interpolated scalp map
         set(tmph, 'visible', 'off');
         handle = tmph;
     end;
+    handle = tmph;                                   % surface handle
   %
   %%%%%%%%%%%%%%%%%% Else fill contours with uniform colors  %%%%%%%%%%%%%%%%%%
   %
   elseif strcmp(STYLE,'fill')
     [cls chs] = contourf(Xi,Yi,Zi,CONTOURNUM,'k');
+    
+    handle = chs;                                   % handle to a contourgroup object
 
     % for h=chs, set(h,'color',CCOLOR); end 
     %     <- 'not line objects.' Why does 'both' work above???
