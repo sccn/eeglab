@@ -85,7 +85,7 @@ if nargin < 2
                { 'style' 'text' 'string' 'Z-score threshold [max] or [min max]' 'tag' 'normlab' } ...
                { 'style' 'edit' 'string' '5' } ...
                { 'style' 'text' 'string' 'Spectrum freq. range' 'enable' 'off' 'tag' 'spec' } ...
-               { 'style' 'edit' 'string' '1 8'  'enable' 'off' 'tag' 'spec' } };
+               { 'style' 'edit' 'string' num2str([1 EEG.srate/2])  'enable' 'off' 'tag' 'spec' } }; % 7/16/2014 Ramon
     geom = { [2 1.3] [2 1.3] [2 0.4 0.9] [2 1.3] [2 1.3] };
     result = inputgui( 'uilist', uilist, 'geometry', geom, 'title', 'Reject channel -- pop_rejchan()', ...
         'helpcom', 'pophelp(''pop_rejchan'')');
@@ -97,9 +97,13 @@ if nargin < 2
     else options = { options{:} 'norm', 'off' }; 
     end;
     
-    if result{2} == 1,     options = { options{:} 'measure', 'prob' };
-    elseif result{2} == 2, options = { options{:} 'measure', 'kurt' }; 
-    else                   options = { options{:} 'measure', 'spec' }; 
+    if result{2} == 1
+        options = { options{:} 'measure', 'prob' };
+    elseif result{2} == 2 
+        options = { options{:} 'measure', 'kurt' }; 
+    else
+        options = { options{:} 'measure', 'spec' };
+        options = { options{:} 'freqrange', str2double(result{5})}; % 7/16/2014 Ramon
     end;
 
 else
