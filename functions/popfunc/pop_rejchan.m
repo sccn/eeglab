@@ -133,8 +133,15 @@ elseif strcmpi(opt.measure, 'kurt')
     [ measure indelec ] = rejkurt( reshape(EEG.data(opt.elec,:,:), length(opt.elec), size(EEG.data,2)*size(EEG.data,3)), opt.threshold, opt.precomp, normval);
 else
     fprintf('Computing spectrum for channels...\n');
-    measure = pop_spectopo(EEG, 1, [], 'EEG' , 'freqrange', opt.freqrange, 'plot','off');
+    [measure freq] = pop_spectopo(EEG, 1, [], 'EEG' , 'plot','off');
 
+    % select frequency range
+    if ~isempty(opt.freqrange)
+        [tmp fBeg] = min(abs(freq-opt.freqrange(1)));
+        [tmp fEnd] = min(abs(freq-opt.freqrange(2)));
+        measure = measure(:, fBeg:fEnd);
+    end;
+    
     % consider that data below 20 db has been filtered and remove it
     indFiltered = find(mean(measure) < -20);
     if ~isempty(indFiltered) && indFiltered(1) > 11, measure = measure(:,1:indFiltered(1)-10); disp('Removing spectrum data below -20dB (most likelly filtered out)'); end;
