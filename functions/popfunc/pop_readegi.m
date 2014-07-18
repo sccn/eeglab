@@ -58,18 +58,34 @@ if nargin < 1
     fclose(fid);
     if head.segments ~= 0
         fileloc = '';
+        floc = { 'GSN-HydroCel-32.sfp' 'GSN65v2_0.sfp' 'GSN129.sfp' 'GSN-HydroCel-257.sfp'};
         switch head.nchan
-            case { 32 33 }, fileloc = 'GSN-HydroCel-32.sfp';
-            case { 64 65 }, fileloc = 'GSN65v2_0.sfp';
-            case { 128 129 }, fileloc = 'GSN129.sfp';
-            case { 256 257 }, fileloc = 'GSN-HydroCel-257.sfp';
+            case { 32 33 }, fileloc = floc;
+            case { 64 65 }, fileloc =  {floc{2} floc{3:4} floc{1}};
+            case { 128 129 }, fileloc = {floc{3} floc{4} floc{1:2}};
+            case { 256 257 }, fileloc = {floc{4} floc{1:3}};
         end;
-        promptstr    = { sprintf('Segment/frame number (default: 1:%d)', head.segments) 'Channel location file (in eeglab/sample_locs)' };
-        inistr       = { '' fileloc };
-        result       = inputdlg2( promptstr, 'Import EGI file -- pop_readegi()', 1,  inistr, 'pop_readegi');
+        uilist = { { 'style' 'text' 'string' sprintf('Segment/frame number (default: 1:%d)', head.segments) } ...
+                   { 'style' 'edit' 'string' '' } ...
+                   { 'style' 'text' 'string' 'Channel location file (in eeglab/sample_locs)' } ...
+                   { 'style' 'popupmenu' 'string' fileloc } ... 
+                   { } ...
+                   { 'style' 'text' 'string' ...
+                   [ 'Note: Choosing the correct electrode location file for your data is critical.' 10 ...
+        'Note that in some cases none of the channel location files listed will correspond' 10 ...
+        'to your montage as EGI has different versions of caps and is creating new ones' 10 ...
+        'constantly. Remember to check your montage in the channel editor and import. Channel' 10 ...
+        'location files are stored in the sample_locs sub-folder of the EEGLAB distribution.' ] } };
+        uigeometry = { [2 1] [2 1] [1] [1] };
+        uigeomvert = [1 1 1.5 3];
+        result = inputgui('uilist', uilist, 'geometry', uigeometry, 'geomvert', uigeomvert);
+       
+%         promptstr    = { sprintf('Segment/frame number (default: 1:%d)', head.segments) 'Channel location file (in eeglab/sample_locs)' };
+%         inistr       = { '' fileloc(res{2})};
+%         result       = inputdlg2( promptstr, 'Import EGI file -- pop_readegi()', 1,  inistr, 'pop_readegi');
         if length(result) == 0 return; end;
         datachunks   = eval( [ '['  result{1} ']' ] );
-        fileloc      = result{2};
+        fileloc      = char(fileloc(result{2}));
     else
         datachunks   = [];
         disp('Only one segment, cannot read portion of the file');
