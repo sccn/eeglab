@@ -24,7 +24,9 @@
 %                 also enter channel types here in a cell array.
 %   'concatenate' - ['on'|'off'] 'on' concatenate all input datasets 
 %                 (assuming there are several). 'off' run ICA independently
-%                 on each dataset. Default is 'on'.
+%                 on each dataset. Default is 'off'.
+%   'concatcond'  - ['on'|'off'] 'on' concatenate conditions for input datasets 
+%                 of the same sessions and the same subject. Default is 'off'.
 %   'key','val' - ICA algorithm options (see ICA routine help messages).
 % 
 % Adding a new algorithm:
