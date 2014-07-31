@@ -97,8 +97,12 @@
 %                   [] -> Do not show channel labels {default|0 -> Show [1:nchans]}
 %    'limits'     - [start end] Time limits for data epochs in ms (for labeling 
 %                   purposes only).
-%    'freqlimits' - [start end] If plotting epoch spectra instead of data, frequency 
-%                   limits of the display. (Data should contain spectral values).
+%    'freqs'      - Vector of frequencies (If data contain  spectral values).
+%                   size(data, 2) must be equal to size(freqs,2).
+%                   *** This option must be used ALWAYS with 'freqlimits' ***                           
+%    'freqlimits' - [freq_start freq_end] If plotting epoch spectra instead of data, frequency 
+%                   limits to display spectrum. (Data should contain spectral values).
+%                   *** This option must be used ALWAYS with 'freqs' ***  
 %    'winlength'  - [value] Seconds (or epochs) of data to display in window {default: 5}
 %    'dispchans'  - [integer] Number of channels to display in the activity window 
 %                   {default: from data}.  If < total number of channels, a vertical  
@@ -241,6 +245,24 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
    catch
        disp('eegplot() error: calling convention {''key'', value, ... } error'); return;
    end;	
+   
+   % Selection of data range If spectrum plot (Ramon)
+   
+   if isfield(g,'freqlimits') || isfield(g,'freqs')
+%        % Check  consistency of freqlimits       
+%        % Check  consistency of freqs
+
+       % Selecting data and freqs
+       [~, fBeg] = min(abs(g.freqs-g.freqlimits(1)));
+       [~, fEnd] = min(abs(g.freqs-g.freqlimits(2)));
+       data = data(:,fBeg:fEnd);
+       g.freqs     = g.freqs(fBeg:fEnd);
+       
+       % Updating settings
+       g.winlength = g.freqs(end) - g.freqs(1);
+       g.srate     = length(g.freqs)/(g.freqs(end)-g.freqs(1));
+       g.isfreq    = 1;
+   end
 
   % push button: create/remove window
   % ---------------------------------
@@ -267,6 +289,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
    try, g.submean;			catch, g.submean	= 'off'; end;
    try, g.children;			catch, g.children	= 0; end;
    try, g.limits;		    catch, g.limits	    = [0 1000*(size(data,2)-1)/g.srate]; end;
+   try, g.freqs;            catch, g.freqs	    = []; end;  % Ramon
    try, g.freqlimits;	    catch, g.freqlimits	= []; end;
    try, g.dispchans; 		catch, g.dispchans  = size(data,1); end;
    try, g.wincolor; 		catch, g.wincolor   = [ 0.7 1 0.9]; end;
@@ -283,8 +306,9 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
    try, g.datastd;          catch, g.datastd = []; end; %ozgur
    try, g.normed;            catch, g.normed = 0; end; %ozgur
    try, g.envelope;          catch, g.envelope = 0; end;%ozgur
-   try, g.maxeventstring;    catch, g.maxeventstring = 10; end; % JavierLC   
-   
+   try, g.maxeventstring;    catch, g.maxeventstring = 10; end; % JavierLC
+   try, g.isfreq;            catch, g.isfreq = 0;    end; % Ramon
+      
    if strcmpi(g.ploteventdur, 'on'), g.ploteventdur = 1; else g.ploteventdur = 0; end;
    if ndims(data) > 2
    		g.trialstag = size(	data, 2);
@@ -295,8 +319,8 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
       switch gfields{index}
       case {'spacing', 'srate' 'eloc_file' 'winlength' 'position' 'title' ...
                'trialstag'  'winrej' 'command' 'tag' 'xgrid' 'ygrid' 'color' 'colmodif'...
-               'freqlimits' 'submean' 'children' 'limits' 'dispchans' 'wincolor' ...
-               'maxeventstring' 'ploteventdur' 'butlabel' 'scale' 'events' 'data2' 'plotdata2' 'mocap' 'selectcommand' 'ctrlselectcommand' 'datastd' 'normed' 'envelope'},;
+               'freqs' 'freqlimits' 'submean' 'children' 'limits' 'dispchans' 'wincolor' ...
+               'maxeventstring' 'ploteventdur' 'butlabel' 'scale' 'events' 'data2' 'plotdata2' 'mocap' 'selectcommand' 'ctrlselectcommand' 'datastd' 'normed' 'envelope' 'isfreq'},;
       otherwise, error(['eegplot: unrecognized option: ''' gfields{index} '''' ]);
       end;
    end;
@@ -611,20 +635,31 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
 	'Style','text', ...
 	'Tag','Eelecname',...
 	'string','Chan.');
+
+% Values of time/value and freq/power in GUI
+  if g.isfreq
+      u15_string =  'Freq';
+      u16_string  = 'Power';
+  else
+      u15_string =  'Time';
+      u16_string  = 'Value';
+  end
+      
   u(15) = uicontrol('Parent',figh, ...
 	'Units', 'normalized', ...
 	'BackgroundColor',DEFAULT_FIG_COLOR, ...
 	'Position', posbut(15,:), ...
 	'Style','text', ...
 	'Tag','Etimename',...
-	'string','Time');
+	'string',u15_string);
+
   u(16) = uicontrol('Parent',figh, ...
 	'Units', 'normalized', ...
 	'BackgroundColor',DEFAULT_FIG_COLOR, ...
 	'Position',posbut(16,:), ...
 	'Style','text', ...
 	'Tag','Evaluename',...
-	'string','Value');
+	'string',u16_string);
 
 % ESpacing buttons: + -
   u(7) = uicontrol('Parent',figh, ...
@@ -1283,7 +1318,11 @@ else
     g.spacing = oldspacing;
     set(ax1, 'Xlim',[1 g.winlength*multiplier+1],...
 		     'XTick',[1:multiplier*DEFAULT_GRID_SPACING:g.winlength*multiplier+1]);
-    set(ax1, 'XTickLabel', num2str((g.time:DEFAULT_GRID_SPACING:g.time+g.winlength)'))
+         if g.isfreq % Ramon
+             set(ax1, 'XTickLabel', num2str((g.freqs(1):DEFAULT_GRID_SPACING:g.freqs(end))'));
+         else
+             set(ax1, 'XTickLabel', num2str((g.time:DEFAULT_GRID_SPACING:g.time+g.winlength)'));
+         end
 
     % ordinates: even if all elec are plotted, some may be hidden
     set(ax1, 'ylim',[g.elecoffset*g.spacing (g.elecoffset+g.dispchans+1)*g.spacing] );
@@ -1523,8 +1562,14 @@ else
 		'XTick',[], 'YTick',[], 'tag','backeeg');
 
 		axes(ax1);
-    	set(ax1,'XTickLabel', num2str((g.time:DEFAULT_GRID_SPACING:g.time+g.winlength)'),...
-		'XTick',[1:multiplier*DEFAULT_GRID_SPACING:g.winlength*multiplier+1])
+        if g.isfreq % Ramon
+            set(ax1, 'XTickLabel', num2str((g.freqs(1):DEFAULT_GRID_SPACING:g.freqs(end))'),...
+                'XTick',[1:multiplier*DEFAULT_GRID_SPACING:g.winlength*multiplier+1]);
+        else
+            set(ax1,'XTickLabel', num2str((g.time:DEFAULT_GRID_SPACING:g.time+g.winlength)'),...
+                'XTick',[1:multiplier*DEFAULT_GRID_SPACING:g.winlength*multiplier+1]);
+        end
+
     set(ax1, 'Position', AXES_POSITION) % JavierLC
     set(ax0, 'Position', AXES_POSITION) % JavierLC
     end;
