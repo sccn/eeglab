@@ -521,8 +521,25 @@ function hdl = mysubplot(nr,nc,ind,subplottype);
 
 % rapid filtering for ERP
 % -----------------------
-function tmpdata2 = myfilt(tmpdata, srate, lowpass, highpass)
-
+function tmpdata2 = myfilt(tmpdata, srate, lowpass, highpass); 
+    bscorrect = 1;
+    if bscorrect
+        % Getting initial baseline
+        bs_val1  =  mean(tmpdata,1);
+        bs1      = repmat(bs_val1, size(tmpdata,1), 1);
+    end
+    
+    % Filtering
     tmpdata2 = reshape(tmpdata, size(tmpdata,1), size(tmpdata,2)*size(tmpdata,3)*size(tmpdata,4));
     tmpdata2 = eegfiltfft(tmpdata2',srate, lowpass, highpass)';
     tmpdata2 = reshape(tmpdata2, size(tmpdata,1), size(tmpdata,2), size(tmpdata,3), size(tmpdata,4));
+    
+    if bscorrect
+        % Getting after-filter baseline
+        bs_val2  =  mean(tmpdata2,1);
+        bs2      = repmat(bs_val2, size(tmpdata2,1), 1);
+        
+        % Correcting the baseline
+        realbs = bs1-bs2;
+        tmpdata2 = tmpdata2 + realbs;
+    end
