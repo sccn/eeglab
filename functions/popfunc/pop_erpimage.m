@@ -551,7 +551,18 @@ else
 		  if ~iscell( varargin{ i } )
 		      options = [ options ',' vararg2str({varargin{i}}) ];
 		  else
-		      options = [ options ', { [' num2str(varargin{ i }{1}') ']'' EEG.chanlocs EEG.chaninfo }' ];
+		      %options = [ options ', { [' num2str(varargin{ i }{1}') ']'' EEG.chanlocs EEG.chaninfo }' ]; % JRI -- why does this ignore value passed as topo option?
+        if length(varargin{i})>1  
+		optchanlocs = varargin{i}{2}; % JRI -- fix
+        else
+		optchanlocs = EEG.chanlocs;
+	end;	
+  	if length(varargin{i})>2,
+            optchaninfo = varargin{i}{3};
+        else
+            optchaninfo = EEG.chaninfo;
+        end
+          options = [ options ', { [' num2str(varargin{ i }{1}') ']'' optchanlocs optchaninfo }' ]; 
 		  end;    
 		end;
 	end;	
