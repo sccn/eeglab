@@ -1167,7 +1167,7 @@ else
   case 'drawp' % Redraw EEG and change position
 
     % this test help to couple eegplot windows
-    if exist('p3')
+    if exist('p3', 'var')
     	figh = p3;
     	figure(p3);
     else	
@@ -1328,7 +1328,7 @@ else
     set(ax1, 'ylim',[g.elecoffset*g.spacing (g.elecoffset+g.dispchans+1)*g.spacing] );
 	
 	 if g.children ~= 0
-		if ~exist('p2')
+		if ~exist('p2', 'var')
 			p2 =[];
 		end;	
 		eegplot( 'drawp', p1, p2, g.children);
@@ -1831,7 +1831,7 @@ else
 
       % reactivate zoom if 3 arguments
       % ------------------------------
-      if exist('p2') == 1
+      if exist('p2', 'var') == 1
           set(gcbf, 'windowbuttondownfcn', [ 'zoom(gcbf,''down''); eegplot(''zoom'', gcbf, 1);' ]);
           set(gcbf, 'windowbuttonmotionfcn', g.commandselect{2});
       end;
