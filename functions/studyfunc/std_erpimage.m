@@ -40,7 +40,7 @@
 %                  {Default: 10}
 %   'sorttype'   - Sorting event type(s) ([int vector]; []=all). See Notes below.
 %                  Either a string or an integer.
-%   'sortwin'    - Sorting event window [start, end] in seconds ([]=whole epoch)
+%   'sortwin'    - Sorting event window [start, end] in milliseconds ([]=whole epoch)
 %   'sortfield'  - Sorting field name. {default: latency}.
 %   'erpimageopt'  - erpimage() options, separated by commas (Ex: 'erp', 'cbar').
 %                  {Default: none}. For further details see >> erpimage help
@@ -195,11 +195,16 @@ if strcmpi(opt.concatenate, 'off')
         end;
     end;
     
-    for index = 1:size(X,1)
+    clear tmperpimage eventvals;
+    parfor index = 1:size(X,1)
         [tmpX tmpevents] = erpimage(squeeze(X(index,:,:)), events, EEG(1).times, '', opt.smoothing, nlines, 'noplot', 'on', opt.erpimageopt{:}, moreopts{:});
         if isempty(events), tmpevents = []; end;
-        allerpimage = setfield(allerpimage, 'events', tmpevents);
-        allerpimage = setfield(allerpimage, [ prefix int2str(opt.indices(index)) ], tmpX');
+        eventvals{index}   = tmpevents;
+        tmperpimage{index} = tmpX';
+    end;
+    allerpimage.events = eventvals{1};
+    for index = 1:size(X,1)
+        allerpimage.([ prefix int2str(opt.indices(index)) ]) = tmperpimage{index};
     end;
 else
     % generate dynamic loading commands
