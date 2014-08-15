@@ -20,6 +20,7 @@
 %                strings, Ex: [9 ' ' ','].
 %   'blankcell' - ['on'|'off'] extract blank cells {default:'on'}
 %   'verbose'  - ['on'|'off'] {default:'on'}
+%   'convertmethod' - ['str2double'|'str2num'] default is 'str2double'
 %   'nlines'   - [integer] number of lines to read {default: all file}
 %
 % Outputs:
@@ -69,6 +70,7 @@ g = finputcheck( varargin, { 'convert'   'string'   { 'on';'off';'force' }   'on
                              'verbose'   'string'   { 'on';'off' }   'on';
                              'uniformdelim' 'string'   { 'on';'off' }   'off';                             
                              'blankcell' 'string'   { 'on';'off' }   'on';
+                             'convertmethod' 'string'   { 'str2double';'str2num' }   'str2double';
                              'delim'     { 'integer';'string' } []               [9 32];
                              'nlines'    'integer'  []               Inf });
 if isstr(g), error(g); end;
@@ -113,9 +115,16 @@ while isempty(inputline) | inputline~=-1
              switch g.convert
                 case 'off', array{linenb, colnb} = tmp;
                 case 'on',  
-                     tmp2 = str2double(tmp);
-                     if isnan( tmp2 )  , array{linenb, colnb} = tmp;
-                     else                array{linenb, colnb} = tmp2;
+                     if strcmpi(g.convertmethod, 'str2double')
+                         tmp2 = str2double(tmp);
+                         if isnan( tmp2 )  , array{linenb, colnb} = tmp;
+                         else                array{linenb, colnb} = tmp2;
+                         end;
+                     else
+                         tmp2 = str2num(tmp);
+                         if isempty( tmp2 )  , array{linenb, colnb} = tmp;
+                         else                  array{linenb, colnb} = tmp2;
+                         end;
                      end;
                 case 'force', array{linenb, colnb} = str2double(tmp);
              end;
