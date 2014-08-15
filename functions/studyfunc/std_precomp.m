@@ -516,18 +516,14 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
     
         rmcomps   = cell(1,length(settmpind));
         for idat = 1:length(settmpind) % scan dataset for which to find component clusters
-            currentdat = settmpind(idat);
             for rmi = 1:length(rmclust) % scan clusters
-                compinds = STUDY.cluster(rmclust(rmi)).allinds;
-                
-                for ind = 1:length(STUDY.cluster(rmclust(rmi)).setinds(:)) % scan datasets of cluster
-                    setinds  = [STUDY.design(STUDY.currentdesign).cell(STUDY.cluster(rmclust(rmi)).setinds{ind}).dataset ];
-                    indmatch = find(setinds == currentdat);
-                    if ~isempty(indmatch)
-                        rmcomps{idat} = union_bc( rmcomps{idat}, compinds{ind}(indmatch));
-                    end;
-                end;
+                comps = STUDY.cluster(rmclust(rmi)).comps;
+                sets  = STUDY.cluster(rmclust(rmi)).sets;
+                indmatch = find(sets(:) == settmpind(idat));
+                indmatch = ceil(indmatch/size(sets,1)); % get the column number
+                rmcomps{idat} = [rmcomps{idat} comps(indmatch(:)') ];
             end;
+            rmcomps{idat} = sort(rmcomps{idat});
         end;
         
     % make option array and channel list (which depend on interp) for any type of measure
