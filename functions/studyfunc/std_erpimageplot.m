@@ -33,18 +33,19 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [STUDY, allitc, alltimes, allfreqs, pgroup, pcond, pinter] = std_erpimageplot(STUDY, ALLEEG, varargin)
+function [STUDY, allitc, alltimes, allfreqs, pgroup, pcond, pinter, events] = std_erpimageplot(STUDY, ALLEEG, varargin)
 
 if nargin < 2
     help std_erpimageplot;
     return;
 end;
 
+events = [];
 STUDY = pop_erpimparams(STUDY, 'default');
 if strcmpi(STUDY.etc.erpimparams.concatenate, 'off')
 
     % use std_erspplot for stats when concatenate is off
-    [STUDY allitc alltimes allfreqs pgroup pcond pinter ] = std_erspplot(STUDY, ALLEEG, 'datatype', 'erpim', varargin{:});
+    [STUDY allitc alltimes allfreqs pgroup pcond pinter events] = std_erspplot(STUDY, ALLEEG, 'datatype', 'erpim', varargin{:});
 
 else
     params = STUDY.etc.erpimparams;
