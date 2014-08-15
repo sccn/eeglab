@@ -36,7 +36,7 @@ function result = plugin_install(zipfilelink, name, version, forceInstall);
         plugin_urlread(['http://sccn.ucsd.edu/eeglab/plugin_uploader/plugin_increment.php?plugin=' name '&version=' version ]);
         plugin_urlwrite( zipfilelink, fullfile(generalPluginPath, zipfile));
     catch,
-        warndlg2( [ 'Could not download extension. Host site might be' 10 'unavailable or you do not have permission' 10 'to write in the EEGLAB plugin folder' ]);
+        warndlg2( [ 'Could not download extension. Host site might be' 10 'unavailable or you do not have permission' 10 'to write in the EEGLAB plugin folder. Try again' 10 'just in case.' ]);
         result = -1;
         return;
     end;
