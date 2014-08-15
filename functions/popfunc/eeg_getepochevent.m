@@ -104,9 +104,9 @@ if length(EEG) > 1
     
     epochval = [];
     for dat = 1:length(EEG)
-        tmpepochval = eeg_getepochevent(EEG, 'trials', trials{dat}, varargin);
+        tmpepochval = eeg_getepochevent(EEG(dat), 'trials', trials{dat}, varargin{:});
+        epochval = [ epochval tmpepochval ];
     end;
-    epochval = [ epochval tmpepochval ];
     return;
 end;
 
@@ -116,7 +116,7 @@ options = {};
 oldformat = 0;
 if nargin < 3
     oldformat = 1;
-elseif isnumeric(varargin{2})
+elseif isnumeric(varargin{2})  && length(varargin{2}) == 2
     oldformat = 1;
 end;
 if oldformat
