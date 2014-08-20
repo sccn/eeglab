@@ -596,7 +596,7 @@ if isfield(g,'timewarpfr')
     end
 end
 
-if isempty(g.nfreqs)
+if ~isempty(g.nfreqs)
     verboseprintf(g.verbose, 'Warning: ''nfreqs'' input overwrite ''padratio''\n');
 end;
 if strcmpi(g.basenorm, 'on')
