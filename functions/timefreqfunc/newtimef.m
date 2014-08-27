@@ -962,6 +962,7 @@ if iscell(data)
         mbase = { mbase mbase };
     elseif strcmpi(g.commonbase, 'on')
         mbase = { NaN NaN };
+        meanmbase = mbase{1}; %Ramon :for bug 1657 
     else
         meanmbase = (mbase1 + mbase2)/2;
         mbase = { mbase1 mbase2 };
@@ -1557,6 +1558,7 @@ if ~isreal(R)
     R = abs(R); % convert coherence vector to magnitude
     setylim = 1;
 else
+    Rangle = zeros(size(R)); % Ramon: if isreal(R) then we get an error because Rangle does not exist
     Rsign = ones(size(R));
     setylim = 0;
 end;
@@ -1695,7 +1697,11 @@ switch lower(g.plotersp)
 
         h(5) = axes('Position',[0 ordinate1 .1 height].*s+q);
 
-        E = mbase;
+        if isnan(g.baseline)              % Ramon :for bug 1657
+            E = zeros(size(freqs));
+        else
+            E = mbase;
+        end
 
         if ~isnan(E(1))
 
@@ -1717,7 +1723,7 @@ switch lower(g.plotersp)
                     end;
                 end
                 if freqs(1) ~= freqs(end), xlim([freqs(1) freqs(end)]); end;
-                ylim(g.speclim)
+                if g.speclim(1) ~= g.speclim(2), ylim(g.speclim); end; % Ramon :for bug 1657 
 
             else % 'log'
                 semilogx(freqs,E,'LineWidth',g.linewidth); hold on;
@@ -1991,6 +1997,7 @@ if ~isreal(R)
     R = abs(R); % convert coherence vector to magnitude
     setylim = 1;
 else
+    Rangle = zeros(size(R)); % Ramon: if isreal(R) then we get an error because Rangle does not exist
     Rsign = ones(size(R));
     setylim = 0;
 end;
