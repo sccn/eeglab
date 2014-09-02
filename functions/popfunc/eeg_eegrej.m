@@ -120,12 +120,34 @@ com = sprintf('%s = eeg_eegrej( %s, %s);', inputname(1), inputname(1), vararg2st
 % it should not be necessary but a 
 % bug in eegplot makes that it sometimes is
 % ----------------------------
+% function newregions = combineregions(regions)
+% newregions = regions;
+% for index = size(regions,1):-1:2
+%     if regions(index-1,2) >= regions(index,1)
+%         disp('Warning: overlapping regions detected and fixed in eeg_eegrej');
+%         newregions(index-1,:) = [regions(index-1,1) regions(index,2) ];
+%         newregions(index,:)   = [];
+%     end;
+% end;
+
 function newregions = combineregions(regions)
-newregions = regions;
-for index = size(regions,1):-1:2
-    if regions(index-1,2) >= regions(index,1)
-        disp('Warning: overlapping regions detected and fixed in eeg_eegrej');
-        newregions(index-1,:) = [regions(index-1,1) regions(index,2) ];
-        newregions(index,:)   = [];
-    end;
-end;
+% 9/1/2014 RMC
+regions = sortrows(sort(regions,2)); % Sorting regions
+allreg = [ regions(:,1)' regions(:,2)'; ones(1,numel(regions(:,1))) -ones(1,numel(regions(:,2)')) ].';
+allreg = sortrows(allreg,1); % Sort all start and stop points (column 1),
+
+mboundary = cumsum(allreg(:,2)); % Rationale: regions will start always with 1 and close with 0, since starts=1 end=-1
+indx = 0; count = 1;
+
+while indx ~= length(allreg) 
+    newregions(count,1) = allreg(indx+1,1);
+    [~,temp]= min(abs(mboundary(indx+1:end))-0);
+    newregions(count,2) = allreg(temp + indx,1);
+    indx = indx + temp ;
+    count = count+1;
+end
+
+% Verbose
+if size(regions,1) ~= size(newregions,1)
+    disp('Warning: overlapping regions detected and fixed in eeg_eegrej');
+end
