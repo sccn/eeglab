@@ -253,8 +253,8 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
 %        % Check  consistency of freqs
 
        % Selecting data and freqs
-       [~, fBeg] = min(abs(g.freqs-g.freqlimits(1)));
-       [~, fEnd] = min(abs(g.freqs-g.freqlimits(2)));
+       [temp, fBeg] = min(abs(g.freqs-g.freqlimits(1)));
+       [temp, fEnd] = min(abs(g.freqs-g.freqlimits(2)));
        data = data(:,fBeg:fEnd);
        g.freqs     = g.freqs(fBeg:fEnd);
        
