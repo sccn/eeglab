@@ -141,9 +141,9 @@ indx = 0; count = 1;
 
 while indx ~= length(allreg) 
     newregions(count,1) = allreg(indx+1,1);
-    [~,temp]= min(abs(mboundary(indx+1:end))-0);
-    newregions(count,2) = allreg(temp + indx,1);
-    indx = indx + temp ;
+    [tmp,I]= min(abs(mboundary(indx+1:end)));
+    newregions(count,2) = allreg(I + indx,1);
+    indx = indx + I ;
     count = count+1;
 end
 
