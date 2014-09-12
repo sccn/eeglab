@@ -26,7 +26,12 @@ function result = plugin_install(zipfilelink, name, version, forceInstall);
              if strcmpi(res, 'no'), fprintf([ 'Skipping ' name ' extension instalation\n' ]); result = -1; return; end;               
         end;
     catch,
-        warndlg2( [ 'Could not download extension. Host site might be' 10 'unavailable or you do not have permission' 10 'to write in the EEGLAB plugin folder' ]);
+        msg = [ 'Could not download extension. Host site might be' 10 'unavailable or you do not have permission' 10 'to write in the EEGLAB plugin folder. Try again' 10 'just in case.' ];
+        if ~forceInstall
+            warndlg2(msg);
+        else
+            disp(msg);
+        end;
         result = -1;
         return;
     end;
