@@ -118,6 +118,8 @@ if nargin < 3
     oldformat = 1;
 elseif isnumeric(varargin{2})  && length(varargin{2}) == 2
     oldformat = 1;
+elseif length(varargin) == 3 && isfield(EEG.event,varargin(3))
+    oldformat = 1;
 end;
 if oldformat
     if nargin > 1, options = { options{:} 'type'      varargin{1} }; end;
