@@ -1707,7 +1707,8 @@ switch lower(g.plotersp)
 
             % plotting limits
             if isempty(g.speclim)
-                g.speclim = [min(E)-max(abs(E))/3 max(E)+max(abs(E))/3];
+               % g.speclim = [min(E)-max(abs(E))/3 max(E)+max(abs(E))/3];
+               g.speclim = [min(mbase)-max(abs(mbase))/3 max(mbase)+max(abs(mbase))/3]; % RMC: Just for plotting
             end;
 
             % plot curves
@@ -1737,7 +1738,7 @@ switch lower(g.plotersp)
                     end;
                 end
                 if freqs(1) ~= freqs(end), xlim([freqs(1) freqs(end)]); end;
-                ylim(g.speclim)
+                if g.speclim(1) ~= g.speclim(2), ylim(g.speclim); end; %RMC
                 set(h(5),'View',[90 90])
                 divs = linspace(log(freqs(1)), log(freqs(end)), 10);
                 set(gca, 'xtickmode', 'manual');
