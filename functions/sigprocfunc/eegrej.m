@@ -64,6 +64,12 @@ end;
 
 reject = zeros(1,datlen);
 regions = round(regions);
+% Checking for extreme values in regions (correcting round) RMC
+if max(regions(:)) > size(indata, 2)
+    IndxOut = find(regions(:) > size(indata, 2));
+    regions(IndxOut) = size(indata, 2);
+end
+
 regions = sortrows(sort(regions,2));        % Sorting regions %regions = sort(regions,1); RMC
 Izero = find(regions == 0);                 % Find regions index == 0 to adjust them
 if ~isempty(Izero), regions(Izero) = 1;end; % Fractional point below 1 adjusted to 1
