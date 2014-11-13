@@ -527,8 +527,14 @@ if ~isempty(g.time) | ~isempty(g.notime)
         end;   
         
         nbtimes = length(g.notime(:));
-        points = eeg_lat2point(g.notime(:)', ones(1,nbtimes), EEG.srate, [EEG.xmin EEG.xmax]);
+        [points,flag] = eeg_lat2point(g.notime(:)', ones(1,nbtimes), EEG.srate, [EEG.xmin EEG.xmax]);
         points = reshape(points, size(g.notime));
+        
+        % fixing if last region is the same
+        if flag
+            if ~isempty(find((points(end,1)-points(end,2))== 0)), points(end,:) = []; end;
+        end
+        
         EEG = eeg_eegrej(EEG, points);
     end
 end;
