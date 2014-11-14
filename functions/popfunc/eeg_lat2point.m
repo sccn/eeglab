@@ -93,10 +93,10 @@ newlat  = (lat_array*timeunit-timewin(1))*srate+1 + (epoch_array-1)*pnts;
 % Note: This is neccesary since the double precision  multiplication could lead to the
 % shifting in one sample out of the valid range
 
-if max(newlat(:)) > pnts
+if max(newlat(:)) > max((epoch_array)*pnts)
     if g.outrange == 1
-        IndxOut = find(newlat(:) > pnts);
-        newlat(IndxOut) = pnts;
+        IndxOut = find(newlat(:) > max((epoch_array)*pnts));
+        newlat(IndxOut) = max((epoch_array)*pnts);
         flag = 1;
         warning('eeg_lat2point(): Points out of range detected. Points replaced with maximum value');
     elseif g.outrange == 0
