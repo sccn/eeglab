@@ -325,9 +325,9 @@ for index = 1:length(allfields)
             eval( [ 'tmpevent = EEG.event; tmpvarvalue = {tmpevent(:).' allfields{index} '};'] );
             Ieventtmp = [];
             for index2 = 1:length( tmpvar )
-                tmpindex = transpose(find(strncmp(tmpvar{index2}, tmpvarvalue, length(tmpvar{index2})))); %Ramon: for bug 1318. Also for compatibility(strmatch will be deleted in next versions of MATLAB)
+                tmpindex = transpose(find(strcmp(deblank(tmpvar{index2}), deblank(tmpvarvalue))));%Ramon: for bug 1318. Also for compatibility(strmatch will be deleted in next versions of MATLAB)
                 %tmpindex = strmatch( tmpvar{index2}, tmpvarvalue, 'exact');
-
+                
                 if isempty( tmpindex ),
                     fprintf('Warning: ''%s'' field value ''%s'' not found\n', allfields{index}, tmpvar{index2});
                 end;
@@ -336,9 +336,9 @@ for index = 1:length(allfields)
             Ievent = intersect_bc( Ievent, Ieventtmp );
         elseif isstr( tmpvar ) % real range
             tmpevent = EEG.event;
-            % ======== JRI BUGFIX 3/6/14            
-            %eval( [ 'tmpvarvalue = [ tmpevent(:).' allfields{index} ' ];'] ); 
-            tmpvarvalue = safeConcatenate(EEG.event, allfields{index});  
+            % ======== JRI BUGFIX 3/6/14
+            %eval( [ 'tmpvarvalue = [ tmpevent(:).' allfields{index} ' ];'] );
+            tmpvarvalue = safeConcatenate(EEG.event, allfields{index});
             
             min = eval(tmpvar(1:findstr(tmpvar, '<=')-1));
             max = eval(tmpvar(findstr(tmpvar, '<=')+2:end));
