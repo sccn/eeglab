@@ -39,6 +39,13 @@ YDIR  = 1;                  % positive potential up = 1; negative up = -1
 
 HZDIR = 'up';               % ascending freqs = 'up'; descending = 'down' 
                             % (e.g., timef/newtimef frequency direction)
+                            
+% Checking MATLAB version
+vers = version;
+indp = find(vers == '.');
+if str2num(vers(indp(1)+1)) > 1, vers = [ vers(1:indp(1)) '0' vers(indp(1)+1:end) ]; end;
+indp = find(vers == '.');
+VERS = str2num(vers(1:indp(2)-1));                            
 
 % font size
 tmpComputer   = computer;
@@ -57,10 +64,16 @@ if retinaDisplay && strcmpi(tmpComputer(1:3), 'MAC')
     GUI_FONTSIZE  = 18; % graphic interface font size
     AXES_FONTSIZE = 18; % Axis labels and legend font size
     TEXT_FONTSIZE = 18; % Miscellaneous font sizes
-else
+    
+elseif VERS < 8.04
     GUI_FONTSIZE  = 10; % graphic interface font size
     AXES_FONTSIZE = 10; % Axis labels and legend font size
     TEXT_FONTSIZE = 10; % Miscellaneous font sizes
+    
+elseif VERS >= 8.04
+    GUI_FONTSIZE  = 9; % graphic interface font size
+    AXES_FONTSIZE = 9; % Axis labels and legend font size
+    TEXT_FONTSIZE = 9; % Miscellaneous font sizes
 end;
 clear retinaDisplay tmpScreenSize tmpComputer;
 
