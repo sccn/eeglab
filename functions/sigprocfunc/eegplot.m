@@ -1747,7 +1747,7 @@ else
 	
 	eyeaxes = findobj('tag','eyeaxes','parent',figh);
     ax1 = findobj('tag','eegaxis','parent',gcf); % axes handle
-	YLim = get(ax1, 'ylim');
+	YLim = double(get(ax1, 'ylim'));
     
 	ESpacing = findobj('tag','ESpacing','parent',figh);
 	g.spacing= str2num(get(ESpacing,'string'));
@@ -1755,8 +1755,8 @@ else
 	axes(eyeaxes); cla; axis off;
     set(eyeaxes, 'ylim', YLim);
     
-	Xl = [.35 .65; .5 .5; .35 .65];
-    Yl = [ g.spacing g.spacing; g.spacing 0; 0 0] + YLim(1);
+	Xl = double([.35 .65; .5 .5; .35 .65]);
+    Yl = double([ g.spacing g.spacing; g.spacing 0; 0 0] + YLim(1));
 	plot(Xl(1,:),Yl(1,:),'color',DEFAULT_AXIS_COLOR,'clipping','off', 'tag','eyeline'); hold on;
 	plot(Xl(2,:),Yl(2,:),'color',DEFAULT_AXIS_COLOR,'clipping','off', 'tag','eyeline');
 	plot(Xl(3,:),Yl(3,:),'color',DEFAULT_AXIS_COLOR,'clipping','off', 'tag','eyeline');
