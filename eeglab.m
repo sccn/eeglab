@@ -1944,6 +1944,18 @@ poswin0 = get(g.win0, 'position');
 extwin0 = get(g.win0, 'extent');
 set(g.win0, 'position', [poswin0(1:2) extwin0(3) extwin0(4)]);
 
+% adjust all font sizes (RMC fix MATLAB 2014 compatibility)
+% -------------------
+handlesname = fieldnames(g);
+for i = 1:length(handlesname)
+    if isprop(eval(['g.' handlesname{i}]),'Style') & ~strcmp(handlesname{i},'win0')
+        propval = get(eval(['g.' handlesname{i}]), 'Style');
+        if strcmp(propval,'text')
+            set(eval(['g.' handlesname{i}]),'FontSize',TEXT_FONTSIZE);
+        end
+    end
+end
+
 return;
 
 function num = popask( text )
