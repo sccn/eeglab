@@ -754,7 +754,9 @@ u(22) = uicontrol('Parent',figh, ...
   end;
 
   for i = 1: length(u) % Matlab 2014b compatibility
-      set(u(i),'Units','Normalized');  
+      if isprop(eval(['u(' num2str(i) ')']),'Style')
+          set(u(i),'Units','Normalized');
+      end
   end
   
   % %%%%%%%%%%%%%%%%%%%%%%%%%%%
