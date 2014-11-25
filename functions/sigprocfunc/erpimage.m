@@ -3358,7 +3358,13 @@ else
     amps   = [];    % null outputs unless coherfreq specified
     cohers = [];
 end
-axhndls = [ax1 axcb ax2 ax3 ax4];
+
+if VERS >= 8.04
+    axhndls = {ax1 axcb ax2 ax3 ax4};
+else
+    axhndls = [ax1 axcb ax2 ax3 ax4];
+end
+
 if exist('ur_outsort')
     outsort = ur_outsort; % restore outsort clipped values, if any
 end
@@ -3391,7 +3397,11 @@ if (~isempty(topomap)) & strcmpi(NoShow, 'no')
         end;
     end;
     axis('square')
-    axhndls = [axhndls h(12)];
+    if VERS >= 8.04
+        axhndls = {axhndls h(12)};
+    else
+        axhndls = [axhndls h(12)];
+    end
 end
 
 %
@@ -3442,7 +3452,11 @@ if (~isempty(lospecHz)) && strcmpi(NoShow, 'no')
     if ~isnan(coherfreq)
         hold on; plot([coherfreq,coherfreq],[mingfs maxgfs],'r');
     end
-    axhndls = [axhndls h(13)];
+    if VERS >= 8.04
+        axhndls = {axhndls h(13)};
+    else
+        axhndls = [axhndls h(13)];
+    end
 end
 
 %
