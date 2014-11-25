@@ -383,10 +383,10 @@ pos(3) = max(pos(3)*factmultx, g.minwidth);
 pos(4) = pos(4)*factmulty;
 set(g.fig, 'position', pos);
 
-% vertical alignment to bottom for text
+% vertical alignment to bottom for text (isnumeric by ishanlde was changed here)
 % ---------------------------------------
 for index = 1:length(allhandlers)
-	if allhandlers{index} ~= 0 && isnumeric(allhandlers{index})
+	if allhandlers{index} ~= 0 && ishandle(allhandlers{index})
 		if strcmp(get(allhandlers{index}, 'style'), 'text')
             set(allhandlers{index}, 'unit', 'pixel');
 			curpos = get(allhandlers{index}, 'position');
@@ -406,7 +406,7 @@ catch,
 	GUITEXTCOLOR        = [0 0 0];
 end;
 
-numobjects = cellfun(@ishandle, allhandlers);
+numobjects = cellfun(@ishandle, allhandlers); % (isnumeric by ishanlde was changed here)
 allhandlersnum = [ allhandlers{numobjects} ];
 hh = findobj(allhandlersnum, 'parent', g.fig, 'style', 'text');
 %set(hh, 'BackgroundColor', get(g.fig, 'color'), 'horizontalalignment', 'left');
