@@ -406,7 +406,7 @@ catch,
 	GUITEXTCOLOR        = [0 0 0];
 end;
 
-numobjects = cellfun(@isnumeric, allhandlers);
+numobjects = cellfun(@ishandle, allhandlers);
 allhandlersnum = [ allhandlers{numobjects} ];
 hh = findobj(allhandlersnum, 'parent', g.fig, 'style', 'text');
 %set(hh, 'BackgroundColor', get(g.fig, 'color'), 'horizontalalignment', 'left');
