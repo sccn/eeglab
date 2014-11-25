@@ -213,8 +213,12 @@ result = {};
 userdat = [];
 strhalt = '';
 resstruct = [];
-try, findobj(fig); % figure still exist ?
-catch, return; end;
+
+% Check if figure still exist (RMC) % try, findobj(fig);catch, return; end;
+ if ~(ishandle(fig))
+     return;
+ end
+ 
 strhalt = get(findobj('parent', fig, 'tag', 'ok'), 'userdata');
 
 % output parameters
