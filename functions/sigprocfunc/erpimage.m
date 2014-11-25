@@ -3093,10 +3093,10 @@ if ~isnan(coherfreq)
             ynumoffset  = double(limit(1)-0.3*ydelta); % double for Matlab 7
         end
         
-        t=text(ynumoffset,maxampERP,num2str(maxampERP,3));
+        t=text(double(ynumoffset),double(maxampERP),num2str(maxampERP,3));
         set(t,'HorizontalAlignment','right','FontSize',TICKFONT);
         
-        t=text(ynumoffset,minampERP, num2str(minampERP,3));
+        t=text(double(ynumoffset),double(minampERP), num2str(minampERP,3));
         set(t,'HorizontalAlignment','right','FontSize',TICKFONT);
         
         ax3=axes('Position',...
