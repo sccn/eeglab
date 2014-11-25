@@ -53,6 +53,8 @@ eval (['global ',dataname])
 % Define defaults
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+icadefs;
+
 % set initial spacing
 
 eval(['DEFAULT_SPACING = max(max(',dataname,''')-min(',dataname,'''));'])
@@ -175,7 +177,11 @@ end
    orient landscape		% choose landscape printer mode
    hold on;
    set(gcf,'NumberTitle','off')
-   set(gcf,'Name',['EEGPLOTOLD #',num2str(gcf)])
+   if VERS >= 8.04
+       set(gcf,'Name',['EEGPLOTOLD #',num2str(fighandle.Number)]);
+   else
+       set(gcf,'Name',['EEGPLOTOLD #',num2str(gcf)]);
+   end
    set (gca, 'xgrid', 'on')				%Xaxis gridlines only
    set (gca, 'GridLineStyle','-')			%Solid grid lines
    set (gca, 'XTickLabels', Xlab)			%Use Xlab for tick labels
@@ -282,20 +288,20 @@ fm2 = uimenu(fm1,'Label','Close ','UserData',fighandle,'Callback',TIMESTRING);
 TIMESTRING = [tstring1,'out1973 = gettext(''Input new windowlength(sec).'');','if isempty(out1973);','out1973 = 0;','else;','data1973(2) = str2num(out1973);',tstring2,tstring3,'end;','clear data1973 out1973'];
 
 dm1 = uimenu('Label','Display');
-dm2 = uimenu(dm1,'Label',' Window Length','Interruptible','yes','Callback',TIMESTRING);
+dm2 = uimenu(dm1,'Label',' Window Length','Interruptible','on','Callback',TIMESTRING);
 dm3 = uimenu(dm1,'Label',' Color');
 
 TIMESTRING = [tstring1,'data1973(7) = 1;',tstring2,tstring3,'clear data1973;'];
 
-dm4 = uimenu(dm3,'Label','Yellow ','UserData',axhandle,'Interruptible','yes','Callback',TIMESTRING);
+dm4 = uimenu(dm3,'Label','Yellow ','UserData',axhandle,'Interruptible','on','Callback',TIMESTRING);
 
 TIMESTRING = [tstring1,'data1973(7) = 2;',tstring2,tstring3,'clear data1973;'];
 
-dm5 = uimenu(dm3,'Label','White ','UserData',axhandle,'Interruptible','yes','Callback',TIMESTRING);
+dm5 = uimenu(dm3,'Label','White ','UserData',axhandle,'Interruptible','on','Callback',TIMESTRING);
 
 TIMESTRING = ['label1973 = gettext(''Enter new title.'');','if isempty(label1973);','label1973 = 0;','else;','title(label1973);','end;','clear label1973;'];
 
-dm6 = uimenu(dm1,'Label','Title ','Interruptible','yes','Callback',TIMESTRING);
+dm6 = uimenu(dm1,'Label','Title ','Interruptible','on','Callback',TIMESTRING);
 
 TIMESTRING = [tstring1,'Check1973 = get(data1973(10),''checked'');','if (Check1973(1:2) == ''on'');','set(data1973(10),''Checked'',''off'');','set(data1973(6),''XGrid'',''off'');','else;','set(data1973(10),''Checked'',''on'');','set(data1973(6),''XGrid'',''on'');','end;','clear data1973 Check1973;'];
 
@@ -315,7 +321,7 @@ sm1 = uimenu('Label','Settings');
 
 TIMESTRING = [tstring1,'Srate1973 = gettext(''Enter new samplerate'');','if isempty(Srate1973);','Srate1973 = 0;','else;','data1973(1) = str2num(Srate1973);','data1973(5) = data1973(8)/data1973(1);','data1973(4) = 0;',tstring2,tstring3,'end;','clear Srate1973 data1973'];
 
-sm2 = uimenu(sm1,'Label','Samplerate','Interruptible','yes','Callback',TIMESTRING);
+sm2 = uimenu(sm1,'Label','Samplerate','Interruptible','on','Callback',TIMESTRING);
 
 %Electrodes menu:
 
@@ -323,11 +329,11 @@ em1 = uimenu('Label','Electrodes');
 
 TIMESTRING = [tstring1,'ChanNamefile1973 = gettext(''Enter Electrode file to load.'');','if isempty(ChanNamefile1973);','ChanNamefile1973=0;','else;','ChanNames1973 = loadelec(ChanNamefile1973);','set(data1973(6),''YTickLabels'',flipud(ChanNames1973));','end;','clear data1973 ChanNamefile1973 ChanNames1973'];
 
-em2 = uimenu(em1,'Label','Load Electrode File ','Interruptible','yes','Callback',TIMESTRING);
+em2 = uimenu(em1,'Label','Load Electrode File ','Interruptible','on','Callback',TIMESTRING);
 
 TIMESTRING = [tstring1,'ChanNames1973 = makeelec(data1973(9));','if isempty(ChanNames1973);','ChanNames1973=0;','else;','set(data1973(6),''YTickLabels'',flipud(ChanNames1973));','end;','clear data1973 ChanNames1973'];
 
-em3 = uimenu(em1,'Label','Make Electrode File ','Interruptible','yes','Callback',TIMESTRING);
+em3 = uimenu(em1,'Label','Make Electrode File ','Interruptible','on','Callback',TIMESTRING);
 
 set(axhandle,'UserData',dataname)
 set(fighandle,'UserData',User_Data_Mat)
