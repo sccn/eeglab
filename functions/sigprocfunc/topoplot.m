@@ -579,11 +579,16 @@ if nargs > 2
         end
     end
 end
+
 if strcmpi(whitebk, 'on')
     BACKCOLOR = [ 1 1 1 ];
 end;
 
-cmap = colormap;
+if isempty(find(strcmp(varargin,'colormap')))
+    cmap = colormap(DEFAULT_COLORMAP);
+else
+    cmap = colormap;
+end
 cmaplen = size(cmap,1);
 
 if strcmp(STYLE,'blank')    % else if Values holds numbers of channels to mark
@@ -1630,7 +1635,6 @@ end;
 %%%%%%%%%%%%% Set EEGLAB background color to match head border %%%%%%%%%%%%%%%%%%%%%%%%
 %
 try, 
-  icadefs; 
   set(gcf, 'color', BACKCOLOR); 
   catch, 
 end; 
