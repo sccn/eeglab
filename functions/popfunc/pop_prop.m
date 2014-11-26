@@ -204,7 +204,7 @@ end;
 if ~exist('winhandle')
     winhandle = NaN;
 end;
-if ~isnan(winhandle)
+if ishandle(winhandle) % RMC isnan by ~ishandle
 	h = axes('units','normalized', 'position',[5 10 95 35].*s+q);
 else
 	h = axes('units','normalized', 'position',[5 0 95 40].*s+q);
@@ -243,7 +243,7 @@ end;
 	
 % display buttons
 % ---------------
-if ~isnan(winhandle)
+if ishandle(winhandle)
 	COLREJ = '[1 0.6 0.6]';
 	COLACC = '[0.75 1 0.75]';
 	% CANCEL button
@@ -281,9 +281,15 @@ if ~isnan(winhandle)
  				'tmpstatus = get( findobj(''parent'', gcbf, ''tag'', ''rejstatus''), ''userdata'');' ...
  				'EEG.reject.gcompreject(' num2str(chanorcomp) ') = tmpstatus;' ]; 
 	if winhandle ~= 0
-	 	command = [ command ...
-	 				sprintf('if tmpstatus set(%3.15f, ''backgroundcolor'', %s); else set(%3.15f, ''backgroundcolor'', %s); end;', ...
-					winhandle, COLREJ, winhandle, COLACC)];
+        if VERS < 8.04
+            command = [ command ...
+                sprintf('if tmpstatus set(%3.15f, ''backgroundcolor'', %s); else set(%3.15f, ''backgroundcolor'', %s); end;', ...
+                winhandle, COLREJ, winhandle, COLACC)];
+        elseif VERS >= 8.04
+            command = [ command ...
+                sprintf('if tmpstatus set(findobj(''Tag'', ''%s''), ''backgroundcolor'', %s); else set(findobj(''Tag'',''%s''), ''backgroundcolor'', %s); end;', ...
+                winhandle.Tag, COLREJ, winhandle.Tag, COLACC)];
+        end
 	end;				
 	command = [ command 'close(gcf); clear tmpstatus' ];
 	h  = uicontrol(gcf, 'Style', 'pushbutton', 'string', 'OK', 'backgroundcolor', GUIBUTTONCOLOR, 'Units','Normalized', 'Position',[90 -10 15 6].*s+q, 'callback', command);
