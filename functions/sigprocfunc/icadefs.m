@@ -64,18 +64,44 @@ if retinaDisplay && strcmpi(tmpComputer(1:3), 'MAC')
     GUI_FONTSIZE  = 18; % graphic interface font size
     AXES_FONTSIZE = 18; % Axis labels and legend font size
     TEXT_FONTSIZE = 18; % Miscellaneous font sizes
+end
+
+% Graph Definitions
+DEFAULT_COLORMAP = 'jet';
+
+if VERS < 8.04
+    % AXES FONTSIZE
+    AXES_FONTSIZE   = 10;                % Axis labels and legend font size
+    AXES_FONTSIZE_S = AXES_FONTSIZE - 2; % Axis labels and legend font size Small
+    AXES_FONTSIZE_L = AXES_FONTSIZE + 2; % Axis labels and legend font size Large
     
-elseif VERS < 8.04
-    GUI_FONTSIZE  = 10; % graphic interface font size
-    AXES_FONTSIZE = 10; % Axis labels and legend font size
-    TEXT_FONTSIZE = 10; % Miscellaneous font sizes
+    % GUI FONTSIZE
+    GUI_FONTSIZE    = 10;               % graphic interface font size
+    GUI_FONTSIZE_S  = GUI_FONTSIZE - 2; % graphic interface font size Small
+    GUI_FONTSIZE_L  = GUI_FONTSIZE + 2; % graphic interface font size Large
+   
+    % TEXT FONTSIZE
+    TEXT_FONTSIZE = 10;                  % Miscellaneous font sizes
+    TEXT_FONTSIZE_S = TEXT_FONTSIZE - 2; % Miscellaneous font sizes Small
+    TEXT_FONTSIZE_L = TEXT_FONTSIZE + 2; % Miscellaneous font sizes Large
     
 elseif VERS >= 8.04
-    GUI_FONTSIZE  = 9; % graphic interface font size
-    AXES_FONTSIZE = 9; % Axis labels and legend font size
-    TEXT_FONTSIZE = 9; % Miscellaneous font sizes
+    AXES_FONTSIZE   = 9;                 % Axis labels and legend font size
+    AXES_FONTSIZE_S = AXES_FONTSIZE - 2; % Axis labels and legend font size Small
+    AXES_FONTSIZE_L = AXES_FONTSIZE + 2; % Axis labels and legend font size Large
+    
+    % GUI FONTSIZE
+    GUI_FONTSIZE    = 9;                % graphic interface font size
+    GUI_FONTSIZE_S  = GUI_FONTSIZE - 2; % graphic interface font size Small
+    GUI_FONTSIZE_L  = GUI_FONTSIZE + 2; % graphic interface font size Large
+   
+    % TEXT FONTSIZE
+    TEXT_FONTSIZE   = 9;                 % Miscellaneous font sizes
+    TEXT_FONTSIZE_S = TEXT_FONTSIZE - 2; % Miscellaneous font sizes Small
+    TEXT_FONTSIZE_L = TEXT_FONTSIZE + 2; % Miscellaneous font sizes Large
 end;
-clear retinaDisplay tmpScreenSize tmpComputer;
+
+clear retinaDisplay tmpScreenSize tmpComputer vers indp;
 
 % the eeg_options.m file also countains additional options
 
