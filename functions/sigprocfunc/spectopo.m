@@ -134,6 +134,7 @@ function [eegspecdB,freqs,compeegspecdB,resvar,specstd] = spectopo(data,frames,s
 
 % formerly: ... headfreqs,chanlocs,limits,titl,freqfac, percent, varargin)
 
+icadefs;
 LOPLOTHZ = 1;  % low  Hz to plot
 FREQFAC  = 2;  % approximate frequencies/Hz (default)
 allcolors = { [0 0.7500 0.7500] 
@@ -539,11 +540,11 @@ if strcmpi(g.plot, 'on')
         axis([freqs(minfreqidx) freqs(maxfreqidx) reallimits(1) reallimits(2)]);
     catch, disp('Could not adjust axis'); end;
     xl=xlabel('Frequency (Hz)');
-    set(xl,'fontsize',16);
+    set(xl,'fontsize',AXES_FONTSIZE_L);
     % yl=ylabel('Rel. Power (dB)');
     yl=ylabel('Power 10*log_{10}(\muV^{2}/Hz)');
-    set(yl,'fontsize',16);
-    set(gca,'fontsize',16)
+    set(yl,'fontsize',AXES_FONTSIZE_L);
+    set(gca,'fontsize',AXES_FONTSIZE_L)
     box off;
 end;
 
@@ -696,7 +697,7 @@ if ~isempty(g.freq) &  strcmpi(g.plot, 'on')
 		else
 			colr = colrs{mod((f-2),5)+1};
 		end
-		li(realpos(f)) = plot([from(1) to(1)],[from(2) to(2)],colr,'LineWidth',1.5);
+		li(realpos(f)) = plot([from(1) to(1)],[from(2) to(2)],colr,'LineWidth',PLOT_LINEWIDTH_S);
 		axis([0 1 0 1]);
 		axis off;
 	end;
@@ -750,7 +751,7 @@ if ~isempty(g.freq) &  strcmpi(g.plot, 'on')
 				tl=title([num2str(freqs(freqidx(f)), '%3.1f') ' Hz']);
 			end
 		end;
-		set(tl,'fontsize',16);
+		set(tl,'fontsize',AXES_FONTSIZE_L);
 		axis square;
 		drawnow
 		fprintf('.');
