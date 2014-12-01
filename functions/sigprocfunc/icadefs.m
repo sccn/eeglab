@@ -70,10 +70,13 @@ end
 DEFAULT_COLORMAP = 'jet';
 
 if VERS < 8.04
+    PLOT_LINEWIDTH   = 2;
+    PLOT_LINEWIDTH_S = 1;
+    
     % AXES FONTSIZE
     AXES_FONTSIZE   = 10;                % Axis labels and legend font size
     AXES_FONTSIZE_S = AXES_FONTSIZE - 2; % Axis labels and legend font size Small
-    AXES_FONTSIZE_L = AXES_FONTSIZE + 2; % Axis labels and legend font size Large
+    AXES_FONTSIZE_L = 16;                % Axis labels and legend font size Large
     
     % GUI FONTSIZE
     GUI_FONTSIZE    = 10;               % graphic interface font size
@@ -86,9 +89,13 @@ if VERS < 8.04
     TEXT_FONTSIZE_L = TEXT_FONTSIZE + 2; % Miscellaneous font sizes Large
     
 elseif VERS >= 8.04
+    PLOT_LINEWIDTH   = 1;
+    PLOT_LINEWIDTH_S = 0.5;
+    
+    % AXES FONTSIZE
     AXES_FONTSIZE   = 9;                 % Axis labels and legend font size
     AXES_FONTSIZE_S = AXES_FONTSIZE - 2; % Axis labels and legend font size Small
-    AXES_FONTSIZE_L = AXES_FONTSIZE + 2; % Axis labels and legend font size Large
+    AXES_FONTSIZE_L = 12.5;              % Axis labels and legend font size Large
     
     % GUI FONTSIZE
     GUI_FONTSIZE    = 9;                % graphic interface font size
