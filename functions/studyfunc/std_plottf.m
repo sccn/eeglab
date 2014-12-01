@@ -335,11 +335,14 @@ function cbar_standard(datatype, ng, unitcolor);
 % colorbar for significance
 % -------------------------
 function cbar_signif(ng, maxplot);
+    % Retrieving Defaults
+    icadefs;
+    
     pos = get(gca, 'position');
     tmpc = caxis;
     fact = fastif(ng == 1, 40, 20);
     tmp = axes('position', [ pos(1)+pos(3)+max(pos(3)/fact,0.006) pos(2) max(pos(3)/fact,0.01) pos(4) ]);  
-    map = colormap;
+    map = colormap(DEFAULT_COLORMAP);
     n = size(map,1);
     cols = [ceil(n/2):n]';
     image([0 1],linspace(0,maxplot,length(cols)),[cols cols]);
@@ -348,6 +351,7 @@ function cbar_signif(ng, maxplot);
     set(gca, 'ytickmode', 'manual', 'YAxisLocation', 'right', 'xtick', [], ...
         'ytick', tick, 'yticklabel', round(10.^-tick*1000)/1000);
     xlabel('');
+    colormap(DEFAULT_COLORMAP);
 
 % rapid filtering for ERP
 % -----------------------
