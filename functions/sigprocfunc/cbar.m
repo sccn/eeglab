@@ -93,6 +93,11 @@ end;
 %  arg = [];
 %  ax = obj;
 %end
+try
+    icadefs;
+catch
+    warning('cbar.m unable to find icadefs.m');
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Choose colorbar position
@@ -139,8 +144,11 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Draw colorbar using image()
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-map = colormap;
+if exist('DEFAULT_COLORMAP', 'var')
+    map = colormap(DEFAULT_COLORMAP);
+else
+    map = colormap;
+end
 n = size(map,1);
 
 if length(colors) == 1
@@ -218,4 +226,8 @@ handle = ax;
 % Adjust cbar tag
 %%%%%%%%%%%%%%%%%%
 
-set(ax,'tag','cbar')
+set(ax,'tag','cbar');
+
+if exist('DEFAULT_COLORMAP', 'var')
+    colormap(DEFAULT_COLORMAP);
+end
