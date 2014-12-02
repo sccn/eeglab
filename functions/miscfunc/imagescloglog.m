@@ -47,6 +47,7 @@ function imagescloglog(times,freqs,data,clim, xticks, yticks, varargin)
       fprintf('logfreq(): frequencies must be > 0!\n');
       return
   end
+  try, icadefs; catch, warning('Using MATLAB default colormap'); end
   
   steplog = log(times(2))-log(times(1)); % same for all points
   realborders = [exp(log(times(1))-steplog/2) exp(log(times(end))+steplog/2)];
@@ -81,7 +82,9 @@ function imagescloglog(times,freqs,data,clim, xticks, yticks, varargin)
   else 
       imagesc(newtimes,newfreqs,data);
   end;
+  
   set(gca, 'yscale', 'log', 'xscale', 'log');
+  try colormap(DEFAULT_COLORMAP); catch, end;
   
   % puting ticks
   % ------------
