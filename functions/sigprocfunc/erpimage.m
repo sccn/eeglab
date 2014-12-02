@@ -2077,6 +2077,7 @@ if ~Allampsflag & ~exist('data2') %%%%%%%% Plot ERP image %%%%%%%%%%
             axis([min(outtrials) max(outtrials)...
                 timelimits(1) timelimits(2)]);
         end
+        try colormap(DEFAULT_COLORMAP); catch, end;
         hold on
         drawnow
     end;
@@ -2271,6 +2272,7 @@ elseif Allampsflag %%%%%%%%%%%%%%%% Plot allamps instead of data %%%%%%%%%%%%%%
             axis([min(outtrials) max(outtrials)...
                 timelimits(1) timelimits(2)]);
         end
+        try colormap(DEFAULT_COLORMAP); catch, end;
         drawnow
         hold on
     end;
@@ -2370,6 +2372,7 @@ elseif exist('data2') %%%%%% Plot allcohers instead of data %%%%%%%%%%%%%%%%%%%
             axis([min(outtrials) max(outtrials)...
                 timelimits(1) timelimits(2)]);
         end
+        try colormap(DEFAULT_COLORMAP); catch, end;
         drawnow
         hold on
     end;
