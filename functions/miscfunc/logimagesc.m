@@ -54,6 +54,9 @@ function [lgfreqs,datout, h, yt, yl] = logimagesc(times,freqs,data,varargin)
       datout = data;
       return
   end
+  
+  try, icadefs; catch, warning('Using MATLAB default colormap'); end
+  
   lfreqs = log(freqs);
   lgfreqs = linspace(lfreqs(1),lfreqs(end),length(lfreqs));
   lgfreqs = lgfreqs(:);
@@ -75,6 +78,7 @@ function [lgfreqs,datout, h, yt, yl] = logimagesc(times,freqs,data,varargin)
   
   if strcmp(plot, 'on')
       imagesc(times,freqs,data);
+      try colormap(DEFAULT_COLORMAP); catch, end;
       nt = ceil(min(freqs)); % new tick - round up min y to int
       ht = floor(max(freqs)); % high freq - round down
 
