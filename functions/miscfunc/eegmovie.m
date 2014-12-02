@@ -162,7 +162,7 @@ if strcmpi(opt.timecourse, 'on')
     % set(axeegplot,'XTick',[])                %%CJH
     % plot negative up
     limits = get(axeegplot,'Ylim');          % list channel numbers only
-    set(axeegplot,'GridLineStyle',':')
+    set(axeegplot,'GridLineStyle','none')
     set(axeegplot,'Xgrid','off')
     set(axeegplot,'Ygrid','on')
     
