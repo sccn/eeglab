@@ -476,9 +476,10 @@ function val = logscale(a,b,n);
 % plot figure
 % -----------
 function limits = plotfig(times, freqs, vals, g)
-    
+    icadefs;
     imagesc(times, [1:size(vals,1)], vals);
-
+    
+    colormap(DEFAULT_COLORMAP);
     ticks = linspace(1, size(vals,1), length(freqs));
     ticks = ticks(1:4:end);
     set(gca, 'ytick', ticks);
@@ -499,9 +500,10 @@ function limits = plotfig(times, freqs, vals, g)
 % plot figure with symetrical phase
 % ---------------------------------
 function limits = plotfigsim(times, freqs, vals, g)
-    
+    icadefs;
     imagesc(times, [1:size(vals,1)], vals);
 
+    colormap(DEFAULT_COLORMAP);
     ticks = linspace(1, size(vals,1), length(freqs));
     ticks = ticks(1:4:end);
     set(gca, 'ytick', ticks);
