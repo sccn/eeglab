@@ -46,8 +46,8 @@ function [x, y, z] = adjustcylinder2( h, pos1, pos2);
     vectrot = [ pos2(1)-pos1(1) pos2(2)-pos1(2) pos2(3)-pos1(3)];
     [thvect phivect] = cart2sph( vectrot(1), vectrot(2), vectrot(3) ); 
     
-    rotate(h, [0 0 1], thvect/pi*180, [0 0 0]);
-    rotate(h, [thvect+pi/2 0]/pi*180, (pi/2-phivect)/pi*180, [0 0 0]);    
+    rotatematlab(h, [0 0 1], thvect/pi*180, [0 0 0]);
+    rotatematlab(h, [thvect+pi/2 0]/pi*180, (pi/2-phivect)/pi*180, [0 0 0]);    
 
     x = get(h, 'xdata') + pos1(1);
     y = get(h, 'ydata') + pos1(2);
