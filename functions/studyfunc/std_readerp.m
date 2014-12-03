@@ -89,7 +89,7 @@ STUDY = pop_specparams(STUDY, 'default');
     'clusters'      'integer' []             [];
     'timerange'     'real'    []             STUDY.etc.erpparams.timerange;
     'freqrange'     'real'    []             STUDY.etc.specparams.freqrange;
-    'datatype'      'string'  { 'erp','spec' } 'erp';
+    'datatype'      'string'  {}             'erp';
     'rmsubjmean'    'string'  { 'on','off' } 'off';
     'singletrials'  'string'  { 'on','off' } 'off';
     'componentpol'  'string'  { 'on','off' } 'on';
@@ -103,6 +103,12 @@ paired1 = STUDY.design(opt.design).variable(1).pairing;
 paired2 = STUDY.design(opt.design).variable(2).pairing;
 
 dtype = opt.datatype;
+dsubtype = '';
+if strcmpi(dtype(1:3), 'erp' )
+    if length(dtype) > 3, dsubtype = dtype(4:end); dtype = 'erp'; end;
+elseif strcmpi(dtype(1:4), 'spec')
+    if length(dtype) > 4, dsubtype = dtype(5:end); dtype = 'spec'; end;
+end;
 
 % find channel indices
 % --------------------
@@ -129,8 +135,8 @@ for ind = 1:length(finalinds) % scan channels or components
     % check if data is already here
     % -----------------------------
     dataread = 0;
-    if strcmpi(dtype, 'erp'), eqtf = isequal( STUDY.etc.erpparams.timerange, opt.timerange);
-    else                      eqtf = isequal(STUDY.etc.specparams.freqrange, opt.freqrange) && ...
+    if strcmpi(dtype, 'erp'), eqtf = isequal( STUDY.etc.erpparams.timerange , opt.timerange);
+    else                      eqtf = isequal( STUDY.etc.specparams.freqrange, opt.freqrange) && ...
                                      isequal( STUDY.etc.specparams.subtractsubjectmean, opt.rmsubjmean);
     end;
     if strcmpi(opt.singletrials,'off')
@@ -166,7 +172,7 @@ for ind = 1:length(finalinds) % scan channels or components
         chanlab = { tmpchanlocs.labels };
         nonemptyindex = ~cellfun(@isempty, allinds);
         nonemptyindex = find(nonemptyindex(:));
-        optGetparams = { 'measure', dtype, 'getparamonly', 'on', 'singletrials', opt.singletrials, 'timelimits', opt.timerange, 'freqlimits', opt.freqrange, 'setinfoinds', 1};
+        optGetparams = { 'measure', [dtype dsubtype], 'getparamonly', 'on', 'singletrials', opt.singletrials, 'timelimits', opt.timerange, 'freqlimits', opt.freqrange, 'setinfoinds', 1};
         if ~isempty(opt.channels), [ tmp params xvals] = std_readfile(setinfo(setinds{nonemptyindex(1)}(1)), optGetparams{:}, 'channels'  , allChangrp(allinds{nonemptyindex(1)}(1)));
         else                       [ tmp params xvals] = std_readfile(setinfo(setinds{nonemptyindex(1)}(1)), optGetparams{:}, 'components', allinds{nonemptyindex(1)}(1));
         end;
@@ -188,9 +194,12 @@ for ind = 1:length(finalinds) % scan channels or components
             for c = 1:nc
                 for g = 1:ng
                     if ~isempty(setinds{c,g})
-                        if ~isempty(opt.channels), [alldata{c, g} z z z z setinfoIndices{c, g}] = std_readfile( setinfo(setinds{c,g}(:)), 'measure', dtype, opts{:}, 'channels'  , opt.channels(ind), 'setinfoinds', setinds{c,g}(:));
-                        else                       [alldata{c, g} z z z z setinfoIndices{c, g}] = std_readfile( setinfo(setinds{c,g}(:)), 'measure', dtype, opts{:}, 'components', allinds{c,g},      'setinfoinds', setinds{c,g}(:));
-                        end;
+%                         if ~isempty(opt.channels), [alldata{c, g} z z z z setinfoIndices{c, g}] = std_readfile( setinfo(setinds{c,g}(:)), 'measure', dtype, opts{:}, 'channels'  , opt.channels(ind), 'setinfoinds', setinds{c,g}(:));
+%                         else                       [alldata{c, g} z z z z setinfoIndices{c, g}] = std_readfile( setinfo(setinds{c,g}(:)), 'measure', dtype, opts{:}, 'components', allinds{c,g},      'setinfoinds', setinds{c,g}(:));
+                        if ~isempty(opt.channels), [alldata{c, g} z z z z setinfoIndices{c, g}] = std_readfile( setinfo(setinds{c,g}(:)), 'measure', [dtype dsubtype], opts{:}, 'channels'  , opt.channels(ind), 'setinfoinds', setinds{c,g}(:));
+                        else                       [alldata{c, g} z z z z setinfoIndices{c, g}] = std_readfile( setinfo(setinds{c,g}(:)), 'measure', [dtype dsubtype], opts{:}, 'components', allinds{c,g},      'setinfoinds', setinds{c,g}(:));
+
+                    end;
                     end;
                 end;
             end;
@@ -198,9 +207,11 @@ for ind = 1:length(finalinds) % scan channels or components
             for c = 1:nc
                 for g = 1:ng
                     if ~isempty(setinds{c,g})
-                        if ~isempty(opt.channels), [alldata{c, g}] = std_readfile( setinfo(setinds{c,g}(:)), 'measure', dtype, opts{:}, 'channels'  , opt.channels(ind));
-                        else                       [alldata{c, g}] = std_readfile( setinfo(setinds{c,g}(:)), 'measure', dtype, opts{:}, 'components', allinds{c,g});
-                        end;
+%                         if ~isempty(opt.channels), [alldata{c, g}] = std_readfile( setinfo(setinds{c,g}(:)), 'measure', dtype, opts{:}, 'channels'  , opt.channels(ind));
+%                         else                       [alldata{c, g}] = std_readfile( setinfo(setinds{c,g}(:)), 'measure', dtype, opts{:}, 'components', allinds{c,g});
+                        if ~isempty(opt.channels), [alldata{c, g}] = std_readfile( setinfo(setinds{c,g}(:)), 'measure', [dtype dsubtype], opts{:}, 'channels'  , opt.channels(ind));
+                        else                       [alldata{c, g}] = std_readfile( setinfo(setinds{c,g}(:)), 'measure', [dtype dsubtype], opts{:}, 'components', allinds{c,g});
+                    end;
                     end;
                 end;
             end;
