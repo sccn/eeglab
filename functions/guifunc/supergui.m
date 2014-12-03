@@ -353,7 +353,7 @@ end;
 % adjustments
 % -----------
 factmultx = factmultx*1.02;% because some text was still hidden
-%factmultx = factmultx*1.2; 
+factmulty = factmulty*1.2; 
 if factmultx < 0.1
 	factmultx = 0.1;
 end;
