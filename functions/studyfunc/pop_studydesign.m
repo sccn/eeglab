@@ -1,7 +1,7 @@
-% pop_studydesign2() - create a STUDY design structure.
+% pop_studydesign() - create a STUDY design structure.
 %
 % Usage: 
-%   >> [STUDY, ALLEEG] = pop_studydesign2(STUDY, ALLEEG, key1, val1, ...);  
+%   >> [STUDY, ALLEEG] = pop_studydesign(STUDY, ALLEEG, key1, val1, ...);  
 %
 % Inputs:
 %   STUDY      - EEGLAB STUDY set
@@ -27,11 +27,11 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [STUDY allcom] = pop_studydesign2(STUDY, ALLEEG, designind, varargin);  
+function [STUDY allcom] = pop_studydesign(STUDY, ALLEEG, designind, varargin);  
     
 allcom = '';
 if nargin < 2
-    help pop_studydesign2;
+    help pop_studydesign;
     return;
 end;
 
@@ -64,22 +64,22 @@ if nargin < 3 && ~isstr(STUDY)
         end;
     end;
         
-    cb_rename = 'pop_studydesign2(''rename'', gcbf);';
-    cb_add    = 'pop_studydesign2(''add'', gcbf);';
-    cb_del    = 'pop_studydesign2(''del'', gcbf);';
-    cb_listboxfact1 = 'pop_studydesign2(''selectfact'', gcf, 0);';
-    cb_listboxfact2 = 'pop_studydesign2(''selectfact'', gcf, 1);';
-    cb_selectsubj   = 'pop_studydesign2(''selectsubj'', gcbf);';
-    cb_combinevals1 = 'pop_studydesign2(''combinevals'', gcbf, 0);';
-    cb_combinevals2 = 'pop_studydesign2(''combinevals'', gcbf, 1);';
-    cb_lbval        = 'pop_studydesign2(''updategui'', gcbf);';
-    cb_selectdesign = 'pop_studydesign2(''selectdesign'', gcbf);';
-    cb_selectdata   = 'pop_studydesign2(''selectdatatrials'', gcbf);';
-    cb_selectfolder = 'pop_studydesign2(''selectfolder'', gcbf);';
-    cb_setfolder    = 'pop_studydesign2(''updategui'', gcbf);';
-    cb_newvar       = 'pop_studydesign2(''newvar'', gcbf);';
-    cb_editvar      = 'pop_studydesign2(''editvar'', gcbf);';
-    cb_delvar       = 'pop_studydesign2(''delvar'', gcbf);';
+    cb_rename = 'pop_studydesign(''rename'', gcbf);';
+    cb_add    = 'pop_studydesign(''add'', gcbf);';
+    cb_del    = 'pop_studydesign(''del'', gcbf);';
+    cb_listboxfact1 = 'pop_studydesign(''selectfact'', gcf, 0);';
+    cb_listboxfact2 = 'pop_studydesign(''selectfact'', gcf, 1);';
+    cb_selectsubj   = 'pop_studydesign(''selectsubj'', gcbf);';
+    cb_combinevals1 = 'pop_studydesign(''combinevals'', gcbf, 0);';
+    cb_combinevals2 = 'pop_studydesign(''combinevals'', gcbf, 1);';
+    cb_lbval        = 'pop_studydesign(''updategui'', gcbf);';
+    cb_selectdesign = 'pop_studydesign(''selectdesign'', gcbf);';
+    cb_selectdata   = 'pop_studydesign(''selectdatatrials'', gcbf);';
+    cb_selectfolder = 'pop_studydesign(''selectfolder'', gcbf);';
+    cb_setfolder    = 'pop_studydesign(''updategui'', gcbf);';
+    cb_newvar       = 'pop_studydesign(''newvar'', gcbf);';
+    cb_editvar      = 'pop_studydesign(''editvar'', gcbf);';
+    cb_delvar       = 'pop_studydesign(''delvar'', gcbf);';
     uilist = { { 'style' 'text'       'string' 'Select STUDY design' 'fontweight' 'bold' } ...
                { 'style' 'listbox'    'string' { usrdat.design.name } 'tag' 'listboxdesign' 'callback' cb_selectdesign 'value' STUDY.currentdesign } ...
                { 'style' 'pushbutton' 'string' 'Add design'    'callback' cb_add } ...
@@ -139,8 +139,8 @@ if nargin < 3 && ~isstr(STUDY)
                  };
 
     for i = 1:length(geometry), geometry{i}{3} = geometry{i}{3}-1; end;            
-    streval = [ 'pop_studydesign2(''selectdesign'', gcf);' ];    
-    [tmp usrdat tmp2 result] = inputgui('uilist', uilist, 'title', 'Edit STUDY design -- pop_studydesign2()', 'helpbut', 'Web help', 'helpcom',  'web(''http://sccn.ucsd.edu/wiki/Chapter_03:_Working_with_STUDY_designs'', ''-browser'')', 'geom', geometry, 'userdata', usrdat, 'eval', streval);
+    streval = [ 'pop_studydesign(''selectdesign'', gcf);' ];    
+    [tmp usrdat tmp2 result] = inputgui('uilist', uilist, 'title', 'Edit STUDY design -- pop_studydesign()', 'helpbut', 'Web help', 'helpcom',  'web(''http://sccn.ucsd.edu/wiki/Chapter_03:_Working_with_STUDY_designs'', ''-browser'')', 'geom', geometry, 'userdata', usrdat, 'eval', streval);
     if isempty(tmp), return; end;
     
     % call std_makedesign
@@ -238,7 +238,7 @@ elseif isstr(STUDY)
             val        = get(findobj(fig, 'tag', 'listboxdesign'), 'value');
             strs       = get(findobj(fig, 'tag', 'listboxdesign'), 'string');
             result     = inputdlg2( { 'Study design name:                                                                    ' }, ...
-                                      'Rename Study Design', 1,  { strs{val} }, 'pop_studydesign2');
+                                      'Rename Study Design', 1,  { strs{val} }, 'pop_studydesign');
             if isempty(result), return; end;
             des(val).name  = result{1};
                       
@@ -280,8 +280,8 @@ elseif isstr(STUDY)
             
         case 'selectdatatrials', % select specific dataset and trials
             usrdat.parent = fig;
-            cb_sel = 'pop_studydesign2(''selectdatatrialssel'',gcbf);';
-            cb_add = 'pop_studydesign2(''selectdatatrialsadd'',gcbf);';
+            cb_sel = 'pop_studydesign(''selectdatatrialssel'',gcbf);';
+            cb_add = 'pop_studydesign(''selectdatatrialsadd'',gcbf);';
             uilist = { { 'style' 'text'    'string' strvcat('Press ''Add'' to add data', 'selection. Multiple variables', 'are combined using AND.') } ...
                        { 'style' 'text'    'string' 'Select data based on variable', 'fontweight' 'bold' } ...
                        { 'style' 'listbox' 'string' usrdat.factors  'tag' 'lbfact2' 'callback' cb_sel 'value' 1 } ...
@@ -359,7 +359,7 @@ elseif isstr(STUDY)
 
     usrdat.design = des;
     set(fig, 'userdata', usrdat);
-    pop_studydesign2( 'updategui', fig);
+    pop_studydesign( 'updategui', fig);
     
     if strcmpi(com, 'newvar')
         set(findobj(fig, 'tag', 'lbfact0'), 'value', length(des(val).variable));
