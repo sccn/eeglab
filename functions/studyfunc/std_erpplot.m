@@ -103,10 +103,16 @@ pgroup = []; pcond = []; pinter = [];
 % find datatype and default options
 % ---------------------------------
 dtype = 'erp';
+dsubtype = '';
 for ind = 1:2:length(varargin)
     if strcmpi(varargin{ind}, 'datatype')
         dtype = varargin{ind+1}; 
     end;
+end;
+if strcmpi(dtype(1:3), 'erp' )
+    if length(dtype) > 3, dsubtype = dtype(4:end); dtype = 'erp'; end;
+elseif strcmpi(dtype(1:4), 'spec')
+    if length(dtype) > 4, dsubtype = dtype(5:end); dtype = 'spec'; end;
 end;
 
 % get parameters
@@ -146,7 +152,7 @@ opt = finputcheck( options, ...
                                'plotstderr'  'string'  []              'off';
                                'channels'    'cell'    []              {};
                                'clusters'    'integer' []              [];
-                               'datatype'    'string'  { 'erp','spec' } 'erp';
+                               'datatype'    'string'  {}              'erp';
                                'mode'        'string'  []              ''; % for backward compatibility (now used for statistics)
                                'comps'       { 'string','integer' } [] []; % for backward compatibility
                                'statmode'    'string'  { 'subjects','common','trials' } 'subjects'; % ignored
@@ -225,10 +231,10 @@ if ~isempty(opt.channels)
 
     if strcmpi(opt.datatype, 'erp')
         [STUDY erpdata alltimes] = std_readerp(STUDY, ALLEEG, 'channels', opt.channels(chaninds), 'timerange', params.timerange, ...
-                'subject', opt.subject, 'singletrials', stats.singletrials, 'design', opt.design);
+                'subject', opt.subject, 'singletrials', stats.singletrials, 'design', opt.design, 'datatype', [dtype dsubtype]);
     else
-        [STUDY erpdata alltimes] = std_readspec(STUDY, ALLEEG, 'channels', opt.channels(chaninds), 'freqrange', params.freqrange, ...
-            'rmsubjmean', params.subtractsubjectmean, 'subject', opt.subject, 'singletrials', stats.singletrials, 'design', opt.design);
+        [STUDY erpdata alltimes] = std_readerp(STUDY, ALLEEG, 'channels', opt.channels(chaninds), 'freqrange', params.freqrange, ...
+            'rmsubjmean', params.subtractsubjectmean, 'subject', opt.subject, 'singletrials', stats.singletrials, 'design', opt.design, 'datatype', [dtype dsubtype]);
     end;
     if strcmpi(params.averagechan, 'on') && length(chaninds) > 1
         for index = 1:length(erpdata(:))
@@ -305,10 +311,10 @@ else
         if length(opt.clusters) > 1, subplot(nr,nc,index); end;
         if strcmpi(opt.datatype, 'erp')
             [STUDY erpdata alltimes] = std_readerp(STUDY, ALLEEG, 'clusters', opt.clusters(index), 'timerange', params.timerange, ...
-                        'component', opt.comps, 'singletrials', stats.singletrials, 'design', opt.design);
+                        'component', opt.comps, 'singletrials', stats.singletrials, 'design', opt.design, 'datatype', [dtype dsubtype]);
         else
-            [STUDY erpdata alltimes] = std_readspec(STUDY, ALLEEG, 'clusters', opt.clusters(index), 'freqrange', params.freqrange, ...
-                        'rmsubjmean', params.subtractsubjectmean, 'component', opt.comps, 'singletrials', stats.singletrials, 'design', opt.design);
+            [STUDY erpdata alltimes] = std_readerp(STUDY, ALLEEG, 'clusters', opt.clusters(index), 'freqrange', params.freqrange, ...
+                        'rmsubjmean', params.subtractsubjectmean, 'component', opt.comps, 'singletrials', stats.singletrials, 'design', opt.design, 'datatype', [dtype dsubtype]);
         end;
         if isempty(erpdata), return; end;
 
