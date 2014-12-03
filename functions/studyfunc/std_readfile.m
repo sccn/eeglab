@@ -12,7 +12,7 @@
 %
 % Optional inputs:
 %   'channels'   - [cell or integer] channel labels - for instance 
-%                  { 'cz' 'pz' } - or indices - for instance [1 2 3]
+%                  { 'cz' 'pz' }
 %                  of channels to load from the data file.
 %   'components' - [integer] component index in the selected EEG dataset for which 
 %                  to read the ERSP
@@ -65,18 +65,35 @@ if nargin < 1
     return;
 end;
 
+limomeasures = {'itcbeta1' , 'itcbeta2' ,'itcr2r' ,'itcr2f' ,'itcr2p' ,...
+                'erpbeta1' , 'erpbeta2' ,'erpr2r' ,'erpr2f' ,'erpr2p' ,...
+                'erspbeta1', 'erspbeta2','erspr2r','erspr2f','erspr2p',...
+                'specbeta1', 'specbeta2','specr2r','specr2f','specr2p'};
 opt = finputcheck(varargin, { 'components'       'integer'  []    [];
                               'getparamonly'     'string'   { 'on','off' }  'off';
                               'singletrials'     'string'   { 'on','off' }  'off';
                               'concatenate'      'string'   { 'on','off' }  'off'; % ERPimage only
                               'channels'         'cell'     []    {};
                               'setinfoinds'      'integer'  []    [];
-                              'measure'          'string'   { 'erpim','ersp','erspboot','erspbase','itc','itcboot','spec','erp','timef' }  'erp';
+                              'measure'          'string'   {limomeasures{:} 'itc' 'erp' 'ersp' 'spec' 'erpim','itcboot'   , 'timef'} 'erp';                                                 
                               'timelimits'       'real'     []    []; % ERPimage, ERP, ERSP, ITC
                               'triallimits'      'real'     []    []; % ERPimage only
                               'freqlimits'       'real'     []    []; % SPEC, ERSP, ITC
                               'dataindices'      'integer'  []    [] }, 'std_readdatafile');
 if isstr(opt), error(opt); end;
+
+if any(strcmpi(opt.measure, limomeasures))
+    for fInd = 1:length(fileBaseName)
+        [datatmp, parameters, measureRange1, measureRange2] = std_readfilelimo(fileBaseName(1), varargin{:});
+        if fInd == 1
+            measureData = datatmp'; 
+        else
+        measureData = cat(2,measureData, datatmp');
+        end
+    end
+    return
+end;
+
 if ~isempty(opt.triallimits), opt.freqlimits = opt.triallimits; end;
 if strcmpi(opt.concatenate, 'on'), opt.singletrials = 'on'; end;
 if isstruct(fileBaseName), fileBaseName = { fileBaseName.filebase }; 
