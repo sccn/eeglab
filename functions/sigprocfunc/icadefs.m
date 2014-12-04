@@ -41,11 +41,11 @@ HZDIR = 'up';               % ascending freqs = 'up'; descending = 'down'
                             % (e.g., timef/newtimef frequency direction)
                             
 % Checking MATLAB version
-vers = version;
-indp = find(vers == '.');
-if str2num(vers(indp(1)+1)) > 1, vers = [ vers(1:indp(1)) '0' vers(indp(1)+1:end) ]; end;
-indp = find(vers == '.');
-VERS = str2num(vers(1:indp(2)-1));                            
+tmpvers = version;
+indp = find(tmpvers == '.');
+if str2num(tmpvers(indp(1)+1)) > 1, tmpvers = [ tmpvers(1:indp(1)) '0' tmpvers(indp(1)+1:end) ]; end;
+indp = find(tmpvers == '.');
+VERS = str2num(tmpvers(1:indp(2)-1));                            
 
 % font size
 tmpComputer   = computer;
@@ -108,7 +108,7 @@ elseif VERS >= 8.04
     TEXT_FONTSIZE_L = TEXT_FONTSIZE + 2; % Miscellaneous font sizes Large
 end;
 
-clear retinaDisplay tmpScreenSize tmpComputer vers indp;
+clear retinaDisplay tmpScreenSize tmpComputer tmpvers indp;
 
 % the eeg_options.m file also countains additional options
 
