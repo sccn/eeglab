@@ -323,7 +323,7 @@ function cbar_standard(datatype, ng, unitcolor);
     set(gca, 'unit', 'normalized');
     if strcmpi(datatype, 'itc')
          cbar(tmp, 0, tmpc, 10); ylim([0.5 1]);
-         title('ITC');
+         title('ITC','fontsize',10,'fontweight','normal');
     elseif strcmpi(datatype, 'erpim')
         cbar(tmp, 0, tmpc, 5);
     else
