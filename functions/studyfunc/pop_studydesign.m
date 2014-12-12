@@ -358,7 +358,8 @@ elseif isstr(STUDY)
                 des(val).variable(val2).value = tmpVarList; % empty for cont var
             end;
         case 'plotdmat'
-            std_plotdmat(usrdat,des(val));
+            val    = get(findobj(fig, 'tag', 'listboxdesign'), 'value');
+            std_plotdmat(usrdat,val);
     end;
 
     usrdat.design = des;
