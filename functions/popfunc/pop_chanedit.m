@@ -160,7 +160,7 @@ if nargin < 2
     orichaninfo = [];
 end;
 
-if isempty(chans) || ~isnumeric(chans)
+if isempty(chans) || ~ishandle(chans)
     % in case an EEG structure was given as input
     % -------------------------------------------
     if isfield(chans, 'chanlocs')
@@ -368,7 +368,7 @@ else
     % call from command line or from a figure
     % ---------------------------------------
     currentpos = 0;
-    if isnumeric(chans)
+    if ishandle(chans)
         fig         = chans;
         userdata    = get(fig, 'userdata');
         chans       = userdata.chans;
