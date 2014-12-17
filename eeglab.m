@@ -1165,7 +1165,7 @@ javaChatFlag    = 1;
 BORDERINT       = 4;
 BORDEREXT       = 10;
 comp = computer;
-if strcmpi(comp(1:3), 'GLN') || strcmpi(comp(1:3), 'MAC') 
+if strcmpi(comp(1:3), 'GLN') || strcmpi(comp(1:3), 'MAC') || strcmpi(comp(1:3), 'PCW')  
     FONTNAME        = 'courier';
     FONTSIZE        = 8;
     % Magnify figure under MATLAB 2012a
