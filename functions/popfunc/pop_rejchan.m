@@ -134,7 +134,9 @@ elseif strcmpi(opt.measure, 'kurt')
 else
     fprintf('Computing spectrum for channels...\n');
     [measure freq] = pop_spectopo(EEG, 1, [], 'EEG' , 'plot','off');
-
+    
+    measure = measure(opt.elec,:); % selecting channels
+    
     % select frequency range
     if ~isempty(opt.freqrange)
         [tmp fBeg] = min(abs(freq-opt.freqrange(1)));
