@@ -111,11 +111,25 @@ else % INEEG is an EEG struct
             INEEG2.xmax = INEEG1.xmax;
             fprintf('Warning: the two epoched datasets do not have the same time offset, adjusted');
         end;
+        
     end;
 
+    % repopulate epoch field if necessary
+    % -----------------------------------
+    if INEEG1.trials > 1 && INEEG2.trials == 1
+        for iEvent = 1:length(INEEG2.event)
+            INEEG2.event(iEvent).epoch = 1;
+        end;
+    end;
+    if INEEG1.trials == 1 && INEEG2.trials > 1
+        for iEvent = 1:length(INEEG1.event)
+            INEEG1.event(iEvent).epoch = 1;
+        end;
+    end;
+    
     % Merge the epoch field
     % ---------------------
-    if INEEG1.trials > 1 | INEEG2.trials > 1
+    if INEEG1.trials > 1 || INEEG2.trials > 1
         INEEGX = {INEEG1,INEEG2};
         for n = 1:2
             % make sure that both have an (appropriately-sized) epoch field
@@ -203,10 +217,9 @@ else % INEEG is an EEG struct
         INEEG1.icaact = [];
     end;
 
-
     % concatenate events
     % ------------------
-    if isempty(INEEG2.event) && INEEG2.trials == 1
+    if isempty(INEEG2.event) && INEEG2.trials == 1 && INEEG1.trials == 1 
 
         % boundary event
         % -------------
@@ -338,6 +351,7 @@ else % INEEG is an EEG struct
     % rebuild event-related epoch fields
     % ----------------------------------
     disp('Reconstituting epoch information...');
+    INEEG1.epoch = [];
     INEEG1 = eeg_checkset(INEEG1, 'eventconsistency');
 end
 
