@@ -180,8 +180,9 @@ if strcmpi(mode, 'together')
     for k = 1:len 
        if len ~= 1
             sbplot(rowcols(1),rowcols(2),k)  
-        end
-        toporeplot(STUDY.cluster(cls(k)).topo, 'style', 'both', 'plotrad',0.5,'intrad',0.5, 'verbose', 'off');
+       end
+        tmpcmap = colormap(DEFAULT_COLORMAP);
+        toporeplot(STUDY.cluster(cls(k)).topo, 'style', 'both', 'plotrad',0.5,'intrad',0.5, 'verbose', 'off','colormap', tmpcmap);
         title([ STUDY.cluster(cls(k)).name ' (' num2str(length(unique(STUDY.cluster(cls(k)).sets(1,:)))) ' Ss, ' num2str(length(STUDY.cluster(cls(k)).comps)),' ICs)']);
         %title([ STUDY.cluster(cls(k)).name ', ' num2str(length(unique(STUDY.cluster(cls(k)).sets(1,:)))) 'Ss' ]);
         if figureon
