@@ -200,8 +200,8 @@ tmpdmat(check,:) = [];
 tmpdmat = [tmpdmat  ones(size(tmpdmat,1), 1)];
 
 % Checking checbox to sort/unsort
-if isfield(handles, 'checkbox_sort') & handles.checkbox_sort.Value
-    [tmpdmat,tmp] = sortrows(tmpdmat,[1:size(tmpdmat,2)]);
+if isfield(handles, 'checkbox_sort') && get(handles.checkbox_sort, 'Value')
+     [tmpdmat,tmp] = sortrows(tmpdmat,[1:size(tmpdmat,2)]);
 end
 
 % Updating the design info
