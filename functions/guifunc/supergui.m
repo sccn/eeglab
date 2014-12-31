@@ -293,6 +293,9 @@ for counter = 1:maxcount
                 % property grid argument
                 panel = uipanel('Title','','FontSize',12,'BackgroundColor','white','Position',[posx posy+addvert width height*heightfactor].*s+q);
                 allhandlers{counter} = arg_guipanel(panel, currentelem{:});
+            elseif strcmpi(currentelem{1}, 'uitable'),
+                uitable(g.fig, currentelem{2:end}, 'unit', 'normalized', 'Position',[posx posy+addvert width height*heightfactor].*s+q);
+                allhandlers{counter} = 0;
             else
                 allhandlers{counter} = uicontrol(g.fig, 'unit', 'normalized', 'position', ...
                     [posx posy+addvert width height*heightfactor].*s+q, currentelem{:}, addParamFont{:});
@@ -334,7 +337,7 @@ for counter = 1:maxcount
 
             % Uniformize button text aspect (first letter must be upercase)
             % -----------------------------
-            if strcmp(style, 'pushbutton')
+            if strcmp(style, 'pushbutton') && ~isequal(allhandlers{counter},0)
                 tmptext = get(allhandlers{counter}, 'string');
                 if length(tmptext) > 1
                     if upper(tmptext(1)) ~= tmptext(1) || lower(tmptext(2)) ~= tmptext(2) && ~strcmpi(tmptext, 'STATS')
