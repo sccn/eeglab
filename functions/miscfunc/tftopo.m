@@ -460,21 +460,12 @@ elseif strcmpi(g.logfreq, 'native'),
         maxTick = max(ylim);
         set(gca,'ytick',linspace(minTick, maxTick,50));
     end;
-    
+   
     tmpval = get(gca,'yticklabel');
     if iscell(tmpval)
-        % MATLAB version >= 8.04
-        try
-            ft = str2num(cell2mat(tmpval));
-        catch
-            % To avoid bug in matlab cell2mat. i.e. when tmpval = {'0';'0.5'}
-            for i = 1:length(tmpval)
-                ft(i,1) = str2num(cell2mat(tmpval(i)));
-            end
-        end
+        ft = str2num(cell2mat(tmpval)); % MATLAB version >= 8.04
     else
-        % MATLAB version <  8.04
-        ft = str2num(tmpval);           
+        ft = str2num(tmpval);           % MATLAB version <  8.04
     end
         
     ft = exp(1).^ft;
