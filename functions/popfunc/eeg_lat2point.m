@@ -93,7 +93,7 @@ newlat  = (lat_array*timeunit-timewin(1))*srate+1 + (epoch_array-1)*pnts;
 % Note: This is neccesary since the double precision  multiplication could lead to the
 % shifting in one sample out of the valid range
 
-if max(newlat(:)) > max((epoch_array)*pnts)
+if  and(~isempty(newlat),~isempty(epoch_array)) && max(newlat(:)) > max((epoch_array)*pnts)
     if g.outrange == 1
         IndxOut = find(newlat(:) > max((epoch_array)*pnts));
         newlat(IndxOut) = max((epoch_array)*pnts);
