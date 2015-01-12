@@ -55,11 +55,11 @@ setappdata(0,'numdesign',numdesign);
 %--------------------------------------------------------------------------
 mainfig_pos        = [.509  .465  .306  .519];
 Text1_pos          = [.124  .946  .191  .024];
-Text2_pos          = [.080  .25   .432  .021];
+Text2_pos          = [.080  .208  .432  .029];
 Text3_pos          = [.397  .861  .24   .024];
 checkbox_sort_pos  = [.422  .901  .242  .027];
-axes_pos           = [.118  .337  .817  .513];
-listbox1_pos       = [.12   .019  .817  .218];
+axes_pos           = [.118  .306  .817  .513];
+listbox1_pos       = [.12   .018  .817  .178];
 popup_subject_pos  = [.124  .896  .224  .035];
 
 GUI_FONTSIZE = 9;
@@ -112,7 +112,14 @@ set(handles.disp_prop,'String'          ,'Loading..',...
 % Axes
 %--------------------------------------------------------------------------
 handles.axes1 =  axes('unit', 'normalized', 'position', axes_pos);
-
+handles.axes2 =  axes('unit'          ,'normalized', ...
+                      'position'      ,axes_pos, ...  
+                      'Position'      ,handles.axes1.Position,...
+                      'XAxisLocation' ,'top',...
+                      'YAxisLocation' ,'right',...
+                      'Color'         ,'none',...
+                      'YTick'         ,'',...
+                      'YTickLabel'    ,'');
 % Checkbox
 %--------------------------------------------------------------------------
  handles.checkbox_sort = uicontrol('Style'   ,'checkbox');
@@ -194,27 +201,41 @@ tmpdmat(check,:) = [];
      [tmpdmat,tmp] = sortrows(tmpdmat,[1:size(tmpdmat,2)]);
  end
 
-% display(['Number of trials missing in design:' num2str(ntrials-newntrials)]);
-fig = handles.axes1;
-imagesc(tmpdmat); colormap('gray'); drawnow;
-xlabel('Regressors', 'FontWeight', 'normal', 'FontSize', 9);
-ylabel('Trials','FontWeight', 'Normal', 'FontSize', 9);
-set(gca,'XTick',1:size(tmpdmat,2))
+% Checking checbox to sort/unsort
+if isfield(handles, 'checkbox_sort') & handles.checkbox_sort.Value
+    [tmpdmat,tmp] = sortrows(tmpdmat,[1:size(tmpdmat,2)]);
+end
 
-% Updating the design info 
+% Updating the design info
 text2display(1) = {['Design Name: ' design.name]}; %Name of the design
 
 % Name and values of Regressors
- for i = 1:length(design.variable) % Loop per condition
-     allvarstmp = '[';
-     for j = 1 : length(design.variable(i).value)
-         allvarstmp = [allvarstmp ' ' num2str(design.variable(i).value{j})];
-     end
-     allvarstmp = [allvarstmp ' ]'];
-     
-     ncond(i)           = length(design.variable(i).value);
-     text2display(2*i)     = {['Regressor ' num2str(i) ' : ' design.variable(i).label]};
-     text2display(2*i + 1) = {['Regressor ' num2str(i) ' values :' allvarstmp]};
- end
+for i = 1:length(design.variable) % Loop per condition
+    allvarstmp = '[';
+    for j = 1 : length(design.variable(i).value)
+        allvarstmp = [allvarstmp ' ' num2str(design.variable(i).value{j})];
+    end
+    allvarstmp = [allvarstmp ' ]'];
+    
+    ncond(i)           = length(design.variable(i).value);
+    text2display(2*i)     = {['Regressor ' num2str(i) ' : ' design.variable(i).label]};
+    text2display(2*i + 1) = {['Regressor ' num2str(i) ' values :' allvarstmp]};
+end
+
+text2display(2*(i+1))     = {['Regressor ' num2str(i+1) ' : Baseline' ]};
+text2display(2*(i+1) + 1) = {['Regressor ' num2str(i+1) ' values : [1]' ]};
+
 %  Display values
 set(handles.disp_prop,'String',text2display,'HorizontalAlignment', 'left');
+
+% display(['Number of trials missing in design:' num2str(ntrials-newntrials)]);
+% fig1 = handles.axes1;
+axes(handles.axes1)
+imagesc(tmpdmat); colormap(flipud(colormap('gray')));
+xlabel('Regressors', 'FontWeight', 'normal', 'FontSize', 9);
+ylabel('Trials','FontWeight', 'Normal', 'FontSize', 9);
+set(handles.axes1,'XTick',1:size(tmpdmat,2))
+set(handles.axes2','XTick', handles.axes1.XTick,...
+                   'XTickLabel', {design.variable.label 'Baseline'},...
+                   'XLim', handles.axes1.XLim);
+drawnow;
