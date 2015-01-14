@@ -10,6 +10,10 @@
 % Optional inputs:
 %   'design'     - [numeric vector] STUDY design index. Default is to use
 %                  the current design.
+%   'cell'       - [integer] index of the STUDY design cell to convert to
+%                  an EEG dataset. Default is the first cell.
+%   'dataset'    - [integer] bypass cell and design above. Simply get
+%                  dataset with a given index.
 %   'rmcomps'    - [integer array] remove artifactual components (this entry
 %                  is ignored when plotting components). This entry contains 
 %                  the indices of the components to be removed. Default is none.
@@ -18,8 +22,6 @@
 %   'interp'     - [struct] channel location structure containing electrode
 %                  to interpolate ((this entry is ignored when plotting 
 %                  components). Default is no interpolation.
-%   'cell'       - [integer] index of the STUDY design cell to convert to
-%                  an EEG dataset. Default is the first cell.
 %   'onecomppercluster' - ['on'|'off'] when 'on' enforces one component per 
 %                  cluster. Default is 'off'.
 %   'interpcomponent' - ['on'|'off'] when 'on' interpolating component 
@@ -74,6 +76,7 @@ opt = finputcheck( varargin, { 'design'  'integer'   []    STUDY.currentdesign;
                                'rmcomps' 'integer'	 []    [];
                                'cluster' 'integer'   []    [];
                                'rmclust' 'integer'   []    [];
+                               'dataset' 'integer'   []    [];
                                'onecomppercluster' 'string'   {'on' 'off'}    'off';
                                'interpcomponent'   'string'   {'on' 'off'}    'off';
                                'checkonly' 'string'   {'on' 'off'}    'off';
@@ -90,7 +93,12 @@ if length(opt.cell) > 1
         EEGOUT(index) = std_getdataset(STUDY, ALLEEG, varargin{:});
     end;
 else
-    mycell = STUDY.design(opt.design).cell(opt.cell);
+    if ~isempty(opt.dataset)
+        mycell.dataset = opt.dataset;
+        mycell.trials  = { [1:ALLEEG(opt.dataset).trials] };
+    else
+        mycell = STUDY.design(opt.design).cell(opt.cell);
+    end;
     
     % find components in non-artifactual cluster
     if ~isempty(opt.cluster)
@@ -135,10 +143,12 @@ else
     end;
     EEGOUT.event  = [];
     EEGOUT.epoch  = [];
-    EEGOUT.filename = mycell.filebase;
-    EEGOUT.condition = mycell.value{1};
-    EEGOUT.group     = mycell.value{2};
-    EEGOUT.subject   = mycell.case;
+    if isfield(mycell, 'filebase')
+        EEGOUT.filename = mycell.filebase;
+        EEGOUT.condition = mycell.value{1};
+        EEGOUT.group     = mycell.value{2};
+        EEGOUT.subject   = mycell.case;
+    end;
     if ~isempty(opt.cluster)
         if ~isempty(opt.interp) && strcmpi(opt.interpcomponent, 'on')
             TMPEEG = EEGOUT;
