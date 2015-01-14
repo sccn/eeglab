@@ -106,6 +106,7 @@ g = finputcheck(options, { 'components' 'integer' []         [];
                            'trialindices' { 'integer','cell' } []         [];
                            'rmcomps'    'cell'    []         cell(1,length(EEG));
                            'fileout'    'string'  []         '';
+                           'trialinfo'  'struct'  []         struct([]);
                            'savetrials' 'string'  { 'on','off' } 'off';
                            'interp'     'struct'  { }        struct([]);
                            'timerange'  'real'    []         [];        % the timerange option is deprecated and has no effect
@@ -212,14 +213,14 @@ end;
 if isempty(timevals), timevals = linspace(EEG(1).xmin, EEG(1).xmax, EEG(1).pnts)*1000; end; % continuous data
 fileNames = computeFullFileName( { EEG.filepath }, { EEG.filename });
 if strcmpi(prefix, 'comp')
-    savetofile( filename, timevals, X, 'comp', 1:size(X,1), options, {}, fileNames, g.trialindices);
+    savetofile( filename, timevals, X, 'comp', 1:size(X,1), options, {}, fileNames, g.trialindices, g.trialinfo);
     %[X,t] = std_readerp( EEG, 1, g.components, g.timerange);
 else
     if ~isempty(g.interp)
-        savetofile( filename, timevals, X, 'chan', 1:size(X,1), options, { g.interp.labels }, fileNames, g.trialindices);
+        savetofile( filename, timevals, X, 'chan', 1:size(X,1), options, { g.interp.labels }, fileNames, g.trialindices, g.trialinfo);
     else
         tmpchanlocs = EEG(1).chanlocs;
-        savetofile( filename, timevals, X, 'chan', 1:size(X,1), options, { tmpchanlocs.labels }, fileNames, g.trialindices);
+        savetofile( filename, timevals, X, 'chan', 1:size(X,1), options, { tmpchanlocs.labels }, fileNames, g.trialindices, g.trialinfo);
     end;
     %[X,t] = std_readerp( EEG, 1, g.channels, g.timerange);
 end;
@@ -234,7 +235,7 @@ end;
 % -------------------------------------
 % saving ERP information to Matlab file
 % -------------------------------------
-function savetofile(filename, t, X, prefix, comps, params, labels, dataFiles, dataTrials);
+function savetofile(filename, t, X, prefix, comps, params, labels, dataFiles, dataTrials, trialInfo);
     
     disp([ 'Saving ERP file ''' filename '''' ]);
     allerp = [];
@@ -249,5 +250,6 @@ function savetofile(filename, t, X, prefix, comps, params, labels, dataFiles, da
     allerp.parameters  = params;
     allerp.datafiles   = dataFiles;
     allerp.datatrials  = dataTrials;
+    allerp.trialinfo   = trialInfo;
     
     std_savedat(filename, allerp);
