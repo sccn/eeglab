@@ -250,9 +250,8 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
             inds = find(strncmp( uniqueSubjects{iSubj}, allSubjects, max(cellfun(@length, allSubjects))));
             filepath = STUDY.datasetinfo(inds(1)).filepath;
             filebase = fullfile(filepath, uniqueSubjects{iSubj});
-            trialinfo = std_combtrialinfo(STUDY.datasetinfo, inds);
-            
-            addopts = { 'savetrials' g.savetrials 'recompute' g.recompute 'fileout' filebase 'trialinfo' trialinfo };
+     
+            addopts = { 'savetrials' g.savetrials 'recompute' g.recompute 'fileout' filebase 'trialinfo' [ STUDY.datasetinfo(inds).trialinfo ] };
             if strcmpi(computewhat, 'channels')
                 [tmpchanlist opts] = getchansandopts(STUDY, ALLEEG, chanlist, inds, g);
                 std_erp(ALLEEG(inds), 'channels', tmpchanlist, opts{:}, addopts{:}, g.erpparams{:});
