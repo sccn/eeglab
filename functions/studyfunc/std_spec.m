@@ -163,11 +163,14 @@ end;
                                       'rmcomps'    'cell'    []         cell(1,length(EEG));
                                       'nw'         'float'   []         4;
                                       'fileout'    'string'  []         '';
+                                      'trialinfo'  'struct'  []         struct([]);
                                       'burgorder'  'integer' []         20;
                                       'interp'     'struct'  { }        struct([]);
                                       'nfft'       'integer' []         [];
                                       'freqrange'  'real'    []         [] }, 'std_spec', 'ignore');
 if isstr(g), error(g); end;
+if isempty(g.trialindices), g.trialindices = cell(length(EEG)); end;
+if ~iscell(g.trialindices), g.trialindices = { g.trialindices }; end;
 if isfield(EEG,'icaweights')
    numc = size(EEG(1).icaweights,1);
 else
@@ -337,13 +340,13 @@ fileNames = computeFullFileName( { EEG.filepath }, { EEG.filename });
 if strcmpi(g.savefile, 'on')
     options = { options{:} spec_opt{:} 'timerange' g.timerange 'nfft' g.nfft 'specmode' g.specmode };
     if strcmpi(prefix, 'comp')
-        savetofile( filename, f, X, 'comp', 1:size(X,1), options, {}, fileNames, g.trialindices, datatype);
+        savetofile( filename, f, X, 'comp', 1:size(X,1), options, {}, fileNames, g.trialindices, datatype , g.trialinfo);
     else
         if ~isempty(g.interp)
-            savetofile( filename, f, X, 'chan', 1:size(X,1), options, { g.interp.labels }, fileNames, g.trialindices, datatype);
+            savetofile( filename, f, X, 'chan', 1:size(X,1), options, { g.interp.labels }, fileNames, g.trialindices, datatype , g.trialinfo);
         else
             tmpchanlocs = EEG(1).chanlocs;
-            savetofile( filename, f, X, 'chan', 1:size(X,1), options, { tmpchanlocs.labels }, fileNames, g.trialindices, datatype);
+            savetofile( filename, f, X, 'chan', 1:size(X,1), options, { tmpchanlocs.labels }, fileNames, g.trialindices, datatype , g.trialinfo);
         end;
     end;
 end;
@@ -359,7 +362,7 @@ end;
 % -------------------------------------
 % saving SPEC information to Matlab file
 % -------------------------------------
-function savetofile(filename, f, X, prefix, comps, params, labels, dataFiles, dataTrials, datatype);
+function savetofile(filename, f, X, prefix, comps, params, labels, dataFiles, dataTrials, datatype , trialInfo);
     
     disp([ 'Saving SPECTRAL file ''' filename '''' ]);
     allspec = [];
@@ -374,6 +377,7 @@ function savetofile(filename, f, X, prefix, comps, params, labels, dataFiles, da
     allspec.datatype   = datatype;
     allspec.datafiles   = dataFiles;
     allspec.datatrials  = dataTrials;
+    allspec.trialinfo   = trialInfo;
     allspec.average_spec = mean(X,1);
     std_savedat(filename, allspec);
 
