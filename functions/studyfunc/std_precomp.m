@@ -289,7 +289,7 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
                 if length(inds)>1 && ~isequal(chanlist{inds})
                     error(['ICA decompositions must be identical if' 10 'several datasets are concatenated' 10 'for a given subject' ]);
                 end;
-                std_erp(ALLEEG(inds), 'components', chanlist{desset.dataset(1)}, addopts{:}, g.erpparams{:});
+                std_erp(ALLEEG(inds), 'components', chanlist{inds(1)}, addopts{:}, g.erpparams{:});
             end;
         end;
         if isfield(curstruct, 'erpdata')
@@ -303,22 +303,23 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
     if strcmpi(g.spec, 'on')
         % check dataset consistency
         % -------------------------
-        for index = 1:length(STUDY.design(g.design).cell)
-            if ~isempty(g.cell)
-                 desset = STUDY.design(g.design).cell(g.cell);
-            else desset = STUDY.design(g.design).cell(index);
-            end;
-            addopts = { 'savetrials', g.savetrials, 'recompute', g.recompute, 'fileout', desset.filebase, 'trialindices', desset.trials };
+        allSubjects = { STUDY.datasetinfo.subject };
+        uniqueSubjects = unique(allSubjects);
+        for iSubj = 1:length(uniqueSubjects)
+            inds = find(strncmp( uniqueSubjects{iSubj}, allSubjects, max(cellfun(@length, allSubjects))));
+            filepath = STUDY.datasetinfo(inds(1)).filepath;
+            filebase = fullfile(filepath, uniqueSubjects{iSubj});
+
+            addopts = { 'savetrials', g.savetrials, 'recompute', g.recompute, 'fileout', filebase, 'trialinfo' [ STUDY.datasetinfo(inds).trialinfo ] };
             if strcmpi(computewhat, 'channels')
-                [tmpchanlist opts] = getchansandopts(STUDY, ALLEEG, chanlist, desset.dataset, g);
-                std_spec(ALLEEG(desset.dataset), 'channels', tmpchanlist, opts{:}, addopts{:}, g.specparams{:});
+                [tmpchanlist opts] = getchansandopts(STUDY, ALLEEG, chanlist, inds, g);
+                std_spec(ALLEEG(inds), 'channels', tmpchanlist, opts{:}, addopts{:}, g.specparams{:});
             else
-                if length(desset.dataset)>1 && ~isequal(chanlist{desset.dataset})
-                    error(['ICA decompositions must be identical if' 10 'several datasets are concatenated to build' 10 'the design, abording' ]);
+                if length(inds)>1 && ~isequal(chanlist{inds})
+                    error(['ICA decompositions must be identical if' 10 'several datasets are concatenated' 10 'for a given subject' ]);
                 end;
-                std_spec(ALLEEG(desset.dataset), 'components', chanlist{desset.dataset(1)}, addopts{:}, g.specparams{:});
+                std_spec(ALLEEG(inds), 'components', chanlist{inds(1)}, addopts{:}, g.specparams{:});
             end;
-            if ~isempty(g.cell), break; end;
         end;
         if isfield(curstruct, 'specdata')
             curstruct = rmfield(curstruct, 'specdata');
