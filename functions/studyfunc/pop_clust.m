@@ -16,7 +16,9 @@
 %                 clustering. The 'kmeans' options requires the statistical toolbox. The
 %                 'kmeanscluster' option is included in EEGLAB. The 'Neural Network' 
 %                  option requires the Matlab Neural Net toolbox {default: 'kmeans'} 
-%   'clus_num'  - [integer] the number of desired clusters (must be > 1) {default: 20}
+%   'clus_num'  - [integer] the number of desired clusters (must be > 1)
+%                 {default: 20}. Not neccesary when using Affinity Propagation algorithm 
+%   'maxiter'   - maximun numer of iterations when using Affinity Propagation algorithm 
 %   'outliers'  - [integer] identify outliers further than the given number of standard
 %                 deviations from any cluster centroid. Inf --> identify no such outliers.
 %                 {default: Inf from the command line; 3 for 'kmeans' from the pop window}
@@ -106,11 +108,15 @@ if isempty(varargin) %GUI call
         if strcmpi(resp, 'cancel'), return; end;
     end;
     
-	alg_options = {'Kmeans (stat. toolbox)' 'Neural Network (stat. toolbox)' 'Kmeanscluster (no toolbox)' }; %'Hierarchical tree' 
+	alg_options = {'Kmeans (stat. toolbox)' 'Neural Network (stat. toolbox)' 'Kmeanscluster (no toolbox)' 'Affinity Propagation' }; %'Hierarchical tree' 
 	set_outliers = ['set(findobj(''parent'', gcbf, ''tag'', ''outliers_std''), ''enable'', fastif(get(gcbo, ''value''), ''on'', ''off''));'...
                             'set(findobj(''parent'', gcbf, ''tag'', ''std_txt''), ''enable'', fastif(get(gcbo, ''value''), ''on'', ''off''));']; 
-	algoptions = [ 'set(findobj(''parent'', gcbf, ''userdata'', ''kmeans''), ''enable'', fastif(get(gcbo, ''value'')==1, ''on'', ''off''));' ];
-	saveSTUDY = [ 'set(findobj(''parent'', gcbf, ''userdata'', ''save''), ''enable'', fastif(get(gcbo, ''value'')==1, ''on'', ''off''));' ];
+                        
+	algoptions = [ 'set(findobj(''parent'', gcbf, ''userdata'', ''kmeans''), ''enable'', fastif(get(gcbo, ''value'')==1, ''on'', ''off''));' ...
+                  'if  get(findobj(''parent'', gcbf, ''tag'', ''clust_algorithm''),''value'') == 4 ;'...
+                  'set(findobj(''parent'', gcbf, ''tag'', ''clust_num''), ''enable'', ''off''); else; set(findobj(''parent'', gcbf, ''tag'', ''clust_num''), ''enable'', ''on''); end;'];
+	
+    saveSTUDY = [ 'set(findobj(''parent'', gcbf, ''userdata'', ''save''), ''enable'', fastif(get(gcbo, ''value'')==1, ''on'', ''off''));' ];
 	browsesave = [ '[filename, filepath] = uiputfile2(''*.study'', ''Save STUDY with .study extension -- pop_clust()''); ' ... 
                       'set(findobj(''parent'', gcbf, ''tag'', ''studyfile''), ''string'', [filepath filename]);' ];
     if ~exist('kmeans'), valalg = 3; else valalg = 1; end;
@@ -195,6 +201,11 @@ if isempty(varargin) %GUI call
              [IDX,C] = neural_net(clustdata,clus_num);
              [STUDY] = std_createclust(STUDY, ALLEEG, 'clusterind', IDX, 'algorithm',  {'Neural Network', clus_num});
              command = sprintf('%s %s %d %s', command, '''algorithm'', ''Neural Network'',''clus_num'', ', clus_num, ',');
+             
+         case 'Affinity Propagation'
+             command = sprintf('%s %s%s%s %d %s', command, '''algorithm'',''Affinity Propagation'',');            
+             [IDX,C,sumd] = std_apcluster(clustdata,'maxits',200);
+             [STUDY]      = std_createclust(STUDY, ALLEEG, 'clusterind', IDX, 'algorithm', {'Affinity Propagation',size(C,1)});
         end
         disp('Done.');
         
@@ -250,11 +261,12 @@ else %command line call
 
     %default values
     algorithm = 'kmeans';
-    clus_num = 20;
-    save = 'off';
+    clus_num  = 20;
+    save     = 'off';
     filename = STUDY.filename;
     filepath = STUDY.filepath;
     outliers = Inf; % default std is Inf - no outliers
+    maxiter  = 200;
     
     if mod(length(varargin),2) ~= 0
         error('pop_clust(): input variables must be specified in pairs: keywords, values');
@@ -263,17 +275,19 @@ else %command line call
     for k = 1:2:length(varargin)
         switch(varargin{k})
             case 'algorithm'
-                algorithm = varargin{k+1};
+                algorithm  = varargin{k+1};
             case 'clus_num'
-                clus_num = varargin{k+1};
+                clus_num   = varargin{k+1};
             case 'outliers'
-                outliers =  varargin{k+1};                
+                outliers   =  varargin{k+1};                
             case 'save'
-                save = varargin{k+1};
+                save       = varargin{k+1};
             case 'filename' 
-                filename = varargin{k+1};
+                filename   = varargin{k+1};
             case 'filepath'
-                filepath = varargin{k+1};
+                filepath   = varargin{k+1};
+            case 'maxiter' 
+                maxiter    = varargin{k+1};
         end
     end    
     if clus_num < 2
@@ -297,6 +311,9 @@ else %command line call
         case 'neural network'
             [IDX,C] = neural_net(clustdata,clus_num);
             [STUDY] = std_createclust(STUDY, ALLEEG, 'clusterind', IDX, 'algorithm',  {'Neural Network', clus_num});
+        case 'Affinity Propagation'           
+             [IDX,C,sumd] = std_apcluster(clustdata,'maxits',maxiter);
+             [STUDY]      = std_createclust(STUDY, ALLEEG, 'clusterind', IDX, 'algorithm', {'Affinity Propagation',size(C,1)});
         otherwise
             disp('pop_clust: unknown algorithm return');
             return
