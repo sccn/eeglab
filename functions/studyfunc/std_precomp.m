@@ -539,11 +539,11 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
             end;
             if strcmpi(g.rmicacomps, 'on')
                 for ind = 1:length(idat)
-                    rmcomps{ind} = union_bc(rmcomps{ind}, find(ALLEEG(idat(1)).reject.gcompreject));
+                    rmcomps{ind} = union_bc(rmcomps{ind}, find(ALLEEG(idat(ind)).reject.gcompreject));
                 end;
             elseif strcmpi(g.rmicacomps, 'processica')
                 for ind = 1:length(idat)
-                    rmcomps{ind} = union_bc(rmcomps{ind}, find(~ALLEEG(idat(1)).reject.gcompreject));
+                    rmcomps{ind} = union_bc(rmcomps{ind}, find(~ALLEEG(idat(ind)).reject.gcompreject));
                 end;
             end;
             opts = { opts{:} 'rmcomps' rmcomps };
