@@ -137,10 +137,9 @@ for ri = compnum
 
 		% plot the head
 		% -------------
-		if ~strcmp(get(gcf, 'tag'), currentfigtag);
-			disp('Aborting plot');
-			return;
-		end;
+        if ~strcmp(get(gcf, 'tag'), currentfigtag);
+            figure(findobj('tag', currentfigtag));
+        end;
 		ha = axes('Units','Normalized', 'Position',[X Y sizewx sizewy].*s+q);
         if plotelec
             topoplot( EEG.icawinv(:,ri), EEG.chanlocs, 'verbose', ...
@@ -153,6 +152,9 @@ for ri = compnum
 
 		% plot the button
 		% ---------------
+         if ~strcmp(get(gcf, 'tag'), currentfigtag);
+             figure(findobj('tag', currentfigtag));
+         end
 		button = uicontrol(gcf, 'Style', 'pushbutton', 'Units','Normalized', 'Position',...
                            [X Y+sizewy sizewx sizewy*0.25].*s+q, 'tag', ['comp' num2str(ri)]);
         command = sprintf('pop_prop( %s, 0, %d, gcbo, { ''freqrange'', [1 50] });', inputname(1), ri); %RMC command = sprintf('pop_prop( %s, 0, %d, %3.15f, { ''freqrange'', [1 50] });', inputname(1), ri, button);
@@ -166,6 +168,9 @@ end;
 % draw the bottom button
 % ----------------------
 if ~exist('fig')
+    if ~strcmp(get(gcf, 'tag'), currentfigtag);
+        figure(findobj('tag', currentfigtag));
+    end
 	hh = uicontrol(gcf, 'Style', 'pushbutton', 'string', 'Cancel', 'Units','Normalized', 'backgroundcolor', GUIBUTTONCOLOR, ...
 			'Position',[-10 -10  15 sizewy*0.25].*s+q, 'callback', 'close(gcf); fprintf(''Operation cancelled\n'')' );
 	hh = uicontrol(gcf, 'Style', 'pushbutton', 'string', 'Set threhsolds', 'Units','Normalized', 'backgroundcolor', GUIBUTTONCOLOR, ...
