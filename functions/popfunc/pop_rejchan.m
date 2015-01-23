@@ -103,7 +103,7 @@ if nargin < 2
         options = { options{:} 'measure', 'kurt' }; 
     else
         options = { options{:} 'measure', 'spec' };
-        options = { options{:} 'freqrange', str2double(result{5})}; % 7/16/2014 Ramon
+        options = { options{:} 'freqrange', str2num(result{5})};
     end;
 
 else
