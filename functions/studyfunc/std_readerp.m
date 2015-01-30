@@ -141,13 +141,15 @@ for ind = 1:length(finalinds) % scan channels or components
         if isfield(tmpstruct, [ dtype 'datatrials' ]) && eqtf
             tmpdat = getfield(tmpstruct, [ dtype 'datatrials' ]);
             range  = fastif( strcmpi(dtype, 'erp'), 'erptimes', 'specfreqs');
-            if ~isempty(opt.channels) && ~isempty(tmpdat) && strcmpi(getfield(tmpstruct, [ dtype 'trialinfo' ]), opt.subject)
-                if size(tmpdat{1},2) == length(getfield(tmpstruct, range))
-                    dataread = 1; 
-                end;
-            elseif isempty(opt.channels) && isequal(getfield(tmpstruct, [ dtype 'trialinfo' ]), opt.component) 
-                if size(tmpdat{1},2) == length(getfield(tmpstruct, range))
-                    dataread = 1; 
+            if isfield(tmpstruct, range)
+                if ~isempty(opt.channels) && ~isempty(tmpdat) && strcmpi(getfield(tmpstruct, [ dtype 'trialinfo' ]), opt.subject)
+                    if size(tmpdat{1},2) == length(getfield(tmpstruct, range))
+                        dataread = 1; 
+                    end;
+                elseif isempty(opt.channels) && isequal(getfield(tmpstruct, [ dtype 'trialinfo' ]), opt.component) 
+                    if size(tmpdat{1},2) == length(getfield(tmpstruct, range))
+                        dataread = 1; 
+                    end;
                 end;
             end;
         end;
