@@ -195,6 +195,8 @@ if isempty(varargin) %GUI call
              [IDX,C] = neural_net(clustdata,clus_num);
              [STUDY] = std_createclust(STUDY, ALLEEG, 'clusterind', IDX, 'algorithm',  {'Neural Network', clus_num});
              command = sprintf('%s %s %d %s', command, '''algorithm'', ''Neural Network'',''clus_num'', ', clus_num, ',');
+         case 'multiapclust'
+             [STUDY] = std_createclust(STUDY, ALLEEG, 'clusterind', STUDY.etc.apclust.IDX{1}, 'algorithm',  {'Neural Network', length(unique(STUDY.etc.apclust.IDX{1}))});
         end
         disp('Done.');
         
@@ -297,6 +299,8 @@ else %command line call
         case 'neural network'
             [IDX,C] = neural_net(clustdata,clus_num);
             [STUDY] = std_createclust(STUDY, ALLEEG, 'clusterind', IDX, 'algorithm',  {'Neural Network', clus_num});
+        case 'multiapclust'
+             [STUDY] = std_createclust(STUDY, ALLEEG, 'clusterind', STUDY.etc.apclust.IDX, 'algorithm',  {'Neural Network', length(unique(STUDY.etc.apclust.IDX))});
         otherwise
             disp('pop_clust: unknown algorithm return');
             return
