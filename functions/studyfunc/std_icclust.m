@@ -291,8 +291,8 @@ for index = 1:length(varargin)
                 cellinds  = [ tmpstruct.setinds{:} ];
                 compinds  = [ tmpstruct.allinds{:} ];
                 cells = STUDY.design(STUDY.currentdesign).cell(cellinds);
-                fprintf('Pre-clustering array row %d, adding %s for design %d cell(s) [%s] component %d ...\n', si, upper(strcom), STUDY.currentdesign, int2str(cellinds), compinds(1));
-                X = std_readfile( cells, 'components', compinds, 'timelimits', timewindow, 'measure', strcom);
+                fprintf('Creating input array for Affinity Propagation Clustering row %d, adding %s for design %d cell(s) [%s] component %d ...\n', si, upper(strcom), STUDY.currentdesign, int2str(cellinds), compinds(1));
+                X = std_readfile( cells, 'components', compinds, 'timelimits', timewindow, 'freqlimits', freqrange, 'measure', strcom);
         end;
         
         % copy data in the array
@@ -347,7 +347,7 @@ if isempty(IDX{useclust})
 end
 
 % Storing data
-if ~isempty(STUDY.etc.apclust.data)
+if isfield(STUDY.etc, 'apclust') && ~isempty(STUDY.etc.apclust.data)
     display('Replacing clustering data with the new one computed ...');
     STUDY.etc.apclust = [];
 end
