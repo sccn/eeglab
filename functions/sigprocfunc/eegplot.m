@@ -444,7 +444,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
   figh = figure('UserData', g,... % store the settings here
       'Color',DEFAULT_FIG_COLOR, 'name', g.title,...
       'MenuBar','none','tag', g.tag ,'Position',g.position, ...
-      'numbertitle', 'off', 'visible', 'off');
+      'numbertitle', 'off', 'visible', 'off', 'Units', 'Normalized');
 
   pos = get(figh,'position'); % plot relative to current axes
   q = [pos(1) pos(2) 0 0];
@@ -455,7 +455,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
   % --------------- 
   ax0 = axes('tag','backeeg','parent',figh,...
       'Position',DEFAULT_AXES_POSITION,...
-      'Box','off','xgrid','off', 'xaxislocation', 'top'); 
+      'Box','off','xgrid','off', 'xaxislocation', 'top', 'Units', 'Normalized'); 
 
   % Drawing axis
   % --------------- 
@@ -1068,7 +1068,7 @@ u(22) = uicontrol('Parent',figh, ...
                          'else '                                            g.selectcommand{3} 'end;' ];
        
   set(figh, 'windowbuttondownfcn',   g.commandselect{1});
-  set(figh, 'windowbuttonmotionfcn', g.commandselect{2});
+  set(figh, 'WindowButtonDownFcn', g.commandselect{2});   %set(figh, 'windowbuttonmotionfcn', g.commandselect{2});
   set(figh, 'windowbuttonupfcn',     g.commandselect{3});
   set(figh, 'WindowKeyPressFcn',     @eegplot_readkey);
   set(figh, 'interruptible', 'off');
@@ -1459,17 +1459,23 @@ else
             event2plot  = union_bc(union(event2plot, event2plot2), event2plot3);
         end;
         for index = 1:length(event2plot)
+            %Just repeat for the first one
+            if index == 1
+                EVENTFONT = ' \fontsize{10} ';
+                ylims=ylim;
+            end
+            
             % draw latency line
             % -----------------
             tmplat = g.eventlatencies(event2plot(index))-lowlim-1;
-            tmph   = plot([ tmplat tmplat ], ylim, 'color', g.eventcolors{ event2plot(index) }, ...
+            tmph   = plot([ tmplat tmplat ], ylims, 'color', g.eventcolors{ event2plot(index) }, ...
                           'linestyle', g.eventstyle { event2plot(index) }, ...
                           'linewidth', g.eventwidths( event2plot(index) ) );
     
             % schtefan: add Event types text above event latency line
             % -------------------------------------------------------
-            EVENTFONT = ' \fontsize{10} ';
-            ylims=ylim;
+%             EVENTFONT = ' \fontsize{10} ';
+%             ylims=ylim;
             evntxt = strrep(num2str(g.events(event2plot(index)).type),'_','-');
             if length(evntxt)>MAXEVENTSTRING, evntxt = [ evntxt(1:MAXEVENTSTRING-1) '...' ]; end; % truncate
             try, 
@@ -1485,7 +1491,7 @@ else
                     & g.eventwidths( event2plot(index) ) ~= 2.5 % do not plot length of boundary events
                 tmplatend = g.eventlatencyend(event2plot(index))-lowlim-1;
                 if tmplatend ~= 0, 
-                    tmplim = ylim;
+                    tmplim = ylims;
                     tmpcol = g.eventcolors{ event2plot(index) };
                     h = patch([ tmplat tmplatend tmplatend tmplat ], ...
                               [ tmplim(1) tmplim(1) tmplim(2) tmplim(2) ], ...
@@ -1898,44 +1904,51 @@ else
   % ----------------------------------------------------------------------------------------
   case 'defmotioncom'
     fig = varargin{1};
-    g = get(fig,'UserData');
     
-    ax1 = findobj('tag','backeeg','parent',fig); 
-	tmppos = get(ax1, 'currentpoint');
-
-    if g.trialstag ~= -1,
-          lowlim = round(g.time*g.trialstag+1);
-    else, lowlim = round(g.time*g.srate+1);
-    end;
-    if g.incallback
-        g.winrej = [g.winrej(1:end-1,:)' [g.winrej(end,1) tmppos(1)+lowlim g.winrej(end,3:end)]']';
-        set(fig,'UserData', g);
-        eegplot('drawb');
-    else
-        hh = findobj('tag','Etime','parent',fig);
+    ax1 = findobj('tag','backeeg','parent',fig);
+    tmppos = get(ax1, 'currentpoint'); 
+    
+    % --- For developing testings ---
+    % disp(['You clicked X:',num2str(tmppos(1,1)),', Y:',num2str(tmppos(1,2)) ', Z:',num2str(tmppos(1,3))]); 
+    % if  all([tmppos(1,1) >= 0,tmppos(1,2)>= 0,tmppos(1,2)<= 640, tmppos(1,1)<= 640 , tmppos(1,3)== 1])
+    % ---
+    
+    if  all([tmppos(1,1) >= 0,tmppos(1,2)>= 0])
+        g = get(fig,'UserData');
         if g.trialstag ~= -1,
-             set(hh, 'string', num2str(mod(tmppos(1)+lowlim-1,g.trialstag)/g.trialstag*(g.limits(2)-g.limits(1)) + g.limits(1)));
-        else set(hh, 'string', num2str((tmppos(1)+lowlim-1)/g.srate)); % put g.time in the box
+            lowlim = round(g.time*g.trialstag+1);
+        else, lowlim = round(g.time*g.srate+1);
         end;
-        ax1 = findobj('tag','eegaxis','parent',fig);
-        tmppos = get(ax1, 'currentpoint');
-        tmpelec = round(tmppos(1,2) / g.spacing);
-        tmpelec = min(max(double(tmpelec), 1),g.chans);
-        labls = get(ax1, 'YtickLabel');
-        hh = findobj('tag','Eelec','parent',fig);  % put electrode in the box
-        if ~g.envelope
-            set(hh, 'string', labls(tmpelec+1,:));
+        if g.incallback
+            g.winrej = [g.winrej(1:end-1,:)' [g.winrej(end,1) tmppos(1)+lowlim g.winrej(end,3:end)]']';
+            set(fig,'UserData', g);
+            eegplot('drawb');
         else
-            set(hh, 'string', ' ');
-        end
-        hh = findobj('tag','Evalue','parent',fig);
-        if ~g.envelope
-            eegplotdata = get(ax1, 'userdata');
-            set(hh, 'string', num2str(eegplotdata(g.chans+1-tmpelec, min(g.frames,max(1,double(round(tmppos(1)+lowlim)))))));  % put value in the box
-        else
-            set(hh,'string',' ');
-        end
-    end;
+            hh = findobj('tag','Etime','parent',fig);
+            if g.trialstag ~= -1,
+                set(hh, 'string', num2str(mod(tmppos(1)+lowlim-1,g.trialstag)/g.trialstag*(g.limits(2)-g.limits(1)) + g.limits(1)));
+            else set(hh, 'string', num2str((tmppos(1)+lowlim-1)/g.srate)); % put g.time in the box
+            end;
+            ax1 = findobj('tag','eegaxis','parent',fig);
+            tmppos = get(ax1, 'currentpoint');
+            tmpelec = round(tmppos(1,2) / g.spacing);
+            tmpelec = min(max(double(tmpelec), 1),g.chans);
+            labls = get(ax1, 'YtickLabel');
+            hh = findobj('tag','Eelec','parent',fig);  % put electrode in the box
+            if ~g.envelope
+                set(hh, 'string', labls(tmpelec+1,:));
+            else
+                set(hh, 'string', ' ');
+            end
+            hh = findobj('tag','Evalue','parent',fig);
+            if ~g.envelope
+                eegplotdata = get(ax1, 'userdata');
+                set(hh, 'string', num2str(eegplotdata(g.chans+1-tmpelec, min(g.frames,max(1,double(round(tmppos(1)+lowlim)))))));  % put value in the box
+            else
+                set(hh,'string',' ');
+            end
+        end;
+    end
          
   % add topoplot
   % ------------
