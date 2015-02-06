@@ -23,9 +23,11 @@
 %  'singletrials' - ['on'|'off'] use single trials to compute statistics.
 %                   This requires the measure to be computed with the
 %                   'savetrials', 'on' option.
+%  'mode'         - ['eeglab'|'fieldtrip'] use either EEGLAB or Fieldtrip
+%                   statistics.
 %
 % EEGLAB statistics:
-%  'method'      - ['parametric'|'permutation'|'bootstrap'] statistical 
+%  'method'      - ['param'|'perm'|'bootstrap'] statistical 
 %                  method. See help statcond for more information.
 %  'naccu'       - [integer] Number of surrogate data averages to use in
 %                  surrogate statistics. For instance, if p<0.01,
@@ -45,6 +47,8 @@
 %                  none'.
 %
 % Fieldtrip statistics:
+%  'fieldtripmethod' - ['analytic'|'montecarlo'] statistical 
+%                  method. See help statcond for more information.
 %  'fieldtripnaccu' - [integer] Number of surrogate data averages to use in
 %                  surrogate statistics.
 %  'fieldtripalpha' - [alpha] Significance threshold (0<alpha<<1). This
@@ -113,6 +117,8 @@ if isempty(varargin) && ~isempty(STUDY)
     fieldtripThresh = fastif(isnan(paramstruct.fieldtrip.alpha),'exact', num2str(paramstruct.fieldtrip.alpha));
     eeglabStat      = strmatch(paramstruct.eeglab.method, eeglabStatvalues);
     fieldtripStat   = strmatch(paramstruct.fieldtrip.method, fieldtripStatvalues);
+    if isempty(eeglabStat)   , error('Unknown statistical method for EEGLAB'); end;
+    if isempty(fieldtripStat), error('Unknown statistical method for Fieldtrip'); end;
     eeglabRand      = fastif(isempty(paramstruct.eeglab.naccu), 'auto', num2str(paramstruct.eeglab.naccu));
     fieldtripRand   = fastif(isempty(paramstruct.fieldtrip.naccu), 'auto', num2str(paramstruct.fieldtrip.naccu));
     eeglabMcorrect    = strmatch(paramstruct.eeglab.mcorrect, mCorrectList);
