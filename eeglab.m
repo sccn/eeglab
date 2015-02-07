@@ -198,7 +198,7 @@ if nargin < 1
         eeglabpath2 = mywhich('eeglab.m');
     end;
     if ~isempty(eeglabpath2)
-        evalin('base', 'clear classes updater;');
+        %evalin('base', 'clear classes updater;'); % this clears all the variables
         eeglabpath2 = eeglabpath2(1:end-length('eeglab.m'));
         tmpWarning = warning('backtrace'); 
         warning backtrace off;
