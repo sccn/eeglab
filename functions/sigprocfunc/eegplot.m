@@ -108,6 +108,7 @@
 %                   {default: from data}.  If < total number of channels, a vertical  
 %                   slider on the left side of the figure allows vertical data scrolling. 
 %    'title'      - Figure title {default: none}
+%    'plottitle'  - Plot title {default: none}
 %    'xgrid'      - ['on'|'off'] Toggle display of the x-axis grid {default: 'off'}
 %    'ygrid'      - ['on'|'off'] Toggle display of the y-axis grid {default: 'off'}
 %    'ploteventdur' - ['on'|'off'] Toggle display of event duration { default: 'off' }
@@ -279,6 +280,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
    try, g.winlength; 		catch, g.winlength	= 5; 	end; % Number of seconds of EEG displayed
    try, g.position; 	    catch, g.position	= ORIGINAL_POSITION; 	end;
    try, g.title; 		    catch, g.title		= ['Scroll activity -- eegplot()']; 	end;
+   try, g.plottitle; 		catch, g.plottitle	= ''; 	end;
    try, g.trialstag; 		catch, g.trialstag	= -1; 	end;
    try, g.winrej; 			catch, g.winrej		= []; 	end;
    try, g.command; 			catch, g.command	= ''; 	end;
@@ -317,7 +319,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
    gfields = fieldnames(g);
    for index=1:length(gfields)
       switch gfields{index}
-      case {'spacing', 'srate' 'eloc_file' 'winlength' 'position' 'title' ...
+      case {'spacing', 'srate' 'eloc_file' 'winlength' 'position' 'title' 'plottitle' ...
                'trialstag'  'winrej' 'command' 'tag' 'xgrid' 'ygrid' 'color' 'colmodif'...
                'freqs' 'freqlimits' 'submean' 'children' 'limits' 'dispchans' 'wincolor' ...
                'maxeventstring' 'ploteventdur' 'butlabel' 'scale' 'events' 'data2' 'plotdata2' 'mocap' 'selectcommand' 'ctrlselectcommand' 'datastd' 'normed' 'envelope' 'isfreq'},;
@@ -450,6 +452,17 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
   q = [pos(1) pos(2) 0 0];
   s = [pos(3) pos(4) pos(3) pos(4)]./100;
   clf;
+  
+  % Plot title if provided
+  if ~isempty(g.plottitle)
+      h = findobj('tag', 'eegplottitle'); 
+      if ~isempty(h)
+          set(h, 'string',g.plottitle);
+      else
+          h = textsc(g.plottitle, 'title'); 
+          set(h, 'tag', 'eegplottitle');
+      end;
+  end
       
   % Background axis
   % --------------- 
