@@ -8,7 +8,7 @@
 %             >> tftopo(tfdata,times,freqs, 'key1', 'val1', 'key2', val2' ...)
 % Inputs:
 %   tfdata    = Set of time/freq images, one for each channel. Matrix dims: 
-%               (time,freq,chans). Else, (time,freq,chans,subjects) for grand mean 
+%               (time,freq),(time,freq,chans). Else, (time,freq,chans,subjects) for grand mean 
 %               RMS plotting.
 %   times     = Vector of image (x-value) times in msec, from timef()).
 %   freqs     = Vector of image (y-value) frequencies in Hz, from timef()).
@@ -132,7 +132,12 @@ else
     help tftopo
     return
 end
-tfdataori = mean(tfdata,4); % for topoplot
+% for topoplot
+if length(size(tfdata)) >= 4
+    tfdataori = mean(tfdata,4);
+else
+    tfdataori = tfdata;
+end
 
 % test inputs
 % -----------
