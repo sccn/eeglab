@@ -82,7 +82,7 @@ end;
 
 if nargin == 2
     cluster_ind = 1; % default to clustering the whole STUDY
-    useclust    = 3; % Default output selection from limo_clusterica
+    useclust    = 1; % Default output selection from limo_clusterica
 end
 
 % check dataset length consistency before computing
@@ -111,7 +111,7 @@ if length(cluster_ind) ~= 1
 end
 
 if isempty(useclust)
-    useclust = 3;
+    useclust = 1;
 end;
 if length(useclust) ~= 1  || useclust > 3
     error('Checky third input. useclust must be 1,2 or 3');
@@ -122,30 +122,30 @@ end
 update_flag  = 0;
 rv           = 1;
 
-indrm        = [];
+% indrm        = [];
 for index = 1:length(varargin) % scan commands
     strcom = varargin{index}{1};
-    if strcmpi(strcom,'dipselect')
-        update_flag = 1;
-        rv = varargin{index}{3};
-        indrm = [indrm index]; %remove this command
-    elseif strcmpi(strcom,'finaldim') % second level pca
-        secondlevpca = varargin{index}{3};
-        indrm = [indrm index]; %remove this command
-    end
+%     if strcmpi(strcom,'dipselect')
+%         update_flag = 1;
+%         rv = varargin{index}{3};
+%         indrm = [indrm index]; %remove this command
+%     elseif strcmpi(strcom,'finaldim') % second level pca
+%         secondlevpca = varargin{index}{3};
+%         indrm = [indrm index]; %remove this command
+%     end
 end
-varargin(indrm) = []; %remove commands
+% varargin(indrm) = []; %remove commands
 
 % Scan which component to remove (no dipole info)
 % -----------------------------------------------
-if update_flag % dipole information is used to select components
-    error('Update flag is obsolete');
-end;
+% if update_flag % dipole information is used to select components
+%     error('Update flag is obsolete');
+% end;
 
 % scan all commands
 % -----------------
-clustdata = [];
-erspquery = 0;
+% clustdata = [];
+% erspquery = 0;
 lmclust_vararg = '';
 
 for index = 1:length(varargin)
@@ -155,7 +155,7 @@ for index = 1:length(varargin)
     strcom = varargin{index}{1};
     if any(strcom == 'X'), disp('character ''X'' found in command'); end;
     %defult values
-    freqrange = [];
+    freqrange  = [];
     timewindow = [];
     abso = 1;
     fun_arg = [];
@@ -186,8 +186,8 @@ for index = 1:length(varargin)
     % scan datasets
     % -------------
     if strcmpi(strcom, 'scalp'),           scalpmodif = 'none';
-    elseif strcmpi(strcom, 'scalpLaplac'), scalpmodif = 'laplacian';
-    else                                   scalpmodif = 'gradient';
+%     elseif strcmpi(strcom, 'scalpLaplac'), scalpmodif = 'laplacian';
+%     else                                   scalpmodif = 'gradient';
     end;
     
     % check that all datasets are in preclustering for current design
@@ -196,7 +196,7 @@ for index = 1:length(varargin)
     alldatasets = unique_bc(STUDY.cluster(cluster_ind).sets(:));
     
     if length(alldatasets) < length(STUDY.datasetinfo) && cluster_ind == 1
-        error( [ 'Some datasets not included in preclustering' 10 ...
+        error( [ 'Some datasets not included in clustering' 10 ...
             'because of partial STUDY design. You need to' 10 ...
             'use a STUDY design that includes all datasets.' ]);
     end;
@@ -229,14 +229,15 @@ for index = 1:length(varargin)
                 fprintf('Creating input array for Affinity Propagation Clustering array row %d, adding ERP for design %d cell(s) [%s] component %d ...\n', si, STUDY.currentdesign, int2str(cellinds), compinds(1));
                 X = std_readfile( cells, 'components', compinds, 'timelimits', timewindow, 'measure', 'erp');
                 X = abs(X(:)'); % take the absolute value of the ERP to avoid polarities issues
+%                X = X(:)';
                 
                 % select ica scalp maps
                 % --------------------------
-            case { 'scalp' 'scalpLaplac' 'scalpGrad' }
+            case { 'scalp'}
                 idat  = STUDY.datasetinfo(STUDY.cluster(cluster_ind).sets(:,si)).index;
                 icomp = STUDY.cluster(cluster_ind).comps(si);
                 fprintf('Creating input array for Affinity Propagation Clustering row %d, adding interpolated scalp maps for dataset %d component %d...\n', si, idat, icomp);
-                X = std_readtopo(ALLEEG, idat, icomp, scalpmodif, 'preclust');
+                X = std_readtopo(ALLEEG, idat, icomp, scalpmodif, '2dmap');
                 
                 % select ica comp spectra
                 % -----------------------
@@ -250,6 +251,7 @@ for index = 1:length(varargin)
                 cells = STUDY.design(STUDY.currentdesign).cell(cellinds);
                 fprintf('Creating input array for Affinity Propagation Clustering row %d, adding spectrum for design %d cell(s) [%s] component %d ...\n', si, STUDY.currentdesign, int2str(cellinds), compinds(1));
                 X = std_readfile( cells, 'components', compinds, 'freqlimits', freqrange, 'measure', 'spec');
+                
                 if size(X,2) > 1, X = X - repmat(mean(X,2), [1 size(X,2)]); end;
                 X = X - repmat(mean(X,1), [size(X,1) 1]);
                 X = X(:)';
@@ -292,25 +294,37 @@ for index = 1:length(varargin)
                 compinds  = [ tmpstruct.allinds{:} ];
                 cells = STUDY.design(STUDY.currentdesign).cell(cellinds);
                 fprintf('Creating input array for Affinity Propagation Clustering row %d, adding %s for design %d cell(s) [%s] component %d ...\n', si, upper(strcom), STUDY.currentdesign, int2str(cellinds), compinds(1));
-                X = std_readfile( cells, 'components', compinds, 'timelimits', timewindow, 'freqlimits', freqrange, 'measure', strcom);
+%                 X = std_readfile( cells, 'components', compinds, 'timelimits', timewindow, 'freqlimits', freqrange, 'measure', strcom);
+                [X, parameters, timerange, freqrange] = std_readfile( cells, 'components', compinds, 'timelimits', timewindow, 'freqlimits', freqrange, 'measure', strcom);
         end;
         
         % copy data in the array
         % ----------------------
         if ~isreal(X) X = abs(X); end; % for ITC data
-        X = reshape(X, 1, numel(X));
-        if si == 1, data = zeros(size(STUDY.cluster(cluster_ind).sets,2),length(X)); end;
-        data(si,:) = X;
-        try
+        if ~any([strcmp(strcom,'ersp'),strcmp(strcom,'itc'),strcmp(strcom,'scalp')])
+            X = reshape(X, 1, numel(X));
+            if si == 1
+                data = zeros(size(STUDY.cluster(cluster_ind).sets,2),length(X));
+            end;
+            
             data(si,:) = X;
-        catch,
-            error([ 'This type of  clustering requires that all subjects' 10 ...
-                'be represented for all combination of selected independent' 10 ...
-                'variables in the current STUDY design. In addition, for each' 10 ...
-                'different ICA decomposition included in the STUDY (some' 10 ...
-                'datasets may have the same decomposition), at least one' 10 ...
-                'dataset must be represented.' ]);
-        end;
+        elseif any([strcmp(strcom,'ersp'),strcmp(strcom,'itc')])
+            X = reshape(X,size(X,1),size(X,2)*size(X,3));
+            if si == 1
+                data = X;
+            else
+                data = cat(3, data, X);
+            end
+        elseif strcmp(strcom,'scalp')
+             X(find(isnan(X))) = 0;
+            if si == 1
+                data = X;
+            else
+                data = cat(3, data, X);
+            end
+                
+        end
+        
     end; % end scan datasets
     
     % Storing data
@@ -319,18 +333,21 @@ for index = 1:length(varargin)
             apdata.erp = data;
             lmclust_vararg = [lmclust_vararg ',''erp'', apdata.erp'];
         case 'ersp'
+            data  = permute(data,[3 1 2]);
             apdata.ersp = data;
             lmclust_vararg = [lmclust_vararg ',''ersp'', apdata.ersp'];
         case 'dipoles'
             apdata.dipoles = data;
-            lmclust_vararg = [lmclust_vararg ',''dipoles'', apdata.dipoles'];
+            lmclust_vararg = [lmclust_vararg ',''dip'', apdata.dipoles'];
         case'spec'
             apdata.spec = data;
             lmclust_vararg = [lmclust_vararg ',''spect'', apdata.spec'];
         case'itc'
+            data  = permute(data,[3 1 2]);
             apdata.itc = data;
             lmclust_vararg = [lmclust_vararg ',''itc'', apdata.itc'];
         case  { 'scalp' 'scalpLaplac' 'scalpGrad' }
+            data  = permute(data,[3 1 2]);
             apdata.smap = data;
             lmclust_vararg = [lmclust_vararg ',''smap'', apdata.smap'];       
     end 
