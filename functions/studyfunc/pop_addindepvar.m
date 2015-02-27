@@ -10,7 +10,7 @@ if isstruct(varlist)
     indCat = 1;
     indVal = 1;
     if ~isempty(var)
-        indVar = strmatch(var, varlist.factors);
+        indVar = strmatch(var, varlist.factors, 'exact');
     else
         indVar = 1;
     end;
