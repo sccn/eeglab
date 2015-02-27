@@ -59,45 +59,40 @@ if isstruct(filename)
         trialinfo = filename.trialinfo;
     else
         trialinfo = filename;
-        warning('std_gettrialsind: First input assumed as trialinfo structure');
+        %warning('std_gettrialsind: First input assumed as trialinfo structure');
     end
 else
     % Loading file
-    datastruct  = load(filename,'-mat');
-    trialinfo = datastruct.trialinfo;
+    trialinfo = load(filename,'-mat', 'trialinfo');
+    trialinfo = trialinfo.trialinfo;
 end
 
 % --- Query ---
 varnames = fieldnames(queryvars);
 hits = zeros(length(trialinfo),length(varnames));
 
-for i = 1 :  length(varnames)
+for iVar = 1 :  length(varnames)
+    dattrials = {trialinfo.(varnames{iVar})};
+    indvarvals = queryvars.(varnames{iVar});
+    if isstr(indvarvals), indvarvals = { indvarvals }; end;
     
-    % Checking if numeric
-    tmpval = {trialinfo.(varnames{i})};
-    for n = 1: length(tmpval)
-        checknum(n) = isnumeric(tmpval{n});
-    end
-     % if nuemric then convert to string
-    if sum(checknum)~=0
-        tmpindx = find(checknum == 1);
-        
-        for m = 1: length(tmpindx)
-            tmpval{tmpindx(m)} = num2str(tmpval{tmpindx(m)});
-        end
-    end
-            
-    % Getting indices of values that comply individually each value    
-    for j = 1 : length(queryvars.(varnames{i}))
-        query = queryvars.(varnames{i})(j);
-        if isnumeric(query)
-            query = num2str(query);
-        end
-        indxtmp = find(strcmp(tmpval,query));
-        if ~isempty(indxtmp) 
-            hits(indxtmp,i) = 1;
-        end
-    end
+    if isstr(dattrials{1})
+        if ~iscell(indvarvals)
+            error(sprintf('Type error - excepting numerical values for field %s', varnames{iVar}));
+        end;
+        for iVal = 1:length(indvarvals) % programmed for speed - AD
+            hits(:,iVar) = hits(:,iVar) | strncmp(indvarvals{iVal}, dattrials, 100)';
+        end;
+    else
+        if iscell(indvarvals)
+            error(sprintf('Type error - excepting string values for field %s', varnames{iVar}));
+        end;
+        dattrials(cellfun(@isempty, dattrials)) = NaN;
+        dattrials = [ dattrials{:} ];
+        for iVal = 1:length(indvarvals) % programmed for speed - AD
+            hits(:,iVar) = hits(:,iVar) | [ dattrials == indvarvals(iVal) ]';
+        end;
+    end;
 end
 
 % Retreiving overlapped values
