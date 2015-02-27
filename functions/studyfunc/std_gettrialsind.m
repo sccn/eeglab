@@ -40,6 +40,9 @@ function trialindsx = std_gettrialsind(filename,varargin)
 
 % Input stuff
 try
+    if length(varargin) == 1
+        varargin = varargin{:}; % Call from std_readfile or other func
+    end
     varsin = varargin;
     if ~isempty( varargin ),
         for i = 1:2:numel(varsin)
