@@ -145,12 +145,11 @@ end;
 % ------------------------------------------------
 if scandesign
     for desind = 1:length(STUDY.design)
-        pos1 = strmatch(STUDY.design(desind).variable(1).label, factor, 'exact');
-        pos2 = strmatch(STUDY.design(desind).variable(2).label, factor, 'exact');
-        if ~isempty(pos1), add1 = mysetdiff(STUDY.design(desind).variable(1).value, factorvals{pos1}); else add1 = []; end;
-        if ~isempty(pos2), add2 = mysetdiff(STUDY.design(desind).variable(2).value, factorvals{pos2}); else add2 = []; end;
-        if ~isempty(add1), factorvals{pos1} = { factorvals{pos1}{:} add1{:} }; end;
-        if ~isempty(add2), factorvals{pos2} = { factorvals{pos2}{:} add2{:} }; end;
+        for iVar = 1:length(STUDY.design(desind).variable)
+            pos1 = strmatch(STUDY.design(desind).variable(iVar).label, factor, 'exact');
+            if ~isempty(pos1), add1 = mysetdiff(STUDY.design(desind).variable(iVar).value, factorvals{pos1}); else add1 = []; end;
+            if ~isempty(add1), factorvals{pos1} = { factorvals{pos1}{:} add1{:} }; end;
+        end;
     end;
 end;
 
