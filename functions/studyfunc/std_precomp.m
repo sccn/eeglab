@@ -538,5 +538,9 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
             [trialinfo(nvals(iDat):nvals(iDat+1)-1).group    ] = deal( datasetinfo(inds(iDat)).group     );
             [trialinfo(nvals(iDat):nvals(iDat+1)-1).session  ] = deal( datasetinfo(inds(iDat)).session   );
         end;
+<<<<<<< HEAD
+        
+>>>>>>> Remove code snippet for trial information
+=======
         
 >>>>>>> Remove code snippet for trial information
