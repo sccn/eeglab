@@ -160,9 +160,11 @@ catch,
 end;
 
 TMP = STUDY.datasetinfo;
-STUDY = std_maketrialinfo(STUDY, ALLEEG);
-if ~isequal(STUDY.datasetinfo, TMP)
-    disp('STUDY Warning: the trial information collected from datasets has changed');
+STUDYTMP = std_maketrialinfo(STUDY, ALLEEG); % some dataset do not have trialinfo and
+sameTrialInfo = isequal( { STUDY.datasetinfo.trialinfo }, { STUDYTMP.datasetinfo.trialinfo });
+clear STUDYTMP;
+if ~sameTrialInfo
+    disp('STUDY Warning: the trial information collected from datasets has changed; use STUDY menu to reconcile if necessary');
 end;
 std_checkfiles(STUDY, ALLEEG);
 STUDY.saved = 'yes';
