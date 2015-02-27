@@ -11,31 +11,46 @@
 %                selected input measure (measure input).
 %
 % Optional inputs:
-%   'channels'   - [cell or integer] channel labels - for instance 
-%                  { 'cz' 'pz' }
-%                  of channels to load from the data file.
-%   'components' - [integer] component index in the selected EEG dataset for which 
-%                  to read the ERSP
-%   'timelimits' - [min max] ERSP time (latency in ms) range of interest
-%   'freqlimits' - [min max] ERSP frequency range (in Hz) of interest
-%   'measure'    - ['erp'|'spec'|'ersp'|'itc'|'timef'|'erspbase'|'erspboot'
-%                  'itcboot'|'erpim'] data measure to read. If a full file name
-%                  is provided, the data measure is selected automatically.
-%   'getparamsonly' - ['on'|'off'] only read file parameters not data.
+%   'channels'       - [cell or integer] channel labels - for instance 
+%                      { 'cz' 'pz' }
+%                      of channels to load from the data file.
+%   'components'     - [integer] component index in the selected EEG dataset for which 
+%                      to read the ERSP
+%   'timelimits'     - [min max] ERSP time (latency in ms) range of interest
+%   'freqlimits'     - [min max] ERSP frequency range (in Hz) of interest
+%   'measure'        - ['erp'|'spec'|'ersp'|'itc'|'timef'|'erspbase'|'erspboot'
+%                      'itcboot'|'erpim'] data measure to read. If a full file name
+%                      is provided, the data measure is selected automatically.
+%   'getparamsonly'  - ['on'|'off'] only read file parameters not data.
+%   'trialselect'    - Cell of cells defining the field and the values
+%                      of the field in the trialinfo structure to be used to pull out the trials. 
+%                      i.e. if values are string:  {'field1',{val1_fromfield1 val2_fromfield1}, 'field2'...} 
+%                           if values are numeric: {'field1',[val1 val2], 'field2'...}
+%   'designvar'      - Structure of Independent Variables(IV) with fields 'label'
+%                      and 'value'. Each IV should have these two fields so
+%                      the function can use these values to pull out the trials. 
+%   'singletrials'   - { 'on','off' } Extract single trials. Default 'off'
+%   'getparamonly'   - { 'on','off'} Get only parameters. Default 'off'
+%   'concatenate'    - { 'on','off'} In case of ERP images this function
+%                      set 'singletrials' to 'on'. Default 'off'
+%   'dataindices'    - (To be updated)
 %
 % Outputs:
-%   data    - the multi-channel or multi-component data. The size of this
-%             output depends on the number of dimension (for ERSP or ERP
-%             for instance). The last dimension is channels or components.
-%   params  - structure containing parameters saved with the data file.
-%   range1  - time points (ERP, ERSP) or frequency points (spectrum)
-%   range2  - frequency points (ERSP, ITCs)
+%   data                - the multi-channel or multi-component data. The size of this
+%                         output depends on the number of dimension (for ERSP or ERP
+%                         for instance). The last dimension is channels or components.
+%   params              - structure containing parameters saved with the data file.
+%   range1              - time points (ERP, ERSP) or frequency points (spectrum)
+%   range2              - frequency points (ERSP, ITCs)
+%   events              - Event readed from the data structure
+%   setinfoTrialIndices - Deprecated
 %
 % Examples:
 %   % the examples below read all data channels for the selected files
 %   [ersp params times freqs] = std_readfiles('s1.datersp');
 %   [erp params times] = std_readfiles('s1.daterp');
 %   [erp params times] = std_readfiles('s1.daterp', timerange', [-100 500]);
+%   [erp params times] = std_readfiles('s1.daterp', timerange', [-100 500],'trialselect','load',[1 2],'type', {'Y'});
 %
 % Authors: Arnaud Delorme, SCCN, INC, UCSD, May 2010
 
@@ -76,7 +91,6 @@ opt = finputcheck(varargin, { 'components'       'integer'  []    [];
                               'singletrials'     'string'   { 'on','off' }  'off';
                               'concatenate'      'string'   { 'on','off' }  'off'; % ERPimage only
                               'channels'         'cell'     []    {};
-                              'setinfoinds'      'integer'  []    [];
                               'function'         { 'function_handle' 'integer' } []  [];
                               'measure'          'string'   {limomeasures{:} 'erp' 'spec' 'timef'} 'erp';                                                 
                               'timelimits'       'real'     []    []; % ERPimage, ERP, ERSP, ITC
