@@ -72,5 +72,3 @@ for indc = 1:length(alllocs)
     STUDY.changrp(indc).name     = alllocs{indc};
     STUDY.changrp(indc).channels = { alllocs{indc} };
 end;
-return; 
-    
