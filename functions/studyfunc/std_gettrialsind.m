@@ -87,7 +87,10 @@ for iVar = 1 :  length(varnames)
         if iscell(indvarvals)
             error(sprintf('Type error - excepting string values for field %s', varnames{iVar}));
         end;
-        dattrials(cellfun(@isempty, dattrials)) = NaN;
+        excl = find(cellfun(@isempty, dattrials));
+        if ~(isempty(excl))
+            dattrials(excl) = NaN;
+        end
         dattrials = [ dattrials{:} ];
         for iVal = 1:length(indvarvals) % programmed for speed - AD
             hits(:,iVar) = hits(:,iVar) | [ dattrials == indvarvals(iVal) ]';
