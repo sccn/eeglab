@@ -165,7 +165,7 @@ if ~isstr(varargin{1})
     
     % enable buttons
     % --------------
-    filename = STUDY.design(STUDY.currentdesign).cell(1).filebase;
+    filename = fullfile(STUDY.datasetinfo(1).filepath, STUDY.datasetinfo(1).subject);
     if exist([filename '.datspec']) , spec_enable = 'on'; else  spec_enable  = 'off'; end;
     if exist([filename '.daterp'] )  , erp_enable = 'on'; else   erp_enable  = 'off'; end;
     if exist([filename '.datersp']) , ersp_enable = 'on'; else  ersp_enable  = 'off'; end;
