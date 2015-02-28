@@ -352,7 +352,7 @@ else
                 % ---------------------
                 chanid{1} = 'All subjects';
                 if length(changrp) == 1
-                    allsubjects = unique_bc({ STUDY.design(STUDY.currentdesign).cell([ changrp.setinds{:} ]).case });
+                    allsubjects = STUDY.design(STUDY.currentdesign).cases.value;
                     for l = 1:length(allsubjects)
                         chanid{end+1} = [ allsubjects{l} ' ' changrp.name ];
                     end;
