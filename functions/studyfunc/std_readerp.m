@@ -97,11 +97,6 @@ STUDY = pop_specparams(STUDY, 'default');
     'subject'       'string'  []             '' }, ...
     'std_readerp', 'ignore');
 if isstr(opt), error(opt); end;
-nc = max(length(STUDY.design(opt.design).variable(1).value),1);
-ng = max(length(STUDY.design(opt.design).variable(2).value),1);
-paired1 = STUDY.design(opt.design).variable(1).pairing;
-paired2 = STUDY.design(opt.design).variable(2).pairing;
-
 dtype = opt.datatype;
 dsubtype = '';
 if strcmpi(dtype(1:3), 'erp' )
@@ -119,18 +114,6 @@ else finalinds = opt.clusters;
 end;
 
 for ind = 1:length(finalinds) % scan channels or components
-
-    % find indices
-    % ------------
-    if ~isempty(opt.channels)
-        tmpstruct = STUDY.changrp(finalinds(ind));
-        allinds       = tmpstruct.allinds;
-        setinds       = tmpstruct.setinds;
-    else
-        tmpstruct = STUDY.cluster(finalinds(ind));
-        allinds       = tmpstruct.allinds;
-        setinds       = tmpstruct.setinds;
-    end;
 
     % check if data is already here
     % -----------------------------
@@ -183,6 +166,7 @@ for ind = 1:length(finalinds) % scan channels or components
         if strcmpi(dtype, 'erp'), opts = { 'timelimits', opt.timerange };
         else                      opts = { 'freqlimits', opt.freqrange };
         end;
+        
         if strcmpi(opt.singletrials, 'on')
             if strcmpi(params.singletrials, 'off')
                 fprintf('\n');
@@ -190,28 +174,16 @@ for ind = 1:length(finalinds) % scan channels or components
                 datavals = [];
                 return;
             end;            
-            opts        = { opts{:} 'singletrials' 'on' };
-            for c = 1:nc
-                for g = 1:ng
-                    if ~isempty(setinds{c,g})
-%                         if ~isempty(opt.channels), [alldata{c, g} z z z z setinfoIndices{c, g}] = std_readfile( setinfo(setinds{c,g}(:)), 'measure', dtype, opts{:}, 'channels'  , opt.channels(ind), 'setinfoinds', setinds{c,g}(:));
-%                         else                       [alldata{c, g} z z z z setinfoIndices{c, g}] = std_readfile( setinfo(setinds{c,g}(:)), 'measure', dtype, opts{:}, 'components', allinds{c,g},      'setinfoinds', setinds{c,g}(:));
-                        if ~isempty(opt.channels), [alldata{c, g} z z z z setinfoIndices{c, g}] = std_readfile( setinfo(setinds{c,g}(:)), 'measure', [dtype dsubtype], opts{:}, 'channels'  , opt.channels(ind), 'setinfoinds', setinds{c,g}(:));
-                        else                       [alldata{c, g} z z z z setinfoIndices{c, g}] = std_readfile( setinfo(setinds{c,g}(:)), 'measure', [dtype dsubtype], opts{:}, 'components', allinds{c,g},      'setinfoinds', setinds{c,g}(:));
-
-                    end;
-                    end;
-                end;
-            end;
-        else
-            for c = 1:nc
-                for g = 1:ng
-                    if ~isempty(setinds{c,g})
-%                         if ~isempty(opt.channels), [alldata{c, g}] = std_readfile( setinfo(setinds{c,g}(:)), 'measure', dtype, opts{:}, 'channels'  , opt.channels(ind));
-%                         else                       [alldata{c, g}] = std_readfile( setinfo(setinds{c,g}(:)), 'measure', dtype, opts{:}, 'components', allinds{c,g});
-                        if ~isempty(opt.channels), [alldata{c, g}] = std_readfile( setinfo(setinds{c,g}(:)), 'measure', [dtype dsubtype], opts{:}, 'channels'  , opt.channels(ind));
-                        else                       [alldata{c, g}] = std_readfile( setinfo(setinds{c,g}(:)), 'measure', [dtype dsubtype], opts{:}, 'components', allinds{c,g});
-                    end;
+            opts = { opts{:} 'singletrials' 'on' };
+            for iSubj = 1:length(STUDY.design(STUDY.currentdesign).cases.value)
+                
+                fileBase = STUDY.design(STUDY.currentdesign).cases.filebase{iSubj};
+                tmpdata = std_readfile( fileBase, 'measure', [dtype dsubtype], opts{:}, 'channels', opt.channels(ind), 'design', STUDY.design(STUDY.currentdesign).variable);
+                if iSubj == 1
+                    alldata = tmpdata;
+                else
+                    if ndims(tmpdata) == 1
+                        alldata
                     end;
                 end;
             end;
