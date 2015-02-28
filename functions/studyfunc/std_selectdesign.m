@@ -43,15 +43,3 @@ if designind < 1 || designind > length(STUDY.design) || isempty(STUDY.design(des
 end;
 STUDY.currentdesign = designind;
 STUDY = std_rmalldatafields( STUDY );
-
-% remake setinds and allinds
-% --------------------------
-STUDY = std_changroup(STUDY, ALLEEG, [], 'on'); % with interpolation HAVE TO FIX THAT
-
-% update the component indices
-% ----------------------------
-STUDY.cluster(1).setinds = {};
-STUDY.cluster(1).allinds = {};
-for index = 1:length(STUDY.cluster)
-    STUDY.cluster(index) = std_setcomps2cell(STUDY, index);
-end;
