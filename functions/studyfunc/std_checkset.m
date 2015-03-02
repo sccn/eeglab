@@ -219,28 +219,12 @@ if ~studywasempty
                     STUDY.design(inddes).variable(indvar).value{indval} = convertindvarval(STUDY.design(inddes).variable(indvar).value{indval});
                 end;
             end;
-            for indcell = 1:length(STUDY.design(inddes).cell)
-                for indval = 1:length(STUDY.design(inddes).cell(indcell).value)
-                    STUDY.design(inddes).cell(indcell).value{indval} = convertindvarval(STUDY.design(inddes).cell(indcell).value{indval});
-                end;
-            end;
             for indinclude = 1:length(STUDY.design(inddes).include)
                 if iscell(STUDY.design(inddes).include{indinclude})
                     for indval = 1:length(STUDY.design(inddes).include{indinclude})
                         STUDY.design(inddes).include{indinclude}{indval} = convertindvarval(STUDY.design(inddes).include{indinclude}{indval});
                     end;
                 end;
-            end;
-            
-            % check for duplicate entries in filebase
-            % ---------------------------------------
-            if length( { STUDY.design(inddes).cell.filebase } ) > length(unique({ STUDY.design(inddes).cell.filebase }))
-                if ~isempty(findstr('design_', STUDY.design(inddes).cell(1).filebase))
-                    error('There is a problem with your STUDY, contact EEGLAB support');
-                else
-                    fprintf('Duplicate entry detected in Design %d, reinitializing design\n', inddes);
-                    [STUDY com] = std_makedesign(STUDY, ALLEEG, inddes, STUDY.design(inddes), 'defaultdesign', 'forceoff');
-                end
             end;
         end;
     end;
