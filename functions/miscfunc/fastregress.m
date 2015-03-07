@@ -13,10 +13,11 @@
 %  alpha - significance level
 %  R^2   - r square
 %  slope - slope of the fit
+%  intercept - intercept of the fit
 %
 % Arnaud Delorme, 25 Feb 2003
 
-function [ypred, alpha, rsq, B] = fastregress(x, y, ploting);
+function [ypred, alpha, rsq, B, intercept] = fastregress(x, y, ploting);
     
     if nargin < 1
         help fastregress; return;
@@ -41,6 +42,7 @@ function [ypred, alpha, rsq, B] = fastregress(x, y, ploting);
     ypred =  x*B(2) + B(1);
 
     % B(1) contain the offset, B(2) the slope
+    intercept = B(1);
     B = B(2);
 
     if nargin > 2
