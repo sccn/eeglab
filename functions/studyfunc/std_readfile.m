@@ -194,9 +194,16 @@ end;
 
 % scan design
 % -----------
+
+% ******************
+% To do
+% - remove all continuous variables
+% - when calling getfiledata, get value for all continuous variable for each selecte trial
+% ******************
+
 options = { opt.dataindices, opt.function, dataType, indBegin1, indEnd1, indBegin2, indEnd2 };
 if isempty(opt.designvar)
-    measureData = getfiledata(fileData, opt.trialselect, options{:});
+    measureData = { getfiledata(fileData, opt.trialselect, options{:}) };
 else
     % loop for 1 or more var
     for iField1 = 1:length(opt.designvar(1).value)
