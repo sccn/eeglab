@@ -3,6 +3,7 @@ function [var values cat] = pop_addindepvar(varlist, fig, var, values)
 if nargin < 3
     var = [];
     values = [];
+    cat = 0;
 end;
 if isstruct(varlist)
     

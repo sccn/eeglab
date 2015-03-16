@@ -33,14 +33,6 @@
 %               so many dataset Plot and Tools menu items may not give 
 %               interpretable results and will thus be made unavailable for 
 %               selection {default: 'condition'}
-%  'pairing1' - ['on'|'off'] the nature of the 'variable1' contrast. 
-%               For example, to compare two conditions recorded from the 
-%               same group of 10 subjects, the 'variable1','condition' design 
-%               elements are paired ('on') since each dataset for one
-%               condition has a corresponding dataset from the same subject 
-%               in the second condition. If the two conditions were recorded 
-%               from different groups of subjects, the variable1 'condition' 
-%               would be unpaired ('off') {default: 'on'}
 %  'values1'   - {cell array of 'strings'} - 'variable1' instances to include 
 %               in the design. For example, if 'variable1' is 'condition'and 
 %               three values for 'condition' (e.g., 'a' , 'b', and 'c')
@@ -54,8 +46,6 @@
 %  'variable2' - ['string'] - second independent variable name, if any. Typically, 
 %               this might refer to ('unpaired') subject group or (typically 
 %               'paired') session number, etc.
-%  'pairing2' - ['on'|'off'] type of statistics for variable2 
-%               (default: 'on'}
 %  'values2'  - {cell array of 'strings'} - variable2 values to include in the 
 %               design {default: all}. Here, 'var[12]' must be field names 
 %               in STUDY.datasetinfo or  STUDY.datasetinfo.trialinfo. 
@@ -146,9 +136,9 @@ defdes.variable(1).label = 'condition';
 defdes.variable(2).label = 'group';
 defdes.variable(1).value = {};
 defdes.variable(2).value = {};
-defdes.variable(1).pairing = 'on';
-defdes.variable(2).pairing = 'on';
-defdes.filepath = '';
+defdes.variable(1).vartype = 'categorical';
+defdes.variable(2).vartype = 'categorical';
+ddefdes.filepath = '';
 defdes.include = {};
 orivarargin = varargin;
 if ~isempty(varargin) && isstruct(varargin{1})
@@ -156,10 +146,10 @@ if ~isempty(varargin) && isstruct(varargin{1})
     varargin(1) = [];
 end;
 if isempty(defdes.filepath), defdes.filepath = ''; end;
-if length(defdes.variable) == 0, defdes.variable(1).label = ''; end;
-if length(defdes.variable) == 1, defdes.variable(2).label = ''; end;
-if length(defdes.variable) == 2, defdes.variable(3).label = ''; end;
-if length(defdes.variable) == 3, defdes.variable(4).label = ''; end;
+if length(defdes.variable) == 0, defdes.variable(1).label = ''; defdes.variable(1).vartype = 'categorical'; end;
+if length(defdes.variable) == 1, defdes.variable(2).label = ''; defdes.variable(2).vartype = 'categorical';  end;
+if length(defdes.variable) == 2, defdes.variable(3).label = ''; defdes.variable(3).vartype = 'categorical'; end;
+if length(defdes.variable) == 3, defdes.variable(4).label = ''; defdes.variable(4).vartype = 'categorical'; end;
 opt = finputcheck(varargin,  {'variable1'     'string'    []     defdes.variable(1).label;
                               'variable2'     'string'    []     defdes.variable(2).label;
                               'variable3'     'string'    []     defdes.variable(3).label;
@@ -168,8 +158,10 @@ opt = finputcheck(varargin,  {'variable1'     'string'    []     defdes.variable
                               'values2'       {'real','cell' } []     defdes.variable(2).value;
                               'values3'       {'real','cell' } []     defdes.variable(3).value;
                               'values4'       {'real','cell' } []     defdes.variable(4).value;
-                              'pairing1'      ''          []     defdes.variable(1).pairing;
-                              'pairing2'      ''          []     defdes.variable(2).pairing;
+                              'vartype1'      'string' {'categorical' 'continuous'}  defdes.variable(1).vartype;
+                              'vartype2'      'string' {'categorical' 'continuous'}  defdes.variable(2).vartype;
+                              'vartype3'      'string' {'categorical' 'continuous'}  defdes.variable(3).vartype;
+                              'vartype4'      'string' {'categorical' 'continuous'}  defdes.variable(4).vartype;
                               'name'          'string'    {}     defdes.name;
                               'filepath'      'string'    {}     defdes.filepath;
                               'datselect'     'cell'      {}     defdes.include;
@@ -189,10 +181,10 @@ if strcmpi(opt.variable2, 'none'), opt.variable2 = ''; end;
 % build command list for history
 % ------------------------------
 listcom = { 'name' opt.name 'delfiles' opt.delfiles 'defaultdesign' opt.defaultdesign };
-if ~isempty(opt.values1), listcom = { listcom{:} 'variable1' opt.variable1 'values1' opt.values1 }; end;
-if ~isempty(opt.values2), listcom = { listcom{:} 'variable2' opt.variable2 'values2' opt.values2 }; end;
-if ~isempty(opt.values2), listcom = { listcom{:} 'variable3' opt.variable2 'values3' opt.values2 }; end;
-if ~isempty(opt.values2), listcom = { listcom{:} 'variable4' opt.variable2 'values4' opt.values2 }; end;
+if ~isempty(opt.values1), listcom = { listcom{:} 'variable1' opt.variable1 'values1' opt.values1 'vartype1' opt.vartype1 }; end;
+if ~isempty(opt.values2), listcom = { listcom{:} 'variable2' opt.variable2 'values2' opt.values2 'vartype2' opt.vartype2 }; end;
+if ~isempty(opt.values2), listcom = { listcom{:} 'variable3' opt.variable2 'values3' opt.values2 'vartype3' opt.vartype3 }; end;
+if ~isempty(opt.values2), listcom = { listcom{:} 'variable4' opt.variable2 'values4' opt.values2 'vartype4' opt.vartype4 }; end;
 if ~isempty(opt.subjselect),  listcom = { listcom{:} 'subjselect'  opt.subjselect }; end;
 if ~isempty(opt.datselect),   listcom = { listcom{:} 'datselect'  opt.datselect }; end;
 if ~isempty(opt.filepath),    listcom = { listcom{:} 'filepath'  opt.filepath }; end;
@@ -283,18 +275,22 @@ des.filepath          = opt.filepath;
 if ~isempty(opt.variable1)
     des.variable(1).label   = opt.variable1;
     des.variable(1).value   = opt.values1;
+    des.variable(1).vartype = opt.vartype1;
 end;
 if ~isempty(opt.variable2)
     des.variable(2).label   = opt.variable2;
     des.variable(2).value   = opt.values2;
+    des.variable(2).vartype = opt.vartype2;
 end;
 if ~isempty(opt.variable3)
     des.variable(3).label   = opt.variable3;
     des.variable(3).value   = opt.values3;
+    des.variable(3).vartype = opt.vartype3;
 end;
 if ~isempty(opt.variable4)
     des.variable(4).label   = opt.variable4;
     des.variable(4).value   = opt.values4;
+    des.variable(4).vartype = opt.vartype4;
 end;
 des.include             = opt.datselect;
 des.cases.label = 'subject';

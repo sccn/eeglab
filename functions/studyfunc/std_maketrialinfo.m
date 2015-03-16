@@ -104,7 +104,8 @@ for index = 1:length(ALLEEG)
         for f = 1:length(ff)
             eval( [ 'eventvals = {events(indtle).' ff{f} '};' ]);
             %if isnumeric(eventvals{1})
-            %    eventvals = cellfun(@num2str, eventvals, 'uniformoutput', false);
+                %eventvals = cellfun(@num2str, eventvals, 'uniformoutput', false);
+            %    eventvals = [ eventvals{:} ];
             %end;
             commands = { commands{:} ff{f} eventvals };
         end;
