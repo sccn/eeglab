@@ -301,7 +301,7 @@ for c = 1:ncplot
                     tmpdata(:,:,:,cc) = tmptmpdata;
                 end;
             elseif ngplot ~= ng % plot groups together
-                for ind = 2:size(data,2), if any(size(data{1,ind}) ~= size(data{1})), dimreduced_sizediffers = 1; end; end;
+                for ind = 2:size(data,2), if numel(size(data{1,ind})) ~= numel(size(data{1}))  || any((size(data{1,ind}) ~= size(data{1}))), dimreduced_sizediffers = 1; end; end;
                 for gg = 1:ng
                     tmptmpdata = real(data{c,gg});
                     if dimreduced_sizediffers
