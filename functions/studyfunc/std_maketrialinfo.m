@@ -78,11 +78,17 @@ for index = 1:length(ALLEEG)
     
     % process time locking event fields
     % ---------------------------------
-    indtle    = find(eventlat < 0.02);
+    indtle    = find(eventlat == 0);
     epochs    = [ events(indtle).epoch ];
     extractepoch = true;
+    
+    % Double checking and changing threshold
+    if length(epochs) < ALLEEG(index).trials
+        indtle    = find(eventlat < 0.02);
+        epochs    = [ events(indtle).epoch ];
+    end
+    
     if length(epochs) ~= ALLEEG(index).trials
-        
         % special case where there are not the same number of time-locking
         % event as there are data epochs
         if length(unique(epochs)) ~= ALLEEG(index).trials
