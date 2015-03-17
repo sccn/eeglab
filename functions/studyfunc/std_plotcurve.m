@@ -158,7 +158,7 @@ if strcmpi(opt.plotsubjects, 'off')
         end;
         if size(coldata,1) ~= size(data,1), coldata = coldata'; end;
     else
-        coldata = manycol;
+        coldata = manycol';
     end;
        
     %coldata = col(mod([0:maxdim-1], length(col))+1);
