@@ -90,6 +90,7 @@ opt = finputcheck( varargin, { 'ylim'          'real'   []              [];
                                'plotsubjects'  'string' { 'on','off' }  'off';
                                'condnames'     'cell'   []              {}; % just for legends
                                'groupnames'    'cell'   []              {}; % just for legends
+                               'figtag'        'string' []              'tmp_curvetag';
                                'groupstats'    'cell'   []              {};
                                'condstats'     'cell'   []              {};
                                'interstats'    'cell'   []              {};
@@ -247,7 +248,7 @@ end;
 % adjust figure size
 % ------------------
 if strcmpi(opt.figure, 'on')
-    figure('color', 'w');
+    figure('color', 'w','Tag', opt.figtag);
     pos = get(gcf, 'position');
     basewinsize = 200/max(nc,ng)*3;
     if strcmpi(opt.plotgroups, 'together') pos(3) = 200*(1+addc);
