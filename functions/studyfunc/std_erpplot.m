@@ -153,11 +153,11 @@ opt = finputcheck( options, ...
                                'plotmode'    'string'  { 'normal','condensed' }  'normal';
                                'unitx'       'string'  { 'ms','Hz' }    'ms';
                                'plotsubjects' 'string' { 'on','off' }  'off';
+                               'detachplots' 'string'  { 'on','off' }  params.detachplots;
                                'noplot'      'string'  { 'on','off' }  'off';
                                'topoplotopt' 'cell'    {}              { 'style' 'both' };
                                'subject'     'string'  []              '' }, 'std_erpplot');
 if isstr(opt), error(opt); end;
-
 if isstr(opt.comps), opt.comps = []; opt.plotsubjects = 'on'; end;
 if ~isempty(params.topofreq) && strcmpi(opt.datatype, 'spec'),  params.topotime  = params.topofreq; end;
 if ~isempty(params.freqrange), params.timerange = params.freqrange; end;
@@ -218,6 +218,7 @@ plotcurveopt = { plotcurveopt{:} ...
 
 % channel plotting
 % ----------------
+axcopyflag = 1;
 if ~isempty(opt.channels)
 
     chaninds = 1:length(opt.channels);
@@ -329,10 +330,47 @@ else
         std_plotcurve(alltimes, erpdata, 'condnames', allconditions, 'legend', alllegends, 'groupnames', allgroups, 'plotstderr', opt.plotstderr, ...
                                           'titles', alltitles, 'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, ...
                                           'plotsubjects', opt.plotsubjects, plotcurveopt{:});
+%--------------------------------------------------------------------------                                      
+%--------------------------------------------------------------------------                          
+        if all([strcmp(opt.plotsubjects,'on') strcmp(opt.detachplots,'on')])
+            
+            % Getting IC and subj
+            %--------------------------------------------------------------
+            % WARNING: design.cell used here (this should be replaced)
+            %--------------------------------------------------------------
+            c = 0;
+            for i = 1 : numel(STUDY.cluster(opt.clusters(index)).allinds)
+                if numel(STUDY.cluster(opt.clusters(index)).allinds{i}) ~= 0
+                    c = c+1;
+                    for j = 1 : numel(STUDY.cluster(opt.clusters(index)).allinds{i})
+                        comp         = STUDY.cluster(opt.clusters(index)).allinds{i}(j);
+                        dsgcell_indx = STUDY.cluster(opt.clusters(index)).setinds{i}(j);
+                        subject = STUDY.design(opt.design).cell(dsgcell_indx).case;
+                        sbtitles{c}{j} = ([subject '/' 'IC' num2str(comp)]);
+                    end
+                end
+            end
+            %--------------------------------------------------------------
+             [alltitlestmp tmp] = std_figtitle('threshold', alpha, 'plotsubjects', opt.plotsubjects, 'mcorrect', mcorrect, 'condstat', 'off', 'cond2stat', 'off', ...
+                                 'statistics', method, 'condnames', allconditions, 'cond2names', allgroups, 'clustname', STUDY.cluster(opt.clusters(index)).name, 'compnames', comp_names, ...
+                                 'subject', opt.subject, 'valsunit', opt.unitx, 'vals', params.topotime, 'datatype', datatypestr, 'cond2group', params.plotgroups, 'condgroup', params.plotconditions);
+                             
+            handles = findall(0,'Type','Figure', 'Tag','tmp_curvetag');
+            std_detachplots('','','data',erpdata,'figtitles', {alltitlestmp{:}}','sbtitles',sbtitles,'handles', handles);
+            axcopyflag = 0;
+
+        end
+%--------------------------------------------------------------------------
+%--------------------------------------------------------------------------
     end;
-    
-    set(gcf,'name', ['Component ' datatypestr ] );
-    axcopy(gca);
+    tmpgcf = gcf;
+    set(tmpgcf,'name', ['Component ' datatypestr ] );
+    if axcopyflag
+          haxis = findall(tmpgcf,'type','axes');
+        for i= 1: length(haxis)
+            axcopy(haxis(i));
+        end
+    end 
 end;
 
 % remove fields and ignore fields who are absent
