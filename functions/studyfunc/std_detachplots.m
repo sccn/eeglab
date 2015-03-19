@@ -1,21 +1,23 @@
-% std_detachplots() - Given a figure with subplots and several lines per axis will add a callback to
-% each axis specified in the 'figtitles' input. The callback consist in a
-% figure with all the detached individuals lines.
+% std_detachplots() -  Given a figure with subplots and several lines per axis, will add a callback to
+% each axis specified in the 'figtitles' input. The callback consist in a figure with all the detached
+% individuals lines.
 %
 % Usage:
 %   >>   std_detachplots('','','data',data 'figtitles', alltitlestmp,'sbtitles',sbtitles,'handles', handles);
 %
 % Inputs:
-%      data        - 
-%      g.timevec   - vector of loaded EEG datasets
-%
-% Optional inputs:
-%
-% Outputs:
+%      data        - Cell array containing the data matrices for each plot in the same order showed in the figure
+%      figtitles   - Cell array of the titles of each individual axes in
+%                    the  figure. The titles must correspond. The function
+%                    use this value to find the right hanlde of the axis
+%      sbtitles    - Cell array of cell arrays with the titles for each
+%                    detached line per axis. i.e. {{'Axis1 line1' 'Axis1 line2'} {'Axis2 line1' 'Axis2 line2'}}
+%      handles     - Handles of the main figure who contain all the
+%                    subplots
+%      flagstd     - Flag to plot the Standar Deviation  {default: 1} means 'on'
 %
 % See also:
-%   std_plotinfocluster
-%
+%  
 % Author: Ramon Martinez-Cancino, SCCN, 2014
 %
 % Copyright (C) 2014  Ramon Martinez-Cancino,INC, SCCN
@@ -62,9 +64,9 @@ try g.ylabel;       catch, g.ylabel        =   '';  end; % ylabel
 try g.timevec;      catch, g.timevec       =   '';  end; % Time or freq vector
 
 % Checking data
- if isempty(g.handles) && any([isempty(g.data) isempty(g.figtitles)])
-     error('std_detachplots : Check entries. Options ''handles'', ''data'' and ''figtitles'' must be provided');
- end
+if isempty(g.handles) && any([isempty(g.data) isempty(g.figtitles)])
+    error('std_detachplots : Check entries. Options ''handles'', ''data'' and ''figtitles'' must be provided');
+end
 
 if iscell(g.data)
     nplots = numel(g.data(:));
@@ -73,7 +75,7 @@ else
     g.data = {g.data};
 end
 
-%  Checking sbtitles 
+%  Checking sbtitles
 if isempty(g.sbtitles)
     for i = 1:numel(g.data)
         c = 1;
@@ -82,15 +84,13 @@ if isempty(g.sbtitles)
                 g.sbtitles{i}{j} = {['Line ' num2str(c)]};
                 c = c+1;
             end
-%         else
-%             g.sbtitles{i} = [];
         end
     end
 end
 
 % Plot goes here
 %--------------------------------------------------------------------------
-if isempty(g.handles) 
+if isempty(g.handles)
     for i_nplots = 1 : nplots
         idata = g.data{i_nplots};
         len = size(idata,2);
@@ -105,14 +105,14 @@ if isempty(g.handles)
             rowcols(2) = ceil(sqrt(len + 4));
             rowcols(1) = ceil((len+4)/rowcols(2));
             
-            for k = 1:len 
+            for k = 1:len
                 %--- first sbplot row ----
                 if k <= rowcols(2) - 2
                     figure(hplot);
                     sbplot(rowcols(1),rowcols(2),k+2);
                     hold on;
                     plotlines(k,idata,meandata,lower, upper,g.sbtitles{k},g);
-                else 
+                else
                     figure(hplot)
                     sbplot(rowcols(1),rowcols(2),k+4);
                     hold on;
@@ -125,51 +125,57 @@ if isempty(g.handles)
             hold on;
             plotlines(1:len,idata,meandata,lower,upper,g.figtitles,g);
             set(gcf,'Color', BACKCOLOR);
-            orient tall  % fill the figure page for printing
-        end % Finished one cluster plot
+            orient tall;
+        end
     end
 else
     xlabelval = '';
     ylabelval = '';
-    
-    % Match Children handles based on titles provided 
+    % Match Children handles based on titles provided
+    c = 0;
     for i = 1: nplots
         htemp          = findall(g.handles,'String', g.figtitles{i});
         if all([~isempty(htemp) ~isempty(g.data(i))])
-        handlestemp{i} = htemp(1);  
-        % Getting x label from handles
-        if isempty(xlabelval)
-            xlabelval = handlestemp{i}.Parent.XLabel.String;
-        end
-        % Getting y label from handles
-        if isempty(ylabelval)
-            ylabelval = handlestemp{i}.Parent.YLabel.String;
-        end
-        % Getting timevec from handles
-        if isempty(g.timevec)
-            g.timevec = handlestemp{i}.Parent.Children(i).XData;
-        end
+            handlestemp{i} = htemp(1);
+            % Getting x label from handles
+            if isempty(xlabelval)
+                xlabelval = get(get(get(handlestemp{i},'Parent'),'Xlabel'),'String'); % xlabelval = handlestemp{i}.Parent.XLabel.String;
+            end
+            % Getting y label from handles
+            if isempty(ylabelval)
+                ylabelval = get(get(get(handlestemp{i},'Parent'),'Ylabel'),'String'); % ylabelval = handlestemp{i}.Parent.YLabel.String;
+            end
+            % Getting timevec from handles
+            if isempty(g.timevec)
+                tmp = get(get(get(handlestemp{i},'Parent'),'Children'));
+                g.timevec = tmp(i).XData; % g.timevec = handlestemp{i}.Parent.Children(i).XData;
+            end
         else
             handlestemp{i} = [];
         end
-    end
-    c = 0;
-    for i = 1: nplots
+        
+        % Callback setting
         if ~isempty(handlestemp{i})
             c = c + 1;
             % For Axis
-            set( handlestemp{i}.Parent, 'ButtonDownFcn',{@std_detachplots,'data',g.data{i},'timevec',g.timevec,'handles' ,'',...
+            set( get( handlestemp{i}, 'Parent'), 'ButtonDownFcn',{@std_detachplots,...
+                'data'     ,g.data{i},...
+                'timevec'  ,g.timevec,...
+                'handles'  ,'',...
                 'figtitles',g.figtitles{i},...
-                'sbtitles',g.sbtitles{c},...
-                'xlabel',xlabelval,...
-                'ylabel',ylabelval,...
+                'sbtitles' ,g.sbtitles{c},...
+                'xlabel'   ,xlabelval,...
+                'ylabel'   ,ylabelval,...
                 });
             % For lines
-            set( handlestemp{i}.Parent.Children, 'ButtonDownFcn',{@std_detachplots,'data',g.data{i},'timevec',g.timevec,'handles'  ,'',...
+            set( get(get( handlestemp{i}, 'Parent'), 'Children'), 'ButtonDownFcn',{@std_detachplots,...
+                'data'     ,g.data{i},...
+                'timevec'  ,g.timevec,...
+                'handles'  ,'',...
                 'figtitles',g.figtitles{i},...
-                'sbtitles',g.sbtitles{c},...
-                'xlabel',xlabelval,...
-                'ylabel',ylabelval,...
+                'sbtitles' ,g.sbtitles{c},...
+                'xlabel'   ,xlabelval,...
+                'ylabel'   ,ylabelval,...
                 });
         end
     end
