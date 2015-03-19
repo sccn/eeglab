@@ -63,7 +63,8 @@ function [chanlist,chanliststr, allchanstr] = pop_chansel(chans, varargin);
     if ~isstr(g.withindex), chan_indices = g.withindex; g.withindex = 'on';
     else                    chan_indices = 1:length(chans);
     end;
-    
+    if isstruct(chans), chans = { chans.labels }; end;
+        
     % convert selection to integer
     % ----------------------------
     if isstr(g.select) & ~isempty(g.select)
