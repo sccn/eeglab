@@ -141,12 +141,14 @@ if strcmpi(mode, 'apart')
                     sbplot(rowcols(1),rowcols(2),k+2) , 
                     toporeplot(scalpmap, 'style', 'both', 'plotrad',0.5,'intrad',0.5, 'verbose', 'off','xsurface', Xi, 'ysurface', Yi );
                     title([subject '/' 'ic' num2str(comp)   ], 'interpreter', 'none');
+                    colormap(DEFAULT_COLORMAP);
                     %waitbar(k/(len+1),h_wait)
                 else %other sbplot rows
                     figure(h_topo)
                     sbplot(rowcols(1),rowcols(2),k+4) , 
                     toporeplot(scalpmap, 'style', 'both', 'plotrad',0.5,'intrad',0.5, 'verbose', 'off','xsurface', Xi, 'ysurface', Yi );
                     title([subject '/' 'ic' num2str(comp)], 'interpreter', 'none');
+                    colormap(DEFAULT_COLORMAP);
                     %waitbar(k/(len+1),h_wait)
                 end
             end
@@ -156,6 +158,7 @@ if strcmpi(mode, 'apart')
             title([ STUDY.cluster(cls(clus)).name ' (' num2str(length(unique(STUDY.cluster(cls(clus)).sets(1,:)))) ' Ss, ' num2str(length(STUDY.cluster(cls(clus)).comps)),' ICs)']);
             %title([ STUDY.cluster(cls(clus)).name ' average scalp map, ' num2str(length(unique(STUDY.cluster(cls(clus)).sets(1,:)))) 'Ss']);
             set(gcf,'Color', BACKCOLOR);
+            colormap(DEFAULT_COLORMAP);
             %waitbar(1,h_wait)
             %delete(h_wait)
             orient tall  % fill the figure page for printing
@@ -184,6 +187,7 @@ if strcmpi(mode, 'together')
         tmpcmap = colormap(DEFAULT_COLORMAP);
         toporeplot(STUDY.cluster(cls(k)).topo, 'style', 'both', 'plotrad',0.5,'intrad',0.5, 'verbose', 'off','colormap', tmpcmap);
         title([ STUDY.cluster(cls(k)).name ' (' num2str(length(unique(STUDY.cluster(cls(k)).sets(1,:)))) ' Ss, ' num2str(length(STUDY.cluster(cls(k)).comps)),' ICs)']);
+        colormap(DEFAULT_COLORMAP);
         %title([ STUDY.cluster(cls(k)).name ', ' num2str(length(unique(STUDY.cluster(cls(k)).sets(1,:)))) 'Ss' ]);
         if figureon
             waitbar(k/len,h_wait)
@@ -287,7 +291,7 @@ for ci = 1:length(comp_ind)
     toporeplot(grid, 'style', 'both', 'plotrad',0.5,'intrad',0.5,'xsurface', Xi, 'ysurface', Yi, 'verbose', 'off');
     title([subject ' / ' 'IC' num2str(comp) ', ' STUDY.cluster(cls).name ]);
     set(gcf,'Color', BACKCOLOR);
-    colormap(DEFAULT_COLORMAP)
+    colormap(DEFAULT_COLORMAP);
     axcopy;
 end
 
