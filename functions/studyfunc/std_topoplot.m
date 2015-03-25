@@ -287,6 +287,7 @@ for ci = 1:length(comp_ind)
     toporeplot(grid, 'style', 'both', 'plotrad',0.5,'intrad',0.5,'xsurface', Xi, 'ysurface', Yi, 'verbose', 'off');
     title([subject ' / ' 'IC' num2str(comp) ', ' STUDY.cluster(cls).name ]);
     set(gcf,'Color', BACKCOLOR);
+    colormap(DEFAULT_COLORMAP)
     axcopy;
 end
 
