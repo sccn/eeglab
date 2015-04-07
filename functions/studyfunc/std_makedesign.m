@@ -138,7 +138,7 @@ defdes.variable(1).value = {};
 defdes.variable(2).value = {};
 defdes.variable(1).vartype = 'categorical';
 defdes.variable(2).vartype = 'categorical';
-ddefdes.filepath = '';
+defdes.filepath = '';
 defdes.include = {};
 orivarargin = varargin;
 if ~isempty(varargin) && isstruct(varargin{1})
@@ -146,10 +146,11 @@ if ~isempty(varargin) && isstruct(varargin{1})
     varargin(1) = [];
 end;
 if isempty(defdes.filepath), defdes.filepath = ''; end;
-if length(defdes.variable) == 0, defdes.variable(1).label = ''; defdes.variable(1).vartype = 'categorical'; end;
-if length(defdes.variable) == 1, defdes.variable(2).label = ''; defdes.variable(2).vartype = 'categorical';  end;
-if length(defdes.variable) == 2, defdes.variable(3).label = ''; defdes.variable(3).vartype = 'categorical'; end;
-if length(defdes.variable) == 3, defdes.variable(4).label = ''; defdes.variable(4).vartype = 'categorical'; end;
+if length(defdes.variable) == 0, defdes.variable(1).label = 'continuous'; defdes.variable(1).vartype = 'categorical'; end;
+if length(defdes.variable) == 1, defdes.variable(2).label = 'continuous'; defdes.variable(2).vartype = 'categorical'; end;
+if length(defdes.variable) == 2, defdes.variable(3).label = 'continuous'; defdes.variable(3).vartype = 'categorical'; end;
+if length(defdes.variable) == 3, defdes.variable(4).label = 'continuous'; defdes.variable(4).vartype = 'categorical'; end;
+for iVar = 1:4, if isempty(defdes.variable(iVar).vartype), defdes.variable(iVar).vartype = 'continuous'; end; end;
 opt = finputcheck(varargin,  {'variable1'     'string'    []     defdes.variable(1).label;
                               'variable2'     'string'    []     defdes.variable(2).label;
                               'variable3'     'string'    []     defdes.variable(3).label;
