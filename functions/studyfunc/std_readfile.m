@@ -171,7 +171,6 @@ if strncmp('parameters', fileFields, 100)
 end;
 if any(strncmp('times', fileFields, 100)),  measureRange1 = fileData.times; end;
 if any(strncmp('freqs', fileFields, 100)),  measureRange2 = fileData.freqs; end;
-if any(strncmp('events', fileFields, 100)), events        = fileData.events; end;
 
 % if the function is only called to get parameters
 % ------------------------------------------------
@@ -192,60 +191,19 @@ if strcmpi(opt.getparamonly, 'on'),
     return;
 end;
 
-% scan design
+% scan design and search for continuous var
 % -----------
+
+
 
 % ******************
 % To do
 % - remove all continuous variables
-% - when calling getfiledata, get value for all continuous variable for each selecte trial
+% - when calling getfiledata, get value for all continuous variable for each selected trial
 % ******************
 
 options = { opt.dataindices, opt.function, dataType, indBegin1, indEnd1, indBegin2, indEnd2 };
-if isempty(opt.designvar)
-    measureData = { getfiledata(fileData, opt.trialselect, options{:}) };
-else
-    % loop for 1 or more var
-    for iField1 = 1:length(opt.designvar(1).value)
-        trialselect = { opt.designvar(1).label opt.designvar(1).value{iField1} };
-        
-        % test for 2 or more var
-        if length(opt.designvar) > 1
-            
-            for iField2 = 1:length(opt.designvar(2).value)
-                trialselect = { trialselect{:} opt.designvar(2).label opt.designvar(2).value{iField2} };
-             
-                % test for 3 or more var
-                if length(opt.designvar) > 2
-                    for iField3 = 1:length(opt.designvar(3).value)
-                        trialselect = { trialselect{:} opt.designvar(3).label opt.designvar(3).value{iField3} };
-                        
-                        % test for 4
-                        if length(opt.designvar) > 3
-                            for iField4 = 1:length(opt.designvar(4).value)
-                                trialselect = { trialselect{:} opt.designvar(4).label opt.designvar(4).value{iField4} };
-                                measureData{iField1,iField2,iField3,iField4} = getfiledata(fileData, trialselect, options{:});
-                            end;
-                        else
-                            measureData{iField1,iField2,iField3} = getfiledata(fileData, trialselect, options{:});
-                        end;
-                    end;
-                else
-                    measureData{iField1,iField2} = getfiledata(fileData, trialselect, options{:});
-                end;
-            end;
-        else
-            measureData{iField1} = getfiledata(fileData, trialselect, options{:});
-        end;
-    end;
-end;  
-
-% special ERP image
-% -----------------
-if ~isempty(events)
-    len    = length(events{1});
-    events = [ events{:} ];
-end;
+[ measureData events ] = globalgetfiledata(fileData, opt.designvar, options, {});
 
 % remove duplicates in the list of parameters
 % -------------------------------------------
@@ -267,19 +225,47 @@ function [measureRange indBegin indEnd] = indicesselect(measureRange, measureLim
         measureRange = measureRange(indBegin:indEnd);
     end;
 
+% recursive function to load data
+% -------------------------------
+function [ measureData eventVals ] = globalgetfiledata(fileData, designvar, options, trialselect);
+
+    if length(designvar) == 0
+        [ measureData eventVals ] = getfiledata(fileData, trialselect, options{:});
+        measureData = { measureData };
+        eventVals   = { eventVals   };
+    else
+        % scan independent variable values
+        if strcmpi('continuous', designvar(1).vartype)
+            if ~isstr(designvar(1).value), designvar(1).value = ''; end;
+            trialselect = { trialselect{:} designvar(1).label designvar(1).value };
+            [ tmpMeasureData tmpEvents ] = globalgetfiledata(fileData, designvar(2:end), options, trialselect);
+            measureData(1,:,:,:) = reshape(tmpMeasureData, [ 1 size(tmpMeasureData) ]);
+            eventVals(  1,:,:,:) = reshape(tmpEvents     , [ 1 size(tmpEvents     ) ]);
+        else
+            for iField = 1:length(designvar(1).value)
+                trialselect = { trialselect{:} designvar(1).label designvar(1).value{iField} };
+                [ tmpMeasureData tmpEvents ] = globalgetfiledata(fileData, designvar(2:end), options, trialselect);
+                measureData(iField,:,:,:) = reshape(tmpMeasureData, [ 1 size(tmpMeasureData) ]);
+                eventVals(  iField,:,:,:) = reshape(tmpEvents     , [ 1 size(tmpEvents     ) ]);
+            end;
+        end;
+    end;
+    
 % load data from structure or file
 % --------------------------------
-function fieldData = getfiledata(fileData, trialselect, chan, func, dataType, indBegin1, indEnd1, indBegin2, indEnd2)
+function [ fieldData events ] = getfiledata(fileData, trialselect, chan, func, dataType, indBegin1, indEnd1, indBegin2, indEnd2)
 
 if length(chan) > 1
     error('This function can only read one channel at a time');
 end;
 
 % get trial indices
+fieldData = [];
+events    = [];
 subTrials = [];
 trials    = [];
 if ~isempty(trialselect)
-    trials = std_gettrialsind(fileData.trialinfo, trialselect{:});
+    [trials events] = std_gettrialsind(fileData.trialinfo, trialselect{:});
     if length(unique(diff(trials))) > 1
         temptrials = [trials(1):trials(end)];
         subTrials  = trials-trials(1)+1;
@@ -290,7 +276,10 @@ end;
 fieldToRead = [ dataType int2str(chan) ];
 
 % find trials
-if isempty(trials), trials = size(fileData.(fieldToRead), ndims(fileData.(fieldToRead))); end;
+if isempty(trials), 
+    return;
+    % trials = size(fileData.(fieldToRead), ndims(fileData.(fieldToRead))); % not sure what this does
+end;
 
 % load data
 if ndims(fileData.(fieldToRead)) == 2
