@@ -247,8 +247,7 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
        disp('eegplot() error: calling convention {''key'', value, ... } error'); return;
    end;	
    
-   % Selection of data range If spectrum plot (Ramon)
-   
+   % Selection of data range If spectrum plot  
    if isfield(g,'freqlimits') || isfield(g,'freqs')
 %        % Check  consistency of freqlimits       
 %        % Check  consistency of freqs
@@ -256,11 +255,11 @@ if ~isstr(data) % If NOT a 'noui' call or a callback from uicontrols
        % Selecting data and freqs
        [temp, fBeg] = min(abs(g.freqs-g.freqlimits(1)));
        [temp, fEnd] = min(abs(g.freqs-g.freqlimits(2)));
-       data = data(:,fBeg:fEnd);
+       data = data(:,fBeg:fEnd,:);
        g.freqs     = g.freqs(fBeg:fEnd);
        
        % Updating settings
-       g.winlength = g.freqs(end) - g.freqs(1);
+       if ndims(data) == 2, g.winlength = g.freqs(end) - g.freqs(1); end 
        g.srate     = length(g.freqs)/(g.freqs(end)-g.freqs(1));
        g.isfreq    = 1;
    end
@@ -1335,11 +1334,11 @@ else
     g.spacing = oldspacing;
     set(ax1, 'Xlim',[1 g.winlength*multiplier+1],...
 		     'XTick',[1:multiplier*DEFAULT_GRID_SPACING:g.winlength*multiplier+1]);
-         if g.isfreq % Ramon
-             set(ax1, 'XTickLabel', num2str((g.freqs(1):DEFAULT_GRID_SPACING:g.freqs(end))'));
-         else
+%          if g.isfreq % Ramon
+%              set(ax1, 'XTickLabel', num2str((g.freqs(1):DEFAULT_GRID_SPACING:g.freqs(end))'));
+%          else
              set(ax1, 'XTickLabel', num2str((g.time:DEFAULT_GRID_SPACING:g.time+g.winlength)'));
-         end
+%          end
 
     % ordinates: even if all elec are plotted, some may be hidden
     set(ax1, 'ylim',[g.elecoffset*g.spacing (g.elecoffset+g.dispchans+1)*g.spacing] );
@@ -1575,22 +1574,27 @@ else
         
         % find corresponding epochs
         % -------------------------
-        tagtext = eeg_point2lat(tagpos, floor((tagpos)/g.trialstag)+1, g.srate, g.limits, 1E-3);
-        set(ax1,'XTickLabel', tagtext,'XTick', tagpos-lowlim);
-
-			
+        if ~g.isfreq
+            tmplimit = g.limits;
+            tpmorder = 1E-3;
+        else
+            tmplimit = g.freqlimits;
+            tpmorder = 1; 
+        end
+        tagtext = eeg_point2lat(tagpos, floor((tagpos)/g.trialstag)+1, g.srate, tmplimit,tpmorder);
+        set(ax1,'XTickLabel', tagtext,'XTick', tagpos-lowlim);	
     else
      	set(ax0,'XTickLabel', [],'YTickLabel', [],...
 		'Xlim',[0 g.winlength*multiplier],...
 		'XTick',[], 'YTick',[], 'tag','backeeg');
 
 		axes(ax1);
-        if g.isfreq % Ramon
+        if g.isfreq
             set(ax1, 'XTickLabel', num2str((g.freqs(1):DEFAULT_GRID_SPACING:g.freqs(end))'),...
-                'XTick',[1:multiplier*DEFAULT_GRID_SPACING:g.winlength*multiplier+1]);
+                     'XTick',[1:multiplier*DEFAULT_GRID_SPACING:g.winlength*multiplier+1]);
         else
             set(ax1,'XTickLabel', num2str((g.time:DEFAULT_GRID_SPACING:g.time+g.winlength)'),...
-                'XTick',[1:multiplier*DEFAULT_GRID_SPACING:g.winlength*multiplier+1]);
+                    'XTick',[1:multiplier*DEFAULT_GRID_SPACING:g.winlength*multiplier+1]);
         end
 
     set(ax1, 'Position', AXES_POSITION) % JavierLC
@@ -1939,8 +1943,13 @@ else
         else
             hh = findobj('tag','Etime','parent',fig);
             if g.trialstag ~= -1,
-                set(hh, 'string', num2str(mod(tmppos(1)+lowlim-1,g.trialstag)/g.trialstag*(g.limits(2)-g.limits(1)) + g.limits(1)));
-            else set(hh, 'string', num2str((tmppos(1)+lowlim-1)/g.srate)); % put g.time in the box
+                tmpval = mod(tmppos(1)+lowlim-1,g.trialstag)/g.trialstag*(g.limits(2)-g.limits(1)) + g.limits(1);
+                if g.isfreq, tmpval = tmpval/1000 + g.freqs(1); end
+                set(hh, 'string', num2str(tmpval));
+            else
+                tmpval = (tmppos(1)+lowlim-1)/g.srate;
+                 if g.isfreq, tmpval = tmpval+g.freqs(1); end
+                set(hh, 'string', num2str(tmpval)); % put g.time in the box
             end;
             ax1 = findobj('tag','eegaxis','parent',fig);
             tmppos = get(ax1, 'currentpoint');
