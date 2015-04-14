@@ -2,8 +2,8 @@
 %                       field trialinfo
 %
 % Usage:
-%   >>   trialinfo = combine_trialinfo(datasetinfo, [1 2]);
-%   >>   trialinfo = combine_trialinfo(datasetinfo, 'S01');
+%   >>   trialinfo = std_combtrialinfo(datasetinfo, [1 2]);
+%   >>   trialinfo = std_combtrialinfo(datasetinfo, 'S01');
 %
 % Inputs:
 %      datasetinfo         -  Datasetinfo structure from STUDY or
