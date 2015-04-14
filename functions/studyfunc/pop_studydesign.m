@@ -167,9 +167,11 @@ if nargin < 3 && ~isstr(STUDY)
         if index > length(STUDY.design) || ~isequal(STUDY.design(index), tmpdes) || strcmpi(rmfiles, 'on')
             fprintf('Updating/creating STUDY design %d\n', index);
             
-            for iVar = 1:length(tmpdes.variable)
-                if isempty(tmpdes.variable(iVar).vartype)
-                    tmpdes.variable(iVar).vartype = 'categorical';
+            if isfield(tmpdes, 'variable')
+                for iVar = 1:length(tmpdes.variable)
+                    if isempty(tmpdes.variable(iVar).vartype)
+                        tmpdes.variable(iVar).vartype = 'categorical';
+                    end;
                 end;
             end;
             
@@ -339,7 +341,7 @@ elseif isstr(STUDY)
         case 'newvar'
             val    = get(findobj(fig, 'tag', 'listboxdesign'), 'value');
             [tmpVar tmpVarList cat] = pop_addindepvar(usrdat);
-            if ~isempty(tmpVar)
+            if ~isempty(tmpVar) && ~strcmp(tmpVar,'None')
                 des(val).variable(end+1).label = tmpVar;
                 des(val).variable(end  ).value = tmpVarList; % empty for cont var
                 if cat, des(val).variable(end).vartype = 'categorical'; else des(val).variable(end).vartype = 'continuous'; end;
@@ -349,7 +351,7 @@ elseif isstr(STUDY)
             val    = get(findobj(fig, 'tag', 'listboxdesign'), 'value');
             val2   = get(findobj(fig, 'tag', 'lbfact0'), 'value');
             [tmpVar tmpVarList cat] = pop_addindepvar(usrdat, [], des(val).variable(val2).label, des(val).variable(val2).value);
-            if ~isempty(tmpVar)
+            if ~isempty(tmpVar) && ~strcmp(tmpVar,'None')
                 des(val).variable(val2).label = tmpVar;
                 des(val).variable(val2).value = tmpVarList; % empty for cont var
                 if cat, des(val).variable(val2).vartype = 'categorical'; else des(val).variable(val2).vartype = 'continuous'; end;
