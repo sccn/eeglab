@@ -280,7 +280,7 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
             inds = find(strncmp( uniqueSubjects{iSubj}, allSubjects, max(cellfun(@length, allSubjects))));
             filepath = STUDY.datasetinfo(inds(1)).filepath;
             filebase = fullfile(filepath, uniqueSubjects{iSubj});
-            trialinfo = combine_trialinfo(STUDY.datasetinfo, inds);
+            trialinfo = std_combtrialinfo(STUDY.datasetinfo, inds);
             
             addopts = { 'savetrials' g.savetrials 'recompute' g.recompute 'fileout' filebase 'trialinfo' trialinfo };
             if strcmpi(computewhat, 'channels')
@@ -583,17 +583,3 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
         for index = 1:length(fileNames)
             res{index} = fullfile(filePaths{index}, fileNames{index});
         end;
-        
-    % combine trial information
-    % -------------------------
-    function trialinfo = combine_trialinfo(datasetinfo, inds);
-
-        trialinfo = [ datasetinfo(inds).trialinfo ];
-        nvals     = [ 1 cumsum(cellfun(@length, { datasetinfo(inds).trialinfo }))+1 ];
-        
-        for iDat = 1:length(inds)
-            [trialinfo(nvals(iDat):nvals(iDat+1)-1).condition] = deal( datasetinfo(inds(iDat)).condition );
-            [trialinfo(nvals(iDat):nvals(iDat+1)-1).group    ] = deal( datasetinfo(inds(iDat)).group     );
-            [trialinfo(nvals(iDat):nvals(iDat+1)-1).session  ] = deal( datasetinfo(inds(iDat)).session   );
-        end;
-        
