@@ -46,24 +46,36 @@ function std_plotmat(usrdat,numdesign)
 % Set var stuff
 design = usrdat.design(numdesign);
 listsubj = unique(design.cases.value,'sorted'); % assuming cases.value will be alwas the subjects
-setappdata(0,'usrdat',usrdat);
-setappdata(0,'numdesign',numdesign);
+
+flag.textdisp = 1;
+flag.subj     = 1;
+setappdata(0,'flag',flag);
+handles.figmode = 0; % Change to 1 if info in GUI. 0 -> info in commandline
+sortlist = [{' '} {design.variable.label}]';
 
 % Creating GUI
 % Positions and settings
 %--------------------------------------------------------------------------
-mainfig_pos        = [.509  .465  .306  .519];
-Text1_pos          = [.124  .946  .191  .024];
-Text2_pos          = [.080  .208  .432  .029];
-Text3_pos          = [.397  .861  .24   .024];
-Text4_pos          = [.692  .946  .201  .020];
-checkbox_sort_pos  = [.422  .901  .242  .027];
-axes_pos           = [.118  .306  .817  .513];
-listbox1_pos       = [.12   .018  .817  .178];
-popup_subject_pos  = [.124  .896  .224  .035];
-disp_click_pos     = [.7    .896  .183  .034];
+mainfig_pos            = [.509  .465  .306  .519];
+Text1_pos              = [.120  .946  .191  .024];
+Text2_pos              = [.080  .208  .432  .029];
+Text3_pos              = [.397  .855  .24   .024];
+Text4_pos              = [.680  .946  .201  .020];
+Text5_pos              = [.380  .946  .201  .020];
+checkbox_sort_pos      = [.422  .901  .242  .027];
 
-GUI_FONTSIZE = 9;
+popup_subject_pos      = [.124  .896  .224  .035];
+disp_click_pos         = [.7    .896  .183  .034];
+
+if handles.figmode
+    axes_pos           = [.118  .306  .817  .513];
+    listbox1_pos       = [.12   .018  .817  .178];
+else
+    axes_pos           = [.118  .07   .817  .750];
+end
+
+GUI_FONTSIZE = 10;
+AXES_FONTSIZE = 9;
 COLOR = [.66 .76 1];
 figunits = 'Normalized';
 
@@ -74,7 +86,12 @@ handles.mainfig = figure('MenuBar'         ,'none',...
                              'NumberTitle' ,'off',...
                              'Units'       ,figunits,...
                              'Color'       ,COLOR,...
-                             'Position'    ,mainfig_pos);                 
+                             'Position'    ,mainfig_pos);
+% Data in mainfig
+setappdata(handles.mainfig,'usrdat',usrdat);
+setappdata(handles.mainfig,'numdesign',numdesign);
+setappdata(handles.mainfig,'flag',flag);
+
 % Text
 %--------------------------------------------------------------------------
 handles.Text1 = uicontrol('Style','Text');
@@ -83,15 +100,15 @@ set(handles.Text1,'String'          ,'Select subject',...
                   'Units'           ,figunits,...
                   'BackgroundColor' ,COLOR,...
                   'Position'        ,Text1_pos);
-
+if handles.figmode
 handles.Text2 = uicontrol('Style','Text');
 set(handles.Text2,'String'          ,'Subject Variables Design',...
                   'FontSize'        ,GUI_FONTSIZE,...
                   'FontWeight'      ,'bold',...
                   'Units'           ,figunits,...
                   'BackgroundColor' ,COLOR,...
-                  'Position'        ,Text2_pos); 
-              
+                  'Position'        ,Text2_pos);
+end           
 handles.Text3 = uicontrol('Style','Text');
 set(handles.Text3,'String'          ,'Design Matrix',...
                   'FontSize'        ,GUI_FONTSIZE,...
@@ -106,17 +123,27 @@ set(handles.Text4,'String'          ,'Value on Click',...
                   'Units'           ,figunits,...
                   'BackgroundColor' ,COLOR,...
                   'Position'        ,Text4_pos);
+              
+handles.Text5 = uicontrol('Style','Text');
+set(handles.Text5,'String'          ,'Sort by: ',...
+                  'FontSize'        ,GUI_FONTSIZE,...
+                  'Units'           ,figunits,...
+                  'BackgroundColor' ,COLOR,...
+                  'Position'        ,Text5_pos);              
+              
 % Edit
-%--------------------------------------------------------------------------                        
-handles.disp_prop = uicontrol('Style','Edit');
-set(handles.disp_prop,'String'          ,'Loading..',...
-                      'FontSize'        ,GUI_FONTSIZE,...
-                      'Units'           ,figunits,...
-                      'BackgroundColor' ,COLOR,...
-                      'Enable'          ,'inactive',...
-                      'Min'             ,1,...
-                      'Max'             ,30,...
-                      'Position'        ,listbox1_pos); 
+%--------------------------------------------------------------------------  
+if handles.figmode
+    handles.disp_prop = uicontrol('Style','Edit');
+    set(handles.disp_prop,'String'          ,'Loading..',...
+                          'FontSize'        ,GUI_FONTSIZE,...
+                          'Units'           ,figunits,...
+                          'BackgroundColor' ,COLOR,...
+                          'Enable'          ,'inactive',...
+                          'Min'             ,1,...
+                          'Max'             ,30,...
+                          'Position'        ,listbox1_pos); 
+ end
                   
 handles.edit_dispclick = uicontrol('Style','Edit');
 set(handles.edit_dispclick,'String'           ,' ',...
@@ -138,38 +165,36 @@ handles.axes2 =  axes('unit'          ,'normalized', ...
                       'Color'         ,'none',...
                       'YTick'         ,'',...
                       'YTickLabel'    ,'');
-% Checkbox
-%--------------------------------------------------------------------------
- handles.checkbox_sort = uicontrol('Style'   ,'checkbox');
- set(handles.checkbox_sort,'String'             ,'Sort trials',...
-                           'FontSize'        ,GUI_FONTSIZE,...
-                           'Units'           ,figunits,...
-                           'BackgroundColor' ,COLOR,...
-                           'Position'        ,checkbox_sort_pos,...
-                           'Value'           ,1',...
-                           'Callback'        ,{@callback_popup_subject,handles}); 
-
-callback_popup_subject('', '', handles);
-
+                      
 % Popupmenu
-%--------------------------------------------------------------------------
+%--------------------------------------------------------------------------   
+handles.popup_sort    = uicontrol('Style','Popupmenu');
 handles.popup_subject = uicontrol('Style','Popupmenu');
+
+set(handles.popup_sort,'String'   ,sortlist,...
+                          'FontSize' ,GUI_FONTSIZE,...
+                          'Units'    ,figunits,...
+                          'Position' ,checkbox_sort_pos,...
+                          'callback' ,{@callback_popup_subject,handles});      
+                      
 set(handles.popup_subject,'String'   ,listsubj,...
                           'FontSize' ,GUI_FONTSIZE,...
-                          'Units'    ,figunits,...f
+                          'Units'    ,figunits,...
                           'Position' ,popup_subject_pos,...
                           'callback' ,{@callback_popup_subject,handles});
                       
+callback_popup_subject('', '', handles);
+              
 %--------------------------------------------------------------------------
 % Callbacks
 %--------------------------------------------------------------------------
 function callback_popup_subject(src,eventdata,handles)
 
-numdesign = getappdata(0,'numdesign');
-usrdat    = getappdata(0,'usrdat');
+AXES_FONTSIZE = 11;
+numdesign = getappdata(handles.mainfig,'numdesign');
+usrdat    = getappdata(handles.mainfig,'usrdat');
 set(handles.edit_dispclick, 'String', ' ', ...
                              'ForegroundColor'  , [0 0 0]);
-
 design = usrdat.design(numdesign);
 listsubj = unique(design.cases.value,'sorted'); % assuming cases.value will be alwas the subjects
 if isfield(handles,'popup_subject')
@@ -177,12 +202,18 @@ if isfield(handles,'popup_subject')
 else
     indtmp = 1;
 end
-
+flag = getappdata(handles.mainfig,'flag');
+inner_subj_flag = 1;
+if flag.subj ~= indtmp
+    flag.textdisp = 1;
+    flag.subj     = indtmp;
+    inner_subj_flag = 0; 
+end
 subj = listsubj{indtmp};
 
 %  Retreiving all trials and values for this subject
-% cell_subjindx     = find(strcmp({design.cell.case},subj));                 % in design.cell (search this in trialinfo)
-dsetinfo_subjindx = sort(find(strcmp({usrdat.datasetinfo.subject},subj))); % in usrdat.datasetinfo
+dsetinfo_subjindx = sort(find(strcmp({usrdat.datasetinfo.subject},subj)));  % in usrdat.datasetinfo
+trialinfo  = std_combtrialinfo(usrdat.datasetinfo, dsetinfo_subjindx);      % Combining trialinfo
 
 ntrials = 0;
 for i = 1 : length(dsetinfo_subjindx)
@@ -222,20 +253,15 @@ for i = 1 : length(design.variable)
             else
                 varval = '';
             end
-            [trialindsx, eventvals] = std_gettrialsind(usrdat.datasetinfo(dsetinfo_subjindx(k)).trialinfo,design.variable(i).label, varval);
+            [trialindsx, eventvals] = std_gettrialsind(trialinfo,design.variable(i).label, varval);
             
             if ~isempty(trialindsx)
                 % case for continous variables
                 if ~catflag
                     facval_indx = eventvals;
                 end
-                
-                % Assigning values to tmpdmat
-                if k == 1
                     tmpdmat(trialindsx,i) = facval_indx;
-                else
-                    tmpdmat(trialindsx + startendindx(k-1,end),i) = facval_indx;
-                end
+
             end
         end
     end
@@ -249,13 +275,10 @@ tmpdmat(check,:) = [];
 tmpdmat(:,end+1) = ones(size(tmpdmat,1),1);
 
 % Checking checbox to sort/unsort
-if isfield(handles, 'checkbox_sort') && get(handles.checkbox_sort, 'Value')
-    [tmpdmat,tmp] = sortrows(tmpdmat,[1:size(tmpdmat,2)]);
-end
-
-% Checking checbox to sort/unsort
-if isfield(handles, 'checkbox_sort') & handles.checkbox_sort.Value
-    [tmpdmat,tmp] = sortrows(tmpdmat,[1:size(tmpdmat,2)]);
+dmatsortindex = 1:size(tmpdmat, 1);
+if get(handles.popup_sort, 'Value') ~= 1
+    [tmp,dmatsortindex] = sortrows(tmpdmat,get(handles.popup_sort, 'Value')-1);
+     if inner_subj_flag, flag.textdisp = 0; end
 end
 
 % Updating the design info
@@ -278,20 +301,30 @@ text2display(2*(i+1))     = {['Regressor ' num2str(i+1) ' : Baseline' ]};
 text2display(2*(i+1) + 1) = {['Regressor ' num2str(i+1) ' values : [1]' ]};
 
 %  Display values
-set(handles.disp_prop,'String',text2display,'HorizontalAlignment', 'left');
+if handles.figmode
+    set(handles.disp_prop,'String',text2display,'HorizontalAlignment', 'left','FontSize', AXES_FONTSIZE);
+elseif  flag.textdisp 
+    display('----------------------------------------')
+    display(['--- Subject ' subj ' Variables Design---'])
+    disp(text2display(:));
+    display('----------------------------------------')
+    handles.notdisp = 0;
+end
 axes(handles.axes1)
-handles.figure = imagesc(normc(tmpdmat)); colormap(flipud(colormap('gray'))); % Normalizing before show (by cols)
+handles.figure = imagesc(normc(tmpdmat(dmatsortindex,:))); colormap(flipud(colormap('gray'))); % Normalizing before show (by cols)
 xlabel('Regressors',...
        'FontWeight', 'normal',...
-       'FontSize', 9);
+       'FontSize', AXES_FONTSIZE);
 ylabel('Trials',...
        'FontWeight', 'Normal',...
-       'FontSize', 9);
+       'FontSize', AXES_FONTSIZE);
 set(handles.axes1,'XTick',1:size(tmpdmat,2))
 set(handles.axes2','XTick', handles.axes1.XTick,...
                    'XTickLabel', {design.variable.label 'Baseline'},...
-                   'XLim', handles.axes1.XLim);
-set(handles.figure, 'ButtonDownFcn', {@callback_dmatclick,handles,tmpdmat,design})
+                   'XLim', handles.axes1.XLim,...
+                   'FontSize', AXES_FONTSIZE);
+set(handles.figure, 'ButtonDownFcn', {@callback_dmatclick,handles,tmpdmat(dmatsortindex,:),design})
+setappdata(handles.mainfig,'flag',flag)
 drawnow;
 
 function callback_dmatclick(src,eventdata,handles,tmpdmat,design)
@@ -301,9 +334,11 @@ coordinates = get(axesHandle,'CurrentPoint');
 coordinates = round(coordinates(1,1:2));
 tmpdmatval = tmpdmat(coordinates(2), coordinates(1));
 if  coordinates(1) <= length(design.variable)
-    if strcmp(design.variable(coordinates(1)).vartype, 'categorical')
+    if isfield(design.variable(coordinates(1)),'vartype') && strcmp(design.variable(coordinates(1)).vartype, 'categorical')
         val = design.variable(coordinates(1)).value(tmpdmatval);
     else
+        % Note: When an old STUDY is used withouth modifying the variables,
+        % the structure 'STUDY.design' does not have the field 'vartype'.
         val = tmpdmatval;
     end
 else
@@ -314,4 +349,3 @@ if isnumeric(val)
 end
 set(handles.edit_dispclick, 'String', val, ...
                              'ForegroundColor'  , [0 0 0]);
-    
