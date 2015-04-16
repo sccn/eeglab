@@ -411,9 +411,9 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
             % ----------------------
             if ~isempty(g.cell)
                 desset = STUDY.design(g.design).cell(g.cell);
-            else desset = STUDY.design(g.design).cell(index);
+                [path,tmp] = fileparts(desset.filebase);
+            else path = ALLEEG(index).filepath;
             end;
-            [path,tmp] = fileparts(desset.filebase);
             
             fprintf('Computing/checking topo file for dataset %d\n', ind1);
             if ~isempty(found)
