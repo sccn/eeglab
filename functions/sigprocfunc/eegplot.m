@@ -1070,22 +1070,21 @@ u(22) = uicontrol('Parent',figh, ...
   
 
   % %%%%%%%%%%%%%%%%%
-  % Set up autoselect
-  % %%%%%%%%%%%%%%%%%
+  % Set up autoselect                                                        
+  % NOTE: commandselect{2} option has been moved to a
+  %       subfunction to improve speed
+  %%%%%%%%%%%%%%%%%%%
   g.commandselect{1} = [ 'if strcmp(get(gcbf, ''SelectionType''),''alt''),' g.ctrlselectcommand{1} ...
                          'else '                                            g.selectcommand{1} 'end;' ];
-  g.commandselect{2} = [ 'if strcmp(get(gcbf, ''SelectionType''),''alt''),' g.ctrlselectcommand{2} ...
-                         'else '                                            g.selectcommand{2} 'end;' ];
   g.commandselect{3} = [ 'if strcmp(get(gcbf, ''SelectionType''),''alt''),' g.ctrlselectcommand{3} ...
                          'else '                                            g.selectcommand{3} 'end;' ];
        
   set(figh, 'windowbuttondownfcn',   g.commandselect{1});
-  set(figh, 'WindowButtonDownFcn', g.commandselect{2});   %set(figh, 'windowbuttonmotionfcn', g.commandselect{2});
+  set(figh, 'windowbuttonmotionfcn', {@defmotion,figh,ax0,ax1,u(10),u(11),u(9)});
   set(figh, 'windowbuttonupfcn',     g.commandselect{3});
   set(figh, 'WindowKeyPressFcn',     @eegplot_readkey);
   set(figh, 'interruptible', 'off');
   set(figh, 'busyaction', 'cancel');
-  
 %  set(figh, 'windowbuttondownfcn', commandpush);
 %  set(figh, 'windowbuttonmotionfcn', commandmove);
 %  set(figh, 'windowbuttonupfcn', commandrelease);
@@ -1919,59 +1918,7 @@ else
 
   % motion button: move windows or display current position (channel, g.time and activation)
   % ----------------------------------------------------------------------------------------
-  case 'defmotioncom'
-    fig = varargin{1};
-    
-    ax1 = findobj('tag','backeeg','parent',fig);
-    tmppos = get(ax1, 'currentpoint'); 
-    
-    % --- For developing testings ---
-    % disp(['You clicked X:',num2str(tmppos(1,1)),', Y:',num2str(tmppos(1,2)) ', Z:',num2str(tmppos(1,3))]); 
-    % if  all([tmppos(1,1) >= 0,tmppos(1,2)>= 0,tmppos(1,2)<= 640, tmppos(1,1)<= 640 , tmppos(1,3)== 1])
-    % ---
-    
-    if  all([tmppos(1,1) >= 0,tmppos(1,2)>= 0])
-        g = get(fig,'UserData');
-        if g.trialstag ~= -1,
-            lowlim = round(g.time*g.trialstag+1);
-        else, lowlim = round(g.time*g.srate+1);
-        end;
-        if g.incallback
-            g.winrej = [g.winrej(1:end-1,:)' [g.winrej(end,1) tmppos(1)+lowlim g.winrej(end,3:end)]']';
-            set(fig,'UserData', g);
-            eegplot('drawb');
-        else
-            hh = findobj('tag','Etime','parent',fig);
-            if g.trialstag ~= -1,
-                tmpval = mod(tmppos(1)+lowlim-1,g.trialstag)/g.trialstag*(g.limits(2)-g.limits(1)) + g.limits(1);
-                if g.isfreq, tmpval = tmpval/1000 + g.freqs(1); end
-                set(hh, 'string', num2str(tmpval));
-            else
-                tmpval = (tmppos(1)+lowlim-1)/g.srate;
-                 if g.isfreq, tmpval = tmpval+g.freqs(1); end
-                set(hh, 'string', num2str(tmpval)); % put g.time in the box
-            end;
-            ax1 = findobj('tag','eegaxis','parent',fig);
-            tmppos = get(ax1, 'currentpoint');
-            tmpelec = round(tmppos(1,2) / g.spacing);
-            tmpelec = min(max(double(tmpelec), 1),g.chans);
-            labls = get(ax1, 'YtickLabel');
-            hh = findobj('tag','Eelec','parent',fig);  % put electrode in the box
-            if ~g.envelope
-                set(hh, 'string', labls(tmpelec+1,:));
-            else
-                set(hh, 'string', ' ');
-            end
-            hh = findobj('tag','Evalue','parent',fig);
-            if ~g.envelope
-                eegplotdata = get(ax1, 'userdata');
-                set(hh, 'string', num2str(eegplotdata(g.chans+1-tmpelec, min(g.frames,max(1,double(round(tmppos(1)+lowlim)))))));  % put value in the box
-            else
-                set(hh,'string',' ');
-            end
-        end;
-    end
-         
+   % case moved as subfunction    
   % add topoplot
   % ------------
   case 'topoplot'
@@ -2059,6 +2006,11 @@ else
     ax1 = findobj('tag','backeeg','parent',fig); 
     tmppos = get(ax1, 'currentpoint');
     if strcmp(get(fig, 'SelectionType'),'normal');
+        
+        fig = varargin{1};
+        g = get(fig,'UserData');       
+        ax1 = findobj('tag','backeeg','parent',fig);
+        tmppos = get(ax1, 'currentpoint');       
         g = get(fig,'UserData'); % get data of backgroung image {g.trialstag g.winrej incallback}
         if g.incallback ~= 1 % interception of nestest calls
             if g.trialstag ~= -1,
@@ -2105,11 +2057,61 @@ else
                 eegplot('drawp', 0);  % redraw background
             end;
         end;
+    elseif strcmp(get(fig, 'SelectionType'),'normal');
+
+        
     end;      
    otherwise
       error(['Error - invalid eegplot() parameter: ',data])
   end  
 end
+% Function to show the value and electrode at mouse position
+function defmotion(varargin)
+    fig = varargin{3};
+    ax1 = varargin{4};
+    tmppos = get(ax1, 'currentpoint'); 
+    
+    if  all([tmppos(1,1) >= 0,tmppos(1,2)>= 0])
+        g = get(fig,'UserData');
+        if g.trialstag ~= -1,
+            lowlim = round(g.time*g.trialstag+1);
+        else, lowlim = round(g.time*g.srate+1);
+        end;
+        if g.incallback
+            g.winrej = [g.winrej(1:end-1,:)' [g.winrej(end,1) tmppos(1)+lowlim g.winrej(end,3:end)]']';
+            set(fig,'UserData', g);
+            eegplot('drawb');
+        else
+            hh = varargin{6}; % h = findobj('tag','Etime','parent',fig);
+            if g.trialstag ~= -1,
+                tmpval = mod(tmppos(1)+lowlim-1,g.trialstag)/g.trialstag*(g.limits(2)-g.limits(1)) + g.limits(1);
+                if g.isfreq, tmpval = tmpval/1000 + g.freqs(1); end
+                set(hh, 'string', num2str(tmpval));
+            else
+                tmpval = (tmppos(1)+lowlim-1)/g.srate;
+                 if g.isfreq, tmpval = tmpval+g.freqs(1); end
+                set(hh, 'string', num2str(tmpval)); % put g.time in the box
+            end;
+            ax1 = varargin{5};% ax1 = findobj('tag','eegaxis','parent',fig);
+            tmppos = get(ax1, 'currentpoint');
+            tmpelec = round(tmppos(1,2) / g.spacing);
+            tmpelec = min(max(double(tmpelec), 1),g.chans);
+            labls = get(ax1, 'YtickLabel');
+            hh = varargin{8}; % hh = findobj('tag','Eelec','parent',fig);  % put electrode in the box
+            if ~g.envelope
+                set(hh, 'string', labls(tmpelec+1,:));
+            else
+                set(hh, 'string', ' ');
+            end
+            hh = varargin{7}; % hh = findobj('tag','Evalue','parent',fig);
+            if ~g.envelope
+                eegplotdata = get(ax1, 'userdata');
+                set(hh, 'string', num2str(eegplotdata(g.chans+1-tmpelec, min(g.frames,max(1,double(round(tmppos(1)+lowlim)))))));  % put value in the box
+            else
+                set(hh,'string',' ');
+            end
+        end;
+    end
 
 % function not supported under Mac
 % --------------------------------
