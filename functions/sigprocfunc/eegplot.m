@@ -1035,7 +1035,9 @@ u(22) = uicontrol('Parent',figh, ...
   zm = uimenu('Parent',m(2),'Label','Zoom off/on');
   commandzoom = [ 'set(gcbf, ''windowbuttondownfcn'', [ ''zoom(gcbf,''''down''''); eegplot(''''zoom'''', gcbf, 1);'' ]);' ...
                   'tmpg = get(gcbf, ''userdata'');' ...
-                  'set(gcbf, ''windowbuttonmotionfcn'', tmpg.commandselect{2}); clear tmpg tmpstr;'];
+                  'clear tmpg tmpstr;'];
+                  %'set(gcbf, ''windowbuttonmotionfcn'',
+                  %tmpg.commandselect{2}); clear tmpg tmpstr;']; clean4release
     
   %uimenu('Parent',zm,'Label','Zoom time', 'callback', ...
   %             [ 'zoom(gcbf, ''xon'');' commandzoom ]);
@@ -1045,9 +1047,10 @@ u(22) = uicontrol('Parent',figh, ...
   uimenu('Parent',zm,'Label','Zoom off', 'separator', 'on', 'callback', ...
      ['zoom(gcbf, ''off''); tmpg = get(gcbf, ''userdata'');' ...
      'set(gcbf, ''windowbuttondownfcn'', tmpg.commandselect{1});' ...
-     'set(gcbf, ''windowbuttonmotionfcn'', tmpg.commandselect{2});' ...
      'set(gcbf, ''windowbuttonupfcn'', tmpg.commandselect{3});' ...
      'clear tmpg;' ]);
+      %'set(gcbf, ''windowbuttonmotionfcn'', tmpg.commandselect{2});' ... clean4release
+      
   uimenu('Parent',figh,'Label', 'Help', 'callback', 'pophelp(''eegplot'');');
 
   % Events %%%%%%%%
@@ -1243,7 +1246,7 @@ else
         switch lower(g.submean) % subtract the mean ?
          case 'on', 
           meandata = mean(g.data2(:,lowlim:highlim)');  
-          if any(isnan(meandata))                              % 6/16/104 Ramon: meandata by memdata
+          if any(isnan(meandata))                              % 6/16/104 Ramon: meandata by memdata clean4release
               meandata = nan_mean(g.data2(:,lowlim:highlim)');
           end;
          otherwise, meandata = zeros(1,g.chans);
@@ -1859,7 +1862,7 @@ else
       % ------------------------------
       if exist('p2', 'var') == 1
           set(gcbf, 'windowbuttondownfcn', [ 'zoom(gcbf,''down''); eegplot(''zoom'', gcbf, 1);' ]);
-          set(gcbf, 'windowbuttonmotionfcn', g.commandselect{2});
+          %set(gcbf, 'windowbuttonmotionfcn', g.commandselect{2}); clean4release
       end;
 
 	case 'updateslider' % if zoom
