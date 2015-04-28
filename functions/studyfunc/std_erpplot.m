@@ -176,9 +176,6 @@ if strcmpi(datatypestr, 'spec'), datatypestr = 'Spectrum'; end;
 
 allconditions = STUDY.design(opt.design).variable(1).value;
 allgroups     = STUDY.design(opt.design).variable(2).value;
-paired = { STUDY.design(opt.design).variable(1).pairing ...
-           STUDY.design(opt.design).variable(2).pairing };
-stats.paired = paired;
 
 % for backward compatibility
 % --------------------------

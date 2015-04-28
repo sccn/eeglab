@@ -99,18 +99,6 @@ opt = finputcheck(varargin, { 'components'       'integer'  []    [];
                               'dataindices'      'integer'  []    [] }, 'std_readdatafile');
 if isstr(opt), error(opt); end;
 
-if any(strcmpi(opt.measure, limomeasures))
-    for fInd = 1:length(fileBaseName)
-        [datatmp, parameters, measureRange1, measureRange2] = std_readfilelimo(fileBaseName, varargin{:});
-        if fInd == 1
-            measureData = datatmp'; 
-        else
-        measureData = cat(2,measureData, datatmp');
-        end
-    end
-    return
-end;
-
 if ~isempty(opt.triallimits), opt.freqlimits = opt.triallimits; end;
 if strcmpi(opt.concatenate, 'on'), opt.singletrials = 'on'; end;
 
@@ -164,7 +152,7 @@ events         = {};
 % get output for parameters and measure ranges
 % --------------------------------------------
 fileFields = fieldnames(fileData);
-if strncmp('parameters', fileFields, 100)
+if any(strncmp('parameters', fileFields, 100))
     parameters = removedup(fileData.parameters);
     for index = 1:length(parameters), if iscell(parameters{index}), parameters{index} = { parameters{index} }; end; end;
     parameters = struct(parameters{:});
