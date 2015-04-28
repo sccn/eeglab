@@ -89,7 +89,7 @@ STUDY = pop_specparams(STUDY, 'default');
     'clusters'      'integer' []             [];
     'timerange'     'real'    []             STUDY.etc.erpparams.timerange;
     'freqrange'     'real'    []             STUDY.etc.specparams.freqrange;
-    'datatype'      'string'  {}             'erp';
+    'datatype'      'string'  { 'erp','spec' } 'erp';
     'rmsubjmean'    'string'  { 'on','off' } 'off';
     'singletrials'  'string'  { 'on','off' } 'off';
     'componentpol'  'string'  { 'on','off' } 'on';
@@ -97,13 +97,10 @@ STUDY = pop_specparams(STUDY, 'default');
     'subject'       'string'  []             '' }, ...
     'std_readerp', 'ignore');
 if isstr(opt), error(opt); end;
+% nc = max(length(STUDY.design(opt.design).variable(1).value),1);
+% ng = max(length(STUDY.design(opt.design).variable(2).value),1);
+
 dtype = opt.datatype;
-dsubtype = '';
-if strcmpi(dtype(1:3), 'erp' )
-    if length(dtype) > 3, dsubtype = dtype(4:end); dtype = 'erp'; end;
-elseif strcmpi(dtype(1:4), 'spec')
-    if length(dtype) > 4, dsubtype = dtype(5:end); dtype = 'spec'; end;
-end;
 
 % find channel indices
 % --------------------
@@ -113,13 +110,31 @@ if ~isempty(opt.channels)
 else finalinds = opt.clusters;
 end;
 
+% get the file extension
+% ----------------------
+if ~isempty(opt.channels), fileExt = '.daterp';
+else                       fileExt = '.icaerp';
+end;
+
+% first subject data file
+% -----------------------
+testSubjectFile = fullfile(ALLEEG(1).filepath, [ ALLEEG(1).subject fileExt ]);
+
 for ind = 1:length(finalinds) % scan channels or components
+
+    % find indices
+    % ------------
+    if ~isempty(opt.channels)
+        tmpstruct = STUDY.changrp(finalinds(ind));
+    else
+        tmpstruct = STUDY.cluster(finalinds(ind));
+    end;
 
     % check if data is already here
     % -----------------------------
     dataread = 0;
-    if strcmpi(dtype, 'erp'), eqtf = isequal( STUDY.etc.erpparams.timerange , opt.timerange);
-    else                      eqtf = isequal( STUDY.etc.specparams.freqrange, opt.freqrange) && ...
+    if strcmpi(dtype, 'erp'), eqtf = isequal( STUDY.etc.erpparams.timerange, opt.timerange);
+    else                      eqtf = isequal(STUDY.etc.specparams.freqrange, opt.freqrange) && ...
                                      isequal( STUDY.etc.specparams.subtractsubjectmean, opt.rmsubjmean);
     end;
     if strcmpi(opt.singletrials,'off')
@@ -147,17 +162,17 @@ for ind = 1:length(finalinds) % scan channels or components
     if ~dataread
         % reserve arrays
         % --------------
-        alldata        = cell( nc, ng );
-        setinfoIndices = cell( nc, ng );
-        tmpind  = 1; while(isempty(setinds{tmpind})), tmpind = tmpind+1; end;
-        setinfo = STUDY.design(opt.design).cell;
-        tmpchanlocs = ALLEEG(setinfo(1).dataset(1)).chanlocs;
-        chanlab = { tmpchanlocs.labels };
-        nonemptyindex = ~cellfun(@isempty, allinds);
-        nonemptyindex = find(nonemptyindex(:));
-        optGetparams = { 'measure', [dtype dsubtype], 'getparamonly', 'on', 'singletrials', opt.singletrials, 'timelimits', opt.timerange, 'freqlimits', opt.freqrange, 'setinfoinds', 1};
-        if ~isempty(opt.channels), [ tmp params xvals] = std_readfile(setinfo(setinds{nonemptyindex(1)}(1)), optGetparams{:}, 'channels'  , allChangrp(allinds{nonemptyindex(1)}(1)));
-        else                       [ tmp params xvals] = std_readfile(setinfo(setinds{nonemptyindex(1)}(1)), optGetparams{:}, 'components', allinds{nonemptyindex(1)}(1));
+%         alldata        = cell( nc, ng );
+%         setinfoIndices = cell( nc, ng );
+%         tmpind  = 1; while(isempty(setinds{tmpind})), tmpind = tmpind+1; end;
+%         setinfo = STUDY.design(opt.design).cell;
+%         tmpchanlocs = ALLEEG(setinfo(1).dataset(1)).chanlocs;
+%         chanlab = { tmpchanlocs.labels };
+%         nonemptyindex = ~cellfun(@isempty, allinds);
+%         nonemptyindex = find(nonemptyindex(:));
+        optGetparams = { 'measure', dtype, 'getparamonly', 'on', 'timelimits', opt.timerange, 'freqlimits', opt.freqrange};
+        if ~isempty(opt.channels), [ tmp params xvals] = std_readfile(testSubjectFile, optGetparams{:}, 'channels', opt.channels(ind));
+        else                       [ tmp params xvals] = std_readfile(testSubjectFile, optGetparams{:}, 'components', finalinds(ind));
         end;
         
         % read the data and select channels
@@ -167,28 +182,19 @@ for ind = 1:length(finalinds) % scan channels or components
         else                      opts = { 'freqlimits', opt.freqrange };
         end;
         
-        if strcmpi(opt.singletrials, 'on')
-            if strcmpi(params.singletrials, 'off')
-                fprintf('\n');
-                errordlg2('No single trial data - recompute data files');
-                datavals = [];
-                return;
-            end;            
-            opts = { opts{:} 'singletrials' 'on' };
-            for iSubj = 1:length(STUDY.design(STUDY.currentdesign).cases.value)
-                
-                fileBase = STUDY.design(STUDY.currentdesign).cases.filebase{iSubj};
-                tmpdata = std_readfile( fileBase, 'measure', [dtype dsubtype], opts{:}, 'channels', opt.channels(ind), 'design', STUDY.design(STUDY.currentdesign).variable);
-                if iSubj == 1
-                    alldata = tmpdata;
-                else
-                    if ndims(tmpdata) == 1
-                        alldata
-                    end;
-                end;
+        for iSubj = length(STUDY.subject):-1:1
+            fileName = fullfile(STUDY.subject{iSubj}, [ STUDY.subject{iSubj} fileExt ]); % FIX THIS - NEED TO FIND FILEPATH FOR SUBJECT
+            
+            dataSubject = std_readfile( fileName,  'designvar', STUDY.design(STUDY.currentdesign).variable, opts{:}, 'channels', opt.channels(ind));
+            % DEAL WITH COMPONENTS HERE
+        end;
+        
+        alldata = cell(size(dataSubject));
+        for iCell = 1:length(dataSubject(:))
+            for iSubj = length(STUDY.subject):-1:1
+                alldata{iCell}(:,iSubj) = mean(dataSubject{iCell},2);
             end;
         end;
-        fprintf('\n');
         
         % inverting component polaritites
         % -------------------------------
@@ -269,35 +275,25 @@ end;
 allinds   = finalinds;
 if ~isempty(opt.channels)
     structdat = STUDY.changrp;
-    datavals = cell(nc, ng);
+    datavals  = cell(size(alldata));
     if strcmpi( dtype, 'spec'), xvals = getfield(structdat(allinds(1)), [ dtype 'freqs' ]);
     else                        xvals = getfield(structdat(allinds(1)), [ dtype 'times' ]);
     end;
-    for ind =  1:length(datavals(:))
-        if strcmpi(opt.singletrials, 'on')
-             tmpdat = getfield(structdat(allinds(1)), [ dtype 'datatrials' ]);
-        else tmpdat = getfield(structdat(allinds(1)), [ dtype 'data' ]);
-        end;
-        if ~isempty(tmpdat{ind})
-            datavals{ind} = zeros([ size(tmpdat{ind}) length(allinds)]);
-            for chan = 1:length(allinds)
-                if strcmpi(opt.singletrials, 'on')
-                     tmpdat = getfield(structdat(allinds(chan)), [ dtype 'datatrials' ]);
-                else tmpdat = getfield(structdat(allinds(chan)), [ dtype 'data' ]);
-                end;
-                datavals{ind}(:,:,chan) = tmpdat{ind}; % only works for interpolated data
-            end;
-        
-            datavals{ind} = squeeze(permute(datavals{ind}, [1 3 2])); % time elec subjects
+   
+    for chan = length(finalinds):-1:1
+        tmpdat = getfield(structdat(finalinds(chan)), [ dtype 'data' ]); % only works for interpolated data
+        for ind =  1:length(tmpdat(:))
+            datavals{ind}(:,:,chan) = tmpdat{ind};
         end;
     end;
-    setinds  = structdat(allinds(1)).setinds;
+    datavals = reshape(datavals, size(tmpdat));
+    
+    for ind =  1:length(datavals(:))
+        datavals{ind} = squeeze(permute(datavals{ind}, [1 3 2])); % time elec subjects
+    end;
     if ~isempty(opt.subject)
-        if strcmpi(opt.singletrials, 'on')
-            datavals = std_selsubject(datavals, opt.subject, structdat(allinds(1)).setindstrials, { STUDY.design(opt.design).cell.case }, 2); 
-        else
-            datavals = std_selsubject(datavals, opt.subject, setinds, { STUDY.design(opt.design).cell.case }, 2); 
-        end;
+        indSubj = strncmp(opt.subject, STUDY.subject, 100);
+        datavals = datavals(indSubj); 
     end;
 else
     if strcmpi(opt.singletrials, 'on')
@@ -358,3 +354,5 @@ function spectrum = removemeanspectrum(spectrum, meanpowbase)
         end;
     end;
 
+
+   
