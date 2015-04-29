@@ -137,62 +137,40 @@ for ind = 1:length(finalinds) % scan channels or components
     else                      eqtf = isequal(STUDY.etc.specparams.freqrange, opt.freqrange) && ...
                                      isequal( STUDY.etc.specparams.subtractsubjectmean, opt.rmsubjmean);
     end;
-    if strcmpi(opt.singletrials,'off')
-        if isfield(tmpstruct, [ dtype 'data' ]) && ~isempty(getfield(tmpstruct, [ dtype 'data' ])) && eqtf
-            dataread = 1;
-        end;
-    else
-        if isfield(tmpstruct, [ dtype 'datatrials' ]) && eqtf
-            tmpdat = getfield(tmpstruct, [ dtype 'datatrials' ]);
-            range  = fastif( strcmpi(dtype, 'erp'), 'erptimes', 'specfreqs');
-            if isfield(tmpstruct, range)
-                if ~isempty(opt.channels) && ~isempty(tmpdat) && strcmpi(getfield(tmpstruct, [ dtype 'trialinfo' ]), opt.subject)
-                    if size(tmpdat{1},2) == length(getfield(tmpstruct, range))
-                        dataread = 1; 
-                    end;
-                elseif isempty(opt.channels) && isequal(getfield(tmpstruct, [ dtype 'trialinfo' ]), opt.component) 
-                    if size(tmpdat{1},2) == length(getfield(tmpstruct, range))
-                        dataread = 1; 
-                    end;
-                end;
-            end;
-        end;
+    if isfield(tmpstruct, [ dtype 'data' ]) && ~isempty(getfield(tmpstruct, [ dtype 'data' ])) && eqtf
+        dataread = 1;
     end;
     
     if ~dataread
-        % reserve arrays
-        % --------------
-%         alldata        = cell( nc, ng );
-%         setinfoIndices = cell( nc, ng );
-%         tmpind  = 1; while(isempty(setinds{tmpind})), tmpind = tmpind+1; end;
-%         setinfo = STUDY.design(opt.design).cell;
-%         tmpchanlocs = ALLEEG(setinfo(1).dataset(1)).chanlocs;
-%         chanlab = { tmpchanlocs.labels };
-%         nonemptyindex = ~cellfun(@isempty, allinds);
-%         nonemptyindex = find(nonemptyindex(:));
+        
+        % reading options
+        % ---------------
         optGetparams = { 'measure', dtype, 'getparamonly', 'on', 'timelimits', opt.timerange, 'freqlimits', opt.freqrange};
         if ~isempty(opt.channels), [ tmp params xvals] = std_readfile(testSubjectFile, optGetparams{:}, 'channels', opt.channels(ind));
         else                       [ tmp params xvals] = std_readfile(testSubjectFile, optGetparams{:}, 'components', finalinds(ind));
         end;
-        
-        % read the data and select channels
-        % ---------------------------------
         fprintf([ 'Reading ' dtype ' data...' ]);
         if strcmpi(dtype, 'erp'), opts = { 'timelimits', opt.timerange };
         else                      opts = { 'freqlimits', opt.freqrange };
         end;
         
+        % read the data and select channels
+        % ---------------------------------
+        allSubjects = { STUDY.datasetinfo.subject };
+        uniqueSubjects = unique(allSubjects);
+        STUDY.subject = uniqueSubjects;
         for iSubj = length(STUDY.subject):-1:1
-            fileName = fullfile(STUDY.subject{iSubj}, [ STUDY.subject{iSubj} fileExt ]); % FIX THIS - NEED TO FIND FILEPATH FOR SUBJECT
+            inds = find(strncmp( uniqueSubjects{iSubj}, allSubjects, max(cellfun(@length, allSubjects))));
+            fileName = fullfile(STUDY.datasetinfo(inds(1)).filepath, [ STUDY.subject{iSubj} fileExt ]); % FIX THIS - NEED TO FIND FILEPATH FOR SUBJECT
             
-            dataSubject = std_readfile( fileName,  'designvar', STUDY.design(STUDY.currentdesign).variable, opts{:}, 'channels', opt.channels(ind));
+            dataSubject{iSubj} = std_readfile( fileName,  'designvar', STUDY.design(STUDY.currentdesign).variable, opts{:}, 'channels', opt.channels(ind));
             % DEAL WITH COMPONENTS HERE
         end;
         
-        alldata = cell(size(dataSubject));
-        for iCell = 1:length(dataSubject(:))
+        alldata = cell(size(dataSubject{1}));
+        for iCell = 1:length(dataSubject{1}(:))
             for iSubj = length(STUDY.subject):-1:1
-                alldata{iCell}(:,iSubj) = mean(dataSubject{iCell},2);
+                alldata{iCell}(:,iSubj) = mean(dataSubject{iSubj}{iCell},2);
             end;
         end;
         
