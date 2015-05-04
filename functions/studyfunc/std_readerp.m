@@ -122,6 +122,12 @@ testSubjectFile = fullfile(ALLEEG(1).filepath, [ ALLEEG(1).subject fileExt ]);
 
 for ind = 1:length(finalinds) % scan channels or components
 
+    % list of subjects
+    % ----------------
+    allSubjects = { STUDY.datasetinfo.subject };
+    uniqueSubjects = unique(allSubjects);
+    STUDY.subject = uniqueSubjects;
+        
     % find indices
     % ------------
     if ~isempty(opt.channels)
@@ -130,51 +136,82 @@ for ind = 1:length(finalinds) % scan channels or components
         tmpstruct = STUDY.cluster(finalinds(ind));
     end;
 
-    % check if data is already here
-    % -----------------------------
-    dataread = 0;
-    if strcmpi(dtype, 'erp'), eqtf = isequal( STUDY.etc.erpparams.timerange, opt.timerange);
-    else                      eqtf = isequal(STUDY.etc.specparams.freqrange, opt.freqrange) && ...
-                                     isequal( STUDY.etc.specparams.subtractsubjectmean, opt.rmsubjmean);
-    end;
-    if isfield(tmpstruct, [ dtype 'data' ]) && ~isempty(getfield(tmpstruct, [ dtype 'data' ])) && eqtf
-        dataread = 1;
-    end;
+    % check if data is already here using hashcode
+    % --------------------------------------------
+    dataread = false;
+    bigstruct = [];
+    bigstruct.timerange = opt.timerange;
+    bigstruct.freqrange = opt.freqrange;
+    bigstruct.rmsubjmean   = opt.rmsubjmean;
+    bigstruct.singletrials = opt.singletrials;
+    bigstruct.subject      = opt.subject;
+    bigstruct.design       = STUDY.design(opt.design);
+    hashcode = gethashcode(std_serialize(bigstruct));
+    if isfield(tmpstruct, [ dtype 'hashcode' ]) && strcmpi( tmpstruct.([ dtype 'hashcode' ]), hashcode), dataread = true; end;
     
-    if ~dataread
+    if dataread == false
+        tmpstruct.([ dtype 'hashcode' ]) = hashcode;
         
         % reading options
         % ---------------
-        optGetparams = { 'measure', dtype, 'getparamonly', 'on', 'timelimits', opt.timerange, 'freqlimits', opt.freqrange};
-        if ~isempty(opt.channels), [ tmp params xvals] = std_readfile(testSubjectFile, optGetparams{:}, 'channels', opt.channels(ind));
-        else                       [ tmp params xvals] = std_readfile(testSubjectFile, optGetparams{:}, 'components', finalinds(ind));
-        end;
-        fprintf([ 'Reading ' dtype ' data...' ]);
+        fprintf([ 'Reading ' dtype ' data...\n' ]);
         if strcmpi(dtype, 'erp'), opts = { 'timelimits', opt.timerange };
         else                      opts = { 'freqlimits', opt.freqrange };
         end;
         
         % read the data and select channels
         % ---------------------------------
-        allSubjects = { STUDY.datasetinfo.subject };
-        uniqueSubjects = unique(allSubjects);
-        STUDY.subject = uniqueSubjects;
-        for iSubj = length(STUDY.subject):-1:1
-            inds = find(strncmp( uniqueSubjects{iSubj}, allSubjects, max(cellfun(@length, allSubjects))));
-            fileName = fullfile(STUDY.datasetinfo(inds(1)).filepath, [ STUDY.subject{iSubj} fileExt ]); % FIX THIS - NEED TO FIND FILEPATH FOR SUBJECT
-            
-            dataSubject{iSubj} = std_readfile( fileName,  'designvar', STUDY.design(STUDY.currentdesign).variable, opts{:}, 'channels', opt.channels(ind));
+        subjectList = opt.subject;
+        if isempty(subjectList), subjectList = STUDY.subject; end;
+        for iSubj = length(subjectList):-1:1
+            inds = find(strncmp( subjectList{iSubj}, allSubjects, max(cellfun(@length, allSubjects))));
+            fileName = fullfile(STUDY.datasetinfo(inds(1)).filepath, [ subjectList{iSubj} fileExt ]); 
+            [dataSubject{ iSubj } params xvals tmp events{ iSubj } ] = std_readfile( fileName,  'designvar', STUDY.design(opt.design).variable, opts{:}, 'channels', opt.channels(ind));
             % DEAL WITH COMPONENTS HERE
         end;
         
-        alldata = cell(size(dataSubject{1}));
-        for iCell = 1:length(dataSubject{1}(:))
-            for iSubj = length(STUDY.subject):-1:1
-                alldata{iCell}(:,iSubj) = mean(dataSubject{iSubj}{iCell},2);
+        % concatenate subject data
+        if strcmpi(opt.singletrials, 'off')
+            for iSubj = length(subjectList):-1:1
+                for iCell = 1:length(dataSubject{1}(:))
+                    alldata{  iCell}(:,iSubj) = mean(dataSubject{ iSubj }{ iCell },2);
+                    if ~isempty(events{iSubj}{iCell})
+                         allevents{iCell}(:,iSubj) = mean(events{      iSubj }{ iCell },2);
+                    else allevents{iCell} = [];
+                    end;
+                end;
+            end;
+        else
+            % calculate dimensions
+            alldim = zeros(size(dataSubject{1}));
+            for iSubj = length(subjectList):-1:1
+                for iCell = 1:length(dataSubject{1}(:))
+                    alldim(iCell) = alldim(iCell)+size(dataSubject{ iSubj }{ iCell },2);
+                end;
+            end;
+            % initialize arrays
+            for iCell = 1:length(dataSubject{1}(:))
+                alldata{  iCell} = zeros(size(dataSubject{ 1 }{ 1 },1), alldim(iCell));
+                allevents{iCell} = zeros(size(events{      1 }{ 1 },1), alldim(iCell));
+            end;
+            % populate arrays
+            allcounts = zeros(size(dataSubject{1}));
+            for iSubj = length(subjectList):-1:1
+                for iCell = 1:length(dataSubject{1}(:))
+                    cols = size(dataSubject{ iSubj }{ iCell },2);
+                    alldata{  iCell}(:,allcounts(iCell)+1:allcounts(iCell)+cols) = dataSubject{ iSubj }{ iCell };
+                    if ~isempty(events{iSubj}{iCell})
+                         allevents{iCell}(:,allcounts(iCell)+1:allcounts(iCell)+cols) = events{      iSubj }{ iCell };
+                    else allevents{iCell} = [];
+                    end;
+                    allcounts(iCell) = allcounts(iCell)+cols;
+                end;
             end;
         end;
+        alldata   = reshape(alldata  , size(dataSubject{1}));
+        allevents = reshape(allevents, size(events{1}));
         
-        % inverting component polaritites
+        % inverting component polaritites - HAVE TO CHECK HERE ABOUT THE NEW FRAMEWORK
         % -------------------------------
         if isempty(opt.channels) && strcmpi(dtype, 'erp')
             if strcmpi(opt.singletrials, 'on')
@@ -195,7 +232,7 @@ for ind = 1:length(finalinds) % scan channels or components
             end;
         end;
 
-        % remove mean of each subject across groups and conditions
+        % remove mean of each subject across groups and conditions - HAVE TO CHECK HERE ABOUT THE NEW FRAMEWORK
         if strcmpi(dtype, 'spec') && strcmpi(opt.rmsubjmean, 'on') && ~isempty(opt.channels)
             disp('Removing subject''s average spectrum based on pairing settings');
             if strcmpi(paired1, 'on') && strcmpi(paired2, 'on') && (nc > 1 || ng > 1)
@@ -219,23 +256,15 @@ for ind = 1:length(finalinds) % scan channels or components
             end;
         end;
         
-        if strcmpi(opt.singletrials, 'on')
-             tmpstruct = setfield( tmpstruct, [ dtype 'datatrials' ], alldata);
-             tmpstruct = setfield( tmpstruct, [ 'setindstrials' ], setinfoIndices);             
-             if ~isempty(opt.channels)
-                  tmpstruct = setfield( tmpstruct, [ dtype 'trialinfo' ], opt.subject);
-             else tmpstruct = setfield( tmpstruct, [ dtype 'trialinfo' ], opt.component);
-             end;
-        else tmpstruct = setfield( tmpstruct, [ dtype 'data' ], alldata);
-        end;
+        tmpstruct = setfield( tmpstruct, [ dtype 'data' ], alldata);
+        tmpstruct = setfield( tmpstruct, [ dtype 'vars' ], allevents);
         if strcmpi(dtype, 'spec'), tmpstruct.specfreqs = xvals;
         else                       tmpstruct.erptimes  = xvals;
         end;
         
         % copy results to structure
         % -------------------------
-        fieldnames = { [ dtype 'data' ]  [ dtype 'freqs' ] [ dtype 'datatrials' ] ...
-                       [ dtype 'times' ] [ dtype 'trialinfo' ] 'allinds' 'setinds' 'setindstrials' };
+        fieldnames = { [ dtype 'data' ] [ dtype 'vars' ] [ dtype 'freqs' ] [ dtype 'times' ] [ dtype 'hashcode' ] };
         for f = 1:length(fieldnames)
             if isfield(tmpstruct, fieldnames{f}),
                 tmpdata = getfield(tmpstruct, fieldnames{f});
@@ -253,7 +282,7 @@ end;
 allinds   = finalinds;
 if ~isempty(opt.channels)
     structdat = STUDY.changrp;
-    datavals  = cell(size(alldata));
+    datavals  = [];
     if strcmpi( dtype, 'spec'), xvals = getfield(structdat(allinds(1)), [ dtype 'freqs' ]);
     else                        xvals = getfield(structdat(allinds(1)), [ dtype 'times' ]);
     end;
@@ -268,10 +297,6 @@ if ~isempty(opt.channels)
     
     for ind =  1:length(datavals(:))
         datavals{ind} = squeeze(permute(datavals{ind}, [1 3 2])); % time elec subjects
-    end;
-    if ~isempty(opt.subject)
-        indSubj = strncmp(opt.subject, STUDY.subject, 100);
-        datavals = datavals(indSubj); 
     end;
 else
     if strcmpi(opt.singletrials, 'on')
