@@ -73,7 +73,7 @@
 % dimensions
 % time x freqs x channel_comps x subjects_trials
 
-function [measureData, parameters, measureRange1, measureRange2, events, setinfoTrialIndices] = std_readfile(fileBaseName, varargin);
+function [measureData, parameters, measureRange1, measureRange2, events] = std_readfile(fileBaseName, varargin);
 
 if nargin < 1
     help std_readfile;
@@ -179,17 +179,6 @@ if strcmpi(opt.getparamonly, 'on'),
     return;
 end;
 
-% scan design and search for continuous var
-% -----------
-
-
-
-% ******************
-% To do
-% - remove all continuous variables
-% - when calling getfiledata, get value for all continuous variable for each selected trial
-% ******************
-
 options = { opt.dataindices, opt.function, dataType, indBegin1, indEnd1, indBegin2, indEnd2 };
 [ measureData events ] = globalgetfiledata(fileData, opt.designvar, options, {});
 
@@ -270,12 +259,14 @@ if isempty(trials),
 end;
 
 % load data
+warning('off', 'MATLAB:MatFile:OlderFormat');
 if ndims(fileData.(fieldToRead)) == 2
     fieldData = fileData.(fieldToRead)(indBegin1:indEnd1,trials);
     if ~isempty(subTrials), fieldData = fieldData(:, subTrials); end;
 else fieldData = fileData.(fieldToRead)(indBegin1:indEnd1,indBegin2:indEnd2,trials);
     if ~isempty(subTrials), fieldData = fieldData(:, :, subTrials); end;
 end;
+warning('on', 'MATLAB:MatFile:OlderFormat');
 
 % average single trials if necessary
 if ~isempty(func)
