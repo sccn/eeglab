@@ -120,7 +120,7 @@ end;
 % -----------------------
 testSubjectFile = fullfile(ALLEEG(1).filepath, [ ALLEEG(1).subject fileExt ]);
 
-for ind = 1:length(finalinds) % scan channels or components
+for ind = 1:length(finalinds) % scan channels or clusters
 
     % list of subjects
     % ----------------
@@ -159,24 +159,50 @@ for ind = 1:length(finalinds) % scan channels or components
         else                      opts = { 'freqlimits', opt.freqrange };
         end;
         
+        % get component polarity if necessary
+        % -----------------------------------
+        componentPol = [];
+        if isempty(opt.channels) && strcmpi(dtype, 'erp') && isempty(opt.channels)
+            disp('Reading component scalp topo polarities - this is done to invert some ERP component polarities');
+            STUDY = std_readtopoclust(STUDY, ALLEEG, finalinds(ind));
+            componentPol = STUDY.cluster(finalinds(ind)).topopol;
+            if isempty(componentPol)
+                disp('Cluster topographies absent - cannot adjust single component ERP polarities');
+            end;
+        end;
+        
         % read the data and select channels
         % ---------------------------------
         subjectList = opt.subject;
         if isempty(subjectList), subjectList = STUDY.subject; end;
+        count = 1;
         for iSubj = length(subjectList):-1:1
-            inds = find(strncmp( subjectList{iSubj}, allSubjects, max(cellfun(@length, allSubjects))));
-            fileName = fullfile(STUDY.datasetinfo(inds(1)).filepath, [ subjectList{iSubj} fileExt ]); 
-            [dataSubject{ iSubj } params xvals tmp events{ iSubj } ] = std_readfile( fileName,  'designvar', STUDY.design(opt.design).variable, opts{:}, 'channels', opt.channels(ind));
-            % DEAL WITH COMPONENTS HERE
+            datInds = find(strncmp( subjectList{iSubj}, allSubjects, max(cellfun(@length, allSubjects))));
+            fileName = fullfile(STUDY.datasetinfo(datInds(1)).filepath, [ subjectList{iSubj} fileExt ]); 
+            
+            if ~isempty(opt.channels)
+                [dataSubject{ iSubj } params xvals tmp events{ iSubj } ] = std_readfile( fileName,  'designvar', STUDY.design(opt.design).variable, opts{:}, 'channels', opt.channels(ind));
+            else
+                % find components for a given cluster and subject
+                setInds = [];
+                for iDat = 1:length(datInds), setInds = [setInds find(tmpstruct.sets(1,:) == datInds(iDat))' ]; end;
+                for iComp = 1:length(setInds)
+                    [dataSubject{ count } params xvals tmp events{ count } ] = std_readfile( fileName,  'designvar', STUDY.design(opt.design).variable, opts{:}, 'components', tmpstruct.comps( setInds(iComp) ));
+                    if ~isempty(componentPol), for iCell = 1:length(dataSubject{ count }(:)), dataSubject{ count }{ iCell } = dataSubject{ count }{ iCell }*componentPol(setInds(iComp)); end; end;
+                    count = count+1;
+                end;
+                % DEAL WITH COMPONENTS HERE
+            end;
         end;
-        
-        % concatenate subject data
+
+        % concatenate data - compute average if not dealing with single trials
+        % --------------------------------------------------------------------
         if strcmpi(opt.singletrials, 'off')
             for iSubj = length(subjectList):-1:1
                 for iCell = 1:length(dataSubject{1}(:))
                     alldata{  iCell}(:,iSubj) = mean(dataSubject{ iSubj }{ iCell },2);
                     if ~isempty(events{iSubj}{iCell})
-                         allevents{iCell}(:,iSubj) = mean(events{      iSubj }{ iCell },2);
+                         allevents{iCell}(:,iSubj) = mean(events{ iSubj }{ iCell },2);
                     else allevents{iCell} = [];
                     end;
                 end;
@@ -210,27 +236,6 @@ for ind = 1:length(finalinds) % scan channels or components
         end;
         alldata   = reshape(alldata  , size(dataSubject{1}));
         allevents = reshape(allevents, size(events{1}));
-        
-        % inverting component polaritites - HAVE TO CHECK HERE ABOUT THE NEW FRAMEWORK
-        % -------------------------------
-        if isempty(opt.channels) && strcmpi(dtype, 'erp')
-            if strcmpi(opt.singletrials, 'on')
-                disp('Warning: component ERP polarity cannot (yet) be inverted for single trials');
-            else
-                STUDY = std_readtopoclust(STUDY, ALLEEG, finalinds(ind));
-                if isfield(STUDY.cluster, 'topopol') && ~isempty(STUDY.cluster(finalinds(ind)).topopol)
-                    [ tmpstruct tmp1 tmp2 topopolcell] = std_setcomps2cell(STUDY, STUDY.cluster(finalinds(ind)).sets, STUDY.cluster(finalinds(ind)).comps, STUDY.cluster(finalinds(ind)).topopol);
-                    disp('Inverting ERP component polarities based on scalp map polarities');
-                    for index = 1:length(alldata(:))
-                        for comps = 1:size(alldata{index},2)
-                            alldata{index}(:,comps) = alldata{index}(:,comps)*topopolcell{index}(comps);
-                        end;
-                    end;
-                else
-                    disp('Cluster topographies absent - cannot adjust single component ERP polarities');
-                end;
-            end;
-        end;
 
         % remove mean of each subject across groups and conditions - HAVE TO CHECK HERE ABOUT THE NEW FRAMEWORK
         if strcmpi(dtype, 'spec') && strcmpi(opt.rmsubjmean, 'on') && ~isempty(opt.channels)
@@ -299,15 +304,14 @@ if ~isempty(opt.channels)
         datavals{ind} = squeeze(permute(datavals{ind}, [1 3 2])); % time elec subjects
     end;
 else
-    if strcmpi(opt.singletrials, 'on')
-         datavals = getfield(STUDY.cluster(allinds(1)), [ dtype 'datatrials' ]);
-    else datavals = getfield(STUDY.cluster(allinds(1)), [ dtype 'data' ]);
-    end;
+    datavals = getfield(STUDY.cluster(allinds(1)), [ dtype 'data' ]);
     if strcmpi( dtype, 'spec'), xvals = getfield(STUDY.cluster(allinds(1)), [ dtype 'freqs' ]);
     else                        xvals = getfield(STUDY.cluster(allinds(1)), [ dtype 'times' ]);
     end;
     compinds = STUDY.cluster(allinds(1)).allinds;
     setinds  = STUDY.cluster(allinds(1)).setinds;
+    
+    % THE SECTION BELOW PROBABLY DOES NOT WORK PROPERLY
     if ~isempty(opt.component) && length(allinds) == 1 && strcmpi(opt.singletrials,'off')
         datavals = std_selcomp(STUDY, datavals, allinds, setinds, compinds, opt.component);
     end;
