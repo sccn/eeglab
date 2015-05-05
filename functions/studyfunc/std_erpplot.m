@@ -321,7 +321,6 @@ else
             comp_names = { STUDY.cluster(opt.clusters(index)).comps(opt.comps) };
             opt.subject = STUDY.datasetinfo(STUDY.cluster(opt.clusters(index)).sets(1,opt.comps)).subject;
         end;
-        stats.paired = paired;
         [pcond pgroup pinter] = std_stat(erpdata, stats);
         if strcmpi(opt.noplot, 'on'), return; end;
             

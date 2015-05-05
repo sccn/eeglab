@@ -59,7 +59,7 @@ end;
 if nargin < 5
     mode = '2Dmap';
 end;
-filename = correctfile(fullfile( ALLEEG(abset).filepath,[ ALLEEG(abset).filename(1:end-3) 'icatopo']));
+filename = correctfile(fullfile( ALLEEG(abset).filepath,[ ALLEEG(abset).filename(1:end-3) 'icatopo']),ALLEEG(abset).filepath);
 tmpfile  = which(filename);
 if ~isempty(tmpfile), filename = tmpfile; end;
 
