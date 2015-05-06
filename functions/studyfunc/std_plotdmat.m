@@ -242,26 +242,25 @@ for i = 1 : length(design.variable)
                 facval_indx = find(strcmp(facval,design.variable(i).value));
             end
         end
-        for k = 1 : length(dsetinfo_subjindx)
-            if catflag
-                if isnumeric( cell2mat(design.variable(i).value(j)))
-                    varval = cell2mat(design.variable(i).value(j));
-                else
-                    varval = design.variable(i).value(j);
-                end
+        
+        if catflag
+            if isnumeric( cell2mat(design.variable(i).value(j)))
+                varval = cell2mat(design.variable(i).value(j));
             else
-                varval = '';
+                varval = design.variable(i).value(j);
             end
-            [trialindsx, eventvals] = std_gettrialsind(trialinfo,design.variable(i).label, varval);
+        else
+            varval = '';
+        end
+        [trialindsx, eventvals] = std_gettrialsind(trialinfo,design.variable(i).label, varval);
+        
+        if ~isempty(trialindsx)
+            % case for continous variables
+            if ~catflag
+                facval_indx = eventvals;
+            end
+            tmpdmat(trialindsx,i) = facval_indx;
             
-            if ~isempty(trialindsx)
-                % case for continous variables
-                if ~catflag
-                    facval_indx = eventvals;
-                end
-                    tmpdmat(trialindsx,i) = facval_indx;
-
-            end
         end
     end
 end
