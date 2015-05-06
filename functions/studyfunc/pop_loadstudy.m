@@ -120,6 +120,24 @@ for inddes = 1:length(STUDY.design)
     end;
 end;
 
+% Update the design path
+if isfield(STUDY.design, 'cell')
+    for inddes = 1:length(STUDY.design)
+        for indcell = 1:length(STUDY.design(inddes).cell)
+            pathname = STUDY.datasetinfo(STUDY.design(inddes).cell(indcell).dataset(1)).filepath;
+            filebase = STUDY.design(inddes).cell(indcell).filebase;
+            tmpinds1 = find(filebase == '/');
+            tmpinds2 = find(filebase == '\');
+            if ~isempty(tmpinds1)
+                STUDY.design(inddes).cell(indcell).filebase = fullfile(pathname, filebase(tmpinds1(end)+1:end));
+            elseif ~isempty(tmpinds2)
+                STUDY.design(inddes).cell(indcell).filebase = fullfile(pathname, filebase(tmpinds2(end)+1:end));
+            else STUDY.design(inddes).cell(indcell).filebase = fullfile(pathname, filebase );
+            end;
+        end;
+    end;
+end
+
 % check for corrupted ERSP ICA data files
 % A corrupted file is present if
 % - components have been selected
@@ -134,7 +152,7 @@ try
             warningshown = 0;
 
             for des = 1:length(STUDY.design)
-                for iCell = 1:length(STUDY.design(des).cell)
+                for iCell = 1:length(STUDY.datasetinfo) % length(STUDY.design(des).cell)
                     if ~warningshown
                         if exist( [ STUDY.design(des).cell(iCell).filebase '.icaersp' ] )
                             warning('off', 'MATLAB:load:variableNotFound');
