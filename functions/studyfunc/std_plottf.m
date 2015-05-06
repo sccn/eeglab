@@ -298,7 +298,7 @@ end;
 axes(hdl(nc,ng)); 
 cbar_standard(opt.datatype, ng, opt.unitcolor); 
 if isnan(opt.threshold) && (nc ~= size(hdl,1) || ng ~= size(hdl,2))
-    ind = find(hdl(end:-1:1));
+    ind = find(ishandle(hdl(end:-1:1)));
     axes(hdl(end-ind(1)+1));
     cbar_signif(ng, maxplot);
 end;
