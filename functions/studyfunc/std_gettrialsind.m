@@ -123,7 +123,7 @@ for iVar = 1 :  length(varnames)
             end;
             excl = find(cellfun(@isempty, dattrials));
             if ~(isempty(excl))
-                dattrials(excl) = NaN;
+                [dattrials{excl}] = deal(nan);
             end
             dattrials = [ dattrials{:} ];
             for iVal = 1:length(indvarvals) % programmed for speed - AD
