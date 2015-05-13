@@ -356,7 +356,7 @@ else
                                  'subject', opt.subject, 'valsunit', opt.unitx, 'vals', params.topotime, 'datatype', datatypestr, 'cond2group', params.plotgroups, 'condgroup', params.plotconditions);
                              
             handles = findall(0,'Type','Figure', 'Tag','tmp_curvetag');
-            std_detachplots('','','data',erpdata,'figtitles', {alltitlestmp{:}}','sbtitles',sbtitles,'handles', handles);
+            std_detachplots('','','data',erpdata,'figtitles', {alltitlestmp{:}}','sbtitles',sbtitles,'handles', handles, 'filter',params.filter);
             axcopyflag = 0;
 
         end
