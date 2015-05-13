@@ -62,6 +62,7 @@ try g.flagstd;      catch, g.flagstd       =   1;   end; % Plot std band around 
 try g.xlabel;       catch, g.xlabel        =   '';  end; % xlabel
 try g.ylabel;       catch, g.ylabel        =   '';  end; % ylabel
 try g.timevec;      catch, g.timevec       =   '';  end; % Time or freq vector
+try g.filter;       catch, g.filter        =   '';  end; % Low pass filter freq
 
 % Checking data
 if isempty(g.handles) && any([isempty(g.data) isempty(g.figtitles)])
@@ -93,6 +94,10 @@ end
 if isempty(g.handles)
     for i_nplots = 1 : nplots
         idata = g.data{i_nplots};
+        
+        % Filtering data to be plotted
+        if ~isempty(g.filter), idata = myfilt(idata, 1000/(g.timevec(2)-g.timevec(1)), 0, g.filter); end;
+        
         len = size(idata,2);
         if len > 0 % A non-empty cluster
             % Getting the mean
@@ -166,6 +171,7 @@ else
                 'sbtitles' ,g.sbtitles{c},...
                 'xlabel'   ,xlabelval,...
                 'ylabel'   ,ylabelval,...
+                'filter'   , g.filter,...
                 });
             % For lines
             set( get(get( handlestemp{i}, 'Parent'), 'Children'), 'ButtonDownFcn',{@std_detachplots,...
@@ -176,6 +182,7 @@ else
                 'sbtitles' ,g.sbtitles{c},...
                 'xlabel'   ,xlabelval,...
                 'ylabel'   ,ylabelval,...
+                'filter'   , g.filter,...
                 });
         end
     end
@@ -198,3 +205,28 @@ box on;
 grid on;
 axis tight;
 title(sbtitle, 'interpreter', 'none');
+
+% rapid filtering for ERP (from std_plotcurve)
+% -----------------------
+function tmpdata2 = myfilt(tmpdata, srate, lowpass, highpass); 
+    bscorrect = 1;
+    if bscorrect
+        % Getting initial baseline
+        bs_val1  =  mean(tmpdata,1);
+        bs1      = repmat(bs_val1, size(tmpdata,1), 1);
+    end
+    
+    % Filtering
+    tmpdata2 = reshape(tmpdata, size(tmpdata,1), size(tmpdata,2)*size(tmpdata,3)*size(tmpdata,4));
+    tmpdata2 = eegfiltfft(tmpdata2',srate, lowpass, highpass)';
+    tmpdata2 = reshape(tmpdata2, size(tmpdata,1), size(tmpdata,2), size(tmpdata,3), size(tmpdata,4));
+    
+    if bscorrect
+        % Getting after-filter baseline
+        bs_val2  =  mean(tmpdata2,1);
+        bs2      = repmat(bs_val2, size(tmpdata2,1), 1);
+        
+        % Correcting the baseline
+        realbs = bs1-bs2;
+        tmpdata2 = tmpdata2 + realbs;
+    end
