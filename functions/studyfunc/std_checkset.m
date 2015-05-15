@@ -294,6 +294,14 @@ if ~studywasempty
     end;
 end;
 
+% adapt STUDY design to new framework
+% -----------------------------------
+for inddes = 1:length(STUDY.design)
+    for indvar = 1:length(STUDY.design(inddes).variable)
+        STUDY.design(inddes).variable(indvar).vartype = 'categorical';
+    end;
+end;
+STUDY.design = rmfield(STUDY.design, 'cell');
 
 % determine if there has been any change
 % --------------------------------------
