@@ -103,9 +103,17 @@ if isempty(g.handles)
             % Getting the mean
             meandata = mean(idata,2);
             stddata  = std(idata,0,2);
-            lower    = meandata-stddata;
-            upper    = meandata+stddata;
             
+            if license('checkout', 'statistics_toolbox')
+                SEM = std(idata,0,2)/sqrt(size(idata,2));       % Standard Error
+                ts = tinv([0.025  0.975],size(idata,2)-1);      % T-Score
+                lower    = meandata + ts(1)*SEM;                % CI
+                upper    = meandata + ts(2)*SEM;                % CI
+            else
+                lower    = meandata-2*stddata;
+                upper    = meandata+2*stddata;
+            end
+                
             hplot = figure('name', g.figtitles, 'NumberTitle','off');
             rowcols(2) = ceil(sqrt(len + 4));
             rowcols(1) = ceil((len+4)/rowcols(2));
@@ -189,14 +197,16 @@ else
 end
 
 function plotlines(kindx,idata,meandata,lower,upper,sbtitle,g)
-if g.flagstd                           % plot std band
-    eeglabciplot(lower,upper,g.timevec, 'r', 0.2);
-    axis tight;
-end
 for i = 1:length(kindx)
     plot(g.timevec,idata(:,kindx(i)),'b','LineWidth', 0.1); % plot g.data
 end
 plot(g.timevec,meandata,'r','LineWidth', 0.1);              % plot mean
+
+if g.flagstd                                                % plot std band
+    eeglabciplot(lower,upper,g.timevec, 'r', 0.2);
+    axis tight;
+end
+
 if length(kindx)>1
     xlabel(g.xlabel);
     ylabel(g.ylabel);
