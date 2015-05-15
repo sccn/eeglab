@@ -53,6 +53,7 @@ if ~isfield(STUDY, 'session'),   STUDY.session   = {}; modif = 1; end;
 if ~isfield(STUDY, 'condition'), STUDY.condition = {}; modif = 1; end;
 if ~isfield(STUDY, 'setind'),    STUDY.setind    = {}; modif = 1; end;
 if ~isfield(STUDY, 'etc'),       STUDY.etc       = []; modif = 1; end;
+if ~isfield(STUDY, 'cache'),     STUDY.cache     = []; modif = 1; end;
 if ~isfield(STUDY, 'etc.warnmemory'), STUDY.etc.warnmemory = 1; modif = 1; end;
 if ~isfield(STUDY, 'preclust'),  STUDY.preclust  = []; modif = 1; end;
 if ~isfield(STUDY, 'datasetinfo'), STUDY.datasetinfo = []; modif = 1; end;
