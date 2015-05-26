@@ -296,12 +296,16 @@ end;
 
 % adapt STUDY design to new framework
 % -----------------------------------
-for inddes = 1:length(STUDY.design)
-    for indvar = 1:length(STUDY.design(inddes).variable)
-        STUDY.design(inddes).variable(indvar).vartype = 'categorical';
+if ~isempty(STUDY.design) && ~isfield(STUDY.design(1).variable, 'vartype')
+    for inddes = 1:length(STUDY.design)
+        for indvar = 1:length(STUDY.design(inddes).variable)
+            STUDY.design(inddes).variable(indvar).vartype = 'categorical';
+        end;
     end;
 end;
-STUDY.design = rmfield(STUDY.design, 'cell');
+if ~isempty(STUDY.design) && isfield(STUDY.design(1), 'cell')
+    STUDY.design = rmfield(STUDY.design, 'cell');
+end;
 
 % determine if there has been any change
 % --------------------------------------
