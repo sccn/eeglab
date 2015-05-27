@@ -57,7 +57,7 @@ if isempty(varargin)
     
     enablecond         = fastif(length(STUDY.design(STUDY.currentdesign).variable(1).value)>1, 'on', 'off');
     enablegroup        = fastif(length(STUDY.design(STUDY.currentdesign).variable(2).value)>1, 'on', 'off');
-    detachplots        = fastif(strcmpi(STUDY.etc.erpparams.detachplots,'on'), 1, 0);
+    detachplots        = fastif(strcmpi(STUDY.etc.specparams.detachplots,'on'), 1, 0);
     plotconditions     = fastif(strcmpi(STUDY.etc.specparams.plotconditions, 'together'), 1, 0);
     plotgroups         = fastif(strcmpi(STUDY.etc.specparams.plotgroups,'together'), 1, 0);
     submean            = fastif(strcmpi(STUDY.etc.specparams.subtractsubjectmean,'on'), 1, 0);
