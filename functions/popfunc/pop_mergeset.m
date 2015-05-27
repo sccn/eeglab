@@ -78,9 +78,6 @@ fprintf('Merging datasets...\n');
 
 if ~isstruct(INEEG2) % if INEEG2 is a vector of ALLEEG indices
     indices = INEEG2;
-    if length(indices) < 2
-        error('needs at least two datasets');
-    end;
 
     NEWEEG = eeg_retrieve(INEEG1, indices(1)); % why abandoned?
 
