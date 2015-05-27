@@ -220,50 +220,7 @@ for i = 1 : length(dsetinfo_subjindx)
     ntrials = ntrials + length(usrdat.datasetinfo(dsetinfo_subjindx(i)).trialinfo);
     startendindx(i,2) = ntrials;
 end
-
-tmpdmat = NaN(ntrials,length(design.variable));
-for i = 1 : length(design.variable)
-    
-    % case for continous variables
-    if isempty(design.variable(i).value)
-        varlength = 1;
-        catflag = 0;
-    else
-        varlength = length(design.variable(i).value);
-        catflag = 1;
-    end
-    
-    for j = 1 : varlength
-        if catflag
-            facval = cell2mat(design.variable(i).value(j));
-            if isnumeric(facval)
-                facval_indx = find(facval == cell2mat(design.variable(i).value));
-            else
-                facval_indx = find(strcmp(facval,design.variable(i).value));
-            end
-        end
-        
-        if catflag
-            if isnumeric( cell2mat(design.variable(i).value(j)))
-                varval = cell2mat(design.variable(i).value(j));
-            else
-                varval = design.variable(i).value(j);
-            end
-        else
-            varval = '';
-        end
-        [trialindsx, eventvals] = std_gettrialsind(trialinfo,design.variable(i).label, varval);
-        
-        if ~isempty(trialindsx)
-            % case for continous variables
-            if ~catflag
-                facval_indx = eventvals;
-            end
-            tmpdmat(trialindsx,i) = facval_indx;
-            
-        end
-    end
-end
+tmpdmat = std_builddesignmat(design, trialinfo, ntrials);
 
 % Removing NANs (Thanks Cyril!!!)
 check = find(sum(isnan(tmpdmat),2));
