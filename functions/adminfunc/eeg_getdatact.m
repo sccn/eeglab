@@ -128,8 +128,8 @@ channelNotDefined = 0;
 if isempty(opt.channel), opt.channel = [1:EEG.nbchan]; channelNotDefined = 1;
 elseif isequal(opt.channel, [1:EEG.nbchan]) && ~isempty(opt.interp) channelNotDefined = 1;
 end;
-if isempty(opt.trialindices), opt.trialindices = [1:EEG.trials]; end;
 if iscell( opt.trialindices), opt.trialindices = opt.trialindices{1}; end;
+if isempty(opt.trialindices), opt.trialindices = [1:EEG.trials]; end;
 if iscell(opt.rmcomps     ), opt.rmcomps      = opt.rmcomps{1};      end;
 if (~isempty(opt.rmcomps) | ~isempty(opt.component)) & isempty(EEG.icaweights)
     error('No ICA weight in dataset');
