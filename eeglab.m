@@ -275,6 +275,10 @@ if ~iseeglabdeployed2
         end;
     end;
     myaddpath( eeglabpath, 'eeg_checkset.m',   [ 'functions' filesep 'adminfunc'        ]);
+<<<<<<< HEAD
+=======
+    myaddpath( eeglabpath, 'std_eeglab2limo.m',   [ 'functions' filesep 'eeglab_limo_interface' ]);
+>>>>>>> Adding LIMO path
     myaddpath( eeglabpath, ['@mmo' filesep 'mmo.m'], 'functions');
     myaddpath( eeglabpath, 'readeetraklocs.m', [ 'functions' filesep 'sigprocfunc'      ]);
     myaddpath( eeglabpath, 'supergui.m',       [ 'functions' filesep 'guifunc'          ]);
