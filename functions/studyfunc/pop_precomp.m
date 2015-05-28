@@ -400,7 +400,7 @@ function warnflag = checkFilePresent(STUDY, datatype, comps, warnflag, recompute
     else dataFilename = [ oneSubject '.dat' datatype ];
     end;
     allSubjects = { STUDY.datasetinfo.subject };
-    inds = find(strncmp( oneSubject, allSubjects, max(cellfun(@length, allSubjects))));
+    inds = strmatch( oneSubject, allSubjects, 'exact');
     filepath = STUDY.datasetinfo(inds(1)).filepath;
     
     if exist(fullfile(filepath, dataFilename))
