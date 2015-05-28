@@ -847,11 +847,15 @@ if ismatlab
     uimenu( std_m,  'Label', 'Select/Edit study design(s)'            , 'userdata', onstudy, 'CallBack', cb_studydesign);
     uimenu( std_m,  'Label', 'Precompute channel measures'            , 'userdata', onstudy, 'CallBack', cb_precomp, 'separator', 'on');
     uimenu( std_m,  'Label', 'Plot channel measures'                  , 'userdata', onstudy, 'CallBack', cb_chanplot);
+<<<<<<< HEAD
     
     limo_chn = uimenu(std_m,'Label','LInear MOdeling EEG Data (LIMO/Channels)' , 'userdata', onstudy,'Tag','limochan');
     uimenu( limo_chn,  'Label', 'Estimate Model Parameters (Channels)'         , 'userdata', onstudy, 'CallBack', cb_limorunchan);
     uimenu( limo_chn,  'Label', 'Linear Model Results (Channels)'              , 'userdata', onstudy, 'CallBack', cb_limoreschan);
     
+=======
+    uimenu( std_m,  'Label', 'LInear MOdeling of EEG data (LIMO)'     , 'userdata', onstudy, 'CallBack', cb_limo);
+>>>>>>> Add LIMO menu
     uimenu( std_m,  'Label', 'Precompute component measures'          , 'userdata', onstudy, 'CallBack', cb_precomp2, 'separator', 'on');
     clust_m = uimenu( std_m, 'Label', 'PCA clustering (original)'     , 'userdata', onstudy);
     uimenu( clust_m,  'Label', 'Build preclustering array'            , 'userdata', onstudy, 'CallBack', cb_preclust);
