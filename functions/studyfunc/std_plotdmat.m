@@ -60,12 +60,12 @@ mainfig_pos            = [.509  .465  .306  .519];
 Text1_pos              = [.120  .946  .191  .024];
 Text2_pos              = [.080  .208  .432  .029];
 Text3_pos              = [.397  .855  .24   .024];
-Text4_pos              = [.680  .946  .201  .020];
-Text5_pos              = [.380  .946  .201  .020];
-checkbox_sort_pos      = [.422  .901  .242  .027];
+Text4_pos              = [.680  .946  .201  .024];
+Text5_pos              = [.380  .946  .201  .024];
+checkbox_sort_pos      = [.422  .896  .242  .035];
 
 popup_subject_pos      = [.124  .896  .224  .035];
-disp_click_pos         = [.7    .896  .183  .034];
+disp_click_pos         = [.7    .896  .183  .035];
 
 if handles.figmode
     axes_pos           = [.118  .306  .817  .513];
@@ -220,14 +220,13 @@ for i = 1 : length(dsetinfo_subjindx)
     ntrials = ntrials + length(usrdat.datasetinfo(dsetinfo_subjindx(i)).trialinfo);
     startendindx(i,2) = ntrials;
 end
-tmpdmat = std_builddesignmat(design, trialinfo, ntrials);
+
+% call function to build design matrix
+[tmpdmat allLabels] = std_builddesignmat(design, trialinfo, true);
 
 % Removing NANs (Thanks Cyril!!!)
 check = find(sum(isnan(tmpdmat),2));
 tmpdmat(check,:) = [];
-
-% Adding baseline to tmpdmat
-tmpdmat(:,end+1) = ones(size(tmpdmat,1),1);
 
 % Checking checbox to sort/unsort
 dmatsortindex = 1:size(tmpdmat, 1);
@@ -266,7 +265,7 @@ elseif  flag.textdisp
     handles.notdisp = 0;
 end
 axes(handles.axes1)
-handles.figure = imagesc(normc(tmpdmat(dmatsortindex,:))); colormap(flipud(colormap('gray'))); % Normalizing before show (by cols)
+handles.figure = imagesc(tmpdmat(dmatsortindex,:)); colormap(flipud(colormap('gray'))); % Normalizing before show (by cols)
 xlabel('Regressors',...
        'FontWeight', 'normal',...
        'FontSize', AXES_FONTSIZE);
@@ -275,7 +274,7 @@ ylabel('Trials',...
        'FontSize', AXES_FONTSIZE);
 set(handles.axes1,'XTick',1:size(tmpdmat,2))
 set(handles.axes2','XTick', get(handles.axes1, 'XTick'),...
-                   'XTickLabel', {design.variable.label 'Baseline'},...
+                   'XTickLabel', allLabels,...
                    'XLim', get(handles.axes1, 'XLim'),...
                    'FontSize', AXES_FONTSIZE);
 set(handles.figure, 'ButtonDownFcn', {@callback_dmatclick,handles,tmpdmat(dmatsortindex,:),design})
