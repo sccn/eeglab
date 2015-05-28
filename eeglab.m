@@ -644,6 +644,7 @@ cb_precomp2    = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_precomp(STUDY, AL
 cb_preclust    = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_preclust(STUDY, ALLEEG);'                e_plot_study];
 cb_clust       = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_clust(STUDY, ALLEEG);'                   e_plot_study];
 cb_clustedit   = [ nocheck 'ALLEEGTMP = ALLEEG; [STUDYTMP LASTCOM] = pop_clustedit(STUDY, ALLEEG);'     e_plot_study];
+cb_limo        = [ nocheck 'LASTCOM = pop_limo(STUDY, ALLEEG);' e_hist];
 % 
 % % add STUDY plugin menus
 % if exist('eegplugin_stderpimage')
@@ -844,6 +845,7 @@ if ismatlab
     uimenu( std_m,  'Label', 'Select/Edit study design(s)'            , 'userdata', onstudy, 'CallBack', cb_studydesign);
     uimenu( std_m,  'Label', 'Precompute channel measures'            , 'userdata', onstudy, 'CallBack', cb_precomp, 'separator', 'on');
     uimenu( std_m,  'Label', 'Plot channel measures'                  , 'userdata', onstudy, 'CallBack', cb_chanplot);
+    uimenu( std_m,  'Label', 'LInear MOdeling of EEG data (LIMO)'     , 'userdata', onstudy, 'CallBack', cb_limo);
     uimenu( std_m,  'Label', 'Precompute component measures'          , 'userdata', onstudy, 'CallBack', cb_precomp2, 'separator', 'on');
     clust_m = uimenu( std_m, 'Label', 'PCA clustering (original)'     , 'userdata', onstudy);
     uimenu( clust_m,  'Label', 'Build preclustering array'            , 'userdata', onstudy, 'CallBack', cb_preclust);
@@ -2060,7 +2062,9 @@ function addpathifnotexist(newpath, functionname);
     tmpp = mywhich(functionname);
         
     if isempty(tmpp)
-        addpath(newpath);
+        if exist(newpath) == 7
+            addpath(newpath);
+        end;
     end;
     
 % find a function path and add path if not present
