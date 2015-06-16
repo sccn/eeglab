@@ -59,7 +59,7 @@ if expanding == 1
         end;
     end;
     
-    tmpdmatExpanded = NaN(size(tmpdmat,1),nCols+1);
+    tmpdmatExpanded = NaN(size(tmpdmat,1),nCols);
     countCol = 0;
     for iCol = 1:size(tmpdmat,2)
         if catflag(iCol)
@@ -89,8 +89,9 @@ if expanding == 1
             tmpdmatExpanded(:,countCol) = (tmpdmat(:,iCol)-min(tmpdmat(:,iCol)))/(max(tmpdmat(:,iCol))-min(tmpdmat(:,iCol)));
         end;
     end;
-    tmpdmatExpanded(:,end) = 1;
-    colLabels{countCol+1}  = 'constant';
-    tmpdmat = tmpdmatExpanded;
 
+    tmpdmat = tmpdmatExpanded;
 end;
+
+tmpdmat(:,end+1) = 1;
+colLabels{numel(colLabels)+1}  = 'constant';
