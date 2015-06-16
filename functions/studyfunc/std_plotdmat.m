@@ -47,11 +47,30 @@ function std_plotmat(usrdat,numdesign)
 design = usrdat.design(numdesign);
 listsubj = unique(design.cases.value,'sorted'); % assuming cases.value will be alwas the subjects
 
-flag.textdisp = 1;
-flag.subj     = 1;
+flag.dmatextend = true; 
+flag.textdisp   = 1;
+flag.subj       = 1;
 setappdata(0,'flag',flag);
 handles.figmode = 0; % Change to 1 if info in GUI. 0 -> info in commandline
-sortlist = [{' '} {design.variable.label}]';
+
+if flag.dmatextend
+    sortlist{1} = ' '; 
+    c = 2;
+    for i = 1:numel(design.variable)
+        if ~isempty(design.variable(i).value)
+            for j = 1 : numel(design.variable(i).value)
+                sortlist{c} = design.variable(i).value{j};
+                c = c+1;
+            end
+        else
+            sortlist{c} = design.variable(i).label;
+            c = c+1; 
+        end
+    end
+    
+else
+    sortlist = [{' '} {design.variable.label}]';
+end
 
 % Creating GUI
 % Positions and settings
@@ -222,7 +241,7 @@ for i = 1 : length(dsetinfo_subjindx)
 end
 
 % call function to build design matrix
-[tmpdmat allLabels] = std_builddesignmat(design, trialinfo, true);
+[tmpdmat allLabels] = std_builddesignmat(design, trialinfo, flag.dmatextend);
 
 % Removing NANs (Thanks Cyril!!!)
 check = find(sum(isnan(tmpdmat),2));
@@ -265,7 +284,7 @@ elseif  flag.textdisp
     handles.notdisp = 0;
 end
 axes(handles.axes1)
-handles.figure = imagesc(tmpdmat(dmatsortindex,:)); colormap(flipud(colormap('gray'))); % Normalizing before show (by cols)
+handles.figure = imagesc(normc(tmpdmat(dmatsortindex,:))); colormap(flipud(colormap('gray'))); % Normalizing before show (by cols)
 xlabel('Regressors',...
        'FontWeight', 'normal',...
        'FontSize', AXES_FONTSIZE);
@@ -287,9 +306,27 @@ axesHandle  = get(src,'Parent');
 coordinates = get(axesHandle,'CurrentPoint');
 coordinates = round(coordinates(1,1:2));
 tmpdmatval = tmpdmat(coordinates(2), coordinates(1));
-if  coordinates(1) <= length(design.variable)
-    if isfield(design.variable(coordinates(1)),'vartype') && strcmp(design.variable(coordinates(1)).vartype, 'categorical')
-        val = design.variable(coordinates(1)).value(tmpdmatval);
+flag = getappdata(handles.mainfig,'flag');
+
+if flag.dmatextend && coordinates(1) <= size(tmpdmat,2)-1
+    for i =  1:length(design.variable)
+        nvars = numel(design.variable(i).value);
+        if nvars == 0, nvars = 1; end
+        reg_varind_tmp{i} = ones(1,nvars)*i;
+    end
+    reg_varind = cell2mat(reg_varind_tmp);
+    indx1 = reg_varind(coordinates(1));
+else
+    indx1 = coordinates(1);
+end
+
+if  coordinates(1) <= size(tmpdmat,2)-1
+    if isfield(design.variable(indx1),'vartype') && strcmp(design.variable(indx1).vartype, 'categorical')
+        if ~flag.dmatextend
+        val = design.variable(indx1).value(tmpdmatval);
+        else
+            val = tmpdmatval;
+        end
     else
         % Note: When an old STUDY is used withouth modifying the variables,
         % the structure 'STUDY.design' does not have the field 'vartype'.
