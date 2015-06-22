@@ -57,7 +57,7 @@ if flag.dmatextend
     sortlist{1} = ' '; 
     c = 2;
     for i = 1:numel(design.variable)
-        if ~isempty(design.variable(i).value)
+        if strcmp(design.variable(i).vartype,'categorical')
             for j = 1 : numel(design.variable(i).value)
                 sortlist{c} = design.variable(i).value{j};
                 c = c+1;
