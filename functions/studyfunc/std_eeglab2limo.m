@@ -81,11 +81,11 @@ end
 
 % Checking that all subjects use the same sets (should not happen)
 % --------------------------------------------
-%if length(unique(nb_sets)) ~= 1
-%    error('different numbers of datasets (.set) used across subjects - cannot go further')
-%else
-%    nb_sets = unique(nb_sets);
-%end
+if length(unique(nb_sets)) ~= 1
+   error('different numbers of datasets (.set) used across subjects - cannot go further')
+else
+   nb_sets = unique(nb_sets);
+end
 
 % simply reshape to read columns
 % ------------------------------
@@ -218,23 +218,18 @@ for s = 1:nb_subjects
         clear OUTEEG
     end
     
-    % model.cat_files: a cell array of categorial variable
-    if nb_sets == 1;
-        [catvar_matrix,tmp] = std_lm_getvars(STUDY,STUDY.datasetinfo(order{s}(1)).subject,'design',design_index,'vartype','cat'); clear tmp; %#ok<ASGLU>
-    else
-        [catvar_matrix,tmp] = std_lm_getvars(STUDY,STUDY.datasetinfo(order{s}(1)).subject,'design',design_index,'vartype','cat');clear tmp; %#ok<ASGLU>
-    end
-    
+    [catvar_matrix,tmp] = std_lm_getvars(STUDY,STUDY.datasetinfo(order{s}(1)).subject,'design',design_index,'vartype','cat'); clear tmp; %#ok<ASGLU>
+
     if ~isempty(catvar_matrix)
         if isvector(catvar_matrix) % only one factor of n conditions
             categ = catvar_matrix;
             model.cat_files{s} = catvar_matrix;
-        elseif 1
-            
-            trialinfo = std_combtrialinfo(STUDY.datasetinfo, order{s});
-            categ = std_builddesignmat(STUDY.design(design_index), trialinfo);
-            model.cat_files{s} = catvar_matrix;
-            
+%         elseif 1
+%             
+%             trialinfo = std_combtrialinfo(STUDY.datasetinfo, order{s});
+%             categ = std_builddesignmat(STUDY.design(design_index), trialinfo);
+%             model.cat_files{s} = catvar_matrix;
+%             
         else % multiple factors (=multiple columns)
             X = []; nb_row = size(catvar_matrix,1);
             for cond = 1:size(catvar_matrix,2)
@@ -260,11 +255,12 @@ for s = 1:nb_subjects
     
     % model.cont_files: a cell array of continuous variable files
     if cont_var_flag
-        if nb_sets == 1;
-            [contvar,tmp] = std_lm_getvars(STUDY,STUDY.datasetinfo(order{s}).subject,'design',design_index,'vartype','cont'); clear tmp; %#ok<ASGLU>
-        else
-            [contvar_matrix,contvar_info] = std_lm_getvars(STUDY,STUDY.datasetinfo(order(1,s)).subject,'design',design_index,'vartype','cont');
-            
+        
+        [contvar,contvar_info] = std_lm_getvars(STUDY,STUDY.datasetinfo(order{s}(1)).subject,'design',design_index,'vartype','cont'); clear tmp; %#ok<ASGLU>
+        
+        if nb_sets ~= 1;
+%             [contvar_matrix,contvar_info] = std_lm_getvars(STUDY,STUDY.datasetinfo(order(1,s)).subject,'design',design_index,'vartype','cont');
+            contvar_matrix = contvar; clear contvar;
             % we need to know the nb of trials in each of the sets
             set_positions = [0];
             getnan = find(isnan(contvar_matrix(:,1)));
@@ -281,7 +277,7 @@ for s = 1:nb_subjects
             contvar = NaN(size(contvar_matrix));
             for cond = 1:size(contvar_info.datasetinfo_trialindx,2)
                 which_dataset = contvar_info.dataset(cond);                    % dataset nb
-                dataset_nb = find(which_dataset == order(:,s));                % position in the concatenated data
+                dataset_nb = find(which_dataset == order{s});                  % position in the concatenated data
                 position = cell2mat(contvar_info.datasetinfo_trialindx(cond)); % position in the set
                 values = contvar_matrix(position+set_positions(dataset_nb));   % covariable values
                 contvar(position+set_positions(dataset_nb)) = values;          % position in the set + position in the concatenated data
