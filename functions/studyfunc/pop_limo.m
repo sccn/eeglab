@@ -4,7 +4,7 @@ if nargin < 2
     help pop_limo;
     return;
 end;
-
+com = '';
 if nargin < 3
     dataMeasures = { 'ERP' 'Spectrum' };
     fileMeasures = { 'daterp' 'datspec' };
