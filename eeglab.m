@@ -609,7 +609,8 @@ cb_precomp2    = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_precomp(STUDY, AL
 cb_preclust    = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_preclust(STUDY, ALLEEG);'                e_plot_study];
 cb_clust       = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_clust(STUDY, ALLEEG);'                   e_plot_study];
 cb_clustedit   = [ nocheck 'ALLEEGTMP = ALLEEG; [STUDYTMP LASTCOM] = pop_clustedit(STUDY, ALLEEG);'     e_plot_study];
-cb_limo        = [ nocheck 'LASTCOM = pop_limo(STUDY, ALLEEG);' e_hist];
+cb_limorun     = [ nocheck '[STUDYTMP LASTCOM]= pop_limo(STUDY, ALLEEG);' e_hist];
+cb_limoresults = [ nocheck 'limo_results;' e_hist];
 % 
 % % add STUDY plugin menus
 % if exist('eegplugin_stderpimage')
@@ -809,7 +810,11 @@ if ismatlab
     uimenu( std_m,  'Label', 'Select/Edit study design(s)'            , 'userdata', onstudy, 'CallBack', cb_studydesign);
     uimenu( std_m,  'Label', 'Precompute channel measures'            , 'userdata', onstudy, 'CallBack', cb_precomp, 'separator', 'on');
     uimenu( std_m,  'Label', 'Plot channel measures'                  , 'userdata', onstudy, 'CallBack', cb_chanplot);
-    uimenu( std_m,  'Label', 'LInear MOdeling of EEG data (LIMO)'     , 'userdata', onstudy, 'CallBack', cb_limo);
+    
+    limo_chn = uimenu(std_m,'Label','LInear MOdeling of EEG data (LIMO)' , 'userdata', onstudy);
+    uimenu( limo_chn,  'Label', 'Estimate Model Parameters'           , 'userdata', onstudy, 'CallBack', cb_limorun);
+    uimenu( limo_chn,  'Label', 'Single Subject Results'              , 'userdata', onstudy, 'CallBack', cb_limoresults);
+    
     uimenu( std_m,  'Label', 'Precompute component measures'          , 'userdata', onstudy, 'CallBack', cb_precomp2, 'separator', 'on');
     clust_m = uimenu( std_m, 'Label', 'PCA clustering (original)'     , 'userdata', onstudy);
     uimenu( clust_m,  'Label', 'Build preclustering array'            , 'userdata', onstudy, 'CallBack', cb_preclust);
