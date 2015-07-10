@@ -41,7 +41,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function LIMO_files = std_eeglab2limo(STUDY,ALLEEG,varargin)
+function [LIMO_files,STUDY] = std_eeglab2limo(STUDY,ALLEEG,varargin)
 
 if nargin < 2
     help std_eeglab2limo;
@@ -56,17 +56,17 @@ if isstr(varargin{1}) && ( strcmpi(varargin{1}, 'daterp') || strcmpi(varargin{1}
 else
     opt = finputcheck( varargin, ...
         { 'measure'        'string'  { 'daterp' 'datspec' } 'daterp'; ...
-        'method'         'string'  { 'OLS' 'WLS'        } 'OLS';
-        'design'         'integer' [] STUDY.currentdesign;
-        'erase'          'string'  { 'on','off' }   'off' }, ...
-        'std_eeglab2limo');
+          'method'         'string'  { 'OLS' 'WLS'        } 'OLS';
+          'design'         'integer' [] STUDY.currentdesign;
+          'erase'          'string'  { 'on','off' }   'off' }, ...
+          'std_eeglab2limo');
     if isstr(opt), error(opt); end;
 end;
 Analysis     = opt.measure;
 design_index = opt.design;
 
 % 1st level analysis
-% ------------------
+% -------------------------------------------------------------------------
 model.cat_files = [];
 model.cont_files = [];
 if isempty(STUDY.design(design_index).filepath)
@@ -80,7 +80,7 @@ for s = 1:nb_subjects
 end
 
 % Checking that all subjects use the same sets (should not happen)
-% --------------------------------------------
+% -------------------------------------------------------------------------
 if length(unique(nb_sets)) ~= 1
    error('different numbers of datasets (.set) used across subjects - cannot go further')
 else
@@ -88,13 +88,13 @@ else
 end
 
 % simply reshape to read columns
-% ------------------------------
+% -------------------------------------------------------------------------
 for s = 1:nb_subjects
     order{s} = find(strcmp(unique_subjects{s},{STUDY.datasetinfo.subject}));
 end
 
 % Detecting type of analysis
-% --------------------------
+% -------------------------------------------------------------------------
 if strncmp(Analysis,'dat',3)
     model.defaults.type = 'Channels';
 elseif strncmp(Analysis,'ica',3)
@@ -106,8 +106,23 @@ elseif strncmp(Analysis,'ica',3)
     model.defaults.icaclustering = 1;
 end
 
+% Cleaning old files from the current design
+% -------------------------------------------------------------------------
+if strcmp(opt.erase,'on')
+    [tmp,filename] = fileparts(STUDY.filename);
+    for i = 1:nb_subjects
+        tmpfiles = dir([STUDY.filepath filesep 'LIMO_' filename filesep unique_subjects{i} filesep 'GLM' num2str(STUDY.currentdesign) '*']);
+        tmpfiles = {tmpfiles.name};
+        if ~isempty(tmpfiles)
+            for j = 1:length(tmpfiles)
+                rmdir([STUDY.filepath filesep 'LIMO_' filename filesep unique_subjects{i} filesep tmpfiles{j}],'s');
+            end
+        end
+    end
+end
+
 % Check if the measures has been computed
-% ---------------------------------------
+% -------------------------------------------------------------------------
 for nsubj = 1 : length(unique_subjects)
     inds     = find(strcmp(unique_subjects{nsubj},{STUDY.datasetinfo.subject}));
     subjpath = fullfile(STUDY.datasetinfo(inds(1)).filepath, [unique_subjects{nsubj} '.' lower(Analysis)]);  
@@ -129,7 +144,7 @@ measureflags.(lower(Analysis))= 'on';
 STUDY.etc.measureflags = measureflags;
 
 % Checking if continuous variables
-% --------------------------------
+% -------------------------------------------------------------------------
 if isfield(STUDY.design(design_index).variable,'vartype')
     if any(strcmp(unique({STUDY.design(design_index).variable.vartype}),'continuous'))
         cont_var_flag = 1;
@@ -139,7 +154,7 @@ if isfield(STUDY.design(design_index).variable,'vartype')
 else
     error('std_eeglab2limo: Define a valid design');
 end
-
+% -------------------------------------------------------------------------
 for s = 1:nb_subjects     
     % model.set_files: a cell array of EEG.set (full path) for the different subjects
     if nb_sets == 1
@@ -350,9 +365,19 @@ else
     limocontrast.mat = [];
     LIMO_files = limo_batch('model specification',model,limocontrast,STUDY);
 end
+
+% Cleaning
+% -------------------------------------------------------------------------
 rmfield(STUDY,'design_index');
 rmfield(STUDY,'design_info');
 rmfield(STUDY,'names');
 
-% Cleaning
+% Assigning info to STUDY
+% -------------------------------------------------------------------------
+STUDY.design(STUDY.currentdesign).limo.chanloc = [];
+STUDY.design(STUDY.currentdesign).limo.beta    = LIMO_files.Beta;
+STUDY.design(STUDY.currentdesign).limo.file    = LIMO_files.mat;
+pop_savestudy( STUDY, [],'filepath', STUDY.filepath,'savemode','resave')
+
+
 
