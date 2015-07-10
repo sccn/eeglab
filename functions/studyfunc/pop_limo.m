@@ -1,4 +1,4 @@
-function com = pop_limo(STUDY, ALLEEG, varargin)
+function [STUDY,com] = pop_limo(STUDY, ALLEEG, varargin)
 
 if nargin < 2
     help pop_limo;
@@ -27,10 +27,14 @@ if nargin < 3
                                             'title', 'LInear MOdeling of EEG data -- pop_limo()');
     if isempty(res), return; end;
     
-    options = { 'method' methods{res.method} 'measure' fileMeasures{res.measure} 'erase' fastif(res.measure, 'on', 'off') };
+    options = { 'method' methods{res.method} 'measure' fileMeasures{res.measure} 'erase' fastif(res.erase, 'on', 'off') };
 else
     options = varargin;
 end;
-
-std_eeglab2limo(STUDY, ALLEEG, options{:});
+if strcmp(fastif(res.measure, 'on', 'off'), 'on')
+    if exist([STUDY.filepath filesep 'limo_batch_report'],'dir') == 7
+        rmdir([STUDY.filepath filesep 'limo_batch_report'],'s');
+    end
+end
+[tmp,STUDY] = std_eeglab2limo(STUDY, ALLEEG, options{:});
 com = sprintf('std_eeglab2limo(STUDY, ALLEEG, %s);', vararg2str(options));
