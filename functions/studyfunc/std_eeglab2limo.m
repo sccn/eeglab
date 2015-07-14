@@ -85,11 +85,12 @@ design_index = opt.design;
 % ---------------------------------
 if isfield(ALLEEG(1).chanlocs, 'theta')
     [tmp1 tmp2 limostruct] = std_prepare_neighbors(STUDY, ALLEEG, 'force', 'on', opt.neighboropt{:});
-    limoFile = fullfile(STUDY.filepath, 'limo_expected_chanlocs.mat');
-    save('-mat', limoFile, '-struct', 'limostruct');
-    fprintf('Saving channel neighbors for correction for multiple comparisons in %s\n', limoFile);
+    limoChanlocs = fullfile(STUDY.filepath, 'limo_expected_chanlocs.mat');
+    save('-mat', limoChanlocs, '-struct', 'limostruct');
+    fprintf('Saving channel neighbors for correction for multiple comparisons in %s\n', limoChanlocs);
 else
     disp('Warning: cannot compute expected channel distance for correction for multiple comparisons');
+    limoChanlocs = [];
 end;
 
 % 1st level analysis
@@ -392,6 +393,7 @@ else
     limocontrast.mat = [];
     LIMO_files = limo_batch('model specification',model,limocontrast,STUDY);
 end
+LIMO_files.expected_chanlocs = limoChanlocs;
 
 % Cleaning
 % -------------------------------------------------------------------------
@@ -401,7 +403,7 @@ rmfield(STUDY,'names');
 
 % Assigning info to STUDY
 % -------------------------------------------------------------------------
-STUDY.design(STUDY.currentdesign).limo.chanloc = [];
+STUDY.design(STUDY.currentdesign).limo.chanloc = LIMO_files.expected_chanlocs;
 STUDY.design(STUDY.currentdesign).limo.beta    = LIMO_files.Beta;
 STUDY.design(STUDY.currentdesign).limo.file    = LIMO_files.mat;
 pop_savestudy( STUDY, [],'filepath', STUDY.filepath,'savemode','resave')
