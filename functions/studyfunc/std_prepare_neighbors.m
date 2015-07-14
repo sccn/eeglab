@@ -24,6 +24,7 @@
 % Outputs:
 %   STUDY       - an EEGLAB STUDY set of loaded EEG structures
 %   neighbors   - Fieldtrip channel neighbour structure
+%   limostruct  - structure compatible with LIMO (need to be saved in a file)
 %
 % Author: Arnaud Delorme, SCCN, UCSD, 2012-
 %
@@ -45,7 +46,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [STUDY neighbors] = std_prepare_neighbors(STUDY, ALLEEG, varargin);
+function [STUDY neighbors limostruct] = std_prepare_neighbors(STUDY, ALLEEG, varargin);
 
 neighbors = [];
 if nargin < 2
@@ -105,4 +106,20 @@ if strcmpi(opt.force, 'on') || (strcmpi(STUDY.etc.statistics.fieldtrip.mcorrect,
     end;
 
     STUDY.etc.statistics.fieldtrip.channelneighbor = neighbors;
+    
+    if nargout > 2
+        limostruct.expected_chanlocs = EEG.chanlocs;
+        limostruct.channeighbstructmat = zeros(length(EEG.chanlocs));
+        allLabels = { neighbors.label };
+        
+        for iN = 1:length(neighbors)
+            if ~isequal(neighbors(iN).label, limostruct.expected_chanlocs(iN).labels)
+                error('Wrong label');
+            else
+                [tmp posChan] = intersect( allLabels, neighbors(iN).neighblabel);
+                limostruct.channeighbstructmat(iN,posChan) = 1;
+                limostruct.channeighbstructmat(posChan,iN) = 1;
+            end;
+        end;
+    end;
 end;
