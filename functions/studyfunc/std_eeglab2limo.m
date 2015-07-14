@@ -1,29 +1,44 @@
-% std_eeglab2limo() Export and run in LIMO the EEGLAB STUDY design
+% std_eeglab2limo() - Export and run in LIMO the EEGLAB STUDY design.
+%           call limo_batch to create all 1st level LIMO_EEG analysis + RFX
 %
 % Usage:
-%          Analysis = 'datspec'; design_index = 1; ;
-%          LIMO_files = std_eeglab2limo(STUDY,ALLEEG,Analysis,design_index) 
+%   [STUDY LIMO_files] = std_eeglab2limo(STUDY,ALLEEG,'key',val) 
 %
 % Inputs:
-%      STUDY        - studyset structure containing some or all files in ALLEEG
-%      ALLEEG       - vector of loaded EEG datasets
-%      design_indx  - Index of the design in he STUDY structure
-%      Analysis     - 'daterp', 'icaerp', 'datspec', 'icaspec', 'datersp', 'icaersp'
+%  STUDY        - studyset structure containing some or all files in ALLEEG
+%  ALLEEG       - vector of loaded EEG datasets
 %
 % Optional inputs:
-%
+%  'measure' - ['daterp'|'icaerp'|'datspec'|'icaspec'|'datersp'|'icaersp']
+%              measure to compute. Currently, only 'daterp' and
+%             'datspec' are supported. Default is 'daterp'.
+%  'method'  - ['OLS'|'WTS'] Ordinary Least Square (OLS) or Weighted Least
+%              Square (WTS). WTS should be used as it is more robust. It is
+%              slower though.
+%  'design'  - [integer] design index to process. Default is the current
+%              design stored in STUDY.currentdesign.
+%  'erase'   - ['on'|'off'] erase previous files. Default is 'on'.
+%  'neighboropt' - [cell] cell array of options for the function computing
+%              the channel neighbox matrix std_prepare_chanlocs(). The file
+%              is saved automatically if channel location are present.
+%              This option allows to overwrite the defaults when computing
+%              the channel neighbox matrix.
+%      
 % Outputs:
-%             call limo_batch to create all 1st level LIMO_EEG analysis + RFX
-%             LIMO_files a structure with the following fields
-%             LIMO_files.LIMO the LIMO folder name where the study is analyzed
-%             LIMO_files.mat a list of 1st level LIMO.mat (with path)
-%             LIMO_files.Beta a list of 1st level Betas.mat (with path)
-%             LIMO_files.con a list of 1st level con.mat (with path)
-%
-% See also:
+%  STUDY     - modified STUDY structure (the STUDY.design now contains a list
+%              of the limo files) 
+%  LIMO_files a structure with the following fields
+%     LIMO_files.LIMO the LIMO folder name where the study is analyzed
+%     LIMO_files.mat a list of 1st level LIMO.mat (with path)
+%     LIMO_files.Beta a list of 1st level Betas.mat (with path)
+%     LIMO_files.con a list of 1st level con.mat (with path)
+%     LIMO_files.expected_chanlocs expected channel location neighbor file for
+%                                  correcting for multiple comparisons
+% Example:
+%  [STUDY LIMO_files] = std_eeglab2limo(STUDY,ALLEEG,'measure','daterp') 
 %
 % Author: Cyril Pernet (LIMO Team), The university of Edinburgh, 2014
-%         Ramon Martinez-Cancino, SCCN, 2014
+%         Ramon Martinez-Cancino and Arnaud Delorme, SCCN, 2014
 %
 % Copyright (C) 2015  Ramon Martinez-Cancino,INC, SCCN
 %
@@ -41,7 +56,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [LIMO_files,STUDY] = std_eeglab2limo(STUDY,ALLEEG,varargin)
+function [STUDY, LIMO_files] = std_eeglab2limo(STUDY,ALLEEG,varargin)
 
 if nargin < 2
     help std_eeglab2limo;
@@ -58,12 +73,24 @@ else
         { 'measure'        'string'  { 'daterp' 'datspec' } 'daterp'; ...
           'method'         'string'  { 'OLS' 'WLS'        } 'OLS';
           'design'         'integer' [] STUDY.currentdesign;
-          'erase'          'string'  { 'on','off' }   'off' }, ...
+          'erase'          'string'  { 'on','off' }   'off';
+          'neighboropt'    'cell'    {}               {} }, ...
           'std_eeglab2limo');
     if isstr(opt), error(opt); end;
 end;
 Analysis     = opt.measure;
 design_index = opt.design;
+
+% computing channel neighbox matrix
+% ---------------------------------
+if isfield(ALLEEG(1).chanlocs, 'theta')
+    [tmp1 tmp2 limostruct] = std_prepare_neighbors(STUDY, ALLEEG, 'force', 'on', opt.neighboropt{:});
+    limoFile = fullfile(STUDY.filepath, 'limo_expected_chanlocs.mat');
+    save('-mat', limoFile, '-struct', 'limostruct');
+    fprintf('Saving channel neighbors for correction for multiple comparisons in %s\n', limoFile);
+else
+    disp('Warning: cannot compute expected channel distance for correction for multiple comparisons');
+end;
 
 % 1st level analysis
 % -------------------------------------------------------------------------
