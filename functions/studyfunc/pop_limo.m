@@ -72,5 +72,5 @@ if strcmp(fastif(res.measure, 'on', 'off'), 'on')
         rmdir([STUDY.filepath filesep 'limo_batch_report'],'s');
     end
 end
-[tmp,STUDY] = std_eeglab2limo(STUDY, ALLEEG, options{:});
+[STUDY tmp] = std_eeglab2limo(STUDY, ALLEEG, options{:});
 com = sprintf('pop_limo(STUDY, ALLEEG, %s);', vararg2str(options));
