@@ -627,7 +627,7 @@ cb_precomp2    = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_precomp(STUDY, AL
 cb_preclust    = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_preclust(STUDY, ALLEEG);'                e_plot_study];
 cb_clust       = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_clust(STUDY, ALLEEG);'                   e_plot_study];
 cb_clustedit   = [ nocheck 'ALLEEGTMP = ALLEEG; [STUDYTMP LASTCOM] = pop_clustedit(STUDY, ALLEEG);'     e_plot_study];
-cb_limorun     = [ nocheck '[STUDYTMP LASTCOM]= pop_limo(STUDY, ALLEEG);' e_hist];
+cb_limorun     = [ nocheck '[STUDYTMP LASTCOM]= pop_limo(STUDY, ALLEEG);' e_plot_study];
 cb_limoresults = [ nocheck 'limo_results;' e_hist];
 % 
 % % add STUDY plugin menus
