@@ -8,14 +8,14 @@
 %   STUDY        - an EEGLAB STUDY set of loaded EEG structures
 %   ALLEEG       - ALLEEG vector of one or more loaded EEG dataset structures
 %
-% Optional inputs: same as std_eeglab2limo()
+% Optional inputs: same as std_limo()
 %
 % Outputs:
 %   STUDY       - an EEGLAB STUDY set of loaded EEG structures
 %
 % Author: Arnaud Delorme, SCCN, UCSD, 2015-
 %
-% See also: std_eeglab2limo()
+% See also: std_limo()
 
 % Copyright (C) Arnaud Delorme
 %
@@ -72,5 +72,5 @@ if strcmp(fastif(res.measure, 'on', 'off'), 'on')
         rmdir([STUDY.filepath filesep 'limo_batch_report'],'s');
     end
 end
-[STUDY tmp] = std_eeglab2limo(STUDY, ALLEEG, options{:});
+[STUDY tmp] = std_limo(STUDY, ALLEEG, options{:});
 com = sprintf('pop_limo(STUDY, ALLEEG, %s);', vararg2str(options));
