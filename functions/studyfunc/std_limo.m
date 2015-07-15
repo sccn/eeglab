@@ -1,8 +1,8 @@
-% std_eeglab2limo() - Export and run in LIMO the EEGLAB STUDY design.
+% std_limo() - Export and run in LIMO the EEGLAB STUDY design.
 %           call limo_batch to create all 1st level LIMO_EEG analysis + RFX
 %
 % Usage:
-%   [STUDY LIMO_files] = std_eeglab2limo(STUDY,ALLEEG,'key',val) 
+%   [STUDY LIMO_files] = std_limo(STUDY,ALLEEG,'key',val) 
 %
 % Inputs:
 %  STUDY        - studyset structure containing some or all files in ALLEEG
@@ -35,7 +35,7 @@
 %     LIMO_files.expected_chanlocs expected channel location neighbor file for
 %                                  correcting for multiple comparisons
 % Example:
-%  [STUDY LIMO_files] = std_eeglab2limo(STUDY,ALLEEG,'measure','daterp') 
+%  [STUDY LIMO_files] = std_limo(STUDY,ALLEEG,'measure','daterp') 
 %
 % Author: Cyril Pernet (LIMO Team), The university of Edinburgh, 2014
 %         Ramon Martinez-Cancino and Arnaud Delorme, SCCN, 2014
@@ -56,10 +56,10 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [STUDY, LIMO_files] = std_eeglab2limo(STUDY,ALLEEG,varargin)
+function [STUDY, LIMO_files] = std_limo(STUDY,ALLEEG,varargin)
 
 if nargin < 2
-    help std_eeglab2limo;
+    help std_limo;
     return;
 end;
 
@@ -75,7 +75,7 @@ else
           'design'         'integer' [] STUDY.currentdesign;
           'erase'          'string'  { 'on','off' }   'off';
           'neighboropt'    'cell'    {}               {} }, ...
-          'std_eeglab2limo');
+          'std_limo');
     if isstr(opt), error(opt); end;
 end;
 Analysis     = opt.measure;
@@ -155,7 +155,7 @@ for nsubj = 1 : length(unique_subjects)
     inds     = find(strcmp(unique_subjects{nsubj},{STUDY.datasetinfo.subject}));
     subjpath = fullfile(STUDY.datasetinfo(inds(1)).filepath, [unique_subjects{nsubj} '.' lower(Analysis)]);  
     if exist(subjpath,'file') ~= 2
-        error('std_eeglab2limo: Measures must be computed first');
+        error('std_limo: Measures must be computed first');
     end
 end
  
@@ -180,7 +180,7 @@ if isfield(STUDY.design(design_index).variable,'vartype')
         cont_var_flag = 0;
     end
 else
-    error('std_eeglab2limo: Define a valid design');
+    error('std_limo: Define a valid design');
 end
 % -------------------------------------------------------------------------
 for s = 1:nb_subjects     
