@@ -114,7 +114,7 @@ switch fieldbox
       % the trials correspond to the raw data trials, except that they
       % contain the component activations
       try,
-          data.trial{index}  = EEG.icaact(:,:,index);
+          data.trial{index}  = EEG.data(:,:,index);
       catch
       end;
       data.time{index}   = linspace(EEG.xmin, EEG.xmax, EEG.pnts); % should be checked in FIELDTRIP
