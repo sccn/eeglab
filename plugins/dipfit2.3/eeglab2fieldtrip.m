@@ -119,6 +119,7 @@ switch fieldbox
       end;
       data.time{index}   = linspace(EEG.xmin, EEG.xmax, EEG.pnts); % should be checked in FIELDTRIP
     end;
+    data.label = [];
     for comp = 1:size(EEG.icawinv,2)
       % the labels correspond to the component activations that are stored in data.trial
       data.label{comp} = sprintf('ica_%03d', comp);
