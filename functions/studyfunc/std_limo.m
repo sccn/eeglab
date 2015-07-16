@@ -84,6 +84,9 @@ design_index = opt.design;
 % computing channel neighbox matrix
 % ---------------------------------
 if isfield(ALLEEG(1).chanlocs, 'theta')
+    if  ~isfield(STUDY.etc,'statistic')
+        STUDY = pop_statparams(STUDY, 'default');
+    end
     [tmp1 tmp2 limostruct] = std_prepare_neighbors(STUDY, ALLEEG, 'force', 'on', opt.neighboropt{:});
     limoChanlocs = fullfile(STUDY.filepath, 'limo_expected_chanlocs.mat');
     save('-mat', limoChanlocs, '-struct', 'limostruct');
