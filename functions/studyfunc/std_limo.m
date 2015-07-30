@@ -355,25 +355,25 @@ end
 % -----------------------------------------------------------------
 if strcmp(Analysis,'daterp') || strcmp(Analysis,'icaerp')
     model.defaults.analysis= 'Time';
-    model.defaults.start = -10; % ALLEEG(index).xmin*1000;
-    model.defaults.end = ALLEEG(index(1)).xmax*1000;
-    model.defaults.lowf = [];
+    model.defaults.start = ALLEEG(index(1)).xmin*1000; %-10; 
+    model.defaults.end   = ALLEEG(index(1)).xmax*1000;
+    model.defaults.lowf  = [];
     model.defaults.highf = [];
     
 elseif strcmp(Analysis,'datspec') || strcmp(Analysis,'icaspec')
     
     model.defaults.analysis= 'Frequency';
-    model.defaults.start = -10;
-    model.defaults.end = ALLEEG(index(1)).xmax*1000;
-    model.defaults.lowf = [];
-    model.defaults.highf = [];
+    model.defaults.start   = -10;
+    model.defaults.end     = ALLEEG(index(1)).xmax*1000;
+    model.defaults.lowf    = [];
+    model.defaults.highf   = [];
     
 elseif strcmp(Analysis,'datersp') || strcmp(Analysis,'icaersp')
-    model.defaults.analysis= 'Time-Frequency';
-    model.defaults.start = [];
-    model.defaults.end = [];
-    model.defaults.lowf = [];
-    model.defaults.highf = [];
+    model.defaults.analysis = 'Time-Frequency';
+    model.defaults.start    = [];
+    model.defaults.end      = [];
+    model.defaults.lowf     = [];
+    model.defaults.highf    = [];
 end
 
 model.defaults.fullfactorial = 0;                    % factorial only for single subject analyses - not included for studies
@@ -398,17 +398,35 @@ else
 end
 LIMO_files.expected_chanlocs = limoChanlocs;
 
+for i = 1:length(LIMO_files.Beta)
+    limofolders{i} = fileparts(LIMO_files.mat{i});
+end
+
 % Cleaning
 % -------------------------------------------------------------------------
 rmfield(STUDY,'design_index');
 rmfield(STUDY,'design_info');
 rmfield(STUDY,'names');
 
+% Getting indices to save LIMO in STUDY structure (save multiples analysis)
+% -------------------------------------------------------------------------
+if isfield(STUDY.design(STUDY.currentdesign),'limo')
+    stdlimo_indx = find(strcmp({STUDY.design(STUDY.currentdesign).limo.datatype},Analysis));
+     if isempty(stdlimo_indx)
+         stdlimo_indx = length(STUDY.design(STUDY.currentdesign).limo) + 1;
+     end   
+else
+    stdlimo_indx = 1;
+end
+
 % Assigning info to STUDY
 % -------------------------------------------------------------------------
-STUDY.design(STUDY.currentdesign).limo.chanloc = LIMO_files.expected_chanlocs;
-STUDY.design(STUDY.currentdesign).limo.beta    = LIMO_files.Beta;
-STUDY.design(STUDY.currentdesign).limo.file    = LIMO_files.mat;
+STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).datatype       = Analysis;
+STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).foldername     = limofolders';
+STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).chanloc        = LIMO_files.expected_chanlocs;
+STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).beta           = LIMO_files.Beta;
+STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).file           = LIMO_files.mat;
+
 pop_savestudy( STUDY, [],'filepath', STUDY.filepath,'savemode','resave')
 
 
