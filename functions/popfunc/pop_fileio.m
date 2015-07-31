@@ -9,8 +9,10 @@
 %
 % Optional inputs:
 %   'channels'   - [integer array] list of channel indices
-%   'samples'    - [min max] sample point limits for importing data. 
-%   'trials'     - [min max] trial's limit for importing data. 
+%   'samples'    - [min max] sample point limits for importing data
+%   'trials'     - [min max] trial's limit for importing data
+%   'dataformat' - [string] data format. Default is automatic. Available
+%                  choices are available in ft_read_data
 %   'memorymapped' - ['on'|'off'] import memory mapped file (useful if 
 %                  encountering memory errors). Default is 'off'.
 %
@@ -61,22 +63,41 @@ if nargin < 1
     
     % open file to get infos
     % ----------------------
+    formats = { 'auto' '4d' '4d_pdf'  '4d_m4d'  '4d_xyz' 'bci2000_dat' 'besa_avr' 'besa_swf' 'biosemi_bdf'  'bham_bdf' 'biosemi_old' 'biosig' ...
+        'gdf' 'brainvision_eeg' 'brainvision_dat' 'brainvision_seg' 'ced_son' 'deymed_ini' 'deymed_dat' 'emotiv_mat' 'gtec_mat' ...
+        'itab_raw' 'combined_ds' 'ctf_ds'  'ctf_meg4'  'ctf_res4' 'ctf_old' 'read_ctf_meg4' 'ctf_read_meg4' 'ctf_shm' 'dataq_wdq' ...
+        'eeglab_set'  'eeglab_erp'  'spmeeg_mat' 'ced_spike6mat' 'edf' 'eep_avr' 'eep_cnt' 'eyelink_asc' 'fcdc_buffer' 'fcdc_buffer_offline' ...
+        'fcdc_matbin'  'fcdc_mysql' 'egi_egia' 'egi_egis' 'egi_sbin' 'egi_mff_v1' 'egi_mff_v2' 'micromed_trc' 'mpi_ds'  'mpi_dap' ...
+        'netmeg' 'neuralynx_dma' 'neuralynx_sdma' 'neuralynx_ncs' 'neuralynx_nse' 'neuralynx_nte' 'neuralynx_ttl'  'neuralynx_tsl' ...
+        'neuralynx_tsh' 'neuralynx_bin' 'neuralynx_ds' 'neuralynx_cds' 'nexstim_nxe' 'ns_avg' 'ns_cnt' 'ns_cnt16'  'ns_cnt32' 'ns_eeg' ...
+        'neuromag_fif' 'neuromag_mne' 'neuromag_mex' 'neuroprax_eeg' 'plexon_ds' 'plexon_ddt' 'read_nex_data' 'read_plexon_nex' 'plexon_nex' ...
+        'plexon_plx' 'yokogawa_ave'  'yokogawa_con'  'yokogawa_raw' 'nmc_archive_k' 'neuroshare' 'bucn_nirs' 'riff_wave' 'neurosim_ds' ...
+        'neurosim_signals' 'neurosim_evolution'  'neurosim_spikes' 'manscan_mb2'  'manscan_mbi' 'neuroscope_bin' };
+    
     eeglab_options;
     mmoval = option_memmapdata;
     disp('Reading data file header...');
     dat = ft_read_header(filename);
+    valueFormat = 1;
+    if strcmpi(filename(end-2:end), 'mff')
+        valueFormat = 48;
+    end;
     uilist   = { { 'style' 'text' 'String' 'Channel list (defaut all):' } ...
                  { 'style' 'edit' 'string' '' } ...
                  { 'style' 'text' 'String' [ 'Data range (in sample points) (default all [1 ' int2str(dat.nSamples) '])' ] } ...
-                 { 'style' 'edit' 'string' '' } };
-    geom = { [3 1] [3 1] };
+                 { 'style' 'edit' 'string' '' } ...
+                 };
+    geom = { [3 1.5] [3 1.5] };
     if dat.nTrials > 1
         uilist{end+1} = { 'style' 'text' 'String' [ 'Trial range (default all [1 ' int2str(dat.nTrials) '])' ] };
         uilist{end+1} = { 'style' 'edit' 'string' '' };
-        geom = { geom{:} [3 1] };
+        geom = { geom{:} [3 1.5] };
     end;
-    uilist   = { uilist{:} { 'style' 'checkbox' 'String' 'Import as memory mapped file (use in case of out of memory error)' 'value' option_memmapdata } };
-    geom = { geom{:} [1] };
+    uilist   = { uilist{:} ...
+                 { 'style' 'text' 'String' 'Data format' } ...
+                 { 'style' 'popupmenu' 'string' formats 'value' valueFormat 'listboxtop' valueFormat } ...
+                 { 'style' 'checkbox' 'String' 'Import as memory mapped file (use in case of out of memory) - beta' 'value' option_memmapdata } };
+    geom = { geom{:}  [3 1.5] [1] };
     
     result = inputgui( geom, uilist, 'pophelp(''pop_fileio'')', 'Load data using FILE-IO -- pop_fileio()');
     if length(result) == 0 return; end;
@@ -86,7 +107,8 @@ if nargin < 1
     if ~isempty(result{1}), options = { options{:} 'channels' eval( [ '[' result{1} ']' ] ) }; end;
     if ~isempty(result{2}), options = { options{:} 'samples'  eval( [ '[' result{2} ']' ] ) }; end;
     if ~isempty(result{3}), options = { options{:} 'trials'   eval( [ '[' result{3} ']' ] ) }; end;
-    if result{4}, options = { options{:} 'memorymapped' fastif(result{4}, 'on', 'off') }; end;
+    if ~isempty(result{4}), options = { options{:} 'dataformat' formats{result{4}} }; end;
+    if result{5}, options = { options{:} 'memorymapped' fastif(result{5}, 'on', 'off') }; end;
     
 else
     dat = ft_read_header(filename);
@@ -98,6 +120,7 @@ end;
 g = finputcheck( options, { 'samples'      'integer' [1 Inf]    [];
                             'trials'       'integer' [1 Inf]    [];
                             'channels'     'integer' [1 Inf]    [];
+                            'dataformat'   'string'  {}         'auto';
                             'memorymapped' 'string'  { 'on';'off' } 'off' }, 'pop_fileio');
 if isstr(g), error(g); end;
 
@@ -108,6 +131,7 @@ fprintf('Reading data ...\n');
 dataopts = {};
 if ~isempty(g.samples ), dataopts = { dataopts{:} 'begsample', g.samples(1), 'endsample', g.samples(2)}; end;
 if ~isempty(g.trials  ), dataopts = { dataopts{:} 'begtrial', g.trials(1), 'endtrial', g.trials(2)}; end;
+if ~strcmpi(g.dataformat, 'auto'), dataopts = { dataopts{:} 'dataformat' g.dataformat }; end;
 if strcmpi(g.memorymapped, 'off')
     if ~isempty(g.channels), dataopts = { dataopts{:} 'chanindx', g.channels }; end;
     alldata = ft_read_data(filename, 'header', dat, dataopts{:});
@@ -143,7 +167,7 @@ end
 % --------------
 disp('Reading events...');
 try
-    event = ft_read_event(filename);
+    event = ft_read_event(filename, dataopts{:});
 catch, disp(lasterr); event = []; end;
 if ~isempty(event)
     subsample = 0;
