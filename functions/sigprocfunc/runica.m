@@ -45,6 +45,9 @@
 % 'logfile'   = [filename] save all message in a log file in addition to showing them
 %               on screen (default -> none)
 % 'interput'  = ['on'|'off'] draw interupt figure. Default is off.
+% 'rndreset'  = ['on'|'off'] reset the random seed. Default is off (although it
+%               used to be on prior to 2015. This means that ICA will always return.
+%               the same decomposition unless this option is set to 'on'.
 %
 % Outputs:    [Note: RO means output in reverse order of projected mean variance
 %                    unless starting weight matrix passed ('weights' above)]
@@ -186,6 +189,8 @@ DEFAULT_PCAFLAG      = 'off';     % don't use PCA reduction
 DEFAULT_POSACTFLAG   = 'off';     % don't use posact(), to save space -sm 7/05
 DEFAULT_VERBOSE      = 1;         % write ascii info to calling screen
 DEFAULT_BIASFLAG     = 1;         % default to using bias in the ICA update rule
+DEFAULT_RESETRANDOMSEED = true;   % default to reset the random number generator to a 'random state'
+
 %                                 
 %%%%%%%%%%%%%%%%%%%%%%% Set up keyword default values %%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -222,6 +227,8 @@ extmomentum= DEFAULT_EXTMOMENTUM;    % exp. average the kurtosis estimates
 nsub       = DEFAULT_NSUB;
 wts_blowup = 0;                      % flag =1 when weights too large
 wts_passed = 0;                      % flag weights passed as argument
+reset_randomseed = DEFAULT_RESETRANDOMSEED;
+
 %
 %%%%%%%%%% Collect keywords and values from argument list %%%%%%%%%%%%%%%
 %
@@ -500,6 +507,18 @@ wts_passed = 0;                      % flag weights passed as argument
          else
              fprintf('runica(): verbose flag value must be on or off')
              return
+         end
+      elseif strcmp(Keyword,'rndreset')
+         if ischar(Value)
+           if strcmp(Value,'yes')
+             reset_randomseed = true;
+           elseif strcmp(Value,'no')
+             reset_randomseed = false;
+           else
+             fprintf('runica(): not using the reset_randomseed flag, it should be ''yes'',''no'',0, or 1');
+           end
+         else
+           reset_randomseed = Value;
          end
       else
          fprintf('runica(): unknown flag')
@@ -809,8 +828,14 @@ step=0;
 laststep=0;
 blockno = 1;  % running block counter for kurtosis interrupts
 
-rand('state',sum(100*clock));  % set the random number generator state to
-                               % a position dependent on the system clock
+warning('off', 'MATLAB:RandStream:ActivatingLegacyGenerators')
+if reset_randomseed
+    rand('state',sum(100*clock));  % set the random number generator state to
+else
+    rand('state', 0);
+end                                % a position dependent on the system clock
+warning('on', 'MATLAB:RandStream:ActivatingLegacyGenerators')
+
 % interupt figure
 % --------------- 
 if strcmpi(interupt, 'on')
