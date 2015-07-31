@@ -828,9 +828,12 @@ blockno = 1;  % running block counter for kurtosis interrupts
 
 if reset_randomseed
     rand('state',sum(100*clock));  % set the random number generator state to
+else
+    rand('state', 0);
 end                                % a position dependent on the system clock
+warning('on', 'MATLAB:RandStream:ActivatingLegacyGenerators')
 
-% interrupt figure
+% interupt figure
 % --------------- 
 if strcmpi(interupt, 'on')
     fig = figure('visible', 'off');
