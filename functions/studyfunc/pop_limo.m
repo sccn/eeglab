@@ -71,6 +71,7 @@ if strcmp(fastif(res.measure, 'on', 'off'), 'on')
     if exist([STUDY.filepath filesep 'limo_batch_report'],'dir') == 7
         rmdir([STUDY.filepath filesep 'limo_batch_report'],'s');
     end
+    STUDY.design(STUDY.currentdesign).limo = [];
 end
 [STUDY tmp] = std_limo(STUDY, ALLEEG, options{:});
 com = sprintf('pop_limo(STUDY, ALLEEG, %s);', vararg2str(options));
