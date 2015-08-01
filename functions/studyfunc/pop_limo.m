@@ -63,7 +63,7 @@ if nargin < 3
                                             'title', 'LInear MOdeling of EEG data -- pop_limo()');
     if isempty(res), return; end;
     
-    options = { 'method' methods{res.method} 'measure' fileMeasures{res.measure} 'erase' fastif(res.erase, 'on', 'off') };
+    options = { 'method' methods{res.method} 'measure' fileMeasures{res.measure} 'erase' fastif(res.erase, 'on', 'off') 'splitreg' 'off' };
 else
     options = varargin;
 end;
