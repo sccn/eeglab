@@ -415,7 +415,7 @@ rmfield(STUDY,'names');
 
 % Getting indices to save LIMO in STUDY structure (save multiples analysis)
 % -------------------------------------------------------------------------
-if isfield(STUDY.design(STUDY.currentdesign),'limo')
+if isfield(STUDY.design(STUDY.currentdesign),'limo') && ~isempty(STUDY.design(STUDY.currentdesign).limo)
     stdlimo_indx = find(strcmp({STUDY.design(STUDY.currentdesign).limo.datatype},Analysis));
      if isempty(stdlimo_indx)
          stdlimo_indx = length(STUDY.design(STUDY.currentdesign).limo) + 1;
