@@ -74,6 +74,7 @@ else
           'method'         'string'  { 'OLS' 'WLS'        } 'OLS';
           'design'         'integer' [] STUDY.currentdesign;
           'erase'          'string'  { 'on','off' }   'off';
+          'splitreg'       'string'  { 'on','off' }   'off';
           'neighboropt'    'cell'    {}               {} }, ...
           'std_limo');
     if isstr(opt), error(opt); end;
@@ -330,9 +331,13 @@ for s = 1:nb_subjects
             end
         end
         
-        % --> split per condition and zscore
+        % --> split per condition and zscore (if requested)
         if exist('categ','var')
-            model.cont_files{s} = limo_split_continuous(categ,contvar);
+            if strcmp(opt.splitreg,'on')
+                model.cont_files{s} = limo_split_continuous(categ,contvar);
+            else
+                model.cont_files{s} = contvar;
+            end
         end
         
         if size(contvar,2) > 1
