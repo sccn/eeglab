@@ -415,7 +415,7 @@ rmfield(STUDY,'names');
 
 % Getting indices to save LIMO in STUDY structure (save multiples analysis)
 % -------------------------------------------------------------------------
-if isfield(STUDY.design(STUDY.currentdesign),'limo') && ~isempty(STUDY.design(STUDY.currentdesign).limo)
+if isfield(STUDY.design(STUDY.currentdesign),'limo') && isfield(STUDY.design(STUDY.currentdesign).limo, 'datatype')
     stdlimo_indx = find(strcmp({STUDY.design(STUDY.currentdesign).limo.datatype},Analysis));
      if isempty(stdlimo_indx)
          stdlimo_indx = length(STUDY.design(STUDY.currentdesign).limo) + 1;
@@ -432,7 +432,7 @@ STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).chanloc        = LIMO_files
 STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).beta           = LIMO_files.Beta;
 STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).file           = LIMO_files.mat;
 
-pop_savestudy( STUDY, [],'filepath', STUDY.filepath,'savemode','resave')
+STUDY = pop_savestudy( STUDY, [],'filepath', STUDY.filepath,'savemode','resave');
 
 
 
