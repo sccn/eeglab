@@ -2,9 +2,9 @@ function checkfunctionmatlab(func, toolbox)
 
 if ismatlab
     if license('test',toolbox)
-        p1 = fileparts(which('firls'));
+        p1 = fileparts(which(func));
         rmpath(p1);
-        p2 = fileparts(which('firls'));
+        p2 = fileparts(which(func));
         if ~isempty(p2)
             error( [ 'Octave functions should not run on Matlab' 10 'Removing path to ' p1 '. Run your command again' ]);
         else
