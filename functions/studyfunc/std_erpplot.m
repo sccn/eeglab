@@ -173,9 +173,10 @@ if strcmpi(datatypestr, 'spec'), datatypestr = 'Spectrum'; end;
 % =======================================================================
 % below this line, all the code should be non-specific to ERP or spectrum
 % =======================================================================
-
-allconditions = STUDY.design(opt.design).variable(1).value;
-allgroups     = STUDY.design(opt.design).variable(2).value;
+allconditions  = {};
+allgroups      = {};
+if length(STUDY.design(STUDY.currentdesign).variable) > 0, allconditions = STUDY.design(STUDY.currentdesign).variable(1).value; end;
+if length(STUDY.design(STUDY.currentdesign).variable) > 1, allgroups     = STUDY.design(STUDY.currentdesign).variable(2).value; end;
 
 % for backward compatibility
 % --------------------------
@@ -230,7 +231,7 @@ if ~isempty(opt.channels)
         [STUDY erpdata alltimes] = std_readerp(STUDY, ALLEEG, 'channels', opt.channels(chaninds), 'timerange', params.timerange, ...
                 'subject', opt.subject, 'singletrials', stats.singletrials, 'design', opt.design, 'datatype', [dtype dsubtype]);
     else
-        [STUDY erpdata alltimes] = std_readerp(STUDY, ALLEEG, 'channels', opt.channels(chaninds), 'freqrange', params.freqrange, ...
+        [STUDY erpdata alltimes] = std_readspec(STUDY, ALLEEG, 'channels', opt.channels(chaninds), 'freqrange', params.freqrange, ...
             'rmsubjmean', params.subtractsubjectmean, 'subject', opt.subject, 'singletrials', stats.singletrials, 'design', opt.design, 'datatype', [dtype dsubtype]);
     end;
     if strcmpi(params.averagechan, 'on') && length(chaninds) > 1
