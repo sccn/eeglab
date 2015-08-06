@@ -55,8 +55,10 @@ TMPSTUDY = STUDY;
 com = '';
 if isempty(varargin)
     
-    enablecond         = fastif(length(STUDY.design(STUDY.currentdesign).variable(1).value)>1, 'on', 'off');
-    enablegroup        = fastif(length(STUDY.design(STUDY.currentdesign).variable(2).value)>1, 'on', 'off');
+    enablecond  = 'off';
+    enablegroup = 'off';
+    if length(STUDY.design(STUDY.currentdesign).variable) > 0 && length(STUDY.design(STUDY.currentdesign).variable(1).value)>1, enablecond  = 'on'; end;
+    if length(STUDY.design(STUDY.currentdesign).variable) > 1 && length(STUDY.design(STUDY.currentdesign).variable(2).value)>1, enablegroup = 'on'; end;   
     detachplots        = fastif(strcmpi(STUDY.etc.specparams.detachplots,'on'), 1, 0);
     plotconditions     = fastif(strcmpi(STUDY.etc.specparams.plotconditions, 'together'), 1, 0);
     plotgroups         = fastif(strcmpi(STUDY.etc.specparams.plotgroups,'together'), 1, 0);
