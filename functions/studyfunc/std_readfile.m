@@ -162,6 +162,7 @@ if any(strncmp('freqs', fileFields, 100)),  measureRange2 = fileData.freqs; end;
 
 % if the function is only called to get parameters
 % ------------------------------------------------
+if strcmpi(opt.measure, 'spec'), measureRange1 = measureRange2; end;
 if ~isempty(opt.timelimits)
     [measureRange1 indBegin1 indEnd1 ] = indicesselect(measureRange1, opt.timelimits);
 else
@@ -174,7 +175,6 @@ else
     indBegin2 = 1;
     indEnd2   = length(measureRange2);
 end;
-if strcmpi(opt.measure, 'spec'), measureRange1 = measureRange2; indBegin2 = indBegin1; indEnd2 = indEnd1; end;
 if strcmpi(opt.getparamonly, 'on'),
     return;
 end;
