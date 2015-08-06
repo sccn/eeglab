@@ -100,8 +100,10 @@ end;
 if isempty(varargin) && ~isempty(STUDY)
     if ~exist('ft_freqstatistics'), fieldtripInstalled = false; else fieldtripInstalled = true; end;
     
-    opt.enablecond  = fastif(length(STUDY.design(STUDY.currentdesign).variable(1).value)>1, 'on', 'off');
-    opt.enablegroup = fastif(length(STUDY.design(STUDY.currentdesign).variable(2).value)>1, 'on', 'off');
+    opt.enablecond  = 'off';
+    opt.enablegroup = 'off';
+    if length(STUDY.design(STUDY.currentdesign).variable) > 0 && length(STUDY.design(STUDY.currentdesign).variable(1).value)>1, opt.enablecond  = 'on'; end;
+    if length(STUDY.design(STUDY.currentdesign).variable) > 1 && length(STUDY.design(STUDY.currentdesign).variable(2).value)>1, opt.enablegroup = 'on'; end;   
     opt.enablesingletrials = 'on';
     
     % encode parameters
