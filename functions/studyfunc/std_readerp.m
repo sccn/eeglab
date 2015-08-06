@@ -113,8 +113,8 @@ end;
 
 % get the file extension
 % ----------------------
-if ~isempty(opt.channels), fileExt = '.daterp';
-else                       fileExt = '.icaerp';
+if ~isempty(opt.channels), fileExt = [ '.dat' opt.datatype ];
+else                       fileExt = [ '.ica' opt.datatype ];
 end;
 
 % first subject data file
@@ -174,7 +174,7 @@ for ind = 1:length(finalinds) % scan channels or clusters
         % read the data and select channels
         % ---------------------------------
         subjectList = opt.subject;
-        if isempty(subjectList), subjectList = STUDY.subject; end;
+        if isempty(subjectList), subjectList = STUDY.design(STUDY.currentdesign).cases.value; end;
         count = 1;
         for iSubj = length(subjectList):-1:1
             datInds = find(strncmp( subjectList{iSubj}, allSubjects, max(cellfun(@length, allSubjects))));
@@ -201,6 +201,9 @@ for ind = 1:length(finalinds) % scan channels or clusters
         if strcmpi(opt.singletrials, 'off')
             for iSubj = length(dataSubject(:)):-1:1
                 for iCell = 1:length(dataSubject{1}(:))
+                    if isempty(dataSubject{ iSubj }{ iCell })
+                        error(sprintf('Subject %s missing one experimental condition, remove subject and try again'));
+                    end;
                     alldata{  iCell}(:,iSubj) = mean(dataSubject{ iSubj }{ iCell },2);
                     if ~isempty(events{iSubj}{iCell})
                          allevents{iCell}(:,iSubj) = mean(events{ iSubj }{ iCell },2);
