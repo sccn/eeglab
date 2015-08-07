@@ -628,7 +628,7 @@ cb_preclust    = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_preclust(STUDY, A
 cb_clust       = [ nocheck '[STUDYTMP ALLEEGTMP LASTCOM] = pop_clust(STUDY, ALLEEG);'                   e_plot_study];
 cb_clustedit   = [ nocheck 'ALLEEGTMP = ALLEEG; [STUDYTMP LASTCOM] = pop_clustedit(STUDY, ALLEEG);'     e_plot_study];
 cb_limorun     = [ nocheck '[STUDYTMP LASTCOM]= pop_limo(STUDY, ALLEEG);' e_plot_study];
-cb_limoresults = [ nocheck 'limo_results;' e_hist];
+cb_limoresults = [ nocheck 'pop_limoresults(STUDY,''dat'');' e_hist];
 % 
 % % add STUDY plugin menus
 % if exist('eegplugin_stderpimage')
