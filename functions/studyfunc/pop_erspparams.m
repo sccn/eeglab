@@ -83,8 +83,10 @@ if isempty(varargin)
     cbline = [0.07 1.1];
     otherline = [ 0.6 .4 0.6 .4];
     geometry = { 1 otherline otherline otherline cbline };
-    enablecond  = fastif(length(STUDY.design(STUDY.currentdesign).variable(1).value)>1, 'on', 'off');
-    enablegroup = fastif(length(STUDY.design(STUDY.currentdesign).variable(2).value)>1, 'on', 'off');
+    enablecond  = 'off';
+    enablegroup = 'off';
+    if length(STUDY.design(STUDY.currentdesign).variable) > 0 && length(STUDY.design(STUDY.currentdesign).variable(1).value)>1, enablecond  = 'on'; end;
+    if length(STUDY.design(STUDY.currentdesign).variable) > 1 && length(STUDY.design(STUDY.currentdesign).variable(2).value)>1, enablegroup = 'on'; end;   
     
     [out_param userdat tmp res] = inputgui( 'geometry' , geometry, 'uilist', uilist, 'skipline', 'off', ...
                                             'title', 'Set ERSP/ITC plotting parameters -- pop_erspparams()', 'eval', evalstr);
