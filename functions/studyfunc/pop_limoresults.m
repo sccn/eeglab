@@ -210,6 +210,9 @@ classdef pop_limoresults < handle
                             set(obj.gui_h.popupmenu_modelvar2plot,'String',var2plot_list);
                             set(obj.gui_h.popupmenu_modelvar2plot,'Value',var2plot_indx);
                         else
+                            var2plot_indx = find(strcmp(string_vplot(val_vplot),var2plot_list));
+                            set(obj.gui_h.popupmenu_modelvar2plot,'String',var2plot_list);
+                            set(obj.gui_h.popupmenu_modelvar2plot,'Value',var2plot_indx);
                         end
                     elseif val_typeplot == 3
                         var2plot_list = string_vplot;
@@ -248,27 +251,34 @@ classdef pop_limoresults < handle
         end
         % =================================================================
         function obj = callback_popupmenu_modelvar2plot(obj,~,~)
+            val_level = get( obj.gui_h.popupmenu_level,'Value');
+            val_mplot    = get(obj.gui_h.popupmenu_measure2plot,'Value');
+            
             plottype     = get(obj.gui_h.popupmenu_plottype,'Value');
             stringtmp    = get(obj.gui_h.popupmenu_modelvar2plot,'String');
             valtmp       = get(obj.gui_h.popupmenu_modelvar2plot,'Value');
             
+            
+            
             if valtmp == length(stringtmp) && (plottype ~= 3)
-                limo_contrast_manager;
-                % Get new generated file and add it to the list as current
-                currentfiles = dir(obj.limofiles_path);
-                currentfiles = {currentfiles.name}';
-                if strcmp(currentfiles{1},'.')
-                    currentfiles(1:2) = [];
+                limo_contrast_manager(fullfile(obj.limofiles_path,'LIMO.mat'));
+                htmp = findall(0,'Type','Figure','Tag','figure_limo_contrast_manager');
+                if ~isempty(htmp)
+                    waitfor(htmp); clear htmp;
                 end
-                stringtmp(end) = [];
+                % Get new generated file and add it to the list as current
+                % ---------------------------------------------------------
+                currentfiles = getmeasures2plot(obj.study,val_level-1,val_mplot,obj.datorica_indx);
                 newfile = setdiff(currentfiles,stringtmp);
-                 if ~isempty(newfile)
-                     stringtmp(end+1) = newfile;
-                     stringtmp(end+1) = {'Add New Var'};
-                 end    
-                 set(obj.gui_h.popupmenu_modelvar2plot,'String',stringtmp);
-                 set(obj.gui_h.popupmenu_modelvar2plot,'Value',length(stringtmp)-1); 
-                 obj.limofiles_filename = stringtmp{length(stringtmp)-1};
+                if ~isempty(newfile)
+                    stringtmp(end+1) = newfile;
+                    set(obj.gui_h.popupmenu_modelvar2plot,'String',currentfiles);
+                    set(obj.gui_h.popupmenu_modelvar2plot,'Value',length(currentfiles)-1);
+                    obj.limofiles_filename = newfile{1};
+                else
+                    set(obj.gui_h.popupmenu_modelvar2plot,'Value',1);
+                end
+                
             else
                 obj.limofiles_filename = stringtmp{valtmp};
             end
