@@ -293,6 +293,10 @@ for counter = 1:maxcount
                 % property grid argument
                 panel = uipanel('Title','','FontSize',12,'BackgroundColor','white','Position',[posx posy+addvert width height*heightfactor].*s+q);
                 allhandlers{counter} = arg_guipanel(panel, currentelem{:});
+            elseif strcmpi(currentelem{1}, 'panel'),
+                % property grid argument
+                uipanel(currentelem{2:end},'FontSize',12,'Position',[posx posy+addvert width height*heightfactor].*s+q);
+                allhandlers{counter} = 0;
             elseif strcmpi(currentelem{1}, 'uitable'),
                 uitable(g.fig, currentelem{2:end}, 'unit', 'normalized', 'Position',[posx posy+addvert width height*heightfactor].*s+q);
                 allhandlers{counter} = 0;
