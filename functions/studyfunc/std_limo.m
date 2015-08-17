@@ -330,7 +330,7 @@ for s = 1:nb_subjects
                 contvar(position+set_positions(dataset_nb)) = values;          % position in the set + position in the concatenated data
             end
         end
-        
+
         % --> split per condition and zscore (if requested)
         if exist('categ','var')
             if strcmp(opt.splitreg,'on')
@@ -395,7 +395,11 @@ STUDY.names = names;
 
 % contrast
 if cont_var_flag && exist('categ','var')
-    limocontrast.mat = [zeros(1,max(categ)) ones(1,max(categ)) 0];
+    if strcmp(opt.splitreg,'on')
+        limocontrast.mat = [zeros(1,max(categ)) ones(1,max(categ)) 0];
+    else
+        limocontrast.mat = [zeros(1,max(categ))  ones(1,size(contvar,2)) 0];
+    end
     LIMO_files = limo_batch('both',model,limocontrast,STUDY);
 else
     limocontrast.mat = [];
