@@ -202,24 +202,26 @@ classdef pop_limoresults < handle
         % =================================================================
         function obj = callback_popupmenu_level(obj,~,~)
             % Getting value (subject from level)
+            % =========================================================
             val_level = get( obj.gui_h.popupmenu_level,'Value');
+            % Getting value from popupmenu_measure2plot
+            % =========================================================
+            val_mplot = get(obj.gui_h.popupmenu_measure2plot,'Value');
+            
+            % Getting value from popupmenu_dataorresult
+            % =========================================================
+            val_dor = get(obj.gui_h.popupmenu_dataorresult,'Value');
+            
+            % Getting values popupmenu_modelvar2plot
+            % =========================================================
+            string_vplot  = get(obj.gui_h.popupmenu_modelvar2plot,'String');
+            val_vplot     = get(obj.gui_h.popupmenu_modelvar2plot,'Value' );
+            val_typeplot  = get(obj.gui_h.popupmenu_plottype     ,'Value' );
+            string_elec   = get(obj.gui_h.listbox_elect2plot     ,'String');
+            val_elec      = get(obj.gui_h.listbox_elect2plot     ,'Value' );
+            
             if val_level ~= 1
-                % Getting value from popupmenu_measure2plot
-                % =========================================================
-                val_mplot = get(obj.gui_h.popupmenu_measure2plot,'Value');
-                
-                % Getting value from popupmenu_dataorresult
-                % =========================================================
-                val_dor = get(obj.gui_h.popupmenu_dataorresult,'Value');
-                
-                % Getting values popupmenu_modelvar2plot
-                % =========================================================
-                string_vplot  = get(obj.gui_h.popupmenu_modelvar2plot,'String');
-                val_vplot     = get(obj.gui_h.popupmenu_modelvar2plot,'Value');
-                val_typeplot  = get(obj.gui_h.popupmenu_plottype     ,'Value'); 
-                string_elec   = get(obj.gui_h.listbox_elect2plot     ,'String'); 
-                val_elec      = get(obj.gui_h.listbox_elect2plot     ,'Value');
-                
+                    
                 [var2plot_list,filespath] = getmeasures2plot(obj.study,val_level-1,val_mplot,obj.datorica_indx);
                 
                 % Updating Electrode list
@@ -235,9 +237,9 @@ classdef pop_limoresults < handle
                     % index
                     if val_typeplot == 1 || val_typeplot == 2
                         
-                            % Updating electrode list val
-                            %----------------------------------------------
-                            set(obj.gui_h.listbox_elect2plot,'Value',1);
+                        % Updating electrode list val
+                        %----------------------------------------------
+                        set(obj.gui_h.listbox_elect2plot,'Value',1);
                             
                          % Just Checking if the selected variable exist in
                          % the sub (case of Results only)
@@ -302,12 +304,57 @@ classdef pop_limoresults < handle
                     obj.limofiles_filename = var2plot_list{get(obj.gui_h.popupmenu_modelvar2plot,'Value')};
                 end
                 
-            else
-                % Just to show individual results
+            else % Case of group level selected % ONGOING WORK %
+                
+                % Loading expected electrodes
                 %----------------------------------------------------------
-                eeglab_warning('Invalid selection for individual results. Selecting 1st subject instead');
-                set( obj.gui_h.popupmenu_level,'Value',2);
-                obj = callback_popupmenu_level(obj);
+                try
+                    load(fullfile(obj.study.filepath,'limo_chanlocs_pval_correct.mat'),'expected_chanlocs');
+                    electoplot_list = ['All Channels';{expected_chanlocs.labels}'];
+                    set(obj.gui_h.listbox_elect2plot,'String',electoplot_list);
+                catch
+                    % implement this
+                end
+                
+                
+                % Looking for group files
+                %----------------------------------------------------------
+                 % UPDATE THIS .. right now the files are changing over and
+                 % over.. waiting for Cyril answer about it
+                
+                
+                if val_typeplot == 1 || val_typeplot == 2
+                    
+                    % Updating electrode list val
+                    %----------------------------------------------
+                    set(obj.gui_h.listbox_elect2plot,'Value',1);
+                    
+                elseif val_typeplot == 3
+                    
+                    % Updating electrode list val
+                    %--------------------------------------------------
+                    newval_elec = find(strcmp(string_elec(val_elec),electoplot_list));
+                    if isempty(newval_elec)
+                        newval_elec = 2;
+                    end
+                    set(obj.gui_h.listbox_elect2plot,'Value',newval_elec);
+                    
+                end
+                
+                % Enabling on GUI features
+                %------------------------------------------------------
+                set(obj.gui_h.popupmenu_dataorresult  ,'Value', 2);
+                set(obj.gui_h.popupmenu_dataorresult  ,'Enable','off');
+                set(obj.gui_h.popupmenu_modelvar2plot ,'Enable','off');
+                set(obj.gui_h.popupmenu_plottype      ,'Enable','on');
+                set(obj.gui_h.pushbutton_plot         ,'Enable','on');
+                
+                
+%                 % Just to show individual results
+%                 %----------------------------------------------------------
+%                 eeglab_warning('Invalid selection for individual results. Selecting 1st subject instead');
+%                 set( obj.gui_h.popupmenu_level,'Value',2);
+%                 obj = callback_popupmenu_level(obj);
             end
         end
         % =================================================================
