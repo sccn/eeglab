@@ -384,10 +384,11 @@ classdef pop_limoresults < handle
             plottype   = get(obj.gui_h.popupmenu_plottype      ,'Value');
             stringtmp  = get(obj.gui_h.popupmenu_modelvar2plot ,'String');
             valtmp     = get(obj.gui_h.popupmenu_modelvar2plot ,'Value');
+            val_dor    = get(obj.gui_h.popupmenu_dataorresult  ,'Value');
             
             % Just if last line if selected
             %--------------------------------------------------------------
-            if valtmp == length(stringtmp) && (plottype ~= 3) && val_level ~= 1
+            if valtmp == length(stringtmp) && (plottype ~= 3) && val_level ~= 1 && val_dor ~= 1
                 limo_contrast_manager(fullfile(obj.limofiles_path,'LIMO.mat'));
                 htmp = findall(0,'Type','Figure','Tag','figure_limo_contrast_manager');
                 if ~isempty(htmp)
