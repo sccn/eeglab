@@ -846,9 +846,9 @@ if ismatlab
     uimenu( std_m,  'Label', 'Precompute channel measures'            , 'userdata', onstudy, 'CallBack', cb_precomp, 'separator', 'on');
     uimenu( std_m,  'Label', 'Plot channel measures'                  , 'userdata', onstudy, 'CallBack', cb_chanplot);
     
-    limo_chn = uimenu(std_m,'Label','LInear MOdeling of EEG data (LIMO)' , 'userdata', onstudy);
-    uimenu( limo_chn,  'Label', 'Estimate Model Parameters'           , 'userdata', onstudy, 'CallBack', cb_limorun);
-    uimenu( limo_chn,  'Label', 'Single Subject Results'              , 'userdata', onstudy, 'CallBack', cb_limoresults);
+    limo_chn = uimenu(std_m,'Label','LInear MOdeling EEG Data (LIMO/channel)' , 'userdata', onstudy);
+    uimenu( limo_chn,  'Label', 'Estimate Model Parameters (channel)'         , 'userdata', onstudy, 'CallBack', cb_limorun);
+    uimenu( limo_chn,  'Label', 'Linear Model Results (channel)'              , 'userdata', onstudy, 'CallBack', cb_limoresults);
     
     uimenu( std_m,  'Label', 'Precompute component measures'          , 'userdata', onstudy, 'CallBack', cb_precomp2, 'separator', 'on');
     clust_m = uimenu( std_m, 'Label', 'PCA clustering (original)'     , 'userdata', onstudy);
