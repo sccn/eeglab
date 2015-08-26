@@ -11,6 +11,7 @@ classdef pop_limoresults < handle
         datorica_indx;
         reg_indx;
         cat_indx;
+        string_mplot;
     end
     
     methods
@@ -23,14 +24,15 @@ classdef pop_limoresults < handle
             %-------------------------------------------------------------- 
             datorica_list = {'dat','ica'};
             obj.datorica_indx = find(strcmp(analysis,datorica_list));
-            
-            obj.gui_h    = guibuilder(STUDY,analysis);
-            obj.gui_h    = guihandles(obj.gui_h.fig);
-            obj.study    = STUDY;
+           
+            obj.gui_h        = guibuilder(STUDY,analysis);
+            obj.string_mplot = get(obj.gui_h.popupmenu_measure2plot,'String'); 
+            obj.gui_h        = guihandles(obj.gui_h.fig);
+            obj.study        = STUDY;
              
-            level_tmp     = get(obj.gui_h.popupmenu_level        ,'Value');
-            m2plot_tmp    = get(obj.gui_h.popupmenu_measure2plot ,'Value');
-            var2plot_indx = get(obj.gui_h.popupmenu_modelvar2plot,'Value');
+            level_tmp       = get(obj.gui_h.popupmenu_level         ,'Value');
+            m2plot_tmp      = get(obj.gui_h.popupmenu_measure2plot  ,'Value');
+            var2plot_indx   = get(obj.gui_h.popupmenu_modelvar2plot ,'Value');
             [var2plot_list,filespath,limoindx] = getmeasures2plot(obj.study,level_tmp-1,m2plot_tmp,obj.datorica_indx);
            
             % Detecting Measure and updating limofiles_path and
@@ -202,27 +204,29 @@ classdef pop_limoresults < handle
         % =================================================================
         function obj = callback_popupmenu_level(obj,~,~)
             % Getting value (subject from level)
-            % =========================================================
-            val_level = get( obj.gui_h.popupmenu_level,'Value');
+            val_level = get(obj.gui_h.popupmenu_level,'Value');
+            
             % Getting value from popupmenu_measure2plot
-            % =========================================================
             val_mplot = get(obj.gui_h.popupmenu_measure2plot,'Value');
             
             % Getting value from popupmenu_dataorresult
-            % =========================================================
             val_dor = get(obj.gui_h.popupmenu_dataorresult,'Value');
             
             % Getting values popupmenu_modelvar2plot
-            % =========================================================
-            string_vplot  = get(obj.gui_h.popupmenu_modelvar2plot,'String');
-            val_vplot     = get(obj.gui_h.popupmenu_modelvar2plot,'Value' );
-            val_typeplot  = get(obj.gui_h.popupmenu_plottype     ,'Value' );
-            string_elec   = get(obj.gui_h.listbox_elect2plot     ,'String');
-            val_elec      = get(obj.gui_h.listbox_elect2plot     ,'Value' );
+            string_vplot  = get(obj.gui_h.popupmenu_modelvar2plot ,'String');
+            val_vplot     = get(obj.gui_h.popupmenu_modelvar2plot ,'Value' );
+            val_typeplot  = get(obj.gui_h.popupmenu_plottype      ,'Value' );
+            string_elec   = get(obj.gui_h.listbox_elect2plot      ,'String');
+            val_elec      = get(obj.gui_h.listbox_elect2plot      ,'Value' );
             
             if val_level ~= 1
-                    
+   
                 [var2plot_list,filespath] = getmeasures2plot(obj.study,val_level-1,val_mplot,obj.datorica_indx);
+                
+                if strcmp(get(obj.gui_h.popupmenu_measure2plot,'String'),{' '})
+                    set(obj.gui_h.popupmenu_measure2plot  ,'String', obj.string_mplot);
+                    set(obj.gui_h.popupmenu_measure2plot  ,'Value',1);
+                end
                 
                 % Updating Electrode list
                 % =========================================================
@@ -280,10 +284,12 @@ classdef pop_limoresults < handle
                     
                     % Enabling on GUI features
                     %------------------------------------------------------
+                    set(obj.gui_h.popupmenu_measure2plot  ,'Enable','on');
                     set(obj.gui_h.popupmenu_dataorresult  ,'Enable','on');
                     set(obj.gui_h.popupmenu_modelvar2plot ,'Enable','on');
                     set(obj.gui_h.popupmenu_plottype      ,'Enable','on');
                     set(obj.gui_h.pushbutton_plot         ,'Enable','on');
+                    set(obj.gui_h.checkbox_stats	      ,'Enable','on');
                 else
                     % Enabling off GUI features
                     %------------------------------------------------------
@@ -306,68 +312,82 @@ classdef pop_limoresults < handle
                 
             else % Case of group level selected % ONGOING WORK %
                 
-                % Loading expected electrodes
-                %----------------------------------------------------------
-                try
-                    load(fullfile(obj.study.filepath,'limo_chanlocs_pval_correct.mat'),'expected_chanlocs');
-                    electoplot_list = ['All Channels';{expected_chanlocs.labels}'];
-                    set(obj.gui_h.listbox_elect2plot,'String',electoplot_list);
-                catch
-                    % implement this
-                end
-                
-                
                 % Looking for group files
                 %----------------------------------------------------------
-                 % UPDATE THIS .. right now the files are changing over and
-                 % over.. waiting for Cyril answer about it
+                tmp = dir(obj.study.filepath);
+                filestmp = {tmp.name}'; clear tmp;
                 
-                
-                if val_typeplot == 1 || val_typeplot == 2
-                    
-                    % Updating electrode list val
-                    %----------------------------------------------
-                    set(obj.gui_h.listbox_elect2plot,'Value',1);
-                    
-                elseif val_typeplot == 3
-                    
-                    % Updating electrode list val
-                    %--------------------------------------------------
-                    newval_elec = find(strcmp(string_elec(val_elec),electoplot_list));
-                    if isempty(newval_elec)
-                        newval_elec = 2;
+                hit = zeros(1,length(filestmp));
+                for i = 1 : length(filestmp)
+                    tmp = strfind(filestmp{i},'one_sample_ttest');
+                    if ~isempty(tmp)
+                        hit(i) = 1;
                     end
-                    set(obj.gui_h.listbox_elect2plot,'Value',newval_elec);
-                    
                 end
-                
-                % Enabling on GUI features
-                %------------------------------------------------------
-                set(obj.gui_h.popupmenu_dataorresult  ,'Value', 2);
-                set(obj.gui_h.popupmenu_dataorresult  ,'Enable','off');
-                set(obj.gui_h.popupmenu_modelvar2plot ,'Enable','off');
-                set(obj.gui_h.popupmenu_plottype      ,'Enable','on');
-                set(obj.gui_h.pushbutton_plot         ,'Enable','on');
-                
-                
-%                 % Just to show individual results
-%                 %----------------------------------------------------------
-%                 eeglab_warning('Invalid selection for individual results. Selecting 1st subject instead');
-%                 set( obj.gui_h.popupmenu_level,'Value',2);
-%                 obj = callback_popupmenu_level(obj);
+                if ~isempty(find(hit))
+                    tmp = filestmp(find(hit));
+                    goupfiles = cellfun(@(x) x(1:end-4), tmp, 'UniformOutput', false);
+                    set(obj.gui_h.popupmenu_modelvar2plot,'String',goupfiles);
+                    set(obj.gui_h.popupmenu_modelvar2plot,'Value',1);
+                    
+                    % Loading expected electrodes
+                    %----------------------------------------------------------
+                    try
+                        load(fullfile(obj.study.filepath,'limo_chanlocs_pval_correct.mat'),'expected_chanlocs');
+                        electoplot_list = ['All Channels';{expected_chanlocs.labels}'];
+                        set(obj.gui_h.listbox_elect2plot,'String',electoplot_list);
+                    catch
+                        % implement this
+                    end
+                    
+                    if val_typeplot == 1 || val_typeplot == 2
+                        
+                        % Updating electrode list val
+                        %----------------------------------------------
+                        set(obj.gui_h.listbox_elect2plot,'Value',1);
+                        
+                    elseif val_typeplot == 3
+                        
+                        % Updating electrode list val
+                        %--------------------------------------------------
+                        newval_elec = find(strcmp(string_elec(val_elec),electoplot_list));
+                        if isempty(newval_elec)
+                            newval_elec = 2;
+                        end
+                        set(obj.gui_h.listbox_elect2plot,'Value',newval_elec);
+                    end
+                    
+                    % Enabling on/off GUI features
+                    %------------------------------------------------------
+                    set(obj.gui_h.popupmenu_measure2plot  ,'String', {' '} );
+                    set(obj.gui_h.popupmenu_measure2plot  ,'Value',1);
+                    set(obj.gui_h.popupmenu_measure2plot  ,'Enable', 'off' );
+                    set(obj.gui_h.popupmenu_dataorresult  ,'Value', 2);
+                    set(obj.gui_h.popupmenu_dataorresult  ,'Enable','off');
+                    set(obj.gui_h.popupmenu_modelvar2plot ,'Enable','on');
+                    set(obj.gui_h.popupmenu_plottype      ,'Enable','on');
+                    set(obj.gui_h.pushbutton_plot         ,'Enable','on');
+                    set(obj.gui_h.popupmenu_mcc	          ,'Enable','off');
+                    set(obj.gui_h.popupmenu_compmethod    ,'Enable','off');
+                    set(obj.gui_h.checkbox_stats	      ,'Enable','off');
+                else
+                    eeglab_warning('No group level results have been found');
+                    set(obj.gui_h.popupmenu_level,'Value',2);
+                    obj = callback_popupmenu_level(obj);
+                end
             end
         end
         % =================================================================
         function obj = callback_popupmenu_modelvar2plot(obj,~,~)
-            val_level  = get( obj.gui_h.popupmenu_level       ,'Value');
-            val_mplot  = get(obj.gui_h.popupmenu_measure2plot ,'Value');
-            plottype   = get(obj.gui_h.popupmenu_plottype     ,'Value');
-            stringtmp  = get(obj.gui_h.popupmenu_modelvar2plot,'String');
-            valtmp     = get(obj.gui_h.popupmenu_modelvar2plot,'Value');
+            val_level  = get( obj.gui_h.popupmenu_level        ,'Value');
+            val_mplot  = get(obj.gui_h.popupmenu_measure2plot  ,'Value');
+            plottype   = get(obj.gui_h.popupmenu_plottype      ,'Value');
+            stringtmp  = get(obj.gui_h.popupmenu_modelvar2plot ,'String');
+            valtmp     = get(obj.gui_h.popupmenu_modelvar2plot ,'Value');
             
             % Just if last line if selected
             %--------------------------------------------------------------
-            if valtmp == length(stringtmp) && (plottype ~= 3)
+            if valtmp == length(stringtmp) && (plottype ~= 3) && val_level ~= 1
                 limo_contrast_manager(fullfile(obj.limofiles_path,'LIMO.mat'));
                 htmp = findall(0,'Type','Figure','Tag','figure_limo_contrast_manager');
                 if ~isempty(htmp)
@@ -385,33 +405,37 @@ classdef pop_limoresults < handle
                 else
                     set(obj.gui_h.popupmenu_modelvar2plot,'Value',1);
                 end
-                
             else
                 obj.limofiles_filename = stringtmp{valtmp};
             end
         end
         % =================================================================
         function obj = callback_popupmenu_plottype(obj,~,~)
-            val_ptype = get( obj.gui_h.popupmenu_plottype   ,'Value');
-            val_dor   = get(obj.gui_h.popupmenu_dataorresult,'Value');
-            if val_ptype == 1 || val_ptype == 2
+            val_ptype = get( obj.gui_h.popupmenu_plottype    ,'Value');
+            val_dor   = get(obj.gui_h.popupmenu_dataorresult ,'Value');
+            val_level = get( obj.gui_h.popupmenu_level       ,'Value');
+            
+            if (val_ptype == 1 || val_ptype == 2) 
                 % Call callback_popupmenu_level
                 obj = callback_popupmenu_level(obj);
                 
                 % Updating listbox_elect2plot
-                set(obj.gui_h.listbox_elect2plot,'Value',1);
-                set(obj.gui_h.listbox_elect2plot,'Enable','off');
+                set(obj.gui_h.listbox_elect2plot ,'Value',1);
+                set(obj.gui_h.listbox_elect2plot ,'Enable','off');
                 
             elseif val_ptype == 3
-                if val_dor == 2
-                    listtmp = obj.regnames;
-                elseif val_dor == 1
-                    listtmp = obj.catvarnames;
+                
+                if val_level ~= 1
+                    if val_dor == 2
+                        listtmp = obj.regnames;
+                    elseif val_dor == 1
+                        listtmp = obj.catvarnames;
+                    end
+                    set(obj.gui_h.popupmenu_modelvar2plot ,'String',listtmp);
+                    set(obj.gui_h.popupmenu_modelvar2plot ,'Value',1);
                 end
-                set(obj.gui_h.popupmenu_modelvar2plot,'String',listtmp);
-                set(obj.gui_h.popupmenu_modelvar2plot,'Value',1);
-                set(obj.gui_h.listbox_elect2plot     ,'Enable','on');
-                set(obj.gui_h.listbox_elect2plot     ,'Value',2);
+                set(obj.gui_h.listbox_elect2plot ,'Enable','on');
+                set(obj.gui_h.listbox_elect2plot ,'Value',2);
             end
             
         end
@@ -446,14 +470,14 @@ classdef pop_limoresults < handle
         % =================================================================
         function obj = callback_checkbox_stats(obj,~,~)
             
-            if get(obj.gui_h.checkbox_stats       ,'Value');
-                set(obj.gui_h.popupmenu_mcc       ,'Enable','on');
-                set(obj.gui_h.popupmenu_compmethod,'Enable','on');
+            if get(obj.gui_h.checkbox_stats        ,'Value');
+                set(obj.gui_h.popupmenu_mcc        ,'Enable','on');
+                set(obj.gui_h.popupmenu_compmethod ,'Enable','on');
             else
-                set(obj.gui_h.popupmenu_mcc       ,'Enable','off');
-                set(obj.gui_h.popupmenu_mcc       ,'Value',1);
-                set(obj.gui_h.popupmenu_compmethod,'Enable','off');
-                set(obj.gui_h.popupmenu_compmethod,'Value',1);
+                set(obj.gui_h.popupmenu_mcc        ,'Enable','off');
+                set(obj.gui_h.popupmenu_mcc        ,'Value',1);
+                set(obj.gui_h.popupmenu_compmethod ,'Enable','off');
+                set(obj.gui_h.popupmenu_compmethod ,'Value',1);
             end
         end
         % =================================================================
@@ -470,19 +494,17 @@ classdef pop_limoresults < handle
         % =================================================================
         function obj = callback_plot(obj,~, ~)
             
+            level = get(obj.gui_h.popupmenu_level,'Value');
             % --- EEGLAB ADDED ---
             % DEFS
             checkbox_stat_status = get(obj.gui_h.checkbox_stats,'Value');
             if checkbox_stat_status
                 handles.p = str2double(get(obj.gui_h.edit_pval,'string'));
-                
                 indxtmp      = get(obj.gui_h.popupmenu_mcc,'Value');
-                %valtmp      = get(obj.gui_h.popupmenu_mcc,'string');
                 handles.MCC  = indxtmp;
                 handles.tfce = 0;
                 handles.dir  = pwd;
                 indxtmp           = get(obj.gui_h.popupmenu_compmethod,'Value');
-                %valtmp            = get(obj.gui_h.popupmenu_mcc,'string');
                 if indxtmp == 1
                     handles.bootstrap = 0;
                 else
@@ -497,8 +519,14 @@ classdef pop_limoresults < handle
             end
             
             % Loading files
-            PathName  = obj.limofiles_path;
-            FileName  = obj.limofiles_filename;
+            if level == 1
+                PathName = obj.study.filepath;
+                files    = get(obj.gui_h.popupmenu_modelvar2plot,'String');
+                FileName = [files{get(obj.gui_h.popupmenu_modelvar2plot,'Value')} '.mat'];
+            else
+                PathName = obj.limofiles_path;
+                FileName = obj.limofiles_filename;
+            end
             
             % Determine if 'Original Data' or 'Results'
             val_dor   = get(obj.gui_h.popupmenu_dataorresult,'Value');
@@ -754,11 +782,13 @@ classdef pop_limoresults < handle
                     catch
                         LIMO = []; handles.LIMO = LIMO;
                     end
-                    if val_dor == 1
+                    if val_dor == 1 && level ~= 1
                         limo_display_results(3,FileName,PathName,handles.p,handles.MCC,handles.LIMO.LIMO,0,'channels', {num2str(selected_chan)}, 'regressor',obj.cat_indx(selected_reg),'plot3type','Original');
-                    elseif val_dor == 2
+                    elseif val_dor == 2 && level ~= 1
                         plot3type_val = questdlg('Plotting ERP','ERP Options','Modelled','Adjusted','Adjusted');
                         limo_display_results(3,FileName,PathName,handles.p,handles.MCC,handles.LIMO.LIMO,0,'channels', {num2str(selected_chan)}, 'regressor',obj.reg_indx(selected_reg),'plot3type',plot3type_val);
+                    elseif level == 1
+                        limo_display_results(3,FileName,PathName,handles.p,handles.MCC,handles.LIMO.LIMO,0,'channels', {num2str(selected_chan)});
                     end
                     cd(handles.dir);
                     
