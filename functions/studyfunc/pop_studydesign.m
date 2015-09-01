@@ -118,13 +118,13 @@ if nargin < 3 && ~isstr(STUDY)
                  ...
                  {3 ht [0.93 5.4+h2] [3.15 5.6] } ...
                  {3 ht [3.3  6+h2]   [0.5 1] } ...    % Subject text
-                 {3 ht [1    6+h2]   [1 1] } ...    % Indep variables 
-                 {3 ht [1.95 6.2+h2] [0.4 1] } ... % New
-                 {3 ht [2.25 6.2+h2] [0.4 1] } ... % Import
-                 {3 ht [2.55 6.2+h2]  [0.4  1] } ... % Edit
-                 {3 ht [2.85 6.2+h2] [0.45 1] } ... % Delete
-                 {3 ht [3.3  7+h2  ] [0.7 3] } ...  % listbox subject  
-                 {3 ht [1    7+h2  ] [2.3 3] } ...  % listbox variable
+                 {3 ht [1    6+h2]   [1 1] } ...      % Indep variables 
+                 {3 ht [1.95 6.2+h2] [0.4 1] } ...    % New
+                 {3 ht [2.25 6.2+h2] [0.4 1] } ...    % Import
+                 {3 ht [2.55 6.2+h2]  [0.4  1] } ...  % Edit
+                 {3 ht [2.85 6.2+h2] [0.45 1] } ...   % Delete
+                 {3 ht [3.3  7+h2  ] [0.7 3] } ...    % listbox subject  
+                 {3 ht [1    7+h2  ] [2.3 3] } ...    % listbox variable
                  {3 ht [1    9.8+h2] [3 1] } ...
                  };
 
