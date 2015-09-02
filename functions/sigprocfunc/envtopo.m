@@ -189,7 +189,7 @@ if nargin <= 2 | isstr(varargin{1})
 				  'voffsets'      'real'     []                       [] ;
 				  'vert'          'real'     []                       [] ;
 				  'fillcomp'      'integer'  []                       0 ; 
-				  'figure'        'integer'  []                       gcf ;                   
+				  'figure'        'integer'  []                       [] ;                   
 				  'colorfile'     'string'   []                       '' ; 
 				  'colors'        'string'   []                       '' ;
 				  'compnums'      'integer'  []                       []; 
@@ -259,7 +259,7 @@ else % dprecated - old style input args
     g.envmode = 'avg';
     g.dispmaps = 'on';
 end;
-figure(g.figure);         % remember the current figure (for Matlab 7.0.0 bug)
+if ~isempty(g.figure), figure(g.figure); end;        % remember the current figure (for Matlab 7.0.0 bug)
 
 if ~isempty(g.pvaf) 
 	g.sortvar = g.pvaf; % leave deprecated g.pvaf behind. 
