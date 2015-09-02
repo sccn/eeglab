@@ -103,13 +103,16 @@ if nargin < 3
     if ~isempty(result{5}),   options = [ options '''subcomps'',[' result{5} '],' ]; end;
     if ~isempty(result{6}),   options = [ options '''title'', ''' result{6} ''',' ]; end;
 	options      =  [ options result{7} ];
-	figure;
+	fig = figure;
+    if ~isnumeric(fig), fig = fig.Number; end;
+    optionsplot = [ options ', ''figure'',' int2str(fig) ];
     try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
 else
     if isempty(timerange)
         timerange = [EEG.xmin*1000 EEG.xmax*1000];
     end
     options = [options vararg2str( varargin ) ];
+    optionsplot = options;
 end;
     
 if length(EEG) > 2
@@ -153,6 +156,7 @@ else
                                    inputname(1), int2str(subindices), num2str(timerange), options);
     end;
 end;
+options = optionsplot;
 
 % plot the data
 % --------------

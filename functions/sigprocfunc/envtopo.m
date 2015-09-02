@@ -170,7 +170,6 @@ VERTWEIGHT = 2.0;  % lineweight of specified vertical lines
 LIMCONTRIBWEIGHT = 1.2; % lineweight of limonctrib vertical lines
 MAX_FRAMES = 10000; % maximum frames to plot
 MAXENVPLOTCHANS = 10;  
-myfig =gcf;         % remember the current figure (for Matlab 7.0.0 bug)
 xmin = 0; xmax = 0;
     
 if nargin < 2
@@ -190,6 +189,7 @@ if nargin <= 2 | isstr(varargin{1})
 				  'voffsets'      'real'     []                       [] ;
 				  'vert'          'real'     []                       [] ;
 				  'fillcomp'      'integer'  []                       0 ; 
+				  'figure'        'integer'  []                       gcf ;                   
 				  'colorfile'     'string'   []                       '' ; 
 				  'colors'        'string'   []                       '' ;
 				  'compnums'      'integer'  []                       []; 
@@ -259,6 +259,7 @@ else % dprecated - old style input args
     g.envmode = 'avg';
     g.dispmaps = 'on';
 end;
+figure(g.figure);         % remember the current figure (for Matlab 7.0.0 bug)
 
 if ~isempty(g.pvaf) 
 	g.sortvar = g.pvaf; % leave deprecated g.pvaf behind. 
@@ -1113,7 +1114,6 @@ if strcmpi(g.dispmaps, 'on')
         cla
         
         if ~isempty(g.chanlocs)  % plot the component scalp maps
-            figure(myfig);
             if ~isempty(varargin)
                 topoplot(maxproj(g.plotchans,t),g.chanlocs(g.plotchans), varargin{:});
             else  % if no varargin specified
