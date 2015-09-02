@@ -218,9 +218,10 @@ if isempty(varargin) %GUI call
            command(end:end+1) = ');';
         end
            
-       % Call menu to plot clusters (use EEGLAB menu which include std_envtopo)
-       eval( [ get(findobj(findobj('tag', 'EEGLAB'), 'Label', 'Edit/plot clusters'), 'callback') ] );
-       %[STUDY com] = pop_clustedit(STUDY, ALLEEG); 
+       % Call menu to plot clusters (use EEGLAB menu which include
+       % std_envtopo) - this crashed the hisotry
+       %eval( [ get(findobj(findobj('tag', 'EEGLAB'), 'Label', 'Edit/plot clusters'), 'callback') ] );
+       [STUDY LASTCOM] = pop_clustedit(STUDY, ALLEEG); 
        command = [ command LASTCOM ];
 	end
     
