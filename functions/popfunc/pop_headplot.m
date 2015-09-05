@@ -204,7 +204,7 @@ if nargin < 3 % Open GUI input window
                       'set(findobj(gcbf, ''userdata'', ''coregtext''), ''string'', num2str(tmpdat{get(gcbo, ''value'')}));' ];
     defaultmat = { 'mheadnew.mat' 'colin27headmesh.mat' };
     defaultloc = { 'mheadnew.xyz' 'colin27headmesh.xyz' };
-    defaulttransform = { transform [0 -15 10 0.05 0 -1.57 1.25 1.1 1] };
+    defaulttransform = { transform [0 -15 -15 0.05 0 -1.57 100 88 110] };
     if iseeglabdeployed
         defaultmat = fullfile(eeglabexefolder, defaultmat);
         defaultloc = fullfile(eeglabexefolder, defaultloc);
@@ -270,7 +270,8 @@ if nargin < 3 % Open GUI input window
                                 fprintf('Transformation matrix: %s\n', result{7});
         end;
         options = { options{:} 'setup' setupopt };
-        if ~strcmpi(result{5}, 'mheadnew.mat'), EEG.headplotmeshfile = result{5}; end;
+        if ~strcmpi(result{5}, 'mheadnew.mat'), EEG.headplotmeshfile = result{5}; 
+        else EEG.headplotmeshfile = ''; end;
     end;
     
     % decode other parameters
