@@ -248,6 +248,24 @@ end;
 % add paths
 % ---------
 if ~iseeglabdeployed2
+    tmp = which('eeglab_data.set');
+    if ~isempty(which('eeglab_data.set')) && ~isempty(which('GSN-HydroCel-32.sfp'))
+        warning backtrace off;
+        warning(sprintf([ '\n\nPath Warning: It appears that you have added the path to all of the\n' ...
+            'subfolders to EEGLAB. This may create issues with some EEGLAB extensions\n' ...
+            'If EEGLAB cannot start or your experience a large number of warning\n' ...
+            'messages, remove all the EEGLAB paths then go to the EEGLAB folder\n' ...
+            'and start EEGLAB which will add all the necessary paths.\n\n' ]));
+        warning backtrace on;
+        foldertorm = fileparts(which('fgetl.m'));
+        if ~isempty(strfind(foldertorm, 'eeglab'))
+            rmpath(foldertorm);
+        end;
+        foldertorm = fileparts(which('strjoin.m'));
+        if ~isempty(strfind(foldertorm, 'eeglab'))
+            rmpath(foldertorm);
+        end;
+    end;
     myaddpath( eeglabpath, 'eeg_checkset.m',   [ 'functions' filesep 'adminfunc'        ]);
     myaddpath( eeglabpath, 'eeg_checkset.m',   [ 'functions' filesep 'adminfunc'        ]);
     myaddpath( eeglabpath, ['@mmo' filesep 'mmo.m'], 'functions');
