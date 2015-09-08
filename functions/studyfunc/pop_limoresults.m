@@ -808,7 +808,7 @@ function handles = guibuilder(STUDY,analysis)
 
 % Create list "Level of Analysis" (Using First Subject)
 %--------------------------------------------------------------------------
-subjnames = STUDY.design(STUDY.design_index).cases.value;
+subjnames = STUDY.design(STUDY.currentdesign).cases.value;
 
 listlevel = {'Group (Level 2)'};
 for i=1:length(subjnames)
