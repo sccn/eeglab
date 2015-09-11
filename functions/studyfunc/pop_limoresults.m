@@ -530,7 +530,7 @@ classdef pop_limoresults < handle
             end
             
             % Determine if 'Original Data' or 'Results'
-            val_dor   = get(obj.gui_h.popupmenu_dataorresult,'Value');
+            flag_DataResult   = get(obj.gui_h.popupmenu_dataorresult,'Value');
             
             % Getting the plot type
             ptype_val   = get(obj.gui_h.popupmenu_plottype,'Value');
@@ -541,7 +541,7 @@ classdef pop_limoresults < handle
                 %             IMAGE ALL (COMBINED PLOT)
                 % --------------------------------------------------------
                 case 1                    
-                    
+                    if flag_DataResult == 2
                     handles.LIMO = load(fullfile(PathName,'LIMO.mat'));% eeglab mod
                     
                     % check if bootstrap or tfce should be computed
@@ -726,14 +726,21 @@ classdef pop_limoresults < handle
                     % -------------
                     limo_display_results(1,FileName,PathName,handles.p,handles.MCC,handles.LIMO.LIMO);
                     cd(handles.dir);
+                    else
+                        eeglab_warning('Under construction');            
+                    end
                     
                 % --------------------------------------------------------
                 %             TOPOPLOT (SCALP MAPS)
                 % --------------------------------------------------------
                 case 2
-                    handles.LIMO = load(fullfile(PathName,'LIMO.mat')); % eeglab mod
-                    limo_display_results(2,FileName,PathName,handles.p,handles.MCC,handles.LIMO.LIMO);
-                    cd(handles.dir);
+                    if flag_DataResult == 2
+                        handles.LIMO = load(fullfile(PathName,'LIMO.mat')); % eeglab mod
+                        limo_display_results(2,FileName,PathName,handles.p,handles.MCC,handles.LIMO.LIMO);
+                        cd(handles.dir);
+                    else
+                        eeglab_warning('Under construction');
+                    end
 
                 % --------------------------------------------------------
                 %             COURSE PLOT (TIME COURSE)
@@ -783,9 +790,9 @@ classdef pop_limoresults < handle
                     catch
                         LIMO = []; handles.LIMO = LIMO;
                     end
-                    if val_dor == 1 && level ~= 1
+                    if flag_DataResult == 1 && level ~= 1
                         limo_display_results(3,FileName,PathName,handles.p,handles.MCC,handles.LIMO.LIMO,0,'channels', {num2str(selected_chan)}, 'regressor',obj.cat_indx(selected_reg),'plot3type','Original');
-                    elseif val_dor == 2 && level ~= 1
+                    elseif flag_DataResult == 2 && level ~= 1
                         plot3type_val = questdlg('Plotting ERP','ERP Options','Modelled','Adjusted','Adjusted');
                         limo_display_results(3,FileName,PathName,handles.p,handles.MCC,handles.LIMO.LIMO,0,'channels', {num2str(selected_chan)}, 'regressor',obj.reg_indx(selected_reg),'plot3type',plot3type_val);
                     elseif level == 1
