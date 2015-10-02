@@ -174,9 +174,7 @@ if strcmpi(opt.plotconditions, 'together') || strcmpi(opt.plotgroups , 'together
             if max(size(data{emptyindx(icell)})) == 0
                 data{emptyindx(icell)} = nan;
             end
-
         end
-        %[data{emptyindx}] = deal(nan);
     end
 end
 
