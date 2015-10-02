@@ -300,7 +300,7 @@ for c = 1:ncplot
                     end;
                 end;
             elseif ncplot ~= nc % plot conditions together
-                for ind = 2:size(data,1), if any(size(data{ind,1}) ~= size(data{1})), dimreduced_sizediffers = 1; end; end;
+                for ind = 2:size(data,1), if numel(size(data{ind,1})) ~= numel(size(data{1})) || any(size(data{ind,1}) ~= size(data{1})), dimreduced_sizediffers = 1; end; end;
                 for cc = 1:nc
                     [trash,order] = sort(cellfun(@length,data(:,g)),'descend'); clear trash;
                     tmptmpdata = real(data{order(cc),g});
