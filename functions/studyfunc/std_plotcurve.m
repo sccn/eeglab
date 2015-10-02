@@ -142,10 +142,10 @@ end;
 if ~isempty(opt.colors), col = opt.colors; end;
 
 nonemptycell = find(~cellfun(@isempty, data));
-maxdim = max(length(data(:)), size(data{nonemptycell(1)}, ndims(data{nonemptycell(1)})));
+
 if strcmpi(opt.plotsubjects, 'off')
     
-    % both group and conditions together
+    % both group and conditions s
     if strcmpi(opt.plotconditions, 'together') && strcmpi(opt.plotgroups, 'together')
         dim1 = max(size(data));
         dim2 = min(size(data));
@@ -158,12 +158,9 @@ if strcmpi(opt.plotsubjects, 'off')
         end;
         if size(coldata,1) ~= size(data,1), coldata = coldata'; end;
     else
-        coldata = manycol';
+        coldata = manycol;
     end;
-       
-    %coldata = col(mod([0:maxdim-1], length(col))+1);
-    %coldata = col(mod([0:maxdim-1], length(col))+1);
-    %coldata = reshape(coldata(1:length(data(:))), size(data));
+    coldata = reshape(coldata(1:length(data(:))), size(data));
 else
     coldata = cell(size(data));
 end;
