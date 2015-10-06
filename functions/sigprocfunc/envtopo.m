@@ -279,7 +279,7 @@ end
 if ndims(data) == 3
     data = mean(data,3); % average the data if 3-D
 end;
-[chans,frames] = size(data);
+[chans,frames] = size(data); 
 
 if frames > MAX_FRAMES
    error('number of data frames to plot too large!');
@@ -293,6 +293,19 @@ if isstr(g.chanlocs)
         chans);
         return
     end
+end
+% Checking dimension of chanlocs
+if length(g.chanlocs) > size(data,1)
+    fprintf(2,['\n envtopo warning: Dimensions of data to plot and channel location are not consistent\n' ...
+        '                 As a result, the plots generated can be WRONG\n'...
+        '                 If you are providing the path to your channel location file. Make sure\n'...
+        '                 to load the file first, and to provide as an input only the channels that\n'...
+        '                 correspond to the data to be plotted, otherwise just provide a valid chanlocs\n ']);
+elseif length(g.chanlocs) > size(data,1)
+        fprintf(2,['\n envtopo error: Dimensions of data to plot and channel location are not consistent\n' ...
+        '                 Check the dimension of the channel location provided\n'...
+        '                 Aborting plot ...\n']);
+    exit;
 end
 
 if ~isempty(g.colors)
@@ -443,7 +456,7 @@ end
 if isempty(g.voffsets) | ( size(g.voffsets) == [1,1] & g.voffsets(1) == 0 )
     g.voffsets = zeros(1,MAXTOPOS); 
 end
-if isempty(g.plotchans) | g.plotchans(1)==0 
+if isempty(g.plotchans) | g.plotchans(1)==0
     g.plotchans = 1:chans;
 end
 if max(g.plotchans) > chans | min(g.plotchans) < 1
