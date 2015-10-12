@@ -67,8 +67,8 @@ if nargin < 3
 else
     options = varargin;
 end;
-if strcmp(fastif(res.measure, 'on', 'off'), 'on')
-    if exist([STUDY.filepath filesep 'limo_batch_report'],'dir') == 7
+if strcmp(fastif(res.erase, 'on', 'off'), 'on')
+    if exist([STUDY.filepath filesep 'limo_batch_report'],'dir')
         rmdir([STUDY.filepath filesep 'limo_batch_report'],'s');
     end
     STUDY.design(STUDY.currentdesign).limo = [];
