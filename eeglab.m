@@ -1857,7 +1857,7 @@ elseif (exist('EEG') == 1) & ~isnumeric(EEG) & ~isempty(EEG(1).data)
             set( g.val12, 'String', [ num2str(round(tmp.bytes/1E6*10)/10) ' (file mapped)' ]);
         end;
 
-        if EEG.trials > 1
+        if EEG.trials > 1 || EEG.xmin ~= 0
             menustatus = { menustatus{:} 'epoched_dataset' };
         else
             menustatus = { menustatus{:} 'continuous_dataset' };
