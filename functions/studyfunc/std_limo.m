@@ -138,10 +138,12 @@ elseif strncmp(Analysis,'ica',3)
     model.defaults.icaclustering = 1;
 end
 
-% Cleaning old files from the current design
+% Cleaning old files from the current design (Cleaning ALL)
 % -------------------------------------------------------------------------
 if strcmp(opt.erase,'on')
     [tmp,filename] = fileparts(STUDY.filename);
+    
+    % Cleaning level 1 folders
     for i = 1:nb_subjects
         tmpfiles = dir([STUDY.filepath filesep 'LIMO_' filename filesep unique_subjects{i} filesep 'GLM' num2str(STUDY.currentdesign) '*']);
         tmpfiles = {tmpfiles.name};
@@ -151,13 +153,47 @@ if strcmp(opt.erase,'on')
             end
         end
     end
+    
+    % Cleaning level 2 folders
+    if isfield(STUDY.design(design_index),'limo')
+        for nlimos = 1:length(STUDY.design(design_index).limo)
+            for ncontrast = 1:size(STUDY.design(design_index).limo(nlimos).l2files,1)
+                path2file = fileparts(STUDY.design(design_index).limo(nlimos).l2files{ncontrast,2});
+                try
+                    rmdir(path2file,'s');
+                catch
+                    fprintf(2,['Fail to remove. Folder ' path2file ' does not exist or has been removed\n']);
+                end
+            end
+        end
+    end
+    
+    % Cleaning files related with design
+    tmpfiles = dir([STUDY.filepath filesep 'LIMO_' filename]);
+    tmpfiles = {tmpfiles.name};
+    
+    filecell = strfind(tmpfiles,['GLM' num2str(STUDY.currentdesign)]);
+    indxtmp = find(not(cellfun('isempty',filecell)));
+    if ~isempty(indxtmp)
+        for nfile = 1:length(indxtmp)
+            try
+            delete([STUDY.filepath filesep 'LIMO_' filename filesep tmpfiles{indxtmp(nfile)}]);
+            catch
+                fprintf(2,['Fail to remove. File ' tmpfiles{indxtmp(nfile)} ' does not exist or has been removed\n']);
+            end
+        end
+    end
+    
+    % Cleaning limo fields
+    STUDY.design(STUDY.currentdesign).limo = [];
+    
 end
 
 % Check if the measures has been computed
 % -------------------------------------------------------------------------
 for nsubj = 1 : length(unique_subjects)
     inds     = find(strcmp(unique_subjects{nsubj},{STUDY.datasetinfo.subject}));
-    subjpath = fullfile(STUDY.datasetinfo(inds(1)).filepath, [unique_subjects{nsubj} '.' lower(Analysis)]);  
+    subjpath = fullfile(STUDY.datasetinfo(inds(1)).filepath, [unique_subjects{nsubj} '.' lower(Analysis)]);  % Check issue when relative path (remove comment)
     if exist(subjpath,'file') ~= 2
         error('std_limo: Measures must be computed first');
     end
@@ -390,7 +426,7 @@ model.defaults.Level= 1;                             % 1st level analysis
 model.defaults.type_of_analysis = 'Mass-univariate'; % future version will allow other techniques
 
 STUDY.design_info = STUDY.design(design_index).variable;
-STUDY.design_index = design_index;
+STUDY.design_index = design_index; % Limo batch have to be fixed to use the field STUDY.currentdesig
 STUDY.names = names;
 
 % contrast
@@ -411,12 +447,6 @@ for i = 1:length(LIMO_files.Beta)
     limofolders{i} = fileparts(LIMO_files.mat{i});
 end
 
-% Cleaning
-% -------------------------------------------------------------------------
-rmfield(STUDY,'design_index');
-rmfield(STUDY,'design_info');
-rmfield(STUDY,'names');
-
 % Getting indices to save LIMO in STUDY structure (save multiples analysis)
 % -------------------------------------------------------------------------
 if isfield(STUDY.design(STUDY.currentdesign),'limo') && isfield(STUDY.design(STUDY.currentdesign).limo, 'datatype')
@@ -428,15 +458,84 @@ else
     stdlimo_indx = 1;
 end
 
+% Cleaning
+% -------------------------------------------------------------------------
+rmfield(STUDY,'design_index');
+rmfield(STUDY,'design_info');
+rmfield(STUDY,'names');
+
+% Clenainig level 2 folders associated to specific analaysis if opt.erase =
+% 'off' (IF EXIST BEFORE)
+if strcmp(opt.erase,'off')
+    if isfield(STUDY.design(STUDY.currentdesign),'limo') && length(STUDY.design(STUDY.currentdesign).limo) >= stdlimo_indx
+        for ncontrast = 1:size(STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).l2files,1)
+            path2file = fileparts(STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).l2files{ncontrast,2});
+            try
+                rmdir(path2file,'s');
+            catch
+                fprintf(2,['Fail to remove. Folder' path2file ' does not exist or has been removed\n']);
+            end
+        end
+    end
+end
+
 % Assigning info to STUDY
 % -------------------------------------------------------------------------
-STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).datatype       = Analysis;
-STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).foldername     = limofolders';
-STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).chanloc        = LIMO_files.expected_chanlocs;
-STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).beta           = LIMO_files.Beta;
-STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).file           = LIMO_files.mat;
+STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).datatype   = Analysis;
+STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).foldername = limofolders';
+STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).chanloc    = LIMO_files.expected_chanlocs;
+STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).beta       = LIMO_files.Beta;
+STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).file       = LIMO_files.mat;
+STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).l2files    = [];
 
+cd(STUDY.filepath);
+
+% Computing Stats (Just ttest and paired ttest ... by now)
+% -------------------------------------------------------------------------
+% NOTE: 
+% 1- Still need to consider the way to figure it out the types of contrast to perform
+% 2- Group variables need to be defined to split data in groups. ??
+
+% 1 - Computing ttest for each parameter
+nparams = 0;
+if exist('categ','var'),   nparams = max(categ); end;
+if exist('contvar','var'), nparams = nparams + size(contvar,2); end;    
+
+foldername = [STUDY.filename(1:end-6) '_GLM' num2str(STUDY.currentdesign) '_' model.defaults.type '_' model.defaults.analysis '_'];
+nbootval   = 0;
+tfceval    = 0;
+folderpath = LIMO_files.LIMO;
+chanloc    = STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).chanloc ;
+
+filesout = limo_random_select(1,LIMO_files.expected_chanlocs,'nboot'         ,nbootval...
+                                                            ,'tfce'          ,tfceval...
+                                                            ,'analysis_type' ,'fullchan'...
+                                                            ,'parameters'    ,{[1:nparams]}...
+                                                            ,'limofiles'     ,{STUDY.design.limo.beta}...;
+                                                            ,'folderprefix'  ,foldername...
+                                                            ,'folderpath'    ,LIMO_files.LIMO);
+testype = cell([length(filesout),1]);
+testype(:) = {'ttest'};
+
+% 2- Computing Paired ttest for each combination of parameters
+ncomb        = combnk(1:nparams,2);
+limofiles{1} = STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).beta;  
+limofiles{2} = STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).beta; 
+
+for i = 1:size(ncomb,1)
+    tmpname          = [foldername 'par_' num2str(ncomb(i,1)) '_' num2str(ncomb(i,2))];
+    mkdir(LIMO_files.LIMO,tmpname);
+    folderpath       = fullfile(LIMO_files.LIMO,tmpname);
+    filesout{end+1}  = limo_random_select(2,LIMO_files.expected_chanlocs,'nboot'         ,nbootval...
+                                                     ,'tfce'          ,tfceval...
+                                                     ,'analysis_type' ,'fullchan'...
+                                                     ,'parameters'    ,{[ncomb(i,1)] [ncomb(i,2)]}...
+                                                     ,'limofiles'     ,limofiles...
+                                                     ,'folderpath'    ,folderpath);      
+    testype{end+1} = 'p_ttest';
+end
+% Assigning Level 2 info to STUDY
+STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).l2files = [testype filesout'];
+
+% Saving STUDY
 STUDY = pop_savestudy( STUDY, [],'filepath', STUDY.filepath,'savemode','resave');
-
-
-
