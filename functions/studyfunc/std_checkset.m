@@ -234,7 +234,7 @@ if ~studywasempty
         end;
         
         for inddes = 1:length(STUDY.design)
-            if ~isfield(STUDY.design, 'cell') || isempty(STUDY.design.cell)
+            if ~isfield(STUDY.design(inddes), 'cell') || isempty(STUDY.design(inddes).cell)
                 fprintf('Warning: Importing newer STUDY format - some information will be lost\n');
                 STUDY = std_makedesign(STUDY, ALLEEG, inddes, STUDY.design(inddes));
             end;
