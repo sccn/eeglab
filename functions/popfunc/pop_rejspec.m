@@ -209,8 +209,8 @@ if nargin < 3 || opt.eegplotplotallrej == 2
 		eegplot(icaacttmp(opt.elecrange,:,:), 'winlength', 5, 'position', [100 550 800 500], 'limits', ...
 				[EEG.xmin EEG.xmax]*1000 , 'xgrid', 'off', 'tag', 'childEEG' );
 	end;	
-	eegplot( allspec(elecrange,:,:), 'srate', EEG.srate, 'freqlimits', [1 EEG.srate/2], 'command', ...
-			 command, 'children', findobj('tag', 'childEEG'), 'position', [100 50 800 500], eegplotoptions{:}); 
+	eegplot( allspec(elecrange,:,:), 'srate', EEG.srate, 'freqlimits', [1 EEG.srate/2],'freqs', freqs,...
+                                     'command',command, 'children', findobj('tag', 'childEEG'), 'position', [100 50 800 500], eegplotoptions{3:end}); % excluding events
 end;
 if ~isempty(rej)
 	if icacomp	== 1

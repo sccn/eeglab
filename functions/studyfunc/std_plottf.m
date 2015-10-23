@@ -298,7 +298,7 @@ end;
 axes(hdl(nc,ng)); 
 cbar_standard(opt.datatype, ng, opt.unitcolor); 
 if isnan(opt.threshold) && (nc ~= size(hdl,1) || ng ~= size(hdl,2))
-    ind = find(hdl(end:-1:1));
+    ind = find(ishandle(hdl(end:-1:1)));
     axes(hdl(end-ind(1)+1));
     cbar_signif(ng, maxplot);
 end;
@@ -323,7 +323,7 @@ function cbar_standard(datatype, ng, unitcolor);
     set(gca, 'unit', 'normalized');
     if strcmpi(datatype, 'itc')
          cbar(tmp, 0, tmpc, 10); ylim([0.5 1]);
-         title('ITC');
+         title('ITC','fontsize',10,'fontweight','normal');
     elseif strcmpi(datatype, 'erpim')
         cbar(tmp, 0, tmpc, 5);
     else

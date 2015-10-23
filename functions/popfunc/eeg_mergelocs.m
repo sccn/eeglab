@@ -84,6 +84,9 @@ catch,
     [alllocs warn ] = eeg_mergelocs_diffstruct(varargin{:});
 end;
 
+% Checking consistency of chanlocs
+alllocs = eeg_checkchanlocs(alllocs);
+
 % union of two channel location structure
 % without loosing the order information
 % ---------------------------------------

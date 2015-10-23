@@ -214,10 +214,29 @@ if ~studywasempty
         % between dash to cell array of strings
         % -------------------------------------
         for inddes = 1:length(STUDY.design)
+            if length(STUDY.design(inddes).variable) == 0
+                STUDY.design(inddes).variable(1).label = '';
+                STUDY.design(inddes).variable(1).value = [];
+            end;
+            if length(STUDY.design(inddes).variable) == 1
+                STUDY.design(inddes).variable(2).label = '';
+                STUDY.design(inddes).variable(2).value = [];
+            end;
+            if ~isfield(STUDY.design(inddes), 'pairing')
+                STUDY.design(inddes).variable(1).pairing = 'on';
+                STUDY.design(inddes).variable(2).pairing = 'on';
+            end;
             for indvar = 1:length(STUDY.design(inddes).variable)
                 for indval = 1:length(STUDY.design(inddes).variable(indvar).value)
                     STUDY.design(inddes).variable(indvar).value{indval} = convertindvarval(STUDY.design(inddes).variable(indvar).value{indval});
                 end;
+            end;
+        end;
+        
+        for inddes = 1:length(STUDY.design)
+            if ~isfield(STUDY.design(inddes), 'cell') || isempty(STUDY.design(inddes).cell)
+                fprintf('Warning: Importing newer STUDY format - some information will be lost\n');
+                STUDY = std_makedesign(STUDY, ALLEEG, inddes, STUDY.design(inddes));
             end;
             for indcell = 1:length(STUDY.design(inddes).cell)
                 for indval = 1:length(STUDY.design(inddes).cell(indcell).value)

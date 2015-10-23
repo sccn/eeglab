@@ -8,7 +8,7 @@
 %             >> tftopo(tfdata,times,freqs, 'key1', 'val1', 'key2', val2' ...)
 % Inputs:
 %   tfdata    = Set of time/freq images, one for each channel. Matrix dims: 
-%               (time,freq,chans). Else, (time,freq,chans,subjects) for grand mean 
+%               (time,freq),(time,freq,chans). Else, (time,freq,chans,subjects) for grand mean 
 %               RMS plotting.
 %   times     = Vector of image (x-value) times in msec, from timef()).
 %   freqs     = Vector of image (y-value) frequencies in Hz, from timef()).
@@ -108,6 +108,17 @@ if nargin<3
    help tftopo
    return
 end
+icadefs_flag = 1; 
+try
+    icadefs;
+catch
+    warning('icadefs.m can not be located in the path');
+    icadefs_flag = 0 ;
+end
+if ~icadefs_flag
+    AXES_FONTSIZE = 10;
+    PLOT_LINEWIDTH = 2;
+end
 
 % reshape tfdata
 % --------------
@@ -121,7 +132,12 @@ else
     help tftopo
     return
 end
-tfdataori = mean(tfdata,4); % for topoplot
+% for topoplot
+if length(size(tfdata)) >= 4
+    tfdataori = mean(tfdata,4);
+else
+    tfdataori = tfdata;
+end
 
 % test inputs
 % -----------
@@ -286,7 +302,7 @@ if ~isempty(g.plotscalponly)
     axis square;
     hold on
     tl=title([int2str(g.plotscalponly(2)),' ms, ',int2str(g.plotscalponly(1)),' Hz']);
-    set(tl,'fontsize',13);
+    set(tl,'fontsize',AXES_FONTSIZE+3); % 13
     return;
 end;
 
@@ -445,7 +461,22 @@ elseif strcmpi(g.logfreq, 'native'),
         set(gca,'ytick',linspace(minTick, maxTick,50));
     end;
     
-    ft = str2num(get(gca,'yticklabel'));
+    tmpval = get(gca,'yticklabel');
+    if iscell(tmpval)
+        % MATLAB version >= 8.04
+        try
+            ft = str2num(cell2mat(tmpval));
+        catch
+            % To avoid bug in matlab cell2mat. i.e. when tmpval = {'0';'0.5'}
+            for i = 1:length(tmpval)
+                ft(i,1) = str2num(cell2mat(tmpval(i)));
+            end
+        end
+    else
+        % MATLAB version <  8.04
+        ft = str2num(tmpval);           
+    end
+        
     ft = exp(1).^ft;
     ft = unique_bc(round(ft));
     ftick = get(gca,'ytick');
@@ -467,7 +498,7 @@ hold on;
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 axes(imgax)
 xl=xlabel('Time (ms)');
-set(xl,'fontsize',12);
+set(xl,'fontsize',AXES_FONTSIZE+2);%12
 set(gca,'yaxislocation','left')
 if g.showchan>0
    % tl=title(['Channel ',int2str(g.showchan)]);
@@ -482,18 +513,20 @@ else
     else
         tl = title(g.title);
     end
-  set(tl,'fontsize',12);
+  set(tl,'fontsize',AXES_FONTSIZE + 2); %12
+  set(tl,'fontweigh','normal');
 end
 
 yl=ylabel(g.ylabel);
-set(yl,'fontsize',12);
+set(yl,'fontsize',AXES_FONTSIZE + 2);  %12
 
-set(gca,'fontsize',12)
+set(gca,'fontsize',AXES_FONTSIZE + 2); %12
 set(gca,'ydir','normal');
 
 for indtime = g.vert
     tmpy = ylim;
-    plot([indtime indtime],tmpy,[LINECOLOR ':'],'linewidth',ZEROLINEWIDTH);
+    htmp = plot([indtime indtime],tmpy,[LINECOLOR ':']);
+    set(htmp,'linewidth',PLOT_LINEWIDTH)
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -562,7 +595,7 @@ if ~isempty(g.timefreqs)
             tl=title([int2str(g.timefreqs(n,1)) '-' int2str(g.timefreqs(n,2)) 'ms, ' ...
                 int2str(g.timefreqs(n,3)) '-' int2str(g.timefreqs(n,4)) ' Hz']);
         end;
-        set(tl,'fontsize',13);
+        set(tl,'fontsize',AXES_FONTSIZE + 3); %13
         endcaxis = max(endcaxis,max(abs(caxis)));
         %caxis([g.limits(5:6)]);
     end;

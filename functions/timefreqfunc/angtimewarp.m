@@ -75,14 +75,10 @@ function angdataw=angtimewarp(evLatency, newLatency, angdata)
     end
   end
   
-  
   %Check what's going on at tp(max(newLatency)), should equal t(max(evLatency))
-% $$$   keyboard;
   tp(max(evLatency)) = max(newLatency);
   ts = tp-min(newLatency)+1;
   
-% $$$   M = sparse(max(newLatency)-min(newLatency)+1, max(evLatency));
-% $$$   M = zeros(max(newLatency)-min(newLatency)+1, max(evLatency));
   angdataw = zeros(1, max(newLatency)-min(newLatency)+1);
   
   k = 0;
@@ -90,37 +86,28 @@ function angdataw=angtimewarp(evLatency, newLatency, angdata)
     while i > ts(k+1)
       k = k+1;
     end
-% $$$     k = k-1;
     
-% $$$     keyboard;
     if k == 0
-      % Check wether i == ts(1) and i == 1
-      % In that case, M(1,1) = 1
-% $$$       keyboard;
-% $$$       M(1,1) = 1;
+
       angdataw(1) = angdata(1);
     else
-% $$$       M(i,k) = 1 - (i-ts(k))/(ts(k+1)-ts(k));
-% $$$       M(i,k+1) = 1 - (ts(k+1)-i)/(ts(k+1)-ts(k));
       
       %Linear interp
       angdataw(i) = angdata(k)*(1 - (i-ts(k))/(ts(k+1)-ts(k))) + ...
-          angdata(k+1)*(1 - (ts(k+1)-i)/(ts(k+1)-ts(k)));
+                    angdata(k+1)*(1 - (ts(k+1)-i)/(ts(k+1)-ts(k)));
       
-      %Correction because angles have a ring structure
-      theta1 = [angdata(k) angdata(k+1) angdataw(i)];
-      theta2 = theta1 - min(angdata(k), angdata(k+1));
-      theta2max = max(theta2(1), theta2(2));
-% $$$       if i == 13
-% $$$         keyboard; %so we get a chance to check wether 0<theta2(3)<2pi
-% $$$       end
-      if ~ ( (theta2max <= pi & theta2(3) <= theta2max) | ...
-             (theta2max >= pi & theta2(3) >= theta2max) | ...
-             theta2(3) == theta2(1) | theta2(3) == theta2(2) )
-        angdataw(i) = angdataw(i) + pi;
-      end
-      if angdataw(i) > pi %Make sure we're still on [-pi, pi]
-        angdataw(i) = angdataw(i) - 2*pi;
-      end
+%       %Correction because angles have a ring structure
+%       theta1 = [angdata(k) angdata(k+1) angdataw(i)];
+%       theta2 = theta1 - min(angdata(k), angdata(k+1));
+%       theta2max = max(theta2(1), theta2(2));
+%       if ~ ( (theta2max <= pi & theta2(3) <= theta2max) | ...
+%              (theta2max >= pi & theta2(3) >= theta2max) | ...
+%              theta2(3) == theta2(1) | theta2(3) == theta2(2) )
+%         angdataw(i) = angdataw(i) + pi;
+%       end
+%       if angdataw(i) > pi %Make sure we're still on [-pi, pi]
+%         angdataw(i) = angdataw(i) - 2*pi;
+%       end
     end
   end
+  angdataw = wrapToPi(angdataw);

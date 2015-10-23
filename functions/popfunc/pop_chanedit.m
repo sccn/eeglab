@@ -160,7 +160,7 @@ if nargin < 2
     orichaninfo = [];
 end;
 
-if isempty(chans) || ~ishandle(chans)
+if isempty(chans) || all(~ishandle(chans))
     % in case an EEG structure was given as input
     % -------------------------------------------
     if isfield(chans, 'chanlocs')
@@ -712,15 +712,17 @@ else
                 fields = { 'labels' 'theta' 'radius' 'X' 'Y' 'Z' 'sph_theta' 'sph_phi' 'sph_radius' 'type' };
                 tmpdiff = setdiff(fields, allfields);
                 if ~isempty(tmpdiff), error(sprintf('Field "%s" missing in channel location structure', tmpdiff{1})); end;
+                [tmp,ia,tmp] = intersect(allfields,fields,'stable');  %Getting the original order from file
+                origfield = allfields(ia);
                 fprintf(fid, 'Number\t');
                 for field = 1:length(fields)
-                    fprintf(fid, '%s\t', fields{field});
+                    fprintf(fid, '%s\t', origfield{field});
                 end;
                 fprintf(fid, '\n');
                 for index=1:length(chans)
                     fprintf(fid, '%d\t',  index);
                     for field = 1:length(fields)
-                        tmpval = getfield(chans, {index}, fields{field});
+                        tmpval = getfield(chans, {index}, origfield{field});
                         if isstr(tmpval)
                             fprintf(fid, '%s\t',  tmpval);
                         else

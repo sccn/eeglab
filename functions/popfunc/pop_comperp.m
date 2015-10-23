@@ -202,9 +202,9 @@ if length(datadd) == 1
     g.alpha = [];
 end;
 
-figure; axcopy
+h = figure; axcopy
 
-try, icadefs; set(gcf, 'color', BACKCOLOR); axis off; catch, end;
+try, icadefs; set(h, 'color', BACKCOLOR); axis off; catch, end;
 
 % backward compatibility of param
 % -------------------------------
@@ -361,6 +361,7 @@ end;
 
 % plot data
 % ---------
+set(0, 'CurrentFigure', h);
 plottopo( erptoplot, 'chanlocs', chanlocs, 'frames', pnts, ...
           'limits', [xmin xmax 0 0]*1000, 'title', g.title, 'colors', colors, ...
           'chans', g.chans, 'legend', legend, 'regions', regions, 'ylim', g.ylim, g.tplotopt{:});

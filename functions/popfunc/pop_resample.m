@@ -3,6 +3,7 @@
 % Usage:
 %   >> [OUTEEG] = pop_resample( INEEG ); % pop up interactive window
 %   >> [OUTEEG] = pop_resample( INEEG, freq);
+%   >> [OUTEEG] = pop_resample( INEEG, freq, fc, df);
 %
 % Graphical interface:
 %   The edit box entitled "New sampling rate" contains the frequency in
@@ -12,6 +13,12 @@
 % Inputs:
 %   INEEG      - input dataset
 %   freq       - frequency to resample (Hz)  
+%
+% Optional inputs:
+%   fc         - anti-aliasing filter cutoff (pi rad / sample)
+%                {default 0.9}
+%   df         - anti-aliasing filter transition band width (pi rad /
+%                sample) {default 0.2}
 %
 % Outputs:
 %   OUTEEG     - output dataset
@@ -45,7 +52,7 @@
 % 03-08-02 debug call to function help -ad
 % 04-05-02 recompute event latencies -ad
 
-function [EEG, command] = pop_resample( EEG, freq); 
+function [EEG, command] = pop_resample( EEG, freq, fc, df); 
 
 command = '';
 if nargin < 1
@@ -68,6 +75,19 @@ if nargin < 2
 
 end;
 
+% Default cutoff frequency (pi rad / smp)
+if nargin < 3 || isempty(fc)
+    fc = 0.9;
+end
+% Default transition band width (pi rad / smp)
+if nargin < 4 || isempty(df)
+    df = 0.2;
+end
+% fc in range?
+if fc < 0 || fc > 1
+    error('Anti-aliasing filter cutoff freqeuncy out of range.')
+end
+
 % process multiple datasets
 % -------------------------
 if length(EEG) > 1
@@ -76,7 +96,8 @@ if length(EEG) > 1
 end;
 
 % finding the best ratio
-[p,q] = rat(freq/EEG.srate, 0.0001); % not used right now 
+% [p,q] = rat(freq/EEG.srate, 0.0001) % not used right now 
+[p,q] = rat(freq/EEG.srate, 1e-12); % used! AW
 
 % set variable
 % ------------
@@ -120,7 +141,7 @@ for index1 = 1:size(EEG.data,1)
         tmpres = [];
         indices = [1];
         for ind = 1:length(bounds)-1
-            tmpres  = [ tmpres; myresample( double( sigtmp(bounds(ind):bounds(ind+1)-1,:)), p, q, usesigproc ) ];
+            tmpres  = [ tmpres; myresample( double( sigtmp(bounds(ind):bounds(ind+1)-1,:)), p, q, usesigproc, fc, df ) ];
             indices = [ indices size(tmpres,1)+1 ];
         end;
         if size(tmpres,1) == 1, EEG.pnts  = size(tmpres,2);
@@ -132,7 +153,7 @@ for index1 = 1:size(EEG.data,1)
         end;
     else
         for ind = 1:length(bounds)-1
-            tmpres(indices(ind):indices(ind+1)-1,:) = myresample( double( sigtmp(bounds(ind):bounds(ind+1)-1,:) ), p, q, usesigproc );
+            tmpres(indices(ind):indices(ind+1)-1,:) = myresample( double( sigtmp(bounds(ind):bounds(ind+1)-1,:) ), p, q, usesigproc, fc, df);
         end;
     end; 
     tmpeeglab(index1,:, :) = tmpres;
@@ -204,7 +225,7 @@ return;
 
 % resample if resample is not present
 % -----------------------------------
-function tmpeeglab = myresample(data, pnts, new_pnts, usesigproc);
+function tmpeeglab = myresample(data, p, q, usesigproc, fc, df)
     
     if length(data) < 2
         tmpeeglab = data;
@@ -225,27 +246,71 @@ function tmpeeglab = myresample(data, pnts, new_pnts, usesigproc);
         %The problem can be solved by padding the data at beginning and end by a DC
         %constant before resampling.
 
-        [p, q] = rat(pnts / new_pnts, 1e-12); % Same precision as in resample
-        N = 10; % Resample default
-        nPad = ceil((max(p, q) * N) / q) * q; % # datapoints to pad, round to integer multiple of q for unpadding
-        tmpeeglab = resample([data(ones(1, nPad), :); data; data(end * ones(1, nPad), :)], pnts, new_pnts);
+%         N = 10; % Resample default
+%         nPad = ceil((max(p, q) * N) / q) * q; % # datapoints to pad, round to integer multiple of q for unpadding
+%         tmpeeglab = resample([data(ones(1, nPad), :); data; data(end * ones(1, nPad), :)], pnts, new_pnts);
+
+        % Conservative custom anti-aliasing FIR filter, see bug 1757
+        nyq = 1 / max([p q]);
+        fc = fc * nyq; % Anti-aliasing filter cutoff frequency
+        df = df * nyq; % Anti-aliasing filter transition band width
+        m = pop_firwsord('kaiser', 2, df, 0.002); % Anti-aliasing filter kernel
+        b = firws(m, fc, windows('kaiser', m + 1, 5)); % Anti-aliasing filter kernel
+        b = p * b; % Normalize filter kernel to inserted zeros
+%         figure; freqz(b, 1, 2^14, q * 1000) % Debugging only! Sampling rate hardcoded as it is unknown in this context. Manually adjust for debugging!
+
+        % Padding, see bug 1017
+        nPad = ceil((m / 2) / q) * q; % Datapoints to pad, round to integer multiple of q for unpadding
+        startPad = repmat(data(1, :), [nPad 1]);
+        endPad = repmat(data(end, :), [nPad 1]);
+
+        % Resampling
+        tmpeeglab = resample([startPad; data; endPad], p, q, b);
+
+        % Remove padding
         nPad = nPad * p / q; % # datapoints to unpad
         tmpeeglab = tmpeeglab(nPad + 1:end - nPad, :); % Remove padded data
-        return;
-    end;
-    
-    % anti-alias filter
-    % -----------------
-    data         = eegfiltfft(data', 256, 0, 128*pnts/new_pnts); % Downsample from 256 to 128 times the ratio of freq. 
-                                                                 % Code was verified by Andreas Widdman March  2014
-    
-    % spline interpolation
-    % --------------------
-    X            = [1:length(data)];
-    nbnewpoints  = length(data)*pnts/new_pnts;
-    nbnewpoints2 = ceil(nbnewpoints);
-    lastpointval = length(data)/nbnewpoints*nbnewpoints2;        
-    XX = linspace( 1, lastpointval, nbnewpoints2);
-    
-    cs = spline( X, data);
-    tmpeeglab = ppval(cs, XX)';
+
+    else % No Signal Processing toolbox
+        
+        % anti-alias filter
+        % -----------------
+%        data         = eegfiltfft(data', 256, 0, 128*pnts/new_pnts); % Downsample from 256 to 128 times the ratio of freq. 
+%                                                                      % Code was verified by Andreas Widdman March  2014
+
+%                                                                      % No! Only cutoff frequency for downsampling was confirmed.
+%                                                                      % Upsampling doesn't work and FFT filtering introduces artifacts.
+%                                                                      % Also see bug 1757. Replaced May 05, 2015, AW
+
+        if p < q, nyq = p / q; else nyq = q / p; end
+        fc = fc * nyq; % Anti-aliasing filter cutoff frequency
+        df = df * nyq; % Anti-aliasing filter transition band width
+        m = pop_firwsord('kaiser', 2, df, 0.002); % Anti-aliasing filter kernel
+        b = firws(m, fc, windows('kaiser', m + 1, 5)); % Anti-aliasing filter kernel
+%         figure; freqz(b, 1, 2^14, 1000) % Debugging only! Sampling rate hardcoded as it is unknown in this context. Manually adjust for debugging!
+
+        if p < q % Downsampling, anti-aliasing filter
+            data = firfiltdcpadded(b, data, 0);
+        end
+
+        % spline interpolation
+        % --------------------
+%         X            = [1:length(data)];
+%         nbnewpoints  = length(data)*p/q;
+%         nbnewpoints2 = ceil(nbnewpoints);
+%         lastpointval = length(data)/nbnewpoints*nbnewpoints2;        
+%         XX = linspace( 1, lastpointval, nbnewpoints2);
+
+        % New time axis scaling, May 06, 2015, AW
+        X = 0:length(data) - 1;
+        newpnts  = ceil(length(data) * p / q);
+        XX = (0:newpnts - 1) / (p / q);
+
+        cs = spline( X, data);
+        tmpeeglab = ppval(cs, XX)';
+
+        if p > q % Upsampling, anti-imaging filter
+            tmpeeglab = firfiltdcpadded(b, tmpeeglab, 0);
+        end
+
+    end

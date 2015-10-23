@@ -7,7 +7,7 @@
 %                         % button 'Update Marks' but perform no actual data rejection.
 %                         % Do not show or use marks from previous visual inspections
 %                         % or from semi-auotmatic rejection.
-%   >> pop_eegplot( EEG, typerej, superpose, reject );
+%   >> pop_eegplot( EEG, icacomp, superpose, reject );
 %
 % Graphic interface:
 %   "Add to previously marked rejections" - [edit box] Either YES or NO. 
@@ -16,7 +16,7 @@
 %                    equivalent 'reject'.
 % Inputs:
 %   EEG        - input EEG dataset
-%   typerej    - type of rejection 0 = independent components; 
+%   icacomp    - type of rejection 0 = independent components; 
 %                                  1 = data channels. {Default: 1 = data channels}
 %   superpose  - 0 = Show new marks only: Do not color the background of data portions 
 %                    previously marked for rejection by visual inspection. Mark new data 
@@ -41,7 +41,9 @@
 %                1 = Reject marked trials. After inspecting/selecting data portions for
 %                    rejection, press button 'Reject' to reject (remove) them from the EEG 
 %                    dataset (i.e., those portions plottted on a colored background. 
-%                    {default: 0, mark for rejection only}
+%                    {default: 1, mark for rejection only}
+%
+%  topcommand   -  Input deprecated.  Kept for compatibility with other function calls
 % Outputs:
 %   Modifications are applied to the current EEG dataset at the end of the
 %   eegplot() call, when the user presses the 'Update Marks' or 'Reject' button.

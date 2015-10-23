@@ -89,7 +89,7 @@ end;
 % -----------------
 column =ceil(sqrt( length(compnum) ))+1;
 rows = ceil(length(compnum)/column);
-if ~exist('fig')
+if ~exist('fig','var')
 	figure('name', [ 'Reject components by map - pop_selectcomps() (dataset: ' EEG.setname ')'], 'tag', currentfigtag, ...
 		   'numbertitle', 'off', 'color', BACKCOLOR);
 	set(gcf,'MenuBar', 'none');
@@ -120,7 +120,7 @@ else
 end;
 count = 1;
 for ri = compnum
-	if exist('fig')
+	if exist('fig','var')
 		button = findobj('parent', fig, 'tag', ['comp' num2str(ri)]);
 		if isempty(button) 
 			error( 'pop_selectcomps(): figure does not contain the component button');
@@ -137,10 +137,9 @@ for ri = compnum
 
 		% plot the head
 		% -------------
-		if ~strcmp(get(gcf, 'tag'), currentfigtag);
-			disp('Aborting plot');
-			return;
-		end;
+        if ~strcmp(get(gcf, 'tag'), currentfigtag);
+            figure(findobj('tag', currentfigtag));
+        end;
 		ha = axes('Units','Normalized', 'Position',[X Y sizewx sizewy].*s+q);
         if plotelec
             topoplot( EEG.icawinv(:,ri), EEG.chanlocs, 'verbose', ...
@@ -153,6 +152,9 @@ for ri = compnum
 
 		% plot the button
 		% ---------------
+         if ~strcmp(get(gcf, 'tag'), currentfigtag);
+             figure(findobj('tag', currentfigtag));
+         end
 		button = uicontrol(gcf, 'Style', 'pushbutton', 'Units','Normalized', 'Position',...
                            [X Y+sizewy sizewx sizewy*0.25].*s+q, 'tag', ['comp' num2str(ri)]);
         command = sprintf('pop_prop( %s, 0, %d, gcbo, { ''freqrange'', [1 50] });', inputname(1), ri); %RMC command = sprintf('pop_prop( %s, 0, %d, %3.15f, { ''freqrange'', [1 50] });', inputname(1), ri, button);
@@ -165,7 +167,10 @@ end;
 
 % draw the bottom button
 % ----------------------
-if ~exist('fig')
+if ~exist('fig','var')
+    if ~strcmp(get(gcf, 'tag'), currentfigtag);
+        figure(findobj('tag', currentfigtag));
+    end
 	hh = uicontrol(gcf, 'Style', 'pushbutton', 'string', 'Cancel', 'Units','Normalized', 'backgroundcolor', GUIBUTTONCOLOR, ...
 			'Position',[-10 -10  15 sizewy*0.25].*s+q, 'callback', 'close(gcf); fprintf(''Operation cancelled\n'')' );
 	hh = uicontrol(gcf, 'Style', 'pushbutton', 'string', 'Set threhsolds', 'Units','Normalized', 'backgroundcolor', GUIBUTTONCOLOR, ...

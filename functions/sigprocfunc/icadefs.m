@@ -43,7 +43,7 @@ HZDIR = 'up';               % ascending freqs = 'up'; descending = 'down'
 % Checking MATLAB version
 tmpvers = version;
 indp = find(tmpvers == '.');
-if str2num(tmpvers(indp(1)+1)) > 1, tmpvers = [ tmpvers(1:indp(1)) '0' tmpvers(indp(1)+1:end) ]; end;
+if str2num(tmpvers(indp(1)+1)) >= 1, tmpvers = [ tmpvers(1:indp(1)) '0' tmpvers(indp(1)+1:end) ]; end;
 indp = find(tmpvers == '.');
 VERS = str2num(tmpvers(1:indp(2)-1));                            
 
