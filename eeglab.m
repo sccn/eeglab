@@ -1341,7 +1341,7 @@ if ismatlab
     alltexth = setdiff_bc(alltexth, titleh);
 
     set(gcf, 'Position',[200 100 (WINMINX+WINMAXX+2*BORDERINT+2*BORDEREXT) (WINY+2*BORDERINT+2*BORDEREXT) ]);
-    set(titleh, 'fontsize', 14, 'fontweight', 'bold');
+    set(titleh, 'fontsize', TEXT_FONTSIZE_L, 'fontweight', 'bold');
     set(alltexth, 'fontname', FONTNAME, 'fontsize', FONTSIZE);
     set(W_MAIN, 'visible', 'on');
 end;
