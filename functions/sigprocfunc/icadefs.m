@@ -59,7 +59,7 @@ end;
 if retinaDisplay && strcmpi(tmpComputer(1:3), 'MAC')
     W_MAIN = findobj('tag', 'EEGLAB');
     if isempty(W_MAIN)
-        disp('Mac OSX retina display detected. If this is not the case uncoment line 50 of icadefs.m');
+        disp('Mac OSX retina display detected. If this is not the case uncoment line 58 of icadefs.m');
     end;
     GUI_FONTSIZE  = 18; % graphic interface font size
     AXES_FONTSIZE = 18; % Axis labels and legend font size
@@ -89,23 +89,43 @@ if VERS < 8.04
     TEXT_FONTSIZE_L = TEXT_FONTSIZE + 2; % Miscellaneous font sizes Large
     
 elseif VERS >= 8.04
-    PLOT_LINEWIDTH   = 1;
-    PLOT_LINEWIDTH_S = 0.5;
-    
-    % AXES FONTSIZE
-    AXES_FONTSIZE   = 9;                 % Axis labels and legend font size
-    AXES_FONTSIZE_S = AXES_FONTSIZE - 2; % Axis labels and legend font size Small
-    AXES_FONTSIZE_L = 12.5;              % Axis labels and legend font size Large
-    
-    % GUI FONTSIZE
-    GUI_FONTSIZE    = 9;                % graphic interface font size
-    GUI_FONTSIZE_S  = GUI_FONTSIZE - 2; % graphic interface font size Small
-    GUI_FONTSIZE_L  = GUI_FONTSIZE + 2; % graphic interface font size Large
-   
-    % TEXT FONTSIZE
-    TEXT_FONTSIZE   = 9;                 % Miscellaneous font sizes
-    TEXT_FONTSIZE_S = TEXT_FONTSIZE - 2; % Miscellaneous font sizes Small
-    TEXT_FONTSIZE_L = TEXT_FONTSIZE + 2; % Miscellaneous font sizes Large
+    if strcmpi(tmpComputer(1:3), 'MAC')
+        PLOT_LINEWIDTH   = 1;
+        PLOT_LINEWIDTH_S = 0.5;
+        
+        % AXES FONTSIZE
+        AXES_FONTSIZE   = 9;                 % Axis labels and legend font size
+        AXES_FONTSIZE_S = AXES_FONTSIZE - 2; % Axis labels and legend font size Small
+        AXES_FONTSIZE_L = 12.5;              % Axis labels and legend font size Large
+        
+        % GUI FONTSIZE
+        GUI_FONTSIZE    = 12;                % graphic interface font size
+        GUI_FONTSIZE_S  = GUI_FONTSIZE - 2; % graphic interface font size Small
+        GUI_FONTSIZE_L  = GUI_FONTSIZE + 2; % graphic interface font size Large
+        
+        % TEXT FONTSIZE
+        TEXT_FONTSIZE   = 12;                 % Miscellaneous font sizes
+        TEXT_FONTSIZE_S = TEXT_FONTSIZE - 2; % Miscellaneous font sizes Small
+        TEXT_FONTSIZE_L = TEXT_FONTSIZE + 4; % Miscellaneous font sizes Large
+    else
+        PLOT_LINEWIDTH   = 1;
+        PLOT_LINEWIDTH_S = 0.5;
+        
+        % AXES FONTSIZE
+        AXES_FONTSIZE   = 9;                 % Axis labels and legend font size
+        AXES_FONTSIZE_S = AXES_FONTSIZE - 2; % Axis labels and legend font size Small
+        AXES_FONTSIZE_L = 12.5;              % Axis labels and legend font size Large
+        
+        % GUI FONTSIZE
+        GUI_FONTSIZE    = 10;                % graphic interface font size
+        GUI_FONTSIZE_S  = GUI_FONTSIZE - 2; % graphic interface font size Small
+        GUI_FONTSIZE_L  = GUI_FONTSIZE + 2; % graphic interface font size Large
+        
+        % TEXT FONTSIZE
+        TEXT_FONTSIZE   = 10;                 % Miscellaneous font sizes
+        TEXT_FONTSIZE_S = TEXT_FONTSIZE - 2; % Miscellaneous font sizes Small
+        TEXT_FONTSIZE_L = TEXT_FONTSIZE + 4; % Miscellaneous font sizes Large
+    end
 end;
 
 clear retinaDisplay tmpScreenSize tmpComputer tmpvers indp;
