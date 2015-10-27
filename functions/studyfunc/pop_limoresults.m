@@ -200,6 +200,9 @@ classdef pop_limoresults < handle
             %set the callback function for checkbox_stats
             set(obj.gui_h.listbox_elect2plot,'Callback', @obj.callback_listbox_elect2plot); 
             
+            %set the callback function for buttom_designadd
+            set(obj.gui_h.pushbutton_designadd, 'Callback', @obj.callback_pushbutton_designadd);
+            
         end
         % =================================================================
         function obj = callback_popupmenu_level(obj,~,~)
@@ -379,36 +382,12 @@ classdef pop_limoresults < handle
         end
         % =================================================================
         function obj = callback_popupmenu_modelvar2plot(obj,~,~)
-            val_level  = get( obj.gui_h.popupmenu_level        ,'Value');
-            val_mplot  = get(obj.gui_h.popupmenu_measure2plot  ,'Value');
-            plottype   = get(obj.gui_h.popupmenu_plottype      ,'Value');
+            
             stringtmp  = get(obj.gui_h.popupmenu_modelvar2plot ,'String');
             valtmp     = get(obj.gui_h.popupmenu_modelvar2plot ,'Value');
-            val_dor    = get(obj.gui_h.popupmenu_dataorresult  ,'Value');
             
-            % Just if last line if selected
-            %--------------------------------------------------------------
-            if valtmp == length(stringtmp) && (plottype ~= 3) && val_level ~= 1 && val_dor ~= 1
-                limo_contrast_manager(fullfile(obj.limofiles_path,'LIMO.mat'));
-                htmp = findall(0,'Type','Figure','Tag','figure_limo_contrast_manager');
-                if ~isempty(htmp)
-                    waitfor(htmp); clear htmp;
-                end
-                % Get new generated file and add it to the list as current
-                % ---------------------------------------------------------
-                currentfiles = getmeasures2plot(obj.study,val_level-1,val_mplot,obj.datorica_indx);
-                newfile = setdiff(currentfiles,stringtmp);
-                if ~isempty(newfile)
-                    stringtmp(end+1) = newfile;
-                    set(obj.gui_h.popupmenu_modelvar2plot,'String',currentfiles);
-                    set(obj.gui_h.popupmenu_modelvar2plot,'Value',length(currentfiles)-1);
-                    obj.limofiles_filename = newfile{1};
-                else
-                    set(obj.gui_h.popupmenu_modelvar2plot,'Value',1);
-                end
-            else
-                obj.limofiles_filename = stringtmp{valtmp};
-            end
+            obj.limofiles_filename = stringtmp{valtmp};
+            
         end
         % =================================================================
         function obj = callback_popupmenu_plottype(obj,~,~)
@@ -421,8 +400,14 @@ classdef pop_limoresults < handle
                 obj = callback_popupmenu_level(obj);
                 
                 % Updating listbox_elect2plot
-                set(obj.gui_h.listbox_elect2plot ,'Value',1);
-                set(obj.gui_h.listbox_elect2plot ,'Enable','off');
+                set(obj.gui_h.listbox_elect2plot   ,'Value',1);
+                set(obj.gui_h.listbox_elect2plot   ,'Enable','off');
+                     
+                if  val_dor == 1
+                    set(obj.gui_h.pushbutton_designadd ,'Enable','off');
+                else
+                    set(obj.gui_h.pushbutton_designadd ,'Enable','on');
+                end
                 
             elseif val_ptype == 3
                 
@@ -435,8 +420,9 @@ classdef pop_limoresults < handle
                     set(obj.gui_h.popupmenu_modelvar2plot ,'String',listtmp);
                     set(obj.gui_h.popupmenu_modelvar2plot ,'Value',1);
                 end
-                set(obj.gui_h.listbox_elect2plot ,'Enable','on');
-                set(obj.gui_h.listbox_elect2plot ,'Value',2);
+                set(obj.gui_h.listbox_elect2plot   ,'Enable','on');
+                set(obj.gui_h.listbox_elect2plot   ,'Value' ,2);
+                set(obj.gui_h.pushbutton_designadd ,'Enable','off');
             end
             
         end
@@ -454,10 +440,17 @@ classdef pop_limoresults < handle
                     set(obj.gui_h.popupmenu_modelvar2plot,'String',obj.catvarnames); % THIS MUST INCLUDE CONT!!!!!!!!!!!!!?????
                     set(obj.gui_h.popupmenu_modelvar2plot,'Value',1);
                 end
+                
+                % Add design disable
+                set(obj.gui_h.pushbutton_designadd ,'Enable','off');
+                
             elseif val_dor == 2
                 if val_ptype == 1 || val_ptype == 2
                     % Call callback_popupmenu_level
                     obj = callback_popupmenu_level(obj);
+                    
+                % Add design enable
+                set(obj.gui_h.pushbutton_designadd ,'Enable','on');
                     
                 elseif val_ptype == 3
                     set(obj.gui_h.popupmenu_modelvar2plot,'String',obj.regnames);
@@ -465,8 +458,12 @@ classdef pop_limoresults < handle
                     
                     % Call callback_popupmenu_level
                     obj = callback_popupmenu_level(obj);
-                end 
-            end 
+                    
+                    % Add design disable
+                    set(obj.gui_h.pushbutton_designadd ,'Enable','off');
+                    
+                end
+            end
         end
         % =================================================================
         function obj = callback_checkbox_stats(obj,~,~)
@@ -807,10 +804,35 @@ classdef pop_limoresults < handle
                     fprintf(2,'Still working on this......\n');
             end
         end
+        
+        % =================================================================
+        function obj = callback_pushbutton_designadd(obj,~,~)
+            val_level  = get( obj.gui_h.popupmenu_level        ,'Value');
+            val_mplot  = get(obj.gui_h.popupmenu_measure2plot  ,'Value');
+            stringtmp  = get(obj.gui_h.popupmenu_modelvar2plot ,'String');
+            
+            limo_contrast_manager(fullfile(obj.limofiles_path,'LIMO.mat'));
+            htmp = findall(0,'Type','Figure','Tag','figure_limo_contrast_manager');
+            if ~isempty(htmp)
+                waitfor(htmp); clear htmp;
+            end
+            % Get new generated file and add it to the list as current
+            % ---------------------------------------------------------
+            currentfiles = getmeasures2plot(obj.study,val_level-1,val_mplot,obj.datorica_indx);
+            newfile = setdiff(currentfiles,stringtmp);
+            if ~isempty(newfile)
+                stringtmp(end+1) = newfile;
+                set(obj.gui_h.popupmenu_modelvar2plot,'String',currentfiles);
+                set(obj.gui_h.popupmenu_modelvar2plot,'Value',length(currentfiles)-1);
+                obj.limofiles_filename = newfile{1};
+            else
+                set(obj.gui_h.popupmenu_modelvar2plot,'Value',1);
+            end
+        end
     end
 end
 % =================================================================
-% =================================================================
+%% =================================================================
 function handles = guibuilder(STUDY,analysis)
 
 % Create list "Level of Analysis" (Using First Subject)
@@ -886,22 +908,22 @@ textpos   = {[0.0349 0.941 0.333 0.0428],...
     [0.0349 0.378 0.345 0.0428],...
     [0.0426 0.591 0.705 0.242 ],...
     [0.0426 0.227 0.481 0.197]};
-textstring = {'Level of Analysis','Data Measure','Plot Type','Data or Results','Model Variable to Plot','Threshold (p-value )','Electrodes to Plot','Method','Computational Approach'};
+textstring = {'Level of Analysis','Data Measure','Plot Type','Data or Results','Variable to Plot','Threshold (p-value )','Electrodes to Plot','Method','Computational Approach'};
 % Stuff for popupmenus
 %--------------------------------------------------------------------------
 plottype_list    = {'Combined Plot','Scalp Maps Series','Time Course'};
 datorresult_list = {'Data';'Linear Model Results'};
 mcc_list         = {'None';'Clustering';'TFCE';'Max'};
 compmethod_list  = {'None','Default Method'};
-
+xalign1          = 0.450; %0.481;
 popupnames = {'popupmenu_level','popupmenu_measure2plot','popupmenu_plottype','popupmenu_dataorresult','popupmenu_modelvar2plot','popupmenu_mcc','popupmenu_compmethod'};
-popuppos   = {[0.481 0.921 0.519 0.0625],... % level
-    [0.481 0.829 0.519 0.0625],... % measure2plot
-    [0.481 0.737 0.519 0.0625],... % plottype
-    [0.481 0.645 0.519 0.0625],... % dataorresult
-    [0.481 0.553 0.519 0.0625],... % modelvar2plot
-    [0.535 0.561 0.465 0.273 ],... % mcc
-    [0.535 0.152 0.465 0.273]};    % compmethod
+popuppos   = {[xalign1 0.921 0.550 0.0625],...           % level
+              [xalign1 0.829 0.550 0.0625],...           % measure2plot
+              [xalign1 0.737 0.550 0.0625],...           % plottype
+              [xalign1 0.645 0.550 0.0625],...           % dataorresult
+              [xalign1+0.08 0.553 0.550-0.08 0.0625],... % modelvar2plot
+              [0.535 0.561 0.465 0.273 ],...             % mcc
+              [0.535 0.152 0.465 0.273]};                % compmethod
 popupstring = {listlevel,measure2plot_list,plottype_list,datorresult_list,var2plot_list,mcc_list,compmethod_list};
 popupindex  = {2,measure2plot_indx,1,2,var2plot_indx,1,1};
 %-------------------------------------------------------------------------
@@ -917,7 +939,7 @@ handles.fig = figure('MenuBar','none',...
     'NumberTitle','off',...
     'Units', 'Points',...
     'Color', color,...
-    'Position',[549.072 185.686 273.538 466.212],...
+    'Position',[549.072 185.686 283.538 466.212],...
     'Resize', 'off');
 
 %Pannel 1 (Plot Settings)
@@ -983,7 +1005,7 @@ set(handles.popupmenu_compmethod,'Enable','off');
 handles.edit_pval = uicontrol('parent',handles.panel_1,...
     'style','edit',...
     'units','normalized',...
-    'position',[0.488 0.451 0.271 0.0724],...
+    'position',[xalign1+0.02 0.451 0.271 0.0724],...
     'string',pval_default,...
     'backgroundcolor',[0.929 0.929 0.929],...
     'tooltipString',ttiptext{6},...
@@ -993,7 +1015,7 @@ handles.edit_pval = uicontrol('parent',handles.panel_1,...
 handles.listbox_elect2plot = uicontrol('parent',handles.panel_1,...
     'style','listbox',...
     'units','normalized',...
-    'position',[0.488 0.0263 0.488 0.395],...
+    'position',[xalign1+0.02 0.0263 0.488 0.395],...
     'string',electoplot_list,...
     'Value',electoplot_indx,...
     'backgroundcolor',[0.929 0.929 0.929],...
@@ -1008,7 +1030,7 @@ handles.listbox_elect2plot = uicontrol('parent',handles.panel_1,...
 handles.checkbox_stats = uicontrol('parent',handles.fig,...
     'style','checkbox',...
     'units','normalized',...
-    'position',[0.755 0.253 0.106 0.0493],...
+    'position',[0.73 0.253 0.106 0.0493],...
     'string','',...
     'backgroundcolor',color,...
     'Tag','checkbox_stats');
@@ -1021,9 +1043,21 @@ handles.pushbutton_plot = uicontrol('parent',handles.fig,...
     'string','PLOT',...
     'backgroundcolor',[0.929 0.929 0.929],...
     'Tag', 'pushbutton_plot');
+
+% Button add design
+handles.pushbutton_designadd = uicontrol('parent',handles.panel_1,...
+    'style','pushbutton',...
+    'units','normalized',...
+    'position',[xalign1+0.02 0.553+0.005 0.07 0.0625 - 0.005],...
+    'string','+',...
+    'FontWeight','bold',...
+    'FontSize', 12,...
+    'tooltipString','Add contrast',...
+    'backgroundcolor',[0.929 0.929 0.929],...
+    'Tag', 'pushbutton_designadd');
 end
 
-% =================================================================
+%% =================================================================
 function [var2plot_list,filespath,limoindx] = getmeasures2plot(STUDY,subjN,measureindx,datoricaindx)
 
 % measureindx  is the index to {'erp','spec'}
@@ -1058,7 +1092,6 @@ if ismember(requested_datatype,measures_computed)
     tmp = dir(filespath);
     if ~isempty({tmp.name})
         var2plot_list        = {tmp.name}';
-        var2plot_list{end+1} = 'Add New Contrast';
         
         % Cleaning out the list
         %----------------------
