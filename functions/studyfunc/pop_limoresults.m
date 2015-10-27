@@ -889,8 +889,8 @@ textpos   = {[0.0349 0.941 0.333 0.0428],...
 textstring = {'Level of Analysis','Data Measure','Plot Type','Data or Results','Model Variable to Plot','Threshold (p-value )','Electrodes to Plot','Method','Computational Approach'};
 % Stuff for popupmenus
 %--------------------------------------------------------------------------
-plottype_list    = {'Combined Plot','Scalp Maps','Time Course'};
-datorresult_list = {'Original Data';'Linear Model Results'};
+plottype_list    = {'Combined Plot','Scalp Maps Series','Time Course'};
+datorresult_list = {'Data';'Linear Model Results'};
 mcc_list         = {'None';'Clustering';'TFCE';'Max'};
 compmethod_list  = {'None','Default Method'};
 
