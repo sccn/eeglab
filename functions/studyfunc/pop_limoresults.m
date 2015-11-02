@@ -317,26 +317,25 @@ classdef pop_limoresults < handle
                 
                 % Looking for group files
                 %----------------------------------------------------------
-                tmp = dir(obj.study.filepath);
-                filestmp = {tmp.name}'; clear tmp;
-                
-                hit = zeros(1,length(filestmp));
-                for i = 1 : length(filestmp)
-                    tmp = strfind(filestmp{i},'one_sample_ttest');
-                    if ~isempty(tmp)
-                        hit(i) = 1;
-                    end
-                end
-                if ~isempty(find(hit))
-                    tmp = filestmp(find(hit));
-                    goupfiles = cellfun(@(x) x(1:end-4), tmp, 'UniformOutput', false);
-                    set(obj.gui_h.popupmenu_modelvar2plot,'String',goupfiles);
+%                 tmp = dir(obj.study.filepath);
+%                 filestmp = {tmp.name}'; clear tmp;
+%                 
+%                 hit = zeros(1,length(filestmp));
+%                 for i = 1 : length(filestmp)
+%                     tmp = strfind(filestmp{i},'one_sample_ttest');
+%                     if ~isempty(tmp)
+%                         hit(i) = 1;
+%                     end
+%                 end
+                if isfield(obj.study(obj.study.currentdesign).design.limo, 'l2files') && ~isempty(obj.study(obj.study.currentdesign).design.limo.l2files)
+                    groupfiles = obj.study.design(obj.study.currentdesign).limo.l2files(:,2);
+                    set(obj.gui_h.popupmenu_modelvar2plot,'String',groupfiles);
                     set(obj.gui_h.popupmenu_modelvar2plot,'Value',1);
                     
                     % Loading expected electrodes
                     %----------------------------------------------------------
                     try
-                        load(fullfile(obj.study.filepath,'limo_chanlocs_pval_correct.mat'),'expected_chanlocs');
+                        load(obj.study.design(obj.study.currentdesign).limo.chanloc);
                         electoplot_list = ['All Channels';{expected_chanlocs.labels}'];
                         set(obj.gui_h.listbox_elect2plot,'String',electoplot_list);
                     catch
@@ -374,7 +373,7 @@ classdef pop_limoresults < handle
                     set(obj.gui_h.popupmenu_compmethod    ,'Enable','off');
                     set(obj.gui_h.checkbox_stats	      ,'Enable','off');
                 else
-                    eeglab_warning('No group level results have been found');
+                    eeglab_warning('No group level results founded');
                     set(obj.gui_h.popupmenu_level,'Value',2);
                     obj = callback_popupmenu_level(obj);
                 end
@@ -396,8 +395,10 @@ classdef pop_limoresults < handle
             val_level = get( obj.gui_h.popupmenu_level       ,'Value');
             
             if (val_ptype == 1 || val_ptype == 2) 
-                % Call callback_popupmenu_level
-                obj = callback_popupmenu_level(obj);
+                if val_level ~= 1
+                    % Call callback_popupmenu_level
+                    obj = callback_popupmenu_level(obj);
+                end
                 
                 % Updating listbox_elect2plot
                 set(obj.gui_h.listbox_elect2plot   ,'Value',1);
@@ -518,9 +519,9 @@ classdef pop_limoresults < handle
             
             % Loading files
             if level == 1
-                PathName = obj.study.filepath;
-                files    = get(obj.gui_h.popupmenu_modelvar2plot,'String');
-                FileName = [files{get(obj.gui_h.popupmenu_modelvar2plot,'Value')} '.mat'];
+                files                   = obj.study.design(obj.study.currentdesign).limo.l2files(:,3);
+                [PathName,  tmp1, tmp2] = fileparts(files{get(obj.gui_h.popupmenu_modelvar2plot,'Value')});
+                FileName                = [tmp1 tmp2]; clear tmp1 tmp2;
             else
                 PathName = obj.limofiles_path;
                 FileName = obj.limofiles_filename;
