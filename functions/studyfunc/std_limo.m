@@ -514,8 +514,11 @@ filesout = limo_random_select(1,LIMO_files.expected_chanlocs,'nboot'         ,nb
                                                             ,'limofiles'     ,{STUDY.design.limo.beta}...;
                                                             ,'folderprefix'  ,foldername...
                                                             ,'folderpath'    ,LIMO_files.LIMO);
-testype = cell([length(filesout),1]);
+testype    = cell([length(filesout),1]);
 testype(:) = {'ttest'};
+for i = 1: nparams
+testname{i,1}   = [testype{i} '_parameter' num2str(i)];
+end
 
 % 2- Computing Paired ttest for each combination of parameters
 ncomb        = combnk(1:nparams,2);
@@ -532,10 +535,11 @@ for i = 1:size(ncomb,1)
                                                      ,'parameters'    ,{[ncomb(i,1)] [ncomb(i,2)]}...
                                                      ,'limofiles'     ,limofiles...
                                                      ,'folderpath'    ,folderpath);      
-    testype{end+1} = 'p_ttest';
+    testype{end+1}      = 'p_ttest';
+    testname{end+1,1}   = [testype{end} '_parameter_' num2str(ncomb(i,1)) '-' num2str(ncomb(i,2))];
 end
 % Assigning Level 2 info to STUDY
-STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).l2files = [testype filesout'];
+STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).l2files = [testype testname filesout' ];
 
 % Saving STUDY
 STUDY = pop_savestudy( STUDY, [],'filepath', STUDY.filepath,'savemode','resave');
