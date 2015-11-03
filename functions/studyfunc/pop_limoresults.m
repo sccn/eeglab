@@ -12,6 +12,7 @@ classdef pop_limoresults < handle
         reg_indx;
         cat_indx;
         string_mplot;
+        limostruct_indx
     end
     
     methods
@@ -206,6 +207,7 @@ classdef pop_limoresults < handle
         end
         % =================================================================
         function obj = callback_popupmenu_level(obj,~,~)
+            
             % Getting value (subject from level)
             val_level = get(obj.gui_h.popupmenu_level,'Value');
             
@@ -221,6 +223,7 @@ classdef pop_limoresults < handle
             val_typeplot  = get(obj.gui_h.popupmenu_plottype      ,'Value' );
             string_elec   = get(obj.gui_h.listbox_elect2plot      ,'String');
             val_elec      = get(obj.gui_h.listbox_elect2plot      ,'Value' );
+            
             
             if val_level ~= 1
    
@@ -313,29 +316,22 @@ classdef pop_limoresults < handle
                     obj.limofiles_filename = var2plot_list{get(obj.gui_h.popupmenu_modelvar2plot,'Value')};
                 end
                 
-            else % Case of group level selected % ONGOING WORK %
+            else % Case of group level selected
+                measure_list  = {'erp','spec'};
+                datorica_list = {'dat', 'ica'};
+                datatype = [datorica_list{obj.datorica_indx} measure_list{get(obj.gui_h.popupmenu_measure2plot,'Value')}];
                 
-                % Looking for group files
-                %----------------------------------------------------------
-%                 tmp = dir(obj.study.filepath);
-%                 filestmp = {tmp.name}'; clear tmp;
-%                 
-%                 hit = zeros(1,length(filestmp));
-%                 for i = 1 : length(filestmp)
-%                     tmp = strfind(filestmp{i},'one_sample_ttest');
-%                     if ~isempty(tmp)
-%                         hit(i) = 1;
-%                     end
-%                 end
-                if isfield(obj.study(obj.study.currentdesign).design.limo, 'l2files') && ~isempty(obj.study(obj.study.currentdesign).design.limo.l2files)
-                    groupfiles = obj.study.design(obj.study.currentdesign).limo.l2files(:,2);
+                obj.limostruct_indx = find(~cellfun(@isempty,strfind({obj.study(obj.study.currentdesign).design.limo.datatype},datatype)));
+                
+                if isfield(obj.study(obj.study.currentdesign).design.limo, 'l2files') && ~isempty(obj.study(obj.study.currentdesign).design.limo(obj.limostruct_indx).l2files)
+                    groupfiles = obj.study.design(obj.study.currentdesign).limo(obj.limostruct_indx).l2files(:,2);
                     set(obj.gui_h.popupmenu_modelvar2plot,'String',groupfiles);
                     set(obj.gui_h.popupmenu_modelvar2plot,'Value',1);
                     
                     % Loading expected electrodes
                     %----------------------------------------------------------
                     try
-                        load(obj.study.design(obj.study.currentdesign).limo.chanloc);
+                        load(obj.study.design(obj.study.currentdesign).limo(obj.limostruct_indx).chanloc);
                         electoplot_list = ['All Channels';{expected_chanlocs.labels}'];
                         set(obj.gui_h.listbox_elect2plot,'String',electoplot_list);
                     catch
@@ -361,9 +357,9 @@ classdef pop_limoresults < handle
                     
                     % Enabling on/off GUI features
                     %------------------------------------------------------
-                    set(obj.gui_h.popupmenu_measure2plot  ,'String', {' '} );
-                    set(obj.gui_h.popupmenu_measure2plot  ,'Value',1);
-                    set(obj.gui_h.popupmenu_measure2plot  ,'Enable', 'off' );
+%                     set(obj.gui_h.popupmenu_measure2plot  ,'String', {' '} );
+%                     set(obj.gui_h.popupmenu_measure2plot  ,'Value',1);
+%                     set(obj.gui_h.popupmenu_measure2plot  ,'Enable', 'off' );
                     set(obj.gui_h.popupmenu_dataorresult  ,'Value', 2);
                     set(obj.gui_h.popupmenu_dataorresult  ,'Enable','off');
                     set(obj.gui_h.popupmenu_modelvar2plot ,'Enable','on');
@@ -519,7 +515,7 @@ classdef pop_limoresults < handle
             
             % Loading files
             if level == 1
-                files                   = obj.study.design(obj.study.currentdesign).limo.l2files(:,3);
+                files                   = obj.study.design(obj.study.currentdesign).limo(obj.limostruct_indx).l2files(:,3);
                 [PathName,  tmp1, tmp2] = fileparts(files{get(obj.gui_h.popupmenu_modelvar2plot,'Value')});
                 FileName                = [tmp1 tmp2]; clear tmp1 tmp2;
             else
