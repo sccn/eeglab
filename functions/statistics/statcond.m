@@ -66,6 +66,9 @@
 %   'structoutput' = ['on'|'off'] return an output structure instead of 
 %                the regular output. Allow to output mask and confidence
 %                intervals.
+%   'cluster'  = ['on'|'off'] cluster correction for multiple comparison.
+%                Only functional when alpha is set (if alpha is NaN, it
+%                sets it to 0.05) and for 1-way Anova or t-test.
 %
 % Legacy parameters:
 %   'threshold' - now 'alpha'
@@ -167,6 +170,7 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
                                      'structoutput' 'string'  { 'on','off' }      'off'; 
                                      'forceanova'   'string'  { 'on','off' }      'off'; 
                                      'arraycomp'  'string'    { 'on','off' }      'on'; 
+                                     'cluster'    'string'    { 'on','off' }      'off'; 
                                      'alpha'      'real'      []                  NaN;
                                      'tail'       'string'    { 'one','both','upper','lower'}    'both'; 
                                      'variance'   'string'    { 'homogenous','inhomogenous' }    'inhomogenous'; 
@@ -417,7 +421,51 @@ function [ ori_vals, df, pvals, surrogval ] = statcond( data, varargin );
             pvals{2} = stat_surrogate_pvals(surrogval{2}, ori_vals{2}, tail);
             pvals{3} = stat_surrogate_pvals(surrogval{3}, ori_vals{3}, tail);
         else
-            pvals = stat_surrogate_pvals(surrogval, ori_vals, tail);
+            if strcmpi(g.cluster, 'on')
+                if isnan(g.alpha)
+                    g.alpha = 0.05;
+                    disp('Alpha value set to 0.05 automatically');
+                end;
+                if size(surrogval,3) > 1 || size(surrogval,4) > 1 || isnan(g.alpha)
+                    error('Cluster method not implemented for alpha NaN or for more than 2 dims');
+                else                    
+                    tmpPvals = 2*tcdf(-abs(surrogval), size(surrogval,1)) < g.alpha;
+                    largestCluster = zeros(1, size(surrogval,2));
+                    signifPos = zeros(1, size(surrogval,1));
+                    for iSurog = 1:size(surrogval,2)
+                        signifPos = tmpPvals(:,iSurog);
+                        while any(signifPos)
+                            tmpInd = find(signifPos);
+                            currentInd = tmpInd(1);
+                            currentCount = 0;
+                            while currentInd+currentCount <= length(signifPos) && signifPos(currentInd+currentCount) == 1
+                                signifPos(currentInd+currentCount) = 0;
+                                currentCount = currentCount+1;
+                            end;
+                            if currentCount > largestCluster(iSurog), largestCluster(iSurog) = currentCount; end;
+                        end;
+                    end;
+                    largestCluster = sort(largestCluster);
+                    thresholdVal = largestCluster(round(length(largestCluster)*(1-g.alpha)));
+                    
+                    % assign p-val status
+                    signifPos = 2*tcdf(-abs(ori_vals), length(ori_vals)) < g.alpha;
+                    pvals     = ones(size(signifPos));
+                    while any(signifPos)
+                        tmpInd = find(signifPos);
+                        currentInd = tmpInd(1);
+                        currentCount = 0;
+                        while currentInd+currentCount <= length(signifPos) && signifPos(currentInd+currentCount) == 1
+                            signifPos(currentInd+currentCount) = 0;
+                            currentCount = currentCount+1;
+                        end;
+                        if currentCount >= thresholdVal, pvals(currentInd:currentInd+currentCount-1) = 0; end;
+                    end;
+                    
+                end;
+            else
+                pvals = stat_surrogate_pvals(surrogval, ori_vals, tail);
+            end;
         end;
         try, warning('on', 'MATLAB:divideByZero'); catch, end;
     end;
