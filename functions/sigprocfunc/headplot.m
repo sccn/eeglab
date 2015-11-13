@@ -164,7 +164,7 @@ ElectDFac  = 1.06;  % plot electrode marker dots out from head surface
 plotelecopt.NamesDFac  = 1.05;  % plot electrode names/numbers out from markers
 plotelecopt.NamesColor = 'k'; % 'r';
 plotelecopt.NamesSize  =  10;   % FontSize for electrode names
-plotelecopt.MarkerColor= [0.5 0.5 0.5];
+plotelecopt.MarkerColor= [0 0 0];
 plotelecopt.electrodes3d = 'off';
 
 sqaxis     = 1;     % if non-zero, make head proportions anatomical
