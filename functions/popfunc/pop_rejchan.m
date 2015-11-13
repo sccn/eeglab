@@ -103,7 +103,7 @@ if nargin < 2
         options = { options{:} 'measure', 'kurt' }; 
     else
         options = { options{:} 'measure', 'spec' };
-        options = { options{:} 'freqrange', str2double(result{5})}; % 7/16/2014 Ramon
+        options = { options{:} 'freqrange', str2num(result{5})};
     end;
 
 else
@@ -134,7 +134,9 @@ elseif strcmpi(opt.measure, 'kurt')
 else
     fprintf('Computing spectrum for channels...\n');
     [measure freq] = pop_spectopo(EEG, 1, [], 'EEG' , 'plot','off');
-
+    
+    measure = measure(opt.elec,:); % selecting channels
+    
     % select frequency range
     if ~isempty(opt.freqrange)
         [tmp fBeg] = min(abs(freq-opt.freqrange(1)));

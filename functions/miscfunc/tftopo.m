@@ -8,7 +8,7 @@
 %             >> tftopo(tfdata,times,freqs, 'key1', 'val1', 'key2', val2' ...)
 % Inputs:
 %   tfdata    = Set of time/freq images, one for each channel. Matrix dims: 
-%               (time,freq,chans). Else, (time,freq,chans,subjects) for grand mean 
+%               (time,freq),(time,freq,chans). Else, (time,freq,chans,subjects) for grand mean 
 %               RMS plotting.
 %   times     = Vector of image (x-value) times in msec, from timef()).
 %   freqs     = Vector of image (y-value) frequencies in Hz, from timef()).
@@ -132,7 +132,12 @@ else
     help tftopo
     return
 end
-tfdataori = mean(tfdata,4); % for topoplot
+% for topoplot
+if length(size(tfdata)) >= 4
+    tfdataori = mean(tfdata,4);
+else
+    tfdataori = tfdata;
+end
 
 % test inputs
 % -----------
@@ -455,12 +460,21 @@ elseif strcmpi(g.logfreq, 'native'),
         maxTick = max(ylim);
         set(gca,'ytick',linspace(minTick, maxTick,50));
     end;
-   
+    
     tmpval = get(gca,'yticklabel');
     if iscell(tmpval)
-        ft = str2num(cell2mat(tmpval)); % MATLAB version >= 8.04
+        % MATLAB version >= 8.04
+        try
+            ft = str2num(cell2mat(tmpval));
+        catch
+            % To avoid bug in matlab cell2mat. i.e. when tmpval = {'0';'0.5'}
+            for i = 1:length(tmpval)
+                ft(i,1) = str2num(cell2mat(tmpval(i)));
+            end
+        end
     else
-        ft = str2num(tmpval);           % MATLAB version <  8.04
+        % MATLAB version <  8.04
+        ft = str2num(tmpval);           
     end
         
     ft = exp(1).^ft;

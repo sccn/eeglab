@@ -112,13 +112,23 @@ if nargin < 3
 end;
 
 tmpevent = EEG.event;
-alltypes = { tmpevent.type };
+
+% Checking for numeric values in fieldnames and changing them to string
+ for i = 1: length(tmpevent)
+     checknum(i) = isnumeric(tmpevent(i).type);
+ end
+  if sum(checknum)~=0
+       tmpindx = find(checknum == 1);
+       for i = 1: length(tmpindx)
+           tmpevent(tmpindx(i)).type = num2str(tmpevent(tmpindx(i)).type);
+       end
+  end
 
 % compute event indices
 % ---------------------
 allinds = [];
 for index = 1:length(events)
-    inds = strmatch(events{index},alltypes, 'exact');
+    inds = strmatch(events{index},{ tmpevent.type }, 'exact');
     allinds = [allinds(:); inds(:) ]';
 end;
 allinds = sort(allinds);
@@ -130,7 +140,6 @@ end;
 % compute time limits
 % -------------------
 array = [];
-tmpevent = EEG.event;
 bnd = strmatch('boundary', lower({tmpevent.type }));
 bndlat = [ tmpevent(bnd).latency ];
 for bind = 1:length(allinds)

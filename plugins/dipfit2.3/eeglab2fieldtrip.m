@@ -110,15 +110,24 @@ switch fieldbox
     data.label   = { tmpchanlocs(1:EEG.nbchan).labels };
     
   case 'componentanalysis'
+      if isempty(EEG.icaact)
+          icaacttmp = eeg_getica(EEG);
+      end
     for index = 1:EEG.trials
       % the trials correspond to the raw data trials, except that they
       % contain the component activations
-      try,
-          data.trial{index}  = EEG.icaact(:,:,index);
+      try
+          if isempty(EEG.icaact)
+              data.trial{index} = icaacttmp(:,:,index); % Using icaacttmp to not change EEG structure
+          else
+              data.trial{index}  = EEG.icaact(:,:,index);
+          end
       catch
+          
       end;
       data.time{index}   = linspace(EEG.xmin, EEG.xmax, EEG.pnts); % should be checked in FIELDTRIP
     end;
+    data.label = [];
     for comp = 1:size(EEG.icawinv,2)
       % the labels correspond to the component activations that are stored in data.trial
       data.label{comp} = sprintf('ica_%03d', comp);

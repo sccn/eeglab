@@ -19,6 +19,11 @@
 %   option     - ['gradient'|'laplacian'|'none'] compute gradient or laplacian of
 %                the scale topography. This does not acffect the saved file which is
 %                always 'none' {default is 'none' = the interpolated topo map}
+% Optional inputs
+%   'recompute'  - ['on'|'off'] force recomputing topo file even if it is 
+%                  already on disk.
+%   'fileout'    - [string] Path of the folder to save output. The default
+%                  is EEG.filepath
 % Outputs:
 %   X          - the topo map grid of the requested ICA components, each grid is 
 %                     one ROW of X. 
@@ -66,14 +71,16 @@ if nargin < 3
     option = 'none';
 end;
 
-g = finputcheck( varargin, { 'recompute'   'string'   { 'on','off' }   'off' }, 'std_topo');
-if isstr(g), error(g); end;
+g = finputcheck( varargin, { 'recompute'   'string'   { 'on','off' }   'off' ;...
+                             'fileout'     'string'   []                EEG.filepath},...
+                             'std_topo');
+% if isstr(g), error(g); end;
 
 % figure; toporeplot(grid,'style', 'both','plotrad', 0.5, 'intrad', 0.5, 'xsurface' ,Xi, 'ysurface',Yi );
 
 % Topo information found in dataset
 % ---------------------------------
-if exist(fullfile(EEG.filepath, [ EEG.filename(1:end-3) 'icatopo' ])) & strcmpi(g.recompute, 'off')
+if exist(fullfile(g.fileout, [ EEG.filename(1:end-3) 'icatopo' ])) && strcmpi(g.recompute, 'off')
     for k = 1:length(comps)
         tmp = std_readtopo( EEG, 1, comps(k));
         if strcmpi(option, 'gradient')
@@ -119,7 +126,7 @@ end
 % Save topos in file
 % ------------------
 all_topos.datatype = 'TOPO';
-tmpfile = fullfile( EEG.filepath, [ EEG.filename(1:end-3) 'icatopo' ]); 
+tmpfile = fullfile( g.fileout, [ EEG.filename(1:end-3) 'icatopo' ]); 
 std_savedat(tmpfile, all_topos);
 
 for k = 1:length(comps)

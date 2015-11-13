@@ -101,18 +101,18 @@ catch,
 end;
 basename = [fastif(typecomp,'Channel ', 'Component ') int2str(chanorcomp) ];
 
-fh = figure('name', ['pop_prop() - ' basename ' properties'], 'color', BACKCOLOR, 'numbertitle', 'off', 'visible', 'off');
-pos = get(gcf,'Position');
-set(gcf,'Position', [pos(1) pos(2)-500+pos(4) 500 500], 'visible', 'on');
-pos = get(gca,'position'); % plot relative to current axes
-hh = gca;
+fhandle = figure('name', ['pop_prop() - ' basename ' properties'], 'color', BACKCOLOR, 'numbertitle', 'off', 'visible', 'off');
+pos     = get(fhandle,'Position');
+set(fhandle,'Position', [pos(1) pos(2)-500+pos(4) 500 500], 'visible', 'on');
+hh = axes('parent',fhandle);
+pos      = get(hh,'position'); % plot relative to current axes
 q = [pos(1) pos(2) 0 0];
 s = [pos(3) pos(4) pos(3) pos(4)]./100;
-axis off;
+axis(hh,'off');
 
 % plotting topoplot
 % -----------------
-h = axes('Units','Normalized', 'Position',[-10 60 40 42].*s+q);
+h = axes('parent',fhandle,'Units','Normalized', 'Position',[-10 60 40 42].*s+q);
 
 %topoplot( EEG.icawinv(:,chanorcomp), EEG.chanlocs); axis square; 
 
@@ -125,20 +125,20 @@ if isfield(EEG.chanlocs, 'theta')
                  'shading', 'interp', 'numcontour', 3); axis square;
     end;
 else
-    axis off;
+    axis(h,'off');
 end;
 basename = [fastif(typecomp,'Channel ', 'IC') int2str(chanorcomp) ];
 % title([ basename fastif(typecomp, ' location', ' map')], 'fontsize', 14); 
-title(basename, 'fontsize', 14); 
+title(basename, 'fontsize', 14);
 
 % plotting erpimage
 % -----------------
-hhh = axes('Units','Normalized', 'Position',[45 62 48 38].*s+q);
+hhh = axes('Parent', fhandle,'Units','Normalized', 'Position',[45 62 48 38].*s+q);
 eeglab_options; 
 if EEG.trials > 1
     % put title at top of erpimage
-    axis off
-    hh = axes('Units','Normalized', 'Position',[45 62 48 38].*s+q);
+    axis(hhh,'off');
+    hh = axes('Parent', fhandle,'Units','Normalized', 'Position',[45 62 48 38].*s+q);
     EEG.times = linspace(EEG.xmin, EEG.xmax, EEG.pnts);
     if EEG.trials < 6
       ei_smooth = 1;
@@ -152,10 +152,10 @@ if EEG.trials > 1
          erpimage( EEG.data(chanorcomp,:)-offset, ones(1,EEG.trials)*10000, EEG.times*1000, ...
                        '', ei_smooth, 1, 'caxis', 2/3, 'cbar','erp','erp_vltg_ticks',erp_limits);   
     else % plot component
-         icaacttmp = eeg_getdatact(EEG, 'component', chanorcomp);
-         offset = nan_mean(icaacttmp(:));
-         era    = nan_mean(squeeze(icaacttmp)')-offset;
-         era_limits=get_era_limits(era);
+         icaacttmp  = eeg_getdatact(EEG, 'component', chanorcomp);
+         offset     = nan_mean(icaacttmp(:));
+         era        = nan_mean(squeeze(icaacttmp)')-offset;
+         era_limits = get_era_limits(era);
          erpimage( icaacttmp-offset, ones(1,EEG.trials)*10000, EEG.times*1000, ...
                        '', ei_smooth, 1, 'caxis', 2/3, 'cbar','erp', 'yerplabel', '','erp_vltg_ticks',era_limits);   
     end;
@@ -164,8 +164,8 @@ if EEG.trials > 1
 else
     % put title at top of erpimage
     EI_TITLE = 'Continous data';
-    axis off
-    hh = axes('Units','Normalized', 'Position',[45 62 48 38].*s+q);
+    axis(hhh,'off');
+    hh = axes('Parent', fhandle,'Units','Normalized', 'Position',[45 62 48 38].*s+q);
     ERPIMAGELINES = 200; % show 200-line erpimage
     while size(EEG.data,2) < ERPIMAGELINES*EEG.srate
        ERPIMAGELINES = 0.9 * ERPIMAGELINES;
@@ -193,7 +193,7 @@ else
                     EI_TITLE, ei_smooth, 1, 'caxis', 2/3, 'cbar','yerplabel', '');
       end
     else
-            axis off;
+            axis(hh,'off');
             text(0.1, 0.3, [ 'No erpimage plotted' 10 'for small continuous data']);
     end;
     axes(hhh);
@@ -204,10 +204,10 @@ end;
 if ~exist('winhandle')
     winhandle = NaN;
 end;
-if ishandle(winhandle) % RMC isnan by ~ishandle
-	h = axes('units','normalized', 'position',[5 10 95 35].*s+q);
+if ishandle(winhandle) 
+	h = axes('Parent', fhandle,'units','normalized', 'position',[5 10 95 35].*s+q);
 else
-	h = axes('units','normalized', 'position',[5 0 95 40].*s+q);
+	h = axes('Parent', fhandle,'units','normalized', 'position',[5 0 95 40].*s+q);
 end;
 %h = axes('units','normalized', 'position',[45 5 60 40].*s+q);
 try
@@ -231,8 +231,8 @@ try
     
 	%tmpy = get(gca, 'ylim');
     %set(gca, 'ylim', [max(tmpy(1),-1) tmpy(2)]);
-	set( get(gca, 'ylabel'), 'string', 'Power 10*log_{10}(\muV^{2}/Hz)', 'fontsize', 14); 
-	set( get(gca, 'xlabel'), 'string', 'Frequency (Hz)', 'fontsize', 14); 
+	set( get(h, 'ylabel'), 'string', 'Power 10*log_{10}(\muV^{2}/Hz)', 'fontsize', 14); 
+	set( get(h, 'xlabel'), 'string', 'Frequency (Hz)', 'fontsize', 14); 
 	title('Activity power spectrum', 'fontsize', 14); 
 catch err
 	axis off;
@@ -248,11 +248,11 @@ if ishandle(winhandle)
 	COLACC = '[0.75 1 0.75]';
 	% CANCEL button
 	% -------------
-	h  = uicontrol(gcf, 'Style', 'pushbutton', 'backgroundcolor', GUIBUTTONCOLOR, 'string', 'Cancel', 'Units','Normalized','Position',[-10 -10 15 6].*s+q, 'callback', 'close(gcf);');
+	h  = uicontrol(fhandle, 'Style', 'pushbutton', 'backgroundcolor', GUIBUTTONCOLOR, 'string', 'Cancel', 'Units','Normalized','Position',[-10 -10 15 6].*s+q, 'callback', 'close(gcf);');
 
 	% VALUE button
 	% -------------
-	hval  = uicontrol(gcf, 'Style', 'pushbutton', 'backgroundcolor', GUIBUTTONCOLOR, 'string', 'Values', 'Units','Normalized', 'Position', [15 -10 15 6].*s+q);
+	hval  = uicontrol(fhandle, 'Style', 'pushbutton', 'backgroundcolor', GUIBUTTONCOLOR, 'string', 'Values', 'Units','Normalized', 'Position', [15 -10 15 6].*s+q);
 
 	% REJECT button
 	% -------------
@@ -261,7 +261,7 @@ if ishandle(winhandle)
     else
         status = 0;
     end;
-	hr = uicontrol(gcf, 'Style', 'pushbutton', 'backgroundcolor', eval(fastif(status,COLREJ,COLACC)), ...
+	hr = uicontrol(fhandle, 'Style', 'pushbutton', 'backgroundcolor', eval(fastif(status,COLREJ,COLACC)), ...
 				'string', fastif(status, 'REJECT', 'ACCEPT'), 'Units','Normalized', 'Position', [40 -10 15 6].*s+q, 'userdata', status, 'tag', 'rejstatus');
 	command = [ 'set(gcbo, ''userdata'', ~get(gcbo, ''userdata''));' ...
 				'if get(gcbo, ''userdata''),' ...
@@ -269,11 +269,11 @@ if ishandle(winhandle)
 				'else ' ...
 				'     set( gcbo, ''backgroundcolor'',' COLACC ', ''string'', ''ACCEPT'');' ...
 				'end;' ];					
-	set( hr, 'callback', command); 
+	set(hr, 'callback', command); 
 
 	% HELP button
 	% -------------
-	h  = uicontrol(gcf, 'Style', 'pushbutton', 'backgroundcolor', GUIBUTTONCOLOR, 'string', 'HELP', 'Units','Normalized', 'Position', [65 -10 15 6].*s+q, 'callback', 'pophelp(''pop_prop'');');
+	h  = uicontrol(fhandle, 'Style', 'pushbutton', 'backgroundcolor', GUIBUTTONCOLOR, 'string', 'HELP', 'Units','Normalized', 'Position', [65 -10 15 6].*s+q, 'callback', 'pophelp(''pop_prop'');');
 
 	% OK button
 	% ---------
@@ -292,7 +292,7 @@ if ishandle(winhandle)
         end
 	end;				
 	command = [ command 'close(gcf); clear tmpstatus' ];
-	h  = uicontrol(gcf, 'Style', 'pushbutton', 'string', 'OK', 'backgroundcolor', GUIBUTTONCOLOR, 'Units','Normalized', 'Position',[90 -10 15 6].*s+q, 'callback', command);
+	h  = uicontrol(fhandle, 'Style', 'pushbutton', 'string', 'OK', 'backgroundcolor', GUIBUTTONCOLOR, 'Units','Normalized', 'Position',[90 -10 15 6].*s+q, 'callback', command);
 
 	% draw the figure for statistical values
 	% --------------------------------------

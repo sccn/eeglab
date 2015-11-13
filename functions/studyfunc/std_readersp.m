@@ -406,12 +406,19 @@ for ind = 1:length(finalinds)
     end;
 end;
 
-% output unit
+% output units
 % -----------
-if exist('tmpparams') ~= 1
-    if ~isempty(opt.channels), [tmpersp tmpparams] = std_readfile(STUDY.design(opt.design).cell(1), 'channels', {STUDY.changrp(1).name}, 'measure', opt.datatype);
-    else                       [tmpersp tmpparams] = std_readfile(STUDY.design(opt.design).cell(1), 'components', STUDY.cluster(finalinds(end)).allinds{1,1}(1), 'measure', opt.datatype);
-    end;
+if exist('tmpparams') ~= 1 
+    tmpparams = []; ctmp = 1;
+    while isempty(tmpparams) && ctmp <= length(STUDY.design(opt.design).cell)
+        try
+            if ~isempty(opt.channels), [tmpersp tmpparams] = std_readfile(STUDY.design(opt.design).cell(ctmp), 'channels', {STUDY.changrp(1).name}, 'measure', opt.datatype);
+            else                       [tmpersp tmpparams] = std_readfile(STUDY.design(opt.design).cell(ctmp), 'components', STUDY.cluster(finalinds(end)).allinds{1,1}(1), 'measure', opt.datatype);
+            end;
+        catch
+        end
+        ctmp = ctmp + 1;
+    end
 end;
 if ~isfield(tmpparams, 'baseline'), tmpparams.baseline = 0;     end;
 if ~isfield(tmpparams, 'scale'   ), tmpparams.scale    = 'log'; end;

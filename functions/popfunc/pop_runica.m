@@ -247,8 +247,9 @@ elseif length(ALLEEG) > 1 & strcmpi(g.concatcond, 'on')
     allgroups   = { ALLEEG.group };
     alltags     = zeros(1,length(allsubjects));
     if any(cellfun('isempty', allsubjects))
-        disp('Aborting: Subject names missing from at least one dataset.');
-        return;
+        errordlg2( [ 'Aborting: Subject names missing from at least one dataset.' 10 ...
+                     'Use the STUDY > Edit STUDY Info menu and check the box' 10 ...
+                     '"Dataset info (condition, group, ...) differs from study info..."' ]);
     end;
     dats = {};
     for index = 1:length(allsubjects)

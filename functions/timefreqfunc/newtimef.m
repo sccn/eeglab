@@ -1912,7 +1912,7 @@ switch lower(g.plotitc)
                 g.itcavglim = [ min(E)-max(E)/3 max(E)+max(E)/3];
             end;
         end;
-        if max(g.itcavglim) == 0        % toby 10.02.2006
+        if max(g.itcavglim) == 0 || any(isnan(g.itcavglim))
             g.itcavglim = [-1 1];
         end
         

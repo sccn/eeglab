@@ -198,7 +198,7 @@ if nargin < 1
         eeglabpath2 = mywhich('eeglab.m');
     end;
     if ~isempty(eeglabpath2)
-        evalin('base', 'clear classes updater;');
+        %evalin('base', 'clear classes updater;'); % this clears all the variables
         eeglabpath2 = eeglabpath2(1:end-length('eeglab.m'));
         tmpWarning = warning('backtrace'); 
         warning backtrace off;
@@ -248,6 +248,24 @@ end;
 % add paths
 % ---------
 if ~iseeglabdeployed2
+    tmp = which('eeglab_data.set');
+    if ~isempty(which('eeglab_data.set')) && ~isempty(which('GSN-HydroCel-32.sfp'))
+        warning backtrace off;
+        warning(sprintf([ '\n\nPath Warning: It appears that you have added the path to all of the\n' ...
+            'subfolders to EEGLAB. This may create issues with some EEGLAB extensions\n' ...
+            'If EEGLAB cannot start or your experience a large number of warning\n' ...
+            'messages, remove all the EEGLAB paths then go to the EEGLAB folder\n' ...
+            'and start EEGLAB which will add all the necessary paths.\n\n' ]));
+        warning backtrace on;
+        foldertorm = fileparts(which('fgetl.m'));
+        if ~isempty(strfind(foldertorm, 'eeglab'))
+            rmpath(foldertorm);
+        end;
+        foldertorm = fileparts(which('strjoin.m'));
+        if ~isempty(strfind(foldertorm, 'eeglab'))
+            rmpath(foldertorm);
+        end;
+    end;
     myaddpath( eeglabpath, 'eeg_checkset.m',   [ 'functions' filesep 'adminfunc'        ]);
     myaddpath( eeglabpath, 'eeg_checkset.m',   [ 'functions' filesep 'adminfunc'        ]);
     myaddpath( eeglabpath, ['@mmo' filesep 'mmo.m'], 'functions');
@@ -1839,7 +1857,7 @@ elseif (exist('EEG') == 1) & ~isnumeric(EEG) & ~isempty(EEG(1).data)
             set( g.val12, 'String', [ num2str(round(tmp.bytes/1E6*10)/10) ' (file mapped)' ]);
         end;
 
-        if EEG.trials > 1
+        if EEG.trials > 1 || EEG.xmin ~= 0
             menustatus = { menustatus{:} 'epoched_dataset' };
         else
             menustatus = { menustatus{:} 'continuous_dataset' };

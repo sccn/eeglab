@@ -47,7 +47,7 @@ end;
 
 % check for multiple condition selection
 if ~iscell(indvarvals), 
-    pos = findstr(' - ', indvarvals);
+    pos = strfind(' - ', indvarvals);
     if ~isempty(pos)
         tmpindvar = indvarvals;
         indvarvals = { indvarvals(1:pos(1)-1) };

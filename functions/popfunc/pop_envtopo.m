@@ -103,13 +103,16 @@ if nargin < 3
     if ~isempty(result{5}),   options = [ options '''subcomps'',[' result{5} '],' ]; end;
     if ~isempty(result{6}),   options = [ options '''title'', ''' result{6} ''',' ]; end;
 	options      =  [ options result{7} ];
-	figure;
+	fig = figure;
+    if ~isnumeric(fig), fig = fig.Number; end;
+    optionsplot = [ options ', ''figure'',' int2str(fig) ];
     try, icadefs; set(gcf, 'color', BACKCOLOR); catch, end;
 else
     if isempty(timerange)
         timerange = [EEG.xmin*1000 EEG.xmax*1000];
     end
     options = [options vararg2str( varargin ) ];
+    optionsplot = options;
 end;
     
 if length(EEG) > 2
@@ -153,6 +156,7 @@ else
                                    inputname(1), int2str(subindices), num2str(timerange), options);
     end;
 end;
+options = optionsplot;
 
 % plot the data
 % --------------
@@ -163,22 +167,22 @@ if any(isnan(sigtmp(:)))
     if length(EEG) == 2
         com =  sprintf(['%s envtopo(nan_mean(sigtmp(:,posi:posf,:),3)-nan_mean(sigtmp2(:,posi:posf,:),3),' ...
                         'EEG(1).icaweights*EEG(1).icasphere, ' ...
-                        '''chanlocs'', EEG(1).chanlocs, ''chaninfo'', EEG(1).chaninfo, ''icawinv'', EEG(1).icawinv,' ...
+                        '''chanlocs'', EEG(1).chanlocs(EEG(1).chaninfo.icachansind), ''chaninfo'', EEG(1).chaninfo, ''icawinv'', EEG(1).icawinv,' ...
                         '''timerange'', [timerange(1) timerange(2)] %s);' ] , outstr, options);
     else % length(EEG) == 1
         com =  sprintf(['%s envtopo(nan_mean(sigtmp(:,posi:posf,:),3), EEG.icaweights*EEG.icasphere, ' ...
-                        '''chanlocs'', EEG.chanlocs, ''chaninfo'', EEG.chaninfo, ''icawinv'', EEG.icawinv,' ...
+                        '''chanlocs'', EEG.chanlocs(EEG.chaninfo.icachansind), ''chaninfo'', EEG.chaninfo, ''icawinv'', EEG.icawinv,' ...
                         '''timerange'', [timerange(1) timerange(2)] %s);' ] , outstr, options);
     end;
 else    
     if length(EEG) == 2
         com =  sprintf(['%s envtopo(mean(sigtmp(:,posi:posf,:),3)-mean(sigtmp2(:,posi:posf,:),3),' ...
                         ' EEG(1).icaweights*EEG(1).icasphere, ' ...
-                        '''chanlocs'', EEG(1).chanlocs, ''chaninfo'', EEG(1).chaninfo, ''icawinv'', EEG(1).icawinv,' ...
+                        '''chanlocs'', EEG(1).chanlocs(EEG(1).chaninfo.icachansind), ''chaninfo'', EEG(1).chaninfo, ''icawinv'', EEG(1).icawinv,' ...
                         '''timerange'', [timerange(1) timerange(2)] %s);' ] , outstr, options);
     else % length(EEG) == 1
         com =  sprintf(['%s envtopo(mean(sigtmp(:,posi:posf,:),3), EEG.icaweights*EEG.icasphere, ' ...
-                        '''chanlocs'', EEG.chanlocs, ''chaninfo'', EEG.chaninfo, ''icawinv'', EEG.icawinv,' ...
+                        '''chanlocs'', EEG.chanlocs(EEG.chaninfo.icachansind), ''chaninfo'', EEG.chaninfo, ''icawinv'', EEG.icawinv,' ...
                         '''timerange'', [timerange(1) timerange(2)] %s);' ] , outstr, options);
     end;    
 end;

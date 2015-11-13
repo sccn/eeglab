@@ -409,13 +409,20 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
             
             % make link if duplicate
             % ----------------------
+            if ~isempty(g.cell)
+                desset = STUDY.design(g.design).cell(g.cell);
+                [path,tmp] = fileparts(desset.filebase);
+            else path = ALLEEG(index).filepath;
+            end;
+            
             fprintf('Computing/checking topo file for dataset %d\n', ind1);
             if ~isempty(found)
-                tmpfile1 = fullfile( ALLEEG(index).filepath, [ ALLEEG(index).filename(1:end-3) 'icatopo' ]); 
+                clear tmp;
+                tmpfile1 = fullfile( path, [ ALLEEG(index).filename(1:end-3) 'icatopo' ]); 
                 tmp.file = fullfile( ALLEEG(found).filepath, [ ALLEEG(found).filename(1:end-3) 'icatopo' ]); 
                 std_savedat(tmpfile1, tmp);
             else
-                std_topo(ALLEEG(index), chanlist{index}, 'none', 'recompute', g.recompute);
+                std_topo(ALLEEG(index), chanlist{index}, 'none', 'recompute', g.recompute,'fileout',path);
             end;
         end;
         if isfield(curstruct, 'topo')
@@ -539,11 +546,11 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
             end;
             if strcmpi(g.rmicacomps, 'on')
                 for ind = 1:length(idat)
-                    rmcomps{ind} = union_bc(rmcomps{ind}, find(ALLEEG(idat(1)).reject.gcompreject));
+                    rmcomps{ind} = union_bc(rmcomps{ind}, find(ALLEEG(idat(ind)).reject.gcompreject));
                 end;
             elseif strcmpi(g.rmicacomps, 'processica')
                 for ind = 1:length(idat)
-                    rmcomps{ind} = union_bc(rmcomps{ind}, find(~ALLEEG(idat(1)).reject.gcompreject));
+                    rmcomps{ind} = union_bc(rmcomps{ind}, find(~ALLEEG(idat(ind)).reject.gcompreject));
                 end;
             end;
             opts = { opts{:} 'rmcomps' rmcomps };

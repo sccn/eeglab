@@ -131,6 +131,9 @@ function [ ori_vals, df, pvals ] = statcondfieldtrip( data, varargin );
         cfg.neighbours = g.neighbours;
     end;
     if isfield(cfg, 'mcorrect')
+         if strcmpi(cfg.mcorrect, 'none')
+             cfg.mcorrect = 'no';
+         end;
          cfg.correctm = cfg.mcorrect;
     else cfg.mcorrect = [];
     end;
