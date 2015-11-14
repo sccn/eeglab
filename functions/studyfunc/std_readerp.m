@@ -270,7 +270,7 @@ for ind = 1:length(finalinds) % scan channels or clusters
         if strcmpi(dtype, 'spec'), newstruct(ind).specfreqs = xvals;
         else                       newstruct(ind).erptimes  = xvals;
         end;
-        STUDY.cache = eeg_cache(STUDY.cache, hashcode, newstruct);
+        STUDY.cache = eeg_cache(STUDY.cache, hashcode, newstruct(ind));
         
     end;
 end;
