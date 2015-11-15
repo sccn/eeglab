@@ -1,8 +1,8 @@
-% spectopo() - Plot the mean log spectrum of a set of data epochs at all channels 
-%              as a bundle of traces. At specified frequencies, plot the relative 
-%              topographic distribution of power. If available, uses pwelch() from 
-%              the Matlab signal processing toolbox, else the EEGLAB spec() function.
-%              Plots the mean spectrum for all of the supplied data, not just
+% spectopo() - Plot the power spectral density (PSD) of winsize length segments of data 
+%              epochs at all channels as a bundle of traces. At specified frequencies,
+%              plot the relative topographic distribution of PSD. If available, uses
+%              pwelch() from the Matlab signal processing toolbox, else the EEGLAB spec()
+%              function. Plots the mean spectrum for all of the supplied data, not just
 %              the pre-stimulus baseline.
 % Usage:
 %              >> spectopo(data, frames, srate);
@@ -29,7 +29,7 @@
 %   'title'    = [quoted string] plot title {default: none}
 %   'freqfac'  = [integer] ntimes to oversample -> frequency resolution {default: 2}
 %   'nfft'     = [integer] length to zero-pad data to. Overwrites 'freqfac' above.
-%   'winsize'  = [integer] window size in data points {default: from data}
+%   'winsize'  = [integer] window size in data points {default: Sampling Rate}
 %   'overlap'  = [integer] window overlap in data points {default: 0}
 %   'percent'  = [float 0 to 100] percent of the data to sample for computing the 
 %                spectra. Values < 100 speed up the computation. {default: 100}.
@@ -542,7 +542,7 @@ if strcmpi(g.plot, 'on')
     xl=xlabel('Frequency (Hz)');
     set(xl,'fontsize',AXES_FONTSIZE_L);
     % yl=ylabel('Rel. Power (dB)');
-    yl=ylabel('Power 10*log_{10}(\muV^{2}/Hz)');
+    yl=ylabel('Power Spectral Density (\muV^{2}/Hz)');%yl=ylabel('Power 10*log_{10}(\muV^{2}/Hz)');
     set(yl,'fontsize',AXES_FONTSIZE_L);
     set(gca,'fontsize',AXES_FONTSIZE_L)
     box off;
@@ -859,15 +859,17 @@ function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_sub
 	end;
 	%fftlength = 2^round(log(srate)/log(2))*g.freqfac;
 	if isempty(g.winsize)
-        winlength = max(pow2(nextpow2(frames)-3),4); %*2 since diveded by 2 later	
-        winlength = min(winlength, 512);
-        winlength = max(winlength, 256);
+%         winlength = max(pow2(nextpow2(frames)-3),4); %*2 since diveded by 2 later	
+%         winlength = min(winlength, 512);
+%         winlength = max(winlength, 256);
+        winlength = srate;
         winlength = min(winlength, frames);
     else
         winlength = g.winsize;
     end;
     if isempty(g.nfft)
-        fftlength = 2^(nextpow2(winlength))*g.freqfac;
+        %fftlength = 2^(nextpow2(winlength))*g.freqfac;
+        fftlength = winlength;
 	else
         fftlength = g.nfft;
     end;
