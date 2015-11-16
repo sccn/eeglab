@@ -98,6 +98,15 @@
 % Notes: The original input format is still functional for backward compatibility.
 %        psd() has been replaced by pwelch() (see Matlab note 24750 on their web site)
 %
+%        On the pwelch() outputs (Nov 15 2015)
+%        In the estimation of the PSD, Matlab's pwelch function normalizes to winsize duration. 
+%        To account for this and allow a consistency of the  values for the same physical input
+%        when sampled with different sampling rates, winsize was set as the sampling rate value.
+%        If winsize equals sampling rate the estimated PSD is equivalent to the power spectrum 
+%        of the signal. However, if winsize value is changed, it will no longer reflects the 
+%        power spectrum.
+%        We thank Andreas Widmann for this analysis.
+%
 % Authors: Scott Makeig, Arnaud Delorme & Marissa Westerfield, 
 %          SCCN/INC/UCSD, La Jolla, 3/01 
 %
@@ -873,9 +882,8 @@ function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_sub
 	else
         fftlength = g.nfft;
     end;
-%     usepwelch = 1; 
-    usepwelch = license('checkout','Signal_Toolbox'); % 5/22/2014 Ramon 
-%     if ~license('checkout','Signal_Toolbox'), 
+    
+    usepwelch = license('checkout','Signal_Toolbox');
     if ~usepwelch, 
         fprintf('\nSignal processing toolbox (SPT) absent: spectrum computed using the pwelch()\n');
         fprintf('function from Octave which is suposedly 100%% compatible with the Matlab pwelch function\n');
