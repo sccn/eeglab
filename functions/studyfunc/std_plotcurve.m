@@ -249,7 +249,7 @@ end;
 % labels
 % ------
 if strcmpi(opt.unitx, 'ms'), xlab = 'Time (ms)';      ylab = 'Potential (\muV)';
-else                         xlab = 'Frequency (Hz)'; ylab = 'Power (10*log_{10}(\muV^{2}))'; 
+else                         xlab = 'Frequency (Hz)'; ylab = 'Power Spectral Density (\muV^{2}/Hz)'; % ylab = 'Power (10*log_{10}(\muV^{2}))'; 
 end;
 if ~isnan(opt.threshold), statopt = {  'xlabel' xlab };
 else                      statopt = { 'logpval' 'on' 'xlabel' xlab 'ylabel' '-log10(p)' 'ylim' [0 maxplot] };
