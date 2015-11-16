@@ -136,6 +136,7 @@ for ind = 1:length(finalinds) % scan channels or clusters
     if ~isempty(opt.channels), bigstruct.channel = opt.channels{ind};
     else                       bigstruct.cluster = opt.clusters(ind);
     end;
+    bigstruct.datatype     = opt.datatype;
     bigstruct.timerange    = opt.timerange;
     bigstruct.freqrange    = opt.freqrange;
     bigstruct.rmsubjmean   = opt.rmsubjmean;
