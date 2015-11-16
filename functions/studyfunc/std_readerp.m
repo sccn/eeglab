@@ -174,7 +174,7 @@ for ind = 1:length(finalinds) % scan channels or clusters
         
         % read the data and select channels
         % ---------------------------------
-        subjectList = opt.subject;
+        if ischar(opt.subject) && ~isempty(opt.subject), subjectList = {opt.subject}; else subjectList = opt.subject; end;
         if isempty(subjectList), subjectList = STUDY.design(STUDY.currentdesign).cases.value; end;
         count = 1;
         for iSubj = length(subjectList):-1:1
