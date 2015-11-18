@@ -27,7 +27,7 @@
 %                Default color limits are symmetric around 0 and are different 
 %                for each scalp map {default|all NaN's: from the data limits}
 %   'title'    = [quoted string] plot title {default: none}
-%   'freqfac'  = [integer] ntimes to oversample -> frequency resolution {default: 2}
+%   'freqfac'  = [integer] ntimes to oversample -> frequency resolution {default: 1}
 %   'nfft'     = [integer] length to zero-pad data to. Overwrites 'freqfac' above.
 %   'winsize'  = [integer] window size in data points {default: Sampling Rate}
 %   'overlap'  = [integer] window overlap in data points {default: 0}
@@ -98,14 +98,16 @@
 % Notes: The original input format is still functional for backward compatibility.
 %        psd() has been replaced by pwelch() (see Matlab note 24750 on their web site)
 %
-%        On the pwelch() outputs (Nov 15 2015)
-%        In the estimation of the PSD, Matlab's pwelch function normalizes to winsize duration. 
-%        To account for this and allow a consistency of the  values for the same physical input
-%        when sampled with different sampling rates, winsize was set as the sampling rate value.
-%        If winsize equals sampling rate the estimated PSD is equivalent to the power spectrum 
-%        of the signal. However, if winsize value is changed, it will no longer reflects the 
-%        power spectrum.
-%        We thank Andreas Widmann for this analysis.
+% Non backward compatible change (Nov 15 2015):
+%   In the estimation of the PSD, Matlab's pwelch function normalizes to winsize duration. 
+%   To account for this and allow a consistency of the  values for the same physical input
+%   when sampled with different sampling rates, winsize was set as the sampling rate value.
+%   If winsize equals sampling rate the estimated PSD is equivalent to the power spectrum 
+%   of the signal. However, if winsize value is changed, it will no longer reflects the 
+%   power spectrum. We thank Andreas Widmann for this analysis. For this reason, the 
+%   data is not padded anymore and spectopo will use a discrete Fourier transform instead
+%   of a fast Fourier transform. Also default frequency resolution was changed to 1Hz 
+%   instead of 2 Hz.
 %
 % Authors: Scott Makeig, Arnaud Delorme & Marissa Westerfield, 
 %          SCCN/INC/UCSD, La Jolla, 3/01 
@@ -145,7 +147,7 @@ function [eegspecdB,freqs,compeegspecdB,resvar,specstd] = spectopo(data,frames,s
 
 icadefs;
 LOPLOTHZ = 1;  % low  Hz to plot
-FREQFAC  = 2;  % approximate frequencies/Hz (default)
+FREQFAC  = 1;  % approximate frequencies/Hz (default)
 allcolors = { [0 0.7500 0.7500] 
               [1 0 0] 
               [0 0.5000 0] 
@@ -878,7 +880,7 @@ function [eegspecdB, freqs, specstd] = spectcomp( data, frames, srate, epoch_sub
     end;
     if isempty(g.nfft)
         %fftlength = 2^(nextpow2(winlength))*g.freqfac;
-        fftlength = winlength;
+        fftlength = winlength*g.freqfac;
 	else
         fftlength = g.nfft;
     end;
