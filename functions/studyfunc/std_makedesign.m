@@ -235,7 +235,7 @@ end;
 
 % check inputs
 % ------------
-[indvars indvarvals ] = std_getindvar(STUDY);
+[indvars indvarvals tmp paired] = std_getindvar(STUDY);
 if isfield(STUDY.datasetinfo, 'trialinfo')
      alltrialinfo = { STUDY.datasetinfo.trialinfo };
      dattrialselect = cellfun(@(x)([1:length(x)]), alltrialinfo, 'uniformoutput', false);
@@ -277,21 +277,25 @@ if ~isempty(opt.variable1)
     des.variable(1).label   = opt.variable1;
     des.variable(1).value   = opt.values1;
     des.variable(1).vartype = opt.vartype1;
+    des.variable(1).paring  = paired{m1};
 end;
 if ~isempty(opt.variable2)
     des.variable(2).label   = opt.variable2;
     des.variable(2).value   = opt.values2;
     des.variable(2).vartype = opt.vartype2;
+    des.variable(2).paring  = paired{m2};
 end;
 if ~isempty(opt.variable3)
     des.variable(3).label   = opt.variable3;
     des.variable(3).value   = opt.values3;
     des.variable(3).vartype = opt.vartype3;
+    des.variable(3).paring  = paired{m3};
 end;
 if ~isempty(opt.variable4)
     des.variable(4).label   = opt.variable4;
     des.variable(4).value   = opt.values4;
     des.variable(4).vartype = opt.vartype4;
+    des.variable(4).paring  = paired{m4};
 end;
 des.include             = opt.datselect;
 des.cases.label = 'subject';
