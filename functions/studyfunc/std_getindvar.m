@@ -34,7 +34,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [ factor factorvals subjects ] = std_getindvar(STUDY, mode, scandesign)
+function [ factor factorvals subjects paired ] = std_getindvar(STUDY, mode, scandesign)
 
 if nargin < 1
     help std_getindvar;
@@ -43,6 +43,7 @@ end;
 
 factor     = {};
 factorvals = {};
+paired     = {};
 subjects   = {};
 if nargin < 2, mode = 'both'; end;
 if nargin < 3, scandesign = 0; end;
@@ -61,9 +62,18 @@ if strcmpi(mode, 'datinfo') || strcmpi(mode, 'both')
                 factorvals{countfact} = tmpvals;
 
                 % get subject for each factor value
+                intersectSubject = { setinfo(:).subject };
                 for c = 1:length(tmpvals)
                     eval( [ 'datind = strmatch(tmpvals{c}, { setinfo.' ff{index} '}, ''exact'');' ] );
                     subjects{  countfact}{c} = unique_bc( { setinfo(datind).subject } );
+                    intersectSubject = intersect(intersectSubject, subjects{  countfact}{c});
+                end;
+                
+                numValues = cellfun(@length, subjects{  countfact});
+                if length(intersectSubject) == numValues(1) && length(unique(numValues)) == 1
+                    paired{countfact} = 'on'; % trial data always paired
+                else
+                    paired{countfact} = 'off';
                 end;
                 countfact = countfact + 1;
             end;
@@ -74,9 +84,18 @@ if strcmpi(mode, 'datinfo') || strcmpi(mode, 'both')
                 factorvals{countfact} = mattocell(tmpvals);
 
                 % get subject for each factor value
+                intersectSubject = { setinfo(:).subject };
                 for c = 1:length(tmpvals)
                     eval( [ 'datind = find(tmpvals(c) == [ setinfo.' ff{index} ']);' ] );
                     subjects{  countfact}{c} = unique_bc( { setinfo(datind).subject } );
+                    intersectSubject = intersect(intersectSubject, subjects{  countfact}{c});
+                end;
+                
+                numValues = cellfun(@length, subjects{  countfact});
+                if length(intersectSubject) == numValues(1) && length(unique(numValues)) == 1
+                    paired{countfact} = 'on'; % trial data always paired
+                else
+                    paired{countfact} = 'off';
                 end;
                 countfact = countfact + 1;
             end;
@@ -118,6 +137,7 @@ if strcmpi(mode, 'trialinfo') || strcmpi(mode, 'both')
                     factor{    countfact} = ff{index};
                     factorvals{countfact} = alltmpvals;
                     subjects{  countfact} = {};
+                    paired{countfact}     = 'on'; % trial data always paired
                     countfact = countfact + 1;
                 end;
             else
@@ -134,6 +154,7 @@ if strcmpi(mode, 'trialinfo') || strcmpi(mode, 'both')
                     factor{    countfact} = ff{index};
                     factorvals{countfact} = mattocell(alltmpvals);
                     subjects{  countfact} = {};
+                    paired{countfact}     = 'off'; % pairing is irrelevant for continuous var
                     countfact = countfact + 1;
                 end;
             end;
