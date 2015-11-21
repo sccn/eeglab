@@ -228,6 +228,16 @@ if ~studywasempty
                 STUDY.design(inddes).variable(2).pairing = 'on';
             end;
             for indvar = 1:length(STUDY.design(inddes).variable)
+                
+                % add pairing info in case it is missing
+                if ~isfield(STUDY.design(inddes).variable, 'pairing') || isempty(STUDY.design(inddes).variable(indvar).pairing)
+                    if strcmpi(STUDY.design(inddes).variable(1).label, 'group')
+                        STUDY.design(inddes).variable(indvar).pairing = 'off';
+                    else
+                        STUDY.design(inddes).variable(indvar).pairing = 'on';
+                    end;
+                end;
+                
                 for indval = 1:length(STUDY.design(inddes).variable(indvar).value)
                     STUDY.design(inddes).variable(indvar).value{indval} = convertindvarval(STUDY.design(inddes).variable(indvar).value{indval});
                 end;
@@ -267,6 +277,20 @@ if ~studywasempty
     
     if rebuild_design % in case datasets have been added or removed
         STUDY = std_rebuilddesign(STUDY, ALLEEG);
+    end;
+    
+    % scan design to fix old pairing format
+    % ------------------------------------
+    for design = 1:length(STUDY.design)
+        for var = 1:length(STUDY.design(design).variable)
+            if isstr(STUDY.design(design).variable(var).pairing)
+                if strcmpi(STUDY.design(design).variable(var).pairing, 'paired')
+                    STUDY.design(design).variable(var).pairing = 'on';
+                elseif strcmpi(STUDY.design(design).variable(var).pairing, 'unpaired')
+                    STUDY.design(design).variable(var).pairing = 'off';
+                end;
+            end;
+        end;
     end;
     
     % add filepath field if absent
