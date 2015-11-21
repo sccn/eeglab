@@ -154,22 +154,24 @@ try
             for des = 1:length(STUDY.design)
                 for iCell = 1:length(STUDY.datasetinfo) % length(STUDY.design(des).cell)
                     if ~warningshown
-                        if exist( [ STUDY.design(des).cell(iCell).filebase '.icaersp' ] )
-                            warning('off', 'MATLAB:load:variableNotFound');
-                            tmp = load('-mat', [ STUDY.design(des).cell(iCell).filebase '.icaersp' ], 'trialindices');
-                            warning('on', 'MATLAB:load:variableNotFound');
-                            if ~isfield(tmp, 'trialindices')
-                                warningshown = 1;
-                                warndlg( [ 'Warning: ICA ERSP or ITC data files computed with old version of EEGLAB for design ' int2str(des) 10 ...
-                                             '(and maybe other designs). These files may be corrupted and must be recomputed.' ], 'Important EEGLAB warning', 'nonmodal');
+                        if isfield( STUDY.design(des), 'cell')
+                            if exist( [ STUDY.design(des).cell(iCell).filebase '.icaersp' ] )
+                                warning('off', 'MATLAB:load:variableNotFound');
+                                tmp = load('-mat', [ STUDY.design(des).cell(iCell).filebase '.icaersp' ], 'trialindices');
+                                warning('on', 'MATLAB:load:variableNotFound');
+                                if ~isfield(tmp, 'trialindices')
+                                    warningshown = 1;
+                                    warndlg2( [ 'Warning: ICA ERSP or ITC data files computed with old version of EEGLAB for design ' int2str(des) 10 ...
+                                                 '(and maybe other designs). These files may be corrupted and must be recomputed.' ], 'Important EEGLAB warning', 'nonmodal');
+                                end;
                             end;
-                        end;
-                        if warningshown == 0 && exist( [ STUDY.design(des).cell(iCell).filebase '.icaitc' ] )
-                            tmp = load('-mat', [ STUDY.design(des).cell(iCell).filebase '.icaersp' ], 'trialindices');
-                            if ~isfield(tmp, 'trialindices')
-                                warningshown = 1;
-                                warndlg( [ 'Warning: ICA ERSP or ITC data files computed with old version of EEGLAB for design ' int2str(des) 10 ...
-                                             '(and maybe other designs). These files may be corrupted and must be recomputed.' ], 'Important EEGLAB warning', 'modal');
+                            if warningshown == 0 && exist( [ STUDY.design(des).cell(iCell).filebase '.icaitc' ] )
+                                tmp = load('-mat', [ STUDY.design(des).cell(iCell).filebase '.icaersp' ], 'trialindices');
+                                if ~isfield(tmp, 'trialindices')
+                                    warningshown = 1;
+                                    warndlg2( [ 'Warning: ICA ERSP or ITC data files computed with old version of EEGLAB for design ' int2str(des) 10 ...
+                                                 '(and maybe other designs). These files may be corrupted and must be recomputed.' ], 'Important EEGLAB warning', 'modal');
+                                end;
                             end;
                         end;
                     end;
