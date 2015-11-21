@@ -8,7 +8,7 @@ end;
 if isstruct(varlist)
     
     indVar = 1;
-    indCat = 1;
+    indCat = 1; % categorical
     indVal = 1;
     if ~isempty(var)
         indVar = strmatch(var, varlist.factors, 'exact');
