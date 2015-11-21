@@ -38,7 +38,7 @@ end;
 if nargin < 3 && ~isstr(STUDY)
     
     %% create GUI
-    [ usrdat.factors usrdat.factorvals usrdat.factsubj] = std_getindvar(STUDY, 'both', 1);
+    [ usrdat.factors usrdat.factorvals usrdat.factsubj usrdat.pairing] = std_getindvar(STUDY, 'both', 1);
     
     usrdat.factors     = { 'None' usrdat.factors{:} };
     usrdat.factorvals  = { {}     usrdat.factorvals{:} };
@@ -241,7 +241,7 @@ elseif isstr(STUDY)
             % categorical var
             curVal = {};
             for iVar = 1:length(des(val).variable)
-                if ~isempty(des(val).variable(iVar).value)
+                if ~isempty(des(val).variable(iVar).value) && strcmpi(des(val).variable(iVar).vartype, 'categorical')
                     valStr = '';
                     valStrCell = encodevals(des(val).variable(iVar).value);
                     for iVal = 1:length(valStrCell)
@@ -335,7 +335,9 @@ elseif isstr(STUDY)
         case 'editvar'
             val    = get(findobj(fig, 'tag', 'listboxdesign'), 'value');
             val2   = get(findobj(fig, 'tag', 'lbfact0'), 'value');
-            [tmpVar tmpVarList cat] = pop_addindepvar(usrdat, [], des(val).variable(val2).label, des(val).variable(val2).value);
+            tmpval = des(val).variable(val2).value;
+            if strcmpi(des(val).variable(val2).vartype, 'continuous'), tmpval = []; end;
+            [tmpVar tmpVarList cat] = pop_addindepvar(usrdat, [], des(val).variable(val2).label, tmpval);
             if ~isempty(tmpVar) && ~strcmp(tmpVar,'None')
                 des(val).variable(val2).label = tmpVar;
                 des(val).variable(val2).value = tmpVarList; % empty for cont var
