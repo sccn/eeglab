@@ -125,7 +125,8 @@ statstruct.currentdesign = STUDY.currentdesign; %added by behnam
 statstruct = pop_statparams(statstruct, varargin{:});
 stats = statstruct.etc.statistics;
 stats.fieldtrip.channelneighbor = struct([]); % asumes one channel or 1 component
-    
+stats.paired = { STUDY.design(opt.design).variable(:).pairing };
+
 % potentially missing fields
 % --------------------------
 fields     = { 'filter' 'subtractsubjectmean' 'timerange' 'freqrange' 'topotime' 'topofreq' 'averagechan'};
