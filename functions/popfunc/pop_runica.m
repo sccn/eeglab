@@ -494,10 +494,17 @@ end;
 % ---------------------------------------
 if length(g.dataset) > 1
     for i = g.dataset
-        ALLEEG(i).icaweights = EEG.icaweights;
-        ALLEEG(i).icasphere  = EEG.icasphere;
-        ALLEEG(i).icawinv    = EEG.icawinv;
+        ALLEEG(i).icaweights  = EEG.icaweights;
+        ALLEEG(i).icasphere   = EEG.icasphere;
+        ALLEEG(i).icawinv     = EEG.icawinv;
         ALLEEG(i).icachansind = g.chanind;
+        
+        % Saving sets
+        if length(ALLEEG) > 1 & strcmpi(g.concatenate, 'on')
+            ALLEEG(i).saved = 'no';
+            pop_saveset(ALLEEG(i), 'savemode', 'resave');
+            ALLEEG(i).saved = 'yes';
+        end
     end;            
     ALLEEG = eeg_checkset(ALLEEG);
 else
