@@ -1412,7 +1412,8 @@ catch, return; end;
 index = 1;
 indexmenu = 1;
 MAX_SET = max(length( ALLEEG ), length(EEGMENU)-1);
-	
+
+warning('off','MATLAB:lang:cannotClearExecutingFunction');
 clear functions;
 eeglab_options;
 if isempty(ALLEEG) && ~isempty(EEG) && ~isempty(EEG.data)
