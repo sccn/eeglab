@@ -177,7 +177,11 @@ end;
                         'timelimits'    'real'                  []          [EEG(1).xmin EEG(1).xmax]*1000;
                         'cycles'        'real'                  []          [3 .5];
                         'padratio'      'real'                  []          1;
+<<<<<<< HEAD
                         'trialinfo'     'struct'                []          struct([]);
+=======
+                         'trialinfo'    'struct'                []          struct([]);
+>>>>>>> Read files in new format and adapt to new design
                         'freqs'         'real'                  []          [0 EEG(1).srate/2];
                         'rmcomps'       'cell'                  []          cell(1,length(EEG));
                         'interp'        'struct'                { }         struct([]);
