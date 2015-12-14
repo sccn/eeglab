@@ -153,7 +153,6 @@ if nargin < 2
            
         % create the gui for this variable
         % --------------------------------
-        geometry = { geometry{:} [4 0.3 0.1] };
         if strcmpi(opt(index).varname, 'option_storedisk') & datasets_in_memory
             cb_nomodif = [ 'set(gcbo, ''value'', ~get(gcbo, ''value''));' ...
                            'warndlg2(strvcat(''This option may only be modified when at most one dataset is stored in memory.''));' ];
@@ -167,11 +166,18 @@ if nargin < 2
         end;
         
         if ~isempty(opt(index).value)
-            uilist   = { uilist{:}, { 'Style', 'text', descrip{:}, 'horizontalalignment', 'left' }, ...
-                         { 'Style', 'checkbox', 'string', '    ', 'value', opt(index).value 'callback' cb_nomodif } { } }; 
+            if opt(index).value <= 1
+                uilist   = { uilist{:}, { 'Style', 'text', descrip{:}, 'horizontalalignment', 'left' }, ...
+                             { 'Style', 'checkbox', 'string', '    ', 'value', opt(index).value 'callback' cb_nomodif } { } }; 
+                geometry = { geometry{:} [4 0.3 0.1] };
+            else
+                uilist   = { uilist{:}, { 'Style', 'text', descrip{:}, 'horizontalalignment', 'left' }, ...
+                             { 'Style', 'edit', 'string', num2str(opt(index).value), 'callback' cb_nomodif } { } }; 
+                geometry = { geometry{:} [3 0.5 0.1] };
+            end;
         else
-            uilist   = { uilist{:}, { 'Style', 'text', descrip{:}, 'fontweight' 'bold', 'horizontalalignment', 'left' }, ...
-                         { } { } }; 
+            uilist   = { uilist{:}, { 'Style', 'text', descrip{:}, 'fontweight' 'bold', 'horizontalalignment', 'left' }, { } { } }; 
+            geometry = { geometry{:} [4 0.3 0.1] };
         end;
     end;
 
@@ -228,7 +234,11 @@ for index = 1:2:length(args)
             error(['Variable name ''' args{index} ''' is invalid']);
         end;
     else
-        opt(ind).value = args{index+1};
+        if strcmpi(args{index}, 'option_cachesize')
+            opt(ind).value = str2num(args{index+1});
+        else
+            opt(ind).value = args{index+1};
+        end;
     end;
 end;        
 
