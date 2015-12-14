@@ -1245,9 +1245,6 @@ else
         end;
     end;
 end;
-if ~isempty(g.precomputed)
-    return; % return single trial power
-end;
 
 % -----------------------
 % compute baseline values
