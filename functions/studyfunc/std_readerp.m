@@ -11,7 +11,8 @@
 %
 % Optional inputs:
 %  'design'    - [integer] read files from a specific STUDY design. Default
-%                is empty (use current design in STUDY.currentdesign).
+%                is empty (use current design in STUDY.currentdesign). Use
+%                NaN to create a design with with all the data.
 %  'channels'  - [cell] list of channels to import {default: none}
 %  'clusters'  - [integer] list of clusters to import {[]|default: all but
 %                the parent cluster (1) and any 'NotClust' clusters}
@@ -64,23 +65,6 @@ if nargin < 2
     help std_readerp;
     return;
 end
-if ~isstruct(ALLEEG) 
-    % old calling format
-    % ------------------
-    EEG = STUDY(ALLEEG);
-    filename   = fullfile(EEG.filepath, EEG.filename(1:end-4));
-    comporchan = varargin{1};
-    options = {'measure', 'erp'};
-    if length(varargin) > 1, options = { options{:} 'timelimits', varargin{2} }; end;
-    if comporchan(1) > 0
-        [datavals tmp xvals] = std_readfile(filename, 'components',comporchan, options{:});
-    else
-       [datavals tmp xvals] = std_readfile(filename, 'channels', comporchan, options{:});
-    end;
-    STUDY    = datavals';
-    datavals = xvals;
-    return;
-end;
 
 STUDY = pop_erpparams(STUDY, 'default');
 STUDY = pop_specparams(STUDY, 'default');
@@ -98,8 +82,6 @@ STUDY = pop_specparams(STUDY, 'default');
     'subject'       'string'  []             '' }, ...
     'std_readerp', 'ignore');
 if isstr(opt), error(opt); end;
-% nc = max(length(STUDY.design(opt.design).variable(1).value),1);
-% ng = max(length(STUDY.design(opt.design).variable(2).value),1);
 
 dtype = opt.datatype;
 
@@ -143,7 +125,11 @@ for ind = 1:length(finalinds) % scan channels or clusters
     bigstruct.singletrials = opt.singletrials;
     bigstruct.subject      = opt.subject;
     bigstruct.component    = opt.component;
-    bigstruct.design       = STUDY.design(opt.design);
+    if isnan(opt.design)
+         bigstruct.design.cases.value = STUDY.subject;
+         bigstruct.design.variable    = struct([]);
+    else bigstruct.design  = STUDY.design(opt.design);
+    end;
     hashcode = gethashcode(std_serialize(bigstruct));
     [STUDY.cache tmpstruct] = eeg_cache(STUDY.cache, hashcode);
     
@@ -175,14 +161,14 @@ for ind = 1:length(finalinds) % scan channels or clusters
         % read the data and select channels
         % ---------------------------------
         if ischar(opt.subject) && ~isempty(opt.subject), subjectList = {opt.subject}; else subjectList = opt.subject; end;
-        if isempty(subjectList), subjectList = STUDY.design(STUDY.currentdesign).cases.value; end;
+        if isempty(subjectList), subjectList = bigstruct.design.cases.value; end;
         count = 1;
         for iSubj = length(subjectList):-1:1
             datInds = find(strncmp( subjectList{iSubj}, allSubjects, max(cellfun(@length, allSubjects))));
             fileName = fullfile(STUDY.datasetinfo(datInds(1)).filepath, [ subjectList{iSubj} fileExt ]); 
             
             if ~isempty(opt.channels)
-                [dataSubject{ iSubj } params xvals tmp events{ iSubj } ] = std_readfile( fileName,  'designvar', STUDY.design(opt.design).variable, opts{:}, 'channels', opt.channels(ind));
+                [dataSubject{ iSubj } params xvals tmp events{ iSubj } ] = std_readfile( fileName, 'designvar', bigstruct.design.variable, opts{:}, 'channels', opt.channels(ind));
             else
                 % find components for a given cluster and subject
                 setInds = [];
@@ -190,15 +176,15 @@ for ind = 1:length(finalinds) % scan channels or clusters
                 if ~isempty(opt.component), setInds = intersect(setInds, opt.component); end;
                 for iComp = 1:length(setInds)
                     comps = STUDY.cluster(finalinds(ind)).comps( setInds(iComp) );
-                    [dataSubject{ count } params xvals tmp events{ count } ] = std_readfile( fileName,  'designvar', STUDY.design(opt.design).variable, opts{:}, 'components', comps);
+                    [dataSubject{ count } params xvals tmp events{ count } ] = std_readfile( fileName,  'designvar', bigstruct.design.variable, opts{:}, 'components', comps);
                     if ~isempty(componentPol), for iCell = 1:length(dataSubject{ count }(:)), dataSubject{ count }{ iCell } = dataSubject{ count }{ iCell }*componentPol(setInds(iComp)); end; end;
                     count = count+1;
                 end;
             end;
         end;
 
-        % concatenate data - compute average if not dealing with single trials
-        % --------------------------------------------------------------------
+        % concatenate data - compute average if not dealing with (processing) single trials
+        % ---------------------------------------------------------------------------------
         if strcmpi(opt.singletrials, 'off')
             for iSubj = length(dataSubject(:)):-1:1
                 for iCell = 1:length(dataSubject{1}(:))
@@ -283,13 +269,10 @@ if strcmpi( dtype, 'spec'), xvals = newstruct(1).([ dtype 'freqs' ]);
 else                        xvals = newstruct(1).([ dtype 'times' ]);
 end;
 if ~isempty(opt.channels)
-    
     % concatenate channels if necessary
-    structdat = STUDY.changrp;
-    datavals  = [];
-   
+    datavals  = [];   
     for chan = length(finalinds):-1:1
-        tmpdat = getfield(newstruct(chan), [ dtype 'data' ]); % only works for interpolated data
+        tmpdat = newstruct(chan).([ dtype 'data' ]); % only works for interpolated data
         for ind =  1:length(tmpdat(:))
             datavals{ind}(:,:,chan) = tmpdat{ind};
         end;
@@ -302,7 +285,7 @@ if ~isempty(opt.channels)
 else
     % in practice clusters are read one by one
     % so it is fine to take the first element only
-    datavals = getfield(newstruct(1), [ dtype 'data' ]);
+    datavals = newstruct(1).([ dtype 'data' ]);
 end;
 
 % compute mean spectrum
