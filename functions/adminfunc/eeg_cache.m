@@ -57,7 +57,7 @@ if isempty(ind)
         cache(end  ).data     = data;
 
         % make sure the cache is not too large
-        while getfield(whos('cache'), 'bytes') > option_cachesize
+        while getfield(whos('cache'), 'bytes') > option_cachesize*1000000
             cache(1) = [];
         end;
     else
