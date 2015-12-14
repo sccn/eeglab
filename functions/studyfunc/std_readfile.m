@@ -12,12 +12,11 @@
 %
 % Optional inputs:
 %   'channels'       - [cell or integer] channel labels - for instance 
-%                      { 'cz' 'pz' }
-%                      of channels to load from the data file.
-%   'components'     - [integer] component index in the selected EEG dataset for which 
-%                      to read the ERSP
-%   'timelimits'     - [min max] ERSP time (latency in ms) range of interest
-%   'freqlimits'     - [min max] ERSP frequency range (in Hz) of interest
+%                      { 'cz' 'pz' } of channels to load from the data file.
+%   'components'     - [integer] component index in the selected EEG dataset 
+%                      for which to read the data
+%   'timelimits'     - [min max] ERSP/ERP time (latency in ms) range of interest
+%   'freqlimits'     - [min max] ERSP/Spectrum frequency range (in Hz) of interest
 %   'measure'        - ['erp'|'spec'|'ersp'|'itc'|'timef'|'erspbase'|'erspboot'
 %                      'itcboot'|'erpim'] data measure to read. If a full file name
 %                      is provided, the data measure is selected automatically.
@@ -26,14 +25,15 @@
 %                      of the field in the trialinfo structure to be used to pull out the trials. 
 %                      i.e. if values are string:  {'field1',{val1_fromfield1 val2_fromfield1}, 'field2'...} 
 %                           if values are numeric: {'field1',[val1 val2], 'field2'...}
-%   'designvar'      - Structure of Independent Variables(IV) with fields 'label'
-%                      and 'value'. Each IV should have these two fields so
-%                      the function can use these values to pull out the trials. 
+%   'designvar'      - Structure of independent variables with fields 'label'
+%                      and 'value'. Each independent variable should have these 
+%                      two fields so the function can use these values to pull 
+%                      out the trials. If empty, all the trials are read.
 %   'singletrials'   - { 'on','off' } Extract single trials. Default 'off'
 %   'getparamonly'   - { 'on','off'} Get only parameters. Default 'off'
 %   'concatenate'    - { 'on','off'} In case of ERP images this function
 %                      set 'singletrials' to 'on'. Default 'off'
-%   'dataindices'    - (To be updated)
+%   'dataindices'    - obsolete input
 %
 % Outputs:
 %   data                - the multi-channel or multi-component data. The size of this
@@ -43,7 +43,6 @@
 %   range1              - time points (ERP, ERSP) or frequency points (spectrum)
 %   range2              - frequency points (ERSP, ITCs)
 %   events              - Event readed from the data structure
-%   setinfoTrialIndices - Deprecated
 %
 % Examples:
 %   % the examples below read all data channels for the selected files
@@ -180,7 +179,13 @@ if strcmpi(opt.getparamonly, 'on'),
 end;
 
 options = { opt.dataindices, opt.function, dataType, indBegin1, indEnd1, indBegin2, indEnd2 };
-[ measureData events ] = globalgetfiledata(fileData, opt.designvar, options, {});
+if isempty(opt.designvar)
+    [ measureData events ] = getfiledata(fileData, NaN, options{:}); % read all data
+    measureData = { measureData };
+    events      = { events };
+else
+    [ measureData events ] = globalgetfiledata(fileData, opt.designvar, options, {});
+end;
 
 % remove duplicates in the list of parameters
 % -------------------------------------------
@@ -242,11 +247,15 @@ events    = [];
 subTrials = [];
 trials    = [];
 if ~isempty(trialselect)
-    [trials events] = std_gettrialsind(fileData.trialinfo, trialselect{:});
-    if length(unique(diff(trials))) > 1
-        temptrials = [trials(1):trials(end)];
-        subTrials  = trials-trials(1)+1;
-        trials     = temptrials;
+    if isnumeric(trialselect) && isnan(trialselect(1))
+        trials = [1:length(fileData.trialinfo)]; % read all trials if NaN
+    else
+        [trials events] = std_gettrialsind(fileData.trialinfo, trialselect{:});
+        if length(unique(diff(trials))) > 1
+            temptrials = [trials(1):trials(end)];
+            subTrials  = trials-trials(1)+1;
+            trials     = temptrials;
+        end;
     end;
 end;
 
