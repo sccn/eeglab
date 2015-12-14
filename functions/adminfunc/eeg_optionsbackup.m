@@ -21,4 +21,4 @@ option_donotusetoolboxes = 0 ;  % If set, do not use Matlab additional toolboxes
 % EEGLAB connectivity and support
 option_checkversion      = 1 ;  % If set, check for new version of EEGLAB at startup.
 option_chat              = 0 ;  % If set, enable EEGLAB chat - currently UCSD only - restart EEGLAB after changing that option.
-option_cachesize         = 1000000000 ;  % Size of cache in bytes for EEGLAB STUDY cache.
+option_cachesize         = 100 ;  % Size of cache in Mbytes for EEGLAB STUDY cache in RAM.
