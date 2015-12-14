@@ -127,7 +127,8 @@ statstruct.currentdesign = STUDY.currentdesign; %added by behnam
 statstruct = pop_statparams(statstruct, varargin{:});
 stats = statstruct.etc.statistics;
 stats.fieldtrip.channelneighbor = struct([]); % asumes one channel or 1 component
-    
+stats.paired = { STUDY.design(STUDY.currentdesign).variable(:).pairing };
+
 % potentially missing fields
 % --------------------------
 fields     = { 'freqrange'     [];
@@ -178,11 +179,10 @@ if isempty(opt.caxis),
     end;
 end;
 
-allconditions = STUDY.design(opt.design).variable(1).value;
-allgroups     = STUDY.design(opt.design).variable(2).value;
-paired        = { STUDY.design(opt.design).variable(1).pairing ...
-                  STUDY.design(opt.design).variable(2).pairing };
-stats.paired  = paired;
+allconditions  = {};
+allgroups      = {};
+if length(STUDY.design(STUDY.currentdesign).variable) > 0, allconditions = STUDY.design(STUDY.currentdesign).variable(1).value; end;
+if length(STUDY.design(STUDY.currentdesign).variable) > 1, allgroups     = STUDY.design(STUDY.currentdesign).variable(2).value; end;
 
 % for backward compatibility
 % --------------------------
@@ -278,7 +278,7 @@ if ~isempty(opt.channels)
             if length(opt.channels) > 1 & ~strcmpi(opt.plotmode, 'none'), figure; opt.plotmode = 'condensed'; end;
             nc = ceil(sqrt(length(opt.channels)));
             nr = ceil(length(opt.channels)/nc);
-            for index = 1:max(cellfun(@(x)(size(x,3)), allersp(:)))
+            for index = length(locs)
                 if length(opt.channels) > 1, try, subplot(nr,nc,index, 'align'); catch, subplot(nr,nc,index); end; end;
                 tmpersp = cell(size(allersp));
                 for ind = 1:length(allersp(:))
