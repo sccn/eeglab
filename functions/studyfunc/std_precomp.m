@@ -265,7 +265,7 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
     % compute ERPs
     % ------------
     if strcmpi(g.erp, 'on')
-
+        
         % check dataset consistency
         % -------------------------
         allPnts = [ALLEEG(:).pnts];
@@ -273,7 +273,7 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
         if length(unique(allPnts)) > 1
             error([ 'Cannot compute ERPs because datasets' 10 'do not have the same number of data points' ])
         end;
-        
+
         allSubjects = { STUDY.datasetinfo.subject };
         uniqueSubjects = unique(allSubjects);
         for iSubj = 1:length(uniqueSubjects)
@@ -302,8 +302,7 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
     % compute spectrum
     % ----------------
     if strcmpi(g.spec, 'on')
-        % check dataset consistency
-        % -------------------------
+
         allSubjects = { STUDY.datasetinfo.subject };
         uniqueSubjects = unique(allSubjects);
         for iSubj = 1:length(uniqueSubjects)
@@ -334,12 +333,12 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
     if strcmpi(g.erpim, 'on')
         % check dataset consistency
         % -------------------------
-        allPnts = [ALLEEG([STUDY.design(g.design).cell.dataset]).pnts];
+        allPnts = [ALLEEG(:).pnts];
         if iscell(allPnts), allPnts = [ allPnts{:} ]; end;
         if length(unique(allPnts)) > 1
-            error([ 'Cannot compute ERSPs/ITCs because datasets' 10 'do not have the same number of data points' ])
+            error([ 'Cannot compute ERPs because datasets' 10 'do not have the same number of data points' ])
         end;
-        
+
         % check consistency with parameters on disk
         % -----------------------------------------
         guimode = 'guion';
@@ -442,40 +441,19 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
     % compute ERSP and ITC
     % --------------------
     if strcmpi(g.ersp, 'on') || strcmpi(g.itc, 'on')
+        
         % check dataset consistency
-        % -------------------------
-        allPnts = [ALLEEG([STUDY.design(g.design).cell.dataset]).pnts];
+        allPnts = [ALLEEG(:).pnts];
         if iscell(allPnts), allPnts = [ allPnts{:} ]; end;
         if length(unique(allPnts)) > 1
-            error([ 'Cannot compute ERSPs/ITCs because datasets' 10 'do not have the same number of data points' ])
+            error([ 'Cannot compute ERPs because datasets' 10 'do not have the same number of data points' ])
         end;
         
+        % options
         if strcmpi(g.ersp, 'on') & strcmpi(g.itc, 'on'), type = 'both';
         elseif strcmpi(g.ersp, 'on')                   , type = 'ersp';
         else                                             type = 'itc';
         end;
-        
-        % check for existing files
-        % ------------------------
-        guimode = 'guion';
-        [ tmpX tmpt tmpf g.erspparams ] = std_ersp(ALLEEG(1), 'channels', 1, 'type', type, 'recompute', 'on', 'getparams', 'on', 'savetrials', g.savetrials, g.erspparams{:});
-        if strcmpi(g.recompute, 'off')
-            for index = 1:length(STUDY.design(g.design).cell)
-                desset = STUDY.design(g.design).cell(index);
-                if strcmpi(computewhat, 'channels')
-                     filename = [ desset.filebase '.datersp'];
-                else filename = [ desset.filebase '.icaersp'];
-                end;
-                [guimode, g.erspparams] = std_filecheck(filename, g.erspparams, guimode, { 'plotitc' 'plotersp' 'plotphase' });
-                if strcmpi(guimode, 'cancel'), return; end;
-            end;
-            if strcmpi(guimode, 'usedisk') || strcmpi(guimode, 'same'), g.recompute = 'off'; 
-            else                                                        g.recompute = 'on'; 
-            end;
-        end;
-        
-        % check for existing files
-        % ------------------------
         if isempty(g.erspparams), 
             tmpparams = {};
         elseif iscell(g.erspparams), 
@@ -484,23 +462,29 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
             tmpparams      = fieldnames(g.erspparams); tmpparams = tmpparams';
             tmpparams(2,:) = struct2cell(g.erspparams);
         end;
-        tmpparams = { tmpparams{:} 'recompute' g.recompute };
-        for index = 1:length(STUDY.design(g.design).cell)
-            if ~isempty(g.cell)
-                 desset = STUDY.design(g.design).cell(g.cell);
-            else desset = STUDY.design(g.design).cell(index);
-            end;
+        
+        % loop accross subjects
+        allSubjects = { STUDY.datasetinfo.subject };
+        uniqueSubjects = unique(allSubjects);
+        for iSubj = 1:length(uniqueSubjects)
+            inds = find(strncmp( uniqueSubjects{iSubj}, allSubjects, max(cellfun(@length, allSubjects))));
+            filepath = STUDY.datasetinfo(inds(1)).filepath;
+            filebase = fullfile(filepath, uniqueSubjects{iSubj});
+            trialinfo = std_combtrialinfo(STUDY.datasetinfo, inds);
+            
+            addopts = { 'savetrials' g.savetrials 'recompute' g.recompute 'fileout' filebase 'trialinfo' trialinfo tmpparams{:} };
             if strcmpi(computewhat, 'channels')
-                [tmpchanlist opts] = getchansandopts(STUDY, ALLEEG, chanlist, desset.dataset, g);
-                std_ersp(ALLEEG(desset.dataset), 'channels', tmpchanlist, 'type', type, 'fileout', desset.filebase, 'trialindices', desset.trials, opts{:}, tmpparams{:});
+                [tmpchanlist opts] = getchansandopts(STUDY, ALLEEG, chanlist, inds, g);
+                std_ersp(ALLEEG(inds), 'channels', tmpchanlist, opts{:}, addopts{:});
             else
-                if length(desset.dataset)>1 && ~isequal(chanlist{desset.dataset})
-                    error(['ICA decompositions must be identical if' 10 'several datasets are concatenated to build' 10 'the design, abording' ]);
+                if length(inds)>1 && ~isequal(chanlist{inds})
+                    error(['ICA decompositions must be identical if' 10 'several datasets are concatenated' 10 'for a given subject' ]);
                 end;
-                std_ersp(ALLEEG(desset.dataset), 'components', chanlist{desset.dataset(1)}, 'type', type, 'fileout', desset.filebase, 'trialindices', desset.trials, tmpparams{:});
+                std_ersp(ALLEEG(inds), 'components', chanlist{inds(1)}, addopts{:});
             end;
-            if ~isempty(g.cell), break; end;
         end;
+        
+        % remove saved data if any
         if isfield(curstruct, 'erspdata')
             curstruct = rmfield(curstruct, 'erspdata');
             curstruct = rmfield(curstruct, 'ersptimes');
@@ -511,6 +495,7 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
             curstruct = rmfield(curstruct, 'itctimes');
             curstruct = rmfield(curstruct, 'itcfreqs');
         end;
+        
     end;
 
     % components or channels
