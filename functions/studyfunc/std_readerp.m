@@ -188,10 +188,18 @@ for ind = 1:length(finalinds) % scan channels or clusters
         if strcmpi(opt.singletrials, 'off')
             for iSubj = length(dataSubject(:)):-1:1
                 for iCell = 1:length(dataSubject{1}(:))
+%                     if isempty(dataSubject{ iSubj }{ iCell })
+%                         error(sprintf('Subject %s missing one experimental condition, remove subject and try again'));
+%                     end;
                     if isempty(dataSubject{ iSubj }{ iCell })
-                        error(sprintf('Subject %s missing one experimental condition, remove subject and try again'));
+                        alldata{  iCell}(:,iSubj) = NaN;
+                    else
+                        meanData = mean(dataSubject{ iSubj }{ iCell },2);
+                        if exist('alldata', 'var') && (iCell > length(alldata) || size(alldata{  iCell},1) ~= length(meanData))
+                            alldata{  iCell} = zeros(length(meanData), length(dataSubject(:)))*NaN;
+                        end;
+                        alldata{  iCell}(:,iSubj) = meanData;
                     end;
-                    alldata{  iCell}(:,iSubj) = mean(dataSubject{ iSubj }{ iCell },2);
                     if ~isempty(events{iSubj}{iCell})
                          allevents{iCell}(:,iSubj) = mean(events{ iSubj }{ iCell },2);
                     else allevents{iCell} = [];
