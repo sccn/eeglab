@@ -108,9 +108,6 @@ if strcmpi(opt.parentcluster, 'on')
     STUDY.cluster(1).child  = {};
     STUDY.cluster.preclust.preclustparams = [];    
     STUDY.cluster.preclust.preclustdata   = []; 
-    if isfield(STUDY, 'design') && ~isempty(STUDY.design)
-        STUDY.cluster = std_setcomps2cell(STUDY, 1);
-    end;
 else
     % Find the next available cluster index
     % -------------------------------------
@@ -172,7 +169,6 @@ else
              STUDY.cluster(k+len).preclust.preclustparams = STUDY.etc.preclust.preclustparams;
         else STUDY.cluster(k+len).preclust.preclustdata   = [];
         end;
-        STUDY.cluster(k+len) = std_setcomps2cell(STUDY, k+len);
 
         %update parents clusters with cluster child indices
         % -------------------------------------------------
