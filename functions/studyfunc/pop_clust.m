@@ -230,9 +230,9 @@ if isempty(varargin) %GUI call
         end
            
        % Call menu to plot clusters (use EEGLAB menu which include std_envtopo)
-       eval( [ get(findobj(findobj('tag', 'EEGLAB'), 'Label', 'Edit/plot clusters'), 'callback') ] );
+       LASTCOM = command;
+       eval([ get(findobj(findobj('tag', 'EEGLAB'), 'Label', 'Edit/plot clusters'), 'callback') ] );
        %[STUDY com] = pop_clustedit(STUDY, ALLEEG); 
-       command = [ command LASTCOM ];
 	end
     
 else %command line call
