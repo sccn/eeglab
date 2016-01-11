@@ -153,6 +153,7 @@ for ind = 1:length(finalinds) % scan channels or components
         if strcmpi(dtype, 'erp'), opts = { 'timelimits', opt.timerange };
         else                      opts = { 'freqlimits', opt.freqrange };
         end;
+        opts = { opts{:} 'singletrials' opt.singletrials };
         
         % read the data and select channels
         % ---------------------------------
