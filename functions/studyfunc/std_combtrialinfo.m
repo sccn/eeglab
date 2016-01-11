@@ -10,10 +10,7 @@
 %                             datafiles
 %      inds                - Either subject name  or indices of subject
 %                            in datasetinfo structure.
-%
-% Optional inputs:
-%
-%
+%      trials              - All EEG dataset trial numbers
 %
 % Outputs:
 %    trialinfo  - Updated trialinfo structure
@@ -40,7 +37,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function trialinfo = std_combtrialinfo(datasetinfo, inds)
+function trialinfo = std_combtrialinfo(datasetinfo, inds, trials)
 
 if nargin < 1
     help std_combtrialinfo;
@@ -62,8 +59,13 @@ elseif ischar(inds)
     
 end
 
-trialinfo = [ datasetinfo(inds).trialinfo ];
-nvals     = [ 1 cumsum(cellfun(@length, { datasetinfo(inds).trialinfo }))+1 ];
+if ~isfield(datasetinfo, 'trialinfo')
+    trialinfo = struct([]);
+    nvals = [ 1 cumsum( [trials( [ datasetinfo(inds).index ]) ])+ 1 ];
+else
+    trialinfo = [ datasetinfo(inds).trialinfo ];
+    nvals     = [ 1 cumsum(cellfun(@length, { datasetinfo(inds).trialinfo }))+1 ];
+end;
 
 for iDat = 1:length(inds)
     [trialinfo(nvals(iDat):nvals(iDat+1)-1).condition] = deal( datasetinfo(inds(iDat)).condition );
