@@ -233,7 +233,7 @@ if ~isempty(opt.channels)
                 'subject', opt.subject, 'singletrials', stats.singletrials, 'design', opt.design, 'datatype', [dtype dsubtype]);
     else
         [STUDY erpdata alltimes] = std_readspec(STUDY, ALLEEG, 'channels', opt.channels(chaninds), 'freqrange', params.freqrange, ...
-            'rmsubjmean', params.subtractsubjectmean, 'subject', opt.subject, 'singletrials', stats.singletrials, 'design', opt.design, 'datatype', [dtype dsubtype]);
+            'rmsubjmean', params.subtractsubjectmean, 'subject', opt.subject, 'singletrials', stats.singletrials, 'design', opt.design);
     end;
     if strcmpi(params.averagechan, 'on') && length(chaninds) > 1
         for index = 1:length(erpdata(:))
@@ -327,13 +327,19 @@ else
         % remove NaNs and generate labels
         % -------------------------------
         erpdata2 = erpdata;
+        subjects       = { STUDY.datasetinfo(STUDY.cluster(opt.clusters(index)).sets(1,:)).subject };
         for iDat = 1:length(erpdata2)
-            keepInd = find(~isnan(erpdata2{iDat}(1,:)));
-            erpdata2{iDat} = erpdata2{iDat}(:,keepInd);
-            subjects       = { STUDY.datasetinfo(STUDY.cluster(opt.clusters(index)).sets(1,:)).subject };
-            comps          = STUDY.cluster(opt.clusters(index)).comps;
-            for iKeep = 1:length(keepInd)
-                sbtitles{iDat}{iKeep} = [ subjects{keepInd(iKeep)}  '/IC' num2str(comps(keepInd(iKeep))) ];
+            if all(cellfun(@(x)size(x,2), erpdata2(:)) == length(subjects))  % NOT single trial data
+                keepInd = find(~isnan(erpdata2{iDat}(1,:)));
+                erpdata2{iDat} = erpdata2{iDat}(:,keepInd);
+                tmpSubjects = subjects(keepInd)
+                comps       = STUDY.cluster(opt.clusters(index)).comps(keepInd);
+            else
+                tmpSubjects = subjects;
+                comps       = STUDY.cluster(opt.clusters(index)).comps;
+            end;
+            for iKeep = 1:length(tmpSubjects)
+                sbtitles{iDat}{iKeep} = [ tmpSubjects{iKeep}  '/IC' num2str(comps(iKeep)) ];
             end;
         end;
         sbtitles = reshape(sbtitles, size(erpdata2));
