@@ -264,11 +264,12 @@ for ind = 1:length(finalinds)
                         if isempty(dataSubject{ iSubj }{ iCell })
                             error(sprintf('Subject %s missing one experimental condition, remove subject and try again'));
                         end;
-                        tmpdat = callnewtimef(dataSubject{ iSubj }{ iCell }, xvals, yvals, ALLEEG(1).pnts, [ALLEEG(1).xmin ALLEEG(1).xmax]*1000, opt.datatype, opt.timerange, params);
+                        tmpdat = callnewtimef(dataSubject{ iSubj }{ iCell }, xvals, yvals, ALLEEG(1).pnts, [ALLEEG(1).xmin ALLEEG(1).xmax]*1000, opt.datatype, params);
+                        if ~isreal(tmpdat(1,1)), tmpdat = abs(tmpdat); end;
                         alldata{  iCell}(:,:,iSubj) = tmpdat;
                         
                         if ~isempty(events{iSubj}{iCell})
-                            allevents{iCell}(:,iSubj) = mean(events{ iSubj }{ iCell },2);
+                             allevents{iCell}(:,iSubj) = mean(events{ iSubj }{ iCell },2);
                         else allevents{iCell} = [];
                         end;
                     end;
@@ -278,20 +279,20 @@ for ind = 1:length(finalinds)
                 alldim = zeros(size(dataSubject{1}));
                 for iSubj = length(subjectList):-1:1
                     for iCell = 1:length(dataSubject{1}(:))
-                        alldim(iCell) = alldim(iCell)+size(dataSubject{ iSubj }{ iCell },2);
+                        alldim(iCell) = alldim(iCell)+size(dataSubject{ iSubj }{ iCell },3);
                     end;
                 end;
                 % initialize arrays
                 for iCell = 1:length(dataSubject{1}(:))
-                    alldata{  iCell} = zeros(size(dataSubject{ 1 }{ 1 },1), alldim(iCell));
+                    alldata{  iCell} = zeros(size(dataSubject{ 1 }{ 1 },1), size(dataSubject{ 1 }{ 1 },2), alldim(iCell));
                     allevents{iCell} = zeros(size(events{      1 }{ 1 },1), alldim(iCell));
                 end;
                 % populate arrays
                 allcounts = zeros(size(dataSubject{1}));
                 for iSubj = length(subjectList):-1:1
                     for iCell = 1:length(dataSubject{1}(:))
-                        cols = size(dataSubject{ iSubj }{ iCell },2);
-                        alldata{  iCell}(:,allcounts(iCell)+1:allcounts(iCell)+cols) = dataSubject{ iSubj }{ iCell };
+                        cols = size(dataSubject{ iSubj }{ iCell },3);
+                        alldata{  iCell}(:,:,allcounts(iCell)+1:allcounts(iCell)+cols) = dataSubject{ iSubj }{ iCell };
                         if ~isempty(events{iSubj}{iCell})
                             allevents{iCell}(:,allcounts(iCell)+1:allcounts(iCell)+cols) = events{ iSubj }{ iCell };
                         else allevents{iCell} = [];
@@ -309,171 +310,7 @@ for ind = 1:length(finalinds)
             newstruct(ind).([ dtype 'freqs' ])  = yvals;
             newstruct(ind).([ dtype 'params' ]) = params;
             STUDY.cache = eeg_cache(STUDY.cache, hashcode, newstruct(ind));
-        
-%            alldata   = reshape(alldata  , size(dataSubject{1}));
-%            allevents = reshape(allevents, size(events{1}));
-        
-%             % read the data and select channels
-%             % ---------------------------------
-%             fprintf('Reading all %s data:', upper(dtype));
-%             setinfo = STUDY.design(opt.design).cell;
-%             if strcmpi(opt.singletrials, 'on')
-%                 for c = 1:nc
-%                     for g = 1:ng
-%                         if ~isempty(opt.channels)
-%                             allsubjects = { STUDY.design(opt.design).cell.case };
-%                             if ~isempty(opt.subject), inds = strmatch( opt.subject, allsubjects(setinds{c,g}));
-%                             else inds = 1:length(allinds{c,g}); end;
-%                         else
-%                             if ~isempty(opt.component) inds = find( allinds{c,g} == STUDY.cluster(finalinds(ind)).comps(opt.component));
-%                             else inds = 1:length(allinds{c,g}); end;
-%                         end;
-%                         if ~isempty(inds)
-%                             count{c, g} = 1;
-%                             for indtmp = 1:length(inds)
-%                                 setindtmp = STUDY.design(opt.design).cell(setinds{c,g}(inds(indtmp)));
-%                                 tmpopts = { 'measure', 'timef' 'timelimits', opt.timerange, 'freqlimits', opt.freqrange };
-%                                 if ~isempty(opt.channels), [ tmpersp tmpparams alltimes allfreqs] = std_readfile(setindtmp, 'channels', allChangrp(allinds{c,g}(inds(indtmp))), tmpopts{:});
-%                                 else                       [ tmpersp tmpparams alltimes allfreqs] = std_readfile(setindtmp, 'components',          allinds{c,g}(inds(indtmp)),  tmpopts{:});
-%                                 end;
-%                                 indices = [count{c, g}:count{c, g}+size(tmpersp,3)-1];
-%                                 if indtmp == 1
-%                                     ersp{c, g} = permute(tmpersp, [2 1 3]);
-%                                 else ersp{c, g}(:,:,indices) = permute(tmpersp, [2 1 3]);
-%                                 end;
-%                                 erspinds{c, g}(1:2,indtmp) = [ count{c, g} count{c, g}+size(tmpersp,3)-1 ];
-%                                 count{c, g} = count{c, g}+size(tmpersp,3);
-%                                 if size(tmpersp,3) ~= sum(cellfun(@length, setindtmp.trials))
-%                                     error( sprintf('Wrong number of trials in datafile for design index %d\n', setinds{c,g}(inds(indtmp))));
-%                                 end;
-%                             end;
-%                         end;
-%                     end;
-%                 end;
-%             else
-%                 for c = 1:nc
-%                     for g = 1:ng
-%                         if ~isempty(setinds{c,g})
-%                             if ~isempty(opt.channels), opts = { 'channels',  allChangrp(allinds{c,g}(:)), 'timelimits', opt.timerange, 'freqlimits', opt.freqrange };
-%                             else                       opts = { 'components',           allinds{c,g}(:) , 'timelimits', opt.timerange, 'freqlimits', opt.freqrange };
-%                             end;
-%                             if strcmpi(dtype, 'ersp')
-%                                  erspbase{c, g}                             = std_readfile( setinfo(setinds{c,g}(:)), 'measure', 'erspbase', opts{:});
-%                                  [ ersp{c, g} tmpparams alltimes allfreqs ] = std_readfile( setinfo(setinds{c,g}(:)), 'measure', 'ersp'    , opts{:});
-%                             else [ ersp{c, g} tmpparams alltimes allfreqs ] = std_readfile( setinfo(setinds{c,g}(:)), 'measure', 'itc'     , opts{:});
-%                                  ersp{c, g} = abs(ersp{c, g});
-%                             end;
-%                             fprintf('.');
-%                             %ersp{c, g}      = permute(ersp{c, g}           , [3 2 1]);
-%                             %erspbase{c, g}  = 10*log(permute(erspbase{c, g}, [3 2 1]));
-%                         end;
-%                     end;
-%                 end;
-%             end;
-%             fprintf('\n');
-%             
-%             % compute ERSP or ITC if trial mode
-%             % (since only the timef have been loaded)
-%             % ---------------------------------------
-%             if strcmpi(opt.singletrials, 'on')
-%                 tmpparams2      = fieldnames(tmpparams); tmpparams2 = tmpparams2';
-%                 tmpparams2(2,:) = struct2cell(tmpparams);
-%                 precomp.times = alltimes;
-%                 precomp.freqs = allfreqs;
-%                 precomp.recompute = dtype;
-%                 for c = 1:nc
-%                     for g = 1:ng
-%                         if ~isempty(ersp{c,g})
-%                             precomp.tfdata = permute(ersp{c,g}, [2 1 3]);
-%                             if strcmpi(dtype, 'itc')
-%                                 [tmp ersp{c,g}] = newtimef(zeros(ALLEEG(1).pnts,2), ALLEEG(1).pnts, [ALLEEG(1).xmin ALLEEG(1).xmax]*1000, ...
-%                                     ALLEEG(1).srate, [], tmpparams2{:}, 'precomputed', precomp, 'verbose', 'off');
-%                             elseif strcmpi(dtype, 'ersp')
-%                                 [ersp{c,g} tmp] = newtimef(zeros(ALLEEG(1).pnts,2), ALLEEG(1).pnts, [ALLEEG(1).xmin ALLEEG(1).xmax]*1000, ...
-%                                     ALLEEG(1).srate, [], tmpparams2{:}, 'precomputed', precomp, 'verbose', 'off');
-%                             end;
-%                             ersp{c,g} = permute(ersp{c,g}, [2 1 3]);
-%                         end;
-%                     end;
-%                 end;
-%             end;
-%             
-%             % compute average baseline across groups and conditions
-%             % -----------------------------------------------------
-%             if strcmpi(opt.subbaseline, 'on') && strcmpi(dtype, 'ersp')
-%                 if strcmpi(opt.singletrials, 'on')
-%                     disp('WARNING: no ERSP baseline may not be subtracted when using single trials');
-%                 else
-%                     disp('Recomputing baseline...');
-%                     if strcmpi(paired1, 'on') && strcmpi(paired2, 'on')
-%                         disp('Removing ERSP baseline for both indep. variables');
-%                         meanpowbase = computeerspbaseline(erspbase(:), opt.singletrials);
-%                         ersp        = removeerspbaseline(ersp, erspbase, meanpowbase);
-%                     elseif strcmpi(paired1, 'on')
-%                         disp('Removing ERSP baseline for first indep. variables (second indep. var. is unpaired)');
-%                         for g = 1:ng        % ng = number of groups
-%                             meanpowbase = computeerspbaseline(erspbase(:,g), opt.singletrials);
-%                             ersp(:,g)   = removeerspbaseline(ersp(:,g), erspbase(:,g), meanpowbase);
-%                         end;
-%                     elseif strcmpi(paired2, 'on')
-%                         disp('Removing ERSP baseline for second indep. variables (first indep. var. is unpaired)');
-%                         for c = 1:nc        % ng = number of groups
-%                             meanpowbase = computeerspbaseline(erspbase(c,:), opt.singletrials);
-%                             ersp(c,:)   = removeerspbaseline(ersp(c,:), erspbase(c,:), meanpowbase);
-%                         end;
-%                     else
-%                         disp('Not removing ERSP baseline (both indep. variables are unpaired');
-%                     end;
-%                 end;
-%             end;
-%         end;
-%         
-% %         if strcmpi(opt.statmode, 'common')
-% %             % collapse the two last dimensions before computing significance
-% %             % i.e. 18 subject with 4 channels -> same as 4*18 subjects
-% %             % --------------------------------------------------------------
-% %             disp('Using all channels for statistics...');
-% %             for c = 1:nc
-% %                 for g = 1:ng
-% %                     ersp{c,g} = reshape( ersp{c,g}, size(ersp{c,g},1), size(ersp{c,g},2), size(ersp{c,g},3)*size(ersp{c,g},4));
-% %                 end;
-% %             end;
-% %         end;
-% 
-%         % copy data to structure
-%         % ----------------------
-%         if ~isempty(events)
-%             tmpstruct = setfield(tmpstruct, [ dtype 'events' ], events);
-%         end;
-%         tmpstruct = setfield(tmpstruct, [ dtype ordinate ], allfreqs);
-%         tmpstruct = setfield(tmpstruct, [ dtype 'times'  ], alltimes);
-%         if strcmpi(opt.singletrials, 'on')
-%             tmpstruct = setfield(tmpstruct, [ dtype 'datatrials' ], ersp);
-%             tmpstruct = setfield(tmpstruct, [ dtype 'subjinds' ], erspinds);
-%             tmpstruct = setfield(tmpstruct, [ dtype 'times' ], alltimes);
-%             if ~isempty(opt.channels)
-%                  tmpstruct = setfield(tmpstruct, [ dtype 'trialinfo' ], opt.subject);
-%             else tmpstruct = setfield(tmpstruct, [ dtype 'trialinfo' ], opt.component);
-%             end;
-%         else
-%             tmpstruct = setfield(tmpstruct, [ dtype 'data' ], ersp);
-%             if strcmpi(dtype, 'ersp')
-%                 tmpstruct = setfield(tmpstruct, [ dtype 'base' ], erspbase);
-%             end;
-%         end;
-%         
-%         % copy results to structure
-%         % -------------------------
-%         fields = { [ dtype 'data'     ] [ dtype 'events' ] [ dtype ordinate ] [ dtype 'datatrials' ] ...
-%                    [ dtype 'subjinds' ] [ dtype 'base'   ] [ dtype 'times'  ] [ dtype 'trialinfo'  ]  'allinds' 'setinds' };
-%         for f = 1:length(fields)
-%             if isfield(tmpstruct, fields{f}),
-%                 tmpdata = getfield(tmpstruct, fields{f});
-%                 if ~isempty(opt.channels)
-%                      STUDY.changrp = setfield(STUDY.changrp, { finalinds(ind) }, fields{f}, tmpdata);
-%                 else STUDY.cluster = setfield(STUDY.cluster, { finalinds(ind) }, fields{f}, tmpdata);
-%                 end;
-%             end;
+
          end;
     end;
 end;
@@ -530,55 +367,6 @@ else
     erspdata = newstruct(1).([ dtype 'data' ]);
 end;
 
-% 
-% if ~isempty(opt.channels)
-%     structdat = STUDY.changrp;
-%     erspdata  = cell(nc, ng);
-%     events    = {};
-%     for ind =  1:length(erspdata(:))
-%         if strcmpi(opt.singletrials, 'on')
-%              tmpdat = getfield(structdat(allinds(1)), [ dtype 'datatrials' ]);
-%         else tmpdat = getfield(structdat(allinds(1)), [ dtype 'data' ]);
-%         end;
-%         if ndims(tmpdat{ind}) == 2, erspdata{ind} = zeros([ size(tmpdat{ind}) 1 length(allinds)]);
-%         else                        erspdata{ind} = zeros([ size(tmpdat{ind}) length(allinds)]);
-%         end;
-%         for index = 1:length(allinds)
-%             if strcmpi(opt.singletrials, 'on')
-%                  tmpdat = getfield(structdat(allinds(index)), [ dtype 'datatrials' ]);
-%             else tmpdat = getfield(structdat(allinds(index)), [ dtype 'data' ]);
-%             end;
-%             erspdata{ind}(:,:,:,index) = tmpdat{ind};
-%             allfreqs = getfield(structdat(allinds(index)), [ dtype ordinate ]);
-%             alltimes = getfield(structdat(allinds(index)), [ dtype 'times'  ]);
-%             if isfield(structdat, [ dtype 'events' ])
-%                 events   = getfield(structdat(allinds(index)), [ dtype 'events' ]);
-%             end;
-%             compinds = structdat(allinds(index)).allinds;
-%             setinds  = structdat(allinds(index)).setinds;
-%         end;
-%         erspdata{ind} = permute(erspdata{ind}, [1 2 4 3]); % time freqs elec subjects
-%     end;
-%     if ~isempty(opt.subject) && strcmpi(opt.singletrials,'off')
-%         erspdata = std_selsubject(erspdata, opt.subject, setinds, { STUDY.design(opt.design).cell.case }, 2); 
-%     end;
-% else
-%     if strcmpi(opt.singletrials, 'on')
-%          erspdata = getfield(STUDY.cluster(allinds(1)), [ dtype 'datatrials' ]);
-%     else erspdata = getfield(STUDY.cluster(allinds(1)), [ dtype 'data' ]);
-%     end;
-%     allfreqs = getfield(STUDY.cluster(allinds(1)), [ dtype ordinate ]);
-%     alltimes = getfield(STUDY.cluster(allinds(1)), [ dtype 'times'  ]);
-%     if isfield(STUDY.cluster, [ dtype 'events' ])
-%         events   = getfield(STUDY.cluster(allinds(1)), [ dtype 'events' ]);
-%     end;
-%     compinds = STUDY.cluster(allinds(1)).allinds;
-%     setinds  = STUDY.cluster(allinds(1)).setinds;
-%     if ~isempty(opt.component) && length(allinds) == 1 && strcmpi(opt.singletrials,'off')
-%         erspdata = std_selcomp(STUDY, erspdata, allinds, setinds, compinds, opt.component);
-%     end;
-% end;
-
 % compute ERSP baseline
 % ---------------------
 function meanpowbase = computeerspbaseline(erspbase, singletrials)
@@ -628,9 +416,9 @@ function ersp = removeerspbaseline(ersp, erspbase, meanpowbase)
         end;
     end;
 
-% call newtimef
+% call newtimef (duplicate function in std_erspplot)
 % --------------
-function [dataout tmpParams] = callnewtimef(dataSubject, xvals, yvals, pnts, tlimits, datatype, timerange, params);
+function [dataout tmpParams] = callnewtimef(dataSubject, xvals, yvals, pnts, tlimits, datatype, params);
 
     precomputed.tfdata = dataSubject;
     precomputed.times = xvals;
@@ -646,5 +434,5 @@ function [dataout tmpParams] = callnewtimef(dataSubject, xvals, yvals, pnts, tli
     if strcmpi(datatype, 'ersp')
         dataout = newtimef([],pnts,tlimits, srate, cycles, 'precomputed', precomputed, 'verbose', 'off', tmpParams{:});
     else
-        [tmp dataout] = newtimef([],pnts,tlimits, srate, cycles, 'verbose', 'off', params);
+        [tmp dataout] = newtimef([],pnts,tlimits, srate, cycles, 'precomputed', precomputed, 'verbose', 'off', tmpParams{:});
     end;
