@@ -163,7 +163,7 @@ if any(strncmp('events', fileFields, 100)), events        = fileData.events; end
 
 % if the function is only called to get parameters
 % ------------------------------------------------
-if strcmpi(opt.measure, 'spec'), measureRange1 = measureRange2; end;
+if strcmpi(opt.measure, 'spec'), measureRange1 = measureRange2; opt.timelimits = opt.freqlimits; end;
 if ~isempty(opt.timelimits)
     [measureRange1 indBegin1 indEnd1 ] = indicesselect(measureRange1, opt.timelimits);
 else
@@ -175,7 +175,8 @@ if ~isempty(opt.freqlimits)
 else
     indBegin2 = 1;
     indEnd2   = length(measureRange2);
-end;
+end;    
+
 if strcmpi(opt.getparamonly, 'on'),
     return;
 end;
