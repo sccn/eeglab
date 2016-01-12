@@ -140,6 +140,7 @@ end
 
 % Cleaning old files from the current design (Cleaning ALL)
 % -------------------------------------------------------------------------
+% NOTE: Clean up the .lock files to (to be implemented)
 if strcmp(opt.erase,'on')
     [tmp,filename] = fileparts(STUDY.filename);
     
@@ -154,21 +155,24 @@ if strcmp(opt.erase,'on')
         end
     end
     
+   
+    
     % Cleaning level 2 folders
-    if isfield(STUDY.design(design_index),'limo')
+    if isfield(STUDY.design(design_index),'limo') && isfield(STUDY.design(design_index).limo,'groupmodel')
         for nlimos = 1:length(STUDY.design(design_index).limo)
-            for ncontrast = 1:size(STUDY.design(design_index).limo(nlimos).l2files,1)
-                path2file = fileparts(STUDY.design(design_index).limo(nlimos).l2files{ncontrast,2});
-                try
-                    rmdir(path2file,'s');
-                catch
-                    fprintf(2,['Fail to remove. Folder ' path2file ' does not exist or has been removed\n']);
-                end
+            for ngroupmodel = 1:size(STUDY.design(design_index).limo(nlimos).groupmodel,2)
+                    path2file = fileparts(STUDY.design(design_index).limo(nlimos).groupmodel(ngroupmodel).filename);
+                    try
+                        rmdir(path2file,'s');
+                    catch
+                        fprintf(2,['Fail to remove. Folder ' path2file ' does not exist or has been removed\n']);
+                    end
             end
+            
         end
     end
     
-    % Cleaning files related with design
+    % Cleaning files related with design (innecesary??)
     tmpfiles = dir([STUDY.filepath filesep 'LIMO_' filename]);
     tmpfiles = {tmpfiles.name};
     
@@ -177,7 +181,12 @@ if strcmp(opt.erase,'on')
     if ~isempty(indxtmp)
         for nfile = 1:length(indxtmp)
             try
-            delete([STUDY.filepath filesep 'LIMO_' filename filesep tmpfiles{indxtmp(nfile)}]);
+                file2delete = [STUDY.filepath filesep 'LIMO_' filename filesep tmpfiles{indxtmp(nfile)}];
+                if isdir(file2delete)
+                    rmdir(file2delete,'s');
+                else
+                    delete(file2delete);
+                end
             catch
                 fprintf(2,['Fail to remove. File ' tmpfiles{indxtmp(nfile)} ' does not exist or has been removed\n']);
             end
@@ -468,25 +477,39 @@ rmfield(STUDY,'names');
 % 'off' (IF EXIST BEFORE)
 if strcmp(opt.erase,'off')
     if isfield(STUDY.design(STUDY.currentdesign),'limo') && length(STUDY.design(STUDY.currentdesign).limo) >= stdlimo_indx
-        for ncontrast = 1:size(STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).l2files,1)
-            path2file = fileparts(STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).l2files{ncontrast,2});
-            try
-                rmdir(path2file,'s');
-            catch
-                fprintf(2,['Fail to remove. Folder' path2file ' does not exist or has been removed\n']);
-            end
-        end
+        STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).model = [];
+        STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).groupmodel = [];
     end
 end
 
 % Assigning info to STUDY
 % -------------------------------------------------------------------------
-STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).datatype   = Analysis;
-STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).foldername = limofolders';
-STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).chanloc    = LIMO_files.expected_chanlocs;
-STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).beta       = LIMO_files.Beta;
-STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).file       = LIMO_files.mat;
-STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).l2files    = [];
+STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).datatype = Analysis;
+STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).chanloc  = LIMO_files.expected_chanlocs;
+
+for i =1:size(LIMO_files.mat,1)
+    STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).basefolder_level1{i}  = fileparts(LIMO_files.mat{i});
+    tmp = dir(fileparts(LIMO_files.mat{i}));
+    if ~isempty({tmp.name})
+        outputfiles = {tmp.name}';
+        
+        % Cleaning out the list
+        %----------------------
+        cleanoutlist = {'Betas.mat','LIMO.mat','Yr.mat','Yhat.mat','Res.mat','.','..'};
+        for j = 1:length(cleanoutlist)
+            ind2delete{j} = find(strcmp(outputfiles,cleanoutlist{j}));
+        end
+        nonemptyvals              = find(cellfun(@(x) ~isempty(x), ind2delete));
+        ind2delete                = [ind2delete{nonemptyvals}];
+        outputfiles(ind2delete) = []; 
+        clear ind2delete;
+    end
+    for nfiles = 1:size(outputfiles,1)
+        STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).model(i).filename{nfiles,1}  = fullfile(fileparts(LIMO_files.mat{i}),outputfiles{nfiles}); 
+        [trash,tmp] = fileparts(outputfiles{nfiles});
+        STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).model(i).guiname{nfiles,1} = tmp;
+    end
+end
 
 cd(STUDY.filepath);
 
@@ -511,7 +534,7 @@ filesout = limo_random_select(1,LIMO_files.expected_chanlocs,'nboot'         ,nb
                                                             ,'tfce'          ,tfceval...
                                                             ,'analysis_type' ,'fullchan'...
                                                             ,'parameters'    ,{[1:nparams]}...
-                                                            ,'limofiles'     ,{STUDY.design.limo.beta}...;
+                                                            ,'limofiles'     ,{LIMO_files.Beta}...;
                                                             ,'folderprefix'  ,foldername...
                                                             ,'folderpath'    ,LIMO_files.LIMO);
 testype    = cell([length(filesout),1]);
@@ -522,8 +545,8 @@ end
 
 % 2- Computing Paired ttest for each combination of parameters
 ncomb        = combnk(1:nparams,2);
-limofiles{1} = STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).beta;  
-limofiles{2} = STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).beta; 
+limofiles{1} = LIMO_files.Beta;  
+limofiles{2} = LIMO_files.Beta; 
 
 for i = 1:size(ncomb,1)
     tmpname          = [foldername 'par_' num2str(ncomb(i,1)) '_' num2str(ncomb(i,2))];
@@ -539,7 +562,12 @@ for i = 1:size(ncomb,1)
     testname{end+1,1}   = [testype{end} '_parameter_' num2str(ncomb(i,1)) '-' num2str(ncomb(i,2))];
 end
 % Assigning Level 2 info to STUDY
-STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).l2files = [testype testname filesout' ];
+% STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).l2files = [testype testname filesout' ];
+
+ for i = 1:size(filesout,2)
+     STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).groupmodel(i).filename = filesout{1,i};
+     STUDY.design(STUDY.currentdesign).limo(stdlimo_indx).groupmodel(i).guiname  = testname{i,1};
+ end
 
 % Saving STUDY
 STUDY = pop_savestudy( STUDY, [],'filepath', STUDY.filepath,'savemode','resave');
