@@ -235,13 +235,13 @@ function [ STUDY, ALLEEG ] = std_preclust(STUDY, ALLEEG, cluster_ind, varargin)
             % select ica component ERPs
             % -------------------------
             case 'erp',
-                [STUDY data] = std_readerp( STUDY, ALLEEG, 'design', NaN, 'clusters', cluster_ind, 'timerange', timewindow, 'measure', 'erp', 'componentpol', 'off');
+                [STUDY data] = std_readerp( STUDY, ALLEEG, 'design', NaN, 'clusters', cluster_ind, 'timerange', timewindow, 'datatype', 'erp', 'componentpol', 'off');
                 data = data{1}';
                 
             % select ica component spectrum
             % -----------------------------
             case 'spec',
-                [STUDY data] = std_readerp( STUDY, ALLEEG, 'design', NaN, 'clusters', cluster_ind, 'freqrange', freqrange, 'measure', 'spec', 'componentpol', 'off');
+                [STUDY data] = std_readerp( STUDY, ALLEEG, 'design', NaN, 'clusters', cluster_ind, 'freqrange', freqrange, 'datatype', 'spec', 'componentpol', 'off');
                 data = data{1}';
                 
             % select ica scalp maps
