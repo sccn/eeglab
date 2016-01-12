@@ -319,6 +319,7 @@ for k = 1:length(g.indices)  % for each (specified) component
 
     all_trials = setfield( all_trials, [ prefix int2str(g.indices(k)) ], single( alltfX ));
 end
+X = logersp;
 
 % Save ERSP into file
 % -------------------
