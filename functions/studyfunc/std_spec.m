@@ -234,29 +234,49 @@ end;
 % extract epochs if necessary
 % ---------------------------
 if ~strcmpi(g.specmode, 'psd')
-    if EEG(1).trials == 1 || strcmpi(g.continuous, 'on')
-        TMP = EEG(1);
-        TMP.data = X;
-        TMP.icaweights = [];
-        TMP.icasphere  = [];
-        TMP.icawinv    = [];
-        TMP.icaact     = [];
-        TMP.icachansind = [];
-        TMP.trials = size(TMP.data,3);
-        TMP.pnts   = size(TMP.data,2);
-        TMP.event  = [];
-        TMP.epoch  = [];
-        for index = 1:length(boundaries)
-            TMP.event(index).type = 'boundary';
-            TMP.event(index).latency = boundaries(index);
+    if all([ EEG.trials] == 1) || strcmpi(g.continuous, 'on')
+        epochCount  = 1;
+        sampleCount = 1;
+        for iEEG = 1:length(EEG)
+            TMP = EEG(1);
+            TMP.data = X;
+            TMP.icaweights = [];
+            TMP.icasphere  = [];
+            TMP.icawinv    = [];
+            TMP.icaact     = [];
+            TMP.icachansind = [];
+            TMP.trials = size(TMP.data,3);
+            TMP.pnts   = size(TMP.data,2);
+            TMP.event  = [];
+            TMP.epoch  = [];
+            for index = 1:length(boundaries)
+                TMP.event(index).type = 'boundary';
+                TMP.event(index).latency = boundaries(index);
+            end;
+            TMP = eeg_checkset(TMP);
+            if TMP.trials > 1
+                % epoch data - need to re-extract data
+                TMP = pop_select(TMP, 'trials', [epochCount:(epochCount+EEG(iEEG).trials-1)]);
+                epochCount = epochCount+EEG(iEEG).trials;
+                TMP = eeg_epoch2continuous(TMP);
+            else
+                % continuous data - need to re-extract data
+                TMP = pop_select(TMP, 'point', [sampleCount:(sampleCount+EEG(iEEG).pnts-1)]);
+                sampleCount = sampleCount+EEG(iEEG).pnts;
+            end;
+            TMP = eeg_regepochs(TMP, g.epochrecur, g.epochlim);
+            disp('Warning: continuous data, extracting 1-second epochs'); 
+            if iEEG == 1, 
+                XX = TMP.data;
+                newTrialInfo = g.trialinfo(iEEG);
+                newTrialInfo(1:size(TMP.data,3)) = g.trialinfo(iEEG);
+            else
+                XX(:,:,end+1:end+size(TMP.data,3)) = TMP.data;
+                newTrialInfo(end+1:end+size(TMP.data,3)) = g.trialinfo(iEEG);
+            end;
         end;
-        TMP = eeg_checkset(TMP);
-        if TMP.trials > 1
-            TMP = eeg_epoch2continuous(TMP);
-        end;
-        TMP = eeg_regepochs(TMP, g.epochrecur, g.epochlim);
-        disp('Warning: continuous data, extracting 1-second epochs'); 
-        X = TMP.data;
+        g.trialinfo = newTrialInfo;
+        X = XX;
     end;
 end;
 
