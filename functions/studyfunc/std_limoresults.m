@@ -48,7 +48,7 @@ if nargin < 1
 end;
 measure_list = {'daterp', 'datspec', 'icaerp', 'icaspec'};
 opt = finputcheck(varargin, { 'plottype'       'integer'   [1 2 3]              []     ;
-                              'flagdata'       'integer'   [1,0]                ''     ; % data 1, otherwise 2
+                              'flagdata'       'integer'   [1,0]                ''     ;
                               'measure'        'string'    measure_list         ''     ;
                               'subjindx'       'integer'   []                   []      ;
                               'level'          'integer'   [1 2]                []      ;
@@ -87,6 +87,8 @@ elseif opt.level == 1
         PathName = fileparts(STUDY.design(STUDY.currentdesign).limo(limostruct_indx).model(opt.subjindx).filename{1});
         FileName                = ''; 
     else
+        if opt.plottype == 3, opt.testindx = 1; end
+            
         [PathName,  tmp1, tmp2] = fileparts(STUDY.design(STUDY.currentdesign).limo(limostruct_indx).model(opt.subjindx).filename{opt.testindx});
         FileName                = [tmp1 tmp2]; clear tmp1 tmp2;
     end
