@@ -309,7 +309,7 @@ function [ STUDY, ALLEEG customRes ] = std_precomp(STUDY, ALLEEG, chanlist, vara
             inds = strmatch( uniqueSubjects{iSubj}, allSubjects, 'exact');
             filepath = STUDY.datasetinfo(inds(1)).filepath;
             filebase = fullfile(filepath, uniqueSubjects{iSubj});
-            trialinfo = std_combtrialinfo(STUDY.datasetinfo, inds);
+            trialinfo = std_combtrialinfo(STUDY.datasetinfo, inds, [ALLEEG.trials]);
 
             addopts = { 'savetrials', g.savetrials, 'recompute', g.recompute, 'fileout', filebase, 'trialinfo', trialinfo };
             if strcmpi(computewhat, 'channels')
