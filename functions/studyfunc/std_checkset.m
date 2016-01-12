@@ -215,11 +215,15 @@ if ~studywasempty
         % between dash to cell array of strings
         % -------------------------------------
         for inddes = 1:length(STUDY.design)
+            rmVar = [];
             for indvar = 1:length(STUDY.design(inddes).variable)
                 
                 % add pairing info in case it is missing
+                if isempty(STUDY.design(inddes).variable(indvar).label)
+                    rmVar = [ rmVar indvar ];
+                end;
                 if ~isfield(STUDY.design(inddes).variable, 'pairing') || isempty(STUDY.design(inddes).variable(indvar).pairing)
-                    if strcmpi(STUDY.design(inddes).variable(1).label, 'group')
+                    if strcmpi(STUDY.design(inddes).variable(indvar).label, 'group')
                         STUDY.design(inddes).variable(indvar).pairing = 'off';
                     else
                         STUDY.design(inddes).variable(indvar).pairing = 'on';
@@ -230,6 +234,7 @@ if ~studywasempty
                     STUDY.design(inddes).variable(indvar).value{indval} = convertindvarval(STUDY.design(inddes).variable(indvar).value{indval});
                 end;
             end;
+            STUDY.design(inddes).variable(rmVar) = [];
             for indinclude = 1:length(STUDY.design(inddes).include)
                 if iscell(STUDY.design(inddes).include{indinclude})
                     for indval = 1:length(STUDY.design(inddes).include{indinclude})
