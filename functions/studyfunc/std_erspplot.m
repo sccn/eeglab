@@ -276,22 +276,29 @@ if ~isempty(opt.channels)
                                           'chanlocs', locs, 'threshold', alpha, 'titles', alltitles);
         else
             if length(opt.channels) > 1 & ~strcmpi(opt.plotmode, 'none'), figure; opt.plotmode = 'condensed'; end;
+            if length(locs) == 1 && size(allersp{1},3) > 1
+                % channels should be in 3rd dim; reshape data to put subjects in the 4th dim if number of channels is 1 
+                for index = 1:length(allersp(:))
+                    allersp{index} = reshape(allersp{index}, size(allersp{index},1), size(allersp{index},2), 1, size(allersp{index},3));
+                end;
+            end;
+            
             nc = ceil(sqrt(length(opt.channels)));
             nr = ceil(length(opt.channels)/nc);
-            for index = length(locs)
+            for index = 1:length(locs)
                 if length(opt.channels) > 1, try, subplot(nr,nc,index, 'align'); catch, subplot(nr,nc,index); end; end;
                 tmpersp = cell(size(allersp));
                 for ind = 1:length(allersp(:))
                     if ~isempty(allersp{ind})
-                        tmpersp{ind} = squeeze(allersp{ind}(:,:,index,:)); 
+                        tmpersp{ind} = squeeze(allersp{ind}(:,:,index,:));
                     end;
                 end;
                 alltitles = std_figtitle('threshold', alpha, 'mcorrect', mcorrect, 'condstat', stats.condstats, 'cond2stat', stats.groupstats, ...
-                                         'statistics', method, 'condnames', allconditions, 'cond2names', allgroups, 'chanlabels', { locs(index).labels }, ...
-                                         'subject', opt.subject, 'datatype', upper(opt.datatype), 'plotmode', opt.plotmode);
+                    'statistics', method, 'condnames', allconditions, 'cond2names', allgroups, 'chanlabels', { locs(index).labels }, ...
+                    'subject', opt.subject, 'datatype', upper(opt.datatype), 'plotmode', opt.plotmode);
                 std_plottf(alltimes, allfreqs, tmpersp, 'datatype', opt.datatype, 'titles', alltitles, ...
-                                           'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, 'plotmode', ...
-                                           opt.plotmode, 'unitcolor', unitPower, 'chanlocs', ALLEEG(1).chanlocs, 'events', events, plottfopt{:});
+                    'groupstats', pgroup, 'condstats', pcond, 'interstats', pinter, 'plotmode', ...
+                    opt.plotmode, 'unitcolor', unitPower, 'chanlocs', ALLEEG(1).chanlocs, 'events', events, plottfopt{:});
             end;
         end;
     end;
